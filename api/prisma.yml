@@ -1,0 +1,11 @@
+endpoint: http://localhost:4466
+datamodel: datamodel.prisma
+secret: '123'
+
+generate:
+  #  Generate the client to use for the API
+  - generator: typescript-client
+    output: ./generated/prisma-client/
+  # Generate the same but as *.graphql file to extend in our custom schema.graphql
+  - generator: graphql-schema
+    output: ./generated/prisma.graphql
