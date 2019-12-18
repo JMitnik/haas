@@ -1,5 +1,6 @@
-# import * from './generated/prisma.graphql'
+# import * from './src/generated/prisma.graphql'
 
 type Query {
-    users: [User]!
+    questions: [Question!]
+    topics: [Topic!]
 }

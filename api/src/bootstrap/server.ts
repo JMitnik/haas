@@ -1,13 +1,7 @@
 import { GraphQLServer, Options } from 'graphql-yoga';
-import { Prisma, forwardTo } from 'prisma-binding';
+import { Prisma } from 'prisma-binding';
 import config from './config';
-import { prisma } from '../../generated/prisma-client'
-
-const resolvers = {
-    Query: {
-        users: forwardTo('db')
-    }
-};
+import resolvers from '../resolvers';
 
 const server: GraphQLServer = new GraphQLServer({
     typeDefs: 'schema.graphql',
@@ -16,15 +10,15 @@ const server: GraphQLServer = new GraphQLServer({
         ...req,
         db: new Prisma({
             typeDefs: 'generated/prisma.graphql',
-            endpoint: 'http://localhost:4466',
-            secret: '123',
+            endpoint: `${config.PRISMA_ENDPOINT}`,
+            secret: `${config.APP_SECRET}`,
         })
     })
 });
 
 const serverOptions: Options = {
     port: config.APP_PORT,
-    endpoint: config.END_POINT,
+    endpoint: config.ENDPOINT,
 };
 
 export const startServer = () => {
