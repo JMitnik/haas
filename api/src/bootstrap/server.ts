@@ -21,10 +21,8 @@ const serverOptions: Options = {
     endpoint: config.ENDPOINT,
 };
 
-export const startServer = () => {
+export const startServer: any = () => {
     server.start(serverOptions, ({ port }) => {
         console.log(`Starting server on port ${port}`);
-    });
+    }).then();
 };
-
-export default server;
