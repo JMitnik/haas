@@ -3,13 +3,16 @@ datamodel:
   - src/models/question/question.prisma
   - src/models/topic/topic.prisma
 
+# Secret to the database
+secret: ${env:APP_SECRET}
 
-secret: '123'
 generate:
   #  Generate the client to use for the API
   - generator: typescript-client
     output: ./src/generated/prisma-client/
+
   # Generate the same but as *.graphql file to extend in our custom schema.graphql
   - generator: graphql-schema
     output: ./src/generated/prisma.graphql
-endpoint: http://localhost:4466
+
+endpoint: ${env:PRISMA_ENDPOINT}

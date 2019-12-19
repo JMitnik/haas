@@ -269,4 +269,4 @@ input TopicWhereInput {
 input TopicWhereUniqueInput {
   id: ID
 }
-`;
+`

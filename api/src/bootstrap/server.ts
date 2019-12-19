@@ -4,12 +4,12 @@ import config from './config';
 import resolvers from '../resolvers';
 
 const server: GraphQLServer = new GraphQLServer({
-    typeDefs: 'schema.graphql',
+    typeDefs: `${config.PATH_TO_APP_SCHEMA}`,
     resolvers,
     context: req => ({
         ...req,
         db: new Prisma({
-            typeDefs: 'generated/prisma.graphql',
+            typeDefs: `${config.PATH_TO_PRISMA_GENERATED_SCHEMA}`,
             endpoint: `${config.PRISMA_ENDPOINT}`,
             secret: `${config.APP_SECRET}`,
         })
