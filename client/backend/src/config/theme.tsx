@@ -1,10 +1,17 @@
 const theme = {
     colors: {
-        primary: 'red',
-        secondary: 'blue',
+        primary: '#3847B2',
+        secondary: '#38E6FA',
         tertiary: 'green',
-        black: '',
+        black: 'black',
         white: '',
+    },
+    textColors: {
+        black: '#242B50',
+    },
+    defaultColors: {
+        normal: '#F5F6F8',
+        alt: '#EBEEFF',
     },
     gutter: 24,
     // TODO: Add font
