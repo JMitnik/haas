@@ -24,6 +24,7 @@ type Mutation {
   deleteManyQuestions(where: QuestionWhereInput): BatchPayload!
   createTopic(data: TopicCreateInput!): Topic!
   updateTopic(data: TopicUpdateInput!, where: TopicWhereUniqueInput!): Topic
+  updateManyTopics(data: TopicUpdateManyMutationInput!, where: TopicWhereInput): BatchPayload!
   upsertTopic(where: TopicWhereUniqueInput!, create: TopicCreateInput!, update: TopicUpdateInput!): Topic!
   deleteTopic(where: TopicWhereUniqueInput!): Topic
   deleteManyTopics(where: TopicWhereInput): BatchPayload!
@@ -193,6 +194,7 @@ type Subscription {
 
 type Topic {
   id: ID!
+  title: String!
   questions(where: QuestionWhereInput, orderBy: QuestionOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Question!]
 }
 
@@ -204,6 +206,7 @@ type TopicConnection {
 
 input TopicCreateInput {
   id: ID
+  title: String!
   questions: QuestionCreateManyInput
 }
 
@@ -215,10 +218,13 @@ type TopicEdge {
 enum TopicOrderByInput {
   id_ASC
   id_DESC
+  title_ASC
+  title_DESC
 }
 
 type TopicPreviousValues {
   id: ID!
+  title: String!
 }
 
 type TopicSubscriptionPayload {
@@ -240,7 +246,12 @@ input TopicSubscriptionWhereInput {
 }
 
 input TopicUpdateInput {
+  title: String
   questions: QuestionUpdateManyInput
+}
+
+input TopicUpdateManyMutationInput {
+  title: String
 }
 
 input TopicWhereInput {
@@ -258,6 +269,20 @@ input TopicWhereInput {
   id_not_starts_with: ID
   id_ends_with: ID
   id_not_ends_with: ID
+  title: String
+  title_not: String
+  title_in: [String!]
+  title_not_in: [String!]
+  title_lt: String
+  title_lte: String
+  title_gt: String
+  title_gte: String
+  title_contains: String
+  title_not_contains: String
+  title_starts_with: String
+  title_not_starts_with: String
+  title_ends_with: String
+  title_not_ends_with: String
   questions_every: QuestionWhereInput
   questions_some: QuestionWhereInput
   questions_none: QuestionWhereInput

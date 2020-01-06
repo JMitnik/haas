@@ -1,4 +1,5 @@
 type Topic {
     id: ID! @id
+    title: String!
     questions: [Question!]! @relation(link: TABLE)
 }
