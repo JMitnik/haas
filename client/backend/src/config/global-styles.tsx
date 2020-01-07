@@ -7,7 +7,6 @@ const GlobalStyle = createGlobalStyle`
     body, html, * {
         /* font-family: 'Open Sans', sans-serif; */
         font-family: 'Raleway', sans-serif;
-        font-weight: 700;
         margin: 0;
         padding: 0;
         box-sizing: border-box;

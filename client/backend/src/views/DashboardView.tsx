@@ -2,6 +2,8 @@ import React, { FC } from 'react'
 import { useQuery } from '@apollo/react-hooks';
 import { gql } from 'apollo-boost';
 import { Query } from '../types';
+import Card from '../components/UI/Cards';
+import styled, { css } from 'styled-components';
 
 const GET_TOPICS_QUERY = gql`
     {
@@ -20,16 +22,32 @@ const DashboardView: FC = () => {
     const topics = data?.topics;
 
     return (
-        <div>
-            {topics?.map((topic, index) => (
-                <div key={index}>
-                    <p>
-                        {topic.title}
-                    </p>
-                </div>
-            ))}
-        </div>
+        <DashboardContainer>
+            <CardGrid>
+                {topics?.map((topic, index) => (
+                    <Card key={index}>
+                        <p>
+                            {topic.title}
+                        </p>
+                    </Card>
+                ))}
+            </CardGrid>
+        </DashboardContainer>
     )
 };
+
+const DashboardContainer = styled.div`
+    ${({ theme }) => css`
+        max-width: ${theme.containerWidth}px;
+        display: grid;
+
+    `}
+`;
+
+const CardGrid = styled.div`
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+`;
+
 
 export default DashboardView;

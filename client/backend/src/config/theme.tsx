@@ -16,6 +16,7 @@ const theme = {
         alt: '#EBEEFF',
     },
     gutter: 24,
+    containerWidth: 1080,
     // TODO: Add font
     fontFamilies: {
         body: '',

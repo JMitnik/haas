@@ -35,6 +35,7 @@ const SideNavContainer = styled.div`
 const SideNavMenu = styled.ul`
     ${({ theme }) => css`
         list-style: none;
+        font-weight: 700;
 
         li {
             display: flex;
