@@ -4,6 +4,7 @@
     "build": "nodemon 'app.ts' --exec 'ts-node' src/server.ts -e ts,graphql"
   },
   "dependencies": {
+    "body-parser": "^1.19.0",
     "dotenv": "^8.2.0",
     "graphql-yoga": "^1.18.3",
     "nodemon": "^2.0.2",

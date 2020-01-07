@@ -1,6 +1,7 @@
 import React from 'react'
 import { useQuery } from '@apollo/react-hooks';
 import { gql } from 'apollo-boost';
+import { Query } from '../types';
 
 const GET_TOPICS_QUERY = gql`
     {
@@ -11,14 +12,23 @@ const GET_TOPICS_QUERY = gql`
 `;
 
 const DashboardView = () => {
-    const { loading, error, data } = useQuery(GET_TOPICS_QUERY);
+    const { loading, error, data } = useQuery<Query>(GET_TOPICS_QUERY);
+
 
     if (loading) return <p>Loading</p>
     if (error) return <p>Error: {error}</p>
 
+    const topics = data?.topics;
+
     return (
         <div>
-            We got data!
+            {topics?.map((topic, index) => (
+                <div key={index}>
+                    <p>
+                        {topic.title}
+                    </p>
+                </div>
+            ))}
         </div>
     )
 };
