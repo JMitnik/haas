@@ -23,6 +23,9 @@ const DashboardView: FC = () => {
 
     return (
         <DashboardContainer>
+            {/* TODO: Header - Will contain general information */}
+
+            {/* TODO: Make nice table for the topics */}
             <CardGrid>
                 {topics?.map((topic, index) => (
                     <Card key={index}>
