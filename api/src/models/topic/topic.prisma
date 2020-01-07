@@ -1,5 +1,10 @@
 type Topic {
     id: ID! @id
     title: String!
+    description: String!
+    publicTitle: String
+    logoUrl: String
+    language: String!
+    topicUrl: String
     questions: [Question!]! @relation(link: TABLE)
 }

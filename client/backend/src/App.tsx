@@ -7,6 +7,8 @@ import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import { ApolloProvider } from '@apollo/react-hooks';
 import client from './config/apollo';
 import DashboardView from './views/DashboardView';
+import TopicBuilderView from './views/TopicBuilderView';
+import OrganisationSettingsView from './views/OrganisationSettingsView';
 
 const AppContainer = styled.div`
   display: grid;
@@ -31,9 +33,13 @@ const App: FC = () => (
           <AppContainer>
             <SideNav />
 
-            {/* Routes */}
+            {/* Top-level routes */}
             <MainWindow>
               <Switch>
+                <Route path="/topic-builder" render={() => <TopicBuilderView />} />
+                <Route path="/organisation-settings" render={() => <OrganisationSettingsView />} />
+
+                {/* Default-view: Ensure this is last */}
                 <Route path="/" render={() => <DashboardView />} />
               </Switch>
             </MainWindow>

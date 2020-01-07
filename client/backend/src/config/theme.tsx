@@ -1,3 +1,5 @@
+// TODO: Export theme as type
+
 const theme = {
     colors: {
         primary: '#3847B2',
@@ -24,7 +26,12 @@ const theme = {
         sm: '12 24px',
         md: '16 24px',
         lg: '18 24px',
-    }
+    },
+    borderRadiuses: {
+        sm: '3px',
+        md: '5px',
+        lg: '7px',
+    },
 };
 
 export default theme;

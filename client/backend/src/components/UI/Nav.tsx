@@ -8,11 +8,11 @@ const SideNav: FC = () => {
     return (
         <SideNavContainer>
             <nav>
-                    <Logo />
+                <Logo />
                 <SideNavMenu>
                     <li>
                         <Home />
-                        <NavLink to="/dashboard">Dashboard</NavLink>
+                        <NavLink to="/">Dashboard</NavLink>
                     </li>
                     <li>
                         <MessageCircle />
