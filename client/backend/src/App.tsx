@@ -1,10 +1,11 @@
 import React, { FC } from 'react';
-import styled, { ThemeProvider, css } from 'styled-components'
-import theme from './config/theme';
-import SideNav from './components/UI/Nav';
-import GlobalStyle from './config/global-styles';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import { ApolloProvider } from '@apollo/react-hooks';
+import styled, { ThemeProvider, css } from 'styled-components';
+
+import SideNav from './components/UI/Nav';
+import GlobalStyle from './config/global-styles';
+import themeConfig from './config/theme';
 import client from './config/apollo';
 import DashboardView from './views/DashboardView';
 import TopicBuilderView from './views/TopicBuilderView';
@@ -29,7 +30,7 @@ const App: FC = () => (
   <>
     <ApolloProvider client={client}>
       <Router>
-        <ThemeProvider theme={theme}>
+        <ThemeProvider theme={themeConfig}>
           <AppContainer>
             <SideNav />
 
