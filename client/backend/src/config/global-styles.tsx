@@ -11,6 +11,15 @@ const GlobalStyle = createGlobalStyle`
         padding: 0;
         box-sizing: border-box;
     }
+
+    h2 {
+        padding-left: 5px;
+    }
+
+    svg { 
+        display: block;
+        /* margin: auto; */
+    }
 `;
 
 export default GlobalStyle;
