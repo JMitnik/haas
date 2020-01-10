@@ -5,7 +5,6 @@ node_modules
 build
 dist
 .rpt2_cache
-.vscode
 
 # misc
 .DS_Store
@@ -23,4 +22,3 @@ yarn-error.log*
 mindmaps
 **/mindmaps/*
 **/.idea
-**/.vscode/*
