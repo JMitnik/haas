@@ -1,0 +1,24 @@
+{
+    "extends": ["airbnb-typescript"],
+    "plugins": [
+        "sort-imports-es6-autofix"
+    ],
+    "rules": {
+        "@typescript-eslint/camelcase": "off",
+        "react/jsx-props-no-spreading": "off",
+        "react/no-array-index-key": "off",
+        "react/no-this-in-sfc": "off", // Bugged, gets triggered by non-SFC functions
+        "no-param-reassign": "off",
+        "sort-imports-es6-autofix/sort-imports-es6": "error",
+        "max-len": ["error", { "code": 100, "ignoreStrings": false, "tabWidth": 4, "ignoreTemplateLiterals": true }],
+        "no-multiple-empty-lines": ["error", { "max": 1 }],
+        "no-nested-ternary": "off",
+        "no-plusplus": "off",
+        "object-curly-newline": ["error", {
+            "ObjectExpression": { "consistent": true, "minProperties": 5 }
+        }]
+    },
+    "env": {
+        "browser": true
+    }
+}
