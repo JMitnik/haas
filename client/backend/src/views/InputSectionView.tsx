@@ -5,29 +5,29 @@ import { GridForm } from '../components/UI/GridForm'
 
 
 import styled, { css } from 'styled-components';
-const ExampleInput = styled.input`
-    grid-column-start: 1;
-    grid-column-end: 3;
+const InputSection = styled.div<{full: Boolean}>`
+    display: flex;
+    flex-direction: column;
+    grid-column-start: ${props => props.full ? 1 : 'auto'};
+    grid-column-end: ${props => props.full ? 3 : 'auto'};
 `
 
-const BasicTopicsForm = (props: any) => {
-    const { register, handleSubmit, watch, errors } = useForm()
-    const onSubmit = (data: any) => { console.log(data) }
+interface IInputSection {
+    title: string;
+    sub_title: string;
+    full: Boolean;
+}
 
-    console.log(watch('example')) // watch input value by passing the name of it
-
+const InputSectionView = (props: IInputSection) => {
+    const { register, handleSubmit, watch, errors } = useForm();
+    
     return (
-        <GridForm onSubmit={handleSubmit(onSubmit)}>
-                {/* register your input into the hook by invoking the "register" function */}
-                <ExampleInput name="example_input" defaultValue="test2" ref={register}/>
-                {/* include validation with required or other standard HTML validation rules */}
-                <input name="exampleRequired" ref={register({ required: true })} />
-                {/* errors will return when field validation fails  */}
-                {errors.exampleRequired && <span>This field is required</span>}
-
-                <input type="submit" />
-        </GridForm>
+        <InputSection full={props.full}>
+        <h5>{props.title}</h5>
+        <h6>{props.sub_title}</h6>
+        <input name="exampleRequired" ref={register({ required: true })} />
+        </InputSection>
     )
 };
 
-export default BasicTopicsForm;
+export default InputSectionView;
