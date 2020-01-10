@@ -8,16 +8,18 @@ import { Grid } from '../components/UI/Grid'
 import styled, { css } from 'styled-components';
 import BasicTopicsForm from './BasicTopicsFormView';
 import {TopicBuildContainer } from '../components/UI/TopicBuilderContainer';
+import { NavLink } from 'react-router-dom';
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 
 const ListItem = styled.li`
-    cursor: pointer;
+  cursor: pointer;
   list-style: none;
   /* padding-left: 1.2em; */
   left: 0;
   margin: 0;
-  box-shadow: 1px 1px 5px 0px rgba(0,0,0,0.75);
-  padding-bottom: 5px;
-  padding-top: 5px;
+  box-shadow: 0px 0px 2px 0px rgba(0,0,0,0.75);
+  padding-bottom: 15px;
+  padding-top: 15px;
   font-size: 15px;
   /* margin-bottom: 5px; */
   /* margin-right: 10px; */
@@ -29,8 +31,9 @@ const ListItem = styled.li`
   overflow: hidden;
   opacity: 0.9;
   transition: all 0.1s ease-in;
+  background-color: #F5F6F8;
   &:hover {
-    background-color: ${({ theme }) => theme.colors.primary};
+    background-color: ${({ theme }) => '#EBEEFF'};
     color: ${({ theme }) => theme.colors.white};}
 `
 
@@ -52,28 +55,37 @@ const BasicTopicDetailsView = (props: any) => {
     `
     const ButtonContainer = styled.div`
         display: flex;
-        flex-direction: column;
+        justify-content: space-around;
+        padding-top: 10%;
     `
     return (
         <Grid>
             
             <TopicBuildContainer>
+            {/* <Switch>
+                <Route path="/topic-builder/questions-and-answers" render={() => <BasicTopicDetailsView />} />
+                <Route path="/topic-builder/" render={() => <BasicTopicDetailsView />} />
+            </Switch> */}
                 <BasicTopicsForm></BasicTopicsForm>
                 <ProgressContainer>
                     <ProgressHeader>PROGRESS</ProgressHeader>
                     <ul>
-                        <ListItem>BASIC TOPIC DETAILS</ListItem>
+                        <ListItem>
+                            <NavLink to="/topic-builder">BASIC TOPIC DETAILS</NavLink>
+                            </ListItem>
                         <ListItem>TOPIC CONFIGURATION</ListItem>
-                        <ListItem>QUESTIONS AND ANSWERS</ListItem>    
+                        <ListItem>
+                            <NavLink to="/topic-builder/questions-and-answers">QUESTIONS AND ANSWERS</NavLink>
+                        </ListItem>    
                         <ListItem>AFTER VOTE CONFIGURATION</ListItem>    
                         <ListItem>GREETING MESSAGES</ListItem>
                         <ListItem>LANGUAGES</ListItem>    
                         <ListItem>TOPIC DISTRIBUTION LINKS</ListItem>            
                     </ul>
-                    <div>
+                    <ButtonContainer>
                         <button>Cancel</button>
                         <button>Publish</button>
-                    </div>  
+                    </ButtonContainer>  
                 </ProgressContainer>
             </TopicBuildContainer>
             {/* <BasicTopicsForm/> */}
