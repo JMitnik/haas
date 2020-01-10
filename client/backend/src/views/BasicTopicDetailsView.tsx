@@ -10,6 +10,7 @@ import BasicTopicsForm from './BasicTopicsFormView';
 import {TopicBuildContainer } from '../components/UI/TopicBuilderContainer';
 import { NavLink } from 'react-router-dom';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import QNATopicsForm from './QNATopicsFormView'
 
 const ListItem = styled.li`
   cursor: pointer;
@@ -67,7 +68,7 @@ const BasicTopicDetailsView = (props: any) => {
             
             <TopicBuildContainer>
             <Switch>
-                <Route path="/topic-builder/questions-and-answers" render={() => <TestQA />} />
+                <Route path="/topic-builder/questions-and-answers" render={() => <QNATopicsForm />} />
                 <Route path="/topic-builder/" render={() => <BasicTopicsForm/>} />
             </Switch>
                 {/* <BasicTopicsForm></BasicTopicsForm> */}
