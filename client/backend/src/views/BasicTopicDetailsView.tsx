@@ -41,6 +41,10 @@ const ProgressHeader = styled.h4`
     padding-bottom: 20px;
 `
 
+const TestQA = styled.div`
+    border: 1px solid black;
+`
+
 const BasicTopicDetailsView = (props: any) => {
     const { register, handleSubmit, watch, errors } = useForm()
     const onSubmit = (data: any) => { console.log(data) }
@@ -62,11 +66,11 @@ const BasicTopicDetailsView = (props: any) => {
         <Grid>
             
             <TopicBuildContainer>
-            {/* <Switch>
-                <Route path="/topic-builder/questions-and-answers" render={() => <BasicTopicDetailsView />} />
-                <Route path="/topic-builder/" render={() => <BasicTopicDetailsView />} />
-            </Switch> */}
-                <BasicTopicsForm></BasicTopicsForm>
+            <Switch>
+                <Route path="/topic-builder/questions-and-answers" render={() => <TestQA />} />
+                <Route path="/topic-builder/" render={() => <BasicTopicsForm/>} />
+            </Switch>
+                {/* <BasicTopicsForm></BasicTopicsForm> */}
                 <ProgressContainer>
                     <ProgressHeader>PROGRESS</ProgressHeader>
                     <ul>
