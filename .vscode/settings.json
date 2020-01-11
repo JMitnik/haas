@@ -1,0 +1,15 @@
+{
+    "eslint.enable": true,
+    "eslint.lintTask.enable": true,
+    "eslint.validate": [
+        "javascript",
+        "typescript",
+        "typescriptreact"
+    ],
+    "eslint.workingDirectories": [
+        {
+            "directory": "./client/backend",
+            "changeProcessCWD": true
+        }
+    ],
+}

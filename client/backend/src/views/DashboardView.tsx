@@ -1,9 +1,10 @@
-import React, { FC } from 'react'
+import React, { FC } from 'react';
 import { useQuery } from '@apollo/react-hooks';
-import { gql } from 'apollo-boost';
-import { Query } from '../types';
-import Card from '../components/UI/Cards';
 import styled, { css } from 'styled-components';
+import { gql } from 'apollo-boost';
+
+import Card from '../components/UI/Cards';
+import { Query } from '../types';
 
 const GET_TOPICS_QUERY = gql`
     {
@@ -14,29 +15,38 @@ const GET_TOPICS_QUERY = gql`
 `;
 
 const DashboardView: FC = () => {
-    const { loading, error, data } = useQuery<Query>(GET_TOPICS_QUERY);
+  const { loading, error, data } = useQuery<Query>(GET_TOPICS_QUERY);
 
-    if (loading) return <p>Loading</p>
-    if (error) return <p>Error: {error}</p>
+  if (loading) return <p>Loading</p>;
 
-    const topics = data?.topics;
-
+  if (error) {
     return (
-        <DashboardContainer>
-            {/* TODO: Header - Will contain general information */}
+      <p>
+        Error:
+        {' '}
+        {error}
+      </p>
+    );
+  }
 
-            {/* TODO: Make nice table for the topics */}
-            <CardGrid>
-                {topics?.map((topic, index) => (
-                    <Card key={index}>
-                        <p>
-                            {topic.title}
-                        </p>
-                    </Card>
-                ))}
-            </CardGrid>
-        </DashboardContainer>
-    )
+  const topics = data?.topics;
+
+  return (
+    <DashboardContainer>
+      {/* TODO: Header - Will contain general information */}
+
+      {/* TODO: Make nice table for the topics */}
+      <CardGrid>
+        {topics?.map((topic, index) => (
+          <Card key={index}>
+            <p>
+              {topic.title}
+            </p>
+          </Card>
+        ))}
+      </CardGrid>
+    </DashboardContainer>
+  );
 };
 
 const DashboardContainer = styled.div`
@@ -51,6 +61,5 @@ const CardGrid = styled.div`
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
 `;
-
 
 export default DashboardView;
