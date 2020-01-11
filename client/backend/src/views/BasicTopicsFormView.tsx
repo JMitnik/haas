@@ -3,76 +3,25 @@ import React from 'react'
 import { useForm } from 'react-hook-form'
 import { GridForm } from '../components/UI/GridForm'
 
+import {CheckBoxWrapper , CheckBox, CheckBoxLabel} from '../components/UI/Form'
 import InputSectionView from './InputSectionView'
-import styled, { css } from 'styled-components';
-const ExampleInput = styled.input`
-    grid-column-start: 1;
-    grid-column-end: 3;
-`
+import styled from 'styled-components';
 
 const DefaultLanguageSection = styled.div`
     grid-column-start: 1;
     grid-column-end: 3;    
-`
-
-const CheckBoxWrapper = styled.div`
-  position: relative;
-  display: flex;
-  align-items: center;
-  
-`;
-const CheckBoxLabel = styled.label`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 42px;
-  height: 26px;
-  border-radius: 15px;
-  background: #bebebe;
-  cursor: pointer;
-  &::after {
-    content: "";
-    display: block;
-    border-radius: 50%;
-    width: 18px;
-    height: 18px;
-    margin: 3px;
-    background: #ffffff;
-    box-shadow: 1px 3px 3px 1px rgba(0, 0, 0, 0.2);
-    transition: 0.2s;
-  }
-`;
-const CheckBox = styled.input`
-  opacity: 0;
-  z-index: 1;
-  border-radius: 15px;
-  width: 42px;
-  height: 26px;
-  &:checked + ${CheckBoxLabel} {
-    background: #3847B2;
-    &::after {
-      content: "";
-      display: block;
-      border-radius: 50%;
-      width: 18px;
-      height: 18px;
-      margin-left: 21px;
-      transition: 0.2s;
-    }
-  }
-`;
-
+  `
+;
 
 export const MiniHeader = styled.h4`
-  ${({ theme }) => css`
     grid-column-start: 1;
     grid-column-end: 3;
     padding: 10px;
-    `
-    }`;
+  `
+;
 
-const BasicTopicsForm = (props: any) => {
-    const { register, handleSubmit, watch, errors } = useForm()
+const BasicTopicsForm = () => {
+    const {handleSubmit, watch, errors } = useForm()
     const onSubmit = (data: any) => { console.log(data) }
     const options: Array<string> = ['English', 'Dutch', 'Russian', 'Chinese']
     console.log(watch('example')) // watch input value by passing the name of it
@@ -89,7 +38,7 @@ const BasicTopicsForm = (props: any) => {
             <DefaultLanguageSection>
                 <h5>DEFAULT LANGUAGE</h5>
                 <select name="cars">
-                    {options?.map((option, index) => (
+                    {options?.map((option) => (
                         <option value={option}>{option}</option>
                     ))}
                 </select>

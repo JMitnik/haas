@@ -11,13 +11,8 @@ const GlobalStyle = createGlobalStyle`
       box-sizing: border-box;
   }
 
-  h2 {
-      padding-left: 5px;
-  }
-
   svg {
       display: block;
-      /* margin: auto; */
   }
 `;
 
