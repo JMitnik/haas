@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 
 import styled, { css } from 'styled-components';
-import { ArrowRight, ArrowDown } from 'react-feather';
+import { ArrowDown, ArrowUp, Square } from 'react-feather';
 
+import CreateQuestionForm from './CreateQuestionFormView'
 
 export const CreateQuestionContainer = styled.div`
     display: grid;
@@ -12,15 +13,19 @@ export const CreateQuestionContainer = styled.div`
     border: 1px solid black;
     align-self: center;
   `
-;
+    ;
 
-const CentreArrowRight = styled(ArrowRight)`
+const CentreSquare = styled(Square)`
     /* display:block; */
     align-self: center;
 
     /* grid-row-start: 1;
     grid-row-end: 2; */
     
+`
+
+const CentreArrowUp = styled(ArrowUp)`
+    align-self: center;
 `
 
 const CentreArrowDown = styled(ArrowDown)`
@@ -37,11 +42,8 @@ const QuestionHeader = styled.div`
     display: flex;
     justify-content: space-between;
     grid-column-start: 1;
-    grid-column-end: 3;
-        &:hover {
-            cursor: pointer;
-            background: ${theme.defaultColors.normal}
-        }    
+    grid-column-end: 3;    
+    background: ${theme.defaultColors.normal}
     `}
 `
 
@@ -55,16 +57,32 @@ const CreateQuestionView = (props: any) => {
         e.preventDefault();
         setCollapsed(!isCollapsed);
         console.log('Collapsed: ', isCollapsed);
-    }
-return (
-<CreateQuestionContainer>
-    <QuestionHeader onClick={e => handleHeaderClick(e)}>
-        <QuestionTitle>{props.question_title}</QuestionTitle>
- {isCollapsed ? <CentreArrowRight/> : <CentreArrowDown/>}
-    </QuestionHeader>
 
-    {!isCollapsed && <div>Expanded</div>}
-</CreateQuestionContainer>)
+    }
+
+    function handleMoveDown(e: any) {
+        e.preventDefault();
+        console.log('HANDLE MOVE DONW')
+        props.sendOrderOfQuestionsToParent(props.question_index, 'down')
+    }
+
+    function handleMoveUp(e: any) {
+        e.preventDefault();
+        console.log('HANDLE MOVE UP')
+        props.sendOrderOfQuestionsToParent(props.question_index, 'up')
+    }
+
+    return (
+        <CreateQuestionContainer>
+            <QuestionHeader >
+                <QuestionTitle>{props.question_title}</QuestionTitle>
+                <CentreArrowDown onClick={e => handleMoveDown(e)} />
+                <CentreArrowUp onClick={e => handleMoveUp(e)}/>
+                <CentreSquare onClick={e => handleHeaderClick(e)} />
+            </QuestionHeader>
+
+            {!isCollapsed && <CreateQuestionForm/>}
+        </CreateQuestionContainer>)
 }
 
 export default CreateQuestionView;
