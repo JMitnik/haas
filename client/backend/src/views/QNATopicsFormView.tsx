@@ -5,19 +5,14 @@ import styled from 'styled-components';
 import { GridForm } from '../components/UI/GridForm';
 import { MiniHeader } from './BasicTopicsFormView';
 import InputSectionView from './InputSectionView';
-
+import CreateQuestionView from './CreateQuestionView'
 const AddNewQuestionButton = styled.button`
     cursor: pointer;
     grid-column-start: 1;
     grid-column-end: 3;
 `;
 
-const CreateQuestionSection = styled.div`
-    grid-column-start: 1;
-    grid-column-end: 3;  
-    border: 1px solid black;
-  `
-;
+
 
 interface IQuestions {
   question_title: string;
@@ -44,7 +39,7 @@ const QNATopicsForm = () => {
       <MiniHeader>QUESTIONS AND ANSWERS</MiniHeader>
       <InputSectionView full sub_title="TOPIC ALIAS NAME, USED AS IDENTIFIER" title="TOPIC NAME" />
       {questions?.map((question) => (
-                      <CreateQuestionSection>{question.question_title}</CreateQuestionSection>
+                      <CreateQuestionView question_title={question.question_title}/>
                     ))}
       <AddNewQuestionButton  onClick={e => handleNewQuestion(e)}>Add new question</AddNewQuestionButton>
     </GridForm>
