@@ -1,15 +1,31 @@
-import styled, { css, StyledComponent } from 'styled-components';
+import styled, { css } from 'styled-components';
+import { Div } from './Generics';
 
-const Card = styled.div`
-    ${({ theme }) => css`
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: ${theme.gutter}px;
-        border-radius: ${theme.borderRadiuses.sm};
-        background: ${theme.defaultColors.alt};
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    `}
+export const Card = styled(Div)`
+  ${({ theme }) => css`
+      border-radius: ${theme.borderRadiuses.md};
+
+      background: ${theme.colors.white};
+      color: ${theme.colors.text.black};
+
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  `}
+`;
+
+export const CardBody = styled(Div)`
+  ${({ theme }) => css`
+    padding: ${theme.gutter}px;
+  `}
+`;
+
+export const CardFooter = styled(Div)`
+  ${({ theme }) => css`
+    padding: ${theme.gutter / 1.5}px;
+    border-radius: 0 0 ${theme.borderRadiuses.md} ${theme.borderRadiuses.md};
+    background: ${theme.colors.default.footer};
+    color: ${theme.colors.default.text};
+    text-align: center;
+  `}
 `;
 
 export default Card;

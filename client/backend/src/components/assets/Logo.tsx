@@ -5,16 +5,18 @@ const LogoContainer = styled.a`
     display: block;
 
     /* Manual size */
-
-    width: 200px;
     max-width: 100%;
-    height: 100px;
+    width: 200px;
+
+    img {
+      max-width: 100%;
+    }
 `;
 
 const Logo = () => (
-    <LogoContainer>
-        <img src="" alt="HAAS Logo"/>
-    </LogoContainer>
-)
+  <LogoContainer>
+    <img src="/logo.svg" alt="HAAS Logo" />
+  </LogoContainer>
+);
 
 export default Logo;
