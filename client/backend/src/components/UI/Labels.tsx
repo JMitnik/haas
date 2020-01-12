@@ -5,31 +5,28 @@ import Color from 'color';
 type brandVariants = 'primary' | 'secondary' | 'warning' | 'error' | 'success' | 'default';
 type sizeVariants = 'sm' | 'md' | 'lg';
 
-export interface ButtonProps {
+interface SpanProps {
   brand?: brandVariants;
   size?: sizeVariants;
 }
 
-const Button = styled.button<ButtonProps>`
+const Label = styled.span<SpanProps>`
   ${({ theme }) => css`
-    border-radius: ${theme.borderRadiuses.md};
-    padding: ${theme.buttonSizes.md};
+    border-radius: ${theme.borderRadiuses.lg};
+    font-weight: 800;
+    padding: ${theme.buttonSizes.sm};
   `}
 
   ${({ theme }) => variant({
     prop: 'brand',
     variants: {
-      default: {
-        background: theme.colors.default.normal,
-        color: Color(theme.colors.default.normal).darken(0.5).hex(),
-      },
       primary: {
         background: theme.colors.primary,
-        color: Color(theme.colors.primary).darken(0.5).hex(),
+        color: Color(theme.colors.primary).darken(0.3).hex(),
       },
       secondary: {
         background: theme.colors.secondary,
-        color: Color(theme.colors.secondary).darken(0.5).hex(),
+        color: theme.colors.white,
       },
       error: {
         background: theme.colors.error,
@@ -62,4 +59,4 @@ const Button = styled.button<ButtonProps>`
   })}
 `;
 
-export default Button;
+export default Label;

@@ -1,57 +1,45 @@
 import styled, { css } from 'styled-components';
 import React, { FC } from 'react';
-import { NavLink } from 'react-router-dom';
-import { Home, MessageCircle } from 'react-feather';
+import { Link } from 'react-router-dom';
+import { Settings } from 'react-feather';
 import Logo from '../assets/Logo';
+import { Container } from './Container';
+import { GenericProps, Div } from './Generics';
+import { ProfilePic } from './User';
 
-const SideNav: FC = () => {
-    return (
-        <SideNavContainer>
-            <nav>
-                <Logo />
-                <SideNavMenu>
-                    <li>
-                        <Home />
-                        <NavLink to="/">Dashboard</NavLink>
-                    </li>
-                    <li>
-                        <MessageCircle />
-                        <NavLink to="/topic-builder">Topic builder</NavLink>
-                    </li>
-                </SideNavMenu>
-            </nav>
-        </SideNavContainer>
-    )
-}
+const TopNavContainer = styled(Div)<GenericProps>`
+  ${({ theme }) => css`
+    box-shadow: 0px 5px 7px -2px rgba(0, 0, 0, 0.4);
+    border-top: 5px solid ${theme.colors.primary};
+    border-bottom: 1px solid ${theme.colors.default.normal};
 
-const SideNavContainer = styled.div`
-    ${({ theme }) => css`
-        background: ${theme.colors.primary};
-        padding: ${theme.gutter}px;
-        color: white;
-    `}
+    a {
+      color: ${theme.colors.default.light};
+      text-decoration: none;
+    }
+  `}
 `;
 
-const SideNavMenu = styled.ul`
-    ${({ theme }) => css`
-        list-style: none;
-        font-weight: 700;
+const UserNav: FC = () => (
+  <Div useFlex width={1 / 10} alignItems="center" justifyContent="space-evenly">
+    <Link to="/settings">
+      <Settings />
+    </Link>
+    <Div pl={4}>
+      <ProfilePic />
+    </Div>
+  </Div>
+);
 
-        li {
-            display: flex;
-            align-items: center;
-            color: white;
-            margin-bottom: ${theme.gutter * 2}px;
-        }
+export const TopNav: FC = () => (
+  <TopNavContainer bg="white">
+    <Container p="4" useFlex justifyContent="space-between" alignItems="center">
+      <Link to="/">
+        <Logo />
+      </Link>
+      <UserNav />
+    </Container>
+  </TopNavContainer>
+);
 
-        li a {
-            margin-left: 10px;
-            vertical-align: text-bottom;
-            display: block;
-            color: inherit;
-            text-decoration: none;
-        }
-    `}
-`;
-
-export default SideNav;
+export default {};

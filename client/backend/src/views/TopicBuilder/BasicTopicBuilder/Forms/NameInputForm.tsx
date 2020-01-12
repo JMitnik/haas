@@ -21,7 +21,7 @@ interface InputSectionProps {
   full: boolean;
 }
 
-const InputSectionView = ({ title, sub_title, full }: InputSectionProps) => {
+const NameInputForm = ({ title, sub_title, full }: InputSectionProps) => {
   const { register } = useForm();
 
   return (
@@ -33,4 +33,4 @@ const InputSectionView = ({ title, sub_title, full }: InputSectionProps) => {
   );
 };
 
-export default InputSectionView;
+export default NameInputForm;

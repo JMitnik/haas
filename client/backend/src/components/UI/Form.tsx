@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 export const CheckBoxWrapper = styled.div`
   position: relative;
@@ -27,6 +27,7 @@ export const CheckBoxLabel = styled.label`
     transition: 0.2s;
   }
 `;
+
 export const CheckBox = styled.input`
   opacity: 0;
   z-index: 1;
@@ -45,4 +46,15 @@ export const CheckBox = styled.input`
       transition: 0.2s;
     }
   }
+`;
+
+export const GridForm = styled.form`
+  ${({ theme }) => css`
+    display: grid;
+    row-gap: 20px;
+    column-gap: 10px;
+    background: ${theme.colors.default.alt};
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    padding: 10px;
+  `}
 `;

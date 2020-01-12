@@ -1,7 +1,7 @@
 import { createGlobalStyle } from 'styled-components';
 
 const GlobalStyle = createGlobalStyle`
-  @import url('https://fonts.googleapis.com/css?family=Raleway:300,400,700&display=swap');
+  @import url('https://fonts.googleapis.com/css?family=Raleway:300,400,500,700&display=swap');
 
   body, html, * {
       /* font-family: 'Open Sans', sans-serif; */
