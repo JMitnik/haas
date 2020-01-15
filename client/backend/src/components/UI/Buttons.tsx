@@ -1,11 +1,11 @@
 import styled, { css } from 'styled-components';
-import { variant } from 'styled-system';
+import { variant, space, SpaceProps } from 'styled-system';
 import Color from 'color';
 
 type brandVariants = 'primary' | 'secondary' | 'warning' | 'error' | 'success' | 'default';
 type sizeVariants = 'sm' | 'md' | 'lg';
 
-export interface ButtonProps {
+export interface ButtonProps extends SpaceProps {
   brand?: brandVariants;
   size?: sizeVariants;
 }
@@ -14,18 +14,23 @@ const Button = styled.button<ButtonProps>`
   ${({ theme }) => css`
     border-radius: ${theme.borderRadiuses.md};
     padding: ${theme.buttonSizes.md};
+    font-size: 1rem;
+    font-weight: 600;
   `}
+
+  ${space}
 
   ${({ theme }) => variant({
     prop: 'brand',
     variants: {
       default: {
         background: theme.colors.default.normal,
-        color: Color(theme.colors.default.normal).darken(0.5).hex(),
+        color: theme.colors.default.darkest,
+        border: `1px solid ${theme.colors.default.normal}`,
       },
       primary: {
         background: theme.colors.primary,
-        color: Color(theme.colors.primary).darken(0.5).hex(),
+        color: theme.colors.white,
       },
       secondary: {
         background: theme.colors.secondary,

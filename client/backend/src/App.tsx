@@ -15,7 +15,7 @@ import { Container } from './components/UI/Container';
 const AppContainer = styled.div`
   ${({ theme }) => css`
     min-height: 1vh;
-    background: ${theme.colors.default.normal};
+    background: ${theme.colors.default.lightest};
     margin: 0 auto;
   `}
 `;
@@ -23,7 +23,7 @@ const AppContainer = styled.div`
 const MainWindow = styled.div`
   ${({ theme }) => css`
     padding: ${theme.gutter}px 0;
-    background: ${theme.colors.default.normal};
+    background: ${theme.colors.default.lightest};
     min-height: 100vh;
   `}
 `;

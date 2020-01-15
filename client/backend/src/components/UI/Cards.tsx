@@ -6,7 +6,7 @@ export const Card = styled(Div)`
       border-radius: ${theme.borderRadiuses.md};
 
       background: ${theme.colors.white};
-      color: ${theme.colors.text.black};
+      color: ${theme.colors.default.darkest};
 
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   `}
@@ -22,7 +22,7 @@ export const CardFooter = styled(Div)`
   ${({ theme }) => css`
     padding: ${theme.gutter / 1.5}px;
     border-radius: 0 0 ${theme.borderRadiuses.md} ${theme.borderRadiuses.md};
-    background: ${theme.colors.default.footer};
+    background: ${theme.colors.default.light};
     color: ${theme.colors.default.text};
     text-align: center;
   `}

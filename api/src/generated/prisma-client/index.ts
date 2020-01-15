@@ -367,7 +367,7 @@ export interface TopicCreateInput {
   description: String;
   publicTitle?: Maybe<String>;
   logoUrl?: Maybe<String>;
-  language: String;
+  language?: Maybe<String>;
   topicUrl?: Maybe<String>;
   questions?: Maybe<QuestionCreateManyInput>;
 }
@@ -426,7 +426,7 @@ export interface TopicPreviousValues {
   description: String;
   publicTitle?: String;
   logoUrl?: String;
-  language: String;
+  language?: String;
   topicUrl?: String;
 }
 
@@ -722,7 +722,7 @@ export interface Topic {
   description: String;
   publicTitle?: String;
   logoUrl?: String;
-  language: String;
+  language?: String;
   topicUrl?: String;
 }
 
@@ -788,7 +788,7 @@ export interface TopicNullablePromise
 }
 
 /*
-The `Int` scalar type represents non-fractional signed whole numeric values. Int can represent values between -(2^31) and 2^31 - 1.
+The `Int` scalar type represents non-fractional signed whole numeric values. Int can represent values between -(2^31) and 2^31 - 1. 
 */
 export type Int = number;
 

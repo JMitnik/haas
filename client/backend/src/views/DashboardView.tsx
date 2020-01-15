@@ -46,7 +46,8 @@ const DashboardView: FC = () => {
         gridTemplateColumns={['1fr', '1fr 1fr 1fr']}
         gridAutoRows="minmax(200px, 1fr)"
       >
-        {topics?.map((topic, index) => <TopicCard key={index} topic={topic} />)}
+        {topics?.map((topic, index) => topic && <TopicCard key={index} topic={topic} /> )}
+
         <Link to="/topic-builder">
           <Div useFlex bg="default.footer" alignItems="center" justifyContent="center">
             <Plus />
@@ -67,8 +68,7 @@ const TopicCard = ({ topic }: { topic: Topic }) => (
         <H3 fontWeight={500}>
           {topic.title}
         </H3>
-        <Label brand="warning">
-          {/* TODO: Make dynamic */}
+        <Label brand="success">
           Score: 9.3
         </Label>
       </Flex>

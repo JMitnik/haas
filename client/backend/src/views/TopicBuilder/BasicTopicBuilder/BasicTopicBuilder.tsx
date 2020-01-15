@@ -28,7 +28,7 @@ const ListItem = styled.li`
   background-color: #F5F6F8;
 
   &:hover {
-    background-color: ${({ theme }) => theme.colors.default.alt};
+    background-color: ${({ theme }) => theme.colors.default.normal};
     color: ${({ theme }) => theme.colors.white};};
 `;
 

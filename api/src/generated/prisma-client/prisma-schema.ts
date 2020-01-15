@@ -198,7 +198,7 @@ type Topic {
   description: String!
   publicTitle: String
   logoUrl: String
-  language: String!
+  language: String
   topicUrl: String
   questions(where: QuestionWhereInput, orderBy: QuestionOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Question!]
 }
@@ -215,7 +215,7 @@ input TopicCreateInput {
   description: String!
   publicTitle: String
   logoUrl: String
-  language: String!
+  language: String
   topicUrl: String
   questions: QuestionCreateManyInput
 }
@@ -248,7 +248,7 @@ type TopicPreviousValues {
   description: String!
   publicTitle: String
   logoUrl: String
-  language: String!
+  language: String
   topicUrl: String
 }
 

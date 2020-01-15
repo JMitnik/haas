@@ -11,16 +11,13 @@ const theme = {
     warning: '#ECC94B',
     error: '#F56565',
     default: {
-      light: '#a4aeb7',
-      normal: '#f5f6f8',
-      background: '#f5f7fa',
-      alt: '#EBEEFF',
-      footer: '#f4f7fa',
+      lightest: '#f5f7fa',
+      light: '#eef1f5',
+      normal: '#d4dcea',
+      dark: '#657590',
+      darkest: '#17263d',
       muted: '#59759c',
       text: '#4f5d6e',
-    },
-    text: {
-      black: '#122840',
     },
   },
   space: [0, 6, 12, 18, 24],
@@ -34,7 +31,7 @@ const theme = {
   },
   buttonSizes: {
     sm: '8px 12px',
-    md: '16px 24px',
+    md: '9px 14px',
     lg: '18px 24px',
   },
   borderRadiuses: {
