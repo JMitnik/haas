@@ -3,25 +3,21 @@ import React from 'react';
 import { gql, ApolloError } from 'apollo-boost';
 import styled, { css } from 'styled-components';
 import { useForm } from 'react-hook-form';
+import { useMutation } from '@apollo/react-hooks';
+import { useHistory } from 'react-router';
 import { Container, Flex, Grid } from '../components/UI/Container';
 import { H2, H3, Muted } from '../components/UI/Type';
 import { Div } from '../components/UI/Generics';
 import Button from '../components/UI/Buttons';
-import { useMutation } from '@apollo/react-hooks';
-import { useLocation, useHistory } from 'react-router';
+import { GetTopicsQuery } from './DashboardView';
 
-const AddTopicMutation = gql`
+export const AddTopicMutation = gql`
   mutation AddTopic($data: TopicCreateInput!) {
     createTopic(data: $data) {
       title
     }
   }
 `;
-
-interface TextInputProps {
-  title: String;
-  placeholder: String;
-}
 
 interface FormDataProps {
   title: String;
@@ -33,19 +29,18 @@ const TopicBuilderView = () => {
   const history = useHistory();
   const { register, handleSubmit, errors } = useForm<FormDataProps>();
 
-  const [addTopic, {loading, error}] = useMutation(AddTopicMutation, {
+  const [addTopic, { loading }] = useMutation(AddTopicMutation, {
     onCompleted: () => {
       console.log('Added a topic!');
       history.push('/');
     },
+    refetchQueries: [{ query: GetTopicsQuery }],
     onError: (serverError: ApolloError) => {
       console.log(serverError);
     },
   });
 
   const onSubmit = (formData: FormDataProps) => {
-    console.log("Handling submit");
-
     // TODO: Make better typescript supported
     addTopic({
       variables: {
@@ -161,4 +156,3 @@ const FormGroupContainer = styled.div`
 const Form = styled.form``;
 
 export default TopicBuilderView;
-

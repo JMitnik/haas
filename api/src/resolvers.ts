@@ -17,6 +17,8 @@ const MutationResolvers: MutationResolvers = {
 
     return topic;
   },
+  deleteManyTopics: forwardTo('db'),
+  deleteTopic: forwardTo('db'),
   createQuestion: async (parent, { data }, ctx, info) => {
     const question = await prisma.createQuestion({});
 

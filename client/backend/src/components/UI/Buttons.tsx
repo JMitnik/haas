@@ -16,6 +16,12 @@ const Button = styled.button<ButtonProps>`
     padding: ${theme.buttonSizes.md};
     font-size: 1rem;
     font-weight: 600;
+    transition: all 0.1s ease-in;
+    cursor: pointer;
+
+    &:hover {
+      transition: all 0.1s ease-in;
+    }
   `}
 
   ${space}
@@ -27,10 +33,16 @@ const Button = styled.button<ButtonProps>`
         background: theme.colors.default.normal,
         color: theme.colors.default.darkest,
         border: `1px solid ${theme.colors.default.normal}`,
+        '&:hover': {
+          background: Color(theme.colors.default.normal).lighten(0.05).hex(),
+        },
       },
       primary: {
         background: theme.colors.primary,
         color: theme.colors.white,
+        '&:hover': {
+          background: Color(theme.colors.primary).lighten(0.1).hex(),
+        },
       },
       secondary: {
         background: theme.colors.secondary,

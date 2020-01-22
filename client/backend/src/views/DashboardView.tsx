@@ -11,8 +11,9 @@ import { Grid, Flex } from '../components/UI/Container';
 import Icon from '../components/UI/Icon';
 import Label from '../components/UI/Labels';
 import { Div } from '../components/UI/Generics';
+import styled, { css } from 'styled-components';
 
-const GET_TOPICS_QUERY = gql`
+export const GetTopicsQuery = gql`
     {
         topics {
             title
@@ -21,7 +22,7 @@ const GET_TOPICS_QUERY = gql`
 `;
 
 const DashboardView: FC = () => {
-  const { loading, error, data } = useQuery<Query>(GET_TOPICS_QUERY);
+  const { loading, error, data } = useQuery<Query>(GetTopicsQuery);
 
   if (loading) return <p>Loading</p>;
 
@@ -48,18 +49,50 @@ const DashboardView: FC = () => {
       >
         {topics?.map((topic, index) => topic && <TopicCard key={index} topic={topic} /> )}
 
-        <Link to="/topic-builder">
-          <Div useFlex bg="default.footer" alignItems="center" justifyContent="center">
+        <AddTopicCard>
+          <Link to="/topic-builder"></Link>
+          <Div>
             <Plus />
             <H3>
               Add topic
             </H3>
           </Div>
-        </Link>
+        </AddTopicCard>
       </Grid>
     </>
   );
 };
+
+const AddTopicCard = styled(Card)`
+  ${({ theme }) => css`
+    position: relative;
+
+    &:hover ${Div} {
+      transition: all 0.2s ease-in;
+      box-shadow: 0 1px 3px 1px rgba(0,0,0,0.1);
+    }
+
+    ${Div} {
+      height: 100%;
+      border: 1px solid ${theme.colors.default.light};
+      transition: all 0.2s ease-in;
+      display: flex;
+      align-items: center;
+      flex-direciton: column;
+      justify-content: center;
+      background: ${theme.colors.default.light};
+    }
+
+    a {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      top: 0;
+      text-decoration: none;
+    }
+  `}
+`;
 
 const TopicCard = ({ topic }: { topic: Topic }) => (
   <Card useFlex flexDirection="column">
