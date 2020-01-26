@@ -11,17 +11,14 @@ const MutationResolvers: MutationResolvers = {
   createTopic: async (parent, { data }, ctx, info) => {
 
     // TODO: Fix type-mismatch between questions from resolver-types and index
-    const { title, language, description, questions } = data;
+    const { title, publicTitle, description } = data;
 
-    const topic = await prisma.createTopic({title, language, description});
+    const topic = await prisma.createTopic({title, publicTitle, description});
 
-    return {
-      id: topic.id,
-      title,
-      language,
-      description
-    }
+    return topic;
   },
+  deleteManyTopics: forwardTo('db'),
+  deleteTopic: forwardTo('db'),
   createQuestion: async (parent, { data }, ctx, info) => {
     const question = await prisma.createQuestion({});
 

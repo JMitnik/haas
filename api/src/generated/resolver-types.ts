@@ -361,7 +361,7 @@ export type Topic = {
   description: Scalars['String'],
   publicTitle?: Maybe<Scalars['String']>,
   logoUrl?: Maybe<Scalars['String']>,
-  language: Scalars['String'],
+  language?: Maybe<Scalars['String']>,
   topicUrl?: Maybe<Scalars['String']>,
   questions?: Maybe<Array<Question>>,
 };
@@ -390,7 +390,7 @@ export type TopicCreateInput = {
   description: Scalars['String'],
   publicTitle?: Maybe<Scalars['String']>,
   logoUrl?: Maybe<Scalars['String']>,
-  language: Scalars['String'],
+  language?: Maybe<Scalars['String']>,
   topicUrl?: Maybe<Scalars['String']>,
   questions?: Maybe<QuestionCreateManyInput>,
 };
@@ -425,7 +425,7 @@ export type TopicPreviousValues = {
   description: Scalars['String'],
   publicTitle?: Maybe<Scalars['String']>,
   logoUrl?: Maybe<Scalars['String']>,
-  language: Scalars['String'],
+  language?: Maybe<Scalars['String']>,
   topicUrl?: Maybe<Scalars['String']>,
 };
 
@@ -832,7 +832,7 @@ export type TopicResolvers<ContextType = any, ParentType extends ResolversParent
   description?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
   publicTitle?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   logoUrl?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
-  language?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
+  language?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   topicUrl?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   questions?: Resolver<Maybe<Array<ResolversTypes['Question']>>, ParentType, ContextType, TopicQuestionsArgs>,
 }>;
@@ -854,7 +854,7 @@ export type TopicPreviousValuesResolvers<ContextType = any, ParentType extends R
   description?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
   publicTitle?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   logoUrl?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
-  language?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
+  language?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   topicUrl?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
 }>;
 

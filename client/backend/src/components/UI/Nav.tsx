@@ -14,7 +14,7 @@ const TopNavContainer = styled(Div)<GenericProps>`
     border-bottom: 1px solid ${theme.colors.default.normal};
 
     a {
-      color: ${theme.colors.default.light};
+      color: ${theme.colors.default.dark};
       text-decoration: none;
     }
   `}

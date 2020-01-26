@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { TypographyProps, typography, space, SpaceProps, color, ColorProps } from 'styled-system';
 
 interface GenericTypeProps extends TypographyProps, SpaceProps, ColorProps {}
@@ -18,5 +18,13 @@ export const H2 = styled(GenericType).attrs({ as: 'h2' })``;
 export const H3 = styled(GenericType).attrs({ as: 'h3' })``;
 
 export const H4 = styled(GenericType).attrs({ as: 'h4' })``;
+
+export const Muted = styled(GenericType).attrs({ as: 'p' })`
+  ${({ theme }) => css`
+    font-weight: 300;
+    font-size: 0.8rem;
+    color: ${theme.colors.default.dark};
+  `}
+`;
 
 export default {};
