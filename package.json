@@ -1,0 +1,19 @@
+{
+    "private": true,
+    "workspaces": [
+        "api",
+        "frontend/dashboard",
+        "frontend/UI"
+    ],
+    "scripts": {
+        "gen": "yarn server:gen && yarn dashboard:gen",
+        "server:start": "yarn workspace @haas/api start",
+        "server:gen": "yarn workspace @haas/api generate",
+        "dashboard:start": "yarn workspace @haas/dashboard start",
+        "dashboard:gen": "yarn workspace @haas/dashboard generate",
+        "bootstrap": "lerna bootstrap --use-workspaces"
+    },
+    "devDependencies": {
+        "lerna": "^3.20.2"
+    }
+}

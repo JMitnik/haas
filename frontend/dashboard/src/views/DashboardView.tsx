@@ -4,6 +4,7 @@ import { gql } from 'apollo-boost';
 
 import { ChevronRight, Plus } from 'react-feather';
 import { Link } from 'react-router-dom';
+import styled, { css } from 'styled-components';
 import { Card, CardBody, CardFooter } from '../components/UI/Cards';
 import { Query, Topic } from '../types';
 import { H2, H3, H4 } from '../components/UI/Type';
@@ -11,7 +12,7 @@ import { Grid, Flex } from '../components/UI/Container';
 import Icon from '../components/UI/Icon';
 import Label from '../components/UI/Labels';
 import { Div } from '../components/UI/Generics';
-import styled, { css } from 'styled-components';
+import UI from '@haas/common';
 
 export const GetTopicsQuery = gql`
     {

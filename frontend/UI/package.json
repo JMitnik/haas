@@ -1,0 +1,8 @@
+{
+    "name": "@haas/ui",
+    "version": "1.0.0",
+    "main": "index.tsx",
+    "dependencies": {
+        "styled-components": "^5.0.0"
+    }
+}
