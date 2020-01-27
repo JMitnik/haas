@@ -13,6 +13,7 @@
         ]
     },
     "scripts": {
+        "start": "concurrently \"yarn start:dashboard\" \"yarn start:api\"",
         "gen": "yarn server:gen && yarn dashboard:gen",
         "start:api": "yarn workspace @haas/api start",
         "server:gen": "yarn workspace @haas/api generate",
@@ -21,6 +22,7 @@
         "bootstrap": "lerna bootstrap --use-workspaces"
     },
     "devDependencies": {
-        "lerna": "^3.20.2"
-    }
+        "lerna": "^3.20.2",
+        "concurrently": "^5.1.0"
+    },
 }
