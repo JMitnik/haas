@@ -1,0 +1,28 @@
+{
+    "private": true,
+    "workspaces": {
+        "packages": [
+            "api",
+            "frontend/dashboard",
+            "frontend/ui"
+        ],
+        "nohoist": [
+            "frontend/dashboard/webpack-dev-server",
+            "**/babel-loader",
+            "**/babel-jest"
+        ]
+    },
+    "scripts": {
+        "start": "concurrently \"yarn start:dashboard\" \"yarn start:api\"",
+        "gen": "yarn server:gen && yarn dashboard:gen",
+        "start:api": "yarn workspace @haas/api start",
+        "server:gen": "yarn workspace @haas/api generate",
+        "start:dashboard": "yarn workspace @haas/dashboard start",
+        "dashboard:gen": "yarn workspace @haas/dashboard generate",
+        "bootstrap": "lerna bootstrap --use-workspaces"
+    },
+    "devDependencies": {
+        "lerna": "^3.20.2",
+        "concurrently": "^5.1.0"
+    },
+}
