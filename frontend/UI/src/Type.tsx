@@ -26,5 +26,3 @@ export const Muted = styled(GenericType).attrs({ as: 'p' })`
     color: ${theme.colors.default.dark};
   `}
 `;
-
-export default {};

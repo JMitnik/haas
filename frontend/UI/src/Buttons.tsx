@@ -10,7 +10,7 @@ export interface ButtonProps extends SpaceProps {
   size?: sizeVariants;
 }
 
-const Button = styled.button<ButtonProps>`
+export const Button = styled.button<ButtonProps>`
   ${({ theme }) => css`
     border-radius: ${theme.borderRadiuses.md};
     padding: ${theme.buttonSizes.md};
@@ -78,5 +78,3 @@ const Button = styled.button<ButtonProps>`
     },
   })}
 `;
-
-export default Button;

@@ -2,7 +2,7 @@ import styled, { css } from 'styled-components';
 import React, { FC } from 'react';
 import { Link } from 'react-router-dom';
 import { Settings } from 'react-feather';
-import Logo from '../assets/Logo';
+// import Logo from '../dashboard/src/components/assets/Logo';
 import { Container } from './Container';
 import { GenericProps, Div } from './Generics';
 import { ProfilePic } from './User';
@@ -35,7 +35,7 @@ export const TopNav: FC = () => (
   <TopNavContainer bg="white">
     <Container p="4" useFlex justifyContent="space-between" alignItems="center">
       <Link to="/">
-        <Logo />
+        {/* <Logo /> */}
       </Link>
       <UserNav />
     </Container>

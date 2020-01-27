@@ -1,70 +1,71 @@
 {
-  "name": "@haas/dashboard",
-  "version": "0.1.0",
-  "private": true,
-  "main": "src/index.tsx",
-  "dependencies": {
-    "@apollo/react-hooks": "^3.1.3",
-    "@graphql-codegen/cli": "^1.11.2",
-    "@graphql-codegen/typescript": "^1.11.2",
-    "@haas/common": "1.0.0",
-    "@react-workspaces/react-scripts": "^3.3.0-alpha-08",
-    "@testing-library/jest-dom": "^4.2.4",
-    "@testing-library/react": "^9.4.0",
-    "@testing-library/user-event": "^7.2.1",
-    "@types/color": "^3.0.1",
-    "@types/jest": "^24.0.25",
-    "@types/node": "^12.12.24",
-    "@types/react": "^16.9.17",
-    "@types/react-dom": "^16.9.5",
-    "@types/react-router": "^5.1.4",
-    "@types/react-router-dom": "^5.1.3",
-    "@types/styled-components": "^4.4.2",
-    "@types/styled-system": "^5.1.4",
-    "apollo": "^2.21.3",
-    "apollo-boost": "^0.4.7",
-    "color": "^3.1.2",
-    "eslint": "^6.8.0",
-    "graphql": "^14.5.8",
-    "react": "^16.12.0",
-    "react-dom": "^16.12.0",
-    "react-feather": "^2.0.3",
-    "react-hook-form": "^4.4.8",
-    "react-router": "^5.1.2",
-    "react-router-dom": "^5.1.2",
-    "styled-components": "^5.0.0",
-    "styled-system": "^5.1.4",
-    "typescript": "^3.7.4"
-  },
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "generate": "graphql-codegen",
-    "eject": "react-scripts eject",
-    "eslint": "eslint --ext .js,.jsx,.ts,.tsx ./src"
-  },
-  "eslintConfig": {
-    "extends": "react-app"
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  },
-  "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^2.15.0",
-    "eslint-config-airbnb-typescript": "^6.3.1",
-    "eslint-plugin-import": "^2.19.1",
-    "eslint-plugin-jsx-a11y": "^6.2.3",
-    "eslint-plugin-react": "^7.17.0",
-    "eslint-plugin-react-hooks": "^1.7.0"
-  }
+    "name": "@haas/dashboard",
+    "version": "0.1.0",
+    "private": true,
+    "main": "src/index.tsx",
+    "dependencies": {
+        "@apollo/react-hooks": "^3.1.3",
+        "@graphql-codegen/cli": "^1.11.2",
+        "@graphql-codegen/typescript": "^1.11.2",
+        "@haas/ui": "*",
+        "@react-workspaces/react-scripts": "^3.3.0-alpha-08",
+        "@testing-library/jest-dom": "^4.2.4",
+        "@testing-library/react": "^9.4.0",
+        "@testing-library/user-event": "^7.2.1",
+        "@types/color": "^3.0.1",
+        "@types/jest": "^24.0.25",
+        "@types/node": "^12.12.24",
+        "@types/react": "^16.9.17",
+        "@types/react-dom": "^16.9.5",
+        "@types/react-router": "^5.1.4",
+        "@types/react-router-dom": "^5.1.3",
+        "@types/styled-components": "^4.4.2",
+        "@types/styled-system": "^5.1.4",
+        "apollo": "^2.21.3",
+        "apollo-boost": "^0.4.7",
+        "color": "^3.1.2",
+        "eslint": "^6.8.0",
+        "graphql": "^14.5.8",
+        "react": "^16.12.0",
+        "react-dom": "^16.12.0",
+        "react-feather": "^2.0.3",
+        "react-hook-form": "^4.4.8",
+        "react-router": "^5.1.2",
+        "react-router-dom": "^5.1.2",
+        "styled-components": "^5.0.0",
+        "styled-system": "^5.1.4",
+        "typescript": "^3.7.4"
+    },
+    "scripts": {
+        "start": "cra-workspaces start",
+        "build": "cra-workspaces build",
+        "test": "react-scripts test",
+        "generate": "graphql-codegen",
+        "eject": "react-scripts eject",
+        "eslint": "eslint --ext .js,.jsx,.ts,.tsx ./src"
+    },
+    "eslintConfig": {
+        "extends": "react-app"
+    },
+    "browserslist": {
+        "production": [
+            ">0.2%",
+            "not dead",
+            "not op_mini all"
+        ],
+        "development": [
+            "last 1 chrome version",
+            "last 1 firefox version",
+            "last 1 safari version"
+        ]
+    },
+    "devDependencies": {
+        "@typescript-eslint/eslint-plugin": "^2.15.0",
+        "cra-workspaces": "^1.0.1",
+        "eslint-config-airbnb-typescript": "^6.3.1",
+        "eslint-plugin-import": "^2.19.1",
+        "eslint-plugin-jsx-a11y": "^6.2.3",
+        "eslint-plugin-react": "^7.17.0",
+        "eslint-plugin-react-hooks": "^1.7.0"
+    }
 }

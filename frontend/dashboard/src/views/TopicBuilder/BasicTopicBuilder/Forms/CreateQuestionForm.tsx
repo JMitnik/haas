@@ -3,10 +3,10 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 
-import { CheckBoxWrapper, CheckBox, CheckBoxLabel, GridForm } from '../../../../components/UI/Form';
+import { CheckBoxWrapper, CheckBox, CheckBoxLabel, GridForm, Button } from '@haas/ui';
+import { ButtonProps } from '@haas/ui/src/Buttons';
 import InputSectionView from './NameInputForm';
 import OpenQuestionForm from './OpenQuestionForm';
-import Button, { ButtonProps } from '../../../../components/UI/Buttons';
 
 export const MiniHeader = styled.h4`
     grid-column-start: 1;

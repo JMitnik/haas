@@ -7,11 +7,9 @@ import {
 
 interface IconProps extends LayoutProps, TypographyProps, ColorProps, SpaceProps {}
 
-const Icon = styled.span<IconProps>`
+export const Icon = styled.span<IconProps>`
   ${color}
   ${typography}
   ${layout}
   ${space}
 `;
-
-export default Icon;

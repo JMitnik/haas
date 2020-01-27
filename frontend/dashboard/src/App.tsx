@@ -3,14 +3,13 @@ import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import { ApolloProvider } from '@apollo/react-hooks';
 import styled, { ThemeProvider, css } from 'styled-components';
 
-import { TopNav } from './components/UI/Nav';
+import { TopNav, Container } from '@haas/ui';
 import GlobalStyle from './config/global-styles';
 import themeConfig from './config/theme';
 import client from './config/apollo';
 import DashboardView from './views/DashboardView';
 import TopicBuilderView from './views/TopicBuilderView';
 import OrganisationSettingsView from './views/OrganisationSettingsView';
-import { Container } from './components/UI/Container';
 
 const AppContainer = styled.div`
   ${({ theme }) => css`

@@ -3,9 +3,8 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { ArrowDown, ArrowUp, Square } from 'react-feather';
 
+import { Div, H3 } from '@haas/ui';
 import CreateQuestionForm from './CreateQuestionForm';
-import { Div } from '../../../../components/UI/Generics';
-import { H3 } from '../../../../components/UI/Type';
 
 export const CreateQuestionContainer = styled.div`
   display: grid;

@@ -10,7 +10,7 @@ interface SpanProps {
   size?: sizeVariants;
 }
 
-const Label = styled.span<SpanProps>`
+export const Label = styled.span<SpanProps>`
   ${({ theme }) => css`
     border-radius: ${theme.borderRadiuses.lg};
     font-weight: 800;
@@ -58,5 +58,3 @@ const Label = styled.span<SpanProps>`
     },
   })}
 `;
-
-export default Label;

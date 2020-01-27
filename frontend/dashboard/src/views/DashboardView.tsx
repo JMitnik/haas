@@ -3,16 +3,10 @@ import { useQuery } from '@apollo/react-hooks';
 import { gql } from 'apollo-boost';
 
 import { ChevronRight, Plus } from 'react-feather';
+import { H2, H3, H4, Grid, Flex, Icon, Label, Div, Card, CardBody, CardFooter } from '@haas/ui';
 import { Link } from 'react-router-dom';
 import styled, { css } from 'styled-components';
-import { Card, CardBody, CardFooter } from '../components/UI/Cards';
-import { Query, Topic } from '../types';
-import { H2, H3, H4 } from '../components/UI/Type';
-import { Grid, Flex } from '../components/UI/Container';
-import Icon from '../components/UI/Icon';
-import Label from '../components/UI/Labels';
-import { Div } from '../components/UI/Generics';
-import UI from '@haas/common';
+import { Query, Topic } from '../types.d';
 
 export const GetTopicsQuery = gql`
     {
@@ -48,10 +42,10 @@ const DashboardView: FC = () => {
         gridTemplateColumns={['1fr', '1fr 1fr 1fr']}
         gridAutoRows="minmax(200px, 1fr)"
       >
-        {topics?.map((topic, index) => topic && <TopicCard key={index} topic={topic} /> )}
+        {topics?.map((topic, index) => topic && <TopicCard key={index} topic={topic} />)}
 
         <AddTopicCard>
-          <Link to="/topic-builder"></Link>
+          <Link to="/topic-builder" />
           <Div>
             <Plus />
             <H3>

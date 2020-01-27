@@ -1,7 +1,7 @@
 {
     "packages": [
         "api",
-        "frontend/common",
+        "frontend/UI",
         "frontend/dashboard"
     ],
     "version": "0.0.0",

@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
 
 import { useForm } from 'react-hook-form';
+import { GridForm, Button } from '@haas/ui';
 import { MiniHeader } from './BasicTopicsTopicForm';
 import NameInputForm from './NameInputForm';
 import BasicTopicQuestionOverview from './BasicTopicQuestionOverview';
-import Button from '../../../../components/UI/Buttons';
-import { GridForm } from '../../../../components/UI/Form';
 
 export interface QuestionProps {
   question_index: number;

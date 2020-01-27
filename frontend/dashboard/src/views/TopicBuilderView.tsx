@@ -5,10 +5,7 @@ import styled, { css } from 'styled-components';
 import { useForm } from 'react-hook-form';
 import { useMutation } from '@apollo/react-hooks';
 import { useHistory } from 'react-router';
-import { Container, Flex, Grid } from '../components/UI/Container';
-import { H2, H3, Muted } from '../components/UI/Type';
-import { Div } from '../components/UI/Generics';
-import Button from '../components/UI/Buttons';
+import { Container, Flex, Grid, H2, H3, Muted, Button, Div } from '@haas/ui';
 import { GetTopicsQuery } from './DashboardView';
 
 export const AddTopicMutation = gql`

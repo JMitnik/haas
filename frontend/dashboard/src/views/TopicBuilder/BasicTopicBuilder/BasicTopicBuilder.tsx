@@ -3,10 +3,8 @@ import React from 'react';
 import styled from 'styled-components';
 import { NavLink, Switch, Route } from 'react-router-dom';
 
+import { Div, Flex, Grid, Button } from '@haas/ui';
 import BasicTopicsTopicForm from './Forms/BasicTopicsTopicForm';
-import { Div } from '../../../components/UI/Generics';
-import { Flex, Grid } from '../../../components/UI/Container';
-import Button from '../../../components/UI/Buttons';
 import QuestionsForm from './Forms/QuestionsForm';
 
 const ListItem = styled.li`

@@ -1,12 +1,10 @@
-import React from 'react'
+import React from 'react';
 
-const OrganisationSettingsView = () => {
-    return (
-        <div>
+const OrganisationSettingsView = () => (
+  <div>
             OrganisationSettings
-        </div>
-    )
-};
+  </div>
+);
 
 export default OrganisationSettingsView;
 

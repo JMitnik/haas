@@ -1,8 +1,61 @@
 {
-    "name": "@haas/ui",
-    "version": "1.0.0",
-    "main": "index.tsx",
-    "dependencies": {
-        "styled-components": "^5.0.0"
+  "name": "@haas/ui",
+  "version": "1.0.0",
+  "main": "src/index.tsx",
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "generate": "graphql-codegen",
+    "eject": "react-scripts eject",
+    "eslint": "eslint --ext .js,.jsx,.ts,.tsx ./src"
+  },
+  "dependencies": {
+    "@react-workspaces/react-scripts": "3.3.0-alpha-08",
+    "@storybook/react": "^5.2.8",
+    "@testing-library/jest-dom": "^4.2.4",
+    "@testing-library/react": "^9.4.0",
+    "@testing-library/user-event": "^8.0.3",
+    "@types/jest": "^24.0.25",
+    "@types/node": "^13.1.6",
+    "@types/react": "^16.9.17",
+    "@types/react-dom": "^16.9.4",
+    "@typescript-eslint/eslint-plugin": "^2.15.0",
+    "@typescript-eslint/parser": "^2.15.0",
+    "react": "^16.12.0",
+    "react-dom": "^16.12.0",
+    "react-feather": "^2.0.3",
+    "react-router-dom": "^5.1.2",
+    "react-scripts": "3.3.0",
+    "styled-components": "5.0.0",
+    "styled-system": "^5.1.4",
+    "typescript": "~3.7.4"
+  },
+  "devDependencies": {
+    "eslint-plugin-react": "^7.17.0",
+    "eslint-plugin-react-hooks": "^2.3.0"
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ],
+  "jest": {
+    "collectCoverageFrom": [
+      "src/**/*.{ts,tsx}",
+      "!src/setupTests.{ts,tsx}",
+      "!src/serviceWorker.{ts,jsx}",
+      "!src/**/*.(spec|test|stories).{ts,tsx}"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "statements": 98,
+        "branches": 98,
+        "functions": 98,
+        "lines": 98
+      }
     }
+  },
+  "license": "MIT"
 }

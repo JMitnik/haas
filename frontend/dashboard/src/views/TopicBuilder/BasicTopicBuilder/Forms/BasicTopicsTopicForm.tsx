@@ -3,10 +3,9 @@ import { gql, ApolloError } from 'apollo-boost';
 import { useForm } from 'react-hook-form';
 import styled from 'styled-components';
 
-import { CheckBoxWrapper, CheckBox, CheckBoxLabel, GridForm } from '../../../../components/UI/Form';
-import InputSectionView from './NameInputForm';
-import { H4 } from '../../../../components/UI/Type';
+import { CheckBoxWrapper, CheckBox, CheckBoxLabel, GridForm, H4 } from '@haas/ui';
 import { useMutation } from '@apollo/react-hooks';
+import InputSectionView from './NameInputForm';
 
 const AddTopicMutation = gql`
   mutation AddTopic($data: TopicCreateInput!) {
