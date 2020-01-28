@@ -24,5 +24,5 @@
     "devDependencies": {
         "lerna": "^3.20.2",
         "concurrently": "^5.1.0"
-    },
+    }
 }
