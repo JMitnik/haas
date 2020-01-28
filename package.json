@@ -4,7 +4,8 @@
         "packages": [
             "api",
             "frontend/dashboard",
-            "frontend/ui"
+            "frontend/ui",
+            "frontend/client"
         ],
         "nohoist": [
             "frontend/dashboard/webpack-dev-server",
@@ -13,9 +14,10 @@
         ]
     },
     "scripts": {
-        "start": "concurrently \"yarn start:dashboard\" \"yarn start:api\"",
+        "start": "concurrently \"yarn start:dashboard\" \"yarn start:client\" \"yarn start:api\"",
         "gen": "yarn server:gen && yarn dashboard:gen",
         "start:api": "yarn workspace @haas/api start",
+        "start:client": "yarn workspace @haas/client start",
         "server:gen": "yarn workspace @haas/api generate",
         "start:dashboard": "yarn workspace @haas/dashboard start",
         "dashboard:gen": "yarn workspace @haas/dashboard generate",
