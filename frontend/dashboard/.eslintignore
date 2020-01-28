@@ -6,3 +6,4 @@
 **/.git/**
 serviceWorker.ts
 src/serviceWorker.ts
+**/serviceWorker.ts

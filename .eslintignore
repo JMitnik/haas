@@ -4,6 +4,5 @@
 **/coverage/**
 **/build/**
 **/.git/**
-**/public/**
-!.eslintrc.js
 serviceWorker.ts
+**/serviceWorker.ts
