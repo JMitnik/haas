@@ -1,4 +1,5 @@
 import styled, { css } from 'styled-components';
+import { space, SpaceProps } from 'styled-system';
 
 export const CheckBoxWrapper = styled.div`
   position: relative;
@@ -47,6 +48,8 @@ export const CheckBox = styled.input`
     }
   }
 `;
+
+export const Slider = styled.input.attrs({ type: 'range' })<SpaceProps>``;
 
 export const GridForm = styled.form`
   ${({ theme }) => css`

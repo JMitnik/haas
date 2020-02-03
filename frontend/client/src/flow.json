@@ -1,0 +1,115 @@
+{
+    "rootQuestion": {
+        "title": "How do you feel about Starbucks?",
+        "type": "slider",
+        "children": [
+            {
+                "branchVal": "8_10-Slider",
+                "title": "What did you like",
+                "conditions": {
+                    "renderMin": 8,
+                    "renderMax": 10
+                },
+                "type": "multi-choice",
+                "children": [
+                    {
+                        "branchVal": "Facilities",
+                        "title": "What exactly did you like aobut facilities?",
+                        "type": "multi-choice",
+                        "setCTAID": "1",
+                        "children": [
+                            {
+                                "branchVal": "Cleanliness",
+                                "title": "Cleanliness"
+                            },
+                            {
+                                "branchVal": "Atmosphere",
+                                "title": "Atmosphere"
+                            },
+                            {
+                                "branchVal": "Location",
+                                "title": "Location"
+                            },
+                            {
+                                "branchVal": "Other",
+                                "children": [
+                                    {
+                                        "title": "Please tell us more",
+                                        "type": "textbox",
+                                        "setCTAID": "2"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "branchVal": "Website",
+                        "title": "What exactly did you like about the website?",
+                        "type": "multi-choice",
+                        "setCTAID": "2",
+                        "children": [
+                            {
+                                "branchVal": "Design"
+                            },
+                            {
+                                "branchVal": "Functionality"
+                            },
+                            {
+                                "branchVal": "Informative"
+                            },
+                            {
+                                "branchVal": "Other",
+                                "children": [
+                                    {
+                                        "title": "Please tell us more",
+                                        "type": "textbox",
+                                        "setCTAID": "2"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+
+                    {
+                        "branchVal": "Website",
+                        "title": "What exactly did you like about the website?",
+                        "type": "multi-choice",
+                        "setCTAID": "2",
+                        "children": [
+                            {
+                                "branchVal": "Design"
+                            },
+                            {
+                                "branchVal": "Functionality"
+                            },
+                            {
+                                "branchVal": "Informative"
+                            },
+                            {
+                                "branchVal": "Other",
+                                "children": [
+                                    {
+                                        "title": "Please tell us more",
+                                        "type": "textbox"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
+    "CTA": [
+        {
+            "id": 1,
+            "title": "We are happy about your positive feedback. You matter to us! Leave your email below to receive our newsletter.",
+            "type": "textbox"
+        },
+        {
+            "id": 2,
+            "title": "Thank you for your positive feedback. Follow us on Instagram and stay updated.",
+            "type": "social-share"
+        }
+    ]
+}
