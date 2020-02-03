@@ -11,16 +11,16 @@ type HAASCTAType = 'textbox' | 'social-share';
 export interface HAASNode {
   id: number;
   title: string;
-  branchVal?: string;
+  branchVal: string;
   conditions?: HAASNodeConditions;
   type?: HAASQuestionNodeType | HAASCTAType;
   setCTAID?: number;
-  children: [HAASNode?];
+  children: [HAASNode];
 }
 
 interface JSONTreeContextProps {
   activeNode: HAASNode;
-  enterBranch: (node: string) => void;
+  enterBranch: (key: string | number) => void;
   getCTANode: () => HAASNode;
 }
 

@@ -17,15 +17,13 @@ export const HAASForm = () => {
 
 export const HAASMultiChoice = () => {
   const { getValues } = useFormContext();
-  const { activeNode } = useJSONTree();
-  console.log(getValues());
-  console.log(activeNode);
+  const { activeNode, enterBranch } = useJSONTree();
 
   return (
     <>
       <Flex>
         {activeNode.children.map((choice, index) => (
-          <Button key={index}>
+          <Button onClick={() => enterBranch(choice.branchVal)} key={index}>
             {choice?.branchVal}
           </Button>
         ))}
@@ -42,6 +40,17 @@ export const HAASSocialShare = () => {
   )
 }
 
+export const CTANode = () => {
+  const { getCTANode } = useJSONTree();
+  console.log(getCTANode());
+
+  return (
+    <>
+      {renderNextNode(getCTANode())}
+    </>
+  );
+}
+
 const renderNextNode = (node: HAASNode) => {
   if (node.type === "slider") {
     return <HAASSlider />
@@ -54,6 +63,8 @@ const renderNextNode = (node: HAASNode) => {
   if (node.type === 'social-share') {
     return <HAASSocialShare />
   }
+
+  return <CTANode />
 }
 
 const HAASSlider = () => {
