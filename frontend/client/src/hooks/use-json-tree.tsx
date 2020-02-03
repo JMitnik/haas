@@ -24,7 +24,9 @@ export const JSONTreeProvider = ({ json, children }: { json: any, children: Reac
   const [activeNode, setActiveNode] = useState(json);
 
   const enterBranch = (key: string | number) => {
+    // Slider does it numerically
     if (activeNode.type === "slider") {
+      // Find the next node meeting the condition
       const nextNode = activeNode.children?.filter((
         node: HAASNode) => {
           if (node?.conditions?.renderMin && key < node?.conditions?.renderMin) {
