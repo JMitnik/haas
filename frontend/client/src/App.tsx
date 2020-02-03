@@ -31,7 +31,7 @@ const App: React.FC = () => {
       <ThemeProvider theme={theme}>
         <MainAppScreen>
           <CenteredScreen>
-            <JSONTreeProvider json={data.rootQuestion}>
+            <JSONTreeProvider json={data}>
               <FormContext {...form}>
                 <ColumnFlex alignItems="center">
                   <HAASForm />

@@ -2,6 +2,7 @@
     "rootQuestion": {
         "title": "How do you feel about Starbucks?",
         "type": "slider",
+        "setCTAID": "1",
         "children": [
             {
                 "branchVal": "8_10-Slider",
@@ -100,7 +101,12 @@
             }
         ]
     },
-    "CTA": [
+    "CTACollection": [
+        {
+            "id": 0,
+            "title": "Thank you for your positive feedback. Follow us on Instagram and stay updated.",
+            "type": "social-share"
+        },
         {
             "id": 1,
             "title": "We are happy about your positive feedback. You matter to us! Leave your email below to receive our newsletter.",

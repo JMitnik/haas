@@ -2,6 +2,7 @@ import React from 'react';
 import { H1, H2, Slider, Flex, Button } from '@haas/ui';
 import { useFormContext } from 'react-hook-form';
 import { useJSONTree, HAASNode } from './hooks/use-json-tree';
+import { Instagram } from 'react-feather';
 
 export const HAASForm = () => {
   const { activeNode } = useJSONTree();
@@ -33,6 +34,14 @@ export const HAASMultiChoice = () => {
   )
 }
 
+export const HAASSocialShare = () => {
+  return (
+    <>
+      <Instagram />
+    </>
+  )
+}
+
 const renderNextNode = (node: HAASNode) => {
   if (node.type === "slider") {
     return <HAASSlider />
@@ -40,6 +49,10 @@ const renderNextNode = (node: HAASNode) => {
 
   if (node.type === "multi-choice") {
     return <HAASMultiChoice />
+  }
+
+  if (node.type === 'social-share') {
+    return <HAASSocialShare />
   }
 }
 
