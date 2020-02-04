@@ -25,7 +25,7 @@ export const startServer: any = () => {
     server.start(serverOptions, ({ port }) => {
         console.log(`Starting server on port ${port}`);
     }).then(() => {
-      console.log('Running!')
+      console.log(`Running with ${serverOptions}!`)
     })
     .catch((e) => {
       console.log(e);
