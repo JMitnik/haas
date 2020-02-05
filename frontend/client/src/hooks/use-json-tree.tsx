@@ -22,6 +22,7 @@ interface JSONTreeContextProps {
   activeNode: HAASNode;
   enterBranch: (key: string | number) => void;
   getCTANode: () => HAASNode;
+  setActiveNode: (obj: Object) => void;
 }
 
 export const JSONTreeContext = React.createContext({} as JSONTreeContextProps);
@@ -31,13 +32,15 @@ export const JSONTreeProvider = ({ json, children }: { json: any, children: Reac
 
   const bagOfCTANodes: [HAASNode] = json.CTACollection;
   const [activeCTANodeId, setActiveCTANodeID] = useState(0);
-  const getCTANode = () => bagOfCTANodes.filter(node => node.id === activeCTANodeId)[0];
+  const getCTANode = () => bagOfCTANodes.filter(node => node.id == activeCTANodeId)[0];
 
   const enterBranch = (key: string | number) => {
     // If current node overrides the current Call-To-Action
     if (activeNode.setCTAID) {
       setActiveCTANodeID(activeNode.setCTAID);
     }
+
+    console.log('Active node: ', activeNode)
 
     // Slider does it numerically
     // Find the next node meeting the condition
@@ -56,6 +59,8 @@ export const JSONTreeProvider = ({ json, children }: { json: any, children: Reac
       return true;
     });
 
+    console.log('Next node: ', nextNode)
+
     // If there is no next node, return the current CTA
     if (nextNode.length === 0) {
       setActiveNode(getCTANode());
@@ -69,7 +74,7 @@ export const JSONTreeProvider = ({ json, children }: { json: any, children: Reac
     }
 
   return (
-    <JSONTreeContext.Provider value={{activeNode, enterBranch, getCTANode}}>
+    <JSONTreeContext.Provider value={{activeNode, enterBranch, getCTANode, setActiveNode}}>
       {children}
     </JSONTreeContext.Provider>
   );

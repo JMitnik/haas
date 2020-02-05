@@ -41,12 +41,11 @@ export const HAASSocialShare = () => {
 }
 
 export const CTANode = () => {
-  const { getCTANode } = useJSONTree();
+  const { getCTANode, setActiveNode} = useJSONTree();
   console.log(getCTANode());
-
+  setActiveNode(getCTANode())
   return (
     <>
-      {renderNextNode(getCTANode())}
     </>
   );
 }
