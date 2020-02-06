@@ -1,7 +1,7 @@
 import React from 'react';
 import { H1, H2, Slider, Flex, Button } from '@haas/ui';
 import { useFormContext } from 'react-hook-form';
-import { useJSONTree, HAASNode } from './hooks/use-json-tree';
+import { useJSONTree, HAASNode, MultiChoiceOption } from './hooks/use-json-tree';
 import { Instagram } from 'react-feather';
 
 export const HAASForm = () => {
@@ -22,7 +22,13 @@ export const HAASMultiChoice = () => {
   return (
     <>
       <Flex>
-        {activeNode.children.map((choice, index) => (
+        {activeNode?.options?.map((multiChoiceOption: MultiChoiceOption, index: any) => (
+          <Button onClick={() => enterBranch(multiChoiceOption.value)} key={index}>
+          {(multiChoiceOption?.publicValue?.length ?? 0) > 0 ? multiChoiceOption?.publicValue : multiChoiceOption?.value}
+        </Button>
+        ))}
+        
+        {activeNode?.children?.map((choice, index) => (
           <Button onClick={() => enterBranch(choice.branchVal)} key={index}>
             {choice?.branchVal}
           </Button>
@@ -40,10 +46,10 @@ export const HAASSocialShare = () => {
   )
 }
 
-export const CTANode = () => {
-  const { getCTANode, setActiveNode} = useJSONTree();
-  console.log(getCTANode());
-  setActiveNode(getCTANode())
+export const LeafNode = () => {
+  // const { getLeafNode, setActiveNode} = useJSONTree();
+  // // console.log(getLeafNode());
+  // // setActiveNode(getLeafNode())
   return (
     <>
     </>
@@ -63,7 +69,7 @@ const renderNextNode = (node: HAASNode) => {
     return <HAASSocialShare />
   }
 
-  return <CTANode />
+  // return <LeafNode />
 }
 
 const HAASSlider = () => {

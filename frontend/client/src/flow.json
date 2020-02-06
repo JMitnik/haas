@@ -2,10 +2,10 @@
     "rootQuestion": {
         "title": "How do you feel about Starbucks?",
         "type": "slider",
-        "setCTAID": "1",
         "children": [
             {
                 "branchVal": "8_10-Slider",
+                "setLeafID": "2",
                 "title": "What did you like",
                 "conditions": {
                     "renderMin": 8,
@@ -15,29 +15,29 @@
                 "children": [
                     {
                         "branchVal": "Facilities",
+                        "setLeafID": "3",
                         "title": "What exactly did you like aobut facilities?",
                         "type": "multi-choice",
-                        "setCTAID": "1",
+                        "options": [
+                            {
+                                "value": "Cleanliness"
+                            },
+                            {
+                                "value": "Atmosphere",
+                                "publicValue": "Atmosphere (publicValue)"
+                            },
+                            {
+                                "value": "Location",
+                                "publicValue": "Location (publicValue)"
+                            }
+                        ],
                         "children": [
-                            {
-                                "branchVal": "Cleanliness",
-                                "title": "Cleanliness"
-                            },
-                            {
-                                "branchVal": "Atmosphere",
-                                "title": "Atmosphere"
-                            },
-                            {
-                                "branchVal": "Location",
-                                "title": "Location"
-                            },
                             {
                                 "branchVal": "Other",
                                 "children": [
                                     {
                                         "title": "Please tell us more",
-                                        "type": "textbox",
-                                        "setCTAID": "2"
+                                        "type": "textbox"
                                     }
                                 ]
                             }
@@ -47,24 +47,25 @@
                         "branchVal": "Website",
                         "title": "What exactly did you like about the website?",
                         "type": "multi-choice",
-                        "setCTAID": "2",
+                        "setLeafID": "4",
+                        "options": [
+                            {
+                                "value": "Design"
+                            },
+                            {
+                                "value": "Functionality"
+                            },
+                            {
+                                "value": "Informative"
+                            }
+                        ],
                         "children": [
-                            {
-                                "branchVal": "Design"
-                            },
-                            {
-                                "branchVal": "Functionality"
-                            },
-                            {
-                                "branchVal": "Informative"
-                            },
                             {
                                 "branchVal": "Other",
                                 "children": [
                                     {
                                         "title": "Please tell us more",
-                                        "type": "textbox",
-                                        "setCTAID": "2"
+                                        "type": "textbox"
                                     }
                                 ]
                             }
@@ -72,20 +73,21 @@
                     },
 
                     {
-                        "branchVal": "Website",
+                        "branchVal": "Website 2",
                         "title": "What exactly did you like about the website?",
                         "type": "multi-choice",
-                        "setCTAID": "2",
+                        "options": [
+                            {
+                                "value": "Design"
+                            },
+                            {
+                                "value": "Functionality"
+                            },
+                            {
+                                "value": "Informative"
+                            }
+                        ],
                         "children": [
-                            {
-                                "branchVal": "Design"
-                            },
-                            {
-                                "branchVal": "Functionality"
-                            },
-                            {
-                                "branchVal": "Informative"
-                            },
                             {
                                 "branchVal": "Other",
                                 "children": [
@@ -101,10 +103,10 @@
             }
         ]
     },
-    "CTACollection": [
+    "LeafCollection": [
         {
             "id": 0,
-            "title": "Thank you for your positive feedback. Follow us on Instagram and stay updated.",
+            "title": "Thank you for your feedback. Follow us on Instagram and stay updated.",
             "type": "social-share"
         },
         {
@@ -114,8 +116,17 @@
         },
         {
             "id": 2,
-            "title": "Thank you for your positive feedback. Follow us on Instagram and stay updated.",
+            "title": "Thank you for your elaborate feedback. Kindly appreciated bruv!",
             "type": "social-share"
+        },
+        {
+            "id": 3,
+            "title": "Thank you for your feedback on our facilities. We hope to see you soon again!",
+            "type": "social-share"
+        },
+        {
+            "id": 4,
+            "title": "Thank you for your feedback on our website. We hope to hear from you again!"
         }
     ]
 }
