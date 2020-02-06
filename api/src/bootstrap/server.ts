@@ -17,8 +17,7 @@ const server: GraphQLServer = new GraphQLServer({
 
 const serverOptions: Options = {
     port: config.APP_PORT,
-    endpoint: config.ENDPOINT,
-    playground: '/playground',
+    endpoint: config.ENDPOINT
 };
 
 export const startServer: any = () => {
