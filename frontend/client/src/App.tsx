@@ -1,26 +1,47 @@
 import React from 'react';
-import logo from './logo.svg';
+import styled, { css, ThemeProvider } from 'styled-components';
+import theme from './theme';
+import { useFormContext, FormContext, useForm } from 'react-hook-form';
+import { Button, Flex, Div, H1, H3, Slider } from '@haas/ui';
+import { ColumnFlex } from '@haas/ui/src/Container';
+import flow from './flow.json';
+import { useJSONTree, JSONTreeProvider, HAASNode }  from './hooks/use-json-tree';
+import { HAASForm } from './HAASForm';
 
-import './App.css';
+const MainAppScreen = styled(Div)`
+  ${({ theme }) => css`
+    min-width: 100vw;
+    min-height: 100vh;
+    background: ${theme.colors.primary};
+  `}
+`;
+
+const CenteredScreen = styled(Div)`
+  max-width: 780px;
+  margin: 0 auto;
+  padding-top: 100px;
+`;
 
 const App: React.FC = () => {
+  const form = useForm();
+  const data = flow;
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <ThemeProvider theme={theme}>
+        <MainAppScreen>
+          <CenteredScreen>
+            <JSONTreeProvider json={data}>
+              <FormContext {...form}>
+                <ColumnFlex alignItems="center">
+                  <HAASForm />
+                </ColumnFlex>
+              </FormContext>
+            </JSONTreeProvider>
+          </CenteredScreen>
+        </MainAppScreen>
+      </ThemeProvider>
+    </>
   );
 }
 

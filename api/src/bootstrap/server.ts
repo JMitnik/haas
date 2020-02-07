@@ -17,12 +17,16 @@ const server: GraphQLServer = new GraphQLServer({
 
 const serverOptions: Options = {
     port: config.APP_PORT,
-    endpoint: config.ENDPOINT,
-    playground: '/playground',
+    endpoint: config.ENDPOINT
 };
 
 export const startServer: any = () => {
     server.start(serverOptions, ({ port }) => {
         console.log(`Starting server on port ${port}`);
-    }).then();
+    }).then(() => {
+      console.log(`Running with port: ${serverOptions.port}!, endpoint: ${serverOptions.endpoint}`)
+    })
+    .catch((e) => {
+      console.log(e);
+    });
 };

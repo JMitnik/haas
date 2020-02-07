@@ -1,4 +1,4 @@
-export { CheckBox, CheckBoxLabel, CheckBoxWrapper, GridForm } from './Form';
+export { CheckBox, CheckBoxLabel, CheckBoxWrapper, GridForm, Slider } from './Form';
 export { Button } from './Buttons';
 export { Container, Grid, Flex } from './Container';
 export { Div } from './Generics';

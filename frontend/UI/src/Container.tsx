@@ -23,6 +23,13 @@ export const Flex = styled.div<FlexboxProps>`
   ${flexbox}
 `;
 
+export const ColumnFlex = styled.div<FlexboxProps>`
+  display: flex;
+  flex-direction: column;
+
+  ${flexbox}
+`;
+
 export const Grid = styled.div<GridProps>`
   display: grid;
   ${grid}
