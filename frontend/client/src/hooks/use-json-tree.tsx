@@ -6,7 +6,7 @@ export interface HAASNodeConditions {
 }
 
 type HAASQuestionNodeType = 'slider' | 'multi-choice' | 'text-box';
-type HAASLeafType = 'textbox' | 'social-share';
+type HAASLeafType = 'textbox' | 'social-share' | 'registration' | 'phone';
 
 export interface MultiChoiceOption {
   value: string;
@@ -69,8 +69,11 @@ export const JSONTreeProvider = ({ json, children }: { json: any, children: Reac
       return true;
     });
 
+
+    console.log('next node: ', nextNode);
+
     // If there is no next node, return the current Leaf
-    if (nextNode.length === 0) {
+    if (!nextNode || (nextNode && nextNode?.length === 0)) {
       const leafNode = getLeafNode();
       console.log('Setting Leaf Node: ', leafNode)
       setActiveNode(leafNode);

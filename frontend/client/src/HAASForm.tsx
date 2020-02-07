@@ -24,10 +24,10 @@ export const HAASMultiChoice = () => {
       <Flex>
         {activeNode?.options?.map((multiChoiceOption: MultiChoiceOption, index: any) => (
           <Button onClick={() => enterBranch(multiChoiceOption.value)} key={index}>
-          {(multiChoiceOption?.publicValue?.length ?? 0) > 0 ? multiChoiceOption?.publicValue : multiChoiceOption?.value}
-        </Button>
+            {(multiChoiceOption?.publicValue?.length ?? 0) > 0 ? multiChoiceOption?.publicValue : multiChoiceOption?.value}
+          </Button>
         ))}
-        
+
         {activeNode?.children?.map((choice, index) => (
           <Button onClick={() => enterBranch(choice.branchVal)} key={index}>
             {choice?.branchVal}
@@ -46,12 +46,29 @@ export const HAASSocialShare = () => {
   )
 }
 
-export const LeafNode = () => {
-  // const { getLeafNode, setActiveNode} = useJSONTree();
-  // // console.log(getLeafNode());
-  // // setActiveNode(getLeafNode())
+export const HAASText = () => {
+  const { enterBranch } = useJSONTree();
   return (
     <>
+      <Flex>
+        <input></input>
+        <Button onClick={() => enterBranch('')}>Continue</Button>
+      </Flex>
+    </>
+  );
+}
+
+export const HAASEmailRegistration = () => {
+  return (
+    <>
+      <Flex>
+        <label htmlFor="email">
+          Email Address
+          <input id="email" type="email"></input>
+        </label>
+        
+        <Button onClick={() => console.log('clicked')}>Continue</Button>
+      </Flex>
     </>
   );
 }
@@ -69,6 +86,14 @@ const renderNextNode = (node: HAASNode) => {
     return <HAASSocialShare />
   }
 
+  if (node.type === 'textbox') {
+    return <HAASText />
+  }
+
+  if (node.type === 'registration') {
+    return <HAASEmailRegistration/>
+  }
+
   // return <LeafNode />
 }
 
@@ -79,7 +104,7 @@ const HAASSlider = () => {
   return (
     <>
       <H2 color="white">{watch('slider-value', '5')}</H2>
-      <Slider name="slider-value" onMouseUp={() => enterBranch(watch('slider-value'))} min={0} max={10} mt={4} defaultValue={5} ref={register}/>
+      <Slider name="slider-value" onMouseUp={() => enterBranch(watch('slider-value'))} min={0} max={10} mt={4} defaultValue={5} ref={register} />
     </>
   )
 };
