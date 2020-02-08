@@ -16,7 +16,6 @@ export const HAASForm = () => {
 };
 
 export const HAASMultiChoice = () => {
-  const { getValues } = useFormContext();
   const { activeNode, enterBranch } = useJSONTree();
 
   return (
@@ -66,7 +65,7 @@ export const HAASEmailRegistration = () => {
           Email Address
           <input id="email" type="email"></input>
         </label>
-        
+
         <Button onClick={() => console.log('clicked')}>Continue</Button>
       </Flex>
     </>
@@ -93,8 +92,6 @@ const renderNextNode = (node: HAASNode) => {
   if (node.type === 'registration') {
     return <HAASEmailRegistration/>
   }
-
-  // return <LeafNode />
 }
 
 const HAASSlider = () => {
