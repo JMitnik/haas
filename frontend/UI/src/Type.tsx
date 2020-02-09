@@ -14,6 +14,10 @@ export const Paragraph = styled(GenericType).attrs({ as: 'p' })``;
 export const H1 = styled(GenericType).attrs({ as: 'h1' })`
   ${({ theme }) => css`
     font-size: ${theme.fontSizes[5]}px;
+
+    @media ${theme.media.mob} {
+      font-size: 3rem;
+    }
   `}
 `;
 

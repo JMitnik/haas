@@ -2,33 +2,54 @@
     "rootQuestion": {
         "title": "How do you feel about Starbucks?",
         "type": "slider",
+        "id": 1,
         "children": [
             {
                 "branchVal": "8_10-Slider",
                 "setLeafID": "2",
+                "id": 2,
                 "title": "What did you like",
                 "conditions": {
                     "renderMin": 8,
                     "renderMax": 10
                 },
+                "options": [
+                    {
+                        "value": "Facilities"
+                    },
+                    {
+                        "value": "Website/Mobile app"
+                    },
+                    {
+                        "value": "Product/Services"
+                    },
+                    {
+                        "value": "Customer Support"
+                    },
+                    {
+                        "value": "Other"
+                    }
+                ],
                 "type": "multi-choice",
                 "children": [
                     {
                         "branchVal": "Facilities",
                         "setLeafID": "6",
-                        "title": "What exactly did you like aobut facilities?",
+                        "id": 3,
+                        "title": "What exactly did you like about facilities?",
                         "type": "multi-choice",
                         "options": [
                             {
                                 "value": "Cleanliness"
                             },
                             {
-                                "value": "Atmosphere",
-                                "publicValue": "Atmosphere (publicValue)"
+                                "value": "Atmosphere"
                             },
                             {
-                                "value": "Location",
-                                "publicValue": "Location (publicValue)"
+                                "value": "Location"
+                            },
+                            {
+                                "value": "Other"
                             }
                         ],
                         "children": [
@@ -45,6 +66,7 @@
                         "title": "What exactly did you like about the website?",
                         "type": "multi-choice",
                         "setLeafID": "4",
+                        "id": 4,
                         "options": [
                             {
                                 "value": "Design"
@@ -70,6 +92,7 @@
                         "title": "What exactly did you like about the product/services?",
                         "type": "multi-choice",
                         "setLeafID": "7",
+                        "id": 5,
                         "options": [
                             {
                                 "value": "Quality"
@@ -85,7 +108,7 @@
                             {
                                 "branchVal": "Other",
                                 "title": "Please tell us more",
-                                "type": "textbox"               
+                                "type": "textbox"
                             }
                         ]
                     },
@@ -95,6 +118,7 @@
                         "title": "What exactly did you like about the customer support?",
                         "type": "multi-choice",
                         "setLeafID": "8",
+                        "id": 6,
                         "options": [
                             {
                                 "value": "Friendliness"
@@ -111,7 +135,7 @@
                                 "branchVal": "Other",
                                 "setLeafID": "5",
                                 "title": "Please tell us more",
-                                "type": "textbox"    
+                                "type": "textbox"
                             }
                         ]
                     }
@@ -121,6 +145,7 @@
                 "branchVal": "5_7-Slider",
                 "setLeafID": "9",
                 "title": "What would you like to talk about?",
+                "id": 7,
                 "conditions": {
                     "renderMin": 5,
                     "renderMax": 7
@@ -131,6 +156,7 @@
                         "branchVal": "Facilities",
                         "title": "Please specify.",
                         "type": "multi-choice",
+                        "id": 8,
                         "options": [
                             {
                                 "value": "Cleanliness"
@@ -157,6 +183,7 @@
                         "branchVal": "Website/Mobile app",
                         "title": "Please specify.",
                         "type": "multi-choice",
+                        "id": 9,
                         "options": [
                             {
                                 "value": "Design"
@@ -182,6 +209,7 @@
                         "branchVal": "Product/Services",
                         "title": "Please specify.",
                         "type": "multi-choice",
+                        "id": 10,
                         "options": [
                             {
                                 "value": "Quality"
@@ -198,7 +226,7 @@
                                 "branchVal": "Other",
                                 "setLeafID": "10",
                                 "title": "Please tell us more",
-                                "type": "textbox"               
+                                "type": "textbox"
                             }
                         ]
                     },
@@ -207,6 +235,7 @@
                         "branchVal": "Customer Support",
                         "title": "Please specify.",
                         "type": "multi-choice",
+                        "id": 12,
                         "options": [
                             {
                                 "value": "Friendliness"
@@ -223,7 +252,7 @@
                                 "branchVal": "Other",
                                 "setLeafID": "10",
                                 "title": "Please tell us more",
-                                "type": "textbox"    
+                                "type": "textbox"
                             }
                         ]
                     }
@@ -233,6 +262,7 @@
             {
                 "branchVal": "0_4-Slider",
                 "setLeafID": "9",
+                "id": 12,
                 "title": "We are sorry to hear that! Where can we improve?",
                 "conditions": {
                     "renderMin": 0,
@@ -314,7 +344,7 @@
                                 "branchVal": "Other",
                                 "setLeafID": "15",
                                 "title": "Please tell us more",
-                                "type": "textbox"               
+                                "type": "textbox"
                             }
                         ]
                     },
@@ -340,7 +370,7 @@
                                 "branchVal": "Other",
                                 "setLeafID": "15",
                                 "title": "Please tell us more",
-                                "type": "textbox"    
+                                "type": "textbox"
                             }
                         ]
                     }
@@ -382,7 +412,7 @@
             "id": 6,
             "title": "Thank you for your positive feedback. Come and join us on 1st April for our great event. Leave your email address below to register.",
             "type": "registration"
-        }, 
+        },
         {
             "id": 7,
             "title": "Thank you for your positive feedback. We think you might like this as well.",
@@ -417,7 +447,7 @@
             "title": "Thank you for your feedback. Please click on the Whatsapp link below so our service team can fix the issue."
         },
         {
-            "id": 14, 
+            "id": 14,
             "title": "Thank you for your feedback. Our team is on it. If you leave your email below we will keep you updated.",
             "type": "registration"
         },

@@ -4,12 +4,14 @@ import { FlexboxProps,
 
 export interface GenericProps extends FlexboxProps, FlexProps, WidthProps, ColorProps, SpaceProps, LayoutProps {
   useFlex?: boolean;
+  fillChildren?: boolean;
 }
 
 export const Div = styled.div<GenericProps>`
-  ${({ useFlex }) => css`
+  ${({ useFlex, fillChildren }) => css`
 
     ${useFlex && css`display: flex;`}
+    ${fillChildren && css` > * {height: 100%; width: 100%;}`}
 
     ${flexbox};
     ${flex};

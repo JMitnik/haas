@@ -6,4 +6,4 @@ export { Card, CardBody, CardFooter } from './Cards';
 export { Icon } from './Icon';
 export { Label } from './Labels';
 export { TopNav } from './Nav';
-export { H1, H2, H3, H4, Muted, Paragraph } from './Type';
+export { H1, H2, H3, H4, H5, Muted, Paragraph } from './Type';

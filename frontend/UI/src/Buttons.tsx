@@ -38,8 +38,9 @@ export const Button = styled.button<ButtonProps>`
         },
       },
       primary: {
-        background: theme.colors.primary,
-        color: theme.colors.white,
+        background: Color(theme.colors.primary).darken(0.6).hex(),
+        color: Color(theme.colors.primary).lighten(0.9).desaturate(0.3).hex(),
+        border: `1px solid ${Color(theme.colors.primary).darken(0.2).hex()}`,
         '&:hover': {
           background: Color(theme.colors.primary).lighten(0.1).hex(),
         },

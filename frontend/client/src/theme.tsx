@@ -37,6 +37,9 @@ const theme = {
     md: '7px',
     lg: '20px',
   },
+  media: {
+    mob: 'only screen and (max-width: 600px)',
+  },
   fontSizes: [16.00, 21.33, 28.43, 37.90, 50.52, 67.34]
 };
 

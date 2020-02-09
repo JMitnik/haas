@@ -18,7 +18,7 @@ export interface HAASNode {
   title: string;
   branchVal: string;
   conditions?: HAASNodeConditions;
-  type?: HAASQuestionNodeType | HAASLeafType;
+  type: HAASQuestionNodeType | HAASLeafType;
   setLeafID?: number;
   options?: [MultiChoiceOption];
   children: [HAASNode];
@@ -60,7 +60,7 @@ export const JSONTreeProvider = ({ json, children }: { json: any, children: Reac
       }
 
       if (activeNode.type === 'multi-choice') {
-        // If this check returns false for all children nodes it means the clicked multi-choice option there is no next node in tree => show a LeafNode 
+        // If this check returns false for all children nodes it means the clicked multi-choice option there is no next node in tree => show a LeafNode
         if (node.branchVal !== key) {
           return false;
         }

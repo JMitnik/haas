@@ -17,9 +17,16 @@ const MainAppScreen = styled(Div)`
 `;
 
 const CenteredScreen = styled(Div)`
-  max-width: 780px;
-  margin: 0 auto;
-  padding-top: 100px;
+  ${({ theme }) => css`
+    max-width: 780px;
+    margin: 0 auto;
+    position: relative;
+    padding-top: 100px;
+
+    @media ${theme.media.mob} {
+      padding-top: 0;
+    }
+  `}
 `;
 
 const App: React.FC = () => {
