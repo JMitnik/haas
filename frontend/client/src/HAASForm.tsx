@@ -1,5 +1,5 @@
 import React from 'react';
-import { H1, H2, Slider, Flex, Button } from '@haas/ui';
+import { H1, H2, Slider, Flex, ColumnFlex, Button, Div } from '@haas/ui';
 import { useFormContext } from 'react-hook-form';
 import { useJSONTree, HAASNode, MultiChoiceOption } from './hooks/use-json-tree';
 import { Instagram } from 'react-feather';
@@ -8,10 +8,10 @@ export const HAASForm = () => {
   const { activeNode } = useJSONTree();
 
   return (
-    <>
-      <H1 color="white">{activeNode.title}</H1>
+    <Div useFlex flexDirection='column' justifyContent='space-between' height='75vh'>
+      <H1 textAlign="center" color="white">{activeNode.title}</H1>
       {renderNextNode(activeNode)}
-    </>
+    </Div>
   );
 };
 
@@ -22,7 +22,7 @@ export const HAASMultiChoice = () => {
     <>
       <Flex>
         {activeNode?.options?.map((multiChoiceOption: MultiChoiceOption, index: any) => (
-          <Button onClick={() => enterBranch(multiChoiceOption.value)} key={index}>
+          <Button margin={4} onClick={() => enterBranch(multiChoiceOption.value)} key={index}>
             {(multiChoiceOption?.publicValue?.length ?? 0) > 0 ? multiChoiceOption?.publicValue : multiChoiceOption?.value}
           </Button>
         ))}
@@ -99,9 +99,11 @@ const HAASSlider = () => {
   const { enterBranch } = useJSONTree();
 
   return (
-    <>
-      <H2 color="white">{watch('slider-value', '5')}</H2>
-      <Slider name="slider-value" onMouseUp={() => enterBranch(watch('slider-value'))} min={0} max={10} mt={4} defaultValue={5} ref={register} />
-    </>
+    <Div flexGrow={0.5}>
+      <ColumnFlex height="100%" justifyContent="space-between" width={1}>
+        <H1 fontSize={-1} textAlign="center" color="white">{watch('slider-value', '5')}</H1>
+        <Slider width={1} name="slider-value" onMouseUp={() => enterBranch(watch('slider-value'))} min={0} max={10} mt={4} defaultValue={5} ref={register} />
+      </ColumnFlex>
+    </Div>
   )
 };

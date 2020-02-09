@@ -1,5 +1,8 @@
+import React, { forwardRef, Ref } from 'react';
 import styled, { css } from 'styled-components';
-import { space, SpaceProps } from 'styled-system';
+import { SpaceProps } from 'styled-system';
+import { InputHTMLAttributes } from 'react';
+import Color from 'color';
 
 export const CheckBoxWrapper = styled.div`
   position: relative;
@@ -49,96 +52,69 @@ export const CheckBox = styled.input`
   }
 `;
 
-export const Slider = styled.input.attrs({ type: 'range' })<SpaceProps>`
-& {
-  height: 25px;
-  -webkit-appearance: none;
-  margin: 10px 0;
-  width: 100%;
-}
-&:focus {
-  outline: none;
-}
-&::-webkit-slider-runnable-track {
-  width: 100%;
-  height: 5px;
-  cursor: pointer;
-  animate: 0.2s;
-  box-shadow: 0px 0px 0px #000000;
-  background: #E3E3E3;
-  border-radius: 1px;
-  border: 0px solid #000000;
-}
-&::-webkit-slider-thumb {
-  box-shadow: 0px 0px 0px #000000;
-  border: 1px solid #2497E3;
-  height: 18px;
-  width: 18px;
-  border-radius: 25px;
-  background: #FFFCFC;
-  cursor: pointer;
-  -webkit-appearance: none;
-  margin-top: -7px;
-}
-&:focus::-webkit-slider-runnable-track {
-  /* background: #E3E3E3; */
-}
-&::-moz-range-track {
-  width: 100%;
-  height: 5px;
-  cursor: pointer;
-  animate: 0.2s;
-  box-shadow: 0px 0px 0px #000000;
-  background: #E3E3E3;
-  border-radius: 1px;
-  border: 0px solid #000000;
-}
-&::-moz-range-thumb {
-  box-shadow: 0px 0px 0px #000000;
-  border: 1px solid #2497E3;
-  height: 18px;
-  width: 18px;
-  border-radius: 25px;
-  background: #FFFCFC;
-  cursor: pointer;
-}
-&::-ms-track {
-  width: 100%;
-  height: 5px;
-  cursor: pointer;
-  animate: 0.2s;
-  background: transparent;
-  border-color: transparent;
-  color: transparent;
-}
-&::-ms-fill-lower {
-  background: #E3E3E3;
-  border: 0px solid #000000;
-  border-radius: 2px;
-  box-shadow: 0px 0px 0px #000000;
-}
-&::-ms-fill-upper {
-  background: #E3E3E3;
-  border: 0px solid #000000;
-  border-radius: 2px;
-  box-shadow: 0px 0px 0px #000000;
-}
-&::-ms-thumb {
-  margin-top: 1px;
-  box-shadow: 0px 0px 0px #000000;
-  border: 1px solid #2497E3;
-  height: 18px;
-  width: 18px;
-  border-radius: 25px;
-  background: #FFFCFC;
-  cursor: pointer;
-}
-&:focus::-ms-fill-lower {
-  background: #E3E3E3;
-}
-&:focus::-ms-fill-upper {
-  background: #E3E3E3;
-}`;
+type SliderProps = InputHTMLAttributes<HTMLInputElement> | SpaceProps;
+
+export const Slider = forwardRef((props: SliderProps, ref: Ref<HTMLInputElement>) => (
+  <SliderContainer>
+    <input {...props} ref={ref} type="range"/>
+  </SliderContainer>
+));
+
+export const SliderContainer = styled.div`
+  ${({ theme }) => css`
+
+    /* TODO: Ensure that size is defined by a variable */
+    input[type=range] {
+      /* Style the input */
+      & {
+        -webkit-appearance: none; /* Hides the slider so that custom slider can be made */
+        width: 100%; /* Specific width is required for Firefox. */
+        background: transparent; /* Otherwise white in Chrome */
+      }
+
+      &:focus {
+        outline: none;
+      }
+
+      &::ms-track {
+        /* Hides the slider so custom styles can be added */
+        width: 100%;
+        cursor: pointer;
+        background: transparent;
+        border-color: transparent;
+        color: transparent;
+      }
+
+      /* Style the thumb */
+      /* TODO: Enable styles for firefox and IE*/
+      &::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        height: 80px;
+        width: 80px;
+
+        /* Ensure that the bunny is on top of the bar */
+        transform: translateY(-100%);
+
+        background-image: url('./logo-haas.png');
+        background-size: contain;
+        background-repeat: no-repeat;
+        cursor: pointer;
+        position: relative;
+      }
+
+      &::-webkit-slider-runnable-track {
+        width: 100%;
+        margin-top: 80px;
+        height: 10px;
+        cursor: pointer;
+        box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+        background: ${Color(theme.colors.primary).darken(0.4).hex()};
+        border-radius: 10px;
+        border: 0.2px solid #010101;
+      }
+    }
+  `}
+`;
 
 export const GridForm = styled.form`
   ${({ theme }) => css`
