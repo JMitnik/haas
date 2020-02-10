@@ -36,7 +36,7 @@ export const JSONTreeProvider = ({ json, children }: { json: any, children: Reac
 
   const bagOfLeafNodes: [HAASNode] = json.LeafCollection;
   const [activeLeafNodeId, setActiveLeafNodeID] = useState(0);
-  const getLeafNode = () => bagOfLeafNodes.filter(node => node.id == activeLeafNodeId)[0];
+  const getLeafNode = () => bagOfLeafNodes.filter(node => node.id === activeLeafNodeId)[0];
 
   const enterBranch = (key: string | number) => {
     // If current node overrides the current Call-To-Action
@@ -99,4 +99,7 @@ export const JSONTreeProvider = ({ json, children }: { json: any, children: Reac
   );
 };
 
-export const useJSONTree = () => useContext(JSONTreeContext);
+export const useJSONTree = () => {
+  console.log("Hello");
+  return useContext(JSONTreeContext);
+};
