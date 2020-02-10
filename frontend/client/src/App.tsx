@@ -1,4 +1,5 @@
 import React from 'react';
+import { BrowserRouter } from 'react-router-dom';
 import styled, { css, ThemeProvider } from 'styled-components';
 import theme from './theme';
 import { FormContext, useForm } from 'react-hook-form';
@@ -35,19 +36,21 @@ const App: React.FC = () => {
 
   return (
     <>
-      <ThemeProvider theme={theme}>
-        <MainAppScreen>
-          <CenteredScreen>
-            <JSONTreeProvider json={data}>
-              <FormContext {...form}>
-                <ColumnFlex alignItems="center">
-                  <HAASForm />
-                </ColumnFlex>
-              </FormContext>
-            </JSONTreeProvider>
-          </CenteredScreen>
-        </MainAppScreen>
-      </ThemeProvider>
+      <BrowserRouter>
+        <ThemeProvider theme={theme}>
+          <MainAppScreen>
+            <CenteredScreen>
+              <JSONTreeProvider json={data}>
+                <FormContext {...form}>
+                  <ColumnFlex alignItems="center">
+                    <HAASForm />
+                  </ColumnFlex>
+                </FormContext>
+              </JSONTreeProvider>
+            </CenteredScreen>
+          </MainAppScreen>
+        </ThemeProvider>
+      </BrowserRouter>
     </>
   );
 }
