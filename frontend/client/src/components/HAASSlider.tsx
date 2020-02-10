@@ -1,9 +1,7 @@
 import React from 'react';
-import { H1, H5, Slider, Flex, ColumnFlex, Button, Div } from '@haas/ui';
+import { H1, Slider, Flex, ColumnFlex, Button, Div } from '@haas/ui';
 import { useFormContext } from 'react-hook-form';
-import { useJSONTree, MultiChoiceOption } from '../hooks/use-json-tree';
-import { Instagram } from 'react-feather';
-import { useTransition, animated } from 'react-spring';
+import { useJSONTree } from '../hooks/use-json-tree';
 
 export const HAASSlider = () => {
   const { register, watch, getValues } = useFormContext();

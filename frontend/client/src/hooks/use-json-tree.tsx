@@ -44,6 +44,7 @@ export const JSONTreeProvider = ({ json, children }: { json: any, children: Reac
   const leafCollection: [HAASNode] = json.LeafCollection;
 
   const getLeafNode = () => leafCollection.filter(node => node.id === activeLeafNodeId)[0];
+
   const getNextChild = (key: string | number) => {
     const nextNode = activeNode.children?.filter((node: HAASNode) => {
       if (activeNode.type === 'slider') {

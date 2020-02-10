@@ -14,7 +14,7 @@ export const HAASMultiChoice = () => {
     <>
       <Flex flexWrap="wrap">
         {activeNode?.options?.map((multiChoiceOption: MultiChoiceOption, index: any) => (
-          <Div key={index} fillChildren padding={4} flex={0.5}>
+          <Div key={index} fillChildren padding={4} flex={1}>
             <Button brand="primary" onClick={() => goToChild(multiChoiceOption.value)} key={index}>
               <H5>
                 {(multiChoiceOption?.publicValue?.length ?? 0) > 0 ? multiChoiceOption?.publicValue : multiChoiceOption?.value}
