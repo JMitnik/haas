@@ -60,6 +60,21 @@ export const Slider = forwardRef((props: SliderProps, ref: Ref<HTMLInputElement>
   </SliderContainer>
 ));
 
+export const Textbox = styled.textarea`
+  ${({ theme }) => css`
+    border-radius: 30px;
+    border: 1px solid ${theme.colors.primary};
+    font-size: ${theme.fontSizes[1]}px;
+    padding: 36px 48px;
+    width: 100%;
+    resize: none;
+
+    &:focus {
+      outline: none;
+    }
+  `}
+`;
+
 export const SliderContainer = styled.div`
   ${({ theme }) => css`
 

@@ -1,7 +1,6 @@
-import React from 'react';
-import { H1, H5, Slider, Flex, ColumnFlex, Button, Div } from '@haas/ui';
-import { useFormContext } from 'react-hook-form';
-import { useJSONTree, MultiChoiceOption } from './hooks/use-json-tree';
+import React, { useCallback } from 'react';
+import { H1, Div } from '@haas/ui';
+import { useJSONTree } from './hooks/use-json-tree';
 import { useTransition, animated } from 'react-spring';
 import { HAASSlider } from './components/HAASSlider';
 import { HAASMultiChoice } from './components/HAASMultiChoice';
@@ -10,19 +9,23 @@ import { HAASTextBox } from './components/HAASTextBox';
 import { HAASSignIn } from './components/HAASSignIn';
 
 export const HAASForm = () => {
-  const { activeNode } = useJSONTree();
+  const { historyStack } = useJSONTree();
 
-  const transitions = useTransition(activeNode, (activeNode) => activeNode.id, {
+  const activeNode = historyStack.slice(-1)[0];
+
+  const transitions = useTransition(activeNode, (activeNode) => activeNode?.id, {
     from: { opacity: 0, transform: 'scale(1.1)' },
     enter: { opacity: 1, transform: 'scale(1)' },
-    leave: { opacity: 0, transform: 'scale(0.9)' },
+    leave: { opacity: 0, transform: 'scale(0.9)' }
   });
 
-  console.log(transitions);
+  const renderNode = useCallback((item) => {
+    return renderNextNode(item)
+  }, [activeNode]);
 
   return (
     <Div useFlex flexDirection='column' justifyContent='space-between' height={['100vh', '75vh']}>
-      <H1 textAlign="center" color="white">{activeNode.title}</H1>
+      <H1 textAlign="center" color="white">{activeNode?.title}</H1>
 
       {transitions.map(({ item, key, props, state }) => {
         // const node = renderNextNode(item.type)
@@ -48,7 +51,10 @@ export const HAASForm = () => {
   );
 };
 
-const renderNextNode = (nodeType: string) => {
+HAASForm.whyDidYouRender = true;
+
+const renderNextNode = (node: any) => {
+  let nodeType = node.type;
   const Component: React.ReactNode | undefined = nodeMap.get(nodeType);
 
   return Component || <HAASTextBox />

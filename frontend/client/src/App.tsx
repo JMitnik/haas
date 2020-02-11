@@ -8,6 +8,8 @@ import { ColumnFlex } from '@haas/ui/src/Container';
 import flow from './flow.json';
 import { JSONTreeProvider }  from './hooks/use-json-tree';
 import { HAASForm } from './HAASForm';
+import whyDidYouRender from '@welldone-software/why-did-you-render';
+whyDidYouRender(React);
 
 const MainAppScreen = styled(Div)`
   ${({ theme }) => css`
@@ -32,25 +34,23 @@ const CenteredScreen = styled(Div)`
 
 const App: React.FC = () => {
   const form = useForm();
-  const data = flow;
+  const data = JSON.parse(JSON.stringify(flow));
 
   return (
     <>
-      <BrowserRouter>
-        <ThemeProvider theme={theme}>
-          <MainAppScreen>
-            <CenteredScreen>
-              <JSONTreeProvider json={data}>
-                <FormContext {...form}>
-                  <ColumnFlex alignItems="center">
-                    <HAASForm />
-                  </ColumnFlex>
-                </FormContext>
-              </JSONTreeProvider>
-            </CenteredScreen>
-          </MainAppScreen>
-        </ThemeProvider>
-      </BrowserRouter>
+      <ThemeProvider theme={theme}>
+        <MainAppScreen>
+          <CenteredScreen>
+            <JSONTreeProvider json={data}>
+              <FormContext {...form}>
+                <ColumnFlex alignItems="center">
+                  <HAASForm />
+                </ColumnFlex>
+              </FormContext>
+            </JSONTreeProvider>
+          </CenteredScreen>
+        </MainAppScreen>
+      </ThemeProvider>
     </>
   );
 }
