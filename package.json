@@ -1,5 +1,6 @@
 {
     "private": true,
+    "homepage": ".",
     "workspaces": {
         "packages": [
             "api",
