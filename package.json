@@ -18,6 +18,7 @@
         "gen": "yarn server:gen && yarn dashboard:gen",
         "start:api": "yarn workspace @haas/api start",
         "start:client": "yarn workspace @haas/client start",
+        "build:client": "yarn workspace @haas/client build",
         "server:gen": "yarn workspace @haas/api generate",
         "start:dashboard": "yarn workspace @haas/dashboard start",
         "dashboard:gen": "yarn workspace @haas/dashboard generate",
