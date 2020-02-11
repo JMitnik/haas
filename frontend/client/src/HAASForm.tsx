@@ -20,7 +20,7 @@ export const HAASForm = () => {
   });
 
   return (
-    <Div useFlex flexDirection='column' justifyContent='space-between' height={['100vh', '75vh']}>
+    <Div useFlex flexDirection='column' justifyContent='space-between' height={['100vh', '80vh']}>
       <H1 textAlign="center" color="white">{activeNode?.title}</H1>
 
       {transitions.map(({ item, key, props, state }) => {
