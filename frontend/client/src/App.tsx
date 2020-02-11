@@ -8,6 +8,8 @@ import { ColumnFlex } from '@haas/ui/src/Container';
 import flow from './flow.json';
 import { JSONTreeProvider }  from './hooks/use-json-tree';
 import { HAASForm } from './HAASForm';
+import whyDidYouRender from '@welldone-software/why-did-you-render';
+whyDidYouRender(React);
 
 const MainAppScreen = styled(Div)`
   ${({ theme }) => css`

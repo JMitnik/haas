@@ -10,21 +10,21 @@ import { HAASTextBox } from './components/HAASTextBox';
 import { HAASSignIn } from './components/HAASSignIn';
 
 export const HAASForm = () => {
-  const { activeNode } = useJSONTree();
+  const { historyStack } = useJSONTree();
 
-  const transitions = useTransition(activeNode, (activeNode) => activeNode.id, {
+  const activeNode = historyStack.slice(-1)[0];
+
+  const transitions = useTransition(activeNode, (activeNode) => activeNode?.id, {
     from: { opacity: 0, transform: 'scale(1.1)' },
     enter: { opacity: 1, transform: 'scale(1)' },
     leave: { opacity: 0, transform: 'scale(0.9)' },
   });
 
-  console.log(transitions);
-
   return (
     <Div useFlex flexDirection='column' justifyContent='space-between' height={['100vh', '75vh']}>
-      <H1 textAlign="center" color="white">{activeNode.title}</H1>
+      <H1 textAlign="center" color="white">{activeNode?.title}</H1>
 
-      {transitions.map(({ item, key, props }) => (
+      {transitions?.map(({ item, key, props }) => (
         <animated.div style={{
           position: 'absolute',
           bottom: '100px',
@@ -33,14 +33,16 @@ export const HAASForm = () => {
           ...props,
           }} key={key}
         >
-          {renderNextNode(item.type)}
+          {renderNextNode(item?.type)}
         </animated.div>
       ))}
     </Div>
   );
 };
+HAASForm.whyDidYouRender = true;
 
 const renderNextNode = (nodeType: string) => {
+  console.log(nodeType);
   const Component: React.ReactNode | undefined = nodeMap.get(nodeType);
 
   return Component || <HAASTextBox />

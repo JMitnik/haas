@@ -1,4 +1,4 @@
-import React, { useState, useContext, ReactNode, useEffect } from 'react';
+import React, { useState, useContext, ReactNode, useEffect, useCallback } from 'react';
 import { useHistory, useLocation, useParams } from 'react-router-dom';
 
 export interface HAASNodeConditions {
@@ -27,7 +27,7 @@ export interface HAASNode {
 }
 
 interface JSONTreeContextProps {
-  activeNode: HAASNode;
+  historyStack: HAASNode[];
   goToChild: (key: string | number) => void;
 }
 
@@ -41,55 +41,79 @@ export const JSONTreeProvider = ({ json, children }: { json: any, children: Reac
   // Initialize the starting point
   const [activeNode, setActiveNode] = useState(json.rootQuestion);
   const [activeLeafNodeId, setActiveLeafNodeID] = useState(0);
+  const [historyStack, setHistoryStack] = useState<HAASNode[]>([json.rootQuestion]);
+
   const leafCollection: [HAASNode] = json.LeafCollection;
+  const history = useHistory();
 
-  const getLeafNode = () => leafCollection.filter(node => node.id === activeLeafNodeId)[0];
+  const goToChild = useCallback((key: string | number) => {
+    const getLeafNode = () => leafCollection.filter(node => node.id === activeLeafNodeId)[0];
 
-  const getNextChild = (key: string | number) => {
-    const nextNode = activeNode.children?.filter((node: HAASNode) => {
-      if (activeNode.type === 'slider') {
-        if (node?.conditions?.renderMin && key < node?.conditions?.renderMin) {
+    const getNextChild = (key: string | number) => {
+      let activeNode = historyStack.slice(-1)[0];
+
+      const nextNode = activeNode.children?.filter((node: HAASNode) => {
+        if (activeNode.type === 'slider') {
+          if (node?.conditions?.renderMin && key < node?.conditions?.renderMin) {
+            return false;
+          }
+
+          if (node?.conditions?.renderMax && key > node?.conditions?.renderMax) {
+            return false;
+          }
+        }
+
+        if (activeNode.type === 'multi-choice') {
+          if (node.conditions?.matchValue === key) {
+            return true;
+          }
+
           return false;
         }
 
-        if (node?.conditions?.renderMax && key > node?.conditions?.renderMax) {
-          return false;
-        }
+        return true;
+      });
+
+      // If there is no next node, return the current Leaf
+      if (!nextNode || (nextNode && nextNode?.length === 0)) {
+        const leafNode = getLeafNode();
+        return leafNode;
       }
 
-      if (activeNode.type === 'multi-choice') {
-        console.log(node);
-        if (node.conditions?.matchValue === key) {
-          return true;
-        }
+      return nextNode[0];
+    };
 
-        return false;
-      }
-
-      return true;
-    });
-
-    // If there is no next node, return the current Leaf
-    if (!nextNode || (nextNode && nextNode?.length === 0)) {
-      const leafNode = getLeafNode();
-      return leafNode;
-    }
-
-    return nextNode[0];
-  };
-
-  const goToChild = (key: string | number) => {
     const nextNode = getNextChild(key);
 
-    if (nextNode.setLeafID) {
-      setActiveLeafNodeID(nextNode.setLeafID);
-    }
+      if (nextNode.setLeafID) {
+        setActiveLeafNodeID(nextNode.setLeafID);
+      }
 
-    setActiveNode(nextNode);
-  };
+      console.log("TCL: goToChild -> nextNode", nextNode);
+
+      // Add node to browser-history
+      history.push({
+        search: `?nextNodeId=${nextNode.id}&?nextNodeKey=${key}`
+      });
+
+      // Add node to history-stack
+      setHistoryStack([...historyStack, nextNode]);
+  }, [historyStack, leafCollection, activeLeafNodeId ,history]);
+
+  useEffect(() => {
+    // Go back
+    if (history.action === "POP") {
+      setHistoryStack(histStack => {
+        if (histStack.length <= 1) return [...histStack];
+        return [...histStack.splice(0, histStack.length - 1)];
+      });
+
+      return;
+    }
+  }, [history.action, history.location]);
 
   return (
-    <JSONTreeContext.Provider value={{ activeNode, goToChild }}>
+    <JSONTreeContext.Provider value={{ historyStack, goToChild }}>
       {children}
     </JSONTreeContext.Provider>
   );
