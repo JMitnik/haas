@@ -34,25 +34,23 @@ const CenteredScreen = styled(Div)`
 
 const App: React.FC = () => {
   const form = useForm();
-  const data = flow;
+  const data = JSON.parse(JSON.stringify(flow));
 
   return (
     <>
-      <BrowserRouter>
-        <ThemeProvider theme={theme}>
-          <MainAppScreen>
-            <CenteredScreen>
-              <JSONTreeProvider json={data}>
-                <FormContext {...form}>
-                  <ColumnFlex alignItems="center">
-                    <HAASForm />
-                  </ColumnFlex>
-                </FormContext>
-              </JSONTreeProvider>
-            </CenteredScreen>
-          </MainAppScreen>
-        </ThemeProvider>
-      </BrowserRouter>
+      <ThemeProvider theme={theme}>
+        <MainAppScreen>
+          <CenteredScreen>
+            <JSONTreeProvider json={data}>
+              <FormContext {...form}>
+                <ColumnFlex alignItems="center">
+                  <HAASForm />
+                </ColumnFlex>
+              </FormContext>
+            </JSONTreeProvider>
+          </CenteredScreen>
+        </MainAppScreen>
+      </ThemeProvider>
     </>
   );
 }

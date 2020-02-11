@@ -55,6 +55,69 @@
                         ],
                         "children": [
                             {
+                                "id": 144,
+                                "type": "multi-choice",
+                                "overrideLeafID": 6,
+                                "title": "What exactly did you like about facilities?",
+                                "conditions": {
+                                    "matchValue": "Cleanliness"
+                                },
+                                "options": [
+                                    {
+                                        "value": "SLIDEEE"
+                                    },
+                                    {
+                                        "value": "Atmosphere"
+                                    },
+                                    {
+                                        "value": "Location"
+                                    },
+                                    {
+                                        "value": "Other"
+                                    }
+                                ],
+                                "children": [
+                                    {
+                                        "id": 155,
+                                        "type": "slider",
+                                        "overrideLeafID": 6,
+                                        "title": "What exactly did you like about facilities?",
+                                        "conditions": {
+                                            "matchValue": "SLIDEEE"
+                                        },
+                                        "children": [
+                                            {
+                                                "id": 4,
+                                                "conditions": {
+                                                    "renderMin": 8,
+                                                    "renderMax": 10
+                                                },
+                                                "title": "Please tell us more",
+                                                "type": "textbox"
+                                            },
+                                            {
+                                                "id": 4,
+                                                "conditions": {
+                                                    "matchValue": "Other"
+                                                },
+                                                "overrideLeafID": "5",
+                                                "title": "Please tell us more",
+                                                "type": "textbox"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "id": 4,
+                                        "conditions": {
+                                            "matchValue": "Other"
+                                        },
+                                        "overrideLeafID": "5",
+                                        "title": "Please tell us more",
+                                        "type": "textbox"
+                                    }
+                                ]
+                            },
+                            {
                                 "id": 4,
                                 "conditions": {
                                     "matchValue": "Other"

@@ -1,5 +1,4 @@
 import React, { useState, useContext, ReactNode, useEffect, useCallback } from 'react';
-import { useHistory, useLocation, useParams } from 'react-router-dom';
 
 export interface HAASNodeConditions {
   renderMin?: number;
@@ -21,7 +20,7 @@ export interface HAASNode {
   branchVal: string;
   conditions?: HAASNodeConditions;
   type: HAASQuestionNodeType | HAASLeafType;
-  setLeafID?: number;
+  overrideLeafID?: number;
   options?: [MultiChoiceOption];
   children: [HAASNode];
 }
@@ -35,82 +34,55 @@ interface HAASRouterParams {
   nodeKey: string;
 }
 
+const findNextNode = (parent: HAASNode, key: string | number) => {
+  const candidates = parent?.children.filter(child => {
+    if (parent.type === 'slider') {
+      if (child?.conditions?.renderMin && key < child?.conditions?.renderMin) {
+        return false;
+      }
+
+      if (child?.conditions?.renderMax && key > child?.conditions?.renderMax) {
+        return false;
+      }
+    }
+
+    if (parent.type === 'multi-choice') {
+      return child.conditions?.matchValue === key;
+    }
+
+    return true;
+  });
+
+  return candidates && candidates[0];
+};
+
+const findLeafNode = (collection: HAASNode[], key: number) => collection.filter(item => item.id === key)[0];
+
 export const JSONTreeContext = React.createContext({} as JSONTreeContextProps);
 
 export const JSONTreeProvider = ({ json, children }: { json: any, children: ReactNode }) => {
-  // Initialize the starting point
-  const [activeNode, setActiveNode] = useState(json.rootQuestion);
   const [activeLeafNodeId, setActiveLeafNodeID] = useState(0);
-  const [historyStack, setHistoryStack] = useState<HAASNode[]>([json.rootQuestion]);
-
+  const [historyStack, setHistoryStack] = useState<HAASNode[]>([JSON.parse(JSON.stringify(json.rootQuestion))]);
+  const [activeNode, setActiveNode] = useState(historyStack.slice(0)[0]);
   const leafCollection: [HAASNode] = json.LeafCollection;
-  const history = useHistory();
 
-  const goToChild = useCallback((key: string | number) => {
-    const getLeafNode = () => leafCollection.filter(node => node.id === activeLeafNodeId)[0];
+  const goToChild = (key: string | number) => {
+    let nextNode: HAASNode = findNextNode(historyStack.slice(-1)[0], key);
 
-    const getNextChild = (key: string | number) => {
-      let activeNode = historyStack.slice(-1)[0];
-
-      const nextNode = activeNode.children?.filter((node: HAASNode) => {
-        if (activeNode.type === 'slider') {
-          if (node?.conditions?.renderMin && key < node?.conditions?.renderMin) {
-            return false;
-          }
-
-          if (node?.conditions?.renderMax && key > node?.conditions?.renderMax) {
-            return false;
-          }
-        }
-
-        if (activeNode.type === 'multi-choice') {
-          if (node.conditions?.matchValue === key) {
-            return true;
-          }
-
-          return false;
-        }
-
-        return true;
-      });
-
-      // If there is no next node, return the current Leaf
-      if (!nextNode || (nextNode && nextNode?.length === 0)) {
-        const leafNode = getLeafNode();
-        return leafNode;
-      }
-
-      return nextNode[0];
-    };
-
-    const nextNode = getNextChild(key);
-
-      if (nextNode.setLeafID) {
-        setActiveLeafNodeID(nextNode.setLeafID);
-      }
-
-      console.log("TCL: goToChild -> nextNode", nextNode);
-
-      // Add node to browser-history
-      history.push({
-        search: `?nextNodeId=${nextNode.id}&?nextNodeKey=${key}`
-      });
-
-      // Add node to history-stack
-      setHistoryStack([...historyStack, nextNode]);
-  }, [historyStack, leafCollection, activeLeafNodeId ,history]);
-
-  useEffect(() => {
-    // Go back
-    if (history.action === "POP") {
-      setHistoryStack(histStack => {
-        if (histStack.length <= 1) return [...histStack];
-        return [...histStack.splice(0, histStack.length - 1)];
-      });
-
-      return;
+    if (nextNode && nextNode.overrideLeafID) {
+      setActiveLeafNodeID(nextNode.overrideLeafID);
     }
-  }, [history.action, history.location]);
+
+    if (!nextNode) {
+      console.log(activeLeafNodeId);
+      nextNode = findLeafNode(leafCollection, activeLeafNodeId);
+      console.log(nextNode);
+    }
+
+    setHistoryStack(hist => [...hist, nextNode]);
+  };
+
+  console.log(historyStack);
 
   return (
     <JSONTreeContext.Provider value={{ historyStack, goToChild }}>

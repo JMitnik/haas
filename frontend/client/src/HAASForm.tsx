@@ -1,7 +1,6 @@
-import React from 'react';
-import { H1, H5, Slider, Flex, ColumnFlex, Button, Div } from '@haas/ui';
-import { useFormContext } from 'react-hook-form';
-import { useJSONTree, MultiChoiceOption } from './hooks/use-json-tree';
+import React, { useCallback } from 'react';
+import { H1, Div } from '@haas/ui';
+import { useJSONTree } from './hooks/use-json-tree';
 import { useTransition, animated } from 'react-spring';
 import { HAASSlider } from './components/HAASSlider';
 import { HAASMultiChoice } from './components/HAASMultiChoice';
@@ -17,8 +16,12 @@ export const HAASForm = () => {
   const transitions = useTransition(activeNode, (activeNode) => activeNode?.id, {
     from: { opacity: 0, transform: 'scale(1.1)' },
     enter: { opacity: 1, transform: 'scale(1)' },
-    leave: { opacity: 0, transform: 'scale(0.9)' },
+    leave: { opacity: 0, transform: 'scale(0.9)' }
   });
+
+  const renderNode = useCallback((item) => {
+    return renderNextNode(item)
+  }, [activeNode]);
 
   return (
     <Div useFlex flexDirection='column' justifyContent='space-between' height={['100vh', '75vh']}>
@@ -33,16 +36,18 @@ export const HAASForm = () => {
           ...props,
           }} key={key}
         >
-          {renderNextNode(item?.type)}
+          {renderNode(item)}
         </animated.div>
       ))}
     </Div>
   );
 };
+
 HAASForm.whyDidYouRender = true;
 
-const renderNextNode = (nodeType: string) => {
-  console.log(nodeType);
+const renderNextNode = (node: any) => {
+  let nodeType = node.type;
+  console.log("TCL: renderNextNode -> nodeType", nodeType)
   const Component: React.ReactNode | undefined = nodeMap.get(nodeType);
 
   return Component || <HAASTextBox />
