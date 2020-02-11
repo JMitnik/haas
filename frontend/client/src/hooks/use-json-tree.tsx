@@ -35,7 +35,7 @@ interface HAASRouterParams {
 }
 
 const findNextNode = (parent: HAASNode, key: string | number) => {
-  const candidates = parent?.children.filter(child => {
+  const candidates = parent?.children?.filter(child => {
     if (parent.type === 'slider') {
       if (child?.conditions?.renderMin && key < child?.conditions?.renderMin) {
         return false;

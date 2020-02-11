@@ -25,7 +25,7 @@ export const HAASTextBox = () => {
   return (
     <>
       <TextboxContainer>
-        <Button brand="secondary">Submit</Button>
+        <Button brand="secondary" onClick={() => goToChild('mic_test')}>Submit</Button>
         <Textbox placeholder="Write your experience here" />
       </TextboxContainer>
     </>
