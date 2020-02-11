@@ -19,17 +19,11 @@ export const HAASForm = () => {
     leave: { opacity: 0, transform: 'scale(0.9)' }
   });
 
-  const renderNode = useCallback((item) => {
-    return renderNextNode(item)
-  }, [activeNode]);
-
   return (
     <Div useFlex flexDirection='column' justifyContent='space-between' height={['100vh', '75vh']}>
       <H1 textAlign="center" color="white">{activeNode?.title}</H1>
 
       {transitions.map(({ item, key, props, state }) => {
-        // const node = renderNextNode(item.type)
-        // console.log('Item: ', props)
         if (state !== 'leave') {
           return <animated.div style={{
             position: 'absolute',
@@ -39,7 +33,7 @@ export const HAASForm = () => {
             ...props,
           }} key={key}
           >
-            {renderNextNode(item.type)}
+            {renderNextNode(item)}
           </animated.div>
         }
         return null
