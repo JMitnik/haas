@@ -40,7 +40,7 @@ const theme = {
   media: {
     mob: 'only screen and (max-width: 600px)',
   },
-  fontSizes: [16.00, 21.33, 28.43, 37.90, 50.52, 67.34]
+  fontSizes: [12, 16.00, 21.33, 28.43, 37.90, 50.52]
 };
 
 export default theme;
