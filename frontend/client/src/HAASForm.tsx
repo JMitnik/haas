@@ -47,7 +47,6 @@ HAASForm.whyDidYouRender = true;
 
 const renderNextNode = (node: any) => {
   let nodeType = node.type;
-  console.log("TCL: renderNextNode -> nodeType", nodeType)
   const Component: React.ReactNode | undefined = nodeMap.get(nodeType);
 
   return Component || <HAASTextBox />
