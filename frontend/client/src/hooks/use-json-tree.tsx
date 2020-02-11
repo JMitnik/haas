@@ -1,8 +1,9 @@
-import React, { useState, useContext, ReactNode } from 'react';
+import React, { useState, useContext, ReactNode, useEffect, useCallback } from 'react';
 
 export interface HAASNodeConditions {
   renderMin?: number;
   renderMax?: number;
+  matchValue?: string;
 }
 
 type HAASQuestionNodeType = 'slider' | 'multi-choice' | 'text-box';
@@ -18,85 +19,78 @@ export interface HAASNode {
   title: string;
   branchVal: string;
   conditions?: HAASNodeConditions;
-  type?: HAASQuestionNodeType | HAASLeafType;
-  setLeafID?: number;
+  type: HAASQuestionNodeType | HAASLeafType;
+  overrideLeafID?: number;
   options?: [MultiChoiceOption];
   children: [HAASNode];
 }
 
 interface JSONTreeContextProps {
-  activeNode: HAASNode;
-  enterBranch: (key: string | number) => void;
+  historyStack: HAASNode[];
+  goToChild: (key: string | number) => void;
 }
+
+interface HAASRouterParams {
+  nodeKey: string;
+}
+
+const findNextNode = (parent: HAASNode, key: string | number) => {
+  const candidates = parent?.children?.filter(child => {
+    if (parent.type === 'slider') {
+      if (child?.conditions?.renderMin && key < child?.conditions?.renderMin) {
+        return false;
+      }
+
+      if (child?.conditions?.renderMax && key > child?.conditions?.renderMax) {
+        return false;
+      }
+    }
+
+    if (parent.type === 'multi-choice') {
+      return child.conditions?.matchValue === key;
+    }
+
+    return true;
+  });
+
+  return candidates && candidates[0];
+};
+
+const findLeafNode = (collection: HAASNode[], key: number) => collection.filter(item => item.id === key)[0];
 
 export const JSONTreeContext = React.createContext({} as JSONTreeContextProps);
 
 export const JSONTreeProvider = ({ json, children }: { json: any, children: ReactNode }) => {
-  const [activeNode, setActiveNode] = useState(json.rootQuestion);
-
-  const bagOfLeafNodes: [HAASNode] = json.LeafCollection;
   const [activeLeafNodeId, setActiveLeafNodeID] = useState(0);
-  const getLeafNode = () => bagOfLeafNodes.filter(node => node.id == activeLeafNodeId)[0];
+  const [historyStack, setHistoryStack] = useState<HAASNode[]>([JSON.parse(JSON.stringify(json.rootQuestion))]);
+  const [activeNode, setActiveNode] = useState(historyStack.slice(0)[0]);
+  const leafCollection: [HAASNode] = json.LeafCollection;
 
-  const enterBranch = (key: string | number) => {
-    // If current node overrides the current Call-To-Action
-    // if (activeNode.setLeafID) {
-    //   console.log(`Node has LeafID changing from ${activeLeafNodeId} to ${activeNode.setLeafID}`)
-    //   setActiveLeafNodeID(activeNode.setLeafID);
-    // }
+  const goToChild = (key: string | number) => {
+    let nextNode: HAASNode = findNextNode(historyStack.slice(-1)[0], key);
 
-    // Slider does it numerically
-    // Find the next node meeting the condition
-    const nextNode = activeNode.children?.filter((node: HAASNode) => {
-      // If slider, check if key is between min and max
-      if (activeNode.type === 'slider') {
-        if (node?.conditions?.renderMin && key < node?.conditions?.renderMin) {
-          return false;
-        }
-
-        if (node?.conditions?.renderMax && key > node?.conditions?.renderMax) {
-          return false;
-        }
-      }
-
-      if (activeNode.type === 'multi-choice') {
-        // If this check returns false for all children nodes it means the clicked multi-choice option there is no next node in tree => show a LeafNode 
-        if (node.branchVal !== key) {
-          return false;
-        }
-      }
-
-      return true;
-    });
-
-
-    console.log('next node: ', nextNode);
-
-    // If there is no next node, return the current Leaf
-    if (!nextNode || (nextNode && nextNode?.length === 0)) {
-      const leafNode = getLeafNode();
-      console.log('Setting Leaf Node: ', leafNode)
-      setActiveNode(leafNode);
-      return
+    if (nextNode && nextNode.overrideLeafID) {
+      setActiveLeafNodeID(nextNode.overrideLeafID);
     }
 
-
-    // Set the first node which matches the conditions
-    // TODO: Ensure no other nodes have this.
-    setActiveNode(nextNode[0]);
-
-    // If clicked node has LeafNode ID override
-    if (nextNode[0].setLeafID) {
-      console.log(`Node has LeafID changing from ${activeLeafNodeId} to ${nextNode[0].setLeafID}`)
-      setActiveLeafNodeID(nextNode[0].setLeafID);
+    if (!nextNode) {
+      console.log(activeLeafNodeId);
+      nextNode = findLeafNode(leafCollection, activeLeafNodeId);
+      console.log(nextNode);
     }
-  }
+
+    setHistoryStack(hist => [...hist, nextNode]);
+  };
+
+  console.log(historyStack);
 
   return (
-    <JSONTreeContext.Provider value={{ activeNode, enterBranch }}>
+    <JSONTreeContext.Provider value={{ historyStack, goToChild }}>
       {children}
     </JSONTreeContext.Provider>
   );
 };
 
-export const useJSONTree = () => useContext(JSONTreeContext);
+export const useJSONTree = () => {
+  return useContext(JSONTreeContext);
+};

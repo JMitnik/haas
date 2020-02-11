@@ -1,12 +1,15 @@
 import React from 'react';
+import { BrowserRouter } from 'react-router-dom';
 import styled, { css, ThemeProvider } from 'styled-components';
 import theme from './theme';
-import { useFormContext, FormContext, useForm } from 'react-hook-form';
-import { Button, Flex, Div, H1, H3, Slider } from '@haas/ui';
+import { FormContext, useForm } from 'react-hook-form';
+import { Div } from '@haas/ui';
 import { ColumnFlex } from '@haas/ui/src/Container';
 import flow from './flow.json';
-import { useJSONTree, JSONTreeProvider, HAASNode }  from './hooks/use-json-tree';
+import { JSONTreeProvider }  from './hooks/use-json-tree';
 import { HAASForm } from './HAASForm';
+import whyDidYouRender from '@welldone-software/why-did-you-render';
+whyDidYouRender(React);
 
 const MainAppScreen = styled(Div)`
   ${({ theme }) => css`
@@ -17,14 +20,21 @@ const MainAppScreen = styled(Div)`
 `;
 
 const CenteredScreen = styled(Div)`
-  max-width: 780px;
-  margin: 0 auto;
-  padding-top: 100px;
+  ${({ theme }) => css`
+    max-width: 780px;
+    margin: 0 auto;
+    position: relative;
+    padding-top: 100px;
+
+    @media ${theme.media.mob} {
+      padding-top: 0;
+    }
+  `}
 `;
 
 const App: React.FC = () => {
   const form = useForm();
-  const data = flow;
+  const data = JSON.parse(JSON.stringify(flow));
 
   return (
     <>

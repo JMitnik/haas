@@ -2,49 +2,140 @@
     "rootQuestion": {
         "title": "How do you feel about Starbucks?",
         "type": "slider",
+        "id": 1,
         "children": [
             {
-                "branchVal": "8_10-Slider",
-                "setLeafID": "2",
+                "id": 2,
+                "type": "multi-choice",
                 "title": "What did you like",
+                "overrideLeafID": 2,
                 "conditions": {
                     "renderMin": 8,
                     "renderMax": 10
                 },
-                "type": "multi-choice",
+                "options": [
+                    {
+                        "value": "Facilities"
+                    },
+                    {
+                        "value": "Website/Mobile app"
+                    },
+                    {
+                        "value": "Product/Services"
+                    },
+                    {
+                        "value": "Customer Support"
+                    },
+                    {
+                        "value": "Other"
+                    }
+                ],
                 "children": [
                     {
-                        "branchVal": "Facilities",
-                        "setLeafID": "6",
-                        "title": "What exactly did you like aobut facilities?",
+                        "id": 3,
                         "type": "multi-choice",
+                        "overrideLeafID": 6,
+                        "title": "What exactly did you like about facilities?",
+                        "conditions": {
+                            "matchValue": "Facilities"
+                        },
                         "options": [
                             {
                                 "value": "Cleanliness"
                             },
                             {
-                                "value": "Atmosphere",
-                                "publicValue": "Atmosphere (publicValue)"
+                                "value": "Atmosphere"
                             },
                             {
-                                "value": "Location",
-                                "publicValue": "Location (publicValue)"
+                                "value": "Location"
+                            },
+                            {
+                                "value": "Other"
                             }
                         ],
                         "children": [
                             {
-                                "branchVal": "Other",
-                                "setLeafID": "5",
+                                "id": 144,
+                                "type": "multi-choice",
+                                "overrideLeafID": 6,
+                                "title": "What exactly did you like about facilities?",
+                                "conditions": {
+                                    "matchValue": "Cleanliness"
+                                },
+                                "options": [
+                                    {
+                                        "value": "SLIDEEE"
+                                    },
+                                    {
+                                        "value": "Atmosphere"
+                                    },
+                                    {
+                                        "value": "Location"
+                                    },
+                                    {
+                                        "value": "Other"
+                                    }
+                                ],
+                                "children": [
+                                    {
+                                        "id": 155,
+                                        "type": "slider",
+                                        "overrideLeafID": 6,
+                                        "title": "What exactly did you like about facilities?",
+                                        "conditions": {
+                                            "matchValue": "SLIDEEE"
+                                        },
+                                        "children": [
+                                            {
+                                                "id": 4,
+                                                "conditions": {
+                                                    "renderMin": 8,
+                                                    "renderMax": 10
+                                                },
+                                                "title": "Please tell us more",
+                                                "type": "textbox"
+                                            },
+                                            {
+                                                "id": 4,
+                                                "conditions": {
+                                                    "matchValue": "Other"
+                                                },
+                                                "overrideLeafID": "5",
+                                                "title": "Please tell us more",
+                                                "type": "textbox"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "id": 4,
+                                        "conditions": {
+                                            "matchValue": "Other"
+                                        },
+                                        "overrideLeafID": "5",
+                                        "title": "Please tell us more",
+                                        "type": "textbox"
+                                    }
+                                ]
+                            },
+                            {
+                                "id": 4,
+                                "conditions": {
+                                    "matchValue": "Other"
+                                },
+                                "overrideLeafID": "5",
                                 "title": "Please tell us more",
                                 "type": "textbox"
                             }
                         ]
                     },
                     {
-                        "branchVal": "Website/Mobile app",
-                        "title": "What exactly did you like about the website?",
+                        "id": 5,
                         "type": "multi-choice",
-                        "setLeafID": "4",
+                        "title": "What exactly did you like about the website?",
+                        "conditions": {
+                            "matchValue": "Website/Mobile app"
+                        },
+                        "overrideLeafID": 4,
                         "options": [
                             {
                                 "value": "Design"
@@ -54,22 +145,31 @@
                             },
                             {
                                 "value": "Informative"
+                            },
+                            {
+                                "value": "Other"
                             }
                         ],
                         "children": [
                             {
+                                "id": 4,
                                 "branchVal": "Other",
+                                "conditions": {
+                                    "matchValue": "Other"
+                                },
                                 "title": "Please tell us more",
                                 "type": "textbox"
                             }
                         ]
                     },
-
                     {
-                        "branchVal": "Product/Services",
-                        "title": "What exactly did you like about the product/services?",
+                        "id": 6,
                         "type": "multi-choice",
-                        "setLeafID": "7",
+                        "title": "What exactly did you like about the product/services?",
+                        "conditions": {
+                            "matchValue": "Product/Services"
+                        },
+                        "overrideLeafID": 7,
                         "options": [
                             {
                                 "value": "Quality"
@@ -79,22 +179,31 @@
                             },
                             {
                                 "value": "Friendliness"
+                            },
+                            {
+                                "value": "Other"
                             }
                         ],
                         "children": [
                             {
+                                "id": 4,
+                                "conditions": {
+                                    "matchValue": "Other"
+                                },
                                 "branchVal": "Other",
                                 "title": "Please tell us more",
-                                "type": "textbox"               
+                                "type": "textbox"
                             }
                         ]
                     },
-
                     {
-                        "branchVal": "Customer Support",
-                        "title": "What exactly did you like about the customer support?",
+                        "id": 7,
                         "type": "multi-choice",
-                        "setLeafID": "8",
+                        "title": "What exactly did you like about the customer support?",
+                        "conditions": {
+                            "matchValue": "Customer Support"
+                        },
+                        "overrideLeafID": 8,
                         "options": [
                             {
                                 "value": "Friendliness"
@@ -104,59 +213,89 @@
                             },
                             {
                                 "value": "Speed"
+                            },
+                            {
+                                "value": "Options"
                             }
                         ],
                         "children": [
                             {
-                                "branchVal": "Other",
-                                "setLeafID": "5",
+                                "id": 4,
+                                "conditions": {
+                                    "matchValue": "Other"
+                                },
+                                "overrideLeafID": 5,
                                 "title": "Please tell us more",
-                                "type": "textbox"    
+                                "type": "textbox"
                             }
                         ]
                     }
                 ]
             },
             {
-                "branchVal": "5_7-Slider",
-                "setLeafID": "9",
+                "id": 8,
+                "overrideLeafID": 9,
                 "title": "What would you like to talk about?",
                 "conditions": {
                     "renderMin": 5,
-                    "renderMax": 7
+                    "renderMax": 8
                 },
                 "type": "multi-choice",
+                "options": [
+                    {
+                        "value": "Facilities"
+                    },
+                    {
+                        "value": "Customer support"
+                    },
+                    {
+                        "value": "Website/Mobile app"
+                    },
+                    {
+                        "value": "Product/Services"
+                    }
+                ],
                 "children": [
                     {
-                        "branchVal": "Facilities",
-                        "title": "Please specify.",
+                        "id": 9,
+                        "conditions": {
+                            "matchValue": "Facilities"
+                        },
                         "type": "multi-choice",
+                        "title": "Please specify.",
                         "options": [
                             {
                                 "value": "Cleanliness"
                             },
                             {
-                                "value": "Atmosphere",
-                                "publicValue": "Atmosphere (publicValue)"
+                                "value": "Atmosphere"
                             },
                             {
-                                "value": "Location",
-                                "publicValue": "Location (publicValue)"
+                                "value": "Location"
+                            },
+                            {
+                                "value": "Other"
                             }
                         ],
                         "children": [
                             {
-                                "branchVal": "Other",
-                                "setLeafID": "10",
+                                "id": 4,
+                                "conditions": {
+                                    "matchValue": "Other"
+                                },
+                                "overrideLeafID": 5,
                                 "title": "Please tell us more",
                                 "type": "textbox"
                             }
                         ]
                     },
                     {
-                        "branchVal": "Website/Mobile app",
                         "title": "Please specify.",
                         "type": "multi-choice",
+                        "conditions": {
+                            "matchValue": "Website/Mobile app"
+                        },
+                        "id": 10,
                         "options": [
                             {
                                 "value": "Design"
@@ -166,12 +305,18 @@
                             },
                             {
                                 "value": "Informative"
+                            },
+                            {
+                                "value": "Other"
                             }
                         ],
                         "children": [
                             {
-                                "branchVal": "Other",
-                                "setLeafID": "10",
+                                "id": 4,
+                                "conditions": {
+                                    "matchValue": "Other"
+                                },
+                                "overrideLeafID": 5,
                                 "title": "Please tell us more",
                                 "type": "textbox"
                             }
@@ -179,9 +324,12 @@
                     },
 
                     {
-                        "branchVal": "Product/Services",
                         "title": "Please specify.",
                         "type": "multi-choice",
+                        "conditions": {
+                            "matchValue": "Product/Services"
+                        },
+                        "id": 11,
                         "options": [
                             {
                                 "value": "Quality"
@@ -191,22 +339,30 @@
                             },
                             {
                                 "value": "Friendliness"
+                            },
+                            {
+                                "value": "Other"
                             }
                         ],
                         "children": [
                             {
-                                "branchVal": "Other",
-                                "setLeafID": "10",
+                                "id": 4,
+                                "conditions": {
+                                    "matchValue": "Other"
+                                },
+                                "overrideLeafID": 5,
                                 "title": "Please tell us more",
-                                "type": "textbox"               
+                                "type": "textbox"
                             }
                         ]
                     },
-
                     {
-                        "branchVal": "Customer Support",
                         "title": "Please specify.",
                         "type": "multi-choice",
+                        "conditions": {
+                            "matchValue": "Customer Support"
+                        },
+                        "id": 12,
                         "options": [
                             {
                                 "value": "Friendliness"
@@ -216,14 +372,20 @@
                             },
                             {
                                 "value": "Speed"
+                            },
+                            {
+                                "value": "Other"
                             }
                         ],
                         "children": [
                             {
-                                "branchVal": "Other",
-                                "setLeafID": "10",
+                                "id": 4,
+                                "conditions": {
+                                    "matchValue": "Other"
+                                },
+                                "overrideLeafID": 5,
                                 "title": "Please tell us more",
-                                "type": "textbox"    
+                                "type": "textbox"
                             }
                         ]
                     }
@@ -231,47 +393,71 @@
             },
 
             {
-                "branchVal": "0_4-Slider",
-                "setLeafID": "9",
+                "overrideLeafID": 9,
+                "id": 13,
                 "title": "We are sorry to hear that! Where can we improve?",
                 "conditions": {
                     "renderMin": 0,
                     "renderMax": 4
                 },
+                "options": [
+                    {
+                        "value": "Facilities"
+                    },
+                    {
+                        "value": "Customer support"
+                    },
+                    {
+                        "value": "Website/Mobile app"
+                    },
+                    {
+                        "value": "Product/Services"
+                    }
+                ],
                 "type": "multi-choice",
                 "children": [
                     {
-                        "branchVal": "Facilities",
+                        "id": 14,
+                        "conditions": {
+                            "matchValue": "Facilities"
+                        },
                         "title": "Please elaborate.",
                         "type": "multi-choice",
-                        "setLeafID": "14",
+                        "overrideLeafID": 14,
                         "options": [
                             {
                                 "value": "Cleanliness"
                             },
                             {
-                                "value": "Atmosphere",
-                                "publicValue": "Atmosphere (publicValue)"
+                                "value": "Atmosphere"
                             },
                             {
-                                "value": "Location",
-                                "publicValue": "Location (publicValue)"
+                                "value": "Location"
+                            },
+                            {
+                                "value": "Other"
                             }
                         ],
                         "children": [
                             {
-                                "branchVal": "Other",
-                                "setLeafID": "15",
+                                "id": 4,
+                                "conditions": {
+                                    "matchValue": "Other"
+                                },
+                                "overrideLeafID": 5,
                                 "title": "Please tell us more",
                                 "type": "textbox"
                             }
                         ]
                     },
                     {
-                        "branchVal": "Website/Mobile app",
+                        "id": 15,
+                        "conditions": {
+                            "matchValue": "Website/Mobile app"
+                        },
                         "title": "Please specify.",
                         "type": "multi-choice",
-                        "setLeafID": "13",
+                        "overrideLeafID": 13,
                         "options": [
                             {
                                 "value": "Design"
@@ -281,12 +467,18 @@
                             },
                             {
                                 "value": "Informative"
+                            },
+                            {
+                                "value": "Other"
                             }
                         ],
                         "children": [
                             {
-                                "branchVal": "Other",
-                                "setLeafID": "15",
+                                "id": 4,
+                                "conditions": {
+                                    "matchValue": "Other"
+                                },
+                                "overrideLeafID": 5,
                                 "title": "Please tell us more",
                                 "type": "textbox"
                             }
@@ -294,10 +486,13 @@
                     },
 
                     {
-                        "branchVal": "Product/Services",
+                        "id": 16,
                         "title": "Please specify.",
+                        "conditions": {
+                            "matchValue": "Product/Services"
+                        },
                         "type": "multi-choice",
-                        "setLeafID": "12",
+                        "overrideLeafID": "12",
                         "options": [
                             {
                                 "value": "Quality"
@@ -307,23 +502,32 @@
                             },
                             {
                                 "value": "Friendliness"
+                            },
+                            {
+                                "value": "Other"
                             }
                         ],
                         "children": [
                             {
-                                "branchVal": "Other",
-                                "setLeafID": "15",
+                                "id": 4,
+                                "conditions": {
+                                    "matchValue": "Other"
+                                },
+                                "overrideLeafID": 5,
                                 "title": "Please tell us more",
-                                "type": "textbox"               
+                                "type": "textbox"
                             }
                         ]
                     },
 
                     {
-                        "branchVal": "Customer Support",
+                        "id": 17,
                         "title": "Please specify.",
+                        "conditions": {
+                            "matchValue": "Customer Support"
+                        },
                         "type": "multi-choice",
-                        "setLeafID": "11",
+                        "overrideLeafID": 11,
                         "options": [
                             {
                                 "value": "Friendliness"
@@ -337,10 +541,13 @@
                         ],
                         "children": [
                             {
-                                "branchVal": "Other",
-                                "setLeafID": "15",
+                                "id": 4,
+                                "conditions": {
+                                    "matchValue": "Other"
+                                },
+                                "overrideLeafID": 5,
                                 "title": "Please tell us more",
-                                "type": "textbox"    
+                                "type": "textbox"
                             }
                         ]
                     }
@@ -382,7 +589,7 @@
             "id": 6,
             "title": "Thank you for your positive feedback. Come and join us on 1st April for our great event. Leave your email address below to register.",
             "type": "registration"
-        }, 
+        },
         {
             "id": 7,
             "title": "Thank you for your positive feedback. We think you might like this as well.",
@@ -417,7 +624,7 @@
             "title": "Thank you for your feedback. Please click on the Whatsapp link below so our service team can fix the issue."
         },
         {
-            "id": 14, 
+            "id": 14,
             "title": "Thank you for your feedback. Our team is on it. If you leave your email below we will keep you updated.",
             "type": "registration"
         },

@@ -1,110 +1,63 @@
-import React from 'react';
-import { H1, H2, Slider, Flex, Button } from '@haas/ui';
-import { useFormContext } from 'react-hook-form';
-import { useJSONTree, HAASNode, MultiChoiceOption } from './hooks/use-json-tree';
-import { Instagram } from 'react-feather';
+import React, { useCallback } from 'react';
+import { H1, Div } from '@haas/ui';
+import { useJSONTree } from './hooks/use-json-tree';
+import { useTransition, animated } from 'react-spring';
+import { HAASSlider } from './components/HAASSlider';
+import { HAASMultiChoice } from './components/HAASMultiChoice';
+import { HAASSocialShare } from './components/HAASSocialShare';
+import { HAASTextBox } from './components/HAASTextBox';
+import { HAASSignIn } from './components/HAASSignIn';
 
 export const HAASForm = () => {
-  const { activeNode } = useJSONTree();
+  const { historyStack } = useJSONTree();
+
+  const activeNode = historyStack.slice(-1)[0];
+
+  const transitions = useTransition(activeNode, (activeNode) => activeNode?.id, {
+    from: { opacity: 0, transform: 'scale(1.1)' },
+    enter: { opacity: 1, transform: 'scale(1)' },
+    leave: { opacity: 0, transform: 'scale(0.9)' }
+  });
 
   return (
-    <>
-      <H1 color="white">{activeNode.title}</H1>
-      {renderNextNode(activeNode)}
-    </>
+    <Div useFlex flexDirection='column' justifyContent='space-between' height={['100vh', '80vh']}>
+      <H1 textAlign="center" color="white">{activeNode?.title}</H1>
+
+      {transitions.map(({ item, key, props, state }) => {
+        if (state !== 'leave') {
+          return <animated.div style={{
+            position: 'absolute',
+            bottom: '100px',
+            left: 0,
+            right: 0,
+            ...props,
+          }} key={key}
+          >
+            {renderNextNode(item)}
+          </animated.div>
+        }
+        return null
+
+      }
+
+      )}
+    </Div>
   );
 };
 
-export const HAASMultiChoice = () => {
-  const { getValues } = useFormContext();
-  const { activeNode, enterBranch } = useJSONTree();
+HAASForm.whyDidYouRender = true;
 
-  return (
-    <>
-      <Flex>
-        {activeNode?.options?.map((multiChoiceOption: MultiChoiceOption, index: any) => (
-          <Button onClick={() => enterBranch(multiChoiceOption.value)} key={index}>
-            {(multiChoiceOption?.publicValue?.length ?? 0) > 0 ? multiChoiceOption?.publicValue : multiChoiceOption?.value}
-          </Button>
-        ))}
+const renderNextNode = (node: any) => {
+  let nodeType = node.type;
+  const Component: React.ReactNode | undefined = nodeMap.get(nodeType);
 
-        {activeNode?.children?.map((choice, index) => (
-          <Button onClick={() => enterBranch(choice.branchVal)} key={index}>
-            {choice?.branchVal}
-          </Button>
-        ))}
-      </Flex>
-    </>
-  )
+  return Component || <HAASTextBox />
 }
 
-export const HAASSocialShare = () => {
-  return (
-    <>
-      <Instagram />
-    </>
-  )
-}
-
-export const HAASText = () => {
-  const { enterBranch } = useJSONTree();
-  return (
-    <>
-      <Flex>
-        <input></input>
-        <Button onClick={() => enterBranch('')}>Continue</Button>
-      </Flex>
-    </>
-  );
-}
-
-export const HAASEmailRegistration = () => {
-  return (
-    <>
-      <Flex>
-        <label htmlFor="email">
-          Email Address
-          <input id="email" type="email"></input>
-        </label>
-        
-        <Button onClick={() => console.log('clicked')}>Continue</Button>
-      </Flex>
-    </>
-  );
-}
-
-const renderNextNode = (node: HAASNode) => {
-  if (node.type === "slider") {
-    return <HAASSlider />
-  }
-
-  if (node.type === "multi-choice") {
-    return <HAASMultiChoice />
-  }
-
-  if (node.type === 'social-share') {
-    return <HAASSocialShare />
-  }
-
-  if (node.type === 'textbox') {
-    return <HAASText />
-  }
-
-  if (node.type === 'registration') {
-    return <HAASEmailRegistration/>
-  }
-
-  // return <LeafNode />
-}
-
-const HAASSlider = () => {
-  const { register, watch } = useFormContext();
-  const { enterBranch } = useJSONTree();
-
-  return (
-    <>
-      <H2 color="white">{watch('slider-value', '5')}</H2>
-      <Slider name="slider-value" onMouseUp={() => enterBranch(watch('slider-value'))} min={0} max={10} mt={4} defaultValue={5} ref={register} />
-    </>
-  )
-};
+const nodeMap = new Map([
+  ['slider', <HAASSlider />],
+  ['multi-choice', <HAASMultiChoice />],
+  ['social-share', <HAASSocialShare />],
+  ['textbox', <HAASTextBox />],
+  ['registration', <HAASSignIn />]
+]);
