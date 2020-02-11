@@ -24,18 +24,26 @@ export const HAASForm = () => {
     <Div useFlex flexDirection='column' justifyContent='space-between' height={['100vh', '75vh']}>
       <H1 textAlign="center" color="white">{activeNode.title}</H1>
 
-      {transitions.map(({ item, key, props }) => (
-        <animated.div style={{
-          position: 'absolute',
-          bottom: '100px',
-          left: 0,
-          right: 0,
-          ...props,
+      {transitions.map(({ item, key, props, state }) => {
+        // const node = renderNextNode(item.type)
+        // console.log('Item: ', props)
+        if (state !== 'leave') {
+          return <animated.div style={{
+            position: 'absolute',
+            bottom: '100px',
+            left: 0,
+            right: 0,
+            ...props,
           }} key={key}
-        >
-          {renderNextNode(item.type)}
-        </animated.div>
-      ))}
+          >
+            {renderNextNode(item.type)}
+          </animated.div>
+        }
+        return null
+
+      }
+
+      )}
     </Div>
   );
 };
