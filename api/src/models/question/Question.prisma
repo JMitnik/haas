@@ -2,7 +2,7 @@ type Question {
     id: ID! @id
     questionnaireId: ID!
     title: String!
-    type: String!
+    questionType(type: QuestionType): String!
     overrideLeafId: Int
     conditions: [QuestionCondition]
     options: [QuestionOption]

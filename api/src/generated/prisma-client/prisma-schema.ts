@@ -819,7 +819,7 @@ type Question {
   id: ID!
   questionnaireId: ID!
   title: String!
-  type: String!
+  questionType: String!
   overrideLeafId: Int
   conditions(where: QuestionConditionWhereInput, orderBy: QuestionConditionOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [QuestionCondition!]
   options(where: QuestionOptionWhereInput, orderBy: QuestionOptionOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [QuestionOption!]
@@ -1095,7 +1095,7 @@ input QuestionCreateInput {
   id: ID
   questionnaireId: ID!
   title: String!
-  type: String!
+  questionType: String!
   overrideLeafId: Int
   conditions: QuestionConditionCreateManyInput
   options: QuestionOptionCreateManyInput
@@ -1854,8 +1854,8 @@ enum QuestionOrderByInput {
   questionnaireId_DESC
   title_ASC
   title_DESC
-  type_ASC
-  type_DESC
+  questionType_ASC
+  questionType_DESC
   overrideLeafId_ASC
   overrideLeafId_DESC
 }
@@ -1864,7 +1864,7 @@ type QuestionPreviousValues {
   id: ID!
   questionnaireId: ID!
   title: String!
-  type: String!
+  questionType: String!
   overrideLeafId: Int
 }
 
@@ -1911,20 +1911,20 @@ input QuestionScalarWhereInput {
   title_not_starts_with: String
   title_ends_with: String
   title_not_ends_with: String
-  type: String
-  type_not: String
-  type_in: [String!]
-  type_not_in: [String!]
-  type_lt: String
-  type_lte: String
-  type_gt: String
-  type_gte: String
-  type_contains: String
-  type_not_contains: String
-  type_starts_with: String
-  type_not_starts_with: String
-  type_ends_with: String
-  type_not_ends_with: String
+  questionType: String
+  questionType_not: String
+  questionType_in: [String!]
+  questionType_not_in: [String!]
+  questionType_lt: String
+  questionType_lte: String
+  questionType_gt: String
+  questionType_gte: String
+  questionType_contains: String
+  questionType_not_contains: String
+  questionType_starts_with: String
+  questionType_not_starts_with: String
+  questionType_ends_with: String
+  questionType_not_ends_with: String
   overrideLeafId: Int
   overrideLeafId_not: Int
   overrideLeafId_in: [Int!]
@@ -1959,7 +1959,7 @@ input QuestionSubscriptionWhereInput {
 input QuestionUpdateDataInput {
   questionnaireId: ID
   title: String
-  type: String
+  questionType: String
   overrideLeafId: Int
   conditions: QuestionConditionUpdateManyInput
   options: QuestionOptionUpdateManyInput
@@ -1969,7 +1969,7 @@ input QuestionUpdateDataInput {
 input QuestionUpdateInput {
   questionnaireId: ID
   title: String
-  type: String
+  questionType: String
   overrideLeafId: Int
   conditions: QuestionConditionUpdateManyInput
   options: QuestionOptionUpdateManyInput
@@ -1979,7 +1979,7 @@ input QuestionUpdateInput {
 input QuestionUpdateManyDataInput {
   questionnaireId: ID
   title: String
-  type: String
+  questionType: String
   overrideLeafId: Int
 }
 
@@ -1998,7 +1998,7 @@ input QuestionUpdateManyInput {
 input QuestionUpdateManyMutationInput {
   questionnaireId: ID
   title: String
-  type: String
+  questionType: String
   overrideLeafId: Int
 }
 
@@ -2061,20 +2061,20 @@ input QuestionWhereInput {
   title_not_starts_with: String
   title_ends_with: String
   title_not_ends_with: String
-  type: String
-  type_not: String
-  type_in: [String!]
-  type_not_in: [String!]
-  type_lt: String
-  type_lte: String
-  type_gt: String
-  type_gte: String
-  type_contains: String
-  type_not_contains: String
-  type_starts_with: String
-  type_not_starts_with: String
-  type_ends_with: String
-  type_not_ends_with: String
+  questionType: String
+  questionType_not: String
+  questionType_in: [String!]
+  questionType_not_in: [String!]
+  questionType_lt: String
+  questionType_lte: String
+  questionType_gt: String
+  questionType_gte: String
+  questionType_contains: String
+  questionType_not_contains: String
+  questionType_starts_with: String
+  questionType_not_starts_with: String
+  questionType_ends_with: String
+  questionType_not_ends_with: String
   overrideLeafId: Int
   overrideLeafId_not: Int
   overrideLeafId_in: [Int!]

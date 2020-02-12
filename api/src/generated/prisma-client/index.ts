@@ -488,8 +488,8 @@ export type QuestionOrderByInput =
   | "questionnaireId_DESC"
   | "title_ASC"
   | "title_DESC"
-  | "type_ASC"
-  | "type_DESC"
+  | "questionType_ASC"
+  | "questionType_DESC"
   | "overrideLeafId_ASC"
   | "overrideLeafId_DESC";
 
@@ -1242,7 +1242,7 @@ export interface QuestionnaireSettingsCreateInput {
 export interface QuestionUpdateInput {
   questionnaireId?: Maybe<ID_Input>;
   title?: Maybe<String>;
-  type?: Maybe<String>;
+  questionType?: Maybe<String>;
   overrideLeafId?: Maybe<Int>;
   conditions?: Maybe<QuestionConditionUpdateManyInput>;
   options?: Maybe<QuestionOptionUpdateManyInput>;
@@ -1302,7 +1302,7 @@ export interface QuestionCreateInput {
   id?: Maybe<ID_Input>;
   questionnaireId: ID_Input;
   title: String;
-  type: String;
+  questionType: String;
   overrideLeafId?: Maybe<Int>;
   conditions?: Maybe<QuestionConditionCreateManyInput>;
   options?: Maybe<QuestionOptionCreateManyInput>;
@@ -1933,20 +1933,20 @@ export interface QuestionWhereInput {
   title_not_starts_with?: Maybe<String>;
   title_ends_with?: Maybe<String>;
   title_not_ends_with?: Maybe<String>;
-  type?: Maybe<String>;
-  type_not?: Maybe<String>;
-  type_in?: Maybe<String[] | String>;
-  type_not_in?: Maybe<String[] | String>;
-  type_lt?: Maybe<String>;
-  type_lte?: Maybe<String>;
-  type_gt?: Maybe<String>;
-  type_gte?: Maybe<String>;
-  type_contains?: Maybe<String>;
-  type_not_contains?: Maybe<String>;
-  type_starts_with?: Maybe<String>;
-  type_not_starts_with?: Maybe<String>;
-  type_ends_with?: Maybe<String>;
-  type_not_ends_with?: Maybe<String>;
+  questionType?: Maybe<String>;
+  questionType_not?: Maybe<String>;
+  questionType_in?: Maybe<String[] | String>;
+  questionType_not_in?: Maybe<String[] | String>;
+  questionType_lt?: Maybe<String>;
+  questionType_lte?: Maybe<String>;
+  questionType_gt?: Maybe<String>;
+  questionType_gte?: Maybe<String>;
+  questionType_contains?: Maybe<String>;
+  questionType_not_contains?: Maybe<String>;
+  questionType_starts_with?: Maybe<String>;
+  questionType_not_starts_with?: Maybe<String>;
+  questionType_ends_with?: Maybe<String>;
+  questionType_not_ends_with?: Maybe<String>;
   overrideLeafId?: Maybe<Int>;
   overrideLeafId_not?: Maybe<Int>;
   overrideLeafId_in?: Maybe<Int[] | Int>;
@@ -2025,7 +2025,7 @@ export interface QuestionOptionWhereInput {
 export interface QuestionUpdateManyMutationInput {
   questionnaireId?: Maybe<ID_Input>;
   title?: Maybe<String>;
-  type?: Maybe<String>;
+  questionType?: Maybe<String>;
   overrideLeafId?: Maybe<Int>;
 }
 
@@ -2156,7 +2156,7 @@ export interface ColourSettingsUpsertNestedInput {
 export interface QuestionUpdateManyDataInput {
   questionnaireId?: Maybe<ID_Input>;
   title?: Maybe<String>;
-  type?: Maybe<String>;
+  questionType?: Maybe<String>;
   overrideLeafId?: Maybe<Int>;
 }
 
@@ -2257,7 +2257,7 @@ export type QuestionnaireSettingsWhereUniqueInput = AtLeastOne<{
 export interface QuestionUpdateDataInput {
   questionnaireId?: Maybe<ID_Input>;
   title?: Maybe<String>;
-  type?: Maybe<String>;
+  questionType?: Maybe<String>;
   overrideLeafId?: Maybe<Int>;
   conditions?: Maybe<QuestionConditionUpdateManyInput>;
   options?: Maybe<QuestionOptionUpdateManyInput>;
@@ -2378,20 +2378,20 @@ export interface QuestionScalarWhereInput {
   title_not_starts_with?: Maybe<String>;
   title_ends_with?: Maybe<String>;
   title_not_ends_with?: Maybe<String>;
-  type?: Maybe<String>;
-  type_not?: Maybe<String>;
-  type_in?: Maybe<String[] | String>;
-  type_not_in?: Maybe<String[] | String>;
-  type_lt?: Maybe<String>;
-  type_lte?: Maybe<String>;
-  type_gt?: Maybe<String>;
-  type_gte?: Maybe<String>;
-  type_contains?: Maybe<String>;
-  type_not_contains?: Maybe<String>;
-  type_starts_with?: Maybe<String>;
-  type_not_starts_with?: Maybe<String>;
-  type_ends_with?: Maybe<String>;
-  type_not_ends_with?: Maybe<String>;
+  questionType?: Maybe<String>;
+  questionType_not?: Maybe<String>;
+  questionType_in?: Maybe<String[] | String>;
+  questionType_not_in?: Maybe<String[] | String>;
+  questionType_lt?: Maybe<String>;
+  questionType_lte?: Maybe<String>;
+  questionType_gt?: Maybe<String>;
+  questionType_gte?: Maybe<String>;
+  questionType_contains?: Maybe<String>;
+  questionType_not_contains?: Maybe<String>;
+  questionType_starts_with?: Maybe<String>;
+  questionType_not_starts_with?: Maybe<String>;
+  questionType_ends_with?: Maybe<String>;
+  questionType_not_ends_with?: Maybe<String>;
   overrideLeafId?: Maybe<Int>;
   overrideLeafId_not?: Maybe<Int>;
   overrideLeafId_in?: Maybe<Int[] | Int>;
@@ -3332,7 +3332,7 @@ export interface QuestionPreviousValues {
   id: ID_Output;
   questionnaireId: ID_Output;
   title: String;
-  type: String;
+  questionType: String;
   overrideLeafId?: Int;
 }
 
@@ -3342,7 +3342,7 @@ export interface QuestionPreviousValuesPromise
   id: () => Promise<ID_Output>;
   questionnaireId: () => Promise<ID_Output>;
   title: () => Promise<String>;
-  type: () => Promise<String>;
+  questionType: () => Promise<String>;
   overrideLeafId: () => Promise<Int>;
 }
 
@@ -3352,7 +3352,7 @@ export interface QuestionPreviousValuesSubscription
   id: () => Promise<AsyncIterator<ID_Output>>;
   questionnaireId: () => Promise<AsyncIterator<ID_Output>>;
   title: () => Promise<AsyncIterator<String>>;
-  type: () => Promise<AsyncIterator<String>>;
+  questionType: () => Promise<AsyncIterator<String>>;
   overrideLeafId: () => Promise<AsyncIterator<Int>>;
 }
 
@@ -3543,7 +3543,7 @@ export interface Question {
   id: ID_Output;
   questionnaireId: ID_Output;
   title: String;
-  type: String;
+  questionType: String;
   overrideLeafId?: Int;
 }
 
@@ -3551,7 +3551,7 @@ export interface QuestionPromise extends Promise<Question>, Fragmentable {
   id: () => Promise<ID_Output>;
   questionnaireId: () => Promise<ID_Output>;
   title: () => Promise<String>;
-  type: () => Promise<String>;
+  questionType: () => Promise<String>;
   overrideLeafId: () => Promise<Int>;
   conditions: <T = FragmentableArray<QuestionCondition>>(args?: {
     where?: QuestionConditionWhereInput;
@@ -3588,7 +3588,7 @@ export interface QuestionSubscription
   id: () => Promise<AsyncIterator<ID_Output>>;
   questionnaireId: () => Promise<AsyncIterator<ID_Output>>;
   title: () => Promise<AsyncIterator<String>>;
-  type: () => Promise<AsyncIterator<String>>;
+  questionType: () => Promise<AsyncIterator<String>>;
   overrideLeafId: () => Promise<AsyncIterator<Int>>;
   conditions: <
     T = Promise<AsyncIterator<QuestionConditionSubscription>>
@@ -3627,7 +3627,7 @@ export interface QuestionNullablePromise
   id: () => Promise<ID_Output>;
   questionnaireId: () => Promise<ID_Output>;
   title: () => Promise<String>;
-  type: () => Promise<String>;
+  questionType: () => Promise<String>;
   overrideLeafId: () => Promise<Int>;
   conditions: <T = FragmentableArray<QuestionCondition>>(args?: {
     where?: QuestionConditionWhereInput;

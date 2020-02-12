@@ -1,0 +1,7 @@
+enum QuestionType {
+    SLIDER
+    MULTI_CHOICE
+    TEXTBOX
+    SOCIAL_SHARE
+    REGISTRATION
+}
