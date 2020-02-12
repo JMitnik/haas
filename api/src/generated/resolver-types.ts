@@ -1458,6 +1458,7 @@ export type QuestionChildrenArgs = {
 export type QuestionCondition = {
    __typename?: 'QuestionCondition',
   id: Scalars['ID'],
+  conditionType?: Maybe<Scalars['String']>,
   renderMin?: Maybe<Scalars['Int']>,
   renderMax?: Maybe<Scalars['Int']>,
   matchValue?: Maybe<Scalars['String']>,
@@ -1472,6 +1473,7 @@ export type QuestionConditionConnection = {
 
 export type QuestionConditionCreateInput = {
   id?: Maybe<Scalars['ID']>,
+  conditionType?: Maybe<Scalars['String']>,
   renderMin?: Maybe<Scalars['Int']>,
   renderMax?: Maybe<Scalars['Int']>,
   matchValue?: Maybe<Scalars['String']>,
@@ -1491,6 +1493,8 @@ export type QuestionConditionEdge = {
 export enum QuestionConditionOrderByInput {
   IdAsc = 'id_ASC',
   IdDesc = 'id_DESC',
+  ConditionTypeAsc = 'conditionType_ASC',
+  ConditionTypeDesc = 'conditionType_DESC',
   RenderMinAsc = 'renderMin_ASC',
   RenderMinDesc = 'renderMin_DESC',
   RenderMaxAsc = 'renderMax_ASC',
@@ -1502,6 +1506,7 @@ export enum QuestionConditionOrderByInput {
 export type QuestionConditionPreviousValues = {
    __typename?: 'QuestionConditionPreviousValues',
   id: Scalars['ID'],
+  conditionType?: Maybe<Scalars['String']>,
   renderMin?: Maybe<Scalars['Int']>,
   renderMax?: Maybe<Scalars['Int']>,
   matchValue?: Maybe<Scalars['String']>,
@@ -1522,6 +1527,20 @@ export type QuestionConditionScalarWhereInput = {
   id_not_starts_with?: Maybe<Scalars['ID']>,
   id_ends_with?: Maybe<Scalars['ID']>,
   id_not_ends_with?: Maybe<Scalars['ID']>,
+  conditionType?: Maybe<Scalars['String']>,
+  conditionType_not?: Maybe<Scalars['String']>,
+  conditionType_in?: Maybe<Array<Scalars['String']>>,
+  conditionType_not_in?: Maybe<Array<Scalars['String']>>,
+  conditionType_lt?: Maybe<Scalars['String']>,
+  conditionType_lte?: Maybe<Scalars['String']>,
+  conditionType_gt?: Maybe<Scalars['String']>,
+  conditionType_gte?: Maybe<Scalars['String']>,
+  conditionType_contains?: Maybe<Scalars['String']>,
+  conditionType_not_contains?: Maybe<Scalars['String']>,
+  conditionType_starts_with?: Maybe<Scalars['String']>,
+  conditionType_not_starts_with?: Maybe<Scalars['String']>,
+  conditionType_ends_with?: Maybe<Scalars['String']>,
+  conditionType_not_ends_with?: Maybe<Scalars['String']>,
   renderMin?: Maybe<Scalars['Int']>,
   renderMin_not?: Maybe<Scalars['Int']>,
   renderMin_in?: Maybe<Array<Scalars['Int']>>,
@@ -1577,18 +1596,21 @@ export type QuestionConditionSubscriptionWhereInput = {
 };
 
 export type QuestionConditionUpdateDataInput = {
+  conditionType?: Maybe<Scalars['String']>,
   renderMin?: Maybe<Scalars['Int']>,
   renderMax?: Maybe<Scalars['Int']>,
   matchValue?: Maybe<Scalars['String']>,
 };
 
 export type QuestionConditionUpdateInput = {
+  conditionType?: Maybe<Scalars['String']>,
   renderMin?: Maybe<Scalars['Int']>,
   renderMax?: Maybe<Scalars['Int']>,
   matchValue?: Maybe<Scalars['String']>,
 };
 
 export type QuestionConditionUpdateManyDataInput = {
+  conditionType?: Maybe<Scalars['String']>,
   renderMin?: Maybe<Scalars['Int']>,
   renderMax?: Maybe<Scalars['Int']>,
   matchValue?: Maybe<Scalars['String']>,
@@ -1607,6 +1629,7 @@ export type QuestionConditionUpdateManyInput = {
 };
 
 export type QuestionConditionUpdateManyMutationInput = {
+  conditionType?: Maybe<Scalars['String']>,
   renderMin?: Maybe<Scalars['Int']>,
   renderMax?: Maybe<Scalars['Int']>,
   matchValue?: Maybe<Scalars['String']>,
@@ -1643,6 +1666,20 @@ export type QuestionConditionWhereInput = {
   id_not_starts_with?: Maybe<Scalars['ID']>,
   id_ends_with?: Maybe<Scalars['ID']>,
   id_not_ends_with?: Maybe<Scalars['ID']>,
+  conditionType?: Maybe<Scalars['String']>,
+  conditionType_not?: Maybe<Scalars['String']>,
+  conditionType_in?: Maybe<Array<Scalars['String']>>,
+  conditionType_not_in?: Maybe<Array<Scalars['String']>>,
+  conditionType_lt?: Maybe<Scalars['String']>,
+  conditionType_lte?: Maybe<Scalars['String']>,
+  conditionType_gt?: Maybe<Scalars['String']>,
+  conditionType_gte?: Maybe<Scalars['String']>,
+  conditionType_contains?: Maybe<Scalars['String']>,
+  conditionType_not_contains?: Maybe<Scalars['String']>,
+  conditionType_starts_with?: Maybe<Scalars['String']>,
+  conditionType_not_starts_with?: Maybe<Scalars['String']>,
+  conditionType_ends_with?: Maybe<Scalars['String']>,
+  conditionType_not_ends_with?: Maybe<Scalars['String']>,
   renderMin?: Maybe<Scalars['Int']>,
   renderMin_not?: Maybe<Scalars['Int']>,
   renderMin_in?: Maybe<Array<Scalars['Int']>>,
@@ -3703,6 +3740,7 @@ export type QuestionResolvers<ContextType = any, ParentType extends ResolversPar
 
 export type QuestionConditionResolvers<ContextType = any, ParentType extends ResolversParentTypes['QuestionCondition'] = ResolversParentTypes['QuestionCondition']> = ResolversObject<{
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>,
+  conditionType?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   renderMin?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>,
   renderMax?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>,
   matchValue?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
@@ -3721,6 +3759,7 @@ export type QuestionConditionEdgeResolvers<ContextType = any, ParentType extends
 
 export type QuestionConditionPreviousValuesResolvers<ContextType = any, ParentType extends ResolversParentTypes['QuestionConditionPreviousValues'] = ResolversParentTypes['QuestionConditionPreviousValues']> = ResolversObject<{
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>,
+  conditionType?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   renderMin?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>,
   renderMax?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>,
   matchValue?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,

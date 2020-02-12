@@ -496,6 +496,8 @@ export type QuestionOrderByInput =
 export type QuestionConditionOrderByInput =
   | "id_ASC"
   | "id_DESC"
+  | "conditionType_ASC"
+  | "conditionType_DESC"
   | "renderMin_ASC"
   | "renderMin_DESC"
   | "renderMax_ASC"
@@ -806,6 +808,20 @@ export interface QuestionConditionWhereInput {
   id_not_starts_with?: Maybe<ID_Input>;
   id_ends_with?: Maybe<ID_Input>;
   id_not_ends_with?: Maybe<ID_Input>;
+  conditionType?: Maybe<String>;
+  conditionType_not?: Maybe<String>;
+  conditionType_in?: Maybe<String[] | String>;
+  conditionType_not_in?: Maybe<String[] | String>;
+  conditionType_lt?: Maybe<String>;
+  conditionType_lte?: Maybe<String>;
+  conditionType_gt?: Maybe<String>;
+  conditionType_gte?: Maybe<String>;
+  conditionType_contains?: Maybe<String>;
+  conditionType_not_contains?: Maybe<String>;
+  conditionType_starts_with?: Maybe<String>;
+  conditionType_not_starts_with?: Maybe<String>;
+  conditionType_ends_with?: Maybe<String>;
+  conditionType_not_ends_with?: Maybe<String>;
   renderMin?: Maybe<Int>;
   renderMin_not?: Maybe<Int>;
   renderMin_in?: Maybe<Int[] | Int>;
@@ -861,6 +877,20 @@ export interface QuestionConditionScalarWhereInput {
   id_not_starts_with?: Maybe<ID_Input>;
   id_ends_with?: Maybe<ID_Input>;
   id_not_ends_with?: Maybe<ID_Input>;
+  conditionType?: Maybe<String>;
+  conditionType_not?: Maybe<String>;
+  conditionType_in?: Maybe<String[] | String>;
+  conditionType_not_in?: Maybe<String[] | String>;
+  conditionType_lt?: Maybe<String>;
+  conditionType_lte?: Maybe<String>;
+  conditionType_gt?: Maybe<String>;
+  conditionType_gte?: Maybe<String>;
+  conditionType_contains?: Maybe<String>;
+  conditionType_not_contains?: Maybe<String>;
+  conditionType_starts_with?: Maybe<String>;
+  conditionType_not_starts_with?: Maybe<String>;
+  conditionType_ends_with?: Maybe<String>;
+  conditionType_not_ends_with?: Maybe<String>;
   renderMin?: Maybe<Int>;
   renderMin_not?: Maybe<Int>;
   renderMin_in?: Maybe<Int[] | Int>;
@@ -1181,6 +1211,7 @@ export interface QuestionnaireCreateInput {
 }
 
 export interface QuestionConditionUpdateManyMutationInput {
+  conditionType?: Maybe<String>;
   renderMin?: Maybe<Int>;
   renderMax?: Maybe<Int>;
   matchValue?: Maybe<String>;
@@ -1192,6 +1223,7 @@ export interface QuestionnaireSettingsCreateOneInput {
 }
 
 export interface QuestionConditionUpdateInput {
+  conditionType?: Maybe<String>;
   renderMin?: Maybe<Int>;
   renderMax?: Maybe<Int>;
   matchValue?: Maybe<String>;
@@ -1531,6 +1563,7 @@ export interface QuestionUpdateManyWithWhereNestedInput {
 
 export interface QuestionConditionCreateInput {
   id?: Maybe<ID_Input>;
+  conditionType?: Maybe<String>;
   renderMin?: Maybe<Int>;
   renderMax?: Maybe<Int>;
   matchValue?: Maybe<String>;
@@ -1748,6 +1781,7 @@ export interface CustomerWhereInput {
 }
 
 export interface QuestionConditionUpdateManyDataInput {
+  conditionType?: Maybe<String>;
   renderMin?: Maybe<Int>;
   renderMax?: Maybe<Int>;
   matchValue?: Maybe<String>;
@@ -2242,6 +2276,7 @@ export interface QuestionConditionUpsertWithWhereUniqueNestedInput {
 }
 
 export interface QuestionConditionUpdateDataInput {
+  conditionType?: Maybe<String>;
   renderMin?: Maybe<Int>;
   renderMax?: Maybe<Int>;
   matchValue?: Maybe<String>;
@@ -3195,6 +3230,7 @@ export interface AggregateFontSettingsSubscription
 
 export interface QuestionCondition {
   id: ID_Output;
+  conditionType?: String;
   renderMin?: Int;
   renderMax?: Int;
   matchValue?: String;
@@ -3204,6 +3240,7 @@ export interface QuestionConditionPromise
   extends Promise<QuestionCondition>,
     Fragmentable {
   id: () => Promise<ID_Output>;
+  conditionType: () => Promise<String>;
   renderMin: () => Promise<Int>;
   renderMax: () => Promise<Int>;
   matchValue: () => Promise<String>;
@@ -3213,6 +3250,7 @@ export interface QuestionConditionSubscription
   extends Promise<AsyncIterator<QuestionCondition>>,
     Fragmentable {
   id: () => Promise<AsyncIterator<ID_Output>>;
+  conditionType: () => Promise<AsyncIterator<String>>;
   renderMin: () => Promise<AsyncIterator<Int>>;
   renderMax: () => Promise<AsyncIterator<Int>>;
   matchValue: () => Promise<AsyncIterator<String>>;
@@ -3222,6 +3260,7 @@ export interface QuestionConditionNullablePromise
   extends Promise<QuestionCondition | null>,
     Fragmentable {
   id: () => Promise<ID_Output>;
+  conditionType: () => Promise<String>;
   renderMin: () => Promise<Int>;
   renderMax: () => Promise<Int>;
   matchValue: () => Promise<String>;
@@ -3455,6 +3494,7 @@ export interface AggregateQuestionOptionSubscription
 
 export interface QuestionConditionPreviousValues {
   id: ID_Output;
+  conditionType?: String;
   renderMin?: Int;
   renderMax?: Int;
   matchValue?: String;
@@ -3464,6 +3504,7 @@ export interface QuestionConditionPreviousValuesPromise
   extends Promise<QuestionConditionPreviousValues>,
     Fragmentable {
   id: () => Promise<ID_Output>;
+  conditionType: () => Promise<String>;
   renderMin: () => Promise<Int>;
   renderMax: () => Promise<Int>;
   matchValue: () => Promise<String>;
@@ -3473,6 +3514,7 @@ export interface QuestionConditionPreviousValuesSubscription
   extends Promise<AsyncIterator<QuestionConditionPreviousValues>>,
     Fragmentable {
   id: () => Promise<AsyncIterator<ID_Output>>;
+  conditionType: () => Promise<AsyncIterator<String>>;
   renderMin: () => Promise<AsyncIterator<Int>>;
   renderMax: () => Promise<AsyncIterator<Int>>;
   matchValue: () => Promise<AsyncIterator<String>>;

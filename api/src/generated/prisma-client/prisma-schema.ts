@@ -828,6 +828,7 @@ type Question {
 
 type QuestionCondition {
   id: ID!
+  conditionType: String
   renderMin: Int
   renderMax: Int
   matchValue: String
@@ -841,6 +842,7 @@ type QuestionConditionConnection {
 
 input QuestionConditionCreateInput {
   id: ID
+  conditionType: String
   renderMin: Int
   renderMax: Int
   matchValue: String
@@ -859,6 +861,8 @@ type QuestionConditionEdge {
 enum QuestionConditionOrderByInput {
   id_ASC
   id_DESC
+  conditionType_ASC
+  conditionType_DESC
   renderMin_ASC
   renderMin_DESC
   renderMax_ASC
@@ -869,6 +873,7 @@ enum QuestionConditionOrderByInput {
 
 type QuestionConditionPreviousValues {
   id: ID!
+  conditionType: String
   renderMin: Int
   renderMax: Int
   matchValue: String
@@ -889,6 +894,20 @@ input QuestionConditionScalarWhereInput {
   id_not_starts_with: ID
   id_ends_with: ID
   id_not_ends_with: ID
+  conditionType: String
+  conditionType_not: String
+  conditionType_in: [String!]
+  conditionType_not_in: [String!]
+  conditionType_lt: String
+  conditionType_lte: String
+  conditionType_gt: String
+  conditionType_gte: String
+  conditionType_contains: String
+  conditionType_not_contains: String
+  conditionType_starts_with: String
+  conditionType_not_starts_with: String
+  conditionType_ends_with: String
+  conditionType_not_ends_with: String
   renderMin: Int
   renderMin_not: Int
   renderMin_in: [Int!]
@@ -943,18 +962,21 @@ input QuestionConditionSubscriptionWhereInput {
 }
 
 input QuestionConditionUpdateDataInput {
+  conditionType: String
   renderMin: Int
   renderMax: Int
   matchValue: String
 }
 
 input QuestionConditionUpdateInput {
+  conditionType: String
   renderMin: Int
   renderMax: Int
   matchValue: String
 }
 
 input QuestionConditionUpdateManyDataInput {
+  conditionType: String
   renderMin: Int
   renderMax: Int
   matchValue: String
@@ -973,6 +995,7 @@ input QuestionConditionUpdateManyInput {
 }
 
 input QuestionConditionUpdateManyMutationInput {
+  conditionType: String
   renderMin: Int
   renderMax: Int
   matchValue: String
@@ -1009,6 +1032,20 @@ input QuestionConditionWhereInput {
   id_not_starts_with: ID
   id_ends_with: ID
   id_not_ends_with: ID
+  conditionType: String
+  conditionType_not: String
+  conditionType_in: [String!]
+  conditionType_not_in: [String!]
+  conditionType_lt: String
+  conditionType_lte: String
+  conditionType_gt: String
+  conditionType_gte: String
+  conditionType_contains: String
+  conditionType_not_contains: String
+  conditionType_starts_with: String
+  conditionType_not_starts_with: String
+  conditionType_ends_with: String
+  conditionType_not_ends_with: String
   renderMin: Int
   renderMin_not: Int
   renderMin_in: [Int!]
