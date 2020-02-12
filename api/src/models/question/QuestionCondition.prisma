@@ -1,0 +1,6 @@
+type QuestionCondition {
+    id: ID! @id
+    renderMin: Int
+    renderMax: Int
+    matchValue: String
+}

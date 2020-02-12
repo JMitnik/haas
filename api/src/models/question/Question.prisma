@@ -1,0 +1,10 @@
+type Question {
+    id: ID! @id
+    questionnaireId: ID!
+    title: String!
+    type: String!
+    overrideLeafId: Int
+    conditions: [QuestionCondition]
+    options: [QuestionOption]
+    children: [Question!]
+}

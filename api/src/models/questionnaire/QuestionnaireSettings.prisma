@@ -1,0 +1,9 @@
+type QuestionnaireSettings {
+    id: ID! @id
+    customerId: ID!
+    questionnaireId: ID!
+    title: String
+    logo: String 
+    colourSettings: ColourSettings!
+    fontSettings: FontSettings!
+}

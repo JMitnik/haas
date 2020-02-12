@@ -1,0 +1,10 @@
+type Questionnaire {
+    id: ID! @id
+    customerId: ID!
+    title: String!
+    description: String!
+    publicTitle: String
+    setting: QuestionnaireSettings!
+    creationDate: String! 
+    questions: [Question!]!
+}

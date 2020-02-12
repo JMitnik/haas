@@ -1,6 +1,13 @@
 # Define paths to the different data-models
 datamodel:
-  - src/models/question/question.prisma
+  - src/models/question/Question.prisma
+  - src/models/question/QuestionCondition.prisma
+  - src/models/question/QuestionOption.prisma
+  - src/models/questionnaire/Questionnaire.prisma
+  - src/models/questionnaire/QuestionnaireSettings.prisma
+  - src/models/settings/ColourSettings.prisma
+  - src/models/settings/FontSettings.prisma
+  - src/models/customer/Customer.prisma
   - src/models/topic/topic.prisma
 
 generate:
