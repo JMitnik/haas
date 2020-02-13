@@ -6,5 +6,6 @@ type Questionnaire {
     publicTitle: String
     setting: QuestionnaireSettings!
     creationDate: DateTime! @createdAt 
+    updatedAt: DateTime @updatedAt
     questions: [QQuestion]
 }

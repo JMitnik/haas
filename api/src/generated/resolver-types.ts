@@ -831,6 +831,7 @@ export type FontSettingsWhereUniqueInput = {
 export type LeafNode = {
    __typename?: 'LeafNode',
   id: Scalars['ID'],
+  nodeId?: Maybe<Scalars['Int']>,
   type: Scalars['String'],
   title: Scalars['String'],
 };
@@ -844,8 +845,14 @@ export type LeafNodeConnection = {
 
 export type LeafNodeCreateInput = {
   id?: Maybe<Scalars['ID']>,
+  nodeId?: Maybe<Scalars['Int']>,
   type: Scalars['String'],
   title: Scalars['String'],
+};
+
+export type LeafNodeCreateOneInput = {
+  create?: Maybe<LeafNodeCreateInput>,
+  connect?: Maybe<LeafNodeWhereUniqueInput>,
 };
 
 export type LeafNodeEdge = {
@@ -857,6 +864,8 @@ export type LeafNodeEdge = {
 export enum LeafNodeOrderByInput {
   IdAsc = 'id_ASC',
   IdDesc = 'id_DESC',
+  NodeIdAsc = 'nodeId_ASC',
+  NodeIdDesc = 'nodeId_DESC',
   TypeAsc = 'type_ASC',
   TypeDesc = 'type_DESC',
   TitleAsc = 'title_ASC',
@@ -866,6 +875,7 @@ export enum LeafNodeOrderByInput {
 export type LeafNodePreviousValues = {
    __typename?: 'LeafNodePreviousValues',
   id: Scalars['ID'],
+  nodeId?: Maybe<Scalars['Int']>,
   type: Scalars['String'],
   title: Scalars['String'],
 };
@@ -889,14 +899,36 @@ export type LeafNodeSubscriptionWhereInput = {
   NOT?: Maybe<Array<LeafNodeSubscriptionWhereInput>>,
 };
 
+export type LeafNodeUpdateDataInput = {
+  nodeId?: Maybe<Scalars['Int']>,
+  type?: Maybe<Scalars['String']>,
+  title?: Maybe<Scalars['String']>,
+};
+
 export type LeafNodeUpdateInput = {
+  nodeId?: Maybe<Scalars['Int']>,
   type?: Maybe<Scalars['String']>,
   title?: Maybe<Scalars['String']>,
 };
 
 export type LeafNodeUpdateManyMutationInput = {
+  nodeId?: Maybe<Scalars['Int']>,
   type?: Maybe<Scalars['String']>,
   title?: Maybe<Scalars['String']>,
+};
+
+export type LeafNodeUpdateOneInput = {
+  create?: Maybe<LeafNodeCreateInput>,
+  update?: Maybe<LeafNodeUpdateDataInput>,
+  upsert?: Maybe<LeafNodeUpsertNestedInput>,
+  delete?: Maybe<Scalars['Boolean']>,
+  disconnect?: Maybe<Scalars['Boolean']>,
+  connect?: Maybe<LeafNodeWhereUniqueInput>,
+};
+
+export type LeafNodeUpsertNestedInput = {
+  update: LeafNodeUpdateDataInput,
+  create: LeafNodeCreateInput,
 };
 
 export type LeafNodeWhereInput = {
@@ -914,6 +946,14 @@ export type LeafNodeWhereInput = {
   id_not_starts_with?: Maybe<Scalars['ID']>,
   id_ends_with?: Maybe<Scalars['ID']>,
   id_not_ends_with?: Maybe<Scalars['ID']>,
+  nodeId?: Maybe<Scalars['Int']>,
+  nodeId_not?: Maybe<Scalars['Int']>,
+  nodeId_in?: Maybe<Array<Scalars['Int']>>,
+  nodeId_not_in?: Maybe<Array<Scalars['Int']>>,
+  nodeId_lt?: Maybe<Scalars['Int']>,
+  nodeId_lte?: Maybe<Scalars['Int']>,
+  nodeId_gt?: Maybe<Scalars['Int']>,
+  nodeId_gte?: Maybe<Scalars['Int']>,
   type?: Maybe<Scalars['String']>,
   type_not?: Maybe<Scalars['String']>,
   type_in?: Maybe<Array<Scalars['String']>>,
@@ -1341,6 +1381,7 @@ export type QQuestion = {
   branchVal?: Maybe<Scalars['String']>,
   questionType: Scalars['String'],
   overrideLeafId?: Maybe<Scalars['Int']>,
+  leafNode?: Maybe<LeafNode>,
   conditions?: Maybe<Array<QuestionCondition>>,
   options?: Maybe<Array<QuestionOption>>,
   children?: Maybe<Array<QQuestion>>,
@@ -1392,6 +1433,7 @@ export type QQuestionCreateInput = {
   branchVal?: Maybe<Scalars['String']>,
   questionType: Scalars['String'],
   overrideLeafId?: Maybe<Scalars['Int']>,
+  leafNode?: Maybe<LeafNodeCreateOneInput>,
   conditions?: Maybe<QuestionConditionCreateManyInput>,
   options?: Maybe<QuestionOptionCreateManyInput>,
   children?: Maybe<QQuestionCreateManyInput>,
@@ -1524,6 +1566,7 @@ export type QQuestionUpdateDataInput = {
   branchVal?: Maybe<Scalars['String']>,
   questionType?: Maybe<Scalars['String']>,
   overrideLeafId?: Maybe<Scalars['Int']>,
+  leafNode?: Maybe<LeafNodeUpdateOneInput>,
   conditions?: Maybe<QuestionConditionUpdateManyInput>,
   options?: Maybe<QuestionOptionUpdateManyInput>,
   children?: Maybe<QQuestionUpdateManyInput>,
@@ -1534,6 +1577,7 @@ export type QQuestionUpdateInput = {
   branchVal?: Maybe<Scalars['String']>,
   questionType?: Maybe<Scalars['String']>,
   overrideLeafId?: Maybe<Scalars['Int']>,
+  leafNode?: Maybe<LeafNodeUpdateOneInput>,
   conditions?: Maybe<QuestionConditionUpdateManyInput>,
   options?: Maybe<QuestionOptionUpdateManyInput>,
   children?: Maybe<QQuestionUpdateManyInput>,
@@ -1646,6 +1690,7 @@ export type QQuestionWhereInput = {
   overrideLeafId_lte?: Maybe<Scalars['Int']>,
   overrideLeafId_gt?: Maybe<Scalars['Int']>,
   overrideLeafId_gte?: Maybe<Scalars['Int']>,
+  leafNode?: Maybe<LeafNodeWhereInput>,
   conditions_every?: Maybe<QuestionConditionWhereInput>,
   conditions_some?: Maybe<QuestionConditionWhereInput>,
   conditions_none?: Maybe<QuestionConditionWhereInput>,
@@ -2217,6 +2262,7 @@ export type Questionnaire = {
   publicTitle?: Maybe<Scalars['String']>,
   setting: QuestionnaireSettings,
   creationDate: Scalars['DateTime'],
+  updatedAt?: Maybe<Scalars['DateTime']>,
   questions?: Maybe<Array<QQuestion>>,
 };
 
@@ -2292,7 +2338,9 @@ export enum QuestionnaireOrderByInput {
   PublicTitleAsc = 'publicTitle_ASC',
   PublicTitleDesc = 'publicTitle_DESC',
   CreationDateAsc = 'creationDate_ASC',
-  CreationDateDesc = 'creationDate_DESC'
+  CreationDateDesc = 'creationDate_DESC',
+  UpdatedAtAsc = 'updatedAt_ASC',
+  UpdatedAtDesc = 'updatedAt_DESC'
 }
 
 export type QuestionnairePreviousValues = {
@@ -2302,6 +2350,7 @@ export type QuestionnairePreviousValues = {
   description: Scalars['String'],
   publicTitle?: Maybe<Scalars['String']>,
   creationDate: Scalars['DateTime'],
+  updatedAt?: Maybe<Scalars['DateTime']>,
 };
 
 export type QuestionnaireScalarWhereInput = {
@@ -2369,6 +2418,14 @@ export type QuestionnaireScalarWhereInput = {
   creationDate_lte?: Maybe<Scalars['DateTime']>,
   creationDate_gt?: Maybe<Scalars['DateTime']>,
   creationDate_gte?: Maybe<Scalars['DateTime']>,
+  updatedAt?: Maybe<Scalars['DateTime']>,
+  updatedAt_not?: Maybe<Scalars['DateTime']>,
+  updatedAt_in?: Maybe<Array<Scalars['DateTime']>>,
+  updatedAt_not_in?: Maybe<Array<Scalars['DateTime']>>,
+  updatedAt_lt?: Maybe<Scalars['DateTime']>,
+  updatedAt_lte?: Maybe<Scalars['DateTime']>,
+  updatedAt_gt?: Maybe<Scalars['DateTime']>,
+  updatedAt_gte?: Maybe<Scalars['DateTime']>,
   AND?: Maybe<Array<QuestionnaireScalarWhereInput>>,
   OR?: Maybe<Array<QuestionnaireScalarWhereInput>>,
   NOT?: Maybe<Array<QuestionnaireScalarWhereInput>>,
@@ -2710,6 +2767,14 @@ export type QuestionnaireWhereInput = {
   creationDate_lte?: Maybe<Scalars['DateTime']>,
   creationDate_gt?: Maybe<Scalars['DateTime']>,
   creationDate_gte?: Maybe<Scalars['DateTime']>,
+  updatedAt?: Maybe<Scalars['DateTime']>,
+  updatedAt_not?: Maybe<Scalars['DateTime']>,
+  updatedAt_in?: Maybe<Array<Scalars['DateTime']>>,
+  updatedAt_not_in?: Maybe<Array<Scalars['DateTime']>>,
+  updatedAt_lt?: Maybe<Scalars['DateTime']>,
+  updatedAt_lte?: Maybe<Scalars['DateTime']>,
+  updatedAt_gt?: Maybe<Scalars['DateTime']>,
+  updatedAt_gte?: Maybe<Scalars['DateTime']>,
   questions_every?: Maybe<QQuestionWhereInput>,
   questions_some?: Maybe<QQuestionWhereInput>,
   questions_none?: Maybe<QQuestionWhereInput>,
@@ -3087,6 +3152,7 @@ export type ResolversTypes = ResolversObject<{
   FontSettingsWhereInput: FontSettingsWhereInput,
   DateTime: ResolverTypeWrapper<Scalars['DateTime']>,
   QQuestionWhereInput: QQuestionWhereInput,
+  LeafNodeWhereInput: LeafNodeWhereInput,
   QuestionConditionWhereInput: QuestionConditionWhereInput,
   QuestionOptionWhereInput: QuestionOptionWhereInput,
   QuestionnaireOrderByInput: QuestionnaireOrderByInput,
@@ -3095,6 +3161,7 @@ export type ResolversTypes = ResolversObject<{
   FontSettings: ResolverTypeWrapper<FontSettings>,
   QQuestionOrderByInput: QQuestionOrderByInput,
   QQuestion: ResolverTypeWrapper<QQuestion>,
+  LeafNode: ResolverTypeWrapper<LeafNode>,
   QuestionConditionOrderByInput: QuestionConditionOrderByInput,
   QuestionCondition: ResolverTypeWrapper<QuestionCondition>,
   QuestionOptionOrderByInput: QuestionOptionOrderByInput,
@@ -3109,8 +3176,6 @@ export type ResolversTypes = ResolversObject<{
   FontSettingsEdge: ResolverTypeWrapper<FontSettingsEdge>,
   AggregateFontSettings: ResolverTypeWrapper<AggregateFontSettings>,
   LeafNodeWhereUniqueInput: LeafNodeWhereUniqueInput,
-  LeafNode: ResolverTypeWrapper<LeafNode>,
-  LeafNodeWhereInput: LeafNodeWhereInput,
   LeafNodeOrderByInput: LeafNodeOrderByInput,
   LeafNodeConnection: ResolverTypeWrapper<LeafNodeConnection>,
   LeafNodeEdge: ResolverTypeWrapper<LeafNodeEdge>,
@@ -3154,6 +3219,8 @@ export type ResolversTypes = ResolversObject<{
   FontSettingsCreateInput: FontSettingsCreateInput,
   QQuestionCreateManyInput: QQuestionCreateManyInput,
   QQuestionCreateInput: QQuestionCreateInput,
+  LeafNodeCreateOneInput: LeafNodeCreateOneInput,
+  LeafNodeCreateInput: LeafNodeCreateInput,
   QuestionConditionCreateManyInput: QuestionConditionCreateManyInput,
   QuestionConditionCreateInput: QuestionConditionCreateInput,
   QuestionOptionCreateManyInput: QuestionOptionCreateManyInput,
@@ -3177,6 +3244,9 @@ export type ResolversTypes = ResolversObject<{
   QQuestionUpdateManyInput: QQuestionUpdateManyInput,
   QQuestionUpdateWithWhereUniqueNestedInput: QQuestionUpdateWithWhereUniqueNestedInput,
   QQuestionUpdateDataInput: QQuestionUpdateDataInput,
+  LeafNodeUpdateOneInput: LeafNodeUpdateOneInput,
+  LeafNodeUpdateDataInput: LeafNodeUpdateDataInput,
+  LeafNodeUpsertNestedInput: LeafNodeUpsertNestedInput,
   QuestionConditionUpdateManyInput: QuestionConditionUpdateManyInput,
   QuestionConditionUpdateWithWhereUniqueNestedInput: QuestionConditionUpdateWithWhereUniqueNestedInput,
   QuestionConditionUpdateDataInput: QuestionConditionUpdateDataInput,
@@ -3202,7 +3272,6 @@ export type ResolversTypes = ResolversObject<{
   CustomerUpdateManyMutationInput: CustomerUpdateManyMutationInput,
   FontSettingsUpdateInput: FontSettingsUpdateInput,
   FontSettingsUpdateManyMutationInput: FontSettingsUpdateManyMutationInput,
-  LeafNodeCreateInput: LeafNodeCreateInput,
   LeafNodeUpdateInput: LeafNodeUpdateInput,
   LeafNodeUpdateManyMutationInput: LeafNodeUpdateManyMutationInput,
   QQuestionUpdateInput: QQuestionUpdateInput,
@@ -3281,6 +3350,7 @@ export type ResolversParentTypes = ResolversObject<{
   FontSettingsWhereInput: FontSettingsWhereInput,
   DateTime: Scalars['DateTime'],
   QQuestionWhereInput: QQuestionWhereInput,
+  LeafNodeWhereInput: LeafNodeWhereInput,
   QuestionConditionWhereInput: QuestionConditionWhereInput,
   QuestionOptionWhereInput: QuestionOptionWhereInput,
   QuestionnaireOrderByInput: QuestionnaireOrderByInput,
@@ -3289,6 +3359,7 @@ export type ResolversParentTypes = ResolversObject<{
   FontSettings: FontSettings,
   QQuestionOrderByInput: QQuestionOrderByInput,
   QQuestion: QQuestion,
+  LeafNode: LeafNode,
   QuestionConditionOrderByInput: QuestionConditionOrderByInput,
   QuestionCondition: QuestionCondition,
   QuestionOptionOrderByInput: QuestionOptionOrderByInput,
@@ -3303,8 +3374,6 @@ export type ResolversParentTypes = ResolversObject<{
   FontSettingsEdge: FontSettingsEdge,
   AggregateFontSettings: AggregateFontSettings,
   LeafNodeWhereUniqueInput: LeafNodeWhereUniqueInput,
-  LeafNode: LeafNode,
-  LeafNodeWhereInput: LeafNodeWhereInput,
   LeafNodeOrderByInput: LeafNodeOrderByInput,
   LeafNodeConnection: LeafNodeConnection,
   LeafNodeEdge: LeafNodeEdge,
@@ -3348,6 +3417,8 @@ export type ResolversParentTypes = ResolversObject<{
   FontSettingsCreateInput: FontSettingsCreateInput,
   QQuestionCreateManyInput: QQuestionCreateManyInput,
   QQuestionCreateInput: QQuestionCreateInput,
+  LeafNodeCreateOneInput: LeafNodeCreateOneInput,
+  LeafNodeCreateInput: LeafNodeCreateInput,
   QuestionConditionCreateManyInput: QuestionConditionCreateManyInput,
   QuestionConditionCreateInput: QuestionConditionCreateInput,
   QuestionOptionCreateManyInput: QuestionOptionCreateManyInput,
@@ -3371,6 +3442,9 @@ export type ResolversParentTypes = ResolversObject<{
   QQuestionUpdateManyInput: QQuestionUpdateManyInput,
   QQuestionUpdateWithWhereUniqueNestedInput: QQuestionUpdateWithWhereUniqueNestedInput,
   QQuestionUpdateDataInput: QQuestionUpdateDataInput,
+  LeafNodeUpdateOneInput: LeafNodeUpdateOneInput,
+  LeafNodeUpdateDataInput: LeafNodeUpdateDataInput,
+  LeafNodeUpsertNestedInput: LeafNodeUpsertNestedInput,
   QuestionConditionUpdateManyInput: QuestionConditionUpdateManyInput,
   QuestionConditionUpdateWithWhereUniqueNestedInput: QuestionConditionUpdateWithWhereUniqueNestedInput,
   QuestionConditionUpdateDataInput: QuestionConditionUpdateDataInput,
@@ -3396,7 +3470,6 @@ export type ResolversParentTypes = ResolversObject<{
   CustomerUpdateManyMutationInput: CustomerUpdateManyMutationInput,
   FontSettingsUpdateInput: FontSettingsUpdateInput,
   FontSettingsUpdateManyMutationInput: FontSettingsUpdateManyMutationInput,
-  LeafNodeCreateInput: LeafNodeCreateInput,
   LeafNodeUpdateInput: LeafNodeUpdateInput,
   LeafNodeUpdateManyMutationInput: LeafNodeUpdateManyMutationInput,
   QQuestionUpdateInput: QQuestionUpdateInput,
@@ -3615,6 +3688,7 @@ export type FontSettingsSubscriptionPayloadResolvers<ContextType = any, ParentTy
 
 export type LeafNodeResolvers<ContextType = any, ParentType extends ResolversParentTypes['LeafNode'] = ResolversParentTypes['LeafNode']> = ResolversObject<{
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>,
+  nodeId?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>,
   type?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
   title?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
 }>;
@@ -3632,6 +3706,7 @@ export type LeafNodeEdgeResolvers<ContextType = any, ParentType extends Resolver
 
 export type LeafNodePreviousValuesResolvers<ContextType = any, ParentType extends ResolversParentTypes['LeafNodePreviousValues'] = ResolversParentTypes['LeafNodePreviousValues']> = ResolversObject<{
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>,
+  nodeId?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>,
   type?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
   title?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
 }>;
@@ -3722,6 +3797,7 @@ export type QQuestionResolvers<ContextType = any, ParentType extends ResolversPa
   branchVal?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   questionType?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
   overrideLeafId?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>,
+  leafNode?: Resolver<Maybe<ResolversTypes['LeafNode']>, ParentType, ContextType>,
   conditions?: Resolver<Maybe<Array<ResolversTypes['QuestionCondition']>>, ParentType, ContextType, QQuestionConditionsArgs>,
   options?: Resolver<Maybe<Array<ResolversTypes['QuestionOption']>>, ParentType, ContextType, QQuestionOptionsArgs>,
   children?: Resolver<Maybe<Array<ResolversTypes['QQuestion']>>, ParentType, ContextType, QQuestionChildrenArgs>,
@@ -3826,6 +3902,7 @@ export type QuestionnaireResolvers<ContextType = any, ParentType extends Resolve
   publicTitle?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   setting?: Resolver<ResolversTypes['QuestionnaireSettings'], ParentType, ContextType>,
   creationDate?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>,
+  updatedAt?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>,
   questions?: Resolver<Maybe<Array<ResolversTypes['QQuestion']>>, ParentType, ContextType, QuestionnaireQuestionsArgs>,
 }>;
 
@@ -3846,6 +3923,7 @@ export type QuestionnairePreviousValuesResolvers<ContextType = any, ParentType e
   description?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
   publicTitle?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   creationDate?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>,
+  updatedAt?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>,
 }>;
 
 export type QuestionnaireSettingsResolvers<ContextType = any, ParentType extends ResolversParentTypes['QuestionnaireSettings'] = ResolversParentTypes['QuestionnaireSettings']> = ResolversObject<{

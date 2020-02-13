@@ -785,6 +785,7 @@ input FontSettingsWhereUniqueInput {
 
 type LeafNode {
   id: ID!
+  nodeId: Int
   type: String!
   title: String!
 }
@@ -797,8 +798,14 @@ type LeafNodeConnection {
 
 input LeafNodeCreateInput {
   id: ID
+  nodeId: Int
   type: String!
   title: String!
+}
+
+input LeafNodeCreateOneInput {
+  create: LeafNodeCreateInput
+  connect: LeafNodeWhereUniqueInput
 }
 
 type LeafNodeEdge {
@@ -809,6 +816,8 @@ type LeafNodeEdge {
 enum LeafNodeOrderByInput {
   id_ASC
   id_DESC
+  nodeId_ASC
+  nodeId_DESC
   type_ASC
   type_DESC
   title_ASC
@@ -817,6 +826,7 @@ enum LeafNodeOrderByInput {
 
 type LeafNodePreviousValues {
   id: ID!
+  nodeId: Int
   type: String!
   title: String!
 }
@@ -839,14 +849,36 @@ input LeafNodeSubscriptionWhereInput {
   NOT: [LeafNodeSubscriptionWhereInput!]
 }
 
+input LeafNodeUpdateDataInput {
+  nodeId: Int
+  type: String
+  title: String
+}
+
 input LeafNodeUpdateInput {
+  nodeId: Int
   type: String
   title: String
 }
 
 input LeafNodeUpdateManyMutationInput {
+  nodeId: Int
   type: String
   title: String
+}
+
+input LeafNodeUpdateOneInput {
+  create: LeafNodeCreateInput
+  update: LeafNodeUpdateDataInput
+  upsert: LeafNodeUpsertNestedInput
+  delete: Boolean
+  disconnect: Boolean
+  connect: LeafNodeWhereUniqueInput
+}
+
+input LeafNodeUpsertNestedInput {
+  update: LeafNodeUpdateDataInput!
+  create: LeafNodeCreateInput!
 }
 
 input LeafNodeWhereInput {
@@ -864,6 +896,14 @@ input LeafNodeWhereInput {
   id_not_starts_with: ID
   id_ends_with: ID
   id_not_ends_with: ID
+  nodeId: Int
+  nodeId_not: Int
+  nodeId_in: [Int!]
+  nodeId_not_in: [Int!]
+  nodeId_lt: Int
+  nodeId_lte: Int
+  nodeId_gt: Int
+  nodeId_gte: Int
   type: String
   type_not: String
   type_in: [String!]
@@ -983,6 +1023,7 @@ type QQuestion {
   branchVal: String
   questionType: String!
   overrideLeafId: Int
+  leafNode: LeafNode
   conditions(where: QuestionConditionWhereInput, orderBy: QuestionConditionOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [QuestionCondition!]
   options(where: QuestionOptionWhereInput, orderBy: QuestionOptionOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [QuestionOption!]
   children(where: QQuestionWhereInput, orderBy: QQuestionOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [QQuestion!]
@@ -1000,6 +1041,7 @@ input QQuestionCreateInput {
   branchVal: String
   questionType: String!
   overrideLeafId: Int
+  leafNode: LeafNodeCreateOneInput
   conditions: QuestionConditionCreateManyInput
   options: QuestionOptionCreateManyInput
   children: QQuestionCreateManyInput
@@ -1129,6 +1171,7 @@ input QQuestionUpdateDataInput {
   branchVal: String
   questionType: String
   overrideLeafId: Int
+  leafNode: LeafNodeUpdateOneInput
   conditions: QuestionConditionUpdateManyInput
   options: QuestionOptionUpdateManyInput
   children: QQuestionUpdateManyInput
@@ -1139,6 +1182,7 @@ input QQuestionUpdateInput {
   branchVal: String
   questionType: String
   overrideLeafId: Int
+  leafNode: LeafNodeUpdateOneInput
   conditions: QuestionConditionUpdateManyInput
   options: QuestionOptionUpdateManyInput
   children: QQuestionUpdateManyInput
@@ -1251,6 +1295,7 @@ input QQuestionWhereInput {
   overrideLeafId_lte: Int
   overrideLeafId_gt: Int
   overrideLeafId_gte: Int
+  leafNode: LeafNodeWhereInput
   conditions_every: QuestionConditionWhereInput
   conditions_some: QuestionConditionWhereInput
   conditions_none: QuestionConditionWhereInput
@@ -1567,6 +1612,7 @@ type Questionnaire {
   publicTitle: String
   setting: QuestionnaireSettings!
   creationDate: DateTime!
+  updatedAt: DateTime
   questions(where: QQuestionWhereInput, orderBy: QQuestionOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [QQuestion!]
 }
 
@@ -1630,6 +1676,8 @@ enum QuestionnaireOrderByInput {
   publicTitle_DESC
   creationDate_ASC
   creationDate_DESC
+  updatedAt_ASC
+  updatedAt_DESC
 }
 
 type QuestionnairePreviousValues {
@@ -1638,6 +1686,7 @@ type QuestionnairePreviousValues {
   description: String!
   publicTitle: String
   creationDate: DateTime!
+  updatedAt: DateTime
 }
 
 input QuestionnaireScalarWhereInput {
@@ -1705,6 +1754,14 @@ input QuestionnaireScalarWhereInput {
   creationDate_lte: DateTime
   creationDate_gt: DateTime
   creationDate_gte: DateTime
+  updatedAt: DateTime
+  updatedAt_not: DateTime
+  updatedAt_in: [DateTime!]
+  updatedAt_not_in: [DateTime!]
+  updatedAt_lt: DateTime
+  updatedAt_lte: DateTime
+  updatedAt_gt: DateTime
+  updatedAt_gte: DateTime
   AND: [QuestionnaireScalarWhereInput!]
   OR: [QuestionnaireScalarWhereInput!]
   NOT: [QuestionnaireScalarWhereInput!]
@@ -2040,6 +2097,14 @@ input QuestionnaireWhereInput {
   creationDate_lte: DateTime
   creationDate_gt: DateTime
   creationDate_gte: DateTime
+  updatedAt: DateTime
+  updatedAt_not: DateTime
+  updatedAt_in: [DateTime!]
+  updatedAt_not_in: [DateTime!]
+  updatedAt_lt: DateTime
+  updatedAt_lte: DateTime
+  updatedAt_gt: DateTime
+  updatedAt_gte: DateTime
   questions_every: QQuestionWhereInput
   questions_some: QQuestionWhereInput
   questions_none: QQuestionWhereInput
