@@ -3,6 +3,9 @@ import { QueryResolvers, MutationResolvers } from './generated/resolver-types';
 import { prisma } from './generated/prisma-client';
 
 const QueryResolvers: QueryResolvers = {
+  qQuestions: forwardTo('db'),
+  questionnaire: forwardTo('db'),
+  leafNodes: forwardTo('db')
   // questions: forwardTo('db'),
   // topics: forwardTo('db'),
 }

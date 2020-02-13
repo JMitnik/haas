@@ -6,10 +6,17 @@ import { FormContext, useForm } from 'react-hook-form';
 import { Div } from '@haas/ui';
 import { ColumnFlex } from '@haas/ui/src/Container';
 import flow from './flow.json';
-import { JSONTreeProvider }  from './hooks/use-json-tree';
+import { JSONTreeProvider } from './hooks/use-json-tree';
 import { HAASForm } from './HAASForm';
 import whyDidYouRender from '@welldone-software/why-did-you-render';
+
+import { useQuery } from '@apollo/react-hooks';
+
+import { GET_QUESTIONNAIRE } from './queries/getQuestionnaire'
+import { GET_LEAF_NODES } from './queries/getLeafNodes'
+
 whyDidYouRender(React);
+
 
 const MainAppScreen = styled(Div)`
   ${({ theme }) => css`
@@ -32,25 +39,42 @@ const CenteredScreen = styled(Div)`
   `}
 `;
 
+
 const App: React.FC = () => {
   const form = useForm();
-  const data = JSON.parse(JSON.stringify(flow));
+  // const data = JSON.parse(JSON.stringify(flow));
+
+  const leafNodes = useQuery<any>(GET_LEAF_NODES)
+
+  const { 
+    data, 
+    loading, 
+    error
+  } = useQuery<any>(GET_QUESTIONNAIRE);
+
+  const cleanData = data?.questionnaire?.questions
+  const finalData = {questionnaire: cleanData, LeafCollection: leafNodes?.data?.leafNodes}
+  // console.log("data: ", data?.questionnaire?.questions)
+  // console.log('Leaf collection: ', leafNodes?.data?.leafNodes)
+  
+  if (loading) return <div>'Loading...'</div>;
+  if (error) return <div>{'Error!' + error.message}</div>;
 
   return (
     <>
-      <ThemeProvider theme={theme}>
-        <MainAppScreen>
-          <CenteredScreen>
-            <JSONTreeProvider json={data}>
-              <FormContext {...form}>
-                <ColumnFlex alignItems="center">
-                  <HAASForm />
-                </ColumnFlex>
-              </FormContext>
-            </JSONTreeProvider>
-          </CenteredScreen>
-        </MainAppScreen>
-      </ThemeProvider>
+        <ThemeProvider theme={theme}>
+          <MainAppScreen>
+            <CenteredScreen>
+              <JSONTreeProvider json={finalData}>
+                <FormContext {...form}>
+                  <ColumnFlex alignItems="center">
+                    <HAASForm />
+                  </ColumnFlex>
+                </FormContext>
+              </JSONTreeProvider>
+            </CenteredScreen>
+          </MainAppScreen>
+        </ThemeProvider>
     </>
   );
 }

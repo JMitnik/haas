@@ -16,11 +16,13 @@ export interface MultiChoiceOption {
 
 export interface HAASNode {
   id: number;
+  nodeId?: number;
   title: string;
   branchVal: string;
-  conditions?: HAASNodeConditions;
+  conditions?: [HAASNodeConditions];
   type: HAASQuestionNodeType | HAASLeafType;
-  overrideLeafID?: number;
+  questionType?: HAASQuestionNodeType | HAASLeafType;
+  overrideLeafId?: number;
   options?: [MultiChoiceOption];
   children: [HAASNode];
 }
@@ -35,48 +37,55 @@ interface HAASRouterParams {
 }
 
 const findNextNode = (parent: HAASNode, key: string | number) => {
+  console.log('Key: ', key)
   const candidates = parent?.children?.filter(child => {
-    if (parent.type === 'slider') {
-      if (child?.conditions?.renderMin && key < child?.conditions?.renderMin) {
+    console.log('Child conditions: ', child?.conditions?.[0]);
+    if (parent.questionType === 'slider') {
+      if (child?.conditions?.[0].renderMin && key < child?.conditions?.[0].renderMin) {
         return false;
       }
 
-      if (child?.conditions?.renderMax && key > child?.conditions?.renderMax) {
+      if (child?.conditions?.[0].renderMax && key > child?.conditions?.[0].renderMax) {
         return false;
       }
     }
 
-    if (parent.type === 'multi-choice') {
-      return child.conditions?.matchValue === key;
+    if (parent.questionType === 'multi-choice') {
+      return child.conditions?.[0].matchValue === key;
     }
 
     return true;
   });
 
+  console.log('candidates: ', candidates);
+
   return candidates && candidates[0];
 };
 
-const findLeafNode = (collection: HAASNode[], key: number) => collection.filter(item => item.id === key)[0];
+const findLeafNode = (collection: HAASNode[], key: number) => collection.filter(item => item.nodeId === key)[0];
 
 export const JSONTreeContext = React.createContext({} as JSONTreeContextProps);
 
 export const JSONTreeProvider = ({ json, children }: { json: any, children: ReactNode }) => {
+
+
+  // console.log("old data: ", JSON.parse(JSON.stringify(json.rootQuestion)))
+
   const [activeLeafNodeId, setActiveLeafNodeID] = useState(0);
-  const [historyStack, setHistoryStack] = useState<HAASNode[]>([JSON.parse(JSON.stringify(json.rootQuestion))]);
-  const [activeNode, setActiveNode] = useState(historyStack.slice(0)[0]);
+  // const [historyStack, setHistoryStack] = useState<HAASNode[]>([JSON.parse(JSON.stringify(json.rootQuestion))]);
+  const [historyStack, setHistoryStack] = useState<HAASNode[]>(json.questionnaire);
+  // console.log('history stack: ', historyStack)
+  // const [activeNode, setActiveNode] = useState(historyStack.slice(0)[0]);
   const leafCollection: [HAASNode] = json.LeafCollection;
 
   const goToChild = (key: string | number) => {
     let nextNode: HAASNode = findNextNode(historyStack.slice(-1)[0], key);
-
-    if (nextNode && nextNode.overrideLeafID) {
-      setActiveLeafNodeID(nextNode.overrideLeafID);
+    if (nextNode && nextNode.overrideLeafId) {
+      setActiveLeafNodeID(nextNode.overrideLeafId);
     }
 
     if (!nextNode) {
-      console.log(activeLeafNodeId);
       nextNode = findLeafNode(leafCollection, activeLeafNodeId);
-      console.log(nextNode);
     }
 
     setHistoryStack(hist => [...hist, nextNode]);
