@@ -10,7 +10,11 @@ type AggregateFontSettings {
   count: Int!
 }
 
-type AggregateQuestion {
+type AggregateLeafNode {
+  count: Int!
+}
+
+type AggregateQQuestion {
   count: Int!
 }
 
@@ -27,10 +31,6 @@ type AggregateQuestionnaireSettings {
 }
 
 type AggregateQuestionOption {
-  count: Int!
-}
-
-type AggregateTopic {
   count: Int!
 }
 
@@ -444,6 +444,7 @@ input ColourSettingsWhereUniqueInput {
 
 type Customer {
   id: ID!
+  name: String!
   questionnaires(where: QuestionnaireWhereInput, orderBy: QuestionnaireOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Questionnaire!]
 }
 
@@ -455,7 +456,23 @@ type CustomerConnection {
 
 input CustomerCreateInput {
   id: ID
-  questionnaires: QuestionnaireCreateManyInput
+  name: String!
+  questionnaires: QuestionnaireCreateManyWithoutCustomerInput
+}
+
+input CustomerCreateOneInput {
+  create: CustomerCreateInput
+  connect: CustomerWhereUniqueInput
+}
+
+input CustomerCreateOneWithoutQuestionnairesInput {
+  create: CustomerCreateWithoutQuestionnairesInput
+  connect: CustomerWhereUniqueInput
+}
+
+input CustomerCreateWithoutQuestionnairesInput {
+  id: ID
+  name: String!
 }
 
 type CustomerEdge {
@@ -466,10 +483,13 @@ type CustomerEdge {
 enum CustomerOrderByInput {
   id_ASC
   id_DESC
+  name_ASC
+  name_DESC
 }
 
 type CustomerPreviousValues {
   id: ID!
+  name: String!
 }
 
 type CustomerSubscriptionPayload {
@@ -490,8 +510,46 @@ input CustomerSubscriptionWhereInput {
   NOT: [CustomerSubscriptionWhereInput!]
 }
 
+input CustomerUpdateDataInput {
+  name: String
+  questionnaires: QuestionnaireUpdateManyWithoutCustomerInput
+}
+
 input CustomerUpdateInput {
-  questionnaires: QuestionnaireUpdateManyInput
+  name: String
+  questionnaires: QuestionnaireUpdateManyWithoutCustomerInput
+}
+
+input CustomerUpdateManyMutationInput {
+  name: String
+}
+
+input CustomerUpdateOneRequiredInput {
+  create: CustomerCreateInput
+  update: CustomerUpdateDataInput
+  upsert: CustomerUpsertNestedInput
+  connect: CustomerWhereUniqueInput
+}
+
+input CustomerUpdateOneRequiredWithoutQuestionnairesInput {
+  create: CustomerCreateWithoutQuestionnairesInput
+  update: CustomerUpdateWithoutQuestionnairesDataInput
+  upsert: CustomerUpsertWithoutQuestionnairesInput
+  connect: CustomerWhereUniqueInput
+}
+
+input CustomerUpdateWithoutQuestionnairesDataInput {
+  name: String
+}
+
+input CustomerUpsertNestedInput {
+  update: CustomerUpdateDataInput!
+  create: CustomerCreateInput!
+}
+
+input CustomerUpsertWithoutQuestionnairesInput {
+  update: CustomerUpdateWithoutQuestionnairesDataInput!
+  create: CustomerCreateWithoutQuestionnairesInput!
 }
 
 input CustomerWhereInput {
@@ -509,6 +567,20 @@ input CustomerWhereInput {
   id_not_starts_with: ID
   id_ends_with: ID
   id_not_ends_with: ID
+  name: String
+  name_not: String
+  name_in: [String!]
+  name_not_in: [String!]
+  name_lt: String
+  name_lte: String
+  name_gt: String
+  name_gte: String
+  name_contains: String
+  name_not_contains: String
+  name_starts_with: String
+  name_not_starts_with: String
+  name_ends_with: String
+  name_not_ends_with: String
   questionnaires_every: QuestionnaireWhereInput
   questionnaires_some: QuestionnaireWhereInput
   questionnaires_none: QuestionnaireWhereInput
@@ -520,6 +592,8 @@ input CustomerWhereInput {
 input CustomerWhereUniqueInput {
   id: ID
 }
+
+scalar DateTime
 
 type FontSettings {
   id: ID!
@@ -705,6 +779,124 @@ input FontSettingsWhereUniqueInput {
   id: ID
 }
 
+type LeafNode {
+  id: ID!
+  type: String!
+  title: String!
+}
+
+type LeafNodeConnection {
+  pageInfo: PageInfo!
+  edges: [LeafNodeEdge]!
+  aggregate: AggregateLeafNode!
+}
+
+input LeafNodeCreateInput {
+  id: ID
+  type: String!
+  title: String!
+}
+
+type LeafNodeEdge {
+  node: LeafNode!
+  cursor: String!
+}
+
+enum LeafNodeOrderByInput {
+  id_ASC
+  id_DESC
+  type_ASC
+  type_DESC
+  title_ASC
+  title_DESC
+}
+
+type LeafNodePreviousValues {
+  id: ID!
+  type: String!
+  title: String!
+}
+
+type LeafNodeSubscriptionPayload {
+  mutation: MutationType!
+  node: LeafNode
+  updatedFields: [String!]
+  previousValues: LeafNodePreviousValues
+}
+
+input LeafNodeSubscriptionWhereInput {
+  mutation_in: [MutationType!]
+  updatedFields_contains: String
+  updatedFields_contains_every: [String!]
+  updatedFields_contains_some: [String!]
+  node: LeafNodeWhereInput
+  AND: [LeafNodeSubscriptionWhereInput!]
+  OR: [LeafNodeSubscriptionWhereInput!]
+  NOT: [LeafNodeSubscriptionWhereInput!]
+}
+
+input LeafNodeUpdateInput {
+  type: String
+  title: String
+}
+
+input LeafNodeUpdateManyMutationInput {
+  type: String
+  title: String
+}
+
+input LeafNodeWhereInput {
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  type: String
+  type_not: String
+  type_in: [String!]
+  type_not_in: [String!]
+  type_lt: String
+  type_lte: String
+  type_gt: String
+  type_gte: String
+  type_contains: String
+  type_not_contains: String
+  type_starts_with: String
+  type_not_starts_with: String
+  type_ends_with: String
+  type_not_ends_with: String
+  title: String
+  title_not: String
+  title_in: [String!]
+  title_not_in: [String!]
+  title_lt: String
+  title_lte: String
+  title_gt: String
+  title_gte: String
+  title_contains: String
+  title_not_contains: String
+  title_starts_with: String
+  title_not_starts_with: String
+  title_ends_with: String
+  title_not_ends_with: String
+  AND: [LeafNodeWhereInput!]
+  OR: [LeafNodeWhereInput!]
+  NOT: [LeafNodeWhereInput!]
+}
+
+input LeafNodeWhereUniqueInput {
+  id: ID
+}
+
 scalar Long
 
 type Mutation {
@@ -716,6 +908,7 @@ type Mutation {
   deleteManyColourSettingses(where: ColourSettingsWhereInput): BatchPayload!
   createCustomer(data: CustomerCreateInput!): Customer!
   updateCustomer(data: CustomerUpdateInput!, where: CustomerWhereUniqueInput!): Customer
+  updateManyCustomers(data: CustomerUpdateManyMutationInput!, where: CustomerWhereInput): BatchPayload!
   upsertCustomer(where: CustomerWhereUniqueInput!, create: CustomerCreateInput!, update: CustomerUpdateInput!): Customer!
   deleteCustomer(where: CustomerWhereUniqueInput!): Customer
   deleteManyCustomers(where: CustomerWhereInput): BatchPayload!
@@ -725,12 +918,18 @@ type Mutation {
   upsertFontSettings(where: FontSettingsWhereUniqueInput!, create: FontSettingsCreateInput!, update: FontSettingsUpdateInput!): FontSettings!
   deleteFontSettings(where: FontSettingsWhereUniqueInput!): FontSettings
   deleteManyFontSettingses(where: FontSettingsWhereInput): BatchPayload!
-  createQuestion(data: QuestionCreateInput!): Question!
-  updateQuestion(data: QuestionUpdateInput!, where: QuestionWhereUniqueInput!): Question
-  updateManyQuestions(data: QuestionUpdateManyMutationInput!, where: QuestionWhereInput): BatchPayload!
-  upsertQuestion(where: QuestionWhereUniqueInput!, create: QuestionCreateInput!, update: QuestionUpdateInput!): Question!
-  deleteQuestion(where: QuestionWhereUniqueInput!): Question
-  deleteManyQuestions(where: QuestionWhereInput): BatchPayload!
+  createLeafNode(data: LeafNodeCreateInput!): LeafNode!
+  updateLeafNode(data: LeafNodeUpdateInput!, where: LeafNodeWhereUniqueInput!): LeafNode
+  updateManyLeafNodes(data: LeafNodeUpdateManyMutationInput!, where: LeafNodeWhereInput): BatchPayload!
+  upsertLeafNode(where: LeafNodeWhereUniqueInput!, create: LeafNodeCreateInput!, update: LeafNodeUpdateInput!): LeafNode!
+  deleteLeafNode(where: LeafNodeWhereUniqueInput!): LeafNode
+  deleteManyLeafNodes(where: LeafNodeWhereInput): BatchPayload!
+  createQQuestion(data: QQuestionCreateInput!): QQuestion!
+  updateQQuestion(data: QQuestionUpdateInput!, where: QQuestionWhereUniqueInput!): QQuestion
+  updateManyQQuestions(data: QQuestionUpdateManyMutationInput!, where: QQuestionWhereInput): BatchPayload!
+  upsertQQuestion(where: QQuestionWhereUniqueInput!, create: QQuestionCreateInput!, update: QQuestionUpdateInput!): QQuestion!
+  deleteQQuestion(where: QQuestionWhereUniqueInput!): QQuestion
+  deleteManyQQuestions(where: QQuestionWhereInput): BatchPayload!
   createQuestionCondition(data: QuestionConditionCreateInput!): QuestionCondition!
   updateQuestionCondition(data: QuestionConditionUpdateInput!, where: QuestionConditionWhereUniqueInput!): QuestionCondition
   updateManyQuestionConditions(data: QuestionConditionUpdateManyMutationInput!, where: QuestionConditionWhereInput): BatchPayload!
@@ -755,12 +954,6 @@ type Mutation {
   upsertQuestionnaireSettings(where: QuestionnaireSettingsWhereUniqueInput!, create: QuestionnaireSettingsCreateInput!, update: QuestionnaireSettingsUpdateInput!): QuestionnaireSettings!
   deleteQuestionnaireSettings(where: QuestionnaireSettingsWhereUniqueInput!): QuestionnaireSettings
   deleteManyQuestionnaireSettingses(where: QuestionnaireSettingsWhereInput): BatchPayload!
-  createTopic(data: TopicCreateInput!): Topic!
-  updateTopic(data: TopicUpdateInput!, where: TopicWhereUniqueInput!): Topic
-  updateManyTopics(data: TopicUpdateManyMutationInput!, where: TopicWhereInput): BatchPayload!
-  upsertTopic(where: TopicWhereUniqueInput!, create: TopicCreateInput!, update: TopicUpdateInput!): Topic!
-  deleteTopic(where: TopicWhereUniqueInput!): Topic
-  deleteManyTopics(where: TopicWhereInput): BatchPayload!
 }
 
 enum MutationType {
@@ -780,6 +973,298 @@ type PageInfo {
   endCursor: String
 }
 
+type QQuestion {
+  id: ID!
+  title: String!
+  branchVal: String
+  questionType: String!
+  overrideLeafId: Int
+  conditions(where: QuestionConditionWhereInput, orderBy: QuestionConditionOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [QuestionCondition!]
+  options(where: QuestionOptionWhereInput, orderBy: QuestionOptionOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [QuestionOption!]
+  children(where: QQuestionWhereInput, orderBy: QQuestionOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [QQuestion!]
+}
+
+type QQuestionConnection {
+  pageInfo: PageInfo!
+  edges: [QQuestionEdge]!
+  aggregate: AggregateQQuestion!
+}
+
+input QQuestionCreateInput {
+  id: ID
+  title: String!
+  branchVal: String
+  questionType: String!
+  overrideLeafId: Int
+  conditions: QuestionConditionCreateManyInput
+  options: QuestionOptionCreateManyInput
+  children: QQuestionCreateManyInput
+}
+
+input QQuestionCreateManyInput {
+  create: [QQuestionCreateInput!]
+  connect: [QQuestionWhereUniqueInput!]
+}
+
+type QQuestionEdge {
+  node: QQuestion!
+  cursor: String!
+}
+
+enum QQuestionOrderByInput {
+  id_ASC
+  id_DESC
+  title_ASC
+  title_DESC
+  branchVal_ASC
+  branchVal_DESC
+  questionType_ASC
+  questionType_DESC
+  overrideLeafId_ASC
+  overrideLeafId_DESC
+}
+
+type QQuestionPreviousValues {
+  id: ID!
+  title: String!
+  branchVal: String
+  questionType: String!
+  overrideLeafId: Int
+}
+
+input QQuestionScalarWhereInput {
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  title: String
+  title_not: String
+  title_in: [String!]
+  title_not_in: [String!]
+  title_lt: String
+  title_lte: String
+  title_gt: String
+  title_gte: String
+  title_contains: String
+  title_not_contains: String
+  title_starts_with: String
+  title_not_starts_with: String
+  title_ends_with: String
+  title_not_ends_with: String
+  branchVal: String
+  branchVal_not: String
+  branchVal_in: [String!]
+  branchVal_not_in: [String!]
+  branchVal_lt: String
+  branchVal_lte: String
+  branchVal_gt: String
+  branchVal_gte: String
+  branchVal_contains: String
+  branchVal_not_contains: String
+  branchVal_starts_with: String
+  branchVal_not_starts_with: String
+  branchVal_ends_with: String
+  branchVal_not_ends_with: String
+  questionType: String
+  questionType_not: String
+  questionType_in: [String!]
+  questionType_not_in: [String!]
+  questionType_lt: String
+  questionType_lte: String
+  questionType_gt: String
+  questionType_gte: String
+  questionType_contains: String
+  questionType_not_contains: String
+  questionType_starts_with: String
+  questionType_not_starts_with: String
+  questionType_ends_with: String
+  questionType_not_ends_with: String
+  overrideLeafId: Int
+  overrideLeafId_not: Int
+  overrideLeafId_in: [Int!]
+  overrideLeafId_not_in: [Int!]
+  overrideLeafId_lt: Int
+  overrideLeafId_lte: Int
+  overrideLeafId_gt: Int
+  overrideLeafId_gte: Int
+  AND: [QQuestionScalarWhereInput!]
+  OR: [QQuestionScalarWhereInput!]
+  NOT: [QQuestionScalarWhereInput!]
+}
+
+type QQuestionSubscriptionPayload {
+  mutation: MutationType!
+  node: QQuestion
+  updatedFields: [String!]
+  previousValues: QQuestionPreviousValues
+}
+
+input QQuestionSubscriptionWhereInput {
+  mutation_in: [MutationType!]
+  updatedFields_contains: String
+  updatedFields_contains_every: [String!]
+  updatedFields_contains_some: [String!]
+  node: QQuestionWhereInput
+  AND: [QQuestionSubscriptionWhereInput!]
+  OR: [QQuestionSubscriptionWhereInput!]
+  NOT: [QQuestionSubscriptionWhereInput!]
+}
+
+input QQuestionUpdateDataInput {
+  title: String
+  branchVal: String
+  questionType: String
+  overrideLeafId: Int
+  conditions: QuestionConditionUpdateManyInput
+  options: QuestionOptionUpdateManyInput
+  children: QQuestionUpdateManyInput
+}
+
+input QQuestionUpdateInput {
+  title: String
+  branchVal: String
+  questionType: String
+  overrideLeafId: Int
+  conditions: QuestionConditionUpdateManyInput
+  options: QuestionOptionUpdateManyInput
+  children: QQuestionUpdateManyInput
+}
+
+input QQuestionUpdateManyDataInput {
+  title: String
+  branchVal: String
+  questionType: String
+  overrideLeafId: Int
+}
+
+input QQuestionUpdateManyInput {
+  create: [QQuestionCreateInput!]
+  update: [QQuestionUpdateWithWhereUniqueNestedInput!]
+  upsert: [QQuestionUpsertWithWhereUniqueNestedInput!]
+  delete: [QQuestionWhereUniqueInput!]
+  connect: [QQuestionWhereUniqueInput!]
+  set: [QQuestionWhereUniqueInput!]
+  disconnect: [QQuestionWhereUniqueInput!]
+  deleteMany: [QQuestionScalarWhereInput!]
+  updateMany: [QQuestionUpdateManyWithWhereNestedInput!]
+}
+
+input QQuestionUpdateManyMutationInput {
+  title: String
+  branchVal: String
+  questionType: String
+  overrideLeafId: Int
+}
+
+input QQuestionUpdateManyWithWhereNestedInput {
+  where: QQuestionScalarWhereInput!
+  data: QQuestionUpdateManyDataInput!
+}
+
+input QQuestionUpdateWithWhereUniqueNestedInput {
+  where: QQuestionWhereUniqueInput!
+  data: QQuestionUpdateDataInput!
+}
+
+input QQuestionUpsertWithWhereUniqueNestedInput {
+  where: QQuestionWhereUniqueInput!
+  update: QQuestionUpdateDataInput!
+  create: QQuestionCreateInput!
+}
+
+input QQuestionWhereInput {
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  title: String
+  title_not: String
+  title_in: [String!]
+  title_not_in: [String!]
+  title_lt: String
+  title_lte: String
+  title_gt: String
+  title_gte: String
+  title_contains: String
+  title_not_contains: String
+  title_starts_with: String
+  title_not_starts_with: String
+  title_ends_with: String
+  title_not_ends_with: String
+  branchVal: String
+  branchVal_not: String
+  branchVal_in: [String!]
+  branchVal_not_in: [String!]
+  branchVal_lt: String
+  branchVal_lte: String
+  branchVal_gt: String
+  branchVal_gte: String
+  branchVal_contains: String
+  branchVal_not_contains: String
+  branchVal_starts_with: String
+  branchVal_not_starts_with: String
+  branchVal_ends_with: String
+  branchVal_not_ends_with: String
+  questionType: String
+  questionType_not: String
+  questionType_in: [String!]
+  questionType_not_in: [String!]
+  questionType_lt: String
+  questionType_lte: String
+  questionType_gt: String
+  questionType_gte: String
+  questionType_contains: String
+  questionType_not_contains: String
+  questionType_starts_with: String
+  questionType_not_starts_with: String
+  questionType_ends_with: String
+  questionType_not_ends_with: String
+  overrideLeafId: Int
+  overrideLeafId_not: Int
+  overrideLeafId_in: [Int!]
+  overrideLeafId_not_in: [Int!]
+  overrideLeafId_lt: Int
+  overrideLeafId_lte: Int
+  overrideLeafId_gt: Int
+  overrideLeafId_gte: Int
+  conditions_every: QuestionConditionWhereInput
+  conditions_some: QuestionConditionWhereInput
+  conditions_none: QuestionConditionWhereInput
+  options_every: QuestionOptionWhereInput
+  options_some: QuestionOptionWhereInput
+  options_none: QuestionOptionWhereInput
+  children_every: QQuestionWhereInput
+  children_some: QQuestionWhereInput
+  children_none: QQuestionWhereInput
+  AND: [QQuestionWhereInput!]
+  OR: [QQuestionWhereInput!]
+  NOT: [QQuestionWhereInput!]
+}
+
+input QQuestionWhereUniqueInput {
+  id: ID
+}
+
 type Query {
   colourSettings(where: ColourSettingsWhereUniqueInput!): ColourSettings
   colourSettingses(where: ColourSettingsWhereInput, orderBy: ColourSettingsOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [ColourSettings]!
@@ -790,9 +1275,12 @@ type Query {
   fontSettings(where: FontSettingsWhereUniqueInput!): FontSettings
   fontSettingses(where: FontSettingsWhereInput, orderBy: FontSettingsOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [FontSettings]!
   fontSettingsesConnection(where: FontSettingsWhereInput, orderBy: FontSettingsOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): FontSettingsConnection!
-  question(where: QuestionWhereUniqueInput!): Question
-  questions(where: QuestionWhereInput, orderBy: QuestionOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Question]!
-  questionsConnection(where: QuestionWhereInput, orderBy: QuestionOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): QuestionConnection!
+  leafNode(where: LeafNodeWhereUniqueInput!): LeafNode
+  leafNodes(where: LeafNodeWhereInput, orderBy: LeafNodeOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [LeafNode]!
+  leafNodesConnection(where: LeafNodeWhereInput, orderBy: LeafNodeOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): LeafNodeConnection!
+  qQuestion(where: QQuestionWhereUniqueInput!): QQuestion
+  qQuestions(where: QQuestionWhereInput, orderBy: QQuestionOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [QQuestion]!
+  qQuestionsConnection(where: QQuestionWhereInput, orderBy: QQuestionOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): QQuestionConnection!
   questionCondition(where: QuestionConditionWhereUniqueInput!): QuestionCondition
   questionConditions(where: QuestionConditionWhereInput, orderBy: QuestionConditionOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [QuestionCondition]!
   questionConditionsConnection(where: QuestionConditionWhereInput, orderBy: QuestionConditionOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): QuestionConditionConnection!
@@ -805,26 +1293,12 @@ type Query {
   questionnaireSettings(where: QuestionnaireSettingsWhereUniqueInput!): QuestionnaireSettings
   questionnaireSettingses(where: QuestionnaireSettingsWhereInput, orderBy: QuestionnaireSettingsOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [QuestionnaireSettings]!
   questionnaireSettingsesConnection(where: QuestionnaireSettingsWhereInput, orderBy: QuestionnaireSettingsOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): QuestionnaireSettingsConnection!
-  topic(where: TopicWhereUniqueInput!): Topic
-  topics(where: TopicWhereInput, orderBy: TopicOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Topic]!
-  topicsConnection(where: TopicWhereInput, orderBy: TopicOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): TopicConnection!
   node(id: ID!): Node
-}
-
-type Question {
-  id: ID!
-  questionnaireId: ID!
-  title: String!
-  questionType: String!
-  overrideLeafId: Int
-  conditions(where: QuestionConditionWhereInput, orderBy: QuestionConditionOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [QuestionCondition!]
-  options(where: QuestionOptionWhereInput, orderBy: QuestionOptionOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [QuestionOption!]
-  children(where: QuestionWhereInput, orderBy: QuestionOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Question!]
 }
 
 type QuestionCondition {
   id: ID!
-  conditionType: String
+  conditionType: String!
   renderMin: Int
   renderMax: Int
   matchValue: String
@@ -838,7 +1312,7 @@ type QuestionConditionConnection {
 
 input QuestionConditionCreateInput {
   id: ID
-  conditionType: String
+  conditionType: String!
   renderMin: Int
   renderMax: Int
   matchValue: String
@@ -869,7 +1343,7 @@ enum QuestionConditionOrderByInput {
 
 type QuestionConditionPreviousValues {
   id: ID!
-  conditionType: String
+  conditionType: String!
   renderMin: Int
   renderMax: Int
   matchValue: String
@@ -1081,42 +1555,15 @@ input QuestionConditionWhereUniqueInput {
   id: ID
 }
 
-type QuestionConnection {
-  pageInfo: PageInfo!
-  edges: [QuestionEdge]!
-  aggregate: AggregateQuestion!
-}
-
-input QuestionCreateInput {
-  id: ID
-  questionnaireId: ID!
-  title: String!
-  questionType: String!
-  overrideLeafId: Int
-  conditions: QuestionConditionCreateManyInput
-  options: QuestionOptionCreateManyInput
-  children: QuestionCreateManyInput
-}
-
-input QuestionCreateManyInput {
-  create: [QuestionCreateInput!]
-  connect: [QuestionWhereUniqueInput!]
-}
-
-type QuestionEdge {
-  node: Question!
-  cursor: String!
-}
-
 type Questionnaire {
   id: ID!
-  customerId: ID!
+  customer: Customer!
   title: String!
   description: String!
   publicTitle: String
   setting: QuestionnaireSettings!
-  creationDate: String!
-  questions(where: QuestionWhereInput, orderBy: QuestionOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Question!]
+  creationDate: DateTime!
+  questions(where: QQuestionWhereInput, orderBy: QQuestionOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [QQuestion!]
 }
 
 type QuestionnaireConnection {
@@ -1127,18 +1574,40 @@ type QuestionnaireConnection {
 
 input QuestionnaireCreateInput {
   id: ID
-  customerId: ID!
+  customer: CustomerCreateOneWithoutQuestionnairesInput!
   title: String!
   description: String!
   publicTitle: String
-  setting: QuestionnaireSettingsCreateOneInput!
-  creationDate: String!
-  questions: QuestionCreateManyInput
+  setting: QuestionnaireSettingsCreateOneWithoutQuestionnaireInput!
+  questions: QQuestionCreateManyInput
 }
 
-input QuestionnaireCreateManyInput {
-  create: [QuestionnaireCreateInput!]
+input QuestionnaireCreateManyWithoutCustomerInput {
+  create: [QuestionnaireCreateWithoutCustomerInput!]
   connect: [QuestionnaireWhereUniqueInput!]
+}
+
+input QuestionnaireCreateOneWithoutSettingInput {
+  create: QuestionnaireCreateWithoutSettingInput
+  connect: QuestionnaireWhereUniqueInput
+}
+
+input QuestionnaireCreateWithoutCustomerInput {
+  id: ID
+  title: String!
+  description: String!
+  publicTitle: String
+  setting: QuestionnaireSettingsCreateOneWithoutQuestionnaireInput!
+  questions: QQuestionCreateManyInput
+}
+
+input QuestionnaireCreateWithoutSettingInput {
+  id: ID
+  customer: CustomerCreateOneWithoutQuestionnairesInput!
+  title: String!
+  description: String!
+  publicTitle: String
+  questions: QQuestionCreateManyInput
 }
 
 type QuestionnaireEdge {
@@ -1149,8 +1618,6 @@ type QuestionnaireEdge {
 enum QuestionnaireOrderByInput {
   id_ASC
   id_DESC
-  customerId_ASC
-  customerId_DESC
   title_ASC
   title_DESC
   description_ASC
@@ -1163,11 +1630,10 @@ enum QuestionnaireOrderByInput {
 
 type QuestionnairePreviousValues {
   id: ID!
-  customerId: ID!
   title: String!
   description: String!
   publicTitle: String
-  creationDate: String!
+  creationDate: DateTime!
 }
 
 input QuestionnaireScalarWhereInput {
@@ -1185,20 +1651,6 @@ input QuestionnaireScalarWhereInput {
   id_not_starts_with: ID
   id_ends_with: ID
   id_not_ends_with: ID
-  customerId: ID
-  customerId_not: ID
-  customerId_in: [ID!]
-  customerId_not_in: [ID!]
-  customerId_lt: ID
-  customerId_lte: ID
-  customerId_gt: ID
-  customerId_gte: ID
-  customerId_contains: ID
-  customerId_not_contains: ID
-  customerId_starts_with: ID
-  customerId_not_starts_with: ID
-  customerId_ends_with: ID
-  customerId_not_ends_with: ID
   title: String
   title_not: String
   title_in: [String!]
@@ -1241,20 +1693,14 @@ input QuestionnaireScalarWhereInput {
   publicTitle_not_starts_with: String
   publicTitle_ends_with: String
   publicTitle_not_ends_with: String
-  creationDate: String
-  creationDate_not: String
-  creationDate_in: [String!]
-  creationDate_not_in: [String!]
-  creationDate_lt: String
-  creationDate_lte: String
-  creationDate_gt: String
-  creationDate_gte: String
-  creationDate_contains: String
-  creationDate_not_contains: String
-  creationDate_starts_with: String
-  creationDate_not_starts_with: String
-  creationDate_ends_with: String
-  creationDate_not_ends_with: String
+  creationDate: DateTime
+  creationDate_not: DateTime
+  creationDate_in: [DateTime!]
+  creationDate_not_in: [DateTime!]
+  creationDate_lt: DateTime
+  creationDate_lte: DateTime
+  creationDate_gt: DateTime
+  creationDate_gte: DateTime
   AND: [QuestionnaireScalarWhereInput!]
   OR: [QuestionnaireScalarWhereInput!]
   NOT: [QuestionnaireScalarWhereInput!]
@@ -1262,8 +1708,8 @@ input QuestionnaireScalarWhereInput {
 
 type QuestionnaireSettings {
   id: ID!
-  customerId: ID!
-  questionnaireId: ID!
+  customer: Customer!
+  questionnaire: Questionnaire!
   title: String
   logo: String
   colourSettings: ColourSettings!
@@ -1278,17 +1724,26 @@ type QuestionnaireSettingsConnection {
 
 input QuestionnaireSettingsCreateInput {
   id: ID
-  customerId: ID!
-  questionnaireId: ID!
+  customer: CustomerCreateOneInput!
+  questionnaire: QuestionnaireCreateOneWithoutSettingInput!
   title: String
   logo: String
   colourSettings: ColourSettingsCreateOneInput!
   fontSettings: FontSettingsCreateOneInput!
 }
 
-input QuestionnaireSettingsCreateOneInput {
-  create: QuestionnaireSettingsCreateInput
+input QuestionnaireSettingsCreateOneWithoutQuestionnaireInput {
+  create: QuestionnaireSettingsCreateWithoutQuestionnaireInput
   connect: QuestionnaireSettingsWhereUniqueInput
+}
+
+input QuestionnaireSettingsCreateWithoutQuestionnaireInput {
+  id: ID
+  customer: CustomerCreateOneInput!
+  title: String
+  logo: String
+  colourSettings: ColourSettingsCreateOneInput!
+  fontSettings: FontSettingsCreateOneInput!
 }
 
 type QuestionnaireSettingsEdge {
@@ -1299,10 +1754,6 @@ type QuestionnaireSettingsEdge {
 enum QuestionnaireSettingsOrderByInput {
   id_ASC
   id_DESC
-  customerId_ASC
-  customerId_DESC
-  questionnaireId_ASC
-  questionnaireId_DESC
   title_ASC
   title_DESC
   logo_ASC
@@ -1311,8 +1762,6 @@ enum QuestionnaireSettingsOrderByInput {
 
 type QuestionnaireSettingsPreviousValues {
   id: ID!
-  customerId: ID!
-  questionnaireId: ID!
   title: String
   logo: String
 }
@@ -1335,18 +1784,9 @@ input QuestionnaireSettingsSubscriptionWhereInput {
   NOT: [QuestionnaireSettingsSubscriptionWhereInput!]
 }
 
-input QuestionnaireSettingsUpdateDataInput {
-  customerId: ID
-  questionnaireId: ID
-  title: String
-  logo: String
-  colourSettings: ColourSettingsUpdateOneRequiredInput
-  fontSettings: FontSettingsUpdateOneRequiredInput
-}
-
 input QuestionnaireSettingsUpdateInput {
-  customerId: ID
-  questionnaireId: ID
+  customer: CustomerUpdateOneRequiredInput
+  questionnaire: QuestionnaireUpdateOneRequiredWithoutSettingInput
   title: String
   logo: String
   colourSettings: ColourSettingsUpdateOneRequiredInput
@@ -1354,22 +1794,28 @@ input QuestionnaireSettingsUpdateInput {
 }
 
 input QuestionnaireSettingsUpdateManyMutationInput {
-  customerId: ID
-  questionnaireId: ID
   title: String
   logo: String
 }
 
-input QuestionnaireSettingsUpdateOneRequiredInput {
-  create: QuestionnaireSettingsCreateInput
-  update: QuestionnaireSettingsUpdateDataInput
-  upsert: QuestionnaireSettingsUpsertNestedInput
+input QuestionnaireSettingsUpdateOneRequiredWithoutQuestionnaireInput {
+  create: QuestionnaireSettingsCreateWithoutQuestionnaireInput
+  update: QuestionnaireSettingsUpdateWithoutQuestionnaireDataInput
+  upsert: QuestionnaireSettingsUpsertWithoutQuestionnaireInput
   connect: QuestionnaireSettingsWhereUniqueInput
 }
 
-input QuestionnaireSettingsUpsertNestedInput {
-  update: QuestionnaireSettingsUpdateDataInput!
-  create: QuestionnaireSettingsCreateInput!
+input QuestionnaireSettingsUpdateWithoutQuestionnaireDataInput {
+  customer: CustomerUpdateOneRequiredInput
+  title: String
+  logo: String
+  colourSettings: ColourSettingsUpdateOneRequiredInput
+  fontSettings: FontSettingsUpdateOneRequiredInput
+}
+
+input QuestionnaireSettingsUpsertWithoutQuestionnaireInput {
+  update: QuestionnaireSettingsUpdateWithoutQuestionnaireDataInput!
+  create: QuestionnaireSettingsCreateWithoutQuestionnaireInput!
 }
 
 input QuestionnaireSettingsWhereInput {
@@ -1387,34 +1833,8 @@ input QuestionnaireSettingsWhereInput {
   id_not_starts_with: ID
   id_ends_with: ID
   id_not_ends_with: ID
-  customerId: ID
-  customerId_not: ID
-  customerId_in: [ID!]
-  customerId_not_in: [ID!]
-  customerId_lt: ID
-  customerId_lte: ID
-  customerId_gt: ID
-  customerId_gte: ID
-  customerId_contains: ID
-  customerId_not_contains: ID
-  customerId_starts_with: ID
-  customerId_not_starts_with: ID
-  customerId_ends_with: ID
-  customerId_not_ends_with: ID
-  questionnaireId: ID
-  questionnaireId_not: ID
-  questionnaireId_in: [ID!]
-  questionnaireId_not_in: [ID!]
-  questionnaireId_lt: ID
-  questionnaireId_lte: ID
-  questionnaireId_gt: ID
-  questionnaireId_gte: ID
-  questionnaireId_contains: ID
-  questionnaireId_not_contains: ID
-  questionnaireId_starts_with: ID
-  questionnaireId_not_starts_with: ID
-  questionnaireId_ends_with: ID
-  questionnaireId_not_ends_with: ID
+  customer: CustomerWhereInput
+  questionnaire: QuestionnaireWhereInput
   title: String
   title_not: String
   title_in: [String!]
@@ -1472,52 +1892,37 @@ input QuestionnaireSubscriptionWhereInput {
   NOT: [QuestionnaireSubscriptionWhereInput!]
 }
 
-input QuestionnaireUpdateDataInput {
-  customerId: ID
-  title: String
-  description: String
-  publicTitle: String
-  setting: QuestionnaireSettingsUpdateOneRequiredInput
-  creationDate: String
-  questions: QuestionUpdateManyInput
-}
-
 input QuestionnaireUpdateInput {
-  customerId: ID
+  customer: CustomerUpdateOneRequiredWithoutQuestionnairesInput
   title: String
   description: String
   publicTitle: String
-  setting: QuestionnaireSettingsUpdateOneRequiredInput
-  creationDate: String
-  questions: QuestionUpdateManyInput
+  setting: QuestionnaireSettingsUpdateOneRequiredWithoutQuestionnaireInput
+  questions: QQuestionUpdateManyInput
 }
 
 input QuestionnaireUpdateManyDataInput {
-  customerId: ID
   title: String
   description: String
   publicTitle: String
-  creationDate: String
 }
 
-input QuestionnaireUpdateManyInput {
-  create: [QuestionnaireCreateInput!]
-  update: [QuestionnaireUpdateWithWhereUniqueNestedInput!]
-  upsert: [QuestionnaireUpsertWithWhereUniqueNestedInput!]
+input QuestionnaireUpdateManyMutationInput {
+  title: String
+  description: String
+  publicTitle: String
+}
+
+input QuestionnaireUpdateManyWithoutCustomerInput {
+  create: [QuestionnaireCreateWithoutCustomerInput!]
   delete: [QuestionnaireWhereUniqueInput!]
   connect: [QuestionnaireWhereUniqueInput!]
   set: [QuestionnaireWhereUniqueInput!]
   disconnect: [QuestionnaireWhereUniqueInput!]
+  update: [QuestionnaireUpdateWithWhereUniqueWithoutCustomerInput!]
+  upsert: [QuestionnaireUpsertWithWhereUniqueWithoutCustomerInput!]
   deleteMany: [QuestionnaireScalarWhereInput!]
   updateMany: [QuestionnaireUpdateManyWithWhereNestedInput!]
-}
-
-input QuestionnaireUpdateManyMutationInput {
-  customerId: ID
-  title: String
-  description: String
-  publicTitle: String
-  creationDate: String
 }
 
 input QuestionnaireUpdateManyWithWhereNestedInput {
@@ -1525,15 +1930,43 @@ input QuestionnaireUpdateManyWithWhereNestedInput {
   data: QuestionnaireUpdateManyDataInput!
 }
 
-input QuestionnaireUpdateWithWhereUniqueNestedInput {
-  where: QuestionnaireWhereUniqueInput!
-  data: QuestionnaireUpdateDataInput!
+input QuestionnaireUpdateOneRequiredWithoutSettingInput {
+  create: QuestionnaireCreateWithoutSettingInput
+  update: QuestionnaireUpdateWithoutSettingDataInput
+  upsert: QuestionnaireUpsertWithoutSettingInput
+  connect: QuestionnaireWhereUniqueInput
 }
 
-input QuestionnaireUpsertWithWhereUniqueNestedInput {
+input QuestionnaireUpdateWithoutCustomerDataInput {
+  title: String
+  description: String
+  publicTitle: String
+  setting: QuestionnaireSettingsUpdateOneRequiredWithoutQuestionnaireInput
+  questions: QQuestionUpdateManyInput
+}
+
+input QuestionnaireUpdateWithoutSettingDataInput {
+  customer: CustomerUpdateOneRequiredWithoutQuestionnairesInput
+  title: String
+  description: String
+  publicTitle: String
+  questions: QQuestionUpdateManyInput
+}
+
+input QuestionnaireUpdateWithWhereUniqueWithoutCustomerInput {
   where: QuestionnaireWhereUniqueInput!
-  update: QuestionnaireUpdateDataInput!
-  create: QuestionnaireCreateInput!
+  data: QuestionnaireUpdateWithoutCustomerDataInput!
+}
+
+input QuestionnaireUpsertWithoutSettingInput {
+  update: QuestionnaireUpdateWithoutSettingDataInput!
+  create: QuestionnaireCreateWithoutSettingInput!
+}
+
+input QuestionnaireUpsertWithWhereUniqueWithoutCustomerInput {
+  where: QuestionnaireWhereUniqueInput!
+  update: QuestionnaireUpdateWithoutCustomerDataInput!
+  create: QuestionnaireCreateWithoutCustomerInput!
 }
 
 input QuestionnaireWhereInput {
@@ -1551,20 +1984,7 @@ input QuestionnaireWhereInput {
   id_not_starts_with: ID
   id_ends_with: ID
   id_not_ends_with: ID
-  customerId: ID
-  customerId_not: ID
-  customerId_in: [ID!]
-  customerId_not_in: [ID!]
-  customerId_lt: ID
-  customerId_lte: ID
-  customerId_gt: ID
-  customerId_gte: ID
-  customerId_contains: ID
-  customerId_not_contains: ID
-  customerId_starts_with: ID
-  customerId_not_starts_with: ID
-  customerId_ends_with: ID
-  customerId_not_ends_with: ID
+  customer: CustomerWhereInput
   title: String
   title_not: String
   title_in: [String!]
@@ -1608,23 +2028,17 @@ input QuestionnaireWhereInput {
   publicTitle_ends_with: String
   publicTitle_not_ends_with: String
   setting: QuestionnaireSettingsWhereInput
-  creationDate: String
-  creationDate_not: String
-  creationDate_in: [String!]
-  creationDate_not_in: [String!]
-  creationDate_lt: String
-  creationDate_lte: String
-  creationDate_gt: String
-  creationDate_gte: String
-  creationDate_contains: String
-  creationDate_not_contains: String
-  creationDate_starts_with: String
-  creationDate_not_starts_with: String
-  creationDate_ends_with: String
-  creationDate_not_ends_with: String
-  questions_every: QuestionWhereInput
-  questions_some: QuestionWhereInput
-  questions_none: QuestionWhereInput
+  creationDate: DateTime
+  creationDate_not: DateTime
+  creationDate_in: [DateTime!]
+  creationDate_not_in: [DateTime!]
+  creationDate_lt: DateTime
+  creationDate_lte: DateTime
+  creationDate_gt: DateTime
+  creationDate_gte: DateTime
+  questions_every: QQuestionWhereInput
+  questions_some: QQuestionWhereInput
+  questions_none: QQuestionWhereInput
   AND: [QuestionnaireWhereInput!]
   OR: [QuestionnaireWhereInput!]
   NOT: [QuestionnaireWhereInput!]
@@ -1843,476 +2257,14 @@ input QuestionOptionWhereUniqueInput {
   id: ID
 }
 
-enum QuestionOrderByInput {
-  id_ASC
-  id_DESC
-  questionnaireId_ASC
-  questionnaireId_DESC
-  title_ASC
-  title_DESC
-  questionType_ASC
-  questionType_DESC
-  overrideLeafId_ASC
-  overrideLeafId_DESC
-}
-
-type QuestionPreviousValues {
-  id: ID!
-  questionnaireId: ID!
-  title: String!
-  questionType: String!
-  overrideLeafId: Int
-}
-
-input QuestionScalarWhereInput {
-  id: ID
-  id_not: ID
-  id_in: [ID!]
-  id_not_in: [ID!]
-  id_lt: ID
-  id_lte: ID
-  id_gt: ID
-  id_gte: ID
-  id_contains: ID
-  id_not_contains: ID
-  id_starts_with: ID
-  id_not_starts_with: ID
-  id_ends_with: ID
-  id_not_ends_with: ID
-  questionnaireId: ID
-  questionnaireId_not: ID
-  questionnaireId_in: [ID!]
-  questionnaireId_not_in: [ID!]
-  questionnaireId_lt: ID
-  questionnaireId_lte: ID
-  questionnaireId_gt: ID
-  questionnaireId_gte: ID
-  questionnaireId_contains: ID
-  questionnaireId_not_contains: ID
-  questionnaireId_starts_with: ID
-  questionnaireId_not_starts_with: ID
-  questionnaireId_ends_with: ID
-  questionnaireId_not_ends_with: ID
-  title: String
-  title_not: String
-  title_in: [String!]
-  title_not_in: [String!]
-  title_lt: String
-  title_lte: String
-  title_gt: String
-  title_gte: String
-  title_contains: String
-  title_not_contains: String
-  title_starts_with: String
-  title_not_starts_with: String
-  title_ends_with: String
-  title_not_ends_with: String
-  questionType: String
-  questionType_not: String
-  questionType_in: [String!]
-  questionType_not_in: [String!]
-  questionType_lt: String
-  questionType_lte: String
-  questionType_gt: String
-  questionType_gte: String
-  questionType_contains: String
-  questionType_not_contains: String
-  questionType_starts_with: String
-  questionType_not_starts_with: String
-  questionType_ends_with: String
-  questionType_not_ends_with: String
-  overrideLeafId: Int
-  overrideLeafId_not: Int
-  overrideLeafId_in: [Int!]
-  overrideLeafId_not_in: [Int!]
-  overrideLeafId_lt: Int
-  overrideLeafId_lte: Int
-  overrideLeafId_gt: Int
-  overrideLeafId_gte: Int
-  AND: [QuestionScalarWhereInput!]
-  OR: [QuestionScalarWhereInput!]
-  NOT: [QuestionScalarWhereInput!]
-}
-
-type QuestionSubscriptionPayload {
-  mutation: MutationType!
-  node: Question
-  updatedFields: [String!]
-  previousValues: QuestionPreviousValues
-}
-
-input QuestionSubscriptionWhereInput {
-  mutation_in: [MutationType!]
-  updatedFields_contains: String
-  updatedFields_contains_every: [String!]
-  updatedFields_contains_some: [String!]
-  node: QuestionWhereInput
-  AND: [QuestionSubscriptionWhereInput!]
-  OR: [QuestionSubscriptionWhereInput!]
-  NOT: [QuestionSubscriptionWhereInput!]
-}
-
-input QuestionUpdateDataInput {
-  questionnaireId: ID
-  title: String
-  questionType: String
-  overrideLeafId: Int
-  conditions: QuestionConditionUpdateManyInput
-  options: QuestionOptionUpdateManyInput
-  children: QuestionUpdateManyInput
-}
-
-input QuestionUpdateInput {
-  questionnaireId: ID
-  title: String
-  questionType: String
-  overrideLeafId: Int
-  conditions: QuestionConditionUpdateManyInput
-  options: QuestionOptionUpdateManyInput
-  children: QuestionUpdateManyInput
-}
-
-input QuestionUpdateManyDataInput {
-  questionnaireId: ID
-  title: String
-  questionType: String
-  overrideLeafId: Int
-}
-
-input QuestionUpdateManyInput {
-  create: [QuestionCreateInput!]
-  update: [QuestionUpdateWithWhereUniqueNestedInput!]
-  upsert: [QuestionUpsertWithWhereUniqueNestedInput!]
-  delete: [QuestionWhereUniqueInput!]
-  connect: [QuestionWhereUniqueInput!]
-  set: [QuestionWhereUniqueInput!]
-  disconnect: [QuestionWhereUniqueInput!]
-  deleteMany: [QuestionScalarWhereInput!]
-  updateMany: [QuestionUpdateManyWithWhereNestedInput!]
-}
-
-input QuestionUpdateManyMutationInput {
-  questionnaireId: ID
-  title: String
-  questionType: String
-  overrideLeafId: Int
-}
-
-input QuestionUpdateManyWithWhereNestedInput {
-  where: QuestionScalarWhereInput!
-  data: QuestionUpdateManyDataInput!
-}
-
-input QuestionUpdateWithWhereUniqueNestedInput {
-  where: QuestionWhereUniqueInput!
-  data: QuestionUpdateDataInput!
-}
-
-input QuestionUpsertWithWhereUniqueNestedInput {
-  where: QuestionWhereUniqueInput!
-  update: QuestionUpdateDataInput!
-  create: QuestionCreateInput!
-}
-
-input QuestionWhereInput {
-  id: ID
-  id_not: ID
-  id_in: [ID!]
-  id_not_in: [ID!]
-  id_lt: ID
-  id_lte: ID
-  id_gt: ID
-  id_gte: ID
-  id_contains: ID
-  id_not_contains: ID
-  id_starts_with: ID
-  id_not_starts_with: ID
-  id_ends_with: ID
-  id_not_ends_with: ID
-  questionnaireId: ID
-  questionnaireId_not: ID
-  questionnaireId_in: [ID!]
-  questionnaireId_not_in: [ID!]
-  questionnaireId_lt: ID
-  questionnaireId_lte: ID
-  questionnaireId_gt: ID
-  questionnaireId_gte: ID
-  questionnaireId_contains: ID
-  questionnaireId_not_contains: ID
-  questionnaireId_starts_with: ID
-  questionnaireId_not_starts_with: ID
-  questionnaireId_ends_with: ID
-  questionnaireId_not_ends_with: ID
-  title: String
-  title_not: String
-  title_in: [String!]
-  title_not_in: [String!]
-  title_lt: String
-  title_lte: String
-  title_gt: String
-  title_gte: String
-  title_contains: String
-  title_not_contains: String
-  title_starts_with: String
-  title_not_starts_with: String
-  title_ends_with: String
-  title_not_ends_with: String
-  questionType: String
-  questionType_not: String
-  questionType_in: [String!]
-  questionType_not_in: [String!]
-  questionType_lt: String
-  questionType_lte: String
-  questionType_gt: String
-  questionType_gte: String
-  questionType_contains: String
-  questionType_not_contains: String
-  questionType_starts_with: String
-  questionType_not_starts_with: String
-  questionType_ends_with: String
-  questionType_not_ends_with: String
-  overrideLeafId: Int
-  overrideLeafId_not: Int
-  overrideLeafId_in: [Int!]
-  overrideLeafId_not_in: [Int!]
-  overrideLeafId_lt: Int
-  overrideLeafId_lte: Int
-  overrideLeafId_gt: Int
-  overrideLeafId_gte: Int
-  conditions_every: QuestionConditionWhereInput
-  conditions_some: QuestionConditionWhereInput
-  conditions_none: QuestionConditionWhereInput
-  options_every: QuestionOptionWhereInput
-  options_some: QuestionOptionWhereInput
-  options_none: QuestionOptionWhereInput
-  children_every: QuestionWhereInput
-  children_some: QuestionWhereInput
-  children_none: QuestionWhereInput
-  AND: [QuestionWhereInput!]
-  OR: [QuestionWhereInput!]
-  NOT: [QuestionWhereInput!]
-}
-
-input QuestionWhereUniqueInput {
-  id: ID
-}
-
 type Subscription {
   colourSettings(where: ColourSettingsSubscriptionWhereInput): ColourSettingsSubscriptionPayload
   customer(where: CustomerSubscriptionWhereInput): CustomerSubscriptionPayload
   fontSettings(where: FontSettingsSubscriptionWhereInput): FontSettingsSubscriptionPayload
-  question(where: QuestionSubscriptionWhereInput): QuestionSubscriptionPayload
+  leafNode(where: LeafNodeSubscriptionWhereInput): LeafNodeSubscriptionPayload
+  qQuestion(where: QQuestionSubscriptionWhereInput): QQuestionSubscriptionPayload
   questionCondition(where: QuestionConditionSubscriptionWhereInput): QuestionConditionSubscriptionPayload
   questionOption(where: QuestionOptionSubscriptionWhereInput): QuestionOptionSubscriptionPayload
   questionnaire(where: QuestionnaireSubscriptionWhereInput): QuestionnaireSubscriptionPayload
   questionnaireSettings(where: QuestionnaireSettingsSubscriptionWhereInput): QuestionnaireSettingsSubscriptionPayload
-  topic(where: TopicSubscriptionWhereInput): TopicSubscriptionPayload
-}
-
-type Topic {
-  id: ID!
-  title: String!
-  description: String!
-  publicTitle: String
-  logoUrl: String
-  language: String
-  topicUrl: String
-  questions(where: QuestionWhereInput, orderBy: QuestionOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Question!]
-}
-
-type TopicConnection {
-  pageInfo: PageInfo!
-  edges: [TopicEdge]!
-  aggregate: AggregateTopic!
-}
-
-input TopicCreateInput {
-  id: ID
-  title: String!
-  description: String!
-  publicTitle: String
-  logoUrl: String
-  language: String
-  topicUrl: String
-  questions: QuestionCreateManyInput
-}
-
-type TopicEdge {
-  node: Topic!
-  cursor: String!
-}
-
-enum TopicOrderByInput {
-  id_ASC
-  id_DESC
-  title_ASC
-  title_DESC
-  description_ASC
-  description_DESC
-  publicTitle_ASC
-  publicTitle_DESC
-  logoUrl_ASC
-  logoUrl_DESC
-  language_ASC
-  language_DESC
-  topicUrl_ASC
-  topicUrl_DESC
-}
-
-type TopicPreviousValues {
-  id: ID!
-  title: String!
-  description: String!
-  publicTitle: String
-  logoUrl: String
-  language: String
-  topicUrl: String
-}
-
-type TopicSubscriptionPayload {
-  mutation: MutationType!
-  node: Topic
-  updatedFields: [String!]
-  previousValues: TopicPreviousValues
-}
-
-input TopicSubscriptionWhereInput {
-  mutation_in: [MutationType!]
-  updatedFields_contains: String
-  updatedFields_contains_every: [String!]
-  updatedFields_contains_some: [String!]
-  node: TopicWhereInput
-  AND: [TopicSubscriptionWhereInput!]
-  OR: [TopicSubscriptionWhereInput!]
-  NOT: [TopicSubscriptionWhereInput!]
-}
-
-input TopicUpdateInput {
-  title: String
-  description: String
-  publicTitle: String
-  logoUrl: String
-  language: String
-  topicUrl: String
-  questions: QuestionUpdateManyInput
-}
-
-input TopicUpdateManyMutationInput {
-  title: String
-  description: String
-  publicTitle: String
-  logoUrl: String
-  language: String
-  topicUrl: String
-}
-
-input TopicWhereInput {
-  id: ID
-  id_not: ID
-  id_in: [ID!]
-  id_not_in: [ID!]
-  id_lt: ID
-  id_lte: ID
-  id_gt: ID
-  id_gte: ID
-  id_contains: ID
-  id_not_contains: ID
-  id_starts_with: ID
-  id_not_starts_with: ID
-  id_ends_with: ID
-  id_not_ends_with: ID
-  title: String
-  title_not: String
-  title_in: [String!]
-  title_not_in: [String!]
-  title_lt: String
-  title_lte: String
-  title_gt: String
-  title_gte: String
-  title_contains: String
-  title_not_contains: String
-  title_starts_with: String
-  title_not_starts_with: String
-  title_ends_with: String
-  title_not_ends_with: String
-  description: String
-  description_not: String
-  description_in: [String!]
-  description_not_in: [String!]
-  description_lt: String
-  description_lte: String
-  description_gt: String
-  description_gte: String
-  description_contains: String
-  description_not_contains: String
-  description_starts_with: String
-  description_not_starts_with: String
-  description_ends_with: String
-  description_not_ends_with: String
-  publicTitle: String
-  publicTitle_not: String
-  publicTitle_in: [String!]
-  publicTitle_not_in: [String!]
-  publicTitle_lt: String
-  publicTitle_lte: String
-  publicTitle_gt: String
-  publicTitle_gte: String
-  publicTitle_contains: String
-  publicTitle_not_contains: String
-  publicTitle_starts_with: String
-  publicTitle_not_starts_with: String
-  publicTitle_ends_with: String
-  publicTitle_not_ends_with: String
-  logoUrl: String
-  logoUrl_not: String
-  logoUrl_in: [String!]
-  logoUrl_not_in: [String!]
-  logoUrl_lt: String
-  logoUrl_lte: String
-  logoUrl_gt: String
-  logoUrl_gte: String
-  logoUrl_contains: String
-  logoUrl_not_contains: String
-  logoUrl_starts_with: String
-  logoUrl_not_starts_with: String
-  logoUrl_ends_with: String
-  logoUrl_not_ends_with: String
-  language: String
-  language_not: String
-  language_in: [String!]
-  language_not_in: [String!]
-  language_lt: String
-  language_lte: String
-  language_gt: String
-  language_gte: String
-  language_contains: String
-  language_not_contains: String
-  language_starts_with: String
-  language_not_starts_with: String
-  language_ends_with: String
-  language_not_ends_with: String
-  topicUrl: String
-  topicUrl_not: String
-  topicUrl_in: [String!]
-  topicUrl_not_in: [String!]
-  topicUrl_lt: String
-  topicUrl_lte: String
-  topicUrl_gt: String
-  topicUrl_gte: String
-  topicUrl_contains: String
-  topicUrl_not_contains: String
-  topicUrl_starts_with: String
-  topicUrl_not_starts_with: String
-  topicUrl_ends_with: String
-  topicUrl_not_ends_with: String
-  questions_every: QuestionWhereInput
-  questions_some: QuestionWhereInput
-  questions_none: QuestionWhereInput
-  AND: [TopicWhereInput!]
-  OR: [TopicWhereInput!]
-  NOT: [TopicWhereInput!]
-}
-
-input TopicWhereUniqueInput {
-  id: ID
 }

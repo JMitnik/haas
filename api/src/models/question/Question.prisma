@@ -1,10 +1,11 @@
-type Question {
+type QQuestion {
     id: ID! @id
-    questionnaireId: ID!
+    # questionnaire: Questionnaire! @relation (link: INLINE) 
     title: String!
-    questionType(type: QuestionType): String!
+    branchVal: String
+    questionType: String!
     overrideLeafId: Int
     conditions: [QuestionCondition]
     options: [QuestionOption]
-    children: [Question!]
+    children: [QQuestion]
 }

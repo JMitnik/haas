@@ -1,0 +1,5 @@
+type LeafNode {
+    id: ID! @id
+    type: String!
+    title: String!
+}

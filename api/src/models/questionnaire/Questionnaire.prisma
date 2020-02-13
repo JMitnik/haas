@@ -1,10 +1,10 @@
 type Questionnaire {
     id: ID! @id
-    customerId: ID!
+    customer: Customer! @relation(link: INLINE)
     title: String!
     description: String!
     publicTitle: String
     setting: QuestionnaireSettings!
-    creationDate: String! 
-    questions: [Question!]!
+    creationDate: DateTime! @createdAt 
+    questions: [QQuestion]
 }
