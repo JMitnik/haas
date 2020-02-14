@@ -6,7 +6,8 @@ const queryResolvers: QueryResolvers = {
   questionNodes: forwardTo('db'),
   questionnaire: forwardTo('db'),
   questionnaires: forwardTo('db'),
-  leafNodes: forwardTo('db')
+  leafNodes: forwardTo('db'),
+  colourSettings: forwardTo('db')
   // questions: forwardTo('db'),
   // topics: forwardTo('db'),
 }
