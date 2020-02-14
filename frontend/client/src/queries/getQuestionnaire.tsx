@@ -3,8 +3,8 @@ import gql from 'graphql-tag';
 
 export const GET_QUESTIONNAIRE = gql`
       query getQuestionnaire {
-  questionnaire(where: {
-    id: "ck6k6y8br00sl0783cxw52ssd"
+        questionnaire(where: {
+    id: "ck6lrox2w01650783lo0kxom8"
   }) {
     id
     title
@@ -14,13 +14,17 @@ export const GET_QUESTIONNAIRE = gql`
     questions {
       id
       title
-      questionType
       overrideLeafId
+      questionType {
+        type
+      }
       children {
         id
         title
+        questionType {
+        type
+      	}
         overrideLeafId
-        questionType
         conditions {
           id
           matchValue
@@ -33,9 +37,11 @@ export const GET_QUESTIONNAIRE = gql`
         }
         children {
           id
-          questionType
           overrideLeafId
           title
+          questionType {
+        		type
+      		}
           options {
             value
             publicValue
@@ -48,9 +54,11 @@ export const GET_QUESTIONNAIRE = gql`
           }
           children {
           	id
-            questionType
             overrideLeafId
             title
+            questionType {
+        			type
+      			}
             options {
               value
               publicValue
@@ -76,11 +84,6 @@ export const GET_QUESTIONNAIRE = gql`
         publicValue
       }    
     }
-  }
-  leafNodes {
-    title
-    nodeId
-    type
   }
 }
 `;

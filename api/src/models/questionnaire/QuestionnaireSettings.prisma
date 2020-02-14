@@ -1,9 +1,0 @@
-type QuestionnaireSettings {
-    id: ID! @id
-    customer: Customer! @relation (link:INLINE)
-    questionnaire: Questionnaire! @relation (link:INLINE)
-    title: String
-    logo: String 
-    colourSettings: ColourSettings!
-    fontSettings: FontSettings!
-}

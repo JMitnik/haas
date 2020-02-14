@@ -48,7 +48,7 @@ export const HAASForm = () => {
 HAASForm.whyDidYouRender = true;
 
 const renderNextNode = (node: any) => {
-  let nodeType = node.type || node.questionType;
+  let nodeType = node.type || node.questionType.type || node.type?.type || '';
   const Component: React.ReactNode | undefined = nodeMap.get(nodeType);
 
   return Component || <HAASTextBox />

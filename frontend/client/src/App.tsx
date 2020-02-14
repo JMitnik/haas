@@ -52,10 +52,8 @@ const App: React.FC = () => {
     error
   } = useQuery<any>(GET_QUESTIONNAIRE);
 
-  const cleanData = data?.questionnaire?.questions
-  const finalData = {questionnaire: cleanData, LeafCollection: leafNodes?.data?.leafNodes}
-  // console.log("data: ", data?.questionnaire?.questions)
-  // console.log('Leaf collection: ', leafNodes?.data?.leafNodes)
+  const cleanData = data?.questionnaire?.questions;
+  const finalData = {questionnaire: cleanData, LeafCollection: leafNodes?.data?.leafNodes};
   
   if (loading) return <div>'Loading...'</div>;
   if (error) return <div>{'Error!' + error.message}</div>;

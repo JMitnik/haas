@@ -1,5 +1,5 @@
 type Customer {
     id: ID! @id
     name: String! 
-    questionnaires: [Questionnaire]
+    settings: CustomerSettings
 }

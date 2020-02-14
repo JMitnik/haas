@@ -4,8 +4,7 @@ type Questionnaire {
     title: String!
     description: String!
     publicTitle: String
-    setting: QuestionnaireSettings!
     creationDate: DateTime! @createdAt 
     updatedAt: DateTime @updatedAt
-    questions: [QQuestion]
+    questions: [QuestionNode]
 }

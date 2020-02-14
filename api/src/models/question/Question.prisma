@@ -1,11 +1,10 @@
-type QQuestion {
+type QuestionNode {
     id: ID! @id
     title: String!
     branchVal: String
-    questionType: String!
+    questionType: NodeType!
     overrideLeafId: Int
-    leafNode: LeafNode
     conditions: [QuestionCondition]
     options: [QuestionOption]
-    children: [QQuestion]
+    children: [QuestionNode]
 }

@@ -22,6 +22,11 @@ export type AggregateCustomer = {
   count: Scalars['Int'],
 };
 
+export type AggregateCustomerSettings = {
+   __typename?: 'AggregateCustomerSettings',
+  count: Scalars['Int'],
+};
+
 export type AggregateFontSettings = {
    __typename?: 'AggregateFontSettings',
   count: Scalars['Int'],
@@ -32,8 +37,8 @@ export type AggregateLeafNode = {
   count: Scalars['Int'],
 };
 
-export type AggregateQQuestion = {
-   __typename?: 'AggregateQQuestion',
+export type AggregateNodeType = {
+   __typename?: 'AggregateNodeType',
   count: Scalars['Int'],
 };
 
@@ -47,8 +52,8 @@ export type AggregateQuestionnaire = {
   count: Scalars['Int'],
 };
 
-export type AggregateQuestionnaireSettings = {
-   __typename?: 'AggregateQuestionnaireSettings',
+export type AggregateQuestionNode = {
+   __typename?: 'AggregateQuestionNode',
   count: Scalars['Int'],
 };
 
@@ -475,18 +480,7 @@ export type Customer = {
    __typename?: 'Customer',
   id: Scalars['ID'],
   name: Scalars['String'],
-  questionnaires?: Maybe<Array<Questionnaire>>,
-};
-
-
-export type CustomerQuestionnairesArgs = {
-  where?: Maybe<QuestionnaireWhereInput>,
-  orderBy?: Maybe<QuestionnaireOrderByInput>,
-  skip?: Maybe<Scalars['Int']>,
-  after?: Maybe<Scalars['String']>,
-  before?: Maybe<Scalars['String']>,
-  first?: Maybe<Scalars['Int']>,
-  last?: Maybe<Scalars['Int']>
+  settings?: Maybe<CustomerSettings>,
 };
 
 export type CustomerConnection = {
@@ -499,7 +493,7 @@ export type CustomerConnection = {
 export type CustomerCreateInput = {
   id?: Maybe<Scalars['ID']>,
   name: Scalars['String'],
-  questionnaires?: Maybe<QuestionnaireCreateManyWithoutCustomerInput>,
+  settings?: Maybe<CustomerSettingsCreateOneWithoutCustomerInput>,
 };
 
 export type CustomerCreateOneInput = {
@@ -507,12 +501,12 @@ export type CustomerCreateOneInput = {
   connect?: Maybe<CustomerWhereUniqueInput>,
 };
 
-export type CustomerCreateOneWithoutQuestionnairesInput = {
-  create?: Maybe<CustomerCreateWithoutQuestionnairesInput>,
+export type CustomerCreateOneWithoutSettingsInput = {
+  create?: Maybe<CustomerCreateWithoutSettingsInput>,
   connect?: Maybe<CustomerWhereUniqueInput>,
 };
 
-export type CustomerCreateWithoutQuestionnairesInput = {
+export type CustomerCreateWithoutSettingsInput = {
   id?: Maybe<Scalars['ID']>,
   name: Scalars['String'],
 };
@@ -536,6 +530,175 @@ export type CustomerPreviousValues = {
   name: Scalars['String'],
 };
 
+export type CustomerSettings = {
+   __typename?: 'CustomerSettings',
+  id: Scalars['ID'],
+  title?: Maybe<Scalars['String']>,
+  customer: Customer,
+  logo?: Maybe<Scalars['String']>,
+  colourSettings: ColourSettings,
+  fontSettings: FontSettings,
+};
+
+export type CustomerSettingsConnection = {
+   __typename?: 'CustomerSettingsConnection',
+  pageInfo: PageInfo,
+  edges: Array<Maybe<CustomerSettingsEdge>>,
+  aggregate: AggregateCustomerSettings,
+};
+
+export type CustomerSettingsCreateInput = {
+  id?: Maybe<Scalars['ID']>,
+  title?: Maybe<Scalars['String']>,
+  customer: CustomerCreateOneWithoutSettingsInput,
+  logo?: Maybe<Scalars['String']>,
+  colourSettings: ColourSettingsCreateOneInput,
+  fontSettings: FontSettingsCreateOneInput,
+};
+
+export type CustomerSettingsCreateOneWithoutCustomerInput = {
+  create?: Maybe<CustomerSettingsCreateWithoutCustomerInput>,
+  connect?: Maybe<CustomerSettingsWhereUniqueInput>,
+};
+
+export type CustomerSettingsCreateWithoutCustomerInput = {
+  id?: Maybe<Scalars['ID']>,
+  title?: Maybe<Scalars['String']>,
+  logo?: Maybe<Scalars['String']>,
+  colourSettings: ColourSettingsCreateOneInput,
+  fontSettings: FontSettingsCreateOneInput,
+};
+
+export type CustomerSettingsEdge = {
+   __typename?: 'CustomerSettingsEdge',
+  node: CustomerSettings,
+  cursor: Scalars['String'],
+};
+
+export enum CustomerSettingsOrderByInput {
+  IdAsc = 'id_ASC',
+  IdDesc = 'id_DESC',
+  TitleAsc = 'title_ASC',
+  TitleDesc = 'title_DESC',
+  LogoAsc = 'logo_ASC',
+  LogoDesc = 'logo_DESC'
+}
+
+export type CustomerSettingsPreviousValues = {
+   __typename?: 'CustomerSettingsPreviousValues',
+  id: Scalars['ID'],
+  title?: Maybe<Scalars['String']>,
+  logo?: Maybe<Scalars['String']>,
+};
+
+export type CustomerSettingsSubscriptionPayload = {
+   __typename?: 'CustomerSettingsSubscriptionPayload',
+  mutation: MutationType,
+  node?: Maybe<CustomerSettings>,
+  updatedFields?: Maybe<Array<Scalars['String']>>,
+  previousValues?: Maybe<CustomerSettingsPreviousValues>,
+};
+
+export type CustomerSettingsSubscriptionWhereInput = {
+  mutation_in?: Maybe<Array<MutationType>>,
+  updatedFields_contains?: Maybe<Scalars['String']>,
+  updatedFields_contains_every?: Maybe<Array<Scalars['String']>>,
+  updatedFields_contains_some?: Maybe<Array<Scalars['String']>>,
+  node?: Maybe<CustomerSettingsWhereInput>,
+  AND?: Maybe<Array<CustomerSettingsSubscriptionWhereInput>>,
+  OR?: Maybe<Array<CustomerSettingsSubscriptionWhereInput>>,
+  NOT?: Maybe<Array<CustomerSettingsSubscriptionWhereInput>>,
+};
+
+export type CustomerSettingsUpdateInput = {
+  title?: Maybe<Scalars['String']>,
+  customer?: Maybe<CustomerUpdateOneRequiredWithoutSettingsInput>,
+  logo?: Maybe<Scalars['String']>,
+  colourSettings?: Maybe<ColourSettingsUpdateOneRequiredInput>,
+  fontSettings?: Maybe<FontSettingsUpdateOneRequiredInput>,
+};
+
+export type CustomerSettingsUpdateManyMutationInput = {
+  title?: Maybe<Scalars['String']>,
+  logo?: Maybe<Scalars['String']>,
+};
+
+export type CustomerSettingsUpdateOneWithoutCustomerInput = {
+  create?: Maybe<CustomerSettingsCreateWithoutCustomerInput>,
+  update?: Maybe<CustomerSettingsUpdateWithoutCustomerDataInput>,
+  upsert?: Maybe<CustomerSettingsUpsertWithoutCustomerInput>,
+  delete?: Maybe<Scalars['Boolean']>,
+  disconnect?: Maybe<Scalars['Boolean']>,
+  connect?: Maybe<CustomerSettingsWhereUniqueInput>,
+};
+
+export type CustomerSettingsUpdateWithoutCustomerDataInput = {
+  title?: Maybe<Scalars['String']>,
+  logo?: Maybe<Scalars['String']>,
+  colourSettings?: Maybe<ColourSettingsUpdateOneRequiredInput>,
+  fontSettings?: Maybe<FontSettingsUpdateOneRequiredInput>,
+};
+
+export type CustomerSettingsUpsertWithoutCustomerInput = {
+  update: CustomerSettingsUpdateWithoutCustomerDataInput,
+  create: CustomerSettingsCreateWithoutCustomerInput,
+};
+
+export type CustomerSettingsWhereInput = {
+  id?: Maybe<Scalars['ID']>,
+  id_not?: Maybe<Scalars['ID']>,
+  id_in?: Maybe<Array<Scalars['ID']>>,
+  id_not_in?: Maybe<Array<Scalars['ID']>>,
+  id_lt?: Maybe<Scalars['ID']>,
+  id_lte?: Maybe<Scalars['ID']>,
+  id_gt?: Maybe<Scalars['ID']>,
+  id_gte?: Maybe<Scalars['ID']>,
+  id_contains?: Maybe<Scalars['ID']>,
+  id_not_contains?: Maybe<Scalars['ID']>,
+  id_starts_with?: Maybe<Scalars['ID']>,
+  id_not_starts_with?: Maybe<Scalars['ID']>,
+  id_ends_with?: Maybe<Scalars['ID']>,
+  id_not_ends_with?: Maybe<Scalars['ID']>,
+  title?: Maybe<Scalars['String']>,
+  title_not?: Maybe<Scalars['String']>,
+  title_in?: Maybe<Array<Scalars['String']>>,
+  title_not_in?: Maybe<Array<Scalars['String']>>,
+  title_lt?: Maybe<Scalars['String']>,
+  title_lte?: Maybe<Scalars['String']>,
+  title_gt?: Maybe<Scalars['String']>,
+  title_gte?: Maybe<Scalars['String']>,
+  title_contains?: Maybe<Scalars['String']>,
+  title_not_contains?: Maybe<Scalars['String']>,
+  title_starts_with?: Maybe<Scalars['String']>,
+  title_not_starts_with?: Maybe<Scalars['String']>,
+  title_ends_with?: Maybe<Scalars['String']>,
+  title_not_ends_with?: Maybe<Scalars['String']>,
+  customer?: Maybe<CustomerWhereInput>,
+  logo?: Maybe<Scalars['String']>,
+  logo_not?: Maybe<Scalars['String']>,
+  logo_in?: Maybe<Array<Scalars['String']>>,
+  logo_not_in?: Maybe<Array<Scalars['String']>>,
+  logo_lt?: Maybe<Scalars['String']>,
+  logo_lte?: Maybe<Scalars['String']>,
+  logo_gt?: Maybe<Scalars['String']>,
+  logo_gte?: Maybe<Scalars['String']>,
+  logo_contains?: Maybe<Scalars['String']>,
+  logo_not_contains?: Maybe<Scalars['String']>,
+  logo_starts_with?: Maybe<Scalars['String']>,
+  logo_not_starts_with?: Maybe<Scalars['String']>,
+  logo_ends_with?: Maybe<Scalars['String']>,
+  logo_not_ends_with?: Maybe<Scalars['String']>,
+  colourSettings?: Maybe<ColourSettingsWhereInput>,
+  fontSettings?: Maybe<FontSettingsWhereInput>,
+  AND?: Maybe<Array<CustomerSettingsWhereInput>>,
+  OR?: Maybe<Array<CustomerSettingsWhereInput>>,
+  NOT?: Maybe<Array<CustomerSettingsWhereInput>>,
+};
+
+export type CustomerSettingsWhereUniqueInput = {
+  id?: Maybe<Scalars['ID']>,
+};
+
 export type CustomerSubscriptionPayload = {
    __typename?: 'CustomerSubscriptionPayload',
   mutation: MutationType,
@@ -557,12 +720,12 @@ export type CustomerSubscriptionWhereInput = {
 
 export type CustomerUpdateDataInput = {
   name?: Maybe<Scalars['String']>,
-  questionnaires?: Maybe<QuestionnaireUpdateManyWithoutCustomerInput>,
+  settings?: Maybe<CustomerSettingsUpdateOneWithoutCustomerInput>,
 };
 
 export type CustomerUpdateInput = {
   name?: Maybe<Scalars['String']>,
-  questionnaires?: Maybe<QuestionnaireUpdateManyWithoutCustomerInput>,
+  settings?: Maybe<CustomerSettingsUpdateOneWithoutCustomerInput>,
 };
 
 export type CustomerUpdateManyMutationInput = {
@@ -576,14 +739,14 @@ export type CustomerUpdateOneRequiredInput = {
   connect?: Maybe<CustomerWhereUniqueInput>,
 };
 
-export type CustomerUpdateOneRequiredWithoutQuestionnairesInput = {
-  create?: Maybe<CustomerCreateWithoutQuestionnairesInput>,
-  update?: Maybe<CustomerUpdateWithoutQuestionnairesDataInput>,
-  upsert?: Maybe<CustomerUpsertWithoutQuestionnairesInput>,
+export type CustomerUpdateOneRequiredWithoutSettingsInput = {
+  create?: Maybe<CustomerCreateWithoutSettingsInput>,
+  update?: Maybe<CustomerUpdateWithoutSettingsDataInput>,
+  upsert?: Maybe<CustomerUpsertWithoutSettingsInput>,
   connect?: Maybe<CustomerWhereUniqueInput>,
 };
 
-export type CustomerUpdateWithoutQuestionnairesDataInput = {
+export type CustomerUpdateWithoutSettingsDataInput = {
   name?: Maybe<Scalars['String']>,
 };
 
@@ -592,9 +755,9 @@ export type CustomerUpsertNestedInput = {
   create: CustomerCreateInput,
 };
 
-export type CustomerUpsertWithoutQuestionnairesInput = {
-  update: CustomerUpdateWithoutQuestionnairesDataInput,
-  create: CustomerCreateWithoutQuestionnairesInput,
+export type CustomerUpsertWithoutSettingsInput = {
+  update: CustomerUpdateWithoutSettingsDataInput,
+  create: CustomerCreateWithoutSettingsInput,
 };
 
 export type CustomerWhereInput = {
@@ -626,9 +789,7 @@ export type CustomerWhereInput = {
   name_not_starts_with?: Maybe<Scalars['String']>,
   name_ends_with?: Maybe<Scalars['String']>,
   name_not_ends_with?: Maybe<Scalars['String']>,
-  questionnaires_every?: Maybe<QuestionnaireWhereInput>,
-  questionnaires_some?: Maybe<QuestionnaireWhereInput>,
-  questionnaires_none?: Maybe<QuestionnaireWhereInput>,
+  settings?: Maybe<CustomerSettingsWhereInput>,
   AND?: Maybe<Array<CustomerWhereInput>>,
   OR?: Maybe<Array<CustomerWhereInput>>,
   NOT?: Maybe<Array<CustomerWhereInput>>,
@@ -832,7 +993,7 @@ export type LeafNode = {
    __typename?: 'LeafNode',
   id: Scalars['ID'],
   nodeId?: Maybe<Scalars['Int']>,
-  type: Scalars['String'],
+  type?: Maybe<NodeType>,
   title: Scalars['String'],
 };
 
@@ -846,13 +1007,8 @@ export type LeafNodeConnection = {
 export type LeafNodeCreateInput = {
   id?: Maybe<Scalars['ID']>,
   nodeId?: Maybe<Scalars['Int']>,
-  type: Scalars['String'],
+  type?: Maybe<NodeTypeCreateOneInput>,
   title: Scalars['String'],
-};
-
-export type LeafNodeCreateOneInput = {
-  create?: Maybe<LeafNodeCreateInput>,
-  connect?: Maybe<LeafNodeWhereUniqueInput>,
 };
 
 export type LeafNodeEdge = {
@@ -866,8 +1022,6 @@ export enum LeafNodeOrderByInput {
   IdDesc = 'id_DESC',
   NodeIdAsc = 'nodeId_ASC',
   NodeIdDesc = 'nodeId_DESC',
-  TypeAsc = 'type_ASC',
-  TypeDesc = 'type_DESC',
   TitleAsc = 'title_ASC',
   TitleDesc = 'title_DESC'
 }
@@ -876,7 +1030,6 @@ export type LeafNodePreviousValues = {
    __typename?: 'LeafNodePreviousValues',
   id: Scalars['ID'],
   nodeId?: Maybe<Scalars['Int']>,
-  type: Scalars['String'],
   title: Scalars['String'],
 };
 
@@ -899,36 +1052,15 @@ export type LeafNodeSubscriptionWhereInput = {
   NOT?: Maybe<Array<LeafNodeSubscriptionWhereInput>>,
 };
 
-export type LeafNodeUpdateDataInput = {
-  nodeId?: Maybe<Scalars['Int']>,
-  type?: Maybe<Scalars['String']>,
-  title?: Maybe<Scalars['String']>,
-};
-
 export type LeafNodeUpdateInput = {
   nodeId?: Maybe<Scalars['Int']>,
-  type?: Maybe<Scalars['String']>,
+  type?: Maybe<NodeTypeUpdateOneInput>,
   title?: Maybe<Scalars['String']>,
 };
 
 export type LeafNodeUpdateManyMutationInput = {
   nodeId?: Maybe<Scalars['Int']>,
-  type?: Maybe<Scalars['String']>,
   title?: Maybe<Scalars['String']>,
-};
-
-export type LeafNodeUpdateOneInput = {
-  create?: Maybe<LeafNodeCreateInput>,
-  update?: Maybe<LeafNodeUpdateDataInput>,
-  upsert?: Maybe<LeafNodeUpsertNestedInput>,
-  delete?: Maybe<Scalars['Boolean']>,
-  disconnect?: Maybe<Scalars['Boolean']>,
-  connect?: Maybe<LeafNodeWhereUniqueInput>,
-};
-
-export type LeafNodeUpsertNestedInput = {
-  update: LeafNodeUpdateDataInput,
-  create: LeafNodeCreateInput,
 };
 
 export type LeafNodeWhereInput = {
@@ -954,20 +1086,7 @@ export type LeafNodeWhereInput = {
   nodeId_lte?: Maybe<Scalars['Int']>,
   nodeId_gt?: Maybe<Scalars['Int']>,
   nodeId_gte?: Maybe<Scalars['Int']>,
-  type?: Maybe<Scalars['String']>,
-  type_not?: Maybe<Scalars['String']>,
-  type_in?: Maybe<Array<Scalars['String']>>,
-  type_not_in?: Maybe<Array<Scalars['String']>>,
-  type_lt?: Maybe<Scalars['String']>,
-  type_lte?: Maybe<Scalars['String']>,
-  type_gt?: Maybe<Scalars['String']>,
-  type_gte?: Maybe<Scalars['String']>,
-  type_contains?: Maybe<Scalars['String']>,
-  type_not_contains?: Maybe<Scalars['String']>,
-  type_starts_with?: Maybe<Scalars['String']>,
-  type_not_starts_with?: Maybe<Scalars['String']>,
-  type_ends_with?: Maybe<Scalars['String']>,
-  type_not_ends_with?: Maybe<Scalars['String']>,
+  type?: Maybe<NodeTypeWhereInput>,
   title?: Maybe<Scalars['String']>,
   title_not?: Maybe<Scalars['String']>,
   title_in?: Maybe<Array<Scalars['String']>>,
@@ -989,6 +1108,7 @@ export type LeafNodeWhereInput = {
 
 export type LeafNodeWhereUniqueInput = {
   id?: Maybe<Scalars['ID']>,
+  nodeId?: Maybe<Scalars['Int']>,
 };
 
 
@@ -1006,6 +1126,12 @@ export type Mutation = {
   upsertCustomer: Customer,
   deleteCustomer?: Maybe<Customer>,
   deleteManyCustomers: BatchPayload,
+  createCustomerSettings: CustomerSettings,
+  updateCustomerSettings?: Maybe<CustomerSettings>,
+  updateManyCustomerSettingses: BatchPayload,
+  upsertCustomerSettings: CustomerSettings,
+  deleteCustomerSettings?: Maybe<CustomerSettings>,
+  deleteManyCustomerSettingses: BatchPayload,
   createFontSettings: FontSettings,
   updateFontSettings?: Maybe<FontSettings>,
   updateManyFontSettingses: BatchPayload,
@@ -1018,18 +1144,24 @@ export type Mutation = {
   upsertLeafNode: LeafNode,
   deleteLeafNode?: Maybe<LeafNode>,
   deleteManyLeafNodes: BatchPayload,
-  createQQuestion: QQuestion,
-  updateQQuestion?: Maybe<QQuestion>,
-  updateManyQQuestions: BatchPayload,
-  upsertQQuestion: QQuestion,
-  deleteQQuestion?: Maybe<QQuestion>,
-  deleteManyQQuestions: BatchPayload,
+  createNodeType: NodeType,
+  updateNodeType?: Maybe<NodeType>,
+  updateManyNodeTypes: BatchPayload,
+  upsertNodeType: NodeType,
+  deleteNodeType?: Maybe<NodeType>,
+  deleteManyNodeTypes: BatchPayload,
   createQuestionCondition: QuestionCondition,
   updateQuestionCondition?: Maybe<QuestionCondition>,
   updateManyQuestionConditions: BatchPayload,
   upsertQuestionCondition: QuestionCondition,
   deleteQuestionCondition?: Maybe<QuestionCondition>,
   deleteManyQuestionConditions: BatchPayload,
+  createQuestionNode: QuestionNode,
+  updateQuestionNode?: Maybe<QuestionNode>,
+  updateManyQuestionNodes: BatchPayload,
+  upsertQuestionNode: QuestionNode,
+  deleteQuestionNode?: Maybe<QuestionNode>,
+  deleteManyQuestionNodes: BatchPayload,
   createQuestionOption: QuestionOption,
   updateQuestionOption?: Maybe<QuestionOption>,
   updateManyQuestionOptions: BatchPayload,
@@ -1042,12 +1174,6 @@ export type Mutation = {
   upsertQuestionnaire: Questionnaire,
   deleteQuestionnaire?: Maybe<Questionnaire>,
   deleteManyQuestionnaires: BatchPayload,
-  createQuestionnaireSettings: QuestionnaireSettings,
-  updateQuestionnaireSettings?: Maybe<QuestionnaireSettings>,
-  updateManyQuestionnaireSettingses: BatchPayload,
-  upsertQuestionnaireSettings: QuestionnaireSettings,
-  deleteQuestionnaireSettings?: Maybe<QuestionnaireSettings>,
-  deleteManyQuestionnaireSettingses: BatchPayload,
 };
 
 
@@ -1119,6 +1245,40 @@ export type MutationDeleteManyCustomersArgs = {
 };
 
 
+export type MutationCreateCustomerSettingsArgs = {
+  data: CustomerSettingsCreateInput
+};
+
+
+export type MutationUpdateCustomerSettingsArgs = {
+  data: CustomerSettingsUpdateInput,
+  where: CustomerSettingsWhereUniqueInput
+};
+
+
+export type MutationUpdateManyCustomerSettingsesArgs = {
+  data: CustomerSettingsUpdateManyMutationInput,
+  where?: Maybe<CustomerSettingsWhereInput>
+};
+
+
+export type MutationUpsertCustomerSettingsArgs = {
+  where: CustomerSettingsWhereUniqueInput,
+  create: CustomerSettingsCreateInput,
+  update: CustomerSettingsUpdateInput
+};
+
+
+export type MutationDeleteCustomerSettingsArgs = {
+  where: CustomerSettingsWhereUniqueInput
+};
+
+
+export type MutationDeleteManyCustomerSettingsesArgs = {
+  where?: Maybe<CustomerSettingsWhereInput>
+};
+
+
 export type MutationCreateFontSettingsArgs = {
   data: FontSettingsCreateInput
 };
@@ -1187,37 +1347,37 @@ export type MutationDeleteManyLeafNodesArgs = {
 };
 
 
-export type MutationCreateQQuestionArgs = {
-  data: QQuestionCreateInput
+export type MutationCreateNodeTypeArgs = {
+  data: NodeTypeCreateInput
 };
 
 
-export type MutationUpdateQQuestionArgs = {
-  data: QQuestionUpdateInput,
-  where: QQuestionWhereUniqueInput
+export type MutationUpdateNodeTypeArgs = {
+  data: NodeTypeUpdateInput,
+  where: NodeTypeWhereUniqueInput
 };
 
 
-export type MutationUpdateManyQQuestionsArgs = {
-  data: QQuestionUpdateManyMutationInput,
-  where?: Maybe<QQuestionWhereInput>
+export type MutationUpdateManyNodeTypesArgs = {
+  data: NodeTypeUpdateManyMutationInput,
+  where?: Maybe<NodeTypeWhereInput>
 };
 
 
-export type MutationUpsertQQuestionArgs = {
-  where: QQuestionWhereUniqueInput,
-  create: QQuestionCreateInput,
-  update: QQuestionUpdateInput
+export type MutationUpsertNodeTypeArgs = {
+  where: NodeTypeWhereUniqueInput,
+  create: NodeTypeCreateInput,
+  update: NodeTypeUpdateInput
 };
 
 
-export type MutationDeleteQQuestionArgs = {
-  where: QQuestionWhereUniqueInput
+export type MutationDeleteNodeTypeArgs = {
+  where: NodeTypeWhereUniqueInput
 };
 
 
-export type MutationDeleteManyQQuestionsArgs = {
-  where?: Maybe<QQuestionWhereInput>
+export type MutationDeleteManyNodeTypesArgs = {
+  where?: Maybe<NodeTypeWhereInput>
 };
 
 
@@ -1252,6 +1412,40 @@ export type MutationDeleteQuestionConditionArgs = {
 
 export type MutationDeleteManyQuestionConditionsArgs = {
   where?: Maybe<QuestionConditionWhereInput>
+};
+
+
+export type MutationCreateQuestionNodeArgs = {
+  data: QuestionNodeCreateInput
+};
+
+
+export type MutationUpdateQuestionNodeArgs = {
+  data: QuestionNodeUpdateInput,
+  where: QuestionNodeWhereUniqueInput
+};
+
+
+export type MutationUpdateManyQuestionNodesArgs = {
+  data: QuestionNodeUpdateManyMutationInput,
+  where?: Maybe<QuestionNodeWhereInput>
+};
+
+
+export type MutationUpsertQuestionNodeArgs = {
+  where: QuestionNodeWhereUniqueInput,
+  create: QuestionNodeCreateInput,
+  update: QuestionNodeUpdateInput
+};
+
+
+export type MutationDeleteQuestionNodeArgs = {
+  where: QuestionNodeWhereUniqueInput
+};
+
+
+export type MutationDeleteManyQuestionNodesArgs = {
+  where?: Maybe<QuestionNodeWhereInput>
 };
 
 
@@ -1322,40 +1516,6 @@ export type MutationDeleteManyQuestionnairesArgs = {
   where?: Maybe<QuestionnaireWhereInput>
 };
 
-
-export type MutationCreateQuestionnaireSettingsArgs = {
-  data: QuestionnaireSettingsCreateInput
-};
-
-
-export type MutationUpdateQuestionnaireSettingsArgs = {
-  data: QuestionnaireSettingsUpdateInput,
-  where: QuestionnaireSettingsWhereUniqueInput
-};
-
-
-export type MutationUpdateManyQuestionnaireSettingsesArgs = {
-  data: QuestionnaireSettingsUpdateManyMutationInput,
-  where?: Maybe<QuestionnaireSettingsWhereInput>
-};
-
-
-export type MutationUpsertQuestionnaireSettingsArgs = {
-  where: QuestionnaireSettingsWhereUniqueInput,
-  create: QuestionnaireSettingsCreateInput,
-  update: QuestionnaireSettingsUpdateInput
-};
-
-
-export type MutationDeleteQuestionnaireSettingsArgs = {
-  where: QuestionnaireSettingsWhereUniqueInput
-};
-
-
-export type MutationDeleteManyQuestionnaireSettingsesArgs = {
-  where?: Maybe<QuestionnaireSettingsWhereInput>
-};
-
 export enum MutationType {
   Created = 'CREATED',
   Updated = 'UPDATED',
@@ -1366,347 +1526,144 @@ export type Node = {
   id: Scalars['ID'],
 };
 
+export type NodeType = {
+   __typename?: 'NodeType',
+  id: Scalars['ID'],
+  type: Scalars['String'],
+};
+
+export type NodeTypeConnection = {
+   __typename?: 'NodeTypeConnection',
+  pageInfo: PageInfo,
+  edges: Array<Maybe<NodeTypeEdge>>,
+  aggregate: AggregateNodeType,
+};
+
+export type NodeTypeCreateInput = {
+  id?: Maybe<Scalars['ID']>,
+  type: Scalars['String'],
+};
+
+export type NodeTypeCreateOneInput = {
+  create?: Maybe<NodeTypeCreateInput>,
+  connect?: Maybe<NodeTypeWhereUniqueInput>,
+};
+
+export type NodeTypeEdge = {
+   __typename?: 'NodeTypeEdge',
+  node: NodeType,
+  cursor: Scalars['String'],
+};
+
+export enum NodeTypeOrderByInput {
+  IdAsc = 'id_ASC',
+  IdDesc = 'id_DESC',
+  TypeAsc = 'type_ASC',
+  TypeDesc = 'type_DESC'
+}
+
+export type NodeTypePreviousValues = {
+   __typename?: 'NodeTypePreviousValues',
+  id: Scalars['ID'],
+  type: Scalars['String'],
+};
+
+export type NodeTypeSubscriptionPayload = {
+   __typename?: 'NodeTypeSubscriptionPayload',
+  mutation: MutationType,
+  node?: Maybe<NodeType>,
+  updatedFields?: Maybe<Array<Scalars['String']>>,
+  previousValues?: Maybe<NodeTypePreviousValues>,
+};
+
+export type NodeTypeSubscriptionWhereInput = {
+  mutation_in?: Maybe<Array<MutationType>>,
+  updatedFields_contains?: Maybe<Scalars['String']>,
+  updatedFields_contains_every?: Maybe<Array<Scalars['String']>>,
+  updatedFields_contains_some?: Maybe<Array<Scalars['String']>>,
+  node?: Maybe<NodeTypeWhereInput>,
+  AND?: Maybe<Array<NodeTypeSubscriptionWhereInput>>,
+  OR?: Maybe<Array<NodeTypeSubscriptionWhereInput>>,
+  NOT?: Maybe<Array<NodeTypeSubscriptionWhereInput>>,
+};
+
+export type NodeTypeUpdateDataInput = {
+  type?: Maybe<Scalars['String']>,
+};
+
+export type NodeTypeUpdateInput = {
+  type?: Maybe<Scalars['String']>,
+};
+
+export type NodeTypeUpdateManyMutationInput = {
+  type?: Maybe<Scalars['String']>,
+};
+
+export type NodeTypeUpdateOneInput = {
+  create?: Maybe<NodeTypeCreateInput>,
+  update?: Maybe<NodeTypeUpdateDataInput>,
+  upsert?: Maybe<NodeTypeUpsertNestedInput>,
+  delete?: Maybe<Scalars['Boolean']>,
+  disconnect?: Maybe<Scalars['Boolean']>,
+  connect?: Maybe<NodeTypeWhereUniqueInput>,
+};
+
+export type NodeTypeUpdateOneRequiredInput = {
+  create?: Maybe<NodeTypeCreateInput>,
+  update?: Maybe<NodeTypeUpdateDataInput>,
+  upsert?: Maybe<NodeTypeUpsertNestedInput>,
+  connect?: Maybe<NodeTypeWhereUniqueInput>,
+};
+
+export type NodeTypeUpsertNestedInput = {
+  update: NodeTypeUpdateDataInput,
+  create: NodeTypeCreateInput,
+};
+
+export type NodeTypeWhereInput = {
+  id?: Maybe<Scalars['ID']>,
+  id_not?: Maybe<Scalars['ID']>,
+  id_in?: Maybe<Array<Scalars['ID']>>,
+  id_not_in?: Maybe<Array<Scalars['ID']>>,
+  id_lt?: Maybe<Scalars['ID']>,
+  id_lte?: Maybe<Scalars['ID']>,
+  id_gt?: Maybe<Scalars['ID']>,
+  id_gte?: Maybe<Scalars['ID']>,
+  id_contains?: Maybe<Scalars['ID']>,
+  id_not_contains?: Maybe<Scalars['ID']>,
+  id_starts_with?: Maybe<Scalars['ID']>,
+  id_not_starts_with?: Maybe<Scalars['ID']>,
+  id_ends_with?: Maybe<Scalars['ID']>,
+  id_not_ends_with?: Maybe<Scalars['ID']>,
+  type?: Maybe<Scalars['String']>,
+  type_not?: Maybe<Scalars['String']>,
+  type_in?: Maybe<Array<Scalars['String']>>,
+  type_not_in?: Maybe<Array<Scalars['String']>>,
+  type_lt?: Maybe<Scalars['String']>,
+  type_lte?: Maybe<Scalars['String']>,
+  type_gt?: Maybe<Scalars['String']>,
+  type_gte?: Maybe<Scalars['String']>,
+  type_contains?: Maybe<Scalars['String']>,
+  type_not_contains?: Maybe<Scalars['String']>,
+  type_starts_with?: Maybe<Scalars['String']>,
+  type_not_starts_with?: Maybe<Scalars['String']>,
+  type_ends_with?: Maybe<Scalars['String']>,
+  type_not_ends_with?: Maybe<Scalars['String']>,
+  AND?: Maybe<Array<NodeTypeWhereInput>>,
+  OR?: Maybe<Array<NodeTypeWhereInput>>,
+  NOT?: Maybe<Array<NodeTypeWhereInput>>,
+};
+
+export type NodeTypeWhereUniqueInput = {
+  id?: Maybe<Scalars['ID']>,
+};
+
 export type PageInfo = {
    __typename?: 'PageInfo',
   hasNextPage: Scalars['Boolean'],
   hasPreviousPage: Scalars['Boolean'],
   startCursor?: Maybe<Scalars['String']>,
   endCursor?: Maybe<Scalars['String']>,
-};
-
-export type QQuestion = {
-   __typename?: 'QQuestion',
-  id: Scalars['ID'],
-  title: Scalars['String'],
-  branchVal?: Maybe<Scalars['String']>,
-  questionType: Scalars['String'],
-  overrideLeafId?: Maybe<Scalars['Int']>,
-  leafNode?: Maybe<LeafNode>,
-  conditions?: Maybe<Array<QuestionCondition>>,
-  options?: Maybe<Array<QuestionOption>>,
-  children?: Maybe<Array<QQuestion>>,
-};
-
-
-export type QQuestionConditionsArgs = {
-  where?: Maybe<QuestionConditionWhereInput>,
-  orderBy?: Maybe<QuestionConditionOrderByInput>,
-  skip?: Maybe<Scalars['Int']>,
-  after?: Maybe<Scalars['String']>,
-  before?: Maybe<Scalars['String']>,
-  first?: Maybe<Scalars['Int']>,
-  last?: Maybe<Scalars['Int']>
-};
-
-
-export type QQuestionOptionsArgs = {
-  where?: Maybe<QuestionOptionWhereInput>,
-  orderBy?: Maybe<QuestionOptionOrderByInput>,
-  skip?: Maybe<Scalars['Int']>,
-  after?: Maybe<Scalars['String']>,
-  before?: Maybe<Scalars['String']>,
-  first?: Maybe<Scalars['Int']>,
-  last?: Maybe<Scalars['Int']>
-};
-
-
-export type QQuestionChildrenArgs = {
-  where?: Maybe<QQuestionWhereInput>,
-  orderBy?: Maybe<QQuestionOrderByInput>,
-  skip?: Maybe<Scalars['Int']>,
-  after?: Maybe<Scalars['String']>,
-  before?: Maybe<Scalars['String']>,
-  first?: Maybe<Scalars['Int']>,
-  last?: Maybe<Scalars['Int']>
-};
-
-export type QQuestionConnection = {
-   __typename?: 'QQuestionConnection',
-  pageInfo: PageInfo,
-  edges: Array<Maybe<QQuestionEdge>>,
-  aggregate: AggregateQQuestion,
-};
-
-export type QQuestionCreateInput = {
-  id?: Maybe<Scalars['ID']>,
-  title: Scalars['String'],
-  branchVal?: Maybe<Scalars['String']>,
-  questionType: Scalars['String'],
-  overrideLeafId?: Maybe<Scalars['Int']>,
-  leafNode?: Maybe<LeafNodeCreateOneInput>,
-  conditions?: Maybe<QuestionConditionCreateManyInput>,
-  options?: Maybe<QuestionOptionCreateManyInput>,
-  children?: Maybe<QQuestionCreateManyInput>,
-};
-
-export type QQuestionCreateManyInput = {
-  create?: Maybe<Array<QQuestionCreateInput>>,
-  connect?: Maybe<Array<QQuestionWhereUniqueInput>>,
-};
-
-export type QQuestionEdge = {
-   __typename?: 'QQuestionEdge',
-  node: QQuestion,
-  cursor: Scalars['String'],
-};
-
-export enum QQuestionOrderByInput {
-  IdAsc = 'id_ASC',
-  IdDesc = 'id_DESC',
-  TitleAsc = 'title_ASC',
-  TitleDesc = 'title_DESC',
-  BranchValAsc = 'branchVal_ASC',
-  BranchValDesc = 'branchVal_DESC',
-  QuestionTypeAsc = 'questionType_ASC',
-  QuestionTypeDesc = 'questionType_DESC',
-  OverrideLeafIdAsc = 'overrideLeafId_ASC',
-  OverrideLeafIdDesc = 'overrideLeafId_DESC'
-}
-
-export type QQuestionPreviousValues = {
-   __typename?: 'QQuestionPreviousValues',
-  id: Scalars['ID'],
-  title: Scalars['String'],
-  branchVal?: Maybe<Scalars['String']>,
-  questionType: Scalars['String'],
-  overrideLeafId?: Maybe<Scalars['Int']>,
-};
-
-export type QQuestionScalarWhereInput = {
-  id?: Maybe<Scalars['ID']>,
-  id_not?: Maybe<Scalars['ID']>,
-  id_in?: Maybe<Array<Scalars['ID']>>,
-  id_not_in?: Maybe<Array<Scalars['ID']>>,
-  id_lt?: Maybe<Scalars['ID']>,
-  id_lte?: Maybe<Scalars['ID']>,
-  id_gt?: Maybe<Scalars['ID']>,
-  id_gte?: Maybe<Scalars['ID']>,
-  id_contains?: Maybe<Scalars['ID']>,
-  id_not_contains?: Maybe<Scalars['ID']>,
-  id_starts_with?: Maybe<Scalars['ID']>,
-  id_not_starts_with?: Maybe<Scalars['ID']>,
-  id_ends_with?: Maybe<Scalars['ID']>,
-  id_not_ends_with?: Maybe<Scalars['ID']>,
-  title?: Maybe<Scalars['String']>,
-  title_not?: Maybe<Scalars['String']>,
-  title_in?: Maybe<Array<Scalars['String']>>,
-  title_not_in?: Maybe<Array<Scalars['String']>>,
-  title_lt?: Maybe<Scalars['String']>,
-  title_lte?: Maybe<Scalars['String']>,
-  title_gt?: Maybe<Scalars['String']>,
-  title_gte?: Maybe<Scalars['String']>,
-  title_contains?: Maybe<Scalars['String']>,
-  title_not_contains?: Maybe<Scalars['String']>,
-  title_starts_with?: Maybe<Scalars['String']>,
-  title_not_starts_with?: Maybe<Scalars['String']>,
-  title_ends_with?: Maybe<Scalars['String']>,
-  title_not_ends_with?: Maybe<Scalars['String']>,
-  branchVal?: Maybe<Scalars['String']>,
-  branchVal_not?: Maybe<Scalars['String']>,
-  branchVal_in?: Maybe<Array<Scalars['String']>>,
-  branchVal_not_in?: Maybe<Array<Scalars['String']>>,
-  branchVal_lt?: Maybe<Scalars['String']>,
-  branchVal_lte?: Maybe<Scalars['String']>,
-  branchVal_gt?: Maybe<Scalars['String']>,
-  branchVal_gte?: Maybe<Scalars['String']>,
-  branchVal_contains?: Maybe<Scalars['String']>,
-  branchVal_not_contains?: Maybe<Scalars['String']>,
-  branchVal_starts_with?: Maybe<Scalars['String']>,
-  branchVal_not_starts_with?: Maybe<Scalars['String']>,
-  branchVal_ends_with?: Maybe<Scalars['String']>,
-  branchVal_not_ends_with?: Maybe<Scalars['String']>,
-  questionType?: Maybe<Scalars['String']>,
-  questionType_not?: Maybe<Scalars['String']>,
-  questionType_in?: Maybe<Array<Scalars['String']>>,
-  questionType_not_in?: Maybe<Array<Scalars['String']>>,
-  questionType_lt?: Maybe<Scalars['String']>,
-  questionType_lte?: Maybe<Scalars['String']>,
-  questionType_gt?: Maybe<Scalars['String']>,
-  questionType_gte?: Maybe<Scalars['String']>,
-  questionType_contains?: Maybe<Scalars['String']>,
-  questionType_not_contains?: Maybe<Scalars['String']>,
-  questionType_starts_with?: Maybe<Scalars['String']>,
-  questionType_not_starts_with?: Maybe<Scalars['String']>,
-  questionType_ends_with?: Maybe<Scalars['String']>,
-  questionType_not_ends_with?: Maybe<Scalars['String']>,
-  overrideLeafId?: Maybe<Scalars['Int']>,
-  overrideLeafId_not?: Maybe<Scalars['Int']>,
-  overrideLeafId_in?: Maybe<Array<Scalars['Int']>>,
-  overrideLeafId_not_in?: Maybe<Array<Scalars['Int']>>,
-  overrideLeafId_lt?: Maybe<Scalars['Int']>,
-  overrideLeafId_lte?: Maybe<Scalars['Int']>,
-  overrideLeafId_gt?: Maybe<Scalars['Int']>,
-  overrideLeafId_gte?: Maybe<Scalars['Int']>,
-  AND?: Maybe<Array<QQuestionScalarWhereInput>>,
-  OR?: Maybe<Array<QQuestionScalarWhereInput>>,
-  NOT?: Maybe<Array<QQuestionScalarWhereInput>>,
-};
-
-export type QQuestionSubscriptionPayload = {
-   __typename?: 'QQuestionSubscriptionPayload',
-  mutation: MutationType,
-  node?: Maybe<QQuestion>,
-  updatedFields?: Maybe<Array<Scalars['String']>>,
-  previousValues?: Maybe<QQuestionPreviousValues>,
-};
-
-export type QQuestionSubscriptionWhereInput = {
-  mutation_in?: Maybe<Array<MutationType>>,
-  updatedFields_contains?: Maybe<Scalars['String']>,
-  updatedFields_contains_every?: Maybe<Array<Scalars['String']>>,
-  updatedFields_contains_some?: Maybe<Array<Scalars['String']>>,
-  node?: Maybe<QQuestionWhereInput>,
-  AND?: Maybe<Array<QQuestionSubscriptionWhereInput>>,
-  OR?: Maybe<Array<QQuestionSubscriptionWhereInput>>,
-  NOT?: Maybe<Array<QQuestionSubscriptionWhereInput>>,
-};
-
-export type QQuestionUpdateDataInput = {
-  title?: Maybe<Scalars['String']>,
-  branchVal?: Maybe<Scalars['String']>,
-  questionType?: Maybe<Scalars['String']>,
-  overrideLeafId?: Maybe<Scalars['Int']>,
-  leafNode?: Maybe<LeafNodeUpdateOneInput>,
-  conditions?: Maybe<QuestionConditionUpdateManyInput>,
-  options?: Maybe<QuestionOptionUpdateManyInput>,
-  children?: Maybe<QQuestionUpdateManyInput>,
-};
-
-export type QQuestionUpdateInput = {
-  title?: Maybe<Scalars['String']>,
-  branchVal?: Maybe<Scalars['String']>,
-  questionType?: Maybe<Scalars['String']>,
-  overrideLeafId?: Maybe<Scalars['Int']>,
-  leafNode?: Maybe<LeafNodeUpdateOneInput>,
-  conditions?: Maybe<QuestionConditionUpdateManyInput>,
-  options?: Maybe<QuestionOptionUpdateManyInput>,
-  children?: Maybe<QQuestionUpdateManyInput>,
-};
-
-export type QQuestionUpdateManyDataInput = {
-  title?: Maybe<Scalars['String']>,
-  branchVal?: Maybe<Scalars['String']>,
-  questionType?: Maybe<Scalars['String']>,
-  overrideLeafId?: Maybe<Scalars['Int']>,
-};
-
-export type QQuestionUpdateManyInput = {
-  create?: Maybe<Array<QQuestionCreateInput>>,
-  update?: Maybe<Array<QQuestionUpdateWithWhereUniqueNestedInput>>,
-  upsert?: Maybe<Array<QQuestionUpsertWithWhereUniqueNestedInput>>,
-  delete?: Maybe<Array<QQuestionWhereUniqueInput>>,
-  connect?: Maybe<Array<QQuestionWhereUniqueInput>>,
-  set?: Maybe<Array<QQuestionWhereUniqueInput>>,
-  disconnect?: Maybe<Array<QQuestionWhereUniqueInput>>,
-  deleteMany?: Maybe<Array<QQuestionScalarWhereInput>>,
-  updateMany?: Maybe<Array<QQuestionUpdateManyWithWhereNestedInput>>,
-};
-
-export type QQuestionUpdateManyMutationInput = {
-  title?: Maybe<Scalars['String']>,
-  branchVal?: Maybe<Scalars['String']>,
-  questionType?: Maybe<Scalars['String']>,
-  overrideLeafId?: Maybe<Scalars['Int']>,
-};
-
-export type QQuestionUpdateManyWithWhereNestedInput = {
-  where: QQuestionScalarWhereInput,
-  data: QQuestionUpdateManyDataInput,
-};
-
-export type QQuestionUpdateWithWhereUniqueNestedInput = {
-  where: QQuestionWhereUniqueInput,
-  data: QQuestionUpdateDataInput,
-};
-
-export type QQuestionUpsertWithWhereUniqueNestedInput = {
-  where: QQuestionWhereUniqueInput,
-  update: QQuestionUpdateDataInput,
-  create: QQuestionCreateInput,
-};
-
-export type QQuestionWhereInput = {
-  id?: Maybe<Scalars['ID']>,
-  id_not?: Maybe<Scalars['ID']>,
-  id_in?: Maybe<Array<Scalars['ID']>>,
-  id_not_in?: Maybe<Array<Scalars['ID']>>,
-  id_lt?: Maybe<Scalars['ID']>,
-  id_lte?: Maybe<Scalars['ID']>,
-  id_gt?: Maybe<Scalars['ID']>,
-  id_gte?: Maybe<Scalars['ID']>,
-  id_contains?: Maybe<Scalars['ID']>,
-  id_not_contains?: Maybe<Scalars['ID']>,
-  id_starts_with?: Maybe<Scalars['ID']>,
-  id_not_starts_with?: Maybe<Scalars['ID']>,
-  id_ends_with?: Maybe<Scalars['ID']>,
-  id_not_ends_with?: Maybe<Scalars['ID']>,
-  title?: Maybe<Scalars['String']>,
-  title_not?: Maybe<Scalars['String']>,
-  title_in?: Maybe<Array<Scalars['String']>>,
-  title_not_in?: Maybe<Array<Scalars['String']>>,
-  title_lt?: Maybe<Scalars['String']>,
-  title_lte?: Maybe<Scalars['String']>,
-  title_gt?: Maybe<Scalars['String']>,
-  title_gte?: Maybe<Scalars['String']>,
-  title_contains?: Maybe<Scalars['String']>,
-  title_not_contains?: Maybe<Scalars['String']>,
-  title_starts_with?: Maybe<Scalars['String']>,
-  title_not_starts_with?: Maybe<Scalars['String']>,
-  title_ends_with?: Maybe<Scalars['String']>,
-  title_not_ends_with?: Maybe<Scalars['String']>,
-  branchVal?: Maybe<Scalars['String']>,
-  branchVal_not?: Maybe<Scalars['String']>,
-  branchVal_in?: Maybe<Array<Scalars['String']>>,
-  branchVal_not_in?: Maybe<Array<Scalars['String']>>,
-  branchVal_lt?: Maybe<Scalars['String']>,
-  branchVal_lte?: Maybe<Scalars['String']>,
-  branchVal_gt?: Maybe<Scalars['String']>,
-  branchVal_gte?: Maybe<Scalars['String']>,
-  branchVal_contains?: Maybe<Scalars['String']>,
-  branchVal_not_contains?: Maybe<Scalars['String']>,
-  branchVal_starts_with?: Maybe<Scalars['String']>,
-  branchVal_not_starts_with?: Maybe<Scalars['String']>,
-  branchVal_ends_with?: Maybe<Scalars['String']>,
-  branchVal_not_ends_with?: Maybe<Scalars['String']>,
-  questionType?: Maybe<Scalars['String']>,
-  questionType_not?: Maybe<Scalars['String']>,
-  questionType_in?: Maybe<Array<Scalars['String']>>,
-  questionType_not_in?: Maybe<Array<Scalars['String']>>,
-  questionType_lt?: Maybe<Scalars['String']>,
-  questionType_lte?: Maybe<Scalars['String']>,
-  questionType_gt?: Maybe<Scalars['String']>,
-  questionType_gte?: Maybe<Scalars['String']>,
-  questionType_contains?: Maybe<Scalars['String']>,
-  questionType_not_contains?: Maybe<Scalars['String']>,
-  questionType_starts_with?: Maybe<Scalars['String']>,
-  questionType_not_starts_with?: Maybe<Scalars['String']>,
-  questionType_ends_with?: Maybe<Scalars['String']>,
-  questionType_not_ends_with?: Maybe<Scalars['String']>,
-  overrideLeafId?: Maybe<Scalars['Int']>,
-  overrideLeafId_not?: Maybe<Scalars['Int']>,
-  overrideLeafId_in?: Maybe<Array<Scalars['Int']>>,
-  overrideLeafId_not_in?: Maybe<Array<Scalars['Int']>>,
-  overrideLeafId_lt?: Maybe<Scalars['Int']>,
-  overrideLeafId_lte?: Maybe<Scalars['Int']>,
-  overrideLeafId_gt?: Maybe<Scalars['Int']>,
-  overrideLeafId_gte?: Maybe<Scalars['Int']>,
-  leafNode?: Maybe<LeafNodeWhereInput>,
-  conditions_every?: Maybe<QuestionConditionWhereInput>,
-  conditions_some?: Maybe<QuestionConditionWhereInput>,
-  conditions_none?: Maybe<QuestionConditionWhereInput>,
-  options_every?: Maybe<QuestionOptionWhereInput>,
-  options_some?: Maybe<QuestionOptionWhereInput>,
-  options_none?: Maybe<QuestionOptionWhereInput>,
-  children_every?: Maybe<QQuestionWhereInput>,
-  children_some?: Maybe<QQuestionWhereInput>,
-  children_none?: Maybe<QQuestionWhereInput>,
-  AND?: Maybe<Array<QQuestionWhereInput>>,
-  OR?: Maybe<Array<QQuestionWhereInput>>,
-  NOT?: Maybe<Array<QQuestionWhereInput>>,
-};
-
-export type QQuestionWhereUniqueInput = {
-  id?: Maybe<Scalars['ID']>,
 };
 
 export type Query = {
@@ -1717,27 +1674,30 @@ export type Query = {
   customer?: Maybe<Customer>,
   customers: Array<Maybe<Customer>>,
   customersConnection: CustomerConnection,
+  customerSettings?: Maybe<CustomerSettings>,
+  customerSettingses: Array<Maybe<CustomerSettings>>,
+  customerSettingsesConnection: CustomerSettingsConnection,
   fontSettings?: Maybe<FontSettings>,
   fontSettingses: Array<Maybe<FontSettings>>,
   fontSettingsesConnection: FontSettingsConnection,
   leafNode?: Maybe<LeafNode>,
   leafNodes: Array<Maybe<LeafNode>>,
   leafNodesConnection: LeafNodeConnection,
-  qQuestion?: Maybe<QQuestion>,
-  qQuestions: Array<Maybe<QQuestion>>,
-  qQuestionsConnection: QQuestionConnection,
+  nodeType?: Maybe<NodeType>,
+  nodeTypes: Array<Maybe<NodeType>>,
+  nodeTypesConnection: NodeTypeConnection,
   questionCondition?: Maybe<QuestionCondition>,
   questionConditions: Array<Maybe<QuestionCondition>>,
   questionConditionsConnection: QuestionConditionConnection,
+  questionNode?: Maybe<QuestionNode>,
+  questionNodes: Array<Maybe<QuestionNode>>,
+  questionNodesConnection: QuestionNodeConnection,
   questionOption?: Maybe<QuestionOption>,
   questionOptions: Array<Maybe<QuestionOption>>,
   questionOptionsConnection: QuestionOptionConnection,
   questionnaire?: Maybe<Questionnaire>,
   questionnaires: Array<Maybe<Questionnaire>>,
   questionnairesConnection: QuestionnaireConnection,
-  questionnaireSettings?: Maybe<QuestionnaireSettings>,
-  questionnaireSettingses: Array<Maybe<QuestionnaireSettings>>,
-  questionnaireSettingsesConnection: QuestionnaireSettingsConnection,
   node?: Maybe<Node>,
 };
 
@@ -1788,6 +1748,33 @@ export type QueryCustomersArgs = {
 export type QueryCustomersConnectionArgs = {
   where?: Maybe<CustomerWhereInput>,
   orderBy?: Maybe<CustomerOrderByInput>,
+  skip?: Maybe<Scalars['Int']>,
+  after?: Maybe<Scalars['String']>,
+  before?: Maybe<Scalars['String']>,
+  first?: Maybe<Scalars['Int']>,
+  last?: Maybe<Scalars['Int']>
+};
+
+
+export type QueryCustomerSettingsArgs = {
+  where: CustomerSettingsWhereUniqueInput
+};
+
+
+export type QueryCustomerSettingsesArgs = {
+  where?: Maybe<CustomerSettingsWhereInput>,
+  orderBy?: Maybe<CustomerSettingsOrderByInput>,
+  skip?: Maybe<Scalars['Int']>,
+  after?: Maybe<Scalars['String']>,
+  before?: Maybe<Scalars['String']>,
+  first?: Maybe<Scalars['Int']>,
+  last?: Maybe<Scalars['Int']>
+};
+
+
+export type QueryCustomerSettingsesConnectionArgs = {
+  where?: Maybe<CustomerSettingsWhereInput>,
+  orderBy?: Maybe<CustomerSettingsOrderByInput>,
   skip?: Maybe<Scalars['Int']>,
   after?: Maybe<Scalars['String']>,
   before?: Maybe<Scalars['String']>,
@@ -1850,14 +1837,14 @@ export type QueryLeafNodesConnectionArgs = {
 };
 
 
-export type QueryQQuestionArgs = {
-  where: QQuestionWhereUniqueInput
+export type QueryNodeTypeArgs = {
+  where: NodeTypeWhereUniqueInput
 };
 
 
-export type QueryQQuestionsArgs = {
-  where?: Maybe<QQuestionWhereInput>,
-  orderBy?: Maybe<QQuestionOrderByInput>,
+export type QueryNodeTypesArgs = {
+  where?: Maybe<NodeTypeWhereInput>,
+  orderBy?: Maybe<NodeTypeOrderByInput>,
   skip?: Maybe<Scalars['Int']>,
   after?: Maybe<Scalars['String']>,
   before?: Maybe<Scalars['String']>,
@@ -1866,9 +1853,9 @@ export type QueryQQuestionsArgs = {
 };
 
 
-export type QueryQQuestionsConnectionArgs = {
-  where?: Maybe<QQuestionWhereInput>,
-  orderBy?: Maybe<QQuestionOrderByInput>,
+export type QueryNodeTypesConnectionArgs = {
+  where?: Maybe<NodeTypeWhereInput>,
+  orderBy?: Maybe<NodeTypeOrderByInput>,
   skip?: Maybe<Scalars['Int']>,
   after?: Maybe<Scalars['String']>,
   before?: Maybe<Scalars['String']>,
@@ -1896,6 +1883,33 @@ export type QueryQuestionConditionsArgs = {
 export type QueryQuestionConditionsConnectionArgs = {
   where?: Maybe<QuestionConditionWhereInput>,
   orderBy?: Maybe<QuestionConditionOrderByInput>,
+  skip?: Maybe<Scalars['Int']>,
+  after?: Maybe<Scalars['String']>,
+  before?: Maybe<Scalars['String']>,
+  first?: Maybe<Scalars['Int']>,
+  last?: Maybe<Scalars['Int']>
+};
+
+
+export type QueryQuestionNodeArgs = {
+  where: QuestionNodeWhereUniqueInput
+};
+
+
+export type QueryQuestionNodesArgs = {
+  where?: Maybe<QuestionNodeWhereInput>,
+  orderBy?: Maybe<QuestionNodeOrderByInput>,
+  skip?: Maybe<Scalars['Int']>,
+  after?: Maybe<Scalars['String']>,
+  before?: Maybe<Scalars['String']>,
+  first?: Maybe<Scalars['Int']>,
+  last?: Maybe<Scalars['Int']>
+};
+
+
+export type QueryQuestionNodesConnectionArgs = {
+  where?: Maybe<QuestionNodeWhereInput>,
+  orderBy?: Maybe<QuestionNodeOrderByInput>,
   skip?: Maybe<Scalars['Int']>,
   after?: Maybe<Scalars['String']>,
   before?: Maybe<Scalars['String']>,
@@ -1950,33 +1964,6 @@ export type QueryQuestionnairesArgs = {
 export type QueryQuestionnairesConnectionArgs = {
   where?: Maybe<QuestionnaireWhereInput>,
   orderBy?: Maybe<QuestionnaireOrderByInput>,
-  skip?: Maybe<Scalars['Int']>,
-  after?: Maybe<Scalars['String']>,
-  before?: Maybe<Scalars['String']>,
-  first?: Maybe<Scalars['Int']>,
-  last?: Maybe<Scalars['Int']>
-};
-
-
-export type QueryQuestionnaireSettingsArgs = {
-  where: QuestionnaireSettingsWhereUniqueInput
-};
-
-
-export type QueryQuestionnaireSettingsesArgs = {
-  where?: Maybe<QuestionnaireSettingsWhereInput>,
-  orderBy?: Maybe<QuestionnaireSettingsOrderByInput>,
-  skip?: Maybe<Scalars['Int']>,
-  after?: Maybe<Scalars['String']>,
-  before?: Maybe<Scalars['String']>,
-  first?: Maybe<Scalars['Int']>,
-  last?: Maybe<Scalars['Int']>
-};
-
-
-export type QueryQuestionnaireSettingsesConnectionArgs = {
-  where?: Maybe<QuestionnaireSettingsWhereInput>,
-  orderBy?: Maybe<QuestionnaireSettingsOrderByInput>,
   skip?: Maybe<Scalars['Int']>,
   after?: Maybe<Scalars['String']>,
   before?: Maybe<Scalars['String']>,
@@ -2260,16 +2247,15 @@ export type Questionnaire = {
   title: Scalars['String'],
   description: Scalars['String'],
   publicTitle?: Maybe<Scalars['String']>,
-  setting: QuestionnaireSettings,
   creationDate: Scalars['DateTime'],
   updatedAt?: Maybe<Scalars['DateTime']>,
-  questions?: Maybe<Array<QQuestion>>,
+  questions?: Maybe<Array<QuestionNode>>,
 };
 
 
 export type QuestionnaireQuestionsArgs = {
-  where?: Maybe<QQuestionWhereInput>,
-  orderBy?: Maybe<QQuestionOrderByInput>,
+  where?: Maybe<QuestionNodeWhereInput>,
+  orderBy?: Maybe<QuestionNodeOrderByInput>,
   skip?: Maybe<Scalars['Int']>,
   after?: Maybe<Scalars['String']>,
   before?: Maybe<Scalars['String']>,
@@ -2286,40 +2272,11 @@ export type QuestionnaireConnection = {
 
 export type QuestionnaireCreateInput = {
   id?: Maybe<Scalars['ID']>,
-  customer: CustomerCreateOneWithoutQuestionnairesInput,
+  customer: CustomerCreateOneInput,
   title: Scalars['String'],
   description: Scalars['String'],
   publicTitle?: Maybe<Scalars['String']>,
-  setting: QuestionnaireSettingsCreateOneWithoutQuestionnaireInput,
-  questions?: Maybe<QQuestionCreateManyInput>,
-};
-
-export type QuestionnaireCreateManyWithoutCustomerInput = {
-  create?: Maybe<Array<QuestionnaireCreateWithoutCustomerInput>>,
-  connect?: Maybe<Array<QuestionnaireWhereUniqueInput>>,
-};
-
-export type QuestionnaireCreateOneWithoutSettingInput = {
-  create?: Maybe<QuestionnaireCreateWithoutSettingInput>,
-  connect?: Maybe<QuestionnaireWhereUniqueInput>,
-};
-
-export type QuestionnaireCreateWithoutCustomerInput = {
-  id?: Maybe<Scalars['ID']>,
-  title: Scalars['String'],
-  description: Scalars['String'],
-  publicTitle?: Maybe<Scalars['String']>,
-  setting: QuestionnaireSettingsCreateOneWithoutQuestionnaireInput,
-  questions?: Maybe<QQuestionCreateManyInput>,
-};
-
-export type QuestionnaireCreateWithoutSettingInput = {
-  id?: Maybe<Scalars['ID']>,
-  customer: CustomerCreateOneWithoutQuestionnairesInput,
-  title: Scalars['String'],
-  description: Scalars['String'],
-  publicTitle?: Maybe<Scalars['String']>,
-  questions?: Maybe<QQuestionCreateManyInput>,
+  questions?: Maybe<QuestionNodeCreateManyInput>,
 };
 
 export type QuestionnaireEdge = {
@@ -2353,257 +2310,6 @@ export type QuestionnairePreviousValues = {
   updatedAt?: Maybe<Scalars['DateTime']>,
 };
 
-export type QuestionnaireScalarWhereInput = {
-  id?: Maybe<Scalars['ID']>,
-  id_not?: Maybe<Scalars['ID']>,
-  id_in?: Maybe<Array<Scalars['ID']>>,
-  id_not_in?: Maybe<Array<Scalars['ID']>>,
-  id_lt?: Maybe<Scalars['ID']>,
-  id_lte?: Maybe<Scalars['ID']>,
-  id_gt?: Maybe<Scalars['ID']>,
-  id_gte?: Maybe<Scalars['ID']>,
-  id_contains?: Maybe<Scalars['ID']>,
-  id_not_contains?: Maybe<Scalars['ID']>,
-  id_starts_with?: Maybe<Scalars['ID']>,
-  id_not_starts_with?: Maybe<Scalars['ID']>,
-  id_ends_with?: Maybe<Scalars['ID']>,
-  id_not_ends_with?: Maybe<Scalars['ID']>,
-  title?: Maybe<Scalars['String']>,
-  title_not?: Maybe<Scalars['String']>,
-  title_in?: Maybe<Array<Scalars['String']>>,
-  title_not_in?: Maybe<Array<Scalars['String']>>,
-  title_lt?: Maybe<Scalars['String']>,
-  title_lte?: Maybe<Scalars['String']>,
-  title_gt?: Maybe<Scalars['String']>,
-  title_gte?: Maybe<Scalars['String']>,
-  title_contains?: Maybe<Scalars['String']>,
-  title_not_contains?: Maybe<Scalars['String']>,
-  title_starts_with?: Maybe<Scalars['String']>,
-  title_not_starts_with?: Maybe<Scalars['String']>,
-  title_ends_with?: Maybe<Scalars['String']>,
-  title_not_ends_with?: Maybe<Scalars['String']>,
-  description?: Maybe<Scalars['String']>,
-  description_not?: Maybe<Scalars['String']>,
-  description_in?: Maybe<Array<Scalars['String']>>,
-  description_not_in?: Maybe<Array<Scalars['String']>>,
-  description_lt?: Maybe<Scalars['String']>,
-  description_lte?: Maybe<Scalars['String']>,
-  description_gt?: Maybe<Scalars['String']>,
-  description_gte?: Maybe<Scalars['String']>,
-  description_contains?: Maybe<Scalars['String']>,
-  description_not_contains?: Maybe<Scalars['String']>,
-  description_starts_with?: Maybe<Scalars['String']>,
-  description_not_starts_with?: Maybe<Scalars['String']>,
-  description_ends_with?: Maybe<Scalars['String']>,
-  description_not_ends_with?: Maybe<Scalars['String']>,
-  publicTitle?: Maybe<Scalars['String']>,
-  publicTitle_not?: Maybe<Scalars['String']>,
-  publicTitle_in?: Maybe<Array<Scalars['String']>>,
-  publicTitle_not_in?: Maybe<Array<Scalars['String']>>,
-  publicTitle_lt?: Maybe<Scalars['String']>,
-  publicTitle_lte?: Maybe<Scalars['String']>,
-  publicTitle_gt?: Maybe<Scalars['String']>,
-  publicTitle_gte?: Maybe<Scalars['String']>,
-  publicTitle_contains?: Maybe<Scalars['String']>,
-  publicTitle_not_contains?: Maybe<Scalars['String']>,
-  publicTitle_starts_with?: Maybe<Scalars['String']>,
-  publicTitle_not_starts_with?: Maybe<Scalars['String']>,
-  publicTitle_ends_with?: Maybe<Scalars['String']>,
-  publicTitle_not_ends_with?: Maybe<Scalars['String']>,
-  creationDate?: Maybe<Scalars['DateTime']>,
-  creationDate_not?: Maybe<Scalars['DateTime']>,
-  creationDate_in?: Maybe<Array<Scalars['DateTime']>>,
-  creationDate_not_in?: Maybe<Array<Scalars['DateTime']>>,
-  creationDate_lt?: Maybe<Scalars['DateTime']>,
-  creationDate_lte?: Maybe<Scalars['DateTime']>,
-  creationDate_gt?: Maybe<Scalars['DateTime']>,
-  creationDate_gte?: Maybe<Scalars['DateTime']>,
-  updatedAt?: Maybe<Scalars['DateTime']>,
-  updatedAt_not?: Maybe<Scalars['DateTime']>,
-  updatedAt_in?: Maybe<Array<Scalars['DateTime']>>,
-  updatedAt_not_in?: Maybe<Array<Scalars['DateTime']>>,
-  updatedAt_lt?: Maybe<Scalars['DateTime']>,
-  updatedAt_lte?: Maybe<Scalars['DateTime']>,
-  updatedAt_gt?: Maybe<Scalars['DateTime']>,
-  updatedAt_gte?: Maybe<Scalars['DateTime']>,
-  AND?: Maybe<Array<QuestionnaireScalarWhereInput>>,
-  OR?: Maybe<Array<QuestionnaireScalarWhereInput>>,
-  NOT?: Maybe<Array<QuestionnaireScalarWhereInput>>,
-};
-
-export type QuestionnaireSettings = {
-   __typename?: 'QuestionnaireSettings',
-  id: Scalars['ID'],
-  customer: Customer,
-  questionnaire: Questionnaire,
-  title?: Maybe<Scalars['String']>,
-  logo?: Maybe<Scalars['String']>,
-  colourSettings: ColourSettings,
-  fontSettings: FontSettings,
-};
-
-export type QuestionnaireSettingsConnection = {
-   __typename?: 'QuestionnaireSettingsConnection',
-  pageInfo: PageInfo,
-  edges: Array<Maybe<QuestionnaireSettingsEdge>>,
-  aggregate: AggregateQuestionnaireSettings,
-};
-
-export type QuestionnaireSettingsCreateInput = {
-  id?: Maybe<Scalars['ID']>,
-  customer: CustomerCreateOneInput,
-  questionnaire: QuestionnaireCreateOneWithoutSettingInput,
-  title?: Maybe<Scalars['String']>,
-  logo?: Maybe<Scalars['String']>,
-  colourSettings: ColourSettingsCreateOneInput,
-  fontSettings: FontSettingsCreateOneInput,
-};
-
-export type QuestionnaireSettingsCreateOneWithoutQuestionnaireInput = {
-  create?: Maybe<QuestionnaireSettingsCreateWithoutQuestionnaireInput>,
-  connect?: Maybe<QuestionnaireSettingsWhereUniqueInput>,
-};
-
-export type QuestionnaireSettingsCreateWithoutQuestionnaireInput = {
-  id?: Maybe<Scalars['ID']>,
-  customer: CustomerCreateOneInput,
-  title?: Maybe<Scalars['String']>,
-  logo?: Maybe<Scalars['String']>,
-  colourSettings: ColourSettingsCreateOneInput,
-  fontSettings: FontSettingsCreateOneInput,
-};
-
-export type QuestionnaireSettingsEdge = {
-   __typename?: 'QuestionnaireSettingsEdge',
-  node: QuestionnaireSettings,
-  cursor: Scalars['String'],
-};
-
-export enum QuestionnaireSettingsOrderByInput {
-  IdAsc = 'id_ASC',
-  IdDesc = 'id_DESC',
-  TitleAsc = 'title_ASC',
-  TitleDesc = 'title_DESC',
-  LogoAsc = 'logo_ASC',
-  LogoDesc = 'logo_DESC'
-}
-
-export type QuestionnaireSettingsPreviousValues = {
-   __typename?: 'QuestionnaireSettingsPreviousValues',
-  id: Scalars['ID'],
-  title?: Maybe<Scalars['String']>,
-  logo?: Maybe<Scalars['String']>,
-};
-
-export type QuestionnaireSettingsSubscriptionPayload = {
-   __typename?: 'QuestionnaireSettingsSubscriptionPayload',
-  mutation: MutationType,
-  node?: Maybe<QuestionnaireSettings>,
-  updatedFields?: Maybe<Array<Scalars['String']>>,
-  previousValues?: Maybe<QuestionnaireSettingsPreviousValues>,
-};
-
-export type QuestionnaireSettingsSubscriptionWhereInput = {
-  mutation_in?: Maybe<Array<MutationType>>,
-  updatedFields_contains?: Maybe<Scalars['String']>,
-  updatedFields_contains_every?: Maybe<Array<Scalars['String']>>,
-  updatedFields_contains_some?: Maybe<Array<Scalars['String']>>,
-  node?: Maybe<QuestionnaireSettingsWhereInput>,
-  AND?: Maybe<Array<QuestionnaireSettingsSubscriptionWhereInput>>,
-  OR?: Maybe<Array<QuestionnaireSettingsSubscriptionWhereInput>>,
-  NOT?: Maybe<Array<QuestionnaireSettingsSubscriptionWhereInput>>,
-};
-
-export type QuestionnaireSettingsUpdateInput = {
-  customer?: Maybe<CustomerUpdateOneRequiredInput>,
-  questionnaire?: Maybe<QuestionnaireUpdateOneRequiredWithoutSettingInput>,
-  title?: Maybe<Scalars['String']>,
-  logo?: Maybe<Scalars['String']>,
-  colourSettings?: Maybe<ColourSettingsUpdateOneRequiredInput>,
-  fontSettings?: Maybe<FontSettingsUpdateOneRequiredInput>,
-};
-
-export type QuestionnaireSettingsUpdateManyMutationInput = {
-  title?: Maybe<Scalars['String']>,
-  logo?: Maybe<Scalars['String']>,
-};
-
-export type QuestionnaireSettingsUpdateOneRequiredWithoutQuestionnaireInput = {
-  create?: Maybe<QuestionnaireSettingsCreateWithoutQuestionnaireInput>,
-  update?: Maybe<QuestionnaireSettingsUpdateWithoutQuestionnaireDataInput>,
-  upsert?: Maybe<QuestionnaireSettingsUpsertWithoutQuestionnaireInput>,
-  connect?: Maybe<QuestionnaireSettingsWhereUniqueInput>,
-};
-
-export type QuestionnaireSettingsUpdateWithoutQuestionnaireDataInput = {
-  customer?: Maybe<CustomerUpdateOneRequiredInput>,
-  title?: Maybe<Scalars['String']>,
-  logo?: Maybe<Scalars['String']>,
-  colourSettings?: Maybe<ColourSettingsUpdateOneRequiredInput>,
-  fontSettings?: Maybe<FontSettingsUpdateOneRequiredInput>,
-};
-
-export type QuestionnaireSettingsUpsertWithoutQuestionnaireInput = {
-  update: QuestionnaireSettingsUpdateWithoutQuestionnaireDataInput,
-  create: QuestionnaireSettingsCreateWithoutQuestionnaireInput,
-};
-
-export type QuestionnaireSettingsWhereInput = {
-  id?: Maybe<Scalars['ID']>,
-  id_not?: Maybe<Scalars['ID']>,
-  id_in?: Maybe<Array<Scalars['ID']>>,
-  id_not_in?: Maybe<Array<Scalars['ID']>>,
-  id_lt?: Maybe<Scalars['ID']>,
-  id_lte?: Maybe<Scalars['ID']>,
-  id_gt?: Maybe<Scalars['ID']>,
-  id_gte?: Maybe<Scalars['ID']>,
-  id_contains?: Maybe<Scalars['ID']>,
-  id_not_contains?: Maybe<Scalars['ID']>,
-  id_starts_with?: Maybe<Scalars['ID']>,
-  id_not_starts_with?: Maybe<Scalars['ID']>,
-  id_ends_with?: Maybe<Scalars['ID']>,
-  id_not_ends_with?: Maybe<Scalars['ID']>,
-  customer?: Maybe<CustomerWhereInput>,
-  questionnaire?: Maybe<QuestionnaireWhereInput>,
-  title?: Maybe<Scalars['String']>,
-  title_not?: Maybe<Scalars['String']>,
-  title_in?: Maybe<Array<Scalars['String']>>,
-  title_not_in?: Maybe<Array<Scalars['String']>>,
-  title_lt?: Maybe<Scalars['String']>,
-  title_lte?: Maybe<Scalars['String']>,
-  title_gt?: Maybe<Scalars['String']>,
-  title_gte?: Maybe<Scalars['String']>,
-  title_contains?: Maybe<Scalars['String']>,
-  title_not_contains?: Maybe<Scalars['String']>,
-  title_starts_with?: Maybe<Scalars['String']>,
-  title_not_starts_with?: Maybe<Scalars['String']>,
-  title_ends_with?: Maybe<Scalars['String']>,
-  title_not_ends_with?: Maybe<Scalars['String']>,
-  logo?: Maybe<Scalars['String']>,
-  logo_not?: Maybe<Scalars['String']>,
-  logo_in?: Maybe<Array<Scalars['String']>>,
-  logo_not_in?: Maybe<Array<Scalars['String']>>,
-  logo_lt?: Maybe<Scalars['String']>,
-  logo_lte?: Maybe<Scalars['String']>,
-  logo_gt?: Maybe<Scalars['String']>,
-  logo_gte?: Maybe<Scalars['String']>,
-  logo_contains?: Maybe<Scalars['String']>,
-  logo_not_contains?: Maybe<Scalars['String']>,
-  logo_starts_with?: Maybe<Scalars['String']>,
-  logo_not_starts_with?: Maybe<Scalars['String']>,
-  logo_ends_with?: Maybe<Scalars['String']>,
-  logo_not_ends_with?: Maybe<Scalars['String']>,
-  colourSettings?: Maybe<ColourSettingsWhereInput>,
-  fontSettings?: Maybe<FontSettingsWhereInput>,
-  AND?: Maybe<Array<QuestionnaireSettingsWhereInput>>,
-  OR?: Maybe<Array<QuestionnaireSettingsWhereInput>>,
-  NOT?: Maybe<Array<QuestionnaireSettingsWhereInput>>,
-};
-
-export type QuestionnaireSettingsWhereUniqueInput = {
-  id?: Maybe<Scalars['ID']>,
-};
-
 export type QuestionnaireSubscriptionPayload = {
    __typename?: 'QuestionnaireSubscriptionPayload',
   mutation: MutationType,
@@ -2624,80 +2330,17 @@ export type QuestionnaireSubscriptionWhereInput = {
 };
 
 export type QuestionnaireUpdateInput = {
-  customer?: Maybe<CustomerUpdateOneRequiredWithoutQuestionnairesInput>,
+  customer?: Maybe<CustomerUpdateOneRequiredInput>,
   title?: Maybe<Scalars['String']>,
   description?: Maybe<Scalars['String']>,
   publicTitle?: Maybe<Scalars['String']>,
-  setting?: Maybe<QuestionnaireSettingsUpdateOneRequiredWithoutQuestionnaireInput>,
-  questions?: Maybe<QQuestionUpdateManyInput>,
-};
-
-export type QuestionnaireUpdateManyDataInput = {
-  title?: Maybe<Scalars['String']>,
-  description?: Maybe<Scalars['String']>,
-  publicTitle?: Maybe<Scalars['String']>,
+  questions?: Maybe<QuestionNodeUpdateManyInput>,
 };
 
 export type QuestionnaireUpdateManyMutationInput = {
   title?: Maybe<Scalars['String']>,
   description?: Maybe<Scalars['String']>,
   publicTitle?: Maybe<Scalars['String']>,
-};
-
-export type QuestionnaireUpdateManyWithoutCustomerInput = {
-  create?: Maybe<Array<QuestionnaireCreateWithoutCustomerInput>>,
-  delete?: Maybe<Array<QuestionnaireWhereUniqueInput>>,
-  connect?: Maybe<Array<QuestionnaireWhereUniqueInput>>,
-  set?: Maybe<Array<QuestionnaireWhereUniqueInput>>,
-  disconnect?: Maybe<Array<QuestionnaireWhereUniqueInput>>,
-  update?: Maybe<Array<QuestionnaireUpdateWithWhereUniqueWithoutCustomerInput>>,
-  upsert?: Maybe<Array<QuestionnaireUpsertWithWhereUniqueWithoutCustomerInput>>,
-  deleteMany?: Maybe<Array<QuestionnaireScalarWhereInput>>,
-  updateMany?: Maybe<Array<QuestionnaireUpdateManyWithWhereNestedInput>>,
-};
-
-export type QuestionnaireUpdateManyWithWhereNestedInput = {
-  where: QuestionnaireScalarWhereInput,
-  data: QuestionnaireUpdateManyDataInput,
-};
-
-export type QuestionnaireUpdateOneRequiredWithoutSettingInput = {
-  create?: Maybe<QuestionnaireCreateWithoutSettingInput>,
-  update?: Maybe<QuestionnaireUpdateWithoutSettingDataInput>,
-  upsert?: Maybe<QuestionnaireUpsertWithoutSettingInput>,
-  connect?: Maybe<QuestionnaireWhereUniqueInput>,
-};
-
-export type QuestionnaireUpdateWithoutCustomerDataInput = {
-  title?: Maybe<Scalars['String']>,
-  description?: Maybe<Scalars['String']>,
-  publicTitle?: Maybe<Scalars['String']>,
-  setting?: Maybe<QuestionnaireSettingsUpdateOneRequiredWithoutQuestionnaireInput>,
-  questions?: Maybe<QQuestionUpdateManyInput>,
-};
-
-export type QuestionnaireUpdateWithoutSettingDataInput = {
-  customer?: Maybe<CustomerUpdateOneRequiredWithoutQuestionnairesInput>,
-  title?: Maybe<Scalars['String']>,
-  description?: Maybe<Scalars['String']>,
-  publicTitle?: Maybe<Scalars['String']>,
-  questions?: Maybe<QQuestionUpdateManyInput>,
-};
-
-export type QuestionnaireUpdateWithWhereUniqueWithoutCustomerInput = {
-  where: QuestionnaireWhereUniqueInput,
-  data: QuestionnaireUpdateWithoutCustomerDataInput,
-};
-
-export type QuestionnaireUpsertWithoutSettingInput = {
-  update: QuestionnaireUpdateWithoutSettingDataInput,
-  create: QuestionnaireCreateWithoutSettingInput,
-};
-
-export type QuestionnaireUpsertWithWhereUniqueWithoutCustomerInput = {
-  where: QuestionnaireWhereUniqueInput,
-  update: QuestionnaireUpdateWithoutCustomerDataInput,
-  create: QuestionnaireCreateWithoutCustomerInput,
 };
 
 export type QuestionnaireWhereInput = {
@@ -2758,7 +2401,6 @@ export type QuestionnaireWhereInput = {
   publicTitle_not_starts_with?: Maybe<Scalars['String']>,
   publicTitle_ends_with?: Maybe<Scalars['String']>,
   publicTitle_not_ends_with?: Maybe<Scalars['String']>,
-  setting?: Maybe<QuestionnaireSettingsWhereInput>,
   creationDate?: Maybe<Scalars['DateTime']>,
   creationDate_not?: Maybe<Scalars['DateTime']>,
   creationDate_in?: Maybe<Array<Scalars['DateTime']>>,
@@ -2775,15 +2417,313 @@ export type QuestionnaireWhereInput = {
   updatedAt_lte?: Maybe<Scalars['DateTime']>,
   updatedAt_gt?: Maybe<Scalars['DateTime']>,
   updatedAt_gte?: Maybe<Scalars['DateTime']>,
-  questions_every?: Maybe<QQuestionWhereInput>,
-  questions_some?: Maybe<QQuestionWhereInput>,
-  questions_none?: Maybe<QQuestionWhereInput>,
+  questions_every?: Maybe<QuestionNodeWhereInput>,
+  questions_some?: Maybe<QuestionNodeWhereInput>,
+  questions_none?: Maybe<QuestionNodeWhereInput>,
   AND?: Maybe<Array<QuestionnaireWhereInput>>,
   OR?: Maybe<Array<QuestionnaireWhereInput>>,
   NOT?: Maybe<Array<QuestionnaireWhereInput>>,
 };
 
 export type QuestionnaireWhereUniqueInput = {
+  id?: Maybe<Scalars['ID']>,
+};
+
+export type QuestionNode = {
+   __typename?: 'QuestionNode',
+  id: Scalars['ID'],
+  title: Scalars['String'],
+  branchVal?: Maybe<Scalars['String']>,
+  questionType: NodeType,
+  overrideLeafId?: Maybe<Scalars['Int']>,
+  conditions?: Maybe<Array<QuestionCondition>>,
+  options?: Maybe<Array<QuestionOption>>,
+  children?: Maybe<Array<QuestionNode>>,
+};
+
+
+export type QuestionNodeConditionsArgs = {
+  where?: Maybe<QuestionConditionWhereInput>,
+  orderBy?: Maybe<QuestionConditionOrderByInput>,
+  skip?: Maybe<Scalars['Int']>,
+  after?: Maybe<Scalars['String']>,
+  before?: Maybe<Scalars['String']>,
+  first?: Maybe<Scalars['Int']>,
+  last?: Maybe<Scalars['Int']>
+};
+
+
+export type QuestionNodeOptionsArgs = {
+  where?: Maybe<QuestionOptionWhereInput>,
+  orderBy?: Maybe<QuestionOptionOrderByInput>,
+  skip?: Maybe<Scalars['Int']>,
+  after?: Maybe<Scalars['String']>,
+  before?: Maybe<Scalars['String']>,
+  first?: Maybe<Scalars['Int']>,
+  last?: Maybe<Scalars['Int']>
+};
+
+
+export type QuestionNodeChildrenArgs = {
+  where?: Maybe<QuestionNodeWhereInput>,
+  orderBy?: Maybe<QuestionNodeOrderByInput>,
+  skip?: Maybe<Scalars['Int']>,
+  after?: Maybe<Scalars['String']>,
+  before?: Maybe<Scalars['String']>,
+  first?: Maybe<Scalars['Int']>,
+  last?: Maybe<Scalars['Int']>
+};
+
+export type QuestionNodeConnection = {
+   __typename?: 'QuestionNodeConnection',
+  pageInfo: PageInfo,
+  edges: Array<Maybe<QuestionNodeEdge>>,
+  aggregate: AggregateQuestionNode,
+};
+
+export type QuestionNodeCreateInput = {
+  id?: Maybe<Scalars['ID']>,
+  title: Scalars['String'],
+  branchVal?: Maybe<Scalars['String']>,
+  questionType: NodeTypeCreateOneInput,
+  overrideLeafId?: Maybe<Scalars['Int']>,
+  conditions?: Maybe<QuestionConditionCreateManyInput>,
+  options?: Maybe<QuestionOptionCreateManyInput>,
+  children?: Maybe<QuestionNodeCreateManyInput>,
+};
+
+export type QuestionNodeCreateManyInput = {
+  create?: Maybe<Array<QuestionNodeCreateInput>>,
+  connect?: Maybe<Array<QuestionNodeWhereUniqueInput>>,
+};
+
+export type QuestionNodeEdge = {
+   __typename?: 'QuestionNodeEdge',
+  node: QuestionNode,
+  cursor: Scalars['String'],
+};
+
+export enum QuestionNodeOrderByInput {
+  IdAsc = 'id_ASC',
+  IdDesc = 'id_DESC',
+  TitleAsc = 'title_ASC',
+  TitleDesc = 'title_DESC',
+  BranchValAsc = 'branchVal_ASC',
+  BranchValDesc = 'branchVal_DESC',
+  OverrideLeafIdAsc = 'overrideLeafId_ASC',
+  OverrideLeafIdDesc = 'overrideLeafId_DESC'
+}
+
+export type QuestionNodePreviousValues = {
+   __typename?: 'QuestionNodePreviousValues',
+  id: Scalars['ID'],
+  title: Scalars['String'],
+  branchVal?: Maybe<Scalars['String']>,
+  overrideLeafId?: Maybe<Scalars['Int']>,
+};
+
+export type QuestionNodeScalarWhereInput = {
+  id?: Maybe<Scalars['ID']>,
+  id_not?: Maybe<Scalars['ID']>,
+  id_in?: Maybe<Array<Scalars['ID']>>,
+  id_not_in?: Maybe<Array<Scalars['ID']>>,
+  id_lt?: Maybe<Scalars['ID']>,
+  id_lte?: Maybe<Scalars['ID']>,
+  id_gt?: Maybe<Scalars['ID']>,
+  id_gte?: Maybe<Scalars['ID']>,
+  id_contains?: Maybe<Scalars['ID']>,
+  id_not_contains?: Maybe<Scalars['ID']>,
+  id_starts_with?: Maybe<Scalars['ID']>,
+  id_not_starts_with?: Maybe<Scalars['ID']>,
+  id_ends_with?: Maybe<Scalars['ID']>,
+  id_not_ends_with?: Maybe<Scalars['ID']>,
+  title?: Maybe<Scalars['String']>,
+  title_not?: Maybe<Scalars['String']>,
+  title_in?: Maybe<Array<Scalars['String']>>,
+  title_not_in?: Maybe<Array<Scalars['String']>>,
+  title_lt?: Maybe<Scalars['String']>,
+  title_lte?: Maybe<Scalars['String']>,
+  title_gt?: Maybe<Scalars['String']>,
+  title_gte?: Maybe<Scalars['String']>,
+  title_contains?: Maybe<Scalars['String']>,
+  title_not_contains?: Maybe<Scalars['String']>,
+  title_starts_with?: Maybe<Scalars['String']>,
+  title_not_starts_with?: Maybe<Scalars['String']>,
+  title_ends_with?: Maybe<Scalars['String']>,
+  title_not_ends_with?: Maybe<Scalars['String']>,
+  branchVal?: Maybe<Scalars['String']>,
+  branchVal_not?: Maybe<Scalars['String']>,
+  branchVal_in?: Maybe<Array<Scalars['String']>>,
+  branchVal_not_in?: Maybe<Array<Scalars['String']>>,
+  branchVal_lt?: Maybe<Scalars['String']>,
+  branchVal_lte?: Maybe<Scalars['String']>,
+  branchVal_gt?: Maybe<Scalars['String']>,
+  branchVal_gte?: Maybe<Scalars['String']>,
+  branchVal_contains?: Maybe<Scalars['String']>,
+  branchVal_not_contains?: Maybe<Scalars['String']>,
+  branchVal_starts_with?: Maybe<Scalars['String']>,
+  branchVal_not_starts_with?: Maybe<Scalars['String']>,
+  branchVal_ends_with?: Maybe<Scalars['String']>,
+  branchVal_not_ends_with?: Maybe<Scalars['String']>,
+  overrideLeafId?: Maybe<Scalars['Int']>,
+  overrideLeafId_not?: Maybe<Scalars['Int']>,
+  overrideLeafId_in?: Maybe<Array<Scalars['Int']>>,
+  overrideLeafId_not_in?: Maybe<Array<Scalars['Int']>>,
+  overrideLeafId_lt?: Maybe<Scalars['Int']>,
+  overrideLeafId_lte?: Maybe<Scalars['Int']>,
+  overrideLeafId_gt?: Maybe<Scalars['Int']>,
+  overrideLeafId_gte?: Maybe<Scalars['Int']>,
+  AND?: Maybe<Array<QuestionNodeScalarWhereInput>>,
+  OR?: Maybe<Array<QuestionNodeScalarWhereInput>>,
+  NOT?: Maybe<Array<QuestionNodeScalarWhereInput>>,
+};
+
+export type QuestionNodeSubscriptionPayload = {
+   __typename?: 'QuestionNodeSubscriptionPayload',
+  mutation: MutationType,
+  node?: Maybe<QuestionNode>,
+  updatedFields?: Maybe<Array<Scalars['String']>>,
+  previousValues?: Maybe<QuestionNodePreviousValues>,
+};
+
+export type QuestionNodeSubscriptionWhereInput = {
+  mutation_in?: Maybe<Array<MutationType>>,
+  updatedFields_contains?: Maybe<Scalars['String']>,
+  updatedFields_contains_every?: Maybe<Array<Scalars['String']>>,
+  updatedFields_contains_some?: Maybe<Array<Scalars['String']>>,
+  node?: Maybe<QuestionNodeWhereInput>,
+  AND?: Maybe<Array<QuestionNodeSubscriptionWhereInput>>,
+  OR?: Maybe<Array<QuestionNodeSubscriptionWhereInput>>,
+  NOT?: Maybe<Array<QuestionNodeSubscriptionWhereInput>>,
+};
+
+export type QuestionNodeUpdateDataInput = {
+  title?: Maybe<Scalars['String']>,
+  branchVal?: Maybe<Scalars['String']>,
+  questionType?: Maybe<NodeTypeUpdateOneRequiredInput>,
+  overrideLeafId?: Maybe<Scalars['Int']>,
+  conditions?: Maybe<QuestionConditionUpdateManyInput>,
+  options?: Maybe<QuestionOptionUpdateManyInput>,
+  children?: Maybe<QuestionNodeUpdateManyInput>,
+};
+
+export type QuestionNodeUpdateInput = {
+  title?: Maybe<Scalars['String']>,
+  branchVal?: Maybe<Scalars['String']>,
+  questionType?: Maybe<NodeTypeUpdateOneRequiredInput>,
+  overrideLeafId?: Maybe<Scalars['Int']>,
+  conditions?: Maybe<QuestionConditionUpdateManyInput>,
+  options?: Maybe<QuestionOptionUpdateManyInput>,
+  children?: Maybe<QuestionNodeUpdateManyInput>,
+};
+
+export type QuestionNodeUpdateManyDataInput = {
+  title?: Maybe<Scalars['String']>,
+  branchVal?: Maybe<Scalars['String']>,
+  overrideLeafId?: Maybe<Scalars['Int']>,
+};
+
+export type QuestionNodeUpdateManyInput = {
+  create?: Maybe<Array<QuestionNodeCreateInput>>,
+  update?: Maybe<Array<QuestionNodeUpdateWithWhereUniqueNestedInput>>,
+  upsert?: Maybe<Array<QuestionNodeUpsertWithWhereUniqueNestedInput>>,
+  delete?: Maybe<Array<QuestionNodeWhereUniqueInput>>,
+  connect?: Maybe<Array<QuestionNodeWhereUniqueInput>>,
+  set?: Maybe<Array<QuestionNodeWhereUniqueInput>>,
+  disconnect?: Maybe<Array<QuestionNodeWhereUniqueInput>>,
+  deleteMany?: Maybe<Array<QuestionNodeScalarWhereInput>>,
+  updateMany?: Maybe<Array<QuestionNodeUpdateManyWithWhereNestedInput>>,
+};
+
+export type QuestionNodeUpdateManyMutationInput = {
+  title?: Maybe<Scalars['String']>,
+  branchVal?: Maybe<Scalars['String']>,
+  overrideLeafId?: Maybe<Scalars['Int']>,
+};
+
+export type QuestionNodeUpdateManyWithWhereNestedInput = {
+  where: QuestionNodeScalarWhereInput,
+  data: QuestionNodeUpdateManyDataInput,
+};
+
+export type QuestionNodeUpdateWithWhereUniqueNestedInput = {
+  where: QuestionNodeWhereUniqueInput,
+  data: QuestionNodeUpdateDataInput,
+};
+
+export type QuestionNodeUpsertWithWhereUniqueNestedInput = {
+  where: QuestionNodeWhereUniqueInput,
+  update: QuestionNodeUpdateDataInput,
+  create: QuestionNodeCreateInput,
+};
+
+export type QuestionNodeWhereInput = {
+  id?: Maybe<Scalars['ID']>,
+  id_not?: Maybe<Scalars['ID']>,
+  id_in?: Maybe<Array<Scalars['ID']>>,
+  id_not_in?: Maybe<Array<Scalars['ID']>>,
+  id_lt?: Maybe<Scalars['ID']>,
+  id_lte?: Maybe<Scalars['ID']>,
+  id_gt?: Maybe<Scalars['ID']>,
+  id_gte?: Maybe<Scalars['ID']>,
+  id_contains?: Maybe<Scalars['ID']>,
+  id_not_contains?: Maybe<Scalars['ID']>,
+  id_starts_with?: Maybe<Scalars['ID']>,
+  id_not_starts_with?: Maybe<Scalars['ID']>,
+  id_ends_with?: Maybe<Scalars['ID']>,
+  id_not_ends_with?: Maybe<Scalars['ID']>,
+  title?: Maybe<Scalars['String']>,
+  title_not?: Maybe<Scalars['String']>,
+  title_in?: Maybe<Array<Scalars['String']>>,
+  title_not_in?: Maybe<Array<Scalars['String']>>,
+  title_lt?: Maybe<Scalars['String']>,
+  title_lte?: Maybe<Scalars['String']>,
+  title_gt?: Maybe<Scalars['String']>,
+  title_gte?: Maybe<Scalars['String']>,
+  title_contains?: Maybe<Scalars['String']>,
+  title_not_contains?: Maybe<Scalars['String']>,
+  title_starts_with?: Maybe<Scalars['String']>,
+  title_not_starts_with?: Maybe<Scalars['String']>,
+  title_ends_with?: Maybe<Scalars['String']>,
+  title_not_ends_with?: Maybe<Scalars['String']>,
+  branchVal?: Maybe<Scalars['String']>,
+  branchVal_not?: Maybe<Scalars['String']>,
+  branchVal_in?: Maybe<Array<Scalars['String']>>,
+  branchVal_not_in?: Maybe<Array<Scalars['String']>>,
+  branchVal_lt?: Maybe<Scalars['String']>,
+  branchVal_lte?: Maybe<Scalars['String']>,
+  branchVal_gt?: Maybe<Scalars['String']>,
+  branchVal_gte?: Maybe<Scalars['String']>,
+  branchVal_contains?: Maybe<Scalars['String']>,
+  branchVal_not_contains?: Maybe<Scalars['String']>,
+  branchVal_starts_with?: Maybe<Scalars['String']>,
+  branchVal_not_starts_with?: Maybe<Scalars['String']>,
+  branchVal_ends_with?: Maybe<Scalars['String']>,
+  branchVal_not_ends_with?: Maybe<Scalars['String']>,
+  questionType?: Maybe<NodeTypeWhereInput>,
+  overrideLeafId?: Maybe<Scalars['Int']>,
+  overrideLeafId_not?: Maybe<Scalars['Int']>,
+  overrideLeafId_in?: Maybe<Array<Scalars['Int']>>,
+  overrideLeafId_not_in?: Maybe<Array<Scalars['Int']>>,
+  overrideLeafId_lt?: Maybe<Scalars['Int']>,
+  overrideLeafId_lte?: Maybe<Scalars['Int']>,
+  overrideLeafId_gt?: Maybe<Scalars['Int']>,
+  overrideLeafId_gte?: Maybe<Scalars['Int']>,
+  conditions_every?: Maybe<QuestionConditionWhereInput>,
+  conditions_some?: Maybe<QuestionConditionWhereInput>,
+  conditions_none?: Maybe<QuestionConditionWhereInput>,
+  options_every?: Maybe<QuestionOptionWhereInput>,
+  options_some?: Maybe<QuestionOptionWhereInput>,
+  options_none?: Maybe<QuestionOptionWhereInput>,
+  children_every?: Maybe<QuestionNodeWhereInput>,
+  children_some?: Maybe<QuestionNodeWhereInput>,
+  children_none?: Maybe<QuestionNodeWhereInput>,
+  AND?: Maybe<Array<QuestionNodeWhereInput>>,
+  OR?: Maybe<Array<QuestionNodeWhereInput>>,
+  NOT?: Maybe<Array<QuestionNodeWhereInput>>,
+};
+
+export type QuestionNodeWhereUniqueInput = {
   id?: Maybe<Scalars['ID']>,
 };
 
@@ -3005,13 +2945,14 @@ export type Subscription = {
    __typename?: 'Subscription',
   colourSettings?: Maybe<ColourSettingsSubscriptionPayload>,
   customer?: Maybe<CustomerSubscriptionPayload>,
+  customerSettings?: Maybe<CustomerSettingsSubscriptionPayload>,
   fontSettings?: Maybe<FontSettingsSubscriptionPayload>,
   leafNode?: Maybe<LeafNodeSubscriptionPayload>,
-  qQuestion?: Maybe<QQuestionSubscriptionPayload>,
+  nodeType?: Maybe<NodeTypeSubscriptionPayload>,
   questionCondition?: Maybe<QuestionConditionSubscriptionPayload>,
+  questionNode?: Maybe<QuestionNodeSubscriptionPayload>,
   questionOption?: Maybe<QuestionOptionSubscriptionPayload>,
   questionnaire?: Maybe<QuestionnaireSubscriptionPayload>,
-  questionnaireSettings?: Maybe<QuestionnaireSettingsSubscriptionPayload>,
 };
 
 
@@ -3025,6 +2966,11 @@ export type SubscriptionCustomerArgs = {
 };
 
 
+export type SubscriptionCustomerSettingsArgs = {
+  where?: Maybe<CustomerSettingsSubscriptionWhereInput>
+};
+
+
 export type SubscriptionFontSettingsArgs = {
   where?: Maybe<FontSettingsSubscriptionWhereInput>
 };
@@ -3035,13 +2981,18 @@ export type SubscriptionLeafNodeArgs = {
 };
 
 
-export type SubscriptionQQuestionArgs = {
-  where?: Maybe<QQuestionSubscriptionWhereInput>
+export type SubscriptionNodeTypeArgs = {
+  where?: Maybe<NodeTypeSubscriptionWhereInput>
 };
 
 
 export type SubscriptionQuestionConditionArgs = {
   where?: Maybe<QuestionConditionSubscriptionWhereInput>
+};
+
+
+export type SubscriptionQuestionNodeArgs = {
+  where?: Maybe<QuestionNodeSubscriptionWhereInput>
 };
 
 
@@ -3052,11 +3003,6 @@ export type SubscriptionQuestionOptionArgs = {
 
 export type SubscriptionQuestionnaireArgs = {
   where?: Maybe<QuestionnaireSubscriptionWhereInput>
-};
-
-
-export type SubscriptionQuestionnaireSettingsArgs = {
-  where?: Maybe<QuestionnaireSettingsSubscriptionWhereInput>
 };
 
 export type WithIndex<TObject> = TObject & Record<string, any>;
@@ -3146,61 +3092,68 @@ export type ResolversTypes = ResolversObject<{
   AggregateColourSettings: ResolverTypeWrapper<AggregateColourSettings>,
   CustomerWhereUniqueInput: CustomerWhereUniqueInput,
   Customer: ResolverTypeWrapper<Customer>,
-  QuestionnaireWhereInput: QuestionnaireWhereInput,
-  CustomerWhereInput: CustomerWhereInput,
-  QuestionnaireSettingsWhereInput: QuestionnaireSettingsWhereInput,
-  FontSettingsWhereInput: FontSettingsWhereInput,
-  DateTime: ResolverTypeWrapper<Scalars['DateTime']>,
-  QQuestionWhereInput: QQuestionWhereInput,
-  LeafNodeWhereInput: LeafNodeWhereInput,
-  QuestionConditionWhereInput: QuestionConditionWhereInput,
-  QuestionOptionWhereInput: QuestionOptionWhereInput,
-  QuestionnaireOrderByInput: QuestionnaireOrderByInput,
-  Questionnaire: ResolverTypeWrapper<Questionnaire>,
-  QuestionnaireSettings: ResolverTypeWrapper<QuestionnaireSettings>,
+  CustomerSettings: ResolverTypeWrapper<CustomerSettings>,
   FontSettings: ResolverTypeWrapper<FontSettings>,
-  QQuestionOrderByInput: QQuestionOrderByInput,
-  QQuestion: ResolverTypeWrapper<QQuestion>,
-  LeafNode: ResolverTypeWrapper<LeafNode>,
-  QuestionConditionOrderByInput: QuestionConditionOrderByInput,
-  QuestionCondition: ResolverTypeWrapper<QuestionCondition>,
-  QuestionOptionOrderByInput: QuestionOptionOrderByInput,
-  QuestionOption: ResolverTypeWrapper<QuestionOption>,
+  CustomerWhereInput: CustomerWhereInput,
+  CustomerSettingsWhereInput: CustomerSettingsWhereInput,
+  FontSettingsWhereInput: FontSettingsWhereInput,
   CustomerOrderByInput: CustomerOrderByInput,
   CustomerConnection: ResolverTypeWrapper<CustomerConnection>,
   CustomerEdge: ResolverTypeWrapper<CustomerEdge>,
   AggregateCustomer: ResolverTypeWrapper<AggregateCustomer>,
+  CustomerSettingsWhereUniqueInput: CustomerSettingsWhereUniqueInput,
+  CustomerSettingsOrderByInput: CustomerSettingsOrderByInput,
+  CustomerSettingsConnection: ResolverTypeWrapper<CustomerSettingsConnection>,
+  CustomerSettingsEdge: ResolverTypeWrapper<CustomerSettingsEdge>,
+  AggregateCustomerSettings: ResolverTypeWrapper<AggregateCustomerSettings>,
   FontSettingsWhereUniqueInput: FontSettingsWhereUniqueInput,
   FontSettingsOrderByInput: FontSettingsOrderByInput,
   FontSettingsConnection: ResolverTypeWrapper<FontSettingsConnection>,
   FontSettingsEdge: ResolverTypeWrapper<FontSettingsEdge>,
   AggregateFontSettings: ResolverTypeWrapper<AggregateFontSettings>,
   LeafNodeWhereUniqueInput: LeafNodeWhereUniqueInput,
+  LeafNode: ResolverTypeWrapper<LeafNode>,
+  NodeType: ResolverTypeWrapper<NodeType>,
+  LeafNodeWhereInput: LeafNodeWhereInput,
+  NodeTypeWhereInput: NodeTypeWhereInput,
   LeafNodeOrderByInput: LeafNodeOrderByInput,
   LeafNodeConnection: ResolverTypeWrapper<LeafNodeConnection>,
   LeafNodeEdge: ResolverTypeWrapper<LeafNodeEdge>,
   AggregateLeafNode: ResolverTypeWrapper<AggregateLeafNode>,
-  QQuestionWhereUniqueInput: QQuestionWhereUniqueInput,
-  QQuestionConnection: ResolverTypeWrapper<QQuestionConnection>,
-  QQuestionEdge: ResolverTypeWrapper<QQuestionEdge>,
-  AggregateQQuestion: ResolverTypeWrapper<AggregateQQuestion>,
+  NodeTypeWhereUniqueInput: NodeTypeWhereUniqueInput,
+  NodeTypeOrderByInput: NodeTypeOrderByInput,
+  NodeTypeConnection: ResolverTypeWrapper<NodeTypeConnection>,
+  NodeTypeEdge: ResolverTypeWrapper<NodeTypeEdge>,
+  AggregateNodeType: ResolverTypeWrapper<AggregateNodeType>,
   QuestionConditionWhereUniqueInput: QuestionConditionWhereUniqueInput,
+  QuestionCondition: ResolverTypeWrapper<QuestionCondition>,
+  QuestionConditionWhereInput: QuestionConditionWhereInput,
+  QuestionConditionOrderByInput: QuestionConditionOrderByInput,
   QuestionConditionConnection: ResolverTypeWrapper<QuestionConditionConnection>,
   QuestionConditionEdge: ResolverTypeWrapper<QuestionConditionEdge>,
   AggregateQuestionCondition: ResolverTypeWrapper<AggregateQuestionCondition>,
+  QuestionNodeWhereUniqueInput: QuestionNodeWhereUniqueInput,
+  QuestionNode: ResolverTypeWrapper<QuestionNode>,
+  QuestionOptionWhereInput: QuestionOptionWhereInput,
+  QuestionOptionOrderByInput: QuestionOptionOrderByInput,
+  QuestionOption: ResolverTypeWrapper<QuestionOption>,
+  QuestionNodeWhereInput: QuestionNodeWhereInput,
+  QuestionNodeOrderByInput: QuestionNodeOrderByInput,
+  QuestionNodeConnection: ResolverTypeWrapper<QuestionNodeConnection>,
+  QuestionNodeEdge: ResolverTypeWrapper<QuestionNodeEdge>,
+  AggregateQuestionNode: ResolverTypeWrapper<AggregateQuestionNode>,
   QuestionOptionWhereUniqueInput: QuestionOptionWhereUniqueInput,
   QuestionOptionConnection: ResolverTypeWrapper<QuestionOptionConnection>,
   QuestionOptionEdge: ResolverTypeWrapper<QuestionOptionEdge>,
   AggregateQuestionOption: ResolverTypeWrapper<AggregateQuestionOption>,
   QuestionnaireWhereUniqueInput: QuestionnaireWhereUniqueInput,
+  Questionnaire: ResolverTypeWrapper<Questionnaire>,
+  DateTime: ResolverTypeWrapper<Scalars['DateTime']>,
+  QuestionnaireWhereInput: QuestionnaireWhereInput,
+  QuestionnaireOrderByInput: QuestionnaireOrderByInput,
   QuestionnaireConnection: ResolverTypeWrapper<QuestionnaireConnection>,
   QuestionnaireEdge: ResolverTypeWrapper<QuestionnaireEdge>,
   AggregateQuestionnaire: ResolverTypeWrapper<AggregateQuestionnaire>,
-  QuestionnaireSettingsWhereUniqueInput: QuestionnaireSettingsWhereUniqueInput,
-  QuestionnaireSettingsOrderByInput: QuestionnaireSettingsOrderByInput,
-  QuestionnaireSettingsConnection: ResolverTypeWrapper<QuestionnaireSettingsConnection>,
-  QuestionnaireSettingsEdge: ResolverTypeWrapper<QuestionnaireSettingsEdge>,
-  AggregateQuestionnaireSettings: ResolverTypeWrapper<AggregateQuestionnaireSettings>,
   Node: ResolverTypeWrapper<Node>,
   Mutation: ResolverTypeWrapper<{}>,
   ColourSettingsCreateInput: ColourSettingsCreateInput,
@@ -3209,44 +3162,52 @@ export type ResolversTypes = ResolversObject<{
   BatchPayload: ResolverTypeWrapper<BatchPayload>,
   Long: ResolverTypeWrapper<Scalars['Long']>,
   CustomerCreateInput: CustomerCreateInput,
-  QuestionnaireCreateManyWithoutCustomerInput: QuestionnaireCreateManyWithoutCustomerInput,
-  QuestionnaireCreateWithoutCustomerInput: QuestionnaireCreateWithoutCustomerInput,
-  QuestionnaireSettingsCreateOneWithoutQuestionnaireInput: QuestionnaireSettingsCreateOneWithoutQuestionnaireInput,
-  QuestionnaireSettingsCreateWithoutQuestionnaireInput: QuestionnaireSettingsCreateWithoutQuestionnaireInput,
-  CustomerCreateOneInput: CustomerCreateOneInput,
+  CustomerSettingsCreateOneWithoutCustomerInput: CustomerSettingsCreateOneWithoutCustomerInput,
+  CustomerSettingsCreateWithoutCustomerInput: CustomerSettingsCreateWithoutCustomerInput,
   ColourSettingsCreateOneInput: ColourSettingsCreateOneInput,
   FontSettingsCreateOneInput: FontSettingsCreateOneInput,
   FontSettingsCreateInput: FontSettingsCreateInput,
-  QQuestionCreateManyInput: QQuestionCreateManyInput,
-  QQuestionCreateInput: QQuestionCreateInput,
-  LeafNodeCreateOneInput: LeafNodeCreateOneInput,
-  LeafNodeCreateInput: LeafNodeCreateInput,
-  QuestionConditionCreateManyInput: QuestionConditionCreateManyInput,
-  QuestionConditionCreateInput: QuestionConditionCreateInput,
-  QuestionOptionCreateManyInput: QuestionOptionCreateManyInput,
-  QuestionOptionCreateInput: QuestionOptionCreateInput,
   CustomerUpdateInput: CustomerUpdateInput,
-  QuestionnaireUpdateManyWithoutCustomerInput: QuestionnaireUpdateManyWithoutCustomerInput,
-  QuestionnaireUpdateWithWhereUniqueWithoutCustomerInput: QuestionnaireUpdateWithWhereUniqueWithoutCustomerInput,
-  QuestionnaireUpdateWithoutCustomerDataInput: QuestionnaireUpdateWithoutCustomerDataInput,
-  QuestionnaireSettingsUpdateOneRequiredWithoutQuestionnaireInput: QuestionnaireSettingsUpdateOneRequiredWithoutQuestionnaireInput,
-  QuestionnaireSettingsUpdateWithoutQuestionnaireDataInput: QuestionnaireSettingsUpdateWithoutQuestionnaireDataInput,
-  CustomerUpdateOneRequiredInput: CustomerUpdateOneRequiredInput,
-  CustomerUpdateDataInput: CustomerUpdateDataInput,
-  CustomerUpsertNestedInput: CustomerUpsertNestedInput,
+  CustomerSettingsUpdateOneWithoutCustomerInput: CustomerSettingsUpdateOneWithoutCustomerInput,
+  CustomerSettingsUpdateWithoutCustomerDataInput: CustomerSettingsUpdateWithoutCustomerDataInput,
   ColourSettingsUpdateOneRequiredInput: ColourSettingsUpdateOneRequiredInput,
   ColourSettingsUpdateDataInput: ColourSettingsUpdateDataInput,
   ColourSettingsUpsertNestedInput: ColourSettingsUpsertNestedInput,
   FontSettingsUpdateOneRequiredInput: FontSettingsUpdateOneRequiredInput,
   FontSettingsUpdateDataInput: FontSettingsUpdateDataInput,
   FontSettingsUpsertNestedInput: FontSettingsUpsertNestedInput,
-  QuestionnaireSettingsUpsertWithoutQuestionnaireInput: QuestionnaireSettingsUpsertWithoutQuestionnaireInput,
-  QQuestionUpdateManyInput: QQuestionUpdateManyInput,
-  QQuestionUpdateWithWhereUniqueNestedInput: QQuestionUpdateWithWhereUniqueNestedInput,
-  QQuestionUpdateDataInput: QQuestionUpdateDataInput,
-  LeafNodeUpdateOneInput: LeafNodeUpdateOneInput,
-  LeafNodeUpdateDataInput: LeafNodeUpdateDataInput,
-  LeafNodeUpsertNestedInput: LeafNodeUpsertNestedInput,
+  CustomerSettingsUpsertWithoutCustomerInput: CustomerSettingsUpsertWithoutCustomerInput,
+  CustomerUpdateManyMutationInput: CustomerUpdateManyMutationInput,
+  CustomerSettingsCreateInput: CustomerSettingsCreateInput,
+  CustomerCreateOneWithoutSettingsInput: CustomerCreateOneWithoutSettingsInput,
+  CustomerCreateWithoutSettingsInput: CustomerCreateWithoutSettingsInput,
+  CustomerSettingsUpdateInput: CustomerSettingsUpdateInput,
+  CustomerUpdateOneRequiredWithoutSettingsInput: CustomerUpdateOneRequiredWithoutSettingsInput,
+  CustomerUpdateWithoutSettingsDataInput: CustomerUpdateWithoutSettingsDataInput,
+  CustomerUpsertWithoutSettingsInput: CustomerUpsertWithoutSettingsInput,
+  CustomerSettingsUpdateManyMutationInput: CustomerSettingsUpdateManyMutationInput,
+  FontSettingsUpdateInput: FontSettingsUpdateInput,
+  FontSettingsUpdateManyMutationInput: FontSettingsUpdateManyMutationInput,
+  LeafNodeCreateInput: LeafNodeCreateInput,
+  NodeTypeCreateOneInput: NodeTypeCreateOneInput,
+  NodeTypeCreateInput: NodeTypeCreateInput,
+  LeafNodeUpdateInput: LeafNodeUpdateInput,
+  NodeTypeUpdateOneInput: NodeTypeUpdateOneInput,
+  NodeTypeUpdateDataInput: NodeTypeUpdateDataInput,
+  NodeTypeUpsertNestedInput: NodeTypeUpsertNestedInput,
+  LeafNodeUpdateManyMutationInput: LeafNodeUpdateManyMutationInput,
+  NodeTypeUpdateInput: NodeTypeUpdateInput,
+  NodeTypeUpdateManyMutationInput: NodeTypeUpdateManyMutationInput,
+  QuestionConditionCreateInput: QuestionConditionCreateInput,
+  QuestionConditionUpdateInput: QuestionConditionUpdateInput,
+  QuestionConditionUpdateManyMutationInput: QuestionConditionUpdateManyMutationInput,
+  QuestionNodeCreateInput: QuestionNodeCreateInput,
+  QuestionConditionCreateManyInput: QuestionConditionCreateManyInput,
+  QuestionOptionCreateManyInput: QuestionOptionCreateManyInput,
+  QuestionOptionCreateInput: QuestionOptionCreateInput,
+  QuestionNodeCreateManyInput: QuestionNodeCreateManyInput,
+  QuestionNodeUpdateInput: QuestionNodeUpdateInput,
+  NodeTypeUpdateOneRequiredInput: NodeTypeUpdateOneRequiredInput,
   QuestionConditionUpdateManyInput: QuestionConditionUpdateManyInput,
   QuestionConditionUpdateWithWhereUniqueNestedInput: QuestionConditionUpdateWithWhereUniqueNestedInput,
   QuestionConditionUpdateDataInput: QuestionConditionUpdateDataInput,
@@ -3261,41 +3222,23 @@ export type ResolversTypes = ResolversObject<{
   QuestionOptionScalarWhereInput: QuestionOptionScalarWhereInput,
   QuestionOptionUpdateManyWithWhereNestedInput: QuestionOptionUpdateManyWithWhereNestedInput,
   QuestionOptionUpdateManyDataInput: QuestionOptionUpdateManyDataInput,
-  QQuestionUpsertWithWhereUniqueNestedInput: QQuestionUpsertWithWhereUniqueNestedInput,
-  QQuestionScalarWhereInput: QQuestionScalarWhereInput,
-  QQuestionUpdateManyWithWhereNestedInput: QQuestionUpdateManyWithWhereNestedInput,
-  QQuestionUpdateManyDataInput: QQuestionUpdateManyDataInput,
-  QuestionnaireUpsertWithWhereUniqueWithoutCustomerInput: QuestionnaireUpsertWithWhereUniqueWithoutCustomerInput,
-  QuestionnaireScalarWhereInput: QuestionnaireScalarWhereInput,
-  QuestionnaireUpdateManyWithWhereNestedInput: QuestionnaireUpdateManyWithWhereNestedInput,
-  QuestionnaireUpdateManyDataInput: QuestionnaireUpdateManyDataInput,
-  CustomerUpdateManyMutationInput: CustomerUpdateManyMutationInput,
-  FontSettingsUpdateInput: FontSettingsUpdateInput,
-  FontSettingsUpdateManyMutationInput: FontSettingsUpdateManyMutationInput,
-  LeafNodeUpdateInput: LeafNodeUpdateInput,
-  LeafNodeUpdateManyMutationInput: LeafNodeUpdateManyMutationInput,
-  QQuestionUpdateInput: QQuestionUpdateInput,
-  QQuestionUpdateManyMutationInput: QQuestionUpdateManyMutationInput,
-  QuestionConditionUpdateInput: QuestionConditionUpdateInput,
-  QuestionConditionUpdateManyMutationInput: QuestionConditionUpdateManyMutationInput,
+  QuestionNodeUpdateManyInput: QuestionNodeUpdateManyInput,
+  QuestionNodeUpdateWithWhereUniqueNestedInput: QuestionNodeUpdateWithWhereUniqueNestedInput,
+  QuestionNodeUpdateDataInput: QuestionNodeUpdateDataInput,
+  QuestionNodeUpsertWithWhereUniqueNestedInput: QuestionNodeUpsertWithWhereUniqueNestedInput,
+  QuestionNodeScalarWhereInput: QuestionNodeScalarWhereInput,
+  QuestionNodeUpdateManyWithWhereNestedInput: QuestionNodeUpdateManyWithWhereNestedInput,
+  QuestionNodeUpdateManyDataInput: QuestionNodeUpdateManyDataInput,
+  QuestionNodeUpdateManyMutationInput: QuestionNodeUpdateManyMutationInput,
   QuestionOptionUpdateInput: QuestionOptionUpdateInput,
   QuestionOptionUpdateManyMutationInput: QuestionOptionUpdateManyMutationInput,
   QuestionnaireCreateInput: QuestionnaireCreateInput,
-  CustomerCreateOneWithoutQuestionnairesInput: CustomerCreateOneWithoutQuestionnairesInput,
-  CustomerCreateWithoutQuestionnairesInput: CustomerCreateWithoutQuestionnairesInput,
+  CustomerCreateOneInput: CustomerCreateOneInput,
   QuestionnaireUpdateInput: QuestionnaireUpdateInput,
-  CustomerUpdateOneRequiredWithoutQuestionnairesInput: CustomerUpdateOneRequiredWithoutQuestionnairesInput,
-  CustomerUpdateWithoutQuestionnairesDataInput: CustomerUpdateWithoutQuestionnairesDataInput,
-  CustomerUpsertWithoutQuestionnairesInput: CustomerUpsertWithoutQuestionnairesInput,
+  CustomerUpdateOneRequiredInput: CustomerUpdateOneRequiredInput,
+  CustomerUpdateDataInput: CustomerUpdateDataInput,
+  CustomerUpsertNestedInput: CustomerUpsertNestedInput,
   QuestionnaireUpdateManyMutationInput: QuestionnaireUpdateManyMutationInput,
-  QuestionnaireSettingsCreateInput: QuestionnaireSettingsCreateInput,
-  QuestionnaireCreateOneWithoutSettingInput: QuestionnaireCreateOneWithoutSettingInput,
-  QuestionnaireCreateWithoutSettingInput: QuestionnaireCreateWithoutSettingInput,
-  QuestionnaireSettingsUpdateInput: QuestionnaireSettingsUpdateInput,
-  QuestionnaireUpdateOneRequiredWithoutSettingInput: QuestionnaireUpdateOneRequiredWithoutSettingInput,
-  QuestionnaireUpdateWithoutSettingDataInput: QuestionnaireUpdateWithoutSettingDataInput,
-  QuestionnaireUpsertWithoutSettingInput: QuestionnaireUpsertWithoutSettingInput,
-  QuestionnaireSettingsUpdateManyMutationInput: QuestionnaireSettingsUpdateManyMutationInput,
   Subscription: ResolverTypeWrapper<{}>,
   ColourSettingsSubscriptionWhereInput: ColourSettingsSubscriptionWhereInput,
   MutationType: MutationType,
@@ -3304,27 +3247,30 @@ export type ResolversTypes = ResolversObject<{
   CustomerSubscriptionWhereInput: CustomerSubscriptionWhereInput,
   CustomerSubscriptionPayload: ResolverTypeWrapper<CustomerSubscriptionPayload>,
   CustomerPreviousValues: ResolverTypeWrapper<CustomerPreviousValues>,
+  CustomerSettingsSubscriptionWhereInput: CustomerSettingsSubscriptionWhereInput,
+  CustomerSettingsSubscriptionPayload: ResolverTypeWrapper<CustomerSettingsSubscriptionPayload>,
+  CustomerSettingsPreviousValues: ResolverTypeWrapper<CustomerSettingsPreviousValues>,
   FontSettingsSubscriptionWhereInput: FontSettingsSubscriptionWhereInput,
   FontSettingsSubscriptionPayload: ResolverTypeWrapper<FontSettingsSubscriptionPayload>,
   FontSettingsPreviousValues: ResolverTypeWrapper<FontSettingsPreviousValues>,
   LeafNodeSubscriptionWhereInput: LeafNodeSubscriptionWhereInput,
   LeafNodeSubscriptionPayload: ResolverTypeWrapper<LeafNodeSubscriptionPayload>,
   LeafNodePreviousValues: ResolverTypeWrapper<LeafNodePreviousValues>,
-  QQuestionSubscriptionWhereInput: QQuestionSubscriptionWhereInput,
-  QQuestionSubscriptionPayload: ResolverTypeWrapper<QQuestionSubscriptionPayload>,
-  QQuestionPreviousValues: ResolverTypeWrapper<QQuestionPreviousValues>,
+  NodeTypeSubscriptionWhereInput: NodeTypeSubscriptionWhereInput,
+  NodeTypeSubscriptionPayload: ResolverTypeWrapper<NodeTypeSubscriptionPayload>,
+  NodeTypePreviousValues: ResolverTypeWrapper<NodeTypePreviousValues>,
   QuestionConditionSubscriptionWhereInput: QuestionConditionSubscriptionWhereInput,
   QuestionConditionSubscriptionPayload: ResolverTypeWrapper<QuestionConditionSubscriptionPayload>,
   QuestionConditionPreviousValues: ResolverTypeWrapper<QuestionConditionPreviousValues>,
+  QuestionNodeSubscriptionWhereInput: QuestionNodeSubscriptionWhereInput,
+  QuestionNodeSubscriptionPayload: ResolverTypeWrapper<QuestionNodeSubscriptionPayload>,
+  QuestionNodePreviousValues: ResolverTypeWrapper<QuestionNodePreviousValues>,
   QuestionOptionSubscriptionWhereInput: QuestionOptionSubscriptionWhereInput,
   QuestionOptionSubscriptionPayload: ResolverTypeWrapper<QuestionOptionSubscriptionPayload>,
   QuestionOptionPreviousValues: ResolverTypeWrapper<QuestionOptionPreviousValues>,
   QuestionnaireSubscriptionWhereInput: QuestionnaireSubscriptionWhereInput,
   QuestionnaireSubscriptionPayload: ResolverTypeWrapper<QuestionnaireSubscriptionPayload>,
   QuestionnairePreviousValues: ResolverTypeWrapper<QuestionnairePreviousValues>,
-  QuestionnaireSettingsSubscriptionWhereInput: QuestionnaireSettingsSubscriptionWhereInput,
-  QuestionnaireSettingsSubscriptionPayload: ResolverTypeWrapper<QuestionnaireSettingsSubscriptionPayload>,
-  QuestionnaireSettingsPreviousValues: ResolverTypeWrapper<QuestionnaireSettingsPreviousValues>,
 }>;
 
 /** Mapping between all available schema types and the resolvers parents */
@@ -3344,61 +3290,68 @@ export type ResolversParentTypes = ResolversObject<{
   AggregateColourSettings: AggregateColourSettings,
   CustomerWhereUniqueInput: CustomerWhereUniqueInput,
   Customer: Customer,
-  QuestionnaireWhereInput: QuestionnaireWhereInput,
-  CustomerWhereInput: CustomerWhereInput,
-  QuestionnaireSettingsWhereInput: QuestionnaireSettingsWhereInput,
-  FontSettingsWhereInput: FontSettingsWhereInput,
-  DateTime: Scalars['DateTime'],
-  QQuestionWhereInput: QQuestionWhereInput,
-  LeafNodeWhereInput: LeafNodeWhereInput,
-  QuestionConditionWhereInput: QuestionConditionWhereInput,
-  QuestionOptionWhereInput: QuestionOptionWhereInput,
-  QuestionnaireOrderByInput: QuestionnaireOrderByInput,
-  Questionnaire: Questionnaire,
-  QuestionnaireSettings: QuestionnaireSettings,
+  CustomerSettings: CustomerSettings,
   FontSettings: FontSettings,
-  QQuestionOrderByInput: QQuestionOrderByInput,
-  QQuestion: QQuestion,
-  LeafNode: LeafNode,
-  QuestionConditionOrderByInput: QuestionConditionOrderByInput,
-  QuestionCondition: QuestionCondition,
-  QuestionOptionOrderByInput: QuestionOptionOrderByInput,
-  QuestionOption: QuestionOption,
+  CustomerWhereInput: CustomerWhereInput,
+  CustomerSettingsWhereInput: CustomerSettingsWhereInput,
+  FontSettingsWhereInput: FontSettingsWhereInput,
   CustomerOrderByInput: CustomerOrderByInput,
   CustomerConnection: CustomerConnection,
   CustomerEdge: CustomerEdge,
   AggregateCustomer: AggregateCustomer,
+  CustomerSettingsWhereUniqueInput: CustomerSettingsWhereUniqueInput,
+  CustomerSettingsOrderByInput: CustomerSettingsOrderByInput,
+  CustomerSettingsConnection: CustomerSettingsConnection,
+  CustomerSettingsEdge: CustomerSettingsEdge,
+  AggregateCustomerSettings: AggregateCustomerSettings,
   FontSettingsWhereUniqueInput: FontSettingsWhereUniqueInput,
   FontSettingsOrderByInput: FontSettingsOrderByInput,
   FontSettingsConnection: FontSettingsConnection,
   FontSettingsEdge: FontSettingsEdge,
   AggregateFontSettings: AggregateFontSettings,
   LeafNodeWhereUniqueInput: LeafNodeWhereUniqueInput,
+  LeafNode: LeafNode,
+  NodeType: NodeType,
+  LeafNodeWhereInput: LeafNodeWhereInput,
+  NodeTypeWhereInput: NodeTypeWhereInput,
   LeafNodeOrderByInput: LeafNodeOrderByInput,
   LeafNodeConnection: LeafNodeConnection,
   LeafNodeEdge: LeafNodeEdge,
   AggregateLeafNode: AggregateLeafNode,
-  QQuestionWhereUniqueInput: QQuestionWhereUniqueInput,
-  QQuestionConnection: QQuestionConnection,
-  QQuestionEdge: QQuestionEdge,
-  AggregateQQuestion: AggregateQQuestion,
+  NodeTypeWhereUniqueInput: NodeTypeWhereUniqueInput,
+  NodeTypeOrderByInput: NodeTypeOrderByInput,
+  NodeTypeConnection: NodeTypeConnection,
+  NodeTypeEdge: NodeTypeEdge,
+  AggregateNodeType: AggregateNodeType,
   QuestionConditionWhereUniqueInput: QuestionConditionWhereUniqueInput,
+  QuestionCondition: QuestionCondition,
+  QuestionConditionWhereInput: QuestionConditionWhereInput,
+  QuestionConditionOrderByInput: QuestionConditionOrderByInput,
   QuestionConditionConnection: QuestionConditionConnection,
   QuestionConditionEdge: QuestionConditionEdge,
   AggregateQuestionCondition: AggregateQuestionCondition,
+  QuestionNodeWhereUniqueInput: QuestionNodeWhereUniqueInput,
+  QuestionNode: QuestionNode,
+  QuestionOptionWhereInput: QuestionOptionWhereInput,
+  QuestionOptionOrderByInput: QuestionOptionOrderByInput,
+  QuestionOption: QuestionOption,
+  QuestionNodeWhereInput: QuestionNodeWhereInput,
+  QuestionNodeOrderByInput: QuestionNodeOrderByInput,
+  QuestionNodeConnection: QuestionNodeConnection,
+  QuestionNodeEdge: QuestionNodeEdge,
+  AggregateQuestionNode: AggregateQuestionNode,
   QuestionOptionWhereUniqueInput: QuestionOptionWhereUniqueInput,
   QuestionOptionConnection: QuestionOptionConnection,
   QuestionOptionEdge: QuestionOptionEdge,
   AggregateQuestionOption: AggregateQuestionOption,
   QuestionnaireWhereUniqueInput: QuestionnaireWhereUniqueInput,
+  Questionnaire: Questionnaire,
+  DateTime: Scalars['DateTime'],
+  QuestionnaireWhereInput: QuestionnaireWhereInput,
+  QuestionnaireOrderByInput: QuestionnaireOrderByInput,
   QuestionnaireConnection: QuestionnaireConnection,
   QuestionnaireEdge: QuestionnaireEdge,
   AggregateQuestionnaire: AggregateQuestionnaire,
-  QuestionnaireSettingsWhereUniqueInput: QuestionnaireSettingsWhereUniqueInput,
-  QuestionnaireSettingsOrderByInput: QuestionnaireSettingsOrderByInput,
-  QuestionnaireSettingsConnection: QuestionnaireSettingsConnection,
-  QuestionnaireSettingsEdge: QuestionnaireSettingsEdge,
-  AggregateQuestionnaireSettings: AggregateQuestionnaireSettings,
   Node: Node,
   Mutation: {},
   ColourSettingsCreateInput: ColourSettingsCreateInput,
@@ -3407,44 +3360,52 @@ export type ResolversParentTypes = ResolversObject<{
   BatchPayload: BatchPayload,
   Long: Scalars['Long'],
   CustomerCreateInput: CustomerCreateInput,
-  QuestionnaireCreateManyWithoutCustomerInput: QuestionnaireCreateManyWithoutCustomerInput,
-  QuestionnaireCreateWithoutCustomerInput: QuestionnaireCreateWithoutCustomerInput,
-  QuestionnaireSettingsCreateOneWithoutQuestionnaireInput: QuestionnaireSettingsCreateOneWithoutQuestionnaireInput,
-  QuestionnaireSettingsCreateWithoutQuestionnaireInput: QuestionnaireSettingsCreateWithoutQuestionnaireInput,
-  CustomerCreateOneInput: CustomerCreateOneInput,
+  CustomerSettingsCreateOneWithoutCustomerInput: CustomerSettingsCreateOneWithoutCustomerInput,
+  CustomerSettingsCreateWithoutCustomerInput: CustomerSettingsCreateWithoutCustomerInput,
   ColourSettingsCreateOneInput: ColourSettingsCreateOneInput,
   FontSettingsCreateOneInput: FontSettingsCreateOneInput,
   FontSettingsCreateInput: FontSettingsCreateInput,
-  QQuestionCreateManyInput: QQuestionCreateManyInput,
-  QQuestionCreateInput: QQuestionCreateInput,
-  LeafNodeCreateOneInput: LeafNodeCreateOneInput,
-  LeafNodeCreateInput: LeafNodeCreateInput,
-  QuestionConditionCreateManyInput: QuestionConditionCreateManyInput,
-  QuestionConditionCreateInput: QuestionConditionCreateInput,
-  QuestionOptionCreateManyInput: QuestionOptionCreateManyInput,
-  QuestionOptionCreateInput: QuestionOptionCreateInput,
   CustomerUpdateInput: CustomerUpdateInput,
-  QuestionnaireUpdateManyWithoutCustomerInput: QuestionnaireUpdateManyWithoutCustomerInput,
-  QuestionnaireUpdateWithWhereUniqueWithoutCustomerInput: QuestionnaireUpdateWithWhereUniqueWithoutCustomerInput,
-  QuestionnaireUpdateWithoutCustomerDataInput: QuestionnaireUpdateWithoutCustomerDataInput,
-  QuestionnaireSettingsUpdateOneRequiredWithoutQuestionnaireInput: QuestionnaireSettingsUpdateOneRequiredWithoutQuestionnaireInput,
-  QuestionnaireSettingsUpdateWithoutQuestionnaireDataInput: QuestionnaireSettingsUpdateWithoutQuestionnaireDataInput,
-  CustomerUpdateOneRequiredInput: CustomerUpdateOneRequiredInput,
-  CustomerUpdateDataInput: CustomerUpdateDataInput,
-  CustomerUpsertNestedInput: CustomerUpsertNestedInput,
+  CustomerSettingsUpdateOneWithoutCustomerInput: CustomerSettingsUpdateOneWithoutCustomerInput,
+  CustomerSettingsUpdateWithoutCustomerDataInput: CustomerSettingsUpdateWithoutCustomerDataInput,
   ColourSettingsUpdateOneRequiredInput: ColourSettingsUpdateOneRequiredInput,
   ColourSettingsUpdateDataInput: ColourSettingsUpdateDataInput,
   ColourSettingsUpsertNestedInput: ColourSettingsUpsertNestedInput,
   FontSettingsUpdateOneRequiredInput: FontSettingsUpdateOneRequiredInput,
   FontSettingsUpdateDataInput: FontSettingsUpdateDataInput,
   FontSettingsUpsertNestedInput: FontSettingsUpsertNestedInput,
-  QuestionnaireSettingsUpsertWithoutQuestionnaireInput: QuestionnaireSettingsUpsertWithoutQuestionnaireInput,
-  QQuestionUpdateManyInput: QQuestionUpdateManyInput,
-  QQuestionUpdateWithWhereUniqueNestedInput: QQuestionUpdateWithWhereUniqueNestedInput,
-  QQuestionUpdateDataInput: QQuestionUpdateDataInput,
-  LeafNodeUpdateOneInput: LeafNodeUpdateOneInput,
-  LeafNodeUpdateDataInput: LeafNodeUpdateDataInput,
-  LeafNodeUpsertNestedInput: LeafNodeUpsertNestedInput,
+  CustomerSettingsUpsertWithoutCustomerInput: CustomerSettingsUpsertWithoutCustomerInput,
+  CustomerUpdateManyMutationInput: CustomerUpdateManyMutationInput,
+  CustomerSettingsCreateInput: CustomerSettingsCreateInput,
+  CustomerCreateOneWithoutSettingsInput: CustomerCreateOneWithoutSettingsInput,
+  CustomerCreateWithoutSettingsInput: CustomerCreateWithoutSettingsInput,
+  CustomerSettingsUpdateInput: CustomerSettingsUpdateInput,
+  CustomerUpdateOneRequiredWithoutSettingsInput: CustomerUpdateOneRequiredWithoutSettingsInput,
+  CustomerUpdateWithoutSettingsDataInput: CustomerUpdateWithoutSettingsDataInput,
+  CustomerUpsertWithoutSettingsInput: CustomerUpsertWithoutSettingsInput,
+  CustomerSettingsUpdateManyMutationInput: CustomerSettingsUpdateManyMutationInput,
+  FontSettingsUpdateInput: FontSettingsUpdateInput,
+  FontSettingsUpdateManyMutationInput: FontSettingsUpdateManyMutationInput,
+  LeafNodeCreateInput: LeafNodeCreateInput,
+  NodeTypeCreateOneInput: NodeTypeCreateOneInput,
+  NodeTypeCreateInput: NodeTypeCreateInput,
+  LeafNodeUpdateInput: LeafNodeUpdateInput,
+  NodeTypeUpdateOneInput: NodeTypeUpdateOneInput,
+  NodeTypeUpdateDataInput: NodeTypeUpdateDataInput,
+  NodeTypeUpsertNestedInput: NodeTypeUpsertNestedInput,
+  LeafNodeUpdateManyMutationInput: LeafNodeUpdateManyMutationInput,
+  NodeTypeUpdateInput: NodeTypeUpdateInput,
+  NodeTypeUpdateManyMutationInput: NodeTypeUpdateManyMutationInput,
+  QuestionConditionCreateInput: QuestionConditionCreateInput,
+  QuestionConditionUpdateInput: QuestionConditionUpdateInput,
+  QuestionConditionUpdateManyMutationInput: QuestionConditionUpdateManyMutationInput,
+  QuestionNodeCreateInput: QuestionNodeCreateInput,
+  QuestionConditionCreateManyInput: QuestionConditionCreateManyInput,
+  QuestionOptionCreateManyInput: QuestionOptionCreateManyInput,
+  QuestionOptionCreateInput: QuestionOptionCreateInput,
+  QuestionNodeCreateManyInput: QuestionNodeCreateManyInput,
+  QuestionNodeUpdateInput: QuestionNodeUpdateInput,
+  NodeTypeUpdateOneRequiredInput: NodeTypeUpdateOneRequiredInput,
   QuestionConditionUpdateManyInput: QuestionConditionUpdateManyInput,
   QuestionConditionUpdateWithWhereUniqueNestedInput: QuestionConditionUpdateWithWhereUniqueNestedInput,
   QuestionConditionUpdateDataInput: QuestionConditionUpdateDataInput,
@@ -3459,41 +3420,23 @@ export type ResolversParentTypes = ResolversObject<{
   QuestionOptionScalarWhereInput: QuestionOptionScalarWhereInput,
   QuestionOptionUpdateManyWithWhereNestedInput: QuestionOptionUpdateManyWithWhereNestedInput,
   QuestionOptionUpdateManyDataInput: QuestionOptionUpdateManyDataInput,
-  QQuestionUpsertWithWhereUniqueNestedInput: QQuestionUpsertWithWhereUniqueNestedInput,
-  QQuestionScalarWhereInput: QQuestionScalarWhereInput,
-  QQuestionUpdateManyWithWhereNestedInput: QQuestionUpdateManyWithWhereNestedInput,
-  QQuestionUpdateManyDataInput: QQuestionUpdateManyDataInput,
-  QuestionnaireUpsertWithWhereUniqueWithoutCustomerInput: QuestionnaireUpsertWithWhereUniqueWithoutCustomerInput,
-  QuestionnaireScalarWhereInput: QuestionnaireScalarWhereInput,
-  QuestionnaireUpdateManyWithWhereNestedInput: QuestionnaireUpdateManyWithWhereNestedInput,
-  QuestionnaireUpdateManyDataInput: QuestionnaireUpdateManyDataInput,
-  CustomerUpdateManyMutationInput: CustomerUpdateManyMutationInput,
-  FontSettingsUpdateInput: FontSettingsUpdateInput,
-  FontSettingsUpdateManyMutationInput: FontSettingsUpdateManyMutationInput,
-  LeafNodeUpdateInput: LeafNodeUpdateInput,
-  LeafNodeUpdateManyMutationInput: LeafNodeUpdateManyMutationInput,
-  QQuestionUpdateInput: QQuestionUpdateInput,
-  QQuestionUpdateManyMutationInput: QQuestionUpdateManyMutationInput,
-  QuestionConditionUpdateInput: QuestionConditionUpdateInput,
-  QuestionConditionUpdateManyMutationInput: QuestionConditionUpdateManyMutationInput,
+  QuestionNodeUpdateManyInput: QuestionNodeUpdateManyInput,
+  QuestionNodeUpdateWithWhereUniqueNestedInput: QuestionNodeUpdateWithWhereUniqueNestedInput,
+  QuestionNodeUpdateDataInput: QuestionNodeUpdateDataInput,
+  QuestionNodeUpsertWithWhereUniqueNestedInput: QuestionNodeUpsertWithWhereUniqueNestedInput,
+  QuestionNodeScalarWhereInput: QuestionNodeScalarWhereInput,
+  QuestionNodeUpdateManyWithWhereNestedInput: QuestionNodeUpdateManyWithWhereNestedInput,
+  QuestionNodeUpdateManyDataInput: QuestionNodeUpdateManyDataInput,
+  QuestionNodeUpdateManyMutationInput: QuestionNodeUpdateManyMutationInput,
   QuestionOptionUpdateInput: QuestionOptionUpdateInput,
   QuestionOptionUpdateManyMutationInput: QuestionOptionUpdateManyMutationInput,
   QuestionnaireCreateInput: QuestionnaireCreateInput,
-  CustomerCreateOneWithoutQuestionnairesInput: CustomerCreateOneWithoutQuestionnairesInput,
-  CustomerCreateWithoutQuestionnairesInput: CustomerCreateWithoutQuestionnairesInput,
+  CustomerCreateOneInput: CustomerCreateOneInput,
   QuestionnaireUpdateInput: QuestionnaireUpdateInput,
-  CustomerUpdateOneRequiredWithoutQuestionnairesInput: CustomerUpdateOneRequiredWithoutQuestionnairesInput,
-  CustomerUpdateWithoutQuestionnairesDataInput: CustomerUpdateWithoutQuestionnairesDataInput,
-  CustomerUpsertWithoutQuestionnairesInput: CustomerUpsertWithoutQuestionnairesInput,
+  CustomerUpdateOneRequiredInput: CustomerUpdateOneRequiredInput,
+  CustomerUpdateDataInput: CustomerUpdateDataInput,
+  CustomerUpsertNestedInput: CustomerUpsertNestedInput,
   QuestionnaireUpdateManyMutationInput: QuestionnaireUpdateManyMutationInput,
-  QuestionnaireSettingsCreateInput: QuestionnaireSettingsCreateInput,
-  QuestionnaireCreateOneWithoutSettingInput: QuestionnaireCreateOneWithoutSettingInput,
-  QuestionnaireCreateWithoutSettingInput: QuestionnaireCreateWithoutSettingInput,
-  QuestionnaireSettingsUpdateInput: QuestionnaireSettingsUpdateInput,
-  QuestionnaireUpdateOneRequiredWithoutSettingInput: QuestionnaireUpdateOneRequiredWithoutSettingInput,
-  QuestionnaireUpdateWithoutSettingDataInput: QuestionnaireUpdateWithoutSettingDataInput,
-  QuestionnaireUpsertWithoutSettingInput: QuestionnaireUpsertWithoutSettingInput,
-  QuestionnaireSettingsUpdateManyMutationInput: QuestionnaireSettingsUpdateManyMutationInput,
   Subscription: {},
   ColourSettingsSubscriptionWhereInput: ColourSettingsSubscriptionWhereInput,
   MutationType: MutationType,
@@ -3502,27 +3445,30 @@ export type ResolversParentTypes = ResolversObject<{
   CustomerSubscriptionWhereInput: CustomerSubscriptionWhereInput,
   CustomerSubscriptionPayload: CustomerSubscriptionPayload,
   CustomerPreviousValues: CustomerPreviousValues,
+  CustomerSettingsSubscriptionWhereInput: CustomerSettingsSubscriptionWhereInput,
+  CustomerSettingsSubscriptionPayload: CustomerSettingsSubscriptionPayload,
+  CustomerSettingsPreviousValues: CustomerSettingsPreviousValues,
   FontSettingsSubscriptionWhereInput: FontSettingsSubscriptionWhereInput,
   FontSettingsSubscriptionPayload: FontSettingsSubscriptionPayload,
   FontSettingsPreviousValues: FontSettingsPreviousValues,
   LeafNodeSubscriptionWhereInput: LeafNodeSubscriptionWhereInput,
   LeafNodeSubscriptionPayload: LeafNodeSubscriptionPayload,
   LeafNodePreviousValues: LeafNodePreviousValues,
-  QQuestionSubscriptionWhereInput: QQuestionSubscriptionWhereInput,
-  QQuestionSubscriptionPayload: QQuestionSubscriptionPayload,
-  QQuestionPreviousValues: QQuestionPreviousValues,
+  NodeTypeSubscriptionWhereInput: NodeTypeSubscriptionWhereInput,
+  NodeTypeSubscriptionPayload: NodeTypeSubscriptionPayload,
+  NodeTypePreviousValues: NodeTypePreviousValues,
   QuestionConditionSubscriptionWhereInput: QuestionConditionSubscriptionWhereInput,
   QuestionConditionSubscriptionPayload: QuestionConditionSubscriptionPayload,
   QuestionConditionPreviousValues: QuestionConditionPreviousValues,
+  QuestionNodeSubscriptionWhereInput: QuestionNodeSubscriptionWhereInput,
+  QuestionNodeSubscriptionPayload: QuestionNodeSubscriptionPayload,
+  QuestionNodePreviousValues: QuestionNodePreviousValues,
   QuestionOptionSubscriptionWhereInput: QuestionOptionSubscriptionWhereInput,
   QuestionOptionSubscriptionPayload: QuestionOptionSubscriptionPayload,
   QuestionOptionPreviousValues: QuestionOptionPreviousValues,
   QuestionnaireSubscriptionWhereInput: QuestionnaireSubscriptionWhereInput,
   QuestionnaireSubscriptionPayload: QuestionnaireSubscriptionPayload,
   QuestionnairePreviousValues: QuestionnairePreviousValues,
-  QuestionnaireSettingsSubscriptionWhereInput: QuestionnaireSettingsSubscriptionWhereInput,
-  QuestionnaireSettingsSubscriptionPayload: QuestionnaireSettingsSubscriptionPayload,
-  QuestionnaireSettingsPreviousValues: QuestionnaireSettingsPreviousValues,
 }>;
 
 export type AggregateColourSettingsResolvers<ContextType = any, ParentType extends ResolversParentTypes['AggregateColourSettings'] = ResolversParentTypes['AggregateColourSettings']> = ResolversObject<{
@@ -3530,6 +3476,10 @@ export type AggregateColourSettingsResolvers<ContextType = any, ParentType exten
 }>;
 
 export type AggregateCustomerResolvers<ContextType = any, ParentType extends ResolversParentTypes['AggregateCustomer'] = ResolversParentTypes['AggregateCustomer']> = ResolversObject<{
+  count?: Resolver<ResolversTypes['Int'], ParentType, ContextType>,
+}>;
+
+export type AggregateCustomerSettingsResolvers<ContextType = any, ParentType extends ResolversParentTypes['AggregateCustomerSettings'] = ResolversParentTypes['AggregateCustomerSettings']> = ResolversObject<{
   count?: Resolver<ResolversTypes['Int'], ParentType, ContextType>,
 }>;
 
@@ -3541,7 +3491,7 @@ export type AggregateLeafNodeResolvers<ContextType = any, ParentType extends Res
   count?: Resolver<ResolversTypes['Int'], ParentType, ContextType>,
 }>;
 
-export type AggregateQQuestionResolvers<ContextType = any, ParentType extends ResolversParentTypes['AggregateQQuestion'] = ResolversParentTypes['AggregateQQuestion']> = ResolversObject<{
+export type AggregateNodeTypeResolvers<ContextType = any, ParentType extends ResolversParentTypes['AggregateNodeType'] = ResolversParentTypes['AggregateNodeType']> = ResolversObject<{
   count?: Resolver<ResolversTypes['Int'], ParentType, ContextType>,
 }>;
 
@@ -3553,7 +3503,7 @@ export type AggregateQuestionnaireResolvers<ContextType = any, ParentType extend
   count?: Resolver<ResolversTypes['Int'], ParentType, ContextType>,
 }>;
 
-export type AggregateQuestionnaireSettingsResolvers<ContextType = any, ParentType extends ResolversParentTypes['AggregateQuestionnaireSettings'] = ResolversParentTypes['AggregateQuestionnaireSettings']> = ResolversObject<{
+export type AggregateQuestionNodeResolvers<ContextType = any, ParentType extends ResolversParentTypes['AggregateQuestionNode'] = ResolversParentTypes['AggregateQuestionNode']> = ResolversObject<{
   count?: Resolver<ResolversTypes['Int'], ParentType, ContextType>,
 }>;
 
@@ -3622,7 +3572,7 @@ export type ColourSettingsSubscriptionPayloadResolvers<ContextType = any, Parent
 export type CustomerResolvers<ContextType = any, ParentType extends ResolversParentTypes['Customer'] = ResolversParentTypes['Customer']> = ResolversObject<{
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>,
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
-  questionnaires?: Resolver<Maybe<Array<ResolversTypes['Questionnaire']>>, ParentType, ContextType, CustomerQuestionnairesArgs>,
+  settings?: Resolver<Maybe<ResolversTypes['CustomerSettings']>, ParentType, ContextType>,
 }>;
 
 export type CustomerConnectionResolvers<ContextType = any, ParentType extends ResolversParentTypes['CustomerConnection'] = ResolversParentTypes['CustomerConnection']> = ResolversObject<{
@@ -3639,6 +3589,39 @@ export type CustomerEdgeResolvers<ContextType = any, ParentType extends Resolver
 export type CustomerPreviousValuesResolvers<ContextType = any, ParentType extends ResolversParentTypes['CustomerPreviousValues'] = ResolversParentTypes['CustomerPreviousValues']> = ResolversObject<{
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>,
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
+}>;
+
+export type CustomerSettingsResolvers<ContextType = any, ParentType extends ResolversParentTypes['CustomerSettings'] = ResolversParentTypes['CustomerSettings']> = ResolversObject<{
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>,
+  title?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  customer?: Resolver<ResolversTypes['Customer'], ParentType, ContextType>,
+  logo?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  colourSettings?: Resolver<ResolversTypes['ColourSettings'], ParentType, ContextType>,
+  fontSettings?: Resolver<ResolversTypes['FontSettings'], ParentType, ContextType>,
+}>;
+
+export type CustomerSettingsConnectionResolvers<ContextType = any, ParentType extends ResolversParentTypes['CustomerSettingsConnection'] = ResolversParentTypes['CustomerSettingsConnection']> = ResolversObject<{
+  pageInfo?: Resolver<ResolversTypes['PageInfo'], ParentType, ContextType>,
+  edges?: Resolver<Array<Maybe<ResolversTypes['CustomerSettingsEdge']>>, ParentType, ContextType>,
+  aggregate?: Resolver<ResolversTypes['AggregateCustomerSettings'], ParentType, ContextType>,
+}>;
+
+export type CustomerSettingsEdgeResolvers<ContextType = any, ParentType extends ResolversParentTypes['CustomerSettingsEdge'] = ResolversParentTypes['CustomerSettingsEdge']> = ResolversObject<{
+  node?: Resolver<ResolversTypes['CustomerSettings'], ParentType, ContextType>,
+  cursor?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
+}>;
+
+export type CustomerSettingsPreviousValuesResolvers<ContextType = any, ParentType extends ResolversParentTypes['CustomerSettingsPreviousValues'] = ResolversParentTypes['CustomerSettingsPreviousValues']> = ResolversObject<{
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>,
+  title?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  logo?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+}>;
+
+export type CustomerSettingsSubscriptionPayloadResolvers<ContextType = any, ParentType extends ResolversParentTypes['CustomerSettingsSubscriptionPayload'] = ResolversParentTypes['CustomerSettingsSubscriptionPayload']> = ResolversObject<{
+  mutation?: Resolver<ResolversTypes['MutationType'], ParentType, ContextType>,
+  node?: Resolver<Maybe<ResolversTypes['CustomerSettings']>, ParentType, ContextType>,
+  updatedFields?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>,
+  previousValues?: Resolver<Maybe<ResolversTypes['CustomerSettingsPreviousValues']>, ParentType, ContextType>,
 }>;
 
 export type CustomerSubscriptionPayloadResolvers<ContextType = any, ParentType extends ResolversParentTypes['CustomerSubscriptionPayload'] = ResolversParentTypes['CustomerSubscriptionPayload']> = ResolversObject<{
@@ -3689,7 +3672,7 @@ export type FontSettingsSubscriptionPayloadResolvers<ContextType = any, ParentTy
 export type LeafNodeResolvers<ContextType = any, ParentType extends ResolversParentTypes['LeafNode'] = ResolversParentTypes['LeafNode']> = ResolversObject<{
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>,
   nodeId?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>,
-  type?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
+  type?: Resolver<Maybe<ResolversTypes['NodeType']>, ParentType, ContextType>,
   title?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
 }>;
 
@@ -3707,7 +3690,6 @@ export type LeafNodeEdgeResolvers<ContextType = any, ParentType extends Resolver
 export type LeafNodePreviousValuesResolvers<ContextType = any, ParentType extends ResolversParentTypes['LeafNodePreviousValues'] = ResolversParentTypes['LeafNodePreviousValues']> = ResolversObject<{
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>,
   nodeId?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>,
-  type?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
   title?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
 }>;
 
@@ -3735,6 +3717,12 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   upsertCustomer?: Resolver<ResolversTypes['Customer'], ParentType, ContextType, RequireFields<MutationUpsertCustomerArgs, 'where' | 'create' | 'update'>>,
   deleteCustomer?: Resolver<Maybe<ResolversTypes['Customer']>, ParentType, ContextType, RequireFields<MutationDeleteCustomerArgs, 'where'>>,
   deleteManyCustomers?: Resolver<ResolversTypes['BatchPayload'], ParentType, ContextType, MutationDeleteManyCustomersArgs>,
+  createCustomerSettings?: Resolver<ResolversTypes['CustomerSettings'], ParentType, ContextType, RequireFields<MutationCreateCustomerSettingsArgs, 'data'>>,
+  updateCustomerSettings?: Resolver<Maybe<ResolversTypes['CustomerSettings']>, ParentType, ContextType, RequireFields<MutationUpdateCustomerSettingsArgs, 'data' | 'where'>>,
+  updateManyCustomerSettingses?: Resolver<ResolversTypes['BatchPayload'], ParentType, ContextType, RequireFields<MutationUpdateManyCustomerSettingsesArgs, 'data'>>,
+  upsertCustomerSettings?: Resolver<ResolversTypes['CustomerSettings'], ParentType, ContextType, RequireFields<MutationUpsertCustomerSettingsArgs, 'where' | 'create' | 'update'>>,
+  deleteCustomerSettings?: Resolver<Maybe<ResolversTypes['CustomerSettings']>, ParentType, ContextType, RequireFields<MutationDeleteCustomerSettingsArgs, 'where'>>,
+  deleteManyCustomerSettingses?: Resolver<ResolversTypes['BatchPayload'], ParentType, ContextType, MutationDeleteManyCustomerSettingsesArgs>,
   createFontSettings?: Resolver<ResolversTypes['FontSettings'], ParentType, ContextType, RequireFields<MutationCreateFontSettingsArgs, 'data'>>,
   updateFontSettings?: Resolver<Maybe<ResolversTypes['FontSettings']>, ParentType, ContextType, RequireFields<MutationUpdateFontSettingsArgs, 'data' | 'where'>>,
   updateManyFontSettingses?: Resolver<ResolversTypes['BatchPayload'], ParentType, ContextType, RequireFields<MutationUpdateManyFontSettingsesArgs, 'data'>>,
@@ -3747,18 +3735,24 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   upsertLeafNode?: Resolver<ResolversTypes['LeafNode'], ParentType, ContextType, RequireFields<MutationUpsertLeafNodeArgs, 'where' | 'create' | 'update'>>,
   deleteLeafNode?: Resolver<Maybe<ResolversTypes['LeafNode']>, ParentType, ContextType, RequireFields<MutationDeleteLeafNodeArgs, 'where'>>,
   deleteManyLeafNodes?: Resolver<ResolversTypes['BatchPayload'], ParentType, ContextType, MutationDeleteManyLeafNodesArgs>,
-  createQQuestion?: Resolver<ResolversTypes['QQuestion'], ParentType, ContextType, RequireFields<MutationCreateQQuestionArgs, 'data'>>,
-  updateQQuestion?: Resolver<Maybe<ResolversTypes['QQuestion']>, ParentType, ContextType, RequireFields<MutationUpdateQQuestionArgs, 'data' | 'where'>>,
-  updateManyQQuestions?: Resolver<ResolversTypes['BatchPayload'], ParentType, ContextType, RequireFields<MutationUpdateManyQQuestionsArgs, 'data'>>,
-  upsertQQuestion?: Resolver<ResolversTypes['QQuestion'], ParentType, ContextType, RequireFields<MutationUpsertQQuestionArgs, 'where' | 'create' | 'update'>>,
-  deleteQQuestion?: Resolver<Maybe<ResolversTypes['QQuestion']>, ParentType, ContextType, RequireFields<MutationDeleteQQuestionArgs, 'where'>>,
-  deleteManyQQuestions?: Resolver<ResolversTypes['BatchPayload'], ParentType, ContextType, MutationDeleteManyQQuestionsArgs>,
+  createNodeType?: Resolver<ResolversTypes['NodeType'], ParentType, ContextType, RequireFields<MutationCreateNodeTypeArgs, 'data'>>,
+  updateNodeType?: Resolver<Maybe<ResolversTypes['NodeType']>, ParentType, ContextType, RequireFields<MutationUpdateNodeTypeArgs, 'data' | 'where'>>,
+  updateManyNodeTypes?: Resolver<ResolversTypes['BatchPayload'], ParentType, ContextType, RequireFields<MutationUpdateManyNodeTypesArgs, 'data'>>,
+  upsertNodeType?: Resolver<ResolversTypes['NodeType'], ParentType, ContextType, RequireFields<MutationUpsertNodeTypeArgs, 'where' | 'create' | 'update'>>,
+  deleteNodeType?: Resolver<Maybe<ResolversTypes['NodeType']>, ParentType, ContextType, RequireFields<MutationDeleteNodeTypeArgs, 'where'>>,
+  deleteManyNodeTypes?: Resolver<ResolversTypes['BatchPayload'], ParentType, ContextType, MutationDeleteManyNodeTypesArgs>,
   createQuestionCondition?: Resolver<ResolversTypes['QuestionCondition'], ParentType, ContextType, RequireFields<MutationCreateQuestionConditionArgs, 'data'>>,
   updateQuestionCondition?: Resolver<Maybe<ResolversTypes['QuestionCondition']>, ParentType, ContextType, RequireFields<MutationUpdateQuestionConditionArgs, 'data' | 'where'>>,
   updateManyQuestionConditions?: Resolver<ResolversTypes['BatchPayload'], ParentType, ContextType, RequireFields<MutationUpdateManyQuestionConditionsArgs, 'data'>>,
   upsertQuestionCondition?: Resolver<ResolversTypes['QuestionCondition'], ParentType, ContextType, RequireFields<MutationUpsertQuestionConditionArgs, 'where' | 'create' | 'update'>>,
   deleteQuestionCondition?: Resolver<Maybe<ResolversTypes['QuestionCondition']>, ParentType, ContextType, RequireFields<MutationDeleteQuestionConditionArgs, 'where'>>,
   deleteManyQuestionConditions?: Resolver<ResolversTypes['BatchPayload'], ParentType, ContextType, MutationDeleteManyQuestionConditionsArgs>,
+  createQuestionNode?: Resolver<ResolversTypes['QuestionNode'], ParentType, ContextType, RequireFields<MutationCreateQuestionNodeArgs, 'data'>>,
+  updateQuestionNode?: Resolver<Maybe<ResolversTypes['QuestionNode']>, ParentType, ContextType, RequireFields<MutationUpdateQuestionNodeArgs, 'data' | 'where'>>,
+  updateManyQuestionNodes?: Resolver<ResolversTypes['BatchPayload'], ParentType, ContextType, RequireFields<MutationUpdateManyQuestionNodesArgs, 'data'>>,
+  upsertQuestionNode?: Resolver<ResolversTypes['QuestionNode'], ParentType, ContextType, RequireFields<MutationUpsertQuestionNodeArgs, 'where' | 'create' | 'update'>>,
+  deleteQuestionNode?: Resolver<Maybe<ResolversTypes['QuestionNode']>, ParentType, ContextType, RequireFields<MutationDeleteQuestionNodeArgs, 'where'>>,
+  deleteManyQuestionNodes?: Resolver<ResolversTypes['BatchPayload'], ParentType, ContextType, MutationDeleteManyQuestionNodesArgs>,
   createQuestionOption?: Resolver<ResolversTypes['QuestionOption'], ParentType, ContextType, RequireFields<MutationCreateQuestionOptionArgs, 'data'>>,
   updateQuestionOption?: Resolver<Maybe<ResolversTypes['QuestionOption']>, ParentType, ContextType, RequireFields<MutationUpdateQuestionOptionArgs, 'data' | 'where'>>,
   updateManyQuestionOptions?: Resolver<ResolversTypes['BatchPayload'], ParentType, ContextType, RequireFields<MutationUpdateManyQuestionOptionsArgs, 'data'>>,
@@ -3771,17 +3765,39 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   upsertQuestionnaire?: Resolver<ResolversTypes['Questionnaire'], ParentType, ContextType, RequireFields<MutationUpsertQuestionnaireArgs, 'where' | 'create' | 'update'>>,
   deleteQuestionnaire?: Resolver<Maybe<ResolversTypes['Questionnaire']>, ParentType, ContextType, RequireFields<MutationDeleteQuestionnaireArgs, 'where'>>,
   deleteManyQuestionnaires?: Resolver<ResolversTypes['BatchPayload'], ParentType, ContextType, MutationDeleteManyQuestionnairesArgs>,
-  createQuestionnaireSettings?: Resolver<ResolversTypes['QuestionnaireSettings'], ParentType, ContextType, RequireFields<MutationCreateQuestionnaireSettingsArgs, 'data'>>,
-  updateQuestionnaireSettings?: Resolver<Maybe<ResolversTypes['QuestionnaireSettings']>, ParentType, ContextType, RequireFields<MutationUpdateQuestionnaireSettingsArgs, 'data' | 'where'>>,
-  updateManyQuestionnaireSettingses?: Resolver<ResolversTypes['BatchPayload'], ParentType, ContextType, RequireFields<MutationUpdateManyQuestionnaireSettingsesArgs, 'data'>>,
-  upsertQuestionnaireSettings?: Resolver<ResolversTypes['QuestionnaireSettings'], ParentType, ContextType, RequireFields<MutationUpsertQuestionnaireSettingsArgs, 'where' | 'create' | 'update'>>,
-  deleteQuestionnaireSettings?: Resolver<Maybe<ResolversTypes['QuestionnaireSettings']>, ParentType, ContextType, RequireFields<MutationDeleteQuestionnaireSettingsArgs, 'where'>>,
-  deleteManyQuestionnaireSettingses?: Resolver<ResolversTypes['BatchPayload'], ParentType, ContextType, MutationDeleteManyQuestionnaireSettingsesArgs>,
 }>;
 
 export type NodeResolvers<ContextType = any, ParentType extends ResolversParentTypes['Node'] = ResolversParentTypes['Node']> = ResolversObject<{
   __resolveType: TypeResolveFn<null, ParentType, ContextType>,
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>,
+}>;
+
+export type NodeTypeResolvers<ContextType = any, ParentType extends ResolversParentTypes['NodeType'] = ResolversParentTypes['NodeType']> = ResolversObject<{
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>,
+  type?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
+}>;
+
+export type NodeTypeConnectionResolvers<ContextType = any, ParentType extends ResolversParentTypes['NodeTypeConnection'] = ResolversParentTypes['NodeTypeConnection']> = ResolversObject<{
+  pageInfo?: Resolver<ResolversTypes['PageInfo'], ParentType, ContextType>,
+  edges?: Resolver<Array<Maybe<ResolversTypes['NodeTypeEdge']>>, ParentType, ContextType>,
+  aggregate?: Resolver<ResolversTypes['AggregateNodeType'], ParentType, ContextType>,
+}>;
+
+export type NodeTypeEdgeResolvers<ContextType = any, ParentType extends ResolversParentTypes['NodeTypeEdge'] = ResolversParentTypes['NodeTypeEdge']> = ResolversObject<{
+  node?: Resolver<ResolversTypes['NodeType'], ParentType, ContextType>,
+  cursor?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
+}>;
+
+export type NodeTypePreviousValuesResolvers<ContextType = any, ParentType extends ResolversParentTypes['NodeTypePreviousValues'] = ResolversParentTypes['NodeTypePreviousValues']> = ResolversObject<{
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>,
+  type?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
+}>;
+
+export type NodeTypeSubscriptionPayloadResolvers<ContextType = any, ParentType extends ResolversParentTypes['NodeTypeSubscriptionPayload'] = ResolversParentTypes['NodeTypeSubscriptionPayload']> = ResolversObject<{
+  mutation?: Resolver<ResolversTypes['MutationType'], ParentType, ContextType>,
+  node?: Resolver<Maybe<ResolversTypes['NodeType']>, ParentType, ContextType>,
+  updatedFields?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>,
+  previousValues?: Resolver<Maybe<ResolversTypes['NodeTypePreviousValues']>, ParentType, ContextType>,
 }>;
 
 export type PageInfoResolvers<ContextType = any, ParentType extends ResolversParentTypes['PageInfo'] = ResolversParentTypes['PageInfo']> = ResolversObject<{
@@ -3791,44 +3807,6 @@ export type PageInfoResolvers<ContextType = any, ParentType extends ResolversPar
   endCursor?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
 }>;
 
-export type QQuestionResolvers<ContextType = any, ParentType extends ResolversParentTypes['QQuestion'] = ResolversParentTypes['QQuestion']> = ResolversObject<{
-  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>,
-  title?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
-  branchVal?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
-  questionType?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
-  overrideLeafId?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>,
-  leafNode?: Resolver<Maybe<ResolversTypes['LeafNode']>, ParentType, ContextType>,
-  conditions?: Resolver<Maybe<Array<ResolversTypes['QuestionCondition']>>, ParentType, ContextType, QQuestionConditionsArgs>,
-  options?: Resolver<Maybe<Array<ResolversTypes['QuestionOption']>>, ParentType, ContextType, QQuestionOptionsArgs>,
-  children?: Resolver<Maybe<Array<ResolversTypes['QQuestion']>>, ParentType, ContextType, QQuestionChildrenArgs>,
-}>;
-
-export type QQuestionConnectionResolvers<ContextType = any, ParentType extends ResolversParentTypes['QQuestionConnection'] = ResolversParentTypes['QQuestionConnection']> = ResolversObject<{
-  pageInfo?: Resolver<ResolversTypes['PageInfo'], ParentType, ContextType>,
-  edges?: Resolver<Array<Maybe<ResolversTypes['QQuestionEdge']>>, ParentType, ContextType>,
-  aggregate?: Resolver<ResolversTypes['AggregateQQuestion'], ParentType, ContextType>,
-}>;
-
-export type QQuestionEdgeResolvers<ContextType = any, ParentType extends ResolversParentTypes['QQuestionEdge'] = ResolversParentTypes['QQuestionEdge']> = ResolversObject<{
-  node?: Resolver<ResolversTypes['QQuestion'], ParentType, ContextType>,
-  cursor?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
-}>;
-
-export type QQuestionPreviousValuesResolvers<ContextType = any, ParentType extends ResolversParentTypes['QQuestionPreviousValues'] = ResolversParentTypes['QQuestionPreviousValues']> = ResolversObject<{
-  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>,
-  title?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
-  branchVal?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
-  questionType?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
-  overrideLeafId?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>,
-}>;
-
-export type QQuestionSubscriptionPayloadResolvers<ContextType = any, ParentType extends ResolversParentTypes['QQuestionSubscriptionPayload'] = ResolversParentTypes['QQuestionSubscriptionPayload']> = ResolversObject<{
-  mutation?: Resolver<ResolversTypes['MutationType'], ParentType, ContextType>,
-  node?: Resolver<Maybe<ResolversTypes['QQuestion']>, ParentType, ContextType>,
-  updatedFields?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>,
-  previousValues?: Resolver<Maybe<ResolversTypes['QQuestionPreviousValues']>, ParentType, ContextType>,
-}>;
-
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
   colourSettings?: Resolver<Maybe<ResolversTypes['ColourSettings']>, ParentType, ContextType, RequireFields<QueryColourSettingsArgs, 'where'>>,
   colourSettingses?: Resolver<Array<Maybe<ResolversTypes['ColourSettings']>>, ParentType, ContextType, QueryColourSettingsesArgs>,
@@ -3836,27 +3814,30 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   customer?: Resolver<Maybe<ResolversTypes['Customer']>, ParentType, ContextType, RequireFields<QueryCustomerArgs, 'where'>>,
   customers?: Resolver<Array<Maybe<ResolversTypes['Customer']>>, ParentType, ContextType, QueryCustomersArgs>,
   customersConnection?: Resolver<ResolversTypes['CustomerConnection'], ParentType, ContextType, QueryCustomersConnectionArgs>,
+  customerSettings?: Resolver<Maybe<ResolversTypes['CustomerSettings']>, ParentType, ContextType, RequireFields<QueryCustomerSettingsArgs, 'where'>>,
+  customerSettingses?: Resolver<Array<Maybe<ResolversTypes['CustomerSettings']>>, ParentType, ContextType, QueryCustomerSettingsesArgs>,
+  customerSettingsesConnection?: Resolver<ResolversTypes['CustomerSettingsConnection'], ParentType, ContextType, QueryCustomerSettingsesConnectionArgs>,
   fontSettings?: Resolver<Maybe<ResolversTypes['FontSettings']>, ParentType, ContextType, RequireFields<QueryFontSettingsArgs, 'where'>>,
   fontSettingses?: Resolver<Array<Maybe<ResolversTypes['FontSettings']>>, ParentType, ContextType, QueryFontSettingsesArgs>,
   fontSettingsesConnection?: Resolver<ResolversTypes['FontSettingsConnection'], ParentType, ContextType, QueryFontSettingsesConnectionArgs>,
   leafNode?: Resolver<Maybe<ResolversTypes['LeafNode']>, ParentType, ContextType, RequireFields<QueryLeafNodeArgs, 'where'>>,
   leafNodes?: Resolver<Array<Maybe<ResolversTypes['LeafNode']>>, ParentType, ContextType, QueryLeafNodesArgs>,
   leafNodesConnection?: Resolver<ResolversTypes['LeafNodeConnection'], ParentType, ContextType, QueryLeafNodesConnectionArgs>,
-  qQuestion?: Resolver<Maybe<ResolversTypes['QQuestion']>, ParentType, ContextType, RequireFields<QueryQQuestionArgs, 'where'>>,
-  qQuestions?: Resolver<Array<Maybe<ResolversTypes['QQuestion']>>, ParentType, ContextType, QueryQQuestionsArgs>,
-  qQuestionsConnection?: Resolver<ResolversTypes['QQuestionConnection'], ParentType, ContextType, QueryQQuestionsConnectionArgs>,
+  nodeType?: Resolver<Maybe<ResolversTypes['NodeType']>, ParentType, ContextType, RequireFields<QueryNodeTypeArgs, 'where'>>,
+  nodeTypes?: Resolver<Array<Maybe<ResolversTypes['NodeType']>>, ParentType, ContextType, QueryNodeTypesArgs>,
+  nodeTypesConnection?: Resolver<ResolversTypes['NodeTypeConnection'], ParentType, ContextType, QueryNodeTypesConnectionArgs>,
   questionCondition?: Resolver<Maybe<ResolversTypes['QuestionCondition']>, ParentType, ContextType, RequireFields<QueryQuestionConditionArgs, 'where'>>,
   questionConditions?: Resolver<Array<Maybe<ResolversTypes['QuestionCondition']>>, ParentType, ContextType, QueryQuestionConditionsArgs>,
   questionConditionsConnection?: Resolver<ResolversTypes['QuestionConditionConnection'], ParentType, ContextType, QueryQuestionConditionsConnectionArgs>,
+  questionNode?: Resolver<Maybe<ResolversTypes['QuestionNode']>, ParentType, ContextType, RequireFields<QueryQuestionNodeArgs, 'where'>>,
+  questionNodes?: Resolver<Array<Maybe<ResolversTypes['QuestionNode']>>, ParentType, ContextType, QueryQuestionNodesArgs>,
+  questionNodesConnection?: Resolver<ResolversTypes['QuestionNodeConnection'], ParentType, ContextType, QueryQuestionNodesConnectionArgs>,
   questionOption?: Resolver<Maybe<ResolversTypes['QuestionOption']>, ParentType, ContextType, RequireFields<QueryQuestionOptionArgs, 'where'>>,
   questionOptions?: Resolver<Array<Maybe<ResolversTypes['QuestionOption']>>, ParentType, ContextType, QueryQuestionOptionsArgs>,
   questionOptionsConnection?: Resolver<ResolversTypes['QuestionOptionConnection'], ParentType, ContextType, QueryQuestionOptionsConnectionArgs>,
   questionnaire?: Resolver<Maybe<ResolversTypes['Questionnaire']>, ParentType, ContextType, RequireFields<QueryQuestionnaireArgs, 'where'>>,
   questionnaires?: Resolver<Array<Maybe<ResolversTypes['Questionnaire']>>, ParentType, ContextType, QueryQuestionnairesArgs>,
   questionnairesConnection?: Resolver<ResolversTypes['QuestionnaireConnection'], ParentType, ContextType, QueryQuestionnairesConnectionArgs>,
-  questionnaireSettings?: Resolver<Maybe<ResolversTypes['QuestionnaireSettings']>, ParentType, ContextType, RequireFields<QueryQuestionnaireSettingsArgs, 'where'>>,
-  questionnaireSettingses?: Resolver<Array<Maybe<ResolversTypes['QuestionnaireSettings']>>, ParentType, ContextType, QueryQuestionnaireSettingsesArgs>,
-  questionnaireSettingsesConnection?: Resolver<ResolversTypes['QuestionnaireSettingsConnection'], ParentType, ContextType, QueryQuestionnaireSettingsesConnectionArgs>,
   node?: Resolver<Maybe<ResolversTypes['Node']>, ParentType, ContextType, RequireFields<QueryNodeArgs, 'id'>>,
 }>;
 
@@ -3900,10 +3881,9 @@ export type QuestionnaireResolvers<ContextType = any, ParentType extends Resolve
   title?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
   description?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
   publicTitle?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
-  setting?: Resolver<ResolversTypes['QuestionnaireSettings'], ParentType, ContextType>,
   creationDate?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>,
   updatedAt?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>,
-  questions?: Resolver<Maybe<Array<ResolversTypes['QQuestion']>>, ParentType, ContextType, QuestionnaireQuestionsArgs>,
+  questions?: Resolver<Maybe<Array<ResolversTypes['QuestionNode']>>, ParentType, ContextType, QuestionnaireQuestionsArgs>,
 }>;
 
 export type QuestionnaireConnectionResolvers<ContextType = any, ParentType extends ResolversParentTypes['QuestionnaireConnection'] = ResolversParentTypes['QuestionnaireConnection']> = ResolversObject<{
@@ -3926,45 +3906,47 @@ export type QuestionnairePreviousValuesResolvers<ContextType = any, ParentType e
   updatedAt?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>,
 }>;
 
-export type QuestionnaireSettingsResolvers<ContextType = any, ParentType extends ResolversParentTypes['QuestionnaireSettings'] = ResolversParentTypes['QuestionnaireSettings']> = ResolversObject<{
-  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>,
-  customer?: Resolver<ResolversTypes['Customer'], ParentType, ContextType>,
-  questionnaire?: Resolver<ResolversTypes['Questionnaire'], ParentType, ContextType>,
-  title?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
-  logo?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
-  colourSettings?: Resolver<ResolversTypes['ColourSettings'], ParentType, ContextType>,
-  fontSettings?: Resolver<ResolversTypes['FontSettings'], ParentType, ContextType>,
-}>;
-
-export type QuestionnaireSettingsConnectionResolvers<ContextType = any, ParentType extends ResolversParentTypes['QuestionnaireSettingsConnection'] = ResolversParentTypes['QuestionnaireSettingsConnection']> = ResolversObject<{
-  pageInfo?: Resolver<ResolversTypes['PageInfo'], ParentType, ContextType>,
-  edges?: Resolver<Array<Maybe<ResolversTypes['QuestionnaireSettingsEdge']>>, ParentType, ContextType>,
-  aggregate?: Resolver<ResolversTypes['AggregateQuestionnaireSettings'], ParentType, ContextType>,
-}>;
-
-export type QuestionnaireSettingsEdgeResolvers<ContextType = any, ParentType extends ResolversParentTypes['QuestionnaireSettingsEdge'] = ResolversParentTypes['QuestionnaireSettingsEdge']> = ResolversObject<{
-  node?: Resolver<ResolversTypes['QuestionnaireSettings'], ParentType, ContextType>,
-  cursor?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
-}>;
-
-export type QuestionnaireSettingsPreviousValuesResolvers<ContextType = any, ParentType extends ResolversParentTypes['QuestionnaireSettingsPreviousValues'] = ResolversParentTypes['QuestionnaireSettingsPreviousValues']> = ResolversObject<{
-  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>,
-  title?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
-  logo?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
-}>;
-
-export type QuestionnaireSettingsSubscriptionPayloadResolvers<ContextType = any, ParentType extends ResolversParentTypes['QuestionnaireSettingsSubscriptionPayload'] = ResolversParentTypes['QuestionnaireSettingsSubscriptionPayload']> = ResolversObject<{
-  mutation?: Resolver<ResolversTypes['MutationType'], ParentType, ContextType>,
-  node?: Resolver<Maybe<ResolversTypes['QuestionnaireSettings']>, ParentType, ContextType>,
-  updatedFields?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>,
-  previousValues?: Resolver<Maybe<ResolversTypes['QuestionnaireSettingsPreviousValues']>, ParentType, ContextType>,
-}>;
-
 export type QuestionnaireSubscriptionPayloadResolvers<ContextType = any, ParentType extends ResolversParentTypes['QuestionnaireSubscriptionPayload'] = ResolversParentTypes['QuestionnaireSubscriptionPayload']> = ResolversObject<{
   mutation?: Resolver<ResolversTypes['MutationType'], ParentType, ContextType>,
   node?: Resolver<Maybe<ResolversTypes['Questionnaire']>, ParentType, ContextType>,
   updatedFields?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>,
   previousValues?: Resolver<Maybe<ResolversTypes['QuestionnairePreviousValues']>, ParentType, ContextType>,
+}>;
+
+export type QuestionNodeResolvers<ContextType = any, ParentType extends ResolversParentTypes['QuestionNode'] = ResolversParentTypes['QuestionNode']> = ResolversObject<{
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>,
+  title?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
+  branchVal?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  questionType?: Resolver<ResolversTypes['NodeType'], ParentType, ContextType>,
+  overrideLeafId?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>,
+  conditions?: Resolver<Maybe<Array<ResolversTypes['QuestionCondition']>>, ParentType, ContextType, QuestionNodeConditionsArgs>,
+  options?: Resolver<Maybe<Array<ResolversTypes['QuestionOption']>>, ParentType, ContextType, QuestionNodeOptionsArgs>,
+  children?: Resolver<Maybe<Array<ResolversTypes['QuestionNode']>>, ParentType, ContextType, QuestionNodeChildrenArgs>,
+}>;
+
+export type QuestionNodeConnectionResolvers<ContextType = any, ParentType extends ResolversParentTypes['QuestionNodeConnection'] = ResolversParentTypes['QuestionNodeConnection']> = ResolversObject<{
+  pageInfo?: Resolver<ResolversTypes['PageInfo'], ParentType, ContextType>,
+  edges?: Resolver<Array<Maybe<ResolversTypes['QuestionNodeEdge']>>, ParentType, ContextType>,
+  aggregate?: Resolver<ResolversTypes['AggregateQuestionNode'], ParentType, ContextType>,
+}>;
+
+export type QuestionNodeEdgeResolvers<ContextType = any, ParentType extends ResolversParentTypes['QuestionNodeEdge'] = ResolversParentTypes['QuestionNodeEdge']> = ResolversObject<{
+  node?: Resolver<ResolversTypes['QuestionNode'], ParentType, ContextType>,
+  cursor?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
+}>;
+
+export type QuestionNodePreviousValuesResolvers<ContextType = any, ParentType extends ResolversParentTypes['QuestionNodePreviousValues'] = ResolversParentTypes['QuestionNodePreviousValues']> = ResolversObject<{
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>,
+  title?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
+  branchVal?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  overrideLeafId?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>,
+}>;
+
+export type QuestionNodeSubscriptionPayloadResolvers<ContextType = any, ParentType extends ResolversParentTypes['QuestionNodeSubscriptionPayload'] = ResolversParentTypes['QuestionNodeSubscriptionPayload']> = ResolversObject<{
+  mutation?: Resolver<ResolversTypes['MutationType'], ParentType, ContextType>,
+  node?: Resolver<Maybe<ResolversTypes['QuestionNode']>, ParentType, ContextType>,
+  updatedFields?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>,
+  previousValues?: Resolver<Maybe<ResolversTypes['QuestionNodePreviousValues']>, ParentType, ContextType>,
 }>;
 
 export type QuestionOptionResolvers<ContextType = any, ParentType extends ResolversParentTypes['QuestionOption'] = ResolversParentTypes['QuestionOption']> = ResolversObject<{
@@ -4000,24 +3982,26 @@ export type QuestionOptionSubscriptionPayloadResolvers<ContextType = any, Parent
 export type SubscriptionResolvers<ContextType = any, ParentType extends ResolversParentTypes['Subscription'] = ResolversParentTypes['Subscription']> = ResolversObject<{
   colourSettings?: SubscriptionResolver<Maybe<ResolversTypes['ColourSettingsSubscriptionPayload']>, "colourSettings", ParentType, ContextType, SubscriptionColourSettingsArgs>,
   customer?: SubscriptionResolver<Maybe<ResolversTypes['CustomerSubscriptionPayload']>, "customer", ParentType, ContextType, SubscriptionCustomerArgs>,
+  customerSettings?: SubscriptionResolver<Maybe<ResolversTypes['CustomerSettingsSubscriptionPayload']>, "customerSettings", ParentType, ContextType, SubscriptionCustomerSettingsArgs>,
   fontSettings?: SubscriptionResolver<Maybe<ResolversTypes['FontSettingsSubscriptionPayload']>, "fontSettings", ParentType, ContextType, SubscriptionFontSettingsArgs>,
   leafNode?: SubscriptionResolver<Maybe<ResolversTypes['LeafNodeSubscriptionPayload']>, "leafNode", ParentType, ContextType, SubscriptionLeafNodeArgs>,
-  qQuestion?: SubscriptionResolver<Maybe<ResolversTypes['QQuestionSubscriptionPayload']>, "qQuestion", ParentType, ContextType, SubscriptionQQuestionArgs>,
+  nodeType?: SubscriptionResolver<Maybe<ResolversTypes['NodeTypeSubscriptionPayload']>, "nodeType", ParentType, ContextType, SubscriptionNodeTypeArgs>,
   questionCondition?: SubscriptionResolver<Maybe<ResolversTypes['QuestionConditionSubscriptionPayload']>, "questionCondition", ParentType, ContextType, SubscriptionQuestionConditionArgs>,
+  questionNode?: SubscriptionResolver<Maybe<ResolversTypes['QuestionNodeSubscriptionPayload']>, "questionNode", ParentType, ContextType, SubscriptionQuestionNodeArgs>,
   questionOption?: SubscriptionResolver<Maybe<ResolversTypes['QuestionOptionSubscriptionPayload']>, "questionOption", ParentType, ContextType, SubscriptionQuestionOptionArgs>,
   questionnaire?: SubscriptionResolver<Maybe<ResolversTypes['QuestionnaireSubscriptionPayload']>, "questionnaire", ParentType, ContextType, SubscriptionQuestionnaireArgs>,
-  questionnaireSettings?: SubscriptionResolver<Maybe<ResolversTypes['QuestionnaireSettingsSubscriptionPayload']>, "questionnaireSettings", ParentType, ContextType, SubscriptionQuestionnaireSettingsArgs>,
 }>;
 
 export type Resolvers<ContextType = any> = ResolversObject<{
   AggregateColourSettings?: AggregateColourSettingsResolvers<ContextType>,
   AggregateCustomer?: AggregateCustomerResolvers<ContextType>,
+  AggregateCustomerSettings?: AggregateCustomerSettingsResolvers<ContextType>,
   AggregateFontSettings?: AggregateFontSettingsResolvers<ContextType>,
   AggregateLeafNode?: AggregateLeafNodeResolvers<ContextType>,
-  AggregateQQuestion?: AggregateQQuestionResolvers<ContextType>,
+  AggregateNodeType?: AggregateNodeTypeResolvers<ContextType>,
   AggregateQuestionCondition?: AggregateQuestionConditionResolvers<ContextType>,
   AggregateQuestionnaire?: AggregateQuestionnaireResolvers<ContextType>,
-  AggregateQuestionnaireSettings?: AggregateQuestionnaireSettingsResolvers<ContextType>,
+  AggregateQuestionNode?: AggregateQuestionNodeResolvers<ContextType>,
   AggregateQuestionOption?: AggregateQuestionOptionResolvers<ContextType>,
   BatchPayload?: BatchPayloadResolvers<ContextType>,
   ColourSettings?: ColourSettingsResolvers<ContextType>,
@@ -4029,6 +4013,11 @@ export type Resolvers<ContextType = any> = ResolversObject<{
   CustomerConnection?: CustomerConnectionResolvers<ContextType>,
   CustomerEdge?: CustomerEdgeResolvers<ContextType>,
   CustomerPreviousValues?: CustomerPreviousValuesResolvers<ContextType>,
+  CustomerSettings?: CustomerSettingsResolvers<ContextType>,
+  CustomerSettingsConnection?: CustomerSettingsConnectionResolvers<ContextType>,
+  CustomerSettingsEdge?: CustomerSettingsEdgeResolvers<ContextType>,
+  CustomerSettingsPreviousValues?: CustomerSettingsPreviousValuesResolvers<ContextType>,
+  CustomerSettingsSubscriptionPayload?: CustomerSettingsSubscriptionPayloadResolvers<ContextType>,
   CustomerSubscriptionPayload?: CustomerSubscriptionPayloadResolvers<ContextType>,
   DateTime?: GraphQLScalarType,
   FontSettings?: FontSettingsResolvers<ContextType>,
@@ -4044,12 +4033,12 @@ export type Resolvers<ContextType = any> = ResolversObject<{
   Long?: GraphQLScalarType,
   Mutation?: MutationResolvers<ContextType>,
   Node?: NodeResolvers,
+  NodeType?: NodeTypeResolvers<ContextType>,
+  NodeTypeConnection?: NodeTypeConnectionResolvers<ContextType>,
+  NodeTypeEdge?: NodeTypeEdgeResolvers<ContextType>,
+  NodeTypePreviousValues?: NodeTypePreviousValuesResolvers<ContextType>,
+  NodeTypeSubscriptionPayload?: NodeTypeSubscriptionPayloadResolvers<ContextType>,
   PageInfo?: PageInfoResolvers<ContextType>,
-  QQuestion?: QQuestionResolvers<ContextType>,
-  QQuestionConnection?: QQuestionConnectionResolvers<ContextType>,
-  QQuestionEdge?: QQuestionEdgeResolvers<ContextType>,
-  QQuestionPreviousValues?: QQuestionPreviousValuesResolvers<ContextType>,
-  QQuestionSubscriptionPayload?: QQuestionSubscriptionPayloadResolvers<ContextType>,
   Query?: QueryResolvers<ContextType>,
   QuestionCondition?: QuestionConditionResolvers<ContextType>,
   QuestionConditionConnection?: QuestionConditionConnectionResolvers<ContextType>,
@@ -4060,12 +4049,12 @@ export type Resolvers<ContextType = any> = ResolversObject<{
   QuestionnaireConnection?: QuestionnaireConnectionResolvers<ContextType>,
   QuestionnaireEdge?: QuestionnaireEdgeResolvers<ContextType>,
   QuestionnairePreviousValues?: QuestionnairePreviousValuesResolvers<ContextType>,
-  QuestionnaireSettings?: QuestionnaireSettingsResolvers<ContextType>,
-  QuestionnaireSettingsConnection?: QuestionnaireSettingsConnectionResolvers<ContextType>,
-  QuestionnaireSettingsEdge?: QuestionnaireSettingsEdgeResolvers<ContextType>,
-  QuestionnaireSettingsPreviousValues?: QuestionnaireSettingsPreviousValuesResolvers<ContextType>,
-  QuestionnaireSettingsSubscriptionPayload?: QuestionnaireSettingsSubscriptionPayloadResolvers<ContextType>,
   QuestionnaireSubscriptionPayload?: QuestionnaireSubscriptionPayloadResolvers<ContextType>,
+  QuestionNode?: QuestionNodeResolvers<ContextType>,
+  QuestionNodeConnection?: QuestionNodeConnectionResolvers<ContextType>,
+  QuestionNodeEdge?: QuestionNodeEdgeResolvers<ContextType>,
+  QuestionNodePreviousValues?: QuestionNodePreviousValuesResolvers<ContextType>,
+  QuestionNodeSubscriptionPayload?: QuestionNodeSubscriptionPayloadResolvers<ContextType>,
   QuestionOption?: QuestionOptionResolvers<ContextType>,
   QuestionOptionConnection?: QuestionOptionConnectionResolvers<ContextType>,
   QuestionOptionEdge?: QuestionOptionEdgeResolvers<ContextType>,

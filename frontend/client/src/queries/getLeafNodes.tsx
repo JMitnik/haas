@@ -5,7 +5,9 @@ export const GET_LEAF_NODES = gql`
         leafNodes {
             title
             nodeId
-            type
+            type {
+              type
+            }
         }
       }
     `

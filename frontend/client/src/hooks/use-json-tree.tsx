@@ -9,6 +9,10 @@ export interface HAASNodeConditions {
 type HAASQuestionNodeType = 'slider' | 'multi-choice' | 'text-box';
 type HAASLeafType = 'textbox' | 'social-share' | 'registration' | 'phone';
 
+export interface HAASQuestionType {
+    type: HAASQuestionNodeType | HAASLeafType;
+}
+
 export interface MultiChoiceOption {
   value: string;
   publicValue?: string;
@@ -18,10 +22,9 @@ export interface HAASNode {
   id: number;
   nodeId?: number;
   title: string;
-  branchVal: string;
+  branchVal?: string;
   conditions?: [HAASNodeConditions];
-  type: HAASQuestionNodeType | HAASLeafType;
-  questionType?: HAASQuestionNodeType | HAASLeafType;
+  questionType: HAASQuestionType;
   overrideLeafId?: number;
   options?: [MultiChoiceOption];
   children: [HAASNode];
@@ -37,10 +40,8 @@ interface HAASRouterParams {
 }
 
 const findNextNode = (parent: HAASNode, key: string | number) => {
-  console.log('Key: ', key)
   const candidates = parent?.children?.filter(child => {
-    console.log('Child conditions: ', child?.conditions?.[0]);
-    if (parent.questionType === 'slider') {
+    if (parent.questionType.type === 'slider') {
       if (child?.conditions?.[0].renderMin && key < child?.conditions?.[0].renderMin) {
         return false;
       }
@@ -50,15 +51,14 @@ const findNextNode = (parent: HAASNode, key: string | number) => {
       }
     }
 
-    if (parent.questionType === 'multi-choice') {
+    if (parent.questionType.type === 'multi-choice') {
       return child.conditions?.[0].matchValue === key;
     }
 
     return true;
   });
 
-  console.log('candidates: ', candidates);
-
+  console.log('Candidates: ', candidates)
   return candidates && candidates[0];
 };
 
@@ -68,14 +68,10 @@ export const JSONTreeContext = React.createContext({} as JSONTreeContextProps);
 
 export const JSONTreeProvider = ({ json, children }: { json: any, children: ReactNode }) => {
 
-
-  // console.log("old data: ", JSON.parse(JSON.stringify(json.rootQuestion)))
-
   const [activeLeafNodeId, setActiveLeafNodeID] = useState(0);
+  
   // const [historyStack, setHistoryStack] = useState<HAASNode[]>([JSON.parse(JSON.stringify(json.rootQuestion))]);
   const [historyStack, setHistoryStack] = useState<HAASNode[]>(json.questionnaire);
-  // console.log('history stack: ', historyStack)
-  // const [activeNode, setActiveNode] = useState(historyStack.slice(0)[0]);
   const leafCollection: [HAASNode] = json.LeafCollection;
 
   const goToChild = (key: string | number) => {
@@ -86,7 +82,10 @@ export const JSONTreeProvider = ({ json, children }: { json: any, children: Reac
 
     if (!nextNode) {
       nextNode = findLeafNode(leafCollection, activeLeafNodeId);
+      console.log('Leaf node: ', nextNode)
     }
+
+    
 
     setHistoryStack(hist => [...hist, nextNode]);
   };
