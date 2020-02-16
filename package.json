@@ -20,10 +20,12 @@
         "start:api": "yarn workspace @haas/api start",
         "start:client": "yarn workspace @haas/client start",
         "build:client": "yarn workspace @haas/client build",
+        "build:api": "yarn workspace @haas/api generate && yarn workspace @haas/api build",
         "server:gen": "yarn workspace @haas/api generate",
         "start:dashboard": "yarn workspace @haas/dashboard start",
         "dashboard:gen": "yarn workspace @haas/dashboard generate",
-        "bootstrap": "lerna bootstrap --use-workspaces"
+        "bootstrap": "lerna bootstrap --use-workspaces",
+        "heroku-postbuild": "yarn build:api"
     },
     "devDependencies": {
         "lerna": "^3.20.2",
