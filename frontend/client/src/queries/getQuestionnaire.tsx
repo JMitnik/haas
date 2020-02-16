@@ -2,10 +2,7 @@
 import gql from 'graphql-tag';
 
 export const GET_QUESTIONNAIRE = gql`
-      query getQuestionnaire {
-        questionnaire(where: {
-    id: "ck6lrox2w01650783lo0kxom8"
-  }) {
+  query getQuestionnaire { questionnaire(where: { id: "ck6lrox2w01650783lo0kxom8"}) {
     id
     title
     publicTitle
@@ -68,7 +65,7 @@ export const GET_QUESTIONNAIRE = gql`
               matchValue
               renderMin
               renderMax
-            }  
+            }
           }
         }
       }
@@ -82,7 +79,7 @@ export const GET_QUESTIONNAIRE = gql`
         id
         value
         publicValue
-      }    
+      }
     }
   }
 }
