@@ -12,4 +12,4 @@ generate:
   - generator: graphql-schema
     output: ./src/generated/prisma.graphql
 
-endpoint: http://localhost:4466
+endpoint: ${env:PRISMA_ENDPOINT}
