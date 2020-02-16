@@ -1,0 +1,7 @@
+type FontSettings {
+    id: ID! @id
+    settingTitle: String
+    body: String
+    fontTitle: String
+    special: String
+}

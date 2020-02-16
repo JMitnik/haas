@@ -6,5 +6,5 @@ type Topic {
     logoUrl: String
     language: String
     topicUrl: String
-    questions: [Question!]! @relation(link: TABLE)
+    questions: [QQuestion!]! @relation(link: TABLE)
 }

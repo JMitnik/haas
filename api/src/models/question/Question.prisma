@@ -1,0 +1,10 @@
+type QuestionNode {
+    id: ID! @id
+    title: String!
+    branchVal: String
+    questionType: NodeType!
+    overrideLeafId: Int
+    conditions: [QuestionCondition]
+    options: [QuestionOption]
+    children: [QuestionNode]
+}

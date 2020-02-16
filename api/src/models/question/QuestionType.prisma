@@ -1,0 +1,4 @@
+type NodeType {
+    id: ID! @id
+    type: String! 
+}
