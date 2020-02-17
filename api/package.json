@@ -2,7 +2,7 @@
     "name": "@haas/api",
     "version": "0.1.0",
     "scripts": {
-        "start": "nodemon 'app.ts' --exec 'ts-node' src/server.ts -e ts,graphql",
+        "start": "nodemon --exec 'ts-node' app.ts",
         "generate": "prisma deploy && prisma generate && graphql-codegen"
     },
     "dependencies": {

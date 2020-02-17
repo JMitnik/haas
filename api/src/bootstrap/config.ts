@@ -10,6 +10,4 @@ const config: any = {
     PATH_TO_PRISMA_GENERATED_SCHEMA: process.env.PATH_TO_PRISMA_GENERATED_SCHEMA || './src/generated/prisma.graphql',
 };
 
-console.log(config);
-
 export default config;
