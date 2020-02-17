@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BrowserRouter } from 'react-router-dom';
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import styled, { css, ThemeProvider } from 'styled-components';
 import theme from './theme';
 import { FormContext, useForm } from 'react-hook-form';
@@ -8,6 +8,7 @@ import { ColumnFlex } from '@haas/ui/src/Container';
 import flow from './flow.json';
 import { JSONTreeProvider } from './hooks/use-json-tree';
 import { HAASForm } from './HAASForm';
+import { StudySelector } from './StudySelector'
 import whyDidYouRender from '@welldone-software/why-did-you-render';
 
 import { useQuery } from '@apollo/react-hooks';
@@ -44,9 +45,8 @@ const CenteredScreen = styled(Div)`
 
 const App: React.FC = () => {
   const form = useForm();
-  // const data = JSON.parse(JSON.stringify(flow));
-  const [currTheme, setCurrTheme] = useState('ck6lq5xn7007t0783e0p51lva') 
-  const themeData = useQuery<any>(GET_THEME_COLOURS, { variables: { id: currTheme}})
+
+  const [currStudy, setCurrStudy] = useState('')
 
   const leafNodes = useQuery<any>(GET_LEAF_NODES)
 
@@ -54,25 +54,19 @@ const App: React.FC = () => {
     data,
     loading,
     error
-  } = useQuery<any>(GET_QUESTIONNAIRE);
+  } = useQuery<any>(GET_QUESTIONNAIRE, { variables: {id: currStudy}});
 
+  const getCurrentStudyFromChild = (studyId: string) => {
+    setCurrStudy(studyId)
+  }
 
-
-  if (themeData?.data?.colourSettings) {
-    const { lightest, light, normal, dark, darkest, muted, text, primary, secondary, tertiary, success, warning, error } = themeData?.data?.colourSettings
-    const colours = { 'black': 'black', 'white': 'white', 'primary': primary, 'secondary': secondary, 'tertiary': tertiary, 'success': success, 'warning': warning, 'error': error, default: { 'lightest': lightest, 'light': light, 'normal': normal, 'dark': dark, 'darkest': darkest, 'muted': muted, 'text': text } }
-    // console.log('lightest: ', lightest)
-    // const defaultValues = {'lightest': lightest, 'light': light, 'normal': normal, 'dark': dark, 'darkest': darkest, 'muted': muted, 'text': text}
-    // colours.default = defaultValues
+  if (data?.questionnaire?.customer?.settings?.colourSettings) {
+    console.log("COLOUR SETTINGS: ",data?.questionnaire?.customer?.settings?.colourSettings)
+    const {title, lightest, light, normal, dark, darkest, muted, text, primary, secondary, tertiary, success, warning, error } = data?.questionnaire?.customer?.settings?.colourSettings
+    const colours = {'title': title, 'black': 'black', 'white': 'white', 'primary': primary, 'secondary': secondary, 'tertiary': tertiary, 'success': success, 'warning': warning, 'error': error, default: { 'lightest': lightest, 'light': light, 'normal': normal, 'dark': dark, 'darkest': darkest, 'muted': muted, 'text': text } }
     theme.colors = colours
+    console.log('New theme colours: ', theme)
   }
-
-  function setTheme(event: any) {
-    event.preventDefault();
-    setCurrTheme(event.target.value)
-  }
-
-  console.log('New theme colours: ', theme)
 
   const cleanData = data?.questionnaire?.questions;
   const finalData = { questionnaire: cleanData, LeafCollection: leafNodes?.data?.leafNodes };
@@ -88,11 +82,12 @@ const App: React.FC = () => {
             <JSONTreeProvider json={finalData}>
               <FormContext {...form}>
                 <ColumnFlex alignItems="center">
-                  <HAASForm />
-                  <select onChange={(event) => setTheme(event)} value={currTheme}>
+                  {currStudy && <HAASForm />}
+                  {!currStudy && <StudySelector sendCurrentStudyToParent={getCurrentStudyFromChild}></StudySelector>}
+                  {/* <select onChange={(event) => setTheme(event)} value={currTheme}>
                     <option value="ck6lq5xn7007t0783e0p51lva">Classic</option>
                     <option value="ck6lzn9bd04370783aywip306">Alternative</option>
-                  </select>
+                  </select> */}
                 </ColumnFlex>
               </FormContext>
             </JSONTreeProvider>

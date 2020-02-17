@@ -2,9 +2,9 @@
 import gql from 'graphql-tag';
 
 export const GET_QUESTIONNAIRE = gql`
-      query getQuestionnaire {
+      query getQuestionnaire ($id: ID) {
         questionnaire(where: {
-    id: "ck6lrox2w01650783lo0kxom8"
+    id: $id
   }) {
     id
     title
@@ -84,6 +84,28 @@ export const GET_QUESTIONNAIRE = gql`
         publicValue
       }    
     }
+    customer {
+      id
+    	settings {
+        colourSettings {
+          id
+          title
+          primary
+          secondary
+          tertiary
+          success
+          warning
+          error
+          lightest
+          light
+          normal
+          dark
+          darkest
+          muted
+          text
+        }
+      }
+  	}
   }
 }
 `;
