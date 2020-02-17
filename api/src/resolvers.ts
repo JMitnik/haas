@@ -1,40 +1,39 @@
-import { forwardTo, Prisma } from 'prisma-binding';
+import { forwardTo } from 'prisma-binding';
 import { QueryResolvers, MutationResolvers } from './generated/resolver-types';
 import { prisma } from './generated/prisma-client';
 
-const QueryResolvers: QueryResolvers = {
+const queryResolvers: QueryResolvers = {
   questions: forwardTo('db'),
   topics: forwardTo('db'),
-}
+};
 
-const MutationResolvers: MutationResolvers = {
-  createTopic: async (parent, { data }, ctx, info) => {
-
+const mutationResolvers: MutationResolvers = {
+  createTopic: async (parent, { data }) => {
     // TODO: Fix type-mismatch between questions from resolver-types and index
     const { title, publicTitle, description } = data;
 
-    const topic = await prisma.createTopic({title, publicTitle, description});
+    const topic = await prisma.createTopic({ title, publicTitle, description });
 
     return topic;
   },
   deleteManyTopics: forwardTo('db'),
   deleteTopic: forwardTo('db'),
-  createQuestion: async (parent, { data }, ctx, info) => {
+  createQuestion: async () => {
     const question = await prisma.createQuestion({});
 
     return {
-      id: question.id
-    }
-  }
-}
+      id: question.id,
+    };
+  },
+};
 
 const resolvers = {
   Query: {
-    ...QueryResolvers
+    ...queryResolvers,
   },
   Mutation: {
-    ...MutationResolvers
-  }
+    ...mutationResolvers,
+  },
 };
 
 export default resolvers;
