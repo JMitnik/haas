@@ -4043,6 +4043,6 @@ export const models: Model[] = [
 export const Prisma = makePrismaClientClass<ClientConstructor<Prisma>>({
   typeDefs,
   models,
-  endpoint: `http://localhost:4466`
+  endpoint: `https://haas-db-prod.herokuapp.com/haas-db-prod/prod`
 });
 export const prisma = new Prisma();
