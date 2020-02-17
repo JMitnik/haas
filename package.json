@@ -24,8 +24,7 @@
         "server:gen": "yarn workspace @haas/api generate",
         "start:dashboard": "yarn workspace @haas/dashboard start",
         "dashboard:gen": "yarn workspace @haas/dashboard generate",
-        "bootstrap": "lerna bootstrap --use-workspaces",
-        "heroku-postbuild": "yarn build:api"
+        "bootstrap": "lerna bootstrap --use-workspaces"
     },
     "devDependencies": {
         "lerna": "^3.20.2",
