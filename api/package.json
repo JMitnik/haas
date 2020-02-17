@@ -3,7 +3,6 @@
     "version": "0.1.0",
     "scripts": {
         "start": "nodemon 'app.ts' --exec 'ts-node' src/server.ts -e ts,graphql",
-        "build": "nodemon 'app.ts' --exec 'ts-node' src/server.ts -e ts,graphql",
         "generate": "prisma deploy && prisma generate && graphql-codegen"
     },
     "dependencies": {
