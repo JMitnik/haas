@@ -6,12 +6,8 @@ export const StudySelector = ({ sendCurrentStudyToParent } : { sendCurrentStudyT
 
     const {data, loading, error} = useQuery<any>(GET_SHALLOW_QUESTIONNAIRE_INFO);
 
-
-    
     if (loading) return <div>'Loading...'</div>;
     if (error) return <div>{'Error!' + error.message}</div>;
-
-    console.log(data?.questionnaires)
 
     return (
         <Div useFlex flexDirection='column' justifyContent='space-between' height={['100vh', '80vh']}>

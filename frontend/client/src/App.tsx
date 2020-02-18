@@ -56,16 +56,16 @@ const App: React.FC = () => {
     error
   } = useQuery<any>(GET_QUESTIONNAIRE, { variables: {id: currStudy}});
 
+  console.log('QUESTIONNAIRE DATA: ', data)
+
   const getCurrentStudyFromChild = (studyId: string) => {
     setCurrStudy(studyId)
   }
 
   if (data?.questionnaire?.customer?.settings?.colourSettings) {
-    console.log("COLOUR SETTINGS: ",data?.questionnaire?.customer?.settings?.colourSettings)
     const {title, lightest, light, normal, dark, darkest, muted, text, primary, secondary, tertiary, success, warning, error } = data?.questionnaire?.customer?.settings?.colourSettings
     const colours = {'title': title, 'black': 'black', 'white': 'white', 'primary': primary, 'secondary': secondary, 'tertiary': tertiary, 'success': success, 'warning': warning, 'error': error, default: { 'lightest': lightest, 'light': light, 'normal': normal, 'dark': dark, 'darkest': darkest, 'muted': muted, 'text': text } }
     theme.colors = colours
-    console.log('New theme colours: ', theme)
   }
 
   const cleanData = data?.questionnaire?.questions;

@@ -4,10 +4,13 @@ import { prisma } from './generated/prisma-client';
 
 const queryResolvers: QueryResolvers = {
   questionNodes: forwardTo('db'),
+  questionNode: forwardTo('db'),
   questionnaire: forwardTo('db'),
   questionnaires: forwardTo('db'),
   leafNodes: forwardTo('db'),
-  colourSettings: forwardTo('db')
+  leafNode: forwardTo('db'),
+  colourSettings: forwardTo('db'),
+  edges: forwardTo('db')
   // questions: forwardTo('db'),
   // topics: forwardTo('db'),
 }

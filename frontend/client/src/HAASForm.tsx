@@ -47,7 +47,7 @@ export const HAASForm = () => {
 HAASForm.whyDidYouRender = true;
 
 const renderNextNode = (node: any) => {
-  let nodeType = node.type || node.questionType.type || node.type?.type || '';
+  let nodeType =  node?.questionType?.type || node?.type?.type || (node && node?.type)  || '';
   const Component: React.ReactNode | undefined = nodeMap.get(nodeType);
 
   return Component || <HAASTextBox />
@@ -58,5 +58,6 @@ const nodeMap = new Map([
   ['multi-choice', <HAASMultiChoice />],
   ['social-share', <HAASSocialShare />],
   ['textbox', <HAASTextBox />],
-  ['registration', <HAASSignIn />]
+  ['registration', <HAASSignIn />],
+  // [undefined, <HAASTextBox />]
 ]);

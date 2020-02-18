@@ -12,78 +12,45 @@ export const GET_QUESTIONNAIRE = gql`
     creationDate
     updatedAt
     questions {
-      id
-      title
-      overrideLeafId
-      questionType {
+    id
+    title
+    questionType {
         type
+    }
+    edgeChildren {
+      id
+      parentNode {
+        id
+        title
       }
-      children {
+      childNode {
         id
         title
         questionType {
-        type
-      	}
-        overrideLeafId
-        conditions {
-          id
-          matchValue
-          renderMin
-          renderMax
+          type
         }
         options {
           value
-          publicValue
         }
-        children {
-          id
-          overrideLeafId
-          title
-          questionType {
-        		type
-      		}
-          options {
-            value
-            publicValue
-          }
-          conditions {
-            id
-            matchValue
-            renderMin
-            renderMax
-          }
-          children {
-          	id
-            overrideLeafId
-            title
-            questionType {
-        			type
-      			}
-            options {
-              value
-              publicValue
-            }
-            conditions {
-              id
-              matchValue
-              renderMin
-              renderMax
-            }  
-          }
+        conditions {
+          conditionType
+          renderMin
+          renderMax
+          matchValue
         }
       }
-      conditions {
-        id
-        matchValue
-        renderMin
-        renderMax
-      }
-      options {
-        id
+    }
+    options {
         value
         publicValue
-      }    
     }
+    conditions {
+      conditionType
+      matchValue
+      renderMin
+      renderMax
+    }
+}
     customer {
       id
     	settings {
@@ -109,4 +76,3 @@ export const GET_QUESTIONNAIRE = gql`
   }
 }
 `;
-
