@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import styled, { css, ThemeProvider } from 'styled-components';
 import theme from './theme';
 import Select from 'react-select';
@@ -7,6 +8,7 @@ import { Div } from '@haas/ui';
 import { ColumnFlex } from '@haas/ui/src/Container';
 import { JSONTreeProvider } from './hooks/use-json-tree';
 import { HAASForm } from './HAASForm';
+import { StudySelector } from './StudySelector'
 
 import { useQuery } from '@apollo/react-hooks';
 
@@ -18,6 +20,8 @@ import { GET_THEME_COLOURS } from './queries/getTheme'
 const App: React.FC = () => {
   const form = useForm();
 
+  const [currStudy, setCurrStudy] = useState('')
+
   const [currTheme, setCurrTheme] = useState<any>('ck6lq5xn7007t0783e0p51lva')
   const themeData = useQuery<any>(GET_THEME_COLOURS, { variables: { id: currTheme}})
   const leafNodes = useQuery<any>(GET_LEAF_NODES);
@@ -26,17 +30,18 @@ const App: React.FC = () => {
     data,
     loading,
     error
-  } = useQuery<any>(GET_QUESTIONNAIRE);
+  } = useQuery<any>(GET_QUESTIONNAIRE, { variables: {id: currStudy}});
 
-  if (themeData?.data?.colourSettings) {
-    const { lightest, light, normal, dark, darkest, muted, text, primary, secondary, tertiary, success, warning, error } = themeData?.data?.colourSettings
-    const colours = { 'black': 'black', 'white': 'white', 'primary': primary, 'secondary': secondary, 'tertiary': tertiary, 'success': success, 'warning': warning, 'error': error, default: { 'lightest': lightest, 'light': light, 'normal': normal, 'dark': dark, 'darkest': darkest, 'muted': muted, 'text': text } }
-    theme.colors = colours
+  const getCurrentStudyFromChild = (studyId: string) => {
+    setCurrStudy(studyId)
   }
 
-  const setTheme = (event: any) => {
-    event.preventDefault();
-    setCurrTheme(event.target?.value)
+  if (data?.questionnaire?.customer?.settings?.colourSettings) {
+    console.log("COLOUR SETTINGS: ",data?.questionnaire?.customer?.settings?.colourSettings)
+    const {title, lightest, light, normal, dark, darkest, muted, text, primary, secondary, tertiary, success, warning, error } = data?.questionnaire?.customer?.settings?.colourSettings
+    const colours = {'title': title, 'black': 'black', 'white': 'white', 'primary': primary, 'secondary': secondary, 'tertiary': tertiary, 'success': success, 'warning': warning, 'error': error, default: { 'lightest': lightest, 'light': light, 'normal': normal, 'dark': dark, 'darkest': darkest, 'muted': muted, 'text': text } }
+    theme.colors = colours
+    console.log('New theme colours: ', theme)
   }
 
   const cleanData = data?.questionnaire?.questions;
@@ -58,10 +63,8 @@ const App: React.FC = () => {
             <JSONTreeProvider json={finalData}>
               <FormContext {...form}>
                 <ColumnFlex alignItems="center">
-                  <HAASForm />
-                  <DropdownContainer alignSelf="normal" width={1/2} >
-                    <Select onChange={(value) => setCurrTheme(value)} options={themeOptions} />
-                  </DropdownContainer>
+                  {currStudy && <HAASForm />}
+                  {!currStudy && <StudySelector sendCurrentStudyToParent={getCurrentStudyFromChild}></StudySelector>}
                 </ColumnFlex>
               </FormContext>
             </JSONTreeProvider>
