@@ -38,6 +38,8 @@ mindmaps
 # misc
 .DS_Store
 .env.local
+.prod.env
+.dev.env
 .env.development.local
 .env.test.local
 .env.production.local
@@ -47,3 +49,5 @@ yarn-debug.log*
 yarn-error.log*
 
 types.d.ts
+
+.now

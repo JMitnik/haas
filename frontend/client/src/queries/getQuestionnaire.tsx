@@ -68,7 +68,7 @@ export const GET_QUESTIONNAIRE = gql`
               matchValue
               renderMin
               renderMax
-            }  
+            }
           }
         }
       }
@@ -82,7 +82,7 @@ export const GET_QUESTIONNAIRE = gql`
         id
         value
         publicValue
-      }    
+      }
     }
     customer {
       id

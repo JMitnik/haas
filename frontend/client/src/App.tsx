@@ -2,14 +2,13 @@ import React, { useState } from 'react';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import styled, { css, ThemeProvider } from 'styled-components';
 import theme from './theme';
+import Select from 'react-select';
 import { FormContext, useForm } from 'react-hook-form';
 import { Div } from '@haas/ui';
 import { ColumnFlex } from '@haas/ui/src/Container';
-import flow from './flow.json';
 import { JSONTreeProvider } from './hooks/use-json-tree';
 import { HAASForm } from './HAASForm';
 import { StudySelector } from './StudySelector'
-import whyDidYouRender from '@welldone-software/why-did-you-render';
 
 import { useQuery } from '@apollo/react-hooks';
 
@@ -18,37 +17,14 @@ import { GET_LEAF_NODES } from './queries/getLeafNodes'
 
 import { GET_THEME_COLOURS } from './queries/getTheme'
 
-whyDidYouRender(React);
-
-
-const MainAppScreen = styled(Div)`
-  ${({ theme }) => css`
-    min-width: 100vw;
-    min-height: 100vh;
-    background: ${theme.colors.primary};
-  `}
-`;
-
-const CenteredScreen = styled(Div)`
-  ${({ theme }) => css`
-    max-width: 780px;
-    margin: 0 auto;
-    position: relative;
-    padding-top: 100px;
-
-    @media ${theme.media.mob} {
-      padding-top: 0;
-    }
-  `}
-`;
-
-
 const App: React.FC = () => {
   const form = useForm();
 
   const [currStudy, setCurrStudy] = useState('')
 
-  const leafNodes = useQuery<any>(GET_LEAF_NODES)
+  const [currTheme, setCurrTheme] = useState<any>('ck6lq5xn7007t0783e0p51lva')
+  const themeData = useQuery<any>(GET_THEME_COLOURS, { variables: { id: currTheme}})
+  const leafNodes = useQuery<any>(GET_LEAF_NODES);
 
   const {
     data,
@@ -74,6 +50,11 @@ const App: React.FC = () => {
   if (loading) return <div>'Loading...'</div>;
   if (error) return <div>{'Error!' + error.message}</div>;
 
+  const themeOptions = [
+    { value: 'ck6lq5xn7007t0783e0p51lva', label: 'Classic' },
+    { value: 'ck6lzn9bd04370783aywip306', label: 'Alternative' },
+  ];
+
   return (
     <>
       <ThemeProvider theme={theme}>
@@ -84,10 +65,6 @@ const App: React.FC = () => {
                 <ColumnFlex alignItems="center">
                   {currStudy && <HAASForm />}
                   {!currStudy && <StudySelector sendCurrentStudyToParent={getCurrentStudyFromChild}></StudySelector>}
-                  {/* <select onChange={(event) => setTheme(event)} value={currTheme}>
-                    <option value="ck6lq5xn7007t0783e0p51lva">Classic</option>
-                    <option value="ck6lzn9bd04370783aywip306">Alternative</option>
-                  </select> */}
                 </ColumnFlex>
               </FormContext>
             </JSONTreeProvider>
@@ -97,5 +74,33 @@ const App: React.FC = () => {
     </>
   );
 }
+
+
+const DropdownContainer = styled(Div)`
+  position: absolute;
+  right: 0;
+  bottom: 0;
+`;
+
+const MainAppScreen = styled(Div)`
+  ${({ theme }) => css`
+    min-width: 100vw;
+    min-height: 100vh;
+    background: ${theme.colors.primary};
+  `}
+`;
+
+const CenteredScreen = styled(Div)`
+  ${({ theme }) => css`
+    max-width: 780px;
+    margin: 0 auto;
+    position: relative;
+    padding-top: 100px;
+
+    @media ${theme.media.mob} {
+      padding-top: 0;
+    }
+  `}
+`;
 
 export default App;
