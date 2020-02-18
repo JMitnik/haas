@@ -5,7 +5,6 @@ import theme from './theme';
 import { FormContext, useForm } from 'react-hook-form';
 import { Div } from '@haas/ui';
 import { ColumnFlex } from '@haas/ui/src/Container';
-import flow from './flow.json';
 import { JSONTreeProvider } from './hooks/use-json-tree';
 import { HAASForm } from './HAASForm';
 import { StudySelector } from './StudySelector'
@@ -15,8 +14,6 @@ import { useQuery } from '@apollo/react-hooks';
 
 import { GET_QUESTIONNAIRE } from './queries/getQuestionnaire'
 import { GET_LEAF_NODES } from './queries/getLeafNodes'
-
-import { GET_THEME_COLOURS } from './queries/getTheme'
 
 whyDidYouRender(React);
 
@@ -56,8 +53,6 @@ const App: React.FC = () => {
     error
   } = useQuery<any>(GET_QUESTIONNAIRE, { variables: {id: currStudy}});
 
-  console.log('QUESTIONNAIRE DATA: ', data)
-
   const getCurrentStudyFromChild = (studyId: string) => {
     setCurrStudy(studyId)
   }
@@ -84,10 +79,6 @@ const App: React.FC = () => {
                 <ColumnFlex alignItems="center">
                   {currStudy && <HAASForm />}
                   {!currStudy && <StudySelector sendCurrentStudyToParent={getCurrentStudyFromChild}></StudySelector>}
-                  {/* <select onChange={(event) => setTheme(event)} value={currTheme}>
-                    <option value="ck6lq5xn7007t0783e0p51lva">Classic</option>
-                    <option value="ck6lzn9bd04370783aywip306">Alternative</option>
-                  </select> */}
                 </ColumnFlex>
               </FormContext>
             </JSONTreeProvider>

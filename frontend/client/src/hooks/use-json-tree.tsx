@@ -76,29 +76,6 @@ const findNextEdge = (parent: HAASNode, key: string | number) => {
   return candidates && candidates[0];
 };
 
-const findNextNode = (parent: HAASNode, key: string | number) => {
-  const candidates = parent?.children?.filter(child => {
-    if (parent.questionType.type === 'slider') {
-      if (child?.conditions?.[0].renderMin && key < child?.conditions?.[0].renderMin) {
-        return false;
-      }
-
-      if (child?.conditions?.[0].renderMax && key > child?.conditions?.[0].renderMax) {
-        return false;
-      }
-    }
-
-    if (parent.questionType.type === 'multi-choice') {
-      return child.conditions?.[0].matchValue === key;
-    }
-
-    return true;
-  });
-
-  console.log('Candidates: ', candidates)
-  return candidates && candidates[0];
-};
-
 const findLeafNode = (collection: HAASNode[], key: number) => collection.filter(item => item.nodeId === key)[0];
 
 export const JSONTreeContext = React.createContext({} as JSONTreeContextProps);
@@ -106,23 +83,19 @@ export const JSONTreeContext = React.createContext({} as JSONTreeContextProps);
 export const JSONTreeProvider = ({ json, children }: { json: any, children: ReactNode }) => {
 
   const [activeLeafNodeId, setActiveLeafNodeID] = useState(0);
-  const [currEdge, setCurrEdge] = useState('')
-  // const [historyStack, setHistoryStack] = useState<HAASNode[]>([JSON.parse(JSON.stringify(json.rootQuestion))]);
+
   const [historyStack, setHistoryStack] = useState<HAASNode[]>(json.questionnaire);
   const leafCollection: [HAASNode] = json.LeafCollection;
 
   const goToChild = async (key: string | number) => {
     let nextEdge: Edge = findNextEdge(historyStack.slice(-1)[0], key);
-    // setCurrEdge(nextEdge.id)
-    console.log('EDGE: ', nextEdge)
-    console.log('Child node from Edge: ',  nextEdge?.childNode?.id)
+
     let nextNode: any = nextEdge?.childNode?.id && await client.query({
       query: GET_QUESTION_NODE,
       variables: {
         id: nextEdge?.childNode.id
       }
     }).then(res => res.data.questionNode)
-    console.log('nextNode: ', nextNode)
 
     if (nextNode && nextNode.overrideLeafId) {
       setActiveLeafNodeID(nextNode.overrideLeafId);
@@ -132,10 +105,6 @@ export const JSONTreeProvider = ({ json, children }: { json: any, children: Reac
       nextNode = findLeafNode(leafCollection, activeLeafNodeId);
       console.log('Leaf node: ', nextNode)
     }
-
-
-    console.log('NEXT NODE: ', nextNode)
-
 
     setHistoryStack(hist => [...hist, nextNode]);
   };

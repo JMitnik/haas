@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React from 'react';
 import { H1, Div, Card, CardBody, H3, Flex } from '@haas/ui';
 import { useQuery } from '@apollo/react-hooks';
 import { GET_SHALLOW_QUESTIONNAIRE_INFO } from './queries/getShallowQuestionnaireInfo'
@@ -13,8 +13,8 @@ export const StudySelector = ({ sendCurrentStudyToParent } : { sendCurrentStudyT
         <Div useFlex flexDirection='column' justifyContent='space-between' height={['100vh', '80vh']}>
             <H1 textAlign="center" color="white">Questionnaires</H1>
 
-            {data?.questionnaires?.map((questionnaire: any) => {
-                return <TopicCard questionnaire={questionnaire} sendCurrentStudyToParent={sendCurrentStudyToParent}></TopicCard>
+            {data?.questionnaires?.map((questionnaire: any, index: number) => {
+                return <TopicCard key={index} questionnaire={questionnaire} sendCurrentStudyToParent={sendCurrentStudyToParent}></TopicCard>
             })}
         </Div>
     )
