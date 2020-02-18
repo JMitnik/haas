@@ -27,6 +27,11 @@ export type AggregateCustomerSettings = {
   count: Scalars['Int'],
 };
 
+export type AggregateEdge = {
+   __typename?: 'AggregateEdge',
+  count: Scalars['Int'],
+};
+
 export type AggregateFontSettings = {
    __typename?: 'AggregateFontSettings',
   count: Scalars['Int'],
@@ -800,6 +805,184 @@ export type CustomerWhereUniqueInput = {
 };
 
 
+export type Edge = {
+   __typename?: 'Edge',
+  id: Scalars['ID'],
+  createdAt: Scalars['DateTime'],
+  updatedAt: Scalars['DateTime'],
+  parentNode?: Maybe<QuestionNode>,
+  childNode?: Maybe<QuestionNode>,
+};
+
+export type EdgeConnection = {
+   __typename?: 'EdgeConnection',
+  pageInfo: PageInfo,
+  edges: Array<Maybe<EdgeEdge>>,
+  aggregate: AggregateEdge,
+};
+
+export type EdgeCreateInput = {
+  id?: Maybe<Scalars['ID']>,
+  parentNode?: Maybe<QuestionNodeCreateOneInput>,
+  childNode?: Maybe<QuestionNodeCreateOneInput>,
+};
+
+export type EdgeCreateManyInput = {
+  create?: Maybe<Array<EdgeCreateInput>>,
+  connect?: Maybe<Array<EdgeWhereUniqueInput>>,
+};
+
+export type EdgeEdge = {
+   __typename?: 'EdgeEdge',
+  node: Edge,
+  cursor: Scalars['String'],
+};
+
+export enum EdgeOrderByInput {
+  IdAsc = 'id_ASC',
+  IdDesc = 'id_DESC',
+  CreatedAtAsc = 'createdAt_ASC',
+  CreatedAtDesc = 'createdAt_DESC',
+  UpdatedAtAsc = 'updatedAt_ASC',
+  UpdatedAtDesc = 'updatedAt_DESC'
+}
+
+export type EdgePreviousValues = {
+   __typename?: 'EdgePreviousValues',
+  id: Scalars['ID'],
+  createdAt: Scalars['DateTime'],
+  updatedAt: Scalars['DateTime'],
+};
+
+export type EdgeScalarWhereInput = {
+  id?: Maybe<Scalars['ID']>,
+  id_not?: Maybe<Scalars['ID']>,
+  id_in?: Maybe<Array<Scalars['ID']>>,
+  id_not_in?: Maybe<Array<Scalars['ID']>>,
+  id_lt?: Maybe<Scalars['ID']>,
+  id_lte?: Maybe<Scalars['ID']>,
+  id_gt?: Maybe<Scalars['ID']>,
+  id_gte?: Maybe<Scalars['ID']>,
+  id_contains?: Maybe<Scalars['ID']>,
+  id_not_contains?: Maybe<Scalars['ID']>,
+  id_starts_with?: Maybe<Scalars['ID']>,
+  id_not_starts_with?: Maybe<Scalars['ID']>,
+  id_ends_with?: Maybe<Scalars['ID']>,
+  id_not_ends_with?: Maybe<Scalars['ID']>,
+  createdAt?: Maybe<Scalars['DateTime']>,
+  createdAt_not?: Maybe<Scalars['DateTime']>,
+  createdAt_in?: Maybe<Array<Scalars['DateTime']>>,
+  createdAt_not_in?: Maybe<Array<Scalars['DateTime']>>,
+  createdAt_lt?: Maybe<Scalars['DateTime']>,
+  createdAt_lte?: Maybe<Scalars['DateTime']>,
+  createdAt_gt?: Maybe<Scalars['DateTime']>,
+  createdAt_gte?: Maybe<Scalars['DateTime']>,
+  updatedAt?: Maybe<Scalars['DateTime']>,
+  updatedAt_not?: Maybe<Scalars['DateTime']>,
+  updatedAt_in?: Maybe<Array<Scalars['DateTime']>>,
+  updatedAt_not_in?: Maybe<Array<Scalars['DateTime']>>,
+  updatedAt_lt?: Maybe<Scalars['DateTime']>,
+  updatedAt_lte?: Maybe<Scalars['DateTime']>,
+  updatedAt_gt?: Maybe<Scalars['DateTime']>,
+  updatedAt_gte?: Maybe<Scalars['DateTime']>,
+  AND?: Maybe<Array<EdgeScalarWhereInput>>,
+  OR?: Maybe<Array<EdgeScalarWhereInput>>,
+  NOT?: Maybe<Array<EdgeScalarWhereInput>>,
+};
+
+export type EdgeSubscriptionPayload = {
+   __typename?: 'EdgeSubscriptionPayload',
+  mutation: MutationType,
+  node?: Maybe<Edge>,
+  updatedFields?: Maybe<Array<Scalars['String']>>,
+  previousValues?: Maybe<EdgePreviousValues>,
+};
+
+export type EdgeSubscriptionWhereInput = {
+  mutation_in?: Maybe<Array<MutationType>>,
+  updatedFields_contains?: Maybe<Scalars['String']>,
+  updatedFields_contains_every?: Maybe<Array<Scalars['String']>>,
+  updatedFields_contains_some?: Maybe<Array<Scalars['String']>>,
+  node?: Maybe<EdgeWhereInput>,
+  AND?: Maybe<Array<EdgeSubscriptionWhereInput>>,
+  OR?: Maybe<Array<EdgeSubscriptionWhereInput>>,
+  NOT?: Maybe<Array<EdgeSubscriptionWhereInput>>,
+};
+
+export type EdgeUpdateDataInput = {
+  parentNode?: Maybe<QuestionNodeUpdateOneInput>,
+  childNode?: Maybe<QuestionNodeUpdateOneInput>,
+};
+
+export type EdgeUpdateInput = {
+  parentNode?: Maybe<QuestionNodeUpdateOneInput>,
+  childNode?: Maybe<QuestionNodeUpdateOneInput>,
+};
+
+export type EdgeUpdateManyInput = {
+  create?: Maybe<Array<EdgeCreateInput>>,
+  update?: Maybe<Array<EdgeUpdateWithWhereUniqueNestedInput>>,
+  upsert?: Maybe<Array<EdgeUpsertWithWhereUniqueNestedInput>>,
+  delete?: Maybe<Array<EdgeWhereUniqueInput>>,
+  connect?: Maybe<Array<EdgeWhereUniqueInput>>,
+  set?: Maybe<Array<EdgeWhereUniqueInput>>,
+  disconnect?: Maybe<Array<EdgeWhereUniqueInput>>,
+  deleteMany?: Maybe<Array<EdgeScalarWhereInput>>,
+};
+
+export type EdgeUpdateWithWhereUniqueNestedInput = {
+  where: EdgeWhereUniqueInput,
+  data: EdgeUpdateDataInput,
+};
+
+export type EdgeUpsertWithWhereUniqueNestedInput = {
+  where: EdgeWhereUniqueInput,
+  update: EdgeUpdateDataInput,
+  create: EdgeCreateInput,
+};
+
+export type EdgeWhereInput = {
+  id?: Maybe<Scalars['ID']>,
+  id_not?: Maybe<Scalars['ID']>,
+  id_in?: Maybe<Array<Scalars['ID']>>,
+  id_not_in?: Maybe<Array<Scalars['ID']>>,
+  id_lt?: Maybe<Scalars['ID']>,
+  id_lte?: Maybe<Scalars['ID']>,
+  id_gt?: Maybe<Scalars['ID']>,
+  id_gte?: Maybe<Scalars['ID']>,
+  id_contains?: Maybe<Scalars['ID']>,
+  id_not_contains?: Maybe<Scalars['ID']>,
+  id_starts_with?: Maybe<Scalars['ID']>,
+  id_not_starts_with?: Maybe<Scalars['ID']>,
+  id_ends_with?: Maybe<Scalars['ID']>,
+  id_not_ends_with?: Maybe<Scalars['ID']>,
+  createdAt?: Maybe<Scalars['DateTime']>,
+  createdAt_not?: Maybe<Scalars['DateTime']>,
+  createdAt_in?: Maybe<Array<Scalars['DateTime']>>,
+  createdAt_not_in?: Maybe<Array<Scalars['DateTime']>>,
+  createdAt_lt?: Maybe<Scalars['DateTime']>,
+  createdAt_lte?: Maybe<Scalars['DateTime']>,
+  createdAt_gt?: Maybe<Scalars['DateTime']>,
+  createdAt_gte?: Maybe<Scalars['DateTime']>,
+  updatedAt?: Maybe<Scalars['DateTime']>,
+  updatedAt_not?: Maybe<Scalars['DateTime']>,
+  updatedAt_in?: Maybe<Array<Scalars['DateTime']>>,
+  updatedAt_not_in?: Maybe<Array<Scalars['DateTime']>>,
+  updatedAt_lt?: Maybe<Scalars['DateTime']>,
+  updatedAt_lte?: Maybe<Scalars['DateTime']>,
+  updatedAt_gt?: Maybe<Scalars['DateTime']>,
+  updatedAt_gte?: Maybe<Scalars['DateTime']>,
+  parentNode?: Maybe<QuestionNodeWhereInput>,
+  childNode?: Maybe<QuestionNodeWhereInput>,
+  AND?: Maybe<Array<EdgeWhereInput>>,
+  OR?: Maybe<Array<EdgeWhereInput>>,
+  NOT?: Maybe<Array<EdgeWhereInput>>,
+};
+
+export type EdgeWhereUniqueInput = {
+  id?: Maybe<Scalars['ID']>,
+};
+
 export type FontSettings = {
    __typename?: 'FontSettings',
   id: Scalars['ID'],
@@ -1132,6 +1315,11 @@ export type Mutation = {
   upsertCustomerSettings: CustomerSettings,
   deleteCustomerSettings?: Maybe<CustomerSettings>,
   deleteManyCustomerSettingses: BatchPayload,
+  createEdge: Edge,
+  updateEdge?: Maybe<Edge>,
+  upsertEdge: Edge,
+  deleteEdge?: Maybe<Edge>,
+  deleteManyEdges: BatchPayload,
   createFontSettings: FontSettings,
   updateFontSettings?: Maybe<FontSettings>,
   updateManyFontSettingses: BatchPayload,
@@ -1276,6 +1464,34 @@ export type MutationDeleteCustomerSettingsArgs = {
 
 export type MutationDeleteManyCustomerSettingsesArgs = {
   where?: Maybe<CustomerSettingsWhereInput>
+};
+
+
+export type MutationCreateEdgeArgs = {
+  data: EdgeCreateInput
+};
+
+
+export type MutationUpdateEdgeArgs = {
+  data: EdgeUpdateInput,
+  where: EdgeWhereUniqueInput
+};
+
+
+export type MutationUpsertEdgeArgs = {
+  where: EdgeWhereUniqueInput,
+  create: EdgeCreateInput,
+  update: EdgeUpdateInput
+};
+
+
+export type MutationDeleteEdgeArgs = {
+  where: EdgeWhereUniqueInput
+};
+
+
+export type MutationDeleteManyEdgesArgs = {
+  where?: Maybe<EdgeWhereInput>
 };
 
 
@@ -1677,6 +1893,9 @@ export type Query = {
   customerSettings?: Maybe<CustomerSettings>,
   customerSettingses: Array<Maybe<CustomerSettings>>,
   customerSettingsesConnection: CustomerSettingsConnection,
+  edge?: Maybe<Edge>,
+  edges: Array<Maybe<Edge>>,
+  edgesConnection: EdgeConnection,
   fontSettings?: Maybe<FontSettings>,
   fontSettingses: Array<Maybe<FontSettings>>,
   fontSettingsesConnection: FontSettingsConnection,
@@ -1775,6 +1994,33 @@ export type QueryCustomerSettingsesArgs = {
 export type QueryCustomerSettingsesConnectionArgs = {
   where?: Maybe<CustomerSettingsWhereInput>,
   orderBy?: Maybe<CustomerSettingsOrderByInput>,
+  skip?: Maybe<Scalars['Int']>,
+  after?: Maybe<Scalars['String']>,
+  before?: Maybe<Scalars['String']>,
+  first?: Maybe<Scalars['Int']>,
+  last?: Maybe<Scalars['Int']>
+};
+
+
+export type QueryEdgeArgs = {
+  where: EdgeWhereUniqueInput
+};
+
+
+export type QueryEdgesArgs = {
+  where?: Maybe<EdgeWhereInput>,
+  orderBy?: Maybe<EdgeOrderByInput>,
+  skip?: Maybe<Scalars['Int']>,
+  after?: Maybe<Scalars['String']>,
+  before?: Maybe<Scalars['String']>,
+  first?: Maybe<Scalars['Int']>,
+  last?: Maybe<Scalars['Int']>
+};
+
+
+export type QueryEdgesConnectionArgs = {
+  where?: Maybe<EdgeWhereInput>,
+  orderBy?: Maybe<EdgeOrderByInput>,
   skip?: Maybe<Scalars['Int']>,
   after?: Maybe<Scalars['String']>,
   before?: Maybe<Scalars['String']>,
@@ -2439,6 +2685,7 @@ export type QuestionNode = {
   conditions?: Maybe<Array<QuestionCondition>>,
   options?: Maybe<Array<QuestionOption>>,
   children?: Maybe<Array<QuestionNode>>,
+  edgeChildren?: Maybe<Array<Edge>>,
 };
 
 
@@ -2474,6 +2721,17 @@ export type QuestionNodeChildrenArgs = {
   last?: Maybe<Scalars['Int']>
 };
 
+
+export type QuestionNodeEdgeChildrenArgs = {
+  where?: Maybe<EdgeWhereInput>,
+  orderBy?: Maybe<EdgeOrderByInput>,
+  skip?: Maybe<Scalars['Int']>,
+  after?: Maybe<Scalars['String']>,
+  before?: Maybe<Scalars['String']>,
+  first?: Maybe<Scalars['Int']>,
+  last?: Maybe<Scalars['Int']>
+};
+
 export type QuestionNodeConnection = {
    __typename?: 'QuestionNodeConnection',
   pageInfo: PageInfo,
@@ -2490,11 +2748,17 @@ export type QuestionNodeCreateInput = {
   conditions?: Maybe<QuestionConditionCreateManyInput>,
   options?: Maybe<QuestionOptionCreateManyInput>,
   children?: Maybe<QuestionNodeCreateManyInput>,
+  edgeChildren?: Maybe<EdgeCreateManyInput>,
 };
 
 export type QuestionNodeCreateManyInput = {
   create?: Maybe<Array<QuestionNodeCreateInput>>,
   connect?: Maybe<Array<QuestionNodeWhereUniqueInput>>,
+};
+
+export type QuestionNodeCreateOneInput = {
+  create?: Maybe<QuestionNodeCreateInput>,
+  connect?: Maybe<QuestionNodeWhereUniqueInput>,
 };
 
 export type QuestionNodeEdge = {
@@ -2605,6 +2869,7 @@ export type QuestionNodeUpdateDataInput = {
   conditions?: Maybe<QuestionConditionUpdateManyInput>,
   options?: Maybe<QuestionOptionUpdateManyInput>,
   children?: Maybe<QuestionNodeUpdateManyInput>,
+  edgeChildren?: Maybe<EdgeUpdateManyInput>,
 };
 
 export type QuestionNodeUpdateInput = {
@@ -2615,6 +2880,7 @@ export type QuestionNodeUpdateInput = {
   conditions?: Maybe<QuestionConditionUpdateManyInput>,
   options?: Maybe<QuestionOptionUpdateManyInput>,
   children?: Maybe<QuestionNodeUpdateManyInput>,
+  edgeChildren?: Maybe<EdgeUpdateManyInput>,
 };
 
 export type QuestionNodeUpdateManyDataInput = {
@@ -2646,9 +2912,23 @@ export type QuestionNodeUpdateManyWithWhereNestedInput = {
   data: QuestionNodeUpdateManyDataInput,
 };
 
+export type QuestionNodeUpdateOneInput = {
+  create?: Maybe<QuestionNodeCreateInput>,
+  update?: Maybe<QuestionNodeUpdateDataInput>,
+  upsert?: Maybe<QuestionNodeUpsertNestedInput>,
+  delete?: Maybe<Scalars['Boolean']>,
+  disconnect?: Maybe<Scalars['Boolean']>,
+  connect?: Maybe<QuestionNodeWhereUniqueInput>,
+};
+
 export type QuestionNodeUpdateWithWhereUniqueNestedInput = {
   where: QuestionNodeWhereUniqueInput,
   data: QuestionNodeUpdateDataInput,
+};
+
+export type QuestionNodeUpsertNestedInput = {
+  update: QuestionNodeUpdateDataInput,
+  create: QuestionNodeCreateInput,
 };
 
 export type QuestionNodeUpsertWithWhereUniqueNestedInput = {
@@ -2718,6 +2998,9 @@ export type QuestionNodeWhereInput = {
   children_every?: Maybe<QuestionNodeWhereInput>,
   children_some?: Maybe<QuestionNodeWhereInput>,
   children_none?: Maybe<QuestionNodeWhereInput>,
+  edgeChildren_every?: Maybe<EdgeWhereInput>,
+  edgeChildren_some?: Maybe<EdgeWhereInput>,
+  edgeChildren_none?: Maybe<EdgeWhereInput>,
   AND?: Maybe<Array<QuestionNodeWhereInput>>,
   OR?: Maybe<Array<QuestionNodeWhereInput>>,
   NOT?: Maybe<Array<QuestionNodeWhereInput>>,
@@ -2946,6 +3229,7 @@ export type Subscription = {
   colourSettings?: Maybe<ColourSettingsSubscriptionPayload>,
   customer?: Maybe<CustomerSubscriptionPayload>,
   customerSettings?: Maybe<CustomerSettingsSubscriptionPayload>,
+  edge?: Maybe<EdgeSubscriptionPayload>,
   fontSettings?: Maybe<FontSettingsSubscriptionPayload>,
   leafNode?: Maybe<LeafNodeSubscriptionPayload>,
   nodeType?: Maybe<NodeTypeSubscriptionPayload>,
@@ -2968,6 +3252,11 @@ export type SubscriptionCustomerArgs = {
 
 export type SubscriptionCustomerSettingsArgs = {
   where?: Maybe<CustomerSettingsSubscriptionWhereInput>
+};
+
+
+export type SubscriptionEdgeArgs = {
+  where?: Maybe<EdgeSubscriptionWhereInput>
 };
 
 
@@ -3106,6 +3395,25 @@ export type ResolversTypes = ResolversObject<{
   CustomerSettingsConnection: ResolverTypeWrapper<CustomerSettingsConnection>,
   CustomerSettingsEdge: ResolverTypeWrapper<CustomerSettingsEdge>,
   AggregateCustomerSettings: ResolverTypeWrapper<AggregateCustomerSettings>,
+  EdgeWhereUniqueInput: EdgeWhereUniqueInput,
+  Edge: ResolverTypeWrapper<Edge>,
+  DateTime: ResolverTypeWrapper<Scalars['DateTime']>,
+  QuestionNode: ResolverTypeWrapper<QuestionNode>,
+  NodeType: ResolverTypeWrapper<NodeType>,
+  QuestionConditionWhereInput: QuestionConditionWhereInput,
+  QuestionConditionOrderByInput: QuestionConditionOrderByInput,
+  QuestionCondition: ResolverTypeWrapper<QuestionCondition>,
+  QuestionOptionWhereInput: QuestionOptionWhereInput,
+  QuestionOptionOrderByInput: QuestionOptionOrderByInput,
+  QuestionOption: ResolverTypeWrapper<QuestionOption>,
+  QuestionNodeWhereInput: QuestionNodeWhereInput,
+  NodeTypeWhereInput: NodeTypeWhereInput,
+  EdgeWhereInput: EdgeWhereInput,
+  QuestionNodeOrderByInput: QuestionNodeOrderByInput,
+  EdgeOrderByInput: EdgeOrderByInput,
+  EdgeConnection: ResolverTypeWrapper<EdgeConnection>,
+  EdgeEdge: ResolverTypeWrapper<EdgeEdge>,
+  AggregateEdge: ResolverTypeWrapper<AggregateEdge>,
   FontSettingsWhereUniqueInput: FontSettingsWhereUniqueInput,
   FontSettingsOrderByInput: FontSettingsOrderByInput,
   FontSettingsConnection: ResolverTypeWrapper<FontSettingsConnection>,
@@ -3113,9 +3421,7 @@ export type ResolversTypes = ResolversObject<{
   AggregateFontSettings: ResolverTypeWrapper<AggregateFontSettings>,
   LeafNodeWhereUniqueInput: LeafNodeWhereUniqueInput,
   LeafNode: ResolverTypeWrapper<LeafNode>,
-  NodeType: ResolverTypeWrapper<NodeType>,
   LeafNodeWhereInput: LeafNodeWhereInput,
-  NodeTypeWhereInput: NodeTypeWhereInput,
   LeafNodeOrderByInput: LeafNodeOrderByInput,
   LeafNodeConnection: ResolverTypeWrapper<LeafNodeConnection>,
   LeafNodeEdge: ResolverTypeWrapper<LeafNodeEdge>,
@@ -3126,19 +3432,10 @@ export type ResolversTypes = ResolversObject<{
   NodeTypeEdge: ResolverTypeWrapper<NodeTypeEdge>,
   AggregateNodeType: ResolverTypeWrapper<AggregateNodeType>,
   QuestionConditionWhereUniqueInput: QuestionConditionWhereUniqueInput,
-  QuestionCondition: ResolverTypeWrapper<QuestionCondition>,
-  QuestionConditionWhereInput: QuestionConditionWhereInput,
-  QuestionConditionOrderByInput: QuestionConditionOrderByInput,
   QuestionConditionConnection: ResolverTypeWrapper<QuestionConditionConnection>,
   QuestionConditionEdge: ResolverTypeWrapper<QuestionConditionEdge>,
   AggregateQuestionCondition: ResolverTypeWrapper<AggregateQuestionCondition>,
   QuestionNodeWhereUniqueInput: QuestionNodeWhereUniqueInput,
-  QuestionNode: ResolverTypeWrapper<QuestionNode>,
-  QuestionOptionWhereInput: QuestionOptionWhereInput,
-  QuestionOptionOrderByInput: QuestionOptionOrderByInput,
-  QuestionOption: ResolverTypeWrapper<QuestionOption>,
-  QuestionNodeWhereInput: QuestionNodeWhereInput,
-  QuestionNodeOrderByInput: QuestionNodeOrderByInput,
   QuestionNodeConnection: ResolverTypeWrapper<QuestionNodeConnection>,
   QuestionNodeEdge: ResolverTypeWrapper<QuestionNodeEdge>,
   AggregateQuestionNode: ResolverTypeWrapper<AggregateQuestionNode>,
@@ -3148,7 +3445,6 @@ export type ResolversTypes = ResolversObject<{
   AggregateQuestionOption: ResolverTypeWrapper<AggregateQuestionOption>,
   QuestionnaireWhereUniqueInput: QuestionnaireWhereUniqueInput,
   Questionnaire: ResolverTypeWrapper<Questionnaire>,
-  DateTime: ResolverTypeWrapper<Scalars['DateTime']>,
   QuestionnaireWhereInput: QuestionnaireWhereInput,
   QuestionnaireOrderByInput: QuestionnaireOrderByInput,
   QuestionnaireConnection: ResolverTypeWrapper<QuestionnaireConnection>,
@@ -3186,28 +3482,23 @@ export type ResolversTypes = ResolversObject<{
   CustomerUpdateWithoutSettingsDataInput: CustomerUpdateWithoutSettingsDataInput,
   CustomerUpsertWithoutSettingsInput: CustomerUpsertWithoutSettingsInput,
   CustomerSettingsUpdateManyMutationInput: CustomerSettingsUpdateManyMutationInput,
-  FontSettingsUpdateInput: FontSettingsUpdateInput,
-  FontSettingsUpdateManyMutationInput: FontSettingsUpdateManyMutationInput,
-  LeafNodeCreateInput: LeafNodeCreateInput,
+  EdgeCreateInput: EdgeCreateInput,
+  QuestionNodeCreateOneInput: QuestionNodeCreateOneInput,
+  QuestionNodeCreateInput: QuestionNodeCreateInput,
   NodeTypeCreateOneInput: NodeTypeCreateOneInput,
   NodeTypeCreateInput: NodeTypeCreateInput,
-  LeafNodeUpdateInput: LeafNodeUpdateInput,
-  NodeTypeUpdateOneInput: NodeTypeUpdateOneInput,
-  NodeTypeUpdateDataInput: NodeTypeUpdateDataInput,
-  NodeTypeUpsertNestedInput: NodeTypeUpsertNestedInput,
-  LeafNodeUpdateManyMutationInput: LeafNodeUpdateManyMutationInput,
-  NodeTypeUpdateInput: NodeTypeUpdateInput,
-  NodeTypeUpdateManyMutationInput: NodeTypeUpdateManyMutationInput,
-  QuestionConditionCreateInput: QuestionConditionCreateInput,
-  QuestionConditionUpdateInput: QuestionConditionUpdateInput,
-  QuestionConditionUpdateManyMutationInput: QuestionConditionUpdateManyMutationInput,
-  QuestionNodeCreateInput: QuestionNodeCreateInput,
   QuestionConditionCreateManyInput: QuestionConditionCreateManyInput,
+  QuestionConditionCreateInput: QuestionConditionCreateInput,
   QuestionOptionCreateManyInput: QuestionOptionCreateManyInput,
   QuestionOptionCreateInput: QuestionOptionCreateInput,
   QuestionNodeCreateManyInput: QuestionNodeCreateManyInput,
-  QuestionNodeUpdateInput: QuestionNodeUpdateInput,
+  EdgeCreateManyInput: EdgeCreateManyInput,
+  EdgeUpdateInput: EdgeUpdateInput,
+  QuestionNodeUpdateOneInput: QuestionNodeUpdateOneInput,
+  QuestionNodeUpdateDataInput: QuestionNodeUpdateDataInput,
   NodeTypeUpdateOneRequiredInput: NodeTypeUpdateOneRequiredInput,
+  NodeTypeUpdateDataInput: NodeTypeUpdateDataInput,
+  NodeTypeUpsertNestedInput: NodeTypeUpsertNestedInput,
   QuestionConditionUpdateManyInput: QuestionConditionUpdateManyInput,
   QuestionConditionUpdateWithWhereUniqueNestedInput: QuestionConditionUpdateWithWhereUniqueNestedInput,
   QuestionConditionUpdateDataInput: QuestionConditionUpdateDataInput,
@@ -3224,11 +3515,27 @@ export type ResolversTypes = ResolversObject<{
   QuestionOptionUpdateManyDataInput: QuestionOptionUpdateManyDataInput,
   QuestionNodeUpdateManyInput: QuestionNodeUpdateManyInput,
   QuestionNodeUpdateWithWhereUniqueNestedInput: QuestionNodeUpdateWithWhereUniqueNestedInput,
-  QuestionNodeUpdateDataInput: QuestionNodeUpdateDataInput,
   QuestionNodeUpsertWithWhereUniqueNestedInput: QuestionNodeUpsertWithWhereUniqueNestedInput,
   QuestionNodeScalarWhereInput: QuestionNodeScalarWhereInput,
   QuestionNodeUpdateManyWithWhereNestedInput: QuestionNodeUpdateManyWithWhereNestedInput,
   QuestionNodeUpdateManyDataInput: QuestionNodeUpdateManyDataInput,
+  EdgeUpdateManyInput: EdgeUpdateManyInput,
+  EdgeUpdateWithWhereUniqueNestedInput: EdgeUpdateWithWhereUniqueNestedInput,
+  EdgeUpdateDataInput: EdgeUpdateDataInput,
+  EdgeUpsertWithWhereUniqueNestedInput: EdgeUpsertWithWhereUniqueNestedInput,
+  EdgeScalarWhereInput: EdgeScalarWhereInput,
+  QuestionNodeUpsertNestedInput: QuestionNodeUpsertNestedInput,
+  FontSettingsUpdateInput: FontSettingsUpdateInput,
+  FontSettingsUpdateManyMutationInput: FontSettingsUpdateManyMutationInput,
+  LeafNodeCreateInput: LeafNodeCreateInput,
+  LeafNodeUpdateInput: LeafNodeUpdateInput,
+  NodeTypeUpdateOneInput: NodeTypeUpdateOneInput,
+  LeafNodeUpdateManyMutationInput: LeafNodeUpdateManyMutationInput,
+  NodeTypeUpdateInput: NodeTypeUpdateInput,
+  NodeTypeUpdateManyMutationInput: NodeTypeUpdateManyMutationInput,
+  QuestionConditionUpdateInput: QuestionConditionUpdateInput,
+  QuestionConditionUpdateManyMutationInput: QuestionConditionUpdateManyMutationInput,
+  QuestionNodeUpdateInput: QuestionNodeUpdateInput,
   QuestionNodeUpdateManyMutationInput: QuestionNodeUpdateManyMutationInput,
   QuestionOptionUpdateInput: QuestionOptionUpdateInput,
   QuestionOptionUpdateManyMutationInput: QuestionOptionUpdateManyMutationInput,
@@ -3250,6 +3557,9 @@ export type ResolversTypes = ResolversObject<{
   CustomerSettingsSubscriptionWhereInput: CustomerSettingsSubscriptionWhereInput,
   CustomerSettingsSubscriptionPayload: ResolverTypeWrapper<CustomerSettingsSubscriptionPayload>,
   CustomerSettingsPreviousValues: ResolverTypeWrapper<CustomerSettingsPreviousValues>,
+  EdgeSubscriptionWhereInput: EdgeSubscriptionWhereInput,
+  EdgeSubscriptionPayload: ResolverTypeWrapper<EdgeSubscriptionPayload>,
+  EdgePreviousValues: ResolverTypeWrapper<EdgePreviousValues>,
   FontSettingsSubscriptionWhereInput: FontSettingsSubscriptionWhereInput,
   FontSettingsSubscriptionPayload: ResolverTypeWrapper<FontSettingsSubscriptionPayload>,
   FontSettingsPreviousValues: ResolverTypeWrapper<FontSettingsPreviousValues>,
@@ -3304,6 +3614,25 @@ export type ResolversParentTypes = ResolversObject<{
   CustomerSettingsConnection: CustomerSettingsConnection,
   CustomerSettingsEdge: CustomerSettingsEdge,
   AggregateCustomerSettings: AggregateCustomerSettings,
+  EdgeWhereUniqueInput: EdgeWhereUniqueInput,
+  Edge: Edge,
+  DateTime: Scalars['DateTime'],
+  QuestionNode: QuestionNode,
+  NodeType: NodeType,
+  QuestionConditionWhereInput: QuestionConditionWhereInput,
+  QuestionConditionOrderByInput: QuestionConditionOrderByInput,
+  QuestionCondition: QuestionCondition,
+  QuestionOptionWhereInput: QuestionOptionWhereInput,
+  QuestionOptionOrderByInput: QuestionOptionOrderByInput,
+  QuestionOption: QuestionOption,
+  QuestionNodeWhereInput: QuestionNodeWhereInput,
+  NodeTypeWhereInput: NodeTypeWhereInput,
+  EdgeWhereInput: EdgeWhereInput,
+  QuestionNodeOrderByInput: QuestionNodeOrderByInput,
+  EdgeOrderByInput: EdgeOrderByInput,
+  EdgeConnection: EdgeConnection,
+  EdgeEdge: EdgeEdge,
+  AggregateEdge: AggregateEdge,
   FontSettingsWhereUniqueInput: FontSettingsWhereUniqueInput,
   FontSettingsOrderByInput: FontSettingsOrderByInput,
   FontSettingsConnection: FontSettingsConnection,
@@ -3311,9 +3640,7 @@ export type ResolversParentTypes = ResolversObject<{
   AggregateFontSettings: AggregateFontSettings,
   LeafNodeWhereUniqueInput: LeafNodeWhereUniqueInput,
   LeafNode: LeafNode,
-  NodeType: NodeType,
   LeafNodeWhereInput: LeafNodeWhereInput,
-  NodeTypeWhereInput: NodeTypeWhereInput,
   LeafNodeOrderByInput: LeafNodeOrderByInput,
   LeafNodeConnection: LeafNodeConnection,
   LeafNodeEdge: LeafNodeEdge,
@@ -3324,19 +3651,10 @@ export type ResolversParentTypes = ResolversObject<{
   NodeTypeEdge: NodeTypeEdge,
   AggregateNodeType: AggregateNodeType,
   QuestionConditionWhereUniqueInput: QuestionConditionWhereUniqueInput,
-  QuestionCondition: QuestionCondition,
-  QuestionConditionWhereInput: QuestionConditionWhereInput,
-  QuestionConditionOrderByInput: QuestionConditionOrderByInput,
   QuestionConditionConnection: QuestionConditionConnection,
   QuestionConditionEdge: QuestionConditionEdge,
   AggregateQuestionCondition: AggregateQuestionCondition,
   QuestionNodeWhereUniqueInput: QuestionNodeWhereUniqueInput,
-  QuestionNode: QuestionNode,
-  QuestionOptionWhereInput: QuestionOptionWhereInput,
-  QuestionOptionOrderByInput: QuestionOptionOrderByInput,
-  QuestionOption: QuestionOption,
-  QuestionNodeWhereInput: QuestionNodeWhereInput,
-  QuestionNodeOrderByInput: QuestionNodeOrderByInput,
   QuestionNodeConnection: QuestionNodeConnection,
   QuestionNodeEdge: QuestionNodeEdge,
   AggregateQuestionNode: AggregateQuestionNode,
@@ -3346,7 +3664,6 @@ export type ResolversParentTypes = ResolversObject<{
   AggregateQuestionOption: AggregateQuestionOption,
   QuestionnaireWhereUniqueInput: QuestionnaireWhereUniqueInput,
   Questionnaire: Questionnaire,
-  DateTime: Scalars['DateTime'],
   QuestionnaireWhereInput: QuestionnaireWhereInput,
   QuestionnaireOrderByInput: QuestionnaireOrderByInput,
   QuestionnaireConnection: QuestionnaireConnection,
@@ -3384,28 +3701,23 @@ export type ResolversParentTypes = ResolversObject<{
   CustomerUpdateWithoutSettingsDataInput: CustomerUpdateWithoutSettingsDataInput,
   CustomerUpsertWithoutSettingsInput: CustomerUpsertWithoutSettingsInput,
   CustomerSettingsUpdateManyMutationInput: CustomerSettingsUpdateManyMutationInput,
-  FontSettingsUpdateInput: FontSettingsUpdateInput,
-  FontSettingsUpdateManyMutationInput: FontSettingsUpdateManyMutationInput,
-  LeafNodeCreateInput: LeafNodeCreateInput,
+  EdgeCreateInput: EdgeCreateInput,
+  QuestionNodeCreateOneInput: QuestionNodeCreateOneInput,
+  QuestionNodeCreateInput: QuestionNodeCreateInput,
   NodeTypeCreateOneInput: NodeTypeCreateOneInput,
   NodeTypeCreateInput: NodeTypeCreateInput,
-  LeafNodeUpdateInput: LeafNodeUpdateInput,
-  NodeTypeUpdateOneInput: NodeTypeUpdateOneInput,
-  NodeTypeUpdateDataInput: NodeTypeUpdateDataInput,
-  NodeTypeUpsertNestedInput: NodeTypeUpsertNestedInput,
-  LeafNodeUpdateManyMutationInput: LeafNodeUpdateManyMutationInput,
-  NodeTypeUpdateInput: NodeTypeUpdateInput,
-  NodeTypeUpdateManyMutationInput: NodeTypeUpdateManyMutationInput,
-  QuestionConditionCreateInput: QuestionConditionCreateInput,
-  QuestionConditionUpdateInput: QuestionConditionUpdateInput,
-  QuestionConditionUpdateManyMutationInput: QuestionConditionUpdateManyMutationInput,
-  QuestionNodeCreateInput: QuestionNodeCreateInput,
   QuestionConditionCreateManyInput: QuestionConditionCreateManyInput,
+  QuestionConditionCreateInput: QuestionConditionCreateInput,
   QuestionOptionCreateManyInput: QuestionOptionCreateManyInput,
   QuestionOptionCreateInput: QuestionOptionCreateInput,
   QuestionNodeCreateManyInput: QuestionNodeCreateManyInput,
-  QuestionNodeUpdateInput: QuestionNodeUpdateInput,
+  EdgeCreateManyInput: EdgeCreateManyInput,
+  EdgeUpdateInput: EdgeUpdateInput,
+  QuestionNodeUpdateOneInput: QuestionNodeUpdateOneInput,
+  QuestionNodeUpdateDataInput: QuestionNodeUpdateDataInput,
   NodeTypeUpdateOneRequiredInput: NodeTypeUpdateOneRequiredInput,
+  NodeTypeUpdateDataInput: NodeTypeUpdateDataInput,
+  NodeTypeUpsertNestedInput: NodeTypeUpsertNestedInput,
   QuestionConditionUpdateManyInput: QuestionConditionUpdateManyInput,
   QuestionConditionUpdateWithWhereUniqueNestedInput: QuestionConditionUpdateWithWhereUniqueNestedInput,
   QuestionConditionUpdateDataInput: QuestionConditionUpdateDataInput,
@@ -3422,11 +3734,27 @@ export type ResolversParentTypes = ResolversObject<{
   QuestionOptionUpdateManyDataInput: QuestionOptionUpdateManyDataInput,
   QuestionNodeUpdateManyInput: QuestionNodeUpdateManyInput,
   QuestionNodeUpdateWithWhereUniqueNestedInput: QuestionNodeUpdateWithWhereUniqueNestedInput,
-  QuestionNodeUpdateDataInput: QuestionNodeUpdateDataInput,
   QuestionNodeUpsertWithWhereUniqueNestedInput: QuestionNodeUpsertWithWhereUniqueNestedInput,
   QuestionNodeScalarWhereInput: QuestionNodeScalarWhereInput,
   QuestionNodeUpdateManyWithWhereNestedInput: QuestionNodeUpdateManyWithWhereNestedInput,
   QuestionNodeUpdateManyDataInput: QuestionNodeUpdateManyDataInput,
+  EdgeUpdateManyInput: EdgeUpdateManyInput,
+  EdgeUpdateWithWhereUniqueNestedInput: EdgeUpdateWithWhereUniqueNestedInput,
+  EdgeUpdateDataInput: EdgeUpdateDataInput,
+  EdgeUpsertWithWhereUniqueNestedInput: EdgeUpsertWithWhereUniqueNestedInput,
+  EdgeScalarWhereInput: EdgeScalarWhereInput,
+  QuestionNodeUpsertNestedInput: QuestionNodeUpsertNestedInput,
+  FontSettingsUpdateInput: FontSettingsUpdateInput,
+  FontSettingsUpdateManyMutationInput: FontSettingsUpdateManyMutationInput,
+  LeafNodeCreateInput: LeafNodeCreateInput,
+  LeafNodeUpdateInput: LeafNodeUpdateInput,
+  NodeTypeUpdateOneInput: NodeTypeUpdateOneInput,
+  LeafNodeUpdateManyMutationInput: LeafNodeUpdateManyMutationInput,
+  NodeTypeUpdateInput: NodeTypeUpdateInput,
+  NodeTypeUpdateManyMutationInput: NodeTypeUpdateManyMutationInput,
+  QuestionConditionUpdateInput: QuestionConditionUpdateInput,
+  QuestionConditionUpdateManyMutationInput: QuestionConditionUpdateManyMutationInput,
+  QuestionNodeUpdateInput: QuestionNodeUpdateInput,
   QuestionNodeUpdateManyMutationInput: QuestionNodeUpdateManyMutationInput,
   QuestionOptionUpdateInput: QuestionOptionUpdateInput,
   QuestionOptionUpdateManyMutationInput: QuestionOptionUpdateManyMutationInput,
@@ -3448,6 +3776,9 @@ export type ResolversParentTypes = ResolversObject<{
   CustomerSettingsSubscriptionWhereInput: CustomerSettingsSubscriptionWhereInput,
   CustomerSettingsSubscriptionPayload: CustomerSettingsSubscriptionPayload,
   CustomerSettingsPreviousValues: CustomerSettingsPreviousValues,
+  EdgeSubscriptionWhereInput: EdgeSubscriptionWhereInput,
+  EdgeSubscriptionPayload: EdgeSubscriptionPayload,
+  EdgePreviousValues: EdgePreviousValues,
   FontSettingsSubscriptionWhereInput: FontSettingsSubscriptionWhereInput,
   FontSettingsSubscriptionPayload: FontSettingsSubscriptionPayload,
   FontSettingsPreviousValues: FontSettingsPreviousValues,
@@ -3480,6 +3811,10 @@ export type AggregateCustomerResolvers<ContextType = any, ParentType extends Res
 }>;
 
 export type AggregateCustomerSettingsResolvers<ContextType = any, ParentType extends ResolversParentTypes['AggregateCustomerSettings'] = ResolversParentTypes['AggregateCustomerSettings']> = ResolversObject<{
+  count?: Resolver<ResolversTypes['Int'], ParentType, ContextType>,
+}>;
+
+export type AggregateEdgeResolvers<ContextType = any, ParentType extends ResolversParentTypes['AggregateEdge'] = ResolversParentTypes['AggregateEdge']> = ResolversObject<{
   count?: Resolver<ResolversTypes['Int'], ParentType, ContextType>,
 }>;
 
@@ -3635,6 +3970,38 @@ export interface DateTimeScalarConfig extends GraphQLScalarTypeConfig<ResolversT
   name: 'DateTime'
 }
 
+export type EdgeResolvers<ContextType = any, ParentType extends ResolversParentTypes['Edge'] = ResolversParentTypes['Edge']> = ResolversObject<{
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>,
+  createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>,
+  updatedAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>,
+  parentNode?: Resolver<Maybe<ResolversTypes['QuestionNode']>, ParentType, ContextType>,
+  childNode?: Resolver<Maybe<ResolversTypes['QuestionNode']>, ParentType, ContextType>,
+}>;
+
+export type EdgeConnectionResolvers<ContextType = any, ParentType extends ResolversParentTypes['EdgeConnection'] = ResolversParentTypes['EdgeConnection']> = ResolversObject<{
+  pageInfo?: Resolver<ResolversTypes['PageInfo'], ParentType, ContextType>,
+  edges?: Resolver<Array<Maybe<ResolversTypes['EdgeEdge']>>, ParentType, ContextType>,
+  aggregate?: Resolver<ResolversTypes['AggregateEdge'], ParentType, ContextType>,
+}>;
+
+export type EdgeEdgeResolvers<ContextType = any, ParentType extends ResolversParentTypes['EdgeEdge'] = ResolversParentTypes['EdgeEdge']> = ResolversObject<{
+  node?: Resolver<ResolversTypes['Edge'], ParentType, ContextType>,
+  cursor?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
+}>;
+
+export type EdgePreviousValuesResolvers<ContextType = any, ParentType extends ResolversParentTypes['EdgePreviousValues'] = ResolversParentTypes['EdgePreviousValues']> = ResolversObject<{
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>,
+  createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>,
+  updatedAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>,
+}>;
+
+export type EdgeSubscriptionPayloadResolvers<ContextType = any, ParentType extends ResolversParentTypes['EdgeSubscriptionPayload'] = ResolversParentTypes['EdgeSubscriptionPayload']> = ResolversObject<{
+  mutation?: Resolver<ResolversTypes['MutationType'], ParentType, ContextType>,
+  node?: Resolver<Maybe<ResolversTypes['Edge']>, ParentType, ContextType>,
+  updatedFields?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>,
+  previousValues?: Resolver<Maybe<ResolversTypes['EdgePreviousValues']>, ParentType, ContextType>,
+}>;
+
 export type FontSettingsResolvers<ContextType = any, ParentType extends ResolversParentTypes['FontSettings'] = ResolversParentTypes['FontSettings']> = ResolversObject<{
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>,
   settingTitle?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
@@ -3723,6 +4090,11 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   upsertCustomerSettings?: Resolver<ResolversTypes['CustomerSettings'], ParentType, ContextType, RequireFields<MutationUpsertCustomerSettingsArgs, 'where' | 'create' | 'update'>>,
   deleteCustomerSettings?: Resolver<Maybe<ResolversTypes['CustomerSettings']>, ParentType, ContextType, RequireFields<MutationDeleteCustomerSettingsArgs, 'where'>>,
   deleteManyCustomerSettingses?: Resolver<ResolversTypes['BatchPayload'], ParentType, ContextType, MutationDeleteManyCustomerSettingsesArgs>,
+  createEdge?: Resolver<ResolversTypes['Edge'], ParentType, ContextType, RequireFields<MutationCreateEdgeArgs, 'data'>>,
+  updateEdge?: Resolver<Maybe<ResolversTypes['Edge']>, ParentType, ContextType, RequireFields<MutationUpdateEdgeArgs, 'data' | 'where'>>,
+  upsertEdge?: Resolver<ResolversTypes['Edge'], ParentType, ContextType, RequireFields<MutationUpsertEdgeArgs, 'where' | 'create' | 'update'>>,
+  deleteEdge?: Resolver<Maybe<ResolversTypes['Edge']>, ParentType, ContextType, RequireFields<MutationDeleteEdgeArgs, 'where'>>,
+  deleteManyEdges?: Resolver<ResolversTypes['BatchPayload'], ParentType, ContextType, MutationDeleteManyEdgesArgs>,
   createFontSettings?: Resolver<ResolversTypes['FontSettings'], ParentType, ContextType, RequireFields<MutationCreateFontSettingsArgs, 'data'>>,
   updateFontSettings?: Resolver<Maybe<ResolversTypes['FontSettings']>, ParentType, ContextType, RequireFields<MutationUpdateFontSettingsArgs, 'data' | 'where'>>,
   updateManyFontSettingses?: Resolver<ResolversTypes['BatchPayload'], ParentType, ContextType, RequireFields<MutationUpdateManyFontSettingsesArgs, 'data'>>,
@@ -3817,6 +4189,9 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   customerSettings?: Resolver<Maybe<ResolversTypes['CustomerSettings']>, ParentType, ContextType, RequireFields<QueryCustomerSettingsArgs, 'where'>>,
   customerSettingses?: Resolver<Array<Maybe<ResolversTypes['CustomerSettings']>>, ParentType, ContextType, QueryCustomerSettingsesArgs>,
   customerSettingsesConnection?: Resolver<ResolversTypes['CustomerSettingsConnection'], ParentType, ContextType, QueryCustomerSettingsesConnectionArgs>,
+  edge?: Resolver<Maybe<ResolversTypes['Edge']>, ParentType, ContextType, RequireFields<QueryEdgeArgs, 'where'>>,
+  edges?: Resolver<Array<Maybe<ResolversTypes['Edge']>>, ParentType, ContextType, QueryEdgesArgs>,
+  edgesConnection?: Resolver<ResolversTypes['EdgeConnection'], ParentType, ContextType, QueryEdgesConnectionArgs>,
   fontSettings?: Resolver<Maybe<ResolversTypes['FontSettings']>, ParentType, ContextType, RequireFields<QueryFontSettingsArgs, 'where'>>,
   fontSettingses?: Resolver<Array<Maybe<ResolversTypes['FontSettings']>>, ParentType, ContextType, QueryFontSettingsesArgs>,
   fontSettingsesConnection?: Resolver<ResolversTypes['FontSettingsConnection'], ParentType, ContextType, QueryFontSettingsesConnectionArgs>,
@@ -3922,6 +4297,7 @@ export type QuestionNodeResolvers<ContextType = any, ParentType extends Resolver
   conditions?: Resolver<Maybe<Array<ResolversTypes['QuestionCondition']>>, ParentType, ContextType, QuestionNodeConditionsArgs>,
   options?: Resolver<Maybe<Array<ResolversTypes['QuestionOption']>>, ParentType, ContextType, QuestionNodeOptionsArgs>,
   children?: Resolver<Maybe<Array<ResolversTypes['QuestionNode']>>, ParentType, ContextType, QuestionNodeChildrenArgs>,
+  edgeChildren?: Resolver<Maybe<Array<ResolversTypes['Edge']>>, ParentType, ContextType, QuestionNodeEdgeChildrenArgs>,
 }>;
 
 export type QuestionNodeConnectionResolvers<ContextType = any, ParentType extends ResolversParentTypes['QuestionNodeConnection'] = ResolversParentTypes['QuestionNodeConnection']> = ResolversObject<{
@@ -3983,6 +4359,7 @@ export type SubscriptionResolvers<ContextType = any, ParentType extends Resolver
   colourSettings?: SubscriptionResolver<Maybe<ResolversTypes['ColourSettingsSubscriptionPayload']>, "colourSettings", ParentType, ContextType, SubscriptionColourSettingsArgs>,
   customer?: SubscriptionResolver<Maybe<ResolversTypes['CustomerSubscriptionPayload']>, "customer", ParentType, ContextType, SubscriptionCustomerArgs>,
   customerSettings?: SubscriptionResolver<Maybe<ResolversTypes['CustomerSettingsSubscriptionPayload']>, "customerSettings", ParentType, ContextType, SubscriptionCustomerSettingsArgs>,
+  edge?: SubscriptionResolver<Maybe<ResolversTypes['EdgeSubscriptionPayload']>, "edge", ParentType, ContextType, SubscriptionEdgeArgs>,
   fontSettings?: SubscriptionResolver<Maybe<ResolversTypes['FontSettingsSubscriptionPayload']>, "fontSettings", ParentType, ContextType, SubscriptionFontSettingsArgs>,
   leafNode?: SubscriptionResolver<Maybe<ResolversTypes['LeafNodeSubscriptionPayload']>, "leafNode", ParentType, ContextType, SubscriptionLeafNodeArgs>,
   nodeType?: SubscriptionResolver<Maybe<ResolversTypes['NodeTypeSubscriptionPayload']>, "nodeType", ParentType, ContextType, SubscriptionNodeTypeArgs>,
@@ -3996,6 +4373,7 @@ export type Resolvers<ContextType = any> = ResolversObject<{
   AggregateColourSettings?: AggregateColourSettingsResolvers<ContextType>,
   AggregateCustomer?: AggregateCustomerResolvers<ContextType>,
   AggregateCustomerSettings?: AggregateCustomerSettingsResolvers<ContextType>,
+  AggregateEdge?: AggregateEdgeResolvers<ContextType>,
   AggregateFontSettings?: AggregateFontSettingsResolvers<ContextType>,
   AggregateLeafNode?: AggregateLeafNodeResolvers<ContextType>,
   AggregateNodeType?: AggregateNodeTypeResolvers<ContextType>,
@@ -4020,6 +4398,11 @@ export type Resolvers<ContextType = any> = ResolversObject<{
   CustomerSettingsSubscriptionPayload?: CustomerSettingsSubscriptionPayloadResolvers<ContextType>,
   CustomerSubscriptionPayload?: CustomerSubscriptionPayloadResolvers<ContextType>,
   DateTime?: GraphQLScalarType,
+  Edge?: EdgeResolvers<ContextType>,
+  EdgeConnection?: EdgeConnectionResolvers<ContextType>,
+  EdgeEdge?: EdgeEdgeResolvers<ContextType>,
+  EdgePreviousValues?: EdgePreviousValuesResolvers<ContextType>,
+  EdgeSubscriptionPayload?: EdgeSubscriptionPayloadResolvers<ContextType>,
   FontSettings?: FontSettingsResolvers<ContextType>,
   FontSettingsConnection?: FontSettingsConnectionResolvers<ContextType>,
   FontSettingsEdge?: FontSettingsEdgeResolvers<ContextType>,

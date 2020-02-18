@@ -7,4 +7,5 @@ type QuestionNode {
     conditions: [QuestionCondition]
     options: [QuestionOption]
     children: [QuestionNode]
+    edgeChildren: [Edge] @relation (link: TABLE, name: "EdgeChildrenRelation")
 }

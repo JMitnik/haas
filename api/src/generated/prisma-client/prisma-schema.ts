@@ -14,6 +14,10 @@ type AggregateCustomerSettings {
   count: Int!
 }
 
+type AggregateEdge {
+  count: Int!
+}
+
 type AggregateFontSettings {
   count: Int!
 }
@@ -765,6 +769,179 @@ input CustomerWhereUniqueInput {
 
 scalar DateTime
 
+type Edge {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  parentNode: QuestionNode
+  childNode: QuestionNode
+}
+
+type EdgeConnection {
+  pageInfo: PageInfo!
+  edges: [EdgeEdge]!
+  aggregate: AggregateEdge!
+}
+
+input EdgeCreateInput {
+  id: ID
+  parentNode: QuestionNodeCreateOneInput
+  childNode: QuestionNodeCreateOneInput
+}
+
+input EdgeCreateManyInput {
+  create: [EdgeCreateInput!]
+  connect: [EdgeWhereUniqueInput!]
+}
+
+type EdgeEdge {
+  node: Edge!
+  cursor: String!
+}
+
+enum EdgeOrderByInput {
+  id_ASC
+  id_DESC
+  createdAt_ASC
+  createdAt_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+}
+
+type EdgePreviousValues {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+input EdgeScalarWhereInput {
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  createdAt: DateTime
+  createdAt_not: DateTime
+  createdAt_in: [DateTime!]
+  createdAt_not_in: [DateTime!]
+  createdAt_lt: DateTime
+  createdAt_lte: DateTime
+  createdAt_gt: DateTime
+  createdAt_gte: DateTime
+  updatedAt: DateTime
+  updatedAt_not: DateTime
+  updatedAt_in: [DateTime!]
+  updatedAt_not_in: [DateTime!]
+  updatedAt_lt: DateTime
+  updatedAt_lte: DateTime
+  updatedAt_gt: DateTime
+  updatedAt_gte: DateTime
+  AND: [EdgeScalarWhereInput!]
+  OR: [EdgeScalarWhereInput!]
+  NOT: [EdgeScalarWhereInput!]
+}
+
+type EdgeSubscriptionPayload {
+  mutation: MutationType!
+  node: Edge
+  updatedFields: [String!]
+  previousValues: EdgePreviousValues
+}
+
+input EdgeSubscriptionWhereInput {
+  mutation_in: [MutationType!]
+  updatedFields_contains: String
+  updatedFields_contains_every: [String!]
+  updatedFields_contains_some: [String!]
+  node: EdgeWhereInput
+  AND: [EdgeSubscriptionWhereInput!]
+  OR: [EdgeSubscriptionWhereInput!]
+  NOT: [EdgeSubscriptionWhereInput!]
+}
+
+input EdgeUpdateDataInput {
+  parentNode: QuestionNodeUpdateOneInput
+  childNode: QuestionNodeUpdateOneInput
+}
+
+input EdgeUpdateInput {
+  parentNode: QuestionNodeUpdateOneInput
+  childNode: QuestionNodeUpdateOneInput
+}
+
+input EdgeUpdateManyInput {
+  create: [EdgeCreateInput!]
+  update: [EdgeUpdateWithWhereUniqueNestedInput!]
+  upsert: [EdgeUpsertWithWhereUniqueNestedInput!]
+  delete: [EdgeWhereUniqueInput!]
+  connect: [EdgeWhereUniqueInput!]
+  set: [EdgeWhereUniqueInput!]
+  disconnect: [EdgeWhereUniqueInput!]
+  deleteMany: [EdgeScalarWhereInput!]
+}
+
+input EdgeUpdateWithWhereUniqueNestedInput {
+  where: EdgeWhereUniqueInput!
+  data: EdgeUpdateDataInput!
+}
+
+input EdgeUpsertWithWhereUniqueNestedInput {
+  where: EdgeWhereUniqueInput!
+  update: EdgeUpdateDataInput!
+  create: EdgeCreateInput!
+}
+
+input EdgeWhereInput {
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  createdAt: DateTime
+  createdAt_not: DateTime
+  createdAt_in: [DateTime!]
+  createdAt_not_in: [DateTime!]
+  createdAt_lt: DateTime
+  createdAt_lte: DateTime
+  createdAt_gt: DateTime
+  createdAt_gte: DateTime
+  updatedAt: DateTime
+  updatedAt_not: DateTime
+  updatedAt_in: [DateTime!]
+  updatedAt_not_in: [DateTime!]
+  updatedAt_lt: DateTime
+  updatedAt_lte: DateTime
+  updatedAt_gt: DateTime
+  updatedAt_gte: DateTime
+  parentNode: QuestionNodeWhereInput
+  childNode: QuestionNodeWhereInput
+  AND: [EdgeWhereInput!]
+  OR: [EdgeWhereInput!]
+  NOT: [EdgeWhereInput!]
+}
+
+input EdgeWhereUniqueInput {
+  id: ID
+}
+
 type FontSettings {
   id: ID!
   settingTitle: String
@@ -1087,6 +1264,11 @@ type Mutation {
   upsertCustomerSettings(where: CustomerSettingsWhereUniqueInput!, create: CustomerSettingsCreateInput!, update: CustomerSettingsUpdateInput!): CustomerSettings!
   deleteCustomerSettings(where: CustomerSettingsWhereUniqueInput!): CustomerSettings
   deleteManyCustomerSettingses(where: CustomerSettingsWhereInput): BatchPayload!
+  createEdge(data: EdgeCreateInput!): Edge!
+  updateEdge(data: EdgeUpdateInput!, where: EdgeWhereUniqueInput!): Edge
+  upsertEdge(where: EdgeWhereUniqueInput!, create: EdgeCreateInput!, update: EdgeUpdateInput!): Edge!
+  deleteEdge(where: EdgeWhereUniqueInput!): Edge
+  deleteManyEdges(where: EdgeWhereInput): BatchPayload!
   createFontSettings(data: FontSettingsCreateInput!): FontSettings!
   updateFontSettings(data: FontSettingsUpdateInput!, where: FontSettingsWhereUniqueInput!): FontSettings
   updateManyFontSettingses(data: FontSettingsUpdateManyMutationInput!, where: FontSettingsWhereInput): BatchPayload!
@@ -1285,6 +1467,9 @@ type Query {
   customerSettings(where: CustomerSettingsWhereUniqueInput!): CustomerSettings
   customerSettingses(where: CustomerSettingsWhereInput, orderBy: CustomerSettingsOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [CustomerSettings]!
   customerSettingsesConnection(where: CustomerSettingsWhereInput, orderBy: CustomerSettingsOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): CustomerSettingsConnection!
+  edge(where: EdgeWhereUniqueInput!): Edge
+  edges(where: EdgeWhereInput, orderBy: EdgeOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Edge]!
+  edgesConnection(where: EdgeWhereInput, orderBy: EdgeOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): EdgeConnection!
   fontSettings(where: FontSettingsWhereUniqueInput!): FontSettings
   fontSettingses(where: FontSettingsWhereInput, orderBy: FontSettingsOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [FontSettings]!
   fontSettingsesConnection(where: FontSettingsWhereInput, orderBy: FontSettingsOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): FontSettingsConnection!
@@ -1750,6 +1935,7 @@ type QuestionNode {
   conditions(where: QuestionConditionWhereInput, orderBy: QuestionConditionOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [QuestionCondition!]
   options(where: QuestionOptionWhereInput, orderBy: QuestionOptionOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [QuestionOption!]
   children(where: QuestionNodeWhereInput, orderBy: QuestionNodeOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [QuestionNode!]
+  edgeChildren(where: EdgeWhereInput, orderBy: EdgeOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Edge!]
 }
 
 type QuestionNodeConnection {
@@ -1767,11 +1953,17 @@ input QuestionNodeCreateInput {
   conditions: QuestionConditionCreateManyInput
   options: QuestionOptionCreateManyInput
   children: QuestionNodeCreateManyInput
+  edgeChildren: EdgeCreateManyInput
 }
 
 input QuestionNodeCreateManyInput {
   create: [QuestionNodeCreateInput!]
   connect: [QuestionNodeWhereUniqueInput!]
+}
+
+input QuestionNodeCreateOneInput {
+  create: QuestionNodeCreateInput
+  connect: QuestionNodeWhereUniqueInput
 }
 
 type QuestionNodeEdge {
@@ -1879,6 +2071,7 @@ input QuestionNodeUpdateDataInput {
   conditions: QuestionConditionUpdateManyInput
   options: QuestionOptionUpdateManyInput
   children: QuestionNodeUpdateManyInput
+  edgeChildren: EdgeUpdateManyInput
 }
 
 input QuestionNodeUpdateInput {
@@ -1889,6 +2082,7 @@ input QuestionNodeUpdateInput {
   conditions: QuestionConditionUpdateManyInput
   options: QuestionOptionUpdateManyInput
   children: QuestionNodeUpdateManyInput
+  edgeChildren: EdgeUpdateManyInput
 }
 
 input QuestionNodeUpdateManyDataInput {
@@ -1920,9 +2114,23 @@ input QuestionNodeUpdateManyWithWhereNestedInput {
   data: QuestionNodeUpdateManyDataInput!
 }
 
+input QuestionNodeUpdateOneInput {
+  create: QuestionNodeCreateInput
+  update: QuestionNodeUpdateDataInput
+  upsert: QuestionNodeUpsertNestedInput
+  delete: Boolean
+  disconnect: Boolean
+  connect: QuestionNodeWhereUniqueInput
+}
+
 input QuestionNodeUpdateWithWhereUniqueNestedInput {
   where: QuestionNodeWhereUniqueInput!
   data: QuestionNodeUpdateDataInput!
+}
+
+input QuestionNodeUpsertNestedInput {
+  update: QuestionNodeUpdateDataInput!
+  create: QuestionNodeCreateInput!
 }
 
 input QuestionNodeUpsertWithWhereUniqueNestedInput {
@@ -1992,6 +2200,9 @@ input QuestionNodeWhereInput {
   children_every: QuestionNodeWhereInput
   children_some: QuestionNodeWhereInput
   children_none: QuestionNodeWhereInput
+  edgeChildren_every: EdgeWhereInput
+  edgeChildren_some: EdgeWhereInput
+  edgeChildren_none: EdgeWhereInput
   AND: [QuestionNodeWhereInput!]
   OR: [QuestionNodeWhereInput!]
   NOT: [QuestionNodeWhereInput!]
@@ -2214,6 +2425,7 @@ type Subscription {
   colourSettings(where: ColourSettingsSubscriptionWhereInput): ColourSettingsSubscriptionPayload
   customer(where: CustomerSubscriptionWhereInput): CustomerSubscriptionPayload
   customerSettings(where: CustomerSettingsSubscriptionWhereInput): CustomerSettingsSubscriptionPayload
+  edge(where: EdgeSubscriptionWhereInput): EdgeSubscriptionPayload
   fontSettings(where: FontSettingsSubscriptionWhereInput): FontSettingsSubscriptionPayload
   leafNode(where: LeafNodeSubscriptionWhereInput): LeafNodeSubscriptionPayload
   nodeType(where: NodeTypeSubscriptionWhereInput): NodeTypeSubscriptionPayload

@@ -1,0 +1,7 @@
+type Edge {
+    id: ID! @id
+    createdAt: DateTime! @createdAt
+    updatedAt: DateTime! @updatedAt 
+    parentNode: QuestionNode @relation (link: INLINE, name: "EdgeParentRelation")
+    childNode: QuestionNode @relation (link: INLINE, name: "EdgeChildRelation")
+}

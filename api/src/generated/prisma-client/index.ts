@@ -19,6 +19,7 @@ export interface Exists {
   colourSettings: (where?: ColourSettingsWhereInput) => Promise<boolean>;
   customer: (where?: CustomerWhereInput) => Promise<boolean>;
   customerSettings: (where?: CustomerSettingsWhereInput) => Promise<boolean>;
+  edge: (where?: EdgeWhereInput) => Promise<boolean>;
   fontSettings: (where?: FontSettingsWhereInput) => Promise<boolean>;
   leafNode: (where?: LeafNodeWhereInput) => Promise<boolean>;
   nodeType: (where?: NodeTypeWhereInput) => Promise<boolean>;
@@ -108,6 +109,25 @@ export interface Prisma {
     first?: Int;
     last?: Int;
   }) => CustomerSettingsConnectionPromise;
+  edge: (where: EdgeWhereUniqueInput) => EdgeNullablePromise;
+  edges: (args?: {
+    where?: EdgeWhereInput;
+    orderBy?: EdgeOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => FragmentableArray<Edge>;
+  edgesConnection: (args?: {
+    where?: EdgeWhereInput;
+    orderBy?: EdgeOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => EdgeConnectionPromise;
   fontSettings: (
     where: FontSettingsWhereUniqueInput
   ) => FontSettingsNullablePromise;
@@ -317,6 +337,18 @@ export interface Prisma {
   deleteManyCustomerSettingses: (
     where?: CustomerSettingsWhereInput
   ) => BatchPayloadPromise;
+  createEdge: (data: EdgeCreateInput) => EdgePromise;
+  updateEdge: (args: {
+    data: EdgeUpdateInput;
+    where: EdgeWhereUniqueInput;
+  }) => EdgePromise;
+  upsertEdge: (args: {
+    where: EdgeWhereUniqueInput;
+    create: EdgeCreateInput;
+    update: EdgeUpdateInput;
+  }) => EdgePromise;
+  deleteEdge: (where: EdgeWhereUniqueInput) => EdgePromise;
+  deleteManyEdges: (where?: EdgeWhereInput) => BatchPayloadPromise;
   createFontSettings: (data: FontSettingsCreateInput) => FontSettingsPromise;
   updateFontSettings: (args: {
     data: FontSettingsUpdateInput;
@@ -471,6 +503,9 @@ export interface Subscription {
   customerSettings: (
     where?: CustomerSettingsSubscriptionWhereInput
   ) => CustomerSettingsSubscriptionPayloadSubscription;
+  edge: (
+    where?: EdgeSubscriptionWhereInput
+  ) => EdgeSubscriptionPayloadSubscription;
   fontSettings: (
     where?: FontSettingsSubscriptionWhereInput
   ) => FontSettingsSubscriptionPayloadSubscription;
@@ -502,32 +537,6 @@ export interface ClientConstructor<T> {
  * Types
  */
 
-export type QuestionConditionOrderByInput =
-  | "id_ASC"
-  | "id_DESC"
-  | "conditionType_ASC"
-  | "conditionType_DESC"
-  | "renderMin_ASC"
-  | "renderMin_DESC"
-  | "renderMax_ASC"
-  | "renderMax_DESC"
-  | "matchValue_ASC"
-  | "matchValue_DESC";
-
-export type CustomerOrderByInput =
-  | "id_ASC"
-  | "id_DESC"
-  | "name_ASC"
-  | "name_DESC";
-
-export type CustomerSettingsOrderByInput =
-  | "id_ASC"
-  | "id_DESC"
-  | "title_ASC"
-  | "title_DESC"
-  | "logo_ASC"
-  | "logo_DESC";
-
 export type FontSettingsOrderByInput =
   | "id_ASC"
   | "id_DESC"
@@ -540,13 +549,71 @@ export type FontSettingsOrderByInput =
   | "special_ASC"
   | "special_DESC";
 
-export type LeafNodeOrderByInput =
+export type CustomerOrderByInput =
   | "id_ASC"
   | "id_DESC"
-  | "nodeId_ASC"
-  | "nodeId_DESC"
+  | "name_ASC"
+  | "name_DESC";
+
+export type EdgeOrderByInput =
+  | "id_ASC"
+  | "id_DESC"
+  | "createdAt_ASC"
+  | "createdAt_DESC"
+  | "updatedAt_ASC"
+  | "updatedAt_DESC";
+
+export type QuestionnaireOrderByInput =
+  | "id_ASC"
+  | "id_DESC"
   | "title_ASC"
-  | "title_DESC";
+  | "title_DESC"
+  | "description_ASC"
+  | "description_DESC"
+  | "publicTitle_ASC"
+  | "publicTitle_DESC"
+  | "creationDate_ASC"
+  | "creationDate_DESC"
+  | "updatedAt_ASC"
+  | "updatedAt_DESC";
+
+export type CustomerSettingsOrderByInput =
+  | "id_ASC"
+  | "id_DESC"
+  | "title_ASC"
+  | "title_DESC"
+  | "logo_ASC"
+  | "logo_DESC";
+
+export type QuestionConditionOrderByInput =
+  | "id_ASC"
+  | "id_DESC"
+  | "conditionType_ASC"
+  | "conditionType_DESC"
+  | "renderMin_ASC"
+  | "renderMin_DESC"
+  | "renderMax_ASC"
+  | "renderMax_DESC"
+  | "matchValue_ASC"
+  | "matchValue_DESC";
+
+export type QuestionOptionOrderByInput =
+  | "id_ASC"
+  | "id_DESC"
+  | "value_ASC"
+  | "value_DESC"
+  | "publicValue_ASC"
+  | "publicValue_DESC";
+
+export type QuestionNodeOrderByInput =
+  | "id_ASC"
+  | "id_DESC"
+  | "title_ASC"
+  | "title_DESC"
+  | "branchVal_ASC"
+  | "branchVal_DESC"
+  | "overrideLeafId_ASC"
+  | "overrideLeafId_DESC";
 
 export type NodeTypeOrderByInput =
   | "id_ASC"
@@ -556,13 +623,13 @@ export type NodeTypeOrderByInput =
 
 export type MutationType = "CREATED" | "UPDATED" | "DELETED";
 
-export type QuestionOptionOrderByInput =
+export type LeafNodeOrderByInput =
   | "id_ASC"
   | "id_DESC"
-  | "value_ASC"
-  | "value_DESC"
-  | "publicValue_ASC"
-  | "publicValue_DESC";
+  | "nodeId_ASC"
+  | "nodeId_DESC"
+  | "title_ASC"
+  | "title_DESC";
 
 export type ColourSettingsOrderByInput =
   | "id_ASC"
@@ -596,130 +663,54 @@ export type ColourSettingsOrderByInput =
   | "text_ASC"
   | "text_DESC";
 
-export type QuestionNodeOrderByInput =
-  | "id_ASC"
-  | "id_DESC"
-  | "title_ASC"
-  | "title_DESC"
-  | "branchVal_ASC"
-  | "branchVal_DESC"
-  | "overrideLeafId_ASC"
-  | "overrideLeafId_DESC";
-
-export type QuestionnaireOrderByInput =
-  | "id_ASC"
-  | "id_DESC"
-  | "title_ASC"
-  | "title_DESC"
-  | "description_ASC"
-  | "description_DESC"
-  | "publicTitle_ASC"
-  | "publicTitle_DESC"
-  | "creationDate_ASC"
-  | "creationDate_DESC"
-  | "updatedAt_ASC"
-  | "updatedAt_DESC";
-
-export interface FontSettingsUpdateDataInput {
-  settingTitle?: Maybe<String>;
-  body?: Maybe<String>;
-  fontTitle?: Maybe<String>;
-  special?: Maybe<String>;
+export interface CustomerSettingsCreateInput {
+  id?: Maybe<ID_Input>;
+  title?: Maybe<String>;
+  customer: CustomerCreateOneWithoutSettingsInput;
+  logo?: Maybe<String>;
+  colourSettings: ColourSettingsCreateOneInput;
+  fontSettings: FontSettingsCreateOneInput;
 }
 
 export type ColourSettingsWhereUniqueInput = AtLeastOne<{
   id: Maybe<ID_Input>;
 }>;
 
-export interface QuestionConditionScalarWhereInput {
-  id?: Maybe<ID_Input>;
-  id_not?: Maybe<ID_Input>;
-  id_in?: Maybe<ID_Input[] | ID_Input>;
-  id_not_in?: Maybe<ID_Input[] | ID_Input>;
-  id_lt?: Maybe<ID_Input>;
-  id_lte?: Maybe<ID_Input>;
-  id_gt?: Maybe<ID_Input>;
-  id_gte?: Maybe<ID_Input>;
-  id_contains?: Maybe<ID_Input>;
-  id_not_contains?: Maybe<ID_Input>;
-  id_starts_with?: Maybe<ID_Input>;
-  id_not_starts_with?: Maybe<ID_Input>;
-  id_ends_with?: Maybe<ID_Input>;
-  id_not_ends_with?: Maybe<ID_Input>;
-  conditionType?: Maybe<String>;
-  conditionType_not?: Maybe<String>;
-  conditionType_in?: Maybe<String[] | String>;
-  conditionType_not_in?: Maybe<String[] | String>;
-  conditionType_lt?: Maybe<String>;
-  conditionType_lte?: Maybe<String>;
-  conditionType_gt?: Maybe<String>;
-  conditionType_gte?: Maybe<String>;
-  conditionType_contains?: Maybe<String>;
-  conditionType_not_contains?: Maybe<String>;
-  conditionType_starts_with?: Maybe<String>;
-  conditionType_not_starts_with?: Maybe<String>;
-  conditionType_ends_with?: Maybe<String>;
-  conditionType_not_ends_with?: Maybe<String>;
-  renderMin?: Maybe<Int>;
-  renderMin_not?: Maybe<Int>;
-  renderMin_in?: Maybe<Int[] | Int>;
-  renderMin_not_in?: Maybe<Int[] | Int>;
-  renderMin_lt?: Maybe<Int>;
-  renderMin_lte?: Maybe<Int>;
-  renderMin_gt?: Maybe<Int>;
-  renderMin_gte?: Maybe<Int>;
-  renderMax?: Maybe<Int>;
-  renderMax_not?: Maybe<Int>;
-  renderMax_in?: Maybe<Int[] | Int>;
-  renderMax_not_in?: Maybe<Int[] | Int>;
-  renderMax_lt?: Maybe<Int>;
-  renderMax_lte?: Maybe<Int>;
-  renderMax_gt?: Maybe<Int>;
-  renderMax_gte?: Maybe<Int>;
-  matchValue?: Maybe<String>;
-  matchValue_not?: Maybe<String>;
-  matchValue_in?: Maybe<String[] | String>;
-  matchValue_not_in?: Maybe<String[] | String>;
-  matchValue_lt?: Maybe<String>;
-  matchValue_lte?: Maybe<String>;
-  matchValue_gt?: Maybe<String>;
-  matchValue_gte?: Maybe<String>;
-  matchValue_contains?: Maybe<String>;
-  matchValue_not_contains?: Maybe<String>;
-  matchValue_starts_with?: Maybe<String>;
-  matchValue_not_starts_with?: Maybe<String>;
-  matchValue_ends_with?: Maybe<String>;
-  matchValue_not_ends_with?: Maybe<String>;
-  AND?: Maybe<
-    QuestionConditionScalarWhereInput[] | QuestionConditionScalarWhereInput
-  >;
-  OR?: Maybe<
-    QuestionConditionScalarWhereInput[] | QuestionConditionScalarWhereInput
-  >;
-  NOT?: Maybe<
-    QuestionConditionScalarWhereInput[] | QuestionConditionScalarWhereInput
-  >;
+export interface QuestionNodeUpsertWithWhereUniqueNestedInput {
+  where: QuestionNodeWhereUniqueInput;
+  update: QuestionNodeUpdateDataInput;
+  create: QuestionNodeCreateInput;
 }
 
-export interface QuestionConditionCreateManyInput {
-  create?: Maybe<QuestionConditionCreateInput[] | QuestionConditionCreateInput>;
+export interface QuestionOptionUpdateManyInput {
+  create?: Maybe<QuestionOptionCreateInput[] | QuestionOptionCreateInput>;
+  update?: Maybe<
+    | QuestionOptionUpdateWithWhereUniqueNestedInput[]
+    | QuestionOptionUpdateWithWhereUniqueNestedInput
+  >;
+  upsert?: Maybe<
+    | QuestionOptionUpsertWithWhereUniqueNestedInput[]
+    | QuestionOptionUpsertWithWhereUniqueNestedInput
+  >;
+  delete?: Maybe<
+    QuestionOptionWhereUniqueInput[] | QuestionOptionWhereUniqueInput
+  >;
   connect?: Maybe<
-    QuestionConditionWhereUniqueInput[] | QuestionConditionWhereUniqueInput
+    QuestionOptionWhereUniqueInput[] | QuestionOptionWhereUniqueInput
   >;
-}
-
-export interface QuestionConditionUpsertWithWhereUniqueNestedInput {
-  where: QuestionConditionWhereUniqueInput;
-  update: QuestionConditionUpdateDataInput;
-  create: QuestionConditionCreateInput;
-}
-
-export interface CustomerSettingsUpdateInput {
-  title?: Maybe<String>;
-  customer?: Maybe<CustomerUpdateOneRequiredWithoutSettingsInput>;
-  logo?: Maybe<String>;
-  colourSettings?: Maybe<ColourSettingsUpdateOneRequiredInput>;
-  fontSettings?: Maybe<FontSettingsUpdateOneRequiredInput>;
+  set?: Maybe<
+    QuestionOptionWhereUniqueInput[] | QuestionOptionWhereUniqueInput
+  >;
+  disconnect?: Maybe<
+    QuestionOptionWhereUniqueInput[] | QuestionOptionWhereUniqueInput
+  >;
+  deleteMany?: Maybe<
+    QuestionOptionScalarWhereInput[] | QuestionOptionScalarWhereInput
+  >;
+  updateMany?: Maybe<
+    | QuestionOptionUpdateManyWithWhereNestedInput[]
+    | QuestionOptionUpdateManyWithWhereNestedInput
+  >;
 }
 
 export interface QuestionnaireWhereInput {
@@ -804,7 +795,17 @@ export interface QuestionnaireWhereInput {
   NOT?: Maybe<QuestionnaireWhereInput[] | QuestionnaireWhereInput>;
 }
 
-export interface CustomerWhereInput {
+export interface CustomerSettingsUpdateManyMutationInput {
+  title?: Maybe<String>;
+  logo?: Maybe<String>;
+}
+
+export interface QuestionNodeUpdateWithWhereUniqueNestedInput {
+  where: QuestionNodeWhereUniqueInput;
+  data: QuestionNodeUpdateDataInput;
+}
+
+export interface CustomerSettingsWhereInput {
   id?: Maybe<ID_Input>;
   id_not?: Maybe<ID_Input>;
   id_in?: Maybe<ID_Input[] | ID_Input>;
@@ -819,191 +820,116 @@ export interface CustomerWhereInput {
   id_not_starts_with?: Maybe<ID_Input>;
   id_ends_with?: Maybe<ID_Input>;
   id_not_ends_with?: Maybe<ID_Input>;
-  name?: Maybe<String>;
-  name_not?: Maybe<String>;
-  name_in?: Maybe<String[] | String>;
-  name_not_in?: Maybe<String[] | String>;
-  name_lt?: Maybe<String>;
-  name_lte?: Maybe<String>;
-  name_gt?: Maybe<String>;
-  name_gte?: Maybe<String>;
-  name_contains?: Maybe<String>;
-  name_not_contains?: Maybe<String>;
-  name_starts_with?: Maybe<String>;
-  name_not_starts_with?: Maybe<String>;
-  name_ends_with?: Maybe<String>;
-  name_not_ends_with?: Maybe<String>;
-  settings?: Maybe<CustomerSettingsWhereInput>;
-  AND?: Maybe<CustomerWhereInput[] | CustomerWhereInput>;
-  OR?: Maybe<CustomerWhereInput[] | CustomerWhereInput>;
-  NOT?: Maybe<CustomerWhereInput[] | CustomerWhereInput>;
+  title?: Maybe<String>;
+  title_not?: Maybe<String>;
+  title_in?: Maybe<String[] | String>;
+  title_not_in?: Maybe<String[] | String>;
+  title_lt?: Maybe<String>;
+  title_lte?: Maybe<String>;
+  title_gt?: Maybe<String>;
+  title_gte?: Maybe<String>;
+  title_contains?: Maybe<String>;
+  title_not_contains?: Maybe<String>;
+  title_starts_with?: Maybe<String>;
+  title_not_starts_with?: Maybe<String>;
+  title_ends_with?: Maybe<String>;
+  title_not_ends_with?: Maybe<String>;
+  customer?: Maybe<CustomerWhereInput>;
+  logo?: Maybe<String>;
+  logo_not?: Maybe<String>;
+  logo_in?: Maybe<String[] | String>;
+  logo_not_in?: Maybe<String[] | String>;
+  logo_lt?: Maybe<String>;
+  logo_lte?: Maybe<String>;
+  logo_gt?: Maybe<String>;
+  logo_gte?: Maybe<String>;
+  logo_contains?: Maybe<String>;
+  logo_not_contains?: Maybe<String>;
+  logo_starts_with?: Maybe<String>;
+  logo_not_starts_with?: Maybe<String>;
+  logo_ends_with?: Maybe<String>;
+  logo_not_ends_with?: Maybe<String>;
+  colourSettings?: Maybe<ColourSettingsWhereInput>;
+  fontSettings?: Maybe<FontSettingsWhereInput>;
+  AND?: Maybe<CustomerSettingsWhereInput[] | CustomerSettingsWhereInput>;
+  OR?: Maybe<CustomerSettingsWhereInput[] | CustomerSettingsWhereInput>;
+  NOT?: Maybe<CustomerSettingsWhereInput[] | CustomerSettingsWhereInput>;
 }
 
-export interface QuestionConditionUpdateDataInput {
-  conditionType?: Maybe<String>;
-  renderMin?: Maybe<Int>;
-  renderMax?: Maybe<Int>;
-  matchValue?: Maybe<String>;
-}
-
-export interface FontSettingsWhereInput {
-  id?: Maybe<ID_Input>;
-  id_not?: Maybe<ID_Input>;
-  id_in?: Maybe<ID_Input[] | ID_Input>;
-  id_not_in?: Maybe<ID_Input[] | ID_Input>;
-  id_lt?: Maybe<ID_Input>;
-  id_lte?: Maybe<ID_Input>;
-  id_gt?: Maybe<ID_Input>;
-  id_gte?: Maybe<ID_Input>;
-  id_contains?: Maybe<ID_Input>;
-  id_not_contains?: Maybe<ID_Input>;
-  id_starts_with?: Maybe<ID_Input>;
-  id_not_starts_with?: Maybe<ID_Input>;
-  id_ends_with?: Maybe<ID_Input>;
-  id_not_ends_with?: Maybe<ID_Input>;
-  settingTitle?: Maybe<String>;
-  settingTitle_not?: Maybe<String>;
-  settingTitle_in?: Maybe<String[] | String>;
-  settingTitle_not_in?: Maybe<String[] | String>;
-  settingTitle_lt?: Maybe<String>;
-  settingTitle_lte?: Maybe<String>;
-  settingTitle_gt?: Maybe<String>;
-  settingTitle_gte?: Maybe<String>;
-  settingTitle_contains?: Maybe<String>;
-  settingTitle_not_contains?: Maybe<String>;
-  settingTitle_starts_with?: Maybe<String>;
-  settingTitle_not_starts_with?: Maybe<String>;
-  settingTitle_ends_with?: Maybe<String>;
-  settingTitle_not_ends_with?: Maybe<String>;
-  body?: Maybe<String>;
-  body_not?: Maybe<String>;
-  body_in?: Maybe<String[] | String>;
-  body_not_in?: Maybe<String[] | String>;
-  body_lt?: Maybe<String>;
-  body_lte?: Maybe<String>;
-  body_gt?: Maybe<String>;
-  body_gte?: Maybe<String>;
-  body_contains?: Maybe<String>;
-  body_not_contains?: Maybe<String>;
-  body_starts_with?: Maybe<String>;
-  body_not_starts_with?: Maybe<String>;
-  body_ends_with?: Maybe<String>;
-  body_not_ends_with?: Maybe<String>;
-  fontTitle?: Maybe<String>;
-  fontTitle_not?: Maybe<String>;
-  fontTitle_in?: Maybe<String[] | String>;
-  fontTitle_not_in?: Maybe<String[] | String>;
-  fontTitle_lt?: Maybe<String>;
-  fontTitle_lte?: Maybe<String>;
-  fontTitle_gt?: Maybe<String>;
-  fontTitle_gte?: Maybe<String>;
-  fontTitle_contains?: Maybe<String>;
-  fontTitle_not_contains?: Maybe<String>;
-  fontTitle_starts_with?: Maybe<String>;
-  fontTitle_not_starts_with?: Maybe<String>;
-  fontTitle_ends_with?: Maybe<String>;
-  fontTitle_not_ends_with?: Maybe<String>;
-  special?: Maybe<String>;
-  special_not?: Maybe<String>;
-  special_in?: Maybe<String[] | String>;
-  special_not_in?: Maybe<String[] | String>;
-  special_lt?: Maybe<String>;
-  special_lte?: Maybe<String>;
-  special_gt?: Maybe<String>;
-  special_gte?: Maybe<String>;
-  special_contains?: Maybe<String>;
-  special_not_contains?: Maybe<String>;
-  special_starts_with?: Maybe<String>;
-  special_not_starts_with?: Maybe<String>;
-  special_ends_with?: Maybe<String>;
-  special_not_ends_with?: Maybe<String>;
-  AND?: Maybe<FontSettingsWhereInput[] | FontSettingsWhereInput>;
-  OR?: Maybe<FontSettingsWhereInput[] | FontSettingsWhereInput>;
-  NOT?: Maybe<FontSettingsWhereInput[] | FontSettingsWhereInput>;
-}
-
-export interface QuestionConditionUpdateWithWhereUniqueNestedInput {
-  where: QuestionConditionWhereUniqueInput;
-  data: QuestionConditionUpdateDataInput;
-}
-
-export interface QuestionOptionSubscriptionWhereInput {
-  mutation_in?: Maybe<MutationType[] | MutationType>;
-  updatedFields_contains?: Maybe<String>;
-  updatedFields_contains_every?: Maybe<String[] | String>;
-  updatedFields_contains_some?: Maybe<String[] | String>;
-  node?: Maybe<QuestionOptionWhereInput>;
-  AND?: Maybe<
-    | QuestionOptionSubscriptionWhereInput[]
-    | QuestionOptionSubscriptionWhereInput
-  >;
-  OR?: Maybe<
-    | QuestionOptionSubscriptionWhereInput[]
-    | QuestionOptionSubscriptionWhereInput
-  >;
-  NOT?: Maybe<
-    | QuestionOptionSubscriptionWhereInput[]
-    | QuestionOptionSubscriptionWhereInput
-  >;
-}
-
-export interface QuestionConditionUpdateManyInput {
-  create?: Maybe<QuestionConditionCreateInput[] | QuestionConditionCreateInput>;
+export interface QuestionNodeUpdateManyInput {
+  create?: Maybe<QuestionNodeCreateInput[] | QuestionNodeCreateInput>;
   update?: Maybe<
-    | QuestionConditionUpdateWithWhereUniqueNestedInput[]
-    | QuestionConditionUpdateWithWhereUniqueNestedInput
+    | QuestionNodeUpdateWithWhereUniqueNestedInput[]
+    | QuestionNodeUpdateWithWhereUniqueNestedInput
   >;
   upsert?: Maybe<
-    | QuestionConditionUpsertWithWhereUniqueNestedInput[]
-    | QuestionConditionUpsertWithWhereUniqueNestedInput
+    | QuestionNodeUpsertWithWhereUniqueNestedInput[]
+    | QuestionNodeUpsertWithWhereUniqueNestedInput
   >;
-  delete?: Maybe<
-    QuestionConditionWhereUniqueInput[] | QuestionConditionWhereUniqueInput
-  >;
+  delete?: Maybe<QuestionNodeWhereUniqueInput[] | QuestionNodeWhereUniqueInput>;
   connect?: Maybe<
-    QuestionConditionWhereUniqueInput[] | QuestionConditionWhereUniqueInput
+    QuestionNodeWhereUniqueInput[] | QuestionNodeWhereUniqueInput
   >;
-  set?: Maybe<
-    QuestionConditionWhereUniqueInput[] | QuestionConditionWhereUniqueInput
-  >;
+  set?: Maybe<QuestionNodeWhereUniqueInput[] | QuestionNodeWhereUniqueInput>;
   disconnect?: Maybe<
-    QuestionConditionWhereUniqueInput[] | QuestionConditionWhereUniqueInput
+    QuestionNodeWhereUniqueInput[] | QuestionNodeWhereUniqueInput
   >;
   deleteMany?: Maybe<
-    QuestionConditionScalarWhereInput[] | QuestionConditionScalarWhereInput
+    QuestionNodeScalarWhereInput[] | QuestionNodeScalarWhereInput
   >;
   updateMany?: Maybe<
-    | QuestionConditionUpdateManyWithWhereNestedInput[]
-    | QuestionConditionUpdateManyWithWhereNestedInput
+    | QuestionNodeUpdateManyWithWhereNestedInput[]
+    | QuestionNodeUpdateManyWithWhereNestedInput
   >;
 }
 
-export interface QuestionConditionSubscriptionWhereInput {
+export interface QuestionnaireSubscriptionWhereInput {
   mutation_in?: Maybe<MutationType[] | MutationType>;
   updatedFields_contains?: Maybe<String>;
   updatedFields_contains_every?: Maybe<String[] | String>;
   updatedFields_contains_some?: Maybe<String[] | String>;
-  node?: Maybe<QuestionConditionWhereInput>;
+  node?: Maybe<QuestionnaireWhereInput>;
   AND?: Maybe<
-    | QuestionConditionSubscriptionWhereInput[]
-    | QuestionConditionSubscriptionWhereInput
+    QuestionnaireSubscriptionWhereInput[] | QuestionnaireSubscriptionWhereInput
   >;
   OR?: Maybe<
-    | QuestionConditionSubscriptionWhereInput[]
-    | QuestionConditionSubscriptionWhereInput
+    QuestionnaireSubscriptionWhereInput[] | QuestionnaireSubscriptionWhereInput
   >;
   NOT?: Maybe<
-    | QuestionConditionSubscriptionWhereInput[]
-    | QuestionConditionSubscriptionWhereInput
+    QuestionnaireSubscriptionWhereInput[] | QuestionnaireSubscriptionWhereInput
   >;
 }
 
-export interface NodeTypeUpdateOneRequiredInput {
-  create?: Maybe<NodeTypeCreateInput>;
-  update?: Maybe<NodeTypeUpdateDataInput>;
-  upsert?: Maybe<NodeTypeUpsertNestedInput>;
-  connect?: Maybe<NodeTypeWhereUniqueInput>;
+export interface QuestionOptionUpdateManyDataInput {
+  value?: Maybe<String>;
+  publicValue?: Maybe<String>;
 }
+
+export interface QuestionNodeSubscriptionWhereInput {
+  mutation_in?: Maybe<MutationType[] | MutationType>;
+  updatedFields_contains?: Maybe<String>;
+  updatedFields_contains_every?: Maybe<String[] | String>;
+  updatedFields_contains_some?: Maybe<String[] | String>;
+  node?: Maybe<QuestionNodeWhereInput>;
+  AND?: Maybe<
+    QuestionNodeSubscriptionWhereInput[] | QuestionNodeSubscriptionWhereInput
+  >;
+  OR?: Maybe<
+    QuestionNodeSubscriptionWhereInput[] | QuestionNodeSubscriptionWhereInput
+  >;
+  NOT?: Maybe<
+    QuestionNodeSubscriptionWhereInput[] | QuestionNodeSubscriptionWhereInput
+  >;
+}
+
+export interface QuestionOptionUpdateManyWithWhereNestedInput {
+  where: QuestionOptionScalarWhereInput;
+  data: QuestionOptionUpdateManyDataInput;
+}
+
+export type CustomerSettingsWhereUniqueInput = AtLeastOne<{
+  id: Maybe<ID_Input>;
+}>;
 
 export interface NodeTypeSubscriptionWhereInput {
   mutation_in?: Maybe<MutationType[] | MutationType>;
@@ -1037,10 +963,6 @@ export interface FontSettingsSubscriptionWhereInput {
   >;
 }
 
-export type FontSettingsWhereUniqueInput = AtLeastOne<{
-  id: Maybe<ID_Input>;
-}>;
-
 export interface ColourSettingsCreateInput {
   id?: Maybe<ID_Input>;
   title?: Maybe<String>;
@@ -1059,24 +981,15 @@ export interface ColourSettingsCreateInput {
   text: String;
 }
 
-export interface ColourSettingsSubscriptionWhereInput {
+export interface EdgeSubscriptionWhereInput {
   mutation_in?: Maybe<MutationType[] | MutationType>;
   updatedFields_contains?: Maybe<String>;
   updatedFields_contains_every?: Maybe<String[] | String>;
   updatedFields_contains_some?: Maybe<String[] | String>;
-  node?: Maybe<ColourSettingsWhereInput>;
-  AND?: Maybe<
-    | ColourSettingsSubscriptionWhereInput[]
-    | ColourSettingsSubscriptionWhereInput
-  >;
-  OR?: Maybe<
-    | ColourSettingsSubscriptionWhereInput[]
-    | ColourSettingsSubscriptionWhereInput
-  >;
-  NOT?: Maybe<
-    | ColourSettingsSubscriptionWhereInput[]
-    | ColourSettingsSubscriptionWhereInput
-  >;
+  node?: Maybe<EdgeWhereInput>;
+  AND?: Maybe<EdgeSubscriptionWhereInput[] | EdgeSubscriptionWhereInput>;
+  OR?: Maybe<EdgeSubscriptionWhereInput[] | EdgeSubscriptionWhereInput>;
+  NOT?: Maybe<EdgeSubscriptionWhereInput[] | EdgeSubscriptionWhereInput>;
 }
 
 export interface ColourSettingsUpdateInput {
@@ -1096,9 +1009,19 @@ export interface ColourSettingsUpdateInput {
   text?: Maybe<String>;
 }
 
-export interface CustomerUpsertNestedInput {
-  update: CustomerUpdateDataInput;
-  create: CustomerCreateInput;
+export interface CustomerSubscriptionWhereInput {
+  mutation_in?: Maybe<MutationType[] | MutationType>;
+  updatedFields_contains?: Maybe<String>;
+  updatedFields_contains_every?: Maybe<String[] | String>;
+  updatedFields_contains_some?: Maybe<String[] | String>;
+  node?: Maybe<CustomerWhereInput>;
+  AND?: Maybe<
+    CustomerSubscriptionWhereInput[] | CustomerSubscriptionWhereInput
+  >;
+  OR?: Maybe<CustomerSubscriptionWhereInput[] | CustomerSubscriptionWhereInput>;
+  NOT?: Maybe<
+    CustomerSubscriptionWhereInput[] | CustomerSubscriptionWhereInput
+  >;
 }
 
 export interface ColourSettingsUpdateManyMutationInput {
@@ -1118,22 +1041,7 @@ export interface ColourSettingsUpdateManyMutationInput {
   text?: Maybe<String>;
 }
 
-export interface CustomerUpdateDataInput {
-  name?: Maybe<String>;
-  settings?: Maybe<CustomerSettingsUpdateOneWithoutCustomerInput>;
-}
-
-export interface QuestionNodeUpdateInput {
-  title?: Maybe<String>;
-  branchVal?: Maybe<String>;
-  questionType?: Maybe<NodeTypeUpdateOneRequiredInput>;
-  overrideLeafId?: Maybe<Int>;
-  conditions?: Maybe<QuestionConditionUpdateManyInput>;
-  options?: Maybe<QuestionOptionUpdateManyInput>;
-  children?: Maybe<QuestionNodeUpdateManyInput>;
-}
-
-export interface LeafNodeWhereInput {
+export interface QuestionConditionWhereInput {
   id?: Maybe<ID_Input>;
   id_not?: Maybe<ID_Input>;
   id_in?: Maybe<ID_Input[] | ID_Input>;
@@ -1148,15 +1056,144 @@ export interface LeafNodeWhereInput {
   id_not_starts_with?: Maybe<ID_Input>;
   id_ends_with?: Maybe<ID_Input>;
   id_not_ends_with?: Maybe<ID_Input>;
-  nodeId?: Maybe<Int>;
-  nodeId_not?: Maybe<Int>;
-  nodeId_in?: Maybe<Int[] | Int>;
-  nodeId_not_in?: Maybe<Int[] | Int>;
-  nodeId_lt?: Maybe<Int>;
-  nodeId_lte?: Maybe<Int>;
-  nodeId_gt?: Maybe<Int>;
-  nodeId_gte?: Maybe<Int>;
-  type?: Maybe<NodeTypeWhereInput>;
+  conditionType?: Maybe<String>;
+  conditionType_not?: Maybe<String>;
+  conditionType_in?: Maybe<String[] | String>;
+  conditionType_not_in?: Maybe<String[] | String>;
+  conditionType_lt?: Maybe<String>;
+  conditionType_lte?: Maybe<String>;
+  conditionType_gt?: Maybe<String>;
+  conditionType_gte?: Maybe<String>;
+  conditionType_contains?: Maybe<String>;
+  conditionType_not_contains?: Maybe<String>;
+  conditionType_starts_with?: Maybe<String>;
+  conditionType_not_starts_with?: Maybe<String>;
+  conditionType_ends_with?: Maybe<String>;
+  conditionType_not_ends_with?: Maybe<String>;
+  renderMin?: Maybe<Int>;
+  renderMin_not?: Maybe<Int>;
+  renderMin_in?: Maybe<Int[] | Int>;
+  renderMin_not_in?: Maybe<Int[] | Int>;
+  renderMin_lt?: Maybe<Int>;
+  renderMin_lte?: Maybe<Int>;
+  renderMin_gt?: Maybe<Int>;
+  renderMin_gte?: Maybe<Int>;
+  renderMax?: Maybe<Int>;
+  renderMax_not?: Maybe<Int>;
+  renderMax_in?: Maybe<Int[] | Int>;
+  renderMax_not_in?: Maybe<Int[] | Int>;
+  renderMax_lt?: Maybe<Int>;
+  renderMax_lte?: Maybe<Int>;
+  renderMax_gt?: Maybe<Int>;
+  renderMax_gte?: Maybe<Int>;
+  matchValue?: Maybe<String>;
+  matchValue_not?: Maybe<String>;
+  matchValue_in?: Maybe<String[] | String>;
+  matchValue_not_in?: Maybe<String[] | String>;
+  matchValue_lt?: Maybe<String>;
+  matchValue_lte?: Maybe<String>;
+  matchValue_gt?: Maybe<String>;
+  matchValue_gte?: Maybe<String>;
+  matchValue_contains?: Maybe<String>;
+  matchValue_not_contains?: Maybe<String>;
+  matchValue_starts_with?: Maybe<String>;
+  matchValue_not_starts_with?: Maybe<String>;
+  matchValue_ends_with?: Maybe<String>;
+  matchValue_not_ends_with?: Maybe<String>;
+  AND?: Maybe<QuestionConditionWhereInput[] | QuestionConditionWhereInput>;
+  OR?: Maybe<QuestionConditionWhereInput[] | QuestionConditionWhereInput>;
+  NOT?: Maybe<QuestionConditionWhereInput[] | QuestionConditionWhereInput>;
+}
+
+export interface QuestionOptionScalarWhereInput {
+  id?: Maybe<ID_Input>;
+  id_not?: Maybe<ID_Input>;
+  id_in?: Maybe<ID_Input[] | ID_Input>;
+  id_not_in?: Maybe<ID_Input[] | ID_Input>;
+  id_lt?: Maybe<ID_Input>;
+  id_lte?: Maybe<ID_Input>;
+  id_gt?: Maybe<ID_Input>;
+  id_gte?: Maybe<ID_Input>;
+  id_contains?: Maybe<ID_Input>;
+  id_not_contains?: Maybe<ID_Input>;
+  id_starts_with?: Maybe<ID_Input>;
+  id_not_starts_with?: Maybe<ID_Input>;
+  id_ends_with?: Maybe<ID_Input>;
+  id_not_ends_with?: Maybe<ID_Input>;
+  value?: Maybe<String>;
+  value_not?: Maybe<String>;
+  value_in?: Maybe<String[] | String>;
+  value_not_in?: Maybe<String[] | String>;
+  value_lt?: Maybe<String>;
+  value_lte?: Maybe<String>;
+  value_gt?: Maybe<String>;
+  value_gte?: Maybe<String>;
+  value_contains?: Maybe<String>;
+  value_not_contains?: Maybe<String>;
+  value_starts_with?: Maybe<String>;
+  value_not_starts_with?: Maybe<String>;
+  value_ends_with?: Maybe<String>;
+  value_not_ends_with?: Maybe<String>;
+  publicValue?: Maybe<String>;
+  publicValue_not?: Maybe<String>;
+  publicValue_in?: Maybe<String[] | String>;
+  publicValue_not_in?: Maybe<String[] | String>;
+  publicValue_lt?: Maybe<String>;
+  publicValue_lte?: Maybe<String>;
+  publicValue_gt?: Maybe<String>;
+  publicValue_gte?: Maybe<String>;
+  publicValue_contains?: Maybe<String>;
+  publicValue_not_contains?: Maybe<String>;
+  publicValue_starts_with?: Maybe<String>;
+  publicValue_not_starts_with?: Maybe<String>;
+  publicValue_ends_with?: Maybe<String>;
+  publicValue_not_ends_with?: Maybe<String>;
+  AND?: Maybe<
+    QuestionOptionScalarWhereInput[] | QuestionOptionScalarWhereInput
+  >;
+  OR?: Maybe<QuestionOptionScalarWhereInput[] | QuestionOptionScalarWhereInput>;
+  NOT?: Maybe<
+    QuestionOptionScalarWhereInput[] | QuestionOptionScalarWhereInput
+  >;
+}
+
+export interface CustomerUpsertNestedInput {
+  update: CustomerUpdateDataInput;
+  create: CustomerCreateInput;
+}
+
+export interface QuestionOptionUpsertWithWhereUniqueNestedInput {
+  where: QuestionOptionWhereUniqueInput;
+  update: QuestionOptionUpdateDataInput;
+  create: QuestionOptionCreateInput;
+}
+
+export interface CustomerUpdateDataInput {
+  name?: Maybe<String>;
+  settings?: Maybe<CustomerSettingsUpdateOneWithoutCustomerInput>;
+}
+
+export interface CustomerCreateInput {
+  id?: Maybe<ID_Input>;
+  name: String;
+  settings?: Maybe<CustomerSettingsCreateOneWithoutCustomerInput>;
+}
+
+export interface QuestionNodeWhereInput {
+  id?: Maybe<ID_Input>;
+  id_not?: Maybe<ID_Input>;
+  id_in?: Maybe<ID_Input[] | ID_Input>;
+  id_not_in?: Maybe<ID_Input[] | ID_Input>;
+  id_lt?: Maybe<ID_Input>;
+  id_lte?: Maybe<ID_Input>;
+  id_gt?: Maybe<ID_Input>;
+  id_gte?: Maybe<ID_Input>;
+  id_contains?: Maybe<ID_Input>;
+  id_not_contains?: Maybe<ID_Input>;
+  id_starts_with?: Maybe<ID_Input>;
+  id_not_starts_with?: Maybe<ID_Input>;
+  id_ends_with?: Maybe<ID_Input>;
+  id_not_ends_with?: Maybe<ID_Input>;
   title?: Maybe<String>;
   title_not?: Maybe<String>;
   title_in?: Maybe<String[] | String>;
@@ -1171,39 +1208,44 @@ export interface LeafNodeWhereInput {
   title_not_starts_with?: Maybe<String>;
   title_ends_with?: Maybe<String>;
   title_not_ends_with?: Maybe<String>;
-  AND?: Maybe<LeafNodeWhereInput[] | LeafNodeWhereInput>;
-  OR?: Maybe<LeafNodeWhereInput[] | LeafNodeWhereInput>;
-  NOT?: Maybe<LeafNodeWhereInput[] | LeafNodeWhereInput>;
-}
-
-export interface QuestionNodeCreateManyInput {
-  create?: Maybe<QuestionNodeCreateInput[] | QuestionNodeCreateInput>;
-  connect?: Maybe<
-    QuestionNodeWhereUniqueInput[] | QuestionNodeWhereUniqueInput
-  >;
-}
-
-export interface QuestionnaireUpdateInput {
-  customer?: Maybe<CustomerUpdateOneRequiredInput>;
-  title?: Maybe<String>;
-  description?: Maybe<String>;
-  publicTitle?: Maybe<String>;
-  questions?: Maybe<QuestionNodeUpdateManyInput>;
-}
-
-export interface CustomerCreateInput {
-  id?: Maybe<ID_Input>;
-  name: String;
-  settings?: Maybe<CustomerSettingsCreateOneWithoutCustomerInput>;
-}
-
-export interface QuestionnaireCreateInput {
-  id?: Maybe<ID_Input>;
-  customer: CustomerCreateOneInput;
-  title: String;
-  description: String;
-  publicTitle?: Maybe<String>;
-  questions?: Maybe<QuestionNodeCreateManyInput>;
+  branchVal?: Maybe<String>;
+  branchVal_not?: Maybe<String>;
+  branchVal_in?: Maybe<String[] | String>;
+  branchVal_not_in?: Maybe<String[] | String>;
+  branchVal_lt?: Maybe<String>;
+  branchVal_lte?: Maybe<String>;
+  branchVal_gt?: Maybe<String>;
+  branchVal_gte?: Maybe<String>;
+  branchVal_contains?: Maybe<String>;
+  branchVal_not_contains?: Maybe<String>;
+  branchVal_starts_with?: Maybe<String>;
+  branchVal_not_starts_with?: Maybe<String>;
+  branchVal_ends_with?: Maybe<String>;
+  branchVal_not_ends_with?: Maybe<String>;
+  questionType?: Maybe<NodeTypeWhereInput>;
+  overrideLeafId?: Maybe<Int>;
+  overrideLeafId_not?: Maybe<Int>;
+  overrideLeafId_in?: Maybe<Int[] | Int>;
+  overrideLeafId_not_in?: Maybe<Int[] | Int>;
+  overrideLeafId_lt?: Maybe<Int>;
+  overrideLeafId_lte?: Maybe<Int>;
+  overrideLeafId_gt?: Maybe<Int>;
+  overrideLeafId_gte?: Maybe<Int>;
+  conditions_every?: Maybe<QuestionConditionWhereInput>;
+  conditions_some?: Maybe<QuestionConditionWhereInput>;
+  conditions_none?: Maybe<QuestionConditionWhereInput>;
+  options_every?: Maybe<QuestionOptionWhereInput>;
+  options_some?: Maybe<QuestionOptionWhereInput>;
+  options_none?: Maybe<QuestionOptionWhereInput>;
+  children_every?: Maybe<QuestionNodeWhereInput>;
+  children_some?: Maybe<QuestionNodeWhereInput>;
+  children_none?: Maybe<QuestionNodeWhereInput>;
+  edgeChildren_every?: Maybe<EdgeWhereInput>;
+  edgeChildren_some?: Maybe<EdgeWhereInput>;
+  edgeChildren_none?: Maybe<EdgeWhereInput>;
+  AND?: Maybe<QuestionNodeWhereInput[] | QuestionNodeWhereInput>;
+  OR?: Maybe<QuestionNodeWhereInput[] | QuestionNodeWhereInput>;
+  NOT?: Maybe<QuestionNodeWhereInput[] | QuestionNodeWhereInput>;
 }
 
 export interface CustomerSettingsCreateOneWithoutCustomerInput {
@@ -1211,9 +1253,43 @@ export interface CustomerSettingsCreateOneWithoutCustomerInput {
   connect?: Maybe<CustomerSettingsWhereUniqueInput>;
 }
 
-export type NodeTypeWhereUniqueInput = AtLeastOne<{
-  id: Maybe<ID_Input>;
-}>;
+export interface EdgeWhereInput {
+  id?: Maybe<ID_Input>;
+  id_not?: Maybe<ID_Input>;
+  id_in?: Maybe<ID_Input[] | ID_Input>;
+  id_not_in?: Maybe<ID_Input[] | ID_Input>;
+  id_lt?: Maybe<ID_Input>;
+  id_lte?: Maybe<ID_Input>;
+  id_gt?: Maybe<ID_Input>;
+  id_gte?: Maybe<ID_Input>;
+  id_contains?: Maybe<ID_Input>;
+  id_not_contains?: Maybe<ID_Input>;
+  id_starts_with?: Maybe<ID_Input>;
+  id_not_starts_with?: Maybe<ID_Input>;
+  id_ends_with?: Maybe<ID_Input>;
+  id_not_ends_with?: Maybe<ID_Input>;
+  createdAt?: Maybe<DateTimeInput>;
+  createdAt_not?: Maybe<DateTimeInput>;
+  createdAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  createdAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  createdAt_lt?: Maybe<DateTimeInput>;
+  createdAt_lte?: Maybe<DateTimeInput>;
+  createdAt_gt?: Maybe<DateTimeInput>;
+  createdAt_gte?: Maybe<DateTimeInput>;
+  updatedAt?: Maybe<DateTimeInput>;
+  updatedAt_not?: Maybe<DateTimeInput>;
+  updatedAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  updatedAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  updatedAt_lt?: Maybe<DateTimeInput>;
+  updatedAt_lte?: Maybe<DateTimeInput>;
+  updatedAt_gt?: Maybe<DateTimeInput>;
+  updatedAt_gte?: Maybe<DateTimeInput>;
+  parentNode?: Maybe<QuestionNodeWhereInput>;
+  childNode?: Maybe<QuestionNodeWhereInput>;
+  AND?: Maybe<EdgeWhereInput[] | EdgeWhereInput>;
+  OR?: Maybe<EdgeWhereInput[] | EdgeWhereInput>;
+  NOT?: Maybe<EdgeWhereInput[] | EdgeWhereInput>;
+}
 
 export interface CustomerSettingsCreateWithoutCustomerInput {
   id?: Maybe<ID_Input>;
@@ -1223,10 +1299,9 @@ export interface CustomerSettingsCreateWithoutCustomerInput {
   fontSettings: FontSettingsCreateOneInput;
 }
 
-export interface QuestionNodeUpdateManyMutationInput {
-  title?: Maybe<String>;
-  branchVal?: Maybe<String>;
-  overrideLeafId?: Maybe<Int>;
+export interface CustomerCreateOneInput {
+  create?: Maybe<CustomerCreateInput>;
+  connect?: Maybe<CustomerWhereUniqueInput>;
 }
 
 export interface ColourSettingsCreateOneInput {
@@ -1234,14 +1309,206 @@ export interface ColourSettingsCreateOneInput {
   connect?: Maybe<ColourSettingsWhereUniqueInput>;
 }
 
-export interface QuestionNodeUpdateManyWithWhereNestedInput {
-  where: QuestionNodeScalarWhereInput;
-  data: QuestionNodeUpdateManyDataInput;
+export interface QuestionOptionUpdateManyMutationInput {
+  value?: Maybe<String>;
+  publicValue?: Maybe<String>;
 }
 
 export interface FontSettingsCreateOneInput {
   create?: Maybe<FontSettingsCreateInput>;
   connect?: Maybe<FontSettingsWhereUniqueInput>;
+}
+
+export type FontSettingsWhereUniqueInput = AtLeastOne<{
+  id: Maybe<ID_Input>;
+}>;
+
+export interface FontSettingsCreateInput {
+  id?: Maybe<ID_Input>;
+  settingTitle?: Maybe<String>;
+  body?: Maybe<String>;
+  fontTitle?: Maybe<String>;
+  special?: Maybe<String>;
+}
+
+export interface QuestionNodeUpdateInput {
+  title?: Maybe<String>;
+  branchVal?: Maybe<String>;
+  questionType?: Maybe<NodeTypeUpdateOneRequiredInput>;
+  overrideLeafId?: Maybe<Int>;
+  conditions?: Maybe<QuestionConditionUpdateManyInput>;
+  options?: Maybe<QuestionOptionUpdateManyInput>;
+  children?: Maybe<QuestionNodeUpdateManyInput>;
+  edgeChildren?: Maybe<EdgeUpdateManyInput>;
+}
+
+export interface CustomerUpdateInput {
+  name?: Maybe<String>;
+  settings?: Maybe<CustomerSettingsUpdateOneWithoutCustomerInput>;
+}
+
+export interface QuestionConditionUpdateInput {
+  conditionType?: Maybe<String>;
+  renderMin?: Maybe<Int>;
+  renderMax?: Maybe<Int>;
+  matchValue?: Maybe<String>;
+}
+
+export interface CustomerSettingsUpdateOneWithoutCustomerInput {
+  create?: Maybe<CustomerSettingsCreateWithoutCustomerInput>;
+  update?: Maybe<CustomerSettingsUpdateWithoutCustomerDataInput>;
+  upsert?: Maybe<CustomerSettingsUpsertWithoutCustomerInput>;
+  delete?: Maybe<Boolean>;
+  disconnect?: Maybe<Boolean>;
+  connect?: Maybe<CustomerSettingsWhereUniqueInput>;
+}
+
+export interface NodeTypeUpdateManyMutationInput {
+  type?: Maybe<String>;
+}
+
+export interface CustomerSettingsUpdateWithoutCustomerDataInput {
+  title?: Maybe<String>;
+  logo?: Maybe<String>;
+  colourSettings?: Maybe<ColourSettingsUpdateOneRequiredInput>;
+  fontSettings?: Maybe<FontSettingsUpdateOneRequiredInput>;
+}
+
+export interface NodeTypeUpdateInput {
+  type?: Maybe<String>;
+}
+
+export interface ColourSettingsUpdateOneRequiredInput {
+  create?: Maybe<ColourSettingsCreateInput>;
+  update?: Maybe<ColourSettingsUpdateDataInput>;
+  upsert?: Maybe<ColourSettingsUpsertNestedInput>;
+  connect?: Maybe<ColourSettingsWhereUniqueInput>;
+}
+
+export interface NodeTypeUpdateOneInput {
+  create?: Maybe<NodeTypeCreateInput>;
+  update?: Maybe<NodeTypeUpdateDataInput>;
+  upsert?: Maybe<NodeTypeUpsertNestedInput>;
+  delete?: Maybe<Boolean>;
+  disconnect?: Maybe<Boolean>;
+  connect?: Maybe<NodeTypeWhereUniqueInput>;
+}
+
+export interface ColourSettingsUpdateDataInput {
+  title?: Maybe<String>;
+  primary?: Maybe<String>;
+  secondary?: Maybe<String>;
+  tertiary?: Maybe<String>;
+  success?: Maybe<String>;
+  warning?: Maybe<String>;
+  error?: Maybe<String>;
+  lightest?: Maybe<String>;
+  light?: Maybe<String>;
+  normal?: Maybe<String>;
+  dark?: Maybe<String>;
+  darkest?: Maybe<String>;
+  muted?: Maybe<String>;
+  text?: Maybe<String>;
+}
+
+export type NodeTypeWhereUniqueInput = AtLeastOne<{
+  id: Maybe<ID_Input>;
+}>;
+
+export interface ColourSettingsUpsertNestedInput {
+  update: ColourSettingsUpdateDataInput;
+  create: ColourSettingsCreateInput;
+}
+
+export interface LeafNodeCreateInput {
+  id?: Maybe<ID_Input>;
+  nodeId?: Maybe<Int>;
+  type?: Maybe<NodeTypeCreateOneInput>;
+  title: String;
+}
+
+export interface FontSettingsUpdateOneRequiredInput {
+  create?: Maybe<FontSettingsCreateInput>;
+  update?: Maybe<FontSettingsUpdateDataInput>;
+  upsert?: Maybe<FontSettingsUpsertNestedInput>;
+  connect?: Maybe<FontSettingsWhereUniqueInput>;
+}
+
+export interface FontSettingsUpdateInput {
+  settingTitle?: Maybe<String>;
+  body?: Maybe<String>;
+  fontTitle?: Maybe<String>;
+  special?: Maybe<String>;
+}
+
+export interface FontSettingsUpdateDataInput {
+  settingTitle?: Maybe<String>;
+  body?: Maybe<String>;
+  fontTitle?: Maybe<String>;
+  special?: Maybe<String>;
+}
+
+export interface QuestionNodeUpsertNestedInput {
+  update: QuestionNodeUpdateDataInput;
+  create: QuestionNodeCreateInput;
+}
+
+export interface FontSettingsUpsertNestedInput {
+  update: FontSettingsUpdateDataInput;
+  create: FontSettingsCreateInput;
+}
+
+export interface EdgeUpsertWithWhereUniqueNestedInput {
+  where: EdgeWhereUniqueInput;
+  update: EdgeUpdateDataInput;
+  create: EdgeCreateInput;
+}
+
+export interface CustomerSettingsUpsertWithoutCustomerInput {
+  update: CustomerSettingsUpdateWithoutCustomerDataInput;
+  create: CustomerSettingsCreateWithoutCustomerInput;
+}
+
+export interface EdgeUpdateDataInput {
+  parentNode?: Maybe<QuestionNodeUpdateOneInput>;
+  childNode?: Maybe<QuestionNodeUpdateOneInput>;
+}
+
+export interface CustomerUpdateManyMutationInput {
+  name?: Maybe<String>;
+}
+
+export interface EdgeUpdateManyInput {
+  create?: Maybe<EdgeCreateInput[] | EdgeCreateInput>;
+  update?: Maybe<
+    | EdgeUpdateWithWhereUniqueNestedInput[]
+    | EdgeUpdateWithWhereUniqueNestedInput
+  >;
+  upsert?: Maybe<
+    | EdgeUpsertWithWhereUniqueNestedInput[]
+    | EdgeUpsertWithWhereUniqueNestedInput
+  >;
+  delete?: Maybe<EdgeWhereUniqueInput[] | EdgeWhereUniqueInput>;
+  connect?: Maybe<EdgeWhereUniqueInput[] | EdgeWhereUniqueInput>;
+  set?: Maybe<EdgeWhereUniqueInput[] | EdgeWhereUniqueInput>;
+  disconnect?: Maybe<EdgeWhereUniqueInput[] | EdgeWhereUniqueInput>;
+  deleteMany?: Maybe<EdgeScalarWhereInput[] | EdgeScalarWhereInput>;
+}
+
+export interface QuestionOptionUpdateDataInput {
+  value?: Maybe<String>;
+  publicValue?: Maybe<String>;
+}
+
+export interface QuestionNodeUpdateManyDataInput {
+  title?: Maybe<String>;
+  branchVal?: Maybe<String>;
+  overrideLeafId?: Maybe<Int>;
+}
+
+export interface CustomerCreateOneWithoutSettingsInput {
+  create?: Maybe<CustomerCreateWithoutSettingsInput>;
+  connect?: Maybe<CustomerWhereUniqueInput>;
 }
 
 export interface QuestionNodeScalarWhereInput {
@@ -1300,48 +1567,121 @@ export interface QuestionNodeScalarWhereInput {
   NOT?: Maybe<QuestionNodeScalarWhereInput[] | QuestionNodeScalarWhereInput>;
 }
 
-export interface FontSettingsCreateInput {
+export interface CustomerCreateWithoutSettingsInput {
   id?: Maybe<ID_Input>;
-  settingTitle?: Maybe<String>;
-  body?: Maybe<String>;
-  fontTitle?: Maybe<String>;
-  special?: Maybe<String>;
+  name: String;
 }
 
-export interface QuestionNodeUpsertWithWhereUniqueNestedInput {
-  where: QuestionNodeWhereUniqueInput;
-  update: QuestionNodeUpdateDataInput;
-  create: QuestionNodeCreateInput;
-}
-
-export interface CustomerUpdateInput {
+export interface CustomerWhereInput {
+  id?: Maybe<ID_Input>;
+  id_not?: Maybe<ID_Input>;
+  id_in?: Maybe<ID_Input[] | ID_Input>;
+  id_not_in?: Maybe<ID_Input[] | ID_Input>;
+  id_lt?: Maybe<ID_Input>;
+  id_lte?: Maybe<ID_Input>;
+  id_gt?: Maybe<ID_Input>;
+  id_gte?: Maybe<ID_Input>;
+  id_contains?: Maybe<ID_Input>;
+  id_not_contains?: Maybe<ID_Input>;
+  id_starts_with?: Maybe<ID_Input>;
+  id_not_starts_with?: Maybe<ID_Input>;
+  id_ends_with?: Maybe<ID_Input>;
+  id_not_ends_with?: Maybe<ID_Input>;
   name?: Maybe<String>;
-  settings?: Maybe<CustomerSettingsUpdateOneWithoutCustomerInput>;
+  name_not?: Maybe<String>;
+  name_in?: Maybe<String[] | String>;
+  name_not_in?: Maybe<String[] | String>;
+  name_lt?: Maybe<String>;
+  name_lte?: Maybe<String>;
+  name_gt?: Maybe<String>;
+  name_gte?: Maybe<String>;
+  name_contains?: Maybe<String>;
+  name_not_contains?: Maybe<String>;
+  name_starts_with?: Maybe<String>;
+  name_not_starts_with?: Maybe<String>;
+  name_ends_with?: Maybe<String>;
+  name_not_ends_with?: Maybe<String>;
+  settings?: Maybe<CustomerSettingsWhereInput>;
+  AND?: Maybe<CustomerWhereInput[] | CustomerWhereInput>;
+  OR?: Maybe<CustomerWhereInput[] | CustomerWhereInput>;
+  NOT?: Maybe<CustomerWhereInput[] | CustomerWhereInput>;
 }
 
-export interface QuestionNodeUpdateWithWhereUniqueNestedInput {
-  where: QuestionNodeWhereUniqueInput;
-  data: QuestionNodeUpdateDataInput;
-}
-
-export interface CustomerSettingsUpdateOneWithoutCustomerInput {
-  create?: Maybe<CustomerSettingsCreateWithoutCustomerInput>;
-  update?: Maybe<CustomerSettingsUpdateWithoutCustomerDataInput>;
-  upsert?: Maybe<CustomerSettingsUpsertWithoutCustomerInput>;
-  delete?: Maybe<Boolean>;
-  disconnect?: Maybe<Boolean>;
-  connect?: Maybe<CustomerSettingsWhereUniqueInput>;
-}
-
-export type QuestionNodeWhereUniqueInput = AtLeastOne<{
-  id: Maybe<ID_Input>;
-}>;
-
-export interface CustomerSettingsUpdateWithoutCustomerDataInput {
+export interface CustomerSettingsUpdateInput {
   title?: Maybe<String>;
+  customer?: Maybe<CustomerUpdateOneRequiredWithoutSettingsInput>;
   logo?: Maybe<String>;
   colourSettings?: Maybe<ColourSettingsUpdateOneRequiredInput>;
   fontSettings?: Maybe<FontSettingsUpdateOneRequiredInput>;
+}
+
+export interface QuestionOptionSubscriptionWhereInput {
+  mutation_in?: Maybe<MutationType[] | MutationType>;
+  updatedFields_contains?: Maybe<String>;
+  updatedFields_contains_every?: Maybe<String[] | String>;
+  updatedFields_contains_some?: Maybe<String[] | String>;
+  node?: Maybe<QuestionOptionWhereInput>;
+  AND?: Maybe<
+    | QuestionOptionSubscriptionWhereInput[]
+    | QuestionOptionSubscriptionWhereInput
+  >;
+  OR?: Maybe<
+    | QuestionOptionSubscriptionWhereInput[]
+    | QuestionOptionSubscriptionWhereInput
+  >;
+  NOT?: Maybe<
+    | QuestionOptionSubscriptionWhereInput[]
+    | QuestionOptionSubscriptionWhereInput
+  >;
+}
+
+export interface CustomerUpdateOneRequiredWithoutSettingsInput {
+  create?: Maybe<CustomerCreateWithoutSettingsInput>;
+  update?: Maybe<CustomerUpdateWithoutSettingsDataInput>;
+  upsert?: Maybe<CustomerUpsertWithoutSettingsInput>;
+  connect?: Maybe<CustomerWhereUniqueInput>;
+}
+
+export type CustomerWhereUniqueInput = AtLeastOne<{
+  id: Maybe<ID_Input>;
+}>;
+
+export interface CustomerUpdateWithoutSettingsDataInput {
+  name?: Maybe<String>;
+}
+
+export type EdgeWhereUniqueInput = AtLeastOne<{
+  id: Maybe<ID_Input>;
+}>;
+
+export interface CustomerUpsertWithoutSettingsInput {
+  update: CustomerUpdateWithoutSettingsDataInput;
+  create: CustomerCreateWithoutSettingsInput;
+}
+
+export interface ColourSettingsSubscriptionWhereInput {
+  mutation_in?: Maybe<MutationType[] | MutationType>;
+  updatedFields_contains?: Maybe<String>;
+  updatedFields_contains_every?: Maybe<String[] | String>;
+  updatedFields_contains_some?: Maybe<String[] | String>;
+  node?: Maybe<ColourSettingsWhereInput>;
+  AND?: Maybe<
+    | ColourSettingsSubscriptionWhereInput[]
+    | ColourSettingsSubscriptionWhereInput
+  >;
+  OR?: Maybe<
+    | ColourSettingsSubscriptionWhereInput[]
+    | ColourSettingsSubscriptionWhereInput
+  >;
+  NOT?: Maybe<
+    | ColourSettingsSubscriptionWhereInput[]
+    | ColourSettingsSubscriptionWhereInput
+  >;
+}
+
+export interface QuestionOptionUpdateWithWhereUniqueNestedInput {
+  where: QuestionOptionWhereUniqueInput;
+  data: QuestionOptionUpdateDataInput;
 }
 
 export interface QuestionOptionWhereInput {
@@ -1392,14 +1732,13 @@ export interface QuestionOptionWhereInput {
   NOT?: Maybe<QuestionOptionWhereInput[] | QuestionOptionWhereInput>;
 }
 
-export interface ColourSettingsUpdateOneRequiredInput {
-  create?: Maybe<ColourSettingsCreateInput>;
-  update?: Maybe<ColourSettingsUpdateDataInput>;
-  upsert?: Maybe<ColourSettingsUpsertNestedInput>;
-  connect?: Maybe<ColourSettingsWhereUniqueInput>;
+export interface EdgeCreateInput {
+  id?: Maybe<ID_Input>;
+  parentNode?: Maybe<QuestionNodeCreateOneInput>;
+  childNode?: Maybe<QuestionNodeCreateOneInput>;
 }
 
-export interface QuestionOptionScalarWhereInput {
+export interface NodeTypeWhereInput {
   id?: Maybe<ID_Input>;
   id_not?: Maybe<ID_Input>;
   id_in?: Maybe<ID_Input[] | ID_Input>;
@@ -1414,58 +1753,82 @@ export interface QuestionOptionScalarWhereInput {
   id_not_starts_with?: Maybe<ID_Input>;
   id_ends_with?: Maybe<ID_Input>;
   id_not_ends_with?: Maybe<ID_Input>;
-  value?: Maybe<String>;
-  value_not?: Maybe<String>;
-  value_in?: Maybe<String[] | String>;
-  value_not_in?: Maybe<String[] | String>;
-  value_lt?: Maybe<String>;
-  value_lte?: Maybe<String>;
-  value_gt?: Maybe<String>;
-  value_gte?: Maybe<String>;
-  value_contains?: Maybe<String>;
-  value_not_contains?: Maybe<String>;
-  value_starts_with?: Maybe<String>;
-  value_not_starts_with?: Maybe<String>;
-  value_ends_with?: Maybe<String>;
-  value_not_ends_with?: Maybe<String>;
-  publicValue?: Maybe<String>;
-  publicValue_not?: Maybe<String>;
-  publicValue_in?: Maybe<String[] | String>;
-  publicValue_not_in?: Maybe<String[] | String>;
-  publicValue_lt?: Maybe<String>;
-  publicValue_lte?: Maybe<String>;
-  publicValue_gt?: Maybe<String>;
-  publicValue_gte?: Maybe<String>;
-  publicValue_contains?: Maybe<String>;
-  publicValue_not_contains?: Maybe<String>;
-  publicValue_starts_with?: Maybe<String>;
-  publicValue_not_starts_with?: Maybe<String>;
-  publicValue_ends_with?: Maybe<String>;
-  publicValue_not_ends_with?: Maybe<String>;
-  AND?: Maybe<
-    QuestionOptionScalarWhereInput[] | QuestionOptionScalarWhereInput
-  >;
-  OR?: Maybe<QuestionOptionScalarWhereInput[] | QuestionOptionScalarWhereInput>;
-  NOT?: Maybe<
-    QuestionOptionScalarWhereInput[] | QuestionOptionScalarWhereInput
-  >;
+  type?: Maybe<String>;
+  type_not?: Maybe<String>;
+  type_in?: Maybe<String[] | String>;
+  type_not_in?: Maybe<String[] | String>;
+  type_lt?: Maybe<String>;
+  type_lte?: Maybe<String>;
+  type_gt?: Maybe<String>;
+  type_gte?: Maybe<String>;
+  type_contains?: Maybe<String>;
+  type_not_contains?: Maybe<String>;
+  type_starts_with?: Maybe<String>;
+  type_not_starts_with?: Maybe<String>;
+  type_ends_with?: Maybe<String>;
+  type_not_ends_with?: Maybe<String>;
+  AND?: Maybe<NodeTypeWhereInput[] | NodeTypeWhereInput>;
+  OR?: Maybe<NodeTypeWhereInput[] | NodeTypeWhereInput>;
+  NOT?: Maybe<NodeTypeWhereInput[] | NodeTypeWhereInput>;
 }
 
-export interface ColourSettingsUpdateDataInput {
+export interface QuestionNodeCreateOneInput {
+  create?: Maybe<QuestionNodeCreateInput>;
+  connect?: Maybe<QuestionNodeWhereUniqueInput>;
+}
+
+export interface QuestionnaireCreateInput {
+  id?: Maybe<ID_Input>;
+  customer: CustomerCreateOneInput;
+  title: String;
+  description: String;
+  publicTitle?: Maybe<String>;
+  questions?: Maybe<QuestionNodeCreateManyInput>;
+}
+
+export interface QuestionNodeCreateInput {
+  id?: Maybe<ID_Input>;
+  title: String;
+  branchVal?: Maybe<String>;
+  questionType: NodeTypeCreateOneInput;
+  overrideLeafId?: Maybe<Int>;
+  conditions?: Maybe<QuestionConditionCreateManyInput>;
+  options?: Maybe<QuestionOptionCreateManyInput>;
+  children?: Maybe<QuestionNodeCreateManyInput>;
+  edgeChildren?: Maybe<EdgeCreateManyInput>;
+}
+
+export interface QuestionNodeUpdateManyMutationInput {
   title?: Maybe<String>;
-  primary?: Maybe<String>;
-  secondary?: Maybe<String>;
-  tertiary?: Maybe<String>;
-  success?: Maybe<String>;
-  warning?: Maybe<String>;
-  error?: Maybe<String>;
-  lightest?: Maybe<String>;
-  light?: Maybe<String>;
-  normal?: Maybe<String>;
-  dark?: Maybe<String>;
-  darkest?: Maybe<String>;
-  muted?: Maybe<String>;
-  text?: Maybe<String>;
+  branchVal?: Maybe<String>;
+  overrideLeafId?: Maybe<Int>;
+}
+
+export interface NodeTypeCreateOneInput {
+  create?: Maybe<NodeTypeCreateInput>;
+  connect?: Maybe<NodeTypeWhereUniqueInput>;
+}
+
+export type LeafNodeWhereUniqueInput = AtLeastOne<{
+  id: Maybe<ID_Input>;
+  nodeId?: Maybe<Int>;
+}>;
+
+export interface NodeTypeCreateInput {
+  id?: Maybe<ID_Input>;
+  type: String;
+}
+
+export interface LeafNodeUpdateManyMutationInput {
+  nodeId?: Maybe<Int>;
+  title?: Maybe<String>;
+}
+
+export interface QuestionConditionCreateManyInput {
+  create?: Maybe<QuestionConditionCreateInput[] | QuestionConditionCreateInput>;
+  connect?: Maybe<
+    QuestionConditionWhereUniqueInput[] | QuestionConditionWhereUniqueInput
+  >;
 }
 
 export interface ColourSettingsWhereInput {
@@ -1684,24 +2047,26 @@ export interface ColourSettingsWhereInput {
   NOT?: Maybe<ColourSettingsWhereInput[] | ColourSettingsWhereInput>;
 }
 
-export interface ColourSettingsUpsertNestedInput {
-  update: ColourSettingsUpdateDataInput;
-  create: ColourSettingsCreateInput;
+export interface QuestionConditionCreateInput {
+  id?: Maybe<ID_Input>;
+  conditionType: String;
+  renderMin?: Maybe<Int>;
+  renderMax?: Maybe<Int>;
+  matchValue?: Maybe<String>;
 }
 
-export interface QuestionOptionUpdateDataInput {
-  value?: Maybe<String>;
-  publicValue?: Maybe<String>;
+export type QuestionConditionWhereUniqueInput = AtLeastOne<{
+  id: Maybe<ID_Input>;
+}>;
+
+export interface QuestionOptionCreateManyInput {
+  create?: Maybe<QuestionOptionCreateInput[] | QuestionOptionCreateInput>;
+  connect?: Maybe<
+    QuestionOptionWhereUniqueInput[] | QuestionOptionWhereUniqueInput
+  >;
 }
 
-export interface FontSettingsUpdateOneRequiredInput {
-  create?: Maybe<FontSettingsCreateInput>;
-  update?: Maybe<FontSettingsUpdateDataInput>;
-  upsert?: Maybe<FontSettingsUpsertNestedInput>;
-  connect?: Maybe<FontSettingsWhereUniqueInput>;
-}
-
-export type QuestionOptionWhereUniqueInput = AtLeastOne<{
+export type QuestionNodeWhereUniqueInput = AtLeastOne<{
   id: Maybe<ID_Input>;
 }>;
 
@@ -1711,28 +2076,111 @@ export interface QuestionOptionCreateInput {
   publicValue?: Maybe<String>;
 }
 
-export interface QuestionConditionUpdateManyDataInput {
-  conditionType?: Maybe<String>;
-  renderMin?: Maybe<Int>;
-  renderMax?: Maybe<Int>;
-  matchValue?: Maybe<String>;
-}
+export type QuestionOptionWhereUniqueInput = AtLeastOne<{
+  id: Maybe<ID_Input>;
+}>;
 
-export interface FontSettingsUpsertNestedInput {
-  update: FontSettingsUpdateDataInput;
-  create: FontSettingsCreateInput;
+export interface QuestionNodeCreateManyInput {
+  create?: Maybe<QuestionNodeCreateInput[] | QuestionNodeCreateInput>;
+  connect?: Maybe<
+    QuestionNodeWhereUniqueInput[] | QuestionNodeWhereUniqueInput
+  >;
 }
 
 export type QuestionnaireWhereUniqueInput = AtLeastOne<{
   id: Maybe<ID_Input>;
 }>;
 
-export interface CustomerSettingsUpsertWithoutCustomerInput {
-  update: CustomerSettingsUpdateWithoutCustomerDataInput;
-  create: CustomerSettingsCreateWithoutCustomerInput;
+export interface EdgeCreateManyInput {
+  create?: Maybe<EdgeCreateInput[] | EdgeCreateInput>;
+  connect?: Maybe<EdgeWhereUniqueInput[] | EdgeWhereUniqueInput>;
 }
 
-export interface CustomerSettingsWhereInput {
+export interface QuestionConditionSubscriptionWhereInput {
+  mutation_in?: Maybe<MutationType[] | MutationType>;
+  updatedFields_contains?: Maybe<String>;
+  updatedFields_contains_every?: Maybe<String[] | String>;
+  updatedFields_contains_some?: Maybe<String[] | String>;
+  node?: Maybe<QuestionConditionWhereInput>;
+  AND?: Maybe<
+    | QuestionConditionSubscriptionWhereInput[]
+    | QuestionConditionSubscriptionWhereInput
+  >;
+  OR?: Maybe<
+    | QuestionConditionSubscriptionWhereInput[]
+    | QuestionConditionSubscriptionWhereInput
+  >;
+  NOT?: Maybe<
+    | QuestionConditionSubscriptionWhereInput[]
+    | QuestionConditionSubscriptionWhereInput
+  >;
+}
+
+export interface EdgeUpdateInput {
+  parentNode?: Maybe<QuestionNodeUpdateOneInput>;
+  childNode?: Maybe<QuestionNodeUpdateOneInput>;
+}
+
+export interface CustomerSettingsSubscriptionWhereInput {
+  mutation_in?: Maybe<MutationType[] | MutationType>;
+  updatedFields_contains?: Maybe<String>;
+  updatedFields_contains_every?: Maybe<String[] | String>;
+  updatedFields_contains_some?: Maybe<String[] | String>;
+  node?: Maybe<CustomerSettingsWhereInput>;
+  AND?: Maybe<
+    | CustomerSettingsSubscriptionWhereInput[]
+    | CustomerSettingsSubscriptionWhereInput
+  >;
+  OR?: Maybe<
+    | CustomerSettingsSubscriptionWhereInput[]
+    | CustomerSettingsSubscriptionWhereInput
+  >;
+  NOT?: Maybe<
+    | CustomerSettingsSubscriptionWhereInput[]
+    | CustomerSettingsSubscriptionWhereInput
+  >;
+}
+
+export interface QuestionNodeUpdateOneInput {
+  create?: Maybe<QuestionNodeCreateInput>;
+  update?: Maybe<QuestionNodeUpdateDataInput>;
+  upsert?: Maybe<QuestionNodeUpsertNestedInput>;
+  delete?: Maybe<Boolean>;
+  disconnect?: Maybe<Boolean>;
+  connect?: Maybe<QuestionNodeWhereUniqueInput>;
+}
+
+export interface CustomerUpdateOneRequiredInput {
+  create?: Maybe<CustomerCreateInput>;
+  update?: Maybe<CustomerUpdateDataInput>;
+  upsert?: Maybe<CustomerUpsertNestedInput>;
+  connect?: Maybe<CustomerWhereUniqueInput>;
+}
+
+export interface QuestionNodeUpdateDataInput {
+  title?: Maybe<String>;
+  branchVal?: Maybe<String>;
+  questionType?: Maybe<NodeTypeUpdateOneRequiredInput>;
+  overrideLeafId?: Maybe<Int>;
+  conditions?: Maybe<QuestionConditionUpdateManyInput>;
+  options?: Maybe<QuestionOptionUpdateManyInput>;
+  children?: Maybe<QuestionNodeUpdateManyInput>;
+  edgeChildren?: Maybe<EdgeUpdateManyInput>;
+}
+
+export interface QuestionOptionUpdateInput {
+  value?: Maybe<String>;
+  publicValue?: Maybe<String>;
+}
+
+export interface NodeTypeUpdateOneRequiredInput {
+  create?: Maybe<NodeTypeCreateInput>;
+  update?: Maybe<NodeTypeUpdateDataInput>;
+  upsert?: Maybe<NodeTypeUpsertNestedInput>;
+  connect?: Maybe<NodeTypeWhereUniqueInput>;
+}
+
+export interface LeafNodeWhereInput {
   id?: Maybe<ID_Input>;
   id_not?: Maybe<ID_Input>;
   id_in?: Maybe<ID_Input[] | ID_Input>;
@@ -1747,6 +2195,15 @@ export interface CustomerSettingsWhereInput {
   id_not_starts_with?: Maybe<ID_Input>;
   id_ends_with?: Maybe<ID_Input>;
   id_not_ends_with?: Maybe<ID_Input>;
+  nodeId?: Maybe<Int>;
+  nodeId_not?: Maybe<Int>;
+  nodeId_in?: Maybe<Int[] | Int>;
+  nodeId_not_in?: Maybe<Int[] | Int>;
+  nodeId_lt?: Maybe<Int>;
+  nodeId_lte?: Maybe<Int>;
+  nodeId_gt?: Maybe<Int>;
+  nodeId_gte?: Maybe<Int>;
+  type?: Maybe<NodeTypeWhereInput>;
   title?: Maybe<String>;
   title_not?: Maybe<String>;
   title_in?: Maybe<String[] | String>;
@@ -1761,111 +2218,64 @@ export interface CustomerSettingsWhereInput {
   title_not_starts_with?: Maybe<String>;
   title_ends_with?: Maybe<String>;
   title_not_ends_with?: Maybe<String>;
-  customer?: Maybe<CustomerWhereInput>;
-  logo?: Maybe<String>;
-  logo_not?: Maybe<String>;
-  logo_in?: Maybe<String[] | String>;
-  logo_not_in?: Maybe<String[] | String>;
-  logo_lt?: Maybe<String>;
-  logo_lte?: Maybe<String>;
-  logo_gt?: Maybe<String>;
-  logo_gte?: Maybe<String>;
-  logo_contains?: Maybe<String>;
-  logo_not_contains?: Maybe<String>;
-  logo_starts_with?: Maybe<String>;
-  logo_not_starts_with?: Maybe<String>;
-  logo_ends_with?: Maybe<String>;
-  logo_not_ends_with?: Maybe<String>;
-  colourSettings?: Maybe<ColourSettingsWhereInput>;
-  fontSettings?: Maybe<FontSettingsWhereInput>;
-  AND?: Maybe<CustomerSettingsWhereInput[] | CustomerSettingsWhereInput>;
-  OR?: Maybe<CustomerSettingsWhereInput[] | CustomerSettingsWhereInput>;
-  NOT?: Maybe<CustomerSettingsWhereInput[] | CustomerSettingsWhereInput>;
+  AND?: Maybe<LeafNodeWhereInput[] | LeafNodeWhereInput>;
+  OR?: Maybe<LeafNodeWhereInput[] | LeafNodeWhereInput>;
+  NOT?: Maybe<LeafNodeWhereInput[] | LeafNodeWhereInput>;
 }
 
-export interface CustomerUpdateManyMutationInput {
-  name?: Maybe<String>;
+export interface NodeTypeUpdateDataInput {
+  type?: Maybe<String>;
 }
 
-export interface QuestionNodeSubscriptionWhereInput {
-  mutation_in?: Maybe<MutationType[] | MutationType>;
-  updatedFields_contains?: Maybe<String>;
-  updatedFields_contains_every?: Maybe<String[] | String>;
-  updatedFields_contains_some?: Maybe<String[] | String>;
-  node?: Maybe<QuestionNodeWhereInput>;
-  AND?: Maybe<
-    QuestionNodeSubscriptionWhereInput[] | QuestionNodeSubscriptionWhereInput
+export interface FontSettingsUpdateManyMutationInput {
+  settingTitle?: Maybe<String>;
+  body?: Maybe<String>;
+  fontTitle?: Maybe<String>;
+  special?: Maybe<String>;
+}
+
+export interface NodeTypeUpsertNestedInput {
+  update: NodeTypeUpdateDataInput;
+  create: NodeTypeCreateInput;
+}
+
+export interface EdgeUpdateWithWhereUniqueNestedInput {
+  where: EdgeWhereUniqueInput;
+  data: EdgeUpdateDataInput;
+}
+
+export interface QuestionConditionUpdateManyInput {
+  create?: Maybe<QuestionConditionCreateInput[] | QuestionConditionCreateInput>;
+  update?: Maybe<
+    | QuestionConditionUpdateWithWhereUniqueNestedInput[]
+    | QuestionConditionUpdateWithWhereUniqueNestedInput
   >;
-  OR?: Maybe<
-    QuestionNodeSubscriptionWhereInput[] | QuestionNodeSubscriptionWhereInput
+  upsert?: Maybe<
+    | QuestionConditionUpsertWithWhereUniqueNestedInput[]
+    | QuestionConditionUpsertWithWhereUniqueNestedInput
   >;
-  NOT?: Maybe<
-    QuestionNodeSubscriptionWhereInput[] | QuestionNodeSubscriptionWhereInput
+  delete?: Maybe<
+    QuestionConditionWhereUniqueInput[] | QuestionConditionWhereUniqueInput
   >;
-}
-
-export interface CustomerSettingsCreateInput {
-  id?: Maybe<ID_Input>;
-  title?: Maybe<String>;
-  customer: CustomerCreateOneWithoutSettingsInput;
-  logo?: Maybe<String>;
-  colourSettings: ColourSettingsCreateOneInput;
-  fontSettings: FontSettingsCreateOneInput;
-}
-
-export interface LeafNodeSubscriptionWhereInput {
-  mutation_in?: Maybe<MutationType[] | MutationType>;
-  updatedFields_contains?: Maybe<String>;
-  updatedFields_contains_every?: Maybe<String[] | String>;
-  updatedFields_contains_some?: Maybe<String[] | String>;
-  node?: Maybe<LeafNodeWhereInput>;
-  AND?: Maybe<
-    LeafNodeSubscriptionWhereInput[] | LeafNodeSubscriptionWhereInput
-  >;
-  OR?: Maybe<LeafNodeSubscriptionWhereInput[] | LeafNodeSubscriptionWhereInput>;
-  NOT?: Maybe<
-    LeafNodeSubscriptionWhereInput[] | LeafNodeSubscriptionWhereInput
-  >;
-}
-
-export interface CustomerCreateOneWithoutSettingsInput {
-  create?: Maybe<CustomerCreateWithoutSettingsInput>;
-  connect?: Maybe<CustomerWhereUniqueInput>;
-}
-
-export interface CustomerSubscriptionWhereInput {
-  mutation_in?: Maybe<MutationType[] | MutationType>;
-  updatedFields_contains?: Maybe<String>;
-  updatedFields_contains_every?: Maybe<String[] | String>;
-  updatedFields_contains_some?: Maybe<String[] | String>;
-  node?: Maybe<CustomerWhereInput>;
-  AND?: Maybe<
-    CustomerSubscriptionWhereInput[] | CustomerSubscriptionWhereInput
-  >;
-  OR?: Maybe<CustomerSubscriptionWhereInput[] | CustomerSubscriptionWhereInput>;
-  NOT?: Maybe<
-    CustomerSubscriptionWhereInput[] | CustomerSubscriptionWhereInput
-  >;
-}
-
-export interface CustomerCreateWithoutSettingsInput {
-  id?: Maybe<ID_Input>;
-  name: String;
-}
-
-export type LeafNodeWhereUniqueInput = AtLeastOne<{
-  id: Maybe<ID_Input>;
-  nodeId?: Maybe<Int>;
-}>;
-
-export interface QuestionOptionCreateManyInput {
-  create?: Maybe<QuestionOptionCreateInput[] | QuestionOptionCreateInput>;
   connect?: Maybe<
-    QuestionOptionWhereUniqueInput[] | QuestionOptionWhereUniqueInput
+    QuestionConditionWhereUniqueInput[] | QuestionConditionWhereUniqueInput
+  >;
+  set?: Maybe<
+    QuestionConditionWhereUniqueInput[] | QuestionConditionWhereUniqueInput
+  >;
+  disconnect?: Maybe<
+    QuestionConditionWhereUniqueInput[] | QuestionConditionWhereUniqueInput
+  >;
+  deleteMany?: Maybe<
+    QuestionConditionScalarWhereInput[] | QuestionConditionScalarWhereInput
+  >;
+  updateMany?: Maybe<
+    | QuestionConditionUpdateManyWithWhereNestedInput[]
+    | QuestionConditionUpdateManyWithWhereNestedInput
   >;
 }
 
-export interface NodeTypeWhereInput {
+export interface FontSettingsWhereInput {
   id?: Maybe<ID_Input>;
   id_not?: Maybe<ID_Input>;
   id_in?: Maybe<ID_Input[] | ID_Input>;
@@ -1880,53 +2290,105 @@ export interface NodeTypeWhereInput {
   id_not_starts_with?: Maybe<ID_Input>;
   id_ends_with?: Maybe<ID_Input>;
   id_not_ends_with?: Maybe<ID_Input>;
-  type?: Maybe<String>;
-  type_not?: Maybe<String>;
-  type_in?: Maybe<String[] | String>;
-  type_not_in?: Maybe<String[] | String>;
-  type_lt?: Maybe<String>;
-  type_lte?: Maybe<String>;
-  type_gt?: Maybe<String>;
-  type_gte?: Maybe<String>;
-  type_contains?: Maybe<String>;
-  type_not_contains?: Maybe<String>;
-  type_starts_with?: Maybe<String>;
-  type_not_starts_with?: Maybe<String>;
-  type_ends_with?: Maybe<String>;
-  type_not_ends_with?: Maybe<String>;
-  AND?: Maybe<NodeTypeWhereInput[] | NodeTypeWhereInput>;
-  OR?: Maybe<NodeTypeWhereInput[] | NodeTypeWhereInput>;
-  NOT?: Maybe<NodeTypeWhereInput[] | NodeTypeWhereInput>;
+  settingTitle?: Maybe<String>;
+  settingTitle_not?: Maybe<String>;
+  settingTitle_in?: Maybe<String[] | String>;
+  settingTitle_not_in?: Maybe<String[] | String>;
+  settingTitle_lt?: Maybe<String>;
+  settingTitle_lte?: Maybe<String>;
+  settingTitle_gt?: Maybe<String>;
+  settingTitle_gte?: Maybe<String>;
+  settingTitle_contains?: Maybe<String>;
+  settingTitle_not_contains?: Maybe<String>;
+  settingTitle_starts_with?: Maybe<String>;
+  settingTitle_not_starts_with?: Maybe<String>;
+  settingTitle_ends_with?: Maybe<String>;
+  settingTitle_not_ends_with?: Maybe<String>;
+  body?: Maybe<String>;
+  body_not?: Maybe<String>;
+  body_in?: Maybe<String[] | String>;
+  body_not_in?: Maybe<String[] | String>;
+  body_lt?: Maybe<String>;
+  body_lte?: Maybe<String>;
+  body_gt?: Maybe<String>;
+  body_gte?: Maybe<String>;
+  body_contains?: Maybe<String>;
+  body_not_contains?: Maybe<String>;
+  body_starts_with?: Maybe<String>;
+  body_not_starts_with?: Maybe<String>;
+  body_ends_with?: Maybe<String>;
+  body_not_ends_with?: Maybe<String>;
+  fontTitle?: Maybe<String>;
+  fontTitle_not?: Maybe<String>;
+  fontTitle_in?: Maybe<String[] | String>;
+  fontTitle_not_in?: Maybe<String[] | String>;
+  fontTitle_lt?: Maybe<String>;
+  fontTitle_lte?: Maybe<String>;
+  fontTitle_gt?: Maybe<String>;
+  fontTitle_gte?: Maybe<String>;
+  fontTitle_contains?: Maybe<String>;
+  fontTitle_not_contains?: Maybe<String>;
+  fontTitle_starts_with?: Maybe<String>;
+  fontTitle_not_starts_with?: Maybe<String>;
+  fontTitle_ends_with?: Maybe<String>;
+  fontTitle_not_ends_with?: Maybe<String>;
+  special?: Maybe<String>;
+  special_not?: Maybe<String>;
+  special_in?: Maybe<String[] | String>;
+  special_not_in?: Maybe<String[] | String>;
+  special_lt?: Maybe<String>;
+  special_lte?: Maybe<String>;
+  special_gt?: Maybe<String>;
+  special_gte?: Maybe<String>;
+  special_contains?: Maybe<String>;
+  special_not_contains?: Maybe<String>;
+  special_starts_with?: Maybe<String>;
+  special_not_starts_with?: Maybe<String>;
+  special_ends_with?: Maybe<String>;
+  special_not_ends_with?: Maybe<String>;
+  AND?: Maybe<FontSettingsWhereInput[] | FontSettingsWhereInput>;
+  OR?: Maybe<FontSettingsWhereInput[] | FontSettingsWhereInput>;
+  NOT?: Maybe<FontSettingsWhereInput[] | FontSettingsWhereInput>;
 }
 
-export interface CustomerUpdateOneRequiredWithoutSettingsInput {
-  create?: Maybe<CustomerCreateWithoutSettingsInput>;
-  update?: Maybe<CustomerUpdateWithoutSettingsDataInput>;
-  upsert?: Maybe<CustomerUpsertWithoutSettingsInput>;
-  connect?: Maybe<CustomerWhereUniqueInput>;
+export interface QuestionConditionUpdateWithWhereUniqueNestedInput {
+  where: QuestionConditionWhereUniqueInput;
+  data: QuestionConditionUpdateDataInput;
 }
 
-export interface QuestionOptionUpdateManyMutationInput {
-  value?: Maybe<String>;
-  publicValue?: Maybe<String>;
-}
-
-export interface CustomerUpdateWithoutSettingsDataInput {
-  name?: Maybe<String>;
-}
-
-export interface QuestionNodeUpdateManyDataInput {
+export interface QuestionnaireUpdateManyMutationInput {
   title?: Maybe<String>;
-  branchVal?: Maybe<String>;
-  overrideLeafId?: Maybe<Int>;
+  description?: Maybe<String>;
+  publicTitle?: Maybe<String>;
 }
 
-export interface CustomerUpsertWithoutSettingsInput {
-  update: CustomerUpdateWithoutSettingsDataInput;
-  create: CustomerCreateWithoutSettingsInput;
+export interface QuestionConditionUpdateDataInput {
+  conditionType?: Maybe<String>;
+  renderMin?: Maybe<Int>;
+  renderMax?: Maybe<Int>;
+  matchValue?: Maybe<String>;
 }
 
-export interface QuestionConditionWhereInput {
+export interface QuestionConditionUpdateManyMutationInput {
+  conditionType?: Maybe<String>;
+  renderMin?: Maybe<Int>;
+  renderMax?: Maybe<Int>;
+  matchValue?: Maybe<String>;
+}
+
+export interface QuestionConditionUpdateManyDataInput {
+  conditionType?: Maybe<String>;
+  renderMin?: Maybe<Int>;
+  renderMax?: Maybe<Int>;
+  matchValue?: Maybe<String>;
+}
+
+export interface QuestionConditionUpdateManyWithWhereNestedInput {
+  where: QuestionConditionScalarWhereInput;
+  data: QuestionConditionUpdateManyDataInput;
+}
+
+export interface QuestionConditionScalarWhereInput {
   id?: Maybe<ID_Input>;
   id_not?: Maybe<ID_Input>;
   id_in?: Maybe<ID_Input[] | ID_Input>;
@@ -1985,136 +2447,22 @@ export interface QuestionConditionWhereInput {
   matchValue_not_starts_with?: Maybe<String>;
   matchValue_ends_with?: Maybe<String>;
   matchValue_not_ends_with?: Maybe<String>;
-  AND?: Maybe<QuestionConditionWhereInput[] | QuestionConditionWhereInput>;
-  OR?: Maybe<QuestionConditionWhereInput[] | QuestionConditionWhereInput>;
-  NOT?: Maybe<QuestionConditionWhereInput[] | QuestionConditionWhereInput>;
-}
-
-export interface CustomerSettingsUpdateManyMutationInput {
-  title?: Maybe<String>;
-  logo?: Maybe<String>;
-}
-
-export interface QuestionNodeUpdateManyInput {
-  create?: Maybe<QuestionNodeCreateInput[] | QuestionNodeCreateInput>;
-  update?: Maybe<
-    | QuestionNodeUpdateWithWhereUniqueNestedInput[]
-    | QuestionNodeUpdateWithWhereUniqueNestedInput
-  >;
-  upsert?: Maybe<
-    | QuestionNodeUpsertWithWhereUniqueNestedInput[]
-    | QuestionNodeUpsertWithWhereUniqueNestedInput
-  >;
-  delete?: Maybe<QuestionNodeWhereUniqueInput[] | QuestionNodeWhereUniqueInput>;
-  connect?: Maybe<
-    QuestionNodeWhereUniqueInput[] | QuestionNodeWhereUniqueInput
-  >;
-  set?: Maybe<QuestionNodeWhereUniqueInput[] | QuestionNodeWhereUniqueInput>;
-  disconnect?: Maybe<
-    QuestionNodeWhereUniqueInput[] | QuestionNodeWhereUniqueInput
-  >;
-  deleteMany?: Maybe<
-    QuestionNodeScalarWhereInput[] | QuestionNodeScalarWhereInput
-  >;
-  updateMany?: Maybe<
-    | QuestionNodeUpdateManyWithWhereNestedInput[]
-    | QuestionNodeUpdateManyWithWhereNestedInput
-  >;
-}
-
-export interface FontSettingsUpdateInput {
-  settingTitle?: Maybe<String>;
-  body?: Maybe<String>;
-  fontTitle?: Maybe<String>;
-  special?: Maybe<String>;
-}
-
-export interface QuestionOptionUpdateManyWithWhereNestedInput {
-  where: QuestionOptionScalarWhereInput;
-  data: QuestionOptionUpdateManyDataInput;
-}
-
-export interface FontSettingsUpdateManyMutationInput {
-  settingTitle?: Maybe<String>;
-  body?: Maybe<String>;
-  fontTitle?: Maybe<String>;
-  special?: Maybe<String>;
-}
-
-export interface QuestionOptionUpsertWithWhereUniqueNestedInput {
-  where: QuestionOptionWhereUniqueInput;
-  update: QuestionOptionUpdateDataInput;
-  create: QuestionOptionCreateInput;
-}
-
-export interface LeafNodeCreateInput {
-  id?: Maybe<ID_Input>;
-  nodeId?: Maybe<Int>;
-  type?: Maybe<NodeTypeCreateOneInput>;
-  title: String;
-}
-
-export interface QuestionOptionUpdateManyInput {
-  create?: Maybe<QuestionOptionCreateInput[] | QuestionOptionCreateInput>;
-  update?: Maybe<
-    | QuestionOptionUpdateWithWhereUniqueNestedInput[]
-    | QuestionOptionUpdateWithWhereUniqueNestedInput
-  >;
-  upsert?: Maybe<
-    | QuestionOptionUpsertWithWhereUniqueNestedInput[]
-    | QuestionOptionUpsertWithWhereUniqueNestedInput
-  >;
-  delete?: Maybe<
-    QuestionOptionWhereUniqueInput[] | QuestionOptionWhereUniqueInput
-  >;
-  connect?: Maybe<
-    QuestionOptionWhereUniqueInput[] | QuestionOptionWhereUniqueInput
-  >;
-  set?: Maybe<
-    QuestionOptionWhereUniqueInput[] | QuestionOptionWhereUniqueInput
-  >;
-  disconnect?: Maybe<
-    QuestionOptionWhereUniqueInput[] | QuestionOptionWhereUniqueInput
-  >;
-  deleteMany?: Maybe<
-    QuestionOptionScalarWhereInput[] | QuestionOptionScalarWhereInput
-  >;
-  updateMany?: Maybe<
-    | QuestionOptionUpdateManyWithWhereNestedInput[]
-    | QuestionOptionUpdateManyWithWhereNestedInput
-  >;
-}
-
-export interface NodeTypeCreateOneInput {
-  create?: Maybe<NodeTypeCreateInput>;
-  connect?: Maybe<NodeTypeWhereUniqueInput>;
-}
-
-export interface QuestionnaireSubscriptionWhereInput {
-  mutation_in?: Maybe<MutationType[] | MutationType>;
-  updatedFields_contains?: Maybe<String>;
-  updatedFields_contains_every?: Maybe<String[] | String>;
-  updatedFields_contains_some?: Maybe<String[] | String>;
-  node?: Maybe<QuestionnaireWhereInput>;
   AND?: Maybe<
-    QuestionnaireSubscriptionWhereInput[] | QuestionnaireSubscriptionWhereInput
+    QuestionConditionScalarWhereInput[] | QuestionConditionScalarWhereInput
   >;
   OR?: Maybe<
-    QuestionnaireSubscriptionWhereInput[] | QuestionnaireSubscriptionWhereInput
+    QuestionConditionScalarWhereInput[] | QuestionConditionScalarWhereInput
   >;
   NOT?: Maybe<
-    QuestionnaireSubscriptionWhereInput[] | QuestionnaireSubscriptionWhereInput
+    QuestionConditionScalarWhereInput[] | QuestionConditionScalarWhereInput
   >;
 }
 
-export interface NodeTypeCreateInput {
-  id?: Maybe<ID_Input>;
-  type: String;
+export interface QuestionConditionUpsertWithWhereUniqueNestedInput {
+  where: QuestionConditionWhereUniqueInput;
+  update: QuestionConditionUpdateDataInput;
+  create: QuestionConditionCreateInput;
 }
-
-export type CustomerSettingsWhereUniqueInput = AtLeastOne<{
-  id: Maybe<ID_Input>;
-}>;
 
 export interface LeafNodeUpdateInput {
   nodeId?: Maybe<Int>;
@@ -2122,137 +2470,35 @@ export interface LeafNodeUpdateInput {
   title?: Maybe<String>;
 }
 
-export interface QuestionnaireUpdateManyMutationInput {
+export interface QuestionnaireUpdateInput {
+  customer?: Maybe<CustomerUpdateOneRequiredInput>;
   title?: Maybe<String>;
   description?: Maybe<String>;
   publicTitle?: Maybe<String>;
+  questions?: Maybe<QuestionNodeUpdateManyInput>;
 }
 
-export interface NodeTypeUpdateOneInput {
-  create?: Maybe<NodeTypeCreateInput>;
-  update?: Maybe<NodeTypeUpdateDataInput>;
-  upsert?: Maybe<NodeTypeUpsertNestedInput>;
-  delete?: Maybe<Boolean>;
-  disconnect?: Maybe<Boolean>;
-  connect?: Maybe<NodeTypeWhereUniqueInput>;
-}
-
-export interface CustomerCreateOneInput {
-  create?: Maybe<CustomerCreateInput>;
-  connect?: Maybe<CustomerWhereUniqueInput>;
-}
-
-export interface NodeTypeUpdateDataInput {
-  type?: Maybe<String>;
-}
-
-export type QuestionConditionWhereUniqueInput = AtLeastOne<{
-  id: Maybe<ID_Input>;
-}>;
-
-export interface NodeTypeUpsertNestedInput {
-  update: NodeTypeUpdateDataInput;
-  create: NodeTypeCreateInput;
-}
-
-export interface QuestionOptionUpdateManyDataInput {
-  value?: Maybe<String>;
-  publicValue?: Maybe<String>;
-}
-
-export interface LeafNodeUpdateManyMutationInput {
-  nodeId?: Maybe<Int>;
-  title?: Maybe<String>;
-}
-
-export interface QuestionOptionUpdateWithWhereUniqueNestedInput {
-  where: QuestionOptionWhereUniqueInput;
-  data: QuestionOptionUpdateDataInput;
-}
-
-export interface NodeTypeUpdateInput {
-  type?: Maybe<String>;
-}
-
-export type CustomerWhereUniqueInput = AtLeastOne<{
-  id: Maybe<ID_Input>;
-}>;
-
-export interface NodeTypeUpdateManyMutationInput {
-  type?: Maybe<String>;
-}
-
-export interface CustomerUpdateOneRequiredInput {
-  create?: Maybe<CustomerCreateInput>;
-  update?: Maybe<CustomerUpdateDataInput>;
-  upsert?: Maybe<CustomerUpsertNestedInput>;
-  connect?: Maybe<CustomerWhereUniqueInput>;
-}
-
-export interface QuestionNodeCreateInput {
-  id?: Maybe<ID_Input>;
-  title: String;
-  branchVal?: Maybe<String>;
-  questionType: NodeTypeCreateOneInput;
-  overrideLeafId?: Maybe<Int>;
-  conditions?: Maybe<QuestionConditionCreateManyInput>;
-  options?: Maybe<QuestionOptionCreateManyInput>;
-  children?: Maybe<QuestionNodeCreateManyInput>;
-}
-
-export interface QuestionConditionUpdateManyMutationInput {
-  conditionType?: Maybe<String>;
-  renderMin?: Maybe<Int>;
-  renderMax?: Maybe<Int>;
-  matchValue?: Maybe<String>;
-}
-
-export interface QuestionConditionUpdateInput {
-  conditionType?: Maybe<String>;
-  renderMin?: Maybe<Int>;
-  renderMax?: Maybe<Int>;
-  matchValue?: Maybe<String>;
-}
-
-export interface QuestionConditionCreateInput {
-  id?: Maybe<ID_Input>;
-  conditionType: String;
-  renderMin?: Maybe<Int>;
-  renderMax?: Maybe<Int>;
-  matchValue?: Maybe<String>;
-}
-
-export interface QuestionOptionUpdateInput {
-  value?: Maybe<String>;
-  publicValue?: Maybe<String>;
-}
-
-export interface CustomerSettingsSubscriptionWhereInput {
+export interface LeafNodeSubscriptionWhereInput {
   mutation_in?: Maybe<MutationType[] | MutationType>;
   updatedFields_contains?: Maybe<String>;
   updatedFields_contains_every?: Maybe<String[] | String>;
   updatedFields_contains_some?: Maybe<String[] | String>;
-  node?: Maybe<CustomerSettingsWhereInput>;
+  node?: Maybe<LeafNodeWhereInput>;
   AND?: Maybe<
-    | CustomerSettingsSubscriptionWhereInput[]
-    | CustomerSettingsSubscriptionWhereInput
+    LeafNodeSubscriptionWhereInput[] | LeafNodeSubscriptionWhereInput
   >;
-  OR?: Maybe<
-    | CustomerSettingsSubscriptionWhereInput[]
-    | CustomerSettingsSubscriptionWhereInput
-  >;
+  OR?: Maybe<LeafNodeSubscriptionWhereInput[] | LeafNodeSubscriptionWhereInput>;
   NOT?: Maybe<
-    | CustomerSettingsSubscriptionWhereInput[]
-    | CustomerSettingsSubscriptionWhereInput
+    LeafNodeSubscriptionWhereInput[] | LeafNodeSubscriptionWhereInput
   >;
 }
 
-export interface QuestionConditionUpdateManyWithWhereNestedInput {
-  where: QuestionConditionScalarWhereInput;
-  data: QuestionConditionUpdateManyDataInput;
+export interface QuestionNodeUpdateManyWithWhereNestedInput {
+  where: QuestionNodeScalarWhereInput;
+  data: QuestionNodeUpdateManyDataInput;
 }
 
-export interface QuestionNodeWhereInput {
+export interface EdgeScalarWhereInput {
   id?: Maybe<ID_Input>;
   id_not?: Maybe<ID_Input>;
   id_in?: Maybe<ID_Input[] | ID_Input>;
@@ -2267,65 +2513,25 @@ export interface QuestionNodeWhereInput {
   id_not_starts_with?: Maybe<ID_Input>;
   id_ends_with?: Maybe<ID_Input>;
   id_not_ends_with?: Maybe<ID_Input>;
-  title?: Maybe<String>;
-  title_not?: Maybe<String>;
-  title_in?: Maybe<String[] | String>;
-  title_not_in?: Maybe<String[] | String>;
-  title_lt?: Maybe<String>;
-  title_lte?: Maybe<String>;
-  title_gt?: Maybe<String>;
-  title_gte?: Maybe<String>;
-  title_contains?: Maybe<String>;
-  title_not_contains?: Maybe<String>;
-  title_starts_with?: Maybe<String>;
-  title_not_starts_with?: Maybe<String>;
-  title_ends_with?: Maybe<String>;
-  title_not_ends_with?: Maybe<String>;
-  branchVal?: Maybe<String>;
-  branchVal_not?: Maybe<String>;
-  branchVal_in?: Maybe<String[] | String>;
-  branchVal_not_in?: Maybe<String[] | String>;
-  branchVal_lt?: Maybe<String>;
-  branchVal_lte?: Maybe<String>;
-  branchVal_gt?: Maybe<String>;
-  branchVal_gte?: Maybe<String>;
-  branchVal_contains?: Maybe<String>;
-  branchVal_not_contains?: Maybe<String>;
-  branchVal_starts_with?: Maybe<String>;
-  branchVal_not_starts_with?: Maybe<String>;
-  branchVal_ends_with?: Maybe<String>;
-  branchVal_not_ends_with?: Maybe<String>;
-  questionType?: Maybe<NodeTypeWhereInput>;
-  overrideLeafId?: Maybe<Int>;
-  overrideLeafId_not?: Maybe<Int>;
-  overrideLeafId_in?: Maybe<Int[] | Int>;
-  overrideLeafId_not_in?: Maybe<Int[] | Int>;
-  overrideLeafId_lt?: Maybe<Int>;
-  overrideLeafId_lte?: Maybe<Int>;
-  overrideLeafId_gt?: Maybe<Int>;
-  overrideLeafId_gte?: Maybe<Int>;
-  conditions_every?: Maybe<QuestionConditionWhereInput>;
-  conditions_some?: Maybe<QuestionConditionWhereInput>;
-  conditions_none?: Maybe<QuestionConditionWhereInput>;
-  options_every?: Maybe<QuestionOptionWhereInput>;
-  options_some?: Maybe<QuestionOptionWhereInput>;
-  options_none?: Maybe<QuestionOptionWhereInput>;
-  children_every?: Maybe<QuestionNodeWhereInput>;
-  children_some?: Maybe<QuestionNodeWhereInput>;
-  children_none?: Maybe<QuestionNodeWhereInput>;
-  AND?: Maybe<QuestionNodeWhereInput[] | QuestionNodeWhereInput>;
-  OR?: Maybe<QuestionNodeWhereInput[] | QuestionNodeWhereInput>;
-  NOT?: Maybe<QuestionNodeWhereInput[] | QuestionNodeWhereInput>;
-}
-
-export interface QuestionNodeUpdateDataInput {
-  title?: Maybe<String>;
-  branchVal?: Maybe<String>;
-  questionType?: Maybe<NodeTypeUpdateOneRequiredInput>;
-  overrideLeafId?: Maybe<Int>;
-  conditions?: Maybe<QuestionConditionUpdateManyInput>;
-  options?: Maybe<QuestionOptionUpdateManyInput>;
-  children?: Maybe<QuestionNodeUpdateManyInput>;
+  createdAt?: Maybe<DateTimeInput>;
+  createdAt_not?: Maybe<DateTimeInput>;
+  createdAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  createdAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  createdAt_lt?: Maybe<DateTimeInput>;
+  createdAt_lte?: Maybe<DateTimeInput>;
+  createdAt_gt?: Maybe<DateTimeInput>;
+  createdAt_gte?: Maybe<DateTimeInput>;
+  updatedAt?: Maybe<DateTimeInput>;
+  updatedAt_not?: Maybe<DateTimeInput>;
+  updatedAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  updatedAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  updatedAt_lt?: Maybe<DateTimeInput>;
+  updatedAt_lte?: Maybe<DateTimeInput>;
+  updatedAt_gt?: Maybe<DateTimeInput>;
+  updatedAt_gte?: Maybe<DateTimeInput>;
+  AND?: Maybe<EdgeScalarWhereInput[] | EdgeScalarWhereInput>;
+  OR?: Maybe<EdgeScalarWhereInput[] | EdgeScalarWhereInput>;
+  NOT?: Maybe<EdgeScalarWhereInput[] | EdgeScalarWhereInput>;
 }
 
 export interface NodeNode {
@@ -2363,78 +2569,23 @@ export interface QuestionnairePreviousValuesSubscription
   updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
 }
 
-export interface LeafNode {
-  id: ID_Output;
-  nodeId?: Int;
-  title: String;
+export interface ColourSettingsEdge {
+  node: ColourSettings;
+  cursor: String;
 }
 
-export interface LeafNodePromise extends Promise<LeafNode>, Fragmentable {
-  id: () => Promise<ID_Output>;
-  nodeId: () => Promise<Int>;
-  type: <T = NodeTypePromise>() => T;
-  title: () => Promise<String>;
-}
-
-export interface LeafNodeSubscription
-  extends Promise<AsyncIterator<LeafNode>>,
+export interface ColourSettingsEdgePromise
+  extends Promise<ColourSettingsEdge>,
     Fragmentable {
-  id: () => Promise<AsyncIterator<ID_Output>>;
-  nodeId: () => Promise<AsyncIterator<Int>>;
-  type: <T = NodeTypeSubscription>() => T;
-  title: () => Promise<AsyncIterator<String>>;
+  node: <T = ColourSettingsPromise>() => T;
+  cursor: () => Promise<String>;
 }
 
-export interface LeafNodeNullablePromise
-  extends Promise<LeafNode | null>,
+export interface ColourSettingsEdgeSubscription
+  extends Promise<AsyncIterator<ColourSettingsEdge>>,
     Fragmentable {
-  id: () => Promise<ID_Output>;
-  nodeId: () => Promise<Int>;
-  type: <T = NodeTypePromise>() => T;
-  title: () => Promise<String>;
-}
-
-export interface Customer {
-  id: ID_Output;
-  name: String;
-}
-
-export interface CustomerPromise extends Promise<Customer>, Fragmentable {
-  id: () => Promise<ID_Output>;
-  name: () => Promise<String>;
-  settings: <T = CustomerSettingsPromise>() => T;
-}
-
-export interface CustomerSubscription
-  extends Promise<AsyncIterator<Customer>>,
-    Fragmentable {
-  id: () => Promise<AsyncIterator<ID_Output>>;
-  name: () => Promise<AsyncIterator<String>>;
-  settings: <T = CustomerSettingsSubscription>() => T;
-}
-
-export interface CustomerNullablePromise
-  extends Promise<Customer | null>,
-    Fragmentable {
-  id: () => Promise<ID_Output>;
-  name: () => Promise<String>;
-  settings: <T = CustomerSettingsPromise>() => T;
-}
-
-export interface AggregateFontSettings {
-  count: Int;
-}
-
-export interface AggregateFontSettingsPromise
-  extends Promise<AggregateFontSettings>,
-    Fragmentable {
-  count: () => Promise<Int>;
-}
-
-export interface AggregateFontSettingsSubscription
-  extends Promise<AsyncIterator<AggregateFontSettings>>,
-    Fragmentable {
-  count: () => Promise<AsyncIterator<Int>>;
+  node: <T = ColourSettingsSubscription>() => T;
+  cursor: () => Promise<AsyncIterator<String>>;
 }
 
 export interface CustomerSettings {
@@ -2476,23 +2627,96 @@ export interface CustomerSettingsNullablePromise
   fontSettings: <T = FontSettingsPromise>() => T;
 }
 
-export interface FontSettingsEdge {
-  node: FontSettings;
-  cursor: String;
+export interface QuestionCondition {
+  id: ID_Output;
+  conditionType: String;
+  renderMin?: Int;
+  renderMax?: Int;
+  matchValue?: String;
 }
 
-export interface FontSettingsEdgePromise
-  extends Promise<FontSettingsEdge>,
+export interface QuestionConditionPromise
+  extends Promise<QuestionCondition>,
     Fragmentable {
-  node: <T = FontSettingsPromise>() => T;
-  cursor: () => Promise<String>;
+  id: () => Promise<ID_Output>;
+  conditionType: () => Promise<String>;
+  renderMin: () => Promise<Int>;
+  renderMax: () => Promise<Int>;
+  matchValue: () => Promise<String>;
 }
 
-export interface FontSettingsEdgeSubscription
-  extends Promise<AsyncIterator<FontSettingsEdge>>,
+export interface QuestionConditionSubscription
+  extends Promise<AsyncIterator<QuestionCondition>>,
     Fragmentable {
-  node: <T = FontSettingsSubscription>() => T;
-  cursor: () => Promise<AsyncIterator<String>>;
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  conditionType: () => Promise<AsyncIterator<String>>;
+  renderMin: () => Promise<AsyncIterator<Int>>;
+  renderMax: () => Promise<AsyncIterator<Int>>;
+  matchValue: () => Promise<AsyncIterator<String>>;
+}
+
+export interface QuestionConditionNullablePromise
+  extends Promise<QuestionCondition | null>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  conditionType: () => Promise<String>;
+  renderMin: () => Promise<Int>;
+  renderMax: () => Promise<Int>;
+  matchValue: () => Promise<String>;
+}
+
+export interface FontSettings {
+  id: ID_Output;
+  settingTitle?: String;
+  body?: String;
+  fontTitle?: String;
+  special?: String;
+}
+
+export interface FontSettingsPromise
+  extends Promise<FontSettings>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  settingTitle: () => Promise<String>;
+  body: () => Promise<String>;
+  fontTitle: () => Promise<String>;
+  special: () => Promise<String>;
+}
+
+export interface FontSettingsSubscription
+  extends Promise<AsyncIterator<FontSettings>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  settingTitle: () => Promise<AsyncIterator<String>>;
+  body: () => Promise<AsyncIterator<String>>;
+  fontTitle: () => Promise<AsyncIterator<String>>;
+  special: () => Promise<AsyncIterator<String>>;
+}
+
+export interface FontSettingsNullablePromise
+  extends Promise<FontSettings | null>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  settingTitle: () => Promise<String>;
+  body: () => Promise<String>;
+  fontTitle: () => Promise<String>;
+  special: () => Promise<String>;
+}
+
+export interface AggregateColourSettings {
+  count: Int;
+}
+
+export interface AggregateColourSettingsPromise
+  extends Promise<AggregateColourSettings>,
+    Fragmentable {
+  count: () => Promise<Int>;
+}
+
+export interface AggregateColourSettingsSubscription
+  extends Promise<AsyncIterator<AggregateColourSettings>>,
+    Fragmentable {
+  count: () => Promise<AsyncIterator<Int>>;
 }
 
 export interface AggregateQuestionnaire {
@@ -2511,25 +2735,28 @@ export interface AggregateQuestionnaireSubscription
   count: () => Promise<AsyncIterator<Int>>;
 }
 
-export interface FontSettingsConnection {
-  pageInfo: PageInfo;
-  edges: FontSettingsEdge[];
+export interface NodeType {
+  id: ID_Output;
+  type: String;
 }
 
-export interface FontSettingsConnectionPromise
-  extends Promise<FontSettingsConnection>,
-    Fragmentable {
-  pageInfo: <T = PageInfoPromise>() => T;
-  edges: <T = FragmentableArray<FontSettingsEdge>>() => T;
-  aggregate: <T = AggregateFontSettingsPromise>() => T;
+export interface NodeTypePromise extends Promise<NodeType>, Fragmentable {
+  id: () => Promise<ID_Output>;
+  type: () => Promise<String>;
 }
 
-export interface FontSettingsConnectionSubscription
-  extends Promise<AsyncIterator<FontSettingsConnection>>,
+export interface NodeTypeSubscription
+  extends Promise<AsyncIterator<NodeType>>,
     Fragmentable {
-  pageInfo: <T = PageInfoSubscription>() => T;
-  edges: <T = Promise<AsyncIterator<FontSettingsEdgeSubscription>>>() => T;
-  aggregate: <T = AggregateFontSettingsSubscription>() => T;
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  type: () => Promise<AsyncIterator<String>>;
+}
+
+export interface NodeTypeNullablePromise
+  extends Promise<NodeType | null>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  type: () => Promise<String>;
 }
 
 export interface QuestionnaireConnection {
@@ -2551,71 +2778,6 @@ export interface QuestionnaireConnectionSubscription
   pageInfo: <T = PageInfoSubscription>() => T;
   edges: <T = Promise<AsyncIterator<QuestionnaireEdgeSubscription>>>() => T;
   aggregate: <T = AggregateQuestionnaireSubscription>() => T;
-}
-
-export interface QuestionnaireEdge {
-  node: Questionnaire;
-  cursor: String;
-}
-
-export interface QuestionnaireEdgePromise
-  extends Promise<QuestionnaireEdge>,
-    Fragmentable {
-  node: <T = QuestionnairePromise>() => T;
-  cursor: () => Promise<String>;
-}
-
-export interface QuestionnaireEdgeSubscription
-  extends Promise<AsyncIterator<QuestionnaireEdge>>,
-    Fragmentable {
-  node: <T = QuestionnaireSubscription>() => T;
-  cursor: () => Promise<AsyncIterator<String>>;
-}
-
-export interface CustomerConnection {
-  pageInfo: PageInfo;
-  edges: CustomerEdge[];
-}
-
-export interface CustomerConnectionPromise
-  extends Promise<CustomerConnection>,
-    Fragmentable {
-  pageInfo: <T = PageInfoPromise>() => T;
-  edges: <T = FragmentableArray<CustomerEdge>>() => T;
-  aggregate: <T = AggregateCustomerPromise>() => T;
-}
-
-export interface CustomerConnectionSubscription
-  extends Promise<AsyncIterator<CustomerConnection>>,
-    Fragmentable {
-  pageInfo: <T = PageInfoSubscription>() => T;
-  edges: <T = Promise<AsyncIterator<CustomerEdgeSubscription>>>() => T;
-  aggregate: <T = AggregateCustomerSubscription>() => T;
-}
-
-export interface QuestionOptionSubscriptionPayload {
-  mutation: MutationType;
-  node: QuestionOption;
-  updatedFields: String[];
-  previousValues: QuestionOptionPreviousValues;
-}
-
-export interface QuestionOptionSubscriptionPayloadPromise
-  extends Promise<QuestionOptionSubscriptionPayload>,
-    Fragmentable {
-  mutation: () => Promise<MutationType>;
-  node: <T = QuestionOptionPromise>() => T;
-  updatedFields: () => Promise<String[]>;
-  previousValues: <T = QuestionOptionPreviousValuesPromise>() => T;
-}
-
-export interface QuestionOptionSubscriptionPayloadSubscription
-  extends Promise<AsyncIterator<QuestionOptionSubscriptionPayload>>,
-    Fragmentable {
-  mutation: () => Promise<AsyncIterator<MutationType>>;
-  node: <T = QuestionOptionSubscription>() => T;
-  updatedFields: () => Promise<AsyncIterator<String[]>>;
-  previousValues: <T = QuestionOptionPreviousValuesSubscription>() => T;
 }
 
 export interface ColourSettings {
@@ -2768,25 +2930,6 @@ export interface QuestionnaireNullablePromise
   }) => T;
 }
 
-export interface QuestionOptionEdge {
-  node: QuestionOption;
-  cursor: String;
-}
-
-export interface QuestionOptionEdgePromise
-  extends Promise<QuestionOptionEdge>,
-    Fragmentable {
-  node: <T = QuestionOptionPromise>() => T;
-  cursor: () => Promise<String>;
-}
-
-export interface QuestionOptionEdgeSubscription
-  extends Promise<AsyncIterator<QuestionOptionEdge>>,
-    Fragmentable {
-  node: <T = QuestionOptionSubscription>() => T;
-  cursor: () => Promise<AsyncIterator<String>>;
-}
-
 export interface ColourSettingsSubscriptionPayload {
   mutation: MutationType;
   node: ColourSettings;
@@ -2812,20 +2955,23 @@ export interface ColourSettingsSubscriptionPayloadSubscription
   previousValues: <T = ColourSettingsPreviousValuesSubscription>() => T;
 }
 
-export interface AggregateQuestionNode {
-  count: Int;
+export interface QuestionOptionEdge {
+  node: QuestionOption;
+  cursor: String;
 }
 
-export interface AggregateQuestionNodePromise
-  extends Promise<AggregateQuestionNode>,
+export interface QuestionOptionEdgePromise
+  extends Promise<QuestionOptionEdge>,
     Fragmentable {
-  count: () => Promise<Int>;
+  node: <T = QuestionOptionPromise>() => T;
+  cursor: () => Promise<String>;
 }
 
-export interface AggregateQuestionNodeSubscription
-  extends Promise<AsyncIterator<AggregateQuestionNode>>,
+export interface QuestionOptionEdgeSubscription
+  extends Promise<AsyncIterator<QuestionOptionEdge>>,
     Fragmentable {
-  count: () => Promise<AsyncIterator<Int>>;
+  node: <T = QuestionOptionSubscription>() => T;
+  cursor: () => Promise<AsyncIterator<String>>;
 }
 
 export interface ColourSettingsPreviousValues {
@@ -2886,547 +3032,20 @@ export interface ColourSettingsPreviousValuesSubscription
   text: () => Promise<AsyncIterator<String>>;
 }
 
-export interface QuestionNodeConnection {
-  pageInfo: PageInfo;
-  edges: QuestionNodeEdge[];
-}
-
-export interface QuestionNodeConnectionPromise
-  extends Promise<QuestionNodeConnection>,
-    Fragmentable {
-  pageInfo: <T = PageInfoPromise>() => T;
-  edges: <T = FragmentableArray<QuestionNodeEdge>>() => T;
-  aggregate: <T = AggregateQuestionNodePromise>() => T;
-}
-
-export interface QuestionNodeConnectionSubscription
-  extends Promise<AsyncIterator<QuestionNodeConnection>>,
-    Fragmentable {
-  pageInfo: <T = PageInfoSubscription>() => T;
-  edges: <T = Promise<AsyncIterator<QuestionNodeEdgeSubscription>>>() => T;
-  aggregate: <T = AggregateQuestionNodeSubscription>() => T;
-}
-
-export interface ColourSettingsEdge {
-  node: ColourSettings;
-  cursor: String;
-}
-
-export interface ColourSettingsEdgePromise
-  extends Promise<ColourSettingsEdge>,
-    Fragmentable {
-  node: <T = ColourSettingsPromise>() => T;
-  cursor: () => Promise<String>;
-}
-
-export interface ColourSettingsEdgeSubscription
-  extends Promise<AsyncIterator<ColourSettingsEdge>>,
-    Fragmentable {
-  node: <T = ColourSettingsSubscription>() => T;
-  cursor: () => Promise<AsyncIterator<String>>;
-}
-
-export interface QuestionnaireSubscriptionPayload {
-  mutation: MutationType;
-  node: Questionnaire;
-  updatedFields: String[];
-  previousValues: QuestionnairePreviousValues;
-}
-
-export interface QuestionnaireSubscriptionPayloadPromise
-  extends Promise<QuestionnaireSubscriptionPayload>,
-    Fragmentable {
-  mutation: () => Promise<MutationType>;
-  node: <T = QuestionnairePromise>() => T;
-  updatedFields: () => Promise<String[]>;
-  previousValues: <T = QuestionnairePreviousValuesPromise>() => T;
-}
-
-export interface QuestionnaireSubscriptionPayloadSubscription
-  extends Promise<AsyncIterator<QuestionnaireSubscriptionPayload>>,
-    Fragmentable {
-  mutation: () => Promise<AsyncIterator<MutationType>>;
-  node: <T = QuestionnaireSubscription>() => T;
-  updatedFields: () => Promise<AsyncIterator<String[]>>;
-  previousValues: <T = QuestionnairePreviousValuesSubscription>() => T;
-}
-
-export interface CustomerSubscriptionPayload {
-  mutation: MutationType;
-  node: Customer;
-  updatedFields: String[];
-  previousValues: CustomerPreviousValues;
-}
-
-export interface CustomerSubscriptionPayloadPromise
-  extends Promise<CustomerSubscriptionPayload>,
-    Fragmentable {
-  mutation: () => Promise<MutationType>;
-  node: <T = CustomerPromise>() => T;
-  updatedFields: () => Promise<String[]>;
-  previousValues: <T = CustomerPreviousValuesPromise>() => T;
-}
-
-export interface CustomerSubscriptionPayloadSubscription
-  extends Promise<AsyncIterator<CustomerSubscriptionPayload>>,
-    Fragmentable {
-  mutation: () => Promise<AsyncIterator<MutationType>>;
-  node: <T = CustomerSubscription>() => T;
-  updatedFields: () => Promise<AsyncIterator<String[]>>;
-  previousValues: <T = CustomerPreviousValuesSubscription>() => T;
-}
-
-export interface AggregateQuestionCondition {
+export interface AggregateQuestionNode {
   count: Int;
 }
 
-export interface AggregateQuestionConditionPromise
-  extends Promise<AggregateQuestionCondition>,
+export interface AggregateQuestionNodePromise
+  extends Promise<AggregateQuestionNode>,
     Fragmentable {
   count: () => Promise<Int>;
 }
 
-export interface AggregateQuestionConditionSubscription
-  extends Promise<AsyncIterator<AggregateQuestionCondition>>,
+export interface AggregateQuestionNodeSubscription
+  extends Promise<AsyncIterator<AggregateQuestionNode>>,
     Fragmentable {
   count: () => Promise<AsyncIterator<Int>>;
-}
-
-export interface CustomerPreviousValues {
-  id: ID_Output;
-  name: String;
-}
-
-export interface CustomerPreviousValuesPromise
-  extends Promise<CustomerPreviousValues>,
-    Fragmentable {
-  id: () => Promise<ID_Output>;
-  name: () => Promise<String>;
-}
-
-export interface CustomerPreviousValuesSubscription
-  extends Promise<AsyncIterator<CustomerPreviousValues>>,
-    Fragmentable {
-  id: () => Promise<AsyncIterator<ID_Output>>;
-  name: () => Promise<AsyncIterator<String>>;
-}
-
-export interface QuestionConditionConnection {
-  pageInfo: PageInfo;
-  edges: QuestionConditionEdge[];
-}
-
-export interface QuestionConditionConnectionPromise
-  extends Promise<QuestionConditionConnection>,
-    Fragmentable {
-  pageInfo: <T = PageInfoPromise>() => T;
-  edges: <T = FragmentableArray<QuestionConditionEdge>>() => T;
-  aggregate: <T = AggregateQuestionConditionPromise>() => T;
-}
-
-export interface QuestionConditionConnectionSubscription
-  extends Promise<AsyncIterator<QuestionConditionConnection>>,
-    Fragmentable {
-  pageInfo: <T = PageInfoSubscription>() => T;
-  edges: <T = Promise<AsyncIterator<QuestionConditionEdgeSubscription>>>() => T;
-  aggregate: <T = AggregateQuestionConditionSubscription>() => T;
-}
-
-export interface AggregateCustomerSettings {
-  count: Int;
-}
-
-export interface AggregateCustomerSettingsPromise
-  extends Promise<AggregateCustomerSettings>,
-    Fragmentable {
-  count: () => Promise<Int>;
-}
-
-export interface AggregateCustomerSettingsSubscription
-  extends Promise<AsyncIterator<AggregateCustomerSettings>>,
-    Fragmentable {
-  count: () => Promise<AsyncIterator<Int>>;
-}
-
-export interface QuestionCondition {
-  id: ID_Output;
-  conditionType: String;
-  renderMin?: Int;
-  renderMax?: Int;
-  matchValue?: String;
-}
-
-export interface QuestionConditionPromise
-  extends Promise<QuestionCondition>,
-    Fragmentable {
-  id: () => Promise<ID_Output>;
-  conditionType: () => Promise<String>;
-  renderMin: () => Promise<Int>;
-  renderMax: () => Promise<Int>;
-  matchValue: () => Promise<String>;
-}
-
-export interface QuestionConditionSubscription
-  extends Promise<AsyncIterator<QuestionCondition>>,
-    Fragmentable {
-  id: () => Promise<AsyncIterator<ID_Output>>;
-  conditionType: () => Promise<AsyncIterator<String>>;
-  renderMin: () => Promise<AsyncIterator<Int>>;
-  renderMax: () => Promise<AsyncIterator<Int>>;
-  matchValue: () => Promise<AsyncIterator<String>>;
-}
-
-export interface QuestionConditionNullablePromise
-  extends Promise<QuestionCondition | null>,
-    Fragmentable {
-  id: () => Promise<ID_Output>;
-  conditionType: () => Promise<String>;
-  renderMin: () => Promise<Int>;
-  renderMax: () => Promise<Int>;
-  matchValue: () => Promise<String>;
-}
-
-export interface CustomerSettingsSubscriptionPayload {
-  mutation: MutationType;
-  node: CustomerSettings;
-  updatedFields: String[];
-  previousValues: CustomerSettingsPreviousValues;
-}
-
-export interface CustomerSettingsSubscriptionPayloadPromise
-  extends Promise<CustomerSettingsSubscriptionPayload>,
-    Fragmentable {
-  mutation: () => Promise<MutationType>;
-  node: <T = CustomerSettingsPromise>() => T;
-  updatedFields: () => Promise<String[]>;
-  previousValues: <T = CustomerSettingsPreviousValuesPromise>() => T;
-}
-
-export interface CustomerSettingsSubscriptionPayloadSubscription
-  extends Promise<AsyncIterator<CustomerSettingsSubscriptionPayload>>,
-    Fragmentable {
-  mutation: () => Promise<AsyncIterator<MutationType>>;
-  node: <T = CustomerSettingsSubscription>() => T;
-  updatedFields: () => Promise<AsyncIterator<String[]>>;
-  previousValues: <T = CustomerSettingsPreviousValuesSubscription>() => T;
-}
-
-export interface NodeTypeEdge {
-  node: NodeType;
-  cursor: String;
-}
-
-export interface NodeTypeEdgePromise
-  extends Promise<NodeTypeEdge>,
-    Fragmentable {
-  node: <T = NodeTypePromise>() => T;
-  cursor: () => Promise<String>;
-}
-
-export interface NodeTypeEdgeSubscription
-  extends Promise<AsyncIterator<NodeTypeEdge>>,
-    Fragmentable {
-  node: <T = NodeTypeSubscription>() => T;
-  cursor: () => Promise<AsyncIterator<String>>;
-}
-
-export interface CustomerSettingsPreviousValues {
-  id: ID_Output;
-  title?: String;
-  logo?: String;
-}
-
-export interface CustomerSettingsPreviousValuesPromise
-  extends Promise<CustomerSettingsPreviousValues>,
-    Fragmentable {
-  id: () => Promise<ID_Output>;
-  title: () => Promise<String>;
-  logo: () => Promise<String>;
-}
-
-export interface CustomerSettingsPreviousValuesSubscription
-  extends Promise<AsyncIterator<CustomerSettingsPreviousValues>>,
-    Fragmentable {
-  id: () => Promise<AsyncIterator<ID_Output>>;
-  title: () => Promise<AsyncIterator<String>>;
-  logo: () => Promise<AsyncIterator<String>>;
-}
-
-export interface PageInfo {
-  hasNextPage: Boolean;
-  hasPreviousPage: Boolean;
-  startCursor?: String;
-  endCursor?: String;
-}
-
-export interface PageInfoPromise extends Promise<PageInfo>, Fragmentable {
-  hasNextPage: () => Promise<Boolean>;
-  hasPreviousPage: () => Promise<Boolean>;
-  startCursor: () => Promise<String>;
-  endCursor: () => Promise<String>;
-}
-
-export interface PageInfoSubscription
-  extends Promise<AsyncIterator<PageInfo>>,
-    Fragmentable {
-  hasNextPage: () => Promise<AsyncIterator<Boolean>>;
-  hasPreviousPage: () => Promise<AsyncIterator<Boolean>>;
-  startCursor: () => Promise<AsyncIterator<String>>;
-  endCursor: () => Promise<AsyncIterator<String>>;
-}
-
-export interface CustomerSettingsEdge {
-  node: CustomerSettings;
-  cursor: String;
-}
-
-export interface CustomerSettingsEdgePromise
-  extends Promise<CustomerSettingsEdge>,
-    Fragmentable {
-  node: <T = CustomerSettingsPromise>() => T;
-  cursor: () => Promise<String>;
-}
-
-export interface CustomerSettingsEdgeSubscription
-  extends Promise<AsyncIterator<CustomerSettingsEdge>>,
-    Fragmentable {
-  node: <T = CustomerSettingsSubscription>() => T;
-  cursor: () => Promise<AsyncIterator<String>>;
-}
-
-export interface LeafNodeEdge {
-  node: LeafNode;
-  cursor: String;
-}
-
-export interface LeafNodeEdgePromise
-  extends Promise<LeafNodeEdge>,
-    Fragmentable {
-  node: <T = LeafNodePromise>() => T;
-  cursor: () => Promise<String>;
-}
-
-export interface LeafNodeEdgeSubscription
-  extends Promise<AsyncIterator<LeafNodeEdge>>,
-    Fragmentable {
-  node: <T = LeafNodeSubscription>() => T;
-  cursor: () => Promise<AsyncIterator<String>>;
-}
-
-export interface FontSettingsSubscriptionPayload {
-  mutation: MutationType;
-  node: FontSettings;
-  updatedFields: String[];
-  previousValues: FontSettingsPreviousValues;
-}
-
-export interface FontSettingsSubscriptionPayloadPromise
-  extends Promise<FontSettingsSubscriptionPayload>,
-    Fragmentable {
-  mutation: () => Promise<MutationType>;
-  node: <T = FontSettingsPromise>() => T;
-  updatedFields: () => Promise<String[]>;
-  previousValues: <T = FontSettingsPreviousValuesPromise>() => T;
-}
-
-export interface FontSettingsSubscriptionPayloadSubscription
-  extends Promise<AsyncIterator<FontSettingsSubscriptionPayload>>,
-    Fragmentable {
-  mutation: () => Promise<AsyncIterator<MutationType>>;
-  node: <T = FontSettingsSubscription>() => T;
-  updatedFields: () => Promise<AsyncIterator<String[]>>;
-  previousValues: <T = FontSettingsPreviousValuesSubscription>() => T;
-}
-
-export interface FontSettings {
-  id: ID_Output;
-  settingTitle?: String;
-  body?: String;
-  fontTitle?: String;
-  special?: String;
-}
-
-export interface FontSettingsPromise
-  extends Promise<FontSettings>,
-    Fragmentable {
-  id: () => Promise<ID_Output>;
-  settingTitle: () => Promise<String>;
-  body: () => Promise<String>;
-  fontTitle: () => Promise<String>;
-  special: () => Promise<String>;
-}
-
-export interface FontSettingsSubscription
-  extends Promise<AsyncIterator<FontSettings>>,
-    Fragmentable {
-  id: () => Promise<AsyncIterator<ID_Output>>;
-  settingTitle: () => Promise<AsyncIterator<String>>;
-  body: () => Promise<AsyncIterator<String>>;
-  fontTitle: () => Promise<AsyncIterator<String>>;
-  special: () => Promise<AsyncIterator<String>>;
-}
-
-export interface FontSettingsNullablePromise
-  extends Promise<FontSettings | null>,
-    Fragmentable {
-  id: () => Promise<ID_Output>;
-  settingTitle: () => Promise<String>;
-  body: () => Promise<String>;
-  fontTitle: () => Promise<String>;
-  special: () => Promise<String>;
-}
-
-export interface FontSettingsPreviousValues {
-  id: ID_Output;
-  settingTitle?: String;
-  body?: String;
-  fontTitle?: String;
-  special?: String;
-}
-
-export interface FontSettingsPreviousValuesPromise
-  extends Promise<FontSettingsPreviousValues>,
-    Fragmentable {
-  id: () => Promise<ID_Output>;
-  settingTitle: () => Promise<String>;
-  body: () => Promise<String>;
-  fontTitle: () => Promise<String>;
-  special: () => Promise<String>;
-}
-
-export interface FontSettingsPreviousValuesSubscription
-  extends Promise<AsyncIterator<FontSettingsPreviousValues>>,
-    Fragmentable {
-  id: () => Promise<AsyncIterator<ID_Output>>;
-  settingTitle: () => Promise<AsyncIterator<String>>;
-  body: () => Promise<AsyncIterator<String>>;
-  fontTitle: () => Promise<AsyncIterator<String>>;
-  special: () => Promise<AsyncIterator<String>>;
-}
-
-export interface QuestionOptionPreviousValues {
-  id: ID_Output;
-  value: String;
-  publicValue?: String;
-}
-
-export interface QuestionOptionPreviousValuesPromise
-  extends Promise<QuestionOptionPreviousValues>,
-    Fragmentable {
-  id: () => Promise<ID_Output>;
-  value: () => Promise<String>;
-  publicValue: () => Promise<String>;
-}
-
-export interface QuestionOptionPreviousValuesSubscription
-  extends Promise<AsyncIterator<QuestionOptionPreviousValues>>,
-    Fragmentable {
-  id: () => Promise<AsyncIterator<ID_Output>>;
-  value: () => Promise<AsyncIterator<String>>;
-  publicValue: () => Promise<AsyncIterator<String>>;
-}
-
-export interface CustomerSettingsConnection {
-  pageInfo: PageInfo;
-  edges: CustomerSettingsEdge[];
-}
-
-export interface CustomerSettingsConnectionPromise
-  extends Promise<CustomerSettingsConnection>,
-    Fragmentable {
-  pageInfo: <T = PageInfoPromise>() => T;
-  edges: <T = FragmentableArray<CustomerSettingsEdge>>() => T;
-  aggregate: <T = AggregateCustomerSettingsPromise>() => T;
-}
-
-export interface CustomerSettingsConnectionSubscription
-  extends Promise<AsyncIterator<CustomerSettingsConnection>>,
-    Fragmentable {
-  pageInfo: <T = PageInfoSubscription>() => T;
-  edges: <T = Promise<AsyncIterator<CustomerSettingsEdgeSubscription>>>() => T;
-  aggregate: <T = AggregateCustomerSettingsSubscription>() => T;
-}
-
-export interface AggregateQuestionOption {
-  count: Int;
-}
-
-export interface AggregateQuestionOptionPromise
-  extends Promise<AggregateQuestionOption>,
-    Fragmentable {
-  count: () => Promise<Int>;
-}
-
-export interface AggregateQuestionOptionSubscription
-  extends Promise<AsyncIterator<AggregateQuestionOption>>,
-    Fragmentable {
-  count: () => Promise<AsyncIterator<Int>>;
-}
-
-export interface LeafNodeSubscriptionPayload {
-  mutation: MutationType;
-  node: LeafNode;
-  updatedFields: String[];
-  previousValues: LeafNodePreviousValues;
-}
-
-export interface LeafNodeSubscriptionPayloadPromise
-  extends Promise<LeafNodeSubscriptionPayload>,
-    Fragmentable {
-  mutation: () => Promise<MutationType>;
-  node: <T = LeafNodePromise>() => T;
-  updatedFields: () => Promise<String[]>;
-  previousValues: <T = LeafNodePreviousValuesPromise>() => T;
-}
-
-export interface LeafNodeSubscriptionPayloadSubscription
-  extends Promise<AsyncIterator<LeafNodeSubscriptionPayload>>,
-    Fragmentable {
-  mutation: () => Promise<AsyncIterator<MutationType>>;
-  node: <T = LeafNodeSubscription>() => T;
-  updatedFields: () => Promise<AsyncIterator<String[]>>;
-  previousValues: <T = LeafNodePreviousValuesSubscription>() => T;
-}
-
-export interface QuestionNodeEdge {
-  node: QuestionNode;
-  cursor: String;
-}
-
-export interface QuestionNodeEdgePromise
-  extends Promise<QuestionNodeEdge>,
-    Fragmentable {
-  node: <T = QuestionNodePromise>() => T;
-  cursor: () => Promise<String>;
-}
-
-export interface QuestionNodeEdgeSubscription
-  extends Promise<AsyncIterator<QuestionNodeEdge>>,
-    Fragmentable {
-  node: <T = QuestionNodeSubscription>() => T;
-  cursor: () => Promise<AsyncIterator<String>>;
-}
-
-export interface LeafNodePreviousValues {
-  id: ID_Output;
-  nodeId?: Int;
-  title: String;
-}
-
-export interface LeafNodePreviousValuesPromise
-  extends Promise<LeafNodePreviousValues>,
-    Fragmentable {
-  id: () => Promise<ID_Output>;
-  nodeId: () => Promise<Int>;
-  title: () => Promise<String>;
-}
-
-export interface LeafNodePreviousValuesSubscription
-  extends Promise<AsyncIterator<LeafNodePreviousValues>>,
-    Fragmentable {
-  id: () => Promise<AsyncIterator<ID_Output>>;
-  nodeId: () => Promise<AsyncIterator<Int>>;
-  title: () => Promise<AsyncIterator<String>>;
 }
 
 export interface QuestionNode {
@@ -3465,6 +3084,15 @@ export interface QuestionNodePromise
   children: <T = FragmentableArray<QuestionNode>>(args?: {
     where?: QuestionNodeWhereInput;
     orderBy?: QuestionNodeOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => T;
+  edgeChildren: <T = FragmentableArray<Edge>>(args?: {
+    where?: EdgeWhereInput;
+    orderBy?: EdgeOrderByInput;
     skip?: Int;
     after?: String;
     before?: String;
@@ -3510,6 +3138,15 @@ export interface QuestionNodeSubscription
     first?: Int;
     last?: Int;
   }) => T;
+  edgeChildren: <T = Promise<AsyncIterator<EdgeSubscription>>>(args?: {
+    where?: EdgeWhereInput;
+    orderBy?: EdgeOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => T;
 }
 
 export interface QuestionNodeNullablePromise
@@ -3547,68 +3184,176 @@ export interface QuestionNodeNullablePromise
     first?: Int;
     last?: Int;
   }) => T;
+  edgeChildren: <T = FragmentableArray<Edge>>(args?: {
+    where?: EdgeWhereInput;
+    orderBy?: EdgeOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => T;
 }
 
-export interface AggregateColourSettings {
+export interface QuestionNodeConnection {
+  pageInfo: PageInfo;
+  edges: QuestionNodeEdge[];
+}
+
+export interface QuestionNodeConnectionPromise
+  extends Promise<QuestionNodeConnection>,
+    Fragmentable {
+  pageInfo: <T = PageInfoPromise>() => T;
+  edges: <T = FragmentableArray<QuestionNodeEdge>>() => T;
+  aggregate: <T = AggregateQuestionNodePromise>() => T;
+}
+
+export interface QuestionNodeConnectionSubscription
+  extends Promise<AsyncIterator<QuestionNodeConnection>>,
+    Fragmentable {
+  pageInfo: <T = PageInfoSubscription>() => T;
+  edges: <T = Promise<AsyncIterator<QuestionNodeEdgeSubscription>>>() => T;
+  aggregate: <T = AggregateQuestionNodeSubscription>() => T;
+}
+
+export interface CustomerSubscriptionPayload {
+  mutation: MutationType;
+  node: Customer;
+  updatedFields: String[];
+  previousValues: CustomerPreviousValues;
+}
+
+export interface CustomerSubscriptionPayloadPromise
+  extends Promise<CustomerSubscriptionPayload>,
+    Fragmentable {
+  mutation: () => Promise<MutationType>;
+  node: <T = CustomerPromise>() => T;
+  updatedFields: () => Promise<String[]>;
+  previousValues: <T = CustomerPreviousValuesPromise>() => T;
+}
+
+export interface CustomerSubscriptionPayloadSubscription
+  extends Promise<AsyncIterator<CustomerSubscriptionPayload>>,
+    Fragmentable {
+  mutation: () => Promise<AsyncIterator<MutationType>>;
+  node: <T = CustomerSubscription>() => T;
+  updatedFields: () => Promise<AsyncIterator<String[]>>;
+  previousValues: <T = CustomerPreviousValuesSubscription>() => T;
+}
+
+export interface QuestionConditionEdge {
+  node: QuestionCondition;
+  cursor: String;
+}
+
+export interface QuestionConditionEdgePromise
+  extends Promise<QuestionConditionEdge>,
+    Fragmentable {
+  node: <T = QuestionConditionPromise>() => T;
+  cursor: () => Promise<String>;
+}
+
+export interface QuestionConditionEdgeSubscription
+  extends Promise<AsyncIterator<QuestionConditionEdge>>,
+    Fragmentable {
+  node: <T = QuestionConditionSubscription>() => T;
+  cursor: () => Promise<AsyncIterator<String>>;
+}
+
+export interface CustomerPreviousValues {
+  id: ID_Output;
+  name: String;
+}
+
+export interface CustomerPreviousValuesPromise
+  extends Promise<CustomerPreviousValues>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  name: () => Promise<String>;
+}
+
+export interface CustomerPreviousValuesSubscription
+  extends Promise<AsyncIterator<CustomerPreviousValues>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  name: () => Promise<AsyncIterator<String>>;
+}
+
+export interface AggregateNodeType {
   count: Int;
 }
 
-export interface AggregateColourSettingsPromise
-  extends Promise<AggregateColourSettings>,
+export interface AggregateNodeTypePromise
+  extends Promise<AggregateNodeType>,
     Fragmentable {
   count: () => Promise<Int>;
 }
 
-export interface AggregateColourSettingsSubscription
-  extends Promise<AsyncIterator<AggregateColourSettings>>,
+export interface AggregateNodeTypeSubscription
+  extends Promise<AsyncIterator<AggregateNodeType>>,
     Fragmentable {
   count: () => Promise<AsyncIterator<Int>>;
 }
 
-export interface ColourSettingsConnection {
+export interface QuestionConditionConnection {
   pageInfo: PageInfo;
-  edges: ColourSettingsEdge[];
+  edges: QuestionConditionEdge[];
 }
 
-export interface ColourSettingsConnectionPromise
-  extends Promise<ColourSettingsConnection>,
+export interface QuestionConditionConnectionPromise
+  extends Promise<QuestionConditionConnection>,
     Fragmentable {
   pageInfo: <T = PageInfoPromise>() => T;
-  edges: <T = FragmentableArray<ColourSettingsEdge>>() => T;
-  aggregate: <T = AggregateColourSettingsPromise>() => T;
+  edges: <T = FragmentableArray<QuestionConditionEdge>>() => T;
+  aggregate: <T = AggregateQuestionConditionPromise>() => T;
 }
 
-export interface ColourSettingsConnectionSubscription
-  extends Promise<AsyncIterator<ColourSettingsConnection>>,
+export interface QuestionConditionConnectionSubscription
+  extends Promise<AsyncIterator<QuestionConditionConnection>>,
     Fragmentable {
   pageInfo: <T = PageInfoSubscription>() => T;
-  edges: <T = Promise<AsyncIterator<ColourSettingsEdgeSubscription>>>() => T;
-  aggregate: <T = AggregateColourSettingsSubscription>() => T;
+  edges: <T = Promise<AsyncIterator<QuestionConditionEdgeSubscription>>>() => T;
+  aggregate: <T = AggregateQuestionConditionSubscription>() => T;
 }
 
-export interface NodeTypeSubscriptionPayload {
-  mutation: MutationType;
+export interface CustomerConnection {
+  pageInfo: PageInfo;
+  edges: CustomerEdge[];
+}
+
+export interface CustomerConnectionPromise
+  extends Promise<CustomerConnection>,
+    Fragmentable {
+  pageInfo: <T = PageInfoPromise>() => T;
+  edges: <T = FragmentableArray<CustomerEdge>>() => T;
+  aggregate: <T = AggregateCustomerPromise>() => T;
+}
+
+export interface CustomerConnectionSubscription
+  extends Promise<AsyncIterator<CustomerConnection>>,
+    Fragmentable {
+  pageInfo: <T = PageInfoSubscription>() => T;
+  edges: <T = Promise<AsyncIterator<CustomerEdgeSubscription>>>() => T;
+  aggregate: <T = AggregateCustomerSubscription>() => T;
+}
+
+export interface NodeTypeEdge {
   node: NodeType;
-  updatedFields: String[];
-  previousValues: NodeTypePreviousValues;
+  cursor: String;
 }
 
-export interface NodeTypeSubscriptionPayloadPromise
-  extends Promise<NodeTypeSubscriptionPayload>,
+export interface NodeTypeEdgePromise
+  extends Promise<NodeTypeEdge>,
     Fragmentable {
-  mutation: () => Promise<MutationType>;
   node: <T = NodeTypePromise>() => T;
-  updatedFields: () => Promise<String[]>;
-  previousValues: <T = NodeTypePreviousValuesPromise>() => T;
+  cursor: () => Promise<String>;
 }
 
-export interface NodeTypeSubscriptionPayloadSubscription
-  extends Promise<AsyncIterator<NodeTypeSubscriptionPayload>>,
+export interface NodeTypeEdgeSubscription
+  extends Promise<AsyncIterator<NodeTypeEdge>>,
     Fragmentable {
-  mutation: () => Promise<AsyncIterator<MutationType>>;
   node: <T = NodeTypeSubscription>() => T;
-  updatedFields: () => Promise<AsyncIterator<String[]>>;
-  previousValues: <T = NodeTypePreviousValuesSubscription>() => T;
+  cursor: () => Promise<AsyncIterator<String>>;
 }
 
 export interface NodeTypeConnection {
@@ -3632,23 +3377,20 @@ export interface NodeTypeConnectionSubscription
   aggregate: <T = AggregateNodeTypeSubscription>() => T;
 }
 
-export interface NodeTypePreviousValues {
-  id: ID_Output;
-  type: String;
+export interface AggregateLeafNode {
+  count: Int;
 }
 
-export interface NodeTypePreviousValuesPromise
-  extends Promise<NodeTypePreviousValues>,
+export interface AggregateLeafNodePromise
+  extends Promise<AggregateLeafNode>,
     Fragmentable {
-  id: () => Promise<ID_Output>;
-  type: () => Promise<String>;
+  count: () => Promise<Int>;
 }
 
-export interface NodeTypePreviousValuesSubscription
-  extends Promise<AsyncIterator<NodeTypePreviousValues>>,
+export interface AggregateLeafNodeSubscription
+  extends Promise<AsyncIterator<AggregateLeafNode>>,
     Fragmentable {
-  id: () => Promise<AsyncIterator<ID_Output>>;
-  type: () => Promise<AsyncIterator<String>>;
+  count: () => Promise<AsyncIterator<Int>>;
 }
 
 export interface LeafNodeConnection {
@@ -3672,61 +3414,259 @@ export interface LeafNodeConnectionSubscription
   aggregate: <T = AggregateLeafNodeSubscription>() => T;
 }
 
-export interface AggregateCustomer {
+export interface CustomerSettingsSubscriptionPayload {
+  mutation: MutationType;
+  node: CustomerSettings;
+  updatedFields: String[];
+  previousValues: CustomerSettingsPreviousValues;
+}
+
+export interface CustomerSettingsSubscriptionPayloadPromise
+  extends Promise<CustomerSettingsSubscriptionPayload>,
+    Fragmentable {
+  mutation: () => Promise<MutationType>;
+  node: <T = CustomerSettingsPromise>() => T;
+  updatedFields: () => Promise<String[]>;
+  previousValues: <T = CustomerSettingsPreviousValuesPromise>() => T;
+}
+
+export interface CustomerSettingsSubscriptionPayloadSubscription
+  extends Promise<AsyncIterator<CustomerSettingsSubscriptionPayload>>,
+    Fragmentable {
+  mutation: () => Promise<AsyncIterator<MutationType>>;
+  node: <T = CustomerSettingsSubscription>() => T;
+  updatedFields: () => Promise<AsyncIterator<String[]>>;
+  previousValues: <T = CustomerSettingsPreviousValuesSubscription>() => T;
+}
+
+export interface LeafNode {
+  id: ID_Output;
+  nodeId?: Int;
+  title: String;
+}
+
+export interface LeafNodePromise extends Promise<LeafNode>, Fragmentable {
+  id: () => Promise<ID_Output>;
+  nodeId: () => Promise<Int>;
+  type: <T = NodeTypePromise>() => T;
+  title: () => Promise<String>;
+}
+
+export interface LeafNodeSubscription
+  extends Promise<AsyncIterator<LeafNode>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  nodeId: () => Promise<AsyncIterator<Int>>;
+  type: <T = NodeTypeSubscription>() => T;
+  title: () => Promise<AsyncIterator<String>>;
+}
+
+export interface LeafNodeNullablePromise
+  extends Promise<LeafNode | null>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  nodeId: () => Promise<Int>;
+  type: <T = NodeTypePromise>() => T;
+  title: () => Promise<String>;
+}
+
+export interface CustomerSettingsPreviousValues {
+  id: ID_Output;
+  title?: String;
+  logo?: String;
+}
+
+export interface CustomerSettingsPreviousValuesPromise
+  extends Promise<CustomerSettingsPreviousValues>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  title: () => Promise<String>;
+  logo: () => Promise<String>;
+}
+
+export interface CustomerSettingsPreviousValuesSubscription
+  extends Promise<AsyncIterator<CustomerSettingsPreviousValues>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  title: () => Promise<AsyncIterator<String>>;
+  logo: () => Promise<AsyncIterator<String>>;
+}
+
+export interface FontSettingsEdge {
+  node: FontSettings;
+  cursor: String;
+}
+
+export interface FontSettingsEdgePromise
+  extends Promise<FontSettingsEdge>,
+    Fragmentable {
+  node: <T = FontSettingsPromise>() => T;
+  cursor: () => Promise<String>;
+}
+
+export interface FontSettingsEdgeSubscription
+  extends Promise<AsyncIterator<FontSettingsEdge>>,
+    Fragmentable {
+  node: <T = FontSettingsSubscription>() => T;
+  cursor: () => Promise<AsyncIterator<String>>;
+}
+
+export interface Edge {
+  id: ID_Output;
+  createdAt: DateTimeOutput;
+  updatedAt: DateTimeOutput;
+}
+
+export interface EdgePromise extends Promise<Edge>, Fragmentable {
+  id: () => Promise<ID_Output>;
+  createdAt: () => Promise<DateTimeOutput>;
+  updatedAt: () => Promise<DateTimeOutput>;
+  parentNode: <T = QuestionNodePromise>() => T;
+  childNode: <T = QuestionNodePromise>() => T;
+}
+
+export interface EdgeSubscription
+  extends Promise<AsyncIterator<Edge>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  parentNode: <T = QuestionNodeSubscription>() => T;
+  childNode: <T = QuestionNodeSubscription>() => T;
+}
+
+export interface EdgeNullablePromise
+  extends Promise<Edge | null>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  createdAt: () => Promise<DateTimeOutput>;
+  updatedAt: () => Promise<DateTimeOutput>;
+  parentNode: <T = QuestionNodePromise>() => T;
+  childNode: <T = QuestionNodePromise>() => T;
+}
+
+export interface ColourSettingsConnection {
+  pageInfo: PageInfo;
+  edges: ColourSettingsEdge[];
+}
+
+export interface ColourSettingsConnectionPromise
+  extends Promise<ColourSettingsConnection>,
+    Fragmentable {
+  pageInfo: <T = PageInfoPromise>() => T;
+  edges: <T = FragmentableArray<ColourSettingsEdge>>() => T;
+  aggregate: <T = AggregateColourSettingsPromise>() => T;
+}
+
+export interface ColourSettingsConnectionSubscription
+  extends Promise<AsyncIterator<ColourSettingsConnection>>,
+    Fragmentable {
+  pageInfo: <T = PageInfoSubscription>() => T;
+  edges: <T = Promise<AsyncIterator<ColourSettingsEdgeSubscription>>>() => T;
+  aggregate: <T = AggregateColourSettingsSubscription>() => T;
+}
+
+export interface EdgeSubscriptionPayload {
+  mutation: MutationType;
+  node: Edge;
+  updatedFields: String[];
+  previousValues: EdgePreviousValues;
+}
+
+export interface EdgeSubscriptionPayloadPromise
+  extends Promise<EdgeSubscriptionPayload>,
+    Fragmentable {
+  mutation: () => Promise<MutationType>;
+  node: <T = EdgePromise>() => T;
+  updatedFields: () => Promise<String[]>;
+  previousValues: <T = EdgePreviousValuesPromise>() => T;
+}
+
+export interface EdgeSubscriptionPayloadSubscription
+  extends Promise<AsyncIterator<EdgeSubscriptionPayload>>,
+    Fragmentable {
+  mutation: () => Promise<AsyncIterator<MutationType>>;
+  node: <T = EdgeSubscription>() => T;
+  updatedFields: () => Promise<AsyncIterator<String[]>>;
+  previousValues: <T = EdgePreviousValuesSubscription>() => T;
+}
+
+export interface EdgeEdge {
+  node: Edge;
+  cursor: String;
+}
+
+export interface EdgeEdgePromise extends Promise<EdgeEdge>, Fragmentable {
+  node: <T = EdgePromise>() => T;
+  cursor: () => Promise<String>;
+}
+
+export interface EdgeEdgeSubscription
+  extends Promise<AsyncIterator<EdgeEdge>>,
+    Fragmentable {
+  node: <T = EdgeSubscription>() => T;
+  cursor: () => Promise<AsyncIterator<String>>;
+}
+
+export interface EdgePreviousValues {
+  id: ID_Output;
+  createdAt: DateTimeOutput;
+  updatedAt: DateTimeOutput;
+}
+
+export interface EdgePreviousValuesPromise
+  extends Promise<EdgePreviousValues>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  createdAt: () => Promise<DateTimeOutput>;
+  updatedAt: () => Promise<DateTimeOutput>;
+}
+
+export interface EdgePreviousValuesSubscription
+  extends Promise<AsyncIterator<EdgePreviousValues>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+}
+
+export interface PageInfo {
+  hasNextPage: Boolean;
+  hasPreviousPage: Boolean;
+  startCursor?: String;
+  endCursor?: String;
+}
+
+export interface PageInfoPromise extends Promise<PageInfo>, Fragmentable {
+  hasNextPage: () => Promise<Boolean>;
+  hasPreviousPage: () => Promise<Boolean>;
+  startCursor: () => Promise<String>;
+  endCursor: () => Promise<String>;
+}
+
+export interface PageInfoSubscription
+  extends Promise<AsyncIterator<PageInfo>>,
+    Fragmentable {
+  hasNextPage: () => Promise<AsyncIterator<Boolean>>;
+  hasPreviousPage: () => Promise<AsyncIterator<Boolean>>;
+  startCursor: () => Promise<AsyncIterator<String>>;
+  endCursor: () => Promise<AsyncIterator<String>>;
+}
+
+export interface AggregateCustomerSettings {
   count: Int;
 }
 
-export interface AggregateCustomerPromise
-  extends Promise<AggregateCustomer>,
+export interface AggregateCustomerSettingsPromise
+  extends Promise<AggregateCustomerSettings>,
     Fragmentable {
   count: () => Promise<Int>;
 }
 
-export interface AggregateCustomerSubscription
-  extends Promise<AsyncIterator<AggregateCustomer>>,
+export interface AggregateCustomerSettingsSubscription
+  extends Promise<AsyncIterator<AggregateCustomerSettings>>,
     Fragmentable {
   count: () => Promise<AsyncIterator<Int>>;
-}
-
-export interface BatchPayload {
-  count: Long;
-}
-
-export interface BatchPayloadPromise
-  extends Promise<BatchPayload>,
-    Fragmentable {
-  count: () => Promise<Long>;
-}
-
-export interface BatchPayloadSubscription
-  extends Promise<AsyncIterator<BatchPayload>>,
-    Fragmentable {
-  count: () => Promise<AsyncIterator<Long>>;
-}
-
-export interface QuestionConditionSubscriptionPayload {
-  mutation: MutationType;
-  node: QuestionCondition;
-  updatedFields: String[];
-  previousValues: QuestionConditionPreviousValues;
-}
-
-export interface QuestionConditionSubscriptionPayloadPromise
-  extends Promise<QuestionConditionSubscriptionPayload>,
-    Fragmentable {
-  mutation: () => Promise<MutationType>;
-  node: <T = QuestionConditionPromise>() => T;
-  updatedFields: () => Promise<String[]>;
-  previousValues: <T = QuestionConditionPreviousValuesPromise>() => T;
-}
-
-export interface QuestionConditionSubscriptionPayloadSubscription
-  extends Promise<AsyncIterator<QuestionConditionSubscriptionPayload>>,
-    Fragmentable {
-  mutation: () => Promise<AsyncIterator<MutationType>>;
-  node: <T = QuestionConditionSubscription>() => T;
-  updatedFields: () => Promise<AsyncIterator<String[]>>;
-  previousValues: <T = QuestionConditionPreviousValuesSubscription>() => T;
 }
 
 export interface QuestionOption {
@@ -3759,18 +3699,445 @@ export interface QuestionOptionNullablePromise
   publicValue: () => Promise<String>;
 }
 
-export interface AggregateNodeType {
+export interface FontSettingsSubscriptionPayload {
+  mutation: MutationType;
+  node: FontSettings;
+  updatedFields: String[];
+  previousValues: FontSettingsPreviousValues;
+}
+
+export interface FontSettingsSubscriptionPayloadPromise
+  extends Promise<FontSettingsSubscriptionPayload>,
+    Fragmentable {
+  mutation: () => Promise<MutationType>;
+  node: <T = FontSettingsPromise>() => T;
+  updatedFields: () => Promise<String[]>;
+  previousValues: <T = FontSettingsPreviousValuesPromise>() => T;
+}
+
+export interface FontSettingsSubscriptionPayloadSubscription
+  extends Promise<AsyncIterator<FontSettingsSubscriptionPayload>>,
+    Fragmentable {
+  mutation: () => Promise<AsyncIterator<MutationType>>;
+  node: <T = FontSettingsSubscription>() => T;
+  updatedFields: () => Promise<AsyncIterator<String[]>>;
+  previousValues: <T = FontSettingsPreviousValuesSubscription>() => T;
+}
+
+export interface BatchPayload {
+  count: Long;
+}
+
+export interface BatchPayloadPromise
+  extends Promise<BatchPayload>,
+    Fragmentable {
+  count: () => Promise<Long>;
+}
+
+export interface BatchPayloadSubscription
+  extends Promise<AsyncIterator<BatchPayload>>,
+    Fragmentable {
+  count: () => Promise<AsyncIterator<Long>>;
+}
+
+export interface FontSettingsPreviousValues {
+  id: ID_Output;
+  settingTitle?: String;
+  body?: String;
+  fontTitle?: String;
+  special?: String;
+}
+
+export interface FontSettingsPreviousValuesPromise
+  extends Promise<FontSettingsPreviousValues>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  settingTitle: () => Promise<String>;
+  body: () => Promise<String>;
+  fontTitle: () => Promise<String>;
+  special: () => Promise<String>;
+}
+
+export interface FontSettingsPreviousValuesSubscription
+  extends Promise<AsyncIterator<FontSettingsPreviousValues>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  settingTitle: () => Promise<AsyncIterator<String>>;
+  body: () => Promise<AsyncIterator<String>>;
+  fontTitle: () => Promise<AsyncIterator<String>>;
+  special: () => Promise<AsyncIterator<String>>;
+}
+
+export interface QuestionOptionSubscriptionPayload {
+  mutation: MutationType;
+  node: QuestionOption;
+  updatedFields: String[];
+  previousValues: QuestionOptionPreviousValues;
+}
+
+export interface QuestionOptionSubscriptionPayloadPromise
+  extends Promise<QuestionOptionSubscriptionPayload>,
+    Fragmentable {
+  mutation: () => Promise<MutationType>;
+  node: <T = QuestionOptionPromise>() => T;
+  updatedFields: () => Promise<String[]>;
+  previousValues: <T = QuestionOptionPreviousValuesPromise>() => T;
+}
+
+export interface QuestionOptionSubscriptionPayloadSubscription
+  extends Promise<AsyncIterator<QuestionOptionSubscriptionPayload>>,
+    Fragmentable {
+  mutation: () => Promise<AsyncIterator<MutationType>>;
+  node: <T = QuestionOptionSubscription>() => T;
+  updatedFields: () => Promise<AsyncIterator<String[]>>;
+  previousValues: <T = QuestionOptionPreviousValuesSubscription>() => T;
+}
+
+export interface CustomerSettingsEdge {
+  node: CustomerSettings;
+  cursor: String;
+}
+
+export interface CustomerSettingsEdgePromise
+  extends Promise<CustomerSettingsEdge>,
+    Fragmentable {
+  node: <T = CustomerSettingsPromise>() => T;
+  cursor: () => Promise<String>;
+}
+
+export interface CustomerSettingsEdgeSubscription
+  extends Promise<AsyncIterator<CustomerSettingsEdge>>,
+    Fragmentable {
+  node: <T = CustomerSettingsSubscription>() => T;
+  cursor: () => Promise<AsyncIterator<String>>;
+}
+
+export interface QuestionOptionConnection {
+  pageInfo: PageInfo;
+  edges: QuestionOptionEdge[];
+}
+
+export interface QuestionOptionConnectionPromise
+  extends Promise<QuestionOptionConnection>,
+    Fragmentable {
+  pageInfo: <T = PageInfoPromise>() => T;
+  edges: <T = FragmentableArray<QuestionOptionEdge>>() => T;
+  aggregate: <T = AggregateQuestionOptionPromise>() => T;
+}
+
+export interface QuestionOptionConnectionSubscription
+  extends Promise<AsyncIterator<QuestionOptionConnection>>,
+    Fragmentable {
+  pageInfo: <T = PageInfoSubscription>() => T;
+  edges: <T = Promise<AsyncIterator<QuestionOptionEdgeSubscription>>>() => T;
+  aggregate: <T = AggregateQuestionOptionSubscription>() => T;
+}
+
+export interface LeafNodeSubscriptionPayload {
+  mutation: MutationType;
+  node: LeafNode;
+  updatedFields: String[];
+  previousValues: LeafNodePreviousValues;
+}
+
+export interface LeafNodeSubscriptionPayloadPromise
+  extends Promise<LeafNodeSubscriptionPayload>,
+    Fragmentable {
+  mutation: () => Promise<MutationType>;
+  node: <T = LeafNodePromise>() => T;
+  updatedFields: () => Promise<String[]>;
+  previousValues: <T = LeafNodePreviousValuesPromise>() => T;
+}
+
+export interface LeafNodeSubscriptionPayloadSubscription
+  extends Promise<AsyncIterator<LeafNodeSubscriptionPayload>>,
+    Fragmentable {
+  mutation: () => Promise<AsyncIterator<MutationType>>;
+  node: <T = LeafNodeSubscription>() => T;
+  updatedFields: () => Promise<AsyncIterator<String[]>>;
+  previousValues: <T = LeafNodePreviousValuesSubscription>() => T;
+}
+
+export interface AggregateQuestionCondition {
   count: Int;
 }
 
-export interface AggregateNodeTypePromise
-  extends Promise<AggregateNodeType>,
+export interface AggregateQuestionConditionPromise
+  extends Promise<AggregateQuestionCondition>,
     Fragmentable {
   count: () => Promise<Int>;
 }
 
-export interface AggregateNodeTypeSubscription
-  extends Promise<AsyncIterator<AggregateNodeType>>,
+export interface AggregateQuestionConditionSubscription
+  extends Promise<AsyncIterator<AggregateQuestionCondition>>,
+    Fragmentable {
+  count: () => Promise<AsyncIterator<Int>>;
+}
+
+export interface LeafNodePreviousValues {
+  id: ID_Output;
+  nodeId?: Int;
+  title: String;
+}
+
+export interface LeafNodePreviousValuesPromise
+  extends Promise<LeafNodePreviousValues>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  nodeId: () => Promise<Int>;
+  title: () => Promise<String>;
+}
+
+export interface LeafNodePreviousValuesSubscription
+  extends Promise<AsyncIterator<LeafNodePreviousValues>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  nodeId: () => Promise<AsyncIterator<Int>>;
+  title: () => Promise<AsyncIterator<String>>;
+}
+
+export interface QuestionnaireSubscriptionPayload {
+  mutation: MutationType;
+  node: Questionnaire;
+  updatedFields: String[];
+  previousValues: QuestionnairePreviousValues;
+}
+
+export interface QuestionnaireSubscriptionPayloadPromise
+  extends Promise<QuestionnaireSubscriptionPayload>,
+    Fragmentable {
+  mutation: () => Promise<MutationType>;
+  node: <T = QuestionnairePromise>() => T;
+  updatedFields: () => Promise<String[]>;
+  previousValues: <T = QuestionnairePreviousValuesPromise>() => T;
+}
+
+export interface QuestionnaireSubscriptionPayloadSubscription
+  extends Promise<AsyncIterator<QuestionnaireSubscriptionPayload>>,
+    Fragmentable {
+  mutation: () => Promise<AsyncIterator<MutationType>>;
+  node: <T = QuestionnaireSubscription>() => T;
+  updatedFields: () => Promise<AsyncIterator<String[]>>;
+  previousValues: <T = QuestionnairePreviousValuesSubscription>() => T;
+}
+
+export interface CustomerSettingsConnection {
+  pageInfo: PageInfo;
+  edges: CustomerSettingsEdge[];
+}
+
+export interface CustomerSettingsConnectionPromise
+  extends Promise<CustomerSettingsConnection>,
+    Fragmentable {
+  pageInfo: <T = PageInfoPromise>() => T;
+  edges: <T = FragmentableArray<CustomerSettingsEdge>>() => T;
+  aggregate: <T = AggregateCustomerSettingsPromise>() => T;
+}
+
+export interface CustomerSettingsConnectionSubscription
+  extends Promise<AsyncIterator<CustomerSettingsConnection>>,
+    Fragmentable {
+  pageInfo: <T = PageInfoSubscription>() => T;
+  edges: <T = Promise<AsyncIterator<CustomerSettingsEdgeSubscription>>>() => T;
+  aggregate: <T = AggregateCustomerSettingsSubscription>() => T;
+}
+
+export interface FontSettingsConnection {
+  pageInfo: PageInfo;
+  edges: FontSettingsEdge[];
+}
+
+export interface FontSettingsConnectionPromise
+  extends Promise<FontSettingsConnection>,
+    Fragmentable {
+  pageInfo: <T = PageInfoPromise>() => T;
+  edges: <T = FragmentableArray<FontSettingsEdge>>() => T;
+  aggregate: <T = AggregateFontSettingsPromise>() => T;
+}
+
+export interface FontSettingsConnectionSubscription
+  extends Promise<AsyncIterator<FontSettingsConnection>>,
+    Fragmentable {
+  pageInfo: <T = PageInfoSubscription>() => T;
+  edges: <T = Promise<AsyncIterator<FontSettingsEdgeSubscription>>>() => T;
+  aggregate: <T = AggregateFontSettingsSubscription>() => T;
+}
+
+export interface NodeTypeSubscriptionPayload {
+  mutation: MutationType;
+  node: NodeType;
+  updatedFields: String[];
+  previousValues: NodeTypePreviousValues;
+}
+
+export interface NodeTypeSubscriptionPayloadPromise
+  extends Promise<NodeTypeSubscriptionPayload>,
+    Fragmentable {
+  mutation: () => Promise<MutationType>;
+  node: <T = NodeTypePromise>() => T;
+  updatedFields: () => Promise<String[]>;
+  previousValues: <T = NodeTypePreviousValuesPromise>() => T;
+}
+
+export interface NodeTypeSubscriptionPayloadSubscription
+  extends Promise<AsyncIterator<NodeTypeSubscriptionPayload>>,
+    Fragmentable {
+  mutation: () => Promise<AsyncIterator<MutationType>>;
+  node: <T = NodeTypeSubscription>() => T;
+  updatedFields: () => Promise<AsyncIterator<String[]>>;
+  previousValues: <T = NodeTypePreviousValuesSubscription>() => T;
+}
+
+export interface EdgeConnection {
+  pageInfo: PageInfo;
+  edges: EdgeEdge[];
+}
+
+export interface EdgeConnectionPromise
+  extends Promise<EdgeConnection>,
+    Fragmentable {
+  pageInfo: <T = PageInfoPromise>() => T;
+  edges: <T = FragmentableArray<EdgeEdge>>() => T;
+  aggregate: <T = AggregateEdgePromise>() => T;
+}
+
+export interface EdgeConnectionSubscription
+  extends Promise<AsyncIterator<EdgeConnection>>,
+    Fragmentable {
+  pageInfo: <T = PageInfoSubscription>() => T;
+  edges: <T = Promise<AsyncIterator<EdgeEdgeSubscription>>>() => T;
+  aggregate: <T = AggregateEdgeSubscription>() => T;
+}
+
+export interface NodeTypePreviousValues {
+  id: ID_Output;
+  type: String;
+}
+
+export interface NodeTypePreviousValuesPromise
+  extends Promise<NodeTypePreviousValues>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  type: () => Promise<String>;
+}
+
+export interface NodeTypePreviousValuesSubscription
+  extends Promise<AsyncIterator<NodeTypePreviousValues>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  type: () => Promise<AsyncIterator<String>>;
+}
+
+export interface QuestionOptionPreviousValues {
+  id: ID_Output;
+  value: String;
+  publicValue?: String;
+}
+
+export interface QuestionOptionPreviousValuesPromise
+  extends Promise<QuestionOptionPreviousValues>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  value: () => Promise<String>;
+  publicValue: () => Promise<String>;
+}
+
+export interface QuestionOptionPreviousValuesSubscription
+  extends Promise<AsyncIterator<QuestionOptionPreviousValues>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  value: () => Promise<AsyncIterator<String>>;
+  publicValue: () => Promise<AsyncIterator<String>>;
+}
+
+export interface AggregateCustomer {
+  count: Int;
+}
+
+export interface AggregateCustomerPromise
+  extends Promise<AggregateCustomer>,
+    Fragmentable {
+  count: () => Promise<Int>;
+}
+
+export interface AggregateCustomerSubscription
+  extends Promise<AsyncIterator<AggregateCustomer>>,
+    Fragmentable {
+  count: () => Promise<AsyncIterator<Int>>;
+}
+
+export interface AggregateQuestionOption {
+  count: Int;
+}
+
+export interface AggregateQuestionOptionPromise
+  extends Promise<AggregateQuestionOption>,
+    Fragmentable {
+  count: () => Promise<Int>;
+}
+
+export interface AggregateQuestionOptionSubscription
+  extends Promise<AsyncIterator<AggregateQuestionOption>>,
+    Fragmentable {
+  count: () => Promise<AsyncIterator<Int>>;
+}
+
+export interface QuestionConditionSubscriptionPayload {
+  mutation: MutationType;
+  node: QuestionCondition;
+  updatedFields: String[];
+  previousValues: QuestionConditionPreviousValues;
+}
+
+export interface QuestionConditionSubscriptionPayloadPromise
+  extends Promise<QuestionConditionSubscriptionPayload>,
+    Fragmentable {
+  mutation: () => Promise<MutationType>;
+  node: <T = QuestionConditionPromise>() => T;
+  updatedFields: () => Promise<String[]>;
+  previousValues: <T = QuestionConditionPreviousValuesPromise>() => T;
+}
+
+export interface QuestionConditionSubscriptionPayloadSubscription
+  extends Promise<AsyncIterator<QuestionConditionSubscriptionPayload>>,
+    Fragmentable {
+  mutation: () => Promise<AsyncIterator<MutationType>>;
+  node: <T = QuestionConditionSubscription>() => T;
+  updatedFields: () => Promise<AsyncIterator<String[]>>;
+  previousValues: <T = QuestionConditionPreviousValuesSubscription>() => T;
+}
+
+export interface LeafNodeEdge {
+  node: LeafNode;
+  cursor: String;
+}
+
+export interface LeafNodeEdgePromise
+  extends Promise<LeafNodeEdge>,
+    Fragmentable {
+  node: <T = LeafNodePromise>() => T;
+  cursor: () => Promise<String>;
+}
+
+export interface LeafNodeEdgeSubscription
+  extends Promise<AsyncIterator<LeafNodeEdge>>,
+    Fragmentable {
+  node: <T = LeafNodeSubscription>() => T;
+  cursor: () => Promise<AsyncIterator<String>>;
+}
+
+export interface AggregateEdge {
+  count: Int;
+}
+
+export interface AggregateEdgePromise
+  extends Promise<AggregateEdge>,
+    Fragmentable {
+  count: () => Promise<Int>;
+}
+
+export interface AggregateEdgeSubscription
+  extends Promise<AsyncIterator<AggregateEdge>>,
     Fragmentable {
   count: () => Promise<AsyncIterator<Int>>;
 }
@@ -3872,87 +4239,86 @@ export interface QuestionConditionPreviousValuesSubscription
   matchValue: () => Promise<AsyncIterator<String>>;
 }
 
-export interface AggregateLeafNode {
+export interface Customer {
+  id: ID_Output;
+  name: String;
+}
+
+export interface CustomerPromise extends Promise<Customer>, Fragmentable {
+  id: () => Promise<ID_Output>;
+  name: () => Promise<String>;
+  settings: <T = CustomerSettingsPromise>() => T;
+}
+
+export interface CustomerSubscription
+  extends Promise<AsyncIterator<Customer>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  name: () => Promise<AsyncIterator<String>>;
+  settings: <T = CustomerSettingsSubscription>() => T;
+}
+
+export interface CustomerNullablePromise
+  extends Promise<Customer | null>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  name: () => Promise<String>;
+  settings: <T = CustomerSettingsPromise>() => T;
+}
+
+export interface AggregateFontSettings {
   count: Int;
 }
 
-export interface AggregateLeafNodePromise
-  extends Promise<AggregateLeafNode>,
+export interface AggregateFontSettingsPromise
+  extends Promise<AggregateFontSettings>,
     Fragmentable {
   count: () => Promise<Int>;
 }
 
-export interface AggregateLeafNodeSubscription
-  extends Promise<AsyncIterator<AggregateLeafNode>>,
+export interface AggregateFontSettingsSubscription
+  extends Promise<AsyncIterator<AggregateFontSettings>>,
     Fragmentable {
   count: () => Promise<AsyncIterator<Int>>;
 }
 
-export interface QuestionConditionEdge {
-  node: QuestionCondition;
+export interface QuestionNodeEdge {
+  node: QuestionNode;
   cursor: String;
 }
 
-export interface QuestionConditionEdgePromise
-  extends Promise<QuestionConditionEdge>,
+export interface QuestionNodeEdgePromise
+  extends Promise<QuestionNodeEdge>,
     Fragmentable {
-  node: <T = QuestionConditionPromise>() => T;
+  node: <T = QuestionNodePromise>() => T;
   cursor: () => Promise<String>;
 }
 
-export interface QuestionConditionEdgeSubscription
-  extends Promise<AsyncIterator<QuestionConditionEdge>>,
+export interface QuestionNodeEdgeSubscription
+  extends Promise<AsyncIterator<QuestionNodeEdge>>,
     Fragmentable {
-  node: <T = QuestionConditionSubscription>() => T;
+  node: <T = QuestionNodeSubscription>() => T;
   cursor: () => Promise<AsyncIterator<String>>;
 }
 
-export interface QuestionOptionConnection {
-  pageInfo: PageInfo;
-  edges: QuestionOptionEdge[];
+export interface QuestionnaireEdge {
+  node: Questionnaire;
+  cursor: String;
 }
 
-export interface QuestionOptionConnectionPromise
-  extends Promise<QuestionOptionConnection>,
+export interface QuestionnaireEdgePromise
+  extends Promise<QuestionnaireEdge>,
     Fragmentable {
-  pageInfo: <T = PageInfoPromise>() => T;
-  edges: <T = FragmentableArray<QuestionOptionEdge>>() => T;
-  aggregate: <T = AggregateQuestionOptionPromise>() => T;
+  node: <T = QuestionnairePromise>() => T;
+  cursor: () => Promise<String>;
 }
 
-export interface QuestionOptionConnectionSubscription
-  extends Promise<AsyncIterator<QuestionOptionConnection>>,
+export interface QuestionnaireEdgeSubscription
+  extends Promise<AsyncIterator<QuestionnaireEdge>>,
     Fragmentable {
-  pageInfo: <T = PageInfoSubscription>() => T;
-  edges: <T = Promise<AsyncIterator<QuestionOptionEdgeSubscription>>>() => T;
-  aggregate: <T = AggregateQuestionOptionSubscription>() => T;
+  node: <T = QuestionnaireSubscription>() => T;
+  cursor: () => Promise<AsyncIterator<String>>;
 }
-
-export interface NodeType {
-  id: ID_Output;
-  type: String;
-}
-
-export interface NodeTypePromise extends Promise<NodeType>, Fragmentable {
-  id: () => Promise<ID_Output>;
-  type: () => Promise<String>;
-}
-
-export interface NodeTypeSubscription
-  extends Promise<AsyncIterator<NodeType>>,
-    Fragmentable {
-  id: () => Promise<AsyncIterator<ID_Output>>;
-  type: () => Promise<AsyncIterator<String>>;
-}
-
-export interface NodeTypeNullablePromise
-  extends Promise<NodeType | null>,
-    Fragmentable {
-  id: () => Promise<ID_Output>;
-  type: () => Promise<String>;
-}
-
-export type Long = string;
 
 /*
 DateTime scalar input type, allowing Date
@@ -3963,6 +4329,8 @@ export type DateTimeInput = Date | string;
 DateTime scalar output type, which is always a string
 */
 export type DateTimeOutput = string;
+
+export type Long = string;
 
 /*
 The `Int` scalar type represents non-fractional signed whole numeric values. Int can represent values between -(2^31) and 2^31 - 1.
@@ -4032,6 +4400,10 @@ export const models: Model[] = [
   },
   {
     name: "LeafNode",
+    embedded: false
+  },
+  {
+    name: "Edge",
     embedded: false
   }
 ];

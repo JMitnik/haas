@@ -11,6 +11,7 @@ datamodel:
   - src/models/question/QuestionType.prisma
   - src/models/question/Question.prisma
   - src/models/leaves/LeafNode.prisma
+  - src/models/edge/edge.prisma
 
 generate:
   #  Generate the client to use for the API
