@@ -15,6 +15,12 @@ export const GET_QUESTION_NODE = gql`
 
     edgeChildren {
       id
+      conditions {
+        conditionType
+        matchValue
+        renderMin
+        renderMax
+      }
 
       parentNode {
         id
@@ -23,23 +29,7 @@ export const GET_QUESTION_NODE = gql`
 
       childNode {
         id
-        title
-
-        questionType {
-          type
-        }
-
-        options {
-          value
-        }
-
-        conditions {
-          conditionType
-          renderMin
-          renderMax
-          matchValue
-        }
-    
+        title    
       }
     }
 
@@ -48,62 +38,6 @@ export const GET_QUESTION_NODE = gql`
         publicValue
     }
 
-    conditions {
-      conditionType
-      matchValue
-      renderMin
-      renderMax
-    }
-    # Potential remove
-    # children {
-    # id
-    # title
-    # questionType {
-    #     type
-    # }
-
-    # edgeChildren {
-      
-    #   parentNode {
-    #     id
-    #     title
-    #   }
-      
-    #   childNode {
-    #     id
-    #     title
-    #     questionType {
-    #       type
-    #     }
-        
-    #     options {
-    #       value
-    #     }
-        
-    #     conditions {
-    #       conditionType
-    #       renderMin
-    #       renderMax
-    #       matchValue
-    #     }
-      
-    #   }
-    # }
-    
-    # options {
-    #     value
-    #     publicValue
-    # }
-    
-    # conditions {
-    #   conditionType
-    #   matchValue
-    #   renderMin
-    #   renderMax
-    # }
-
-    # }
-    # Potential remove
   }
 }
     `

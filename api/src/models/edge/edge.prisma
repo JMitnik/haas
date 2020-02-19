@@ -2,6 +2,7 @@ type Edge {
     id: ID! @id
     createdAt: DateTime! @createdAt
     updatedAt: DateTime! @updatedAt 
+    conditions: [QuestionCondition]
     parentNode: QuestionNode @relation (link: INLINE, name: "EdgeParentRelation")
     childNode: QuestionNode @relation (link: INLINE, name: "EdgeChildRelation")
 }

@@ -1,11 +1,6 @@
 import React, { useState, useContext, ReactNode, useEffect, useCallback } from 'react';
 import client from '../ApolloClient'
-import { useQuery } from '@apollo/react-hooks';
-import gql from 'graphql-tag';
 import { GET_QUESTION_NODE } from '../queries/getQuestionNode';
-
-
-
 
 export interface HAASNodeConditions {
   renderMin?: number;
@@ -29,6 +24,7 @@ export interface Edge {
   id: string;
   parentNode: HAASNode;
   childNode: HAASNode;
+  conditions: [HAASNodeConditions];
 }
 
 export interface HAASNode {
@@ -56,17 +52,17 @@ interface HAASRouterParams {
 const findNextEdge = (parent: HAASNode, key: string | number) => {
   const candidates = parent?.edgeChildren?.filter(edge => {
     if (parent.questionType.type === 'slider') {
-      if (edge?.childNode?.conditions?.[0].renderMin && key < edge?.childNode?.conditions?.[0].renderMin) {
+      if (edge?.conditions?.[0].renderMin && key < edge?.conditions?.[0].renderMin) {
         return false;
       }
 
-      if (edge?.childNode?.conditions?.[0].renderMax && key > edge?.childNode?.conditions?.[0].renderMax) {
+      if (edge?.conditions?.[0].renderMax && key > edge?.conditions?.[0].renderMax) {
         return false;
       }
     }
 
     if (parent.questionType.type === 'multi-choice') {
-      return edge.childNode?.conditions?.[0].matchValue === key;
+      return edge.conditions?.[0].matchValue === key;
     }
 
     return true;
@@ -81,7 +77,6 @@ const findLeafNode = (collection: HAASNode[], key: number) => collection.filter(
 export const JSONTreeContext = React.createContext({} as JSONTreeContextProps);
 
 export const JSONTreeProvider = ({ json, children }: { json: any, children: ReactNode }) => {
-
   const [activeLeafNodeId, setActiveLeafNodeID] = useState(0);
 
   const [historyStack, setHistoryStack] = useState<HAASNode[]>(json.questionnaire);

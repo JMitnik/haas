@@ -773,6 +773,7 @@ type Edge {
   id: ID!
   createdAt: DateTime!
   updatedAt: DateTime!
+  conditions(where: QuestionConditionWhereInput, orderBy: QuestionConditionOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [QuestionCondition!]
   parentNode: QuestionNode
   childNode: QuestionNode
 }
@@ -785,6 +786,7 @@ type EdgeConnection {
 
 input EdgeCreateInput {
   id: ID
+  conditions: QuestionConditionCreateManyInput
   parentNode: QuestionNodeCreateOneInput
   childNode: QuestionNodeCreateOneInput
 }
@@ -869,11 +871,13 @@ input EdgeSubscriptionWhereInput {
 }
 
 input EdgeUpdateDataInput {
+  conditions: QuestionConditionUpdateManyInput
   parentNode: QuestionNodeUpdateOneInput
   childNode: QuestionNodeUpdateOneInput
 }
 
 input EdgeUpdateInput {
+  conditions: QuestionConditionUpdateManyInput
   parentNode: QuestionNodeUpdateOneInput
   childNode: QuestionNodeUpdateOneInput
 }
@@ -931,6 +935,9 @@ input EdgeWhereInput {
   updatedAt_lte: DateTime
   updatedAt_gt: DateTime
   updatedAt_gte: DateTime
+  conditions_every: QuestionConditionWhereInput
+  conditions_some: QuestionConditionWhereInput
+  conditions_none: QuestionConditionWhereInput
   parentNode: QuestionNodeWhereInput
   childNode: QuestionNodeWhereInput
   AND: [EdgeWhereInput!]
