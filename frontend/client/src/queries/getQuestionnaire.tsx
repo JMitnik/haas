@@ -2,8 +2,8 @@
 import gql from 'graphql-tag';
 
 export const GET_QUESTIONNAIRE = gql`
-      query getQuestionnaire ($id: ID) {
-        questionnaire(where: {
+  query getQuestionnaire ($id: ID) {
+    questionnaire(where: {
     id: $id
   }) {
     id
