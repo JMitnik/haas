@@ -28,8 +28,9 @@ const serverOptions: Options = {
 };
 
 const startServer = () => {
-  server.start(serverOptions, ({ port }) => {
+  server.start(serverOptions, ({ port, cors }) => {
     console.log(`Starting server on port ${port}`);
+    console.log(`Running with cors: ${cors}`);
   }).then(() => {
     console.log(`Running with port: ${serverOptions.port}!, endpoint: ${serverOptions.endpoint}`);
   });
