@@ -20,7 +20,7 @@ const serverOptions: Options = {
   endpoint: config.ENDPOINT,
   cors: {
     credentials: true,
-    origin: config.FRONTEND_URL,
+    origin: /haas-client.netlify\.com/,
   },
 };
 
