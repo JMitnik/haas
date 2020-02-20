@@ -20,7 +20,7 @@ const serverOptions: Options = {
   endpoint: config.ENDPOINT,
   cors: {
     credentials: true,
-    origin: [config.FRONTEND_URL],
+    origin: false,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     preflightContinue: false,
     optionsSuccessStatus: 204,
