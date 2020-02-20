@@ -15,15 +15,11 @@ export const GET_QUESTIONNAIRE = gql`
       id
       title
       overrideLeafId
-      questionType {
-        type
-      }
+      questionType
       children {
         id
         title
-        questionType {
-        type
-      	}
+        questionType
         overrideLeafId
         conditions {
           id
@@ -39,9 +35,7 @@ export const GET_QUESTIONNAIRE = gql`
           id
           overrideLeafId
           title
-          questionType {
-        		type
-      		}
+          questionType
           options {
             value
             publicValue
@@ -56,9 +50,7 @@ export const GET_QUESTIONNAIRE = gql`
           	id
             overrideLeafId
             title
-            questionType {
-        			type
-      			}
+            questionType
             options {
               value
               publicValue

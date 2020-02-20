@@ -4,7 +4,8 @@ import { HttpLink } from 'apollo-link-http';
 
 const cache = new InMemoryCache();
 const link = new HttpLink({
-  uri: process.env.REACT_APP_API_ENDPOINT || 'http://localhost:4000/graphql'
+  uri: process.env.REACT_APP_API_ENDPOINT || 'http://localhost:4000/graphql',
+  fetchOptions:
 });
 
 // TODO: REMOVE!
@@ -12,7 +13,7 @@ console.log(process.env);
 
 const client: ApolloClient<NormalizedCacheObject> = new ApolloClient({
   cache,
-  link
+  link,
 });
 
 export default client;
