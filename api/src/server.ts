@@ -18,6 +18,13 @@ const server: GraphQLServer = new GraphQLServer({
 const serverOptions: Options = {
   port: config.APP_PORT,
   endpoint: config.ENDPOINT,
+  cors: {
+    credentials: true,
+    origin: [config.FRONTEND_URL],
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    preflightContinue: false,
+    optionsSuccessStatus: 204,
+  },
 };
 
 const startServer = () => {
