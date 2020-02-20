@@ -20,17 +20,15 @@ const serverOptions: Options = {
   endpoint: config.ENDPOINT,
   cors: {
     credentials: true,
-    origin: false,
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    preflightContinue: false,
-    optionsSuccessStatus: 204,
+    origin: config.FRONTEND_URL,
   },
 };
 
 const startServer = () => {
   server.start(serverOptions, ({ port, cors }) => {
     console.log(`Starting server on port ${port}`);
-    console.log(`Running with cors: ${cors}`);
+    console.log(`Running with cors for origin: ${cors && cors.origin}`);
+    console.log(`URL for FRONTEND is here: ${config.FRONTEND_URL}`);
   }).then(() => {
     console.log(`Running with port: ${serverOptions.port}!, endpoint: ${serverOptions.endpoint}`);
   });
