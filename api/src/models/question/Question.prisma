@@ -1,7 +1,22 @@
+type QuestionCondition {
+    id: ID! @id
+    conditionType: String!
+    renderMin: Int
+    renderMax: Int
+    matchValue: String
+}
+
+type QuestionOption {
+    id: ID! @id
+    value: String!
+    publicValue: String
+}
+
 type QuestionNode {
     id: ID! @id
     title: String!
     branchVal: String
+    isRoot: Boolean! @default(value: false)
     questionType: NodeType!
     overrideLeafId: Int
     conditions: [QuestionCondition]

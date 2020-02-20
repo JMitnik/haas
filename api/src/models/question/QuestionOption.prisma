@@ -1,5 +1,0 @@
-type QuestionOption {
-    id: ID! @id
-    value: String!
-    publicValue: String
-}
