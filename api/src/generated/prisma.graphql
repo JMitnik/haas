@@ -961,6 +961,11 @@ input LeafNodeCreateInput {
   title: String!
 }
 
+input LeafNodeCreateOneInput {
+  create: LeafNodeCreateInput
+  connect: LeafNodeWhereUniqueInput
+}
+
 type LeafNodeEdge {
   node: LeafNode!
   cursor: String!
@@ -1002,6 +1007,12 @@ input LeafNodeSubscriptionWhereInput {
   NOT: [LeafNodeSubscriptionWhereInput!]
 }
 
+input LeafNodeUpdateDataInput {
+  nodeId: Int
+  type: NodeType
+  title: String
+}
+
 input LeafNodeUpdateInput {
   nodeId: Int
   type: NodeType
@@ -1012,6 +1023,20 @@ input LeafNodeUpdateManyMutationInput {
   nodeId: Int
   type: NodeType
   title: String
+}
+
+input LeafNodeUpdateOneInput {
+  create: LeafNodeCreateInput
+  update: LeafNodeUpdateDataInput
+  upsert: LeafNodeUpsertNestedInput
+  delete: Boolean
+  disconnect: Boolean
+  connect: LeafNodeWhereUniqueInput
+}
+
+input LeafNodeUpsertNestedInput {
+  update: LeafNodeUpdateDataInput!
+  create: LeafNodeCreateInput!
 }
 
 input LeafNodeWhereInput {
@@ -1447,6 +1472,7 @@ type Questionnaire {
   publicTitle: String
   creationDate: DateTime!
   updatedAt: DateTime
+  defaultLeafNode: LeafNode
   questions(where: QuestionNodeWhereInput, orderBy: QuestionNodeOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [QuestionNode!]
 }
 
@@ -1462,6 +1488,7 @@ input QuestionnaireCreateInput {
   title: String!
   description: String!
   publicTitle: String
+  defaultLeafNode: LeafNodeCreateOneInput
   questions: QuestionNodeCreateManyInput
 }
 
@@ -1517,6 +1544,7 @@ input QuestionnaireUpdateInput {
   title: String
   description: String
   publicTitle: String
+  defaultLeafNode: LeafNodeUpdateOneInput
   questions: QuestionNodeUpdateManyInput
 }
 
@@ -1600,6 +1628,7 @@ input QuestionnaireWhereInput {
   updatedAt_lte: DateTime
   updatedAt_gt: DateTime
   updatedAt_gte: DateTime
+  defaultLeafNode: LeafNodeWhereInput
   questions_every: QuestionNodeWhereInput
   questions_some: QuestionNodeWhereInput
   questions_none: QuestionNodeWhereInput
@@ -1618,7 +1647,7 @@ type QuestionNode {
   branchVal: String
   isRoot: Boolean!
   questionType: NodeType!
-  overrideLeafId: Int
+  overrideLeaf: LeafNode
   conditions(where: QuestionConditionWhereInput, orderBy: QuestionConditionOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [QuestionCondition!]
   options(where: QuestionOptionWhereInput, orderBy: QuestionOptionOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [QuestionOption!]
   children(where: QuestionNodeWhereInput, orderBy: QuestionNodeOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [QuestionNode!]
@@ -1636,7 +1665,7 @@ input QuestionNodeCreateInput {
   branchVal: String
   isRoot: Boolean
   questionType: NodeType!
-  overrideLeafId: Int
+  overrideLeaf: LeafNodeCreateOneInput
   conditions: QuestionConditionCreateManyInput
   options: QuestionOptionCreateManyInput
   children: QuestionNodeCreateManyInput
@@ -1663,8 +1692,6 @@ enum QuestionNodeOrderByInput {
   isRoot_DESC
   questionType_ASC
   questionType_DESC
-  overrideLeafId_ASC
-  overrideLeafId_DESC
 }
 
 type QuestionNodePreviousValues {
@@ -1673,7 +1700,6 @@ type QuestionNodePreviousValues {
   branchVal: String
   isRoot: Boolean!
   questionType: NodeType!
-  overrideLeafId: Int
 }
 
 input QuestionNodeScalarWhereInput {
@@ -1725,14 +1751,6 @@ input QuestionNodeScalarWhereInput {
   questionType_not: NodeType
   questionType_in: [NodeType!]
   questionType_not_in: [NodeType!]
-  overrideLeafId: Int
-  overrideLeafId_not: Int
-  overrideLeafId_in: [Int!]
-  overrideLeafId_not_in: [Int!]
-  overrideLeafId_lt: Int
-  overrideLeafId_lte: Int
-  overrideLeafId_gt: Int
-  overrideLeafId_gte: Int
   AND: [QuestionNodeScalarWhereInput!]
   OR: [QuestionNodeScalarWhereInput!]
   NOT: [QuestionNodeScalarWhereInput!]
@@ -1761,7 +1779,7 @@ input QuestionNodeUpdateDataInput {
   branchVal: String
   isRoot: Boolean
   questionType: NodeType
-  overrideLeafId: Int
+  overrideLeaf: LeafNodeUpdateOneInput
   conditions: QuestionConditionUpdateManyInput
   options: QuestionOptionUpdateManyInput
   children: QuestionNodeUpdateManyInput
@@ -1772,7 +1790,7 @@ input QuestionNodeUpdateInput {
   branchVal: String
   isRoot: Boolean
   questionType: NodeType
-  overrideLeafId: Int
+  overrideLeaf: LeafNodeUpdateOneInput
   conditions: QuestionConditionUpdateManyInput
   options: QuestionOptionUpdateManyInput
   children: QuestionNodeUpdateManyInput
@@ -1783,7 +1801,6 @@ input QuestionNodeUpdateManyDataInput {
   branchVal: String
   isRoot: Boolean
   questionType: NodeType
-  overrideLeafId: Int
 }
 
 input QuestionNodeUpdateManyInput {
@@ -1803,7 +1820,6 @@ input QuestionNodeUpdateManyMutationInput {
   branchVal: String
   isRoot: Boolean
   questionType: NodeType
-  overrideLeafId: Int
 }
 
 input QuestionNodeUpdateManyWithWhereNestedInput {
@@ -1871,14 +1887,7 @@ input QuestionNodeWhereInput {
   questionType_not: NodeType
   questionType_in: [NodeType!]
   questionType_not_in: [NodeType!]
-  overrideLeafId: Int
-  overrideLeafId_not: Int
-  overrideLeafId_in: [Int!]
-  overrideLeafId_not_in: [Int!]
-  overrideLeafId_lt: Int
-  overrideLeafId_lte: Int
-  overrideLeafId_gt: Int
-  overrideLeafId_gte: Int
+  overrideLeaf: LeafNodeWhereInput
   conditions_every: QuestionConditionWhereInput
   conditions_some: QuestionConditionWhereInput
   conditions_none: QuestionConditionWhereInput

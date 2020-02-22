@@ -1,6 +1,7 @@
 require('dotenv').config();
 
 const config: any = {
+  ENVIRONMENT: process.env.ENVIRONMENT || 'local',
   APP_PORT: process.env.PORT,
   FRONTEND_URL: process.env.FRONTEND_URL,
   ENDPOINT: process.env.APP_ENDPOINT || '/graphql',
@@ -10,6 +11,5 @@ const config: any = {
   PATH_TO_PRISMA_GENERATED_SCHEMA:
     process.env.PATH_TO_PRISMA_GENERATED_SCHEMA || './src/generated/prisma.graphql',
 };
-
 
 export default config;

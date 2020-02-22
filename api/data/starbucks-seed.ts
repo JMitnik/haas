@@ -11,7 +11,7 @@ const registrationType: NodeType = 'REGISTRATION';
 const standardSubChildren = [
   {
     title: 'What exactly did you like about facilities?',
-    overrideLeafId: 1,
+    overrideLeafContains: 'Instagram',
     type: multiChoiceType,
     relatedOptionValue: 'Facilities',
     childrenNodes: [
@@ -23,7 +23,7 @@ const standardSubChildren = [
   },
   {
     title: 'What exactly did you like about the website?',
-    overrideLeafId: 2,
+    overrideLeafContains: 'newsletter',
     type: multiChoiceType,
     relatedOptionValue: 'Website/Mobile app',
     childrenNodes: [
@@ -35,7 +35,7 @@ const standardSubChildren = [
   },
   {
     title: 'What exactly did you like about the product?',
-    overrideLeafId: 3,
+    overrideLeafContains: 'see you soon',
     type: multiChoiceType,
     relatedOptionValue: 'Product / Services',
     childrenNodes: [
@@ -47,7 +47,7 @@ const standardSubChildren = [
   },
   {
     title: 'What exactly did you like about the customer support?',
-    overrideLeafId: 4,
+    overrideLeafContains: 'team is on it',
     type: multiChoiceType,
     relatedOptionValue: 'Customer Support',
     childrenNodes: [
@@ -63,7 +63,7 @@ const standardRootChildren = [
   {
     title: 'What did you like?',
     questionType: multiChoiceType,
-    overrideLeafId: 2,
+    overrideLeafContains: 'Instagram',
     conditions: {
       renderMin: 7,
       renderMax: 10,
@@ -94,10 +94,6 @@ const standardRootChildren = [
 ];
 
 const leafNodes = [
-  {
-    title: 'Thank you for your feedback. Follow us on Instagram and stay updated.',
-    type: socialShareType,
-  },
   {
     title: 'We are happy about your positive feedback. You matter to us! Leave your email below to receive our newsletter.',
     type: textboxType,
@@ -188,11 +184,54 @@ const main = async () => {
     },
   });
 
+  const standardSubChildrenWithLeafs = await Promise.all(standardSubChildren.map(async (rootChild) => {
+    const leafs = await prisma.leafNodes({
+      where: {
+        title_contains: rootChild.overrideLeafContains,
+      },
+    });
+
+    let leaf = null;
+
+    if (leafs) {
+      [leaf] = leafs;
+    }
+
+    return {
+      ...rootChild,
+      overrideLeaf: leaf,
+    };
+  }));
+
+  const standardRootChildrenWithLeafs = await Promise.all(standardRootChildren.map(async (rootChild) => {
+    const leafs = await prisma.leafNodes({
+      where: {
+        title_contains: rootChild.overrideLeafContains,
+      },
+    });
+
+    let leaf = null;
+
+    if (leafs) {
+      [leaf] = leafs;
+    }
+
+    return {
+      ...rootChild,
+      overrideLeaf: leaf,
+      children: standardSubChildrenWithLeafs,
+    };
+  }));
+
   // Create root-questions
-  const rootQuestions = await Promise.all(standardRootChildren.map(async (childNode) => prisma.createQuestionNode({
+  const rootQuestions = await Promise.all(standardRootChildrenWithLeafs.map(async (childNode) => prisma.createQuestionNode({
     title: childNode.title,
     questionType: childNode.questionType,
-    overrideLeafId: childNode.overrideLeafId,
+    overrideLeaf: {
+      connect: {
+        id: childNode.overrideLeaf?.id,
+      },
+    },
     conditions: {
       create: {
         conditionType: 'valueBoundary',
@@ -207,7 +246,11 @@ const main = async () => {
       create: childNode.children.map((child) => ({
         title: child.title,
         questionType: child.type,
-        overrideLeafId: child.overrideLeafId,
+        overrideLeaf: {
+          connect: {
+            id: child.overrideLeaf?.id,
+          },
+        },
         conditions: {
           create: {
             conditionType: 'match',

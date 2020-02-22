@@ -7,8 +7,8 @@ import { GET_SHALLOW_QUESTIONNAIRE_INFO } from './queries/getShallowQuestionnair
 export const StudySelector = ({ sendCurrentStudyToParent } : { sendCurrentStudyToParent: any }) => {
     const {data, loading, error} = useQuery<any>(GET_SHALLOW_QUESTIONNAIRE_INFO);
 
-    if (loading) return <div>'Loading...'</div>;
-    if (error) return <div>{'Error!' + error.message}</div>;
+    // if (loading) return <div>'Loading...'</div>;
+    // if (error) return <div>{'Error!' + error.message}</div>;
 
     return (
         <Div useFlex flexDirection='column' justifyContent='space-between' height={['100vh', '80vh']}>
@@ -21,7 +21,9 @@ export const StudySelector = ({ sendCurrentStudyToParent } : { sendCurrentStudyT
     )
 }
 
-const TopicCard = ({ questionnaire, sendCurrentStudyToParent }: { questionnaire: any, sendCurrentStudyToParent: any }) => (
+const TopicCard = ({ questionnaire, sendCurrentStudyToParent }: { questionnaire: any, sendCurrentStudyToParent: any }) => {
+
+  return (
     <Card useFlex flexDirection="column" onClick={() => sendCurrentStudyToParent(questionnaire.id)}>
       <CardBody flex="100%">
         <Flex alignItems="center" justifyContent="space-between">
@@ -32,3 +34,4 @@ const TopicCard = ({ questionnaire, sendCurrentStudyToParent }: { questionnaire:
       </CardBody>
     </Card>
   );
+};
