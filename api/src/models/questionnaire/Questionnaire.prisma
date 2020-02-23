@@ -1,0 +1,11 @@
+type Questionnaire {
+    id: ID! @id
+    customer: Customer! @relation(link: INLINE)
+    title: String!
+    description: String!
+    publicTitle: String
+    creationDate: DateTime! @createdAt
+    updatedAt: DateTime @updatedAt
+    defaultLeafNode: LeafNode
+    questions: [QuestionNode]
+}

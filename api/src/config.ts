@@ -1,7 +1,9 @@
 require('dotenv').config();
 
 const config: any = {
+  ENVIRONMENT: process.env.ENVIRONMENT || 'local',
   APP_PORT: process.env.PORT,
+  FRONTEND_URL: process.env.FRONTEND_URL,
   ENDPOINT: process.env.APP_ENDPOINT || '/graphql',
   PRISMA_ENDPOINT: process.env.PRISMA_ENDPOINT || 'http://localhost:4466',
   APP_SECRET: process.env.APP_SECRET,

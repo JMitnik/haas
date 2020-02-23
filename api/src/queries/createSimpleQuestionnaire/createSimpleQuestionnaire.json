@@ -1,0 +1,12 @@
+{
+    "data": {
+        "title": "<TITLE_OF_QUESTIONNAIRE>",
+        "description": "<DESCRIPTION_OF_QUESTIONNAIR>",
+        "customer": {
+            "connect": {
+                "id": "<ID_OF_CUSTOMER>"
+            }
+        },
+        "questions": {}
+    }
+}

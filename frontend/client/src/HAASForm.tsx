@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 import { H1, Div } from '@haas/ui';
 import { useJSONTree } from './hooks/use-json-tree';
 import { useTransition, animated } from 'react-spring';
@@ -10,7 +10,6 @@ import { HAASSignIn } from './components/HAASSignIn';
 
 export const HAASForm = () => {
   const { historyStack } = useJSONTree();
-
   const activeNode = historyStack.slice(-1)[0];
 
   const transitions = useTransition(activeNode, (activeNode) => activeNode?.id, {
@@ -45,19 +44,17 @@ export const HAASForm = () => {
   );
 };
 
-HAASForm.whyDidYouRender = true;
-
 const renderNextNode = (node: any) => {
-  let nodeType = node.type;
+  let nodeType = node.questionType || node.questionType.type || node.type?.type || '';
   const Component: React.ReactNode | undefined = nodeMap.get(nodeType);
 
   return Component || <HAASTextBox />
 }
 
 const nodeMap = new Map([
-  ['slider', <HAASSlider />],
-  ['multi-choice', <HAASMultiChoice />],
-  ['social-share', <HAASSocialShare />],
-  ['textbox', <HAASTextBox />],
-  ['registration', <HAASSignIn />]
+  ['SLIDER', <HAASSlider />],
+  ['MULTI_CHOICE', <HAASMultiChoice />],
+  ['SOCIAL_SHARE', <HAASSocialShare />],
+  ['TEXTBOX', <HAASTextBox />],
+  ['REGISTRATION', <HAASSignIn />]
 ]);
