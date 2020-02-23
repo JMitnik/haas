@@ -80,7 +80,6 @@ export const JSONTreeProvider = ({ json, children }: { json: any, children: Reac
 
     if (!nextNode) {
       nextNode = findLeafNode(leafCollection, activeLeafNodeId);
-      console.log('Leaf node: ', nextNode)
     }
 
     setHistoryStack(hist => [...hist, nextNode]);
