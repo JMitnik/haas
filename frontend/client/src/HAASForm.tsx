@@ -12,6 +12,8 @@ export const HAASForm = () => {
   const { historyStack } = useJSONTree();
   const activeNode = historyStack.slice(-1)[0];
 
+  console.log(activeNode);
+
   const transitions = useTransition(activeNode, (activeNode) => activeNode?.id, {
     from: { opacity: 0, transform: 'scale(1.1)' },
     enter: { opacity: 1, transform: 'scale(1)' },
@@ -45,7 +47,7 @@ export const HAASForm = () => {
 };
 
 const renderNextNode = (node: any) => {
-  let nodeType = node.questionType || node.questionType.type || node.type?.type || '';
+  let nodeType = node.questionType || node.questionType?.type || node.type?.type || '';
   const Component: React.ReactNode | undefined = nodeMap.get(nodeType);
 
   return Component || <HAASTextBox />

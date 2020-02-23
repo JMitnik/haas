@@ -62,7 +62,7 @@ const findNextNode = (parent: HAASNode, key: string | number) => {
   return candidates && candidates[0];
 };
 
-const findLeafNode = (collection: HAASNode[], key: number) => collection.filter(item => item.nodeId === key)[0];
+const findLeafNode = (collection: HAASNode[], key: number) => collection.filter(item => item.id === key)[0];
 
 export const JSONTreeContext = React.createContext({} as JSONTreeContextProps);
 
