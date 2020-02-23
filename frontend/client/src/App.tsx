@@ -6,7 +6,7 @@ import styled, { css, ThemeProvider } from 'styled-components';
 import theme from './theme';
 import Select from 'react-select';
 import { FormContext, useForm } from 'react-hook-form';
-import { Div } from '@haas/ui';
+import { Div, Loader } from '@haas/ui';
 import { ColumnFlex } from '@haas/ui/src/Container';
 import { JSONTreeProvider } from './hooks/use-json-tree';
 import { HAASForm } from './HAASForm';
@@ -45,7 +45,6 @@ const App: React.FC = () => {
 
   const treeData = { questionnaire: data?.questionnaire?.questions, LeafCollection: leafNodes?.data?.leafNodes };
 
-  if (loading) return <div>'Loading...'</div>;
   if (error) return <div>{'Error!' + error.message}</div>;
 
   return (
@@ -53,14 +52,16 @@ const App: React.FC = () => {
       <ThemeProvider theme={theme}>
         <MainAppScreen>
           <CenteredScreen>
-            <JSONTreeProvider json={treeData}>
-              <FormContext {...form}>
-                <ColumnFlex alignItems="center">
-                  {currStudy && <HAASForm />}
-                  {!currStudy && <StudySelector sendCurrentStudyToParent={getCurrentStudyFromChild}></StudySelector>}
-                </ColumnFlex>
-              </FormContext>
-            </JSONTreeProvider>
+            {loading ? <Loader/> : (
+                <JSONTreeProvider json={treeData}>
+                <FormContext {...form}>
+                  <ColumnFlex alignItems="center">
+                    {currStudy && <HAASForm />}
+                    {!currStudy && <StudySelector sendCurrentStudyToParent={getCurrentStudyFromChild}></StudySelector>}
+                  </ColumnFlex>
+                </FormContext>
+              </JSONTreeProvider>
+            )}
           </CenteredScreen>
         </MainAppScreen>
       </ThemeProvider>
