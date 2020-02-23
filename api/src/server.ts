@@ -18,11 +18,17 @@ const server: GraphQLServer = new GraphQLServer({
 const serverOptions: Options = {
   port: config.APP_PORT,
   endpoint: config.ENDPOINT,
+  cors: {
+    credentials: true,
+    origin: config.FRONTEND_URL,
+  },
 };
 
 const startServer = () => {
-  server.start(serverOptions, ({ port }) => {
+  server.start(serverOptions, ({ port, cors }) => {
     console.log(`Starting server on port ${port}`);
+    console.log(`Running with cors for origin: ${cors && cors.origin}`);
+    console.log(`URL for FRONTEND is here: ${config.FRONTEND_URL}`);
   }).then(() => {
     console.log(`Running with port: ${serverOptions.port}!, endpoint: ${serverOptions.endpoint}`);
   });

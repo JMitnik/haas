@@ -1,7 +1,14 @@
 # Define paths to the different data-models
 datamodel:
-  - src/models/question/question.prisma
-  - src/models/topic/topic.prisma
+  - src/models/nodes/NodeType.prisma
+  - src/models/questionnaire/Questionnaire.prisma
+  - src/models/customer/CustomerSettings.prisma
+  - src/models/settings/ColourSettings.prisma
+  - src/models/settings/FontSettings.prisma
+  - src/models/customer/Customer.prisma
+  - src/models/enums/ConditionType.prisma
+  - src/models/question/Question.prisma
+  - src/models/leaves/LeafNode.prisma
 
 generate:
   #  Generate the client to use for the API
@@ -11,5 +18,8 @@ generate:
   # Generate the same but as *.graphql file to extend in our custom schema.graphql
   - generator: graphql-schema
     output: ./src/generated/prisma.graphql
+
+seed:
+  run: ts-node ./data/${env:STARBUCKS_SEED}.ts
 
 endpoint: ${env:PRISMA_ENDPOINT}

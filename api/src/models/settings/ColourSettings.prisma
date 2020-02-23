@@ -1,0 +1,17 @@
+type ColourSettings {
+    id: ID! @id
+    title: String
+    primary: String!
+    secondary: String!
+    tertiary: String!
+    success: String!
+    warning: String!
+    error: String!
+    lightest: String!
+    light: String!
+    normal: String!
+    dark: String!
+    darkest: String!
+    muted: String!
+    text: String!
+}
