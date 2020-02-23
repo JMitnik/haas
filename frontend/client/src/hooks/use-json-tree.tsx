@@ -25,7 +25,7 @@ export interface HAASNode {
   branchVal?: string;
   conditions?: [HAASNodeConditions];
   questionType: HAASQuestionType;
-  overrideLeafId?: number;
+  overrideLeaf?: HAASNode;
   options?: [MultiChoiceOption];
   children: [HAASNode];
 }
@@ -74,8 +74,8 @@ export const JSONTreeProvider = ({ json, children }: { json: any, children: Reac
 
   const goToChild = (key: string | number) => {
     let nextNode: HAASNode = findNextNode(historyStack.slice(-1)[0], key);
-    if (nextNode && nextNode.overrideLeafId) {
-      setActiveLeafNodeID(nextNode.overrideLeafId);
+    if (nextNode?.overrideLeaf?.id) {
+      setActiveLeafNodeID(nextNode?.overrideLeaf?.id);
     }
 
     if (!nextNode) {

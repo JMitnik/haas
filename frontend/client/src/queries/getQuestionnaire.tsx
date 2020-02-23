@@ -14,13 +14,17 @@ export const GET_QUESTIONNAIRE = gql`
     questions {
       id
       title
-      overrideLeafId
+      overrideLeaf {
+        id
+      }
       questionType
       children {
         id
         title
         questionType
-        overrideLeafId
+        overrideLeaf {
+          id
+        }
         conditions {
           id
           matchValue
@@ -33,7 +37,9 @@ export const GET_QUESTIONNAIRE = gql`
         }
         children {
           id
-          overrideLeafId
+          overrideLeaf {
+            id
+          }
           title
           questionType
           options {
@@ -48,7 +54,9 @@ export const GET_QUESTIONNAIRE = gql`
           }
           children {
           	id
-            overrideLeafId
+            overrideLeaf {
+              id
+            }
             title
             questionType
             options {
