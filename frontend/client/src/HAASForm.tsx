@@ -1,4 +1,5 @@
 import React from 'react';
+import styled, { css } from 'styled-components';
 import { H1, Div } from '@haas/ui';
 import { useJSONTree } from './hooks/use-json-tree';
 import { useTransition, animated } from 'react-spring';
@@ -26,25 +27,34 @@ export const HAASForm = () => {
 
       {transitions.map(({ item, key, props, state }) => {
         if (state !== 'leave') {
-          return <animated.div style={{
-            position: 'absolute',
-            bottom: '100px',
-            left: 0,
-            right: 0,
+          return <Entry style={{
             ...props,
           }} key={key}
           >
             {renderNextNode(item)}
-          </animated.div>
+          </Entry>
         }
-        return null
-
-      }
-
-      )}
+        return null;
+      })}
     </Div>
   );
 };
+
+const Entry = styled(animated.div)`
+  ${({ theme }) => css`
+    position: absolute;
+    left: 0;
+    right: 0;
+
+    @media ${theme.media.mob} {
+      bottom: 30px;
+    }
+
+    @media ${theme.media.desk} {
+      bottom: 100px;
+    }
+  `}
+`;
 
 const renderNextNode = (node: any) => {
   let nodeType = node.questionType || node.questionType?.type || node.type?.type || '';

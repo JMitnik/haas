@@ -22,6 +22,10 @@ export const Button = styled.button<ButtonProps>`
     &:hover {
       transition: all 0.1s ease-in;
     }
+
+    h1, h2, h3, h4, h5 {
+      margin: 0;
+    }
   `}
 
   ${space}

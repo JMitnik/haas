@@ -1,9 +1,6 @@
 import React from 'react';
-import { H1, H5, Slider, Flex, ColumnFlex, Button, Div } from '@haas/ui';
-import { useFormContext } from 'react-hook-form';
-import { useJSONTree, MultiChoiceOption } from '../hooks/use-json-tree';
+import { Flex, Div } from '@haas/ui';
 import { Instagram, Facebook, Twitter, Linkedin } from 'react-feather';
-import { useTransition, animated } from 'react-spring';
 import styled from 'styled-components';
 
 const ShareItem = styled(Div)`

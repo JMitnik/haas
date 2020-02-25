@@ -16,7 +16,7 @@ export const H1 = styled(GenericType).attrs({ as: 'h1' })`
     font-size: ${theme.fontSizes[5]}px;
 
     @media ${theme.media.mob} {
-      font-size: 3rem;
+      font-size: calc(1.5rem + 5vw);
     }
   `}
 `;

@@ -1,17 +1,14 @@
-import React, { useCallback, useState } from 'react';
+import React from 'react';
 import { H1, Div, Card, CardBody, H3, Flex } from '@haas/ui';
 import { useQuery } from '@apollo/react-hooks';
 import { GET_SHALLOW_QUESTIONNAIRE_INFO } from './queries/getShallowQuestionnaireInfo';
 
 
 export const StudySelector = ({ sendCurrentStudyToParent } : { sendCurrentStudyToParent: any }) => {
-    const {data, loading, error} = useQuery<any>(GET_SHALLOW_QUESTIONNAIRE_INFO);
-
-    // if (loading) return <div>'Loading...'</div>;
-    // if (error) return <div>{'Error!' + error.message}</div>;
+    const {data} = useQuery<any>(GET_SHALLOW_QUESTIONNAIRE_INFO);
 
     return (
-        <Div useFlex flexDirection='column' justifyContent='space-between' height={['100vh', '80vh']}>
+        <Div useFlex flexDirection='column' justifyContent='space-between' height='80vh'>
             <H1 textAlign="center" color="white">Questionnaires</H1>
 
             {data?.questionnaires?.map((questionnaire: any) => {
