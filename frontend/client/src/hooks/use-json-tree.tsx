@@ -1,4 +1,4 @@
-import React, { useState, useContext, ReactNode, useEffect, useCallback } from 'react';
+import React, { useState, useContext, ReactNode } from 'react';
 
 export interface HAASNodeConditions {
   renderMin?: number;
@@ -35,9 +35,6 @@ interface JSONTreeContextProps {
   goToChild: (key: string | number) => void;
 }
 
-interface HAASRouterParams {
-  nodeKey: string;
-}
 
 const findNextNode = (parent: HAASNode, key: string | number) => {
   const candidates = parent?.children?.filter(child => {

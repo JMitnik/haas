@@ -1,6 +1,6 @@
 const theme = {
   colors: {
-    primary: '#452f94',
+    primary: '#0059f8',
     secondary: '#4FD1C5',
     tertiary: 'green',
     black: 'black',
@@ -39,6 +39,7 @@ const theme = {
   },
   media: {
     mob: 'only screen and (max-width: 600px)',
+    desk: 'only screen and (min-width: 601px)',
   },
   fontSizes: [12, 16.00, 21.33, 28.43, 37.90, 50.52]
 };

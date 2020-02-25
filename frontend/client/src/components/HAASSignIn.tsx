@@ -1,11 +1,6 @@
 import React from 'react';
-import { H1, H5, Slider, Flex, ColumnFlex, Button, Div } from '@haas/ui';
-import { useFormContext } from 'react-hook-form';
-import { useJSONTree, MultiChoiceOption } from '../hooks/use-json-tree';
-import { Instagram } from 'react-feather';
-import { useTransition, animated } from 'react-spring';
+import { Button } from '@haas/ui';
 import styled, { css } from 'styled-components';
-
 
 const SignInContainer = styled.div`
   ${({ theme }) => css`
