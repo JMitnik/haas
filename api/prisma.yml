@@ -1,14 +1,12 @@
 # Define paths to the different data-models
 datamodel:
   - src/models/nodes/NodeType.prisma
+  - src/models/nodes/LeafNode.prisma
   - src/models/questionnaire/Questionnaire.prisma
-  - src/models/customer/CustomerSettings.prisma
   - src/models/settings/ColourSettings.prisma
   - src/models/settings/FontSettings.prisma
   - src/models/customer/Customer.prisma
-  - src/models/enums/ConditionType.prisma
   - src/models/question/Question.prisma
-  - src/models/leaves/LeafNode.prisma
 
 generate:
   #  Generate the client to use for the API

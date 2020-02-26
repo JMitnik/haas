@@ -28,7 +28,7 @@ const theme = {
     special: '',
   },
   buttonSizes: {
-    sm: '8px 12px',
+    sm: '4px 6px',
     md: '9px 14px',
     lg: '18px 24px',
   },

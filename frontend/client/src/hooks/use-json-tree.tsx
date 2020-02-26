@@ -1,4 +1,8 @@
-import React, { useState, useContext, ReactNode } from 'react';
+import React, { useState, useContext, useEffect, ReactNode } from 'react';
+import { useQuery } from '@apollo/react-hooks';
+import { useParams } from 'react-router-dom';
+import { getCustomerQuery } from '../queries/getCustomerQuery';
+import { getQuestionnaireQuery } from '../queries/getQuestionnaireQuery';
 
 export interface HAASNodeConditions {
   renderMin?: number;
@@ -32,6 +36,7 @@ export interface HAASNode {
 
 interface JSONTreeContextProps {
   historyStack: HAASNode[];
+  customer: any;
   goToChild: (key: string | number) => void;
 }
 
@@ -61,13 +66,34 @@ const findNextNode = (parent: HAASNode, key: string | number) => {
 
 const findLeafNode = (collection: HAASNode[], key: number) => collection.filter(item => item.id === key)[0];
 
+interface ProjectParamProps {
+  customerId: string;
+  questionnaireId: string;
+}
+
 export const JSONTreeContext = React.createContext({} as JSONTreeContextProps);
 
-export const JSONTreeProvider = ({ json, children }: { json: any, children: ReactNode }) => {
-  const [activeLeafNodeId, setActiveLeafNodeID] = useState(0);
-  const [historyStack, setHistoryStack] = useState<HAASNode[]>(json.questionnaire);
+export const JSONTreeProvider = ({ children }: { children: ReactNode }) => {
+  const params = useParams<ProjectParamProps>();
 
-  const leafCollection: [HAASNode] = json.LeafCollection;
+  const [activeLeafNodeId, setActiveLeafNodeID] = useState(0);
+  const [historyStack, setHistoryStack] = useState<HAASNode[]>([]);
+  const [leafCollection, setLeafCollection] = useState([]);
+  const [customer, setCustomer] = useState();
+
+  const res = useQuery(getQuestionnaireQuery, {
+    variables: {
+      id: params.questionnaireId
+    },
+  });
+
+  const data = res.data;
+
+  useEffect(() => {
+    setHistoryStack(data?.questionnaire?.questions || []);
+    setCustomer(data?.questionnaire?.customer || []);
+    setLeafCollection(data?.questionnaire?.leafs || []);
+  }, [data]);
 
   const goToChild = (key: string | number) => {
     let nextNode: HAASNode = findNextNode(historyStack.slice(-1)[0], key);
@@ -83,7 +109,7 @@ export const JSONTreeProvider = ({ json, children }: { json: any, children: Reac
   };
 
   return (
-    <JSONTreeContext.Provider value={{ historyStack, goToChild }}>
+    <JSONTreeContext.Provider value={{ historyStack, goToChild, customer }}>
       {children}
     </JSONTreeContext.Provider>
   );

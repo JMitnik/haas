@@ -214,10 +214,12 @@ input ColourSettingsUpdateManyMutationInput {
   text: String
 }
 
-input ColourSettingsUpdateOneRequiredInput {
+input ColourSettingsUpdateOneInput {
   create: ColourSettingsCreateInput
   update: ColourSettingsUpdateDataInput
   upsert: ColourSettingsUpsertNestedInput
+  delete: Boolean
+  disconnect: Boolean
   connect: ColourSettingsWhereUniqueInput
 }
 
@@ -449,6 +451,7 @@ input ColourSettingsWhereUniqueInput {
 type Customer {
   id: ID!
   name: String!
+  questionnaires(where: QuestionnaireWhereInput, orderBy: QuestionnaireOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Questionnaire!]
   settings: CustomerSettings
 }
 
@@ -461,22 +464,19 @@ type CustomerConnection {
 input CustomerCreateInput {
   id: ID
   name: String!
-  settings: CustomerSettingsCreateOneWithoutCustomerInput
+  questionnaires: QuestionnaireCreateManyWithoutCustomerInput
+  settings: CustomerSettingsCreateOneInput
 }
 
-input CustomerCreateOneInput {
-  create: CustomerCreateInput
+input CustomerCreateOneWithoutQuestionnairesInput {
+  create: CustomerCreateWithoutQuestionnairesInput
   connect: CustomerWhereUniqueInput
 }
 
-input CustomerCreateOneWithoutSettingsInput {
-  create: CustomerCreateWithoutSettingsInput
-  connect: CustomerWhereUniqueInput
-}
-
-input CustomerCreateWithoutSettingsInput {
+input CustomerCreateWithoutQuestionnairesInput {
   id: ID
   name: String!
+  settings: CustomerSettingsCreateOneInput
 }
 
 type CustomerEdge {
@@ -498,11 +498,9 @@ type CustomerPreviousValues {
 
 type CustomerSettings {
   id: ID!
-  title: String
-  customer: Customer!
-  logo: String
-  colourSettings: ColourSettings!
-  fontSettings: FontSettings!
+  logoUrl: String
+  colourSettings: ColourSettings
+  fontSettings: FontSettings
 }
 
 type CustomerSettingsConnection {
@@ -513,24 +511,14 @@ type CustomerSettingsConnection {
 
 input CustomerSettingsCreateInput {
   id: ID
-  title: String
-  customer: CustomerCreateOneWithoutSettingsInput!
-  logo: String
-  colourSettings: ColourSettingsCreateOneInput!
-  fontSettings: FontSettingsCreateOneInput!
+  logoUrl: String
+  colourSettings: ColourSettingsCreateOneInput
+  fontSettings: FontSettingsCreateOneInput
 }
 
-input CustomerSettingsCreateOneWithoutCustomerInput {
-  create: CustomerSettingsCreateWithoutCustomerInput
+input CustomerSettingsCreateOneInput {
+  create: CustomerSettingsCreateInput
   connect: CustomerSettingsWhereUniqueInput
-}
-
-input CustomerSettingsCreateWithoutCustomerInput {
-  id: ID
-  title: String
-  logo: String
-  colourSettings: ColourSettingsCreateOneInput!
-  fontSettings: FontSettingsCreateOneInput!
 }
 
 type CustomerSettingsEdge {
@@ -541,16 +529,13 @@ type CustomerSettingsEdge {
 enum CustomerSettingsOrderByInput {
   id_ASC
   id_DESC
-  title_ASC
-  title_DESC
-  logo_ASC
-  logo_DESC
+  logoUrl_ASC
+  logoUrl_DESC
 }
 
 type CustomerSettingsPreviousValues {
   id: ID!
-  title: String
-  logo: String
+  logoUrl: String
 }
 
 type CustomerSettingsSubscriptionPayload {
@@ -571,38 +556,34 @@ input CustomerSettingsSubscriptionWhereInput {
   NOT: [CustomerSettingsSubscriptionWhereInput!]
 }
 
+input CustomerSettingsUpdateDataInput {
+  logoUrl: String
+  colourSettings: ColourSettingsUpdateOneInput
+  fontSettings: FontSettingsUpdateOneInput
+}
+
 input CustomerSettingsUpdateInput {
-  title: String
-  customer: CustomerUpdateOneRequiredWithoutSettingsInput
-  logo: String
-  colourSettings: ColourSettingsUpdateOneRequiredInput
-  fontSettings: FontSettingsUpdateOneRequiredInput
+  logoUrl: String
+  colourSettings: ColourSettingsUpdateOneInput
+  fontSettings: FontSettingsUpdateOneInput
 }
 
 input CustomerSettingsUpdateManyMutationInput {
-  title: String
-  logo: String
+  logoUrl: String
 }
 
-input CustomerSettingsUpdateOneWithoutCustomerInput {
-  create: CustomerSettingsCreateWithoutCustomerInput
-  update: CustomerSettingsUpdateWithoutCustomerDataInput
-  upsert: CustomerSettingsUpsertWithoutCustomerInput
+input CustomerSettingsUpdateOneInput {
+  create: CustomerSettingsCreateInput
+  update: CustomerSettingsUpdateDataInput
+  upsert: CustomerSettingsUpsertNestedInput
   delete: Boolean
   disconnect: Boolean
   connect: CustomerSettingsWhereUniqueInput
 }
 
-input CustomerSettingsUpdateWithoutCustomerDataInput {
-  title: String
-  logo: String
-  colourSettings: ColourSettingsUpdateOneRequiredInput
-  fontSettings: FontSettingsUpdateOneRequiredInput
-}
-
-input CustomerSettingsUpsertWithoutCustomerInput {
-  update: CustomerSettingsUpdateWithoutCustomerDataInput!
-  create: CustomerSettingsCreateWithoutCustomerInput!
+input CustomerSettingsUpsertNestedInput {
+  update: CustomerSettingsUpdateDataInput!
+  create: CustomerSettingsCreateInput!
 }
 
 input CustomerSettingsWhereInput {
@@ -620,35 +601,20 @@ input CustomerSettingsWhereInput {
   id_not_starts_with: ID
   id_ends_with: ID
   id_not_ends_with: ID
-  title: String
-  title_not: String
-  title_in: [String!]
-  title_not_in: [String!]
-  title_lt: String
-  title_lte: String
-  title_gt: String
-  title_gte: String
-  title_contains: String
-  title_not_contains: String
-  title_starts_with: String
-  title_not_starts_with: String
-  title_ends_with: String
-  title_not_ends_with: String
-  customer: CustomerWhereInput
-  logo: String
-  logo_not: String
-  logo_in: [String!]
-  logo_not_in: [String!]
-  logo_lt: String
-  logo_lte: String
-  logo_gt: String
-  logo_gte: String
-  logo_contains: String
-  logo_not_contains: String
-  logo_starts_with: String
-  logo_not_starts_with: String
-  logo_ends_with: String
-  logo_not_ends_with: String
+  logoUrl: String
+  logoUrl_not: String
+  logoUrl_in: [String!]
+  logoUrl_not_in: [String!]
+  logoUrl_lt: String
+  logoUrl_lte: String
+  logoUrl_gt: String
+  logoUrl_gte: String
+  logoUrl_contains: String
+  logoUrl_not_contains: String
+  logoUrl_starts_with: String
+  logoUrl_not_starts_with: String
+  logoUrl_ends_with: String
+  logoUrl_not_ends_with: String
   colourSettings: ColourSettingsWhereInput
   fontSettings: FontSettingsWhereInput
   AND: [CustomerSettingsWhereInput!]
@@ -678,46 +644,31 @@ input CustomerSubscriptionWhereInput {
   NOT: [CustomerSubscriptionWhereInput!]
 }
 
-input CustomerUpdateDataInput {
-  name: String
-  settings: CustomerSettingsUpdateOneWithoutCustomerInput
-}
-
 input CustomerUpdateInput {
   name: String
-  settings: CustomerSettingsUpdateOneWithoutCustomerInput
+  questionnaires: QuestionnaireUpdateManyWithoutCustomerInput
+  settings: CustomerSettingsUpdateOneInput
 }
 
 input CustomerUpdateManyMutationInput {
   name: String
 }
 
-input CustomerUpdateOneRequiredInput {
-  create: CustomerCreateInput
-  update: CustomerUpdateDataInput
-  upsert: CustomerUpsertNestedInput
+input CustomerUpdateOneRequiredWithoutQuestionnairesInput {
+  create: CustomerCreateWithoutQuestionnairesInput
+  update: CustomerUpdateWithoutQuestionnairesDataInput
+  upsert: CustomerUpsertWithoutQuestionnairesInput
   connect: CustomerWhereUniqueInput
 }
 
-input CustomerUpdateOneRequiredWithoutSettingsInput {
-  create: CustomerCreateWithoutSettingsInput
-  update: CustomerUpdateWithoutSettingsDataInput
-  upsert: CustomerUpsertWithoutSettingsInput
-  connect: CustomerWhereUniqueInput
-}
-
-input CustomerUpdateWithoutSettingsDataInput {
+input CustomerUpdateWithoutQuestionnairesDataInput {
   name: String
+  settings: CustomerSettingsUpdateOneInput
 }
 
-input CustomerUpsertNestedInput {
-  update: CustomerUpdateDataInput!
-  create: CustomerCreateInput!
-}
-
-input CustomerUpsertWithoutSettingsInput {
-  update: CustomerUpdateWithoutSettingsDataInput!
-  create: CustomerCreateWithoutSettingsInput!
+input CustomerUpsertWithoutQuestionnairesInput {
+  update: CustomerUpdateWithoutQuestionnairesDataInput!
+  create: CustomerCreateWithoutQuestionnairesInput!
 }
 
 input CustomerWhereInput {
@@ -749,6 +700,9 @@ input CustomerWhereInput {
   name_not_starts_with: String
   name_ends_with: String
   name_not_ends_with: String
+  questionnaires_every: QuestionnaireWhereInput
+  questionnaires_some: QuestionnaireWhereInput
+  questionnaires_none: QuestionnaireWhereInput
   settings: CustomerSettingsWhereInput
   AND: [CustomerWhereInput!]
   OR: [CustomerWhereInput!]
@@ -853,10 +807,12 @@ input FontSettingsUpdateManyMutationInput {
   special: String
 }
 
-input FontSettingsUpdateOneRequiredInput {
+input FontSettingsUpdateOneInput {
   create: FontSettingsCreateInput
   update: FontSettingsUpdateDataInput
   upsert: FontSettingsUpsertNestedInput
+  delete: Boolean
+  disconnect: Boolean
   connect: FontSettingsWhereUniqueInput
 }
 
@@ -965,6 +921,11 @@ input LeafNodeCreateInput {
   title: String!
 }
 
+input LeafNodeCreateManyInput {
+  create: [LeafNodeCreateInput!]
+  connect: [LeafNodeWhereUniqueInput!]
+}
+
 input LeafNodeCreateOneInput {
   create: LeafNodeCreateInput
   connect: LeafNodeWhereUniqueInput
@@ -991,6 +952,52 @@ type LeafNodePreviousValues {
   nodeId: Int
   type: NodeType
   title: String!
+}
+
+input LeafNodeScalarWhereInput {
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  nodeId: Int
+  nodeId_not: Int
+  nodeId_in: [Int!]
+  nodeId_not_in: [Int!]
+  nodeId_lt: Int
+  nodeId_lte: Int
+  nodeId_gt: Int
+  nodeId_gte: Int
+  type: NodeType
+  type_not: NodeType
+  type_in: [NodeType!]
+  type_not_in: [NodeType!]
+  title: String
+  title_not: String
+  title_in: [String!]
+  title_not_in: [String!]
+  title_lt: String
+  title_lte: String
+  title_gt: String
+  title_gte: String
+  title_contains: String
+  title_not_contains: String
+  title_starts_with: String
+  title_not_starts_with: String
+  title_ends_with: String
+  title_not_ends_with: String
+  AND: [LeafNodeScalarWhereInput!]
+  OR: [LeafNodeScalarWhereInput!]
+  NOT: [LeafNodeScalarWhereInput!]
 }
 
 type LeafNodeSubscriptionPayload {
@@ -1023,10 +1030,33 @@ input LeafNodeUpdateInput {
   title: String
 }
 
+input LeafNodeUpdateManyDataInput {
+  nodeId: Int
+  type: NodeType
+  title: String
+}
+
+input LeafNodeUpdateManyInput {
+  create: [LeafNodeCreateInput!]
+  update: [LeafNodeUpdateWithWhereUniqueNestedInput!]
+  upsert: [LeafNodeUpsertWithWhereUniqueNestedInput!]
+  delete: [LeafNodeWhereUniqueInput!]
+  connect: [LeafNodeWhereUniqueInput!]
+  set: [LeafNodeWhereUniqueInput!]
+  disconnect: [LeafNodeWhereUniqueInput!]
+  deleteMany: [LeafNodeScalarWhereInput!]
+  updateMany: [LeafNodeUpdateManyWithWhereNestedInput!]
+}
+
 input LeafNodeUpdateManyMutationInput {
   nodeId: Int
   type: NodeType
   title: String
+}
+
+input LeafNodeUpdateManyWithWhereNestedInput {
+  where: LeafNodeScalarWhereInput!
+  data: LeafNodeUpdateManyDataInput!
 }
 
 input LeafNodeUpdateOneInput {
@@ -1038,7 +1068,18 @@ input LeafNodeUpdateOneInput {
   connect: LeafNodeWhereUniqueInput
 }
 
+input LeafNodeUpdateWithWhereUniqueNestedInput {
+  where: LeafNodeWhereUniqueInput!
+  data: LeafNodeUpdateDataInput!
+}
+
 input LeafNodeUpsertNestedInput {
+  update: LeafNodeUpdateDataInput!
+  create: LeafNodeCreateInput!
+}
+
+input LeafNodeUpsertWithWhereUniqueNestedInput {
+  where: LeafNodeWhereUniqueInput!
   update: LeafNodeUpdateDataInput!
   create: LeafNodeCreateInput!
 }
@@ -1476,8 +1517,8 @@ type Questionnaire {
   publicTitle: String
   creationDate: DateTime!
   updatedAt: DateTime
-  defaultLeafNode: LeafNode
   questions(where: QuestionNodeWhereInput, orderBy: QuestionNodeOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [QuestionNode!]
+  leafs(where: LeafNodeWhereInput, orderBy: LeafNodeOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [LeafNode!]
 }
 
 type QuestionnaireConnection {
@@ -1488,12 +1529,26 @@ type QuestionnaireConnection {
 
 input QuestionnaireCreateInput {
   id: ID
-  customer: CustomerCreateOneInput!
+  customer: CustomerCreateOneWithoutQuestionnairesInput!
   title: String!
   description: String!
   publicTitle: String
-  defaultLeafNode: LeafNodeCreateOneInput
   questions: QuestionNodeCreateManyInput
+  leafs: LeafNodeCreateManyInput
+}
+
+input QuestionnaireCreateManyWithoutCustomerInput {
+  create: [QuestionnaireCreateWithoutCustomerInput!]
+  connect: [QuestionnaireWhereUniqueInput!]
+}
+
+input QuestionnaireCreateWithoutCustomerInput {
+  id: ID
+  title: String!
+  description: String!
+  publicTitle: String
+  questions: QuestionNodeCreateManyInput
+  leafs: LeafNodeCreateManyInput
 }
 
 type QuestionnaireEdge {
@@ -1525,6 +1580,84 @@ type QuestionnairePreviousValues {
   updatedAt: DateTime
 }
 
+input QuestionnaireScalarWhereInput {
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  title: String
+  title_not: String
+  title_in: [String!]
+  title_not_in: [String!]
+  title_lt: String
+  title_lte: String
+  title_gt: String
+  title_gte: String
+  title_contains: String
+  title_not_contains: String
+  title_starts_with: String
+  title_not_starts_with: String
+  title_ends_with: String
+  title_not_ends_with: String
+  description: String
+  description_not: String
+  description_in: [String!]
+  description_not_in: [String!]
+  description_lt: String
+  description_lte: String
+  description_gt: String
+  description_gte: String
+  description_contains: String
+  description_not_contains: String
+  description_starts_with: String
+  description_not_starts_with: String
+  description_ends_with: String
+  description_not_ends_with: String
+  publicTitle: String
+  publicTitle_not: String
+  publicTitle_in: [String!]
+  publicTitle_not_in: [String!]
+  publicTitle_lt: String
+  publicTitle_lte: String
+  publicTitle_gt: String
+  publicTitle_gte: String
+  publicTitle_contains: String
+  publicTitle_not_contains: String
+  publicTitle_starts_with: String
+  publicTitle_not_starts_with: String
+  publicTitle_ends_with: String
+  publicTitle_not_ends_with: String
+  creationDate: DateTime
+  creationDate_not: DateTime
+  creationDate_in: [DateTime!]
+  creationDate_not_in: [DateTime!]
+  creationDate_lt: DateTime
+  creationDate_lte: DateTime
+  creationDate_gt: DateTime
+  creationDate_gte: DateTime
+  updatedAt: DateTime
+  updatedAt_not: DateTime
+  updatedAt_in: [DateTime!]
+  updatedAt_not_in: [DateTime!]
+  updatedAt_lt: DateTime
+  updatedAt_lte: DateTime
+  updatedAt_gt: DateTime
+  updatedAt_gte: DateTime
+  AND: [QuestionnaireScalarWhereInput!]
+  OR: [QuestionnaireScalarWhereInput!]
+  NOT: [QuestionnaireScalarWhereInput!]
+}
+
 type QuestionnaireSubscriptionPayload {
   mutation: MutationType!
   node: Questionnaire
@@ -1544,18 +1677,60 @@ input QuestionnaireSubscriptionWhereInput {
 }
 
 input QuestionnaireUpdateInput {
-  customer: CustomerUpdateOneRequiredInput
+  customer: CustomerUpdateOneRequiredWithoutQuestionnairesInput
   title: String
   description: String
   publicTitle: String
-  defaultLeafNode: LeafNodeUpdateOneInput
   questions: QuestionNodeUpdateManyInput
+  leafs: LeafNodeUpdateManyInput
+}
+
+input QuestionnaireUpdateManyDataInput {
+  title: String
+  description: String
+  publicTitle: String
 }
 
 input QuestionnaireUpdateManyMutationInput {
   title: String
   description: String
   publicTitle: String
+}
+
+input QuestionnaireUpdateManyWithoutCustomerInput {
+  create: [QuestionnaireCreateWithoutCustomerInput!]
+  delete: [QuestionnaireWhereUniqueInput!]
+  connect: [QuestionnaireWhereUniqueInput!]
+  set: [QuestionnaireWhereUniqueInput!]
+  disconnect: [QuestionnaireWhereUniqueInput!]
+  update: [QuestionnaireUpdateWithWhereUniqueWithoutCustomerInput!]
+  upsert: [QuestionnaireUpsertWithWhereUniqueWithoutCustomerInput!]
+  deleteMany: [QuestionnaireScalarWhereInput!]
+  updateMany: [QuestionnaireUpdateManyWithWhereNestedInput!]
+}
+
+input QuestionnaireUpdateManyWithWhereNestedInput {
+  where: QuestionnaireScalarWhereInput!
+  data: QuestionnaireUpdateManyDataInput!
+}
+
+input QuestionnaireUpdateWithoutCustomerDataInput {
+  title: String
+  description: String
+  publicTitle: String
+  questions: QuestionNodeUpdateManyInput
+  leafs: LeafNodeUpdateManyInput
+}
+
+input QuestionnaireUpdateWithWhereUniqueWithoutCustomerInput {
+  where: QuestionnaireWhereUniqueInput!
+  data: QuestionnaireUpdateWithoutCustomerDataInput!
+}
+
+input QuestionnaireUpsertWithWhereUniqueWithoutCustomerInput {
+  where: QuestionnaireWhereUniqueInput!
+  update: QuestionnaireUpdateWithoutCustomerDataInput!
+  create: QuestionnaireCreateWithoutCustomerInput!
 }
 
 input QuestionnaireWhereInput {
@@ -1632,10 +1807,12 @@ input QuestionnaireWhereInput {
   updatedAt_lte: DateTime
   updatedAt_gt: DateTime
   updatedAt_gte: DateTime
-  defaultLeafNode: LeafNodeWhereInput
   questions_every: QuestionNodeWhereInput
   questions_some: QuestionNodeWhereInput
   questions_none: QuestionNodeWhereInput
+  leafs_every: LeafNodeWhereInput
+  leafs_some: LeafNodeWhereInput
+  leafs_none: LeafNodeWhereInput
   AND: [QuestionnaireWhereInput!]
   OR: [QuestionnaireWhereInput!]
   NOT: [QuestionnaireWhereInput!]

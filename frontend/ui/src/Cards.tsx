@@ -3,13 +3,10 @@ import { Div } from './Generics';
 
 export const Card = styled(Div)`
   ${({ theme }) => css`
+      position: relative;
       border-radius: ${theme.borderRadiuses.md};
-      cursor: pointer;
       background: ${theme.colors.white};
       color: ${theme.colors.default.darkest};
-      &:hover {
-        background: #6856a6;
-      }
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   `}
 `;
@@ -17,6 +14,7 @@ export const Card = styled(Div)`
 export const CardBody = styled(Div)`
   ${({ theme }) => css`
     padding: ${theme.gutter}px;
+    position: relative;
   `}
 `;
 

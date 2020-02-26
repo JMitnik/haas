@@ -156,22 +156,30 @@ const leafNodes = [
 const main = async () => {
   const customer = await prisma.createCustomer({
     name: CUSTOMER,
+    settings: {
+      create: {
+        logoUrl: 'https://www.stickpng.com/assets/images/58428cc1a6515b1e0ad75ab1.png',
+      },
+    },
   });
 
   // Create leaf-nodes
-  leafNodes.map(async (leafNode) => {
-    await prisma.createLeafNode({
+  const leafs = await Promise.all(leafNodes.map(async (leafNode) => {
+    return prisma.createLeafNode({
       title: leafNode.title,
       type: leafNode.type,
     });
-  });
+  }));
 
   // Create questionnaire
-  await prisma.createQuestionnaire({
+  const questionnaire = await prisma.createQuestionnaire({
     customer: {
       connect: {
         id: customer.id,
       },
+    },
+    leafs: {
+      connect: leafs.map((leaf) => ({ id: leaf.id })),
     },
     title: 'Default questionnaire',
     description: 'Default questions',
@@ -180,6 +188,20 @@ const main = async () => {
         title: `How do you feel about ${customer.name}?`,
         questionType: sliderType,
         isRoot: true,
+      },
+    },
+  });
+
+  // Connect the questionnaire to the customer
+  prisma.updateCustomer({
+    where: {
+      id: customer.id,
+    },
+    data: {
+      questionnaires: {
+        connect: {
+          id: questionnaire.id,
+        },
       },
     },
   });

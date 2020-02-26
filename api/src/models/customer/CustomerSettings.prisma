@@ -1,8 +1,0 @@
-type CustomerSettings {
-    id: ID! @id
-    title: String
-    customer: Customer! @relation (link:INLINE)
-    logo: String 
-    colourSettings: ColourSettings!
-    fontSettings: FontSettings!
-}
