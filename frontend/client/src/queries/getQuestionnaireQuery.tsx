@@ -11,6 +11,12 @@ export const getQuestionnaireQuery = gql`
       publicTitle
       creationDate
       updatedAt
+      customer {
+        name
+        settings {
+          logoUrl
+        }
+      }
       questions {
         id
         title

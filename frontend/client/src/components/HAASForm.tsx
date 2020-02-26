@@ -10,11 +10,8 @@ import { HAASTextBox } from './HAASTextBox';
 import { HAASSignIn } from './HAASSignIn';
 
 export const HAASForm = () => {
-  const { historyStack } = useJSONTree();
-  console.log(historyStack);
+  const { historyStack, customer } = useJSONTree();
   const activeNode = historyStack.slice(-1)[0];
-
-  console.log(activeNode);
 
   const transitions = useTransition(activeNode, (activeNode) => activeNode?.id, {
     from: { opacity: 0, transform: 'scale(1.1)' },
@@ -27,7 +24,7 @@ export const HAASForm = () => {
   return (
     <Div useFlex flexDirection='column' justifyContent='space-between' height={['100vh', '80vh']}>
       <H1 textAlign="center" color="white">{activeNode?.title}</H1>
-
+      {/* <img src={customer.settings.logoUrl} alt="Logo" /> */}
       {transitions.map(({ item, key, props, state }) => {
         if (state !== 'leave') {
           return <Entry style={{

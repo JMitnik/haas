@@ -36,6 +36,7 @@ export interface HAASNode {
 
 interface JSONTreeContextProps {
   historyStack: HAASNode[];
+  customer: any;
   goToChild: (key: string | number) => void;
 }
 
@@ -78,6 +79,7 @@ export const JSONTreeProvider = ({ children }: { children: ReactNode }) => {
   const [activeLeafNodeId, setActiveLeafNodeID] = useState(0);
   const [historyStack, setHistoryStack] = useState<HAASNode[]>([]);
   const [leafCollection, setLeafCollection] = useState([]);
+  const [customer, setCustomer] = useState();
 
   const res = useQuery(getQuestionnaireQuery, {
     variables: {
@@ -89,6 +91,7 @@ export const JSONTreeProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     setHistoryStack(data?.questionnaire?.questions || []);
+    setCustomer(data?.questionnaire?.customer || []);
     setLeafCollection(data?.questionnaire?.leafs || []);
   }, [data]);
 
@@ -106,7 +109,7 @@ export const JSONTreeProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <JSONTreeContext.Provider value={{ historyStack, goToChild }}>
+    <JSONTreeContext.Provider value={{ historyStack, goToChild, customer }}>
       {children}
     </JSONTreeContext.Provider>
   );
