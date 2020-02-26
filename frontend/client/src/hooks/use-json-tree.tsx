@@ -60,7 +60,6 @@ const findNextNode = (parent: HAASNode, key: string | number) => {
     return true;
   });
 
-  console.log('Candidates: ', candidates)
   return candidates && candidates[0];
 };
 
