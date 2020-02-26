@@ -28,7 +28,7 @@ export interface HAASNode {
   title: string;
   branchVal?: string;
   conditions?: [HAASNodeConditions];
-  questionType: HAASQuestionType;
+  questionType: string;
   overrideLeaf?: HAASNode;
   options?: [MultiChoiceOption];
   children: [HAASNode];
@@ -43,7 +43,7 @@ interface JSONTreeContextProps {
 
 const findNextNode = (parent: HAASNode, key: string | number) => {
   const candidates = parent?.children?.filter(child => {
-    if (parent.questionType.type === 'SLIDER') {
+    if (parent.questionType === 'SLIDER') {
       if (child?.conditions?.[0].renderMin && key < child?.conditions?.[0].renderMin) {
         return false;
       }
@@ -53,7 +53,7 @@ const findNextNode = (parent: HAASNode, key: string | number) => {
       }
     }
 
-    if (parent.questionType.type === 'MULTI_CHOICE') {
+    if (parent.questionType === 'MULTI_CHOICE') {
       return child.conditions?.[0].matchValue === key;
     }
 

@@ -54,19 +54,11 @@ const App: React.FC = () => {
 }
 
 const MainAppScreen = styled(Div)`
-  ${() => css`
+  ${({ theme }) => css`
     min-width: 100vw;
     min-height: 100vh;
-    /* TODO: Make something out of this */
-    background: linear-gradient(270deg, #0059f8, #091a32);
-    animation: MovingBackground 20s ease infinite;
+    background: ${theme.colors.primary};
     background-size: 400% 400%;
-
-    @keyframes MovingBackground {
-        0%{background-position:0% 50%}
-        50%{background-position:100% 50%}
-        100%{background-position:0% 50%}
-    }
 
     @media ${theme.media.mob} {
       padding: 0 ${theme.gutter}px;
