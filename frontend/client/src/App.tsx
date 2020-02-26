@@ -1,7 +1,6 @@
 import React from 'react';
 import { useQuery } from '@apollo/react-hooks';
 import styled, { css, ThemeProvider } from 'styled-components';
-import gql from 'graphql-tag';
 import { Switch, Route, BrowserRouter, Redirect } from 'react-router-dom';
 
 import theme from './config/theme';
@@ -11,13 +10,11 @@ import { ColumnFlex } from '@haas/ui/src/Container';
 import { JSONTreeProvider } from './hooks/use-json-tree';
 import { HAASForm } from './components/HAASForm';
 import { CustomerSelector } from './components/CustomerSelector';
-import { GET_LEAF_NODES } from './queries/getLeafNodes';
 import { getCustomerQuery } from './queries/getCustomerQuery';
 
 const App: React.FC = () => {
   const form = useForm();
 
-  const leafNodes = useQuery<any>(GET_LEAF_NODES);
   const { data, loading, error } = useQuery(getCustomerQuery);
   if (error) return <div>{'Error!' + error.message}</div>;
 
