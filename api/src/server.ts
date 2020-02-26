@@ -9,8 +9,9 @@ const server: GraphQLServer = new GraphQLServer({
   context: (req) => ({
     ...req,
     db: new Prisma({
-      typeDefs: `${config.PATH_TO_PRISMA_GENERATED_SCHEMA}`,
-      endpoint: `${config.PRISMA_ENDPOINT}`,
+      typeDefs: config.PATH_TO_PRISMA_GENERATED_SCHEMA,
+      endpoint: config.PRISMA_ENDPOINT,
+      secret: process.env.PRISMA_SERVICE_SECRET,
     }),
   }),
 });
