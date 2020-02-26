@@ -20,4 +20,6 @@ generate:
 seed:
   run: ts-node ./data/${env:SEED}.ts
 
+secret: '${env:PRISMA_SERVICE_SECRET}'
+
 endpoint: ${env:PRISMA_ENDPOINT}
