@@ -10,7 +10,8 @@
         "reset": "prisma reset -e .env && yarn migrate && prisma seed -e .env -r",
         "reset:prod": "prisma reset -e .env.prod && yarn migrate && prisma seed -e .env.prod -r",
         "seed": "yarn migrate && prisma seed",
-        "seed:prod": "yarn migrate && prisma seed -e .env.prod"
+        "seed:prod": "yarn migrate && prisma seed -e .env.prod",
+        "token:prod": "prisma token -e .env.prod"
     },
     "dependencies": {
         "@graphql-codegen/cli": "^1.11.2",
