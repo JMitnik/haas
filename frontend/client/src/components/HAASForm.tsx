@@ -1,16 +1,17 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { H1, Div } from '@haas/ui';
-import { useJSONTree } from './hooks/use-json-tree';
+import { H1, Div, Loader } from '@haas/ui';
+import { useJSONTree } from '../hooks/use-json-tree';
 import { useTransition, animated } from 'react-spring';
-import { HAASSlider } from './components/HAASSlider';
-import { HAASMultiChoice } from './components/HAASMultiChoice';
-import { HAASSocialShare } from './components/HAASSocialShare';
-import { HAASTextBox } from './components/HAASTextBox';
-import { HAASSignIn } from './components/HAASSignIn';
+import { HAASSlider } from './HAASSlider';
+import { HAASMultiChoice } from './HAASMultiChoice';
+import { HAASSocialShare } from './HAASSocialShare';
+import { HAASTextBox } from './HAASTextBox';
+import { HAASSignIn } from './HAASSignIn';
 
 export const HAASForm = () => {
   const { historyStack } = useJSONTree();
+  console.log(historyStack);
   const activeNode = historyStack.slice(-1)[0];
 
   console.log(activeNode);
@@ -20,6 +21,8 @@ export const HAASForm = () => {
     enter: { opacity: 1, transform: 'scale(1)' },
     leave: { opacity: 0, transform: 'scale(0.9)' }
   });
+
+  if (!activeNode) return <Loader />;
 
   return (
     <Div useFlex flexDirection='column' justifyContent='space-between' height={['100vh', '80vh']}>

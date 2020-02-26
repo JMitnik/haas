@@ -6,6 +6,6 @@ type Questionnaire {
     publicTitle: String
     creationDate: DateTime! @createdAt
     updatedAt: DateTime @updatedAt
-    defaultLeafNode: LeafNode
     questions: [QuestionNode]
+    leafs: [LeafNode!] @relation(link: TABLE, name: "QuestionnaireLeafs")
 }
