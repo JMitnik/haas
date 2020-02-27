@@ -212,16 +212,19 @@ const makeStarbucks = async () => {
   });
 
   const standardSubChildrenWithLeafs = await Promise.all(standardSubChildren.map(async (rootChild) => {
-    const leafs = await prisma.leafNodes({
+    const subleafs = await prisma.leafNodes({
       where: {
         title_contains: rootChild.overrideLeafContains,
+        AND: {
+          id_in: await Promise.all((await prisma.questionnaire({ id: questionnaire.id }).leafs()).map((leaf) => leaf.id)),
+        },
       },
     });
 
     let leaf = null;
 
-    if (leafs) {
-      [leaf] = leafs;
+    if (subleafs) {
+      [leaf] = subleafs;
     }
 
     return {
@@ -231,16 +234,19 @@ const makeStarbucks = async () => {
   }));
 
   const standardRootChildrenWithLeafs = await Promise.all(standardRootChildren.map(async (rootChild) => {
-    const leafs = await prisma.leafNodes({
+    const subleafs = await prisma.leafNodes({
       where: {
         title_contains: rootChild.overrideLeafContains,
+        AND: {
+          id_in: await Promise.all((await prisma.questionnaire({ id: questionnaire.id }).leafs()).map((leaf) => leaf.id)),
+        },
       },
     });
 
     let leaf = null;
 
-    if (leafs) {
-      [leaf] = leafs;
+    if (subleafs) {
+      [leaf] = subleafs;
     }
 
     return {
@@ -296,6 +302,9 @@ const makeStarbucks = async () => {
   const mainQuestions = await prisma.questionNodes({
     where: {
       isRoot: true,
+      AND: {
+        id_in: await Promise.all((await prisma.questionnaire({ id: questionnaire.id }).questions()).map((q) => q.id)),
+      },
     },
   });
   const mainQuestion = mainQuestions[0];
