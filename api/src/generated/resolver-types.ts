@@ -65,20 +65,19 @@ export type BatchPayload = {
 export type ColourSettings = {
    __typename?: 'ColourSettings',
   id: Scalars['ID'],
-  title?: Maybe<Scalars['String']>,
   primary: Scalars['String'],
-  secondary: Scalars['String'],
-  tertiary: Scalars['String'],
-  success: Scalars['String'],
-  warning: Scalars['String'],
-  error: Scalars['String'],
-  lightest: Scalars['String'],
-  light: Scalars['String'],
-  normal: Scalars['String'],
-  dark: Scalars['String'],
-  darkest: Scalars['String'],
-  muted: Scalars['String'],
-  text: Scalars['String'],
+  secondary?: Maybe<Scalars['String']>,
+  tertiary?: Maybe<Scalars['String']>,
+  success?: Maybe<Scalars['String']>,
+  warning?: Maybe<Scalars['String']>,
+  error?: Maybe<Scalars['String']>,
+  lightest?: Maybe<Scalars['String']>,
+  light?: Maybe<Scalars['String']>,
+  normal?: Maybe<Scalars['String']>,
+  dark?: Maybe<Scalars['String']>,
+  darkest?: Maybe<Scalars['String']>,
+  muted?: Maybe<Scalars['String']>,
+  text?: Maybe<Scalars['String']>,
 };
 
 export type ColourSettingsConnection = {
@@ -90,20 +89,19 @@ export type ColourSettingsConnection = {
 
 export type ColourSettingsCreateInput = {
   id?: Maybe<Scalars['ID']>,
-  title?: Maybe<Scalars['String']>,
   primary: Scalars['String'],
-  secondary: Scalars['String'],
-  tertiary: Scalars['String'],
-  success: Scalars['String'],
-  warning: Scalars['String'],
-  error: Scalars['String'],
-  lightest: Scalars['String'],
-  light: Scalars['String'],
-  normal: Scalars['String'],
-  dark: Scalars['String'],
-  darkest: Scalars['String'],
-  muted: Scalars['String'],
-  text: Scalars['String'],
+  secondary?: Maybe<Scalars['String']>,
+  tertiary?: Maybe<Scalars['String']>,
+  success?: Maybe<Scalars['String']>,
+  warning?: Maybe<Scalars['String']>,
+  error?: Maybe<Scalars['String']>,
+  lightest?: Maybe<Scalars['String']>,
+  light?: Maybe<Scalars['String']>,
+  normal?: Maybe<Scalars['String']>,
+  dark?: Maybe<Scalars['String']>,
+  darkest?: Maybe<Scalars['String']>,
+  muted?: Maybe<Scalars['String']>,
+  text?: Maybe<Scalars['String']>,
 };
 
 export type ColourSettingsCreateOneInput = {
@@ -120,8 +118,6 @@ export type ColourSettingsEdge = {
 export enum ColourSettingsOrderByInput {
   IdAsc = 'id_ASC',
   IdDesc = 'id_DESC',
-  TitleAsc = 'title_ASC',
-  TitleDesc = 'title_DESC',
   PrimaryAsc = 'primary_ASC',
   PrimaryDesc = 'primary_DESC',
   SecondaryAsc = 'secondary_ASC',
@@ -153,20 +149,19 @@ export enum ColourSettingsOrderByInput {
 export type ColourSettingsPreviousValues = {
    __typename?: 'ColourSettingsPreviousValues',
   id: Scalars['ID'],
-  title?: Maybe<Scalars['String']>,
   primary: Scalars['String'],
-  secondary: Scalars['String'],
-  tertiary: Scalars['String'],
-  success: Scalars['String'],
-  warning: Scalars['String'],
-  error: Scalars['String'],
-  lightest: Scalars['String'],
-  light: Scalars['String'],
-  normal: Scalars['String'],
-  dark: Scalars['String'],
-  darkest: Scalars['String'],
-  muted: Scalars['String'],
-  text: Scalars['String'],
+  secondary?: Maybe<Scalars['String']>,
+  tertiary?: Maybe<Scalars['String']>,
+  success?: Maybe<Scalars['String']>,
+  warning?: Maybe<Scalars['String']>,
+  error?: Maybe<Scalars['String']>,
+  lightest?: Maybe<Scalars['String']>,
+  light?: Maybe<Scalars['String']>,
+  normal?: Maybe<Scalars['String']>,
+  dark?: Maybe<Scalars['String']>,
+  darkest?: Maybe<Scalars['String']>,
+  muted?: Maybe<Scalars['String']>,
+  text?: Maybe<Scalars['String']>,
 };
 
 export type ColourSettingsSubscriptionPayload = {
@@ -189,7 +184,6 @@ export type ColourSettingsSubscriptionWhereInput = {
 };
 
 export type ColourSettingsUpdateDataInput = {
-  title?: Maybe<Scalars['String']>,
   primary?: Maybe<Scalars['String']>,
   secondary?: Maybe<Scalars['String']>,
   tertiary?: Maybe<Scalars['String']>,
@@ -206,7 +200,6 @@ export type ColourSettingsUpdateDataInput = {
 };
 
 export type ColourSettingsUpdateInput = {
-  title?: Maybe<Scalars['String']>,
   primary?: Maybe<Scalars['String']>,
   secondary?: Maybe<Scalars['String']>,
   tertiary?: Maybe<Scalars['String']>,
@@ -223,7 +216,6 @@ export type ColourSettingsUpdateInput = {
 };
 
 export type ColourSettingsUpdateManyMutationInput = {
-  title?: Maybe<Scalars['String']>,
   primary?: Maybe<Scalars['String']>,
   secondary?: Maybe<Scalars['String']>,
   tertiary?: Maybe<Scalars['String']>,
@@ -268,20 +260,6 @@ export type ColourSettingsWhereInput = {
   id_not_starts_with?: Maybe<Scalars['ID']>,
   id_ends_with?: Maybe<Scalars['ID']>,
   id_not_ends_with?: Maybe<Scalars['ID']>,
-  title?: Maybe<Scalars['String']>,
-  title_not?: Maybe<Scalars['String']>,
-  title_in?: Maybe<Array<Scalars['String']>>,
-  title_not_in?: Maybe<Array<Scalars['String']>>,
-  title_lt?: Maybe<Scalars['String']>,
-  title_lte?: Maybe<Scalars['String']>,
-  title_gt?: Maybe<Scalars['String']>,
-  title_gte?: Maybe<Scalars['String']>,
-  title_contains?: Maybe<Scalars['String']>,
-  title_not_contains?: Maybe<Scalars['String']>,
-  title_starts_with?: Maybe<Scalars['String']>,
-  title_not_starts_with?: Maybe<Scalars['String']>,
-  title_ends_with?: Maybe<Scalars['String']>,
-  title_not_ends_with?: Maybe<Scalars['String']>,
   primary?: Maybe<Scalars['String']>,
   primary_not?: Maybe<Scalars['String']>,
   primary_in?: Maybe<Array<Scalars['String']>>,
@@ -3544,20 +3522,19 @@ export type BatchPayloadResolvers<ContextType = any, ParentType extends Resolver
 
 export type ColourSettingsResolvers<ContextType = any, ParentType extends ResolversParentTypes['ColourSettings'] = ResolversParentTypes['ColourSettings']> = ResolversObject<{
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>,
-  title?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   primary?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
-  secondary?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
-  tertiary?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
-  success?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
-  warning?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
-  error?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
-  lightest?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
-  light?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
-  normal?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
-  dark?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
-  darkest?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
-  muted?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
-  text?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
+  secondary?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  tertiary?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  success?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  warning?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  error?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  lightest?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  light?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  normal?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  dark?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  darkest?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  muted?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  text?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
 }>;
 
 export type ColourSettingsConnectionResolvers<ContextType = any, ParentType extends ResolversParentTypes['ColourSettingsConnection'] = ResolversParentTypes['ColourSettingsConnection']> = ResolversObject<{
@@ -3573,20 +3550,19 @@ export type ColourSettingsEdgeResolvers<ContextType = any, ParentType extends Re
 
 export type ColourSettingsPreviousValuesResolvers<ContextType = any, ParentType extends ResolversParentTypes['ColourSettingsPreviousValues'] = ResolversParentTypes['ColourSettingsPreviousValues']> = ResolversObject<{
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>,
-  title?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   primary?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
-  secondary?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
-  tertiary?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
-  success?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
-  warning?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
-  error?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
-  lightest?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
-  light?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
-  normal?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
-  dark?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
-  darkest?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
-  muted?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
-  text?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
+  secondary?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  tertiary?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  success?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  warning?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  error?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  lightest?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  light?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  normal?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  dark?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  darkest?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  muted?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  text?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
 }>;
 
 export type ColourSettingsSubscriptionPayloadResolvers<ContextType = any, ParentType extends ResolversParentTypes['ColourSettingsSubscriptionPayload'] = ResolversParentTypes['ColourSettingsSubscriptionPayload']> = ResolversObject<{

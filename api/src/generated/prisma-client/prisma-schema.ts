@@ -44,20 +44,19 @@ type BatchPayload {
 
 type ColourSettings {
   id: ID!
-  title: String
   primary: String!
-  secondary: String!
-  tertiary: String!
-  success: String!
-  warning: String!
-  error: String!
-  lightest: String!
-  light: String!
-  normal: String!
-  dark: String!
-  darkest: String!
-  muted: String!
-  text: String!
+  secondary: String
+  tertiary: String
+  success: String
+  warning: String
+  error: String
+  lightest: String
+  light: String
+  normal: String
+  dark: String
+  darkest: String
+  muted: String
+  text: String
 }
 
 type ColourSettingsConnection {
@@ -68,20 +67,19 @@ type ColourSettingsConnection {
 
 input ColourSettingsCreateInput {
   id: ID
-  title: String
   primary: String!
-  secondary: String!
-  tertiary: String!
-  success: String!
-  warning: String!
-  error: String!
-  lightest: String!
-  light: String!
-  normal: String!
-  dark: String!
-  darkest: String!
-  muted: String!
-  text: String!
+  secondary: String
+  tertiary: String
+  success: String
+  warning: String
+  error: String
+  lightest: String
+  light: String
+  normal: String
+  dark: String
+  darkest: String
+  muted: String
+  text: String
 }
 
 input ColourSettingsCreateOneInput {
@@ -97,8 +95,6 @@ type ColourSettingsEdge {
 enum ColourSettingsOrderByInput {
   id_ASC
   id_DESC
-  title_ASC
-  title_DESC
   primary_ASC
   primary_DESC
   secondary_ASC
@@ -129,20 +125,19 @@ enum ColourSettingsOrderByInput {
 
 type ColourSettingsPreviousValues {
   id: ID!
-  title: String
   primary: String!
-  secondary: String!
-  tertiary: String!
-  success: String!
-  warning: String!
-  error: String!
-  lightest: String!
-  light: String!
-  normal: String!
-  dark: String!
-  darkest: String!
-  muted: String!
-  text: String!
+  secondary: String
+  tertiary: String
+  success: String
+  warning: String
+  error: String
+  lightest: String
+  light: String
+  normal: String
+  dark: String
+  darkest: String
+  muted: String
+  text: String
 }
 
 type ColourSettingsSubscriptionPayload {
@@ -164,7 +159,6 @@ input ColourSettingsSubscriptionWhereInput {
 }
 
 input ColourSettingsUpdateDataInput {
-  title: String
   primary: String
   secondary: String
   tertiary: String
@@ -181,7 +175,6 @@ input ColourSettingsUpdateDataInput {
 }
 
 input ColourSettingsUpdateInput {
-  title: String
   primary: String
   secondary: String
   tertiary: String
@@ -198,7 +191,6 @@ input ColourSettingsUpdateInput {
 }
 
 input ColourSettingsUpdateManyMutationInput {
-  title: String
   primary: String
   secondary: String
   tertiary: String
@@ -243,20 +235,6 @@ input ColourSettingsWhereInput {
   id_not_starts_with: ID
   id_ends_with: ID
   id_not_ends_with: ID
-  title: String
-  title_not: String
-  title_in: [String!]
-  title_not_in: [String!]
-  title_lt: String
-  title_lte: String
-  title_gt: String
-  title_gte: String
-  title_contains: String
-  title_not_contains: String
-  title_starts_with: String
-  title_not_starts_with: String
-  title_ends_with: String
-  title_not_ends_with: String
   primary: String
   primary_not: String
   primary_in: [String!]

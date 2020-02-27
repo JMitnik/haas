@@ -12,13 +12,15 @@ interface CustomerSelectorProps {
 
 export const CustomerSelector = ({ customers }: { customers: any }) => {
     return (
+      <CenteredScreen>
         <Div useFlex flexDirection='column' justifyContent='space-between' height='80vh'>
-            <H1 textAlign="center" color="white">Welcome to HAAS!</H1>
+            <H1 textAlign="center" color="white">Welcome to haas!</H1>
 
             {customers.map((customer: any, index: number) => {
                 return <CustomerCard key={index} customer={customer} ></CustomerCard>
             })}
         </Div>
+      </CenteredScreen>
     )
 };
 
@@ -74,5 +76,18 @@ const CustomerCardEnqueteLabel = styled(Label)`
     position: absolute;
     top: ${theme.gutter / 2}px;
     right: ${theme.gutter / 2}px;
+  `}
+`;
+
+const CenteredScreen = styled(Div)`
+  ${({ theme }) => css`
+    max-width: 780px;
+    margin: 0 auto;
+    position: relative;
+    padding-top: 100px;
+
+    @media ${theme.media.mob} {
+      padding-top: 0;
+    }
   `}
 `;

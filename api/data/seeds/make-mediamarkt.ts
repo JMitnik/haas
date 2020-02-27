@@ -1,6 +1,6 @@
-import { prisma, NodeType } from '../src/generated/prisma-client/index';
+import { prisma, NodeType } from '../../src/generated/prisma-client/index';
 
-const CUSTOMER = 'Starbucks';
+const CUSTOMER = 'Mediamarkt';
 
 const multiChoiceType: NodeType = 'MULTI_CHOICE';
 const socialShareType: NodeType = 'SOCIAL_SHARE';
@@ -153,12 +153,17 @@ const leafNodes = [
   },
 ];
 
-const main = async () => {
+const makeMediamarkt = async () => {
   const customer = await prisma.createCustomer({
     name: CUSTOMER,
     settings: {
       create: {
-        logoUrl: 'https://www.stickpng.com/assets/images/58428cc1a6515b1e0ad75ab1.png',
+        logoUrl: 'https://pbs.twimg.com/profile_images/644430670513631232/x7TWAZrV_400x400.png',
+        colourSettings: {
+          create: {
+            primary: '#e31e24',
+          },
+        }
       },
     },
   });
@@ -207,16 +212,19 @@ const main = async () => {
   });
 
   const standardSubChildrenWithLeafs = await Promise.all(standardSubChildren.map(async (rootChild) => {
-    const leafs = await prisma.leafNodes({
+    const subleafs = await prisma.leafNodes({
       where: {
         title_contains: rootChild.overrideLeafContains,
+        AND: {
+          id_in: await Promise.all((await prisma.questionnaire({ id: questionnaire.id }).leafs()).map((leaf) => leaf.id)),
+        },
       },
     });
 
     let leaf = null;
 
-    if (leafs) {
-      [leaf] = leafs;
+    if (subleafs) {
+      [leaf] = subleafs;
     }
 
     return {
@@ -226,16 +234,19 @@ const main = async () => {
   }));
 
   const standardRootChildrenWithLeafs = await Promise.all(standardRootChildren.map(async (rootChild) => {
-    const leafs = await prisma.leafNodes({
+    const subleafs = await prisma.leafNodes({
       where: {
         title_contains: rootChild.overrideLeafContains,
+        AND: {
+          id_in: await Promise.all((await prisma.questionnaire({ id: questionnaire.id }).leafs()).map((leaf) => leaf.id)),
+        },
       },
     });
 
     let leaf = null;
 
-    if (leafs) {
-      [leaf] = leafs;
+    if (subleafs) {
+      [leaf] = subleafs;
     }
 
     return {
@@ -291,6 +302,9 @@ const main = async () => {
   const mainQuestions = await prisma.questionNodes({
     where: {
       isRoot: true,
+      AND: {
+        id_in: await Promise.all((await prisma.questionnaire({ id: questionnaire.id }).questions()).map((q) => q.id)),
+      },
     },
   });
   const mainQuestion = mainQuestions[0];
@@ -308,4 +322,4 @@ const main = async () => {
   });
 };
 
-main();
+export default makeMediamarkt;

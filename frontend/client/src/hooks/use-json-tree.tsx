@@ -3,6 +3,7 @@ import { useQuery } from '@apollo/react-hooks';
 import { useParams } from 'react-router-dom';
 import { getCustomerQuery } from '../queries/getCustomerQuery';
 import { getQuestionnaireQuery } from '../queries/getQuestionnaireQuery';
+import { useQuestionnaire } from './use-questionnaire';
 
 export interface HAASNodeConditions {
   renderMin?: number;
@@ -28,7 +29,7 @@ export interface HAASNode {
   title: string;
   branchVal?: string;
   conditions?: [HAASNodeConditions];
-  questionType: HAASQuestionType;
+  questionType: string;
   overrideLeaf?: HAASNode;
   options?: [MultiChoiceOption];
   children: [HAASNode];
@@ -36,14 +37,13 @@ export interface HAASNode {
 
 interface JSONTreeContextProps {
   historyStack: HAASNode[];
-  customer: any;
   goToChild: (key: string | number) => void;
 }
 
 
 const findNextNode = (parent: HAASNode, key: string | number) => {
   const candidates = parent?.children?.filter(child => {
-    if (parent.questionType.type === 'SLIDER') {
+    if (parent.questionType === 'SLIDER') {
       if (child?.conditions?.[0].renderMin && key < child?.conditions?.[0].renderMin) {
         return false;
       }
@@ -53,14 +53,13 @@ const findNextNode = (parent: HAASNode, key: string | number) => {
       }
     }
 
-    if (parent.questionType.type === 'MULTI_CHOICE') {
+    if (parent.questionType === 'MULTI_CHOICE') {
       return child.conditions?.[0].matchValue === key;
     }
 
     return true;
   });
 
-  console.log('Candidates: ', candidates)
   return candidates && candidates[0];
 };
 
@@ -74,26 +73,18 @@ interface ProjectParamProps {
 export const JSONTreeContext = React.createContext({} as JSONTreeContextProps);
 
 export const JSONTreeProvider = ({ children }: { children: ReactNode }) => {
-  const params = useParams<ProjectParamProps>();
+  const { questionnaire } = useQuestionnaire();
 
   const [activeLeafNodeId, setActiveLeafNodeID] = useState(0);
   const [historyStack, setHistoryStack] = useState<HAASNode[]>([]);
   const [leafCollection, setLeafCollection] = useState([]);
-  const [customer, setCustomer] = useState();
-
-  const res = useQuery(getQuestionnaireQuery, {
-    variables: {
-      id: params.questionnaireId
-    },
-  });
-
-  const data = res.data;
 
   useEffect(() => {
-    setHistoryStack(data?.questionnaire?.questions || []);
-    setCustomer(data?.questionnaire?.customer || []);
-    setLeafCollection(data?.questionnaire?.leafs || []);
-  }, [data]);
+    if (questionnaire) {
+      setHistoryStack(questionnaire?.questions || []);
+      setLeafCollection(questionnaire?.leafs || []);
+    }
+  }, [questionnaire]);
 
   const goToChild = (key: string | number) => {
     let nextNode: HAASNode = findNextNode(historyStack.slice(-1)[0], key);
@@ -109,7 +100,7 @@ export const JSONTreeProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <JSONTreeContext.Provider value={{ historyStack, goToChild, customer }}>
+    <JSONTreeContext.Provider value={{ historyStack, goToChild }}>
       {children}
     </JSONTreeContext.Provider>
   );

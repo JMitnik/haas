@@ -466,8 +466,6 @@ export interface ClientConstructor<T> {
 export type ColourSettingsOrderByInput =
   | "id_ASC"
   | "id_DESC"
-  | "title_ASC"
-  | "title_DESC"
   | "primary_ASC"
   | "primary_DESC"
   | "secondary_ASC"
@@ -603,20 +601,6 @@ export interface ColourSettingsWhereInput {
   id_not_starts_with?: Maybe<ID_Input>;
   id_ends_with?: Maybe<ID_Input>;
   id_not_ends_with?: Maybe<ID_Input>;
-  title?: Maybe<String>;
-  title_not?: Maybe<String>;
-  title_in?: Maybe<String[] | String>;
-  title_not_in?: Maybe<String[] | String>;
-  title_lt?: Maybe<String>;
-  title_lte?: Maybe<String>;
-  title_gt?: Maybe<String>;
-  title_gte?: Maybe<String>;
-  title_contains?: Maybe<String>;
-  title_not_contains?: Maybe<String>;
-  title_starts_with?: Maybe<String>;
-  title_not_starts_with?: Maybe<String>;
-  title_ends_with?: Maybe<String>;
-  title_not_ends_with?: Maybe<String>;
   primary?: Maybe<String>;
   primary_not?: Maybe<String>;
   primary_in?: Maybe<String[] | String>;
@@ -1296,24 +1280,22 @@ export type QuestionnaireWhereUniqueInput = AtLeastOne<{
 
 export interface ColourSettingsCreateInput {
   id?: Maybe<ID_Input>;
-  title?: Maybe<String>;
   primary: String;
-  secondary: String;
-  tertiary: String;
-  success: String;
-  warning: String;
-  error: String;
-  lightest: String;
-  light: String;
-  normal: String;
-  dark: String;
-  darkest: String;
-  muted: String;
-  text: String;
+  secondary?: Maybe<String>;
+  tertiary?: Maybe<String>;
+  success?: Maybe<String>;
+  warning?: Maybe<String>;
+  error?: Maybe<String>;
+  lightest?: Maybe<String>;
+  light?: Maybe<String>;
+  normal?: Maybe<String>;
+  dark?: Maybe<String>;
+  darkest?: Maybe<String>;
+  muted?: Maybe<String>;
+  text?: Maybe<String>;
 }
 
 export interface ColourSettingsUpdateInput {
-  title?: Maybe<String>;
   primary?: Maybe<String>;
   secondary?: Maybe<String>;
   tertiary?: Maybe<String>;
@@ -1330,7 +1312,6 @@ export interface ColourSettingsUpdateInput {
 }
 
 export interface ColourSettingsUpdateManyMutationInput {
-  title?: Maybe<String>;
   primary?: Maybe<String>;
   secondary?: Maybe<String>;
   tertiary?: Maybe<String>;
@@ -2101,7 +2082,6 @@ export interface ColourSettingsUpdateOneInput {
 }
 
 export interface ColourSettingsUpdateDataInput {
-  title?: Maybe<String>;
   primary?: Maybe<String>;
   secondary?: Maybe<String>;
   tertiary?: Maybe<String>;
@@ -2450,27 +2430,25 @@ export interface NodeNode {
 
 export interface ColourSettings {
   id: ID_Output;
-  title?: String;
   primary: String;
-  secondary: String;
-  tertiary: String;
-  success: String;
-  warning: String;
-  error: String;
-  lightest: String;
-  light: String;
-  normal: String;
-  dark: String;
-  darkest: String;
-  muted: String;
-  text: String;
+  secondary?: String;
+  tertiary?: String;
+  success?: String;
+  warning?: String;
+  error?: String;
+  lightest?: String;
+  light?: String;
+  normal?: String;
+  dark?: String;
+  darkest?: String;
+  muted?: String;
+  text?: String;
 }
 
 export interface ColourSettingsPromise
   extends Promise<ColourSettings>,
     Fragmentable {
   id: () => Promise<ID_Output>;
-  title: () => Promise<String>;
   primary: () => Promise<String>;
   secondary: () => Promise<String>;
   tertiary: () => Promise<String>;
@@ -2490,7 +2468,6 @@ export interface ColourSettingsSubscription
   extends Promise<AsyncIterator<ColourSettings>>,
     Fragmentable {
   id: () => Promise<AsyncIterator<ID_Output>>;
-  title: () => Promise<AsyncIterator<String>>;
   primary: () => Promise<AsyncIterator<String>>;
   secondary: () => Promise<AsyncIterator<String>>;
   tertiary: () => Promise<AsyncIterator<String>>;
@@ -2510,7 +2487,6 @@ export interface ColourSettingsNullablePromise
   extends Promise<ColourSettings | null>,
     Fragmentable {
   id: () => Promise<ID_Output>;
-  title: () => Promise<String>;
   primary: () => Promise<String>;
   secondary: () => Promise<String>;
   tertiary: () => Promise<String>;
@@ -3545,27 +3521,25 @@ export interface ColourSettingsSubscriptionPayloadSubscription
 
 export interface ColourSettingsPreviousValues {
   id: ID_Output;
-  title?: String;
   primary: String;
-  secondary: String;
-  tertiary: String;
-  success: String;
-  warning: String;
-  error: String;
-  lightest: String;
-  light: String;
-  normal: String;
-  dark: String;
-  darkest: String;
-  muted: String;
-  text: String;
+  secondary?: String;
+  tertiary?: String;
+  success?: String;
+  warning?: String;
+  error?: String;
+  lightest?: String;
+  light?: String;
+  normal?: String;
+  dark?: String;
+  darkest?: String;
+  muted?: String;
+  text?: String;
 }
 
 export interface ColourSettingsPreviousValuesPromise
   extends Promise<ColourSettingsPreviousValues>,
     Fragmentable {
   id: () => Promise<ID_Output>;
-  title: () => Promise<String>;
   primary: () => Promise<String>;
   secondary: () => Promise<String>;
   tertiary: () => Promise<String>;
@@ -3585,7 +3559,6 @@ export interface ColourSettingsPreviousValuesSubscription
   extends Promise<AsyncIterator<ColourSettingsPreviousValues>>,
     Fragmentable {
   id: () => Promise<AsyncIterator<ID_Output>>;
-  title: () => Promise<AsyncIterator<String>>;
   primary: () => Promise<AsyncIterator<String>>;
   secondary: () => Promise<AsyncIterator<String>>;
   tertiary: () => Promise<AsyncIterator<String>>;
