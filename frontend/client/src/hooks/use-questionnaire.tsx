@@ -30,7 +30,6 @@ export const QuestionnaireProvider = ({ children }: { children: ReactNode }) => 
   const data = res.data;
 
   useEffect(() => {
-    console.log('data', data)
     if (data?.questionnaire) {
       setQuestionnaire(data?.questionnaire);
       setCustomer(data?.questionnaire?.customer || {});

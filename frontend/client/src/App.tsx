@@ -48,10 +48,6 @@ const MainAppScreen = styled(Div)`
     min-width: 100vw;
     min-height: 100vh;
     background: ${theme.colors.primary};
-
-    @media ${theme.media.mob} {
-      padding: 0 ${theme.gutter}px;
-    }
   `}
 `;
 

@@ -1,6 +1,8 @@
 
 import gql from 'graphql-tag';
 
+// TODO: Make more dynamic
+// TODO: Express nodes using Fragments
 export const getQuestionnaireQuery = gql`
   query getQuestionnaire ($id: ID) {
     questionnaire(where: {

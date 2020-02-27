@@ -50,6 +50,7 @@ const CenteredScreen = styled(Div)`
 
     @media ${theme.media.mob} {
       padding-top: 0;
+      margin: 0 ${theme.gutter}px;
     }
   `}
 `;
