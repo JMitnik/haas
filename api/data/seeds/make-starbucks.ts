@@ -1,4 +1,4 @@
-import { prisma, NodeType } from '../src/generated/prisma-client/index';
+import { prisma, NodeType } from '../../src/generated/prisma-client/index';
 
 const CUSTOMER = 'Starbucks';
 
@@ -153,7 +153,7 @@ const leafNodes = [
   },
 ];
 
-const main = async () => {
+const makeStarbucks = async () => {
   const customer = await prisma.createCustomer({
     name: CUSTOMER,
     settings: {
@@ -313,4 +313,4 @@ const main = async () => {
   });
 };
 
-main();
+export default makeStarbucks;
