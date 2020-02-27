@@ -22,7 +22,7 @@
         "build:client": "yarn workspace @haas/client build",
         "build:api": "yarn workspace @haas/api generate && yarn workspace @haas/api build",
         "clean:db": "yarn workspace @haas/api clean",
-        "clean:db:prod": "yarn workspace @haas/api clean",
+        "clean:db:prod": "yarn workspace @haas/api clean:prod",
         "gen": "yarn server:gen && yarn dashboard:gen",
         "gen:api": "yarn workspace @haas/api generate",
         "gen:dashboard": "yarn workspace @haas/dashboard generate",
