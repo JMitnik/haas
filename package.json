@@ -25,7 +25,9 @@
         "gen:api": "yarn workspace @haas/api generate",
         "gen:dashboard": "yarn workspace @haas/dashboard generate",
         "migrate:api": "yarn workspace @haas/api migrate",
+        "migrate:api:prod": "yarn workspace @haas/api migrate:prod",
         "seed:api": "yarn workspace @haas/api seed",
+        "seed:api:prod": "yarn workspace @haas/api seed:prod",
         "reset:api": "yarn workspace @haas/api reset"
     },
     "devDependencies": {

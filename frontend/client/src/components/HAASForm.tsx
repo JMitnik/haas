@@ -1,5 +1,6 @@
-import React from 'react';
-import styled, { css } from 'styled-components';
+import React, { useContext, useEffect, useState } from 'react';
+import styled, { css, ThemeContext, ThemeProvider } from 'styled-components';
+import { FormContext, useForm } from 'react-hook-form';
 import { H1, Div, Loader } from '@haas/ui';
 import { useJSONTree } from '../hooks/use-json-tree';
 import { useTransition, animated } from 'react-spring';
@@ -10,8 +11,9 @@ import { HAASTextBox } from './HAASTextBox';
 import { HAASSignIn } from './HAASSignIn';
 
 export const HAASForm = () => {
-  const { historyStack, customer } = useJSONTree();
+  const { historyStack } = useJSONTree();
   const activeNode = historyStack.slice(-1)[0];
+  const form = useForm();
 
   const transitions = useTransition(activeNode, (activeNode) => activeNode?.id, {
     from: { opacity: 0, transform: 'scale(1.1)' },
@@ -22,21 +24,23 @@ export const HAASForm = () => {
   if (!activeNode) return <Loader />;
 
   return (
-    <Div useFlex flexDirection='column' justifyContent='space-between' height={['100vh', '80vh']}>
-      <H1 textAlign="center" color="white">{activeNode?.title}</H1>
-      {/* <img src={customer.settings.logoUrl} alt="Logo" /> */}
-      {transitions.map(({ item, key, props, state }) => {
-        if (state !== 'leave') {
-          return <Entry style={{
-            ...props,
-          }} key={key}
-          >
-            {renderNextNode(item)}
-          </Entry>
-        }
-        return null;
-      })}
-    </Div>
+    <FormContext {...form}>
+      <Div useFlex flexDirection='column' justifyContent='space-between' height={['100vh', '80vh']}>
+        <H1 textAlign="center" color="white">{activeNode?.title}</H1>
+        {/* <img src={customer.settings.logoUrl} alt="Logo" /> */}
+        {transitions.map(({ item, key, props, state }) => {
+          if (state !== 'leave') {
+            return <Entry style={{
+              ...props,
+            }} key={key}
+            >
+              {renderNextNode(item)}
+            </Entry>
+          }
+          return null;
+        })}
+      </Div>
+    </FormContext>
   );
 };
 

@@ -11,6 +11,7 @@
         "reset:prod": "prisma reset -e .env.prod && yarn migrate && prisma seed -e .env.prod -r",
         "seed": "yarn migrate && prisma seed",
         "seed:prod": "yarn migrate && prisma seed -e .env.prod",
+        "token": "prisma token -e .env",
         "token:prod": "prisma token -e .env.prod"
     },
     "dependencies": {

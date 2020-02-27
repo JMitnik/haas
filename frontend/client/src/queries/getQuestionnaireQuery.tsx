@@ -15,6 +15,10 @@ export const getQuestionnaireQuery = gql`
         name
         settings {
           logoUrl
+          colourSettings {
+            primary
+            secondary
+          }
         }
       }
       questions {

@@ -8,6 +8,10 @@ export const getCustomerQuery = gql`
       settings {
         id
         logoUrl
+        colourSettings {
+          primary
+          secondary
+        }
       }
       questionnaires {
         id
