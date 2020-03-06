@@ -8,6 +8,204 @@ const sliderType: NodeType = 'SLIDER';
 const textboxType: NodeType = 'TEXTBOX';
 const registrationType: NodeType = 'REGISTRATION';
 
+const standardEdges = [
+  {
+    parentQuestionContains: `How do you feel about ${CUSTOMER}`, // hardcode company name?
+    childQuestionContains: 'What did you like?',
+    conditions: [
+      {
+        conditionType: 'valueBoundary',
+        renderMin: 7,
+        renderMax: 10,
+        matchValue: null,
+      },
+    ],
+  },
+
+  {
+    parentQuestionContains: 'What did you like?',
+    childQuestionContains: 'What exactly did you like about facilities?',
+    conditions: [
+      {
+        conditionType: 'match',
+        matchValue: 'Facilities',
+        renderMin: null,
+        renderMax: null,
+      },
+    ],
+  },
+
+  {
+    parentQuestionContains: 'What did you like?',
+    childQuestionContains: 'What exactly did you like about the website',
+    conditions: [
+      {
+        conditionType: 'match',
+        matchValue: 'Website/Mobile app',
+        renderMin: null,
+        renderMax: null,
+      },
+    ],
+  },
+
+  {
+    parentQuestionContains: 'What did you like?',
+    childQuestionContains: 'What exactly did you like about the product?',
+    conditions: [
+      {
+        conditionType: 'match',
+        matchValue: 'Product / Services',
+        renderMin: null,
+        renderMax: null,
+      },
+    ],
+  },
+
+  {
+    parentQuestionContains: 'What did you like?',
+    childQuestionContains: 'What exactly did you like about the customer support?',
+    conditions: [
+      {
+        conditionType: 'match',
+        matchValue: 'Customer Support',
+        renderMin: null,
+        renderMax: null,
+      },
+    ],
+  },
+
+  {
+    parentQuestionContains: `How do you feel about ${CUSTOMER}`,
+    childQuestionContains: 'What would you like to talk about?',
+    conditions: [
+      {
+        conditionType: 'valueBoundary',
+        renderMin: 5,
+        renderMax: 7,
+        matchValue: null,
+      },
+    ],
+  },
+
+  {
+    parentQuestionContains: 'What would you like to talk about?',
+    childQuestionContains: 'What exactly did you like about facilities?',
+    conditions: [
+      {
+        conditionType: 'match',
+        matchValue: 'Facilities',
+        renderMin: null,
+        renderMax: null,
+      },
+    ],
+  },
+
+  {
+    parentQuestionContains: 'What would you like to talk about?',
+    childQuestionContains: 'What exactly did you like about the website',
+    conditions: [
+      {
+        conditionType: 'match',
+        matchValue: 'Website/Mobile app',
+        renderMin: null,
+        renderMax: null,
+      },
+    ],
+  },
+
+  {
+    parentQuestionContains: 'What would you like to talk about?',
+    childQuestionContains: 'What exactly did you like about the product?',
+    conditions: [
+      {
+        conditionType: 'match',
+        matchValue: 'Product / Services',
+        renderMin: null,
+        renderMax: null,
+      },
+    ],
+  },
+
+  {
+    parentQuestionContains: 'What would you like to talk about?',
+    childQuestionContains: 'What exactly did you like about the customer support?',
+    conditions: [
+      {
+        conditionType: 'match',
+        matchValue: 'Customer Support',
+        renderMin: null,
+        renderMax: null,
+      },
+    ],
+  },
+
+  {
+    parentQuestionContains: `How do you feel about ${CUSTOMER}`,
+    childQuestionContains: 'We are sorry to hear that',
+    conditions: [
+      {
+        conditionType: 'valueBoundary',
+        renderMin: 0,
+        renderMax: 5,
+        matchValue: null,
+      },
+    ],
+  },
+
+  {
+    parentQuestionContains: 'We are sorry to hear that',
+    childQuestionContains: 'What exactly did you like about facilities?',
+    conditions: [
+      {
+        conditionType: 'match',
+        matchValue: 'Facilities',
+        renderMin: null,
+        renderMax: null,
+      },
+    ],
+  },
+
+  {
+    parentQuestionContains: 'We are sorry to hear that',
+    childQuestionContains: 'What exactly did you like about the website',
+    conditions: [
+      {
+        conditionType: 'match',
+        matchValue: 'Website/Mobile app',
+        renderMin: null,
+        renderMax: null,
+      },
+    ],
+  },
+
+  {
+    parentQuestionContains: 'We are sorry to hear that',
+    childQuestionContains: 'What exactly did you like about the product?',
+    conditions: [
+      {
+        conditionType: 'match',
+        matchValue: 'Product / Services',
+        renderMin: null,
+        renderMax: null,
+      },
+    ],
+  },
+
+  {
+    parentQuestionContains: 'We are sorry to hear that',
+    childQuestionContains: 'What exactly did you like about the customer support?',
+    conditions: [
+      {
+        conditionType: 'match',
+        matchValue: 'Customer Support',
+        renderMin: null,
+        renderMax: null,
+      },
+    ],
+  },
+
+];
+
 const standardSubChildren = [
   {
     title: 'What exactly did you like about facilities?',
@@ -320,6 +518,93 @@ const makeMediamarkt = async () => {
       },
     },
   });
+
+  await Promise.all(standardEdges.map(async (edge) => {
+    const childNode = await prisma.questionNodes({
+      where: {
+        title_contains: edge.childQuestionContains,
+        // AND: {
+        //   id_in: await Promise.all((await prisma.questionNodes()).map((question) => question.id)),
+        // },
+      },
+    });
+
+    if (!childNode[0]) {
+      console.log('Cant find node for:', edge);
+    }
+    const childNodeId = childNode?.[0]?.id;
+
+    const parentNode = await prisma.questionNodes(
+      {
+        where: {
+          title_contains: edge.parentQuestionContains,
+          // AND: {
+          //   id_in: await Promise.all((await prisma.questionNodes()).map((question) => question.id)),
+          // },
+        },
+      },
+    );
+
+    const parentNodeId = parentNode?.[0]?.id;
+
+    const questionCondition = await prisma.questionConditions(
+      {
+        where: {
+          // renderMin: edge.conditions[0].renderMin,
+          id_in: await Promise.all((await prisma.questionConditions()).map((question) => question.id)),
+          conditionType: edge.conditions?.[0].conditionType,
+          matchValue: edge.conditions?.[0].matchValue,
+          renderMin: edge.conditions?.[0].renderMin,
+          renderMax: edge.conditions?.[0].renderMax,
+        },
+      },
+    );
+
+    const questionConditionId = questionCondition?.[0]?.id;
+
+    if (childNodeId && parentNodeId && questionConditionId) {
+      await prisma.createEdge({
+        childNode: {
+          connect: {
+            id: childNodeId,
+          },
+        },
+        parentNode: {
+          connect: {
+            id: parentNodeId,
+          },
+        },
+        conditions: {
+          connect: {
+            id: questionConditionId,
+          },
+        },
+      });
+    }
+  }));
+
+  await Promise.all((await prisma.questionNodes()).map(async (node) => {
+    const edgeChildrenNodes = await prisma.edges({
+      where: {
+        parentNode: {
+          id: node.id,
+        },
+      },
+    });
+
+    await prisma.updateQuestionNode({
+      where: {
+        id: node.id,
+      },
+      data: {
+        edgeChildren: {
+          connect: edgeChildrenNodes.map((edgeChild) => ({ id: edgeChild.id })),
+        },
+      },
+    });
+    // 1. Find all edges (parentId) corresponderend met huidige node id
+    // 2. Update edgeChildren van huidige node met gevonden edges
+  }));
 };
 
 export default makeMediamarkt;

@@ -518,7 +518,7 @@ const makeStarbucks = async () => {
       },
     },
   });
-  // await Promise.all(standardSubChildren.map(async (rootChild)
+
   await Promise.all(standardEdges.map(async (edge) => {
     const childNode = await prisma.questionNodes({
       where: {

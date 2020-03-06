@@ -88,8 +88,10 @@ export const JSONTreeProvider = ({ children }: { children: ReactNode }) => {
     if (questionnaire) {
       setHistoryStack(questionnaire?.questions || []);
       setLeafCollection(questionnaire?.leafs || []);
+      console.log('Questionnaire: ', questionnaire)
+      console.log('Leaf collection: ', leafCollection)
     }
-  }, [questionnaire]);
+  }, [questionnaire, leafCollection]);
 
   const goToChild = async (key: string | number) => {
         let nextEdge: Edge = findNextEdge(historyStack.slice(-1)[0], key);
@@ -101,28 +103,19 @@ export const JSONTreeProvider = ({ children }: { children: ReactNode }) => {
         }).then(res => res.data.questionNode)
     
         if (nextNode && nextNode.overrideLeaf?.id) {
+          console.log('SETTING NEW LEAF NODE TO: ', nextNode.overrideLeaf?.id)
           setActiveLeafNodeID(nextNode?.overrideLeaf?.id);
         }
     
         if (!nextNode) {
+          console.log('NO NEXT NODE SETTING LEAFNODE')
+          console.log(leafCollection)
+          console.log('Current LEAF: ', activeLeafNodeId)
           nextNode = findLeafNode(leafCollection, activeLeafNodeId);
         }
     
         setHistoryStack(hist => [...hist, nextNode]);
       };
-
-  // const goToChild = (key: string | number) => {
-  //   let nextNode: HAASNode = findNextNode(historyStack.slice(-1)[0], key);
-  //   if (nextNode?.overrideLeaf?.id) {
-  //     setActiveLeafNodeID(nextNode?.overrideLeaf?.id);
-  //   }
-
-  //   if (!nextNode) {
-  //     nextNode = findLeafNode(leafCollection, activeLeafNodeId);
-  //   }
-
-  //   setHistoryStack(hist => [...hist, nextNode]);
-  // };
 
   return (
     <JSONTreeContext.Provider value={{ historyStack, goToChild }}>
