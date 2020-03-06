@@ -562,7 +562,6 @@ const makeStarbucks = async () => {
 
     const questionConditionId = questionCondition?.[0]?.id;
 
-    console.log(`childId: ${childNodeId}, parentId: ${parentNodeId}, questionConditionId: ${questionConditionId}`);
     if (childNodeId && parentNodeId && questionConditionId) {
       await prisma.createEdge({
         childNode: {

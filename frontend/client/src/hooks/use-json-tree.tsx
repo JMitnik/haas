@@ -93,7 +93,6 @@ export const JSONTreeProvider = ({ children }: { children: ReactNode }) => {
 
   const goToChild = async (key: string | number) => {
         let nextEdge: Edge = findNextEdge(historyStack.slice(-1)[0], key);
-        console.log('NEXT EDGE: ', nextEdge)
         let nextNode: any = nextEdge?.childNode?.id && await client.query({
           query: GET_QUESTION_NODE,
           variables: {
@@ -102,12 +101,10 @@ export const JSONTreeProvider = ({ children }: { children: ReactNode }) => {
         }).then(res => res.data.questionNode)
     
         if (nextNode && nextNode.overrideLeaf?.id) {
-          console.log('Setting active leafnode to: ', nextNode?.overrideLeaf?.id)
           setActiveLeafNodeID(nextNode?.overrideLeaf?.id);
         }
     
         if (!nextNode) {
-          console.log('No next node going to look for leaf nodes')
           nextNode = findLeafNode(leafCollection, activeLeafNodeId);
         }
     

@@ -20,16 +20,11 @@ export const QuestionnaireProvider = ({ children }: { children: ReactNode }) => 
 
   const [questionnaire, setQuestionnaire] = useState();
   const [customer, setCustomer] = useState();
-
-  console.log('PARAMS: ', params)
-
   const res = useQuery(GET_QUESTIONNAIRE, {
     variables: {
       id: params.questionnaireId
     },
   });
-
-  console.log(res.data)
 
   const data = res.data;
 
