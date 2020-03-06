@@ -1,8 +1,4 @@
 import React, { useState, useContext, useEffect, ReactNode } from 'react';
-import { useQuery } from '@apollo/react-hooks';
-import { useParams } from 'react-router-dom';
-import { getCustomerQuery } from '../queries/getCustomerQuery';
-import { getQuestionnaireQuery } from '../queries/getQuestionnaireQuery';
 import { useQuestionnaire } from './use-questionnaire';
 import { GET_QUESTION_NODE } from '../queries/getQuestionNode';
 import client from '../config/ApolloClient'
