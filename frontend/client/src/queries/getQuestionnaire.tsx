@@ -11,12 +11,28 @@ export const GET_QUESTIONNAIRE = gql`
     publicTitle
     creationDate
     updatedAt
+    leafs {
+        id
+        title
+        type
+    }
+    customer {
+        name
+        settings {
+          logoUrl
+          colourSettings {
+            primary
+            secondary
+          }
+        }
+    }
     questions {
     id
     title
-    questionType {
-        type
+    overrideLeaf {
+      id
     }
+    questionType
     edgeChildren {
       id
       conditions {
@@ -39,28 +55,6 @@ export const GET_QUESTIONNAIRE = gql`
         publicValue
     }
 }
-    customer {
-      id
-    	settings {
-        colourSettings {
-          id
-          title
-          primary
-          secondary
-          tertiary
-          success
-          warning
-          error
-          lightest
-          light
-          normal
-          dark
-          darkest
-          muted
-          text
-        }
-      }
-  	}
   }
 }
 `;

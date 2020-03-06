@@ -1,6 +1,11 @@
-import React, { useState, useContext, ReactNode, useEffect, useCallback } from 'react';
-import client from '../ApolloClient'
+import React, { useState, useContext, useEffect, ReactNode } from 'react';
+import { useQuery } from '@apollo/react-hooks';
+import { useParams } from 'react-router-dom';
+import { getCustomerQuery } from '../queries/getCustomerQuery';
+import { getQuestionnaireQuery } from '../queries/getQuestionnaireQuery';
+import { useQuestionnaire } from './use-questionnaire';
 import { GET_QUESTION_NODE } from '../queries/getQuestionNode';
+import client from '../config/ApolloClient'
 
 export interface HAASNodeConditions {
   renderMin?: number;
@@ -8,7 +13,7 @@ export interface HAASNodeConditions {
   matchValue?: string;
 }
 
-type HAASQuestionNodeType = 'slider' | 'multi-choice' | 'text-box';
+type HAASQuestionNodeType = 'SLIDER' | 'MULTI_CHOICE' | 'text-box';
 type HAASLeafType = 'textbox' | 'social-share' | 'registration' | 'phone';
 
 export interface HAASQuestionType {
@@ -33,8 +38,8 @@ export interface HAASNode {
   title: string;
   branchVal?: string;
   conditions?: [HAASNodeConditions];
-  questionType: HAASQuestionType;
-  overrideLeafId?: number;
+  questionType: string;
+  overrideLeaf?: HAASNode;
   options?: [MultiChoiceOption];
   children: [HAASNode];
   edgeChildren: [Edge];
@@ -45,13 +50,10 @@ interface JSONTreeContextProps {
   goToChild: (key: string | number) => void;
 }
 
-interface HAASRouterParams {
-  nodeKey: string;
-}
 
 const findNextEdge = (parent: HAASNode, key: string | number) => {
   const candidates = parent?.edgeChildren?.filter(edge => {
-    if (parent.questionType.type === 'slider') {
+    if (parent.questionType === 'SLIDER') {
       if (edge?.conditions?.[0].renderMin && key < edge?.conditions?.[0].renderMin) {
         return false;
       }
@@ -60,51 +62,74 @@ const findNextEdge = (parent: HAASNode, key: string | number) => {
         return false;
       }
     }
-
-    if (parent.questionType.type === 'multi-choice') {
+    if (parent.questionType === 'MULTI_CHOICE') {
       return edge.conditions?.[0].matchValue === key;
     }
 
     return true;
   });
 
-  console.log('Candidates: ', candidates)
   return candidates && candidates[0];
 };
 
-const findLeafNode = (collection: HAASNode[], key: number) => collection.filter(item => item.nodeId === key)[0];
+const findLeafNode = (collection: HAASNode[], key: number) => collection.filter(item => item.id === key)[0];
+
+interface ProjectParamProps {
+  customerId: string;
+  questionnaireId: string;
+}
 
 export const JSONTreeContext = React.createContext({} as JSONTreeContextProps);
 
-export const JSONTreeProvider = ({ json, children }: { json: any, children: ReactNode }) => {
-  const [activeLeafNodeId, setActiveLeafNodeID] = useState(0);
+export const JSONTreeProvider = ({ children }: { children: ReactNode }) => {
+  const { questionnaire } = useQuestionnaire();
 
-  const [historyStack, setHistoryStack] = useState<HAASNode[]>(json.questionnaire);
-  const leafCollection: [HAASNode] = json.LeafCollection;
+  const [activeLeafNodeId, setActiveLeafNodeID] = useState(0);
+  const [historyStack, setHistoryStack] = useState<HAASNode[]>([]);
+  const [leafCollection, setLeafCollection] = useState([]);
+
+  useEffect(() => {
+    if (questionnaire) {
+      setHistoryStack(questionnaire?.questions || []);
+      setLeafCollection(questionnaire?.leafs || []);
+    }
+  }, [questionnaire]);
 
   const goToChild = async (key: string | number) => {
-    let nextEdge: Edge = findNextEdge(historyStack.slice(-1)[0], key);
+        let nextEdge: Edge = findNextEdge(historyStack.slice(-1)[0], key);
+        console.log('NEXT EDGE: ', nextEdge)
+        let nextNode: any = nextEdge?.childNode?.id && await client.query({
+          query: GET_QUESTION_NODE,
+          variables: {
+            id: nextEdge?.childNode.id
+          }
+        }).then(res => res.data.questionNode)
+    
+        if (nextNode && nextNode.overrideLeaf?.id) {
+          console.log('Setting active leafnode to: ', nextNode?.overrideLeaf?.id)
+          setActiveLeafNodeID(nextNode?.overrideLeaf?.id);
+        }
+    
+        if (!nextNode) {
+          console.log('No next node going to look for leaf nodes')
+          nextNode = findLeafNode(leafCollection, activeLeafNodeId);
+        }
+    
+        setHistoryStack(hist => [...hist, nextNode]);
+      };
 
-    let nextNode: any = nextEdge?.childNode?.id && await client.query({
-      query: GET_QUESTION_NODE,
-      variables: {
-        id: nextEdge?.childNode.id
-      }
-    }).then(res => res.data.questionNode)
+  // const goToChild = (key: string | number) => {
+  //   let nextNode: HAASNode = findNextNode(historyStack.slice(-1)[0], key);
+  //   if (nextNode?.overrideLeaf?.id) {
+  //     setActiveLeafNodeID(nextNode?.overrideLeaf?.id);
+  //   }
 
-    if (nextNode && nextNode.overrideLeafId) {
-      setActiveLeafNodeID(nextNode.overrideLeafId);
-    }
+  //   if (!nextNode) {
+  //     nextNode = findLeafNode(leafCollection, activeLeafNodeId);
+  //   }
 
-    if (!nextNode) {
-      nextNode = findLeafNode(leafCollection, activeLeafNodeId);
-      console.log('Leaf node: ', nextNode)
-    }
-
-    setHistoryStack(hist => [...hist, nextNode]);
-  };
-
-  console.log(historyStack);
+  //   setHistoryStack(hist => [...hist, nextNode]);
+  // };
 
   return (
     <JSONTreeContext.Provider value={{ historyStack, goToChild }}>

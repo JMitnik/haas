@@ -4,7 +4,8 @@ type Questionnaire {
     title: String!
     description: String!
     publicTitle: String
-    creationDate: DateTime! @createdAt 
+    creationDate: DateTime! @createdAt
     updatedAt: DateTime @updatedAt
     questions: [QuestionNode]
+    leafs: [LeafNode!] @relation(link: TABLE, name: "QuestionnaireLeafs")
 }

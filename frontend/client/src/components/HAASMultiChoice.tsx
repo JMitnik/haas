@@ -1,5 +1,5 @@
 import React, { memo } from 'react';
-import { H1, H5, Slider, Flex, ColumnFlex, Button, Div } from '@haas/ui';
+import { H5, Flex, Button, Div } from '@haas/ui';
 import { useJSONTree, MultiChoiceOption } from '../hooks/use-json-tree';
 
 export const HAASMultiChoice = memo((props) => {
@@ -11,7 +11,7 @@ export const HAASMultiChoice = memo((props) => {
     <>
       <Flex flexWrap="wrap">
         {activeNode.options?.map((multiChoiceOption: MultiChoiceOption, index: any) => (
-          <Div key={index} fillChildren padding={4} flex={1}>
+          <Div key={index} fillChildren padding={[2,4]} width={['100%', null]} flex={['100%', 1]}>
             {/* TODO: Register the form value here */}
             <Button brand="primary" onClick={() => goToChild(multiChoiceOption.value)} key={index}>
               <H5>

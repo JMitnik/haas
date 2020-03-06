@@ -1,22 +1,47 @@
-import React, { useState } from 'react';
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
-import styled, { css, ThemeProvider } from 'styled-components';
-import theme from './theme';
-import { FormContext, useForm } from 'react-hook-form';
-import { Div } from '@haas/ui';
-import { ColumnFlex } from '@haas/ui/src/Container';
-import { JSONTreeProvider } from './hooks/use-json-tree';
-import { HAASForm } from './HAASForm';
-import { StudySelector } from './StudySelector'
-import whyDidYouRender from '@welldone-software/why-did-you-render';
-
+import React from 'react';
 import { useQuery } from '@apollo/react-hooks';
+import styled, { css, ThemeProvider } from 'styled-components';
+import { Switch, Route, BrowserRouter, Redirect } from 'react-router-dom';
 
-import { GET_QUESTIONNAIRE } from './queries/getQuestionnaire'
-import { GET_LEAF_NODES } from './queries/getLeafNodes'
+import theme from './config/theme';
+import HAASQuestionnaire from './views/HAASQuestionnaire';
+import { Div, Loader } from '@haas/ui';
+import { CustomerSelector } from './components/CustomerSelector';
+import { getCustomerQuery } from './queries/getCustomerQuery';
+import { QuestionnaireProvider } from './hooks/use-questionnaire';
 
-whyDidYouRender(React);
+const App: React.FC = () => {
+  const { data, loading, error } = useQuery(getCustomerQuery);
+  if (error) return <div>{'Error!' + error.message}</div>;
 
+  const customers = data?.customers;
+
+  return (
+    <>
+      <BrowserRouter>
+        <ThemeProvider theme={theme}>
+          <MainAppScreen>
+              {loading ? <Loader/> : (
+                <Switch>
+                  <Route path="/c/:customerId/q/:questionnaireId">
+                    <QuestionnaireProvider>
+                      <HAASQuestionnaire />
+                    </QuestionnaireProvider>
+                  </Route>
+                  <Route path="/c/">
+                    <Redirect to="/" />
+                  </Route>
+                  <Route path="/">
+                    <CustomerSelector customers={customers} />
+                  </Route>
+                </Switch>
+              )}
+          </MainAppScreen>
+        </ThemeProvider>
+      </BrowserRouter>
+    </>
+  );
+}
 
 const MainAppScreen = styled(Div)`
   ${({ theme }) => css`
@@ -25,68 +50,5 @@ const MainAppScreen = styled(Div)`
     background: ${theme.colors.primary};
   `}
 `;
-
-const CenteredScreen = styled(Div)`
-  ${({ theme }) => css`
-    max-width: 780px;
-    margin: 0 auto;
-    position: relative;
-    padding-top: 100px;
-
-    @media ${theme.media.mob} {
-      padding-top: 0;
-    }
-  `}
-`;
-
-
-const App: React.FC = () => {
-  const form = useForm();
-
-  const [currStudy, setCurrStudy] = useState('')
-
-  const leafNodes = useQuery<any>(GET_LEAF_NODES)
-
-  const {
-    data,
-    loading,
-    error
-  } = useQuery<any>(GET_QUESTIONNAIRE, { variables: {id: currStudy}});
-
-  const getCurrentStudyFromChild = (studyId: string) => {
-    setCurrStudy(studyId)
-  }
-
-  if (data?.questionnaire?.customer?.settings?.colourSettings) {
-    const {title, lightest, light, normal, dark, darkest, muted, text, primary, secondary, tertiary, success, warning, error } = data?.questionnaire?.customer?.settings?.colourSettings
-    const colours = {'title': title, 'black': 'black', 'white': 'white', 'primary': primary, 'secondary': secondary, 'tertiary': tertiary, 'success': success, 'warning': warning, 'error': error, default: { 'lightest': lightest, 'light': light, 'normal': normal, 'dark': dark, 'darkest': darkest, 'muted': muted, 'text': text } }
-    theme.colors = colours
-  }
-
-  const cleanData = data?.questionnaire?.questions;
-  const finalData = { questionnaire: cleanData, LeafCollection: leafNodes?.data?.leafNodes };
-
-  if (loading) return <div>'Loading...'</div>;
-  if (error) return <div>{'Error!' + error.message}</div>;
-
-  return (
-    <>
-      <ThemeProvider theme={theme}>
-        <MainAppScreen>
-          <CenteredScreen>
-            <JSONTreeProvider json={finalData}>
-              <FormContext {...form}>
-                <ColumnFlex alignItems="center">
-                  {currStudy && <HAASForm />}
-                  {!currStudy && <StudySelector sendCurrentStudyToParent={getCurrentStudyFromChild}></StudySelector>}
-                </ColumnFlex>
-              </FormContext>
-            </JSONTreeProvider>
-          </CenteredScreen>
-        </MainAppScreen>
-      </ThemeProvider>
-    </>
-  );
-}
 
 export default App;

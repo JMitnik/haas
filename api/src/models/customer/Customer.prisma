@@ -1,5 +1,13 @@
 type Customer {
     id: ID! @id
-    name: String! 
+    name: String!
+    questionnaires: [Questionnaire]
     settings: CustomerSettings
+}
+
+type CustomerSettings {
+    id: ID! @id
+    logoUrl: String
+    colourSettings: ColourSettings
+    fontSettings: FontSettings
 }

@@ -10,6 +10,7 @@ dist
 .DS_Store
 .env
 .env.local
+.env.prod
 .env.development.local
 .env.test.local
 .env.production.local
@@ -38,12 +39,20 @@ mindmaps
 # misc
 .DS_Store
 .env.local
+.prod.env
+.dev.env
 .env.development.local
 .env.test.local
 .env.production.local
+.env.prod
 
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
 types.d.ts
+
+.now
+
+**/.env.prod
+api/.env.prod

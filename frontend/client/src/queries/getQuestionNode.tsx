@@ -7,12 +7,13 @@ export const GET_QUESTION_NODE = gql`
   }) {
     id
     title
-    overrideLeafId
-
-    questionType {
-        type
-    }
-
+    overrideLeaf {
+      id
+      nodeId
+      type
+      title
+		}
+    questionType 
     edgeChildren {
       id
       conditions {
