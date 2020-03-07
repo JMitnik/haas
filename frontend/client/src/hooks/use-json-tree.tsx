@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect, ReactNode } from 'react';
 import { useQuestionnaire } from './use-questionnaire';
-import { GET_QUESTION_NODE } from '../queries/getQuestionNode';
+import { getQuestionNodeQuery } from '../queries/getQuestionNodeQuery';
 import client from '../config/ApolloClient'
 
 export interface HAASNodeConditions {
@@ -96,7 +96,7 @@ export const JSONTreeProvider = ({ children }: { children: ReactNode }) => {
   const goToChild = async (key: string | number) => {
     let nextEdge: Edge = findNextEdge(historyStack.slice(-1)[0], key);
     let nextNode: any = nextEdge?.childNode?.id && await client.query({
-      query: GET_QUESTION_NODE,
+      query: getQuestionNodeQuery,
       variables: {
         id: nextEdge?.childNode.id
       }
