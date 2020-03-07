@@ -1,9 +1,7 @@
 import React, { useState, useContext, useEffect, ReactNode } from 'react';
-import { useQuery } from '@apollo/react-hooks';
-import { useParams } from 'react-router-dom';
-import { getCustomerQuery } from '../queries/getCustomerQuery';
-import { getQuestionnaireQuery } from '../queries/getQuestionnaireQuery';
 import { useQuestionnaire } from './use-questionnaire';
+import { GET_QUESTION_NODE } from '../queries/getQuestionNode';
+import client from '../config/ApolloClient'
 
 export interface HAASNodeConditions {
   renderMin?: number;
@@ -15,12 +13,19 @@ type HAASQuestionNodeType = 'SLIDER' | 'MULTI_CHOICE' | 'text-box';
 type HAASLeafType = 'textbox' | 'social-share' | 'registration' | 'phone';
 
 export interface HAASQuestionType {
-    type: HAASQuestionNodeType | HAASLeafType;
+  type: HAASQuestionNodeType | HAASLeafType;
 }
 
 export interface MultiChoiceOption {
   value: string;
   publicValue?: string;
+}
+
+export interface Edge {
+  id: string;
+  parentNode: HAASNode;
+  childNode: HAASNode;
+  conditions: [HAASNodeConditions];
 }
 
 export interface HAASNode {
@@ -33,6 +38,7 @@ export interface HAASNode {
   overrideLeaf?: HAASNode;
   options?: [MultiChoiceOption];
   children: [HAASNode];
+  edgeChildren: [Edge];
 }
 
 interface JSONTreeContextProps {
@@ -41,20 +47,19 @@ interface JSONTreeContextProps {
 }
 
 
-const findNextNode = (parent: HAASNode, key: string | number) => {
-  const candidates = parent?.children?.filter(child => {
+const findNextEdge = (parent: HAASNode, key: string | number) => {
+  const candidates = parent?.edgeChildren?.filter(edge => {
     if (parent.questionType === 'SLIDER') {
-      if (child?.conditions?.[0].renderMin && key < child?.conditions?.[0].renderMin) {
+      if (edge?.conditions?.[0].renderMin && key < edge?.conditions?.[0].renderMin) {
         return false;
       }
 
-      if (child?.conditions?.[0].renderMax && key > child?.conditions?.[0].renderMax) {
+      if (edge?.conditions?.[0].renderMax && key > edge?.conditions?.[0].renderMax) {
         return false;
       }
     }
-
     if (parent.questionType === 'MULTI_CHOICE') {
-      return child.conditions?.[0].matchValue === key;
+      return edge.conditions?.[0].matchValue === key;
     }
 
     return true;
@@ -83,16 +88,29 @@ export const JSONTreeProvider = ({ children }: { children: ReactNode }) => {
     if (questionnaire) {
       setHistoryStack(questionnaire?.questions || []);
       setLeafCollection(questionnaire?.leafs || []);
+      console.log('Questionnaire: ', questionnaire)
+      console.log('Leaf collection: ', leafCollection)
     }
-  }, [questionnaire]);
+  }, [questionnaire, leafCollection]);
 
-  const goToChild = (key: string | number) => {
-    let nextNode: HAASNode = findNextNode(historyStack.slice(-1)[0], key);
-    if (nextNode?.overrideLeaf?.id) {
+  const goToChild = async (key: string | number) => {
+    let nextEdge: Edge = findNextEdge(historyStack.slice(-1)[0], key);
+    let nextNode: any = nextEdge?.childNode?.id && await client.query({
+      query: GET_QUESTION_NODE,
+      variables: {
+        id: nextEdge?.childNode.id
+      }
+    }).then(res => res.data.questionNode)
+
+    if (nextNode && nextNode.overrideLeaf?.id) {
+      console.log('SETTING NEW LEAF NODE TO: ', nextNode.overrideLeaf?.id)
       setActiveLeafNodeID(nextNode?.overrideLeaf?.id);
     }
 
     if (!nextNode) {
+      console.log('NO NEXT NODE SETTING LEAFNODE')
+      console.log(leafCollection)
+      console.log('Current LEAF: ', activeLeafNodeId)
       nextNode = findLeafNode(leafCollection, activeLeafNodeId);
     }
 

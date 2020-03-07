@@ -4,7 +4,6 @@ import Select, { ActionMeta } from 'react-select';
 import { useHistory } from 'react-router-dom';
 
 import { H1, Div, Card, CardBody, CardFooter, H3, Flex, ColumnFlex, Label } from '@haas/ui';
-import { useQuery } from '@apollo/react-hooks';
 
 interface CustomerSelectorProps {
   customers: []

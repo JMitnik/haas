@@ -6,7 +6,7 @@
         "build": "yarn",
         "clean": "prisma reset",
         "clean:prod": "prisma reset -e .env.prod",
-        "generate": "prisma deploy && prisma generate && graphql-codegen",
+        "generate": "prisma deploy && prisma generate -e .env && graphql-codegen",
         "migrate": "prisma deploy -f -e .env && prisma generate && graphql-codegen",
         "migrate:prod": "prisma deploy -f -e .env.prod",
         "seed": "yarn migrate && prisma seed",

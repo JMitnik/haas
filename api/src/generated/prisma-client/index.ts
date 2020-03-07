@@ -19,6 +19,7 @@ export interface Exists {
   colourSettings: (where?: ColourSettingsWhereInput) => Promise<boolean>;
   customer: (where?: CustomerWhereInput) => Promise<boolean>;
   customerSettings: (where?: CustomerSettingsWhereInput) => Promise<boolean>;
+  edge: (where?: EdgeWhereInput) => Promise<boolean>;
   fontSettings: (where?: FontSettingsWhereInput) => Promise<boolean>;
   leafNode: (where?: LeafNodeWhereInput) => Promise<boolean>;
   questionCondition: (where?: QuestionConditionWhereInput) => Promise<boolean>;
@@ -107,6 +108,25 @@ export interface Prisma {
     first?: Int;
     last?: Int;
   }) => CustomerSettingsConnectionPromise;
+  edge: (where: EdgeWhereUniqueInput) => EdgeNullablePromise;
+  edges: (args?: {
+    where?: EdgeWhereInput;
+    orderBy?: EdgeOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => FragmentableArray<Edge>;
+  edgesConnection: (args?: {
+    where?: EdgeWhereInput;
+    orderBy?: EdgeOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => EdgeConnectionPromise;
   fontSettings: (
     where: FontSettingsWhereUniqueInput
   ) => FontSettingsNullablePromise;
@@ -297,6 +317,18 @@ export interface Prisma {
   deleteManyCustomerSettingses: (
     where?: CustomerSettingsWhereInput
   ) => BatchPayloadPromise;
+  createEdge: (data: EdgeCreateInput) => EdgePromise;
+  updateEdge: (args: {
+    data: EdgeUpdateInput;
+    where: EdgeWhereUniqueInput;
+  }) => EdgePromise;
+  upsertEdge: (args: {
+    where: EdgeWhereUniqueInput;
+    create: EdgeCreateInput;
+    update: EdgeUpdateInput;
+  }) => EdgePromise;
+  deleteEdge: (where: EdgeWhereUniqueInput) => EdgePromise;
+  deleteManyEdges: (where?: EdgeWhereInput) => BatchPayloadPromise;
   createFontSettings: (data: FontSettingsCreateInput) => FontSettingsPromise;
   updateFontSettings: (args: {
     data: FontSettingsUpdateInput;
@@ -435,6 +467,9 @@ export interface Subscription {
   customerSettings: (
     where?: CustomerSettingsSubscriptionWhereInput
   ) => CustomerSettingsSubscriptionPayloadSubscription;
+  edge: (
+    where?: EdgeSubscriptionWhereInput
+  ) => EdgeSubscriptionPayloadSubscription;
   fontSettings: (
     where?: FontSettingsSubscriptionWhereInput
   ) => FontSettingsSubscriptionPayloadSubscription;
@@ -545,6 +580,14 @@ export type QuestionOptionOrderByInput =
   | "value_DESC"
   | "publicValue_ASC"
   | "publicValue_DESC";
+
+export type EdgeOrderByInput =
+  | "id_ASC"
+  | "id_DESC"
+  | "createdAt_ASC"
+  | "createdAt_DESC"
+  | "updatedAt_ASC"
+  | "updatedAt_DESC";
 
 export type LeafNodeOrderByInput =
   | "id_ASC"
@@ -1086,6 +1129,9 @@ export interface QuestionNodeWhereInput {
   children_every?: Maybe<QuestionNodeWhereInput>;
   children_some?: Maybe<QuestionNodeWhereInput>;
   children_none?: Maybe<QuestionNodeWhereInput>;
+  edgeChildren_every?: Maybe<EdgeWhereInput>;
+  edgeChildren_some?: Maybe<EdgeWhereInput>;
+  edgeChildren_none?: Maybe<EdgeWhereInput>;
   AND?: Maybe<QuestionNodeWhereInput[] | QuestionNodeWhereInput>;
   OR?: Maybe<QuestionNodeWhereInput[] | QuestionNodeWhereInput>;
   NOT?: Maybe<QuestionNodeWhereInput[] | QuestionNodeWhereInput>;
@@ -1249,7 +1295,52 @@ export interface QuestionOptionWhereInput {
   NOT?: Maybe<QuestionOptionWhereInput[] | QuestionOptionWhereInput>;
 }
 
+export interface EdgeWhereInput {
+  id?: Maybe<ID_Input>;
+  id_not?: Maybe<ID_Input>;
+  id_in?: Maybe<ID_Input[] | ID_Input>;
+  id_not_in?: Maybe<ID_Input[] | ID_Input>;
+  id_lt?: Maybe<ID_Input>;
+  id_lte?: Maybe<ID_Input>;
+  id_gt?: Maybe<ID_Input>;
+  id_gte?: Maybe<ID_Input>;
+  id_contains?: Maybe<ID_Input>;
+  id_not_contains?: Maybe<ID_Input>;
+  id_starts_with?: Maybe<ID_Input>;
+  id_not_starts_with?: Maybe<ID_Input>;
+  id_ends_with?: Maybe<ID_Input>;
+  id_not_ends_with?: Maybe<ID_Input>;
+  createdAt?: Maybe<DateTimeInput>;
+  createdAt_not?: Maybe<DateTimeInput>;
+  createdAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  createdAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  createdAt_lt?: Maybe<DateTimeInput>;
+  createdAt_lte?: Maybe<DateTimeInput>;
+  createdAt_gt?: Maybe<DateTimeInput>;
+  createdAt_gte?: Maybe<DateTimeInput>;
+  updatedAt?: Maybe<DateTimeInput>;
+  updatedAt_not?: Maybe<DateTimeInput>;
+  updatedAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  updatedAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  updatedAt_lt?: Maybe<DateTimeInput>;
+  updatedAt_lte?: Maybe<DateTimeInput>;
+  updatedAt_gt?: Maybe<DateTimeInput>;
+  updatedAt_gte?: Maybe<DateTimeInput>;
+  conditions_every?: Maybe<QuestionConditionWhereInput>;
+  conditions_some?: Maybe<QuestionConditionWhereInput>;
+  conditions_none?: Maybe<QuestionConditionWhereInput>;
+  parentNode?: Maybe<QuestionNodeWhereInput>;
+  childNode?: Maybe<QuestionNodeWhereInput>;
+  AND?: Maybe<EdgeWhereInput[] | EdgeWhereInput>;
+  OR?: Maybe<EdgeWhereInput[] | EdgeWhereInput>;
+  NOT?: Maybe<EdgeWhereInput[] | EdgeWhereInput>;
+}
+
 export type CustomerSettingsWhereUniqueInput = AtLeastOne<{
+  id: Maybe<ID_Input>;
+}>;
+
+export type EdgeWhereUniqueInput = AtLeastOne<{
   id: Maybe<ID_Input>;
 }>;
 
@@ -1370,6 +1461,7 @@ export interface QuestionNodeCreateInput {
   conditions?: Maybe<QuestionConditionCreateManyInput>;
   options?: Maybe<QuestionOptionCreateManyInput>;
   children?: Maybe<QuestionNodeCreateManyInput>;
+  edgeChildren?: Maybe<EdgeCreateManyInput>;
 }
 
 export interface LeafNodeCreateOneInput {
@@ -1410,6 +1502,23 @@ export interface QuestionOptionCreateInput {
   id?: Maybe<ID_Input>;
   value: String;
   publicValue?: Maybe<String>;
+}
+
+export interface EdgeCreateManyInput {
+  create?: Maybe<EdgeCreateInput[] | EdgeCreateInput>;
+  connect?: Maybe<EdgeWhereUniqueInput[] | EdgeWhereUniqueInput>;
+}
+
+export interface EdgeCreateInput {
+  id?: Maybe<ID_Input>;
+  conditions?: Maybe<QuestionConditionCreateManyInput>;
+  parentNode?: Maybe<QuestionNodeCreateOneInput>;
+  childNode?: Maybe<QuestionNodeCreateOneInput>;
+}
+
+export interface QuestionNodeCreateOneInput {
+  create?: Maybe<QuestionNodeCreateInput>;
+  connect?: Maybe<QuestionNodeWhereUniqueInput>;
 }
 
 export interface LeafNodeCreateManyInput {
@@ -1539,6 +1648,7 @@ export interface QuestionNodeUpdateDataInput {
   conditions?: Maybe<QuestionConditionUpdateManyInput>;
   options?: Maybe<QuestionOptionUpdateManyInput>;
   children?: Maybe<QuestionNodeUpdateManyInput>;
+  edgeChildren?: Maybe<EdgeUpdateManyInput>;
 }
 
 export interface LeafNodeUpdateOneInput {
@@ -1799,6 +1909,90 @@ export interface QuestionOptionUpdateManyWithWhereNestedInput {
 export interface QuestionOptionUpdateManyDataInput {
   value?: Maybe<String>;
   publicValue?: Maybe<String>;
+}
+
+export interface EdgeUpdateManyInput {
+  create?: Maybe<EdgeCreateInput[] | EdgeCreateInput>;
+  update?: Maybe<
+    | EdgeUpdateWithWhereUniqueNestedInput[]
+    | EdgeUpdateWithWhereUniqueNestedInput
+  >;
+  upsert?: Maybe<
+    | EdgeUpsertWithWhereUniqueNestedInput[]
+    | EdgeUpsertWithWhereUniqueNestedInput
+  >;
+  delete?: Maybe<EdgeWhereUniqueInput[] | EdgeWhereUniqueInput>;
+  connect?: Maybe<EdgeWhereUniqueInput[] | EdgeWhereUniqueInput>;
+  set?: Maybe<EdgeWhereUniqueInput[] | EdgeWhereUniqueInput>;
+  disconnect?: Maybe<EdgeWhereUniqueInput[] | EdgeWhereUniqueInput>;
+  deleteMany?: Maybe<EdgeScalarWhereInput[] | EdgeScalarWhereInput>;
+}
+
+export interface EdgeUpdateWithWhereUniqueNestedInput {
+  where: EdgeWhereUniqueInput;
+  data: EdgeUpdateDataInput;
+}
+
+export interface EdgeUpdateDataInput {
+  conditions?: Maybe<QuestionConditionUpdateManyInput>;
+  parentNode?: Maybe<QuestionNodeUpdateOneInput>;
+  childNode?: Maybe<QuestionNodeUpdateOneInput>;
+}
+
+export interface QuestionNodeUpdateOneInput {
+  create?: Maybe<QuestionNodeCreateInput>;
+  update?: Maybe<QuestionNodeUpdateDataInput>;
+  upsert?: Maybe<QuestionNodeUpsertNestedInput>;
+  delete?: Maybe<Boolean>;
+  disconnect?: Maybe<Boolean>;
+  connect?: Maybe<QuestionNodeWhereUniqueInput>;
+}
+
+export interface QuestionNodeUpsertNestedInput {
+  update: QuestionNodeUpdateDataInput;
+  create: QuestionNodeCreateInput;
+}
+
+export interface EdgeUpsertWithWhereUniqueNestedInput {
+  where: EdgeWhereUniqueInput;
+  update: EdgeUpdateDataInput;
+  create: EdgeCreateInput;
+}
+
+export interface EdgeScalarWhereInput {
+  id?: Maybe<ID_Input>;
+  id_not?: Maybe<ID_Input>;
+  id_in?: Maybe<ID_Input[] | ID_Input>;
+  id_not_in?: Maybe<ID_Input[] | ID_Input>;
+  id_lt?: Maybe<ID_Input>;
+  id_lte?: Maybe<ID_Input>;
+  id_gt?: Maybe<ID_Input>;
+  id_gte?: Maybe<ID_Input>;
+  id_contains?: Maybe<ID_Input>;
+  id_not_contains?: Maybe<ID_Input>;
+  id_starts_with?: Maybe<ID_Input>;
+  id_not_starts_with?: Maybe<ID_Input>;
+  id_ends_with?: Maybe<ID_Input>;
+  id_not_ends_with?: Maybe<ID_Input>;
+  createdAt?: Maybe<DateTimeInput>;
+  createdAt_not?: Maybe<DateTimeInput>;
+  createdAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  createdAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  createdAt_lt?: Maybe<DateTimeInput>;
+  createdAt_lte?: Maybe<DateTimeInput>;
+  createdAt_gt?: Maybe<DateTimeInput>;
+  createdAt_gte?: Maybe<DateTimeInput>;
+  updatedAt?: Maybe<DateTimeInput>;
+  updatedAt_not?: Maybe<DateTimeInput>;
+  updatedAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  updatedAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  updatedAt_lt?: Maybe<DateTimeInput>;
+  updatedAt_lte?: Maybe<DateTimeInput>;
+  updatedAt_gt?: Maybe<DateTimeInput>;
+  updatedAt_gte?: Maybe<DateTimeInput>;
+  AND?: Maybe<EdgeScalarWhereInput[] | EdgeScalarWhereInput>;
+  OR?: Maybe<EdgeScalarWhereInput[] | EdgeScalarWhereInput>;
+  NOT?: Maybe<EdgeScalarWhereInput[] | EdgeScalarWhereInput>;
 }
 
 export interface QuestionNodeUpsertWithWhereUniqueNestedInput {
@@ -2142,6 +2336,12 @@ export interface CustomerSettingsUpdateManyMutationInput {
   logoUrl?: Maybe<String>;
 }
 
+export interface EdgeUpdateInput {
+  conditions?: Maybe<QuestionConditionUpdateManyInput>;
+  parentNode?: Maybe<QuestionNodeUpdateOneInput>;
+  childNode?: Maybe<QuestionNodeUpdateOneInput>;
+}
+
 export interface FontSettingsUpdateInput {
   settingTitle?: Maybe<String>;
   body?: Maybe<String>;
@@ -2191,6 +2391,7 @@ export interface QuestionNodeUpdateInput {
   conditions?: Maybe<QuestionConditionUpdateManyInput>;
   options?: Maybe<QuestionOptionUpdateManyInput>;
   children?: Maybe<QuestionNodeUpdateManyInput>;
+  edgeChildren?: Maybe<EdgeUpdateManyInput>;
 }
 
 export interface QuestionNodeUpdateManyMutationInput {
@@ -2316,6 +2517,17 @@ export interface CustomerSettingsSubscriptionWhereInput {
     | CustomerSettingsSubscriptionWhereInput[]
     | CustomerSettingsSubscriptionWhereInput
   >;
+}
+
+export interface EdgeSubscriptionWhereInput {
+  mutation_in?: Maybe<MutationType[] | MutationType>;
+  updatedFields_contains?: Maybe<String>;
+  updatedFields_contains_every?: Maybe<String[] | String>;
+  updatedFields_contains_some?: Maybe<String[] | String>;
+  node?: Maybe<EdgeWhereInput>;
+  AND?: Maybe<EdgeSubscriptionWhereInput[] | EdgeSubscriptionWhereInput>;
+  OR?: Maybe<EdgeSubscriptionWhereInput[] | EdgeSubscriptionWhereInput>;
+  NOT?: Maybe<EdgeSubscriptionWhereInput[] | EdgeSubscriptionWhereInput>;
 }
 
 export interface FontSettingsSubscriptionWhereInput {
@@ -2780,6 +2992,15 @@ export interface QuestionNodePromise
     first?: Int;
     last?: Int;
   }) => T;
+  edgeChildren: <T = FragmentableArray<Edge>>(args?: {
+    where?: EdgeWhereInput;
+    orderBy?: EdgeOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => T;
 }
 
 export interface QuestionNodeSubscription
@@ -2820,6 +3041,15 @@ export interface QuestionNodeSubscription
     first?: Int;
     last?: Int;
   }) => T;
+  edgeChildren: <T = Promise<AsyncIterator<EdgeSubscription>>>(args?: {
+    where?: EdgeWhereInput;
+    orderBy?: EdgeOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => T;
 }
 
 export interface QuestionNodeNullablePromise
@@ -2852,6 +3082,15 @@ export interface QuestionNodeNullablePromise
   children: <T = FragmentableArray<QuestionNode>>(args?: {
     where?: QuestionNodeWhereInput;
     orderBy?: QuestionNodeOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => T;
+  edgeChildren: <T = FragmentableArray<Edge>>(args?: {
+    where?: EdgeWhereInput;
+    orderBy?: EdgeOrderByInput;
     skip?: Int;
     after?: String;
     before?: String;
@@ -2958,6 +3197,69 @@ export interface QuestionOptionNullablePromise
   id: () => Promise<ID_Output>;
   value: () => Promise<String>;
   publicValue: () => Promise<String>;
+}
+
+export interface Edge {
+  id: ID_Output;
+  createdAt: DateTimeOutput;
+  updatedAt: DateTimeOutput;
+}
+
+export interface EdgePromise extends Promise<Edge>, Fragmentable {
+  id: () => Promise<ID_Output>;
+  createdAt: () => Promise<DateTimeOutput>;
+  updatedAt: () => Promise<DateTimeOutput>;
+  conditions: <T = FragmentableArray<QuestionCondition>>(args?: {
+    where?: QuestionConditionWhereInput;
+    orderBy?: QuestionConditionOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => T;
+  parentNode: <T = QuestionNodePromise>() => T;
+  childNode: <T = QuestionNodePromise>() => T;
+}
+
+export interface EdgeSubscription
+  extends Promise<AsyncIterator<Edge>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  conditions: <
+    T = Promise<AsyncIterator<QuestionConditionSubscription>>
+  >(args?: {
+    where?: QuestionConditionWhereInput;
+    orderBy?: QuestionConditionOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => T;
+  parentNode: <T = QuestionNodeSubscription>() => T;
+  childNode: <T = QuestionNodeSubscription>() => T;
+}
+
+export interface EdgeNullablePromise
+  extends Promise<Edge | null>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  createdAt: () => Promise<DateTimeOutput>;
+  updatedAt: () => Promise<DateTimeOutput>;
+  conditions: <T = FragmentableArray<QuestionCondition>>(args?: {
+    where?: QuestionConditionWhereInput;
+    orderBy?: QuestionConditionOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => T;
+  parentNode: <T = QuestionNodePromise>() => T;
+  childNode: <T = QuestionNodePromise>() => T;
 }
 
 export interface CustomerSettings {
@@ -3138,6 +3440,60 @@ export interface AggregateCustomerSettingsPromise
 
 export interface AggregateCustomerSettingsSubscription
   extends Promise<AsyncIterator<AggregateCustomerSettings>>,
+    Fragmentable {
+  count: () => Promise<AsyncIterator<Int>>;
+}
+
+export interface EdgeConnection {
+  pageInfo: PageInfo;
+  edges: EdgeEdge[];
+}
+
+export interface EdgeConnectionPromise
+  extends Promise<EdgeConnection>,
+    Fragmentable {
+  pageInfo: <T = PageInfoPromise>() => T;
+  edges: <T = FragmentableArray<EdgeEdge>>() => T;
+  aggregate: <T = AggregateEdgePromise>() => T;
+}
+
+export interface EdgeConnectionSubscription
+  extends Promise<AsyncIterator<EdgeConnection>>,
+    Fragmentable {
+  pageInfo: <T = PageInfoSubscription>() => T;
+  edges: <T = Promise<AsyncIterator<EdgeEdgeSubscription>>>() => T;
+  aggregate: <T = AggregateEdgeSubscription>() => T;
+}
+
+export interface EdgeEdge {
+  node: Edge;
+  cursor: String;
+}
+
+export interface EdgeEdgePromise extends Promise<EdgeEdge>, Fragmentable {
+  node: <T = EdgePromise>() => T;
+  cursor: () => Promise<String>;
+}
+
+export interface EdgeEdgeSubscription
+  extends Promise<AsyncIterator<EdgeEdge>>,
+    Fragmentable {
+  node: <T = EdgeSubscription>() => T;
+  cursor: () => Promise<AsyncIterator<String>>;
+}
+
+export interface AggregateEdge {
+  count: Int;
+}
+
+export interface AggregateEdgePromise
+  extends Promise<AggregateEdge>,
+    Fragmentable {
+  count: () => Promise<Int>;
+}
+
+export interface AggregateEdgeSubscription
+  extends Promise<AsyncIterator<AggregateEdge>>,
     Fragmentable {
   count: () => Promise<AsyncIterator<Int>>;
 }
@@ -3662,6 +4018,53 @@ export interface CustomerSettingsPreviousValuesSubscription
   logoUrl: () => Promise<AsyncIterator<String>>;
 }
 
+export interface EdgeSubscriptionPayload {
+  mutation: MutationType;
+  node: Edge;
+  updatedFields: String[];
+  previousValues: EdgePreviousValues;
+}
+
+export interface EdgeSubscriptionPayloadPromise
+  extends Promise<EdgeSubscriptionPayload>,
+    Fragmentable {
+  mutation: () => Promise<MutationType>;
+  node: <T = EdgePromise>() => T;
+  updatedFields: () => Promise<String[]>;
+  previousValues: <T = EdgePreviousValuesPromise>() => T;
+}
+
+export interface EdgeSubscriptionPayloadSubscription
+  extends Promise<AsyncIterator<EdgeSubscriptionPayload>>,
+    Fragmentable {
+  mutation: () => Promise<AsyncIterator<MutationType>>;
+  node: <T = EdgeSubscription>() => T;
+  updatedFields: () => Promise<AsyncIterator<String[]>>;
+  previousValues: <T = EdgePreviousValuesSubscription>() => T;
+}
+
+export interface EdgePreviousValues {
+  id: ID_Output;
+  createdAt: DateTimeOutput;
+  updatedAt: DateTimeOutput;
+}
+
+export interface EdgePreviousValuesPromise
+  extends Promise<EdgePreviousValues>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  createdAt: () => Promise<DateTimeOutput>;
+  updatedAt: () => Promise<DateTimeOutput>;
+}
+
+export interface EdgePreviousValuesSubscription
+  extends Promise<AsyncIterator<EdgePreviousValues>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+}
+
 export interface FontSettingsSubscriptionPayload {
   mutation: MutationType;
   node: FontSettings;
@@ -4050,6 +4453,10 @@ export const models: Model[] = [
   },
   {
     name: "QuestionNode",
+    embedded: false
+  },
+  {
+    name: "Edge",
     embedded: false
   }
 ];

@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect, ReactNode } from 'react';
 import { useQuery } from '@apollo/react-hooks';
 import { useParams } from 'react-router-dom';
-import { getQuestionnaireQuery } from '../queries/getQuestionnaireQuery';
+import { GET_QUESTIONNAIRE } from '../queries/getQuestionnaire';
 
 interface QuestionnaireContextProps {
   customer: any;
@@ -20,8 +20,7 @@ export const QuestionnaireProvider = ({ children }: { children: ReactNode }) => 
 
   const [questionnaire, setQuestionnaire] = useState();
   const [customer, setCustomer] = useState();
-
-  const res = useQuery(getQuestionnaireQuery, {
+  const res = useQuery(GET_QUESTIONNAIRE, {
     variables: {
       id: params.questionnaireId
     },

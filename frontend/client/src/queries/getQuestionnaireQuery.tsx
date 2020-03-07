@@ -29,6 +29,25 @@ export const getQuestionnaireQuery = gql`
         overrideLeaf {
           id
         }
+        edgeChildren {
+        id
+        conditions {
+          conditionType
+          matchValue
+          renderMin
+          renderMax
+        }
+
+        parentNode {
+          id
+          title
+        }
+
+        childNode {
+          id
+          title    
+        }
+      }
         questionType
         children {
           id
