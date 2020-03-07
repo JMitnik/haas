@@ -520,31 +520,65 @@ const makeMediamarkt = async () => {
   });
 
   await Promise.all(standardEdges.map(async (edge) => {
+    const leafIds = leafs.map((leaf) => leaf.id);
+
     const childNode = await prisma.questionNodes({
       where: {
         title_contains: edge.childQuestionContains,
-        // AND: {
-        //   id_in: await Promise.all((await prisma.questionNodes()).map((question) => question.id)),
-        // },
+        OR: [
+          {
+            overrideLeaf: {
+              id_not: null,
+              id_in: leafIds,
+            },
+          },
+          {
+            id: null,
+          },
+        ],
       },
     });
 
     if (!childNode[0]) {
       console.log('Cant find node for:', edge);
     }
+
     const childNodeId = childNode?.[0]?.id;
+    console.log('# Child node(s):', childNode.length);
 
     const parentNode = await prisma.questionNodes(
       {
         where: {
-          title_contains: edge.parentQuestionContains,
-          // AND: {
-          //   id_in: await Promise.all((await prisma.questionNodes()).map((question) => question.id)),
-          // },
+          OR: [
+            {
+              title_contains: edge.parentQuestionContains,
+              overrideLeaf: {
+                id_not: null,
+                id_in: leafIds,
+              },
+            },
+            {
+              title_contains: edge.parentQuestionContains,
+              overrideLeaf: null,
+            },
+          ],
         },
       },
     );
 
+    if (parentNode.length === 0) {
+      console.log('Something went wrong with edge: ', edge);
+    }
+
+    console.log('# Parent node(s):', parentNode.length);
+    // const filteredParentNodes = parentNode.filter((node) => {
+    //   if (node?.overrideLeaf?.id) {
+    //     return true;
+    //   } else {
+    //     return true;
+    //   }
+    //   return false;
+    // });
     const parentNodeId = parentNode?.[0]?.id;
 
     const questionCondition = await prisma.questionConditions(
@@ -591,6 +625,12 @@ const makeMediamarkt = async () => {
         },
       },
     });
+
+    
+
+    // if (node.overrideLeaf.id ) {
+
+    // }
 
     await prisma.updateQuestionNode({
       where: {
