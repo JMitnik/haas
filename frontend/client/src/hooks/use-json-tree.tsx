@@ -94,28 +94,28 @@ export const JSONTreeProvider = ({ children }: { children: ReactNode }) => {
   }, [questionnaire, leafCollection]);
 
   const goToChild = async (key: string | number) => {
-        let nextEdge: Edge = findNextEdge(historyStack.slice(-1)[0], key);
-        let nextNode: any = nextEdge?.childNode?.id && await client.query({
-          query: GET_QUESTION_NODE,
-          variables: {
-            id: nextEdge?.childNode.id
-          }
-        }).then(res => res.data.questionNode)
-    
-        if (nextNode && nextNode.overrideLeaf?.id) {
-          console.log('SETTING NEW LEAF NODE TO: ', nextNode.overrideLeaf?.id)
-          setActiveLeafNodeID(nextNode?.overrideLeaf?.id);
-        }
-    
-        if (!nextNode) {
-          console.log('NO NEXT NODE SETTING LEAFNODE')
-          console.log(leafCollection)
-          console.log('Current LEAF: ', activeLeafNodeId)
-          nextNode = findLeafNode(leafCollection, activeLeafNodeId);
-        }
-    
-        setHistoryStack(hist => [...hist, nextNode]);
-      };
+    let nextEdge: Edge = findNextEdge(historyStack.slice(-1)[0], key);
+    let nextNode: any = nextEdge?.childNode?.id && await client.query({
+      query: GET_QUESTION_NODE,
+      variables: {
+        id: nextEdge?.childNode.id
+      }
+    }).then(res => res.data.questionNode)
+
+    if (nextNode && nextNode.overrideLeaf?.id) {
+      console.log('SETTING NEW LEAF NODE TO: ', nextNode.overrideLeaf?.id)
+      setActiveLeafNodeID(nextNode?.overrideLeaf?.id);
+    }
+
+    if (!nextNode) {
+      console.log('NO NEXT NODE SETTING LEAFNODE')
+      console.log(leafCollection)
+      console.log('Current LEAF: ', activeLeafNodeId)
+      nextNode = findLeafNode(leafCollection, activeLeafNodeId);
+    }
+
+    setHistoryStack(hist => [...hist, nextNode]);
+  };
 
   return (
     <JSONTreeContext.Provider value={{ historyStack, goToChild }}>
