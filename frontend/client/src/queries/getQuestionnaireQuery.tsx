@@ -23,6 +23,7 @@ export const getQuestionnaireQuery = gql`
       }
     }
   }
+
   ${QuestionFragment}
   ${CustomerFragment}
 `;

@@ -7,5 +7,6 @@ export const getCustomerQuery = gql`
       ...CustomerFragment
     }
   }
+
   ${CustomerFragment}
 `;
