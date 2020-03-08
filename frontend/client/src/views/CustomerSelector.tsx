@@ -10,7 +10,6 @@ interface CustomerSelectorProps {
 }
 
 export const CustomerSelector = ({ customers }: { customers: any }) => {
-    console.log('customers', customers);
     return (
       <CenteredScreen>
         <Div useFlex flexDirection='column' justifyContent='space-between' height='80vh'>

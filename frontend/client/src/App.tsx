@@ -6,7 +6,7 @@ import { Switch, Route, BrowserRouter, Redirect } from 'react-router-dom';
 import theme from './config/theme';
 import HAASQuestionnaire from './views/HAASQuestionnaire';
 import { Div, Loader } from '@haas/ui';
-import { CustomerSelector } from './components/CustomerSelector';
+import { CustomerSelector } from './views/CustomerSelector';
 import { getCustomerQuery } from './queries/getCustomerQuery';
 import { QuestionnaireProvider } from './hooks/use-questionnaire';
 

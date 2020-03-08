@@ -5,6 +5,7 @@ import { useJSONTree, MultiChoiceOption } from '../hooks/use-json-tree';
 export const HAASMultiChoice = memo((props) => {
   const { historyStack, goToChild } = useJSONTree();
 
+
   let activeNode = historyStack.slice(-1)[0];
 
   return (

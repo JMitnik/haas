@@ -61,7 +61,6 @@ const Entry = styled(animated.div)`
 `;
 
 const renderNextNode = (node: any) => {
-  console.log('node', node);
   let nodeType = node.questionType || node.questionType?.type || node.type?.type || '';
   const Component: React.ReactNode | undefined = nodeMap.get(nodeType);
 
