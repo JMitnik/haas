@@ -4,9 +4,10 @@ import { gql } from 'apollo-boost';
 
 import { ChevronRight, Plus } from 'react-feather';
 import { H2, H3, H4, Grid, Flex, Icon, Label, Div, Card, CardBody, CardFooter } from '@haas/ui';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import styled, { css } from 'styled-components';
-import { Query, Questionnaire } from '../types.d';
+import { Query, Questionnaire, Customer } from '../types.d';
+
 
 import { getCustomerQuery } from '../queries/getCustomerQuery';
 
@@ -25,25 +26,25 @@ const DashboardView: FC = () => {
     );
   }
 
-  const topics = data?.questionnaires;
+  const topics = data?.customers;
 
   return (
     <>
-      <H2 color="default.text" fontWeight={400} mb={4}>Recent Topics</H2>
+      <H2 color="default.text" fontWeight={400} mb={4}>Customers</H2>
 
       <Grid
         gridGap={4}
         gridTemplateColumns={['1fr', '1fr 1fr 1fr']}
         gridAutoRows="minmax(200px, 1fr)"
       >
-        {topics?.map((topic, index) => topic && <TopicCard key={index} topic={topic} />)}
+        {topics?.map((topic, index) => topic && <CustomerCard key={index} customer={topic} />)}
 
         <AddTopicCard>
           <Link to="/topic-builder" />
           <Div>
             <Plus />
             <H3>
-              Add topic
+              Add new customer
             </H3>
           </Div>
         </AddTopicCard>
@@ -83,27 +84,44 @@ const AddTopicCard = styled(Card)`
   `}
 `;
 
-const TopicCard = ({ topic }: { topic: Questionnaire }) => (
-  <Card useFlex flexDirection="column">
-    <CardBody flex="100%">
-      <Flex alignItems="center" justifyContent="space-between">
-        <H3 fontWeight={500}>
-          {topic.title}
-        </H3>
-        <Label brand="success">
-          Score: 9.3
-        </Label>
-      </Flex>
-    </CardBody>
-    <CardFooter useFlex justifyContent="center" alignItems="center">
-      <H4>
-        View project
-      </H4>
-      <Icon pl={1} fontSize={1}>
-        <ChevronRight />
-      </Icon>
-    </CardFooter>
-  </Card>
-);
+const CustomerCardImage = styled.img`
+  width: 75px;
+  height: 75px;
+`;
+
+const CustomerCard = ({ customer }: { customer: Customer }) => {
+  const history = useHistory();
+
+  const setCustomerID = (customerId: string) => {
+    history.push(`/c/${customerId}`);
+  };
+
+  return (
+    <Card
+      useFlex
+      flexDirection="column"
+      backgroundColor={customer.settings?.colourSettings?.primary
+        ? customer.settings?.colourSettings?.primary : 'white'}
+      onClick={() => setCustomerID(customer.id)}
+    >
+      <CardBody flex="100%">
+        <Flex alignItems="center" justifyContent="space-between">
+          <H3 fontWeight={500}>
+            {customer.name}
+          </H3>
+          <CustomerCardImage src={customer?.settings?.logoUrl ? customer?.settings?.logoUrl : ''} />
+        </Flex>
+      </CardBody>
+      <CardFooter useFlex justifyContent="center" alignItems="center">
+        <H4>
+          View project
+        </H4>
+        <Icon pl={1} fontSize={1}>
+          <ChevronRight />
+        </Icon>
+      </CardFooter>
+    </Card>
+  );
+};
 
 export default DashboardView;

@@ -5,9 +5,14 @@ export const Card = styled(Div)`
   ${({ theme }) => css`
       position: relative;
       border-radius: ${theme.borderRadiuses.md};
-      background: ${theme.colors.white};
+      /* background: ${theme.colors.white}; */
       color: ${theme.colors.default.darkest};
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      &:hover ${Div} {
+      transition: all 0.2s ease-in;
+      box-shadow: 0 1px 3px 1px rgba(0,0,0,0.1);
+    }
   `}
 `;
 
@@ -25,6 +30,7 @@ export const CardFooter = styled(Div)`
     background: ${theme.colors.default.light};
     color: ${theme.colors.default.text};
     text-align: center;
+    /* cursor: pointer; */
   `}
 `;
 

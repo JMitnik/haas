@@ -2,7 +2,7 @@ import gql from 'graphql-tag';
 import { CustomerFragment } from './CustomerFragment';
 import { QuestionFragment } from './QuestionFragment';
 
-export const getQuestionnaireQuery = gql`
+export const getQuestionnairesCustomerQuery = gql`
   query getQuestionnairesOfCustomer($id: ID) {
   questionnaires(where: { customer: {
   	id: $id 
@@ -12,17 +12,6 @@ export const getQuestionnaireQuery = gql`
     publicTitle
     creationDate
     updatedAt
-    questions {
-      title
-      overrideLeaf {
-        id
-      }
-    }
-    leafs {
-      id
-    }
   }
 }
-  ${QuestionFragment}
-  ${CustomerFragment}
 `;

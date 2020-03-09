@@ -10,6 +10,7 @@ import client from './config/apollo';
 import DashboardView from './views/DashboardView';
 import TopicBuilderView from './views/TopicBuilderView';
 import OrganisationSettingsView from './views/OrganisationSettingsView';
+import TopicsView from './views/TopicsView';
 
 const AppContainer = styled.div`
   ${({ theme }) => css`
@@ -39,6 +40,7 @@ const App: FC = () => (
               <Container>
                 <Switch>
                   <Route path="/topic-builder" render={() => <TopicBuilderView />} />
+                  <Route path="/c/:customerId/" render={() => <TopicsView />} />
                   <Route
                     path="/organisation-settings"
                     render={() => <OrganisationSettingsView />}
