@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form';
 import { useMutation } from '@apollo/react-hooks';
 import { useHistory } from 'react-router';
 import { Container, Flex, Grid, H2, H3, Muted, Button, Div } from '@haas/ui';
-import { GetTopicsQuery } from './DashboardView';
+import { getCustomerQuery } from '../queries/getCustomerQuery';
 
 export const AddTopicMutation = gql`
   mutation AddTopic($data: TopicCreateInput!) {
@@ -31,7 +31,7 @@ const TopicBuilderView = () => {
       console.log('Added a topic!');
       history.push('/');
     },
-    refetchQueries: [{ query: GetTopicsQuery }],
+    refetchQueries: [{ query: getCustomerQuery }],
     onError: (serverError: ApolloError) => {
       console.log(serverError);
     },

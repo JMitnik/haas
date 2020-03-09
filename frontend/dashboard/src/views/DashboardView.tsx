@@ -6,18 +6,12 @@ import { ChevronRight, Plus } from 'react-feather';
 import { H2, H3, H4, Grid, Flex, Icon, Label, Div, Card, CardBody, CardFooter } from '@haas/ui';
 import { Link } from 'react-router-dom';
 import styled, { css } from 'styled-components';
-import { Query, Topic } from '../types.d';
+import { Query, Questionnaire } from '../types.d';
 
-export const GetTopicsQuery = gql`
-    {
-        topics {
-            title
-        }
-    }
-`;
+import { getCustomerQuery } from '../queries/getCustomerQuery';
 
 const DashboardView: FC = () => {
-  const { loading, error, data } = useQuery<Query>(GetTopicsQuery);
+  const { loading, error, data } = useQuery<Query>(getCustomerQuery);
 
   if (loading) return <p>Loading</p>;
 
@@ -31,7 +25,7 @@ const DashboardView: FC = () => {
     );
   }
 
-  const topics = data?.topics;
+  const topics = data?.questionnaires;
 
   return (
     <>
@@ -89,7 +83,7 @@ const AddTopicCard = styled(Card)`
   `}
 `;
 
-const TopicCard = ({ topic }: { topic: Topic }) => (
+const TopicCard = ({ topic }: { topic: Questionnaire }) => (
   <Card useFlex flexDirection="column">
     <CardBody flex="100%">
       <Flex alignItems="center" justifyContent="space-between">
