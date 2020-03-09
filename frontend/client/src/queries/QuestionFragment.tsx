@@ -1,10 +1,7 @@
 import gql from 'graphql-tag';
 
-export const GET_QUESTION_NODE = gql`
-      query getQuestionNode($id: ID!) {
-  questionNode(where: {
-    id: $id
-  }) {
+export const QuestionFragment = gql`
+  fragment QuestionFragment on QuestionNode {
     id
     title
     overrideLeaf {
@@ -13,7 +10,7 @@ export const GET_QUESTION_NODE = gql`
       type
       title
 		}
-    questionType 
+    questionType
     edgeChildren {
       id
       conditions {
@@ -22,23 +19,18 @@ export const GET_QUESTION_NODE = gql`
         renderMin
         renderMax
       }
-
       parentNode {
         id
         title
       }
-
       childNode {
         id
-        title    
+        title
       }
     }
-
     options {
         value
         publicValue
     }
-
   }
-}
-    `
+`;

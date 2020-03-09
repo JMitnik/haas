@@ -1,126 +1,29 @@
-
 import gql from 'graphql-tag';
+import { CustomerFragment } from './CustomerFragment';
+import { QuestionFragment } from './QuestionFragment';
 
-// TODO: Make more dynamic
-// TODO: Express nodes using Fragments
 export const getQuestionnaireQuery = gql`
   query getQuestionnaire ($id: ID) {
-    questionnaire(where: {
-      id: $id
-    }) {
+    questionnaire(where: { id: $id }) {
       id
       title
       publicTitle
       creationDate
       updatedAt
+      leafs {
+          id
+          title
+          type
+      }
       customer {
-        name
-        settings {
-          logoUrl
-          colourSettings {
-            primary
-            secondary
-          }
-        }
+          ...CustomerFragment
       }
       questions {
-        id
-        title
-        overrideLeaf {
-          id
-        }
-        edgeChildren {
-        id
-        conditions {
-          conditionType
-          matchValue
-          renderMin
-          renderMax
-        }
-
-        parentNode {
-          id
-          title
-        }
-
-        childNode {
-          id
-          title    
-        }
-      }
-        questionType
-        children {
-          id
-          title
-          questionType
-          overrideLeaf {
-            id
-          }
-          conditions {
-            id
-            matchValue
-            renderMin
-            renderMax
-          }
-          options {
-            value
-            publicValue
-          }
-          children {
-            id
-            overrideLeaf {
-              id
-            }
-            title
-            questionType
-            options {
-              value
-              publicValue
-            }
-            conditions {
-              id
-              matchValue
-              renderMin
-              renderMax
-            }
-            children {
-              id
-              overrideLeaf {
-                id
-              }
-              title
-              questionType
-              options {
-                value
-                publicValue
-              }
-              conditions {
-                id
-                matchValue
-                renderMin
-                renderMax
-              }
-            }
-          }
-        }
-        conditions {
-          id
-          matchValue
-          renderMin
-          renderMax
-        }
-        options {
-          id
-          value
-          publicValue
-        }
-      }
-      leafs {
-        id
-        title
-        type
+        ...QuestionFragment
       }
     }
   }
-`;
 
+  ${QuestionFragment}
+  ${CustomerFragment}
+`;

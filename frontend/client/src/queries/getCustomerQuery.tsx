@@ -1,24 +1,12 @@
 import gql from 'graphql-tag';
+import { CustomerFragment } from './CustomerFragment';
 
 export const getCustomerQuery = gql`
   query getCustomers {
     customers {
-      id
-      name
-      settings {
-        id
-        logoUrl
-        colourSettings {
-          primary
-          secondary
-        }
-      }
-      questionnaires {
-        id
-        description
-        title
-        publicTitle
-      }
+      ...CustomerFragment
     }
   }
+
+  ${CustomerFragment}
 `;
