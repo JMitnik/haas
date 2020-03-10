@@ -17,7 +17,8 @@ export const QuestionnaireContext = React.createContext({} as QuestionnaireConte
 
 export const QuestionnaireProvider = ({ children }: { children: ReactNode }) => {
   const params = useParams<ProjectParamProps>();
-
+  console.log('Params: ', params);
+  
   const [questionnaire, setQuestionnaire] = useState();
   const [customer, setCustomer] = useState();
   const res = useQuery(getQuestionnaireQuery, {
@@ -27,6 +28,7 @@ export const QuestionnaireProvider = ({ children }: { children: ReactNode }) => 
   });
 
   const data = res.data;
+  console.log('Data: ', data)
 
   useEffect(() => {
     if (data?.questionnaire) {

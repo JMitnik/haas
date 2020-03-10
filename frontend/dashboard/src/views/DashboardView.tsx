@@ -40,7 +40,7 @@ const DashboardView: FC = () => {
         {topics?.map((topic, index) => topic && <CustomerCard key={index} customer={topic} />)}
 
         <AddTopicCard>
-          <Link to="/topic-builder" />
+          <Link to="/customer-builder" />
           <Div>
             <Plus />
             <H3>

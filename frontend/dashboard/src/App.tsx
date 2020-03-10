@@ -11,6 +11,7 @@ import DashboardView from './views/DashboardView';
 import TopicBuilderView from './views/TopicBuilderView';
 import OrganisationSettingsView from './views/OrganisationSettingsView';
 import TopicsView from './views/TopicsView';
+import CustomerBuilderView from './views/CustomerBuilderView';
 
 const AppContainer = styled.div`
   ${({ theme }) => css`
@@ -40,6 +41,7 @@ const App: FC = () => (
               <Container>
                 <Switch>
                   <Route path="/topic-builder" render={() => <TopicBuilderView />} />
+                  <Route path="/customer-builder" render={() => <CustomerBuilderView />} />
                   <Route path="/c/:customerId/" render={() => <TopicsView />} />
                   <Route
                     path="/organisation-settings"

@@ -1,10 +1,10 @@
-# # import * from './generated/prisma.graphql'
+# import Query.*, * from './generated/prisma.graphql'
 
-# type Query {
-#     questions: [Question!]
-#     topics: [Topic!]
-# }
+type Mutation {
+    createNewCustomer(name: String, options: CustomerCreateOptions): Customer!
+}
 
-# type Mutation {
-#     createTopic: Topic!
-# }
+input CustomerCreateOptions {
+    isSeed: Boolean
+    logo: String
+}

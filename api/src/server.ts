@@ -4,7 +4,7 @@ import config from './config';
 import resolvers from './resolvers';
 
 const server: GraphQLServer = new GraphQLServer({
-  typeDefs: `${config.PATH_TO_PRISMA_GENERATED_SCHEMA}`,
+  typeDefs: `${config.PATH_TO_APP_SCHEMA}`,
   resolvers,
   context: (req) => ({
     ...req,

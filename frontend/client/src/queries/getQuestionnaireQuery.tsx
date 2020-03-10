@@ -3,26 +3,27 @@ import { CustomerFragment } from './CustomerFragment';
 import { QuestionFragment } from './QuestionFragment';
 
 export const getQuestionnaireQuery = gql`
-  query getQuestionnairesOfCustomer($id: ID) {
-  questionnaires(where: { customer: {
-  	id: $id 
-  } }) {
-    id
-    title
-    publicTitle
-    creationDate
-    updatedAt
-    questions {
+  query getQuestionnaire ($id: ID) {
+    questionnaire(where: { id: $id }) {
+      id
       title
-      overrideLeaf {
-        id
+      publicTitle
+      creationDate
+      updatedAt
+      leafs {
+          id
+          title
+          type
+      }
+      customer {
+          ...CustomerFragment
+      }
+      questions {
+        ...QuestionFragment
       }
     }
-    leafs {
-      id
-    }
   }
-}
+
   ${QuestionFragment}
   ${CustomerFragment}
 `;

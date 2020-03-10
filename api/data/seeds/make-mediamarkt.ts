@@ -361,7 +361,7 @@ const makeMediamarkt = async () => {
           create: {
             primary: '#e31e24',
           },
-        }
+        },
       },
     },
   });
