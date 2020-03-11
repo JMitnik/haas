@@ -1,5 +1,5 @@
 import React, { FC } from 'react';
-import { useQuery } from '@apollo/react-hooks';
+import { useQuery, useApolloClient } from '@apollo/react-hooks';
 import { gql } from 'apollo-boost';
 
 import { ChevronRight, Plus } from 'react-feather';
@@ -10,6 +10,7 @@ import { Query, Questionnaire, Customer } from '../types.d';
 
 
 import { getCustomerQuery } from '../queries/getCustomerQuery';
+import { deleteFullCustomerQuery } from '../mutations/deleteFullCustomer';
 
 const DashboardView: FC = () => {
   const { loading, error, data } = useQuery<Query>(getCustomerQuery);
@@ -91,9 +92,21 @@ const CustomerCardImage = styled.img`
 
 const CustomerCard = ({ customer }: { customer: Customer }) => {
   const history = useHistory();
-
+  const client = useApolloClient();
   const setCustomerID = (customerId: string) => {
     history.push(`/c/${customerId}`);
+  };
+
+  const deleteClickedCustomer = async (customerId: string) => {
+    console.log(customer.id);
+    const result = await client.mutate({
+      mutation: deleteFullCustomerQuery,
+      variables: {
+        id: customerId,
+      },
+    }).then((res) => res.data);
+
+    console.log('Succesfully deleted customer: ', result);
   };
 
   return (
@@ -102,9 +115,9 @@ const CustomerCard = ({ customer }: { customer: Customer }) => {
       flexDirection="column"
       backgroundColor={customer.settings?.colourSettings?.primary
         ? customer.settings?.colourSettings?.primary : 'white'}
-      onClick={() => setCustomerID(customer.id)}
     >
       <CardBody flex="100%">
+        <button type="button" onClick={() => deleteClickedCustomer(customer.id)}>DELETE ME PLS</button>
         <Flex alignItems="center" justifyContent="space-between">
           <H3 fontWeight={500}>
             {customer.name}
@@ -112,7 +125,7 @@ const CustomerCard = ({ customer }: { customer: Customer }) => {
           <CustomerCardImage src={customer?.settings?.logoUrl ? customer?.settings?.logoUrl : ''} />
         </Flex>
       </CardBody>
-      <CardFooter useFlex justifyContent="center" alignItems="center">
+      <CardFooter useFlex justifyContent="center" alignItems="center" onClick={() => setCustomerID(customer.id)}>
         <H4>
           View project
         </H4>

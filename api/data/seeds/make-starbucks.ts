@@ -262,29 +262,17 @@ const standardRootChildren = [
     title: 'What did you like?',
     questionType: multiChoiceType,
     overrideLeafContains: 'Instagram',
-    conditions: {
-      renderMin: 7,
-      renderMax: 10,
-    },
     options: standardSubChildren.map((child) => child.relatedOptionValue),
     children: standardSubChildren,
   },
   {
     title: 'What would you like to talk about?',
     questionType: multiChoiceType,
-    conditions: {
-      renderMin: 5,
-      renderMax: 7,
-    },
     options: standardSubChildren.map((child) => child.relatedOptionValue),
     children: standardSubChildren,
   },
   {
     title: 'We are sorry to hear that! Where can we improve?',
-    conditions: {
-      renderMin: 0,
-      renderMax: 5,
-    },
     questionType: multiChoiceType,
     options: standardSubChildren.map((child) => child.relatedOptionValue),
     children: standardSubChildren,
@@ -384,14 +372,16 @@ const makeStarbucks = async () => {
     leafs: {
       connect: leafs.map((leaf) => ({ id: leaf.id })),
     },
-    title: 'Default questionnaire',
+    title: 'Default starbucks questionnaire',
     description: 'Default questions',
     questions: {
-      create: {
-        title: `How do you feel about ${customer.name}?`,
-        questionType: sliderType,
-        isRoot: true,
-      },
+      create: [
+        {
+          title: `How do you feel about ${customer.name}?`,
+          questionType: sliderType,
+          isRoot: true,
+        },
+      ],
     },
   });
 
@@ -457,17 +447,15 @@ const makeStarbucks = async () => {
   // Create root-questions
   const rootQuestions = await Promise.all(standardRootChildrenWithLeafs.map(async (childNode) => prisma.createQuestionNode({
     title: childNode.title,
+    questionnaire: {
+      connect: {
+        id: questionnaire.id,
+      },
+    },
     questionType: childNode.questionType,
     overrideLeaf: {
       connect: {
         id: childNode.overrideLeaf?.id,
-      },
-    },
-    conditions: {
-      create: {
-        conditionType: 'valueBoundary',
-        renderMax: childNode.conditions.renderMax,
-        renderMin: childNode.conditions.renderMin,
       },
     },
     options: {
@@ -476,16 +464,15 @@ const makeStarbucks = async () => {
     children: {
       create: childNode.children.map((child) => ({
         title: child.title,
+        questionnaire: {
+          connect: {
+            id: questionnaire.id,
+          },
+        },
         questionType: child.type,
         overrideLeaf: {
           connect: {
             id: child.overrideLeaf?.id,
-          },
-        },
-        conditions: {
-          create: {
-            conditionType: 'match',
-            matchValue: child.relatedOptionValue,
           },
         },
         options: {
@@ -513,16 +500,35 @@ const makeStarbucks = async () => {
       id: mainQuestion.id,
     },
     data: {
+      questionnaire: {
+        connect: {
+          id: questionnaire.id,
+        },
+      },
       children: {
         connect: rootQuestions.map((rootNode) => ({ id: rootNode.id })),
       },
     },
   });
 
+  const leafIds = leafs.map((leaf) => leaf.id);
+
+  // Create edges here
   await Promise.all(standardEdges.map(async (edge) => {
     const childNode = await prisma.questionNodes({
       where: {
         title_contains: edge.childQuestionContains,
+        OR: [
+          {
+            overrideLeaf: {
+              id_not: null,
+              id_in: leafIds,
+            },
+          },
+          {
+            id: null,
+          },
+        ],
         // AND: {
         //   id_in: await Promise.all((await prisma.questionNodes()).map((question) => question.id)),
         // },
@@ -537,32 +543,26 @@ const makeStarbucks = async () => {
     const parentNode = await prisma.questionNodes(
       {
         where: {
-          title_contains: edge.parentQuestionContains,
-          // AND: {
-          //   id_in: await Promise.all((await prisma.questionNodes()).map((question) => question.id)),
-          // },
+          OR: [
+            {
+              title_contains: edge.parentQuestionContains,
+              overrideLeaf: {
+                id_not: null,
+                id_in: leafIds,
+              },
+            },
+            {
+              title_contains: edge.parentQuestionContains,
+              overrideLeaf: null,
+            },
+          ],
         },
       },
     );
 
     const parentNodeId = parentNode?.[0]?.id;
 
-    const questionCondition = await prisma.questionConditions(
-      {
-        where: {
-          // renderMin: edge.conditions[0].renderMin,
-          id_in: await Promise.all((await prisma.questionConditions()).map((question) => question.id)),
-          conditionType: edge.conditions?.[0].conditionType,
-          matchValue: edge.conditions?.[0].matchValue,
-          renderMin: edge.conditions?.[0].renderMin,
-          renderMax: edge.conditions?.[0].renderMax,
-        },
-      },
-    );
-
-    const questionConditionId = questionCondition?.[0]?.id;
-
-    if (childNodeId && parentNodeId && questionConditionId) {
+    if (childNodeId && parentNodeId) {
       await prisma.createEdge({
         childNode: {
           connect: {
@@ -575,15 +575,19 @@ const makeStarbucks = async () => {
           },
         },
         conditions: {
-          connect: {
-            id: questionConditionId,
+          create: {
+            conditionType: edge.conditions?.[0].conditionType,
+            matchValue: edge.conditions?.[0].matchValue,
+            renderMin: edge.conditions?.[0].renderMin,
+            renderMax: edge.conditions?.[0].renderMax,
           },
         },
       });
     }
   }));
 
-  await Promise.all((await prisma.questionNodes()).map(async (node) => {
+  await Promise.all((await prisma.questionNodes({ where:
+    { questionnaire: { id: questionnaire.id } } })).map(async (node) => {
     const edgeChildrenNodes = await prisma.edges({
       where: {
         parentNode: {
@@ -597,6 +601,11 @@ const makeStarbucks = async () => {
         id: node.id,
       },
       data: {
+        questionnaire: {
+          connect: {
+            id: questionnaire.id,
+          },
+        },
         edgeChildren: {
           connect: edgeChildrenNodes.map((edgeChild) => ({ id: edgeChild.id })),
         },

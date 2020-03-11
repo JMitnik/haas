@@ -479,13 +479,6 @@ const seedCompany = async (customer: Customer) => {
             id: childNode.overrideLeaf?.id
           }
         },
-        conditions: {
-          create: {
-            conditionType: 'valueBoundary',
-            renderMax: childNode.conditions.renderMax,
-            renderMin: childNode.conditions.renderMin
-          }
-        },
         options: {
           create: childNode.options.map(option => ({ value: option }))
         },

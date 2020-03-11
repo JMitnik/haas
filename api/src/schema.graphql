@@ -2,6 +2,7 @@
 
 type Mutation {
     createNewCustomer(name: String, options: CustomerCreateOptions): Customer!
+    deleteFullCustomer(id: ID!): Customer!
 }
 
 input CustomerCreateOptions {

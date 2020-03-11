@@ -1,13 +1,13 @@
 type Customer {
     id: ID! @id
     name: String!
-    questionnaires: [Questionnaire]
-    settings: CustomerSettings
+    questionnaires: [Questionnaire] @relation(name: "CustomerToQuestionnaire", onDelete: CASCADE)
+    settings: CustomerSettings @relation(name: "CustomerCustomerSettings", onDelete: CASCADE)
 }
 
 type CustomerSettings {
     id: ID! @id
     logoUrl: String
-    colourSettings: ColourSettings
+    colourSettings: ColourSettings @relation(name: "CustomerSettingsColourSettings", onDelete: CASCADE)
     fontSettings: FontSettings
 }
