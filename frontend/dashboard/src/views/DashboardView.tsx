@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
-import { useQuery, useApolloClient } from '@apollo/react-hooks';
-import { gql } from 'apollo-boost';
+import { useQuery, useApolloClient, useMutation } from '@apollo/react-hooks';
+import { gql, ApolloError } from 'apollo-boost';
 
 import { ChevronRight, Plus } from 'react-feather';
 import { H2, H3, H4, Grid, Flex, Icon, Label, Div, Card, CardBody, CardFooter } from '@haas/ui';
@@ -97,16 +97,23 @@ const CustomerCard = ({ customer }: { customer: Customer }) => {
     history.push(`/c/${customerId}`);
   };
 
+  const [deleteCustomer, { loading }] = useMutation(deleteFullCustomerQuery, {
+    onCompleted: () => {
+      console.log('Succesfully deleted customer !');
+    },
+    refetchQueries: [{ query: getCustomerQuery }],
+    onError: (serverError: ApolloError) => {
+      console.log(serverError);
+    },
+  });
+
   const deleteClickedCustomer = async (customerId: string) => {
     console.log(customer.id);
-    const result = await client.mutate({
-      mutation: deleteFullCustomerQuery,
+    deleteCustomer({
       variables: {
         id: customerId,
       },
-    }).then((res) => res.data);
-
-    console.log('Succesfully deleted customer: ', result);
+    });
   };
 
   return (

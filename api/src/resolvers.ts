@@ -17,6 +17,13 @@ const queryResolvers: QueryResolvers = {
   edges: forwardTo('db'),
 };
 
+const deleteFullCustomerNode = async (parent: any, args:any) => {
+  const { id } : { id: ID_Input} = args;
+  const customerId = id;
+  const customer = await prisma.deleteCustomer({ id: customerId });
+
+  return customer;
+};
 // const deleteFullCustomerNode = async (parent: any, args:any) => {
 //   const { id } : { id: ID_Input} = args;
 //   const customerId = id;
@@ -120,7 +127,7 @@ const createNewCustomerMutation = async (parent : any, args: any) => {
 
 const mutationResolvers: MutationResolvers = {
   createNewCustomer: createNewCustomerMutation,
-  // deleteFullCustomer: deleteFullCustomerNode,
+  deleteFullCustomer: deleteFullCustomerNode,
 };
 
 const resolvers = {
