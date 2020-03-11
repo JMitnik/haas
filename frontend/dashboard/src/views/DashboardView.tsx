@@ -8,7 +8,6 @@ import { Link, useHistory } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 import { Query, Questionnaire, Customer } from '../types.d';
 
-
 import { getCustomerQuery } from '../queries/getCustomerQuery';
 import { deleteFullCustomerQuery } from '../mutations/deleteFullCustomer';
 
