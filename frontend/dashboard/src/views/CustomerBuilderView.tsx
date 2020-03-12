@@ -10,21 +10,13 @@ import { getCustomerQuery } from '../queries/getCustomerQuery';
 
 import { createNewCustomer } from '../mutations/createNewCustomer';
 
-export const AddTopicMutation = gql`
-  mutation AddTopic($data: TopicCreateInput!) {
-    createTopic(data: $data) {
-      title
-    }
-  }
-`;
-
 interface FormDataProps {
   name: String;
   logo: String;
   seed?: Boolean;
 }
 
-const TopicBuilderView = () => {
+const CustomerBuilderView = () => {
   const history = useHistory();
   const { register, handleSubmit, errors } = useForm<FormDataProps>();
 
@@ -152,4 +144,4 @@ const FormGroupContainer = styled.div`
 
 const Form = styled.form``;
 
-export default TopicBuilderView;
+export default CustomerBuilderView;
