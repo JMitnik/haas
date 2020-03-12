@@ -12,6 +12,9 @@ export const getQuestionnairesCustomerQuery = gql`
     publicTitle
     creationDate
     updatedAt
+    customer {
+      id
+    }
   }
 }
 `;

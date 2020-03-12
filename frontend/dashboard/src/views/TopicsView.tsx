@@ -90,12 +90,14 @@ const AddTopicCard = styled(Card)`
 `;
 
 const TopicCard = ({ topic }: { topic: Questionnaire }) => {
-
   const [deleteTopic, { loading }] = useMutation(deleteQuestionnaireMutation, {
     onCompleted: () => {
       console.log('Succesfully deleted customer !');
     },
-    refetchQueries: [{ query: getQuestionnairesCustomerQuery }],
+    refetchQueries: [{ query: getQuestionnairesCustomerQuery,
+      variables: {
+        id: topic.customer.id,
+      } }],
     onError: (serverError: ApolloError) => {
       console.log(serverError);
     },

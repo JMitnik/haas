@@ -82,6 +82,7 @@ const mutationResolvers: MutationResolvers = {
   createNewCustomer: createNewCustomerMutation,
   deleteFullCustomer: deleteFullCustomerNode,
   createNewQuestionnaire,
+  deleteQuestionnaire: forwardTo('db'),
 };
 
 const resolvers = {
