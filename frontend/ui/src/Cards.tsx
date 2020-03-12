@@ -10,8 +10,8 @@ export const Card = styled(Div)`
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
       cursor: pointer;
       &:hover ${Div} {
-      transition: all 0.2s ease-in;
-      box-shadow: 0 1px 3px 1px rgba(0,0,0,0.1);
+        transition: all 0.2s ease-in;
+        box-shadow: 0 1px 3px 1px rgba(0,0,0,0.1);
     }
   `}
 `;

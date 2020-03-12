@@ -104,7 +104,7 @@ const StyledLabel = styled(Div).attrs({ as: 'label' })`
     color: ${theme.colors.default.dark}
     text-transform: uppercase;
   `}
-      `;
+`;
 
 const StyledInput = styled.input`
   ${({ theme }) => css`
@@ -123,24 +123,19 @@ const StyledInput = styled.input`
     /* Set to variable */
     padding: 15px;
   `}
-      `;
-
-const StyledTextInput = styled(StyledInput).attrs({as: 'textarea' })`
-        resize: none;
-        min-height: 150px;
-      `;
+`;
 
 const Hr = styled.hr`
   ${({ theme }) => css`
     border-top: 1px solid ${theme.colors.default.light};
   `}
-      `;
+`;
 
 const FormGroupContainer = styled.div`
   ${({ theme }) => css`
     padding-bottom: ${theme.gutter * 3}px;
   `}
-      `;
+`;
 
 const Form = styled.form``;
 

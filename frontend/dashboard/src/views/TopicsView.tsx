@@ -9,7 +9,7 @@ import styled, { css } from 'styled-components';
 import { Query, Questionnaire } from '../types.d';
 
 import { getQuestionnairesCustomerQuery } from '../queries/getQuestionnairesCustomerQuery';
-import { deleteQuestionnaireQuery } from '../mutations/deleteQuestionnaire';
+import { deleteQuestionnaireMutation } from '../mutations/deleteQuestionnaire';
 
 const TopicsView: FC = () => {
   const { customerId } = useParams();
@@ -91,7 +91,7 @@ const AddTopicCard = styled(Card)`
 
 const TopicCard = ({ topic }: { topic: Questionnaire }) => {
 
-  const [deleteTopic, { loading }] = useMutation(deleteQuestionnaireQuery, {
+  const [deleteTopic, { loading }] = useMutation(deleteQuestionnaireMutation, {
     onCompleted: () => {
       console.log('Succesfully deleted customer !');
     },

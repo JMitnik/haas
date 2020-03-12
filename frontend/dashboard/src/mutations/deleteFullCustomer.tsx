@@ -2,7 +2,7 @@
 import gql from 'graphql-tag';
 
 export const deleteFullCustomerQuery = gql`
-  mutation deleteDaCustomer($id: ID!) {
+  mutation deleteFullCustomer($id: ID!) {
     deleteFullCustomer(id: $id) {
       id
     }

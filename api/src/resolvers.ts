@@ -1,5 +1,4 @@
 import { forwardTo } from 'prisma-binding';
-import * as _ from 'lodash';
 
 import { QueryResolvers, MutationResolvers } from './generated/resolver-types';
 import { prisma, ID_Input } from './generated/prisma-client/index';
@@ -54,7 +53,6 @@ const createNewCustomerMutation = async (parent : any, args: any) => {
 };
 
 const createNewQuestionnaire = async (parent : any, args: any) => {
-  console.log(args);
   const { customerId, title, description, publicTitle, isSeed } = args;
   const questionnaire = await prisma.createQuestionnaire({
     customer: {
