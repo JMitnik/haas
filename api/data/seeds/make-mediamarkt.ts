@@ -1,5 +1,7 @@
 import { prisma, NodeType } from '../../src/generated/prisma-client/index';
 
+import seedCompany from './make-company';
+
 const CUSTOMER = 'Mediamarkt';
 
 const multiChoiceType: NodeType = 'MULTI_CHOICE';
@@ -354,270 +356,272 @@ const makeMediamarkt = async () => {
     },
   });
 
-  // Create leaf-nodes
-  const leafs = await Promise.all(leafNodes.map(async (leafNode) => {
-    return prisma.createLeafNode({
-      title: leafNode.title,
-      type: leafNode.type,
-    });
-  }));
+  await seedCompany(customer);
 
-  // Create questionnaire
-  const questionnaire = await prisma.createQuestionnaire({
-    customer: {
-      connect: {
-        id: customer.id,
-      },
-    },
-    leafs: {
-      connect: leafs.map((leaf) => ({ id: leaf.id })),
-    },
-    title: 'Default questionnaire',
-    description: 'Default questions',
-    questions: {
-      create: [
-        {
-          title: `How do you feel about ${customer.name}?`,
-          questionType: sliderType,
-          isRoot: true,
-        },
-      ],
-    },
-  });
+  // // Create leaf-nodes
+  // const leafs = await Promise.all(leafNodes.map(async (leafNode) => {
+  //   return prisma.createLeafNode({
+  //     title: leafNode.title,
+  //     type: leafNode.type,
+  //   });
+  // }));
 
-  // Connect the questionnaire to the customer
-  prisma.updateCustomer({
-    where: {
-      id: customer.id,
-    },
-    data: {
-      questionnaires: {
-        connect: {
-          id: questionnaire.id,
-        },
-      },
-    },
-  });
+  // // Create questionnaire
+  // const questionnaire = await prisma.createQuestionnaire({
+  //   customer: {
+  //     connect: {
+  //       id: customer.id,
+  //     },
+  //   },
+  //   leafs: {
+  //     connect: leafs.map((leaf) => ({ id: leaf.id })),
+  //   },
+  //   title: 'Default questionnaire',
+  //   description: 'Default questions',
+  //   questions: {
+  //     create: [
+  //       {
+  //         title: `How do you feel about ${customer.name}?`,
+  //         questionType: sliderType,
+  //         isRoot: true,
+  //       },
+  //     ],
+  //   },
+  // });
 
-  const standardSubChildrenWithLeafs = await Promise.all(standardSubChildren.map(async (rootChild) => {
-    const subleafs = await prisma.leafNodes({
-      where: {
-        title_contains: rootChild.overrideLeafContains,
-        AND: {
-          id_in: await Promise.all((await prisma.questionnaire({ id: questionnaire.id }).leafs()).map((leaf) => leaf.id)),
-        },
-      },
-    });
+  // // Connect the questionnaire to the customer
+  // prisma.updateCustomer({
+  //   where: {
+  //     id: customer.id,
+  //   },
+  //   data: {
+  //     questionnaires: {
+  //       connect: {
+  //         id: questionnaire.id,
+  //       },
+  //     },
+  //   },
+  // });
 
-    let leaf = null;
+  // const standardSubChildrenWithLeafs = await Promise.all(standardSubChildren.map(async (rootChild) => {
+  //   const subleafs = await prisma.leafNodes({
+  //     where: {
+  //       title_contains: rootChild.overrideLeafContains,
+  //       AND: {
+  //         id_in: await Promise.all((await prisma.questionnaire({ id: questionnaire.id }).leafs()).map((leaf) => leaf.id)),
+  //       },
+  //     },
+  //   });
 
-    if (subleafs) {
-      [leaf] = subleafs;
-    }
+  //   let leaf = null;
 
-    return {
-      ...rootChild,
-      overrideLeaf: leaf,
-    };
-  }));
+  //   if (subleafs) {
+  //     [leaf] = subleafs;
+  //   }
 
-  const standardRootChildrenWithLeafs = await Promise.all(standardRootChildren.map(async (rootChild) => {
-    const subleafs = await prisma.leafNodes({
-      where: {
-        title_contains: rootChild.overrideLeafContains,
-        AND: {
-          id_in: await Promise.all((await prisma.questionnaire({ id: questionnaire.id }).leafs()).map((leaf) => leaf.id)),
-        },
-      },
-    });
+  //   return {
+  //     ...rootChild,
+  //     overrideLeaf: leaf,
+  //   };
+  // }));
 
-    let leaf = null;
+  // const standardRootChildrenWithLeafs = await Promise.all(standardRootChildren.map(async (rootChild) => {
+  //   const subleafs = await prisma.leafNodes({
+  //     where: {
+  //       title_contains: rootChild.overrideLeafContains,
+  //       AND: {
+  //         id_in: await Promise.all((await prisma.questionnaire({ id: questionnaire.id }).leafs()).map((leaf) => leaf.id)),
+  //       },
+  //     },
+  //   });
 
-    if (subleafs) {
-      [leaf] = subleafs;
-    }
+  //   let leaf = null;
 
-    return {
-      ...rootChild,
-      overrideLeaf: leaf,
-      children: standardSubChildrenWithLeafs,
-    };
-  }));
+  //   if (subleafs) {
+  //     [leaf] = subleafs;
+  //   }
 
-  // Create root-questions
-  const rootQuestions = await Promise.all(standardRootChildrenWithLeafs.map(async (childNode) => prisma.createQuestionNode({
-    title: childNode.title,
-    questionnaire: {
-      connect: {
-        id: questionnaire.id,
-      },
-    },
-    questionType: childNode.questionType,
-    overrideLeaf: {
-      connect: {
-        id: childNode.overrideLeaf?.id,
-      },
-    },
-    options: {
-      create: childNode.options.map((option) => ({ value: option })),
-    },
-    children: {
-      create: childNode.children.map((child) => ({
-        title: child.title,
-        questionnaire: {
-          connect: {
-            id: questionnaire.id,
-          },
-        },
-        questionType: child.type,
-        overrideLeaf: {
-          connect: {
-            id: child.overrideLeaf?.id,
-          },
-        },
-        options: {
-          create: child.childrenNodes.map((subChild) => ({ value: subChild.value })),
-        },
-      })),
-    },
-  })));
+  //   return {
+  //     ...rootChild,
+  //     overrideLeaf: leaf,
+  //     children: standardSubChildrenWithLeafs,
+  //   };
+  // }));
 
-  // Extract mainQuestion
-  // TODO: How to get unique boolean isRoot, so that we can use prisma.questionNode
-  const mainQuestions = await prisma.questionNodes({
-    where: {
-      isRoot: true,
-      AND: {
-        id_in: await Promise.all((await prisma.questionnaire({ id: questionnaire.id }).questions()).map((q) => q.id)),
-      },
-    },
-  });
-  const mainQuestion = mainQuestions[0];
+  // // Create root-questions
+  // const rootQuestions = await Promise.all(standardRootChildrenWithLeafs.map(async (childNode) => prisma.createQuestionNode({
+  //   title: childNode.title,
+  //   questionnaire: {
+  //     connect: {
+  //       id: questionnaire.id,
+  //     },
+  //   },
+  //   questionType: childNode.questionType,
+  //   overrideLeaf: {
+  //     connect: {
+  //       id: childNode.overrideLeaf?.id,
+  //     },
+  //   },
+  //   options: {
+  //     create: childNode.options.map((option) => ({ value: option })),
+  //   },
+  //   children: {
+  //     create: childNode.children.map((child) => ({
+  //       title: child.title,
+  //       questionnaire: {
+  //         connect: {
+  //           id: questionnaire.id,
+  //         },
+  //       },
+  //       questionType: child.type,
+  //       overrideLeaf: {
+  //         connect: {
+  //           id: child.overrideLeaf?.id,
+  //         },
+  //       },
+  //       options: {
+  //         create: child.childrenNodes.map((subChild) => ({ value: subChild.value })),
+  //       },
+  //     })),
+  //   },
+  // })));
 
-  // Connect the root question to the other questions
-  await prisma.updateQuestionNode({
-    where: {
-      id: mainQuestion.id,
-    },
-    data: {
-      questionnaire: {
-        connect: {
-          id: questionnaire.id,
-        },
-      },
-      children: {
-        connect: rootQuestions.map((rootNode) => ({ id: rootNode.id })),
-      },
-    },
-  });
+  // // Extract mainQuestion
+  // // TODO: How to get unique boolean isRoot, so that we can use prisma.questionNode
+  // const mainQuestions = await prisma.questionNodes({
+  //   where: {
+  //     isRoot: true,
+  //     AND: {
+  //       id_in: await Promise.all((await prisma.questionnaire({ id: questionnaire.id }).questions()).map((q) => q.id)),
+  //     },
+  //   },
+  // });
+  // const mainQuestion = mainQuestions[0];
 
-  const leafIds = leafs.map((leaf) => leaf.id);
-  await Promise.all(standardEdges.map(async (edge) => {
-    const childNode = await prisma.questionNodes({
-      where: {
-        title_contains: edge.childQuestionContains,
-        OR: [
-          {
-            overrideLeaf: {
-              id_not: null,
-              id_in: leafIds,
-            },
-          },
-          {
-            id: null,
-          },
-        ],
-      },
-    });
+  // // Connect the root question to the other questions
+  // await prisma.updateQuestionNode({
+  //   where: {
+  //     id: mainQuestion.id,
+  //   },
+  //   data: {
+  //     questionnaire: {
+  //       connect: {
+  //         id: questionnaire.id,
+  //       },
+  //     },
+  //     children: {
+  //       connect: rootQuestions.map((rootNode) => ({ id: rootNode.id })),
+  //     },
+  //   },
+  // });
 
-    if (!childNode[0]) {
-      console.log('Cant find node for:', edge);
-    }
+  // const leafIds = leafs.map((leaf) => leaf.id);
+  // await Promise.all(standardEdges.map(async (edge) => {
+  //   const childNode = await prisma.questionNodes({
+  //     where: {
+  //       title_contains: edge.childQuestionContains,
+  //       OR: [
+  //         {
+  //           overrideLeaf: {
+  //             id_not: null,
+  //             id_in: leafIds,
+  //           },
+  //         },
+  //         {
+  //           id: null,
+  //         },
+  //       ],
+  //     },
+  //   });
 
-    const childNodeId = childNode?.[0]?.id;
+  //   if (!childNode[0]) {
+  //     console.log('Cant find node for:', edge);
+  //   }
 
-    const parentNode = await prisma.questionNodes(
-      {
-        where: {
-          OR: [
-            {
-              title_contains: edge.parentQuestionContains,
-              overrideLeaf: {
-                id_not: null,
-                id_in: leafIds,
-              },
-            },
-            {
-              title_contains: edge.parentQuestionContains,
-              overrideLeaf: null,
-            },
-          ],
-        },
-      },
-    );
+  //   const childNodeId = childNode?.[0]?.id;
 
-    if (parentNode.length === 0) {
-      console.log('Something went wrong with edge: ', edge);
-    }
+  //   const parentNode = await prisma.questionNodes(
+  //     {
+  //       where: {
+  //         OR: [
+  //           {
+  //             title_contains: edge.parentQuestionContains,
+  //             overrideLeaf: {
+  //               id_not: null,
+  //               id_in: leafIds,
+  //             },
+  //           },
+  //           {
+  //             title_contains: edge.parentQuestionContains,
+  //             overrideLeaf: null,
+  //           },
+  //         ],
+  //       },
+  //     },
+  //   );
 
-    const parentNodeId = parentNode?.[0]?.id;
+  //   if (parentNode.length === 0) {
+  //     console.log('Something went wrong with edge: ', edge);
+  //   }
 
-    if (childNodeId && parentNodeId) {
-      await prisma.createEdge({
-        childNode: {
-          connect: {
-            id: childNodeId,
-          },
-        },
-        parentNode: {
-          connect: {
-            id: parentNodeId,
-          },
-        },
-        conditions: {
-          create: {
-            conditionType: edge.conditions?.[0].conditionType,
-            matchValue: edge.conditions?.[0].matchValue,
-            renderMin: edge.conditions?.[0].renderMin,
-            renderMax: edge.conditions?.[0].renderMax,
-          },
-        },
-      });
-    }
-  }));
+  //   const parentNodeId = parentNode?.[0]?.id;
 
-  console.log(await Promise.all((await prisma.questionNodes({ where:
-    { questionnaire: { id: questionnaire.id } } }))));
+  //   if (childNodeId && parentNodeId) {
+  //     await prisma.createEdge({
+  //       childNode: {
+  //         connect: {
+  //           id: childNodeId,
+  //         },
+  //       },
+  //       parentNode: {
+  //         connect: {
+  //           id: parentNodeId,
+  //         },
+  //       },
+  //       conditions: {
+  //         create: {
+  //           conditionType: edge.conditions?.[0].conditionType,
+  //           matchValue: edge.conditions?.[0].matchValue,
+  //           renderMin: edge.conditions?.[0].renderMin,
+  //           renderMax: edge.conditions?.[0].renderMax,
+  //         },
+  //       },
+  //     });
+  //   }
+  // }));
 
-  await Promise.all((await prisma.questionNodes({ where:
-    { questionnaire: { id: questionnaire.id } } })).map(async (node) => {
+  // console.log(await Promise.all((await prisma.questionNodes({ where:
+  //   { questionnaire: { id: questionnaire.id } } }))));
 
-    const edgeChildrenNodes = await prisma.edges({
-      where: {
-        parentNode: {
-          id: node.id,
-        },
-      },
-    });
+  // await Promise.all((await prisma.questionNodes({ where:
+  //   { questionnaire: { id: questionnaire.id } } })).map(async (node) => {
 
-    await prisma.updateQuestionNode({
-      where: {
-        id: node.id,
-      },
-      data: {
-        questionnaire: {
-          connect: {
-            id: questionnaire.id,
-          },
-        },
-        edgeChildren: {
-          connect: edgeChildrenNodes.map((edgeChild) => ({ id: edgeChild.id })),
-        },
-      },
-    });
-    // 1. Find all edges (parentId) corresponderend met huidige node id
-    // 2. Update edgeChildren van huidige node met gevonden edges
-  }));
+  //   const edgeChildrenNodes = await prisma.edges({
+  //     where: {
+  //       parentNode: {
+  //         id: node.id,
+  //       },
+  //     },
+  //   });
+
+  //   await prisma.updateQuestionNode({
+  //     where: {
+  //       id: node.id,
+  //     },
+  //     data: {
+  //       questionnaire: {
+  //         connect: {
+  //           id: questionnaire.id,
+  //         },
+  //       },
+  //       edgeChildren: {
+  //         connect: edgeChildrenNodes.map((edgeChild) => ({ id: edgeChild.id })),
+  //       },
+  //     },
+  //   });
+  //   // 1. Find all edges (parentId) corresponderend met huidige node id
+  //   // 2. Update edgeChildren van huidige node met gevonden edges
+  // }));
 };
 
 export default makeMediamarkt;

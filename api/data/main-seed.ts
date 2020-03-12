@@ -4,7 +4,7 @@ import makeMediamarkt from './seeds/make-mediamarkt';
 
 const main = async () => {
   await makeStarbucks();
-  // await makeMediamarkt();
+  await makeMediamarkt();
 };
 
 main();

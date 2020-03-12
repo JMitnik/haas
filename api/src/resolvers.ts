@@ -105,7 +105,7 @@ const createNewCustomerMutation = async (parent : any, args: any) => {
         logoUrl: logo,
         colourSettings: {
           create: {
-            primary: 'white',
+            primary: '#4287f5',
           },
         },
       },
