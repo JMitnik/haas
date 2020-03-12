@@ -70,11 +70,6 @@ const findNextEdge = (parent: HAASNode, key: string | number) => {
 
 const findLeafNode = (collection: HAASNode[], key: number) => collection.filter(item => item.id === key)[0];
 
-interface ProjectParamProps {
-  customerId: string;
-  questionnaireId: string;
-}
-
 export const JSONTreeContext = React.createContext({} as JSONTreeContextProps);
 
 export const JSONTreeProvider = ({ children }: { children: ReactNode }) => {
@@ -113,7 +108,7 @@ export const JSONTreeProvider = ({ children }: { children: ReactNode }) => {
       console.log('Current LEAF: ', activeLeafNodeId)
       nextNode = findLeafNode(leafCollection, activeLeafNodeId);
     }
-
+    console.log(historyStack);
     setHistoryStack(hist => [...hist, nextNode]);
   };
 

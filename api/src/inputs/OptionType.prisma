@@ -1,4 +1,0 @@
-input IOptions {
-  logo: string;
-  useSeed: Boolean;
-}

@@ -13,6 +13,12 @@ export const QuestionFragment = gql`
     questionType
     edgeChildren {
       id
+      conditions {
+        conditionType
+        renderMin
+        renderMax
+        matchValue
+      }
       parentNode {
         id
         title

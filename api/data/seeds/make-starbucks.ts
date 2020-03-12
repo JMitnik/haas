@@ -362,6 +362,12 @@ const makeStarbucks = async () => {
     });
   }));
 
+  const rootQuestion = await prisma.createQuestionNode({
+    title: `How do you feel about ${customer.name}?`,
+    questionType: sliderType,
+    isRoot: true,
+  });
+
   // Create questionnaire
   const questionnaire = await prisma.createQuestionnaire({
     customer: {
@@ -375,12 +381,9 @@ const makeStarbucks = async () => {
     title: 'Default starbucks questionnaire',
     description: 'Default questions',
     questions: {
-      create: [
-        {
-          title: `How do you feel about ${customer.name}?`,
-          questionType: sliderType,
-          isRoot: true,
-        },
+      connect: [{
+        id: rootQuestion.id,
+      },
       ],
     },
   });

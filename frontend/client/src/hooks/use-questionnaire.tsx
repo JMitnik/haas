@@ -28,7 +28,7 @@ export const QuestionnaireProvider = ({ children }: { children: ReactNode }) => 
   });
 
   const data = res.data;
-  console.log('Data: ', data)
+  console.log('Data: ', res.data)
 
   useEffect(() => {
     if (data?.questionnaire) {
