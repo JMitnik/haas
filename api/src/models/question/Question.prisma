@@ -20,7 +20,6 @@ type QuestionNode {
     isRoot: Boolean! @default(value: false)
     questionType: NodeType!
     overrideLeaf: LeafNode
-    # conditions: [QuestionCondition] 
     options: [QuestionOption] @relation (link: TABLE name: "QuestionNodeOptions", onDelete: CASCADE)
     children: [QuestionNode]
     edgeChildren: [Edge] @relation (link: TABLE, name: "EdgeChildrenRelation", onDelete: CASCADE)

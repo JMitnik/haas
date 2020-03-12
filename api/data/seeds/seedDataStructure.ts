@@ -7,8 +7,6 @@ export const sliderType: NodeType = 'SLIDER';
 export const textboxType: NodeType = 'TEXTBOX';
 export const registrationType: NodeType = 'REGISTRATION';
 
-export const CUSTOMER = 'Starbucks';
-
 export const getStandardEdgeData = (customerName: string) => {
   return [
     {
@@ -209,55 +207,55 @@ export const getStandardEdgeData = (customerName: string) => {
 };
 
 export const standardSubChildren = [
-    {
-        title: 'What exactly did you like about facilities?',
-        overrideLeafContains: 'Instagram',
-        type: multiChoiceType,
-        relatedOptionValue: 'Facilities',
-        childrenNodes: [
-        { value: 'Design', type: multiChoiceType },
-        { value: 'Functionality', type: multiChoiceType },
-        { value: 'Informative', type: multiChoiceType },
-        { value: 'Other', type: multiChoiceType },
-        ],
-    },
-    {
-        title: 'What exactly did you like about the website?',
-        overrideLeafContains: 'newsletter',
-        type: multiChoiceType,
-        relatedOptionValue: 'Website/Mobile app',
-        childrenNodes: [
-        { value: 'Cleanliness', type: multiChoiceType },
-        { value: 'Atmosphere', type: multiChoiceType },
-        { value: 'Location', type: multiChoiceType },
-        { value: 'Other', type: multiChoiceType },
-        ],
-    },
-    {
-        title: 'What exactly did you like about the product?',
-        overrideLeafContains: 'see you soon',
-        type: multiChoiceType,
-        relatedOptionValue: 'Product / Services',
-        childrenNodes: [
-        { value: 'Quality', type: multiChoiceType },
-        { value: 'Price', type: multiChoiceType },
-        { value: 'Friendliness', type: multiChoiceType },
-        { value: 'Other', type: multiChoiceType },
-        ],
-    },
-    {
-        title: 'What exactly did you like about the customer support?',
-        overrideLeafContains: 'team is on it',
-        type: multiChoiceType,
-        relatedOptionValue: 'Customer Support',
-        childrenNodes: [
-        { value: 'Friendliness', type: multiChoiceType },
-        { value: 'Competence', type: multiChoiceType },
-        { value: 'Speed', type: multiChoiceType },
-        { value: 'Options', type: multiChoiceType },
-        ],
-    },
-    ];
+  {
+    title: 'What exactly did you like about facilities?',
+    overrideLeafContains: 'Instagram',
+    type: multiChoiceType,
+    relatedOptionValue: 'Facilities',
+    childrenNodes: [
+      { value: 'Design', type: multiChoiceType },
+      { value: 'Functionality', type: multiChoiceType },
+      { value: 'Informative', type: multiChoiceType },
+      { value: 'Other', type: multiChoiceType },
+    ],
+  },
+  {
+    title: 'What exactly did you like about the website?',
+    overrideLeafContains: 'newsletter',
+    type: multiChoiceType,
+    relatedOptionValue: 'Website/Mobile app',
+    childrenNodes: [
+      { value: 'Cleanliness', type: multiChoiceType },
+      { value: 'Atmosphere', type: multiChoiceType },
+      { value: 'Location', type: multiChoiceType },
+      { value: 'Other', type: multiChoiceType },
+    ],
+  },
+  {
+    title: 'What exactly did you like about the product?',
+    overrideLeafContains: 'see you soon',
+    type: multiChoiceType,
+    relatedOptionValue: 'Product / Services',
+    childrenNodes: [
+      { value: 'Quality', type: multiChoiceType },
+      { value: 'Price', type: multiChoiceType },
+      { value: 'Friendliness', type: multiChoiceType },
+      { value: 'Other', type: multiChoiceType },
+    ],
+  },
+  {
+    title: 'What exactly did you like about the customer support?',
+    overrideLeafContains: 'team is on it',
+    type: multiChoiceType,
+    relatedOptionValue: 'Customer Support',
+    childrenNodes: [
+      { value: 'Friendliness', type: multiChoiceType },
+      { value: 'Competence', type: multiChoiceType },
+      { value: 'Speed', type: multiChoiceType },
+      { value: 'Options', type: multiChoiceType },
+    ],
+  },
+];
 
 export const standardRootChildren = [
   {

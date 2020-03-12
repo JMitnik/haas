@@ -83,8 +83,6 @@ export const JSONTreeProvider = ({ children }: { children: ReactNode }) => {
     if (questionnaire) {
       setHistoryStack(questionnaire?.questions || []);
       setLeafCollection(questionnaire?.leafs || []);
-      console.log('Questionnaire: ', questionnaire)
-      console.log('Leaf collection: ', leafCollection)
     }
   }, [questionnaire, leafCollection]);
 
@@ -98,17 +96,13 @@ export const JSONTreeProvider = ({ children }: { children: ReactNode }) => {
     }).then(res => res.data.questionNode)
 
     if (nextNode && nextNode.overrideLeaf?.id) {
-      console.log('SETTING NEW LEAF NODE TO: ', nextNode.overrideLeaf?.id)
       setActiveLeafNodeID(nextNode?.overrideLeaf?.id);
     }
 
     if (!nextNode) {
-      console.log('NO NEXT NODE SETTING LEAFNODE')
-      console.log(leafCollection)
-      console.log('Current LEAF: ', activeLeafNodeId)
       nextNode = findLeafNode(leafCollection, activeLeafNodeId);
     }
-    console.log(historyStack);
+
     setHistoryStack(hist => [...hist, nextNode]);
   };
 

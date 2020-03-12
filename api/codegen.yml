@@ -1,6 +1,5 @@
 schema: 
   - ./src/generated/prisma.graphql
-  - ./src/schema.graphql
 generates:
   ./src/generated/resolver-types.ts:
     plugins:

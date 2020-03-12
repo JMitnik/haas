@@ -30,7 +30,6 @@ export const CardFooter = styled(Div)`
     background: ${theme.colors.default.light};
     color: ${theme.colors.default.text};
     text-align: center;
-    /* cursor: pointer; */
   `}
 `;
 
