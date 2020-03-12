@@ -91,7 +91,7 @@ const CustomerCardImage = styled.img`
 
 const CustomerCard = ({ customer }: { customer: Customer }) => {
   const history = useHistory();
-  const client = useApolloClient();
+
   const setCustomerID = (customerId: string) => {
     history.push(`/c/${customerId}`);
   };
@@ -107,7 +107,6 @@ const CustomerCard = ({ customer }: { customer: Customer }) => {
   });
 
   const deleteClickedCustomer = async (customerId: string) => {
-    console.log(customer.id);
     deleteCustomer({
       variables: {
         id: customerId,

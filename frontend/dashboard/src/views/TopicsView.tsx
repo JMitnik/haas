@@ -1,5 +1,6 @@
 import React, { FC } from 'react';
-import { useQuery } from '@apollo/react-hooks';
+import { useQuery, useMutation } from '@apollo/react-hooks';
+import { ApolloError } from 'apollo-boost';
 
 import { ChevronRight, Plus } from 'react-feather';
 import { H2, H3, H4, Grid, Flex, Icon, Label, Div, Card, CardBody, CardFooter } from '@haas/ui';
@@ -8,6 +9,7 @@ import styled, { css } from 'styled-components';
 import { Query, Questionnaire } from '../types.d';
 
 import { getQuestionnairesCustomerQuery } from '../queries/getQuestionnairesCustomerQuery';
+import { deleteQuestionnaireQuery } from '../mutations/deleteQuestionnaire';
 
 const TopicsView: FC = () => {
   const { customerId } = useParams();
@@ -87,27 +89,49 @@ const AddTopicCard = styled(Card)`
   `}
 `;
 
-const TopicCard = ({ topic }: { topic: Questionnaire }) => (
-  <Card useFlex flexDirection="column">
-    <CardBody flex="100%">
-      <Flex alignItems="center" justifyContent="space-between">
-        <H3 fontWeight={500}>
-          {topic.title}
-        </H3>
-        <Label brand="success">
-          Score: 9.3
-        </Label>
-      </Flex>
-    </CardBody>
-    <CardFooter useFlex justifyContent="center" alignItems="center">
-      <H4>
-        View topic
-      </H4>
-      <Icon pl={1} fontSize={1}>
-        <ChevronRight />
-      </Icon>
-    </CardFooter>
-  </Card>
-);
+const TopicCard = ({ topic }: { topic: Questionnaire }) => {
+
+  const [deleteTopic, { loading }] = useMutation(deleteQuestionnaireQuery, {
+    onCompleted: () => {
+      console.log('Succesfully deleted customer !');
+    },
+    refetchQueries: [{ query: getQuestionnairesCustomerQuery }],
+    onError: (serverError: ApolloError) => {
+      console.log(serverError);
+    },
+  });
+
+  const deleteClickedCustomer = async (topicId: string) => {
+    deleteTopic({
+      variables: {
+        id: topicId,
+      },
+    });
+  };
+
+  return (
+    <Card useFlex flexDirection="column">
+      <button type="button" onClick={() => deleteClickedCustomer(topic.id)}>Delete</button>
+      <CardBody flex="100%">
+        <Flex alignItems="center" justifyContent="space-between">
+          <H3 fontWeight={500}>
+            {topic.title}
+          </H3>
+          <Label brand="success">
+            Score: 9.3
+          </Label>
+        </Flex>
+      </CardBody>
+      <CardFooter useFlex justifyContent="center" alignItems="center">
+        <H4>
+          View topic
+        </H4>
+        <Icon pl={1} fontSize={1}>
+          <ChevronRight />
+        </Icon>
+      </CardFooter>
+    </Card>
+  );
+};
 
 export default TopicsView;
