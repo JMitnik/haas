@@ -53,9 +53,37 @@ const createNewCustomerMutation = async (parent : any, args: any) => {
   return customer;
 };
 
+const createNewQuestionnaire = async (parent : any, args: any) => {
+  console.log(args);
+  const { customerId, title, description, publicTitle, isSeed } = args;
+  const questionnaire = await prisma.createQuestionnaire({
+    customer: {
+      connect: {
+        id: customerId,
+      },
+    },
+    leafs: {
+      create: [],
+    },
+    title,
+    publicTitle,
+    description,
+    questions: {
+      create: [],
+    },
+  });
+
+  if (isSeed) {
+    console.log('Seed for questionnaire has been selected. Seeding...');
+  }
+
+  return questionnaire;
+};
+
 const mutationResolvers: MutationResolvers = {
   createNewCustomer: createNewCustomerMutation,
   deleteFullCustomer: deleteFullCustomerNode,
+  createNewQuestionnaire,
 };
 
 const resolvers = {

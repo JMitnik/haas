@@ -40,7 +40,7 @@ const App: FC = () => (
             <MainWindow>
               <Container>
                 <Switch>
-                  <Route path="/topic-builder" render={() => <TopicBuilderView />} />
+                  <Route path="/c/:customerId/topic-builder" render={() => <TopicBuilderView />} />
                   <Route path="/customer-builder" render={() => <CustomerBuilderView />} />
                   <Route path="/c/:customerId/" render={() => <TopicsView />} />
                   <Route

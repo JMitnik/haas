@@ -11,6 +11,7 @@ import { getQuestionnairesCustomerQuery } from '../queries/getQuestionnairesCust
 
 const TopicsView: FC = () => {
   const { customerId } = useParams();
+  const history = useHistory();
 
   const { loading, error, data } = useQuery<Query>(getQuestionnairesCustomerQuery, {
     variables: { id: customerId },
@@ -42,7 +43,7 @@ const TopicsView: FC = () => {
         {topics?.map((topic, index) => topic && <TopicCard key={index} topic={topic} />)}
 
         <AddTopicCard>
-          <Link to="/topic-builder" />
+          <Link to={`/c/${customerId}/topic-builder`} />
           <Div>
             <Plus />
             <H3>
