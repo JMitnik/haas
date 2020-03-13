@@ -22,6 +22,8 @@ export interface Exists {
   edge: (where?: EdgeWhereInput) => Promise<boolean>;
   fontSettings: (where?: FontSettingsWhereInput) => Promise<boolean>;
   leafNode: (where?: LeafNodeWhereInput) => Promise<boolean>;
+  nodeEntry: (where?: NodeEntryWhereInput) => Promise<boolean>;
+  nodeEntryValue: (where?: NodeEntryValueWhereInput) => Promise<boolean>;
   questionCondition: (where?: QuestionConditionWhereInput) => Promise<boolean>;
   questionNode: (where?: QuestionNodeWhereInput) => Promise<boolean>;
   questionOption: (where?: QuestionOptionWhereInput) => Promise<boolean>;
@@ -167,6 +169,46 @@ export interface Prisma {
     first?: Int;
     last?: Int;
   }) => LeafNodeConnectionPromise;
+  nodeEntry: (where: NodeEntryWhereUniqueInput) => NodeEntryNullablePromise;
+  nodeEntries: (args?: {
+    where?: NodeEntryWhereInput;
+    orderBy?: NodeEntryOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => FragmentableArray<NodeEntry>;
+  nodeEntriesConnection: (args?: {
+    where?: NodeEntryWhereInput;
+    orderBy?: NodeEntryOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => NodeEntryConnectionPromise;
+  nodeEntryValue: (
+    where: NodeEntryValueWhereUniqueInput
+  ) => NodeEntryValueNullablePromise;
+  nodeEntryValues: (args?: {
+    where?: NodeEntryValueWhereInput;
+    orderBy?: NodeEntryValueOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => FragmentableArray<NodeEntryValue>;
+  nodeEntryValuesConnection: (args?: {
+    where?: NodeEntryValueWhereInput;
+    orderBy?: NodeEntryValueOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => NodeEntryValueConnectionPromise;
   questionCondition: (
     where: QuestionConditionWhereUniqueInput
   ) => QuestionConditionNullablePromise;
@@ -365,6 +407,44 @@ export interface Prisma {
   }) => LeafNodePromise;
   deleteLeafNode: (where: LeafNodeWhereUniqueInput) => LeafNodePromise;
   deleteManyLeafNodes: (where?: LeafNodeWhereInput) => BatchPayloadPromise;
+  createNodeEntry: (data: NodeEntryCreateInput) => NodeEntryPromise;
+  updateNodeEntry: (args: {
+    data: NodeEntryUpdateInput;
+    where: NodeEntryWhereUniqueInput;
+  }) => NodeEntryPromise;
+  updateManyNodeEntries: (args: {
+    data: NodeEntryUpdateManyMutationInput;
+    where?: NodeEntryWhereInput;
+  }) => BatchPayloadPromise;
+  upsertNodeEntry: (args: {
+    where: NodeEntryWhereUniqueInput;
+    create: NodeEntryCreateInput;
+    update: NodeEntryUpdateInput;
+  }) => NodeEntryPromise;
+  deleteNodeEntry: (where: NodeEntryWhereUniqueInput) => NodeEntryPromise;
+  deleteManyNodeEntries: (where?: NodeEntryWhereInput) => BatchPayloadPromise;
+  createNodeEntryValue: (
+    data: NodeEntryValueCreateInput
+  ) => NodeEntryValuePromise;
+  updateNodeEntryValue: (args: {
+    data: NodeEntryValueUpdateInput;
+    where: NodeEntryValueWhereUniqueInput;
+  }) => NodeEntryValuePromise;
+  updateManyNodeEntryValues: (args: {
+    data: NodeEntryValueUpdateManyMutationInput;
+    where?: NodeEntryValueWhereInput;
+  }) => BatchPayloadPromise;
+  upsertNodeEntryValue: (args: {
+    where: NodeEntryValueWhereUniqueInput;
+    create: NodeEntryValueCreateInput;
+    update: NodeEntryValueUpdateInput;
+  }) => NodeEntryValuePromise;
+  deleteNodeEntryValue: (
+    where: NodeEntryValueWhereUniqueInput
+  ) => NodeEntryValuePromise;
+  deleteManyNodeEntryValues: (
+    where?: NodeEntryValueWhereInput
+  ) => BatchPayloadPromise;
   createQuestionCondition: (
     data: QuestionConditionCreateInput
   ) => QuestionConditionPromise;
@@ -476,6 +556,12 @@ export interface Subscription {
   leafNode: (
     where?: LeafNodeSubscriptionWhereInput
   ) => LeafNodeSubscriptionPayloadSubscription;
+  nodeEntry: (
+    where?: NodeEntrySubscriptionWhereInput
+  ) => NodeEntrySubscriptionPayloadSubscription;
+  nodeEntryValue: (
+    where?: NodeEntryValueSubscriptionWhereInput
+  ) => NodeEntryValueSubscriptionPayloadSubscription;
   questionCondition: (
     where?: QuestionConditionSubscriptionWhereInput
   ) => QuestionConditionSubscriptionPayloadSubscription;
@@ -622,6 +708,20 @@ export type FontSettingsOrderByInput =
   | "fontTitle_DESC"
   | "special_ASC"
   | "special_DESC";
+
+export type NodeEntryValueOrderByInput =
+  | "id_ASC"
+  | "id_DESC"
+  | "textValue_ASC"
+  | "textValue_DESC"
+  | "numberValue_ASC"
+  | "numberValue_DESC";
+
+export type NodeEntryOrderByInput =
+  | "id_ASC"
+  | "id_DESC"
+  | "sessionId_ASC"
+  | "sessionId_DESC";
 
 export type MutationType = "CREATED" | "UPDATED" | "DELETED";
 
@@ -1351,6 +1451,95 @@ export type FontSettingsWhereUniqueInput = AtLeastOne<{
 export type LeafNodeWhereUniqueInput = AtLeastOne<{
   id: Maybe<ID_Input>;
   nodeId?: Maybe<Int>;
+}>;
+
+export type NodeEntryWhereUniqueInput = AtLeastOne<{
+  id: Maybe<ID_Input>;
+}>;
+
+export interface NodeEntryValueWhereInput {
+  id?: Maybe<ID_Input>;
+  id_not?: Maybe<ID_Input>;
+  id_in?: Maybe<ID_Input[] | ID_Input>;
+  id_not_in?: Maybe<ID_Input[] | ID_Input>;
+  id_lt?: Maybe<ID_Input>;
+  id_lte?: Maybe<ID_Input>;
+  id_gt?: Maybe<ID_Input>;
+  id_gte?: Maybe<ID_Input>;
+  id_contains?: Maybe<ID_Input>;
+  id_not_contains?: Maybe<ID_Input>;
+  id_starts_with?: Maybe<ID_Input>;
+  id_not_starts_with?: Maybe<ID_Input>;
+  id_ends_with?: Maybe<ID_Input>;
+  id_not_ends_with?: Maybe<ID_Input>;
+  textValue?: Maybe<String>;
+  textValue_not?: Maybe<String>;
+  textValue_in?: Maybe<String[] | String>;
+  textValue_not_in?: Maybe<String[] | String>;
+  textValue_lt?: Maybe<String>;
+  textValue_lte?: Maybe<String>;
+  textValue_gt?: Maybe<String>;
+  textValue_gte?: Maybe<String>;
+  textValue_contains?: Maybe<String>;
+  textValue_not_contains?: Maybe<String>;
+  textValue_starts_with?: Maybe<String>;
+  textValue_not_starts_with?: Maybe<String>;
+  textValue_ends_with?: Maybe<String>;
+  textValue_not_ends_with?: Maybe<String>;
+  numberValue?: Maybe<Int>;
+  numberValue_not?: Maybe<Int>;
+  numberValue_in?: Maybe<Int[] | Int>;
+  numberValue_not_in?: Maybe<Int[] | Int>;
+  numberValue_lt?: Maybe<Int>;
+  numberValue_lte?: Maybe<Int>;
+  numberValue_gt?: Maybe<Int>;
+  numberValue_gte?: Maybe<Int>;
+  AND?: Maybe<NodeEntryValueWhereInput[] | NodeEntryValueWhereInput>;
+  OR?: Maybe<NodeEntryValueWhereInput[] | NodeEntryValueWhereInput>;
+  NOT?: Maybe<NodeEntryValueWhereInput[] | NodeEntryValueWhereInput>;
+}
+
+export interface NodeEntryWhereInput {
+  id?: Maybe<ID_Input>;
+  id_not?: Maybe<ID_Input>;
+  id_in?: Maybe<ID_Input[] | ID_Input>;
+  id_not_in?: Maybe<ID_Input[] | ID_Input>;
+  id_lt?: Maybe<ID_Input>;
+  id_lte?: Maybe<ID_Input>;
+  id_gt?: Maybe<ID_Input>;
+  id_gte?: Maybe<ID_Input>;
+  id_contains?: Maybe<ID_Input>;
+  id_not_contains?: Maybe<ID_Input>;
+  id_starts_with?: Maybe<ID_Input>;
+  id_not_starts_with?: Maybe<ID_Input>;
+  id_ends_with?: Maybe<ID_Input>;
+  id_not_ends_with?: Maybe<ID_Input>;
+  sessionId?: Maybe<String>;
+  sessionId_not?: Maybe<String>;
+  sessionId_in?: Maybe<String[] | String>;
+  sessionId_not_in?: Maybe<String[] | String>;
+  sessionId_lt?: Maybe<String>;
+  sessionId_lte?: Maybe<String>;
+  sessionId_gt?: Maybe<String>;
+  sessionId_gte?: Maybe<String>;
+  sessionId_contains?: Maybe<String>;
+  sessionId_not_contains?: Maybe<String>;
+  sessionId_starts_with?: Maybe<String>;
+  sessionId_not_starts_with?: Maybe<String>;
+  sessionId_ends_with?: Maybe<String>;
+  sessionId_not_ends_with?: Maybe<String>;
+  relatedNode?: Maybe<QuestionNodeWhereInput>;
+  edgeChild?: Maybe<EdgeWhereInput>;
+  values_every?: Maybe<NodeEntryValueWhereInput>;
+  values_some?: Maybe<NodeEntryValueWhereInput>;
+  values_none?: Maybe<NodeEntryValueWhereInput>;
+  AND?: Maybe<NodeEntryWhereInput[] | NodeEntryWhereInput>;
+  OR?: Maybe<NodeEntryWhereInput[] | NodeEntryWhereInput>;
+  NOT?: Maybe<NodeEntryWhereInput[] | NodeEntryWhereInput>;
+}
+
+export type NodeEntryValueWhereUniqueInput = AtLeastOne<{
+  id: Maybe<ID_Input>;
 }>;
 
 export type QuestionConditionWhereUniqueInput = AtLeastOne<{
@@ -2368,6 +2557,177 @@ export interface LeafNodeUpdateManyMutationInput {
   title?: Maybe<String>;
 }
 
+export interface NodeEntryCreateInput {
+  id?: Maybe<ID_Input>;
+  sessionId: String;
+  relatedNode: QuestionNodeCreateOneInput;
+  edgeChild?: Maybe<EdgeCreateOneInput>;
+  values?: Maybe<NodeEntryValueCreateManyInput>;
+}
+
+export interface EdgeCreateOneInput {
+  create?: Maybe<EdgeCreateInput>;
+  connect?: Maybe<EdgeWhereUniqueInput>;
+}
+
+export interface NodeEntryValueCreateManyInput {
+  create?: Maybe<NodeEntryValueCreateInput[] | NodeEntryValueCreateInput>;
+  connect?: Maybe<
+    NodeEntryValueWhereUniqueInput[] | NodeEntryValueWhereUniqueInput
+  >;
+}
+
+export interface NodeEntryValueCreateInput {
+  id?: Maybe<ID_Input>;
+  textValue?: Maybe<String>;
+  numberValue?: Maybe<Int>;
+}
+
+export interface NodeEntryUpdateInput {
+  sessionId?: Maybe<String>;
+  relatedNode?: Maybe<QuestionNodeUpdateOneRequiredInput>;
+  edgeChild?: Maybe<EdgeUpdateOneInput>;
+  values?: Maybe<NodeEntryValueUpdateManyInput>;
+}
+
+export interface QuestionNodeUpdateOneRequiredInput {
+  create?: Maybe<QuestionNodeCreateInput>;
+  update?: Maybe<QuestionNodeUpdateDataInput>;
+  upsert?: Maybe<QuestionNodeUpsertNestedInput>;
+  connect?: Maybe<QuestionNodeWhereUniqueInput>;
+}
+
+export interface EdgeUpdateOneInput {
+  create?: Maybe<EdgeCreateInput>;
+  update?: Maybe<EdgeUpdateDataInput>;
+  upsert?: Maybe<EdgeUpsertNestedInput>;
+  delete?: Maybe<Boolean>;
+  disconnect?: Maybe<Boolean>;
+  connect?: Maybe<EdgeWhereUniqueInput>;
+}
+
+export interface EdgeUpsertNestedInput {
+  update: EdgeUpdateDataInput;
+  create: EdgeCreateInput;
+}
+
+export interface NodeEntryValueUpdateManyInput {
+  create?: Maybe<NodeEntryValueCreateInput[] | NodeEntryValueCreateInput>;
+  update?: Maybe<
+    | NodeEntryValueUpdateWithWhereUniqueNestedInput[]
+    | NodeEntryValueUpdateWithWhereUniqueNestedInput
+  >;
+  upsert?: Maybe<
+    | NodeEntryValueUpsertWithWhereUniqueNestedInput[]
+    | NodeEntryValueUpsertWithWhereUniqueNestedInput
+  >;
+  delete?: Maybe<
+    NodeEntryValueWhereUniqueInput[] | NodeEntryValueWhereUniqueInput
+  >;
+  connect?: Maybe<
+    NodeEntryValueWhereUniqueInput[] | NodeEntryValueWhereUniqueInput
+  >;
+  set?: Maybe<
+    NodeEntryValueWhereUniqueInput[] | NodeEntryValueWhereUniqueInput
+  >;
+  disconnect?: Maybe<
+    NodeEntryValueWhereUniqueInput[] | NodeEntryValueWhereUniqueInput
+  >;
+  deleteMany?: Maybe<
+    NodeEntryValueScalarWhereInput[] | NodeEntryValueScalarWhereInput
+  >;
+  updateMany?: Maybe<
+    | NodeEntryValueUpdateManyWithWhereNestedInput[]
+    | NodeEntryValueUpdateManyWithWhereNestedInput
+  >;
+}
+
+export interface NodeEntryValueUpdateWithWhereUniqueNestedInput {
+  where: NodeEntryValueWhereUniqueInput;
+  data: NodeEntryValueUpdateDataInput;
+}
+
+export interface NodeEntryValueUpdateDataInput {
+  textValue?: Maybe<String>;
+  numberValue?: Maybe<Int>;
+}
+
+export interface NodeEntryValueUpsertWithWhereUniqueNestedInput {
+  where: NodeEntryValueWhereUniqueInput;
+  update: NodeEntryValueUpdateDataInput;
+  create: NodeEntryValueCreateInput;
+}
+
+export interface NodeEntryValueScalarWhereInput {
+  id?: Maybe<ID_Input>;
+  id_not?: Maybe<ID_Input>;
+  id_in?: Maybe<ID_Input[] | ID_Input>;
+  id_not_in?: Maybe<ID_Input[] | ID_Input>;
+  id_lt?: Maybe<ID_Input>;
+  id_lte?: Maybe<ID_Input>;
+  id_gt?: Maybe<ID_Input>;
+  id_gte?: Maybe<ID_Input>;
+  id_contains?: Maybe<ID_Input>;
+  id_not_contains?: Maybe<ID_Input>;
+  id_starts_with?: Maybe<ID_Input>;
+  id_not_starts_with?: Maybe<ID_Input>;
+  id_ends_with?: Maybe<ID_Input>;
+  id_not_ends_with?: Maybe<ID_Input>;
+  textValue?: Maybe<String>;
+  textValue_not?: Maybe<String>;
+  textValue_in?: Maybe<String[] | String>;
+  textValue_not_in?: Maybe<String[] | String>;
+  textValue_lt?: Maybe<String>;
+  textValue_lte?: Maybe<String>;
+  textValue_gt?: Maybe<String>;
+  textValue_gte?: Maybe<String>;
+  textValue_contains?: Maybe<String>;
+  textValue_not_contains?: Maybe<String>;
+  textValue_starts_with?: Maybe<String>;
+  textValue_not_starts_with?: Maybe<String>;
+  textValue_ends_with?: Maybe<String>;
+  textValue_not_ends_with?: Maybe<String>;
+  numberValue?: Maybe<Int>;
+  numberValue_not?: Maybe<Int>;
+  numberValue_in?: Maybe<Int[] | Int>;
+  numberValue_not_in?: Maybe<Int[] | Int>;
+  numberValue_lt?: Maybe<Int>;
+  numberValue_lte?: Maybe<Int>;
+  numberValue_gt?: Maybe<Int>;
+  numberValue_gte?: Maybe<Int>;
+  AND?: Maybe<
+    NodeEntryValueScalarWhereInput[] | NodeEntryValueScalarWhereInput
+  >;
+  OR?: Maybe<NodeEntryValueScalarWhereInput[] | NodeEntryValueScalarWhereInput>;
+  NOT?: Maybe<
+    NodeEntryValueScalarWhereInput[] | NodeEntryValueScalarWhereInput
+  >;
+}
+
+export interface NodeEntryValueUpdateManyWithWhereNestedInput {
+  where: NodeEntryValueScalarWhereInput;
+  data: NodeEntryValueUpdateManyDataInput;
+}
+
+export interface NodeEntryValueUpdateManyDataInput {
+  textValue?: Maybe<String>;
+  numberValue?: Maybe<Int>;
+}
+
+export interface NodeEntryUpdateManyMutationInput {
+  sessionId?: Maybe<String>;
+}
+
+export interface NodeEntryValueUpdateInput {
+  textValue?: Maybe<String>;
+  numberValue?: Maybe<Int>;
+}
+
+export interface NodeEntryValueUpdateManyMutationInput {
+  textValue?: Maybe<String>;
+  numberValue?: Maybe<Int>;
+}
+
 export interface QuestionConditionUpdateInput {
   conditionType?: Maybe<String>;
   renderMin?: Maybe<Int>;
@@ -2559,6 +2919,43 @@ export interface LeafNodeSubscriptionWhereInput {
   OR?: Maybe<LeafNodeSubscriptionWhereInput[] | LeafNodeSubscriptionWhereInput>;
   NOT?: Maybe<
     LeafNodeSubscriptionWhereInput[] | LeafNodeSubscriptionWhereInput
+  >;
+}
+
+export interface NodeEntrySubscriptionWhereInput {
+  mutation_in?: Maybe<MutationType[] | MutationType>;
+  updatedFields_contains?: Maybe<String>;
+  updatedFields_contains_every?: Maybe<String[] | String>;
+  updatedFields_contains_some?: Maybe<String[] | String>;
+  node?: Maybe<NodeEntryWhereInput>;
+  AND?: Maybe<
+    NodeEntrySubscriptionWhereInput[] | NodeEntrySubscriptionWhereInput
+  >;
+  OR?: Maybe<
+    NodeEntrySubscriptionWhereInput[] | NodeEntrySubscriptionWhereInput
+  >;
+  NOT?: Maybe<
+    NodeEntrySubscriptionWhereInput[] | NodeEntrySubscriptionWhereInput
+  >;
+}
+
+export interface NodeEntryValueSubscriptionWhereInput {
+  mutation_in?: Maybe<MutationType[] | MutationType>;
+  updatedFields_contains?: Maybe<String>;
+  updatedFields_contains_every?: Maybe<String[] | String>;
+  updatedFields_contains_some?: Maybe<String[] | String>;
+  node?: Maybe<NodeEntryValueWhereInput>;
+  AND?: Maybe<
+    | NodeEntryValueSubscriptionWhereInput[]
+    | NodeEntryValueSubscriptionWhereInput
+  >;
+  OR?: Maybe<
+    | NodeEntryValueSubscriptionWhereInput[]
+    | NodeEntryValueSubscriptionWhereInput
+  >;
+  NOT?: Maybe<
+    | NodeEntryValueSubscriptionWhereInput[]
+    | NodeEntryValueSubscriptionWhereInput
   >;
 }
 
@@ -3610,6 +4007,205 @@ export interface AggregateLeafNodeSubscription
   count: () => Promise<AsyncIterator<Int>>;
 }
 
+export interface NodeEntry {
+  id: ID_Output;
+  sessionId: String;
+}
+
+export interface NodeEntryPromise extends Promise<NodeEntry>, Fragmentable {
+  id: () => Promise<ID_Output>;
+  sessionId: () => Promise<String>;
+  relatedNode: <T = QuestionNodePromise>() => T;
+  edgeChild: <T = EdgePromise>() => T;
+  values: <T = FragmentableArray<NodeEntryValue>>(args?: {
+    where?: NodeEntryValueWhereInput;
+    orderBy?: NodeEntryValueOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => T;
+}
+
+export interface NodeEntrySubscription
+  extends Promise<AsyncIterator<NodeEntry>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  sessionId: () => Promise<AsyncIterator<String>>;
+  relatedNode: <T = QuestionNodeSubscription>() => T;
+  edgeChild: <T = EdgeSubscription>() => T;
+  values: <T = Promise<AsyncIterator<NodeEntryValueSubscription>>>(args?: {
+    where?: NodeEntryValueWhereInput;
+    orderBy?: NodeEntryValueOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => T;
+}
+
+export interface NodeEntryNullablePromise
+  extends Promise<NodeEntry | null>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  sessionId: () => Promise<String>;
+  relatedNode: <T = QuestionNodePromise>() => T;
+  edgeChild: <T = EdgePromise>() => T;
+  values: <T = FragmentableArray<NodeEntryValue>>(args?: {
+    where?: NodeEntryValueWhereInput;
+    orderBy?: NodeEntryValueOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => T;
+}
+
+export interface NodeEntryValue {
+  id: ID_Output;
+  textValue?: String;
+  numberValue?: Int;
+}
+
+export interface NodeEntryValuePromise
+  extends Promise<NodeEntryValue>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  textValue: () => Promise<String>;
+  numberValue: () => Promise<Int>;
+}
+
+export interface NodeEntryValueSubscription
+  extends Promise<AsyncIterator<NodeEntryValue>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  textValue: () => Promise<AsyncIterator<String>>;
+  numberValue: () => Promise<AsyncIterator<Int>>;
+}
+
+export interface NodeEntryValueNullablePromise
+  extends Promise<NodeEntryValue | null>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  textValue: () => Promise<String>;
+  numberValue: () => Promise<Int>;
+}
+
+export interface NodeEntryConnection {
+  pageInfo: PageInfo;
+  edges: NodeEntryEdge[];
+}
+
+export interface NodeEntryConnectionPromise
+  extends Promise<NodeEntryConnection>,
+    Fragmentable {
+  pageInfo: <T = PageInfoPromise>() => T;
+  edges: <T = FragmentableArray<NodeEntryEdge>>() => T;
+  aggregate: <T = AggregateNodeEntryPromise>() => T;
+}
+
+export interface NodeEntryConnectionSubscription
+  extends Promise<AsyncIterator<NodeEntryConnection>>,
+    Fragmentable {
+  pageInfo: <T = PageInfoSubscription>() => T;
+  edges: <T = Promise<AsyncIterator<NodeEntryEdgeSubscription>>>() => T;
+  aggregate: <T = AggregateNodeEntrySubscription>() => T;
+}
+
+export interface NodeEntryEdge {
+  node: NodeEntry;
+  cursor: String;
+}
+
+export interface NodeEntryEdgePromise
+  extends Promise<NodeEntryEdge>,
+    Fragmentable {
+  node: <T = NodeEntryPromise>() => T;
+  cursor: () => Promise<String>;
+}
+
+export interface NodeEntryEdgeSubscription
+  extends Promise<AsyncIterator<NodeEntryEdge>>,
+    Fragmentable {
+  node: <T = NodeEntrySubscription>() => T;
+  cursor: () => Promise<AsyncIterator<String>>;
+}
+
+export interface AggregateNodeEntry {
+  count: Int;
+}
+
+export interface AggregateNodeEntryPromise
+  extends Promise<AggregateNodeEntry>,
+    Fragmentable {
+  count: () => Promise<Int>;
+}
+
+export interface AggregateNodeEntrySubscription
+  extends Promise<AsyncIterator<AggregateNodeEntry>>,
+    Fragmentable {
+  count: () => Promise<AsyncIterator<Int>>;
+}
+
+export interface NodeEntryValueConnection {
+  pageInfo: PageInfo;
+  edges: NodeEntryValueEdge[];
+}
+
+export interface NodeEntryValueConnectionPromise
+  extends Promise<NodeEntryValueConnection>,
+    Fragmentable {
+  pageInfo: <T = PageInfoPromise>() => T;
+  edges: <T = FragmentableArray<NodeEntryValueEdge>>() => T;
+  aggregate: <T = AggregateNodeEntryValuePromise>() => T;
+}
+
+export interface NodeEntryValueConnectionSubscription
+  extends Promise<AsyncIterator<NodeEntryValueConnection>>,
+    Fragmentable {
+  pageInfo: <T = PageInfoSubscription>() => T;
+  edges: <T = Promise<AsyncIterator<NodeEntryValueEdgeSubscription>>>() => T;
+  aggregate: <T = AggregateNodeEntryValueSubscription>() => T;
+}
+
+export interface NodeEntryValueEdge {
+  node: NodeEntryValue;
+  cursor: String;
+}
+
+export interface NodeEntryValueEdgePromise
+  extends Promise<NodeEntryValueEdge>,
+    Fragmentable {
+  node: <T = NodeEntryValuePromise>() => T;
+  cursor: () => Promise<String>;
+}
+
+export interface NodeEntryValueEdgeSubscription
+  extends Promise<AsyncIterator<NodeEntryValueEdge>>,
+    Fragmentable {
+  node: <T = NodeEntryValueSubscription>() => T;
+  cursor: () => Promise<AsyncIterator<String>>;
+}
+
+export interface AggregateNodeEntryValue {
+  count: Int;
+}
+
+export interface AggregateNodeEntryValuePromise
+  extends Promise<AggregateNodeEntryValue>,
+    Fragmentable {
+  count: () => Promise<Int>;
+}
+
+export interface AggregateNodeEntryValueSubscription
+  extends Promise<AsyncIterator<AggregateNodeEntryValue>>,
+    Fragmentable {
+  count: () => Promise<AsyncIterator<Int>>;
+}
+
 export interface QuestionConditionConnection {
   pageInfo: PageInfo;
   edges: QuestionConditionEdge[];
@@ -4168,6 +4764,97 @@ export interface LeafNodePreviousValuesSubscription
   title: () => Promise<AsyncIterator<String>>;
 }
 
+export interface NodeEntrySubscriptionPayload {
+  mutation: MutationType;
+  node: NodeEntry;
+  updatedFields: String[];
+  previousValues: NodeEntryPreviousValues;
+}
+
+export interface NodeEntrySubscriptionPayloadPromise
+  extends Promise<NodeEntrySubscriptionPayload>,
+    Fragmentable {
+  mutation: () => Promise<MutationType>;
+  node: <T = NodeEntryPromise>() => T;
+  updatedFields: () => Promise<String[]>;
+  previousValues: <T = NodeEntryPreviousValuesPromise>() => T;
+}
+
+export interface NodeEntrySubscriptionPayloadSubscription
+  extends Promise<AsyncIterator<NodeEntrySubscriptionPayload>>,
+    Fragmentable {
+  mutation: () => Promise<AsyncIterator<MutationType>>;
+  node: <T = NodeEntrySubscription>() => T;
+  updatedFields: () => Promise<AsyncIterator<String[]>>;
+  previousValues: <T = NodeEntryPreviousValuesSubscription>() => T;
+}
+
+export interface NodeEntryPreviousValues {
+  id: ID_Output;
+  sessionId: String;
+}
+
+export interface NodeEntryPreviousValuesPromise
+  extends Promise<NodeEntryPreviousValues>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  sessionId: () => Promise<String>;
+}
+
+export interface NodeEntryPreviousValuesSubscription
+  extends Promise<AsyncIterator<NodeEntryPreviousValues>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  sessionId: () => Promise<AsyncIterator<String>>;
+}
+
+export interface NodeEntryValueSubscriptionPayload {
+  mutation: MutationType;
+  node: NodeEntryValue;
+  updatedFields: String[];
+  previousValues: NodeEntryValuePreviousValues;
+}
+
+export interface NodeEntryValueSubscriptionPayloadPromise
+  extends Promise<NodeEntryValueSubscriptionPayload>,
+    Fragmentable {
+  mutation: () => Promise<MutationType>;
+  node: <T = NodeEntryValuePromise>() => T;
+  updatedFields: () => Promise<String[]>;
+  previousValues: <T = NodeEntryValuePreviousValuesPromise>() => T;
+}
+
+export interface NodeEntryValueSubscriptionPayloadSubscription
+  extends Promise<AsyncIterator<NodeEntryValueSubscriptionPayload>>,
+    Fragmentable {
+  mutation: () => Promise<AsyncIterator<MutationType>>;
+  node: <T = NodeEntryValueSubscription>() => T;
+  updatedFields: () => Promise<AsyncIterator<String[]>>;
+  previousValues: <T = NodeEntryValuePreviousValuesSubscription>() => T;
+}
+
+export interface NodeEntryValuePreviousValues {
+  id: ID_Output;
+  textValue?: String;
+  numberValue?: Int;
+}
+
+export interface NodeEntryValuePreviousValuesPromise
+  extends Promise<NodeEntryValuePreviousValues>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  textValue: () => Promise<String>;
+  numberValue: () => Promise<Int>;
+}
+
+export interface NodeEntryValuePreviousValuesSubscription
+  extends Promise<AsyncIterator<NodeEntryValuePreviousValues>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  textValue: () => Promise<AsyncIterator<String>>;
+  numberValue: () => Promise<AsyncIterator<Int>>;
+}
+
 export interface QuestionConditionSubscriptionPayload {
   mutation: MutationType;
   node: QuestionCondition;
@@ -4457,6 +5144,14 @@ export const models: Model[] = [
   },
   {
     name: "Edge",
+    embedded: false
+  },
+  {
+    name: "NodeEntry",
+    embedded: false
+  },
+  {
+    name: "NodeEntryValue",
     embedded: false
   }
 ];

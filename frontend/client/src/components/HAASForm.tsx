@@ -2,18 +2,42 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 import { FormContext, useForm } from 'react-hook-form';
 import { H1, Div, Loader } from '@haas/ui';
-import { useJSONTree } from '../hooks/use-json-tree';
+import { useHAASTree, HAASNode } from '../hooks/use-haas-tree';
 import { useTransition, animated } from 'react-spring';
 import { HAASSlider } from './HAASSlider';
+import { DevTool } from 'react-hook-form-devtools';
 import { HAASMultiChoice } from './HAASMultiChoice';
 import { HAASSocialShare } from './HAASSocialShare';
 import { HAASTextBox } from './HAASTextBox';
 import { HAASSignIn } from './HAASSignIn';
+import { useFieldArray } from 'react-hook-form';
 
 export const HAASForm = () => {
-  const { historyStack } = useJSONTree();
-  const activeNode = historyStack.slice(-1)[0];
-  const form = useForm();
+  const form = useForm({
+    mode: 'onChange',
+  });
+
+  return (
+    <FormContext {...form}>
+      <HAASTreeComponent />
+      <DevTool control={form.control} />
+    </FormContext>
+  );
+};
+
+const HAASTreeComponent = () => {
+  const { nodeHistoryStack, isAtLeaf } = useHAASTree();
+  const activeNode = nodeHistoryStack.slice(-1)[0];
+
+  if (isAtLeaf) return <LeafNodeView />
+  if (!activeNode) return <Loader />;
+
+  return <HAASNodeView />;
+};
+
+const HAASNodeView = () => {
+  const { nodeHistoryStack, isAtLeaf } = useHAASTree();
+  const activeNode = nodeHistoryStack.slice(-1)[0];
 
   const transitions = useTransition(activeNode, (activeNode) => activeNode?.id, {
     from: { opacity: 0, transform: 'scale(1.1)' },
@@ -21,13 +45,9 @@ export const HAASForm = () => {
     leave: { opacity: 0, transform: 'scale(0.9)' }
   });
 
-  if (!activeNode) return <Loader />;
-
   return (
-    <FormContext {...form}>
-      <Div useFlex flexDirection='column' justifyContent='space-between' height={['100vh', '80vh']}>
+    <Div useFlex flexDirection='column' justifyContent='space-between' height={['100vh', '80vh']}>
         <H1 textAlign="center" color="white">{activeNode?.title}</H1>
-        {/* <img src={customer.settings.logoUrl} alt="Logo" /> */}
         {transitions.map(({ item, key, props, state }) => {
           if (state !== 'leave') {
             return <Entry style={{
@@ -39,10 +59,23 @@ export const HAASForm = () => {
           }
           return null;
         })}
+  </Div>
+  )
+}
+
+const LeafNodeView = () => {
+  const { getActiveLeaf } = useHAASTree();
+  const leaf = getActiveLeaf();
+
+  return (
+    <Div useFlex flexDirection='column' justifyContent='space-between' height={['100vh', '80vh']}>
+      <H1 textAlign="center" color="white">{leaf?.title}</H1>
+      <Div position="relative">
+        {renderLeaf(leaf)}
       </Div>
-    </FormContext>
+    </Div>
   );
-};
+}
 
 const Entry = styled(animated.div)`
   ${({ theme }) => css`
@@ -61,16 +94,34 @@ const Entry = styled(animated.div)`
 `;
 
 const renderNextNode = (node: any) => {
-  let nodeType = node.questionType || node.questionType?.type || node.type?.type || '';
-  const Component: React.ReactNode | undefined = nodeMap.get(nodeType);
+  if (node) {
+    let nodeType = node.questionType || node.questionType?.type;
+    const Component: React.ReactNode | undefined = nodeMap.get(nodeType);
 
-  return Component || <HAASTextBox />
+    return Component || <HAASTextBox />
+  }
+
+  return null;
+};
+
+const renderLeaf = (leaf: HAASNode | null) => {
+  if (leaf?.type) {
+    const Component: React.ReactNode | undefined = leafMap.get(leaf?.type);
+
+    return Component;
+  }
+
+  return <HAASTextBox isLeaf />
 }
 
 const nodeMap = new Map([
   ['SLIDER', <HAASSlider />],
   ['MULTI_CHOICE', <HAASMultiChoice />],
-  ['SOCIAL_SHARE', <HAASSocialShare />],
   ['TEXTBOX', <HAASTextBox />],
-  ['REGISTRATION', <HAASSignIn />]
+]);
+
+const leafMap = new Map([
+  ['SOCIAL_SHARE', <HAASSocialShare isLeaf />],
+  ['REGISTRATION', <HAASSignIn isLeaf />],
+  ['TEXTBOX', <HAASTextBox isLeaf />],
 ]);

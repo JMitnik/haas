@@ -1,10 +1,29 @@
-# # import * from './generated/prisma.graphql'
+# import *, Query, Mutation from './generated/prisma.graphql'
 
-# type Query {
-#     questions: [Question!]
-#     topics: [Topic!]
-# }
+type Query {
+    newSessionId: String
+}
 
-# type Mutation {
-#     createTopic: Topic!
-# }
+input UploadEntriesInput {
+    entries: [EntryInput!]!
+    sessionId: String!
+}
+
+input EntriesInput {
+    entries: [EntryInput!]!
+}
+
+input EntryInput {
+    data: EntryInputData!
+}
+
+input EntryInputData {
+    nodeId: String!
+    edgeId: String
+    textValue: String
+    numberValue: Int
+}
+
+type Mutation {
+    uploadUserEntries(uploadEntriesInput: UploadEntriesInput): String
+}

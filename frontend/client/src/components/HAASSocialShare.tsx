@@ -16,7 +16,7 @@ const ShareItem = styled(Div)`
 `;
 
 
-export const HAASSocialShare = () => {
+export const HAASSocialShare = ({ isLeaf }: { isLeaf: boolean }) => {
   return (
     <>
       <Flex justifyContent="center" alignItems="center">

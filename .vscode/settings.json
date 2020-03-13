@@ -12,4 +12,10 @@
             "changeProcessCWD": true
         }
     ],
+    "workbench.colorCustomizations": {
+        "statusBar.background": "#2c03b8",
+        "statusBarItem.hoverBackground": "#3804ea",
+        "statusBar.foreground": "#e7e7e7"
+    },
+    "peacock.remoteColor": "#2c03b8",
 }

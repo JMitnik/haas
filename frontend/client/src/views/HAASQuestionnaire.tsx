@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import styled, { css, ThemeProvider } from 'styled-components';
-import { JSONTreeProvider } from '../hooks/use-json-tree';
+import { HAASTreeProvider } from '../hooks/use-haas-tree';
 import { HAASForm } from '../components/HAASForm';
 import { Div, Loader } from '@haas/ui';
 import { removeEmpty } from '../utils/removeEmpty';
@@ -23,11 +23,11 @@ const HAASQuestionnaire = () => {
     <>
       <ThemeProvider theme={((theme: any) => makeCustomTheme(theme, customTheme))}>
         <ThemedBackground>
-          <JSONTreeProvider>
+          <HAASTreeProvider>
             <CenteredScreen>
               <HAASForm />
             </CenteredScreen>
-          </JSONTreeProvider>
+          </HAASTreeProvider>
         </ThemedBackground>
       </ThemeProvider>
     </>

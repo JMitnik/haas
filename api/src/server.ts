@@ -4,7 +4,7 @@ import config from './config';
 import resolvers from './resolvers';
 
 const server: GraphQLServer = new GraphQLServer({
-  typeDefs: `${config.PATH_TO_PRISMA_GENERATED_SCHEMA}`,
+  typeDefs: config.PATH_TO_APP_SCHEMA,
   resolvers,
   context: (req) => ({
     ...req,
@@ -19,6 +19,7 @@ const server: GraphQLServer = new GraphQLServer({
 const serverOptions: Options = {
   port: config.APP_PORT,
   endpoint: config.ENDPOINT,
+  debug: config.ENABLE_DEBUG,
   cors: {
     credentials: true,
     origin: config.FRONTEND_URL,

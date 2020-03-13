@@ -26,6 +26,14 @@ type AggregateLeafNode {
   count: Int!
 }
 
+type AggregateNodeEntry {
+  count: Int!
+}
+
+type AggregateNodeEntryValue {
+  count: Int!
+}
+
 type AggregateQuestionCondition {
   count: Int!
 }
@@ -724,6 +732,11 @@ input EdgeCreateManyInput {
   connect: [EdgeWhereUniqueInput!]
 }
 
+input EdgeCreateOneInput {
+  create: EdgeCreateInput
+  connect: EdgeWhereUniqueInput
+}
+
 type EdgeEdge {
   node: Edge!
   cursor: String!
@@ -821,9 +834,23 @@ input EdgeUpdateManyInput {
   deleteMany: [EdgeScalarWhereInput!]
 }
 
+input EdgeUpdateOneInput {
+  create: EdgeCreateInput
+  update: EdgeUpdateDataInput
+  upsert: EdgeUpsertNestedInput
+  delete: Boolean
+  disconnect: Boolean
+  connect: EdgeWhereUniqueInput
+}
+
 input EdgeUpdateWithWhereUniqueNestedInput {
   where: EdgeWhereUniqueInput!
   data: EdgeUpdateDataInput!
+}
+
+input EdgeUpsertNestedInput {
+  update: EdgeUpdateDataInput!
+  create: EdgeCreateInput!
 }
 
 input EdgeUpsertWithWhereUniqueNestedInput {
@@ -1335,6 +1362,18 @@ type Mutation {
   upsertLeafNode(where: LeafNodeWhereUniqueInput!, create: LeafNodeCreateInput!, update: LeafNodeUpdateInput!): LeafNode!
   deleteLeafNode(where: LeafNodeWhereUniqueInput!): LeafNode
   deleteManyLeafNodes(where: LeafNodeWhereInput): BatchPayload!
+  createNodeEntry(data: NodeEntryCreateInput!): NodeEntry!
+  updateNodeEntry(data: NodeEntryUpdateInput!, where: NodeEntryWhereUniqueInput!): NodeEntry
+  updateManyNodeEntries(data: NodeEntryUpdateManyMutationInput!, where: NodeEntryWhereInput): BatchPayload!
+  upsertNodeEntry(where: NodeEntryWhereUniqueInput!, create: NodeEntryCreateInput!, update: NodeEntryUpdateInput!): NodeEntry!
+  deleteNodeEntry(where: NodeEntryWhereUniqueInput!): NodeEntry
+  deleteManyNodeEntries(where: NodeEntryWhereInput): BatchPayload!
+  createNodeEntryValue(data: NodeEntryValueCreateInput!): NodeEntryValue!
+  updateNodeEntryValue(data: NodeEntryValueUpdateInput!, where: NodeEntryValueWhereUniqueInput!): NodeEntryValue
+  updateManyNodeEntryValues(data: NodeEntryValueUpdateManyMutationInput!, where: NodeEntryValueWhereInput): BatchPayload!
+  upsertNodeEntryValue(where: NodeEntryValueWhereUniqueInput!, create: NodeEntryValueCreateInput!, update: NodeEntryValueUpdateInput!): NodeEntryValue!
+  deleteNodeEntryValue(where: NodeEntryValueWhereUniqueInput!): NodeEntryValue
+  deleteManyNodeEntryValues(where: NodeEntryValueWhereInput): BatchPayload!
   createQuestionCondition(data: QuestionConditionCreateInput!): QuestionCondition!
   updateQuestionCondition(data: QuestionConditionUpdateInput!, where: QuestionConditionWhereUniqueInput!): QuestionCondition
   updateManyQuestionConditions(data: QuestionConditionUpdateManyMutationInput!, where: QuestionConditionWhereInput): BatchPayload!
@@ -1371,6 +1410,314 @@ interface Node {
   id: ID!
 }
 
+type NodeEntry {
+  id: ID!
+  sessionId: String!
+  relatedNode: QuestionNode!
+  edgeChild: Edge
+  values(where: NodeEntryValueWhereInput, orderBy: NodeEntryValueOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [NodeEntryValue!]
+}
+
+type NodeEntryConnection {
+  pageInfo: PageInfo!
+  edges: [NodeEntryEdge]!
+  aggregate: AggregateNodeEntry!
+}
+
+input NodeEntryCreateInput {
+  id: ID
+  sessionId: String!
+  relatedNode: QuestionNodeCreateOneInput!
+  edgeChild: EdgeCreateOneInput
+  values: NodeEntryValueCreateManyInput
+}
+
+type NodeEntryEdge {
+  node: NodeEntry!
+  cursor: String!
+}
+
+enum NodeEntryOrderByInput {
+  id_ASC
+  id_DESC
+  sessionId_ASC
+  sessionId_DESC
+}
+
+type NodeEntryPreviousValues {
+  id: ID!
+  sessionId: String!
+}
+
+type NodeEntrySubscriptionPayload {
+  mutation: MutationType!
+  node: NodeEntry
+  updatedFields: [String!]
+  previousValues: NodeEntryPreviousValues
+}
+
+input NodeEntrySubscriptionWhereInput {
+  mutation_in: [MutationType!]
+  updatedFields_contains: String
+  updatedFields_contains_every: [String!]
+  updatedFields_contains_some: [String!]
+  node: NodeEntryWhereInput
+  AND: [NodeEntrySubscriptionWhereInput!]
+  OR: [NodeEntrySubscriptionWhereInput!]
+  NOT: [NodeEntrySubscriptionWhereInput!]
+}
+
+input NodeEntryUpdateInput {
+  sessionId: String
+  relatedNode: QuestionNodeUpdateOneRequiredInput
+  edgeChild: EdgeUpdateOneInput
+  values: NodeEntryValueUpdateManyInput
+}
+
+input NodeEntryUpdateManyMutationInput {
+  sessionId: String
+}
+
+type NodeEntryValue {
+  id: ID!
+  textValue: String
+  numberValue: Int
+}
+
+type NodeEntryValueConnection {
+  pageInfo: PageInfo!
+  edges: [NodeEntryValueEdge]!
+  aggregate: AggregateNodeEntryValue!
+}
+
+input NodeEntryValueCreateInput {
+  id: ID
+  textValue: String
+  numberValue: Int
+}
+
+input NodeEntryValueCreateManyInput {
+  create: [NodeEntryValueCreateInput!]
+  connect: [NodeEntryValueWhereUniqueInput!]
+}
+
+type NodeEntryValueEdge {
+  node: NodeEntryValue!
+  cursor: String!
+}
+
+enum NodeEntryValueOrderByInput {
+  id_ASC
+  id_DESC
+  textValue_ASC
+  textValue_DESC
+  numberValue_ASC
+  numberValue_DESC
+}
+
+type NodeEntryValuePreviousValues {
+  id: ID!
+  textValue: String
+  numberValue: Int
+}
+
+input NodeEntryValueScalarWhereInput {
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  textValue: String
+  textValue_not: String
+  textValue_in: [String!]
+  textValue_not_in: [String!]
+  textValue_lt: String
+  textValue_lte: String
+  textValue_gt: String
+  textValue_gte: String
+  textValue_contains: String
+  textValue_not_contains: String
+  textValue_starts_with: String
+  textValue_not_starts_with: String
+  textValue_ends_with: String
+  textValue_not_ends_with: String
+  numberValue: Int
+  numberValue_not: Int
+  numberValue_in: [Int!]
+  numberValue_not_in: [Int!]
+  numberValue_lt: Int
+  numberValue_lte: Int
+  numberValue_gt: Int
+  numberValue_gte: Int
+  AND: [NodeEntryValueScalarWhereInput!]
+  OR: [NodeEntryValueScalarWhereInput!]
+  NOT: [NodeEntryValueScalarWhereInput!]
+}
+
+type NodeEntryValueSubscriptionPayload {
+  mutation: MutationType!
+  node: NodeEntryValue
+  updatedFields: [String!]
+  previousValues: NodeEntryValuePreviousValues
+}
+
+input NodeEntryValueSubscriptionWhereInput {
+  mutation_in: [MutationType!]
+  updatedFields_contains: String
+  updatedFields_contains_every: [String!]
+  updatedFields_contains_some: [String!]
+  node: NodeEntryValueWhereInput
+  AND: [NodeEntryValueSubscriptionWhereInput!]
+  OR: [NodeEntryValueSubscriptionWhereInput!]
+  NOT: [NodeEntryValueSubscriptionWhereInput!]
+}
+
+input NodeEntryValueUpdateDataInput {
+  textValue: String
+  numberValue: Int
+}
+
+input NodeEntryValueUpdateInput {
+  textValue: String
+  numberValue: Int
+}
+
+input NodeEntryValueUpdateManyDataInput {
+  textValue: String
+  numberValue: Int
+}
+
+input NodeEntryValueUpdateManyInput {
+  create: [NodeEntryValueCreateInput!]
+  update: [NodeEntryValueUpdateWithWhereUniqueNestedInput!]
+  upsert: [NodeEntryValueUpsertWithWhereUniqueNestedInput!]
+  delete: [NodeEntryValueWhereUniqueInput!]
+  connect: [NodeEntryValueWhereUniqueInput!]
+  set: [NodeEntryValueWhereUniqueInput!]
+  disconnect: [NodeEntryValueWhereUniqueInput!]
+  deleteMany: [NodeEntryValueScalarWhereInput!]
+  updateMany: [NodeEntryValueUpdateManyWithWhereNestedInput!]
+}
+
+input NodeEntryValueUpdateManyMutationInput {
+  textValue: String
+  numberValue: Int
+}
+
+input NodeEntryValueUpdateManyWithWhereNestedInput {
+  where: NodeEntryValueScalarWhereInput!
+  data: NodeEntryValueUpdateManyDataInput!
+}
+
+input NodeEntryValueUpdateWithWhereUniqueNestedInput {
+  where: NodeEntryValueWhereUniqueInput!
+  data: NodeEntryValueUpdateDataInput!
+}
+
+input NodeEntryValueUpsertWithWhereUniqueNestedInput {
+  where: NodeEntryValueWhereUniqueInput!
+  update: NodeEntryValueUpdateDataInput!
+  create: NodeEntryValueCreateInput!
+}
+
+input NodeEntryValueWhereInput {
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  textValue: String
+  textValue_not: String
+  textValue_in: [String!]
+  textValue_not_in: [String!]
+  textValue_lt: String
+  textValue_lte: String
+  textValue_gt: String
+  textValue_gte: String
+  textValue_contains: String
+  textValue_not_contains: String
+  textValue_starts_with: String
+  textValue_not_starts_with: String
+  textValue_ends_with: String
+  textValue_not_ends_with: String
+  numberValue: Int
+  numberValue_not: Int
+  numberValue_in: [Int!]
+  numberValue_not_in: [Int!]
+  numberValue_lt: Int
+  numberValue_lte: Int
+  numberValue_gt: Int
+  numberValue_gte: Int
+  AND: [NodeEntryValueWhereInput!]
+  OR: [NodeEntryValueWhereInput!]
+  NOT: [NodeEntryValueWhereInput!]
+}
+
+input NodeEntryValueWhereUniqueInput {
+  id: ID
+}
+
+input NodeEntryWhereInput {
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  sessionId: String
+  sessionId_not: String
+  sessionId_in: [String!]
+  sessionId_not_in: [String!]
+  sessionId_lt: String
+  sessionId_lte: String
+  sessionId_gt: String
+  sessionId_gte: String
+  sessionId_contains: String
+  sessionId_not_contains: String
+  sessionId_starts_with: String
+  sessionId_not_starts_with: String
+  sessionId_ends_with: String
+  sessionId_not_ends_with: String
+  relatedNode: QuestionNodeWhereInput
+  edgeChild: EdgeWhereInput
+  values_every: NodeEntryValueWhereInput
+  values_some: NodeEntryValueWhereInput
+  values_none: NodeEntryValueWhereInput
+  AND: [NodeEntryWhereInput!]
+  OR: [NodeEntryWhereInput!]
+  NOT: [NodeEntryWhereInput!]
+}
+
+input NodeEntryWhereUniqueInput {
+  id: ID
+}
+
 enum NodeType {
   SLIDER
   MULTI_CHOICE
@@ -1405,6 +1752,12 @@ type Query {
   leafNode(where: LeafNodeWhereUniqueInput!): LeafNode
   leafNodes(where: LeafNodeWhereInput, orderBy: LeafNodeOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [LeafNode]!
   leafNodesConnection(where: LeafNodeWhereInput, orderBy: LeafNodeOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): LeafNodeConnection!
+  nodeEntry(where: NodeEntryWhereUniqueInput!): NodeEntry
+  nodeEntries(where: NodeEntryWhereInput, orderBy: NodeEntryOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [NodeEntry]!
+  nodeEntriesConnection(where: NodeEntryWhereInput, orderBy: NodeEntryOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): NodeEntryConnection!
+  nodeEntryValue(where: NodeEntryValueWhereUniqueInput!): NodeEntryValue
+  nodeEntryValues(where: NodeEntryValueWhereInput, orderBy: NodeEntryValueOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [NodeEntryValue]!
+  nodeEntryValuesConnection(where: NodeEntryValueWhereInput, orderBy: NodeEntryValueOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): NodeEntryValueConnection!
   questionCondition(where: QuestionConditionWhereUniqueInput!): QuestionCondition
   questionConditions(where: QuestionConditionWhereInput, orderBy: QuestionConditionOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [QuestionCondition]!
   questionConditionsConnection(where: QuestionConditionWhereInput, orderBy: QuestionConditionOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): QuestionConditionConnection!
@@ -2196,6 +2549,13 @@ input QuestionNodeUpdateOneInput {
   connect: QuestionNodeWhereUniqueInput
 }
 
+input QuestionNodeUpdateOneRequiredInput {
+  create: QuestionNodeCreateInput
+  update: QuestionNodeUpdateDataInput
+  upsert: QuestionNodeUpsertNestedInput
+  connect: QuestionNodeWhereUniqueInput
+}
+
 input QuestionNodeUpdateWithWhereUniqueNestedInput {
   where: QuestionNodeWhereUniqueInput!
   data: QuestionNodeUpdateDataInput!
@@ -2499,6 +2859,8 @@ type Subscription {
   edge(where: EdgeSubscriptionWhereInput): EdgeSubscriptionPayload
   fontSettings(where: FontSettingsSubscriptionWhereInput): FontSettingsSubscriptionPayload
   leafNode(where: LeafNodeSubscriptionWhereInput): LeafNodeSubscriptionPayload
+  nodeEntry(where: NodeEntrySubscriptionWhereInput): NodeEntrySubscriptionPayload
+  nodeEntryValue(where: NodeEntryValueSubscriptionWhereInput): NodeEntryValueSubscriptionPayload
   questionCondition(where: QuestionConditionSubscriptionWhereInput): QuestionConditionSubscriptionPayload
   questionNode(where: QuestionNodeSubscriptionWhereInput): QuestionNodeSubscriptionPayload
   questionOption(where: QuestionOptionSubscriptionWhereInput): QuestionOptionSubscriptionPayload

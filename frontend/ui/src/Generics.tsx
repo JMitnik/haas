@@ -1,8 +1,8 @@
 import styled, { css } from 'styled-components';
 import { FlexboxProps,
-  flexbox, width, WidthProps, color, ColorProps, space, SpaceProps, LayoutProps, layout, FlexProps, flex } from 'styled-system';
+  flexbox, width, WidthProps, color, ColorProps, space, SpaceProps, LayoutProps, layout, FlexProps, flex, PositionProps, position } from 'styled-system';
 
-export interface GenericProps extends FlexboxProps, FlexProps, WidthProps, ColorProps, SpaceProps, LayoutProps {
+export interface GenericProps extends FlexboxProps, FlexProps, WidthProps, ColorProps, SpaceProps, LayoutProps, PositionProps {
   useFlex?: boolean;
   fillChildren?: boolean;
 }
@@ -19,5 +19,6 @@ export const Div = styled.div<GenericProps>`
     ${color};
     ${space};
     ${layout};
+    ${position}
   `}
 `;

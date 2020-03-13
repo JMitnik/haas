@@ -27,7 +27,7 @@ const SignInContainer = styled.div`
 `;
 
 
-export const HAASSignIn = () => {
+export const HAASSignIn = ({ isLeaf }: { isLeaf: boolean }) => {
   return (
     <SignInContainer>
       <label htmlFor="email">

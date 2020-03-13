@@ -1,7 +1,11 @@
 import React from 'react';
+import { useMutation } from '@apollo/react-hooks';
+
 import { Textbox, Button } from '@haas/ui';
-import { useJSONTree } from '../hooks/use-json-tree';
+import { useHAASTree } from '../hooks/use-haas-tree';
 import styled, { css } from 'styled-components';
+import { useFormContext } from 'react-hook-form';
+import uploadEntryMutation from '../mutations/UploadEntryMutation';
 
 
 const TextboxContainer = styled.div`
@@ -16,13 +20,35 @@ const TextboxContainer = styled.div`
 `;
 
 
-export const HAASTextBox = () => {
-  const { goToChild } = useJSONTree();
+export const HAASTextBox = ({ isLeaf }: { isLeaf?: boolean | null }) => {
+  const { goToChild, nodeHistoryStack, edgeHistoryStack, formEntryStack } = useHAASTree();
+
+  const form = useFormContext();
+  const [submitForm, { error, loading }] = useMutation(uploadEntryMutation);
+
+  console.log('nodeHistoryStack', nodeHistoryStack);
+
+  const sessionId = sessionStorage.getItem('sessionId') || '';
+
+  const onSubmit = () => {
+    submitForm({
+      variables: {
+        uploadEntriesInput: {
+          entries: formEntryStack,
+          sessionId
+        }
+      }
+    })
+  };
 
   return (
     <>
       <TextboxContainer>
-        <Button brand="secondary" onClick={() => goToChild('mic_test')}>Submit</Button>
+        {isLeaf ? (
+          <Button brand="secondary" onClick={() => onSubmit()}>Submit</Button>
+        ) : (
+          <Button brand="secondary" onClick={() => goToChild('')}>Submit</Button>
+        )}
         <Textbox placeholder="Write your experience here" />
       </TextboxContainer>
     </>
