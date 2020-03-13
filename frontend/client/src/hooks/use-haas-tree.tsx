@@ -73,11 +73,11 @@ export interface HAASEntryData {
 const findNextEdge = (parent: HAASNode, key: string | number) => {
   const candidates = parent?.edgeChildren?.filter(edge => {
     if (parent.questionType === 'SLIDER') {
-      if (edge?.conditions?.[0].renderMin && key < edge?.conditions?.[0].renderMin) {
+      if (edge?.conditions?.[0]?.renderMin && edge?.conditions?.[0]?.renderMin * 100 && key < edge?.conditions?.[0].renderMin * 100) {
         return false;
       }
 
-      if (edge?.conditions?.[0].renderMax && key > edge?.conditions?.[0].renderMax) {
+      if (edge?.conditions?.[0]?.renderMax && edge?.conditions?.[0].renderMax * 100 && key > edge?.conditions?.[0].renderMax * 100) {
         return false;
       }
     }

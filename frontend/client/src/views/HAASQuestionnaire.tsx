@@ -2,9 +2,11 @@ import React, { useEffect, useState } from 'react';
 import styled, { css, ThemeProvider } from 'styled-components';
 import { HAASTreeProvider } from '../hooks/use-haas-tree';
 import { HAASForm } from '../components/HAASForm';
+import { Switch, Route } from 'react-router-dom';
 import { Div, Loader } from '@haas/ui';
 import { removeEmpty } from '../utils/removeEmpty';
 import { useQuestionnaire } from '../hooks/use-questionnaire';
+import FinalScreen from './FinalScreen';
 
 const HAASQuestionnaire = () => {
   const { customer } = useQuestionnaire();
@@ -25,7 +27,10 @@ const HAASQuestionnaire = () => {
         <ThemedBackground>
           <HAASTreeProvider>
             <CenteredScreen>
-              <HAASForm />
+              <Switch>
+                <Route path="/finished" render={() => <FinalScreen />} />
+                <Route path="/" render={() => <HAASForm />} />
+              </Switch>
             </CenteredScreen>
           </HAASTreeProvider>
         </ThemedBackground>

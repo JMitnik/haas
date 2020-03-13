@@ -2,6 +2,7 @@ import { forwardTo } from 'prisma-binding';
 import crypto from 'crypto';
 import { QueryResolvers, MutationResolvers } from './generated/resolver-types';
 import { prisma } from './generated/prisma-client';
+import cleanInt from './utils/cleanInt';
 
 const queryResolvers = {
   questionNode: forwardTo('db'),
@@ -41,7 +42,8 @@ const mutationResolvers = {
         },
         values: {
           create: {
-            numberValue: entry.data.numberValue,
+            // TODO: Make this better
+            numberValue: cleanInt(entry.data.numberValue),
             textValue: entry.data.textValue,
           },
         },

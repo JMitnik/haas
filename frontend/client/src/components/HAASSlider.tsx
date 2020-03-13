@@ -3,6 +3,15 @@ import { H1, Slider, ColumnFlex, Div } from '@haas/ui';
 import { useFormContext, useForm } from 'react-hook-form';
 import { useHAASTree, HAASEntry } from '../hooks/use-haas-tree';
 
+
+const cleanInt = (x: any) => {
+  x = Number(x);
+  return x >= 0 ? Math.floor(x) : Math.ceil(x);
+};
+
+export default cleanInt;
+
+
 export const HAASSlider = () => {
   const { watch, setValue, getValues, triggerValidation, register } = useForm<HAASEntry>({
     defaultValues: {
@@ -56,7 +65,7 @@ export const HAASSlider = () => {
     if (numberValue) {
       return {
         data: {
-          numberValue: numberValue / 10,
+          numberValue: cleanInt(numberValue) ,
           ...entryVals
         }
       };

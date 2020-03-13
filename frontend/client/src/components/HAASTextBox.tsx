@@ -2,6 +2,7 @@ import React from 'react';
 import { useMutation } from '@apollo/react-hooks';
 
 import { Textbox, Button } from '@haas/ui';
+import { useHistory } from 'react-router-dom';
 import { useHAASTree } from '../hooks/use-haas-tree';
 import styled, { css } from 'styled-components';
 import { useFormContext } from 'react-hook-form';
@@ -22,9 +23,14 @@ const TextboxContainer = styled.div`
 
 export const HAASTextBox = ({ isLeaf }: { isLeaf?: boolean | null }) => {
   const { goToChild, nodeHistoryStack, edgeHistoryStack, formEntryStack } = useHAASTree();
+  const history = useHistory();
 
   const form = useFormContext();
-  const [submitForm, { error, loading }] = useMutation(uploadEntryMutation);
+  const [submitForm, { error, loading }] = useMutation(uploadEntryMutation,{
+    onCompleted: () => {
+      history.push('finished');
+    }
+  });
 
   console.log('nodeHistoryStack', nodeHistoryStack);
 
