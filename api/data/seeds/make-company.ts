@@ -1,62 +1,61 @@
-import { prisma, NodeType } from '../../src/generated/prisma-client/index';
-import { leafNodes, sliderType, standardRootChildren, socialShareType, multiChoiceType, textboxType, registrationType, getStandardEdgeData, standardSubChildren } from './seedDataStructure';
+import { prisma, NodeType, QuestionNode, LeafNode, Questionnaire } from '../../src/generated/prisma-client/index';
+import { leafNodes, sliderType, standardRootChildren,
+  getStandardEdgeData, standardSubChildren } from './seedDataStructure';
 import { Customer } from '../../src/generated/resolver-types';
 
-const seedCompany = async (customer: Customer) => {
-  // Create leaf-nodes
-  const leafs = await Promise.all(leafNodes.map(async (leafNode) => {
+interface ILeafNodeDataEntry {
+  title: string;
+  type?: NodeType;
+}
+
+interface IChildrenNode {
+  value: string;
+  type: NodeType
+}
+
+interface standardSubChildrenEntry {
+  title: string;
+  overrideLeafContains?: string;
+  type: NodeType;
+  relatedOptionValue: string;
+  childrenNodes: Array<IChildrenNode>;
+}
+
+interface IStandardRootChildWithLeafs {
+  overrideLeaf: LeafNode | null;
+  children: any;
+  title: string;
+  questionType: NodeType;
+  overrideLeafContains?: string | undefined;
+  options: string[];
+}
+interface IStandardRootChildEntry{
+  title: string;
+  questionType: NodeType;
+  overrideLeaf?: LeafNode;
+  overrideLeafContains?: string;
+  options: Array<string>;
+  children: any;
+}
+
+export const createTemplateLeafNodes = async (leafNodesArray: Array<ILeafNodeDataEntry>) => {
+  const leafs = await Promise.all(leafNodesArray.map(async (leafNode) => {
     return prisma.createLeafNode({
       title: leafNode.title,
-      type: leafNode.type,
+      type: leafNode?.type,
     });
   }));
 
-  const rootQuestion = await prisma.createQuestionNode({
-    title: `How do you feel about ${customer.name}?`,
-    questionType: sliderType,
-    isRoot: true,
-  });
+  return leafs;
+};
 
-  // Create questionnaire
-  const questionnaire = await prisma.createQuestionnaire({
-    customer: {
-      connect: {
-        id: customer.id,
-      },
-    },
-    leafs: {
-      connect: leafs.map((leaf) => ({ id: leaf.id })),
-    },
-    title: 'Default questionnaire',
-    description: 'Default questions',
-    questions: {
-      connect: [{
-        id: rootQuestion.id,
-      },
-      ],
-    },
-  });
-
-  // Connect the questionnaire to the customer
-  prisma.updateCustomer({
-    where: {
-      id: customer.id,
-    },
-    data: {
-      questionnaires: {
-        connect: {
-          id: questionnaire.id,
-        },
-      },
-    },
-  });
-
-  const standardSubChildrenWithLeafs = await Promise.all(standardSubChildren.map(async (rootChild) => {
+export const createStandardSubChildrenWithLeaves = async (questionnaireId: string, standardSubChildrenArray: Array<standardSubChildrenEntry>) => {
+  const standardSubChildrenWithLeafs = await Promise.all(standardSubChildrenArray.map(async (rootChild) => {
     const subleafs = await prisma.leafNodes({
       where: {
         title_contains: rootChild.overrideLeafContains,
         AND: {
-          id_in: await Promise.all((await prisma.questionnaire({ id: questionnaire.id }).leafs()).map((leaf) => leaf.id)),
+          id_in: await Promise.all((await prisma.questionnaire({ id: questionnaireId }).leafs()).map((leaf) => leaf.id)),
         },
       },
     });
@@ -73,13 +72,19 @@ const seedCompany = async (customer: Customer) => {
     };
   }));
 
-  const standardRootChildrenWithLeafs = await Promise.all(standardRootChildren
+  return standardSubChildrenWithLeafs;
+};
+
+export const createStandardRootChildrenWithLeaves = async (questionnaireId: string,
+  standardRootChildrenArray: Array<IStandardRootChildEntry>, standardSubChildrenWithLeafs: any) => {
+
+  const standardRootChildrenWithLeafs = await Promise.all(standardRootChildrenArray
     .map(async (rootChild) => {
       const subleafs = await prisma.leafNodes({
         where: {
           title_contains: rootChild.overrideLeafContains,
           AND: {
-            id_in: await Promise.all((await prisma.questionnaire({ id: questionnaire.id })
+            id_in: await Promise.all((await prisma.questionnaire({ id: questionnaireId })
               .leafs()).map((leaf) => leaf.id)),
           },
         },
@@ -98,13 +103,26 @@ const seedCompany = async (customer: Customer) => {
       };
     }));
 
+  return standardRootChildrenWithLeafs;
+};
+
+export const createQuestionsForQuestionnaire = async (questionnaireId: string) => {
+
+  const standardSubChildrenWithLeafs = await createStandardSubChildrenWithLeaves(questionnaireId,
+    standardSubChildren);
+
+  const standardRootChildrenWithLeafs: Array<IStandardRootChildWithLeafs> = await
+  createStandardRootChildrenWithLeaves(
+    questionnaireId, standardRootChildren, standardSubChildrenWithLeafs,
+  );
+
   // Create root-questions
   const rootQuestions = await Promise.all(standardRootChildrenWithLeafs
     .map(async (childNode) => prisma.createQuestionNode({
       title: childNode.title,
       questionnaire: {
         connect: {
-          id: questionnaire.id,
+          id: questionnaireId,
         },
       },
       questionType: childNode.questionType,
@@ -117,40 +135,47 @@ const seedCompany = async (customer: Customer) => {
         create: childNode.options.map((option) => ({ value: option })),
       },
       children: {
-        create: childNode.children.map((child) => ({
+        create: childNode.children.map((child: any) => ({
           title: child.title,
           questionnaire: {
             connect: {
-              id: questionnaire.id,
+              id: questionnaireId,
             },
           },
-          questionType: child.type,
+          questionType: child?.type,
           overrideLeaf: {
             connect: {
-              id: child.overrideLeaf?.id,
+              id: child?.overrideLeaf?.id,
             },
           },
           options: {
-            create: child.childrenNodes.map((subChild) => ({ value: subChild.value })),
+            create: child.childrenNodes.map((subChild: any) => ({ value: subChild.value })),
           },
         })),
       },
     })));
 
+  return rootQuestions;
+};
+
+export const getRootQuestionOfQuestionnaire = async (questionnaireId: string) => {
   // Extract mainQuestion
   // TODO: How to get unique boolean isRoot, so that we can use prisma.questionNode
   const mainQuestions = await prisma.questionNodes({
     where: {
       isRoot: true,
       AND: {
-        id_in: await Promise.all((await prisma.questionnaire({ id: questionnaire.id })
+        id_in: await Promise.all((await prisma.questionnaire({ id: questionnaireId })
           .questions()).map((q) => q.id)),
       },
     },
   });
   const mainQuestion = mainQuestions[0];
+  return mainQuestion;
+};
 
-  // Connect the root question to the other questions
+export const connectQuestionsToQuestionnaire = async (questionnaireId: string,
+  mainQuestion: QuestionNode, rootQuestions: QuestionNode[]) => {
   await prisma.updateQuestionNode({
     where: {
       id: mainQuestion.id,
@@ -158,17 +183,26 @@ const seedCompany = async (customer: Customer) => {
     data: {
       questionnaire: {
         connect: {
-          id: questionnaire.id,
+          id: questionnaireId,
         },
       },
       children: {
-        connect: rootQuestions.map((rootNode) => ({ id: rootNode.id })),
+        connect: rootQuestions.map((rootNode: QuestionNode) => ({ id: rootNode.id })),
       },
     },
   });
+};
 
+export const seedQuestions = async (questionnaireId: string) => {
+  const rootQuestions = await createQuestionsForQuestionnaire(questionnaireId);
+  const mainQuestion = await getRootQuestionOfQuestionnaire(questionnaireId);
+
+  await connectQuestionsToQuestionnaire(questionnaireId, mainQuestion, rootQuestions);
+};
+
+export const createEdges = async (customerName: string, leafs: LeafNode[]) => {
   const leafIds = leafs.map((leaf) => leaf.id);
-  const edges = getStandardEdgeData(customer.name);
+  const edges = getStandardEdgeData(customerName);
 
   // Create edges here
   await Promise.all(edges.map(async (edge) => {
@@ -239,9 +273,11 @@ const seedCompany = async (customer: Customer) => {
       });
     }
   }));
+};
 
+export const connectEdgesToQuestionnaire = async (questionnaireId: string) => {
   await Promise.all((await prisma.questionNodes({ where:
-    { questionnaire: { id: questionnaire.id } } })).map(async (node) => {
+    { questionnaire: { id: questionnaireId } } })).map(async (node) => {
     const edgeChildrenNodes = await prisma.edges({
       where: {
         parentNode: {
@@ -257,7 +293,7 @@ const seedCompany = async (customer: Customer) => {
       data: {
         questionnaire: {
           connect: {
-            id: questionnaire.id,
+            id: questionnaireId,
           },
         },
         edgeChildren: {
@@ -265,9 +301,98 @@ const seedCompany = async (customer: Customer) => {
         },
       },
     });
-    // 1. Find all edges (parentId) corresponderend met huidige node id
-    // 2. Update edgeChildren van huidige node met gevonden edges
   }));
+};
+
+export const seedEdges = async (customerName: string,
+  questionnaireId: string, leafs: LeafNode[]) => {
+
+  await createEdges(customerName, leafs);
+  await connectEdgesToQuestionnaire(questionnaireId);
+};
+
+export const seedQuestionnare = async (customerId: string,
+  customerName: string): Promise<Questionnaire> => {
+  const leafs = await createTemplateLeafNodes(leafNodes);
+
+  const questionnaire = await prisma.createQuestionnaire({
+    customer: {
+      connect: {
+        id: customerId,
+      },
+    },
+    leafs: {
+      connect: leafs.map((leaf) => ({ id: leaf.id })),
+    },
+    title: 'Default questionnaire',
+    description: 'Default questions',
+    questions: {
+      create: [{
+        title: `How do you feel about ${customerName}?`,
+        questionType: sliderType,
+        isRoot: true,
+      },
+      ],
+    },
+  });
+
+  await seedQuestions(questionnaire.id);
+
+  await seedEdges(customerName, questionnaire.id, leafs);
+
+  return questionnaire;
+};
+
+const seedQuestionnareOfCustomer = async (customer: Customer): Promise<Questionnaire> => {
+  const leafs = await createTemplateLeafNodes(leafNodes);
+
+  const questionnaire = await prisma.createQuestionnaire({
+    customer: {
+      connect: {
+        id: customer.id,
+      },
+    },
+    leafs: {
+      connect: leafs.map((leaf) => ({ id: leaf.id })),
+    },
+    title: 'Default questionnaire',
+    description: 'Default questions',
+    questions: {
+      create: [{
+        title: `How do you feel about ${customer.name}?`,
+        questionType: sliderType,
+        isRoot: true,
+      },
+      ],
+    },
+  });
+
+  await seedQuestions(questionnaire.id);
+
+  await seedEdges(customer.name, questionnaire.id, leafs);
+
+  return questionnaire;
+};
+
+const seedCompany = async (customer: Customer) => {
+
+  const questionnaire = await seedQuestionnareOfCustomer(customer);
+
+  // Connect the questionnaire to the customer
+  const company = await prisma.updateCustomer({
+    where: {
+      id: customer.id,
+    },
+    data: {
+      questionnaires: {
+        connect: {
+          id: questionnaire.id,
+        },
+      },
+    },
+  });
+
+  return company;
 };
 
 export default seedCompany;
