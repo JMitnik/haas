@@ -200,7 +200,7 @@ export const seedQuestions = async (questionnaireId: string) => {
   await connectQuestionsToQuestionnaire(questionnaireId, mainQuestion, rootQuestions);
 };
 
-export const createEdges = async (customerName: string, leafs: LeafNode[]) => {
+export const createEdges = async (questionnaireId: string, customerName: string, leafs: LeafNode[]) => {
   const leafIds = leafs.map((leaf) => leaf.id);
   const edges = getStandardEdgeData(customerName);
 
@@ -208,15 +208,22 @@ export const createEdges = async (customerName: string, leafs: LeafNode[]) => {
   await Promise.all(edges.map(async (edge) => {
     const childNode = await prisma.questionNodes({
       where: {
-        title_contains: edge.childQuestionContains,
         OR: [
           {
+            title_contains: edge.childQuestionContains,
+            questionnaire: {
+              id: questionnaireId,
+            },
             overrideLeaf: {
               id_not: null,
               id_in: leafIds,
             },
           },
           {
+            title_contains: edge.childQuestionContains,
+            questionnaire: {
+              id: questionnaireId,
+            },
             id: null,
           },
         ],
@@ -233,6 +240,9 @@ export const createEdges = async (customerName: string, leafs: LeafNode[]) => {
         where: {
           OR: [
             {
+              questionnaire: {
+                id: questionnaireId,
+              },
               title_contains: edge.parentQuestionContains,
               overrideLeaf: {
                 id_not: null,
@@ -240,6 +250,9 @@ export const createEdges = async (customerName: string, leafs: LeafNode[]) => {
               },
             },
             {
+              questionnaire: {
+                id: questionnaireId,
+              },
               title_contains: edge.parentQuestionContains,
               overrideLeaf: null,
             },
@@ -247,6 +260,10 @@ export const createEdges = async (customerName: string, leafs: LeafNode[]) => {
         },
       },
     );
+
+    if (!parentNode[0]) {
+      console.log('Cant find node for:', edge);
+    }
 
     const parentNodeId = parentNode?.[0]?.id;
 
@@ -307,13 +324,21 @@ export const connectEdgesToQuestionnaire = async (questionnaireId: string) => {
 export const seedEdges = async (customerName: string,
   questionnaireId: string, leafs: LeafNode[]) => {
 
-  await createEdges(customerName, leafs);
+  await createEdges(questionnaireId, customerName, leafs);
   await connectEdgesToQuestionnaire(questionnaireId);
 };
 
-export const seedQuestionnare = async (customerId: string,
-  customerName: string): Promise<Questionnaire> => {
+export const seedQuestionnare = async (
+  customerId: string,
+  customerName: string,
+  questionnaireTitle: string = 'Default questionnaire',
+  questionnaireDescription: string = 'Default questions',
+): Promise<Questionnaire> => {
   const leafs = await createTemplateLeafNodes(leafNodes);
+
+  console.log('Questionnaire title: ', questionnaireTitle);
+  console.log('Questionnaire description: ', questionnaireDescription);
+  console.log('Customer name: ', customerName);
 
   const questionnaire = await prisma.createQuestionnaire({
     customer: {
@@ -324,8 +349,8 @@ export const seedQuestionnare = async (customerId: string,
     leafs: {
       connect: leafs.map((leaf) => ({ id: leaf.id })),
     },
-    title: 'Default questionnaire',
-    description: 'Default questions',
+    title: questionnaireTitle,
+    description: questionnaireDescription,
     questions: {
       create: [{
         title: `How do you feel about ${customerName}?`,

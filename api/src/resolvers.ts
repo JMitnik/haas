@@ -1,8 +1,8 @@
 import { forwardTo } from 'prisma-binding';
 
 import { QueryResolvers, MutationResolvers } from './generated/resolver-types';
-import { prisma, ID_Input } from './generated/prisma-client/index';
-import seedCompany from '../data/seeds/make-company';
+import { prisma, ID_Input, Questionnaire } from './generated/prisma-client/index';
+import seedCompany, { seedQuestionnare } from '../data/seeds/make-company';
 
 const queryResolvers: QueryResolvers = {
   questionNodes: forwardTo('db'),
@@ -52,9 +52,23 @@ const createNewCustomerMutation = async (parent : any, args: any) => {
   return customer;
 };
 
-const createNewQuestionnaire = async (parent : any, args: any) => {
+const createNewQuestionnaire = async (parent : any, args: any): Promise<Questionnaire> => {
   const { customerId, title, description, publicTitle, isSeed } = args;
-  const questionnaire = await prisma.createQuestionnaire({
+  let questionnaire = null;
+
+  if (isSeed) {
+    console.log('Seed for questionnaire has been selected. Seeding...');
+    const customer = await prisma.customer({ id: customerId });
+
+    if (customer?.name) {
+      console.log('CUSTOMER NAME IS: ', customer?.name);
+      return seedQuestionnare(customerId, customer?.name, title, description);
+    }
+
+    console.log('Cant find customer with specified ID while seeding');
+  }
+
+  questionnaire = await prisma.createQuestionnaire({
     customer: {
       connect: {
         id: customerId,
@@ -70,10 +84,6 @@ const createNewQuestionnaire = async (parent : any, args: any) => {
       create: [],
     },
   });
-
-  if (isSeed) {
-    console.log('Seed for questionnaire has been selected. Seeding...');
-  }
 
   return questionnaire;
 };

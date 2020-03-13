@@ -95,6 +95,10 @@ const TopicBuilderView = () => {
                   {errors.description && <Muted color="warning">Something went wrong!</Muted>}
                 </Flex>
               </Div>
+              <Div py={4}>
+                <StyledInput type="checkbox" id="isSeed" name="isSeed" ref={register({ required: false })} />
+                <label htmlFor="isSeed"> Generate template topic </label>
+              </Div>
             </Div>
           </Grid>
         </FormGroupContainer>
