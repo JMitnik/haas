@@ -23,24 +23,18 @@ const getQuestionnaireAggregatedData = async (parent: any, args: any) => {
 
   console.log('NODE ENTRIES: ', nodeEntries);
 
-  const filterNodePromises = nodeEntries.filter(async ({ id }) => {
-    // const nodeEntryValues = await prisma.nodeEntry({ id }).values({ where: { numberValue_not: null } });
-    console.log((await prisma.nodeEntry({ id }).values({ where: { numberValue_not: null } })).length > 0);
-    return (await prisma.nodeEntry({ id }).values({ where: { numberValue_not: null } })).length > 0;
-  });
-
-  console.log('filterNodePromises: ', filterNodePromises);
-
-  const aggregateNodes = await Promise.all(filterNodePromises);
-
-  console.log('Aggregated nodes: ', aggregateNodes);
-
-  const aggregatedData = await Promise.all(aggregateNodes.map(async ({ id }) => {
+  const aggregatedData = await Promise.all(nodeEntries.map(async ({ id }) => {
     const values = await prisma.nodeEntry({ id }).values();
     return values[0].numberValue;
   }));
 
   console.log('AGGREGATED DATA: ', aggregatedData);
+
+  const filterNodePromises = aggregatedData.filter((value) => {
+    return value !== null || value !== undefined;
+  });
+
+  console.log(filterNodePromises);
 
   return 'Succesful';
 };
