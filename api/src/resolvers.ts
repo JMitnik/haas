@@ -57,11 +57,9 @@ const createNewQuestionnaire = async (parent : any, args: any): Promise<Question
   let questionnaire = null;
 
   if (isSeed) {
-    console.log('Seed for questionnaire has been selected. Seeding...');
     const customer = await prisma.customer({ id: customerId });
 
     if (customer?.name) {
-      console.log('CUSTOMER NAME IS: ', customer?.name);
       return seedQuestionnare(customerId, customer?.name, title, description);
     }
 
