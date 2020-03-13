@@ -4,6 +4,47 @@ import { QueryResolvers, MutationResolvers } from './generated/resolver-types';
 import { prisma, ID_Input, Questionnaire } from './generated/prisma-client/index';
 import seedCompany, { seedQuestionnare } from '../data/seeds/make-company';
 
+const getQuestionnaireAggregatedData = async (parent: any, args: any) => {
+  const { topicId } = args;
+  console.log('TOPIC ID: ', topicId);
+  const questionNodes = await prisma.questionNodes({ where: {
+    questionnaire: {
+      id: topicId,
+    },
+  } });
+
+  const questionNodeIds = questionNodes.map((qNode) => qNode.id);
+
+  const nodeEntries = await prisma.nodeEntries({ where: {
+    relatedNode: {
+      id_in: questionNodeIds,
+    },
+  } });
+
+  console.log('NODE ENTRIES: ', nodeEntries);
+
+  const filterNodePromises = nodeEntries.filter(async ({ id }) => {
+    // const nodeEntryValues = await prisma.nodeEntry({ id }).values({ where: { numberValue_not: null } });
+    console.log((await prisma.nodeEntry({ id }).values({ where: { numberValue_not: null } })).length > 0);
+    return (await prisma.nodeEntry({ id }).values({ where: { numberValue_not: null } })).length > 0;
+  });
+
+  console.log('filterNodePromises: ', filterNodePromises);
+
+  const aggregateNodes = await Promise.all(filterNodePromises);
+
+  console.log('Aggregated nodes: ', aggregateNodes);
+
+  const aggregatedData = await Promise.all(aggregateNodes.map(async ({ id }) => {
+    const values = await prisma.nodeEntry({ id }).values();
+    return values[0].numberValue;
+  }));
+
+  console.log('AGGREGATED DATA: ', aggregatedData);
+
+  return 'Succesful';
+};
+
 const queryResolvers: QueryResolvers = {
   questionNodes: forwardTo('db'),
   questionNode: forwardTo('db'),
@@ -14,6 +55,9 @@ const queryResolvers: QueryResolvers = {
   customers: forwardTo('db'),
   leafNode: forwardTo('db'),
   edges: forwardTo('db'),
+  nodeEntries: forwardTo('db'),
+  nodeEntryValues: forwardTo('db'),
+  getQuestionnaireData: getQuestionnaireAggregatedData,
 };
 
 const deleteFullCustomerNode = async (parent: any, args:any) => {
