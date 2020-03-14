@@ -1,7 +1,6 @@
-import { NodeType, QuestionNode, Edge, NodeEntryValue } from '../../src/generated/prisma-client/index';
+import { NodeType } from '../../src/generated/prisma-client/index';
 
 export const multiChoiceType: NodeType = 'MULTI_CHOICE';
-
 export const socialShareType: NodeType = 'SOCIAL_SHARE';
 export const sliderType: NodeType = 'SLIDER';
 export const textboxType: NodeType = 'TEXTBOX';

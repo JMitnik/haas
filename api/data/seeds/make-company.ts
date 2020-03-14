@@ -3,12 +3,12 @@ import { leafNodes, sliderType, standardRootChildren,
   getStandardEdgeData, standardSubChildren } from './seedDataStructure';
 import { Customer } from '../../src/generated/resolver-types';
 
-interface ILeafNodeDataEntry {
+interface LeafNodeDataEntryProps {
   title: string;
   type?: NodeType;
 }
 
-interface IChildrenNode {
+interface LeafNodeChildrenProps {
   value: string;
   type: NodeType
 }
@@ -18,10 +18,10 @@ interface standardSubChildrenEntry {
   overrideLeafContains?: string;
   type: NodeType;
   relatedOptionValue: string;
-  childrenNodes: Array<IChildrenNode>;
+  childrenNodes: Array<LeafNodeChildrenProps>;
 }
 
-interface IStandardRootChildWithLeafs {
+interface StandardRootChildWithLeafsProps {
   overrideLeaf: LeafNode | null;
   children: any;
   title: string;
@@ -29,7 +29,7 @@ interface IStandardRootChildWithLeafs {
   overrideLeafContains?: string | undefined;
   options: string[];
 }
-interface IStandardRootChildEntry{
+interface StandardRootChildEntryProps {
   title: string;
   questionType: NodeType;
   overrideLeaf?: LeafNode;
@@ -38,46 +38,52 @@ interface IStandardRootChildEntry{
   children: any;
 }
 
-export const createTemplateLeafNodes = async (leafNodesArray: Array<ILeafNodeDataEntry>) => {
-  const leafs = await Promise.all(leafNodesArray.map(async (leafNode) => {
-    return prisma.createLeafNode({
-      title: leafNode.title,
-      type: leafNode?.type,
-    });
-  }));
+export const createTemplateLeafNodes = async (leafNodesArray: Array<LeafNodeDataEntryProps>) => {
+  const leafs = await Promise.all(leafNodesArray.map(async (leafNode) => prisma.createLeafNode({
+    title: leafNode.title,
+    type: leafNode?.type,
+  })));
 
   return leafs;
 };
 
-export const createStandardSubChildrenWithLeaves = async (questionnaireId: string, standardSubChildrenArray: Array<standardSubChildrenEntry>) => {
-  const standardSubChildrenWithLeafs = await Promise.all(standardSubChildrenArray.map(async (rootChild) => {
-    const subleafs = await prisma.leafNodes({
-      where: {
-        title_contains: rootChild.overrideLeafContains,
-        AND: {
-          id_in: await Promise.all((await prisma.questionnaire({ id: questionnaireId }).leafs()).map((leaf) => leaf.id)),
+export const createStandardSubChildrenWithLeaves = async (
+  questionnaireId: string,
+  standardSubChildrenArray: Array<standardSubChildrenEntry>,
+) => {
+  const standardSubChildrenWithLeafs = await Promise.all(
+    standardSubChildrenArray.map(async (rootChild) => {
+      const subleafs = await prisma.leafNodes({
+        where: {
+          title_contains: rootChild.overrideLeafContains,
+          AND: {
+            id_in: await Promise.all((await
+            prisma.questionnaire({ id: questionnaireId }).leafs()).map((leaf) => leaf.id)),
+          },
         },
-      },
-    });
+      });
 
-    let leaf = null;
+      let leaf = null;
 
-    if (subleafs) {
-      [leaf] = subleafs;
-    }
+      if (subleafs) {
+        [leaf] = subleafs;
+      }
 
-    return {
-      ...rootChild,
-      overrideLeaf: leaf,
-    };
-  }));
+      return {
+        ...rootChild,
+        overrideLeaf: leaf,
+      };
+    }),
+  );
 
   return standardSubChildrenWithLeafs;
 };
 
-export const createStandardRootChildrenWithLeaves = async (questionnaireId: string,
-  standardRootChildrenArray: Array<IStandardRootChildEntry>, standardSubChildrenWithLeafs: any) => {
-
+export const createStandardRootChildrenWithLeaves = async (
+  questionnaireId: string,
+  standardRootChildrenArray: Array<StandardRootChildEntryProps>,
+  standardSubChildrenWithLeafs: any,
+) => {
   const standardRootChildrenWithLeafs = await Promise.all(standardRootChildrenArray
     .map(async (rootChild) => {
       const subleafs = await prisma.leafNodes({
@@ -107,11 +113,10 @@ export const createStandardRootChildrenWithLeaves = async (questionnaireId: stri
 };
 
 export const createQuestionsForQuestionnaire = async (questionnaireId: string) => {
-
   const standardSubChildrenWithLeafs = await createStandardSubChildrenWithLeaves(questionnaireId,
     standardSubChildren);
 
-  const standardRootChildrenWithLeafs: Array<IStandardRootChildWithLeafs> = await
+  const standardRootChildrenWithLeafs: Array<StandardRootChildWithLeafsProps> = await
   createStandardRootChildrenWithLeaves(
     questionnaireId, standardRootChildren, standardSubChildrenWithLeafs,
   );
@@ -200,7 +205,11 @@ export const seedQuestions = async (questionnaireId: string) => {
   await connectQuestionsToQuestionnaire(questionnaireId, mainQuestion, rootQuestions);
 };
 
-export const createEdges = async (questionnaireId: string, customerName: string, leafs: LeafNode[]) => {
+export const createEdges = async (
+  questionnaireId: string,
+  customerName: string,
+  leafs: LeafNode[],
+) => {
   const leafIds = leafs.map((leaf) => leaf.id);
   const edges = getStandardEdgeData(customerName);
 
@@ -323,7 +332,6 @@ export const connectEdgesToQuestionnaire = async (questionnaireId: string) => {
 
 export const seedEdges = async (customerName: string,
   questionnaireId: string, leafs: LeafNode[]) => {
-
   await createEdges(questionnaireId, customerName, leafs);
   await connectEdgesToQuestionnaire(questionnaireId);
 };
@@ -400,7 +408,6 @@ const seedQuestionnareOfCustomer = async (customer: Customer): Promise<Questionn
 };
 
 const seedCompany = async (customer: Customer) => {
-
   const questionnaire = await seedQuestionnareOfCustomer(customer);
 
   // Connect the questionnaire to the customer
