@@ -13,6 +13,7 @@ const getQuestionnaireDataQuery = gql`
       timelineEntries {
         sessionId
         value
+        createdAt
       }
     }
   }

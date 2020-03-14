@@ -1413,6 +1413,7 @@ interface Node {
 
 type NodeEntry {
   id: ID!
+  creationDate: DateTime!
   sessionId: String!
   relatedNode: QuestionNode!
   edgeChild: Edge
@@ -1441,12 +1442,15 @@ type NodeEntryEdge {
 enum NodeEntryOrderByInput {
   id_ASC
   id_DESC
+  creationDate_ASC
+  creationDate_DESC
   sessionId_ASC
   sessionId_DESC
 }
 
 type NodeEntryPreviousValues {
   id: ID!
+  creationDate: DateTime!
   sessionId: String!
 }
 
@@ -1691,6 +1695,14 @@ input NodeEntryWhereInput {
   id_not_starts_with: ID
   id_ends_with: ID
   id_not_ends_with: ID
+  creationDate: DateTime
+  creationDate_not: DateTime
+  creationDate_in: [DateTime!]
+  creationDate_not_in: [DateTime!]
+  creationDate_lt: DateTime
+  creationDate_lte: DateTime
+  creationDate_gt: DateTime
+  creationDate_gte: DateTime
   sessionId: String
   sessionId_not: String
   sessionId_in: [String!]

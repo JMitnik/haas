@@ -1894,6 +1894,7 @@ export type Node = {
 export type NodeEntry = {
    __typename?: 'NodeEntry',
   id: Scalars['ID'],
+  creationDate: Scalars['DateTime'],
   sessionId: Scalars['String'],
   relatedNode: QuestionNode,
   edgeChild?: Maybe<Edge>,
@@ -1935,6 +1936,8 @@ export type NodeEntryEdge = {
 export enum NodeEntryOrderByInput {
   IdAsc = 'id_ASC',
   IdDesc = 'id_DESC',
+  CreationDateAsc = 'creationDate_ASC',
+  CreationDateDesc = 'creationDate_DESC',
   SessionIdAsc = 'sessionId_ASC',
   SessionIdDesc = 'sessionId_DESC'
 }
@@ -1942,6 +1945,7 @@ export enum NodeEntryOrderByInput {
 export type NodeEntryPreviousValues = {
    __typename?: 'NodeEntryPreviousValues',
   id: Scalars['ID'],
+  creationDate: Scalars['DateTime'],
   sessionId: Scalars['String'],
 };
 
@@ -2192,6 +2196,14 @@ export type NodeEntryWhereInput = {
   id_not_starts_with?: Maybe<Scalars['ID']>,
   id_ends_with?: Maybe<Scalars['ID']>,
   id_not_ends_with?: Maybe<Scalars['ID']>,
+  creationDate?: Maybe<Scalars['DateTime']>,
+  creationDate_not?: Maybe<Scalars['DateTime']>,
+  creationDate_in?: Maybe<Array<Scalars['DateTime']>>,
+  creationDate_not_in?: Maybe<Array<Scalars['DateTime']>>,
+  creationDate_lt?: Maybe<Scalars['DateTime']>,
+  creationDate_lte?: Maybe<Scalars['DateTime']>,
+  creationDate_gt?: Maybe<Scalars['DateTime']>,
+  creationDate_gte?: Maybe<Scalars['DateTime']>,
   sessionId?: Maybe<Scalars['String']>,
   sessionId_not?: Maybe<Scalars['String']>,
   sessionId_in?: Maybe<Array<Scalars['String']>>,
@@ -4912,6 +4924,7 @@ export type NodeResolvers<ContextType = any, ParentType extends ResolversParentT
 
 export type NodeEntryResolvers<ContextType = any, ParentType extends ResolversParentTypes['NodeEntry'] = ResolversParentTypes['NodeEntry']> = ResolversObject<{
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>,
+  creationDate?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>,
   sessionId?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
   relatedNode?: Resolver<ResolversTypes['QuestionNode'], ParentType, ContextType>,
   edgeChild?: Resolver<Maybe<ResolversTypes['Edge']>, ParentType, ContextType>,
@@ -4931,6 +4944,7 @@ export type NodeEntryEdgeResolvers<ContextType = any, ParentType extends Resolve
 
 export type NodeEntryPreviousValuesResolvers<ContextType = any, ParentType extends ResolversParentTypes['NodeEntryPreviousValues'] = ResolversParentTypes['NodeEntryPreviousValues']> = ResolversObject<{
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>,
+  creationDate?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>,
   sessionId?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
 }>;
 

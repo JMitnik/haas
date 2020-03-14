@@ -610,6 +610,8 @@ export type LeafNodeOrderByInput =
 export type NodeEntryOrderByInput =
   | "id_ASC"
   | "id_DESC"
+  | "creationDate_ASC"
+  | "creationDate_DESC"
   | "sessionId_ASC"
   | "sessionId_DESC";
 
@@ -2787,6 +2789,14 @@ export interface NodeEntryWhereInput {
   id_not_starts_with?: Maybe<ID_Input>;
   id_ends_with?: Maybe<ID_Input>;
   id_not_ends_with?: Maybe<ID_Input>;
+  creationDate?: Maybe<DateTimeInput>;
+  creationDate_not?: Maybe<DateTimeInput>;
+  creationDate_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  creationDate_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  creationDate_lt?: Maybe<DateTimeInput>;
+  creationDate_lte?: Maybe<DateTimeInput>;
+  creationDate_gt?: Maybe<DateTimeInput>;
+  creationDate_gte?: Maybe<DateTimeInput>;
   sessionId?: Maybe<String>;
   sessionId_not?: Maybe<String>;
   sessionId_in?: Maybe<String[] | String>;
@@ -3874,11 +3884,13 @@ export interface QuestionOptionSubscriptionPayloadSubscription
 
 export interface NodeEntry {
   id: ID_Output;
+  creationDate: DateTimeOutput;
   sessionId: String;
 }
 
 export interface NodeEntryPromise extends Promise<NodeEntry>, Fragmentable {
   id: () => Promise<ID_Output>;
+  creationDate: () => Promise<DateTimeOutput>;
   sessionId: () => Promise<String>;
   relatedNode: <T = QuestionNodePromise>() => T;
   edgeChild: <T = EdgePromise>() => T;
@@ -3897,6 +3909,7 @@ export interface NodeEntrySubscription
   extends Promise<AsyncIterator<NodeEntry>>,
     Fragmentable {
   id: () => Promise<AsyncIterator<ID_Output>>;
+  creationDate: () => Promise<AsyncIterator<DateTimeOutput>>;
   sessionId: () => Promise<AsyncIterator<String>>;
   relatedNode: <T = QuestionNodeSubscription>() => T;
   edgeChild: <T = EdgeSubscription>() => T;
@@ -3915,6 +3928,7 @@ export interface NodeEntryNullablePromise
   extends Promise<NodeEntry | null>,
     Fragmentable {
   id: () => Promise<ID_Output>;
+  creationDate: () => Promise<DateTimeOutput>;
   sessionId: () => Promise<String>;
   relatedNode: <T = QuestionNodePromise>() => T;
   edgeChild: <T = EdgePromise>() => T;
@@ -4540,6 +4554,7 @@ export interface LeafNodeConnectionSubscription
 
 export interface NodeEntryPreviousValues {
   id: ID_Output;
+  creationDate: DateTimeOutput;
   sessionId: String;
 }
 
@@ -4547,6 +4562,7 @@ export interface NodeEntryPreviousValuesPromise
   extends Promise<NodeEntryPreviousValues>,
     Fragmentable {
   id: () => Promise<ID_Output>;
+  creationDate: () => Promise<DateTimeOutput>;
   sessionId: () => Promise<String>;
 }
 
@@ -4554,6 +4570,7 @@ export interface NodeEntryPreviousValuesSubscription
   extends Promise<AsyncIterator<NodeEntryPreviousValues>>,
     Fragmentable {
   id: () => Promise<AsyncIterator<ID_Output>>;
+  creationDate: () => Promise<AsyncIterator<DateTimeOutput>>;
   sessionId: () => Promise<AsyncIterator<String>>;
 }
 

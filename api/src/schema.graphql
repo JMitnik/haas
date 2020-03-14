@@ -15,6 +15,7 @@ type QuestionnaireDetailResult {
 type UniqueDataResultEntry { 
     sessionId: String!
     value: Int!
+    createdAt: String!
 }
 
 type Query {

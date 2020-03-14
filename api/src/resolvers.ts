@@ -1,4 +1,5 @@
 import { forwardTo } from 'prisma-binding';
+import _ from 'lodash';
 
 import { QueryResolvers, MutationResolvers } from './generated/resolver-types';
 import { prisma, ID_Input, Questionnaire } from './generated/prisma-client/index';
@@ -32,7 +33,7 @@ const getQuestionnaireAggregatedData = async (parent: any, args: any) => {
     const aggregatedData = await Promise.all(nodeEntries.map(async ({ id }) => {
       const values = await prisma.nodeEntry({ id }).values();
       const nodeEntry = await prisma.nodeEntry({ id });
-      const mappedResult = { sessionId: nodeEntry?.sessionId, value: values[0].numberValue ? values[0].numberValue : -1 };
+      const mappedResult = { sessionId: nodeEntry?.sessionId, createdAt: nodeEntry?.creationDate, value: values[0].numberValue ? values[0].numberValue : -1 };
       return mappedResult;
     }));
 
@@ -52,8 +53,14 @@ const getQuestionnaireAggregatedData = async (parent: any, args: any) => {
     console.log(averageSliderResult);
 
     console.log('Unique NODES: ', filterNodes);
+    const orderedTimelineEntries = _.orderBy(filterNodes, (filterNode) => {
+      return filterNode.createdAt;
+    }, 'desc');
+
+    console.log('ORDERED: ', orderedTimelineEntries);
+
     const result = {
-      customerName, title, timelineEntries: filterNodes, description, creationDate, updatedAt, average: averageSliderResult, totalNodeEntries: filterNodes.length,
+      customerName, title, timelineEntries: orderedTimelineEntries, description, creationDate, updatedAt, average: averageSliderResult, totalNodeEntries: filterNodes.length,
     };
 
     return result;

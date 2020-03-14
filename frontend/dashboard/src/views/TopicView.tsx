@@ -12,6 +12,7 @@ import getQuestionnaireData from '../queries/getQuestionnaireData';
 interface timelineEntry {
   sessionId: string;
   value: number;
+  createdAt: string;
 }
 
 interface QuestionnaireDetailResult {
@@ -45,7 +46,7 @@ const TopicView = () => {
     <>
       <Flex height="100%" alignItems="center" justifyContent="space-between">
         <TopicDetails QuestionnaireDetailResult={resultData} />
-        <HistoryLog timelineEntries={resultData.timelineEntries} />
+        <HistoryLog timelineEntries={resultData?.timelineEntries} />
       </Flex>
     </>
   );
@@ -75,15 +76,53 @@ const HistoryLog = ({ timelineEntries } : { timelineEntries : Array<timelineEntr
   );
 };
 
-const TimelineEntry = ( { timelineEntry } : {timelineEntry: timelineEntry}) => {
+const monthMap = new Map([
+  [0, 'JAN'],
+  [1, 'FEB'],
+  [2, 'MAR'],
+  [3, 'APR'],
+  [4, 'MAY'],
+  [5, 'JUN'],
+  [6, 'JUL'],
+  [7, 'AUG'],
+  [8, 'SEP'],
+  [9, 'OCT'],
+  [10, 'NOV'],
+  [11, 'DEC'],
+]);
+
+const getUniversalDate = (date: Date) => {
+  const result = `${date.getDay().toString()}-${monthMap.get(date.getMonth())}-${date.getFullYear().toString()}`;
+  return result;
+};
+
+const TimelineEntry = ({ timelineEntry } : {timelineEntry: timelineEntry}) => {
+
+  const date = new Date(timelineEntry.createdAt);
+  const acceptedDate = getUniversalDate(date);
+
   return (
-    <>
+    <TimelineEntryView>
       <div>
+        <span style={{ color: 'white' }}>
         User {timelineEntry.sessionId} has voted {timelineEntry.value}
+        </span>
+        <div>
+          <Muted>
+            {acceptedDate}
+          </Muted>
+        </div>
       </div>
-    </>
-  )
-}
+    </TimelineEntryView>
+  );
+};
+
+const TimelineEntryView = styled.div`
+   ${({ theme }) => css`
+    margin: 5px;
+    background: ${theme.colors.primary};
+  `}
+`;
 
 const TopicDetails = ({ QuestionnaireDetailResult }: { QuestionnaireDetailResult: QuestionnaireDetailResult }) => {
   const { customerName, title, description, creationDate, updatedAt, average, totalNodeEntries } = QuestionnaireDetailResult;
