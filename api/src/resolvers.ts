@@ -5,8 +5,10 @@ import { QueryResolvers, MutationResolvers } from './generated/resolver-types';
 import { prisma, ID_Input, Questionnaire } from './generated/prisma-client/index';
 import seedCompany, { seedQuestionnare } from '../data/seeds/make-company';
 
+// TODO: Put these in a 'model' file, named Questionnaire (with a Questionnaire class). Create a new instance of Questionnaire, and call .getEntries
 const getQuestionnaireAggregatedData = async (parent: any, args: any) => {
   const { topicId } = args;
+
   const customerName = (await prisma.questionnaire({ id: topicId }).customer()).name;
   const questionnaire: Questionnaire | null = (await prisma.questionnaire({ id: topicId }));
 
@@ -25,36 +27,54 @@ const getQuestionnaireAggregatedData = async (parent: any, args: any) => {
       relatedNode: {
         id_in: questionNodeIds,
       },
-    } });
+    } }) || [];
 
-    const aggregatedData = await Promise.all(nodeEntries.map(async ({ id }) => {
+    const aggregatedNodeEntries = await Promise.all(nodeEntries.map(async ({ id }) => {
       const values = await prisma.nodeEntry({ id }).values();
       const nodeEntry = await prisma.nodeEntry({ id });
-      const mappedResult = { sessionId: nodeEntry?.sessionId, createdAt: nodeEntry?.creationDate, value: values[0].numberValue ? values[0].numberValue : -1 };
+
+      const mappedResult = {
+        sessionId: nodeEntry?.sessionId,
+        createdAt: nodeEntry?.creationDate,
+        value: values[0].numberValue ? values[0].numberValue : -1,
+      };
       return mappedResult;
-    }));
+    })) || [];
 
-    const filterNodes = aggregatedData.filter((node) => {
-      return node.value !== -1;
-    });
+    const filterNodes = aggregatedNodeEntries.filter((node) => {
+      return node?.value !== -1;
+    }) || [];
 
-    const filteredNodeData = await Promise.all(filterNodes.map((node) => {
-      return node.value;
-    }));
+    const filteredNodeData = (filterNodes.map((node) => {
+      return node?.value;
+    })) || [];
 
-    const totalData = filteredNodeData.reduce((total, previousValue) => total + previousValue);
-    const averageSliderResult = (filteredNodeData.length > 0 && totalData / filteredNodeData.length).toString() || 'N/A';
+    const nrEntries = filteredNodeData.reduce(
+      (total = 0, previousValue) => total + previousValue, 0,
+    );
+
+    const averageSliderResult = (
+      filteredNodeData.length > 0 && nrEntries / filteredNodeData.length).toString()
+      || 'N/A';
 
     const orderedTimelineEntries = _.orderBy(filterNodes, (filterNode) => {
       return filterNode.createdAt;
-    }, 'desc');
+    }, 'desc') || [];
 
-    const result = {
-      customerName, title, timelineEntries: orderedTimelineEntries, description, creationDate, updatedAt, average: averageSliderResult, totalNodeEntries: filterNodes.length,
+    return {
+      customerName,
+      title,
+      timelineEntries: orderedTimelineEntries,
+      description,
+      creationDate,
+      updatedAt,
+      average: averageSliderResult,
+      totalNodeEntries: filterNodes.length,
     };
-
-    return result;
   }
+
+  // TODO: What will we return here?
+  return {};
 };
 
 const queryResolvers: QueryResolvers = {
@@ -69,6 +89,7 @@ const queryResolvers: QueryResolvers = {
   edges: forwardTo('db'),
   nodeEntries: forwardTo('db'),
   nodeEntryValues: forwardTo('db'),
+  // TODO: Rename
   getQuestionnaireData: getQuestionnaireAggregatedData,
 };
 
