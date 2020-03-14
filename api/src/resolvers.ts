@@ -1,8 +1,61 @@
 import { forwardTo } from 'prisma-binding';
+import _ from 'lodash';
 
 import { QueryResolvers, MutationResolvers } from './generated/resolver-types';
 import { prisma, ID_Input, Questionnaire } from './generated/prisma-client/index';
 import seedCompany, { seedQuestionnare } from '../data/seeds/make-company';
+
+const getQuestionnaireAggregatedData = async (parent: any, args: any) => {
+  const { topicId } = args;
+  const customerName = (await prisma.questionnaire({ id: topicId }).customer()).name;
+  const questionnaire: Questionnaire | null = (await prisma.questionnaire({ id: topicId }));
+
+  if (questionnaire) {
+    const { title, description, creationDate, updatedAt } = questionnaire;
+
+    const questionNodes = await prisma.questionNodes({ where: {
+      questionnaire: {
+        id: topicId,
+      },
+    } });
+
+    const questionNodeIds = questionNodes.map((qNode) => qNode.id);
+
+    const nodeEntries = await prisma.nodeEntries({ where: {
+      relatedNode: {
+        id_in: questionNodeIds,
+      },
+    } });
+
+    const aggregatedData = await Promise.all(nodeEntries.map(async ({ id }) => {
+      const values = await prisma.nodeEntry({ id }).values();
+      const nodeEntry = await prisma.nodeEntry({ id });
+      const mappedResult = { sessionId: nodeEntry?.sessionId, createdAt: nodeEntry?.creationDate, value: values[0].numberValue ? values[0].numberValue : -1 };
+      return mappedResult;
+    }));
+
+    const filterNodes = aggregatedData.filter((node) => {
+      return node.value !== -1;
+    });
+
+    const filteredNodeData = await Promise.all(filterNodes.map((node) => {
+      return node.value;
+    }));
+
+    const totalData = filteredNodeData.reduce((total, previousValue) => total + previousValue);
+    const averageSliderResult = (filteredNodeData.length > 0 && totalData / filteredNodeData.length).toString() || 'N/A';
+
+    const orderedTimelineEntries = _.orderBy(filterNodes, (filterNode) => {
+      return filterNode.createdAt;
+    }, 'desc');
+
+    const result = {
+      customerName, title, timelineEntries: orderedTimelineEntries, description, creationDate, updatedAt, average: averageSliderResult, totalNodeEntries: filterNodes.length,
+    };
+
+    return result;
+  }
+};
 
 const queryResolvers: QueryResolvers = {
   questionNodes: forwardTo('db'),
@@ -14,6 +67,9 @@ const queryResolvers: QueryResolvers = {
   customers: forwardTo('db'),
   leafNode: forwardTo('db'),
   edges: forwardTo('db'),
+  nodeEntries: forwardTo('db'),
+  nodeEntryValues: forwardTo('db'),
+  getQuestionnaireData: getQuestionnaireAggregatedData,
 };
 
 const deleteFullCustomerNode = async (parent: any, args:any) => {

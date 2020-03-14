@@ -1,5 +1,27 @@
 # import Query.*, * from './generated/prisma.graphql'
 
+
+type QuestionnaireDetailResult {
+    customerName: String!
+    title: String!
+    description: String!
+    creationDate: String!
+    updatedAt: String!
+    average: String!
+    totalNodeEntries: Int!
+    timelineEntries: [UniqueDataResultEntry]
+}
+
+type UniqueDataResultEntry { 
+    sessionId: String!
+    value: Int!
+    createdAt: String!
+}
+
+type Query {
+    getQuestionnaireData(topicId: String): QuestionnaireDetailResult!
+}
+
 type Mutation {
     createNewCustomer(name: String, options: CustomerCreateOptions): Customer!
     deleteFullCustomer(id: ID!): Customer!

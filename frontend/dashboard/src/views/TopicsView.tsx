@@ -90,6 +90,9 @@ const AddTopicCard = styled(Card)`
 `;
 
 const TopicCard = ({ topic }: { topic: Questionnaire }) => {
+  const history = useHistory();
+  const { customerId } = useParams();
+
   const [deleteTopic, { loading }] = useMutation(deleteQuestionnaireMutation, {
     onCompleted: () => {
       console.log('Succesfully deleted customer !');
@@ -111,8 +114,13 @@ const TopicCard = ({ topic }: { topic: Questionnaire }) => {
     });
   };
 
+  // const setTopicId = (topicId: string) => {
+  //   const url = `/c/${customerId}/t/${topicId}`;
+  //   history.push(`/c/${customerId}/t/${topicId}`);
+  // };
+
   return (
-    <Card useFlex flexDirection="column">
+    <Card useFlex flexDirection="column" onClick={() => history.push(`/c/${customerId}/t/${topic.id}`)}>
       <button type="button" onClick={() => deleteClickedCustomer(topic.id)}>Delete</button>
       <CardBody flex="100%">
         <Flex alignItems="center" justifyContent="space-between">

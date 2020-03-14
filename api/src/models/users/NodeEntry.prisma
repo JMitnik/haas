@@ -1,0 +1,14 @@
+type NodeEntry {
+    id: ID! @id
+    creationDate: DateTime! @createdAt
+    sessionId: String!
+    relatedNode: QuestionNode!
+    edgeChild: Edge
+    values: [NodeEntryValue]
+}
+
+type NodeEntryValue {
+    id: ID! @id
+    textValue: String
+    numberValue: Int
+}
