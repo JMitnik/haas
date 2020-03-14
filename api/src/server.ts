@@ -21,7 +21,7 @@ const serverOptions: Options = {
   endpoint: config.ENDPOINT,
   cors: {
     credentials: true,
-    origin: config.FRONTEND_URL,
+    origin: [config.CLIENT_URL, config.DASHBOARD_URL],
   },
 };
 
