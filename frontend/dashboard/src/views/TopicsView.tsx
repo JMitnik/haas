@@ -114,11 +114,6 @@ const TopicCard = ({ topic }: { topic: Questionnaire }) => {
     });
   };
 
-  // const setTopicId = (topicId: string) => {
-  //   const url = `/c/${customerId}/t/${topicId}`;
-  //   history.push(`/c/${customerId}/t/${topicId}`);
-  // };
-
   return (
     <Card useFlex flexDirection="column" onClick={() => history.push(`/c/${customerId}/t/${topic.id}`)}>
       <button type="button" onClick={() => deleteClickedCustomer(topic.id)}>Delete</button>
