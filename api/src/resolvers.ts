@@ -7,36 +7,57 @@ import seedCompany, { seedQuestionnare } from '../data/seeds/make-company';
 const getQuestionnaireAggregatedData = async (parent: any, args: any) => {
   const { topicId } = args;
   console.log('TOPIC ID: ', topicId);
-  const questionNodes = await prisma.questionNodes({ where: {
-    questionnaire: {
-      id: topicId,
-    },
-  } });
+  const customerName = (await prisma.questionnaire({ id: topicId }).customer()).name;
+  console.log('CUSTOMER : ', customerName);
+  const questionnaire: Questionnaire | null = (await prisma.questionnaire({ id: topicId }));
+  if (questionnaire) {
+    const { title, description, creationDate, updatedAt } = questionnaire;
 
-  const questionNodeIds = questionNodes.map((qNode) => qNode.id);
+    const questionNodes = await prisma.questionNodes({ where: {
+      questionnaire: {
+        id: topicId,
+      },
+    } });
 
-  const nodeEntries = await prisma.nodeEntries({ where: {
-    relatedNode: {
-      id_in: questionNodeIds,
-    },
-  } });
+    const questionNodeIds = questionNodes.map((qNode) => qNode.id);
 
-  console.log('NODE ENTRIES: ', nodeEntries);
+    const nodeEntries = await prisma.nodeEntries({ where: {
+      relatedNode: {
+        id_in: questionNodeIds,
+      },
+    } });
 
-  const aggregatedData = await Promise.all(nodeEntries.map(async ({ id }) => {
-    const values = await prisma.nodeEntry({ id }).values();
-    return values[0].numberValue;
-  }));
+    console.log('NODE ENTRIES: ', nodeEntries);
 
-  console.log('AGGREGATED DATA: ', aggregatedData);
+    const aggregatedData = await Promise.all(nodeEntries.map(async ({ id }) => {
+      const values = await prisma.nodeEntry({ id }).values();
+      const nodeEntry = await prisma.nodeEntry({ id });
+      const mappedResult = { sessionId: nodeEntry?.sessionId, value: values[0].numberValue ? values[0].numberValue : -1 };
+      return mappedResult;
+    }));
 
-  const filterNodePromises = aggregatedData.filter((value) => {
-    return value !== null || value !== undefined;
-  });
+    console.log('AGGREGATED DATA: ', aggregatedData);
 
-  console.log(filterNodePromises);
+    const filterNodes = aggregatedData.filter((node) => {
+      return node.value !== -1;
+    });
 
-  return 'Succesful';
+    const filteredNodeData = await Promise.all(filterNodes.map((node) => {
+      return node.value;
+    }));
+
+    const totalData = filteredNodeData.reduce((total, previousValue) => total + previousValue);
+    const averageSliderResult = (filteredNodeData.length > 0 && totalData / filteredNodeData.length).toString() || 'N/A';
+
+    console.log(averageSliderResult);
+
+    console.log('Unique NODES: ', filterNodes);
+    const result = {
+      customerName, title, timelineEntries: filterNodes, description, creationDate, updatedAt, average: averageSliderResult, totalNodeEntries: filterNodes.length,
+    };
+
+    return result;
+  }
 };
 
 const queryResolvers: QueryResolvers = {
