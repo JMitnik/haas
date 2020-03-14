@@ -1,6 +1,5 @@
 # import Query.*, * from './generated/prisma.graphql'
 
-
 type QuestionnaireDetailResult {
     customerName: String!
     title: String!
@@ -12,7 +11,7 @@ type QuestionnaireDetailResult {
     timelineEntries: [UniqueDataResultEntry]
 }
 
-type UniqueDataResultEntry { 
+type UniqueDataResultEntry {
     sessionId: String!
     value: Int!
     createdAt: String!

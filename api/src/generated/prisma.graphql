@@ -1413,11 +1413,11 @@ interface Node {
 
 type NodeEntry {
   id: ID!
-  creationDate: DateTime!
   sessionId: String!
   relatedNode: QuestionNode!
   edgeChild: Edge
   values(where: NodeEntryValueWhereInput, orderBy: NodeEntryValueOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [NodeEntryValue!]
+  creationDate: DateTime!
 }
 
 type NodeEntryConnection {
@@ -1442,16 +1442,16 @@ type NodeEntryEdge {
 enum NodeEntryOrderByInput {
   id_ASC
   id_DESC
-  creationDate_ASC
-  creationDate_DESC
   sessionId_ASC
   sessionId_DESC
+  creationDate_ASC
+  creationDate_DESC
 }
 
 type NodeEntryPreviousValues {
   id: ID!
-  creationDate: DateTime!
   sessionId: String!
+  creationDate: DateTime!
 }
 
 type NodeEntrySubscriptionPayload {
@@ -1695,14 +1695,6 @@ input NodeEntryWhereInput {
   id_not_starts_with: ID
   id_ends_with: ID
   id_not_ends_with: ID
-  creationDate: DateTime
-  creationDate_not: DateTime
-  creationDate_in: [DateTime!]
-  creationDate_not_in: [DateTime!]
-  creationDate_lt: DateTime
-  creationDate_lte: DateTime
-  creationDate_gt: DateTime
-  creationDate_gte: DateTime
   sessionId: String
   sessionId_not: String
   sessionId_in: [String!]
@@ -1722,6 +1714,14 @@ input NodeEntryWhereInput {
   values_every: NodeEntryValueWhereInput
   values_some: NodeEntryValueWhereInput
   values_none: NodeEntryValueWhereInput
+  creationDate: DateTime
+  creationDate_not: DateTime
+  creationDate_in: [DateTime!]
+  creationDate_not_in: [DateTime!]
+  creationDate_lt: DateTime
+  creationDate_lte: DateTime
+  creationDate_gt: DateTime
+  creationDate_gte: DateTime
   AND: [NodeEntryWhereInput!]
   OR: [NodeEntryWhereInput!]
   NOT: [NodeEntryWhereInput!]

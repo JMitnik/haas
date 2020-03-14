@@ -1,4 +1,5 @@
-import { prisma, NodeType, QuestionNode, LeafNode, Questionnaire } from '../../src/generated/prisma-client/index';
+import { prisma, NodeType,
+  QuestionNode, LeafNode, Questionnaire } from '../../src/generated/prisma-client/index';
 import { leafNodes, sliderType, standardRootChildren,
   getStandardEdgeData, standardSubChildren } from './seedDataStructure';
 import { Customer } from '../../src/generated/resolver-types';

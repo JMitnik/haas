@@ -4,13 +4,13 @@
     "scripts": {
         "start": "nodemon --exec 'ts-node' src/app.ts",
         "build": "yarn",
-        "clean": "prisma reset",
         "clean:prod": "prisma reset -e .env.prod",
         "generate": "prisma deploy && prisma generate -e .env && graphql-codegen",
         "migrate": "prisma deploy -f -e .env && prisma generate && graphql-codegen",
         "migrate:prod": "prisma deploy -f -e .env.prod",
         "seed": "yarn migrate && prisma seed",
         "seed:prod": "yarn migrate && prisma seed -e .env.prod",
+        "reset": "prisma reset",
         "token": "prisma token -e .env",
         "token:prod": "prisma token -e .env.prod"
     },
