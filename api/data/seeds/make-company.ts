@@ -399,14 +399,6 @@ const seedQuestionnareOfCustomer = async (customer: Customer): Promise<Questionn
   return questionnaire;
 };
 
-// const seedNodeEntries = async (questionnaireId: string) => {
-//   const rootQuestions = await prisma.questionNodes({ where: {
-//     isRoot: true,
-//     questionnaire: { id: questionnaireId },
-//   } });
-//   const rootQuestionId = rootQuestions[0].id;
-// };
-
 const seedCompany = async (customer: Customer) => {
 
   const questionnaire = await seedQuestionnareOfCustomer(customer);

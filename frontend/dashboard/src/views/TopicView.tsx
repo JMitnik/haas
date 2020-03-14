@@ -1,11 +1,9 @@
 /* eslint-disable react/jsx-one-expression-per-line */
 import React from 'react';
-import { useQuery, useApolloClient, useMutation } from '@apollo/react-hooks';
-import { H2, H3, H4, Grid, Flex, Icon, Label, Div, Card, CardBody, CardFooter, Muted } from '@haas/ui';
+import { useQuery } from '@apollo/react-hooks';
+import { H2, Flex, Muted } from '@haas/ui';
 import styled, { css } from 'styled-components';
-import { Link, useHistory, useParams } from 'react-router-dom';
-
-import { Query, Questionnaire, Customer, } from '../types';
+import { useParams } from 'react-router-dom';
 
 import getQuestionnaireData from '../queries/getQuestionnaireData';
 
@@ -27,9 +25,7 @@ interface QuestionnaireDetailResult {
 }
 
 const TopicView = () => {
-  // Query to get following information: Aggregated value of slider values , All sessions
   const { topicId } = useParams();
-  console.log('topic ID: ', topicId);
 
   const { loading, error, data } = useQuery(getQuestionnaireData, {
     variables: { topicId },
@@ -40,8 +36,7 @@ const TopicView = () => {
   }
 
   const resultData = data?.getQuestionnaireData;
-  console.log('QUESTIONNAIRE DATA: ', data);
-  // const { customerName, title, description, creationDate, updatedAt, average, totalNodeEntries } = data?.getQuestionnaireData;
+
   return (
     <>
       <Flex height="100%" alignItems="center" justifyContent="space-between">
@@ -52,11 +47,7 @@ const TopicView = () => {
   );
 };
 
-const Hr = styled.hr`
-  ${({ theme }) => css`
-    border-top: 1px solid ${theme.colors.default.light};
-  `}
-`;
+
 
 const HistoryLog = ({ timelineEntries } : { timelineEntries : Array<timelineEntry> }) => {
   return (
@@ -75,21 +66,6 @@ const HistoryLog = ({ timelineEntries } : { timelineEntries : Array<timelineEntr
     </HistoryLogView>
   );
 };
-
-const monthMap = new Map([
-  [0, 'JAN'],
-  [1, 'FEB'],
-  [2, 'MAR'],
-  [3, 'APR'],
-  [4, 'MAY'],
-  [5, 'JUN'],
-  [6, 'JUL'],
-  [7, 'AUG'],
-  [8, 'SEP'],
-  [9, 'OCT'],
-  [10, 'NOV'],
-  [11, 'DEC'],
-]);
 
 const getUniversalDate = (date: Date) => {
   const result = `${date.getDay().toString()}-${monthMap.get(date.getMonth())}-${date.getFullYear().toString()}`;
@@ -159,5 +135,26 @@ const HistoryLogView = styled.div`
   height: 100%;
   width: 30%;
 `;
+
+const Hr = styled.hr`
+  ${({ theme }) => css`
+    border-top: 1px solid ${theme.colors.default.light};
+  `}
+`;
+
+const monthMap = new Map([
+  [0, 'JAN'],
+  [1, 'FEB'],
+  [2, 'MAR'],
+  [3, 'APR'],
+  [4, 'MAY'],
+  [5, 'JUN'],
+  [6, 'JUL'],
+  [7, 'AUG'],
+  [8, 'SEP'],
+  [9, 'OCT'],
+  [10, 'NOV'],
+  [11, 'DEC'],
+]);
 
 export default TopicView;

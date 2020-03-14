@@ -7,10 +7,9 @@ import seedCompany, { seedQuestionnare } from '../data/seeds/make-company';
 
 const getQuestionnaireAggregatedData = async (parent: any, args: any) => {
   const { topicId } = args;
-  console.log('TOPIC ID: ', topicId);
   const customerName = (await prisma.questionnaire({ id: topicId }).customer()).name;
-  console.log('CUSTOMER : ', customerName);
   const questionnaire: Questionnaire | null = (await prisma.questionnaire({ id: topicId }));
+
   if (questionnaire) {
     const { title, description, creationDate, updatedAt } = questionnaire;
 
@@ -28,16 +27,12 @@ const getQuestionnaireAggregatedData = async (parent: any, args: any) => {
       },
     } });
 
-    console.log('NODE ENTRIES: ', nodeEntries);
-
     const aggregatedData = await Promise.all(nodeEntries.map(async ({ id }) => {
       const values = await prisma.nodeEntry({ id }).values();
       const nodeEntry = await prisma.nodeEntry({ id });
       const mappedResult = { sessionId: nodeEntry?.sessionId, createdAt: nodeEntry?.creationDate, value: values[0].numberValue ? values[0].numberValue : -1 };
       return mappedResult;
     }));
-
-    console.log('AGGREGATED DATA: ', aggregatedData);
 
     const filterNodes = aggregatedData.filter((node) => {
       return node.value !== -1;
@@ -50,14 +45,9 @@ const getQuestionnaireAggregatedData = async (parent: any, args: any) => {
     const totalData = filteredNodeData.reduce((total, previousValue) => total + previousValue);
     const averageSliderResult = (filteredNodeData.length > 0 && totalData / filteredNodeData.length).toString() || 'N/A';
 
-    console.log(averageSliderResult);
-
-    console.log('Unique NODES: ', filterNodes);
     const orderedTimelineEntries = _.orderBy(filterNodes, (filterNode) => {
       return filterNode.createdAt;
     }, 'desc');
-
-    console.log('ORDERED: ', orderedTimelineEntries);
 
     const result = {
       customerName, title, timelineEntries: orderedTimelineEntries, description, creationDate, updatedAt, average: averageSliderResult, totalNodeEntries: filterNodes.length,
