@@ -14,13 +14,13 @@ type QuestionOption {
 
 type QuestionNode {
     id: ID! @id
+    questionnaire: Questionnaire @relation(name: "QuestionnaireToQuestions")
     title: String!
     branchVal: String
     isRoot: Boolean! @default(value: false)
     questionType: NodeType!
     overrideLeaf: LeafNode
-    conditions: [QuestionCondition]
-    options: [QuestionOption]
+    options: [QuestionOption] @relation (link: TABLE name: "QuestionNodeOptions", onDelete: CASCADE)
     children: [QuestionNode]
-    edgeChildren: [Edge] @relation (link: TABLE, name: "EdgeChildrenRelation")
+    edgeChildren: [Edge] @relation (link: TABLE, name: "EdgeChildrenRelation", onDelete: CASCADE)
 }

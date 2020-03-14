@@ -18,7 +18,9 @@ export const getQuestionnaireQuery = gql`
       customer {
           ...CustomerFragment
       }
-      questions {
+      questions(where: {
+      isRoot: true,
+    }) {
         ...QuestionFragment
       }
     }

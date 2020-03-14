@@ -1,5 +1,5 @@
+/* eslint-disable import/prefer-default-export */
 import gql from 'graphql-tag';
-import { QuestionFragment } from './QuestionFragment';
 
 export const CustomerFragment = gql`
   fragment CustomerFragment on Customer {

@@ -4,9 +4,11 @@ import { gql, ApolloError } from 'apollo-boost';
 import styled, { css } from 'styled-components';
 import { useForm } from 'react-hook-form';
 import { useMutation } from '@apollo/react-hooks';
-import { useHistory } from 'react-router';
+import { useHistory, useParams } from 'react-router';
 import { Container, Flex, Grid, H2, H3, Muted, Button, Div } from '@haas/ui';
-import { GetTopicsQuery } from './DashboardView';
+// import { getCustomerQuery } from '../queries/getCustomerQuery';
+import { getQuestionnairesCustomerQuery } from '../queries/getQuestionnairesCustomerQuery'
+import { createNewQuestionnaire } from '../mutations/createNewQuestionnaire';
 
 export const AddTopicMutation = gql`
   mutation AddTopic($data: TopicCreateInput!) {
@@ -20,18 +22,23 @@ interface FormDataProps {
   title: String;
   description: String;
   publicTitle?: String;
+  isSeed?: Boolean;
 }
 
 const TopicBuilderView = () => {
   const history = useHistory();
   const { register, handleSubmit, errors } = useForm<FormDataProps>();
+  const { customerId } = useParams();
 
-  const [addTopic, { loading }] = useMutation(AddTopicMutation, {
+  const [addTopic, { loading }] = useMutation(createNewQuestionnaire, {
     onCompleted: () => {
       console.log('Added a topic!');
-      history.push('/');
+      history.push(`/c/${customerId}/`);
     },
-    refetchQueries: [{ query: GetTopicsQuery }],
+    refetchQueries: [{ query: getQuestionnairesCustomerQuery,
+      variables: {
+        id: customerId,
+      } }],
     onError: (serverError: ApolloError) => {
       console.log(serverError);
     },
@@ -41,9 +48,11 @@ const TopicBuilderView = () => {
     // TODO: Make better typescript supported
     addTopic({
       variables: {
-        data: {
-          ...formData,
-        },
+        customerId,
+        title: formData.title,
+        publicTitle: formData.publicTitle,
+        description: formData.description,
+        isSeed: formData.isSeed,
       },
     });
   };
@@ -86,6 +95,10 @@ const TopicBuilderView = () => {
                   {errors.description && <Muted color="warning">Something went wrong!</Muted>}
                 </Flex>
               </Div>
+              <Div py={4}>
+                <StyledInput type="checkbox" id="isSeed" name="isSeed" ref={register({ required: false })} />
+                <label htmlFor="isSeed"> Generate template topic </label>
+              </Div>
             </Div>
           </Grid>
         </FormGroupContainer>
@@ -95,7 +108,7 @@ const TopicBuilderView = () => {
 
           <Flex>
             <Button brand="primary" mr={2} type="submit">Create topic</Button>
-            <Button brand="default" type="button" onClick={() => history.push('/')}>Cancel</Button>
+            <Button brand="default" type="button" onClick={() => history.push(`/c/${customerId}/`)}>Cancel</Button>
           </Flex>
         </Div>
       </Form>
