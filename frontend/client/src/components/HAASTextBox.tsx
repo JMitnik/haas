@@ -22,17 +22,14 @@ const TextboxContainer = styled.div`
 
 
 export const HAASTextBox = ({ isLeaf }: { isLeaf?: boolean | null }) => {
-  const { goToChild, nodeHistoryStack, edgeHistoryStack, formEntryStack } = useHAASTree();
+  const { goToChild, entryHistoryStack } = useHAASTree();
   const history = useHistory();
 
-  const form = useFormContext();
-  const [submitForm, { error, loading }] = useMutation(uploadEntryMutation,{
+  const [submitForm] = useMutation(uploadEntryMutation,{
     onCompleted: () => {
       history.push('finished');
     }
   });
-
-  console.log('nodeHistoryStack', nodeHistoryStack);
 
   const sessionId = sessionStorage.getItem('sessionId') || '';
 
@@ -40,7 +37,7 @@ export const HAASTextBox = ({ isLeaf }: { isLeaf?: boolean | null }) => {
     submitForm({
       variables: {
         uploadEntriesInput: {
-          entries: formEntryStack,
+          entries: entryHistoryStack,
           sessionId
         }
       }

@@ -4,9 +4,8 @@ type Query {
     newSessionId: String
 }
 
-input UploadEntriesInput {
+input Session {
     entries: [EntryInput!]!
-    sessionId: String!
 }
 
 input EntriesInput {
@@ -22,6 +21,7 @@ input EntryInputData {
     edgeId: String
     textValue: String
     numberValue: Int
+    depth: Int
 }
 
 type Mutation {

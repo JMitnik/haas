@@ -1,20 +1,17 @@
-import React, { memo, useEffect, useState } from 'react';
+import React, { memo, useEffect } from 'react';
 import { H5, Flex, Button, Div } from '@haas/ui';
-import { useHAASTree, MultiChoiceOption, HAASEntry } from '../hooks/use-haas-tree';
-import { useFormContext, useFieldArray, useForm } from 'react-hook-form';
+import { useHAASTree, MultiChoiceOption, HAASFormEntry } from '../hooks/use-haas-tree';
+import { useForm } from 'react-hook-form';
 
-export const HAASMultiChoice = memo((props) => {
-  const { nodeHistoryStack, edgeHistoryStack, goToChild, currentDepth } = useHAASTree();
+export const HAASMultiChoice = memo(() => {
+  const { nodeHistoryStack, goToChild } = useHAASTree();
   const [ activeNode ] = nodeHistoryStack.slice(-1);
-  const [ activeEdge ] = edgeHistoryStack.slice(-1);
 
-  const { register, setValue, triggerValidation, getValues } = useForm<HAASEntry>({
+  const { register, setValue, triggerValidation, getValues } = useForm<HAASFormEntry>({
     mode: 'onSubmit',
     defaultValues: {
       data: {
         textValue: '',
-        edgeId: '',
-        nodeId: ''
       }
     }
   });
@@ -22,23 +19,7 @@ export const HAASMultiChoice = memo((props) => {
   // Register the relevant form fields
   useEffect(() => {
     register('data.textValue');
-    register('data.edgeId');
-    register('data.nodeId');
   }, [register]);
-
-  // Register the node once loaded
-  useEffect(() => {
-    if (activeNode?.id) {
-      setValue('data.nodeId', activeNode.id);
-    }
-  }, [activeNode, setValue]);
-
-  // Register the node once loaded
-  useEffect(() => {
-    if (activeEdge?.id) {
-      setValue('data.edgeId', activeEdge.id);
-    }
-  }, [activeEdge, setValue]);
 
   // Apply submission
   const onSubmit = async (multiChoiceOption: MultiChoiceOption) => {

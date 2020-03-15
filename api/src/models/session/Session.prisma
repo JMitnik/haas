@@ -1,0 +1,5 @@
+type Session {
+    id: ID! @id
+    nodeEntries: [NodeEntry!]
+    createdAt: DateTime! @createdAt
+}

@@ -52,23 +52,29 @@ export interface HAASNode {
 interface HAASTreeContextProps {
   nodeHistoryStack: HAASNode[];
   edgeHistoryStack: HAASEdge[];
-  formEntryStack: HAASEntry[];
+  entryHistoryStack: HAASEntry[];
   isAtLeaf: boolean;
   currentDepth: number;
   getActiveLeaf: () => HAASNode | null;
-  goToChild: (key: string | number, formEntry?: HAASEntry) => void;
+  goToChild: (key: string | number, formEntry?: HAASFormEntry) => void;
 }
 
 export interface HAASEntry {
-  data: HAASEntryData
-};
-
-export interface HAASEntryData {
   nodeId: string | null;
+  depth: number;
   edgeId?: string | null;
+  data: HAASFormEntry;
+}
+
+export interface HAASFormEntry {
+  data: HAASFormEntryData;
+}
+
+export interface HAASFormEntryData {
   textValue?: string | null;
   numberValue?: number | null;
-}
+  multiValue?: HAASFormEntry[];
+};
 
 const findNextEdge = (parent: HAASNode, key: string | number) => {
   const candidates = parent?.edgeChildren?.filter(edge => {
@@ -93,19 +99,22 @@ const findNextEdge = (parent: HAASNode, key: string | number) => {
 
 const findLeafNode = (collection: HAASNode[], key: string) => collection.filter(item => item.id === key)[0];
 
+
 export const HAASTreeContext = React.createContext({} as HAASTreeContextProps);
 
 export const HAASTreeProvider = ({ children }: { children: ReactNode }) => {
   const { questionnaire } = useQuestionnaire();
+  const [leafCollection, setLeafCollection] = useState<HAASNode[]>([]);
 
+  // Active trackables
   const [isAtLeaf, setIsAtLeaf] = useState(false);
   const [currentDepth, setCurrentDepth] = useState(0);
   const [activeLeafNodeId, setActiveLeafNodeID] = useState("");
 
-  const [formEntryStack, setFormEntryStack] = useState<HAASEntry[]>([]);
+  // History trackables
+  const [entryHistoryStack, setEntryHistoryStack] = useState<HAASEntry[]>([]);
   const [nodeHistoryStack, setNodeHistoryStack] = useState<HAASNode[]>([]);
   const [edgeHistoryStack, setEdgeHistoryStack] = useState<HAASEdge[]>([]);
-  const [leafCollection, setLeafCollection] = useState<HAASNode[]>([]);
 
   // If questionnaire is initialized
   useEffect(() => {
@@ -115,9 +124,16 @@ export const HAASTreeProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [questionnaire, leafCollection]);
 
-  const goToChild = async (key: string | number, formEntry?: HAASEntry) => {
+  const getActiveNode = () => nodeHistoryStack.slice(-1)[0];
+  const getActiveEdge = () => entryHistoryStack.slice(-1)[0];
+
+  const goToChild = async (key: string | number, formEntry?: HAASFormEntry) => {
     if (formEntry) {
-      setFormEntryStack(entries => [...entries, formEntry]);
+      setEntryHistoryStack(entries => ([...entries, {
+        nodeId: getActiveNode().id,
+        depth: currentDepth,
+        data: formEntry,
+      }]));
     }
 
     let nextEdge: Edge = findNextEdge(nodeHistoryStack.slice(-1)[0], key);
@@ -153,7 +169,7 @@ export const HAASTreeProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <HAASTreeContext.Provider value={{ formEntryStack, nodeHistoryStack, edgeHistoryStack, goToChild, isAtLeaf, getActiveLeaf, currentDepth }}>
+    <HAASTreeContext.Provider value={{ entryHistoryStack, nodeHistoryStack, edgeHistoryStack, goToChild, isAtLeaf, getActiveLeaf, currentDepth }}>
       {children}
     </HAASTreeContext.Provider>
   );

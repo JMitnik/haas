@@ -4,6 +4,7 @@ type NodeEntry {
     relatedNode: QuestionNode!
     edgeChild: Edge
     values: [NodeEntryValue]
+    depth: Int
 }
 
 type NodeEntryValue {
