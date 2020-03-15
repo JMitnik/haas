@@ -5,7 +5,6 @@ import { H1, Div, Loader } from '@haas/ui';
 import { useHAASTree, HAASNode } from '../hooks/use-haas-tree';
 import { useTransition, animated } from 'react-spring';
 import { HAASSlider } from './HAASSlider';
-import { DevTool } from 'react-hook-form-devtools';
 import { HAASMultiChoice } from './HAASMultiChoice';
 import { HAASSocialShare } from './HAASSocialShare';
 import { HAASTextBox } from './HAASTextBox';
@@ -20,7 +19,6 @@ export const HAASForm = () => {
   return (
     <FormContext {...form}>
       <HAASTreeComponent />
-      <DevTool control={form.control} />
     </FormContext>
   );
 };
