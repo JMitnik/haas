@@ -8,26 +8,25 @@ const main = async () => {
 
   apollo.applyMiddleware({
     app,
-    path:
     cors: {
       credentials: true,
       origin: [config.CLIENT_URL, config.DASHBOARD_URL],
     },
   });
 
-  app.use(function(req: any, res: any, next: any) {
-      const allowedOrigins = [config.CLIENT_URL, config.DASHBOARD_URL],
+  app.use((req: any, res: any, next: any) => {
+    const allowedOrigins = [config.CLIENT_URL, config.DASHBOARD_URL],;
 
-      const origin = req.headers.origin;
+    const { origin } = req.headers;
 
-      if (allowedOrigins.indexOf(origin) > -1){
-            res.setHeader('Access-Control-Allow-Origin', origin);
-      }
-      res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
-      res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-      res.header('Access-Control-Allow-Credentials', true);
+    if (allowedOrigins.indexOf(origin) > -1) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+    }
+    res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.header('Access-Control-Allow-Credentials', true);
 
-      return next();
+    return next();
   });
   app.listen(config.APP_PORT);
 
