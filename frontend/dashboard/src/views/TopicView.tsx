@@ -144,6 +144,9 @@ const HistoryLog = ({ setCurrSession, timelineEntries }: { setCurrSession: Dispa
         timelineEntries && timelineEntries.length > 0 && timelineEntries?.map(
           (timelineEntry, index) => <TimelineEntry setCurrSession={setCurrSession} key={index} timelineEntry={timelineEntry} />)
       }
+      {
+        ((timelineEntries && timelineEntries.length === 0) || (!timelineEntries)) && <div style={{ margin: '5px 20px' }}>No data available...</div>
+      }
     </HistoryLogView>
   );
 };
@@ -187,6 +190,7 @@ const TimelineEntryView = styled.div`
 `;
 
 const TopicDetails = ({ QuestionnaireDetailResult }: { QuestionnaireDetailResult: QuestionnaireDetailResult }) => {
+  console.log(QuestionnaireDetailResult?.average);
 
   return (
     <TopicDetailsView>
@@ -204,17 +208,24 @@ const TopicDetails = ({ QuestionnaireDetailResult }: { QuestionnaireDetailResult
               Created at: {getUniversalDate(new Date(QuestionnaireDetailResult?.creationDate))}
             </div>
             <div>
-              <Score>
-                <div style={{ marginTop: '5px', alignSelf: 'centre' }}>
-                  Average score:
-                </div>
-                <div style={{ marginLeft: '5px', fontSize: '200%', alignSelf: 'flex-start' }}>
-                  {parseFloat(QuestionnaireDetailResult?.average).toPrecision(4)} /
-                </div>
-                <div style={{ alignSelf: 'flex-end', marginBottom: '2px' }}>
-                  {QuestionnaireDetailResult?.totalNodeEntries} answer(s)
-                </div>
-              </Score>
+              {
+                QuestionnaireDetailResult?.average !== 'false' && (
+                  <Score>
+                    <div style={{ marginTop: '5px', alignSelf: 'centre' }}>
+                      Average score:
+                    </div>
+                    <div style={{ marginLeft: '5px', fontSize: '200%', alignSelf: 'flex-start' }}>
+                      {
+                      parseFloat(QuestionnaireDetailResult?.average).toPrecision(4)
+                      }
+                    </div>
+                    <div style={{ alignSelf: 'flex-end', marginBottom: '2px' }}>
+                      {QuestionnaireDetailResult?.totalNodeEntries} answer(s)
+                    </div>
+                  </Score>
+                )
+              }
+
             </div>
           </>
         )
