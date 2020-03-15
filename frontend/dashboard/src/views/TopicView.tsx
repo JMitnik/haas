@@ -43,11 +43,13 @@ const TopicView = () => {
         <TopicDetails QuestionnaireDetailResult={resultData} />
         <HistoryLog timelineEntries={resultData?.timelineEntries} />
       </Flex>
+      <Hr />
+      <div>
+        Detail
+      </div>
     </>
   );
 };
-
-
 
 const HistoryLog = ({ timelineEntries } : { timelineEntries : Array<timelineEntry> }) => {
   return (
@@ -97,6 +99,10 @@ const TimelineEntryView = styled.div`
    ${({ theme }) => css`
     margin: 5px;
     background: ${theme.colors.primary};
+    cursor: pointer;
+    :hover {
+      background: ${theme.colors.secondary};
+    }
   `}
 `;
 
