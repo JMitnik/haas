@@ -7,7 +7,7 @@ import { useParams } from 'react-router-dom';
 
 import getQuestionnaireData from '../queries/getQuestionnaireData';
 import getSessionAnswerFlow from '../queries/getSessionAnswerFlow';
-import { margin } from 'styled-system';
+import { margin, alignSelf } from 'styled-system';
 
 interface timelineEntry {
   sessionId: string;
@@ -200,11 +200,21 @@ const TopicDetails = ({ QuestionnaireDetailResult }: { QuestionnaireDetailResult
               {QuestionnaireDetailResult?.description}
             </Muted>
             <Hr />
-            <div>
+            <div style={{ marginTop: '10px' }}>
               Created at: {getUniversalDate(new Date(QuestionnaireDetailResult?.creationDate))}
             </div>
             <div>
-              Average score: {parseFloat(QuestionnaireDetailResult?.average).toPrecision(4)} ({QuestionnaireDetailResult?.totalNodeEntries} answer(s))
+              <Score>
+                <div style={{ marginTop: '5px', alignSelf: 'centre' }}>
+                  Average score:
+                </div>
+                <div style={{ marginLeft: '5px', fontSize: '200%', alignSelf: 'flex-start' }}>
+                  {parseFloat(QuestionnaireDetailResult?.average).toPrecision(4)} /
+                </div>
+                <div style={{ alignSelf: 'flex-end', marginBottom: '2px' }}>
+                  {QuestionnaireDetailResult?.totalNodeEntries} answer(s)
+                </div>
+              </Score>
             </div>
           </>
         )
@@ -212,6 +222,12 @@ const TopicDetails = ({ QuestionnaireDetailResult }: { QuestionnaireDetailResult
     </TopicDetailsView>
   );
 };
+
+const Score = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+`;
 
 const TopicDetailsView = styled.div`
   display: flex;
