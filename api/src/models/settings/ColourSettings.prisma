@@ -1,6 +1,7 @@
 type ColourSettings {
     id: ID! @id
     primary: String!
+    primaryAlt: String
     secondary: String
     tertiary: String
     success: String
