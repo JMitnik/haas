@@ -18,6 +18,13 @@ input UserSessionEntryInput {
     textValue: String
     numberValue: Int
     depth: Int
+    data: UserSessionEntryDataInput!
+}
+
+input UserSessionEntryDataInput {
+    textValue: String
+    numberValue: Int
+    multiValues: [UserSessionEntryDataInput!]
 }
 
 input UploadUserSessionInput {

@@ -1,9 +1,9 @@
 import gql from 'graphql-tag';
 
-const uploadEntryMutation = gql`
-    mutation uploadUserEntries($uploadUserSessionInput: UploadUserSessionInput) {
-        uploadUserEntries(uploadUserSessionInput: $uploadUserSessionInput)
+const uploadUserSessionMutation = gql`
+    mutation uploadUserSession($uploadUserSessionInput: UploadUserSessionInput) {
+        uploadUserSession(uploadUserSessionInput: $uploadUserSessionInput)
     }
 `;
 
-export default uploadEntryMutation;
+export default uploadUserSessionMutation;

@@ -1421,11 +1421,8 @@ type NodeEntry {
   relatedNode: QuestionNode!
   edgeChild: Edge
   values(where: NodeEntryValueWhereInput, orderBy: NodeEntryValueOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [NodeEntryValue!]
-<<<<<<< HEAD
   depth: Int
-=======
   creationDate: DateTime!
->>>>>>> master
 }
 
 type NodeEntryConnection {
@@ -1440,10 +1437,7 @@ input NodeEntryCreateInput {
   relatedNode: QuestionNodeCreateOneInput!
   edgeChild: EdgeCreateOneInput
   values: NodeEntryValueCreateManyInput
-<<<<<<< HEAD
   depth: Int
-=======
->>>>>>> master
 }
 
 type NodeEntryEdge {
@@ -1456,23 +1450,17 @@ enum NodeEntryOrderByInput {
   id_DESC
   sessionId_ASC
   sessionId_DESC
-<<<<<<< HEAD
   depth_ASC
   depth_DESC
-=======
   creationDate_ASC
   creationDate_DESC
->>>>>>> master
 }
 
 type NodeEntryPreviousValues {
   id: ID!
   sessionId: String!
-<<<<<<< HEAD
   depth: Int
-=======
   creationDate: DateTime!
->>>>>>> master
 }
 
 type NodeEntrySubscriptionPayload {
@@ -1498,18 +1486,12 @@ input NodeEntryUpdateInput {
   relatedNode: QuestionNodeUpdateOneRequiredInput
   edgeChild: EdgeUpdateOneInput
   values: NodeEntryValueUpdateManyInput
-<<<<<<< HEAD
   depth: Int
-=======
->>>>>>> master
 }
 
 input NodeEntryUpdateManyMutationInput {
   sessionId: String
-<<<<<<< HEAD
   depth: Int
-=======
->>>>>>> master
 }
 
 type NodeEntryValue {
@@ -1743,7 +1725,6 @@ input NodeEntryWhereInput {
   values_every: NodeEntryValueWhereInput
   values_some: NodeEntryValueWhereInput
   values_none: NodeEntryValueWhereInput
-<<<<<<< HEAD
   depth: Int
   depth_not: Int
   depth_in: [Int!]
@@ -1752,7 +1733,6 @@ input NodeEntryWhereInput {
   depth_lte: Int
   depth_gt: Int
   depth_gte: Int
-=======
   creationDate: DateTime
   creationDate_not: DateTime
   creationDate_in: [DateTime!]
@@ -1761,7 +1741,6 @@ input NodeEntryWhereInput {
   creationDate_lte: DateTime
   creationDate_gt: DateTime
   creationDate_gte: DateTime
->>>>>>> master
   AND: [NodeEntryWhereInput!]
   OR: [NodeEntryWhereInput!]
   NOT: [NodeEntryWhereInput!]
@@ -2110,10 +2089,7 @@ input QuestionnaireCreateInput {
   title: String!
   description: String!
   publicTitle: String
-<<<<<<< HEAD
   rootQuestion: QuestionNodeCreateOneInput
-=======
->>>>>>> master
   questions: QuestionNodeCreateManyWithoutQuestionnaireInput
   leafs: LeafNodeCreateManyInput
 }
@@ -2123,14 +2099,11 @@ input QuestionnaireCreateManyWithoutCustomerInput {
   connect: [QuestionnaireWhereUniqueInput!]
 }
 
-<<<<<<< HEAD
-=======
 input QuestionnaireCreateOneInput {
   create: QuestionnaireCreateInput
   connect: QuestionnaireWhereUniqueInput
 }
 
->>>>>>> master
 input QuestionnaireCreateOneWithoutQuestionsInput {
   create: QuestionnaireCreateWithoutQuestionsInput
   connect: QuestionnaireWhereUniqueInput
@@ -2141,10 +2114,7 @@ input QuestionnaireCreateWithoutCustomerInput {
   title: String!
   description: String!
   publicTitle: String
-<<<<<<< HEAD
   rootQuestion: QuestionNodeCreateOneInput
-=======
->>>>>>> master
   questions: QuestionNodeCreateManyWithoutQuestionnaireInput
   leafs: LeafNodeCreateManyInput
 }
@@ -2155,10 +2125,7 @@ input QuestionnaireCreateWithoutQuestionsInput {
   title: String!
   description: String!
   publicTitle: String
-<<<<<<< HEAD
   rootQuestion: QuestionNodeCreateOneInput
-=======
->>>>>>> master
   leafs: LeafNodeCreateManyInput
 }
 
@@ -2292,6 +2259,7 @@ input QuestionnaireUpdateDataInput {
   title: String
   description: String
   publicTitle: String
+  rootQuestion: QuestionNodeUpdateOneInput
   questions: QuestionNodeUpdateManyWithoutQuestionnaireInput
   leafs: LeafNodeUpdateManyInput
 }
@@ -2301,10 +2269,7 @@ input QuestionnaireUpdateInput {
   title: String
   description: String
   publicTitle: String
-<<<<<<< HEAD
   rootQuestion: QuestionNodeUpdateOneInput
-=======
->>>>>>> master
   questions: QuestionNodeUpdateManyWithoutQuestionnaireInput
   leafs: LeafNodeUpdateManyInput
 }
@@ -2338,12 +2303,6 @@ input QuestionnaireUpdateManyWithWhereNestedInput {
   data: QuestionnaireUpdateManyDataInput!
 }
 
-<<<<<<< HEAD
-input QuestionnaireUpdateOneRequiredWithoutQuestionsInput {
-  create: QuestionnaireCreateWithoutQuestionsInput
-  update: QuestionnaireUpdateWithoutQuestionsDataInput
-  upsert: QuestionnaireUpsertWithoutQuestionsInput
-=======
 input QuestionnaireUpdateOneInput {
   create: QuestionnaireCreateInput
   update: QuestionnaireUpdateDataInput
@@ -2359,7 +2318,6 @@ input QuestionnaireUpdateOneWithoutQuestionsInput {
   upsert: QuestionnaireUpsertWithoutQuestionsInput
   delete: Boolean
   disconnect: Boolean
->>>>>>> master
   connect: QuestionnaireWhereUniqueInput
 }
 
@@ -2367,10 +2325,7 @@ input QuestionnaireUpdateWithoutCustomerDataInput {
   title: String
   description: String
   publicTitle: String
-<<<<<<< HEAD
   rootQuestion: QuestionNodeUpdateOneInput
-=======
->>>>>>> master
   questions: QuestionNodeUpdateManyWithoutQuestionnaireInput
   leafs: LeafNodeUpdateManyInput
 }
@@ -2380,10 +2335,7 @@ input QuestionnaireUpdateWithoutQuestionsDataInput {
   title: String
   description: String
   publicTitle: String
-<<<<<<< HEAD
   rootQuestion: QuestionNodeUpdateOneInput
-=======
->>>>>>> master
   leafs: LeafNodeUpdateManyInput
 }
 
@@ -2392,14 +2344,11 @@ input QuestionnaireUpdateWithWhereUniqueWithoutCustomerInput {
   data: QuestionnaireUpdateWithoutCustomerDataInput!
 }
 
-<<<<<<< HEAD
-=======
 input QuestionnaireUpsertNestedInput {
   update: QuestionnaireUpdateDataInput!
   create: QuestionnaireCreateInput!
 }
 
->>>>>>> master
 input QuestionnaireUpsertWithoutQuestionsInput {
   update: QuestionnaireUpdateWithoutQuestionsDataInput!
   create: QuestionnaireCreateWithoutQuestionsInput!
@@ -2508,7 +2457,6 @@ type QuestionNode {
   branchVal: String
   isRoot: Boolean!
   questionType: NodeType!
-  questionnaire: Questionnaire!
   overrideLeaf: LeafNode
   options(where: QuestionOptionWhereInput, orderBy: QuestionOptionOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [QuestionOption!]
   children(where: QuestionNodeWhereInput, orderBy: QuestionNodeOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [QuestionNode!]
@@ -2528,7 +2476,6 @@ input QuestionNodeCreateInput {
   branchVal: String
   isRoot: Boolean
   questionType: NodeType!
-  questionnaire: QuestionnaireCreateOneWithoutQuestionsInput!
   overrideLeaf: LeafNodeCreateOneInput
   options: QuestionOptionCreateManyInput
   children: QuestionNodeCreateManyInput
@@ -2557,10 +2504,6 @@ input QuestionNodeCreateWithoutQuestionnaireInput {
   isRoot: Boolean
   questionType: NodeType!
   overrideLeaf: LeafNodeCreateOneInput
-<<<<<<< HEAD
-  conditions: QuestionConditionCreateManyInput
-=======
->>>>>>> master
   options: QuestionOptionCreateManyInput
   children: QuestionNodeCreateManyInput
   edgeChildren: EdgeCreateManyInput
@@ -2670,7 +2613,6 @@ input QuestionNodeUpdateDataInput {
   branchVal: String
   isRoot: Boolean
   questionType: NodeType
-  questionnaire: QuestionnaireUpdateOneRequiredWithoutQuestionsInput
   overrideLeaf: LeafNodeUpdateOneInput
   options: QuestionOptionUpdateManyInput
   children: QuestionNodeUpdateManyInput
@@ -2683,7 +2625,6 @@ input QuestionNodeUpdateInput {
   branchVal: String
   isRoot: Boolean
   questionType: NodeType
-  questionnaire: QuestionnaireUpdateOneRequiredWithoutQuestionsInput
   overrideLeaf: LeafNodeUpdateOneInput
   options: QuestionOptionUpdateManyInput
   children: QuestionNodeUpdateManyInput
@@ -2755,10 +2696,6 @@ input QuestionNodeUpdateWithoutQuestionnaireDataInput {
   isRoot: Boolean
   questionType: NodeType
   overrideLeaf: LeafNodeUpdateOneInput
-<<<<<<< HEAD
-  conditions: QuestionConditionUpdateManyInput
-=======
->>>>>>> master
   options: QuestionOptionUpdateManyInput
   children: QuestionNodeUpdateManyInput
   edgeChildren: EdgeUpdateManyInput
@@ -2841,7 +2778,6 @@ input QuestionNodeWhereInput {
   questionType_not: NodeType
   questionType_in: [NodeType!]
   questionType_not_in: [NodeType!]
-  questionnaire: QuestionnaireWhereInput
   overrideLeaf: LeafNodeWhereInput
   options_every: QuestionOptionWhereInput
   options_some: QuestionOptionWhereInput

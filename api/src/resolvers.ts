@@ -1,13 +1,80 @@
 import { forwardTo } from 'prisma-binding';
 import crypto from 'crypto';
 import { QueryResolvers, MutationResolvers } from './generated/resolver-types';
-import { prisma } from './generated/prisma-client';
 import cleanInt from './utils/cleanInt';
 import _ from 'lodash';
-
-import { QueryResolvers, MutationResolvers } from './generated/resolver-types';
 import { prisma, ID_Input, Questionnaire } from './generated/prisma-client/index';
 import seedCompany, { seedQuestionnare } from '../data/seeds/make-company';
+
+const deleteFullCustomerNode = async (parent: any, args:any) => {
+  const { id } : { id: ID_Input} = args;
+  const customerId = id;
+  const customer = await prisma.deleteCustomer({ id: customerId });
+
+  return customer;
+};
+
+const createNewCustomerMutation = async (parent : any, args: any) => {
+  const { name, options } = args;
+  const { isSeed, logo } = options;
+
+  const customer = await prisma.createCustomer({
+    name,
+    settings: {
+      create: {
+        logoUrl: logo,
+        colourSettings: {
+          create: {
+            primary: '#4287f5',
+          },
+        },
+      },
+    },
+    questionnaires: {
+      create: [],
+    },
+  });
+
+  if (isSeed) {
+    await seedCompany(customer);
+  }
+
+  return customer;
+};
+
+const createNewQuestionnaire = async (parent : any, args: any): Promise<Questionnaire> => {
+  const { customerId, title, description, publicTitle, isSeed } = args;
+  let questionnaire = null;
+
+  if (isSeed) {
+    const customer = await prisma.customer({ id: customerId });
+
+    if (customer?.name) {
+      return seedQuestionnare(customerId, customer?.name, title, description);
+    }
+
+    console.log('Cant find customer with specified ID while seeding');
+  }
+
+  questionnaire = await prisma.createQuestionnaire({
+    customer: {
+      connect: {
+        id: customerId,
+      },
+    },
+    leafs: {
+      create: [],
+    },
+    title,
+    publicTitle,
+    description,
+    questions: {
+      create: [],
+    },
+  });
+
+  return questionnaire;
+};
 
 // TODO: Put these in a 'model' file, named Questionnaire (with a Questionnaire class). Create a new instance of Questionnaire, and call .getEntries
 const getQuestionnaireAggregatedData = async (parent: any, args: any) => {
@@ -87,14 +154,19 @@ const queryResolvers = {
   questionnaire: forwardTo('db'),
   questionnaires: forwardTo('db'),
   customers: forwardTo('db'),
+  leafNode: forwardTo('db'),
+  edges: forwardTo('db'),
+  nodeEntryValues: forwardTo('db'),
   nodeEntries: forwardTo('db'),
+  // TODO: Rename
+  getQuestionnaireData: getQuestionnaireAggregatedData,
   nodeEntry: forwardTo('db'),
   newSessionId: () => crypto.randomBytes(16).toString('base64'),
 };
 
 const mutationResolvers = {
   uploadUserSession: async (obj: any, args: any, ctx: any, info: any) => {
-    args.uploadEntriesInput.entries.forEach(async (entry: any) => {
+    args.uploadUserSessionInput.entries.forEach(async (entry: any) => {
       const maybeCreateEdgeChild = (entry: any) => {
         if (entry.data.edgeId) {
           return {
@@ -128,85 +200,6 @@ const mutationResolvers = {
     });
     return 'Success!';
   },
-  leafNode: forwardTo('db'),
-  edges: forwardTo('db'),
-  nodeEntries: forwardTo('db'),
-  nodeEntryValues: forwardTo('db'),
-  // TODO: Rename
-  getQuestionnaireData: getQuestionnaireAggregatedData,
-};
-
-const deleteFullCustomerNode = async (parent: any, args:any) => {
-  const { id } : { id: ID_Input} = args;
-  const customerId = id;
-  const customer = await prisma.deleteCustomer({ id: customerId });
-
-  return customer;
-};
-
-const createNewCustomerMutation = async (parent : any, args: any) => {
-  const { name, options } = args;
-  const { isSeed, logo } = options;
-
-  const customer = await prisma.createCustomer({
-    name,
-    settings: {
-      create: {
-        logoUrl: logo,
-        colourSettings: {
-          create: {
-            primary: '#4287f5',
-          },
-        },
-      },
-    },
-    questionnaires: {
-      create: [],
-    },
-  });
-
-  if (isSeed) {
-    await seedCompany(customer);
-  }
-
-  return customer;
-};
-
-const createNewQuestionnaire = async (parent : any, args: any): Promise<Questionnaire> => {
-  const { customerId, title, description, publicTitle, isSeed } = args;
-  let questionnaire = null;
-
-  if (isSeed) {
-    const customer = await prisma.customer({ id: customerId });
-
-    if (customer?.name) {
-      return seedQuestionnare(customerId, customer?.name, title, description);
-    }
-
-    console.log('Cant find customer with specified ID while seeding');
-  }
-
-  questionnaire = await prisma.createQuestionnaire({
-    customer: {
-      connect: {
-        id: customerId,
-      },
-    },
-    leafs: {
-      create: [],
-    },
-    title,
-    publicTitle,
-    description,
-    questions: {
-      create: [],
-    },
-  });
-
-  return questionnaire;
-};
-
-const mutationResolvers: MutationResolvers = {
   createNewCustomer: createNewCustomerMutation,
   deleteFullCustomer: deleteFullCustomerNode,
   createNewQuestionnaire,
