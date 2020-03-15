@@ -93,9 +93,6 @@ const findNextEdge = (parent: HAASNode, key: string | number) => {
   return candidates && candidates[0];
 };
 
-const findLeafNode = (collection: HAASNode[], key: string) => collection.filter(item => item.id === key)[0];
-
-
 export const HAASTreeContext = React.createContext({} as HAASTreeContextProps);
 
 export const HAASTreeProvider = ({ children }: { children: ReactNode }) => {
@@ -121,12 +118,13 @@ export const HAASTreeProvider = ({ children }: { children: ReactNode }) => {
   }, [questionnaire, leafCollection]);
 
   const getActiveNode = () => nodeHistoryStack.slice(-1)[0];
-  const getActiveEdge = () => entryHistoryStack.slice(-1)[0];
+  const getActiveEdge = () => edgeHistoryStack.slice(-1)[0];
 
   const goToChild = async (key: string | number, formEntry?: HAASFormEntry) => {
     if (formEntry) {
       setEntryHistoryStack(entries => ([...entries, {
         nodeId: getActiveNode().id,
+        edgeId: getActiveEdge().id,
         depth: currentDepth,
         data: formEntry,
       }]));

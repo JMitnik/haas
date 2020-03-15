@@ -1,16 +1,12 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 import Select, { ActionMeta } from 'react-select';
-import { useHistory, useParams } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 
-import { H1, Div, Card, CardBody, CardFooter, H3, Flex, ColumnFlex, Label, H2 } from '@haas/ui';
+import { H1, Div, Card, CardBody, CardFooter, H3, Flex, ColumnFlex, Label } from '@haas/ui';
 
-interface CustomerSelectorProps {
-  customers: []
-}
 
 export const CustomerSelector = ({ customers }: { customers: any }) => {
-    const params = useParams();
 
     return (
       <CenteredScreen>

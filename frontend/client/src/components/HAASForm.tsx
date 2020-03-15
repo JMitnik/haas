@@ -9,7 +9,6 @@ import { HAASMultiChoice } from './HAASMultiChoice';
 import { HAASSocialShare } from './HAASSocialShare';
 import { HAASTextBox } from './HAASTextBox';
 import { HAASSignIn } from './HAASSignIn';
-import { useFieldArray } from 'react-hook-form';
 
 export const HAASForm = () => {
   const form = useForm({
@@ -34,7 +33,7 @@ const HAASTreeComponent = () => {
 };
 
 const HAASNodeView = () => {
-  const { nodeHistoryStack, isAtLeaf } = useHAASTree();
+  const { nodeHistoryStack } = useHAASTree();
   const activeNode = nodeHistoryStack.slice(-1)[0];
 
   const transitions = useTransition(activeNode, (activeNode) => activeNode?.id, {

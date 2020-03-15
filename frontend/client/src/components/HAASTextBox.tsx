@@ -5,7 +5,6 @@ import { Textbox, Button } from '@haas/ui';
 import { useHistory } from 'react-router-dom';
 import { useHAASTree } from '../hooks/use-haas-tree';
 import styled, { css } from 'styled-components';
-import { useFormContext } from 'react-hook-form';
 import uploadEntryMutation from '../mutations/UploadEntryMutation';
 
 

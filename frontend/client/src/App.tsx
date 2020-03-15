@@ -10,7 +10,6 @@ import { CustomerSelector } from './views/CustomerSelector';
 import { getCustomerQuery } from './queries/getCustomerQuery';
 import { QuestionnaireProvider } from './hooks/use-questionnaire';
 import getNewSessionId from './queries/getNewSessionId';
-import FinalScreen from './views/FinalScreen';
 
 const App: React.FC = () => {
   const { data, loading, error } = useQuery(getCustomerQuery);
