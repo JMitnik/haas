@@ -211,6 +211,159 @@ export const getStandardEdgeData = (customerName: string) => {
   ];
 };
 
+export const positiveSubChildren = [
+  {
+    title: 'What exactly did you like about website?',
+    overrideLeafContains: 'Instagram',
+    type: multiChoiceType,
+    relatedOptionValue: 'Website/Mobile app',
+    childrenNodes: [
+      { value: 'Design', type: multiChoiceType },
+      { value: 'Functionality', type: multiChoiceType },
+      { value: 'Informative', type: multiChoiceType },
+      { value: 'Other', type: multiChoiceType },
+    ],
+  },
+  {
+    title: 'What exactly did you like about the facilities?',
+    overrideLeafContains: 'newsletter',
+    type: multiChoiceType,
+    relatedOptionValue: 'Website/Mobile app',
+    childrenNodes: [
+      { value: 'Cleanliness', type: multiChoiceType, overrideLeafContains: 'Come and join us' },
+      { value: 'Atmosphere', type: multiChoiceType, overrideLeafContains: 'Come and join us' },
+      { value: 'Location', type: multiChoiceType, overrideLeafContains: 'Come and join us' },
+      { value: 'Other', type: multiChoiceType },
+    ],
+  },
+  {
+    title: 'What exactly did you like about the product?',
+    overrideLeafContains: 'see you soon',
+    type: multiChoiceType,
+    relatedOptionValue: 'Product / Services',
+    childrenNodes: [
+      { value: 'Quality', type: multiChoiceType, overrideLeafContains: 'We think you might like' },
+      { value: 'Price', type: multiChoiceType, overrideLeafContains: 'We think you might like' },
+      { value: 'Friendliness', type: multiChoiceType, overrideLeafContains: 'We think you might like' },
+      { value: 'Other', type: multiChoiceType },
+    ],
+  },
+  {
+    title: 'What exactly did you like about the customer support?',
+    overrideLeafContains: 'team is on it',
+    type: multiChoiceType,
+    relatedOptionValue: 'Customer Support',
+    childrenNodes: [
+      { value: 'Friendliness', type: multiChoiceType, overrideLeafContains: 'Leave your email below to receive our' },
+      { value: 'Competence', type: multiChoiceType, overrideLeafContains: 'Leave your email below to receive our' },
+      { value: 'Speed', type: multiChoiceType, overrideLeafContains: 'Leave your email below to receive our' },
+      { value: 'Other', type: multiChoiceType },
+    ],
+  },
+];
+
+export const neutralSubChildren = [
+  {
+    title: 'Please specify.',
+    overrideLeafContains: 'receive our newsletter',
+    type: multiChoiceType,
+    relatedOptionValue: 'Facilities',
+    childrenNodes: [
+      { value: 'Design', type: multiChoiceType },
+      { value: 'Functionality', type: multiChoiceType },
+      { value: 'Informative', type: multiChoiceType },
+      { value: 'Other', type: multiChoiceType },
+    ],
+  },
+  {
+    title: 'Please specify.',
+    overrideLeafContains: 'receive our newsletter',
+    type: multiChoiceType,
+    relatedOptionValue: 'Website/Mobile app',
+    childrenNodes: [
+      { value: 'Cleanliness', type: multiChoiceType },
+      { value: 'Atmosphere', type: multiChoiceType },
+      { value: 'Location', type: multiChoiceType },
+      { value: 'Other', type: multiChoiceType },
+    ],
+  },
+  {
+    title: 'Please specify.',
+    overrideLeafContains: 'receive our newsletter',
+    type: multiChoiceType,
+    relatedOptionValue: 'Product / Services',
+    childrenNodes: [
+      { value: 'Quality', type: multiChoiceType },
+      { value: 'Price', type: multiChoiceType },
+      { value: 'Friendliness', type: multiChoiceType },
+      { value: 'Other', type: multiChoiceType },
+    ],
+  },
+  {
+    title: 'Please specify',
+    overrideLeafContains: 'receive our newsletter',
+    type: multiChoiceType,
+    relatedOptionValue: 'Customer Support',
+    childrenNodes: [
+      { value: 'Friendliness', type: multiChoiceType },
+      { value: 'Competence', type: multiChoiceType },
+      { value: 'Speed', type: multiChoiceType },
+      { value: 'Options', type: multiChoiceType },
+    ],
+  },
+];
+
+export const negativeSubChildren = [
+  {
+    title: 'Please elaborate.',
+    overrideLeafContains: 'with a solution',
+    type: multiChoiceType,
+    relatedOptionValue: 'Website/Mobile app',
+    childrenNodes: [
+      { value: 'Design', type: multiChoiceType, overrideLeafContains: 'click on the Whatsapp' },
+      { value: 'Functionality', type: multiChoiceType, overrideLeafContains: 'click on the Whatsapp' },
+      { value: 'Informative', type: multiChoiceType, overrideLeafContains: 'click on the Whatsapp' },
+      { value: 'Other', type: multiChoiceType },
+    ],
+  },
+  {
+    title: 'Please elaborate.',
+    overrideLeafContains: 'with a solution',
+    type: multiChoiceType,
+    relatedOptionValue: 'Facilities',
+    childrenNodes: [
+      { value: 'Cleanliness', type: multiChoiceType, overrideLeafContains: 'Our team is on it' },
+      { value: 'Atmosphere', type: multiChoiceType, overrideLeafContains: 'Our team is on it' },
+      { value: 'Location', type: multiChoiceType, overrideLeafContains: 'Our team is on it' },
+      { value: 'Other', type: multiChoiceType },
+    ],
+  },
+  {
+    title: 'Please elaborate.',
+    overrideLeafContains: 'with a solution',
+    type: multiChoiceType,
+    relatedOptionValue: 'Product / Services',
+    childrenNodes: [
+      { value: 'Quality', type: multiChoiceType, overrideLeafContains: 'Click below for your' },
+      { value: 'Price', type: multiChoiceType, overrideLeafContains: 'Click below for your' },
+      { value: 'Friendliness', type: multiChoiceType, overrideLeafContains: 'Click below for your' },
+      { value: 'Other', type: multiChoiceType },
+    ],
+  },
+  {
+    title: 'Please elaborate',
+    overrideLeafContains: 'with a solution',
+    type: multiChoiceType,
+    relatedOptionValue: 'Customer Support',
+    childrenNodes: [
+      { value: 'Friendliness', type: multiChoiceType, overrideLeafContains: 'Our customer experience supervisor' },
+      { value: 'Competence', type: multiChoiceType, overrideLeafContains: 'Our customer experience supervisor' },
+      { value: 'Speed', type: multiChoiceType, overrideLeafContains: 'Our customer experience supervisor' },
+      { value: 'Other', type: multiChoiceType },
+    ],
+  },
+];
+
 export const standardSubChildren = [
   {
     title: 'What exactly did you like about facilities?',
@@ -257,7 +410,7 @@ export const standardSubChildren = [
       { value: 'Friendliness', type: multiChoiceType },
       { value: 'Competence', type: multiChoiceType },
       { value: 'Speed', type: multiChoiceType },
-      { value: 'Options', type: multiChoiceType },
+      { value: 'Other', type: multiChoiceType },
     ],
   },
 ];
@@ -267,20 +420,20 @@ export const standardRootChildren = [
     title: 'What did you like?',
     questionType: multiChoiceType,
     overrideLeafContains: 'Instagram',
-    options: standardSubChildren.map((child) => child.relatedOptionValue),
-    children: standardSubChildren,
+    options: positiveSubChildren.map((child) => child.relatedOptionValue),
+    children: positiveSubChildren,
   },
   {
     title: 'What would you like to talk about?',
     questionType: multiChoiceType,
-    options: standardSubChildren.map((child) => child.relatedOptionValue),
-    children: standardSubChildren,
+    options: neutralSubChildren.map((child) => child.relatedOptionValue),
+    children: neutralSubChildren,
   },
   {
     title: 'We are sorry to hear that! Where can we improve?',
     questionType: multiChoiceType,
-    options: standardSubChildren.map((child) => child.relatedOptionValue),
-    children: standardSubChildren,
+    options: negativeSubChildren.map((child) => child.relatedOptionValue),
+    children: negativeSubChildren,
   },
 ];
 
