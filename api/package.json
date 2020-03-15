@@ -4,16 +4,16 @@
     "scripts": {
         "start": "nodemon --exec 'ts-node' --watch src/ src/app.ts",
         "build": "yarn",
-        "clean:prod": "prisma reset -e .env.prod",
+        "clean:prod": "prisma reset -e .prod.env",
         "deploy:prod": "docker build -t juronemo/haasapi-local:latest . && docker push juronemo/haasapi-local:latest",
         "generate": "prisma deploy && prisma generate -e .env && graphql-codegen",
         "migrate": "prisma deploy --force -f -e .env && prisma generate && graphql-codegen",
-        "migrate:prod": "prisma deploy -f -e .env.prod",
+        "migrate:prod": "prisma deploy -f -e .prod.env",
         "seed": "yarn migrate && prisma seed",
-        "seed:prod": "yarn migrate && prisma seed -e .env.prod",
+        "seed:prod": "yarn migrate && prisma seed -e .prod.env",
         "reset": "prisma reset",
         "token": "prisma token -e .env",
-        "token:prod": "prisma token -e .env.prod"
+        "token:prod": "prisma token -e .prod.env"
     },
     "dependencies": {
         "@graphql-codegen/cli": "^1.11.2",

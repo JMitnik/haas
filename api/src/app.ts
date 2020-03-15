@@ -1,4 +1,5 @@
 import express from 'express';
+import cors, { CorsOptions } from 'cors';
 import makeApollo from './apollo';
 import config from './config';
 
@@ -6,27 +7,18 @@ const main = async () => {
   const apollo = await makeApollo();
   const app = express();
 
+  const corsOptions: CorsOptions = {
+    origin: [config.CLIENT_URL, config.DASHBOARD_URL],
+    credentials: true,
+  };
+
+  app.use(cors(corsOptions));
+
   apollo.applyMiddleware({
     app,
-    cors: {
-      credentials: true,
-      origin: [config.CLIENT_URL, config.DASHBOARD_URL],
-    },
+    cors: corsOptions,
   });
 
-  app.use((req: any, res: any, next: any) => {
-    const allowedOrigins = [config.CLIENT_URL, config.DASHBOARD_URL];
-
-    const { origin } = req.headers;
-    console.log('The origin is: ', origin);
-
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-    res.header('Access-Control-Allow-Credentials', true);
-
-    return next();
-  });
   app.listen(config.APP_PORT);
 
   console.log(`Only intended to work on ${config.CLIENT_URL} and ${config.DASHBOARD_URL}`);
