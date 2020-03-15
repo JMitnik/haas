@@ -17,41 +17,34 @@ export const HAASSlider = () => {
 
   const { watch, getValues, triggerValidation, register } = useForm<HAASFormEntry>({
     defaultValues: {
-      data: {
-        numberValue: 50,
-      },
+      numberValue: 50,
     },
   });
 
   const onSubmit = async () => {
-    const validForm = await triggerValidation('data.numberValue');
+    const validForm = await triggerValidation('numberValue');
 
     if (validForm) {
       const formEntry = formatSliderEntry(getValues({ nest: true }));
 
-      if (formEntry.data.numberValue) {
-        goToChild(formEntry.data.numberValue, formEntry);
+      if (formEntry?.numberValue) {
+        goToChild(formEntry.numberValue, formEntry);
       }
     }
   };
 
   const formatSliderEntry = (entry: HAASFormEntry) => {
-    const { numberValue, ...entryVals } = entry?.data;
+    const { numberValue, ...entryVals } = entry;
 
     if (numberValue) {
-      return {
-        data: {
-          numberValue: cleanInt(numberValue) ,
-          ...entryVals
-        }
-      };
+      return { ...entryVals, numberValue: cleanInt(numberValue), };
     }
 
     return entry;
   }
 
   const showValue = () => {
-    let val = watch({ nest: true }).data.numberValue;
+    let val = watch({ nest: true }).numberValue;
 
     if (val) return val / 10;
 
@@ -65,7 +58,7 @@ export const HAASSlider = () => {
           <H1 textAlign="center" color="white">{showValue()}</H1>
           <Slider
             width={1}
-            name="data.numberValue"
+            name="numberValue"
             onMouseUp={() => onSubmit()}
             onTouchEnd={() => onSubmit()}
             min={0}

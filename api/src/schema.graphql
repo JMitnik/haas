@@ -4,19 +4,11 @@ type Query {
     newSessionId: String
 }
 
-input Session {
-    entries: [EntryInput!]!
+type Mutation {
+    uploadUserSession(uploadUserSessionInput: UploadUserSessionInput): String
 }
 
-input EntriesInput {
-    entries: [EntryInput!]!
-}
-
-input EntryInput {
-    data: EntryInputData!
-}
-
-input EntryInputData {
+input UserSessionEntryInput {
     nodeId: String!
     edgeId: String
     textValue: String
@@ -24,6 +16,6 @@ input EntryInputData {
     depth: Int
 }
 
-type Mutation {
-    uploadUserEntries(uploadEntriesInput: UploadEntriesInput): String
+input UploadUserSessionInput {
+    entries: [UserSessionEntryInput!]!
 }

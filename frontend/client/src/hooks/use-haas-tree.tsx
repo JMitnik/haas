@@ -64,13 +64,9 @@ export interface HAASEntry {
   depth: number;
   edgeId?: string | null;
   data: HAASFormEntry;
-}
+};
 
 export interface HAASFormEntry {
-  data: HAASFormEntryData;
-}
-
-export interface HAASFormEntryData {
   textValue?: string | null;
   numberValue?: number | null;
   multiValue?: HAASFormEntry[];

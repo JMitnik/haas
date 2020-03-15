@@ -31,14 +31,11 @@ export const HAASTextBox = ({ isLeaf }: { isLeaf?: boolean | null }) => {
     }
   });
 
-  const sessionId = sessionStorage.getItem('sessionId') || '';
-
   const onSubmit = () => {
     submitForm({
       variables: {
-        uploadEntriesInput: {
+        uploadUserSessionInput: {
           entries: entryHistoryStack,
-          sessionId
         }
       }
     })

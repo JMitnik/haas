@@ -10,21 +10,19 @@ export const HAASMultiChoice = memo(() => {
   const { register, setValue, triggerValidation, getValues } = useForm<HAASFormEntry>({
     mode: 'onSubmit',
     defaultValues: {
-      data: {
-        textValue: '',
-      }
+      textValue: '',
     }
   });
 
   // Register the relevant form fields
   useEffect(() => {
-    register('data.textValue');
+    register('textValue');
   }, [register]);
 
   // Apply submission
   const onSubmit = async (multiChoiceOption: MultiChoiceOption) => {
-    setValue('data.textValue', multiChoiceOption.value);
-    const validForm = await triggerValidation('data.textValue');
+    setValue('textValue', multiChoiceOption.value);
+    const validForm = await triggerValidation('textValue');
 
     if (validForm) {
       const formEntry = getValues({ nest: true });
