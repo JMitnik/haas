@@ -345,10 +345,6 @@ export const seedQuestionnare = async (
 ): Promise<Questionnaire> => {
   const leafs = await createTemplateLeafNodes(leafNodes);
 
-  console.log('Questionnaire title: ', questionnaireTitle);
-  console.log('Questionnaire description: ', questionnaireDescription);
-  console.log('Customer name: ', customerName);
-
   const questionnaire = await prisma.createQuestionnaire({
     customer: {
       connect: {

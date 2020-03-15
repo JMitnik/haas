@@ -14,8 +14,6 @@ const HAASQuestionnaire = () => {
   const [customTheme, setCustomTheme] = useState({});
   const location = useLocation();
 
-  console.log('location', location);
-
   // Customize app for customer
   useEffect(() => {
     if (customer?.name) {
