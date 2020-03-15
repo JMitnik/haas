@@ -14,6 +14,7 @@ const App: React.FC = () => {
   const { data, loading, error } = useQuery(getCustomerQuery);
   if (error) return <div>{'Error!' + error.message}</div>;
 
+  
   const customers = data?.customers;
 
   return (
