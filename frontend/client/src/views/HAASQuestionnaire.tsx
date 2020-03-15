@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import styled, { css, ThemeProvider } from 'styled-components';
 import { HAASTreeProvider } from '../hooks/use-haas-tree';
 import { HAASForm } from '../components/HAASForm';
-import { Switch, Route } from 'react-router-dom';
+import { Switch, Route, useLocation } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Div, Loader } from '@haas/ui';
 import { useQuestionnaire } from '../hooks/use-questionnaire';
 import FinalScreen from './FinalScreen';
@@ -11,6 +12,9 @@ import { makeCustomTheme } from '../utils/makeCustomerTheme';
 const HAASQuestionnaire = () => {
   const { customer } = useQuestionnaire();
   const [customTheme, setCustomTheme] = useState({});
+  const location = useLocation();
+
+  console.log('location', location);
 
   // Customize app for customer
   useEffect(() => {
@@ -32,10 +36,12 @@ const HAASQuestionnaire = () => {
         <ThemedBackground>
           <HAASTreeProvider>
             <CenteredScreen>
-              <Switch>
-                <Route path="/finished" render={() => <FinalScreen />} />
-                <Route path="/" render={() => <HAASForm />} />
-              </Switch>
+              <AnimatePresence>
+                <Switch key={location.pathname}>
+                  <Route path="/c/:customerId/q/:questionnaireId/finished" render={() => <FinalScreen />} />
+                  <Route path="/" render={() => <HAASForm />} />
+                </Switch>
+              </AnimatePresence>
             </CenteredScreen>
           </HAASTreeProvider>
         </ThemedBackground>

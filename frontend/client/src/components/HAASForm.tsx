@@ -9,15 +9,35 @@ import { HAASMultiChoice } from './HAASMultiChoice';
 import { HAASSocialShare } from './HAASSocialShare';
 import { HAASTextBox } from './HAASTextBox';
 import { HAASSignIn } from './HAASSignIn';
+import { AnimatePresence, motion } from 'framer-motion';
 
 export const HAASForm = () => {
   const form = useForm({
     mode: 'onChange',
   });
 
+  const pageVariants = {
+    initial: {
+      opacity: 0,
+    },
+    in: {
+      opacity: 1,
+    },
+    out: {
+      opacity: 0,
+    }
+  };
+
   return (
     <FormContext {...form}>
-      <HAASTreeComponent />
+      <motion.div
+        initial="initial"
+        animate="in"
+        exit="out"
+        variants={pageVariants}
+      >
+        <HAASTreeComponent />
+      </motion.div>
     </FormContext>
   );
 };
@@ -36,26 +56,30 @@ const HAASNodeView = () => {
   const { nodeHistoryStack } = useHAASTree();
   const activeNode = nodeHistoryStack.slice(-1)[0];
 
-  const transitions = useTransition(activeNode, (activeNode) => activeNode?.id, {
-    from: { opacity: 0, transform: 'scale(1.1)' },
-    enter: { opacity: 1, transform: 'scale(1)' },
-    leave: { opacity: 0, transform: 'scale(0.9)' }
-  });
+   const pageVariants = {
+    initial: {
+      opacity: 0,
+    },
+    in: {
+      opacity: 1,
+    },
+  };
 
   return (
     <Div useFlex flexDirection='column' justifyContent='space-between' height={['100vh', '80vh']}>
         <H1 textAlign="center" color="white">{activeNode?.title}</H1>
-        {transitions.map(({ item, key, props, state }) => {
-          if (state !== 'leave') {
-            return <Entry style={{
-              ...props,
-            }} key={key}
-            >
-              {renderNextNode(item)}
+
+        <motion.div
+          initial="initial"
+          animate="in"
+          variants={pageVariants}
+          key={activeNode.id}
+          transition={{ duration: 0.5 }}
+        >
+            <Entry >
+              {renderNextNode(activeNode)}
             </Entry>
-          }
-          return null;
-        })}
+          </motion.div>
   </Div>
   )
 }
