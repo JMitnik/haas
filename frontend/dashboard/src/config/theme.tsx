@@ -2,7 +2,8 @@
 
 const theme = {
   colors: {
-    primary: '#452f94',
+    primary: '#0866fd',
+    primaryAlt: '#8cb6ff',
     secondary: '#6f6594',
     tertiary: 'green',
     black: 'black',
@@ -11,7 +12,7 @@ const theme = {
     warning: '#ECC94B',
     error: '#F56565',
     default: {
-      lightest: '#f5f7fa',
+      lightest: '#f7faff',
       light: '#eef1f5',
       normal: '#d4dcea',
       dark: '#657590',
@@ -28,6 +29,9 @@ const theme = {
     body: '',
     title: '',
     special: '',
+  },
+  nav: {
+    height: 80,
   },
   fontSizes: [8, 12, 16, 18, 24, 32],
   buttonSizes: {

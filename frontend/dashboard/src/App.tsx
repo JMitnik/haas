@@ -3,7 +3,8 @@ import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import { ApolloProvider } from '@apollo/react-hooks';
 import styled, { ThemeProvider, css } from 'styled-components';
 
-import { TopNav, Container } from '@haas/ui';
+import { Container } from '@haas/ui';
+import TopNav from './components/Nav';
 import GlobalStyle from './config/global-styles';
 import themeConfig from './config/theme';
 import client from './config/apollo';
