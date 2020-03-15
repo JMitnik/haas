@@ -1,12 +1,12 @@
 type Questionnaire {
     id: ID! @id
-    customer: Customer! @relation(link: INLINE)
+    customer: Customer! @relation(name: "CustomerToQuestionnaire", link: INLINE)
     title: String!
     description: String!
     publicTitle: String
     creationDate: DateTime! @createdAt
     updatedAt: DateTime @updatedAt
     rootQuestion: QuestionNode @relation(link: TABLE, name: "QuestionnaireRootQuestion")
-    questions: [QuestionNode] @relation(link: TABLE, name: "QuestionnaireQuestions")
-    leafs: [LeafNode!] @relation(link: TABLE, name: "QuestionnaireLeafs")
+    questions: [QuestionNode] @relation(link: TABLE, name: "QuestionnaireToQuestions", onDelete: CASCADE)
+    leafs: [LeafNode!] @relation(link: TABLE, name: "QuestionnaireLeafs", onDelete: CASCADE)
 }

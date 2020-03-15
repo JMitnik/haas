@@ -26,6 +26,7 @@
         "color": "^3.1.2",
         "eslint": "^6.8.0",
         "graphql": "^14.5.8",
+        "graphql-tag": "^2.10.3",
         "react": "^16.12.0",
         "react-dom": "^16.12.0",
         "react-feather": "^2.0.3",
@@ -40,7 +41,7 @@
         "start": "cra-workspaces start",
         "build": "cra-workspaces build",
         "test": "react-scripts test",
-        "generate": "graphql-codegen",
+        "generate": "graphql-codegen -r dotenv/config",
         "eject": "react-scripts eject",
         "eslint": "eslint --ext .js,.jsx,.ts,.tsx ./src"
     },

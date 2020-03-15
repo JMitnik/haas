@@ -5,6 +5,7 @@ type NodeEntry {
     edgeChild: Edge
     values: [NodeEntryValue]
     depth: Int
+    creationDate: DateTime! @createdAt
 }
 
 type NodeEntryValue {

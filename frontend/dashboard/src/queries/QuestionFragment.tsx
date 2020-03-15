@@ -15,9 +15,9 @@ export const QuestionFragment = gql`
       id
       conditions {
         conditionType
+        matchValue
         renderMin
         renderMax
-        matchValue
       }
       parentNode {
         id

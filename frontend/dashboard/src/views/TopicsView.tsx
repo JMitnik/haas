@@ -1,18 +1,23 @@
 import React, { FC } from 'react';
-import { useQuery, useApolloClient, useMutation } from '@apollo/react-hooks';
-import { gql, ApolloError } from 'apollo-boost';
+import { useQuery, useMutation } from '@apollo/react-hooks';
+import { ApolloError } from 'apollo-boost';
 
 import { ChevronRight, Plus } from 'react-feather';
 import { H2, H3, H4, Grid, Flex, Icon, Label, Div, Card, CardBody, CardFooter } from '@haas/ui';
-import { Link, useHistory } from 'react-router-dom';
+import { Link, useHistory, useParams } from 'react-router-dom';
 import styled, { css } from 'styled-components';
-import { Query, Questionnaire, Customer } from '../types.d';
+import { Query, Questionnaire } from '../types.d';
 
-import { getCustomerQuery } from '../queries/getCustomerQuery';
-import { deleteFullCustomerQuery } from '../mutations/deleteFullCustomer';
+import { getQuestionnairesCustomerQuery } from '../queries/getQuestionnairesCustomerQuery';
+import { deleteQuestionnaireMutation } from '../mutations/deleteQuestionnaire';
 
-const DashboardView: FC = () => {
-  const { loading, error, data } = useQuery<Query>(getCustomerQuery);
+const TopicsView: FC = () => {
+  const { customerId } = useParams();
+  const history = useHistory();
+
+  const { loading, error, data } = useQuery<Query>(getQuestionnairesCustomerQuery, {
+    variables: { id: customerId },
+  });
 
   if (loading) return <p>Loading</p>;
 
@@ -26,25 +31,25 @@ const DashboardView: FC = () => {
     );
   }
 
-  const topics = data?.customers;
+  const topics = data?.questionnaires;
 
   return (
     <>
-      <H2 color="default.text" fontWeight={400} mb={4}>Customers</H2>
+      <H2 color="default.text" fontWeight={400} mb={4}>Topics</H2>
 
       <Grid
         gridGap={4}
         gridTemplateColumns={['1fr', '1fr 1fr 1fr']}
         gridAutoRows="minmax(200px, 1fr)"
       >
-        {topics?.map((topic, index) => topic && <CustomerCard key={index} customer={topic} />)}
+        {topics?.map((topic, index) => topic && <TopicCard key={index} topic={topic} />)}
 
         <AddTopicCard>
-          <Link to="/customer-builder" />
+          <Link to={`/c/${customerId}/topic-builder`} />
           <Div>
             <Plus />
             <H3>
-              Add new customer
+              Add topic
             </H3>
           </Div>
         </AddTopicCard>
@@ -84,55 +89,47 @@ const AddTopicCard = styled(Card)`
   `}
 `;
 
-const CustomerCardImage = styled.img`
-  width: 75px;
-  height: 75px;
-`;
-
-const CustomerCard = ({ customer }: { customer: Customer }) => {
+const TopicCard = ({ topic }: { topic: Questionnaire }) => {
   const history = useHistory();
+  const { customerId } = useParams();
 
-  const setCustomerID = (customerId: string) => {
-    history.push(`/c/${customerId}`);
-  };
-
-  const [deleteCustomer, { loading }] = useMutation(deleteFullCustomerQuery, {
+  const [deleteTopic, { loading }] = useMutation(deleteQuestionnaireMutation, {
     onCompleted: () => {
       console.log('Succesfully deleted customer !');
     },
-    refetchQueries: [{ query: getCustomerQuery }],
+    refetchQueries: [{ query: getQuestionnairesCustomerQuery,
+      variables: {
+        id: topic.customer.id,
+      } }],
     onError: (serverError: ApolloError) => {
       console.log(serverError);
     },
   });
 
-  const deleteClickedCustomer = async (customerId: string) => {
-    deleteCustomer({
+  const deleteClickedCustomer = async (topicId: string) => {
+    deleteTopic({
       variables: {
-        id: customerId,
+        id: topicId,
       },
     });
   };
 
   return (
-    <Card
-      useFlex
-      flexDirection="column"
-      backgroundColor={customer.settings?.colourSettings?.primary
-        ? customer.settings?.colourSettings?.primary : 'white'}
-    >
+    <Card useFlex flexDirection="column" onClick={() => history.push(`/c/${customerId}/t/${topic.id}`)}>
+      <button type="button" onClick={() => deleteClickedCustomer(topic.id)}>Delete</button>
       <CardBody flex="100%">
-        <button type="button" onClick={() => deleteClickedCustomer(customer.id)}>DELETE ME PLS</button>
         <Flex alignItems="center" justifyContent="space-between">
           <H3 fontWeight={500}>
-            {customer.name}
+            {topic.title}
           </H3>
-          <CustomerCardImage src={customer?.settings?.logoUrl ? customer?.settings?.logoUrl : ''} />
+          <Label brand="success">
+            Score: 9.3
+          </Label>
         </Flex>
       </CardBody>
-      <CardFooter useFlex justifyContent="center" alignItems="center" onClick={() => setCustomerID(customer.id)}>
+      <CardFooter useFlex justifyContent="center" alignItems="center">
         <H4>
-          View project
+          View topic
         </H4>
         <Icon pl={1} fontSize={1}>
           <ChevronRight />
@@ -142,4 +139,4 @@ const CustomerCard = ({ customer }: { customer: Customer }) => {
   );
 };
 
-export default DashboardView;
+export default TopicsView;

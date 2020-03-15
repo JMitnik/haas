@@ -23,12 +23,13 @@ const theme = {
   space: [0, 6, 12, 18, 24],
   gutter: 24,
   containerWidth: 1080,
-  // TODO: Add font
+  // TODO: Add
   fontFamilies: {
     body: '',
     title: '',
     special: '',
   },
+  fontSizes: [8, 12, 16, 18, 24, 32],
   buttonSizes: {
     sm: '8px 12px',
     md: '9px 14px',
