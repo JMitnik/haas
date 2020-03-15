@@ -1893,6 +1893,7 @@ export type NodeEntry = {
   relatedNode: QuestionNode;
   edgeChild?: Maybe<Edge>;
   values?: Maybe<Array<NodeEntryValue>>;
+  depth?: Maybe<Scalars['Int']>;
 };
 
 
@@ -1919,6 +1920,7 @@ export type NodeEntryCreateInput = {
   relatedNode: QuestionNodeCreateOneInput;
   edgeChild?: Maybe<EdgeCreateOneInput>;
   values?: Maybe<NodeEntryValueCreateManyInput>;
+  depth?: Maybe<Scalars['Int']>;
 };
 
 export type NodeEntryEdge = {
@@ -1931,13 +1933,16 @@ export enum NodeEntryOrderByInput {
   IdAsc = 'id_ASC',
   IdDesc = 'id_DESC',
   SessionIdAsc = 'sessionId_ASC',
-  SessionIdDesc = 'sessionId_DESC'
+  SessionIdDesc = 'sessionId_DESC',
+  DepthAsc = 'depth_ASC',
+  DepthDesc = 'depth_DESC'
 }
 
 export type NodeEntryPreviousValues = {
    __typename?: 'NodeEntryPreviousValues';
   id: Scalars['ID'];
   sessionId: Scalars['String'];
+  depth?: Maybe<Scalars['Int']>;
 };
 
 export type NodeEntrySubscriptionPayload = {
@@ -1964,10 +1969,12 @@ export type NodeEntryUpdateInput = {
   relatedNode?: Maybe<QuestionNodeUpdateOneRequiredInput>;
   edgeChild?: Maybe<EdgeUpdateOneInput>;
   values?: Maybe<NodeEntryValueUpdateManyInput>;
+  depth?: Maybe<Scalars['Int']>;
 };
 
 export type NodeEntryUpdateManyMutationInput = {
   sessionId?: Maybe<Scalars['String']>;
+  depth?: Maybe<Scalars['Int']>;
 };
 
 export type NodeEntryValue = {
@@ -2206,6 +2213,14 @@ export type NodeEntryWhereInput = {
   values_every?: Maybe<NodeEntryValueWhereInput>;
   values_some?: Maybe<NodeEntryValueWhereInput>;
   values_none?: Maybe<NodeEntryValueWhereInput>;
+  depth?: Maybe<Scalars['Int']>;
+  depth_not?: Maybe<Scalars['Int']>;
+  depth_in?: Maybe<Array<Scalars['Int']>>;
+  depth_not_in?: Maybe<Array<Scalars['Int']>>;
+  depth_lt?: Maybe<Scalars['Int']>;
+  depth_lte?: Maybe<Scalars['Int']>;
+  depth_gt?: Maybe<Scalars['Int']>;
+  depth_gte?: Maybe<Scalars['Int']>;
   AND?: Maybe<Array<NodeEntryWhereInput>>;
   OR?: Maybe<Array<NodeEntryWhereInput>>;
   NOT?: Maybe<Array<NodeEntryWhereInput>>;
@@ -4823,6 +4838,7 @@ export type NodeEntryResolvers<ContextType = any, ParentType extends ResolversPa
   relatedNode?: Resolver<ResolversTypes['QuestionNode'], ParentType, ContextType>,
   edgeChild?: Resolver<Maybe<ResolversTypes['Edge']>, ParentType, ContextType>,
   values?: Resolver<Maybe<Array<ResolversTypes['NodeEntryValue']>>, ParentType, ContextType, RequireFields<NodeEntryValuesArgs, never>>,
+  depth?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>,
   __isTypeOf?: isTypeOfResolverFn<ParentType>,
 }>;
 
@@ -4842,6 +4858,7 @@ export type NodeEntryEdgeResolvers<ContextType = any, ParentType extends Resolve
 export type NodeEntryPreviousValuesResolvers<ContextType = any, ParentType extends ResolversParentTypes['NodeEntryPreviousValues'] = ResolversParentTypes['NodeEntryPreviousValues']> = ResolversObject<{
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>,
   sessionId?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
+  depth?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>,
   __isTypeOf?: isTypeOfResolverFn<ParentType>,
 }>;
 

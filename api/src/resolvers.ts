@@ -16,7 +16,7 @@ const queryResolvers = {
 };
 
 const mutationResolvers = {
-  uploadUserEntries: async (obj: any, args: any, ctx: any, info: any) => {
+  uploadUserSession: async (obj: any, args: any, ctx: any, info: any) => {
     args.uploadEntriesInput.entries.forEach(async (entry: any) => {
       const maybeCreateEdgeChild = (entry: any) => {
         if (entry.data.edgeId) {
@@ -59,6 +59,11 @@ const resolvers = {
   },
   Mutation: {
     ...mutationResolvers,
+  },
+  Node: {
+    __resolveType(obj: any, ctx: any, info: any) {
+      return obj.__typename;
+    },
   },
 };
 

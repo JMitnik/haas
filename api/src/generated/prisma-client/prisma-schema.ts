@@ -1416,6 +1416,7 @@ type NodeEntry {
   relatedNode: QuestionNode!
   edgeChild: Edge
   values(where: NodeEntryValueWhereInput, orderBy: NodeEntryValueOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [NodeEntryValue!]
+  depth: Int
 }
 
 type NodeEntryConnection {
@@ -1430,6 +1431,7 @@ input NodeEntryCreateInput {
   relatedNode: QuestionNodeCreateOneInput!
   edgeChild: EdgeCreateOneInput
   values: NodeEntryValueCreateManyInput
+  depth: Int
 }
 
 type NodeEntryEdge {
@@ -1442,11 +1444,14 @@ enum NodeEntryOrderByInput {
   id_DESC
   sessionId_ASC
   sessionId_DESC
+  depth_ASC
+  depth_DESC
 }
 
 type NodeEntryPreviousValues {
   id: ID!
   sessionId: String!
+  depth: Int
 }
 
 type NodeEntrySubscriptionPayload {
@@ -1472,10 +1477,12 @@ input NodeEntryUpdateInput {
   relatedNode: QuestionNodeUpdateOneRequiredInput
   edgeChild: EdgeUpdateOneInput
   values: NodeEntryValueUpdateManyInput
+  depth: Int
 }
 
 input NodeEntryUpdateManyMutationInput {
   sessionId: String
+  depth: Int
 }
 
 type NodeEntryValue {
@@ -1709,6 +1716,14 @@ input NodeEntryWhereInput {
   values_every: NodeEntryValueWhereInput
   values_some: NodeEntryValueWhereInput
   values_none: NodeEntryValueWhereInput
+  depth: Int
+  depth_not: Int
+  depth_in: [Int!]
+  depth_not_in: [Int!]
+  depth_lt: Int
+  depth_lte: Int
+  depth_gt: Int
+  depth_gte: Int
   AND: [NodeEntryWhereInput!]
   OR: [NodeEntryWhereInput!]
   NOT: [NodeEntryWhereInput!]

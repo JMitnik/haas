@@ -721,7 +721,9 @@ export type NodeEntryOrderByInput =
   | "id_ASC"
   | "id_DESC"
   | "sessionId_ASC"
-  | "sessionId_DESC";
+  | "sessionId_DESC"
+  | "depth_ASC"
+  | "depth_DESC";
 
 export type MutationType = "CREATED" | "UPDATED" | "DELETED";
 
@@ -1533,6 +1535,14 @@ export interface NodeEntryWhereInput {
   values_every?: Maybe<NodeEntryValueWhereInput>;
   values_some?: Maybe<NodeEntryValueWhereInput>;
   values_none?: Maybe<NodeEntryValueWhereInput>;
+  depth?: Maybe<Int>;
+  depth_not?: Maybe<Int>;
+  depth_in?: Maybe<Int[] | Int>;
+  depth_not_in?: Maybe<Int[] | Int>;
+  depth_lt?: Maybe<Int>;
+  depth_lte?: Maybe<Int>;
+  depth_gt?: Maybe<Int>;
+  depth_gte?: Maybe<Int>;
   AND?: Maybe<NodeEntryWhereInput[] | NodeEntryWhereInput>;
   OR?: Maybe<NodeEntryWhereInput[] | NodeEntryWhereInput>;
   NOT?: Maybe<NodeEntryWhereInput[] | NodeEntryWhereInput>;
@@ -2563,6 +2573,7 @@ export interface NodeEntryCreateInput {
   relatedNode: QuestionNodeCreateOneInput;
   edgeChild?: Maybe<EdgeCreateOneInput>;
   values?: Maybe<NodeEntryValueCreateManyInput>;
+  depth?: Maybe<Int>;
 }
 
 export interface EdgeCreateOneInput {
@@ -2588,6 +2599,7 @@ export interface NodeEntryUpdateInput {
   relatedNode?: Maybe<QuestionNodeUpdateOneRequiredInput>;
   edgeChild?: Maybe<EdgeUpdateOneInput>;
   values?: Maybe<NodeEntryValueUpdateManyInput>;
+  depth?: Maybe<Int>;
 }
 
 export interface QuestionNodeUpdateOneRequiredInput {
@@ -2716,6 +2728,7 @@ export interface NodeEntryValueUpdateManyDataInput {
 
 export interface NodeEntryUpdateManyMutationInput {
   sessionId?: Maybe<String>;
+  depth?: Maybe<Int>;
 }
 
 export interface NodeEntryValueUpdateInput {
@@ -4010,6 +4023,7 @@ export interface AggregateLeafNodeSubscription
 export interface NodeEntry {
   id: ID_Output;
   sessionId: String;
+  depth?: Int;
 }
 
 export interface NodeEntryPromise extends Promise<NodeEntry>, Fragmentable {
@@ -4026,6 +4040,7 @@ export interface NodeEntryPromise extends Promise<NodeEntry>, Fragmentable {
     first?: Int;
     last?: Int;
   }) => T;
+  depth: () => Promise<Int>;
 }
 
 export interface NodeEntrySubscription
@@ -4044,6 +4059,7 @@ export interface NodeEntrySubscription
     first?: Int;
     last?: Int;
   }) => T;
+  depth: () => Promise<AsyncIterator<Int>>;
 }
 
 export interface NodeEntryNullablePromise
@@ -4062,6 +4078,7 @@ export interface NodeEntryNullablePromise
     first?: Int;
     last?: Int;
   }) => T;
+  depth: () => Promise<Int>;
 }
 
 export interface NodeEntryValue {
@@ -4792,6 +4809,7 @@ export interface NodeEntrySubscriptionPayloadSubscription
 export interface NodeEntryPreviousValues {
   id: ID_Output;
   sessionId: String;
+  depth?: Int;
 }
 
 export interface NodeEntryPreviousValuesPromise
@@ -4799,6 +4817,7 @@ export interface NodeEntryPreviousValuesPromise
     Fragmentable {
   id: () => Promise<ID_Output>;
   sessionId: () => Promise<String>;
+  depth: () => Promise<Int>;
 }
 
 export interface NodeEntryPreviousValuesSubscription
@@ -4806,6 +4825,7 @@ export interface NodeEntryPreviousValuesSubscription
     Fragmentable {
   id: () => Promise<AsyncIterator<ID_Output>>;
   sessionId: () => Promise<AsyncIterator<String>>;
+  depth: () => Promise<AsyncIterator<Int>>;
 }
 
 export interface NodeEntryValueSubscriptionPayload {

@@ -4,19 +4,20 @@ import { HAASTreeProvider } from '../hooks/use-haas-tree';
 import { HAASForm } from '../components/HAASForm';
 import { Switch, Route } from 'react-router-dom';
 import { Div, Loader } from '@haas/ui';
-import { removeEmpty } from '../utils/removeEmpty';
 import { useQuestionnaire } from '../hooks/use-questionnaire';
 import FinalScreen from './FinalScreen';
+import { makeCustomTheme } from '../utils/makeCustomerTheme';
 
 const HAASQuestionnaire = () => {
   const { customer } = useQuestionnaire();
   const [customTheme, setCustomTheme] = useState({});
 
+  // Customize app for customer
   useEffect(() => {
-    window.document.title = `${customer.name} | Powered by HAAS`
-  }, [customer]);
+    if (customer?.name) {
+      window.document.title = `${customer.name} | Powered by HAAS`;
+    }
 
-  useEffect(() => {
     if (customer?.settings) {
       const customerTheme = {colors: customer?.settings?.colourSettings};
       setCustomTheme(customerTheme);
@@ -63,12 +64,5 @@ const CenteredScreen = styled(Div)`
     }
   `}
 `;
-
-const makeCustomTheme = (currTheme: any, customTheme: any) => {
-  const colors = {...currTheme?.colors, ...removeEmpty({...customTheme?.colors})};
-  const newTheme = {...currTheme, colors};
-
-  return newTheme;
-};
 
 export default HAASQuestionnaire;

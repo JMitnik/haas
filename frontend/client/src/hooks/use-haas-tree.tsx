@@ -124,7 +124,7 @@ export const HAASTreeProvider = ({ children }: { children: ReactNode }) => {
     if (formEntry) {
       setEntryHistoryStack(entries => ([...entries, {
         nodeId: getActiveNode().id,
-        edgeId: getActiveEdge().id,
+        edgeId: getActiveEdge()?.id,
         depth: currentDepth,
         data: formEntry,
       }]));
