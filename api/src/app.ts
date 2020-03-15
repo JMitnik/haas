@@ -1,5 +1,4 @@
 import express from 'express';
-import cors from 'cors';
 import makeApollo from './apollo';
 import config from './config';
 
@@ -15,7 +14,6 @@ const main = async () => {
     },
   });
 
-  app.use(cors());
   app.listen(config.APP_PORT);
 
   console.log(`Server successfully started on port ${config.APP_PORT} for graphql entrypoint at ${apollo.graphqlPath}`);
