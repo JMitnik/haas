@@ -80,7 +80,7 @@ const TopicAnswerFlow = ({ sessionId }: { sessionId: string }) => {
   console.log('Topic answer flow: ', data);
 
   if (loading) {
-    return <div>loading...</div>;
+    return <div />;
   }
 
   const session = data?.session;
@@ -165,7 +165,7 @@ const TimelineEntry = ({ setCurrSession, timelineEntry }: { setCurrSession: Disp
           User {timelineEntry.sessionId} has voted {timelineEntry.value}
         </div>
         <div>
-          <p style={{ color: 'white', fontSize: '0.8rem', margin: '10px'}}>
+          <p style={{ color: 'white', fontSize: '0.8rem', margin: '5px' }}>
             {acceptedDate}
           </p>
         </div>
@@ -215,6 +215,7 @@ const TopicDetails = ({ QuestionnaireDetailResult }: { QuestionnaireDetailResult
 
 const TopicDetailsView = styled.div`
   display: flex;
+  align-self: flex-start;
   flex-direction: column;
 `;
 
