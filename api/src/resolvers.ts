@@ -159,6 +159,8 @@ const queryResolvers = {
   edges: forwardTo('db'),
   nodeEntryValues: forwardTo('db'),
   nodeEntries: forwardTo('db'),
+  sessions: forwardTo('db'),
+  session: forwardTo('db'),
   // TODO: Rename
   getQuestionnaireData: getQuestionnaireAggregatedData,
   nodeEntry: forwardTo('db'),
