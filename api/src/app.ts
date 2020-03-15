@@ -15,7 +15,7 @@ const main = async () => {
   });
 
   app.use((req: any, res: any, next: any) => {
-    const allowedOrigins = [config.CLIENT_URL, config.DASHBOARD_URL],;
+    const allowedOrigins = [config.CLIENT_URL, config.DASHBOARD_URL];
 
     const { origin } = req.headers;
 
