@@ -52,7 +52,30 @@ const HAASQuestionnaire = () => {
 
 const ThemedBackground = styled(Div)`
   ${({ theme }) => css`
-    background: ${theme.colors.primary};
+    background: ${theme.colors.primary || 'green'};
+
+    ${theme.colors.primary && theme.colors.primaryAlt && css`
+        animation: BackgroundMove 30s ease infinite;
+        background: linear-gradient(to right, ${theme.colors.primary}, ${theme.colors.primaryAlt});
+    `}
+
+
+    @-webkit-keyframes BackgroundMove {
+        0%{background-position:0% 50%}
+        50%{background-position:100% 50%}
+        100%{background-position:0% 50%}
+    }
+    @-moz-keyframes BackgroundMove {
+        0%{background-position:0% 50%}
+        50%{background-position:100% 50%}
+        100%{background-position:0% 50%}
+    }
+    @keyframes BackgroundMove {
+        0%{background-position:0% 50%}
+        50%{background-position:100% 50%}
+        100%{background-position:0% 50%}
+    }
+
     min-height: 100vh;
   `}
 `;

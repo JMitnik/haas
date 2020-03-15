@@ -61,6 +61,7 @@ type BatchPayload {
 type ColourSettings {
   id: ID!
   primary: String!
+  primaryAlt: String
   secondary: String
   tertiary: String
   success: String
@@ -84,6 +85,7 @@ type ColourSettingsConnection {
 input ColourSettingsCreateInput {
   id: ID
   primary: String!
+  primaryAlt: String
   secondary: String
   tertiary: String
   success: String
@@ -113,6 +115,8 @@ enum ColourSettingsOrderByInput {
   id_DESC
   primary_ASC
   primary_DESC
+  primaryAlt_ASC
+  primaryAlt_DESC
   secondary_ASC
   secondary_DESC
   tertiary_ASC
@@ -142,6 +146,7 @@ enum ColourSettingsOrderByInput {
 type ColourSettingsPreviousValues {
   id: ID!
   primary: String!
+  primaryAlt: String
   secondary: String
   tertiary: String
   success: String
@@ -176,6 +181,7 @@ input ColourSettingsSubscriptionWhereInput {
 
 input ColourSettingsUpdateDataInput {
   primary: String
+  primaryAlt: String
   secondary: String
   tertiary: String
   success: String
@@ -192,6 +198,7 @@ input ColourSettingsUpdateDataInput {
 
 input ColourSettingsUpdateInput {
   primary: String
+  primaryAlt: String
   secondary: String
   tertiary: String
   success: String
@@ -208,6 +215,7 @@ input ColourSettingsUpdateInput {
 
 input ColourSettingsUpdateManyMutationInput {
   primary: String
+  primaryAlt: String
   secondary: String
   tertiary: String
   success: String
@@ -265,6 +273,20 @@ input ColourSettingsWhereInput {
   primary_not_starts_with: String
   primary_ends_with: String
   primary_not_ends_with: String
+  primaryAlt: String
+  primaryAlt_not: String
+  primaryAlt_in: [String!]
+  primaryAlt_not_in: [String!]
+  primaryAlt_lt: String
+  primaryAlt_lte: String
+  primaryAlt_gt: String
+  primaryAlt_gte: String
+  primaryAlt_contains: String
+  primaryAlt_not_contains: String
+  primaryAlt_starts_with: String
+  primaryAlt_not_starts_with: String
+  primaryAlt_ends_with: String
+  primaryAlt_not_ends_with: String
   secondary: String
   secondary_not: String
   secondary_in: [String!]

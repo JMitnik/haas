@@ -8,6 +8,7 @@ export const CustomerFragment = gql`
       logoUrl
       colourSettings {
         primary
+        primaryAlt
         secondary
       }
     }

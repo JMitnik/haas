@@ -624,6 +624,8 @@ export type ColourSettingsOrderByInput =
   | "id_DESC"
   | "primary_ASC"
   | "primary_DESC"
+  | "primaryAlt_ASC"
+  | "primaryAlt_DESC"
   | "secondary_ASC"
   | "secondary_DESC"
   | "tertiary_ASC"
@@ -801,6 +803,20 @@ export interface ColourSettingsWhereInput {
   primary_not_starts_with?: Maybe<String>;
   primary_ends_with?: Maybe<String>;
   primary_not_ends_with?: Maybe<String>;
+  primaryAlt?: Maybe<String>;
+  primaryAlt_not?: Maybe<String>;
+  primaryAlt_in?: Maybe<String[] | String>;
+  primaryAlt_not_in?: Maybe<String[] | String>;
+  primaryAlt_lt?: Maybe<String>;
+  primaryAlt_lte?: Maybe<String>;
+  primaryAlt_gt?: Maybe<String>;
+  primaryAlt_gte?: Maybe<String>;
+  primaryAlt_contains?: Maybe<String>;
+  primaryAlt_not_contains?: Maybe<String>;
+  primaryAlt_starts_with?: Maybe<String>;
+  primaryAlt_not_starts_with?: Maybe<String>;
+  primaryAlt_ends_with?: Maybe<String>;
+  primaryAlt_not_ends_with?: Maybe<String>;
   secondary?: Maybe<String>;
   secondary_not?: Maybe<String>;
   secondary_in?: Maybe<String[] | String>;
@@ -1642,6 +1658,7 @@ export type SessionWhereUniqueInput = AtLeastOne<{
 export interface ColourSettingsCreateInput {
   id?: Maybe<ID_Input>;
   primary: String;
+  primaryAlt?: Maybe<String>;
   secondary?: Maybe<String>;
   tertiary?: Maybe<String>;
   success?: Maybe<String>;
@@ -1658,6 +1675,7 @@ export interface ColourSettingsCreateInput {
 
 export interface ColourSettingsUpdateInput {
   primary?: Maybe<String>;
+  primaryAlt?: Maybe<String>;
   secondary?: Maybe<String>;
   tertiary?: Maybe<String>;
   success?: Maybe<String>;
@@ -1674,6 +1692,7 @@ export interface ColourSettingsUpdateInput {
 
 export interface ColourSettingsUpdateManyMutationInput {
   primary?: Maybe<String>;
+  primaryAlt?: Maybe<String>;
   secondary?: Maybe<String>;
   tertiary?: Maybe<String>;
   success?: Maybe<String>;
@@ -2021,6 +2040,7 @@ export interface ColourSettingsUpdateOneInput {
 
 export interface ColourSettingsUpdateDataInput {
   primary?: Maybe<String>;
+  primaryAlt?: Maybe<String>;
   secondary?: Maybe<String>;
   tertiary?: Maybe<String>;
   success?: Maybe<String>;
@@ -3406,6 +3426,7 @@ export interface NodeNode {
 export interface ColourSettings {
   id: ID_Output;
   primary: String;
+  primaryAlt?: String;
   secondary?: String;
   tertiary?: String;
   success?: String;
@@ -3425,6 +3446,7 @@ export interface ColourSettingsPromise
     Fragmentable {
   id: () => Promise<ID_Output>;
   primary: () => Promise<String>;
+  primaryAlt: () => Promise<String>;
   secondary: () => Promise<String>;
   tertiary: () => Promise<String>;
   success: () => Promise<String>;
@@ -3444,6 +3466,7 @@ export interface ColourSettingsSubscription
     Fragmentable {
   id: () => Promise<AsyncIterator<ID_Output>>;
   primary: () => Promise<AsyncIterator<String>>;
+  primaryAlt: () => Promise<AsyncIterator<String>>;
   secondary: () => Promise<AsyncIterator<String>>;
   tertiary: () => Promise<AsyncIterator<String>>;
   success: () => Promise<AsyncIterator<String>>;
@@ -3463,6 +3486,7 @@ export interface ColourSettingsNullablePromise
     Fragmentable {
   id: () => Promise<ID_Output>;
   primary: () => Promise<String>;
+  primaryAlt: () => Promise<String>;
   secondary: () => Promise<String>;
   tertiary: () => Promise<String>;
   success: () => Promise<String>;
@@ -4932,6 +4956,7 @@ export interface ColourSettingsSubscriptionPayloadSubscription
 export interface ColourSettingsPreviousValues {
   id: ID_Output;
   primary: String;
+  primaryAlt?: String;
   secondary?: String;
   tertiary?: String;
   success?: String;
@@ -4951,6 +4976,7 @@ export interface ColourSettingsPreviousValuesPromise
     Fragmentable {
   id: () => Promise<ID_Output>;
   primary: () => Promise<String>;
+  primaryAlt: () => Promise<String>;
   secondary: () => Promise<String>;
   tertiary: () => Promise<String>;
   success: () => Promise<String>;
@@ -4970,6 +4996,7 @@ export interface ColourSettingsPreviousValuesSubscription
     Fragmentable {
   id: () => Promise<AsyncIterator<ID_Output>>;
   primary: () => Promise<AsyncIterator<String>>;
+  primaryAlt: () => Promise<AsyncIterator<String>>;
   secondary: () => Promise<AsyncIterator<String>>;
   tertiary: () => Promise<AsyncIterator<String>>;
   success: () => Promise<AsyncIterator<String>>;
