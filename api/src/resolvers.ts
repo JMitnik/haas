@@ -103,8 +103,10 @@ const getQuestionnaireAggregatedData = async (parent: any, args: any) => {
     const aggregatedNodeEntries = await Promise.all(nodeEntries.map(async ({ id }) => {
       const values = await prisma.nodeEntry({ id }).values();
       const nodeEntry = await prisma.nodeEntry({ id });
+      const sessionId = (await prisma.nodeEntry({ id }).session()).id;
 
       const mappedResult = {
+        sessionId,
         createdAt: nodeEntry?.creationDate,
         value: values[0].numberValue ? values[0].numberValue : -1,
       };

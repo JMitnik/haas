@@ -60,7 +60,7 @@ const HistoryLog = ({ timelineEntries } : { timelineEntries : Array<timelineEntr
       </Muted>
       <Hr />
       {
-        timelineEntries.length > 0 && timelineEntries?.map(
+        timelineEntries && timelineEntries.length > 0 && timelineEntries?.map(
           (timelineEntry, index) => <TimelineEntry key={index} timelineEntry={timelineEntry} />)
       }
     </HistoryLogView>
@@ -101,25 +101,31 @@ const TimelineEntryView = styled.div`
 `;
 
 const TopicDetails = ({ QuestionnaireDetailResult }: { QuestionnaireDetailResult: QuestionnaireDetailResult }) => {
-  const { customerName, title, description, creationDate, updatedAt, average, totalNodeEntries } = QuestionnaireDetailResult;
+
   return (
     <TopicDetailsView>
-      <H2 color="default.text" fontWeight={400} mb={4}>
-        {customerName} - {title}
-      </H2>
-      <Muted>
-        {description}
-      </Muted>
-      <Hr />
-      <div>
-        creationDate: {creationDate}
-      </div>
-      <div>
-        updatedAt: {updatedAt}
-      </div>
-      <div>
-        Average score: {average} ({totalNodeEntries} answer(s))
-      </div>
+      {
+        QuestionnaireDetailResult && (
+        <>
+          <H2 color="default.text" fontWeight={400} mb={4}>
+            {QuestionnaireDetailResult?.customerName} - {QuestionnaireDetailResult?.title}
+          </H2>
+          <Muted>
+            {QuestionnaireDetailResult?.description}
+          </Muted>
+          <Hr />
+          <div>
+            creationDate: {QuestionnaireDetailResult?.creationDate}
+          </div>
+          <div>
+            updatedAt: {QuestionnaireDetailResult?.updatedAt}
+          </div>
+          <div>
+            Average score: {QuestionnaireDetailResult?.average} ({QuestionnaireDetailResult?.totalNodeEntries} answer(s))
+          </div>
+        </>
+        )
+      }
     </TopicDetailsView>
   );
 };
