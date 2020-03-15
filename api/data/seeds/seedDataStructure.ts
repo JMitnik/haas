@@ -20,8 +20,8 @@ export const getStandardEdgeData = (customerName: string) => {
       conditions: [
         {
           conditionType: 'valueBoundary',
-          renderMin: 7,
-          renderMax: 10,
+          renderMin: 70,
+          renderMax: 100,
           matchValue: null,
         },
       ],
@@ -85,8 +85,8 @@ export const getStandardEdgeData = (customerName: string) => {
       conditions: [
         {
           conditionType: 'valueBoundary',
-          renderMin: 5,
-          renderMax: 7,
+          renderMin: 50,
+          renderMax: 70,
           matchValue: null,
         },
       ],
@@ -151,7 +151,7 @@ export const getStandardEdgeData = (customerName: string) => {
         {
           conditionType: 'valueBoundary',
           renderMin: 0,
-          renderMax: 5,
+          renderMax: 50,
           matchValue: null,
         },
       ],
