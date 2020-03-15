@@ -13,6 +13,10 @@ const HAASQuestionnaire = () => {
   const [customTheme, setCustomTheme] = useState({});
 
   useEffect(() => {
+    window.document.title = `${customer.name} | Powered by HAAS`
+  }, [customer]);
+
+  useEffect(() => {
     if (customer?.settings) {
       const customerTheme = {colors: customer?.settings?.colourSettings};
       setCustomTheme(customerTheme);
