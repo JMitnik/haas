@@ -64,6 +64,11 @@ export const createStandardSubChildrenWithLeaves = async (
         },
       });
 
+      if (subleafs.length > 1) {
+        console.log('Sub leafs length: ', subleafs.length);
+        console.log('SUB LEAFS: ', subleafs);
+      }
+
       let leaf = null;
 
       if (subleafs) {

@@ -74,12 +74,13 @@ export interface HAASFormEntry {
 
 const findNextEdge = (parent: HAASNode, key: string | number) => {
   const candidates = parent?.edgeChildren?.filter(edge => {
+    console.log('RENDER MIN MAX: ', edge?.conditions?.[0]?.renderMin, edge?.conditions?.[0].renderMax)
     if (parent.questionType === 'SLIDER') {
-      if (edge?.conditions?.[0]?.renderMin && edge?.conditions?.[0]?.renderMin * 100 && key < edge?.conditions?.[0].renderMin * 100) {
+      if (edge?.conditions?.[0]?.renderMin && key < edge?.conditions?.[0].renderMin) {
         return false;
       }
 
-      if (edge?.conditions?.[0]?.renderMax && edge?.conditions?.[0].renderMax * 100 && key > edge?.conditions?.[0].renderMax * 100) {
+      if (edge?.conditions?.[0]?.renderMax && key > edge?.conditions?.[0].renderMax) {
         return false;
       }
     }
@@ -89,7 +90,7 @@ const findNextEdge = (parent: HAASNode, key: string | number) => {
 
     return true;
   });
-
+  console.log('NEXT EDGE: ', candidates[0]);
   return candidates && candidates[0];
 };
 
@@ -121,6 +122,7 @@ export const HAASTreeProvider = ({ children }: { children: ReactNode }) => {
   const getActiveEdge = () => edgeHistoryStack.slice(-1)[0];
 
   const goToChild = async (key: string | number, formEntry?: HAASFormEntry) => {
+    console.log('KEY: ', key)
     if (formEntry) {
       setEntryHistoryStack(entries => ([...entries, {
         nodeId: getActiveNode().id,
