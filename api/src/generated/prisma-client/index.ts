@@ -28,6 +28,7 @@ export interface Exists {
   questionNode: (where?: QuestionNodeWhereInput) => Promise<boolean>;
   questionOption: (where?: QuestionOptionWhereInput) => Promise<boolean>;
   questionnaire: (where?: QuestionnaireWhereInput) => Promise<boolean>;
+  session: (where?: SessionWhereInput) => Promise<boolean>;
 }
 
 export interface Node {}
@@ -293,6 +294,25 @@ export interface Prisma {
     first?: Int;
     last?: Int;
   }) => QuestionnaireConnectionPromise;
+  session: (where: SessionWhereUniqueInput) => SessionNullablePromise;
+  sessions: (args?: {
+    where?: SessionWhereInput;
+    orderBy?: SessionOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => FragmentableArray<Session>;
+  sessionsConnection: (args?: {
+    where?: SessionWhereInput;
+    orderBy?: SessionOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => SessionConnectionPromise;
   node: (args: { id: ID_Output }) => Node;
 
   /**
@@ -529,6 +549,18 @@ export interface Prisma {
   deleteManyQuestionnaires: (
     where?: QuestionnaireWhereInput
   ) => BatchPayloadPromise;
+  createSession: (data: SessionCreateInput) => SessionPromise;
+  updateSession: (args: {
+    data: SessionUpdateInput;
+    where: SessionWhereUniqueInput;
+  }) => SessionPromise;
+  upsertSession: (args: {
+    where: SessionWhereUniqueInput;
+    create: SessionCreateInput;
+    update: SessionUpdateInput;
+  }) => SessionPromise;
+  deleteSession: (where: SessionWhereUniqueInput) => SessionPromise;
+  deleteManySessions: (where?: SessionWhereInput) => BatchPayloadPromise;
 
   /**
    * Subscriptions
@@ -574,6 +606,9 @@ export interface Subscription {
   questionnaire: (
     where?: QuestionnaireSubscriptionWhereInput
   ) => QuestionnaireSubscriptionPayloadSubscription;
+  session: (
+    where?: SessionSubscriptionWhereInput
+  ) => SessionSubscriptionPayloadSubscription;
 }
 
 export interface ClientConstructor<T> {
@@ -709,6 +744,14 @@ export type FontSettingsOrderByInput =
   | "special_ASC"
   | "special_DESC";
 
+export type NodeEntryOrderByInput =
+  | "id_ASC"
+  | "id_DESC"
+  | "depth_ASC"
+  | "depth_DESC"
+  | "creationDate_ASC"
+  | "creationDate_DESC";
+
 export type NodeEntryValueOrderByInput =
   | "id_ASC"
   | "id_DESC"
@@ -717,15 +760,11 @@ export type NodeEntryValueOrderByInput =
   | "numberValue_ASC"
   | "numberValue_DESC";
 
-export type NodeEntryOrderByInput =
+export type SessionOrderByInput =
   | "id_ASC"
   | "id_DESC"
-  | "sessionId_ASC"
-  | "sessionId_DESC"
-  | "depth_ASC"
-  | "depth_DESC"
-  | "creationDate_ASC"
-  | "creationDate_DESC";
+  | "createdAt_ASC"
+  | "createdAt_DESC";
 
 export type MutationType = "CREATED" | "UPDATED" | "DELETED";
 
@@ -1461,6 +1500,79 @@ export type NodeEntryWhereUniqueInput = AtLeastOne<{
   id: Maybe<ID_Input>;
 }>;
 
+export interface NodeEntryWhereInput {
+  id?: Maybe<ID_Input>;
+  id_not?: Maybe<ID_Input>;
+  id_in?: Maybe<ID_Input[] | ID_Input>;
+  id_not_in?: Maybe<ID_Input[] | ID_Input>;
+  id_lt?: Maybe<ID_Input>;
+  id_lte?: Maybe<ID_Input>;
+  id_gt?: Maybe<ID_Input>;
+  id_gte?: Maybe<ID_Input>;
+  id_contains?: Maybe<ID_Input>;
+  id_not_contains?: Maybe<ID_Input>;
+  id_starts_with?: Maybe<ID_Input>;
+  id_not_starts_with?: Maybe<ID_Input>;
+  id_ends_with?: Maybe<ID_Input>;
+  id_not_ends_with?: Maybe<ID_Input>;
+  session?: Maybe<SessionWhereInput>;
+  relatedNode?: Maybe<QuestionNodeWhereInput>;
+  edgeChild?: Maybe<EdgeWhereInput>;
+  values_every?: Maybe<NodeEntryValueWhereInput>;
+  values_some?: Maybe<NodeEntryValueWhereInput>;
+  values_none?: Maybe<NodeEntryValueWhereInput>;
+  depth?: Maybe<Int>;
+  depth_not?: Maybe<Int>;
+  depth_in?: Maybe<Int[] | Int>;
+  depth_not_in?: Maybe<Int[] | Int>;
+  depth_lt?: Maybe<Int>;
+  depth_lte?: Maybe<Int>;
+  depth_gt?: Maybe<Int>;
+  depth_gte?: Maybe<Int>;
+  creationDate?: Maybe<DateTimeInput>;
+  creationDate_not?: Maybe<DateTimeInput>;
+  creationDate_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  creationDate_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  creationDate_lt?: Maybe<DateTimeInput>;
+  creationDate_lte?: Maybe<DateTimeInput>;
+  creationDate_gt?: Maybe<DateTimeInput>;
+  creationDate_gte?: Maybe<DateTimeInput>;
+  AND?: Maybe<NodeEntryWhereInput[] | NodeEntryWhereInput>;
+  OR?: Maybe<NodeEntryWhereInput[] | NodeEntryWhereInput>;
+  NOT?: Maybe<NodeEntryWhereInput[] | NodeEntryWhereInput>;
+}
+
+export interface SessionWhereInput {
+  id?: Maybe<ID_Input>;
+  id_not?: Maybe<ID_Input>;
+  id_in?: Maybe<ID_Input[] | ID_Input>;
+  id_not_in?: Maybe<ID_Input[] | ID_Input>;
+  id_lt?: Maybe<ID_Input>;
+  id_lte?: Maybe<ID_Input>;
+  id_gt?: Maybe<ID_Input>;
+  id_gte?: Maybe<ID_Input>;
+  id_contains?: Maybe<ID_Input>;
+  id_not_contains?: Maybe<ID_Input>;
+  id_starts_with?: Maybe<ID_Input>;
+  id_not_starts_with?: Maybe<ID_Input>;
+  id_ends_with?: Maybe<ID_Input>;
+  id_not_ends_with?: Maybe<ID_Input>;
+  nodeEntries_every?: Maybe<NodeEntryWhereInput>;
+  nodeEntries_some?: Maybe<NodeEntryWhereInput>;
+  nodeEntries_none?: Maybe<NodeEntryWhereInput>;
+  createdAt?: Maybe<DateTimeInput>;
+  createdAt_not?: Maybe<DateTimeInput>;
+  createdAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  createdAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  createdAt_lt?: Maybe<DateTimeInput>;
+  createdAt_lte?: Maybe<DateTimeInput>;
+  createdAt_gt?: Maybe<DateTimeInput>;
+  createdAt_gte?: Maybe<DateTimeInput>;
+  AND?: Maybe<SessionWhereInput[] | SessionWhereInput>;
+  OR?: Maybe<SessionWhereInput[] | SessionWhereInput>;
+  NOT?: Maybe<SessionWhereInput[] | SessionWhereInput>;
+}
+
 export interface NodeEntryValueWhereInput {
   id?: Maybe<ID_Input>;
   id_not?: Maybe<ID_Input>;
@@ -1503,61 +1615,6 @@ export interface NodeEntryValueWhereInput {
   NOT?: Maybe<NodeEntryValueWhereInput[] | NodeEntryValueWhereInput>;
 }
 
-export interface NodeEntryWhereInput {
-  id?: Maybe<ID_Input>;
-  id_not?: Maybe<ID_Input>;
-  id_in?: Maybe<ID_Input[] | ID_Input>;
-  id_not_in?: Maybe<ID_Input[] | ID_Input>;
-  id_lt?: Maybe<ID_Input>;
-  id_lte?: Maybe<ID_Input>;
-  id_gt?: Maybe<ID_Input>;
-  id_gte?: Maybe<ID_Input>;
-  id_contains?: Maybe<ID_Input>;
-  id_not_contains?: Maybe<ID_Input>;
-  id_starts_with?: Maybe<ID_Input>;
-  id_not_starts_with?: Maybe<ID_Input>;
-  id_ends_with?: Maybe<ID_Input>;
-  id_not_ends_with?: Maybe<ID_Input>;
-  sessionId?: Maybe<String>;
-  sessionId_not?: Maybe<String>;
-  sessionId_in?: Maybe<String[] | String>;
-  sessionId_not_in?: Maybe<String[] | String>;
-  sessionId_lt?: Maybe<String>;
-  sessionId_lte?: Maybe<String>;
-  sessionId_gt?: Maybe<String>;
-  sessionId_gte?: Maybe<String>;
-  sessionId_contains?: Maybe<String>;
-  sessionId_not_contains?: Maybe<String>;
-  sessionId_starts_with?: Maybe<String>;
-  sessionId_not_starts_with?: Maybe<String>;
-  sessionId_ends_with?: Maybe<String>;
-  sessionId_not_ends_with?: Maybe<String>;
-  relatedNode?: Maybe<QuestionNodeWhereInput>;
-  edgeChild?: Maybe<EdgeWhereInput>;
-  values_every?: Maybe<NodeEntryValueWhereInput>;
-  values_some?: Maybe<NodeEntryValueWhereInput>;
-  values_none?: Maybe<NodeEntryValueWhereInput>;
-  depth?: Maybe<Int>;
-  depth_not?: Maybe<Int>;
-  depth_in?: Maybe<Int[] | Int>;
-  depth_not_in?: Maybe<Int[] | Int>;
-  depth_lt?: Maybe<Int>;
-  depth_lte?: Maybe<Int>;
-  depth_gt?: Maybe<Int>;
-  depth_gte?: Maybe<Int>;
-  creationDate?: Maybe<DateTimeInput>;
-  creationDate_not?: Maybe<DateTimeInput>;
-  creationDate_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  creationDate_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  creationDate_lt?: Maybe<DateTimeInput>;
-  creationDate_lte?: Maybe<DateTimeInput>;
-  creationDate_gt?: Maybe<DateTimeInput>;
-  creationDate_gte?: Maybe<DateTimeInput>;
-  AND?: Maybe<NodeEntryWhereInput[] | NodeEntryWhereInput>;
-  OR?: Maybe<NodeEntryWhereInput[] | NodeEntryWhereInput>;
-  NOT?: Maybe<NodeEntryWhereInput[] | NodeEntryWhereInput>;
-}
-
 export type NodeEntryValueWhereUniqueInput = AtLeastOne<{
   id: Maybe<ID_Input>;
 }>;
@@ -1575,6 +1632,10 @@ export type QuestionOptionWhereUniqueInput = AtLeastOne<{
 }>;
 
 export type QuestionnaireWhereUniqueInput = AtLeastOne<{
+  id: Maybe<ID_Input>;
+}>;
+
+export type SessionWhereUniqueInput = AtLeastOne<{
   id: Maybe<ID_Input>;
 }>;
 
@@ -2764,11 +2825,20 @@ export interface LeafNodeUpdateManyMutationInput {
 
 export interface NodeEntryCreateInput {
   id?: Maybe<ID_Input>;
-  sessionId: String;
+  session: SessionCreateOneWithoutNodeEntriesInput;
   relatedNode: QuestionNodeCreateOneInput;
   edgeChild?: Maybe<EdgeCreateOneInput>;
   values?: Maybe<NodeEntryValueCreateManyInput>;
   depth?: Maybe<Int>;
+}
+
+export interface SessionCreateOneWithoutNodeEntriesInput {
+  create?: Maybe<SessionCreateWithoutNodeEntriesInput>;
+  connect?: Maybe<SessionWhereUniqueInput>;
+}
+
+export interface SessionCreateWithoutNodeEntriesInput {
+  id?: Maybe<ID_Input>;
 }
 
 export interface EdgeCreateOneInput {
@@ -2790,11 +2860,16 @@ export interface NodeEntryValueCreateInput {
 }
 
 export interface NodeEntryUpdateInput {
-  sessionId?: Maybe<String>;
+  session?: Maybe<SessionUpdateOneRequiredWithoutNodeEntriesInput>;
   relatedNode?: Maybe<QuestionNodeUpdateOneRequiredInput>;
   edgeChild?: Maybe<EdgeUpdateOneInput>;
   values?: Maybe<NodeEntryValueUpdateManyInput>;
   depth?: Maybe<Int>;
+}
+
+export interface SessionUpdateOneRequiredWithoutNodeEntriesInput {
+  create?: Maybe<SessionCreateWithoutNodeEntriesInput>;
+  connect?: Maybe<SessionWhereUniqueInput>;
 }
 
 export interface QuestionNodeUpdateOneRequiredInput {
@@ -2922,7 +2997,6 @@ export interface NodeEntryValueUpdateManyDataInput {
 }
 
 export interface NodeEntryUpdateManyMutationInput {
-  sessionId?: Maybe<String>;
   depth?: Maybe<Int>;
 }
 
@@ -2993,6 +3067,116 @@ export interface QuestionnaireUpdateManyMutationInput {
   title?: Maybe<String>;
   description?: Maybe<String>;
   publicTitle?: Maybe<String>;
+}
+
+export interface SessionCreateInput {
+  id?: Maybe<ID_Input>;
+  nodeEntries?: Maybe<NodeEntryCreateManyWithoutSessionInput>;
+}
+
+export interface NodeEntryCreateManyWithoutSessionInput {
+  create?: Maybe<
+    NodeEntryCreateWithoutSessionInput[] | NodeEntryCreateWithoutSessionInput
+  >;
+  connect?: Maybe<NodeEntryWhereUniqueInput[] | NodeEntryWhereUniqueInput>;
+}
+
+export interface NodeEntryCreateWithoutSessionInput {
+  id?: Maybe<ID_Input>;
+  relatedNode: QuestionNodeCreateOneInput;
+  edgeChild?: Maybe<EdgeCreateOneInput>;
+  values?: Maybe<NodeEntryValueCreateManyInput>;
+  depth?: Maybe<Int>;
+}
+
+export interface SessionUpdateInput {
+  nodeEntries?: Maybe<NodeEntryUpdateManyWithoutSessionInput>;
+}
+
+export interface NodeEntryUpdateManyWithoutSessionInput {
+  create?: Maybe<
+    NodeEntryCreateWithoutSessionInput[] | NodeEntryCreateWithoutSessionInput
+  >;
+  delete?: Maybe<NodeEntryWhereUniqueInput[] | NodeEntryWhereUniqueInput>;
+  connect?: Maybe<NodeEntryWhereUniqueInput[] | NodeEntryWhereUniqueInput>;
+  set?: Maybe<NodeEntryWhereUniqueInput[] | NodeEntryWhereUniqueInput>;
+  disconnect?: Maybe<NodeEntryWhereUniqueInput[] | NodeEntryWhereUniqueInput>;
+  update?: Maybe<
+    | NodeEntryUpdateWithWhereUniqueWithoutSessionInput[]
+    | NodeEntryUpdateWithWhereUniqueWithoutSessionInput
+  >;
+  upsert?: Maybe<
+    | NodeEntryUpsertWithWhereUniqueWithoutSessionInput[]
+    | NodeEntryUpsertWithWhereUniqueWithoutSessionInput
+  >;
+  deleteMany?: Maybe<NodeEntryScalarWhereInput[] | NodeEntryScalarWhereInput>;
+  updateMany?: Maybe<
+    | NodeEntryUpdateManyWithWhereNestedInput[]
+    | NodeEntryUpdateManyWithWhereNestedInput
+  >;
+}
+
+export interface NodeEntryUpdateWithWhereUniqueWithoutSessionInput {
+  where: NodeEntryWhereUniqueInput;
+  data: NodeEntryUpdateWithoutSessionDataInput;
+}
+
+export interface NodeEntryUpdateWithoutSessionDataInput {
+  relatedNode?: Maybe<QuestionNodeUpdateOneRequiredInput>;
+  edgeChild?: Maybe<EdgeUpdateOneInput>;
+  values?: Maybe<NodeEntryValueUpdateManyInput>;
+  depth?: Maybe<Int>;
+}
+
+export interface NodeEntryUpsertWithWhereUniqueWithoutSessionInput {
+  where: NodeEntryWhereUniqueInput;
+  update: NodeEntryUpdateWithoutSessionDataInput;
+  create: NodeEntryCreateWithoutSessionInput;
+}
+
+export interface NodeEntryScalarWhereInput {
+  id?: Maybe<ID_Input>;
+  id_not?: Maybe<ID_Input>;
+  id_in?: Maybe<ID_Input[] | ID_Input>;
+  id_not_in?: Maybe<ID_Input[] | ID_Input>;
+  id_lt?: Maybe<ID_Input>;
+  id_lte?: Maybe<ID_Input>;
+  id_gt?: Maybe<ID_Input>;
+  id_gte?: Maybe<ID_Input>;
+  id_contains?: Maybe<ID_Input>;
+  id_not_contains?: Maybe<ID_Input>;
+  id_starts_with?: Maybe<ID_Input>;
+  id_not_starts_with?: Maybe<ID_Input>;
+  id_ends_with?: Maybe<ID_Input>;
+  id_not_ends_with?: Maybe<ID_Input>;
+  depth?: Maybe<Int>;
+  depth_not?: Maybe<Int>;
+  depth_in?: Maybe<Int[] | Int>;
+  depth_not_in?: Maybe<Int[] | Int>;
+  depth_lt?: Maybe<Int>;
+  depth_lte?: Maybe<Int>;
+  depth_gt?: Maybe<Int>;
+  depth_gte?: Maybe<Int>;
+  creationDate?: Maybe<DateTimeInput>;
+  creationDate_not?: Maybe<DateTimeInput>;
+  creationDate_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  creationDate_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  creationDate_lt?: Maybe<DateTimeInput>;
+  creationDate_lte?: Maybe<DateTimeInput>;
+  creationDate_gt?: Maybe<DateTimeInput>;
+  creationDate_gte?: Maybe<DateTimeInput>;
+  AND?: Maybe<NodeEntryScalarWhereInput[] | NodeEntryScalarWhereInput>;
+  OR?: Maybe<NodeEntryScalarWhereInput[] | NodeEntryScalarWhereInput>;
+  NOT?: Maybe<NodeEntryScalarWhereInput[] | NodeEntryScalarWhereInput>;
+}
+
+export interface NodeEntryUpdateManyWithWhereNestedInput {
+  where: NodeEntryScalarWhereInput;
+  data: NodeEntryUpdateManyDataInput;
+}
+
+export interface NodeEntryUpdateManyDataInput {
+  depth?: Maybe<Int>;
 }
 
 export interface ColourSettingsSubscriptionWhereInput {
@@ -3202,6 +3386,17 @@ export interface QuestionnaireSubscriptionWhereInput {
   NOT?: Maybe<
     QuestionnaireSubscriptionWhereInput[] | QuestionnaireSubscriptionWhereInput
   >;
+}
+
+export interface SessionSubscriptionWhereInput {
+  mutation_in?: Maybe<MutationType[] | MutationType>;
+  updatedFields_contains?: Maybe<String>;
+  updatedFields_contains_every?: Maybe<String[] | String>;
+  updatedFields_contains_some?: Maybe<String[] | String>;
+  node?: Maybe<SessionWhereInput>;
+  AND?: Maybe<SessionSubscriptionWhereInput[] | SessionSubscriptionWhereInput>;
+  OR?: Maybe<SessionSubscriptionWhereInput[] | SessionSubscriptionWhereInput>;
+  NOT?: Maybe<SessionSubscriptionWhereInput[] | SessionSubscriptionWhereInput>;
 }
 
 export interface NodeNode {
@@ -4160,14 +4355,13 @@ export interface AggregateLeafNodeSubscription
 
 export interface NodeEntry {
   id: ID_Output;
-  sessionId: String;
   depth?: Int;
   creationDate: DateTimeOutput;
 }
 
 export interface NodeEntryPromise extends Promise<NodeEntry>, Fragmentable {
   id: () => Promise<ID_Output>;
-  sessionId: () => Promise<String>;
+  session: <T = SessionPromise>() => T;
   relatedNode: <T = QuestionNodePromise>() => T;
   edgeChild: <T = EdgePromise>() => T;
   values: <T = FragmentableArray<NodeEntryValue>>(args?: {
@@ -4187,7 +4381,7 @@ export interface NodeEntrySubscription
   extends Promise<AsyncIterator<NodeEntry>>,
     Fragmentable {
   id: () => Promise<AsyncIterator<ID_Output>>;
-  sessionId: () => Promise<AsyncIterator<String>>;
+  session: <T = SessionSubscription>() => T;
   relatedNode: <T = QuestionNodeSubscription>() => T;
   edgeChild: <T = EdgeSubscription>() => T;
   values: <T = Promise<AsyncIterator<NodeEntryValueSubscription>>>(args?: {
@@ -4207,7 +4401,7 @@ export interface NodeEntryNullablePromise
   extends Promise<NodeEntry | null>,
     Fragmentable {
   id: () => Promise<ID_Output>;
-  sessionId: () => Promise<String>;
+  session: <T = SessionPromise>() => T;
   relatedNode: <T = QuestionNodePromise>() => T;
   edgeChild: <T = EdgePromise>() => T;
   values: <T = FragmentableArray<NodeEntryValue>>(args?: {
@@ -4221,6 +4415,57 @@ export interface NodeEntryNullablePromise
   }) => T;
   depth: () => Promise<Int>;
   creationDate: () => Promise<DateTimeOutput>;
+}
+
+export interface Session {
+  id: ID_Output;
+  createdAt: DateTimeOutput;
+}
+
+export interface SessionPromise extends Promise<Session>, Fragmentable {
+  id: () => Promise<ID_Output>;
+  nodeEntries: <T = FragmentableArray<NodeEntry>>(args?: {
+    where?: NodeEntryWhereInput;
+    orderBy?: NodeEntryOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => T;
+  createdAt: () => Promise<DateTimeOutput>;
+}
+
+export interface SessionSubscription
+  extends Promise<AsyncIterator<Session>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  nodeEntries: <T = Promise<AsyncIterator<NodeEntrySubscription>>>(args?: {
+    where?: NodeEntryWhereInput;
+    orderBy?: NodeEntryOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => T;
+  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+}
+
+export interface SessionNullablePromise
+  extends Promise<Session | null>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  nodeEntries: <T = FragmentableArray<NodeEntry>>(args?: {
+    where?: NodeEntryWhereInput;
+    orderBy?: NodeEntryOrderByInput;
+    skip?: Int;
+    after?: String;
+    before?: String;
+    first?: Int;
+    last?: Int;
+  }) => T;
+  createdAt: () => Promise<DateTimeOutput>;
 }
 
 export interface NodeEntryValue {
@@ -4589,6 +4834,60 @@ export interface AggregateQuestionnaireSubscription
   count: () => Promise<AsyncIterator<Int>>;
 }
 
+export interface SessionConnection {
+  pageInfo: PageInfo;
+  edges: SessionEdge[];
+}
+
+export interface SessionConnectionPromise
+  extends Promise<SessionConnection>,
+    Fragmentable {
+  pageInfo: <T = PageInfoPromise>() => T;
+  edges: <T = FragmentableArray<SessionEdge>>() => T;
+  aggregate: <T = AggregateSessionPromise>() => T;
+}
+
+export interface SessionConnectionSubscription
+  extends Promise<AsyncIterator<SessionConnection>>,
+    Fragmentable {
+  pageInfo: <T = PageInfoSubscription>() => T;
+  edges: <T = Promise<AsyncIterator<SessionEdgeSubscription>>>() => T;
+  aggregate: <T = AggregateSessionSubscription>() => T;
+}
+
+export interface SessionEdge {
+  node: Session;
+  cursor: String;
+}
+
+export interface SessionEdgePromise extends Promise<SessionEdge>, Fragmentable {
+  node: <T = SessionPromise>() => T;
+  cursor: () => Promise<String>;
+}
+
+export interface SessionEdgeSubscription
+  extends Promise<AsyncIterator<SessionEdge>>,
+    Fragmentable {
+  node: <T = SessionSubscription>() => T;
+  cursor: () => Promise<AsyncIterator<String>>;
+}
+
+export interface AggregateSession {
+  count: Int;
+}
+
+export interface AggregateSessionPromise
+  extends Promise<AggregateSession>,
+    Fragmentable {
+  count: () => Promise<Int>;
+}
+
+export interface AggregateSessionSubscription
+  extends Promise<AsyncIterator<AggregateSession>>,
+    Fragmentable {
+  count: () => Promise<AsyncIterator<Int>>;
+}
+
 export interface BatchPayload {
   count: Long;
 }
@@ -4950,7 +5249,6 @@ export interface NodeEntrySubscriptionPayloadSubscription
 
 export interface NodeEntryPreviousValues {
   id: ID_Output;
-  sessionId: String;
   depth?: Int;
   creationDate: DateTimeOutput;
 }
@@ -4959,7 +5257,6 @@ export interface NodeEntryPreviousValuesPromise
   extends Promise<NodeEntryPreviousValues>,
     Fragmentable {
   id: () => Promise<ID_Output>;
-  sessionId: () => Promise<String>;
   depth: () => Promise<Int>;
   creationDate: () => Promise<DateTimeOutput>;
 }
@@ -4968,7 +5265,6 @@ export interface NodeEntryPreviousValuesSubscription
   extends Promise<AsyncIterator<NodeEntryPreviousValues>>,
     Fragmentable {
   id: () => Promise<AsyncIterator<ID_Output>>;
-  sessionId: () => Promise<AsyncIterator<String>>;
   depth: () => Promise<AsyncIterator<Int>>;
   creationDate: () => Promise<AsyncIterator<DateTimeOutput>>;
 }
@@ -5229,6 +5525,50 @@ export interface QuestionnairePreviousValuesSubscription
   updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
 }
 
+export interface SessionSubscriptionPayload {
+  mutation: MutationType;
+  node: Session;
+  updatedFields: String[];
+  previousValues: SessionPreviousValues;
+}
+
+export interface SessionSubscriptionPayloadPromise
+  extends Promise<SessionSubscriptionPayload>,
+    Fragmentable {
+  mutation: () => Promise<MutationType>;
+  node: <T = SessionPromise>() => T;
+  updatedFields: () => Promise<String[]>;
+  previousValues: <T = SessionPreviousValuesPromise>() => T;
+}
+
+export interface SessionSubscriptionPayloadSubscription
+  extends Promise<AsyncIterator<SessionSubscriptionPayload>>,
+    Fragmentable {
+  mutation: () => Promise<AsyncIterator<MutationType>>;
+  node: <T = SessionSubscription>() => T;
+  updatedFields: () => Promise<AsyncIterator<String[]>>;
+  previousValues: <T = SessionPreviousValuesSubscription>() => T;
+}
+
+export interface SessionPreviousValues {
+  id: ID_Output;
+  createdAt: DateTimeOutput;
+}
+
+export interface SessionPreviousValuesPromise
+  extends Promise<SessionPreviousValues>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  createdAt: () => Promise<DateTimeOutput>;
+}
+
+export interface SessionPreviousValuesSubscription
+  extends Promise<AsyncIterator<SessionPreviousValues>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+}
+
 /*
 The `ID` scalar type represents a unique identifier, often used to refetch an object or as key for a cache. The ID type appears in a JSON response as a String; however, it is not intended to be human-readable. When expected as an input type, any string (such as `"4"`) or integer (such as `4`) input value will be accepted as an ID.
 */
@@ -5317,6 +5657,10 @@ export const models: Model[] = [
   },
   {
     name: "NodeEntryValue",
+    embedded: false
+  },
+  {
+    name: "Session",
     embedded: false
   }
 ];

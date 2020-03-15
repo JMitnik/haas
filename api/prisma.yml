@@ -9,6 +9,7 @@ datamodel:
   - src/models/question/Question.prisma
   - src/models/edge/edge.prisma
   - src/models/users/NodeEntry.prisma
+  - src/models/session/Session.prisma
 
 generate:
   #  Generate the client to use for the API

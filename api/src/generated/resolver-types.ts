@@ -72,6 +72,11 @@ export type AggregateQuestionOption = {
   count: Scalars['Int'];
 };
 
+export type AggregateSession = {
+   __typename?: 'AggregateSession';
+  count: Scalars['Int'];
+};
+
 export type BatchPayload = {
    __typename?: 'BatchPayload';
   count: Scalars['Long'];
@@ -1477,6 +1482,11 @@ export type Mutation = {
   upsertQuestionnaire: Questionnaire;
   deleteQuestionnaire?: Maybe<Questionnaire>;
   deleteManyQuestionnaires: BatchPayload;
+  createSession: Session;
+  updateSession?: Maybe<Session>;
+  upsertSession: Session;
+  deleteSession?: Maybe<Session>;
+  deleteManySessions: BatchPayload;
 };
 
 
@@ -1881,6 +1891,34 @@ export type MutationDeleteManyQuestionnairesArgs = {
   where?: Maybe<QuestionnaireWhereInput>;
 };
 
+
+export type MutationCreateSessionArgs = {
+  data: SessionCreateInput;
+};
+
+
+export type MutationUpdateSessionArgs = {
+  data: SessionUpdateInput;
+  where: SessionWhereUniqueInput;
+};
+
+
+export type MutationUpsertSessionArgs = {
+  where: SessionWhereUniqueInput;
+  create: SessionCreateInput;
+  update: SessionUpdateInput;
+};
+
+
+export type MutationDeleteSessionArgs = {
+  where: SessionWhereUniqueInput;
+};
+
+
+export type MutationDeleteManySessionsArgs = {
+  where?: Maybe<SessionWhereInput>;
+};
+
 export enum MutationType {
   Created = 'CREATED',
   Updated = 'UPDATED',
@@ -1894,7 +1932,7 @@ export type Node = {
 export type NodeEntry = {
    __typename?: 'NodeEntry';
   id: Scalars['ID'];
-  sessionId: Scalars['String'];
+  session: Session;
   relatedNode: QuestionNode;
   edgeChild?: Maybe<Edge>;
   values?: Maybe<Array<NodeEntryValue>>;
@@ -1922,7 +1960,20 @@ export type NodeEntryConnection = {
 
 export type NodeEntryCreateInput = {
   id?: Maybe<Scalars['ID']>;
-  sessionId: Scalars['String'];
+  session: SessionCreateOneWithoutNodeEntriesInput;
+  relatedNode: QuestionNodeCreateOneInput;
+  edgeChild?: Maybe<EdgeCreateOneInput>;
+  values?: Maybe<NodeEntryValueCreateManyInput>;
+  depth?: Maybe<Scalars['Int']>;
+};
+
+export type NodeEntryCreateManyWithoutSessionInput = {
+  create?: Maybe<Array<NodeEntryCreateWithoutSessionInput>>;
+  connect?: Maybe<Array<NodeEntryWhereUniqueInput>>;
+};
+
+export type NodeEntryCreateWithoutSessionInput = {
+  id?: Maybe<Scalars['ID']>;
   relatedNode: QuestionNodeCreateOneInput;
   edgeChild?: Maybe<EdgeCreateOneInput>;
   values?: Maybe<NodeEntryValueCreateManyInput>;
@@ -1938,8 +1989,6 @@ export type NodeEntryEdge = {
 export enum NodeEntryOrderByInput {
   IdAsc = 'id_ASC',
   IdDesc = 'id_DESC',
-  SessionIdAsc = 'sessionId_ASC',
-  SessionIdDesc = 'sessionId_DESC',
   DepthAsc = 'depth_ASC',
   DepthDesc = 'depth_DESC',
   CreationDateAsc = 'creationDate_ASC',
@@ -1949,9 +1998,44 @@ export enum NodeEntryOrderByInput {
 export type NodeEntryPreviousValues = {
    __typename?: 'NodeEntryPreviousValues';
   id: Scalars['ID'];
-  sessionId: Scalars['String'];
   depth?: Maybe<Scalars['Int']>;
   creationDate: Scalars['DateTime'];
+};
+
+export type NodeEntryScalarWhereInput = {
+  id?: Maybe<Scalars['ID']>;
+  id_not?: Maybe<Scalars['ID']>;
+  id_in?: Maybe<Array<Scalars['ID']>>;
+  id_not_in?: Maybe<Array<Scalars['ID']>>;
+  id_lt?: Maybe<Scalars['ID']>;
+  id_lte?: Maybe<Scalars['ID']>;
+  id_gt?: Maybe<Scalars['ID']>;
+  id_gte?: Maybe<Scalars['ID']>;
+  id_contains?: Maybe<Scalars['ID']>;
+  id_not_contains?: Maybe<Scalars['ID']>;
+  id_starts_with?: Maybe<Scalars['ID']>;
+  id_not_starts_with?: Maybe<Scalars['ID']>;
+  id_ends_with?: Maybe<Scalars['ID']>;
+  id_not_ends_with?: Maybe<Scalars['ID']>;
+  depth?: Maybe<Scalars['Int']>;
+  depth_not?: Maybe<Scalars['Int']>;
+  depth_in?: Maybe<Array<Scalars['Int']>>;
+  depth_not_in?: Maybe<Array<Scalars['Int']>>;
+  depth_lt?: Maybe<Scalars['Int']>;
+  depth_lte?: Maybe<Scalars['Int']>;
+  depth_gt?: Maybe<Scalars['Int']>;
+  depth_gte?: Maybe<Scalars['Int']>;
+  creationDate?: Maybe<Scalars['DateTime']>;
+  creationDate_not?: Maybe<Scalars['DateTime']>;
+  creationDate_in?: Maybe<Array<Scalars['DateTime']>>;
+  creationDate_not_in?: Maybe<Array<Scalars['DateTime']>>;
+  creationDate_lt?: Maybe<Scalars['DateTime']>;
+  creationDate_lte?: Maybe<Scalars['DateTime']>;
+  creationDate_gt?: Maybe<Scalars['DateTime']>;
+  creationDate_gte?: Maybe<Scalars['DateTime']>;
+  AND?: Maybe<Array<NodeEntryScalarWhereInput>>;
+  OR?: Maybe<Array<NodeEntryScalarWhereInput>>;
+  NOT?: Maybe<Array<NodeEntryScalarWhereInput>>;
 };
 
 export type NodeEntrySubscriptionPayload = {
@@ -1974,16 +2058,54 @@ export type NodeEntrySubscriptionWhereInput = {
 };
 
 export type NodeEntryUpdateInput = {
-  sessionId?: Maybe<Scalars['String']>;
+  session?: Maybe<SessionUpdateOneRequiredWithoutNodeEntriesInput>;
   relatedNode?: Maybe<QuestionNodeUpdateOneRequiredInput>;
   edgeChild?: Maybe<EdgeUpdateOneInput>;
   values?: Maybe<NodeEntryValueUpdateManyInput>;
   depth?: Maybe<Scalars['Int']>;
 };
 
-export type NodeEntryUpdateManyMutationInput = {
-  sessionId?: Maybe<Scalars['String']>;
+export type NodeEntryUpdateManyDataInput = {
   depth?: Maybe<Scalars['Int']>;
+};
+
+export type NodeEntryUpdateManyMutationInput = {
+  depth?: Maybe<Scalars['Int']>;
+};
+
+export type NodeEntryUpdateManyWithoutSessionInput = {
+  create?: Maybe<Array<NodeEntryCreateWithoutSessionInput>>;
+  delete?: Maybe<Array<NodeEntryWhereUniqueInput>>;
+  connect?: Maybe<Array<NodeEntryWhereUniqueInput>>;
+  set?: Maybe<Array<NodeEntryWhereUniqueInput>>;
+  disconnect?: Maybe<Array<NodeEntryWhereUniqueInput>>;
+  update?: Maybe<Array<NodeEntryUpdateWithWhereUniqueWithoutSessionInput>>;
+  upsert?: Maybe<Array<NodeEntryUpsertWithWhereUniqueWithoutSessionInput>>;
+  deleteMany?: Maybe<Array<NodeEntryScalarWhereInput>>;
+  updateMany?: Maybe<Array<NodeEntryUpdateManyWithWhereNestedInput>>;
+};
+
+export type NodeEntryUpdateManyWithWhereNestedInput = {
+  where: NodeEntryScalarWhereInput;
+  data: NodeEntryUpdateManyDataInput;
+};
+
+export type NodeEntryUpdateWithoutSessionDataInput = {
+  relatedNode?: Maybe<QuestionNodeUpdateOneRequiredInput>;
+  edgeChild?: Maybe<EdgeUpdateOneInput>;
+  values?: Maybe<NodeEntryValueUpdateManyInput>;
+  depth?: Maybe<Scalars['Int']>;
+};
+
+export type NodeEntryUpdateWithWhereUniqueWithoutSessionInput = {
+  where: NodeEntryWhereUniqueInput;
+  data: NodeEntryUpdateWithoutSessionDataInput;
+};
+
+export type NodeEntryUpsertWithWhereUniqueWithoutSessionInput = {
+  where: NodeEntryWhereUniqueInput;
+  update: NodeEntryUpdateWithoutSessionDataInput;
+  create: NodeEntryCreateWithoutSessionInput;
 };
 
 export type NodeEntryValue = {
@@ -2203,20 +2325,7 @@ export type NodeEntryWhereInput = {
   id_not_starts_with?: Maybe<Scalars['ID']>;
   id_ends_with?: Maybe<Scalars['ID']>;
   id_not_ends_with?: Maybe<Scalars['ID']>;
-  sessionId?: Maybe<Scalars['String']>;
-  sessionId_not?: Maybe<Scalars['String']>;
-  sessionId_in?: Maybe<Array<Scalars['String']>>;
-  sessionId_not_in?: Maybe<Array<Scalars['String']>>;
-  sessionId_lt?: Maybe<Scalars['String']>;
-  sessionId_lte?: Maybe<Scalars['String']>;
-  sessionId_gt?: Maybe<Scalars['String']>;
-  sessionId_gte?: Maybe<Scalars['String']>;
-  sessionId_contains?: Maybe<Scalars['String']>;
-  sessionId_not_contains?: Maybe<Scalars['String']>;
-  sessionId_starts_with?: Maybe<Scalars['String']>;
-  sessionId_not_starts_with?: Maybe<Scalars['String']>;
-  sessionId_ends_with?: Maybe<Scalars['String']>;
-  sessionId_not_ends_with?: Maybe<Scalars['String']>;
+  session?: Maybe<SessionWhereInput>;
   relatedNode?: Maybe<QuestionNodeWhereInput>;
   edgeChild?: Maybe<EdgeWhereInput>;
   values_every?: Maybe<NodeEntryValueWhereInput>;
@@ -2301,6 +2410,9 @@ export type Query = {
   questionnaire?: Maybe<Questionnaire>;
   questionnaires: Array<Maybe<Questionnaire>>;
   questionnairesConnection: QuestionnaireConnection;
+  session?: Maybe<Session>;
+  sessions: Array<Maybe<Session>>;
+  sessionsConnection: SessionConnection;
   node?: Maybe<Node>;
 };
 
@@ -2621,6 +2733,33 @@ export type QueryQuestionnairesArgs = {
 export type QueryQuestionnairesConnectionArgs = {
   where?: Maybe<QuestionnaireWhereInput>;
   orderBy?: Maybe<QuestionnaireOrderByInput>;
+  skip?: Maybe<Scalars['Int']>;
+  after?: Maybe<Scalars['String']>;
+  before?: Maybe<Scalars['String']>;
+  first?: Maybe<Scalars['Int']>;
+  last?: Maybe<Scalars['Int']>;
+};
+
+
+export type QuerySessionArgs = {
+  where: SessionWhereUniqueInput;
+};
+
+
+export type QuerySessionsArgs = {
+  where?: Maybe<SessionWhereInput>;
+  orderBy?: Maybe<SessionOrderByInput>;
+  skip?: Maybe<Scalars['Int']>;
+  after?: Maybe<Scalars['String']>;
+  before?: Maybe<Scalars['String']>;
+  first?: Maybe<Scalars['Int']>;
+  last?: Maybe<Scalars['Int']>;
+};
+
+
+export type QuerySessionsConnectionArgs = {
+  where?: Maybe<SessionWhereInput>;
+  orderBy?: Maybe<SessionOrderByInput>;
   skip?: Maybe<Scalars['Int']>;
   after?: Maybe<Scalars['String']>;
   before?: Maybe<Scalars['String']>;
@@ -3909,6 +4048,127 @@ export type QuestionOptionWhereUniqueInput = {
   id?: Maybe<Scalars['ID']>;
 };
 
+export type Session = {
+   __typename?: 'Session';
+  id: Scalars['ID'];
+  nodeEntries?: Maybe<Array<NodeEntry>>;
+  createdAt: Scalars['DateTime'];
+};
+
+
+export type SessionNodeEntriesArgs = {
+  where?: Maybe<NodeEntryWhereInput>;
+  orderBy?: Maybe<NodeEntryOrderByInput>;
+  skip?: Maybe<Scalars['Int']>;
+  after?: Maybe<Scalars['String']>;
+  before?: Maybe<Scalars['String']>;
+  first?: Maybe<Scalars['Int']>;
+  last?: Maybe<Scalars['Int']>;
+};
+
+export type SessionConnection = {
+   __typename?: 'SessionConnection';
+  pageInfo: PageInfo;
+  edges: Array<Maybe<SessionEdge>>;
+  aggregate: AggregateSession;
+};
+
+export type SessionCreateInput = {
+  id?: Maybe<Scalars['ID']>;
+  nodeEntries?: Maybe<NodeEntryCreateManyWithoutSessionInput>;
+};
+
+export type SessionCreateOneWithoutNodeEntriesInput = {
+  create?: Maybe<SessionCreateWithoutNodeEntriesInput>;
+  connect?: Maybe<SessionWhereUniqueInput>;
+};
+
+export type SessionCreateWithoutNodeEntriesInput = {
+  id?: Maybe<Scalars['ID']>;
+};
+
+export type SessionEdge = {
+   __typename?: 'SessionEdge';
+  node: Session;
+  cursor: Scalars['String'];
+};
+
+export enum SessionOrderByInput {
+  IdAsc = 'id_ASC',
+  IdDesc = 'id_DESC',
+  CreatedAtAsc = 'createdAt_ASC',
+  CreatedAtDesc = 'createdAt_DESC'
+}
+
+export type SessionPreviousValues = {
+   __typename?: 'SessionPreviousValues';
+  id: Scalars['ID'];
+  createdAt: Scalars['DateTime'];
+};
+
+export type SessionSubscriptionPayload = {
+   __typename?: 'SessionSubscriptionPayload';
+  mutation: MutationType;
+  node?: Maybe<Session>;
+  updatedFields?: Maybe<Array<Scalars['String']>>;
+  previousValues?: Maybe<SessionPreviousValues>;
+};
+
+export type SessionSubscriptionWhereInput = {
+  mutation_in?: Maybe<Array<MutationType>>;
+  updatedFields_contains?: Maybe<Scalars['String']>;
+  updatedFields_contains_every?: Maybe<Array<Scalars['String']>>;
+  updatedFields_contains_some?: Maybe<Array<Scalars['String']>>;
+  node?: Maybe<SessionWhereInput>;
+  AND?: Maybe<Array<SessionSubscriptionWhereInput>>;
+  OR?: Maybe<Array<SessionSubscriptionWhereInput>>;
+  NOT?: Maybe<Array<SessionSubscriptionWhereInput>>;
+};
+
+export type SessionUpdateInput = {
+  nodeEntries?: Maybe<NodeEntryUpdateManyWithoutSessionInput>;
+};
+
+export type SessionUpdateOneRequiredWithoutNodeEntriesInput = {
+  create?: Maybe<SessionCreateWithoutNodeEntriesInput>;
+  connect?: Maybe<SessionWhereUniqueInput>;
+};
+
+export type SessionWhereInput = {
+  id?: Maybe<Scalars['ID']>;
+  id_not?: Maybe<Scalars['ID']>;
+  id_in?: Maybe<Array<Scalars['ID']>>;
+  id_not_in?: Maybe<Array<Scalars['ID']>>;
+  id_lt?: Maybe<Scalars['ID']>;
+  id_lte?: Maybe<Scalars['ID']>;
+  id_gt?: Maybe<Scalars['ID']>;
+  id_gte?: Maybe<Scalars['ID']>;
+  id_contains?: Maybe<Scalars['ID']>;
+  id_not_contains?: Maybe<Scalars['ID']>;
+  id_starts_with?: Maybe<Scalars['ID']>;
+  id_not_starts_with?: Maybe<Scalars['ID']>;
+  id_ends_with?: Maybe<Scalars['ID']>;
+  id_not_ends_with?: Maybe<Scalars['ID']>;
+  nodeEntries_every?: Maybe<NodeEntryWhereInput>;
+  nodeEntries_some?: Maybe<NodeEntryWhereInput>;
+  nodeEntries_none?: Maybe<NodeEntryWhereInput>;
+  createdAt?: Maybe<Scalars['DateTime']>;
+  createdAt_not?: Maybe<Scalars['DateTime']>;
+  createdAt_in?: Maybe<Array<Scalars['DateTime']>>;
+  createdAt_not_in?: Maybe<Array<Scalars['DateTime']>>;
+  createdAt_lt?: Maybe<Scalars['DateTime']>;
+  createdAt_lte?: Maybe<Scalars['DateTime']>;
+  createdAt_gt?: Maybe<Scalars['DateTime']>;
+  createdAt_gte?: Maybe<Scalars['DateTime']>;
+  AND?: Maybe<Array<SessionWhereInput>>;
+  OR?: Maybe<Array<SessionWhereInput>>;
+  NOT?: Maybe<Array<SessionWhereInput>>;
+};
+
+export type SessionWhereUniqueInput = {
+  id?: Maybe<Scalars['ID']>;
+};
+
 export type Subscription = {
    __typename?: 'Subscription';
   colourSettings?: Maybe<ColourSettingsSubscriptionPayload>;
@@ -3923,6 +4183,7 @@ export type Subscription = {
   questionNode?: Maybe<QuestionNodeSubscriptionPayload>;
   questionOption?: Maybe<QuestionOptionSubscriptionPayload>;
   questionnaire?: Maybe<QuestionnaireSubscriptionPayload>;
+  session?: Maybe<SessionSubscriptionPayload>;
 };
 
 
@@ -3983,6 +4244,11 @@ export type SubscriptionQuestionOptionArgs = {
 
 export type SubscriptionQuestionnaireArgs = {
   where?: Maybe<QuestionnaireSubscriptionWhereInput>;
+};
+
+
+export type SubscriptionSessionArgs = {
+  where?: Maybe<SessionSubscriptionWhereInput>;
 };
 
 export type WithIndex<TObject> = TObject & Record<string, any>;
@@ -4123,11 +4389,13 @@ export type ResolversTypes = ResolversObject<{
   AggregateLeafNode: ResolverTypeWrapper<AggregateLeafNode>,
   NodeEntryWhereUniqueInput: NodeEntryWhereUniqueInput,
   NodeEntry: ResolverTypeWrapper<NodeEntry>,
+  Session: ResolverTypeWrapper<Session>,
+  NodeEntryWhereInput: NodeEntryWhereInput,
+  SessionWhereInput: SessionWhereInput,
   NodeEntryValueWhereInput: NodeEntryValueWhereInput,
+  NodeEntryOrderByInput: NodeEntryOrderByInput,
   NodeEntryValueOrderByInput: NodeEntryValueOrderByInput,
   NodeEntryValue: ResolverTypeWrapper<NodeEntryValue>,
-  NodeEntryWhereInput: NodeEntryWhereInput,
-  NodeEntryOrderByInput: NodeEntryOrderByInput,
   NodeEntryConnection: ResolverTypeWrapper<NodeEntryConnection>,
   NodeEntryEdge: ResolverTypeWrapper<NodeEntryEdge>,
   AggregateNodeEntry: ResolverTypeWrapper<AggregateNodeEntry>,
@@ -4151,6 +4419,11 @@ export type ResolversTypes = ResolversObject<{
   QuestionnaireConnection: ResolverTypeWrapper<QuestionnaireConnection>,
   QuestionnaireEdge: ResolverTypeWrapper<QuestionnaireEdge>,
   AggregateQuestionnaire: ResolverTypeWrapper<AggregateQuestionnaire>,
+  SessionWhereUniqueInput: SessionWhereUniqueInput,
+  SessionOrderByInput: SessionOrderByInput,
+  SessionConnection: ResolverTypeWrapper<SessionConnection>,
+  SessionEdge: ResolverTypeWrapper<SessionEdge>,
+  AggregateSession: ResolverTypeWrapper<AggregateSession>,
   Node: ResolverTypeWrapper<Node>,
   Mutation: ResolverTypeWrapper<{}>,
   ColourSettingsCreateInput: ColourSettingsCreateInput,
@@ -4262,10 +4535,13 @@ export type ResolversTypes = ResolversObject<{
   LeafNodeUpdateInput: LeafNodeUpdateInput,
   LeafNodeUpdateManyMutationInput: LeafNodeUpdateManyMutationInput,
   NodeEntryCreateInput: NodeEntryCreateInput,
+  SessionCreateOneWithoutNodeEntriesInput: SessionCreateOneWithoutNodeEntriesInput,
+  SessionCreateWithoutNodeEntriesInput: SessionCreateWithoutNodeEntriesInput,
   EdgeCreateOneInput: EdgeCreateOneInput,
   NodeEntryValueCreateManyInput: NodeEntryValueCreateManyInput,
   NodeEntryValueCreateInput: NodeEntryValueCreateInput,
   NodeEntryUpdateInput: NodeEntryUpdateInput,
+  SessionUpdateOneRequiredWithoutNodeEntriesInput: SessionUpdateOneRequiredWithoutNodeEntriesInput,
   QuestionNodeUpdateOneRequiredInput: QuestionNodeUpdateOneRequiredInput,
   EdgeUpdateOneInput: EdgeUpdateOneInput,
   EdgeUpsertNestedInput: EdgeUpsertNestedInput,
@@ -4287,6 +4563,17 @@ export type ResolversTypes = ResolversObject<{
   QuestionOptionUpdateManyMutationInput: QuestionOptionUpdateManyMutationInput,
   QuestionnaireUpdateInput: QuestionnaireUpdateInput,
   QuestionnaireUpdateManyMutationInput: QuestionnaireUpdateManyMutationInput,
+  SessionCreateInput: SessionCreateInput,
+  NodeEntryCreateManyWithoutSessionInput: NodeEntryCreateManyWithoutSessionInput,
+  NodeEntryCreateWithoutSessionInput: NodeEntryCreateWithoutSessionInput,
+  SessionUpdateInput: SessionUpdateInput,
+  NodeEntryUpdateManyWithoutSessionInput: NodeEntryUpdateManyWithoutSessionInput,
+  NodeEntryUpdateWithWhereUniqueWithoutSessionInput: NodeEntryUpdateWithWhereUniqueWithoutSessionInput,
+  NodeEntryUpdateWithoutSessionDataInput: NodeEntryUpdateWithoutSessionDataInput,
+  NodeEntryUpsertWithWhereUniqueWithoutSessionInput: NodeEntryUpsertWithWhereUniqueWithoutSessionInput,
+  NodeEntryScalarWhereInput: NodeEntryScalarWhereInput,
+  NodeEntryUpdateManyWithWhereNestedInput: NodeEntryUpdateManyWithWhereNestedInput,
+  NodeEntryUpdateManyDataInput: NodeEntryUpdateManyDataInput,
   Subscription: ResolverTypeWrapper<{}>,
   ColourSettingsSubscriptionWhereInput: ColourSettingsSubscriptionWhereInput,
   MutationType: MutationType,
@@ -4325,6 +4612,9 @@ export type ResolversTypes = ResolversObject<{
   QuestionnaireSubscriptionWhereInput: QuestionnaireSubscriptionWhereInput,
   QuestionnaireSubscriptionPayload: ResolverTypeWrapper<QuestionnaireSubscriptionPayload>,
   QuestionnairePreviousValues: ResolverTypeWrapper<QuestionnairePreviousValues>,
+  SessionSubscriptionWhereInput: SessionSubscriptionWhereInput,
+  SessionSubscriptionPayload: ResolverTypeWrapper<SessionSubscriptionPayload>,
+  SessionPreviousValues: ResolverTypeWrapper<SessionPreviousValues>,
 }>;
 
 /** Mapping between all available schema types and the resolvers parents */
@@ -4393,11 +4683,13 @@ export type ResolversParentTypes = ResolversObject<{
   AggregateLeafNode: AggregateLeafNode,
   NodeEntryWhereUniqueInput: NodeEntryWhereUniqueInput,
   NodeEntry: NodeEntry,
+  Session: Session,
+  NodeEntryWhereInput: NodeEntryWhereInput,
+  SessionWhereInput: SessionWhereInput,
   NodeEntryValueWhereInput: NodeEntryValueWhereInput,
+  NodeEntryOrderByInput: NodeEntryOrderByInput,
   NodeEntryValueOrderByInput: NodeEntryValueOrderByInput,
   NodeEntryValue: NodeEntryValue,
-  NodeEntryWhereInput: NodeEntryWhereInput,
-  NodeEntryOrderByInput: NodeEntryOrderByInput,
   NodeEntryConnection: NodeEntryConnection,
   NodeEntryEdge: NodeEntryEdge,
   AggregateNodeEntry: AggregateNodeEntry,
@@ -4421,6 +4713,11 @@ export type ResolversParentTypes = ResolversObject<{
   QuestionnaireConnection: QuestionnaireConnection,
   QuestionnaireEdge: QuestionnaireEdge,
   AggregateQuestionnaire: AggregateQuestionnaire,
+  SessionWhereUniqueInput: SessionWhereUniqueInput,
+  SessionOrderByInput: SessionOrderByInput,
+  SessionConnection: SessionConnection,
+  SessionEdge: SessionEdge,
+  AggregateSession: AggregateSession,
   Node: Node,
   Mutation: {},
   ColourSettingsCreateInput: ColourSettingsCreateInput,
@@ -4532,10 +4829,13 @@ export type ResolversParentTypes = ResolversObject<{
   LeafNodeUpdateInput: LeafNodeUpdateInput,
   LeafNodeUpdateManyMutationInput: LeafNodeUpdateManyMutationInput,
   NodeEntryCreateInput: NodeEntryCreateInput,
+  SessionCreateOneWithoutNodeEntriesInput: SessionCreateOneWithoutNodeEntriesInput,
+  SessionCreateWithoutNodeEntriesInput: SessionCreateWithoutNodeEntriesInput,
   EdgeCreateOneInput: EdgeCreateOneInput,
   NodeEntryValueCreateManyInput: NodeEntryValueCreateManyInput,
   NodeEntryValueCreateInput: NodeEntryValueCreateInput,
   NodeEntryUpdateInput: NodeEntryUpdateInput,
+  SessionUpdateOneRequiredWithoutNodeEntriesInput: SessionUpdateOneRequiredWithoutNodeEntriesInput,
   QuestionNodeUpdateOneRequiredInput: QuestionNodeUpdateOneRequiredInput,
   EdgeUpdateOneInput: EdgeUpdateOneInput,
   EdgeUpsertNestedInput: EdgeUpsertNestedInput,
@@ -4557,6 +4857,17 @@ export type ResolversParentTypes = ResolversObject<{
   QuestionOptionUpdateManyMutationInput: QuestionOptionUpdateManyMutationInput,
   QuestionnaireUpdateInput: QuestionnaireUpdateInput,
   QuestionnaireUpdateManyMutationInput: QuestionnaireUpdateManyMutationInput,
+  SessionCreateInput: SessionCreateInput,
+  NodeEntryCreateManyWithoutSessionInput: NodeEntryCreateManyWithoutSessionInput,
+  NodeEntryCreateWithoutSessionInput: NodeEntryCreateWithoutSessionInput,
+  SessionUpdateInput: SessionUpdateInput,
+  NodeEntryUpdateManyWithoutSessionInput: NodeEntryUpdateManyWithoutSessionInput,
+  NodeEntryUpdateWithWhereUniqueWithoutSessionInput: NodeEntryUpdateWithWhereUniqueWithoutSessionInput,
+  NodeEntryUpdateWithoutSessionDataInput: NodeEntryUpdateWithoutSessionDataInput,
+  NodeEntryUpsertWithWhereUniqueWithoutSessionInput: NodeEntryUpsertWithWhereUniqueWithoutSessionInput,
+  NodeEntryScalarWhereInput: NodeEntryScalarWhereInput,
+  NodeEntryUpdateManyWithWhereNestedInput: NodeEntryUpdateManyWithWhereNestedInput,
+  NodeEntryUpdateManyDataInput: NodeEntryUpdateManyDataInput,
   Subscription: {},
   ColourSettingsSubscriptionWhereInput: ColourSettingsSubscriptionWhereInput,
   MutationType: MutationType,
@@ -4595,6 +4906,9 @@ export type ResolversParentTypes = ResolversObject<{
   QuestionnaireSubscriptionWhereInput: QuestionnaireSubscriptionWhereInput,
   QuestionnaireSubscriptionPayload: QuestionnaireSubscriptionPayload,
   QuestionnairePreviousValues: QuestionnairePreviousValues,
+  SessionSubscriptionWhereInput: SessionSubscriptionWhereInput,
+  SessionSubscriptionPayload: SessionSubscriptionPayload,
+  SessionPreviousValues: SessionPreviousValues,
 }>;
 
 export type AggregateColourSettingsResolvers<ContextType = any, ParentType extends ResolversParentTypes['AggregateColourSettings'] = ResolversParentTypes['AggregateColourSettings']> = ResolversObject<{
@@ -4653,6 +4967,11 @@ export type AggregateQuestionNodeResolvers<ContextType = any, ParentType extends
 }>;
 
 export type AggregateQuestionOptionResolvers<ContextType = any, ParentType extends ResolversParentTypes['AggregateQuestionOption'] = ResolversParentTypes['AggregateQuestionOption']> = ResolversObject<{
+  count?: Resolver<ResolversTypes['Int'], ParentType, ContextType>,
+  __isTypeOf?: isTypeOfResolverFn<ParentType>,
+}>;
+
+export type AggregateSessionResolvers<ContextType = any, ParentType extends ResolversParentTypes['AggregateSession'] = ResolversParentTypes['AggregateSession']> = ResolversObject<{
   count?: Resolver<ResolversTypes['Int'], ParentType, ContextType>,
   __isTypeOf?: isTypeOfResolverFn<ParentType>,
 }>;
@@ -4984,6 +5303,11 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   upsertQuestionnaire?: Resolver<ResolversTypes['Questionnaire'], ParentType, ContextType, RequireFields<MutationUpsertQuestionnaireArgs, 'where' | 'create' | 'update'>>,
   deleteQuestionnaire?: Resolver<Maybe<ResolversTypes['Questionnaire']>, ParentType, ContextType, RequireFields<MutationDeleteQuestionnaireArgs, 'where'>>,
   deleteManyQuestionnaires?: Resolver<ResolversTypes['BatchPayload'], ParentType, ContextType, RequireFields<MutationDeleteManyQuestionnairesArgs, never>>,
+  createSession?: Resolver<ResolversTypes['Session'], ParentType, ContextType, RequireFields<MutationCreateSessionArgs, 'data'>>,
+  updateSession?: Resolver<Maybe<ResolversTypes['Session']>, ParentType, ContextType, RequireFields<MutationUpdateSessionArgs, 'data' | 'where'>>,
+  upsertSession?: Resolver<ResolversTypes['Session'], ParentType, ContextType, RequireFields<MutationUpsertSessionArgs, 'where' | 'create' | 'update'>>,
+  deleteSession?: Resolver<Maybe<ResolversTypes['Session']>, ParentType, ContextType, RequireFields<MutationDeleteSessionArgs, 'where'>>,
+  deleteManySessions?: Resolver<ResolversTypes['BatchPayload'], ParentType, ContextType, RequireFields<MutationDeleteManySessionsArgs, never>>,
 }>;
 
 export type NodeResolvers<ContextType = any, ParentType extends ResolversParentTypes['Node'] = ResolversParentTypes['Node']> = ResolversObject<{
@@ -4993,7 +5317,7 @@ export type NodeResolvers<ContextType = any, ParentType extends ResolversParentT
 
 export type NodeEntryResolvers<ContextType = any, ParentType extends ResolversParentTypes['NodeEntry'] = ResolversParentTypes['NodeEntry']> = ResolversObject<{
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>,
-  sessionId?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
+  session?: Resolver<ResolversTypes['Session'], ParentType, ContextType>,
   relatedNode?: Resolver<ResolversTypes['QuestionNode'], ParentType, ContextType>,
   edgeChild?: Resolver<Maybe<ResolversTypes['Edge']>, ParentType, ContextType>,
   values?: Resolver<Maybe<Array<ResolversTypes['NodeEntryValue']>>, ParentType, ContextType, RequireFields<NodeEntryValuesArgs, never>>,
@@ -5017,7 +5341,6 @@ export type NodeEntryEdgeResolvers<ContextType = any, ParentType extends Resolve
 
 export type NodeEntryPreviousValuesResolvers<ContextType = any, ParentType extends ResolversParentTypes['NodeEntryPreviousValues'] = ResolversParentTypes['NodeEntryPreviousValues']> = ResolversObject<{
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>,
-  sessionId?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
   depth?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>,
   creationDate?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>,
   __isTypeOf?: isTypeOfResolverFn<ParentType>,
@@ -5111,6 +5434,9 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   questionnaire?: Resolver<Maybe<ResolversTypes['Questionnaire']>, ParentType, ContextType, RequireFields<QueryQuestionnaireArgs, 'where'>>,
   questionnaires?: Resolver<Array<Maybe<ResolversTypes['Questionnaire']>>, ParentType, ContextType, RequireFields<QueryQuestionnairesArgs, never>>,
   questionnairesConnection?: Resolver<ResolversTypes['QuestionnaireConnection'], ParentType, ContextType, RequireFields<QueryQuestionnairesConnectionArgs, never>>,
+  session?: Resolver<Maybe<ResolversTypes['Session']>, ParentType, ContextType, RequireFields<QuerySessionArgs, 'where'>>,
+  sessions?: Resolver<Array<Maybe<ResolversTypes['Session']>>, ParentType, ContextType, RequireFields<QuerySessionsArgs, never>>,
+  sessionsConnection?: Resolver<ResolversTypes['SessionConnection'], ParentType, ContextType, RequireFields<QuerySessionsConnectionArgs, never>>,
   node?: Resolver<Maybe<ResolversTypes['Node']>, ParentType, ContextType, RequireFields<QueryNodeArgs, 'id'>>,
 }>;
 
@@ -5277,6 +5603,40 @@ export type QuestionOptionSubscriptionPayloadResolvers<ContextType = any, Parent
   __isTypeOf?: isTypeOfResolverFn<ParentType>,
 }>;
 
+export type SessionResolvers<ContextType = any, ParentType extends ResolversParentTypes['Session'] = ResolversParentTypes['Session']> = ResolversObject<{
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>,
+  nodeEntries?: Resolver<Maybe<Array<ResolversTypes['NodeEntry']>>, ParentType, ContextType, RequireFields<SessionNodeEntriesArgs, never>>,
+  createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>,
+  __isTypeOf?: isTypeOfResolverFn<ParentType>,
+}>;
+
+export type SessionConnectionResolvers<ContextType = any, ParentType extends ResolversParentTypes['SessionConnection'] = ResolversParentTypes['SessionConnection']> = ResolversObject<{
+  pageInfo?: Resolver<ResolversTypes['PageInfo'], ParentType, ContextType>,
+  edges?: Resolver<Array<Maybe<ResolversTypes['SessionEdge']>>, ParentType, ContextType>,
+  aggregate?: Resolver<ResolversTypes['AggregateSession'], ParentType, ContextType>,
+  __isTypeOf?: isTypeOfResolverFn<ParentType>,
+}>;
+
+export type SessionEdgeResolvers<ContextType = any, ParentType extends ResolversParentTypes['SessionEdge'] = ResolversParentTypes['SessionEdge']> = ResolversObject<{
+  node?: Resolver<ResolversTypes['Session'], ParentType, ContextType>,
+  cursor?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
+  __isTypeOf?: isTypeOfResolverFn<ParentType>,
+}>;
+
+export type SessionPreviousValuesResolvers<ContextType = any, ParentType extends ResolversParentTypes['SessionPreviousValues'] = ResolversParentTypes['SessionPreviousValues']> = ResolversObject<{
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>,
+  createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>,
+  __isTypeOf?: isTypeOfResolverFn<ParentType>,
+}>;
+
+export type SessionSubscriptionPayloadResolvers<ContextType = any, ParentType extends ResolversParentTypes['SessionSubscriptionPayload'] = ResolversParentTypes['SessionSubscriptionPayload']> = ResolversObject<{
+  mutation?: Resolver<ResolversTypes['MutationType'], ParentType, ContextType>,
+  node?: Resolver<Maybe<ResolversTypes['Session']>, ParentType, ContextType>,
+  updatedFields?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>,
+  previousValues?: Resolver<Maybe<ResolversTypes['SessionPreviousValues']>, ParentType, ContextType>,
+  __isTypeOf?: isTypeOfResolverFn<ParentType>,
+}>;
+
 export type SubscriptionResolvers<ContextType = any, ParentType extends ResolversParentTypes['Subscription'] = ResolversParentTypes['Subscription']> = ResolversObject<{
   colourSettings?: SubscriptionResolver<Maybe<ResolversTypes['ColourSettingsSubscriptionPayload']>, "colourSettings", ParentType, ContextType, RequireFields<SubscriptionColourSettingsArgs, never>>,
   customer?: SubscriptionResolver<Maybe<ResolversTypes['CustomerSubscriptionPayload']>, "customer", ParentType, ContextType, RequireFields<SubscriptionCustomerArgs, never>>,
@@ -5290,6 +5650,7 @@ export type SubscriptionResolvers<ContextType = any, ParentType extends Resolver
   questionNode?: SubscriptionResolver<Maybe<ResolversTypes['QuestionNodeSubscriptionPayload']>, "questionNode", ParentType, ContextType, RequireFields<SubscriptionQuestionNodeArgs, never>>,
   questionOption?: SubscriptionResolver<Maybe<ResolversTypes['QuestionOptionSubscriptionPayload']>, "questionOption", ParentType, ContextType, RequireFields<SubscriptionQuestionOptionArgs, never>>,
   questionnaire?: SubscriptionResolver<Maybe<ResolversTypes['QuestionnaireSubscriptionPayload']>, "questionnaire", ParentType, ContextType, RequireFields<SubscriptionQuestionnaireArgs, never>>,
+  session?: SubscriptionResolver<Maybe<ResolversTypes['SessionSubscriptionPayload']>, "session", ParentType, ContextType, RequireFields<SubscriptionSessionArgs, never>>,
 }>;
 
 export type Resolvers<ContextType = any> = ResolversObject<{
@@ -5305,6 +5666,7 @@ export type Resolvers<ContextType = any> = ResolversObject<{
   AggregateQuestionnaire?: AggregateQuestionnaireResolvers<ContextType>,
   AggregateQuestionNode?: AggregateQuestionNodeResolvers<ContextType>,
   AggregateQuestionOption?: AggregateQuestionOptionResolvers<ContextType>,
+  AggregateSession?: AggregateSessionResolvers<ContextType>,
   BatchPayload?: BatchPayloadResolvers<ContextType>,
   ColourSettings?: ColourSettingsResolvers<ContextType>,
   ColourSettingsConnection?: ColourSettingsConnectionResolvers<ContextType>,
@@ -5372,6 +5734,11 @@ export type Resolvers<ContextType = any> = ResolversObject<{
   QuestionOptionEdge?: QuestionOptionEdgeResolvers<ContextType>,
   QuestionOptionPreviousValues?: QuestionOptionPreviousValuesResolvers<ContextType>,
   QuestionOptionSubscriptionPayload?: QuestionOptionSubscriptionPayloadResolvers<ContextType>,
+  Session?: SessionResolvers<ContextType>,
+  SessionConnection?: SessionConnectionResolvers<ContextType>,
+  SessionEdge?: SessionEdgeResolvers<ContextType>,
+  SessionPreviousValues?: SessionPreviousValuesResolvers<ContextType>,
+  SessionSubscriptionPayload?: SessionSubscriptionPayloadResolvers<ContextType>,
   Subscription?: SubscriptionResolvers<ContextType>,
 }>;
 

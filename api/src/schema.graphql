@@ -15,8 +15,6 @@ type Mutation {
 input UserSessionEntryInput {
     nodeId: String!
     edgeId: String
-    textValue: String
-    numberValue: Int
     depth: Int
     data: UserSessionEntryDataInput!
 }

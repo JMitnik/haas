@@ -105,7 +105,6 @@ const getQuestionnaireAggregatedData = async (parent: any, args: any) => {
       const nodeEntry = await prisma.nodeEntry({ id });
 
       const mappedResult = {
-        sessionId: nodeEntry?.sessionId,
         createdAt: nodeEntry?.creationDate,
         value: values[0].numberValue ? values[0].numberValue : -1,
       };
@@ -166,32 +165,32 @@ const queryResolvers = {
 
 const mutationResolvers = {
   uploadUserSession: async (obj: any, args: any, ctx: any, info: any) => {
+    const session = await prisma.createSession({});
+
     args.uploadUserSessionInput.entries.forEach(async (entry: any) => {
       const maybeCreateEdgeChild = (entry: any) => {
-        if (entry.data.edgeId) {
-          return {
-            edgeChild: {
-              connect: {
-                id: entry.data.edgeId,
-              },
-            },
-          };
+        if (entry.edgeId) {
+          return { edgeChild: { connect: { id: entry.edgeId } } };
         }
 
         return {};
       };
 
       await prisma.createNodeEntry({
-        sessionId: args.uploadEntriesInput.sessionId,
         ...maybeCreateEdgeChild(entry),
-        relatedNode: {
+        session: {
           connect: {
-            id: entry.data.nodeId,
+            id: session.id,
           },
         },
+        relatedNode: {
+          connect: {
+            id: entry.nodeId,
+          },
+        },
+        depth: entry.depth,
         values: {
           create: {
-            // TODO: Make this better
             numberValue: cleanInt(entry.data.numberValue),
             textValue: entry.data.textValue,
           },
