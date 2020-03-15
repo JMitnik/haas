@@ -33,7 +33,7 @@ const theme = {
   nav: {
     height: 80,
   },
-  fontSizes: [8, 12, 16, 18, 24, 32],
+  fontSizes: [8, 12, 22, 28, 36, 48],
   buttonSizes: {
     sm: '8px 12px',
     md: '9px 14px',

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 import { Settings } from 'react-feather';
 
-import { Div, H3 } from '@haas/ui';
+import { Div, H3, H4 } from '@haas/ui';
 import { GenericProps } from '@haas/ui/src/Generics';
 import { ProfilePic } from '@haas/ui/src/User';
 import Logo, { LogoContainer } from '../assets/Logo';
@@ -14,11 +14,11 @@ const UserNav: FC = () => {
   const user = { firstName: 'Markus', lastName: 'Z.' };
 
   return (
-    <Div useFlex width={2 / 10} alignItems="center" justifyContent="flex-end">
+    <Div useFlex width={4 / 10} alignItems="center" justifyContent="flex-end">
       <Div pl={4} useFlex alignItems="center">
-        <H3 mr="4" color="primary">
+        <H4 mr="4" color="primary">
           {`${user?.firstName} ${user?.lastName}`}
-        </H3>
+        </H4>
         <ProfilePic userName={user?.firstName} />
       </Div>
     </Div>
