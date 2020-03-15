@@ -64,6 +64,11 @@ export const createStandardSubChildrenWithLeaves = async (
         },
       });
 
+      if (subleafs.length > 1) {
+        console.log('Sub leafs length: ', subleafs.length);
+        console.log('SUB LEAFS: ', subleafs);
+      }
+
       let leaf = null;
 
       if (subleafs) {
@@ -344,10 +349,6 @@ export const seedQuestionnare = async (
   questionnaireDescription: string = 'Default questions',
 ): Promise<Questionnaire> => {
   const leafs = await createTemplateLeafNodes(leafNodes);
-
-  console.log('Questionnaire title: ', questionnaireTitle);
-  console.log('Questionnaire description: ', questionnaireDescription);
-  console.log('Customer name: ', customerName);
 
   const questionnaire = await prisma.createQuestionnaire({
     customer: {

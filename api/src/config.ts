@@ -3,6 +3,7 @@ require('dotenv').config();
 const config: any = {
   ENVIRONMENT: process.env.ENVIRONMENT || 'local',
   APP_PORT: process.env.PORT,
+  ENABLE_DEBUG: process.env.ENABLE_DEBUG || false,
   CLIENT_URL: process.env.CLIENT_URL || 'http://localhost:4000',
   DASHBOARD_URL: process.env.DASHBOARD_URL || 'http://localhost:4000',
   ENDPOINT: process.env.APP_ENDPOINT || '/graphql',

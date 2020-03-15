@@ -50,6 +50,10 @@ type AggregateQuestionOption {
   count: Int!
 }
 
+type AggregateSession {
+  count: Int!
+}
+
 type BatchPayload {
   count: Long!
 }
@@ -57,6 +61,7 @@ type BatchPayload {
 type ColourSettings {
   id: ID!
   primary: String!
+  primaryAlt: String
   secondary: String
   tertiary: String
   success: String
@@ -80,6 +85,7 @@ type ColourSettingsConnection {
 input ColourSettingsCreateInput {
   id: ID
   primary: String!
+  primaryAlt: String
   secondary: String
   tertiary: String
   success: String
@@ -109,6 +115,8 @@ enum ColourSettingsOrderByInput {
   id_DESC
   primary_ASC
   primary_DESC
+  primaryAlt_ASC
+  primaryAlt_DESC
   secondary_ASC
   secondary_DESC
   tertiary_ASC
@@ -138,6 +146,7 @@ enum ColourSettingsOrderByInput {
 type ColourSettingsPreviousValues {
   id: ID!
   primary: String!
+  primaryAlt: String
   secondary: String
   tertiary: String
   success: String
@@ -172,6 +181,7 @@ input ColourSettingsSubscriptionWhereInput {
 
 input ColourSettingsUpdateDataInput {
   primary: String
+  primaryAlt: String
   secondary: String
   tertiary: String
   success: String
@@ -188,6 +198,7 @@ input ColourSettingsUpdateDataInput {
 
 input ColourSettingsUpdateInput {
   primary: String
+  primaryAlt: String
   secondary: String
   tertiary: String
   success: String
@@ -204,6 +215,7 @@ input ColourSettingsUpdateInput {
 
 input ColourSettingsUpdateManyMutationInput {
   primary: String
+  primaryAlt: String
   secondary: String
   tertiary: String
   success: String
@@ -261,6 +273,20 @@ input ColourSettingsWhereInput {
   primary_not_starts_with: String
   primary_ends_with: String
   primary_not_ends_with: String
+  primaryAlt: String
+  primaryAlt_not: String
+  primaryAlt_in: [String!]
+  primaryAlt_not_in: [String!]
+  primaryAlt_lt: String
+  primaryAlt_lte: String
+  primaryAlt_gt: String
+  primaryAlt_gte: String
+  primaryAlt_contains: String
+  primaryAlt_not_contains: String
+  primaryAlt_starts_with: String
+  primaryAlt_not_starts_with: String
+  primaryAlt_ends_with: String
+  primaryAlt_not_ends_with: String
   secondary: String
   secondary_not: String
   secondary_in: [String!]
@@ -1403,6 +1429,11 @@ type Mutation {
   upsertQuestionnaire(where: QuestionnaireWhereUniqueInput!, create: QuestionnaireCreateInput!, update: QuestionnaireUpdateInput!): Questionnaire!
   deleteQuestionnaire(where: QuestionnaireWhereUniqueInput!): Questionnaire
   deleteManyQuestionnaires(where: QuestionnaireWhereInput): BatchPayload!
+  createSession(data: SessionCreateInput!): Session!
+  updateSession(data: SessionUpdateInput!, where: SessionWhereUniqueInput!): Session
+  upsertSession(where: SessionWhereUniqueInput!, create: SessionCreateInput!, update: SessionUpdateInput!): Session!
+  deleteSession(where: SessionWhereUniqueInput!): Session
+  deleteManySessions(where: SessionWhereInput): BatchPayload!
 }
 
 enum MutationType {
@@ -1417,10 +1448,11 @@ interface Node {
 
 type NodeEntry {
   id: ID!
-  sessionId: String!
+  session: Session!
   relatedNode: QuestionNode!
   edgeChild: Edge
   values(where: NodeEntryValueWhereInput, orderBy: NodeEntryValueOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [NodeEntryValue!]
+  depth: Int
   creationDate: DateTime!
 }
 
@@ -1432,10 +1464,24 @@ type NodeEntryConnection {
 
 input NodeEntryCreateInput {
   id: ID
-  sessionId: String!
+  session: SessionCreateOneWithoutNodeEntriesInput!
   relatedNode: QuestionNodeCreateOneInput!
   edgeChild: EdgeCreateOneInput
   values: NodeEntryValueCreateManyInput
+  depth: Int
+}
+
+input NodeEntryCreateManyWithoutSessionInput {
+  create: [NodeEntryCreateWithoutSessionInput!]
+  connect: [NodeEntryWhereUniqueInput!]
+}
+
+input NodeEntryCreateWithoutSessionInput {
+  id: ID
+  relatedNode: QuestionNodeCreateOneInput!
+  edgeChild: EdgeCreateOneInput
+  values: NodeEntryValueCreateManyInput
+  depth: Int
 }
 
 type NodeEntryEdge {
@@ -1446,16 +1492,52 @@ type NodeEntryEdge {
 enum NodeEntryOrderByInput {
   id_ASC
   id_DESC
-  sessionId_ASC
-  sessionId_DESC
+  depth_ASC
+  depth_DESC
   creationDate_ASC
   creationDate_DESC
 }
 
 type NodeEntryPreviousValues {
   id: ID!
-  sessionId: String!
+  depth: Int
   creationDate: DateTime!
+}
+
+input NodeEntryScalarWhereInput {
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  depth: Int
+  depth_not: Int
+  depth_in: [Int!]
+  depth_not_in: [Int!]
+  depth_lt: Int
+  depth_lte: Int
+  depth_gt: Int
+  depth_gte: Int
+  creationDate: DateTime
+  creationDate_not: DateTime
+  creationDate_in: [DateTime!]
+  creationDate_not_in: [DateTime!]
+  creationDate_lt: DateTime
+  creationDate_lte: DateTime
+  creationDate_gt: DateTime
+  creationDate_gte: DateTime
+  AND: [NodeEntryScalarWhereInput!]
+  OR: [NodeEntryScalarWhereInput!]
+  NOT: [NodeEntryScalarWhereInput!]
 }
 
 type NodeEntrySubscriptionPayload {
@@ -1477,14 +1559,54 @@ input NodeEntrySubscriptionWhereInput {
 }
 
 input NodeEntryUpdateInput {
-  sessionId: String
+  session: SessionUpdateOneRequiredWithoutNodeEntriesInput
   relatedNode: QuestionNodeUpdateOneRequiredInput
   edgeChild: EdgeUpdateOneInput
   values: NodeEntryValueUpdateManyInput
+  depth: Int
+}
+
+input NodeEntryUpdateManyDataInput {
+  depth: Int
 }
 
 input NodeEntryUpdateManyMutationInput {
-  sessionId: String
+  depth: Int
+}
+
+input NodeEntryUpdateManyWithoutSessionInput {
+  create: [NodeEntryCreateWithoutSessionInput!]
+  delete: [NodeEntryWhereUniqueInput!]
+  connect: [NodeEntryWhereUniqueInput!]
+  set: [NodeEntryWhereUniqueInput!]
+  disconnect: [NodeEntryWhereUniqueInput!]
+  update: [NodeEntryUpdateWithWhereUniqueWithoutSessionInput!]
+  upsert: [NodeEntryUpsertWithWhereUniqueWithoutSessionInput!]
+  deleteMany: [NodeEntryScalarWhereInput!]
+  updateMany: [NodeEntryUpdateManyWithWhereNestedInput!]
+}
+
+input NodeEntryUpdateManyWithWhereNestedInput {
+  where: NodeEntryScalarWhereInput!
+  data: NodeEntryUpdateManyDataInput!
+}
+
+input NodeEntryUpdateWithoutSessionDataInput {
+  relatedNode: QuestionNodeUpdateOneRequiredInput
+  edgeChild: EdgeUpdateOneInput
+  values: NodeEntryValueUpdateManyInput
+  depth: Int
+}
+
+input NodeEntryUpdateWithWhereUniqueWithoutSessionInput {
+  where: NodeEntryWhereUniqueInput!
+  data: NodeEntryUpdateWithoutSessionDataInput!
+}
+
+input NodeEntryUpsertWithWhereUniqueWithoutSessionInput {
+  where: NodeEntryWhereUniqueInput!
+  update: NodeEntryUpdateWithoutSessionDataInput!
+  create: NodeEntryCreateWithoutSessionInput!
 }
 
 type NodeEntryValue {
@@ -1699,25 +1821,20 @@ input NodeEntryWhereInput {
   id_not_starts_with: ID
   id_ends_with: ID
   id_not_ends_with: ID
-  sessionId: String
-  sessionId_not: String
-  sessionId_in: [String!]
-  sessionId_not_in: [String!]
-  sessionId_lt: String
-  sessionId_lte: String
-  sessionId_gt: String
-  sessionId_gte: String
-  sessionId_contains: String
-  sessionId_not_contains: String
-  sessionId_starts_with: String
-  sessionId_not_starts_with: String
-  sessionId_ends_with: String
-  sessionId_not_ends_with: String
+  session: SessionWhereInput
   relatedNode: QuestionNodeWhereInput
   edgeChild: EdgeWhereInput
   values_every: NodeEntryValueWhereInput
   values_some: NodeEntryValueWhereInput
   values_none: NodeEntryValueWhereInput
+  depth: Int
+  depth_not: Int
+  depth_in: [Int!]
+  depth_not_in: [Int!]
+  depth_lt: Int
+  depth_lte: Int
+  depth_gt: Int
+  depth_gte: Int
   creationDate: DateTime
   creationDate_not: DateTime
   creationDate_in: [DateTime!]
@@ -1787,6 +1904,9 @@ type Query {
   questionnaire(where: QuestionnaireWhereUniqueInput!): Questionnaire
   questionnaires(where: QuestionnaireWhereInput, orderBy: QuestionnaireOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Questionnaire]!
   questionnairesConnection(where: QuestionnaireWhereInput, orderBy: QuestionnaireOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): QuestionnaireConnection!
+  session(where: SessionWhereUniqueInput!): Session
+  sessions(where: SessionWhereInput, orderBy: SessionOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Session]!
+  sessionsConnection(where: SessionWhereInput, orderBy: SessionOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): SessionConnection!
   node(id: ID!): Node
 }
 
@@ -2057,6 +2177,7 @@ type Questionnaire {
   publicTitle: String
   creationDate: DateTime!
   updatedAt: DateTime
+  rootQuestion: QuestionNode
   questions(where: QuestionNodeWhereInput, orderBy: QuestionNodeOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [QuestionNode!]
   leafs(where: LeafNodeWhereInput, orderBy: LeafNodeOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [LeafNode!]
 }
@@ -2073,6 +2194,7 @@ input QuestionnaireCreateInput {
   title: String!
   description: String!
   publicTitle: String
+  rootQuestion: QuestionNodeCreateOneInput
   questions: QuestionNodeCreateManyWithoutQuestionnaireInput
   leafs: LeafNodeCreateManyInput
 }
@@ -2097,6 +2219,7 @@ input QuestionnaireCreateWithoutCustomerInput {
   title: String!
   description: String!
   publicTitle: String
+  rootQuestion: QuestionNodeCreateOneInput
   questions: QuestionNodeCreateManyWithoutQuestionnaireInput
   leafs: LeafNodeCreateManyInput
 }
@@ -2107,6 +2230,7 @@ input QuestionnaireCreateWithoutQuestionsInput {
   title: String!
   description: String!
   publicTitle: String
+  rootQuestion: QuestionNodeCreateOneInput
   leafs: LeafNodeCreateManyInput
 }
 
@@ -2240,6 +2364,7 @@ input QuestionnaireUpdateDataInput {
   title: String
   description: String
   publicTitle: String
+  rootQuestion: QuestionNodeUpdateOneInput
   questions: QuestionNodeUpdateManyWithoutQuestionnaireInput
   leafs: LeafNodeUpdateManyInput
 }
@@ -2249,6 +2374,7 @@ input QuestionnaireUpdateInput {
   title: String
   description: String
   publicTitle: String
+  rootQuestion: QuestionNodeUpdateOneInput
   questions: QuestionNodeUpdateManyWithoutQuestionnaireInput
   leafs: LeafNodeUpdateManyInput
 }
@@ -2304,6 +2430,7 @@ input QuestionnaireUpdateWithoutCustomerDataInput {
   title: String
   description: String
   publicTitle: String
+  rootQuestion: QuestionNodeUpdateOneInput
   questions: QuestionNodeUpdateManyWithoutQuestionnaireInput
   leafs: LeafNodeUpdateManyInput
 }
@@ -2313,6 +2440,7 @@ input QuestionnaireUpdateWithoutQuestionsDataInput {
   title: String
   description: String
   publicTitle: String
+  rootQuestion: QuestionNodeUpdateOneInput
   leafs: LeafNodeUpdateManyInput
 }
 
@@ -2411,6 +2539,7 @@ input QuestionnaireWhereInput {
   updatedAt_lte: DateTime
   updatedAt_gt: DateTime
   updatedAt_gte: DateTime
+  rootQuestion: QuestionNodeWhereInput
   questions_every: QuestionNodeWhereInput
   questions_some: QuestionNodeWhereInput
   questions_none: QuestionNodeWhereInput
@@ -2982,6 +3111,111 @@ input QuestionOptionWhereUniqueInput {
   id: ID
 }
 
+type Session {
+  id: ID!
+  nodeEntries(where: NodeEntryWhereInput, orderBy: NodeEntryOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [NodeEntry!]
+  createdAt: DateTime!
+}
+
+type SessionConnection {
+  pageInfo: PageInfo!
+  edges: [SessionEdge]!
+  aggregate: AggregateSession!
+}
+
+input SessionCreateInput {
+  id: ID
+  nodeEntries: NodeEntryCreateManyWithoutSessionInput
+}
+
+input SessionCreateOneWithoutNodeEntriesInput {
+  create: SessionCreateWithoutNodeEntriesInput
+  connect: SessionWhereUniqueInput
+}
+
+input SessionCreateWithoutNodeEntriesInput {
+  id: ID
+}
+
+type SessionEdge {
+  node: Session!
+  cursor: String!
+}
+
+enum SessionOrderByInput {
+  id_ASC
+  id_DESC
+  createdAt_ASC
+  createdAt_DESC
+}
+
+type SessionPreviousValues {
+  id: ID!
+  createdAt: DateTime!
+}
+
+type SessionSubscriptionPayload {
+  mutation: MutationType!
+  node: Session
+  updatedFields: [String!]
+  previousValues: SessionPreviousValues
+}
+
+input SessionSubscriptionWhereInput {
+  mutation_in: [MutationType!]
+  updatedFields_contains: String
+  updatedFields_contains_every: [String!]
+  updatedFields_contains_some: [String!]
+  node: SessionWhereInput
+  AND: [SessionSubscriptionWhereInput!]
+  OR: [SessionSubscriptionWhereInput!]
+  NOT: [SessionSubscriptionWhereInput!]
+}
+
+input SessionUpdateInput {
+  nodeEntries: NodeEntryUpdateManyWithoutSessionInput
+}
+
+input SessionUpdateOneRequiredWithoutNodeEntriesInput {
+  create: SessionCreateWithoutNodeEntriesInput
+  connect: SessionWhereUniqueInput
+}
+
+input SessionWhereInput {
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  nodeEntries_every: NodeEntryWhereInput
+  nodeEntries_some: NodeEntryWhereInput
+  nodeEntries_none: NodeEntryWhereInput
+  createdAt: DateTime
+  createdAt_not: DateTime
+  createdAt_in: [DateTime!]
+  createdAt_not_in: [DateTime!]
+  createdAt_lt: DateTime
+  createdAt_lte: DateTime
+  createdAt_gt: DateTime
+  createdAt_gte: DateTime
+  AND: [SessionWhereInput!]
+  OR: [SessionWhereInput!]
+  NOT: [SessionWhereInput!]
+}
+
+input SessionWhereUniqueInput {
+  id: ID
+}
+
 type Subscription {
   colourSettings(where: ColourSettingsSubscriptionWhereInput): ColourSettingsSubscriptionPayload
   customer(where: CustomerSubscriptionWhereInput): CustomerSubscriptionPayload
@@ -2995,5 +3229,6 @@ type Subscription {
   questionNode(where: QuestionNodeSubscriptionWhereInput): QuestionNodeSubscriptionPayload
   questionOption(where: QuestionOptionSubscriptionWhereInput): QuestionOptionSubscriptionPayload
   questionnaire(where: QuestionnaireSubscriptionWhereInput): QuestionnaireSubscriptionPayload
+  session(where: SessionSubscriptionWhereInput): SessionSubscriptionPayload
 }
 `

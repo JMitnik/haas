@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useQuery } from '@apollo/react-hooks';
 import styled, { css, ThemeProvider } from 'styled-components';
 import { Switch, Route, BrowserRouter, Redirect } from 'react-router-dom';
@@ -9,13 +9,25 @@ import { Div, Loader } from '@haas/ui';
 import { CustomerSelector } from './views/CustomerSelector';
 import { getCustomerQuery } from './queries/getCustomerQuery';
 import { QuestionnaireProvider } from './hooks/use-questionnaire';
+import getNewSessionId from './queries/getNewSessionId';
 
 const App: React.FC = () => {
   const { data, loading, error } = useQuery(getCustomerQuery);
-  if (error) return <div>{'Error!' + error.message}</div>;
 
-  
+  if (error) return <div>{'Error!' + error.message}</div>;
   const customers = data?.customers;
+
+  const { data: newSessionData } = useQuery(getNewSessionId);
+  const sessionId = newSessionData?.newSessionId;
+
+  // Initialize unique sessionId
+  useEffect(() => {
+    if (sessionId) {
+      sessionStorage.setItem('sessionId', sessionId);
+    }
+  }, [sessionId])
+
+  if (error) return <div>{'Error!' + error.message}</div>;
 
   return (
     <>

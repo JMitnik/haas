@@ -1,4 +1,33 @@
-# import Query.*, * from './generated/prisma.graphql'
+# import *, Query, Mutation from './generated/prisma.graphql'
+
+type Query {
+    newSessionId: String
+    getQuestionnaireData(topicId: String): QuestionnaireDetailResult!
+}
+
+type Mutation {
+    uploadUserSession(uploadUserSessionInput: UploadUserSessionInput): String
+    createNewCustomer(name: String, options: CustomerCreateOptions): Customer!
+    deleteFullCustomer(id: ID!): Customer!
+    createNewQuestionnaire(customerId: String, title: String, publicTitle: String, description: String, isSeed: Boolean): Questionnaire!
+}
+
+input UserSessionEntryInput {
+    nodeId: String!
+    edgeId: String
+    depth: Int
+    data: UserSessionEntryDataInput!
+}
+
+input UserSessionEntryDataInput {
+    textValue: String
+    numberValue: Int
+    multiValues: [UserSessionEntryDataInput!]
+}
+
+input UploadUserSessionInput {
+    entries: [UserSessionEntryInput!]!
+}
 
 type QuestionnaireDetailResult {
     customerName: String!
@@ -15,16 +44,6 @@ type UniqueDataResultEntry {
     sessionId: String!
     value: Int!
     createdAt: String!
-}
-
-type Query {
-    getQuestionnaireData(topicId: String): QuestionnaireDetailResult!
-}
-
-type Mutation {
-    createNewCustomer(name: String, options: CustomerCreateOptions): Customer!
-    deleteFullCustomer(id: ID!): Customer!
-    createNewQuestionnaire(customerId: String, title: String, publicTitle: String, description: String, isSeed: Boolean): Questionnaire!
 }
 
 input CustomerCreateOptions {

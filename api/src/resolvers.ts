@@ -1,97 +1,10 @@
 import { forwardTo } from 'prisma-binding';
-import _ from 'lodash';
-
+import crypto from 'crypto';
 import { QueryResolvers, MutationResolvers } from './generated/resolver-types';
+import cleanInt from './utils/cleanInt';
+import _ from 'lodash';
 import { prisma, ID_Input, Questionnaire } from './generated/prisma-client/index';
 import seedCompany, { seedQuestionnare } from '../data/seeds/make-company';
-
-// TODO: Put these in a 'model' file, named Questionnaire (with a Questionnaire class). Create a new instance of Questionnaire, and call .getEntries
-const getQuestionnaireAggregatedData = async (parent: any, args: any) => {
-  const { topicId } = args;
-
-  const customerName = (await prisma.questionnaire({ id: topicId }).customer()).name;
-  const questionnaire: Questionnaire | null = (await prisma.questionnaire({ id: topicId }));
-
-  if (questionnaire) {
-    const { title, description, creationDate, updatedAt } = questionnaire;
-
-    const questionNodes = await prisma.questionNodes({ where: {
-      questionnaire: {
-        id: topicId,
-      },
-    } });
-
-    const questionNodeIds = questionNodes.map((qNode) => qNode.id);
-
-    const nodeEntries = await prisma.nodeEntries({ where: {
-      relatedNode: {
-        id_in: questionNodeIds,
-      },
-    } }) || [];
-
-    const aggregatedNodeEntries = await Promise.all(nodeEntries.map(async ({ id }) => {
-      const values = await prisma.nodeEntry({ id }).values();
-      const nodeEntry = await prisma.nodeEntry({ id });
-
-      const mappedResult = {
-        sessionId: nodeEntry?.sessionId,
-        createdAt: nodeEntry?.creationDate,
-        value: values[0].numberValue ? values[0].numberValue : -1,
-      };
-      return mappedResult;
-    })) || [];
-
-    const filterNodes = aggregatedNodeEntries.filter((node) => {
-      return node?.value !== -1;
-    }) || [];
-
-    const filteredNodeData = (filterNodes.map((node) => {
-      return node?.value;
-    })) || [];
-
-    const nrEntries = filteredNodeData.reduce(
-      (total = 0, previousValue) => total + previousValue, 0,
-    );
-
-    const averageSliderResult = (
-      filteredNodeData.length > 0 && nrEntries / filteredNodeData.length).toString()
-      || 'N/A';
-
-    const orderedTimelineEntries = _.orderBy(filterNodes, (filterNode) => {
-      return filterNode.createdAt;
-    }, 'desc') || [];
-
-    return {
-      customerName,
-      title,
-      timelineEntries: orderedTimelineEntries,
-      description,
-      creationDate,
-      updatedAt,
-      average: averageSliderResult,
-      totalNodeEntries: filterNodes.length,
-    };
-  }
-
-  // TODO: What will we return here?
-  return {};
-};
-
-const queryResolvers: QueryResolvers = {
-  questionNodes: forwardTo('db'),
-  questionNode: forwardTo('db'),
-  questionnaire: forwardTo('db'),
-  questionnaires: forwardTo('db'),
-  leafNodes: forwardTo('db'),
-  colourSettings: forwardTo('db'),
-  customers: forwardTo('db'),
-  leafNode: forwardTo('db'),
-  edges: forwardTo('db'),
-  nodeEntries: forwardTo('db'),
-  nodeEntryValues: forwardTo('db'),
-  // TODO: Rename
-  getQuestionnaireData: getQuestionnaireAggregatedData,
-};
 
 const deleteFullCustomerNode = async (parent: any, args:any) => {
   const { id } : { id: ID_Input} = args;
@@ -163,7 +76,133 @@ const createNewQuestionnaire = async (parent : any, args: any): Promise<Question
   return questionnaire;
 };
 
-const mutationResolvers: MutationResolvers = {
+// TODO: Put these in a 'model' file, named Questionnaire (with a Questionnaire class). Create a new instance of Questionnaire, and call .getEntries
+const getQuestionnaireAggregatedData = async (parent: any, args: any) => {
+  const { topicId } = args;
+
+  const customerName = (await prisma.questionnaire({ id: topicId }).customer()).name;
+  const questionnaire: Questionnaire | null = (await prisma.questionnaire({ id: topicId }));
+
+  if (questionnaire) {
+    const { title, description, creationDate, updatedAt } = questionnaire;
+
+    const questionNodes = await prisma.questionNodes({ where: {
+      questionnaire: {
+        id: topicId,
+      },
+    } });
+
+    const questionNodeIds = questionNodes.map((qNode) => qNode.id);
+
+    const nodeEntries = await prisma.nodeEntries({ where: {
+      relatedNode: {
+        id_in: questionNodeIds,
+      },
+    } }) || [];
+
+    const aggregatedNodeEntries = await Promise.all(nodeEntries.map(async ({ id }) => {
+      const values = await prisma.nodeEntry({ id }).values();
+      const nodeEntry = await prisma.nodeEntry({ id });
+      const sessionId = (await prisma.nodeEntry({ id }).session()).id;
+
+      const mappedResult = {
+        sessionId,
+        createdAt: nodeEntry?.creationDate,
+        value: values[0].numberValue ? values[0].numberValue : -1,
+      };
+      return mappedResult;
+    })) || [];
+
+    const filterNodes = aggregatedNodeEntries.filter((node) => {
+      return node?.value !== -1;
+    }) || [];
+
+    const filteredNodeData = (filterNodes.map((node) => {
+      return node?.value;
+    })) || [];
+
+    const nrEntries = filteredNodeData.reduce(
+      (total = 0, previousValue) => total + previousValue, 0,
+    );
+
+    const averageSliderResult = (
+      filteredNodeData.length > 0 && nrEntries / filteredNodeData.length).toString()
+      || 'N/A';
+
+    const orderedTimelineEntries = _.orderBy(filterNodes, (filterNode) => {
+      return filterNode.createdAt;
+    }, 'desc') || [];
+
+    return {
+      customerName,
+      title,
+      timelineEntries: orderedTimelineEntries,
+      description,
+      creationDate,
+      updatedAt,
+      average: averageSliderResult,
+      totalNodeEntries: filterNodes.length,
+    };
+  }
+
+  // TODO: What will we return here?
+  return {};
+};
+
+const queryResolvers = {
+  questionNode: forwardTo('db'),
+  questionNodes: forwardTo('db'),
+  questionnaire: forwardTo('db'),
+  questionnaires: forwardTo('db'),
+  customers: forwardTo('db'),
+  leafNode: forwardTo('db'),
+  edges: forwardTo('db'),
+  nodeEntryValues: forwardTo('db'),
+  nodeEntries: forwardTo('db'),
+  sessions: forwardTo('db'),
+  session: forwardTo('db'),
+  // TODO: Rename
+  getQuestionnaireData: getQuestionnaireAggregatedData,
+  nodeEntry: forwardTo('db'),
+  newSessionId: () => crypto.randomBytes(16).toString('base64'),
+};
+
+const mutationResolvers = {
+  uploadUserSession: async (obj: any, args: any, ctx: any, info: any) => {
+    const session = await prisma.createSession({});
+
+    args.uploadUserSessionInput.entries.forEach(async (entry: any) => {
+      const maybeCreateEdgeChild = (entry: any) => {
+        if (entry.edgeId) {
+          return { edgeChild: { connect: { id: entry.edgeId } } };
+        }
+
+        return {};
+      };
+
+      await prisma.createNodeEntry({
+        ...maybeCreateEdgeChild(entry),
+        session: {
+          connect: {
+            id: session.id,
+          },
+        },
+        relatedNode: {
+          connect: {
+            id: entry.nodeId,
+          },
+        },
+        depth: entry.depth,
+        values: {
+          create: {
+            numberValue: cleanInt(entry.data.numberValue),
+            textValue: entry.data.textValue,
+          },
+        },
+      });
+    });
+    return 'Success!';
+  },
   createNewCustomer: createNewCustomerMutation,
   deleteFullCustomer: deleteFullCustomerNode,
   createNewQuestionnaire,
@@ -176,6 +215,11 @@ const resolvers = {
   },
   Mutation: {
     ...mutationResolvers,
+  },
+  Node: {
+    __resolveType(obj: any, ctx: any, info: any) {
+      return obj.__typename;
+    },
   },
 };
 

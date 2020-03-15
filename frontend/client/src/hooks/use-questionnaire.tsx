@@ -24,6 +24,8 @@ export const QuestionnaireProvider = ({ children }: { children: ReactNode }) => 
     variables: {
       id: params.questionnaireId
     },
+    onCompleted: (e) => {console.log(e)},
+    onError: (e) => {console.log(e)}
   });
 
   const data = res.data;

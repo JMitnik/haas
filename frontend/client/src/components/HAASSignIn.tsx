@@ -26,13 +26,10 @@ const SignInContainer = styled.div`
   `}
 `;
 
-
-export const HAASSignIn = () => {
+export const HAASSignIn = ({ isLeaf }: { isLeaf: boolean }) => {
   return (
     <SignInContainer>
-      <label htmlFor="email">
-        <input id="email" type="email"></input>
-      </label>
+      <p>How should we contact you?</p>
 
       <Button brand="secondary" onClick={() => console.log('clicked')}>Submit</Button>
     </SignInContainer>

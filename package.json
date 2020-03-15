@@ -9,6 +9,8 @@
             "frontend/client"
         ],
         "nohoist": [
+            "frontend/client/webpack-dev-server",
+            "frontend/client/react-scripts-server",
             "frontend/dashboard/webpack-dev-server",
             "**/babel-loader",
             "**/babel-jest"
@@ -31,10 +33,14 @@
         "migrate:api:prod": "yarn workspace @haas/api migrate:prod",
         "seed:api": "yarn workspace @haas/api seed",
         "seed:api:prod": "yarn workspace @haas/api seed:prod",
+        "kill": "yarn kill:api && yarn kill:client",
+        "kill:api": "kill $(lsof -t -i:4000) | exit 0",
+        "kill:client": "kill $(lsof -t -i:3000) | exit 0",
         "reset:api": "yarn workspace @haas/api reset"
     },
     "devDependencies": {
+        "concurrently": "^5.1.0",
         "lerna": "^3.20.2",
-        "concurrently": "^5.1.0"
+        "react-scripts": "^3.4.0"
     }
 }

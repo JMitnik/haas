@@ -1,9 +1,10 @@
 type NodeEntry {
     id: ID! @id
-    sessionId: String!
+    session: Session!
     relatedNode: QuestionNode!
     edgeChild: Edge
     values: [NodeEntryValue]
+    depth: Int
     creationDate: DateTime! @createdAt
 }
 

@@ -1,18 +1,74 @@
 import React from 'react';
 import { H1, Slider, ColumnFlex, Div } from '@haas/ui';
-import { useFormContext } from 'react-hook-form';
-import { useJSONTree } from '../hooks/use-json-tree';
+import { useForm } from 'react-hook-form';
+import { useHAASTree, HAASFormEntry } from '../hooks/use-haas-tree';
+
+
+const cleanInt = (x: any) => {
+  x = Number(x);
+  return x >= 0 ? Math.floor(x) : Math.ceil(x);
+};
+
+export default cleanInt;
+
 
 export const HAASSlider = () => {
-  const { register, watch, getValues } = useFormContext();
-  const { goToChild } = useJSONTree();
+  const { goToChild } = useHAASTree();
+
+  const { watch, getValues, triggerValidation, register } = useForm<HAASFormEntry>({
+    defaultValues: {
+      numberValue: 50,
+    },
+  });
+
+  const onSubmit = async () => {
+    const validForm = await triggerValidation('numberValue');
+
+    if (validForm) {
+      const formEntry = formatSliderEntry(getValues({ nest: true }));
+
+      if (formEntry?.numberValue) {
+        goToChild(formEntry.numberValue, formEntry);
+      }
+    }
+  };
+
+  const formatSliderEntry = (entry: HAASFormEntry) => {
+    const { numberValue, ...entryVals } = entry;
+
+    if (numberValue) {
+      return { ...entryVals, numberValue: cleanInt(numberValue), };
+    }
+
+    return entry;
+  }
+
+  const showValue = () => {
+    let val = watch({ nest: true }).numberValue;
+
+    if (val) return val / 10;
+
+    return 0;
+  }
 
   return (
-    <Div flexGrow={0.5}>
-      <ColumnFlex height="100%" justifyContent="space-between" width={1}>
-        <H1 textAlign="center" color="white">{watch('slider-value', '5')}</H1>
-        <Slider width={1} name="slider-value" onMouseUp={() => goToChild(getValues()['slider-value'])} onTouchEnd={() => goToChild(getValues()['slider-value'])} min={0} max={10} mt={4} defaultValue={5} ref={register} />
-      </ColumnFlex>
-    </Div>
+    <form>
+      <Div flexGrow={0.5}>
+        <ColumnFlex height="100%" justifyContent="space-between" width={1}>
+          <H1 textAlign="center" color="white">{showValue()}</H1>
+          <Slider
+            width={1}
+            name="numberValue"
+            onMouseUp={() => onSubmit()}
+            onTouchEnd={() => onSubmit()}
+            min={0}
+            max={100}
+            mt={4}
+            defaultValue={50}
+            ref={register}
+          />
+        </ColumnFlex>
+      </Div>
+    </form>
   )
 };
