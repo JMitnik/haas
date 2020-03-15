@@ -367,12 +367,10 @@ const makeStarbucks = async () => {
   });
 
   // Create leaf-nodes
-  const leafs = await Promise.all(leafNodes.map(async (leafNode) => {
-    return prisma.createLeafNode({
-      title: leafNode.title,
-      type: leafNode.type,
-    });
-  }));
+  const leafs = await Promise.all(leafNodes.map(async (leafNode) => prisma.createLeafNode({
+    title: leafNode.title,
+    type: leafNode.type,
+  })));
 
   // Create questionnaire
   const questionnaire = await prisma.createQuestionnaire({
@@ -386,7 +384,7 @@ const makeStarbucks = async () => {
     },
     title: 'Default questionnaire',
     description: 'Default questions',
-    questions: {
+    rootQuestion: {
       create: {
         title: `How do you feel about ${customer.name}?`,
         questionType: sliderType,
@@ -394,6 +392,15 @@ const makeStarbucks = async () => {
       },
     },
   });
+
+  const rootQuestion = await prisma.questionnaire({ id: questionnaire.id }).rootQuestion();
+
+  await prisma.updateQuestionnaire({ where: { id: questionnaire.id },
+    data: { questions: {
+      connect: {
+        id: rootQuestion.id,
+      },
+    } } });
 
   // Connect the questionnaire to the customer
   prisma.updateCustomer({

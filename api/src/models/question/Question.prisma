@@ -18,6 +18,7 @@ type QuestionNode {
     branchVal: String
     isRoot: Boolean! @default(value: false)
     questionType: NodeType!
+    questionnaire: Questionnaire! @relation(name: "QuestionnaireQuestions")
     overrideLeaf: LeafNode
     conditions: [QuestionCondition]
     options: [QuestionOption]

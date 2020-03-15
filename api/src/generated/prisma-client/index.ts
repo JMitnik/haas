@@ -635,18 +635,6 @@ export type QuestionnaireOrderByInput =
   | "updatedAt_ASC"
   | "updatedAt_DESC";
 
-export type QuestionNodeOrderByInput =
-  | "id_ASC"
-  | "id_DESC"
-  | "title_ASC"
-  | "title_DESC"
-  | "branchVal_ASC"
-  | "branchVal_DESC"
-  | "isRoot_ASC"
-  | "isRoot_DESC"
-  | "questionType_ASC"
-  | "questionType_DESC";
-
 export type QuestionConditionOrderByInput =
   | "id_ASC"
   | "id_DESC"
@@ -666,6 +654,18 @@ export type QuestionOptionOrderByInput =
   | "value_DESC"
   | "publicValue_ASC"
   | "publicValue_DESC";
+
+export type QuestionNodeOrderByInput =
+  | "id_ASC"
+  | "id_DESC"
+  | "title_ASC"
+  | "title_DESC"
+  | "branchVal_ASC"
+  | "branchVal_DESC"
+  | "isRoot_ASC"
+  | "isRoot_DESC"
+  | "questionType_ASC"
+  | "questionType_DESC";
 
 export type EdgeOrderByInput =
   | "id_ASC"
@@ -1011,6 +1011,7 @@ export interface QuestionnaireWhereInput {
   updatedAt_lte?: Maybe<DateTimeInput>;
   updatedAt_gt?: Maybe<DateTimeInput>;
   updatedAt_gte?: Maybe<DateTimeInput>;
+  rootQuestion?: Maybe<QuestionNodeWhereInput>;
   questions_every?: Maybe<QuestionNodeWhereInput>;
   questions_some?: Maybe<QuestionNodeWhereInput>;
   questions_none?: Maybe<QuestionNodeWhereInput>;
@@ -1221,6 +1222,7 @@ export interface QuestionNodeWhereInput {
   questionType_not?: Maybe<NodeType>;
   questionType_in?: Maybe<NodeType[] | NodeType>;
   questionType_not_in?: Maybe<NodeType[] | NodeType>;
+  questionnaire?: Maybe<QuestionnaireWhereInput>;
   overrideLeaf?: Maybe<LeafNodeWhereInput>;
   conditions_every?: Maybe<QuestionConditionWhereInput>;
   conditions_some?: Maybe<QuestionConditionWhereInput>;
@@ -1639,15 +1641,14 @@ export interface QuestionnaireCreateWithoutCustomerInput {
   title: String;
   description: String;
   publicTitle?: Maybe<String>;
-  questions?: Maybe<QuestionNodeCreateManyInput>;
+  rootQuestion?: Maybe<QuestionNodeCreateOneInput>;
+  questions?: Maybe<QuestionNodeCreateManyWithoutQuestionnaireInput>;
   leafs?: Maybe<LeafNodeCreateManyInput>;
 }
 
-export interface QuestionNodeCreateManyInput {
-  create?: Maybe<QuestionNodeCreateInput[] | QuestionNodeCreateInput>;
-  connect?: Maybe<
-    QuestionNodeWhereUniqueInput[] | QuestionNodeWhereUniqueInput
-  >;
+export interface QuestionNodeCreateOneInput {
+  create?: Maybe<QuestionNodeCreateInput>;
+  connect?: Maybe<QuestionNodeWhereUniqueInput>;
 }
 
 export interface QuestionNodeCreateInput {
@@ -1656,6 +1657,7 @@ export interface QuestionNodeCreateInput {
   branchVal?: Maybe<String>;
   isRoot?: Maybe<Boolean>;
   questionType: NodeType;
+  questionnaire: QuestionnaireCreateOneWithoutQuestionsInput;
   overrideLeaf?: Maybe<LeafNodeCreateOneInput>;
   conditions?: Maybe<QuestionConditionCreateManyInput>;
   options?: Maybe<QuestionOptionCreateManyInput>;
@@ -1663,66 +1665,30 @@ export interface QuestionNodeCreateInput {
   edgeChildren?: Maybe<EdgeCreateManyInput>;
 }
 
-export interface LeafNodeCreateOneInput {
-  create?: Maybe<LeafNodeCreateInput>;
-  connect?: Maybe<LeafNodeWhereUniqueInput>;
+export interface QuestionnaireCreateOneWithoutQuestionsInput {
+  create?: Maybe<QuestionnaireCreateWithoutQuestionsInput>;
+  connect?: Maybe<QuestionnaireWhereUniqueInput>;
 }
 
-export interface LeafNodeCreateInput {
+export interface QuestionnaireCreateWithoutQuestionsInput {
   id?: Maybe<ID_Input>;
-  nodeId?: Maybe<Int>;
-  type?: Maybe<NodeType>;
+  customer: CustomerCreateOneWithoutQuestionnairesInput;
   title: String;
+  description: String;
+  publicTitle?: Maybe<String>;
+  rootQuestion?: Maybe<QuestionNodeCreateOneInput>;
+  leafs?: Maybe<LeafNodeCreateManyInput>;
 }
 
-export interface QuestionConditionCreateManyInput {
-  create?: Maybe<QuestionConditionCreateInput[] | QuestionConditionCreateInput>;
-  connect?: Maybe<
-    QuestionConditionWhereUniqueInput[] | QuestionConditionWhereUniqueInput
-  >;
+export interface CustomerCreateOneWithoutQuestionnairesInput {
+  create?: Maybe<CustomerCreateWithoutQuestionnairesInput>;
+  connect?: Maybe<CustomerWhereUniqueInput>;
 }
 
-export interface QuestionConditionCreateInput {
+export interface CustomerCreateWithoutQuestionnairesInput {
   id?: Maybe<ID_Input>;
-  conditionType: String;
-  renderMin?: Maybe<Int>;
-  renderMax?: Maybe<Int>;
-  matchValue?: Maybe<String>;
-}
-
-export interface QuestionOptionCreateManyInput {
-  create?: Maybe<QuestionOptionCreateInput[] | QuestionOptionCreateInput>;
-  connect?: Maybe<
-    QuestionOptionWhereUniqueInput[] | QuestionOptionWhereUniqueInput
-  >;
-}
-
-export interface QuestionOptionCreateInput {
-  id?: Maybe<ID_Input>;
-  value: String;
-  publicValue?: Maybe<String>;
-}
-
-export interface EdgeCreateManyInput {
-  create?: Maybe<EdgeCreateInput[] | EdgeCreateInput>;
-  connect?: Maybe<EdgeWhereUniqueInput[] | EdgeWhereUniqueInput>;
-}
-
-export interface EdgeCreateInput {
-  id?: Maybe<ID_Input>;
-  conditions?: Maybe<QuestionConditionCreateManyInput>;
-  parentNode?: Maybe<QuestionNodeCreateOneInput>;
-  childNode?: Maybe<QuestionNodeCreateOneInput>;
-}
-
-export interface QuestionNodeCreateOneInput {
-  create?: Maybe<QuestionNodeCreateInput>;
-  connect?: Maybe<QuestionNodeWhereUniqueInput>;
-}
-
-export interface LeafNodeCreateManyInput {
-  create?: Maybe<LeafNodeCreateInput[] | LeafNodeCreateInput>;
-  connect?: Maybe<LeafNodeWhereUniqueInput[] | LeafNodeWhereUniqueInput>;
+  name: String;
+  settings?: Maybe<CustomerSettingsCreateOneInput>;
 }
 
 export interface CustomerSettingsCreateOneInput {
@@ -1753,6 +1719,93 @@ export interface FontSettingsCreateInput {
   body?: Maybe<String>;
   fontTitle?: Maybe<String>;
   special?: Maybe<String>;
+}
+
+export interface LeafNodeCreateManyInput {
+  create?: Maybe<LeafNodeCreateInput[] | LeafNodeCreateInput>;
+  connect?: Maybe<LeafNodeWhereUniqueInput[] | LeafNodeWhereUniqueInput>;
+}
+
+export interface LeafNodeCreateInput {
+  id?: Maybe<ID_Input>;
+  nodeId?: Maybe<Int>;
+  type?: Maybe<NodeType>;
+  title: String;
+}
+
+export interface LeafNodeCreateOneInput {
+  create?: Maybe<LeafNodeCreateInput>;
+  connect?: Maybe<LeafNodeWhereUniqueInput>;
+}
+
+export interface QuestionConditionCreateManyInput {
+  create?: Maybe<QuestionConditionCreateInput[] | QuestionConditionCreateInput>;
+  connect?: Maybe<
+    QuestionConditionWhereUniqueInput[] | QuestionConditionWhereUniqueInput
+  >;
+}
+
+export interface QuestionConditionCreateInput {
+  id?: Maybe<ID_Input>;
+  conditionType: String;
+  renderMin?: Maybe<Int>;
+  renderMax?: Maybe<Int>;
+  matchValue?: Maybe<String>;
+}
+
+export interface QuestionOptionCreateManyInput {
+  create?: Maybe<QuestionOptionCreateInput[] | QuestionOptionCreateInput>;
+  connect?: Maybe<
+    QuestionOptionWhereUniqueInput[] | QuestionOptionWhereUniqueInput
+  >;
+}
+
+export interface QuestionOptionCreateInput {
+  id?: Maybe<ID_Input>;
+  value: String;
+  publicValue?: Maybe<String>;
+}
+
+export interface QuestionNodeCreateManyInput {
+  create?: Maybe<QuestionNodeCreateInput[] | QuestionNodeCreateInput>;
+  connect?: Maybe<
+    QuestionNodeWhereUniqueInput[] | QuestionNodeWhereUniqueInput
+  >;
+}
+
+export interface EdgeCreateManyInput {
+  create?: Maybe<EdgeCreateInput[] | EdgeCreateInput>;
+  connect?: Maybe<EdgeWhereUniqueInput[] | EdgeWhereUniqueInput>;
+}
+
+export interface EdgeCreateInput {
+  id?: Maybe<ID_Input>;
+  conditions?: Maybe<QuestionConditionCreateManyInput>;
+  parentNode?: Maybe<QuestionNodeCreateOneInput>;
+  childNode?: Maybe<QuestionNodeCreateOneInput>;
+}
+
+export interface QuestionNodeCreateManyWithoutQuestionnaireInput {
+  create?: Maybe<
+    | QuestionNodeCreateWithoutQuestionnaireInput[]
+    | QuestionNodeCreateWithoutQuestionnaireInput
+  >;
+  connect?: Maybe<
+    QuestionNodeWhereUniqueInput[] | QuestionNodeWhereUniqueInput
+  >;
+}
+
+export interface QuestionNodeCreateWithoutQuestionnaireInput {
+  id?: Maybe<ID_Input>;
+  title: String;
+  branchVal?: Maybe<String>;
+  isRoot?: Maybe<Boolean>;
+  questionType: NodeType;
+  overrideLeaf?: Maybe<LeafNodeCreateOneInput>;
+  conditions?: Maybe<QuestionConditionCreateManyInput>;
+  options?: Maybe<QuestionOptionCreateManyInput>;
+  children?: Maybe<QuestionNodeCreateManyInput>;
+  edgeChildren?: Maybe<EdgeCreateManyInput>;
 }
 
 export interface CustomerUpdateInput {
@@ -1802,40 +1855,18 @@ export interface QuestionnaireUpdateWithoutCustomerDataInput {
   title?: Maybe<String>;
   description?: Maybe<String>;
   publicTitle?: Maybe<String>;
-  questions?: Maybe<QuestionNodeUpdateManyInput>;
+  rootQuestion?: Maybe<QuestionNodeUpdateOneInput>;
+  questions?: Maybe<QuestionNodeUpdateManyWithoutQuestionnaireInput>;
   leafs?: Maybe<LeafNodeUpdateManyInput>;
 }
 
-export interface QuestionNodeUpdateManyInput {
-  create?: Maybe<QuestionNodeCreateInput[] | QuestionNodeCreateInput>;
-  update?: Maybe<
-    | QuestionNodeUpdateWithWhereUniqueNestedInput[]
-    | QuestionNodeUpdateWithWhereUniqueNestedInput
-  >;
-  upsert?: Maybe<
-    | QuestionNodeUpsertWithWhereUniqueNestedInput[]
-    | QuestionNodeUpsertWithWhereUniqueNestedInput
-  >;
-  delete?: Maybe<QuestionNodeWhereUniqueInput[] | QuestionNodeWhereUniqueInput>;
-  connect?: Maybe<
-    QuestionNodeWhereUniqueInput[] | QuestionNodeWhereUniqueInput
-  >;
-  set?: Maybe<QuestionNodeWhereUniqueInput[] | QuestionNodeWhereUniqueInput>;
-  disconnect?: Maybe<
-    QuestionNodeWhereUniqueInput[] | QuestionNodeWhereUniqueInput
-  >;
-  deleteMany?: Maybe<
-    QuestionNodeScalarWhereInput[] | QuestionNodeScalarWhereInput
-  >;
-  updateMany?: Maybe<
-    | QuestionNodeUpdateManyWithWhereNestedInput[]
-    | QuestionNodeUpdateManyWithWhereNestedInput
-  >;
-}
-
-export interface QuestionNodeUpdateWithWhereUniqueNestedInput {
-  where: QuestionNodeWhereUniqueInput;
-  data: QuestionNodeUpdateDataInput;
+export interface QuestionNodeUpdateOneInput {
+  create?: Maybe<QuestionNodeCreateInput>;
+  update?: Maybe<QuestionNodeUpdateDataInput>;
+  upsert?: Maybe<QuestionNodeUpsertNestedInput>;
+  delete?: Maybe<Boolean>;
+  disconnect?: Maybe<Boolean>;
+  connect?: Maybe<QuestionNodeWhereUniqueInput>;
 }
 
 export interface QuestionNodeUpdateDataInput {
@@ -1843,11 +1874,216 @@ export interface QuestionNodeUpdateDataInput {
   branchVal?: Maybe<String>;
   isRoot?: Maybe<Boolean>;
   questionType?: Maybe<NodeType>;
+  questionnaire?: Maybe<QuestionnaireUpdateOneRequiredWithoutQuestionsInput>;
   overrideLeaf?: Maybe<LeafNodeUpdateOneInput>;
   conditions?: Maybe<QuestionConditionUpdateManyInput>;
   options?: Maybe<QuestionOptionUpdateManyInput>;
   children?: Maybe<QuestionNodeUpdateManyInput>;
   edgeChildren?: Maybe<EdgeUpdateManyInput>;
+}
+
+export interface QuestionnaireUpdateOneRequiredWithoutQuestionsInput {
+  create?: Maybe<QuestionnaireCreateWithoutQuestionsInput>;
+  update?: Maybe<QuestionnaireUpdateWithoutQuestionsDataInput>;
+  upsert?: Maybe<QuestionnaireUpsertWithoutQuestionsInput>;
+  connect?: Maybe<QuestionnaireWhereUniqueInput>;
+}
+
+export interface QuestionnaireUpdateWithoutQuestionsDataInput {
+  customer?: Maybe<CustomerUpdateOneRequiredWithoutQuestionnairesInput>;
+  title?: Maybe<String>;
+  description?: Maybe<String>;
+  publicTitle?: Maybe<String>;
+  rootQuestion?: Maybe<QuestionNodeUpdateOneInput>;
+  leafs?: Maybe<LeafNodeUpdateManyInput>;
+}
+
+export interface CustomerUpdateOneRequiredWithoutQuestionnairesInput {
+  create?: Maybe<CustomerCreateWithoutQuestionnairesInput>;
+  update?: Maybe<CustomerUpdateWithoutQuestionnairesDataInput>;
+  upsert?: Maybe<CustomerUpsertWithoutQuestionnairesInput>;
+  connect?: Maybe<CustomerWhereUniqueInput>;
+}
+
+export interface CustomerUpdateWithoutQuestionnairesDataInput {
+  name?: Maybe<String>;
+  settings?: Maybe<CustomerSettingsUpdateOneInput>;
+}
+
+export interface CustomerSettingsUpdateOneInput {
+  create?: Maybe<CustomerSettingsCreateInput>;
+  update?: Maybe<CustomerSettingsUpdateDataInput>;
+  upsert?: Maybe<CustomerSettingsUpsertNestedInput>;
+  delete?: Maybe<Boolean>;
+  disconnect?: Maybe<Boolean>;
+  connect?: Maybe<CustomerSettingsWhereUniqueInput>;
+}
+
+export interface CustomerSettingsUpdateDataInput {
+  logoUrl?: Maybe<String>;
+  colourSettings?: Maybe<ColourSettingsUpdateOneInput>;
+  fontSettings?: Maybe<FontSettingsUpdateOneInput>;
+}
+
+export interface ColourSettingsUpdateOneInput {
+  create?: Maybe<ColourSettingsCreateInput>;
+  update?: Maybe<ColourSettingsUpdateDataInput>;
+  upsert?: Maybe<ColourSettingsUpsertNestedInput>;
+  delete?: Maybe<Boolean>;
+  disconnect?: Maybe<Boolean>;
+  connect?: Maybe<ColourSettingsWhereUniqueInput>;
+}
+
+export interface ColourSettingsUpdateDataInput {
+  primary?: Maybe<String>;
+  secondary?: Maybe<String>;
+  tertiary?: Maybe<String>;
+  success?: Maybe<String>;
+  warning?: Maybe<String>;
+  error?: Maybe<String>;
+  lightest?: Maybe<String>;
+  light?: Maybe<String>;
+  normal?: Maybe<String>;
+  dark?: Maybe<String>;
+  darkest?: Maybe<String>;
+  muted?: Maybe<String>;
+  text?: Maybe<String>;
+}
+
+export interface ColourSettingsUpsertNestedInput {
+  update: ColourSettingsUpdateDataInput;
+  create: ColourSettingsCreateInput;
+}
+
+export interface FontSettingsUpdateOneInput {
+  create?: Maybe<FontSettingsCreateInput>;
+  update?: Maybe<FontSettingsUpdateDataInput>;
+  upsert?: Maybe<FontSettingsUpsertNestedInput>;
+  delete?: Maybe<Boolean>;
+  disconnect?: Maybe<Boolean>;
+  connect?: Maybe<FontSettingsWhereUniqueInput>;
+}
+
+export interface FontSettingsUpdateDataInput {
+  settingTitle?: Maybe<String>;
+  body?: Maybe<String>;
+  fontTitle?: Maybe<String>;
+  special?: Maybe<String>;
+}
+
+export interface FontSettingsUpsertNestedInput {
+  update: FontSettingsUpdateDataInput;
+  create: FontSettingsCreateInput;
+}
+
+export interface CustomerSettingsUpsertNestedInput {
+  update: CustomerSettingsUpdateDataInput;
+  create: CustomerSettingsCreateInput;
+}
+
+export interface CustomerUpsertWithoutQuestionnairesInput {
+  update: CustomerUpdateWithoutQuestionnairesDataInput;
+  create: CustomerCreateWithoutQuestionnairesInput;
+}
+
+export interface LeafNodeUpdateManyInput {
+  create?: Maybe<LeafNodeCreateInput[] | LeafNodeCreateInput>;
+  update?: Maybe<
+    | LeafNodeUpdateWithWhereUniqueNestedInput[]
+    | LeafNodeUpdateWithWhereUniqueNestedInput
+  >;
+  upsert?: Maybe<
+    | LeafNodeUpsertWithWhereUniqueNestedInput[]
+    | LeafNodeUpsertWithWhereUniqueNestedInput
+  >;
+  delete?: Maybe<LeafNodeWhereUniqueInput[] | LeafNodeWhereUniqueInput>;
+  connect?: Maybe<LeafNodeWhereUniqueInput[] | LeafNodeWhereUniqueInput>;
+  set?: Maybe<LeafNodeWhereUniqueInput[] | LeafNodeWhereUniqueInput>;
+  disconnect?: Maybe<LeafNodeWhereUniqueInput[] | LeafNodeWhereUniqueInput>;
+  deleteMany?: Maybe<LeafNodeScalarWhereInput[] | LeafNodeScalarWhereInput>;
+  updateMany?: Maybe<
+    | LeafNodeUpdateManyWithWhereNestedInput[]
+    | LeafNodeUpdateManyWithWhereNestedInput
+  >;
+}
+
+export interface LeafNodeUpdateWithWhereUniqueNestedInput {
+  where: LeafNodeWhereUniqueInput;
+  data: LeafNodeUpdateDataInput;
+}
+
+export interface LeafNodeUpdateDataInput {
+  nodeId?: Maybe<Int>;
+  type?: Maybe<NodeType>;
+  title?: Maybe<String>;
+}
+
+export interface LeafNodeUpsertWithWhereUniqueNestedInput {
+  where: LeafNodeWhereUniqueInput;
+  update: LeafNodeUpdateDataInput;
+  create: LeafNodeCreateInput;
+}
+
+export interface LeafNodeScalarWhereInput {
+  id?: Maybe<ID_Input>;
+  id_not?: Maybe<ID_Input>;
+  id_in?: Maybe<ID_Input[] | ID_Input>;
+  id_not_in?: Maybe<ID_Input[] | ID_Input>;
+  id_lt?: Maybe<ID_Input>;
+  id_lte?: Maybe<ID_Input>;
+  id_gt?: Maybe<ID_Input>;
+  id_gte?: Maybe<ID_Input>;
+  id_contains?: Maybe<ID_Input>;
+  id_not_contains?: Maybe<ID_Input>;
+  id_starts_with?: Maybe<ID_Input>;
+  id_not_starts_with?: Maybe<ID_Input>;
+  id_ends_with?: Maybe<ID_Input>;
+  id_not_ends_with?: Maybe<ID_Input>;
+  nodeId?: Maybe<Int>;
+  nodeId_not?: Maybe<Int>;
+  nodeId_in?: Maybe<Int[] | Int>;
+  nodeId_not_in?: Maybe<Int[] | Int>;
+  nodeId_lt?: Maybe<Int>;
+  nodeId_lte?: Maybe<Int>;
+  nodeId_gt?: Maybe<Int>;
+  nodeId_gte?: Maybe<Int>;
+  type?: Maybe<NodeType>;
+  type_not?: Maybe<NodeType>;
+  type_in?: Maybe<NodeType[] | NodeType>;
+  type_not_in?: Maybe<NodeType[] | NodeType>;
+  title?: Maybe<String>;
+  title_not?: Maybe<String>;
+  title_in?: Maybe<String[] | String>;
+  title_not_in?: Maybe<String[] | String>;
+  title_lt?: Maybe<String>;
+  title_lte?: Maybe<String>;
+  title_gt?: Maybe<String>;
+  title_gte?: Maybe<String>;
+  title_contains?: Maybe<String>;
+  title_not_contains?: Maybe<String>;
+  title_starts_with?: Maybe<String>;
+  title_not_starts_with?: Maybe<String>;
+  title_ends_with?: Maybe<String>;
+  title_not_ends_with?: Maybe<String>;
+  AND?: Maybe<LeafNodeScalarWhereInput[] | LeafNodeScalarWhereInput>;
+  OR?: Maybe<LeafNodeScalarWhereInput[] | LeafNodeScalarWhereInput>;
+  NOT?: Maybe<LeafNodeScalarWhereInput[] | LeafNodeScalarWhereInput>;
+}
+
+export interface LeafNodeUpdateManyWithWhereNestedInput {
+  where: LeafNodeScalarWhereInput;
+  data: LeafNodeUpdateManyDataInput;
+}
+
+export interface LeafNodeUpdateManyDataInput {
+  nodeId?: Maybe<Int>;
+  type?: Maybe<NodeType>;
+  title?: Maybe<String>;
+}
+
+export interface QuestionnaireUpsertWithoutQuestionsInput {
+  update: QuestionnaireUpdateWithoutQuestionsDataInput;
+  create: QuestionnaireCreateWithoutQuestionsInput;
 }
 
 export interface LeafNodeUpdateOneInput {
@@ -1857,12 +2093,6 @@ export interface LeafNodeUpdateOneInput {
   delete?: Maybe<Boolean>;
   disconnect?: Maybe<Boolean>;
   connect?: Maybe<LeafNodeWhereUniqueInput>;
-}
-
-export interface LeafNodeUpdateDataInput {
-  nodeId?: Maybe<Int>;
-  type?: Maybe<NodeType>;
-  title?: Maybe<String>;
 }
 
 export interface LeafNodeUpsertNestedInput {
@@ -2110,88 +2340,36 @@ export interface QuestionOptionUpdateManyDataInput {
   publicValue?: Maybe<String>;
 }
 
-export interface EdgeUpdateManyInput {
-  create?: Maybe<EdgeCreateInput[] | EdgeCreateInput>;
+export interface QuestionNodeUpdateManyInput {
+  create?: Maybe<QuestionNodeCreateInput[] | QuestionNodeCreateInput>;
   update?: Maybe<
-    | EdgeUpdateWithWhereUniqueNestedInput[]
-    | EdgeUpdateWithWhereUniqueNestedInput
+    | QuestionNodeUpdateWithWhereUniqueNestedInput[]
+    | QuestionNodeUpdateWithWhereUniqueNestedInput
   >;
   upsert?: Maybe<
-    | EdgeUpsertWithWhereUniqueNestedInput[]
-    | EdgeUpsertWithWhereUniqueNestedInput
+    | QuestionNodeUpsertWithWhereUniqueNestedInput[]
+    | QuestionNodeUpsertWithWhereUniqueNestedInput
   >;
-  delete?: Maybe<EdgeWhereUniqueInput[] | EdgeWhereUniqueInput>;
-  connect?: Maybe<EdgeWhereUniqueInput[] | EdgeWhereUniqueInput>;
-  set?: Maybe<EdgeWhereUniqueInput[] | EdgeWhereUniqueInput>;
-  disconnect?: Maybe<EdgeWhereUniqueInput[] | EdgeWhereUniqueInput>;
-  deleteMany?: Maybe<EdgeScalarWhereInput[] | EdgeScalarWhereInput>;
+  delete?: Maybe<QuestionNodeWhereUniqueInput[] | QuestionNodeWhereUniqueInput>;
+  connect?: Maybe<
+    QuestionNodeWhereUniqueInput[] | QuestionNodeWhereUniqueInput
+  >;
+  set?: Maybe<QuestionNodeWhereUniqueInput[] | QuestionNodeWhereUniqueInput>;
+  disconnect?: Maybe<
+    QuestionNodeWhereUniqueInput[] | QuestionNodeWhereUniqueInput
+  >;
+  deleteMany?: Maybe<
+    QuestionNodeScalarWhereInput[] | QuestionNodeScalarWhereInput
+  >;
+  updateMany?: Maybe<
+    | QuestionNodeUpdateManyWithWhereNestedInput[]
+    | QuestionNodeUpdateManyWithWhereNestedInput
+  >;
 }
 
-export interface EdgeUpdateWithWhereUniqueNestedInput {
-  where: EdgeWhereUniqueInput;
-  data: EdgeUpdateDataInput;
-}
-
-export interface EdgeUpdateDataInput {
-  conditions?: Maybe<QuestionConditionUpdateManyInput>;
-  parentNode?: Maybe<QuestionNodeUpdateOneInput>;
-  childNode?: Maybe<QuestionNodeUpdateOneInput>;
-}
-
-export interface QuestionNodeUpdateOneInput {
-  create?: Maybe<QuestionNodeCreateInput>;
-  update?: Maybe<QuestionNodeUpdateDataInput>;
-  upsert?: Maybe<QuestionNodeUpsertNestedInput>;
-  delete?: Maybe<Boolean>;
-  disconnect?: Maybe<Boolean>;
-  connect?: Maybe<QuestionNodeWhereUniqueInput>;
-}
-
-export interface QuestionNodeUpsertNestedInput {
-  update: QuestionNodeUpdateDataInput;
-  create: QuestionNodeCreateInput;
-}
-
-export interface EdgeUpsertWithWhereUniqueNestedInput {
-  where: EdgeWhereUniqueInput;
-  update: EdgeUpdateDataInput;
-  create: EdgeCreateInput;
-}
-
-export interface EdgeScalarWhereInput {
-  id?: Maybe<ID_Input>;
-  id_not?: Maybe<ID_Input>;
-  id_in?: Maybe<ID_Input[] | ID_Input>;
-  id_not_in?: Maybe<ID_Input[] | ID_Input>;
-  id_lt?: Maybe<ID_Input>;
-  id_lte?: Maybe<ID_Input>;
-  id_gt?: Maybe<ID_Input>;
-  id_gte?: Maybe<ID_Input>;
-  id_contains?: Maybe<ID_Input>;
-  id_not_contains?: Maybe<ID_Input>;
-  id_starts_with?: Maybe<ID_Input>;
-  id_not_starts_with?: Maybe<ID_Input>;
-  id_ends_with?: Maybe<ID_Input>;
-  id_not_ends_with?: Maybe<ID_Input>;
-  createdAt?: Maybe<DateTimeInput>;
-  createdAt_not?: Maybe<DateTimeInput>;
-  createdAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  createdAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  createdAt_lt?: Maybe<DateTimeInput>;
-  createdAt_lte?: Maybe<DateTimeInput>;
-  createdAt_gt?: Maybe<DateTimeInput>;
-  createdAt_gte?: Maybe<DateTimeInput>;
-  updatedAt?: Maybe<DateTimeInput>;
-  updatedAt_not?: Maybe<DateTimeInput>;
-  updatedAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  updatedAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
-  updatedAt_lt?: Maybe<DateTimeInput>;
-  updatedAt_lte?: Maybe<DateTimeInput>;
-  updatedAt_gt?: Maybe<DateTimeInput>;
-  updatedAt_gte?: Maybe<DateTimeInput>;
-  AND?: Maybe<EdgeScalarWhereInput[] | EdgeScalarWhereInput>;
-  OR?: Maybe<EdgeScalarWhereInput[] | EdgeScalarWhereInput>;
-  NOT?: Maybe<EdgeScalarWhereInput[] | EdgeScalarWhereInput>;
+export interface QuestionNodeUpdateWithWhereUniqueNestedInput {
+  where: QuestionNodeWhereUniqueInput;
+  data: QuestionNodeUpdateDataInput;
 }
 
 export interface QuestionNodeUpsertWithWhereUniqueNestedInput {
@@ -2266,39 +2444,41 @@ export interface QuestionNodeUpdateManyDataInput {
   questionType?: Maybe<NodeType>;
 }
 
-export interface LeafNodeUpdateManyInput {
-  create?: Maybe<LeafNodeCreateInput[] | LeafNodeCreateInput>;
+export interface EdgeUpdateManyInput {
+  create?: Maybe<EdgeCreateInput[] | EdgeCreateInput>;
   update?: Maybe<
-    | LeafNodeUpdateWithWhereUniqueNestedInput[]
-    | LeafNodeUpdateWithWhereUniqueNestedInput
+    | EdgeUpdateWithWhereUniqueNestedInput[]
+    | EdgeUpdateWithWhereUniqueNestedInput
   >;
   upsert?: Maybe<
-    | LeafNodeUpsertWithWhereUniqueNestedInput[]
-    | LeafNodeUpsertWithWhereUniqueNestedInput
+    | EdgeUpsertWithWhereUniqueNestedInput[]
+    | EdgeUpsertWithWhereUniqueNestedInput
   >;
-  delete?: Maybe<LeafNodeWhereUniqueInput[] | LeafNodeWhereUniqueInput>;
-  connect?: Maybe<LeafNodeWhereUniqueInput[] | LeafNodeWhereUniqueInput>;
-  set?: Maybe<LeafNodeWhereUniqueInput[] | LeafNodeWhereUniqueInput>;
-  disconnect?: Maybe<LeafNodeWhereUniqueInput[] | LeafNodeWhereUniqueInput>;
-  deleteMany?: Maybe<LeafNodeScalarWhereInput[] | LeafNodeScalarWhereInput>;
-  updateMany?: Maybe<
-    | LeafNodeUpdateManyWithWhereNestedInput[]
-    | LeafNodeUpdateManyWithWhereNestedInput
-  >;
+  delete?: Maybe<EdgeWhereUniqueInput[] | EdgeWhereUniqueInput>;
+  connect?: Maybe<EdgeWhereUniqueInput[] | EdgeWhereUniqueInput>;
+  set?: Maybe<EdgeWhereUniqueInput[] | EdgeWhereUniqueInput>;
+  disconnect?: Maybe<EdgeWhereUniqueInput[] | EdgeWhereUniqueInput>;
+  deleteMany?: Maybe<EdgeScalarWhereInput[] | EdgeScalarWhereInput>;
 }
 
-export interface LeafNodeUpdateWithWhereUniqueNestedInput {
-  where: LeafNodeWhereUniqueInput;
-  data: LeafNodeUpdateDataInput;
+export interface EdgeUpdateWithWhereUniqueNestedInput {
+  where: EdgeWhereUniqueInput;
+  data: EdgeUpdateDataInput;
 }
 
-export interface LeafNodeUpsertWithWhereUniqueNestedInput {
-  where: LeafNodeWhereUniqueInput;
-  update: LeafNodeUpdateDataInput;
-  create: LeafNodeCreateInput;
+export interface EdgeUpdateDataInput {
+  conditions?: Maybe<QuestionConditionUpdateManyInput>;
+  parentNode?: Maybe<QuestionNodeUpdateOneInput>;
+  childNode?: Maybe<QuestionNodeUpdateOneInput>;
 }
 
-export interface LeafNodeScalarWhereInput {
+export interface EdgeUpsertWithWhereUniqueNestedInput {
+  where: EdgeWhereUniqueInput;
+  update: EdgeUpdateDataInput;
+  create: EdgeCreateInput;
+}
+
+export interface EdgeScalarWhereInput {
   id?: Maybe<ID_Input>;
   id_not?: Maybe<ID_Input>;
   id_in?: Maybe<ID_Input[] | ID_Input>;
@@ -2313,46 +2493,83 @@ export interface LeafNodeScalarWhereInput {
   id_not_starts_with?: Maybe<ID_Input>;
   id_ends_with?: Maybe<ID_Input>;
   id_not_ends_with?: Maybe<ID_Input>;
-  nodeId?: Maybe<Int>;
-  nodeId_not?: Maybe<Int>;
-  nodeId_in?: Maybe<Int[] | Int>;
-  nodeId_not_in?: Maybe<Int[] | Int>;
-  nodeId_lt?: Maybe<Int>;
-  nodeId_lte?: Maybe<Int>;
-  nodeId_gt?: Maybe<Int>;
-  nodeId_gte?: Maybe<Int>;
-  type?: Maybe<NodeType>;
-  type_not?: Maybe<NodeType>;
-  type_in?: Maybe<NodeType[] | NodeType>;
-  type_not_in?: Maybe<NodeType[] | NodeType>;
-  title?: Maybe<String>;
-  title_not?: Maybe<String>;
-  title_in?: Maybe<String[] | String>;
-  title_not_in?: Maybe<String[] | String>;
-  title_lt?: Maybe<String>;
-  title_lte?: Maybe<String>;
-  title_gt?: Maybe<String>;
-  title_gte?: Maybe<String>;
-  title_contains?: Maybe<String>;
-  title_not_contains?: Maybe<String>;
-  title_starts_with?: Maybe<String>;
-  title_not_starts_with?: Maybe<String>;
-  title_ends_with?: Maybe<String>;
-  title_not_ends_with?: Maybe<String>;
-  AND?: Maybe<LeafNodeScalarWhereInput[] | LeafNodeScalarWhereInput>;
-  OR?: Maybe<LeafNodeScalarWhereInput[] | LeafNodeScalarWhereInput>;
-  NOT?: Maybe<LeafNodeScalarWhereInput[] | LeafNodeScalarWhereInput>;
+  createdAt?: Maybe<DateTimeInput>;
+  createdAt_not?: Maybe<DateTimeInput>;
+  createdAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  createdAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  createdAt_lt?: Maybe<DateTimeInput>;
+  createdAt_lte?: Maybe<DateTimeInput>;
+  createdAt_gt?: Maybe<DateTimeInput>;
+  createdAt_gte?: Maybe<DateTimeInput>;
+  updatedAt?: Maybe<DateTimeInput>;
+  updatedAt_not?: Maybe<DateTimeInput>;
+  updatedAt_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  updatedAt_not_in?: Maybe<DateTimeInput[] | DateTimeInput>;
+  updatedAt_lt?: Maybe<DateTimeInput>;
+  updatedAt_lte?: Maybe<DateTimeInput>;
+  updatedAt_gt?: Maybe<DateTimeInput>;
+  updatedAt_gte?: Maybe<DateTimeInput>;
+  AND?: Maybe<EdgeScalarWhereInput[] | EdgeScalarWhereInput>;
+  OR?: Maybe<EdgeScalarWhereInput[] | EdgeScalarWhereInput>;
+  NOT?: Maybe<EdgeScalarWhereInput[] | EdgeScalarWhereInput>;
 }
 
-export interface LeafNodeUpdateManyWithWhereNestedInput {
-  where: LeafNodeScalarWhereInput;
-  data: LeafNodeUpdateManyDataInput;
+export interface QuestionNodeUpsertNestedInput {
+  update: QuestionNodeUpdateDataInput;
+  create: QuestionNodeCreateInput;
 }
 
-export interface LeafNodeUpdateManyDataInput {
-  nodeId?: Maybe<Int>;
-  type?: Maybe<NodeType>;
+export interface QuestionNodeUpdateManyWithoutQuestionnaireInput {
+  create?: Maybe<
+    | QuestionNodeCreateWithoutQuestionnaireInput[]
+    | QuestionNodeCreateWithoutQuestionnaireInput
+  >;
+  delete?: Maybe<QuestionNodeWhereUniqueInput[] | QuestionNodeWhereUniqueInput>;
+  connect?: Maybe<
+    QuestionNodeWhereUniqueInput[] | QuestionNodeWhereUniqueInput
+  >;
+  set?: Maybe<QuestionNodeWhereUniqueInput[] | QuestionNodeWhereUniqueInput>;
+  disconnect?: Maybe<
+    QuestionNodeWhereUniqueInput[] | QuestionNodeWhereUniqueInput
+  >;
+  update?: Maybe<
+    | QuestionNodeUpdateWithWhereUniqueWithoutQuestionnaireInput[]
+    | QuestionNodeUpdateWithWhereUniqueWithoutQuestionnaireInput
+  >;
+  upsert?: Maybe<
+    | QuestionNodeUpsertWithWhereUniqueWithoutQuestionnaireInput[]
+    | QuestionNodeUpsertWithWhereUniqueWithoutQuestionnaireInput
+  >;
+  deleteMany?: Maybe<
+    QuestionNodeScalarWhereInput[] | QuestionNodeScalarWhereInput
+  >;
+  updateMany?: Maybe<
+    | QuestionNodeUpdateManyWithWhereNestedInput[]
+    | QuestionNodeUpdateManyWithWhereNestedInput
+  >;
+}
+
+export interface QuestionNodeUpdateWithWhereUniqueWithoutQuestionnaireInput {
+  where: QuestionNodeWhereUniqueInput;
+  data: QuestionNodeUpdateWithoutQuestionnaireDataInput;
+}
+
+export interface QuestionNodeUpdateWithoutQuestionnaireDataInput {
   title?: Maybe<String>;
+  branchVal?: Maybe<String>;
+  isRoot?: Maybe<Boolean>;
+  questionType?: Maybe<NodeType>;
+  overrideLeaf?: Maybe<LeafNodeUpdateOneInput>;
+  conditions?: Maybe<QuestionConditionUpdateManyInput>;
+  options?: Maybe<QuestionOptionUpdateManyInput>;
+  children?: Maybe<QuestionNodeUpdateManyInput>;
+  edgeChildren?: Maybe<EdgeUpdateManyInput>;
+}
+
+export interface QuestionNodeUpsertWithWhereUniqueWithoutQuestionnaireInput {
+  where: QuestionNodeWhereUniqueInput;
+  update: QuestionNodeUpdateWithoutQuestionnaireDataInput;
+  create: QuestionNodeCreateWithoutQuestionnaireInput;
 }
 
 export interface QuestionnaireUpsertWithWhereUniqueWithoutCustomerInput {
@@ -2448,77 +2665,6 @@ export interface QuestionnaireUpdateManyDataInput {
   title?: Maybe<String>;
   description?: Maybe<String>;
   publicTitle?: Maybe<String>;
-}
-
-export interface CustomerSettingsUpdateOneInput {
-  create?: Maybe<CustomerSettingsCreateInput>;
-  update?: Maybe<CustomerSettingsUpdateDataInput>;
-  upsert?: Maybe<CustomerSettingsUpsertNestedInput>;
-  delete?: Maybe<Boolean>;
-  disconnect?: Maybe<Boolean>;
-  connect?: Maybe<CustomerSettingsWhereUniqueInput>;
-}
-
-export interface CustomerSettingsUpdateDataInput {
-  logoUrl?: Maybe<String>;
-  colourSettings?: Maybe<ColourSettingsUpdateOneInput>;
-  fontSettings?: Maybe<FontSettingsUpdateOneInput>;
-}
-
-export interface ColourSettingsUpdateOneInput {
-  create?: Maybe<ColourSettingsCreateInput>;
-  update?: Maybe<ColourSettingsUpdateDataInput>;
-  upsert?: Maybe<ColourSettingsUpsertNestedInput>;
-  delete?: Maybe<Boolean>;
-  disconnect?: Maybe<Boolean>;
-  connect?: Maybe<ColourSettingsWhereUniqueInput>;
-}
-
-export interface ColourSettingsUpdateDataInput {
-  primary?: Maybe<String>;
-  secondary?: Maybe<String>;
-  tertiary?: Maybe<String>;
-  success?: Maybe<String>;
-  warning?: Maybe<String>;
-  error?: Maybe<String>;
-  lightest?: Maybe<String>;
-  light?: Maybe<String>;
-  normal?: Maybe<String>;
-  dark?: Maybe<String>;
-  darkest?: Maybe<String>;
-  muted?: Maybe<String>;
-  text?: Maybe<String>;
-}
-
-export interface ColourSettingsUpsertNestedInput {
-  update: ColourSettingsUpdateDataInput;
-  create: ColourSettingsCreateInput;
-}
-
-export interface FontSettingsUpdateOneInput {
-  create?: Maybe<FontSettingsCreateInput>;
-  update?: Maybe<FontSettingsUpdateDataInput>;
-  upsert?: Maybe<FontSettingsUpsertNestedInput>;
-  delete?: Maybe<Boolean>;
-  disconnect?: Maybe<Boolean>;
-  connect?: Maybe<FontSettingsWhereUniqueInput>;
-}
-
-export interface FontSettingsUpdateDataInput {
-  settingTitle?: Maybe<String>;
-  body?: Maybe<String>;
-  fontTitle?: Maybe<String>;
-  special?: Maybe<String>;
-}
-
-export interface FontSettingsUpsertNestedInput {
-  update: FontSettingsUpdateDataInput;
-  create: FontSettingsCreateInput;
-}
-
-export interface CustomerSettingsUpsertNestedInput {
-  update: CustomerSettingsUpdateDataInput;
-  create: CustomerSettingsCreateInput;
 }
 
 export interface CustomerUpdateManyMutationInput {
@@ -2760,6 +2906,7 @@ export interface QuestionNodeUpdateInput {
   branchVal?: Maybe<String>;
   isRoot?: Maybe<Boolean>;
   questionType?: Maybe<NodeType>;
+  questionnaire?: Maybe<QuestionnaireUpdateOneRequiredWithoutQuestionsInput>;
   overrideLeaf?: Maybe<LeafNodeUpdateOneInput>;
   conditions?: Maybe<QuestionConditionUpdateManyInput>;
   options?: Maybe<QuestionOptionUpdateManyInput>;
@@ -2790,19 +2937,9 @@ export interface QuestionnaireCreateInput {
   title: String;
   description: String;
   publicTitle?: Maybe<String>;
-  questions?: Maybe<QuestionNodeCreateManyInput>;
+  rootQuestion?: Maybe<QuestionNodeCreateOneInput>;
+  questions?: Maybe<QuestionNodeCreateManyWithoutQuestionnaireInput>;
   leafs?: Maybe<LeafNodeCreateManyInput>;
-}
-
-export interface CustomerCreateOneWithoutQuestionnairesInput {
-  create?: Maybe<CustomerCreateWithoutQuestionnairesInput>;
-  connect?: Maybe<CustomerWhereUniqueInput>;
-}
-
-export interface CustomerCreateWithoutQuestionnairesInput {
-  id?: Maybe<ID_Input>;
-  name: String;
-  settings?: Maybe<CustomerSettingsCreateOneInput>;
 }
 
 export interface QuestionnaireUpdateInput {
@@ -2810,25 +2947,9 @@ export interface QuestionnaireUpdateInput {
   title?: Maybe<String>;
   description?: Maybe<String>;
   publicTitle?: Maybe<String>;
-  questions?: Maybe<QuestionNodeUpdateManyInput>;
+  rootQuestion?: Maybe<QuestionNodeUpdateOneInput>;
+  questions?: Maybe<QuestionNodeUpdateManyWithoutQuestionnaireInput>;
   leafs?: Maybe<LeafNodeUpdateManyInput>;
-}
-
-export interface CustomerUpdateOneRequiredWithoutQuestionnairesInput {
-  create?: Maybe<CustomerCreateWithoutQuestionnairesInput>;
-  update?: Maybe<CustomerUpdateWithoutQuestionnairesDataInput>;
-  upsert?: Maybe<CustomerUpsertWithoutQuestionnairesInput>;
-  connect?: Maybe<CustomerWhereUniqueInput>;
-}
-
-export interface CustomerUpdateWithoutQuestionnairesDataInput {
-  name?: Maybe<String>;
-  settings?: Maybe<CustomerSettingsUpdateOneInput>;
-}
-
-export interface CustomerUpsertWithoutQuestionnairesInput {
-  update: CustomerUpdateWithoutQuestionnairesDataInput;
-  create: CustomerCreateWithoutQuestionnairesInput;
 }
 
 export interface QuestionnaireUpdateManyMutationInput {
@@ -3278,6 +3399,7 @@ export interface QuestionnairePromise
   publicTitle: () => Promise<String>;
   creationDate: () => Promise<DateTimeOutput>;
   updatedAt: () => Promise<DateTimeOutput>;
+  rootQuestion: <T = QuestionNodePromise>() => T;
   questions: <T = FragmentableArray<QuestionNode>>(args?: {
     where?: QuestionNodeWhereInput;
     orderBy?: QuestionNodeOrderByInput;
@@ -3308,6 +3430,7 @@ export interface QuestionnaireSubscription
   publicTitle: () => Promise<AsyncIterator<String>>;
   creationDate: () => Promise<AsyncIterator<DateTimeOutput>>;
   updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  rootQuestion: <T = QuestionNodeSubscription>() => T;
   questions: <T = Promise<AsyncIterator<QuestionNodeSubscription>>>(args?: {
     where?: QuestionNodeWhereInput;
     orderBy?: QuestionNodeOrderByInput;
@@ -3338,6 +3461,7 @@ export interface QuestionnaireNullablePromise
   publicTitle: () => Promise<String>;
   creationDate: () => Promise<DateTimeOutput>;
   updatedAt: () => Promise<DateTimeOutput>;
+  rootQuestion: <T = QuestionNodePromise>() => T;
   questions: <T = FragmentableArray<QuestionNode>>(args?: {
     where?: QuestionNodeWhereInput;
     orderBy?: QuestionNodeOrderByInput;
@@ -3374,6 +3498,7 @@ export interface QuestionNodePromise
   branchVal: () => Promise<String>;
   isRoot: () => Promise<Boolean>;
   questionType: () => Promise<NodeType>;
+  questionnaire: <T = QuestionnairePromise>() => T;
   overrideLeaf: <T = LeafNodePromise>() => T;
   conditions: <T = FragmentableArray<QuestionCondition>>(args?: {
     where?: QuestionConditionWhereInput;
@@ -3421,6 +3546,7 @@ export interface QuestionNodeSubscription
   branchVal: () => Promise<AsyncIterator<String>>;
   isRoot: () => Promise<AsyncIterator<Boolean>>;
   questionType: () => Promise<AsyncIterator<NodeType>>;
+  questionnaire: <T = QuestionnaireSubscription>() => T;
   overrideLeaf: <T = LeafNodeSubscription>() => T;
   conditions: <
     T = Promise<AsyncIterator<QuestionConditionSubscription>>
@@ -3470,6 +3596,7 @@ export interface QuestionNodeNullablePromise
   branchVal: () => Promise<String>;
   isRoot: () => Promise<Boolean>;
   questionType: () => Promise<NodeType>;
+  questionnaire: <T = QuestionnairePromise>() => T;
   overrideLeaf: <T = LeafNodePromise>() => T;
   conditions: <T = FragmentableArray<QuestionCondition>>(args?: {
     where?: QuestionConditionWhereInput;

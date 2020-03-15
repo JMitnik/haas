@@ -18,6 +18,9 @@ export const getQuestionnaireQuery = gql`
       customer {
           ...CustomerFragment
       }
+      rootQuestion {
+        ...QuestionFragment
+      }
       questions {
         ...QuestionFragment
       }

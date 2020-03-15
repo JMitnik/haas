@@ -386,7 +386,7 @@ const makeMediamarkt = async () => {
     },
     title: 'Default questionnaire',
     description: 'Default questions',
-    questions: {
+    rootQuestion: {
       create: {
         title: `How do you feel about ${customer.name}?`,
         questionType: sliderType,
@@ -395,8 +395,17 @@ const makeMediamarkt = async () => {
     },
   });
 
+  const rootQuestion = await prisma.questionnaire({ id: questionnaire.id }).rootQuestion();
+
+  await prisma.updateQuestionnaire({ where: { id: questionnaire.id },
+    data: { questions: {
+      connect: {
+        id: rootQuestion.id,
+      },
+    } } });
+
   // Connect the questionnaire to the customer
-  prisma.updateCustomer({
+  await prisma.updateCustomer({
     where: {
       id: customer.id,
     },
@@ -626,7 +635,7 @@ const makeMediamarkt = async () => {
       },
     });
 
-    
+
 
     // if (node.overrideLeaf.id ) {
 

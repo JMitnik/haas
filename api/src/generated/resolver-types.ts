@@ -2889,6 +2889,7 @@ export type Questionnaire = {
   publicTitle?: Maybe<Scalars['String']>;
   creationDate: Scalars['DateTime'];
   updatedAt?: Maybe<Scalars['DateTime']>;
+  rootQuestion?: Maybe<QuestionNode>;
   questions?: Maybe<Array<QuestionNode>>;
   leafs?: Maybe<Array<LeafNode>>;
 };
@@ -2928,7 +2929,8 @@ export type QuestionnaireCreateInput = {
   title: Scalars['String'];
   description: Scalars['String'];
   publicTitle?: Maybe<Scalars['String']>;
-  questions?: Maybe<QuestionNodeCreateManyInput>;
+  rootQuestion?: Maybe<QuestionNodeCreateOneInput>;
+  questions?: Maybe<QuestionNodeCreateManyWithoutQuestionnaireInput>;
   leafs?: Maybe<LeafNodeCreateManyInput>;
 };
 
@@ -2937,12 +2939,28 @@ export type QuestionnaireCreateManyWithoutCustomerInput = {
   connect?: Maybe<Array<QuestionnaireWhereUniqueInput>>;
 };
 
+export type QuestionnaireCreateOneWithoutQuestionsInput = {
+  create?: Maybe<QuestionnaireCreateWithoutQuestionsInput>;
+  connect?: Maybe<QuestionnaireWhereUniqueInput>;
+};
+
 export type QuestionnaireCreateWithoutCustomerInput = {
   id?: Maybe<Scalars['ID']>;
   title: Scalars['String'];
   description: Scalars['String'];
   publicTitle?: Maybe<Scalars['String']>;
-  questions?: Maybe<QuestionNodeCreateManyInput>;
+  rootQuestion?: Maybe<QuestionNodeCreateOneInput>;
+  questions?: Maybe<QuestionNodeCreateManyWithoutQuestionnaireInput>;
+  leafs?: Maybe<LeafNodeCreateManyInput>;
+};
+
+export type QuestionnaireCreateWithoutQuestionsInput = {
+  id?: Maybe<Scalars['ID']>;
+  customer: CustomerCreateOneWithoutQuestionnairesInput;
+  title: Scalars['String'];
+  description: Scalars['String'];
+  publicTitle?: Maybe<Scalars['String']>;
+  rootQuestion?: Maybe<QuestionNodeCreateOneInput>;
   leafs?: Maybe<LeafNodeCreateManyInput>;
 };
 
@@ -3079,7 +3097,8 @@ export type QuestionnaireUpdateInput = {
   title?: Maybe<Scalars['String']>;
   description?: Maybe<Scalars['String']>;
   publicTitle?: Maybe<Scalars['String']>;
-  questions?: Maybe<QuestionNodeUpdateManyInput>;
+  rootQuestion?: Maybe<QuestionNodeUpdateOneInput>;
+  questions?: Maybe<QuestionNodeUpdateManyWithoutQuestionnaireInput>;
   leafs?: Maybe<LeafNodeUpdateManyInput>;
 };
 
@@ -3112,17 +3131,39 @@ export type QuestionnaireUpdateManyWithWhereNestedInput = {
   data: QuestionnaireUpdateManyDataInput;
 };
 
+export type QuestionnaireUpdateOneRequiredWithoutQuestionsInput = {
+  create?: Maybe<QuestionnaireCreateWithoutQuestionsInput>;
+  update?: Maybe<QuestionnaireUpdateWithoutQuestionsDataInput>;
+  upsert?: Maybe<QuestionnaireUpsertWithoutQuestionsInput>;
+  connect?: Maybe<QuestionnaireWhereUniqueInput>;
+};
+
 export type QuestionnaireUpdateWithoutCustomerDataInput = {
   title?: Maybe<Scalars['String']>;
   description?: Maybe<Scalars['String']>;
   publicTitle?: Maybe<Scalars['String']>;
-  questions?: Maybe<QuestionNodeUpdateManyInput>;
+  rootQuestion?: Maybe<QuestionNodeUpdateOneInput>;
+  questions?: Maybe<QuestionNodeUpdateManyWithoutQuestionnaireInput>;
+  leafs?: Maybe<LeafNodeUpdateManyInput>;
+};
+
+export type QuestionnaireUpdateWithoutQuestionsDataInput = {
+  customer?: Maybe<CustomerUpdateOneRequiredWithoutQuestionnairesInput>;
+  title?: Maybe<Scalars['String']>;
+  description?: Maybe<Scalars['String']>;
+  publicTitle?: Maybe<Scalars['String']>;
+  rootQuestion?: Maybe<QuestionNodeUpdateOneInput>;
   leafs?: Maybe<LeafNodeUpdateManyInput>;
 };
 
 export type QuestionnaireUpdateWithWhereUniqueWithoutCustomerInput = {
   where: QuestionnaireWhereUniqueInput;
   data: QuestionnaireUpdateWithoutCustomerDataInput;
+};
+
+export type QuestionnaireUpsertWithoutQuestionsInput = {
+  update: QuestionnaireUpdateWithoutQuestionsDataInput;
+  create: QuestionnaireCreateWithoutQuestionsInput;
 };
 
 export type QuestionnaireUpsertWithWhereUniqueWithoutCustomerInput = {
@@ -3205,6 +3246,7 @@ export type QuestionnaireWhereInput = {
   updatedAt_lte?: Maybe<Scalars['DateTime']>;
   updatedAt_gt?: Maybe<Scalars['DateTime']>;
   updatedAt_gte?: Maybe<Scalars['DateTime']>;
+  rootQuestion?: Maybe<QuestionNodeWhereInput>;
   questions_every?: Maybe<QuestionNodeWhereInput>;
   questions_some?: Maybe<QuestionNodeWhereInput>;
   questions_none?: Maybe<QuestionNodeWhereInput>;
@@ -3227,6 +3269,7 @@ export type QuestionNode = {
   branchVal?: Maybe<Scalars['String']>;
   isRoot: Scalars['Boolean'];
   questionType: NodeType;
+  questionnaire: Questionnaire;
   overrideLeaf?: Maybe<LeafNode>;
   conditions?: Maybe<Array<QuestionCondition>>;
   options?: Maybe<Array<QuestionOption>>;
@@ -3291,6 +3334,7 @@ export type QuestionNodeCreateInput = {
   branchVal?: Maybe<Scalars['String']>;
   isRoot?: Maybe<Scalars['Boolean']>;
   questionType: NodeType;
+  questionnaire: QuestionnaireCreateOneWithoutQuestionsInput;
   overrideLeaf?: Maybe<LeafNodeCreateOneInput>;
   conditions?: Maybe<QuestionConditionCreateManyInput>;
   options?: Maybe<QuestionOptionCreateManyInput>;
@@ -3303,9 +3347,27 @@ export type QuestionNodeCreateManyInput = {
   connect?: Maybe<Array<QuestionNodeWhereUniqueInput>>;
 };
 
+export type QuestionNodeCreateManyWithoutQuestionnaireInput = {
+  create?: Maybe<Array<QuestionNodeCreateWithoutQuestionnaireInput>>;
+  connect?: Maybe<Array<QuestionNodeWhereUniqueInput>>;
+};
+
 export type QuestionNodeCreateOneInput = {
   create?: Maybe<QuestionNodeCreateInput>;
   connect?: Maybe<QuestionNodeWhereUniqueInput>;
+};
+
+export type QuestionNodeCreateWithoutQuestionnaireInput = {
+  id?: Maybe<Scalars['ID']>;
+  title: Scalars['String'];
+  branchVal?: Maybe<Scalars['String']>;
+  isRoot?: Maybe<Scalars['Boolean']>;
+  questionType: NodeType;
+  overrideLeaf?: Maybe<LeafNodeCreateOneInput>;
+  conditions?: Maybe<QuestionConditionCreateManyInput>;
+  options?: Maybe<QuestionOptionCreateManyInput>;
+  children?: Maybe<QuestionNodeCreateManyInput>;
+  edgeChildren?: Maybe<EdgeCreateManyInput>;
 };
 
 export type QuestionNodeEdge = {
@@ -3414,6 +3476,7 @@ export type QuestionNodeUpdateDataInput = {
   branchVal?: Maybe<Scalars['String']>;
   isRoot?: Maybe<Scalars['Boolean']>;
   questionType?: Maybe<NodeType>;
+  questionnaire?: Maybe<QuestionnaireUpdateOneRequiredWithoutQuestionsInput>;
   overrideLeaf?: Maybe<LeafNodeUpdateOneInput>;
   conditions?: Maybe<QuestionConditionUpdateManyInput>;
   options?: Maybe<QuestionOptionUpdateManyInput>;
@@ -3426,6 +3489,7 @@ export type QuestionNodeUpdateInput = {
   branchVal?: Maybe<Scalars['String']>;
   isRoot?: Maybe<Scalars['Boolean']>;
   questionType?: Maybe<NodeType>;
+  questionnaire?: Maybe<QuestionnaireUpdateOneRequiredWithoutQuestionsInput>;
   overrideLeaf?: Maybe<LeafNodeUpdateOneInput>;
   conditions?: Maybe<QuestionConditionUpdateManyInput>;
   options?: Maybe<QuestionOptionUpdateManyInput>;
@@ -3459,6 +3523,18 @@ export type QuestionNodeUpdateManyMutationInput = {
   questionType?: Maybe<NodeType>;
 };
 
+export type QuestionNodeUpdateManyWithoutQuestionnaireInput = {
+  create?: Maybe<Array<QuestionNodeCreateWithoutQuestionnaireInput>>;
+  delete?: Maybe<Array<QuestionNodeWhereUniqueInput>>;
+  connect?: Maybe<Array<QuestionNodeWhereUniqueInput>>;
+  set?: Maybe<Array<QuestionNodeWhereUniqueInput>>;
+  disconnect?: Maybe<Array<QuestionNodeWhereUniqueInput>>;
+  update?: Maybe<Array<QuestionNodeUpdateWithWhereUniqueWithoutQuestionnaireInput>>;
+  upsert?: Maybe<Array<QuestionNodeUpsertWithWhereUniqueWithoutQuestionnaireInput>>;
+  deleteMany?: Maybe<Array<QuestionNodeScalarWhereInput>>;
+  updateMany?: Maybe<Array<QuestionNodeUpdateManyWithWhereNestedInput>>;
+};
+
 export type QuestionNodeUpdateManyWithWhereNestedInput = {
   where: QuestionNodeScalarWhereInput;
   data: QuestionNodeUpdateManyDataInput;
@@ -3480,9 +3556,26 @@ export type QuestionNodeUpdateOneRequiredInput = {
   connect?: Maybe<QuestionNodeWhereUniqueInput>;
 };
 
+export type QuestionNodeUpdateWithoutQuestionnaireDataInput = {
+  title?: Maybe<Scalars['String']>;
+  branchVal?: Maybe<Scalars['String']>;
+  isRoot?: Maybe<Scalars['Boolean']>;
+  questionType?: Maybe<NodeType>;
+  overrideLeaf?: Maybe<LeafNodeUpdateOneInput>;
+  conditions?: Maybe<QuestionConditionUpdateManyInput>;
+  options?: Maybe<QuestionOptionUpdateManyInput>;
+  children?: Maybe<QuestionNodeUpdateManyInput>;
+  edgeChildren?: Maybe<EdgeUpdateManyInput>;
+};
+
 export type QuestionNodeUpdateWithWhereUniqueNestedInput = {
   where: QuestionNodeWhereUniqueInput;
   data: QuestionNodeUpdateDataInput;
+};
+
+export type QuestionNodeUpdateWithWhereUniqueWithoutQuestionnaireInput = {
+  where: QuestionNodeWhereUniqueInput;
+  data: QuestionNodeUpdateWithoutQuestionnaireDataInput;
 };
 
 export type QuestionNodeUpsertNestedInput = {
@@ -3494,6 +3587,12 @@ export type QuestionNodeUpsertWithWhereUniqueNestedInput = {
   where: QuestionNodeWhereUniqueInput;
   update: QuestionNodeUpdateDataInput;
   create: QuestionNodeCreateInput;
+};
+
+export type QuestionNodeUpsertWithWhereUniqueWithoutQuestionnaireInput = {
+  where: QuestionNodeWhereUniqueInput;
+  update: QuestionNodeUpdateWithoutQuestionnaireDataInput;
+  create: QuestionNodeCreateWithoutQuestionnaireInput;
 };
 
 export type QuestionNodeWhereInput = {
@@ -3545,6 +3644,7 @@ export type QuestionNodeWhereInput = {
   questionType_not?: Maybe<NodeType>;
   questionType_in?: Maybe<Array<NodeType>>;
   questionType_not_in?: Maybe<Array<NodeType>>;
+  questionnaire?: Maybe<QuestionnaireWhereInput>;
   overrideLeaf?: Maybe<LeafNodeWhereInput>;
   conditions_every?: Maybe<QuestionConditionWhereInput>;
   conditions_some?: Maybe<QuestionConditionWhereInput>;
@@ -3959,13 +4059,13 @@ export type ResolversTypes = ResolversObject<{
   EdgeWhereInput: EdgeWhereInput,
   QuestionnaireOrderByInput: QuestionnaireOrderByInput,
   Questionnaire: ResolverTypeWrapper<Questionnaire>,
-  QuestionNodeOrderByInput: QuestionNodeOrderByInput,
   QuestionNode: ResolverTypeWrapper<QuestionNode>,
   LeafNode: ResolverTypeWrapper<LeafNode>,
   QuestionConditionOrderByInput: QuestionConditionOrderByInput,
   QuestionCondition: ResolverTypeWrapper<QuestionCondition>,
   QuestionOptionOrderByInput: QuestionOptionOrderByInput,
   QuestionOption: ResolverTypeWrapper<QuestionOption>,
+  QuestionNodeOrderByInput: QuestionNodeOrderByInput,
   EdgeOrderByInput: EdgeOrderByInput,
   Edge: ResolverTypeWrapper<Edge>,
   LeafNodeOrderByInput: LeafNodeOrderByInput,
@@ -4033,32 +4133,58 @@ export type ResolversTypes = ResolversObject<{
   CustomerCreateInput: CustomerCreateInput,
   QuestionnaireCreateManyWithoutCustomerInput: QuestionnaireCreateManyWithoutCustomerInput,
   QuestionnaireCreateWithoutCustomerInput: QuestionnaireCreateWithoutCustomerInput,
-  QuestionNodeCreateManyInput: QuestionNodeCreateManyInput,
-  QuestionNodeCreateInput: QuestionNodeCreateInput,
-  LeafNodeCreateOneInput: LeafNodeCreateOneInput,
-  LeafNodeCreateInput: LeafNodeCreateInput,
-  QuestionConditionCreateManyInput: QuestionConditionCreateManyInput,
-  QuestionConditionCreateInput: QuestionConditionCreateInput,
-  QuestionOptionCreateManyInput: QuestionOptionCreateManyInput,
-  QuestionOptionCreateInput: QuestionOptionCreateInput,
-  EdgeCreateManyInput: EdgeCreateManyInput,
-  EdgeCreateInput: EdgeCreateInput,
   QuestionNodeCreateOneInput: QuestionNodeCreateOneInput,
-  LeafNodeCreateManyInput: LeafNodeCreateManyInput,
+  QuestionNodeCreateInput: QuestionNodeCreateInput,
+  QuestionnaireCreateOneWithoutQuestionsInput: QuestionnaireCreateOneWithoutQuestionsInput,
+  QuestionnaireCreateWithoutQuestionsInput: QuestionnaireCreateWithoutQuestionsInput,
+  CustomerCreateOneWithoutQuestionnairesInput: CustomerCreateOneWithoutQuestionnairesInput,
+  CustomerCreateWithoutQuestionnairesInput: CustomerCreateWithoutQuestionnairesInput,
   CustomerSettingsCreateOneInput: CustomerSettingsCreateOneInput,
   CustomerSettingsCreateInput: CustomerSettingsCreateInput,
   ColourSettingsCreateOneInput: ColourSettingsCreateOneInput,
   FontSettingsCreateOneInput: FontSettingsCreateOneInput,
   FontSettingsCreateInput: FontSettingsCreateInput,
+  LeafNodeCreateManyInput: LeafNodeCreateManyInput,
+  LeafNodeCreateInput: LeafNodeCreateInput,
+  LeafNodeCreateOneInput: LeafNodeCreateOneInput,
+  QuestionConditionCreateManyInput: QuestionConditionCreateManyInput,
+  QuestionConditionCreateInput: QuestionConditionCreateInput,
+  QuestionOptionCreateManyInput: QuestionOptionCreateManyInput,
+  QuestionOptionCreateInput: QuestionOptionCreateInput,
+  QuestionNodeCreateManyInput: QuestionNodeCreateManyInput,
+  EdgeCreateManyInput: EdgeCreateManyInput,
+  EdgeCreateInput: EdgeCreateInput,
+  QuestionNodeCreateManyWithoutQuestionnaireInput: QuestionNodeCreateManyWithoutQuestionnaireInput,
+  QuestionNodeCreateWithoutQuestionnaireInput: QuestionNodeCreateWithoutQuestionnaireInput,
   CustomerUpdateInput: CustomerUpdateInput,
   QuestionnaireUpdateManyWithoutCustomerInput: QuestionnaireUpdateManyWithoutCustomerInput,
   QuestionnaireUpdateWithWhereUniqueWithoutCustomerInput: QuestionnaireUpdateWithWhereUniqueWithoutCustomerInput,
   QuestionnaireUpdateWithoutCustomerDataInput: QuestionnaireUpdateWithoutCustomerDataInput,
-  QuestionNodeUpdateManyInput: QuestionNodeUpdateManyInput,
-  QuestionNodeUpdateWithWhereUniqueNestedInput: QuestionNodeUpdateWithWhereUniqueNestedInput,
+  QuestionNodeUpdateOneInput: QuestionNodeUpdateOneInput,
   QuestionNodeUpdateDataInput: QuestionNodeUpdateDataInput,
-  LeafNodeUpdateOneInput: LeafNodeUpdateOneInput,
+  QuestionnaireUpdateOneRequiredWithoutQuestionsInput: QuestionnaireUpdateOneRequiredWithoutQuestionsInput,
+  QuestionnaireUpdateWithoutQuestionsDataInput: QuestionnaireUpdateWithoutQuestionsDataInput,
+  CustomerUpdateOneRequiredWithoutQuestionnairesInput: CustomerUpdateOneRequiredWithoutQuestionnairesInput,
+  CustomerUpdateWithoutQuestionnairesDataInput: CustomerUpdateWithoutQuestionnairesDataInput,
+  CustomerSettingsUpdateOneInput: CustomerSettingsUpdateOneInput,
+  CustomerSettingsUpdateDataInput: CustomerSettingsUpdateDataInput,
+  ColourSettingsUpdateOneInput: ColourSettingsUpdateOneInput,
+  ColourSettingsUpdateDataInput: ColourSettingsUpdateDataInput,
+  ColourSettingsUpsertNestedInput: ColourSettingsUpsertNestedInput,
+  FontSettingsUpdateOneInput: FontSettingsUpdateOneInput,
+  FontSettingsUpdateDataInput: FontSettingsUpdateDataInput,
+  FontSettingsUpsertNestedInput: FontSettingsUpsertNestedInput,
+  CustomerSettingsUpsertNestedInput: CustomerSettingsUpsertNestedInput,
+  CustomerUpsertWithoutQuestionnairesInput: CustomerUpsertWithoutQuestionnairesInput,
+  LeafNodeUpdateManyInput: LeafNodeUpdateManyInput,
+  LeafNodeUpdateWithWhereUniqueNestedInput: LeafNodeUpdateWithWhereUniqueNestedInput,
   LeafNodeUpdateDataInput: LeafNodeUpdateDataInput,
+  LeafNodeUpsertWithWhereUniqueNestedInput: LeafNodeUpsertWithWhereUniqueNestedInput,
+  LeafNodeScalarWhereInput: LeafNodeScalarWhereInput,
+  LeafNodeUpdateManyWithWhereNestedInput: LeafNodeUpdateManyWithWhereNestedInput,
+  LeafNodeUpdateManyDataInput: LeafNodeUpdateManyDataInput,
+  QuestionnaireUpsertWithoutQuestionsInput: QuestionnaireUpsertWithoutQuestionsInput,
+  LeafNodeUpdateOneInput: LeafNodeUpdateOneInput,
   LeafNodeUpsertNestedInput: LeafNodeUpsertNestedInput,
   QuestionConditionUpdateManyInput: QuestionConditionUpdateManyInput,
   QuestionConditionUpdateWithWhereUniqueNestedInput: QuestionConditionUpdateWithWhereUniqueNestedInput,
@@ -4074,36 +4200,26 @@ export type ResolversTypes = ResolversObject<{
   QuestionOptionScalarWhereInput: QuestionOptionScalarWhereInput,
   QuestionOptionUpdateManyWithWhereNestedInput: QuestionOptionUpdateManyWithWhereNestedInput,
   QuestionOptionUpdateManyDataInput: QuestionOptionUpdateManyDataInput,
-  EdgeUpdateManyInput: EdgeUpdateManyInput,
-  EdgeUpdateWithWhereUniqueNestedInput: EdgeUpdateWithWhereUniqueNestedInput,
-  EdgeUpdateDataInput: EdgeUpdateDataInput,
-  QuestionNodeUpdateOneInput: QuestionNodeUpdateOneInput,
-  QuestionNodeUpsertNestedInput: QuestionNodeUpsertNestedInput,
-  EdgeUpsertWithWhereUniqueNestedInput: EdgeUpsertWithWhereUniqueNestedInput,
-  EdgeScalarWhereInput: EdgeScalarWhereInput,
+  QuestionNodeUpdateManyInput: QuestionNodeUpdateManyInput,
+  QuestionNodeUpdateWithWhereUniqueNestedInput: QuestionNodeUpdateWithWhereUniqueNestedInput,
   QuestionNodeUpsertWithWhereUniqueNestedInput: QuestionNodeUpsertWithWhereUniqueNestedInput,
   QuestionNodeScalarWhereInput: QuestionNodeScalarWhereInput,
   QuestionNodeUpdateManyWithWhereNestedInput: QuestionNodeUpdateManyWithWhereNestedInput,
   QuestionNodeUpdateManyDataInput: QuestionNodeUpdateManyDataInput,
-  LeafNodeUpdateManyInput: LeafNodeUpdateManyInput,
-  LeafNodeUpdateWithWhereUniqueNestedInput: LeafNodeUpdateWithWhereUniqueNestedInput,
-  LeafNodeUpsertWithWhereUniqueNestedInput: LeafNodeUpsertWithWhereUniqueNestedInput,
-  LeafNodeScalarWhereInput: LeafNodeScalarWhereInput,
-  LeafNodeUpdateManyWithWhereNestedInput: LeafNodeUpdateManyWithWhereNestedInput,
-  LeafNodeUpdateManyDataInput: LeafNodeUpdateManyDataInput,
+  EdgeUpdateManyInput: EdgeUpdateManyInput,
+  EdgeUpdateWithWhereUniqueNestedInput: EdgeUpdateWithWhereUniqueNestedInput,
+  EdgeUpdateDataInput: EdgeUpdateDataInput,
+  EdgeUpsertWithWhereUniqueNestedInput: EdgeUpsertWithWhereUniqueNestedInput,
+  EdgeScalarWhereInput: EdgeScalarWhereInput,
+  QuestionNodeUpsertNestedInput: QuestionNodeUpsertNestedInput,
+  QuestionNodeUpdateManyWithoutQuestionnaireInput: QuestionNodeUpdateManyWithoutQuestionnaireInput,
+  QuestionNodeUpdateWithWhereUniqueWithoutQuestionnaireInput: QuestionNodeUpdateWithWhereUniqueWithoutQuestionnaireInput,
+  QuestionNodeUpdateWithoutQuestionnaireDataInput: QuestionNodeUpdateWithoutQuestionnaireDataInput,
+  QuestionNodeUpsertWithWhereUniqueWithoutQuestionnaireInput: QuestionNodeUpsertWithWhereUniqueWithoutQuestionnaireInput,
   QuestionnaireUpsertWithWhereUniqueWithoutCustomerInput: QuestionnaireUpsertWithWhereUniqueWithoutCustomerInput,
   QuestionnaireScalarWhereInput: QuestionnaireScalarWhereInput,
   QuestionnaireUpdateManyWithWhereNestedInput: QuestionnaireUpdateManyWithWhereNestedInput,
   QuestionnaireUpdateManyDataInput: QuestionnaireUpdateManyDataInput,
-  CustomerSettingsUpdateOneInput: CustomerSettingsUpdateOneInput,
-  CustomerSettingsUpdateDataInput: CustomerSettingsUpdateDataInput,
-  ColourSettingsUpdateOneInput: ColourSettingsUpdateOneInput,
-  ColourSettingsUpdateDataInput: ColourSettingsUpdateDataInput,
-  ColourSettingsUpsertNestedInput: ColourSettingsUpsertNestedInput,
-  FontSettingsUpdateOneInput: FontSettingsUpdateOneInput,
-  FontSettingsUpdateDataInput: FontSettingsUpdateDataInput,
-  FontSettingsUpsertNestedInput: FontSettingsUpsertNestedInput,
-  CustomerSettingsUpsertNestedInput: CustomerSettingsUpsertNestedInput,
   CustomerUpdateManyMutationInput: CustomerUpdateManyMutationInput,
   CustomerSettingsUpdateInput: CustomerSettingsUpdateInput,
   CustomerSettingsUpdateManyMutationInput: CustomerSettingsUpdateManyMutationInput,
@@ -4137,12 +4253,7 @@ export type ResolversTypes = ResolversObject<{
   QuestionOptionUpdateInput: QuestionOptionUpdateInput,
   QuestionOptionUpdateManyMutationInput: QuestionOptionUpdateManyMutationInput,
   QuestionnaireCreateInput: QuestionnaireCreateInput,
-  CustomerCreateOneWithoutQuestionnairesInput: CustomerCreateOneWithoutQuestionnairesInput,
-  CustomerCreateWithoutQuestionnairesInput: CustomerCreateWithoutQuestionnairesInput,
   QuestionnaireUpdateInput: QuestionnaireUpdateInput,
-  CustomerUpdateOneRequiredWithoutQuestionnairesInput: CustomerUpdateOneRequiredWithoutQuestionnairesInput,
-  CustomerUpdateWithoutQuestionnairesDataInput: CustomerUpdateWithoutQuestionnairesDataInput,
-  CustomerUpsertWithoutQuestionnairesInput: CustomerUpsertWithoutQuestionnairesInput,
   QuestionnaireUpdateManyMutationInput: QuestionnaireUpdateManyMutationInput,
   Subscription: ResolverTypeWrapper<{}>,
   ColourSettingsSubscriptionWhereInput: ColourSettingsSubscriptionWhereInput,
@@ -4214,13 +4325,13 @@ export type ResolversParentTypes = ResolversObject<{
   EdgeWhereInput: EdgeWhereInput,
   QuestionnaireOrderByInput: QuestionnaireOrderByInput,
   Questionnaire: Questionnaire,
-  QuestionNodeOrderByInput: QuestionNodeOrderByInput,
   QuestionNode: QuestionNode,
   LeafNode: LeafNode,
   QuestionConditionOrderByInput: QuestionConditionOrderByInput,
   QuestionCondition: QuestionCondition,
   QuestionOptionOrderByInput: QuestionOptionOrderByInput,
   QuestionOption: QuestionOption,
+  QuestionNodeOrderByInput: QuestionNodeOrderByInput,
   EdgeOrderByInput: EdgeOrderByInput,
   Edge: Edge,
   LeafNodeOrderByInput: LeafNodeOrderByInput,
@@ -4288,32 +4399,58 @@ export type ResolversParentTypes = ResolversObject<{
   CustomerCreateInput: CustomerCreateInput,
   QuestionnaireCreateManyWithoutCustomerInput: QuestionnaireCreateManyWithoutCustomerInput,
   QuestionnaireCreateWithoutCustomerInput: QuestionnaireCreateWithoutCustomerInput,
-  QuestionNodeCreateManyInput: QuestionNodeCreateManyInput,
-  QuestionNodeCreateInput: QuestionNodeCreateInput,
-  LeafNodeCreateOneInput: LeafNodeCreateOneInput,
-  LeafNodeCreateInput: LeafNodeCreateInput,
-  QuestionConditionCreateManyInput: QuestionConditionCreateManyInput,
-  QuestionConditionCreateInput: QuestionConditionCreateInput,
-  QuestionOptionCreateManyInput: QuestionOptionCreateManyInput,
-  QuestionOptionCreateInput: QuestionOptionCreateInput,
-  EdgeCreateManyInput: EdgeCreateManyInput,
-  EdgeCreateInput: EdgeCreateInput,
   QuestionNodeCreateOneInput: QuestionNodeCreateOneInput,
-  LeafNodeCreateManyInput: LeafNodeCreateManyInput,
+  QuestionNodeCreateInput: QuestionNodeCreateInput,
+  QuestionnaireCreateOneWithoutQuestionsInput: QuestionnaireCreateOneWithoutQuestionsInput,
+  QuestionnaireCreateWithoutQuestionsInput: QuestionnaireCreateWithoutQuestionsInput,
+  CustomerCreateOneWithoutQuestionnairesInput: CustomerCreateOneWithoutQuestionnairesInput,
+  CustomerCreateWithoutQuestionnairesInput: CustomerCreateWithoutQuestionnairesInput,
   CustomerSettingsCreateOneInput: CustomerSettingsCreateOneInput,
   CustomerSettingsCreateInput: CustomerSettingsCreateInput,
   ColourSettingsCreateOneInput: ColourSettingsCreateOneInput,
   FontSettingsCreateOneInput: FontSettingsCreateOneInput,
   FontSettingsCreateInput: FontSettingsCreateInput,
+  LeafNodeCreateManyInput: LeafNodeCreateManyInput,
+  LeafNodeCreateInput: LeafNodeCreateInput,
+  LeafNodeCreateOneInput: LeafNodeCreateOneInput,
+  QuestionConditionCreateManyInput: QuestionConditionCreateManyInput,
+  QuestionConditionCreateInput: QuestionConditionCreateInput,
+  QuestionOptionCreateManyInput: QuestionOptionCreateManyInput,
+  QuestionOptionCreateInput: QuestionOptionCreateInput,
+  QuestionNodeCreateManyInput: QuestionNodeCreateManyInput,
+  EdgeCreateManyInput: EdgeCreateManyInput,
+  EdgeCreateInput: EdgeCreateInput,
+  QuestionNodeCreateManyWithoutQuestionnaireInput: QuestionNodeCreateManyWithoutQuestionnaireInput,
+  QuestionNodeCreateWithoutQuestionnaireInput: QuestionNodeCreateWithoutQuestionnaireInput,
   CustomerUpdateInput: CustomerUpdateInput,
   QuestionnaireUpdateManyWithoutCustomerInput: QuestionnaireUpdateManyWithoutCustomerInput,
   QuestionnaireUpdateWithWhereUniqueWithoutCustomerInput: QuestionnaireUpdateWithWhereUniqueWithoutCustomerInput,
   QuestionnaireUpdateWithoutCustomerDataInput: QuestionnaireUpdateWithoutCustomerDataInput,
-  QuestionNodeUpdateManyInput: QuestionNodeUpdateManyInput,
-  QuestionNodeUpdateWithWhereUniqueNestedInput: QuestionNodeUpdateWithWhereUniqueNestedInput,
+  QuestionNodeUpdateOneInput: QuestionNodeUpdateOneInput,
   QuestionNodeUpdateDataInput: QuestionNodeUpdateDataInput,
-  LeafNodeUpdateOneInput: LeafNodeUpdateOneInput,
+  QuestionnaireUpdateOneRequiredWithoutQuestionsInput: QuestionnaireUpdateOneRequiredWithoutQuestionsInput,
+  QuestionnaireUpdateWithoutQuestionsDataInput: QuestionnaireUpdateWithoutQuestionsDataInput,
+  CustomerUpdateOneRequiredWithoutQuestionnairesInput: CustomerUpdateOneRequiredWithoutQuestionnairesInput,
+  CustomerUpdateWithoutQuestionnairesDataInput: CustomerUpdateWithoutQuestionnairesDataInput,
+  CustomerSettingsUpdateOneInput: CustomerSettingsUpdateOneInput,
+  CustomerSettingsUpdateDataInput: CustomerSettingsUpdateDataInput,
+  ColourSettingsUpdateOneInput: ColourSettingsUpdateOneInput,
+  ColourSettingsUpdateDataInput: ColourSettingsUpdateDataInput,
+  ColourSettingsUpsertNestedInput: ColourSettingsUpsertNestedInput,
+  FontSettingsUpdateOneInput: FontSettingsUpdateOneInput,
+  FontSettingsUpdateDataInput: FontSettingsUpdateDataInput,
+  FontSettingsUpsertNestedInput: FontSettingsUpsertNestedInput,
+  CustomerSettingsUpsertNestedInput: CustomerSettingsUpsertNestedInput,
+  CustomerUpsertWithoutQuestionnairesInput: CustomerUpsertWithoutQuestionnairesInput,
+  LeafNodeUpdateManyInput: LeafNodeUpdateManyInput,
+  LeafNodeUpdateWithWhereUniqueNestedInput: LeafNodeUpdateWithWhereUniqueNestedInput,
   LeafNodeUpdateDataInput: LeafNodeUpdateDataInput,
+  LeafNodeUpsertWithWhereUniqueNestedInput: LeafNodeUpsertWithWhereUniqueNestedInput,
+  LeafNodeScalarWhereInput: LeafNodeScalarWhereInput,
+  LeafNodeUpdateManyWithWhereNestedInput: LeafNodeUpdateManyWithWhereNestedInput,
+  LeafNodeUpdateManyDataInput: LeafNodeUpdateManyDataInput,
+  QuestionnaireUpsertWithoutQuestionsInput: QuestionnaireUpsertWithoutQuestionsInput,
+  LeafNodeUpdateOneInput: LeafNodeUpdateOneInput,
   LeafNodeUpsertNestedInput: LeafNodeUpsertNestedInput,
   QuestionConditionUpdateManyInput: QuestionConditionUpdateManyInput,
   QuestionConditionUpdateWithWhereUniqueNestedInput: QuestionConditionUpdateWithWhereUniqueNestedInput,
@@ -4329,36 +4466,26 @@ export type ResolversParentTypes = ResolversObject<{
   QuestionOptionScalarWhereInput: QuestionOptionScalarWhereInput,
   QuestionOptionUpdateManyWithWhereNestedInput: QuestionOptionUpdateManyWithWhereNestedInput,
   QuestionOptionUpdateManyDataInput: QuestionOptionUpdateManyDataInput,
-  EdgeUpdateManyInput: EdgeUpdateManyInput,
-  EdgeUpdateWithWhereUniqueNestedInput: EdgeUpdateWithWhereUniqueNestedInput,
-  EdgeUpdateDataInput: EdgeUpdateDataInput,
-  QuestionNodeUpdateOneInput: QuestionNodeUpdateOneInput,
-  QuestionNodeUpsertNestedInput: QuestionNodeUpsertNestedInput,
-  EdgeUpsertWithWhereUniqueNestedInput: EdgeUpsertWithWhereUniqueNestedInput,
-  EdgeScalarWhereInput: EdgeScalarWhereInput,
+  QuestionNodeUpdateManyInput: QuestionNodeUpdateManyInput,
+  QuestionNodeUpdateWithWhereUniqueNestedInput: QuestionNodeUpdateWithWhereUniqueNestedInput,
   QuestionNodeUpsertWithWhereUniqueNestedInput: QuestionNodeUpsertWithWhereUniqueNestedInput,
   QuestionNodeScalarWhereInput: QuestionNodeScalarWhereInput,
   QuestionNodeUpdateManyWithWhereNestedInput: QuestionNodeUpdateManyWithWhereNestedInput,
   QuestionNodeUpdateManyDataInput: QuestionNodeUpdateManyDataInput,
-  LeafNodeUpdateManyInput: LeafNodeUpdateManyInput,
-  LeafNodeUpdateWithWhereUniqueNestedInput: LeafNodeUpdateWithWhereUniqueNestedInput,
-  LeafNodeUpsertWithWhereUniqueNestedInput: LeafNodeUpsertWithWhereUniqueNestedInput,
-  LeafNodeScalarWhereInput: LeafNodeScalarWhereInput,
-  LeafNodeUpdateManyWithWhereNestedInput: LeafNodeUpdateManyWithWhereNestedInput,
-  LeafNodeUpdateManyDataInput: LeafNodeUpdateManyDataInput,
+  EdgeUpdateManyInput: EdgeUpdateManyInput,
+  EdgeUpdateWithWhereUniqueNestedInput: EdgeUpdateWithWhereUniqueNestedInput,
+  EdgeUpdateDataInput: EdgeUpdateDataInput,
+  EdgeUpsertWithWhereUniqueNestedInput: EdgeUpsertWithWhereUniqueNestedInput,
+  EdgeScalarWhereInput: EdgeScalarWhereInput,
+  QuestionNodeUpsertNestedInput: QuestionNodeUpsertNestedInput,
+  QuestionNodeUpdateManyWithoutQuestionnaireInput: QuestionNodeUpdateManyWithoutQuestionnaireInput,
+  QuestionNodeUpdateWithWhereUniqueWithoutQuestionnaireInput: QuestionNodeUpdateWithWhereUniqueWithoutQuestionnaireInput,
+  QuestionNodeUpdateWithoutQuestionnaireDataInput: QuestionNodeUpdateWithoutQuestionnaireDataInput,
+  QuestionNodeUpsertWithWhereUniqueWithoutQuestionnaireInput: QuestionNodeUpsertWithWhereUniqueWithoutQuestionnaireInput,
   QuestionnaireUpsertWithWhereUniqueWithoutCustomerInput: QuestionnaireUpsertWithWhereUniqueWithoutCustomerInput,
   QuestionnaireScalarWhereInput: QuestionnaireScalarWhereInput,
   QuestionnaireUpdateManyWithWhereNestedInput: QuestionnaireUpdateManyWithWhereNestedInput,
   QuestionnaireUpdateManyDataInput: QuestionnaireUpdateManyDataInput,
-  CustomerSettingsUpdateOneInput: CustomerSettingsUpdateOneInput,
-  CustomerSettingsUpdateDataInput: CustomerSettingsUpdateDataInput,
-  ColourSettingsUpdateOneInput: ColourSettingsUpdateOneInput,
-  ColourSettingsUpdateDataInput: ColourSettingsUpdateDataInput,
-  ColourSettingsUpsertNestedInput: ColourSettingsUpsertNestedInput,
-  FontSettingsUpdateOneInput: FontSettingsUpdateOneInput,
-  FontSettingsUpdateDataInput: FontSettingsUpdateDataInput,
-  FontSettingsUpsertNestedInput: FontSettingsUpsertNestedInput,
-  CustomerSettingsUpsertNestedInput: CustomerSettingsUpsertNestedInput,
   CustomerUpdateManyMutationInput: CustomerUpdateManyMutationInput,
   CustomerSettingsUpdateInput: CustomerSettingsUpdateInput,
   CustomerSettingsUpdateManyMutationInput: CustomerSettingsUpdateManyMutationInput,
@@ -4392,12 +4519,7 @@ export type ResolversParentTypes = ResolversObject<{
   QuestionOptionUpdateInput: QuestionOptionUpdateInput,
   QuestionOptionUpdateManyMutationInput: QuestionOptionUpdateManyMutationInput,
   QuestionnaireCreateInput: QuestionnaireCreateInput,
-  CustomerCreateOneWithoutQuestionnairesInput: CustomerCreateOneWithoutQuestionnairesInput,
-  CustomerCreateWithoutQuestionnairesInput: CustomerCreateWithoutQuestionnairesInput,
   QuestionnaireUpdateInput: QuestionnaireUpdateInput,
-  CustomerUpdateOneRequiredWithoutQuestionnairesInput: CustomerUpdateOneRequiredWithoutQuestionnairesInput,
-  CustomerUpdateWithoutQuestionnairesDataInput: CustomerUpdateWithoutQuestionnairesDataInput,
-  CustomerUpsertWithoutQuestionnairesInput: CustomerUpsertWithoutQuestionnairesInput,
   QuestionnaireUpdateManyMutationInput: QuestionnaireUpdateManyMutationInput,
   Subscription: {},
   ColourSettingsSubscriptionWhereInput: ColourSettingsSubscriptionWhereInput,
@@ -5000,6 +5122,7 @@ export type QuestionnaireResolvers<ContextType = any, ParentType extends Resolve
   publicTitle?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   creationDate?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>,
   updatedAt?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>,
+  rootQuestion?: Resolver<Maybe<ResolversTypes['QuestionNode']>, ParentType, ContextType>,
   questions?: Resolver<Maybe<Array<ResolversTypes['QuestionNode']>>, ParentType, ContextType, RequireFields<QuestionnaireQuestionsArgs, never>>,
   leafs?: Resolver<Maybe<Array<ResolversTypes['LeafNode']>>, ParentType, ContextType, RequireFields<QuestionnaireLeafsArgs, never>>,
   __isTypeOf?: isTypeOfResolverFn<ParentType>,
@@ -5042,6 +5165,7 @@ export type QuestionNodeResolvers<ContextType = any, ParentType extends Resolver
   branchVal?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   isRoot?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>,
   questionType?: Resolver<ResolversTypes['NodeType'], ParentType, ContextType>,
+  questionnaire?: Resolver<ResolversTypes['Questionnaire'], ParentType, ContextType>,
   overrideLeaf?: Resolver<Maybe<ResolversTypes['LeafNode']>, ParentType, ContextType>,
   conditions?: Resolver<Maybe<Array<ResolversTypes['QuestionCondition']>>, ParentType, ContextType, RequireFields<QuestionNodeConditionsArgs, never>>,
   options?: Resolver<Maybe<Array<ResolversTypes['QuestionOption']>>, ParentType, ContextType, RequireFields<QuestionNodeOptionsArgs, never>>,
