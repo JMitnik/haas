@@ -7,6 +7,7 @@ import { useParams } from 'react-router-dom';
 
 import getQuestionnaireData from '../queries/getQuestionnaireData';
 import getSessionAnswerFlow from '../queries/getSessionAnswerFlow';
+import { margin } from 'styled-system';
 
 interface timelineEntry {
   sessionId: string;
@@ -160,11 +161,11 @@ const TimelineEntry = ({ setCurrSession, timelineEntry }: { setCurrSession: Disp
   return (
     <TimelineEntryView onClick={() => setCurrSession(timelineEntry.sessionId)}>
       <div>
-        <span style={{ color: 'white' }}>
+        <div style={{ color: 'white', margin: '5px' }}>
           User {timelineEntry.sessionId} has voted {timelineEntry.value}
-        </span>
+        </div>
         <div>
-          <p style={{ color: 'white', fontSize: '0.8rem' }}>
+          <p style={{ color: 'white', fontSize: '0.8rem', margin: '10px'}}>
             {acceptedDate}
           </p>
         </div>
@@ -175,8 +176,8 @@ const TimelineEntry = ({ setCurrSession, timelineEntry }: { setCurrSession: Disp
 
 const TimelineEntryView = styled.div`
    ${({ theme }) => css`
-    margin-top: 5px;
-    margin-bottom: 5px;
+    margin: 5px 20px;
+    box-shadow: 0px 0px 2px 0px rgba(0,0,0,0.75);
     background: ${theme.colors.secondary};
     cursor: pointer;
     :hover {
