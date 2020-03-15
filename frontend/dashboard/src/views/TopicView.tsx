@@ -215,7 +215,7 @@ const TopicDetails = ({ QuestionnaireDetailResult }: { QuestionnaireDetailResult
                       Average score:
                     </div>
                     <div style={{ marginLeft: '5px', fontSize: '200%', alignSelf: 'flex-start' }}>
-                      { parseFloat(QuestionnaireDetailResult?.average).toPrecision(4) } /
+                      { parseFloat(QuestionnaireDetailResult?.average).toPrecision(4) }/
                     </div>
                     <div style={{ alignSelf: 'flex-end', marginBottom: '2px' }}>
                       {QuestionnaireDetailResult?.totalNodeEntries} answer(s)
