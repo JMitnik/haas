@@ -7,7 +7,6 @@ import { useParams } from 'react-router-dom';
 
 import getQuestionnaireData from '../queries/getQuestionnaireData';
 import getSessionAnswerFlow from '../queries/getSessionAnswerFlow';
-import { Query, Questionnaire } from '../types.d';
 
 interface timelineEntry {
   sessionId: string;
