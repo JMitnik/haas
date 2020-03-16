@@ -2,14 +2,30 @@ import React, { FC } from 'react';
 import { useQuery, useApolloClient, useMutation } from '@apollo/react-hooks';
 import { gql, ApolloError } from 'apollo-boost';
 
-import { ChevronRight, Plus } from 'react-feather';
-import { H2, H3, H4, Grid, Flex, Icon, Label, Div, Card, CardBody, CardFooter } from '@haas/ui';
+import { ChevronRight, Plus, X } from 'react-feather';
+import { H2, H3, H4, Grid, Flex, Icon, Label, Div, Card, CardBody, CardFooter, Container } from '@haas/ui';
 import { Link, useHistory } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 import { Query, Questionnaire, Customer } from '../types.d';
 
 import { getCustomerQuery } from '../queries/getCustomerQuery';
 import { deleteFullCustomerQuery } from '../mutations/deleteFullCustomer';
+
+const DeleteCustomerButtonContainer = styled.button`
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background: none;
+  border: none;
+  opacity: 0.1;
+  cursor: pointer;
+  transition: all 0.2s ease-in;
+
+  &:hover {
+    transition: all 0.2s ease-in;
+    opacity: 0.8;
+  }
+`;
 
 const DashboardView: FC = () => {
   const { loading, error, data } = useQuery<Query>(getCustomerQuery);
@@ -30,25 +46,27 @@ const DashboardView: FC = () => {
 
   return (
     <>
-      <H2 color="default.text" fontWeight={400} mb={4}>Customers</H2>
+      <Container>
+        <H2 color="default.primary" fontWeight={400} mb={4}>Customers</H2>
 
-      <Grid
-        gridGap={4}
-        gridTemplateColumns={['1fr', '1fr 1fr 1fr']}
-        gridAutoRows="minmax(200px, 1fr)"
-      >
-        {topics?.map((topic, index) => topic && <CustomerCard key={index} customer={topic} />)}
+        <Grid
+          gridGap={4}
+          gridTemplateColumns={['1fr', '1fr 1fr 1fr']}
+          gridAutoRows="minmax(200px, 1fr)"
+        >
+          {topics?.map((topic, index) => topic && <CustomerCard key={index} customer={topic} />)}
 
-        <AddTopicCard>
-          <Link to="/customer-builder" />
-          <Div>
-            <Plus />
-            <H3>
-              Add new customer
-            </H3>
-          </Div>
-        </AddTopicCard>
-      </Grid>
+          <AddTopicCard>
+            <Link to="/customer-builder" />
+            <Div>
+              <Plus />
+              <H3>
+                Add new customer
+              </H3>
+            </Div>
+          </AddTopicCard>
+        </Grid>
+      </Container>
     </>
   );
 };
@@ -106,23 +124,24 @@ const CustomerCard = ({ customer }: { customer: Customer }) => {
     },
   });
 
-  const deleteClickedCustomer = async (customerId: string) => {
+  const deleteClickedCustomer = async (event: any, customerId: string) => {
     deleteCustomer({
       variables: {
         id: customerId,
       },
     });
+    event.stopPropagation();
   };
 
   return (
     <Card
       useFlex
       flexDirection="column"
-      backgroundColor={customer.settings?.colourSettings?.primary
-        ? customer.settings?.colourSettings?.primary : 'white'}
+      bg={customer.settings?.colourSettings?.primary || 'white'}
+      onClick={() => setCustomerID(customer.id)}
     >
       <CardBody flex="100%">
-        <button type="button" onClick={() => deleteClickedCustomer(customer.id)}>DELETE ME PLS</button>
+        <DeleteCustomerButtonContainer onClick={(e) => deleteClickedCustomer(e, customer.id)}><X /></DeleteCustomerButtonContainer>
         <Flex alignItems="center" justifyContent="space-between">
           <H3 fontWeight={500}>
             {customer.name}
@@ -130,14 +149,6 @@ const CustomerCard = ({ customer }: { customer: Customer }) => {
           <CustomerCardImage src={customer?.settings?.logoUrl ? customer?.settings?.logoUrl : ''} />
         </Flex>
       </CardBody>
-      <CardFooter useFlex justifyContent="center" alignItems="center" onClick={() => setCustomerID(customer.id)}>
-        <H4>
-          View project
-        </H4>
-        <Icon pl={1} fontSize={1}>
-          <ChevronRight />
-        </Icon>
-      </CardFooter>
     </Card>
   );
 };
