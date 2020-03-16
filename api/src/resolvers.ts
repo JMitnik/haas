@@ -4,7 +4,7 @@ import { QueryResolvers, MutationResolvers } from './generated/resolver-types';
 import cleanInt from './utils/cleanInt';
 import _ from 'lodash';
 import { prisma, ID_Input, Questionnaire } from './generated/prisma-client/index';
-import seedCompany, { seedQuestionnare } from '../data/seeds/make-company';
+import seedCompany, { seedQuestionnare, seedFreshCompany } from '../data/seeds/make-company';
 
 const deleteFullCustomerNode = async (parent: any, args:any) => {
   const { id } : { id: ID_Input} = args;
@@ -36,7 +36,7 @@ const createNewCustomerMutation = async (parent : any, args: any) => {
   });
 
   if (isSeed) {
-    await seedCompany(customer);
+    await seedFreshCompany(customer);
   }
 
   return customer;
