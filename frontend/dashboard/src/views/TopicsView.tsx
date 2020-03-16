@@ -125,18 +125,19 @@ const TopicCard = ({ topic }: { topic: Questionnaire }) => {
     },
   });
 
-  const deleteClickedCustomer = async (topicId: string) => {
+  const deleteClickedCustomer = async (event: any, topicId: string) => {
     deleteTopic({
       variables: {
         id: topicId,
       },
     });
+    event.stopPropagation();
   };
 
   return (
     <Card useFlex flexDirection="column" onClick={() => history.push(`/c/${customerId}/t/${topic.id}`)}>
-      <DeleteTopicButton onClick={() => deleteClickedCustomer(topic.id)}><X /></DeleteTopicButton>
       <CardBody flex="100%">
+        <DeleteTopicButton onClick={(e) => deleteClickedCustomer(e, topic.id)}><X /></DeleteTopicButton>
         <Flex alignItems="center" justifyContent="space-between">
           <H3 fontWeight={500}>
             {topic.title}

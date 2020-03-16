@@ -124,12 +124,13 @@ const CustomerCard = ({ customer }: { customer: Customer }) => {
     },
   });
 
-  const deleteClickedCustomer = async (customerId: string) => {
+  const deleteClickedCustomer = async (event: any, customerId: string) => {
     deleteCustomer({
       variables: {
         id: customerId,
       },
     });
+    event.stopPropagation();
   };
 
   return (
@@ -140,7 +141,7 @@ const CustomerCard = ({ customer }: { customer: Customer }) => {
       onClick={() => setCustomerID(customer.id)}
     >
       <CardBody flex="100%">
-        <DeleteCustomerButtonContainer onClick={() => deleteClickedCustomer(customer.id)}><X /></DeleteCustomerButtonContainer>
+        <DeleteCustomerButtonContainer onClick={(e) => deleteClickedCustomer(e, customer.id)}><X /></DeleteCustomerButtonContainer>
         <Flex alignItems="center" justifyContent="space-between">
           <H3 fontWeight={500}>
             {customer.name}

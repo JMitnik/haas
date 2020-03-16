@@ -169,10 +169,11 @@ const TimelineEntry = ({
   const date = new Date(timeLineEntry.createdAt);
   const acceptedDate = getUniversalDate(date);
   const history = useHistory();
+  const { customerId, topicId } = useParams();
 
   // TODO: Set setCurrSession on a context, so you dont pass it as prop around
   const viewTimeLine = () => {
-    history.push(`/c/:customerId/t/:topicId/e/${timeLineEntry.sessionId}`);
+    history.push(`/c/${customerId}/t/${topicId}/e/${timeLineEntry.sessionId}`);
     setCurrSession(timeLineEntry.sessionId);
   };
 
