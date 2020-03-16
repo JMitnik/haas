@@ -1,6 +1,6 @@
 import { prisma } from '../../src/generated/prisma-client/index';
 
-import seedCompany from './make-company';
+import seedCompany, { seedFreshCompany } from './make-company';
 
 const CUSTOMER = 'Starbucks';
 
@@ -19,7 +19,7 @@ const makeStarbucks = async () => {
     },
   });
 
-  await seedCompany(customer);
+  await seedFreshCompany(customer);
 };
 
 export default makeStarbucks;
