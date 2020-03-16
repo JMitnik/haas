@@ -2,8 +2,8 @@ import React, { FC } from 'react';
 import { useQuery, useMutation } from '@apollo/react-hooks';
 import { ApolloError } from 'apollo-boost';
 
-import { ChevronRight, Plus } from 'react-feather';
-import { H2, H3, H4, Grid, Flex, Icon, Label, Div, Card, CardBody, CardFooter } from '@haas/ui';
+import { ChevronRight, Plus, X } from 'react-feather';
+import { H2, H3, H4, Grid, Flex, Icon, Label, Div, Card, CardBody, CardFooter, Container } from '@haas/ui';
 import { Link, useHistory, useParams } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 import { Query, Questionnaire } from '../types.d';
@@ -35,25 +35,27 @@ const TopicsView: FC = () => {
 
   return (
     <>
-      <H2 color="default.text" fontWeight={400} mb={4}>Topics</H2>
+      <Container>
+        <H2 color="default.text" fontWeight={400} mb={4}>Topics</H2>
 
-      <Grid
-        gridGap={4}
-        gridTemplateColumns={['1fr', '1fr 1fr 1fr']}
-        gridAutoRows="minmax(200px, 1fr)"
-      >
-        {topics?.map((topic, index) => topic && <TopicCard key={index} topic={topic} />)}
+        <Grid
+          gridGap={4}
+          gridTemplateColumns={['1fr', '1fr 1fr 1fr']}
+          gridAutoRows="minmax(200px, 1fr)"
+        >
+          {topics?.map((topic, index) => topic && <TopicCard key={index} topic={topic} />)}
 
-        <AddTopicCard>
-          <Link to={`/c/${customerId}/topic-builder`} />
-          <Div>
-            <Plus />
-            <H3>
-              Add topic
-            </H3>
-          </Div>
-        </AddTopicCard>
-      </Grid>
+          <AddTopicCard>
+            <Link to={`/c/${customerId}/topic-builder`} />
+            <Div>
+              <Plus />
+              <H3>
+                Add topic
+              </H3>
+            </Div>
+          </AddTopicCard>
+        </Grid>
+      </Container>
     </>
   );
 };
@@ -89,6 +91,23 @@ const AddTopicCard = styled(Card)`
   `}
 `;
 
+
+const DeleteTopicButton = styled.button`
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background: none;
+  border: none;
+  opacity: 0.1;
+  cursor: pointer;
+  transition: all 0.2s ease-in;
+
+  &:hover {
+    transition: all 0.2s ease-in;
+    opacity: 0.8;
+  }
+`;
+
 const TopicCard = ({ topic }: { topic: Questionnaire }) => {
   const history = useHistory();
   const { customerId } = useParams();
@@ -116,25 +135,17 @@ const TopicCard = ({ topic }: { topic: Questionnaire }) => {
 
   return (
     <Card useFlex flexDirection="column" onClick={() => history.push(`/c/${customerId}/t/${topic.id}`)}>
-      <button type="button" onClick={() => deleteClickedCustomer(topic.id)}>Delete</button>
+      <DeleteTopicButton onClick={() => deleteClickedCustomer(topic.id)}><X /></DeleteTopicButton>
       <CardBody flex="100%">
         <Flex alignItems="center" justifyContent="space-between">
           <H3 fontWeight={500}>
             {topic.title}
           </H3>
           <Label brand="success">
-            Score: 9.3
+            9.3
           </Label>
         </Flex>
       </CardBody>
-      <CardFooter useFlex justifyContent="center" alignItems="center">
-        <H4>
-          View topic
-        </H4>
-        <Icon pl={1} fontSize={1}>
-          <ChevronRight />
-        </Icon>
-      </CardFooter>
     </Card>
   );
 };

@@ -1,15 +1,15 @@
 /* eslint-disable react/jsx-one-expression-per-line */
 import React, { useState, Dispatch, SetStateAction } from 'react';
 import { useQuery } from '@apollo/react-hooks';
-import { H2, Flex, Muted } from '@haas/ui';
+import { H2, Flex, Muted, Loader, Grid, Div, H5 } from '@haas/ui';
 import styled, { css } from 'styled-components';
-import { useParams } from 'react-router-dom';
+import { useParams, Switch, Route, useHistory } from 'react-router-dom';
 
 import getQuestionnaireData from '../queries/getQuestionnaireData';
 import getSessionAnswerFlow from '../queries/getSessionAnswerFlow';
-import { margin, alignSelf } from 'styled-system';
+import { Activity } from 'react-feather';
 
-interface timelineEntry {
+interface TimelineEntryProps {
   sessionId: string;
   value: number;
   createdAt: string;
@@ -23,47 +23,75 @@ interface QuestionnaireDetailResult {
   updatedAt: string;
   average: string;
   totalNodeEntries: number;
-  timelineEntries?: Array<timelineEntry>
+  timelineEntries?: Array<TimelineEntryProps>
 }
 
-interface INodeEntryValue {
+interface NodeEntryValueProps {
   numberValue?: number;
   textValue?: string;
   id: string;
 }
 
-interface IRelatedNode {
+interface RelatedNodeProps {
   title: string;
 }
 
-interface INodeEntry {
-  values: Array<INodeEntryValue>;
-  relatedNode: IRelatedNode;
+interface NodeEntryProps {
+  values: Array<NodeEntryValueProps>;
+  relatedNode: RelatedNodeProps;
 }
+
+const monthMap = new Map([
+  [0, 'JAN'],
+  [1, 'FEB'],
+  [2, 'MAR'],
+  [3, 'APR'],
+  [4, 'MAY'],
+  [5, 'JUN'],
+  [6, 'JUL'],
+  [7, 'AUG'],
+  [8, 'SEP'],
+  [9, 'OCT'],
+  [10, 'NOV'],
+  [11, 'DEC'],
+]);
 
 const TopicView = () => {
   const { topicId } = useParams();
   const [currSession, setCurrSession] = useState('');
-  console.log('Current session: ', currSession);
 
-  const { loading, error, data } = useQuery(getQuestionnaireData, {
+  const { loading, data } = useQuery(getQuestionnaireData, {
     variables: { topicId },
   });
 
-  if (loading) {
-    return (<div> loading... </div>);
-  }
+  if (loading) return <Loader />;
 
   const resultData = data?.getQuestionnaireData;
 
   return (
     <>
-      <Flex height="100%" alignItems="center" justifyContent="space-between">
-        <TopicDetails QuestionnaireDetailResult={resultData} />
-        <HistoryLog setCurrSession={setCurrSession} timelineEntries={resultData?.timelineEntries} />
-      </Flex>
-      <Hr />
-      <TopicAnswerFlow sessionId={currSession} />
+      <Div width="80%" margin="0 auto">
+        <Grid gridTemplateColumns="3fr 1fr">
+          <Div>
+            <Flex height="100%" alignItems="center" justifyContent="space-between">
+              <Switch>
+                <Route path="/c/:customerId/t/:topicId/e/:entryId">
+                  <TopicAnswerFlow sessionId={currSession} />
+                </Route>
+                <Route>
+                  <TopicDetails QuestionnaireDetailResult={resultData} />
+                </Route>
+              </Switch>
+            </Flex>
+          </Div>
+          <Div>
+            <HistoryLog
+              setCurrSession={setCurrSession}
+              timelineEntries={resultData?.timelineEntries}
+            />
+          </Div>
+        </Grid>
+      </Div>
     </>
   );
 };
@@ -73,15 +101,11 @@ const TopicAnswerFlowView = styled.div`
 `;
 
 const TopicAnswerFlow = ({ sessionId }: { sessionId: string }) => {
-  const { loading, error, data } = useQuery(getSessionAnswerFlow, {
+  const { loading, data } = useQuery(getSessionAnswerFlow, {
     variables: { sessionId },
   });
 
-  console.log('Topic answer flow: ', data);
-
-  if (loading) {
-    return <div />;
-  }
+  if (loading) return <Loader />;
 
   const session = data?.session;
 
@@ -101,7 +125,7 @@ const TopicAnswerFlow = ({ sessionId }: { sessionId: string }) => {
         session && (
           <>
             {
-              session && session?.nodeEntries.map((nodeEntry: INodeEntry, index: number) => <TopicAnswerEntry key={index} nodeEntry={nodeEntry} />)
+              session && session?.nodeEntries.map((nodeEntry: NodeEntryProps, index: number) => <TopicAnswerEntry key={index} nodeEntry={nodeEntry} />)
             }
           </>
         )
@@ -110,91 +134,108 @@ const TopicAnswerFlow = ({ sessionId }: { sessionId: string }) => {
   );
 };
 
-const TopicAnswerEntry = ({ nodeEntry }: { nodeEntry: INodeEntry }) => {
-  return (
-    <TopicAnswerEntryView>
-      <div>
-        Question: {nodeEntry.relatedNode.title}
-      </div>
-      <div>
-        <strong>
-        Answer: {nodeEntry.values?.[0].numberValue ? nodeEntry.values?.[0].numberValue : nodeEntry.values?.[0].textValue}
-        </strong>
-      </div>
-      <Hr />
-    </TopicAnswerEntryView>
-  );
-};
+const TopicAnswerEntry = ({ nodeEntry }: { nodeEntry: NodeEntryProps }) => (
+  <TopicAnswerEntryView>
+    <div>
+      Question: {nodeEntry.relatedNode.title}
+    </div>
+    <div>
+      <strong>
+        Answer: {nodeEntry.values?.[0].numberValue
+        ? nodeEntry.values?.[0].numberValue
+        : nodeEntry.values?.[0].textValue}
+      </strong>
+    </div>
+    <Hr />
+  </TopicAnswerEntryView>
+);
 
 const TopicAnswerEntryView = styled.div`
   margin: 10px;
 `;
-
-const HistoryLog = ({ setCurrSession, timelineEntries }: { setCurrSession: Dispatch<SetStateAction<string>>, timelineEntries: Array<timelineEntry> }) => {
-  return (
-    <HistoryLogView>
-      <H2 color="default.text" fontWeight={400} mb={4}>
-        Timeline
-      </H2>
-      <Muted>
-        History of entries for this topic
-      </Muted>
-      <Hr />
-      {
-        timelineEntries && timelineEntries.length > 0 && timelineEntries?.map(
-          (timelineEntry, index) => <TimelineEntry setCurrSession={setCurrSession} key={index} timelineEntry={timelineEntry} />)
-      }
-      {
-        ((timelineEntries && timelineEntries.length === 0) || (!timelineEntries)) && <div style={{ margin: '5px 20px' }}>No data available...</div>
-      }
-    </HistoryLogView>
-  );
-};
 
 const getUniversalDate = (date: Date) => {
   const result = `${date.getDate().toString()}-${monthMap.get(date.getMonth())}-${date.getFullYear().toString()}`;
   return result;
 };
 
-const TimelineEntry = ({ setCurrSession, timelineEntry }: { setCurrSession: Dispatch<SetStateAction<string>>, timelineEntry: timelineEntry }) => {
-
-  const date = new Date(timelineEntry.createdAt);
+const TimelineEntry = ({
+  setCurrSession,
+  timeLineEntry,
+}: {
+  setCurrSession: Dispatch<SetStateAction<string>>,
+  timeLineEntry: TimelineEntryProps
+}) => {
+  const date = new Date(timeLineEntry.createdAt);
   const acceptedDate = getUniversalDate(date);
+  const history = useHistory();
+
+  // TODO: Set setCurrSession on a context, so you dont pass it as prop around
+  const viewTimeLine = () => {
+    history.push(`/c/:customerId/t/:topicId/e/${timeLineEntry.sessionId}`);
+    setCurrSession(timeLineEntry.sessionId);
+  };
 
   return (
-    <TimelineEntryView onClick={() => setCurrSession(timelineEntry.sessionId)}>
-      <div>
-        <div style={{ color: 'white', margin: '5px' }}>
-          User {timelineEntry.sessionId} has voted {timelineEntry.value}
-        </div>
-        <div>
-          <p style={{ color: 'white', fontSize: '0.8rem', margin: '5px' }}>
-            {acceptedDate}
-          </p>
-        </div>
-      </div>
-    </TimelineEntryView>
+    <TimeLineEntryContainer onClick={() => viewTimeLine()}>
+      <Div>
+        <Div>
+          User {timeLineEntry.sessionId} has voted {timeLineEntry.value}
+        </Div>
+      </Div>
+
+      <Div>
+        <H5>
+          {acceptedDate}
+        </H5>
+      </Div>
+    </TimeLineEntryContainer>
   );
 };
 
-const TimelineEntryView = styled.div`
+const HistoryLog = ({ setCurrSession, timelineEntries }: { setCurrSession: Dispatch<SetStateAction<string>>, timelineEntries: Array<TimelineEntryProps> }) => (
+  <HistoryLogContainer>
+    <Div useFlex alignItems="center" mb={4}>
+      <H2 color="primary" fontWeight={400}>
+        Timeline feed
+      </H2>
+    </Div>
+    <Muted>
+      History of entries for this topic
+    </Muted>
+    <Hr />
+    { timelineEntries?.length > 0 && timelineEntries?.map((timelineEntry, index) => (
+      <TimelineEntry setCurrSession={setCurrSession} key={index} timeLineEntry={timelineEntry} />)
+    )}
+    {(timelineEntries?.length === 0 || (!timelineEntries)) && (
+      <div style={{ margin: '5px 20px' }}>No data available...</div>
+    )}
+  </HistoryLogContainer>
+);
+
+const TimeLineEntryContainer = styled.div`
    ${({ theme }) => css`
-    margin: 5px 20px;
-    box-shadow: 0px 0px 2px 0px rgba(0,0,0,0.75);
-    background: ${theme.colors.secondary};
+    padding: 8px 14px;
+    border-radius: ${theme.borderRadiuses.md};
+    background: ${theme.colors.primaryAlt};
+    color: ${theme.colors.primary};
+    margin: ${theme.gutter}px 0;
+    transition: all 0.2s ease-in;
     cursor: pointer;
+
     :hover {
+      transition: all 0.2s ease-in;
       background: ${theme.colors.primary};
+      color: white;
     }
   `}
 `;
 
-const TopicDetails = ({ QuestionnaireDetailResult }: { QuestionnaireDetailResult: QuestionnaireDetailResult }) => {
-  console.log(QuestionnaireDetailResult?.average);
-
-  return (
-    <TopicDetailsView>
-      {
+const TopicDetails = (
+  { QuestionnaireDetailResult }: { QuestionnaireDetailResult: QuestionnaireDetailResult },
+) => (
+  <TopicDetailsView>
+    {
         QuestionnaireDetailResult && (
           <>
             <H2 color="default.text" fontWeight={400} mb={4}>
@@ -228,9 +269,8 @@ const TopicDetails = ({ QuestionnaireDetailResult }: { QuestionnaireDetailResult
           </>
         )
       }
-    </TopicDetailsView>
-  );
-};
+  </TopicDetailsView>
+);
 
 const Score = styled.div`
   display: flex;
@@ -244,11 +284,14 @@ const TopicDetailsView = styled.div`
   flex-direction: column;
 `;
 
-const HistoryLogView = styled.div`
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  width: 30%;
+const HistoryLogContainer = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    flex-direction: column;
+    background: #daecfc;
+    border-radius: 20px;
+    padding: ${theme.gutter}px;
+  `}
 `;
 
 const Hr = styled.hr`
@@ -256,20 +299,5 @@ const Hr = styled.hr`
     border-top: 1px solid ${theme.colors.default.light};
   `}
 `;
-
-const monthMap = new Map([
-  [0, 'JAN'],
-  [1, 'FEB'],
-  [2, 'MAR'],
-  [3, 'APR'],
-  [4, 'MAY'],
-  [5, 'JUN'],
-  [6, 'JUL'],
-  [7, 'AUG'],
-  [8, 'SEP'],
-  [9, 'OCT'],
-  [10, 'NOV'],
-  [11, 'DEC'],
-]);
 
 export default TopicView;

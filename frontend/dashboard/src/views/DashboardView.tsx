@@ -3,7 +3,7 @@ import { useQuery, useApolloClient, useMutation } from '@apollo/react-hooks';
 import { gql, ApolloError } from 'apollo-boost';
 
 import { ChevronRight, Plus, X } from 'react-feather';
-import { H2, H3, H4, Grid, Flex, Icon, Label, Div, Card, CardBody, CardFooter } from '@haas/ui';
+import { H2, H3, H4, Grid, Flex, Icon, Label, Div, Card, CardBody, CardFooter, Container } from '@haas/ui';
 import { Link, useHistory } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 import { Query, Questionnaire, Customer } from '../types.d';
@@ -46,25 +46,27 @@ const DashboardView: FC = () => {
 
   return (
     <>
-      <H2 color="default.primary" fontWeight={400} mb={4}>Customers</H2>
+      <Container>
+        <H2 color="default.primary" fontWeight={400} mb={4}>Customers</H2>
 
-      <Grid
-        gridGap={4}
-        gridTemplateColumns={['1fr', '1fr 1fr 1fr']}
-        gridAutoRows="minmax(200px, 1fr)"
-      >
-        {topics?.map((topic, index) => topic && <CustomerCard key={index} customer={topic} />)}
+        <Grid
+          gridGap={4}
+          gridTemplateColumns={['1fr', '1fr 1fr 1fr']}
+          gridAutoRows="minmax(200px, 1fr)"
+        >
+          {topics?.map((topic, index) => topic && <CustomerCard key={index} customer={topic} />)}
 
-        <AddTopicCard>
-          <Link to="/customer-builder" />
-          <Div>
-            <Plus />
-            <H3>
-              Add new customer
-            </H3>
-          </Div>
-        </AddTopicCard>
-      </Grid>
+          <AddTopicCard>
+            <Link to="/customer-builder" />
+            <Div>
+              <Plus />
+              <H3>
+                Add new customer
+              </H3>
+            </Div>
+          </AddTopicCard>
+        </Grid>
+      </Container>
     </>
   );
 };

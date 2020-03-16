@@ -25,7 +25,7 @@ const AppContainer = styled.div`
 
 const MainWindow = styled.div`
   ${({ theme }) => css`
-    padding: ${theme.gutter}px 0;
+    padding: ${theme.gutter}px;
     background: ${theme.colors.default.lightest};
     min-height: 100vh;
   `}
@@ -40,21 +40,19 @@ const App: FC = () => (
             {/* Top-level routes */}
             <TopNav />
             <MainWindow>
-              <Container>
-                <Switch>
-                  <Route path="/c/:customerId/t/:topicId/" render={() => <TopicView />} />
-                  <Route path="/c/:customerId/topic-builder" render={() => <TopicBuilderView />} />
-                  <Route path="/customer-builder" render={() => <CustomerBuilderView />} />
-                  <Route path="/c/:customerId/" render={() => <TopicsView />} />
-                  <Route
-                    path="/organisation-settings"
-                    render={() => <OrganisationSettingsView />}
-                  />
+              <Switch>
+                <Route path="/c/:customerId/t/:topicId/" render={() => <TopicView />} />
+                <Route path="/c/:customerId/topic-builder" render={() => <TopicBuilderView />} />
+                <Route path="/customer-builder" render={() => <CustomerBuilderView />} />
+                <Route path="/c/:customerId/" render={() => <TopicsView />} />
+                <Route
+                  path="/organisation-settings"
+                  render={() => <OrganisationSettingsView />}
+                />
 
-                  {/* Default-view: Ensure this is last */}
-                  <Route path="/" render={() => <DashboardView />} />
-                </Switch>
-              </Container>
+                {/* Default-view: Ensure this is last */}
+                <Route path="/" render={() => <DashboardView />} />
+              </Switch>
             </MainWindow>
           </AppContainer>
           <GlobalStyle />
