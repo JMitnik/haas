@@ -1,11 +1,13 @@
 /* eslint-disable react/jsx-one-expression-per-line */
 import React, { useState, Dispatch, SetStateAction } from 'react';
 import { useQuery } from '@apollo/react-hooks';
-import { H2, Flex, Muted, Loader, Grid, Div, H5 } from '@haas/ui';
+import { H2, Flex, Muted, Loader, Grid, Div, H5, H3, Button } from '@haas/ui';
 import styled, { css } from 'styled-components';
 import { useParams, Switch, Route, useHistory } from 'react-router-dom';
-
+// import Select, { ActionMeta } from 'react-select';
+import { useForm } from 'react-hook-form';
 import getQuestionnaireData from '../queries/getQuestionnaireData';
+import getTopicBuilderQuery from '../queries/getQuestionnaireQuery';
 import getSessionAnswerFlow from '../queries/getSessionAnswerFlow';
 import { Activity } from 'react-feather';
 
@@ -57,9 +59,9 @@ const monthMap = new Map([
 ]);
 
 const TopicView = () => {
-  const { topicId } = useParams();
+  const { customerId, topicId } = useParams();
   const [currSession, setCurrSession] = useState('');
-
+  const history = useHistory();
   const { loading, data } = useQuery(getQuestionnaireData, {
     variables: { topicId },
   });
@@ -73,13 +75,17 @@ const TopicView = () => {
       <Div width="80%" margin="0 auto">
         <Grid gridTemplateColumns="3fr 1fr">
           <Div>
-            <Flex height="100%" alignItems="center" justifyContent="space-between">
+            <Flex height="100%" alignItems="center" justifyContent="space-between" flexDirection="column">
               <Switch>
                 <Route path="/c/:customerId/t/:topicId/e/:entryId">
                   <TopicAnswerFlow sessionId={currSession} />
                 </Route>
+                <Route path="/c/:customerId/t/:topicId/topic-builder/">
+                  <TopicBuilderContent />
+                </Route>
                 <Route>
                   <TopicDetails QuestionnaireDetailResult={resultData} />
+                  <button type="button" onClick={() => history.push(`/c/${customerId}/t/${topicId}/topic-builder/`)}>Go to topic builder</button>
                 </Route>
               </Switch>
             </Flex>
@@ -92,6 +98,133 @@ const TopicView = () => {
           </Div>
         </Grid>
       </Div>
+    </>
+  );
+};
+
+interface QuestionEntryProps {
+  title: String;
+  questionType: String;
+  overrideLeaf?: String;
+  edgeChildren?: Array<QuestionEntryProps>
+  options?: Array<string>
+}
+
+const QuestionEntry = ({ question }: { question: QuestionEntryProps }) => {
+  const { register, handleSubmit, errors } = useForm();
+  console.log('Question: ', question);
+  return (
+    <>
+      <Grid gridTemplateColumns={['1fr', '1fr 2fr']} gridColumnGap={4}>
+        <Div py={4} pr={4}>
+          <H3 color="default.text" fontWeight={500} pb={2}>General topic information</H3>
+          <Muted>
+            General information about your project, such as title, descriptions, etc.
+          </Muted>
+        </Div>
+        <Div py={4}>
+          <Grid gridTemplateColumns={['1fr', '1fr 1fr']}>
+            <Flex flexDirection="column">
+              <StyledLabel>Title</StyledLabel>
+              <StyledInput name="title" ref={register({ required: true })} />
+              {errors.title && <Muted color="warning">Something went wrong!</Muted>}
+            </Flex>
+            <Div useFlex pl={4} flexDirection="column">
+              <StyledLabel>Public Title</StyledLabel>
+              <StyledInput name="publicTitle" ref={register({ required: true })} />
+              {errors.publicTitle && <Muted color="warning">Something went wrong!</Muted>}
+            </Div>
+          </Grid>
+          <Div py={4}>
+            <Flex flexDirection="column">
+              <StyledLabel>Description</StyledLabel>
+              <StyledTextInput name="description" ref={register({ required: true })} />
+              {errors.description && <Muted color="warning">Something went wrong!</Muted>}
+            </Flex>
+          </Div>
+          <Div py={4}>
+            <StyledInput type="checkbox" id="isSeed" name="isSeed" ref={register({ required: false })} />
+            <label htmlFor="isSeed"> Generate template topic </label>
+          </Div>
+        </Div>
+      </Grid>
+      {
+        question?.edgeChildren && question?.edgeChildren.map((childQuestion: QuestionEntryProps) => {
+          return <QuestionEntry question={childQuestion} />;
+        })
+      }
+    </>
+  );
+};
+
+const StyledLabel = styled(Div).attrs({ as: 'label' })`
+  ${({ theme }) => css`
+    font-size: 0.8rem;
+    font-weight: bold;
+    margin-bottom: 2px;
+    display: inline-block;
+    color: ${theme.colors.default.dark}
+    text-transform: uppercase;
+  `}
+`;
+
+const StyledInput = styled.input`
+  ${({ theme }) => css`
+    border-radius: ${theme.borderRadiuses.sm};
+    background: ${theme.colors.white};
+    border: none;
+    border-bottom: ${theme.colors.default.normal} 1px solid;
+    box-shadow: none;
+    background: white;
+    border-radius: 3px;
+
+    /* Make somehow a color */
+    border: 1px solid #dbdde0;
+    box-shadow: none;
+
+    /* Set to variable */
+    padding: 15px;
+  `}
+`;
+
+const StyledTextInput = styled(StyledInput).attrs({ as: 'textarea' })`
+  resize: none;
+  min-height: 150px;
+`;
+
+const TopicBuilderContentView = styled.div`
+  display: flex;
+  flex-direction: column;
+  border: 1px solid;
+  width: 90%;
+`;
+
+const TopicBuilderContent = () => {
+  const { topicId } = useParams();
+  console.log('topic Id: ', topicId);
+  const { loading, data } = useQuery(getTopicBuilderQuery, {
+    variables: { topicId },
+  });
+
+  if (loading) {
+    return <Loader />;
+  }
+
+  const topicBuilderData = data?.questionnaire;
+  console.log('Topic builder data: ', topicBuilderData);
+
+  return (
+    <>
+      <H2 color="default.text" fontWeight={400} mb={4}>
+        Topic builder
+      </H2>
+      <TopicBuilderContentView>
+        {
+          topicBuilderData?.questions.map((question: QuestionEntryProps) => {
+            return <QuestionEntry question={question} />;
+          })
+        }
+      </TopicBuilderContentView>
     </>
   );
 };
@@ -142,8 +275,8 @@ const TopicAnswerEntry = ({ nodeEntry }: { nodeEntry: NodeEntryProps }) => (
     <div>
       <strong>
         Answer: {nodeEntry.values?.[0].numberValue
-        ? nodeEntry.values?.[0].numberValue
-        : nodeEntry.values?.[0].textValue}
+          ? nodeEntry.values?.[0].numberValue
+          : nodeEntry.values?.[0].textValue}
       </strong>
     </div>
     <Hr />
@@ -205,7 +338,7 @@ const HistoryLog = ({ setCurrSession, timelineEntries }: { setCurrSession: Dispa
       History of entries for this topic
     </Muted>
     <Hr />
-    { timelineEntries?.length > 0 && timelineEntries?.map((timelineEntry, index) => (
+    {timelineEntries?.length > 0 && timelineEntries?.map((timelineEntry, index) => (
       <TimelineEntry setCurrSession={setCurrSession} key={index} timeLineEntry={timelineEntry} />)
     )}
     {(timelineEntries?.length === 0 || (!timelineEntries)) && (
@@ -235,8 +368,8 @@ const TimeLineEntryContainer = styled.div`
 const TopicDetails = (
   { QuestionnaireDetailResult }: { QuestionnaireDetailResult: QuestionnaireDetailResult },
 ) => (
-  <TopicDetailsView>
-    {
+    <TopicDetailsView>
+      {
         QuestionnaireDetailResult && (
           <>
             <H2 color="default.text" fontWeight={400} mb={4}>
@@ -257,7 +390,7 @@ const TopicDetails = (
                       Average score:
                     </div>
                     <div style={{ marginLeft: '5px', fontSize: '200%', alignSelf: 'flex-start' }}>
-                      { parseFloat(QuestionnaireDetailResult?.average).toPrecision(4) }/
+                      {parseFloat(QuestionnaireDetailResult?.average).toPrecision(4)}/
                     </div>
                     <div style={{ alignSelf: 'flex-end', marginBottom: '2px' }}>
                       {QuestionnaireDetailResult?.totalNodeEntries} answer(s)
@@ -270,8 +403,8 @@ const TopicDetails = (
           </>
         )
       }
-  </TopicDetailsView>
-);
+    </TopicDetailsView>
+  );
 
 const Score = styled.div`
   display: flex;

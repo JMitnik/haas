@@ -1,3 +1,4 @@
+/* eslint-disable import/prefer-default-export */
 import gql from 'graphql-tag';
 
 export const QuestionFragment = gql`
@@ -9,7 +10,7 @@ export const QuestionFragment = gql`
       nodeId
       type
       title
-		}
+    }
     questionType
     edgeChildren {
       id
@@ -33,4 +34,6 @@ export const QuestionFragment = gql`
         publicValue
     }
   }
+
+  # {SubQuestionFragment}
 `;
