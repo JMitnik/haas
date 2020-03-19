@@ -131,12 +131,42 @@ interface EdgeConditonProps {
   matchValue?: string;
 }
 
+const conditionTypes = [{ value: 'match', label: 'match' }, { value: 'valueBoundary', label: 'valueBoundary' }];
+
 const EdgeEntry = ({ edge, index } : {edge: EdgeChildProps, index: number}) => {
+
+  const [currCondition, setCurrCondition] = useState({ value: edge.conditions[0].conditionType, label: edge.conditions[0].conditionType });
+
   return (
     <>
-      <Div useFlex flexDirection="column">
+      <Div useFlex my={10} flexDirection="column">
         <StyledLabel>Child node #{index + 1}</StyledLabel>
         <StyledInput name="title" value={edge.childNode.title} />
+        <Div>
+          <StyledLabel>conditionType</StyledLabel>
+          <Select options={conditionTypes} value={currCondition} />
+          {
+            // onChange={(qOption) => setCurrCondition({value: qOption.value, label: qOption.label })}
+          }
+          {
+            currCondition.value === 'valueBoundary' && (
+              <>
+                <StyledLabel>Min value</StyledLabel>
+                <StyledInput value={edge.conditions[0].renderMin} />
+                <StyledLabel>Max value</StyledLabel>
+                <StyledInput value={edge.conditions[0].renderMax} />
+              </>
+            )
+          }
+          {
+            currCondition.value === 'match' && (
+              <>
+                <StyledLabel>Match value</StyledLabel>
+                <StyledInput value={edge.conditions[0].matchValue} />
+              </>
+            )
+          }
+        </Div>
       </Div>
     </>
   );
@@ -173,7 +203,7 @@ const QuestionEntry = ({ question, leafs }: { question: QuestionEntryProps, leaf
           <Select options={leafs} value={currLeaf} />
         </Div>
         <Div useFlex pl={4} pr={4} pb={2} flexDirection="column">
-          <H5>Child nodes</H5>
+          <H4>Child nodes</H4>
           {
             question.edgeChildren && question.edgeChildren.map((edge: EdgeChildProps, index) => {
               return <EdgeEntry edge={edge} index={index} />;
