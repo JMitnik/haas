@@ -15,9 +15,7 @@ export const getTopicBuilderQuery = gql`
           title
           type
       }
-      questions(where: {
-        isRoot: true,
-      }) {
+      questions {
         ...QuestionFragment
       }
     }

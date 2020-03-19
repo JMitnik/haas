@@ -1,10 +1,10 @@
 /* eslint-disable react/jsx-one-expression-per-line */
 import React, { useState, Dispatch, SetStateAction } from 'react';
 import { useQuery } from '@apollo/react-hooks';
-import { H2, Flex, Muted, Loader, Grid, Div, H5, H3, Button } from '@haas/ui';
+import { H2, Flex, Muted, Loader, Grid, Div, H5, H4, H3, Button } from '@haas/ui';
 import styled, { css } from 'styled-components';
 import { useParams, Switch, Route, useHistory } from 'react-router-dom';
-// import Select, { ActionMeta } from 'react-select';
+import Select, { ActionMeta } from 'react-select';
 import { useForm } from 'react-hook-form';
 import getQuestionnaireData from '../queries/getQuestionnaireData';
 import getTopicBuilderQuery from '../queries/getQuestionnaireQuery';
@@ -102,58 +102,86 @@ const TopicView = () => {
   );
 };
 
+interface OverrideLeafProps {
+  id: string;
+  type?: string;
+  title: string;
+}
 interface QuestionEntryProps {
-  title: String;
-  questionType: String;
-  overrideLeaf?: String;
-  edgeChildren?: Array<QuestionEntryProps>
+  id: string;
+  title: string;
+  questionType: string;
+  overrideLeaf?: OverrideLeafProps;
+  edgeChildren?: Array<EdgeChildProps>
   options?: Array<string>
 }
 
-const QuestionEntry = ({ question }: { question: QuestionEntryProps }) => {
-  const { register, handleSubmit, errors } = useForm();
-  console.log('Question: ', question);
+interface EdgeChildProps {
+  id: string;
+  conditions: Array<EdgeConditonProps>;
+  parentNode: QuestionEntryProps;
+  childNode: QuestionEntryProps;
+}
+
+interface EdgeConditonProps {
+  id: string;
+  conditionType: string;
+  renderMin?: number;
+  renderMax?: number;
+  matchValue?: string;
+}
+
+const EdgeEntry = ({ edge, index } : {edge: EdgeChildProps, index: number}) => {
   return (
     <>
-      <Grid gridTemplateColumns={['1fr', '1fr 2fr']} gridColumnGap={4}>
-        <Div py={4} pr={4}>
-          <H3 color="default.text" fontWeight={500} pb={2}>General topic information</H3>
-          <Muted>
-            General information about your project, such as title, descriptions, etc.
-          </Muted>
-        </Div>
-        <Div py={4}>
-          <Grid gridTemplateColumns={['1fr', '1fr 1fr']}>
-            <Flex flexDirection="column">
-              <StyledLabel>Title</StyledLabel>
-              <StyledInput name="title" ref={register({ required: true })} />
-              {errors.title && <Muted color="warning">Something went wrong!</Muted>}
-            </Flex>
-            <Div useFlex pl={4} flexDirection="column">
-              <StyledLabel>Public Title</StyledLabel>
-              <StyledInput name="publicTitle" ref={register({ required: true })} />
-              {errors.publicTitle && <Muted color="warning">Something went wrong!</Muted>}
-            </Div>
-          </Grid>
-          <Div py={4}>
-            <Flex flexDirection="column">
-              <StyledLabel>Description</StyledLabel>
-              <StyledTextInput name="description" ref={register({ required: true })} />
-              {errors.description && <Muted color="warning">Something went wrong!</Muted>}
-            </Flex>
-          </Div>
-          <Div py={4}>
-            <StyledInput type="checkbox" id="isSeed" name="isSeed" ref={register({ required: false })} />
-            <label htmlFor="isSeed"> Generate template topic </label>
-          </Div>
-        </Div>
-      </Grid>
-      {
-        question?.edgeChildren && question?.edgeChildren.map((childQuestion: QuestionEntryProps) => {
-          return <QuestionEntry question={childQuestion} />;
-        })
-      }
+      <Div useFlex flexDirection="column">
+        <StyledLabel>Child node #{index + 1}</StyledLabel>
+        <StyledInput name="title" value={edge.childNode.title} />
+      </Div>
     </>
+  );
+};
+
+const QuestionEntryView = styled.div`
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+`;
+
+
+const questionTypes = [{ value: 'SLIDER', label: 'SLIDER' }, { value: 'MULTI-CHOICE', label: 'MULTI-CHOICE' }];
+
+const QuestionEntry = ({ question, leafs }: { question: QuestionEntryProps, leafs: any }) => {
+  const { register, handleSubmit, errors } = useForm();
+  console.log('Question: ', question);
+
+  const qType = { label: question.questionType, value: question.questionType };
+  const currLeaf = { label: question.overrideLeaf?.title, value: question.overrideLeaf?.id };
+  return (
+    <QuestionEntryView>
+      <Div backgroundColor="#daecfc" margin={5} py={6}>
+        <Div useFlex pl={4} pr={4} pb={2} flexDirection="column">
+          <H4>Question: {question.id}</H4>
+          <StyledLabel>Title</StyledLabel>
+          <StyledInput name="title" value={question.title} ref={register({ required: true })} />
+          {errors.title && <Muted color="warning">Something went wrong!</Muted>}
+        </Div>
+        <Div useFlex pl={4} pr={4} pb={2} flexDirection="column">
+          <StyledLabel>Question type</StyledLabel>
+          <Select options={questionTypes} value={qType} />
+        </Div>
+        <Div useFlex pl={4} pr={4} pb={2} flexDirection="column">
+          <StyledLabel>Leaf node</StyledLabel>
+          <Select options={leafs} value={currLeaf} />
+        </Div>
+        <Div useFlex pl={4} pr={4} pb={2} flexDirection="column">
+          <H5>Child nodes</H5>
+          {
+            question.edgeChildren && question.edgeChildren.map((edge: EdgeChildProps, index) => {
+              return <EdgeEntry edge={edge} index={index} />;
+            })
+          }
+        </Div>
+      </Div>
+    </QuestionEntryView>
   );
 };
 
@@ -195,9 +223,14 @@ const StyledTextInput = styled(StyledInput).attrs({ as: 'textarea' })`
 const TopicBuilderContentView = styled.div`
   display: flex;
   flex-direction: column;
-  border: 1px solid;
   width: 90%;
 `;
+
+interface LeafProps {
+  id: string;
+  type: string;
+  title: string;
+}
 
 const TopicBuilderContent = () => {
   const { topicId } = useParams();
@@ -212,6 +245,10 @@ const TopicBuilderContent = () => {
 
   const topicBuilderData = data?.questionnaire;
   console.log('Topic builder data: ', topicBuilderData);
+  const leafs: Array<LeafProps> = topicBuilderData?.leafs;
+  const selectLeafs = leafs.map((leaf) => {
+    return { value: leaf.id, label: leaf.title };
+  });
 
   return (
     <>
@@ -221,7 +258,7 @@ const TopicBuilderContent = () => {
       <TopicBuilderContentView>
         {
           topicBuilderData?.questions.map((question: QuestionEntryProps) => {
-            return <QuestionEntry question={question} />;
+            return <QuestionEntry question={question} leafs={selectLeafs} />;
           })
         }
       </TopicBuilderContentView>
@@ -275,8 +312,8 @@ const TopicAnswerEntry = ({ nodeEntry }: { nodeEntry: NodeEntryProps }) => (
     <div>
       <strong>
         Answer: {nodeEntry.values?.[0].numberValue
-          ? nodeEntry.values?.[0].numberValue
-          : nodeEntry.values?.[0].textValue}
+        ? nodeEntry.values?.[0].numberValue
+        : nodeEntry.values?.[0].textValue}
       </strong>
     </div>
     <Hr />
