@@ -15,7 +15,7 @@ const theme = {
       dark: '#657590',
       darkest: '#17263d',
       muted: '#59759c',
-      text: '#4f5d6e',
+      text: '#030426',
     },
   },
   space: [0, 6, 12, 18, 24],

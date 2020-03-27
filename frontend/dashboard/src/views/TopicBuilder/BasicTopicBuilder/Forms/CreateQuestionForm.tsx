@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 import { useForm } from 'react-hook-form';
-import styled, { css } from 'styled-components';
+import styled, { css } from 'styled-components/macro';
 
 import { CheckBoxWrapper, CheckBox, CheckBoxLabel, GridForm, Button } from '@haas/ui';
 import { ButtonProps } from '@haas/ui/src/Buttons';

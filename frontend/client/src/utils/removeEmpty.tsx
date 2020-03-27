@@ -3,6 +3,6 @@ export const removeEmpty = (obj: any) => {
     // value is "falsey" or is empty array
     return !obj[key] || (Array.isArray(obj[key]) && !obj[key].length)
       ? acc
-      : {...acc, [key]: obj[key]}
-  }, {})
-}
+      : { ...acc, [key]: obj[key] };
+  }, {});
+};

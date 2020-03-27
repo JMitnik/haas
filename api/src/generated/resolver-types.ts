@@ -2135,6 +2135,18 @@ export type NodeEntryValue = {
   id: Scalars['ID'];
   textValue?: Maybe<Scalars['String']>;
   numberValue?: Maybe<Scalars['Int']>;
+  multiValues?: Maybe<Array<NodeEntryValue>>;
+};
+
+
+export type NodeEntryValueMultiValuesArgs = {
+  where?: Maybe<NodeEntryValueWhereInput>;
+  orderBy?: Maybe<NodeEntryValueOrderByInput>;
+  skip?: Maybe<Scalars['Int']>;
+  after?: Maybe<Scalars['String']>;
+  before?: Maybe<Scalars['String']>;
+  first?: Maybe<Scalars['Int']>;
+  last?: Maybe<Scalars['Int']>;
 };
 
 export type NodeEntryValueConnection = {
@@ -2148,6 +2160,7 @@ export type NodeEntryValueCreateInput = {
   id?: Maybe<Scalars['ID']>;
   textValue?: Maybe<Scalars['String']>;
   numberValue?: Maybe<Scalars['Int']>;
+  multiValues?: Maybe<NodeEntryValueCreateManyInput>;
 };
 
 export type NodeEntryValueCreateManyInput = {
@@ -2241,11 +2254,13 @@ export type NodeEntryValueSubscriptionWhereInput = {
 export type NodeEntryValueUpdateDataInput = {
   textValue?: Maybe<Scalars['String']>;
   numberValue?: Maybe<Scalars['Int']>;
+  multiValues?: Maybe<NodeEntryValueUpdateManyInput>;
 };
 
 export type NodeEntryValueUpdateInput = {
   textValue?: Maybe<Scalars['String']>;
   numberValue?: Maybe<Scalars['Int']>;
+  multiValues?: Maybe<NodeEntryValueUpdateManyInput>;
 };
 
 export type NodeEntryValueUpdateManyDataInput = {
@@ -2323,6 +2338,9 @@ export type NodeEntryValueWhereInput = {
   numberValue_lte?: Maybe<Scalars['Int']>;
   numberValue_gt?: Maybe<Scalars['Int']>;
   numberValue_gte?: Maybe<Scalars['Int']>;
+  multiValues_every?: Maybe<NodeEntryValueWhereInput>;
+  multiValues_some?: Maybe<NodeEntryValueWhereInput>;
+  multiValues_none?: Maybe<NodeEntryValueWhereInput>;
   AND?: Maybe<Array<NodeEntryValueWhereInput>>;
   OR?: Maybe<Array<NodeEntryValueWhereInput>>;
   NOT?: Maybe<Array<NodeEntryValueWhereInput>>;
@@ -5382,6 +5400,7 @@ export type NodeEntryValueResolvers<ContextType = any, ParentType extends Resolv
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>,
   textValue?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   numberValue?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>,
+  multiValues?: Resolver<Maybe<Array<ResolversTypes['NodeEntryValue']>>, ParentType, ContextType, RequireFields<NodeEntryValueMultiValuesArgs, never>>,
   __isTypeOf?: isTypeOfResolverFn<ParentType>,
 }>;
 

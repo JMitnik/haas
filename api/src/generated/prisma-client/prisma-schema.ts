@@ -1613,6 +1613,7 @@ type NodeEntryValue {
   id: ID!
   textValue: String
   numberValue: Int
+  multiValues(where: NodeEntryValueWhereInput, orderBy: NodeEntryValueOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [NodeEntryValue!]
 }
 
 type NodeEntryValueConnection {
@@ -1625,6 +1626,7 @@ input NodeEntryValueCreateInput {
   id: ID
   textValue: String
   numberValue: Int
+  multiValues: NodeEntryValueCreateManyInput
 }
 
 input NodeEntryValueCreateManyInput {
@@ -1715,11 +1717,13 @@ input NodeEntryValueSubscriptionWhereInput {
 input NodeEntryValueUpdateDataInput {
   textValue: String
   numberValue: Int
+  multiValues: NodeEntryValueUpdateManyInput
 }
 
 input NodeEntryValueUpdateInput {
   textValue: String
   numberValue: Int
+  multiValues: NodeEntryValueUpdateManyInput
 }
 
 input NodeEntryValueUpdateManyDataInput {
@@ -1797,6 +1801,9 @@ input NodeEntryValueWhereInput {
   numberValue_lte: Int
   numberValue_gt: Int
   numberValue_gte: Int
+  multiValues_every: NodeEntryValueWhereInput
+  multiValues_some: NodeEntryValueWhereInput
+  multiValues_none: NodeEntryValueWhereInput
   AND: [NodeEntryValueWhereInput!]
   OR: [NodeEntryValueWhereInput!]
   NOT: [NodeEntryValueWhereInput!]

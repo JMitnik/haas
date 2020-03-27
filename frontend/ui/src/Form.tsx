@@ -1,8 +1,25 @@
 import React, { forwardRef, Ref } from 'react';
-import styled, { css } from 'styled-components';
+import styled, { css } from 'styled-components/macro';
 import { SpaceProps } from 'styled-system';
 import { InputHTMLAttributes } from 'react';
 import Color from 'color';
+
+export const InputGroup = styled.div`
+`;
+
+export const InputLabel = styled.label`
+  ${({ theme }) => css`
+    font-size: ${theme.fontSizes[2]}px;
+    margin: 0;
+    margin-bottom: ${theme.gutter / 3}px;
+    padding-left: ${theme.gutter}px;
+    text-align: left;
+    display: block;
+
+    /* TODO: Hard-coded, needs to be determiend */
+    color: white;
+  `}
+`;
 
 export const CheckBoxWrapper = styled.div`
   position: relative;
@@ -60,12 +77,27 @@ export const Slider = forwardRef((props: SliderProps, ref: Ref<HTMLInputElement>
   </SliderContainer>
 ));
 
+export const InputField = styled.input`
+  ${({ theme }) => css`
+      border: none;
+      font-size: ${theme.fontSizes[1]}px;
+      border-radius: 50px;
+      padding: 12px 24px;
+      background: white;
+      text-align: center;
+      font-weight: bolder;
+      color: ${theme.colors.default.text};
+  `}
+`;
+
 export const Textbox = styled.textarea`
   ${({ theme }) => css`
-    border-radius: 30px;
-    border: 1px solid ${theme.colors.primary};
+    border: none;
     font-size: ${theme.fontSizes[1]}px;
-    padding: 36px 48px;
+    border-radius: 20px;
+    box-shadow: none;
+    padding: 24px 24px;
+    min-height: 200px;
     width: 100%;
     resize: none;
 

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import styled from 'styled-components';
+import styled from 'styled-components/macro';
 import { NavLink, Switch, Route } from 'react-router-dom';
 
 import { Div, Flex, Grid, Button } from '@haas/ui';

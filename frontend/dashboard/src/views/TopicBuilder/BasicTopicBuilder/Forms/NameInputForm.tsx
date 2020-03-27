@@ -1,6 +1,6 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import styled, { css } from 'styled-components';
+import styled, { css } from 'styled-components/macro';
 
 interface InputSectionContainerProps {
   full: boolean;

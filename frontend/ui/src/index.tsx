@@ -1,4 +1,4 @@
-export { CheckBox, CheckBoxLabel, CheckBoxWrapper, GridForm, Slider, Textbox } from './Form';
+export { CheckBox, CheckBoxLabel, CheckBoxWrapper, GridForm, Slider, Textbox, InputLabel, InputGroup, InputField } from './Form';
 export { Button } from './Buttons';
 export { Container, Grid, Flex, ColumnFlex } from './Container';
 export { Div } from './Generics';
@@ -8,3 +8,4 @@ export { Loader } from './Loader';
 export { Label } from './Labels';
 export { TopNav } from './Nav';
 export { H1, H2, H3, H4, H5, Muted, Paragraph } from './Type';
+export { Hr } from './Special';

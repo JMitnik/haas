@@ -197,6 +197,9 @@ const mutationResolvers = {
           create: {
             numberValue: cleanInt(entry.data.numberValue),
             textValue: entry.data.textValue,
+            multiValues: {
+              create: entry.data.multiValues,
+            },
           },
         },
       });

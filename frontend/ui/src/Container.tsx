@@ -1,4 +1,4 @@
-import styled, { css } from 'styled-components';
+import styled, { css } from 'styled-components/macro';
 import { flexbox,
   width, color, space, grid, GridProps, FlexboxProps, FlexProps, flexDirection, LayoutProps, layout } from 'styled-system';
 import { Div, GenericProps } from './Generics';
@@ -45,6 +45,9 @@ export const ColumnFlex = styled.div<ExtraFlexProps>`
 `;
 
 export const Grid = styled.div<GridProps>`
-  display: grid;
-  ${grid}
+  ${({ theme }) => css`
+    display: grid;
+    grid-gap: ${theme.gutter}px;
+    ${grid}
+  `}
 `;

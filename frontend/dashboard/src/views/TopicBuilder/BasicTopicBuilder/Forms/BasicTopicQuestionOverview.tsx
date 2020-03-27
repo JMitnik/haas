@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import styled from 'styled-components';
+import styled from 'styled-components/macro';
 import { ArrowDown, ArrowUp, Square } from 'react-feather';
 
 import { Div, H3 } from '@haas/ui';

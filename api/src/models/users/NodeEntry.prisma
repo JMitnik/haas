@@ -12,4 +12,5 @@ type NodeEntryValue {
     id: ID! @id
     textValue: String
     numberValue: Int
+    multiValues: [NodeEntryValue]
 }
