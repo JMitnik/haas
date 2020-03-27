@@ -9,6 +9,9 @@ export const getQuestionnaireQuery = gql`
       title
       publicTitle
       creationDate
+      rootQuestion {
+        ...QuestionFragment
+      }
       updatedAt
       leafs {
         id

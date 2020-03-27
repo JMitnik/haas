@@ -41,13 +41,10 @@ const QuestionnaireTree = () => {
 
   const renderActiveNode = () => {
     const Component = nodeMap[activeNode?.type || 'Slider'];
-    console.log('activeNode', activeNode);
 
     if (!Component) {
       return <Loader />;
     }
-
-    console.log('Component', Component);
 
     return <Component />;
   };

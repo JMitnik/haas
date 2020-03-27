@@ -5,8 +5,7 @@ import AppProviders from './GlobalAppState';
 import AppContainer from './AppContainer';
 import { QuestionnaireProvider } from 'hooks/use-questionnaire';
 import CustomerOverview from './CustomerOverview/CustomerOverview';
-import QuestionnaireTree from './QuestionnaireTree/QuestionnaireTree';
-import { HAASTreeProvider } from 'hooks/use-haas-tree';
+import Questionnaire from './Questionnaire/Questionnaire';
 
 const App = () => (
   <AppProviders>
@@ -15,9 +14,7 @@ const App = () => (
       <Switch>
         <Route path="/c/:customerId/q/:questionnaireId">
           <QuestionnaireProvider>
-            <HAASTreeProvider>
-              <QuestionnaireTree />
-            </HAASTreeProvider>
+            <Questionnaire />
           </QuestionnaireProvider>
         </Route>
         <Route path="/c/">

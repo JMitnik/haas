@@ -1,14 +1,15 @@
 import React from 'react';
 import { H1, Slider, ColumnFlex, Div } from '@haas/ui';
 import { useForm } from 'react-hook-form';
-import useHAASTree, { HAASFormEntry } from 'hooks/use-haas-tree';
+import useHAASTree from 'hooks/use-haas-tree';
 import { cleanInt } from 'utils/cleanInt';
 import { GenericNodeProps } from '../Node';
+import { HAASFormEntry } from 'hooks/use-questionnaire';
 
 type SliderNodeProps = GenericNodeProps;
 
 const SliderNode = () => {
-  const { goToChild, addFormEntry } = useHAASTree();
+  const { goToChild, saveNodeEntry } = useHAASTree();
 
   const { watch, getValues, triggerValidation, register } = useForm<HAASFormEntry>({
     defaultValues: {
@@ -33,7 +34,7 @@ const SliderNode = () => {
       const formEntry = formatSliderEntry(getValues({ nest: true }));
 
       if (formEntry?.numberValue) {
-        addFormEntry(formEntry);
+        saveNodeEntry(formEntry);
         goToChild(formEntry.numberValue, formEntry);
       }
     }

@@ -12,7 +12,7 @@ const useJourneyFinish = ({
   useFinishPage: boolean;
 }) => {
   const finishedRef = useRef(false);
-  const { entryHistoryStack } = useHAASTree();
+  const { historyStack } = useHAASTree();
   const [submitForm] = useMutation(uploadEntryMutation, {});
   const history = useHistory();
   const location = useLocation();
@@ -22,24 +22,15 @@ const useJourneyFinish = ({
     const finishJourney = () => {
       submitForm({
         variables: {
-          uploadUserSessionInput: { entries: entryHistoryStack }
+          uploadUserSessionInput: { entries: historyStack }
         }
-      }).then(
-        () => useFinishPage && history.push(`${location.pathname}/finished`)
-      );
+      }).then(() => useFinishPage && history.push(`${location.pathname}/finished`));
     };
 
     if (finishedRef.current && isLeaf) {
       finishJourney();
     }
-  }, [
-    entryHistoryStack,
-    useFinishPage,
-    isLeaf,
-    submitForm,
-    history,
-    location.pathname
-  ]);
+  }, [historyStack, useFinishPage, isLeaf, submitForm, history, location.pathname]);
 
   return { finishedRef };
 };

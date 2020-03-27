@@ -1,198 +1,125 @@
 import React, { useState, useContext, useEffect, ReactNode } from 'react';
-import useQuestionnaire from './use-questionnaire';
+import useQuestionnaire, {
+  HAASNode,
+  HAASEntry,
+  HAASFormEntry,
+  Questionnaire,
+  HAASEdge,
+  Edge
+} from './use-questionnaire';
 import { getQuestionNodeQuery } from '../queries/getQuestionNodeQuery';
 import client from '../config/apollo';
 import { useHistory, useLocation } from 'react-router-dom';
 
-export interface HAASNodeConditions {
-  renderMin?: number;
-  renderMax?: number;
-  matchValue?: string;
-}
-
-type HAASQuestionNodeType = 'SLIDER' | 'MULTI_CHOICE' | 'text-box';
-type HAASLeafType = 'textbox' | 'social-share' | 'registration' | 'phone';
-type HAASQuestionType = HAASQuestionNodeType | HAASLeafType;
-
-export interface MultiChoiceOption {
-  value: string;
-  publicValue?: string;
-}
-
-export interface Edge {
-  id: string;
-  parentNode: HAASNode;
-  childNode: HAASNode;
-  conditions: [HAASNodeConditions];
-}
-
-export interface HAASEdge {
-  id: string;
-  parentNode: HAASNode;
-  childNode: HAASNode;
-  conditions: HAASNodeConditions[];
-}
-
-export interface HAASNode {
-  id: string;
-  nodeId?: number;
-  title: string;
-  branchVal?: string;
-  conditions?: [HAASNodeConditions];
-  type: HAASQuestionType;
-  overrideLeaf?: HAASNode;
-  options?: [MultiChoiceOption];
-  children: [HAASNode];
-  edgeChildren: [Edge];
-}
+export const HAASTreeContext = React.createContext({} as HAASTreeContextProps);
 
 interface HAASTreeContextProps {
-  nodeHistoryStack: HAASNode[];
-  edgeHistoryStack: HAASEdge[];
-  entryHistoryStack: HAASEntry[];
+  historyStack: HAASEntry[];
   isAtLeaf: boolean;
   currentDepth: number;
   activeNode: HAASNode | null;
-  addFormEntry: (formEntry: HAASFormEntry) => void;
+  saveNodeEntry: (formEntry: HAASFormEntry) => void;
   goToChild: (key: string | number, formEntry?: HAASFormEntry) => void;
 }
 
-export interface HAASEntry {
-  nodeId: string | null;
-  depth: number;
-  edgeId?: string | null;
-  data: HAASFormEntry;
+interface TreeProviderProps {
+  questionnaire: Questionnaire;
+  children: ReactNode;
 }
 
-export interface HAASFormEntry {
-  textValue?: string | null;
-  numberValue?: number | null;
-  multiValues?: HAASFormEntry[];
-}
-
-const findNextEdge = (parent: HAASNode, key: string | number) => {
-  const candidates = parent?.edgeChildren?.filter(edge => {
-    if (parent.type === 'SLIDER') {
-      if (edge?.conditions?.[0]?.renderMin && key < edge?.conditions?.[0].renderMin) {
-        return false;
-      }
-
-      if (edge?.conditions?.[0]?.renderMax && key > edge?.conditions?.[0].renderMax) {
-        return false;
-      }
-    }
-    if (parent.type === 'MULTI_CHOICE') {
-      return edge.conditions?.[0].matchValue === key;
-    }
-
-    return true;
-  });
-  return candidates && candidates[0];
-};
-
-export const HAASTreeContext = React.createContext({} as HAASTreeContextProps);
-
-export const HAASTreeProvider = ({ children }: { children: ReactNode }) => {
+export const HAASTreeProvider = ({ questionnaire, children }: TreeProviderProps) => {
   const history = useHistory();
   const location = useLocation();
 
-  const { questionnaire } = useQuestionnaire();
-  const [leafCollection, setLeafCollection] = useState<HAASNode[]>([]);
+  const [leafCollection, setLeafCollection] = useState<HAASNode[]>(questionnaire.leafs);
+  const [isAtLeaf, setIsAtLeaf] = useState<boolean>(false);
+  const [currentDepth, setCurrentDepth] = useState<number>(0);
 
-  // Active trackables
-  const [isAtLeaf, setIsAtLeaf] = useState(false);
-  const [currentDepth, setCurrentDepth] = useState(0);
-  const [activeLeafNodeId, setActiveLeafNodeID] = useState('');
-  const [activeNode, setActiveNode] = useState<HAASNode | null>(null);
+  // Three trackables
+  const [activeLeaf, setActiveLeaf] = useState<HAASNode>(questionnaire.leafs[0]);
+  const [activeEdge, setActiveEdge] = useState<HAASEdge | null>(null);
 
-  // History trackables
-  const [entryHistoryStack, setEntryHistoryStack] = useState<HAASEntry[]>([]);
-  const [nodeHistoryStack, setNodeHistoryStack] = useState<HAASNode[]>([]);
-  const [edgeHistoryStack, setEdgeHistoryStack] = useState<HAASEdge[]>([]);
+  // TODO: Set on the rootQuestion
+  const [activeNode, setActiveNode] = useState<HAASNode>(questionnaire.questions[0]);
 
-  // If questionnaire is initialized
-  useEffect(() => {
-    if (questionnaire) {
-      setNodeHistoryStack(questionnaire?.questions || []);
-      setActiveNode(questionnaire?.questions?.slice(0)[0]);
-      setLeafCollection(questionnaire?.leafs || []);
-    }
-  }, [questionnaire, leafCollection]);
+  // History of user's interaction
+  const [historyStack, setHistoryStack] = useState<HAASEntry[]>([]);
 
-  const getActiveNode = () => {
-    if (isAtLeaf) {
-      const [leaf] = leafCollection.filter(leaf => leaf.id === activeLeafNodeId);
-      return leaf || null;
-    }
-
-    return nodeHistoryStack.slice(-1)[0];
-  };
-  const getActiveEdge = () => edgeHistoryStack.slice(-1)[0];
-
-  const addFormEntry = (formEntry: HAASFormEntry) => {
-    setEntryHistoryStack(entries => [
+  const saveNodeEntry = (formEntry: HAASFormEntry) => {
+    setHistoryStack(entries => [
       ...entries,
       {
-        nodeId: getActiveNode().id,
-        edgeId: getActiveEdge()?.id,
+        node: activeNode,
+        edge: activeEdge,
         depth: currentDepth,
         data: formEntry
       }
     ]);
+  };
 
-    return entryHistoryStack;
+  const findNextEdge = (parent: HAASNode, key: string | number) => {
+    const candidates = parent?.edgeChildren?.filter(edge => {
+      if (parent.type === 'SLIDER') {
+        if (edge?.conditions?.[0]?.renderMin && key < edge?.conditions?.[0].renderMin) {
+          return false;
+        }
+
+        if (edge?.conditions?.[0]?.renderMax && key > edge?.conditions?.[0].renderMax) {
+          return false;
+        }
+      }
+
+      if (parent.type === 'MULTI_CHOICE') {
+        return edge.conditions?.[0].matchValue === key;
+      }
+
+      return true;
+    });
+    return candidates && candidates[0];
+  };
+
+  const findNextNode = async (edge: HAASEdge | null) => {
+    if (edge?.childNode?.id) {
+      const { data: nextNodeData } = await client.query({
+        query: getQuestionNodeQuery,
+        variables: {
+          id: edge?.childNode.id
+        }
+      });
+
+      return nextNodeData.questionNode;
+    }
+
+    return activeLeaf;
+  };
+
+  const findNewActiveLeaf = (node: HAASNode) => {
+    const newLeaf = node?.overrideLeaf;
+
+    if (newLeaf) {
+      setActiveLeaf(newLeaf);
+    }
   };
 
   const goToChild = async (key: string | number) => {
-    const nextEdge: Edge = findNextEdge(nodeHistoryStack.slice(-1)[0], key);
-
-    // Find next node
-    const nextNode: any =
-      nextEdge?.childNode?.id &&
-      (await client
-        .query({
-          query: getQuestionNodeQuery,
-          variables: {
-            id: nextEdge?.childNode.id
-          }
-        })
-        .then(res => res.data.questionNode));
-
     setCurrentDepth(depth => (depth += 1));
 
-    // If next-node has an override-leaf
-    if (nextNode && nextNode.overrideLeaf?.id) setActiveLeafNodeID(nextNode?.overrideLeaf?.id);
+    const nextEdge: Edge = findNextEdge(activeNode, key) || null;
+    const nextNode = await findNextNode(nextEdge);
+    findNewActiveLeaf(nextNode);
 
-    if (!nextNode) {
-      setIsAtLeaf(true);
-
-      const [leaf] = leafCollection.filter(leaf => leaf.id === activeLeafNodeId);
-
-      if (leaf) {
-        setActiveNode(leaf);
-      }
-
-      return;
-    }
-
-    // TODO: Can be this done better?
-    // Track both nodes and edges traversed
     setActiveNode(nextNode);
-    setNodeHistoryStack(hist => [...hist, nextNode]);
-    setEdgeHistoryStack(hist => [...hist, nextEdge]);
   };
 
   return (
     <HAASTreeContext.Provider
       value={{
-        entryHistoryStack,
-        nodeHistoryStack,
-        edgeHistoryStack,
+        historyStack,
         goToChild,
         isAtLeaf,
         activeNode,
         currentDepth,
-        addFormEntry
+        saveNodeEntry
       }}
     >
       {children}

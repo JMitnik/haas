@@ -15,12 +15,12 @@ type RegisterNodeProps = GenericNodeProps;
 
 const RegisterNode = ({ isLeaf }: RegisterNodeProps) => {
   const { register, getValues } = useForm();
-  const { addFormEntry } = useHAASTree();
+  const { saveNodeEntry } = useHAASTree();
   const { finishedRef } = useJourneyFinish({ isLeaf, useFinishPage: true });
 
   const onSubmit = () => {
     const formEntry = getValues({ nest: true });
-    addFormEntry(formEntry);
+    saveNodeEntry(formEntry);
     finishedRef.current = true;
   };
 

@@ -1,13 +1,14 @@
 import React, { useEffect } from 'react';
 import { H5, Flex, Button, Div, H2 } from '@haas/ui';
-import useHAASTree, { MultiChoiceOption, HAASFormEntry } from 'hooks/use-haas-tree';
+import useHAASTree from 'hooks/use-haas-tree';
 import { useForm } from 'react-hook-form';
 import { GenericNodeProps } from '../Node';
+import { HAASFormEntry, MultiChoiceOption } from 'hooks/use-questionnaire';
 
 type MultiChoiceNode = GenericNodeProps;
 
 const MultiChoiceNode = () => {
-  const { activeNode, goToChild, addFormEntry } = useHAASTree();
+  const { activeNode, goToChild, saveNodeEntry } = useHAASTree();
 
   const { register, setValue, triggerValidation, getValues } = useForm<HAASFormEntry>({
     mode: 'onSubmit',
@@ -28,7 +29,7 @@ const MultiChoiceNode = () => {
 
     if (validForm) {
       const formEntry = getValues({ nest: true });
-      addFormEntry(formEntry);
+      saveNodeEntry(formEntry);
       goToChild(multiChoiceOption.value, formEntry);
     }
   };
