@@ -10,7 +10,7 @@ export const QuestionFragment = gql`
       type
       title
     }
-    questionType
+    type
     edgeChildren {
       id
       conditions {

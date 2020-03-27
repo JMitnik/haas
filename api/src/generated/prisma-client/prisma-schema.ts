@@ -2568,7 +2568,7 @@ type QuestionNode {
   title: String!
   branchVal: String
   isRoot: Boolean!
-  questionType: NodeType!
+  type: NodeType!
   overrideLeaf: LeafNode
   options(where: QuestionOptionWhereInput, orderBy: QuestionOptionOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [QuestionOption!]
   children(where: QuestionNodeWhereInput, orderBy: QuestionNodeOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [QuestionNode!]
@@ -2587,7 +2587,7 @@ input QuestionNodeCreateInput {
   title: String!
   branchVal: String
   isRoot: Boolean
-  questionType: NodeType!
+  type: NodeType!
   overrideLeaf: LeafNodeCreateOneInput
   options: QuestionOptionCreateManyInput
   children: QuestionNodeCreateManyInput
@@ -2614,7 +2614,7 @@ input QuestionNodeCreateWithoutQuestionnaireInput {
   title: String!
   branchVal: String
   isRoot: Boolean
-  questionType: NodeType!
+  type: NodeType!
   overrideLeaf: LeafNodeCreateOneInput
   options: QuestionOptionCreateManyInput
   children: QuestionNodeCreateManyInput
@@ -2635,8 +2635,8 @@ enum QuestionNodeOrderByInput {
   branchVal_DESC
   isRoot_ASC
   isRoot_DESC
-  questionType_ASC
-  questionType_DESC
+  type_ASC
+  type_DESC
 }
 
 type QuestionNodePreviousValues {
@@ -2644,7 +2644,7 @@ type QuestionNodePreviousValues {
   title: String!
   branchVal: String
   isRoot: Boolean!
-  questionType: NodeType!
+  type: NodeType!
 }
 
 input QuestionNodeScalarWhereInput {
@@ -2692,10 +2692,10 @@ input QuestionNodeScalarWhereInput {
   branchVal_not_ends_with: String
   isRoot: Boolean
   isRoot_not: Boolean
-  questionType: NodeType
-  questionType_not: NodeType
-  questionType_in: [NodeType!]
-  questionType_not_in: [NodeType!]
+  type: NodeType
+  type_not: NodeType
+  type_in: [NodeType!]
+  type_not_in: [NodeType!]
   AND: [QuestionNodeScalarWhereInput!]
   OR: [QuestionNodeScalarWhereInput!]
   NOT: [QuestionNodeScalarWhereInput!]
@@ -2724,7 +2724,7 @@ input QuestionNodeUpdateDataInput {
   title: String
   branchVal: String
   isRoot: Boolean
-  questionType: NodeType
+  type: NodeType
   overrideLeaf: LeafNodeUpdateOneInput
   options: QuestionOptionUpdateManyInput
   children: QuestionNodeUpdateManyInput
@@ -2736,7 +2736,7 @@ input QuestionNodeUpdateInput {
   title: String
   branchVal: String
   isRoot: Boolean
-  questionType: NodeType
+  type: NodeType
   overrideLeaf: LeafNodeUpdateOneInput
   options: QuestionOptionUpdateManyInput
   children: QuestionNodeUpdateManyInput
@@ -2747,7 +2747,7 @@ input QuestionNodeUpdateManyDataInput {
   title: String
   branchVal: String
   isRoot: Boolean
-  questionType: NodeType
+  type: NodeType
 }
 
 input QuestionNodeUpdateManyInput {
@@ -2766,7 +2766,7 @@ input QuestionNodeUpdateManyMutationInput {
   title: String
   branchVal: String
   isRoot: Boolean
-  questionType: NodeType
+  type: NodeType
 }
 
 input QuestionNodeUpdateManyWithoutQuestionnaireInput {
@@ -2806,7 +2806,7 @@ input QuestionNodeUpdateWithoutQuestionnaireDataInput {
   title: String
   branchVal: String
   isRoot: Boolean
-  questionType: NodeType
+  type: NodeType
   overrideLeaf: LeafNodeUpdateOneInput
   options: QuestionOptionUpdateManyInput
   children: QuestionNodeUpdateManyInput
@@ -2886,10 +2886,10 @@ input QuestionNodeWhereInput {
   branchVal_not_ends_with: String
   isRoot: Boolean
   isRoot_not: Boolean
-  questionType: NodeType
-  questionType_not: NodeType
-  questionType_in: [NodeType!]
-  questionType_not_in: [NodeType!]
+  type: NodeType
+  type_not: NodeType
+  type_in: [NodeType!]
+  type_not_in: [NodeType!]
   overrideLeaf: LeafNodeWhereInput
   options_every: QuestionOptionWhereInput
   options_some: QuestionOptionWhereInput

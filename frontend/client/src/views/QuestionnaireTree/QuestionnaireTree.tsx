@@ -11,13 +11,14 @@ import MultiChoiceNode from './nodes/MultiChoiceNode/MultiChoiceNode';
 import TextboxNode from './nodes/TextboxNode/TextboxNode';
 import SocialShareNode from './nodes/SocialShareNode/SocialShareNode';
 import RegisterNode from './nodes/RegisterNode/RegisterNode';
+import { GenericNodeProps } from './nodes/Node';
 
-const nodeMap: Record<string, JSX.Element> = {
-  SLIDER: <SliderNode />,
-  MULTI_CHOICE: <MultiChoiceNode />,
-  TEXTBOX: <TextboxNode />,
-  SOCIAL_SHARE: <SocialShareNode />,
-  REGISTRATION: <RegisterNode />
+const nodeMap: Record<string, (props: GenericNodeProps) => JSX.Element> = {
+  SLIDER: SliderNode,
+  MULTI_CHOICE: MultiChoiceNode,
+  TEXTBOX: TextboxNode,
+  SOCIAL_SHARE: SocialShareNode,
+  REGISTRATION: RegisterNode
 };
 
 const QuestionnaireTree = () => {
@@ -38,7 +39,18 @@ const QuestionnaireTree = () => {
     }
   }, [customer]);
 
-  const renderActiveNode = () => nodeMap[activeNode?.questionType || 'Slider'];
+  const renderActiveNode = () => {
+    const Component = nodeMap[activeNode?.type || 'Slider'];
+    console.log('activeNode', activeNode);
+
+    if (!Component) {
+      return <Loader />;
+    }
+
+    console.log('Component', Component);
+
+    return <Component />;
+  };
 
   if (!customer) return <Loader />;
 

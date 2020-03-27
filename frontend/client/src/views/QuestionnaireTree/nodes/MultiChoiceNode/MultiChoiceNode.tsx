@@ -1,4 +1,4 @@
-import React, { memo, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { H5, Flex, Button, Div, H2 } from '@haas/ui';
 import useHAASTree, { MultiChoiceOption, HAASFormEntry } from 'hooks/use-haas-tree';
 import { useForm } from 'react-hook-form';
@@ -6,7 +6,7 @@ import { GenericNodeProps } from '../Node';
 
 type MultiChoiceNode = GenericNodeProps;
 
-const MultiChoiceNode = memo(() => {
+const MultiChoiceNode = () => {
   const { activeNode, goToChild, addFormEntry } = useHAASTree();
 
   const { register, setValue, triggerValidation, getValues } = useForm<HAASFormEntry>({
@@ -64,6 +64,6 @@ const MultiChoiceNode = memo(() => {
       </form>
     </>
   );
-});
+};
 
 export default MultiChoiceNode;

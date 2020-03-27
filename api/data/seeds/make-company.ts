@@ -26,13 +26,13 @@ interface StandardRootChildWithLeafsProps {
   overrideLeaf: LeafNode | null;
   children: any;
   title: string;
-  questionType: NodeType;
+  type: NodeType;
   overrideLeafContains?: string | undefined;
   options: string[];
 }
 interface StandardRootChildEntryProps {
   title: string;
-  questionType: NodeType;
+  type: NodeType;
   overrideLeaf?: LeafNode;
   overrideLeafContains?: string;
   options: Array<string>;
@@ -136,7 +136,7 @@ export const createQuestionsForQuestionnaire = async (questionnaireId: string) =
           id: questionnaireId,
         },
       },
-      questionType: childNode.questionType,
+      type: childNode.type,
       overrideLeaf: {
         connect: {
           id: childNode.overrideLeaf?.id,
@@ -153,7 +153,7 @@ export const createQuestionsForQuestionnaire = async (questionnaireId: string) =
               id: questionnaireId,
             },
           },
-          questionType: child?.type,
+          type: child?.type,
           overrideLeaf: {
             connect: {
               id: child?.overrideLeaf?.id,
@@ -220,7 +220,6 @@ export const createNodesAndEdges = async (
   customerName: string,
   leafs: LeafNode[],
 ) => {
-
   // Root question (How do you feel about?)
   const rootQuestion = await prisma.createQuestionNode({
     title: `How do you feel about ${customerName}?`,
@@ -229,7 +228,7 @@ export const createNodesAndEdges = async (
         id: questionnaireId,
       },
     },
-    questionType: sliderType,
+    type: sliderType,
     isRoot: true,
   });
 
@@ -246,7 +245,7 @@ export const createNodesAndEdges = async (
         id: getCorrectLeaf(leafs, 'Follow us on Instagram and stay'),
       },
     },
-    questionType: 'MULTI_CHOICE',
+    type: 'MULTI_CHOICE',
     options: {
       create: [
         ...standardOptions,
@@ -267,7 +266,7 @@ export const createNodesAndEdges = async (
         id: getCorrectLeaf(leafs, 'Come and join us on 1st April for our great event'),
       },
     },
-    questionType: 'MULTI_CHOICE',
+    type: 'MULTI_CHOICE',
     options: {
       create: [
         ...facilityOptions,
@@ -288,7 +287,7 @@ export const createNodesAndEdges = async (
         id: getCorrectLeaf(leafs, 'Follow us on Instagram and stay'),
       },
     },
-    questionType: 'MULTI_CHOICE',
+    type: 'MULTI_CHOICE',
     options: {
       create: [
         ...websiteOptions,
@@ -309,7 +308,7 @@ export const createNodesAndEdges = async (
         id: getCorrectLeaf(leafs, 'We think you might like this as'),
       },
     },
-    questionType: 'MULTI_CHOICE',
+    type: 'MULTI_CHOICE',
     options: {
       create: [
         ...productServicesOptions,
@@ -330,7 +329,7 @@ export const createNodesAndEdges = async (
         id: getCorrectLeaf(leafs, 'your email below to receive our newsletter'),
       },
     },
-    questionType: 'MULTI_CHOICE',
+    type: 'MULTI_CHOICE',
     options: {
       create: [
         ...customerSupportOptions,
@@ -351,14 +350,13 @@ export const createNodesAndEdges = async (
         id: getCorrectLeaf(leafs, 'Leave your email below to receive our'),
       },
     },
-    questionType: 'MULTI_CHOICE',
+    type: 'MULTI_CHOICE',
     options: {
       create: [
         ...standardOptions,
       ],
     },
   });
-
 
   // Neutral Sub sub child 1 (Facilities)
   const whatWouldYouLikeToTalkAboutToFacilities = await prisma.createQuestionNode({
@@ -368,7 +366,7 @@ export const createNodesAndEdges = async (
         id: questionnaireId,
       },
     },
-    questionType: 'MULTI_CHOICE',
+    type: 'MULTI_CHOICE',
     options: {
       create: [
         ...facilityOptions,
@@ -384,7 +382,7 @@ export const createNodesAndEdges = async (
         id: questionnaireId,
       },
     },
-    questionType: 'MULTI_CHOICE',
+    type: 'MULTI_CHOICE',
     options: {
       create: [
         ...websiteOptions,
@@ -392,15 +390,15 @@ export const createNodesAndEdges = async (
     },
   });
 
-   // Neutral Sub sub child 3 (Product/Services)
-   const whatWouldYouLikeToTalkAboutToProduct = await prisma.createQuestionNode({
+  // Neutral Sub sub child 3 (Product/Services)
+  const whatWouldYouLikeToTalkAboutToProduct = await prisma.createQuestionNode({
     title: 'Please specify.',
     questionnaire: {
       connect: {
         id: questionnaireId,
       },
     },
-    questionType: 'MULTI_CHOICE',
+    type: 'MULTI_CHOICE',
     options: {
       create: [
         ...productServicesOptions,
@@ -416,7 +414,7 @@ export const createNodesAndEdges = async (
         id: questionnaireId,
       },
     },
-    questionType: 'MULTI_CHOICE',
+    type: 'MULTI_CHOICE',
     options: {
       create: [
         ...customerSupportOptions,
@@ -432,7 +430,7 @@ export const createNodesAndEdges = async (
         id: questionnaireId,
       },
     },
-    questionType: 'MULTI_CHOICE',
+    type: 'MULTI_CHOICE',
     options: {
       create: [
         ...standardOptions,
@@ -453,7 +451,7 @@ export const createNodesAndEdges = async (
         id: getCorrectLeaf(leafs, 'Our team is on it'),
       },
     },
-    questionType: 'MULTI_CHOICE',
+    type: 'MULTI_CHOICE',
     options: {
       create: [
         ...facilityOptions,
@@ -474,7 +472,7 @@ export const createNodesAndEdges = async (
         id: getCorrectLeaf(leafs, 'Please click on the Whatsapp link below so our service'),
       },
     },
-    questionType: 'MULTI_CHOICE',
+    type: 'MULTI_CHOICE',
     options: {
       create: [
         ...websiteOptions,
@@ -495,7 +493,7 @@ export const createNodesAndEdges = async (
         id: getCorrectLeaf(leafs, 'Click below for your refund'),
       },
     },
-    questionType: 'MULTI_CHOICE',
+    type: 'MULTI_CHOICE',
     options: {
       create: [
         ...productServicesOptions,
@@ -516,7 +514,7 @@ export const createNodesAndEdges = async (
         id: getCorrectLeaf(leafs, 'Our customer experience supervisor is'),
       },
     },
-    questionType: 'MULTI_CHOICE',
+    type: 'MULTI_CHOICE',
     options: {
       create: [
         ...customerSupportOptions,
@@ -581,7 +579,6 @@ export const createNodesAndEdges = async (
       },
       child: whatDidYouToProduct,
     },
-
 
     // NEUTRAL EDGES
     {
@@ -914,7 +911,7 @@ const seedQuestionnareOfCustomer = async (customer: Customer): Promise<Questionn
     questions: {
       create: [{
         title: `How do you feel about ${customer.name}?`,
-        questionType: sliderType,
+        type: sliderType,
         isRoot: true,
       },
       ],

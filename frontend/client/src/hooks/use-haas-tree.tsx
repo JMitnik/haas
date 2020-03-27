@@ -12,10 +12,7 @@ export interface HAASNodeConditions {
 
 type HAASQuestionNodeType = 'SLIDER' | 'MULTI_CHOICE' | 'text-box';
 type HAASLeafType = 'textbox' | 'social-share' | 'registration' | 'phone';
-
-export interface HAASQuestionType {
-  type: HAASQuestionNodeType | HAASLeafType;
-}
+type HAASQuestionType = HAASQuestionNodeType | HAASLeafType;
 
 export interface MultiChoiceOption {
   value: string;
@@ -42,8 +39,7 @@ export interface HAASNode {
   title: string;
   branchVal?: string;
   conditions?: [HAASNodeConditions];
-  questionType: string;
-  type?: string;
+  type: HAASQuestionType;
   overrideLeaf?: HAASNode;
   options?: [MultiChoiceOption];
   children: [HAASNode];
@@ -76,7 +72,7 @@ export interface HAASFormEntry {
 
 const findNextEdge = (parent: HAASNode, key: string | number) => {
   const candidates = parent?.edgeChildren?.filter(edge => {
-    if (parent.questionType === 'SLIDER') {
+    if (parent.type === 'SLIDER') {
       if (edge?.conditions?.[0]?.renderMin && key < edge?.conditions?.[0].renderMin) {
         return false;
       }
@@ -85,7 +81,7 @@ const findNextEdge = (parent: HAASNode, key: string | number) => {
         return false;
       }
     }
-    if (parent.questionType === 'MULTI_CHOICE') {
+    if (parent.type === 'MULTI_CHOICE') {
       return edge.conditions?.[0].matchValue === key;
     }
 
@@ -118,7 +114,7 @@ export const HAASTreeProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     if (questionnaire) {
       setNodeHistoryStack(questionnaire?.questions || []);
-      setActiveNode(questionnaire?.questions?.slice(0));
+      setActiveNode(questionnaire?.questions?.slice(0)[0]);
       setLeafCollection(questionnaire?.leafs || []);
     }
   }, [questionnaire, leafCollection]);
@@ -169,6 +165,14 @@ export const HAASTreeProvider = ({ children }: { children: ReactNode }) => {
 
     if (!nextNode) {
       setIsAtLeaf(true);
+
+      const [leaf] = leafCollection.filter(leaf => leaf.id === activeLeafNodeId);
+
+      if (leaf) {
+        setActiveNode(leaf);
+      }
+
+      return;
     }
 
     // TODO: Can be this done better?

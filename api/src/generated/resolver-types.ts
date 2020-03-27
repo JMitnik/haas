@@ -3496,7 +3496,7 @@ export type QuestionNode = {
   title: Scalars['String'];
   branchVal?: Maybe<Scalars['String']>;
   isRoot: Scalars['Boolean'];
-  questionType: NodeType;
+  type: NodeType;
   overrideLeaf?: Maybe<LeafNode>;
   options?: Maybe<Array<QuestionOption>>;
   children?: Maybe<Array<QuestionNode>>;
@@ -3549,7 +3549,7 @@ export type QuestionNodeCreateInput = {
   title: Scalars['String'];
   branchVal?: Maybe<Scalars['String']>;
   isRoot?: Maybe<Scalars['Boolean']>;
-  questionType: NodeType;
+  type: NodeType;
   overrideLeaf?: Maybe<LeafNodeCreateOneInput>;
   options?: Maybe<QuestionOptionCreateManyInput>;
   children?: Maybe<QuestionNodeCreateManyInput>;
@@ -3576,7 +3576,7 @@ export type QuestionNodeCreateWithoutQuestionnaireInput = {
   title: Scalars['String'];
   branchVal?: Maybe<Scalars['String']>;
   isRoot?: Maybe<Scalars['Boolean']>;
-  questionType: NodeType;
+  type: NodeType;
   overrideLeaf?: Maybe<LeafNodeCreateOneInput>;
   options?: Maybe<QuestionOptionCreateManyInput>;
   children?: Maybe<QuestionNodeCreateManyInput>;
@@ -3598,8 +3598,8 @@ export enum QuestionNodeOrderByInput {
   BranchValDesc = 'branchVal_DESC',
   IsRootAsc = 'isRoot_ASC',
   IsRootDesc = 'isRoot_DESC',
-  QuestionTypeAsc = 'questionType_ASC',
-  QuestionTypeDesc = 'questionType_DESC'
+  TypeAsc = 'type_ASC',
+  TypeDesc = 'type_DESC'
 }
 
 export type QuestionNodePreviousValues = {
@@ -3608,7 +3608,7 @@ export type QuestionNodePreviousValues = {
   title: Scalars['String'];
   branchVal?: Maybe<Scalars['String']>;
   isRoot: Scalars['Boolean'];
-  questionType: NodeType;
+  type: NodeType;
 };
 
 export type QuestionNodeScalarWhereInput = {
@@ -3656,10 +3656,10 @@ export type QuestionNodeScalarWhereInput = {
   branchVal_not_ends_with?: Maybe<Scalars['String']>;
   isRoot?: Maybe<Scalars['Boolean']>;
   isRoot_not?: Maybe<Scalars['Boolean']>;
-  questionType?: Maybe<NodeType>;
-  questionType_not?: Maybe<NodeType>;
-  questionType_in?: Maybe<Array<NodeType>>;
-  questionType_not_in?: Maybe<Array<NodeType>>;
+  type?: Maybe<NodeType>;
+  type_not?: Maybe<NodeType>;
+  type_in?: Maybe<Array<NodeType>>;
+  type_not_in?: Maybe<Array<NodeType>>;
   AND?: Maybe<Array<QuestionNodeScalarWhereInput>>;
   OR?: Maybe<Array<QuestionNodeScalarWhereInput>>;
   NOT?: Maybe<Array<QuestionNodeScalarWhereInput>>;
@@ -3689,7 +3689,7 @@ export type QuestionNodeUpdateDataInput = {
   title?: Maybe<Scalars['String']>;
   branchVal?: Maybe<Scalars['String']>;
   isRoot?: Maybe<Scalars['Boolean']>;
-  questionType?: Maybe<NodeType>;
+  type?: Maybe<NodeType>;
   overrideLeaf?: Maybe<LeafNodeUpdateOneInput>;
   options?: Maybe<QuestionOptionUpdateManyInput>;
   children?: Maybe<QuestionNodeUpdateManyInput>;
@@ -3701,7 +3701,7 @@ export type QuestionNodeUpdateInput = {
   title?: Maybe<Scalars['String']>;
   branchVal?: Maybe<Scalars['String']>;
   isRoot?: Maybe<Scalars['Boolean']>;
-  questionType?: Maybe<NodeType>;
+  type?: Maybe<NodeType>;
   overrideLeaf?: Maybe<LeafNodeUpdateOneInput>;
   options?: Maybe<QuestionOptionUpdateManyInput>;
   children?: Maybe<QuestionNodeUpdateManyInput>;
@@ -3712,7 +3712,7 @@ export type QuestionNodeUpdateManyDataInput = {
   title?: Maybe<Scalars['String']>;
   branchVal?: Maybe<Scalars['String']>;
   isRoot?: Maybe<Scalars['Boolean']>;
-  questionType?: Maybe<NodeType>;
+  type?: Maybe<NodeType>;
 };
 
 export type QuestionNodeUpdateManyInput = {
@@ -3731,7 +3731,7 @@ export type QuestionNodeUpdateManyMutationInput = {
   title?: Maybe<Scalars['String']>;
   branchVal?: Maybe<Scalars['String']>;
   isRoot?: Maybe<Scalars['Boolean']>;
-  questionType?: Maybe<NodeType>;
+  type?: Maybe<NodeType>;
 };
 
 export type QuestionNodeUpdateManyWithoutQuestionnaireInput = {
@@ -3771,7 +3771,7 @@ export type QuestionNodeUpdateWithoutQuestionnaireDataInput = {
   title?: Maybe<Scalars['String']>;
   branchVal?: Maybe<Scalars['String']>;
   isRoot?: Maybe<Scalars['Boolean']>;
-  questionType?: Maybe<NodeType>;
+  type?: Maybe<NodeType>;
   overrideLeaf?: Maybe<LeafNodeUpdateOneInput>;
   options?: Maybe<QuestionOptionUpdateManyInput>;
   children?: Maybe<QuestionNodeUpdateManyInput>;
@@ -3851,10 +3851,10 @@ export type QuestionNodeWhereInput = {
   branchVal_not_ends_with?: Maybe<Scalars['String']>;
   isRoot?: Maybe<Scalars['Boolean']>;
   isRoot_not?: Maybe<Scalars['Boolean']>;
-  questionType?: Maybe<NodeType>;
-  questionType_not?: Maybe<NodeType>;
-  questionType_in?: Maybe<Array<NodeType>>;
-  questionType_not_in?: Maybe<Array<NodeType>>;
+  type?: Maybe<NodeType>;
+  type_not?: Maybe<NodeType>;
+  type_in?: Maybe<Array<NodeType>>;
+  type_not_in?: Maybe<Array<NodeType>>;
   overrideLeaf?: Maybe<LeafNodeWhereInput>;
   options_every?: Maybe<QuestionOptionWhereInput>;
   options_some?: Maybe<QuestionOptionWhereInput>;
@@ -5573,7 +5573,7 @@ export type QuestionNodeResolvers<ContextType = any, ParentType extends Resolver
   title?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
   branchVal?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   isRoot?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>,
-  questionType?: Resolver<ResolversTypes['NodeType'], ParentType, ContextType>,
+  type?: Resolver<ResolversTypes['NodeType'], ParentType, ContextType>,
   overrideLeaf?: Resolver<Maybe<ResolversTypes['LeafNode']>, ParentType, ContextType>,
   options?: Resolver<Maybe<Array<ResolversTypes['QuestionOption']>>, ParentType, ContextType, RequireFields<QuestionNodeOptionsArgs, never>>,
   children?: Resolver<Maybe<Array<ResolversTypes['QuestionNode']>>, ParentType, ContextType, RequireFields<QuestionNodeChildrenArgs, never>>,
@@ -5599,7 +5599,7 @@ export type QuestionNodePreviousValuesResolvers<ContextType = any, ParentType ex
   title?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
   branchVal?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   isRoot?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>,
-  questionType?: Resolver<ResolversTypes['NodeType'], ParentType, ContextType>,
+  type?: Resolver<ResolversTypes['NodeType'], ParentType, ContextType>,
   __isTypeOf?: isTypeOfResolverFn<ParentType>,
 }>;
 
