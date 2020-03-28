@@ -133,7 +133,7 @@ interface EdgeConditonProps {
 
 const conditionTypes = [{ value: 'match', label: 'match' }, { value: 'valueBoundary', label: 'valueBoundary' }];
 
-const EdgeEntry = ({ edge, index } : {edge: EdgeChildProps, index: number}) => {
+const EdgeEntry = ({ edge, index }: { edge: EdgeChildProps, index: number }) => {
 
   const [currCondition, setCurrCondition] = useState({ value: edge.conditions[0].conditionType, label: edge.conditions[0].conditionType });
 
@@ -144,28 +144,28 @@ const EdgeEntry = ({ edge, index } : {edge: EdgeChildProps, index: number}) => {
 
   return (
     <>
-      <Div useFlex my={10} flexDirection="column">
+      <Div useFlex my={10} flexDirection="column" backgroundColor="lightgrey">
         <StyledLabel>Child node #{index + 1}</StyledLabel>
         <StyledInput name="title" value={edge.childNode.title} />
-        <Div>
+        <Div mt={10} mb={20}>
           <StyledLabel>conditionType</StyledLabel>
           <Select options={conditionTypes} value={currCondition} onChange={(qOption) => setCondition(qOption)} />
           {
             currCondition.value === 'valueBoundary' && (
-              <>
-                <StyledLabel>Min value</StyledLabel>
+              <Div mt={10}>
+                <StyledLabel ml={5} mr={5}>Min value</StyledLabel>
                 <StyledInput value={edge.conditions[0].renderMin} />
-                <StyledLabel>Max value</StyledLabel>
+                <StyledLabel ml={5} mr={5}>Max value</StyledLabel>
                 <StyledInput value={edge.conditions[0].renderMax} />
-              </>
+              </Div>
             )
           }
           {
             currCondition.value === 'match' && (
-              <>
-                <StyledLabel>Match value</StyledLabel>
+              <Div mt={10}>
+                <StyledLabel ml={5} mr={5}>Match value</StyledLabel>
                 <StyledInput value={edge.conditions[0].matchValue} />
-              </>
+              </Div>
             )
           }
         </Div>
@@ -187,6 +187,13 @@ const QuestionEntry = ({ question, leafs }: { question: QuestionEntryProps, leaf
 
   const qType = { label: question.questionType, value: question.questionType };
   const currLeaf = { label: question.overrideLeaf?.title, value: question.overrideLeaf?.id };
+  const [currQuestionType, setCurrQuestionType] = useState(qType);
+
+  const setQuestionType = (questionType: any) => {
+    const { label, value } = questionType;
+    setCurrQuestionType({ label, value });
+  };
+
   return (
     <QuestionEntryView>
       <Div backgroundColor="#daecfc" margin={5} py={6}>
@@ -198,7 +205,7 @@ const QuestionEntry = ({ question, leafs }: { question: QuestionEntryProps, leaf
         </Div>
         <Div useFlex pl={4} pr={4} pb={2} flexDirection="column">
           <StyledLabel>Question type</StyledLabel>
-          <Select options={questionTypes} value={qType} />
+          <Select options={questionTypes} value={currQuestionType} onChange={(qOption) => setQuestionType(qOption)} />
         </Div>
         <Div useFlex pl={4} pr={4} pb={2} flexDirection="column">
           <StyledLabel>Leaf node</StyledLabel>
@@ -344,8 +351,8 @@ const TopicAnswerEntry = ({ nodeEntry }: { nodeEntry: NodeEntryProps }) => (
     <div>
       <strong>
         Answer: {nodeEntry.values?.[0].numberValue
-        ? nodeEntry.values?.[0].numberValue
-        : nodeEntry.values?.[0].textValue}
+          ? nodeEntry.values?.[0].numberValue
+          : nodeEntry.values?.[0].textValue}
       </strong>
     </div>
     <Hr />
