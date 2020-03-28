@@ -137,6 +137,11 @@ const EdgeEntry = ({ edge, index } : {edge: EdgeChildProps, index: number}) => {
 
   const [currCondition, setCurrCondition] = useState({ value: edge.conditions[0].conditionType, label: edge.conditions[0].conditionType });
 
+  const setCondition = (qOption: any) => {
+    const { label, value } = qOption;
+    setCurrCondition({ label, value });
+  };
+
   return (
     <>
       <Div useFlex my={10} flexDirection="column">
@@ -144,10 +149,7 @@ const EdgeEntry = ({ edge, index } : {edge: EdgeChildProps, index: number}) => {
         <StyledInput name="title" value={edge.childNode.title} />
         <Div>
           <StyledLabel>conditionType</StyledLabel>
-          <Select options={conditionTypes} value={currCondition} />
-          {
-            // onChange={(qOption) => setCurrCondition({value: qOption.value, label: qOption.label })}
-          }
+          <Select options={conditionTypes} value={currCondition} onChange={(qOption) => setCondition(qOption)} />
           {
             currCondition.value === 'valueBoundary' && (
               <>
