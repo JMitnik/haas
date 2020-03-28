@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Grid, Div } from '@haas/ui';
+import { Button, Grid, Div, H2 } from '@haas/ui';
 import { useForm } from 'react-hook-form';
 import { InputField, InputGroup, InputLabel } from '@haas/ui/src/Form';
 import { CheckCircle } from 'react-feather';
@@ -13,7 +13,7 @@ import useJourneyFinish from 'hooks/use-journey-finish';
 
 type RegisterNodeProps = GenericNodeProps;
 
-const RegisterNode = ({ isLeaf }: RegisterNodeProps) => {
+const RegisterNode = ({ node, isLeaf }: RegisterNodeProps) => {
   const { register, getValues } = useForm();
 
   const { finishedRef } = useJourneyFinish({ isLeaf, useFinishPage: true });
@@ -26,7 +26,9 @@ const RegisterNode = ({ isLeaf }: RegisterNodeProps) => {
 
   return (
     <RegisterNodeContainer>
-      <Div mb={4}>
+      <H2>{node.title}</H2>
+
+      <Div>
         <Grid gridTemplateColumns={['auto', 'repeat(auto-fit, minmax(100px, 1fr))']} gridGap="24px">
           <Grid gridTemplateColumns="1fr 1fr">
             <InputGroup>
@@ -45,13 +47,15 @@ const RegisterNode = ({ isLeaf }: RegisterNodeProps) => {
             <InputField name="multiValues[2].textValue" ref={register} />
           </InputGroup>
         </Grid>
+        <Div mt={4}>
+          <Button brand="secondary" onClick={() => onSubmit()}>
+            <ButtonIcon>
+              <CheckCircle />
+            </ButtonIcon>
+            Submit
+          </Button>
+        </Div>
       </Div>
-      <Button brand="secondary" onClick={() => onSubmit()}>
-        <ButtonIcon>
-          <CheckCircle />
-        </ButtonIcon>
-        Submit
-      </Button>
     </RegisterNodeContainer>
   );
 };

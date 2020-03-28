@@ -28,6 +28,11 @@ interface TreeStateProps {
   activeLeaf: HAASNode;
 }
 
+/**
+ * Reduces the tree state
+ * @param state
+ * @param action
+ */
 const treeReducer = (state: TreeStateProps, action: TreeAction) => {
   switch (action.type) {
     case 'goToChild': {
@@ -67,6 +72,9 @@ const treeReducer = (state: TreeStateProps, action: TreeAction) => {
   }
 };
 
+/**
+ * Finds the first outgoing edge from a parent that satisfies the key.
+ */
 const findNextEdge = (parent: HAASNode, key: string | number) => {
   const candidates = parent?.edgeChildren?.filter(edge => {
     if (parent.type === 'SLIDER') {
@@ -89,6 +97,10 @@ const findNextEdge = (parent: HAASNode, key: string | number) => {
   return candidates && candidates[0];
 };
 
+/**
+ * Retrieves next node from the API based on its incoming edge.
+ * @param edge
+ */
 const findNextNode = async (edge: HAASEdge | null) => {
   if (edge?.childNode?.id) {
     const { data: nextNodeData } = await client.query({
@@ -105,6 +117,7 @@ const findNextNode = async (edge: HAASEdge | null) => {
 export const HAASTreeStateContext = React.createContext({} as TreeStateProps);
 export const HAASTreeDispatchContext = React.createContext({} as TreeDispatchProps);
 
+// Provider which manages the state of the context
 export const HAASTreeProvider = ({ questionnaire, children }: TreeProviderProps) => {
   const [state, dispatch] = useReducer(treeReducer, {
     currentDepth: 0,
@@ -135,14 +148,17 @@ export const HAASTreeProvider = ({ questionnaire, children }: TreeProviderProps)
   );
 };
 
+// Hook which extracts the context with the state variables
 const useHAASTreeState = () => {
   return useContext(HAASTreeStateContext);
 };
 
+// Hook which extracts the context with the interactionable dispatches.
 const useHAASTreeDispatch = () => {
   return useContext(HAASTreeDispatchContext);
 };
 
+// Hook which combines the dispatches and variables
 const useHAASTree = () => {
   return { treeState: useHAASTreeState(), treeDispatch: useHAASTreeDispatch() };
 };
