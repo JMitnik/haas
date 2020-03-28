@@ -14,7 +14,7 @@ interface TreeProviderProps {
 
 type TreeAction = {
   type: 'goToChild';
-  nextNode: HAASNode;
+  nextNode: HAASNode | null;
   nextEdge: HAASEdge;
   newNodeFormEntry: HAASFormEntry;
 };
@@ -31,12 +31,7 @@ interface TreeStateProps {
 const treeReducer = (state: TreeStateProps, action: TreeAction) => {
   switch (action.type) {
     case 'goToChild': {
-      let activeLeaf = state.activeLeaf;
-
-      if (action.nextNode.overrideLeaf) {
-        activeLeaf = action.nextNode.overrideLeaf;
-      }
-
+      // Construct new node entry from form-entry
       const newNodeEntry: HAASEntry = {
         depth: state.currentDepth,
         node: state.activeNode,
@@ -44,10 +39,24 @@ const treeReducer = (state: TreeStateProps, action: TreeAction) => {
         data: action.newNodeFormEntry
       };
 
+      // Check if next state has leaf to override
+      let activeLeaf = state.activeLeaf;
+      if (action.nextNode?.overrideLeaf) {
+        activeLeaf = action.nextNode.overrideLeaf;
+      }
+
+      // Check if we are at leaf
+      let isAtLeaf = state.isAtLeaf;
+      let nextNode = action.nextNode;
+      if (!nextNode) {
+        nextNode = state.activeLeaf;
+        isAtLeaf = true;
+      }
+
       return {
         currentDepth: state.currentDepth + 1,
-        activeNode: action.nextNode,
-        isAtLeaf: state.isAtLeaf,
+        activeNode: nextNode,
+        isAtLeaf,
         activeEdge: action.nextEdge,
         activeLeaf: activeLeaf,
         historyStack: [...state.historyStack, newNodeEntry]
