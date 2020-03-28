@@ -1,6 +1,7 @@
 /* eslint-disable react/jsx-one-expression-per-line */
 import React, { useState, Dispatch, SetStateAction } from 'react';
 import { useQuery } from '@apollo/react-hooks';
+import { ChevronRight, Plus, X, MinusCircle } from 'react-feather';
 import { H2, Flex, Muted, Loader, Grid, Div, H5, H4, H3, Button } from '@haas/ui';
 import styled, { css } from 'styled-components';
 import { useParams, Switch, Route, useHistory } from 'react-router-dom';
@@ -112,8 +113,13 @@ interface QuestionEntryProps {
   title: string;
   questionType: string;
   overrideLeaf?: OverrideLeafProps;
-  edgeChildren?: Array<EdgeChildProps>
-  options?: Array<string>
+  edgeChildren?: Array<EdgeChildProps>;
+  options?: Array<QuestionOptionProps>;
+}
+
+interface QuestionOptionProps {
+  value: string;
+  publicValue?: string;
 }
 
 interface EdgeChildProps {
@@ -131,22 +137,64 @@ interface EdgeConditonProps {
   matchValue?: string;
 }
 
+const DeleteCustomerButtonContainer = styled.button`
+  position: absolute;
+  top: 10px;
+  right: 0px;
+  background: none;
+  border: none;
+  opacity: 0.1;
+  cursor: pointer;
+  transition: all 0.2s ease-in;
+
+  &:hover {
+    transition: all 0.2s ease-in;
+    opacity: 0.8;
+  }
+`;
+
+const DeleteQuestionOptionButtonContainer = styled.button`
+  background: none;
+  border: none;
+  opacity: 0.1;
+  cursor: pointer;
+  transition: all 0.2s ease-in;
+
+  &:hover {
+    transition: all 0.2s ease-in;
+    opacity: 0.8;
+  }
+`;
+
 const conditionTypes = [{ value: 'match', label: 'match' }, { value: 'valueBoundary', label: 'valueBoundary' }];
 
-const EdgeEntry = ({ edge, index }: { edge: EdgeChildProps, index: number }) => {
+const EdgeEntry = ({questions, edge, index }: { questions: Array<QuestionEntryProps>, edge: EdgeChildProps, index: number }) => {
 
   const [currCondition, setCurrCondition] = useState({ value: edge.conditions[0].conditionType, label: edge.conditions[0].conditionType });
+  const [currChildQuestion, setCurrChildQuestion] = useState({ value: edge.childNode.id, label: `${edge.childNode.title} - ${edge.childNode.id}` });
 
   const setCondition = (qOption: any) => {
     const { label, value } = qOption;
     setCurrCondition({ label, value });
   };
 
+  const questionsSelect = questions.map((question) => {
+    const label = `${question.title} - ${question.id}`;
+    const value = question.id;
+    return { label, value };
+  });
+
+  const deleteEdgeEntry = (event: any, entryId: any) => {
+    console.log('DELETE THE FUCKER');
+  };
+
   return (
-    <>
-      <Div useFlex my={10} flexDirection="column" backgroundColor="lightgrey">
-        <StyledLabel>Child node #{index + 1}</StyledLabel>
-        <StyledInput name="title" value={edge.childNode.title} />
+    <Div position="relative">
+      <Div useFlex my={10} flexDirection="column" backgroundColor="#f5f5f5">
+        <DeleteCustomerButtonContainer onClick={(e) => deleteEdgeEntry(e, edge.id)}><X /></DeleteCustomerButtonContainer>
+        <StyledLabel marginTop={10} marginBottom={20}>Child node #{index + 1}</StyledLabel>
+        <Select options={questionsSelect} value={ {label: `${edge.childNode.title} - ${edge.childNode.id}`, value: edge.childNode.id}} />
+        {/* <StyledInput name="title" value={`${edge.childNode.title} - ${edge.childNode.id}`} /> */}
         <Div mt={10} mb={20}>
           <StyledLabel>conditionType</StyledLabel>
           <Select options={conditionTypes} value={currCondition} onChange={(qOption) => setCondition(qOption)} />
@@ -170,7 +218,7 @@ const EdgeEntry = ({ edge, index }: { edge: EdgeChildProps, index: number }) => 
           }
         </Div>
       </Div>
-    </>
+    </Div>
   );
 };
 
@@ -179,15 +227,13 @@ const QuestionEntryView = styled.div`
 `;
 
 
-const questionTypes = [{ value: 'SLIDER', label: 'SLIDER' }, { value: 'MULTI-CHOICE', label: 'MULTI-CHOICE' }];
+const questionTypes = [{ value: 'SLIDER', label: 'SLIDER' }, { value: 'MULTI_CHOICE', label: 'MULTI_CHOICE' }];
 
-const QuestionEntry = ({ question, leafs }: { question: QuestionEntryProps, leafs: any }) => {
+const QuestionEntry = ({ questionsQ, question, leafs }: {questionsQ: Array<QuestionEntryProps>, question: QuestionEntryProps, leafs: any }) => {
   const { register, handleSubmit, errors } = useForm();
-  console.log('Question: ', question);
 
-  const qType = { label: question.questionType, value: question.questionType };
   const currLeaf = { label: question.overrideLeaf?.title, value: question.overrideLeaf?.id };
-  const [currQuestionType, setCurrQuestionType] = useState(qType);
+  const [currQuestionType, setCurrQuestionType] = useState({ label: question.questionType, value: question.questionType });
 
   const setQuestionType = (questionType: any) => {
     const { label, value } = questionType;
@@ -207,15 +253,30 @@ const QuestionEntry = ({ question, leafs }: { question: QuestionEntryProps, leaf
           <StyledLabel>Question type</StyledLabel>
           <Select options={questionTypes} value={currQuestionType} onChange={(qOption) => setQuestionType(qOption)} />
         </Div>
+        { currQuestionType.value === 'MULTI_CHOICE' && (
+          <Div useFlex pl={4} pr={4} pb={2} flexDirection="column">
+            <H4>OPTIONS</H4>
+            {
+              question?.options?.map((option, index) => {
+                return (
+                  <Div useFlex flexDirection="row">
+                    <StyledInput name={`${question.id}-option-${index}`} value={option.value} />
+                    <DeleteQuestionOptionButtonContainer> <MinusCircle /> </DeleteQuestionOptionButtonContainer>
+                  </Div>
+                );
+              })
+            }
+          </Div>
+        ) }
         <Div useFlex pl={4} pr={4} pb={2} flexDirection="column">
           <StyledLabel>Leaf node</StyledLabel>
           <Select options={leafs} value={currLeaf} />
         </Div>
         <Div useFlex pl={4} pr={4} pb={2} flexDirection="column">
-          <H4>Child nodes</H4>
+          <H4>Edges</H4>
           {
             question.edgeChildren && question.edgeChildren.map((edge: EdgeChildProps, index) => {
-              return <EdgeEntry edge={edge} index={index} />;
+              return <EdgeEntry questions={questionsQ} edge={edge} index={index} />;
             })
           }
         </Div>
@@ -223,6 +284,8 @@ const QuestionEntry = ({ question, leafs }: { question: QuestionEntryProps, leaf
     </QuestionEntryView>
   );
 };
+
+
 
 const StyledLabel = styled(Div).attrs({ as: 'label' })`
   ${({ theme }) => css`
@@ -297,7 +360,7 @@ const TopicBuilderContent = () => {
       <TopicBuilderContentView>
         {
           topicBuilderData?.questions.map((question: QuestionEntryProps) => {
-            return <QuestionEntry question={question} leafs={selectLeafs} />;
+            return <QuestionEntry questionsQ={topicBuilderData?.questions} question={question} leafs={selectLeafs} />;
           })
         }
       </TopicBuilderContentView>
@@ -351,8 +414,8 @@ const TopicAnswerEntry = ({ nodeEntry }: { nodeEntry: NodeEntryProps }) => (
     <div>
       <strong>
         Answer: {nodeEntry.values?.[0].numberValue
-          ? nodeEntry.values?.[0].numberValue
-          : nodeEntry.values?.[0].textValue}
+        ? nodeEntry.values?.[0].numberValue
+        : nodeEntry.values?.[0].textValue}
       </strong>
     </div>
     <Hr />
