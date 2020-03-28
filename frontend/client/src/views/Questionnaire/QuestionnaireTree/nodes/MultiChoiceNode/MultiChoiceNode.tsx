@@ -9,7 +9,7 @@ type MultiChoiceNodeProps = GenericNodeProps;
 
 const MultiChoiceNode = ({ node, isLeaf }: MultiChoiceNodeProps) => {
   const {
-    treeDispatch: { dispatch, goToChild }
+    treeDispatch: { goToChild }
   } = useHAASTree();
 
   const { register, setValue, triggerValidation, getValues } = useForm<HAASFormEntry>({
@@ -31,7 +31,7 @@ const MultiChoiceNode = ({ node, isLeaf }: MultiChoiceNodeProps) => {
 
     if (validForm) {
       const formEntry = getValues({ nest: true });
-      goToChild(dispatch, node, multiChoiceOption.value);
+      goToChild(node, multiChoiceOption.value);
       // treeDispatch.saveNodeEntry(formEntry);
       // treeDispatch.goToChild(multiChoiceOption.value);
     }

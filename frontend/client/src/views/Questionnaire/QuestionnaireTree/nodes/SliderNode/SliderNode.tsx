@@ -10,7 +10,7 @@ type SliderNodeProps = GenericNodeProps;
 
 const SliderNode = ({ node }: SliderNodeProps) => {
   const {
-    treeDispatch: { dispatch, goToChild }
+    treeDispatch: { goToChild }
   } = useHAASTree();
 
   const { watch, getValues, triggerValidation, register } = useForm<HAASFormEntry>({
@@ -37,7 +37,7 @@ const SliderNode = ({ node }: SliderNodeProps) => {
 
       if (formEntry?.numberValue) {
         // saveNodeEntry(formEntry);
-        goToChild(dispatch, node, formEntry.numberValue);
+        goToChild(node, formEntry.numberValue);
       }
     }
   };

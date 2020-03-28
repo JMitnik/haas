@@ -24,9 +24,7 @@ const QuestionnaireTree = () => {
   return (
     <QuestionnaireContainer>
       <NodeContainer useFlex flex="100%" alignItems="stretch">
-        <AnimatePresence exitBeforeEnter initial={false}>
-          <Node />
-        </AnimatePresence>
+        <Node />
       </NodeContainer>
     </QuestionnaireContainer>
   );

@@ -1,60 +1,51 @@
-import React, {
-  useState,
-  useContext,
-  useEffect,
-  ReactNode,
-  useDebugValue,
-  useReducer
-} from 'react';
-import useQuestionnaire, {
-  HAASNode,
-  HAASEntry,
-  HAASFormEntry,
-  Questionnaire,
-  HAASEdge,
-  Edge
-} from './use-questionnaire';
+import React, { useContext, ReactNode, useReducer } from 'react';
+import { HAASNode, HAASEntry, Questionnaire, HAASEdge } from './use-questionnaire';
 import { getQuestionNodeQuery } from '../queries/getQuestionNodeQuery';
 import client from '../config/apollo';
-import { useHistory, useLocation, useParams } from 'react-router-dom';
 
-interface HAASTreeStateContextProps {
-  historyStack: HAASEntry[];
-  isAtLeaf: boolean;
-  currentDepth: number;
-  activeNode: HAASNode | null;
+interface TreeDispatchProps {
+  goToChild: (currentNode: HAASNode, key: string | number) => void;
 }
-
-interface HAASTreeDispatchContextProps {
-  dispatch: Dispatch;
-  goToChild: (dispatch: Dispatch, currentNode: HAASNode, key: string | number) => void;
-}
-
-export const HAASTreeStateContext = React.createContext({} as HAASTreeStateContextProps);
-export const HAASTreeDispatchContext = React.createContext({} as HAASTreeDispatchContextProps);
 
 interface TreeProviderProps {
   questionnaire: Questionnaire;
   children: ReactNode;
 }
 
-interface ParamsProps {
-  customerId: string;
-  questionnaireId: string;
-}
-
-type Action =
+type TreeAction =
   | { type: 'addNodeEntry'; data: HAASEntry }
   | { type: 'goToChild'; nextNode: HAASNode; nextEdge: HAASEdge };
-type Dispatch = (action: Action) => void;
 
-type State = {
-  currentDepth: number;
-  isAtLeaf: boolean;
-  activeNode: HAASNode;
-  activeEdge?: HAASEdge | null;
-  activeLeaf: HAASNode;
+interface TreeStateProps {
   historyStack: HAASEntry[];
+  isAtLeaf: boolean;
+  currentDepth: number;
+  activeNode: HAASNode | null;
+  activeEdge: HAASEdge | null;
+  activeLeaf: HAASNode;
+}
+
+const treeReducer = (state: TreeStateProps, action: TreeAction) => {
+  switch (action.type) {
+    case 'goToChild': {
+      let activeLeaf = state.activeLeaf;
+
+      if (action.nextNode.overrideLeaf) {
+        activeLeaf = action.nextNode.overrideLeaf;
+      }
+
+      return {
+        currentDepth: state.currentDepth + 1,
+        activeNode: action.nextNode,
+        isAtLeaf: state.isAtLeaf,
+        activeEdge: action.nextEdge,
+        activeLeaf: activeLeaf,
+        historyStack: state.historyStack
+      };
+    }
+    default:
+      return state;
+  }
 };
 
 const findNextEdge = (parent: HAASNode, key: string | number) => {
@@ -92,39 +83,11 @@ const findNextNode = async (edge: HAASEdge | null) => {
   }
 };
 
-const findNewActiveLeaf = (node: HAASNode) => node?.overrideLeaf;
-
-const reducer = (state: State, action: Action) => {
-  switch (action.type) {
-    case 'goToChild': {
-      let activeLeaf = state.activeLeaf;
-
-      if (action.nextNode.overrideLeaf) {
-        activeLeaf = action.nextNode.overrideLeaf;
-      }
-
-      return {
-        currentDepth: state.currentDepth + 1,
-        activeNode: action.nextNode,
-        isAtLeaf: state.isAtLeaf,
-        activeEdge: action.nextEdge,
-        activeLeaf: activeLeaf,
-        historyStack: state.historyStack
-      };
-    }
-    default:
-      return state;
-  }
-};
-
-const goToChild = async (dispatch: Dispatch, currentNode: HAASNode, key: string | number) => {
-  const nextEdge = findNextEdge(currentNode, key);
-  const nextNode = await findNextNode(nextEdge);
-  dispatch({ type: 'goToChild', nextNode, nextEdge });
-};
+export const HAASTreeStateContext = React.createContext({} as TreeStateProps);
+export const HAASTreeDispatchContext = React.createContext({} as TreeDispatchProps);
 
 export const HAASTreeProvider = ({ questionnaire, children }: TreeProviderProps) => {
-  const [state, dispatch] = useReducer(reducer, {
+  const [state, dispatch] = useReducer(treeReducer, {
     currentDepth: 0,
     activeNode: questionnaire.questions[0],
     activeLeaf: questionnaire.leafs[0],
@@ -133,9 +96,15 @@ export const HAASTreeProvider = ({ questionnaire, children }: TreeProviderProps)
     historyStack: []
   });
 
+  const goToChild = async (currentNode: HAASNode, key: string | number) => {
+    const nextEdge = findNextEdge(currentNode, key);
+    const nextNode = await findNextNode(nextEdge);
+    dispatch({ type: 'goToChild', nextNode, nextEdge });
+  };
+
   return (
     <HAASTreeStateContext.Provider value={state}>
-      <HAASTreeDispatchContext.Provider value={{ dispatch, goToChild }}>
+      <HAASTreeDispatchContext.Provider value={{ goToChild }}>
         {children}
       </HAASTreeDispatchContext.Provider>
     </HAASTreeStateContext.Provider>

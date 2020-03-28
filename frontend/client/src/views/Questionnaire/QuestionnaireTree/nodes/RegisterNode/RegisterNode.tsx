@@ -15,9 +15,7 @@ type RegisterNodeProps = GenericNodeProps;
 
 const RegisterNode = ({ isLeaf }: RegisterNodeProps) => {
   const { register, getValues } = useForm();
-  const {
-    treeDispatch: { dispatch }
-  } = useHAASTree();
+
   const { finishedRef } = useJourneyFinish({ isLeaf, useFinishPage: true });
 
   const onSubmit = () => {
