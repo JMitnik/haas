@@ -1,14 +1,14 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, FC } from 'react';
 import { H5, Flex, Button, Div, H2 } from '@haas/ui';
 import useHAASTree from 'hooks/use-haas-tree';
 import { useForm } from 'react-hook-form';
 import { GenericNodeProps } from '../Node';
 import { HAASFormEntry, MultiChoiceOption } from 'hooks/use-questionnaire';
 
-type MultiChoiceNode = GenericNodeProps;
+type MultiChoiceNodeProps = GenericNodeProps;
 
-const MultiChoiceNode = () => {
-  const { activeNode, goToChild, saveNodeEntry } = useHAASTree();
+const MultiChoiceNode = ({ node, isLeaf }: MultiChoiceNodeProps) => {
+  const { treeDispatch } = useHAASTree();
 
   const { register, setValue, triggerValidation, getValues } = useForm<HAASFormEntry>({
     mode: 'onSubmit',
@@ -29,8 +29,8 @@ const MultiChoiceNode = () => {
 
     if (validForm) {
       const formEntry = getValues({ nest: true });
-      saveNodeEntry(formEntry);
-      goToChild(multiChoiceOption.value, formEntry);
+      treeDispatch.saveNodeEntry(formEntry);
+      treeDispatch.goToChild(multiChoiceOption.value);
     }
   };
 
@@ -38,8 +38,8 @@ const MultiChoiceNode = () => {
     <>
       <form>
         <Flex flexDirection="column" justifyContent="space-between">
-          <H2>{activeNode?.title}</H2>
-          {activeNode?.options?.map((multiChoiceOption: MultiChoiceOption, index: number) => (
+          <H2>{node.title}</H2>
+          {node.options?.map((multiChoiceOption: MultiChoiceOption, index: number) => (
             <Div
               key={index}
               fillChildren

@@ -11,7 +11,9 @@ type SocialShareNodeProps = GenericNodeProps;
 
 const SocialShareNode = ({ isLeaf }: SocialShareNodeProps) => {
   const [submitForm] = useMutation(uploadEntryMutation, {});
-  const { historyStack } = useHAASTree();
+  const {
+    treeState: { historyStack }
+  } = useHAASTree();
 
   useEffect(() => {
     if (historyStack && submitForm && isLeaf) {

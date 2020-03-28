@@ -11,16 +11,20 @@ import { getQuestionNodeQuery } from '../queries/getQuestionNodeQuery';
 import client from '../config/apollo';
 import { useHistory, useLocation, useParams } from 'react-router-dom';
 
-export const HAASTreeContext = React.createContext({} as HAASTreeContextProps);
-
-interface HAASTreeContextProps {
+interface HAASTreeStateContextProps {
   historyStack: HAASEntry[];
   isAtLeaf: boolean;
   currentDepth: number;
   activeNode: HAASNode | null;
+}
+
+interface HAASTreeDispatchContextProps {
   saveNodeEntry: (formEntry: HAASFormEntry) => void;
   goToChild: (key: string | number, formEntry?: HAASFormEntry) => void;
 }
+
+export const HAASTreeStateContext = React.createContext({} as HAASTreeStateContextProps);
+export const HAASTreeDispatchContext = React.createContext({} as HAASTreeDispatchContextProps);
 
 interface TreeProviderProps {
   questionnaire: Questionnaire;
@@ -45,7 +49,6 @@ export const HAASTreeProvider = ({ questionnaire, children }: TreeProviderProps)
 
   // TODO: Set on the rootQuestion
   const [activeNode, setActiveNode] = useState<HAASNode>(questionnaire.questions[0]);
-  useDebugValue(activeNode.id);
 
   // History of user's interaction
   const [historyStack, setHistoryStack] = useState<HAASEntry[]>([]);
@@ -121,23 +124,24 @@ export const HAASTreeProvider = ({ questionnaire, children }: TreeProviderProps)
   };
 
   return (
-    <HAASTreeContext.Provider
-      value={{
-        historyStack,
-        goToChild,
-        isAtLeaf,
-        activeNode,
-        currentDepth,
-        saveNodeEntry
-      }}
-    >
-      {children}
-    </HAASTreeContext.Provider>
+    <HAASTreeStateContext.Provider value={{ historyStack, isAtLeaf, activeNode, currentDepth }}>
+      <HAASTreeDispatchContext.Provider value={{ goToChild, saveNodeEntry }}>
+        {children}
+      </HAASTreeDispatchContext.Provider>
+    </HAASTreeStateContext.Provider>
   );
 };
 
+const useHAASTreeState = () => {
+  return useContext(HAASTreeStateContext);
+};
+
+const useHAASTreeDispatch = () => {
+  return useContext(HAASTreeDispatchContext);
+};
+
 const useHAASTree = () => {
-  return useContext(HAASTreeContext);
+  return { treeState: useHAASTreeState(), treeDispatch: useHAASTreeDispatch() };
 };
 
 export default useHAASTree;

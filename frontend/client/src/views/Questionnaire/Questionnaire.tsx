@@ -30,11 +30,11 @@ const Questionnaire = () => {
 
   return (
     <>
-      <HAASTreeProvider questionnaire={questionnaire}>
-        <ThemeProvider theme={(theme: any) => makeCustomTheme(theme, customTheme)}>
+      <ThemeProvider theme={(theme: any) => makeCustomTheme(theme, customTheme)}>
+        <HAASTreeProvider questionnaire={questionnaire}>
           <QuestionnaireTree />
-        </ThemeProvider>
-      </HAASTreeProvider>
+        </HAASTreeProvider>
+      </ThemeProvider>
     </>
   );
 };

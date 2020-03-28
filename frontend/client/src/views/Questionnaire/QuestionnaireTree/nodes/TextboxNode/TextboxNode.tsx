@@ -15,7 +15,7 @@ interface TextboxNodeProps {
 }
 
 const TextboxNode = ({ isLeaf }: TextboxNodeProps) => {
-  const { saveNodeEntry, historyStack } = useHAASTree();
+  // const { saveNodeEntry, historyStack } = useHAASTree();
   const history = useHistory();
   const location = useLocation();
   const finishedRef = useRef(false);
@@ -24,31 +24,9 @@ const TextboxNode = ({ isLeaf }: TextboxNodeProps) => {
 
   const onSubmit = () => {
     const formEntry = getValues({ nest: true });
-    saveNodeEntry(formEntry);
+    // saveNodeEntry(formEntry);
     finishedRef.current = true;
   };
-
-  useEffect(() => {
-    const finishJourney = () => {
-      submitForm({
-        variables: {
-          uploadUserSessionInput: {
-            entries: historyStack.map(nodeEntry => {
-              const { node, edge, ...data } = nodeEntry;
-
-              return { ...data, nodeId: node.id, edgeId: edge?.id };
-            })
-          }
-        }
-      })
-        .catch(e => console.log(e))
-        .then(() => console.log('Done!'));
-    };
-
-    if (finishedRef.current && isLeaf) {
-      finishJourney();
-    }
-  }, [historyStack, isLeaf, submitForm, history, location.pathname]);
 
   return (
     <>

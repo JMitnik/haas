@@ -12,7 +12,9 @@ const useJourneyFinish = ({
   useFinishPage: boolean;
 }) => {
   const finishedRef = useRef(false);
-  const { historyStack } = useHAASTree();
+  const {
+    treeState: { historyStack }
+  } = useHAASTree();
   const [submitForm] = useMutation(uploadEntryMutation, {});
   const history = useHistory();
   const location = useLocation();
