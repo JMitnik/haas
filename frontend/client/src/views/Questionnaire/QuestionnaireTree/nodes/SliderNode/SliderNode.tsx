@@ -8,9 +8,9 @@ import { HAASFormEntry } from 'hooks/use-questionnaire';
 
 type SliderNodeProps = GenericNodeProps;
 
-const SliderNode = () => {
+const SliderNode = ({ node }: SliderNodeProps) => {
   const {
-    treeDispatch: { saveNodeEntry, goToChild }
+    treeDispatch: { dispatch, goToChild }
   } = useHAASTree();
 
   const { watch, getValues, triggerValidation, register } = useForm<HAASFormEntry>({
@@ -36,8 +36,8 @@ const SliderNode = () => {
       const formEntry = formatSliderEntry(getValues({ nest: true }));
 
       if (formEntry?.numberValue) {
-        saveNodeEntry(formEntry);
-        goToChild(formEntry.numberValue, formEntry);
+        // saveNodeEntry(formEntry);
+        goToChild(dispatch, node, formEntry.numberValue);
       }
     }
   };

@@ -8,7 +8,9 @@ import { HAASFormEntry, MultiChoiceOption } from 'hooks/use-questionnaire';
 type MultiChoiceNodeProps = GenericNodeProps;
 
 const MultiChoiceNode = ({ node, isLeaf }: MultiChoiceNodeProps) => {
-  const { treeDispatch } = useHAASTree();
+  const {
+    treeDispatch: { dispatch, goToChild }
+  } = useHAASTree();
 
   const { register, setValue, triggerValidation, getValues } = useForm<HAASFormEntry>({
     mode: 'onSubmit',
@@ -29,8 +31,9 @@ const MultiChoiceNode = ({ node, isLeaf }: MultiChoiceNodeProps) => {
 
     if (validForm) {
       const formEntry = getValues({ nest: true });
-      treeDispatch.saveNodeEntry(formEntry);
-      treeDispatch.goToChild(multiChoiceOption.value);
+      goToChild(dispatch, node, multiChoiceOption.value);
+      // treeDispatch.saveNodeEntry(formEntry);
+      // treeDispatch.goToChild(multiChoiceOption.value);
     }
   };
 
