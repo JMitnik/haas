@@ -17,7 +17,13 @@ const SocialShareNode = ({ isLeaf }: SocialShareNodeProps) => {
     if (historyStack && submitForm && isLeaf) {
       submitForm({
         variables: {
-          uploadUserSessionInput: { entries: historyStack }
+          uploadUserSessionInput: {
+            entries: historyStack.map(nodeEntry => {
+              const { node, edge, ...data } = nodeEntry;
+
+              return { ...data, nodeId: node.id, edgeId: edge?.id };
+            })
+          }
         }
       });
     }

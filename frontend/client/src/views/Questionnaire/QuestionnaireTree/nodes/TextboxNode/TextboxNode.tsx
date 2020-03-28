@@ -32,9 +32,17 @@ const TextboxNode = ({ isLeaf }: TextboxNodeProps) => {
     const finishJourney = () => {
       submitForm({
         variables: {
-          uploadUserSessionInput: { entries: historyStack }
+          uploadUserSessionInput: {
+            entries: historyStack.map(nodeEntry => {
+              const { node, edge, ...data } = nodeEntry;
+
+              return { ...data, nodeId: node.id, edgeId: edge?.id };
+            })
+          }
         }
-      }).then(() => history.push(`${location.pathname}/finished`));
+      })
+        .catch(e => console.log(e))
+        .then(() => console.log('Done!'));
     };
 
     if (finishedRef.current && isLeaf) {

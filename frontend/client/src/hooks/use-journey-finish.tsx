@@ -22,12 +22,22 @@ const useJourneyFinish = ({
     const finishJourney = () => {
       submitForm({
         variables: {
-          uploadUserSessionInput: { entries: historyStack }
+          uploadUserSessionInput: {
+            entries: historyStack.map(nodeEntry => {
+              const { node, edge, ...data } = nodeEntry;
+
+              return { ...data, nodeId: node.id, edgeId: edge?.id };
+            })
+          }
         }
-      }).then(() => useFinishPage && history.push(`${location.pathname}/finished`));
+      }).then(() => {
+        finishedRef.current = false;
+        history.push(`${location.pathname}/finished`);
+      });
     };
 
     if (finishedRef.current && isLeaf) {
+      console.log('asdasd');
       finishJourney();
     }
   }, [historyStack, useFinishPage, isLeaf, submitForm, history, location.pathname]);

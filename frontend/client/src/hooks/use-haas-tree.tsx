@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect, ReactNode } from 'react';
+import React, { useState, useContext, useEffect, ReactNode, useDebugValue } from 'react';
 import useQuestionnaire, {
   HAASNode,
   HAASEntry,
@@ -9,7 +9,7 @@ import useQuestionnaire, {
 } from './use-questionnaire';
 import { getQuestionNodeQuery } from '../queries/getQuestionNodeQuery';
 import client from '../config/apollo';
-import { useHistory, useLocation } from 'react-router-dom';
+import { useHistory, useLocation, useParams } from 'react-router-dom';
 
 export const HAASTreeContext = React.createContext({} as HAASTreeContextProps);
 
@@ -27,11 +27,15 @@ interface TreeProviderProps {
   children: ReactNode;
 }
 
+interface ParamsProps {
+  customerId: string;
+  questionnaireId: string;
+}
+
 export const HAASTreeProvider = ({ questionnaire, children }: TreeProviderProps) => {
   const history = useHistory();
-  const location = useLocation();
+  const params = useParams<ParamsProps>();
 
-  const [leafCollection, setLeafCollection] = useState<HAASNode[]>(questionnaire.leafs);
   const [isAtLeaf, setIsAtLeaf] = useState<boolean>(false);
   const [currentDepth, setCurrentDepth] = useState<number>(0);
 
@@ -41,6 +45,7 @@ export const HAASTreeProvider = ({ questionnaire, children }: TreeProviderProps)
 
   // TODO: Set on the rootQuestion
   const [activeNode, setActiveNode] = useState<HAASNode>(questionnaire.questions[0]);
+  useDebugValue(activeNode.id);
 
   // History of user's interaction
   const [historyStack, setHistoryStack] = useState<HAASEntry[]>([]);
@@ -75,6 +80,7 @@ export const HAASTreeProvider = ({ questionnaire, children }: TreeProviderProps)
 
       return true;
     });
+
     return candidates && candidates[0];
   };
 
@@ -90,6 +96,8 @@ export const HAASTreeProvider = ({ questionnaire, children }: TreeProviderProps)
       return nextNodeData.questionNode;
     }
 
+    // Means we are at leaf
+    setIsAtLeaf(true);
     return activeLeaf;
   };
 
@@ -105,6 +113,7 @@ export const HAASTreeProvider = ({ questionnaire, children }: TreeProviderProps)
     setCurrentDepth(depth => (depth += 1));
 
     const nextEdge: Edge = findNextEdge(activeNode, key) || null;
+
     const nextNode = await findNextNode(nextEdge);
     findNewActiveLeaf(nextNode);
 

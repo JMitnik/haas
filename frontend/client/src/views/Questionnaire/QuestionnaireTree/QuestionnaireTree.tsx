@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ThemeProvider } from 'styled-components/macro';
-import { Container, Loader } from '@haas/ui';
+import { Container, Loader, Div } from '@haas/ui';
 
 import useHAASTree from 'hooks/use-haas-tree';
 import useQuestionnaire from 'hooks/use-questionnaire';
@@ -12,6 +12,8 @@ import TextboxNode from './nodes/TextboxNode/TextboxNode';
 import SocialShareNode from './nodes/SocialShareNode/SocialShareNode';
 import RegisterNode from './nodes/RegisterNode/RegisterNode';
 import { GenericNodeProps } from './nodes/Node';
+import { Switch, useLocation, Route } from 'react-router-dom';
+import { AnimatePresence, motion } from 'framer-motion';
 
 const nodeMap: Record<string, (props: GenericNodeProps) => JSX.Element> = {
   SLIDER: SliderNode,
@@ -23,21 +25,9 @@ const nodeMap: Record<string, (props: GenericNodeProps) => JSX.Element> = {
 
 const QuestionnaireTree = () => {
   const { customer } = useQuestionnaire();
-  const [customTheme, setCustomTheme] = useState({});
+  const location = useLocation();
 
-  const { activeNode } = useHAASTree();
-
-  // Customize app for customer
-  useEffect(() => {
-    if (customer?.name) {
-      window.document.title = `${customer.name} | Powered by HAAS`;
-    }
-
-    if (customer?.settings) {
-      const customerTheme = { colors: customer?.settings?.colourSettings };
-      setCustomTheme(customerTheme);
-    }
-  }, [customer]);
+  const { activeNode, isAtLeaf } = useHAASTree();
 
   const renderActiveNode = () => {
     const Component = nodeMap[activeNode?.type || 'Slider'];
@@ -46,19 +36,35 @@ const QuestionnaireTree = () => {
       return <Loader />;
     }
 
-    return <Component />;
+    return <Component isLeaf={isAtLeaf} />;
   };
 
   if (!customer) return <Loader />;
 
   return (
-    <ThemeProvider theme={(theme: any) => makeCustomTheme(theme, customTheme)}>
-      <QuestionnaireContainer>
-        <NodeContainer useFlex flex="100%" alignItems="stretch">
-          {renderActiveNode()}
-        </NodeContainer>
-      </QuestionnaireContainer>
-    </ThemeProvider>
+    <QuestionnaireContainer>
+      <NodeContainer useFlex flex="100%" alignItems="stretch">
+        <AnimatePresence exitBeforeEnter initial={false}>
+          <Switch location={location} key={location.pathname}>
+            <Route path={`/c/:customerId/q/:questionnaireId/finished`}>
+              <motion.div>
+                <Div>Busy</Div>
+              </motion.div>
+            </Route>
+            <Route path={`/c/:customerId/q/:questionnaireId/e/:edgeId`}>
+              <motion.div exit={{ opacity: 0 }} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                {renderActiveNode()}
+              </motion.div>
+            </Route>
+            <Route path={`/c/:customerId/q/:questionnaireId`}>
+              <motion.div exit={{ opacity: 0 }} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                {renderActiveNode()}
+              </motion.div>
+            </Route>
+          </Switch>
+        </AnimatePresence>
+      </NodeContainer>
+    </QuestionnaireContainer>
   );
 };
 
