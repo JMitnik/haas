@@ -36,8 +36,7 @@ const SliderNode = ({ node }: SliderNodeProps) => {
       const formEntry = formatSliderEntry(getValues({ nest: true }));
 
       if (formEntry?.numberValue) {
-        // saveNodeEntry(formEntry);
-        goToChild(node, formEntry.numberValue);
+        goToChild(node, formEntry.numberValue, formEntry);
       }
     }
   };

@@ -31,9 +31,7 @@ const MultiChoiceNode = ({ node, isLeaf }: MultiChoiceNodeProps) => {
 
     if (validForm) {
       const formEntry = getValues({ nest: true });
-      goToChild(node, multiChoiceOption.value);
-      // treeDispatch.saveNodeEntry(formEntry);
-      // treeDispatch.goToChild(multiChoiceOption.value);
+      goToChild(node, multiChoiceOption.value, formEntry);
     }
   };
 

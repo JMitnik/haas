@@ -1,10 +1,10 @@
 import React, { useContext, ReactNode, useReducer } from 'react';
-import { HAASNode, HAASEntry, Questionnaire, HAASEdge } from './use-questionnaire';
+import { HAASNode, HAASEntry, Questionnaire, HAASEdge, HAASFormEntry } from './use-questionnaire';
 import { getQuestionNodeQuery } from '../queries/getQuestionNodeQuery';
 import client from '../config/apollo';
 
 interface TreeDispatchProps {
-  goToChild: (currentNode: HAASNode, key: string | number) => void;
+  goToChild: (currentNode: HAASNode, key: string | number, newNodeFormEntry: HAASFormEntry) => void;
 }
 
 interface TreeProviderProps {
@@ -12,15 +12,18 @@ interface TreeProviderProps {
   children: ReactNode;
 }
 
-type TreeAction =
-  | { type: 'addNodeEntry'; data: HAASEntry }
-  | { type: 'goToChild'; nextNode: HAASNode; nextEdge: HAASEdge };
+type TreeAction = {
+  type: 'goToChild';
+  nextNode: HAASNode;
+  nextEdge: HAASEdge;
+  newNodeFormEntry: HAASFormEntry;
+};
 
 interface TreeStateProps {
   historyStack: HAASEntry[];
   isAtLeaf: boolean;
   currentDepth: number;
-  activeNode: HAASNode | null;
+  activeNode: HAASNode;
   activeEdge: HAASEdge | null;
   activeLeaf: HAASNode;
 }
@@ -34,13 +37,20 @@ const treeReducer = (state: TreeStateProps, action: TreeAction) => {
         activeLeaf = action.nextNode.overrideLeaf;
       }
 
+      const newNodeEntry: HAASEntry = {
+        depth: state.currentDepth,
+        node: state.activeNode,
+        edge: state.activeEdge,
+        data: action.newNodeFormEntry
+      };
+
       return {
         currentDepth: state.currentDepth + 1,
         activeNode: action.nextNode,
         isAtLeaf: state.isAtLeaf,
         activeEdge: action.nextEdge,
         activeLeaf: activeLeaf,
-        historyStack: state.historyStack
+        historyStack: [...state.historyStack, newNodeEntry]
       };
     }
     default:
@@ -96,10 +106,15 @@ export const HAASTreeProvider = ({ questionnaire, children }: TreeProviderProps)
     historyStack: []
   });
 
-  const goToChild = async (currentNode: HAASNode, key: string | number) => {
+  const goToChild = async (
+    currentNode: HAASNode,
+    key: string | number,
+    nodeEntry: HAASFormEntry
+  ) => {
     const nextEdge = findNextEdge(currentNode, key);
     const nextNode = await findNextNode(nextEdge);
-    dispatch({ type: 'goToChild', nextNode, nextEdge });
+
+    dispatch({ type: 'goToChild', nextNode, nextEdge, newNodeFormEntry: nodeEntry });
   };
 
   return (

@@ -41,14 +41,16 @@ const Node = () => {
   return (
     <>
       <AnimatePresence>
-        <motion.div
-          key={activeNode?.id}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          initial={{ opacity: 1 }}
-        >
-          <NodeContainer>{activeNode && renderActiveNode({ node: activeNode })}</NodeContainer>
-        </motion.div>
+        <NodeContainer key={activeNode?.id}>
+          <motion.div
+            key={activeNode?.id}
+            initial={{ x: 300, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: -300, opacity: 0 }}
+          >
+            {activeNode && renderActiveNode({ node: activeNode })}
+          </motion.div>
+        </NodeContainer>
       </AnimatePresence>
     </>
   );

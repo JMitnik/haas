@@ -5,7 +5,7 @@ import AppProviders from './GlobalAppState';
 import AppContainer from './AppContainer';
 import { QuestionnaireProvider } from 'hooks/use-questionnaire';
 import CustomerOverview from './CustomerOverview/CustomerOverview';
-import Questionnaire from './Questionnaire/Questionnaire';
+import QuestionnaireTree from './QuestionnaireTree/QuestionnaireTree';
 
 const App = () => (
   <AppProviders>
@@ -14,7 +14,7 @@ const App = () => (
       <Switch>
         <Route path="/c/:customerId/q/:questionnaireId">
           <QuestionnaireProvider>
-            <Questionnaire />
+            <QuestionnaireTree />
           </QuestionnaireProvider>
         </Route>
         <Route path="/c/">
