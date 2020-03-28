@@ -1,12 +1,24 @@
 import styled, { css } from 'styled-components/macro';
-import { flexbox,
-  width, color, space, grid, GridProps, FlexboxProps, FlexProps, flexDirection, LayoutProps, layout } from 'styled-system';
+import {
+  flexbox,
+  width,
+  color,
+  space,
+  grid,
+  GridProps,
+  FlexboxProps,
+  FlexProps,
+  flexDirection,
+  LayoutProps,
+  layout
+} from 'styled-system';
 import { Div, GenericProps } from './Generics';
 
 interface ContainerProps extends GenericProps {}
 
 export const Container = styled(Div)<ContainerProps>`
   ${({ theme }) => css`
+    position: relative;
     margin: 0 auto;
     width: ${theme.containerWidth}px;
 
@@ -34,11 +46,12 @@ export const ColumnFlex = styled.div<ExtraFlexProps>`
       display: flex;
       flex-direction: column;
 
-      ${!!growChildren && css`
-        > * {
-          flex-grow: 1;
-        }
-      `}
+      ${!!growChildren &&
+        css`
+          > * {
+            flex-grow: 1;
+          }
+        `}
       ${flexbox}
       ${layout}
   `};

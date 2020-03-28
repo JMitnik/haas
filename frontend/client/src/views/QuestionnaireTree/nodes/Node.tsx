@@ -1,5 +1,4 @@
 import React, { useCallback } from 'react';
-import styled, { css } from 'styled-components/macro';
 import useHAASTree from 'hooks/use-haas-tree';
 import { HAASNode, HAASFormEntry } from 'hooks/use-questionnaire';
 import { Loader, Div } from '@haas/ui';
@@ -9,6 +8,7 @@ import TextboxNode from './TextboxNode/TextboxNode';
 import SocialShareNode from './SocialShareNode/SocialShareNode';
 import RegisterNode from './RegisterNode/RegisterNode';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ActiveNodeContainer, FloatingNodeContainer } from './NodeStyles';
 
 export interface GenericNodeProps {
   isLeaf?: boolean;
@@ -41,23 +41,22 @@ const Node = () => {
   return (
     <>
       <AnimatePresence>
-        <NodeContainer key={activeNode?.id}>
+        <FloatingNodeContainer key={activeNode?.id}>
           <motion.div
             key={activeNode?.id}
             initial={{ x: 300, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: -300, opacity: 0 }}
+            style={{ display: 'flex', width: '100%' }}
           >
-            {activeNode && renderActiveNode({ node: activeNode })}
+            <ActiveNodeContainer>
+              {activeNode && renderActiveNode({ node: activeNode })}
+            </ActiveNodeContainer>
           </motion.div>
-        </NodeContainer>
+        </FloatingNodeContainer>
       </AnimatePresence>
     </>
   );
 };
-
-const NodeContainer = styled(Div)`
-  position: absolute;
-`;
 
 export default Node;

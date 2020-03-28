@@ -9,6 +9,7 @@ export const QuestionnaireContainer = styled(Div)`
     position: relative;
     display: flex;
     width: 100%;
+    justify-content: center;
     align-items: stretch;
 
     ${theme.colors.primary &&
@@ -54,5 +55,3 @@ export const QuestionnaireContainer = styled(Div)`
     }
   `}
 `;
-
-export const NodeContainer = styled(Container)``;

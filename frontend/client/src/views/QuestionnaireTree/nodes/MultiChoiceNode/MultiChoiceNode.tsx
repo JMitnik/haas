@@ -1,9 +1,10 @@
 import React, { useEffect, FC } from 'react';
-import { H5, Flex, Button, Div, H2 } from '@haas/ui';
+import { H5, Flex, Button, Div, H2, ColumnFlex } from '@haas/ui';
 import useHAASTree from 'hooks/use-haas-tree';
 import { useForm } from 'react-hook-form';
 import { GenericNodeProps } from '../Node';
 import { HAASFormEntry, MultiChoiceOption } from 'hooks/use-questionnaire';
+import { MultiChoiceNodeContainer } from './MultiChoiceNodeStyles';
 
 type MultiChoiceNodeProps = GenericNodeProps;
 
@@ -36,35 +37,27 @@ const MultiChoiceNode = ({ node, isLeaf }: MultiChoiceNodeProps) => {
   };
 
   return (
-    <>
-      <form>
-        <Flex flexDirection="column" justifyContent="space-between">
-          <H2>{node.title}</H2>
-          {node.options?.map((multiChoiceOption: MultiChoiceOption, index: number) => (
-            <Div
+    <MultiChoiceNodeContainer>
+      <H2>{node.title}</H2>
+      <Div>
+        {node.options?.map((multiChoiceOption: MultiChoiceOption, index: number) => (
+          <Div useFlex justifyContent="center" key={index} padding={[2, 4]} flex={['100%', 1]}>
+            <Button
+              brand="primary"
+              type="button"
+              onClick={() => onSubmit(multiChoiceOption)}
               key={index}
-              fillChildren
-              padding={[2, 4]}
-              width={['100%', null]}
-              flex={['100%', 1]}
             >
-              <Button
-                brand="primary"
-                type="button"
-                onClick={() => onSubmit(multiChoiceOption)}
-                key={index}
-              >
-                <H5>
-                  {(multiChoiceOption?.publicValue?.length ?? 0) > 0
-                    ? multiChoiceOption?.publicValue
-                    : multiChoiceOption?.value}
-                </H5>
-              </Button>
-            </Div>
-          ))}
-        </Flex>
-      </form>
-    </>
+              <H5>
+                {(multiChoiceOption?.publicValue?.length ?? 0) > 0
+                  ? multiChoiceOption?.publicValue
+                  : multiChoiceOption?.value}
+              </H5>
+            </Button>
+          </Div>
+        ))}
+      </Div>
+    </MultiChoiceNodeContainer>
   );
 };
 

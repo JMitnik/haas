@@ -1,10 +1,11 @@
 import React from 'react';
-import { H1, Slider, ColumnFlex, Div } from '@haas/ui';
+import { H1, Slider, ColumnFlex, Div, H2 } from '@haas/ui';
 import { useForm } from 'react-hook-form';
 import useHAASTree from 'hooks/use-haas-tree';
 import { cleanInt } from 'utils/cleanInt';
 import { GenericNodeProps } from '../Node';
 import { HAASFormEntry } from 'hooks/use-questionnaire';
+import { SliderNodeContainer, SliderNodeValue } from './SliderNodeStyles';
 
 type SliderNodeProps = GenericNodeProps;
 
@@ -50,31 +51,30 @@ const SliderNode = ({ node }: SliderNodeProps) => {
   };
 
   return (
-    <form>
-      <Div pb={['60px', '120px']}>
-        <ColumnFlex height="100%" justifyContent="space-between" width={1}>
-          <H1
-            textAlign="center"
-            my="0"
-            fontSize={['5rem !important', '5rem !important']}
-            color="white"
-          >
-            {showValue()}
-          </H1>
-          <Slider
-            width={1}
-            name="numberValue"
-            onMouseUp={() => onSubmit()}
-            onTouchEnd={() => onSubmit()}
-            min={0}
-            max={100}
-            mt={4}
-            defaultValue={50}
-            ref={register}
-          />
-        </ColumnFlex>
+    <SliderNodeContainer>
+      <Div>
+        <H2>{node.title}</H2>
+        <SliderNodeValue
+          textAlign="center"
+          my="0"
+          fontSize={['5rem !important', '5rem !important']}
+          color="white"
+        >
+          {showValue()}
+        </SliderNodeValue>
       </Div>
-    </form>
+      <Slider
+        width={1}
+        name="numberValue"
+        onMouseUp={() => onSubmit()}
+        onTouchEnd={() => onSubmit()}
+        min={0}
+        max={100}
+        mt={4}
+        defaultValue={50}
+        ref={register}
+      />
+    </SliderNodeContainer>
   );
 };
 
