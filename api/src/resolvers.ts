@@ -1,10 +1,10 @@
 import { forwardTo } from 'prisma-binding';
 import crypto from 'crypto';
+import _ from 'lodash';
 import { QueryResolvers, MutationResolvers } from './generated/resolver-types';
 import cleanInt from './utils/cleanInt';
-import _ from 'lodash';
 import { prisma, ID_Input, Questionnaire } from './generated/prisma-client/index';
-import seedCompany, { seedQuestionnare, seedFreshCompany } from '../data/seeds/make-company';
+import { seedQuestionnare, seedFreshCompany } from '../data/seeds/make-company';
 
 const deleteFullCustomerNode = async (parent: any, args:any) => {
   const { id } : { id: ID_Input} = args;

@@ -1,6 +1,6 @@
 import { prisma } from '../../src/generated/prisma-client/index';
 
-import seedCompany, { seedFreshCompany } from './make-company';
+import { seedFreshCompany } from './make-company';
 
 const CUSTOMER = 'Starbucks';
 
