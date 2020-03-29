@@ -149,6 +149,40 @@ export const SliderContainer = styled.div`
         position: relative;
       }
 
+      /* Style the thumb */
+      /* TODO: Enable styles for firefox and IE*/
+      &::-moz-range-thumb {
+        -webkit-appearance: none;
+        height: 80px;
+        width: 80px;
+
+        /* Ensure that the bunny is on top of the bar */
+        transform: translateY(-100%);
+
+        background-image: url('/logo-haas.svg');
+        background-size: contain;
+        background-repeat: no-repeat;
+        cursor: pointer;
+        position: relative;
+      }
+
+      /* Style the thumb */
+      /* TODO: Enable styles for firefox and IE*/
+      &::-ms-thumb {
+        -webkit-appearance: none;
+        height: 80px;
+        width: 80px;
+
+        /* Ensure that the bunny is on top of the bar */
+        transform: translateY(-100%);
+
+        background-image: url('/logo-haas.svg');
+        background-size: contain;
+        background-repeat: no-repeat;
+        cursor: pointer;
+        position: relative;
+      }
+
       &::-webkit-slider-runnable-track {
         width: 100%;
         margin-top: 80px;
