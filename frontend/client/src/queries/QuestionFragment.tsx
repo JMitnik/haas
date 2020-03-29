@@ -9,8 +9,8 @@ export const QuestionFragment = gql`
       nodeId
       type
       title
-		}
-    questionType
+    }
+    type
     edgeChildren {
       id
       conditions {
@@ -29,8 +29,8 @@ export const QuestionFragment = gql`
       }
     }
     options {
-        value
-        publicValue
+      value
+      publicValue
     }
   }
 `;

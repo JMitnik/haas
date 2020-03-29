@@ -1,6 +1,6 @@
 import React, { Component, FC } from 'react';
 import { Link } from 'react-router-dom';
-import styled, { css } from 'styled-components';
+import styled, { css } from 'styled-components/macro';
 import { Settings } from 'react-feather';
 
 import { Div, H3, H4 } from '@haas/ui';

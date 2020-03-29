@@ -18,7 +18,7 @@ type QuestionNode {
     title: String!
     branchVal: String
     isRoot: Boolean! @default(value: false)
-    questionType: NodeType!
+    type: NodeType!
     overrideLeaf: LeafNode
     options: [QuestionOption] @relation (link: TABLE name: "QuestionNodeOptions", onDelete: CASCADE)
     children: [QuestionNode]

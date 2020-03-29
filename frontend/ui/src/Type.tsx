@@ -1,4 +1,4 @@
-import styled, { css } from 'styled-components';
+import styled, { css } from 'styled-components/macro';
 import { TypographyProps, typography, space, SpaceProps, color, ColorProps } from 'styled-system';
 
 interface GenericTypeProps extends TypographyProps, SpaceProps, ColorProps {}
@@ -14,10 +14,6 @@ export const Paragraph = styled(GenericType).attrs({ as: 'p' })``;
 export const H1 = styled(GenericType).attrs({ as: 'h1' })`
   ${({ theme }) => css`
     font-size: ${theme.fontSizes[5]}px;
-
-    @media ${theme.media.mob} {
-      font-size: calc(1.5rem + 5vw);
-    }
   `}
 `;
 

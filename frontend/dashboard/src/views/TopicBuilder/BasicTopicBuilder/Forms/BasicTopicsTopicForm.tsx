@@ -1,7 +1,7 @@
 import React from 'react';
 import { gql, ApolloError } from 'apollo-boost';
 import { useForm } from 'react-hook-form';
-import styled from 'styled-components';
+import styled from 'styled-components/macro';
 
 import { CheckBoxWrapper, CheckBox, CheckBoxLabel, GridForm, H4 } from '@haas/ui';
 import { useMutation } from '@apollo/react-hooks';

@@ -5,7 +5,7 @@ import { gql, ApolloError } from 'apollo-boost';
 import { ChevronRight, Plus, X } from 'react-feather';
 import { H2, H3, H4, Grid, Flex, Icon, Label, Div, Card, CardBody, CardFooter, Container } from '@haas/ui';
 import { Link, useHistory } from 'react-router-dom';
-import styled, { css } from 'styled-components';
+import styled, { css } from 'styled-components/macro';
 import { Query, Questionnaire, Customer } from '../types.d';
 
 import { getCustomerQuery } from '../queries/getCustomerQuery';

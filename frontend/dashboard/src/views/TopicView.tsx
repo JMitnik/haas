@@ -2,7 +2,7 @@
 import React, { useState, Dispatch, SetStateAction } from 'react';
 import { useQuery } from '@apollo/react-hooks';
 import { H2, Flex, Muted, Loader, Grid, Div, H5 } from '@haas/ui';
-import styled, { css } from 'styled-components';
+import styled, { css } from 'styled-components/macro';
 import { useParams, Switch, Route, useHistory } from 'react-router-dom';
 
 import getQuestionnaireData from '../queries/getQuestionnaireData';

@@ -1,4 +1,4 @@
-import styled, { css } from 'styled-components';
+import styled, { css } from 'styled-components/macro';
 import React, { FC } from 'react';
 import { Link } from 'react-router-dom';
 import { Settings } from 'react-feather';
