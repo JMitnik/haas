@@ -1,5 +1,5 @@
-import React, { useEffect, FC } from 'react';
-import { H5, Flex, Button, Div, H2, ColumnFlex } from '@haas/ui';
+import React, { useEffect } from 'react';
+import { H5, Div, H2 } from '@haas/ui';
 import useHAASTree from 'hooks/use-haas-tree';
 import { useForm } from 'react-hook-form';
 import { GenericNodeProps } from '../Node';
@@ -9,7 +9,7 @@ import { ClientButton } from 'components/Buttons';
 
 type MultiChoiceNodeProps = GenericNodeProps;
 
-const MultiChoiceNode = ({ node, isLeaf }: MultiChoiceNodeProps) => {
+const MultiChoiceNode = ({ node }: MultiChoiceNodeProps) => {
   const {
     treeDispatch: { goToChild }
   } = useHAASTree();

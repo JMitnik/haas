@@ -4,6 +4,7 @@ import { Button, H5 } from '@haas/ui';
 export const ClientButton = styled(Button)`
   ${({ theme, isActive }) => css`
     width: 400px;
+    border: none;
     max-width: 100%;
     background: rgba(0, 0, 0, 0.2);
     position: relative;
@@ -29,11 +30,6 @@ export const ClientButton = styled(Button)`
 
     &:hover {
       background: rgba(0, 0, 0, 0.4);
-
-      &::after {
-        background: rgba(0, 0, 0, 0.3);
-        transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
-      }
     }
 
     &:focus {
@@ -46,7 +42,11 @@ export const ClientButton = styled(Button)`
         background: white;
 
         &:hover {
-          background: rgba(1, 1, 1, 1);
+          background: rgb(255, 255, 255, 0.9);
+        }
+
+        &:focus {
+          background: rgb(255, 255, 255, 0.8);
         }
 
         &::after {

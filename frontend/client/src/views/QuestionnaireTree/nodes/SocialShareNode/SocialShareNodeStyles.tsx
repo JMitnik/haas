@@ -1,14 +1,21 @@
 import { Div } from '@haas/ui';
-import styled from 'styled-components/macro';
+import styled, { css } from 'styled-components/macro';
 
 export const ShareItem = styled(Div)`
-  border-radius: 100%;
-  padding: 16px;
-  display: flex;
-  margin: 5px;
+  ${({ theme, bg }) => css`
+    border-radius: 100%;
+    padding: 13px;
+    display: flex;
+    margin-right: ${theme.gutter}px;
+    cursor: pointer;
 
-  svg {
-    height: 50px;
-    width: 50px;
-  }
+    &:hover {
+      background: ${String(bg)};
+    }
+
+    svg {
+      height: 30px;
+      width: 30px;
+    }
+  `}
 `;
