@@ -1,17 +1,17 @@
-import { forwardTo } from "prisma-binding";
-import crypto from "crypto";
-import _ from "lodash";
-import { QueryResolvers, MutationResolvers } from "./generated/resolver-types";
-import cleanInt from "./utils/cleanInt";
+import { forwardTo } from 'prisma-binding';
+import crypto from 'crypto';
+import _ from 'lodash';
+import { QueryResolvers, MutationResolvers } from './generated/resolver-types';
+import cleanInt from './utils/cleanInt';
 import {
   prisma,
   ID_Input,
-  Questionnaire
-} from "./generated/prisma-client/index";
+  Questionnaire,
+} from './generated/prisma-client/index';
 import seedCompany, {
   seedQuestionnare,
-  seedFreshCompany
-} from "../data/seeds/make-company";
+  seedFreshCompany,
+} from '../data/seeds/make-company';
 
 const deleteFullCustomerNode = async (parent: any, args: any) => {
   const { id }: { id: ID_Input } = args;
@@ -32,14 +32,14 @@ const createNewCustomerMutation = async (parent: any, args: any) => {
         logoUrl: logo,
         colourSettings: {
           create: {
-            primary: "#4287f5"
-          }
-        }
-      }
+            primary: '#4287f5',
+          },
+        },
+      },
     },
     questionnaires: {
-      create: []
-    }
+      create: [],
+    },
   });
 
   if (isSeed) {
@@ -51,7 +51,7 @@ const createNewCustomerMutation = async (parent: any, args: any) => {
 
 const createNewQuestionnaire = async (
   parent: any,
-  args: any
+  args: any,
 ): Promise<Questionnaire> => {
   const { customerId, title, description, publicTitle, isSeed } = args;
   let questionnaire = null;
@@ -63,24 +63,24 @@ const createNewQuestionnaire = async (
       return seedQuestionnare(customerId, customer?.name, title, description);
     }
 
-    console.log("Cant find customer with specified ID while seeding");
+    console.log('Cant find customer with specified ID while seeding');
   }
 
   questionnaire = await prisma.createQuestionnaire({
     customer: {
       connect: {
-        id: customerId
-      }
+        id: customerId,
+      },
     },
     leafs: {
-      create: []
+      create: [],
     },
     title,
     publicTitle,
     description,
     questions: {
-      create: []
-    }
+      create: [],
+    },
   });
 
   return questionnaire;
@@ -93,7 +93,7 @@ const getQuestionnaireAggregatedData = async (parent: any, args: any) => {
   const customerName = (await prisma.questionnaire({ id: topicId }).customer())
     .name;
   const questionnaire: Questionnaire | null = await prisma.questionnaire({
-    id: topicId
+    id: topicId,
   });
 
   if (questionnaire) {
@@ -102,55 +102,50 @@ const getQuestionnaireAggregatedData = async (parent: any, args: any) => {
     const questionNodes = await prisma.questionNodes({
       where: {
         questionnaire: {
-          id: topicId
-        }
-      }
+          id: topicId,
+        },
+      },
     });
 
-    const questionNodeIds = questionNodes.map(qNode => qNode.id);
+    const questionNodeIds = questionNodes.map((qNode) => qNode.id);
 
-    const nodeEntries =
-      (await prisma.nodeEntries({
-        where: {
-          relatedNode: {
-            id_in: questionNodeIds
-          }
-        }
-      })) || [];
+    const nodeEntries = (await prisma.nodeEntries({
+      where: {
+        relatedNode: {
+          id_in: questionNodeIds,
+        },
+      },
+    })) || [];
 
-    const aggregatedNodeEntries =
-      (await Promise.all(
-        nodeEntries.map(async ({ id }) => {
-          const values = await prisma.nodeEntry({ id }).values();
-          const nodeEntry = await prisma.nodeEntry({ id });
-          const sessionId = (await prisma.nodeEntry({ id }).session()).id;
+    const aggregatedNodeEntries = (await Promise.all(
+      nodeEntries.map(async ({ id }) => {
+        const values = await prisma.nodeEntry({ id }).values();
+        const nodeEntry = await prisma.nodeEntry({ id });
+        const sessionId = (await prisma.nodeEntry({ id }).session()).id;
 
-          const mappedResult = {
-            sessionId,
-            createdAt: nodeEntry?.creationDate,
-            value: values[0].numberValue ? values[0].numberValue : -1
-          };
-          return mappedResult;
-        })
-      )) || [];
+        const mappedResult = {
+          sessionId,
+          createdAt: nodeEntry?.creationDate,
+          value: values[0].numberValue ? values[0].numberValue : -1,
+        };
+        return mappedResult;
+      }),
+    )) || [];
 
-    const filterNodes =
-      aggregatedNodeEntries.filter(node => node?.value !== -1) || [];
+    const filterNodes = aggregatedNodeEntries.filter((node) => node?.value !== -1) || [];
 
-    const filteredNodeData = filterNodes.map(node => node?.value) || [];
+    const filteredNodeData = filterNodes.map((node) => node?.value) || [];
 
     const nrEntries = filteredNodeData.reduce(
       (total = 0, previousValue) => total + previousValue,
-      0
+      0,
     );
 
-    const averageSliderResult =
-      (
-        filteredNodeData.length > 0 && nrEntries / filteredNodeData.length
-      ).toString() || "N/A";
+    const averageSliderResult = (
+      filteredNodeData.length > 0 && nrEntries / filteredNodeData.length
+    ).toString() || 'N/A';
 
-    const orderedTimelineEntries =
-      _.orderBy(filterNodes, filterNode => filterNode.createdAt, "desc") || [];
+    const orderedTimelineEntries = _.orderBy(filterNodes, (filterNode) => filterNode.createdAt, 'desc') || [];
 
     return {
       customerName,
@@ -160,7 +155,7 @@ const getQuestionnaireAggregatedData = async (parent: any, args: any) => {
       creationDate,
       updatedAt,
       average: averageSliderResult,
-      totalNodeEntries: filterNodes.length
+      totalNodeEntries: filterNodes.length,
     };
   }
 
@@ -169,20 +164,20 @@ const getQuestionnaireAggregatedData = async (parent: any, args: any) => {
 };
 
 const queryResolvers = {
-  questionNode: forwardTo("db"),
-  questionNodes: forwardTo("db"),
-  questionnaire: forwardTo("db"),
-  questionnaires: forwardTo("db"),
-  customers: forwardTo("db"),
-  edges: forwardTo("db"),
-  nodeEntryValues: forwardTo("db"),
-  nodeEntries: forwardTo("db"),
-  sessions: forwardTo("db"),
-  session: forwardTo("db"),
+  questionNode: forwardTo('db'),
+  questionNodes: forwardTo('db'),
+  questionnaire: forwardTo('db'),
+  questionnaires: forwardTo('db'),
+  customers: forwardTo('db'),
+  edges: forwardTo('db'),
+  nodeEntryValues: forwardTo('db'),
+  nodeEntries: forwardTo('db'),
+  sessions: forwardTo('db'),
+  session: forwardTo('db'),
   // TODO: Rename
   getQuestionnaireData: getQuestionnaireAggregatedData,
-  nodeEntry: forwardTo("db"),
-  newSessionId: () => crypto.randomBytes(16).toString("base64")
+  nodeEntry: forwardTo('db'),
+  newSessionId: () => crypto.randomBytes(16).toString('base64'),
 };
 
 const mutationResolvers = {
@@ -202,13 +197,13 @@ const mutationResolvers = {
         ...maybeCreateEdgeChild(entry),
         session: {
           connect: {
-            id: session.id
-          }
+            id: session.id,
+          },
         },
         relatedNode: {
           connect: {
-            id: entry.nodeId
-          }
+            id: entry.nodeId,
+          },
         },
         depth: entry.depth,
         values: {
@@ -216,32 +211,32 @@ const mutationResolvers = {
             numberValue: cleanInt(entry.data.numberValue),
             textValue: entry.data.textValue,
             multiValues: {
-              create: entry.data.multiValues
-            }
-          }
-        }
+              create: entry.data.multiValues,
+            },
+          },
+        },
       });
     });
-    return "Success!";
+    return 'Success!';
   },
   createNewCustomer: createNewCustomerMutation,
   deleteFullCustomer: deleteFullCustomerNode,
   createNewQuestionnaire,
-  deleteQuestionnaire: forwardTo("db")
+  deleteQuestionnaire: forwardTo('db'),
 };
 
 const resolvers = {
   Query: {
-    ...queryResolvers
+    ...queryResolvers,
   },
   Mutation: {
-    ...mutationResolvers
+    ...mutationResolvers,
   },
   Node: {
     __resolveType(obj: any, ctx: any, info: any) {
       return obj.__typename;
-    }
-  }
+    },
+  },
 };
 
 export default resolvers;
