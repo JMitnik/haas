@@ -6,12 +6,14 @@ export const TextboxContainer = styled(ActiveNodeContainer)`
   ${({ theme }) => css`
     height: 100%;
 
-    ${H2} {
-      font-size: 1.2em;
-    }
+    @media ${theme.media.mob} {
+      ${H2} {
+        font-size: 1.2em;
+      }
 
-    ${H3} {
-      font-size: 1em;
+      ${H3} {
+        font-size: 1em;
+      }
     }
   `}
 `;

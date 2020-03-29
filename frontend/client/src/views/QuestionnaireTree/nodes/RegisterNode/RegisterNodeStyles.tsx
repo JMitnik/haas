@@ -6,8 +6,11 @@ export const RegisterNodeContainer = styled(ActiveNodeContainer)`
   ${({ theme }) => css`
     height: 100%;
 
-    ${H2} {
-      font-size: 1.2em;
+
+    @media ${theme.media.mob} {
+      ${H2} {
+        font-size: 1.2em;
+      }
     }
 
     input {
