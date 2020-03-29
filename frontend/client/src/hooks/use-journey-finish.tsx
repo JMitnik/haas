@@ -14,7 +14,7 @@ const useJourneyFinish = () => {
   const history = useHistory();
   const location = useLocation();
 
-  //  Only fires if current is set to true (which only happens)
+  //  Only fires if a user arrives as a node with no more interaction (FinishNode and ShareNode)
   useEffect(() => {
     console.log('submitting');
     submitForm({
