@@ -204,7 +204,7 @@ export const connectQuestionsToQuestionnaire = async (questionnaireId: string,
   });
 };
 
-const standardOptions = [{ value: 'Facilities' }, { value: 'Website/Mobile app' }, { value: 'Product/Services' }, { value: 'Customer support' }];
+const standardOptions = [{ value: 'Facilities' }, { value: 'Website/Mobile app' }, { value: 'Product/Services' }, { value: 'Customer Support' }];
 const facilityOptions = [{ value: 'Cleanliness' }, { value: 'Atmosphere' }, { value: 'Location' }, { value: 'Other' }];
 const websiteOptions = [{ value: 'Design' }, { value: 'Functionality' }, { value: 'Informative' }, { value: 'Other' }];
 const customerSupportOptions = [{ value: 'Friendliness' }, { value: 'Competence' }, { value: 'Speed' }, { value: 'Other' }];
