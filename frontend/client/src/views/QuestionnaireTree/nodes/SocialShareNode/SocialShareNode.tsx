@@ -6,6 +6,7 @@ import uploadEntryMutation from 'mutations/UploadEntryMutation';
 import useHAASTree from 'hooks/use-haas-tree';
 import { ShareItem } from './SocialShareNodeStyles';
 import { GenericNodeProps } from '../Node';
+import useJourneyFinish from 'hooks/use-journey-finish';
 
 type SocialShareNodeProps = GenericNodeProps;
 
@@ -14,22 +15,7 @@ const SocialShareNode = ({ node, isLeaf }: SocialShareNodeProps) => {
   const {
     treeState: { historyStack }
   } = useHAASTree();
-
-  useEffect(() => {
-    if (historyStack && submitForm && isLeaf) {
-      submitForm({
-        variables: {
-          uploadUserSessionInput: {
-            entries: historyStack.map(nodeEntry => {
-              const { node, edge, ...data } = nodeEntry;
-
-              return { ...data, nodeId: node.id, edgeId: edge?.id };
-            })
-          }
-        }
-      });
-    }
-  }, [historyStack, submitForm, isLeaf]);
+  const finish = useJourneyFinish();
 
   return (
     <>

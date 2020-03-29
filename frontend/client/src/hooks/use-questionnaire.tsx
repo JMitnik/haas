@@ -9,9 +9,13 @@ export interface HAASNodeConditions {
   matchValue?: string;
 }
 
-type HAASQuestionNodeType = 'SLIDER' | 'MULTI_CHOICE' | 'text-box';
-type HAASLeafType = 'textbox' | 'social-share' | 'registration' | 'phone';
-type HAASQuestionType = HAASQuestionNodeType | HAASLeafType;
+type HAASQuestionType =
+  | 'SLIDER'
+  | 'MULTI_CHOICE'
+  | 'TEXTBOX'
+  | 'SOCIAL-SHARE'
+  | 'REGISTRATION'
+  | 'FINISH';
 
 export interface MultiChoiceOption {
   value: string;
@@ -34,15 +38,15 @@ export interface HAASEdge {
 
 export interface HAASNode {
   id: string;
-  nodeId?: number;
   title: string;
+  type: HAASQuestionType;
+  children: Array<HAASNode>;
+  edgeChildren: Array<Edge>;
+  nodeId?: number;
   branchVal?: string;
   conditions?: [HAASNodeConditions];
-  type: HAASQuestionType;
   overrideLeaf?: HAASNode;
   options?: [MultiChoiceOption];
-  children: [HAASNode];
-  edgeChildren: [Edge];
 }
 
 export interface HAASEntry {

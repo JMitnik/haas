@@ -16,17 +16,18 @@ type RegisterNodeProps = GenericNodeProps;
 
 const RegisterNode = ({ node, isLeaf }: RegisterNodeProps) => {
   const { register, getValues, formState } = useForm();
-
-  const { finishedRef } = useJourneyFinish({ isLeaf, useFinishPage: true });
+  const {
+    treeDispatch: { goToChild }
+  } = useHAASTree();
 
   const onSubmit = () => {
-    console.log(formState);
     const formEntry = getValues({ nest: true });
-    // saveNodeEntry(formEntry);
-    finishedRef.current = true;
+    goToChild(node, null, formEntry);
   };
 
-  console.log('formState', formState);
+  const touched = () => {
+    return 'multiValues' in formState.touched;
+  };
 
   return (
     <RegisterNodeContainer>
@@ -52,7 +53,7 @@ const RegisterNode = ({ node, isLeaf }: RegisterNodeProps) => {
           </InputGroup>
         </Grid>
         <Div mt={4}>
-          <ClientButton onClick={() => onSubmit()}>
+          <ClientButton isActive={touched()} onClick={() => onSubmit()}>
             <ButtonIcon>
               <CheckCircle />
             </ButtonIcon>

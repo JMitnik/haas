@@ -22,11 +22,13 @@ const TextboxNode = ({ isLeaf, node }: TextboxNodeProps) => {
   const finishedRef = useRef(false);
   const { register, getValues, formState } = useForm();
   const [submitForm] = useMutation(uploadEntryMutation, {});
+  const {
+    treeDispatch: { goToChild }
+  } = useHAASTree();
 
   const onSubmit = () => {
     const formEntry = getValues({ nest: true });
-    // saveNodeEntry(formEntry);
-    finishedRef.current = true;
+    goToChild(node, null, formEntry);
   };
 
   return (

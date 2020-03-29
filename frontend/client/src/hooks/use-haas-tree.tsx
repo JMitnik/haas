@@ -4,7 +4,11 @@ import { getQuestionNodeQuery } from '../queries/getQuestionNodeQuery';
 import client from '../config/apollo';
 
 interface TreeDispatchProps {
-  goToChild: (currentNode: HAASNode, key: string | number, newNodeFormEntry: HAASFormEntry) => void;
+  goToChild: (
+    currentNode: HAASNode,
+    key: string | number | null,
+    newNodeFormEntry: HAASFormEntry
+  ) => void;
 }
 
 interface TreeProviderProps {
@@ -12,28 +16,41 @@ interface TreeProviderProps {
   children: ReactNode;
 }
 
-type TreeAction = {
-  type: 'goToChild';
-  nextNode: HAASNode | null;
-  nextEdge: HAASEdge;
-  newNodeFormEntry: HAASFormEntry;
-};
+type TreeAction =
+  | {
+      type: 'goToChild';
+      nextNode: HAASNode | null;
+      nextEdge: HAASEdge | null;
+      newNodeFormEntry: HAASFormEntry;
+    }
+  | {
+      type: 'finish';
+    };
 
 interface TreeStateProps {
   historyStack: HAASEntry[];
   isAtLeaf: boolean;
+  isFinished: boolean;
   currentDepth: number;
   activeNode: HAASNode;
   activeEdge: HAASEdge | null;
   activeLeaf: HAASNode;
 }
 
+const makeFinishedNode: () => HAASNode = () => ({
+  id: '-1',
+  children: [],
+  edgeChildren: [],
+  title: 'Thank you for answering!',
+  type: 'FINISH'
+});
+
 /**
  * Reduces the tree state
  * @param state
  * @param action
  */
-const treeReducer = (state: TreeStateProps, action: TreeAction) => {
+const treeReducer = (state: TreeStateProps, action: TreeAction): TreeStateProps => {
   switch (action.type) {
     case 'goToChild': {
       // Construct new node entry from form-entry
@@ -44,26 +61,39 @@ const treeReducer = (state: TreeStateProps, action: TreeAction) => {
         data: action.newNodeFormEntry
       };
 
+      const nextDepth = state.currentDepth + 1;
+
       // Check if next state has leaf to override
       let activeLeaf = state.activeLeaf;
       if (action.nextNode?.overrideLeaf) {
         activeLeaf = action.nextNode.overrideLeaf;
       }
 
-      // Check if we are at leaf
-      let isAtLeaf = state.isAtLeaf;
       let nextNode = action.nextNode;
+
+      // First check if we are already at leaf
+      // if so override with final leaf, and
+      let isFinished = state.isFinished;
+      let isAtLeaf = state.isAtLeaf;
+      if (isAtLeaf) {
+        nextNode = makeFinishedNode();
+        isFinished = true;
+      }
+
+      // If not, check if we arrive at leaf
+      // if so override with leaf
       if (!nextNode) {
         nextNode = state.activeLeaf;
         isAtLeaf = true;
       }
 
       return {
-        currentDepth: state.currentDepth + 1,
+        currentDepth: nextDepth,
         activeNode: nextNode,
+        isFinished,
         isAtLeaf,
         activeEdge: action.nextEdge,
-        activeLeaf: activeLeaf,
+        activeLeaf,
         historyStack: [...state.historyStack, newNodeEntry]
       };
     }
@@ -75,7 +105,9 @@ const treeReducer = (state: TreeStateProps, action: TreeAction) => {
 /**
  * Finds the first outgoing edge from a parent that satisfies the key.
  */
-const findNextEdge = (parent: HAASNode, key: string | number) => {
+const findNextEdge = (parent: HAASNode, key: string | number | null) => {
+  if (!key) return null;
+
   const candidates = parent?.edgeChildren?.filter(edge => {
     if (parent.type === 'SLIDER') {
       if (edge?.conditions?.[0]?.renderMin && key < edge?.conditions?.[0].renderMin) {
@@ -112,6 +144,8 @@ const findNextNode = async (edge: HAASEdge | null) => {
 
     return nextNodeData.questionNode;
   }
+
+  return null;
 };
 
 export const HAASTreeStateContext = React.createContext({} as TreeStateProps);
@@ -125,12 +159,13 @@ export const HAASTreeProvider = ({ questionnaire, children }: TreeProviderProps)
     activeLeaf: questionnaire.leafs[0],
     activeEdge: null,
     isAtLeaf: false,
+    isFinished: false,
     historyStack: []
   });
 
   const goToChild = async (
     currentNode: HAASNode,
-    key: string | number,
+    key: string | number | null,
     nodeEntry: HAASFormEntry
   ) => {
     const nextEdge = findNextEdge(currentNode, key);

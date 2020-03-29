@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 import useHAASTree from 'hooks/use-haas-tree';
 import { HAASNode, HAASFormEntry } from 'hooks/use-questionnaire';
 import { Loader, Div } from '@haas/ui';
@@ -9,6 +9,7 @@ import SocialShareNode from './SocialShareNode/SocialShareNode';
 import RegisterNode from './RegisterNode/RegisterNode';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ActiveNodeContainer, FloatingNodeContainer } from './NodeStyles';
+import FinishNode from './FinishNode/FinishNode';
 
 export interface GenericNodeProps {
   isLeaf?: boolean;
@@ -20,7 +21,8 @@ const nodeMap: Record<string, (props: GenericNodeProps) => JSX.Element> = {
   MULTI_CHOICE: MultiChoiceNode,
   TEXTBOX: TextboxNode,
   SOCIAL_SHARE: SocialShareNode,
-  REGISTRATION: RegisterNode
+  REGISTRATION: RegisterNode,
+  FINISH: FinishNode
 };
 
 const Node = () => {
