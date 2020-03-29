@@ -8,5 +8,5 @@ type Questionnaire {
     updatedAt: DateTime @updatedAt
     rootQuestion: QuestionNode @relation(link: TABLE, name: "QuestionnaireRootQuestion")
     questions: [QuestionNode] @relation(link: TABLE, name: "QuestionnaireToQuestions", onDelete: CASCADE)
-    leafs: [LeafNode!] @relation(link: TABLE, name: "QuestionnaireLeafs", onDelete: CASCADE)
+    leafs: [QuestionNode!] @relation(link: TABLE, name: "QuestionnaireToLeafNodes", onDelete: CASCADE)
 }

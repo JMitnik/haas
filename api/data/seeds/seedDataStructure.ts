@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import { NodeType } from '../../src/generated/prisma-client/index';
 
 export const multiChoiceType: NodeType = 'MULTI_CHOICE';
@@ -540,6 +541,7 @@ export const leafNodes = [
   {
     title:
       'Thank you for your feedback on our website. We hope to hear from you again!',
+    type: socialShareType,
   },
   {
     title:

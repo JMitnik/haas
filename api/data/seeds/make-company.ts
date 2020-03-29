@@ -1,17 +1,26 @@
-import { prisma, NodeType,
-  QuestionNode, LeafNode, Questionnaire, Maybe, ID_Input } from '../../src/generated/prisma-client/index';
-import { leafNodes, sliderType, standardRootChildren,
-  getStandardEdgeData, standardSubChildren } from './seedDataStructure';
+import {
+  prisma,
+  NodeType,
+  QuestionNode,
+  Questionnaire,
+} from '../../src/generated/prisma-client/index';
+import {
+  leafNodes,
+  sliderType,
+  standardRootChildren,
+  getStandardEdgeData,
+  standardSubChildren,
+} from './seedDataStructure';
 import { Customer } from '../../src/generated/resolver-types';
 
 interface LeafNodeDataEntryProps {
   title: string;
-  type?: NodeType;
+  type: NodeType;
 }
 
 interface LeafNodeChildrenProps {
   value: string;
-  type: NodeType
+  type: NodeType;
 }
 
 interface standardSubChildrenEntry {
@@ -23,7 +32,7 @@ interface standardSubChildrenEntry {
 }
 
 interface StandardRootChildWithLeafsProps {
-  overrideLeaf: LeafNode | null;
+  overrideLeaf: QuestionNode | null;
   children: any;
   title: string;
   type: NodeType;
@@ -33,17 +42,21 @@ interface StandardRootChildWithLeafsProps {
 interface StandardRootChildEntryProps {
   title: string;
   type: NodeType;
-  overrideLeaf?: LeafNode;
+  overrideLeaf?: QuestionNode;
   overrideLeafContains?: string;
   options: Array<string>;
   children: any;
 }
 
-export const createTemplateLeafNodes = async (leafNodesArray: Array<LeafNodeDataEntryProps>) => {
-  const leafs = await Promise.all(leafNodesArray.map(async (leafNode) => prisma.createLeafNode({
-    title: leafNode.title,
-    type: leafNode?.type,
-  })));
+export const createTemplateLeafNodes = async (
+  leafNodesArray: Array<LeafNodeDataEntryProps>,
+) => {
+  const leafs = await Promise.all(
+    leafNodesArray.map(async (leafNode) => prisma.createQuestionNode({
+      title: leafNode.title,
+      type: leafNode.type,
+    })),
+  );
 
   return leafs;
 };
@@ -54,12 +67,18 @@ export const createStandardSubChildrenWithLeaves = async (
 ) => {
   const standardSubChildrenWithLeafs = await Promise.all(
     standardSubChildrenArray.map(async (rootChild) => {
-      const subleafs = await prisma.leafNodes({
+      const subleafs = await prisma.questionNodes({
         where: {
           title_contains: rootChild.overrideLeafContains,
           AND: {
-            id_in: await Promise.all((await
-            prisma.questionnaire({ id: questionnaireId }).leafs()).map((leaf) => leaf.id)),
+            id_in: await Promise.all(
+              (await prisma.questionnaire({ id: questionnaireId }).leafs()).map(
+                (leaf) => leaf.id,
+              ),
+            ),
+            AND: {
+              isLeaf: true,
+            },
           },
         },
       });
@@ -90,14 +109,20 @@ export const createStandardRootChildrenWithLeaves = async (
   standardRootChildrenArray: Array<StandardRootChildEntryProps>,
   standardSubChildrenWithLeafs: any,
 ) => {
-  const standardRootChildrenWithLeafs = await Promise.all(standardRootChildrenArray
-    .map(async (rootChild) => {
-      const subleafs = await prisma.leafNodes({
+  const standardRootChildrenWithLeafs = await Promise.all(
+    standardRootChildrenArray.map(async (rootChild) => {
+      const subleafs = await prisma.questionNodes({
         where: {
           title_contains: rootChild.overrideLeafContains,
           AND: {
-            id_in: await Promise.all((await prisma.questionnaire({ id: questionnaireId })
-              .leafs()).map((leaf) => leaf.id)),
+            id_in: await Promise.all(
+              (await prisma.questionnaire({ id: questionnaireId }).leafs()).map(
+                (leaf) => leaf.id,
+              ),
+            ),
+            AND: {
+              isLeaf: true,
+            },
           },
         },
       });
@@ -113,23 +138,30 @@ export const createStandardRootChildrenWithLeaves = async (
         overrideLeaf: leaf,
         children: standardSubChildrenWithLeafs,
       };
-    }));
+    }),
+  );
 
   return standardRootChildrenWithLeafs;
 };
 
-export const createQuestionsForQuestionnaire = async (questionnaireId: string) => {
-  const standardSubChildrenWithLeafs = await createStandardSubChildrenWithLeaves(questionnaireId,
-    standardSubChildren);
+export const createQuestionsForQuestionnaire = async (
+  questionnaireId: string,
+) => {
+  const standardSubChildrenWithLeafs = await createStandardSubChildrenWithLeaves(
+    questionnaireId,
+    standardSubChildren,
+  );
 
-  const standardRootChildrenWithLeafs: Array<StandardRootChildWithLeafsProps> = await
-  createStandardRootChildrenWithLeaves(
-    questionnaireId, standardRootChildren, standardSubChildrenWithLeafs,
+  const standardRootChildrenWithLeafs:
+  Array<StandardRootChildWithLeafsProps> = await createStandardRootChildrenWithLeaves(
+    questionnaireId,
+    standardRootChildren,
+    standardSubChildrenWithLeafs,
   );
 
   // Create root-questions
-  const rootQuestions = await Promise.all(standardRootChildrenWithLeafs
-    .map(async (childNode) => prisma.createQuestionNode({
+  const rootQuestions = await Promise.all(
+    standardRootChildrenWithLeafs.map(async (childNode) => prisma.createQuestionNode({
       title: childNode.title,
       questionnaire: {
         connect: {
@@ -160,24 +192,32 @@ export const createQuestionsForQuestionnaire = async (questionnaireId: string) =
             },
           },
           options: {
-            create: child.childrenNodes.map((subChild: any) => ({ value: subChild.value })),
+            create: child.childrenNodes.map((subChild: any) => ({
+              value: subChild.value,
+            })),
           },
         })),
       },
-    })));
+    })),
+  );
 
   return rootQuestions;
 };
 
-export const getRootQuestionOfQuestionnaire = async (questionnaireId: string) => {
+export const getRootQuestionOfQuestionnaire = async (
+  questionnaireId: string,
+) => {
   // Extract mainQuestion
   // TODO: How to get unique boolean isRoot, so that we can use prisma.questionNode
   const mainQuestions = await prisma.questionNodes({
     where: {
       isRoot: true,
       AND: {
-        id_in: await Promise.all((await prisma.questionnaire({ id: questionnaireId })
-          .questions()).map((q) => q.id)),
+        id_in: await Promise.all(
+          (await prisma.questionnaire({ id: questionnaireId }).questions()).map(
+            (q) => q.id,
+          ),
+        ),
       },
     },
   });
@@ -185,8 +225,11 @@ export const getRootQuestionOfQuestionnaire = async (questionnaireId: string) =>
   return mainQuestion;
 };
 
-export const connectQuestionsToQuestionnaire = async (questionnaireId: string,
-  mainQuestion: QuestionNode, rootQuestions: QuestionNode[]) => {
+export const connectQuestionsToQuestionnaire = async (
+  questionnaireId: string,
+  mainQuestion: QuestionNode,
+  rootQuestions: QuestionNode[],
+) => {
   await prisma.updateQuestionNode({
     where: {
       id: mainQuestion.id,
@@ -198,19 +241,46 @@ export const connectQuestionsToQuestionnaire = async (questionnaireId: string,
         },
       },
       children: {
-        connect: rootQuestions.map((rootNode: QuestionNode) => ({ id: rootNode.id })),
+        connect: rootQuestions.map((rootNode: QuestionNode) => ({
+          id: rootNode.id,
+        })),
       },
     },
   });
 };
 
-const standardOptions = [{ value: 'Facilities' }, { value: 'Website/Mobile app' }, { value: 'Product/Services' }, { value: 'Customer support' }];
-const facilityOptions = [{ value: 'Cleanliness' }, { value: 'Atmosphere' }, { value: 'Location' }, { value: 'Other' }];
-const websiteOptions = [{ value: 'Design' }, { value: 'Functionality' }, { value: 'Informative' }, { value: 'Other' }];
-const customerSupportOptions = [{ value: 'Friendliness' }, { value: 'Competence' }, { value: 'Speed' }, { value: 'Other' }];
-const productServicesOptions = [{ value: 'Quality' }, { value: 'Price' }, { value: 'Friendliness' }, { value: 'Other' }];
+const standardOptions = [
+  { value: 'Facilities' },
+  { value: 'Website/Mobile app' },
+  { value: 'Product/Services' },
+  { value: 'Customer support' },
+];
+const facilityOptions = [
+  { value: 'Cleanliness' },
+  { value: 'Atmosphere' },
+  { value: 'Location' },
+  { value: 'Other' },
+];
+const websiteOptions = [
+  { value: 'Design' },
+  { value: 'Functionality' },
+  { value: 'Informative' },
+  { value: 'Other' },
+];
+const customerSupportOptions = [
+  { value: 'Friendliness' },
+  { value: 'Competence' },
+  { value: 'Speed' },
+  { value: 'Other' },
+];
+const productServicesOptions = [
+  { value: 'Quality' },
+  { value: 'Price' },
+  { value: 'Friendliness' },
+  { value: 'Other' },
+];
 
-export const getCorrectLeaf = (leafs: LeafNode[], titleSubset: string) => {
+export const getCorrectLeaf = (leafs: QuestionNode[], titleSubset: string) => {
   const correctLeaf = leafs.find((leaf) => leaf.title.includes(titleSubset));
   return correctLeaf?.id;
 };
@@ -218,10 +288,10 @@ export const getCorrectLeaf = (leafs: LeafNode[], titleSubset: string) => {
 export const createNodesAndEdges = async (
   questionnaireId: string,
   customerName: string,
-  leafs: LeafNode[],
+  leafs: QuestionNode[],
 ) => {
   // Root question (How do you feel about?)
-  const rootQuestion = await prisma.createQuestionNode({
+  await prisma.createQuestionNode({
     title: `How do you feel about ${customerName}?`,
     questionnaire: {
       connect: {
@@ -233,7 +303,7 @@ export const createNodesAndEdges = async (
   });
 
   // Positive Sub child 1 (What did you like?)
-  const rootToWhatDidYou = await prisma.createQuestionNode({
+  await prisma.createQuestionNode({
     title: 'What did you like?',
     questionnaire: {
       connect: {
@@ -247,14 +317,12 @@ export const createNodesAndEdges = async (
     },
     type: 'MULTI_CHOICE',
     options: {
-      create: [
-        ...standardOptions,
-      ],
+      create: [...standardOptions],
     },
   });
 
   // Positive Sub sub child 1 (Facilities)
-  const whatDidYouToFacilities = await prisma.createQuestionNode({
+  await prisma.createQuestionNode({
     title: 'What exactly did you like about the facilities?',
     questionnaire: {
       connect: {
@@ -263,19 +331,20 @@ export const createNodesAndEdges = async (
     },
     overrideLeaf: {
       connect: {
-        id: getCorrectLeaf(leafs, 'Come and join us on 1st April for our great event'),
+        id: getCorrectLeaf(
+          leafs,
+          'Come and join us on 1st April for our great event',
+        ),
       },
     },
     type: 'MULTI_CHOICE',
     options: {
-      create: [
-        ...facilityOptions,
-      ],
+      create: [...facilityOptions],
     },
   });
 
   // Positive Sub sub child 2 (Website)
-  const whatDidYouToWebsite = await prisma.createQuestionNode({
+  await prisma.createQuestionNode({
     title: 'What exactly did you like about the website?',
     questionnaire: {
       connect: {
@@ -289,14 +358,12 @@ export const createNodesAndEdges = async (
     },
     type: 'MULTI_CHOICE',
     options: {
-      create: [
-        ...websiteOptions,
-      ],
+      create: [...websiteOptions],
     },
   });
 
   // Positive Sub sub child 3 (Product/Services)
-  const whatDidYouToProduct = await prisma.createQuestionNode({
+  await prisma.createQuestionNode({
     title: 'What exactly did you like about the product / services?',
     questionnaire: {
       connect: {
@@ -310,35 +377,12 @@ export const createNodesAndEdges = async (
     },
     type: 'MULTI_CHOICE',
     options: {
-      create: [
-        ...productServicesOptions,
-      ],
-    },
-  });
-
-  // Positive Sub sub child 4 (Customer Support)
-  const whatDidYouToCustomerSupport = await prisma.createQuestionNode({
-    title: 'What exactly did you like about the customer support?',
-    questionnaire: {
-      connect: {
-        id: questionnaireId,
-      },
-    },
-    overrideLeaf: {
-      connect: {
-        id: getCorrectLeaf(leafs, 'your email below to receive our newsletter'),
-      },
-    },
-    type: 'MULTI_CHOICE',
-    options: {
-      create: [
-        ...customerSupportOptions,
-      ],
+      create: [...productServicesOptions],
     },
   });
 
   // Neutral Sub child 2
-  const rootToWhatWouldYouLikeToTalkAbout = await prisma.createQuestionNode({
+  await prisma.createQuestionNode({
     title: 'What would you like to talk about?',
     questionnaire: {
       connect: {
@@ -352,30 +396,12 @@ export const createNodesAndEdges = async (
     },
     type: 'MULTI_CHOICE',
     options: {
-      create: [
-        ...standardOptions,
-      ],
-    },
-  });
-
-  // Neutral Sub sub child 1 (Facilities)
-  const whatWouldYouLikeToTalkAboutToFacilities = await prisma.createQuestionNode({
-    title: 'Please specify.',
-    questionnaire: {
-      connect: {
-        id: questionnaireId,
-      },
-    },
-    type: 'MULTI_CHOICE',
-    options: {
-      create: [
-        ...facilityOptions,
-      ],
+      create: [...standardOptions],
     },
   });
 
   // Neutral Sub sub child 2 (Website)
-  const whatWouldYouLikeToTalkAboutToWebsite = await prisma.createQuestionNode({
+  await prisma.createQuestionNode({
     title: 'Please specify.',
     questionnaire: {
       connect: {
@@ -384,14 +410,12 @@ export const createNodesAndEdges = async (
     },
     type: 'MULTI_CHOICE',
     options: {
-      create: [
-        ...websiteOptions,
-      ],
+      create: [...websiteOptions],
     },
   });
 
   // Neutral Sub sub child 3 (Product/Services)
-  const whatWouldYouLikeToTalkAboutToProduct = await prisma.createQuestionNode({
+  await prisma.createQuestionNode({
     title: 'Please specify.',
     questionnaire: {
       connect: {
@@ -400,30 +424,28 @@ export const createNodesAndEdges = async (
     },
     type: 'MULTI_CHOICE',
     options: {
-      create: [
-        ...productServicesOptions,
-      ],
+      create: [...productServicesOptions],
     },
   });
 
   // Neutral Sub sub child 4 (Customer Support)
-  const whatWouldYouLikeToTalkAboutToCustomerSupport = await prisma.createQuestionNode({
-    title: 'Please specify.',
-    questionnaire: {
-      connect: {
-        id: questionnaireId,
+  await prisma.createQuestionNode(
+    {
+      title: 'Please specify.',
+      questionnaire: {
+        connect: {
+          id: questionnaireId,
+        },
+      },
+      type: 'MULTI_CHOICE',
+      options: {
+        create: [...customerSupportOptions],
       },
     },
-    type: 'MULTI_CHOICE',
-    options: {
-      create: [
-        ...customerSupportOptions,
-      ],
-    },
-  });
+  );
 
   // Negative Sub child 3
-  const rootToWeAreSorryToHearThat = await prisma.createQuestionNode({
+  await prisma.createQuestionNode({
     title: 'We are sorry to hear that! Where can we improve?',
     questionnaire: {
       connect: {
@@ -432,14 +454,12 @@ export const createNodesAndEdges = async (
     },
     type: 'MULTI_CHOICE',
     options: {
-      create: [
-        ...standardOptions,
-      ],
+      create: [...standardOptions],
     },
   });
 
   // Negative Sub sub child 1 (Facilities)
-  const weAreSorryToHearThatToFacilities = await prisma.createQuestionNode({
+  await prisma.createQuestionNode({
     title: 'Please elaborate.',
     questionnaire: {
       connect: {
@@ -453,14 +473,12 @@ export const createNodesAndEdges = async (
     },
     type: 'MULTI_CHOICE',
     options: {
-      create: [
-        ...facilityOptions,
-      ],
+      create: [...facilityOptions],
     },
   });
 
   // Negative Sub sub child 2 (Website)
-  const weAreSorryToHearThatToWebsite = await prisma.createQuestionNode({
+  await prisma.createQuestionNode({
     title: 'Please elaborate.',
     questionnaire: {
       connect: {
@@ -469,19 +487,20 @@ export const createNodesAndEdges = async (
     },
     overrideLeaf: {
       connect: {
-        id: getCorrectLeaf(leafs, 'Please click on the Whatsapp link below so our service'),
+        id: getCorrectLeaf(
+          leafs,
+          'Please click on the Whatsapp link below so our service',
+        ),
       },
     },
     type: 'MULTI_CHOICE',
     options: {
-      create: [
-        ...websiteOptions,
-      ],
+      create: [...websiteOptions],
     },
   });
 
   // Negative Sub sub child 3 (Product/Services)
-  const weAreSorryToHearThatToProduct = await prisma.createQuestionNode({
+  await prisma.createQuestionNode({
     title: 'Please elaborate.',
     questionnaire: {
       connect: {
@@ -495,283 +514,84 @@ export const createNodesAndEdges = async (
     },
     type: 'MULTI_CHOICE',
     options: {
-      create: [
-        ...productServicesOptions,
-      ],
+      create: [...productServicesOptions],
     },
   });
 
   // Negative Sub sub child 4 (Customer Support)
-  const weAreSorryToHearThatToCustomerSupport = await prisma.createQuestionNode({
-    title: 'Please elaborate.',
-    questionnaire: {
-      connect: {
-        id: questionnaireId,
-      },
-    },
-    overrideLeaf: {
-      connect: {
-        id: getCorrectLeaf(leafs, 'Our customer experience supervisor is'),
-      },
-    },
-    type: 'MULTI_CHOICE',
-    options: {
-      create: [
-        ...customerSupportOptions,
-      ],
-    },
-  });
-
-  // ################################### EDGES ################################
-  const edgeData = [
-    // POSITIVE EDGES
+  await prisma.createQuestionNode(
     {
-      parent: rootQuestion,
-      conditions: {
-        conditionType: 'valueBoundary',
-        matchValue: null,
-        renderMin: 70,
-        renderMax: 100,
-      },
-      child: rootToWhatDidYou,
-    },
-
-    {
-      parent: rootToWhatDidYou,
-      conditions: {
-        conditionType: 'match',
-        matchValue: 'Facilities',
-        renderMin: null,
-        renderMax: null,
-      },
-      child: whatDidYouToFacilities,
-    },
-
-    {
-      parent: rootToWhatDidYou,
-      conditions: {
-        conditionType: 'match',
-        matchValue: 'Website/Mobile app',
-        renderMin: null,
-        renderMax: null,
-      },
-      child: whatDidYouToWebsite,
-    },
-
-    {
-      parent: rootToWhatDidYou,
-      conditions: {
-        conditionType: 'match',
-        matchValue: 'Product/Services',
-        renderMin: null,
-        renderMax: null,
-      },
-      child: whatDidYouToProduct,
-    },
-
-    {
-      parent: rootToWhatDidYou,
-      conditions: {
-        conditionType: 'match',
-        matchValue: 'Customer Support',
-        renderMin: null,
-        renderMax: null,
-      },
-      child: whatDidYouToProduct,
-    },
-
-    // NEUTRAL EDGES
-    {
-      parent: rootQuestion,
-      conditions: {
-        conditionType: 'valueBoundary',
-        matchValue: null,
-        renderMin: 50,
-        renderMax: 70,
-      },
-      child: rootToWhatWouldYouLikeToTalkAbout,
-    },
-
-    {
-      parent: rootToWhatWouldYouLikeToTalkAbout,
-      conditions: {
-        conditionType: 'match',
-        matchValue: 'Facilities',
-        renderMin: null,
-        renderMax: null,
-      },
-      child: whatDidYouToFacilities,
-    },
-
-    {
-      parent: rootToWhatWouldYouLikeToTalkAbout,
-      conditions: {
-        conditionType: 'match',
-        matchValue: 'Website/Mobile app',
-        renderMin: null,
-        renderMax: null,
-      },
-      child: whatWouldYouLikeToTalkAboutToWebsite,
-    },
-
-    {
-      parent: rootToWhatWouldYouLikeToTalkAbout,
-      conditions: {
-        conditionType: 'match',
-        matchValue: 'Product/Services',
-        renderMin: null,
-        renderMax: null,
-      },
-      child: whatWouldYouLikeToTalkAboutToProduct,
-    },
-
-    {
-      parent: rootToWhatWouldYouLikeToTalkAbout,
-      conditions: {
-        conditionType: 'match',
-        matchValue: 'Customer Support',
-        renderMin: null,
-        renderMax: null,
-      },
-      child: whatWouldYouLikeToTalkAboutToCustomerSupport,
-    },
-
-    // NEGATIVE EDGES
-    {
-      parent: rootQuestion,
-      conditions: {
-        conditionType: 'valueBoundary',
-        matchValue: null,
-        renderMin: 0,
-        renderMax: 50,
-      },
-      child: rootToWeAreSorryToHearThat,
-    },
-
-    {
-      parent: rootToWeAreSorryToHearThat,
-      conditions: {
-        conditionType: 'match',
-        matchValue: 'Facilities',
-        renderMin: null,
-        renderMax: null,
-      },
-      child: weAreSorryToHearThatToFacilities,
-    },
-
-    {
-      parent: rootToWeAreSorryToHearThat,
-      conditions: {
-        conditionType: 'match',
-        matchValue: 'Website/Mobile app',
-        renderMin: null,
-        renderMax: null,
-      },
-      child: weAreSorryToHearThatToWebsite,
-    },
-
-    {
-      parent: rootToWeAreSorryToHearThat,
-      conditions: {
-        conditionType: 'match',
-        matchValue: 'Product/Services',
-        renderMin: null,
-        renderMax: null,
-      },
-      child: weAreSorryToHearThatToProduct,
-    },
-
-    {
-      parent: rootToWeAreSorryToHearThat,
-      conditions: {
-        conditionType: 'match',
-        matchValue: 'Customer Support',
-        renderMin: null,
-        renderMax: null,
-      },
-      child: weAreSorryToHearThatToCustomerSupport,
-    },
-
-  ];
-  // Root to 'What did you like'
-  const edges = await Promise.all(edgeData.map(async (edge) => {
-    const edgeEntry = await prisma.createEdge({
-      parentNode: {
+      title: 'Please elaborate.',
+      questionnaire: {
         connect: {
-          id: edge.parent.id,
+          id: questionnaireId,
         },
       },
-      conditions: {
-        create: [edge.conditions],
-      },
-      childNode: {
+      overrideLeaf: {
         connect: {
-          id: edge.child.id,
+          id: getCorrectLeaf(leafs, 'Our customer experience supervisor is'),
         },
       },
-    });
-
-    await prisma.updateQuestionNode({
-      where: {
-        id: edge.parent.id,
+      type: 'MULTI_CHOICE',
+      options: {
+        create: [...customerSupportOptions],
       },
-      data: {
-        edgeChildren: {
-          connect: [{ id: edgeEntry.id }],
-        },
-      },
-    });
-  }));
+    },
+  );
 };
 
 export const seedQuestions = async (questionnaireId: string) => {
   const rootQuestions = await createQuestionsForQuestionnaire(questionnaireId);
   const mainQuestion = await getRootQuestionOfQuestionnaire(questionnaireId);
 
-  await connectQuestionsToQuestionnaire(questionnaireId, mainQuestion, rootQuestions);
+  await connectQuestionsToQuestionnaire(
+    questionnaireId,
+    mainQuestion,
+    rootQuestions,
+  );
 };
 
 export const createEdges = async (
   questionnaireId: string,
   customerName: string,
-  leafs: LeafNode[],
+  leafs: QuestionNode[],
 ) => {
   const leafIds = leafs.map((leaf) => leaf.id);
   const edges = getStandardEdgeData(customerName);
 
   // Create edges here
-  await Promise.all(edges.map(async (edge) => {
-    const childNode = await prisma.questionNodes({
-      where: {
-        OR: [
-          {
-            title_contains: edge.childQuestionContains,
-            questionnaire: {
-              id: questionnaireId,
+  await Promise.all(
+    edges.map(async (edge) => {
+      const childNode = await prisma.questionNodes({
+        where: {
+          OR: [
+            {
+              title_contains: edge.childQuestionContains,
+              questionnaire: {
+                id: questionnaireId,
+              },
+              overrideLeaf: {
+                id_not: null,
+                id_in: leafIds,
+              },
             },
-            overrideLeaf: {
-              id_not: null,
-              id_in: leafIds,
+            {
+              title_contains: edge.childQuestionContains,
+              questionnaire: {
+                id: questionnaireId,
+              },
+              id: null,
             },
-          },
-          {
-            title_contains: edge.childQuestionContains,
-            questionnaire: {
-              id: questionnaireId,
-            },
-            id: null,
-          },
-        ],
-      },
-    });
+          ],
+        },
+      });
 
-    if (!childNode[0]) {
-      console.log('Cant find node for:', edge);
-    }
-    const childNodeId = childNode?.[0]?.id;
+      if (!childNode[0]) {
+        console.log('Cant find node for:', edge);
+      }
+      const childNodeId = childNode?.[0]?.id;
 
-    const parentNode = await prisma.questionNodes(
-      {
+      const parentNode = await prisma.questionNodes({
         where: {
           OR: [
             {
@@ -793,71 +613,79 @@ export const createEdges = async (
             },
           ],
         },
-      },
-    );
-
-    if (!parentNode[0]) {
-      console.log('Cant find node for:', edge);
-    }
-
-    const parentNodeId = parentNode?.[0]?.id;
-
-    if (childNodeId && parentNodeId) {
-      await prisma.createEdge({
-        childNode: {
-          connect: {
-            id: childNodeId,
-          },
-        },
-        parentNode: {
-          connect: {
-            id: parentNodeId,
-          },
-        },
-        conditions: {
-          create: {
-            conditionType: edge.conditions?.[0].conditionType,
-            matchValue: edge.conditions?.[0].matchValue,
-            renderMin: edge.conditions?.[0].renderMin,
-            renderMax: edge.conditions?.[0].renderMax,
-          },
-        },
       });
-    }
-  }));
+
+      if (!parentNode[0]) {
+        console.log('Cant find node for:', edge);
+      }
+
+      const parentNodeId = parentNode?.[0]?.id;
+
+      if (childNodeId && parentNodeId) {
+        await prisma.createEdge({
+          childNode: {
+            connect: {
+              id: childNodeId,
+            },
+          },
+          parentNode: {
+            connect: {
+              id: parentNodeId,
+            },
+          },
+          conditions: {
+            create: {
+              conditionType: edge.conditions?.[0].conditionType,
+              matchValue: edge.conditions?.[0].matchValue,
+              renderMin: edge.conditions?.[0].renderMin,
+              renderMax: edge.conditions?.[0].renderMax,
+            },
+          },
+        });
+      }
+    }),
+  );
 };
 
 export const connectEdgesToQuestionnaire = async (questionnaireId: string) => {
-  await Promise.all((await prisma.questionNodes({ where:
-    { questionnaire: { id: questionnaireId } } })).map(async (node) => {
-    const edgeChildrenNodes = await prisma.edges({
-      where: {
-        parentNode: {
-          id: node.id,
-        },
-      },
-    });
-
-    await prisma.updateQuestionNode({
-      where: {
-        id: node.id,
-      },
-      data: {
-        questionnaire: {
-          connect: {
-            id: questionnaireId,
+  await Promise.all(
+    (
+      await prisma.questionNodes({
+        where: { questionnaire: { id: questionnaireId } },
+      })
+    ).map(async (node) => {
+      const edgeChildrenNodes = await prisma.edges({
+        where: {
+          parentNode: {
+            id: node.id,
           },
         },
-        edgeChildren: {
-          connect: edgeChildrenNodes.map((edgeChild) => ({ id: edgeChild.id })),
+      });
+
+      await prisma.updateQuestionNode({
+        where: {
+          id: node.id,
         },
-      },
-    });
-  }));
+        data: {
+          questionnaire: {
+            connect: {
+              id: questionnaireId,
+            },
+          },
+          children: {
+            connect: edgeChildrenNodes.map((edgeChild) => ({ id: edgeChild.id })),
+          },
+        },
+      });
+    }),
+  );
 };
 
-export const seedEdges = async (customerName: string,
-  questionnaireId: string, leafs: LeafNode[]) => {
+export const seedEdges = async (
+  customerName: string,
+  questionnaireId: string,
+  leafs: QuestionNode[],
+) => {
   await createEdges(questionnaireId, customerName, leafs);
   await connectEdgesToQuestionnaire(questionnaireId);
 };
@@ -894,7 +722,9 @@ export const seedQuestionnare = async (
   return questionnaire;
 };
 
-const seedQuestionnareOfCustomer = async (customer: Customer): Promise<Questionnaire> => {
+const seedQuestionnareOfCustomer = async (
+  customer: Customer,
+): Promise<Questionnaire> => {
   const leafs = await createTemplateLeafNodes(leafNodes);
 
   const questionnaire = await prisma.createQuestionnaire({
@@ -909,11 +739,12 @@ const seedQuestionnareOfCustomer = async (customer: Customer): Promise<Questionn
     title: 'Default questionnaire',
     description: 'Default questions',
     questions: {
-      create: [{
-        title: `How do you feel about ${customer.name}?`,
-        type: sliderType,
-        isRoot: true,
-      },
+      create: [
+        {
+          title: `How do you feel about ${customer.name}?`,
+          type: sliderType,
+          isRoot: true,
+        },
       ],
     },
   });
@@ -927,6 +758,7 @@ const seedQuestionnareOfCustomer = async (customer: Customer): Promise<Questionn
 
 export const seedFreshCompany = async (customer: Customer) => {
   const leafs = await createTemplateLeafNodes(leafNodes);
+  console.log('leafs[0]', leafs[0]);
 
   const questionnaire = await prisma.createQuestionnaire({
     customer: {
