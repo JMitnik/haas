@@ -10,6 +10,7 @@ import { CheckCircle } from 'react-feather';
 import { ButtonIcon } from '@haas/ui/src/Buttons';
 import { TextboxContainer } from './TextboxStyles';
 import { GenericNodeProps } from '../Node';
+import { ClientButton } from 'components/Buttons';
 
 interface TextboxNodeProps extends GenericNodeProps {
   isLeaf?: boolean;
@@ -32,18 +33,14 @@ const TextboxNode = ({ isLeaf, node }: TextboxNodeProps) => {
     <TextboxContainer>
       <H2>{node.title}</H2>
       <Div>
-        <Button
-          isActive={'textValue' in formState.touched}
-          brand="secondary"
-          onClick={() => onSubmit()}
-        >
+        <H3 color="white">What would you like to tell us?</H3>
+        <Textbox name="textValue" ref={register} />
+        <ClientButton mt={4} isActive={'textValue' in formState.touched} onClick={() => onSubmit()}>
           <ButtonIcon>
             <CheckCircle />
           </ButtonIcon>
           Submit
-        </Button>
-        <H3 color="white">What would you like to tell us?</H3>
-        <Textbox name="textValue" ref={register} />
+        </ClientButton>
       </Div>
     </TextboxContainer>
   );

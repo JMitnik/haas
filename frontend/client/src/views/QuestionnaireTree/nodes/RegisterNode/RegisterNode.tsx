@@ -10,19 +10,23 @@ import { GenericNodeProps } from '../Node';
 
 import useHAASTree from 'hooks/use-haas-tree';
 import useJourneyFinish from 'hooks/use-journey-finish';
+import { ClientButton } from 'components/Buttons';
 
 type RegisterNodeProps = GenericNodeProps;
 
 const RegisterNode = ({ node, isLeaf }: RegisterNodeProps) => {
-  const { register, getValues } = useForm();
+  const { register, getValues, formState } = useForm();
 
   const { finishedRef } = useJourneyFinish({ isLeaf, useFinishPage: true });
 
   const onSubmit = () => {
+    console.log(formState);
     const formEntry = getValues({ nest: true });
     // saveNodeEntry(formEntry);
     finishedRef.current = true;
   };
+
+  console.log('formState', formState);
 
   return (
     <RegisterNodeContainer>
@@ -48,12 +52,12 @@ const RegisterNode = ({ node, isLeaf }: RegisterNodeProps) => {
           </InputGroup>
         </Grid>
         <Div mt={4}>
-          <Button brand="secondary" onClick={() => onSubmit()}>
+          <ClientButton onClick={() => onSubmit()}>
             <ButtonIcon>
               <CheckCircle />
             </ButtonIcon>
             Submit
-          </Button>
+          </ClientButton>
         </Div>
       </Div>
     </RegisterNodeContainer>

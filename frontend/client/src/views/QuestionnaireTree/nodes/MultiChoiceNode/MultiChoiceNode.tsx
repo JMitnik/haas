@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { GenericNodeProps } from '../Node';
 import { HAASFormEntry, MultiChoiceOption } from 'hooks/use-questionnaire';
 import { MultiChoiceNodeContainer } from './MultiChoiceNodeStyles';
+import { ClientButton } from 'components/Buttons';
 
 type MultiChoiceNodeProps = GenericNodeProps;
 
@@ -42,7 +43,7 @@ const MultiChoiceNode = ({ node, isLeaf }: MultiChoiceNodeProps) => {
       <Div>
         {node.options?.map((multiChoiceOption: MultiChoiceOption, index: number) => (
           <Div useFlex justifyContent="center" key={index} padding={[2, 4]} flex={['100%', 1]}>
-            <Button
+            <ClientButton
               brand="primary"
               type="button"
               onClick={() => onSubmit(multiChoiceOption)}
@@ -53,7 +54,7 @@ const MultiChoiceNode = ({ node, isLeaf }: MultiChoiceNodeProps) => {
                   ? multiChoiceOption?.publicValue
                   : multiChoiceOption?.value}
               </H5>
-            </Button>
+            </ClientButton>
           </Div>
         ))}
       </Div>
