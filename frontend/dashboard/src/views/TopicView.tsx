@@ -1,9 +1,9 @@
 /* eslint-disable react/jsx-one-expression-per-line */
-import React, { useState, Dispatch, SetStateAction } from 'react';
+import React, { useState, Dispatch, SetStateAction, useEffect } from 'react';
 import { useQuery } from '@apollo/react-hooks';
 import { ChevronRight, Plus, X, MinusCircle } from 'react-feather';
 import { H2, Flex, Muted, Loader, Grid, Div, H5, H4, H3, Button } from '@haas/ui';
-import styled, { css } from 'styled-components';
+import styled, { css } from 'styled-components/macro';
 import { useParams, Switch, Route, useHistory } from 'react-router-dom';
 import Select, { ActionMeta } from 'react-select';
 import { useForm } from 'react-hook-form';
@@ -123,10 +123,9 @@ interface QuestionOptionProps {
 }
 
 interface EdgeChildProps {
-  id: string;
-  conditions: Array<EdgeConditonProps>;
-  parentNode: QuestionEntryProps;
-  childNode: QuestionEntryProps;
+  conditions?: Array<EdgeConditonProps>;
+  parentNode?: QuestionEntryProps;
+  childNode?: QuestionEntryProps;
 }
 
 interface EdgeConditonProps {
@@ -159,6 +158,7 @@ const DeleteQuestionOptionButtonContainer = styled.button`
   opacity: 0.1;
   cursor: pointer;
   transition: all 0.2s ease-in;
+  margin-left: 1%;
 
   &:hover {
     transition: all 0.2s ease-in;
@@ -168,14 +168,19 @@ const DeleteQuestionOptionButtonContainer = styled.button`
 
 const conditionTypes = [{ value: 'match', label: 'match' }, { value: 'valueBoundary', label: 'valueBoundary' }];
 
-const EdgeEntry = ({questions, edge, index }: { questions: Array<QuestionEntryProps>, edge: EdgeChildProps, index: number }) => {
+const EdgeEntry = ({ questions, edge, index, setCurrEdges }: { questions: Array<QuestionEntryProps>, edge: EdgeChildProps, index: number, setCurrEdges: React.Dispatch<React.SetStateAction<EdgeChildProps[]>> }) => {
 
-  const [currCondition, setCurrCondition] = useState({ value: edge.conditions[0].conditionType, label: edge.conditions[0].conditionType });
-  const [currChildQuestion, setCurrChildQuestion] = useState({ value: edge.childNode.id, label: `${edge.childNode.title} - ${edge.childNode.id}` });
+  const [currCondition, setCurrCondition] = useState({ value: edge?.conditions?.[0].conditionType, label: edge?.conditions?.[0].conditionType });
+  const [currChildQuestion, setCurrChildQuestion] = useState({ value: edge?.childNode?.id, label: `${edge?.childNode?.title} - ${edge?.childNode?.id}` });
 
   const setCondition = (qOption: any) => {
     const { label, value } = qOption;
     setCurrCondition({ label, value });
+  };
+
+  const setChildQuestion = (childQuestion: any) => {
+    const { label, value } = childQuestion;
+    setCurrChildQuestion({ label, value });
   };
 
   const questionsSelect = questions.map((question) => {
@@ -184,16 +189,21 @@ const EdgeEntry = ({questions, edge, index }: { questions: Array<QuestionEntryPr
     return { label, value };
   });
 
-  const deleteEdgeEntry = (event: any, entryId: any) => {
-    console.log('DELETE THE FUCKER');
+  const deleteEdgeEntry = (event: any, edgeIndex: number) => {
+    event.preventDefault();
+
+    setCurrEdges((edges) => {
+      edges.splice(edgeIndex, 1);
+      return [...edges];
+    });
   };
 
   return (
     <Div position="relative">
       <Div useFlex my={10} flexDirection="column" backgroundColor="#f5f5f5">
-        <DeleteCustomerButtonContainer onClick={(e) => deleteEdgeEntry(e, edge.id)}><X /></DeleteCustomerButtonContainer>
+        <DeleteCustomerButtonContainer onClick={(e) => deleteEdgeEntry(e, index)}><X /></DeleteCustomerButtonContainer>
         <StyledLabel marginTop={10} marginBottom={20}>Child node #{index + 1}</StyledLabel>
-        <Select options={questionsSelect} value={ {label: `${edge.childNode.title} - ${edge.childNode.id}`, value: edge.childNode.id}} />
+        <Select options={questionsSelect} value={currChildQuestion} onChange={(childNode) => setChildQuestion(childNode)} />
         {/* <StyledInput name="title" value={`${edge.childNode.title} - ${edge.childNode.id}`} /> */}
         <Div mt={10} mb={20}>
           <StyledLabel>conditionType</StyledLabel>
@@ -202,9 +212,9 @@ const EdgeEntry = ({questions, edge, index }: { questions: Array<QuestionEntryPr
             currCondition.value === 'valueBoundary' && (
               <Div mt={10}>
                 <StyledLabel ml={5} mr={5}>Min value</StyledLabel>
-                <StyledInput value={edge.conditions[0].renderMin} />
+                <StyledInput defaultValue={edge?.conditions?.[0].renderMin} />
                 <StyledLabel ml={5} mr={5}>Max value</StyledLabel>
-                <StyledInput value={edge.conditions[0].renderMax} />
+                <StyledInput defaultValue={edge?.conditions?.[0].renderMax} />
               </Div>
             )
           }
@@ -212,7 +222,7 @@ const EdgeEntry = ({questions, edge, index }: { questions: Array<QuestionEntryPr
             currCondition.value === 'match' && (
               <Div mt={10}>
                 <StyledLabel ml={5} mr={5}>Match value</StyledLabel>
-                <StyledInput value={edge.conditions[0].matchValue} />
+                <StyledInput defaultValue={edge?.conditions?.[0].matchValue} />
               </Div>
             )
           }
@@ -232,12 +242,42 @@ const questionTypes = [{ value: 'SLIDER', label: 'SLIDER' }, { value: 'MULTI_CHO
 const QuestionEntry = ({ questionsQ, question, leafs }: {questionsQ: Array<QuestionEntryProps>, question: QuestionEntryProps, leafs: any }) => {
   const { register, handleSubmit, errors } = useForm();
 
-  const currLeaf = { label: question.overrideLeaf?.title, value: question.overrideLeaf?.id };
+  const [currLeaf, setCurrLeaf] = useState({ label: question.overrideLeaf?.title, value: question.overrideLeaf?.id });
   const [currQuestionType, setCurrQuestionType] = useState({ label: question.questionType, value: question.questionType });
+  const [currOptions, setCurrOptions] = useState(question?.options || []);
+  const [currEdges, setCurrEdges] = useState(question?.edgeChildren || []);
 
   const setQuestionType = (questionType: any) => {
     const { label, value } = questionType;
     setCurrQuestionType({ label, value });
+  };
+
+  const setLeafNode = (leafNode: any) => {
+    const { label, value } = leafNode;
+    setCurrLeaf({ label, value });
+  };
+
+  const addNewOption = (event: any) => {
+    event.preventDefault();
+
+    const value = '';
+    const publicValue = '';
+
+    setCurrOptions((options) => [...options, { value, publicValue }]);
+  };
+
+  const deleteOption = (event: any, index: number) => {
+    console.log('Removing option with index: ', index);
+    event.preventDefault();
+    setCurrOptions((options) => {
+      options.splice(index, 1);
+      return [...options];
+    });
+  };
+
+  const addNewEdge = (event: any) => {
+    event.preventDefault();
+    setCurrEdges((edges: Array<EdgeChildProps>) => [...edges, {}]);
   };
 
   return (
@@ -246,7 +286,7 @@ const QuestionEntry = ({ questionsQ, question, leafs }: {questionsQ: Array<Quest
         <Div useFlex pl={4} pr={4} pb={2} flexDirection="column">
           <H4>Question: {question.id}</H4>
           <StyledLabel>Title</StyledLabel>
-          <StyledInput name="title" value={question.title} ref={register({ required: true })} />
+          <StyledInput name="title" defaultValue={question.title} ref={register({ required: true })} />
           {errors.title && <Muted color="warning">Something went wrong!</Muted>}
         </Div>
         <Div useFlex pl={4} pr={4} pb={2} flexDirection="column">
@@ -257,28 +297,45 @@ const QuestionEntry = ({ questionsQ, question, leafs }: {questionsQ: Array<Quest
           <Div useFlex pl={4} pr={4} pb={2} flexDirection="column">
             <H4>OPTIONS</H4>
             {
-              question?.options?.map((option, index) => {
+            ((currOptions && currOptions.length === 0) || (!currOptions)) && (
+              <Div alignSelf="center">
+                No options available...
+              </Div>
+            )
+            }
+            {
+              currOptions && currOptions.map((option, index) => {
                 return (
-                  <Div useFlex flexDirection="row">
-                    <StyledInput name={`${question.id}-option-${index}`} value={option.value} />
-                    <DeleteQuestionOptionButtonContainer> <MinusCircle /> </DeleteQuestionOptionButtonContainer>
+                  <Div key={index} my={1} useFlex flexDirection="row">
+                    <StyledInput name={`${question.id}-option-${index}`} defaultValue={option.value} />
+                    <DeleteQuestionOptionButtonContainer onClick={(e) => deleteOption(e, index)}> <MinusCircle /> </DeleteQuestionOptionButtonContainer>
                   </Div>
                 );
               })
             }
+            <Hr />
+            <Button brand="primary" mt={2} ml={4} mr={4} onClick={(e) => addNewOption(e)}>Add new option</Button>
           </Div>
         ) }
         <Div useFlex pl={4} pr={4} pb={2} flexDirection="column">
           <StyledLabel>Leaf node</StyledLabel>
-          <Select options={leafs} value={currLeaf} />
+          <Select options={leafs} value={(currLeaf?.value && currLeaf) || leafs[0]} onChange={(leafOption) => setLeafNode(leafOption)} />
         </Div>
         <Div useFlex pl={4} pr={4} pb={2} flexDirection="column">
           <H4>Edges</H4>
           {
-            question.edgeChildren && question.edgeChildren.map((edge: EdgeChildProps, index) => {
-              return <EdgeEntry questions={questionsQ} edge={edge} index={index} />;
+            ((currEdges && currEdges.length === 0) || (!currEdges)) && (
+              <Div alignSelf="center">
+                No edges available...
+              </Div>
+            )
+          }
+          {
+            currEdges && currEdges.map((edge: EdgeChildProps, index) => {
+              return <EdgeEntry key={index} setCurrEdges={setCurrEdges} questions={questionsQ} edge={edge} index={index} />;
             })
           }
+          <Button brand="primary" mt={2} ml={4} mr={4} onClick={(e) => addNewEdge(e)}>Add new edge</Button>
         </Div>
       </Div>
     </QuestionEntryView>
@@ -336,10 +393,17 @@ interface LeafProps {
 
 const TopicBuilderContent = () => {
   const { topicId } = useParams();
-  console.log('topic Id: ', topicId);
   const { loading, data } = useQuery(getTopicBuilderQuery, {
     variables: { topicId },
   });
+
+  const [questions, setQuestions] = useState(data?.questionnaire?.questions || []);
+
+  useEffect(() => {
+    if (data?.questionnaire) {
+      setQuestions(data?.questionnaire.questions);
+    }
+  }, [data]);
 
   if (loading) {
     return <Loader />;
@@ -348,9 +412,12 @@ const TopicBuilderContent = () => {
   const topicBuilderData = data?.questionnaire;
   console.log('Topic builder data: ', topicBuilderData);
   const leafs: Array<LeafProps> = topicBuilderData?.leafs;
+
   const selectLeafs = leafs.map((leaf) => {
     return { value: leaf.id, label: leaf.title };
   });
+
+  selectLeafs.unshift({ value: 'None', label: 'None' });
 
   return (
     <>
@@ -359,10 +426,16 @@ const TopicBuilderContent = () => {
       </H2>
       <TopicBuilderContentView>
         {
-          topicBuilderData?.questions.map((question: QuestionEntryProps) => {
-            return <QuestionEntry questionsQ={topicBuilderData?.questions} question={question} leafs={selectLeafs} />;
+          (questions && questions.length === 0) && (
+            <Div alignSelf="center">No question available...</Div>
+          )
+        }
+        {
+          questions && questions.map((question: QuestionEntryProps, index: number) => {
+            return <QuestionEntry key={index} questionsQ={topicBuilderData?.questions} question={question} leafs={selectLeafs} />;
           })
         }
+        <Button brand="primary" mt={2} ml={4} mr={4} onClick={() => setQuestions((questionsPrev: any) => setQuestions([...questionsPrev, {}]))}>Add new question</Button>
       </TopicBuilderContentView>
     </>
   );
