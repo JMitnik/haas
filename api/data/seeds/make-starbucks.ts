@@ -1,6 +1,6 @@
 import { prisma } from '../../src/generated/prisma-client/index';
 
-import { createNewCompany } from './make-company';
+import { createQuestionnaire } from './make-company';
 
 const CUSTOMER = 'Starbucks';
 
@@ -19,7 +19,7 @@ const makeStarbucks = async () => {
     },
   });
 
-  await createNewCompany(customer);
+  await createQuestionnaire(customer);
 };
 
 export default makeStarbucks;

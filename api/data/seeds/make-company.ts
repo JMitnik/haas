@@ -8,7 +8,7 @@ interface LeafNodeDataEntryProps {
   type: NodeType;
 }
 
-export const createTemplateLeafNodes = async (
+export const createLeafs = async (
   leafNodesArray: Array<LeafNodeDataEntryProps>,
 ) => {
   const leafs = await Promise.all(
@@ -21,7 +21,7 @@ export const createTemplateLeafNodes = async (
   return leafs;
 };
 
-export const getCorrectLeaf = (leafs: QuestionNode[], titleSubset: string) => {
+export const findLeaf = (leafs: QuestionNode[], titleSubset: string) => {
   const correctLeaf = leafs.find((leaf) => leaf.title.includes(titleSubset));
   return correctLeaf?.id;
 };
@@ -53,7 +53,7 @@ export const createNodesAndEdges = async (
     },
     overrideLeaf: {
       connect: {
-        id: getCorrectLeaf(leafs, 'Follow us on Instagram and stay'),
+        id: findLeaf(leafs, 'Follow us on Instagram and stay'),
       },
     },
     type: 'MULTI_CHOICE',
@@ -72,7 +72,7 @@ export const createNodesAndEdges = async (
     },
     overrideLeaf: {
       connect: {
-        id: getCorrectLeaf(
+        id: findLeaf(
           leafs,
           'Come and join us on 1st April for our great event',
         ),
@@ -94,7 +94,7 @@ export const createNodesAndEdges = async (
     },
     overrideLeaf: {
       connect: {
-        id: getCorrectLeaf(leafs, 'Follow us on Instagram and stay'),
+        id: findLeaf(leafs, 'Follow us on Instagram and stay'),
       },
     },
     type: 'MULTI_CHOICE',
@@ -113,7 +113,7 @@ export const createNodesAndEdges = async (
     },
     overrideLeaf: {
       connect: {
-        id: getCorrectLeaf(leafs, 'We think you might like this as'),
+        id: findLeaf(leafs, 'We think you might like this as'),
       },
     },
     type: 'MULTI_CHOICE',
@@ -132,7 +132,7 @@ export const createNodesAndEdges = async (
     },
     overrideLeaf: {
       connect: {
-        id: getCorrectLeaf(leafs, 'Leave your email below to receive our'),
+        id: findLeaf(leafs, 'Leave your email below to receive our'),
       },
     },
     type: 'MULTI_CHOICE',
@@ -209,7 +209,7 @@ export const createNodesAndEdges = async (
     },
     overrideLeaf: {
       connect: {
-        id: getCorrectLeaf(leafs, 'Our team is on it'),
+        id: findLeaf(leafs, 'Our team is on it'),
       },
     },
     type: 'MULTI_CHOICE',
@@ -228,7 +228,7 @@ export const createNodesAndEdges = async (
     },
     overrideLeaf: {
       connect: {
-        id: getCorrectLeaf(
+        id: findLeaf(
           leafs,
           'Please click on the Whatsapp link below so our service',
         ),
@@ -250,7 +250,7 @@ export const createNodesAndEdges = async (
     },
     overrideLeaf: {
       connect: {
-        id: getCorrectLeaf(leafs, 'Click below for your refund'),
+        id: findLeaf(leafs, 'Click below for your refund'),
       },
     },
     type: 'MULTI_CHOICE',
@@ -270,7 +270,7 @@ export const createNodesAndEdges = async (
       },
       overrideLeaf: {
         connect: {
-          id: getCorrectLeaf(leafs, 'Our customer experience supervisor is'),
+          id: findLeaf(leafs, 'Our customer experience supervisor is'),
         },
       },
       type: 'MULTI_CHOICE',
@@ -281,13 +281,14 @@ export const createNodesAndEdges = async (
   );
 };
 
+// TODO: Merge this with the below function
 export const seedQuestionnare = async (
   customerId: string,
   customerName: string,
   questionnaireTitle: string = 'Default questionnaire',
   questionnaireDescription: string = 'Default questions',
 ): Promise<Questionnaire> => {
-  const leafs = await createTemplateLeafNodes(leafNodes);
+  const leafs = await createLeafs(leafNodes);
 
   const questionnaire = await prisma.createQuestionnaire({
     customer: {
@@ -310,8 +311,7 @@ export const seedQuestionnare = async (
 };
 
 export const createQuestionnaire = async (customer: Customer) => {
-  const leafs = await createTemplateLeafNodes(leafNodes);
-  console.log('leafs[0]', leafs[0]);
+  const leafs = await createLeafs(leafNodes);
 
   const questionnaire = await prisma.createQuestionnaire({
     customer: {

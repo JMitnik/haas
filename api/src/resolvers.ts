@@ -1,10 +1,9 @@
 import { forwardTo } from 'prisma-binding';
 import crypto from 'crypto';
 import _ from 'lodash';
-import { QueryResolvers, MutationResolvers } from './generated/resolver-types';
 import cleanInt from './utils/cleanInt';
 import { prisma, ID_Input, Questionnaire } from './generated/prisma-client/index';
-import { seedQuestionnare, createNewCompany } from '../data/seeds/make-company';
+import { seedQuestionnare, createQuestionnaire } from '../data/seeds/make-company';
 
 const deleteFullCustomerNode = async (parent: any, args:any) => {
   const { id } : { id: ID_Input} = args;
@@ -36,7 +35,7 @@ const createNewCustomerMutation = async (parent: any, args: any) => {
   });
 
   if (isSeed) {
-    await createNewCompany(customer);
+    await createQuestionnaire(customer);
   }
 
   return customer;
