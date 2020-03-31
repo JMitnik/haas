@@ -3,7 +3,7 @@ import crypto from 'crypto';
 import _ from 'lodash';
 import cleanInt from './utils/cleanInt';
 import { prisma, ID_Input, Questionnaire } from './generated/prisma-client/index';
-import { seedQuestionnare, createQuestionnaire } from '../data/seeds/make-company';
+import { seedQuestionnare, createQuestionnaire } from '../data/seeds/make-customer';
 
 const deleteFullCustomerNode = async (parent: any, args:any) => {
   const { id } : { id: ID_Input} = args;

@@ -1,6 +1,6 @@
 import { prisma } from '../../src/generated/prisma-client/index';
 
-import { createQuestionnaire } from './make-company';
+import { createQuestionnaire } from './make-customer';
 
 const CUSTOMER = 'Starbucks';
 
