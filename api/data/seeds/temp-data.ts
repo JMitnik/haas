@@ -500,28 +500,6 @@ export const standardSubChildren = [
   },
 ];
 
-export const standardRootChildren = [
-  {
-    title: 'What did you like?',
-    type: multiChoiceType,
-    overrideLeafContains: 'Instagram',
-    options: positiveSubChildren.map((child) => child.relatedOptionValue),
-    children: positiveSubChildren,
-  },
-  {
-    title: 'What would you like to talk about?',
-    type: multiChoiceType,
-    options: neutralSubChildren.map((child) => child.relatedOptionValue),
-    children: neutralSubChildren,
-  },
-  {
-    title: 'We are sorry to hear that! Where can we improve?',
-    type: multiChoiceType,
-    options: negativeSubChildren.map((child) => child.relatedOptionValue),
-    children: negativeSubChildren,
-  },
-];
-
 export const leafNodes = [
   {
     title:
