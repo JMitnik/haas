@@ -13,7 +13,7 @@ export const registrationType: NodeType = 'REGISTRATION';
 // 2. Entry gekoppeld aan edge van Mediamarkt met een node entry value met multi choice (string)
 // 3. 2 entries gekoppeld aan edge van Starbucks met een node entry value uit slider
 
-export const getStandardEdgeData = (customerName: string) => [
+export const makeEdges = (customerName: string) => [
   {
     parentQuestionContains: `How do you feel about ${customerName}`, // hardcode company name?
     childQuestionContains: 'What did you like?',
@@ -598,3 +598,9 @@ export const leafNodes = [
     type: registrationType,
   },
 ];
+
+export const standardOptions = [{ value: 'Facilities' }, { value: 'Website/Mobile app' }, { value: 'Product/Services' }, { value: 'Customer Support' }];
+export const facilityOptions = [{ value: 'Cleanliness' }, { value: 'Atmosphere' }, { value: 'Location' }, { value: 'Other' }];
+export const websiteOptions = [{ value: 'Design' }, { value: 'Functionality' }, { value: 'Informative' }, { value: 'Other' }];
+export const customerSupportOptions = [{ value: 'Friendliness' }, { value: 'Competence' }, { value: 'Speed' }, { value: 'Other' }];
+export const productServicesOptions = [{ value: 'Quality' }, { value: 'Price' }, { value: 'Friendliness' }, { value: 'Other' }];

@@ -1,6 +1,6 @@
 import { prisma } from '../../src/generated/prisma-client/index';
 
-import { seedFreshCompany } from './make-company';
+import { createNewCompany } from './make-company';
 
 const CUSTOMER = 'Mediamarkt';
 
@@ -19,7 +19,7 @@ const makeMediamarkt = async () => {
     },
   });
 
-  await seedFreshCompany(customer);
+  await createNewCompany(customer);
 };
 
 export default makeMediamarkt;

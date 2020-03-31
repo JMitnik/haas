@@ -1,18 +1,12 @@
 /* eslint-disable max-len */
-import { prisma, NodeType, LeafNode, Questionnaire } from '../../src/generated/prisma-client/index';
-import { leafNodes, sliderType } from './seedDataStructure';
+import { prisma, NodeType, Questionnaire, QuestionNode } from '../../src/generated/prisma-client/index';
+import { leafNodes, sliderType, websiteOptions, standardOptions, productServicesOptions, customerSupportOptions, facilityOptions } from './default-data';
 import { Customer } from '../../src/generated/resolver-types';
 
 interface LeafNodeDataEntryProps {
   title: string;
   type: NodeType;
 }
-
-const standardOptions = [{ value: 'Facilities' }, { value: 'Website/Mobile app' }, { value: 'Product/Services' }, { value: 'Customer Support' }];
-const facilityOptions = [{ value: 'Cleanliness' }, { value: 'Atmosphere' }, { value: 'Location' }, { value: 'Other' }];
-const websiteOptions = [{ value: 'Design' }, { value: 'Functionality' }, { value: 'Informative' }, { value: 'Other' }];
-const customerSupportOptions = [{ value: 'Friendliness' }, { value: 'Competence' }, { value: 'Speed' }, { value: 'Other' }];
-const productServicesOptions = [{ value: 'Quality' }, { value: 'Price' }, { value: 'Friendliness' }, { value: 'Other' }];
 
 export const createTemplateLeafNodes = async (
   leafNodesArray: Array<LeafNodeDataEntryProps>,
@@ -27,7 +21,7 @@ export const createTemplateLeafNodes = async (
   return leafs;
 };
 
-export const getCorrectLeaf = (leafs: LeafNode[], titleSubset: string) => {
+export const getCorrectLeaf = (leafs: QuestionNode[], titleSubset: string) => {
   const correctLeaf = leafs.find((leaf) => leaf.title.includes(titleSubset));
   return correctLeaf?.id;
 };
@@ -315,7 +309,7 @@ export const seedQuestionnare = async (
   return questionnaire;
 };
 
-export const seedFreshCompany = async (customer: Customer) => {
+export const createQuestionnaire = async (customer: Customer) => {
   const leafs = await createTemplateLeafNodes(leafNodes);
   console.log('leafs[0]', leafs[0]);
 
