@@ -1,27 +1,28 @@
-/* eslint-disable max-len */
-import { prisma, NodeType, Questionnaire, QuestionNode } from '../../src/generated/prisma-client/index';
-import { leafNodes, sliderType, websiteOptions, standardOptions, productServicesOptions, customerSupportOptions, facilityOptions } from './default-data';
+import { prisma, NodeType, LeafNode, Questionnaire } from '../../src/generated/prisma-client/index';
+import { leafNodes, sliderType } from './temp-data';
 import { Customer } from '../../src/generated/resolver-types';
 
 interface LeafNodeDataEntryProps {
   title: string;
-  type: NodeType;
+  type?: NodeType;
 }
 
-export const createLeafs = async (
-  leafNodesArray: Array<LeafNodeDataEntryProps>,
-) => {
-  const leafs = await Promise.all(
-    leafNodesArray.map(async (leafNode) => prisma.createQuestionNode({
-      title: leafNode.title,
-      type: leafNode.type,
-    })),
-  );
+const standardOptions = [{ value: 'Facilities' }, { value: 'Website/Mobile app' }, { value: 'Product/Services' }, { value: 'Customer Support' }];
+const facilityOptions = [{ value: 'Cleanliness' }, { value: 'Atmosphere' }, { value: 'Location' }, { value: 'Other' }];
+const websiteOptions = [{ value: 'Design' }, { value: 'Functionality' }, { value: 'Informative' }, { value: 'Other' }];
+const customerSupportOptions = [{ value: 'Friendliness' }, { value: 'Competence' }, { value: 'Speed' }, { value: 'Other' }];
+const productServicesOptions = [{ value: 'Quality' }, { value: 'Price' }, { value: 'Friendliness' }, { value: 'Other' }];
+
+export const createTemplateLeafNodes = async (leafNodesArray: Array<LeafNodeDataEntryProps>) => {
+  const leafs = await Promise.all(leafNodesArray.map(async (leafNode) => prisma.createLeafNode({
+    title: leafNode.title,
+    type: leafNode?.type,
+  })));
 
   return leafs;
 };
 
-export const findLeaf = (leafs: QuestionNode[], titleSubset: string) => {
+export const getCorrectLeaf = (leafs: LeafNode[], titleSubset: string) => {
   const correctLeaf = leafs.find((leaf) => leaf.title.includes(titleSubset));
   return correctLeaf?.id;
 };
@@ -29,7 +30,7 @@ export const findLeaf = (leafs: QuestionNode[], titleSubset: string) => {
 export const createNodesAndEdges = async (
   questionnaireId: string,
   customerName: string,
-  leafs: QuestionNode[],
+  leafs: LeafNode[],
 ) => {
   // Root question (How do you feel about?)
   const rootQuestion = await prisma.createQuestionNode({
@@ -53,7 +54,7 @@ export const createNodesAndEdges = async (
     },
     overrideLeaf: {
       connect: {
-        id: findLeaf(leafs, 'Follow us on Instagram and stay'),
+        id: getCorrectLeaf(leafs, 'Follow us on Instagram and stay'),
       },
     },
     type: 'MULTI_CHOICE',
@@ -74,7 +75,7 @@ export const createNodesAndEdges = async (
     },
     overrideLeaf: {
       connect: {
-        id: findLeaf(leafs, 'Come and join us on 1st April for our great event'),
+        id: getCorrectLeaf(leafs, 'Come and join us on 1st April for our great event'),
       },
     },
     type: 'MULTI_CHOICE',
@@ -95,7 +96,7 @@ export const createNodesAndEdges = async (
     },
     overrideLeaf: {
       connect: {
-        id: findLeaf(leafs, 'Follow us on Instagram and stay'),
+        id: getCorrectLeaf(leafs, 'Follow us on Instagram and stay'),
       },
     },
     type: 'MULTI_CHOICE',
@@ -116,7 +117,7 @@ export const createNodesAndEdges = async (
     },
     overrideLeaf: {
       connect: {
-        id: findLeaf(leafs, 'We think you might like this as'),
+        id: getCorrectLeaf(leafs, 'We think you might like this as'),
       },
     },
     type: 'MULTI_CHOICE',
@@ -137,7 +138,7 @@ export const createNodesAndEdges = async (
     },
     overrideLeaf: {
       connect: {
-        id: findLeaf(leafs, 'your email below to receive our newsletter'),
+        id: getCorrectLeaf(leafs, 'your email below to receive our newsletter'),
       },
     },
     type: 'MULTI_CHOICE',
@@ -158,7 +159,7 @@ export const createNodesAndEdges = async (
     },
     overrideLeaf: {
       connect: {
-        id: findLeaf(leafs, 'Leave your email below to receive our'),
+        id: getCorrectLeaf(leafs, 'Leave your email below to receive our'),
       },
     },
     type: 'MULTI_CHOICE',
@@ -259,7 +260,7 @@ export const createNodesAndEdges = async (
     },
     overrideLeaf: {
       connect: {
-        id: findLeaf(leafs, 'Our team is on it'),
+        id: getCorrectLeaf(leafs, 'Our team is on it'),
       },
     },
     type: 'MULTI_CHOICE',
@@ -280,7 +281,7 @@ export const createNodesAndEdges = async (
     },
     overrideLeaf: {
       connect: {
-        id: findLeaf(leafs, 'Please click on the Whatsapp link below so our service'),
+        id: getCorrectLeaf(leafs, 'Please click on the Whatsapp link below so our service'),
       },
     },
     type: 'MULTI_CHOICE',
@@ -301,7 +302,7 @@ export const createNodesAndEdges = async (
     },
     overrideLeaf: {
       connect: {
-        id: findLeaf(leafs, 'Click below for your refund'),
+        id: getCorrectLeaf(leafs, 'Click below for your refund'),
       },
     },
     type: 'MULTI_CHOICE',
@@ -322,7 +323,7 @@ export const createNodesAndEdges = async (
     },
     overrideLeaf: {
       connect: {
-        id: findLeaf(leafs, 'Our customer experience supervisor is'),
+        id: getCorrectLeaf(leafs, 'Our customer experience supervisor is'),
       },
     },
     type: 'MULTI_CHOICE',
@@ -535,14 +536,13 @@ export const createNodesAndEdges = async (
   }));
 };
 
-// TODO: Merge this with the below function
 export const seedQuestionnare = async (
   customerId: string,
   customerName: string,
   questionnaireTitle: string = 'Default questionnaire',
   questionnaireDescription: string = 'Default questions',
 ): Promise<Questionnaire> => {
-  const leafs = await createLeafs(leafNodes);
+  const leafs = await createTemplateLeafNodes(leafNodes);
 
   const questionnaire = await prisma.createQuestionnaire({
     customer: {
@@ -564,8 +564,8 @@ export const seedQuestionnare = async (
   return questionnaire;
 };
 
-export const createQuestionnaire = async (customer: Customer) => {
-  const leafs = await createLeafs(leafNodes);
+export const seedFreshCompany = async (customer: Customer) => {
+  const leafs = await createTemplateLeafNodes(leafNodes);
 
   const questionnaire = await prisma.createQuestionnaire({
     customer: {

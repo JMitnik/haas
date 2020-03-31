@@ -2,7 +2,7 @@ import gql from 'graphql-tag';
 
 const getSessionAnswerFlowQuery = gql`
   query getSessionAnswerFlow($sessionId: ID) {
-    session(where: { 
+    session(where: {
       id: $sessionId
     }) {
         id
@@ -10,6 +10,9 @@ const getSessionAnswerFlowQuery = gql`
         values {
           numberValue
           textValue
+          multiValues {
+            textValue
+          }
           id
         }
         relatedNode {
