@@ -12,13 +12,19 @@ export const FloatingNodeContainer = styled(Div)`
 `;
 
 export const ActiveNodeContainer = styled(Div)`
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  justify-content: space-between;
+  ${({ theme }) => css`
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    justify-content: space-between;
 
-  ${H2} {
-    color: white;
-    text-align: center;
-  }
+    ${H2} {
+      color: white;
+      text-align: center;
+
+      @media ${theme.media.mob} {
+        font-size: 30px;
+      }
+    }
+  `}
 `;

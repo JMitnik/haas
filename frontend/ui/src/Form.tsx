@@ -142,11 +142,61 @@ export const SliderContainer = styled.div`
         /* Ensure that the bunny is on top of the bar */
         transform: translateY(-100%);
 
-        background-image: url('/logo-haas.png');
+        border: none;
+        background-color: transparent;
+        background-image: url('/logo-haas.svg');
         background-size: contain;
         background-repeat: no-repeat;
         cursor: pointer;
         position: relative;
+
+        &:hover {
+          background-color: transparent;
+        }
+      }
+
+      /* Style the thumb */
+      /* TODO: Enable styles for firefox and IE*/
+      &::-moz-range-thumb {
+        -webkit-appearance: none;
+        height: 80px;
+        width: 80px;
+
+        /* Ensure that the bunny is on top of the bar */
+        transform: translateY(-100%);
+        border: none;
+        background-color: transparent;
+        background-image: url('/logo-haas.svg');
+        background-size: contain;
+        background-repeat: no-repeat;
+        cursor: pointer;
+        position: relative;
+
+        &:hover {
+          background-color: transparent;
+        }
+      }
+
+      /* Style the thumb */
+      /* TODO: Enable styles for firefox and IE*/
+      &::-ms-thumb {
+        -webkit-appearance: none;
+        height: 80px;
+        width: 80px;
+
+        /* Ensure that the bunny is on top of the bar */
+        transform: translateY(-100%);
+        border: none;
+        background-color: transparent;
+        background-image: url('/logo-haas.svg');
+        background-size: contain;
+        background-repeat: no-repeat;
+        cursor: pointer;
+        position: relative;
+
+        &:hover {
+          background-color: transparent;
+        }
       }
 
       &::-webkit-slider-runnable-track {
