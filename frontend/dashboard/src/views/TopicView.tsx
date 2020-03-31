@@ -1,5 +1,5 @@
 /* eslint-disable react/jsx-one-expression-per-line */
-import React, { useState, Dispatch, SetStateAction, useEffect } from 'react';
+import React, { useState, Dispatch, SetStateAction, useEffect, useRef } from 'react';
 import { useQuery } from '@apollo/react-hooks';
 import { ChevronRight, Plus, X, MinusCircle } from 'react-feather';
 import { H2, Flex, Muted, Loader, Grid, Div, H5, H4, H3, Button } from '@haas/ui';
@@ -123,14 +123,15 @@ interface QuestionOptionProps {
 }
 
 interface EdgeChildProps {
+  id?: string;
   conditions?: Array<EdgeConditonProps>;
   parentNode?: QuestionEntryProps;
   childNode?: QuestionEntryProps;
 }
 
 interface EdgeConditonProps {
-  id: string;
-  conditionType: string;
+  id?: string;
+  conditionType?: string;
   renderMin?: number;
   renderMax?: number;
   matchValue?: string;
@@ -168,14 +169,22 @@ const DeleteQuestionOptionButtonContainer = styled.button`
 
 const conditionTypes = [{ value: 'match', label: 'match' }, { value: 'valueBoundary', label: 'valueBoundary' }];
 
-const EdgeEntry = ({ questions, edge, index, setCurrEdges }: { questions: Array<QuestionEntryProps>, edge: EdgeChildProps, index: number, setCurrEdges: React.Dispatch<React.SetStateAction<EdgeChildProps[]>> }) => {
+const EdgeEntry = ({ questions, edge, index, setCurrEdges, onEdgesChange, setConditionType }: { questions: Array<QuestionEntryProps>, edge: EdgeChildProps, index: number, setCurrEdges: React.Dispatch<React.SetStateAction<EdgeChildProps[]>>, onEdgesChange: Function, setConditionType: Function }) => {
 
   const [currCondition, setCurrCondition] = useState({ value: edge?.conditions?.[0].conditionType, label: edge?.conditions?.[0].conditionType });
   const [currChildQuestion, setCurrChildQuestion] = useState({ value: edge?.childNode?.id, label: `${edge?.childNode?.title} - ${edge?.childNode?.id}` });
+  // const [activeMinValue, setActiveMinValue] = useState(undefined);
+  // const [activeMaxValue, setActiveMaxValue] = useState(undefined);
+  // const [activeMatchValue, setActiveMatchValue] = useState(undefined);
+
+  // const setEdgeData = () => {
+
+  // };
 
   const setCondition = (qOption: any) => {
     const { label, value } = qOption;
     setCurrCondition({ label, value });
+    setConditionType(value, index);
   };
 
   const setChildQuestion = (childQuestion: any) => {
@@ -239,13 +248,14 @@ const QuestionEntryView = styled.div`
 
 const questionTypes = [{ value: 'SLIDER', label: 'SLIDER' }, { value: 'MULTI_CHOICE', label: 'MULTI_CHOICE' }];
 
-const QuestionEntry = ({ questionsQ, question, leafs, index, setNewTitle, onQuestionTypeChange, onQuestionOptionsChange, onAddQuestionOption }: { questionsQ: Array<QuestionEntryProps>, question: QuestionEntryProps, leafs: any, index: number, setNewTitle: Function, onQuestionTypeChange: Function, onQuestionOptionsChange: Function, onAddQuestionOption: Function }) => {
+const QuestionEntry = ({ questionsQ, question, leafs, index, setNewTitle, onQuestionTypeChange, onQuestionOptionsChange, onAddQuestionOption, onEdgesChange }: { questionsQ: Array<QuestionEntryProps>, question: QuestionEntryProps, leafs: any, index: number, setNewTitle: Function, onQuestionTypeChange: Function, onQuestionOptionsChange: Function, onAddQuestionOption: Function, onEdgesChange: Function }) => {
   const { register, handleSubmit, errors } = useForm();
 
   const [currLeaf, setCurrLeaf] = useState({ label: question.overrideLeaf?.title, value: question.overrideLeaf?.id });
   const [currQuestionType, setCurrQuestionType] = useState({ label: question.questionType, value: question.questionType });
   const [currOptions, setCurrOptions] = useState(question?.options || []);
   const [currEdges, setCurrEdges] = useState(question?.edgeChildren || []);
+  const isIntialRender = useRef(true);
 
   const setQuestionType = (questionType: any) => {
     const { label, value } = questionType;
@@ -268,15 +278,43 @@ const QuestionEntry = ({ questionsQ, question, leafs, index, setNewTitle, onQues
     onAddQuestionOption(currOptions, qIndex);
   };
 
+  const setConditionType = (conditionType: string, edgeIndex: number) => {
+    setCurrEdges((edgesPrev: Array<EdgeChildProps>) => {
+      if (edgesPrev?.[edgeIndex]?.conditions?.[0].conditionType) {
+        const edge: EdgeChildProps = edgesPrev[edgeIndex];
+        if (!edge.conditions) {
+          edge.conditions = [];
+          edge.conditions = [{ conditionType }];
+          return [...edgesPrev];
+        }
+
+        edge.conditions[0].conditionType = conditionType;
+      }
+      return [...edgesPrev];
+    });
+  };
+
+  useEffect(() => {
+    // TODO: don't run this on initial render. For some reason parent is not updated intially when new edge is added
+    if (isIntialRender.current === true) {
+      console.log('Initial render so skipping setting edges');
+      isIntialRender.current = false;
+      return;
+    }
+    onEdgesChange(currEdges, index);
+  }, [currEdges, isIntialRender]);
+
+  const addNewEdge = (event: any, qIndex: number) => {
+    event.preventDefault();
+    setCurrEdges((edges: Array<EdgeChildProps>) => [...edges, { conditions: undefined, parentNode: undefined, childNode: undefined }]);
+  };
+
   const deleteOption = (event: any, questionIndex: number, optionIndex: number) => {
-    console.log('OPTION INDEX: ', optionIndex);
     event.preventDefault();
     setCurrOptions((options) => {
       options.splice(optionIndex, 1);
-      console.log('new options: ', options);
       return [...options];
     });
-    console.log('After delete sent to parent: ', currOptions);
     onQuestionOptionsChange(currOptions, questionIndex);
   };
 
@@ -289,11 +327,6 @@ const QuestionEntry = ({ questionsQ, question, leafs, index, setNewTitle, onQues
     });
 
     onQuestionOptionsChange(currOptions, questionIndex);
-  };
-
-  const addNewEdge = (event: any) => {
-    event.preventDefault();
-    setCurrEdges((edges: Array<EdgeChildProps>) => [...edges, {}]);
   };
 
   return (
@@ -347,12 +380,11 @@ const QuestionEntry = ({ questionsQ, question, leafs, index, setNewTitle, onQues
             )
           }
           {
-            currEdges && currEdges.map((edge: EdgeChildProps, index) => {
-              return <EdgeEntry key={index} setCurrEdges={setCurrEdges} questions={questionsQ} edge={edge} index={index} />;
+            currEdges && currEdges.map((edge: EdgeChildProps, edgeIndex: number) => {
+              return <EdgeEntry setConditionType={setConditionType} onEdgesChange={onEdgesChange} key={`${edgeIndex}-${edge.id}`} setCurrEdges={setCurrEdges} questions={questionsQ} edge={edge} index={edgeIndex} />;
             })
           }
-          <Button brand="default" mt={2} ml={4} mr={4} onClick={(e) => addNewEdge(e)}>Add new edge</Button>
-          <Button brand="primary" mt={6} ml={4} mr={4} onClick={(e) => addNewEdge(e)}>Save question</Button>
+          <Button brand="default" mt={2} ml={4} mr={4} onClick={(e) => addNewEdge(e, index)}>Add new edge</Button>
         </Div>
       </Div>
     </QuestionEntryView>
@@ -459,6 +491,13 @@ const TopicBuilderContent = () => {
     });
   };
 
+  const onEdgesChange = (edgeChildren: Array<EdgeChildProps>, qIndex: number) => {
+    setQuestions((questionsPrev: Array<QuestionEntryProps>) => {
+      questionsPrev[qIndex].edgeChildren = edgeChildren;
+      return [...questionsPrev];
+    });
+  };
+
   const selectLeafs = leafs.map((leaf) => {
     return { value: leaf.id, label: leaf.title };
   });
@@ -478,7 +517,7 @@ const TopicBuilderContent = () => {
         }
         {
           questions && questions.map((question: QuestionEntryProps, index: number) => {
-            return <QuestionEntry onAddQuestionOption={onAddQuestionOption} onQuestionOptionsChange={onQuestionOptionsChange} onQuestionTypeChange={onQuestionTypeChange} setNewTitle={setNewTitle} key={index} index={index} questionsQ={topicBuilderData?.questions} question={question} leafs={selectLeafs} />;
+            return <QuestionEntry onEdgesChange={onEdgesChange} onAddQuestionOption={onAddQuestionOption} onQuestionOptionsChange={onQuestionOptionsChange} onQuestionTypeChange={onQuestionTypeChange} setNewTitle={setNewTitle} key={index} index={index} questionsQ={topicBuilderData?.questions} question={question} leafs={selectLeafs} />;
           })
         }
         <Button brand="default" mt={2} ml={4} mr={4} onClick={() => setQuestions((questionsPrev: any) => setQuestions([...questionsPrev, {}]))}>Add new question</Button>
