@@ -114,7 +114,7 @@ interface QuestionEntryProps {
   questionType: string;
   overrideLeaf?: OverrideLeafProps;
   edgeChildren?: Array<EdgeChildProps>;
-  options?: Array<QuestionOptionProps>;
+  options: Array<QuestionOptionProps>;
 }
 
 interface QuestionOptionProps {
@@ -183,7 +183,7 @@ const EdgeEntry = ({ questions, edge, index, setCurrEdges }: { questions: Array<
     setCurrChildQuestion({ label, value });
   };
 
-  const questionsSelect = questions.map((question) => {
+  const newSelect = questions.map((question) => {
     const label = `${question.title} - ${question.id}`;
     const value = question.id;
     return { label, value };
@@ -203,7 +203,7 @@ const EdgeEntry = ({ questions, edge, index, setCurrEdges }: { questions: Array<
       <Div useFlex my={10} flexDirection="column" backgroundColor="#f5f5f5">
         <DeleteCustomerButtonContainer onClick={(e) => deleteEdgeEntry(e, index)}><X /></DeleteCustomerButtonContainer>
         <StyledLabel marginTop={10} marginBottom={20}>Child node #{index + 1}</StyledLabel>
-        <Select options={questionsSelect} value={currChildQuestion} onChange={(childNode) => setChildQuestion(childNode)} />
+        <Select options={newSelect} value={currChildQuestion} onChange={(childNode) => setChildQuestion(childNode)} />
         {/* <StyledInput name="title" value={`${edge.childNode.title} - ${edge.childNode.id}`} /> */}
         <Div mt={10} mb={20}>
           <StyledLabel>conditionType</StyledLabel>
@@ -239,7 +239,7 @@ const QuestionEntryView = styled.div`
 
 const questionTypes = [{ value: 'SLIDER', label: 'SLIDER' }, { value: 'MULTI_CHOICE', label: 'MULTI_CHOICE' }];
 
-const QuestionEntry = ({ questionsQ, question, leafs }: {questionsQ: Array<QuestionEntryProps>, question: QuestionEntryProps, leafs: any }) => {
+const QuestionEntry = ({ questionsQ, question, leafs, index, setNewTitle, onQuestionTypeChange, onQuestionOptionsChange, onAddQuestionOption }: { questionsQ: Array<QuestionEntryProps>, question: QuestionEntryProps, leafs: any, index: number, setNewTitle: Function, onQuestionTypeChange: Function, onQuestionOptionsChange: Function, onAddQuestionOption: Function }) => {
   const { register, handleSubmit, errors } = useForm();
 
   const [currLeaf, setCurrLeaf] = useState({ label: question.overrideLeaf?.title, value: question.overrideLeaf?.id });
@@ -250,6 +250,7 @@ const QuestionEntry = ({ questionsQ, question, leafs }: {questionsQ: Array<Quest
   const setQuestionType = (questionType: any) => {
     const { label, value } = questionType;
     setCurrQuestionType({ label, value });
+    onQuestionTypeChange(value, index);
   };
 
   const setLeafNode = (leafNode: any) => {
@@ -257,22 +258,37 @@ const QuestionEntry = ({ questionsQ, question, leafs }: {questionsQ: Array<Quest
     setCurrLeaf({ label, value });
   };
 
-  const addNewOption = (event: any) => {
+  const addNewOption = (event: any, qIndex: number) => {
     event.preventDefault();
 
     const value = '';
     const publicValue = '';
 
     setCurrOptions((options) => [...options, { value, publicValue }]);
+    onAddQuestionOption(currOptions, qIndex);
   };
 
-  const deleteOption = (event: any, index: number) => {
-    console.log('Removing option with index: ', index);
+  const deleteOption = (event: any, questionIndex: number, optionIndex: number) => {
+    console.log('OPTION INDEX: ', optionIndex);
     event.preventDefault();
     setCurrOptions((options) => {
-      options.splice(index, 1);
+      options.splice(optionIndex, 1);
+      console.log('new options: ', options);
       return [...options];
     });
+    console.log('After delete sent to parent: ', currOptions);
+    onQuestionOptionsChange(currOptions, questionIndex);
+  };
+
+  const setOption = (event: any, questionIndex: number, optionIndex: number) => {
+    event.preventDefault();
+    const { value } = event.target;
+    setCurrOptions((options) => {
+      options[optionIndex] = { value, publicValue: '' };
+      return [...options];
+    });
+
+    onQuestionOptionsChange(currOptions, questionIndex);
   };
 
   const addNewEdge = (event: any) => {
@@ -286,37 +302,37 @@ const QuestionEntry = ({ questionsQ, question, leafs }: {questionsQ: Array<Quest
         <Div useFlex pl={4} pr={4} pb={2} flexDirection="column">
           <H4>Question: {question.id}</H4>
           <StyledLabel>Title</StyledLabel>
-          <StyledInput name="title" defaultValue={question.title} ref={register({ required: true })} />
+          <StyledInput name="title" defaultValue={question.title} onBlur={(e) => setNewTitle(e, index)} ref={register({ required: true })} />
           {errors.title && <Muted color="warning">Something went wrong!</Muted>}
         </Div>
         <Div useFlex pl={4} pr={4} pb={2} flexDirection="column">
           <StyledLabel>Question type</StyledLabel>
           <Select options={questionTypes} value={currQuestionType} onChange={(qOption) => setQuestionType(qOption)} />
         </Div>
-        { currQuestionType.value === 'MULTI_CHOICE' && (
+        {currQuestionType.value === 'MULTI_CHOICE' && (
           <Div useFlex pl={4} pr={4} pb={2} flexDirection="column">
             <H4>OPTIONS</H4>
             {
-            ((currOptions && currOptions.length === 0) || (!currOptions)) && (
-              <Div alignSelf="center">
-                No options available...
-              </Div>
-            )
+              ((currOptions && currOptions.length === 0) || (!currOptions)) && (
+                <Div alignSelf="center">
+                  No options available...
+                </Div>
+              )
             }
             {
-              currOptions && currOptions.map((option, index) => {
+              currOptions && currOptions.map((option, optionIndex) => {
                 return (
-                  <Div key={index} my={1} useFlex flexDirection="row">
-                    <StyledInput name={`${question.id}-option-${index}`} defaultValue={option.value} />
-                    <DeleteQuestionOptionButtonContainer onClick={(e) => deleteOption(e, index)}> <MinusCircle /> </DeleteQuestionOptionButtonContainer>
+                  <Div key={`${optionIndex}-${option.value}`} my={1} useFlex flexDirection="row">
+                    <StyledInput key={optionIndex} name={`${question.id}-option-${optionIndex}`} defaultValue={option.value} onBlur={(e) => setOption(e, index, optionIndex)} />
+                    <DeleteQuestionOptionButtonContainer onClick={(e) => deleteOption(e, index, optionIndex)}> <MinusCircle /> </DeleteQuestionOptionButtonContainer>
                   </Div>
                 );
               })
             }
             <Hr />
-            <Button brand="primary" mt={2} ml={4} mr={4} onClick={(e) => addNewOption(e)}>Add new option</Button>
+            <Button brand="default" mt={2} ml={4} mr={4} onClick={(e) => addNewOption(e, index)}>Add new option</Button>
           </Div>
-        ) }
+        )}
         <Div useFlex pl={4} pr={4} pb={2} flexDirection="column">
           <StyledLabel>Leaf node</StyledLabel>
           <Select options={leafs} value={(currLeaf?.value && currLeaf) || leafs[0]} onChange={(leafOption) => setLeafNode(leafOption)} />
@@ -335,7 +351,8 @@ const QuestionEntry = ({ questionsQ, question, leafs }: {questionsQ: Array<Quest
               return <EdgeEntry key={index} setCurrEdges={setCurrEdges} questions={questionsQ} edge={edge} index={index} />;
             })
           }
-          <Button brand="primary" mt={2} ml={4} mr={4} onClick={(e) => addNewEdge(e)}>Add new edge</Button>
+          <Button brand="default" mt={2} ml={4} mr={4} onClick={(e) => addNewEdge(e)}>Add new edge</Button>
+          <Button brand="primary" mt={6} ml={4} mr={4} onClick={(e) => addNewEdge(e)}>Save question</Button>
         </Div>
       </Div>
     </QuestionEntryView>
@@ -413,6 +430,35 @@ const TopicBuilderContent = () => {
   console.log('Topic builder data: ', topicBuilderData);
   const leafs: Array<LeafProps> = topicBuilderData?.leafs;
 
+  const setNewTitle = (event: any, qIndex: number) => {
+    event.preventDefault();
+    setQuestions((questionsPrev: Array<QuestionEntryProps>) => {
+      questionsPrev[qIndex].title = event.target.value;
+      return [...questionsPrev];
+    });
+  };
+
+  const onQuestionTypeChange = (value: string, qIndex: number) => {
+    setQuestions((questionsPrev: Array<QuestionEntryProps>) => {
+      questionsPrev[qIndex].questionType = value;
+      return [...questionsPrev];
+    });
+  };
+
+  const onAddQuestionOption = (value: Array<QuestionOptionProps>, qIndex: number) => {
+    setQuestions((questionsPrev: Array<QuestionEntryProps>) => {
+      questionsPrev[qIndex].options = value;
+      return [...questionsPrev];
+    });
+  };
+
+  const onQuestionOptionsChange = (questionOptions: Array<QuestionOptionProps>, qIndex: number) => {
+    setQuestions((questionsPrev: Array<QuestionEntryProps>) => {
+      questionsPrev[qIndex].options = questionOptions;
+      return [...questionsPrev];
+    });
+  };
+
   const selectLeafs = leafs.map((leaf) => {
     return { value: leaf.id, label: leaf.title };
   });
@@ -432,10 +478,11 @@ const TopicBuilderContent = () => {
         }
         {
           questions && questions.map((question: QuestionEntryProps, index: number) => {
-            return <QuestionEntry key={index} questionsQ={topicBuilderData?.questions} question={question} leafs={selectLeafs} />;
+            return <QuestionEntry onAddQuestionOption={onAddQuestionOption} onQuestionOptionsChange={onQuestionOptionsChange} onQuestionTypeChange={onQuestionTypeChange} setNewTitle={setNewTitle} key={index} index={index} questionsQ={topicBuilderData?.questions} question={question} leafs={selectLeafs} />;
           })
         }
-        <Button brand="primary" mt={2} ml={4} mr={4} onClick={() => setQuestions((questionsPrev: any) => setQuestions([...questionsPrev, {}]))}>Add new question</Button>
+        <Button brand="default" mt={2} ml={4} mr={4} onClick={() => setQuestions((questionsPrev: any) => setQuestions([...questionsPrev, {}]))}>Add new question</Button>
+        <Button brand="primary" mt={2} ml={4} mr={4} type="submit">Save submit</Button>
       </TopicBuilderContentView>
     </>
   );
@@ -487,8 +534,8 @@ const TopicAnswerEntry = ({ nodeEntry }: { nodeEntry: NodeEntryProps }) => (
     <div>
       <strong>
         Answer: {nodeEntry.values?.[0].numberValue
-        ? nodeEntry.values?.[0].numberValue
-        : nodeEntry.values?.[0].textValue}
+          ? nodeEntry.values?.[0].numberValue
+          : nodeEntry.values?.[0].textValue}
       </strong>
     </div>
     <Hr />
@@ -600,13 +647,13 @@ const TopicDetails = (
                   <Score>
                     <div style={{ marginTop: '5px', alignSelf: 'centre' }}>
                       Average score:
-                    </div>
+                  </div>
                     <div style={{ marginLeft: '5px', fontSize: '200%', alignSelf: 'flex-start' }}>
                       {parseFloat(QuestionnaireDetailResult?.average).toPrecision(4)}/
-                    </div>
+                  </div>
                     <div style={{ alignSelf: 'flex-end', marginBottom: '2px' }}>
                       {QuestionnaireDetailResult?.totalNodeEntries} answer(s)
-                    </div>
+                  </div>
                   </Score>
                 )
               }
