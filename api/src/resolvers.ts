@@ -1,8 +1,9 @@
 import { forwardTo } from 'prisma-binding';
 import crypto from 'crypto';
+import _ from 'lodash';
 import { QueryResolvers, MutationResolvers } from './generated/resolver-types';
 import cleanInt from './utils/cleanInt';
-import _ from 'lodash';
+
 import { prisma, ID_Input, Questionnaire } from './generated/prisma-client/index';
 import seedCompany, { seedQuestionnare, seedFreshCompany } from '../data/seeds/make-company';
 
@@ -149,6 +150,12 @@ const getQuestionnaireAggregatedData = async (parent: any, args: any) => {
   return {};
 };
 
+const updateTopicBuilder = async (parent: any, args: any) => {
+  console.log('IN UPDATE TOPIC BUILDER');
+  console.log(args.topicData);
+  return 'Succesfully updated topic(?)';
+};
+
 const queryResolvers = {
   questionNode: forwardTo('db'),
   questionNodes: forwardTo('db'),
@@ -203,6 +210,7 @@ const mutationResolvers = {
     });
     return 'Success!';
   },
+  updateTopicBuilder,
   createNewCustomer: createNewCustomerMutation,
   deleteFullCustomer: deleteFullCustomerNode,
   createNewQuestionnaire,

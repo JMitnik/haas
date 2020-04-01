@@ -10,6 +10,54 @@ type Mutation {
     createNewCustomer(name: String, options: CustomerCreateOptions): Customer!
     deleteFullCustomer(id: ID!): Customer!
     createNewQuestionnaire(customerId: String, title: String, publicTitle: String, description: String, isSeed: Boolean): Questionnaire!
+    updateTopicBuilder(id: String, topicData: TopicDataEntry): String!
+}
+
+input TopicDataEntry {
+    id: String
+    questions: [QuestionInput]
+}
+
+input LeafNodeInput {
+    id: String
+    nodeId: String
+    type: String
+    title: String
+}
+
+input QuestionConditionInput {
+    id: String
+    conditionType: String
+    renderMin: Int
+    renderMax: Int
+    matchValue: String
+}
+
+input EdgeNodeInput {
+    id: String
+    title: String
+}
+
+input EdgeChildInput {
+    id: String
+    conditions: [QuestionConditionInput]
+    parentNode: EdgeNodeInput
+    childNode: EdgeNodeInput
+}
+
+input OptionInput {
+    value: String
+    publicValue: String
+}
+
+input QuestionInput {
+    id: String
+    title: String!
+    isRoot: Boolean!
+    questionType: NodeType!
+    overrideLeaf: LeafNodeInput
+    options: [OptionInput] 
+    edgeChildren: [EdgeChildInput] 
 }
 
 input UserSessionEntryInput {

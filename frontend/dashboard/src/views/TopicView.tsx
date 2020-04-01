@@ -1,6 +1,7 @@
 /* eslint-disable react/jsx-one-expression-per-line */
 import React, { useState, Dispatch, SetStateAction, useEffect, useRef } from 'react';
-import { useQuery } from '@apollo/react-hooks';
+import { ApolloError } from 'apollo-boost';
+import { useQuery, useMutation } from '@apollo/react-hooks';
 import { ChevronRight, Plus, X, MinusCircle } from 'react-feather';
 import { H2, Flex, Muted, Loader, Grid, Div, H5, H4, H3, Button } from '@haas/ui';
 import styled, { css } from 'styled-components/macro';
@@ -10,7 +11,7 @@ import { useForm } from 'react-hook-form';
 import getQuestionnaireData from '../queries/getQuestionnaireData';
 import getTopicBuilderQuery from '../queries/getQuestionnaireQuery';
 import getSessionAnswerFlow from '../queries/getSessionAnswerFlow';
-import { Activity } from 'react-feather';
+import updateTopicBuilder from '../mutations/updateTopicBuilder';
 
 interface TimelineEntryProps {
   sessionId: string;
@@ -523,30 +524,65 @@ interface LeafProps {
 
 const TopicBuilderContent = () => {
   const { topicId } = useParams();
+  
+  const [updateTopic, status] = useMutation(updateTopicBuilder, {
+    onCompleted: () => {
+      console.log('Succesfully updated topic!');
+    },
+    // refetchQueries: [{ query: getQuestionnairesCustomerQuery,
+    //   variables: {
+    //     id: customerId,
+    //   } }],
+    onError: (serverError: ApolloError) => {
+      console.log(serverError);
+    },
+  });
+
   const { loading, data } = useQuery(getTopicBuilderQuery, {
     variables: { topicId },
   });
 
+  // TODO: MAPPING questions 
   const [questions, setQuestions] = useState(data?.questionnaire?.questions || []);
 
   useEffect(() => {
     if (data?.questionnaire) {
-      setQuestions(data?.questionnaire.questions);
+      setQuestions(data?.questionnaire?.questions?.map(({ id, title, isRoot, questionType, overrideLeaf, options, edgeChildren }: QuestionEntryProps) => {
+        return {
+          id,
+          title,
+          isRoot,
+          questionType,
+          overrideLeaf: !overrideLeaf ? undefined : { id: overrideLeaf?.id, title: overrideLeaf?.title, type: overrideLeaf?.type },
+          options: options?.map(({ value, publicValue }) => { return { value, publicValue }; }),
+          edgeChildren: edgeChildren?.map((edge: EdgeChildProps) => {
+            return { id: edge.id,
+              parentNode: { id: edge?.parentNode?.id, title: edge?.parentNode?.title },
+              conditions: [{ conditionType: edge?.conditions?.[0]?.conditionType,
+                matchValue: edge?.conditions?.[0]?.matchValue,
+                renderMin: edge?.conditions?.[0]?.renderMin,
+                renderMax: edge?.conditions?.[0]?.renderMax }],
+              childNode: { id: edge?.childNode?.id, title: edge?.childNode?.title } };
+          }),
+        };
+      }) || []);
     }
   }, [data]);
 
   if (loading) {
     return <Loader />;
   }
-  console.log('Current questions: ', questions);
+
+  // console.log('Current questions: ', questions);
   const topicBuilderData = data?.questionnaire;
+  console.log(questions);
   const leafs: Array<LeafProps> = topicBuilderData?.leafs;
 
-  const selectLeafs = leafs.map((leaf) => {
+  const selectLeafs = leafs?.map((leaf) => {
     return { value: leaf.id, label: leaf.title };
   });
 
-  selectLeafs.unshift({ value: 'None', label: 'None' });
+  selectLeafs?.unshift({ value: 'None', label: 'None' });
 
   const setNewTitle = (event: any, qIndex: number) => {
     event.preventDefault();
@@ -620,6 +656,11 @@ const TopicBuilderContent = () => {
     }]);
   };
 
+  const updateDaTopic = () => {
+    console.log('Current questions: ', questions);
+    updateTopic({ variables: { id: topicBuilderData.id, topicData: { id: topicBuilderData.id, questions } } });
+  };
+
   return (
     <>
       <H2 color="default.text" fontWeight={400} mb={4}>
@@ -637,7 +678,20 @@ const TopicBuilderContent = () => {
           })
         }
         <Button brand="default" mt={2} ml={4} mr={4} onClick={(e) => onAddQuestion(e)}>Add new question</Button>
-        <Button brand="primary" mt={2} ml={4} mr={4} type="submit">Save submit</Button>
+        <Button
+          brand="primary"
+          mt={2}
+          ml={4}
+          mr={4}
+          onClick={
+            (e) => {
+              e.preventDefault();
+              updateDaTopic();
+            }
+          }
+        >
+          Save topic
+        </Button>
       </TopicBuilderContentView>
     </>
   );
