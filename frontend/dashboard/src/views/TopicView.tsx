@@ -169,8 +169,10 @@ const DeleteQuestionOptionButtonContainer = styled.button`
 
 const conditionTypes = [{ value: 'match', label: 'match' }, { value: 'valueBoundary', label: 'valueBoundary' }];
 
-const EdgeEntry = ({ questions, edge, index, setCurrEdges, onEdgesChange, setConditionType, setChildQuestionNode, setEdgeConditionMinValue, setEdgeConditionMaxValue, setEdgeConditionMatchValue }: { questions: Array<QuestionEntryProps>, edge: EdgeChildProps, index: number, setCurrEdges: React.Dispatch<React.SetStateAction<EdgeChildProps[]>>, 
-  onEdgesChange: Function, setConditionType: Function, setChildQuestionNode: Function, setEdgeConditionMinValue: Function, setEdgeConditionMaxValue: Function, setEdgeConditionMatchValue: Function }) => {
+const EdgeEntry = ({ questions, edge, index, setCurrEdges, onEdgesChange, setConditionType, setChildQuestionNode, setEdgeConditionMinValue, setEdgeConditionMaxValue, setEdgeConditionMatchValue }: {
+  questions: Array<QuestionEntryProps>, edge: EdgeChildProps, index: number, setCurrEdges: React.Dispatch<React.SetStateAction<EdgeChildProps[]>>,
+  onEdgesChange: Function, setConditionType: Function, setChildQuestionNode: Function, setEdgeConditionMinValue: Function, setEdgeConditionMaxValue: Function, setEdgeConditionMatchValue: Function
+}) => {
 
   const [currCondition, setCurrCondition] = useState({ value: edge?.conditions?.[0]?.conditionType, label: edge?.conditions?.[0]?.conditionType });
   const [currChildQuestion, setCurrChildQuestion] = useState({ value: edge?.childNode?.id, label: `${edge?.childNode?.title} - ${edge?.childNode?.id}` });
@@ -189,7 +191,7 @@ const EdgeEntry = ({ questions, edge, index, setCurrEdges, onEdgesChange, setCon
   };
 
   const setChildQuestion = (childQuestion: any) => {
-    const { label, value }: {label: string, value: string} = childQuestion;
+    const { label, value }: { label: string, value: string } = childQuestion;
     const strippedLabel = label.split('-')?.[0]?.trim();
     setCurrChildQuestion({ label, value });
     setChildQuestionNode({ title: strippedLabel, id: value }, index);
@@ -229,7 +231,7 @@ const EdgeEntry = ({ questions, edge, index, setCurrEdges, onEdgesChange, setCon
         <Div mt={10} mb={20}>
           <StyledLabel>conditionType</StyledLabel>
           {
-          // TODO: Clear fields when condition type is changed?
+            // TODO: Clear fields when condition type is changed?
           }
           <Select options={conditionTypes} value={currCondition} onChange={(qOption) => setCondition(qOption)} />
           {
@@ -246,7 +248,7 @@ const EdgeEntry = ({ questions, edge, index, setCurrEdges, onEdgesChange, setCon
             currCondition.value === 'match' && (
               <Div mt={10}>
                 <StyledLabel ml={5} mr={5}>Match value</StyledLabel>
-                <StyledInput defaultValue={edge?.conditions?.[0].matchValue} onBlur={(event: React.FocusEvent<HTMLInputElement>) => setEdgeConditionMatchValue(event.target.value, index)}/>
+                <StyledInput defaultValue={edge?.conditions?.[0].matchValue} onBlur={(event: React.FocusEvent<HTMLInputElement>) => setEdgeConditionMatchValue(event.target.value, index)} />
               </Div>
             )
           }
@@ -376,7 +378,8 @@ const QuestionEntry = ({ questionsQ, question, leafs, index, setNewTitle, onLeaf
       id: undefined,
       conditions: [],
       parentNode: { id: question.id, title: question.title },
-      childNode: {} }]);
+      childNode: {},
+    }]);
   };
 
   const deleteOption = (event: any, questionIndex: number, optionIndex: number) => {
@@ -529,7 +532,6 @@ const TopicBuilderContent = () => {
   }
 
   const topicBuilderData = data?.questionnaire;
-  console.log('Topic builder data: ', topicBuilderData);
   const leafs: Array<LeafProps> = topicBuilderData?.leafs;
 
   const setNewTitle = (event: any, qIndex: number) => {
@@ -585,6 +587,17 @@ const TopicBuilderContent = () => {
     });
   };
 
+  const onAddQuestion = (event: any) => {
+    event.preventDefault();
+    setQuestions((questionsPrev: any) => [...questionsPrev, {
+      id: undefined,
+      title: undefined,
+      questionType: undefined,
+      overrideLeaf: undefined,
+      edgeChildren: undefined,
+    }]);
+  };
+
   const selectLeafs = leafs.map((leaf) => {
     return { value: leaf.id, label: leaf.title };
   });
@@ -604,10 +617,10 @@ const TopicBuilderContent = () => {
         }
         {
           questions && questions.map((question: QuestionEntryProps, index: number) => {
-            return <QuestionEntry onLeafNodeChange={onLeafNodeChange} onEdgesChange={onEdgesChange} onAddQuestionOption={onAddQuestionOption} onQuestionOptionsChange={onQuestionOptionsChange} onQuestionTypeChange={onQuestionTypeChange} setNewTitle={setNewTitle} key={index} index={index} questionsQ={topicBuilderData?.questions} question={question} leafs={selectLeafs} />;
+            return <QuestionEntry onLeafNodeChange={onLeafNodeChange} onEdgesChange={onEdgesChange} onAddQuestionOption={onAddQuestionOption} onQuestionOptionsChange={onQuestionOptionsChange} onQuestionTypeChange={onQuestionTypeChange} setNewTitle={setNewTitle} key={index} index={index} questionsQ={questions} question={question} leafs={selectLeafs} />;
           })
         }
-        <Button brand="default" mt={2} ml={4} mr={4} onClick={() => setQuestions((questionsPrev: any) => setQuestions([...questionsPrev, {}]))}>Add new question</Button>
+        <Button brand="default" mt={2} ml={4} mr={4} onClick={(e) => onAddQuestion(e)}>Add new question</Button>
         <Button brand="primary" mt={2} ml={4} mr={4} type="submit">Save submit</Button>
       </TopicBuilderContentView>
     </>
