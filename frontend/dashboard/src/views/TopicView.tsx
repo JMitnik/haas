@@ -176,13 +176,6 @@ const EdgeEntry = ({ questions, edge, index, setCurrEdges, onEdgesChange, setCon
 
   const [currCondition, setCurrCondition] = useState({ value: edge?.conditions?.[0]?.conditionType, label: edge?.conditions?.[0]?.conditionType });
   const [currChildQuestion, setCurrChildQuestion] = useState({ value: edge?.childNode?.id, label: `${edge?.childNode?.title} - ${edge?.childNode?.id}` });
-  // const [activeMinValue, setActiveMinValue] = useState(undefined);
-  // const [activeMaxValue, setActiveMaxValue] = useState(undefined);
-  // const [activeMatchValue, setActiveMatchValue] = useState(undefined);
-
-  // const setEdgeData = () => {
-
-  // };
 
   const setCondition = (qOption: any) => {
     const { label, value } = qOption;
@@ -363,12 +356,11 @@ const QuestionEntry = ({ questionsQ, question, leafs, index, setNewTitle, onLeaf
   };
 
   useEffect(() => {
-    // TODO: don't run this on initial render. For some reason parent is not updated intially when new edge is added
     if (isIntialRender.current === true) {
-      console.log('Initial render so skipping setting edges');
       isIntialRender.current = false;
       return;
     }
+
     onEdgesChange(currEdges, index);
   }, [currEdges, isIntialRender]);
 
