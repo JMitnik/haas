@@ -109,12 +109,12 @@ interface OverrideLeafProps {
   title: string;
 }
 interface QuestionEntryProps {
-  id: string;
-  title: string;
-  questionType: string;
+  id?: string;
+  title?: string;
+  questionType?: string;
   overrideLeaf?: OverrideLeafProps;
   edgeChildren?: Array<EdgeChildProps>;
-  options: Array<QuestionOptionProps>;
+  options?: Array<QuestionOptionProps>;
 }
 
 interface QuestionOptionProps {
@@ -124,9 +124,9 @@ interface QuestionOptionProps {
 
 interface EdgeChildProps {
   id?: string;
-  conditions?: Array<EdgeConditonProps>;
-  parentNode?: QuestionEntryProps;
-  childNode?: QuestionEntryProps;
+  conditions: Array<EdgeConditonProps>;
+  parentNode: QuestionEntryProps;
+  childNode: QuestionEntryProps;
 }
 
 interface EdgeConditonProps {
@@ -169,9 +169,10 @@ const DeleteQuestionOptionButtonContainer = styled.button`
 
 const conditionTypes = [{ value: 'match', label: 'match' }, { value: 'valueBoundary', label: 'valueBoundary' }];
 
-const EdgeEntry = ({ questions, edge, index, setCurrEdges, onEdgesChange, setConditionType }: { questions: Array<QuestionEntryProps>, edge: EdgeChildProps, index: number, setCurrEdges: React.Dispatch<React.SetStateAction<EdgeChildProps[]>>, onEdgesChange: Function, setConditionType: Function }) => {
+const EdgeEntry = ({ questions, edge, index, setCurrEdges, onEdgesChange, setConditionType, setChildQuestionNode, setEdgeConditionMinValue, setEdgeConditionMaxValue, setEdgeConditionMatchValue }: { questions: Array<QuestionEntryProps>, edge: EdgeChildProps, index: number, setCurrEdges: React.Dispatch<React.SetStateAction<EdgeChildProps[]>>, 
+  onEdgesChange: Function, setConditionType: Function, setChildQuestionNode: Function, setEdgeConditionMinValue: Function, setEdgeConditionMaxValue: Function, setEdgeConditionMatchValue: Function }) => {
 
-  const [currCondition, setCurrCondition] = useState({ value: edge?.conditions?.[0].conditionType, label: edge?.conditions?.[0].conditionType });
+  const [currCondition, setCurrCondition] = useState({ value: edge?.conditions?.[0]?.conditionType, label: edge?.conditions?.[0]?.conditionType });
   const [currChildQuestion, setCurrChildQuestion] = useState({ value: edge?.childNode?.id, label: `${edge?.childNode?.title} - ${edge?.childNode?.id}` });
   // const [activeMinValue, setActiveMinValue] = useState(undefined);
   // const [activeMaxValue, setActiveMaxValue] = useState(undefined);
@@ -188,8 +189,20 @@ const EdgeEntry = ({ questions, edge, index, setCurrEdges, onEdgesChange, setCon
   };
 
   const setChildQuestion = (childQuestion: any) => {
-    const { label, value } = childQuestion;
+    const { label, value }: {label: string, value: string} = childQuestion;
+    const strippedLabel = label.split('-')?.[0]?.trim();
     setCurrChildQuestion({ label, value });
+    setChildQuestionNode({ title: strippedLabel, id: value }, index);
+  };
+
+  const setMinValue = (event: React.FocusEvent<HTMLInputElement>) => {
+    const minValue = Number(event.target.value);
+    setEdgeConditionMinValue(minValue, index);
+  };
+
+  const setMaxValue = (event: React.FocusEvent<HTMLInputElement>) => {
+    const maxValue = Number(event.target.value);
+    setEdgeConditionMaxValue(maxValue, index);
   };
 
   const newSelect = questions.map((question) => {
@@ -213,17 +226,19 @@ const EdgeEntry = ({ questions, edge, index, setCurrEdges, onEdgesChange, setCon
         <DeleteCustomerButtonContainer onClick={(e) => deleteEdgeEntry(e, index)}><X /></DeleteCustomerButtonContainer>
         <StyledLabel marginTop={10} marginBottom={20}>Child node #{index + 1}</StyledLabel>
         <Select options={newSelect} value={currChildQuestion} onChange={(childNode) => setChildQuestion(childNode)} />
-        {/* <StyledInput name="title" value={`${edge.childNode.title} - ${edge.childNode.id}`} /> */}
         <Div mt={10} mb={20}>
           <StyledLabel>conditionType</StyledLabel>
+          {
+          // TODO: Clear fields when condition type is changed?
+          }
           <Select options={conditionTypes} value={currCondition} onChange={(qOption) => setCondition(qOption)} />
           {
             currCondition.value === 'valueBoundary' && (
               <Div mt={10}>
                 <StyledLabel ml={5} mr={5}>Min value</StyledLabel>
-                <StyledInput defaultValue={edge?.conditions?.[0].renderMin} />
+                <StyledInput defaultValue={edge?.conditions?.[0].renderMin} onBlur={(event: React.FocusEvent<HTMLInputElement>) => setMinValue(event)} />
                 <StyledLabel ml={5} mr={5}>Max value</StyledLabel>
-                <StyledInput defaultValue={edge?.conditions?.[0].renderMax} />
+                <StyledInput defaultValue={edge?.conditions?.[0].renderMax} onBlur={(event: React.FocusEvent<HTMLInputElement>) => setMaxValue(event)} />
               </Div>
             )
           }
@@ -231,7 +246,7 @@ const EdgeEntry = ({ questions, edge, index, setCurrEdges, onEdgesChange, setCon
             currCondition.value === 'match' && (
               <Div mt={10}>
                 <StyledLabel ml={5} mr={5}>Match value</StyledLabel>
-                <StyledInput defaultValue={edge?.conditions?.[0].matchValue} />
+                <StyledInput defaultValue={edge?.conditions?.[0].matchValue} onBlur={(event: React.FocusEvent<HTMLInputElement>) => setEdgeConditionMatchValue(event.target.value, index)}/>
               </Div>
             )
           }
@@ -280,16 +295,65 @@ const QuestionEntry = ({ questionsQ, question, leafs, index, setNewTitle, onQues
 
   const setConditionType = (conditionType: string, edgeIndex: number) => {
     setCurrEdges((edgesPrev: Array<EdgeChildProps>) => {
-      if (edgesPrev?.[edgeIndex]?.conditions?.[0].conditionType) {
-        const edge: EdgeChildProps = edgesPrev[edgeIndex];
-        if (!edge.conditions) {
-          edge.conditions = [];
-          edge.conditions = [{ conditionType }];
-          return [...edgesPrev];
-        }
-
-        edge.conditions[0].conditionType = conditionType;
+      const edge: EdgeChildProps = edgesPrev[edgeIndex];
+      if (edge.conditions.length === 0) {
+        edge.conditions = [{ conditionType }];
+        return [...edgesPrev];
       }
+
+      edge.conditions[0].conditionType = conditionType;
+      return [...edgesPrev];
+    });
+  };
+
+  const setChildQuestionNode = (childNode: any, edgeIndex: number) => {
+    setCurrEdges((edgesPrev: Array<EdgeChildProps>) => {
+      let edge: EdgeChildProps = edgesPrev[edgeIndex];
+      if (!edge) {
+        edge = { childNode, conditions: [], parentNode: {} };
+        return [...edgesPrev];
+      }
+
+      edge.childNode = childNode;
+      return [...edgesPrev];
+    });
+  };
+
+  const setEdgeConditionMinValue = (renderMin: number, edgeIndex: number) => {
+    setCurrEdges((edgesPrev: Array<EdgeChildProps>) => {
+      const edge: EdgeChildProps = edgesPrev[edgeIndex];
+      if (edge?.conditions?.length === 0) {
+        edge.conditions = [{ renderMin }];
+        return [...edgesPrev];
+      }
+
+      edge.conditions[0].renderMin = renderMin;
+      return [...edgesPrev];
+    });
+  };
+
+  const setEdgeConditionMaxValue = (renderMax: number, edgeIndex: number) => {
+    setCurrEdges((edgesPrev: Array<EdgeChildProps>) => {
+      const edge: EdgeChildProps = edgesPrev[edgeIndex];
+      if (edge?.conditions?.length === 0) {
+        edge.conditions = [{ renderMax }];
+        return [...edgesPrev];
+      }
+
+      edge.conditions[0].renderMax = renderMax;
+      return [...edgesPrev];
+    });
+  };
+
+  const setEdgeConditionMatchValue = (matchValue: string, edgeIndex: number) => {
+    setCurrEdges((edgesPrev: Array<EdgeChildProps>) => {
+      const edge: EdgeChildProps = edgesPrev[edgeIndex];
+      if (edge?.conditions?.length === 0) {
+        edge.conditions = [{ matchValue }];
+        return [...edgesPrev];
+      }
+
+      edge.conditions[0].matchValue = matchValue;
       return [...edgesPrev];
     });
   };
@@ -306,7 +370,7 @@ const QuestionEntry = ({ questionsQ, question, leafs, index, setNewTitle, onQues
 
   const addNewEdge = (event: any, qIndex: number) => {
     event.preventDefault();
-    setCurrEdges((edges: Array<EdgeChildProps>) => [...edges, { conditions: undefined, parentNode: undefined, childNode: undefined }]);
+    setCurrEdges((edges: Array<EdgeChildProps>) => [...edges, { id: undefined, conditions: [], parentNode: { id: question.id, title: question.title }, childNode: {} }]);
   };
 
   const deleteOption = (event: any, questionIndex: number, optionIndex: number) => {
@@ -381,7 +445,7 @@ const QuestionEntry = ({ questionsQ, question, leafs, index, setNewTitle, onQues
           }
           {
             currEdges && currEdges.map((edge: EdgeChildProps, edgeIndex: number) => {
-              return <EdgeEntry setConditionType={setConditionType} onEdgesChange={onEdgesChange} key={`${edgeIndex}-${edge.id}`} setCurrEdges={setCurrEdges} questions={questionsQ} edge={edge} index={edgeIndex} />;
+              return <EdgeEntry setEdgeConditionMatchValue={setEdgeConditionMatchValue} setEdgeConditionMaxValue={setEdgeConditionMaxValue} setEdgeConditionMinValue={setEdgeConditionMinValue} setChildQuestionNode={setChildQuestionNode} setConditionType={setConditionType} onEdgesChange={onEdgesChange} key={`${edgeIndex}-${edge.id}`} setCurrEdges={setCurrEdges} questions={questionsQ} edge={edge} index={edgeIndex} />;
             })
           }
           <Button brand="default" mt={2} ml={4} mr={4} onClick={(e) => addNewEdge(e, index)}>Add new edge</Button>
