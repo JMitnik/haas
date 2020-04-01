@@ -5,6 +5,7 @@ export const QuestionFragment = gql`
   fragment QuestionFragment on QuestionNode {
     id
     title
+    isRoot
     overrideLeaf {
       id
       nodeId

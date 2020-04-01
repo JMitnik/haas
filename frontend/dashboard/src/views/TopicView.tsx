@@ -111,6 +111,7 @@ interface OverrideLeafProps {
 interface QuestionEntryProps {
   id?: string;
   title?: string;
+  isRoot?: boolean;
   questionType?: string;
   overrideLeaf?: OverrideLeafProps;
   edgeChildren?: Array<EdgeChildProps>;
@@ -258,13 +259,14 @@ const QuestionEntryView = styled.div`
 
 const questionTypes = [{ value: 'SLIDER', label: 'SLIDER' }, { value: 'MULTI_CHOICE', label: 'MULTI_CHOICE' }];
 
-const QuestionEntry = ({ questionsQ, question, leafs, index, setNewTitle, onLeafNodeChange, onQuestionTypeChange, onQuestionOptionsChange, onAddQuestionOption, onEdgesChange }: { questionsQ: Array<QuestionEntryProps>, question: QuestionEntryProps, leafs: any, index: number, setNewTitle: Function, onLeafNodeChange: Function, onQuestionTypeChange: Function, onQuestionOptionsChange: Function, onAddQuestionOption: Function, onEdgesChange: Function }) => {
+const QuestionEntry = ({ questionsQ, question, leafs, index, setNewTitle, onIsRootQuestionChange, onLeafNodeChange, onQuestionTypeChange, onQuestionOptionsChange, onAddQuestionOption, onEdgesChange }: { questionsQ: Array<QuestionEntryProps>, question: QuestionEntryProps, leafs: any, index: number, setNewTitle: Function, onLeafNodeChange: Function, onQuestionTypeChange: Function, onQuestionOptionsChange: Function, onAddQuestionOption: Function, onEdgesChange: Function, onIsRootQuestionChange: Function }) => {
   const { register, handleSubmit, errors } = useForm();
 
   const [currLeaf, setCurrLeaf] = useState({ label: question.overrideLeaf?.title, value: question.overrideLeaf?.id });
   const [currQuestionType, setCurrQuestionType] = useState({ label: question.questionType, value: question.questionType });
   const [currOptions, setCurrOptions] = useState(question?.options || []);
   const [currEdges, setCurrEdges] = useState(question?.edgeChildren || []);
+  const [isRoot, setIsRoot] = useState(question?.isRoot);
   const isIntialRender = useRef(true);
 
   const setQuestionType = (questionType: any) => {
@@ -278,6 +280,11 @@ const QuestionEntry = ({ questionsQ, question, leafs, index, setNewTitle, onLeaf
     setCurrLeaf({ label, value });
     // TODO: Set new leaf
     onLeafNodeChange(value, index);
+  };
+
+  const setIsRootQuestion = () => {
+    onIsRootQuestionChange(!isRoot, index);
+    setIsRoot(!isRoot);
   };
 
   const addNewOption = (event: any, qIndex: number) => {
@@ -403,6 +410,15 @@ const QuestionEntry = ({ questionsQ, question, leafs, index, setNewTitle, onLeaf
           <StyledInput name="title" defaultValue={question.title} onBlur={(e) => setNewTitle(e, index)} ref={register({ required: true })} />
           {errors.title && <Muted color="warning">Something went wrong!</Muted>}
         </Div>
+        <Div useFlex pl={4} pr={4} pb={2} flexDirection="row">
+          <StyledLabel>Is root:</StyledLabel>
+          <input
+            name="isGoing"
+            type="checkbox"
+            checked={question.isRoot}
+            onChange={() => setIsRootQuestion()}
+          />
+        </Div>
         <Div useFlex pl={4} pr={4} pb={2} flexDirection="column">
           <StyledLabel>Question type</StyledLabel>
           <Select options={questionTypes} value={currQuestionType} onChange={(qOption) => setQuestionType(qOption)} />
@@ -522,14 +538,28 @@ const TopicBuilderContent = () => {
   if (loading) {
     return <Loader />;
   }
-
+  console.log('Current questions: ', questions);
   const topicBuilderData = data?.questionnaire;
   const leafs: Array<LeafProps> = topicBuilderData?.leafs;
+
+  const selectLeafs = leafs.map((leaf) => {
+    return { value: leaf.id, label: leaf.title };
+  });
+
+  selectLeafs.unshift({ value: 'None', label: 'None' });
 
   const setNewTitle = (event: any, qIndex: number) => {
     event.preventDefault();
     setQuestions((questionsPrev: Array<QuestionEntryProps>) => {
       questionsPrev[qIndex].title = event.target.value;
+      return [...questionsPrev];
+    });
+  };
+
+  const onIsRootQuestionChange = (isRoot: boolean, qIndex: number) => {
+    console.log('is root?: ', isRoot);
+    setQuestions((questionsPrev: Array<QuestionEntryProps>) => {
+      questionsPrev[qIndex].isRoot = isRoot;
       return [...questionsPrev];
     });
   };
@@ -590,12 +620,6 @@ const TopicBuilderContent = () => {
     }]);
   };
 
-  const selectLeafs = leafs.map((leaf) => {
-    return { value: leaf.id, label: leaf.title };
-  });
-
-  selectLeafs.unshift({ value: 'None', label: 'None' });
-
   return (
     <>
       <H2 color="default.text" fontWeight={400} mb={4}>
@@ -609,7 +633,7 @@ const TopicBuilderContent = () => {
         }
         {
           questions && questions.map((question: QuestionEntryProps, index: number) => {
-            return <QuestionEntry onLeafNodeChange={onLeafNodeChange} onEdgesChange={onEdgesChange} onAddQuestionOption={onAddQuestionOption} onQuestionOptionsChange={onQuestionOptionsChange} onQuestionTypeChange={onQuestionTypeChange} setNewTitle={setNewTitle} key={index} index={index} questionsQ={questions} question={question} leafs={selectLeafs} />;
+            return <QuestionEntry onIsRootQuestionChange={onIsRootQuestionChange} onLeafNodeChange={onLeafNodeChange} onEdgesChange={onEdgesChange} onAddQuestionOption={onAddQuestionOption} onQuestionOptionsChange={onQuestionOptionsChange} onQuestionTypeChange={onQuestionTypeChange} setNewTitle={setNewTitle} key={index} index={index} questionsQ={questions} question={question} leafs={selectLeafs} />;
           })
         }
         <Button brand="default" mt={2} ml={4} mr={4} onClick={(e) => onAddQuestion(e)}>Add new question</Button>
