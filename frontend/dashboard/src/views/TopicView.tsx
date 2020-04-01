@@ -104,9 +104,9 @@ const TopicView = () => {
 };
 
 interface OverrideLeafProps {
-  id: string;
+  id?: string;
   type?: string;
-  title: string;
+  title?: string;
 }
 interface QuestionEntryProps {
   id?: string;
@@ -263,7 +263,7 @@ const QuestionEntryView = styled.div`
 
 const questionTypes = [{ value: 'SLIDER', label: 'SLIDER' }, { value: 'MULTI_CHOICE', label: 'MULTI_CHOICE' }];
 
-const QuestionEntry = ({ questionsQ, question, leafs, index, setNewTitle, onQuestionTypeChange, onQuestionOptionsChange, onAddQuestionOption, onEdgesChange }: { questionsQ: Array<QuestionEntryProps>, question: QuestionEntryProps, leafs: any, index: number, setNewTitle: Function, onQuestionTypeChange: Function, onQuestionOptionsChange: Function, onAddQuestionOption: Function, onEdgesChange: Function }) => {
+const QuestionEntry = ({ questionsQ, question, leafs, index, setNewTitle, onLeafNodeChange, onQuestionTypeChange, onQuestionOptionsChange, onAddQuestionOption, onEdgesChange }: { questionsQ: Array<QuestionEntryProps>, question: QuestionEntryProps, leafs: any, index: number, setNewTitle: Function, onLeafNodeChange: Function, onQuestionTypeChange: Function, onQuestionOptionsChange: Function, onAddQuestionOption: Function, onEdgesChange: Function }) => {
   const { register, handleSubmit, errors } = useForm();
 
   const [currLeaf, setCurrLeaf] = useState({ label: question.overrideLeaf?.title, value: question.overrideLeaf?.id });
@@ -281,6 +281,8 @@ const QuestionEntry = ({ questionsQ, question, leafs, index, setNewTitle, onQues
   const setLeafNode = (leafNode: any) => {
     const { label, value } = leafNode;
     setCurrLeaf({ label, value });
+    // TODO: Set new leaf
+    onLeafNodeChange(value, index);
   };
 
   const addNewOption = (event: any, qIndex: number) => {
@@ -368,9 +370,13 @@ const QuestionEntry = ({ questionsQ, question, leafs, index, setNewTitle, onQues
     onEdgesChange(currEdges, index);
   }, [currEdges, isIntialRender]);
 
-  const addNewEdge = (event: any, qIndex: number) => {
+  const addNewEdge = (event: any) => {
     event.preventDefault();
-    setCurrEdges((edges: Array<EdgeChildProps>) => [...edges, { id: undefined, conditions: [], parentNode: { id: question.id, title: question.title }, childNode: {} }]);
+    setCurrEdges((edges: Array<EdgeChildProps>) => [...edges, {
+      id: undefined,
+      conditions: [],
+      parentNode: { id: question.id, title: question.title },
+      childNode: {} }]);
   };
 
   const deleteOption = (event: any, questionIndex: number, optionIndex: number) => {
@@ -448,7 +454,7 @@ const QuestionEntry = ({ questionsQ, question, leafs, index, setNewTitle, onQues
               return <EdgeEntry setEdgeConditionMatchValue={setEdgeConditionMatchValue} setEdgeConditionMaxValue={setEdgeConditionMaxValue} setEdgeConditionMinValue={setEdgeConditionMinValue} setChildQuestionNode={setChildQuestionNode} setConditionType={setConditionType} onEdgesChange={onEdgesChange} key={`${edgeIndex}-${edge.id}`} setCurrEdges={setCurrEdges} questions={questionsQ} edge={edge} index={edgeIndex} />;
             })
           }
-          <Button brand="default" mt={2} ml={4} mr={4} onClick={(e) => addNewEdge(e, index)}>Add new edge</Button>
+          <Button brand="default" mt={2} ml={4} mr={4} onClick={(e) => addNewEdge(e)}>Add new edge</Button>
         </Div>
       </Div>
     </QuestionEntryView>
@@ -534,6 +540,23 @@ const TopicBuilderContent = () => {
     });
   };
 
+  const onLeafNodeChange = (leafId: string, qIndex: number) => {
+    setQuestions((questionsPrev: Array<QuestionEntryProps>) => {
+      const question = questionsPrev?.[qIndex];
+      if (question.overrideLeaf?.id) {
+        if (leafId === 'None') {
+          question.overrideLeaf = undefined;
+          return [...questionsPrev];
+        }
+        question.overrideLeaf.id = leafId;
+        return [...questionsPrev];
+      }
+
+      question.overrideLeaf = { id: leafId };
+      return [...questionsPrev];
+    });
+  };
+
   const onQuestionTypeChange = (value: string, qIndex: number) => {
     setQuestions((questionsPrev: Array<QuestionEntryProps>) => {
       questionsPrev[qIndex].questionType = value;
@@ -581,7 +604,7 @@ const TopicBuilderContent = () => {
         }
         {
           questions && questions.map((question: QuestionEntryProps, index: number) => {
-            return <QuestionEntry onEdgesChange={onEdgesChange} onAddQuestionOption={onAddQuestionOption} onQuestionOptionsChange={onQuestionOptionsChange} onQuestionTypeChange={onQuestionTypeChange} setNewTitle={setNewTitle} key={index} index={index} questionsQ={topicBuilderData?.questions} question={question} leafs={selectLeafs} />;
+            return <QuestionEntry onLeafNodeChange={onLeafNodeChange} onEdgesChange={onEdgesChange} onAddQuestionOption={onAddQuestionOption} onQuestionOptionsChange={onQuestionOptionsChange} onQuestionTypeChange={onQuestionTypeChange} setNewTitle={setNewTitle} key={index} index={index} questionsQ={topicBuilderData?.questions} question={question} leafs={selectLeafs} />;
           })
         }
         <Button brand="default" mt={2} ml={4} mr={4} onClick={() => setQuestions((questionsPrev: any) => setQuestions([...questionsPrev, {}]))}>Add new question</Button>
