@@ -46,6 +46,7 @@ input EdgeChildInput {
 }
 
 input OptionInput {
+    id: String
     value: String
     publicValue: String
 }

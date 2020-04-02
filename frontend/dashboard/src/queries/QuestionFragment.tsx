@@ -16,6 +16,7 @@ export const QuestionFragment = gql`
     edgeChildren {
       id
       conditions {
+        id
         conditionType
         matchValue
         renderMin
@@ -31,6 +32,7 @@ export const QuestionFragment = gql`
       }
     }
     options {
+        id
         value
         publicValue
     }
