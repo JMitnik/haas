@@ -343,16 +343,8 @@ const updateQuestionOptions = async (options: Array<IOptionInput>) => {
 };
 
 const getCorrectLeaf = (currentOverrideLeafId: string | undefined | null, overrideLeaf: any) => {
-  if (currentOverrideLeafId && overrideLeaf?.id) {
-    return {
-      connect: {
-        id: overrideLeaf.id,
-      },
-      disconnect: true,
-    };
-  }
-
-  if (!currentOverrideLeafId && overrideLeaf?.id) {
+  console.log('Active override leafId: ', currentOverrideLeafId, 'New overrideLeaf: ', overrideLeaf);
+  if (overrideLeaf?.id) {
     return {
       connect: {
         id: overrideLeaf.id,
@@ -385,16 +377,10 @@ const updateQuestion = async (questionnaireId: string, questionData: IQuestionIn
   const activeOptions = questionData.id ? ((await prisma.questionNode({ id: questionData.id }).options()).map((edge) => edge.id)) : [];
   const currentOverrideLeafId = questionData.id ? (await prisma.questionNode({ id: questionData.id })?.overrideLeaf())?.id : null;
 
-  const leaf = getCorrectLeaf(currentOverrideLeafId, overrideLeaf);
-  const leaf2 = overrideLeaf?.id ? {
-    connect: {
-      id: overrideLeaf.id,
-    },
-  } : null;
-
-  console.log('Active edges: ', activeEdges);
-  console.log('Active options: ', activeOptions);
   console.log('Current OvverideLeafId: ', currentOverrideLeafId);
+  const leaf = getCorrectLeaf(currentOverrideLeafId, overrideLeaf);
+
+  console.log('FINAL LEAF: ', leaf);
   // Remove QuestionOptions which are not in new questionDataInput (disconnect should happen automatically I think)
   try {
     await removeNonExistingQOptions(activeOptions, options, questionData.id);
@@ -459,27 +445,9 @@ const updateQuestion = async (questionnaireId: string, questionData: IQuestionIn
 
   const questionId = questionData.id || 'noooope';
   // console.log('QUESTION ID: ', questionId);
-  await prisma.upsertQuestionNode({ where: { id: questionId },
-    create:
-      {
-        title,
-        overrideLeaf: leaf2,
-        questionnaire: {
-          connect: {
-            id: questionnaireId,
-          },
-        },
-        isRoot,
-        questionType,
-        options: {
-          connect: updatedOptionIds,
-        },
-        edgeChildren: {
-          connect: updatedEdgeIds,
-        },
-      },
-    update:
-    {
+  await prisma.updateQuestionNode({
+    where: { id: questionId },
+    data: {
       title,
       overrideLeaf: leaf,
       questionnaire: {
@@ -495,7 +463,8 @@ const updateQuestion = async (questionnaireId: string, questionData: IQuestionIn
       edgeChildren: {
         connect: updatedEdgeIds,
       },
-    } });
+    },
+  });
 
   console.log('Succesfully updated question node');
 };

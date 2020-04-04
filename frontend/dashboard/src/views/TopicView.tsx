@@ -533,15 +533,18 @@ interface LeafProps {
 
 const TopicBuilderContent = () => {
   const { customerId, topicId } = useParams();
+  const history = useHistory();
   
   const [updateTopic, status] = useMutation(updateTopicBuilder, {
     onCompleted: () => {
       console.log('Succesfully updated topic!');
+      console.log('TOPIC ID: ', topicId, typeof topicId);
+      history.push(`/c/${customerId}/t/${topicId}/`);
     },
-    // refetchQueries: [{ query: getQuestionnairesCustomerQuery,
-    //   variables: {
-    //     id: customerId,
-    //   } }],
+    refetchQueries: [{ query: getTopicBuilderQuery,
+      variables: {
+        topicId,
+      } }],
     onError: (serverError: ApolloError) => {
       console.log(serverError);
     },
@@ -552,11 +555,38 @@ const TopicBuilderContent = () => {
   });
 
   // TODO: MAPPING questions 
-  const [questions, setQuestions] = useState(data?.questionnaire?.questions || []);
+  const [questions, setQuestions] = useState(data?.questionnaire?.questions?.map(({ id, title, isRoot, questionType, overrideLeaf, options, edgeChildren }: QuestionEntryProps) => {
+    return {
+      id,
+      title,
+      isRoot,
+      questionType,
+      overrideLeaf: !overrideLeaf ? null : { id: overrideLeaf?.id, title: overrideLeaf?.title, type: overrideLeaf?.type },
+      options: options?.map((option) => ({ id: option.id, value: option.value, publicValue: option.publicValue })),
+      edgeChildren: edgeChildren?.map((edge: EdgeChildProps) => {
+        return { id: edge.id,
+          parentNode: { id: edge?.parentNode?.id, title: edge?.parentNode?.title },
+          conditions: [{
+            id: edge?.conditions?.[0]?.id,
+            conditionType: edge?.conditions?.[0]?.conditionType,
+            matchValue: edge?.conditions?.[0]?.matchValue,
+            renderMin: edge?.conditions?.[0]?.renderMin,
+            renderMax: edge?.conditions?.[0]?.renderMax }],
+          childNode: { id: edge?.childNode?.id, title: edge?.childNode?.title } };
+      }),
+    };
+  }) || []);
 
   useEffect(() => {
+    console.log('Got new data!');
+    console.log('New data: ', data);
+    if (!data) {
+      console.log('Data is empty so returning!');
+      return;
+    }
     if (data?.questionnaire) {
       setQuestions(data?.questionnaire?.questions?.map(({ id, title, isRoot, questionType, overrideLeaf, options, edgeChildren }: QuestionEntryProps) => {
+        console.log('Override leaf: ', overrideLeaf);
         return {
           id,
           title,
@@ -580,7 +610,7 @@ const TopicBuilderContent = () => {
     }
   }, [data]);
 
-  if (loading) {
+  if (!data || loading) {
     return <Loader />;
   }
 
@@ -616,13 +646,15 @@ const TopicBuilderContent = () => {
       if (question.overrideLeaf?.id) {
         if (leafId === 'None') {
           question.overrideLeaf = undefined;
+          console.log('New leaf node is undefined');
           return [...questionsPrev];
         }
         question.overrideLeaf.id = leafId;
+        console.log('New leaf node: ', question.overrideLeaf.id);
         return [...questionsPrev];
       }
-
       question.overrideLeaf = { id: leafId };
+      console.log('New leaf node: ', question.overrideLeaf.id);
       return [...questionsPrev];
     });
   };
@@ -668,6 +700,7 @@ const TopicBuilderContent = () => {
     }]);
   };
 
+  //FIXME: REFETCH Query (or at least give new questions their respective IDs otherwise will have double entries in DB)
   const updateDaTopic = () => {
     console.log('Current questions: ', questions);
     updateTopic({ variables: { id: topicBuilderData.id, topicData: { id: topicBuilderData.id, questions } } });
