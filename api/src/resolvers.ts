@@ -1,10 +1,11 @@
 import { forwardTo } from 'prisma-binding';
 import crypto from 'crypto';
 import _ from 'lodash';
-import { QueryResolvers, MutationResolvers } from './generated/resolver-types';
-import cleanInt from './utils/cleanInt';
-import { prisma, ID_Input, Questionnaire } from './generated/prisma-client/index';
+import { ServiceContainerProps } from './services/service-container';
+import { QueryResolvers } from './generated/resolver-types';
+import { prisma, ID_Input, Questionnaire, Prisma } from './generated/prisma-client/index';
 import { seedQuestionnare, seedFreshCompany } from '../data/seeds/make-company';
+import SessionResolver from './models/session/session-resolver';
 
 const deleteFullCustomerNode = async (parent: any, args:any) => {
   const { id } : { id: ID_Input} = args;
@@ -149,7 +150,12 @@ const getQuestionnaireAggregatedData = async (parent: any, args: any) => {
   return {};
 };
 
-const queryResolvers = {
+interface ContextProps {
+  db: Prisma;
+  services: ServiceContainerProps;
+}
+
+const queryResolvers: QueryResolvers<ContextProps> = {
   questionNode: forwardTo('db'),
   questionNodes: forwardTo('db'),
   questionnaire: forwardTo('db'),
@@ -168,44 +174,7 @@ const queryResolvers = {
 };
 
 const mutationResolvers = {
-  uploadUserSession: async (obj: any, args: any, ctx: any, info: any) => {
-    const session = await prisma.createSession({});
-
-    args.uploadUserSessionInput.entries.forEach(async (entry: any) => {
-      const maybeCreateEdgeChild = (entry: any) => {
-        if (entry.edgeId) {
-          return { edgeChild: { connect: { id: entry.edgeId } } };
-        }
-
-        return {};
-      };
-
-      await prisma.createNodeEntry({
-        ...maybeCreateEdgeChild(entry),
-        session: {
-          connect: {
-            id: session.id,
-          },
-        },
-        relatedNode: {
-          connect: {
-            id: entry.nodeId,
-          },
-        },
-        depth: entry.depth,
-        values: {
-          create: {
-            numberValue: cleanInt(entry.data.numberValue),
-            textValue: entry.data.textValue,
-            multiValues: {
-              create: entry.data.multiValues,
-            },
-          },
-        },
-      });
-    });
-    return 'Success!';
-  },
+  uploadUserSession: SessionResolver.uploadUserSession,
   createNewCustomer: createNewCustomerMutation,
   deleteFullCustomer: deleteFullCustomerNode,
   createNewQuestionnaire,

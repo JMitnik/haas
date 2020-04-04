@@ -5,7 +5,8 @@ import { useHistory } from 'react-router-dom';
 import { CustomerCardImage, CustomerCardEnqueteLabel } from './CustomerOverviewStyles';
 
 const CustomerCard = ({ customer }: { customer: any }) => {
-  const questionnaireOptions = customer?.questionnaires.map((questionnaire: any) => ({
+  console.log(customer);
+  const questionnaireOptions = customer?.questionnaires?.map((questionnaire: any) => ({
     value: questionnaire.id,
     label: questionnaire.title
   }));
