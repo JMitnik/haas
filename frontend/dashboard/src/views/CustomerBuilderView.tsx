@@ -13,6 +13,7 @@ import { createNewCustomer } from '../mutations/createNewCustomer';
 interface FormDataProps {
   name: String;
   logo: String;
+  primaryColour?: String;
   seed?: Boolean;
 }
 
@@ -33,7 +34,7 @@ const CustomerBuilderView = () => {
 
   const onSubmit = (formData: FormDataProps) => {
     console.log('Form data: ', formData);
-    const optionInput = { logo: formData.logo, isSeed: formData.seed };
+    const optionInput = { logo: formData.logo, isSeed: formData.seed, primaryColour: formData.primaryColour };
     // TODO: Make better typescript supported
     addCustomer({
       variables: {
@@ -71,6 +72,11 @@ const CustomerBuilderView = () => {
                 <Div useFlex pl={4} flexDirection="column">
                   <StyledLabel>Logo</StyledLabel>
                   <StyledInput name="logo" ref={register({ required: true })} />
+                  {errors.name && <Muted color="warning">Something went wrong!</Muted>}
+                </Div>
+                <Div useFlex py={4} flexDirection="column">
+                  <StyledLabel>Primary colour</StyledLabel>
+                  <StyledInput name="primaryColour" ref={register({ required: true })} />
                   {errors.name && <Muted color="warning">Something went wrong!</Muted>}
                 </Div>
               </Grid>

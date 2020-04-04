@@ -98,4 +98,5 @@ type UniqueDataResultEntry {
 input CustomerCreateOptions {
     isSeed: Boolean
     logo: String
+    primaryColour: String
 }

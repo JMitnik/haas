@@ -69,8 +69,8 @@ const deleteFullCustomerNode = async (parent: any, args: any) => {
 
 const createNewCustomerMutation = async (parent: any, args: any) => {
   const { name, options } = args;
-  const { isSeed, logo } = options;
-
+  const { isSeed, logo, primaryColour } = options;
+  console.log('primary colour: ', primaryColour);
   const customer = await prisma.createCustomer({
     name,
     settings: {
@@ -78,14 +78,14 @@ const createNewCustomerMutation = async (parent: any, args: any) => {
         logoUrl: logo,
         colourSettings: {
           create: {
-            primary: "#4287f5"
-          }
-        }
-      }
+            primary: primaryColour || '#4287f5',
+          },
+        },
+      },
     },
     questionnaires: {
-      create: []
-    }
+      create: [],
+    },
   });
 
   if (isSeed) {
