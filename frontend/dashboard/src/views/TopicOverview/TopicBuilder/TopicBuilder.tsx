@@ -7,7 +7,7 @@ import { H2, Loader, Div, Button } from '@haas/ui';
 import { useParams, useHistory } from 'react-router-dom';
 import { updateTopicBuilder } from '../../../mutations/updateTopicBuilder';
 import { getTopicBuilderQuery } from '../../../queries/getQuestionnaireQuery';
-import QuestionEntry from '../QuestionEntry/QuestionEntry';
+import QuestionEntry from './QuestionEntry/QuestionEntry';
 import { TopicBuilderView } from './TopicBuilderStyles';
 
 interface OverrideLeafProps {
@@ -72,11 +72,7 @@ const TopicBuilder = () => {
     },
   });
 
-  const { loading, data } = useQuery(getTopicBuilderQuery, {
-    variables: { topicId },
-  });
-
-  const [questions, setQuestions] = useState(data?.questionnaire?.questions?.map(({ id, title, isRoot, questionType, overrideLeaf, options, edgeChildren }: QuestionEntryProps) => ({
+  const mapQuestionsInputData = (questions: any) => questions?.map(({ id, title, isRoot, questionType, overrideLeaf, options, edgeChildren }: QuestionEntryProps) => ({
     id,
     title,
     isRoot,
@@ -95,33 +91,20 @@ const TopicBuilder = () => {
       }],
       childNode: { id: edge?.childNode?.id, title: edge?.childNode?.title },
     })),
-  })) || []);
+  })) || [];
+
+  const { loading, data } = useQuery(getTopicBuilderQuery, {
+    variables: { topicId },
+  });
+  const questionsData = mapQuestionsInputData(data?.questionnaire?.questions);
+  const [questions, setQuestions] = useState(questionsData);
 
   useEffect(() => {
     if (!data) {
       return;
     }
     if (data?.questionnaire) {
-      setQuestions(data?.questionnaire?.questions?.map(({ id, title, isRoot, questionType, overrideLeaf, options, edgeChildren }: QuestionEntryProps) => ({
-        id,
-        title,
-        isRoot,
-        questionType,
-        overrideLeaf: !overrideLeaf ? null : { id: overrideLeaf?.id, title: overrideLeaf?.title, type: overrideLeaf?.type },
-        options: options?.map((option) => ({ id: option.id, value: option.value, publicValue: option.publicValue })),
-        edgeChildren: edgeChildren?.map((edge: EdgeChildProps) => ({
-          id: edge.id,
-          parentNode: { id: edge?.parentNode?.id, title: edge?.parentNode?.title },
-          conditions: [{
-            id: edge?.conditions?.[0]?.id,
-            conditionType: edge?.conditions?.[0]?.conditionType,
-            matchValue: edge?.conditions?.[0]?.matchValue,
-            renderMin: edge?.conditions?.[0]?.renderMin,
-            renderMax: edge?.conditions?.[0]?.renderMax,
-          }],
-          childNode: { id: edge?.childNode?.id, title: edge?.childNode?.title },
-        })),
-      })) || []);
+      setQuestions(questionsData || []);
     }
   }, [data]);
 

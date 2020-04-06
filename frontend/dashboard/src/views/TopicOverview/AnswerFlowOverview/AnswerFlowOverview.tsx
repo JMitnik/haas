@@ -3,7 +3,7 @@
 import React from 'react';
 import { useQuery } from '@apollo/react-hooks';
 import { H2, Loader, Hr, Div } from '@haas/ui';
-import getSessionAnswerFlow from '../../queries/getSessionAnswerFlow';
+import getSessionAnswerFlow from '../../../queries/getSessionAnswerFlow';
 import { AnswerFlowView, AnswerEntryView } from './AnserFlowOverviewStyles';
 import { NodeEntryProps } from './AnswerFlowOverviewInterfaces';
 
