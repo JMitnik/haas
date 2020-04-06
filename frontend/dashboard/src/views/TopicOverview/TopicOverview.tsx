@@ -5,8 +5,8 @@ import { useQuery } from '@apollo/react-hooks';
 import { Flex, Loader, Grid, Div } from '@haas/ui';
 import { useParams, Switch, Route, useHistory } from 'react-router-dom';
 import getQuestionnaireData from '../../queries/getQuestionnaireData';
-import TimelineFeedOverview from '../TimelineFeedOverview/TimelineFeedOverview';
-import AnswerFlowOverview from '../AnswerFlowOverview/AnswerFlowOverview';
+import TimelineFeedOverview from './TimelineFeedOverview/TimelineFeedOverview';
+import AnswerFlowOverview from './AnswerFlowOverview/AnswerFlowOverview';
 import TopicBuilder from './TopicBuilder/TopicBuilder';
 import TopicDetail from './TopicDetail/TopicDetail';
 
