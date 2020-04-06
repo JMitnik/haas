@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import { ApolloProvider } from '@apollo/react-hooks';
 import styled, { ThemeProvider, css } from 'styled-components';
 
-import { Container } from '@haas/ui';
 import TopNav from './components/Nav';
 import GlobalStyle from './config/global-styles';
 import themeConfig from './config/theme';
@@ -12,7 +11,7 @@ import DashboardView from './views/DashboardView';
 import TopicBuilderView from './views/TopicBuilderView';
 import OrganisationSettingsView from './views/OrganisationSettingsView';
 import TopicsView from './views/TopicsView';
-import TopicView from './views/TopicView';
+import TopicView from './views/TopicOverview/TopicOverview';
 import CustomerBuilderView from './views/CustomerBuilderView';
 
 const AppContainer = styled.div`
