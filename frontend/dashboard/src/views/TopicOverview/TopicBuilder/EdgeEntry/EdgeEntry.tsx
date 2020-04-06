@@ -90,23 +90,23 @@ const StyledInput = styled.input`
 
 const conditionTypes = [{ value: 'match', label: 'match' }, { value: 'valueBoundary', label: 'valueBoundary' }];
 
-const EdgeEntry = ({ questions, edge, index, setCurrEdges, setConditionType, setChildQuestionNode, setEdgeConditionMinValue, setEdgeConditionMaxValue, setEdgeConditionMatchValue }: {
-  questions: Array<QuestionEntryProps>, edge: EdgeChildProps, index: number, setCurrEdges: React.Dispatch<React.SetStateAction<EdgeChildProps[]>>,
+const EdgeEntry = ({ questions, edge, index, setactiveEdges, setConditionType, setChildQuestionNode, setEdgeConditionMinValue, setEdgeConditionMaxValue, setEdgeConditionMatchValue }: {
+  questions: Array<QuestionEntryProps>, edge: EdgeChildProps, index: number, setactiveEdges: React.Dispatch<React.SetStateAction<EdgeChildProps[]>>,
   setConditionType: Function, setChildQuestionNode: Function, setEdgeConditionMinValue: Function, setEdgeConditionMaxValue: Function, setEdgeConditionMatchValue: Function
 }) => {
-  const [currCondition, setCurrCondition] = useState({ value: edge?.conditions?.[0]?.conditionType, label: edge?.conditions?.[0]?.conditionType });
-  const [currChildQuestion, setCurrChildQuestion] = useState({ value: edge?.childNode?.id, label: `${edge?.childNode?.title} - ${edge?.childNode?.id}` });
+  const [activeCondition, setactiveCondition] = useState({ value: edge?.conditions?.[0]?.conditionType, label: edge?.conditions?.[0]?.conditionType });
+  const [activeChildQuestion, setactiveChildQuestion] = useState({ value: edge?.childNode?.id, label: `${edge?.childNode?.title} - ${edge?.childNode?.id}` });
 
   const setCondition = (qOption: any) => {
     const { label, value } = qOption;
-    setCurrCondition({ label, value });
+    setactiveCondition({ label, value });
     setConditionType(value, index);
   };
 
   const setChildQuestion = (childQuestion: any) => {
     const { label, value }: { label: string, value: string } = childQuestion;
     const strippedLabel = label.split('-')?.[0]?.trim();
-    setCurrChildQuestion({ label, value });
+    setactiveChildQuestion({ label, value });
     setChildQuestionNode({ title: strippedLabel, id: value }, index);
   };
 
@@ -129,7 +129,7 @@ const EdgeEntry = ({ questions, edge, index, setCurrEdges, setConditionType, set
   const deleteEdgeEntry = (event: any, edgeIndex: number) => {
     event.preventDefault();
 
-    setCurrEdges((edges) => {
+    setactiveEdges((edges) => {
       edges.splice(edgeIndex, 1);
       return [...edges];
     });
@@ -140,15 +140,15 @@ const EdgeEntry = ({ questions, edge, index, setCurrEdges, setConditionType, set
       <Div useFlex my={10} flexDirection="column" backgroundColor="#f5f5f5">
         <DeleteCustomerButtonContainer onClick={(e) => deleteEdgeEntry(e, index)}><X /></DeleteCustomerButtonContainer>
         <StyledLabel marginTop={10} marginBottom={20}>Child node #{index + 1}</StyledLabel>
-        <Select options={newSelect} value={currChildQuestion} onChange={(childNode) => setChildQuestion(childNode)} />
+        <Select options={newSelect} value={activeChildQuestion} onChange={(childNode) => setChildQuestion(childNode)} />
         <Div mt={10} mb={20}>
           <StyledLabel>conditionType</StyledLabel>
           {
                         // TODO: Clear fields when condition type is changed?
                     }
-          <Select options={conditionTypes} value={currCondition} onChange={(qOption) => setCondition(qOption)} />
+          <Select options={conditionTypes} value={activeCondition} onChange={(qOption) => setCondition(qOption)} />
           {
-                        currCondition.value === 'valueBoundary' && (
+                        activeCondition.value === 'valueBoundary' && (
                         <Div mt={10}>
                           <StyledLabel ml={5} mr={5}>Min value</StyledLabel>
                           <StyledInput defaultValue={edge?.conditions?.[0].renderMin} onBlur={(event: React.FocusEvent<HTMLInputElement>) => setMinValue(event)} />
@@ -158,7 +158,7 @@ const EdgeEntry = ({ questions, edge, index, setCurrEdges, setConditionType, set
                         )
                     }
           {
-                        currCondition.value === 'match' && (
+                        activeCondition.value === 'match' && (
                         <Div mt={10}>
                           <StyledLabel ml={5} mr={5}>Match value</StyledLabel>
                           <StyledInput defaultValue={edge?.conditions?.[0].matchValue} onBlur={(event: React.FocusEvent<HTMLInputElement>) => setEdgeConditionMatchValue(event.target.value, index)} />

@@ -12,7 +12,7 @@ import TopicDetail from './TopicDetail/TopicDetail';
 
 const TopicView = () => {
   const { customerId, topicId } = useParams();
-  const [currSession, setCurrSession] = useState('');
+  const [activeSession, setActiveSession] = useState('');
   const history = useHistory();
   const { loading, data } = useQuery(getQuestionnaireData, {
     variables: { topicId },
@@ -30,7 +30,7 @@ const TopicView = () => {
             <Flex height="100%" alignItems="center" justifyContent="space-between" flexDirection="column">
               <Switch>
                 <Route path="/c/:customerId/t/:topicId/e/:entryId">
-                  <AnswerFlowOverview sessionId={currSession} />
+                  <AnswerFlowOverview sessionId={activeSession} />
                 </Route>
                 <Route path="/c/:customerId/t/:topicId/topic-builder/">
                   <TopicBuilder />
@@ -44,7 +44,7 @@ const TopicView = () => {
           </Div>
           <Div>
             <TimelineFeedOverview
-              setCurrSession={setCurrSession}
+              onActiveSessionChange={setActiveSession}
               timelineEntries={resultData?.timelineEntries}
             />
           </Div>

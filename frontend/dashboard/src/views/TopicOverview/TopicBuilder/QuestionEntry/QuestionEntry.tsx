@@ -102,10 +102,10 @@ const QuestionEntry = ({ questionsQ, question, leafs, index, onTitleChange, onIs
   const { register, errors } = useForm();
 
   const [activeTitle, setActiveTitle] = useState(question.title);
-  const [currLeaf, setCurrLeaf] = useState({ label: question.overrideLeaf?.title, value: question.overrideLeaf?.id });
-  const [currQuestionType, setCurrQuestionType] = useState({ label: question.questionType, value: question.questionType });
-  const [currOptions, setCurrOptions] = useState(question?.options || []);
-  const [currEdges, setCurrEdges] = useState(question?.edgeChildren || []);
+  const [activeLeaf, setactiveLeaf] = useState({ label: question.overrideLeaf?.title, value: question.overrideLeaf?.id });
+  const [activeQuestionType, setactiveQuestionType] = useState({ label: question.questionType, value: question.questionType });
+  const [activeOptions, setactiveOptions] = useState(question?.options || []);
+  const [activeEdges, setactiveEdges] = useState(question?.edgeChildren || []);
   const [isRoot, setIsRoot] = useState(question?.isRoot);
   const isIntialRender = useRef(true);
 
@@ -118,13 +118,13 @@ const QuestionEntry = ({ questionsQ, question, leafs, index, onTitleChange, onIs
 
   const setQuestionType = (questionType: any) => {
     const { label, value } = questionType;
-    setCurrQuestionType({ label, value });
+    setactiveQuestionType({ label, value });
     onQuestionTypeChange(value, index);
   };
 
   const setLeafNode = (leafNode: any) => {
     const { label, value } = leafNode;
-    setCurrLeaf({ label, value });
+    setactiveLeaf({ label, value });
     // TODO: Set new leaf
     onLeafNodeChange(value, index);
   };
@@ -140,12 +140,12 @@ const QuestionEntry = ({ questionsQ, question, leafs, index, onTitleChange, onIs
     const value = '';
     const publicValue = '';
 
-    setCurrOptions((options) => [...options, { value, publicValue }]);
-    onAddQuestionOption(currOptions, qIndex);
+    setactiveOptions((options) => [...options, { value, publicValue }]);
+    onAddQuestionOption(activeOptions, qIndex);
   };
 
   const setConditionType = (conditionType: string, edgeIndex: number) => {
-    setCurrEdges((edgesPrev: Array<EdgeChildProps>) => {
+    setactiveEdges((edgesPrev: Array<EdgeChildProps>) => {
       const edge: EdgeChildProps = edgesPrev[edgeIndex];
       if (edge.conditions.length === 0) {
         edge.conditions = [{ conditionType }];
@@ -158,7 +158,7 @@ const QuestionEntry = ({ questionsQ, question, leafs, index, onTitleChange, onIs
   };
 
   const setChildQuestionNode = (childNode: any, edgeIndex: number) => {
-    setCurrEdges((edgesPrev: Array<EdgeChildProps>) => {
+    setactiveEdges((edgesPrev: Array<EdgeChildProps>) => {
       let edge: EdgeChildProps = edgesPrev[edgeIndex];
       if (!edge) {
         edge = { childNode, conditions: [], parentNode: {} };
@@ -171,7 +171,7 @@ const QuestionEntry = ({ questionsQ, question, leafs, index, onTitleChange, onIs
   };
 
   const setEdgeConditionMinValue = (renderMin: number, edgeIndex: number) => {
-    setCurrEdges((edgesPrev: Array<EdgeChildProps>) => {
+    setactiveEdges((edgesPrev: Array<EdgeChildProps>) => {
       const edge: EdgeChildProps = edgesPrev[edgeIndex];
       if (edge?.conditions?.length === 0) {
         edge.conditions = [{ renderMin }];
@@ -184,7 +184,7 @@ const QuestionEntry = ({ questionsQ, question, leafs, index, onTitleChange, onIs
   };
 
   const setEdgeConditionMaxValue = (renderMax: number, edgeIndex: number) => {
-    setCurrEdges((edgesPrev: Array<EdgeChildProps>) => {
+    setactiveEdges((edgesPrev: Array<EdgeChildProps>) => {
       const edge: EdgeChildProps = edgesPrev[edgeIndex];
       if (edge?.conditions?.length === 0) {
         edge.conditions = [{ renderMax }];
@@ -197,7 +197,7 @@ const QuestionEntry = ({ questionsQ, question, leafs, index, onTitleChange, onIs
   };
 
   const setEdgeConditionMatchValue = (matchValue: string, edgeIndex: number) => {
-    setCurrEdges((edgesPrev: Array<EdgeChildProps>) => {
+    setactiveEdges((edgesPrev: Array<EdgeChildProps>) => {
       const edge: EdgeChildProps = edgesPrev[edgeIndex];
       if (edge?.conditions?.length === 0) {
         edge.conditions = [{ matchValue }];
@@ -215,12 +215,12 @@ const QuestionEntry = ({ questionsQ, question, leafs, index, onTitleChange, onIs
       return;
     }
 
-    onEdgesChange(currEdges, index);
-  }, [currEdges, isIntialRender]);
+    onEdgesChange(activeEdges, index);
+  }, [activeEdges, isIntialRender]);
 
   const addNewEdge = (event: any) => {
     event.preventDefault();
-    setCurrEdges((edges: Array<EdgeChildProps>) => [...edges, {
+    setactiveEdges((edges: Array<EdgeChildProps>) => [...edges, {
       id: undefined,
       conditions: [],
       parentNode: { id: question.id, title: question.title },
@@ -230,22 +230,22 @@ const QuestionEntry = ({ questionsQ, question, leafs, index, onTitleChange, onIs
 
   const deleteOption = (event: any, questionIndex: number, optionIndex: number) => {
     event.preventDefault();
-    setCurrOptions((options) => {
+    setactiveOptions((options) => {
       options.splice(optionIndex, 1);
       return [...options];
     });
-    onQuestionOptionsChange(currOptions, questionIndex);
+    onQuestionOptionsChange(activeOptions, questionIndex);
   };
 
   const setOption = (event: any, questionIndex: number, optionIndex: number) => {
     event.preventDefault();
     const { value } = event.target;
-    setCurrOptions((options) => {
+    setactiveOptions((options) => {
       options[optionIndex] = { value, publicValue: '' };
       return [...options];
     });
 
-    onQuestionOptionsChange(currOptions, questionIndex);
+    onQuestionOptionsChange(activeOptions, questionIndex);
   };
 
   return (
@@ -271,20 +271,20 @@ const QuestionEntry = ({ questionsQ, question, leafs, index, onTitleChange, onIs
         </Div>
         <Div useFlex pl={4} pr={4} pb={2} flexDirection="column">
           <StyledLabel>Question type</StyledLabel>
-          <Select options={questionTypes} value={currQuestionType} onChange={(qOption) => setQuestionType(qOption)} />
+          <Select options={questionTypes} value={activeQuestionType} onChange={(qOption) => setQuestionType(qOption)} />
         </Div>
-        {currQuestionType.value === 'MULTI_CHOICE' && (
+        {activeQuestionType.value === 'MULTI_CHOICE' && (
         <Div useFlex pl={4} pr={4} pb={2} flexDirection="column">
           <H4>OPTIONS</H4>
           {
-            ((currOptions && currOptions.length === 0) || (!currOptions)) && (
+            ((activeOptions && activeOptions.length === 0) || (!activeOptions)) && (
             <Div alignSelf="center">
               No options available...
             </Div>
             )
           }
           {
-                            currOptions && currOptions.map((option, optionIndex) => (
+                            activeOptions && activeOptions.map((option, optionIndex) => (
                               <Div key={`${optionIndex}-${option.value}`} my={1} useFlex flexDirection="row">
                                 <StyledInput key={optionIndex} name={`${question.id}-option-${optionIndex}`} defaultValue={option.value} onBlur={(e) => setOption(e, index, optionIndex)} />
                                 <DeleteQuestionOptionButtonContainer onClick={(e) => deleteOption(e, index, optionIndex)}>
@@ -301,19 +301,19 @@ const QuestionEntry = ({ questionsQ, question, leafs, index, onTitleChange, onIs
         )}
         <Div useFlex pl={4} pr={4} pb={2} flexDirection="column">
           <StyledLabel>Leaf node</StyledLabel>
-          <Select options={leafs} value={(currLeaf?.value && currLeaf) || leafs[0]} onChange={(leafOption) => setLeafNode(leafOption)} />
+          <Select options={leafs} value={(activeLeaf?.value && activeLeaf) || leafs[0]} onChange={(leafOption) => setLeafNode(leafOption)} />
         </Div>
         <Div useFlex pl={4} pr={4} pb={2} flexDirection="column">
           <H4>Edges</H4>
           {
-                        ((currEdges && currEdges.length === 0) || (!currEdges)) && (
+                        ((activeEdges && activeEdges.length === 0) || (!activeEdges)) && (
                         <Div alignSelf="center">
                           No edges available...
                         </Div>
                         )
                     }
           {
-                        currEdges && currEdges.map((edge: EdgeChildProps, edgeIndex: number) => <EdgeEntry setEdgeConditionMatchValue={setEdgeConditionMatchValue} setEdgeConditionMaxValue={setEdgeConditionMaxValue} setEdgeConditionMinValue={setEdgeConditionMinValue} setChildQuestionNode={setChildQuestionNode} setConditionType={setConditionType} key={`${edgeIndex}-${edge.id}`} setCurrEdges={setCurrEdges} questions={questionsQ} edge={edge} index={edgeIndex} />)
+                        activeEdges && activeEdges.map((edge: EdgeChildProps, edgeIndex: number) => <EdgeEntry setEdgeConditionMatchValue={setEdgeConditionMatchValue} setEdgeConditionMaxValue={setEdgeConditionMaxValue} setEdgeConditionMinValue={setEdgeConditionMinValue} setChildQuestionNode={setChildQuestionNode} setConditionType={setConditionType} key={`${edgeIndex}-${edge.id}`} setactiveEdges={setactiveEdges} questions={questionsQ} edge={edge} index={edgeIndex} />)
                     }
           <Button brand="default" mt={2} ml={4} mr={4} onClick={(e) => addNewEdge(e)}>Add new edge</Button>
         </Div>

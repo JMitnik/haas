@@ -30,10 +30,10 @@ const getUniversalDate = (date: Date) => {
 };
 
 const TimelineEntry = ({
-  setCurrSession,
+  onActiveSessionChange,
   timeLineEntry,
 }: {
-  setCurrSession: Dispatch<SetStateAction<string>>,
+  onActiveSessionChange: Dispatch<SetStateAction<string>>,
   timeLineEntry: TimelineEntryProps
 }) => {
   const date = new Date(timeLineEntry.createdAt);
@@ -41,10 +41,10 @@ const TimelineEntry = ({
   const history = useHistory();
   const { customerId, topicId } = useParams();
 
-  // TODO: Set setCurrSession on a context, so you dont pass it as prop around
+  // TODO: Set setActiveSession on a context, so you dont pass it as prop around
   const viewTimeLine = () => {
     history.push(`/c/${customerId}/t/${topicId}/e/${timeLineEntry.sessionId}`);
-    setCurrSession(timeLineEntry.sessionId);
+    onActiveSessionChange(timeLineEntry.sessionId);
   };
 
   return (

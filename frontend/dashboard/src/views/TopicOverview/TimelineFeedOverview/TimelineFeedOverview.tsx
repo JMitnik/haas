@@ -10,7 +10,7 @@ interface TimelineEntryProps {
   createdAt: string;
 }
 
-const TimelineFeedOverview = ({ setCurrSession, timelineEntries }: { setCurrSession: Dispatch<SetStateAction<string>>, timelineEntries: Array<TimelineEntryProps> }) => (
+const TimelineFeedOverview = ({ onActiveSessionChange, timelineEntries }: { onActiveSessionChange: Dispatch<SetStateAction<string>>, timelineEntries: Array<TimelineEntryProps> }) => (
   <TimelineFeedView>
     <Div useFlex alignItems="center" mb={4}>
       <H2 color="primary" fontWeight={400}>
@@ -22,7 +22,7 @@ const TimelineFeedOverview = ({ setCurrSession, timelineEntries }: { setCurrSess
     </Muted>
     <Hr />
     {timelineEntries?.length > 0 && timelineEntries?.map((timelineEntry, index) => (
-      <TimelineEntry setCurrSession={setCurrSession} key={index} timeLineEntry={timelineEntry} />)
+      <TimelineEntry onActiveSessionChange={onActiveSessionChange} key={index} timeLineEntry={timelineEntry} />)
         )}
     {(timelineEntries?.length === 0 || (!timelineEntries)) && (
     <Div style={{ margin: '5px 20px' }}>No data available...</Div>
