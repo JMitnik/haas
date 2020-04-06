@@ -41,7 +41,6 @@ export interface HAASNode {
   title: string;
   type: HAASQuestionType;
   children: Array<Edge>;
-  branchVal?: string;
   conditions?: [HAASNodeConditions];
   overrideLeaf?: HAASNode;
   options?: [MultiChoiceOption];
