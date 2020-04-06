@@ -22,5 +22,4 @@ type QuestionNode {
     overrideLeaf: QuestionNode @relation(name: "OverrideLeaf")
     options: [QuestionOption] @relation (link: TABLE name: "QuestionNodeOptions", onDelete: CASCADE)
     children: [Edge] @relation (link: TABLE, name: "EdgeChildrenRelation", onDelete: CASCADE)
-    branchVal: String
 }

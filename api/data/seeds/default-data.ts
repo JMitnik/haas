@@ -7,15 +7,9 @@ export const sliderType: NodeType = 'SLIDER';
 export const textboxType: NodeType = 'TEXTBOX';
 export const registrationType: NodeType = 'REGISTRATION';
 
-// # Create 5 node entries:
-// 1. Entry gekoppeld aan edge van Questionnaire #1 Mediamarkt met een node entry value uit slider (getal)
-// 2. Entry gekoppeld aan edge van Questionnaire #2 Mediamarkt met een node entry value uit slider (getal)
-// 2. Entry gekoppeld aan edge van Mediamarkt met een node entry value met multi choice (string)
-// 3. 2 entries gekoppeld aan edge van Starbucks met een node entry value uit slider
-
 export const makeEdges = (customerName: string) => [
   {
-    parentQuestionContains: `How do you feel about ${customerName}`, // hardcode company name?
+    parentQuestionContains: `How do you feel about ${customerName}`,
     childQuestionContains: 'What did you like?',
     conditions: [
       {
