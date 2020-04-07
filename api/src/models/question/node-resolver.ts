@@ -1,8 +1,13 @@
 /* eslint-disable max-len */
-import { prisma, Questionnaire, LeafNode, NodeType } from '../../generated/prisma-client/index';
-import { sliderType } from '../../../data/seeds/seedDataStructure';
-import { getCorrectLeaf } from '../../../data/seeds/make-company';
-import { QuestionOption } from '../../generated/resolver-types';
+import { prisma, LeafNode, NodeType } from '../../generated/prisma-client/index';
+import { sliderType, multiChoiceType } from '../../../data/seeds/seedDataStructure';
+// import { NodeResolver.getCorrectLeaf } from '../../../data/seeds/make-company';
+import EdgeResolver from '../edge/edge-resolver';
+
+interface LeafNodeDataEntryProps {
+  title: string;
+  type?: NodeType;
+}
 
 const standardOptions = [{ value: 'Facilities' }, { value: 'Website/Mobile app' }, { value: 'Product/Services' }, { value: 'Customer Support' }];
 const facilityOptions = [{ value: 'Cleanliness' }, { value: 'Atmosphere' }, { value: 'Location' }, { value: 'Other' }];
@@ -16,521 +21,127 @@ class NodeResolver {
     title: string,
     questionnaireId: string,
     type: NodeType,
+    options: Array<any> = [],
     isRoot: boolean = false,
-    options: Array<any>) => prisma.createQuestionNode({
+    overrideLeafId: string = '') => prisma.createQuestionNode({
     title,
     questionnaire: {
       connect: {
         id: questionnaireId,
       },
     },
+    overrideLeaf: overrideLeafId ? {
+      connect: {
+        id: overrideLeafId,
+      },
+    } : null,
     type,
     isRoot,
     options: {
-      create: [
+      create: options.length > 0 ? [
         ...options,
-      ],
+      ] : [],
     },
   });
 
-  static createNodesAndEdges = async (
+  static createTemplateLeafNodes = async (leafNodesArray: Array<LeafNodeDataEntryProps>) => {
+    const leafs = await Promise.all(leafNodesArray.map(async (leafNode) => prisma.createLeafNode({
+      title: leafNode.title,
+      type: leafNode?.type,
+    })));
+
+    return leafs;
+  };
+
+  static getCorrectLeaf = (leafs: LeafNode[], titleSubset: string) => {
+    const correctLeaf = leafs.find((leaf) => leaf.title.includes(titleSubset));
+    return correctLeaf?.id;
+  };
+
+  static createTemplateNodes = async (
     questionnaireId: string,
     customerName: string,
     leafs: LeafNode[],
   ) => {
     // Root question (How do you feel about?)
-    const rootQuestion = await NodeResolver.constructQuestionNode(`How do you feel about ${customerName}?`, questionnaireId, sliderType, true, standardOptions);
+    const rootQuestion = await NodeResolver.constructQuestionNode(`How do you feel about ${customerName}?`, questionnaireId, sliderType, standardOptions, true);
 
     // Positive Sub child 1 (What did you like?)
-    const rootToWhatDidYou = await prisma.createQuestionNode({
-      title: 'What did you like?',
-      questionnaire: {
-        connect: {
-          id: questionnaireId,
-        },
-      },
-      overrideLeaf: {
-        connect: {
-          id: getCorrectLeaf(leafs, 'Follow us on Instagram and stay'),
-        },
-      },
-      type: 'MULTI_CHOICE',
-      options: {
-        create: [
-          ...standardOptions,
-        ],
-      },
-    });
+    const instagramNodeId = NodeResolver.getCorrectLeaf(leafs, 'Follow us on Instagram and stay');
+    const rootToWhatDidYou = await NodeResolver.constructQuestionNode('What did you like?', questionnaireId, multiChoiceType, standardOptions, false, instagramNodeId);
 
     // Positive Sub sub child 1 (Facilities)
-    const whatDidYouToFacilities = await prisma.createQuestionNode({
-      title: 'What exactly did you like about the facilities?',
-      questionnaire: {
-        connect: {
-          id: questionnaireId,
-        },
-      },
-      overrideLeaf: {
-        connect: {
-          id: getCorrectLeaf(leafs, 'Come and join us on 1st April for our great event'),
-        },
-      },
-      type: 'MULTI_CHOICE',
-      options: {
-        create: [
-          ...facilityOptions,
-        ],
-      },
-    });
+    const comeAndJoin1stAprilId = NodeResolver.getCorrectLeaf(leafs, 'Come and join us on 1st April for our great event');
+    const whatDidYouToFacilities = await NodeResolver.constructQuestionNode('What exactly did you like about the facilities?', questionnaireId, multiChoiceType, facilityOptions, false, comeAndJoin1stAprilId);
 
     // Positive Sub sub child 2 (Website)
-    const whatDidYouToWebsite = await prisma.createQuestionNode({
-      title: 'What exactly did you like about the website?',
-      questionnaire: {
-        connect: {
-          id: questionnaireId,
-        },
-      },
-      overrideLeaf: {
-        connect: {
-          id: getCorrectLeaf(leafs, 'Follow us on Instagram and stay'),
-        },
-      },
-      type: 'MULTI_CHOICE',
-      options: {
-        create: [
-          ...websiteOptions,
-        ],
-      },
-    });
+    const whatDidYouToWebsite = await NodeResolver.constructQuestionNode('What exactly did you like about the website?', questionnaireId, multiChoiceType, websiteOptions, false, instagramNodeId);
 
     // Positive Sub sub child 3 (Product/Services)
-    const whatDidYouToProduct = await prisma.createQuestionNode({
-      title: 'What exactly did you like about the product / services?',
-      questionnaire: {
-        connect: {
-          id: questionnaireId,
-        },
-      },
-      overrideLeaf: {
-        connect: {
-          id: getCorrectLeaf(leafs, 'We think you might like this as'),
-        },
-      },
-      type: 'MULTI_CHOICE',
-      options: {
-        create: [
-          ...productServicesOptions,
-        ],
-      },
-    });
+    const weThinkYouMightLikeThis = NodeResolver.getCorrectLeaf(leafs, 'We think you might like this as');
+    const whatDidYouToProduct = await NodeResolver.constructQuestionNode('What exactly did you like about the product / services?', questionnaireId, multiChoiceType, productServicesOptions, false, weThinkYouMightLikeThis);
 
     // Positive Sub sub child 4 (Customer Support)
-    const whatDidYouToCustomerSupport = await prisma.createQuestionNode({
-      title: 'What exactly did you like about the customer support?',
-      questionnaire: {
-        connect: {
-          id: questionnaireId,
-        },
-      },
-      overrideLeaf: {
-        connect: {
-          id: getCorrectLeaf(leafs, 'your email below to receive our newsletter'),
-        },
-      },
-      type: 'MULTI_CHOICE',
-      options: {
-        create: [
-          ...customerSupportOptions,
-        ],
-      },
-    });
+    const yourEmailBelowForNewsletter = NodeResolver.getCorrectLeaf(leafs, 'your email below to receive our newsletter');
+    await NodeResolver.constructQuestionNode('What exactly did you like about the customer support?', questionnaireId, multiChoiceType, customerSupportOptions, false, yourEmailBelowForNewsletter);
 
     // Neutral Sub child 2
-    const rootToWhatWouldYouLikeToTalkAbout = await prisma.createQuestionNode({
-      title: 'What would you like to talk about?',
-      questionnaire: {
-        connect: {
-          id: questionnaireId,
-        },
-      },
-      overrideLeaf: {
-        connect: {
-          id: getCorrectLeaf(leafs, 'Leave your email below to receive our'),
-        },
-      },
-      type: 'MULTI_CHOICE',
-      options: {
-        create: [
-          ...standardOptions,
-        ],
-      },
-    });
+    const leaveYourEmailBelowToReceive = NodeResolver.getCorrectLeaf(leafs, 'Leave your email below to receive our');
+    const rootToWhatWouldYouLikeToTalkAbout = await NodeResolver.constructQuestionNode('What would you like to talk about?', questionnaireId, multiChoiceType, standardOptions, false, leaveYourEmailBelowToReceive);
 
     // Neutral Sub sub child 1 (Facilities)
-    const whatWouldYouLikeToTalkAboutToFacilities = await prisma.createQuestionNode({
-      title: 'Please specify.',
-      questionnaire: {
-        connect: {
-          id: questionnaireId,
-        },
-      },
-      type: 'MULTI_CHOICE',
-      options: {
-        create: [
-          ...facilityOptions,
-        ],
-      },
-    });
+    await NodeResolver.constructQuestionNode('Please specify.', questionnaireId, multiChoiceType, facilityOptions);
 
     // Neutral Sub sub child 2 (Website)
-    const whatWouldYouLikeToTalkAboutToWebsite = await prisma.createQuestionNode({
-      title: 'Please specify.',
-      questionnaire: {
-        connect: {
-          id: questionnaireId,
-        },
-      },
-      type: 'MULTI_CHOICE',
-      options: {
-        create: [
-          ...websiteOptions,
-        ],
-      },
-    });
+    const whatWouldYouLikeToTalkAboutToWebsite = await NodeResolver.constructQuestionNode('Please specify.', questionnaireId, multiChoiceType, websiteOptions);
 
     // Neutral Sub sub child 3 (Product/Services)
-    const whatWouldYouLikeToTalkAboutToProduct = await prisma.createQuestionNode({
-      title: 'Please specify.',
-      questionnaire: {
-        connect: {
-          id: questionnaireId,
-        },
-      },
-      type: 'MULTI_CHOICE',
-      options: {
-        create: [
-          ...productServicesOptions,
-        ],
-      },
-    });
+    const whatWouldYouLikeToTalkAboutToProduct = await NodeResolver.constructQuestionNode('Please specify.', questionnaireId, multiChoiceType, productServicesOptions);
 
     // Neutral Sub sub child 4 (Customer Support)
-    const whatWouldYouLikeToTalkAboutToCustomerSupport = await prisma.createQuestionNode({
-      title: 'Please specify.',
-      questionnaire: {
-        connect: {
-          id: questionnaireId,
-        },
-      },
-      type: 'MULTI_CHOICE',
-      options: {
-        create: [
-          ...customerSupportOptions,
-        ],
-      },
-    });
+    const whatWouldYouLikeToTalkAboutToCustomerSupport = await NodeResolver.constructQuestionNode('Please specify.', questionnaireId, multiChoiceType, customerSupportOptions);
 
     // Negative Sub child 3
-    const rootToWeAreSorryToHearThat = await prisma.createQuestionNode({
-      title: 'We are sorry to hear that! Where can we improve?',
-      questionnaire: {
-        connect: {
-          id: questionnaireId,
-        },
-      },
-      type: 'MULTI_CHOICE',
-      options: {
-        create: [
-          ...standardOptions,
-        ],
-      },
-    });
+    const rootToWeAreSorryToHearThat = await NodeResolver.constructQuestionNode('We are sorry to hear that! Where can we improve?', questionnaireId, multiChoiceType, standardOptions);
 
     // Negative Sub sub child 1 (Facilities)
-    const weAreSorryToHearThatToFacilities = await prisma.createQuestionNode({
-      title: 'Please elaborate.',
-      questionnaire: {
-        connect: {
-          id: questionnaireId,
-        },
-      },
-      overrideLeaf: {
-        connect: {
-          id: getCorrectLeaf(leafs, 'Our team is on it'),
-        },
-      },
-      type: 'MULTI_CHOICE',
-      options: {
-        create: [
-          ...facilityOptions,
-        ],
-      },
-    });
+    const ourTeamIsOnIt = NodeResolver.getCorrectLeaf(leafs, 'Our team is on it');
+    const weAreSorryToHearThatToFacilities = await NodeResolver.constructQuestionNode('Please elaborate.', questionnaireId, multiChoiceType, facilityOptions, false, ourTeamIsOnIt);
 
     // Negative Sub sub child 2 (Website)
-    const weAreSorryToHearThatToWebsite = await prisma.createQuestionNode({
-      title: 'Please elaborate.',
-      questionnaire: {
-        connect: {
-          id: questionnaireId,
-        },
-      },
-      overrideLeaf: {
-        connect: {
-          id: getCorrectLeaf(leafs, 'Please click on the Whatsapp link below so our service'),
-        },
-      },
-      type: 'MULTI_CHOICE',
-      options: {
-        create: [
-          ...websiteOptions,
-        ],
-      },
-    });
+    const pleaseClickWhatsappLink = NodeResolver.getCorrectLeaf(leafs, 'Please click on the Whatsapp link below so our service');
+    const weAreSorryToHearThatToWebsite = await NodeResolver.constructQuestionNode('Please elaborate.', questionnaireId, multiChoiceType, websiteOptions, false, pleaseClickWhatsappLink);
 
     // Negative Sub sub child 3 (Product/Services)
-    const weAreSorryToHearThatToProduct = await prisma.createQuestionNode({
-      title: 'Please elaborate.',
-      questionnaire: {
-        connect: {
-          id: questionnaireId,
-        },
-      },
-      overrideLeaf: {
-        connect: {
-          id: getCorrectLeaf(leafs, 'Click below for your refund'),
-        },
-      },
-      type: 'MULTI_CHOICE',
-      options: {
-        create: [
-          ...productServicesOptions,
-        ],
-      },
-    });
+    const clickBelowForRefund = NodeResolver.getCorrectLeaf(leafs, 'Click below for your refund');
+    const weAreSorryToHearThatToProduct = await NodeResolver.constructQuestionNode('Please elaborate.', questionnaireId, multiChoiceType, productServicesOptions, false, clickBelowForRefund);
 
     // Negative Sub sub child 4 (Customer Support)
-    const weAreSorryToHearThatToCustomerSupport = await prisma.createQuestionNode({
-      title: 'Please elaborate.',
-      questionnaire: {
-        connect: {
-          id: questionnaireId,
-        },
-      },
-      overrideLeaf: {
-        connect: {
-          id: getCorrectLeaf(leafs, 'Our customer experience supervisor is'),
-        },
-      },
-      type: 'MULTI_CHOICE',
-      options: {
-        create: [
-          ...customerSupportOptions,
-        ],
-      },
-    });
+    const ourCustomerExperienceSupervisor = NodeResolver.getCorrectLeaf(leafs, 'Our customer experience supervisor is');
+    const weAreSorryToHearThatToCustomerSupport = await NodeResolver.constructQuestionNode('Please elaborate', questionnaireId, multiChoiceType, customerSupportOptions, false, ourCustomerExperienceSupervisor);
 
     // ################################### EDGES ################################
-    const edgeData = [
-      // POSITIVE EDGES
-      {
-        parent: rootQuestion,
-        conditions: {
-          conditionType: 'valueBoundary',
-          matchValue: null,
-          renderMin: 70,
-          renderMax: 100,
-        },
-        child: rootToWhatDidYou,
-      },
 
-      {
-        parent: rootToWhatDidYou,
-        conditions: {
-          conditionType: 'match',
-          matchValue: 'Facilities',
-          renderMin: null,
-          renderMax: null,
-        },
-        child: whatDidYouToFacilities,
-      },
+    // Positive edges
+    await EdgeResolver.constructEdge(rootQuestion, rootToWhatDidYou, { conditionType: 'valueBoundary', matchValue: null, renderMin: 70, renderMax: 100 });
+    await EdgeResolver.constructEdge(rootToWhatDidYou, whatDidYouToFacilities, { conditionType: 'match', matchValue: 'Facilities', renderMin: null, renderMax: null });
+    await EdgeResolver.constructEdge(rootToWhatDidYou, whatDidYouToWebsite, { conditionType: 'match', matchValue: 'Website/Mobile app', renderMin: null, renderMax: null });
+    await EdgeResolver.constructEdge(rootToWhatDidYou, whatDidYouToProduct, { conditionType: 'match', matchValue: 'Product/Services', renderMin: null, renderMax: null });
+    await EdgeResolver.constructEdge(rootToWhatDidYou, whatDidYouToProduct, { conditionType: 'match', matchValue: 'Customer Support', renderMin: null, renderMax: null });
 
-      {
-        parent: rootToWhatDidYou,
-        conditions: {
-          conditionType: 'match',
-          matchValue: 'Website/Mobile app',
-          renderMin: null,
-          renderMax: null,
-        },
-        child: whatDidYouToWebsite,
-      },
+    // Neutral edges
+    await EdgeResolver.constructEdge(rootQuestion, rootToWhatWouldYouLikeToTalkAbout, { conditionType: 'valueBoundary', matchValue: null, renderMin: 50, renderMax: 70 });
+    await EdgeResolver.constructEdge(rootToWhatWouldYouLikeToTalkAbout, whatDidYouToFacilities, { conditionType: 'match', matchValue: 'Facilities', renderMin: null, renderMax: null });
+    await EdgeResolver.constructEdge(rootToWhatWouldYouLikeToTalkAbout, whatWouldYouLikeToTalkAboutToWebsite, { conditionType: 'match', matchValue: 'Website/Mobile app', renderMin: null, renderMax: null });
+    await EdgeResolver.constructEdge(rootToWhatWouldYouLikeToTalkAbout, whatWouldYouLikeToTalkAboutToProduct, { conditionType: 'match', matchValue: 'Product/Services', renderMin: null, renderMax: null });
+    await EdgeResolver.constructEdge(rootToWhatWouldYouLikeToTalkAbout, whatWouldYouLikeToTalkAboutToCustomerSupport, { conditionType: 'match', matchValue: 'Customer Support', renderMin: null, renderMax: null });
 
-      {
-        parent: rootToWhatDidYou,
-        conditions: {
-          conditionType: 'match',
-          matchValue: 'Product/Services',
-          renderMin: null,
-          renderMax: null,
-        },
-        child: whatDidYouToProduct,
-      },
-
-      {
-        parent: rootToWhatDidYou,
-        conditions: {
-          conditionType: 'match',
-          matchValue: 'Customer Support',
-          renderMin: null,
-          renderMax: null,
-        },
-        child: whatDidYouToProduct,
-      },
-
-      // NEUTRAL EDGES
-      {
-        parent: rootQuestion,
-        conditions: {
-          conditionType: 'valueBoundary',
-          matchValue: null,
-          renderMin: 50,
-          renderMax: 70,
-        },
-        child: rootToWhatWouldYouLikeToTalkAbout,
-      },
-
-      {
-        parent: rootToWhatWouldYouLikeToTalkAbout,
-        conditions: {
-          conditionType: 'match',
-          matchValue: 'Facilities',
-          renderMin: null,
-          renderMax: null,
-        },
-        child: whatDidYouToFacilities,
-      },
-
-      {
-        parent: rootToWhatWouldYouLikeToTalkAbout,
-        conditions: {
-          conditionType: 'match',
-          matchValue: 'Website/Mobile app',
-          renderMin: null,
-          renderMax: null,
-        },
-        child: whatWouldYouLikeToTalkAboutToWebsite,
-      },
-
-      {
-        parent: rootToWhatWouldYouLikeToTalkAbout,
-        conditions: {
-          conditionType: 'match',
-          matchValue: 'Product/Services',
-          renderMin: null,
-          renderMax: null,
-        },
-        child: whatWouldYouLikeToTalkAboutToProduct,
-      },
-
-      {
-        parent: rootToWhatWouldYouLikeToTalkAbout,
-        conditions: {
-          conditionType: 'match',
-          matchValue: 'Customer Support',
-          renderMin: null,
-          renderMax: null,
-        },
-        child: whatWouldYouLikeToTalkAboutToCustomerSupport,
-      },
-
-      // NEGATIVE EDGES
-      {
-        parent: rootQuestion,
-        conditions: {
-          conditionType: 'valueBoundary',
-          matchValue: null,
-          renderMin: 0,
-          renderMax: 50,
-        },
-        child: rootToWeAreSorryToHearThat,
-      },
-
-      {
-        parent: rootToWeAreSorryToHearThat,
-        conditions: {
-          conditionType: 'match',
-          matchValue: 'Facilities',
-          renderMin: null,
-          renderMax: null,
-        },
-        child: weAreSorryToHearThatToFacilities,
-      },
-
-      {
-        parent: rootToWeAreSorryToHearThat,
-        conditions: {
-          conditionType: 'match',
-          matchValue: 'Website/Mobile app',
-          renderMin: null,
-          renderMax: null,
-        },
-        child: weAreSorryToHearThatToWebsite,
-      },
-
-      {
-        parent: rootToWeAreSorryToHearThat,
-        conditions: {
-          conditionType: 'match',
-          matchValue: 'Product/Services',
-          renderMin: null,
-          renderMax: null,
-        },
-        child: weAreSorryToHearThatToProduct,
-      },
-
-      {
-        parent: rootToWeAreSorryToHearThat,
-        conditions: {
-          conditionType: 'match',
-          matchValue: 'Customer Support',
-          renderMin: null,
-          renderMax: null,
-        },
-        child: weAreSorryToHearThatToCustomerSupport,
-      },
-
-    ];
-    // Root to 'What did you like'
-    const edges = await Promise.all(edgeData.map(async (edge) => {
-      const edgeEntry = await prisma.createEdge({
-        parentNode: {
-          connect: {
-            id: edge.parent.id,
-          },
-        },
-        conditions: {
-          create: [edge.conditions],
-        },
-        childNode: {
-          connect: {
-            id: edge.child.id,
-          },
-        },
-      });
-
-      await prisma.updateQuestionNode({
-        where: {
-          id: edge.parent.id,
-        },
-        data: {
-          edgeChildren: {
-            connect: [{ id: edgeEntry.id }],
-          },
-        },
-      });
-    }));
+    // Negative edges
+    await EdgeResolver.constructEdge(rootQuestion, rootToWeAreSorryToHearThat, { conditionType: 'valueBoundary', matchValue: null, renderMin: 0, renderMax: 50 });
+    await EdgeResolver.constructEdge(rootToWeAreSorryToHearThat, weAreSorryToHearThatToFacilities, { conditionType: 'match', matchValue: 'Facilities', renderMax: null, renderMin: null });
+    await EdgeResolver.constructEdge(rootToWeAreSorryToHearThat, weAreSorryToHearThatToWebsite, { conditionType: 'match', matchValue: 'Website/Mobile app', renderMax: null, renderMin: null });
+    await EdgeResolver.constructEdge(rootToWeAreSorryToHearThat, weAreSorryToHearThatToProduct, { conditionType: 'match', matchValue: 'Product/Services', renderMax: null, renderMin: null });
+    await EdgeResolver.constructEdge(rootToWeAreSorryToHearThat, weAreSorryToHearThatToCustomerSupport, { conditionType: 'match', matchValue: 'Customer Support', renderMax: null, renderMin: null });
   };
 }
 

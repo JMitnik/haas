@@ -46,7 +46,7 @@ const resolvers = {
     ...mutationResolvers,
   },
   Node: {
-    __resolveType(obj: any, ctx: any, info: any) {
+    __resolveType(obj: any) {
       return obj.__typename;
     },
   },

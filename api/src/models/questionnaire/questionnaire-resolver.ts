@@ -1,7 +1,9 @@
 /* eslint-disable max-len */
 import _ from 'lodash';
 import { prisma, Questionnaire } from '../../generated/prisma-client/index';
-import { seedQuestionnare } from '../../../data/seeds/make-company';
+
+import NodeResolver from '../question/node-resolver';
+import { leafNodes } from '../../../data/seeds/seedDataStructure';
 
 class DialogueResolver {
   static createNewQuestionnaire = async (parent : any, args: any): Promise<Questionnaire> => {
@@ -12,7 +14,7 @@ class DialogueResolver {
       const customer = await prisma.customer({ id: customerId });
 
       if (customer?.name) {
-        return seedQuestionnare(customerId, customer?.name, title, description);
+        return DialogueResolver.seedQuestionnare(customerId, customer?.name, title, description);
       }
 
       console.log('Cant find customer with specified ID while seeding');
@@ -35,6 +37,34 @@ class DialogueResolver {
       },
     });
 
+    return questionnaire;
+  };
+
+  static seedQuestionnare = async (
+    customerId: string,
+    customerName: string,
+    questionnaireTitle: string = 'Default questionnaire',
+    questionnaireDescription: string = 'Default questions',
+  ): Promise<Questionnaire> => {
+    const leafs = await NodeResolver.createTemplateLeafNodes(leafNodes);
+
+    const questionnaire = await prisma.createQuestionnaire({
+      customer: {
+        connect: {
+          id: customerId,
+        },
+      },
+      leafs: {
+        connect: leafs.map((leaf) => ({ id: leaf.id })),
+      },
+      title: questionnaireTitle,
+      description: questionnaireDescription,
+      questions: {
+        create: [],
+      },
+    });
+
+    await NodeResolver.createTemplateNodes(questionnaire.id, customerName, leafs);
     return questionnaire;
   };
 
