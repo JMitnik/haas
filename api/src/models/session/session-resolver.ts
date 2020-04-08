@@ -4,11 +4,16 @@ import { NodeEntryCreateWithoutSessionInput } from '../../generated/resolver-typ
 
 class SessionResolver {
   static async uploadUserSession(obj: any, args: any, ctx: any) {
-    const { uploadUserSessionInput } = args;
+    const { questionnaireId, entries } = args.uploadUserSessionInput;
 
     const session = await prisma.createSession({
+      questionnaire: {
+        connect: {
+          id: questionnaireId,
+        },
+      },
       nodeEntries: {
-        create: uploadUserSessionInput.entries.map(
+        create: entries.map(
           (entry: any) => SessionResolver.constructNodeEntry(entry),
         ),
       },
@@ -19,7 +24,7 @@ class SessionResolver {
     return session;
   }
 
-  static constructNodeEntry(nodeEntry: any): NodeEntryCreateWithoutSessionInput {
+  static constructNodeEntry(nodeEntry: any) : NodeEntryCreateWithoutSessionInput {
     return {
       // todo: Add relatedEdge back
       relatedNode: {

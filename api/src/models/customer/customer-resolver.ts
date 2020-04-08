@@ -6,8 +6,11 @@ import NodeResolver from '../question/node-resolver';
 class CustomerResolver {
   static deleteFullCustomerNode = async (obj: any, args: any) => {
     const { id }: { id: ID_Input } = args;
-    const customer = await prisma.deleteCustomer({ id });
-
+    const customerId = id;
+    console.log('Customer ID: ', customerId);
+    console.log('CUSTOMER RESOLVER DELETE CUSTOMER');
+    const customer = await prisma.deleteCustomer({ id: customerId });
+    console.log('Customer: ', customer);
     return customer;
   };
 

@@ -37,8 +37,6 @@ class MailService {
       },
     });
 
-    console.log(this.container);
-
     this.defaultSender = input.defaultSender;
   }
 
@@ -54,7 +52,7 @@ class MailService {
       html: body,
     }, (error) => {
       if (error) {
-        console.log(error);
+        console.log('error: ', error);
       }
     });
 

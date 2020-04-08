@@ -26,13 +26,13 @@ services:
       POSTGRES_PASSWORD: prisma
     volumes:
       - postgres:/var/lib/postgresql/data3
-  api:
-    image: juronemo/haasapi-local
-    restart: always
-    ports:
-      - '4000:4000'
-    env_file:
-      - .env
+  # api:
+  #   image: juronemo/haasapi-local
+  #   restart: always
+  #   ports:
+  #     - '4000:4000'
+  #   env_file:
+  #     - .env
 volumes:
   postgres: ~
 

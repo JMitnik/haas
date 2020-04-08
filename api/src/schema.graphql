@@ -26,6 +26,7 @@ input UserSessionEntryDataInput {
 }
 
 input UploadUserSessionInput {
+    questionnaireId: String!
     entries: [UserSessionEntryInput!]!
 }
 
