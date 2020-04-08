@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import _ from 'lodash';
 import { prisma, Questionnaire } from '../../generated/prisma-client/index';
 
@@ -116,7 +115,8 @@ class DialogueResolver {
         filteredNodeData.length > 0 && nrEntries / filteredNodeData.length).toString()
         || 'N/A';
 
-      const orderedTimelineEntries = _.orderBy(filterNodes, (filterNode) => filterNode.createdAt, 'desc') || [];
+      const orderedTimelineEntries = _.orderBy(filterNodes,
+        (filterNode) => filterNode.createdAt, 'desc') || [];
 
       return {
         customerName,
