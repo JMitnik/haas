@@ -10,9 +10,9 @@ import { Query, Questionnaire } from '../../types';
 
 import getQuestionnairesCustomerQuery from '../../queries/getQuestionnairesCustomerQuery';
 import { deleteQuestionnaireMutation } from '../../mutations/deleteQuestionnaire';
-import AddTopicCard from './TopicsViewStyle';
+import AddTopicCard from './TopicsOverviewStyle';
 
-const TopicsView: FC = () => {
+const TopicsOverview: FC = () => {
   const { customerId } = useParams();
 
   const { loading, error, data } = useQuery<Query>(getQuestionnairesCustomerQuery, {
@@ -107,4 +107,4 @@ const TopicCard = ({ topic }: { topic: Questionnaire }) => {
   );
 };
 
-export default TopicsView;
+export default TopicsOverview;

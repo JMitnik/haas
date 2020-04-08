@@ -8,10 +8,10 @@ import GlobalStyle from './config/global-styles';
 import themeConfig from './config/theme';
 import client from './config/apollo';
 import DashboardView from './views/DashboardView/DashboardView';
-import TopicBuilderView from './views/TopicBuilderView';
+import AddTopicView from './views/AddTopicView';
 import OrganisationSettingsView from './views/OrganisationSettingsView';
-import TopicsView from './views/TopicsOverview/TopicsView';
-import TopicView from './views/DetailTopic/TopicDetail';
+import TopicsOverview from './views/TopicsOverview/TopicsOverview';
+import TopicDetail from './views/TopicDetail/TopicDetail';
 import CustomerBuilderView from './views/CustomerBuilderView';
 import { AppContainer, MainWindow } from './AppStyles';
 
@@ -25,10 +25,10 @@ const App: FC = () => (
             <TopNav />
             <MainWindow>
               <Switch>
-                <Route path="/c/:customerId/t/:topicId/" render={() => <TopicView />} />
-                <Route path="/c/:customerId/topic-builder" render={() => <TopicBuilderView />} />
+                <Route path="/c/:customerId/t/:topicId/" render={() => <TopicDetail />} />
+                <Route path="/c/:customerId/topic-builder" render={() => <AddTopicView />} />
                 <Route path="/customer-builder" render={() => <CustomerBuilderView />} />
-                <Route path="/c/:customerId/" render={() => <TopicsView />} />
+                <Route path="/c/:customerId/" render={() => <TopicsOverview />} />
                 <Route
                   path="/organisation-settings"
                   render={() => <OrganisationSettingsView />}

@@ -25,7 +25,7 @@ interface FormDataProps {
   isSeed?: Boolean;
 }
 
-const TopicBuilderView = () => {
+const AddTopicView = () => {
   const history = useHistory();
   const { register, handleSubmit, errors } = useForm<FormDataProps>();
   const { customerId } = useParams();
@@ -128,4 +128,4 @@ const FormGroupContainer = styled.div`
 
 const Form = styled.form``;
 
-export default TopicBuilderView;
+export default AddTopicView;

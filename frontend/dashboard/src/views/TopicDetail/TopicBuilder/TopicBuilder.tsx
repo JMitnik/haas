@@ -71,7 +71,7 @@ const TopicBuilder = () => {
     if (data?.questionnaire) {
       setQuestions(questionsData || []);
     }
-  }, [data, questionsData]);
+  }, [data]);
 
   if (!data || loading) {
     return <Loader />;
