@@ -1,10 +1,34 @@
 import _ from 'lodash';
-import { prisma, Questionnaire } from '../../generated/prisma-client/index';
+import { prisma, Questionnaire, LeafNode } from '../../generated/prisma-client/index';
 
 import NodeResolver from '../question/node-resolver';
 import { leafNodes } from '../../../data/seeds/seedDataStructure';
 
 class DialogueResolver {
+  static constructDialogue = async (
+    customerId: string,
+    title: string,
+    description: string,
+    publicTitle: string = '',
+    leafs: Array<LeafNode> = []) => prisma.createQuestionnaire({
+    customer: {
+      connect: {
+        id: customerId,
+      },
+    },
+    leafs: leafs.length > 0 ? {
+      connect: leafs.map((leaf) => ({ id: leaf.id })),
+    } : {
+      create: [],
+    },
+    title,
+    publicTitle,
+    description,
+    questions: {
+      create: [],
+    },
+  });
+
   static createNewQuestionnaire = async (parent : any, args: any): Promise<Questionnaire> => {
     const { customerId, title, description, publicTitle, isSeed } = args;
     let questionnaire = null;
@@ -19,22 +43,9 @@ class DialogueResolver {
       console.log('Cant find customer with specified ID while seeding');
     }
 
-    questionnaire = await prisma.createQuestionnaire({
-      customer: {
-        connect: {
-          id: customerId,
-        },
-      },
-      leafs: {
-        create: [],
-      },
-      title,
-      publicTitle,
-      description,
-      questions: {
-        create: [],
-      },
-    });
+    questionnaire = await DialogueResolver.constructDialogue(
+      customerId, title, description, publicTitle,
+    );
 
     return questionnaire;
   };
@@ -47,21 +58,9 @@ class DialogueResolver {
   ): Promise<Questionnaire> => {
     const leafs = await NodeResolver.createTemplateLeafNodes(leafNodes);
 
-    const questionnaire = await prisma.createQuestionnaire({
-      customer: {
-        connect: {
-          id: customerId,
-        },
-      },
-      leafs: {
-        connect: leafs.map((leaf) => ({ id: leaf.id })),
-      },
-      title: questionnaireTitle,
-      description: questionnaireDescription,
-      questions: {
-        create: [],
-      },
-    });
+    const questionnaire = await DialogueResolver.constructDialogue(
+      customerId, questionnaireTitle, questionnaireDescription, '', leafs,
+    );
 
     await NodeResolver.createTemplateNodes(questionnaire.id, customerName, leafs);
     return questionnaire;
