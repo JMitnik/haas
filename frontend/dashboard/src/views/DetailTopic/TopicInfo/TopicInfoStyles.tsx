@@ -1,7 +1,7 @@
 /* eslint-disable import/prefer-default-export */
 import styled from 'styled-components/macro';
 
-export const TopicDetailView = styled.div`
+export const TopicInfoView = styled.div`
   display: flex;
   align-self: flex-start;
   flex-direction: column;

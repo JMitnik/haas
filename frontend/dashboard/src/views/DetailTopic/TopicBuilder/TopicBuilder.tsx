@@ -5,7 +5,7 @@ import { ApolloError } from 'apollo-boost';
 import { useQuery, useMutation } from '@apollo/react-hooks';
 import { H2, Loader, Div, Button } from '@haas/ui';
 import { useParams, useHistory } from 'react-router-dom';
-import { updateTopicBuilder } from '../../../mutations/updateTopicBuilder';
+import updateTopicBuilder from '../../../mutations/updateTopicBuilder';
 import { getTopicBuilderQuery } from '../../../queries/getQuestionnaireQuery';
 import QuestionEntry from './QuestionEntry/QuestionEntry';
 import { TopicBuilderView } from './TopicBuilderStyles';

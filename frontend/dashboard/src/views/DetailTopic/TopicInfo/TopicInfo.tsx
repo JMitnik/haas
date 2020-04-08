@@ -1,6 +1,6 @@
 import React from 'react';
 import { H2, Muted, Hr } from '@haas/ui';
-import { TopicDetailView, Score } from './TopicDetailStyles';
+import { TopicInfoView, Score } from './TopicInfoStyles';
 
 interface TimelineEntryProps {
   sessionId: string;
@@ -39,10 +39,10 @@ const getUniversalDate = (date: Date) => {
   return result;
 };
 
-const TopicDetail = (
+const TopicInfo = (
   { QuestionnaireDetailResult }: { QuestionnaireDetailResult: QuestionnaireDetailResult },
 ) => (
-  <TopicDetailView>
+  <TopicInfoView>
     {
       QuestionnaireDetailResult && (
         <>
@@ -85,7 +85,7 @@ const TopicDetail = (
         </>
       )
     }
-  </TopicDetailView>
+  </TopicInfoView>
 );
 
-export default TopicDetail;
+export default TopicInfo;

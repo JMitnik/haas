@@ -6,7 +6,7 @@ import { ChevronRight, Plus, X } from 'react-feather';
 import { H2, H3, H4, Grid, Flex, Icon, Label, Div, Card, CardBody, CardFooter, Container } from '@haas/ui';
 import { Link, useHistory, useParams } from 'react-router-dom';
 import styled, { css } from 'styled-components';
-import { Query, Questionnaire } from '../types.d';
+import { Query, Questionnaire } from '../types';
 
 import { getQuestionnairesCustomerQuery } from '../queries/getQuestionnairesCustomerQuery';
 import { deleteQuestionnaireMutation } from '../mutations/deleteQuestionnaire';
@@ -65,7 +65,7 @@ const AddTopicCard = styled(Card)`
     position: relative;
 
     &:hover ${Div} {
-      transition: all 0.2s ease-in;
+      transition: a/c/ck8r5mbah04rv0883m0a4uvetll 0.2s ease-in;
       box-shadow: 0 1px 3px 1px rgba(0,0,0,0.1);
     }
 
@@ -90,7 +90,6 @@ const AddTopicCard = styled(Card)`
     }
   `}
 `;
-
 
 const DeleteTopicButton = styled.button`
   position: absolute;

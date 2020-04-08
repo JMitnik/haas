@@ -8,9 +8,9 @@ import getQuestionnaireData from '../../queries/getQuestionnaireData';
 import TimelineFeedOverview from './TimelineFeedOverview/TimelineFeedOverview';
 import AnswerFlowOverview from './AnswerFlowOverview/AnswerFlowOverview';
 import TopicBuilder from './TopicBuilder/TopicBuilder';
-import TopicDetail from './TopicDetail/TopicDetail';
+import TopicInfo from './TopicInfo/TopicInfo';
 
-const TopicView = () => {
+const TopicDetail = () => {
   const { customerId, topicId } = useParams();
   const [activeSession, setActiveSession] = useState('');
   const history = useHistory();
@@ -36,7 +36,7 @@ const TopicView = () => {
                   <TopicBuilder />
                 </Route>
                 <Route>
-                  <TopicDetail QuestionnaireDetailResult={resultData} />
+                  <TopicInfo QuestionnaireDetailResult={resultData} />
                   <button type="button" onClick={() => history.push(`/c/${customerId}/t/${topicId}/topic-builder/`)}>Go to topic builder</button>
                 </Route>
               </Switch>
@@ -54,4 +54,4 @@ const TopicView = () => {
   );
 };
 
-export default TopicView;
+export default TopicDetail;

@@ -11,7 +11,7 @@ import DashboardView from './views/DashboardView';
 import TopicBuilderView from './views/TopicBuilderView';
 import OrganisationSettingsView from './views/OrganisationSettingsView';
 import TopicsView from './views/TopicsView';
-import TopicView from './views/TopicOverview/TopicOverview';
+import TopicView from './views/DetailTopic/TopicDetail';
 import CustomerBuilderView from './views/CustomerBuilderView';
 
 const AppContainer = styled.div`
