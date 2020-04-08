@@ -1,5 +1,3 @@
-/* eslint-disable max-len */
-/* eslint-disable react/jsx-one-expression-per-line */
 import React, { useState, useEffect } from 'react';
 import { ApolloError } from 'apollo-boost';
 import { useQuery, useMutation } from '@apollo/react-hooks';
@@ -9,7 +7,10 @@ import updateTopicBuilder from '../../../mutations/updateTopicBuilder';
 import { getTopicBuilderQuery } from '../../../queries/getQuestionnaireQuery';
 import QuestionEntry from './QuestionEntry/QuestionEntry';
 import { TopicBuilderView } from './TopicBuilderStyles';
-import { QuestionEntryProps, LeafProps, EdgeChildProps, QuestionOptionProps } from './TopicBuilderInterfaces';
+import {
+  QuestionEntryProps, LeafProps, EdgeChildProps,
+  QuestionOptionProps,
+} from './TopicBuilderInterfaces';
 
 const TopicBuilder = () => {
   const { customerId, topicId } = useParams();
@@ -34,13 +35,17 @@ const TopicBuilder = () => {
     },
   });
 
-  const mapQuestionsInputData = (questions: any) => questions?.map(({ id, title, isRoot, questionType, overrideLeaf, options, edgeChildren }: QuestionEntryProps) => ({
+  const mapQuestionsInputData = (questions: any) => questions?.map(({ id,
+    title, isRoot, questionType, overrideLeaf, options, edgeChildren }: QuestionEntryProps) => ({
     id,
     title,
     isRoot,
     questionType,
-    overrideLeaf: !overrideLeaf ? null : { id: overrideLeaf?.id, title: overrideLeaf?.title, type: overrideLeaf?.type },
-    options: options?.map((option) => ({ id: option.id, value: option.value, publicValue: option.publicValue })),
+    overrideLeaf: !overrideLeaf
+      ? null
+      : { id: overrideLeaf?.id, title: overrideLeaf?.title, type: overrideLeaf?.type },
+    options: options?.map((option) => (
+      { id: option.id, value: option.value, publicValue: option.publicValue })),
     edgeChildren: edgeChildren?.map((edge: EdgeChildProps) => ({
       id: edge.id,
       parentNode: { id: edge?.parentNode?.id, title: edge?.parentNode?.title },
@@ -155,25 +160,51 @@ const TopicBuilder = () => {
       </H2>
       <TopicBuilderView>
         {
-            (questions && questions.length === 0) && (
-              <Div alignSelf="center">No question available...</Div>
-            )
-          }
+          (questions && questions.length === 0) && (
+            <Div alignSelf="center">No question available...</Div>
+          )
+        }
         {
-            questions && questions.map((question: QuestionEntryProps, index: number) => <QuestionEntry onIsRootQuestionChange={onIsRootQuestionChange} onLeafNodeChange={onLeafNodeChange} onEdgesChange={onEdgesChange} onAddQuestionOption={onAddQuestionOption} onQuestionOptionsChange={onQuestionOptionsChange} onQuestionTypeChange={onQuestionTypeChange} onTitleChange={onTitleChange} key={index} index={index} questionsQ={questions} question={question} leafs={selectLeafs} />)
-          }
-        <Button brand="default" mt={2} ml={4} mr={4} onClick={(e) => onAddQuestion(e)}>Add new question</Button>
+          questions && questions.map((question: QuestionEntryProps, index: number) => (
+            <QuestionEntry
+              onIsRootQuestionChange={onIsRootQuestionChange}
+              onLeafNodeChange={onLeafNodeChange}
+              onEdgesChange={onEdgesChange}
+              onAddQuestionOption={onAddQuestionOption}
+              onQuestionOptionsChange={onQuestionOptionsChange}
+              onQuestionTypeChange={onQuestionTypeChange}
+              onTitleChange={onTitleChange}
+              key={index}
+              index={index}
+              questionsQ={questions}
+              question={question}
+              leafs={selectLeafs}
+            />
+          ))
+        }
+        <Button
+          brand="default"
+          mt={2}
+          ml={4}
+          mr={4}
+          onClick={(e) => onAddQuestion(e)}
+        >
+          Add new question
+        </Button>
         <Button
           brand="primary"
           mt={2}
           ml={4}
           mr={4}
           onClick={
-              (e) => {
-                e.preventDefault();
-                updateTopic({ variables: { id: topicBuilderData.id, topicData: { id: topicBuilderData.id, questions } } });
-              }
+            (e) => {
+              e.preventDefault();
+              updateTopic(
+                { variables: { id: topicBuilderData.id,
+                  topicData: { id: topicBuilderData.id, questions } } },
+              );
             }
+          }
         >
           Save topic
         </Button>

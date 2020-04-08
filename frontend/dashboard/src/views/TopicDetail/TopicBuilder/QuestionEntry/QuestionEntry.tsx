@@ -162,7 +162,7 @@ const QuestionEntry = ({ questionsQ, question, leafs, index, onTitleChange, onIs
     }
 
     onEdgesChange(activeEdges, index);
-  }, [activeEdges, isIntialRender, index, onEdgesChange]);
+  }, [activeEdges, isIntialRender]);
 
   const addNewEdge = (event: any) => {
     event.preventDefault();
