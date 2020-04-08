@@ -6,7 +6,7 @@ import { Flex, Loader, Grid, Div } from '@haas/ui';
 import { useParams, Switch, Route, useHistory } from 'react-router-dom';
 import getQuestionnaireData from '../../queries/getQuestionnaireData';
 import TimelineFeedOverview from './TimelineFeedOverview/TimelineFeedOverview';
-import AnswerFlowOverview from './AnswerFlowOverview/AnswerFlowOverview';
+import NodeEntriesOverview from './NodeEntriesOverview/NodeEntriesOverview';
 import TopicBuilder from './TopicBuilder/TopicBuilder';
 import TopicInfo from './TopicInfo/TopicInfo';
 
@@ -30,7 +30,7 @@ const TopicDetail = () => {
             <Flex height="100%" alignItems="center" justifyContent="space-between" flexDirection="column">
               <Switch>
                 <Route path="/c/:customerId/t/:topicId/e/:entryId">
-                  <AnswerFlowOverview sessionId={activeSession} />
+                  <NodeEntriesOverview sessionId={activeSession} />
                 </Route>
                 <Route path="/c/:customerId/t/:topicId/topic-builder/">
                   <TopicBuilder />

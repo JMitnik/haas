@@ -2,18 +2,17 @@ import React, { FC } from 'react';
 import { useQuery, useMutation } from '@apollo/react-hooks';
 import { ApolloError } from 'apollo-boost';
 
-import { ChevronRight, Plus, X } from 'react-feather';
-import { H2, H3, H4, Grid, Flex, Icon, Label, Div, Card, CardBody, CardFooter, Container } from '@haas/ui';
+import { Plus, X } from 'react-feather';
+import { H2, H3, Grid, Flex, Label, Div, Card, CardBody, Container } from '@haas/ui';
 import { Link, useHistory, useParams } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 import { Query, Questionnaire } from '../types';
 
-import { getQuestionnairesCustomerQuery } from '../queries/getQuestionnairesCustomerQuery';
+import getQuestionnairesCustomerQuery from '../queries/getQuestionnairesCustomerQuery';
 import { deleteQuestionnaireMutation } from '../mutations/deleteQuestionnaire';
 
 const TopicsView: FC = () => {
   const { customerId } = useParams();
-  const history = useHistory();
 
   const { loading, error, data } = useQuery<Query>(getQuestionnairesCustomerQuery, {
     variables: { id: customerId },
@@ -24,9 +23,10 @@ const TopicsView: FC = () => {
   if (error) {
     return (
       <p>
+        `
         Error:
-        {' '}
         {error.message}
+        `
       </p>
     );
   }
@@ -112,13 +112,12 @@ const TopicCard = ({ topic }: { topic: Questionnaire }) => {
   const { customerId } = useParams();
 
   const [deleteTopic, { loading }] = useMutation(deleteQuestionnaireMutation, {
-    onCompleted: () => {
-      console.log('Succesfully deleted customer !');
-    },
-    refetchQueries: [{ query: getQuestionnairesCustomerQuery,
+    refetchQueries: [{
+      query: getQuestionnairesCustomerQuery,
       variables: {
         id: topic.customer.id,
-      } }],
+      },
+    }],
     onError: (serverError: ApolloError) => {
       console.log(serverError);
     },
@@ -136,7 +135,11 @@ const TopicCard = ({ topic }: { topic: Questionnaire }) => {
   return (
     <Card useFlex flexDirection="column" onClick={() => history.push(`/c/${customerId}/t/${topic.id}`)}>
       <CardBody flex="100%">
-        <DeleteTopicButton onClick={(e) => deleteClickedCustomer(e, topic.id)}><X /></DeleteTopicButton>
+        <DeleteTopicButton
+          onClick={(e) => deleteClickedCustomer(e, topic.id)}
+        >
+          <X />
+        </DeleteTopicButton>
         <Flex alignItems="center" justifyContent="space-between">
           <H3 fontWeight={500}>
             {topic.title}

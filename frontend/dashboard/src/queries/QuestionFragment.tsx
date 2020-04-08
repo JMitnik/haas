@@ -1,7 +1,6 @@
-/* eslint-disable import/prefer-default-export */
 import gql from 'graphql-tag';
 
-export const QuestionFragment = gql`
+const QuestionFragment = gql`
   fragment QuestionFragment on QuestionNode {
     id
     title
@@ -37,6 +36,6 @@ export const QuestionFragment = gql`
         publicValue
     }
   }
-
-  # {SubQuestionFragment}
 `;
+
+export default QuestionFragment;

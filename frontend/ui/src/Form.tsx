@@ -1,8 +1,47 @@
 import React, { forwardRef, Ref } from 'react';
+import { Div } from '@haas/ui';
 import styled, { css } from 'styled-components';
 import { SpaceProps } from 'styled-system';
 import { InputHTMLAttributes } from 'react';
 import Color from 'color';
+
+
+
+
+export const StyledLabel = styled(Div).attrs({ as: 'label' })`
+  ${({ theme }) => css`
+    font-size: 0.8rem;
+    font-weight: bold;
+    margin-bottom: 2px;
+    display: inline-block;
+    color: ${theme.colors.default.dark}
+    text-transform: uppercase;
+  `}
+`;
+
+export const StyledInput = styled.input`
+  ${({ theme }) => css`
+    border-radius: ${theme.borderRadiuses.sm};
+    background: ${theme.colors.white};
+    border: none;
+    border-bottom: ${theme.colors.default.normal} 1px solid;
+    box-shadow: none;
+    background: white;
+    border-radius: 3px;
+
+    /* Make somehow a color */
+    border: 1px solid #dbdde0;
+    box-shadow: none;
+
+    /* Set to variable */
+    padding: 15px;
+  `}
+`;
+
+export const StyledTextInput = styled(StyledInput).attrs({ as: 'textarea' })`
+  resize: none;
+  min-height: 150px;
+`;
 
 export const CheckBoxWrapper = styled.div`
   position: relative;

@@ -1,7 +1,7 @@
 /* eslint-disable import/prefer-default-export */
 import styled, { css } from 'styled-components/macro';
 
-export const TimelineFeedView = styled.div`
+export const TimelineFeedOverviewContainer = styled.div`
   ${({ theme }) => css`
     display: flex;
     flex-direction: column;

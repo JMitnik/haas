@@ -1,7 +1,6 @@
 import React, { Dispatch, SetStateAction } from 'react';
 import { Div, H5 } from '@haas/ui';
-import { useParams, useHistory } from 'react-router-dom';
-import { TimelineEntryView } from './TImelineEntryStyles';
+import TimelineEntryContainer from './TimelineEntryStyles';
 
 interface TimelineEntryProps {
   sessionId: string;
@@ -30,43 +29,34 @@ const getUniversalDate = (date: Date) => {
 };
 
 const TimelineEntry = ({
-  onActiveSessionChange,
   timeLineEntry,
+  viewTimeLine,
 }: {
   onActiveSessionChange: Dispatch<SetStateAction<string>>,
-  timeLineEntry: TimelineEntryProps
+  timeLineEntry: TimelineEntryProps,
+  viewTimeLine: Function
 }) => {
   const date = new Date(timeLineEntry.createdAt);
   const acceptedDate = getUniversalDate(date);
-  const history = useHistory();
-  const { customerId, topicId } = useParams();
-
-  // TODO: Set setActiveSession on a context, so you dont pass it as prop around
-  const viewTimeLine = () => {
-    history.push(`/c/${customerId}/t/${topicId}/e/${timeLineEntry.sessionId}`);
-    onActiveSessionChange(timeLineEntry.sessionId);
-  };
 
   return (
-    <TimelineEntryView onClick={() => viewTimeLine()}>
+    <TimelineEntryContainer onClick={() => viewTimeLine(timeLineEntry)}>
       <Div>
         <Div>
+          `
           User
-          {' '}
           {timeLineEntry.sessionId}
-          {' '}
           has voted
-          {' '}
           {timeLineEntry.value}
+          `
         </Div>
       </Div>
-
       <Div>
         <H5>
           {acceptedDate}
         </H5>
       </Div>
-    </TimelineEntryView>
+    </TimelineEntryContainer>
   );
 };
 

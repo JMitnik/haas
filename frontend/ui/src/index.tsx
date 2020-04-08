@@ -1,7 +1,7 @@
-export { CheckBox, CheckBoxLabel, CheckBoxWrapper, GridForm, Slider, Textbox } from './Form';
-export { Button } from './Buttons';
-export { Container, Grid, Flex, ColumnFlex } from './Container';
 export { Div } from './Generics';
+export { CheckBox, CheckBoxLabel, CheckBoxWrapper, GridForm, Slider, Textbox, StyledLabel, StyledInput, StyledTextInput } from './Form';
+export { Button, DeleteButtonContainer } from './Buttons';
+export { Container, Grid, Flex, ColumnFlex } from './Container';
 export { Card, CardBody, CardFooter } from './Cards';
 export { Icon } from './Icon';
 export { Loader } from './Loader';

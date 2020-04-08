@@ -1,6 +1,6 @@
 /* eslint-disable import/prefer-default-export */
 import gql from 'graphql-tag';
-import { QuestionFragment } from './QuestionFragment';
+import QuestionFragment from './QuestionFragment';
 
 export const getTopicBuilderQuery = gql`
   query getQuestionnaire ($topicId: ID) {

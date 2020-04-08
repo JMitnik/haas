@@ -1,7 +1,6 @@
-/* eslint-disable import/prefer-default-export */
 import styled, { css } from 'styled-components/macro';
 
-export const TimelineEntryView = styled.div`
+const TimelineEntryContainer = styled.div`
    ${({ theme }) => css`
     padding: 8px 14px;
     border-radius: ${theme.borderRadiuses.md};
@@ -18,3 +17,5 @@ export const TimelineEntryView = styled.div`
     }
   `}
 `;
+
+export default TimelineEntryContainer;
