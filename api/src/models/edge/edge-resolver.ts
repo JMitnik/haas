@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import { prisma, QuestionNode } from '../../generated/prisma-client';
 
 class EdgeResolver {
