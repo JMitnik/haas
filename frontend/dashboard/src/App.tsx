@@ -1,34 +1,19 @@
 import React, { FC } from 'react';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import { ApolloProvider } from '@apollo/react-hooks';
-import styled, { ThemeProvider, css } from 'styled-components';
+import { ThemeProvider } from 'styled-components';
 
 import TopNav from './components/Nav';
 import GlobalStyle from './config/global-styles';
 import themeConfig from './config/theme';
 import client from './config/apollo';
-import DashboardView from './views/DashboardView';
+import DashboardView from './views/DashboardView/DashboardView';
 import TopicBuilderView from './views/TopicBuilderView';
 import OrganisationSettingsView from './views/OrganisationSettingsView';
-import TopicsView from './views/TopicsView';
+import TopicsView from './views/TopicsOverview/TopicsView';
 import TopicView from './views/DetailTopic/TopicDetail';
 import CustomerBuilderView from './views/CustomerBuilderView';
-
-const AppContainer = styled.div`
-  ${({ theme }) => css`
-    min-height: 1vh;
-    background: ${theme.colors.default.lightest};
-    margin: 0 auto;
-  `}
-`;
-
-const MainWindow = styled.div`
-  ${({ theme }) => css`
-    padding: ${theme.gutter}px;
-    background: ${theme.colors.default.lightest};
-    min-height: 100vh;
-  `}
-`;
+import { AppContainer, MainWindow } from './AppStyles';
 
 const App: FC = () => (
   <>

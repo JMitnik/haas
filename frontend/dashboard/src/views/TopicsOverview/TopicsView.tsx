@@ -3,13 +3,14 @@ import { useQuery, useMutation } from '@apollo/react-hooks';
 import { ApolloError } from 'apollo-boost';
 
 import { Plus, X } from 'react-feather';
-import { H2, H3, Grid, Flex, Label, Div, Card, CardBody, Container } from '@haas/ui';
+import { H2, H3, Grid, Flex, Label, Div, Card, CardBody,
+  Container, DeleteButtonContainer } from '@haas/ui';
 import { Link, useHistory, useParams } from 'react-router-dom';
-import styled, { css } from 'styled-components';
-import { Query, Questionnaire } from '../types';
+import { Query, Questionnaire } from '../../types';
 
-import getQuestionnairesCustomerQuery from '../queries/getQuestionnairesCustomerQuery';
-import { deleteQuestionnaireMutation } from '../mutations/deleteQuestionnaire';
+import getQuestionnairesCustomerQuery from '../../queries/getQuestionnairesCustomerQuery';
+import { deleteQuestionnaireMutation } from '../../mutations/deleteQuestionnaire';
+import AddTopicCard from './TopicsViewStyle';
 
 const TopicsView: FC = () => {
   const { customerId } = useParams();
@@ -60,58 +61,11 @@ const TopicsView: FC = () => {
   );
 };
 
-const AddTopicCard = styled(Card)`
-  ${({ theme }) => css`
-    position: relative;
-
-    &:hover ${Div} {
-      transition: a/c/ck8r5mbah04rv0883m0a4uvetll 0.2s ease-in;
-      box-shadow: 0 1px 3px 1px rgba(0,0,0,0.1);
-    }
-
-    ${Div} {
-      height: 100%;
-      border: 1px solid ${theme.colors.default.light};
-      transition: all 0.2s ease-in;
-      display: flex;
-      align-items: center;
-      flex-direciton: column;
-      justify-content: center;
-      background: ${theme.colors.default.light};
-    }
-
-    a {
-      position: absolute;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      top: 0;
-      text-decoration: none;
-    }
-  `}
-`;
-
-const DeleteTopicButton = styled.button`
-  position: absolute;
-  top: 5px;
-  right: 5px;
-  background: none;
-  border: none;
-  opacity: 0.1;
-  cursor: pointer;
-  transition: all 0.2s ease-in;
-
-  &:hover {
-    transition: all 0.2s ease-in;
-    opacity: 0.8;
-  }
-`;
-
 const TopicCard = ({ topic }: { topic: Questionnaire }) => {
   const history = useHistory();
   const { customerId } = useParams();
 
-  const [deleteTopic, { loading }] = useMutation(deleteQuestionnaireMutation, {
+  const [deleteTopic] = useMutation(deleteQuestionnaireMutation, {
     refetchQueries: [{
       query: getQuestionnairesCustomerQuery,
       variables: {
@@ -135,11 +89,11 @@ const TopicCard = ({ topic }: { topic: Questionnaire }) => {
   return (
     <Card useFlex flexDirection="column" onClick={() => history.push(`/c/${customerId}/t/${topic.id}`)}>
       <CardBody flex="100%">
-        <DeleteTopicButton
+        <DeleteButtonContainer
           onClick={(e) => deleteClickedCustomer(e, topic.id)}
         >
           <X />
-        </DeleteTopicButton>
+        </DeleteButtonContainer>
         <Flex alignItems="center" justifyContent="space-between">
           <H3 fontWeight={500}>
             {topic.title}

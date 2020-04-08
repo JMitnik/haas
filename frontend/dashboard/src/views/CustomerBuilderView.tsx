@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { gql, ApolloError } from 'apollo-boost';
+import { ApolloError } from 'apollo-boost';
 import styled, { css } from 'styled-components';
 import { useForm } from 'react-hook-form';
 import { useMutation } from '@apollo/react-hooks';
@@ -23,7 +23,6 @@ const CustomerBuilderView = () => {
 
   const [addCustomer, { loading }] = useMutation(createNewCustomer, {
     onCompleted: () => {
-      console.log('Added a customer!');
       history.push('/');
     },
     refetchQueries: [{ query: getCustomerQuery }],
@@ -33,8 +32,9 @@ const CustomerBuilderView = () => {
   });
 
   const onSubmit = (formData: FormDataProps) => {
-    console.log('Form data: ', formData);
-    const optionInput = { logo: formData.logo, isSeed: formData.seed, primaryColour: formData.primaryColour };
+    const optionInput = { logo: formData.logo,
+      isSeed: formData.seed,
+      primaryColour: formData.primaryColour };
     // TODO: Make better typescript supported
     addCustomer({
       variables: {
@@ -81,7 +81,12 @@ const CustomerBuilderView = () => {
                 </Div>
               </Grid>
               <Div py={4}>
-                <StyledInput type="checkbox" id="seed" name="seed" ref={register({ required: false })} />
+                <StyledInput
+                  type="checkbox"
+                  id="seed"
+                  name="seed"
+                  ref={register({ required: false })}
+                />
                 <label htmlFor="seed"> Generate template topic for customer </label>
               </Div>
             </Div>

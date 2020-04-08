@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 
-export const LogoContainer = styled.a`
+export const LogoContainer = styled.div`
     display: block;
 
     /* Manual size */
