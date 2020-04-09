@@ -3,7 +3,7 @@ import { prisma,
   Questionnaire, QuestionnaireCreateInput, QuestionNode } from '../../generated/prisma-client/index';
 
 import NodeResolver from '../question/node-resolver';
-import { leafNodes } from '../../../data/seeds/seedDataStructure';
+import { leafNodes } from '../../../data/seeds/default-data';
 
 class DialogueResolver {
   static constructDialogue(customerId: string,

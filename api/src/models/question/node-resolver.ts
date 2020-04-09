@@ -1,6 +1,6 @@
 import { prisma,
   NodeType, QuestionNode, QuestionNodeCreateInput } from '../../generated/prisma-client/index';
-import { sliderType, multiChoiceType } from '../../../data/seeds/seedDataStructure';
+import { sliderType, multiChoiceType } from '../../../data/seeds/default-data';
 import EdgeResolver from '../edge/edge-resolver';
 
 interface LeafNodeDataEntryProps {

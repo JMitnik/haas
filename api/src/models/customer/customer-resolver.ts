@@ -1,6 +1,6 @@
 import { prisma, ID_Input } from '../../generated/prisma-client/index';
 import { Customer } from '../../generated/resolver-types';
-import { leafNodes } from '../../../data/seeds/seedDataStructure';
+import { leafNodes } from '../../../data/seeds/default-data';
 import NodeResolver from '../question/node-resolver';
 
 class CustomerResolver {
