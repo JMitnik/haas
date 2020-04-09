@@ -182,7 +182,8 @@ const QuestionEntryItem = ({ question, leafs, questionsQ, onEdgesChange, index, 
     onEdgesChange(activeEdges, index);
     // TODO: This will turn to code smells, props is an important dependency.
     // We need to ensure that the flow of the state is handles from one direction/
-  }, [activeEdges, index, isIntialRender, onEdgesChange]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeEdges, isIntialRender]);
 
   const addNewEdge = (event: any) => {
     event.preventDefault();
