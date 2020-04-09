@@ -1205,7 +1205,7 @@ interface Node {
 type NodeEntry {
   id: ID!
   session: Session!
-  relatedNode: QuestionNode!
+  relatedNode: QuestionNode
   edgeChild: Edge
   values(where: NodeEntryValueWhereInput, orderBy: NodeEntryValueOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [NodeEntryValue!]
   depth: Int
@@ -1221,7 +1221,7 @@ type NodeEntryConnection {
 input NodeEntryCreateInput {
   id: ID
   session: SessionCreateOneWithoutNodeEntriesInput!
-  relatedNode: QuestionNodeCreateOneInput!
+  relatedNode: QuestionNodeCreateOneInput
   edgeChild: EdgeCreateOneInput
   values: NodeEntryValueCreateManyInput
   depth: Int
@@ -1234,7 +1234,7 @@ input NodeEntryCreateManyWithoutSessionInput {
 
 input NodeEntryCreateWithoutSessionInput {
   id: ID
-  relatedNode: QuestionNodeCreateOneInput!
+  relatedNode: QuestionNodeCreateOneInput
   edgeChild: EdgeCreateOneInput
   values: NodeEntryValueCreateManyInput
   depth: Int
@@ -1316,7 +1316,7 @@ input NodeEntrySubscriptionWhereInput {
 
 input NodeEntryUpdateInput {
   session: SessionUpdateOneRequiredWithoutNodeEntriesInput
-  relatedNode: QuestionNodeUpdateOneRequiredInput
+  relatedNode: QuestionNodeUpdateOneInput
   edgeChild: EdgeUpdateOneInput
   values: NodeEntryValueUpdateManyInput
   depth: Int
@@ -1348,7 +1348,7 @@ input NodeEntryUpdateManyWithWhereNestedInput {
 }
 
 input NodeEntryUpdateWithoutSessionDataInput {
-  relatedNode: QuestionNodeUpdateOneRequiredInput
+  relatedNode: QuestionNodeUpdateOneInput
   edgeChild: EdgeUpdateOneInput
   values: NodeEntryValueUpdateManyInput
   depth: Int
@@ -1941,6 +1941,7 @@ type Questionnaire {
   rootQuestion: QuestionNode
   questions(where: QuestionNodeWhereInput, orderBy: QuestionNodeOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [QuestionNode!]
   leafs(where: QuestionNodeWhereInput, orderBy: QuestionNodeOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [QuestionNode!]
+  sessions(where: SessionWhereInput, orderBy: SessionOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Session!]
 }
 
 type QuestionnaireConnection {
@@ -1958,6 +1959,7 @@ input QuestionnaireCreateInput {
   rootQuestion: QuestionNodeCreateOneInput
   questions: QuestionNodeCreateManyWithoutQuestionnaireInput
   leafs: QuestionNodeCreateManyInput
+  sessions: SessionCreateManyWithoutQuestionnaireInput
 }
 
 input QuestionnaireCreateManyWithoutCustomerInput {
@@ -1975,6 +1977,11 @@ input QuestionnaireCreateOneWithoutQuestionsInput {
   connect: QuestionnaireWhereUniqueInput
 }
 
+input QuestionnaireCreateOneWithoutSessionsInput {
+  create: QuestionnaireCreateWithoutSessionsInput
+  connect: QuestionnaireWhereUniqueInput
+}
+
 input QuestionnaireCreateWithoutCustomerInput {
   id: ID
   title: String!
@@ -1983,6 +1990,7 @@ input QuestionnaireCreateWithoutCustomerInput {
   rootQuestion: QuestionNodeCreateOneInput
   questions: QuestionNodeCreateManyWithoutQuestionnaireInput
   leafs: QuestionNodeCreateManyInput
+  sessions: SessionCreateManyWithoutQuestionnaireInput
 }
 
 input QuestionnaireCreateWithoutQuestionsInput {
@@ -1992,6 +2000,18 @@ input QuestionnaireCreateWithoutQuestionsInput {
   description: String!
   publicTitle: String
   rootQuestion: QuestionNodeCreateOneInput
+  leafs: QuestionNodeCreateManyInput
+  sessions: SessionCreateManyWithoutQuestionnaireInput
+}
+
+input QuestionnaireCreateWithoutSessionsInput {
+  id: ID
+  customer: CustomerCreateOneWithoutQuestionnairesInput!
+  title: String!
+  description: String!
+  publicTitle: String
+  rootQuestion: QuestionNodeCreateOneInput
+  questions: QuestionNodeCreateManyWithoutQuestionnaireInput
   leafs: QuestionNodeCreateManyInput
 }
 
@@ -2128,6 +2148,7 @@ input QuestionnaireUpdateDataInput {
   rootQuestion: QuestionNodeUpdateOneInput
   questions: QuestionNodeUpdateManyWithoutQuestionnaireInput
   leafs: QuestionNodeUpdateManyInput
+  sessions: SessionUpdateManyWithoutQuestionnaireInput
 }
 
 input QuestionnaireUpdateInput {
@@ -2138,6 +2159,7 @@ input QuestionnaireUpdateInput {
   rootQuestion: QuestionNodeUpdateOneInput
   questions: QuestionNodeUpdateManyWithoutQuestionnaireInput
   leafs: QuestionNodeUpdateManyInput
+  sessions: SessionUpdateManyWithoutQuestionnaireInput
 }
 
 input QuestionnaireUpdateManyDataInput {
@@ -2187,6 +2209,15 @@ input QuestionnaireUpdateOneWithoutQuestionsInput {
   connect: QuestionnaireWhereUniqueInput
 }
 
+input QuestionnaireUpdateOneWithoutSessionsInput {
+  create: QuestionnaireCreateWithoutSessionsInput
+  update: QuestionnaireUpdateWithoutSessionsDataInput
+  upsert: QuestionnaireUpsertWithoutSessionsInput
+  delete: Boolean
+  disconnect: Boolean
+  connect: QuestionnaireWhereUniqueInput
+}
+
 input QuestionnaireUpdateWithoutCustomerDataInput {
   title: String
   description: String
@@ -2194,6 +2225,7 @@ input QuestionnaireUpdateWithoutCustomerDataInput {
   rootQuestion: QuestionNodeUpdateOneInput
   questions: QuestionNodeUpdateManyWithoutQuestionnaireInput
   leafs: QuestionNodeUpdateManyInput
+  sessions: SessionUpdateManyWithoutQuestionnaireInput
 }
 
 input QuestionnaireUpdateWithoutQuestionsDataInput {
@@ -2202,6 +2234,17 @@ input QuestionnaireUpdateWithoutQuestionsDataInput {
   description: String
   publicTitle: String
   rootQuestion: QuestionNodeUpdateOneInput
+  leafs: QuestionNodeUpdateManyInput
+  sessions: SessionUpdateManyWithoutQuestionnaireInput
+}
+
+input QuestionnaireUpdateWithoutSessionsDataInput {
+  customer: CustomerUpdateOneRequiredWithoutQuestionnairesInput
+  title: String
+  description: String
+  publicTitle: String
+  rootQuestion: QuestionNodeUpdateOneInput
+  questions: QuestionNodeUpdateManyWithoutQuestionnaireInput
   leafs: QuestionNodeUpdateManyInput
 }
 
@@ -2218,6 +2261,11 @@ input QuestionnaireUpsertNestedInput {
 input QuestionnaireUpsertWithoutQuestionsInput {
   update: QuestionnaireUpdateWithoutQuestionsDataInput!
   create: QuestionnaireCreateWithoutQuestionsInput!
+}
+
+input QuestionnaireUpsertWithoutSessionsInput {
+  update: QuestionnaireUpdateWithoutSessionsDataInput!
+  create: QuestionnaireCreateWithoutSessionsInput!
 }
 
 input QuestionnaireUpsertWithWhereUniqueWithoutCustomerInput {
@@ -2307,6 +2355,9 @@ input QuestionnaireWhereInput {
   leafs_every: QuestionNodeWhereInput
   leafs_some: QuestionNodeWhereInput
   leafs_none: QuestionNodeWhereInput
+  sessions_every: SessionWhereInput
+  sessions_some: SessionWhereInput
+  sessions_none: SessionWhereInput
   AND: [QuestionnaireWhereInput!]
   OR: [QuestionnaireWhereInput!]
   NOT: [QuestionnaireWhereInput!]
@@ -2326,7 +2377,6 @@ type QuestionNode {
   overrideLeaf: QuestionNode
   options(where: QuestionOptionWhereInput, orderBy: QuestionOptionOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [QuestionOption!]
   children(where: EdgeWhereInput, orderBy: EdgeOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Edge!]
-  branchVal: String
 }
 
 type QuestionNodeConnection {
@@ -2345,7 +2395,6 @@ input QuestionNodeCreateInput {
   overrideLeaf: QuestionNodeCreateOneWithoutOverrideLeafInput
   options: QuestionOptionCreateManyInput
   children: EdgeCreateManyInput
-  branchVal: String
 }
 
 input QuestionNodeCreateManyInput {
@@ -2377,7 +2426,6 @@ input QuestionNodeCreateWithoutOverrideLeafInput {
   isLeaf: Boolean
   options: QuestionOptionCreateManyInput
   children: EdgeCreateManyInput
-  branchVal: String
 }
 
 input QuestionNodeCreateWithoutQuestionnaireInput {
@@ -2389,7 +2437,6 @@ input QuestionNodeCreateWithoutQuestionnaireInput {
   overrideLeaf: QuestionNodeCreateOneWithoutOverrideLeafInput
   options: QuestionOptionCreateManyInput
   children: EdgeCreateManyInput
-  branchVal: String
 }
 
 type QuestionNodeEdge {
@@ -2408,8 +2455,6 @@ enum QuestionNodeOrderByInput {
   isRoot_DESC
   isLeaf_ASC
   isLeaf_DESC
-  branchVal_ASC
-  branchVal_DESC
 }
 
 type QuestionNodePreviousValues {
@@ -2418,7 +2463,6 @@ type QuestionNodePreviousValues {
   type: NodeType!
   isRoot: Boolean!
   isLeaf: Boolean!
-  branchVal: String
 }
 
 input QuestionNodeScalarWhereInput {
@@ -2458,20 +2502,6 @@ input QuestionNodeScalarWhereInput {
   isRoot_not: Boolean
   isLeaf: Boolean
   isLeaf_not: Boolean
-  branchVal: String
-  branchVal_not: String
-  branchVal_in: [String!]
-  branchVal_not_in: [String!]
-  branchVal_lt: String
-  branchVal_lte: String
-  branchVal_gt: String
-  branchVal_gte: String
-  branchVal_contains: String
-  branchVal_not_contains: String
-  branchVal_starts_with: String
-  branchVal_not_starts_with: String
-  branchVal_ends_with: String
-  branchVal_not_ends_with: String
   AND: [QuestionNodeScalarWhereInput!]
   OR: [QuestionNodeScalarWhereInput!]
   NOT: [QuestionNodeScalarWhereInput!]
@@ -2504,7 +2534,6 @@ input QuestionNodeUpdateDataInput {
   overrideLeaf: QuestionNodeUpdateOneWithoutOverrideLeafInput
   options: QuestionOptionUpdateManyInput
   children: EdgeUpdateManyInput
-  branchVal: String
 }
 
 input QuestionNodeUpdateInput {
@@ -2516,7 +2545,6 @@ input QuestionNodeUpdateInput {
   overrideLeaf: QuestionNodeUpdateOneWithoutOverrideLeafInput
   options: QuestionOptionUpdateManyInput
   children: EdgeUpdateManyInput
-  branchVal: String
 }
 
 input QuestionNodeUpdateManyDataInput {
@@ -2524,7 +2552,6 @@ input QuestionNodeUpdateManyDataInput {
   type: NodeType
   isRoot: Boolean
   isLeaf: Boolean
-  branchVal: String
 }
 
 input QuestionNodeUpdateManyInput {
@@ -2544,7 +2571,6 @@ input QuestionNodeUpdateManyMutationInput {
   type: NodeType
   isRoot: Boolean
   isLeaf: Boolean
-  branchVal: String
 }
 
 input QuestionNodeUpdateManyWithoutQuestionnaireInput {
@@ -2573,13 +2599,6 @@ input QuestionNodeUpdateOneInput {
   connect: QuestionNodeWhereUniqueInput
 }
 
-input QuestionNodeUpdateOneRequiredInput {
-  create: QuestionNodeCreateInput
-  update: QuestionNodeUpdateDataInput
-  upsert: QuestionNodeUpsertNestedInput
-  connect: QuestionNodeWhereUniqueInput
-}
-
 input QuestionNodeUpdateOneWithoutOverrideLeafInput {
   create: QuestionNodeCreateWithoutOverrideLeafInput
   update: QuestionNodeUpdateWithoutOverrideLeafDataInput
@@ -2597,7 +2616,6 @@ input QuestionNodeUpdateWithoutOverrideLeafDataInput {
   isLeaf: Boolean
   options: QuestionOptionUpdateManyInput
   children: EdgeUpdateManyInput
-  branchVal: String
 }
 
 input QuestionNodeUpdateWithoutQuestionnaireDataInput {
@@ -2608,7 +2626,6 @@ input QuestionNodeUpdateWithoutQuestionnaireDataInput {
   overrideLeaf: QuestionNodeUpdateOneWithoutOverrideLeafInput
   options: QuestionOptionUpdateManyInput
   children: EdgeUpdateManyInput
-  branchVal: String
 }
 
 input QuestionNodeUpdateWithWhereUniqueNestedInput {
@@ -2688,20 +2705,6 @@ input QuestionNodeWhereInput {
   children_every: EdgeWhereInput
   children_some: EdgeWhereInput
   children_none: EdgeWhereInput
-  branchVal: String
-  branchVal_not: String
-  branchVal_in: [String!]
-  branchVal_not_in: [String!]
-  branchVal_lt: String
-  branchVal_lte: String
-  branchVal_gt: String
-  branchVal_gte: String
-  branchVal_contains: String
-  branchVal_not_contains: String
-  branchVal_starts_with: String
-  branchVal_not_starts_with: String
-  branchVal_ends_with: String
-  branchVal_not_ends_with: String
   AND: [QuestionNodeWhereInput!]
   OR: [QuestionNodeWhereInput!]
   NOT: [QuestionNodeWhereInput!]
@@ -2922,6 +2925,7 @@ input QuestionOptionWhereUniqueInput {
 
 type Session {
   id: ID!
+  questionnaire: Questionnaire
   nodeEntries(where: NodeEntryWhereInput, orderBy: NodeEntryOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [NodeEntry!]
   createdAt: DateTime!
 }
@@ -2934,7 +2938,13 @@ type SessionConnection {
 
 input SessionCreateInput {
   id: ID
+  questionnaire: QuestionnaireCreateOneWithoutSessionsInput
   nodeEntries: NodeEntryCreateManyWithoutSessionInput
+}
+
+input SessionCreateManyWithoutQuestionnaireInput {
+  create: [SessionCreateWithoutQuestionnaireInput!]
+  connect: [SessionWhereUniqueInput!]
 }
 
 input SessionCreateOneWithoutNodeEntriesInput {
@@ -2944,6 +2954,12 @@ input SessionCreateOneWithoutNodeEntriesInput {
 
 input SessionCreateWithoutNodeEntriesInput {
   id: ID
+  questionnaire: QuestionnaireCreateOneWithoutSessionsInput
+}
+
+input SessionCreateWithoutQuestionnaireInput {
+  id: ID
+  nodeEntries: NodeEntryCreateManyWithoutSessionInput
 }
 
 type SessionEdge {
@@ -2961,6 +2977,34 @@ enum SessionOrderByInput {
 type SessionPreviousValues {
   id: ID!
   createdAt: DateTime!
+}
+
+input SessionScalarWhereInput {
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  createdAt: DateTime
+  createdAt_not: DateTime
+  createdAt_in: [DateTime!]
+  createdAt_not_in: [DateTime!]
+  createdAt_lt: DateTime
+  createdAt_lte: DateTime
+  createdAt_gt: DateTime
+  createdAt_gte: DateTime
+  AND: [SessionScalarWhereInput!]
+  OR: [SessionScalarWhereInput!]
+  NOT: [SessionScalarWhereInput!]
 }
 
 type SessionSubscriptionPayload {
@@ -2982,12 +3026,50 @@ input SessionSubscriptionWhereInput {
 }
 
 input SessionUpdateInput {
+  questionnaire: QuestionnaireUpdateOneWithoutSessionsInput
   nodeEntries: NodeEntryUpdateManyWithoutSessionInput
+}
+
+input SessionUpdateManyWithoutQuestionnaireInput {
+  create: [SessionCreateWithoutQuestionnaireInput!]
+  delete: [SessionWhereUniqueInput!]
+  connect: [SessionWhereUniqueInput!]
+  set: [SessionWhereUniqueInput!]
+  disconnect: [SessionWhereUniqueInput!]
+  update: [SessionUpdateWithWhereUniqueWithoutQuestionnaireInput!]
+  upsert: [SessionUpsertWithWhereUniqueWithoutQuestionnaireInput!]
+  deleteMany: [SessionScalarWhereInput!]
 }
 
 input SessionUpdateOneRequiredWithoutNodeEntriesInput {
   create: SessionCreateWithoutNodeEntriesInput
+  update: SessionUpdateWithoutNodeEntriesDataInput
+  upsert: SessionUpsertWithoutNodeEntriesInput
   connect: SessionWhereUniqueInput
+}
+
+input SessionUpdateWithoutNodeEntriesDataInput {
+  questionnaire: QuestionnaireUpdateOneWithoutSessionsInput
+}
+
+input SessionUpdateWithoutQuestionnaireDataInput {
+  nodeEntries: NodeEntryUpdateManyWithoutSessionInput
+}
+
+input SessionUpdateWithWhereUniqueWithoutQuestionnaireInput {
+  where: SessionWhereUniqueInput!
+  data: SessionUpdateWithoutQuestionnaireDataInput!
+}
+
+input SessionUpsertWithoutNodeEntriesInput {
+  update: SessionUpdateWithoutNodeEntriesDataInput!
+  create: SessionCreateWithoutNodeEntriesInput!
+}
+
+input SessionUpsertWithWhereUniqueWithoutQuestionnaireInput {
+  where: SessionWhereUniqueInput!
+  update: SessionUpdateWithoutQuestionnaireDataInput!
+  create: SessionCreateWithoutQuestionnaireInput!
 }
 
 input SessionWhereInput {
@@ -3005,6 +3087,7 @@ input SessionWhereInput {
   id_not_starts_with: ID
   id_ends_with: ID
   id_not_ends_with: ID
+  questionnaire: QuestionnaireWhereInput
   nodeEntries_every: NodeEntryWhereInput
   nodeEntries_some: NodeEntryWhereInput
   nodeEntries_none: NodeEntryWhereInput

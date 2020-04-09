@@ -1,9 +1,9 @@
 type NodeEntry {
     id: ID! @id
-    session: Session!
-    relatedNode: QuestionNode!
+    session: Session! @relation(name: "SessionToNodeEntries")
+    relatedNode: QuestionNode
     edgeChild: Edge
-    values: [NodeEntryValue]
+    values: [NodeEntryValue] @relation(link: TABLE, name: "NodeEntryToNodeEntryValue", onDelete: CASCADE)
     depth: Int
     creationDate: DateTime! @createdAt
 }
