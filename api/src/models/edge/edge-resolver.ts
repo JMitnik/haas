@@ -1,11 +1,15 @@
-import { prisma, QuestionNode } from '../../generated/prisma-client';
+import { prisma, QuestionNode, EdgeCreateInput } from '../../generated/prisma-client';
 
 class EdgeResolver {
-  static constructEdge = async (parent: QuestionNode, child: QuestionNode, conditions: any) => {
-    const edge = await prisma.createEdge({
+  static constructEdge(
+    parentNodeEntry: QuestionNode,
+    childNodeEntry: QuestionNode,
+    conditions: any,
+  ) : EdgeCreateInput {
+    return {
       parentNode: {
         connect: {
-          id: parent.id,
+          id: parentNodeEntry.id,
         },
       },
       conditions: {
@@ -13,10 +17,14 @@ class EdgeResolver {
       },
       childNode: {
         connect: {
-          id: child.id,
+          id: childNodeEntry.id,
         },
       },
-    });
+    };
+  }
+
+  static createEdge = async (parent: QuestionNode, child: QuestionNode, conditions: any) => {
+    const edge = await prisma.createEdge(EdgeResolver.constructEdge(parent, child, conditions));
 
     await prisma.updateQuestionNode({
       where: {

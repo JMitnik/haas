@@ -1,35 +1,46 @@
 import _ from 'lodash';
-import { prisma, Questionnaire, LeafNode } from '../../generated/prisma-client/index';
+import { prisma,
+  Questionnaire, LeafNode, QuestionnaireCreateInput } from '../../generated/prisma-client/index';
 
 import NodeResolver from '../question/node-resolver';
 import { leafNodes } from '../../../data/seeds/seedDataStructure';
 
 class DialogueResolver {
-  static constructDialogue = async (
+  static constructDialogue(customerId: string,
+    title: string,
+    description: string,
+    publicTitle: string = '',
+    leafs: Array<LeafNode> = []): QuestionnaireCreateInput {
+    return {
+      customer: {
+        connect: {
+          id: customerId,
+        },
+      },
+      title,
+      description,
+      publicTitle,
+      leafs: leafs.length > 0 ? {
+        connect: leafs.map((leaf) => ({ id: leaf.id })),
+      } : {
+        create: [],
+      },
+      questions: {
+        create: [],
+      },
+    };
+  }
+
+  static createDialogue = async (
     customerId: string,
     title: string,
     description: string,
     publicTitle: string = '',
-    leafs: Array<LeafNode> = []) => prisma.createQuestionnaire({
-    customer: {
-      connect: {
-        id: customerId,
-      },
-    },
-    leafs: leafs.length > 0 ? {
-      connect: leafs.map((leaf) => ({ id: leaf.id })),
-    } : {
-      create: [],
-    },
-    title,
-    publicTitle,
-    description,
-    questions: {
-      create: [],
-    },
-  });
+    leafs: Array<LeafNode> = []) => prisma.createQuestionnaire(DialogueResolver.constructDialogue(
+    customerId, title, description, publicTitle, leafs,
+  ));
 
-  static createNewQuestionnaire = async (parent : any, args: any): Promise<Questionnaire> => {
+  static createNewQuestionnaire = async (parent: any, args: any): Promise<Questionnaire> => {
     const { customerId, title, description, publicTitle, isSeed } = args;
     let questionnaire = null;
 
@@ -43,7 +54,7 @@ class DialogueResolver {
       console.log('Cant find customer with specified ID while seeding');
     }
 
-    questionnaire = await DialogueResolver.constructDialogue(
+    questionnaire = await DialogueResolver.createDialogue(
       customerId, title, description, publicTitle,
     );
 
@@ -58,7 +69,7 @@ class DialogueResolver {
   ): Promise<Questionnaire> => {
     const leafs = await NodeResolver.createTemplateLeafNodes(leafNodes);
 
-    const questionnaire = await DialogueResolver.constructDialogue(
+    const questionnaire = await DialogueResolver.createDialogue(
       customerId, questionnaireTitle, questionnaireDescription, '', leafs,
     );
 
@@ -75,19 +86,23 @@ class DialogueResolver {
     if (questionnaire) {
       const { title, description, creationDate, updatedAt } = questionnaire;
 
-      const questionNodes = await prisma.questionNodes({ where: {
-        questionnaire: {
-          id: topicId,
+      const questionNodes = await prisma.questionNodes({
+        where: {
+          questionnaire: {
+            id: topicId,
+          },
         },
-      } });
+      });
 
       const questionNodeIds = questionNodes.map((qNode) => qNode.id);
 
-      const nodeEntries = await prisma.nodeEntries({ where: {
-        relatedNode: {
-          id_in: questionNodeIds,
+      const nodeEntries = await prisma.nodeEntries({
+        where: {
+          relatedNode: {
+            id_in: questionNodeIds,
+          },
         },
-      } }) || [];
+      }) || [];
 
       const aggregatedNodeEntries = await Promise.all(nodeEntries.map(async ({ id }) => {
         const values = await prisma.nodeEntry({ id }).values();
