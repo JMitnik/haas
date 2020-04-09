@@ -16,7 +16,7 @@ interface QuestionEntryProps {
   id?: string;
   title?: string;
   isRoot?: boolean;
-  questionType?: string;
+  type?: string;
   overrideLeaf?: OverrideLeafProps;
   edgeChildren?: Array<EdgeChildProps>;
   options?: Array<QuestionOptionProps>;
@@ -68,7 +68,7 @@ const QuestionEntryItem = ({ question, leafs, questionsQ, onEdgesChange, index, 
 
   const [activeTitle, setActiveTitle] = useState(() => question.title);
   const [activeLeaf, setActiveLeaf] = useState(() => ({ label: question.overrideLeaf?.title, value: question.overrideLeaf?.id }));
-  const [activeQuestionType, setActiveQuestionType] = useState(() => ({ label: question.questionType, value: question.questionType }));
+  const [activeQuestionType, setActiveQuestionType] = useState(() => ({ label: question.type, value: question.type }));
   const [activeOptions, setActiveOptions] = useState(() => question?.options || []);
   const [activeEdges, setActiveEdges] = useState(() => question?.edgeChildren || []);
   const [isRoot, setIsRoot] = useState(() => question?.isRoot);
@@ -182,7 +182,7 @@ const QuestionEntryItem = ({ question, leafs, questionsQ, onEdgesChange, index, 
     onEdgesChange(activeEdges, index);
     // TODO: This will turn to code smells, props is an important dependency.
     // We need to ensure that the flow of the state is handles from one direction/
-  }, [activeEdges, isIntialRender]);
+  }, [activeEdges, index, isIntialRender, onEdgesChange]);
 
   const addNewEdge = (event: any) => {
     event.preventDefault();

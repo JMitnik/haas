@@ -15,7 +15,7 @@ export interface QuestionEntryProps {
   id?: string;
   title?: string;
   isRoot?: boolean;
-  questionType?: string;
+  type?: string;
   overrideLeaf?: OverrideLeafProps;
   edgeChildren?: Array<EdgeChildProps>;
   options?: Array<QuestionOptionProps>;

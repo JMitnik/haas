@@ -22,19 +22,6 @@ export const InputLabel = styled.label`
   `}
 `;
 
-export const InputField = styled.input`
-  ${({ theme }) => css`
-      border: none;
-      font-size: ${theme.fontSizes[1]}px;
-      border-radius: 50px;
-      padding: 12px 24px;
-      background: white;
-      text-align: center;
-      font-weight: bolder;
-      color: ${theme.colors.default.text};
-  `}
-`;
-
 export const StyledLabel = styled(Div).attrs({ as: 'label' })`
   ${({ theme }) => css`
     font-size: 0.8rem;

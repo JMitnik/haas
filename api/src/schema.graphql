@@ -55,7 +55,7 @@ input QuestionInput {
     id: String
     title: String!
     isRoot: Boolean!
-    questionType: NodeType!
+    type: NodeType!
     overrideLeaf: LeafNodeInput
     options: [OptionInput] 
     edgeChildren: [EdgeChildInput] 

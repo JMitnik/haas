@@ -36,11 +36,11 @@ const TopicBuilder = () => {
   });
 
   const mapQuestionsInputData = (questions: any) => questions?.map(({ id,
-    title, isRoot, questionType, overrideLeaf, options, edgeChildren }: QuestionEntryProps) => ({
+    title, isRoot, type, overrideLeaf, options, edgeChildren }: QuestionEntryProps) => ({
     id,
     title,
     isRoot,
-    questionType,
+    type,
     overrideLeaf: !overrideLeaf
       ? null
       : { id: overrideLeaf?.id, title: overrideLeaf?.title, type: overrideLeaf?.type },
@@ -76,7 +76,7 @@ const TopicBuilder = () => {
     if (data?.questionnaire) {
       setQuestions(questionsData || []);
     }
-  }, [data]);
+  }, [data, questionsData]);
 
   if (!data || loading) {
     return <Loader />;
@@ -114,7 +114,7 @@ const TopicBuilder = () => {
 
   const handleQuestionTypeChange = (value: string, qIndex: number) => {
     setQuestions((questionsPrev: Array<QuestionEntryProps>) => {
-      questionsPrev[qIndex].questionType = value;
+      questionsPrev[qIndex].type = value;
       return [...questionsPrev];
     });
   };
@@ -149,7 +149,7 @@ const TopicBuilder = () => {
       title: undefined,
       isRoot: false,
       options: [],
-      questionType: undefined,
+      type: undefined,
       overrideLeaf: undefined,
       edgeChildren: undefined,
     }]);
