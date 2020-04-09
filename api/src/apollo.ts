@@ -3,9 +3,10 @@ import { importSchema } from 'graphql-import';
 import { Prisma } from 'prisma-binding';
 import config from './config';
 import resolvers from './resolvers';
+import ServiceContainer from './services/service-container';
 
 const makeApollo = async () => {
-  const typeDefs = await importSchema(config.PATH_TO_APP_SCHEMA, {});
+  const typeDefs = await importSchema(config.appSchemaUrl, {});
 
   const apollo: ApolloServer = new ApolloServer({
     typeDefs,
@@ -13,10 +14,11 @@ const makeApollo = async () => {
     context: (req) => ({
       ...req,
       db: new Prisma({
-        typeDefs: config.PATH_TO_PRISMA_GENERATED_SCHEMA,
-        endpoint: config.PRISMA_ENDPOINT,
-        secret: process.env.PRISMA_SERVICE_SECRET,
+        typeDefs: config.prismaSchemaUrl,
+        endpoint: config.prismaUrl,
+        secret: config.prismaServiceSecret,
       }),
+      services: new ServiceContainer(config),
     }),
   });
 

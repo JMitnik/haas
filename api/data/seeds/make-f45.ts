@@ -1,6 +1,6 @@
 import { prisma } from '../../src/generated/prisma-client/index';
 
-import seedCompany, { seedFreshCompany } from './make-company';
+import CustomerResolver from '../../src/models/customer/customer-resolver';
 
 const CUSTOMER = 'F45 Training';
 
@@ -20,7 +20,7 @@ const makef45 = async () => {
     },
   });
 
-  await seedFreshCompany(customer);
+  await CustomerResolver.seed(customer);
 };
 
 export default makef45;

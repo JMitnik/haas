@@ -4,4 +4,5 @@ enum NodeType {
     TEXTBOX
     SOCIAL_SHARE
     REGISTRATION
+    FINISH
 }

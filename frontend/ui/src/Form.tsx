@@ -6,7 +6,34 @@ import { InputHTMLAttributes } from 'react';
 import Color from 'color';
 
 
+export const InputGroup = styled.div`
+`;
 
+export const InputLabel = styled.label`
+  ${({ theme }) => css`
+    font-size: ${theme.fontSizes[2]}px;
+    margin: 0;
+    margin-bottom: ${theme.gutter / 3}px;
+    padding-left: ${theme.gutter}px;
+    text-align: left;
+    display: block;
+    /* TODO: Hard-coded, needs to be determiend */
+    color: white;
+  `}
+`;
+
+export const InputField = styled.input`
+  ${({ theme }) => css`
+      border: none;
+      font-size: ${theme.fontSizes[1]}px;
+      border-radius: 50px;
+      padding: 12px 24px;
+      background: white;
+      text-align: center;
+      font-weight: bolder;
+      color: ${theme.colors.default.text};
+  `}
+`;
 
 export const StyledLabel = styled(Div).attrs({ as: 'label' })`
   ${({ theme }) => css`
@@ -99,12 +126,27 @@ export const Slider = forwardRef((props: SliderProps, ref: Ref<HTMLInputElement>
   </SliderContainer>
 ));
 
+export const InputField = styled.input`
+  ${({ theme }) => css`
+      border: none;
+      font-size: ${theme.fontSizes[1]}px;
+      border-radius: 50px;
+      padding: 12px 24px;
+      background: white;
+      text-align: center;
+      font-weight: bolder;
+      color: ${theme.colors.default.text};
+  `}
+`;
+
 export const Textbox = styled.textarea`
   ${({ theme }) => css`
-    border-radius: 30px;
-    border: 1px solid ${theme.colors.primary};
+    border: none;
     font-size: ${theme.fontSizes[1]}px;
-    padding: 36px 48px;
+    border-radius: 20px;
+    box-shadow: none;
+    padding: 24px 24px;
+    min-height: 200px;
     width: 100%;
     resize: none;
 
@@ -149,11 +191,61 @@ export const SliderContainer = styled.div`
         /* Ensure that the bunny is on top of the bar */
         transform: translateY(-100%);
 
-        background-image: url('/logo-haas.png');
+        border: none;
+        background-color: transparent;
+        background-image: url('/logo-haas.svg');
         background-size: contain;
         background-repeat: no-repeat;
         cursor: pointer;
         position: relative;
+
+        &:hover {
+          background-color: transparent;
+        }
+      }
+
+      /* Style the thumb */
+      /* TODO: Enable styles for firefox and IE*/
+      &::-moz-range-thumb {
+        -webkit-appearance: none;
+        height: 80px;
+        width: 80px;
+
+        /* Ensure that the bunny is on top of the bar */
+        transform: translateY(-100%);
+        border: none;
+        background-color: transparent;
+        background-image: url('/logo-haas.svg');
+        background-size: contain;
+        background-repeat: no-repeat;
+        cursor: pointer;
+        position: relative;
+
+        &:hover {
+          background-color: transparent;
+        }
+      }
+
+      /* Style the thumb */
+      /* TODO: Enable styles for firefox and IE*/
+      &::-ms-thumb {
+        -webkit-appearance: none;
+        height: 80px;
+        width: 80px;
+
+        /* Ensure that the bunny is on top of the bar */
+        transform: translateY(-100%);
+        border: none;
+        background-color: transparent;
+        background-image: url('/logo-haas.svg');
+        background-size: contain;
+        background-repeat: no-repeat;
+        cursor: pointer;
+        position: relative;
+
+        &:hover {
+          background-color: transparent;
+        }
       }
 
       &::-webkit-slider-runnable-track {

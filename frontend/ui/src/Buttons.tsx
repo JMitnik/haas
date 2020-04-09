@@ -1,4 +1,4 @@
-import styled, { css } from 'styled-components';
+import styled, { css } from 'styled-components/macro';
 import { variant, space, SpaceProps } from 'styled-system';
 import Color from 'color';
 
@@ -6,6 +6,7 @@ type brandVariants = 'primary' | 'secondary' | 'warning' | 'error' | 'success' |
 type sizeVariants = 'sm' | 'md' | 'lg';
 
 export interface ButtonProps extends SpaceProps {
+  isActive?: boolean;
   brand?: brandVariants;
   size?: sizeVariants;
 }
@@ -25,18 +26,31 @@ export const DeleteButtonContainer = styled.button`
     opacity: 0.8;
   }
 `;
+export const ButtonIcon = styled.span``;
 
 export const Button = styled.button<ButtonProps>`
-  ${({ theme }) => css`
-    border-radius: ${theme.borderRadiuses.md};
+  ${({ theme, isActive }) => css`
     padding: ${theme.buttonSizes.md};
     font-size: 1rem;
     font-weight: 600;
+    border-radius: 50px;
+    padding: 10px 24px;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+
+    min-width: 150px;
     transition: all 0.1s ease-in;
     cursor: pointer;
 
     &:hover {
       transition: all 0.1s ease-in;
+    }
+
+    ${ButtonIcon} {
+      display: inline-block;
+      margin-right: 5px;
+      vertical-align: middle;
     }
 
     h1, h2, h3, h4, h5 {

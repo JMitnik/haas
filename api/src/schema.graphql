@@ -6,7 +6,7 @@ type Query {
 }
 
 type Mutation {
-    uploadUserSession(uploadUserSessionInput: UploadUserSessionInput): String
+    uploadUserSession(uploadUserSessionInput: UploadUserSessionInput): Session!
     createNewCustomer(name: String, options: CustomerCreateOptions): Customer!
     deleteFullCustomer(id: ID!): Customer!
     createNewQuestionnaire(customerId: String, title: String, publicTitle: String, description: String, isSeed: Boolean): Questionnaire!
@@ -75,6 +75,7 @@ input UserSessionEntryDataInput {
 }
 
 input UploadUserSessionInput {
+    questionnaireId: String!
     entries: [UserSessionEntryInput!]!
 }
 

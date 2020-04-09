@@ -1,5 +1,5 @@
 import React, { FC } from 'react';
-import styled, { css } from 'styled-components';
+import styled, { css } from 'styled-components/macro';
 import { ChevronDown } from 'react-feather';
 import { Div } from './Generics';
 

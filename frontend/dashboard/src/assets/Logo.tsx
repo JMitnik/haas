@@ -1,15 +1,15 @@
 import React from 'react';
-import styled from 'styled-components';
+import styled from 'styled-components/macro';
 
 export const LogoContainer = styled.div`
     display: block;
 
-    /* Manual size */
-    width: 60px;
+  /* Manual size */
+  width: 60px;
 
-    img {
-      max-width: 100%;
-    }
+  img {
+    max-width: 100%;
+  }
 `;
 
 const Logo = () => (

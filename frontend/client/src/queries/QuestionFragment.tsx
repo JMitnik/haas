@@ -6,12 +6,11 @@ const QuestionFragment = gql`
     title
     overrideLeaf {
       id
-      nodeId
       type
       title
-		}
-    questionType
-    edgeChildren {
+    }
+    type
+    children {
       id
       conditions {
         conditionType
@@ -29,8 +28,8 @@ const QuestionFragment = gql`
       }
     }
     options {
-        value
-        publicValue
+      value
+      publicValue
     }
   }
 `;

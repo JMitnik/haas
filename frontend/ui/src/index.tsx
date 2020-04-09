@@ -1,11 +1,11 @@
 export { Div } from './Generics';
-export { CheckBox, CheckBoxLabel, CheckBoxWrapper, GridForm, Slider, Textbox, StyledLabel, StyledInput, StyledTextInput } from './Form';
-export { Button, DeleteButtonContainer } from './Buttons';
+export { CheckBox, CheckBoxLabel, CheckBoxWrapper, GridForm, Slider, Textbox, InputLabel, InputGroup, InputField, StyledLabel, StyledInput, StyledTextInput } from './Form';
 export { Container, Grid, Flex, ColumnFlex } from './Container';
+export { Button, DeleteButtonContainer } from './Buttons';
 export { Card, CardBody, CardFooter, AddCard } from './Cards';
 export { Icon } from './Icon';
 export { Loader } from './Loader';
 export { Label } from './Labels';
 export { TopNav } from './Nav';
 export { H1, H2, H3, H4, H5, Muted, Paragraph } from './Type';
-export { Hr } from './Hr';
+export { Hr } from './Special';

@@ -7,12 +7,11 @@ const QuestionFragment = gql`
     isRoot
     overrideLeaf {
       id
-      nodeId
       type
       title
     }
-    questionType
-    edgeChildren {
+    type
+    children {
       id
       conditions {
         id

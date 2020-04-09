@@ -22,6 +22,7 @@
         "start:client": "yarn workspace @haas/client start",
         "start:api": "yarn workspace @haas/api start",
         "start:dashboard": "yarn workspace @haas/dashboard start",
+        "debug": "concurrently \"yarn start:client\" \"yarn workspace @haas/api debug\"",
         "build:client": "yarn workspace @haas/client build",
         "build:api": "yarn workspace @haas/api generate && yarn workspace @haas/api build",
         "clean:db": "yarn workspace @haas/api clean",
@@ -40,6 +41,7 @@
     },
     "devDependencies": {
         "concurrently": "^5.1.0",
+        "eslint": "^6.8.0",
         "lerna": "^3.20.2",
         "react-scripts": "^3.4.0"
     }

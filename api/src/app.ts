@@ -8,7 +8,7 @@ const main = async () => {
   const app = express();
 
   const corsOptions: CorsOptions = {
-    origin: [config.CLIENT_URL, config.DASHBOARD_URL],
+    origin: [config.clientUrl, config.dashboardUrl],
     credentials: true,
   };
 
@@ -19,10 +19,10 @@ const main = async () => {
     cors: corsOptions,
   });
 
-  app.listen(config.APP_PORT);
+  app.listen(config.port);
 
-  console.log(`Only intended to work on ${config.CLIENT_URL} and ${config.DASHBOARD_URL}`);
-  console.log(`Server successfully started on port ${config.APP_PORT} for graphql entrypoint at ${apollo.graphqlPath}`);
+  console.log(`Only intended to work on ${config.clientUrl} and ${config.dashboardUrl}`);
+  console.log(`Server successfully started on port ${config.port} for graphql entrypoint at ${apollo.graphqlPath}`);
 };
 
 main();
