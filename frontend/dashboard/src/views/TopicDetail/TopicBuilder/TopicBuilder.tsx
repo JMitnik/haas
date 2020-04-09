@@ -82,21 +82,21 @@ const TopicBuilder = () => {
     return <Loader />;
   }
 
-  const onTitleChange = (title: string, qIndex: number) => {
+  const handleTitleChange = (title: string, qIndex: number) => {
     setQuestions((questionsPrev: Array<QuestionEntryProps>) => {
       questionsPrev[qIndex].title = title;
       return [...questionsPrev];
     });
   };
 
-  const onIsRootQuestionChange = (isRoot: boolean, qIndex: number) => {
+  const handleIsRootQuestionChange = (isRoot: boolean, qIndex: number) => {
     setQuestions((questionsPrev: Array<QuestionEntryProps>) => {
       questionsPrev[qIndex].isRoot = isRoot;
       return [...questionsPrev];
     });
   };
 
-  const onLeafNodeChange = (leafId: string, qIndex: number) => {
+  const handleLeafNodeChange = (leafId: string, qIndex: number) => {
     setQuestions((questionsPrev: Array<QuestionEntryProps>) => {
       const question = questionsPrev?.[qIndex];
       if (question.overrideLeaf?.id) {
@@ -112,35 +112,37 @@ const TopicBuilder = () => {
     });
   };
 
-  const onQuestionTypeChange = (value: string, qIndex: number) => {
+  const handleQuestionTypeChange = (value: string, qIndex: number) => {
     setQuestions((questionsPrev: Array<QuestionEntryProps>) => {
       questionsPrev[qIndex].questionType = value;
       return [...questionsPrev];
     });
   };
 
-  const onAddQuestionOption = (value: Array<QuestionOptionProps>, qIndex: number) => {
+  const handleAddQuestionOption = (value: Array<QuestionOptionProps>, qIndex: number) => {
     setQuestions((questionsPrev: Array<QuestionEntryProps>) => {
       questionsPrev[qIndex].options = value;
       return [...questionsPrev];
     });
   };
 
-  const onQuestionOptionsChange = (questionOptions: Array<QuestionOptionProps>, qIndex: number) => {
+  const handleQuestionOptionsChange = (
+    questionOptions: Array<QuestionOptionProps>, qIndex: number,
+  ) => {
     setQuestions((questionsPrev: Array<QuestionEntryProps>) => {
       questionsPrev[qIndex].options = questionOptions;
       return [...questionsPrev];
     });
   };
 
-  const onEdgesChange = (edgeChildren: Array<EdgeChildProps>, qIndex: number) => {
+  const handleEdgesChange = (edgeChildren: Array<EdgeChildProps>, qIndex: number) => {
     setQuestions((questionsPrev: Array<QuestionEntryProps>) => {
       questionsPrev[qIndex].edgeChildren = edgeChildren;
       return [...questionsPrev];
     });
   };
 
-  const onAddQuestion = (event: any) => {
+  const handleAddQuestion = (event: any) => {
     event.preventDefault();
     setQuestions((questionsPrev: any) => [...questionsPrev, {
       id: undefined,
@@ -167,13 +169,13 @@ const TopicBuilder = () => {
         {
           questions && questions.map((question: QuestionEntryProps, index: number) => (
             <QuestionEntry
-              onIsRootQuestionChange={onIsRootQuestionChange}
-              onLeafNodeChange={onLeafNodeChange}
-              onEdgesChange={onEdgesChange}
-              onAddQuestionOption={onAddQuestionOption}
-              onQuestionOptionsChange={onQuestionOptionsChange}
-              onQuestionTypeChange={onQuestionTypeChange}
-              onTitleChange={onTitleChange}
+              onIsRootQuestionChange={handleIsRootQuestionChange}
+              onLeafNodeChange={handleLeafNodeChange}
+              onEdgesChange={handleEdgesChange}
+              onAddQuestionOption={handleAddQuestionOption}
+              onQuestionOptionsChange={handleQuestionOptionsChange}
+              onQuestionTypeChange={handleQuestionTypeChange}
+              onTitleChange={handleTitleChange}
               key={index}
               index={index}
               questionsQ={questions}
@@ -187,7 +189,7 @@ const TopicBuilder = () => {
           mt={2}
           ml={4}
           mr={4}
-          onClick={(e) => onAddQuestion(e)}
+          onClick={handleAddQuestion}
         >
           Add new question
         </Button>
@@ -196,15 +198,13 @@ const TopicBuilder = () => {
           mt={2}
           ml={4}
           mr={4}
-          onClick={
-            (e) => {
-              e.preventDefault();
-              updateTopic(
-                { variables: { id: topicBuilderData.id,
-                  topicData: { id: topicBuilderData.id, questions } } },
-              );
-            }
-          }
+          onClick={(e) => {
+            e.preventDefault();
+            updateTopic(
+              { variables: { id: topicBuilderData.id,
+                topicData: { id: topicBuilderData.id, questions } } },
+            );
+          }}
         >
           Save topic
         </Button>

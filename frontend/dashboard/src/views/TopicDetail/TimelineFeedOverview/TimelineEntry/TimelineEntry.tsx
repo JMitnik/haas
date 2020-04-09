@@ -1,6 +1,6 @@
 import React, { Dispatch, SetStateAction } from 'react';
 import { Div, H5 } from '@haas/ui';
-import TimelineEntryContainer from './TimelineEntryStyles';
+import { TimelineEntryContainer } from './TimelineEntryStyles';
 
 interface TimelineEntryProps {
   sessionId: string;
@@ -8,6 +8,7 @@ interface TimelineEntryProps {
   createdAt: string;
 }
 
+// TODO: Replace with date parser
 const monthMap = new Map([
   [0, 'JAN'],
   [1, 'FEB'],
@@ -42,14 +43,7 @@ const TimelineEntry = ({
   return (
     <TimelineEntryContainer onClick={() => viewTimeLine(timeLineEntry)}>
       <Div>
-        <Div>
-          `
-          User
-          {timeLineEntry.sessionId}
-          has voted
-          {timeLineEntry.value}
-          `
-        </Div>
+        {`User ${timeLineEntry.sessionId} has voted ${timeLineEntry.value}`}
       </Div>
       <Div>
         <H5>

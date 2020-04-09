@@ -1,6 +1,6 @@
 import styled, { css } from 'styled-components/macro';
 
-const TimelineEntryContainer = styled.div`
+export const TimelineEntryContainer = styled.div`
    ${({ theme }) => css`
     padding: 8px 14px;
     border-radius: ${theme.borderRadiuses.md};
@@ -17,5 +17,3 @@ const TimelineEntryContainer = styled.div`
     }
   `}
 `;
-
-export default TimelineEntryContainer;

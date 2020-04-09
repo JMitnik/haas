@@ -10,9 +10,12 @@ interface TimelineEntryProps {
   createdAt: string;
 }
 
-const TimelineFeedOverview = ({ onActiveSessionChange, timelineEntries } :
-{ onActiveSessionChange: Dispatch<SetStateAction<string>>,
-  timelineEntries: Array<TimelineEntryProps> }) => {
+const TimelineFeedOverview = ({
+  onActiveSessionChange, timelineEntries,
+} : {
+  onActiveSessionChange: Dispatch<SetStateAction<string>>,
+  timelineEntries: Array<TimelineEntryProps>
+}) => {
   const history = useHistory();
   const { customerId, topicId } = useParams();
 

@@ -10,7 +10,7 @@ import { Query, Customer } from '../../types';
 
 import { getCustomerQuery } from '../../queries/getCustomerQuery';
 import { deleteFullCustomerQuery } from '../../mutations/deleteFullCustomer';
-import CustomerCardImage from './DashboardViewStyles';
+import { CustomerCardImage } from './DashboardViewStyles';
 
 const DashboardView: FC = () => {
   const { loading, error, data } = useQuery<Query>(getCustomerQuery);
@@ -20,7 +20,6 @@ const DashboardView: FC = () => {
   if (error) {
     return (
       <p>
-        `
         Error:
         {error.message}
         `

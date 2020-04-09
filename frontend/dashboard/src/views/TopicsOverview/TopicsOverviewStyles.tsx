@@ -1,12 +1,11 @@
 import { Div, Card } from '@haas/ui';
 import styled, { css } from 'styled-components';
 
-const AddTopicCard = styled(Card)`
+export const AddTopicCard = styled(Card)`
   ${({ theme }) => css`
     position: relative;
 
     &:hover ${Div} {
-      transition: a/c/ck8r5mbah04rv0883m0a4uvetll 0.2s ease-in;
       box-shadow: 0 1px 3px 1px rgba(0,0,0,0.1);
     }
 
@@ -31,5 +30,3 @@ const AddTopicCard = styled(Card)`
     }
   `}
 `;
-
-export default AddTopicCard;

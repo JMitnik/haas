@@ -9,12 +9,12 @@ const conditionTypes = [
   { value: 'valueBoundary', label: 'valueBoundary' }];
 
 const EdgeEntry = (
-  { questions, edge, index, setactiveEdges,
+  { questions, edge, index, setActiveEdges,
     setConditionType, setChildQuestionNode, setEdgeConditionMinValue,
     setEdgeConditionMaxValue, setEdgeConditionMatchValue }:
   {
     questions: Array<QuestionEntryProps>, edge: EdgeChildProps,
-    index: number, setactiveEdges: React.Dispatch<React.SetStateAction<EdgeChildProps[]>>,
+    index: number, setActiveEdges: React.Dispatch<React.SetStateAction<EdgeChildProps[]>>,
     setConditionType: Function, setChildQuestionNode: Function, setEdgeConditionMinValue: Function,
     setEdgeConditionMaxValue: Function, setEdgeConditionMatchValue: Function
   },
@@ -61,7 +61,7 @@ const EdgeEntry = (
   const deleteEdgeEntry = (event: any, edgeIndex: number) => {
     event.preventDefault();
 
-    setactiveEdges((edges) => {
+    setActiveEdges((edges) => {
       edges.splice(edgeIndex, 1);
       return [...edges];
     });

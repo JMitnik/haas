@@ -10,7 +10,7 @@ import { Query, Questionnaire } from '../../types';
 
 import getQuestionnairesCustomerQuery from '../../queries/getQuestionnairesCustomerQuery';
 import { deleteQuestionnaireMutation } from '../../mutations/deleteQuestionnaire';
-import AddTopicCard from './TopicsOverviewStyle';
+import { AddTopicCard } from './TopicsOverviewStyles';
 
 const TopicsOverview: FC = () => {
   const { customerId } = useParams();
