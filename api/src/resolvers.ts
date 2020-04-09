@@ -18,7 +18,6 @@ const queryResolvers: QueryResolvers<ContextProps> = {
   questionnaire: forwardTo('db'),
   questionnaires: forwardTo('db'),
   customers: forwardTo('db'),
-  leafNode: forwardTo('db'),
   edges: forwardTo('db'),
   nodeEntryValues: forwardTo('db'),
   nodeEntries: forwardTo('db'),

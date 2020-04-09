@@ -6,12 +6,11 @@ export const QuestionFragment = gql`
     title
     overrideLeaf {
       id
-      nodeId
       type
       title
     }
     type
-    edgeChildren {
+    children {
       id
       conditions {
         conditionType

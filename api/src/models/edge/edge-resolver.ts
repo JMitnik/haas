@@ -31,7 +31,7 @@ class EdgeResolver {
         id: parent.id,
       },
       data: {
-        edgeChildren: {
+        children: {
           connect: [{ id: edge.id }],
         },
       },

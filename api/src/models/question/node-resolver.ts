@@ -1,10 +1,11 @@
-import { prisma, LeafNode, NodeType, QuestionNodeCreateInput } from '../../generated/prisma-client/index';
-import { sliderType, multiChoiceType } from '../../../data/seeds/seedDataStructure';
+import { prisma,
+  NodeType, QuestionNode, QuestionNodeCreateInput } from '../../generated/prisma-client/index';
+import { sliderType, multiChoiceType } from '../../../data/seeds/default-data';
 import EdgeResolver from '../edge/edge-resolver';
 
 interface LeafNodeDataEntryProps {
   title: string;
-  type?: NodeType;
+  type: NodeType;
 }
 
 const standardOptions = [{ value: 'Facilities' },
@@ -38,7 +39,8 @@ class NodeResolver {
     type: NodeType,
     options: Array<any> = [],
     isRoot: boolean = false,
-    overrideLeafId: string = ''): QuestionNodeCreateInput {
+    overrideLeafId: string = '',
+    isLeaf: boolean = false): QuestionNodeCreateInput {
     return {
       title,
       questionnaire: {
@@ -53,6 +55,7 @@ class NodeResolver {
       } : null,
       type,
       isRoot,
+      isLeaf,
       options: {
         create: options.length > 0 ? [
           ...options,
@@ -67,24 +70,36 @@ class NodeResolver {
     type: NodeType,
     options: Array<any> = [],
     isRoot: boolean = false,
-    overrideLeafId: string = '') => prisma.createQuestionNode(NodeResolver.constructQuestionNode(
+    overrideLeafId: string = '',
+    isLeaf: boolean = false) => prisma.createQuestionNode(NodeResolver.constructQuestionNode(
     title,
     questionnaireId,
     type, options,
     isRoot,
     overrideLeafId,
+    isLeaf,
   ));
 
-  static createTemplateLeafNodes = async (leafNodesArray: Array<LeafNodeDataEntryProps>) => {
-    const leafs = await Promise.all(leafNodesArray.map(async (leafNode) => prisma.createLeafNode({
-      title: leafNode.title,
-      type: leafNode?.type,
-    })));
+  static createTemplateLeafNodes = async (
+    leafNodesArray: Array<LeafNodeDataEntryProps>, dialogueId: string) => {
+    const leafs = await Promise.all(
+      leafNodesArray.map(async ({ title, type }) => prisma.createQuestionNode(
+        NodeResolver.constructQuestionNode(
+          title,
+          dialogueId,
+          type,
+          [],
+          false,
+          '',
+          true,
+        ),
+      )),
+    );
 
     return leafs;
   };
 
-  static getCorrectLeaf = (leafs: LeafNode[], titleSubset: string) => {
+  static getCorrectLeaf = (leafs: QuestionNode[], titleSubset: string) => {
     const correctLeaf = leafs.find((leaf) => leaf.title.includes(titleSubset));
     return correctLeaf?.id;
   };
@@ -92,7 +107,7 @@ class NodeResolver {
   static createTemplateNodes = async (
     questionnaireId: string,
     customerName: string,
-    leafs: LeafNode[],
+    leafs: QuestionNode[],
   ) => {
     // Root question (How do you feel about?)
     const rootQuestion = await NodeResolver.createQuestionNode(`How do you feel about ${customerName}?`, questionnaireId, sliderType, standardOptions, true);

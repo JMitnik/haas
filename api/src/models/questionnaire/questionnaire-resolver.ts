@@ -1,16 +1,16 @@
 import _ from 'lodash';
 import { prisma,
-  Questionnaire, LeafNode, QuestionnaireCreateInput } from '../../generated/prisma-client/index';
+  Questionnaire, QuestionnaireCreateInput, QuestionNode } from '../../generated/prisma-client/index';
 
 import NodeResolver from '../question/node-resolver';
-import { leafNodes } from '../../../data/seeds/seedDataStructure';
+import { leafNodes } from '../../../data/seeds/default-data';
 
 class DialogueResolver {
   static constructDialogue(customerId: string,
     title: string,
     description: string,
     publicTitle: string = '',
-    leafs: Array<LeafNode> = []): QuestionnaireCreateInput {
+    leafs: Array<QuestionNode> = []): QuestionnaireCreateInput {
     return {
       customer: {
         connect: {
@@ -36,9 +36,11 @@ class DialogueResolver {
     title: string,
     description: string,
     publicTitle: string = '',
-    leafs: Array<LeafNode> = []) => prisma.createQuestionnaire(DialogueResolver.constructDialogue(
-    customerId, title, description, publicTitle, leafs,
-  ));
+    leafs: Array<QuestionNode> = []) => prisma.createQuestionnaire(
+    DialogueResolver.constructDialogue(
+      customerId, title, description, publicTitle, leafs,
+    ),
+  );
 
   static createNewQuestionnaire = async (parent: any, args: any): Promise<Questionnaire> => {
     const { customerId, title, description, publicTitle, isSeed } = args;
@@ -67,11 +69,11 @@ class DialogueResolver {
     questionnaireTitle: string = 'Default questionnaire',
     questionnaireDescription: string = 'Default questions',
   ): Promise<Questionnaire> => {
-    const leafs = await NodeResolver.createTemplateLeafNodes(leafNodes);
-
     const questionnaire = await DialogueResolver.createDialogue(
-      customerId, questionnaireTitle, questionnaireDescription, '', leafs,
+      customerId, questionnaireTitle, questionnaireDescription, '',
     );
+
+    const leafs = await NodeResolver.createTemplateLeafNodes(leafNodes, questionnaire.id);
 
     await NodeResolver.createTemplateNodes(questionnaire.id, customerName, leafs);
     return questionnaire;

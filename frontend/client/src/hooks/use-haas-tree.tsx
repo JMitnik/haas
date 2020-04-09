@@ -40,7 +40,6 @@ interface TreeStateProps {
 const makeFinishedNode: () => HAASNode = () => ({
   id: '-1',
   children: [],
-  edgeChildren: [],
   title: 'Thank you for answering!',
   type: 'FINISH'
 });
@@ -108,7 +107,7 @@ const treeReducer = (state: TreeStateProps, action: TreeAction): TreeStateProps 
 const findNextEdge = (parent: HAASNode, key: string | number | null) => {
   if (!key) return null;
 
-  const candidates = parent?.edgeChildren?.filter(edge => {
+  const candidates = parent?.children?.filter(edge => {
     if (parent.type === 'SLIDER') {
       if (edge?.conditions?.[0]?.renderMin && key < edge?.conditions?.[0].renderMin) {
         return false;

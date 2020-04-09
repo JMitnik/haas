@@ -1,6 +1,6 @@
 import { prisma, ID_Input } from '../../generated/prisma-client/index';
 import { Customer } from '../../generated/resolver-types';
-import { leafNodes } from '../../../data/seeds/seedDataStructure';
+import { leafNodes } from '../../../data/seeds/default-data';
 import NodeResolver from '../question/node-resolver';
 
 class CustomerResolver {
@@ -12,8 +12,6 @@ class CustomerResolver {
   };
 
   static seed = async (customer: Customer) => {
-    const leafs = await NodeResolver.createTemplateLeafNodes(leafNodes);
-
     const questionnaire = await prisma.createQuestionnaire({
       customer: {
         connect: {
@@ -21,7 +19,7 @@ class CustomerResolver {
         },
       },
       leafs: {
-        connect: leafs.map((leaf) => ({ id: leaf.id })),
+        create: [],
       },
       title: 'Default questionnaire',
       description: 'Default questions',
@@ -29,6 +27,8 @@ class CustomerResolver {
         create: [],
       },
     });
+
+    const leafs = await NodeResolver.createTemplateLeafNodes(leafNodes, questionnaire.id);
 
     await NodeResolver.createTemplateNodes(questionnaire.id, customer.name, leafs);
   };
