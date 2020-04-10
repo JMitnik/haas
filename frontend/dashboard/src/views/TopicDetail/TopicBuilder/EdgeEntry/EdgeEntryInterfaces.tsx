@@ -4,20 +4,26 @@ export interface OverrideLeafProps {
   title?: string;
 }
 
+export interface ShallowQuestionEntryProps {
+  id?: string;
+  title?: string;
+}
+
 export interface EdgeChildProps {
   id?: string;
   conditions: Array<EdgeConditonProps>;
-  parentNode: QuestionEntryProps;
-  childNode: QuestionEntryProps;
+  parentNode: ShallowQuestionEntryProps;
+  childNode: ShallowQuestionEntryProps;
 }
 
 export interface QuestionEntryProps {
   id?: string;
   title?: string;
   isRoot?: boolean;
+  isLeaf?: boolean;
   type?: string;
   overrideLeaf?: OverrideLeafProps;
-  edgeChildren?: Array<EdgeChildProps>;
+  children?: Array<EdgeChildProps>;
   options?: Array<QuestionOptionProps>;
 }
 

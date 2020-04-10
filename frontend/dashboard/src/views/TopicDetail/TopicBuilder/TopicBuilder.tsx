@@ -7,8 +7,9 @@ import updateTopicBuilder from '../../../mutations/updateTopicBuilder';
 import { getTopicBuilderQuery } from '../../../queries/getQuestionnaireQuery';
 import QuestionEntry from './QuestionEntry/QuestionEntry';
 import { TopicBuilderView } from './TopicBuilderStyles';
+
 import {
-  QuestionEntryProps, LeafProps, EdgeChildProps,
+  QuestionEntryProps, EdgeChildProps,
   QuestionOptionProps,
 } from './TopicBuilderInterfaces';
 
@@ -35,36 +36,45 @@ const TopicBuilder = () => {
     },
   });
 
-  const mapQuestionsInputData = (questions: any) => questions?.map(({ id,
-    title, isRoot, type, overrideLeaf, options, edgeChildren }: QuestionEntryProps) => ({
-    id,
-    title,
-    isRoot,
-    type,
-    overrideLeaf: !overrideLeaf
-      ? null
-      : { id: overrideLeaf?.id, title: overrideLeaf?.title, type: overrideLeaf?.type },
-    options: options?.map((option) => (
-      { id: option.id, value: option.value, publicValue: option.publicValue })),
-    edgeChildren: edgeChildren?.map((edge: EdgeChildProps) => ({
-      id: edge.id,
-      parentNode: { id: edge?.parentNode?.id, title: edge?.parentNode?.title },
-      conditions: [{
-        id: edge?.conditions?.[0]?.id,
-        conditionType: edge?.conditions?.[0]?.conditionType,
-        matchValue: edge?.conditions?.[0]?.matchValue,
-        renderMin: edge?.conditions?.[0]?.renderMin,
-        renderMax: edge?.conditions?.[0]?.renderMax,
-      }],
-      childNode: { id: edge?.childNode?.id, title: edge?.childNode?.title },
-    })),
-  })) || [];
+  const mapQuestionsInputData = (nodes: Array<QuestionEntryProps>) => {
+    const questions = nodes?.filter((node) => !node.isLeaf);
+    return questions?.map(({ id,
+      title, isRoot, isLeaf, type, overrideLeaf, options, children }: QuestionEntryProps) => ({
+      id,
+      title,
+      isRoot,
+      isLeaf,
+      type,
+      overrideLeaf: !overrideLeaf
+        ? undefined
+        : { id: overrideLeaf?.id, title: overrideLeaf?.title, type: overrideLeaf?.type },
+      options: options?.map((option) => (
+        { id: option.id, value: option.value, publicValue: option.publicValue })),
+      children: children?.map((edge: EdgeChildProps) => ({
+        id: edge.id,
+        parentNode: { id: edge?.parentNode?.id, title: edge?.parentNode?.title },
+        conditions: [{
+          id: edge?.conditions?.[0]?.id,
+          conditionType: edge?.conditions?.[0]?.conditionType,
+          matchValue: edge?.conditions?.[0]?.matchValue,
+          renderMin: edge?.conditions?.[0]?.renderMin,
+          renderMax: edge?.conditions?.[0]?.renderMax,
+        }],
+        childNode: { id: edge?.childNode?.id, title: edge?.childNode?.title },
+      })),
+    })) || [];
+  };
+
+  const findLeafs = (nodes: Array<QuestionEntryProps>) => {
+    const leafs = nodes?.filter((node) => node.isLeaf);
+    const selectLeafs = leafs?.map((leaf) => ({ value: leaf.id, label: leaf.title }));
+    selectLeafs?.unshift({ value: 'None', label: 'None' });
+    return selectLeafs;
+  };
 
   const topicBuilderData = data?.questionnaire;
-  const leafs: Array<LeafProps> = topicBuilderData?.leafs;
 
-  const selectLeafs = leafs?.map((leaf) => ({ value: leaf.id, label: leaf.title }));
-  selectLeafs?.unshift({ value: 'None', label: 'None' });
+  const selectLeafs = findLeafs(data?.questionnaire?.questions);
 
   const questionsData = mapQuestionsInputData(data?.questionnaire?.questions);
   const [questions, setQuestions] = useState(questionsData);
@@ -74,53 +84,59 @@ const TopicBuilder = () => {
       return;
     }
     if (data?.questionnaire) {
-      setQuestions(questionsData || []);
+      const questionData = mapQuestionsInputData(data?.questionnaire?.questions);
+      setQuestions(questionData);
     }
-  }, [data, questionsData]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data]);
 
   if (!data || loading) {
     return <Loader />;
   }
 
+  console.log('Questions: ', questions);
+
   const handleTitleChange = (title: string, qIndex: number) => {
-    setQuestions((questionsPrev: Array<QuestionEntryProps>) => {
+    setQuestions((questionsPrev: any) => { // Array<QuestionEntryProps>
       questionsPrev[qIndex].title = title;
       return [...questionsPrev];
     });
   };
 
   const handleIsRootQuestionChange = (isRoot: boolean, qIndex: number) => {
-    setQuestions((questionsPrev: Array<QuestionEntryProps>) => {
+    setQuestions((questionsPrev: any) => { // Array<QuestionEntryProps>
       questionsPrev[qIndex].isRoot = isRoot;
       return [...questionsPrev];
     });
   };
 
-  const handleLeafNodeChange = (leafId: string, qIndex: number) => {
-    setQuestions((questionsPrev: Array<QuestionEntryProps>) => {
-      const question = questionsPrev?.[qIndex];
+  const handleLeafNodeChange = (leaf: any, qIndex: number) => {
+    setQuestions((questionsPrev: any) => { // Array<QuestionEntryProps>
+      const question = questionsPrev[qIndex];
+      console.log('Question: ', question);
+      console.log('leaf: ', leaf);
       if (question.overrideLeaf?.id) {
-        if (leafId === 'None') {
+        if (leaf?.id === 'None') {
           question.overrideLeaf = undefined;
           return [...questionsPrev];
         }
-        question.overrideLeaf.id = leafId;
-        return [...questionsPrev];
+        // question.overrideLeaf.id = leaf?.id;
+        // return [...questionsPrev];
       }
-      question.overrideLeaf = { id: leafId };
+      question.overrideLeaf = leaf;
       return [...questionsPrev];
     });
   };
 
   const handleQuestionTypeChange = (value: string, qIndex: number) => {
-    setQuestions((questionsPrev: Array<QuestionEntryProps>) => {
+    setQuestions((questionsPrev: any) => { // Array<QuestionEntryProps>
       questionsPrev[qIndex].type = value;
       return [...questionsPrev];
     });
   };
 
   const handleAddQuestionOption = (value: Array<QuestionOptionProps>, qIndex: number) => {
-    setQuestions((questionsPrev: Array<QuestionEntryProps>) => {
+    setQuestions((questionsPrev: any) => { // Array<QuestionEntryProps>
       questionsPrev[qIndex].options = value;
       return [...questionsPrev];
     });
@@ -129,15 +145,15 @@ const TopicBuilder = () => {
   const handleQuestionOptionsChange = (
     questionOptions: Array<QuestionOptionProps>, qIndex: number,
   ) => {
-    setQuestions((questionsPrev: Array<QuestionEntryProps>) => {
+    setQuestions((questionsPrev: any) => { // Array<QuestionEntryProps>
       questionsPrev[qIndex].options = questionOptions;
       return [...questionsPrev];
     });
   };
 
-  const handleEdgesChange = (edgeChildren: Array<EdgeChildProps>, qIndex: number) => {
-    setQuestions((questionsPrev: Array<QuestionEntryProps>) => {
-      questionsPrev[qIndex].edgeChildren = edgeChildren;
+  const handleEdgesChange = (children: Array<EdgeChildProps>, qIndex: number) => {
+    setQuestions((questionsPrev: any) => { // Array<QuestionEntryProps>
+      questionsPrev[qIndex].children = children;
       return [...questionsPrev];
     });
   };
@@ -148,10 +164,11 @@ const TopicBuilder = () => {
       id: undefined,
       title: undefined,
       isRoot: false,
+      isLeaf: false,
       options: [],
       type: undefined,
       overrideLeaf: undefined,
-      edgeChildren: undefined,
+      children: undefined,
     }]);
   };
 
@@ -200,6 +217,7 @@ const TopicBuilder = () => {
           mr={4}
           onClick={(e) => {
             e.preventDefault();
+            console.log('Sending this question to back-end: ', questions[0]);
             updateTopic(
               { variables: { id: topicBuilderData.id,
                 topicData: { id: topicBuilderData.id, questions } } },

@@ -55,10 +55,11 @@ input QuestionInput {
     id: String
     title: String!
     isRoot: Boolean!
+    isLeaf: Boolean!
     type: NodeType!
     overrideLeaf: LeafNodeInput
     options: [OptionInput] 
-    edgeChildren: [EdgeChildInput] 
+    children: [EdgeChildInput] 
 }
 
 input UserSessionEntryInput {

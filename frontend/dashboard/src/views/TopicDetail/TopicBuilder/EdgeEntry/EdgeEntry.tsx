@@ -2,31 +2,35 @@ import React, { useState } from 'react';
 import { X } from 'react-feather';
 import { Div, StyledInput, StyledLabel, DeleteButtonContainer } from '@haas/ui';
 import Select from 'react-select';
-import { QuestionEntryProps, EdgeChildProps } from './EdgeEntryInterfaces';
+import { QuestionEntryProps, EdgeChildProps } from '../TopicBuilderInterfaces';
 
 const conditionTypes = [
   { value: 'match', label: 'match' },
   { value: 'valueBoundary', label: 'valueBoundary' }];
 
 const EdgeEntry = (
-  { questions, edge, index, setActiveEdges,
+  { questions, edge, index, deleteEdgeEntry,
     setConditionType, setChildQuestionNode, setEdgeConditionMinValue,
     setEdgeConditionMaxValue, setEdgeConditionMatchValue }:
   {
     questions: Array<QuestionEntryProps>, edge: EdgeChildProps,
-    index: number, setActiveEdges: React.Dispatch<React.SetStateAction<EdgeChildProps[]>>,
+    index: number, deleteEdgeEntry: Function,
     setConditionType: Function, setChildQuestionNode: Function, setEdgeConditionMinValue: Function,
     setEdgeConditionMaxValue: Function, setEdgeConditionMatchValue: Function
   },
 ) => {
   const [activeCondition, setactiveCondition] = useState(
-    { value: edge?.conditions?.[0]?.conditionType,
-      label: edge?.conditions?.[0]?.conditionType },
+    {
+      value: edge?.conditions?.[0]?.conditionType,
+      label: edge?.conditions?.[0]?.conditionType,
+    },
   );
 
   const [activeChildQuestion, setactiveChildQuestion] = useState(
-    { value: edge?.childNode?.id,
-      label: `${edge?.childNode?.title} - ${edge?.childNode?.id}` },
+    {
+      value: edge?.childNode?.id,
+      label: `${edge?.childNode?.title} - ${edge?.childNode?.id}`,
+    },
   );
 
   const setCondition = (qOption: any) => {
@@ -57,15 +61,6 @@ const EdgeEntry = (
     const value = question.id;
     return { label, value };
   });
-
-  const deleteEdgeEntry = (event: any, edgeIndex: number) => {
-    event.preventDefault();
-
-    setActiveEdges((edges) => {
-      edges.splice(edgeIndex, 1);
-      return [...edges];
-    });
-  };
 
   return (
     <Div position="relative">

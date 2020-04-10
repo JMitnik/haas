@@ -5,6 +5,7 @@ const QuestionFragment = gql`
     id
     title
     isRoot
+    isLeaf
     overrideLeaf {
       id
       type

@@ -1,47 +1,12 @@
 /* eslint-disable max-len */
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { MinusCircle } from 'react-feather';
 import { Muted, Div, H4, Button, StyledLabel, StyledInput, Hr, DeleteButtonContainer } from '@haas/ui';
 import Select from 'react-select';
 import { useForm } from 'react-hook-form';
 import EdgeEntry from '../EdgeEntry/EdgeEntry';
 import { QuestionEntryContainer } from './QuestionEntryStyles';
-
-interface OverrideLeafProps {
-  id?: string;
-  type?: string;
-  title?: string;
-}
-interface QuestionEntryProps {
-  id?: string;
-  title?: string;
-  isRoot?: boolean;
-  type?: string;
-  overrideLeaf?: OverrideLeafProps;
-  edgeChildren?: Array<EdgeChildProps>;
-  options?: Array<QuestionOptionProps>;
-}
-
-interface QuestionOptionProps {
-  id?: string;
-  value: string;
-  publicValue?: string;
-}
-
-interface EdgeChildProps {
-  id?: string;
-  conditions: Array<EdgeConditonProps>;
-  parentNode: QuestionEntryProps;
-  childNode: QuestionEntryProps;
-}
-
-interface EdgeConditonProps {
-  id?: string;
-  conditionType?: string;
-  renderMin?: number;
-  renderMax?: number;
-  matchValue?: string;
-}
+import { QuestionEntryProps, EdgeChildProps } from '../TopicBuilderInterfaces';
 
 const questionTypes = [{ value: 'SLIDER', label: 'SLIDER' }, { value: 'MULTI_CHOICE', label: 'MULTI_CHOICE' }];
 
@@ -61,41 +26,38 @@ interface QuestionEntryItemProps {
   onIsRootQuestionChange: (isRoot: boolean, index: number) => void;
 }
 
-const QuestionEntryItem = ({ question, leafs, questionsQ, onEdgesChange, index, ...props }: QuestionEntryItemProps) => {
+const QuestionEntryItem = ({ question, leafs, questionsQ, index, ...props }: QuestionEntryItemProps) => {
   const { register, errors } = useForm();
-
   // TODO: What is difference between eustion and questionsQ? <- Not clear
 
-  const [activeTitle, setActiveTitle] = useState(() => question.title);
-  const [activeLeaf, setActiveLeaf] = useState(() => ({ label: question.overrideLeaf?.title, value: question.overrideLeaf?.id }));
-  const [activeQuestionType, setActiveQuestionType] = useState(() => ({ label: question.type, value: question.type }));
-  const [activeOptions, setActiveOptions] = useState(() => question?.options || []);
-  const [activeEdges, setActiveEdges] = useState(() => question?.edgeChildren || []);
-  const [isRoot, setIsRoot] = useState(() => question?.isRoot);
-  const isIntialRender = useRef(true);
+  // const [activeTitle, setActiveTitle] = useState(() => question.title);
+  const activeTitle = question.title;
+  const activeLeaf = { label: question.overrideLeaf?.title, value: question.overrideLeaf?.id };
+  const activeQuestionType = { label: question.type, value: question.type };
+  const activeOptions = question?.options || [];
+  const activeEdges = question?.children || [];
+  const isRoot = question?.isRoot;
 
   const setNewTitle = (event: any, qIndex: number) => {
     event.preventDefault();
     const newTitle = event.target.value;
     props.onTitleChange(newTitle, qIndex);
-    setActiveTitle(newTitle);
+    // setActiveTitle(newTitle);
   };
 
   const setQuestionType = (questionType: any) => {
-    const { label, value } = questionType;
-    setActiveQuestionType({ label, value });
+    const { value } = questionType;
     props.onQuestionTypeChange(value, index);
   };
 
   const setLeafNode = (leafNode: any) => {
     const { label, value } = leafNode;
-    setActiveLeaf({ label, value });
-    props?.onLeafNodeChange(value, index);
+    console.log('New Leafnode: ', leafNode);
+    props?.onLeafNodeChange({ id: value, title: label }, index);
   };
 
   const setIsRootQuestion = () => {
     props?.onIsRootQuestionChange(!isRoot, index);
-    setIsRoot(!isRoot);
   };
 
   const addNewOption = (event: any, qIndex: number) => {
@@ -103,116 +65,103 @@ const QuestionEntryItem = ({ question, leafs, questionsQ, onEdgesChange, index, 
 
     const value = '';
     const publicValue = '';
-
-    setActiveOptions((options) => [...options, { value, publicValue }]);
-    props.onAddQuestionOption(activeOptions, qIndex);
+    const newActiveOptions = [...activeOptions, { value, publicValue }];
+    props.onAddQuestionOption(newActiveOptions, qIndex);
   };
 
   const setConditionType = (conditionType: string, edgeIndex: number) => {
-    setActiveEdges((edgesPrev: Array<EdgeChildProps>) => {
-      const edge: EdgeChildProps = edgesPrev[edgeIndex];
-      if (edge.conditions.length === 0) {
-        edge.conditions = [{ conditionType }];
-        return [...edgesPrev];
-      }
+    const edge: EdgeChildProps = activeEdges[edgeIndex];
+    if (edge.conditions.length === 0) {
+      edge.conditions = [{ conditionType }];
+      props.onEdgesChange([...activeEdges], index);
+    }
 
-      edge.conditions[0].conditionType = conditionType;
-      return [...edgesPrev];
-    });
+    edge.conditions[0].conditionType = conditionType;
+    props.onEdgesChange([...activeEdges], index);
   };
 
   const setChildQuestionNode = (childNode: any, edgeIndex: number) => {
-    setActiveEdges((edgesPrev: Array<EdgeChildProps>) => {
-      let edge: EdgeChildProps = edgesPrev[edgeIndex];
-      if (!edge) {
-        edge = { childNode, conditions: [], parentNode: {} };
-        return [...edgesPrev];
-      }
+    const edge: EdgeChildProps = activeEdges[edgeIndex];
+    if (!edge) {
+      return props.onEdgesChange([...activeEdges], index);
+    }
 
-      edge.childNode = childNode;
-      return [...edgesPrev];
-    });
+    edge.childNode = childNode;
+    return props.onEdgesChange([...activeEdges], index);
   };
 
   const setEdgeConditionMinValue = (renderMin: number, edgeIndex: number) => {
-    setActiveEdges((edgesPrev: Array<EdgeChildProps>) => {
-      const edge: EdgeChildProps = edgesPrev[edgeIndex];
-      if (edge?.conditions?.length === 0) {
-        edge.conditions = [{ renderMin }];
-        return [...edgesPrev];
-      }
+    const edge: EdgeChildProps = activeEdges[edgeIndex];
+    if (edge?.conditions?.length === 0) {
+      edge.conditions = [{ renderMin }];
+      props.onEdgesChange([...activeEdges], index);
+    }
 
-      edge.conditions[0].renderMin = renderMin;
-      return [...edgesPrev];
-    });
+    edge.conditions[0].renderMin = renderMin;
+    props.onEdgesChange([...activeEdges], index);
   };
 
   const setEdgeConditionMaxValue = (renderMax: number, edgeIndex: number) => {
-    setActiveEdges((edgesPrev: Array<EdgeChildProps>) => {
-      const edge: EdgeChildProps = edgesPrev[edgeIndex];
-      if (edge?.conditions?.length === 0) {
-        edge.conditions = [{ renderMax }];
-        return [...edgesPrev];
-      }
+    const edge: EdgeChildProps = activeEdges[edgeIndex];
+    if (edge?.conditions?.length === 0) {
+      edge.conditions = [{ renderMax }];
+      props.onEdgesChange([...activeEdges], index);
+    }
 
-      edge.conditions[0].renderMax = renderMax;
-      return [...edgesPrev];
-    });
+    edge.conditions[0].renderMax = renderMax;
+    props.onEdgesChange([...activeEdges], index);
   };
 
   const setEdgeConditionMatchValue = (matchValue: string, edgeIndex: number) => {
-    setActiveEdges((edgesPrev: Array<EdgeChildProps>) => {
-      const edge: EdgeChildProps = edgesPrev[edgeIndex];
-      if (edge?.conditions?.length === 0) {
-        edge.conditions = [{ matchValue }];
-        return [...edgesPrev];
-      }
-
-      edge.conditions[0].matchValue = matchValue;
-      return [...edgesPrev];
-    });
-  };
-
-  useEffect(() => {
-    if (isIntialRender.current === true) {
-      isIntialRender.current = false;
-      return;
+    const edge: EdgeChildProps = activeEdges[edgeIndex];
+    if (edge?.conditions?.length === 0) {
+      edge.conditions = [{ matchValue }];
+      props.onEdgesChange([...activeEdges], index);
     }
 
-    onEdgesChange(activeEdges, index);
-    // TODO: This will turn to code smells, props is an important dependency.
-    // We need to ensure that the flow of the state is handles from one direction/
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeEdges, isIntialRender]);
+    edge.conditions[0].matchValue = matchValue;
+    props.onEdgesChange([...activeEdges], index);
+  };
+
+  // useEffect(() => {
+  //   if (isIntialRender.current === true) {
+  //     isIntialRender.current = false;
+  //   }
+
+  //   // onEdgesChange(activeEdges, index);
+  //   // TODO: This will turn to code smells, props is an important dependency.
+  //   // We need to ensure that the flow of the state is handles from one direction/
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [activeEdges, isIntialRender]);
 
   const addNewEdge = (event: any) => {
     event.preventDefault();
-    setActiveEdges((edges: Array<EdgeChildProps>) => [...edges, {
-      id: undefined,
-      conditions: [],
-      parentNode: { id: question.id, title: question.title },
-      childNode: {},
-    }]);
+    props.onEdgesChange([
+      ...activeEdges, {
+        id: undefined,
+        conditions: [],
+        parentNode: { id: question.id, title: question.title },
+        childNode: {},
+      }], index);
+  };
+
+  const deleteEdgeEntry = (event: any, edgeIndex: number) => {
+    event.preventDefault();
+
+    activeEdges.splice(edgeIndex, 1);
+    props.onEdgesChange([...activeEdges], index);
   };
 
   const deleteOption = (event: any, questionIndex: number, optionIndex: number) => {
     event.preventDefault();
-    setActiveOptions((options) => {
-      options.splice(optionIndex, 1);
-      return [...options];
-    });
-
+    activeOptions.splice(optionIndex, 1);
     props.onQuestionOptionsChange(activeOptions, questionIndex);
   };
 
   const setOption = (event: any, questionIndex: number, optionIndex: number) => {
     event.preventDefault();
     const { value } = event.target;
-    setActiveOptions((options) => {
-      options[optionIndex] = { value, publicValue: '' };
-      return [...options];
-    });
-
+    activeOptions[optionIndex] = { value, publicValue: '' };
     props.onQuestionOptionsChange(activeOptions, questionIndex);
   };
 
@@ -293,8 +242,8 @@ const QuestionEntryItem = ({ question, leafs, questionsQ, onEdgesChange, index, 
                 setEdgeConditionMinValue={setEdgeConditionMinValue}
                 setChildQuestionNode={setChildQuestionNode}
                 setConditionType={setConditionType}
+                deleteEdgeEntry={deleteEdgeEntry}
                 key={`${edgeIndex}-${edge.id}`}
-                setActiveEdges={setActiveEdges}
                 questions={questionsQ}
                 edge={edge}
                 index={edgeIndex}
