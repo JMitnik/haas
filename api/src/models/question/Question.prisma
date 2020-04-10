@@ -19,8 +19,8 @@ type QuestionNode {
     type: NodeType!
     isRoot: Boolean! @default(value: false)
     isLeaf: Boolean! @default(value: false)
-    overrideLeaf: QuestionNode @relation(link: INLINE, name: "QNodeToOverrideLeaf")
-    isOverrideLeafOf: QuestionNode @relation(link: INLINE, name: "QNodeToOverrideLeaf")
+    overrideLeaf: QuestionNode @relation(link: TABLE, name: "QNodeToOverrideLeaf")
+    isOverrideLeafOf: QuestionNode @relation(name: "QNodeToOverrideLeaf")
     options: [QuestionOption] @relation (link: TABLE name: "QuestionNodeOptions", onDelete: CASCADE)
     children: [Edge] @relation (link: TABLE, name: "EdgeChildrenRelation", onDelete: CASCADE)
 }
