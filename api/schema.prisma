@@ -1,0 +1,28 @@
+datasource postgresql {
+  provider = "postgresql"
+  url      = env("DB_STRING")
+}
+
+model Customer {
+  id       Int        @default(autoincrement()) @id
+  name     String?
+  Dialogue Dialogue[] @relation("customersTodialogues", references: [id])
+}
+
+model Dialogue {
+  id       Int        @default(autoincrement()) @id
+  title    String?
+  Customer Customer[] @relation("customersTodialogues", references: [id])
+}
+
+model knex_migrations {
+  batch          Int?
+  id             Int       @default(autoincrement()) @id
+  migration_time DateTime?
+  name           String?
+}
+
+model knex_migrations_lock {
+  index     Int  @default(autoincrement()) @id
+  is_locked Int?
+}

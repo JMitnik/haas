@@ -2,18 +2,32 @@
 import * as Knex from 'knex';
 
 export async function up(knex: Knex): Promise<any> {
-  knex.schema.withSchema('public').createTable('Customer', (table) => {
-    table.increments();
+  await knex.schema.createTable('Customer', (table) => {
+    table.increments('id').primary();
     table.string('name');
   });
 
-  knex.schema.withSchema('public').createTable('Dialogue', (table) => {
-    table.increments();
+  await knex.schema.createTable('Dialogue', (table) => {
+    table.increments('id').primary();
     table.string('title');
   });
 
-  knex.schema.withSchema('public').createTable('_CustomerToDialogue', (table) => {
-    table.index('A');
-    table.index('B');
+  // TODO: Make this its own helper function for two models (Customer and Dialogue)
+  await knex.schema.createTable('_customersTodialogues', (table) => {
+    table.integer('A');
+    table.integer('B').index();
+
+    table.unique(['A', 'B']);
+
+    table.foreign('A')
+      .references('Customer.id');
+    table.foreign('B')
+      .references('Dialogue.id');
   });
+}
+
+export async function down(knex: Knex): Promise<any> {
+  await knex.schema.dropTable('_customersTodialogues');
+  await knex.schema.dropTable('Customer');
+  await knex.schema.dropTable('Post');
 }

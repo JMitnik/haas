@@ -4,9 +4,11 @@ module.exports = {
   development: {
     client: 'postgresql',
     connection: {
-      database: 'haas',
-      user: 'haas',
-      password: 'haas',
+      host: 'localhost',
+      port: '5432',
+      database: 'postgres',
+      user: 'prisma',
+      password: 'prisma',
     },
   },
 
