@@ -13,7 +13,7 @@ export async function up(knex: Knex): Promise<any> {
   });
 
   // TODO: Make this its own helper function for two models (Customer and Dialogue)
-  await knex.schema.createTable('_customersTodialogues', (table) => {
+  await knex.schema.createTable('_CustomerToDialogue', (table) => {
     table.integer('A');
     table.integer('B').index();
 
@@ -27,7 +27,7 @@ export async function up(knex: Knex): Promise<any> {
 }
 
 export async function down(knex: Knex): Promise<any> {
-  await knex.schema.dropTable('_customersTodialogues');
+  await knex.schema.dropTable('_CustomerToDialogue');
   await knex.schema.dropTable('Customer');
   await knex.schema.dropTable('Post');
 }
