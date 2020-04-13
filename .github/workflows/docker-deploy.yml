@@ -18,3 +18,10 @@ jobs:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_PASSWORD }}
         workdir: api
+    - name: SSH Commands
+      uses: appleboy/ssh-action@v0.0.7
+      with:
+        host: ${{ secrets.API_SERVER_HOST }}
+        username: ${{ secrets.API_SERVER_USERNAME }}
+        key: ${{ secrets.API_SERVER_KEY }}
+        script: /bin/sh deployment.sh
