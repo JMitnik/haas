@@ -14,5 +14,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Build the Docker image
-      run: docker build ./api --tag haas-api:latest
+    - name: Publish to Docker Registry
+      uses: elgohr/Publish-Docker-Github-Action@master
+      with:
+        name: juronemo/haasapi-local
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+        workdir: api
