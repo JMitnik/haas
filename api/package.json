@@ -3,6 +3,7 @@
     "version": "0.1.0",
     "scripts": {
         "start": "pm2 start ts-node -- -P tsconfig.json ./src/app.ts --watch",
+        "serve": "pm2 start ts-noe -- -P tsconfig.json ./src/app.ts",
         "debug": "nodemon --config config.json",
         "build": "yarn",
         "clean:prod": "prisma reset -e .prod.env",
