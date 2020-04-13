@@ -14,7 +14,5 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Login to Dockerhub
-      run: echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
     - name: Build the Docker image
       run: docker build ./api --file Dockerfile --tag haas-api:latest
