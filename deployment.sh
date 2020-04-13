@@ -1,11 +1,3 @@
-# Pull in the code
-git pull
-
-# Go to api
-cd api
-
-# Migrations
-yarn migrate
-
 # Restart docker-compose
+docker-compose pull
 docker-compose up -d
