@@ -19,6 +19,7 @@ class SessionResolver {
       },
     });
 
+    console.log('Sending mail');
     ctx.services.triggerMailService.sendTrigger({ to: 'jmitnik@gmail.com', userSession: session });
 
     return session;

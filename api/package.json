@@ -2,9 +2,10 @@
     "name": "@haas/api",
     "version": "0.1.0",
     "scripts": {
-        "start": "pm2 start ts-node -- -P tsconfig.json ./src/app.ts --watch",
-        "serve": "pm2 start ts-noe -- -P tsconfig.json ./src/app.ts",
+        "start": "nodemon",
+        "serve": "ts-node -P tsconfig.json ./src/app.ts",
         "build": "yarn",
+        "logs": "",
         "deploy": "echo 'not setup webhook yet'",
         "generate": "prisma deploy && prisma generate -e .env && graphql-codegen",
         "migrate": "prisma deploy --force -f -e .env && prisma generate && graphql-codegen",
@@ -18,6 +19,7 @@
         "@graphql-codegen/typescript": "^1.11.2",
         "@graphql-codegen/typescript-resolvers": "^1.11.2",
         "@types/lodash": "^4.14.149",
+        "@types/mjml": "^4.0.4",
         "@types/nodemailer": "^6.4.0",
         "apollo-datasource": "^0.7.0",
         "apollo-datasource-rest": "^0.8.0",
@@ -31,6 +33,7 @@
         "graphql-import": "^1.0.0-beta.1",
         "graphql-yoga": "^1.18.3",
         "lodash": "^4.17.15",
+        "mjml": "^4.6.2",
         "nodemailer": "^6.4.6",
         "nodemailer-sendgrid": "^1.0.3",
         "nodemon": "^2.0.2",
@@ -40,6 +43,7 @@
         "ts-node": "^8.6.2"
     },
     "devDependencies": {
+        "nodemon": "^2.0.3",
         "typescript": "^3.7.3"
     }
 }

@@ -1,3 +1,4 @@
+import mjml2html from 'mjml';
 import MailService, { MailServiceInputProps } from './mail-service';
 import { Session } from '../../generated/resolver-types';
 
@@ -14,18 +15,41 @@ interface SendTriggerProps {
 class TriggerMailService extends MailService {
   sendTrigger({ from, to, userSession }: SendTriggerProps) {
     // TODO: Put in MJML
-    const mailBody = `
-      <div>
-          <h1>Hello, from HAAS!</h1>
-          <div>We noticed one of your customers gave a score of X</div>
-          <div>Here what they also said</div>
-          ${userSession.nodeEntries?.map(entry => `
-            <div>
-              ${entry.id}
-            </div>
+    const testArr = [2, 3, 4];
+
+    console.log('Sending mail!!!!');
+
+    const mailBody = mjml2html(`
+      <mjml>
+        <mj-body background-color="#e0f2ff">
+          <mj-section background-color="#4ca9eb">
+              <mj-column>
+                  <mj-text font-size="20px" color="white" align="center">
+                      Dear ${to}
+                  </mj-text>
+              </mj-column>
+          </mj-section>
+          <mj-section background-color="white">
+              <mj-column width="100%">
+                  <mj-text>
+                      We notice one of your customers had something to say!
+                  </mj-text>
+              </mj-column>
+          </mj-section>
+
+          ${testArr.map((item) => `
+            <mj-section border-top="1px solid #ddd" background-color="white">
+                <mj-column width="100%">
+                    <mj-text>
+                        This is what they said about ${item}
+                    </mj-text>
+                </mj-column>
+            </mj-section>
           `)}
-      </div>
-    `;
+
+        </mj-body>
+      </mjml>
+    `);
 
     this.sendMail({
       from,

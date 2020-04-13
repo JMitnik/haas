@@ -1,0 +1,29 @@
+<mjml>
+    <mj-body background-color="#e0f2ff">
+    <mj-section background-color="#e0f2ff">
+
+    </mj-section>
+    <mj-section background-color="#4ca9eb">
+        <mj-column>
+            <mj-text font-size="20px" color="white" align="center">
+                Dear ${to}
+            </mj-text>
+        </mj-column>
+    </mj-section>
+    <mj-section background-color="white">
+        <mj-column width="100%">
+            <mj-text>
+                We notice one of your customers had something to say!
+            </mj-text>
+        </mj-column>
+    </mj-section>
+    {Loop around this}
+    <mj-section border-top="1px solid #ddd" background-color="white">
+        <mj-column width="100%">
+            <mj-text>
+                We notice one of your customers had something to say!
+            </mj-text>
+        </mj-column>
+    </mj-section>
+    </mj-body>
+</mjml>
