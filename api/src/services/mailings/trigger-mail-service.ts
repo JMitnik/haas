@@ -32,16 +32,18 @@ class TriggerMailService extends MailService {
           <mj-section background-color="white">
               <mj-column width="100%">
                   <mj-text>
-                      We notice one of your customers had something to say!
+                      We notice one of your customers had something to say about dialogue #${userSession.questionnaire?.id}.
                   </mj-text>
               </mj-column>
           </mj-section>
 
-          ${testArr.map((item) => `
+          ${userSession?.nodeEntries?.map((entry) => `
             <mj-section border-top="1px solid #ddd" background-color="white">
                 <mj-column width="100%">
                     <mj-text>
-                        This is what they said about ${item}
+                        For node ${entry.relatedNode?.id}: ${entry?.values?.map((val) => `
+                          Value: ${val.numberValue || val.textValue})}
+                        `)}
                     </mj-text>
                 </mj-column>
             </mj-section>
@@ -49,7 +51,7 @@ class TriggerMailService extends MailService {
 
         </mj-body>
       </mjml>
-    `);
+    `).html;
 
     this.sendMail({
       from,

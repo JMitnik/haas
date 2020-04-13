@@ -6,6 +6,8 @@ class SessionResolver {
   static async uploadUserSession(obj: any, args: any, ctx: any) {
     const { questionnaireId, entries } = args.uploadUserSessionInput;
 
+    const nodeEntries = entries.map((entry: any) => SessionResolver.constructNodeEntry(entry));
+
     const session = await prisma.createSession({
       questionnaire: {
         connect: {
@@ -13,14 +15,21 @@ class SessionResolver {
         },
       },
       nodeEntries: {
-        create: entries.map(
-          (entry: any) => SessionResolver.constructNodeEntry(entry),
-        ),
+        create: nodeEntries,
       },
     });
 
-    console.log('Sending mail');
-    ctx.services.triggerMailService.sendTrigger({ to: 'jmitnik@gmail.com', userSession: session });
+    // TODO: Replace this with email associated to dialogue (or fallback to company)
+    const dialogueAgentMail = 'jmitnik@gmail.com';
+
+    ctx.services.triggerMailService.sendTrigger({
+      to: dialogueAgentMail,
+      userSession: {
+        id: session.id,
+        nodeEntries,
+        questionnaire: { id: questionnaireId },
+      },
+    });
 
     return session;
   }
