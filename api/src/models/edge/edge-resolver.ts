@@ -1,6 +1,6 @@
 import { prisma, QuestionNode, EdgeCreateInput } from '../../generated/prisma-client';
 
-interface IQuestionConditionInput {
+interface QuestionConditionProps {
   id?: string;
   conditionType: string;
   renderMin: number;
