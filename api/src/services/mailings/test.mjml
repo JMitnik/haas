@@ -1,16 +1,14 @@
 <mjml>
-    <mj-body background-color="#e0f2ff">
-    <mj-section background-color="#e0f2ff">
-
-    </mj-section>
-    <mj-section background-color="#4ca9eb">
+    <mj-body background-color="#f5f7fa">
+    <mj-spacer height="50px" />
+    <mj-section border-radius="5px 5px 0 0"  background-color="#0059f8">
         <mj-column>
             <mj-text font-size="20px" color="white" align="center">
                 Dear ${to}
             </mj-text>
         </mj-column>
     </mj-section>
-    <mj-section background-color="white">
+    <mj-section background-color="#eef1f5">
         <mj-column width="100%">
             <mj-text>
                 We notice one of your customers had something to say!
