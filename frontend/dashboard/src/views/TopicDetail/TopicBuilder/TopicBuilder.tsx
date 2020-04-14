@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 import { ApolloError } from 'apollo-boost';
 import { useQuery, useMutation } from '@apollo/react-hooks';
 import { H2, Loader, Div, Button } from '@haas/ui';
@@ -7,7 +8,6 @@ import updateTopicBuilder from '../../../mutations/updateTopicBuilder';
 import { getTopicBuilderQuery } from '../../../queries/getQuestionnaireQuery';
 import QuestionEntry from './QuestionEntry/QuestionEntry';
 import { TopicBuilderView } from './TopicBuilderStyles';
-
 import {
   QuestionEntryProps, EdgeChildProps,
   QuestionOptionProps,
@@ -161,7 +161,7 @@ const TopicBuilder = () => {
   const handleAddQuestion = (event: any) => {
     event.preventDefault();
     setQuestions((questionsPrev: any) => [...questionsPrev, {
-      id: undefined,
+      id: uuidv4(), // ⇨ '9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d',
       title: undefined,
       isRoot: false,
       isLeaf: false,

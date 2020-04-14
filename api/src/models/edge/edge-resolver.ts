@@ -1,5 +1,25 @@
 import { prisma, QuestionNode, EdgeCreateInput } from '../../generated/prisma-client';
 
+interface IQuestionConditionInput {
+  id?: string;
+  conditionType: string;
+  renderMin: number;
+  renderMax: number;
+  matchValue: string;
+}
+
+interface IEdgeNodeInput {
+  id: string;
+  title: string;
+}
+
+interface IEdgeChildInput {
+  id?: string;
+  conditions: [IQuestionConditionInput];
+  parentNode: IEdgeNodeInput;
+  childNode: IEdgeNodeInput;
+}
+
 class EdgeResolver {
   static constructEdge(
     parentNodeEntry: QuestionNode,
@@ -36,6 +56,18 @@ class EdgeResolver {
         },
       },
     });
+  };
+
+  static removeNonExistingEdges = async (activeEdges: Array<string>,
+    newEdges: Array<IEdgeChildInput>, questionId: any) => {
+    if (questionId) {
+      const newEdgeIds = newEdges.map(({ id }) => id);
+      // Remove when not in list and when not undefined (= nog niet beschikbaar in db)
+      const removeEdgeChildIds = activeEdges?.filter((id) => (!newEdgeIds.includes(id) && id));
+      if (removeEdgeChildIds?.length > 0) {
+        await prisma.deleteManyEdges({ id_in: removeEdgeChildIds });
+      }
+    }
   };
 }
 

@@ -5,6 +5,13 @@ import { SpaceProps } from 'styled-system';
 import { InputHTMLAttributes } from 'react';
 import Color from 'color';
 
+export const FormGroupContainer = styled.div`
+  ${({ theme }) => css`
+    padding-bottom: ${theme.gutter * 3}px;
+  `}
+`;
+
+export const Form = styled.form``;
 
 export const InputGroup = styled.div`
 `;

@@ -1,5 +1,6 @@
 /* eslint-disable max-len */
 import React, { useEffect, useRef } from 'react';
+import styled from 'styled-components/macro';
 import { MinusCircle } from 'react-feather';
 import { Muted, Div, H4, Button, StyledLabel, StyledInput, Hr, DeleteButtonContainer } from '@haas/ui';
 import Select from 'react-select';
@@ -9,6 +10,19 @@ import { QuestionEntryContainer } from './QuestionEntryStyles';
 import { QuestionEntryProps, EdgeChildProps } from '../TopicBuilderInterfaces';
 
 const questionTypes = [{ value: 'SLIDER', label: 'SLIDER' }, { value: 'MULTI_CHOICE', label: 'MULTI_CHOICE' }];
+
+const DeleteQuestionOptionButtonContainer = styled.button`
+  background: none;
+  border: none;
+  opacity: 0.1;
+  cursor: pointer;
+  transition: all 0.2s ease-in;
+  margin-left: 1%;
+  &:hover {
+    transition: all 0.2s ease-in;
+    opacity: 0.8;
+  }
+`;
 
 interface QuestionEntryItemProps {
   questionsQ: Array<QuestionEntryProps>;
@@ -209,14 +223,14 @@ const QuestionEntryItem = ({ question, leafs, questionsQ, index, ...props }: Que
                     defaultValue={option.value}
                     onBlur={(e) => setOption(e, index, optionIndex)}
                   />
-                  <DeleteButtonContainer onClick={(e) => deleteOption(e, index, optionIndex)}>
+                  <DeleteQuestionOptionButtonContainer onClick={(e) => deleteOption(e, index, optionIndex)}>
                     <MinusCircle />
-                  </DeleteButtonContainer>
+                  </DeleteQuestionOptionButtonContainer>
                 </Div>
               ))
             }
-            <Hr />
             <Button brand="default" mt={2} ml={4} mr={4} onClick={(e) => addNewOption(e, index)}>Add new option</Button>
+            <Hr />
           </Div>
         )}
         <Div useFlex pl={4} pr={4} pb={2} flexDirection="column">
