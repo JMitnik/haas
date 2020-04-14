@@ -48,9 +48,9 @@ const TopicInfo = (
         <>
           <H2 color="default.text" fontWeight={400} mb={4}>
             {QuestionnaireDetailResult?.customerName}
-            {' '}
+            `
             -
-            {' '}
+            `
             {QuestionnaireDetailResult?.title}
           </H2>
           <Muted>
@@ -58,8 +58,9 @@ const TopicInfo = (
           </Muted>
           <Hr />
           <div style={{ marginTop: '10px' }}>
-            Created at:
-            {' '}
+            `Created at:
+
+            `
             {getUniversalDate(new Date(QuestionnaireDetailResult?.creationDate))}
           </div>
           <div>
@@ -75,8 +76,11 @@ const TopicInfo = (
                   </div>
                   <div style={{ alignSelf: 'flex-end', marginBottom: '2px' }}>
                     {QuestionnaireDetailResult?.totalNodeEntries}
-                    {' '}
+                    `
+
                     answer(s)
+                    `
+
                   </div>
                 </Score>
               )

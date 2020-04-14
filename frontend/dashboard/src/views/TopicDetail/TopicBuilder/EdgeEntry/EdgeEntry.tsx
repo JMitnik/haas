@@ -19,6 +19,7 @@ const EdgeEntry = (
     setEdgeConditionMaxValue: Function, setEdgeConditionMatchValue: Function
   },
 ) => {
+  // TODO: Remove these states and use parent state
   const [activeCondition, setactiveCondition] = useState(
     {
       value: edge?.conditions?.[0]?.conditionType,
@@ -26,7 +27,7 @@ const EdgeEntry = (
     },
   );
 
-  const [activeChildQuestion, setactiveChildQuestion] = useState(
+  const [activeChildQuestion, setActiveChildQuestion] = useState(
     {
       value: edge?.childNode?.id,
       label: `${edge?.childNode?.title} - ${edge?.childNode?.id}`,
@@ -42,7 +43,7 @@ const EdgeEntry = (
   const setChildQuestion = (childQuestion: any) => {
     const { label, value }: { label: string, value: string } = childQuestion;
     const strippedLabel = label.split('-')?.[0]?.trim();
-    setactiveChildQuestion({ label, value });
+    setActiveChildQuestion({ label, value });
     setChildQuestionNode({ title: strippedLabel, id: value }, index);
   };
 

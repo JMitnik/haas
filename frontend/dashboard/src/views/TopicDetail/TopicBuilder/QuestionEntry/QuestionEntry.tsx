@@ -1,28 +1,15 @@
-/* eslint-disable max-len */
-import React, { useEffect, useRef } from 'react';
-import styled from 'styled-components/macro';
+import React from 'react';
 import { MinusCircle } from 'react-feather';
-import { Muted, Div, H4, Button, StyledLabel, StyledInput, Hr, DeleteButtonContainer } from '@haas/ui';
+import { Muted, Div, H4, Button, StyledLabel, StyledInput, Hr } from '@haas/ui';
 import Select from 'react-select';
 import { useForm } from 'react-hook-form';
 import EdgeEntry from '../EdgeEntry/EdgeEntry';
-import { QuestionEntryContainer } from './QuestionEntryStyles';
+import { QuestionEntryContainer, DeleteQuestionOptionButtonContainer } from './QuestionEntryStyles';
 import { QuestionEntryProps, EdgeChildProps } from '../TopicBuilderInterfaces';
 
-const questionTypes = [{ value: 'SLIDER', label: 'SLIDER' }, { value: 'MULTI_CHOICE', label: 'MULTI_CHOICE' }];
-
-const DeleteQuestionOptionButtonContainer = styled.button`
-  background: none;
-  border: none;
-  opacity: 0.1;
-  cursor: pointer;
-  transition: all 0.2s ease-in;
-  margin-left: 1%;
-  &:hover {
-    transition: all 0.2s ease-in;
-    opacity: 0.8;
-  }
-`;
+const questionTypes = [
+  { value: 'SLIDER', label: 'SLIDER' },
+  { value: 'MULTI_CHOICE', label: 'MULTI_CHOICE' }];
 
 interface QuestionEntryItemProps {
   questionsQ: Array<QuestionEntryProps>;
@@ -40,11 +27,14 @@ interface QuestionEntryItemProps {
   onIsRootQuestionChange: (isRoot: boolean, index: number) => void;
 }
 
-const QuestionEntryItem = ({ question, leafs, questionsQ, index, ...props }: QuestionEntryItemProps) => {
+const QuestionEntryItem = ({ question,
+  leafs,
+  questionsQ,
+  index,
+  ...props }: QuestionEntryItemProps) => {
   const { register, errors } = useForm();
   // TODO: What is difference between eustion and questionsQ? <- Not clear
 
-  // const [activeTitle, setActiveTitle] = useState(() => question.title);
   const activeTitle = question.title;
   const activeLeaf = { label: question.overrideLeaf?.title, value: question.overrideLeaf?.id };
   const activeQuestionType = { label: question.type, value: question.type };
@@ -56,7 +46,6 @@ const QuestionEntryItem = ({ question, leafs, questionsQ, index, ...props }: Que
     event.preventDefault();
     const newTitle = event.target.value;
     props.onTitleChange(newTitle, qIndex);
-    // setActiveTitle(newTitle);
   };
 
   const setQuestionType = (questionType: any) => {
@@ -66,7 +55,6 @@ const QuestionEntryItem = ({ question, leafs, questionsQ, index, ...props }: Que
 
   const setLeafNode = (leafNode: any) => {
     const { label, value } = leafNode;
-    console.log('New Leafnode: ', leafNode);
     props?.onLeafNodeChange({ id: value, title: label }, index);
   };
 
@@ -137,17 +125,6 @@ const QuestionEntryItem = ({ question, leafs, questionsQ, index, ...props }: Que
     props.onEdgesChange([...activeEdges], index);
   };
 
-  // useEffect(() => {
-  //   if (isIntialRender.current === true) {
-  //     isIntialRender.current = false;
-  //   }
-
-  //   // onEdgesChange(activeEdges, index);
-  //   // TODO: This will turn to code smells, props is an important dependency.
-  //   // We need to ensure that the flow of the state is handles from one direction/
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [activeEdges, isIntialRender]);
-
   const addNewEdge = (event: any) => {
     event.preventDefault();
     props.onEdgesChange([
@@ -188,7 +165,12 @@ const QuestionEntryItem = ({ question, leafs, questionsQ, index, ...props }: Que
             {question.id}
           </H4>
           <StyledLabel>Title</StyledLabel>
-          <StyledInput name="title" defaultValue={activeTitle} onBlur={(e) => setNewTitle(e, index)} ref={register({ required: true })} />
+          <StyledInput
+            name="title"
+            defaultValue={activeTitle}
+            onBlur={(e) => setNewTitle(e, index)}
+            ref={register({ required: true })}
+          />
           {errors.title && <Muted color="warning">Something went wrong!</Muted>}
         </Div>
         <Div useFlex pl={4} pr={4} pb={2} flexDirection="row">
@@ -202,7 +184,11 @@ const QuestionEntryItem = ({ question, leafs, questionsQ, index, ...props }: Que
         </Div>
         <Div useFlex pl={4} pr={4} pb={2} flexDirection="column">
           <StyledLabel>Question type</StyledLabel>
-          <Select options={questionTypes} value={activeQuestionType} onChange={(qOption) => setQuestionType(qOption)} />
+          <Select
+            options={questionTypes}
+            value={activeQuestionType}
+            onChange={(qOption) => setQuestionType(qOption)}
+          />
         </Div>
         {activeQuestionType.value === 'MULTI_CHOICE' && (
           <Div useFlex pl={4} pr={4} pb={2} flexDirection="column">
@@ -223,19 +209,33 @@ const QuestionEntryItem = ({ question, leafs, questionsQ, index, ...props }: Que
                     defaultValue={option.value}
                     onBlur={(e) => setOption(e, index, optionIndex)}
                   />
-                  <DeleteQuestionOptionButtonContainer onClick={(e) => deleteOption(e, index, optionIndex)}>
+                  <DeleteQuestionOptionButtonContainer
+                    onClick={(e) => deleteOption(e, index, optionIndex)}
+                  >
                     <MinusCircle />
                   </DeleteQuestionOptionButtonContainer>
                 </Div>
               ))
             }
-            <Button brand="default" mt={2} ml={4} mr={4} onClick={(e) => addNewOption(e, index)}>Add new option</Button>
+            <Button
+              brand="default"
+              mt={2}
+              ml={4}
+              mr={4}
+              onClick={(e) => addNewOption(e, index)}
+            >
+              Add new option
+            </Button>
             <Hr />
           </Div>
         )}
         <Div useFlex pl={4} pr={4} pb={2} flexDirection="column">
           <StyledLabel>Leaf node</StyledLabel>
-          <Select options={leafs} value={(activeLeaf?.value && activeLeaf) || leafs[0]} onChange={(leafOption) => setLeafNode(leafOption)} />
+          <Select
+            options={leafs}
+            value={(activeLeaf?.value && activeLeaf) || leafs[0]}
+            onChange={(leafOption) => setLeafNode(leafOption)}
+          />
         </Div>
         <Div useFlex pl={4} pr={4} pb={2} flexDirection="column">
           <H4>Edges</H4>
@@ -264,7 +264,15 @@ const QuestionEntryItem = ({ question, leafs, questionsQ, index, ...props }: Que
               />
             ))
           }
-          <Button brand="default" mt={2} ml={4} mr={4} onClick={(e) => addNewEdge(e)}>Add new edge</Button>
+          <Button
+            brand="default"
+            mt={2}
+            ml={4}
+            mr={4}
+            onClick={(e) => addNewEdge(e)}
+          >
+            Add new edge
+          </Button>
         </Div>
       </Div>
     </QuestionEntryContainer>

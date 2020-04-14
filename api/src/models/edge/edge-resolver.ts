@@ -62,7 +62,6 @@ class EdgeResolver {
     newEdges: Array<IEdgeChildInput>, questionId: any) => {
     if (questionId) {
       const newEdgeIds = newEdges.map(({ id }) => id);
-      // Remove when not in list and when not undefined (= nog niet beschikbaar in db)
       const removeEdgeChildIds = activeEdges?.filter((id) => (!newEdgeIds.includes(id) && id));
       if (removeEdgeChildIds?.length > 0) {
         await prisma.deleteManyEdges({ id_in: removeEdgeChildIds });

@@ -1,5 +1,3 @@
-/* eslint-disable max-len */
-/* eslint-disable react/jsx-one-expression-per-line */
 import React, { useState } from 'react';
 import { useQuery } from '@apollo/react-hooks';
 import { Flex, Loader, Grid, Div } from '@haas/ui';
@@ -27,7 +25,12 @@ const TopicDetail = () => {
       <Div width="80%" margin="0 auto">
         <Grid gridTemplateColumns="3fr 1fr">
           <Div>
-            <Flex height="100%" alignItems="center" justifyContent="space-between" flexDirection="column">
+            <Flex
+              height="100%"
+              alignItems="center"
+              justifyContent="space-between"
+              flexDirection="column"
+            >
               <Switch>
                 <Route path="/c/:customerId/t/:topicId/e/:entryId">
                   <NodeEntriesOverview sessionId={activeSession} />

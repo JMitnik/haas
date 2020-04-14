@@ -94,34 +94,28 @@ const TopicBuilder = () => {
     return <Loader />;
   }
 
-  console.log('Questions: ', questions);
-
   const handleTitleChange = (title: string, qIndex: number) => {
-    setQuestions((questionsPrev: any) => { // Array<QuestionEntryProps>
+    setQuestions((questionsPrev: any) => {
       questionsPrev[qIndex].title = title;
       return [...questionsPrev];
     });
   };
 
   const handleIsRootQuestionChange = (isRoot: boolean, qIndex: number) => {
-    setQuestions((questionsPrev: any) => { // Array<QuestionEntryProps>
+    setQuestions((questionsPrev: any) => {
       questionsPrev[qIndex].isRoot = isRoot;
       return [...questionsPrev];
     });
   };
 
   const handleLeafNodeChange = (leaf: any, qIndex: number) => {
-    setQuestions((questionsPrev: any) => { // Array<QuestionEntryProps>
+    setQuestions((questionsPrev: any) => {
       const question = questionsPrev[qIndex];
-      console.log('Question: ', question);
-      console.log('leaf: ', leaf);
       if (question.overrideLeaf?.id) {
         if (leaf?.id === 'None') {
           question.overrideLeaf = undefined;
           return [...questionsPrev];
         }
-        // question.overrideLeaf.id = leaf?.id;
-        // return [...questionsPrev];
       }
       question.overrideLeaf = leaf;
       return [...questionsPrev];
@@ -129,14 +123,14 @@ const TopicBuilder = () => {
   };
 
   const handleQuestionTypeChange = (value: string, qIndex: number) => {
-    setQuestions((questionsPrev: any) => { // Array<QuestionEntryProps>
+    setQuestions((questionsPrev: any) => {
       questionsPrev[qIndex].type = value;
       return [...questionsPrev];
     });
   };
 
   const handleAddQuestionOption = (value: Array<QuestionOptionProps>, qIndex: number) => {
-    setQuestions((questionsPrev: any) => { // Array<QuestionEntryProps>
+    setQuestions((questionsPrev: any) => {
       questionsPrev[qIndex].options = value;
       return [...questionsPrev];
     });
@@ -145,14 +139,14 @@ const TopicBuilder = () => {
   const handleQuestionOptionsChange = (
     questionOptions: Array<QuestionOptionProps>, qIndex: number,
   ) => {
-    setQuestions((questionsPrev: any) => { // Array<QuestionEntryProps>
+    setQuestions((questionsPrev: any) => {
       questionsPrev[qIndex].options = questionOptions;
       return [...questionsPrev];
     });
   };
 
   const handleEdgesChange = (children: Array<EdgeChildProps>, qIndex: number) => {
-    setQuestions((questionsPrev: any) => { // Array<QuestionEntryProps>
+    setQuestions((questionsPrev: any) => {
       questionsPrev[qIndex].children = children;
       return [...questionsPrev];
     });
@@ -161,7 +155,7 @@ const TopicBuilder = () => {
   const handleAddQuestion = (event: any) => {
     event.preventDefault();
     setQuestions((questionsPrev: any) => [...questionsPrev, {
-      id: uuidv4(), // ⇨ '9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d',
+      id: uuidv4(),
       title: undefined,
       isRoot: false,
       isLeaf: false,
@@ -217,7 +211,6 @@ const TopicBuilder = () => {
           mr={4}
           onClick={(e) => {
             e.preventDefault();
-            console.log('Sending this question to back-end: ', questions[0]);
             updateTopic(
               { variables: { id: topicBuilderData.id,
                 topicData: { id: topicBuilderData.id, questions } } },
