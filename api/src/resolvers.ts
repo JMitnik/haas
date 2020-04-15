@@ -34,6 +34,7 @@ const mutationResolvers = {
   createNewCustomer: CustomerResolver.createNewCustomerMutation,
   deleteFullCustomer: CustomerResolver.deleteFullCustomerNode,
   createNewQuestionnaire: DialogueResolver.createNewQuestionnaire,
+  updateTopicBuilder: DialogueResolver.updateTopicBuilder,
   deleteQuestionnaire: forwardTo('db'),
   deleteCustomer: forwardTo('db'),
 };

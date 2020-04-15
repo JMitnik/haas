@@ -11,6 +11,21 @@ export interface ButtonProps extends SpaceProps {
   size?: sizeVariants;
 }
 
+export const DeleteButtonContainer = styled.button`
+  position: absolute;
+  top: 10px;
+  right: 0px;
+  background: none;
+  border: none;
+  opacity: 0.1;
+  cursor: pointer;
+  transition: all 0.2s ease-in;
+
+  &:hover {
+    transition: all 0.2s ease-in;
+    opacity: 0.8;
+  }
+`;
 export const ButtonIcon = styled.span``;
 
 export const Button = styled.button<ButtonProps>`

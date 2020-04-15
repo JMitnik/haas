@@ -1,9 +1,8 @@
-import React, { Component, FC } from 'react';
+import React, { FC } from 'react';
 import { Link } from 'react-router-dom';
-import styled, { css } from 'styled-components/macro';
-import { Settings } from 'react-feather';
+import styled, { css } from 'styled-components';
 
-import { Div, H3, H4 } from '@haas/ui';
+import { Div, H4 } from '@haas/ui';
 import { GenericProps } from '@haas/ui/src/Generics';
 import { ProfilePic } from '@haas/ui/src/User';
 import Logo, { LogoContainer } from '../assets/Logo';
