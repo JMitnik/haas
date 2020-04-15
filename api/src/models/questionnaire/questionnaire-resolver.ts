@@ -1,53 +1,9 @@
 import _ from 'lodash';
-import { prisma, Questionnaire, NodeType,
-  QuestionnaireCreateInput, QuestionNode } from '../../generated/prisma-client/index';
+import { prisma,
+  Questionnaire, QuestionnaireCreateInput, QuestionNode } from '../../generated/prisma-client/index';
 
 import NodeResolver from '../question/node-resolver';
 import { leafNodes } from '../../../data/seeds/default-data';
-
-interface LeafNodeProps {
-  id: string;
-  nodeId?: string;
-  type?: string;
-  title: string;
-}
-
-interface QuestionConditionProps {
-  id?: string;
-  conditionType: string;
-  renderMin: number;
-  renderMax: number;
-  matchValue: string;
-}
-
-interface EdgeNodeProps {
-  id: string;
-  title: string;
-}
-
-interface EdgeChildProps {
-  id?: string;
-  conditions: [QuestionConditionProps];
-  parentNode: EdgeNodeProps;
-  childNode: EdgeNodeProps;
-}
-
-interface QuestionOptionProps {
-  id?: string;
-  value: string;
-  publicValue?: string;
-}
-
-interface QuestionProps {
-  id: string;
-  title: string;
-  isRoot: boolean;
-  isLeaf: boolean;
-  type: NodeType;
-  overrideLeaf: LeafNodeProps;
-  options: Array<QuestionOptionProps>;
-  children: Array<EdgeChildProps>;
-}
 
 class DialogueResolver {
   static constructDialogue(customerId: string,
@@ -96,12 +52,13 @@ class DialogueResolver {
       if (customer?.name) {
         return DialogueResolver.seedQuestionnare(customerId, customer?.name, title, description);
       }
+
+      console.log('Cant find customer with specified ID while seeding');
     }
+
     questionnaire = await DialogueResolver.createDialogue(
       customerId, title, description, publicTitle,
     );
-
-    await NodeResolver.createTemplateLeafNodes(leafNodes, questionnaire.id);
 
     return questionnaire;
   };
@@ -120,64 +77,6 @@ class DialogueResolver {
 
     await NodeResolver.createTemplateNodes(questionnaire.id, customerName, leafs);
     return questionnaire;
-  };
-
-  static uuidToPrismaIds = async (questions: Array<QuestionProps>, dialogueId: string) => {
-    const v4 = new RegExp(/^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i);
-    const newQuestions = questions.filter(({ id }) => {
-      const matchResult = id.match(v4);
-      return matchResult ? matchResult.length > 0 : false;
-    });
-
-    const newMappedQuestions = await Promise.all(newQuestions.map(
-      async ({ id, title, type }) => {
-        const question = await NodeResolver.createQuestionNode(title, dialogueId, type);
-        return { [id]: question.id };
-      },
-    ));
-
-    const reducer = (accumulator: object, currentValue: object) => (
-      { ...accumulator, ...currentValue }
-    );
-    const finalMapping = newMappedQuestions.reduce(reducer, {});
-    const finalQuestions = questions.map((question) => {
-      const matchResult = question.id.match(v4) || [];
-      if (matchResult.length > 0) {
-        question.id = finalMapping[question.id];
-      }
-
-      const updatedEdges = question.children?.map((edge) => {
-        const matchParent = edge?.parentNode?.id?.match(v4) || [];
-        const matchChild = edge.childNode.id.match(v4) || [];
-        if (matchParent && matchParent.length > 0) {
-          edge.parentNode.id = question.id;
-        }
-        if (matchChild && matchChild.length > 0) {
-          edge.childNode.id = finalMapping[edge.childNode.id];
-        }
-        return edge;
-      });
-
-      question.children = updatedEdges?.length > 0 ? updatedEdges : [];
-      return question;
-    });
-    return finalQuestions;
-  };
-
-  static updateTopicBuilder = async (parent: any, args: any) => {
-    try {
-      const questionnaireId: string = args.id || undefined;
-      const { questions }: { questions: Array<any> } = args.topicData;
-      const finalQuestions = await DialogueResolver.uuidToPrismaIds(questions, questionnaireId);
-      await Promise.all(finalQuestions.map((question) => NodeResolver.updateQuestion(
-        questionnaireId,
-        question,
-      )));
-
-      return 'Succesfully updated topic(?)';
-    } catch (e) {
-      return `Something went wrong in update topic builder: ${e}`;
-    }
   };
 
   static getQuestionnaireAggregatedData = async (parent: any, args: any) => {

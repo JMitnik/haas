@@ -1,11 +1,9 @@
 import gql from 'graphql-tag';
 
-const QuestionFragment = gql`
+export const QuestionFragment = gql`
   fragment QuestionFragment on QuestionNode {
     id
     title
-    isRoot
-    isLeaf
     overrideLeaf {
       id
       type
@@ -15,7 +13,6 @@ const QuestionFragment = gql`
     children {
       id
       conditions {
-        id
         conditionType
         matchValue
         renderMin
@@ -31,11 +28,8 @@ const QuestionFragment = gql`
       }
     }
     options {
-        id
-        value
-        publicValue
+      value
+      publicValue
     }
   }
 `;
-
-export default QuestionFragment;
