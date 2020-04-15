@@ -1,6 +1,6 @@
 import { prisma, QuestionNode, EdgeCreateInput } from '../../generated/prisma-client';
 
-interface IQuestionConditionInput {
+interface QuestionConditionProps {
   id?: string;
   conditionType: string;
   renderMin: number;
@@ -8,16 +8,16 @@ interface IQuestionConditionInput {
   matchValue: string;
 }
 
-interface IEdgeNodeInput {
+interface EdgeNodeProps {
   id: string;
   title: string;
 }
 
-interface IEdgeChildInput {
+interface EdgeChildProps {
   id?: string;
-  conditions: [IQuestionConditionInput];
-  parentNode: IEdgeNodeInput;
-  childNode: IEdgeNodeInput;
+  conditions: [QuestionConditionProps];
+  parentNode: EdgeNodeProps;
+  childNode: EdgeNodeProps;
 }
 
 class EdgeResolver {
@@ -59,7 +59,7 @@ class EdgeResolver {
   };
 
   static removeNonExistingEdges = async (activeEdges: Array<string>,
-    newEdges: Array<IEdgeChildInput>, questionId: any) => {
+    newEdges: Array<EdgeChildProps>, questionId: any) => {
     if (questionId) {
       const newEdgeIds = newEdges.map(({ id }) => id);
       const removeEdgeChildIds = activeEdges?.filter((id) => (!newEdgeIds.includes(id) && id));

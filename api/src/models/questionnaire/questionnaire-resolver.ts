@@ -5,14 +5,14 @@ import { prisma, Questionnaire, NodeType,
 import NodeResolver from '../question/node-resolver';
 import { leafNodes } from '../../../data/seeds/default-data';
 
-interface ILeafNodeInput {
+interface LeafNodeProps {
   id: string;
   nodeId?: string;
   type?: string;
   title: string;
 }
 
-interface IQuestionConditionInput {
+interface QuestionConditionProps {
   id?: string;
   conditionType: string;
   renderMin: number;
@@ -20,33 +20,33 @@ interface IQuestionConditionInput {
   matchValue: string;
 }
 
-interface IEdgeNodeInput {
+interface EdgeNodeProps {
   id: string;
   title: string;
 }
 
-interface IEdgeChildInput {
+interface EdgeChildProps {
   id?: string;
-  conditions: [IQuestionConditionInput];
-  parentNode: IEdgeNodeInput;
-  childNode: IEdgeNodeInput;
+  conditions: [QuestionConditionProps];
+  parentNode: EdgeNodeProps;
+  childNode: EdgeNodeProps;
 }
 
-interface IOptionInput {
+interface QuestionOptionProps {
   id?: string;
   value: string;
   publicValue?: string;
 }
 
-interface IQuestionInput {
+interface QuestionProps {
   id: string;
   title: string;
   isRoot: boolean;
   isLeaf: boolean;
   type: NodeType;
-  overrideLeaf: ILeafNodeInput;
-  options: Array<IOptionInput>;
-  children: Array<IEdgeChildInput>;
+  overrideLeaf: LeafNodeProps;
+  options: Array<QuestionOptionProps>;
+  children: Array<EdgeChildProps>;
 }
 
 class DialogueResolver {
@@ -122,7 +122,7 @@ class DialogueResolver {
     return questionnaire;
   };
 
-  static uuidToPrismaIds = async (questions: Array<IQuestionInput>, dialogueId: string) => {
+  static uuidToPrismaIds = async (questions: Array<QuestionProps>, dialogueId: string) => {
     const v4 = new RegExp(/^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i);
     const newQuestions = questions.filter(({ id }) => {
       const matchResult = id.match(v4);

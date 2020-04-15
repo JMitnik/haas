@@ -10,20 +10,20 @@ interface LeafNodeDataEntryProps {
   type: NodeType;
 }
 
-interface IOptionInput {
+interface QuestionOptionProps {
   id?: string;
   value: string;
   publicValue?: string;
 }
 
-interface IEdgeChildInput {
+interface EdgeChildProps {
   id?: string;
-  conditions: [IQuestionConditionInput];
-  parentNode: IEdgeNodeInput;
-  childNode: IEdgeNodeInput;
+  conditions: [QuestionConditionProps];
+  parentNode: EdgeNodeProps;
+  childNode: EdgeNodeProps;
 }
 
-interface IQuestionConditionInput {
+interface QuestionConditionProps {
   id?: string;
   conditionType: string;
   renderMin: number;
@@ -31,27 +31,27 @@ interface IQuestionConditionInput {
   matchValue: string;
 }
 
-interface IEdgeNodeInput {
+interface EdgeNodeProps {
   id: string;
   title: string;
 }
 
-interface ILeafNodeInput {
+interface LeafNodeProps {
   id: string;
   nodeId?: string;
   type?: string;
   title: string;
 }
 
-interface IQuestionInput {
+interface QuestionProps {
   id: string;
   title: string;
   isRoot: boolean;
   isLeaf: boolean;
   type: NodeType;
-  overrideLeaf: ILeafNodeInput;
-  options: Array<IOptionInput>;
-  children: Array<IEdgeChildInput>;
+  overrideLeaf: LeafNodeProps;
+  options: Array<QuestionOptionProps>;
+  children: Array<EdgeChildProps>;
 }
 
 const standardOptions = [{ value: 'Facilities' },
@@ -170,7 +170,7 @@ class NodeResolver {
     return undefined;
   };
 
-  static updateQuestion = async (questionnaireId: string, questionData: IQuestionInput) => {
+  static updateQuestion = async (questionnaireId: string, questionData: QuestionProps) => {
     const {
       title,
       isRoot,
@@ -269,7 +269,7 @@ class NodeResolver {
     });
   };
 
-  static updateQuestionOptions = async (options: Array<IOptionInput>) => Promise.all(
+  static updateQuestionOptions = async (options: Array<QuestionOptionProps>) => Promise.all(
     options?.map(async (option) => {
       const updatedQOption = await prisma.upsertQuestionOption(
         {
@@ -288,7 +288,7 @@ class NodeResolver {
     }),
   );
 
-  static updateNewQConditions = async (edge: IEdgeChildInput) => {
+  static updateNewQConditions = async (edge: EdgeChildProps) => {
     const { conditionType, renderMax, renderMin, matchValue } = edge.conditions[0];
     const condition = await prisma.upsertQuestionCondition(
       {
@@ -317,7 +317,7 @@ class NodeResolver {
 
   static removeNonExistingQOptions = async (
     activeOptions: Array<string>,
-    newOptions: Array<IOptionInput>,
+    newOptions: Array<QuestionOptionProps>,
     questionId: string) => {
     if (questionId) {
       const newOptioIds = newOptions?.map(({ id }) => id);

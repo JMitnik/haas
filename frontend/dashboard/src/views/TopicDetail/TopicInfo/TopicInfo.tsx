@@ -8,7 +8,7 @@ interface TimelineEntryProps {
   createdAt: string;
 }
 
-interface QuestionnaireDetailResult {
+interface DialogueResultProps {
   customerName: string;
   title: string;
   description: string;
@@ -40,42 +40,42 @@ const getUniversalDate = (date: Date) => {
 };
 
 const TopicInfo = (
-  { QuestionnaireDetailResult }: { QuestionnaireDetailResult: QuestionnaireDetailResult },
+  { DialogueResultProps }: { DialogueResultProps: DialogueResultProps },
 ) => (
   <TopicInfoView>
     {
-      QuestionnaireDetailResult && (
+      DialogueResultProps && (
         <>
           <H2 color="default.text" fontWeight={400} mb={4}>
-            {QuestionnaireDetailResult?.customerName}
+            {DialogueResultProps?.customerName}
             `
             -
             `
-            {QuestionnaireDetailResult?.title}
+            {DialogueResultProps?.title}
           </H2>
           <Muted>
-            {QuestionnaireDetailResult?.description}
+            {DialogueResultProps?.description}
           </Muted>
           <Hr />
           <div style={{ marginTop: '10px' }}>
             `Created at:
 
             `
-            {getUniversalDate(new Date(QuestionnaireDetailResult?.creationDate))}
+            {getUniversalDate(new Date(DialogueResultProps?.creationDate))}
           </div>
           <div>
             {
-              QuestionnaireDetailResult?.average !== 'false' && (
+              DialogueResultProps?.average !== 'false' && (
                 <Score>
                   <div style={{ marginTop: '5px', alignSelf: 'centre' }}>
                     Average score:
                   </div>
                   <div style={{ marginLeft: '5px', fontSize: '200%', alignSelf: 'flex-start' }}>
-                    {parseFloat(QuestionnaireDetailResult?.average).toPrecision(4)}
+                    {parseFloat(DialogueResultProps?.average).toPrecision(4)}
                     /
                   </div>
                   <div style={{ alignSelf: 'flex-end', marginBottom: '2px' }}>
-                    {QuestionnaireDetailResult?.totalNodeEntries}
+                    {DialogueResultProps?.totalNodeEntries}
                     `
 
                     answer(s)
