@@ -1,0 +1,28 @@
+name: Docker Image CI
+
+on:
+  release:
+    types: [published]
+
+jobs:
+
+  build-api:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Publish to Docker Registry
+      uses: elgohr/Publish-Docker-Github-Action@master
+      with:
+        name: juronemo/haasapi-local
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_PASSWORD }}
+        workdir: api
+    - name: SSH Commands
+      uses: appleboy/ssh-action@v0.0.7
+      with:
+        host: ${{ secrets.API_SERVER_HOST }}
+        username: ${{ secrets.API_SERVER_USERNAME }}
+        key: ${{ secrets.API_SERVER_KEY }}
+        script: /bin/sh deployment.sh
