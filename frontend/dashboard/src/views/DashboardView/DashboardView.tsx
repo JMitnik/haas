@@ -1,31 +1,16 @@
 import React, { FC } from 'react';
-import { useQuery, useApolloClient, useMutation } from '@apollo/react-hooks';
-import { gql, ApolloError } from 'apollo-boost';
+import { useQuery, useMutation } from '@apollo/react-hooks';
+import { ApolloError } from 'apollo-boost';
 
-import { ChevronRight, Plus, X } from 'react-feather';
-import { H2, H3, H4, Grid, Flex, Icon, Label, Div, Card, CardBody, CardFooter, Container } from '@haas/ui';
+import { Plus, X } from 'react-feather';
+import { H2, H3, Grid, Flex, Div, Card, CardBody,
+  Container, DeleteButtonContainer, AddCard } from '@haas/ui';
 import { Link, useHistory } from 'react-router-dom';
-import styled, { css } from 'styled-components/macro';
-import { Query, Questionnaire, Customer } from '../types.d';
+import { Query, Customer } from '../../types';
 
-import { getCustomerQuery } from '../queries/getCustomerQuery';
-import { deleteFullCustomerQuery } from '../mutations/deleteFullCustomer';
-
-const DeleteCustomerButtonContainer = styled.button`
-  position: absolute;
-  top: 5px;
-  right: 5px;
-  background: none;
-  border: none;
-  opacity: 0.1;
-  cursor: pointer;
-  transition: all 0.2s ease-in;
-
-  &:hover {
-    transition: all 0.2s ease-in;
-    opacity: 0.8;
-  }
-`;
+import { getCustomerQuery } from '../../queries/getCustomerQuery';
+import { deleteFullCustomerQuery } from '../../mutations/deleteFullCustomer';
+import { CustomerCardImage } from './DashboardViewStyles';
 
 const DashboardView: FC = () => {
   const { loading, error, data } = useQuery<Query>(getCustomerQuery);
@@ -36,8 +21,8 @@ const DashboardView: FC = () => {
     return (
       <p>
         Error:
-        {' '}
         {error.message}
+        `
       </p>
     );
   }
@@ -56,7 +41,7 @@ const DashboardView: FC = () => {
         >
           {topics?.map((topic, index) => topic && <CustomerCard key={index} customer={topic} />)}
 
-          <AddTopicCard>
+          <AddCard>
             <Link to="/customer-builder" />
             <Div>
               <Plus />
@@ -64,48 +49,12 @@ const DashboardView: FC = () => {
                 Add new customer
               </H3>
             </Div>
-          </AddTopicCard>
+          </AddCard>
         </Grid>
       </Container>
     </>
   );
 };
-
-const AddTopicCard = styled(Card)`
-  ${({ theme }) => css`
-    position: relative;
-
-    &:hover ${Div} {
-      transition: all 0.2s ease-in;
-      box-shadow: 0 1px 3px 1px rgba(0,0,0,0.1);
-    }
-
-    ${Div} {
-      height: 100%;
-      border: 1px solid ${theme.colors.default.light};
-      transition: all 0.2s ease-in;
-      display: flex;
-      align-items: center;
-      flex-direciton: column;
-      justify-content: center;
-      background: ${theme.colors.default.light};
-    }
-
-    a {
-      position: absolute;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      top: 0;
-      text-decoration: none;
-    }
-  `}
-`;
-
-const CustomerCardImage = styled.img`
-  width: 75px;
-  height: 75px;
-`;
 
 const CustomerCard = ({ customer }: { customer: Customer }) => {
   const history = useHistory();
@@ -114,10 +63,7 @@ const CustomerCard = ({ customer }: { customer: Customer }) => {
     history.push(`/c/${customerId}`);
   };
 
-  const [deleteCustomer, { loading }] = useMutation(deleteFullCustomerQuery, {
-    onCompleted: () => {
-      console.log('Succesfully deleted customer !');
-    },
+  const [deleteCustomer] = useMutation(deleteFullCustomerQuery, {
     refetchQueries: [{ query: getCustomerQuery }],
     onError: (serverError: ApolloError) => {
       console.log(serverError);
@@ -141,7 +87,11 @@ const CustomerCard = ({ customer }: { customer: Customer }) => {
       onClick={() => setCustomerID(customer.id)}
     >
       <CardBody flex="100%">
-        <DeleteCustomerButtonContainer onClick={(e) => deleteClickedCustomer(e, customer.id)}><X /></DeleteCustomerButtonContainer>
+        <DeleteButtonContainer
+          onClick={(e) => deleteClickedCustomer(e, customer.id)}
+        >
+          <X />
+        </DeleteButtonContainer>
         <Flex alignItems="center" justifyContent="space-between">
           <H3 fontWeight={500}>
             {customer.name}

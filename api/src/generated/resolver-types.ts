@@ -3247,6 +3247,7 @@ export type QuestionNode = {
   isRoot: Scalars['Boolean'];
   isLeaf: Scalars['Boolean'];
   overrideLeaf?: Maybe<QuestionNode>;
+  isOverrideLeafOf?: Maybe<QuestionNode>;
   options?: Maybe<Array<QuestionOption>>;
   children?: Maybe<Array<Edge>>;
 };
@@ -3287,7 +3288,8 @@ export type QuestionNodeCreateInput = {
   type: NodeType;
   isRoot?: Maybe<Scalars['Boolean']>;
   isLeaf?: Maybe<Scalars['Boolean']>;
-  overrideLeaf?: Maybe<QuestionNodeCreateOneWithoutOverrideLeafInput>;
+  overrideLeaf?: Maybe<QuestionNodeCreateOneWithoutIsOverrideLeafOfInput>;
+  isOverrideLeafOf?: Maybe<QuestionNodeCreateOneWithoutOverrideLeafInput>;
   options?: Maybe<QuestionOptionCreateManyInput>;
   children?: Maybe<EdgeCreateManyInput>;
 };
@@ -3307,9 +3309,26 @@ export type QuestionNodeCreateOneInput = {
   connect?: Maybe<QuestionNodeWhereUniqueInput>;
 };
 
+export type QuestionNodeCreateOneWithoutIsOverrideLeafOfInput = {
+  create?: Maybe<QuestionNodeCreateWithoutIsOverrideLeafOfInput>;
+  connect?: Maybe<QuestionNodeWhereUniqueInput>;
+};
+
 export type QuestionNodeCreateOneWithoutOverrideLeafInput = {
   create?: Maybe<QuestionNodeCreateWithoutOverrideLeafInput>;
   connect?: Maybe<QuestionNodeWhereUniqueInput>;
+};
+
+export type QuestionNodeCreateWithoutIsOverrideLeafOfInput = {
+  id?: Maybe<Scalars['ID']>;
+  title: Scalars['String'];
+  questionnaire?: Maybe<QuestionnaireCreateOneWithoutQuestionsInput>;
+  type: NodeType;
+  isRoot?: Maybe<Scalars['Boolean']>;
+  isLeaf?: Maybe<Scalars['Boolean']>;
+  overrideLeaf?: Maybe<QuestionNodeCreateOneWithoutIsOverrideLeafOfInput>;
+  options?: Maybe<QuestionOptionCreateManyInput>;
+  children?: Maybe<EdgeCreateManyInput>;
 };
 
 export type QuestionNodeCreateWithoutOverrideLeafInput = {
@@ -3319,6 +3338,7 @@ export type QuestionNodeCreateWithoutOverrideLeafInput = {
   type: NodeType;
   isRoot?: Maybe<Scalars['Boolean']>;
   isLeaf?: Maybe<Scalars['Boolean']>;
+  isOverrideLeafOf?: Maybe<QuestionNodeCreateOneWithoutOverrideLeafInput>;
   options?: Maybe<QuestionOptionCreateManyInput>;
   children?: Maybe<EdgeCreateManyInput>;
 };
@@ -3329,7 +3349,8 @@ export type QuestionNodeCreateWithoutQuestionnaireInput = {
   type: NodeType;
   isRoot?: Maybe<Scalars['Boolean']>;
   isLeaf?: Maybe<Scalars['Boolean']>;
-  overrideLeaf?: Maybe<QuestionNodeCreateOneWithoutOverrideLeafInput>;
+  overrideLeaf?: Maybe<QuestionNodeCreateOneWithoutIsOverrideLeafOfInput>;
+  isOverrideLeafOf?: Maybe<QuestionNodeCreateOneWithoutOverrideLeafInput>;
   options?: Maybe<QuestionOptionCreateManyInput>;
   children?: Maybe<EdgeCreateManyInput>;
 };
@@ -3429,7 +3450,8 @@ export type QuestionNodeUpdateDataInput = {
   type?: Maybe<NodeType>;
   isRoot?: Maybe<Scalars['Boolean']>;
   isLeaf?: Maybe<Scalars['Boolean']>;
-  overrideLeaf?: Maybe<QuestionNodeUpdateOneWithoutOverrideLeafInput>;
+  overrideLeaf?: Maybe<QuestionNodeUpdateOneWithoutIsOverrideLeafOfInput>;
+  isOverrideLeafOf?: Maybe<QuestionNodeUpdateOneWithoutOverrideLeafInput>;
   options?: Maybe<QuestionOptionUpdateManyInput>;
   children?: Maybe<EdgeUpdateManyInput>;
 };
@@ -3440,7 +3462,8 @@ export type QuestionNodeUpdateInput = {
   type?: Maybe<NodeType>;
   isRoot?: Maybe<Scalars['Boolean']>;
   isLeaf?: Maybe<Scalars['Boolean']>;
-  overrideLeaf?: Maybe<QuestionNodeUpdateOneWithoutOverrideLeafInput>;
+  overrideLeaf?: Maybe<QuestionNodeUpdateOneWithoutIsOverrideLeafOfInput>;
+  isOverrideLeafOf?: Maybe<QuestionNodeUpdateOneWithoutOverrideLeafInput>;
   options?: Maybe<QuestionOptionUpdateManyInput>;
   children?: Maybe<EdgeUpdateManyInput>;
 };
@@ -3497,6 +3520,15 @@ export type QuestionNodeUpdateOneInput = {
   connect?: Maybe<QuestionNodeWhereUniqueInput>;
 };
 
+export type QuestionNodeUpdateOneWithoutIsOverrideLeafOfInput = {
+  create?: Maybe<QuestionNodeCreateWithoutIsOverrideLeafOfInput>;
+  update?: Maybe<QuestionNodeUpdateWithoutIsOverrideLeafOfDataInput>;
+  upsert?: Maybe<QuestionNodeUpsertWithoutIsOverrideLeafOfInput>;
+  delete?: Maybe<Scalars['Boolean']>;
+  disconnect?: Maybe<Scalars['Boolean']>;
+  connect?: Maybe<QuestionNodeWhereUniqueInput>;
+};
+
 export type QuestionNodeUpdateOneWithoutOverrideLeafInput = {
   create?: Maybe<QuestionNodeCreateWithoutOverrideLeafInput>;
   update?: Maybe<QuestionNodeUpdateWithoutOverrideLeafDataInput>;
@@ -3506,12 +3538,24 @@ export type QuestionNodeUpdateOneWithoutOverrideLeafInput = {
   connect?: Maybe<QuestionNodeWhereUniqueInput>;
 };
 
+export type QuestionNodeUpdateWithoutIsOverrideLeafOfDataInput = {
+  title?: Maybe<Scalars['String']>;
+  questionnaire?: Maybe<QuestionnaireUpdateOneWithoutQuestionsInput>;
+  type?: Maybe<NodeType>;
+  isRoot?: Maybe<Scalars['Boolean']>;
+  isLeaf?: Maybe<Scalars['Boolean']>;
+  overrideLeaf?: Maybe<QuestionNodeUpdateOneWithoutIsOverrideLeafOfInput>;
+  options?: Maybe<QuestionOptionUpdateManyInput>;
+  children?: Maybe<EdgeUpdateManyInput>;
+};
+
 export type QuestionNodeUpdateWithoutOverrideLeafDataInput = {
   title?: Maybe<Scalars['String']>;
   questionnaire?: Maybe<QuestionnaireUpdateOneWithoutQuestionsInput>;
   type?: Maybe<NodeType>;
   isRoot?: Maybe<Scalars['Boolean']>;
   isLeaf?: Maybe<Scalars['Boolean']>;
+  isOverrideLeafOf?: Maybe<QuestionNodeUpdateOneWithoutOverrideLeafInput>;
   options?: Maybe<QuestionOptionUpdateManyInput>;
   children?: Maybe<EdgeUpdateManyInput>;
 };
@@ -3521,7 +3565,8 @@ export type QuestionNodeUpdateWithoutQuestionnaireDataInput = {
   type?: Maybe<NodeType>;
   isRoot?: Maybe<Scalars['Boolean']>;
   isLeaf?: Maybe<Scalars['Boolean']>;
-  overrideLeaf?: Maybe<QuestionNodeUpdateOneWithoutOverrideLeafInput>;
+  overrideLeaf?: Maybe<QuestionNodeUpdateOneWithoutIsOverrideLeafOfInput>;
+  isOverrideLeafOf?: Maybe<QuestionNodeUpdateOneWithoutOverrideLeafInput>;
   options?: Maybe<QuestionOptionUpdateManyInput>;
   children?: Maybe<EdgeUpdateManyInput>;
 };
@@ -3539,6 +3584,11 @@ export type QuestionNodeUpdateWithWhereUniqueWithoutQuestionnaireInput = {
 export type QuestionNodeUpsertNestedInput = {
   update: QuestionNodeUpdateDataInput;
   create: QuestionNodeCreateInput;
+};
+
+export type QuestionNodeUpsertWithoutIsOverrideLeafOfInput = {
+  update: QuestionNodeUpdateWithoutIsOverrideLeafOfDataInput;
+  create: QuestionNodeCreateWithoutIsOverrideLeafOfInput;
 };
 
 export type QuestionNodeUpsertWithoutOverrideLeafInput = {
@@ -3597,6 +3647,7 @@ export type QuestionNodeWhereInput = {
   isLeaf?: Maybe<Scalars['Boolean']>;
   isLeaf_not?: Maybe<Scalars['Boolean']>;
   overrideLeaf?: Maybe<QuestionNodeWhereInput>;
+  isOverrideLeafOf?: Maybe<QuestionNodeWhereInput>;
   options_every?: Maybe<QuestionOptionWhereInput>;
   options_some?: Maybe<QuestionOptionWhereInput>;
   options_none?: Maybe<QuestionOptionWhereInput>;
@@ -4301,11 +4352,13 @@ export type ResolversTypes = ResolversObject<{
   QuestionnaireCreateInput: QuestionnaireCreateInput,
   QuestionNodeCreateManyWithoutQuestionnaireInput: QuestionNodeCreateManyWithoutQuestionnaireInput,
   QuestionNodeCreateWithoutQuestionnaireInput: QuestionNodeCreateWithoutQuestionnaireInput,
-  QuestionNodeCreateOneWithoutOverrideLeafInput: QuestionNodeCreateOneWithoutOverrideLeafInput,
-  QuestionNodeCreateWithoutOverrideLeafInput: QuestionNodeCreateWithoutOverrideLeafInput,
+  QuestionNodeCreateOneWithoutIsOverrideLeafOfInput: QuestionNodeCreateOneWithoutIsOverrideLeafOfInput,
+  QuestionNodeCreateWithoutIsOverrideLeafOfInput: QuestionNodeCreateWithoutIsOverrideLeafOfInput,
   QuestionOptionCreateManyInput: QuestionOptionCreateManyInput,
   QuestionOptionCreateInput: QuestionOptionCreateInput,
   EdgeCreateManyInput: EdgeCreateManyInput,
+  QuestionNodeCreateOneWithoutOverrideLeafInput: QuestionNodeCreateOneWithoutOverrideLeafInput,
+  QuestionNodeCreateWithoutOverrideLeafInput: QuestionNodeCreateWithoutOverrideLeafInput,
   QuestionConditionCreateManyInput: QuestionConditionCreateManyInput,
   QuestionConditionCreateInput: QuestionConditionCreateInput,
   NodeEntryValueCreateManyInput: NodeEntryValueCreateManyInput,
@@ -4349,8 +4402,8 @@ export type ResolversTypes = ResolversObject<{
   QuestionNodeUpdateManyWithoutQuestionnaireInput: QuestionNodeUpdateManyWithoutQuestionnaireInput,
   QuestionNodeUpdateWithWhereUniqueWithoutQuestionnaireInput: QuestionNodeUpdateWithWhereUniqueWithoutQuestionnaireInput,
   QuestionNodeUpdateWithoutQuestionnaireDataInput: QuestionNodeUpdateWithoutQuestionnaireDataInput,
-  QuestionNodeUpdateOneWithoutOverrideLeafInput: QuestionNodeUpdateOneWithoutOverrideLeafInput,
-  QuestionNodeUpdateWithoutOverrideLeafDataInput: QuestionNodeUpdateWithoutOverrideLeafDataInput,
+  QuestionNodeUpdateOneWithoutIsOverrideLeafOfInput: QuestionNodeUpdateOneWithoutIsOverrideLeafOfInput,
+  QuestionNodeUpdateWithoutIsOverrideLeafOfDataInput: QuestionNodeUpdateWithoutIsOverrideLeafOfDataInput,
   QuestionOptionUpdateManyInput: QuestionOptionUpdateManyInput,
   QuestionOptionUpdateWithWhereUniqueNestedInput: QuestionOptionUpdateWithWhereUniqueNestedInput,
   QuestionOptionUpdateDataInput: QuestionOptionUpdateDataInput,
@@ -4362,6 +4415,9 @@ export type ResolversTypes = ResolversObject<{
   EdgeUpdateWithWhereUniqueNestedInput: EdgeUpdateWithWhereUniqueNestedInput,
   EdgeUpsertWithWhereUniqueNestedInput: EdgeUpsertWithWhereUniqueNestedInput,
   EdgeScalarWhereInput: EdgeScalarWhereInput,
+  QuestionNodeUpsertWithoutIsOverrideLeafOfInput: QuestionNodeUpsertWithoutIsOverrideLeafOfInput,
+  QuestionNodeUpdateOneWithoutOverrideLeafInput: QuestionNodeUpdateOneWithoutOverrideLeafInput,
+  QuestionNodeUpdateWithoutOverrideLeafDataInput: QuestionNodeUpdateWithoutOverrideLeafDataInput,
   QuestionNodeUpsertWithoutOverrideLeafInput: QuestionNodeUpsertWithoutOverrideLeafInput,
   QuestionNodeUpsertWithWhereUniqueWithoutQuestionnaireInput: QuestionNodeUpsertWithWhereUniqueWithoutQuestionnaireInput,
   QuestionnaireUpsertNestedInput: QuestionnaireUpsertNestedInput,
@@ -4589,11 +4645,13 @@ export type ResolversParentTypes = ResolversObject<{
   QuestionnaireCreateInput: QuestionnaireCreateInput,
   QuestionNodeCreateManyWithoutQuestionnaireInput: QuestionNodeCreateManyWithoutQuestionnaireInput,
   QuestionNodeCreateWithoutQuestionnaireInput: QuestionNodeCreateWithoutQuestionnaireInput,
-  QuestionNodeCreateOneWithoutOverrideLeafInput: QuestionNodeCreateOneWithoutOverrideLeafInput,
-  QuestionNodeCreateWithoutOverrideLeafInput: QuestionNodeCreateWithoutOverrideLeafInput,
+  QuestionNodeCreateOneWithoutIsOverrideLeafOfInput: QuestionNodeCreateOneWithoutIsOverrideLeafOfInput,
+  QuestionNodeCreateWithoutIsOverrideLeafOfInput: QuestionNodeCreateWithoutIsOverrideLeafOfInput,
   QuestionOptionCreateManyInput: QuestionOptionCreateManyInput,
   QuestionOptionCreateInput: QuestionOptionCreateInput,
   EdgeCreateManyInput: EdgeCreateManyInput,
+  QuestionNodeCreateOneWithoutOverrideLeafInput: QuestionNodeCreateOneWithoutOverrideLeafInput,
+  QuestionNodeCreateWithoutOverrideLeafInput: QuestionNodeCreateWithoutOverrideLeafInput,
   QuestionConditionCreateManyInput: QuestionConditionCreateManyInput,
   QuestionConditionCreateInput: QuestionConditionCreateInput,
   NodeEntryValueCreateManyInput: NodeEntryValueCreateManyInput,
@@ -4637,8 +4695,8 @@ export type ResolversParentTypes = ResolversObject<{
   QuestionNodeUpdateManyWithoutQuestionnaireInput: QuestionNodeUpdateManyWithoutQuestionnaireInput,
   QuestionNodeUpdateWithWhereUniqueWithoutQuestionnaireInput: QuestionNodeUpdateWithWhereUniqueWithoutQuestionnaireInput,
   QuestionNodeUpdateWithoutQuestionnaireDataInput: QuestionNodeUpdateWithoutQuestionnaireDataInput,
-  QuestionNodeUpdateOneWithoutOverrideLeafInput: QuestionNodeUpdateOneWithoutOverrideLeafInput,
-  QuestionNodeUpdateWithoutOverrideLeafDataInput: QuestionNodeUpdateWithoutOverrideLeafDataInput,
+  QuestionNodeUpdateOneWithoutIsOverrideLeafOfInput: QuestionNodeUpdateOneWithoutIsOverrideLeafOfInput,
+  QuestionNodeUpdateWithoutIsOverrideLeafOfDataInput: QuestionNodeUpdateWithoutIsOverrideLeafOfDataInput,
   QuestionOptionUpdateManyInput: QuestionOptionUpdateManyInput,
   QuestionOptionUpdateWithWhereUniqueNestedInput: QuestionOptionUpdateWithWhereUniqueNestedInput,
   QuestionOptionUpdateDataInput: QuestionOptionUpdateDataInput,
@@ -4650,6 +4708,9 @@ export type ResolversParentTypes = ResolversObject<{
   EdgeUpdateWithWhereUniqueNestedInput: EdgeUpdateWithWhereUniqueNestedInput,
   EdgeUpsertWithWhereUniqueNestedInput: EdgeUpsertWithWhereUniqueNestedInput,
   EdgeScalarWhereInput: EdgeScalarWhereInput,
+  QuestionNodeUpsertWithoutIsOverrideLeafOfInput: QuestionNodeUpsertWithoutIsOverrideLeafOfInput,
+  QuestionNodeUpdateOneWithoutOverrideLeafInput: QuestionNodeUpdateOneWithoutOverrideLeafInput,
+  QuestionNodeUpdateWithoutOverrideLeafDataInput: QuestionNodeUpdateWithoutOverrideLeafDataInput,
   QuestionNodeUpsertWithoutOverrideLeafInput: QuestionNodeUpsertWithoutOverrideLeafInput,
   QuestionNodeUpsertWithWhereUniqueWithoutQuestionnaireInput: QuestionNodeUpsertWithWhereUniqueWithoutQuestionnaireInput,
   QuestionnaireUpsertNestedInput: QuestionnaireUpsertNestedInput,
@@ -5325,6 +5386,7 @@ export type QuestionNodeResolvers<ContextType = any, ParentType extends Resolver
   isRoot?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>,
   isLeaf?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>,
   overrideLeaf?: Resolver<Maybe<ResolversTypes['QuestionNode']>, ParentType, ContextType>,
+  isOverrideLeafOf?: Resolver<Maybe<ResolversTypes['QuestionNode']>, ParentType, ContextType>,
   options?: Resolver<Maybe<Array<ResolversTypes['QuestionOption']>>, ParentType, ContextType, RequireFields<QuestionNodeOptionsArgs, never>>,
   children?: Resolver<Maybe<Array<ResolversTypes['Edge']>>, ParentType, ContextType, RequireFields<QuestionNodeChildrenArgs, never>>,
   __isTypeOf?: isTypeOfResolverFn<ParentType>,

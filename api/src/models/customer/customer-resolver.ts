@@ -35,7 +35,8 @@ class CustomerResolver {
 
   static createNewCustomerMutation = async (parent : any, args: any) => {
     const { name, options } = args;
-    const { isSeed, logo } = options;
+    const { isSeed, logo, primaryColour } = options;
+    // TODO: Need to re-implement primary colour field
 
     const customer = await prisma.createCustomer({
       name,
@@ -44,7 +45,7 @@ class CustomerResolver {
           logoUrl: logo,
           colourSettings: {
             create: {
-              primary: '#4287f5',
+              primary: primaryColour || '#4287f5',
             },
           },
         },

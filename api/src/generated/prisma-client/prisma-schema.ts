@@ -2375,6 +2375,7 @@ type QuestionNode {
   isRoot: Boolean!
   isLeaf: Boolean!
   overrideLeaf: QuestionNode
+  isOverrideLeafOf: QuestionNode
   options(where: QuestionOptionWhereInput, orderBy: QuestionOptionOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [QuestionOption!]
   children(where: EdgeWhereInput, orderBy: EdgeOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Edge!]
 }
@@ -2392,7 +2393,8 @@ input QuestionNodeCreateInput {
   type: NodeType!
   isRoot: Boolean
   isLeaf: Boolean
-  overrideLeaf: QuestionNodeCreateOneWithoutOverrideLeafInput
+  overrideLeaf: QuestionNodeCreateOneWithoutIsOverrideLeafOfInput
+  isOverrideLeafOf: QuestionNodeCreateOneWithoutOverrideLeafInput
   options: QuestionOptionCreateManyInput
   children: EdgeCreateManyInput
 }
@@ -2412,9 +2414,26 @@ input QuestionNodeCreateOneInput {
   connect: QuestionNodeWhereUniqueInput
 }
 
+input QuestionNodeCreateOneWithoutIsOverrideLeafOfInput {
+  create: QuestionNodeCreateWithoutIsOverrideLeafOfInput
+  connect: QuestionNodeWhereUniqueInput
+}
+
 input QuestionNodeCreateOneWithoutOverrideLeafInput {
   create: QuestionNodeCreateWithoutOverrideLeafInput
   connect: QuestionNodeWhereUniqueInput
+}
+
+input QuestionNodeCreateWithoutIsOverrideLeafOfInput {
+  id: ID
+  title: String!
+  questionnaire: QuestionnaireCreateOneWithoutQuestionsInput
+  type: NodeType!
+  isRoot: Boolean
+  isLeaf: Boolean
+  overrideLeaf: QuestionNodeCreateOneWithoutIsOverrideLeafOfInput
+  options: QuestionOptionCreateManyInput
+  children: EdgeCreateManyInput
 }
 
 input QuestionNodeCreateWithoutOverrideLeafInput {
@@ -2424,6 +2443,7 @@ input QuestionNodeCreateWithoutOverrideLeafInput {
   type: NodeType!
   isRoot: Boolean
   isLeaf: Boolean
+  isOverrideLeafOf: QuestionNodeCreateOneWithoutOverrideLeafInput
   options: QuestionOptionCreateManyInput
   children: EdgeCreateManyInput
 }
@@ -2434,7 +2454,8 @@ input QuestionNodeCreateWithoutQuestionnaireInput {
   type: NodeType!
   isRoot: Boolean
   isLeaf: Boolean
-  overrideLeaf: QuestionNodeCreateOneWithoutOverrideLeafInput
+  overrideLeaf: QuestionNodeCreateOneWithoutIsOverrideLeafOfInput
+  isOverrideLeafOf: QuestionNodeCreateOneWithoutOverrideLeafInput
   options: QuestionOptionCreateManyInput
   children: EdgeCreateManyInput
 }
@@ -2531,7 +2552,8 @@ input QuestionNodeUpdateDataInput {
   type: NodeType
   isRoot: Boolean
   isLeaf: Boolean
-  overrideLeaf: QuestionNodeUpdateOneWithoutOverrideLeafInput
+  overrideLeaf: QuestionNodeUpdateOneWithoutIsOverrideLeafOfInput
+  isOverrideLeafOf: QuestionNodeUpdateOneWithoutOverrideLeafInput
   options: QuestionOptionUpdateManyInput
   children: EdgeUpdateManyInput
 }
@@ -2542,7 +2564,8 @@ input QuestionNodeUpdateInput {
   type: NodeType
   isRoot: Boolean
   isLeaf: Boolean
-  overrideLeaf: QuestionNodeUpdateOneWithoutOverrideLeafInput
+  overrideLeaf: QuestionNodeUpdateOneWithoutIsOverrideLeafOfInput
+  isOverrideLeafOf: QuestionNodeUpdateOneWithoutOverrideLeafInput
   options: QuestionOptionUpdateManyInput
   children: EdgeUpdateManyInput
 }
@@ -2599,6 +2622,15 @@ input QuestionNodeUpdateOneInput {
   connect: QuestionNodeWhereUniqueInput
 }
 
+input QuestionNodeUpdateOneWithoutIsOverrideLeafOfInput {
+  create: QuestionNodeCreateWithoutIsOverrideLeafOfInput
+  update: QuestionNodeUpdateWithoutIsOverrideLeafOfDataInput
+  upsert: QuestionNodeUpsertWithoutIsOverrideLeafOfInput
+  delete: Boolean
+  disconnect: Boolean
+  connect: QuestionNodeWhereUniqueInput
+}
+
 input QuestionNodeUpdateOneWithoutOverrideLeafInput {
   create: QuestionNodeCreateWithoutOverrideLeafInput
   update: QuestionNodeUpdateWithoutOverrideLeafDataInput
@@ -2608,12 +2640,24 @@ input QuestionNodeUpdateOneWithoutOverrideLeafInput {
   connect: QuestionNodeWhereUniqueInput
 }
 
+input QuestionNodeUpdateWithoutIsOverrideLeafOfDataInput {
+  title: String
+  questionnaire: QuestionnaireUpdateOneWithoutQuestionsInput
+  type: NodeType
+  isRoot: Boolean
+  isLeaf: Boolean
+  overrideLeaf: QuestionNodeUpdateOneWithoutIsOverrideLeafOfInput
+  options: QuestionOptionUpdateManyInput
+  children: EdgeUpdateManyInput
+}
+
 input QuestionNodeUpdateWithoutOverrideLeafDataInput {
   title: String
   questionnaire: QuestionnaireUpdateOneWithoutQuestionsInput
   type: NodeType
   isRoot: Boolean
   isLeaf: Boolean
+  isOverrideLeafOf: QuestionNodeUpdateOneWithoutOverrideLeafInput
   options: QuestionOptionUpdateManyInput
   children: EdgeUpdateManyInput
 }
@@ -2623,7 +2667,8 @@ input QuestionNodeUpdateWithoutQuestionnaireDataInput {
   type: NodeType
   isRoot: Boolean
   isLeaf: Boolean
-  overrideLeaf: QuestionNodeUpdateOneWithoutOverrideLeafInput
+  overrideLeaf: QuestionNodeUpdateOneWithoutIsOverrideLeafOfInput
+  isOverrideLeafOf: QuestionNodeUpdateOneWithoutOverrideLeafInput
   options: QuestionOptionUpdateManyInput
   children: EdgeUpdateManyInput
 }
@@ -2641,6 +2686,11 @@ input QuestionNodeUpdateWithWhereUniqueWithoutQuestionnaireInput {
 input QuestionNodeUpsertNestedInput {
   update: QuestionNodeUpdateDataInput!
   create: QuestionNodeCreateInput!
+}
+
+input QuestionNodeUpsertWithoutIsOverrideLeafOfInput {
+  update: QuestionNodeUpdateWithoutIsOverrideLeafOfDataInput!
+  create: QuestionNodeCreateWithoutIsOverrideLeafOfInput!
 }
 
 input QuestionNodeUpsertWithoutOverrideLeafInput {
@@ -2699,6 +2749,7 @@ input QuestionNodeWhereInput {
   isLeaf: Boolean
   isLeaf_not: Boolean
   overrideLeaf: QuestionNodeWhereInput
+  isOverrideLeafOf: QuestionNodeWhereInput
   options_every: QuestionOptionWhereInput
   options_some: QuestionOptionWhereInput
   options_none: QuestionOptionWhereInput
