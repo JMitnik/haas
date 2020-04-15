@@ -12,14 +12,8 @@
         "no-plusplus": "off",
         "object-curly-newline": ["error", {
             "ObjectExpression": { "consistent": true, "minProperties": 5 }
-        }],
-        "import/prefer-default-export": "off",
-        "react-hooks/rules-of-hooks": "error",
-        "react-hooks/exhaustive-deps": "error"
+        }]
     },
-    "plugins": [
-        "react-hooks"
-    ],
     "env": {
         "browser": true
     }

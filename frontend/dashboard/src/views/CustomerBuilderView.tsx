@@ -1,11 +1,11 @@
 import React from 'react';
 
-import { ApolloError } from 'apollo-boost';
+import { gql, ApolloError } from 'apollo-boost';
+import styled, { css } from 'styled-components/macro';
 import { useForm } from 'react-hook-form';
 import { useMutation } from '@apollo/react-hooks';
 import { useHistory } from 'react-router';
-import { Container, Flex, Grid, H2, H3, Muted, Button,
-  Div, StyledLabel, StyledInput, Hr, FormGroupContainer, Form } from '@haas/ui';
+import { Container, Flex, Grid, H2, H3, Muted, Button, Div } from '@haas/ui';
 import { getCustomerQuery } from '../queries/getCustomerQuery';
 
 import { createNewCustomer } from '../mutations/createNewCustomer';
@@ -13,7 +13,6 @@ import { createNewCustomer } from '../mutations/createNewCustomer';
 interface FormDataProps {
   name: String;
   logo: String;
-  primaryColour?: String;
   seed?: Boolean;
 }
 
@@ -23,6 +22,7 @@ const CustomerBuilderView = () => {
 
   const [addCustomer, { loading }] = useMutation(createNewCustomer, {
     onCompleted: () => {
+      console.log('Added a customer!');
       history.push('/');
     },
     refetchQueries: [{ query: getCustomerQuery }],
@@ -32,9 +32,8 @@ const CustomerBuilderView = () => {
   });
 
   const onSubmit = (formData: FormDataProps) => {
-    const optionInput = { logo: formData.logo,
-      isSeed: formData.seed,
-      primaryColour: formData.primaryColour };
+    console.log('Form data: ', formData);
+    const optionInput = { logo: formData.logo, isSeed: formData.seed };
     // TODO: Make better typescript supported
     addCustomer({
       variables: {
@@ -74,19 +73,9 @@ const CustomerBuilderView = () => {
                   <StyledInput name="logo" ref={register({ required: true })} />
                   {errors.name && <Muted color="warning">Something went wrong!</Muted>}
                 </Div>
-                <Div useFlex py={4} flexDirection="column">
-                  <StyledLabel>Primary colour</StyledLabel>
-                  <StyledInput name="primaryColour" ref={register({ required: true })} />
-                  {errors.name && <Muted color="warning">Something went wrong!</Muted>}
-                </Div>
               </Grid>
               <Div py={4}>
-                <StyledInput
-                  type="checkbox"
-                  id="seed"
-                  name="seed"
-                  ref={register({ required: false })}
-                />
+                <StyledInput type="checkbox" id="seed" name="seed" ref={register({ required: false })} />
                 <label htmlFor="seed"> Generate template topic for customer </label>
               </Div>
             </Div>
@@ -105,5 +94,49 @@ const CustomerBuilderView = () => {
     </Container>
   );
 };
+
+const StyledLabel = styled(Div).attrs({ as: 'label' })`
+  ${({ theme }) => css`
+    font-size: 0.8rem;
+    font-weight: bold;
+    margin-bottom: 2px;
+    display: inline-block;
+    color: ${theme.colors.default.dark}
+    text-transform: uppercase;
+  `}
+`;
+
+const StyledInput = styled.input`
+  ${({ theme }) => css`
+    border-radius: ${theme.borderRadiuses.sm};
+    background: ${theme.colors.white};
+    border: none;
+    border-bottom: ${theme.colors.default.normal} 1px solid;
+    box-shadow: none;
+    background: white;
+    border-radius: 3px;
+
+    /* Make somehow a color */
+    border: 1px solid #dbdde0;
+    box-shadow: none;
+
+    /* Set to variable */
+    padding: 15px;
+  `}
+`;
+
+const Hr = styled.hr`
+  ${({ theme }) => css`
+    border-top: 1px solid ${theme.colors.default.light};
+  `}
+`;
+
+const FormGroupContainer = styled.div`
+  ${({ theme }) => css`
+    padding-bottom: ${theme.gutter * 3}px;
+  `}
+`;
+
+const Form = styled.form``;
 
 export default CustomerBuilderView;

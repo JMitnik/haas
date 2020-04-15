@@ -5,9 +5,9 @@ import styled, { css } from 'styled-components/macro';
 import { useForm } from 'react-hook-form';
 import { useMutation } from '@apollo/react-hooks';
 import { useHistory, useParams } from 'react-router';
-import { Container, Flex, Grid, H2, H3, Muted, Button,
-  Div, StyledInput, StyledTextInput, StyledLabel, Hr } from '@haas/ui';
-import getQuestionnairesCustomerQuery from '../queries/getQuestionnairesCustomerQuery';
+import { Container, Flex, Grid, H2, H3, Muted, Button, Div } from '@haas/ui';
+// import { getCustomerQuery } from '../queries/getCustomerQuery';
+import { getQuestionnairesCustomerQuery } from '../queries/getQuestionnairesCustomerQuery'
 import { createNewQuestionnaire } from '../mutations/createNewQuestionnaire';
 
 export const AddTopicMutation = gql`
@@ -25,13 +25,14 @@ interface FormDataProps {
   isSeed?: Boolean;
 }
 
-const AddTopicView = () => {
+const TopicBuilderView = () => {
   const history = useHistory();
   const { register, handleSubmit, errors } = useForm<FormDataProps>();
   const { customerId } = useParams();
 
   const [addTopic, { loading }] = useMutation(createNewQuestionnaire, {
     onCompleted: () => {
+      console.log('Added a topic!');
       history.push(`/c/${customerId}/`);
     },
     refetchQueries: [{ query: getQuestionnairesCustomerQuery,
@@ -95,12 +96,7 @@ const AddTopicView = () => {
                 </Flex>
               </Div>
               <Div py={4}>
-                <StyledInput
-                  type="checkbox"
-                  id="isSeed"
-                  name="isSeed"
-                  ref={register({ required: false })}
-                />
+                <StyledInput type="checkbox" id="isSeed" name="isSeed" ref={register({ required: false })} />
                 <label htmlFor="isSeed"> Generate template topic </label>
               </Div>
             </Div>
@@ -120,6 +116,47 @@ const AddTopicView = () => {
   );
 };
 
+const StyledLabel = styled(Div).attrs({ as: 'label' })`
+  ${({ theme }) => css`
+    font-size: 0.8rem;
+    font-weight: bold;
+    margin-bottom: 2px;
+    display: inline-block;
+    color: ${theme.colors.default.dark}
+    text-transform: uppercase;
+  `}
+`;
+
+const StyledInput = styled.input`
+  ${({ theme }) => css`
+    border-radius: ${theme.borderRadiuses.sm};
+    background: ${theme.colors.white};
+    border: none;
+    border-bottom: ${theme.colors.default.normal} 1px solid;
+    box-shadow: none;
+    background: white;
+    border-radius: 3px;
+
+    /* Make somehow a color */
+    border: 1px solid #dbdde0;
+    box-shadow: none;
+
+    /* Set to variable */
+    padding: 15px;
+  `}
+`;
+
+const StyledTextInput = styled(StyledInput).attrs({ as: 'textarea' })`
+  resize: none;
+  min-height: 150px;
+`;
+
+const Hr = styled.hr`
+  ${({ theme }) => css`
+    border-top: 1px solid ${theme.colors.default.light};
+  `}
+`;
+
 const FormGroupContainer = styled.div`
   ${({ theme }) => css`
     padding-bottom: ${theme.gutter * 3}px;
@@ -128,4 +165,4 @@ const FormGroupContainer = styled.div`
 
 const Form = styled.form``;
 
-export default AddTopicView;
+export default TopicBuilderView;
