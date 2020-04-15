@@ -39,7 +39,7 @@ const TopicDetail = () => {
                   <TopicBuilder />
                 </Route>
                 <Route>
-                  <TopicInfo QuestionnaireDetailResult={resultData} />
+                  <TopicInfo DialogueResultProps={resultData} />
                   <button type="button" onClick={() => history.push(`/c/${customerId}/t/${topicId}/topic-builder/`)}>Go to topic builder</button>
                 </Route>
               </Switch>
