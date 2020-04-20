@@ -3,6 +3,7 @@
     "version": "0.1.0",
     "scripts": {
         "start": "nodemon --exec 'ts-node' --watch src/ src/app.ts",
+        "serve": "ts-node --transpile-only src/app.ts",
         "debug": "nodemon --config config.json",
         "build": "yarn",
         "clean:prod": "prisma reset -e .prod.env",
