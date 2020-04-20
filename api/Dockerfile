@@ -6,7 +6,7 @@ COPY ./package.json /app/
 COPY ./ /app/
 
 RUN apk update \
-  && apk add curl python --no-cache --virtual build-dependencies build-base gcc \
+  && apk add curl python bash --no-cache --virtual build-dependencies build-base gcc \
   && yarn add prisma \
   && yarn
 
