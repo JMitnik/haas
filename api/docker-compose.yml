@@ -20,19 +20,15 @@ services:
             password: prisma
   postgres:
     image: postgres:10.3
-    restart: always
     environment:
       POSTGRES_USER: prisma
       POSTGRES_PASSWORD: prisma
     volumes:
-      - postgres:/var/lib/postgresql/data3
-  # api:
-  #   image: juronemo/haasapi-local
-  #   restart: always
-  #   ports:
-  #     - '4000:4000'
-  #   env_file:
-  #     - .env
-volumes:
-  postgres: ~
-
+      - /postgresdata:/var/lib/postgresql/data
+  api:
+    build: .
+    restart: always
+    ports:
+      - '4000:4000'
+    env_file:
+      - .env
