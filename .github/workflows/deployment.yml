@@ -1,8 +1,9 @@
-name: Docker Image CI
+name: Production deployment
 
 on:
   release:
     types: [published]
+  repository_dispatch:
 
 jobs:
 
