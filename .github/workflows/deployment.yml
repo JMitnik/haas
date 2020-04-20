@@ -3,7 +3,9 @@ name: Production deployment
 on:
   release:
     types: [published]
-  repository_dispatch:
+  push:
+    branches:
+      - master
 
 jobs:
 
