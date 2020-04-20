@@ -17,7 +17,7 @@
         ]
     },
     "scripts": {
-        "start": "concurrently \"yarn start:client\" \"yarn start:api\"",
+        "start": "concurrently \"yarn start:client\" \"yarn start:dashboard\" \"yarn start:api\"",
         "start-dashboard": "concurrently \"yarn start:dashboard\" \"yarn start:api\"",
         "start:client": "yarn workspace @haas/client start",
         "start:api": "yarn workspace @haas/api start",

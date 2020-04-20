@@ -12,9 +12,6 @@ import Node from './nodes/Node';
 const QuestionnaireTree = () => {
   const { questionnaire, customer } = useQuestionnaire();
   const [customTheme, setCustomTheme] = useState({});
-  const location = useLocation();
-
-  const locationRef = useRef(location.pathname);
 
   // Customize app for customer
   useEffect(() => {
