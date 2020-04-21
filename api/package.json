@@ -21,6 +21,7 @@
         "@graphql-codegen/cli": "^1.11.2",
         "@graphql-codegen/typescript": "^1.11.2",
         "@graphql-codegen/typescript-resolvers": "^1.11.2",
+        "@prisma/client": "^2.0.0-beta.2",
         "@types/lodash": "^4.14.149",
         "@types/nodemailer": "^6.4.0",
         "apollo-datasource": "^0.7.0",

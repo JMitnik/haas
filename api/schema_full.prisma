@@ -1,0 +1,157 @@
+datasource postgresql {
+  provider = "postgresql"
+  url      = env("DB_STRING")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model ColourSettings {
+  dark             String?
+  darkest          String?
+  error            String?
+  id               Int             @default(autoincrement()) @id
+  light            String?
+  lightest         String?
+  muted            String?
+  normal           String?
+  primary          String
+  primaryAlt       String?
+  secondary        String?
+  success          String?
+  tertiary         String?
+  text             String?
+  warning          String?
+  customerSettings CustomerSettings
+}
+
+model Customer {
+  id               String            @default(cuid()) @id
+  name             String
+  settingsId       Int?              @map("settings")
+  dialogues        Dialogue[]
+  settings         CustomerSettings? @relation(fields: [settingsId], references: [id])
+}
+
+model CustomerSettings {
+  colourSettingsId Int?         @map("colourSettings")
+  fontSettingsId   Int?         @map("fontSettings")
+  id             Int          @default(autoincrement()) @id
+  logoUrl        String?
+  colourSettings ColourSettings? @relation(fields: [colourSettingsId], references: [id])
+  fontSettings   FontSettings?   @relation(fields: [fontSettingsId], references: [id])
+  customer       Customer
+}
+
+model Edge {
+  childNodeId                                String              @map("childNode")
+  createdAt                                  DateTime            @default(now())
+  updatedAt                                  DateTime            @updatedAt
+  id                                         String              @default(cuid()) @id
+  parentNodeId                               String              @map("parentNode")
+  dialogueId                                 String              @map("dialogue")
+  conditions                                 QuestionCondition[] @relation("EdgeQQonditions", references: [id])
+  isEdgeOf                                   QuestionNode[]      @relation("EdgeChildrenRelation", references: [id])
+  childNode                                  QuestionNode       @relation("Edge_childNodeToQuestionNode", fields: [childNodeId], references: [id])
+  parentNode                                 QuestionNode       @relation("Edge_parentNodeToQuestionNode", fields: [parentNodeId], references: [id])
+  dialogue                                   Dialogue      @relation(fields: [dialogueId], references: [id])
+  NodeEntry                                  NodeEntry[] //// yea geen idee waar deze voor is maar ik laat em staan
+}
+
+model FontSettings {
+  body             String?
+  fontTitle        String?
+  id               Int             @default(autoincrement()) @id
+  settingTitle     String?
+  special          String?
+  CustomerSettings CustomerSettings
+}
+
+model NodeEntry {
+  id             String           @default(cuid()) @id
+  creationDate   DateTime         @default(now())
+  depth          Int?
+  relatedEdgeId  String?          @map("relatedEdge")
+  relatedNodeId  String?          @map("relatedNode")
+  sessionId      String           @map("session")
+  values         NodeEntryValue[] @relation(references: [id])
+  session        Session          @relation("SessionToNodeEntries", fields: [sessionId], references: [id])
+  relatedNode    QuestionNode?    @relation(fields: [relatedNodeId], references: [id])
+  relatedEdge    Edge?            @relation(fields: [relatedEdgeId], references: [id])
+}
+
+model NodeEntryValue {
+  id                 Int              @default(autoincrement()) @id
+  numberValue        Int?
+  textValue          String?
+  parentNodeEntryId  Int?             @map("parentNodeEntry")
+  NodeEntry          NodeEntry[]      @relation(references: [id])
+  parentNodeEntry    NodeEntryValue?   @relation("NodeEntryValueToNodeEntryValue", fields: [parentNodeEntryId], references: [id])
+  multiValues        NodeEntryValue[] @relation("NodeEntryValueToNodeEntryValue", references: [id])
+}
+
+model QuestionCondition {
+  conditionType String
+  id            Int  @default(autoincrement()) @id
+  matchValue    String?
+  renderMax     Int?
+  renderMin     Int?
+  edgeId        String @map("edge")
+  edge          Edge    @relation("EdgeQQonditions", fields: [edgeId], references: [id])
+}
+
+model Dialogue {
+  creationDate                           DateTime      @default(now())
+  updatedAt                              DateTime?     @updatedAt
+  customerId                             String        @map("customer")
+  description                            String
+  id                                     String        @default(cuid()) @id
+  publicTitle                            String?
+  //// rootQuestionId                    String?       @map("rootQuestion")
+  title                                  String 
+  customer                               Customer      @relation(fields: [customerId], references: [id])
+  edges                                  Edge[] 
+  //// rootQuestion                      QuestionNode?   @relation("DialogueRootQuestion", fields: [rootQuestionId], references: [id])
+  leafs                                  QuestionNode[]  @relation("DialogueToLeafNodes", references: [id])
+  questions                              QuestionNode[]  @relation("DialogueToQuestions", references: [id])
+  sessions                               Session[]       @relation("DialogueToSessions", references: [id])
+}
+
+model QuestionNode {
+  id                                      String           @default(cuid()) @id
+  isLeaf                                  Boolean          @default(false)
+  isRoot                                  Boolean          @default(false)
+  title                                   String
+  type                                    String
+  overrideLeafId                          String?           @map("overrideLeaf")
+  overrideLeaf                            QuestionNode?     @relation("QNodeToOverrideLeaf", fields: [overrideLeafId], references: [id])
+  isOverrideLeafOf                        QuestionNode[]   @relation("QNodeToOverrideLeaf", references: [id])
+  children                                Edge[]           @relation("EdgeChildrenRelation", references: [id])
+  options                                 QuestionOption[] @relation("QuestionNodeOptions", references: [id])
+
+  isChildNodeOf                           Edge[]           @relation("Edge_childNodeToQuestionNode")
+  isParentNodeOf                          Edge[]           @relation("Edge_parentNodeToQuestionNode")
+  NodeEntry                               NodeEntry[] //// yea geen idee waar deze voor is maar ik laat em staan
+  //// rootDialogue                       Dialogue?   @relation("DialogueRootQuestion", references: [id])
+  leafDialogue                            Dialogue?   @relation("DialogueToLeafNodes", fields: [leafDialogueId], references: [id])
+  leafDialogueId                          String?          @map("leafDialogue")
+  questionDialogue                        Dialogue?    @relation("DialogueToQuestions", fields: [questionDialogueId], references: [id])
+  questionDialogueId                      String?          @map("questionDialogue")
+}
+
+model QuestionOption {
+  id           Int         @default(autoincrement()) @id
+  publicValue  String?
+  value        String
+  questionId   String        @map("question")
+  question     QuestionNode       @relation("QuestionNodeOptions", fields: [questionId], references: [id])
+}
+
+model Session {
+  createdAt     DateTime        @default(now())
+  id            String          @default(cuid()) @id
+  dialogueId    String         @map("Dialogue")
+  dialogue      Dialogue        @relation("DialogueToSessions", fields: [dialogueId], references: [id])
+  nodeEntries   NodeEntry[]     @relation("SessionToNodeEntries", references: [id])
+}
