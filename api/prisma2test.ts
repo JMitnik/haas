@@ -31,34 +31,34 @@ async function main() {
     },
   });
 
-  const dialogue = await prisma.dialogue.create({
-    data: {
-      title: 'Dialogue',
-      description: 'Desc.',
-      questions: {
-        create: {
-          title: 'OverrideLeaf Question',
-          type: 'MULTI-VALUE',
-          options: {
-            create: {
-              value: 'Option 1',
-            },
-          },
-          overrideLeaf: {
-            create: {
-              title: 'Leaf',
-              type: 'Social-Share',
-            },
-          },
-          children: {
-            connect: {
-              id: edge.id,
-            },
-          },
-        },
-      },
-    },
-  });
+  // const dialogue = await prisma.dialogue.create({
+  //   data: {
+  //     title: 'Dialogue',
+  //     description: 'Desc.',
+  //     questions: {
+  //       create: {
+  //         title: 'OverrideLeaf Question',
+  //         type: 'MULTI-VALUE',
+  //         options: {
+  //           create: {
+  //             value: 'Option 1',
+  //           },
+  //         },
+  //         overrideLeaf: {
+  //           create: {
+  //             title: 'Leaf',
+  //             type: 'Social-Share',
+  //           },
+  //         },
+  //         children: {
+  //           connect: {
+  //             id: edge.id,
+  //           },
+  //         },
+  //       },
+  //     },
+  //   },
+  // });
 
   // console.log('Edge dialogue id: ', await prisma.dialogue.findOne({ where: { id: dialogue.id } }).edges());
   // await prisma.questionNode.create({

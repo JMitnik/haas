@@ -24,17 +24,17 @@ const queryResolvers: QueryResolvers<ContextProps> = {
   sessions: forwardTo('db'),
   session: forwardTo('db'),
   // TODO: Rename
-  getQuestionnaireData: DialogueResolver.getQuestionnaireAggregatedData,
+  // getQuestionnaireData: DialogueResolver.getQuestionnaireAggregatedData,
   nodeEntry: forwardTo('db'),
   newSessionId: () => crypto.randomBytes(16).toString('base64'),
 };
 
 const mutationResolvers = {
   uploadUserSession: SessionResolver.uploadUserSession,
-  createNewCustomer: CustomerResolver.createNewCustomerMutation,
-  deleteFullCustomer: CustomerResolver.deleteFullCustomerNode,
-  createNewQuestionnaire: DialogueResolver.createNewQuestionnaire,
-  updateTopicBuilder: DialogueResolver.updateTopicBuilder,
+  // createNewCustomer: CustomerResolver.createNewCustomerMutation,
+  // deleteFullCustomer: CustomerResolver.deleteFullCustomerNode,
+  // createNewQuestionnaire: DialogueResolver.createNewQuestionnaire,
+  // updateTopicBuilder: DialogueResolver.updateTopicBuilder,
   deleteQuestionnaire: forwardTo('db'),
   deleteCustomer: forwardTo('db'),
 };

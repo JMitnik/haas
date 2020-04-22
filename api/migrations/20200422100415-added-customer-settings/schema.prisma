@@ -7,11 +7,59 @@ generator client {
   provider = "prisma-client-js"
 }
 
+model Customer {
+  id               String            @default(cuid()) @id
+  name             String
+  settingsId       Int?              @map("settings")
+  dialogues        Dialogue[]
+  settings         CustomerSettings? @relation(fields: [settingsId], references: [id])
+}
+
+model CustomerSettings {
+  colourSettingsId Int?         @map("colourSettings")
+  fontSettingsId   Int?         @map("fontSettings")
+  id             Int          @default(autoincrement()) @id
+  logoUrl        String?
+  colourSettings ColourSettings? @relation(fields: [colourSettingsId], references: [id])
+  fontSettings   FontSettings?   @relation(fields: [fontSettingsId], references: [id])
+  customer       Customer
+}
+
+model ColourSettings {
+  dark             String?
+  darkest          String?
+  error            String?
+  id               Int             @default(autoincrement()) @id
+  light            String?
+  lightest         String?
+  muted            String?
+  normal           String?
+  primary          String
+  primaryAlt       String?
+  secondary        String?
+  success          String?
+  tertiary         String?
+  text             String?
+  warning          String?
+  customerSettings CustomerSettings
+}
+
+model FontSettings {
+  body             String?
+  fontTitle        String?
+  id               Int             @default(autoincrement()) @id
+  settingTitle     String?
+  special          String?
+  CustomerSettings CustomerSettings
+}
+
 model Dialogue {
   creationDate DateTime       @default(now())
   updatedAt    DateTime?      @updatedAt
   description  String
   id           String         @default(cuid()) @id
+  customerId                             String        @map("customer")
+  customer                               Customer      @relation(fields: [customerId], references: [id])
   publicTitle  String?
   title        String
   edges        Edge[]
@@ -47,6 +95,8 @@ model Edge {
   isEdgeOf                                   QuestionNode[]       @relation("EdgeChildrenRelation")
   childNode                                  QuestionNode       @relation("Edge_childNodeToQuestionNode", fields: [childNodeId], references: [id])
   parentNode                                 QuestionNode       @relation("Edge_parentNodeToQuestionNode", fields: [parentNodeId], references: [id])
+  
+  // FIXME: dialogue ID wordt niet gevuld volgens mij
   dialogue                                   Dialogue?           @relation(fields: [dialogueId], references: [id])
   // NodeEntry                                  NodeEntry[] //// yea geen idee waar deze voor is maar ik laat em staan
 }
