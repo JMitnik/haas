@@ -3,5 +3,4 @@
 # Prisma Migrate lockfile v1
 # Read more about conflict resolution here: TODO
 
-20200422100145-prisma2-init
-20200422100415-added-customer-settings
+20200423112521-init-prisma2
