@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 // import { prisma, ID_Input } from '../../generated/prisma-client/index';
 import { Customer } from '../../generated/resolver-types';
-import { leafNodes } from '../../../data/seeds/default-data';
+import { leafNodes } from '../../data/seeds/default-data';
 import NodeResolver from '../question/node-resolver';
 
 const prisma = new PrismaClient();
@@ -12,6 +12,16 @@ class CustomerResolver {
   //   const customer = await prisma.deleteCustomer({ id: customerId });
   //   return customer;
   // };
+
+  static customers = async () => {
+    const customers = prisma.customer.findMany();
+    return customers;
+  };
+
+  static customerSettings = async (parent: Customer) => {
+    const customerSettings = prisma.customerSettings.findOne({ where: { customerId: parent.id } });
+    return customerSettings;
+  };
 
   static seed = async (customer: Customer) => {
     const questionnaire = await prisma.dialogue.create({

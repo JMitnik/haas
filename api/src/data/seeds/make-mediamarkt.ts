@@ -1,6 +1,6 @@
-import { prisma } from '../../src/generated/prisma-client/index';
+import { prisma } from '../../generated/prisma-client/index';
 
-import CustomerResolver from '../../src/models/customer/customer-resolver';
+import CustomerResolver from '../../models/customer/customer-resolver';
 
 const CUSTOMER = 'Mediamarkt';
 

@@ -7,8 +7,6 @@ generator client {
   provider = "prisma-client-js"
 }
 
-//FIXME: remove maps from all models
-
 model ColourSettings {
   dark             String?
   darkest          String?
@@ -34,23 +32,24 @@ model FontSettings {
   id               Int             @default(autoincrement()) @id
   settingTitle     String?
   special          String?
-  CustomerSettings CustomerSettings
+  CustomerSettings CustomerSettings 
 }
 
 model CustomerSettings {
   id             Int          @default(autoincrement()) @id
   logoUrl        String?
-  colourSettingsId Int?         // @map("colourSettings")
+  colourSettingsId Int?        
   colourSettings ColourSettings? @relation(fields: [colourSettingsId], references: [id])
-  fontSettingsId   Int?         // @map("fontSettings")
+  fontSettingsId   Int?         
   fontSettings   FontSettings?   @relation(fields: [fontSettingsId], references: [id])
-  customerId     String?   // @map("customer")
+  customerId     String? @unique
   customer       Customer? @relation(fields: [customerId], references: [id])
+
 }
 
 model Customer {
   id               String            @default(cuid()) @id
-  name             String  
+  name             String 
   settings         CustomerSettings?
   dialogues        Dialogue[]
 }
@@ -60,7 +59,7 @@ model Dialogue {
   updatedAt    DateTime?      @updatedAt
   description  String
   id           String         @default(cuid()) @id
-  customerId                             String        // @map("customer")
+  customerId                             String       
   customer                               Customer      @relation(fields: [customerId], references: [id])
   publicTitle  String?
   title        String
@@ -75,23 +74,23 @@ model QuestionNode {
   type               String
   options            QuestionOption[]
   children                                Edge[]
-  overrideLeafId                          String?           // @map("overrideLeaf")
+  overrideLeafId                          String?           
   overrideLeaf                            QuestionNode?     @relation("QNodeToOverrideLeaf", fields: [overrideLeafId], references: [id])
   isOverrideLeafOf                        QuestionNode[]    @relation("QNodeToOverrideLeaf")         
   questionDialogue   Dialogue? @relation(fields: [questionDialogueId], references: [id])
-  questionDialogueId String?   // @map("questionDialogue")
+  questionDialogueId String?  
   isChildNodeOf                           Edge[]           @relation("Edge_childNodeToQuestionNode")
   isParentNodeOf                          Edge[]           @relation("Edge_parentNodeToQuestionNode")
   // NodeEntry                               NodeEntry[] //// yea geen idee waar deze voor is maar ik laat em staan
 }
 
 model Edge {
-  childNodeId                                String              // @map("childNode")
+  childNodeId                                String              
   createdAt                                  DateTime            @default(now())
   updatedAt                                  DateTime            @updatedAt
   id                                         String              @default(cuid()) @id
-  parentNodeId                               String              // @map("parentNode")
-  dialogueId                                 String?             // @map("dialogue")
+  parentNodeId                               String              
+  dialogueId                                 String?             
   conditions                                 QuestionCondition[]  @relation("EdgeQQonditions")
   isEdgeOf                                   QuestionNode[]       @relation("EdgeChildrenRelation")
   childNode                                  QuestionNode       @relation("Edge_childNodeToQuestionNode", fields: [childNodeId], references: [id])
@@ -108,7 +107,7 @@ model QuestionCondition {
   matchValue    String?
   renderMax     Int?
   renderMin     Int?
-  edgeId        String // @map("edge")
+  edgeId        String 
   edge          Edge    @relation("EdgeQQonditions", fields: [edgeId], references: [id])
 }
 
@@ -116,6 +115,6 @@ model QuestionOption {
   id           Int         @default(autoincrement()) @id
   publicValue  String?
   value        String
-  questionId   String?         // @map("question")
+  questionId   String?         
   question     QuestionNode?   @relation("QuestionNodeOptions", fields: [questionId], references: [id])
 }

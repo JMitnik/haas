@@ -6,7 +6,7 @@ import { PrismaClient, Dialogue, DialogueCreateInput, QuestionNode } from '@pris
 //   QuestionnaireCreateInput, QuestionNode } from '../../generated/prisma-client/index';
 
 import NodeResolver from '../question/node-resolver';
-import { leafNodes } from '../../../data/seeds/default-data';
+import { leafNodes } from '../../data/seeds/default-data';
 
 const prisma = new PrismaClient();
 interface LeafNodeProps {
@@ -78,6 +78,11 @@ class DialogueResolver {
       },
     };
   }
+
+  static dialogues = async () => {
+    const dialogues = prisma.dialogue.findMany();
+    return dialogues;
+  };
 
   static createDialogue = async (
     customerId: string,

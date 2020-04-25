@@ -1,6 +1,6 @@
 datasource postgresql {
   provider = "postgresql"
-  url      = env("DB_STRING")
+  url = "***"
 }
 
 generator client {
@@ -42,9 +42,10 @@ model CustomerSettings {
   colourSettings ColourSettings? @relation(fields: [colourSettingsId], references: [id])
   fontSettingsId   Int?         
   fontSettings   FontSettings?   @relation(fields: [fontSettingsId], references: [id])
-  customerId     String? @unique
+  customerId     String?   
   customer       Customer? @relation(fields: [customerId], references: [id])
 
+  @@unique([customerId])
 }
 
 model Customer {

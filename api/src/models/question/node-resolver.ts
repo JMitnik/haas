@@ -3,7 +3,7 @@ import { PrismaClient, QuestionNode, QuestionNodeCreateInput } from '@prisma/cli
 //   prisma,
 //   string, QuestionNode, QuestionNodeCreateInput,
 // } from '../../generated/prisma-client/index';
-import { sliderType, multiChoiceType } from '../../../data/seeds/default-data';
+import { sliderType, multiChoiceType } from '../../data/seeds/default-data';
 import EdgeResolver from '../edge/edge-resolver';
 
 const prisma = new PrismaClient();

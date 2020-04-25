@@ -4,12 +4,13 @@ import { Prisma } from 'prisma-binding';
 import config from './config';
 import resolvers from './resolvers';
 import ServiceContainer from './services/service-container';
+import schema from './schema';
 
 const makeApollo = async () => {
   const typeDefs = await importSchema(config.appSchemaUrl, {});
 
   const apollo: ApolloServer = new ApolloServer({
-    typeDefs,
+    schema,
     resolvers,
     context: (req) => ({
       ...req,

@@ -17,7 +17,7 @@ const queryResolvers: QueryResolvers<ContextProps> = {
   questionNodes: forwardTo('db'),
   questionnaire: forwardTo('db'),
   questionnaires: forwardTo('db'),
-  customers: forwardTo('db'),
+  customers: CustomerResolver.customers,
   edges: forwardTo('db'),
   nodeEntryValues: forwardTo('db'),
   nodeEntries: forwardTo('db'),
@@ -42,6 +42,10 @@ const mutationResolvers = {
 const resolvers = {
   Query: {
     ...queryResolvers,
+  },
+  Customer: {
+    settings: CustomerResolver.customerSettings,
+    // dialogues: DialogueResolver.dialogues,
   },
   Mutation: {
     ...mutationResolvers,

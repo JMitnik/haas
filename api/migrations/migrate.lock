@@ -3,4 +3,5 @@
 # Prisma Migrate lockfile v1
 # Read more about conflict resolution here: TODO
 
-20200423112521-init-prisma2
+20200423133746-init
+20200423134029-added-unique-field-customer-id
