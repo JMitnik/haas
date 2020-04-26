@@ -16,6 +16,7 @@ export interface ConfigProps {
   mailUsername: string;
   mailPassword: string;
   prismaServiceSecret: string;
+  jwtSecret: string;
 }
 
 const config: ConfigProps = {
@@ -34,6 +35,7 @@ const config: ConfigProps = {
   mailPassword: process.env.MAIL_PASSWORD || '',
   mailDefaultSender: process.env.MAIL_DEFAULT_SENDER || '',
   prismaServiceSecret: process.env.PRISMA_SERVICE_SECRET || '',
+  jwtSecret: process.env.JWT_SECRET || '',
 };
 
 export default config;

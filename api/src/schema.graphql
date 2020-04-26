@@ -10,6 +10,8 @@ type Mutation {
     createNewCustomer(name: String, options: CustomerCreateOptions): Customer!
     deleteFullCustomer(id: ID!): Customer!
     createNewQuestionnaire(customerId: String, title: String, publicTitle: String, description: String, isSeed: Boolean): Questionnaire!
+    signup(email: String, password: String): String
+    login(email: String, password: String): String
 }
 
 input UserSessionEntryInput {

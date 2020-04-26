@@ -6,6 +6,7 @@ import { Prisma } from './generated/prisma-client/index';
 import SessionResolver from './models/session/session-resolver';
 import CustomerResolver from './models/customer/customer-resolver';
 import DialogueResolver from './models/questionnaire/questionnaire-resolver';
+import UserResolver from './models/users/user-resolver';
 
 interface ContextProps {
   db: Prisma;
@@ -17,7 +18,7 @@ const queryResolvers: QueryResolvers<ContextProps> = {
   questionNodes: forwardTo('db'),
   questionnaire: forwardTo('db'),
   questionnaires: forwardTo('db'),
-  customers: forwardTo('db'),
+  customers: CustomerResolver.customers,
   edges: forwardTo('db'),
   nodeEntryValues: forwardTo('db'),
   nodeEntries: forwardTo('db'),
@@ -36,6 +37,8 @@ const mutationResolvers = {
   createNewQuestionnaire: DialogueResolver.createNewQuestionnaire,
   deleteQuestionnaire: forwardTo('db'),
   deleteCustomer: forwardTo('db'),
+  signup: UserResolver.signup,
+  login: UserResolver.login,
 };
 
 const resolvers = {

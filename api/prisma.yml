@@ -8,6 +8,7 @@ datamodel:
   - src/models/question/Question.prisma
   - src/models/edge/edge.prisma
   - src/models/users/NodeEntry.prisma
+  - src/models/users/User.prisma
   - src/models/session/Session.prisma
 
 generate:

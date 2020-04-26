@@ -5,9 +5,9 @@ import { H2, Flex, Muted, Loader, Grid, Div, H5 } from '@haas/ui';
 import styled, { css } from 'styled-components/macro';
 import { useParams, Switch, Route, useHistory } from 'react-router-dom';
 
+import { Activity } from 'react-feather';
 import getQuestionnaireData from '../queries/getQuestionnaireData';
 import getSessionAnswerFlow from '../queries/getSessionAnswerFlow';
-import { Activity } from 'react-feather';
 
 interface TimelineEntryProps {
   sessionId: string;
@@ -79,7 +79,7 @@ const TopicView = () => {
                   <TopicAnswerFlow sessionId={currSession} />
                 </Route>
                 <Route>
-                  <TopicDetails QuestionnaireDetailResult={resultData} />
+                  {/* <TopicDetails QuestionnaireDetailResult={resultData} /> */}
                 </Route>
               </Switch>
             </Flex>

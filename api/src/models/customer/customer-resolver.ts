@@ -4,6 +4,17 @@ import { leafNodes } from '../../../data/seeds/default-data';
 import NodeResolver from '../question/node-resolver';
 
 class CustomerResolver {
+  static async customers(obj: any, args: any, ctx: any) {
+    console.log(ctx.user);
+    if (!ctx.user) {
+      return [];
+    }
+
+    const customers = prisma.customers();
+
+    return customers;
+  }
+
   static deleteFullCustomerNode = async (obj: any, args: any) => {
     const { id }: { id: ID_Input } = args;
     const customerId = id;

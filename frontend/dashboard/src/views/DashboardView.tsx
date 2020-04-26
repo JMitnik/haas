@@ -1,12 +1,12 @@
 import React, { FC } from 'react';
-import { useQuery, useApolloClient, useMutation } from '@apollo/react-hooks';
-import { gql, ApolloError } from 'apollo-boost';
+import { useQuery, useMutation } from '@apollo/react-hooks';
+import { ApolloError } from 'apollo-boost';
 
-import { ChevronRight, Plus, X } from 'react-feather';
-import { H2, H3, H4, Grid, Flex, Icon, Label, Div, Card, CardBody, CardFooter, Container } from '@haas/ui';
+import { Plus, X } from 'react-feather';
+import { H2, H3, Grid, Flex, Div, Card, CardBody, Container } from '@haas/ui';
 import { Link, useHistory } from 'react-router-dom';
 import styled, { css } from 'styled-components/macro';
-import { Query, Questionnaire, Customer } from '../types.d';
+import { Query, Customer } from '../types.d';
 
 import { getCustomerQuery } from '../queries/getCustomerQuery';
 import { deleteFullCustomerQuery } from '../mutations/deleteFullCustomer';
@@ -114,7 +114,7 @@ const CustomerCard = ({ customer }: { customer: Customer }) => {
     history.push(`/c/${customerId}`);
   };
 
-  const [deleteCustomer, { loading }] = useMutation(deleteFullCustomerQuery, {
+  const [deleteCustomer] = useMutation(deleteFullCustomerQuery, {
     onCompleted: () => {
       console.log('Succesfully deleted customer !');
     },
@@ -141,7 +141,11 @@ const CustomerCard = ({ customer }: { customer: Customer }) => {
       onClick={() => setCustomerID(customer.id)}
     >
       <CardBody flex="100%">
-        <DeleteCustomerButtonContainer onClick={(e) => deleteClickedCustomer(e, customer.id)}><X /></DeleteCustomerButtonContainer>
+        <DeleteCustomerButtonContainer
+          onClick={(e) => deleteClickedCustomer(e, customer.id)}
+        >
+          <X />
+        </DeleteCustomerButtonContainer>
         <Flex alignItems="center" justifyContent="space-between">
           <H3 fontWeight={500}>
             {customer.name}
