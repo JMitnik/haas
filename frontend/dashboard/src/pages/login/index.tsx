@@ -1,8 +1,8 @@
 import React from 'react';
 import { H2, Div, ColumnFlex } from '@haas/ui';
 import { useForm } from 'react-hook-form';
-import { LoginContainer } from './LoginStyles';
-import useUser from '../hooks/useUser';
+import { LoginContainer } from '../LoginStyles';
+import useUser from '../../hooks/useUser';
 
 const Login = () => {
   const form = useForm();

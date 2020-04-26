@@ -3,4 +3,7 @@ type User {
     email: String!
     password: String!
     creationDate: DateTime! @createdAt
+
+    firstName: String
+    lastName: String
 }

@@ -3,6 +3,7 @@ import styled from 'styled-components/macro';
 
 export const LogoContainer = styled.a`
   display: block;
+  filter: grayscale(100%) brightness(70%) contrast(2);
 
   /* Manual size */
   width: 60px;

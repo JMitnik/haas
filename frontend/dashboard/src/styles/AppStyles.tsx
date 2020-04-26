@@ -7,11 +7,3 @@ export const AppContainer = styled.div`
     margin: 0 auto;
   `}
 `;
-
-export const MainWindow = styled.div`
-  ${({ theme }) => css`
-    padding: ${theme.gutter}px;
-    background: ${theme.colors.default.lightest};
-    min-height: 100vh;
-  `}
-`;

@@ -1,4 +1,4 @@
-import React, { useContext, ReactNode, useReducer, useEffect } from 'react';
+import React, { useContext, ReactNode, useReducer, useEffect, useCallback } from 'react';
 import jwtDecoder from 'jwt-decode';
 import { useMutation } from '@apollo/react-hooks';
 import { MutationFunctionOptions } from '@apollo/react-common';
@@ -12,7 +12,7 @@ interface UserProviderProps {
 interface UserContextProps {
   user: null | any;
   login: ((options?: MutationFunctionOptions<any, Record<string, any>> | undefined) => Promise<any>);
-  logout: ((options?: MutationFunctionOptions<any, Record<string, any>> | undefined) => Promise<any>);
+  logout: (() => void);
 }
 
 export const UserContext = React.createContext({
@@ -68,16 +68,13 @@ export const UserProvider = ({ children }: UserProviderProps) => {
     },
   });
 
-  const [logout] = useMutation(logoutMutation, {
-    errorPolicy: 'all',
-    onError: (err: any) => {
-      console.log(`Oh no ${err}`);
-    },
-    onCompleted: () => {
+  const logout = useCallback(
+    () => {
       setUserToken('');
       setUser(null);
     },
-  });
+    [setUser, setUserToken],
+  );
 
   return (
     <UserContext.Provider value={{ user, login, logout }}>
