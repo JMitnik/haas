@@ -16,15 +16,16 @@ interface SignInProps {
 
 class UserResolver {
   static async signup(obj: any, { password, email }: SignUpProps) {
+    const emailTransformed = email.toLowerCase();
     // TODO: Ensure no other user exists with this email
-    const existingUsers = await prisma.users({ where: { email } });
+    const existingUsers = await prisma.users({ where: { email: emailTransformed } });
 
     if (existingUsers) {
       throw new AuthenticationError('A user already exists with this email');
     }
 
     const user = await prisma.createUser({
-      email,
+      email: emailTransformed,
       password: await bcrypt.hash(password, 10),
     });
 
@@ -36,7 +37,8 @@ class UserResolver {
   }
 
   static async login(obj: any, { password, email }: SignInProps) {
-    const users = await prisma.users({ where: { email } });
+    const emailTransformed = email.toLowerCase();
+    const users = await prisma.users({ where: { email: emailTransformed } });
 
     if (!users.length) {
       // TODO: Replace with generic

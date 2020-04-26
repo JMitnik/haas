@@ -1,10 +1,7 @@
 import styled, { css } from 'styled-components/macro';
 import React, { FC } from 'react';
 import { Link } from 'react-router-dom';
-import { Settings } from 'react-feather';
-import { Container } from './Container';
 import { GenericProps, Div } from './Generics';
-import { ProfilePic } from './User';
 
 const TopNavContainer = styled(Div)<GenericProps>`
   ${({ theme }) => css`
@@ -18,16 +15,6 @@ const TopNavContainer = styled(Div)<GenericProps>`
   `}
 `;
 
-const UserNav: FC = () => (
-  <Div useFlex width={1 / 10} alignItems="center" justifyContent="space-evenly">
-    <Link to="/settings">
-      <Settings />
-    </Link>
-    <Div pl={4}>
-      <ProfilePic />
-    </Div>
-  </Div>
-);
 
 export const TopNav: FC = () => (
   <TopNavContainer>

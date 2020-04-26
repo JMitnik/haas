@@ -1,27 +1,27 @@
 import React, { FC } from 'react';
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
-import { ApolloProvider } from '@apollo/react-hooks';
-import { ThemeProvider } from 'styled-components';
+import { Switch, Route } from 'react-router-dom';
 
 import { AppContainer, MainWindow } from './styles/AppStyles';
 import TopNav from './components/Nav';
 import GlobalStyle from './config/global-styles';
-import themeConfig from './config/theme';
-import client from './config/apollo';
 import DashboardView from './views/DashboardView/DashboardView';
 import AddTopicView from './views/AddTopicView';
 import OrganisationSettingsView from './views/OrganisationSettingsView';
 import TopicsOverview from './views/TopicsOverview/TopicsOverview';
 import TopicDetail from './views/TopicDetail/TopicDetail';
 import CustomerBuilderView from './views/CustomerBuilderView';
+import Login from './pages/Login';
+import useUser from './hooks/useUser';
 
-const App: FC = () => (
-  <>
-    <ApolloProvider client={client}>
-      <Router>
-        <ThemeProvider theme={themeConfig}>
-          <AppContainer>
-            {/* Top-level routes */}
+const App: FC = () => {
+  const { user } = useUser();
+
+  return (
+    <>
+      <AppContainer>
+        {/* Top-level routes */}
+        {user ? (
+          <>
             <TopNav />
             <MainWindow>
               <Switch>
@@ -38,12 +38,14 @@ const App: FC = () => (
                 <Route path="/" render={() => <DashboardView />} />
               </Switch>
             </MainWindow>
-          </AppContainer>
-          <GlobalStyle />
-        </ThemeProvider>
-      </Router>
-    </ApolloProvider>
-  </>
-);
+          </>
+        ) : (
+          <Login />
+        )}
+      </AppContainer>
+      <GlobalStyle />
+    </>
+  );
+};
 
 export default App;

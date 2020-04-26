@@ -25,6 +25,8 @@ services:
       POSTGRES_PASSWORD: prisma
     volumes:
       - /postgresdata:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
   api:
     build: .
     restart: always
