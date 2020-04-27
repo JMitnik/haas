@@ -91,9 +91,9 @@ export const QuestionnaireProvider = ({ children }: { children: ReactNode }) => 
   const { data } = res;
 
   useEffect(() => {
-    if (data?.questionnaire) {
-      setQuestionnaire(data?.questionnaire);
-      setCustomer(data?.questionnaire?.customer || {});
+    if (data?.dialogue) {
+      setQuestionnaire(data?.dialogue);
+      setCustomer(data?.dialogue?.customer || {});
     }
   }, [data]);
 

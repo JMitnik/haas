@@ -9,6 +9,7 @@ export const ColourSettingsType = objectType({
     t.id('id');
     t.string('primary');
     t.string('secondary', { nullable: true });
+    t.string('primaryAlt', { nullable: true });
   },
 });
 

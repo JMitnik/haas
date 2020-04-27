@@ -12,7 +12,7 @@ export const CustomerFragment = gql`
         secondary
       }
     }
-    questionnaires {
+    dialogues {
       id
       description
       title

@@ -1,6 +1,6 @@
 datasource postgresql {
   provider = "postgresql"
-  url      = env("DB_STRING")
+  url = "***"
 }
 
 generator client {
@@ -98,7 +98,7 @@ model Edge {
   
   // FIXME: dialogue ID wordt niet gevuld volgens mij
   dialogue                                   Dialogue?           @relation(fields: [dialogueId], references: [id])
-  NodeEntry                                  NodeEntry[] //// yea geen idee waar deze voor is maar ik laat em staan
+  // NodeEntry                                  NodeEntry[] //// yea geen idee waar deze voor is maar ik laat em staan
 }
 
 model QuestionCondition {

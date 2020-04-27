@@ -5,6 +5,7 @@
 type ColourSettings {
   id: ID!
   primary: String!
+  primaryAlt: String
   secondary: String
 }
 
@@ -24,10 +25,13 @@ type CustomerSettings {
 
 type Dialogue {
   creationDate: String
+  customer: Customer!
   customerId: String!
   description: String!
   id: ID!
+  leafs: [QuestionNode!]!
   publicTitle: String
+  questions(where: QuestionNodeWhereInput): [QuestionNode!]!
   title: String!
   updatedAt: String
 }
@@ -41,6 +45,29 @@ type DialogueDetailResult {
   title: String!
   totalNodeEntries: Int!
   updatedAt: String!
+}
+
+input DialogueWhereUniqueInput {
+  id: String!
+}
+
+type Edge {
+  childNodeId: String!
+  conditions: [EdgeCondition!]!
+  createdAt: String!
+  dialogueId: String!
+  id: ID!
+  parentNodeId: String!
+  updatedAt: String!
+}
+
+type EdgeCondition {
+  conditionType: String!
+  edgeId: String!
+  id: ID!
+  matchValue: String
+  renderMax: Int
+  renderMin: Int
 }
 
 type FontSettings {
@@ -68,8 +95,32 @@ type NodeEntryValue {
 
 type Query {
   customers: [Customer!]!
+  dialogue(where: DialogueWhereUniqueInput): Dialogue!
   dialogues(customerId: String): [Dialogue!]!
   getQuestionnaireData(dialogueId: String): DialogueDetailResult!
+}
+
+type QuestionNode {
+  children: [Edge!]!
+  id: ID!
+  isLeaf: Boolean!
+  isRoot: Boolean!
+  options: [QuestionOption!]!
+  overrideLeafId: String
+  questionDialogueId: String!
+  title: String!
+  type: String!
+}
+
+input QuestionNodeWhereInput {
+  isRoot: Boolean
+}
+
+type QuestionOption {
+  id: ID!
+  publicValue: String
+  questionId: String!
+  value: String!
 }
 
 type Session {

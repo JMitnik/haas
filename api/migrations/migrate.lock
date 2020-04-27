@@ -7,3 +7,4 @@
 20200423134029-added-unique-field-customer-id
 20200427095850-add-session-related-models
 20200427111051-updated-node-entry-value-to-contain-parent-node-entry-id
+20200427115455-re-added-node-entry-to-question-node-and-edge

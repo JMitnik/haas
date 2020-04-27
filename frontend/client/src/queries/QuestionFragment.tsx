@@ -4,11 +4,7 @@ const QuestionFragment = gql`
   fragment QuestionFragment on QuestionNode {
     id
     title
-    overrideLeaf {
-      id
-      type
-      title
-    }
+    overrideLeafId
     type
     children {
       id
@@ -18,14 +14,8 @@ const QuestionFragment = gql`
         renderMax
         matchValue
       }
-      parentNode {
-        id
-        title
-      }
-      childNode {
-        id
-        title
-      }
+      parentNodeId
+      childNodeId
     }
     options {
       value

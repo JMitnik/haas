@@ -5,12 +5,20 @@ import { nexusPrismaPlugin } from 'nexus-prisma';
 import path from 'path';
 import CustomerType, { CustomersQuery } from './models/customer/Customer';
 import CustomerSettingsType, { ColourSettingsType, FontSettingsType } from './models/settings/CustomerSettings';
-import { DialogueType, DialoguesOfCustomerQuery, DialogueDetailResultType, getQuestionnaireDataQuery } from './models/questionnaire/Dialogue';
+import { DialogueType, DialoguesOfCustomerQuery, DialogueDetailResultType, getQuestionnaireDataQuery, DialogueInput } from './models/questionnaire/Dialogue';
 import { UniqueDataResultEntry, NodeEntryValueType, NodeEntryType, SessionType } from './models/session/Session';
+import { QuestionNodeType, QuestionOptionType, QuestionNodeWhereInput } from './models/question/QuestionNode';
+import { EdgeConditionType, EdgeType } from './models/edge/Edge';
 
 const schema = makeSchema({
   shouldGenerateArtifacts: true,
   types: [
+    QuestionNodeWhereInput,
+    DialogueInput,
+    EdgeConditionType,
+    EdgeType,
+    QuestionOptionType,
+    QuestionNodeType,
     NodeEntryValueType,
     NodeEntryType,
     SessionType,

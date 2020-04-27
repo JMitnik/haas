@@ -1,6 +1,8 @@
-import { PrismaClient, Customer } from '@prisma/client';
-import { objectType, queryType, extendType } from '@nexus/schema';
+import { PrismaClient, Dialogue } from '@prisma/client';
+import { objectType, queryType, extendType, inputObjectType, arg } from '@nexus/schema';
 import { UniqueDataResultEntry } from '../session/Session';
+import { QuestionNodeType, QuestionNodeWhereInput } from '../question/QuestionNode';
+import CustomerType from '../customer/Customer';
 import DialogueResolver from './questionnaire-resolver';
 
 const prisma = new PrismaClient();
@@ -14,7 +16,74 @@ export const DialogueType = objectType({
     t.string('publicTitle', { nullable: true });
     t.string('creationDate', { nullable: true });
     t.string('updatedAt', { nullable: true });
+    t.field('customer', {
+      type: CustomerType,
+      resolve(parent: Dialogue, args: any, ctx: any, info: any) {
+        const customer = prisma.customer.findOne({
+          where: {
+            id: parent.customerId,
+          },
+        });
+        return customer;
+      },
+    });
     t.string('customerId');
+    t.list.field('questions', {
+      type: QuestionNodeType,
+      args: {
+        where: QuestionNodeWhereInput, // TODO: Use prisma generated type?
+      },
+      resolve(parent: Dialogue, args: any, ctx: any, info: any) {
+        console.log('HELLO?');
+        if (args.where.isRoot) {
+          const rootQuestion = prisma.questionNode.findMany({
+            where: {
+              isRoot: args.where.isRoot,
+            },
+          });
+          return rootQuestion;
+        }
+
+        const questions = prisma.questionNode.findMany({
+          where: {
+            AND: [
+              {
+                questionDialogueId: parent.id,
+              },
+              {
+                isLeaf: false,
+              },
+            ],
+          },
+        });
+        return questions;
+      },
+    });
+    t.list.field('leafs', {
+      type: QuestionNodeType,
+      resolve(parent: Dialogue, args: any, ctx: any, info: any) {
+        const leafs = prisma.questionNode.findMany({
+          where: {
+            AND: [
+              {
+                questionDialogueId: parent.id,
+              },
+              {
+                isLeaf: true,
+              },
+            ],
+          },
+        });
+        return leafs;
+      },
+    });
+  },
+});
+
+export const DialogueInput = inputObjectType({
+  name: 'DialogueWhereUniqueInput',
+  definition(t) {
+    t.string('id', { required: true });
   },
 });
 
@@ -53,6 +122,18 @@ export const getQuestionnaireDataQuery = extendType({
 export const DialoguesOfCustomerQuery = extendType({
   type: 'Query',
   definition(t) {
+    t.field('dialogue', {
+      type: DialogueType,
+      args: {
+        where: DialogueInput,
+      },
+      resolve(parent: any, args: any, ctx: any, info: any) {
+        const dialogue = prisma.dialogue.findOne({ where: {
+          id: args.where.id,
+        } });
+        return dialogue;
+      },
+    });
     t.list.field('dialogues', {
       type: DialogueType,
       args: {
