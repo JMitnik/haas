@@ -15,7 +15,7 @@ import { AddTopicCard } from './TopicsOverviewStyles';
 const TopicsOverview: FC = () => {
   const { customerId } = useParams();
 
-  const { loading, error, data } = useQuery<Query>(getQuestionnairesCustomerQuery, {
+  const { loading, error, data } = useQuery<any>(getQuestionnairesCustomerQuery, {
     variables: { id: customerId },
   });
 
@@ -32,7 +32,7 @@ const TopicsOverview: FC = () => {
     );
   }
 
-  const topics = data?.questionnaires;
+  const topics: Array<Questionnaire> = data?.dialogues;
 
   return (
     <>
@@ -69,7 +69,7 @@ const TopicCard = ({ topic }: { topic: Questionnaire }) => {
     refetchQueries: [{
       query: getQuestionnairesCustomerQuery,
       variables: {
-        id: topic.customer.id,
+        id: customerId,
       },
     }],
     onError: (serverError: ApolloError) => {

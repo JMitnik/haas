@@ -1,19 +1,10 @@
 import { PrismaClient, Customer } from '@prisma/client';
-import { objectType, queryType } from '@nexus/schema';
+import { objectType, queryType, extendType } from '@nexus/schema';
 
 import CustomerSettingsType from '../settings/CustomerSettings';
+import { DialogueType } from '../questionnaire/Dialogue';
 
 const prisma = new PrismaClient();
-
-export const DialogueType = objectType({
-  name: 'Dialogue',
-  definition(t) {
-    t.id('id');
-    t.string('title');
-    t.string('description');
-    t.string('publicTitle', { nullable: true });
-  },
-});
 
 const CustomerType = objectType({
   name: 'Customer',
@@ -41,8 +32,8 @@ const CustomerType = objectType({
   },
 });
 
-export const CustomersQuery = objectType({
-  name: 'Query',
+export const CustomersQuery = extendType({
+  type: 'Query',
   definition(t) {
     t.list.field('customers', {
       type: CustomerType,

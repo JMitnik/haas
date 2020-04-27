@@ -23,10 +23,13 @@ type CustomerSettings {
 }
 
 type Dialogue {
+  creationDate: String
+  customerId: String!
   description: String!
   id: ID!
   publicTitle: String
   title: String!
+  updatedAt: String
 }
 
 type FontSettings {
@@ -35,4 +38,5 @@ type FontSettings {
 
 type Query {
   customers: [Customer!]!
+  dialogues(customerId: String): [Dialogue!]!
 }

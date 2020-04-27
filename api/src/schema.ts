@@ -3,12 +3,14 @@ import { nexusPrismaPlugin } from 'nexus-prisma';
 // import { Query } from './queries';
 // import { Mutation } from './mutations';
 import path from 'path';
-import CustomerType, { CustomersQuery, DialogueType } from './models/customer/Customer';
+import CustomerType, { CustomersQuery } from './models/customer/Customer';
 import CustomerSettingsType, { ColourSettingsType, FontSettingsType } from './models/settings/CustomerSettings';
+import { DialogueType, DialoguesOfCustomerQuery } from './models/questionnaire/Dialogue';
 
 const schema = makeSchema({
   shouldGenerateArtifacts: true,
   types: [
+    DialoguesOfCustomerQuery,
     ColourSettingsType,
     FontSettingsType,
     DialogueType,
