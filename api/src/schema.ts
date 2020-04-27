@@ -7,12 +7,14 @@ import CustomerType, { CustomersQuery } from './models/customer/Customer';
 import CustomerSettingsType, { ColourSettingsType, FontSettingsType } from './models/settings/CustomerSettings';
 import { DialogueType, DialoguesOfCustomerQuery, DialogueDetailResultType, getQuestionnaireDataQuery, DialogueInput } from './models/questionnaire/Dialogue';
 import { UniqueDataResultEntry, NodeEntryValueType, NodeEntryType, SessionType } from './models/session/Session';
-import { QuestionNodeType, QuestionOptionType, QuestionNodeWhereInput } from './models/question/QuestionNode';
+import { QuestionNodeType, QuestionOptionType, QuestionNodeWhereInput, getQuestionNodeQuery, QuestionNodeInput } from './models/question/QuestionNode';
 import { EdgeConditionType, EdgeType } from './models/edge/Edge';
 
 const schema = makeSchema({
   shouldGenerateArtifacts: true,
   types: [
+    QuestionNodeInput,
+    getQuestionNodeQuery,
     QuestionNodeWhereInput,
     DialogueInput,
     EdgeConditionType,

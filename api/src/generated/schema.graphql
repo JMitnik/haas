@@ -98,6 +98,8 @@ type Query {
   dialogue(where: DialogueWhereUniqueInput): Dialogue!
   dialogues(customerId: String): [Dialogue!]!
   getQuestionnaireData(dialogueId: String): DialogueDetailResult!
+  getQuestionNode(id: String): QuestionNode!
+  questionNode(where: QuestionNodeWhereUniqueInput): QuestionNode!
 }
 
 type QuestionNode {
@@ -114,6 +116,10 @@ type QuestionNode {
 
 input QuestionNodeWhereInput {
   isRoot: Boolean
+}
+
+input QuestionNodeWhereUniqueInput {
+  id: String!
 }
 
 type QuestionOption {

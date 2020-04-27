@@ -106,7 +106,6 @@ const treeReducer = (state: TreeStateProps, action: TreeAction): TreeStateProps 
  */
 const findNextEdge = (parent: HAASNode, key: string | number | null) => {
   if (!key) return null;
-
   const candidates = parent?.children?.filter(edge => {
     if (parent.type === 'SLIDER') {
       if (edge?.conditions?.[0]?.renderMin && key < edge?.conditions?.[0].renderMin) {
@@ -124,7 +123,6 @@ const findNextEdge = (parent: HAASNode, key: string | number | null) => {
 
     return true;
   });
-
   return candidates && candidates[0];
 };
 
@@ -133,11 +131,11 @@ const findNextEdge = (parent: HAASNode, key: string | number | null) => {
  * @param edge
  */
 const findNextNode = async (edge: HAASEdge | null) => {
-  if (edge?.childNode?.id) {
+  if (edge?.childNodeId) {
     const { data: nextNodeData } = await client.query({
       query: getQuestionNodeQuery,
       variables: {
-        id: edge?.childNode.id
+        id: edge?.childNodeId
       }
     });
 

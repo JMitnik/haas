@@ -57,3 +57,43 @@ export const QuestionNodeWhereInput = inputObjectType({
   },
 });
 
+export const QuestionNodeInput = inputObjectType({
+  name: 'QuestionNodeWhereUniqueInput',
+  definition(t) {
+    t.string('id', { required: true });
+  },
+});
+
+export const getQuestionNodeQuery = extendType({
+  type: 'Query',
+  definition(t) {
+    t.field('getQuestionNode', {
+      type: QuestionNodeType,
+      args: {
+        id: 'String',
+      },
+      resolve(parent: any, args: any, ctx: any, info: any) {
+        const questionNode = prisma.questionNode.findOne({
+          where: {
+            id: args.id,
+          },
+        });
+        return questionNode;
+      },
+    });
+    t.field('questionNode', {
+      type: QuestionNodeType,
+      args: {
+        where: QuestionNodeInput,
+      },
+      resolve(parent: any, args: any, ctx: any, info: any) {
+        const questionNode = prisma.questionNode.findOne({
+          where: {
+            id: args.where.id,
+          },
+        });
+        return questionNode;
+      },
+    });
+  },
+});
