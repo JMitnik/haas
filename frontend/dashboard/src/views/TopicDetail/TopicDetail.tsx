@@ -13,7 +13,7 @@ const TopicDetail = () => {
   const [activeSession, setActiveSession] = useState('');
   const history = useHistory();
   const { loading, data } = useQuery(getQuestionnaireData, {
-    variables: { topicId },
+    variables: { dialogueId: topicId },
   });
 
   if (loading) return <Loader />;

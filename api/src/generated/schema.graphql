@@ -32,11 +32,55 @@ type Dialogue {
   updatedAt: String
 }
 
+type DialogueDetailResult {
+  average: String!
+  creationDate: String!
+  customerName: String!
+  description: String!
+  timelineEntries: [UniqueDataResultEntry!]!
+  title: String!
+  totalNodeEntries: Int!
+  updatedAt: String!
+}
+
 type FontSettings {
   id: ID!
+}
+
+type NodeEntry {
+  creationDate: String!
+  depth: Int!
+  id: ID!
+  relatedEdgeId: String!
+  relatedNodeId: String!
+  sessionId: String!
+  values: [NodeEntryValue!]!
+}
+
+type NodeEntryValue {
+  id: ID!
+  multiValues: [NodeEntryValue!]!
+  numberValue: Int
+  parentNodeEntryId: String!
+  parentNodeEntryValueId: Int
+  textValue: String
 }
 
 type Query {
   customers: [Customer!]!
   dialogues(customerId: String): [Dialogue!]!
+  getQuestionnaireData(dialogueId: String): DialogueDetailResult!
+}
+
+type Session {
+  createdAt: String!
+  dialogueId: String!
+  id: ID!
+  nodeEntries: [NodeEntry!]!
+}
+
+type UniqueDataResultEntry {
+  createdAt: String!
+  sessionId: String!
+  value: Int!
 }

@@ -1,0 +1,159 @@
+{
+  "version": "0.3.14-fixed",
+  "steps": [
+    {
+      "tag": "DeleteDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "Session",
+          "field": "dialogueId"
+        },
+        "directive": "map"
+      }
+    },
+    {
+      "tag": "DeleteDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "NodeEntry",
+          "field": "relatedEdgeId"
+        },
+        "directive": "map"
+      }
+    },
+    {
+      "tag": "DeleteDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "NodeEntry",
+          "field": "relatedNodeId"
+        },
+        "directive": "map"
+      }
+    },
+    {
+      "tag": "DeleteDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "NodeEntry",
+          "field": "sessionId"
+        },
+        "directive": "map"
+      }
+    },
+    {
+      "tag": "CreateField",
+      "model": "NodeEntryValue",
+      "field": "parentNodeEntryValueId",
+      "type": "Int",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateField",
+      "model": "NodeEntryValue",
+      "field": "parentNodeEntryValue",
+      "type": "NodeEntryValue",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "NodeEntryValue",
+          "field": "parentNodeEntryValue"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "NodeEntryValue",
+          "field": "parentNodeEntryValue"
+        },
+        "directive": "relation"
+      },
+      "argument": "",
+      "value": "\"NodeEntryValueToNodeEntryValue\""
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "NodeEntryValue",
+          "field": "parentNodeEntryValue"
+        },
+        "directive": "relation"
+      },
+      "argument": "fields",
+      "value": "[parentNodeEntryValueId]"
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "NodeEntryValue",
+          "field": "parentNodeEntryValue"
+        },
+        "directive": "relation"
+      },
+      "argument": "references",
+      "value": "[id]"
+    },
+    {
+      "tag": "DeleteField",
+      "model": "NodeEntryValue",
+      "field": "parentNodeEntry"
+    },
+    {
+      "tag": "UpdateField",
+      "model": "NodeEntryValue",
+      "field": "parentNodeEntryId",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "DeleteDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "NodeEntryValue",
+          "field": "parentNodeEntryId"
+        },
+        "directive": "map"
+      }
+    },
+    {
+      "tag": "UpdateField",
+      "model": "NodeEntryValue",
+      "field": "NodeEntry",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "NodeEntryValue",
+          "field": "NodeEntry"
+        },
+        "directive": "relation"
+      },
+      "argument": "fields",
+      "value": "[parentNodeEntryId]"
+    }
+  ]
+}

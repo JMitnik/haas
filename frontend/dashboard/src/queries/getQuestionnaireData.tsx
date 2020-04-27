@@ -1,8 +1,8 @@
 import gql from 'graphql-tag';
 
 const getQuestionnaireDataQuery = gql`
-  query getQuestionnaireData($topicId: String) {
-    getQuestionnaireData(topicId: $topicId) {
+  query getQuestionnaireData($dialogueId: String) {
+    getQuestionnaireData(dialogueId: $dialogueId) {
       customerName
       title
       description

@@ -189,76 +189,78 @@ class DialogueResolver {
   //   }
   // };
 
-  // static getQuestionnaireAggregatedData = async (parent: any, args: any) => {
-  //   const { topicId } = args;
+  static getQuestionnaireAggregatedData = async (parent: any, args: any) => {
+    const { dialogueId } = args;
 
-  //   const customerName = (await prisma.questionnaire({ id: topicId }).customer()).name;
-  //   const questionnaire: Questionnaire | null = (await prisma.questionnaire({ id: topicId }));
+    // const customerName = (await prisma.questionnaire({ id: dialogueId }).customer()).name;
+    const customer = await (prisma.dialogue.findOne({ where: { id: dialogueId } }).customer());
+    const customerName = customer?.name;
 
-  //   if (questionnaire) {
-  //     const { title, description, creationDate, updatedAt } = questionnaire;
+    const dialogue: Dialogue | null = (await prisma.dialogue.findOne({ where: { id: dialogueId } }));
 
-  //     const questionNodes = await prisma.questionNodes({
-  //       where: {
-  //         questionnaire: {
-  //           id: topicId,
-  //         },
-  //       },
-  //     });
+    if (dialogue) {
+      const { title, description, creationDate, updatedAt } = dialogue;
 
-  //     const questionNodeIds = questionNodes.map((qNode) => qNode.id);
+      const questionNodes = await prisma.questionNode.findMany({
+        where: {
+          questionDialogueId: dialogueId,
+        },
+      });
 
-  //     const nodeEntries = await prisma.nodeEntries({
-  //       where: {
-  //         relatedNode: {
-  //           id_in: questionNodeIds,
-  //         },
-  //       },
-  //     }) || [];
+      const questionNodeIds = questionNodes.map((qNode) => qNode.id);
 
-  //     const aggregatedNodeEntries = await Promise.all(nodeEntries.map(async ({ id }) => {
-  //       const values = await prisma.nodeEntry({ id }).values();
-  //       const nodeEntry = await prisma.nodeEntry({ id });
-  //       const sessionId = (await prisma.nodeEntry({ id }).session()).id;
+      const nodeEntries = await prisma.nodeEntry.findMany({
+        where: {
+          relatedNodeId: {
+            in: questionNodeIds,
+          },
+        },
+      }) || [];
 
-  //       const mappedResult = {
-  //         sessionId,
-  //         createdAt: nodeEntry?.creationDate,
-  //         value: values[0].numberValue ? values[0].numberValue : -1,
-  //       };
-  //       return mappedResult;
-  //     })) || [];
+      const aggregatedNodeEntries = await Promise.all(nodeEntries.map(async ({ id }) => {
+        const values = await prisma.nodeEntry.findOne({ where: { id } }).values();
+        const nodeEntry = await prisma.nodeEntry.findOne({ where: { id } });
+        const session = (await prisma.nodeEntry.findOne({ where: { id } }).session());
+        const sessionId = session?.id;
 
-  //     const filterNodes = aggregatedNodeEntries.filter((node) => node?.value !== -1) || [];
+        const mappedResult = {
+          sessionId,
+          createdAt: nodeEntry?.creationDate,
+          value: values[0].numberValue ? values[0].numberValue : -1,
+        };
+        return mappedResult;
+      })) || [];
 
-  //     const filteredNodeData = (filterNodes.map((node) => node?.value)) || [];
+      const filterNodes = aggregatedNodeEntries.filter((node) => node?.value !== -1) || [];
 
-  //     const nrEntries = filteredNodeData.reduce(
-  //       (total = 0, previousValue) => total + previousValue, 0,
-  //     );
+      const filteredNodeData = (filterNodes.map((node) => node?.value)) || [];
 
-  //     const averageSliderResult = (
-  //       filteredNodeData.length > 0 && nrEntries / filteredNodeData.length).toString()
-  //       || 'N/A';
+      const nrEntries = filteredNodeData.reduce(
+        (total = 0, previousValue) => total + previousValue, 0,
+      );
 
-  //     const orderedTimelineEntries = _.orderBy(filterNodes,
-  //       (filterNode) => filterNode.createdAt, 'desc') || [];
+      const averageSliderResult = (
+        filteredNodeData.length > 0 && nrEntries / filteredNodeData.length).toString()
+        || 'N/A';
 
-  //     return {
-  //       customerName,
-  //       title,
-  //       timelineEntries: orderedTimelineEntries,
-  //       description,
-  //       creationDate,
-  //       updatedAt,
-  //       average: averageSliderResult,
-  //       totalNodeEntries: filterNodes.length,
-  //     };
-  //   }
+      const orderedTimelineEntries = _.orderBy(filterNodes,
+        (filterNode) => filterNode.createdAt, 'desc') || [];
 
-  //   // TODO: What will we return here?
-  //   return {};
-  // };
+      return {
+        customerName,
+        title,
+        timelineEntries: orderedTimelineEntries,
+        description,
+        creationDate,
+        updatedAt,
+        average: averageSliderResult,
+        totalNodeEntries: filterNodes.length,
+      };
+    }
+
+    // TODO: What will we return here?
+    return {};
+  };
 }
 
 export default DialogueResolver;

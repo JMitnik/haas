@@ -1,6 +1,6 @@
 datasource postgresql {
   provider = "postgresql"
-  url      = env("DB_STRING")
+  url = "***"
 }
 
 generator client {
@@ -122,7 +122,7 @@ model QuestionOption {
 model Session {
   createdAt     DateTime        @default(now())
   id            String          @default(cuid()) @id
-  dialogueId    String         
+  dialogueId    String         @map("Dialogue")
   dialogue      Dialogue        @relation("DialogueToSessions", fields: [dialogueId], references: [id])
   nodeEntries   NodeEntry[]     @relation("SessionToNodeEntries", references: [id])
 }
@@ -131,9 +131,9 @@ model NodeEntry {
   id             String           @default(cuid()) @id
   creationDate   DateTime         @default(now())
   depth          Int?
-  relatedEdgeId  String?         
-  relatedNodeId  String?          
-  sessionId      String           
+  relatedEdgeId  String?          @map("relatedEdge")
+  relatedNodeId  String?          @map("relatedNode")
+  sessionId      String           @map("session")
   values         NodeEntryValue[] @relation(references: [id])
   session        Session          @relation("SessionToNodeEntries", fields: [sessionId], references: [id])
   relatedNode    QuestionNode?    @relation(fields: [relatedNodeId], references: [id])
@@ -144,11 +144,8 @@ model NodeEntryValue {
   id                 Int              @default(autoincrement()) @id
   numberValue        Int?
   textValue          String?
-  
-  parentNodeEntryId  String
-  NodeEntry          NodeEntry      @relation(fields: [parentNodeEntryId], references: [id])
-  
-  parentNodeEntryValueId  Int?
-  parentNodeEntryValue    NodeEntryValue?   @relation("NodeEntryValueToNodeEntryValue", fields: [parentNodeEntryValueId], references: [id])
+  parentNodeEntryId  Int?             @map("parentNodeEntry")
+  NodeEntry          NodeEntry[]      @relation(references: [id])
+  parentNodeEntry    NodeEntryValue?   @relation("NodeEntryValueToNodeEntryValue", fields: [parentNodeEntryId], references: [id])
   multiValues        NodeEntryValue[] @relation("NodeEntryValueToNodeEntryValue", references: [id])
 }
