@@ -1,21 +1,24 @@
-import { prisma } from '../../generated/prisma-client/index';
+import { PrismaClient, Dialogue, NodeEntryCreateWithoutSessionInput } from '@prisma/client';
 import cleanInt from '../../utils/cleanInt';
-import { NodeEntryCreateWithoutSessionInput } from '../../generated/resolver-types';
+
+const prisma = new PrismaClient();
 
 class SessionResolver {
   static async uploadUserSession(obj: any, args: any, ctx: any) {
     const { questionnaireId, entries } = args.uploadUserSessionInput;
 
-    const session = await prisma.createSession({
-      questionnaire: {
-        connect: {
-          id: questionnaireId,
+    const session = await prisma.session.create({
+      data: {
+        dialogue: {
+          connect: {
+            id: questionnaireId,
+          },
         },
-      },
-      nodeEntries: {
-        create: entries.map(
-          (entry: any) => SessionResolver.constructNodeEntry(entry),
-        ),
+        nodeEntries: {
+          create: entries.map(
+            (entry: any) => SessionResolver.constructNodeEntry(entry),
+          ),
+        },
       },
     });
 
@@ -25,6 +28,18 @@ class SessionResolver {
   }
 
   static constructNodeEntry(nodeEntry: any) : NodeEntryCreateWithoutSessionInput {
+    const valuesObject: any = { multiValues: { create: nodeEntry.data.multiValues || [] } }; // multiValues: { create: nodeEntry.data.multiValues || [], }
+
+    if (nodeEntry.data.numberValue) {
+      valuesObject.numberValue = cleanInt(nodeEntry.data.numberValue);
+    }
+
+    if (nodeEntry.data.textValue) {
+      valuesObject.textValue = nodeEntry.data.textValue;
+    }
+
+    console.log('Values object', valuesObject);
+
     return {
       // todo: Add relatedEdge back
       relatedNode: {
@@ -34,13 +49,7 @@ class SessionResolver {
       },
       depth: nodeEntry.depth,
       values: {
-        create: [{
-          numberValue: cleanInt(nodeEntry.data.numberValue),
-          textValue: nodeEntry.data.textValue,
-          multiValues: {
-            create: nodeEntry.data.multiValues,
-          },
-        }],
+        create: [valuesObject],
       },
     };
   }

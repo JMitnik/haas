@@ -47,7 +47,7 @@ export interface HAASNode {
   children: Array<Edge>;
   conditions?: [HAASNodeConditions];
   overrideLeaf?: HAASNode;
-  overrideLeafId: string;
+  overrideLeafId?: string;
   options?: [MultiChoiceOption];
 }
 

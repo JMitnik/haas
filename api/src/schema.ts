@@ -6,13 +6,17 @@ import path from 'path';
 import CustomerType, { CustomersQuery } from './models/customer/Customer';
 import CustomerSettingsType, { ColourSettingsType, FontSettingsType } from './models/settings/CustomerSettings';
 import { DialogueType, DialoguesOfCustomerQuery, DialogueDetailResultType, getQuestionnaireDataQuery, DialogueInput } from './models/questionnaire/Dialogue';
-import { UniqueDataResultEntry, NodeEntryValueType, NodeEntryType, SessionType } from './models/session/Session';
+import { UniqueDataResultEntry, NodeEntryValueType, NodeEntryType, SessionType, uploadUserSessionMutation, UploadUserSessionInput, UserSessionEntryInput, UserSessionEntryDataInput } from './models/session/Session';
 import { QuestionNodeType, QuestionOptionType, QuestionNodeWhereInput, getQuestionNodeQuery, QuestionNodeInput } from './models/question/QuestionNode';
 import { EdgeConditionType, EdgeType } from './models/edge/Edge';
 
 const schema = makeSchema({
   shouldGenerateArtifacts: true,
   types: [
+    UploadUserSessionInput,
+    UserSessionEntryInput,
+    UserSessionEntryDataInput,
+    uploadUserSessionMutation,
     QuestionNodeInput,
     getQuestionNodeQuery,
     QuestionNodeWhereInput,

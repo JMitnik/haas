@@ -5,68 +5,41 @@ const prisma = new PrismaClient();
 
 async function main() {
   // ... you will write your Prisma Client queries here
+  const questionnaireId = 'ck9jm0gsf00008dr5w2w54vcc';
 
-  const edge = await prisma.edge.create({
+  const session = await prisma.session.create({
     data: {
-      parentNode: {
-        create: {
-          title: 'parentNode',
-          type: 'SLIDER',
+      dialogue: {
+        connect: {
+          id: questionnaireId,
         },
       },
-      childNode: {
-        create: {
-          title: 'childNode',
-          type: 'multi-value',
-        },
-      },
-      conditions: {
+      nodeEntries: {
         create: [
-          {
-            conditionType: 'match',
-            matchValue: 'FACILITIES',
-          },
+          {},
+          {},
         ],
       },
     },
   });
 
-  // const dialogue = await prisma.dialogue.create({
-  //   data: {
-  //     title: 'Dialogue',
-  //     description: 'Desc.',
-  //     questions: {
-  //       create: {
-  //         title: 'OverrideLeaf Question',
-  //         type: 'MULTI-VALUE',
-  //         options: {
-  //           create: {
-  //             value: 'Option 1',
-  //           },
-  //         },
-  //         overrideLeaf: {
-  //           create: {
-  //             title: 'Leaf',
-  //             type: 'Social-Share',
-  //           },
-  //         },
-  //         children: {
-  //           connect: {
-  //             id: edge.id,
-  //           },
-  //         },
-  //       },
-  //     },
-  //   },
-  // });
+  const nodeEntry = await prisma.nodeEntry.create({
+    data: {
+      // relatedNode: {
+      //   create: {
+      //     title: 'Hi',
+      //     type: 'mult',
+      //   },
+      // },
+      session: {
+        connect: {
+          id: session.id,
+        },
+      },
+    },
+  });
 
-  // console.log('Edge dialogue id: ', await prisma.dialogue.findOne({ where: { id: dialogue.id } }).edges());
-  // await prisma.questionNode.create({
-  //   data: {
-  //     title: 'Question1',
-  //     type: 'Multi-Value',
-  //   },
-  // });
+  console.log('NodeEntry: ', nodeEntry);
 }
 
 main()

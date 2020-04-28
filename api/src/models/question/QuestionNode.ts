@@ -25,6 +25,14 @@ export const QuestionNodeType = objectType({
     t.string('type');
     t.string('overrideLeafId', { nullable: true });
     t.string('questionDialogueId');
+    t.field('overrideLeaf', {
+      type: QuestionNodeType,
+      nullable: true,
+      resolve(parent: QuestionNode, args: any, ctx: any, info: any) {
+        const overrideLeaf = prisma.questionNode.findOne({ where: { id: parent.id } }).overrideLeaf();
+        return overrideLeaf;
+      },
+    });
     t.list.field('options', {
       type: QuestionOptionType,
       resolve(parent: QuestionNode, args: any, ctx: any, info: any) {

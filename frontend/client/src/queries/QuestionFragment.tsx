@@ -5,6 +5,11 @@ const QuestionFragment = gql`
     id
     title
     overrideLeafId
+    overrideLeaf {
+      id
+      title
+      type
+    }
     type
     children {
       id

@@ -1,0 +1,22 @@
+{
+  "version": "0.3.14-fixed",
+  "steps": [
+    {
+      "tag": "CreateField",
+      "model": "NodeEntryValue",
+      "field": "nodeEntryId",
+      "type": "String",
+      "arity": "Optional"
+    },
+    {
+      "tag": "DeleteField",
+      "model": "NodeEntryValue",
+      "field": "parentNodeEntryId"
+    },
+    {
+      "tag": "DeleteField",
+      "model": "NodeEntryValue",
+      "field": "parentNodeEntry"
+    }
+  ]
+}

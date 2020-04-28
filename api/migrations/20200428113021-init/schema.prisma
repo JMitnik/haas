@@ -1,6 +1,6 @@
 datasource postgresql {
   provider = "postgresql"
-  url      = env("DB_STRING")
+  url = "***"
 }
 
 generator client {
@@ -131,6 +131,7 @@ model Session {
   nodeEntries NodeEntry[]
 }
 
+// // 
 model NodeEntry {
   id            String           @default(cuid()) @id
   creationDate  DateTime         @default(now())
@@ -143,13 +144,15 @@ model NodeEntry {
   relatedEdge   Edge?            @relation(fields: [relatedEdgeId], references: [id])
   values        NodeEntryValue[]
 }
+// // nodeEntryId            String?
 
 model NodeEntryValue {
   id                     Int              @default(autoincrement()) @id
   numberValue            Int?
   textValue              String?
   parentNodeEntryValueId Int?
+  parentNodeEntryId      String?
+  parentNodeEntry        NodeEntry?       @relation("NodeEntryToNodeEntryValues", fields: [parentNodeEntryId], references: [id])
   parentNodeEntryValue   NodeEntryValue?  @relation("NodeEntryValueToNodeEntryValue", fields: [parentNodeEntryValueId], references: [id])
   multiValues            NodeEntryValue[] @relation("NodeEntryValueToNodeEntryValue")
-  nodeEntryId            String?
 }

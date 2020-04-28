@@ -218,7 +218,7 @@ class DialogueResolver {
       }) || [];
 
       const aggregatedNodeEntries = await Promise.all(nodeEntries.map(async ({ id }) => {
-        const values = await prisma.nodeEntry.findOne({ where: { id } }).values();
+        const values: Array<any> = []; // await prisma.nodeEntry.findOne({ where: { id } }).values(); //TODO: CHANGE BACK
         const nodeEntry = await prisma.nodeEntry.findOne({ where: { id } });
         const session = (await prisma.nodeEntry.findOne({ where: { id } }).session());
         const sessionId = session?.id;
