@@ -31,6 +31,11 @@ class EdgeResolver {
     conditions: any,
   ) : EdgeCreateInput {
     return {
+      dialogue: {
+        connect: {
+          id: parentNodeEntry.questionDialogueId,
+        },
+      },
       parentNode: {
         connect: {
           id: parentNodeEntry.id,
