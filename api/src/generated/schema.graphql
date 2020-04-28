@@ -83,6 +83,7 @@ type NodeEntry {
   depth: Int!
   id: ID!
   relatedEdgeId: String
+  relatedNode: QuestionNode!
   relatedNodeId: String!
   sessionId: String!
   values: [NodeEntryValue!]!
@@ -103,7 +104,9 @@ type Query {
   dialogues(customerId: String): [Dialogue!]!
   getQuestionnaireData(dialogueId: String): DialogueDetailResult!
   getQuestionNode(id: String): QuestionNode!
+  getSessionAnswerFlow(sessionId: ID): Session!
   questionNode(where: QuestionNodeWhereUniqueInput): QuestionNode!
+  session(where: SessionWhereUniqueInput): Session!
 }
 
 type QuestionNode {
@@ -139,6 +142,10 @@ type Session {
   dialogueId: String!
   id: ID!
   nodeEntries: [NodeEntry!]!
+}
+
+input SessionWhereUniqueInput {
+  id: ID!
 }
 
 type UniqueDataResultEntry {

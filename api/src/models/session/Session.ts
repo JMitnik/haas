@@ -2,6 +2,7 @@
 import { PrismaClient, NodeEntry, NodeEntryValue, Session } from '@prisma/client';
 import { objectType, queryType, extendType, inputObjectType } from '@nexus/schema';
 import SessionResolver from './session-resolver';
+import { QuestionNodeType } from '../question/QuestionNode';
 
 const prisma = new PrismaClient();
 
@@ -32,6 +33,13 @@ export const NodeEntryType = objectType({
     t.string('relatedEdgeId', { nullable: true });
     t.string('relatedNodeId');
     t.string('sessionId');
+    t.field('relatedNode', {
+      type: QuestionNodeType,
+      resolve(parent: NodeEntry, args: any, ctx: any, info: any) {
+        const relatedNode = prisma.questionNode.findOne({ where: { id: parent.relatedNodeId } });
+        return relatedNode;
+      },
+    });
     t.list.field('values', {
       type: NodeEntryValueType,
       resolve(parent: NodeEntry, args: any, ctx: any, info: any) {
@@ -100,6 +108,37 @@ export const UploadUserSessionInput = inputObjectType({
     t.string('questionnaireId', { required: true });
     t.list.field('entries', {
       type: UserSessionEntryInput,
+    });
+  },
+});
+
+export const SessionWhereUniqueInput = inputObjectType({
+  name: 'SessionWhereUniqueInput',
+  definition(t) {
+    t.id('id', { required: true });
+  },
+});
+
+export const getSessionAnswerFlowQuery = extendType({
+  type: 'Query',
+  definition(t) {
+    t.field('getSessionAnswerFlow', {
+      type: SessionType,
+      args: {
+        sessionId: 'ID',
+      },
+    });
+    t.field('session', {
+      type: SessionType,
+      args: {
+        where: SessionWhereUniqueInput,
+      },
+      resolve(parent: any, args: any, ctx: any, info: any) {
+        const session = prisma.session.findOne({ where: {
+          id: args.where.id,
+        } });
+        return session;
+      },
     });
   },
 });
