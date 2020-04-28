@@ -82,7 +82,7 @@ type NodeEntry {
   creationDate: String!
   depth: Int!
   id: ID!
-  relatedEdgeId: String!
+  relatedEdgeId: String
   relatedNodeId: String!
   sessionId: String!
   values: [NodeEntryValue!]!

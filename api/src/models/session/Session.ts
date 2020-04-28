@@ -29,7 +29,7 @@ export const NodeEntryType = objectType({
     t.id('id');
     t.string('creationDate');
     t.int('depth');
-    t.string('relatedEdgeId');
+    t.string('relatedEdgeId', { nullable: true });
     t.string('relatedNodeId');
     t.string('sessionId');
     t.list.field('values', {
@@ -38,7 +38,7 @@ export const NodeEntryType = objectType({
         const values = prisma.nodeEntryValue.findMany({ where: { nodeEntryId: parent.id } });
         return values;
       },
-    }); // TODO: ADD BACK
+    });
   },
 });
 
