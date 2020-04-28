@@ -91,8 +91,8 @@ type NodeEntry {
 type NodeEntryValue {
   id: ID!
   multiValues: [NodeEntryValue!]!
+  nodeEntryId: String
   numberValue: Int
-  parentNodeEntryId: String!
   parentNodeEntryValueId: Int
   textValue: String
 }

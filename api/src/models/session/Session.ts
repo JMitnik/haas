@@ -11,7 +11,7 @@ export const NodeEntryValueType = objectType({
     t.id('id');
     t.int('numberValue', { nullable: true });
     t.string('textValue', { nullable: true });
-    t.string('parentNodeEntryId');
+    t.string('nodeEntryId', { nullable: true });
     t.int('parentNodeEntryValueId', { nullable: true });
     t.list.field('multiValues', {
       type: NodeEntryValueType,
