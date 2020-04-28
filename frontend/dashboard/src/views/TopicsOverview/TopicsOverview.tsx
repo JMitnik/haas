@@ -33,7 +33,7 @@ const TopicsOverview: FC = () => {
   }
 
   const topics: Array<Questionnaire> = data?.dialogues;
-
+  console.log('topics: ', topics);
   return (
     <>
       <Container>

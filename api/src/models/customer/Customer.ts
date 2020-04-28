@@ -4,6 +4,8 @@ import { objectType, queryType, extendType, inputObjectType, arg } from '@nexus/
 import CustomerSettingsType from '../settings/CustomerSettings';
 import { DialogueType } from '../questionnaire/Dialogue';
 
+import DialogueResolver from '../questionnaire/questionnaire-resolver';
+
 const prisma = new PrismaClient();
 
 const CustomerType = objectType({
@@ -99,119 +101,9 @@ export const DeleteCustomerMutation = extendType({
           },
         });
 
-        // //// Session-related
         if (dialogueIds.length > 0) {
           await Promise.all(dialogueIds.map(async (dialogueId) => {
-            const dialogue = await prisma.dialogue.findOne({
-              where: {
-                id: dialogueId.id,
-              },
-              include: {
-                questions: {
-                  select: {
-                    id: true,
-                  },
-                },
-                edges: {
-                  select: {
-                    id: true,
-                  },
-                },
-                session: {
-                  select: {
-                    id: true,
-                  },
-                },
-              },
-            });
-
-            const sessionIds = dialogue?.session.map((session) => session.id);
-            const nodeEntries = await prisma.nodeEntry.findMany({ where: {
-              sessionId: {
-                in: sessionIds,
-              },
-            } });
-
-            const nodeEntryIds = nodeEntries.map((nodeEntry) => nodeEntry.id);
-            // FIXME: nodeEntryValues of leaf node remain in db
-            if (nodeEntryIds.length > 0) {
-              await prisma.nodeEntryValue.deleteMany(
-                { where: {
-                  nodeEntryId: {
-                    in: nodeEntryIds,
-                  },
-                } },
-              );
-
-              await prisma.nodeEntry.deleteMany(
-                { where: {
-                  sessionId: {
-                    in: sessionIds,
-                  },
-                } },
-              );
-            }
-
-            if (sessionIds && sessionIds.length > 0) {
-              await prisma.session.deleteMany(
-                { where: {
-                  id: {
-                    in: sessionIds,
-                  },
-                } },
-              );
-            }
-
-            // //// Edge-related
-            // FIXME: fill edges field dialogue
-            // TODO: Cascade delete edgeCondition
-            console.log('edges: ', dialogue?.edges);
-            const edgeIds = dialogue?.edges && dialogue?.edges.map((edge) => edge.id);
-            if (edgeIds && edgeIds.length > 0) {
-              await prisma.questionCondition.deleteMany(
-                { where: {
-                  edgeId: {
-                    in: edgeIds,
-                  },
-                } },
-              );
-
-              // TODO: Cascade delete edge
-              await prisma.edge.deleteMany(
-                { where: {
-                  id: {
-                    in: edgeIds,
-                  },
-                } },
-              );
-            }
-
-            // //// Question-related
-            const questionIds = dialogue?.questions.map((question) => question.id);
-            if (questionIds && questionIds.length > 0) {
-              await prisma.questionOption.deleteMany(
-                { where: {
-                  questionNodeId: {
-                    in: questionIds,
-                  },
-                } },
-              );
-
-              await prisma.questionNode.deleteMany(
-                { where: {
-                  id: {
-                    in: questionIds,
-                  },
-                } },
-              );
-            }
-
-            // TODO: Cascade delete dialogue
-            await prisma.dialogue.delete({
-              where: {
-                id: dialogueId.id,
-              },
-            });
+            await DialogueResolver.deleteDialogue(dialogueId.id);
           }));
         }
 

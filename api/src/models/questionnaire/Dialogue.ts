@@ -80,10 +80,10 @@ export const DialogueType = objectType({
   },
 });
 
-export const DialogueInput = inputObjectType({
+export const DialogueWhereUniqueInput = inputObjectType({
   name: 'DialogueWhereUniqueInput',
   definition(t) {
-    t.string('id', { required: true });
+    t.id('id', { required: true });
   },
 });
 
@@ -119,13 +119,28 @@ export const getQuestionnaireDataQuery = extendType({
   },
 });
 
+export const deleteDialogueOfCustomerMutation = extendType({
+  type: 'Mutation',
+  definition(t) {
+    t.field('deleteDialogue', {
+      type: DialogueType,
+      args: {
+        where: DialogueWhereUniqueInput,
+      },
+      resolve(parent: any, args: any, ctx: any, info: any) {
+        return DialogueResolver.deleteDialogue(args.where.id);
+      },
+    });
+  },
+});
+
 export const DialoguesOfCustomerQuery = extendType({
   type: 'Query',
   definition(t) {
     t.field('dialogue', {
       type: DialogueType,
       args: {
-        where: DialogueInput,
+        where: DialogueWhereUniqueInput,
       },
       resolve(parent: any, args: any, ctx: any, info: any) {
         const dialogue = prisma.dialogue.findOne({ where: {
@@ -137,7 +152,7 @@ export const DialoguesOfCustomerQuery = extendType({
     t.list.field('dialogues', {
       type: DialogueType,
       args: {
-        customerId: 'String',
+        customerId: 'ID',
       },
       resolve(parent: any, args: any, ctx: any, info: any) {
         const dialogues = prisma.dialogue.findMany({

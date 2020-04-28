@@ -52,7 +52,7 @@ type DialogueDetailResult {
 }
 
 input DialogueWhereUniqueInput {
-  id: String!
+  id: ID!
 }
 
 type Edge {
@@ -80,6 +80,7 @@ type FontSettings {
 
 type Mutation {
   deleteCustomer(where: CustomerWhereUniqueInput): Customer!
+  deleteDialogue(where: DialogueWhereUniqueInput): Dialogue!
   uploadUserSession(uploadUserSessionInput: UploadUserSessionInput): Session!
 }
 
@@ -106,7 +107,7 @@ type NodeEntryValue {
 type Query {
   customers: [Customer!]!
   dialogue(where: DialogueWhereUniqueInput): Dialogue!
-  dialogues(customerId: String): [Dialogue!]!
+  dialogues(customerId: ID): [Dialogue!]!
   getQuestionnaireData(dialogueId: String): DialogueDetailResult!
   getQuestionNode(id: String): QuestionNode!
   getSessionAnswerFlow(sessionId: ID): Session!

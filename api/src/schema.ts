@@ -5,7 +5,7 @@ import { nexusPrismaPlugin } from 'nexus-prisma';
 import path from 'path';
 import CustomerType, { CustomersQuery, DeleteCustomerMutation } from './models/customer/Customer';
 import CustomerSettingsType, { ColourSettingsType, FontSettingsType } from './models/settings/CustomerSettings';
-import { DialogueType, DialoguesOfCustomerQuery, DialogueDetailResultType, getQuestionnaireDataQuery, DialogueInput } from './models/questionnaire/Dialogue';
+import { DialogueWhereUniqueInput, deleteDialogueOfCustomerMutation, DialogueType, DialoguesOfCustomerQuery, DialogueDetailResultType, getQuestionnaireDataQuery } from './models/questionnaire/Dialogue';
 import { SessionWhereUniqueInput, getSessionAnswerFlowQuery, UniqueDataResultEntry, NodeEntryValueType, NodeEntryType, SessionType, uploadUserSessionMutation, UploadUserSessionInput, UserSessionEntryInput, UserSessionEntryDataInput } from './models/session/Session';
 import { QuestionNodeType, QuestionOptionType, QuestionNodeWhereInput, getQuestionNodeQuery, QuestionNodeInput } from './models/question/QuestionNode';
 import { EdgeConditionType, EdgeType } from './models/edge/Edge';
@@ -13,6 +13,8 @@ import { EdgeConditionType, EdgeType } from './models/edge/Edge';
 const schema = makeSchema({
   shouldGenerateArtifacts: true,
   types: [
+    deleteDialogueOfCustomerMutation,
+    DialogueWhereUniqueInput,
     DeleteCustomerMutation,
     SessionWhereUniqueInput,
     getSessionAnswerFlowQuery,
@@ -23,7 +25,6 @@ const schema = makeSchema({
     QuestionNodeInput,
     getQuestionNodeQuery,
     QuestionNodeWhereInput,
-    DialogueInput,
     EdgeConditionType,
     EdgeType,
     QuestionOptionType,
