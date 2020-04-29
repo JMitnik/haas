@@ -1,4 +1,4 @@
-import { Button, H3, H2 } from '@haas/ui';
+import { H3, H2 } from '@haas/ui';
 import styled, { css } from 'styled-components/macro';
 import { ActiveNodeContainer } from '../Node/NodeStyles';
 

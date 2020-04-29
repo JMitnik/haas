@@ -1,27 +1,20 @@
-import React, { useRef, useEffect } from 'react';
-import { useMutation } from '@apollo/react-hooks';
+import React from 'react';
 
-import { Textbox, Button, H3, H2, Div } from '@haas/ui';
-import { useHistory, useLocation } from 'react-router-dom';
-import useHAASTree from '../../../../components/Nodes/MultiChoiceNode/node_modules/hooks/use-haas-tree';
-import uploadEntryMutation from 'mutations/UploadEntryMutation';
+import { Textbox, H3, H2, Div } from '@haas/ui';
+import useHAASTree from 'providers/dialogue-tree-provider';
 import { useForm } from 'react-hook-form';
 import { CheckCircle } from 'react-feather';
 import { ButtonIcon } from '@haas/ui/src/Buttons';
 import { TextboxContainer } from './TextboxStyles';
-import { GenericNodeProps } from '../../../views/QuestionnaireTree/nodes/Node';
-import { ClientButton } from '../../../../components/Nodes/MultiChoiceNode/node_modules/components/Buttons/Buttons';
+import { GenericNodeProps } from '../Node/Node';
+import { ClientButton } from 'components/Buttons/Buttons';
 
 interface TextboxNodeProps extends GenericNodeProps {
   isLeaf?: boolean;
 }
 
-const TextboxNode = ({ isLeaf, node }: TextboxNodeProps) => {
-  const history = useHistory();
-  const location = useLocation();
-  const finishedRef = useRef(false);
+const TextboxNode = ({ node }: TextboxNodeProps) => {
   const { register, getValues, formState } = useForm();
-  const [submitForm] = useMutation(uploadEntryMutation, {});
   const {
     treeDispatch: { goToChild }
   } = useHAASTree();

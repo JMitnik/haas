@@ -29,7 +29,7 @@ const useJourneyFinish = () => {
         }
       }
     });
-  }, [historyStack, submitForm, history, location.pathname]);
+  }, [historyStack, submitForm, history, location.pathname, questionnaireId]);
 
   return { finishedRef };
 };

@@ -1,21 +1,14 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Flex, H2 } from '@haas/ui';
 import { Instagram, Facebook, Twitter, Linkedin } from 'react-feather';
-import { useMutation } from '@apollo/react-hooks';
-import uploadEntryMutation from 'mutations/UploadEntryMutation';
-import useHAASTree from '../../../../components/Nodes/MultiChoiceNode/node_modules/hooks/use-haas-tree';
 import { ShareItem } from './SocialShareNodeStyles';
-import { GenericNodeProps } from '../../../views/QuestionnaireTree/nodes/Node';
-import useJourneyFinish from '../../../../components/Nodes/RegisterNode/node_modules/hooks/use-journey-finish';
+import { GenericNodeProps } from '../Node/Node';
+import useDialogueFinish from 'hooks/use-dialogue-finish';
 
 type SocialShareNodeProps = GenericNodeProps;
 
-const SocialShareNode = ({ node, isLeaf }: SocialShareNodeProps) => {
-  const [submitForm] = useMutation(uploadEntryMutation, {});
-  const {
-    treeState: { historyStack }
-  } = useHAASTree();
-  const finish = useJourneyFinish();
+const SocialShareNode = ({ node }: SocialShareNodeProps) => {
+  useDialogueFinish();
 
   return (
     <>

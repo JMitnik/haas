@@ -1,10 +1,10 @@
 import React from 'react';
-import { Div, H2, H3, H4 } from '@haas/ui';
-import useJourneyFinish from 'hooks/use-journey-finish';
+import { Div, H2, H4 } from '@haas/ui';
+import useDialogueFinish from 'hooks/use-dialogue-finish';
 import { FinishNodeContainer } from './FinishNodeStyles';
 
 const FinishNode = () => {
-  const finish = useJourneyFinish();
+  useDialogueFinish();
 
   return (
     <FinishNodeContainer>

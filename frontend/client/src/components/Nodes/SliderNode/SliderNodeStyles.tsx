@@ -1,5 +1,5 @@
-import styled, { css } from 'styled-components/macro';
-import { Div, H2 } from '@haas/ui';
+import styled from 'styled-components/macro';
+import { H2 } from '@haas/ui';
 import { ActiveNodeContainer } from '../Node/NodeStyles';
 
 export const SliderNodeContainer = styled(ActiveNodeContainer)`

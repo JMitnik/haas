@@ -1,5 +1,5 @@
 import styled, { css } from 'styled-components/macro';
-import { Div, H1, H2, H3, H4 } from '@haas/ui';
+import { Div, H2 } from '@haas/ui';
 
 export const FloatingNodeContainer = styled(Div)`
   position: absolute;

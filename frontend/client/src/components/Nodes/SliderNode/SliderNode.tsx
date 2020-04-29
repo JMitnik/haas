@@ -1,9 +1,9 @@
 import React from 'react';
-import { H1, Slider, ColumnFlex, Div, H2 } from '@haas/ui';
+import { Slider, Div, H2 } from '@haas/ui';
 import { useForm } from 'react-hook-form';
 import useHAASTree from 'providers/dialogue-tree-provider';
 import { cleanInt } from 'utils/cleanInt';
-import { GenericNodeProps } from '../../../views/QuestionnaireTree/nodes/Node';
+import { GenericNodeProps } from '../Node/Node';
 import { HAASFormEntry } from 'providers/dialogue-provider';
 import { SliderNodeContainer, SliderNodeValue } from './SliderNodeStyles';
 

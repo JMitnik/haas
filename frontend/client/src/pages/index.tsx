@@ -1,11 +1,11 @@
 import React from 'react';
 import { Switch, Route, Redirect } from 'react-router-dom';
 
-import AppProviders from './GlobalAppState';
-import AppContainer from './AppContainer';
+import AppProviders from 'providers/app-providers';
+import AppContainer from 'styles/AppStyles';
 import { QuestionnaireProvider } from 'providers/dialogue-provider';
 import CustomerOverview from 'pages/customers';
-import QuestionnaireTree from './QuestionnaireTree/QuestionnaireTree';
+import DialogueTree from 'components/DialogueTree';
 
 const App = () => (
   <AppProviders>
@@ -14,7 +14,7 @@ const App = () => (
       <Switch>
         <Route path="/c/:customerId/q/:questionnaireId">
           <QuestionnaireProvider>
-            <QuestionnaireTree />
+            <DialogueTree />
           </QuestionnaireProvider>
         </Route>
         <Route path="/c/">

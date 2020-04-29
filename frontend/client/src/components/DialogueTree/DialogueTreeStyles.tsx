@@ -1,5 +1,5 @@
 import styled, { css } from 'styled-components/macro';
-import { Div, Container } from '@haas/ui';
+import { Div } from '@haas/ui';
 
 export const DialogueContainer = styled(Div)`
   ${({ theme }) => css`

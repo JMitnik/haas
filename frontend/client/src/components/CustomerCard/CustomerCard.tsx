@@ -2,7 +2,7 @@ import React from 'react';
 import { Div, Card, CardBody, CardFooter, H3, Flex, ColumnFlex } from '@haas/ui';
 import Select, { ActionMeta } from 'react-select';
 import { useHistory } from 'react-router-dom';
-import { CustomerCardImage, CustomerCardEnqueteLabel } from './CustomerOverviewStyles';
+import { CustomerCardImage, CustomerCardEnqueteLabel } from './CustomerCardStyles';
 
 const CustomerCard = ({ customer }: { customer: any }) => {
   const questionnaireOptions = customer?.questionnaires?.map((questionnaire: any) => ({

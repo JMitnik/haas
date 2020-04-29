@@ -1,13 +1,12 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import useQuestionnaire from 'providers/dialogue-provider';
 import { Loader, Container } from '@haas/ui';
 import { HAASTreeProvider } from 'providers/dialogue-tree-provider';
 
-import { useLocation } from 'react-router-dom';
 import { ThemeProvider } from 'styled-components';
 import { makeCustomTheme } from 'utils/makeCustomerTheme';
-import { QuestionnaireContainer } from './DialogueTreeStyles';
-import Node from './nodes/Node';
+import { DialogueContainer } from './DialogueTreeStyles';
+import Node from '../Nodes/Node';
 
 const DialogueTree = () => {
   const { questionnaire, customer } = useQuestionnaire();
@@ -30,13 +29,13 @@ const DialogueTree = () => {
   return (
     <>
       <ThemeProvider theme={(theme: any) => makeCustomTheme(theme, customTheme)}>
-        <QuestionnaireContainer>
+        <DialogueContainer>
           <Container>
             <HAASTreeProvider questionnaire={questionnaire}>
               <Node />
             </HAASTreeProvider>
           </Container>
-        </QuestionnaireContainer>
+        </DialogueContainer>
       </ThemeProvider>
     </>
   );
