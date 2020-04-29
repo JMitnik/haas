@@ -71,7 +71,6 @@ export const CustomerMutations = extendType({
       },
       async resolve(parent: any, args: any, ctx: any, info: any) {
         const customerId = args.where.id;
-        console.log('Customer ID: ', customerId);
 
         const customer = await prisma.customer.findOne({ where: { id: customerId },
           include: {
@@ -85,7 +84,6 @@ export const CustomerMutations = extendType({
 
         const colourSettingsId = customer?.settings?.colourSettingsId;
         const fontSettingsId = customer?.settings?.fontSettingsId;
-        console.log(customer?.settings);
 
         // //// Settings-related
         if (fontSettingsId) {
@@ -132,10 +130,8 @@ export const CustomerMutations = extendType({
             id: customerId,
           },
         });
-        console.log('Deleted customer: ', deletedCustomer.id);
         return customer;
       },
-      // deleteCustomer(where: CustomerWhereUniqueInput!): Customer
     });
   },
 });

@@ -39,7 +39,6 @@ class CustomerResolver {
       },
     });
 
-    console.log('Dialogue: ', questionnaire);
     const leafs = await NodeResolver.createTemplateLeafNodes(leafNodes, questionnaire.id);
 
     await NodeResolver.createTemplateNodes(questionnaire.id, customer.name, leafs);

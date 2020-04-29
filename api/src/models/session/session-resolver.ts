@@ -38,10 +38,7 @@ class SessionResolver {
       valuesObject.textValue = nodeEntry.data.textValue;
     }
 
-    console.log('Values object', valuesObject);
-
     return {
-      // todo: Add relatedEdge back
       relatedNode: {
         connect: {
           id: nodeEntry.nodeId,

@@ -98,11 +98,7 @@ export const topicBuilderMutations = extendType({
         topicData: TopicDataEntryInput,
       },
       resolve(parent: any, args: any, ctx: any, info: any) {
-        try {
-          return DialogueResolver.updateTopicBuilder(args);
-        } catch (e) {
-          console.log(`ERROR: ${e}`);
-        }
+        return DialogueResolver.updateTopicBuilder(args);
       },
     });
   },

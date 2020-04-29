@@ -74,7 +74,6 @@ const TopicBuilder = () => {
   };
 
   const topicBuilderData = data?.dialogue;
-  console.log('topic builder data: ', topicBuilderData);
   const selectLeafs = findLeafs(data?.dialogue?.leafs);
 
   const questionsData = mapQuestionsInputData(data?.dialogue?.questions);
@@ -94,8 +93,6 @@ const TopicBuilder = () => {
   if (!data || loading) {
     return <Loader />;
   }
-
-  console.log('questions: ', questions);
 
   const handleTitleChange = (title: string, qIndex: number) => {
     setQuestions((questionsPrev: any) => {
