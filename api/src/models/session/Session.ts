@@ -1,9 +1,7 @@
-import { PrismaClient, NodeEntry, NodeEntryValue, Session } from '@prisma/client';
+import { NodeEntry, NodeEntryValue, Session } from '@prisma/client';
 import { objectType, extendType, inputObjectType } from '@nexus/schema';
 import SessionResolver from './session-resolver';
 import { QuestionNodeType } from '../question/QuestionNode';
-
-const prisma = new PrismaClient();
 
 export const NodeEntryValueType = objectType({
   name: 'NodeEntryValue',
@@ -16,7 +14,7 @@ export const NodeEntryValueType = objectType({
     t.list.field('multiValues', {
       type: NodeEntryValueType,
       resolve(parent: NodeEntryValue, args: any, ctx: any, info: any) {
-        const multiValues = prisma.nodeEntryValue.findMany({ where: { parentNodeEntryValueId: parent.id } });
+        const multiValues = ctx.prisma.nodeEntryValue.findMany({ where: { parentNodeEntryValueId: parent.id } });
         return multiValues;
       },
     });
@@ -35,14 +33,14 @@ export const NodeEntryType = objectType({
     t.field('relatedNode', {
       type: QuestionNodeType,
       resolve(parent: NodeEntry, args: any, ctx: any, info: any) {
-        const relatedNode = prisma.questionNode.findOne({ where: { id: parent.relatedNodeId } });
+        const relatedNode = ctx.prisma.questionNode.findOne({ where: { id: parent.relatedNodeId } });
         return relatedNode;
       },
     });
     t.list.field('values', {
       type: NodeEntryValueType,
       resolve(parent: NodeEntry, args: any, ctx: any, info: any) {
-        const values = prisma.nodeEntryValue.findMany({ where: { nodeEntryId: parent.id } });
+        const values = ctx.prisma.nodeEntryValue.findMany({ where: { nodeEntryId: parent.id } });
         return values;
       },
     });
@@ -58,7 +56,7 @@ export const SessionType = objectType({
     t.list.field('nodeEntries', {
       type: NodeEntryType,
       resolve(parent: Session, args: any, ctx: any, info: any) {
-        const nodeEntries = prisma.nodeEntry.findMany({
+        const nodeEntries = ctx.prisma.nodeEntry.findMany({
           where: {
             sessionId: parent.id,
           },
@@ -133,7 +131,7 @@ export const getSessionAnswerFlowQuery = extendType({
         where: SessionWhereUniqueInput,
       },
       resolve(parent: any, args: any, ctx: any, info: any) {
-        const session = prisma.session.findOne({ where: {
+        const session = ctx.prisma.session.findOne({ where: {
           id: args.where.id,
         } });
         return session;

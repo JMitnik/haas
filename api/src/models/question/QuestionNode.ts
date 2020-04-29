@@ -1,8 +1,6 @@
-import { PrismaClient, Customer, QuestionNode } from '@prisma/client';
-import { objectType, queryType, extendType, inputObjectType, arg } from '@nexus/schema';
+import { QuestionNode } from '@prisma/client';
+import { objectType, extendType, inputObjectType } from '@nexus/schema';
 import { EdgeType } from '../edge/Edge';
-
-const prisma = new PrismaClient();
 
 export const QuestionOptionType = objectType({
   name: 'QuestionOption',
@@ -29,14 +27,14 @@ export const QuestionNodeType = objectType({
       type: QuestionNodeType,
       nullable: true,
       resolve(parent: QuestionNode, args: any, ctx: any, info: any) {
-        const overrideLeaf = prisma.questionNode.findOne({ where: { id: parent.id } }).overrideLeaf();
+        const overrideLeaf = ctx.prisma.questionNode.findOne({ where: { id: parent.id } }).overrideLeaf();
         return overrideLeaf;
       },
     });
     t.list.field('options', {
       type: QuestionOptionType,
       resolve(parent: QuestionNode, args: any, ctx: any, info: any) {
-        const options = prisma.questionOption.findMany({
+        const options = ctx.prisma.questionOption.findMany({
           where: {
             questionNodeId: parent.id,
           },
@@ -47,7 +45,7 @@ export const QuestionNodeType = objectType({
     t.list.field('children', {
       type: EdgeType,
       resolve(parent: QuestionNode, args: any, ctx: any, info: any) {
-        const children = prisma.edge.findMany({
+        const children = ctx.prisma.edge.findMany({
           where: {
             parentNodeId: parent.id,
           },
@@ -82,7 +80,7 @@ export const getQuestionNodeQuery = extendType({
         where: QuestionNodeInput,
       },
       resolve(parent: any, args: any, ctx: any, info: any) {
-        const questionNode = prisma.questionNode.findOne({
+        const questionNode = ctx.prisma.questionNode.findOne({
           where: {
             id: args.where.id,
           },
@@ -93,7 +91,7 @@ export const getQuestionNodeQuery = extendType({
     t.list.field('questionNodes', {
       type: QuestionNodeType,
       resolve(parent: any, args: any, ctx: any, info: any) {
-        return prisma.questionNode.findMany();
+        return ctx.prisma.questionNode.findMany();
       },
     });
   },

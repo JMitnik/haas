@@ -1,11 +1,9 @@
-import { PrismaClient, Dialogue } from '@prisma/client';
+import { Dialogue } from '@prisma/client';
 import { objectType, extendType, inputObjectType } from '@nexus/schema';
 import { UniqueDataResultEntry } from '../session/Session';
 import { QuestionNodeType, QuestionNodeWhereInput } from '../question/QuestionNode';
 import { CustomerType } from '../customer/Customer';
 import DialogueResolver from './dialogue-resolver';
-
-const prisma = new PrismaClient();
 
 export const DialogueType = objectType({
   name: 'Dialogue',
@@ -19,7 +17,7 @@ export const DialogueType = objectType({
     t.field('customer', {
       type: CustomerType,
       resolve(parent: Dialogue, args: any, ctx: any, info: any) {
-        const customer = prisma.customer.findOne({
+        const customer = ctx.prisma.customer.findOne({
           where: {
             id: parent.customerId,
           },
@@ -35,7 +33,7 @@ export const DialogueType = objectType({
       },
       resolve(parent: Dialogue, args: any, ctx: any, info: any) {
         if (args?.where?.isRoot) {
-          const rootQuestion = prisma.questionNode.findMany({
+          const rootQuestion = ctx.prisma.questionNode.findMany({
             where: {
               isRoot: args.where.isRoot,
             },
@@ -44,7 +42,7 @@ export const DialogueType = objectType({
         }
 
         if (args?.where?.id) {
-          const questions = prisma.questionNode.findMany({
+          const questions = ctx.prisma.questionNode.findMany({
             where: {
               id: args.where.id,
             },
@@ -52,7 +50,7 @@ export const DialogueType = objectType({
           return questions;
         }
 
-        const questions = prisma.questionNode.findMany({
+        const questions = ctx.prisma.questionNode.findMany({
           where: {
             AND: [
               {
@@ -70,7 +68,7 @@ export const DialogueType = objectType({
     t.list.field('leafs', {
       type: QuestionNodeType,
       resolve(parent: Dialogue, args: any, ctx: any, info: any) {
-        const leafs = prisma.questionNode.findMany({
+        const leafs = ctx.prisma.questionNode.findMany({
           where: {
             AND: [
               {
@@ -164,7 +162,7 @@ export const DialoguesOfCustomerQuery = extendType({
         where: DialogueWhereUniqueInput,
       },
       resolve(parent: any, args: any, ctx: any, info: any) {
-        const dialogue = prisma.dialogue.findOne({ where: {
+        const dialogue = ctx.prisma.dialogue.findOne({ where: {
           id: args.where.id,
         } });
         return dialogue;
@@ -176,7 +174,7 @@ export const DialoguesOfCustomerQuery = extendType({
         customerId: 'ID',
       },
       resolve(parent: any, args: any, ctx: any, info: any) {
-        const dialogues = prisma.dialogue.findMany({
+        const dialogues = ctx.prisma.dialogue.findMany({
           where: {
             customerId: args.customerId,
           },

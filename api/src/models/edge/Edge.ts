@@ -1,8 +1,6 @@
-import { PrismaClient, Edge } from '@prisma/client';
+import { Edge } from '@prisma/client';
 import { objectType, extendType } from '@nexus/schema';
 import { QuestionNodeType } from '../question/QuestionNode';
-
-const prisma = new PrismaClient();
 
 export const EdgeConditionType = objectType({
   name: 'EdgeCondition',
@@ -28,7 +26,7 @@ export const EdgeType = objectType({
     t.field('parentNode', {
       type: QuestionNodeType,
       resolve(parent: Edge, args: any, ctx: any, info: any) {
-        const parentNode = prisma.questionNode.findOne({ where: {
+        const parentNode = ctx.prisma.questionNode.findOne({ where: {
           id: parent.parentNodeId,
         } });
         return parentNode;
@@ -37,7 +35,7 @@ export const EdgeType = objectType({
     t.field('childNode', {
       type: QuestionNodeType,
       resolve(parent: Edge, args: any, ctx: any, info: any) {
-        const childNode = prisma.questionNode.findOne({ where: {
+        const childNode = ctx.prisma.questionNode.findOne({ where: {
           id: parent.childNodeId,
         } });
         return childNode;
@@ -46,7 +44,7 @@ export const EdgeType = objectType({
     t.list.field('conditions', {
       type: EdgeConditionType,
       resolve(parent: Edge, args: any, ctx: any, info: any) {
-        const edgeConditions = prisma.questionCondition.findMany({
+        const edgeConditions = ctx.prisma.questionCondition.findMany({
           where: {
             edgeId: parent.id,
           },
@@ -66,7 +64,7 @@ export const EdgeQueries = extendType({
         id: 'String',
       },
       resolve(parent: any, args: any, ctx: any, info: any) {
-        return prisma.edge.findOne({ where: { id: args.id } });
+        return ctx.prisma.edge.findOne({ where: { id: args.id } });
       },
     });
   },

@@ -1,13 +1,11 @@
-import { PrismaClient, Customer } from '@prisma/client';
-import { objectType, queryType, extendType, inputObjectType, arg } from '@nexus/schema';
+import { Customer, PrismaClient } from '@prisma/client';
+import { objectType, extendType, inputObjectType } from '@nexus/schema';
 
 import { CustomerSettingsType } from '../settings/CustomerSettings';
 import { DialogueType } from '../questionnaire/Dialogue';
 
 import DialogueResolver from '../questionnaire/dialogue-resolver';
 import CustomerResolver from './customer-resolver';
-
-const prisma = new PrismaClient();
 
 export const CustomerType = objectType({
   name: 'Customer',
@@ -17,14 +15,14 @@ export const CustomerType = objectType({
     t.field('settings', {
       type: CustomerSettingsType,
       resolve(parent: Customer, args: any, ctx: any, info: any) {
-        const customerSettings = prisma.customerSettings.findOne({ where: { customerId: parent.id } });
+        const customerSettings = ctx.prisma.customerSettings.findOne({ where: { customerId: parent.id } });
         return customerSettings;
       },
     });
     t.list.field('dialogues', {
       type: DialogueType,
       resolve(parent: Customer, args: any, ctx: any, info: any) {
-        const dialogues = prisma.dialogue.findMany({
+        const dialogues = ctx.prisma.dialogue.findMany({
           where: {
             customerId: parent.id,
           },
@@ -71,8 +69,9 @@ export const CustomerMutations = extendType({
       },
       async resolve(parent: any, args: any, ctx: any, info: any) {
         const customerId = args.where.id;
+        const { prisma } : { prisma: PrismaClient } = ctx.prisma; // TODO: Check with jonathan if this is preferred for auto completion
 
-        const customer = await prisma.customer.findOne({ where: { id: customerId },
+        const customer = await ctx.prisma.customer.findOne({ where: { id: customerId },
           include: {
             settings: {
               include: {
@@ -87,7 +86,7 @@ export const CustomerMutations = extendType({
 
         // //// Settings-related
         if (fontSettingsId) {
-          await prisma.fontSettings.delete({
+          await ctx.prisma.fontSettings.delete({
             where: {
               id: fontSettingsId,
             },
@@ -95,7 +94,7 @@ export const CustomerMutations = extendType({
         }
 
         if (colourSettingsId) {
-          await prisma.colourSettings.delete({
+          await ctx.prisma.colourSettings.delete({
             where: {
               id: colourSettingsId,
             },
@@ -103,7 +102,7 @@ export const CustomerMutations = extendType({
         }
 
         if (customer?.settings) {
-          await prisma.customerSettings.delete({
+          await ctx.prisma.customerSettings.delete({
             where: {
               customerId,
             },
@@ -125,7 +124,7 @@ export const CustomerMutations = extendType({
           }));
         }
 
-        const deletedCustomer = await prisma.customer.delete({
+        const deletedCustomer = await ctx.prisma.customer.delete({
           where: {
             id: customerId,
           },
