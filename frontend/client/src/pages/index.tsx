@@ -4,9 +4,8 @@ import { Switch, Route, Redirect } from 'react-router-dom';
 import AppProviders from 'providers/app-providers';
 import AppContainer from 'styles/AppStyles';
 import { QuestionnaireProvider } from 'providers/dialogue-provider';
-import CustomerOverview from 'pages/customers';
-import DialogueTree from 'components/DialogueTree';
 import CustomerPage from 'pages/customers';
+import DialogueTreePage from './dialogue';
 
 const App = () => (
   <AppProviders>
@@ -15,7 +14,7 @@ const App = () => (
       <Switch>
         <Route path="/c/:customerId/q/:questionnaireId">
           <QuestionnaireProvider>
-            <DialogueTree />
+            <DialogueTreePage />
           </QuestionnaireProvider>
         </Route>
         <Route path="/c/">

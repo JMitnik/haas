@@ -1,8 +1,8 @@
 import React from 'react';
-import DialogueEnd from "components/DialogueEnd";
+import DialogueTree from 'components/DialogueTree';
 
-const DialogueEndPage = () => (
-  <DialogueEnd />
+const DialogueTreePage = () => (
+  <DialogueTree />
 );
 
-export default DialogueEndPage;
+export default DialogueTreePage;
