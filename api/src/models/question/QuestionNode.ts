@@ -27,7 +27,9 @@ export const QuestionNodeType = objectType({
       type: QuestionNodeType,
       nullable: true,
       resolve(parent: QuestionNode, args: any, ctx: any, info: any) {
-        const overrideLeaf = ctx.prisma.questionNode.findOne({ where: { id: parent.id } }).overrideLeaf();
+        const overrideLeaf = ctx.prisma.questionNode.findOne(
+          { where: { id: parent.id } },
+        ).overrideLeaf();
         return overrideLeaf;
       },
     });

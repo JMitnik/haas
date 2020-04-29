@@ -14,7 +14,9 @@ export const NodeEntryValueType = objectType({
     t.list.field('multiValues', {
       type: NodeEntryValueType,
       resolve(parent: NodeEntryValue, args: any, ctx: any, info: any) {
-        const multiValues = ctx.prisma.nodeEntryValue.findMany({ where: { parentNodeEntryValueId: parent.id } });
+        const multiValues = ctx.prisma.nodeEntryValue.findMany(
+          { where: { parentNodeEntryValueId: parent.id } },
+        );
         return multiValues;
       },
     });
@@ -33,14 +35,18 @@ export const NodeEntryType = objectType({
     t.field('relatedNode', {
       type: QuestionNodeType,
       resolve(parent: NodeEntry, args: any, ctx: any, info: any) {
-        const relatedNode = ctx.prisma.questionNode.findOne({ where: { id: parent.relatedNodeId } });
+        const relatedNode = ctx.prisma.questionNode.findOne(
+          { where: { id: parent.relatedNodeId } },
+        );
         return relatedNode;
       },
     });
     t.list.field('values', {
       type: NodeEntryValueType,
       resolve(parent: NodeEntry, args: any, ctx: any, info: any) {
-        const values = ctx.prisma.nodeEntryValue.findMany({ where: { nodeEntryId: parent.id } });
+        const values = ctx.prisma.nodeEntryValue.findMany(
+          { where: { nodeEntryId: parent.id } },
+        );
         return values;
       },
     });

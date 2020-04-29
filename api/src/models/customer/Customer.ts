@@ -15,7 +15,9 @@ export const CustomerType = objectType({
     t.field('settings', {
       type: CustomerSettingsType,
       resolve(parent: Customer, args: any, ctx: any, info: any) {
-        const customerSettings = ctx.prisma.customerSettings.findOne({ where: { customerId: parent.id } });
+        const customerSettings = ctx.prisma.customerSettings.findOne(
+          { where: { customerId: parent.id } },
+        );
         return customerSettings;
       },
     });
@@ -69,7 +71,8 @@ export const CustomerMutations = extendType({
       },
       async resolve(parent: any, args: any, ctx: any, info: any) {
         const customerId = args.where.id;
-        const { prisma } : { prisma: PrismaClient } = ctx.prisma; // TODO: Check with jonathan if this is preferred for auto completion
+        // TODO: Check with jonathan if this is preferred for auto completion
+        const { prisma } : { prisma: PrismaClient } = ctx.prisma;
 
         const customer = await ctx.prisma.customer.findOne({ where: { id: customerId },
           include: {
