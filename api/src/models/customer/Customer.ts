@@ -124,7 +124,7 @@ export const CustomerMutations = extendType({
           }));
         }
 
-        const deletedCustomer = await ctx.prisma.customer.delete({
+        await ctx.prisma.customer.delete({
           where: {
             id: customerId,
           },
@@ -141,7 +141,7 @@ export const CustomersQuery = extendType({
     t.list.field('customers', {
       type: CustomerType,
       resolve(parent: any, args: any, ctx: any, info: any) {
-        const customers = prisma.customer.findMany();
+        const customers = ctx.prisma.customer.findMany();
         return customers;
       },
     });
