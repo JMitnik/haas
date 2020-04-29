@@ -83,7 +83,6 @@ model QuestionNode {
   questionDialogueId         String?
   isChildNodeOf              Edge[]           @relation("Edge_childNodeToQuestionNode")
   isParentNodeOf             Edge[]           @relation("Edge_parentNodeToQuestionNode")
-  // // yea geen idee waar deze voor is maar ik laat em staan
   isRelatedNodeOfNodeEntries NodeEntry[]
   edgeId                     String?
 }
@@ -99,14 +98,11 @@ model Edge {
   isEdgeOf                   QuestionNode[]      @relation("EdgeChildrenRelation")
   childNode                  QuestionNode        @relation("Edge_childNodeToQuestionNode", fields: [childNodeId], references: [id])
   parentNode                 QuestionNode        @relation("Edge_parentNodeToQuestionNode", fields: [parentNodeId], references: [id])
-  // FIXME: dialogue ID wordt niet gevuld volgens mij
   dialogue                   Dialogue?           @relation(fields: [dialogueId], references: [id])
-  // // yea geen idee waar deze voor is maar ik laat em staan
   isRelatedNodeOfNodeEntries NodeEntry[]
   questionNodeId             String?
 }
 
-// edge          Edge?   @relation(fields: [edgeId], references: [id])
 model QuestionCondition {
   conditionType String
   id            Int     @default(autoincrement()) @id

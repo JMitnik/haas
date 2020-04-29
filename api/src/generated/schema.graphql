@@ -145,7 +145,6 @@ type Query {
   dialogues(customerId: ID): [Dialogue!]!
   edge(id: String): Edge!
   getQuestionnaireData(dialogueId: String): DialogueDetailResult!
-  getQuestionNode(id: String): QuestionNode!
   getSessionAnswerFlow(sessionId: ID): Session!
   questionNode(where: QuestionNodeWhereUniqueInput): QuestionNode!
   questionNodes: [QuestionNode!]!

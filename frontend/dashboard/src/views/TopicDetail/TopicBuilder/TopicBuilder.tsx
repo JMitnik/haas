@@ -87,7 +87,6 @@ const TopicBuilder = () => {
       const questionData = mapQuestionsInputData(data?.dialogue?.questions);
       setQuestions(questionData);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
   if (!data || loading) {

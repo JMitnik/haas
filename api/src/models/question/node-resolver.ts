@@ -121,8 +121,6 @@ class NodeResolver {
     isRoot: boolean = false,
     overrideLeafId: string = '',
     isLeaf: boolean = false) => {
-    console.log(`title: ${title}, dialogue: ${questionnaireId}, type: ${type}, options: ${options}, isRoot: ${isRoot}, overrideLeaf: ${overrideLeafId}, isLeaf: ${isLeaf}`);
-
     const override = overrideLeafId ? {
       connect: {
         id: overrideLeafId,
@@ -177,7 +175,6 @@ class NodeResolver {
 
   static createTemplateLeafNodes = async (
     leafNodesArray: Array<LeafNodeDataEntryProps>, dialogueId: string) => {
-    console.log('Leaf node data:', leafNodesArray);
     const leafs = await Promise.all(
       leafNodesArray.map(async ({ title, type }) => prisma.questionNode.create({
         data: {
@@ -193,7 +190,6 @@ class NodeResolver {
         },
       })),
     );
-    console.log('Succesfully create leaf nodes');
     return leafs;
   };
 
@@ -242,10 +238,8 @@ class NodeResolver {
           },
         },
       } });
-    // console.log('Active question: ', activeQuestion);
     const activeEdges = activeQuestion ? activeQuestion?.children.map((edge) => edge.id) : [];
     const activeOptions = activeQuestion ? activeQuestion?.options.map((option) => option.id) : [];
-    console.log('Ative options: ', activeOptions, 'Coming in options: ', options);
     const currentOverrideLeafId = activeQuestion ? activeQuestion.overrideLeafId : null;
 
     const leaf = NodeResolver.getLeafObject(currentOverrideLeafId, overrideLeaf);
@@ -376,7 +370,6 @@ class NodeResolver {
     newOptions: Array<QuestionOptionProps>,
     questionId: string) => {
     if (questionId) {
-      console.log('');
       const newOptioIds = newOptions?.map(({ id }) => id);
       const removeQOptionsIds = activeOptions?.filter((id) => (!newOptioIds.includes(id) && id));
       if (removeQOptionsIds?.length > 0) {

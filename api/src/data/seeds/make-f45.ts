@@ -1,4 +1,3 @@
-// import { prisma } from '../../src/generated/prisma-client/index';
 import { PrismaClient } from '@prisma/client';
 import CustomerResolver from '../../models/customer/customer-resolver';
 

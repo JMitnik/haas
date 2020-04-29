@@ -135,9 +135,6 @@ class DialogueResolver {
     }
 
     // //// Edge-related
-    // FIXME: fill edges field dialogue
-    // TODO: Cascade delete edgeCondition
-    console.log('edges: ', dialogue?.edges);
     const edgeIds = dialogue?.edges && dialogue?.edges.map((edge) => edge.id);
     if (edgeIds && edgeIds.length > 0) {
       await prisma.questionCondition.deleteMany(
@@ -148,7 +145,6 @@ class DialogueResolver {
         } },
       );
 
-      // TODO: Cascade delete edge
       await prisma.edge.deleteMany(
         { where: {
           id: {
@@ -178,7 +174,6 @@ class DialogueResolver {
       );
     }
 
-    // TODO: Cascade delete dialogue
     const deletedDialogue = await prisma.dialogue.delete({
       where: {
         id: dialogueId,
@@ -282,11 +277,9 @@ class DialogueResolver {
 
   static updateTopicBuilder = async (args: any) => {
     try {
-      console.log('In topicbuilder');
       const questionnaireId: string = args.id || undefined;
       const { questions }: { questions: Array<any> } = args.topicData;
       const finalQuestions = await DialogueResolver.uuidToPrismaIds(questions, questionnaireId);
-      console.log('finalQuestions: ', finalQuestions);
       await Promise.all(finalQuestions.map(async (question) => NodeResolver.updateQuestion(
         questionnaireId,
         question,
@@ -294,7 +287,6 @@ class DialogueResolver {
 
       return 'Succesfully updated topic(?)';
     } catch (e) {
-      console.log(`Something went wrong in update topic builder: ${e}`);
       return `Something went wrong in update topic builder: ${e}`;
     }
   };

@@ -1,18 +1,10 @@
 import { PrismaClient } from '@prisma/client';
-// import { prisma, ID_Input } from '../../generated/prisma-client/index';
 import { Customer } from '../../generated/resolver-types';
 import { leafNodes } from '../../data/seeds/default-data';
 import NodeResolver from '../question/node-resolver';
 
 const prisma = new PrismaClient();
 class CustomerResolver {
-  // static deleteFullCustomerNode = async (obj: any, args: any) => {
-  //   const { id }: { id: string } = args;
-  //   const customerId = id;
-  //   const customer = await prisma.deleteCustomer({ id: customerId });
-  //   return customer;
-  // };
-
   static customers = async () => {
     const customers = prisma.customer.findMany();
     return customers;

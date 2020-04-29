@@ -3,7 +3,7 @@ import QuestionFragment from './QuestionFragment';
 import { CustomerFragment } from './CustomerFragment';
 
 export const getQuestionnaireQuery = gql`
-  query getQuestionnaire($id: String!) {
+  query getQuestionnaire($id: ID!) {
     dialogue(where: { id: $id }) {
       id
       title
