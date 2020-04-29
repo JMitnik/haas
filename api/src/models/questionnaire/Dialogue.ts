@@ -34,14 +34,22 @@ export const DialogueType = objectType({
         where: QuestionNodeWhereInput, // TODO: Use prisma generated type?
       },
       resolve(parent: Dialogue, args: any, ctx: any, info: any) {
-        console.log('HELLO?');
-        if (args.where.isRoot) {
+        if (args?.where?.isRoot) {
           const rootQuestion = prisma.questionNode.findMany({
             where: {
               isRoot: args.where.isRoot,
             },
           });
           return rootQuestion;
+        }
+
+        if (args?.where?.id) {
+          const questions = prisma.questionNode.findMany({
+            where: {
+              id: args.where.id,
+            },
+          });
+          return questions;
         }
 
         const questions = prisma.questionNode.findMany({

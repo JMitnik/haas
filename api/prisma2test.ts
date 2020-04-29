@@ -7,39 +7,13 @@ async function main() {
   // ... you will write your Prisma Client queries here
   const questionnaireId = 'ck9jm0gsf00008dr5w2w54vcc';
 
-  const session = await prisma.session.create({
-    data: {
-      dialogue: {
-        connect: {
-          id: questionnaireId,
-        },
-      },
-      nodeEntries: {
-        create: [
-          {},
-          {},
-        ],
-      },
-    },
-  });
+  const nodes = await prisma.questionNode.findMany();
+  console.log(nodes[0]);
 
-  const nodeEntry = await prisma.nodeEntry.create({
-    data: {
-      // relatedNode: {
-      //   create: {
-      //     title: 'Hi',
-      //     type: 'mult',
-      //   },
-      // },
-      session: {
-        connect: {
-          id: session.id,
-        },
-      },
-    },
+  const specificNode = await prisma.questionNode.findOne({
+    where: { id: 'ck9ldc2mg0000xsr5fk4wqob9' },
   });
-
-  console.log('NodeEntry: ', nodeEntry);
+  console.log(specificNode);
 }
 
 main()

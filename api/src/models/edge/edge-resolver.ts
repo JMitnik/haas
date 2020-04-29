@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 // import { prisma, QuestionNode, EdgeCreateInput } from '../../generated/prisma-client';
 
 interface QuestionConditionProps {
-  id?: string;
+  id?: number;
   conditionType: string;
   renderMin: number;
   renderMax: number;
@@ -53,7 +53,9 @@ class EdgeResolver {
   }
 
   static createEdge = async (parent: QuestionNode, child: QuestionNode, conditions: any) => {
-    const edge = await prisma.edge.create({ data: EdgeResolver.constructEdge(parent, child, conditions) });
+    const edge = await prisma.edge.create(
+      { data: EdgeResolver.constructEdge(parent, child, conditions) },
+    );
 
     await prisma.questionNode.update({
       where: {
@@ -67,16 +69,16 @@ class EdgeResolver {
     });
   };
 
-  // static removeNonExistingEdges = async (activeEdges: Array<string>,
-  //   newEdges: Array<EdgeChildProps>, questionId: any) => {
-  //   if (questionId) {
-  //     const newEdgeIds = newEdges.map(({ id }) => id);
-  //     const removeEdgeChildIds = activeEdges?.filter((id) => (!newEdgeIds.includes(id) && id));
-  //     if (removeEdgeChildIds?.length > 0) {
-  //       await prisma.deleteManyEdges({ id_in: removeEdgeChildIds });
-  //     }
-  //   }
-  // };
+  static removeNonExistingEdges = async (activeEdges: Array<string>,
+    newEdges: Array<EdgeChildProps>, questionId: any) => {
+    if (questionId) {
+      const newEdgeIds = newEdges.map(({ id }) => id);
+      const removeEdgeChildIds = activeEdges?.filter((id) => (!newEdgeIds.includes(id) && id));
+      if (removeEdgeChildIds?.length > 0) {
+        await prisma.edge.deleteMany({ where: { id: { in: removeEdgeChildIds } } });
+      }
+    }
+  };
 }
 
 export default EdgeResolver;

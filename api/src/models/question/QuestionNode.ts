@@ -8,7 +8,7 @@ const prisma = new PrismaClient();
 export const QuestionOptionType = objectType({
   name: 'QuestionOption',
   definition(t) {
-    t.id('id');
+    t.int('id');
     t.string('value');
     t.string('publicValue', { nullable: true });
     t.string('questionId');
@@ -19,6 +19,7 @@ export const QuestionNodeType = objectType({
   name: 'QuestionNode',
   definition(t) {
     t.id('id');
+    t.string('creationDate', { nullable: true });
     t.boolean('isLeaf');
     t.boolean('isRoot');
     t.string('title');
@@ -62,6 +63,7 @@ export const QuestionNodeWhereInput = inputObjectType({
   name: 'QuestionNodeWhereInput',
   definition(t) {
     t.boolean('isRoot', { nullable: true });
+    t.id('id', { nullable: true });
   },
 });
 
@@ -101,6 +103,12 @@ export const getQuestionNodeQuery = extendType({
           },
         });
         return questionNode;
+      },
+    });
+    t.list.field('questionNodes', {
+      type: QuestionNodeType,
+      resolve(parent: any, args: any, ctx: any, info: any) {
+        return prisma.questionNode.findMany();
       },
     });
   },

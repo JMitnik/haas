@@ -8,11 +8,21 @@ import CustomerSettingsType, { ColourSettingsType, FontSettingsType } from './mo
 import { DialogueWhereUniqueInput, deleteDialogueOfCustomerMutation, DialogueType, DialoguesOfCustomerQuery, DialogueDetailResultType, getQuestionnaireDataQuery } from './models/questionnaire/Dialogue';
 import { SessionWhereUniqueInput, getSessionAnswerFlowQuery, UniqueDataResultEntry, NodeEntryValueType, NodeEntryType, SessionType, uploadUserSessionMutation, UploadUserSessionInput, UserSessionEntryInput, UserSessionEntryDataInput } from './models/session/Session';
 import { QuestionNodeType, QuestionOptionType, QuestionNodeWhereInput, getQuestionNodeQuery, QuestionNodeInput } from './models/question/QuestionNode';
-import { EdgeConditionType, EdgeType } from './models/edge/Edge';
+import { LeafNodeInput, QuestionConditionInput, EdgeNodeInput, EdgeChildInput, QuestionOptionInput, QuestionInput, TopicDataEntryInput, topicBuilderMutations } from './models/topicBuilder/TopicBuilder';
+import { EdgeConditionType, EdgeType, EdgeQueries } from './models/edge/Edge';
 
 const schema = makeSchema({
   shouldGenerateArtifacts: true,
   types: [
+    EdgeQueries,
+    LeafNodeInput,
+    QuestionConditionInput,
+    EdgeNodeInput,
+    EdgeChildInput,
+    QuestionOptionInput,
+    QuestionInput,
+    TopicDataEntryInput,
+    topicBuilderMutations,
     CustomerCreateOptionsInput,
     deleteDialogueOfCustomerMutation,
     DialogueWhereUniqueInput,

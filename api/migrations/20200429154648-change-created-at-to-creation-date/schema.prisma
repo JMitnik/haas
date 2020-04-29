@@ -11,7 +11,7 @@ model ColourSettings {
   dark             String?
   darkest          String?
   error            String?
-  id               Int              @default(autoincrement()) @id
+  id               Int               @default(autoincrement()) @id
   light            String?
   lightest         String?
   muted            String?
@@ -23,16 +23,16 @@ model ColourSettings {
   tertiary         String?
   text             String?
   warning          String?
-  customerSettings CustomerSettings
+  customerSettings CustomerSettings?
 }
 
 model FontSettings {
   body             String?
   fontTitle        String?
-  id               Int              @default(autoincrement()) @id
+  id               Int               @default(autoincrement()) @id
   settingTitle     String?
   special          String?
-  CustomerSettings CustomerSettings
+  customerSettings CustomerSettings?
 }
 
 model CustomerSettings {
@@ -68,6 +68,8 @@ model Dialogue {
 
 model QuestionNode {
   id                         String           @default(cuid()) @id
+  creationDate               DateTime         @default(now())
+  updatedAt                  DateTime?        @updatedAt
   isLeaf                     Boolean          @default(false)
   isRoot                     Boolean          @default(false)
   title                      String
@@ -93,7 +95,7 @@ model Edge {
   id                         String              @default(cuid()) @id
   parentNodeId               String
   dialogueId                 String?
-  conditions                 QuestionCondition[] @relation("EdgeQQonditions")
+  conditions                 QuestionCondition[]
   isEdgeOf                   QuestionNode[]      @relation("EdgeChildrenRelation")
   childNode                  QuestionNode        @relation("Edge_childNodeToQuestionNode", fields: [childNodeId], references: [id])
   parentNode                 QuestionNode        @relation("Edge_parentNodeToQuestionNode", fields: [parentNodeId], references: [id])
@@ -104,14 +106,14 @@ model Edge {
   questionNodeId             String?
 }
 
+// edge          Edge?   @relation(fields: [edgeId], references: [id])
 model QuestionCondition {
   conditionType String
   id            Int     @default(autoincrement()) @id
   matchValue    String?
   renderMax     Int?
   renderMin     Int?
-  edgeId        String
-  edge          Edge    @relation("EdgeQQonditions", fields: [edgeId], references: [id])
+  edgeId        String?
 }
 
 model QuestionOption {
@@ -131,7 +133,6 @@ model Session {
   nodeEntries NodeEntry[]
 }
 
-// // 
 model NodeEntry {
   id            String           @default(cuid()) @id
   creationDate  DateTime         @default(now())
@@ -144,15 +145,13 @@ model NodeEntry {
   relatedEdge   Edge?            @relation(fields: [relatedEdgeId], references: [id])
   values        NodeEntryValue[]
 }
-// // nodeEntryId            String?
 
 model NodeEntryValue {
   id                     Int              @default(autoincrement()) @id
   numberValue            Int?
   textValue              String?
   parentNodeEntryValueId Int?
-  parentNodeEntryId      String?
-  parentNodeEntry        NodeEntry?       @relation("NodeEntryToNodeEntryValues", fields: [parentNodeEntryId], references: [id])
   parentNodeEntryValue   NodeEntryValue?  @relation("NodeEntryValueToNodeEntryValue", fields: [parentNodeEntryValueId], references: [id])
   multiValues            NodeEntryValue[] @relation("NodeEntryValueToNodeEntryValue")
+  nodeEntryId            String?
 }

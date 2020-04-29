@@ -17,7 +17,7 @@ interface LeafNodeProps {
 }
 
 interface QuestionConditionProps {
-  id?: string;
+  id?: number;
   conditionType: string;
   renderMin: number;
   renderMax: number;
@@ -37,7 +37,7 @@ interface EdgeChildProps {
 }
 
 interface QuestionOptionProps {
-  id?: string;
+  id?: number;
   value: string;
   publicValue?: string;
 }
@@ -57,8 +57,7 @@ class DialogueResolver {
   static constructDialogue(customerId: string,
     title: string,
     description: string,
-    publicTitle: string = '',
-    leafs: Array<QuestionNode> = []): DialogueCreateInput {
+    publicTitle: string = ''): DialogueCreateInput {
     return {
       customer: {
         connect: {
@@ -68,11 +67,6 @@ class DialogueResolver {
       title,
       description,
       publicTitle,
-      // leafs: leafs.length > 0 ? {
-      //   connect: leafs.map((leaf) => ({ id: leaf.id })),
-      // } : {
-      //   create: [],
-      // },
       questions: {
         create: [],
       },
@@ -202,10 +196,9 @@ class DialogueResolver {
     customerId: string,
     title: string,
     description: string,
-    publicTitle: string = '',
-    leafs: Array<QuestionNode> = []) => prisma.dialogue.create({
+    publicTitle: string = '') => prisma.dialogue.create({
     data: DialogueResolver.constructDialogue(
-      customerId, title, description, publicTitle, leafs,
+      customerId, title, description, publicTitle,
     ),
   });
 
@@ -287,21 +280,24 @@ class DialogueResolver {
     return finalQuestions;
   };
 
-  // static updateTopicBuilder = async (parent: any, args: any) => {
-  //   try {
-  //     const questionnaireId: string = args.id || undefined;
-  //     const { questions }: { questions: Array<any> } = args.topicData;
-  //     const finalQuestions = await DialogueResolver.uuidToPrismaIds(questions, questionnaireId);
-  //     await Promise.all(finalQuestions.map((question) => NodeResolver.updateQuestion(
-  //       questionnaireId,
-  //       question,
-  //     )));
+  static updateTopicBuilder = async (args: any) => {
+    try {
+      console.log('In topicbuilder');
+      const questionnaireId: string = args.id || undefined;
+      const { questions }: { questions: Array<any> } = args.topicData;
+      const finalQuestions = await DialogueResolver.uuidToPrismaIds(questions, questionnaireId);
+      console.log('finalQuestions: ', finalQuestions);
+      await Promise.all(finalQuestions.map(async (question) => NodeResolver.updateQuestion(
+        questionnaireId,
+        question,
+      )));
 
-  //     return 'Succesfully updated topic(?)';
-  //   } catch (e) {
-  //     return `Something went wrong in update topic builder: ${e}`;
-  //   }
-  // };
+      return 'Succesfully updated topic(?)';
+    } catch (e) {
+      console.log(`Something went wrong in update topic builder: ${e}`);
+      return `Something went wrong in update topic builder: ${e}`;
+    }
+  };
 
   static getQuestionnaireAggregatedData = async (parent: any, args: any) => {
     const { dialogueId } = args;

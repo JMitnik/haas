@@ -3,5 +3,5 @@
 # Prisma Migrate lockfile v1
 # Read more about conflict resolution here: TODO
 
-20200428113021-init
-20200428113418-removed-parent-node-entry
+20200429152103-init
+20200429154648-change-created-at-to-creation-date

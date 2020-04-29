@@ -35,6 +35,7 @@ const CustomerSettingsType = objectType({
       },
     });
     t.field('fontSettings', {
+      nullable: true,
       type: FontSettingsType,
       resolve(parent: CustomerSettings, args: any, ctx: any, info: any) {
         const colourSettings = prisma.fontSettings.findOne(

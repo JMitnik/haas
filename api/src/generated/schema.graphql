@@ -24,7 +24,7 @@ input CustomerCreateOptions {
 
 type CustomerSettings {
   colourSettings: ColourSettings!
-  fontSettings: FontSettings!
+  fontSettings: FontSettings
   id: ID!
   logoUrl: String
 }
@@ -62,26 +62,46 @@ input DialogueWhereUniqueInput {
 }
 
 type Edge {
+  childNode: QuestionNode!
   childNodeId: String!
   conditions: [EdgeCondition!]!
   createdAt: String!
   dialogueId: String!
   id: ID!
+  parentNode: QuestionNode!
   parentNodeId: String!
   updatedAt: String!
+}
+
+input EdgeChildInput {
+  childNode: EdgeNodeInput
+  conditions: [QuestionConditionInput!]
+  id: ID
+  parentNode: EdgeNodeInput
 }
 
 type EdgeCondition {
   conditionType: String!
   edgeId: String!
-  id: ID!
+  id: Int!
   matchValue: String
   renderMax: Int
   renderMin: Int
 }
 
+input EdgeNodeInput {
+  id: ID
+  title: String
+}
+
 type FontSettings {
   id: ID!
+}
+
+input LeafNodeInput {
+  id: ID
+  title: String
+  type: String
 }
 
 type Mutation {
@@ -89,6 +109,7 @@ type Mutation {
   createDialogue(customerId: String, description: String, isSeed: Boolean, publicTitle: String, title: String): Dialogue!
   deleteCustomer(where: CustomerWhereUniqueInput): Customer!
   deleteDialogue(where: DialogueWhereUniqueInput): Dialogue!
+  updateTopicBuilder(id: String, topicData: TopicDataEntry): String!
   uploadUserSession(uploadUserSessionInput: UploadUserSessionInput): Session!
 }
 
@@ -112,19 +133,47 @@ type NodeEntryValue {
   textValue: String
 }
 
+input OptionInput {
+  id: Int
+  publicValue: String
+  value: String
+}
+
 type Query {
   customers: [Customer!]!
   dialogue(where: DialogueWhereUniqueInput): Dialogue!
   dialogues(customerId: ID): [Dialogue!]!
+  edge(id: String): Edge!
   getQuestionnaireData(dialogueId: String): DialogueDetailResult!
   getQuestionNode(id: String): QuestionNode!
   getSessionAnswerFlow(sessionId: ID): Session!
   questionNode(where: QuestionNodeWhereUniqueInput): QuestionNode!
+  questionNodes: [QuestionNode!]!
   session(where: SessionWhereUniqueInput): Session!
+}
+
+input QuestionConditionInput {
+  conditionType: String
+  id: Int
+  matchValue: String
+  renderMax: Int
+  renderMin: Int
+}
+
+input QuestionInput {
+  children: [EdgeChildInput!]
+  id: ID
+  isLeaf: Boolean
+  isRoot: Boolean
+  options: [OptionInput!]
+  overrideLeaf: LeafNodeInput
+  title: String
+  type: String
 }
 
 type QuestionNode {
   children: [Edge!]!
+  creationDate: String
   id: ID!
   isLeaf: Boolean!
   isRoot: Boolean!
@@ -137,6 +186,7 @@ type QuestionNode {
 }
 
 input QuestionNodeWhereInput {
+  id: ID
   isRoot: Boolean
 }
 
@@ -145,7 +195,7 @@ input QuestionNodeWhereUniqueInput {
 }
 
 type QuestionOption {
-  id: ID!
+  id: Int!
   publicValue: String
   questionId: String!
   value: String!
@@ -160,6 +210,11 @@ type Session {
 
 input SessionWhereUniqueInput {
   id: ID!
+}
+
+input TopicDataEntry {
+  id: ID
+  questions: [QuestionInput!]
 }
 
 type UniqueDataResultEntry {

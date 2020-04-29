@@ -173,7 +173,7 @@
       "model": "ColourSettings",
       "field": "customerSettings",
       "type": "CustomerSettings",
-      "arity": "Required"
+      "arity": "Optional"
     },
     {
       "tag": "CreateModel",
@@ -253,9 +253,9 @@
     {
       "tag": "CreateField",
       "model": "FontSettings",
-      "field": "CustomerSettings",
+      "field": "customerSettings",
       "type": "CustomerSettings",
-      "arity": "Required"
+      "arity": "Optional"
     },
     {
       "tag": "CreateModel",
@@ -784,6 +784,56 @@
     {
       "tag": "CreateField",
       "model": "QuestionNode",
+      "field": "createdAt",
+      "type": "DateTime",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "QuestionNode",
+          "field": "createdAt"
+        },
+        "directive": "default"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "QuestionNode",
+          "field": "createdAt"
+        },
+        "directive": "default"
+      },
+      "argument": "",
+      "value": "now()"
+    },
+    {
+      "tag": "CreateField",
+      "model": "QuestionNode",
+      "field": "updatedAt",
+      "type": "DateTime",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "QuestionNode",
+          "field": "updatedAt"
+        },
+        "directive": "updatedAt"
+      }
+    },
+    {
+      "tag": "CreateField",
+      "model": "QuestionNode",
       "field": "isLeaf",
       "type": "Boolean",
       "arity": "Required"
@@ -1229,31 +1279,6 @@
       "arity": "List"
     },
     {
-      "tag": "CreateDirective",
-      "location": {
-        "path": {
-          "tag": "Field",
-          "model": "Edge",
-          "field": "conditions"
-        },
-        "directive": "relation"
-      }
-    },
-    {
-      "tag": "CreateArgument",
-      "location": {
-        "tag": "Directive",
-        "path": {
-          "tag": "Field",
-          "model": "Edge",
-          "field": "conditions"
-        },
-        "directive": "relation"
-      },
-      "argument": "",
-      "value": "\"EdgeQQonditions\""
-    },
-    {
       "tag": "CreateField",
       "model": "Edge",
       "field": "isEdgeOf",
@@ -1545,67 +1570,7 @@
       "model": "QuestionCondition",
       "field": "edgeId",
       "type": "String",
-      "arity": "Required"
-    },
-    {
-      "tag": "CreateField",
-      "model": "QuestionCondition",
-      "field": "edge",
-      "type": "Edge",
-      "arity": "Required"
-    },
-    {
-      "tag": "CreateDirective",
-      "location": {
-        "path": {
-          "tag": "Field",
-          "model": "QuestionCondition",
-          "field": "edge"
-        },
-        "directive": "relation"
-      }
-    },
-    {
-      "tag": "CreateArgument",
-      "location": {
-        "tag": "Directive",
-        "path": {
-          "tag": "Field",
-          "model": "QuestionCondition",
-          "field": "edge"
-        },
-        "directive": "relation"
-      },
-      "argument": "",
-      "value": "\"EdgeQQonditions\""
-    },
-    {
-      "tag": "CreateArgument",
-      "location": {
-        "tag": "Directive",
-        "path": {
-          "tag": "Field",
-          "model": "QuestionCondition",
-          "field": "edge"
-        },
-        "directive": "relation"
-      },
-      "argument": "fields",
-      "value": "[edgeId]"
-    },
-    {
-      "tag": "CreateArgument",
-      "location": {
-        "tag": "Directive",
-        "path": {
-          "tag": "Field",
-          "model": "QuestionCondition",
-          "field": "edge"
-        },
-        "directive": "relation"
-      },
-      "argument": "references",
-      "value": "[id]"
+      "arity": "Optional"
     },
     {
       "tag": "CreateModel",
@@ -2218,73 +2183,6 @@
     {
       "tag": "CreateField",
       "model": "NodeEntryValue",
-      "field": "parentNodeEntryId",
-      "type": "String",
-      "arity": "Optional"
-    },
-    {
-      "tag": "CreateField",
-      "model": "NodeEntryValue",
-      "field": "parentNodeEntry",
-      "type": "NodeEntry",
-      "arity": "Optional"
-    },
-    {
-      "tag": "CreateDirective",
-      "location": {
-        "path": {
-          "tag": "Field",
-          "model": "NodeEntryValue",
-          "field": "parentNodeEntry"
-        },
-        "directive": "relation"
-      }
-    },
-    {
-      "tag": "CreateArgument",
-      "location": {
-        "tag": "Directive",
-        "path": {
-          "tag": "Field",
-          "model": "NodeEntryValue",
-          "field": "parentNodeEntry"
-        },
-        "directive": "relation"
-      },
-      "argument": "",
-      "value": "\"NodeEntryToNodeEntryValues\""
-    },
-    {
-      "tag": "CreateArgument",
-      "location": {
-        "tag": "Directive",
-        "path": {
-          "tag": "Field",
-          "model": "NodeEntryValue",
-          "field": "parentNodeEntry"
-        },
-        "directive": "relation"
-      },
-      "argument": "fields",
-      "value": "[parentNodeEntryId]"
-    },
-    {
-      "tag": "CreateArgument",
-      "location": {
-        "tag": "Directive",
-        "path": {
-          "tag": "Field",
-          "model": "NodeEntryValue",
-          "field": "parentNodeEntry"
-        },
-        "directive": "relation"
-      },
-      "argument": "references",
-      "value": "[id]"
-    },
-    {
-      "tag": "CreateField",
-      "model": "NodeEntryValue",
       "field": "parentNodeEntryValue",
       "type": "NodeEntryValue",
       "arity": "Optional"
@@ -2373,6 +2271,13 @@
       },
       "argument": "",
       "value": "\"NodeEntryValueToNodeEntryValue\""
+    },
+    {
+      "tag": "CreateField",
+      "model": "NodeEntryValue",
+      "field": "nodeEntryId",
+      "type": "String",
+      "arity": "Optional"
     }
   ]
 }
