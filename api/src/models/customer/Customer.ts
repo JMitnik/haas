@@ -1,15 +1,15 @@
 import { PrismaClient, Customer } from '@prisma/client';
 import { objectType, queryType, extendType, inputObjectType, arg } from '@nexus/schema';
 
-import CustomerSettingsType from '../settings/CustomerSettings';
+import { CustomerSettingsType } from '../settings/CustomerSettings';
 import { DialogueType } from '../questionnaire/Dialogue';
 
-import DialogueResolver from '../questionnaire/questionnaire-resolver';
+import DialogueResolver from '../questionnaire/dialogue-resolver';
 import CustomerResolver from './customer-resolver';
 
 const prisma = new PrismaClient();
 
-const CustomerType = objectType({
+export const CustomerType = objectType({
   name: 'Customer',
   definition(t) {
     t.id('id');
@@ -149,4 +149,9 @@ export const CustomersQuery = extendType({
   },
 });
 
-export default CustomerType;
+const customerNexus = [CustomersQuery,
+  CustomerMutations,
+  CustomerCreateOptionsInput,
+  CustomerType];
+
+export default customerNexus;

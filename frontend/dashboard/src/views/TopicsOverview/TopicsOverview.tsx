@@ -6,7 +6,6 @@ import { Plus, X } from 'react-feather';
 import { H2, H3, Grid, Flex, Label, Div, Card, CardBody,
   Container, DeleteButtonContainer } from '@haas/ui';
 import { Link, useHistory, useParams } from 'react-router-dom';
-import { Query, Questionnaire } from '../../types';
 
 import getQuestionnairesCustomerQuery from '../../queries/getQuestionnairesCustomerQuery';
 import { deleteQuestionnaireMutation } from '../../mutations/deleteQuestionnaire';
@@ -32,7 +31,7 @@ const TopicsOverview: FC = () => {
     );
   }
 
-  const topics: Array<Questionnaire> = data?.dialogues;
+  const topics: Array<any> = data?.dialogues;
   return (
     <>
       <Container>

@@ -5,7 +5,7 @@ import { QueryResolvers } from './generated/resolver-types';
 import { Prisma } from './generated/prisma-client/index';
 import SessionResolver from './models/session/session-resolver';
 import CustomerResolver from './models/customer/customer-resolver';
-import DialogueResolver from './models/questionnaire/questionnaire-resolver';
+import DialogueResolver from './models/questionnaire/dialogue-resolver';
 
 interface ContextProps {
   db: Prisma;

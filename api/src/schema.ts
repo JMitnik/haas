@@ -1,63 +1,12 @@
 import { makeSchema } from '@nexus/schema';
-import { nexusPrismaPlugin } from 'nexus-prisma';
-// import { Query } from './queries';
-// import { Mutation } from './mutations';
 import path from 'path';
-import CustomerType, { CustomerCreateOptionsInput, CustomersQuery, CustomerMutations } from './models/customer/Customer';
-import CustomerSettingsType, { ColourSettingsType, FontSettingsType } from './models/settings/CustomerSettings';
-import { DialogueWhereUniqueInput, deleteDialogueOfCustomerMutation, DialogueType, DialoguesOfCustomerQuery, DialogueDetailResultType, getQuestionnaireDataQuery } from './models/questionnaire/Dialogue';
-import { SessionWhereUniqueInput, getSessionAnswerFlowQuery, UniqueDataResultEntry, NodeEntryValueType, NodeEntryType, SessionType, uploadUserSessionMutation, UploadUserSessionInput, UserSessionEntryInput, UserSessionEntryDataInput } from './models/session/Session';
-import { QuestionNodeType, QuestionOptionType, QuestionNodeWhereInput, getQuestionNodeQuery, QuestionNodeInput } from './models/question/QuestionNode';
-import { LeafNodeInput, QuestionConditionInput, EdgeNodeInput, EdgeChildInput, QuestionOptionInput, QuestionInput, TopicDataEntryInput, topicBuilderMutations } from './models/topicBuilder/TopicBuilder';
-import { EdgeConditionType, EdgeType, EdgeQueries } from './models/edge/Edge';
+import nexus from './nexus/index';
 
 const schema = makeSchema({
   shouldGenerateArtifacts: true,
   types: [
-    EdgeQueries,
-    LeafNodeInput,
-    QuestionConditionInput,
-    EdgeNodeInput,
-    EdgeChildInput,
-    QuestionOptionInput,
-    QuestionInput,
-    TopicDataEntryInput,
-    topicBuilderMutations,
-    CustomerCreateOptionsInput,
-    deleteDialogueOfCustomerMutation,
-    DialogueWhereUniqueInput,
-    CustomerMutations,
-    SessionWhereUniqueInput,
-    getSessionAnswerFlowQuery,
-    UploadUserSessionInput,
-    UserSessionEntryInput,
-    UserSessionEntryDataInput,
-    uploadUserSessionMutation,
-    QuestionNodeInput,
-    getQuestionNodeQuery,
-    QuestionNodeWhereInput,
-    EdgeConditionType,
-    EdgeType,
-    QuestionOptionType,
-    QuestionNodeType,
-    NodeEntryValueType,
-    NodeEntryType,
-    SessionType,
-    DialogueDetailResultType,
-    getQuestionnaireDataQuery,
-    UniqueDataResultEntry,
-    DialoguesOfCustomerQuery,
-    ColourSettingsType,
-    FontSettingsType,
-    DialogueType,
-    CustomersQuery,
-    CustomerType,
-    CustomerSettingsType,
+    ...nexus,
   ],
-  plugins: [
-    nexusPrismaPlugin(),
-  ],
-  // Tells nexus where to look for types when generating the graphql schema
   typegenAutoConfig: {
     sources: [
       {
@@ -66,10 +15,9 @@ const schema = makeSchema({
       },
     ],
   },
-  // Tells nexus where to output the generated graphql schema and types
   outputs: {
     schema: path.join(__dirname, './generated/schema.graphql'),
-    // typegen: path.join(__dirname, './generated/nexus.ts'),
+    typegen: path.join(__dirname, './generated/nexus.ts'),
   },
 });
 

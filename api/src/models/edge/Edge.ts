@@ -1,6 +1,5 @@
-/* eslint-disable import/prefer-default-export */
-import { PrismaClient, Customer, QuestionNode, Edge } from '@prisma/client';
-import { objectType, queryType, extendType } from '@nexus/schema';
+import { PrismaClient, Edge } from '@prisma/client';
+import { objectType, extendType } from '@nexus/schema';
 import { QuestionNodeType } from '../question/QuestionNode';
 
 const prisma = new PrismaClient();
@@ -72,3 +71,9 @@ export const EdgeQueries = extendType({
     });
   },
 });
+
+const edgeNexus = [EdgeConditionType,
+  EdgeType,
+  EdgeQueries];
+
+export default edgeNexus;

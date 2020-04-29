@@ -20,7 +20,7 @@ export const FontSettingsType = objectType({
   },
 });
 
-const CustomerSettingsType = objectType({
+export const CustomerSettingsType = objectType({
   name: 'CustomerSettings',
   definition(t) {
     t.id('id');
@@ -47,4 +47,6 @@ const CustomerSettingsType = objectType({
   },
 });
 
-export default CustomerSettingsType;
+const customerSettingsNexus = [CustomerSettingsType, FontSettingsType, ColourSettingsType];
+
+export default customerSettingsNexus;

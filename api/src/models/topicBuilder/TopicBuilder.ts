@@ -1,9 +1,5 @@
-import { PrismaClient, Customer, QuestionNode } from '@prisma/client';
-import { objectType, queryType, extendType, inputObjectType, arg } from '@nexus/schema';
-import { EdgeType } from '../edge/Edge';
-import DialogueResolver from '../questionnaire/questionnaire-resolver';
-
-const prisma = new PrismaClient();
+import { extendType, inputObjectType } from '@nexus/schema';
+import DialogueResolver from '../questionnaire/dialogue-resolver';
 
 export const LeafNodeInput = inputObjectType({
   name: 'LeafNodeInput',
@@ -103,3 +99,16 @@ export const topicBuilderMutations = extendType({
     });
   },
 });
+
+const topicBuilderNexus = [
+  LeafNodeInput,
+  QuestionConditionInput,
+  EdgeNodeInput,
+  EdgeChildInput,
+  QuestionOptionInput,
+  QuestionInput,
+  TopicDataEntryInput,
+  topicBuilderMutations,
+];
+
+export default topicBuilderNexus;

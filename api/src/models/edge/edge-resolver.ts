@@ -1,8 +1,6 @@
 import { PrismaClient, QuestionNode, EdgeCreateInput } from '@prisma/client';
-// or const { PrismaClient } = require('@prisma/client')
 
 const prisma = new PrismaClient();
-// import { prisma, QuestionNode, EdgeCreateInput } from '../../generated/prisma-client';
 
 interface QuestionConditionProps {
   id?: number;

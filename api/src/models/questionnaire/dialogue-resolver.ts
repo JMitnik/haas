@@ -1,10 +1,5 @@
 import _ from 'lodash';
-import { PrismaClient, Dialogue, DialogueCreateInput, QuestionNode } from '@prisma/client';
-// or const { PrismaClient } = require('@prisma/client')
-
-// import { prisma, Questionnaire, NodeType,
-//   QuestionnaireCreateInput, QuestionNode } from '../../generated/prisma-client/index';
-
+import { PrismaClient, Dialogue, DialogueCreateInput } from '@prisma/client';
 import NodeResolver from '../question/node-resolver';
 import { leafNodes } from '../../data/seeds/default-data';
 

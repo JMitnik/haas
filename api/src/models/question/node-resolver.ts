@@ -1,8 +1,4 @@
 import { PrismaClient, QuestionNode, QuestionNodeCreateInput } from '@prisma/client';
-// import {
-//   prisma,
-//   string, QuestionNode, QuestionNodeCreateInput,
-// } from '../../generated/prisma-client/index';
 import { sliderType, multiChoiceType } from '../../data/seeds/default-data';
 import EdgeResolver from '../edge/edge-resolver';
 
@@ -163,14 +159,6 @@ class NodeResolver {
     return prisma.questionNode.create({
       data: params,
     });
-    // NodeResolver.constructQuestionNode(
-    //   title,
-    //   questionnaireId,
-    //   type, options,
-    //   isRoot,
-    //   overrideLeafId,
-    //   isLeaf,
-    // )
   };
 
   static createTemplateLeafNodes = async (

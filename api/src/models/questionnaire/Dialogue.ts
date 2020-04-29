@@ -1,9 +1,9 @@
 import { PrismaClient, Dialogue } from '@prisma/client';
-import { objectType, queryType, extendType, inputObjectType, arg } from '@nexus/schema';
+import { objectType, extendType, inputObjectType } from '@nexus/schema';
 import { UniqueDataResultEntry } from '../session/Session';
 import { QuestionNodeType, QuestionNodeWhereInput } from '../question/QuestionNode';
-import CustomerType from '../customer/Customer';
-import DialogueResolver from './questionnaire-resolver';
+import { CustomerType } from '../customer/Customer';
+import DialogueResolver from './dialogue-resolver';
 
 const prisma = new PrismaClient();
 
@@ -31,7 +31,7 @@ export const DialogueType = objectType({
     t.list.field('questions', {
       type: QuestionNodeType,
       args: {
-        where: QuestionNodeWhereInput, // TODO: Use prisma generated type?
+        where: QuestionNodeWhereInput,
       },
       resolve(parent: Dialogue, args: any, ctx: any, info: any) {
         if (args?.where?.isRoot) {
@@ -186,3 +186,14 @@ export const DialoguesOfCustomerQuery = extendType({
     });
   },
 });
+
+const dialogueNexus = [
+  DialogueWhereUniqueInput,
+  deleteDialogueOfCustomerMutation,
+  DialogueType,
+  DialoguesOfCustomerQuery,
+  DialogueDetailResultType,
+  getQuestionnaireDataQuery,
+];
+
+export default dialogueNexus;

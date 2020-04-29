@@ -1,4 +1,3 @@
-/* eslint-disable import/prefer-default-export */
 import { PrismaClient, Customer, QuestionNode } from '@prisma/client';
 import { objectType, queryType, extendType, inputObjectType, arg } from '@nexus/schema';
 import { EdgeType } from '../edge/Edge';
@@ -99,3 +98,13 @@ export const getQuestionNodeQuery = extendType({
     });
   },
 });
+
+const questionNodeNexus = [
+  QuestionNodeType,
+  QuestionOptionType,
+  QuestionNodeWhereInput,
+  getQuestionNodeQuery,
+  QuestionNodeInput,
+];
+
+export default questionNodeNexus;

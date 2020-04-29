@@ -1,6 +1,5 @@
-/* eslint-disable import/prefer-default-export */
 import { PrismaClient, NodeEntry, NodeEntryValue, Session } from '@prisma/client';
-import { objectType, queryType, extendType, inputObjectType } from '@nexus/schema';
+import { objectType, extendType, inputObjectType } from '@nexus/schema';
 import SessionResolver from './session-resolver';
 import { QuestionNodeType } from '../question/QuestionNode';
 
@@ -158,3 +157,18 @@ export const uploadUserSessionMutation = extendType({
     });
   },
 });
+
+const sessionNexus = [
+  SessionWhereUniqueInput,
+  getSessionAnswerFlowQuery,
+  UniqueDataResultEntry,
+  NodeEntryValueType,
+  NodeEntryType,
+  SessionType,
+  uploadUserSessionMutation,
+  UploadUserSessionInput,
+  UserSessionEntryInput,
+  UserSessionEntryDataInput,
+];
+
+export default sessionNexus;
