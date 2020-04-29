@@ -6,7 +6,7 @@ import { HAASTreeProvider } from 'providers/dialogue-tree-provider';
 import { ThemeProvider } from 'styled-components';
 import { makeCustomTheme } from 'utils/makeCustomerTheme';
 import { DialogueContainer } from './DialogueTreeStyles';
-import Node from '../Nodes/Node';
+import NodePage from 'pages/dialogue/[node]';
 
 const DialogueTree = () => {
   const { questionnaire, customer } = useQuestionnaire();
@@ -32,7 +32,7 @@ const DialogueTree = () => {
         <DialogueContainer>
           <Container>
             <HAASTreeProvider questionnaire={questionnaire}>
-              <Node />
+              <NodePage />
             </HAASTreeProvider>
           </Container>
         </DialogueContainer>

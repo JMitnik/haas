@@ -6,6 +6,7 @@ import AppContainer from 'styles/AppStyles';
 import { QuestionnaireProvider } from 'providers/dialogue-provider';
 import CustomerOverview from 'pages/customers';
 import DialogueTree from 'components/DialogueTree';
+import CustomerPage from 'pages/customers';
 
 const App = () => (
   <AppProviders>
@@ -21,7 +22,7 @@ const App = () => (
           <Redirect to="/" />
         </Route>
         <Route path="/">
-          <CustomerOverview />
+          <CustomerPage />
         </Route>
       </Switch>
     </AppContainer>
