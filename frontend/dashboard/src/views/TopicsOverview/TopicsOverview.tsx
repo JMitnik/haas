@@ -59,7 +59,7 @@ const TopicsOverview: FC = () => {
   );
 };
 
-const TopicCard = ({ topic }: { topic: Questionnaire }) => {
+const TopicCard = ({ topic }: { topic: any }) => {
   const history = useHistory();
   const { customerId } = useParams();
 
