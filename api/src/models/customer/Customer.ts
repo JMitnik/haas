@@ -5,6 +5,7 @@ import CustomerSettingsType from '../settings/CustomerSettings';
 import { DialogueType } from '../questionnaire/Dialogue';
 
 import DialogueResolver from '../questionnaire/questionnaire-resolver';
+import CustomerResolver from './customer-resolver';
 
 const prisma = new PrismaClient();
 
@@ -41,9 +42,28 @@ export const CustomerWhereUniqueInput = inputObjectType({
   },
 });
 
-export const DeleteCustomerMutation = extendType({
+export const CustomerCreateOptionsInput = inputObjectType({
+  name: 'CustomerCreateOptions',
+  definition(t) {
+    t.boolean('isSeed', { default: false });
+    t.string('logo');
+    t.string('primaryColour');
+  },
+});
+
+export const CustomerMutations = extendType({
   type: 'Mutation',
   definition(t) {
+    t.field('createCustomer', {
+      type: CustomerType,
+      args: {
+        name: 'String',
+        options: CustomerCreateOptionsInput,
+      },
+      resolve(parent: any, args: any, ctx: any, info: any) {
+        return CustomerResolver.createCustomer(args);
+      },
+    });
     t.field('deleteCustomer', {
       type: CustomerType,
       args: {

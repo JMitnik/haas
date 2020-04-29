@@ -45,34 +45,35 @@ class CustomerResolver {
     await NodeResolver.createTemplateNodes(questionnaire.id, customer.name, leafs);
   };
 
-  // static createNewCustomerMutation = async (parent : any, args: any) => {
-  //   const { name, options } = args;
-  //   const { isSeed, logo, primaryColour } = options;
-  //   // TODO: Need to re-implement primary colour field
+  static createCustomer = async (args: any) => {
+    const { name, options } = args;
+    const { isSeed, logo, primaryColour } = options;
 
-  //   const customer = await prisma.createCustomer({
-  //     name,
-  //     settings: {
-  //       create: {
-  //         logoUrl: logo,
-  //         colourSettings: {
-  //           create: {
-  //             primary: primaryColour || '#4287f5',
-  //           },
-  //         },
-  //       },
-  //     },
-  //     questionnaires: {
-  //       create: [],
-  //     },
-  //   });
+    const customer = await prisma.customer.create({
+      data: {
+        name,
+        settings: {
+          create: {
+            logoUrl: logo,
+            colourSettings: {
+              create: {
+                primary: primaryColour || '#4287f5',
+              },
+            },
+          },
+        },
+        dialogues: {
+          create: [],
+        },
+      },
+    });
 
-  //   if (isSeed) {
-  //     await CustomerResolver.seed(customer);
-  //   }
+    if (isSeed) {
+      await CustomerResolver.seed(customer);
+    }
 
-  //   return customer;
-  // };
+    return customer;
+  };
 }
 
 export default CustomerResolver;

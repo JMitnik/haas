@@ -3,7 +3,7 @@ import { nexusPrismaPlugin } from 'nexus-prisma';
 // import { Query } from './queries';
 // import { Mutation } from './mutations';
 import path from 'path';
-import CustomerType, { CustomersQuery, DeleteCustomerMutation } from './models/customer/Customer';
+import CustomerType, { CustomerCreateOptionsInput, CustomersQuery, CustomerMutations } from './models/customer/Customer';
 import CustomerSettingsType, { ColourSettingsType, FontSettingsType } from './models/settings/CustomerSettings';
 import { DialogueWhereUniqueInput, deleteDialogueOfCustomerMutation, DialogueType, DialoguesOfCustomerQuery, DialogueDetailResultType, getQuestionnaireDataQuery } from './models/questionnaire/Dialogue';
 import { SessionWhereUniqueInput, getSessionAnswerFlowQuery, UniqueDataResultEntry, NodeEntryValueType, NodeEntryType, SessionType, uploadUserSessionMutation, UploadUserSessionInput, UserSessionEntryInput, UserSessionEntryDataInput } from './models/session/Session';
@@ -13,9 +13,10 @@ import { EdgeConditionType, EdgeType } from './models/edge/Edge';
 const schema = makeSchema({
   shouldGenerateArtifacts: true,
   types: [
+    CustomerCreateOptionsInput,
     deleteDialogueOfCustomerMutation,
     DialogueWhereUniqueInput,
-    DeleteCustomerMutation,
+    CustomerMutations,
     SessionWhereUniqueInput,
     getSessionAnswerFlowQuery,
     UploadUserSessionInput,

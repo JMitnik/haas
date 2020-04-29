@@ -122,6 +122,19 @@ export const getQuestionnaireDataQuery = extendType({
 export const deleteDialogueOfCustomerMutation = extendType({
   type: 'Mutation',
   definition(t) {
+    t.field('createDialogue', {
+      type: DialogueType,
+      args: {
+        customerId: 'String',
+        title: 'String',
+        description: 'String',
+        publicTitle: 'String',
+        isSeed: 'Boolean',
+      },
+      resolve(parent: any, args: any, ctx: any, info: any) {
+        return DialogueResolver.createDialogue(args);
+      },
+    });
     t.field('deleteDialogue', {
       type: DialogueType,
       args: {

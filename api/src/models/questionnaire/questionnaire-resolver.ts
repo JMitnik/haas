@@ -198,7 +198,7 @@ class DialogueResolver {
     return dialogues;
   };
 
-  static createDialogue = async (
+  static initDialogue = async (
     customerId: string,
     title: string,
     description: string,
@@ -209,41 +209,41 @@ class DialogueResolver {
     ),
   });
 
-  // static createNewQuestionnaire = async (parent: any, args: any): Promise<Dialogue> => {
-  //   const { customerId, title, description, publicTitle, isSeed } = args;
-  //   let questionnaire = null;
+  static createDialogue = async (args: any): Promise<Dialogue> => {
+    const { customerId, title, description, publicTitle, isSeed } = args;
+    let questionnaire = null;
 
-  //   if (isSeed) {
-  //     const customer = await prisma.customer.findOne({ where: { id: customerId } });
+    if (isSeed) {
+      const customer = await prisma.customer.findOne({ where: { id: customerId } });
 
-  //     if (customer?.name) {
-  //       return DialogueResolver.seedQuestionnare(customerId, customer?.name, title, description);
-  //     }
-  //   }
-  //   questionnaire = await DialogueResolver.createDialogue(
-  //     customerId, title, description, publicTitle,
-  //   );
+      if (customer?.name) {
+        return DialogueResolver.seedQuestionnare(customerId, customer?.name, title, description);
+      }
+    }
+    questionnaire = await DialogueResolver.initDialogue(
+      customerId, title, description, publicTitle,
+    );
 
-  //   await NodeResolver.createTemplateLeafNodes(leafNodes, questionnaire.id);
+    await NodeResolver.createTemplateLeafNodes(leafNodes, questionnaire.id);
 
-  //   return questionnaire;
-  // };
+    return questionnaire;
+  };
 
-  // static seedQuestionnare = async (
-  //   customerId: string,
-  //   customerName: string,
-  //   questionnaireTitle: string = 'Default questionnaire',
-  //   questionnaireDescription: string = 'Default questions',
-  // ): Promise<Questionnaire> => {
-  //   const questionnaire = await DialogueResolver.createDialogue(
-  //     customerId, questionnaireTitle, questionnaireDescription, '',
-  //   );
+  static seedQuestionnare = async (
+    customerId: string,
+    customerName: string,
+    questionnaireTitle: string = 'Default questionnaire',
+    questionnaireDescription: string = 'Default questions',
+  ): Promise<Dialogue> => {
+    const questionnaire = await DialogueResolver.initDialogue(
+      customerId, questionnaireTitle, questionnaireDescription, '',
+    );
 
-  //   const leafs = await NodeResolver.createTemplateLeafNodes(leafNodes, questionnaire.id);
+    const leafs = await NodeResolver.createTemplateLeafNodes(leafNodes, questionnaire.id);
 
-  //   await NodeResolver.createTemplateNodes(questionnaire.id, customerName, leafs);
-  //   return questionnaire;
-  // };
+    await NodeResolver.createTemplateNodes(questionnaire.id, customerName, leafs);
+    return questionnaire;
+  };
 
   static uuidToPrismaIds = async (questions: Array<QuestionProps>, dialogueId: string) => {
     const v4 = new RegExp(/^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i);
