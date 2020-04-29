@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import { ApolloProvider } from '@apollo/react-hooks';
 import { ThemeProvider } from 'styled-components';
 
+import { AppContainer, MainWindow } from './styles/AppStyles';
 import TopNav from './components/Nav';
 import GlobalStyle from './config/global-styles';
 import themeConfig from './config/theme';
@@ -13,7 +14,6 @@ import OrganisationSettingsView from './views/OrganisationSettingsView';
 import TopicsOverview from './views/TopicsOverview/TopicsOverview';
 import TopicDetail from './views/TopicDetail/TopicDetail';
 import CustomerBuilderView from './views/CustomerBuilderView';
-import { AppContainer, MainWindow } from './AppStyles';
 
 const App: FC = () => (
   <>

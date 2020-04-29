@@ -372,7 +372,6 @@ class NodeResolver {
     leafs: QuestionNode[],
   ) => {
     // Root question (How do you feel about?)
-    console.log(`Dialogue Id: ${questionnaireId}, Customer: ${customerName}, Slider type: ${sliderType}, Standard options:  ${standardOptions}`);
     const rootQuestion = await NodeResolver.createQuestionNode(`How do you feel about ${customerName}?`, questionnaireId, sliderType, standardOptions, true);
 
     // Positive Sub child 1 (What did you like?)

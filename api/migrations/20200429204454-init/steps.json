@@ -784,7 +784,7 @@
     {
       "tag": "CreateField",
       "model": "QuestionNode",
-      "field": "createdAt",
+      "field": "creationDate",
       "type": "DateTime",
       "arity": "Required"
     },
@@ -794,7 +794,7 @@
         "path": {
           "tag": "Field",
           "model": "QuestionNode",
-          "field": "createdAt"
+          "field": "creationDate"
         },
         "directive": "default"
       }
@@ -806,7 +806,7 @@
         "path": {
           "tag": "Field",
           "model": "QuestionNode",
-          "field": "createdAt"
+          "field": "creationDate"
         },
         "directive": "default"
       },

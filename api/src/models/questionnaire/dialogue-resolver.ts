@@ -202,6 +202,8 @@ class DialogueResolver {
       if (customer?.name) {
         return DialogueResolver.seedQuestionnare(customerId, customer?.name, title, description);
       }
+
+      console.log('Cant find customer with specified ID while seeding');
     }
     questionnaire = await DialogueResolver.initDialogue(
       customerId, title, description, publicTitle,
@@ -293,7 +295,9 @@ class DialogueResolver {
     const customer = await (prisma.dialogue.findOne({ where: { id: dialogueId } }).customer());
     const customerName = customer?.name;
 
-    const dialogue: Dialogue | null = (await prisma.dialogue.findOne({ where: { id: dialogueId } }));
+    const dialogue: Dialogue | null = (await prisma.dialogue.findOne(
+      { where: { id: dialogueId } },
+    ));
 
     if (dialogue) {
       const { title, description, creationDate, updatedAt } = dialogue;

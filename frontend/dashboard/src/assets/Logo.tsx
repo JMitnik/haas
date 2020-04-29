@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components/macro';
 
 export const LogoContainer = styled.div`
-    display: block;
+  display: block;
 
   /* Manual size */
   width: 60px;

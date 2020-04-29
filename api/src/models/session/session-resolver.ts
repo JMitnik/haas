@@ -1,4 +1,5 @@
-import { PrismaClient, Dialogue, NodeEntryCreateWithoutSessionInput } from '@prisma/client';
+import { PrismaClient,
+  Session, NodeEntry, NodeEntryCreateWithoutSessionInput } from '@prisma/client';
 import cleanInt from '../../utils/cleanInt';
 
 const prisma = new PrismaClient();
@@ -22,13 +23,44 @@ class SessionResolver {
       },
     });
 
-    ctx.services.triggerMailService.sendTrigger({ to: 'jmitnik@gmail.com', userSession: session });
+    // TODO: Replace this with email associated to dialogue (or fallback to company)
+    const dialogueAgentMail = 'jmitnik@gmail.com';
+
+    // TODO: Roundabout way, needs to be done in Prisma2 better
+    const nodeEntries = await SessionResolver.getEntriesOfSession(session);
+    const questionnaire = await prisma.dialogue.findOne({ where: { id: questionnaireId } });
+
+    ctx.services.triggerMailService.sendTrigger({
+      to: dialogueAgentMail,
+      userSession: {
+        id: session.id,
+        nodeEntries,
+        questionnaire,
+      },
+    });
 
     return session;
   }
 
+  static async getEntriesOfSession(session: Session): Promise<NodeEntry[]> {
+    const entries = await Promise.all((
+      await prisma.session.findOne({ where: { id: session.id } }).nodeEntries()).map(
+      async (entry) => ({
+        ...entry,
+        relatedNode: await Promise.resolve(prisma.nodeEntry.findOne({ where: {
+          id: entry.id,
+        } }).relatedNode()),
+        values: await Promise.resolve(prisma.nodeEntry.findOne({ where: {
+          id: entry.id,
+        } }).values()),
+      }),
+    ));
+
+    return entries;
+  }
+
   static constructNodeEntry(nodeEntry: any) : NodeEntryCreateWithoutSessionInput {
-    const valuesObject: any = { multiValues: { create: nodeEntry.data.multiValues || [] } }; // multiValues: { create: nodeEntry.data.multiValues || [], }
+    const valuesObject: any = { multiValues: { create: nodeEntry.data.multiValues || [] } };
 
     if (nodeEntry.data.numberValue) {
       valuesObject.numberValue = cleanInt(nodeEntry.data.numberValue);

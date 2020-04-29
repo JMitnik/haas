@@ -1,5 +1,4 @@
 import nodemailer from 'nodemailer';
-
 import Mail from 'nodemailer/lib/mailer';
 
 export interface MailServiceInputProps {
@@ -13,7 +12,7 @@ export interface MailServiceInputProps {
 
 export interface MailSendOptionsProps {
   to: string;
-  body: string;
+  body: string | any;
   subject: string;
   from?: string | null;
 }

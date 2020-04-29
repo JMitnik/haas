@@ -1,6 +1,6 @@
 import gql from 'graphql-tag';
 
-const QuestionFragment = gql`
+export const QuestionFragment = gql`
   fragment QuestionFragment on QuestionNode {
     id
     title
@@ -28,5 +28,3 @@ const QuestionFragment = gql`
     }
   }
 `;
-
-export default QuestionFragment;
