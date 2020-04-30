@@ -41,8 +41,7 @@ const getDialogueQuery = gql`
 
 
 const DialogueTreePage = () => {
-  // TODO: Replace with
-  const { customerSlug, dialogueId } = useParams();
+  const { dialogueId } = useParams();
   const [customTheme, setCustomTheme] = useState({});
 
   const { data, error, loading } = useQuery(getDialogueQuery, {

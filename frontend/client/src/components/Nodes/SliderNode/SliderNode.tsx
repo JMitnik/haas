@@ -6,6 +6,7 @@ import { cleanInt } from 'utils/cleanInt';
 import { GenericNodeProps } from '../Node/Node';
 import { HAASFormEntry } from 'types/generic';
 import { SliderNodeContainer, SliderNodeValue } from './SliderNodeStyles';
+import { useAnimation, motion } from 'framer-motion';
 
 type SliderNodeProps = GenericNodeProps;
 
@@ -13,6 +14,8 @@ const SliderNode = ({ node }: SliderNodeProps) => {
   const {
     treeDispatch: { goToChild }
   } = useHAASTree();
+
+  const controls = useAnimation();
 
   const { watch, getValues, triggerValidation, register } = useForm<HAASFormEntry>({
     defaultValues: {
@@ -54,26 +57,35 @@ const SliderNode = ({ node }: SliderNodeProps) => {
     <SliderNodeContainer>
       <Div>
         <H2>{node.title}</H2>
+      </Div>
+      <Div>
         <SliderNodeValue
           textAlign="center"
           my="0"
-          fontSize={['5rem !important', '5rem !important']}
-          color="white"
+          pb="100px"
+          fontSize={['3rem !important']}
+          color="red"
+          backgroundColor="white"
         >
-          {showValue()}
+          <motion.div animate={controls}>
+            {showValue()}
+          </motion.div>
         </SliderNodeValue>
+        <Slider
+          width={1}
+          name="numberValue"
+          onMouseDown={() => controls.start({
+            scale: 1.5,
+          })}
+          onMouseUp={() => onSubmit()}
+          onTouchEnd={() => onSubmit()}
+          min={0}
+          max={100}
+          mt={4}
+          defaultValue={50}
+          ref={register}
+        />
       </Div>
-      <Slider
-        width={1}
-        name="numberValue"
-        onMouseUp={() => onSubmit()}
-        onTouchEnd={() => onSubmit()}
-        min={0}
-        max={100}
-        mt={4}
-        defaultValue={50}
-        ref={register}
-      />
     </SliderNodeContainer>
   );
 };
