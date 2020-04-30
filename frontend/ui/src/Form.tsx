@@ -130,6 +130,19 @@ export const InputField = styled.input`
       text-align: center;
       font-weight: bolder;
       color: ${theme.colors.default.text};
+      text-align: left;
+
+      &::placeholder {
+        color: #c6c6c6;
+        font-weight: 500;
+      }
+
+      &:focus, &:active {
+        border: 1px solid #0059f8;
+        background: ${Color('#0059f8').mix(Color('white'), 0.9).hex()};
+        box-shadow: 0 0 0 4px ${Color('#0059f8').fade(0.8).string()};
+        outline: none !important;
+      }
   `}
 `;
 

@@ -37,18 +37,18 @@ const RegisterNode = ({ node, isLeaf }: RegisterNodeProps) => {
           <Grid gridTemplateColumns="1fr 1fr">
             <InputGroup>
               <InputLabel color="white">First name</InputLabel>
-              <InputField name="multiValues[0].textValue" ref={register} />
+              <InputField placeholder="Jane" name="multiValues[0].textValue" ref={register} />
             </InputGroup>
 
             <InputGroup>
               <InputLabel color="white">Last name</InputLabel>
-              <InputField name="multiValues[1].textValue" ref={register} />
+              <InputField placeholder="White" name="multiValues[1].textValue" ref={register} />
             </InputGroup>
           </Grid>
 
           <InputGroup>
             <InputLabel color="white">Email adress</InputLabel>
-            <InputField name="multiValues[2].textValue" ref={register} />
+            <InputField placeholder="janewhite@gmail.com" name="multiValues[2].textValue" ref={register} />
           </InputGroup>
         </Grid>
         <Div mt={4}>
