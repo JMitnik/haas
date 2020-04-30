@@ -1,9 +1,11 @@
 import styled, { css } from 'styled-components/macro';
+import Color from 'color';
 import { Div } from '@haas/ui';
 
 export const DialogueContainer = styled(Div)`
   ${({ theme }) => css`
-    background: ${theme.colors.primary || 'green'};
+    background: ${theme.colors.primary};
+    background: linear-gradient(45deg, ${Color(theme.colors.primary).darken(0.1).hex()}, ${Color(theme.colors.primary).lighten(0.7).hex()});
     padding: 5vh ${theme.gutter}px;
     margin: 0 auto;
     position: relative;

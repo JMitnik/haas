@@ -11,6 +11,15 @@ import Slider from './Slider';
 
 type SliderNodeProps = GenericNodeProps;
 
+const sliderValueAnimeVariants = {
+  initial: {
+    transform: 'scale(1)'
+  },
+  active: {
+    transform: 'scale(1.5)'
+  }
+};
+
 const SliderNode = ({ node }: SliderNodeProps) => {
   const {
     treeDispatch: { goToChild }
@@ -20,7 +29,7 @@ const SliderNode = ({ node }: SliderNodeProps) => {
 
   const { watch, getValues, triggerValidation, register } = useForm<HAASFormEntry>({
     defaultValues: {
-      numberValue: 50
+      numberValue: 50.01
     }
   });
 
@@ -49,7 +58,7 @@ const SliderNode = ({ node }: SliderNodeProps) => {
   const showValue = () => {
     const val = watch({ nest: true }).numberValue;
 
-    if (val) return val / 10;
+    if (val) return Number(val / 10).toFixed(1);
 
     return 0;
   };
@@ -60,17 +69,10 @@ const SliderNode = ({ node }: SliderNodeProps) => {
         <H2>{node.title}</H2>
       </Div>
       <Div>
-        <SliderNodeValue
-          textAlign="center"
-          my="0"
-          pb="100px"
-          fontSize={['3rem !important']}
-        >
-          <motion.div animate={controls}>
-            {showValue()}
-          </motion.div>
+        <SliderNodeValue initial="initial" variants={sliderValueAnimeVariants} animate={controls}>
+          {showValue()}
         </SliderNodeValue>
-        <Slider onSubmit={onSubmit} register={register} />
+        <Slider onSubmit={onSubmit} register={register} animationControls={controls} />
       </Div>
     </SliderNodeContainer>
   );

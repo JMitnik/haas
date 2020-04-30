@@ -3,6 +3,7 @@ import { HAASIdle, HAASRun, HAASStopping } from 'assets/animations';
 import Lottie from 'react-lottie';
 import { Slider as UISlider } from '@haas/ui';
 import { HAASRabbit } from './SliderNodeStyles';
+import { AnimationControls } from 'framer-motion';
 
 interface SliderAnimationStateProps {
   isStopped: boolean;
@@ -32,10 +33,11 @@ const defaultSliderAnimationState: SliderAnimationStateProps = {
 
 interface SliderProps {
   register: any;
-  onSubmit: () => void
+  onSubmit: () => void;
+  animationControls: AnimationControls;
 }
 
-const Slider = ({ register, onSubmit }: SliderProps) => {
+const Slider = ({ register, onSubmit, animationControls }: SliderProps) => {
   const [animationState, dispatchAnimationState] = useReducer((state: SliderAnimationStateProps, action: SliderAnimationActionType): SliderAnimationStateProps => {
     switch(action.type) {
       case 'idle':
@@ -84,6 +86,7 @@ const Slider = ({ register, onSubmit }: SliderProps) => {
 
   const moveBunny = (event: React.FormEvent<HTMLInputElement>) => {
     const val = Number(event.currentTarget.value);
+    animationControls.start('active');
 
     dispatchAnimationState({ type: 'run', payload: { position: val } })
   }

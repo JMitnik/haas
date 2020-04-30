@@ -239,12 +239,12 @@ export const SliderContainer = styled.div`
       &::-webkit-slider-runnable-track {
         width: 100%;
         margin-top: 80px;
-        height: 10px;
+        height: 15px;
         cursor: pointer;
-        box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
-        background: ${Color(theme.colors.primary).darken(0.4).hex()};
+        width: 100%;
+        box-shadow: 0px 2px 2px 1px rgba(0,0,0,0.05);
+        background: linear-gradient(45deg, rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.04));
         border-radius: 10px;
-        border: 0.2px solid #010101;
       }
     }
   `}
