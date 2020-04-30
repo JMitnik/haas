@@ -24,6 +24,8 @@ export interface MultiChoiceOption {
 
 export interface Edge {
   id: string;
+  childNodeId: string;
+  parentNodeId: string;
   parentNode: HAASNode;
   childNode: HAASNode;
   conditions: [HAASNodeConditions];
@@ -31,6 +33,8 @@ export interface Edge {
 
 export interface HAASEdge {
   id: string;
+  childNodeId: string;
+  parentNodeId: string;
   parentNode: HAASNode;
   childNode: HAASNode;
   conditions: HAASNodeConditions[];
@@ -43,6 +47,7 @@ export interface HAASNode {
   children: Array<Edge>;
   conditions?: [HAASNodeConditions];
   overrideLeaf?: HAASNode;
+  overrideLeafId?: string;
   options?: [MultiChoiceOption];
 }
 
@@ -91,9 +96,9 @@ export const QuestionnaireProvider = ({ children }: { children: ReactNode }) => 
   const { data } = res;
 
   useEffect(() => {
-    if (data?.questionnaire) {
-      setQuestionnaire(data?.questionnaire);
-      setCustomer(data?.questionnaire?.customer || {});
+    if (data?.dialogue) {
+      setQuestionnaire(data?.dialogue);
+      setCustomer(data?.dialogue?.customer || {});
     }
   }, [data]);
 

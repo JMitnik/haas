@@ -1,18 +1,14 @@
 import gql from 'graphql-tag';
 
 const getQuestionnairesCustomerQuery = gql`
-  query getQuestionnairesOfCustomer($id: ID) {
-  questionnaires(where: { customer: {
-  id: $id
-  } }) {
+  query getQuestionnairesOfCustomer($id: ID!) {
+  dialogues(customerId: $id) {
     id
     title
     publicTitle
     creationDate
     updatedAt
-    customer {
-      id
-    }
+    customerId
   }
 }
 `;

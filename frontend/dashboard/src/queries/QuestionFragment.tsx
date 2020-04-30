@@ -4,6 +4,7 @@ const QuestionFragment = gql`
   fragment QuestionFragment on QuestionNode {
     id
     title
+    creationDate
     isRoot
     isLeaf
     overrideLeaf {

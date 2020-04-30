@@ -1,0 +1,197 @@
+import { Dialogue } from '@prisma/client';
+import { objectType, extendType, inputObjectType } from '@nexus/schema';
+import { UniqueDataResultEntry } from '../session/Session';
+import { QuestionNodeType, QuestionNodeWhereInput } from '../question/QuestionNode';
+import { CustomerType } from '../customer/Customer';
+import DialogueResolver from './dialogue-resolver';
+
+export const DialogueType = objectType({
+  name: 'Dialogue',
+  definition(t) {
+    t.id('id');
+    t.string('title');
+    t.string('description');
+    t.string('publicTitle', { nullable: true });
+    t.string('creationDate', { nullable: true });
+    t.string('updatedAt', { nullable: true });
+    t.field('customer', {
+      type: CustomerType,
+      resolve(parent: Dialogue, args: any, ctx: any, info: any) {
+        const customer = ctx.prisma.customer.findOne({
+          where: {
+            id: parent.customerId,
+          },
+        });
+        return customer;
+      },
+    });
+    t.string('customerId');
+    t.list.field('questions', {
+      type: QuestionNodeType,
+      args: {
+        where: QuestionNodeWhereInput,
+      },
+      resolve(parent: Dialogue, args: any, ctx: any, info: any) {
+        if (args?.where?.isRoot) {
+          const rootQuestion = ctx.prisma.questionNode.findMany({
+            where: {
+              isRoot: args.where.isRoot,
+            },
+          });
+          return rootQuestion;
+        }
+
+        if (args?.where?.id) {
+          const questions = ctx.prisma.questionNode.findMany({
+            where: {
+              id: args.where.id,
+            },
+          });
+          return questions;
+        }
+
+        const questions = ctx.prisma.questionNode.findMany({
+          where: {
+            AND: [
+              {
+                questionDialogueId: parent.id,
+              },
+              {
+                isLeaf: false,
+              },
+            ],
+          },
+        });
+        return questions;
+      },
+    });
+    t.list.field('leafs', {
+      type: QuestionNodeType,
+      resolve(parent: Dialogue, args: any, ctx: any, info: any) {
+        const leafs = ctx.prisma.questionNode.findMany({
+          where: {
+            AND: [
+              {
+                questionDialogueId: parent.id,
+              },
+              {
+                isLeaf: true,
+              },
+            ],
+          },
+        });
+        return leafs;
+      },
+    });
+  },
+});
+
+export const DialogueWhereUniqueInput = inputObjectType({
+  name: 'DialogueWhereUniqueInput',
+  definition(t) {
+    t.id('id', { required: true });
+  },
+});
+
+export const DialogueDetailResultType = objectType({
+  name: 'DialogueDetailResult',
+  definition(t) {
+    t.string('customerName');
+    t.string('title');
+    t.string('description');
+    t.string('creationDate');
+    t.string('updatedAt');
+    t.string('average');
+    t.int('totalNodeEntries');
+    t.list.field('timelineEntries', {
+      type: UniqueDataResultEntry,
+    });
+  },
+});
+
+export const getQuestionnaireDataQuery = extendType({
+  type: 'Query',
+  definition(t) {
+    t.field('getQuestionnaireData', {
+      type: DialogueDetailResultType,
+      args: {
+        dialogueId: 'String',
+      },
+      resolve(parent: any, args: any, ctx: any, info: any) {
+        const result = DialogueResolver.getQuestionnaireAggregatedData(parent, args);
+        return result;
+      },
+    });
+  },
+});
+
+export const deleteDialogueOfCustomerMutation = extendType({
+  type: 'Mutation',
+  definition(t) {
+    t.field('createDialogue', {
+      type: DialogueType,
+      args: {
+        customerId: 'String',
+        title: 'String',
+        description: 'String',
+        publicTitle: 'String',
+        isSeed: 'Boolean',
+      },
+      resolve(parent: any, args: any, ctx: any, info: any) {
+        return DialogueResolver.createDialogue(args);
+      },
+    });
+    t.field('deleteDialogue', {
+      type: DialogueType,
+      args: {
+        where: DialogueWhereUniqueInput,
+      },
+      resolve(parent: any, args: any, ctx: any, info: any) {
+        return DialogueResolver.deleteDialogue(args.where.id);
+      },
+    });
+  },
+});
+
+export const DialoguesOfCustomerQuery = extendType({
+  type: 'Query',
+  definition(t) {
+    t.field('dialogue', {
+      type: DialogueType,
+      args: {
+        where: DialogueWhereUniqueInput,
+      },
+      resolve(parent: any, args: any, ctx: any, info: any) {
+        const dialogue = ctx.prisma.dialogue.findOne({ where: {
+          id: args.where.id,
+        } });
+        return dialogue;
+      },
+    });
+    t.list.field('dialogues', {
+      type: DialogueType,
+      args: {
+        customerId: 'ID',
+      },
+      resolve(parent: any, args: any, ctx: any, info: any) {
+        const dialogues = ctx.prisma.dialogue.findMany({
+          where: {
+            customerId: args.customerId,
+          },
+        });
+        return dialogues;
+      },
+    });
+  },
+});
+
+const dialogueNexus = [
+  DialogueWhereUniqueInput,
+  deleteDialogueOfCustomerMutation,
+  DialogueType,
+  DialoguesOfCustomerQuery,
+  DialogueDetailResultType,
+  getQuestionnaireDataQuery,
+];
+
+export default dialogueNexus;

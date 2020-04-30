@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-import { NodeType } from '../../src/generated/prisma-client/index';
+import { NodeType } from '../../generated/prisma-client/index';
 
 export const multiChoiceType: NodeType = 'MULTI_CHOICE';
 export const socialShareType: NodeType = 'SOCIAL_SHARE';
