@@ -1,5 +1,6 @@
 # Perform migrations
-yarn deploy
+yarn migrate
+yarn gen
 
 # Serve application
 yarn serve
