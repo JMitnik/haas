@@ -48,6 +48,10 @@ const resolvers = {
   },
   Customer: {
     questionnaires: (parent: any) => prisma.customer({ id: parent.id }).questionnaires(),
+    settings: (parent: any) => prisma.customer({ id: parent.id }).settings(),
+  },
+  CustomerSettings: {
+    colourSettings: (parent: any) => prisma.customerSettings({ id: parent.id }).colourSettings(),
   },
   Questionnaire: {
     customer: (parent: any) => prisma.questionnaire({ id: parent.id }).customer(),
