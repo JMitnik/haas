@@ -8,4 +8,4 @@ export { Loader } from './Loader';
 export { Label } from './Labels';
 export { TopNav } from './Nav';
 export { H1, H2, H3, H4, H5, Muted, Paragraph } from './Type';
-export { Hr } from './Special';
+export { Hr, WatermarkLogo } from './Special';

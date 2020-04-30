@@ -1,5 +1,5 @@
 import React, { useContext, ReactNode, useReducer } from 'react';
-import { HAASNode, HAASEntry, HAASEdge, HAASFormEntry, Dialogue } from 'types/generic';
+import { HAASNode, HAASEntry, HAASEdge, HAASFormEntry, Dialogue, CustomerProps } from 'types/generic';
 import { getQuestionNodeQuery } from '../queries/getQuestionNodeQuery';
 import client from '../config/apollo';
 
@@ -37,7 +37,7 @@ interface TreeStateProps {
   activeNode: HAASNode;
   activeEdge: HAASEdge | null;
   activeLeaf: HAASNode;
-  customer: any;
+  customer: CustomerProps;
 }
 
 const makeFinishedNode: () => HAASNode = () => ({
