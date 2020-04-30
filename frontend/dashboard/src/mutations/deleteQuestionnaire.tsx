@@ -2,8 +2,8 @@
 import gql from 'graphql-tag';
 
 export const deleteQuestionnaireMutation = gql`
-mutation deleteQuestionnaire($id: ID!) {
-  deleteQuestionnaire(where: {
+mutation deleteDialogue($id: ID!) {
+  deleteDialogue(where: {
     id: $id
   }) {
     id

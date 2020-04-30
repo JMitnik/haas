@@ -19,26 +19,6 @@ interface DialogueResultProps {
   timelineEntries?: Array<TimelineEntryProps>
 }
 
-const monthMap = new Map([
-  [0, 'JAN'],
-  [1, 'FEB'],
-  [2, 'MAR'],
-  [3, 'APR'],
-  [4, 'MAY'],
-  [5, 'JUN'],
-  [6, 'JUL'],
-  [7, 'AUG'],
-  [8, 'SEP'],
-  [9, 'OCT'],
-  [10, 'NOV'],
-  [11, 'DEC'],
-]);
-
-const getUniversalDate = (date: Date) => {
-  const result = `${date.getDate().toString()}-${monthMap.get(date.getMonth())}-${date.getFullYear().toString()}`;
-  return result;
-};
-
 const TopicInfo = (
   { DialogueResultProps }: { DialogueResultProps: DialogueResultProps },
 ) => (
@@ -57,12 +37,6 @@ const TopicInfo = (
             {DialogueResultProps?.description}
           </Muted>
           <Hr />
-          <div style={{ marginTop: '10px' }}>
-            `Created at:
-
-            `
-            {getUniversalDate(new Date(DialogueResultProps?.creationDate))}
-          </div>
           <div>
             {
               DialogueResultProps?.average !== 'false' && (

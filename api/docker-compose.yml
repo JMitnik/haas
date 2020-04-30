@@ -1,23 +1,5 @@
 version: '3'
 services:
-  prisma:
-    image: prismagraphql/prisma:1.34
-    restart: always
-    ports:
-      - '4466:4466'
-    environment:
-      SLOW_QUERIES_LOGGING: 'true'
-      SLOW_QUERIES_LOGGING_THRESHOLD: '0'
-      PRISMA_CONFIG: |
-        port: 4466
-        managementApiSecret: ${PRISMA_MANAGEMENT_API_SECRET}
-        databases:
-          default:
-            connector: postgres
-            host: postgres
-            port: 5432
-            user: prisma
-            password: prisma
   postgres:
     image: postgres:10.3
     environment:
@@ -25,10 +7,12 @@ services:
       POSTGRES_PASSWORD: prisma
     volumes:
       - /postgresdata:/var/lib/postgresql/data
-  api:
-    build: .
-    restart: always
     ports:
-      - '4000:4000'
-    env_file:
-      - .env
+      - '5432:5432'
+  # api:
+  #   build: .
+  #   restart: always
+  #   ports:
+  #     - '4000:4000'
+  #   env_file:
+  #     - .env

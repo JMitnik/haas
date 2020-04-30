@@ -3,8 +3,8 @@ import gql from 'graphql-tag';
 import QuestionFragment from './QuestionFragment';
 
 export const getTopicBuilderQuery = gql`
-  query getQuestionnaire ($topicId: ID) {
-    questionnaire(where: { id: $topicId }) {
+  query getTopicBuilder ($topicId: ID!) {
+    dialogue(where: { id: $topicId }) {
       id
       title
       publicTitle

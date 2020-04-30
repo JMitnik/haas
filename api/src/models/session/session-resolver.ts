@@ -1,19 +1,25 @@
-import { prisma, NodeEntry } from '../../generated/prisma-client/index';
+import { PrismaClient,
+  Session, NodeEntry, NodeEntryCreateWithoutSessionInput } from '@prisma/client';
 import cleanInt from '../../utils/cleanInt';
-import { NodeEntryCreateWithoutSessionInput, Session } from '../../generated/resolver-types';
+
+const prisma = new PrismaClient();
 
 class SessionResolver {
   static async uploadUserSession(obj: any, args: any, ctx: any) {
     const { questionnaireId, entries } = args.uploadUserSessionInput;
 
-    const session = await prisma.createSession({
-      questionnaire: {
-        connect: {
-          id: questionnaireId,
+    const session = await prisma.session.create({
+      data: {
+        dialogue: {
+          connect: {
+            id: questionnaireId,
+          },
         },
-      },
-      nodeEntries: {
-        create: entries.map((entry: any) => SessionResolver.constructNodeEntry(entry)),
+        nodeEntries: {
+          create: entries.map(
+            (entry: any) => SessionResolver.constructNodeEntry(entry),
+          ),
+        },
       },
     });
 
@@ -22,7 +28,7 @@ class SessionResolver {
 
     // TODO: Roundabout way, needs to be done in Prisma2 better
     const nodeEntries = await SessionResolver.getEntriesOfSession(session);
-    const questionnaire = await prisma.questionnaire({ id: questionnaireId });
+    const questionnaire = await prisma.dialogue.findOne({ where: { id: questionnaireId } });
 
     ctx.services.triggerMailService.sendTrigger({
       to: dialogueAgentMail,
@@ -38,22 +44,33 @@ class SessionResolver {
 
   static async getEntriesOfSession(session: Session): Promise<NodeEntry[]> {
     const entries = await Promise.all((
-      await prisma.session({ id: session.id }).nodeEntries()).map(async (entry) => ({
-      ...entry,
-      relatedNode: await Promise.resolve(prisma.nodeEntry({
-        id: entry.id,
-      }).relatedNode()),
-      values: await Promise.resolve(prisma.nodeEntry({
-        id: entry.id,
-      }).values()),
-    })));
+      await prisma.session.findOne({ where: { id: session.id } }).nodeEntries()).map(
+      async (entry) => ({
+        ...entry,
+        relatedNode: await Promise.resolve(prisma.nodeEntry.findOne({ where: {
+          id: entry.id,
+        } }).relatedNode()),
+        values: await Promise.resolve(prisma.nodeEntry.findOne({ where: {
+          id: entry.id,
+        } }).values()),
+      }),
+    ));
 
     return entries;
   }
 
   static constructNodeEntry(nodeEntry: any) : NodeEntryCreateWithoutSessionInput {
+    const valuesObject: any = { multiValues: { create: nodeEntry.data.multiValues || [] } };
+
+    if (nodeEntry.data.numberValue) {
+      valuesObject.numberValue = cleanInt(nodeEntry.data.numberValue);
+    }
+
+    if (nodeEntry.data.textValue) {
+      valuesObject.textValue = nodeEntry.data.textValue;
+    }
+
     return {
-      // todo: Add relatedEdge back
       relatedNode: {
         connect: {
           id: nodeEntry.nodeId,
@@ -61,13 +78,7 @@ class SessionResolver {
       },
       depth: nodeEntry.depth,
       values: {
-        create: [{
-          numberValue: cleanInt(nodeEntry.data.numberValue),
-          textValue: nodeEntry.data.textValue,
-          multiValues: {
-            create: nodeEntry.data.multiValues,
-          },
-        }],
+        create: [valuesObject],
       },
     };
   }

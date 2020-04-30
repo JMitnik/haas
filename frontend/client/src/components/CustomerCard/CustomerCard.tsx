@@ -5,14 +5,14 @@ import { useHistory } from 'react-router-dom';
 import { CustomerCardImage, CustomerCardEnqueteLabel } from './CustomerCardStyles';
 
 const CustomerCard = ({ customer }: { customer: any }) => {
-  const questionnaireOptions = customer?.questionnaires?.map((questionnaire: any) => ({
+  const questionnaireOptions = customer?.dialogues?.map((questionnaire: any) => ({
     value: questionnaire.id,
     label: questionnaire.title
   }));
 
   const history = useHistory();
 
-  const startQuestionnaire = (questionnaireOption: any, actionMeta: ActionMeta) => {
+  const startQuestionnaire = (questionnaireOption: any, actionMeta: any) => {
     if (actionMeta.action === 'select-option') {
       history.push(`/${customer.slug}/${questionnaireOption.value}`);
     }

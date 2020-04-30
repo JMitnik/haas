@@ -5,6 +5,7 @@ export interface OverrideLeafProps {
 }
 export interface QuestionEntryProps {
   id?: string;
+  creationDate?: string;
   title?: string;
   isRoot?: boolean;
   isLeaf?: boolean;
@@ -15,7 +16,7 @@ export interface QuestionEntryProps {
 }
 
 export interface QuestionOptionProps {
-  id?: string;
+  id?: number;
   value: string;
   publicValue?: string;
 }
@@ -33,7 +34,7 @@ export interface EdgeChildProps {
 }
 
 export interface EdgeConditonProps {
-  id?: string;
+  id?: number;
   conditionType?: string;
   renderMin?: number;
   renderMax?: number;

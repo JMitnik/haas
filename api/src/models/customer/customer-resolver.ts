@@ -1,19 +1,23 @@
-import { prisma, ID_Input } from '../../generated/prisma-client/index';
+import { PrismaClient } from '@prisma/client';
 import { Customer } from '../../generated/resolver-types';
-import { leafNodes } from '../../../data/seeds/default-data';
+import { leafNodes } from '../../data/seeds/default-data';
 import NodeResolver from '../question/node-resolver';
 
+const prisma = new PrismaClient();
 class CustomerResolver {
-  static deleteFullCustomerNode = async (obj: any, args: any) => {
-    const { id }: { id: ID_Input } = args;
-    const customerId = id;
-    const customer = await prisma.deleteCustomer({ id: customerId });
-    return customer;
+  static customers = async () => {
+    const customers = prisma.customer.findMany();
+    return customers;
+  };
+
+  static customerSettings = async (parent: Customer) => {
+    const customerSettings = prisma.customerSettings.findOne({ where: { customerId: parent.id } });
+    return customerSettings;
   };
 
   static customerBySlug = async (obj: any, args: any) => {
     const { slug } = args;
-    const customer = await prisma.customer({ slug });
+    const customer = await prisma.customer.findOne({ where: { slug } });
 
     if (!customer) {
       throw new Error("Can't find slug, shit!");
@@ -25,19 +29,18 @@ class CustomerResolver {
   };
 
   static seed = async (customer: Customer) => {
-    const questionnaire = await prisma.createQuestionnaire({
-      customer: {
-        connect: {
-          id: customer.id,
+    const questionnaire = await prisma.dialogue.create({
+      data: {
+        customer: {
+          connect: {
+            id: customer.id,
+          },
         },
-      },
-      leafs: {
-        create: [],
-      },
-      title: 'Default questionnaire',
-      description: 'Default questions',
-      questions: {
-        create: [],
+        title: 'Default questionnaire',
+        description: 'Default questions',
+        questions: {
+          create: [],
+        },
       },
     });
 
@@ -46,25 +49,27 @@ class CustomerResolver {
     await NodeResolver.createTemplateNodes(questionnaire.id, customer.name, leafs);
   };
 
-  static createNewCustomerMutation = async (parent : any, args: any) => {
+  static createCustomer = async (args: any) => {
     const { name, options, slug } = args;
-    const { isSeed, logo } = options;
+    const { isSeed, logo, primaryColour } = options;
 
-    const customer = await prisma.createCustomer({
-      name,
-      slug,
-      settings: {
-        create: {
-          logoUrl: logo,
-          colourSettings: {
-            create: {
-              primary: '#4287f5',
+    const customer = await prisma.customer.create({
+      data: {
+        name,
+        slug,
+        settings: {
+          create: {
+            logoUrl: logo,
+            colourSettings: {
+              create: {
+                primary: primaryColour || '#4287f5',
+              },
             },
           },
         },
-      },
-      questionnaires: {
-        create: [],
+        dialogues: {
+          create: [],
+        },
       },
     });
 

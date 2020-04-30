@@ -3,7 +3,7 @@ import { QuestionFragment } from './QuestionFragment';
 import { EdgeFragment } from './EdgeFragment';
 
 export const getQuestionNodeQuery = gql`
-  query getQuestionNode($id: ID!) {
+  query getQuestionNode($id: String!) {
     questionNode(where: { id: $id }) {
       ...QuestionFragment
       children {

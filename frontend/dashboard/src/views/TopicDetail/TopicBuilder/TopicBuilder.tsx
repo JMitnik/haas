@@ -4,6 +4,7 @@ import { ApolloError } from 'apollo-boost';
 import { useQuery, useMutation } from '@apollo/react-hooks';
 import { H2, Loader, Div, Button } from '@haas/ui';
 import { useParams, useHistory } from 'react-router-dom';
+import { orderBy } from 'lodash';
 import updateTopicBuilder from '../../../mutations/updateTopicBuilder';
 import { getTopicBuilderQuery } from '../../../queries/getQuestionnaireQuery';
 import QuestionEntry from './QuestionEntry/QuestionEntry';
@@ -37,7 +38,8 @@ const TopicBuilder = () => {
   });
 
   const mapQuestionsInputData = (nodes: Array<QuestionEntryProps>) => {
-    const questions = nodes?.filter((node) => !node.isLeaf);
+    let questions = nodes?.filter((node) => !node.isLeaf);
+    questions = orderBy(questions, (question) => question.creationDate, ['asc']);
     return questions?.map(({ id,
       title, isRoot, isLeaf, type, overrideLeaf, options, children }: QuestionEntryProps) => ({
       id,
@@ -66,28 +68,25 @@ const TopicBuilder = () => {
   };
 
   const findLeafs = (nodes: Array<QuestionEntryProps>) => {
-    const leafs = nodes?.filter((node) => node.isLeaf);
-    const selectLeafs = leafs?.map((leaf) => ({ value: leaf.id, label: leaf.title }));
+    const selectLeafs = nodes?.map((leaf) => ({ value: leaf.id, label: leaf.title }));
     selectLeafs?.unshift({ value: 'None', label: 'None' });
     return selectLeafs;
   };
 
-  const topicBuilderData = data?.questionnaire;
+  const topicBuilderData = data?.dialogue;
+  const selectLeafs = findLeafs(data?.dialogue?.leafs);
 
-  const selectLeafs = findLeafs(data?.questionnaire?.questions);
-
-  const questionsData = mapQuestionsInputData(data?.questionnaire?.questions);
+  const questionsData = mapQuestionsInputData(data?.dialogue?.questions);
   const [questions, setQuestions] = useState(questionsData);
 
   useEffect(() => {
     if (!data) {
       return;
     }
-    if (data?.questionnaire) {
-      const questionData = mapQuestionsInputData(data?.questionnaire?.questions);
+    if (data?.dialogue) {
+      const questionData = mapQuestionsInputData(data?.dialogue?.questions);
       setQuestions(questionData);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
   if (!data || loading) {

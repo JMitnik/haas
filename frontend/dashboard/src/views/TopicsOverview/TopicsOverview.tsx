@@ -6,7 +6,6 @@ import { Plus, X } from 'react-feather';
 import { H2, H3, Grid, Flex, Label, Div, Card, CardBody,
   Container, DeleteButtonContainer } from '@haas/ui';
 import { Link, useHistory, useParams } from 'react-router-dom';
-import { Query, Questionnaire } from '../../types';
 
 import getQuestionnairesCustomerQuery from '../../queries/getQuestionnairesCustomerQuery';
 import { deleteQuestionnaireMutation } from '../../mutations/deleteQuestionnaire';
@@ -15,7 +14,7 @@ import { AddTopicCard } from './TopicsOverviewStyles';
 const TopicsOverview: FC = () => {
   const { customerId } = useParams();
 
-  const { loading, error, data } = useQuery<Query>(getQuestionnairesCustomerQuery, {
+  const { loading, error, data } = useQuery<any>(getQuestionnairesCustomerQuery, {
     variables: { id: customerId },
   });
 
@@ -32,8 +31,7 @@ const TopicsOverview: FC = () => {
     );
   }
 
-  const topics = data?.questionnaires;
-
+  const topics: Array<any> = data?.dialogues;
   return (
     <>
       <Container>
@@ -61,7 +59,7 @@ const TopicsOverview: FC = () => {
   );
 };
 
-const TopicCard = ({ topic }: { topic: Questionnaire }) => {
+const TopicCard = ({ topic }: { topic: any }) => {
   const history = useHistory();
   const { customerId } = useParams();
 
@@ -69,7 +67,7 @@ const TopicCard = ({ topic }: { topic: Questionnaire }) => {
     refetchQueries: [{
       query: getQuestionnairesCustomerQuery,
       variables: {
-        id: topic.customer.id,
+        id: customerId,
       },
     }],
     onError: (serverError: ApolloError) => {

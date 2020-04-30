@@ -1,7 +1,7 @@
 import gql from 'graphql-tag';
 
 const getSessionAnswerFlowQuery = gql`
-  query getSessionAnswerFlow($sessionId: ID) {
+  query getSessionAnswerFlow($sessionId: ID!) {
     session(where: {
       id: $sessionId
     }) {
