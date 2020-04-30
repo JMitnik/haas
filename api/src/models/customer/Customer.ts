@@ -11,6 +11,7 @@ export const CustomerType = objectType({
   name: 'Customer',
   definition(t) {
     t.id('id');
+    t.string('slug');
     t.string('name');
     t.field('settings', {
       type: CustomerSettingsType,

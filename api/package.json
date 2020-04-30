@@ -7,7 +7,7 @@
         "build": "yarn",
         "logs": "",
         "deploy": "echo 'not setup webhook yet'",
-        "generate": "prisma deploy && prisma generate -e .env && graphql-codegen",
+        "gen": "prisma generate && ts-node ./src/schema.ts && graphql-codegen",
         "migrate": "prisma deploy --force -f -e .env && prisma generate && graphql-codegen",
         "seed": "ts-node --transpile-only src/data/main-seed.ts",
         "reset": "prisma reset",
