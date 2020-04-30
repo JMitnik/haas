@@ -1,4 +1,4 @@
-FROM mhart/alpine-node:13.12.0
+FROM node:12-buster-slim AS base
 ENV PORT 4000
 
 WORKDIR /app
