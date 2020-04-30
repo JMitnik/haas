@@ -5,16 +5,16 @@ import { useHistory } from 'react-router-dom';
 import { CustomerCardImage, CustomerCardEnqueteLabel } from './CustomerCardStyles';
 
 const CustomerCard = ({ customer }: { customer: any }) => {
-  const questionnaireOptions = customer?.dialogues?.map((questionnaire: any) => ({
-    value: questionnaire.id,
-    label: questionnaire.title
+  const questionnaireOptions = customer?.dialogues?.map((dialogue: any) => ({
+    value: dialogue.id,
+    label: dialogue.title
   }));
 
   const history = useHistory();
 
-  const startQuestionnaire = (questionnaireOption: any, actionMeta: any) => {
+  const startQuestionnaire = (dialogueOption: any, actionMeta: any) => {
     if (actionMeta.action === 'select-option') {
-      history.push(`/${customer.slug}/${questionnaireOption.value}`);
+      history.push(`/${customer.slug}/${dialogueOption.value}`);
     }
   };
 
@@ -31,7 +31,7 @@ const CustomerCard = ({ customer }: { customer: any }) => {
             </ColumnFlex>
           </Div>
           <CustomerCardEnqueteLabel>
-            {customer?.questionnaires ? customer?.questionnaires.length : 'No'} questionnaires
+            {customer?.dialogues ? customer?.dialogues.length : 'No'} questionnaires
           </CustomerCardEnqueteLabel>
         </Flex>
       </CardBody>

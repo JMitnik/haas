@@ -55,15 +55,15 @@ export type HAASQuestionType =
     multiValues?: HAASFormEntry[];
   }
 
-  export interface Questionnaire {
+  export interface Dialogue {
     questions: HAASNode[];
     leafs: HAASNode[];
     rootQuestion: HAASNode;
   }
 
-  interface QuestionnaireContextProps {
+  interface DialogueContextProps {
     customer: any;
-    questionnaire?: Questionnaire | null;
+    dialogue?: Dialogue | null;
   }
 
   interface ProjectParamProps {

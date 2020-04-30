@@ -10,33 +10,31 @@ import { ThemeProvider } from 'styled-components';
 import { makeCustomTheme } from 'utils/makeCustomerTheme';
 import { DialogueTreeProvider } from 'providers/dialogue-tree-provider';
 
+
 const getDialogueQuery = gql`
-  query getQuestionnaire($id: ID) {
-    questionnaire(where: { id: $id }) {
+  query getDialogue($id: ID!) {
+    dialogue(where: { id: $id }) {
       id
       title
       publicTitle
       creationDate
-      rootQuestion {
-        ...QuestionFragment
-      }
       updatedAt
       leafs {
         id
         title
         type
       }
+      customerId
+      questions {
+        ...QuestionFragment
+      }
       customer {
         ...CustomerFragment
       }
-      questions(where: { isRoot: true }) {
-        ...QuestionFragment
-      }
     }
   }
-
-  ${QuestionFragment}
   ${CustomerFragment}
+  ${QuestionFragment}
 `;
 
 
@@ -52,12 +50,12 @@ const DialogueTreePage = () => {
 
   // Customize app for customer
   useEffect(() => {
-    if (data?.questionnaire?.customer?.name) {
-      window.document.title = `${data.questionnaire?.customer?.name} | Powered by HAAS`;
+    if (data?.dialogue?.customer?.name) {
+      window.document.title = `${data.dialogue?.customer?.name} | Powered by HAAS`;
     }
 
-    if (data?.questionnaire?.customer?.settings) {
-      const customerTheme = { colors: data.questionnaire?.customer?.settings.colourSettings };
+    if (data?.dialogue?.customer?.settings) {
+      const customerTheme = { colors: data.dialogue?.customer?.settings.colourSettings };
       setCustomTheme(customerTheme);
     }
   }, [data]);
@@ -66,11 +64,11 @@ const DialogueTreePage = () => {
   if (loading) return <Loader/>
   if (error) return <p>Shit</p>
 
-  const questionnaire = data?.questionnaire;
-  const customer = data?.questionnaire?.customer;
+  const dialogue = data?.dialogue;
+  const customer = data?.dialogue?.customer;
 
   return (
-    <DialogueTreeProvider customer={customer} questionnaire={questionnaire}>
+    <DialogueTreeProvider customer={customer} dialogue={dialogue}>
       <ThemeProvider theme={(theme: any) => makeCustomTheme(theme, customTheme)}>
         <DialogueTree />
       </ThemeProvider>

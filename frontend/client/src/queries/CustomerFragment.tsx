@@ -6,8 +6,10 @@ export const CustomerFragment = gql`
     name
     slug
     settings {
+      id
       logoUrl
       colourSettings {
+        id
         primary
         primaryAlt
         secondary

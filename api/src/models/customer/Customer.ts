@@ -144,7 +144,7 @@ export const CustomersQuery = extendType({
   definition(t) {
     t.list.field('customers', {
       type: CustomerType,
-      resolve(parent: any, args: any, ctx: any, info: any) {
+      resolve(parent: any, args: any, ctx: any) {
         const customers = ctx.prisma.customer.findMany();
         return customers;
       },
@@ -152,7 +152,41 @@ export const CustomersQuery = extendType({
   },
 });
 
-const customerNexus = [CustomersQuery,
+interface ContextProps {
+  prisma: PrismaClient;
+}
+
+export const CustomerQuery = extendType({
+  type: 'Query',
+  definition(t) {
+    t.field('customer', {
+      type: CustomerType,
+      args: {
+        id: 'ID',
+        slug: 'String',
+      },
+      async resolve(parent: any, args: any, ctx: any): Promise<Customer | null> {
+        const { prisma } : { prisma: PrismaClient } = ctx;
+
+        if (args.slug) {
+          const customer = await prisma.customer.findOne({ where: { slug: args.slug } });
+          return customer;
+        }
+
+        if (args.id) {
+          const customer = await prisma.customer.findOne({ where: { id: args.id } });
+          return customer;
+        }
+
+        throw new Error('Cant find the customer here');
+      },
+    });
+  },
+});
+
+const customerNexus = [
+  CustomersQuery,
+  CustomerQuery,
   CustomerMutations,
   CustomerCreateOptionsInput,
   CustomerType];

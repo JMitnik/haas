@@ -6,9 +6,9 @@ import { DialogueContainer } from './DialogueTreeStyles';
 import NodePage from 'pages/[customer]/[dialogue]/[node]';
 
 const DialogueTree = () => {
-  const { treeState: { questionnaire, customer } } = useDialogueTree();
+  const { treeState: { dialogue } } = useDialogueTree();
 
-  if (!questionnaire) return <Loader />;
+  if (!dialogue) return <Loader />;
 
   return (
     <>

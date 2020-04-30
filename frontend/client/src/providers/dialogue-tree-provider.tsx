@@ -1,5 +1,5 @@
 import React, { useContext, ReactNode, useReducer } from 'react';
-import { HAASNode, HAASEntry, Questionnaire, HAASEdge, HAASFormEntry } from 'types/generic';
+import { HAASNode, HAASEntry, HAASEdge, HAASFormEntry, Dialogue } from 'types/generic';
 import { getQuestionNodeQuery } from '../queries/getQuestionNodeQuery';
 import client from '../config/apollo';
 
@@ -12,7 +12,7 @@ interface TreeDispatchProps {
 }
 
 interface TreeProviderProps {
-  questionnaire: Questionnaire;
+  dialogue: Dialogue;
   customer: any;
   children: ReactNode;
 }
@@ -29,7 +29,7 @@ type TreeAction =
     };
 
 interface TreeStateProps {
-  questionnaire: any;
+  dialogue: Dialogue;
   historyStack: HAASEntry[];
   isAtLeaf: boolean;
   isFinished: boolean;
@@ -90,7 +90,7 @@ const treeReducer = (state: TreeStateProps, action: TreeAction): TreeStateProps 
       }
 
       return {
-        questionnaire: state.questionnaire,
+        dialogue: state.dialogue,
         currentDepth: nextDepth,
         activeNode: nextNode,
         isFinished,
@@ -156,12 +156,12 @@ export const HAASTreeStateContext = React.createContext({} as TreeStateProps);
 export const HAASTreeDispatchContext = React.createContext({} as TreeDispatchProps);
 
 // Provider which manages the state of the context
-export const DialogueTreeProvider = ({ questionnaire, customer, children }: TreeProviderProps) => {
+export const DialogueTreeProvider = ({ dialogue, customer, children }: TreeProviderProps) => {
   const [state, dispatch] = useReducer(treeReducer, {
-    questionnaire,
+    dialogue,
     currentDepth: 0,
-    activeNode: questionnaire.questions[0],
-    activeLeaf: questionnaire.leafs[0],
+    activeNode: dialogue.questions[0],
+    activeLeaf: dialogue.leafs[0],
     activeEdge: null,
     isAtLeaf: false,
     isFinished: false,

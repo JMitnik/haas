@@ -6,8 +6,8 @@ import { CustomerFragment } from 'queries/CustomerFragment';
 import { useQuery } from '@apollo/react-hooks';
 
 const getCustomerFromSlug = gql`
-    query customerBySlug($slug: String!) {
-        customerBySlug(slug: $slug) {
+    query customer($slug: String!) {
+        customer(slug: $slug) {
             ...CustomerFragment
         }
     }
@@ -38,10 +38,10 @@ const CustomerPage = () => {
     if (error) return <p>Shit</p>
 
     // Extract relevant questionnaire here, either default, first, or return to the selection
-    if (!data?.customerBySlug?.questionnaires) return <Loader />
+    if (!data?.customer?.dialogues) return <Loader />
 
     return (
-        <Redirect to={`${location.pathname}/${data?.customerBySlug?.questionnaires[0].id}`} />
+        <Redirect to={`${location.pathname}/${data?.customer?.dialogues[0].id}`} />
     );
 }
 

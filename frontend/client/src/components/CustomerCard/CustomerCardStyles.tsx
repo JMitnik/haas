@@ -9,14 +9,14 @@ export const CustomerCardImage = styled.img`
 
 export const CustomerCardEnqueteLabel = styled(Label)`
     ${({ theme }) => css`
-    text-transform: uppercase;
-    color: ${theme.colors.default.muted};
-    background: ${theme.colors.default.normal};
-    font-size: 12px;
+        text-transform: uppercase;
+        color: ${theme.colors.default.muted};
+        background: ${theme.colors.default.normal};
+        font-size: 12px;
 
-    font-weight: 1000;
-    position: absolute;
-    top: ${theme.gutter / 2}px;
-    right: ${theme.gutter / 2}px;
+        font-weight: 1000;
+        position: absolute;
+        top: ${theme.gutter / 2}px;
+        right: ${theme.gutter / 2}px;
     `}
 `;
