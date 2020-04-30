@@ -2,7 +2,7 @@ import { forwardTo } from 'prisma-binding';
 import crypto from 'crypto';
 import { ServiceContainerProps } from './services/service-container';
 import { QueryResolvers } from './generated/resolver-types';
-import { Prisma } from './generated/prisma-client/index';
+import { Prisma, prisma } from './generated/prisma-client/index';
 import SessionResolver from './models/session/session-resolver';
 import CustomerResolver from './models/customer/customer-resolver';
 import DialogueResolver from './models/questionnaire/questionnaire-resolver';
@@ -18,6 +18,7 @@ const queryResolvers: QueryResolvers<ContextProps> = {
   questionnaire: forwardTo('db'),
   questionnaires: forwardTo('db'),
   customers: forwardTo('db'),
+  customerBySlug: CustomerResolver.customerBySlug,
   edges: forwardTo('db'),
   nodeEntryValues: forwardTo('db'),
   nodeEntries: forwardTo('db'),
@@ -44,6 +45,12 @@ const resolvers = {
   },
   Mutation: {
     ...mutationResolvers,
+  },
+  Customer: {
+    questionnaires: (parent: any) => prisma.customer({ id: parent.id }).questionnaires(),
+  },
+  Questionnaire: {
+    customer: (parent: any) => prisma.questionnaire({ id: parent.id }).customer(),
   },
   Node: {
     __resolveType(obj: any) {

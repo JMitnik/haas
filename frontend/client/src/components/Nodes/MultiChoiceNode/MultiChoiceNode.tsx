@@ -3,7 +3,7 @@ import { H5, Div, H2 } from '@haas/ui';
 import useHAASTree from 'providers/dialogue-tree-provider';
 import { useForm } from 'react-hook-form';
 import { GenericNodeProps } from '../Node/Node';
-import { HAASFormEntry, MultiChoiceOption } from 'providers/dialogue-provider';
+import { HAASFormEntry, MultiChoiceOption } from 'types/generic';
 import { MultiChoiceNodeContainer } from './MultiChoiceNodeStyles';
 import { ClientButton } from 'components/Buttons/Buttons';
 

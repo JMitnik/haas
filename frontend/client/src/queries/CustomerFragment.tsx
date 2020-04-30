@@ -4,6 +4,7 @@ export const CustomerFragment = gql`
   fragment CustomerFragment on Customer {
     id
     name
+    slug
     settings {
       logoUrl
       colourSettings {

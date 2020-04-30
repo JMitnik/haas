@@ -1,6 +1,6 @@
 import React from 'react';
 import useHAASTree from 'providers/dialogue-tree-provider';
-import { HAASNode } from 'providers/dialogue-provider';
+import { HAASNode } from 'types/generic';
 import { Loader } from '@haas/ui';
 import SliderNode from 'components/Nodes/SliderNode/SliderNode';
 import MultiChoiceNode from 'components/Nodes/MultiChoiceNode/MultiChoiceNode';

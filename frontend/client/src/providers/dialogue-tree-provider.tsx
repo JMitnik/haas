@@ -1,5 +1,5 @@
 import React, { useContext, ReactNode, useReducer } from 'react';
-import { HAASNode, HAASEntry, Questionnaire, HAASEdge, HAASFormEntry } from './dialogue-provider';
+import { HAASNode, HAASEntry, Questionnaire, HAASEdge, HAASFormEntry } from 'types/generic';
 import { getQuestionNodeQuery } from '../queries/getQuestionNodeQuery';
 import client from '../config/apollo';
 
@@ -13,6 +13,7 @@ interface TreeDispatchProps {
 
 interface TreeProviderProps {
   questionnaire: Questionnaire;
+  customer: any;
   children: ReactNode;
 }
 
@@ -28,6 +29,7 @@ type TreeAction =
     };
 
 interface TreeStateProps {
+  questionnaire: any;
   historyStack: HAASEntry[];
   isAtLeaf: boolean;
   isFinished: boolean;
@@ -35,6 +37,7 @@ interface TreeStateProps {
   activeNode: HAASNode;
   activeEdge: HAASEdge | null;
   activeLeaf: HAASNode;
+  customer: any;
 }
 
 const makeFinishedNode: () => HAASNode = () => ({
@@ -87,11 +90,13 @@ const treeReducer = (state: TreeStateProps, action: TreeAction): TreeStateProps 
       }
 
       return {
+        questionnaire: state.questionnaire,
         currentDepth: nextDepth,
         activeNode: nextNode,
         isFinished,
         isAtLeaf,
         activeEdge: action.nextEdge,
+        customer: state.customer,
         activeLeaf,
         historyStack: [...state.historyStack, newNodeEntry]
       };
@@ -107,7 +112,7 @@ const treeReducer = (state: TreeStateProps, action: TreeAction): TreeStateProps 
 const findNextEdge = (parent: HAASNode, key: string | number | null) => {
   if (!key) return null;
 
-  const candidates = parent?.children?.filter(edge => {
+  const candidates = parent?.children?.filter((edge: any) => {
     if (parent.type === 'SLIDER') {
       if (edge?.conditions?.[0]?.renderMin && key < edge?.conditions?.[0].renderMin) {
         return false;
@@ -151,14 +156,16 @@ export const HAASTreeStateContext = React.createContext({} as TreeStateProps);
 export const HAASTreeDispatchContext = React.createContext({} as TreeDispatchProps);
 
 // Provider which manages the state of the context
-export const HAASTreeProvider = ({ questionnaire, children }: TreeProviderProps) => {
+export const DialogueTreeProvider = ({ questionnaire, customer, children }: TreeProviderProps) => {
   const [state, dispatch] = useReducer(treeReducer, {
+    questionnaire,
     currentDepth: 0,
     activeNode: questionnaire.questions[0],
     activeLeaf: questionnaire.leafs[0],
     activeEdge: null,
     isAtLeaf: false,
     isFinished: false,
+    customer,
     historyStack: []
   });
 

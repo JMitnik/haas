@@ -14,7 +14,7 @@ const CustomerCard = ({ customer }: { customer: any }) => {
 
   const startQuestionnaire = (questionnaireOption: any, actionMeta: ActionMeta) => {
     if (actionMeta.action === 'select-option') {
-      history.push(`/c/${customer.id}/q/${questionnaireOption.value}`);
+      history.push(`/${customer.slug}/${questionnaireOption.value}`);
     }
   };
 

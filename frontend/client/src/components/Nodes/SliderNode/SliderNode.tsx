@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import useHAASTree from 'providers/dialogue-tree-provider';
 import { cleanInt } from 'utils/cleanInt';
 import { GenericNodeProps } from '../Node/Node';
-import { HAASFormEntry } from 'providers/dialogue-provider';
+import { HAASFormEntry } from 'types/generic';
 import { SliderNodeContainer, SliderNodeValue } from './SliderNodeStyles';
 
 type SliderNodeProps = GenericNodeProps;

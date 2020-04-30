@@ -1,27 +1,25 @@
 import React from 'react';
-import { Switch, Route, Redirect } from 'react-router-dom';
+import { Switch, Route } from 'react-router-dom';
 
 import AppProviders from 'providers/app-providers';
 import AppContainer from 'styles/AppStyles';
-import { QuestionnaireProvider } from 'providers/dialogue-provider';
-import CustomerPage from 'pages/customers';
-import DialogueTreePage from './dialogue';
+import CustomersPage from 'pages/customers';
+import DialogueTreePage from './[customer]/[dialogue]';
+import CustomerPage from 'pages/[customer]';
 
 const App = () => (
   <AppProviders>
     <AppContainer>
       {/* Top-level routes */}
       <Switch>
-        <Route path="/c/:customerId/q/:questionnaireId">
-          <QuestionnaireProvider>
-            <DialogueTreePage />
-          </QuestionnaireProvider>
+        <Route path="/:customerSlug/:dialogueId">
+          <DialogueTreePage />
         </Route>
-        <Route path="/c/">
-          <Redirect to="/" />
+        <Route path="/:customerSlug">
+          <CustomerPage />
         </Route>
         <Route path="/">
-          <CustomerPage />
+          <CustomersPage />
         </Route>
       </Switch>
     </AppContainer>

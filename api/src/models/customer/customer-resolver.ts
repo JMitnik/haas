@@ -11,6 +11,19 @@ class CustomerResolver {
     return customer;
   };
 
+  static customerBySlug = async (obj: any, args: any) => {
+    const { slug } = args;
+    const customer = await prisma.customer({ slug });
+
+    if (!customer) {
+      throw new Error("Can't find slug, shit!");
+    }
+
+    console.log(customer);
+
+    return customer;
+  };
+
   static seed = async (customer: Customer) => {
     const questionnaire = await prisma.createQuestionnaire({
       customer: {
@@ -34,11 +47,12 @@ class CustomerResolver {
   };
 
   static createNewCustomerMutation = async (parent : any, args: any) => {
-    const { name, options } = args;
+    const { name, options, slug } = args;
     const { isSeed, logo } = options;
 
     const customer = await prisma.createCustomer({
       name,
+      slug,
       settings: {
         create: {
           logoUrl: logo,

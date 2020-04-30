@@ -3,6 +3,7 @@
 type Query {
     newSessionId: String
     getQuestionnaireData(topicId: String): QuestionnaireDetailResult!
+    customerBySlug(slug: String): Customer!
 }
 
 type Mutation {

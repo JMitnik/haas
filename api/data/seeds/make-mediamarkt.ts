@@ -7,6 +7,7 @@ const CUSTOMER = 'Mediamarkt';
 const makeMediamarkt = async () => {
   const customer = await prisma.createCustomer({
     name: CUSTOMER,
+    slug: 'mediamarkt',
     settings: {
       create: {
         logoUrl: 'https://pbs.twimg.com/profile_images/644430670513631232/x7TWAZrV_400x400.png',

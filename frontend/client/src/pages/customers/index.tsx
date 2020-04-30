@@ -7,7 +7,7 @@ import Logo from 'components/Logo';
 import { CustomerOverviewContainer } from 'components/CustomerOverview/CustomerOverviewStyles';
 import CustomerCard from 'components/CustomerCard/CustomerCard';
 
-const CustomerPage = () => {
+const CustomersPage = () => {
   const { data, loading } = useQuery(getCustomerQuery);
 
   const customers = data?.customers;
@@ -33,4 +33,4 @@ const CustomerPage = () => {
   );
 };
 
-export default CustomerPage;
+export default CustomersPage;

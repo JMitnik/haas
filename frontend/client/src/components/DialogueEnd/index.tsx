@@ -1,2 +1,2 @@
-import DialogueEnd from "pages/dialogue/end";
+import DialogueEnd from './DialogueEnd'
 export default DialogueEnd;

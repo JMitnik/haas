@@ -1,5 +1,5 @@
 import React from 'react';
-import DialogueEnd from "components/DialogueEnd";
+import DialogueEnd from 'components/DialogueEnd';
 
 const DialogueEndPage = () => (
   <DialogueEnd />

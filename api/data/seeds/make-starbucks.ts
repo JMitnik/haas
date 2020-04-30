@@ -7,6 +7,7 @@ const CUSTOMER = 'Starbucks';
 const makeStarbucks = async () => {
   const customer = await prisma.createCustomer({
     name: CUSTOMER,
+    slug: 'starbucks',
     settings: {
       create: {
         logoUrl: 'https://www.stickpng.com/assets/images/58428cc1a6515b1e0ad75ab1.png',
