@@ -1,7 +1,6 @@
 import React from 'react';
 import useHAASTree from 'providers/dialogue-tree-provider';
 import { HAASNode } from 'types/generic';
-import { Loader } from '@haas/ui';
 import SliderNode from 'components/Nodes/SliderNode/SliderNode';
 import MultiChoiceNode from 'components/Nodes/MultiChoiceNode/MultiChoiceNode';
 import TextboxNode from 'components/Nodes/TextboxNode/TextboxNode';
@@ -10,6 +9,7 @@ import RegisterNode from 'components/Nodes/RegisterNode/RegisterNode';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ActiveNodeContainer, FloatingNodeContainer } from './NodeStyles';
 import FinishNode from 'components/Nodes/FinishNode/FinishNode';
+import Loader from 'components/Loader';
 
 export interface GenericNodeProps {
   isLeaf?: boolean;

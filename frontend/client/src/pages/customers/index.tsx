@@ -1,7 +1,8 @@
 import React from 'react';
 import { useQuery } from '@apollo/react-hooks';
 
-import { H1, Div, Grid, Loader } from '@haas/ui';
+import { H1, Div, Grid } from '@haas/ui';
+import Loader from 'components/Loader';
 import { getCustomerQuery } from 'queries/getCustomerQuery';
 import Logo from 'components/Logo';
 import { CustomerOverviewContainer } from 'components/CustomerOverview/CustomerOverviewStyles';

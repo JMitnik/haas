@@ -1,9 +1,10 @@
 import React from 'react';
 import gql from 'graphql-tag';
 import { useParams, Redirect, useLocation, useHistory } from 'react-router-dom';
-import { Div, Loader } from '@haas/ui';
+import { Div } from '@haas/ui';
 import { CustomerFragment } from 'queries/CustomerFragment';
 import { useQuery } from '@apollo/react-hooks';
+import Loader from 'components/Loader';
 
 const getCustomerFromSlug = gql`
     query customer($slug: String!) {
