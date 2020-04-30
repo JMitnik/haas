@@ -24,7 +24,7 @@ export const CustomerSettingsType = objectType({
     t.id('id');
     t.string('logoUrl', { nullable: true });
     t.field('colourSettings', {
-      type: ColourSettingsType,
+      type: 'ColourSettings',
       resolve(parent: CustomerSettings, args: any, ctx: any, info: any) {
         const colourSettings = ctx.prisma.colourSettings.findOne(
           { where: { id: parent.colourSettingsId } },
