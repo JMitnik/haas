@@ -1,5 +1,4 @@
 import { ApolloServer } from 'apollo-server-express';
-import { Prisma } from 'prisma-binding';
 import { PrismaClient } from '@prisma/client';
 import config from './config';
 import ServiceContainer from './services/service-container';
@@ -13,11 +12,6 @@ const makeApollo = async () => {
     context: (req) => ({
       ...req,
       prisma,
-      db: new Prisma({
-        typeDefs: config.prismaSchemaUrl,
-        endpoint: config.prismaUrl,
-        secret: config.prismaServiceSecret,
-      }),
       services: new ServiceContainer(config),
     }),
   });

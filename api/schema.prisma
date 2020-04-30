@@ -49,6 +49,7 @@ model CustomerSettings {
 
 model Customer {
   id        String            @default(cuid()) @id
+  slug      String            @unique
   name      String
   settings  CustomerSettings?
   dialogues Dialogue[]

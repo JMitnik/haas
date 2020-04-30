@@ -7,8 +7,9 @@
         "build": "yarn",
         "logs": "",
         "deploy": "echo 'not setup webhook yet'",
-        "generate": "prisma deploy && prisma generate -e .env && graphql-codegen",
-        "migrate": "prisma deploy --force -f -e .env && prisma generate && graphql-codegen",
+        "migrate:create": "npx prisma migrate save --experimental",
+        "migrate": "prisma migrate up --experimental",
+        "gen": "prisma generate && ts-node ./src/schema.ts",
         "seed": "ts-node --transpile-only src/data/main-seed.ts",
         "reset": "prisma reset",
         "token": "prisma token -e .env",
@@ -19,6 +20,7 @@
         "@graphql-codegen/typescript": "^1.11.2",
         "@graphql-codegen/typescript-resolvers": "^1.11.2",
         "@nexus/schema": "^0.13.1",
+        "@prisma/cli": "^2.0.0-beta.3",
         "@prisma/client": "^2.0.0-beta.2",
         "@types/lodash": "^4.14.149",
         "@types/mjml": "^4.0.4",
@@ -27,6 +29,7 @@
         "apollo-datasource-rest": "^0.8.0",
         "apollo-server": "^2.11.0",
         "apollo-server-express": "^2.11.0",
+        "apollo-utilities": "^1.3.3",
         "body-parser": "^1.19.0",
         "cloudinary": "^1.21.0",
         "concurrently": "^5.1.0",
@@ -36,7 +39,6 @@
         "express": "^4.17.1",
         "graphql": "^14.5.8",
         "graphql-import": "^1.0.0-beta.1",
-        "graphql-yoga": "^1.18.3",
         "lodash": "^4.17.15",
         "mjml": "^4.6.2",
         "nexus": "^0.20.0",
@@ -46,9 +48,12 @@
         "nodemon": "^2.0.2",
         "path": "^0.12.7",
         "pg": "^8.0.2",
+<<<<<<< HEAD
         "pm2": "^4.2.3",
         "prisma-binding": "^2.3.16",
         "prisma-client-lib": "^1.34.10",
+=======
+>>>>>>> master
         "react-scripts": "^3.4.0",
         "ts-node": "^8.6.2"
     },

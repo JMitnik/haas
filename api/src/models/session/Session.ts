@@ -108,7 +108,7 @@ export const UserSessionEntryInput = inputObjectType({
 export const UploadUserSessionInput = inputObjectType({
   name: 'UploadUserSessionInput',
   definition(t) {
-    t.string('questionnaireId', { required: true });
+    t.string('dialogueId', { required: true });
     t.list.field('entries', {
       type: UserSessionEntryInput,
     });

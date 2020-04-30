@@ -1,6 +1,7 @@
 type Customer {
     id: ID! @id
     name: String!
+    slug: String! @unique
     questionnaires: [Questionnaire] @relation(name: "CustomerToQuestionnaire", onDelete: CASCADE)
     settings: CustomerSettings @relation(name: "CustomerCustomerSettings", onDelete: CASCADE)
 }

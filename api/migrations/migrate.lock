@@ -3,4 +3,9 @@
 # Prisma Migrate lockfile v1
 # Read more about conflict resolution here: TODO
 
+<<<<<<< HEAD
 20200430134201-init
+=======
+20200430104258-start
+20200430121917-slug-add
+>>>>>>> master

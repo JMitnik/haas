@@ -77,8 +77,8 @@ export interface NexusGenInputs {
     questions?: NexusGenInputs['QuestionInput'][] | null; // [QuestionInput!]
   }
   UploadUserSessionInput: { // input type
+    dialogueId: string; // String!
     entries?: NexusGenInputs['UserSessionEntryInput'][] | null; // [UserSessionEntryInput!]
-    questionnaireId: string; // String!
   }
   UserSessionEntryDataInput: { // input type
     multiValues?: NexusGenInputs['UserSessionEntryDataInput'][] | null; // [UserSessionEntryDataInput!]
@@ -176,6 +176,7 @@ export interface NexusGenFieldTypes {
     id: string; // ID!
     name: string; // String!
     settings: NexusGenRootTypes['CustomerSettings']; // CustomerSettings!
+    slug: string; // String!
   }
   CustomerSettings: { // field return type
     colourSettings: NexusGenRootTypes['ColourSettings']; // ColourSettings!
@@ -256,6 +257,7 @@ export interface NexusGenFieldTypes {
     textValue: string | null; // String
   }
   Query: { // field return type
+    customer: NexusGenRootTypes['Customer']; // Customer!
     customers: NexusGenRootTypes['Customer'][]; // [Customer!]!
     dialogue: NexusGenRootTypes['Dialogue']; // Dialogue!
     dialogues: NexusGenRootTypes['Dialogue'][]; // [Dialogue!]!
@@ -336,6 +338,10 @@ export interface NexusGenArgTypes {
     }
   }
   Query: {
+    customer: { // args
+      id?: string | null; // ID
+      slug?: string | null; // String
+    }
     dialogue: { // args
       where?: NexusGenInputs['DialogueWhereUniqueInput'] | null; // DialogueWhereUniqueInput
     }

@@ -492,6 +492,7 @@ export type Customer = {
    __typename?: 'Customer';
   id: Scalars['ID'];
   name: Scalars['String'];
+  slug: Scalars['String'];
   questionnaires?: Maybe<Array<Questionnaire>>;
   settings?: Maybe<CustomerSettings>;
 };
@@ -517,6 +518,7 @@ export type CustomerConnection = {
 export type CustomerCreateInput = {
   id?: Maybe<Scalars['ID']>;
   name: Scalars['String'];
+  slug: Scalars['String'];
   questionnaires?: Maybe<QuestionnaireCreateManyWithoutCustomerInput>;
   settings?: Maybe<CustomerSettingsCreateOneInput>;
 };
@@ -529,6 +531,7 @@ export type CustomerCreateOneWithoutQuestionnairesInput = {
 export type CustomerCreateWithoutQuestionnairesInput = {
   id?: Maybe<Scalars['ID']>;
   name: Scalars['String'];
+  slug: Scalars['String'];
   settings?: Maybe<CustomerSettingsCreateOneInput>;
 };
 
@@ -542,13 +545,16 @@ export enum CustomerOrderByInput {
   IdAsc = 'id_ASC',
   IdDesc = 'id_DESC',
   NameAsc = 'name_ASC',
-  NameDesc = 'name_DESC'
+  NameDesc = 'name_DESC',
+  SlugAsc = 'slug_ASC',
+  SlugDesc = 'slug_DESC'
 }
 
 export type CustomerPreviousValues = {
    __typename?: 'CustomerPreviousValues';
   id: Scalars['ID'];
   name: Scalars['String'];
+  slug: Scalars['String'];
 };
 
 export type CustomerSettings = {
@@ -707,12 +713,14 @@ export type CustomerSubscriptionWhereInput = {
 
 export type CustomerUpdateInput = {
   name?: Maybe<Scalars['String']>;
+  slug?: Maybe<Scalars['String']>;
   questionnaires?: Maybe<QuestionnaireUpdateManyWithoutCustomerInput>;
   settings?: Maybe<CustomerSettingsUpdateOneInput>;
 };
 
 export type CustomerUpdateManyMutationInput = {
   name?: Maybe<Scalars['String']>;
+  slug?: Maybe<Scalars['String']>;
 };
 
 export type CustomerUpdateOneRequiredWithoutQuestionnairesInput = {
@@ -724,6 +732,7 @@ export type CustomerUpdateOneRequiredWithoutQuestionnairesInput = {
 
 export type CustomerUpdateWithoutQuestionnairesDataInput = {
   name?: Maybe<Scalars['String']>;
+  slug?: Maybe<Scalars['String']>;
   settings?: Maybe<CustomerSettingsUpdateOneInput>;
 };
 
@@ -761,6 +770,20 @@ export type CustomerWhereInput = {
   name_not_starts_with?: Maybe<Scalars['String']>;
   name_ends_with?: Maybe<Scalars['String']>;
   name_not_ends_with?: Maybe<Scalars['String']>;
+  slug?: Maybe<Scalars['String']>;
+  slug_not?: Maybe<Scalars['String']>;
+  slug_in?: Maybe<Array<Scalars['String']>>;
+  slug_not_in?: Maybe<Array<Scalars['String']>>;
+  slug_lt?: Maybe<Scalars['String']>;
+  slug_lte?: Maybe<Scalars['String']>;
+  slug_gt?: Maybe<Scalars['String']>;
+  slug_gte?: Maybe<Scalars['String']>;
+  slug_contains?: Maybe<Scalars['String']>;
+  slug_not_contains?: Maybe<Scalars['String']>;
+  slug_starts_with?: Maybe<Scalars['String']>;
+  slug_not_starts_with?: Maybe<Scalars['String']>;
+  slug_ends_with?: Maybe<Scalars['String']>;
+  slug_not_ends_with?: Maybe<Scalars['String']>;
   questionnaires_every?: Maybe<QuestionnaireWhereInput>;
   questionnaires_some?: Maybe<QuestionnaireWhereInput>;
   questionnaires_none?: Maybe<QuestionnaireWhereInput>;
@@ -772,6 +795,7 @@ export type CustomerWhereInput = {
 
 export type CustomerWhereUniqueInput = {
   id?: Maybe<Scalars['ID']>;
+  slug?: Maybe<Scalars['String']>;
 };
 
 
@@ -4878,6 +4902,7 @@ export type ColourSettingsSubscriptionPayloadResolvers<ContextType = any, Parent
 export type CustomerResolvers<ContextType = any, ParentType extends ResolversParentTypes['Customer'] = ResolversParentTypes['Customer']> = ResolversObject<{
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>,
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
+  slug?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
   questionnaires?: Resolver<Maybe<Array<ResolversTypes['Questionnaire']>>, ParentType, ContextType, RequireFields<CustomerQuestionnairesArgs, never>>,
   settings?: Resolver<Maybe<ResolversTypes['CustomerSettings']>, ParentType, ContextType>,
   __isTypeOf?: isTypeOfResolverFn<ParentType>,
@@ -4899,6 +4924,7 @@ export type CustomerEdgeResolvers<ContextType = any, ParentType extends Resolver
 export type CustomerPreviousValuesResolvers<ContextType = any, ParentType extends ResolversParentTypes['CustomerPreviousValues'] = ResolversParentTypes['CustomerPreviousValues']> = ResolversObject<{
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>,
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
+  slug?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
   __isTypeOf?: isTypeOfResolverFn<ParentType>,
 }>;
 

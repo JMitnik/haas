@@ -72,7 +72,7 @@ export const Button = styled.button<ButtonProps>`
         },
       },
       primary: {
-        background: Color(theme.colors.primary).darken(0.6).hex(),
+        background: Color(theme.colors.primary).darken(0.8).hex(),
         color: Color(theme.colors.primary).lighten(0.9).desaturate(0.3).hex(),
         border: `1px solid ${Color(theme.colors.primary).darken(0.2).hex()}`,
         '&:hover': {

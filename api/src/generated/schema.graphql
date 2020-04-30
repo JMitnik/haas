@@ -14,6 +14,7 @@ type Customer {
   id: ID!
   name: String!
   settings: CustomerSettings!
+  slug: String!
 }
 
 input CustomerCreateOptions {
@@ -147,6 +148,7 @@ input OptionInput {
 }
 
 type Query {
+  customer(id: ID, slug: String): Customer!
   customers: [Customer!]!
   dialogue(where: DialogueWhereUniqueInput): Dialogue!
   dialogues(customerId: ID): [Dialogue!]!
@@ -231,8 +233,8 @@ type UniqueDataResultEntry {
 }
 
 input UploadUserSessionInput {
+  dialogueId: String!
   entries: [UserSessionEntryInput!]
-  questionnaireId: String!
 }
 
 input UserSessionEntryDataInput {

@@ -463,6 +463,7 @@ input ColourSettingsWhereUniqueInput {
 type Customer {
   id: ID!
   name: String!
+  slug: String!
   questionnaires(where: QuestionnaireWhereInput, orderBy: QuestionnaireOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Questionnaire!]
   settings: CustomerSettings
 }
@@ -476,6 +477,7 @@ type CustomerConnection {
 input CustomerCreateInput {
   id: ID
   name: String!
+  slug: String!
   questionnaires: QuestionnaireCreateManyWithoutCustomerInput
   settings: CustomerSettingsCreateOneInput
 }
@@ -488,6 +490,7 @@ input CustomerCreateOneWithoutQuestionnairesInput {
 input CustomerCreateWithoutQuestionnairesInput {
   id: ID
   name: String!
+  slug: String!
   settings: CustomerSettingsCreateOneInput
 }
 
@@ -501,11 +504,14 @@ enum CustomerOrderByInput {
   id_DESC
   name_ASC
   name_DESC
+  slug_ASC
+  slug_DESC
 }
 
 type CustomerPreviousValues {
   id: ID!
   name: String!
+  slug: String!
 }
 
 type CustomerSettings {
@@ -658,12 +664,14 @@ input CustomerSubscriptionWhereInput {
 
 input CustomerUpdateInput {
   name: String
+  slug: String
   questionnaires: QuestionnaireUpdateManyWithoutCustomerInput
   settings: CustomerSettingsUpdateOneInput
 }
 
 input CustomerUpdateManyMutationInput {
   name: String
+  slug: String
 }
 
 input CustomerUpdateOneRequiredWithoutQuestionnairesInput {
@@ -675,6 +683,7 @@ input CustomerUpdateOneRequiredWithoutQuestionnairesInput {
 
 input CustomerUpdateWithoutQuestionnairesDataInput {
   name: String
+  slug: String
   settings: CustomerSettingsUpdateOneInput
 }
 
@@ -712,6 +721,20 @@ input CustomerWhereInput {
   name_not_starts_with: String
   name_ends_with: String
   name_not_ends_with: String
+  slug: String
+  slug_not: String
+  slug_in: [String!]
+  slug_not_in: [String!]
+  slug_lt: String
+  slug_lte: String
+  slug_gt: String
+  slug_gte: String
+  slug_contains: String
+  slug_not_contains: String
+  slug_starts_with: String
+  slug_not_starts_with: String
+  slug_ends_with: String
+  slug_not_ends_with: String
   questionnaires_every: QuestionnaireWhereInput
   questionnaires_some: QuestionnaireWhereInput
   questionnaires_none: QuestionnaireWhereInput
@@ -723,6 +746,7 @@ input CustomerWhereInput {
 
 input CustomerWhereUniqueInput {
   id: ID
+  slug: String
 }
 
 scalar DateTime

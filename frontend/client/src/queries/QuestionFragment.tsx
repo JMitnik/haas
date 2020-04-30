@@ -1,30 +1,37 @@
 import gql from 'graphql-tag';
+import { ShallowNodeFragment } from './ShallowNodeFragment';
+import { EdgeFragment } from './EdgeFragment';
 
 export const QuestionFragment = gql`
   fragment QuestionFragment on QuestionNode {
-    id
-    title
-    overrideLeafId
-    overrideLeaf {
-      id
-      title
-      type
-    }
-    type
+    ...ShallowNodeFragment
     children {
-      id
-      conditions {
-        conditionType
-        renderMin
-        renderMax
-        matchValue
+      ...EdgeFragment
+      parentNode {
+        ...ShallowNodeFragment
       }
-      parentNodeId
-      childNodeId
+      childNode {
+        ...ShallowNodeFragment
+        children {
+          ...EdgeFragment
+          childNode {
+            ...ShallowNodeFragment
+            children {
+              childNode {
+                ...ShallowNodeFragment
+              }
+            }
+          }
+        }
+      }
     }
     options {
+      id
       value
       publicValue
     }
   }
+
+  ${ShallowNodeFragment}
+  ${EdgeFragment}
 `;

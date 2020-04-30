@@ -700,7 +700,9 @@ export type CustomerOrderByInput =
   | "id_ASC"
   | "id_DESC"
   | "name_ASC"
-  | "name_DESC";
+  | "name_DESC"
+  | "slug_ASC"
+  | "slug_DESC";
 
 export type CustomerSettingsOrderByInput =
   | "id_ASC"
@@ -944,6 +946,7 @@ export interface ColourSettingsWhereInput {
 
 export type CustomerWhereUniqueInput = AtLeastOne<{
   id: Maybe<ID_Input>;
+  slug?: Maybe<String>;
 }>;
 
 export interface QuestionnaireWhereInput {
@@ -1064,6 +1067,20 @@ export interface CustomerWhereInput {
   name_not_starts_with?: Maybe<String>;
   name_ends_with?: Maybe<String>;
   name_not_ends_with?: Maybe<String>;
+  slug?: Maybe<String>;
+  slug_not?: Maybe<String>;
+  slug_in?: Maybe<String[] | String>;
+  slug_not_in?: Maybe<String[] | String>;
+  slug_lt?: Maybe<String>;
+  slug_lte?: Maybe<String>;
+  slug_gt?: Maybe<String>;
+  slug_gte?: Maybe<String>;
+  slug_contains?: Maybe<String>;
+  slug_not_contains?: Maybe<String>;
+  slug_starts_with?: Maybe<String>;
+  slug_not_starts_with?: Maybe<String>;
+  slug_ends_with?: Maybe<String>;
+  slug_not_ends_with?: Maybe<String>;
   questionnaires_every?: Maybe<QuestionnaireWhereInput>;
   questionnaires_some?: Maybe<QuestionnaireWhereInput>;
   questionnaires_none?: Maybe<QuestionnaireWhereInput>;
@@ -1603,6 +1620,7 @@ export interface ColourSettingsUpdateManyMutationInput {
 export interface CustomerCreateInput {
   id?: Maybe<ID_Input>;
   name: String;
+  slug: String;
   questionnaires?: Maybe<QuestionnaireCreateManyWithoutCustomerInput>;
   settings?: Maybe<CustomerSettingsCreateOneInput>;
 }
@@ -1669,6 +1687,7 @@ export interface CustomerCreateOneWithoutQuestionnairesInput {
 export interface CustomerCreateWithoutQuestionnairesInput {
   id?: Maybe<ID_Input>;
   name: String;
+  slug: String;
   settings?: Maybe<CustomerSettingsCreateOneInput>;
 }
 
@@ -1853,6 +1872,7 @@ export interface NodeEntryValueCreateInput {
 
 export interface CustomerUpdateInput {
   name?: Maybe<String>;
+  slug?: Maybe<String>;
   questionnaires?: Maybe<QuestionnaireUpdateManyWithoutCustomerInput>;
   settings?: Maybe<CustomerSettingsUpdateOneInput>;
 }
@@ -1952,6 +1972,7 @@ export interface CustomerUpdateOneRequiredWithoutQuestionnairesInput {
 
 export interface CustomerUpdateWithoutQuestionnairesDataInput {
   name?: Maybe<String>;
+  slug?: Maybe<String>;
   settings?: Maybe<CustomerSettingsUpdateOneInput>;
 }
 
@@ -2909,6 +2930,7 @@ export interface QuestionnaireUpdateManyDataInput {
 
 export interface CustomerUpdateManyMutationInput {
   name?: Maybe<String>;
+  slug?: Maybe<String>;
 }
 
 export interface CustomerSettingsUpdateInput {
@@ -3479,11 +3501,13 @@ export interface AggregateColourSettingsSubscription
 export interface Customer {
   id: ID_Output;
   name: String;
+  slug: String;
 }
 
 export interface CustomerPromise extends Promise<Customer>, Fragmentable {
   id: () => Promise<ID_Output>;
   name: () => Promise<String>;
+  slug: () => Promise<String>;
   questionnaires: <T = FragmentableArray<Questionnaire>>(args?: {
     where?: QuestionnaireWhereInput;
     orderBy?: QuestionnaireOrderByInput;
@@ -3501,6 +3525,7 @@ export interface CustomerSubscription
     Fragmentable {
   id: () => Promise<AsyncIterator<ID_Output>>;
   name: () => Promise<AsyncIterator<String>>;
+  slug: () => Promise<AsyncIterator<String>>;
   questionnaires: <
     T = Promise<AsyncIterator<QuestionnaireSubscription>>
   >(args?: {
@@ -3520,6 +3545,7 @@ export interface CustomerNullablePromise
     Fragmentable {
   id: () => Promise<ID_Output>;
   name: () => Promise<String>;
+  slug: () => Promise<String>;
   questionnaires: <T = FragmentableArray<Questionnaire>>(args?: {
     where?: QuestionnaireWhereInput;
     orderBy?: QuestionnaireOrderByInput;
@@ -4877,6 +4903,7 @@ export interface CustomerSubscriptionPayloadSubscription
 export interface CustomerPreviousValues {
   id: ID_Output;
   name: String;
+  slug: String;
 }
 
 export interface CustomerPreviousValuesPromise
@@ -4884,6 +4911,7 @@ export interface CustomerPreviousValuesPromise
     Fragmentable {
   id: () => Promise<ID_Output>;
   name: () => Promise<String>;
+  slug: () => Promise<String>;
 }
 
 export interface CustomerPreviousValuesSubscription
@@ -4891,6 +4919,7 @@ export interface CustomerPreviousValuesSubscription
     Fragmentable {
   id: () => Promise<AsyncIterator<ID_Output>>;
   name: () => Promise<AsyncIterator<String>>;
+  slug: () => Promise<AsyncIterator<String>>;
 }
 
 export interface CustomerSettingsSubscriptionPayload {
