@@ -15,6 +15,7 @@ const WatermarkLogoContainer = styled.div`
   transform: translateY(-50%);
 
   opacity: 0.5;
+  z-index: 0;
 
   img {
       max-width: 100%;

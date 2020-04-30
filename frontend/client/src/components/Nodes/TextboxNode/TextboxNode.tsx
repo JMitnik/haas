@@ -29,7 +29,7 @@ const TextboxNode = ({ node }: TextboxNodeProps) => {
       <H2>{node.title}</H2>
       <Div>
         <H3 color="white">What would you like to tell us?</H3>
-        <Textbox name="textValue" ref={register} />
+        <Textbox placeholder="I have experienced ..." name="textValue" ref={register} />
         <ClientButton mt={4} isActive={'textValue' in formState.touched} onClick={() => onSubmit()}>
           <ButtonIcon>
             <CheckCircle />

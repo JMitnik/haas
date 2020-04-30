@@ -1,6 +1,6 @@
 import styled, { css } from 'styled-components/macro';
 import Color from 'color';
-import { Div } from '@haas/ui';
+import { Div, Container } from '@haas/ui';
 
 export const DialogueContainer = styled(Div)`
   ${({ theme }) => css`
@@ -13,6 +13,10 @@ export const DialogueContainer = styled(Div)`
     width: 100%;
     justify-content: center;
     align-items: stretch;
+
+    > ${Container} {
+      z-index: 1;
+    }
 
     ${theme.colors.primary &&
       theme.colors.primaryAlt &&

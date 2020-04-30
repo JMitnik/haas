@@ -61,7 +61,6 @@ const Slider = ({ register, onSubmit, animationControls }: SliderProps) => {
           direction = 1;
         }
 
-        console.log('position', position);
         return {
           speed: 1.0,
           animationJson: HAASRun,
@@ -118,6 +117,7 @@ const Slider = ({ register, onSubmit, animationControls }: SliderProps) => {
             name="numberValue"
             onChange={(e) => moveBunny(e)}
             onMouseUp={() => handleSubmit()}
+            onTouchEnd={() => handleSubmit()}
             min={0}
             max={100}
             defaultValue={50}

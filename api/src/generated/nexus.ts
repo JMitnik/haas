@@ -77,8 +77,8 @@ export interface NexusGenInputs {
     questions?: NexusGenInputs['QuestionInput'][] | null; // [QuestionInput!]
   }
   UploadUserSessionInput: { // input type
+    dialogueId: string; // String!
     entries?: NexusGenInputs['UserSessionEntryInput'][] | null; // [UserSessionEntryInput!]
-    questionnaireId: string; // String!
   }
   UserSessionEntryDataInput: { // input type
     multiValues?: NexusGenInputs['UserSessionEntryDataInput'][] | null; // [UserSessionEntryDataInput!]

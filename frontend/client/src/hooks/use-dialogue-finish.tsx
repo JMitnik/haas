@@ -12,7 +12,7 @@ const useJourneyFinish = () => {
 
   const [submitForm] = useMutation(uploadEntryMutation, {});
   const history = useHistory();
-  const { questionnaireId } = useParams();
+  const { dialogueId } = useParams();
   const location = useLocation();
   //  Only fires if a user arrives as a node with no more interaction (FinishNode and ShareNode)
   useEffect(() => {
@@ -20,7 +20,7 @@ const useJourneyFinish = () => {
     submitForm({
       variables: {
         uploadUserSessionInput: {
-          questionnaireId,
+          dialogueId,
           entries: historyStack.map(nodeEntry => {
             const { node, edge, ...data } = nodeEntry;
 
@@ -29,7 +29,7 @@ const useJourneyFinish = () => {
         }
       }
     });
-  }, [historyStack, submitForm, history, location.pathname, questionnaireId]);
+  }, [historyStack, submitForm, history, location.pathname, dialogueId]);
 
   return { finishedRef };
 };

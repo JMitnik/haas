@@ -40,7 +40,7 @@ const MultiChoiceNode = ({ node }: MultiChoiceNodeProps) => {
   return (
     <MultiChoiceNodeContainer>
       <H2>{node.title}</H2>
-      <Grid gridTemplateColumns="repeat(auto-fill, minmax(250px, 1fr))">
+      <Grid gridGap={["0", "12px"]} gridTemplateColumns="repeat(auto-fill, minmax(250px, 1fr))">
         {node.options?.map((multiChoiceOption: MultiChoiceOption, index: number) => (
           <Div useFlex justifyContent="center" key={index} padding={2} flex={['100%', 1]}>
             <ClientButton
