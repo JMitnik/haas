@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { H5, Div, H2 } from '@haas/ui';
+import { H5, Div, H2, Grid } from '@haas/ui';
 import useHAASTree from 'providers/dialogue-tree-provider';
 import { useForm } from 'react-hook-form';
 import { GenericNodeProps } from '../Node/Node';
@@ -40,9 +40,9 @@ const MultiChoiceNode = ({ node }: MultiChoiceNodeProps) => {
   return (
     <MultiChoiceNodeContainer>
       <H2>{node.title}</H2>
-      <Div>
+      <Grid gridTemplateColumns="repeat(auto-fill, minmax(250px, 1fr))">
         {node.options?.map((multiChoiceOption: MultiChoiceOption, index: number) => (
-          <Div useFlex justifyContent="center" key={index} padding={[2, 4]} flex={['100%', 1]}>
+          <Div useFlex justifyContent="center" key={index} padding={2} flex={['100%', 1]}>
             <ClientButton
               brand="primary"
               type="button"
@@ -57,7 +57,7 @@ const MultiChoiceNode = ({ node }: MultiChoiceNodeProps) => {
             </ClientButton>
           </Div>
         ))}
-      </Div>
+      </Grid>
     </MultiChoiceNodeContainer>
   );
 };
