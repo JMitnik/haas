@@ -68,6 +68,41 @@ class DialogueResolver {
     };
   }
 
+  static getLineData = async (dialogueId: string, numberOfDaysBack: number) => {
+    const dialogue = await prisma.dialogue.findOne(
+      {
+        where: { id: dialogueId },
+        include: {
+          session: {
+            include: {
+              nodeEntries: {
+                include: {
+                  values: {
+                    select: {
+                      id: true,
+                      nodeEntryId: true,
+                      numberValue: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    );
+    const nodeEntries = dialogue?.session.flatMap((session) => session.nodeEntries);
+    const nodeEntryValues = nodeEntries && nodeEntries.flatMap((nodeEntry) => ({ creationDate: nodeEntry.creationDate, values: nodeEntry.values[0] }));
+    const nodeEntryNumberValues = nodeEntryValues?.filter((nodeEntryValue) => nodeEntryValue.values.numberValue);
+    const finalNodeEntryNumberValues = nodeEntryNumberValues?.map(
+      (nodeEntryNumberValue) => (
+        { x: nodeEntryNumberValue.creationDate,
+          y: nodeEntryNumberValue.values.numberValue }));
+    const orderedFinalNodeEntryNumberValues = _.orderBy(finalNodeEntryNumberValues, ['x'], ['asc']);
+    const final = orderedFinalNodeEntryNumberValues.map((entry) => ({ x: entry.x.toUTCString(), y: entry.y }));
+    return final;
+  };
+
   static deleteDialogue = async (dialogueId: string) => {
     const dialogue = await prisma.dialogue.findOne({
       where: {

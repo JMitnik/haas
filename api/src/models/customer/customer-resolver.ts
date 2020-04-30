@@ -1,7 +1,11 @@
-import { PrismaClient } from '@prisma/client';
-import { Customer } from '../../generated/resolver-types';
+import { PrismaClient, Customer } from '@prisma/client';
+import { formatDistance, subDays } from 'date-fns';
 import { leafNodes } from '../../data/seeds/default-data';
 import NodeResolver from '../question/node-resolver';
+
+function getRandomInt(max: number) {
+  return Math.floor(Math.random() * Math.floor(max));
+}
 
 const prisma = new PrismaClient();
 class CustomerResolver {
@@ -34,6 +38,33 @@ class CustomerResolver {
     const leafs = await NodeResolver.createTemplateLeafNodes(leafNodes, questionnaire.id);
 
     await NodeResolver.createTemplateNodes(questionnaire.id, customer.name, leafs);
+
+    const currentDate = new Date();
+    const amtOfDaysBack = Array.from(Array(30)).map((empty, index) => index + 1);
+    const datesBackInTime = amtOfDaysBack.map((amtDaysBack) => subDays(currentDate, amtDaysBack));
+
+    await Promise.all(datesBackInTime.map(async (backDate) => {
+      await prisma.session.create({
+        data: {
+          nodeEntries: {
+            create: {
+              creationDate: backDate,
+              values: {
+                create: {
+                  numberValue: getRandomInt(100),
+                },
+              },
+
+            },
+          },
+          dialogue: {
+            connect: {
+              id: questionnaire.id,
+            },
+          },
+        },
+      });
+    }));
   };
 
   static createCustomer = async (args: any) => {

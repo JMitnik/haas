@@ -14,6 +14,13 @@ export const DialogueType = objectType({
     t.string('publicTitle', { nullable: true });
     t.string('creationDate', { nullable: true });
     t.string('updatedAt', { nullable: true });
+    t.field('lineChartData', {
+      nullable: true,
+      type: 'String', // TODO: Change to appropriate return type
+      resolve(parent: Dialogue, args: any, ctx: any, info: any) {
+        return '';
+      },
+    });
     t.field('customer', {
       type: CustomerType,
       resolve(parent: Dialogue, args: any, ctx: any, info: any) {
@@ -125,6 +132,14 @@ export const getQuestionnaireDataQuery = extendType({
   },
 });
 
+export const lineChartData = objectType({
+  name: 'lineChartDataType',
+  definition(t) {
+    t.string('x');
+    t.int('y');
+  },
+});
+
 export const deleteDialogueOfCustomerMutation = extendType({
   type: 'Mutation',
   definition(t) {
@@ -156,6 +171,16 @@ export const deleteDialogueOfCustomerMutation = extendType({
 export const DialoguesOfCustomerQuery = extendType({
   type: 'Query',
   definition(t) {
+    t.list.field('lineChartData', {
+      type: lineChartData,
+      args: {
+        dialogueId: 'String',
+        numberOfDaysBack: 'Int',
+      },
+      resolve(parent: any, args: any, ctx: any, info: any) {
+        return DialogueResolver.getLineData(args.dialogueId, 30);
+      },
+    });
     t.field('dialogue', {
       type: DialogueType,
       args: {
@@ -186,6 +211,7 @@ export const DialoguesOfCustomerQuery = extendType({
 });
 
 const dialogueNexus = [
+  lineChartData,
   DialogueWhereUniqueInput,
   deleteDialogueOfCustomerMutation,
   DialogueType,

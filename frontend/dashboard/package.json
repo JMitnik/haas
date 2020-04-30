@@ -8,6 +8,7 @@
         "@graphql-codegen/cli": "^1.11.2",
         "@graphql-codegen/typescript": "^1.11.2",
         "@haas/ui": "*",
+        "@nivo/line": "^0.61.1",
         "@react-workspaces/react-scripts": "^3.3.0-alpha-08",
         "@testing-library/jest-dom": "^4.2.4",
         "@testing-library/react": "^9.4.0",
