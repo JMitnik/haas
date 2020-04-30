@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import gql from 'graphql-tag';
 import DialogueTree from 'components/DialogueTree';
-import { Div, Loader } from '@haas/ui';
+import { Loader } from '@haas/ui';
 import { QuestionFragment } from 'queries/QuestionFragment';
 import { CustomerFragment } from 'queries/CustomerFragment';
 import { useParams } from 'react-router-dom';
