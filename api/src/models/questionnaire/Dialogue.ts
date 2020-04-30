@@ -31,24 +31,24 @@ export const DialogueType = objectType({
       args: {
         where: QuestionNodeWhereInput,
       },
-      resolve(parent: Dialogue, args: any, ctx: any, info: any) {
-        if (args?.where?.isRoot) {
-          const rootQuestion = ctx.prisma.questionNode.findMany({
-            where: {
-              isRoot: args.where.isRoot,
-            },
-          });
-          return rootQuestion;
-        }
+      resolve(parent: Dialogue, args: any, ctx: any) {
+        // if (args?.where?.isRoot) {
+        //   const rootQuestion = ctx.prisma.questionNode.findMany({
+        //     where: {
+        //       isRoot: args.where.isRoot,
+        //     },
+        //   });
+        //   return rootQuestion;
+        // }
 
-        if (args?.where?.id) {
-          const questions = ctx.prisma.questionNode.findMany({
-            where: {
-              id: args.where.id,
-            },
-          });
-          return questions;
-        }
+        // if (args?.where?.id) {
+        //   const questions = ctx.prisma.questionNode.findMany({
+        //     where: {
+        //       id: args.where.id,
+        //     },
+        //   });
+        //   return questions;
+        // }
 
         const questions = ctx.prisma.questionNode.findMany({
           where: {

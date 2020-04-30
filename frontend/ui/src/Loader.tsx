@@ -93,9 +93,7 @@ const LoaderContainer = styled.div`
 
 
 export const Loader = () => (
-  <LoaderContainer>
-    <div className="lds-default"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
-  </LoaderContainer>
+<></>
 )
 
 export default Loader;

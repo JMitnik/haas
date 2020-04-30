@@ -6,13 +6,13 @@ const prisma = new PrismaClient();
 
 class SessionResolver {
   static async uploadUserSession(obj: any, args: any, ctx: any) {
-    const { questionnaireId, entries } = args.uploadUserSessionInput;
+    const { dialogueId, entries } = args.uploadUserSessionInput;
 
     const session = await prisma.session.create({
       data: {
         dialogue: {
           connect: {
-            id: questionnaireId,
+            id: dialogueId,
           },
         },
         nodeEntries: {
@@ -28,7 +28,7 @@ class SessionResolver {
 
     // TODO: Roundabout way, needs to be done in Prisma2 better
     const nodeEntries = await SessionResolver.getEntriesOfSession(session);
-    const questionnaire = await prisma.dialogue.findOne({ where: { id: questionnaireId } });
+    const questionnaire = await prisma.dialogue.findOne({ where: { id: dialogueId } });
 
     ctx.services.triggerMailService.sendTrigger({
       to: dialogueAgentMail,

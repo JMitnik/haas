@@ -130,6 +130,19 @@ export const InputField = styled.input`
       text-align: center;
       font-weight: bolder;
       color: ${theme.colors.default.text};
+      text-align: left;
+
+      &::placeholder {
+        color: #c6c6c6;
+        font-weight: 500;
+      }
+
+      &:focus, &:active {
+        border: 1px solid #0059f8;
+        background: ${Color('#0059f8').mix(Color('white'), 0.9).hex()};
+        box-shadow: 0 0 0 4px ${Color('#0059f8').fade(0.8).string()};
+        outline: none !important;
+      }
   `}
 `;
 
@@ -184,12 +197,6 @@ export const SliderContainer = styled.div`
 
         /* Ensure that the bunny is on top of the bar */
         transform: translateY(-100%);
-
-        border: none;
-        background-color: transparent;
-        background-image: url('/logo-haas.svg');
-        background-size: contain;
-        background-repeat: no-repeat;
         cursor: pointer;
         position: relative;
 
@@ -245,12 +252,12 @@ export const SliderContainer = styled.div`
       &::-webkit-slider-runnable-track {
         width: 100%;
         margin-top: 80px;
-        height: 10px;
+        height: 15px;
         cursor: pointer;
-        box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
-        background: ${Color(theme.colors.primary).darken(0.4).hex()};
+        width: 100%;
+        box-shadow: 0px 2px 2px 1px rgba(0,0,0,0.05);
+        background: linear-gradient(45deg, rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.04));
         border-radius: 10px;
-        border: 0.2px solid #010101;
       }
     }
   `}
