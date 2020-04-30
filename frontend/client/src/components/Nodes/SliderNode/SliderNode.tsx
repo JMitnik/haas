@@ -1,5 +1,5 @@
-import React from 'react';
-import { Slider, Div, H2 } from '@haas/ui';
+import React, { useReducer } from 'react';
+import { Div, H2 } from '@haas/ui';
 import { useForm } from 'react-hook-form';
 import useHAASTree from 'providers/dialogue-tree-provider';
 import { cleanInt } from 'utils/cleanInt';
@@ -7,6 +7,7 @@ import { GenericNodeProps } from '../Node/Node';
 import { HAASFormEntry } from 'types/generic';
 import { SliderNodeContainer, SliderNodeValue } from './SliderNodeStyles';
 import { useAnimation, motion } from 'framer-motion';
+import Slider from './Slider';
 
 type SliderNodeProps = GenericNodeProps;
 
@@ -64,27 +65,12 @@ const SliderNode = ({ node }: SliderNodeProps) => {
           my="0"
           pb="100px"
           fontSize={['3rem !important']}
-          color="red"
-          backgroundColor="white"
         >
           <motion.div animate={controls}>
             {showValue()}
           </motion.div>
         </SliderNodeValue>
-        <Slider
-          width={1}
-          name="numberValue"
-          onMouseDown={() => controls.start({
-            scale: 1.5,
-          })}
-          onMouseUp={() => onSubmit()}
-          onTouchEnd={() => onSubmit()}
-          min={0}
-          max={100}
-          mt={4}
-          defaultValue={50}
-          ref={register}
-        />
+        <Slider onSubmit={onSubmit} register={register} />
       </Div>
     </SliderNodeContainer>
   );

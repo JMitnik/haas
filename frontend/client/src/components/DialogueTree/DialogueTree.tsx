@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import useDialogueTree from 'providers/dialogue-tree-provider';
-import { Loader, Container, Div, WatermarkLogo } from '@haas/ui';
+import React from 'react';
+import { Loader, Container } from '@haas/ui';
 
+import useDialogueTree from 'providers/dialogue-tree-provider';
 import { DialogueContainer } from './DialogueTreeStyles';
 import NodePage from 'pages/[customer]/[dialogue]/[node]';
+import WatermarkLogo from 'components/WatermarkLogo';
 
 const DialogueTree = () => {
   const { treeState: { dialogue, customer } } = useDialogueTree();

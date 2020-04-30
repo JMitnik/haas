@@ -184,12 +184,6 @@ export const SliderContainer = styled.div`
 
         /* Ensure that the bunny is on top of the bar */
         transform: translateY(-100%);
-
-        border: none;
-        background-color: transparent;
-        background-image: url('/logo-haas.svg');
-        background-size: contain;
-        background-repeat: no-repeat;
         cursor: pointer;
         position: relative;
 

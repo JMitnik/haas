@@ -17,9 +17,17 @@ export const SliderNodeValue = styled(H2)`
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
+`;
 
-  div {
-    width: 75px;
-    height: 75px;
+export const HAASRabbit = styled.div`
+  position: absolute;
+  transform: translateX(-50%);
+
+  svg {
+    /* TODO: Find out why important is so important */
+    width: auto !important;
+    height: auto !important;
+    max-width: 200px;
   }
 `;
