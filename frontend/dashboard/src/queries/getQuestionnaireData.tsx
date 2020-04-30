@@ -10,6 +10,10 @@ const getQuestionnaireDataQuery = gql`
       updatedAt
       average
       totalNodeEntries
+      lineChartData {
+        x
+        y
+      }
       timelineEntries {
         sessionId
         value

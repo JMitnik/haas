@@ -3,8 +3,6 @@ import { useQuery } from '@apollo/react-hooks';
 import { Flex, Loader, Grid, Div } from '@haas/ui';
 import { useParams, Switch, Route, useHistory } from 'react-router-dom';
 import { ResponsiveLine } from '@nivo/line';
-
-import getLineDataQuery from '../../queries/getLineData';
 import getQuestionnaireData from '../../queries/getQuestionnaireData';
 import TimelineFeedOverview from './TimelineFeedOverview/TimelineFeedOverview';
 import NodeEntriesOverview from './NodeEntriesOverview/NodeEntriesOverview';
@@ -84,22 +82,18 @@ const TopicDetail = () => {
   const history = useHistory();
   const { loading, data } = useQuery(getQuestionnaireData, {
     variables: { dialogueId: topicId },
-  });
-
-  const lineQuery = useQuery(getLineDataQuery, {
-    variables: { dialogueId: topicId },
     pollInterval: 5000,
   });
 
   if (loading) return <Loader />;
 
   const resultData = data?.getQuestionnaireData;
-  const LineQueryData = lineQuery?.data?.lineChartData;
+  const lineQueryData = resultData?.lineChartData;
   const lineData = [
     {
       id: 'avg score on date',
       color: 'hsl(38, 70%, 50%)',
-      data: LineQueryData,
+      data: lineQueryData,
     },
   ];
 
@@ -127,7 +121,9 @@ const TopicDetail = () => {
                 </Route>
               </Switch>
               <Div height="300px" width="100%">
-                <MyResponsiveLine data={lineData} />
+                {
+                  lineQueryData && <MyResponsiveLine data={lineData} />
+                }
               </Div>
             </Flex>
           </Div>

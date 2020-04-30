@@ -52,6 +52,7 @@ type DialogueDetailResult {
   creationDate: String!
   customerName: String!
   description: String!
+  lineChartData: [lineChartDataType!]!
   timelineEntries: [UniqueDataResultEntry!]!
   title: String!
   totalNodeEntries: Int!

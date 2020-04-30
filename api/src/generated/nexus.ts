@@ -106,6 +106,7 @@ export interface NexusGenRootTypes {
     creationDate: string; // String!
     customerName: string; // String!
     description: string; // String!
+    lineChartData: NexusGenRootTypes['lineChartDataType'][]; // [lineChartDataType!]!
     timelineEntries: NexusGenRootTypes['UniqueDataResultEntry'][]; // [UniqueDataResultEntry!]!
     title: string; // String!
     totalNodeEntries: number; // Int!
@@ -200,6 +201,7 @@ export interface NexusGenFieldTypes {
     creationDate: string; // String!
     customerName: string; // String!
     description: string; // String!
+    lineChartData: NexusGenRootTypes['lineChartDataType'][]; // [lineChartDataType!]!
     timelineEntries: NexusGenRootTypes['UniqueDataResultEntry'][]; // [UniqueDataResultEntry!]!
     title: string; // String!
     totalNodeEntries: number; // Int!

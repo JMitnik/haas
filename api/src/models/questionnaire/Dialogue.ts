@@ -100,6 +100,14 @@ export const DialogueWhereUniqueInput = inputObjectType({
   },
 });
 
+export const lineChartDataType = objectType({
+  name: 'lineChartDataType',
+  definition(t) {
+    t.string('x');
+    t.int('y');
+  },
+});
+
 export const DialogueDetailResultType = objectType({
   name: 'DialogueDetailResult',
   definition(t) {
@@ -113,6 +121,9 @@ export const DialogueDetailResultType = objectType({
     t.list.field('timelineEntries', {
       type: UniqueDataResultEntry,
     });
+    t.list.field('lineChartData', {
+      type: lineChartDataType,
+    });
   },
 });
 
@@ -124,19 +135,14 @@ export const getQuestionnaireDataQuery = extendType({
       args: {
         dialogueId: 'String',
       },
-      resolve(parent: any, args: any, ctx: any, info: any) {
-        const result = DialogueResolver.getQuestionnaireAggregatedData(parent, args);
+      async resolve(parent: any, args: any, ctx: any, info: any) {
+        const aggregatedData = await DialogueResolver.getQuestionnaireAggregatedData(parent, args);
+        const lineChartData = await DialogueResolver.getLineData(args.dialogueId, 30);
+        const result = { ...aggregatedData, lineChartData };
+        console.log('result: ', result);
         return result;
       },
     });
-  },
-});
-
-export const lineChartData = objectType({
-  name: 'lineChartDataType',
-  definition(t) {
-    t.string('x');
-    t.int('y');
   },
 });
 
@@ -172,7 +178,7 @@ export const DialoguesOfCustomerQuery = extendType({
   type: 'Query',
   definition(t) {
     t.list.field('lineChartData', {
-      type: lineChartData,
+      type: lineChartDataType,
       args: {
         dialogueId: 'String',
         numberOfDaysBack: 'Int',
@@ -211,7 +217,7 @@ export const DialoguesOfCustomerQuery = extendType({
 });
 
 const dialogueNexus = [
-  lineChartData,
+  lineChartDataType,
   DialogueWhereUniqueInput,
   deleteDialogueOfCustomerMutation,
   DialogueType,
