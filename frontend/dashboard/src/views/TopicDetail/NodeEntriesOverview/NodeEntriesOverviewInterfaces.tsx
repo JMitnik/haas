@@ -1,6 +1,7 @@
 export interface NodeEntryValueProps {
   numberValue?: number;
   textValue?: string;
+  multiValues?: Array<NodeEntryValueProps>;
   id: string;
 }
 

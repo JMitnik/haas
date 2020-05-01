@@ -68,6 +68,15 @@ class DialogueResolver {
     };
   }
 
+  static getTopPaths = (groupedJoined: any) => {
+    // console.log('JOINED: ', joined);
+    const countedPaths = _.countBy(groupedJoined, 'textValue');
+    const o = _.sortBy(_.toPairs(countedPaths), 1).reverse();
+    const countedPathsObjects = o.map((array) => ({ answer: array[0], quantity: array[1] }));
+    const topPath = countedPathsObjects.length > 3 ? countedPathsObjects.slice(0, 3) : countedPathsObjects;
+    return topPath;
+  };
+
   static getLineData = async (dialogueId: string, numberOfDaysBack: number) => {
     const dialogue = await prisma.dialogue.findOne(
       {
@@ -76,12 +85,15 @@ class DialogueResolver {
           sessions: {
             include: {
               nodeEntries: {
-                include: {
+                select: {
+                  creationDate: true,
+                  depth: true,
                   values: {
                     select: {
                       id: true,
                       nodeEntryId: true,
                       numberValue: true,
+                      textValue: true,
                     },
                   },
                 },
@@ -92,15 +104,25 @@ class DialogueResolver {
       },
     );
     const nodeEntries = dialogue?.sessions.flatMap((session) => session.nodeEntries);
-    const nodeEntryValues = nodeEntries && nodeEntries.flatMap((nodeEntry) => ({ creationDate: nodeEntry.creationDate, values: nodeEntry.values[0] }));
-    const nodeEntryNumberValues = nodeEntryValues?.filter((nodeEntryValue) => nodeEntryValue.values.numberValue);
+    const nodeEntryValues = nodeEntries && nodeEntries.flatMap((nodeEntry) => ({ creationDate: nodeEntry.creationDate, values: nodeEntry.values[0], depth: nodeEntry.depth }));
+    const nodeEntryNumberValues = nodeEntryValues?.filter((nodeEntryValue) => nodeEntryValue?.values?.numberValue);
     const finalNodeEntryNumberValues = nodeEntryNumberValues?.map(
       (nodeEntryNumberValue) => (
         { x: nodeEntryNumberValue.creationDate,
-          y: nodeEntryNumberValue.values.numberValue }));
+          y: nodeEntryNumberValue.values.numberValue,
+          nodeEntryId: nodeEntryNumberValue.values.nodeEntryId }));
     const orderedFinalNodeEntryNumberValues = _.orderBy(finalNodeEntryNumberValues, ['x'], ['asc']);
-    const final = orderedFinalNodeEntryNumberValues.map((entry) => ({ x: entry.x.toUTCString(), y: entry.y }));
-    return final;
+    const lineChartData = orderedFinalNodeEntryNumberValues.map((entry) => ({ x: entry.x.toUTCString(), y: entry.y }));
+
+    const nodeEntryTextValues = nodeEntryValues?.filter((nodeEntryValue) => nodeEntryValue?.values?.textValue && nodeEntryValue?.depth === 1);
+    const finalNodeEntryTextValues = nodeEntryTextValues?.map(
+      (nodeEntryTextValue) => (
+        { nodeEntryId: nodeEntryTextValue.values.nodeEntryId, textValue: nodeEntryTextValue.values.textValue }));
+    const joined = _.merge(lineChartData, finalNodeEntryTextValues);
+    const groupedJoined = _.groupBy(joined, (entry) => entry.y && entry.y > 50);
+    const topNegativePath = DialogueResolver.getTopPaths(groupedJoined.false);
+    const topPositivePath = DialogueResolver.getTopPaths(groupedJoined.true);
+    return { lineChartData, topNegativePath, topPositivePath };
   };
 
   static deleteDialogue = async (dialogueId: string) => {

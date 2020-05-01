@@ -753,6 +753,13 @@
       "arity": "List"
     },
     {
+      "tag": "CreateField",
+      "model": "Dialogue",
+      "field": "sessions",
+      "type": "Session",
+      "arity": "List"
+    },
+    {
       "tag": "CreateModel",
       "model": "QuestionNode"
     },
@@ -1828,20 +1835,6 @@
         },
         "directive": "relation"
       }
-    },
-    {
-      "tag": "CreateArgument",
-      "location": {
-        "tag": "Directive",
-        "path": {
-          "tag": "Field",
-          "model": "Session",
-          "field": "dialogue"
-        },
-        "directive": "relation"
-      },
-      "argument": "",
-      "value": "\"DialogueToSessions\""
     },
     {
       "tag": "CreateArgument",

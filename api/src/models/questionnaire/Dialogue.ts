@@ -108,6 +108,14 @@ export const lineChartDataType = objectType({
   },
 });
 
+export const topPathType = objectType({
+  name: 'topPathType',
+  definition(t) {
+    t.string('answer');
+    t.int('quantity');
+  },
+});
+
 export const DialogueDetailResultType = objectType({
   name: 'DialogueDetailResult',
   definition(t) {
@@ -122,7 +130,16 @@ export const DialogueDetailResultType = objectType({
       type: UniqueDataResultEntry,
     });
     t.list.field('lineChartData', {
+      nullable: true,
       type: lineChartDataType,
+    });
+    t.list.field('topPositivePath', {
+      type: topPathType,
+      nullable: true,
+    });
+    t.list.field('topNegativePath', {
+      type: topPathType,
+      nullable: true,
     });
   },
 });
@@ -137,9 +154,8 @@ export const getQuestionnaireDataQuery = extendType({
       },
       async resolve(parent: any, args: any, ctx: any, info: any) {
         const aggregatedData = await DialogueResolver.getQuestionnaireAggregatedData(parent, args);
-        const lineChartData = await DialogueResolver.getLineData(args.dialogueId, 30);
-        const result = { ...aggregatedData, lineChartData };
-        console.log('result: ', result);
+        const data = await DialogueResolver.getLineData(args.dialogueId, 30);
+        const result = { ...aggregatedData, ...data };
         return result;
       },
     });
@@ -217,6 +233,7 @@ export const DialoguesOfCustomerQuery = extendType({
 });
 
 const dialogueNexus = [
+  topPathType,
   lineChartDataType,
   DialogueWhereUniqueInput,
   deleteDialogueOfCustomerMutation,

@@ -42,8 +42,8 @@ const NodeEntryItem = ({ nodeEntry }: { nodeEntry: NodeEntryProps }) => (
       <strong>
         Answer:
         {nodeEntry.values?.[0].numberValue
-          ? nodeEntry.values?.[0].numberValue
-          : nodeEntry.values?.[0].textValue}
+        || nodeEntry.values?.[0].textValue
+        || nodeEntry.values?.[0].multiValues?.map((value) => value.textValue)?.join(' ')}
       </strong>
     </Div>
     <Hr />
