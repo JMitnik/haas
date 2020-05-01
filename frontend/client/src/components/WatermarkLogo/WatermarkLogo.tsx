@@ -11,7 +11,7 @@ const WatermarkLogoContainer = styled.div`
   height: 175px;
 
   /* Put positioning smarter */
-  top: 40%;
+  top: 50%;
   transform: translateY(-50%);
 
   opacity: 0.35;
