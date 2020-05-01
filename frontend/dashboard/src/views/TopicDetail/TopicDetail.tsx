@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery } from '@apollo/react-hooks';
-import { Flex, Loader, Grid, Div } from '@haas/ui';
+import { Flex, Loader, Grid, Div, H3, Button } from '@haas/ui';
 import { useParams, Switch, Route, useHistory, useLocation } from 'react-router-dom';
 import { ResponsiveLine } from '@nivo/line';
 import getQuestionnaireData from '../../queries/getQuestionnaireData';
@@ -81,6 +81,7 @@ const MyResponsiveLine = ({ data }: { data: any }) => (
 const StatisticWidget = styled(Div)`
   background: #f7f9fe;
   border-radius: 12px;
+  padding: 12px;
 
   ol {
     padding: 12px 24px;
@@ -113,7 +114,7 @@ const TopicDetail = () => {
 
   return (
     <>
-      <Div width="80%" margin="0 auto">
+      <Div px="24px" margin="0 auto">
           <Div height="100vh" maxHeight="100vh" overflow="hidden">
               <Switch>
                 <Route path="/dashboard/c/:customerId/t/:topicId/topic-builder/">
@@ -122,11 +123,11 @@ const TopicDetail = () => {
                 <Route>
                 <Grid gridTemplateColumns="3fr 1fr">
                   <Div>
-                    <TopicInfo DialogueResultProps={resultData} />
-                    <button type="button" onClick={() => history.push(`/dashboard/c/${customerId}/t/${topicId}/topic-builder/`)}>Go to topic builder</button>
+                    <TopicInfo DialogueResultProps={resultData} customerId={customerId} topicId={topicId} />
 
-                    <Grid gridTemplateColumns="1fr 1fr 1fr" gridTemplateRows="1fr 1fr 1fr">
+                    <Grid gridTemplateColumns="1fr 1fr" gridTemplateRows="1fr 100px 3fr">
                       <StatisticWidget>
+                          <H3>Top positive results</H3>
                           <ol>
                             {
                             resultData?.topPositivePath.map(({ answer, quantity }: {answer: string, quantity: number}) => <li key={`${answer}-${quantity}`}>{`${answer} (${quantity} answer(s))`}</li>
@@ -136,6 +137,7 @@ const TopicDetail = () => {
                         </StatisticWidget>
 
                       <StatisticWidget>
+                        <H3>Top negative results</H3>
                         <ol>
                           {
                           resultData?.topNegativePath.map(({ answer, quantity }: {answer: string, quantity: number}) => <li key={`${answer}-${quantity}`}>{`${answer} (${quantity} answer(s))`}</li>
@@ -145,7 +147,7 @@ const TopicDetail = () => {
                       </StatisticWidget>
 
 
-                      <StatisticWidget gridColumn="span 3" height="300px" width="100%">
+                      <StatisticWidget gridColumn="span 2" height="300px" width="100%">
                         {
                           lineQueryData && <MyResponsiveLine data={lineData} />
                         }

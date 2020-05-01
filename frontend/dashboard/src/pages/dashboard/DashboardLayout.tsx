@@ -25,8 +25,6 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
         {/* Topside */}
         <Div>
           <Logo isWhite={sideNavIsActive} />
-
-
         </Div>
       </Sidenav>
       {children}
