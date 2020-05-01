@@ -2,13 +2,17 @@ import React from "react";
 import styled, { css } from "styled-components/macro";
 
 const SidenavContainer = styled.div`
-    ${({ theme }) => css`
-    background: white;
+    ${({ theme, isActive }: { theme: any, isActive: boolean }) => css`
+    background: ${theme.colors.primary};
     padding: ${theme.gutter * 1.5}px;
     display: flex;
     height: 100vh;
     flex-direction: column;
     justify-content: space-between;
+
+    ${isActive && css`
+      background: #392ab6;
+    `}
 
     ul {
         display: block;
@@ -18,7 +22,7 @@ const SidenavContainer = styled.div`
       li {
         display: flex;
         margin-bottom: ${theme.gutter}px;
-        color: #a0a4a5;
+        color: #9088d5;
       }
 
       a {
@@ -44,10 +48,13 @@ const SidenavContainer = styled.div`
     `}
 `;
 
-const Sidenav = ({ children }: { children: React.ReactNode }) => (
-<SidenavContainer>
-  {children}
-</SidenavContainer>
-);
+const Sidenav = ({ children, isActive }: { children: React.ReactNode, isActive: boolean }) => {
+
+  return (
+    <SidenavContainer isActive={isActive}>
+      {children}
+    </SidenavContainer>
+  );
+};
 
 export default Sidenav;

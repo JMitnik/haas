@@ -79,6 +79,8 @@ const MyResponsiveLine = ({ data }: { data: any }) => (
 const TopicDetail = () => {
   const { customerId, topicId } = useParams();
   const [activeSession, setActiveSession] = useState('');
+  const params = useParams();
+  console.log('params', params);
   const history = useHistory();
   const { loading, data } = useQuery(getQuestionnaireData, {
     variables: { dialogueId: topicId },

@@ -5,7 +5,7 @@ import { ApolloError } from 'apollo-boost';
 import { Plus, X } from 'react-feather';
 import { H2, H3, Grid, Flex, Label, Div, Card, CardBody,
   Container, DeleteButtonContainer } from '@haas/ui';
-import { Link, useHistory, useParams } from 'react-router-dom';
+import { Link, useHistory, useParams, useLocation } from 'react-router-dom';
 
 import getQuestionnairesCustomerQuery from '../../queries/getQuestionnairesCustomerQuery';
 import { deleteQuestionnaireMutation } from '../../mutations/deleteQuestionnaire';
@@ -13,6 +13,8 @@ import { AddTopicCard } from './TopicsOverviewStyles';
 
 const TopicsOverview: FC = () => {
   const { customerId } = useParams();
+  const location = useLocation();
+  const history = useHistory();
 
   const { loading, error, data } = useQuery<any>(getQuestionnairesCustomerQuery, {
     variables: { id: customerId },
@@ -32,6 +34,7 @@ const TopicsOverview: FC = () => {
   }
 
   const topics: Array<any> = data?.dialogues;
+
   return (
     <>
       <Container>

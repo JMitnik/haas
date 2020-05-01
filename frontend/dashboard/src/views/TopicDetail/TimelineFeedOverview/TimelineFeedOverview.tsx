@@ -32,10 +32,6 @@ const TimelineFeedOverview = ({
           Timeline feed
         </H2>
       </Div>
-      <Muted>
-        History of entries for this topic
-      </Muted>
-      <Hr />
       {timelineEntries?.length > 0 && timelineEntries?.map((timelineEntry, index) => (
         <TimelineEntry
           viewTimeLine={viewTimeLine}

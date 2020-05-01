@@ -12,9 +12,13 @@ export const LogoContainer = styled.div`
   }
 `;
 
-const Logo = () => (
+const Logo = ({ isWhite = false }: { isWhite?: boolean }) => (
   <LogoContainer>
-    <img src="/logo.svg" alt="HAAS Logo" />
+    {isWhite ? (
+      <img src="/logo-white.png" alt="HAAS Logo" />
+    ): (
+      <img src="/logo.svg" alt="HAAS Logo" />
+    )}
   </LogoContainer>
 );
 
