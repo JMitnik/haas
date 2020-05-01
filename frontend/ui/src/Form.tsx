@@ -193,6 +193,7 @@ export const SliderContainer = styled.div`
       &::-webkit-slider-thumb {
         -webkit-appearance: none;
         height: 80px;
+        opacity: 0;
         width: 80px;
         background: transparent;
         border-color: transparent;
@@ -215,6 +216,7 @@ export const SliderContainer = styled.div`
         -webkit-appearance: none;
         height: 80px;
         width: 80px;
+        opacity: 0;
 
         /* Ensure that the bunny is on top of the bar */
         transform: translateY(-100%);
@@ -238,6 +240,7 @@ export const SliderContainer = styled.div`
         -webkit-appearance: none;
         height: 80px;
         width: 80px;
+        opacity: 0;
 
         /* Ensure that the bunny is on top of the bar */
         transform: translateY(-100%);
