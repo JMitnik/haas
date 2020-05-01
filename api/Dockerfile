@@ -7,8 +7,7 @@ COPY ./ /app/
 
 RUN apt-get update \
   && apt-get install curl python bash \
-  && npm install -g yarn \
-  && yarn add prisma \
+  && yarn add @prisma/cli \
   && yarn
 
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
