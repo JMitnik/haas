@@ -45,7 +45,7 @@ const TopicsOverview: FC = () => {
           {topics?.map((topic, index) => topic && <TopicCard key={index} topic={topic} />)}
 
           <AddTopicCard>
-            <Link to={`/c/${customerId}/topic-builder`} />
+            <Link to={`/dashboard/c/${customerId}/topic-builder`} />
             <Div>
               <Plus />
               <H3>
@@ -85,7 +85,7 @@ const TopicCard = ({ topic }: { topic: any }) => {
   };
 
   return (
-    <Card useFlex flexDirection="column" onClick={() => history.push(`/c/${customerId}/t/${topic.id}`)}>
+    <Card useFlex flexDirection="column" onClick={() => history.push(`/dashboard/c/${customerId}/t/${topic.id}`)}>
       <CardBody flex="100%">
         <DeleteButtonContainer
           onClick={(e) => deleteClickedCustomer(e, topic.id)}

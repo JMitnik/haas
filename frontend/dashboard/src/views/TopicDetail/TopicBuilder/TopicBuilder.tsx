@@ -23,7 +23,7 @@ const TopicBuilder = () => {
 
   const [updateTopic] = useMutation(updateTopicBuilder, {
     onCompleted: () => {
-      history.push(`/c/${customerId}/t/${topicId}/`);
+      history.push(`/dashboard/c/${customerId}/t/${topicId}/`);
     },
     refetchQueries: [{
       query: getTopicBuilderQuery,

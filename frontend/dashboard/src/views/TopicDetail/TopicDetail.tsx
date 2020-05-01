@@ -117,7 +117,7 @@ const TopicDetail = () => {
                 </Route>
                 <Route>
                   <TopicInfo DialogueResultProps={resultData} />
-                  <button type="button" onClick={() => history.push(`/c/${customerId}/t/${topicId}/topic-builder/`)}>Go to topic builder</button>
+                  <button type="button" onClick={() => history.push(`/dashboard/c/${customerId}/t/${topicId}/topic-builder/`)}>Go to topic builder</button>
                 </Route>
               </Switch>
               <Div height="300px" width="100%">

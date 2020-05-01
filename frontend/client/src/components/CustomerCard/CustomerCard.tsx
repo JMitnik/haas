@@ -14,7 +14,7 @@ const CustomerCard = ({ customer }: { customer: any }) => {
 
   const startQuestionnaire = (dialogueOption: any, actionMeta: any) => {
     if (actionMeta.action === 'select-option') {
-      history.push(`/${customer.slug}/${dialogueOption.value}`);
+      history.push(`/dashboard/${customer.slug}/${dialogueOption.value}`);
     }
   };
 
