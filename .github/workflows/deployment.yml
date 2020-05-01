@@ -15,17 +15,22 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - name: Get release version
+      id: get_version
+      run: echo ::set-env name=RELEASE_VERSION::$(echo ${GITHUB_REF:10})
     - name: Publish to Docker Registry
       uses: elgohr/Publish-Docker-Github-Action@master
+      id: docker_deploy
       with:
         name: juronemo/haas-api
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_PASSWORD }}
         workdir: api
+        snapshot: true
     - name: SSH Commands
       uses: appleboy/ssh-action@v0.0.7
       with:
         host: ${{ secrets.API_SERVER_HOST }}
         username: ${{ secrets.API_SERVER_USERNAME }}
         key: ${{ secrets.API_SERVER_KEY }}
-        script: /bin/sh deployment.sh
+        script: (export API_TAG=${{ steps.docker_deploy.outputs.snapshot-tag }} && /bin/sh deployment.sh)
