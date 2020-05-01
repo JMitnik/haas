@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { useQuery } from '@apollo/react-hooks';
-import { Flex, Loader, Grid, Div } from '@haas/ui';
-import { useParams, Switch, Route, useHistory } from 'react-router-dom';
+import { Flex, Loader, Grid, Div, H3, Button } from '@haas/ui';
+import { useParams, Switch, Route, useHistory, useLocation } from 'react-router-dom';
 import { ResponsiveLine } from '@nivo/line';
 import getQuestionnaireData from '../../queries/getQuestionnaireData';
 import TimelineFeedOverview from './TimelineFeedOverview/TimelineFeedOverview';
 import NodeEntriesOverview from './NodeEntriesOverview/NodeEntriesOverview';
 import TopicBuilder from './TopicBuilder/TopicBuilder';
 import TopicInfo from './TopicInfo/TopicInfo';
+import Modal from 'components/Modal';
+import styled from 'styled-components/macro';
 
 const MyResponsiveLine = ({ data }: { data: any }) => (
   <ResponsiveLine
@@ -76,9 +78,22 @@ const MyResponsiveLine = ({ data }: { data: any }) => (
   />
 );
 
+const StatisticWidget = styled(Div)`
+  background: #f7f9fe;
+  border-radius: 12px;
+  padding: 12px;
+
+  ol {
+    padding: 12px 24px;
+  }
+`;
+
 const TopicDetail = () => {
   const { customerId, topicId } = useParams();
   const [activeSession, setActiveSession] = useState('');
+  const params = useParams();
+  const location = useLocation<any>();
+  console.log('params', params);
   const history = useHistory();
   const { loading, data } = useQuery(getQuestionnaireData, {
     variables: { dialogueId: topicId },
@@ -99,57 +114,62 @@ const TopicDetail = () => {
 
   return (
     <>
-      <Div width="80%" margin="0 auto">
-        <Grid gridTemplateColumns="3fr 1fr">
-          <Div>
-            <Flex
-              height="100%"
-              alignItems="center"
-              justifyContent="space-between"
-              flexDirection="column"
-            >
+      <Div px="24px" margin="0 auto">
+          <Div height="100vh" maxHeight="100vh" overflow="hidden">
               <Switch>
-                <Route path="/c/:customerId/t/:topicId/e/:entryId">
-                  <NodeEntriesOverview sessionId={activeSession} />
-                </Route>
-                <Route path="/c/:customerId/t/:topicId/topic-builder/">
+                <Route path="/dashboard/c/:customerId/t/:topicId/topic-builder/">
                   <TopicBuilder />
                 </Route>
                 <Route>
-                  <TopicInfo DialogueResultProps={resultData} />
-                  <button type="button" onClick={() => history.push(`/c/${customerId}/t/${topicId}/topic-builder/`)}>Go to topic builder</button>
-                </Route>
-              </Switch>
-              <Div height="300px" width="100%">
-                {
-                  lineQueryData && <MyResponsiveLine data={lineData} />
-                }
-              </Div>
-              <Div>
-                <ol>
-                  {
-                  resultData?.topPositivePath.map(({ answer, quantity }: {answer: string, quantity: number}) => <li key={`${answer}-${quantity}`}>{`${answer} (${quantity} answer(s))`}</li>
-                  )
-                }
-                </ol>
-              </Div>
-              <Div>
-                <ol>
-                  {
-                  resultData?.topNegativePath.map(({ answer, quantity }: {answer: string, quantity: number}) => <li key={`${answer}-${quantity}`}>{`${answer} (${quantity} answer(s))`}</li>
-                  )
-                }
-                </ol>
-              </Div>
-            </Flex>
-          </Div>
-          <Div>
-            <TimelineFeedOverview
-              onActiveSessionChange={setActiveSession}
-              timelineEntries={resultData?.timelineEntries}
-            />
-          </Div>
-        </Grid>
+                <Grid gridTemplateColumns="3fr 1fr">
+                  <Div>
+                    <TopicInfo DialogueResultProps={resultData} customerId={customerId} topicId={topicId} />
+
+                    <Grid gridTemplateColumns="1fr 1fr" gridTemplateRows="1fr 100px 3fr">
+                      <StatisticWidget>
+                          <H3>Top positive results</H3>
+                          <ol>
+                            {
+                            resultData?.topPositivePath.map(({ answer, quantity }: {answer: string, quantity: number}) => <li key={`${answer}-${quantity}`}>{`${answer} (${quantity} answer(s))`}</li>
+                            )
+                          }
+                          </ol>
+                        </StatisticWidget>
+
+                      <StatisticWidget>
+                        <H3>Top negative results</H3>
+                        <ol>
+                          {
+                          resultData?.topNegativePath.map(({ answer, quantity }: {answer: string, quantity: number}) => <li key={`${answer}-${quantity}`}>{`${answer} (${quantity} answer(s))`}</li>
+                          )
+                        }
+                        </ol>
+                      </StatisticWidget>
+
+
+                      <StatisticWidget gridColumn="span 2" height="300px" width="100%">
+                        {
+                          lineQueryData && <MyResponsiveLine data={lineData} />
+                        }
+                      </StatisticWidget>
+                    </Grid>
+                  </Div>
+
+                <Div>
+                  <TimelineFeedOverview
+                    onActiveSessionChange={setActiveSession}
+                    timelineEntries={resultData?.timelineEntries}
+                  />
+                </Div>
+            </Grid>
+          </Route>
+        </Switch>
+        </Div>
+        {location?.state?.modal && (
+          <Modal>
+            <NodeEntriesOverview sessionId={activeSession} />
+          </Modal>
+        )}
       </Div>
     </>
   );

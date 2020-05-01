@@ -46,7 +46,6 @@ const NodeEntryItem = ({ nodeEntry }: { nodeEntry: NodeEntryProps }) => (
         || nodeEntry.values?.[0].multiValues?.map((value) => value.textValue)?.join(' ')}
       </strong>
     </Div>
-    <Hr />
   </NodeEntryContainer>
 );
 

@@ -14,16 +14,26 @@ export interface ButtonProps extends SpaceProps {
 export const DeleteButtonContainer = styled.button`
   position: absolute;
   top: 10px;
-  right: 0px;
-  background: none;
+  right: 5px;
   border: none;
-  opacity: 0.1;
+  background: #f6f7f9;
+  color: #a1a2a5;
+  padding: 5px;
+  border-radius: 100%;
+
+  svg {
+    width: 10px;
+    height: 10px;
+  }
+
+  opacity: 0.7;
   cursor: pointer;
   transition: all 0.2s ease-in;
 
   &:hover {
     transition: all 0.2s ease-in;
-    opacity: 0.8;
+    opacity: 0.9;
+    background: #e1e2e5;
   }
 `;
 export const ButtonIcon = styled.span``;

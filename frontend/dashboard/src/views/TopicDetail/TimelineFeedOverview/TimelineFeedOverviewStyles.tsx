@@ -5,8 +5,9 @@ export const TimelineFeedOverviewContainer = styled.div`
   ${({ theme }) => css`
     display: flex;
     flex-direction: column;
-    background: #daecfc;
+    background: #f7f9fe;
     border-radius: 20px;
     padding: ${theme.gutter}px;
+    height: 80vh;
   `}
 `;

@@ -19,10 +19,10 @@ export const AddTopicMutation = gql`
 `;
 
 interface FormDataProps {
-  title: String;
-  description: String;
-  publicTitle?: String;
-  isSeed?: Boolean;
+  title: string;
+  description: string;
+  publicTitle?: string;
+  isSeed?: boolean;
 }
 
 const AddTopicView = () => {
@@ -112,7 +112,7 @@ const AddTopicView = () => {
 
           <Flex>
             <Button brand="primary" mr={2} type="submit">Create topic</Button>
-            <Button brand="default" type="button" onClick={() => history.push(`/c/${customerId}/`)}>Cancel</Button>
+            <Button brand="default" type="button" onClick={() => history.push(`/dashboard/c/${customerId}/`)}>Cancel</Button>
           </Flex>
         </Div>
       </Form>

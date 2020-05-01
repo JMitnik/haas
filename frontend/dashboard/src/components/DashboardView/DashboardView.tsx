@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 import { useQuery, useMutation } from '@apollo/react-hooks';
-import { ApolloError } from 'apollo-boost';
+import { ApolloError, gql } from 'apollo-boost';
 
 import { Plus, X } from 'react-feather';
 import { H2, H3, Grid, Flex, Div, Card, CardBody,
@@ -11,12 +11,12 @@ import { Link, useHistory } from 'react-router-dom';
 import { getCustomerQuery } from '../../queries/getCustomerQuery';
 import { deleteFullCustomerQuery } from '../../mutations/deleteFullCustomer';
 import { CustomerCardImage } from './DashboardViewStyles';
-import styled from 'styled-components/macro';
 
 const DashboardView: FC = () => {
   const { loading, error, data } = useQuery(getCustomerQuery);
 
-  if (loading) return <p>Loading</p>;
+  console.log(error);
+  console.log(loading);
 
   if (error) {
     return (
@@ -27,6 +27,8 @@ const DashboardView: FC = () => {
       </p>
     );
   }
+
+  if (loading) return <p>Loading</p>;
 
   const topics = data?.customers;
 
@@ -43,7 +45,7 @@ const DashboardView: FC = () => {
           {topics?.map((topic: any, index: any) => topic && <CustomerCard key={index} customer={topic} />)}
 
           <AddCard>
-            <Link to="dashboard/customer-builder" />
+            <Link to="/dashboard/customer-builder" />
             <Div>
               <Plus />
               <H3>

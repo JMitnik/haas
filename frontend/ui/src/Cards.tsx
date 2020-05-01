@@ -7,29 +7,40 @@ export const Card = styled(Div)`
       border-radius: ${theme.borderRadiuses.md};
       background: ${theme.colors.white};
       color: ${theme.colors.default.darkest};
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      box-shadow: 1px 4px 5px 2px rgb(241, 242, 248);
+      border: 1px solid #fcfcfc;
       cursor: pointer;
+      transition: all .3s cubic-bezier(.55,0,.1,1);
+
+
+      &:hover {
+        transition: all .3s cubic-bezier(.55,0,.1,1);
+        transform: scale(1.1);
+      }
   `}
 `;
 
 export const AddCard = styled(Card)`
   ${({ theme }) => css`
     position: relative;
+    box-shadow: none;
+    border-radius: ${theme.borderRadiuses.md}
 
     &:hover ${Div} {
       transition: all 0.2s ease-in;
-      box-shadow: 0 1px 3px 1px rgba(0,0,0,0.1);
+      box-shadow: 0 1px 3px 1px rgba(0,0,0,0.2) !important;
     }
 
     ${Div} {
       height: 100%;
+      border-radius: ${theme.borderRadiuses.md}
       border: 1px solid ${theme.colors.default.light};
       transition: all 0.2s ease-in;
       display: flex;
       align-items: center;
       flex-direciton: column;
       justify-content: center;
-      background: ${theme.colors.default.light};
+      background: #f7f9fe;
     }
 
     a {

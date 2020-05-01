@@ -11,13 +11,14 @@ export const AddTopicCard = styled(Card)`
 
     ${Div} {
       height: 100%;
+      border-radius: ${theme.borderRadiuses.md}
       border: 1px solid ${theme.colors.default.light};
       transition: all 0.2s ease-in;
       display: flex;
       align-items: center;
       flex-direciton: column;
       justify-content: center;
-      background: ${theme.colors.default.light};
+      background: #f7f9fe;
     }
 
     a {

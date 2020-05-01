@@ -21,7 +21,7 @@ const TimelineFeedOverview = ({
 
   // TODO: Set setActiveSession on a context, so you dont pass it as prop around
   const viewTimeLine = (timelineEntry: any) => {
-    history.push(`/c/${customerId}/t/${topicId}/e/${timelineEntry.sessionId}`);
+    history.push(`/dashboard/c/${customerId}/t/${topicId}`, { modal: true });
     onActiveSessionChange(timelineEntry.sessionId);
   };
 
@@ -32,10 +32,6 @@ const TimelineFeedOverview = ({
           Timeline feed
         </H2>
       </Div>
-      <Muted>
-        History of entries for this topic
-      </Muted>
-      <Hr />
       {timelineEntries?.length > 0 && timelineEntries?.map((timelineEntry, index) => (
         <TimelineEntry
           viewTimeLine={viewTimeLine}
