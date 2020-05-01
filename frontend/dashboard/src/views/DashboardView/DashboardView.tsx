@@ -6,14 +6,14 @@ import { Plus, X } from 'react-feather';
 import { H2, H3, Grid, Flex, Div, Card, CardBody,
   Container, DeleteButtonContainer, AddCard } from '@haas/ui';
 import { Link, useHistory } from 'react-router-dom';
-import { Query, Customer } from '../../types';
+// import { Query, Customer } from '../../types';
 
 import { getCustomerQuery } from '../../queries/getCustomerQuery';
 import { deleteFullCustomerQuery } from '../../mutations/deleteFullCustomer';
 import { CustomerCardImage } from './DashboardViewStyles';
 
 const DashboardView: FC = () => {
-  const { loading, error, data } = useQuery<Query>(getCustomerQuery);
+  const { loading, error, data } = useQuery(getCustomerQuery);
 
   if (loading) return <p>Loading</p>;
 
@@ -39,7 +39,7 @@ const DashboardView: FC = () => {
           gridTemplateColumns={['1fr', '1fr 1fr 1fr']}
           gridAutoRows="minmax(200px, 1fr)"
         >
-          {topics?.map((topic, index) => topic && <CustomerCard key={index} customer={topic} />)}
+          {topics?.map((topic: any, index: any) => topic && <CustomerCard key={index} customer={topic} />)}
 
           <AddCard>
             <Link to="/customer-builder" />
@@ -56,7 +56,7 @@ const DashboardView: FC = () => {
   );
 };
 
-const CustomerCard = ({ customer }: { customer: Customer }) => {
+const CustomerCard = ({ customer }: { customer: any }) => {
   const history = useHistory();
 
   const setCustomerID = (customerId: string) => {
