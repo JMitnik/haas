@@ -2,6 +2,9 @@ import styled, { css } from 'styled-components/macro';
 
 export const TimelineEntryContainer = styled.div`
    ${({ theme }) => css`
+    display: grid;
+    grid-template-columns: 50px 1fr;
+    grid-gap: 24px;
     padding: 8px 14px;
     border-radius: 7px;
     background: #ffffff;

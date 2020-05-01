@@ -1,6 +1,7 @@
 import React, { Dispatch, SetStateAction } from 'react';
 import { Div, H5 } from '@haas/ui';
 import { TimelineEntryContainer } from './TimelineEntryStyles';
+import styled, { css } from 'styled-components/macro';
 
 interface TimelineEntryProps {
   sessionId: string;
@@ -29,6 +30,39 @@ const getUniversalDate = (date: Date) => {
   return result;
 };
 
+const TimeLineEntryValueContainer = styled.div`
+  ${({ value }: { value: number }) => css`
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    font-weight: 1000;
+    font-size: 1.5rem;
+
+    ${value < 50 && css`
+      background: #FED7D7;
+      color: #E53E3E;
+    `}
+
+    ${value >= 50 && value < 75 && css`
+      background: #FEEBC8;
+      color: #C05621;
+    `}
+
+    ${value >= 75 && value < 95 && css`
+      background: #C6F6D5;
+      color: #2F855A;
+    `}
+
+    ${value >= 80 && css`
+      background: #BEE3F8;
+      color: #2B6CB0;
+    `}
+  `}
+`;
+
+
 const TimelineEntry = ({
   timeLineEntry,
   viewTimeLine,
@@ -42,14 +76,17 @@ const TimelineEntry = ({
 
   return (
     <TimelineEntryContainer onClick={() => viewTimeLine(timeLineEntry)}>
+      <TimeLineEntryValueContainer value={timeLineEntry.value}>
+        {Number(timeLineEntry.value / 10).toFixed(1)}
+      </TimeLineEntryValueContainer>
       <Div>
-        {`User ${timeLineEntry.sessionId} has voted ${timeLineEntry.value}`}
+        {`User ${timeLineEntry.sessionId} has voted `}
       </Div>
-      <Div>
+      {/* <Div>
         <H5>
           {acceptedDate}
         </H5>
-      </Div>
+      </Div> */}
     </TimelineEntryContainer>
   );
 };
