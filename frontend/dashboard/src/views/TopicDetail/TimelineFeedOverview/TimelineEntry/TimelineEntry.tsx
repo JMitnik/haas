@@ -37,7 +37,7 @@ const TimelineEntry = ({
   timeLineEntry: TimelineEntryProps,
   viewTimeLine: Function
 }) => {
-  const date = new Date(timeLineEntry.createdAt);
+  const date = new Date(parseInt(timeLineEntry.createdAt));
   const acceptedDate = getUniversalDate(date);
 
   return (
