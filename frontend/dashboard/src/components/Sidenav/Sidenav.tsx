@@ -3,7 +3,7 @@ import styled, { css } from "styled-components/macro";
 
 const SidenavContainer = styled.div`
     ${({ theme, isActive }: { theme: any, isActive: boolean }) => css`
-    background: ${theme.colors.primary};
+    background: white;
     padding: ${theme.gutter * 1.5}px;
     display: flex;
     height: 100vh;

@@ -15,7 +15,9 @@ import { Div } from '@haas/ui';
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const params = useParams<any>();
 
+
   const sideNavIsActive = (params?.customerId != undefined && params?.topicId != undefined);
+  console.log(sideNavIsActive);
 
   return (
     <DashboardContainer>

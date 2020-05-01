@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 import { useQuery, useMutation } from '@apollo/react-hooks';
-import { ApolloError } from 'apollo-boost';
+import { ApolloError, gql } from 'apollo-boost';
 
 import { Plus, X } from 'react-feather';
 import { H2, H3, Grid, Flex, Div, Card, CardBody,
@@ -15,7 +15,8 @@ import { CustomerCardImage } from './DashboardViewStyles';
 const DashboardView: FC = () => {
   const { loading, error, data } = useQuery(getCustomerQuery);
 
-  if (loading) return <p>Loading</p>;
+  console.log(error);
+  console.log(loading);
 
   if (error) {
     return (
@@ -26,6 +27,8 @@ const DashboardView: FC = () => {
       </p>
     );
   }
+
+  if (loading) return <p>Loading</p>;
 
   const topics = data?.customers;
 

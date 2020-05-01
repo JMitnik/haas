@@ -8,12 +8,12 @@ import CustomerBuilderView from 'views/CustomerBuilderView';
 import TopicsOverview from 'views/TopicsOverview/TopicsOverview';
 import OrganisationSettingsView from 'views/OrganisationSettingsView';
 import Sidenav from 'components/Sidenav';
-import DashboardView from 'components/DashboardView';
 import Logo from 'assets/Logo';
 import { Div } from '@haas/ui';
 import DashboardLayout from './DashboardLayout';
 
 const DashboardPage = () => {
+  console.log("Hello");
   return (
     <>
       <Switch>
@@ -26,12 +26,12 @@ const DashboardPage = () => {
           <TopicsOverview />
         </DashboardLayout>} />
         <Route
-          path="/organisation-settings"
+          path="/dashboard/organisation-settings"
           render={() => <OrganisationSettingsView />}
         />
 
         {/* Default-view: Ensure this is last */}
-        <Route path="/" render={() => <DashboardLayout><CustomerOverview /></DashboardLayout>} />
+        <Route path="/dashboard" render={() => <DashboardLayout><CustomerOverview /></DashboardLayout>} />
       </Switch>
     </>
   );
