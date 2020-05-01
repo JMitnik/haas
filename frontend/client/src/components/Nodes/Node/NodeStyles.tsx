@@ -2,13 +2,19 @@ import styled, { css } from 'styled-components/macro';
 import { Div, H2 } from '@haas/ui';
 
 export const FloatingNodeContainer = styled(Div)`
-  position: absolute;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
-  display: flex;
-  height: 90%;
+  ${({ theme }) => css`
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    display: flex;
+    height: 100%;
+
+    @media and ${theme.media.desk} {
+      height: 90%;
+    }
+  `}
 `;
 
 export const ActiveNodeContainer = styled(Div)`
