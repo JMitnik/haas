@@ -531,6 +531,24 @@
     {
       "tag": "CreateField",
       "model": "Customer",
+      "field": "slug",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "Customer",
+          "field": "slug"
+        },
+        "directive": "unique"
+      }
+    },
+    {
+      "tag": "CreateField",
+      "model": "Customer",
       "field": "name",
       "type": "String",
       "arity": "Required"

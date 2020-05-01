@@ -1,6 +1,10 @@
 {
     "name": "@haas/api",
+    "private": true,
     "version": "0.1.0",
+    "workspaces": {
+        "nohoist": ["@prisma", "@prisma/**"]
+    },
     "scripts": {
         "start": "nodemon",
         "serve": "ts-node -P tsconfig.json ./src/app.ts",

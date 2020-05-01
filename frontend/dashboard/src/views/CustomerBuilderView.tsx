@@ -11,10 +11,11 @@ import { getCustomerQuery } from '../queries/getCustomerQuery';
 import { createNewCustomer } from '../mutations/createNewCustomer';
 
 interface FormDataProps {
-  name: String;
-  logo: String;
-  primaryColour?: String;
-  seed?: Boolean;
+  name: string;
+  logo: string;
+  slug: string;
+  primaryColour?: string;
+  seed?: boolean;
 }
 
 const CustomerBuilderView = () => {
@@ -33,6 +34,7 @@ const CustomerBuilderView = () => {
 
   const onSubmit = (formData: FormDataProps) => {
     const optionInput = { logo: formData.logo,
+      slug: formData.slug,
       isSeed: formData.seed,
       primaryColour: formData.primaryColour };
     // TODO: Make better typescript supported
@@ -72,6 +74,11 @@ const CustomerBuilderView = () => {
                 <Div useFlex pl={4} flexDirection="column">
                   <StyledLabel>Logo</StyledLabel>
                   <StyledInput name="logo" ref={register({ required: true })} />
+                  {errors.name && <Muted color="warning">Something went wrong!</Muted>}
+                </Div>
+                <Div useFlex pl={4} flexDirection="column">
+                  <StyledLabel>Slug</StyledLabel>
+                  <StyledInput name="slug" ref={register({ required: true })} />
                   {errors.name && <Muted color="warning">Something went wrong!</Muted>}
                 </Div>
                 <Div useFlex py={4} flexDirection="column">

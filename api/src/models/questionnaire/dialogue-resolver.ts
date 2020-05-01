@@ -73,7 +73,7 @@ class DialogueResolver {
       {
         where: { id: dialogueId },
         include: {
-          session: {
+          sessions: {
             include: {
               nodeEntries: {
                 include: {
@@ -91,7 +91,7 @@ class DialogueResolver {
         },
       },
     );
-    const nodeEntries = dialogue?.session.flatMap((session) => session.nodeEntries);
+    const nodeEntries = dialogue?.sessions.flatMap((session) => session.nodeEntries);
     const nodeEntryValues = nodeEntries && nodeEntries.flatMap((nodeEntry) => ({ creationDate: nodeEntry.creationDate, values: nodeEntry.values[0] }));
     const nodeEntryNumberValues = nodeEntryValues?.filter((nodeEntryValue) => nodeEntryValue.values.numberValue);
     const finalNodeEntryNumberValues = nodeEntryNumberValues?.map(
@@ -119,7 +119,7 @@ class DialogueResolver {
             id: true,
           },
         },
-        session: {
+        sessions: {
           select: {
             id: true,
           },
@@ -127,7 +127,7 @@ class DialogueResolver {
       },
     });
 
-    const sessionIds = dialogue?.session.map((session) => session.id);
+    const sessionIds = dialogue?.sessions.map((session) => session.id);
     const nodeEntries = await prisma.nodeEntry.findMany({ where: {
       sessionId: {
         in: sessionIds,

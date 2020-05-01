@@ -5,6 +5,6 @@ export const createNewCustomer = gql`
   mutation createNewCustomer($name: String!, $options: CustomerCreateOptions) {
     createCustomer(name: $name, options: $options) {
         name
-      }
+    }
   }
 `;

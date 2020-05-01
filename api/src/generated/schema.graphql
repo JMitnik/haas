@@ -21,6 +21,7 @@ input CustomerCreateOptions {
   isSeed: Boolean = false
   logo: String
   primaryColour: String
+  slug: String!
 }
 
 type CustomerSettings {

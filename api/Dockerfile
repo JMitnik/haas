@@ -1,18 +1,22 @@
-FROM mhart/alpine-node:13.12.0
+FROM node:13 AS base
 ENV PORT 4000
-
 WORKDIR /app
-COPY ./package.json /app/
-COPY ./ /app/
 
-RUN apk update \
-  && apk add curl python bash --no-cache --virtual build-dependencies build-base gcc \
-  && yarn add prisma \
-  && yarn
+from base as builder
 
-HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
-  CMD curl -f http://localhost:$PORT || exit 1
+COPY ./package.json schema.prisma ./
 
+RUN apt-get update \
+  && apt-get install curl python bash \
+  && yarn add @prisma/cli \
+  && yarn install
+
+RUN npx prisma generate
+
+from base
+
+COPY --from=builder /app/node_modules ./node_modules
+COPY ./ /app
 EXPOSE ${PORT}
 
 CMD [ "bash", "docker-entrypoint.sh" ]

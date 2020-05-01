@@ -3,7 +3,7 @@
  * Do not make changes to this file directly
  */
 
-import * as prisma from "../node_modules/@prisma/client"
+import * as prisma from "@prisma/client"
 
 
 
@@ -18,6 +18,7 @@ export interface NexusGenInputs {
     isSeed?: boolean | null; // Boolean
     logo?: string | null; // String
     primaryColour?: string | null; // String
+    slug: string; // String!
   }
   CustomerWhereUniqueInput: { // input type
     id: string; // ID!

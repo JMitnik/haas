@@ -81,8 +81,8 @@ class CustomerResolver {
   };
 
   static createCustomer = async (args: any) => {
-    const { name, options, slug } = args;
-    const { isSeed, logo, primaryColour } = options;
+    const { name, options } = args;
+    const { isSeed, logo, primaryColour, slug } = options;
 
     const customer = await prisma.customer.create({
       data: {
