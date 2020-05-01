@@ -216,7 +216,6 @@ export const SliderContainer = styled.div`
         transform: translateY(-100%);
         border: none;
         background-color: transparent;
-        background-image: url('/logo-haas.svg');
         background-size: contain;
         background-repeat: no-repeat;
         cursor: pointer;
@@ -238,7 +237,6 @@ export const SliderContainer = styled.div`
         transform: translateY(-100%);
         border: none;
         background-color: transparent;
-        background-image: url('/logo-haas.svg');
         background-size: contain;
         background-repeat: no-repeat;
         cursor: pointer;

@@ -106,7 +106,6 @@ const Slider = ({ register, onSubmit, animationControls }: SliderProps) => {
             options={{
               animationData: animationState.animationJson,
               loop: true,
-
             }}
             speed={animationState.speed}
           />

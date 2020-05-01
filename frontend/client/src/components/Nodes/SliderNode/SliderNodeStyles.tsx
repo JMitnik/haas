@@ -38,5 +38,7 @@ export const HAASRabbit = styled.div`
     width: auto !important;
     height: auto !important;
     max-width: 200px;
+    background: transparent;
+    border: none;
   }
 `;
