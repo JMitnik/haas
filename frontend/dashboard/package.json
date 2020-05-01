@@ -44,7 +44,7 @@
         "start": "cra-workspaces start",
         "build": "cra-workspaces build",
         "test": "react-scripts test",
-        "generate": "graphql-codegen -r dotenv/config",
+        "generate": "",
         "eject": "react-scripts eject",
         "eslint": "eslint --ext .js,.jsx,.ts,.tsx ./src"
     },
