@@ -6,16 +6,22 @@ export const ShareItem = styled(Div)`
     border-radius: 100%;
     padding: 13px;
     display: flex;
-    margin-right: ${theme.gutter}px;
+    margin-right: ${theme.gutter / 2}px;
     cursor: pointer;
+
+    @media ${theme.media.mob} {
+      margin-right: ${theme.gutter}px;
+    }
 
     &:hover {
       background: ${String(bg)};
     }
 
     svg {
-      height: 30px;
-      width: 30px;
+      @media ${theme.media.desk} {
+        height: 25px;
+        width: 25px;
+      }
     }
   `}
 `;
