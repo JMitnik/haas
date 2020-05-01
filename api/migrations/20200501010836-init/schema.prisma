@@ -3,6 +3,7 @@ datasource postgresql {
   url = "***"
 }
 
+// binaryTargets = ["debian-openssl-1.1.x"]
 generator client {
   provider = "prisma-client-js"
 }
@@ -48,6 +49,7 @@ model CustomerSettings {
 
 model Customer {
   id        String            @default(cuid()) @id
+  slug      String            @unique
   name      String
   settings  CustomerSettings?
   dialogues Dialogue[]

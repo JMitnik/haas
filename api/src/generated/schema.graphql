@@ -21,6 +21,7 @@ input CustomerCreateOptions {
   isSeed: Boolean = false
   logo: String
   primaryColour: String
+  slug: String!
 }
 
 type CustomerSettings {
@@ -41,6 +42,7 @@ type Dialogue {
   description: String!
   id: ID!
   leafs: [QuestionNode!]!
+  lineChartData: String
   publicTitle: String
   questions(where: QuestionNodeWhereInput): [QuestionNode!]!
   title: String!
@@ -52,6 +54,7 @@ type DialogueDetailResult {
   creationDate: String!
   customerName: String!
   description: String!
+  lineChartData: [lineChartDataType!]!
   timelineEntries: [UniqueDataResultEntry!]!
   title: String!
   totalNodeEntries: Int!
@@ -105,6 +108,11 @@ input LeafNodeInput {
   type: String
 }
 
+type lineChartDataType {
+  x: String!
+  y: Int!
+}
+
 type Mutation {
   createCustomer(name: String, options: CustomerCreateOptions): Customer!
   createDialogue(customerId: String, description: String, isSeed: Boolean, publicTitle: String, title: String): Dialogue!
@@ -148,6 +156,7 @@ type Query {
   edge(id: String): Edge!
   getQuestionnaireData(dialogueId: String): DialogueDetailResult!
   getSessionAnswerFlow(sessionId: ID): Session!
+  lineChartData(dialogueId: String, numberOfDaysBack: Int): [lineChartDataType!]!
   questionNode(where: QuestionNodeWhereUniqueInput): QuestionNode!
   questionNodes: [QuestionNode!]!
   session(where: SessionWhereUniqueInput): Session!

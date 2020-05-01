@@ -1,6 +1,10 @@
 {
     "name": "@haas/api",
+    "private": true,
     "version": "0.1.0",
+    "workspaces": {
+        "nohoist": ["@prisma", "@prisma/**"]
+    },
     "scripts": {
         "start": "nodemon",
         "serve": "ts-node -P tsconfig.json ./src/app.ts",
@@ -34,6 +38,7 @@
         "cloudinary": "^1.21.0",
         "concurrently": "^5.1.0",
         "cors": "^2.8.5",
+        "date-fns": "^2.12.0",
         "dotenv": "^8.2.0",
         "express": "^4.17.1",
         "graphql": "^14.5.8",

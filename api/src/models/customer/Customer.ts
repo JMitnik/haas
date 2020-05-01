@@ -47,6 +47,7 @@ export const CustomerCreateOptionsInput = inputObjectType({
   name: 'CustomerCreateOptions',
   definition(t) {
     t.boolean('isSeed', { default: false });
+    t.string('slug', { required: true });
     t.string('logo');
     t.string('primaryColour');
   },
@@ -62,6 +63,7 @@ export const CustomerMutations = extendType({
         options: CustomerCreateOptionsInput,
       },
       resolve(parent: any, args: any, ctx: any, info: any) {
+        console.log(args);
         return CustomerResolver.createCustomer(args);
       },
     });

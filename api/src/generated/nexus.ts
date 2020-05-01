@@ -3,7 +3,7 @@
  * Do not make changes to this file directly
  */
 
-import * as prisma from "../node_modules/@prisma/client"
+import * as prisma from "@prisma/client"
 
 
 
@@ -18,6 +18,7 @@ export interface NexusGenInputs {
     isSeed?: boolean | null; // Boolean
     logo?: string | null; // String
     primaryColour?: string | null; // String
+    slug: string; // String!
   }
   CustomerWhereUniqueInput: { // input type
     id: string; // ID!
@@ -106,6 +107,7 @@ export interface NexusGenRootTypes {
     creationDate: string; // String!
     customerName: string; // String!
     description: string; // String!
+    lineChartData: NexusGenRootTypes['lineChartDataType'][]; // [lineChartDataType!]!
     timelineEntries: NexusGenRootTypes['UniqueDataResultEntry'][]; // [UniqueDataResultEntry!]!
     title: string; // String!
     totalNodeEntries: number; // Int!
@@ -132,6 +134,10 @@ export interface NexusGenRootTypes {
     createdAt: string; // String!
     sessionId: string; // String!
     value: number; // Int!
+  }
+  lineChartDataType: { // root type
+    x: string; // String!
+    y: number; // Int!
   }
   String: string;
   Int: number;
@@ -186,6 +192,7 @@ export interface NexusGenFieldTypes {
     description: string; // String!
     id: string; // ID!
     leafs: NexusGenRootTypes['QuestionNode'][]; // [QuestionNode!]!
+    lineChartData: string | null; // String
     publicTitle: string | null; // String
     questions: NexusGenRootTypes['QuestionNode'][]; // [QuestionNode!]!
     title: string; // String!
@@ -196,6 +203,7 @@ export interface NexusGenFieldTypes {
     creationDate: string; // String!
     customerName: string; // String!
     description: string; // String!
+    lineChartData: NexusGenRootTypes['lineChartDataType'][]; // [lineChartDataType!]!
     timelineEntries: NexusGenRootTypes['UniqueDataResultEntry'][]; // [UniqueDataResultEntry!]!
     title: string; // String!
     totalNodeEntries: number; // Int!
@@ -257,6 +265,7 @@ export interface NexusGenFieldTypes {
     edge: NexusGenRootTypes['Edge']; // Edge!
     getQuestionnaireData: NexusGenRootTypes['DialogueDetailResult']; // DialogueDetailResult!
     getSessionAnswerFlow: NexusGenRootTypes['Session']; // Session!
+    lineChartData: NexusGenRootTypes['lineChartDataType'][]; // [lineChartDataType!]!
     questionNode: NexusGenRootTypes['QuestionNode']; // QuestionNode!
     questionNodes: NexusGenRootTypes['QuestionNode'][]; // [QuestionNode!]!
     session: NexusGenRootTypes['Session']; // Session!
@@ -290,6 +299,10 @@ export interface NexusGenFieldTypes {
     createdAt: string; // String!
     sessionId: string; // String!
     value: number; // Int!
+  }
+  lineChartDataType: { // field return type
+    x: string; // String!
+    y: number; // Int!
   }
 }
 
@@ -345,6 +358,10 @@ export interface NexusGenArgTypes {
     getSessionAnswerFlow: { // args
       sessionId?: string | null; // ID
     }
+    lineChartData: { // args
+      dialogueId?: string | null; // String
+      numberOfDaysBack?: number | null; // Int
+    }
     questionNode: { // args
       where?: NexusGenInputs['QuestionNodeWhereUniqueInput'] | null; // QuestionNodeWhereUniqueInput
     }
@@ -359,7 +376,7 @@ export interface NexusGenAbstractResolveReturnTypes {
 
 export interface NexusGenInheritedFields {}
 
-export type NexusGenObjectNames = "ColourSettings" | "Customer" | "CustomerSettings" | "Dialogue" | "DialogueDetailResult" | "Edge" | "EdgeCondition" | "FontSettings" | "Mutation" | "NodeEntry" | "NodeEntryValue" | "Query" | "QuestionNode" | "QuestionOption" | "Session" | "UniqueDataResultEntry";
+export type NexusGenObjectNames = "ColourSettings" | "Customer" | "CustomerSettings" | "Dialogue" | "DialogueDetailResult" | "Edge" | "EdgeCondition" | "FontSettings" | "Mutation" | "NodeEntry" | "NodeEntryValue" | "Query" | "QuestionNode" | "QuestionOption" | "Session" | "UniqueDataResultEntry" | "lineChartDataType";
 
 export type NexusGenInputNames = "CustomerCreateOptions" | "CustomerWhereUniqueInput" | "DialogueWhereUniqueInput" | "EdgeChildInput" | "EdgeNodeInput" | "LeafNodeInput" | "OptionInput" | "QuestionConditionInput" | "QuestionInput" | "QuestionNodeWhereInput" | "QuestionNodeWhereUniqueInput" | "SessionWhereUniqueInput" | "TopicDataEntry" | "UploadUserSessionInput" | "UserSessionEntryDataInput" | "UserSessionEntryInput";
 

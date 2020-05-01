@@ -10,7 +10,7 @@ const schema = makeSchema({
   typegenAutoConfig: {
     sources: [
       {
-        source: '../node_modules/@prisma/client',
+        source: '@prisma/client',
         alias: 'prisma',
       },
     ],
