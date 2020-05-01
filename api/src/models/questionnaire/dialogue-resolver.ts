@@ -119,12 +119,9 @@ class DialogueResolver {
       (nodeEntryTextValue) => (
         { nodeEntryId: nodeEntryTextValue.values.nodeEntryId, textValue: nodeEntryTextValue.values.textValue }));
     const joined = _.merge(lineChartData, finalNodeEntryTextValues);
-    // console.log('JOINED: ', joined);
     const groupedJoined = _.groupBy(joined, (entry) => entry.y && entry.y > 50);
     const topNegativePath = DialogueResolver.getTopPaths(groupedJoined.false);
     const topPositivePath = DialogueResolver.getTopPaths(groupedJoined.true);
-    console.log('top negative path: ', topNegativePath);
-    console.log('top positive path: ', topPositivePath);
     return { lineChartData, topNegativePath, topPositivePath };
   };
 

@@ -55,7 +55,6 @@ class CustomerResolver {
     const currentDate = new Date();
     const amtOfDaysBack = Array.from(Array(30)).map((empty, index) => index + 1);
     const datesBackInTime = amtOfDaysBack.map((amtDaysBack) => subDays(currentDate, amtDaysBack));
-    // TODO: Crea
     const options = ['Facilities', 'Website/Mobile app', 'Product/Services', 'Customer support'];
 
     await Promise.all(datesBackInTime.map(async (backDate) => {
