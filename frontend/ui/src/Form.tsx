@@ -194,6 +194,10 @@ export const SliderContainer = styled.div`
         -webkit-appearance: none;
         height: 80px;
         width: 80px;
+        background: transparent;
+        border-color: transparent;
+        border: none;
+        background-color: transparent;
 
         /* Ensure that the bunny is on top of the bar */
         transform: translateY(-100%);
@@ -216,6 +220,8 @@ export const SliderContainer = styled.div`
         transform: translateY(-100%);
         border: none;
         background-color: transparent;
+        background: transparent;
+        border-color: transparent;
         background-size: contain;
         background-repeat: no-repeat;
         cursor: pointer;
@@ -236,6 +242,7 @@ export const SliderContainer = styled.div`
         /* Ensure that the bunny is on top of the bar */
         transform: translateY(-100%);
         border: none;
+        border-color: transparent;
         background-color: transparent;
         background-size: contain;
         background-repeat: no-repeat;
@@ -244,6 +251,7 @@ export const SliderContainer = styled.div`
 
         &:hover {
           background-color: transparent;
+          border-color: transparent;
         }
       }
 
