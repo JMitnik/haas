@@ -33,4 +33,4 @@ jobs:
         host: ${{ secrets.API_SERVER_HOST }}
         username: ${{ secrets.API_SERVER_USERNAME }}
         key: ${{ secrets.API_SERVER_KEY }}
-        script: (export API_TAG=${{ steps.docker_deploy.outputs.snapshot }} && /bin/sh deployment.sh)
+        script: (export API_TAG=${{ steps.docker_deploy.outputs.snapshot-tag }} && /bin/sh deployment.sh)
