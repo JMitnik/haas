@@ -5,9 +5,9 @@ WORKDIR /app
 COPY ./package.json /app/
 COPY ./ /app/
 
-RUN apk update \
-  && apk add curl python bash --no-cache --virtual build-dependencies build-base gcc \
-  && yarn add @prisma/cli \
+RUN apt-get update \
+  && apt-get add curl python bash \
+  && yarn add prisma \
   && yarn
 
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
