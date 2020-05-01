@@ -6,7 +6,8 @@ COPY ./package.json /app/
 COPY ./ /app/
 
 RUN apt-get update \
-  && apt-get add curl python bash \
+  && apt-get install curl python bash \
+  && npm install -g yarn \
   && yarn add prisma \
   && yarn
 
