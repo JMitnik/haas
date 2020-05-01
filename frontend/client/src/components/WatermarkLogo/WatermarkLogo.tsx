@@ -14,7 +14,7 @@ const WatermarkLogoContainer = styled.div`
   top: 40%;
   transform: translateY(-50%);
 
-  opacity: 0.5;
+  opacity: 0.35;
   z-index: 0;
 
   img {
