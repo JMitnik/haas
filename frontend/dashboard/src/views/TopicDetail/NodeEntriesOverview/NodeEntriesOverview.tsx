@@ -46,7 +46,6 @@ const NodeEntryItem = ({ nodeEntry }: { nodeEntry: NodeEntryProps }) => (
           : nodeEntry.values?.[0].textValue}
       </strong>
     </Div>
-    <Hr />
   </NodeEntryContainer>
 );
 

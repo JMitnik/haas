@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { useQuery } from '@apollo/react-hooks';
 import { Flex, Loader, Grid, Div } from '@haas/ui';
-import { useParams, Switch, Route, useHistory } from 'react-router-dom';
+import { useParams, Switch, Route, useHistory, useLocation } from 'react-router-dom';
 import { ResponsiveLine } from '@nivo/line';
 import getQuestionnaireData from '../../queries/getQuestionnaireData';
 import TimelineFeedOverview from './TimelineFeedOverview/TimelineFeedOverview';
 import NodeEntriesOverview from './NodeEntriesOverview/NodeEntriesOverview';
 import TopicBuilder from './TopicBuilder/TopicBuilder';
 import TopicInfo from './TopicInfo/TopicInfo';
+import Modal from 'components/Modal';
 
 const MyResponsiveLine = ({ data }: { data: any }) => (
   <ResponsiveLine
@@ -80,6 +81,7 @@ const TopicDetail = () => {
   const { customerId, topicId } = useParams();
   const [activeSession, setActiveSession] = useState('');
   const params = useParams();
+  const location = useLocation<any>();
   console.log('params', params);
   const history = useHistory();
   const { loading, data } = useQuery(getQuestionnaireData, {
@@ -111,9 +113,6 @@ const TopicDetail = () => {
               flexDirection="column"
             >
               <Switch>
-                <Route path="/dashboard/c/:customerId/t/:topicId/e/:entryId">
-                  <NodeEntriesOverview sessionId={activeSession} />
-                </Route>
                 <Route path="/dashboard/c/:customerId/t/:topicId/topic-builder/">
                   <TopicBuilder />
                 </Route>
@@ -122,6 +121,11 @@ const TopicDetail = () => {
                   <button type="button" onClick={() => history.push(`/dashboard/c/${customerId}/t/${topicId}/topic-builder/`)}>Go to topic builder</button>
                 </Route>
               </Switch>
+              {location?.state?.modal && (
+                <Modal>
+                  <NodeEntriesOverview sessionId={activeSession} />
+                </Modal>
+              )}
               <Div height="300px" width="100%">
                 {
                   lineQueryData && <MyResponsiveLine data={lineData} />
