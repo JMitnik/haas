@@ -55,20 +55,34 @@ class CustomerResolver {
     const currentDate = new Date();
     const amtOfDaysBack = Array.from(Array(30)).map((empty, index) => index + 1);
     const datesBackInTime = amtOfDaysBack.map((amtDaysBack) => subDays(currentDate, amtDaysBack));
+    // TODO: Crea
+    const options = ['Facilities', 'Website/Mobile app', 'Product/Services', 'Customer support'];
 
     await Promise.all(datesBackInTime.map(async (backDate) => {
+      const randomOptionElement = options[Math.floor(Math.random() * options.length)];
       await prisma.session.create({
         data: {
           nodeEntries: {
-            create: {
-              creationDate: backDate,
-              values: {
-                create: {
-                  numberValue: getRandomInt(100),
+            create: [
+              {
+                depth: 0,
+                creationDate: backDate,
+                values: {
+                  create: {
+                    numberValue: getRandomInt(100),
+                  },
                 },
               },
-
-            },
+              {
+                depth: 1,
+                creationDate: backDate,
+                values: {
+                  create: {
+                    textValue: randomOptionElement,
+                  },
+                },
+              },
+            ],
           },
           dialogue: {
             connect: {

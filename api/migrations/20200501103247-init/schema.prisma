@@ -6,6 +6,7 @@ datasource postgresql {
 // binaryTargets = ["debian-openssl-1.1.x"]
 generator client {
   provider = "prisma-client-js"
+  output   = "./node_modules/@prisma/client"
 }
 
 model ColourSettings {
@@ -66,6 +67,7 @@ model Dialogue {
   title        String
   edges        Edge[]
   questions    QuestionNode[]
+  sessions     Session[]     
 }
 
 model QuestionNode {
@@ -127,7 +129,7 @@ model Session {
   createdAt   DateTime    @default(now())
   id          String      @default(cuid()) @id
   dialogueId  String
-  dialogue    Dialogue    @relation("DialogueToSessions", fields: [dialogueId], references: [id])
+  dialogue    Dialogue    @relation(fields: [dialogueId], references: [id])
   nodeEntries NodeEntry[]
 }
 
