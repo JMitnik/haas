@@ -37,7 +37,7 @@ const DashboardView: FC = () => {
         <Grid
           gridGap={4}
           gridTemplateColumns={['1fr', '1fr 1fr 1fr']}
-          gridAutoRows="minmax(200px, 1fr)"
+          gridAutoRows="minmax(150px, 1fr)"
         >
           {topics?.map((topic: any, index: any) => topic && <CustomerCard key={index} customer={topic} />)}
 

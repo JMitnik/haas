@@ -18,10 +18,14 @@ const App: FC = () => (
         <ThemeProvider theme={themeConfig}>
           <AppContainer>
             {/* Top-level routes */}
-            <Route path="/dashboard">
-              <DashboardPage />
-            </Route>
-            <Redirect to="/dashboard" />
+            <Switch>
+              <Route path="/dashboard">
+                <DashboardPage />
+              </Route>
+              <Route path="/">
+                <Redirect to="/dashboard" />
+              </Route>
+            </Switch>
           </AppContainer>
           <GlobalStyle />
         </ThemeProvider>

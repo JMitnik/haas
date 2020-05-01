@@ -101,7 +101,7 @@ const TopicDetail = () => {
     <>
       <Div width="80%" margin="0 auto">
         <Grid gridTemplateColumns="3fr 1fr">
-          <Div>
+          <Div height="100vh" maxHeight="100vh" overflow="hidden">
             <Flex
               height="100%"
               alignItems="center"
