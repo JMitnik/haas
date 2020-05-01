@@ -9,7 +9,7 @@ export const FloatingNodeContainer = styled(Div)`
     bottom: 0;
     right: 0;
     display: flex;
-    height: 100%;
+    height: 95%;
 
     @media and ${theme.media.desk} {
       height: 90%;
