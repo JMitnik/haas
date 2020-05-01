@@ -1,4 +1,4 @@
-FROM node:12-buster-slim AS base
+FROM node:13 AS base
 ENV PORT 4000
 
 WORKDIR /app
