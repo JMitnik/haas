@@ -128,7 +128,7 @@ const TopicDetail = () => {
               <Div>
                 <ol>
                   {
-                  resultData?.topPositivePath.map(({ answer, quantity }: {answer: string, quantity: number}) => <li>{`${answer} (${quantity} answer(s))`}</li>
+                  resultData?.topPositivePath.map(({ answer, quantity }: {answer: string, quantity: number}) => <li key={`${answer}-${quantity}`}>{`${answer} (${quantity} answer(s))`}</li>
                   )
                 }
                 </ol>
@@ -136,7 +136,7 @@ const TopicDetail = () => {
               <Div>
                 <ol>
                   {
-                  resultData?.topNegativePath.map(({ answer, quantity }: {answer: string, quantity: number}) => <li>{`${answer} (${quantity} answer(s))`}</li>
+                  resultData?.topNegativePath.map(({ answer, quantity }: {answer: string, quantity: number}) => <li key={`${answer}-${quantity}`}>{`${answer} (${quantity} answer(s))`}</li>
                   )
                 }
                 </ol>
