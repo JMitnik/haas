@@ -9,6 +9,7 @@ import NodeEntriesOverview from './NodeEntriesOverview/NodeEntriesOverview';
 import TopicBuilder from './TopicBuilder/TopicBuilder';
 import TopicInfo from './TopicInfo/TopicInfo';
 import Modal from 'components/Modal';
+import styled from 'styled-components/macro';
 
 const MyResponsiveLine = ({ data }: { data: any }) => (
   <ResponsiveLine
@@ -77,6 +78,15 @@ const MyResponsiveLine = ({ data }: { data: any }) => (
   />
 );
 
+const StatisticWidget = styled(Div)`
+  background: #f7f9fe;
+  border-radius: 12px;
+
+  ol {
+    padding: 12px 24px;
+  }
+`;
+
 const TopicDetail = () => {
   const { customerId, topicId } = useParams();
   const [activeSession, setActiveSession] = useState('');
@@ -104,58 +114,60 @@ const TopicDetail = () => {
   return (
     <>
       <Div width="80%" margin="0 auto">
-        <Grid gridTemplateColumns="3fr 1fr">
           <Div height="100vh" maxHeight="100vh" overflow="hidden">
-            <Flex
-              height="100%"
-              alignItems="center"
-              justifyContent="space-between"
-              flexDirection="column"
-            >
               <Switch>
                 <Route path="/dashboard/c/:customerId/t/:topicId/topic-builder/">
                   <TopicBuilder />
                 </Route>
                 <Route>
-                  <TopicInfo DialogueResultProps={resultData} />
-                  <button type="button" onClick={() => history.push(`/dashboard/c/${customerId}/t/${topicId}/topic-builder/`)}>Go to topic builder</button>
-                </Route>
-              </Switch>
-              {location?.state?.modal && (
-                <Modal>
-                  <NodeEntriesOverview sessionId={activeSession} />
-                </Modal>
-              )}
-              <Div height="300px" width="100%">
-                {
-                  lineQueryData && <MyResponsiveLine data={lineData} />
-                }
-              </Div>
-              <Div>
-                <ol>
-                  {
-                  resultData?.topPositivePath.map(({ answer, quantity }: {answer: string, quantity: number}) => <li key={`${answer}-${quantity}`}>{`${answer} (${quantity} answer(s))`}</li>
-                  )
-                }
-                </ol>
-              </Div>
-              <Div>
-                <ol>
-                  {
-                  resultData?.topNegativePath.map(({ answer, quantity }: {answer: string, quantity: number}) => <li key={`${answer}-${quantity}`}>{`${answer} (${quantity} answer(s))`}</li>
-                  )
-                }
-                </ol>
-              </Div>
-            </Flex>
-          </Div>
-          <Div>
-            <TimelineFeedOverview
-              onActiveSessionChange={setActiveSession}
-              timelineEntries={resultData?.timelineEntries}
-            />
-          </Div>
-        </Grid>
+                <Grid gridTemplateColumns="3fr 1fr">
+                  <Div>
+                    <TopicInfo DialogueResultProps={resultData} />
+                    <button type="button" onClick={() => history.push(`/dashboard/c/${customerId}/t/${topicId}/topic-builder/`)}>Go to topic builder</button>
+
+                    <Grid gridTemplateColumns="1fr 1fr 1fr" gridTemplateRows="1fr 1fr 1fr">
+                      <StatisticWidget>
+                          <ol>
+                            {
+                            resultData?.topPositivePath.map(({ answer, quantity }: {answer: string, quantity: number}) => <li key={`${answer}-${quantity}`}>{`${answer} (${quantity} answer(s))`}</li>
+                            )
+                          }
+                          </ol>
+                        </StatisticWidget>
+
+                      <StatisticWidget>
+                        <ol>
+                          {
+                          resultData?.topNegativePath.map(({ answer, quantity }: {answer: string, quantity: number}) => <li key={`${answer}-${quantity}`}>{`${answer} (${quantity} answer(s))`}</li>
+                          )
+                        }
+                        </ol>
+                      </StatisticWidget>
+
+
+                      <StatisticWidget gridColumn="span 3" height="300px" width="100%">
+                        {
+                          lineQueryData && <MyResponsiveLine data={lineData} />
+                        }
+                      </StatisticWidget>
+                    </Grid>
+                  </Div>
+
+                <Div>
+                  <TimelineFeedOverview
+                    onActiveSessionChange={setActiveSession}
+                    timelineEntries={resultData?.timelineEntries}
+                  />
+                </Div>
+            </Grid>
+          </Route>
+        </Switch>
+        </Div>
+        {location?.state?.modal && (
+          <Modal>
+            <NodeEntriesOverview sessionId={activeSession} />
+          </Modal>
+        )}
       </Div>
     </>
   );
