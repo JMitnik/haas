@@ -111,10 +111,10 @@ const TopicDetail = () => {
               flexDirection="column"
             >
               <Switch>
-                <Route path="/c/:customerId/t/:topicId/e/:entryId">
+                <Route path="/dashboard/c/:customerId/t/:topicId/e/:entryId">
                   <NodeEntriesOverview sessionId={activeSession} />
                 </Route>
-                <Route path="/c/:customerId/t/:topicId/topic-builder/">
+                <Route path="/dashboard/c/:customerId/t/:topicId/topic-builder/">
                   <TopicBuilder />
                 </Route>
                 <Route>

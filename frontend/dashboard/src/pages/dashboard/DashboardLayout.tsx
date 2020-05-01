@@ -20,10 +20,12 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <DashboardContainer>
       <Sidenav isActive={sideNavIsActive}>
+        {/* Topside */}
         <Div>
           <Logo isWhite={sideNavIsActive} />
+
+
         </Div>
-        Hello
       </Sidenav>
       {children}
     </DashboardContainer>

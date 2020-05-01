@@ -55,7 +55,7 @@ const TimeLineEntryValueContainer = styled.div`
       color: #2F855A;
     `}
 
-    ${value >= 80 && css`
+    ${value >= 95 && css`
       background: #BEE3F8;
       color: #2B6CB0;
     `}
