@@ -107,9 +107,11 @@ export interface NexusGenRootTypes {
     creationDate: string; // String!
     customerName: string; // String!
     description: string; // String!
-    lineChartData: NexusGenRootTypes['lineChartDataType'][]; // [lineChartDataType!]!
+    lineChartData?: NexusGenRootTypes['lineChartDataType'][] | null; // [lineChartDataType!]
     timelineEntries: NexusGenRootTypes['UniqueDataResultEntry'][]; // [UniqueDataResultEntry!]!
     title: string; // String!
+    topNegativePath?: NexusGenRootTypes['topPathType'][] | null; // [topPathType!]
+    topPositivePath?: NexusGenRootTypes['topPathType'][] | null; // [topPathType!]
     totalNodeEntries: number; // Int!
     updatedAt: string; // String!
   }
@@ -138,6 +140,10 @@ export interface NexusGenRootTypes {
   lineChartDataType: { // root type
     x: string; // String!
     y: number; // Int!
+  }
+  topPathType: { // root type
+    answer: string; // String!
+    quantity: number; // Int!
   }
   String: string;
   Int: number;
@@ -203,9 +209,11 @@ export interface NexusGenFieldTypes {
     creationDate: string; // String!
     customerName: string; // String!
     description: string; // String!
-    lineChartData: NexusGenRootTypes['lineChartDataType'][]; // [lineChartDataType!]!
+    lineChartData: NexusGenRootTypes['lineChartDataType'][] | null; // [lineChartDataType!]
     timelineEntries: NexusGenRootTypes['UniqueDataResultEntry'][]; // [UniqueDataResultEntry!]!
     title: string; // String!
+    topNegativePath: NexusGenRootTypes['topPathType'][] | null; // [topPathType!]
+    topPositivePath: NexusGenRootTypes['topPathType'][] | null; // [topPathType!]
     totalNodeEntries: number; // Int!
     updatedAt: string; // String!
   }
@@ -304,6 +312,10 @@ export interface NexusGenFieldTypes {
     x: string; // String!
     y: number; // Int!
   }
+  topPathType: { // field return type
+    answer: string; // String!
+    quantity: number; // Int!
+  }
 }
 
 export interface NexusGenArgTypes {
@@ -376,7 +388,7 @@ export interface NexusGenAbstractResolveReturnTypes {
 
 export interface NexusGenInheritedFields {}
 
-export type NexusGenObjectNames = "ColourSettings" | "Customer" | "CustomerSettings" | "Dialogue" | "DialogueDetailResult" | "Edge" | "EdgeCondition" | "FontSettings" | "Mutation" | "NodeEntry" | "NodeEntryValue" | "Query" | "QuestionNode" | "QuestionOption" | "Session" | "UniqueDataResultEntry" | "lineChartDataType";
+export type NexusGenObjectNames = "ColourSettings" | "Customer" | "CustomerSettings" | "Dialogue" | "DialogueDetailResult" | "Edge" | "EdgeCondition" | "FontSettings" | "Mutation" | "NodeEntry" | "NodeEntryValue" | "Query" | "QuestionNode" | "QuestionOption" | "Session" | "UniqueDataResultEntry" | "lineChartDataType" | "topPathType";
 
 export type NexusGenInputNames = "CustomerCreateOptions" | "CustomerWhereUniqueInput" | "DialogueWhereUniqueInput" | "EdgeChildInput" | "EdgeNodeInput" | "LeafNodeInput" | "OptionInput" | "QuestionConditionInput" | "QuestionInput" | "QuestionNodeWhereInput" | "QuestionNodeWhereUniqueInput" | "SessionWhereUniqueInput" | "TopicDataEntry" | "UploadUserSessionInput" | "UserSessionEntryDataInput" | "UserSessionEntryInput";
 

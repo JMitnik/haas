@@ -54,9 +54,11 @@ type DialogueDetailResult {
   creationDate: String!
   customerName: String!
   description: String!
-  lineChartData: [lineChartDataType!]!
+  lineChartData: [lineChartDataType!]
   timelineEntries: [UniqueDataResultEntry!]!
   title: String!
+  topNegativePath: [topPathType!]
+  topPositivePath: [topPathType!]
   totalNodeEntries: Int!
   updatedAt: String!
 }
@@ -225,6 +227,11 @@ input SessionWhereUniqueInput {
 input TopicDataEntry {
   id: ID
   questions: [QuestionInput!]
+}
+
+type topPathType {
+  answer: String!
+  quantity: Int!
 }
 
 type UniqueDataResultEntry {

@@ -14,6 +14,14 @@ const getQuestionnaireDataQuery = gql`
         x
         y
       }
+      topPositivePath {
+        answer
+        quantity
+      }
+      topNegativePath {
+        answer
+        quantity
+      }
       timelineEntries {
         sessionId
         value

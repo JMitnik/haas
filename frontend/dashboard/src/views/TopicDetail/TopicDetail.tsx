@@ -131,6 +131,22 @@ const TopicDetail = () => {
                   lineQueryData && <MyResponsiveLine data={lineData} />
                 }
               </Div>
+              <Div>
+                <ol>
+                  {
+                  resultData?.topPositivePath.map(({ answer, quantity }: {answer: string, quantity: number}) => <li key={`${answer}-${quantity}`}>{`${answer} (${quantity} answer(s))`}</li>
+                  )
+                }
+                </ol>
+              </Div>
+              <Div>
+                <ol>
+                  {
+                  resultData?.topNegativePath.map(({ answer, quantity }: {answer: string, quantity: number}) => <li key={`${answer}-${quantity}`}>{`${answer} (${quantity} answer(s))`}</li>
+                  )
+                }
+                </ol>
+              </Div>
             </Flex>
           </Div>
           <Div>
