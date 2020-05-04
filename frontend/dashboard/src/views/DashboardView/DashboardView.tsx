@@ -8,7 +8,7 @@ import { H2, H3, Grid, Flex, Div, Card, CardBody,
 import { Link, useHistory } from 'react-router-dom';
 // import { Query, Customer } from '../../types';
 
-import { getCustomerQuery } from '../../queries/getCustomerQuery';
+import { getCustomerQuery } from '../../queries/getCustomersQuery';
 import { deleteFullCustomerQuery } from '../../mutations/deleteFullCustomer';
 import { CustomerCardImage } from './DashboardViewStyles';
 import styled from 'styled-components/macro';

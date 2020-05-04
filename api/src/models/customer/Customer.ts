@@ -46,10 +46,11 @@ export const CustomerWhereUniqueInput = inputObjectType({
 export const CustomerCreateOptionsInput = inputObjectType({
   name: 'CustomerCreateOptions',
   definition(t) {
-    t.boolean('isSeed', { default: false });
+    t.boolean('isSeed', { default: false, required: false });
     t.string('slug', { required: true });
     t.string('logo');
     t.string('primaryColour');
+    t.string('name', { required: false });
   },
 });
 
@@ -65,6 +66,17 @@ export const CustomerMutations = extendType({
       resolve(parent: any, args: any, ctx: any, info: any) {
         console.log(args);
         return CustomerResolver.createCustomer(args);
+      },
+    });
+    t.field('editCustomer', {
+      type: CustomerType,
+      args: {
+        id: 'String',
+        options: CustomerCreateOptionsInput,
+      },
+      resolve(parent: any, args: any, ctx: any, info: any) {
+        console.log(args);
+        return CustomerResolver.editCustomer(args);
       },
     });
     t.field('deleteCustomer', {

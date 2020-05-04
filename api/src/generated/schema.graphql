@@ -20,6 +20,7 @@ type Customer {
 input CustomerCreateOptions {
   isSeed: Boolean = false
   logo: String
+  name: String
   primaryColour: String
   slug: String!
 }
@@ -120,6 +121,7 @@ type Mutation {
   createDialogue(customerId: String, description: String, isSeed: Boolean, publicTitle: String, title: String): Dialogue!
   deleteCustomer(where: CustomerWhereUniqueInput): Customer!
   deleteDialogue(where: DialogueWhereUniqueInput): Dialogue!
+  editCustomer(id: String, options: CustomerCreateOptions): Customer!
   updateTopicBuilder(id: String, topicData: TopicDataEntry): String!
   uploadUserSession(uploadUserSessionInput: UploadUserSessionInput): Session!
 }

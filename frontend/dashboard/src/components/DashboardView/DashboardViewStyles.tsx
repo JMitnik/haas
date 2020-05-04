@@ -17,4 +17,5 @@ export const DashboardContainer = styled.div`
 export const CustomerCardImage = styled.img`
   width: 75px;
   height: 75px;
+  margin-right: 5%;
 `;

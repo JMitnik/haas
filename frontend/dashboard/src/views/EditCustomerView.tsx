@@ -2,26 +2,37 @@ import React from 'react';
 
 import { ApolloError } from 'apollo-boost';
 import { useForm } from 'react-hook-form';
-import { useMutation } from '@apollo/react-hooks';
-import { useHistory } from 'react-router';
+import { useMutation, useQuery } from '@apollo/react-hooks';
+import { useHistory, useParams } from 'react-router';
 import { Container, Flex, Grid, H2, H3, Muted, Button,
   Div, StyledLabel, StyledInput, Hr, FormGroupContainer, Form } from '@haas/ui';
 import { getCustomerQuery } from '../queries/getCustomersQuery';
+
 import { createNewCustomer } from '../mutations/createNewCustomer';
+import editCustomerMutation from '../mutations/editCustomer';
+import getEditCustomerData from '../queries/getEditCustomer'
 
 interface FormDataProps {
   name: string;
   logo: string;
   slug: string;
   primaryColour?: string;
-  seed?: boolean;
 }
 
-const CustomerBuilderView = () => {
+const EditCustomerView = () => {
   const history = useHistory();
+  const { customerId } = useParams();
   const { register, handleSubmit, errors } = useForm<FormDataProps>();
 
-  const [addCustomer, { loading }] = useMutation(createNewCustomer, {
+  // TODO: Add query that retrieves current data available for a customer
+  const getEditCustomerQuery = useQuery(getEditCustomerData, {
+    variables: {
+      id: customerId
+    }
+  })
+
+  // TODO: Update customer instead of creating new one
+  const [editCustomer, { loading }] = useMutation(editCustomerMutation, {
     onCompleted: () => {
       history.push('/');
     },
@@ -31,15 +42,18 @@ const CustomerBuilderView = () => {
     },
   });
 
+  if (getEditCustomerQuery.loading) return null;
+
+  console.log(getEditCustomerQuery.data);
+  
   const onSubmit = (formData: FormDataProps) => {
     const optionInput = { logo: formData.logo,
       slug: formData.slug,
-      isSeed: formData.seed,
-      primaryColour: formData.primaryColour };
-    // TODO: Make better typescript supported
-    addCustomer({
+      primaryColour: formData.primaryColour,
+      name: formData.name };
+      editCustomer({
       variables: {
-        name: formData.name,
+        id: getEditCustomerQuery.data?.customer?.id,
         options: optionInput,
       },
     });
@@ -49,7 +63,7 @@ const CustomerBuilderView = () => {
     <Container>
       <Div>
         <H2 color="default.darkest" fontWeight={500} py={2}> Customer </H2>
-        <Muted pb={4}>Create a new customer</Muted>
+        <Muted pb={4}>Edit a new customer</Muted>
       </Div>
 
       <Hr />
@@ -67,34 +81,25 @@ const CustomerBuilderView = () => {
               <Grid gridTemplateColumns={['1fr', '1fr 1fr']}>
                 <Flex flexDirection="column">
                   <StyledLabel>Name</StyledLabel>
-                  <StyledInput name="name" ref={register({ required: true })} />
+                  <StyledInput defaultValue={getEditCustomerQuery.data?.customer?.name} name="name" ref={register({ required: true })} />
                   {errors.name && <Muted color="warning">Something went wrong!</Muted>}
                 </Flex>
                 <Div useFlex pl={4} flexDirection="column">
                   <StyledLabel>Logo</StyledLabel>
-                  <StyledInput name="logo" ref={register({ required: true })} />
+                  <StyledInput defaultValue={getEditCustomerQuery.data?.customer?.settings?.logoUrl} name="logo" ref={register({ required: true })} />
                   {errors.name && <Muted color="warning">Something went wrong!</Muted>}
                 </Div>
                 <Div useFlex pl={4} flexDirection="column">
                   <StyledLabel>Slug</StyledLabel>
-                  <StyledInput name="slug" ref={register({ required: true })} />
+                  <StyledInput defaultValue={getEditCustomerQuery.data?.customer?.slug} name="slug" ref={register({ required: true })} />
                   {errors.name && <Muted color="warning">Something went wrong!</Muted>}
                 </Div>
                 <Div useFlex py={4} flexDirection="column">
                   <StyledLabel>Primary colour</StyledLabel>
-                  <StyledInput name="primaryColour" ref={register({ required: true })} />
+                  <StyledInput defaultValue={getEditCustomerQuery.data?.customer?.settings?.colourSettings?.primary} name="primaryColour" ref={register({ required: true })} />
                   {errors.name && <Muted color="warning">Something went wrong!</Muted>}
                 </Div>
               </Grid>
-              <Div py={4}>
-                <StyledInput
-                  type="checkbox"
-                  id="seed"
-                  name="seed"
-                  ref={register({ required: false })}
-                />
-                <label htmlFor="seed"> Generate template topic for customer </label>
-              </Div>
             </Div>
           </Grid>
         </FormGroupContainer>
@@ -103,7 +108,7 @@ const CustomerBuilderView = () => {
           {loading && (<Muted>Loading...</Muted>)}
 
           <Flex>
-            <Button brand="primary" mr={2} type="submit">Create topic</Button>
+            <Button brand="primary" mr={2} type="submit">Save topic</Button>
             <Button brand="default" type="button" onClick={() => history.push('/')}>Cancel</Button>
           </Flex>
         </Div>
@@ -112,4 +117,4 @@ const CustomerBuilderView = () => {
   );
 };
 
-export default CustomerBuilderView;
+export default EditCustomerView;

@@ -17,6 +17,7 @@ export interface NexusGenInputs {
   CustomerCreateOptions: { // input type
     isSeed?: boolean | null; // Boolean
     logo?: string | null; // String
+    name?: string | null; // String
     primaryColour?: string | null; // String
     slug: string; // String!
   }
@@ -244,6 +245,7 @@ export interface NexusGenFieldTypes {
     createDialogue: NexusGenRootTypes['Dialogue']; // Dialogue!
     deleteCustomer: NexusGenRootTypes['Customer']; // Customer!
     deleteDialogue: NexusGenRootTypes['Dialogue']; // Dialogue!
+    editCustomer: NexusGenRootTypes['Customer']; // Customer!
     updateTopicBuilder: string; // String!
     uploadUserSession: NexusGenRootTypes['Session']; // Session!
   }
@@ -341,6 +343,10 @@ export interface NexusGenArgTypes {
     }
     deleteDialogue: { // args
       where?: NexusGenInputs['DialogueWhereUniqueInput'] | null; // DialogueWhereUniqueInput
+    }
+    editCustomer: { // args
+      id?: string | null; // String
+      options?: NexusGenInputs['CustomerCreateOptions'] | null; // CustomerCreateOptions
     }
     updateTopicBuilder: { // args
       id?: string | null; // String

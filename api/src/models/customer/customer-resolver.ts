@@ -93,6 +93,40 @@ class CustomerResolver {
     }));
   };
 
+  static editCustomer = async (args: any) => {
+    const { id, options } = args;
+    const { logo, primaryColour, slug, name } = options;
+
+    const customerSettings = await prisma.customerSettings.update({
+      where: {
+        customerId: id,
+      },
+      data: {
+        logoUrl: logo,
+      },
+    });
+
+    await prisma.colourSettings.update({
+      where: {
+        id: customerSettings.colourSettingsId,
+      },
+      data: {
+        primary: primaryColour,
+      },
+    });
+
+    const customer = await prisma.customer.update({
+      where: {
+        id,
+      },
+      data: {
+        slug,
+        name,
+      },
+    });
+    return customer;
+  };
+
   static createCustomer = async (args: any) => {
     const { name, options } = args;
     const { isSeed, logo, primaryColour, slug } = options;
