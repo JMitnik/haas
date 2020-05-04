@@ -122,6 +122,7 @@ type Mutation {
   deleteCustomer(where: CustomerWhereUniqueInput): Customer!
   deleteDialogue(where: DialogueWhereUniqueInput): Dialogue!
   editCustomer(id: String, options: CustomerCreateOptions): Customer!
+  editDialogue(description: String, dialogueId: String, publicTitle: String, title: String): Dialogue!
   updateTopicBuilder(id: String, topicData: TopicDataEntry): String!
   uploadUserSession(uploadUserSessionInput: UploadUserSessionInput): Session!
 }

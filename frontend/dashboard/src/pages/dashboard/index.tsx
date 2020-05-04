@@ -4,6 +4,7 @@ import { DashboardContainer } from 'components/DashboardView/DashboardViewStyles
 import { Route, Switch, useParams } from 'react-router';
 import TopicDetail from 'views/TopicDetail/TopicDetail';
 import AddTopicView from 'views/AddTopicView';
+import EditTopicView from 'views/EditTopicView';
 import EditCustomerView from 'views/EditCustomerView';
 import CustomerBuilderView from 'views/CustomerBuilderView';
 import TopicsOverview from 'views/TopicsOverview/TopicsOverview';
@@ -18,7 +19,9 @@ const DashboardPage = () => {
   return (
     <>
       <Switch>
+        <Route path="/dashboard/c/:customerId/t/:topicId/edit" render={() => <DashboardLayout><EditTopicView /></DashboardLayout>} />
         <Route path="/dashboard/c/:customerId/t/:topicId/" render={() => <DashboardLayout><TopicDetail /></DashboardLayout>} />
+
         <Route path="/dashboard/c/:customerId/topic-builder" render={() => <DashboardLayout><AddTopicView /></DashboardLayout>} />
         <Route path="/dashboard/c/:customerId/edit" render={() => <DashboardLayout><EditCustomerView /></DashboardLayout>} />
         <Route path="/dashboard/customer-builder" render={() => <DashboardLayout>

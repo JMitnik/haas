@@ -6,9 +6,8 @@ import { useMutation, useQuery } from '@apollo/react-hooks';
 import { useHistory, useParams } from 'react-router';
 import { Container, Flex, Grid, H2, H3, Muted, Button,
   Div, StyledLabel, StyledInput, Hr, FormGroupContainer, Form } from '@haas/ui';
-import { getCustomerQuery } from '../queries/getCustomersQuery';
 
-import { createNewCustomer } from '../mutations/createNewCustomer';
+import { getCustomerQuery } from '../queries/getCustomersQuery';
 import editCustomerMutation from '../mutations/editCustomer';
 import getEditCustomerData from '../queries/getEditCustomer'
 
@@ -43,8 +42,6 @@ const EditCustomerView = () => {
   });
 
   if (getEditCustomerQuery.loading) return null;
-
-  console.log(getEditCustomerQuery.data);
   
   const onSubmit = (formData: FormDataProps) => {
     const optionInput = { logo: formData.logo,

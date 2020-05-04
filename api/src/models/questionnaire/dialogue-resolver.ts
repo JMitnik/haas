@@ -68,6 +68,21 @@ class DialogueResolver {
     };
   }
 
+  static editDialogue = async (args: any) => {
+    const { dialogueId, title, description, publicTitle } = args;
+    const dialogue = await prisma.dialogue.update({
+      where: {
+        id: dialogueId,
+      },
+      data: {
+        title,
+        description,
+        publicTitle,
+      },
+    });
+    return dialogue;
+  };
+
   static getTopPaths = (groupedJoined: any) => {
     // console.log('JOINED: ', joined);
     const countedPaths = _.countBy(groupedJoined, 'textValue');

@@ -246,6 +246,7 @@ export interface NexusGenFieldTypes {
     deleteCustomer: NexusGenRootTypes['Customer']; // Customer!
     deleteDialogue: NexusGenRootTypes['Dialogue']; // Dialogue!
     editCustomer: NexusGenRootTypes['Customer']; // Customer!
+    editDialogue: NexusGenRootTypes['Dialogue']; // Dialogue!
     updateTopicBuilder: string; // String!
     uploadUserSession: NexusGenRootTypes['Session']; // Session!
   }
@@ -347,6 +348,12 @@ export interface NexusGenArgTypes {
     editCustomer: { // args
       id?: string | null; // String
       options?: NexusGenInputs['CustomerCreateOptions'] | null; // CustomerCreateOptions
+    }
+    editDialogue: { // args
+      description?: string | null; // String
+      dialogueId?: string | null; // String
+      publicTitle?: string | null; // String
+      title?: string | null; // String
     }
     updateTopicBuilder: { // args
       id?: string | null; // String

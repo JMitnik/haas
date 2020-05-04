@@ -178,6 +178,18 @@ export const deleteDialogueOfCustomerMutation = extendType({
         return DialogueResolver.createDialogue(args);
       },
     });
+    t.field('editDialogue', {
+      type: DialogueType,
+      args: {
+        dialogueId: 'String',
+        title: 'String',
+        description: 'String',
+        publicTitle: 'String',
+      },
+      resolve(parent: any, args: any, ctx: any, info: any) {
+        return DialogueResolver.editDialogue(args);
+      },
+    });
     t.field('deleteDialogue', {
       type: DialogueType,
       args: {
@@ -208,10 +220,12 @@ export const DialoguesOfCustomerQuery = extendType({
       args: {
         where: DialogueWhereUniqueInput,
       },
-      resolve(parent: any, args: any, ctx: any, info: any) {
-        const dialogue = ctx.prisma.dialogue.findOne({ where: {
+      async resolve(parent: any, args: any, ctx: any, info: any) {
+        console.log(args.where.id);
+        const dialogue = await ctx.prisma.dialogue.findOne({ where: {
           id: args.where.id,
         } });
+        console.log('Dialogue: ', dialogue);
         return dialogue;
       },
     });
