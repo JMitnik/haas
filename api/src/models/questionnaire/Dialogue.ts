@@ -14,6 +14,7 @@ export const DialogueType = objectType({
     t.string('publicTitle', { nullable: true });
     t.string('creationDate', { nullable: true });
     t.string('updatedAt', { nullable: true });
+    t.string('averageScore', { nullable: true });
     t.field('lineChartData', {
       nullable: true,
       type: 'String', // TODO: Change to appropriate return type
@@ -220,13 +221,18 @@ export const DialoguesOfCustomerQuery = extendType({
       args: {
         customerId: 'ID',
       },
-      resolve(parent: any, args: any, ctx: any, info: any) {
-        const dialogues = ctx.prisma.dialogue.findMany({
+      async resolve(parent: any, args: any, ctx: any, info: any) {
+        const dialogues: Array<Dialogue> = await ctx.prisma.dialogue.findMany({
           where: {
             customerId: args.customerId,
           },
         });
-        return dialogues;
+        const updatedDialogues = Promise.all(dialogues.map(async (dialogue) => {
+          const arg = { dialogueId: dialogue.id };
+          const aggregated = await DialogueResolver.getQuestionnaireAggregatedData(parent, arg);
+          return { ...dialogue, averageScore: aggregated.average };
+        }));
+        return updatedDialogues;
       },
     });
   },

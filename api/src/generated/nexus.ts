@@ -192,6 +192,7 @@ export interface NexusGenFieldTypes {
     logoUrl: string | null; // String
   }
   Dialogue: { // field return type
+    averageScore: string | null; // String
     creationDate: string | null; // String
     customer: NexusGenRootTypes['Customer']; // Customer!
     customerId: string; // String!
