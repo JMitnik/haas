@@ -96,7 +96,6 @@ class CustomerResolver {
   static editCustomer = async (args: any) => {
     const { id, options } = args;
     const { logo, primaryColour, slug, name } = options;
-
     const customerSettings = await prisma.customerSettings.update({
       where: {
         customerId: id,

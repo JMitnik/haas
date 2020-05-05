@@ -1,5 +1,8 @@
 {
     "private": true,
+    "jest": {
+        "verbose": true
+    },
     "homepage": ".",
     "workspaces": {
         "packages": [
