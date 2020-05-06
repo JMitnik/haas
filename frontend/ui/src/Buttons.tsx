@@ -11,6 +11,25 @@ export interface ButtonProps extends SpaceProps {
   size?: sizeVariants;
 }
 
+export const EditDialogueContainer = styled.button`
+margin-bottom: 20px;
+margin-left: 2%;
+border: none;
+background: #f6f7f9;
+padding: 5px;
+
+svg {
+  width: 15px;
+  height: 15px;
+}
+
+opacity: 0.7;
+cursor: pointer;
+transition: all 0.2s ease-in;
+
+
+`;
+
 export const EditButtonContainer = styled.button`
 position: absolute;
 top: 10px;
