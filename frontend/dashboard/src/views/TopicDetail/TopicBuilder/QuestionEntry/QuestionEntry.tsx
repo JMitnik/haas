@@ -4,7 +4,7 @@ import { Muted, Div, H4, Button, StyledLabel, StyledInput, Hr } from '@haas/ui';
 import Select from 'react-select';
 import { useForm } from 'react-hook-form';
 import EdgeEntry from '../EdgeEntry/EdgeEntry';
-import { QuestionEntryContainer, DeleteQuestionOptionButtonContainer } from './QuestionEntryStyles';
+import { QuestionEntryContainer, DeleteQuestionOptionButtonContainer, QuestionEntryHeader } from './QuestionEntryStyles';
 import { QuestionEntryProps, EdgeChildProps } from '../TopicBuilderInterfaces';
 
 const questionTypes = [
@@ -17,6 +17,8 @@ interface QuestionEntryItemProps {
   // TODO: Use right type for leafs;
   leafs: any;
   index: number;
+  activeExpanded: Array<any>;
+  setActiveExpanded: (newExpanded: any) => void;
   // TODO: Define function type, ala () => void or whatever
   onTitleChange: (newTitle: string, index: number) => void;
   onLeafNodeChange: (value: any, index: number) => void;
@@ -31,6 +33,8 @@ const QuestionEntryItem = ({ question,
   leafs,
   questionsQ,
   index,
+  activeExpanded,
+  setActiveExpanded,
   ...props }: QuestionEntryItemProps) => {
   const { register, errors } = useForm();
   // TODO: What is difference between eustion and questionsQ? <- Not clear
@@ -158,124 +162,142 @@ const QuestionEntryItem = ({ question,
 
   return (
     <QuestionEntryContainer>
-      <Div backgroundColor="#daecfc" margin={5} py={6}>
-        <Div useFlex pl={4} pr={4} pb={2} flexDirection="column">
-          <H4>
-            Question:
-            {question.id}
-          </H4>
-          <StyledLabel>Title</StyledLabel>
-          <StyledInput
-            name="title"
-            defaultValue={activeTitle}
-            onBlur={(e) => setNewTitle(e, index)}
-            ref={register({ required: true })}
-          />
-          {errors.title && <Muted color="warning">Something went wrong!</Muted>}
-        </Div>
-        <Div useFlex pl={4} pr={4} pb={2} flexDirection="row">
-          <StyledLabel>Is root:</StyledLabel>
-          <input
-            name="isGoing"
-            type="checkbox"
-            checked={question.isRoot}
-            onChange={() => setIsRootQuestion()}
-          />
-        </Div>
-        <Div useFlex pl={4} pr={4} pb={2} flexDirection="column">
-          <StyledLabel>Question type</StyledLabel>
-          <Select
-            options={questionTypes}
-            value={activeQuestionType}
-            onChange={(qOption) => setQuestionType(qOption)}
-          />
-        </Div>
-        {activeQuestionType.value === 'MULTI_CHOICE' && (
-          <Div useFlex pl={4} pr={4} pb={2} flexDirection="column">
-            <H4>OPTIONS</H4>
-            {
-              ((activeOptions && activeOptions.length === 0) || (!activeOptions)) && (
-                <Div alignSelf="center">
-                  No options available...
-                </Div>
-              )
-            }
-            {
-              activeOptions && activeOptions.map((option, optionIndex) => (
-                <Div key={`${optionIndex}-${option.value}`} my={1} useFlex flexDirection="row">
-                  <StyledInput
-                    key={optionIndex}
-                    name={`${question.id}-option-${optionIndex}`}
-                    defaultValue={option.value}
-                    onBlur={(e) => setOption(e, index, optionIndex)}
-                  />
-                  <DeleteQuestionOptionButtonContainer
-                    onClick={(e) => deleteOption(e, index, optionIndex)}
-                  >
-                    <MinusCircle />
-                  </DeleteQuestionOptionButtonContainer>
-                </Div>
-              ))
-            }
-            <Button
-              brand="default"
-              mt={2}
-              ml={4}
-              mr={4}
-              onClick={(e) => addNewOption(e, index)}
-            >
-              Add new option
-            </Button>
-            <Hr />
-          </Div>
-        )}
-        <Div useFlex pl={4} pr={4} pb={2} flexDirection="column">
-          <StyledLabel>Leaf node</StyledLabel>
-          <Select
-            options={leafs}
-            value={(activeLeaf?.value && activeLeaf) || leafs[0]}
-            onChange={(leafOption) => setLeafNode(leafOption)}
-          />
-        </Div>
-        <Div useFlex pl={4} pr={4} pb={2} flexDirection="column">
-          <H4>Edges</H4>
-          {
-            ((activeEdges && activeEdges.length === 0) || (!activeEdges)) && (
-              <Div alignSelf="center">
-                No edges available...
-              </Div>
-            )
-          }
-          {
-            activeEdges && activeEdges.map((edge: EdgeChildProps, edgeIndex: number) => (
 
-              // TODO: setters rename to onXChange
-              <EdgeEntry
-                setEdgeConditionMatchValue={setEdgeConditionMatchValue}
-                setEdgeConditionMaxValue={setEdgeConditionMaxValue}
-                setEdgeConditionMinValue={setEdgeConditionMinValue}
-                setChildQuestionNode={setChildQuestionNode}
-                setConditionType={setConditionType}
-                deleteEdgeEntry={deleteEdgeEntry}
-                key={`${edgeIndex}-${edge.id}`}
-                questions={questionsQ}
-                edge={edge}
-                index={edgeIndex}
-              />
-            ))
+      <Div margin={5} py={6}>
+        <QuestionEntryHeader pl={4} pr={4} pb={2} pt={2} onClick={() => setActiveExpanded((prevExpanded: any) => {
+          if (prevExpanded.includes(question.id) ) {
+            return []
           }
-          <Button
-            brand="default"
-            mt={2}
-            ml={4}
-            mr={4}
-            onClick={(e) => addNewEdge(e)}
-          >
-            Add new edge
-          </Button>
-        </Div>
-      </Div>
-    </QuestionEntryContainer>
+          return [question.id]
+          }
+        )}>
+          Question: 
+            {question.title} ({question.id})
+        </QuestionEntryHeader>
+        {activeExpanded.includes(question.id) &&
+          <Div backgroundColor="#daecfc">
+
+            <Div useFlex pl={4} pr={4} pb={2} flexDirection="column">
+              <StyledLabel>Title</StyledLabel>
+              <StyledInput
+                name="title"
+                defaultValue={activeTitle}
+                onBlur={(e) => setNewTitle(e, index)}
+                ref={register({ required: true })}
+              />
+              {errors.title && <Muted color="warning">Something went wrong!</Muted>}
+            </Div>
+
+            <Div useFlex pl={4} pr={4} pb={2} flexDirection="row">
+              <StyledLabel>Is root:</StyledLabel>
+              <input
+                name="isGoing"
+                type="checkbox"
+                checked={question.isRoot}
+                onChange={() => setIsRootQuestion()}
+              />
+            </Div>
+
+            <Div useFlex pl={4} pr={4} pb={2} flexDirection="column">
+              <StyledLabel>Question type</StyledLabel>
+              <Select
+                options={questionTypes}
+                value={activeQuestionType}
+                onChange={(qOption) => setQuestionType(qOption)}
+              />
+            </Div>
+
+            {activeQuestionType.value === 'MULTI_CHOICE' && (
+              <Div useFlex pl={4} pr={4} pb={2} flexDirection="column">
+                <H4>OPTIONS</H4>
+                {
+                  ((activeOptions && activeOptions.length === 0) || (!activeOptions)) && (
+                    <Div alignSelf="center">
+                      No options available...
+                    </Div>
+                  )
+                }
+                {
+                  activeOptions && activeOptions.map((option, optionIndex) => (
+                    <Div key={`${optionIndex}-${option.value}`} my={1} useFlex flexDirection="row">
+                      <StyledInput
+                        key={optionIndex}
+                        name={`${question.id}-option-${optionIndex}`}
+                        defaultValue={option.value}
+                        onBlur={(e) => setOption(e, index, optionIndex)}
+                      />
+                      <DeleteQuestionOptionButtonContainer
+                        onClick={(e) => deleteOption(e, index, optionIndex)}
+                      >
+                        <MinusCircle />
+                      </DeleteQuestionOptionButtonContainer>
+                    </Div>
+                  ))
+                }
+                <Button
+                  brand="default"
+                  mt={2}
+                  ml={4}
+                  mr={4}
+                  onClick={(e) => addNewOption(e, index)}
+                >
+                  Add new option
+                </Button>
+                <Hr />
+              </Div>
+            )}
+
+            <Div useFlex pl={4} pr={4} pb={2} flexDirection="column">
+              <StyledLabel>Leaf node</StyledLabel>
+              <Select
+                options={leafs}
+                value={(activeLeaf?.value && activeLeaf) || leafs[0]}
+                onChange={(leafOption) => setLeafNode(leafOption)}
+              />
+            </Div>
+
+            <Div useFlex pl={4} pr={4} pb={2} flexDirection="column">
+              <H4>Edges</H4>
+              {
+                ((activeEdges && activeEdges.length === 0) || (!activeEdges)) && (
+                  <Div alignSelf="center">
+                    No edges available...
+                  </Div>
+                )
+              }
+              {
+                activeEdges && activeEdges.map((edge: EdgeChildProps, edgeIndex: number) => (
+
+                  // TODO: setters rename to onXChange
+                  <EdgeEntry
+                    setEdgeConditionMatchValue={setEdgeConditionMatchValue}
+                    setEdgeConditionMaxValue={setEdgeConditionMaxValue}
+                    setEdgeConditionMinValue={setEdgeConditionMinValue}
+                    setChildQuestionNode={setChildQuestionNode}
+                    setConditionType={setConditionType}
+                    deleteEdgeEntry={deleteEdgeEntry}
+                    key={`${edgeIndex}-${edge.id}`}
+                    questions={questionsQ}
+                    edge={edge}
+                    index={edgeIndex}
+                  />
+                ))
+              }
+              <Button
+                brand="default"
+                mt={2}
+                ml={4}
+                mr={4}
+                onClick={(e) => addNewEdge(e)}
+              >
+                Add new edge
+              </Button>
+            </Div>
+          </Div>
+        }
+      </Div >
+
+    </QuestionEntryContainer >
   );
 };
 

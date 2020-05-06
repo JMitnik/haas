@@ -78,6 +78,7 @@ const TopicBuilder = () => {
 
   const questionsData = mapQuestionsInputData(data?.dialogue?.questions);
   const [questions, setQuestions] = useState(questionsData);
+  const [activeExpanded, setActiveExpanded] = useState([]);
 
   useEffect(() => {
     if (!data) {
@@ -166,7 +167,7 @@ const TopicBuilder = () => {
   };
 
   return (
-    <>
+    <Div>
       <H2 color="default.text" fontWeight={400} mb={4}>
         Topic builder
       </H2>
@@ -179,6 +180,8 @@ const TopicBuilder = () => {
         {
           questions && questions.map((question: QuestionEntryProps, index: number) => (
             <QuestionEntry
+              activeExpanded={activeExpanded}
+              setActiveExpanded={setActiveExpanded}
               onIsRootQuestionChange={handleIsRootQuestionChange}
               onLeafNodeChange={handleLeafNodeChange}
               onEdgesChange={handleEdgesChange}
@@ -194,7 +197,10 @@ const TopicBuilder = () => {
             />
           ))
         }
-        <Button
+       
+      </TopicBuilderView>
+      <Div display='flex' justifyContent='space-around'>
+      <Button
           brand="default"
           mt={2}
           ml={4}
@@ -218,8 +224,9 @@ const TopicBuilder = () => {
         >
           Save topic
         </Button>
-      </TopicBuilderView>
-    </>
+      </Div>
+      
+    </Div>
   );
 };
 

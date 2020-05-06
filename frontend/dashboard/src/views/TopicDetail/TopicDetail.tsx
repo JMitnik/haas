@@ -146,7 +146,7 @@ const TopicDetail = () => {
         <Div height="100vh" maxHeight="100vh" overflow="hidden">
           <Switch>
             <Route path="/dashboard/c/:customerId/t/:topicId/topic-builder/">
-              <TopicBuilder />
+              <TopicBuilder/>
             </Route>
             <Route>
               <Grid gridTemplateColumns="3fr 1fr">
