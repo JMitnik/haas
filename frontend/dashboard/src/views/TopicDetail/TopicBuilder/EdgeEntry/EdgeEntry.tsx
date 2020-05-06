@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X } from 'react-feather';
+import { X, Plus } from 'react-feather';
 import { Div, StyledInput, StyledLabel, DeleteButtonContainer } from '@haas/ui';
 import Select from 'react-select';
 import { QuestionEntryProps, EdgeChildProps } from '../TopicBuilderInterfaces';
@@ -11,13 +11,13 @@ const conditionTypes = [
 const EdgeEntry = (
   { questions, edge, index, deleteEdgeEntry,
     setConditionType, setChildQuestionNode, setEdgeConditionMinValue,
-    setEdgeConditionMaxValue, setEdgeConditionMatchValue }:
-  {
-    questions: Array<QuestionEntryProps>, edge: EdgeChildProps,
-    index: number, deleteEdgeEntry: Function,
-    setConditionType: Function, setChildQuestionNode: Function, setEdgeConditionMinValue: Function,
-    setEdgeConditionMaxValue: Function, setEdgeConditionMatchValue: Function
-  },
+    setEdgeConditionMaxValue, setEdgeConditionMatchValue, question }:
+    {
+      question: QuestionEntryProps, questions: Array<QuestionEntryProps>, edge: EdgeChildProps,
+      index: number, deleteEdgeEntry: Function,
+      setConditionType: Function, setChildQuestionNode: Function, setEdgeConditionMinValue: Function,
+      setEdgeConditionMaxValue: Function, setEdgeConditionMatchValue: Function
+    },
 ) => {
   // TODO: Remove these states and use parent state
   const [activeCondition, setactiveCondition] = useState(
@@ -33,6 +33,8 @@ const EdgeEntry = (
       label: `${edge?.childNode?.title} - ${edge?.childNode?.id}`,
     },
   );
+
+  const [edgeExpanded, setEdgeExpanded] = useState(false)
 
   const setCondition = (qOption: any) => {
     const { label, value } = qOption;
@@ -57,6 +59,10 @@ const EdgeEntry = (
     setEdgeConditionMaxValue(maxValue, index);
   };
 
+  const newOptionsSelect = question.options?.map((option) => {
+    return { label: option.value, value: option.value };
+  })
+
   const newSelect = questions.map((question) => {
     const label = `${question.title} - ${question.id}`;
     const value = question.id;
@@ -71,56 +77,62 @@ const EdgeEntry = (
         >
           <X />
         </DeleteButtonContainer>
-        <StyledLabel marginTop={10} marginBottom={20}>
+        <StyledLabel style={{ 'cursor': 'pointer', 'padding': '5px' }} onClick={() => setEdgeExpanded(!edgeExpanded)} marginBottom={20}>
           Child node #
           {index + 1}
         </StyledLabel>
-        <Select
-          options={newSelect}
-          value={activeChildQuestion}
-          onChange={(childNode) => setChildQuestion(childNode)}
-        />
-        <Div mt={10} mb={20}>
-          <StyledLabel>conditionType</StyledLabel>
-          {
-            // TODO: Clear fields when condition type is changed?
-          }
+        {edgeExpanded && <Div>
           <Select
-            options={conditionTypes}
-            value={activeCondition}
-            onChange={(qOption) => setCondition(qOption)}
+            options={newSelect}
+            value={activeChildQuestion}
+            onChange={(childNode) => setChildQuestion(childNode)}
           />
-          {
-            activeCondition.value === 'valueBoundary' && (
-              <Div mt={10}>
-                <StyledLabel ml={5} mr={5}>Min value</StyledLabel>
-                <StyledInput
-                  defaultValue={edge?.conditions?.[0].renderMin}
-                  onBlur={(event: React.FocusEvent<HTMLInputElement>) => setMinValue(event)}
-                />
-                <StyledLabel ml={5} mr={5}>Max value</StyledLabel>
-                <StyledInput
-                  defaultValue={edge?.conditions?.[0].renderMax}
-                  onBlur={(event: React.FocusEvent<HTMLInputElement>) => setMaxValue(event)}
-                />
-              </Div>
-            )
-          }
-          {
-            activeCondition.value === 'match' && (
-              <Div mt={10}>
-                <StyledLabel ml={5} mr={5}>Match value</StyledLabel>
-                <StyledInput
-                  defaultValue={edge?.conditions?.[0].matchValue}
-                  onBlur={(event: React.FocusEvent<HTMLInputElement>) => {
-                    setEdgeConditionMatchValue(event.target.value, index);
-                  }}
-                />
-              </Div>
-            )
-          }
+          <Div mt={10} mb={20}>
+            <StyledLabel>conditionType</StyledLabel>
+            {
+              // TODO: Clear fields when condition type is changed?
+            }
+            <Select
+              options={conditionTypes}
+              value={activeCondition}
+              onChange={(qOption) => setCondition(qOption)}
+            />
+            {
+              activeCondition.value === 'valueBoundary' && (
+                <Div mt={10}>
+                  <StyledLabel ml={5} mr={5}>Min value</StyledLabel>
+                  <StyledInput
+                    defaultValue={edge?.conditions?.[0].renderMin}
+                    onBlur={(event: React.FocusEvent<HTMLInputElement>) => setMinValue(event)}
+                  />
+                  <StyledLabel ml={5} mr={5}>Max value</StyledLabel>
+                  <StyledInput
+                    defaultValue={edge?.conditions?.[0].renderMax}
+                    onBlur={(event: React.FocusEvent<HTMLInputElement>) => setMaxValue(event)}
+                  />
+                </Div>
+              )
+            }
+            {
+              activeCondition.value === 'match' && (
+                <Div mt={10}>
+                  <StyledLabel ml={5} mr={5}>Match value</StyledLabel>
+                  <Select
+                    options={newOptionsSelect}
+                    value={{ label: edge?.conditions?.[0].matchValue, value: edge?.conditions?.[0].matchValue}}
+                    onChange={(option: any) => {
+                      console.log(option);
+                      setEdgeConditionMatchValue(option.value, index);
+                    }}
+                  />
+                </Div>
+              )
+            }
+          </Div>
         </Div>
+        }
       </Div>
+
     </Div>
   );
 };

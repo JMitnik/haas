@@ -4,7 +4,7 @@ import styled from 'styled-components/macro';
 export const TopicBuilderView = styled.div`
   display: flex;
   flex-direction: column;
-  height: 75vh;
+  height: 80vh;
   overflow-y: scroll;
   width: 100vh;
 `;

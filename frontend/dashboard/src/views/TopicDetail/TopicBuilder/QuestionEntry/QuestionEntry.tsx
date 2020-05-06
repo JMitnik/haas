@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { MinusCircle } from 'react-feather';
 import { Muted, Div, H4, Button, StyledLabel, StyledInput, Hr } from '@haas/ui';
 import Select from 'react-select';
@@ -39,6 +39,8 @@ const QuestionEntryItem = ({ question,
   const { register, errors } = useForm();
   // TODO: What is difference between eustion and questionsQ? <- Not clear
 
+  const [optionsExpanded, setOptionsExpanded] = useState(false);
+
   const activeTitle = question.title;
   const activeLeaf = { label: question.overrideLeaf?.title, value: question.overrideLeaf?.id };
   const activeQuestionType = { label: question.type, value: question.type };
@@ -54,6 +56,9 @@ const QuestionEntryItem = ({ question,
 
   const setQuestionType = (questionType: any) => {
     const { value } = questionType;
+    if (value === 'MULTI_CHOICE') {
+      setOptionsExpanded(true);
+    }
     props.onQuestionTypeChange(value, index);
   };
 
@@ -165,13 +170,13 @@ const QuestionEntryItem = ({ question,
 
       <Div margin={5} py={6}>
         <QuestionEntryHeader pl={4} pr={4} pb={2} pt={2} onClick={() => setActiveExpanded((prevExpanded: any) => {
-          if (prevExpanded.includes(question.id) ) {
+          if (prevExpanded.includes(question.id)) {
             return []
           }
           return [question.id]
-          }
+        }
         )}>
-          Question: 
+          Question:
             {question.title} ({question.id})
         </QuestionEntryHeader>
         {activeExpanded.includes(question.id) &&
@@ -209,41 +214,45 @@ const QuestionEntryItem = ({ question,
 
             {activeQuestionType.value === 'MULTI_CHOICE' && (
               <Div useFlex pl={4} pr={4} pb={2} flexDirection="column">
-                <H4>OPTIONS</H4>
-                {
-                  ((activeOptions && activeOptions.length === 0) || (!activeOptions)) && (
-                    <Div alignSelf="center">
-                      No options available...
-                    </Div>
-                  )
-                }
-                {
-                  activeOptions && activeOptions.map((option, optionIndex) => (
-                    <Div key={`${optionIndex}-${option.value}`} my={1} useFlex flexDirection="row">
-                      <StyledInput
-                        key={optionIndex}
-                        name={`${question.id}-option-${optionIndex}`}
-                        defaultValue={option.value}
-                        onBlur={(e) => setOption(e, index, optionIndex)}
-                      />
-                      <DeleteQuestionOptionButtonContainer
-                        onClick={(e) => deleteOption(e, index, optionIndex)}
-                      >
-                        <MinusCircle />
-                      </DeleteQuestionOptionButtonContainer>
-                    </Div>
-                  ))
-                }
-                <Button
-                  brand="default"
-                  mt={2}
-                  ml={4}
-                  mr={4}
-                  onClick={(e) => addNewOption(e, index)}
-                >
-                  Add new option
+                <QuestionEntryHeader onClick={() => setOptionsExpanded(!optionsExpanded)}>OPTIONS ({activeOptions.length} option(s) selected)</QuestionEntryHeader>
+                {optionsExpanded &&
+                  <Div>
+                    {
+                      ((activeOptions && activeOptions.length === 0) || (!activeOptions)) && (
+                        <Div alignSelf="center">
+                          No options available...
+                        </Div>
+                      )
+                    }
+                    {
+                      activeOptions && activeOptions.map((option, optionIndex) => (
+                        <Div key={`${optionIndex}-${option.value}`} my={1} useFlex flexDirection="row">
+                          <StyledInput
+                            key={optionIndex}
+                            name={`${question.id}-option-${optionIndex}`}
+                            defaultValue={option.value}
+                            onBlur={(e) => setOption(e, index, optionIndex)}
+                          />
+                          <DeleteQuestionOptionButtonContainer
+                            onClick={(e) => deleteOption(e, index, optionIndex)}
+                          >
+                            <MinusCircle />
+                          </DeleteQuestionOptionButtonContainer>
+                        </Div>
+                      ))
+                    }
+                    <Button
+                      brand="default"
+                      mt={2}
+                      ml={4}
+                      mr={4}
+                      onClick={(e) => addNewOption(e, index)}
+                    >
+                      Add new option
                 </Button>
-                <Hr />
+                    <Hr />
+                  </Div>}
+
               </Div>
             )}
 
@@ -257,7 +266,7 @@ const QuestionEntryItem = ({ question,
             </Div>
 
             <Div useFlex pl={4} pr={4} pb={2} flexDirection="column">
-              <H4>Edges</H4>
+                  <H4>Edges ({activeEdges.length} selected)</H4>
               {
                 ((activeEdges && activeEdges.length === 0) || (!activeEdges)) && (
                   <Div alignSelf="center">
@@ -278,6 +287,7 @@ const QuestionEntryItem = ({ question,
                     deleteEdgeEntry={deleteEdgeEntry}
                     key={`${edgeIndex}-${edge.id}`}
                     questions={questionsQ}
+                    question={question}
                     edge={edge}
                     index={edgeIndex}
                   />
