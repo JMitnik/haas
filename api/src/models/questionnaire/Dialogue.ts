@@ -151,10 +151,12 @@ export const getQuestionnaireDataQuery = extendType({
       type: DialogueDetailResultType,
       args: {
         dialogueId: 'String',
+        filter: 'Int',
       },
       async resolve(parent: any, args: any, ctx: any, info: any) {
+        console.log('filter: ', args.filter);
         const aggregatedData = await DialogueResolver.getQuestionnaireAggregatedData(parent, args);
-        const data = await DialogueResolver.getLineData(args.dialogueId, 30);
+        const data = await DialogueResolver.getLineData(args.dialogueId, args.filter);
         const result = { ...aggregatedData, ...data };
         return result;
       },

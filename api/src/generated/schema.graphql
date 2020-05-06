@@ -159,7 +159,7 @@ type Query {
   dialogue(where: DialogueWhereUniqueInput): Dialogue!
   dialogues(customerId: ID): [Dialogue!]!
   edge(id: String): Edge!
-  getQuestionnaireData(dialogueId: String): DialogueDetailResult!
+  getQuestionnaireData(dialogueId: String, filter: Int): DialogueDetailResult!
   getSessionAnswerFlow(sessionId: ID): Session!
   lineChartData(dialogueId: String, numberOfDaysBack: Int): [lineChartDataType!]!
   questionNode(where: QuestionNodeWhereUniqueInput): QuestionNode!

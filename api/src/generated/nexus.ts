@@ -379,6 +379,7 @@ export interface NexusGenArgTypes {
     }
     getQuestionnaireData: { // args
       dialogueId?: string | null; // String
+      filter?: number | null; // Int
     }
     getSessionAnswerFlow: { // args
       sessionId?: string | null; // ID
