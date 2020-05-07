@@ -4,11 +4,9 @@ import { Div } from '@haas/ui';
 const AppContainer = styled(Div)`
   ${({ theme }) => css`
     min-width: 100vw;
-    height: 100vh;
-    height: -webkit-fill-available;
-    overflow: hidden;
     background: ${theme.colors.primary};
     display: flex;
+    min-height: 100%;
     align-items: stretch;
   `}
 `;

@@ -11,6 +11,7 @@ export const DialogueContainer = styled(Div)`
     position: relative;
     display: flex;
     width: 100%;
+    max-height: 100vh;
     justify-content: center;
     align-items: stretch;
 
