@@ -75,6 +75,12 @@ export interface CustomerProps {
   settings: CustomerSettingsProps;
 }
 
+export interface Customer {
+  name: string;
+  settings: CustomerSettingsProps;
+  dialogues?: Dialogue[];
+}
+
 export interface CustomerSettingsProps {
   logoUrl: string;
 }
