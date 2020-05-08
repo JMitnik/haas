@@ -79,8 +79,9 @@ const TopicBuilder = () => {
   const questionsData = mapQuestionsInputData(data?.dialogue?.questions);
   const [questions, setQuestions] = useState(questionsData);
   const rootQuestion = questions && questions.filter((question) => question.isRoot);
+  console.log('Questions: ', questions);
   const [activeExpanded, setActiveExpanded] : [Array<string>, React.Dispatch<React.SetStateAction<string[]>>] = useState(['-1']);
-  console.log(questions);
+
   useEffect(() => {
     if (!data) {
       return;
@@ -248,15 +249,6 @@ const TopicBuilder = () => {
       </TopicBuilderView>
       <Div display='flex' justifyContent='space-around'>
       <Button
-          brand="default"
-          mt={2}
-          ml={4}
-          mr={4}
-          onClick={(e) => handleAddQuestion(e, uuidv4())}
-        >
-          Add new question
-        </Button>
-        <Button
           brand="primary"
           mt={2}
           ml={4}
@@ -271,6 +263,16 @@ const TopicBuilder = () => {
         >
           Save topic
         </Button>
+      <Button
+          brand="default"
+          mt={2}
+          ml={4}
+          mr={4}
+          onClick={(e) => history.goBack()}
+        >
+          Cancel
+        </Button>
+        
       </Div>
       
     </Div>

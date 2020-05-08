@@ -44,6 +44,7 @@ const makeFinishedNode: () => HAASNode = () => ({
   id: '-1',
   children: [],
   title: 'Thank you for answering!',
+  isRoot: false,
   type: 'FINISH'
 });
 
@@ -157,10 +158,11 @@ export const HAASTreeDispatchContext = React.createContext({} as TreeDispatchPro
 
 // Provider which manages the state of the context
 export const DialogueTreeProvider = ({ dialogue, customer, children }: TreeProviderProps) => {
+  console.log('Dialogue: ', dialogue);
   const [state, dispatch] = useReducer(treeReducer, {
     dialogue,
     currentDepth: 0,
-    activeNode: dialogue.questions[0],
+    activeNode: dialogue.questions.filter((question) => question.isRoot)[0],
     activeLeaf: dialogue.leafs[0],
     activeEdge: null,
     isAtLeaf: false,

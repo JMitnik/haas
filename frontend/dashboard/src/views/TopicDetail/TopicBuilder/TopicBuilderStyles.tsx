@@ -5,6 +5,6 @@ export const TopicBuilderView = styled.div`
   display: flex;
   flex-direction: column;
   height: 80vh;
-  overflow-y: scroll;
+  overflow-y: auto;
   width: 100vh;
 `;

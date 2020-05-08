@@ -2,7 +2,7 @@ import _ from 'lodash';
 import { PrismaClient, Dialogue, DialogueCreateInput } from '@prisma/client';
 import { formatDistance, isAfter, subDays } from 'date-fns';
 import NodeResolver from '../question/node-resolver';
-import { leafNodes } from '../../data/seeds/default-data';
+import { leafNodes, sliderType } from '../../data/seeds/default-data';
 
 const prisma = new PrismaClient();
 interface LeafNodeProps {
@@ -85,7 +85,6 @@ class DialogueResolver {
   };
 
   static getTopPaths = (groupedJoined: any) => {
-    // console.log('JOINED: ', joined);
     const countedPaths = _.countBy(groupedJoined, 'textValue');
     const o = _.sortBy(_.toPairs(countedPaths), 1).reverse();
     const countedPathsObjects = o.map((array) => ({ answer: array[0], quantity: array[1] }));
@@ -127,7 +126,6 @@ class DialogueResolver {
     const nodeEntryValues = nodeEntries && nodeEntries.flatMap((nodeEntry) => ({ creationDate: nodeEntry.creationDate, values: nodeEntry.values[0], depth: nodeEntry.depth }));
     const nodeEntryNumberValues = nodeEntryValues?.filter((nodeEntryValue) => nodeEntryValue?.values?.numberValue && isAfter(nodeEntryValue.creationDate, filterDateTime)
     );
-    console.log('Node number entry values: ', nodeEntryNumberValues?.length);
     const finalNodeEntryNumberValues = nodeEntryNumberValues?.map(
       (nodeEntryNumberValue) => (
         {
@@ -142,9 +140,7 @@ class DialogueResolver {
     const finalNodeEntryTextValues = nodeEntryTextValues?.map(
       (nodeEntryTextValue) => (
         { nodeEntryId: nodeEntryTextValue.values.nodeEntryId, textValue: nodeEntryTextValue.values.textValue }));
-    console.log('Node text entry values: ', finalNodeEntryTextValues?.length);
     const joined = _.merge(lineChartData, finalNodeEntryTextValues);
-    console.log(joined);
     const groupedJoined = _.groupBy(joined, (entry) => entry.y && entry.y > 50);
     const topNegativePath = DialogueResolver.getTopPaths(groupedJoined.false);
     const topPositivePath = DialogueResolver.getTopPaths(groupedJoined.true);
@@ -347,10 +343,9 @@ class DialogueResolver {
   static createDialogue = async (args: any): Promise<Dialogue> => {
     const { customerId, title, description, publicTitle, isSeed } = args;
     let questionnaire = null;
+    const customer = await prisma.customer.findOne({ where: { id: customerId } });
 
     if (isSeed) {
-      const customer = await prisma.customer.findOne({ where: { id: customerId } });
-
       if (customer?.name) {
         return DialogueResolver.seedQuestionnare(customerId, customer?.name, title, description);
       }
@@ -360,7 +355,20 @@ class DialogueResolver {
     questionnaire = await DialogueResolver.initDialogue(
       customerId, title, description, publicTitle,
     );
-
+    await prisma.dialogue.update({
+      where: {
+        id: questionnaire.id,
+      },
+      data: {
+        questions: {
+          create: {
+            title: `What do you think about ${customer?.name} ?`,
+            type: sliderType,
+            isRoot: true,
+          },
+        },
+      },
+    });
     await NodeResolver.createTemplateLeafNodes(leafNodes, questionnaire.id);
 
     return questionnaire;
@@ -429,6 +437,7 @@ class DialogueResolver {
       const questionnaireId: string = args.id || undefined;
       const { questions }: { questions: Array<any> } = args.topicData;
       const finalQuestions = await DialogueResolver.uuidToPrismaIds(questions, questionnaireId);
+      console.log('final question: ', finalQuestions[0].children);
       await Promise.all(finalQuestions.map(async (question) => NodeResolver.updateQuestion(
         questionnaireId,
         question,

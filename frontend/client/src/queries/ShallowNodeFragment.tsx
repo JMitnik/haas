@@ -4,6 +4,7 @@ export const ShallowNodeFragment = gql`
   fragment ShallowNodeFragment on QuestionNode {
     id
     title
+    isRoot
     overrideLeafId
     overrideLeaf {
       id

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MinusCircle } from 'react-feather';
+import { MinusCircle, PlusCircle } from 'react-feather';
 import { Muted, Div, H4, Button, StyledLabel, StyledInput, Hr } from '@haas/ui';
 import { v4 as uuidv4 } from 'uuid';
 import Select from 'react-select';
@@ -274,7 +274,11 @@ const QuestionEntryItem = ({ question,
             </Div>
 
             <Div useFlex pl={4} pr={4} pb={2} flexDirection="column">
-                  <H4>Edges ({activeEdges.length} selected)</H4>
+                  <Div useFlex justifyContent='space-between' mb={1}>
+                    <H4>Edges ({activeEdges.length} selected)</H4>
+                    <PlusCircle style={{cursor: 'pointer'}} onClick={(e) => addNewEdge(e)} />
+                  </Div>
+                  <Hr/>
               {
                 ((activeEdges && activeEdges.length === 0) || (!activeEdges)) && (
                   <Div alignSelf="center">
@@ -313,15 +317,6 @@ const QuestionEntryItem = ({ question,
                   />
                 ))
               }
-              <Button
-                brand="default"
-                mt={2}
-                ml={4}
-                mr={4}
-                onClick={(e) => addNewEdge(e)}
-              >
-                Add new edge
-              </Button>
             </Div>
           </Div>
         }

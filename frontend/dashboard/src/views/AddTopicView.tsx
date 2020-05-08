@@ -32,7 +32,7 @@ const AddTopicView = () => {
 
   const [addTopic, { loading }] = useMutation(createNewQuestionnaire, {
     onCompleted: () => {
-      history.push(`/c/${customerId}/`);
+      history.push(`/dashboard/c/${customerId}/`);
     },
     refetchQueries: [{ query: getQuestionnairesCustomerQuery,
       variables: {
