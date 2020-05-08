@@ -82,11 +82,11 @@ const TimelineEntry = ({
       <Div>
         {`User ${timeLineEntry.sessionId} has voted `}
       </Div>
-      {/* <Div>
+      <Div useFlex justifyContent='flex-end' gridColumn='2'>
         <H5>
           {acceptedDate}
         </H5>
-      </Div> */}
+      </Div>
     </TimelineEntryContainer>
   );
 };

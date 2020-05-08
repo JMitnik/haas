@@ -9,5 +9,6 @@ export const TimelineFeedOverviewContainer = styled.div`
     border-radius: 20px;
     padding: ${theme.gutter}px;
     height: 80vh;
+    overflow-y: auto;
   `}
 `;
