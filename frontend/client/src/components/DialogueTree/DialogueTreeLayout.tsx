@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { Container } from '@haas/ui';
 
 import useDialogueTree from 'providers/dialogue-tree-provider';
@@ -7,7 +7,7 @@ import NodePage from 'pages/[customer]/[dialogue]/[node]';
 import WatermarkLogo from 'components/WatermarkLogo';
 import Loader from 'components/Loader';
 
-const DialogueTree = () => {
+const DialogueTreeLayout = ({ children }: { children: ReactNode }) => {
   const { treeState: { dialogue, customer } } = useDialogueTree();
 
   if (!dialogue) return <Loader />;
@@ -15,7 +15,7 @@ const DialogueTree = () => {
   return (
     <DialogueContainer>
       <Container>
-        <NodePage />
+        {children}
       </Container>
 
       <WatermarkLogo logoUrl={customer.settings.logoUrl} />
@@ -23,4 +23,4 @@ const DialogueTree = () => {
   );
 };
 
-export default DialogueTree;
+export default DialogueTreeLayout;

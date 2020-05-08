@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form';
 import { CheckCircle } from 'react-feather';
 import { ButtonIcon } from '@haas/ui/src/Buttons';
 import { TextboxContainer } from './TextboxStyles';
-import { GenericNodeProps } from '../Node/Node';
+import { GenericNodeProps } from '../NodeLayout/NodeLayout';
 import { ClientButton } from 'components/Buttons/Buttons';
 
 interface TextboxNodeProps extends GenericNodeProps {

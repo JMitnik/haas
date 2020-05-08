@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { H5, Div, H2, Grid } from '@haas/ui';
 import useHAASTree from 'providers/dialogue-tree-provider';
 import { useForm } from 'react-hook-form';
-import { GenericNodeProps } from '../Node/Node';
+import { GenericNodeProps } from '../NodeLayout/NodeLayout';
 import { HAASFormEntry, MultiChoiceOption } from 'types/generic';
 import { MultiChoiceNodeContainer } from './MultiChoiceNodeStyles';
 import { ClientButton } from 'components/Buttons/Buttons';

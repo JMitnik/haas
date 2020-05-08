@@ -3,7 +3,7 @@ import { Div, H2 } from '@haas/ui';
 import { useForm } from 'react-hook-form';
 import useHAASTree from 'providers/dialogue-tree-provider';
 import { cleanInt } from 'utils/cleanInt';
-import { GenericNodeProps } from '../Node/Node';
+import { GenericNodeProps } from '../NodeLayout/NodeLayout';
 import { HAASFormEntry } from 'types/generic';
 import { SliderNodeContainer, SliderNodeValue } from './SliderNodeStyles';
 import { useAnimation, motion } from 'framer-motion';

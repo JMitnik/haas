@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import gql from 'graphql-tag';
-import DialogueTree from 'components/DialogueTree';
 import { QuestionFragment } from 'queries/QuestionFragment';
 import { CustomerFragment } from 'queries/CustomerFragment';
-import { useParams } from 'react-router-dom';
+import { useParams, useLocation, Route } from 'react-router-dom';
 import { useQuery } from '@apollo/react-hooks';
 import { ThemeProvider } from 'styled-components';
 import { makeCustomTheme } from 'utils/makeCustomerTheme';
 import { DialogueTreeProvider } from 'providers/dialogue-tree-provider';
 import Loader from 'components/Loader';
+import NodePage from './[node]';
+import DialogueTreeLayout from 'components/DialogueTree/DialogueTreeLayout';
 
 const getDialogueQuery = gql`
   query getDialogue($id: ID!) {
@@ -59,7 +60,6 @@ const DialogueTreePage = () => {
     }
   }, [data]);
 
-
   if (loading) return <Loader/>
   if (error) return <p>Shit</p>
 
@@ -69,7 +69,9 @@ const DialogueTreePage = () => {
   return (
     <DialogueTreeProvider customer={customer} dialogue={dialogue}>
       <ThemeProvider theme={(theme: any) => makeCustomTheme(theme, customTheme)}>
-        <DialogueTree />
+        <DialogueTreeLayout>
+          <NodePage />
+        </DialogueTreeLayout>
       </ThemeProvider>
     </DialogueTreeProvider>
   );

@@ -2,6 +2,7 @@ import React, { useContext, ReactNode, useReducer } from 'react';
 import { HAASNode, HAASEntry, HAASEdge, HAASFormEntry, Dialogue, CustomerProps } from 'types/generic';
 import { getQuestionNodeQuery } from '../queries/getQuestionNodeQuery';
 import client from '../config/apollo';
+import { useHistory, useLocation } from 'react-router-dom';
 
 interface TreeDispatchProps {
   goToChild: (
@@ -157,6 +158,8 @@ export const HAASTreeDispatchContext = React.createContext({} as TreeDispatchPro
 
 // Provider which manages the state of the context
 export const DialogueTreeProvider = ({ dialogue, customer, children }: TreeProviderProps) => {
+  const history = useHistory();
+  const location = useLocation();
   const [state, dispatch] = useReducer(treeReducer, {
     dialogue,
     currentDepth: 0,
@@ -178,6 +181,7 @@ export const DialogueTreeProvider = ({ dialogue, customer, children }: TreeProvi
     const nextNode = await findNextNode(nextEdge);
 
     dispatch({ type: 'goToChild', nextNode, nextEdge, newNodeFormEntry: nodeEntry });
+    history.push(`${location.pathname}/${nextEdge?.id}`);
   };
 
   return (

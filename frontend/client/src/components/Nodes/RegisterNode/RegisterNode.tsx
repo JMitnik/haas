@@ -6,7 +6,7 @@ import { CheckCircle } from 'react-feather';
 
 import { ButtonIcon } from '@haas/ui/src/Buttons';
 import { RegisterNodeContainer } from './RegisterNodeStyles';
-import { GenericNodeProps } from 'components/Nodes/Node/Node';
+import { GenericNodeProps } from 'components/Nodes/NodeLayout/NodeLayout';
 
 import useHAASTree from 'providers/dialogue-tree-provider';
 import { ClientButton } from 'components/Buttons/Buttons';

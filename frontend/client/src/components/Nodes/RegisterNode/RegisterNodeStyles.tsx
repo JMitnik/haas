@@ -1,5 +1,5 @@
 import styled, { css } from 'styled-components/macro';
-import { ActiveNodeContainer } from '../Node/NodeStyles';
+import { ActiveNodeContainer } from '../NodeLayout/NodeStyles';
 import { H2 } from '@haas/ui';
 
 export const RegisterNodeContainer = styled(ActiveNodeContainer)`
