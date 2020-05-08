@@ -95,7 +95,7 @@ class DialogueResolver {
   static getLineData = async (dialogueId: string, numberOfDaysBack: number) => {
     const currentDate = new Date();
     const filterDateTime = subDays(currentDate, numberOfDaysBack);
-
+    console.log('filterDataTime:', filterDateTime);
     const dialogue = await prisma.dialogue.findOne(
       {
         where: { id: dialogueId },
@@ -437,7 +437,6 @@ class DialogueResolver {
       const questionnaireId: string = args.id || undefined;
       const { questions }: { questions: Array<any> } = args.topicData;
       const finalQuestions = await DialogueResolver.uuidToPrismaIds(questions, questionnaireId);
-      console.log('final question: ', finalQuestions[0].children);
       await Promise.all(finalQuestions.map(async (question) => NodeResolver.updateQuestion(
         questionnaireId,
         question,

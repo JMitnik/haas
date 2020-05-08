@@ -12,7 +12,7 @@ import Modal from 'components/Modal';
 import styled, { css } from 'styled-components/macro';
 
 const filterMap = new Map([
-  ['Today', 0],
+  ['Last 24h', 1],
   ['Last week', 7],
   ['Last month', 30],
   ['Last year', 365],
@@ -157,8 +157,7 @@ const TopicDetail = () => {
                     <Widget gridColumn="span 2">
                       <H3>Filter</H3>
                       <Div display='flex'>
-                        {/* backgroundColor={activeFilter === 'Today' ? 'purple' : '#f7f9fe'} */}
-                        <FilterButton isActive={activeFilter === 'Today'} onClick={(e) => setActiveFilter('Today')}>Today</FilterButton>
+                        <FilterButton isActive={activeFilter === 'Last 24h'} onClick={(e) => setActiveFilter('Last 24h')}>Last 24h</FilterButton>
                         <FilterButton isActive={activeFilter === 'Last week'} onClick={(e) => setActiveFilter('Last week')}>Last week</FilterButton>
                         <FilterButton isActive={activeFilter === 'Last month'} onClick={(e) => setActiveFilter('Last month')}>Last month</FilterButton>
                         <FilterButton isActive={activeFilter === 'Last year'} onClick={(e) => setActiveFilter('Last year')}>Last year</FilterButton>
