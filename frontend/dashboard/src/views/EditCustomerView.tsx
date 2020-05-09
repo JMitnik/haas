@@ -23,14 +23,12 @@ const EditCustomerView = () => {
   const { customerId } = useParams();
   const { register, handleSubmit, errors } = useForm<FormDataProps>();
 
-  // TODO: Add query that retrieves current data available for a customer
   const getEditCustomerQuery = useQuery(getEditCustomerData, {
     variables: {
       id: customerId
     }
   })
 
-  // TODO: Update customer instead of creating new one
   const [editCustomer, { loading }] = useMutation(editCustomerMutation, {
     onCompleted: () => {
       history.push('/');

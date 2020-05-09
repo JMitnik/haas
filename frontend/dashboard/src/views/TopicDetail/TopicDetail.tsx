@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery } from '@apollo/react-hooks';
-import { Flex, Loader, Grid, Div, H3, Button } from '@haas/ui';
-import { useParams, Switch, Route, useHistory, useLocation } from 'react-router-dom';
+import { Loader, Grid, Div, H3 } from '@haas/ui';
+import { useParams, Switch, Route, useLocation } from 'react-router-dom';
 import { ResponsiveLine } from '@nivo/line';
 import getQuestionnaireData from '../../queries/getQuestionnaireData';
 import TimelineFeedOverview from './TimelineFeedOverview/TimelineFeedOverview';
@@ -134,7 +134,7 @@ const TopicDetail = () => {
   const lineQueryData = resultData?.lineChartData;
   const lineData = [
     {
-      id: 'avg score on date',
+      id: 'score',
       color: 'hsl(38, 70%, 50%)',
       data: lineQueryData,
     },
@@ -157,10 +157,10 @@ const TopicDetail = () => {
                     <Widget gridColumn="span 2">
                       <H3>Filter</H3>
                       <Div display='flex'>
-                        <FilterButton isActive={activeFilter === 'Last 24h'} onClick={(e) => setActiveFilter('Last 24h')}>Last 24h</FilterButton>
-                        <FilterButton isActive={activeFilter === 'Last week'} onClick={(e) => setActiveFilter('Last week')}>Last week</FilterButton>
-                        <FilterButton isActive={activeFilter === 'Last month'} onClick={(e) => setActiveFilter('Last month')}>Last month</FilterButton>
-                        <FilterButton isActive={activeFilter === 'Last year'} onClick={(e) => setActiveFilter('Last year')}>Last year</FilterButton>
+                        <FilterButton isActive={activeFilter === 'Last 24h'} onClick={() => setActiveFilter('Last 24h')}>Last 24h</FilterButton>
+                        <FilterButton isActive={activeFilter === 'Last week'} onClick={() => setActiveFilter('Last week')}>Last week</FilterButton>
+                        <FilterButton isActive={activeFilter === 'Last month'} onClick={() => setActiveFilter('Last month')}>Last month</FilterButton>
+                        <FilterButton isActive={activeFilter === 'Last year'} onClick={() => setActiveFilter('Last year')}>Last year</FilterButton>
                       </Div>
                     </Widget>
                     <StatisticWidget>

@@ -199,7 +199,6 @@ const TopicBuilder = () => {
   const handleDeleteQuestion = (event: any, questionId: string) => {
     event.preventDefault();
     setQuestions((questionsPrev: any) => {
-      // TODO: Get questionIndex
       const questionIds = questions.map((question) => question.id);
       const questionIndex = questionIds.indexOf(questionId)
       questionsPrev.splice(questionIndex, 1);
