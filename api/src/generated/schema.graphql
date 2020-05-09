@@ -37,6 +37,7 @@ input CustomerWhereUniqueInput {
 }
 
 type Dialogue {
+  averageScore: String
   creationDate: String
   customer: Customer!
   customerId: String!

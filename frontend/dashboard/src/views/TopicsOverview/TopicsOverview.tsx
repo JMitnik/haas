@@ -108,7 +108,7 @@ const TopicCard = ({ topic }: { topic: any }) => {
             {topic.title}
           </H3>
           <Label brand="success">
-            9.3
+            {topic.averageScore === 'false' ? 'N/A' : topic.averageScore}
           </Label>
         </Flex>
       </CardBody>

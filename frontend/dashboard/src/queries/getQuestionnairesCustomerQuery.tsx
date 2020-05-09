@@ -9,6 +9,7 @@ const getQuestionnairesCustomerQuery = gql`
     creationDate
     updatedAt
     customerId
+    averageScore
   }
 }
 `;
