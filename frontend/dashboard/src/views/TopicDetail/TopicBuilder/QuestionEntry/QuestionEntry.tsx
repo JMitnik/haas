@@ -33,15 +33,7 @@ interface QuestionEntryItemProps {
   onQuestionExpandChange: (question: any) => void;
 }
 
-const QuestionEntryItem = ({ question,
-  leafs,
-  questionsQ,
-  index,
-  activeExpanded,
-  onAddQuestion,
-  setActiveExpanded,
-  onDeleteQuestion,
-  ...props }: QuestionEntryItemProps) => {
+const QuestionEntryItem = ({ question, leafs, ...props }: QuestionEntryItemProps) => {
   const { register, errors } = useForm();
   // TODO: What is difference between eustion and questionsQ? <- Not clear
 
@@ -54,10 +46,9 @@ const QuestionEntryItem = ({ question,
   const activeEdges = question?.children || [];
   const isRoot = question?.isRoot;
 
-  const setNewTitle = (event: any, qIndex: number) => {
+  const setNewTitle = (event: any) => {
     event.preventDefault();
     const newTitle = event.target.value;
-    //TODO: check if questionId works instead of index
     props.onTitleChange(newTitle, question.id);
   };
 
@@ -78,7 +69,7 @@ const QuestionEntryItem = ({ question,
     props?.onIsRootQuestionChange(!isRoot, question.id);
   };
 
-  const addNewOption = (event: any, qIndex: number) => {
+  const addNewOption = (event: any) => {
     event.preventDefault();
 
     const value = '';
@@ -96,16 +87,6 @@ const QuestionEntryItem = ({ question,
 
     edge.conditions[0].conditionType = conditionType;
     props.onEdgesChange([...activeEdges], question.id);
-  };
-
-  const setChildQuestionNode = (childNode: any, edgeIndex: number) => {
-    const edge: EdgeChildProps = activeEdges[edgeIndex];
-    if (!edge) {
-      return props.onEdgesChange([...activeEdges], question.id);
-    }
-
-    edge.childNode = childNode;
-    return props.onEdgesChange([...activeEdges], question.id);
   };
 
   const setEdgeConditionMinValue = (renderMin: number, edgeIndex: number) => {
@@ -144,35 +125,34 @@ const QuestionEntryItem = ({ question,
   const addNewEdge = (event: any) => {
     event.preventDefault();
     const questionUUID = uuidv4();
-    onAddQuestion(event, questionUUID)
+    props.onAddQuestion(event, questionUUID)
     props.onEdgesChange([
       ...activeEdges, {
         id: undefined,
         conditions: [],
         parentNode: { id: question.id, title: question.title },
-        childNode: { id: questionUUID},
+        childNode: { id: questionUUID },
       }], question.id);
-    
+
   };
 
   const deleteEdgeEntry = (event: any, edgeIndex: number) => {
     event.preventDefault();
 
     const removedEdge = activeEdges.splice(edgeIndex, 1);
-    console.log('removed edge: ', removedEdge?.[0].childNode?.id)
     if (removedEdge?.[0].childNode?.id) {
-      onDeleteQuestion(event, removedEdge?.[0].childNode?.id)
-    } 
+      props.onDeleteQuestion(event, removedEdge?.[0].childNode?.id)
+    }
     props.onEdgesChange([...activeEdges], question.id);
   };
 
-  const deleteOption = (event: any, questionIndex: number, optionIndex: number) => {
+  const deleteOption = (event: any, optionIndex: number) => {
     event.preventDefault();
     activeOptions.splice(optionIndex, 1);
     props.onQuestionOptionsChange(activeOptions, question.id);
   };
 
-  const setOption = (event: any, questionIndex: number, optionIndex: number) => {
+  const setOption = (event: any, optionIndex: number) => {
     event.preventDefault();
     const { value } = event.target;
     activeOptions[optionIndex] = { value, publicValue: '' };
@@ -187,7 +167,7 @@ const QuestionEntryItem = ({ question,
           Question:
             {question.title} ({question.id})
         </QuestionEntryHeader>
-        {activeExpanded.includes(question.id) &&
+        {props.activeExpanded.includes(question.id) &&
           <Div backgroundColor="#daecfc">
 
             <Div useFlex pl={4} pr={4} pb={2} flexDirection="column">
@@ -195,7 +175,7 @@ const QuestionEntryItem = ({ question,
               <StyledInput
                 name="title"
                 defaultValue={activeTitle}
-                onBlur={(e) => setNewTitle(e, index)}
+                onBlur={(e) => setNewTitle(e)}
                 ref={register({ required: true })}
               />
               {errors.title && <Muted color="warning">Something went wrong!</Muted>}
@@ -239,10 +219,10 @@ const QuestionEntryItem = ({ question,
                             key={optionIndex}
                             name={`${question.id}-option-${optionIndex}`}
                             defaultValue={option.value}
-                            onBlur={(e) => setOption(e, index, optionIndex)}
+                            onBlur={(e) => setOption(e, optionIndex)}
                           />
                           <DeleteQuestionOptionButtonContainer
-                            onClick={(e) => deleteOption(e, index, optionIndex)}
+                            onClick={(e) => deleteOption(e, optionIndex)}
                           >
                             <MinusCircle />
                           </DeleteQuestionOptionButtonContainer>
@@ -254,7 +234,7 @@ const QuestionEntryItem = ({ question,
                       mt={2}
                       ml={4}
                       mr={4}
-                      onClick={(e) => addNewOption(e, index)}
+                      onClick={(e) => addNewOption(e)}
                     >
                       Add new option
                 </Button>
@@ -274,11 +254,11 @@ const QuestionEntryItem = ({ question,
             </Div>
 
             <Div useFlex pl={4} pr={4} pb={2} flexDirection="column">
-                  <Div useFlex justifyContent='space-between' mb={1}>
-                    <H4>Edges ({activeEdges.length} selected)</H4>
-                    <PlusCircle style={{cursor: 'pointer'}} onClick={(e) => addNewEdge(e)} />
-                  </Div>
-                  <Hr/>
+              <Div useFlex justifyContent='space-between' mb={1}>
+                <H4>Edges ({activeEdges.length} selected)</H4>
+                <PlusCircle style={{ cursor: 'pointer' }} onClick={(e) => addNewEdge(e)} />
+              </Div>
+              <Hr />
               {
                 ((activeEdges && activeEdges.length === 0) || (!activeEdges)) && (
                   <Div alignSelf="center">
@@ -291,11 +271,11 @@ const QuestionEntryItem = ({ question,
                   // TODO: setters rename to onXChange
                   <EdgeEntry
                     leafs={leafs}
-                    onAddQuestion={onAddQuestion}
-                    onDeleteQuestion={onDeleteQuestion}
+                    onAddQuestion={props.onAddQuestion}
+                    onDeleteQuestion={props.onDeleteQuestion}
                     onQuestionExpandChange={props.onQuestionExpandChange}
-                    activeExpanded={activeExpanded}
-                    setActiveExpanded={setActiveExpanded}
+                    activeExpanded={props.activeExpanded}
+                    setActiveExpanded={props.setActiveExpanded}
                     onTitleChange={props.onTitleChange}
                     onLeafNodeChange={props.onLeafNodeChange}
                     onQuestionTypeChange={props.onQuestionTypeChange}
@@ -306,11 +286,10 @@ const QuestionEntryItem = ({ question,
                     setEdgeConditionMatchValue={setEdgeConditionMatchValue}
                     setEdgeConditionMaxValue={setEdgeConditionMaxValue}
                     setEdgeConditionMinValue={setEdgeConditionMinValue}
-                    setChildQuestionNode={setChildQuestionNode}
                     setConditionType={setConditionType}
                     deleteEdgeEntry={deleteEdgeEntry}
                     key={`${edgeIndex}-${edge.id}`}
-                    questions={questionsQ}
+                    questions={props.questionsQ}
                     question={question}
                     edge={edge}
                     index={edgeIndex}

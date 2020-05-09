@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { v4 as uuidv4 } from 'uuid';
 import { ApolloError } from 'apollo-boost';
 import { useQuery, useMutation } from '@apollo/react-hooks';
 import { H2, Loader, Div, Button } from '@haas/ui';
@@ -79,7 +78,6 @@ const TopicBuilder = () => {
   const questionsData = mapQuestionsInputData(data?.dialogue?.questions);
   const [questions, setQuestions] = useState(questionsData);
   const rootQuestion = questions && questions.filter((question) => question.isRoot);
-  console.log('Questions: ', questions);
   const [activeExpanded, setActiveExpanded] : [Array<string>, React.Dispatch<React.SetStateAction<string[]>>] = useState(['-1']);
 
   useEffect(() => {
@@ -268,7 +266,7 @@ const TopicBuilder = () => {
           mt={2}
           ml={4}
           mr={4}
-          onClick={(e) => history.goBack()}
+          onClick={() => history.goBack()}
         >
           Cancel
         </Button>

@@ -222,11 +222,9 @@ export const DialoguesOfCustomerQuery = extendType({
         where: DialogueWhereUniqueInput,
       },
       async resolve(parent: any, args: any, ctx: any, info: any) {
-        console.log(args.where.id);
         const dialogue = await ctx.prisma.dialogue.findOne({ where: {
           id: args.where.id,
         } });
-        console.log('Dialogue: ', dialogue);
         return dialogue;
       },
     });

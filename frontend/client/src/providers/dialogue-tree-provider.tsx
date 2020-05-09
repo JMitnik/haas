@@ -158,7 +158,6 @@ export const HAASTreeDispatchContext = React.createContext({} as TreeDispatchPro
 
 // Provider which manages the state of the context
 export const DialogueTreeProvider = ({ dialogue, customer, children }: TreeProviderProps) => {
-  console.log('Dialogue: ', dialogue);
   const [state, dispatch] = useReducer(treeReducer, {
     dialogue,
     currentDepth: 0,

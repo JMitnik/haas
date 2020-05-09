@@ -1,5 +1,5 @@
 import { PrismaClient, Customer } from '@prisma/client';
-import { formatDistance, subDays } from 'date-fns';
+import { subDays } from 'date-fns';
 import { leafNodes } from '../../data/seeds/default-data';
 import NodeResolver from '../question/node-resolver';
 
@@ -26,8 +26,6 @@ class CustomerResolver {
     if (!customer) {
       throw new Error("Can't find slug, shit!");
     }
-
-    console.log(customer);
 
     return customer;
   };

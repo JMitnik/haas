@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import { PrismaClient, Dialogue, DialogueCreateInput } from '@prisma/client';
-import { formatDistance, isAfter, subDays } from 'date-fns';
+import { isAfter, subDays } from 'date-fns';
 import NodeResolver from '../question/node-resolver';
 import { leafNodes, sliderType } from '../../data/seeds/default-data';
 
@@ -88,14 +88,14 @@ class DialogueResolver {
     const countedPaths = _.countBy(groupedJoined, 'textValue');
     const o = _.sortBy(_.toPairs(countedPaths), 1).reverse();
     const countedPathsObjects = o.map((array) => ({ answer: array[0], quantity: array[1] }));
-    const topPath = countedPathsObjects.length > 3 ? countedPathsObjects.slice(0, 3) : countedPathsObjects;
+    const topPath = countedPathsObjects.length > 3
+      ? countedPathsObjects.slice(0, 3) : countedPathsObjects;
     return topPath;
   };
 
   static getLineData = async (dialogueId: string, numberOfDaysBack: number) => {
     const currentDate = new Date();
     const filterDateTime = subDays(currentDate, numberOfDaysBack);
-    console.log('filterDataTime:', filterDateTime);
     const dialogue = await prisma.dialogue.findOne(
       {
         where: { id: dialogueId },
@@ -123,8 +123,13 @@ class DialogueResolver {
     );
 
     const nodeEntries = dialogue?.sessions.flatMap((session) => session.nodeEntries);
-    const nodeEntryValues = nodeEntries && nodeEntries.flatMap((nodeEntry) => ({ creationDate: nodeEntry.creationDate, values: nodeEntry.values[0], depth: nodeEntry.depth }));
-    const nodeEntryNumberValues = nodeEntryValues?.filter((nodeEntryValue) => nodeEntryValue?.values?.numberValue && isAfter(nodeEntryValue.creationDate, filterDateTime)
+    const nodeEntryValues = nodeEntries && nodeEntries.flatMap((nodeEntry) => (
+      { creationDate: nodeEntry.creationDate,
+        values: nodeEntry.values[0],
+        depth: nodeEntry.depth }));
+    const nodeEntryNumberValues = nodeEntryValues?.filter(
+      (nodeEntryValue) => nodeEntryValue?.values?.numberValue
+      && isAfter(nodeEntryValue.creationDate, filterDateTime)
     );
     const finalNodeEntryNumberValues = nodeEntryNumberValues?.map(
       (nodeEntryNumberValue) => (
@@ -134,12 +139,16 @@ class DialogueResolver {
           nodeEntryId: nodeEntryNumberValue.values.nodeEntryId,
         }));
     const orderedFinalNodeEntryNumberValues = _.orderBy(finalNodeEntryNumberValues, ['x'], ['asc']);
-    const lineChartData = orderedFinalNodeEntryNumberValues.map((entry) => ({ x: entry.x.toUTCString(), y: entry.y }));
+    const lineChartData = orderedFinalNodeEntryNumberValues.map((entry) => (
+      { x: entry.x.toUTCString(), y: entry.y }));
 
-    const nodeEntryTextValues = nodeEntryValues?.filter((nodeEntryValue) => nodeEntryValue?.values?.textValue && nodeEntryValue?.depth === 1 && isAfter(nodeEntryValue.creationDate, filterDateTime));
+    const nodeEntryTextValues = nodeEntryValues?.filter(
+      (nodeEntryValue) => nodeEntryValue?.values?.textValue && nodeEntryValue?.depth === 1
+      && isAfter(nodeEntryValue.creationDate, filterDateTime));
     const finalNodeEntryTextValues = nodeEntryTextValues?.map(
       (nodeEntryTextValue) => (
-        { nodeEntryId: nodeEntryTextValue.values.nodeEntryId, textValue: nodeEntryTextValue.values.textValue }));
+        { nodeEntryId: nodeEntryTextValue.values.nodeEntryId,
+          textValue: nodeEntryTextValue.values.textValue }));
     const joined = _.merge(lineChartData, finalNodeEntryTextValues);
     const groupedJoined = _.groupBy(joined, (entry) => entry.y && entry.y > 50);
     const topNegativePath = DialogueResolver.getTopPaths(groupedJoined.false);
@@ -177,8 +186,13 @@ class DialogueResolver {
       },
     );
     const nodeEntries = dialogue?.sessions.flatMap((session) => session.nodeEntries);
-    const nodeEntryValues = nodeEntries && nodeEntries.flatMap((nodeEntry) => ({ creationDate: nodeEntry.creationDate, values: nodeEntry.values[0], depth: nodeEntry.depth }));
-    const nodeEntryNumberValues = nodeEntryValues?.filter((nodeEntryValue) => nodeEntryValue?.values?.numberValue && nodeEntryValue.creationDate > filterDateTime);
+    const nodeEntryValues = nodeEntries && nodeEntries.flatMap((nodeEntry) => (
+      { creationDate: nodeEntry.creationDate,
+        values: nodeEntry.values[0],
+        depth: nodeEntry.depth }));
+    const nodeEntryNumberValues = nodeEntryValues?.filter(
+      (nodeEntryValue) => nodeEntryValue?.values?.numberValue
+      && nodeEntryValue.creationDate > filterDateTime);
     const finalNodeEntryNumberValues = nodeEntryNumberValues?.map(
       (nodeEntryNumberValue) => (
         {
@@ -187,12 +201,16 @@ class DialogueResolver {
           nodeEntryId: nodeEntryNumberValue.values.nodeEntryId,
         }));
     const orderedFinalNodeEntryNumberValues = _.orderBy(finalNodeEntryNumberValues, ['x'], ['asc']);
-    const lineChartData = orderedFinalNodeEntryNumberValues.map((entry) => ({ x: entry.x.toUTCString(), y: entry.y }));
+    const lineChartData = orderedFinalNodeEntryNumberValues.map(
+      (entry) => ({ x: entry.x.toUTCString(), y: entry.y }),
+    );
 
-    const nodeEntryTextValues = nodeEntryValues?.filter((nodeEntryValue) => nodeEntryValue?.values?.textValue && nodeEntryValue?.depth === 1);
+    const nodeEntryTextValues = nodeEntryValues?.filter(
+      (nodeEntryValue) => nodeEntryValue?.values?.textValue && nodeEntryValue?.depth === 1);
     const finalNodeEntryTextValues = nodeEntryTextValues?.map(
       (nodeEntryTextValue) => (
-        { nodeEntryId: nodeEntryTextValue.values.nodeEntryId, textValue: nodeEntryTextValue.values.textValue }));
+        { nodeEntryId: nodeEntryTextValue.values.nodeEntryId,
+          textValue: nodeEntryTextValue.values.textValue }));
     const joined = _.merge(lineChartData, finalNodeEntryTextValues);
     const groupedJoined = _.groupBy(joined, (entry) => entry.y && entry.y > 50);
     const topNegativePath = DialogueResolver.getTopPaths(groupedJoined.false);
@@ -349,8 +367,6 @@ class DialogueResolver {
       if (customer?.name) {
         return DialogueResolver.seedQuestionnare(customerId, customer?.name, title, description);
       }
-
-      console.log('Cant find customer with specified ID while seeding');
     }
     questionnaire = await DialogueResolver.initDialogue(
       customerId, title, description, publicTitle,

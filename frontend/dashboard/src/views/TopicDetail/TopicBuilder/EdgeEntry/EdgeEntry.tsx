@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Plus } from 'react-feather';
+import { X } from 'react-feather';
 import { Div, StyledInput, StyledLabel, DeleteButtonContainer } from '@haas/ui';
 import Select from 'react-select';
 import { QuestionEntryProps, EdgeChildProps } from '../TopicBuilderInterfaces';
@@ -9,21 +9,35 @@ const conditionTypes = [
   { value: 'match', label: 'match' },
   { value: 'valueBoundary', label: 'valueBoundary' }];
 
+interface EdgeEntryItemProps {
+  questions: Array<QuestionEntryProps>;
+  edge: EdgeChildProps;
+  question: QuestionEntryProps;
+  // TODO: Use right type for leafs;
+  leafs: any;
+  index: number;
+  activeExpanded: Array<any>;
+  onAddQuestion: (event: any, questionUUID: string) => void;
+  onDeleteQuestion: (event: any, questionId: string) => void;
+  setActiveExpanded: (newExpanded: any) => void;
+  deleteEdgeEntry: (event: any, edgeIndex: number) => void;
+  setConditionType: (conditionType: string, edgeIndex: number) => void;
+  setEdgeConditionMinValue: (renderMin: number, edgeIndex: number) => void;
+  setEdgeConditionMaxValue: (renderMax: number, edgeIndex: number) => void;
+  setEdgeConditionMatchValue: (matchValue: string, edgeIndex: number) => void;
+  onTitleChange: (newTitle: string, questionId: string) => void;
+  onLeafNodeChange: (leaf: any, questionId: string) => void;
+  onQuestionTypeChange: (value: string, questionId: string) => void;
+  onQuestionOptionsChange: (value: Array<any>, questionId: string) => void;
+  onAddQuestionOption: (value: Array<any>, questionId: string) => void;
+  onEdgesChange: (edges: Array<EdgeChildProps>, questionId: string) => void;
+  onIsRootQuestionChange: (isRoot: boolean, questionId: string) => void;
+  onQuestionExpandChange: (question: any) => void;
+}
+
 const EdgeEntry = (
-  { questions, leafs, edge, index, deleteEdgeEntry, onTitleChange, onLeafNodeChange, onQuestionOptionsChange,
-    setConditionType, setChildQuestionNode, setEdgeConditionMinValue, onQuestionTypeChange, onDeleteQuestion,
-    setEdgeConditionMaxValue, setEdgeConditionMatchValue, question, setActiveExpanded, onAddQuestion,
-    onAddQuestionOption, onEdgesChange, onIsRootQuestionChange, activeExpanded, onQuestionExpandChange }:
-    {
-      activeExpanded: Array<string>, setActiveExpanded: (newExpanded: any) => void, onTitleChange: (newTitle: string, questionId: string) => void,
-      onLeafNodeChange: (leaf: any, questionId: string) => void, onEdgesChange: (edges: Array<EdgeChildProps>, questionId: string) => void,
-      question: QuestionEntryProps, questions: Array<QuestionEntryProps>, edge: EdgeChildProps, onDeleteQuestion: (event: any, questionId: string) => void,
-      onIsRootQuestionChange: (isRoot: boolean, questionId: string) => void, onQuestionExpandChange: (question: any) => void,
-      index: number, deleteEdgeEntry: Function, onQuestionTypeChange: (value: string, questionId: string) => void,
-      onQuestionOptionsChange: (value: Array<any>, questionId: string) => void, leafs: any, onAddQuestion: (event: any, questionUUID: string) => void,
-      setConditionType: Function, setChildQuestionNode: Function, setEdgeConditionMinValue: Function,
-      setEdgeConditionMaxValue: Function, setEdgeConditionMatchValue: Function, onAddQuestionOption: (value: Array<any>, questionId: string) => void
-    },
+  { edge, index, questions, question, ...props }:
+    EdgeEntryItemProps,
 ) => {
   // TODO: Remove these states and use parent state
   const [activeCondition, setactiveCondition] = useState(
@@ -42,24 +56,24 @@ const EdgeEntry = (
   const setCondition = (qOption: any) => {
     const { label, value } = qOption;
     setactiveCondition({ label, value });
-    setConditionType(value, index);
+    props.setConditionType(value, index);
   };
 
 
   const setMinValue = (event: React.FocusEvent<HTMLInputElement>) => {
     const minValue = Number(event.target.value);
-    setEdgeConditionMinValue(minValue, index);
+    props.setEdgeConditionMinValue(minValue, index);
   };
 
   const setMaxValue = (event: React.FocusEvent<HTMLInputElement>) => {
     const maxValue = Number(event.target.value);
-    setEdgeConditionMaxValue(maxValue, index);
+    props.setEdgeConditionMaxValue(maxValue, index);
   };
 
   const expandEdge = () => {
     setEdgeExpanded(!edgeExpanded);
     if (respectiveQuestion[0]) {
-      onQuestionExpandChange(respectiveQuestion[0].id);
+      props.onQuestionExpandChange(respectiveQuestion[0].id);
     }
   }
 
@@ -71,7 +85,7 @@ const EdgeEntry = (
     <Div position="relative">
       <Div useFlex my={10} flexDirection="column" backgroundColor="#f5f5f5">
         <DeleteButtonContainer
-          onClick={(e) => deleteEdgeEntry(e, index)}
+          onClick={(e) => props.deleteEdgeEntry(e, index)}
         >
           <X />
         </DeleteButtonContainer>
@@ -117,51 +131,32 @@ const EdgeEntry = (
                     options={newOptionsSelect}
                     value={{ label: edge?.conditions?.[0].matchValue, value: edge?.conditions?.[0].matchValue }}
                     onChange={(option: any) => {
-                      console.log(option);
-                      setEdgeConditionMatchValue(option.value, index);
+                      props.setEdgeConditionMatchValue(option.value, index);
                     }}
                   />
                 </Div>
               )
             }
-            {/* <Div mt={2}>
-              <Select
-                options={[{ value: 'Existing question', label: 'Existing question' }, { value: 'New question', label: 'New question' }]}
-                value={{ value: edgeQuestionType, label: edgeQuestionType }}
-                onChange={(qOption) => handleEdgeQuestionType(qOption)}
-              />
-            </Div>
-
-            {
-              edgeQuestionType === 'Existing question' &&
-              <Div mt={2}>
-                <Select
-                  options={newSelect}
-                  value={activeChildQuestion}
-                  onChange={(childNode) => handleExistingQuestion(childNode)}
-                />
-              </Div>  
-            } */}
 
             {
               respectiveQuestion[0] && <QuestionEntry
-                onAddQuestion={onAddQuestion}
-                onDeleteQuestion={onDeleteQuestion}
-                onQuestionExpandChange={onQuestionExpandChange}
-                activeExpanded={activeExpanded}
-                setActiveExpanded={setActiveExpanded}
-                onIsRootQuestionChange={onIsRootQuestionChange}
-                onLeafNodeChange={onLeafNodeChange}
-                onEdgesChange={onEdgesChange}
-                onAddQuestionOption={onAddQuestionOption}
-                onQuestionOptionsChange={onQuestionOptionsChange}
-                onQuestionTypeChange={onQuestionTypeChange}
-                onTitleChange={onTitleChange}
+                onAddQuestion={props.onAddQuestion}
+                onDeleteQuestion={props.onDeleteQuestion}
+                onQuestionExpandChange={props.onQuestionExpandChange}
+                activeExpanded={props.activeExpanded}
+                setActiveExpanded={props.setActiveExpanded}
+                onIsRootQuestionChange={props.onIsRootQuestionChange}
+                onLeafNodeChange={props.onLeafNodeChange}
+                onEdgesChange={props.onEdgesChange}
+                onAddQuestionOption={props.onAddQuestionOption}
+                onQuestionOptionsChange={props.onQuestionOptionsChange}
+                onQuestionTypeChange={props.onQuestionTypeChange}
+                onTitleChange={props.onTitleChange}
                 key={index}
                 index={index}
                 questionsQ={questions}
                 question={respectiveQuestion[0]}
-                leafs={leafs}
+                leafs={props.leafs}
               />
             }
 
