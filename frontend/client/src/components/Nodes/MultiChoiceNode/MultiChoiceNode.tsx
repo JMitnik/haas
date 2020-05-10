@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { H5, Div, H2, Grid } from '@haas/ui';
-import useHAASTree from 'providers/dialogue-tree-provider';
+import useDialogueTree from 'providers/DialogueTreeProvider';
 import { useForm } from 'react-hook-form';
 import { GenericNodeProps } from '../NodeLayout/NodeLayout';
 import { HAASFormEntry, MultiChoiceOption } from 'types/generic';
@@ -12,7 +12,7 @@ type MultiChoiceNodeProps = GenericNodeProps;
 const MultiChoiceNode = ({ node }: MultiChoiceNodeProps) => {
   const {
     treeDispatch: { goToChild }
-  } = useHAASTree();
+  } = useDialogueTree();
 
   const { register, setValue, triggerValidation, getValues } = useForm<HAASFormEntry>({
     mode: 'onSubmit',

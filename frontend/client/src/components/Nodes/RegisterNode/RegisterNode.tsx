@@ -8,7 +8,7 @@ import { ButtonIcon } from '@haas/ui/src/Buttons';
 import { RegisterNodeContainer } from './RegisterNodeStyles';
 import { GenericNodeProps } from 'components/Nodes/NodeLayout/NodeLayout';
 
-import useHAASTree from 'providers/dialogue-tree-provider';
+import useDialogueTree from 'providers/DialogueTreeProvider';
 import { ClientButton } from 'components/Buttons/Buttons';
 
 type RegisterNodeProps = GenericNodeProps;
@@ -17,7 +17,7 @@ const RegisterNode = ({ node, isLeaf }: RegisterNodeProps) => {
   const { register, getValues, formState } = useForm();
   const {
     treeDispatch: { goToChild }
-  } = useHAASTree();
+  } = useDialogueTree();
 
   const onSubmit = () => {
     const formEntry = getValues({ nest: true });

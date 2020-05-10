@@ -1,7 +1,7 @@
 import React, { useReducer } from 'react';
 import { Div, H2 } from '@haas/ui';
 import { useForm } from 'react-hook-form';
-import useHAASTree from 'providers/dialogue-tree-provider';
+import useDialogueTree from 'providers/DialogueTreeProvider';
 import { cleanInt } from 'utils/cleanInt';
 import { GenericNodeProps } from '../NodeLayout/NodeLayout';
 import { HAASFormEntry } from 'types/generic';
@@ -23,7 +23,7 @@ const sliderValueAnimeVariants = {
 const SliderNode = ({ node }: SliderNodeProps) => {
   const {
     treeDispatch: { goToChild }
-  } = useHAASTree();
+  } = useDialogueTree();
 
   const controls = useAnimation();
 

@@ -2,14 +2,14 @@ import React, { useEffect, useState } from 'react';
 import gql from 'graphql-tag';
 import { QuestionFragment } from 'queries/QuestionFragment';
 import { CustomerFragment } from 'queries/CustomerFragment';
-import { useParams, useLocation, Route } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useQuery } from '@apollo/react-hooks';
 import { ThemeProvider } from 'styled-components';
 import { makeCustomTheme } from 'utils/makeCustomerTheme';
-import { DialogueTreeProvider } from 'providers/dialogue-tree-provider';
 import Loader from 'components/Loader';
 import NodePage from './[node]';
-import DialogueTreeLayout from 'components/DialogueTree/DialogueTreeLayout';
+import DialogueTreeLayout from 'components/DialogueTreeLayout';
+import useProject from 'providers/ProjectProvider';
 
 const getDialogueQuery = gql`
   query getDialogue($id: ID!) {
@@ -39,6 +39,7 @@ const getDialogueQuery = gql`
 
 
 const DialogueTreePage = () => {
+  const { customer, dialogue, setCustomerAndDialogue, setDialogue } = useProject();
   const { dialogueId } = useParams();
   const [customTheme, setCustomTheme] = useState({});
 
@@ -63,17 +64,12 @@ const DialogueTreePage = () => {
   if (loading) return <Loader/>
   if (error) return <p>Shit</p>
 
-  const dialogue = data?.dialogue;
-  const customer = data?.dialogue?.customer;
-
   return (
-    <DialogueTreeProvider customer={customer} dialogue={dialogue}>
-      <ThemeProvider theme={(theme: any) => makeCustomTheme(theme, customTheme)}>
-        <DialogueTreeLayout>
-          <NodePage />
-        </DialogueTreeLayout>
-      </ThemeProvider>
-    </DialogueTreeProvider>
+    <ThemeProvider theme={(theme: any) => makeCustomTheme(theme, customTheme)}>
+      <DialogueTreeLayout>
+        <NodePage />
+      </DialogueTreeLayout>
+    </ThemeProvider>
   );
 }
 

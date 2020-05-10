@@ -1,14 +1,14 @@
 import { useRef, useEffect } from 'react';
 import { useMutation } from '@apollo/react-hooks';
 import uploadEntryMutation from '../mutations/UploadEntryMutation';
-import useHAASTree from '../providers/dialogue-tree-provider';
+import useDialogueTree from '../providers/DialogueTreeProvider';
 import { useHistory, useLocation, useParams } from 'react-router-dom';
 
 const useJourneyFinish = () => {
   const finishedRef = useRef(false);
   const {
     treeState: { historyStack }
-  } = useHAASTree();
+  } = useDialogueTree();
 
   const [submitForm] = useMutation(uploadEntryMutation, {});
   const history = useHistory();

@@ -1,5 +1,5 @@
 import SliderNode from './SliderNode';
-import { DialogueTreeProvider } from 'providers/dialogue-tree-provider';
+import { DialogueTreeProvider } from 'providers/DialogueTreeProvider';
 import React from 'react';
 import { mockEmptyDialogue } from 'tests/mocks/mockDialogues';
 import { mockCustomerWithoutDialogue } from 'tests/mocks/mockCustomers';

@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { Textbox, H3, H2, Div } from '@haas/ui';
-import useHAASTree from 'providers/dialogue-tree-provider';
+import useDialogueTree from 'providers/DialogueTreeProvider';
 import { useForm } from 'react-hook-form';
 import { CheckCircle } from 'react-feather';
 import { ButtonIcon } from '@haas/ui/src/Buttons';
@@ -17,7 +17,7 @@ const TextboxNode = ({ node }: TextboxNodeProps) => {
   const { register, getValues, formState } = useForm();
   const {
     treeDispatch: { goToChild }
-  } = useHAASTree();
+  } = useDialogueTree();
 
   const onSubmit = () => {
     const formEntry = getValues({ nest: true });

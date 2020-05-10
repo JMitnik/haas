@@ -6,11 +6,17 @@ import { ThemeProvider } from 'styled-components/macro';
 
 import client from 'config/apollo';
 import theme from 'config/theme';
+import { DialogueTreeProvider } from './DialogueTreeProvider';
+import { ProjectProvider } from './ProjectProvider/ProjectProvider';
 
 const AppProviders = ({ children }: { children: ReactNode }) => (
   <ApolloProvider client={client}>
     <BrowserRouter>
-      <ThemeProvider theme={theme}>{children}</ThemeProvider>
+      <ProjectProvider>
+        <DialogueTreeProvider>
+          <ThemeProvider theme={theme}>{children}</ThemeProvider>
+        </DialogueTreeProvider>
+      </ProjectProvider>
     </BrowserRouter>
   </ApolloProvider>
 );

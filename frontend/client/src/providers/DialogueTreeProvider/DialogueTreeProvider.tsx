@@ -1,8 +1,10 @@
-import React, { useContext, ReactNode, useReducer } from 'react';
+import React, { useContext, useReducer } from 'react';
 import { HAASNode, HAASEntry, HAASEdge, HAASFormEntry, Dialogue, CustomerProps } from 'types/generic';
-import { getQuestionNodeQuery } from '../queries/getQuestionNodeQuery';
-import client from '../config/apollo';
+import { getQuestionNodeQuery } from '../../queries/getQuestionNodeQuery';
+import client from '../../config/apollo';
 import { useHistory, useLocation } from 'react-router-dom';
+import useProject from 'providers/ProjectProvider/ProjectProvider';
+import { Loader } from '@haas/ui';
 
 interface TreeDispatchProps {
   goToChild: (
@@ -10,12 +12,6 @@ interface TreeDispatchProps {
     key: string | number | null,
     newNodeFormEntry: HAASFormEntry
   ) => void;
-}
-
-interface TreeProviderProps {
-  dialogue: Dialogue;
-  customer: any;
-  children: ReactNode;
 }
 
 type TreeAction =
@@ -27,18 +23,26 @@ type TreeAction =
     }
   | {
       type: 'finish';
-    };
+    }
+  | {
+    type: 'setDialogueAndCustomer';
+    dialogue: Dialogue;
+    customer: any;
+    }
+  | {
+    type: 'unsetDialogueAndCustomer'
+    }
 
 interface TreeStateProps {
-  dialogue: Dialogue;
   historyStack: HAASEntry[];
+  currentDepth: number;
+  activeLeaf: HAASNode;
+  dialogue: Dialogue | null;
   isAtLeaf: boolean;
   isFinished: boolean;
-  currentDepth: number;
-  activeNode: HAASNode;
+  activeNode: HAASNode | null;
   activeEdge: HAASEdge | null;
-  activeLeaf: HAASNode;
-  customer: CustomerProps;
+  customer: any;
 }
 
 const makeFinishedNode: () => HAASNode = () => ({
@@ -56,6 +60,8 @@ const makeFinishedNode: () => HAASNode = () => ({
 const treeReducer = (state: TreeStateProps, action: TreeAction): TreeStateProps => {
   switch (action.type) {
     case 'goToChild': {
+      if (!state.activeNode) return state;
+
       // Construct new node entry from form-entry
       const newNodeEntry: HAASEntry = {
         depth: state.currentDepth,
@@ -91,17 +97,24 @@ const treeReducer = (state: TreeStateProps, action: TreeAction): TreeStateProps 
       }
 
       return {
-        dialogue: state.dialogue,
+        ...state,
         currentDepth: nextDepth,
         activeNode: nextNode,
+        activeEdge: action.nextEdge,
         isFinished,
         isAtLeaf,
-        activeEdge: action.nextEdge,
-        customer: state.customer,
         activeLeaf,
         historyStack: [...state.historyStack, newNodeEntry]
       };
     }
+
+    case 'setDialogueAndCustomer':
+      return {
+        ...state,
+        dialogue: action.dialogue,
+        customer: action.customer
+      };
+
     default:
       return state;
   }
@@ -153,24 +166,32 @@ const findNextNode = async (edge: HAASEdge | null) => {
   return null;
 };
 
+const defaultActiveLeaf: HAASNode = {
+  id: '-1',
+  type: 'FINISH',
+  title: 'Thank you for participating!',
+  children: [],
+};
+
+
 export const HAASTreeStateContext = React.createContext({} as TreeStateProps);
 export const HAASTreeDispatchContext = React.createContext({} as TreeDispatchProps);
 
 // Provider which manages the state of the context
-export const DialogueTreeProvider = ({ dialogue, customer, children }: TreeProviderProps) => {
-  const history = useHistory();
-  const location = useLocation();
+export const DialogueTreeProvider = ({ children }: { children: React.ReactNode }) => {
   const [state, dispatch] = useReducer(treeReducer, {
-    dialogue,
+    historyStack: [],
     currentDepth: 0,
-    activeNode: dialogue.questions[0],
-    activeLeaf: dialogue.leafs[0],
-    activeEdge: null,
+    activeLeaf: defaultActiveLeaf,
+    activeNode: null,
+    dialogue: null,
     isAtLeaf: false,
     isFinished: false,
-    customer,
-    historyStack: []
+    activeEdge: null,
+    customer: null,
   });
+
+  console.log(state);
 
   const goToChild = async (
     currentNode: HAASNode,
@@ -181,7 +202,6 @@ export const DialogueTreeProvider = ({ dialogue, customer, children }: TreeProvi
     const nextNode = await findNextNode(nextEdge);
 
     dispatch({ type: 'goToChild', nextNode, nextEdge, newNodeFormEntry: nodeEntry });
-    history.push(`${location.pathname}/${nextEdge?.id}`);
   };
 
   return (
@@ -194,18 +214,18 @@ export const DialogueTreeProvider = ({ dialogue, customer, children }: TreeProvi
 };
 
 // Hook which extracts the context with the state variables
-const useHAASTreeState = () => {
+const useDialogueTreeState = () => {
   return useContext(HAASTreeStateContext);
 };
 
 // Hook which extracts the context with the interactionable dispatches.
-const useHAASTreeDispatch = () => {
+const useDialogueTreeDispatch = () => {
   return useContext(HAASTreeDispatchContext);
 };
 
 // Hook which combines the dispatches and variables
-const useHAASTree = () => {
-  return { treeState: useHAASTreeState(), treeDispatch: useHAASTreeDispatch() };
+const useDialogueTree = () => {
+  return { treeState: useDialogueTreeState(), treeDispatch: useDialogueTreeDispatch() };
 };
 
-export default useHAASTree;
+export default useDialogueTree;

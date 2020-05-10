@@ -9,7 +9,8 @@ import SocialShareNode from 'components/Nodes/SocialShareNode/SocialShareNode';
 import RegisterNode from 'components/Nodes/RegisterNode/RegisterNode';
 import FinishNode from 'components/Nodes/FinishNode/FinishNode';
 import Loader from 'components/Loader';
-import useHAASTree from 'providers/dialogue-tree-provider';
+import useDialogueTree from 'providers/DialogueTreeProvider';
+import DialogueTreeLayout from 'components/DialogueTreeLayout';
 
 export interface GenericNodeProps {
   isLeaf?: boolean;
@@ -38,14 +39,17 @@ const NodeType = ({ isLeaf, node }: GenericNodeProps) => {
 
 const NodePage = () => {
   const params = useParams<{ edgeId: string }>();
-  const { treeState: { activeNode } } = useHAASTree();
+  const { treeState: { activeNode } } = useDialogueTree();
 
   if (!params) {}
 
   return (
-    <NodeLayout activeNode={activeNode}>
-      {/* <NodeType /> */}
-    </NodeLayout>
+    <DialogueTreeLayout>
+      Test
+      {/* <NodeLayout activeNode={activeNode}> */}
+        {/* <NodeType /> */}
+      {/* </NodeLayout> */}
+    </DialogueTreeLayout>
   );
 }
 

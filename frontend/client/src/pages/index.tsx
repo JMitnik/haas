@@ -1,7 +1,7 @@
 import React from 'react';
 import { Switch, Route } from 'react-router-dom';
 
-import AppProviders from 'providers/app-providers';
+import AppProviders from 'providers/AppProviders';
 import AppContainer from 'styles/AppStyles';
 import CustomersPage from 'pages/customers';
 import DialogueTreePage from './[customer]/[dialogue]';

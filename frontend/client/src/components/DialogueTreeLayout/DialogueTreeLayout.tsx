@@ -1,7 +1,7 @@
 import React, { ReactNode } from 'react';
 import { Container } from '@haas/ui';
 
-import useDialogueTree from 'providers/dialogue-tree-provider';
+import useDialogueTree from 'providers/DialogueTreeProvider';
 import { DialogueContainer } from './DialogueTreeStyles';
 import NodePage from 'pages/[customer]/[dialogue]/[node]';
 import WatermarkLogo from 'components/WatermarkLogo';
@@ -18,7 +18,7 @@ const DialogueTreeLayout = ({ children }: { children: ReactNode }) => {
         {children}
       </Container>
 
-      <WatermarkLogo logoUrl={customer.settings.logoUrl} />
+      {!!customer && <WatermarkLogo logoUrl={customer.settings.logoUrl} />}
     </DialogueContainer>
   );
 };

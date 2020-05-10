@@ -5,6 +5,7 @@ import { Div } from '@haas/ui';
 import { CustomerFragment } from 'queries/CustomerFragment';
 import { useQuery } from '@apollo/react-hooks';
 import Loader from 'components/Loader';
+import useProject from 'providers/ProjectProvider';
 
 const getCustomerFromSlug = gql`
     query customer($slug: String!) {
@@ -21,6 +22,7 @@ const CustomerPage = () => {
     const { customerSlug } = useParams();
     const history = useHistory();
     const location = useLocation();
+    const { setCustomer } = useProject();
 
     if (!customerSlug) {
         history.push('/');
@@ -40,6 +42,8 @@ const CustomerPage = () => {
 
     // Extract relevant questionnaire here, either default, first, or return to the selection
     if (!data?.customer?.dialogues) return <Loader />
+
+    setCustomer(data?.customer);
 
     return (
         <Redirect to={`${location.pathname}/${data?.customer?.dialogues[0].id}`} />
