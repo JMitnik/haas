@@ -387,7 +387,9 @@ export interface NexusGenArgTypes {
     }
     lineChartData: { // args
       dialogueId?: string | null; // String
+      limit?: number | null; // Int
       numberOfDaysBack?: number | null; // Int
+      offset?: number | null; // Int
     }
     questionNode: { // args
       where?: NexusGenInputs['QuestionNodeWhereUniqueInput'] | null; // QuestionNodeWhereUniqueInput

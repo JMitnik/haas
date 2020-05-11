@@ -162,7 +162,7 @@ type Query {
   edge(id: String): Edge!
   getQuestionnaireData(dialogueId: String, filter: Int): DialogueDetailResult!
   getSessionAnswerFlow(sessionId: ID): Session!
-  lineChartData(dialogueId: String, numberOfDaysBack: Int): [lineChartDataType!]!
+  lineChartData(dialogueId: String, limit: Int, numberOfDaysBack: Int, offset: Int): [lineChartDataType!]!
   questionNode(where: QuestionNodeWhereUniqueInput): QuestionNode!
   questionNodes: [QuestionNode!]!
   session(where: SessionWhereUniqueInput): Session!

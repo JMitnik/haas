@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { PrismaClient, Dialogue, DialogueCreateInput } from '@prisma/client';
+import { PrismaClient, Dialogue, DialogueCreateInput, NodeEntry } from '@prisma/client';
 import { isAfter, subDays } from 'date-fns';
 import NodeResolver from '../question/node-resolver';
 import { leafNodes, sliderType } from '../../data/seeds/default-data';
@@ -93,36 +93,85 @@ class DialogueResolver {
     return topPath;
   };
 
-  static getLineData = async (dialogueId: string, numberOfDaysBack: number) => {
+  static getNextLineData = async (dialogueId: string, numberOfDaysBack: number, limit: number, offset: number) => {
     const currentDate = new Date();
     const filterDateTime = subDays(currentDate, numberOfDaysBack);
-    const dialogue = await prisma.dialogue.findOne(
-      {
-        where: { id: dialogueId },
-        include: {
-          sessions: {
-            include: {
-              nodeEntries: {
-                select: {
-                  creationDate: true,
-                  depth: true,
-                  values: {
-                    select: {
-                      id: true,
-                      nodeEntryId: true,
-                      numberValue: true,
-                      textValue: true,
-                    },
-                  },
-                },
+    console.log('OFFSET: ', offset);
+    const sessions = await prisma.session.findMany({
+      skip: offset,
+      first: limit,
+      where: {
+        dialogueId,
+      },
+      include: {
+        nodeEntries: {
+          select: {
+            creationDate: true,
+            depth: true,
+            values: {
+              select: {
+                id: true,
+                nodeEntryId: true,
+                numberValue: true,
+                textValue: true,
               },
             },
           },
         },
       },
-    );
+    });
+    console.log('Sessions: ', sessions.length);
 
-    const nodeEntries = dialogue?.sessions.flatMap((session) => session.nodeEntries);
+    const nodeEntries = sessions.flatMap((session) => session.nodeEntries);
+    const nodeEntryValues = nodeEntries && nodeEntries.flatMap((nodeEntry) => (
+      { creationDate: nodeEntry.creationDate,
+        values: nodeEntry.values[0],
+        depth: nodeEntry.depth }));
+    const nodeEntryNumberValues = nodeEntryValues?.filter(
+      (nodeEntryValue) => nodeEntryValue?.values?.numberValue
+      && isAfter(nodeEntryValue.creationDate, filterDateTime)
+    );
+    const finalNodeEntryNumberValues = nodeEntryNumberValues?.map(
+      (nodeEntryNumberValue) => (
+        {
+          x: nodeEntryNumberValue.creationDate,
+          y: nodeEntryNumberValue.values.numberValue,
+          nodeEntryId: nodeEntryNumberValue.values.nodeEntryId,
+        }));
+    const orderedFinalNodeEntryNumberValues = _.orderBy(finalNodeEntryNumberValues, ['x'], ['asc']);
+    const lineChartData = orderedFinalNodeEntryNumberValues.map((entry) => (
+      { x: entry.x.toUTCString(), y: entry.y }));
+    return lineChartData;
+  };
+
+  static getLineData = async (dialogueId: string, numberOfDaysBack: number) => {
+    const currentDate = new Date();
+    const filterDateTime = subDays(currentDate, numberOfDaysBack);
+    const sessions = await prisma.session.findMany({
+      // skip: offset,
+      // first: limit,
+      where: {
+        dialogueId,
+      },
+      include: {
+        nodeEntries: {
+          select: {
+            creationDate: true,
+            depth: true,
+            values: {
+              select: {
+                id: true,
+                nodeEntryId: true,
+                numberValue: true,
+                textValue: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    const nodeEntries = sessions.flatMap((session) => session.nodeEntries);
     const nodeEntryValues = nodeEntries && nodeEntries.flatMap((nodeEntry) => (
       { creationDate: nodeEntry.creationDate,
         values: nodeEntry.values[0],

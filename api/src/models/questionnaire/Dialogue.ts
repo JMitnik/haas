@@ -212,9 +212,11 @@ export const DialoguesOfCustomerQuery = extendType({
       args: {
         dialogueId: 'String',
         numberOfDaysBack: 'Int',
+        limit: 'Int',
+        offset: 'Int',
       },
       resolve(parent: any, args: any, ctx: any, info: any) {
-        return DialogueResolver.getLineData(args.dialogueId, 30);
+        return DialogueResolver.getNextLineData(args.dialogueId, args.numberOfDaysBack, args.limit, args.offset);
       },
     });
     t.field('dialogue', {
