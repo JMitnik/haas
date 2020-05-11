@@ -132,6 +132,9 @@ const TopicDetail = () => {
 
   const resultData = data?.getQuestionnaireData;
   const lineQueryData = resultData?.lineChartData;
+  let timelineEntries: Array<any> = resultData?.timelineEntries
+  timelineEntries = timelineEntries.length > 8 ? timelineEntries.slice(0, 8) : timelineEntries
+
   const lineData = [
     {
       id: 'score',
@@ -197,7 +200,7 @@ const TopicDetail = () => {
                 <Div>
                   <TimelineFeedOverview
                     onActiveSessionChange={setActiveSession}
-                    timelineEntries={resultData?.timelineEntries}
+                    timelineEntries={timelineEntries}
                   />
                 </Div>
               </Grid>
