@@ -94,6 +94,18 @@ const EditCustomerView = () => {
                   <StyledInput defaultValue={getEditCustomerQuery.data?.customer?.settings?.colourSettings?.primary} name="primaryColour" ref={register({ required: true })} />
                   {errors.name && <Muted color="warning">Something went wrong!</Muted>}
                 </Div>
+                {/* TODO: Add onChange mutation to edit customer view onChange={onChange} */}
+                <Div useFlex flexDirection="column">
+                  <StyledLabel>Logo (Cloudinary)</StyledLabel>
+                  <StyledInput type="file" name="cloudinary" ref={register({ required: false })} />
+                  {errors.name && <Muted color="warning">Something went wrong!</Muted>}
+                </Div>
+                <Div useFlex flexDirection="column">
+                  <StyledLabel>Preview</StyledLabel>
+                  <Div width={200} height={200} style={{ border: '1px solid lightgrey', borderRadius: '8px' }}>
+                    {getEditCustomerQuery.data?.customer?.settings?.logoUrl && <img src={getEditCustomerQuery.data?.customer?.settings?.logoUrl} height={200} width={200} />}
+                  </Div>
+                </Div>
               </Grid>
             </Div>
           </Grid>

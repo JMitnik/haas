@@ -4,7 +4,7 @@ import { Customer, PrismaClient } from '@prisma/client';
 import { objectType, extendType, inputObjectType, asNexusMethod, scalarType } from '@nexus/schema';
 
 import { GraphQLUpload } from 'apollo-server-express';
-import cloudinary from 'cloudinary';
+import cloudinary, { UploadApiResponse } from 'cloudinary';
 
 import { CustomerSettingsType } from '../settings/CustomerSettings';
 import { DialogueType } from '../questionnaire/Dialogue';
@@ -52,9 +52,10 @@ export const CustomerWhereUniqueInput = inputObjectType({
 export const ImageType = objectType({
   name: 'ImageType',
   definition(t) {
-    t.string('filename');
-    t.string('mimetype');
-    t.string('encoding');
+    t.string('filename', { nullable: true });
+    t.string('mimetype', { nullable: true });
+    t.string('encoding', { nullable: true });
+    t.string('url', { nullable: true });
   },
 });
 
@@ -81,6 +82,10 @@ const CustomerCreateOptionsInput = inputObjectType({
   },
 });
 
+interface test {
+  url?: string;
+}
+
 export const CustomerMutations = Upload && extendType({
   type: 'Mutation',
   definition(t) {
@@ -94,23 +99,24 @@ export const CustomerMutations = Upload && extendType({
         const stream = new Promise((resolve, reject) => {
           const cld_upload_stream = cloudinary.v2.uploader.upload_stream(
             {
-              folder: 'foo',
+              folder: 'company_logos',
             },
-            (error: any, result: any) => {
+            (error: any, result: UploadApiResponse | undefined) => {
               if (result) {
-                resolve(result);
-              } else {
-                reject(error);
+                return resolve(result);
               }
+              return reject(error);
             },
           );
 
-          createReadStream().pipe(cld_upload_stream);
+          return createReadStream().pipe(cld_upload_stream);
         });
 
-        const result = await stream;
-        console.log('FILE NAME: ', result);
-        return { filename, mimetype, encoding };
+        const result: any = await stream;
+        console.log(typeof result);
+        const { url }: { url: string } = result;
+        console.log('url: ', url);
+        return { filename, mimetype, encoding, url };
       },
     });
     t.field('createCustomer', {

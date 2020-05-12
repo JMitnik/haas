@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import { ApolloError } from 'apollo-boost';
 import { useForm } from 'react-hook-form';
@@ -23,8 +23,15 @@ interface FormDataProps {
 const CustomerBuilderView = () => {
   const history = useHistory();
   const { register, handleSubmit, errors } = useForm<FormDataProps>();
-  const [uploadFile] = useMutation(uploadSingleImage)
-  const [addCustomer, { loading }] = useMutation(createNewCustomer, {
+  const [activePreview, setActivePreview] = useState('');
+  const [uploadFile] = useMutation(uploadSingleImage,
+    {
+      onCompleted: (result) => {
+        console.log('URL: ', result.singleUpload.url);
+        setActivePreview(result.singleUpload.url);
+      },
+    })
+  const [addCustomer, { data, loading }] = useMutation(createNewCustomer, {
     onCompleted: () => {
       history.push('/');
     },
@@ -40,13 +47,13 @@ const CustomerBuilderView = () => {
     console.log(image);
     if (image) {
       uploadFile({ variables: { file: image } });
-    } 
+    }
   }
 
   const onSubmit = (formData: FormDataProps) => {
     // TODO: Add cloudinary link instead of file 
     const optionInput = {
-      logo: formData.logo,
+      logo: activePreview,
       slug: formData.slug,
       isSeed: formData.seed,
       primaryColour: formData.primaryColour,
@@ -87,7 +94,7 @@ const CustomerBuilderView = () => {
                 </Flex>
                 <Div useFlex flexDirection="column">
                   <StyledLabel>Logo</StyledLabel>
-                  <StyledInput name="logo" ref={register({ required: true })} />
+                  <StyledInput name="logo" readOnly={true} value={activePreview} ref={register({ required: true })} />
                   {errors.name && <Muted color="warning">Something went wrong!</Muted>}
                 </Div>
                 <Div useFlex flexDirection="column">
@@ -104,9 +111,14 @@ const CustomerBuilderView = () => {
                   <StyledLabel>Logo (Cloudinary)</StyledLabel>
                   <StyledInput type="file" name="cloudinary" onChange={onChange} ref={register({ required: false })} />
                   {errors.name && <Muted color="warning">Something went wrong!</Muted>}
-                  
+
                 </Div>
-                <img src='https://res.cloudinary.com/haas-storage/image/upload/v1589279324/foo/yjdm21gxsluzfyqr6agn.jpg' height={100} width={100}/>
+                <Div useFlex flexDirection="column">
+                  <StyledLabel>Preview</StyledLabel>
+                  <Div width={200} height={200} style={{ border: '1px solid lightgrey', borderRadius: '8px' }}>
+                    {activePreview && <img src={activePreview} height={200} width={200} />}
+                  </Div>
+                </Div>
               </Grid>
               <Div py={4}>
                 <StyledInput

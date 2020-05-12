@@ -107,9 +107,10 @@ type FontSettings {
 }
 
 type ImageType {
-  encoding: String!
-  filename: String!
-  mimetype: String!
+  encoding: String
+  filename: String
+  mimetype: String
+  url: String
 }
 
 input LeafNodeInput {
