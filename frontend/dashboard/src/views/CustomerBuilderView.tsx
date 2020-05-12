@@ -4,15 +4,18 @@ import { ApolloError } from 'apollo-boost';
 import { useForm } from 'react-hook-form';
 import { useMutation } from '@apollo/react-hooks';
 import { useHistory } from 'react-router';
-import { Container, Flex, Grid, H2, H3, Muted, Button,
-  Div, StyledLabel, StyledInput, Hr, FormGroupContainer, Form } from '@haas/ui';
+import {
+  Container, Flex, Grid, H2, H3, Muted, Button,
+  Div, StyledLabel, StyledInput, Hr, FormGroupContainer, Form
+} from '@haas/ui';
 import { getCustomerQuery } from '../queries/getCustomersQuery';
 import { createNewCustomer } from '../mutations/createNewCustomer';
-
+import uploadSingleImage from '../mutations/uploadSingleImage';
 interface FormDataProps {
   name: string;
   logo: string;
   slug: string;
+  cloudinary?: File;
   primaryColour?: string;
   seed?: boolean;
 }
@@ -20,7 +23,7 @@ interface FormDataProps {
 const CustomerBuilderView = () => {
   const history = useHistory();
   const { register, handleSubmit, errors } = useForm<FormDataProps>();
-
+  const [uploadFile] = useMutation(uploadSingleImage)
   const [addCustomer, { loading }] = useMutation(createNewCustomer, {
     onCompleted: () => {
       history.push('/');
@@ -31,11 +34,23 @@ const CustomerBuilderView = () => {
     },
   });
 
+  const onChange = (event: any) => {
+    const image: File = event.target.files[0];
+    // TODO: New upload file mutation 
+    console.log(image);
+    if (image) {
+      uploadFile({ variables: { file: image } });
+    } 
+  }
+
   const onSubmit = (formData: FormDataProps) => {
-    const optionInput = { logo: formData.logo,
+    // TODO: Add cloudinary link instead of file 
+    const optionInput = {
+      logo: formData.logo,
       slug: formData.slug,
       isSeed: formData.seed,
-      primaryColour: formData.primaryColour };
+      primaryColour: formData.primaryColour,
+    };
     // TODO: Make better typescript supported
     addCustomer({
       variables: {
@@ -70,6 +85,11 @@ const CustomerBuilderView = () => {
                   <StyledInput name="name" ref={register({ required: true })} />
                   {errors.name && <Muted color="warning">Something went wrong!</Muted>}
                 </Flex>
+                <Div useFlex pl={4} flexDirection="column">
+                  <StyledLabel>Logo (Cloudinary)</StyledLabel>
+                  <StyledInput type="file" name="cloudinary" onChange={onChange} ref={register({ required: false })} />
+                  {errors.name && <Muted color="warning">Something went wrong!</Muted>}
+                </Div>
                 <Div useFlex pl={4} flexDirection="column">
                   <StyledLabel>Logo</StyledLabel>
                   <StyledInput name="logo" ref={register({ required: true })} />

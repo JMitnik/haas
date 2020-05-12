@@ -106,6 +106,12 @@ type FontSettings {
   id: ID!
 }
 
+type ImageType {
+  encoding: String!
+  filename: String!
+  mimetype: String!
+}
+
 input LeafNodeInput {
   id: ID
   title: String
@@ -124,6 +130,7 @@ type Mutation {
   deleteDialogue(where: DialogueWhereUniqueInput): Dialogue!
   editCustomer(id: String, options: CustomerCreateOptions): Customer!
   editDialogue(description: String, dialogueId: String, publicTitle: String, title: String): Dialogue!
+  singleUpload(file: Upload): ImageType!
   updateTopicBuilder(id: String, topicData: TopicDataEntry): String!
   uploadUserSession(uploadUserSessionInput: UploadUserSessionInput): Session!
 }
@@ -243,6 +250,9 @@ type UniqueDataResultEntry {
   sessionId: String!
   value: Int!
 }
+
+"""The `Upload` scalar type represents a file upload."""
+scalar Upload
 
 input UploadUserSessionInput {
   dialogueId: String!

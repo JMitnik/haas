@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { gql, ApolloError } from 'apollo-boost';
+import { ApolloError } from 'apollo-boost';
 import styled, { css } from 'styled-components/macro';
 import { useForm } from 'react-hook-form';
 import { useMutation } from '@apollo/react-hooks';
@@ -9,14 +9,6 @@ import { Container, Flex, Grid, H2, H3, Muted, Button,
   Div, StyledInput, StyledTextInput, StyledLabel, Hr } from '@haas/ui';
 import getQuestionnairesCustomerQuery from '../queries/getQuestionnairesCustomerQuery';
 import { createNewQuestionnaire } from '../mutations/createNewQuestionnaire';
-
-export const AddTopicMutation = gql`
-  mutation AddTopic($data: TopicCreateInput!) {
-    createTopic(data: $data) {
-      title
-    }
-  }
-`;
 
 interface FormDataProps {
   title: string;

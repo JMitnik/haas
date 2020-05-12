@@ -3,8 +3,4 @@
 # Prisma Migrate lockfile v1
 # Read more about conflict resolution here: TODO
 
-<<<<<<< HEAD
-20200501140814-init
-=======
-20200501143107-init
->>>>>>> feature/dialogue-badge
+20200512103521-init

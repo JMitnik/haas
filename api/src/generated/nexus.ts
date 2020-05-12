@@ -4,9 +4,17 @@
  */
 
 import * as prisma from "@prisma/client"
-
-
-
+import { core } from "@nexus/schema"
+declare global {
+  interface NexusGenCustomInputMethods<TypeName extends string> {
+    upload<FieldName extends string>(fieldName: FieldName, opts?: core.ScalarInputFieldConfig<core.GetGen3<"inputTypes", TypeName, FieldName>>): void // "Upload";
+  }
+}
+declare global {
+  interface NexusGenCustomOutputMethods<TypeName extends string> {
+    upload<FieldName extends string>(fieldName: FieldName, ...opts: core.ScalarOutSpread<TypeName, FieldName>): void // "Upload";
+  }
+}
 
 
 declare global {
@@ -126,6 +134,11 @@ export interface NexusGenRootTypes {
     renderMin?: number | null; // Int
   }
   FontSettings: prisma.FontSettings;
+  ImageType: { // root type
+    encoding: string; // String!
+    filename: string; // String!
+    mimetype: string; // String!
+  }
   Mutation: {};
   NodeEntry: prisma.NodeEntry;
   NodeEntryValue: prisma.NodeEntryValue;
@@ -151,6 +164,7 @@ export interface NexusGenRootTypes {
   Float: number;
   Boolean: boolean;
   ID: string;
+  Upload: any;
 }
 
 export interface NexusGenAllTypes extends NexusGenRootTypes {
@@ -241,6 +255,11 @@ export interface NexusGenFieldTypes {
   FontSettings: { // field return type
     id: string; // ID!
   }
+  ImageType: { // field return type
+    encoding: string; // String!
+    filename: string; // String!
+    mimetype: string; // String!
+  }
   Mutation: { // field return type
     createCustomer: NexusGenRootTypes['Customer']; // Customer!
     createDialogue: NexusGenRootTypes['Dialogue']; // Dialogue!
@@ -248,6 +267,7 @@ export interface NexusGenFieldTypes {
     deleteDialogue: NexusGenRootTypes['Dialogue']; // Dialogue!
     editCustomer: NexusGenRootTypes['Customer']; // Customer!
     editDialogue: NexusGenRootTypes['Dialogue']; // Dialogue!
+    singleUpload: NexusGenRootTypes['ImageType']; // ImageType!
     updateTopicBuilder: string; // String!
     uploadUserSession: NexusGenRootTypes['Session']; // Session!
   }
@@ -356,6 +376,9 @@ export interface NexusGenArgTypes {
       publicTitle?: string | null; // String
       title?: string | null; // String
     }
+    singleUpload: { // args
+      file?: any | null; // Upload
+    }
     updateTopicBuilder: { // args
       id?: string | null; // String
       topicData?: NexusGenInputs['TopicDataEntry'] | null; // TopicDataEntry
@@ -405,7 +428,7 @@ export interface NexusGenAbstractResolveReturnTypes {
 
 export interface NexusGenInheritedFields {}
 
-export type NexusGenObjectNames = "ColourSettings" | "Customer" | "CustomerSettings" | "Dialogue" | "DialogueDetailResult" | "Edge" | "EdgeCondition" | "FontSettings" | "Mutation" | "NodeEntry" | "NodeEntryValue" | "Query" | "QuestionNode" | "QuestionOption" | "Session" | "UniqueDataResultEntry" | "lineChartDataType" | "topPathType";
+export type NexusGenObjectNames = "ColourSettings" | "Customer" | "CustomerSettings" | "Dialogue" | "DialogueDetailResult" | "Edge" | "EdgeCondition" | "FontSettings" | "ImageType" | "Mutation" | "NodeEntry" | "NodeEntryValue" | "Query" | "QuestionNode" | "QuestionOption" | "Session" | "UniqueDataResultEntry" | "lineChartDataType" | "topPathType";
 
 export type NexusGenInputNames = "CustomerCreateOptions" | "CustomerWhereUniqueInput" | "DialogueWhereUniqueInput" | "EdgeChildInput" | "EdgeNodeInput" | "LeafNodeInput" | "OptionInput" | "QuestionConditionInput" | "QuestionInput" | "QuestionNodeWhereInput" | "QuestionNodeWhereUniqueInput" | "SessionWhereUniqueInput" | "TopicDataEntry" | "UploadUserSessionInput" | "UserSessionEntryDataInput" | "UserSessionEntryInput";
 
@@ -413,7 +436,7 @@ export type NexusGenEnumNames = never;
 
 export type NexusGenInterfaceNames = never;
 
-export type NexusGenScalarNames = "Boolean" | "Float" | "ID" | "Int" | "String";
+export type NexusGenScalarNames = "Boolean" | "Float" | "ID" | "Int" | "String" | "Upload";
 
 export type NexusGenUnionNames = never;
 

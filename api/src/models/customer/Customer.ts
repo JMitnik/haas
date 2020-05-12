@@ -1,9 +1,13 @@
+
 import { Customer, PrismaClient } from '@prisma/client';
-import { objectType, extendType, inputObjectType } from '@nexus/schema';
+
+import { objectType, extendType, inputObjectType, asNexusMethod, scalarType } from '@nexus/schema';
+
+import { GraphQLUpload } from 'apollo-server-express';
+import cloudinary from 'cloudinary';
 
 import { CustomerSettingsType } from '../settings/CustomerSettings';
 import { DialogueType } from '../questionnaire/Dialogue';
-
 import DialogueResolver from '../questionnaire/dialogue-resolver';
 import CustomerResolver from './customer-resolver';
 
@@ -15,7 +19,7 @@ export const CustomerType = objectType({
     t.string('name');
     t.field('settings', {
       type: CustomerSettingsType,
-      resolve(parent: Customer, args: any, ctx: any, info: any) {
+      resolve(parent: Customer, args: any, ctx: any) {
         const customerSettings = ctx.prisma.customerSettings.findOne(
           { where: { customerId: parent.id } },
         );
@@ -24,7 +28,7 @@ export const CustomerType = objectType({
     });
     t.list.field('dialogues', {
       type: DialogueType,
-      resolve(parent: Customer, args: any, ctx: any, info: any) {
+      resolve(parent: Customer, args: any, ctx: any) {
         const dialogues = ctx.prisma.dialogue.findMany({
           where: {
             customerId: parent.id,
@@ -43,7 +47,28 @@ export const CustomerWhereUniqueInput = inputObjectType({
   },
 });
 
-export const CustomerCreateOptionsInput = inputObjectType({
+export const ImageType = objectType({
+  name: 'ImageType',
+  definition(t) {
+    t.string('filename');
+    t.string('mimetype');
+    t.string('encoding');
+  },
+});
+
+// console.log('GraphQLUpload: ', GraphQLUpload);
+
+export const Upload = GraphQLUpload && scalarType({
+  name: GraphQLUpload.name,
+  asNexusMethod: 'upload', // We set this to be used as a method later as `t.upload()` if needed
+  description: GraphQLUpload.description,
+  serialize: GraphQLUpload.serialize,
+  parseValue: GraphQLUpload.parseValue,
+  parseLiteral: GraphQLUpload.parseLiteral,
+});
+
+console.log(Upload);
+const CustomerCreateOptionsInput = inputObjectType({
   name: 'CustomerCreateOptions',
   definition(t) {
     t.boolean('isSeed', { default: false, required: false });
@@ -54,16 +79,30 @@ export const CustomerCreateOptionsInput = inputObjectType({
   },
 });
 
-export const CustomerMutations = extendType({
+export const CustomerMutations = Upload && extendType({
   type: 'Mutation',
   definition(t) {
+    t.field('singleUpload', {
+      type: ImageType,
+      args: {
+        file: Upload,
+      },
+      async resolve(parent: any, { file }) {
+        const { createReadStream, filename, mimetype, encoding } = await file;
+        console.log('FILE NAME: ', filename);
+        return { filename, mimetype, encoding };
+      },
+    });
     t.field('createCustomer', {
       type: CustomerType,
       args: {
         name: 'String',
         options: CustomerCreateOptionsInput,
       },
-      resolve(parent: any, args: any, ctx: any, info: any) {
+      async resolve(parent: any, args: any, ctx: any) {
+        console.log(args);
+        const file = await args.options.file;
+        console.log('file: ', file);
         return CustomerResolver.createCustomer(args);
       },
     });
@@ -73,7 +112,7 @@ export const CustomerMutations = extendType({
         id: 'String',
         options: CustomerCreateOptionsInput,
       },
-      resolve(parent: any, args: any, ctx: any, info: any) {
+      resolve(parent: any, args: any, ctx: any) {
         return CustomerResolver.editCustomer(args);
       },
     });
@@ -82,12 +121,13 @@ export const CustomerMutations = extendType({
       args: {
         where: CustomerWhereUniqueInput,
       },
-      async resolve(parent: any, args: any, ctx: any, info: any) {
+      async resolve(parent: any, args: any, ctx: any) {
         const customerId = args.where.id;
         // TODO: Check with jonathan if this is preferred for auto completion
-        const { prisma } : { prisma: PrismaClient } = ctx.prisma;
+        const { prisma }: { prisma: PrismaClient } = ctx.prisma;
 
-        const customer = await ctx.prisma.customer.findOne({ where: { id: customerId },
+        const customer = await ctx.prisma.customer.findOne({
+          where: { id: customerId },
           include: {
             settings: {
               include: {
@@ -95,7 +135,8 @@ export const CustomerMutations = extendType({
                 fontSettings: true,
               },
             },
-          } });
+          },
+        });
 
         const colourSettingsId = customer?.settings?.colourSettingsId;
         const fontSettingsId = customer?.settings?.fontSettingsId;
@@ -178,7 +219,7 @@ export const CustomerQuery = extendType({
         slug: 'String',
       },
       async resolve(parent: any, args: any, ctx: any): Promise<Customer | null> {
-        const { prisma } : { prisma: PrismaClient } = ctx;
+        const { prisma }: { prisma: PrismaClient } = ctx;
 
         if (args.slug) {
           const customer = await prisma.customer.findOne({ where: { slug: args.slug } });
@@ -197,6 +238,7 @@ export const CustomerQuery = extendType({
 });
 
 const customerNexus = [
+  Upload,
   CustomersQuery,
   CustomerQuery,
   CustomerMutations,
