@@ -11,6 +11,8 @@ import { DialogueType } from '../questionnaire/Dialogue';
 import DialogueResolver from '../questionnaire/dialogue-resolver';
 import CustomerResolver from './customer-resolver';
 
+const cloud = cloudinary.v2;
+
 export const CustomerType = objectType({
   name: 'Customer',
   definition(t) {
@@ -89,7 +91,25 @@ export const CustomerMutations = Upload && extendType({
       },
       async resolve(parent: any, { file }) {
         const { createReadStream, filename, mimetype, encoding } = await file;
-        console.log('FILE NAME: ', filename);
+        const stream = new Promise((resolve, reject) => {
+          const cld_upload_stream = cloudinary.v2.uploader.upload_stream(
+            {
+              folder: 'foo',
+            },
+            (error: any, result: any) => {
+              if (result) {
+                resolve(result);
+              } else {
+                reject(error);
+              }
+            },
+          );
+
+          createReadStream().pipe(cld_upload_stream);
+        });
+
+        const result = await stream;
+        console.log('FILE NAME: ', result);
         return { filename, mimetype, encoding };
       },
     });

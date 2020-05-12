@@ -85,26 +85,28 @@ const CustomerBuilderView = () => {
                   <StyledInput name="name" ref={register({ required: true })} />
                   {errors.name && <Muted color="warning">Something went wrong!</Muted>}
                 </Flex>
-                <Div useFlex pl={4} flexDirection="column">
-                  <StyledLabel>Logo (Cloudinary)</StyledLabel>
-                  <StyledInput type="file" name="cloudinary" onChange={onChange} ref={register({ required: false })} />
-                  {errors.name && <Muted color="warning">Something went wrong!</Muted>}
-                </Div>
-                <Div useFlex pl={4} flexDirection="column">
+                <Div useFlex flexDirection="column">
                   <StyledLabel>Logo</StyledLabel>
                   <StyledInput name="logo" ref={register({ required: true })} />
                   {errors.name && <Muted color="warning">Something went wrong!</Muted>}
                 </Div>
-                <Div useFlex pl={4} flexDirection="column">
+                <Div useFlex flexDirection="column">
                   <StyledLabel>Slug</StyledLabel>
                   <StyledInput name="slug" ref={register({ required: true })} />
                   {errors.name && <Muted color="warning">Something went wrong!</Muted>}
                 </Div>
-                <Div useFlex py={4} flexDirection="column">
+                <Div useFlex flexDirection="column">
                   <StyledLabel>Primary colour</StyledLabel>
                   <StyledInput name="primaryColour" ref={register({ required: true })} />
                   {errors.name && <Muted color="warning">Something went wrong!</Muted>}
                 </Div>
+                <Div useFlex flexDirection="column">
+                  <StyledLabel>Logo (Cloudinary)</StyledLabel>
+                  <StyledInput type="file" name="cloudinary" onChange={onChange} ref={register({ required: false })} />
+                  {errors.name && <Muted color="warning">Something went wrong!</Muted>}
+                  
+                </Div>
+                <img src='https://res.cloudinary.com/haas-storage/image/upload/v1589279324/foo/yjdm21gxsluzfyqr6agn.jpg' height={100} width={100}/>
               </Grid>
               <Div py={4}>
                 <StyledInput

@@ -7,6 +7,7 @@ export interface ConfigProps {
   isDebug: boolean;
   clientUrl: string;
   dashboardUrl: string;
+  cloudinaryUrl: string;
   prismaUrl: string;
   appSchemaUrl: string;
   prismaSchemaUrl: string;
@@ -25,6 +26,7 @@ const config: ConfigProps = {
   isDebug: Boolean(process.env.ENABLE_DEBUG) || false,
   clientUrl: process.env.CLIENT_URL || 'http://localhost:3000',
   dashboardUrl: process.env.DASHBOARD_URL || 'http://localhost:3002',
+  cloudinaryUrl: process.env.CLOUDINARY_URL || '',
   prismaUrl: process.env.PRISMA_SERVICE_ENDPOINT || 'http://localhost:4466',
   appSchemaUrl: process.env.PATH_TO_APP_SCHEMA || './src/schema.graphql',
   prismaSchemaUrl: process.env.PATH_TO_PRISMA_GENERATED_SCHEMA || './src/generated/prisma.graphql',
