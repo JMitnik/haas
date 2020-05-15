@@ -118,7 +118,8 @@ export const UploadUserSessionInput = inputObjectType({
 export const SessionWhereUniqueInput = inputObjectType({
   name: 'SessionWhereUniqueInput',
   definition(t) {
-    t.id('id', { required: true });
+    t.id('id', { required: false });
+    t.id('dialogueId', { required: false });
   },
 });
 
@@ -129,6 +130,23 @@ export const getSessionAnswerFlowQuery = extendType({
       type: SessionType,
       args: {
         sessionId: 'ID',
+      },
+    });
+    t.list.field('sessions', {
+      type: SessionType,
+      args: {
+        where: SessionWhereUniqueInput,
+      },
+      resolve(parent: any, args: any, ctx: any) {
+        if (!args.where) {
+          const sessions = ctx.prisma.session.findMany();
+          return sessions;
+        }
+
+        const sessions = ctx.prisma.session.findMany({ where: {
+          dialogueId: args.where.dialogueId,
+        } });
+        return sessions;
       },
     });
     t.field('session', {

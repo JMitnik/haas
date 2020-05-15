@@ -13,6 +13,7 @@ import Sidenav from 'components/Sidenav';
 import Logo from 'assets/Logo';
 import { Div } from '@haas/ui';
 import DashboardLayout from './DashboardLayout';
+import InteractionsOverview from 'views/InteractionsOverview/InteractionsOverview';
 
 const DashboardPage = () => {
   console.log("Hello");
@@ -20,8 +21,8 @@ const DashboardPage = () => {
     <>
       <Switch>
         <Route path="/dashboard/c/:customerId/t/:topicId/edit" render={() => <DashboardLayout><EditTopicView /></DashboardLayout>} />
+        <Route path="/dashboard/c/:customerId/t/:topicId/interactions" render={() => <DashboardLayout><InteractionsOverview /></DashboardLayout>}/>
         <Route path="/dashboard/c/:customerId/t/:topicId/" render={() => <DashboardLayout><TopicDetail /></DashboardLayout>} />
-
         <Route path="/dashboard/c/:customerId/topic-builder" render={() => <DashboardLayout><AddTopicView /></DashboardLayout>} />
         <Route path="/dashboard/c/:customerId/edit" render={() => <DashboardLayout><EditCustomerView /></DashboardLayout>} />
         <Route path="/dashboard/customer-builder" render={() => <DashboardLayout>

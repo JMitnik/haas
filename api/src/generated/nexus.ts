@@ -80,7 +80,8 @@ export interface NexusGenInputs {
     id: string; // String!
   }
   SessionWhereUniqueInput: { // input type
-    id: string; // ID!
+    dialogueId?: string | null; // ID
+    id?: string | null; // ID
   }
   TopicDataEntry: { // input type
     id?: string | null; // ID
@@ -303,6 +304,7 @@ export interface NexusGenFieldTypes {
     questionNode: NexusGenRootTypes['QuestionNode']; // QuestionNode!
     questionNodes: NexusGenRootTypes['QuestionNode'][]; // [QuestionNode!]!
     session: NexusGenRootTypes['Session']; // Session!
+    sessions: NexusGenRootTypes['Session'][]; // [Session!]!
   }
   QuestionNode: { // field return type
     children: NexusGenRootTypes['Edge'][]; // [Edge!]!
@@ -420,6 +422,9 @@ export interface NexusGenArgTypes {
       where?: NexusGenInputs['QuestionNodeWhereUniqueInput'] | null; // QuestionNodeWhereUniqueInput
     }
     session: { // args
+      where?: NexusGenInputs['SessionWhereUniqueInput'] | null; // SessionWhereUniqueInput
+    }
+    sessions: { // args
       where?: NexusGenInputs['SessionWhereUniqueInput'] | null; // SessionWhereUniqueInput
     }
   }
