@@ -59,8 +59,6 @@ export const ImageType = objectType({
   },
 });
 
-// console.log('GraphQLUpload: ', GraphQLUpload);
-
 export const Upload = GraphQLUpload && scalarType({
   name: GraphQLUpload.name,
   asNexusMethod: 'upload', // We set this to be used as a method later as `t.upload()` if needed
@@ -70,7 +68,6 @@ export const Upload = GraphQLUpload && scalarType({
   parseLiteral: GraphQLUpload.parseLiteral,
 });
 
-console.log(Upload);
 const CustomerCreateOptionsInput = inputObjectType({
   name: 'CustomerCreateOptions',
   definition(t) {
@@ -113,9 +110,7 @@ export const CustomerMutations = Upload && extendType({
         });
 
         const result: any = await stream;
-        console.log(typeof result);
         const { url }: { url: string } = result;
-        console.log('url: ', url);
         return { filename, mimetype, encoding, url };
       },
     });
@@ -126,9 +121,7 @@ export const CustomerMutations = Upload && extendType({
         options: CustomerCreateOptionsInput,
       },
       async resolve(parent: any, args: any, ctx: any) {
-        console.log(args);
         const file = await args.options.file;
-        console.log('file: ', file);
         return CustomerResolver.createCustomer(args);
       },
     });
