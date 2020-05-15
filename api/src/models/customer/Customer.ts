@@ -4,12 +4,14 @@ import { Customer, PrismaClient } from '@prisma/client';
 import { objectType, extendType, inputObjectType, asNexusMethod, scalarType } from '@nexus/schema';
 
 import { GraphQLUpload } from 'apollo-server-express';
-import cloudinary from 'cloudinary';
+import cloudinary, { UploadApiResponse } from 'cloudinary';
 
 import { CustomerSettingsType } from '../settings/CustomerSettings';
 import { DialogueType } from '../questionnaire/Dialogue';
 import DialogueResolver from '../questionnaire/dialogue-resolver';
 import CustomerResolver from './customer-resolver';
+
+const cloud = cloudinary.v2;
 
 export const CustomerType = objectType({
   name: 'Customer',
@@ -50,13 +52,12 @@ export const CustomerWhereUniqueInput = inputObjectType({
 export const ImageType = objectType({
   name: 'ImageType',
   definition(t) {
-    t.string('filename');
-    t.string('mimetype');
-    t.string('encoding');
+    t.string('filename', { nullable: true });
+    t.string('mimetype', { nullable: true });
+    t.string('encoding', { nullable: true });
+    t.string('url', { nullable: true });
   },
 });
-
-// console.log('GraphQLUpload: ', GraphQLUpload);
 
 export const Upload = GraphQLUpload && scalarType({
   name: GraphQLUpload.name,
@@ -67,7 +68,6 @@ export const Upload = GraphQLUpload && scalarType({
   parseLiteral: GraphQLUpload.parseLiteral,
 });
 
-console.log(Upload);
 const CustomerCreateOptionsInput = inputObjectType({
   name: 'CustomerCreateOptions',
   definition(t) {
@@ -79,6 +79,10 @@ const CustomerCreateOptionsInput = inputObjectType({
   },
 });
 
+interface test {
+  url?: string;
+}
+
 export const CustomerMutations = Upload && extendType({
   type: 'Mutation',
   definition(t) {
@@ -89,8 +93,25 @@ export const CustomerMutations = Upload && extendType({
       },
       async resolve(parent: any, { file }) {
         const { createReadStream, filename, mimetype, encoding } = await file;
-        console.log('FILE NAME: ', filename);
-        return { filename, mimetype, encoding };
+        const stream = new Promise((resolve, reject) => {
+          const cld_upload_stream = cloudinary.v2.uploader.upload_stream(
+            {
+              folder: 'company_logos',
+            },
+            (error: any, result: UploadApiResponse | undefined) => {
+              if (result) {
+                return resolve(result);
+              }
+              return reject(error);
+            },
+          );
+
+          return createReadStream().pipe(cld_upload_stream);
+        });
+
+        const result: any = await stream;
+        const { url }: { url: string } = result;
+        return { filename, mimetype, encoding, url };
       },
     });
     t.field('createCustomer', {
@@ -100,9 +121,7 @@ export const CustomerMutations = Upload && extendType({
         options: CustomerCreateOptionsInput,
       },
       async resolve(parent: any, args: any, ctx: any) {
-        console.log(args);
         const file = await args.options.file;
-        console.log('file: ', file);
         return CustomerResolver.createCustomer(args);
       },
     });

@@ -135,9 +135,10 @@ export interface NexusGenRootTypes {
   }
   FontSettings: prisma.FontSettings;
   ImageType: { // root type
-    encoding: string; // String!
-    filename: string; // String!
-    mimetype: string; // String!
+    encoding?: string | null; // String
+    filename?: string | null; // String
+    mimetype?: string | null; // String
+    url?: string | null; // String
   }
   Mutation: {};
   NodeEntry: prisma.NodeEntry;
@@ -256,9 +257,10 @@ export interface NexusGenFieldTypes {
     id: string; // ID!
   }
   ImageType: { // field return type
-    encoding: string; // String!
-    filename: string; // String!
-    mimetype: string; // String!
+    encoding: string | null; // String
+    filename: string | null; // String
+    mimetype: string | null; // String
+    url: string | null; // String
   }
   Mutation: { // field return type
     createCustomer: NexusGenRootTypes['Customer']; // Customer!
