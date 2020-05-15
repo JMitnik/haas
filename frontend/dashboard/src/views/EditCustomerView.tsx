@@ -1,28 +1,38 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import { ApolloError } from 'apollo-boost';
 import { useForm } from 'react-hook-form';
 import { useMutation, useQuery } from '@apollo/react-hooks';
 import { useHistory, useParams } from 'react-router';
-import { Container, Flex, Grid, H2, H3, Muted, Button,
-  Div, StyledLabel, StyledInput, Hr, FormGroupContainer, Form } from '@haas/ui';
+import {
+  Container, Flex, Grid, H2, H3, Muted, Button,
+  Div, StyledLabel, StyledInput, Hr, FormGroupContainer, Form
+} from '@haas/ui';
 
 import { getCustomerQuery } from '../queries/getCustomersQuery';
 import editCustomerMutation from '../mutations/editCustomer';
-import getEditCustomerData from '../queries/getEditCustomer'
+import getEditCustomerData from '../queries/getEditCustomer';
+import uploadSingleImage from '../mutations/uploadSingleImage';
 
 interface FormDataProps {
   name: string;
   logo: string;
   slug: string;
   primaryColour?: string;
+  cloudinary?: string;
 }
 
 const EditCustomerView = () => {
   const history = useHistory();
   const { customerId } = useParams();
+  const [activePreview, setActivePreview] = useState('');
   const { register, handleSubmit, errors } = useForm<FormDataProps>();
-
+  const [uploadFile] = useMutation(uploadSingleImage,
+    {
+      onCompleted: (result) => {
+        setActivePreview(result.singleUpload.url);
+      },
+    })
   const getEditCustomerQuery = useQuery(getEditCustomerData, {
     variables: {
       id: customerId
@@ -40,13 +50,22 @@ const EditCustomerView = () => {
   });
 
   if (getEditCustomerQuery.loading) return null;
-  
+
+  const onChange = (event: any) => {
+    const image: File = event.target.files[0];
+    if (image) {
+      uploadFile({ variables: { file: image } });
+    }
+  }
+
   const onSubmit = (formData: FormDataProps) => {
-    const optionInput = { logo: formData.logo,
+    const optionInput = {
+      logo: activePreview,
       slug: formData.slug,
       primaryColour: formData.primaryColour,
-      name: formData.name };
-      editCustomer({
+      name: formData.name
+    };
+    editCustomer({
       variables: {
         id: getEditCustomerQuery.data?.customer?.id,
         options: optionInput,
@@ -94,16 +113,16 @@ const EditCustomerView = () => {
                   <StyledInput defaultValue={getEditCustomerQuery.data?.customer?.settings?.colourSettings?.primary} name="primaryColour" ref={register({ required: true })} />
                   {errors.name && <Muted color="warning">Something went wrong!</Muted>}
                 </Div>
-                {/* TODO: Add onChange mutation to edit customer view onChange={onChange} */}
                 <Div useFlex flexDirection="column">
                   <StyledLabel>Logo (Cloudinary)</StyledLabel>
-                  <StyledInput type="file" name="cloudinary" ref={register({ required: false })} />
+                  <StyledInput type="file" name="cloudinary" onChange={onChange} ref={register({ required: false })} />
                   {errors.name && <Muted color="warning">Something went wrong!</Muted>}
                 </Div>
                 <Div useFlex flexDirection="column">
                   <StyledLabel>Preview</StyledLabel>
                   <Div width={200} height={200} style={{ border: '1px solid lightgrey', borderRadius: '8px' }}>
-                    {getEditCustomerQuery.data?.customer?.settings?.logoUrl && <img src={getEditCustomerQuery.data?.customer?.settings?.logoUrl} height={200} width={200} />}
+                    { (!activePreview && getEditCustomerQuery.data?.customer?.settings?.logoUrl) && <img src={getEditCustomerQuery.data?.customer?.settings?.logoUrl} height={200} width={200} />}
+                    { activePreview && <img src={activePreview} height={200} width={200} />}
                   </Div>
                 </Div>
               </Grid>

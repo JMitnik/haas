@@ -27,7 +27,6 @@ const CustomerBuilderView = () => {
   const [uploadFile] = useMutation(uploadSingleImage,
     {
       onCompleted: (result) => {
-        console.log('URL: ', result.singleUpload.url);
         setActivePreview(result.singleUpload.url);
       },
     })
@@ -43,15 +42,12 @@ const CustomerBuilderView = () => {
 
   const onChange = (event: any) => {
     const image: File = event.target.files[0];
-    // TODO: New upload file mutation 
-    console.log(image);
     if (image) {
       uploadFile({ variables: { file: image } });
     }
   }
 
   const onSubmit = (formData: FormDataProps) => {
-    // TODO: Add cloudinary link instead of file 
     const optionInput = {
       logo: activePreview,
       slug: formData.slug,
