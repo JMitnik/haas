@@ -1,4 +1,5 @@
-import { NodeEntry, NodeEntryValue, Session } from '@prisma/client';
+import _ from 'lodash';
+import { NodeEntry, NodeEntryValue, Session, PrismaClient } from '@prisma/client';
 import { objectType, extendType, inputObjectType } from '@nexus/schema';
 import SessionResolver from './session-resolver';
 import { QuestionNodeType } from '../question/QuestionNode';
@@ -123,6 +124,16 @@ export const SessionWhereUniqueInput = inputObjectType({
   },
 });
 
+export const InteractionType = objectType({
+  name: 'InteractionType',
+  definition(t) {
+    t.string('sessionId');
+    t.float('score');
+    t.int('paths');
+    t.string('createdAt');
+  },
+});
+
 export const getSessionAnswerFlowQuery = extendType({
   type: 'Query',
   definition(t) {
@@ -130,6 +141,44 @@ export const getSessionAnswerFlowQuery = extendType({
       type: SessionType,
       args: {
         sessionId: 'ID',
+      },
+    });
+    t.list.field('interactions', {
+      type: InteractionType, // TODO: Might need to change to own InteractionType but not sure yet
+      args: {
+        where: SessionWhereUniqueInput,
+      },
+      async resolve(parent: any, args: any, ctx: any) {
+        const { prisma }: { prisma: PrismaClient } = ctx;
+        const sessions = await prisma.session.findMany({
+          where: {
+            dialogueId: args.where.dialogueId,
+          },
+          include: {
+            nodeEntries: {
+              select: {
+                creationDate: true,
+                depth: true,
+                values: {
+                  select: {
+                    id: true,
+                    nodeEntryId: true,
+                    numberValue: true,
+                    textValue: true,
+                  },
+                },
+              },
+            },
+          },
+        });
+        const mappedSessions = sessions.map((session) => {
+          const { id, createdAt } = session;
+          const score = session.nodeEntries.find((entry) => entry.depth === 0)?.values?.[0]?.numberValue;
+          const paths = session.nodeEntries.length;
+          return { sessionId: id, score, paths, createdAt };
+        });
+        const orderedSessions = _.orderBy(mappedSessions, (session) => session.createdAt, ['desc']);
+        return orderedSessions;
       },
     });
     t.list.field('sessions', {
@@ -143,9 +192,11 @@ export const getSessionAnswerFlowQuery = extendType({
           return sessions;
         }
 
-        const sessions = ctx.prisma.session.findMany({ where: {
-          dialogueId: args.where.dialogueId,
-        } });
+        const sessions = ctx.prisma.session.findMany({
+          where: {
+            dialogueId: args.where.dialogueId,
+          },
+        });
         return sessions;
       },
     });
@@ -155,9 +206,11 @@ export const getSessionAnswerFlowQuery = extendType({
         where: SessionWhereUniqueInput,
       },
       resolve(parent: any, args: any, ctx: any, info: any) {
-        const session = ctx.prisma.session.findOne({ where: {
-          id: args.where.id,
-        } });
+        const session = ctx.prisma.session.findOne({
+          where: {
+            id: args.where.id,
+          },
+        });
         return session;
       },
     });
@@ -181,6 +234,7 @@ export const uploadUserSessionMutation = extendType({
 });
 
 const sessionNexus = [
+  InteractionType,
   SessionWhereUniqueInput,
   getSessionAnswerFlowQuery,
   UniqueDataResultEntry,

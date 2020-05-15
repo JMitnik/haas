@@ -141,6 +141,12 @@ export interface NexusGenRootTypes {
     mimetype?: string | null; // String
     url?: string | null; // String
   }
+  InteractionType: { // root type
+    createdAt: string; // String!
+    paths: number; // Int!
+    score: number; // Float!
+    sessionId: string; // String!
+  }
   Mutation: {};
   NodeEntry: prisma.NodeEntry;
   NodeEntryValue: prisma.NodeEntryValue;
@@ -263,6 +269,12 @@ export interface NexusGenFieldTypes {
     mimetype: string | null; // String
     url: string | null; // String
   }
+  InteractionType: { // field return type
+    createdAt: string; // String!
+    paths: number; // Int!
+    score: number; // Float!
+    sessionId: string; // String!
+  }
   Mutation: { // field return type
     createCustomer: NexusGenRootTypes['Customer']; // Customer!
     createDialogue: NexusGenRootTypes['Dialogue']; // Dialogue!
@@ -300,6 +312,7 @@ export interface NexusGenFieldTypes {
     edge: NexusGenRootTypes['Edge']; // Edge!
     getQuestionnaireData: NexusGenRootTypes['DialogueDetailResult']; // DialogueDetailResult!
     getSessionAnswerFlow: NexusGenRootTypes['Session']; // Session!
+    interactions: NexusGenRootTypes['InteractionType'][]; // [InteractionType!]!
     lineChartData: NexusGenRootTypes['lineChartDataType'][]; // [lineChartDataType!]!
     questionNode: NexusGenRootTypes['QuestionNode']; // QuestionNode!
     questionNodes: NexusGenRootTypes['QuestionNode'][]; // [QuestionNode!]!
@@ -412,6 +425,9 @@ export interface NexusGenArgTypes {
     getSessionAnswerFlow: { // args
       sessionId?: string | null; // ID
     }
+    interactions: { // args
+      where?: NexusGenInputs['SessionWhereUniqueInput'] | null; // SessionWhereUniqueInput
+    }
     lineChartData: { // args
       dialogueId?: string | null; // String
       limit?: number | null; // Int
@@ -435,7 +451,7 @@ export interface NexusGenAbstractResolveReturnTypes {
 
 export interface NexusGenInheritedFields {}
 
-export type NexusGenObjectNames = "ColourSettings" | "Customer" | "CustomerSettings" | "Dialogue" | "DialogueDetailResult" | "Edge" | "EdgeCondition" | "FontSettings" | "ImageType" | "Mutation" | "NodeEntry" | "NodeEntryValue" | "Query" | "QuestionNode" | "QuestionOption" | "Session" | "UniqueDataResultEntry" | "lineChartDataType" | "topPathType";
+export type NexusGenObjectNames = "ColourSettings" | "Customer" | "CustomerSettings" | "Dialogue" | "DialogueDetailResult" | "Edge" | "EdgeCondition" | "FontSettings" | "ImageType" | "InteractionType" | "Mutation" | "NodeEntry" | "NodeEntryValue" | "Query" | "QuestionNode" | "QuestionOption" | "Session" | "UniqueDataResultEntry" | "lineChartDataType" | "topPathType";
 
 export type NexusGenInputNames = "CustomerCreateOptions" | "CustomerWhereUniqueInput" | "DialogueWhereUniqueInput" | "EdgeChildInput" | "EdgeNodeInput" | "LeafNodeInput" | "OptionInput" | "QuestionConditionInput" | "QuestionInput" | "QuestionNodeWhereInput" | "QuestionNodeWhereUniqueInput" | "SessionWhereUniqueInput" | "TopicDataEntry" | "UploadUserSessionInput" | "UserSessionEntryDataInput" | "UserSessionEntryInput";
 

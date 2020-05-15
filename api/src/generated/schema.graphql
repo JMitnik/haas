@@ -113,6 +113,13 @@ type ImageType {
   url: String
 }
 
+type InteractionType {
+  createdAt: String!
+  paths: Int!
+  score: Float!
+  sessionId: String!
+}
+
 input LeafNodeInput {
   id: ID
   title: String
@@ -170,6 +177,7 @@ type Query {
   edge(id: String): Edge!
   getQuestionnaireData(dialogueId: String, filter: Int): DialogueDetailResult!
   getSessionAnswerFlow(sessionId: ID): Session!
+  interactions(where: SessionWhereUniqueInput): [InteractionType!]!
   lineChartData(dialogueId: String, limit: Int, numberOfDaysBack: Int, offset: Int): [lineChartDataType!]!
   questionNode(where: QuestionNodeWhereUniqueInput): QuestionNode!
   questionNodes: [QuestionNode!]!
