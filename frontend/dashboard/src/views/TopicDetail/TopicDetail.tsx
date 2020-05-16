@@ -133,7 +133,7 @@ const TopicDetail = () => {
   const resultData = data?.getQuestionnaireData;
   const lineQueryData = resultData?.lineChartData;
   let timelineEntries: Array<any> = resultData?.timelineEntries
-  timelineEntries = timelineEntries.length > 8 ? timelineEntries.slice(0, 8) : timelineEntries
+  timelineEntries = timelineEntries?.length > 8 ? timelineEntries.slice(0, 8) : timelineEntries
 
   const lineData = [
     {
