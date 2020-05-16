@@ -45,7 +45,7 @@ const EditCustomerView = () => {
 const EditCustomerForm = ({ customer }: { customer: any } ) => {
   const history = useHistory();
 
-  const [activePreviewUrl, setActivePreviewUrl] = useState();
+  const [activePreviewUrl, setActivePreviewUrl] = useState(null);
 
   const { register, handleSubmit, errors } = useForm<FormDataProps>({
     defaultValues: {
@@ -87,6 +87,10 @@ const EditCustomerForm = ({ customer }: { customer: any } ) => {
       primaryColour: formData.primaryColour,
       name: formData.name
     };
+
+    console.log(customer);
+    console.log(activePreviewUrl);
+    console.log(formData);
 
     editCustomer({
       variables: {
@@ -165,7 +169,7 @@ const EditCustomerForm = ({ customer }: { customer: any } ) => {
           {loading && (<Muted>Loading...</Muted>)}
 
           <Flex>
-            <Button brand="primary" mr={2} type="submit">Save topic</Button>
+            <Button brand="primary" mr={2} type="submit">Save customer</Button>
             <Button brand="default" type="button" onClick={() => history.push('/')}>Cancel</Button>
           </Flex>
         </Div>
