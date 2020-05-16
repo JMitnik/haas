@@ -92,7 +92,7 @@ const CustomerBuilderView = () => {
                 </Flex>
                 <Div useFlex flexDirection="column">
                   <StyledLabel>Logo</StyledLabel>
-                  <StyledInput name="logo" readOnly={true} value={activePreview} ref={register({ required: false })} />
+                  <StyledInput name="logo" ref={register({ required: false })} />
                   {errors.name && <Muted color="warning">Something went wrong!</Muted>}
                 </Div>
                 <Div useFlex flexDirection="column">
