@@ -3,12 +3,16 @@
     "private": true,
     "version": "0.1.0",
     "workspaces": {
-        "nohoist": ["@prisma", "@prisma/**"]
+        "nohoist": [
+            "@prisma",
+            "@prisma/**"
+        ]
     },
     "scripts": {
         "start": "nodemon",
         "serve": "ts-node -P tsconfig.json ./src/app.ts",
         "build": "yarn",
+        "test": "jest --detectOpenHandles",
         "logs": "",
         "deploy": "echo 'not setup webhook yet'",
         "migrate:create": "npx prisma migrate save --experimental",
@@ -43,6 +47,7 @@
         "express": "^4.17.1",
         "graphql": "^14.5.8",
         "graphql-import": "^1.0.0-beta.1",
+        "graphql-upload": "^10.0.0",
         "lodash": "^4.17.15",
         "mjml": "^4.6.2",
         "nexus": "^0.20.0",
@@ -57,7 +62,10 @@
     },
     "devDependencies": {
         "@prisma/cli": "^2.0.0-beta.3",
+        "@types/jest": "^25.2.1",
+        "jest": "^26.0.0",
         "nodemon": "^2.0.3",
+        "ts-jest": "^25.4.0",
         "typescript": "^3.7.3"
     }
 }

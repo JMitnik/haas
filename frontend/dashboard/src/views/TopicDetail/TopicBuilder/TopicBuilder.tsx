@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { v4 as uuidv4 } from 'uuid';
 import { ApolloError } from 'apollo-boost';
 import { useQuery, useMutation } from '@apollo/react-hooks';
 import { H2, Loader, Div, Button } from '@haas/ui';
@@ -78,6 +77,8 @@ const TopicBuilder = () => {
 
   const questionsData = mapQuestionsInputData(data?.dialogue?.questions);
   const [questions, setQuestions] = useState(questionsData);
+  const rootQuestion = questions && questions.filter((question) => question.isRoot);
+  const [activeExpanded, setActiveExpanded] : [Array<string>, React.Dispatch<React.SetStateAction<string[]>>] = useState(['-1']);
 
   useEffect(() => {
     if (!data) {
@@ -86,6 +87,8 @@ const TopicBuilder = () => {
     if (data?.dialogue) {
       const questionData = mapQuestionsInputData(data?.dialogue?.questions);
       setQuestions(questionData);
+      const rootQuestion = questionData && questionData.filter((question) => question.isRoot);
+      setActiveExpanded(rootQuestion.map((question) => question.id))
     }
   }, [data]);
 
@@ -93,23 +96,43 @@ const TopicBuilder = () => {
     return <Loader />;
   }
 
-  const handleTitleChange = (title: string, qIndex: number) => {
+  const handleOnQuestionExpandChange = (questionId: string) => setActiveExpanded((prevExpanded: Array<string>) => {
+    if (!questionId) {
+      return [...prevExpanded];
+    }
+    if (questionId && prevExpanded.includes(questionId)) {
+      const collapseIndex: number = prevExpanded.indexOf(questionId);
+      prevExpanded.splice(collapseIndex, 1);
+      return [...prevExpanded];
+
+    }
+    return [questionId, ...prevExpanded];
+  }
+  )
+
+  const handleTitleChange = (title: string, questionId: string) => {
     setQuestions((questionsPrev: any) => {
-      questionsPrev[qIndex].title = title;
+      const questionIds = questions.map((question) => question.id)
+      const questionIndex = questionIds.indexOf(questionId)
+      questionsPrev[questionIndex].title = title;
       return [...questionsPrev];
     });
   };
 
-  const handleIsRootQuestionChange = (isRoot: boolean, qIndex: number) => {
+  const handleIsRootQuestionChange = (isRoot: boolean, questionId: string) => {
     setQuestions((questionsPrev: any) => {
-      questionsPrev[qIndex].isRoot = isRoot;
+      const questionIds = questions.map((question) => question.id)
+      const questionIndex = questionIds.indexOf(questionId)
+      questionsPrev[questionIndex].isRoot = isRoot;
       return [...questionsPrev];
     });
   };
 
-  const handleLeafNodeChange = (leaf: any, qIndex: number) => {
-    setQuestions((questionsPrev: any) => {
-      const question = questionsPrev[qIndex];
+  const handleLeafNodeChange = (leaf: any, questionId: string) => {
+    setQuestions((questionsPrev: any) => {    
+      const questionIds = questions.map((question) => question.id)
+      const questionIndex = questionIds.indexOf(questionId)
+      const question = questionsPrev[questionIndex];
       if (question.overrideLeaf?.id) {
         if (leaf?.id === 'None') {
           question.overrideLeaf = undefined;
@@ -121,40 +144,48 @@ const TopicBuilder = () => {
     });
   };
 
-  const handleQuestionTypeChange = (value: string, qIndex: number) => {
+  const handleQuestionTypeChange = (value: string, questionId: string) => {
     setQuestions((questionsPrev: any) => {
-      questionsPrev[qIndex].type = value;
+      const questionIds = questions.map((question) => question.id)
+      const questionIndex = questionIds.indexOf(questionId)
+      questionsPrev[questionIndex].type = value;
       return [...questionsPrev];
     });
   };
 
-  const handleAddQuestionOption = (value: Array<QuestionOptionProps>, qIndex: number) => {
+  const handleAddQuestionOption = (value: Array<any>, questionId: string) => {
     setQuestions((questionsPrev: any) => {
-      questionsPrev[qIndex].options = value;
+      const questionIds = questions.map((question) => question.id)
+      const questionIndex = questionIds.indexOf(questionId)
+      questionsPrev[questionIndex].options = value;
       return [...questionsPrev];
     });
   };
 
   const handleQuestionOptionsChange = (
-    questionOptions: Array<QuestionOptionProps>, qIndex: number,
+    questionOptions: Array<QuestionOptionProps>, questionId: string
   ) => {
     setQuestions((questionsPrev: any) => {
-      questionsPrev[qIndex].options = questionOptions;
+      const questionIds = questions.map((question) => question.id)
+      const questionIndex = questionIds.indexOf(questionId)
+      questionsPrev[questionIndex].options = questionOptions;
       return [...questionsPrev];
     });
   };
 
-  const handleEdgesChange = (children: Array<EdgeChildProps>, qIndex: number) => {
+  const handleEdgesChange = (children: Array<EdgeChildProps>, questionId: string) => {
     setQuestions((questionsPrev: any) => {
-      questionsPrev[qIndex].children = children;
+      const questionIds = questions.map((question) => question.id)
+      const questionIndex = questionIds.indexOf(questionId)
+      questionsPrev[questionIndex].children = children;
       return [...questionsPrev];
     });
   };
 
-  const handleAddQuestion = (event: any) => {
+  const handleAddQuestion = (event: any, quesionUUID: string) => {
     event.preventDefault();
     setQuestions((questionsPrev: any) => [...questionsPrev, {
-      id: uuidv4(),
+      id: quesionUUID,
       title: undefined,
       isRoot: false,
       isLeaf: false,
@@ -165,8 +196,19 @@ const TopicBuilder = () => {
     }]);
   };
 
+  const handleDeleteQuestion = (event: any, questionId: string) => {
+    event.preventDefault();
+    setQuestions((questionsPrev: any) => {
+      const questionIds = questions.map((question) => question.id);
+      const questionIndex = questionIds.indexOf(questionId)
+      questionsPrev.splice(questionIndex, 1);
+      return [...questionsPrev]
+    })
+  }
+  
+
   return (
-    <>
+    <Div>
       <H2 color="default.text" fontWeight={400} mb={4}>
         Topic builder
       </H2>
@@ -177,11 +219,17 @@ const TopicBuilder = () => {
           )
         }
         {
-          questions && questions.map((question: QuestionEntryProps, index: number) => (
+          rootQuestion && rootQuestion.map((question: QuestionEntryProps, index: number) => (
+          
             <QuestionEntry
+              activeExpanded={activeExpanded}
+              setActiveExpanded={setActiveExpanded}
+              onQuestionExpandChange={handleOnQuestionExpandChange}
               onIsRootQuestionChange={handleIsRootQuestionChange}
               onLeafNodeChange={handleLeafNodeChange}
               onEdgesChange={handleEdgesChange}
+              onAddQuestion={handleAddQuestion}
+              onDeleteQuestion={handleDeleteQuestion}
               onAddQuestionOption={handleAddQuestionOption}
               onQuestionOptionsChange={handleQuestionOptionsChange}
               onQuestionTypeChange={handleQuestionTypeChange}
@@ -194,16 +242,10 @@ const TopicBuilder = () => {
             />
           ))
         }
-        <Button
-          brand="default"
-          mt={2}
-          ml={4}
-          mr={4}
-          onClick={handleAddQuestion}
-        >
-          Add new question
-        </Button>
-        <Button
+       
+      </TopicBuilderView>
+      <Div display='flex' justifyContent='space-around'>
+      <Button
           brand="primary"
           mt={2}
           ml={4}
@@ -218,8 +260,19 @@ const TopicBuilder = () => {
         >
           Save topic
         </Button>
-      </TopicBuilderView>
-    </>
+      <Button
+          brand="default"
+          mt={2}
+          ml={4}
+          mr={4}
+          onClick={() => history.goBack()}
+        >
+          Cancel
+        </Button>
+        
+      </Div>
+      
+    </Div>
   );
 };
 

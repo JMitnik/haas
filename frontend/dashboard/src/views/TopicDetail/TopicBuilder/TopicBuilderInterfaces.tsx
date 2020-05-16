@@ -4,7 +4,7 @@ export interface OverrideLeafProps {
   title?: string;
 }
 export interface QuestionEntryProps {
-  id?: string;
+  id: string;
   creationDate?: string;
   title?: string;
   isRoot?: boolean;

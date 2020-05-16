@@ -14,6 +14,7 @@ export const DialogueType = objectType({
     t.string('publicTitle', { nullable: true });
     t.string('creationDate', { nullable: true });
     t.string('updatedAt', { nullable: true });
+    t.string('averageScore', { nullable: true });
     t.field('lineChartData', {
       nullable: true,
       type: 'String', // TODO: Change to appropriate return type
@@ -39,24 +40,6 @@ export const DialogueType = objectType({
         where: QuestionNodeWhereInput,
       },
       resolve(parent: Dialogue, args: any, ctx: any) {
-        // if (args?.where?.isRoot) {
-        //   const rootQuestion = ctx.prisma.questionNode.findMany({
-        //     where: {
-        //       isRoot: args.where.isRoot,
-        //     },
-        //   });
-        //   return rootQuestion;
-        // }
-
-        // if (args?.where?.id) {
-        //   const questions = ctx.prisma.questionNode.findMany({
-        //     where: {
-        //       id: args.where.id,
-        //     },
-        //   });
-        //   return questions;
-        // }
-
         const questions = ctx.prisma.questionNode.findMany({
           where: {
             AND: [
@@ -151,10 +134,11 @@ export const getQuestionnaireDataQuery = extendType({
       type: DialogueDetailResultType,
       args: {
         dialogueId: 'String',
+        filter: 'Int',
       },
       async resolve(parent: any, args: any, ctx: any, info: any) {
         const aggregatedData = await DialogueResolver.getQuestionnaireAggregatedData(parent, args);
-        const data = await DialogueResolver.getLineData(args.dialogueId, 30);
+        const data = await DialogueResolver.getLineData(args.dialogueId, args.filter);
         const result = { ...aggregatedData, ...data };
         return result;
       },
@@ -178,6 +162,20 @@ export const deleteDialogueOfCustomerMutation = extendType({
         return DialogueResolver.createDialogue(args);
       },
     });
+
+    t.field('editDialogue', {
+      type: DialogueType,
+      args: {
+        dialogueId: 'String',
+        title: 'String',
+        description: 'String',
+        publicTitle: 'String',
+      },
+      resolve(parent: any, args: any, ctx: any, info: any) {
+        return DialogueResolver.editDialogue(args);
+      },
+    });
+
     t.field('deleteDialogue', {
       type: DialogueType,
       args: {
@@ -198,9 +196,11 @@ export const DialoguesOfCustomerQuery = extendType({
       args: {
         dialogueId: 'String',
         numberOfDaysBack: 'Int',
+        limit: 'Int',
+        offset: 'Int',
       },
       resolve(parent: any, args: any, ctx: any, info: any) {
-        return DialogueResolver.getLineData(args.dialogueId, 30);
+        return DialogueResolver.getNextLineData(args.dialogueId, args.numberOfDaysBack, args.limit, args.offset);
       },
     });
     t.field('dialogue', {
@@ -208,8 +208,8 @@ export const DialoguesOfCustomerQuery = extendType({
       args: {
         where: DialogueWhereUniqueInput,
       },
-      resolve(parent: any, args: any, ctx: any, info: any) {
-        const dialogue = ctx.prisma.dialogue.findOne({ where: {
+      async resolve(parent: any, args: any, ctx: any, info: any) {
+        const dialogue = await ctx.prisma.dialogue.findOne({ where: {
           id: args.where.id,
         } });
         return dialogue;
@@ -220,13 +220,20 @@ export const DialoguesOfCustomerQuery = extendType({
       args: {
         customerId: 'ID',
       },
-      resolve(parent: any, args: any, ctx: any, info: any) {
-        const dialogues = ctx.prisma.dialogue.findMany({
+      async resolve(parent: any, args: any, ctx: any, info: any) {
+        const dialogues: Array<Dialogue> = await ctx.prisma.dialogue.findMany({
           where: {
             customerId: args.customerId,
           },
         });
-        return dialogues;
+
+        const updatedDialogues = Promise.all(dialogues.map(async (dialogue) => {
+          const arg = { dialogueId: dialogue.id };
+          const aggregated = await DialogueResolver.getQuestionnaireAggregatedData(parent, arg);
+          return { ...dialogue, averageScore: aggregated.average };
+        }));
+
+        return updatedDialogues;
       },
     });
   },

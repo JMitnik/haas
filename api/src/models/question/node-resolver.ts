@@ -251,6 +251,11 @@ class NodeResolver {
         {
           where: { id: edge.id ? edge.id : 'nooope' },
           create: {
+            dialogue: {
+              connect: {
+                id: questionnaireId,
+              },
+            },
             parentNode: {
               connect: {
                 id: edge.parentNode.id,
@@ -266,6 +271,11 @@ class NodeResolver {
             },
           },
           update: {
+            dialogue: {
+              connect: {
+                id: questionnaireId,
+              },
+            },
             parentNode: {
               connect: {
                 id: edge.parentNode.id,

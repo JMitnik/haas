@@ -2,7 +2,7 @@ import React, { Dispatch, SetStateAction } from 'react';
 import { H2, Muted, Div, Hr } from '@haas/ui';
 import { useParams, useHistory } from 'react-router-dom';
 import TimelineEntry from './TimelineEntry/TimelineEntry';
-import { TimelineFeedOverviewContainer } from './TimelineFeedOverviewStyles';
+import { TimelineFeedOverviewContainer, TimelineEntriesContainer } from './TimelineFeedOverviewStyles';
 
 interface TimelineEntryProps {
   sessionId: string;
@@ -27,20 +27,21 @@ const TimelineFeedOverview = ({
 
   return (
     <TimelineFeedOverviewContainer>
-      <Div useFlex alignItems="center" mb={4}>
-        <H2 color="primary" fontWeight={400}>
+      <H2 color="primary" fontWeight={400}>
           Timeline feed
-        </H2>
-      </Div>
-      {timelineEntries?.length > 0 && timelineEntries?.map((timelineEntry, index) => (
-        <TimelineEntry
-          viewTimeLine={viewTimeLine}
-          onActiveSessionChange={onActiveSessionChange}
-          key={index}
-          timeLineEntry={timelineEntry}
-        />
-      )
-      )}
+      </H2>
+      <TimelineEntriesContainer>
+        {timelineEntries?.length > 0 && timelineEntries?.map((timelineEntry, index) => (
+          <TimelineEntry
+            viewTimeLine={viewTimeLine}
+            onActiveSessionChange={onActiveSessionChange}
+            key={index}
+            timeLineEntry={timelineEntry}
+          />
+        )
+        )}
+      </TimelineEntriesContainer>
+
       {(timelineEntries?.length === 0 || (!timelineEntries)) && (
         <Div style={{ margin: '5px 20px' }}>No data available...</Div>
       )}

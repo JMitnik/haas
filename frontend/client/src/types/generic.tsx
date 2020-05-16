@@ -36,6 +36,7 @@ export interface HAASNode {
   id: string;
   title: string;
   type: HAASQuestionType;
+  isRoot: boolean;
   children: Array<Edge>;
   conditions?: [HAASNodeConditions];
   overrideLeaf?: HAASNode;

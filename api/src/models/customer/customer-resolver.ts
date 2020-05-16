@@ -1,5 +1,5 @@
 import { PrismaClient, Customer } from '@prisma/client';
-import { formatDistance, subDays } from 'date-fns';
+import { subDays } from 'date-fns';
 import { leafNodes } from '../../data/seeds/default-data';
 import NodeResolver from '../question/node-resolver';
 
@@ -26,8 +26,6 @@ class CustomerResolver {
     if (!customer) {
       throw new Error("Can't find slug, shit!");
     }
-
-    console.log(customer);
 
     return customer;
   };
@@ -93,10 +91,43 @@ class CustomerResolver {
     }));
   };
 
+  static editCustomer = async (args: any) => {
+    const { id, options } = args;
+    const { logo, primaryColour, slug, name } = options;
+    const customerSettings = await prisma.customerSettings.update({
+      where: {
+        customerId: id,
+      },
+      data: {
+        logoUrl: logo,
+      },
+    });
+
+    await prisma.colourSettings.update({
+      where: {
+        id: customerSettings.colourSettingsId,
+      },
+      data: {
+        primary: primaryColour,
+      },
+    });
+
+    const customer = await prisma.customer.update({
+      where: {
+        id,
+      },
+      data: {
+        slug,
+        name,
+      },
+    });
+
+    return customer;
+  };
+
   static createCustomer = async (args: any) => {
     const { name, options } = args;
-    const { isSeed, logo, primaryColour, slug } = options;
-
+    const { isSeed, logo, primaryColour, slug, cloudinary } = options;
     const customer = await prisma.customer.create({
       data: {
         name,

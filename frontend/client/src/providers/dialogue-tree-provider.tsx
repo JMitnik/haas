@@ -44,6 +44,7 @@ const makeFinishedNode: () => HAASNode = () => ({
   id: '-1',
   children: [],
   title: 'Thank you for answering!',
+  isRoot: false,
   type: 'FINISH'
 });
 
@@ -160,7 +161,7 @@ export const DialogueTreeProvider = ({ dialogue, customer, children }: TreeProvi
   const [state, dispatch] = useReducer(treeReducer, {
     dialogue,
     currentDepth: 0,
-    activeNode: dialogue.questions[0],
+    activeNode: dialogue.questions.filter((question) => question.isRoot)[0],
     activeLeaf: dialogue.leafs[0],
     activeEdge: null,
     isAtLeaf: false,
