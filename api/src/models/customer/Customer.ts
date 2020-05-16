@@ -92,17 +92,15 @@ export const CustomerMutations = Upload && extendType({
       async resolve(parent: any, { file }) {
         const { createReadStream, filename, mimetype, encoding } = await file;
         const stream = new Promise((resolve, reject) => {
-          const cld_upload_stream = cloudinary.v2.uploader.upload_stream(
-            {
-              folder: 'company_logos',
-            },
-            (error: any, result: UploadApiResponse | undefined) => {
-              if (result) {
-                return resolve(result);
-              }
-              return reject(error);
-            },
-          );
+          const cld_upload_stream = cloudinary.v2.uploader.upload_stream({
+            folder: 'company_logos',
+          },
+          (error: any, result: UploadApiResponse | undefined) => {
+            if (result) {
+              return resolve(result);
+            }
+            return reject(error);
+          });
 
           return createReadStream().pipe(cld_upload_stream);
         });

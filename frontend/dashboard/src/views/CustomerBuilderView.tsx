@@ -11,6 +11,7 @@ import {
 import { getCustomerQuery } from '../queries/getCustomersQuery';
 import { createNewCustomer } from '../mutations/createNewCustomer';
 import uploadSingleImage from '../mutations/uploadSingleImage';
+
 interface FormDataProps {
   name: string;
   logo: string;
@@ -24,13 +25,14 @@ const CustomerBuilderView = () => {
   const history = useHistory();
   const { register, handleSubmit, errors } = useForm<FormDataProps>();
   const [activePreview, setActivePreview] = useState('');
-  const [uploadFile] = useMutation(uploadSingleImage,
-    {
-      onCompleted: (result) => {
-        setActivePreview(result.singleUpload.url);
-      },
-    })
-  const [addCustomer, { data, loading }] = useMutation(createNewCustomer, {
+
+  const [uploadFile] = useMutation(uploadSingleImage, {
+    onCompleted: (result) => {
+      setActivePreview(result.singleUpload.url);
+    },
+  });
+
+  const [addCustomer, { loading }] = useMutation(createNewCustomer, {
     onCompleted: () => {
       history.push('/');
     },
@@ -45,7 +47,7 @@ const CustomerBuilderView = () => {
     if (image) {
       uploadFile({ variables: { file: image } });
     }
-  }
+  };
 
   const onSubmit = (formData: FormDataProps) => {
     const optionInput = {
