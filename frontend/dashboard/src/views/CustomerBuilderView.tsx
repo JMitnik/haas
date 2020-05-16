@@ -14,8 +14,8 @@ import uploadSingleImage from '../mutations/uploadSingleImage';
 
 interface FormDataProps {
   name: string;
-  logo: string;
   slug: string;
+  logo?: string;
   cloudinary?: File;
   primaryColour?: string;
   seed?: boolean;
@@ -51,7 +51,7 @@ const CustomerBuilderView = () => {
 
   const onSubmit = (formData: FormDataProps) => {
     const optionInput = {
-      logo: activePreview,
+      logo: activePreview || formData.logo,
       slug: formData.slug,
       isSeed: formData.seed,
       primaryColour: formData.primaryColour,
@@ -92,7 +92,7 @@ const CustomerBuilderView = () => {
                 </Flex>
                 <Div useFlex flexDirection="column">
                   <StyledLabel>Logo</StyledLabel>
-                  <StyledInput name="logo" readOnly={true} value={activePreview} ref={register({ required: true })} />
+                  <StyledInput name="logo" readOnly={true} value={activePreview} ref={register({ required: false })} />
                   {errors.name && <Muted color="warning">Something went wrong!</Muted>}
                 </Div>
                 <Div useFlex flexDirection="column">
@@ -125,7 +125,7 @@ const CustomerBuilderView = () => {
                   name="seed"
                   ref={register({ required: false })}
                 />
-                <label htmlFor="seed"> Generate template topic for customer </label>
+                <label htmlFor="seed">Generate template topic for customer </label>
               </Div>
             </Div>
           </Grid>
