@@ -45,7 +45,7 @@ const EditCustomerView = () => {
 const EditCustomerForm = ({ customer }: { customer: any } ) => {
   const history = useHistory();
 
-  const [activePreviewUrl, setActivePreviewUrl] = useState(null);
+  const [activePreviewUrl, setActivePreviewUrl] = useState<null | string>(null);
 
   const { register, handleSubmit, errors } = useForm<FormDataProps>({
     defaultValues: {
