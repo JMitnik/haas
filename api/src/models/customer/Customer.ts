@@ -1,7 +1,7 @@
 
 import { Customer, PrismaClient } from '@prisma/client';
 
-import { objectType, extendType, inputObjectType, asNexusMethod, scalarType } from '@nexus/schema';
+import { objectType, extendType, inputObjectType, scalarType } from '@nexus/schema';
 
 import { GraphQLUpload } from 'apollo-server-express';
 import cloudinary, { UploadApiResponse } from 'cloudinary';
@@ -10,8 +10,6 @@ import { CustomerSettingsType } from '../settings/CustomerSettings';
 import { DialogueType } from '../questionnaire/Dialogue';
 import DialogueResolver from '../questionnaire/dialogue-resolver';
 import CustomerResolver from './customer-resolver';
-
-const cloud = cloudinary.v2;
 
 export const CustomerType = objectType({
   name: 'Customer',

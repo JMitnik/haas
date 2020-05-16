@@ -23,14 +23,7 @@ const TopicsOverview: FC = () => {
   if (loading) return <p>Loading</p>;
 
   if (error) {
-    return (
-      <p>
-        `
-        Error:
-        {error.message}
-        `
-      </p>
-    );
+    return <p>Error: {error.message}</p>;
   }
 
   const topics: Array<any> = data?.dialogues;
@@ -38,7 +31,7 @@ const TopicsOverview: FC = () => {
   return (
     <>
       <Container>
-        <H2 color="default.text" fontWeight={400} mb={4}>Topics</H2>
+        <H2 color="default.text" fontWeight={400} mb={4}>Dialogues</H2>
 
         <Grid
           gridGap={4}
@@ -52,7 +45,7 @@ const TopicsOverview: FC = () => {
             <Div>
               <Plus />
               <H3>
-                Add topic
+                Add dialogue
               </H3>
             </Div>
           </AddTopicCard>
@@ -108,7 +101,7 @@ const TopicCard = ({ topic }: { topic: any }) => {
             {topic.title}
           </H3>
           <Label brand="success">
-            {topic.averageScore === 'false' ? 'N/A' : topic.averageScore}
+            {topic.averageScore === 'false' ? 'N/A' : Number(topic.averageScore).toFixed(1)}
           </Label>
         </Flex>
       </CardBody>

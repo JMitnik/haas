@@ -98,17 +98,17 @@ const EditCustomerView = () => {
                   <StyledInput defaultValue={getEditCustomerQuery.data?.customer?.name} name="name" ref={register({ required: true })} />
                   {errors.name && <Muted color="warning">Something went wrong!</Muted>}
                 </Flex>
-                <Div useFlex pl={4} flexDirection="column">
+                <Div useFlex flexDirection="column">
                   <StyledLabel>Logo</StyledLabel>
                   <StyledInput defaultValue={getEditCustomerQuery.data?.customer?.settings?.logoUrl} name="logo" ref={register({ required: true })} />
                   {errors.name && <Muted color="warning">Something went wrong!</Muted>}
                 </Div>
-                <Div useFlex pl={4} flexDirection="column">
+                <Div useFlex flexDirection="column">
                   <StyledLabel>Slug</StyledLabel>
                   <StyledInput defaultValue={getEditCustomerQuery.data?.customer?.slug} name="slug" ref={register({ required: true })} />
                   {errors.name && <Muted color="warning">Something went wrong!</Muted>}
                 </Div>
-                <Div useFlex py={4} flexDirection="column">
+                <Div useFlex flexDirection="column">
                   <StyledLabel>Primary colour</StyledLabel>
                   <StyledInput defaultValue={getEditCustomerQuery.data?.customer?.settings?.colourSettings?.primary} name="primaryColour" ref={register({ required: true })} />
                   {errors.name && <Muted color="warning">Something went wrong!</Muted>}
@@ -121,7 +121,7 @@ const EditCustomerView = () => {
                 <Div useFlex flexDirection="column">
                   <StyledLabel>Preview</StyledLabel>
                   <Div width={200} height={200} style={{ border: '1px solid lightgrey', borderRadius: '8px' }}>
-                    { (!activePreview && getEditCustomerQuery.data?.customer?.settings?.logoUrl) && <img src={getEditCustomerQuery.data?.customer?.settings?.logoUrl} height={200} width={200} />}
+                    { (!activePreview && getEditCustomerQuery.data?.customer?.settings?.logoUrl) && <img src={getEditCustomerQuery.data?.customer?.settings?.logoUrl} height={200} width={200} style={{ objectFit: 'contain' }} />}
                     { activePreview && <img src={activePreview} height={200} width={200} />}
                   </Div>
                 </Div>
