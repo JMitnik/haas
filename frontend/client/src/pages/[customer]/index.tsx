@@ -17,7 +17,6 @@ const getCustomerFromSlug = gql`
     ${CustomerFragment}
 `;
 
-
 const CustomerPage = () => {
     const { customerSlug } = useParams();
     const history = useHistory();

@@ -32,6 +32,9 @@ const getDialogueQuery = gql`
         title
         type
       }
+      rootQuestion {
+        ...QuestionFragment
+      }
       customerId
       questions {
         ...QuestionFragment

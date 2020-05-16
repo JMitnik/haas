@@ -1,49 +1,30 @@
-import { renderHook } from '@testing-library/react-hooks';
+import { renderHook, act } from '@testing-library/react-hooks';
 import { render } from "@testing-library/react";
 import React from "react";
 import useProject, { ProjectProvider } from "../ProjectProvider";
 import useDialogueTree, { DialogueTreeProvider } from './DialogueTreeProvider';
+import MockContainer from 'tests/mocks/MockContainer';
+import wait from 'waait';
 
-test('<ProjectProvider /> renders', () => {
-    render(
-        <ProjectProvider>
-            <></>
-        </ProjectProvider>
-    );
-});
-
-
-const MockChild = ({ children }: { children?: React.ReactNode }) => {
-
-  return (
-    <>
-      {children}
-    </>
-  );
-};
-
-const MockProviders = ({children}: { children?: React.ReactNode }) => (
-  <ProjectProvider>
-      <DialogueTreeProvider>
-        <MockChild>
-          {children}
-        </MockChild>
-      </DialogueTreeProvider>
-  </ProjectProvider>
-);
 
 test('<DialogueTreeProvider /> renders without known project', () => {
-    const { result } = renderHook(() => useDialogueTree(), { wrapper: MockProviders });
+    const { result } = renderHook(() => useDialogueTree(), { wrapper: MockContainer });
 
     // Check on initial state
     expect(result.current.treeState.currentDepth).toBe(0);
     expect(result.current.treeState.activeNode).toBe(null);
 });
 
-test('<DialogueTreeProvider /> gets set once project is set', () => {
-    const { result } = renderHook(() => useDialogueTree(), { wrapper: MockProviders });
+test('<DialogueTreeProvider /> updates once <ProjectProvider is updated />', async () => {
+    const wrapper = ({ children }: { children?: React.ReactNode }) => <MockContainer baseUrl="/companyX/123">{children}</MockContainer>;
+    const { result } = renderHook(() => useDialogueTree(), { wrapper });
 
-    // Check that first is empty
-    expect(result.current.treeState.currentDepth).toBe(0);
-    expect(result.current.treeState.activeNode).toBe(null);
+
+    await act(async () => {
+      await wait(0);
+    });
+
+    // Check that depth is not null, and that id is not falsy.
+    expect(result.current.treeState.currentDepth).toBe(1);
+    expect(result.current.treeState.activeNode?.id).toBeTruthy();
 });

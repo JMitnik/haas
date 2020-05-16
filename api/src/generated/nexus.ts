@@ -201,6 +201,7 @@ export interface NexusGenFieldTypes {
     lineChartData: string | null; // String
     publicTitle: string | null; // String
     questions: NexusGenRootTypes['QuestionNode'][]; // [QuestionNode!]!
+    rootQuestion: NexusGenRootTypes['QuestionNode']; // QuestionNode!
     title: string; // String!
     updatedAt: string | null; // String
   }

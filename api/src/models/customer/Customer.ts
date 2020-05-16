@@ -148,7 +148,6 @@ export const CustomersQuery = extendType({
       type: CustomerType,
       async resolve(parent: any, args: any, ctx: any) {
         const customers = await ctx.prisma.customer.findMany();
-        console.log(customers);
         return customers;
       },
     });
@@ -170,8 +169,6 @@ export const CustomerQuery = extendType({
       },
       async resolve(parent: any, args: any, ctx: any): Promise<Customer | null> {
         const { prisma } : { prisma: PrismaClient } = ctx;
-
-        console.log(prisma);
 
         if (args.slug) {
           const customer = await prisma.customer.findOne({ where: { slug: args.slug } });

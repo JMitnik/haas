@@ -45,6 +45,7 @@ type Dialogue {
   lineChartData: String
   publicTitle: String
   questions(where: QuestionNodeWhereInput): [QuestionNode!]!
+  rootQuestion: QuestionNode!
   title: String!
   updatedAt: String
 }

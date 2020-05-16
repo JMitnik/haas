@@ -1,49 +1,30 @@
-import React, { useContext, useReducer } from 'react';
-import { HAASNode, HAASEntry, HAASEdge, HAASFormEntry, Dialogue, CustomerProps } from 'types/generic';
+import React, { useContext, useReducer, useEffect } from 'react';
+import gql from 'graphql-tag';
+import { HAASNode, HAASEntry, HAASEdge, HAASFormEntry } from 'types/generic';
 import { getQuestionNodeQuery } from '../../queries/getQuestionNodeQuery';
 import client from '../../config/apollo';
-import { useHistory, useLocation } from 'react-router-dom';
 import useProject from 'providers/ProjectProvider/ProjectProvider';
-import { Loader } from '@haas/ui';
+import { TreeStateProps, TreeAction, TreeDispatchProps } from './DialogueTreeProviderTypes';
+import { useHistory, useLocation, useRouteMatch } from 'react-router-dom';
+import { useApolloClient } from '@apollo/react-hooks';
+import { EdgeFragment } from 'queries/EdgeFragment';
+import { QuestionFragment } from 'queries/QuestionFragment';
+import { ShallowNodeFragment } from 'queries/ShallowNodeFragment';
 
-interface TreeDispatchProps {
-  goToChild: (
-    currentNode: HAASNode,
-    key: string | number | null,
-    newNodeFormEntry: HAASFormEntry
-  ) => void;
-}
+const defaultActiveLeaf: HAASNode = {
+  id: '-1',
+  type: 'FINISH',
+  title: 'Thank you for participating!',
+  children: [],
+};
 
-type TreeAction =
-  | {
-      type: 'goToChild';
-      nextNode: HAASNode | null;
-      nextEdge: HAASEdge | null;
-      newNodeFormEntry: HAASFormEntry;
-    }
-  | {
-      type: 'finish';
-    }
-  | {
-    type: 'setDialogueAndCustomer';
-    dialogue: Dialogue;
-    customer: any;
-    }
-  | {
-    type: 'unsetDialogueAndCustomer'
-    }
-
-interface TreeStateProps {
-  historyStack: HAASEntry[];
-  currentDepth: number;
-  activeLeaf: HAASNode;
-  dialogue: Dialogue | null;
-  isAtLeaf: boolean;
-  isFinished: boolean;
-  activeNode: HAASNode | null;
-  activeEdge: HAASEdge | null;
-  customer: any;
-}
+const defaultTreeState: TreeStateProps = {
+  historyStack: [],
+  currentDepth: 0,
+  activeLeaf: defaultActiveLeaf,
+  isAtLeaf: false,
+  isFinished: false,
+};
 
 const makeFinishedNode: () => HAASNode = () => ({
   id: '-1',
@@ -60,47 +41,42 @@ const makeFinishedNode: () => HAASNode = () => ({
 const treeReducer = (state: TreeStateProps, action: TreeAction): TreeStateProps => {
   switch (action.type) {
     case 'goToChild': {
-      if (!state.activeNode) return state;
-
       // Construct new node entry from form-entry
       const newNodeEntry: HAASEntry = {
         depth: state.currentDepth,
-        node: state.activeNode,
-        edge: state.activeEdge,
-        data: action.newNodeFormEntry
+        node: action.payload.currentNode,
+        data: action.payload.nodeEntry
       };
 
       const nextDepth = state.currentDepth + 1;
 
       // Check if next state has leaf to override
-      let activeLeaf = state.activeLeaf;
-      if (action.nextNode?.overrideLeaf) {
-        activeLeaf = action.nextNode.overrideLeaf;
-      }
+      const activeLeaf = state.activeLeaf;
+      // if (action.nextNode?.overrideLeaf) {
+      //   activeLeaf = action.nextNode.overrideLeaf;
+      // }
 
-      let nextNode = action.nextNode;
+      // let nextNode = action.nextNode;
 
       // First check if we are already at leaf
       // if so override with final leaf, and
       let isFinished = state.isFinished;
-      let isAtLeaf = state.isAtLeaf;
+      const isAtLeaf = state.isAtLeaf;
       if (isAtLeaf) {
-        nextNode = makeFinishedNode();
+        // nextNode = makeFinishedNode();
         isFinished = true;
       }
 
       // If not, check if we arrive at leaf
       // if so override with leaf
-      if (!nextNode) {
-        nextNode = state.activeLeaf;
-        isAtLeaf = true;
-      }
+      // if (!nextNode) {
+      //   nextNode = state.activeLeaf;
+      //   isAtLeaf = true;
+      // }
 
       return {
         ...state,
         currentDepth: nextDepth,
-        activeNode: nextNode,
-        activeEdge: action.nextEdge,
         isFinished,
         isAtLeaf,
         activeLeaf,
@@ -108,12 +84,14 @@ const treeReducer = (state: TreeStateProps, action: TreeAction): TreeStateProps 
       };
     }
 
-    case 'setDialogueAndCustomer':
+    case 'startTree':
       return {
         ...state,
-        dialogue: action.dialogue,
-        customer: action.customer
+        currentDepth: 1,
       };
+
+    case 'resetTree':
+      return defaultTreeState;
 
     default:
       return state;
@@ -166,32 +144,24 @@ const findNextNode = async (edge: HAASEdge | null) => {
   return null;
 };
 
-const defaultActiveLeaf: HAASNode = {
-  id: '-1',
-  type: 'FINISH',
-  title: 'Thank you for participating!',
-  children: [],
-};
-
-
 export const HAASTreeStateContext = React.createContext({} as TreeStateProps);
 export const HAASTreeDispatchContext = React.createContext({} as TreeDispatchProps);
 
 // Provider which manages the state of the context
 export const DialogueTreeProvider = ({ children }: { children: React.ReactNode }) => {
-  const [state, dispatch] = useReducer(treeReducer, {
-    historyStack: [],
-    currentDepth: 0,
-    activeLeaf: defaultActiveLeaf,
-    activeNode: null,
-    dialogue: null,
-    isAtLeaf: false,
-    isFinished: false,
-    activeEdge: null,
-    customer: null,
-  });
+  const [state, dispatch] = useReducer(treeReducer, defaultTreeState);
+  const history = useHistory();
+  const client = useApolloClient();
+  const {customer, dialogue} = useProject();
+  const edgeMatch = useRouteMatch<{ companySlug: string, projectId: string, edgeId: string }>('/:companySlug/:projectId/:edgeId?');
 
-  console.log(state);
+  // Start the tree project
+  useEffect(() => {
+    // TODO: #113 Decide what to do if customer can be found but dialogue can't.
+    if (dialogue && customer) {
+      dispatch({ type: 'startTree', payload: { rootNode: dialogue.rootQuestion } })
+    }
+  }, [customer, dialogue]);
 
   const goToChild = async (
     currentNode: HAASNode,
@@ -199,14 +169,73 @@ export const DialogueTreeProvider = ({ children }: { children: React.ReactNode }
     nodeEntry: HAASFormEntry
   ) => {
     const nextEdge = findNextEdge(currentNode, key);
-    const nextNode = await findNextNode(nextEdge);
+    dispatch({ type: 'goToChild', payload: { currentNode, nodeEntry } });
 
-    dispatch({ type: 'goToChild', nextNode, nextEdge, newNodeFormEntry: nodeEntry });
+    if (edgeMatch && nextEdge) {
+      history.push(`/${edgeMatch.params.companySlug}/${edgeMatch.params.projectId}/${nextEdge?.id}`)
+      return;
+    }
+
+    if (edgeMatch && !nextEdge) {
+      history.push(`/${edgeMatch.params.companySlug}/${edgeMatch.params.projectId}/leaf/${state.activeLeaf.id}`)
+      return;
+    }
+  };
+
+  const getActiveNode = (edgeId?: string) => {
+    if (dialogue && edgeId) {
+      const data = client.readQuery({
+        query: gql`
+          query edge {
+            edge(id: ${edgeId}) {
+              childNode {
+                ...QuestionFragment
+              }
+            }
+          }
+
+          ${QuestionFragment}
+        `
+      });
+
+      return data?.edge?.childNode;
+    }
+
+    return dialogue?.rootQuestion;
+  }
+
+  const getActiveLeaf = (leafId: string) => {
+    if (dialogue && leafId) {
+      // TODO: #115 Resolve this nicer
+      if (leafId === "-1") {
+        return defaultActiveLeaf;
+      }
+
+      const data = client.readQuery({
+        query: gql`
+          query questionNode($id: ID!) {
+            questionNode(id: $id) {
+              id
+              title
+              type
+            }
+          }
+        `,
+        variables: {
+          id: leafId
+        }
+      });
+
+      console.log(data);
+      return data.questionNode;
+    }
+
+    return null;
   };
 
   return (
     <HAASTreeStateContext.Provider value={state}>
-      <HAASTreeDispatchContext.Provider value={{ goToChild }}>
+      <HAASTreeDispatchContext.Provider value={{ goToChild, getActiveNode, getActiveLeaf }}>
         {children}
       </HAASTreeDispatchContext.Provider>
     </HAASTreeStateContext.Provider>

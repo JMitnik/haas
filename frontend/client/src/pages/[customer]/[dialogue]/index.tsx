@@ -39,37 +39,10 @@ const getDialogueQuery = gql`
 
 
 const DialogueTreePage = () => {
-  const { customer, dialogue, setCustomerAndDialogue, setDialogue } = useProject();
-  const { dialogueId } = useParams();
-  const [customTheme, setCustomTheme] = useState({});
-
-  const { data, error, loading } = useQuery(getDialogueQuery, {
-    variables: {
-      id: dialogueId,
-    }
-  });
-
-  // Customize app for customer
-  useEffect(() => {
-    if (data?.dialogue?.customer?.name) {
-      window.document.title = `${data.dialogue?.customer?.name} | Powered by HAAS`;
-    }
-
-    if (data?.dialogue?.customer?.settings) {
-      const customerTheme = { colors: data.dialogue?.customer?.settings.colourSettings };
-      setCustomTheme(customerTheme);
-    }
-  }, [data]);
-
-  if (loading) return <Loader/>
-  if (error) return <p>Shit</p>
+  const { customer, dialogue } = useProject();
 
   return (
-    <ThemeProvider theme={(theme: any) => makeCustomTheme(theme, customTheme)}>
-      <DialogueTreeLayout>
-        <NodePage />
-      </DialogueTreeLayout>
-    </ThemeProvider>
+      <NodePage />
   );
 }
 

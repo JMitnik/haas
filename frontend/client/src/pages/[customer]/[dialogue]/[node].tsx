@@ -38,17 +38,20 @@ const NodeType = ({ isLeaf, node }: GenericNodeProps) => {
 };
 
 const NodePage = () => {
-  const params = useParams<{ edgeId: string }>();
-  const { treeState: { activeNode } } = useDialogueTree();
+  const { edgeId, leafId } = useParams<{ edgeId?: string, leafId?: string }>();
+  const { treeDispatch: { getActiveNode, getActiveLeaf } } = useDialogueTree();
 
-  if (!params) {}
+  let activeNode = null;
+  activeNode = getActiveNode(edgeId);
+  if (leafId) activeNode= getActiveLeaf(leafId);
+
+  if (!activeNode) return <Loader />
 
   return (
     <DialogueTreeLayout>
-      Test
-      {/* <NodeLayout activeNode={activeNode}> */}
-        {/* <NodeType /> */}
-      {/* </NodeLayout> */}
+      <NodeLayout activeNode={activeNode}>
+        <NodeType node={activeNode} />
+      </NodeLayout>
     </DialogueTreeLayout>
   );
 }

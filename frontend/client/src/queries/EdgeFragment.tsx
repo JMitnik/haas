@@ -1,4 +1,5 @@
 import gql from 'graphql-tag';
+import { ShallowNodeFragment } from './ShallowNodeFragment';
 
 export const EdgeFragment = gql`
   fragment EdgeFragment on Edge {
@@ -15,8 +16,9 @@ export const EdgeFragment = gql`
       title
     }
     childNode {
-      id
-      title
+      ...ShallowNodeFragment
     }
   }
+
+  ${ShallowNodeFragment}
 `;
