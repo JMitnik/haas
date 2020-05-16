@@ -24,7 +24,7 @@ const DashboardPage = () => {
 
         <Route path="/dashboard/c/:customerId/topic-builder" render={() => <DashboardLayout><AddTopicView /></DashboardLayout>} />
         <Route path="/dashboard/c/:customerId/edit" render={() => <DashboardLayout><EditCustomerView /></DashboardLayout>} />
-        <Route path="/dashboard/customer-builder" render={() => <DashboardLayout>
+        <Route path="/dashboard/c/:customerId/customer-builder" render={() => <DashboardLayout>
           <CustomerBuilderView />
         </DashboardLayout>} />
         <Route path="/dashboard/c/:customerId/" render={() => <DashboardLayout>

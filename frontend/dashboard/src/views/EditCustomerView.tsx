@@ -88,10 +88,6 @@ const EditCustomerForm = ({ customer }: { customer: any } ) => {
       name: formData.name
     };
 
-    console.log(customer);
-    console.log(activePreviewUrl);
-    console.log(formData);
-
     editCustomer({
       variables: {
         id: customer?.id,
@@ -127,7 +123,7 @@ const EditCustomerForm = ({ customer }: { customer: any } ) => {
                 </Flex>
                 <Div useFlex flexDirection="column">
                   <StyledLabel>Logo</StyledLabel>
-                  <StyledInput name="logo" ref={register({ required: false })} />
+                  <StyledInput name="logo" ref={register({ required: true })} />
                   {errors.name && <Muted color="warning">Something went wrong!</Muted>}
                 </Div>
                 <Div useFlex flexDirection="column">

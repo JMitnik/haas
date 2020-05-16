@@ -129,7 +129,7 @@ const TopicBuilder = () => {
   };
 
   const handleLeafNodeChange = (leaf: any, questionId: string) => {
-    setQuestions((questionsPrev: any) => {    
+    setQuestions((questionsPrev: any) => {
       const questionIds = questions.map((question) => question.id)
       const questionIndex = questionIds.indexOf(questionId)
       const question = questionsPrev[questionIndex];
@@ -205,7 +205,7 @@ const TopicBuilder = () => {
       return [...questionsPrev]
     })
   }
-  
+
 
   return (
     <Div>
@@ -218,31 +218,28 @@ const TopicBuilder = () => {
             <Div alignSelf="center">No question available...</Div>
           )
         }
-        {
-          rootQuestion && rootQuestion.map((question: QuestionEntryProps, index: number) => (
-          
-            <QuestionEntry
-              activeExpanded={activeExpanded}
-              setActiveExpanded={setActiveExpanded}
-              onQuestionExpandChange={handleOnQuestionExpandChange}
-              onIsRootQuestionChange={handleIsRootQuestionChange}
-              onLeafNodeChange={handleLeafNodeChange}
-              onEdgesChange={handleEdgesChange}
-              onAddQuestion={handleAddQuestion}
-              onDeleteQuestion={handleDeleteQuestion}
-              onAddQuestionOption={handleAddQuestionOption}
-              onQuestionOptionsChange={handleQuestionOptionsChange}
-              onQuestionTypeChange={handleQuestionTypeChange}
-              onTitleChange={handleTitleChange}
-              key={index}
-              index={index}
-              questionsQ={questions}
-              question={question}
-              leafs={selectLeafs}
-            />
-          ))
-        }
-       
+        {rootQuestion && rootQuestion.map((question: QuestionEntryProps, index: number) => (
+          <QuestionEntry
+            activeExpanded={activeExpanded}
+            setActiveExpanded={setActiveExpanded}
+            onQuestionExpandChange={handleOnQuestionExpandChange}
+            onIsRootQuestionChange={handleIsRootQuestionChange}
+            onLeafNodeChange={handleLeafNodeChange}
+            onEdgesChange={handleEdgesChange}
+            onAddQuestion={handleAddQuestion}
+            onDeleteQuestion={handleDeleteQuestion}
+            onAddQuestionOption={handleAddQuestionOption}
+            onQuestionOptionsChange={handleQuestionOptionsChange}
+            onQuestionTypeChange={handleQuestionTypeChange}
+            onTitleChange={handleTitleChange}
+            key={index}
+            index={index}
+            questionsQ={questions}
+            question={question}
+            leafs={selectLeafs}
+          />
+        ))}
+
       </TopicBuilderView>
       <Div display='flex' justifyContent='space-around'>
       <Button
@@ -269,9 +266,7 @@ const TopicBuilder = () => {
         >
           Cancel
         </Button>
-        
       </Div>
-      
     </Div>
   );
 };
