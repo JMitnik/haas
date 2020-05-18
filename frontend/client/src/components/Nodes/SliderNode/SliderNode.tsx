@@ -1,4 +1,4 @@
-import React, { useReducer } from 'react';
+import React from 'react';
 import { Div, H2 } from '@haas/ui';
 import { useForm } from 'react-hook-form';
 import useHAASTree from 'providers/dialogue-tree-provider';
@@ -6,7 +6,7 @@ import { cleanInt } from 'utils/cleanInt';
 import { GenericNodeProps } from '../Node/Node';
 import { HAASFormEntry } from 'types/generic';
 import { SliderNodeContainer, SliderNodeValue } from './SliderNodeStyles';
-import { useAnimation, motion } from 'framer-motion';
+import { useAnimation } from 'framer-motion';
 import Slider from './Slider';
 
 type SliderNodeProps = GenericNodeProps;
