@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect } from 'react';
+import React, { useLayoutEffect } from 'react';
 import { Switch, Route } from 'react-router-dom';
 
 import AppProviders from 'providers/app-providers';
