@@ -42,15 +42,33 @@ const InteractionsOverview = () => {
 
     console.log('columns: ', columns);
     console.log('interactions: ', interactions);
-
     const {
         getTableProps,
         getTableBodyProps,
         headerGroups,
-        rows,
         prepareRow,
-    } = useTable({ data: interactions, columns });
-
+        page, // Instead of using 'rows', we'll use page,
+        // which has only the rows for the active page
+    
+        // The rest of these things are super handy, too ;)
+        canPreviousPage,
+        canNextPage,
+        pageOptions,
+        pageCount,
+        gotoPage,
+        nextPage,
+        previousPage,
+        setPageSize,
+        state: { pageIndex, pageSize },
+      } = useTable(
+        {
+          columns,
+          data: interactions,
+          initialState: { pageIndex: 1 },
+        },
+        usePagination
+      )
+    
     if (loading) return null;
 
     console.log('Data: ', interactions);
@@ -80,11 +98,11 @@ const InteractionsOverview = () => {
                 {
                     interactions && <table {...getTableProps()} style={{ border: 'solid 1px blue', width: '100%', overflowY: "auto" }}>
                         <thead style={{
-                  borderBottom: 'solid 3px red',
-                  background: 'aliceblue',
-                  color: 'black',
-                  fontWeight: 'bold',
-                }}>
+                            borderBottom: 'solid 3px red',
+                            background: 'aliceblue',
+                            color: 'black',
+                            fontWeight: 'bold',
+                        }}>
                             {headerGroups.map((headerGroup, index) => (
                                 <tr key={index} {...headerGroup.getHeaderGroupProps()}>
                                     {headerGroup.headers.map((column, index) => (
@@ -94,16 +112,16 @@ const InteractionsOverview = () => {
                             ))}
                         </thead>
                         <tbody {...getTableBodyProps()}>
-                            {rows.map((row, index) => {
+                            {page.map((row: any, index: number) => {
                                 prepareRow(row)
                                 return (
                                     <tr key={index} {...row.getRowProps()}>
-                                        {row.cells.map((cell, index) => {
-                                            return <td  style={{
+                                        {row.cells.map((cell: any, index: number) => {
+                                            return <td style={{
                                                 padding: '10px',
                                                 border: 'solid 1px gray',
                                                 background: 'papayawhip',
-                                              }} key={index} {...cell.getCellProps()}>{cell.render('Cell')}</td>
+                                            }} key={index} {...cell.getCellProps()}>{cell.render('Cell')}</td>
                                         })}
                                     </tr>
                                 )
@@ -113,7 +131,50 @@ const InteractionsOverview = () => {
                 }
 
             </Div>
-            <Div justifyContent="center">Pagination here</Div>
+            <div className="pagination">
+        <button onClick={() => gotoPage(0)} disabled={!canPreviousPage}>
+          {'<<'}
+        </button>{' '}
+        <button onClick={() => previousPage()} disabled={!canPreviousPage}>
+          {'<'}
+        </button>{' '}
+        <button onClick={() => nextPage()} disabled={!canNextPage}>
+          {'>'}
+        </button>{' '}
+        <button onClick={() => gotoPage(pageCount - 1)} disabled={!canNextPage}>
+          {'>>'}
+        </button>{' '}
+        <span>
+          Page{' '}
+          <strong>
+            {pageIndex + 1} of {pageOptions.length}
+          </strong>{' '}
+        </span>
+        <span>
+          | Go to page:{' '}
+          <input
+            type="number"
+            defaultValue={pageIndex + 1}
+            onChange={e => {
+              const page = e.target.value ? Number(e.target.value) - 1 : 0
+              gotoPage(page)
+            }}
+            style={{ width: '100px' }}
+          />
+        </span>{' '}
+        <select
+          value={pageSize}
+          onChange={e => {
+            setPageSize(Number(e.target.value))
+          }}
+        >
+          {[10, 20, 30, 40, 50].map(pageSize => (
+            <option key={pageSize} value={pageSize}>
+              Show {pageSize}
+            </option>
+          ))}
+        </select>
+      </div>
         </Div>
     )
 }
