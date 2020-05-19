@@ -46,7 +46,7 @@ const CustomerCard = ({ customer }: { customer: any }) => {
           <CustomerCardEnqueteLabel>
             {customer?.dialogues ? customer?.dialogues.length : 'No'}
             {' '}
-            {customer?.dialogues?.length == 1 ? 'dialogue' : 'dialogues'}
+            {customer?.dialogues?.length === 1 ? 'dialogue' : 'dialogues'}
           </CustomerCardEnqueteLabel>
         </Flex>
       </CardBody>

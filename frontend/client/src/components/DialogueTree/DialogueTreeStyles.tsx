@@ -9,9 +9,8 @@ export const DialogueContainer = styled(Div)`
     padding: 5vh ${theme.gutter}px;
     margin: 0 auto;
     display: flex;
-    min-height: 100%;
-    min-height: -webkit-fill-available;
     width: 100%;
+    min-height: calc(var(--vh, 1vh) * 100);
     justify-content: center;
     align-items: stretch;
 
