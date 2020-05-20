@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import { format } from 'date-fns';
 import { NodeEntry, NodeEntryValue, Session, PrismaClient } from '@prisma/client';
 import { objectType, extendType, inputObjectType } from '@nexus/schema';
 import SessionResolver from './session-resolver';
@@ -144,7 +145,7 @@ export const getSessionAnswerFlowQuery = extendType({
       },
     });
     t.list.field('interactions', {
-      type: InteractionType, // TODO: Might need to change to own InteractionType but not sure yet
+      type: InteractionType,
       args: {
         where: SessionWhereUniqueInput,
       },
@@ -175,7 +176,8 @@ export const getSessionAnswerFlowQuery = extendType({
           const { id, createdAt } = session;
           const score = session.nodeEntries.find((entry) => entry.depth === 0)?.values?.[0]?.numberValue;
           const paths = session.nodeEntries.length;
-          return { sessionId: id, score, paths, createdAt };
+          const formattedCreatedAt = format(createdAt, 'dd-LLL-yyyy HH:mm:ss.SSS');
+          return { sessionId: id, score, paths, createdAt: formattedCreatedAt };
         });
         const orderedSessions = _.orderBy(mappedSessions, (session) => session.createdAt, ['desc']);
         return orderedSessions;
