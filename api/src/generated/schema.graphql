@@ -113,8 +113,14 @@ type ImageType {
   url: String
 }
 
+input InteractionFilterInput {
+  endDate: String
+  startDate: String
+}
+
 type InteractionType {
   createdAt: String!
+  index: Int!
   paths: Int!
   score: Float!
   sessionId: String!
@@ -177,7 +183,7 @@ type Query {
   edge(id: String): Edge!
   getQuestionnaireData(dialogueId: String, filter: Int): DialogueDetailResult!
   getSessionAnswerFlow(sessionId: ID): Session!
-  interactions(where: SessionWhereUniqueInput): [InteractionType!]!
+  interactions(filter: InteractionFilterInput, where: SessionWhereUniqueInput): [InteractionType!]!
   lineChartData(dialogueId: String, limit: Int, numberOfDaysBack: Int, offset: Int): [lineChartDataType!]!
   questionNode(where: QuestionNodeWhereUniqueInput): QuestionNode!
   questionNodes: [QuestionNode!]!

@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import { format } from 'date-fns';
-import { NodeEntry, NodeEntryValue, Session, PrismaClient } from '@prisma/client';
+import { NodeEntry, NodeEntryValue, Session, PrismaClient, SessionWhereInput } from '@prisma/client';
 import { objectType, extendType, inputObjectType } from '@nexus/schema';
 import SessionResolver from './session-resolver';
 import { QuestionNodeType } from '../question/QuestionNode';
@@ -129,9 +129,18 @@ export const InteractionType = objectType({
   name: 'InteractionType',
   definition(t) {
     t.string('sessionId');
+    t.int('index');
     t.float('score');
     t.int('paths');
     t.string('createdAt');
+  },
+});
+
+export const InteractionFilterInput = inputObjectType({
+  name: 'InteractionFilterInput',
+  definition(t) {
+    t.string('startDate', { required: false });
+    t.string('endDate', { required: false });
   },
 });
 
@@ -148,12 +157,29 @@ export const getSessionAnswerFlowQuery = extendType({
       type: InteractionType,
       args: {
         where: SessionWhereUniqueInput,
+        filter: InteractionFilterInput,
       },
       async resolve(parent: any, args: any, ctx: any) {
         const { prisma }: { prisma: PrismaClient } = ctx;
+        console.log('filter interactions: ', args.filter);
+        // TODO: Filter based on filter function
+        let dateRange: SessionWhereInput[] | [] = [];
+        if (args.filter.startDate && !args.filter.endDate) {
+          dateRange = [
+            { createdAt: { gte: args.filter.startDate } },
+          ];
+        }
+
+        if (args.filter.startDate && args.filter.endDate) {
+          dateRange = [
+            { createdAt: { gte: args.filter.startDate } },
+            { createdAt: { lte: args.filter.endDate } }];
+        }
+
         const sessions = await prisma.session.findMany({
           where: {
             dialogueId: args.where.dialogueId,
+            AND: dateRange,
           },
           include: {
             nodeEntries: {
@@ -176,11 +202,11 @@ export const getSessionAnswerFlowQuery = extendType({
           const { id, createdAt } = session;
           const score = session.nodeEntries.find((entry) => entry.depth === 0)?.values?.[0]?.numberValue;
           const paths = session.nodeEntries.length;
-          const formattedCreatedAt = format(createdAt, 'dd-LLL-yyyy HH:mm:ss.SSS');
-          return { sessionId: id, score, paths, createdAt: formattedCreatedAt };
+          return { sessionId: id, score, paths, createdAt };
         });
         const orderedSessions = _.orderBy(mappedSessions, (session) => session.createdAt, ['desc']);
-        return orderedSessions;
+        const finalSessions = orderedSessions.map((session, index) => ({ ...session, index }));
+        return finalSessions;
       },
     });
     t.list.field('sessions', {
@@ -236,6 +262,7 @@ export const uploadUserSessionMutation = extendType({
 });
 
 const sessionNexus = [
+  InteractionFilterInput,
   InteractionType,
   SessionWhereUniqueInput,
   getSessionAnswerFlowQuery,

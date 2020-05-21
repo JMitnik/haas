@@ -1,11 +1,14 @@
 import React, { useState, useMemo } from 'react';
-
+import _ from 'lodash';
+import 'react-dates/initialize';
+import 'react-dates/lib/css/_datepicker.css';
 import { ApolloError } from 'apollo-boost';
 import { useForm } from 'react-hook-form';
 import { useMutation, useQuery } from '@apollo/react-hooks';
 import { useHistory, useParams } from 'react-router';
 import { DownloadCloud, Search, Calendar } from 'react-feather'
 import {
+  Row,
   useTable,
   useGroupBy,
   useFilters,
@@ -20,6 +23,12 @@ import {
 import getInteractionsQuery from 'queries/getInteractionsQuery'
 import { InteractionsOverviewContainer, InputOutputContainer, OutputContainer, InputContainer } from './InteractionOverviewStyles';
 import Papa from 'papaparse';
+import { DateRangePicker, SingleDatePicker, DayPickerRangeController } from 'react-dates';
+import DatePicker from "react-datepicker";
+import { format } from 'date-fns';
+import "react-datepicker/dist/react-datepicker.css";
+
+
 interface InteractionProps {
   sessionId: string;
   paths: number;
@@ -27,21 +36,44 @@ interface InteractionProps {
   createdAt: string;
 }
 
+interface CellProps {
+  value: any;
+  columnProps: any;
+}
+
+const MyCell = ({ value }: CellProps) => {
+  const date = new Date(parseInt(value));
+  const formattedCreatedAt = format(date, 'dd-LLL-yyyy HH:mm:ss.SSS');
+  return <div>{formattedCreatedAt}</div>;
+}
+
+const IndexCell = ({ row }: { row: Row<object> }) => {
+  return <div>{row.index + 1}</div>
+}
+
 const InteractionsOverview = () => {
-  const { topicId } = useParams();
+  const { topicId, customerId } = useParams();
+
+  const [activeStartDate, setActiveStartDate] = useState<Date | null>(null);
+  const [activeEndDate, setActiveEndDate] = useState<Date | null>(null);
+  const [activeFocusedInput, setFocusedInput] = useState(null);
 
   const { loading, data } = useQuery(getInteractionsQuery, {
     variables: {
       dialogueId: topicId,
+      filter: { startDate: activeStartDate, endDate: activeEndDate },
     },
   });
 
   const interactions = useMemo(() => data?.interactions || [], [data?.interactions]);
-  const columns = useMemo(() => [{ Header: 'Score', accessor: 'score' },
-  { Header: 'Paths', accessor: 'paths' }, { Header: 'User', accessor: 'sessionId' }, { Header: 'When', accessor: 'createdAt'}], []);
+  const columns = useMemo(() => [{
+    Header: "Nr",
+    id: "row",
+    accessor: 'index',
+    maxWidth: 50,
+  }, { Header: 'Score', accessor: 'score' },
+  { Header: 'Paths', accessor: 'paths' }, { Header: 'User', accessor: 'sessionId' }, { Header: 'When', accessor: 'createdAt', Cell: MyCell }], []);
 
-  console.log('columns: ', columns);
-  console.log('interactions: ', interactions);
   const {
     getTableProps,
     getTableBodyProps,
@@ -65,12 +97,14 @@ const InteractionsOverview = () => {
     {
       columns,
       data: interactions,
-      initialState: { pageIndex: 1, pageSize: 8, sortBy: [
-        {
+      initialState: {
+        pageIndex: 0, pageSize: 8, sortBy: [
+          {
             id: 'createdAt',
             desc: true
-        }
-    ] },
+          }
+        ]
+      },
     },
     useSortBy,
     usePagination
@@ -78,33 +112,46 @@ const InteractionsOverview = () => {
 
   const handleExport = () => {
     const csv = Papa.unparse(interactions);
-    const csvData = new Blob([csv], {type: 'text/csv;charset=utf-8;'});
+    const csvData = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const csvUrl = window.URL.createObjectURL(csvData);
     const tempLink = document.createElement('a');
     tempLink.href = csvUrl;
-    tempLink.setAttribute('download', 'download.csv');
+    const currDate = new Date().getTime();
+    tempLink.setAttribute('download', `${currDate}-${customerId}-${topicId}.csv`);
     tempLink.click();
+    tempLink.remove();
   }
+
 
   if (loading) return null;
 
-  console.log('stringified: ', JSON.stringify(interactions));
   return (
     <Div px="24px" margin="0 auto" width="100vh" height="100vh" maxHeight="100vh" overflow="hidden">
       <H2 color="#3e3d5a" fontWeight={400} mb="10%"> Interactions </H2>
       <InputOutputContainer mb="5%">
         <OutputContainer>
           <Div justifyContent="center">Export</Div>
-          <Button marginLeft="10%" padding="5px 12px" onClick={handleExport}>
+          <Button marginLeft="10%" padding="2px 8px" onClick={handleExport}>
             <Div marginRight="20%">CSV</Div>
             <DownloadCloud />
           </Button>
         </OutputContainer>
         <InputContainer>
-          <Button marginRight="10%" padding="5px 12px">
-            <Div marginRight="20%">ALL</Div>
-            <Calendar />
-          </Button>
+          <DatePicker
+            selected={activeStartDate}
+            onChange={date => setActiveStartDate(date)}
+            selectsStart
+            startDate={activeStartDate}
+            endDate={activeEndDate}
+          />
+          <DatePicker
+            selected={activeEndDate}
+            onChange={date => setActiveEndDate(date)}
+            selectsEnd
+            startDate={activeStartDate}
+            endDate={activeEndDate}
+            minDate={activeStartDate}
+          />
           <Button padding="5px 12px">
             <Div marginRight="20%">SEARCH</Div>
             <Search />
@@ -124,10 +171,17 @@ const InteractionsOverview = () => {
                 <tr key={index} {...headerGroup.getHeaderGroupProps()}>
                   {headerGroup.headers.map((column, index) => (
                     <th key={index} {...column.getHeaderProps(column.getSortByToggleProps())}>
-                      {column.render('Header')}
-                      <span>
-                        {column.isSorted ? (column.isSortedDesc ? ' 🔽' : ' 🔼') : ''}
-                      </span>
+                      <Div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                        <Div width='85%'>
+                          <H3>
+                            {column.render('Header')}
+                          </H3>
+                        </Div>
+                        <span>
+                          {column.isSorted ? (column.isSortedDesc ? ' 🔽' : ' 🔼') : ''}
+                        </span>
+                      </Div>
+
                     </th>
                   ))}
                 </tr>

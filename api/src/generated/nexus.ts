@@ -45,6 +45,10 @@ export interface NexusGenInputs {
     id?: string | null; // ID
     title?: string | null; // String
   }
+  InteractionFilterInput: { // input type
+    endDate?: string | null; // String
+    startDate?: string | null; // String
+  }
   LeafNodeInput: { // input type
     id?: string | null; // ID
     title?: string | null; // String
@@ -143,6 +147,7 @@ export interface NexusGenRootTypes {
   }
   InteractionType: { // root type
     createdAt: string; // String!
+    index: number; // Int!
     paths: number; // Int!
     score: number; // Float!
     sessionId: string; // String!
@@ -181,6 +186,7 @@ export interface NexusGenAllTypes extends NexusGenRootTypes {
   DialogueWhereUniqueInput: NexusGenInputs['DialogueWhereUniqueInput'];
   EdgeChildInput: NexusGenInputs['EdgeChildInput'];
   EdgeNodeInput: NexusGenInputs['EdgeNodeInput'];
+  InteractionFilterInput: NexusGenInputs['InteractionFilterInput'];
   LeafNodeInput: NexusGenInputs['LeafNodeInput'];
   OptionInput: NexusGenInputs['OptionInput'];
   QuestionConditionInput: NexusGenInputs['QuestionConditionInput'];
@@ -271,6 +277,7 @@ export interface NexusGenFieldTypes {
   }
   InteractionType: { // field return type
     createdAt: string; // String!
+    index: number; // Int!
     paths: number; // Int!
     score: number; // Float!
     sessionId: string; // String!
@@ -426,6 +433,7 @@ export interface NexusGenArgTypes {
       sessionId?: string | null; // ID
     }
     interactions: { // args
+      filter?: NexusGenInputs['InteractionFilterInput'] | null; // InteractionFilterInput
       where?: NexusGenInputs['SessionWhereUniqueInput'] | null; // SessionWhereUniqueInput
     }
     lineChartData: { // args
@@ -453,7 +461,7 @@ export interface NexusGenInheritedFields {}
 
 export type NexusGenObjectNames = "ColourSettings" | "Customer" | "CustomerSettings" | "Dialogue" | "DialogueDetailResult" | "Edge" | "EdgeCondition" | "FontSettings" | "ImageType" | "InteractionType" | "Mutation" | "NodeEntry" | "NodeEntryValue" | "Query" | "QuestionNode" | "QuestionOption" | "Session" | "UniqueDataResultEntry" | "lineChartDataType" | "topPathType";
 
-export type NexusGenInputNames = "CustomerCreateOptions" | "CustomerWhereUniqueInput" | "DialogueWhereUniqueInput" | "EdgeChildInput" | "EdgeNodeInput" | "LeafNodeInput" | "OptionInput" | "QuestionConditionInput" | "QuestionInput" | "QuestionNodeWhereInput" | "QuestionNodeWhereUniqueInput" | "SessionWhereUniqueInput" | "TopicDataEntry" | "UploadUserSessionInput" | "UserSessionEntryDataInput" | "UserSessionEntryInput";
+export type NexusGenInputNames = "CustomerCreateOptions" | "CustomerWhereUniqueInput" | "DialogueWhereUniqueInput" | "EdgeChildInput" | "EdgeNodeInput" | "InteractionFilterInput" | "LeafNodeInput" | "OptionInput" | "QuestionConditionInput" | "QuestionInput" | "QuestionNodeWhereInput" | "QuestionNodeWhereUniqueInput" | "SessionWhereUniqueInput" | "TopicDataEntry" | "UploadUserSessionInput" | "UserSessionEntryDataInput" | "UserSessionEntryInput";
 
 export type NexusGenEnumNames = never;
 
