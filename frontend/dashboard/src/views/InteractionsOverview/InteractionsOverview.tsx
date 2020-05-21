@@ -47,8 +47,15 @@ const MyCell = ({ value }: CellProps) => {
   return <div>{formattedCreatedAt}</div>;
 }
 
-const IndexCell = ({ row }: { row: Row<object> }) => {
-  return <div>{row.index + 1}</div>
+const ScoreCell = ({ value }: CellProps) => {
+  return (
+  <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <div style={{width: 'max-content', border: '1px solid', padding: '14px', borderRadius: '360px' }}>
+    {value}
+    </div>
+    
+  </div>
+  )
 }
 
 const InteractionsOverview = () => {
@@ -71,7 +78,7 @@ const InteractionsOverview = () => {
     id: "row",
     accessor: 'index',
     maxWidth: 50,
-  }, { Header: 'Score', accessor: 'score' },
+  }, { Header: 'Score', accessor: 'score', Cell: ScoreCell },
   { Header: 'Paths', accessor: 'paths' }, { Header: 'User', accessor: 'sessionId' }, { Header: 'When', accessor: 'createdAt', Cell: MyCell }], []);
 
   const {
@@ -194,9 +201,9 @@ const InteractionsOverview = () => {
                   <tr key={index} {...row.getRowProps()}>
                     {row.cells.map((cell, index: number) => {
                       return <td style={{
-                        padding: '10px',
-                        border: 'solid 1px gray',
-                        background: 'papayawhip',
+                        padding: '8px',
+                        // border: 'solid 1px gray',
+                        // background: 'papayawhip',
                       }} key={index} {...cell.getCellProps()}>{cell.render('Cell')}</td>
                     })}
                   </tr>
