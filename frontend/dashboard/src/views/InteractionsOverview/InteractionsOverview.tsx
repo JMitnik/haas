@@ -27,6 +27,7 @@ import { DateRangePicker, SingleDatePicker, DayPickerRangeController } from 'rea
 import DatePicker from "react-datepicker";
 import { format } from 'date-fns';
 import "react-datepicker/dist/react-datepicker.css";
+import { background, borderRadius } from 'styled-system';
 
 
 interface InteractionProps {
@@ -47,16 +48,24 @@ const MyCell = ({ value }: CellProps) => {
   return <div>{formattedCreatedAt}</div>;
 }
 
+const getBadgeBackgroundColour = (value: number) => {
+  if (value >= 70) return { background: '#e2f0c7', color: '#42c355' };
+  else if ( value > 50 && value < 70) return { background: '#f2dda5', color: '#dd992a' };
+  else return { background: '#f5c4c0', color: '#d5372c' };
+}
+
 const ScoreCell = ({ value }: CellProps) => {
+  const { background, color } = getBadgeBackgroundColour(value);
   return (
   <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-    <div style={{width: 'max-content', border: '1px solid', padding: '14px', borderRadius: '360px' }}>
-    {value}
+    <div style={{width: 'max-content', border: '1px solid', padding: '10px', borderRadius: '360px', background, color, borderColor: background }}>
+    <span style={{fontSize: '1.2em', fontWeight: 900}}>{value}</span>
     </div>
     
   </div>
   )
 }
+
 
 const InteractionsOverview = () => {
   const { topicId, customerId } = useParams();
@@ -74,12 +83,12 @@ const InteractionsOverview = () => {
 
   const interactions = useMemo(() => data?.interactions || [], [data?.interactions]);
   const columns = useMemo(() => [{
-    Header: "Nr",
+    Header: "NR",
     id: "row",
     accessor: 'index',
     maxWidth: 50,
-  }, { Header: 'Score', accessor: 'score', Cell: ScoreCell },
-  { Header: 'Paths', accessor: 'paths' }, { Header: 'User', accessor: 'sessionId' }, { Header: 'When', accessor: 'createdAt', Cell: MyCell }], []);
+  }, { Header: 'SCORE', accessor: 'score', Cell: ScoreCell },
+  { Header: 'PATHS', accessor: 'paths' }, { Header: 'USER', accessor: 'sessionId' }, { Header: 'WHEN', accessor: 'createdAt', Cell: MyCell }], []);
 
   const {
     getTableProps,
@@ -134,10 +143,10 @@ const InteractionsOverview = () => {
 
   return (
     <Div px="24px" margin="0 auto" width="100vh" height="100vh" maxHeight="100vh" overflow="hidden">
-      <H2 color="#3e3d5a" fontWeight={400} mb="10%"> Interactions </H2>
+      <H2 color="#3653e8" fontWeight={400} mb="10%"> Interactions </H2>
       <InputOutputContainer mb="5%">
         <OutputContainer>
-          <Div justifyContent="center">Export</Div>
+          <Div justifyContent="center"><Muted>Exports</Muted> </Div>
           <Button marginLeft="10%" padding="2px 8px" onClick={handleExport}>
             <Div marginRight="20%">CSV</Div>
             <DownloadCloud />
@@ -165,12 +174,12 @@ const InteractionsOverview = () => {
           </Button>
         </InputContainer>
       </InputOutputContainer>
-      <Div style={{ border: "1px solid" }} mb="1%" height="65%">
+      <Div style={{ background: '#fdfbfe' }} mb="1%" height="65%">
         {
-          interactions && <table {...getTableProps()} style={{ border: 'solid 1px blue', width: '100%', overflowY: "auto" }}>
+          interactions && <table {...getTableProps()} style={{ width: '100%', overflowY: "auto", borderCollapse:'collapse' }}>
             <thead style={{
-              borderBottom: 'solid 3px red',
-              background: 'aliceblue',
+              borderRadius:'360px',
+              background: '#f1f5f8',
               color: 'black',
               fontWeight: 'bold',
             }}>
@@ -178,9 +187,9 @@ const InteractionsOverview = () => {
                 <tr key={index} {...headerGroup.getHeaderGroupProps()}>
                   {headerGroup.headers.map((column, index) => (
                     <th key={index} {...column.getHeaderProps(column.getSortByToggleProps())}>
-                      <Div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                        <Div width='85%'>
-                          <H3>
+                      <Div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', borderRadius:'10px 0 0 10px'}}>
+                        <Div width='85%' padding='10px'>
+                          <H3 color='#6d767d'>
                             {column.render('Header')}
                           </H3>
                         </Div>
