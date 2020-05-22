@@ -47,6 +47,8 @@ export interface NexusGenInputs {
   }
   InteractionFilterInput: { // input type
     endDate?: string | null; // String
+    limit?: number | null; // Int
+    offset?: number | null; // Int
     startDate?: string | null; // String
   }
   LeafNodeInput: { // input type

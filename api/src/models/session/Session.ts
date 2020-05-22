@@ -141,6 +141,8 @@ export const InteractionFilterInput = inputObjectType({
   definition(t) {
     t.string('startDate', { required: false });
     t.string('endDate', { required: false });
+    t.int('offset', { required: false });
+    t.int('limit', { required: false });
   },
 });
 
@@ -162,21 +164,27 @@ export const getSessionAnswerFlowQuery = extendType({
       async resolve(parent: any, args: any, ctx: any) {
         const { prisma }: { prisma: PrismaClient } = ctx;
         console.log('filter interactions: ', args.filter);
-        // TODO: Filter based on filter function
+        // TODO: Add orderBy filter
+        const { offset, limit, startDate, endDate }: { offset: number, limit: number, startDate: Date, endDate: Date } = args.filter;
         let dateRange: SessionWhereInput[] | [] = [];
-        if (args.filter.startDate && !args.filter.endDate) {
+        if (startDate && !endDate) {
           dateRange = [
-            { createdAt: { gte: args.filter.startDate } },
+            { createdAt: { gte: startDate } },
           ];
         }
 
-        if (args.filter.startDate && args.filter.endDate) {
+        if (startDate && endDate) {
           dateRange = [
-            { createdAt: { gte: args.filter.startDate } },
-            { createdAt: { lte: args.filter.endDate } }];
+            { createdAt: { gte: startDate } },
+            { createdAt: { lte: endDate } }];
         }
 
         const sessions = await prisma.session.findMany({
+          skip: offset,
+          first: limit,
+          orderBy: {
+            id: 'desc',
+          },
           where: {
             dialogueId: args.where.dialogueId,
             AND: dateRange,
@@ -198,6 +206,8 @@ export const getSessionAnswerFlowQuery = extendType({
             },
           },
         });
+
+        console.log('Sessions: ', sessions.length);
         const mappedSessions = sessions.map((session) => {
           const { id, createdAt } = session;
           const score = session.nodeEntries.find((entry) => entry.depth === 0)?.values?.[0]?.numberValue;

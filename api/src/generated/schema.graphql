@@ -115,6 +115,8 @@ type ImageType {
 
 input InteractionFilterInput {
   endDate: String
+  limit: Int
+  offset: Int
   startDate: String
 }
 

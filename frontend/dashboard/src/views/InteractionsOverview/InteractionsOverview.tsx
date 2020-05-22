@@ -27,7 +27,7 @@ import { DateRangePicker, SingleDatePicker, DayPickerRangeController } from 'rea
 import DatePicker from "react-datepicker";
 import { format } from 'date-fns';
 import "react-datepicker/dist/react-datepicker.css";
-import { background, borderRadius } from 'styled-system';
+import useInteractionsTable from "./useInteractionsTable";
 
 
 interface InteractionProps {
@@ -66,18 +66,18 @@ const ScoreCell = ({ value }: CellProps) => {
   )
 }
 
-
 const InteractionsOverview = () => {
   const { topicId, customerId } = useParams();
 
   const [activeStartDate, setActiveStartDate] = useState<Date | null>(null);
   const [activeEndDate, setActiveEndDate] = useState<Date | null>(null);
-  const [activeFocusedInput, setFocusedInput] = useState(null);
+  const [activePageIndex, setActivePageIndex] = useState(0);
+  const [activePageSize, setActivePageSize] = useState(8);
 
   const { loading, data } = useQuery(getInteractionsQuery, {
     variables: {
       dialogueId: topicId,
-      filter: { startDate: activeStartDate, endDate: activeEndDate },
+      filter: { startDate: activeStartDate, endDate: activeEndDate, offset: activePageIndex, limit: activePageSize },
     },
   });
 
@@ -114,9 +114,9 @@ const InteractionsOverview = () => {
       columns,
       data: interactions,
       initialState: {
-        pageIndex: 0, pageSize: 8, sortBy: [
+        pageIndex: activePageIndex, pageSize: activePageSize, sortBy: [
           {
-            id: 'createdAt',
+            id: 'sessionId',
             desc: true
           }
         ]
