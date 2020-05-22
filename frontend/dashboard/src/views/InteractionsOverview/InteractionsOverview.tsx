@@ -25,7 +25,7 @@ import { InteractionsOverviewContainer, InputOutputContainer, OutputContainer, I
 import Papa from 'papaparse';
 import { DateRangePicker, SingleDatePicker, DayPickerRangeController } from 'react-dates';
 import DatePicker from "react-datepicker";
-import { format } from 'date-fns';
+import { format, formatDistance, subDays, differenceInCalendarDays } from 'date-fns';
 import "react-datepicker/dist/react-datepicker.css";
 import useInteractionsTable from "./useInteractionsTable";
 
@@ -44,8 +44,21 @@ interface CellProps {
 
 const MyCell = ({ value }: CellProps) => {
   const date = new Date(parseInt(value));
-  const formattedCreatedAt = format(date, 'dd-LLL-yyyy HH:mm:ss.SSS');
-  return <div>{formattedCreatedAt}</div>;
+  const currentDate = new Date();
+  const dateDifference = differenceInCalendarDays(currentDate, date);
+  let formatted;
+  if (dateDifference <= 4 || dateDifference > 7) {
+    formatted = `${formatDistance(date, currentDate)} ago`;
+  } else if (dateDifference > 4 && dateDifference < 7) {
+    formatted = format(date, 'EEEE hh:mm a')
+  } 
+  // const formattedCreatedAt = format(date, 'dd-LLL-yyyy HH:mm:ss.SSS');
+  return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <div style={{ width: 'max-content', padding: '4px 24px', borderRadius: '90px', background: '#f1f5f8', color: '#6d767d' }}>
+      <span style={{ fontSize: '0.8em', fontWeight: 900 }}>{formatted?.toUpperCase()}</span>
+    </div>
+
+  </div>
 }
 
 const getBadgeBackgroundColour = (value: number) => {
@@ -66,6 +79,28 @@ const ScoreCell = ({ value }: CellProps) => {
   )
 }
 
+const UserCell = ({ value }: CellProps) => {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ width: 'max-content', padding: '4px 24px', borderRadius: '90px', background: '#f1f5f8', color: '#6d767d' }}>
+        <span style={{ fontSize: '0.8em', fontWeight: 900 }}>{value}</span>
+      </div>
+
+    </div>
+  )
+}
+
+const CenterCell = ({ value }: CellProps) => {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ width: 'max-content' }}>
+        <span style={{ fontSize: '1.2em', fontWeight: 900 }}>{value}</span>
+      </div>
+
+    </div>
+  )
+}
+
 const InteractionsOverview = () => {
   const { topicId, customerId } = useParams();
 
@@ -79,8 +114,9 @@ const InteractionsOverview = () => {
     id: "row",
     accessor: 'index',
     maxWidth: 50,
+    Cell: CenterCell
   }, { Header: 'SCORE', accessor: 'score', Cell: ScoreCell },
-  { Header: 'PATHS', accessor: 'paths' }, { Header: 'USER', accessor: 'sessionId' }, { Header: 'WHEN', accessor: 'createdAt', Cell: MyCell }], []);
+  { Header: 'PATHS', accessor: 'paths', Cell: CenterCell }, { Header: 'USER', accessor: 'sessionId', Cell: UserCell }, { Header: 'WHEN', accessor: 'createdAt', Cell: MyCell }], []);
 
   const {
     getTableProps,
@@ -125,11 +161,12 @@ const InteractionsOverview = () => {
     fetchInteractions({
       variables: {
         dialogueId: topicId,
-        filter: { 
-          startDate: activeStartDate, 
-          endDate: activeEndDate, 
-          offset: whichWay !== 0 ? (pageIndex + whichWay) * pageSize : 0, 
-          limit: pageSize, pageIndex: whichWay !== 0 ? pageIndex + whichWay : 0 },
+        filter: {
+          startDate: activeStartDate,
+          endDate: activeEndDate,
+          offset: whichWay !== 0 ? (pageIndex + whichWay) * pageSize : 0,
+          limit: pageSize, pageIndex: whichWay !== 0 ? pageIndex + whichWay : 0
+        },
       },
     })
   }
@@ -196,8 +233,8 @@ const InteractionsOverview = () => {
                 <tr key={index} {...headerGroup.getHeaderGroupProps()}>
                   {headerGroup.headers.map((column, index) => (
                     <th key={index} {...column.getHeaderProps(column.getSortByToggleProps())}>
-                      <Div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', borderRadius: '10px 0 0 10px' }}>
-                        <Div width='85%' padding='10px'>
+                      <Div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', borderRadius: '10px 0 0 10px' }}>
+                        <Div style={{ maxWidth: 'fit-content' }} padding='10px'>
                           <H3 color='#6d767d'>
                             {column.render('Header')}
                           </H3>
