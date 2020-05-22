@@ -21,7 +21,7 @@ export default function useInteractionsTable() {
   const { topicId } = useParams();
   const [fetchInteractions, { loading, data, error }] = useLazyQuery(getInteractionsQuery);
 
-  const onFetchData = () => {
+  const onFetchData = useCallback(() => {
     fetchInteractions({
       variables: {
         dialogueId: topicId,
@@ -30,7 +30,8 @@ export default function useInteractionsTable() {
     })
     //TODO: destructure result data and set grid stat
     setGridState({pages: null, page: page + 1, startDate, endDate, offset: page * limit,limit });
-  };
+    console.log('GRID state: ', gridState);
+  }, []);
 
   return {
     gridState: {
@@ -42,6 +43,8 @@ export default function useInteractionsTable() {
       onFetchData,
       loading
     },
+    startDate,
+    endDate,
     error
   };
 }

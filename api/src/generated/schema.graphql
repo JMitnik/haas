@@ -117,15 +117,23 @@ input InteractionFilterInput {
   endDate: String
   limit: Int
   offset: Int
+  pageIndex: Int
   startDate: String
 }
 
-type InteractionType {
+type InteractionSessionType {
   createdAt: String!
   index: Int!
   paths: Int!
   score: Float!
   sessionId: String!
+}
+
+type InteractionType {
+  pageIndex: Int!
+  pages: Int!
+  pageSize: Int!
+  sessions: [InteractionSessionType!]!
 }
 
 input LeafNodeInput {
@@ -185,7 +193,7 @@ type Query {
   edge(id: String): Edge!
   getQuestionnaireData(dialogueId: String, filter: Int): DialogueDetailResult!
   getSessionAnswerFlow(sessionId: ID): Session!
-  interactions(filter: InteractionFilterInput, where: SessionWhereUniqueInput): [InteractionType!]!
+  interactions(filter: InteractionFilterInput, where: SessionWhereUniqueInput): InteractionType!
   lineChartData(dialogueId: String, limit: Int, numberOfDaysBack: Int, offset: Int): [lineChartDataType!]!
   questionNode(where: QuestionNodeWhereUniqueInput): QuestionNode!
   questionNodes: [QuestionNode!]!

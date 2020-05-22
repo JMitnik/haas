@@ -125,14 +125,26 @@ export const SessionWhereUniqueInput = inputObjectType({
   },
 });
 
-export const InteractionType = objectType({
-  name: 'InteractionType',
+export const InteractionSessionType = objectType({
+  name: 'InteractionSessionType',
   definition(t) {
     t.string('sessionId');
     t.int('index');
     t.float('score');
     t.int('paths');
     t.string('createdAt');
+  },
+});
+
+export const InteractionType = objectType({
+  name: 'InteractionType',
+  definition(t) {
+    t.list.field('sessions', {
+      type: InteractionSessionType,
+    });
+    t.int('pages');
+    t.int('pageIndex');
+    t.int('pageSize');
   },
 });
 
@@ -143,6 +155,7 @@ export const InteractionFilterInput = inputObjectType({
     t.string('endDate', { required: false });
     t.int('offset', { required: false });
     t.int('limit', { required: false });
+    t.int('pageIndex', { required: false });
   },
 });
 
@@ -155,7 +168,7 @@ export const getSessionAnswerFlowQuery = extendType({
         sessionId: 'ID',
       },
     });
-    t.list.field('interactions', {
+    t.field('interactions', {
       type: InteractionType,
       args: {
         where: SessionWhereUniqueInput,
@@ -165,7 +178,7 @@ export const getSessionAnswerFlowQuery = extendType({
         const { prisma }: { prisma: PrismaClient } = ctx;
         console.log('filter interactions: ', args.filter);
         // TODO: Add orderBy filter
-        const { offset, limit, startDate, endDate }: { offset: number, limit: number, startDate: Date, endDate: Date } = args.filter;
+        const { pageIndex, offset, limit, startDate, endDate }: { pageIndex: number, offset: number, limit: number, startDate: Date, endDate: Date } = args.filter;
         let dateRange: SessionWhereInput[] | [] = [];
         if (startDate && !endDate) {
           dateRange = [
@@ -178,6 +191,13 @@ export const getSessionAnswerFlowQuery = extendType({
             { createdAt: { gte: startDate } },
             { createdAt: { lte: endDate } }];
         }
+
+        const pages = await prisma.session.findMany({
+          where: {
+            dialogueId: args.where.dialogueId,
+            AND: dateRange,
+          },
+        });
 
         const sessions = await prisma.session.findMany({
           skip: offset,
@@ -208,6 +228,7 @@ export const getSessionAnswerFlowQuery = extendType({
         });
 
         console.log('Sessions: ', sessions.length);
+        console.log('Pages: ', Math.ceil(pages.length / limit));
         const mappedSessions = sessions.map((session) => {
           const { id, createdAt } = session;
           const score = session.nodeEntries.find((entry) => entry.depth === 0)?.values?.[0]?.numberValue;
@@ -216,7 +237,9 @@ export const getSessionAnswerFlowQuery = extendType({
         });
         const orderedSessions = _.orderBy(mappedSessions, (session) => session.createdAt, ['desc']);
         const finalSessions = orderedSessions.map((session, index) => ({ ...session, index }));
-        return finalSessions;
+        return {
+          sessions: finalSessions, pages: Math.ceil(pages.length / limit), offset, limit, pageIndex,
+        };
       },
     });
     t.list.field('sessions', {
@@ -272,6 +295,7 @@ export const uploadUserSessionMutation = extendType({
 });
 
 const sessionNexus = [
+  InteractionSessionType,
   InteractionFilterInput,
   InteractionType,
   SessionWhereUniqueInput,

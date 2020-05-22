@@ -1,10 +1,10 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import _ from 'lodash';
 import 'react-dates/initialize';
 import 'react-dates/lib/css/_datepicker.css';
 import { ApolloError } from 'apollo-boost';
 import { useForm } from 'react-hook-form';
-import { useMutation, useQuery } from '@apollo/react-hooks';
+import { useMutation, useQuery, useLazyQuery } from '@apollo/react-hooks';
 import { useHistory, useParams } from 'react-router';
 import { DownloadCloud, Search, Calendar } from 'react-feather'
 import {
@@ -50,19 +50,19 @@ const MyCell = ({ value }: CellProps) => {
 
 const getBadgeBackgroundColour = (value: number) => {
   if (value >= 70) return { background: '#e2f0c7', color: '#42c355' };
-  else if ( value > 50 && value < 70) return { background: '#f2dda5', color: '#dd992a' };
+  else if (value > 50 && value < 70) return { background: '#f2dda5', color: '#dd992a' };
   else return { background: '#f5c4c0', color: '#d5372c' };
 }
 
 const ScoreCell = ({ value }: CellProps) => {
   const { background, color } = getBadgeBackgroundColour(value);
   return (
-  <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-    <div style={{width: 'max-content', border: '1px solid', padding: '10px', borderRadius: '360px', background, color, borderColor: background }}>
-    <span style={{fontSize: '1.2em', fontWeight: 900}}>{value}</span>
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ width: 'max-content', border: '1px solid', padding: '10px', borderRadius: '360px', background, color, borderColor: background }}>
+        <span style={{ fontSize: '1.2em', fontWeight: 900 }}>{value}</span>
+      </div>
+
     </div>
-    
-  </div>
   )
 }
 
@@ -71,17 +71,9 @@ const InteractionsOverview = () => {
 
   const [activeStartDate, setActiveStartDate] = useState<Date | null>(null);
   const [activeEndDate, setActiveEndDate] = useState<Date | null>(null);
-  const [activePageIndex, setActivePageIndex] = useState(0);
-  const [activePageSize, setActivePageSize] = useState(8);
+  const [fetchInteractions, { loading, data }] = useLazyQuery(getInteractionsQuery);
 
-  const { loading, data } = useQuery(getInteractionsQuery, {
-    variables: {
-      dialogueId: topicId,
-      filter: { startDate: activeStartDate, endDate: activeEndDate, offset: activePageIndex, limit: activePageSize },
-    },
-  });
-
-  const interactions = useMemo(() => data?.interactions || [], [data?.interactions]);
+  const interactions = useMemo(() => data?.interactions?.sessions || [], [data]);
   const columns = useMemo(() => [{
     Header: "NR",
     id: "row",
@@ -95,26 +87,20 @@ const InteractionsOverview = () => {
     getTableBodyProps,
     headerGroups,
     prepareRow,
-    page, // Instead of using 'rows', we'll use page,
-    // which has only the rows for the active page
-
-    // The rest of these things are super handy, too ;)
-    rows,
+    page,
     canPreviousPage,
     canNextPage,
     pageOptions,
     pageCount,
-    gotoPage,
-    nextPage,
-    previousPage,
-    setPageSize,
     state: { pageIndex, pageSize },
   } = useTable(
     {
       columns,
+      manualPagination: true,
+      pageCount: data?.interactions?.pages || 1,
       data: interactions,
       initialState: {
-        pageIndex: activePageIndex, pageSize: activePageSize, sortBy: [
+        pageIndex: data?.interactions?.pageIndex || 0, pageSize: 8, sortBy: [
           {
             id: 'sessionId',
             desc: true
@@ -125,6 +111,28 @@ const InteractionsOverview = () => {
     useSortBy,
     usePagination
   )
+
+  useEffect(() => {
+    fetchInteractions({
+      variables: {
+        dialogueId: topicId,
+        filter: { startDate: activeStartDate, endDate: activeEndDate, offset: pageIndex * pageSize, limit: pageSize, pageIndex },
+      },
+    })
+  }, [])
+
+  const handlePage = (whichWay: number) => {
+    fetchInteractions({
+      variables: {
+        dialogueId: topicId,
+        filter: { 
+          startDate: activeStartDate, 
+          endDate: activeEndDate, 
+          offset: whichWay !== 0 ? (pageIndex + whichWay) * pageSize : 0, 
+          limit: pageSize, pageIndex: whichWay !== 0 ? pageIndex + whichWay : 0 },
+      },
+    })
+  }
 
   const handleExport = () => {
     const csv = Papa.unparse(interactions);
@@ -138,6 +146,7 @@ const InteractionsOverview = () => {
     tempLink.remove();
   }
 
+  console.log('DATA: ', data);
 
   if (loading) return null;
 
@@ -176,9 +185,9 @@ const InteractionsOverview = () => {
       </InputOutputContainer>
       <Div style={{ background: '#fdfbfe' }} mb="1%" height="65%">
         {
-          interactions && <table {...getTableProps()} style={{ width: '100%', overflowY: "auto", borderCollapse:'collapse' }}>
+          interactions && <table {...getTableProps()} style={{ width: '100%', overflowY: "auto", borderCollapse: 'collapse' }}>
             <thead style={{
-              borderRadius:'360px',
+              borderRadius: '360px',
               background: '#f1f5f8',
               color: 'black',
               fontWeight: 'bold',
@@ -187,7 +196,7 @@ const InteractionsOverview = () => {
                 <tr key={index} {...headerGroup.getHeaderGroupProps()}>
                   {headerGroup.headers.map((column, index) => (
                     <th key={index} {...column.getHeaderProps(column.getSortByToggleProps())}>
-                      <Div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', borderRadius:'10px 0 0 10px'}}>
+                      <Div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', borderRadius: '10px 0 0 10px' }}>
                         <Div width='85%' padding='10px'>
                           <H3 color='#6d767d'>
                             {column.render('Header')}
@@ -224,16 +233,16 @@ const InteractionsOverview = () => {
 
       </Div>
       <div className="pagination">
-        <button onClick={() => gotoPage(0)} disabled={!canPreviousPage}>
+        <button onClick={() => handlePage(0)} disabled={!canPreviousPage}>
           {'<<'}
         </button>{' '}
-        <button onClick={() => previousPage()} disabled={!canPreviousPage}>
+        <button onClick={() => handlePage(-1)} disabled={!canPreviousPage}>
           {'<'}
         </button>{' '}
-        <button onClick={() => nextPage()} disabled={!canNextPage}>
+        <button onClick={() => handlePage(1)} disabled={!canNextPage}>
           {'>'}
         </button>{' '}
-        <button onClick={() => gotoPage(pageCount - 1)} disabled={!canNextPage}>
+        <button onClick={() => handlePage(pageCount - 1)} disabled={!canNextPage}>
           {'>>'}
         </button>{' '}
         <span>
@@ -242,30 +251,6 @@ const InteractionsOverview = () => {
             {pageIndex + 1} of {pageOptions.length}
           </strong>{' '}
         </span>
-        <span>
-          | Go to page:{' '}
-          <input
-            type="number"
-            defaultValue={pageIndex + 1}
-            onChange={e => {
-              const page = e.target.value ? Number(e.target.value) - 1 : 0
-              gotoPage(page)
-            }}
-            style={{ width: '100px' }}
-          />
-        </span>{' '}
-        <select
-          value={pageSize}
-          onChange={e => {
-            setPageSize(Number(e.target.value))
-          }}
-        >
-          {[10, 20, 30, 40, 50].map(pageSize => (
-            <option key={pageSize} value={pageSize}>
-              Show {pageSize}
-            </option>
-          ))}
-        </select>
       </div>
     </Div>
   )
