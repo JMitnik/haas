@@ -113,7 +113,6 @@ const InteractionsOverview = () => {
       data?.interactions?.orderBy?.map(({ id, desc }: {id: string, desc: boolean}) => ({ id, desc })) || [], [data]
   )
   const inputPageSize = useMemo(() => data?.interactions?.pageIndex || 0, [data])
-  console.log('input page size in component: ', inputPageSize)
 
   const {
     getTableProps,
@@ -128,12 +127,11 @@ const InteractionsOverview = () => {
     canNextPage,
     pageOptions,
     pageCount,
-    state: { pageIndex, pageSize, sortBy },
+    state: { pageIndex, pageSize },
   } = useTable(
     {
       columns,
       manualSortBy: true,
-      // disableSortBy: true,
       manualPagination: true,
       pageCount: data?.interactions?.pages || 1,
       data: interactions,
@@ -144,8 +142,6 @@ const InteractionsOverview = () => {
     useSortBy,
     usePagination
   )
-
-  console.log('page index: ', pageIndex);
 
   useEffect(() => {
     fetchInteractions({
@@ -225,8 +221,6 @@ const InteractionsOverview = () => {
     tempLink.remove();
   }
 
-  if (loading) return null;
-
   return (
     <Div px="24px" margin="0 auto" width="100vh" height="100vh" maxHeight="100vh" overflow="hidden">
       <H2 color="#3653e8" fontWeight={400} mb="10%"> Interactions </H2>
@@ -261,8 +255,8 @@ const InteractionsOverview = () => {
         </InputContainer>
       </InputOutputContainer>
       <Div style={{ background: '#fdfbfe' }} mb="1%" height="65%">
-        {
-          interactions && <table {...getTableProps()} style={{ width: '100%', overflowY: "auto", borderCollapse: 'collapse' }}>
+        
+           <table {...getTableProps()} style={{ width: '100%', overflowY: "auto", borderCollapse: 'collapse' }}>
             <thead style={{
               borderRadius: '360px',
               background: '#f1f5f8',
@@ -295,7 +289,8 @@ const InteractionsOverview = () => {
                 </tr>
               ))}
             </thead>
-            <tbody {...getTableBodyProps()}>
+          {
+            interactions ? <tbody {...getTableBodyProps()}>
               {page.map((row, index: number) => {
                 prepareRow(row)
                 return (
@@ -310,9 +305,10 @@ const InteractionsOverview = () => {
                   </tr>
                 )
               })}
-            </tbody>
+            </tbody> : <div>LOADING</div>
+          } 
           </table>
-        }
+       
 
       </Div>
       <div className="pagination">
