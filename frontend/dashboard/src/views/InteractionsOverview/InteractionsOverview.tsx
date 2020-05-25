@@ -1,7 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import _ from 'lodash';
-import 'react-dates/initialize';
-import 'react-dates/lib/css/_datepicker.css';
 import { ApolloError } from 'apollo-boost';
 import { useForm } from 'react-hook-form';
 import { useMutation, useQuery, useLazyQuery } from '@apollo/react-hooks';
@@ -21,21 +19,12 @@ import {
   Div, StyledLabel, StyledInput, Hr, FormGroupContainer, Form
 } from '@haas/ui';
 import getInteractionsQuery from 'queries/getInteractionsQuery'
-import { InteractionsOverviewContainer, InputOutputContainer, OutputContainer, InputContainer } from './InteractionOverviewStyles';
+import { InputOutputContainer, OutputContainer, InputContainer } from './InteractionOverviewStyles';
 import Papa from 'papaparse';
-import { DateRangePicker, SingleDatePicker, DayPickerRangeController } from 'react-dates';
 import DatePicker from "react-datepicker";
-import { format, formatDistance, subDays, differenceInCalendarDays } from 'date-fns';
+import { format, formatDistance, differenceInCalendarDays } from 'date-fns';
 import "react-datepicker/dist/react-datepicker.css";
-import useInteractionsTable from "./useInteractionsTable";
 
-
-interface InteractionProps {
-  sessionId: string;
-  paths: number;
-  score: number;
-  createdAt: string;
-}
 
 interface CellProps {
   value: any;
@@ -52,7 +41,7 @@ const MyCell = ({ value }: CellProps) => {
   } else if (dateDifference > 4 && dateDifference < 7) {
     formatted = format(date, 'EEEE hh:mm a')
   } 
-  // const formattedCreatedAt = format(date, 'dd-LLL-yyyy HH:mm:ss.SSS');
+
   return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
     <div style={{ width: 'max-content', padding: '4px 24px', borderRadius: '90px', background: '#f1f5f8', color: '#6d767d' }}>
       <span style={{ fontSize: '0.8em', fontWeight: 900 }}>{formatted?.toUpperCase()}</span>
@@ -106,7 +95,9 @@ const InteractionsOverview = () => {
 
   const [activeStartDate, setActiveStartDate] = useState<Date | null>(null);
   const [activeEndDate, setActiveEndDate] = useState<Date | null>(null);
-  const [fetchInteractions, { loading, data }] = useLazyQuery(getInteractionsQuery);
+  const [activeSorting, setActiveSorting] = useState<Array<any>>([]);
+
+  const [fetchInteractions, { loading, data }] = useLazyQuery(getInteractionsQuery, { fetchPolicy: 'cache-and-network' });
 
   const interactions = useMemo(() => data?.interactions?.sessions || [], [data]);
   const columns = useMemo(() => [{
@@ -116,7 +107,13 @@ const InteractionsOverview = () => {
     maxWidth: 50,
     Cell: CenterCell
   }, { Header: 'SCORE', accessor: 'score', Cell: ScoreCell },
-  { Header: 'PATHS', accessor: 'paths', Cell: CenterCell }, { Header: 'USER', accessor: 'sessionId', Cell: UserCell }, { Header: 'WHEN', accessor: 'createdAt', Cell: MyCell }], []);
+  { Header: 'PATHS', accessor: 'paths', Cell: CenterCell }, { Header: 'USER', accessor: 'id', Cell: UserCell }, { Header: 'WHEN', accessor: 'createdAt', Cell: MyCell }], []);
+
+  const order = useMemo(() => 
+      data?.interactions?.orderBy?.map(({ id, desc }: {id: string, desc: boolean}) => ({ id, desc })) || [], [data]
+  )
+  const inputPageSize = useMemo(() => data?.interactions?.pageIndex || 0, [data])
+  console.log('input page size in component: ', inputPageSize)
 
   const {
     getTableProps,
@@ -125,50 +122,95 @@ const InteractionsOverview = () => {
     prepareRow,
     page,
     canPreviousPage,
+    gotoPage,
+    nextPage,
+    previousPage,
     canNextPage,
     pageOptions,
     pageCount,
-    state: { pageIndex, pageSize },
+    state: { pageIndex, pageSize, sortBy },
   } = useTable(
     {
       columns,
+      manualSortBy: true,
+      // disableSortBy: true,
       manualPagination: true,
       pageCount: data?.interactions?.pages || 1,
       data: interactions,
       initialState: {
-        pageIndex: data?.interactions?.pageIndex || 0, pageSize: 8, sortBy: [
-          {
-            id: 'sessionId',
-            desc: true
-          }
-        ]
+        pageIndex: inputPageSize , pageSize: 8, sortBy: order
       },
     },
     useSortBy,
     usePagination
   )
 
+  console.log('page index: ', pageIndex);
+
   useEffect(() => {
     fetchInteractions({
       variables: {
         dialogueId: topicId,
-        filter: { startDate: activeStartDate, endDate: activeEndDate, offset: pageIndex * pageSize, limit: pageSize, pageIndex },
+        filter: { startDate: activeStartDate, 
+          endDate: activeEndDate, 
+          offset: pageIndex * pageSize, 
+          limit: pageSize, pageIndex,
+          orderBy: [{ id: 'id', desc: true }] },
       },
     })
   }, [])
 
   const handlePage = (whichWay: number) => {
+    switch (whichWay) {
+      case 0:
+        gotoPage(0);
+        break;
+      case 1:
+        nextPage();
+        break;
+      case -1: 
+        previousPage();
+        break;
+      default:
+        gotoPage(whichWay);
+    }
+
+    const offset = whichWay !== 0 ? (pageIndex + whichWay) * pageSize : 0;
+    const newPageIndex = whichWay !== 0 ? pageIndex + whichWay : 0;
+
     fetchInteractions({
       variables: {
         dialogueId: topicId,
         filter: {
           startDate: activeStartDate,
           endDate: activeEndDate,
-          offset: whichWay !== 0 ? (pageIndex + whichWay) * pageSize : 0,
-          limit: pageSize, pageIndex: whichWay !== 0 ? pageIndex + whichWay : 0
+          offset,
+          limit: pageSize, 
+          pageIndex: newPageIndex,
+          orderBy: order,
         },
       },
     })
+  }
+
+  const handleSort = (targetSort: any) => {
+    const newOrderBy = order?.[0]?.id === targetSort.id ? 
+    [{ id: order?.[0]?.id, desc: !order?.[0]?.desc }] : 
+    [{id: targetSort.id, desc: true }]
+
+    fetchInteractions({
+      variables: {
+        dialogueId: topicId,
+        filter: {
+          startDate: activeStartDate,
+          endDate: activeEndDate,
+          offset: pageIndex * pageSize,
+          limit: pageSize, 
+          pageIndex: pageIndex,
+          orderBy: newOrderBy,
+        },
+      },
+    },)
   }
 
   const handleExport = () => {
@@ -182,8 +224,6 @@ const InteractionsOverview = () => {
     tempLink.click();
     tempLink.remove();
   }
-
-  console.log('DATA: ', data);
 
   if (loading) return null;
 
@@ -231,21 +271,27 @@ const InteractionsOverview = () => {
             }}>
               {headerGroups.map((headerGroup, index) => (
                 <tr key={index} {...headerGroup.getHeaderGroupProps()}>
-                  {headerGroup.headers.map((column, index) => (
+                  {headerGroup.headers.map((column, index) => { 
+                    return (
                     <th key={index} {...column.getHeaderProps(column.getSortByToggleProps())}>
-                      <Div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', borderRadius: '10px 0 0 10px' }}>
+                      <Div onClick={() => handleSort(column)} style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', borderRadius: '10px 0 0 10px' }}>
                         <Div style={{ maxWidth: 'fit-content' }} padding='10px'>
                           <H3 color='#6d767d'>
                             {column.render('Header')}
                           </H3>
                         </Div>
                         <span>
-                          {column.isSorted ? (column.isSortedDesc ? ' 🔽' : ' 🔼') : ''}
+                          {data?.interactions?.orderBy.find(
+                            (columnObject: any) => column.id === columnObject.id) ? 
+                            (data?.interactions?.orderBy.find(
+                              (columnObject: any) => column.id === columnObject.id)?.desc ? ' 🔽' : ' 🔼') : ''}
                         </span>
                       </Div>
 
                     </th>
-                  ))}
+                  )
+                }
+                )}
                 </tr>
               ))}
             </thead>

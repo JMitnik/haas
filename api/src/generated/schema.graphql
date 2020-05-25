@@ -117,19 +117,21 @@ input InteractionFilterInput {
   endDate: String
   limit: Int
   offset: Int
+  orderBy: [SortFilterInputObject!]
   pageIndex: Int
   startDate: String
 }
 
 type InteractionSessionType {
   createdAt: String!
+  id: String!
   index: Int!
   paths: Int!
   score: Float!
-  sessionId: String!
 }
 
 type InteractionType {
+  orderBy: [SortFilterObject!]!
   pageIndex: Int!
   pages: Int!
   pageSize: Int!
@@ -260,6 +262,16 @@ type Session {
 input SessionWhereUniqueInput {
   dialogueId: ID
   id: ID
+}
+
+input SortFilterInputObject {
+  desc: Boolean
+  id: String
+}
+
+type SortFilterObject {
+  desc: Boolean!
+  id: String!
 }
 
 input TopicDataEntry {

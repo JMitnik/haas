@@ -4,12 +4,16 @@ const getInteractionsQuery = gql`
   query getInteractions($dialogueId: ID!, $filter: InteractionFilterInput) {
     interactions(where: { dialogueId: $dialogueId }, filter: $filter) {
         sessions {
-          sessionId
+          id
           createdAt
           paths
           score
           index
         }
+        orderBy {
+            id
+            desc
+          }
         pages
         pageIndex
       }

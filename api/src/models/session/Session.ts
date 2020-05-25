@@ -125,10 +125,26 @@ export const SessionWhereUniqueInput = inputObjectType({
   },
 });
 
+export const SortFilterInputObject = inputObjectType({
+  name: 'SortFilterInputObject',
+  definition(t) {
+    t.string('id', { required: false });
+    t.boolean('desc', { required: false });
+  },
+});
+
+export const SortFilterObject = objectType({
+  name: 'SortFilterObject',
+  definition(t) {
+    t.string('id');
+    t.boolean('desc');
+  },
+});
+
 export const InteractionSessionType = objectType({
   name: 'InteractionSessionType',
   definition(t) {
-    t.string('sessionId');
+    t.string('id');
     t.int('index');
     t.float('score');
     t.int('paths');
@@ -145,6 +161,9 @@ export const InteractionType = objectType({
     t.int('pages');
     t.int('pageIndex');
     t.int('pageSize');
+    t.list.field('orderBy', {
+      type: SortFilterObject,
+    });
   },
 });
 
@@ -156,6 +175,10 @@ export const InteractionFilterInput = inputObjectType({
     t.int('offset', { required: false });
     t.int('limit', { required: false });
     t.int('pageIndex', { required: false });
+    t.list.field('orderBy', {
+      type: SortFilterInputObject,
+      required: false,
+    });
   },
 });
 
@@ -192,6 +215,9 @@ export const getSessionAnswerFlowQuery = extendType({
             { createdAt: { lte: endDate } }];
         }
 
+        const orderBy = args.filter.orderBy ? Object.assign({}, ...args.filter.orderBy) : null;
+        console.log('orderBy: ', orderBy);
+
         const pages = await prisma.session.findMany({
           where: {
             dialogueId: args.where.dialogueId,
@@ -203,7 +229,7 @@ export const getSessionAnswerFlowQuery = extendType({
           skip: offset,
           first: limit,
           orderBy: {
-            id: 'desc',
+            [orderBy.id]: orderBy.desc ? 'desc' : 'asc',
           },
           where: {
             dialogueId: args.where.dialogueId,
@@ -233,12 +259,18 @@ export const getSessionAnswerFlowQuery = extendType({
           const { id, createdAt } = session;
           const score = session.nodeEntries.find((entry) => entry.depth === 0)?.values?.[0]?.numberValue;
           const paths = session.nodeEntries.length;
-          return { sessionId: id, score, paths, createdAt };
+          return { id, score, paths, createdAt };
         });
-        const orderedSessions = _.orderBy(mappedSessions, (session) => session.createdAt, ['desc']);
-        const finalSessions = orderedSessions.map((session, index) => ({ ...session, index }));
+        // const orderedSessions = _.orderBy(mappedSessions, (session) => session.createdAt, ['desc']);
+        const finalSessions = mappedSessions.map((session, index) => ({ ...session, index }));
+        console.log('NEW CURRENT PAGE: ', pageIndex);
         return {
-          sessions: finalSessions, pages: Math.ceil(pages.length / limit), offset, limit, pageIndex,
+          sessions: finalSessions,
+          pages: Math.ceil(pages.length / limit),
+          offset,
+          limit,
+          pageIndex,
+          orderBy: args.filter.orderBy || [],
         };
       },
     });
@@ -295,6 +327,8 @@ export const uploadUserSessionMutation = extendType({
 });
 
 const sessionNexus = [
+  SortFilterObject,
+  SortFilterInputObject,
   InteractionSessionType,
   InteractionFilterInput,
   InteractionType,
