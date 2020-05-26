@@ -21,9 +21,7 @@ import {
 import getInteractionsQuery from 'queries/getInteractionsQuery'
 import { InputOutputContainer, OutputContainer, InputContainer } from './InteractionOverviewStyles';
 import Papa from 'papaparse';
-import DatePicker from "react-datepicker";
 import { format, formatDistance, differenceInCalendarDays } from 'date-fns';
-import "react-datepicker/dist/react-datepicker.css";
 import DatePickerComponent from './DatePickerComponent';
 
 interface CellProps {
@@ -92,14 +90,7 @@ const CenterCell = ({ value }: CellProps) => {
 
 const InteractionsOverview = () => {
   const { topicId, customerId } = useParams();
-
-  const [activeSorting, setActiveSorting] = useState<Array<any>>([]);
-
   const [fetchInteractions, { loading, data }] = useLazyQuery(getInteractionsQuery, { fetchPolicy: 'cache-and-network' });
-
-
-  // const [activeStartDate, setActiveStartDate] = useState<Date | null>(null);
-  // const [activeEndDate, setActiveEndDate] = useState<Date | null>(null);
   
   const activeStartDate = useMemo(() => data?.interactions?.startDate ? new Date(data?.interactions?.startDate) : null, [data?.interactions?.startDate])
   const activeEndDate = useMemo(() => data?.interactions?.endDate? new Date(data?.interactions?.endDate) : null, [data?.interactions?.endDate])
@@ -260,24 +251,7 @@ const InteractionsOverview = () => {
           <DatePickerComponent
             activeStartDate={activeStartDate}
             activeEndDate={activeEndDate}
-            // setActiveStartDate={setActiveStartDate}
-            // setActiveEndDate={setActiveEndDate} 
             handleDateChange={handleDateChange}/>
-          {/* <DatePicker
-            selected={activeStartDate}
-            onChange={date => setActiveStartDate(date)}
-            selectsStart
-            startDate={activeStartDate}
-            endDate={activeEndDate}
-          />
-          <DatePicker
-            selected={activeEndDate}
-            onChange={date => setActiveEndDate(date)}
-            selectsEnd
-            startDate={activeStartDate}
-            endDate={activeEndDate}
-            minDate={activeStartDate}
-          /> */}
           <Button padding="5px 12px">
             <Div marginRight="20%">SEARCH</Div>
             <Search />
