@@ -157,6 +157,7 @@ const InteractionsOverview = () => {
   }, [])
 
   const handlePage = (whichWay: number) => {
+    // FIXME: Somehow manages to go to amount of pages + 1 sometimes
     switch (whichWay) {
       case 0:
         gotoPage(0);

@@ -2,6 +2,7 @@ import _ from 'lodash';
 import { format } from 'date-fns';
 import { NodeEntry, NodeEntryValue, Session, PrismaClient, SessionWhereInput } from '@prisma/client';
 import { objectType, extendType, inputObjectType } from '@nexus/schema';
+import { id } from 'date-fns/locale';
 import SessionResolver from './session-resolver';
 import { QuestionNodeType } from '../question/QuestionNode';
 
@@ -216,7 +217,47 @@ export const getSessionAnswerFlowQuery = extendType({
         }
 
         const orderBy = args.filter.orderBy ? Object.assign({}, ...args.filter.orderBy) : null;
-        console.log('orderBy: ', orderBy);
+        let pageSessionIds: Array<any> = [];
+        if (orderBy.id === 'score') {
+          const nodeEntriesScore = await prisma.nodeEntry.findMany(
+            {
+              where: {
+                session: {
+                  dialogueId: args.where.dialogueId,
+                },
+                depth: 0,
+                values: {
+                  every: {
+                    numberValue: {
+                      not: null,
+                    },
+                  },
+                },
+              },
+              include: {
+                values: true,
+              },
+            },
+          );
+
+          const orderedNodeEntriesScore = _.orderBy(nodeEntriesScore, (entry) => entry.values[0].numberValue, orderBy.desc ? 'desc' : 'asc');
+          const pageNodeEntries = (offset + limit) < orderedNodeEntriesScore.length
+            ? orderedNodeEntriesScore.slice(offset, (pageIndex + 1) * limit)
+            : orderedNodeEntriesScore.slice(offset, orderedNodeEntriesScore.length);
+          pageSessionIds = pageNodeEntries.map((entry) => entry.sessionId);
+        }
+
+        const whereClause: SessionWhereInput = {
+          dialogueId: args.where.dialogueId,
+        };
+
+        if (dateRange.length > 0) {
+          whereClause.AND = dateRange;
+        }
+
+        if (pageSessionIds.length > 0) {
+          whereClause.id = { in: pageSessionIds };
+        }
 
         const pages = await prisma.session.findMany({
           where: {
@@ -225,16 +266,17 @@ export const getSessionAnswerFlowQuery = extendType({
           },
         });
 
+        const orderByClause = orderBy.id !== 'score' ? {
+          [orderBy.id]: orderBy.desc ? 'desc' : 'asc',
+        } : null;
+        const skipClause = pageSessionIds.length === 0 ? offset : null;
+        const firstClause = pageSessionIds.length === 0 ? limit : null;
+
         const sessions = await prisma.session.findMany({
-          skip: offset,
-          first: limit,
-          orderBy: {
-            [orderBy.id]: orderBy.desc ? 'desc' : 'asc',
-          },
-          where: {
-            dialogueId: args.where.dialogueId,
-            AND: dateRange,
-          },
+          skip: skipClause,
+          first: firstClause,
+          orderBy: orderByClause,
+          where: whereClause,
           include: {
             nodeEntries: {
               select: {
@@ -255,15 +297,16 @@ export const getSessionAnswerFlowQuery = extendType({
 
         console.log('Sessions: ', sessions.length);
         console.log('Pages: ', Math.ceil(pages.length / limit));
-        const mappedSessions = sessions.map((session) => {
-          const { id, createdAt } = session;
+        let mappedSessions = sessions.map((session) => {
+          const { createdAt } = session;
           const score = session.nodeEntries.find((entry) => entry.depth === 0)?.values?.[0]?.numberValue;
           const paths = session.nodeEntries.length;
-          return { id, score, paths, createdAt };
+          return { id: session.id, score, paths, createdAt };
         });
-        // const orderedSessions = _.orderBy(mappedSessions, (session) => session.createdAt, ['desc']);
+
+        const orderedSessions = pageSessionIds.length > 0 ? _.orderBy(mappedSessions, (session) => session.score, orderBy.desc ? 'desc' : 'asc') : [];
+        mappedSessions = orderedSessions.length > 0 ? orderedSessions : mappedSessions;
         const finalSessions = mappedSessions.map((session, index) => ({ ...session, index }));
-        console.log('NEW CURRENT PAGE: ', pageIndex);
         return {
           sessions: finalSessions,
           pages: Math.ceil(pages.length / limit),
