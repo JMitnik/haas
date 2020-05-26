@@ -24,7 +24,7 @@ import Papa from 'papaparse';
 import DatePicker from "react-datepicker";
 import { format, formatDistance, differenceInCalendarDays } from 'date-fns';
 import "react-datepicker/dist/react-datepicker.css";
-
+import DatePickerComponent from './DatePickerComponent';
 
 interface CellProps {
   value: any;
@@ -40,7 +40,7 @@ const MyCell = ({ value }: CellProps) => {
     formatted = `${formatDistance(date, currentDate)} ago`;
   } else if (dateDifference > 4 && dateDifference < 7) {
     formatted = format(date, 'EEEE hh:mm a')
-  } 
+  }
 
   return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
     <div style={{ width: 'max-content', padding: '4px 24px', borderRadius: '90px', background: '#f1f5f8', color: '#6d767d' }}>
@@ -93,12 +93,16 @@ const CenterCell = ({ value }: CellProps) => {
 const InteractionsOverview = () => {
   const { topicId, customerId } = useParams();
 
-  const [activeStartDate, setActiveStartDate] = useState<Date | null>(null);
-  const [activeEndDate, setActiveEndDate] = useState<Date | null>(null);
   const [activeSorting, setActiveSorting] = useState<Array<any>>([]);
 
   const [fetchInteractions, { loading, data }] = useLazyQuery(getInteractionsQuery, { fetchPolicy: 'cache-and-network' });
 
+
+  // const [activeStartDate, setActiveStartDate] = useState<Date | null>(null);
+  // const [activeEndDate, setActiveEndDate] = useState<Date | null>(null);
+  
+  const activeStartDate = useMemo(() => data?.interactions?.startDate ? new Date(data?.interactions?.startDate) : null, [data?.interactions?.startDate])
+  const activeEndDate = useMemo(() => data?.interactions?.endDate? new Date(data?.interactions?.endDate) : null, [data?.interactions?.endDate])
   const interactions = useMemo(() => data?.interactions?.sessions || [], [data]);
   const columns = useMemo(() => [{
     Header: "NR",
@@ -109,8 +113,8 @@ const InteractionsOverview = () => {
   }, { Header: 'SCORE', accessor: 'score', Cell: ScoreCell },
   { Header: 'PATHS', accessor: 'paths', Cell: CenterCell }, { Header: 'USER', accessor: 'id', Cell: UserCell }, { Header: 'WHEN', accessor: 'createdAt', Cell: MyCell }], []);
 
-  const order = useMemo(() => 
-      data?.interactions?.orderBy?.map(({ id, desc }: {id: string, desc: boolean}) => ({ id, desc })) || [], [data]
+  const order = useMemo(() =>
+    data?.interactions?.orderBy?.map(({ id, desc }: { id: string, desc: boolean }) => ({ id, desc })) || [], [data]
   )
   const inputPageSize = useMemo(() => data?.interactions?.pageIndex || 0, [data])
 
@@ -136,7 +140,7 @@ const InteractionsOverview = () => {
       pageCount: data?.interactions?.pages || 1,
       data: interactions,
       initialState: {
-        pageIndex: inputPageSize , pageSize: 8, sortBy: order
+        pageIndex: inputPageSize, pageSize: 8, sortBy: order
       },
     },
     useSortBy,
@@ -147,11 +151,13 @@ const InteractionsOverview = () => {
     fetchInteractions({
       variables: {
         dialogueId: topicId,
-        filter: { startDate: activeStartDate, 
-          endDate: activeEndDate, 
-          offset: pageIndex * pageSize, 
+        filter: {
+          startDate: activeStartDate,
+          endDate: activeEndDate,
+          offset: pageIndex * pageSize,
           limit: pageSize, pageIndex,
-          orderBy: [{ id: 'id', desc: true }] },
+          orderBy: [{ id: 'id', desc: true }]
+        },
       },
     })
   }, [])
@@ -165,7 +171,7 @@ const InteractionsOverview = () => {
       case 1:
         nextPage();
         break;
-      case -1: 
+      case -1:
         previousPage();
         break;
       default:
@@ -182,7 +188,7 @@ const InteractionsOverview = () => {
           startDate: activeStartDate,
           endDate: activeEndDate,
           offset,
-          limit: pageSize, 
+          limit: pageSize,
           pageIndex: newPageIndex,
           orderBy: order,
         },
@@ -190,10 +196,26 @@ const InteractionsOverview = () => {
     })
   }
 
+  const handleDateChange = (startDate: Date | null, endDate: Date | null) => {
+    fetchInteractions({
+      variables: {
+        dialogueId: topicId,
+        filter: {
+          startDate,
+          endDate,
+          offset: pageIndex * pageSize,
+          limit: pageSize, 
+          pageIndex,
+          orderBy: order,
+        },
+      },
+    })
+  }
+ 
   const handleSort = (targetSort: any) => {
-    const newOrderBy = order?.[0]?.id === targetSort.id ? 
-    [{ id: order?.[0]?.id, desc: !order?.[0]?.desc }] : 
-    [{id: targetSort.id, desc: true }]
+    const newOrderBy = order?.[0]?.id === targetSort.id ?
+      [{ id: order?.[0]?.id, desc: !order?.[0]?.desc }] :
+      [{ id: targetSort.id, desc: true }]
 
     fetchInteractions({
       variables: {
@@ -202,12 +224,12 @@ const InteractionsOverview = () => {
           startDate: activeStartDate,
           endDate: activeEndDate,
           offset: pageIndex * pageSize,
-          limit: pageSize, 
+          limit: pageSize,
           pageIndex: pageIndex,
           orderBy: newOrderBy,
         },
       },
-    },)
+    })
   }
 
   const handleExport = () => {
@@ -222,6 +244,7 @@ const InteractionsOverview = () => {
     tempLink.remove();
   }
 
+  console.log('Active date: ', activeStartDate);
   return (
     <Div px="24px" margin="0 auto" width="100vh" height="100vh" maxHeight="100vh" overflow="hidden">
       <H2 color="#3653e8" fontWeight={400} mb="10%"> Interactions </H2>
@@ -234,7 +257,13 @@ const InteractionsOverview = () => {
           </Button>
         </OutputContainer>
         <InputContainer>
-          <DatePicker
+          <DatePickerComponent
+            activeStartDate={activeStartDate}
+            activeEndDate={activeEndDate}
+            // setActiveStartDate={setActiveStartDate}
+            // setActiveEndDate={setActiveEndDate} 
+            handleDateChange={handleDateChange}/>
+          {/* <DatePicker
             selected={activeStartDate}
             onChange={date => setActiveStartDate(date)}
             selectsStart
@@ -248,7 +277,7 @@ const InteractionsOverview = () => {
             startDate={activeStartDate}
             endDate={activeEndDate}
             minDate={activeStartDate}
-          />
+          /> */}
           <Button padding="5px 12px">
             <Div marginRight="20%">SEARCH</Div>
             <Search />
@@ -256,18 +285,18 @@ const InteractionsOverview = () => {
         </InputContainer>
       </InputOutputContainer>
       <Div style={{ background: '#fdfbfe' }} mb="1%" height="65%">
-        
-           <table {...getTableProps()} style={{ width: '100%', overflowY: "auto", borderCollapse: 'collapse' }}>
-            <thead style={{
-              borderRadius: '360px',
-              background: '#f1f5f8',
-              color: 'black',
-              fontWeight: 'bold',
-            }}>
-              {headerGroups.map((headerGroup, index) => (
-                <tr key={index} {...headerGroup.getHeaderGroupProps()}>
-                  {headerGroup.headers.map((column, index) => { 
-                    return (
+
+        <table {...getTableProps()} style={{ width: '100%', overflowY: "auto", borderCollapse: 'collapse' }}>
+          <thead style={{
+            borderRadius: '360px',
+            background: '#f1f5f8',
+            color: 'black',
+            fontWeight: 'bold',
+          }}>
+            {headerGroups.map((headerGroup, index) => (
+              <tr key={index} {...headerGroup.getHeaderGroupProps()}>
+                {headerGroup.headers.map((column, index) => {
+                  return (
                     <th key={index} {...column.getHeaderProps(column.getSortByToggleProps())}>
                       <Div onClick={() => handleSort(column)} style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', borderRadius: '10px 0 0 10px' }}>
                         <Div style={{ maxWidth: 'fit-content' }} padding='10px'>
@@ -277,7 +306,7 @@ const InteractionsOverview = () => {
                         </Div>
                         <span>
                           {data?.interactions?.orderBy.find(
-                            (columnObject: any) => column.id === columnObject.id) ? 
+                            (columnObject: any) => column.id === columnObject.id) ?
                             (data?.interactions?.orderBy.find(
                               (columnObject: any) => column.id === columnObject.id)?.desc ? ' 🔽' : ' 🔼') : ''}
                         </span>
@@ -287,9 +316,9 @@ const InteractionsOverview = () => {
                   )
                 }
                 )}
-                </tr>
-              ))}
-            </thead>
+              </tr>
+            ))}
+          </thead>
           {
             interactions ? <tbody {...getTableBodyProps()}>
               {page.map((row, index: number) => {
@@ -307,9 +336,9 @@ const InteractionsOverview = () => {
                 )
               })}
             </tbody> : <div>LOADING</div>
-          } 
-          </table>
-       
+          }
+        </table>
+
 
       </Div>
       <div className="pagination">

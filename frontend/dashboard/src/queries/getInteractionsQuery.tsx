@@ -16,6 +16,8 @@ const getInteractionsQuery = gql`
           }
         pages
         pageIndex
+        startDate
+        endDate
       }
   }
 `;

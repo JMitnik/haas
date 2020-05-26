@@ -165,6 +165,8 @@ export const InteractionType = objectType({
     t.list.field('orderBy', {
       type: SortFilterObject,
     });
+    t.string('startDate', { nullable: true });
+    t.string('endDate', { nullable: true });
   },
 });
 
@@ -224,6 +226,7 @@ export const getSessionAnswerFlowQuery = extendType({
               where: {
                 session: {
                   dialogueId: args.where.dialogueId,
+                  AND: dateRange,
                 },
                 depth: 0,
                 values: {
@@ -312,7 +315,9 @@ export const getSessionAnswerFlowQuery = extendType({
           pages: Math.ceil(pages.length / limit),
           offset,
           limit,
-          pageIndex,
+          pageIndex: finalSessions.length > limit ? pageIndex : 0,
+          startDate,
+          endDate,
           orderBy: args.filter.orderBy || [],
         };
       },

@@ -131,11 +131,13 @@ type InteractionSessionType {
 }
 
 type InteractionType {
+  endDate: String
   orderBy: [SortFilterObject!]!
   pageIndex: Int!
   pages: Int!
   pageSize: Int!
   sessions: [InteractionSessionType!]!
+  startDate: String
 }
 
 input LeafNodeInput {

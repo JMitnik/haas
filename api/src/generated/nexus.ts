@@ -161,11 +161,13 @@ export interface NexusGenRootTypes {
     score: number; // Float!
   }
   InteractionType: { // root type
+    endDate?: string | null; // String
     orderBy: NexusGenRootTypes['SortFilterObject'][]; // [SortFilterObject!]!
     pageIndex: number; // Int!
     pages: number; // Int!
     pageSize: number; // Int!
     sessions: NexusGenRootTypes['InteractionSessionType'][]; // [InteractionSessionType!]!
+    startDate?: string | null; // String
   }
   Mutation: {};
   NodeEntry: prisma.NodeEntry;
@@ -303,11 +305,13 @@ export interface NexusGenFieldTypes {
     score: number; // Float!
   }
   InteractionType: { // field return type
+    endDate: string | null; // String
     orderBy: NexusGenRootTypes['SortFilterObject'][]; // [SortFilterObject!]!
     pageIndex: number; // Int!
     pages: number; // Int!
     pageSize: number; // Int!
     sessions: NexusGenRootTypes['InteractionSessionType'][]; // [InteractionSessionType!]!
+    startDate: string | null; // String
   }
   Mutation: { // field return type
     createCustomer: NexusGenRootTypes['Customer']; // Customer!
