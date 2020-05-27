@@ -23,7 +23,7 @@ import { InputOutputContainer, OutputContainer, InputContainer } from './Interac
 import Papa from 'papaparse';
 import { format, formatDistance, differenceInCalendarDays } from 'date-fns';
 import DatePickerComponent from './DatePickerComponent';
-
+import SearchBarComponent from './SearchBarComponent';
 interface CellProps {
   value: any;
   columnProps: any;
@@ -94,6 +94,7 @@ const InteractionsOverview = () => {
 
   const activeStartDate = useMemo(() => data?.interactions?.startDate ? new Date(data?.interactions?.startDate) : null, [data?.interactions?.startDate])
   const activeEndDate = useMemo(() => data?.interactions?.endDate ? new Date(data?.interactions?.endDate) : null, [data?.interactions?.endDate])
+  
   const interactions = useMemo(() => data?.interactions?.sessions || [], [data]);
   const columns = useMemo(() => [{
     Header: "NR",
@@ -152,6 +153,10 @@ const InteractionsOverview = () => {
       },
     })
   }, [])
+
+  const handleSearchTermChange = (newSearchTerm: string) => {
+    console.log('New search term: ', newSearchTerm);
+  }
 
   const handlePage = (whichWay: number) => {
     // FIXME: Somehow manages to go to amount of pages + 1 sometimes
@@ -253,10 +258,7 @@ const InteractionsOverview = () => {
             activeStartDate={activeStartDate}
             activeEndDate={activeEndDate}
             handleDateChange={handleDateChange} />
-          <Div padding={15} style={{ borderRadius: '90px' }} useFlex flexDirection='row' alignItems='center' backgroundColor='#f1f5f8'>
-            <Div style={{ color: '#6d767d'}}>SEARCH</Div>
-            <Search style={{ color: '#6d767d', marginLeft: '10px'}}/>
-          </Div>
+          <SearchBarComponent handleSearchTermChange={handleSearchTermChange} />
         </InputContainer>
       </InputOutputContainer>
       <Div style={{ background: '#fdfbfe' }} mb="1%" height="65%">
