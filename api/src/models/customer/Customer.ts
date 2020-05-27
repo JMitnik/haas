@@ -1,9 +1,13 @@
+
 import { Customer, PrismaClient } from '@prisma/client';
-import { objectType, extendType, inputObjectType } from '@nexus/schema';
+
+import { objectType, extendType, inputObjectType, scalarType } from '@nexus/schema';
+
+import { GraphQLUpload } from 'apollo-server-express';
+import cloudinary, { UploadApiResponse } from 'cloudinary';
 
 import { CustomerSettingsType } from '../settings/CustomerSettings';
 import { DialogueType } from '../questionnaire/Dialogue';
-
 import DialogueResolver from '../questionnaire/dialogue-resolver';
 import CustomerResolver from './customer-resolver';
 
@@ -15,7 +19,7 @@ export const CustomerType = objectType({
     t.string('name');
     t.field('settings', {
       type: CustomerSettingsType,
-      resolve(parent: Customer, args: any, ctx: any, info: any) {
+      resolve(parent: Customer, args: any, ctx: any) {
         const customerSettings = ctx.prisma.customerSettings.findOne(
           { where: { customerId: parent.id } },
         );
@@ -24,7 +28,7 @@ export const CustomerType = objectType({
     });
     t.list.field('dialogues', {
       type: DialogueType,
-      resolve(parent: Customer, args: any, ctx: any, info: any) {
+      resolve(parent: Customer, args: any, ctx: any) {
         const dialogues = ctx.prisma.dialogue.findMany({
           where: {
             customerId: parent.id,
@@ -43,28 +47,88 @@ export const CustomerWhereUniqueInput = inputObjectType({
   },
 });
 
-export const CustomerCreateOptionsInput = inputObjectType({
-  name: 'CustomerCreateOptions',
+export const ImageType = objectType({
+  name: 'ImageType',
   definition(t) {
-    t.boolean('isSeed', { default: false });
-    t.string('slug', { required: true });
-    t.string('logo');
-    t.string('primaryColour');
+    t.string('filename', { nullable: true });
+    t.string('mimetype', { nullable: true });
+    t.string('encoding', { nullable: true });
+    t.string('url', { nullable: true });
   },
 });
 
-export const CustomerMutations = extendType({
+export const Upload = GraphQLUpload && scalarType({
+  name: GraphQLUpload.name,
+  asNexusMethod: 'upload', // We set this to be used as a method later as `t.upload()` if needed
+  description: GraphQLUpload.description,
+  serialize: GraphQLUpload.serialize,
+  parseValue: GraphQLUpload.parseValue,
+  parseLiteral: GraphQLUpload.parseLiteral,
+});
+
+const CustomerCreateOptionsInput = inputObjectType({
+  name: 'CustomerCreateOptions',
+  definition(t) {
+    t.boolean('isSeed', { default: false, required: false });
+    t.string('slug', { required: true });
+    t.string('logo');
+    t.string('primaryColour');
+    t.string('name', { required: false });
+  },
+});
+
+interface test {
+  url?: string;
+}
+
+export const CustomerMutations = Upload && extendType({
   type: 'Mutation',
   definition(t) {
+    t.field('singleUpload', {
+      type: ImageType,
+      args: {
+        file: Upload,
+      },
+      async resolve(parent: any, { file }) {
+        const { createReadStream, filename, mimetype, encoding } = await file;
+        const stream = new Promise((resolve, reject) => {
+          const cld_upload_stream = cloudinary.v2.uploader.upload_stream({
+            folder: 'company_logos',
+          },
+          (error: any, result: UploadApiResponse | undefined) => {
+            if (result) {
+              return resolve(result);
+            }
+            return reject(error);
+          });
+
+          return createReadStream().pipe(cld_upload_stream);
+        });
+
+        const result: any = await stream;
+        const { url }: { url: string } = result;
+        return { filename, mimetype, encoding, url };
+      },
+    });
     t.field('createCustomer', {
       type: CustomerType,
       args: {
         name: 'String',
         options: CustomerCreateOptionsInput,
       },
-      resolve(parent: any, args: any, ctx: any, info: any) {
-        console.log(args);
+      async resolve(parent: any, args: any, ctx: any) {
+        const file = await args.options.file;
         return CustomerResolver.createCustomer(args);
+      },
+    });
+    t.field('editCustomer', {
+      type: CustomerType,
+      args: {
+        id: 'String',
+        options: CustomerCreateOptionsInput,
+      },
+      resolve(parent: any, args: any, ctx: any) {
+        return CustomerResolver.editCustomer(args);
       },
     });
     t.field('deleteCustomer', {
@@ -72,12 +136,13 @@ export const CustomerMutations = extendType({
       args: {
         where: CustomerWhereUniqueInput,
       },
-      async resolve(parent: any, args: any, ctx: any, info: any) {
+      async resolve(parent: any, args: any, ctx: any) {
         const customerId = args.where.id;
         // TODO: Check with jonathan if this is preferred for auto completion
-        const { prisma } : { prisma: PrismaClient } = ctx.prisma;
+        const { prisma }: { prisma: PrismaClient } = ctx.prisma;
 
-        const customer = await ctx.prisma.customer.findOne({ where: { id: customerId },
+        const customer = await ctx.prisma.customer.findOne({
+          where: { id: customerId },
           include: {
             settings: {
               include: {
@@ -85,7 +150,8 @@ export const CustomerMutations = extendType({
                 fontSettings: true,
               },
             },
-          } });
+          },
+        });
 
         const colourSettingsId = customer?.settings?.colourSettingsId;
         const fontSettingsId = customer?.settings?.fontSettingsId;
@@ -187,6 +253,7 @@ export const CustomerQuery = extendType({
 });
 
 const customerNexus = [
+  Upload,
   CustomersQuery,
   CustomerQuery,
   CustomerMutations,

@@ -20,6 +20,7 @@ type Customer {
 input CustomerCreateOptions {
   isSeed: Boolean = false
   logo: String
+  name: String
   primaryColour: String
   slug: String!
 }
@@ -36,6 +37,7 @@ input CustomerWhereUniqueInput {
 }
 
 type Dialogue {
+  averageScore: String
   creationDate: String
   customer: Customer!
   customerId: String!
@@ -105,6 +107,13 @@ type FontSettings {
   id: ID!
 }
 
+type ImageType {
+  encoding: String
+  filename: String
+  mimetype: String
+  url: String
+}
+
 input LeafNodeInput {
   id: ID
   title: String
@@ -121,6 +130,9 @@ type Mutation {
   createDialogue(customerId: String, description: String, isSeed: Boolean, publicTitle: String, title: String): Dialogue!
   deleteCustomer(where: CustomerWhereUniqueInput): Customer!
   deleteDialogue(where: DialogueWhereUniqueInput): Dialogue!
+  editCustomer(id: String, options: CustomerCreateOptions): Customer!
+  editDialogue(description: String, dialogueId: String, publicTitle: String, title: String): Dialogue!
+  singleUpload(file: Upload): ImageType!
   updateTopicBuilder(id: String, topicData: TopicDataEntry): String!
   uploadUserSession(uploadUserSessionInput: UploadUserSessionInput): Session!
 }
@@ -157,9 +169,9 @@ type Query {
   dialogue(where: DialogueWhereUniqueInput): Dialogue!
   dialogues(customerId: ID): [Dialogue!]!
   edge(id: String): Edge!
-  getQuestionnaireData(dialogueId: String): DialogueDetailResult!
+  getQuestionnaireData(dialogueId: String, filter: Int): DialogueDetailResult!
   getSessionAnswerFlow(sessionId: ID): Session!
-  lineChartData(dialogueId: String, numberOfDaysBack: Int): [lineChartDataType!]!
+  lineChartData(dialogueId: String, limit: Int, numberOfDaysBack: Int, offset: Int): [lineChartDataType!]!
   questionNode(where: QuestionNodeWhereUniqueInput): QuestionNode!
   questionNodes: [QuestionNode!]!
   session(where: SessionWhereUniqueInput): Session!
@@ -240,6 +252,9 @@ type UniqueDataResultEntry {
   sessionId: String!
   value: Int!
 }
+
+"""The `Upload` scalar type represents a file upload."""
+scalar Upload
 
 input UploadUserSessionInput {
   dialogueId: String!

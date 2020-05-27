@@ -258,6 +258,17 @@ export const SliderContainer = styled.div`
         }
       }
 
+      &::-moz-range-track {
+        width: 100%;
+        margin-top: 80px;
+        height: 15px;
+        cursor: pointer;
+        width: 100%;
+        box-shadow: 0px 2px 2px 1px rgba(0,0,0,0.05);
+        background: linear-gradient(45deg, rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.04));
+        border-radius: 10px;
+      }
+
       &::-webkit-slider-runnable-track {
         width: 100%;
         margin-top: 80px;

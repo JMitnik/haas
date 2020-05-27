@@ -1,7 +1,8 @@
 import _ from 'lodash';
-import { PrismaClient, Dialogue, DialogueCreateInput } from '@prisma/client';
+import { PrismaClient, Dialogue, DialogueCreateInput, NodeEntry } from '@prisma/client';
+import { isAfter, subDays } from 'date-fns';
 import NodeResolver from '../question/node-resolver';
-import { leafNodes } from '../../data/seeds/default-data';
+import { leafNodes, sliderType } from '../../data/seeds/default-data';
 
 const prisma = new PrismaClient();
 interface LeafNodeProps {
@@ -68,16 +69,146 @@ class DialogueResolver {
     };
   }
 
+  static editDialogue = async (args: any) => {
+    const { dialogueId, title, description, publicTitle } = args;
+    const dialogue = await prisma.dialogue.update({
+      where: {
+        id: dialogueId,
+      },
+      data: {
+        title,
+        description,
+        publicTitle,
+      },
+    });
+    return dialogue;
+  };
+
   static getTopPaths = (groupedJoined: any) => {
-    // console.log('JOINED: ', joined);
     const countedPaths = _.countBy(groupedJoined, 'textValue');
     const o = _.sortBy(_.toPairs(countedPaths), 1).reverse();
     const countedPathsObjects = o.map((array) => ({ answer: array[0], quantity: array[1] }));
-    const topPath = countedPathsObjects.length > 3 ? countedPathsObjects.slice(0, 3) : countedPathsObjects;
+    const topPath = countedPathsObjects.length > 3
+      ? countedPathsObjects.slice(0, 3) : countedPathsObjects;
     return topPath;
   };
 
+  static getNextLineData = async (dialogueId: string, numberOfDaysBack: number, limit: number, offset: number) => {
+    const currentDate = new Date();
+    const filterDateTime = subDays(currentDate, numberOfDaysBack);
+    console.log('OFFSET: ', offset);
+    const sessions = await prisma.session.findMany({
+      skip: offset,
+      first: limit,
+      where: {
+        dialogueId,
+      },
+      include: {
+        nodeEntries: {
+          select: {
+            creationDate: true,
+            depth: true,
+            values: {
+              select: {
+                id: true,
+                nodeEntryId: true,
+                numberValue: true,
+                textValue: true,
+              },
+            },
+          },
+        },
+      },
+    });
+    console.log('Sessions: ', sessions.length);
+
+    const nodeEntries = sessions.flatMap((session) => session.nodeEntries);
+    const nodeEntryValues = nodeEntries && nodeEntries.flatMap((nodeEntry) => (
+      { creationDate: nodeEntry.creationDate,
+        values: nodeEntry.values[0],
+        depth: nodeEntry.depth }));
+    const nodeEntryNumberValues = nodeEntryValues?.filter(
+      (nodeEntryValue) => nodeEntryValue?.values?.numberValue
+      && isAfter(nodeEntryValue.creationDate, filterDateTime)
+    );
+    const finalNodeEntryNumberValues = nodeEntryNumberValues?.map(
+      (nodeEntryNumberValue) => (
+        {
+          x: nodeEntryNumberValue.creationDate,
+          y: nodeEntryNumberValue.values.numberValue,
+          nodeEntryId: nodeEntryNumberValue.values.nodeEntryId,
+        }));
+    const orderedFinalNodeEntryNumberValues = _.orderBy(finalNodeEntryNumberValues, ['x'], ['asc']);
+    const lineChartData = orderedFinalNodeEntryNumberValues.map((entry) => (
+      { x: entry.x.toUTCString(), y: entry.y }));
+    return lineChartData;
+  };
+
   static getLineData = async (dialogueId: string, numberOfDaysBack: number) => {
+    const currentDate = new Date();
+    const filterDateTime = subDays(currentDate, numberOfDaysBack);
+    const sessions = await prisma.session.findMany({
+      // skip: offset,
+      // first: limit,
+      where: {
+        dialogueId,
+      },
+      include: {
+        nodeEntries: {
+          select: {
+            creationDate: true,
+            depth: true,
+            values: {
+              select: {
+                id: true,
+                nodeEntryId: true,
+                numberValue: true,
+                textValue: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    const nodeEntries = sessions.flatMap((session) => session.nodeEntries);
+    const nodeEntryValues = nodeEntries && nodeEntries.flatMap((nodeEntry) => (
+      { creationDate: nodeEntry.creationDate,
+        values: nodeEntry.values[0],
+        depth: nodeEntry.depth }));
+    const nodeEntryNumberValues = nodeEntryValues?.filter(
+      (nodeEntryValue) => nodeEntryValue?.values?.numberValue
+      && isAfter(nodeEntryValue.creationDate, filterDateTime)
+    );
+    const finalNodeEntryNumberValues = nodeEntryNumberValues?.map(
+      (nodeEntryNumberValue) => (
+        {
+          x: nodeEntryNumberValue.creationDate,
+          y: nodeEntryNumberValue.values.numberValue,
+          nodeEntryId: nodeEntryNumberValue.values.nodeEntryId,
+        }));
+    const orderedFinalNodeEntryNumberValues = _.orderBy(finalNodeEntryNumberValues, ['x'], ['asc']);
+    const lineChartData = orderedFinalNodeEntryNumberValues.map((entry) => (
+      { x: entry.x.toUTCString(), y: entry.y }));
+
+    const nodeEntryTextValues = nodeEntryValues?.filter(
+      (nodeEntryValue) => nodeEntryValue?.values?.textValue && nodeEntryValue?.depth === 1
+      && isAfter(nodeEntryValue.creationDate, filterDateTime));
+    const finalNodeEntryTextValues = nodeEntryTextValues?.map(
+      (nodeEntryTextValue) => (
+        { nodeEntryId: nodeEntryTextValue.values.nodeEntryId,
+          textValue: nodeEntryTextValue.values.textValue }));
+    const joined = _.merge(lineChartData, finalNodeEntryTextValues);
+    const groupedJoined = _.groupBy(joined, (entry) => entry.y && entry.y > 50);
+    const topNegativePath = DialogueResolver.getTopPaths(groupedJoined.false);
+    const topPositivePath = DialogueResolver.getTopPaths(groupedJoined.true);
+    return { lineChartData, topNegativePath, topPositivePath };
+  };
+
+  static getLineData_OLD = async (dialogueId: string, numberOfDaysBack: number) => {
+    const currentDate = new Date();
+    const filterDateTime = subDays(currentDate, numberOfDaysBack);
+
     const dialogue = await prisma.dialogue.findOne(
       {
         where: { id: dialogueId },
@@ -104,20 +235,31 @@ class DialogueResolver {
       },
     );
     const nodeEntries = dialogue?.sessions.flatMap((session) => session.nodeEntries);
-    const nodeEntryValues = nodeEntries && nodeEntries.flatMap((nodeEntry) => ({ creationDate: nodeEntry.creationDate, values: nodeEntry.values[0], depth: nodeEntry.depth }));
-    const nodeEntryNumberValues = nodeEntryValues?.filter((nodeEntryValue) => nodeEntryValue?.values?.numberValue);
+    const nodeEntryValues = nodeEntries && nodeEntries.flatMap((nodeEntry) => (
+      { creationDate: nodeEntry.creationDate,
+        values: nodeEntry.values[0],
+        depth: nodeEntry.depth }));
+    const nodeEntryNumberValues = nodeEntryValues?.filter(
+      (nodeEntryValue) => nodeEntryValue?.values?.numberValue
+      && nodeEntryValue.creationDate > filterDateTime);
     const finalNodeEntryNumberValues = nodeEntryNumberValues?.map(
       (nodeEntryNumberValue) => (
-        { x: nodeEntryNumberValue.creationDate,
+        {
+          x: nodeEntryNumberValue.creationDate,
           y: nodeEntryNumberValue.values.numberValue,
-          nodeEntryId: nodeEntryNumberValue.values.nodeEntryId }));
+          nodeEntryId: nodeEntryNumberValue.values.nodeEntryId,
+        }));
     const orderedFinalNodeEntryNumberValues = _.orderBy(finalNodeEntryNumberValues, ['x'], ['asc']);
-    const lineChartData = orderedFinalNodeEntryNumberValues.map((entry) => ({ x: entry.x.toUTCString(), y: entry.y }));
+    const lineChartData = orderedFinalNodeEntryNumberValues.map(
+      (entry) => ({ x: entry.x.toUTCString(), y: entry.y }),
+    );
 
-    const nodeEntryTextValues = nodeEntryValues?.filter((nodeEntryValue) => nodeEntryValue?.values?.textValue && nodeEntryValue?.depth === 1);
+    const nodeEntryTextValues = nodeEntryValues?.filter(
+      (nodeEntryValue) => nodeEntryValue?.values?.textValue && nodeEntryValue?.depth === 1);
     const finalNodeEntryTextValues = nodeEntryTextValues?.map(
       (nodeEntryTextValue) => (
-        { nodeEntryId: nodeEntryTextValue.values.nodeEntryId, textValue: nodeEntryTextValue.values.textValue }));
+        { nodeEntryId: nodeEntryTextValue.values.nodeEntryId,
+          textValue: nodeEntryTextValue.values.textValue }));
     const joined = _.merge(lineChartData, finalNodeEntryTextValues);
     const groupedJoined = _.groupBy(joined, (entry) => entry.y && entry.y > 50);
     const topNegativePath = DialogueResolver.getTopPaths(groupedJoined.false);
@@ -150,39 +292,47 @@ class DialogueResolver {
     });
 
     const sessionIds = dialogue?.sessions.map((session) => session.id);
-    const nodeEntries = await prisma.nodeEntry.findMany({ where: {
-      sessionId: {
-        in: sessionIds,
+    const nodeEntries = await prisma.nodeEntry.findMany({
+      where: {
+        sessionId: {
+          in: sessionIds,
+        },
       },
-    } });
+    });
 
     const nodeEntryIds = nodeEntries.map((nodeEntry) => nodeEntry.id);
     // FIXME: nodeEntryValues of leaf node remain in db
     if (nodeEntryIds.length > 0) {
       await prisma.nodeEntryValue.deleteMany(
-        { where: {
-          nodeEntryId: {
-            in: nodeEntryIds,
+        {
+          where: {
+            nodeEntryId: {
+              in: nodeEntryIds,
+            },
           },
-        } },
+        },
       );
 
       await prisma.nodeEntry.deleteMany(
-        { where: {
-          sessionId: {
-            in: sessionIds,
+        {
+          where: {
+            sessionId: {
+              in: sessionIds,
+            },
           },
-        } },
+        },
       );
     }
 
     if (sessionIds && sessionIds.length > 0) {
       await prisma.session.deleteMany(
-        { where: {
-          id: {
-            in: sessionIds,
+        {
+          where: {
+            id: {
+              in: sessionIds,
+            },
           },
-        } },
+        },
       );
     }
 
@@ -190,19 +340,23 @@ class DialogueResolver {
     const edgeIds = dialogue?.edges && dialogue?.edges.map((edge) => edge.id);
     if (edgeIds && edgeIds.length > 0) {
       await prisma.questionCondition.deleteMany(
-        { where: {
-          edgeId: {
-            in: edgeIds,
+        {
+          where: {
+            edgeId: {
+              in: edgeIds,
+            },
           },
-        } },
+        },
       );
 
       await prisma.edge.deleteMany(
-        { where: {
-          id: {
-            in: edgeIds,
+        {
+          where: {
+            id: {
+              in: edgeIds,
+            },
           },
-        } },
+        },
       );
     }
 
@@ -210,19 +364,23 @@ class DialogueResolver {
     const questionIds = dialogue?.questions.map((question) => question.id);
     if (questionIds && questionIds.length > 0) {
       await prisma.questionOption.deleteMany(
-        { where: {
-          questionNodeId: {
-            in: questionIds,
+        {
+          where: {
+            questionNodeId: {
+              in: questionIds,
+            },
           },
-        } },
+        },
       );
 
       await prisma.questionNode.deleteMany(
-        { where: {
-          id: {
-            in: questionIds,
+        {
+          where: {
+            id: {
+              in: questionIds,
+            },
           },
-        } },
+        },
       );
     }
 
@@ -252,20 +410,30 @@ class DialogueResolver {
   static createDialogue = async (args: any): Promise<Dialogue> => {
     const { customerId, title, description, publicTitle, isSeed } = args;
     let questionnaire = null;
+    const customer = await prisma.customer.findOne({ where: { id: customerId } });
 
     if (isSeed) {
-      const customer = await prisma.customer.findOne({ where: { id: customerId } });
-
       if (customer?.name) {
         return DialogueResolver.seedQuestionnare(customerId, customer?.name, title, description);
       }
-
-      console.log('Cant find customer with specified ID while seeding');
     }
     questionnaire = await DialogueResolver.initDialogue(
       customerId, title, description, publicTitle,
     );
-
+    await prisma.dialogue.update({
+      where: {
+        id: questionnaire.id,
+      },
+      data: {
+        questions: {
+          create: {
+            title: `What do you think about ${customer?.name} ?`,
+            type: sliderType,
+            isRoot: true,
+          },
+        },
+      },
+    });
     await NodeResolver.createTemplateLeafNodes(leafNodes, questionnaire.id);
 
     return questionnaire;

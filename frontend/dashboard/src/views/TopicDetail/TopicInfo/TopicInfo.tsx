@@ -1,6 +1,8 @@
 import React from 'react';
-import { H2, Muted, Hr, Div } from '@haas/ui';
+import { H2, Muted, Hr, Div, EditDialogueContainer } from '@haas/ui';
 import { TopicInfoView, Score } from './TopicInfoStyles';
+import { useParams, Switch, Route, useHistory, useLocation } from 'react-router-dom';
+import { Edit } from 'react-feather';
 import styled from 'styled-components/macro';
 
 interface TimelineEntryProps {
@@ -34,16 +36,21 @@ const StatisticWidget = styled(Div)`
 const TopicInfo = (
   { DialogueResultProps, customerId, topicId }: { DialogueResultProps: DialogueResultProps, customerId: string, topicId: string },
 ) => {
-
+  const history = useHistory();
 
   return (
-<TopicInfoView>
-    {
-      DialogueResultProps && (
-        <>
-          <H2 color="#3e3d5a" fontWeight={400} mb={4}>
-            {DialogueResultProps?.title}
-          </H2>
+    <TopicInfoView>
+      <Div display="flex">
+        <H2 color="#3e3d5a" fontWeight={400} mb={4}>
+          {DialogueResultProps?.title || 'Dialogue'}
+        </H2>
+        <EditDialogueContainer onClick={() => history.push(`/dashboard/c/${customerId}/t/${topicId}/topic-builder/`)}>
+          <Edit />
+        </EditDialogueContainer>
+
+      </Div>
+      {
+        DialogueResultProps && (
           <StatisticWidget>
             {
               DialogueResultProps?.average !== 'false' && (
@@ -58,10 +65,9 @@ const TopicInfo = (
               )
             }
           </StatisticWidget>
-        </>
-      )
-    }
-  </TopicInfoView>
+        )
+      }
+    </TopicInfoView>
   );
 };
 

@@ -3,27 +3,33 @@ import React from 'react';
 import { ApolloError } from 'apollo-boost';
 import styled, { css } from 'styled-components/macro';
 import { useForm } from 'react-hook-form';
-import { useMutation } from '@apollo/react-hooks';
+import { useMutation, useQuery } from '@apollo/react-hooks';
 import { useHistory, useParams } from 'react-router';
 import { Container, Flex, Grid, H2, H3, Muted, Button,
   Div, StyledInput, StyledTextInput, StyledLabel, Hr } from '@haas/ui';
 import getQuestionnairesCustomerQuery from '../queries/getQuestionnairesCustomerQuery';
-import { createNewQuestionnaire } from '../mutations/createNewQuestionnaire';
+
+import getEditDialogueQuery from '../queries/getEditDialogue';
+import editDialogueMutation from '../mutations/editDialogue';
 
 interface FormDataProps {
   title: string;
   description: string;
   publicTitle?: string;
-  isSeed?: boolean;
 }
 
-const AddTopicView = () => {
+const EditTopicView = () => {
   const history = useHistory();
   const { register, handleSubmit, errors } = useForm<FormDataProps>();
-  const params = useParams();
-  const { customerId } = useParams();
+  const { customerId, topicId } = useParams();
 
-  const [addTopic, { loading }] = useMutation(createNewQuestionnaire, {
+  const editDialogueData = useQuery(getEditDialogueQuery, {
+    variables: {
+      id: topicId,
+    },
+  })
+
+  const [editDialogue, { loading }] = useMutation(editDialogueMutation, {
     onCompleted: () => {
       history.push(`/dashboard/c/${customerId}/`);
     },
@@ -36,15 +42,17 @@ const AddTopicView = () => {
     },
   });
 
+  
+
+  if (editDialogueData.loading) return null;
+
   const onSubmit = (formData: FormDataProps) => {
-    // TODO: Make better typescript supported
-    addTopic({
+    editDialogue({
       variables: {
-        customerId,
+        dialogueId: topicId,
         title: formData.title,
         publicTitle: formData.publicTitle,
         description: formData.description,
-        isSeed: formData.isSeed,
       },
     });
   };
@@ -52,8 +60,8 @@ const AddTopicView = () => {
   return (
     <Container>
       <Div>
-        <H2 color="default.darkest" fontWeight={500} py={2}> Topic Builder </H2>
-        <Muted pb={4}>Create a new topic</Muted>
+        <H2 color="default.darkest" fontWeight={500} py={2}> Dialogue </H2>
+        <Muted pb={4}>Edit a dialogue</Muted>
       </Div>
 
       <Hr />
@@ -62,39 +70,30 @@ const AddTopicView = () => {
         <FormGroupContainer>
           <Grid gridTemplateColumns={['1fr', '1fr 2fr']} gridColumnGap={4}>
             <Div py={4} pr={4}>
-              <H3 color="default.text" fontWeight={500} pb={2}>General topic information</H3>
+              <H3 color="default.text" fontWeight={500} pb={2}>General dialogue information</H3>
               <Muted>
-                General information about your project, such as title, descriptions, etc.
+                General information about your dialogue such as title, description, etc.
               </Muted>
             </Div>
             <Div py={4}>
               <Grid gridTemplateColumns={['1fr', '1fr 1fr']}>
                 <Flex flexDirection="column">
                   <StyledLabel>Title</StyledLabel>
-                  <StyledInput name="title" ref={register({ required: true })} />
+                  <StyledInput defaultValue={editDialogueData.data?.dialogue?.title} name="title" ref={register({ required: true })} />
                   {errors.title && <Muted color="warning">Something went wrong!</Muted>}
                 </Flex>
                 <Div useFlex pl={4} flexDirection="column">
                   <StyledLabel>Public Title</StyledLabel>
-                  <StyledInput name="publicTitle" ref={register({ required: true })} />
+                  <StyledInput defaultValue={editDialogueData.data?.dialogue?.publicTitle} name="publicTitle" ref={register({ required: true })} />
                   {errors.publicTitle && <Muted color="warning">Something went wrong!</Muted>}
                 </Div>
               </Grid>
               <Div py={4}>
                 <Flex flexDirection="column">
                   <StyledLabel>Description</StyledLabel>
-                  <StyledTextInput name="description" ref={register({ required: true })} />
+                  <StyledTextInput defaultValue={editDialogueData.data?.dialogue?.description} name="description" ref={register({ required: true })} />
                   {errors.description && <Muted color="warning">Something went wrong!</Muted>}
                 </Flex>
-              </Div>
-              <Div py={4}>
-                <StyledInput
-                  type="checkbox"
-                  id="isSeed"
-                  name="isSeed"
-                  ref={register({ required: false })}
-                />
-                <label htmlFor="isSeed"> Generate template topic </label>
               </Div>
             </Div>
           </Grid>
@@ -104,7 +103,7 @@ const AddTopicView = () => {
           {loading && (<Muted>Loading...</Muted>)}
 
           <Flex>
-            <Button brand="primary" mr={2} type="submit">Create topic</Button>
+            <Button brand="primary" mr={2} type="submit">Save dialogue</Button>
             <Button brand="default" type="button" onClick={() => history.push(`/dashboard/c/${customerId}/`)}>Cancel</Button>
           </Flex>
         </Div>
@@ -121,4 +120,4 @@ const FormGroupContainer = styled.div`
 
 const Form = styled.form``;
 
-export default AddTopicView;
+export default EditTopicView;

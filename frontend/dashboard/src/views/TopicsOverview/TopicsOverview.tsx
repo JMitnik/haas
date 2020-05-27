@@ -2,9 +2,9 @@ import React, { FC } from 'react';
 import { useQuery, useMutation } from '@apollo/react-hooks';
 import { ApolloError } from 'apollo-boost';
 
-import { Plus, X } from 'react-feather';
+import { Plus, X, Edit } from 'react-feather';
 import { H2, H3, Grid, Flex, Label, Div, Card, CardBody,
-  Container, DeleteButtonContainer } from '@haas/ui';
+  Container, DeleteButtonContainer, EditButtonContainer } from '@haas/ui';
 import { Link, useHistory, useParams, useLocation } from 'react-router-dom';
 
 import getQuestionnairesCustomerQuery from '../../queries/getQuestionnairesCustomerQuery';
@@ -12,7 +12,7 @@ import { deleteQuestionnaireMutation } from '../../mutations/deleteQuestionnaire
 import { AddTopicCard } from './TopicsOverviewStyles';
 
 const TopicsOverview: FC = () => {
-  const { customerId } = useParams();
+  const { topicId, customerId } = useParams();
   const location = useLocation();
   const history = useHistory();
 
@@ -23,14 +23,7 @@ const TopicsOverview: FC = () => {
   if (loading) return <p>Loading</p>;
 
   if (error) {
-    return (
-      <p>
-        `
-        Error:
-        {error.message}
-        `
-      </p>
-    );
+    return <p>Error: {error.message}</p>;
   }
 
   const topics: Array<any> = data?.dialogues;
@@ -38,7 +31,7 @@ const TopicsOverview: FC = () => {
   return (
     <>
       <Container>
-        <H2 color="default.text" fontWeight={400} mb={4}>Topics</H2>
+        <H2 color="default.text" fontWeight={400} mb={4}>Dialogues</H2>
 
         <Grid
           gridGap={4}
@@ -52,7 +45,7 @@ const TopicsOverview: FC = () => {
             <Div>
               <Plus />
               <H3>
-                Add topic
+                Add dialogue
               </H3>
             </Div>
           </AddTopicCard>
@@ -87,9 +80,17 @@ const TopicCard = ({ topic }: { topic: any }) => {
     event.stopPropagation();
   };
 
+  const setEditDialogue = (event: any, topicId: string) => {
+    history.push(`/dashboard/c/${customerId}/t/${topicId}/edit`);
+    event.stopPropagation();
+  }
+
   return (
     <Card useFlex flexDirection="column" onClick={() => history.push(`/dashboard/c/${customerId}/t/${topic.id}`)}>
       <CardBody flex="100%">
+        <EditButtonContainer onClick={(e) => setEditDialogue(e, topic.id)}>
+          <Edit />
+        </EditButtonContainer>
         <DeleteButtonContainer
           onClick={(e) => deleteClickedCustomer(e, topic.id)}
         >
@@ -100,7 +101,7 @@ const TopicCard = ({ topic }: { topic: any }) => {
             {topic.title}
           </H3>
           <Label brand="success">
-            9.3
+            {topic.averageScore === 'false' ? 'N/A' : Number(topic.averageScore).toFixed(1)}
           </Label>
         </Flex>
       </CardBody>

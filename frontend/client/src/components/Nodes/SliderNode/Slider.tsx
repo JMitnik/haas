@@ -99,6 +99,7 @@ const Slider = ({ register, onSubmit, animationControls }: SliderProps) => {
       <>
         <HAASRabbit style={{
           left: `${animationState.position}%`,
+          bottom: `5px`,
           transform: `translateX(-50%) scaleX(${animationState.direction})`
         }}>
           <Lottie

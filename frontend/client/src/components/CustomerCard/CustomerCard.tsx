@@ -1,8 +1,21 @@
 import React from 'react';
-import { Div, Card, CardBody, CardFooter, H3, Flex, ColumnFlex } from '@haas/ui';
-import Select, { ActionMeta } from 'react-select';
+import { Div, CardBody, CardFooter, H3, Flex, ColumnFlex } from '@haas/ui';
+import Select from 'react-select';
 import { useHistory } from 'react-router-dom';
 import { CustomerCardImage, CustomerCardEnqueteLabel } from './CustomerCardStyles';
+import styled, { css } from 'styled-components/macro';
+
+// TODO: Reconcile with regular Card
+const Card = styled(Div)`
+  ${({ theme }) => css`
+      position: relative;
+      border-radius: ${theme.borderRadiuses.md};
+      background: ${theme.colors.white};
+      color: ${theme.colors.default.darkest};
+      cursor: pointer;
+      transition: all .3s cubic-bezier(.55,0,.1,1);
+  `}
+`;
 
 const CustomerCard = ({ customer }: { customer: any }) => {
   const questionnaireOptions = customer?.dialogues?.map((dialogue: any) => ({
@@ -31,7 +44,9 @@ const CustomerCard = ({ customer }: { customer: any }) => {
             </ColumnFlex>
           </Div>
           <CustomerCardEnqueteLabel>
-            {customer?.dialogues ? customer?.dialogues.length : 'No'} questionnaires
+            {customer?.dialogues ? customer?.dialogues.length : 'No'}
+            {' '}
+            {customer?.dialogues?.length === 1 ? 'dialogue' : 'dialogues'}
           </CustomerCardEnqueteLabel>
         </Flex>
       </CardBody>

@@ -6,12 +6,10 @@ import { Plus, X } from 'react-feather';
 import { H2, H3, Grid, Flex, Div, Card, CardBody,
   Container, DeleteButtonContainer, AddCard } from '@haas/ui';
 import { Link, useHistory } from 'react-router-dom';
-// import { Query, Customer } from '../../types';
 
-import { getCustomerQuery } from '../../queries/getCustomerQuery';
+import { getCustomerQuery } from '../../queries/getCustomersQuery';
 import { deleteFullCustomerQuery } from '../../mutations/deleteFullCustomer';
 import { CustomerCardImage } from './DashboardViewStyles';
-import styled from 'styled-components/macro';
 
 const DashboardView: FC = () => {
   const { loading, error, data } = useQuery(getCustomerQuery);

@@ -8,10 +8,9 @@ export const DialogueContainer = styled(Div)`
     background: linear-gradient(45deg, ${Color(theme.colors.primary).darken(0.1).hex()}, ${Color(theme.colors.primary).lighten(0.4).hex()});
     padding: 5vh ${theme.gutter}px;
     margin: 0 auto;
-    position: relative;
     display: flex;
     width: 100%;
-    max-height: 100vh;
+    min-height: calc(var(--vh, 1vh) * 100);
     justify-content: center;
     align-items: stretch;
 
