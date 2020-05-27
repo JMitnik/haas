@@ -1,6 +1,7 @@
 import gql from 'graphql-tag';
-import { QuestionFragment } from './QuestionFragment';
+
 import { EdgeFragment } from './EdgeFragment';
+import { QuestionFragment } from './QuestionFragment';
 
 export const getQuestionNodeQuery = gql`
   query getQuestionNode($id: String!) {

@@ -1,19 +1,18 @@
+import { Route, Switch } from 'react-router-dom';
 import React, { useLayoutEffect } from 'react';
-import { Switch, Route } from 'react-router-dom';
 
-import AppProviders from 'providers/AppProviders';
 import AppContainer from 'styles/AppStyles';
+import AppProviders from 'providers/AppProviders';
+import CustomerPage from 'pages/[customer]';
 import CustomersPage from 'pages/customers';
 import DialogueTreePage from './[customer]/[dialogue]';
-import CustomerPage from 'pages/[customer]';
-import NodePage from './[customer]/[dialogue]/[node]';
 
 const App = () => {
   useLayoutEffect(() => {
     const updateSize = () => {
       const vh = window.innerHeight * 0.01;
       document.documentElement.style.setProperty('--vh', `${vh}px`);
-    }
+    };
 
     window.addEventListener('resize', updateSize);
     updateSize();
@@ -24,7 +23,6 @@ const App = () => {
   return (
     <AppProviders>
       <AppContainer>
-        {/* Top-level routes */}
         <Switch>
           <Route path="/:customerSlug/:dialogueId">
             <DialogueTreePage />
@@ -38,7 +36,7 @@ const App = () => {
         </Switch>
       </AppContainer>
     </AppProviders>
-  )
+  );
 };
 
 export default App;

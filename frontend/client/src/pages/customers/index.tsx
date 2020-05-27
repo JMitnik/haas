@@ -10,11 +10,10 @@ import CustomerCard from 'components/CustomerCard/CustomerCard';
 
 const CustomersPage = () => {
   const { data, loading, error } = useQuery(getCustomerQuery);
-
   const customers = data?.customers;
+
   if (loading) return <Loader />;
   if (error) return <p>{error.message}</p>
-
 
   return (
     <CustomerOverviewContainer py={['30px', '100px']} px="24px">

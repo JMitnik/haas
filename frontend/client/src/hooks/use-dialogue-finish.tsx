@@ -1,13 +1,14 @@
-import { useRef, useEffect } from 'react';
+import { useEffect, useRef } from 'react';
+import { useHistory, useLocation, useParams } from 'react-router-dom';
 import { useMutation } from '@apollo/react-hooks';
+
 import uploadEntryMutation from '../mutations/UploadEntryMutation';
 import useDialogueTree from '../providers/DialogueTreeProvider';
-import { useHistory, useLocation, useParams } from 'react-router-dom';
 
 const useJourneyFinish = () => {
   const finishedRef = useRef(false);
   const {
-    treeState: { historyStack }
+    treeState: { historyStack },
   } = useDialogueTree();
 
   const [submitForm] = useMutation(uploadEntryMutation, {});
@@ -21,13 +22,13 @@ const useJourneyFinish = () => {
       variables: {
         uploadUserSessionInput: {
           dialogueId,
-          entries: historyStack.map(nodeEntry => {
+          entries: historyStack.map((nodeEntry) => {
             const { node, edge, ...data } = nodeEntry;
 
             return { ...data, nodeId: node.id, edgeId: edge?.id };
-          })
-        }
-      }
+          }),
+        },
+      },
     });
   }, [historyStack, submitForm, history, location.pathname, dialogueId]);
 

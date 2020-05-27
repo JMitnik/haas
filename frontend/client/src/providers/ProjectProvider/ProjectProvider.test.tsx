@@ -1,67 +1,78 @@
-import { renderHook, act } from '@testing-library/react-hooks';
+import { act, renderHook } from '@testing-library/react-hooks';
+import { render } from '@testing-library/react';
+import React from 'react';
 import wait from 'waait';
-import { render } from "@testing-library/react";
-import React from "react";
-import useProject from "./ProjectProvider";
-import { mockCustomerWithoutDialogue, } from "tests/mocks/mockCustomers";
+
+import { mockCustomerWithoutDialogue } from 'tests/mocks/mockCustomers';
 import { mockEmptyDialogue } from 'tests/mocks/mockDialogues';
 import MockContainer from 'tests/mocks/MockContainer';
 
+import useProject from './ProjectProvider';
+
 test('<ProjectProvider /> renders', () => {
-    render(<MockContainer/>);
-    wait(0);
+  render(<MockContainer />);
+  wait(0);
 });
 
 test('<ProjectProvider /> returns only customer', () => {
-    const wrapper = ({ children }: { children?: React.ReactNode }) => <MockContainer>{children}</MockContainer>;
-    const { result } = renderHook(() => useProject(), { wrapper });
-    expect(result.current.customer).toBeNull();
+  const wrapper = ({ children }: { children?: React.ReactNode }) => (
+    <MockContainer>{children}</MockContainer>
+  );
 
-    // Now add a customer
-    act(() => {
-        result.current.setCustomer(mockCustomerWithoutDialogue);
-    });
+  const { result } = renderHook(() => useProject(), { wrapper });
+  expect(result.current.customer).toBeNull();
 
-    expect(result.current.customer).toBe(mockCustomerWithoutDialogue);
+  // Now add a customer
+  act(() => {
+    result.current.setCustomer(mockCustomerWithoutDialogue);
+  });
+
+  expect(result.current.customer).toBe(mockCustomerWithoutDialogue);
 });
 
 test('<ProjectProvider /> returns both customer and dialogue on set', () => {
-    const wrapper = ({ children }: { children?: React.ReactNode }) => <MockContainer>{children}</MockContainer>;
-    const { result } = renderHook(() => useProject(), { wrapper });
+  const wrapper = ({ children }: { children?: React.ReactNode }) => (
+    <MockContainer>{children}</MockContainer>
+  );
+  const { result } = renderHook(() => useProject(), { wrapper });
 
-    wait(0);
-    expect(result.current.dialogue).toBeNull();
+  wait(0);
+  expect(result.current.dialogue).toBeNull();
 
-    // Now add a customer
-    act(() => {
-        result.current.setCustomerAndDialogue(mockCustomerWithoutDialogue, mockEmptyDialogue);
-    });
+  // Now add a customer
+  act(() => {
+    result.current.setCustomerAndDialogue(mockCustomerWithoutDialogue, mockEmptyDialogue);
+  });
 
-    expect(result.current.customer).toBe(mockCustomerWithoutDialogue);
-    expect(result.current.dialogue).toBe(mockEmptyDialogue);
+  expect(result.current.customer).toBe(mockCustomerWithoutDialogue);
+  expect(result.current.dialogue).toBe(mockEmptyDialogue);
 });
 
 test('<ProjectProvider /> returns the customer at the URL', async () => {
-    const wrapper = ({ children }: { children?: React.ReactNode }) => <MockContainer baseUrl="/companyX">{children}</MockContainer>;
+  const wrapper = ({ children }: { children?: React.ReactNode }) => (
+    <MockContainer baseUrl="/companyX">{children}</MockContainer>
+  );
 
-    const { result } = renderHook(() => useProject(), { wrapper });
+  const { result } = renderHook(() => useProject(), { wrapper });
 
-    await act(async () => {
-        await wait(0);
-    })
+  await act(async () => {
+    await wait(0);
+  });
 
-    expect(result.current.customer.id).toBeTruthy();
+  expect(result.current.customer.id).toBeTruthy();
 });
 
 test('<ProjectProvider /> returns the customer AND dialogue at the URL', async () => {
-    const wrapper = ({ children }: { children?: React.ReactNode }) => <MockContainer baseUrl="/companyX/123">{children}</MockContainer>;
+  const wrapper = ({ children }: { children?: React.ReactNode }) => (
+    <MockContainer baseUrl="/companyX/123">{children}</MockContainer>
+  );
 
-    const { result } = renderHook(() => useProject(), { wrapper });
+  const { result } = renderHook(() => useProject(), { wrapper });
 
-    await act(async () => {
-        await wait(0);
-    })
+  await act(async () => {
+    await wait(0);
+  });
 
-    expect(result.current.dialogue?.rootQuestion?.id).toBeTruthy();
-    expect(result.current.customer?.id).toBeTruthy();
+  expect(result.current.dialogue?.rootQuestion?.id).toBeTruthy();
+  expect(result.current.customer?.id).toBeTruthy();
 });

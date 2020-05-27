@@ -1,7 +1,7 @@
-import { toIdValue } from 'apollo-utilities';
 import { ApolloClient } from 'apollo-client';
-import { InMemoryCache, NormalizedCacheObject, defaultDataIdFromObject } from 'apollo-cache-inmemory';
 import { HttpLink } from 'apollo-link-http';
+import { InMemoryCache, NormalizedCacheObject, defaultDataIdFromObject } from 'apollo-cache-inmemory';
+import { toIdValue } from 'apollo-utilities';
 
 const cache: InMemoryCache = new InMemoryCache({
   dataIdFromObject: defaultDataIdFromObject,
@@ -14,8 +14,8 @@ const cache: InMemoryCache = new InMemoryCache({
       questionNode: (_, args) => toIdValue(defaultDataIdFromObject({ __typename: 'QuestionNode', id: args?.id }) || ''),
       edge: (_, args) => toIdValue(defaultDataIdFromObject({ __typename: 'Edge', id: args?.id }) || ''),
       edges: (_, args) => args.ids.map((id: any) => toIdValue(defaultDataIdFromObject({ __typename: 'Edge', id: id?.id }) || '')),
-    }
-  }
+    },
+  },
 });
 const link = new HttpLink({
   uri: process.env.REACT_APP_API_ENDPOINT || 'http://localhost:4000/graphql',

@@ -13,7 +13,7 @@ const ApolloMockProvider = ({ children }: { children?: any }) => {
             query: { fetchPolicy: 'no-cache' },
         }}
     >
-    {children}
+      {children}
     </MockedProvider>
   )
 };

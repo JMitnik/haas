@@ -1,9 +1,7 @@
 import React, { ReactNode, useEffect } from 'react';
 import { Container } from '@haas/ui';
 
-import useDialogueTree from 'providers/DialogueTreeProvider';
 import { DialogueContainer } from './DialogueTreeStyles';
-import NodePage from 'pages/[customer]/[dialogue]/[node]';
 import WatermarkLogo from 'components/WatermarkLogo';
 import Loader from 'components/Loader';
 import useProject from 'providers/ProjectProvider';
@@ -18,7 +16,6 @@ const DialogueTreeLayout = ({ children }: { children: ReactNode }) => {
     }
 
     if (customer?.settings) {
-      const customerTheme = { colors: customer?.settings.colourSettings };
       // setCustomTheme(customerTheme);
     }
   }, [customer]);

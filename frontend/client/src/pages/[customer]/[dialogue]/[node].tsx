@@ -1,5 +1,5 @@
 import React from 'react';
-import { useParams, Redirect } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import NodeLayout from 'components/Nodes/NodeLayout';
 import { HAASNode } from 'types/generic';
 import SliderNode from 'components/Nodes/SliderNode/SliderNode';

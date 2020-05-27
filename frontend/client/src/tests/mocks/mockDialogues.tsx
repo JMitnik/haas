@@ -4,6 +4,7 @@ export const mockEmptyDialogue: Dialogue = {
     questions: [],
     leafs: [],
     rootQuestion: {
+        isRoot: true,
         id: '1',
         children: [],
         title: 'How do you feel about Mock',
