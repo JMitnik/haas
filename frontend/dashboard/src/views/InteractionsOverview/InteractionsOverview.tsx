@@ -91,9 +91,9 @@ const CenterCell = ({ value }: CellProps) => {
 const InteractionsOverview = () => {
   const { topicId, customerId } = useParams();
   const [fetchInteractions, { loading, data }] = useLazyQuery(getInteractionsQuery, { fetchPolicy: 'cache-and-network' });
-  
+
   const activeStartDate = useMemo(() => data?.interactions?.startDate ? new Date(data?.interactions?.startDate) : null, [data?.interactions?.startDate])
-  const activeEndDate = useMemo(() => data?.interactions?.endDate? new Date(data?.interactions?.endDate) : null, [data?.interactions?.endDate])
+  const activeEndDate = useMemo(() => data?.interactions?.endDate ? new Date(data?.interactions?.endDate) : null, [data?.interactions?.endDate])
   const interactions = useMemo(() => data?.interactions?.sessions || [], [data]);
   const columns = useMemo(() => [{
     Header: "NR",
@@ -195,14 +195,14 @@ const InteractionsOverview = () => {
           startDate,
           endDate,
           offset: pageIndex * pageSize,
-          limit: pageSize, 
+          limit: pageSize,
           pageIndex,
           orderBy: order,
         },
       },
     })
   }
- 
+
   const handleSort = (targetSort: any) => {
     const newOrderBy = order?.[0]?.id === targetSort.id ?
       [{ id: order?.[0]?.id, desc: !order?.[0]?.desc }] :
@@ -241,21 +241,22 @@ const InteractionsOverview = () => {
       <H2 color="#3653e8" fontWeight={400} mb="10%"> Interactions </H2>
       <InputOutputContainer mb="5%">
         <OutputContainer>
-          <Div justifyContent="center"><Muted>Exports</Muted> </Div>
-          <Button marginLeft="10%" padding="2px 8px" onClick={handleExport}>
-            <Div marginRight="20%">CSV</Div>
-            <DownloadCloud />
-          </Button>
+          <Div justifyContent="center" marginRight='15px'>
+            <Muted style={{ fontWeight: 'bold'}}>Exports</Muted> 
+          </Div>
+          <Div padding='8px 36px' style={{ cursor: 'pointer', borderRadius: '90px' }} onClick={handleExport} useFlex flexDirection='row' alignItems='center' backgroundColor='#c4c4c4'>
+            <Div style={{ fontWeight: 'bold' }}>CSV</Div>
+          </Div>
         </OutputContainer>
         <InputContainer>
           <DatePickerComponent
             activeStartDate={activeStartDate}
             activeEndDate={activeEndDate}
-            handleDateChange={handleDateChange}/>
-          <Button padding="5px 12px">
-            <Div marginRight="20%">SEARCH</Div>
-            <Search />
-          </Button>
+            handleDateChange={handleDateChange} />
+          <Div padding={15} style={{ borderRadius: '90px' }} useFlex flexDirection='row' alignItems='center' backgroundColor='#f1f5f8'>
+            <Div style={{ color: '#6d767d'}}>SEARCH</Div>
+            <Search style={{ color: '#6d767d', marginLeft: '10px'}}/>
+          </Div>
         </InputContainer>
       </InputOutputContainer>
       <Div style={{ background: '#fdfbfe' }} mb="1%" height="65%">
@@ -315,19 +316,19 @@ const InteractionsOverview = () => {
 
 
       </Div>
-      <div className="pagination">
-        <button onClick={() => handlePage(0)} disabled={!canPreviousPage}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <button style={{ padding: '5px', margin: '5px' }} onClick={() => handlePage(0)} disabled={!canPreviousPage}>
           {'<<'}
-        </button>{' '}
-        <button onClick={() => handlePage(-1)} disabled={!canPreviousPage}>
+        </button>
+        <button style={{ padding: '5px 7.5px', margin: '5px' }} onClick={() => handlePage(-1)} disabled={!canPreviousPage}>
           {'<'}
-        </button>{' '}
-        <button onClick={() => handlePage(1)} disabled={!canNextPage}>
+        </button>
+        <button style={{ padding: '5px 7.5px', margin: '5px' }} onClick={() => handlePage(1)} disabled={!canNextPage}>
           {'>'}
-        </button>{' '}
-        <button onClick={() => handlePage(pageCount - 1)} disabled={!canNextPage}>
+        </button>
+        <button style={{ padding: '5px', margin: '5px' }} onClick={() => handlePage(pageCount - 1)} disabled={!canNextPage}>
           {'>>'}
-        </button>{' '}
+        </button>
         <span>
           Page{' '}
           <strong>

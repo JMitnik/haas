@@ -12,7 +12,7 @@ export const InputOutputContainer = styled(FlexRow)`
 `;
 
 export const InputContainer = styled(FlexRow)`
-    margin-right: 2.5%;
+    /* margin-right: 2.5%; */
     align-items: center;
 `
 
