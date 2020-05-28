@@ -14,7 +14,9 @@ const AppProviders = ({ children }: { children: ReactNode }) => (
     <BrowserRouter>
       <ProjectProvider>
         <DialogueTreeProvider>
-          <ThemeProvider theme={theme}>{children}</ThemeProvider>
+          <ThemeProvider theme={theme}>
+            {children}
+          </ThemeProvider>
         </DialogueTreeProvider>
       </ProjectProvider>
     </BrowserRouter>

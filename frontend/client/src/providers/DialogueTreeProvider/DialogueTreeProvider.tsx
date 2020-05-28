@@ -5,8 +5,9 @@ import gql from 'graphql-tag';
 
 import { HAASEntry, HAASFormEntry, HAASNode } from 'types/generic';
 import { QuestionFragment } from 'queries/QuestionFragment';
-import { TreeAction, TreeDispatchProps, TreeStateProps } from './DialogueTreeProviderTypes';
 import useProject from 'providers/ProjectProvider/ProjectProvider';
+
+import { TreeAction, TreeDispatchProps, TreeStateProps, URLParams } from './DialogueTreeProviderTypes';
 
 const defaultActiveLeaf: HAASNode = {
   id: '-1',
@@ -125,7 +126,7 @@ export const DialogueTreeProvider = ({ children }: { children: React.ReactNode }
   const history = useHistory();
   const client = useApolloClient();
   const { customer, dialogue } = useProject();
-  const edgeMatch = useRouteMatch<{ companySlug: string, projectId: string, edgeId: string }>('/:companySlug/:projectId/:edgeId?');
+  const edgeMatch = useRouteMatch<URLParams>('/:companySlug/:projectId/:edgeId?');
 
   // Start the tree project
   useEffect(() => {
@@ -172,6 +173,7 @@ export const DialogueTreeProvider = ({ children }: { children: React.ReactNode }
       return data?.edge?.childNode;
     }
 
+    // TODO: Unlikely we should return rootQuestion
     return dialogue?.rootQuestion;
   };
 

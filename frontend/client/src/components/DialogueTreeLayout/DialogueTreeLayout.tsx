@@ -1,10 +1,11 @@
-import React, { ReactNode, useEffect } from 'react';
 import { Container } from '@haas/ui';
+import React, { ReactNode, useEffect } from 'react';
+
+import Loader from 'components/Loader';
+import WatermarkLogo from 'components/WatermarkLogo';
+import useProject from 'providers/ProjectProvider';
 
 import { DialogueContainer } from './DialogueTreeStyles';
-import WatermarkLogo from 'components/WatermarkLogo';
-import Loader from 'components/Loader';
-import useProject from 'providers/ProjectProvider';
 
 const DialogueTreeLayout = ({ children }: { children: ReactNode }) => {
   const { customer } = useProject();

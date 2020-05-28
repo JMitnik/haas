@@ -1,19 +1,19 @@
-import React from 'react';
 import { useQuery } from '@apollo/react-hooks';
+import React from 'react';
 
-import { H1, Div, Grid } from '@haas/ui';
-import Loader from 'components/Loader';
-import { getCustomerQuery } from 'queries/getCustomerQuery';
-import Logo from 'components/Logo';
 import { CustomerOverviewContainer } from 'components/CustomerOverview/CustomerOverviewStyles';
+import { Div, Grid, H1 } from '@haas/ui';
+import { getCustomerQuery } from 'queries/getCustomerQuery';
 import CustomerCard from 'components/CustomerCard/CustomerCard';
+import Loader from 'components/Loader';
+import Logo from 'components/Logo';
 
 const CustomersPage = () => {
   const { data, loading, error } = useQuery(getCustomerQuery);
   const customers = data?.customers;
 
   if (loading) return <Loader />;
-  if (error) return <p>{error.message}</p>
+  if (error) return <p>{error.message}</p>;
 
   return (
     <CustomerOverviewContainer py={['30px', '100px']} px="24px">
@@ -26,9 +26,7 @@ const CustomersPage = () => {
         </Div>
 
         <Grid gridTemplateColumns="repeat(auto-fit, minmax(300px, 1fr))" gridGap="24px">
-          {customers?.map((customer: any, index: number) => {
-            return <CustomerCard key={index} customer={customer} />;
-          })}
+          {customers?.map((customer: any, index: number) => <CustomerCard key={index} customer={customer} />)}
         </Grid>
       </Div>
     </CustomerOverviewContainer>

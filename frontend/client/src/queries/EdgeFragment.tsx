@@ -1,4 +1,5 @@
 import gql from 'graphql-tag';
+
 import { ShallowNodeFragment } from './ShallowNodeFragment';
 
 export const EdgeFragment = gql`
