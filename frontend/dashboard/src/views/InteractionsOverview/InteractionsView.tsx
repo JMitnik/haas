@@ -109,12 +109,12 @@ const InteractionsView = (
     console.log('Acive grid properties: ', gridProperties);
 
     return (
-        <Grid gridRowGap={2} gridTemplateRows='repeat(10, 50px)'>
+        <Grid gridRowGap={2}>
             <HeaderComponent sortProperties={gridProperties.sortBy} onGridPropertiesChange={onGridPropertiesChange} headers={HEADERS} />
             {interactions && interactions.map((interaction, index) => {
                 return <RowComponent headers={HEADERS} data={interaction} key={index} index={index} />
             })}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gridRow: -2 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <button style={{ padding: '5px', margin: '5px' }}
                     onClick={() => handlePage(0)}
                     disabled={gridProperties.pageIndex === 0}>
