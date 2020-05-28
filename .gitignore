@@ -56,3 +56,7 @@ types.d.ts
 
 **/.env.prod
 api/.env.prod
+
+# VSCode related
+.vscode
+launch.json
