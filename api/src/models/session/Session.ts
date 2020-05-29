@@ -221,25 +221,31 @@ export const getSessionAnswerFlowQuery = extendType({
         }
 
         const valuesCondition: NodeEntryWhereInput = {};
-        valuesCondition.values = {
-          every: {
-            numberValue: {
-              not: null,
+        valuesCondition.OR = [{
+          values: {
+            every: {
+              numberValue: {
+                not: null,
+              },
             },
           },
-        };
+        },
+        ];
 
         if (searchTerm) {
           // if (valuesCondition.values) {
-          valuesCondition.values.some = {
-            textValue: {
-              contains: searchTerm,
+          valuesCondition.OR.push({
+            values: {
+              some: {
+                textValue: {
+                  contains: searchTerm,
+                },
+              },
             },
-          };
-          // }
+          });
         }
 
-        console.log('value conditions: ', valuesCondition.values);
+        console.log('value conditions: ', valuesCondition.OR);
 
         const orderBy = args.filter.orderBy ? Object.assign({}, ...args.filter.orderBy) : null;
         let pageSessionIds: Array<any> = [];
@@ -252,7 +258,7 @@ export const getSessionAnswerFlowQuery = extendType({
                   AND: dateRange,
                 },
                 // depth: 0, // FIXME:search term doesn't work when filtering on score
-                values: valuesCondition.values,
+                OR: valuesCondition, // values: valuesCondition.values,
               },
               include: {
                 values: true,
@@ -260,8 +266,10 @@ export const getSessionAnswerFlowQuery = extendType({
             },
           );
 
-          console.log('node entries score: ', nodeEntriesScore);
-          const filteredNodeEntresScore = _.filter(nodeEntriesScore, (nodeEntryScore) => nodeEntryScore.depth === 0);
+          const groupedScoreSessions = _.groupBy(nodeEntriesScore, (entry) => entry.sessionId);
+          const merged = _.filter(groupedScoreSessions, (session) => session.length > 1);
+          const flatMerged = _.flatten(merged);
+          const filteredNodeEntresScore = _.filter(flatMerged, (nodeEntryScore) => nodeEntryScore.depth === 0);
           const orderedNodeEntriesScore = _.orderBy(filteredNodeEntresScore, (entry) => entry.values[0].numberValue, orderBy.desc ? 'desc' : 'asc');
           const pageNodeEntries = (offset + limit) < orderedNodeEntriesScore.length
             ? orderedNodeEntriesScore.slice(offset, (pageIndex + 1) * limit)
