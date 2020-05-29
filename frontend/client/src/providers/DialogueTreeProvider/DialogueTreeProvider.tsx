@@ -7,7 +7,9 @@ import { HAASEntry, HAASFormEntry, HAASNode } from 'types/generic';
 import { QuestionFragment } from 'queries/QuestionFragment';
 import useProject from 'providers/ProjectProvider/ProjectProvider';
 
-import { TreeAction, TreeDispatchProps, TreeStateProps, URLParams } from './DialogueTreeProviderTypes';
+import {
+  TreeAction, TreeDispatchProps, TreeStateProps, URLParams,
+} from './DialogueTreeProviderTypes';
 
 const defaultActiveLeaf: HAASNode = {
   id: '-1',
@@ -145,8 +147,9 @@ export const DialogueTreeProvider = ({ children }: { children: React.ReactNode }
     dispatch({ type: 'goToChild', payload: { currentNode, nodeEntry } });
 
     if (edgeMatch && nextEdge) {
-      history.push(`/${edgeMatch.params.companySlug}/${edgeMatch.params.projectId}/${nextEdge?.id}`);
-      return;
+      history.push(
+        `/${edgeMatch.params.companySlug}/${edgeMatch.params.projectId}/${nextEdge?.id}`,
+      );
     }
 
     if (edgeMatch && !nextEdge) {

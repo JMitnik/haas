@@ -3,7 +3,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { ThemeProvider } from 'styled-components/macro';
 import React, { ReactNode } from 'react';
 
-import client from 'config/apollo';
+import client from 'graphql/apollo';
 import theme from 'config/theme';
 
 import { DialogueTreeProvider } from './DialogueTreeProvider';

@@ -47,23 +47,19 @@ interface NodeViewProps {
   node: HAASNode;
 }
 
-const NodeView = ({ node }: NodeViewProps) => {
-  console.log(node);
-
-  return (
-    <motion.div
-      style={{ width: '100%' }}
-      variants={nodeViewAnimation}
-      initial="initial"
-      animate="animate"
-      exit="exit"
-      key={node.id}
-    >
-      <DialogueTreeLayout>
-        <NodeType node={node} />
-      </DialogueTreeLayout>
-    </motion.div>
-  );
-};
+const NodeView = ({ node }: NodeViewProps) => (
+  <motion.div
+    style={{ width: '100%' }}
+    variants={nodeViewAnimation}
+    initial="initial"
+    animate="animate"
+    exit="exit"
+    key={node.id}
+  >
+    <DialogueTreeLayout>
+      <NodeType node={node} />
+    </DialogueTreeLayout>
+  </motion.div>
+);
 
 export default NodeView;

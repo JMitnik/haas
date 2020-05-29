@@ -12,18 +12,8 @@ export interface GenericNodeProps {
   node: HAASNode;
 }
 
-const nodeVariants = {
-  initial: {
-    opacity: 1,
-  },
-  exit: {
-    opacity: 0,
-  },
-};
-
 const NodePage = () => {
   const { edgeId, leafId } = useParams<{ edgeId?: string, leafId?: string }>();
-  console.log('edgeId', edgeId);
   const { treeDispatch: { getActiveNode, getActiveLeaf } } = useDialogueTree();
 
   let activeNode = null;

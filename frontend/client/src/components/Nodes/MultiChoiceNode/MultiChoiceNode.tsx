@@ -1,24 +1,50 @@
-import React, { useEffect } from 'react';
-import { H5, Div, H2, Grid } from '@haas/ui';
-import useDialogueTree from 'providers/DialogueTreeProvider';
-import { useForm } from 'react-hook-form';
-import { GenericNodeProps } from '../NodeLayout/NodeLayout';
-import { HAASFormEntry, MultiChoiceOption } from 'types/generic';
-import { MultiChoiceNodeContainer } from './MultiChoiceNodeStyles';
 import { ClientButton } from 'components/Buttons/Buttons';
+import { Div, Grid, H2, H5 } from '@haas/ui';
+import { Variants, motion } from 'framer-motion';
+import { useForm } from 'react-hook-form';
+import React, { useEffect } from 'react';
+
+import { HAASFormEntry, MultiChoiceOption } from 'types/generic';
+import useDialogueTree from 'providers/DialogueTreeProvider';
+
+import { GenericNodeProps } from '../NodeLayout/NodeLayout';
+import { MultiChoiceNodeContainer, MultiChoiceNodeGrid } from './MultiChoiceNodeStyles';
 
 type MultiChoiceNodeProps = GenericNodeProps;
 
+const multiChoiceContainerAnimation: Variants = {
+  initial: {
+    opacity: 0,
+  },
+  animate: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.07,
+    },
+  },
+};
+
+const multiChoiceItemAnimation: Variants = {
+  initial: {
+    opacity: 0,
+    y: 100,
+  },
+  animate: {
+    opacity: 1,
+    y: 0,
+  },
+};
+
 const MultiChoiceNode = ({ node }: MultiChoiceNodeProps) => {
   const {
-    treeDispatch: { goToChild }
+    treeDispatch: { goToChild },
   } = useDialogueTree();
 
   const { register, setValue, triggerValidation, getValues } = useForm<HAASFormEntry>({
     mode: 'onSubmit',
     defaultValues: {
-      textValue: ''
-    }
+      textValue: '',
+    },
   });
 
   // Register the relevant form fields
@@ -40,24 +66,33 @@ const MultiChoiceNode = ({ node }: MultiChoiceNodeProps) => {
   return (
     <MultiChoiceNodeContainer>
       <H2>{node.title}</H2>
-      <Grid gridGap={["0", "12px"]} gridTemplateColumns="repeat(auto-fill, minmax(250px, 1fr))">
+
+      <MultiChoiceNodeGrid
+        variants={multiChoiceContainerAnimation}
+        initial="initial"
+        animate="animate"
+      >
         {node.options?.map((multiChoiceOption: MultiChoiceOption, index: number) => (
-          <Div useFlex justifyContent="center" key={index} padding={2} flex={['100%', 1]}>
-            <ClientButton
-              brand="primary"
-              type="button"
-              onClick={() => onSubmit(multiChoiceOption)}
-              key={index}
-            >
-              <H5>
-                {(multiChoiceOption?.publicValue?.length ?? 0) > 0
-                  ? multiChoiceOption?.publicValue
-                  : multiChoiceOption?.value}
-              </H5>
-            </ClientButton>
-          </Div>
+
+          <motion.div variants={multiChoiceItemAnimation}>
+            <Div useFlex justifyContent="center" key={index} padding={2} flex={['100%', 1]}>
+              <ClientButton
+                brand="primary"
+                type="button"
+                onClick={() => onSubmit(multiChoiceOption)}
+                key={index}
+              >
+                <H5>
+                  {(multiChoiceOption?.publicValue?.length ?? 0) > 0
+                    ? multiChoiceOption?.publicValue
+                    : multiChoiceOption?.value}
+                </H5>
+              </ClientButton>
+            </Div>
+          </motion.div>
         ))}
-      </Grid>
+
+      </MultiChoiceNodeGrid>
     </MultiChoiceNodeContainer>
   );
 };
