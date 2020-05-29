@@ -266,10 +266,14 @@ export const getSessionAnswerFlowQuery = extendType({
             },
           );
 
-          const groupedScoreSessions = _.groupBy(nodeEntriesScore, (entry) => entry.sessionId);
-          const merged = _.filter(groupedScoreSessions, (session) => session.length > 1);
-          const flatMerged = _.flatten(merged);
-          const filteredNodeEntresScore = _.filter(flatMerged, (nodeEntryScore) => nodeEntryScore.depth === 0);
+          let flatMerged;
+          if (searchTerm) {
+            const groupedScoreSessions = _.groupBy(nodeEntriesScore, (entry) => entry.sessionId);
+            const merged = _.filter(groupedScoreSessions, (session) => session.length > 1);
+            flatMerged = _.flatten(merged);
+          }
+          const finalNodeEntryScore = flatMerged || nodeEntriesScore;
+          const filteredNodeEntresScore = _.filter(finalNodeEntryScore, (nodeEntryScore) => nodeEntryScore.depth === 0);
           const orderedNodeEntriesScore = _.orderBy(filteredNodeEntresScore, (entry) => entry.values[0].numberValue, orderBy.desc ? 'desc' : 'asc');
           const pageNodeEntries = (offset + limit) < orderedNodeEntriesScore.length
             ? orderedNodeEntriesScore.slice(offset, (pageIndex + 1) * limit)
@@ -357,11 +361,14 @@ export const getSessionAnswerFlowQuery = extendType({
         mappedSessions = orderedSessions.length > 0 ? orderedSessions : mappedSessions;
         const finalSessions = mappedSessions.map((session, index) => ({ ...session, index }));
         return {
+          // FIXME: Page 3 of 2 when search query (where max 16 rows exist e.g. Facilities)
+          // is entered while being on page 3 of full overview. It won't be able to find data for page 3
+          // => Should display data of page 1 instead and set pageIndex to 0
           sessions: finalSessions,
           pages: Math.ceil(pages.length / limit),
           offset,
           limit,
-          pageIndex: finalSessions.length > limit ? pageIndex : 0,
+          pageIndex: (finalSessions.length > limit) ? pageIndex : 0,
           startDate,
           endDate,
           orderBy: args.filter.orderBy || [],
