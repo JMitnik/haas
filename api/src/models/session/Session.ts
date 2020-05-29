@@ -257,8 +257,7 @@ export const getSessionAnswerFlowQuery = extendType({
                   dialogueId: args.where.dialogueId,
                   AND: dateRange,
                 },
-                // depth: 0, // FIXME:search term doesn't work when filtering on score
-                OR: valuesCondition, // values: valuesCondition.values,
+                OR: valuesCondition,
               },
               include: {
                 values: true,
