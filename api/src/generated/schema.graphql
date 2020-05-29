@@ -119,6 +119,7 @@ input InteractionFilterInput {
   offset: Int
   orderBy: [SortFilterInputObject!]
   pageIndex: Int
+  searchTerm: String
   startDate: String
 }
 
@@ -126,6 +127,7 @@ type InteractionSessionType {
   createdAt: String!
   id: String!
   index: Int!
+  nodeEntries: [NodeEntry!]!
   paths: Int!
   score: Float!
 }
@@ -166,7 +168,7 @@ type Mutation {
 type NodeEntry {
   creationDate: String!
   depth: Int!
-  id: ID!
+  id: ID
   relatedEdgeId: String
   relatedNode: QuestionNode!
   relatedNodeId: String!

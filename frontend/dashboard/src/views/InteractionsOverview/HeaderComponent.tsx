@@ -18,9 +18,10 @@ interface HeaderComponentProps {
 interface TableProps {
     activeStartDate: Date | null;
     activeEndDate: Date | null;
+    activeSearchTerm: string;
     pageIndex: number;
     pageSize: number;
-    pageCount: number;
+    // pageCount: number;
     sortBy: {
         id: string;
         desc: boolean;

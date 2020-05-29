@@ -3,8 +3,7 @@ import { Grid } from '@haas/ui';
 import HeaderComponent from './HeaderComponent';
 import RowComponent from './RowComponent';
 import { format, formatDistance, differenceInCalendarDays } from 'date-fns';
-import { QueryLazyOptions } from '@apollo/react-hooks';
-import { gridRow } from 'styled-system';
+
 interface CellProps {
     value: any;
     columnProps?: any;
@@ -82,9 +81,10 @@ interface DataGridProps {
 interface TableProps {
     activeStartDate: Date | null;
     activeEndDate: Date | null;
+    activeSearchTerm: string;
     pageIndex: number;
     pageSize: number;
-    pageCount: number;
+    // pageCount: number;
     sortBy: {
       id: string;
       desc: boolean;

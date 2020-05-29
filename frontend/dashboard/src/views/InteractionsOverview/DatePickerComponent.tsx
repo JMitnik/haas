@@ -61,7 +61,7 @@ const DatePickerComponent = ({ activeStartDate, activeEndDate, handleDateChange 
                 <Div padding={15} style={{ borderRadius: '90px' }} useFlex flexDirection='row' backgroundColor='#f1f5f8'>
                     <DatePicker
                         selected={activeStartDate}
-                        onChange={date => handleDateChange(date, activeEndDate)}
+                        onChange={date => date !== activeStartDate && handleDateChange(date, activeEndDate)}
                         selectsStart
                         isClearable
                         // customInput={<Input />}
@@ -70,7 +70,7 @@ const DatePickerComponent = ({ activeStartDate, activeEndDate, handleDateChange 
                     />
                     <DatePicker
                         selected={activeEndDate}
-                        onChange={date => handleDateChange(activeStartDate, date)}
+                        onChange={date => date !== activeEndDate &&  handleDateChange(activeStartDate, date)}
                         selectsEnd
                         isClearable
                         startDate={activeStartDate}

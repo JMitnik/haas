@@ -6,10 +6,10 @@ import { XCircle, Search } from 'react-feather'
 import useDebounce from 'hooks/useDebounce';
 
 
-const SearchBarComponent = ({ handleSearchTermChange }: { handleSearchTermChange: ( newSearchTerm: string) => void}) => {
+const SearchBarComponent = ({ activeSearchTerm, handleSearchTermChange }: { activeSearchTerm: string, handleSearchTermChange: ( newSearchTerm: string) => void}) => {
     const [isActive, setIsActive] = useState(false);
-    const [activeSearchTerm, setActiveSearchTerm] = useState('');
-    const debouncedSearchTerm = useDebounce(activeSearchTerm, 500);
+    const [searchTerm, setSearchTerm] = useState<string>(activeSearchTerm);
+    const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
     useEffect(
         () => {
@@ -31,7 +31,7 @@ const SearchBarComponent = ({ handleSearchTermChange }: { handleSearchTermChange
                 isActive &&
                 <Div useFlex alignItems='center' >
                     <input defaultValue={activeSearchTerm} onChange={(e) => {
-                        setActiveSearchTerm(e.target.value);
+                        setSearchTerm(e.target.value);
                     }} />
                     <XCircle onClick={() => setIsActive(false)} style={{ color: '#6d767d', marginLeft: '10px' }} />
                 </Div>

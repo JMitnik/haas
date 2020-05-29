@@ -51,6 +51,7 @@ export interface NexusGenInputs {
     offset?: number | null; // Int
     orderBy?: NexusGenInputs['SortFilterInputObject'][] | null; // [SortFilterInputObject!]
     pageIndex?: number | null; // Int
+    searchTerm?: string | null; // String
     startDate?: string | null; // String
   }
   LeafNodeInput: { // input type
@@ -157,6 +158,7 @@ export interface NexusGenRootTypes {
     createdAt: string; // String!
     id: string; // String!
     index: number; // Int!
+    nodeEntries: NexusGenRootTypes['NodeEntry'][]; // [NodeEntry!]!
     paths: number; // Int!
     score: number; // Float!
   }
@@ -301,6 +303,7 @@ export interface NexusGenFieldTypes {
     createdAt: string; // String!
     id: string; // String!
     index: number; // Int!
+    nodeEntries: NexusGenRootTypes['NodeEntry'][]; // [NodeEntry!]!
     paths: number; // Int!
     score: number; // Float!
   }
@@ -327,7 +330,7 @@ export interface NexusGenFieldTypes {
   NodeEntry: { // field return type
     creationDate: string; // String!
     depth: number; // Int!
-    id: string; // ID!
+    id: string | null; // ID
     relatedEdgeId: string | null; // String
     relatedNode: NexusGenRootTypes['QuestionNode']; // QuestionNode!
     relatedNodeId: string; // String!

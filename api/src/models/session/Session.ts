@@ -1,8 +1,6 @@
 import _ from 'lodash';
-import { format } from 'date-fns';
-import { NodeEntry, NodeEntryValue, Session, PrismaClient, SessionWhereInput } from '@prisma/client';
+import { NodeEntry, NodeEntryValue, Session, PrismaClient, SessionWhereInput, NodeEntryWhereInput } from '@prisma/client';
 import { objectType, extendType, inputObjectType } from '@nexus/schema';
-import { id } from 'date-fns/locale';
 import SessionResolver from './session-resolver';
 import { QuestionNodeType } from '../question/QuestionNode';
 
@@ -16,7 +14,7 @@ export const NodeEntryValueType = objectType({
     t.int('parentNodeEntryValueId', { nullable: true });
     t.list.field('multiValues', {
       type: NodeEntryValueType,
-      resolve(parent: NodeEntryValue, args: any, ctx: any, info: any) {
+      resolve(parent: NodeEntryValue, args: any, ctx: any) {
         const multiValues = ctx.prisma.nodeEntryValue.findMany(
           { where: { parentNodeEntryValueId: parent.id } },
         );
@@ -29,7 +27,7 @@ export const NodeEntryValueType = objectType({
 export const NodeEntryType = objectType({
   name: 'NodeEntry',
   definition(t) {
-    t.id('id');
+    t.id('id', { nullable: true });
     t.string('creationDate');
     t.int('depth');
     t.string('relatedEdgeId', { nullable: true });
@@ -37,7 +35,7 @@ export const NodeEntryType = objectType({
     t.string('sessionId');
     t.field('relatedNode', {
       type: QuestionNodeType,
-      resolve(parent: NodeEntry, args: any, ctx: any, info: any) {
+      resolve(parent: NodeEntry, args: any, ctx: any) {
         const relatedNode = ctx.prisma.questionNode.findOne(
           { where: { id: parent.relatedNodeId } },
         );
@@ -46,7 +44,7 @@ export const NodeEntryType = objectType({
     });
     t.list.field('values', {
       type: NodeEntryValueType,
-      resolve(parent: NodeEntry, args: any, ctx: any, info: any) {
+      resolve(parent: NodeEntry, args: any, ctx: any) {
         const values = ctx.prisma.nodeEntryValue.findMany(
           { where: { nodeEntryId: parent.id } },
         );
@@ -64,7 +62,7 @@ export const SessionType = objectType({
     t.string('dialogueId');
     t.list.field('nodeEntries', {
       type: NodeEntryType,
-      resolve(parent: Session, args: any, ctx: any, info: any) {
+      resolve(parent: Session, args: any, ctx: any) {
         const nodeEntries = ctx.prisma.nodeEntry.findMany({
           where: {
             sessionId: parent.id,
@@ -150,6 +148,9 @@ export const InteractionSessionType = objectType({
     t.float('score');
     t.int('paths');
     t.string('createdAt');
+    t.list.field('nodeEntries', {
+      type: NodeEntryType,
+    });
   },
 });
 
@@ -175,9 +176,10 @@ export const InteractionFilterInput = inputObjectType({
   definition(t) {
     t.string('startDate', { required: false });
     t.string('endDate', { required: false });
-    t.int('offset', { required: false });
-    t.int('limit', { required: false });
-    t.int('pageIndex', { required: false });
+    t.string('searchTerm', { required: false });
+    t.int('offset');
+    t.int('limit');
+    t.int('pageIndex');
     t.list.field('orderBy', {
       type: SortFilterInputObject,
       required: false,
@@ -204,7 +206,7 @@ export const getSessionAnswerFlowQuery = extendType({
         const { prisma }: { prisma: PrismaClient } = ctx;
         console.log('filter interactions: ', args.filter);
         // TODO: Add orderBy filter
-        const { pageIndex, offset, limit, startDate, endDate }: { pageIndex: number, offset: number, limit: number, startDate: Date, endDate: Date } = args.filter;
+        const { pageIndex, offset, limit, startDate, endDate, searchTerm }: { pageIndex: number, offset: number, limit: number, startDate: Date, endDate: Date, searchTerm: string } = args.filter;
         let dateRange: SessionWhereInput[] | [] = [];
         if (startDate && !endDate) {
           dateRange = [
@@ -218,6 +220,27 @@ export const getSessionAnswerFlowQuery = extendType({
             { createdAt: { lte: endDate } }];
         }
 
+        const valuesCondition: NodeEntryWhereInput = {};
+        valuesCondition.values = {
+          every: {
+            numberValue: {
+              not: null,
+            },
+          },
+        };
+
+        if (searchTerm) {
+          // if (valuesCondition.values) {
+          valuesCondition.values.some = {
+            textValue: {
+              contains: searchTerm,
+            },
+          };
+          // }
+        }
+
+        console.log('value conditions: ', valuesCondition.values);
+
         const orderBy = args.filter.orderBy ? Object.assign({}, ...args.filter.orderBy) : null;
         let pageSessionIds: Array<any> = [];
         if (orderBy.id === 'score') {
@@ -228,14 +251,8 @@ export const getSessionAnswerFlowQuery = extendType({
                   dialogueId: args.where.dialogueId,
                   AND: dateRange,
                 },
-                depth: 0,
-                values: {
-                  every: {
-                    numberValue: {
-                      not: null,
-                    },
-                  },
-                },
+                // depth: 0, // FIXME:search term doesn't work when filtering on score
+                values: valuesCondition.values,
               },
               include: {
                 values: true,
@@ -243,7 +260,9 @@ export const getSessionAnswerFlowQuery = extendType({
             },
           );
 
-          const orderedNodeEntriesScore = _.orderBy(nodeEntriesScore, (entry) => entry.values[0].numberValue, orderBy.desc ? 'desc' : 'asc');
+          console.log('node entries score: ', nodeEntriesScore);
+          const filteredNodeEntresScore = _.filter(nodeEntriesScore, (nodeEntryScore) => nodeEntryScore.depth === 0);
+          const orderedNodeEntriesScore = _.orderBy(filteredNodeEntresScore, (entry) => entry.values[0].numberValue, orderBy.desc ? 'desc' : 'asc');
           const pageNodeEntries = (offset + limit) < orderedNodeEntriesScore.length
             ? orderedNodeEntriesScore.slice(offset, (pageIndex + 1) * limit)
             : orderedNodeEntriesScore.slice(offset, orderedNodeEntriesScore.length);
@@ -253,6 +272,20 @@ export const getSessionAnswerFlowQuery = extendType({
         const whereClause: SessionWhereInput = {
           dialogueId: args.where.dialogueId,
         };
+
+        if (searchTerm) {
+          whereClause.nodeEntries = {
+            some: {
+              values: {
+                some: {
+                  textValue: {
+                    contains: searchTerm,
+                  },
+                },
+              },
+            },
+          };
+        }
 
         if (dateRange.length > 0) {
           whereClause.AND = dateRange;
@@ -266,6 +299,7 @@ export const getSessionAnswerFlowQuery = extendType({
           where: {
             dialogueId: args.where.dialogueId,
             AND: dateRange,
+            nodeEntries: whereClause.nodeEntries,
           },
         });
 
@@ -283,6 +317,7 @@ export const getSessionAnswerFlowQuery = extendType({
           include: {
             nodeEntries: {
               select: {
+                id: true,
                 creationDate: true,
                 depth: true,
                 values: {
@@ -291,6 +326,7 @@ export const getSessionAnswerFlowQuery = extendType({
                     nodeEntryId: true,
                     numberValue: true,
                     textValue: true,
+                    multiValues: true,
                   },
                 },
               },
@@ -301,10 +337,12 @@ export const getSessionAnswerFlowQuery = extendType({
         console.log('Sessions: ', sessions.length);
         console.log('Pages: ', Math.ceil(pages.length / limit));
         let mappedSessions = sessions.map((session) => {
-          const { createdAt } = session;
+          const { createdAt, nodeEntries } = session;
           const score = session.nodeEntries.find((entry) => entry.depth === 0)?.values?.[0]?.numberValue;
           const paths = session.nodeEntries.length;
-          return { id: session.id, score, paths, createdAt };
+          return {
+            id: session.id, score, paths, createdAt, nodeEntries,
+          };
         });
 
         const orderedSessions = pageSessionIds.length > 0 ? _.orderBy(mappedSessions, (session) => session.score, orderBy.desc ? 'desc' : 'asc') : [];
@@ -346,7 +384,7 @@ export const getSessionAnswerFlowQuery = extendType({
       args: {
         where: SessionWhereUniqueInput,
       },
-      resolve(parent: any, args: any, ctx: any, info: any) {
+      resolve(parent: any, args: any, ctx: any) {
         const session = ctx.prisma.session.findOne({
           where: {
             id: args.where.id,
@@ -366,7 +404,7 @@ export const uploadUserSessionMutation = extendType({
       args: {
         uploadUserSessionInput: UploadUserSessionInput,
       },
-      resolve(parent: any, args: any, ctx: any, info: any) {
+      resolve(parent: any, args: any, ctx: any) {
         const session = SessionResolver.uploadUserSession(parent, args, ctx);
         return session;
       },

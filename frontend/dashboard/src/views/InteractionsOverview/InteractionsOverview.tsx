@@ -13,9 +13,10 @@ import InteractionsView from './InteractionsView';
 interface TableProps {
   activeStartDate: Date | null;
   activeEndDate: Date | null;
+  activeSearchTerm: string;
   pageIndex: number;
   pageSize: number;
-  pageCount: number;
+  // pageCount: number;
   sortBy: {
     id: string;
     desc: boolean;
@@ -29,22 +30,23 @@ const InteractionsOverview = () => {
     {
       activeStartDate: null,
       activeEndDate: null,
+      activeSearchTerm: '',
       pageIndex: 0,
       pageSize: 8,
-      pageCount: 4,
       sortBy: [{ id: 'id', desc: true }]
     });
 
   const interactions = data?.interactions?.sessions || []
 
   useEffect(() => {
-    const { activeStartDate, activeEndDate, pageIndex, pageSize, sortBy } = activeGridProperties;
+    const { activeStartDate, activeEndDate, pageIndex, pageSize, sortBy, activeSearchTerm } = activeGridProperties;
     fetchInteractions({
       variables: {
         dialogueId: topicId,
         filter: {
           startDate: activeStartDate,
           endDate: activeEndDate,
+          searchTerm: activeSearchTerm,
           offset: pageIndex * pageSize,
           limit: pageSize,
           pageIndex: pageIndex,
@@ -55,6 +57,9 @@ const InteractionsOverview = () => {
   }, [activeGridProperties])
 
   const handleSearchTermChange = (newSearchTerm: string) => {
+    setActiveGridProperties((prevValues) => {
+      return { ...prevValues, activeSearchTerm: newSearchTerm }
+    });
     console.log('New search term: ', newSearchTerm);
   }
 
@@ -76,7 +81,8 @@ const InteractionsOverview = () => {
     tempLink.remove();
   }
 
-  console.log('interactions', interactions);
+  console.log('interactions', data?.interactions);
+  const pageCount = data?.interactions?.pages || 1;
 
   return (
     <Div px="24px" margin="0 auto" width="100vh" height="100vh" maxHeight="100vh" overflow="hidden">
@@ -95,12 +101,12 @@ const InteractionsOverview = () => {
             activeStartDate={activeGridProperties.activeStartDate}
             activeEndDate={activeGridProperties.activeEndDate}
             handleDateChange={handleDateChange} />
-          <SearchBarComponent handleSearchTermChange={handleSearchTermChange} />
+          <SearchBarComponent activeSearchTerm={activeGridProperties.activeSearchTerm} handleSearchTermChange={handleSearchTermChange} />
         </InputContainer>
       </InputOutputContainer>
       <Div style={{ background: '#fdfbfe' }} mb="1%" height="65%">
         <InteractionsView
-          gridProperties={activeGridProperties}
+          gridProperties={{... activeGridProperties, pageCount}}
           onGridPropertiesChange={setActiveGridProperties}
           interactions={interactions} />
       </Div>
