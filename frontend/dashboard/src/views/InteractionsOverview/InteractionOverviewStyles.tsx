@@ -7,6 +7,23 @@ const FlexRow = styled(Div)`
     flex-direction: row;
 `;
 
+export const InteractionDetailQuestionEntry = styled(Div)`
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+    &::before {
+        content:"";
+        position: absolute;
+        height: 90%;
+        z-index: 0;
+        top: 5%;
+        bottom: 0;
+        left: 52%;
+        border-left: 2px solid #c0bcbb; /*#c0bcbb */
+        transform: translate(-50%);
+    }
+`;
+
 export const InputOutputContainer = styled(FlexRow)`
     justify-content: space-between;
 `;
@@ -29,3 +46,5 @@ ${({ theme }) => css`
     height: '100%';
     border: '1px solid black'
 `;
+
+
