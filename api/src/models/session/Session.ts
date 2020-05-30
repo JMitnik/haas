@@ -31,11 +31,15 @@ export const NodeEntryType = objectType({
     t.string('creationDate');
     t.int('depth');
     t.string('relatedEdgeId', { nullable: true });
-    t.string('relatedNodeId');
+    t.string('relatedNodeId', { nullable: true });
     t.string('sessionId');
     t.field('relatedNode', {
       type: QuestionNodeType,
+      nullable: true,
       resolve(parent: NodeEntry, args: any, ctx: any) {
+        if (!parent.relatedNodeId) {
+          return null;
+        }
         const relatedNode = ctx.prisma.questionNode.findOne(
           { where: { id: parent.relatedNodeId } },
         );
@@ -331,6 +335,7 @@ export const getSessionAnswerFlowQuery = extendType({
                 id: true,
                 creationDate: true,
                 depth: true,
+                relatedNodeId: true,
                 values: {
                   select: {
                     id: true,
@@ -345,7 +350,7 @@ export const getSessionAnswerFlowQuery = extendType({
           },
         });
 
-        console.log('Sessions: ', sessions.length);
+        console.log('Session question entry title: ', sessions[0]);
         console.log('Pages: ', Math.ceil(pages.length / limit));
         let mappedSessions = sessions.map((session) => {
           const { createdAt, nodeEntries } = session;

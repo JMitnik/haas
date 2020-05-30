@@ -12,6 +12,10 @@ const getInteractionsQuery = gql`
       nodeEntries {
         id
         depth
+        relatedNode {
+          title
+          type
+        }
         values {
           numberValue
           textValue

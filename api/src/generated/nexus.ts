@@ -332,8 +332,8 @@ export interface NexusGenFieldTypes {
     depth: number; // Int!
     id: string | null; // ID
     relatedEdgeId: string | null; // String
-    relatedNode: NexusGenRootTypes['QuestionNode']; // QuestionNode!
-    relatedNodeId: string; // String!
+    relatedNode: NexusGenRootTypes['QuestionNode'] | null; // QuestionNode
+    relatedNodeId: string | null; // String
     sessionId: string; // String!
     values: NexusGenRootTypes['NodeEntryValue'][]; // [NodeEntryValue!]!
   }

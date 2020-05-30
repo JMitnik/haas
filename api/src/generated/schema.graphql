@@ -170,8 +170,8 @@ type NodeEntry {
   depth: Int!
   id: ID
   relatedEdgeId: String
-  relatedNode: QuestionNode!
-  relatedNodeId: String!
+  relatedNode: QuestionNode
+  relatedNodeId: String
   sessionId: String!
   values: [NodeEntryValue!]!
 }
