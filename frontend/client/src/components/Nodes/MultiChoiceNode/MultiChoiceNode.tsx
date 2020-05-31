@@ -4,7 +4,7 @@ import { Variants, motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import React, { useEffect } from 'react';
 
-import { HAASFormEntry, MultiChoiceOption } from 'types/generic';
+import { HAASFormEntry } from 'types/generic';
 import { TreeNodeOptionProps } from 'models/TreeNodeOptionModel';
 import useDialogueTree from 'providers/DialogueTreeProvider';
 import useEdgeTransition from 'hooks/use-edge-transition';
@@ -67,8 +67,8 @@ const MultiChoiceNode = ({ node }: MultiChoiceNodeProps) => {
         throw new Error('We lost customer and/or dialogue');
       }
 
-      const nextEdge = node.getNextEdgeFromKey(multiChoiceOption.value);
-      goToEdge(customer.slug, dialogue?.id, nextEdge.id);
+      const nextEdgeId = node.getNextEdgeIdFromKey(multiChoiceOption.value);
+      goToEdge(customer.slug, dialogue?.id, nextEdgeId);
     }
   };
 

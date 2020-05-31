@@ -13,9 +13,10 @@ export const DialogueTreeProvider = ({ children }: { children: React.ReactNode }
 
   // Start the tree project
   useEffect(() => {
-    if (dialogue?.questions && dialogue?.edges) {
+    if (dialogue?.questions && dialogue?.edges && dialogue?.edges) {
       treeStore.tree.setInitialNodes(dialogue?.questions);
       treeStore.tree.setInitialEdges(dialogue?.edges);
+      treeStore.tree.setInitialLeaves(dialogue?.leafs);
     }
   }, [customer, dialogue]);
 

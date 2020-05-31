@@ -1,18 +1,17 @@
+import { useAnimation } from 'framer-motion';
+import { useForm } from 'react-hook-form';
+import React from 'react';
+
 import { Div, H2 } from '@haas/ui';
 import { HAASFormEntry } from 'types/generic';
 import { cleanInt } from 'utils/cleanInt';
-import { useAnimation } from 'framer-motion';
-import { useForm } from 'react-hook-form';
-import { useHistory, useRouteMatch } from 'react-router-dom';
-import React from 'react';
-
 import useDialogueTree from 'providers/DialogueTreeProvider';
+import useEdgeTransition from 'hooks/use-edge-transition';
+import useProject from 'providers/ProjectProvider';
 
 import { GenericNodeProps } from '../NodeLayout/NodeLayout';
 import { SliderNodeContainer, SliderNodeValue } from './SliderNodeStyles';
 import Slider from './Slider';
-import useEdgeTransition from 'hooks/use-edge-transition';
-import useProject from 'providers/ProjectProvider';
 
 type SliderNodeProps = GenericNodeProps;
 
@@ -59,13 +58,13 @@ const SliderNode = ({ node }: SliderNodeProps) => {
           nodeId: node.id,
         });
 
-        const nextEdge = node.getNextEdgeFromKey(formEntry.numberValue);
+        const nextEdgeId = node.getNextEdgeIdFromKey(formEntry.numberValue);
 
         if (!customer || !dialogue) {
           throw new Error('We lost customer and/or dialogue');
         }
 
-        goToEdge(customer.slug, dialogue?.id, nextEdge.id);
+        goToEdge(customer.slug, dialogue?.id, nextEdgeId);
       }
     }
   };
