@@ -2,6 +2,7 @@ import React from 'react';
 
 import { HAASNode } from 'types/generic';
 import { Loader } from '@haas/ui';
+import { TreeNodeProps } from 'models/TreeNodeModel';
 import { Variants, motion } from 'framer-motion';
 import DialogueTreeLayout from 'components/DialogueTreeLayout';
 import FinishNode from 'components/Nodes/FinishNode/FinishNode';
@@ -44,22 +45,13 @@ const nodeViewAnimation: Variants = {
 };
 
 interface NodeViewProps {
-  node: HAASNode;
+  node: TreeNodeProps;
 }
 
 const NodeView = ({ node }: NodeViewProps) => (
-  <motion.div
-    style={{ width: '100%' }}
-    variants={nodeViewAnimation}
-    initial="initial"
-    animate="animate"
-    exit="exit"
-    key={node.id}
-  >
-    <DialogueTreeLayout>
-      <NodeType node={node} />
-    </DialogueTreeLayout>
-  </motion.div>
+  <DialogueTreeLayout>
+    <NodeType node={node} />
+  </DialogueTreeLayout>
 );
 
 export default NodeView;

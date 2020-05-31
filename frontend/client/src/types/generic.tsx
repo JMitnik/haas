@@ -37,7 +37,8 @@ export interface HAASEdge {
 export interface HAASNode {
   id: string;
   title: string;
-  type: HAASQuestionType;
+  // type: HAASQuestionType;
+  type: string;
   isRoot: boolean;
   children: Array<Edge>;
   conditions?: [HAASNodeConditions];

@@ -79,7 +79,6 @@ const MultiChoiceNode = ({ node }: MultiChoiceNodeProps) => {
         animate="animate"
       >
         {node.options?.map((multiChoiceOption: MultiChoiceOption, index: number) => (
-
           <motion.div key={index} variants={multiChoiceItemAnimation}>
             <Div useFlex justifyContent="center" key={index} padding={2} flex={['100%', 1]}>
               <ClientButton

@@ -16,7 +16,6 @@ export const DialogueTreeProvider = ({ children }: { children: React.ReactNode }
     if (dialogue?.questions && dialogue?.edges) {
       treeStore.tree.setInitialNodes(dialogue?.questions);
       treeStore.tree.setInitialEdges(dialogue?.edges);
-      console.log(treeStore);
     }
   }, [customer, dialogue]);
 

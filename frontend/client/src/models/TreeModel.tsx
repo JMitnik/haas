@@ -1,4 +1,5 @@
-import { Instance, types } from 'mobx-state-tree';
+import { Instance, getSnapshot, types } from 'mobx-state-tree';
+import { TreeEdgeConditionProps } from './TreeEdgeConditionModel';
 import TreeEdgeModel, { TreeEdgeProps } from './TreeEdgeModel';
 import TreeNode, { TreeNodeProps } from './TreeNodeModel';
 
@@ -8,31 +9,48 @@ const TreeModel = types
     edges: types.optional(types.array(TreeEdgeModel), []),
   })
   .actions((self) => ({
-    setNodes(nodes: TreeNodeProps[]) {
-      self.nodes.replace(nodes);
-    },
+    /**
+     * Store nodes on tree-init
+     */
     setInitialNodes(nodes: TreeNodeProps[]) {
-      nodes.forEach((node) => {
-        const newNode = TreeNode.create({
-          id: node.id,
-          isRoot: node.isRoot,
-          title: node.title,
-          children: node.children.map((edge) => edge.id),
-        });
+      const newNodes = nodes.map((node) => TreeNode.create({
+        id: node.id,
+        isRoot: node.isRoot,
+        title: node.title,
+        children: node.children.map((edge) => edge.id),
+        type: node.type,
+      }));
 
-        self.nodes.push(newNode);
-      });
+      self.nodes.replace(newNodes);
     },
-    setInitialEdges(edges: TreeEdgeProps[]) {
-      edges.forEach((edge) => {
-        const newEdge = TreeEdgeModel.create({
-          id: edge.id,
-          parentNode: edge.parentNode.id,
-          childNode: edge.childNode.id,
-        });
 
-        self.edges.push(newEdge);
-      });
+    /**
+     * Store edge on tree init
+     * @param edges
+     */
+    setInitialEdges(edges: TreeEdgeProps[]) {
+      const newEdges = edges.map((edge) => TreeEdgeModel.create({
+        id: edge.id,
+        parentNode: edge.parentNode.id,
+        childNode: edge.childNode.id,
+        conditions: edge.conditions,
+      }));
+
+      self.edges.replace(newEdges);
+    },
+
+    /**
+     * Extract Node by passing edge
+     * @param edgeId
+     */
+    getChildNodeByEdge(edgeId: string | undefined) {
+      const edge: TreeEdgeProps | null = self.edges.find((edge: TreeEdgeProps) => edge.id === edgeId);
+
+      if (!edge) {
+        throw new Error('Unable to find relevant edge');
+      }
+
+      return edge.childNode;
     },
   }))
   .views((self) => ({

@@ -2,12 +2,13 @@ import { AnimatePresence, motion } from 'framer-motion';
 import React, { ReactNode } from 'react';
 
 import { HAASNode } from 'types/generic';
+import { TreeNodeProps } from 'models/TreeNodeModel';
 
 import { ActiveNodeContainer, FloatingNodeContainer } from './NodeStyles';
 
 export interface GenericNodeProps {
   isLeaf?: boolean;
-  node: HAASNode;
+  node: TreeNodeProps;
 }
 
 const NodeLayout = ({ activeNode, children }: { activeNode: HAASNode, children: ReactNode }) => (

@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion';
 import { useQuery } from '@apollo/react-hooks';
 import React from 'react';
 
@@ -16,20 +17,22 @@ const CustomersPage = () => {
   if (error) return <p>{error.message}</p>;
 
   return (
-    <CustomerOverviewContainer py={['30px', '100px']} px="24px">
-      <Div useFlex flexDirection="column" minHeight="80vh">
-        <Div useFlex mb="70px" alignItems="flex-end" justifyContent="center">
-          <Logo width={150} />
-          <H1 mb={0} fontSize={[40, 100]} textAlign="center" color="white" ml={4}>
-            haas
-          </H1>
-        </Div>
+    <motion.div exit={{ opacity: 0 }}>
+      <CustomerOverviewContainer py={['30px', '100px']} px="24px">
+        <Div useFlex flexDirection="column" minHeight="80vh">
+          <Div useFlex mb="70px" alignItems="flex-end" justifyContent="center">
+            <Logo width={150} />
+            <H1 mb={0} fontSize={[40, 100]} textAlign="center" color="white" ml={4}>
+              haas
+            </H1>
+          </Div>
 
-        <Grid gridTemplateColumns="repeat(auto-fit, minmax(300px, 1fr))" gridGap="24px">
-          {customers?.map((customer: any, index: number) => <CustomerCard key={index} customer={customer} />)}
-        </Grid>
-      </Div>
-    </CustomerOverviewContainer>
+          <Grid gridTemplateColumns="repeat(auto-fit, minmax(300px, 1fr))" gridGap="24px">
+            {customers?.map((customer: any, index: number) => <CustomerCard key={index} customer={customer} />)}
+          </Grid>
+        </Div>
+      </CustomerOverviewContainer>
+    </motion.div>
   );
 };
 
