@@ -7,6 +7,6 @@ const TreeNodeOptionModel = types
     publicValue: types.maybeNull(types.string),
   });
 
-export interface TreeEdgeConditionProps extends Instance<typeof TreeNodeOptionModel>{}
+export interface TreeNodeOptionProps extends Instance<typeof TreeNodeOptionModel>{}
 
 export default TreeNodeOptionModel;

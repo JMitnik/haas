@@ -5,12 +5,13 @@ import { useForm } from 'react-hook-form';
 import React, { useEffect } from 'react';
 
 import { HAASFormEntry, MultiChoiceOption } from 'types/generic';
+import { TreeNodeOptionProps } from 'models/TreeNodeOptionModel';
 import useDialogueTree from 'providers/DialogueTreeProvider';
-
 import useEdgeTransition from 'hooks/use-edge-transition';
+import useProject from 'providers/ProjectProvider';
+
 import { GenericNodeProps } from '../NodeLayout/NodeLayout';
 import { MultiChoiceNodeContainer, MultiChoiceNodeGrid } from './MultiChoiceNodeStyles';
-import useProject from 'providers/ProjectProvider';
 
 type MultiChoiceNodeProps = GenericNodeProps;
 
@@ -55,7 +56,7 @@ const MultiChoiceNode = ({ node }: MultiChoiceNodeProps) => {
   }, [register]);
 
   // Apply submission
-  const onSubmit = async (multiChoiceOption: MultiChoiceOption) => {
+  const onSubmit = async (multiChoiceOption: TreeNodeOptionProps) => {
     setValue('textValue', multiChoiceOption.value);
     const validForm = await triggerValidation('textValue');
 
@@ -80,7 +81,7 @@ const MultiChoiceNode = ({ node }: MultiChoiceNodeProps) => {
         initial="initial"
         animate="animate"
       >
-        {node.options?.map((multiChoiceOption: MultiChoiceOption, index: number) => (
+        {node.options?.map((multiChoiceOption: TreeNodeOptionProps, index: number) => (
           <motion.div key={index} variants={multiChoiceItemAnimation}>
             <Div useFlex justifyContent="center" key={index} padding={2} flex={['100%', 1]}>
               <ClientButton
