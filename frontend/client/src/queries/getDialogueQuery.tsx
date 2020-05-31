@@ -1,6 +1,7 @@
-import gql from 'graphql-tag';
 import { CustomerFragment } from './CustomerFragment';
+import { EdgeFragment } from './EdgeFragment';
 import { QuestionFragment } from './QuestionFragment';
+import gql from 'graphql-tag';
 
 const getDialogueQuery = gql`
     query getDialogue($id: ID!) {
@@ -22,11 +23,16 @@ const getDialogueQuery = gql`
         questions {
         ...QuestionFragment
         }
+        edges {
+        ...EdgeFragment
+        }
         customer {
         ...CustomerFragment
         }
     }
     }
+
+    ${EdgeFragment}
     ${CustomerFragment}
     ${QuestionFragment}
 `;

@@ -10,14 +10,19 @@ export interface TreeDispatchProps {
   goToChild: (
     currentNode: HAASNode,
     key: string | number | null,
-    newNodeFormEntry: HAASFormEntry
+    newNodeFormEntry: any,
   ) => void;
-  getActiveNode: (
+  findNodeFromEdge: (
     edgeId?: string
   ) => HAASNode | null,
   getActiveLeaf: (
     leafId: string
   ) => HAASNode
+  saveEntry: (
+    currentNode: HAASNode,
+    key: string | number | null,
+    nodeEntry: HAASFormEntry,
+  ) => void;
 }
 
 interface TreeActionGotoChildProps {

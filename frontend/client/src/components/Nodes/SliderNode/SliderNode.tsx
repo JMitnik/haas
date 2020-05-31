@@ -1,36 +1,38 @@
-import React from 'react';
 import { Div, H2 } from '@haas/ui';
-import { useForm } from 'react-hook-form';
-import useDialogueTree from 'providers/DialogueTreeProvider';
-import { cleanInt } from 'utils/cleanInt';
 import { GenericNodeProps } from '../NodeLayout/NodeLayout';
 import { HAASFormEntry } from 'types/generic';
 import { SliderNodeContainer, SliderNodeValue } from './SliderNodeStyles';
+import { cleanInt } from 'utils/cleanInt';
 import { useAnimation } from 'framer-motion';
+import { useForm } from 'react-hook-form';
+import React from 'react';
 import Slider from './Slider';
+import useDialogueTree from 'providers/DialogueTreeProvider';
 
 type SliderNodeProps = GenericNodeProps;
 
 const sliderValueAnimeVariants = {
   initial: {
-    transform: 'scale(1)'
+    transform: 'scale(1)',
   },
   active: {
-    transform: 'scale(1.5)'
-  }
+    transform: 'scale(1.5)',
+  },
 };
 
 const SliderNode = ({ node }: SliderNodeProps) => {
-  const {
-    treeDispatch: { goToChild }
-  } = useDialogueTree();
+  // const {
+  //   treeDispatch: { saveEntry, goToChild },
+  // } = useDialogueTree();
+  const goToChild = (a: any, b: any, c: any) => {};
+  const saveEntry = (a: any, b: any, c: any) => {};
 
   const controls = useAnimation();
 
   const { watch, getValues, triggerValidation, register } = useForm<HAASFormEntry>({
     defaultValues: {
-      numberValue: 50.01
-    }
+      numberValue: 50.01,
+    },
   });
 
   const formatSliderEntry = (entry: HAASFormEntry) => {
@@ -50,7 +52,8 @@ const SliderNode = ({ node }: SliderNodeProps) => {
       const formEntry = formatSliderEntry(getValues({ nest: true }));
 
       if (formEntry?.numberValue) {
-        goToChild(node, formEntry.numberValue, formEntry);
+        saveEntry(node, formEntry?.numberValue, formEntry);
+        goToChild(node, formEntry.numberValue, null);
       }
     }
   };

@@ -1,28 +1,19 @@
 import gql from 'graphql-tag';
-import { ShallowNodeFragment } from './ShallowNodeFragment';
+
 import { EdgeFragment } from './EdgeFragment';
+import { ShallowNodeFragment } from './ShallowNodeFragment';
 
 export const QuestionFragment = gql`
+
   fragment QuestionFragment on QuestionNode {
     ...ShallowNodeFragment
     children {
       ...EdgeFragment
       parentNode {
-        ...ShallowNodeFragment
+        id
       }
       childNode {
-        ...ShallowNodeFragment
-        children {
-          ...EdgeFragment
-          childNode {
-            ...ShallowNodeFragment
-            children {
-              childNode {
-                ...ShallowNodeFragment
-              }
-            }
-          }
-        }
+        id
       }
     }
     options {

@@ -1,32 +1,32 @@
-import React from 'react';
-import { Grid, Div, H2 } from '@haas/ui';
-import { useForm } from 'react-hook-form';
-import { InputField, InputGroup, InputLabel } from '@haas/ui/src/Form';
 import { CheckCircle } from 'react-feather';
+import { Div, Grid, H2 } from '@haas/ui';
+import { InputField, InputGroup, InputLabel } from '@haas/ui/src/Form';
+import { useForm } from 'react-hook-form';
+import React from 'react';
 
 import { ButtonIcon } from '@haas/ui/src/Buttons';
-import { RegisterNodeContainer } from './RegisterNodeStyles';
 import { GenericNodeProps } from 'components/Nodes/NodeLayout/NodeLayout';
 
-import useDialogueTree from 'providers/DialogueTreeProvider';
 import { ClientButton } from 'components/Buttons/Buttons';
+import { RegisterNodeContainer } from './RegisterNodeStyles';
+import useDialogueTree from 'providers/DialogueTreeProvider';
 
 type RegisterNodeProps = GenericNodeProps;
 
 const RegisterNode = ({ node, isLeaf }: RegisterNodeProps) => {
   const { register, getValues, formState } = useForm();
-  const {
-    treeDispatch: { goToChild }
-  } = useDialogueTree();
+  // const {
+  //   treeDispatch: { goToChild }
+  // } = useDialogueTree();
+  const goToChild = (a: any, b: any, c: any) => {};
+  const saveEntry = (a: any, b: any, c: any) => {};
 
   const onSubmit = () => {
     const formEntry = getValues({ nest: true });
     goToChild(node, null, formEntry);
   };
 
-  const touched = () => {
-    return 'multiValues' in formState.touched;
-  };
+  const touched = () => 'multiValues' in formState.touched;
 
   return (
     <RegisterNodeContainer>

@@ -36,9 +36,14 @@ const multiChoiceItemAnimation: Variants = {
 };
 
 const MultiChoiceNode = ({ node }: MultiChoiceNodeProps) => {
-  const {
-    treeDispatch: { goToChild },
-  } = useDialogueTree();
+  // const {
+  //   treeDispatch: { goToChild, saveEntry },
+  // } = useDialogueTree();
+
+  const goToChild = (a: any, b: any, c: any) => {};
+  const saveEntry = (a: any, b: any, c: any) => {};
+
+  console.log('We are rendering multichoice node');
 
   const { register, setValue, triggerValidation, getValues } = useForm<HAASFormEntry>({
     mode: 'onSubmit',
@@ -59,7 +64,8 @@ const MultiChoiceNode = ({ node }: MultiChoiceNodeProps) => {
 
     if (validForm) {
       const formEntry = getValues({ nest: true });
-      goToChild(node, multiChoiceOption.value, formEntry);
+      saveEntry(node, multiChoiceOption.value, formEntry);
+      goToChild(node, multiChoiceOption.value, null);
     }
   };
 
@@ -74,7 +80,7 @@ const MultiChoiceNode = ({ node }: MultiChoiceNodeProps) => {
       >
         {node.options?.map((multiChoiceOption: MultiChoiceOption, index: number) => (
 
-          <motion.div variants={multiChoiceItemAnimation}>
+          <motion.div key={index} variants={multiChoiceItemAnimation}>
             <Div useFlex justifyContent="center" key={index} padding={2} flex={['100%', 1]}>
               <ClientButton
                 brand="primary"

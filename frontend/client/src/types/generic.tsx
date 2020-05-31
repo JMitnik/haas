@@ -1,3 +1,5 @@
+import { TreeEdgeProps } from 'models/TreeEdgeModel';
+import { TreeNodeProps } from 'models/TreeNodeModel';
 
 export interface HAASNodeConditions {
   renderMin?: number;
@@ -57,9 +59,10 @@ export interface HAASFormEntry {
 }
 
 export interface Dialogue {
-  questions: HAASNode[];
-  leafs: HAASNode[];
-  rootQuestion: HAASNode;
+  questions: TreeNodeProps[];
+  edges: TreeEdgeProps[];
+  leafs: TreeNodeProps[];
+  rootQuestion: TreeNodeProps;
 }
 
 interface DialogueContextProps {

@@ -42,6 +42,7 @@ type Dialogue {
   customer: Customer!
   customerId: String!
   description: String!
+  edges: [Edge!]!
   id: ID!
   leafs: [QuestionNode!]!
   lineChartData: String

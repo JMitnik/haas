@@ -1,13 +1,13 @@
 import React from 'react';
 
-import { Textbox, H3, H2, Div } from '@haas/ui';
-import useDialogueTree from 'providers/DialogueTreeProvider';
-import { useForm } from 'react-hook-form';
-import { CheckCircle } from 'react-feather';
 import { ButtonIcon } from '@haas/ui/src/Buttons';
-import { TextboxContainer } from './TextboxStyles';
-import { GenericNodeProps } from '../NodeLayout/NodeLayout';
+import { CheckCircle } from 'react-feather';
 import { ClientButton } from 'components/Buttons/Buttons';
+import { Div, H2, H3, Textbox } from '@haas/ui';
+import { useForm } from 'react-hook-form';
+import { GenericNodeProps } from '../NodeLayout/NodeLayout';
+import { TextboxContainer } from './TextboxStyles';
+import useDialogueTree from 'providers/DialogueTreeProvider';
 
 interface TextboxNodeProps extends GenericNodeProps {
   isLeaf?: boolean;
@@ -15,9 +15,11 @@ interface TextboxNodeProps extends GenericNodeProps {
 
 const TextboxNode = ({ node }: TextboxNodeProps) => {
   const { register, getValues, formState } = useForm();
-  const {
-    treeDispatch: { goToChild }
-  } = useDialogueTree();
+  // const {
+  //   treeDispatch: { goToChild }
+  // } = useDialogueTree();
+  const goToChild = (a: any, b: any, c: any) => {};
+  const saveEntry = (a: any, b: any, c: any) => {};
 
   const onSubmit = () => {
     const formEntry = getValues({ nest: true });

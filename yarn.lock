@@ -4352,6 +4352,11 @@
   resolved "https://registry.yarnpkg.com/@types/mjml/-/mjml-4.0.4.tgz#af6075d29f64d47186d76125504daf544dfb2b42"
   integrity sha512-4PhI6iZ1zGXZ9X9W0bbmI7mS2xdxITURueqSWJ/cTeS5+tbAtOUDG1ww/fPbfcffWwR4NeOjyNcZiczafH/yfw==
 
+"@types/mobx-devtools-mst@0.9.0":
+  version "0.9.0"
+  resolved "https://registry.yarnpkg.com/@types/mobx-devtools-mst/-/mobx-devtools-mst-0.9.0.tgz#eef2fa04d74914bc1bb1857475f46490ebd23d7a"
+  integrity sha512-17xwXau7im+1Ci5uad1M4fhNh/x7kNXUrQ8+9bJsSw2y1Vu97ftAxKD+60eQ641nHkWKW+7CxaDtXoyDKKaeTg==
+
 "@types/node-fetch@2.5.6":
   version "2.5.6"
   resolved "https://registry.yarnpkg.com/@types/node-fetch/-/node-fetch-2.5.6.tgz#df8377a66e64ddf75b65b072e37b3c5c5425a96f"
@@ -15339,6 +15344,26 @@ mkdirp@0.5.5, mkdirp@^0.5.0, mkdirp@^0.5.1, mkdirp@^0.5.3, mkdirp@~0.5.1:
   integrity sha512-NKmAlESf6jMGym1++R0Ra7wvhV+wFW63FaSOFPwRahvea0gMUcGUhVeAg/0BC0wiv9ih5NYPB1Wn1UEI1/L+xQ==
   dependencies:
     minimist "^1.2.5"
+
+mobx-devtools-mst@^0.9.22:
+  version "0.9.22"
+  resolved "https://registry.yarnpkg.com/mobx-devtools-mst/-/mobx-devtools-mst-0.9.22.tgz#51c7695064d78d31a9c416e7bc58c90a185575cc"
+  integrity sha512-Yi0zoZjy/HcpIYQSttJfzjP8sWvSDxwtemGB99wSvKCSITvWk0CRCeT149Ynhud6sJ9XUgZMdsSAd/kIuZ8vOQ==
+
+mobx-react-lite@^2.0.7:
+  version "2.0.7"
+  resolved "https://registry.yarnpkg.com/mobx-react-lite/-/mobx-react-lite-2.0.7.tgz#1bfb3b4272668e288047cf0c7940b14e91cba284"
+  integrity sha512-YKAh2gThC6WooPnVZCoC+rV1bODAKFwkhxikzgH18wpBjkgTkkR9Sb0IesQAH5QrAEH/JQVmy47jcpQkf2Au3Q==
+
+mobx-state-tree@^3.16.0:
+  version "3.16.0"
+  resolved "https://registry.yarnpkg.com/mobx-state-tree/-/mobx-state-tree-3.16.0.tgz#814c5c87371ababc07d47bef3892ffa21d739e1d"
+  integrity sha512-3eB3/h611fMNu5tvs7I09Hw9Njd0inJzuJMKaY7l49zbNVV6g1kh/poCu1AHZCA/s91N1rq+2VTv9FPo7wyjdA==
+
+mobx@^5.15.4:
+  version "5.15.4"
+  resolved "https://registry.yarnpkg.com/mobx/-/mobx-5.15.4.tgz#9da1a84e97ba624622f4e55a0bf3300fb931c2ab"
+  integrity sha512-xRFJxSU2Im3nrGCdjSuOTFmxVDGeqOHL+TyADCGbT0k4HHqGmx5u2yaHNryvoORpI4DfbzjJ5jPmuv+d7sioFw==
 
 mock-require@^3.0.2:
   version "3.0.3"

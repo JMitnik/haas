@@ -7,6 +7,7 @@ import { CustomerFragment } from 'queries/CustomerFragment';
 import { Dialogue } from 'types/generic';
 import { QuestionFragment } from 'queries/QuestionFragment';
 
+import { EdgeFragment } from 'queries/EdgeFragment';
 import { ProjectActionProps, ProjectContextProps, ProjectStateProps } from './ProjectProviderTypes';
 
 const getCustomerFromSlug = gql`
@@ -39,11 +40,16 @@ const getDialogueQuery = gql`
       questions {
         ...QuestionFragment
       }
+      edges {
+        ...EdgeFragment
+      }
       customer {
         ...CustomerFragment
       }
     }
   }
+
+  ${EdgeFragment}
   ${CustomerFragment}
   ${QuestionFragment}
 `;
