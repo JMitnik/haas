@@ -4,7 +4,7 @@ const TreeNodeOptionModel = types
   .model({
     id: types.identifierNumber,
     value: types.string,
-    publicValue: types.optional(types.string, ''),
+    publicValue: types.maybeNull(types.string),
   });
 
 export interface TreeEdgeConditionProps extends Instance<typeof TreeNodeOptionModel>{}

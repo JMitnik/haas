@@ -7,8 +7,10 @@ import React, { useEffect } from 'react';
 import { HAASFormEntry, MultiChoiceOption } from 'types/generic';
 import useDialogueTree from 'providers/DialogueTreeProvider';
 
+import useEdgeTransition from 'hooks/use-edge-transition';
 import { GenericNodeProps } from '../NodeLayout/NodeLayout';
 import { MultiChoiceNodeContainer, MultiChoiceNodeGrid } from './MultiChoiceNodeStyles';
+import useProject from 'providers/ProjectProvider';
 
 type MultiChoiceNodeProps = GenericNodeProps;
 
@@ -36,14 +38,9 @@ const multiChoiceItemAnimation: Variants = {
 };
 
 const MultiChoiceNode = ({ node }: MultiChoiceNodeProps) => {
-  // const {
-  //   treeDispatch: { goToChild, saveEntry },
-  // } = useDialogueTree();
-
-  const goToChild = (a: any, b: any, c: any) => {};
-  const saveEntry = (a: any, b: any, c: any) => {};
-
-  console.log('We are rendering multichoice node');
+  const store = useDialogueTree();
+  const { goToEdge } = useEdgeTransition();
+  const { customer, dialogue } = useProject();
 
   const { register, setValue, triggerValidation, getValues } = useForm<HAASFormEntry>({
     mode: 'onSubmit',
@@ -64,8 +61,13 @@ const MultiChoiceNode = ({ node }: MultiChoiceNodeProps) => {
 
     if (validForm) {
       const formEntry = getValues({ nest: true });
-      saveEntry(node, multiChoiceOption.value, formEntry);
-      goToChild(node, multiChoiceOption.value, null);
+
+      if (!customer || !dialogue) {
+        throw new Error('We lost customer and/or dialogue');
+      }
+
+      const nextEdge = node.getNextEdgeFromKey(multiChoiceOption.value);
+      goToEdge(customer.slug, dialogue?.id, nextEdge.id);
     }
   };
 
@@ -88,9 +90,7 @@ const MultiChoiceNode = ({ node }: MultiChoiceNodeProps) => {
                 key={index}
               >
                 <H5>
-                  {(multiChoiceOption?.publicValue?.length ?? 0) > 0
-                    ? multiChoiceOption?.publicValue
-                    : multiChoiceOption?.value}
+                  {(multiChoiceOption?.publicValue || multiChoiceOption?.value)}
                 </H5>
               </ClientButton>
             </Div>

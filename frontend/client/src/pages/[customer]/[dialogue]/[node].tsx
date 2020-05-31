@@ -31,10 +31,12 @@ const NodePage = observer(() => {
   const store = useDialogueTree();
 
   return useObserver(() => {
+    // If rootNode is unknown yet, return Loader
     if (!store.tree.rootNode) {
       return <Loader />;
     }
 
+    // Either we start from the 'root' (no edge) or we get the next node.
     const node = edgeId ? store.tree.getChildNodeByEdge(edgeId) : store.tree.rootNode;
 
     return (

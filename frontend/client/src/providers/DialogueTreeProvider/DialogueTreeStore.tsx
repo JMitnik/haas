@@ -1,6 +1,6 @@
 import makeInspectable from 'mobx-devtools-mst';
 
-import TreeStoreModel, { TreeStoreModelProps } from 'models/TreeStoreModel';
+import TreeStoreModel from 'models/TreeStoreModel';
 
 const treeStore = TreeStoreModel.create({
   session: {},

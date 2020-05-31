@@ -19,6 +19,7 @@ const TreeModel = types
         title: node.title,
         children: node.children.map((edge) => edge.id),
         type: node.type,
+        options: node.options,
       }));
 
       self.nodes.replace(newNodes);

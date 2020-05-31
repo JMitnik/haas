@@ -1,6 +1,7 @@
-import styled, { css } from 'styled-components/macro';
 import Color from 'color';
-import { Div, Container } from '@haas/ui';
+
+import { Container, Div } from '@haas/ui';
+import styled, { css } from 'styled-components/macro';
 
 export const DialogueContainer = styled(Div)`
   ${({ theme }) => css`
@@ -18,9 +19,9 @@ export const DialogueContainer = styled(Div)`
       z-index: 1;
     }
 
-    ${theme.colors.primary &&
-      theme.colors.primaryAlt &&
-      css`
+    ${theme.colors.primary
+      && theme.colors.primaryAlt
+      && css`
         animation: BackgroundMove 30s ease infinite;
         background: linear-gradient(to right, ${theme.colors.primary}, ${theme.colors.primaryAlt});
         background-size: 200%;
@@ -58,6 +59,31 @@ export const DialogueContainer = styled(Div)`
       100% {
         background-position: 0% 50%;
       }
+    }
+  `}
+`;
+
+export const GoBackButton = styled(Div)`
+  ${({ theme }) => css`
+    border-radius: 100%;
+    box-shadow: 1px;
+    position: absolute;
+    top: ${theme.gutter}px;
+    width: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 30px;
+    box-shadow: 0px 3px 1px 1px rgba(0, 0, 0, 0.10);
+    left: ${theme.gutter}px;
+
+    color: white;
+
+    i, svg {
+      width: 25px;
+      line-height: 25px;
+      height: 25px;
+      font-size: 2em;
     }
   `}
 `;

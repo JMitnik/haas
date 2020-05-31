@@ -1,2 +1,2 @@
 export * from './DialogueTreeProvider';
-export {default} from './DialogueTreeProvider';
+export { default } from './DialogueTreeProvider';

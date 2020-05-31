@@ -60,6 +60,7 @@ export interface HAASFormEntry {
 }
 
 export interface Dialogue {
+  id: string;
   questions: TreeNodeProps[];
   edges: TreeEdgeProps[];
   leafs: TreeNodeProps[];
