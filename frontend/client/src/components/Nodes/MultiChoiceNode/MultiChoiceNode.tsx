@@ -61,11 +61,15 @@ const MultiChoiceNode = ({ node }: MultiChoiceNodeProps) => {
     const validForm = await triggerValidation('textValue');
 
     if (validForm) {
-      const formEntry = getValues({ nest: true });
-
       if (!customer || !dialogue) {
         throw new Error('We lost customer and/or dialogue');
       }
+
+      store.session.add(node.id, {
+        multiValues: null,
+        numberValue: null,
+        textValue: multiChoiceOption.value,
+      });
 
       const nextEdgeId = node.getNextEdgeIdFromKey(multiChoiceOption.value);
       goToEdge(customer.slug, dialogue?.id, nextEdgeId);

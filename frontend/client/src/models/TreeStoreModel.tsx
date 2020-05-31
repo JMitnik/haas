@@ -6,7 +6,7 @@ import TreeModel from './TreeModel';
 const TreeStoreModel = types
   .model('TreeStore', {
     session: types.optional(SessionModel, {}),
-    tree: types.optional(TreeModel, {}),
+    tree: TreeModel,
   });
 
 export interface TreeStoreModelProps extends Instance<typeof TreeStoreModel>{}

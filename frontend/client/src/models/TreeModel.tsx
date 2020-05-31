@@ -1,4 +1,4 @@
-import { Instance, types } from 'mobx-state-tree';
+import { Instance, getSnapshot, types } from 'mobx-state-tree';
 import { TreeEdgeModel, TreeEdgeProps } from './TreeEdgeModel';
 import { TreeNodeModel, TreeNodeProps, defaultTreeLeaf } from './TreeNodeModel';
 
@@ -7,7 +7,7 @@ const TreeModel = types
     nodes: types.optional(types.array(TreeNodeModel), []),
     edges: types.optional(types.array(TreeEdgeModel), []),
     leaves: types.optional(types.array(TreeNodeModel), []),
-    activeLeaf: types.maybe(types.reference(TreeNodeModel)),
+    activeLeaf: types.reference(TreeNodeModel),
   })
   .actions((self) => ({
 
@@ -22,6 +22,7 @@ const TreeModel = types
         children: node.children.map((edge) => edge.id),
         type: node.type,
         options: node.options,
+        overrideLeaf: node.overrideLeaf?.id,
       }));
 
       self.nodes.replace(newNodes);
@@ -63,7 +64,7 @@ const TreeModel = types
      * Extract Node by passing edge
      * @param edgeId
      */
-    getChildNodeByEdge(edgeId: string | undefined) {
+    getChildNodeByEdge(edgeId: string | undefined): TreeNodeProps {
       const edge: TreeEdgeProps | null = self.edges.find((edge: TreeEdgeProps) => edge.id === edgeId);
 
       if (edgeId === String(-1)) {
@@ -75,6 +76,13 @@ const TreeModel = types
       }
 
       return edge.childNode;
+    },
+
+    setActiveLeafFromNode(node: TreeNodeProps): void {
+      console.log('trees', getSnapshot(node));
+      if (node.overrideLeaf) {
+        self.activeLeaf = node.overrideLeaf;
+      }
     },
   }))
   .views((self) => ({

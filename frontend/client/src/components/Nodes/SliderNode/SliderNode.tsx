@@ -9,6 +9,7 @@ import useDialogueTree from 'providers/DialogueTreeProvider';
 import useEdgeTransition from 'hooks/use-edge-transition';
 import useProject from 'providers/ProjectProvider';
 
+import { SessionEntryDataModel } from 'models/SessionEntryModel';
 import { GenericNodeProps } from '../NodeLayout/NodeLayout';
 import { SliderNodeContainer, SliderNodeValue } from './SliderNodeStyles';
 import Slider from './Slider';
@@ -53,9 +54,10 @@ const SliderNode = ({ node }: SliderNodeProps) => {
       const formEntry = formatSliderEntry(getValues({ nest: true }));
 
       if (formEntry?.numberValue) {
-        store.session.add({
-          data: 'test',
-          nodeId: node.id,
+        store.session.add(node.id, {
+          numberValue: formEntry.numberValue,
+          textValue: null,
+          multiValues: null,
         });
 
         const nextEdgeId = node.getNextEdgeIdFromKey(formEntry.numberValue);

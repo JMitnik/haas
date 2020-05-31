@@ -38,6 +38,7 @@ const NodePage = observer(() => {
 
     // Either we start from the 'root' (no edge) or we get the next node.
     const node = edgeId ? store.tree.getChildNodeByEdge(edgeId) : store.tree.rootNode;
+    store.tree.setActiveLeafFromNode(node);
 
     return (
       <motion.div
