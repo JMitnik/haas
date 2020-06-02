@@ -203,7 +203,7 @@ class NodeResolver {
       return null;
     }
 
-    return undefined;
+    return null;
   };
 
   static updateQuestion = async (questionnaireId: string, questionData: QuestionProps) => {
@@ -231,7 +231,6 @@ class NodeResolver {
     const currentOverrideLeafId = activeQuestion ? activeQuestion.overrideLeafId : null;
 
     const leaf = NodeResolver.getLeafObject(currentOverrideLeafId, overrideLeaf);
-
     try {
       await NodeResolver.removeNonExistingQOptions(activeOptions, options, questionData.id);
     } catch (e) {
@@ -294,13 +293,31 @@ class NodeResolver {
       );
     }));
     const updatedEdgeIds = updatedEdges.map((edge) => ({ id: edge.id }));
-
     const questionId = questionData.id;
-    await prisma.questionNode.update({
+    const updated = leaf ? await prisma.questionNode.update({
       where: { id: questionId },
       data: {
         title,
         overrideLeaf: leaf,
+        questionDialogue: {
+          connect: {
+            id: questionnaireId,
+          },
+        },
+        isRoot,
+        isLeaf,
+        type,
+        options: {
+          connect: updatedOptionIds,
+        },
+        children: {
+          connect: updatedEdgeIds,
+        },
+      },
+    }) : await prisma.questionNode.update({
+      where: { id: questionId },
+      data: {
+        title,
         questionDialogue: {
           connect: {
             id: questionnaireId,

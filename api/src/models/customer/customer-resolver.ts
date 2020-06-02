@@ -121,13 +121,13 @@ class CustomerResolver {
         name,
       },
     });
+
     return customer;
   };
 
   static createCustomer = async (args: any) => {
     const { name, options } = args;
     const { isSeed, logo, primaryColour, slug, cloudinary } = options;
-    console.log(cloudinary);
     const customer = await prisma.customer.create({
       data: {
         name,

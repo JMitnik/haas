@@ -95,7 +95,7 @@ const CustomerCard = ({ customer }: { customer: any }) => {
     >
       <CardBody flex="100%">
         <EditButtonContainer onClick={(e) => setCustomerEditPath(e, customer.id)}>
-          <Edit />   
+          <Edit />
         </EditButtonContainer>
         <DeleteButtonContainer
           onClick={(e) => deleteClickedCustomer(e, customer.id)}
@@ -106,7 +106,7 @@ const CustomerCard = ({ customer }: { customer: any }) => {
           <H3 fontWeight={500}>
             {customer.name}
           </H3>
-          <CustomerCardImage src={customer?.settings?.logoUrl ? customer?.settings?.logoUrl : ''} />
+          <CustomerCardImage src={customer?.settings?.logoUrl} />
         </Flex>
       </CardBody>
     </Card>

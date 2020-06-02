@@ -25,4 +25,5 @@ export const CustomerOverviewContainer = styled(Div)`
   max-width: 100%;
   width: 1200px;
   margin: 0 auto;
+  padding-bottom: 48px;
 `;

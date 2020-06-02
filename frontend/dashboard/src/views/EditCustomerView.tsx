@@ -23,21 +23,52 @@ interface FormDataProps {
 }
 
 const EditCustomerView = () => {
-  const history = useHistory();
   const { customerId } = useParams();
-  const [activePreview, setActivePreview] = useState('');
-  const { register, handleSubmit, errors } = useForm<FormDataProps>();
-  const [uploadFile] = useMutation(uploadSingleImage,
-    {
-      onCompleted: (result) => {
-        setActivePreview(result.singleUpload.url);
-      },
-    })
-  const getEditCustomerQuery = useQuery(getEditCustomerData, {
+
+  const { data: customerData, error, loading } = useQuery(getEditCustomerData, {
     variables: {
       id: customerId
     }
-  })
+  });
+
+  if (loading) return null;
+  if (error) return <><p>{error.message}</p></>;
+
+  const customer = customerData?.customer;
+
+  console.log(customer);
+  return (
+    <EditCustomerForm customer={customer}/>
+  )
+};
+
+const EditCustomerForm = ({ customer }: { customer: any } ) => {
+  const history = useHistory();
+
+  const [activePreviewUrl, setActivePreviewUrl] = useState<null | string>(null);
+
+  const { register, handleSubmit, errors } = useForm<FormDataProps>({
+    defaultValues: {
+      name: customer.name,
+      logo: customer.settings?.logoUrl,
+      primaryColour: customer.settings?.colourSettings?.primary,
+      slug: customer.slug,
+    },
+  });
+
+  const [uploadFile] = useMutation(uploadSingleImage, {
+    onCompleted: (result) => {
+      setActivePreviewUrl(result.singleUpload.url);
+    },
+  });
+
+  const onLogoUploadChange = (event: any) => {
+    const image: File = event.target.files[0];
+
+    if (image) {
+      uploadFile({ variables: { file: image } });
+    }
+  };
 
   const [editCustomer, { loading }] = useMutation(editCustomerMutation, {
     onCompleted: () => {
@@ -49,25 +80,17 @@ const EditCustomerView = () => {
     },
   });
 
-  if (getEditCustomerQuery.loading) return null;
-
-  const onChange = (event: any) => {
-    const image: File = event.target.files[0];
-    if (image) {
-      uploadFile({ variables: { file: image } });
-    }
-  }
-
   const onSubmit = (formData: FormDataProps) => {
     const optionInput = {
-      logo: activePreview,
+      logo: activePreviewUrl || formData.logo,
       slug: formData.slug,
       primaryColour: formData.primaryColour,
       name: formData.name
     };
+
     editCustomer({
       variables: {
-        id: getEditCustomerQuery.data?.customer?.id,
+        id: customer?.id,
         options: optionInput,
       },
     });
@@ -95,34 +118,42 @@ const EditCustomerView = () => {
               <Grid gridTemplateColumns={['1fr', '1fr 1fr']}>
                 <Flex flexDirection="column">
                   <StyledLabel>Name</StyledLabel>
-                  <StyledInput defaultValue={getEditCustomerQuery.data?.customer?.name} name="name" ref={register({ required: true })} />
+                  <StyledInput name="name" ref={register({ required: true })} />
                   {errors.name && <Muted color="warning">Something went wrong!</Muted>}
                 </Flex>
-                <Div useFlex pl={4} flexDirection="column">
+                <Div useFlex flexDirection="column">
                   <StyledLabel>Logo</StyledLabel>
-                  <StyledInput defaultValue={getEditCustomerQuery.data?.customer?.settings?.logoUrl} name="logo" ref={register({ required: true })} />
+                  <StyledInput name="logo" ref={register({ required: true })} />
                   {errors.name && <Muted color="warning">Something went wrong!</Muted>}
                 </Div>
-                <Div useFlex pl={4} flexDirection="column">
+                <Div useFlex flexDirection="column">
                   <StyledLabel>Slug</StyledLabel>
-                  <StyledInput defaultValue={getEditCustomerQuery.data?.customer?.slug} name="slug" ref={register({ required: true })} />
+                  <StyledInput name="slug" ref={register({ required: true })} />
                   {errors.name && <Muted color="warning">Something went wrong!</Muted>}
                 </Div>
-                <Div useFlex py={4} flexDirection="column">
+                <Div useFlex flexDirection="column">
                   <StyledLabel>Primary colour</StyledLabel>
-                  <StyledInput defaultValue={getEditCustomerQuery.data?.customer?.settings?.colourSettings?.primary} name="primaryColour" ref={register({ required: true })} />
+                  <StyledInput name="primaryColour" ref={register({ required: true })} />
                   {errors.name && <Muted color="warning">Something went wrong!</Muted>}
                 </Div>
                 <Div useFlex flexDirection="column">
                   <StyledLabel>Logo (Cloudinary)</StyledLabel>
-                  <StyledInput type="file" name="cloudinary" onChange={onChange} ref={register({ required: false })} />
+                  <StyledInput type="file" name="cloudinary" onChange={onLogoUploadChange} ref={register({ required: false })} />
                   {errors.name && <Muted color="warning">Something went wrong!</Muted>}
                 </Div>
                 <Div useFlex flexDirection="column">
                   <StyledLabel>Preview</StyledLabel>
                   <Div width={200} height={200} style={{ border: '1px solid lightgrey', borderRadius: '8px' }}>
-                    { (!activePreview && getEditCustomerQuery.data?.customer?.settings?.logoUrl) && <img src={getEditCustomerQuery.data?.customer?.settings?.logoUrl} height={200} width={200} />}
-                    { activePreview && <img src={activePreview} height={200} width={200} />}
+                    {(!activePreviewUrl && customer?.settings?.logoUrl) && (
+                      <img
+                        src={customer?.settings?.logoUrl}
+                        height={200}
+                        width={200}
+                        style={{ objectFit: 'contain' }}
+                      />
+                    )}
+
+                    {activePreviewUrl && <img src={activePreviewUrl} height={200} width={200} />}
                   </Div>
                 </Div>
               </Grid>
@@ -134,13 +165,14 @@ const EditCustomerView = () => {
           {loading && (<Muted>Loading...</Muted>)}
 
           <Flex>
-            <Button brand="primary" mr={2} type="submit">Save topic</Button>
+            <Button brand="primary" mr={2} type="submit">Save customer</Button>
             <Button brand="default" type="button" onClick={() => history.push('/')}>Cancel</Button>
           </Flex>
         </Div>
       </Form>
     </Container>
   );
-};
+}
+
 
 export default EditCustomerView;

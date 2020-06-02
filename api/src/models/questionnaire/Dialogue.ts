@@ -40,24 +40,6 @@ export const DialogueType = objectType({
         where: QuestionNodeWhereInput,
       },
       resolve(parent: Dialogue, args: any, ctx: any) {
-        // if (args?.where?.isRoot) {
-        //   const rootQuestion = ctx.prisma.questionNode.findMany({
-        //     where: {
-        //       isRoot: args.where.isRoot,
-        //     },
-        //   });
-        //   return rootQuestion;
-        // }
-
-        // if (args?.where?.id) {
-        //   const questions = ctx.prisma.questionNode.findMany({
-        //     where: {
-        //       id: args.where.id,
-        //     },
-        //   });
-        //   return questions;
-        // }
-
         const questions = ctx.prisma.questionNode.findMany({
           where: {
             AND: [
@@ -180,6 +162,7 @@ export const deleteDialogueOfCustomerMutation = extendType({
         return DialogueResolver.createDialogue(args);
       },
     });
+
     t.field('editDialogue', {
       type: DialogueType,
       args: {
@@ -192,6 +175,7 @@ export const deleteDialogueOfCustomerMutation = extendType({
         return DialogueResolver.editDialogue(args);
       },
     });
+
     t.field('deleteDialogue', {
       type: DialogueType,
       args: {
@@ -216,7 +200,12 @@ export const DialoguesOfCustomerQuery = extendType({
         offset: 'Int',
       },
       resolve(parent: any, args: any, ctx: any, info: any) {
-        return DialogueResolver.getNextLineData(args.dialogueId, args.numberOfDaysBack, args.limit, args.offset);
+        return DialogueResolver.getNextLineData(
+          args.dialogueId,
+          args.numberOfDaysBack,
+          args.limit,
+          args.offset,
+        );
       },
     });
     t.field('dialogue', {
@@ -242,11 +231,13 @@ export const DialoguesOfCustomerQuery = extendType({
             customerId: args.customerId,
           },
         });
+
         const updatedDialogues = Promise.all(dialogues.map(async (dialogue) => {
           const arg = { dialogueId: dialogue.id };
           const aggregated = await DialogueResolver.getQuestionnaireAggregatedData(parent, arg);
           return { ...dialogue, averageScore: aggregated.average };
         }));
+
         return updatedDialogues;
       },
     });

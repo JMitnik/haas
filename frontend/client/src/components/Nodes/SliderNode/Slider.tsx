@@ -1,4 +1,4 @@
-import React, { forwardRef, useReducer } from 'react';
+import React, { useReducer } from 'react';
 import { HAASIdle, HAASRun, HAASStopping } from 'assets/animations';
 import Lottie from 'react-lottie';
 import { Slider as UISlider } from '@haas/ui';
@@ -99,6 +99,7 @@ const Slider = ({ register, onSubmit, animationControls }: SliderProps) => {
       <>
         <HAASRabbit style={{
           left: `${animationState.position}%`,
+          bottom: `5px`,
           transform: `translateX(-50%) scaleX(${animationState.direction})`
         }}>
           <Lottie

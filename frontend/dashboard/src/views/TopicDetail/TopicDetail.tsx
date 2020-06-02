@@ -119,7 +119,7 @@ const TopicDetail = () => {
   const { customerId, topicId } = useParams();
   const [activeSession, setActiveSession] = useState('');
   const location = useLocation<any>();
-  const [activeFilter, setActiveFilter] = useState('Last month');
+  const [activeFilter, setActiveFilter] = useState('Last 24h'); // FIXME: If this is started with anything else start result is undefined :S
   const { loading, data } = useQuery(getQuestionnaireData, {
     variables: { 
       dialogueId: topicId,
@@ -133,7 +133,7 @@ const TopicDetail = () => {
   const resultData = data?.getQuestionnaireData;
   const lineQueryData = resultData?.lineChartData;
   let timelineEntries: Array<any> = resultData?.timelineEntries
-  timelineEntries = timelineEntries.length > 8 ? timelineEntries.slice(0, 8) : timelineEntries
+  timelineEntries = timelineEntries?.length > 8 ? timelineEntries.slice(0, 8) : timelineEntries
 
   const lineData = [
     {
@@ -149,13 +149,12 @@ const TopicDetail = () => {
         <Div height="100vh" maxHeight="100vh" overflow="hidden">
           <Switch>
             <Route path="/dashboard/c/:customerId/t/:topicId/topic-builder/">
-              <TopicBuilder/>
+              <TopicBuilder/> 
             </Route>
             <Route>
               <Grid gridTemplateColumns="3fr 1fr">
                 <Div>
                   <TopicInfo DialogueResultProps={resultData} customerId={customerId} topicId={topicId} />
-
                   <Grid gridTemplateColumns="1fr 1fr" gridTemplateRows="1fr 100px 3fr">
                     <Widget gridColumn="span 2">
                       <H3>Filter</H3>

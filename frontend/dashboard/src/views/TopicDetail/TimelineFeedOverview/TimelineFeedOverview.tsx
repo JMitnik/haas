@@ -31,17 +31,17 @@ const TimelineFeedOverview = ({
           Timeline feed
       </H2>
       <TimelineEntriesContainer>
-      {timelineEntries?.length > 0 && timelineEntries?.map((timelineEntry, index) => (
-        <TimelineEntry
-          viewTimeLine={viewTimeLine}
-          onActiveSessionChange={onActiveSessionChange}
-          key={index}
-          timeLineEntry={timelineEntry}
-        />
-      )
-      )}
+        {timelineEntries?.length > 0 && timelineEntries?.map((timelineEntry, index) => (
+          <TimelineEntry
+            viewTimeLine={viewTimeLine}
+            onActiveSessionChange={onActiveSessionChange}
+            key={index}
+            timeLineEntry={timelineEntry}
+          />
+        )
+        )}
       </TimelineEntriesContainer>
-      
+
       {(timelineEntries?.length === 0 || (!timelineEntries)) && (
         <Div style={{ margin: '5px 20px' }}>No data available...</Div>
       )}

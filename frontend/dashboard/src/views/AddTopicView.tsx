@@ -20,6 +20,7 @@ interface FormDataProps {
 const AddTopicView = () => {
   const history = useHistory();
   const { register, handleSubmit, errors } = useForm<FormDataProps>();
+  const params = useParams();
   const { customerId } = useParams();
 
   const [addTopic, { loading }] = useMutation(createNewQuestionnaire, {
