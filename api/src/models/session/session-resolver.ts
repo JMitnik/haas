@@ -1,5 +1,7 @@
-import { PrismaClient,
-  Session, NodeEntry, NodeEntryCreateWithoutSessionInput } from '@prisma/client';
+import {
+  PrismaClient,
+  Session, NodeEntry, NodeEntryCreateWithoutSessionInput, SessionWhereInput,
+} from '@prisma/client';
 import cleanInt from '../../utils/cleanInt';
 
 const prisma = new PrismaClient();
@@ -47,19 +49,70 @@ class SessionResolver {
       await prisma.session.findOne({ where: { id: session.id } }).nodeEntries()).map(
       async (entry) => ({
         ...entry,
-        relatedNode: await Promise.resolve(prisma.nodeEntry.findOne({ where: {
-          id: entry.id,
-        } }).relatedNode()),
-        values: await Promise.resolve(prisma.nodeEntry.findOne({ where: {
-          id: entry.id,
-        } }).values()),
+        relatedNode: await Promise.resolve(prisma.nodeEntry.findOne({
+          where: {
+            id: entry.id,
+          },
+        }).relatedNode()),
+        values: await Promise.resolve(prisma.nodeEntry.findOne({
+          where: {
+            id: entry.id,
+          },
+        }).values()),
       }),
     ));
 
     return entries;
   }
 
-  static constructNodeEntry(nodeEntry: any) : NodeEntryCreateWithoutSessionInput {
+  static constructDateRangeWhereInput(startDate: Date, endDate: Date): SessionWhereInput[] | [] {
+    let dateRange: SessionWhereInput[] | [] = [];
+    if (startDate && !endDate) {
+      dateRange = [
+        { createdAt: { gte: startDate } },
+      ];
+    } else if (!startDate && endDate) {
+      dateRange = [
+        { createdAt: { lte: endDate } },
+      ];
+    } else if (startDate && endDate) {
+      dateRange = [
+        { createdAt: { gte: startDate } },
+        { createdAt: { lte: endDate } }];
+    }
+    return dateRange;
+  }
+
+  static constructInteractionWhereInput(dialogueId: string, searchTerm: string, dateRange: SessionWhereInput[] | [], pageSessionIds: Array<string>) {
+    const whereClause: SessionWhereInput = {
+      dialogueId,
+    };
+
+    if (searchTerm) {
+      whereClause.nodeEntries = {
+        some: {
+          values: {
+            some: {
+              textValue: {
+                contains: searchTerm,
+              },
+            },
+          },
+        },
+      };
+    }
+
+    if (dateRange.length > 0) {
+      whereClause.AND = dateRange;
+    }
+
+    if (pageSessionIds.length > 0) {
+      whereClause.id = { in: pageSessionIds };
+    }
+    return whereClause;
+  }
+
+  static constructNodeEntry(nodeEntry: any): NodeEntryCreateWithoutSessionInput {
     const valuesObject: any = { multiValues: { create: nodeEntry.data.multiValues || [] } };
 
     if (nodeEntry.data.numberValue) {

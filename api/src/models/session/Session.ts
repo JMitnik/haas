@@ -2,6 +2,7 @@ import _ from 'lodash';
 import { NodeEntry, NodeEntryValue, Session, PrismaClient, SessionWhereInput, NodeEntryWhereInput } from '@prisma/client';
 import { objectType, extendType, inputObjectType } from '@nexus/schema';
 import SessionResolver from './session-resolver';
+import NodeEntryResolver from '../nodeentry/nodeentry-resolver';
 import { QuestionNodeType } from '../question/QuestionNode';
 
 export const NodeEntryValueType = objectType({
@@ -208,48 +209,10 @@ export const getSessionAnswerFlowQuery = extendType({
       },
       async resolve(parent: any, args: any, ctx: any) {
         const { prisma }: { prisma: PrismaClient } = ctx;
-        console.log('filter interactions: ', args.filter);
-        // TODO: Add orderBy filter
         const { pageIndex, offset, limit, startDate, endDate, searchTerm }: { pageIndex: number, offset: number, limit: number, startDate: Date, endDate: Date, searchTerm: string } = args.filter;
-        let dateRange: SessionWhereInput[] | [] = [];
-        if (startDate && !endDate) {
-          dateRange = [
-            { createdAt: { gte: startDate } },
-          ];
-        }
 
-        if (startDate && endDate) {
-          dateRange = [
-            { createdAt: { gte: startDate } },
-            { createdAt: { lte: endDate } }];
-        }
-
-        const valuesCondition: NodeEntryWhereInput = {};
-        valuesCondition.OR = [{
-          values: {
-            every: {
-              numberValue: {
-                not: null,
-              },
-            },
-          },
-        },
-        ];
-
-        if (searchTerm) {
-          // if (valuesCondition.values) {
-          valuesCondition.OR.push({
-            values: {
-              some: {
-                textValue: {
-                  contains: searchTerm,
-                },
-              },
-            },
-          });
-        }
-
-        console.log('value conditions: ', valuesCondition.OR);
+        const dateRange = SessionResolver.constructDateRangeWhereInput(startDate, endDate);
+        const valuesCondition = NodeEntryResolver.constructValuesWhereInput(searchTerm);
 
         const orderBy = args.filter.orderBy ? Object.assign({}, ...args.filter.orderBy) : null;
         let pageSessionIds: Array<any> = [];
@@ -268,7 +231,7 @@ export const getSessionAnswerFlowQuery = extendType({
               },
             },
           );
-
+          console.log('pages nodeEntries: ', Math.ceil(nodeEntriesScore.length / limit));
           let flatMerged;
           if (searchTerm) {
             const groupedScoreSessions = _.groupBy(nodeEntriesScore, (entry) => entry.sessionId);
@@ -284,37 +247,14 @@ export const getSessionAnswerFlowQuery = extendType({
           pageSessionIds = pageNodeEntries.map((entry) => entry.sessionId);
         }
 
-        const whereClause: SessionWhereInput = {
-          dialogueId: args.where.dialogueId,
-        };
-
-        if (searchTerm) {
-          whereClause.nodeEntries = {
-            some: {
-              values: {
-                some: {
-                  textValue: {
-                    contains: searchTerm,
-                  },
-                },
-              },
-            },
-          };
-        }
-
-        if (dateRange.length > 0) {
-          whereClause.AND = dateRange;
-        }
-
-        if (pageSessionIds.length > 0) {
-          whereClause.id = { in: pageSessionIds };
-        }
+        const sessionWhereClause = SessionResolver.constructInteractionWhereInput(args.where.dialogueId, searchTerm, dateRange, pageSessionIds);
+        console.log('session where clause: ', sessionWhereClause);
 
         const pages = await prisma.session.findMany({
           where: {
-            dialogueId: args.where.dialogueId,
-            AND: dateRange,
-            nodeEntries: whereClause.nodeEntries,
+            dialogueId: sessionWhereClause.dialogueId,
+            AND: sessionWhereClause.AND,
+            nodeEntries: sessionWhereClause.nodeEntries,
           },
         });
 
@@ -328,7 +268,7 @@ export const getSessionAnswerFlowQuery = extendType({
           skip: skipClause,
           first: firstClause,
           orderBy: orderByClause,
-          where: whereClause,
+          where: sessionWhereClause,
           include: {
             nodeEntries: {
               select: {
@@ -350,7 +290,6 @@ export const getSessionAnswerFlowQuery = extendType({
           },
         });
 
-        console.log('Session question entry title: ', sessions[0]);
         console.log('Pages: ', Math.ceil(pages.length / limit));
         let mappedSessions = sessions.map((session) => {
           const { createdAt, nodeEntries } = session;

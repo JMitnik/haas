@@ -1,6 +1,5 @@
-import { Div, Card } from '@haas/ui';
+import { Div } from '@haas/ui';
 import styled, { css } from 'styled-components';
-
 
 const FlexRow = styled(Div)`
     display: flex;
@@ -19,7 +18,7 @@ export const InteractionDetailQuestionEntry = styled(Div)`
         top: 5%;
         bottom: 0;
         left: 52%;
-        border-left: 2px solid #c0bcbb; /*#c0bcbb */
+        border-left: 2px solid #c0bcbb;
         transform: translate(-50%);
     }
 `;
@@ -29,7 +28,6 @@ export const InputOutputContainer = styled(FlexRow)`
 `;
 
 export const InputContainer = styled(FlexRow)`
-    /* margin-right: 2.5%; */
     align-items: center;
 `
 
@@ -41,7 +39,6 @@ export const InteractionsOverviewContainer = styled(Div)`
 ${({ theme }) => css`
     margin-left: ${theme.gutter}
 `};
-    
     width: '100%';
     height: '100%';
     border: '1px solid black'
