@@ -21,7 +21,6 @@ interface TableProps {
     activeSearchTerm: string;
     pageIndex: number;
     pageSize: number;
-    // pageCount: number;
     sortBy: {
         id: string;
         desc: boolean;
@@ -38,7 +37,6 @@ interface HeaderColumnComponentProps {
     onGridPropertiesChange: React.Dispatch<React.SetStateAction<TableProps>>;
 }
 const HeaderColumnComponent = ({ sortProperties, accessor, value, onGridPropertiesChange }: HeaderColumnComponentProps) => {
-
     const handleSort = () => {
         onGridPropertiesChange((prevValues) => {
             const { sortBy } = prevValues;
@@ -70,10 +68,9 @@ const HeaderComponent = ({ sortProperties, headers, onGridPropertiesChange }: He
 
     return (
         <Grid style={{
-            borderRadius: '360px',
+            borderRadius: '90px',
             background: '#f1f5f8',
             color: 'black',
-            fontWeight: 'bold',
         }} gridColumnGap={5} gridTemplateColumns={templateColumns}>
             {
                 headers && headers.map((header, index) => {

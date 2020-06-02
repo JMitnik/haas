@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLazyQuery } from '@apollo/react-hooks';
 import { useParams } from 'react-router';
-
 import { H2, Muted, Div } from '@haas/ui';
 import getInteractionsQuery from 'queries/getInteractionsQuery'
 import { InputOutputContainer, OutputContainer, InputContainer } from './InteractionOverviewStyles';
@@ -16,7 +15,6 @@ interface TableProps {
   activeSearchTerm: string;
   pageIndex: number;
   pageSize: number;
-  // pageCount: number;
   sortBy: {
     id: string;
     desc: boolean;
@@ -81,7 +79,6 @@ const InteractionsOverview = () => {
     tempLink.remove();
   }
 
-  console.log('interactions', data?.interactions);
   const pageCount = data?.interactions?.pages || 1;
 
   return (
