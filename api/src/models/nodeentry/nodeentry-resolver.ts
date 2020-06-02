@@ -76,7 +76,7 @@ class NodeEntryResolver {
       orderedNodeEntriesScore = _.orderBy(filteredNodeEntresScore, (entry) => entry.id, orderBy.desc ? 'desc' : 'asc');
     } else if (orderBy.id === 'createdAt') {
       orderedNodeEntriesScore = _.orderBy(filteredNodeEntresScore, (entry) => entry.creationDate, orderBy.desc ? 'desc' : 'asc');
-    } else { // Dont perform and ordering/ Perform default ordering (=== id column?)
+    } else {
       orderedNodeEntriesScore = filteredNodeEntresScore;
     }
 

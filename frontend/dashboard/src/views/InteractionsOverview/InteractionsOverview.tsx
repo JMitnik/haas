@@ -58,7 +58,6 @@ const InteractionsOverview = () => {
     setActiveGridProperties((prevValues) => {
       return { ...prevValues, activeSearchTerm: newSearchTerm }
     });
-    console.log('New search term: ', newSearchTerm);
   }
 
   const handleDateChange = (startDate: Date | null, endDate: Date | null) => {
@@ -80,7 +79,6 @@ const InteractionsOverview = () => {
   }
 
   const pageCount = data?.interactions?.pages || 1;
-  console.log('INTERACTIONS: ', data?.interactions?.pageIndex);
   const pageIndex = data?.interactions?.pageIndex || 0;
 
   return (
