@@ -207,111 +207,22 @@ export const getSessionAnswerFlowQuery = extendType({
         where: SessionWhereUniqueInput,
         filter: InteractionFilterInput,
       },
-      async resolve(parent: any, args: any, ctx: any) {
-        const { prisma }: { prisma: PrismaClient } = ctx;
+      async resolve(parent: any, args: any) {
         const { pageIndex, offset, limit, startDate, endDate, searchTerm }: { pageIndex: number, offset: number, limit: number, startDate: Date, endDate: Date, searchTerm: string } = args.filter;
 
         const dateRange = SessionResolver.constructDateRangeWhereInput(startDate, endDate);
         const valuesCondition = NodeEntryResolver.constructValuesWhereInput(searchTerm);
 
         const orderBy = args.filter.orderBy ? Object.assign({}, ...args.filter.orderBy) : null;
-        let pageSessionIds: Array<any> = [];
-        if (orderBy.id === 'score') {
-          const nodeEntriesScore = await prisma.nodeEntry.findMany(
-            {
-              where: {
-                session: {
-                  dialogueId: args.where.dialogueId,
-                  AND: dateRange,
-                },
-                OR: valuesCondition,
-              },
-              include: {
-                values: true,
-              },
-            },
-          );
-          console.log('pages nodeEntries: ', Math.ceil(nodeEntriesScore.length / limit));
-          let flatMerged;
-          if (searchTerm) {
-            const groupedScoreSessions = _.groupBy(nodeEntriesScore, (entry) => entry.sessionId);
-            const merged = _.filter(groupedScoreSessions, (session) => session.length > 1);
-            flatMerged = _.flatten(merged);
-          }
-          const finalNodeEntryScore = flatMerged || nodeEntriesScore;
-          const filteredNodeEntresScore = _.filter(finalNodeEntryScore, (nodeEntryScore) => nodeEntryScore.depth === 0);
-          const orderedNodeEntriesScore = _.orderBy(filteredNodeEntresScore, (entry) => entry.values[0].numberValue, orderBy.desc ? 'desc' : 'asc');
-          const pageNodeEntries = (offset + limit) < orderedNodeEntriesScore.length
-            ? orderedNodeEntriesScore.slice(offset, (pageIndex + 1) * limit)
-            : orderedNodeEntriesScore.slice(offset, orderedNodeEntriesScore.length);
-          pageSessionIds = pageNodeEntries.map((entry) => entry.sessionId);
-        }
+        const { pageSessions, totalPages, resetPages } = await NodeEntryResolver.getCurrentSessionIdsByScore(args.where.dialogueId, offset, limit, pageIndex, orderBy, dateRange, valuesCondition, searchTerm);
 
-        const sessionWhereClause = SessionResolver.constructInteractionWhereInput(args.where.dialogueId, searchTerm, dateRange, pageSessionIds);
-        console.log('session where clause: ', sessionWhereClause);
-
-        const pages = await prisma.session.findMany({
-          where: {
-            dialogueId: sessionWhereClause.dialogueId,
-            AND: sessionWhereClause.AND,
-            nodeEntries: sessionWhereClause.nodeEntries,
-          },
-        });
-
-        const orderByClause = orderBy.id !== 'score' ? {
-          [orderBy.id]: orderBy.desc ? 'desc' : 'asc',
-        } : null;
-        const skipClause = pageSessionIds.length === 0 ? offset : null;
-        const firstClause = pageSessionIds.length === 0 ? limit : null;
-
-        const sessions = await prisma.session.findMany({
-          skip: skipClause,
-          first: firstClause,
-          orderBy: orderByClause,
-          where: sessionWhereClause,
-          include: {
-            nodeEntries: {
-              select: {
-                id: true,
-                creationDate: true,
-                depth: true,
-                relatedNodeId: true,
-                values: {
-                  select: {
-                    id: true,
-                    nodeEntryId: true,
-                    numberValue: true,
-                    textValue: true,
-                    multiValues: true,
-                  },
-                },
-              },
-            },
-          },
-        });
-
-        console.log('Pages: ', Math.ceil(pages.length / limit));
-        let mappedSessions = sessions.map((session) => {
-          const { createdAt, nodeEntries } = session;
-          const score = session.nodeEntries.find((entry) => entry.depth === 0)?.values?.[0]?.numberValue;
-          const paths = session.nodeEntries.length;
-          return {
-            id: session.id, score, paths, createdAt, nodeEntries,
-          };
-        });
-
-        const orderedSessions = pageSessionIds.length > 0 ? _.orderBy(mappedSessions, (session) => session.score, orderBy.desc ? 'desc' : 'asc') : [];
-        mappedSessions = orderedSessions.length > 0 ? orderedSessions : mappedSessions;
-        const finalSessions = mappedSessions.map((session, index) => ({ ...session, index }));
+        const finalSessions = pageSessions.map((session, index) => ({ ...session, index }));
         return {
-          // FIXME: Page 3 of 2 when search query (where max 16 rows exist e.g. Facilities)
-          // is entered while being on page 3 of full overview. It won't be able to find data for page 3
-          // => Should display data of page 1 instead and set pageIndex to 0
           sessions: finalSessions,
-          pages: Math.ceil(pages.length / limit),
+          pages: !resetPages ? totalPages : 1,
           offset,
           limit,
-          pageIndex: (finalSessions.length > limit) ? pageIndex : 0,
+          pageIndex: !resetPages ? pageIndex : 0,
           startDate,
           endDate,
           orderBy: args.filter.orderBy || [],

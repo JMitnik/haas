@@ -80,6 +80,8 @@ const InteractionsOverview = () => {
   }
 
   const pageCount = data?.interactions?.pages || 1;
+  console.log('INTERACTIONS: ', data?.interactions?.pageIndex);
+  const pageIndex = data?.interactions?.pageIndex || 0;
 
   return (
     <Div px="24px" margin="0 auto" width="100vh" height="100vh" maxHeight="100vh" overflow="hidden">
@@ -103,7 +105,7 @@ const InteractionsOverview = () => {
       </InputOutputContainer>
       <Div style={{ background: '#fdfbfe' }} mb="1%" height="65%">
         <InteractionsView
-          gridProperties={{... activeGridProperties, pageCount}}
+          gridProperties={{...activeGridProperties, pageCount, pageIndex }}
           onGridPropertiesChange={setActiveGridProperties}
           interactions={interactions} />
       </Div>
