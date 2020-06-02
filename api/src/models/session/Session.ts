@@ -209,12 +209,17 @@ export const getSessionAnswerFlowQuery = extendType({
       },
       async resolve(parent: any, args: any) {
         const { pageIndex, offset, limit, startDate, endDate, searchTerm }: { pageIndex: number, offset: number, limit: number, startDate: Date, endDate: Date, searchTerm: string } = args.filter;
-
         const dateRange = SessionResolver.constructDateRangeWhereInput(startDate, endDate);
-        const valuesCondition = NodeEntryResolver.constructValuesWhereInput(searchTerm);
-
         const orderBy = args.filter.orderBy ? Object.assign({}, ...args.filter.orderBy) : null;
-        const { pageSessions, totalPages, resetPages } = await NodeEntryResolver.getCurrentSessionIdsByScore(args.where.dialogueId, offset, limit, pageIndex, orderBy, dateRange, valuesCondition, searchTerm);
+        const { pageSessions, totalPages, resetPages } = await NodeEntryResolver.getCurrentInteractionSessions(
+          args.where.dialogueId,
+          offset,
+          limit,
+          pageIndex,
+          orderBy,
+          dateRange,
+          searchTerm,
+        );
 
         const finalSessions = pageSessions.map((session, index) => ({ ...session, index }));
         return {

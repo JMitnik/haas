@@ -83,35 +83,6 @@ class SessionResolver {
     return dateRange;
   }
 
-  static constructInteractionWhereInput(dialogueId: string, searchTerm: string, dateRange: SessionWhereInput[] | [], pageSessionIds: Array<string>) {
-    const whereClause: SessionWhereInput = {
-      dialogueId,
-    };
-
-    if (searchTerm) {
-      whereClause.nodeEntries = {
-        some: {
-          values: {
-            some: {
-              textValue: {
-                contains: searchTerm,
-              },
-            },
-          },
-        },
-      };
-    }
-
-    if (dateRange.length > 0) {
-      whereClause.AND = dateRange;
-    }
-
-    if (pageSessionIds.length > 0) {
-      whereClause.id = { in: pageSessionIds };
-    }
-    return whereClause;
-  }
-
   static constructNodeEntry(nodeEntry: any): NodeEntryCreateWithoutSessionInput {
     const valuesObject: any = { multiValues: { create: nodeEntry.data.multiValues || [] } };
 
