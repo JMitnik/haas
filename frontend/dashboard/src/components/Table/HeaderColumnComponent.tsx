@@ -1,13 +1,9 @@
 import { Div, Grid, H3, Span } from '@haas/ui';
 import React from 'react'
 
-interface HeaderColumnProps {
-    Header: string;
+interface HeaderColumnComponentProps {
+    value: string;
     accessor: string;
-}
-
-interface HeaderComponentProps {
-    headers: Array<HeaderColumnProps>;
     sortProperties: {
         id: string;
         desc: boolean;
@@ -27,16 +23,9 @@ interface TableProps {
     }[]
 }
 
-interface HeaderColumnComponentProps {
-    value: string;
-    accessor: string;
-    sortProperties: {
-        id: string;
-        desc: boolean;
-    }[];
-    onGridPropertiesChange: React.Dispatch<React.SetStateAction<TableProps>>;
-}
-const HeaderColumnComponent = ({ sortProperties, accessor, value, onGridPropertiesChange }: HeaderColumnComponentProps) => {
+const HeaderColumnComponent = (
+    { sortProperties, accessor, value, onGridPropertiesChange }: HeaderColumnComponentProps,
+    ) => {
     const handleSort = () => {
         onGridPropertiesChange((prevValues) => {
             const { sortBy } = prevValues;
@@ -68,30 +57,4 @@ const HeaderColumnComponent = ({ sortProperties, accessor, value, onGridProperti
     )
 }
 
-const HeaderComponent = ({ sortProperties, headers, onGridPropertiesChange }: HeaderComponentProps) => {
-    const amtHeaders = headers.length;
-    const percentage = 100 / amtHeaders;
-    const templateColumns = `${percentage.toString()}% `.repeat(amtHeaders);
-
-    return (
-      <Grid
-        backgroundColor="#f1f5f8"
-        color="black"
-        borderRadius="90px"
-        gridColumnGap={5}
-        gridTemplateColumns={templateColumns}
-      >
-        { headers && headers.map((header, index) => (
-          <HeaderColumnComponent
-            sortProperties={sortProperties}
-            onGridPropertiesChange={onGridPropertiesChange}
-            accessor={header.accessor}
-            value={header.Header}
-            key={index}
-          />
-))}
-      </Grid>
-    )
-}
-
-export default HeaderComponent;
+export default HeaderColumnComponent;

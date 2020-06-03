@@ -21,7 +21,7 @@ const RowComponent = ({ headers, data, index }: RowComponentProps) => {
         {
                 isExpanded
                 && (
-                <Div useFlex flexDirection="column" style={{ background: '#f0f0f0', gridColumnStart: 1, gridColumnEnd: -1 }}>
+                <Div useFlex flexDirection="column" backgroundColor="#f0f0f0" gridColumn="1 / -1">
                   <Div padding={25}>
                     <Div marginBottom={10} useFlex flexDirection="column">
                       <Div useFlex flexDirection="row">
