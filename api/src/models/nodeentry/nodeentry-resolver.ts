@@ -1,8 +1,77 @@
-import { PrismaClient, SessionWhereInput } from '@prisma/client';
+import { PrismaClient, SessionWhereInput, NodeEntry, NodeEntryValue, NodeEntryWhereInput } from '@prisma/client';
 import _ from 'lodash';
+
+interface EnhancedNodeEntryProps {
+  session: {
+    id: string;
+    createdAt: Date;
+  } | null;
+  values: NodeEntryValue[];
+}
+
+interface SessionWhereProps {
+  where: {
+    dialogueId: string, dateRange: SessionWhereInput[] | [],
+  }
+}
 
 const prisma = new PrismaClient();
 class NodeEntryResolver {
+  static matchText = (
+    entry: NodeEntry & EnhancedNodeEntryProps,
+    searchTerm: string,
+  ) => entry.values[0].textValue?.toLowerCase().includes(searchTerm.toLowerCase());
+
+  static orderEntriesBy = (
+    entries: Array<NodeEntry & EnhancedNodeEntryProps>,
+    orderBy: { id: string, desc: boolean },
+  ) => {
+    let orderedNodeEntriesScore;
+    if (orderBy.id === 'score') {
+      orderedNodeEntriesScore = _.orderBy(
+        entries, (entry) => entry.values[0].numberValue, orderBy.desc ? 'desc' : 'asc',
+      );
+    } else if (orderBy.id === 'id') {
+      orderedNodeEntriesScore = _.orderBy(
+        entries, (entry) => entry.id, orderBy.desc ? 'desc' : 'asc',
+      );
+    } else if (orderBy.id === 'createdAt') {
+      orderedNodeEntriesScore = _.orderBy(
+        entries, (entry) => entry.creationDate, orderBy.desc ? 'desc' : 'asc',
+      );
+    } else {
+      orderedNodeEntriesScore = entries;
+    }
+    return orderedNodeEntriesScore;
+  };
+
+  static findInteractionEntries = async (whereInput: NodeEntryWhereInput) => prisma.nodeEntry.findMany(
+    {
+      where: whereInput,
+      include: {
+        session: {
+          select: {
+            id: true,
+            createdAt: true,
+          },
+        },
+        values: true,
+      },
+    },
+  );
+
+  // Slice node entries to match amount of nodes displayed in front-end
+  // If offset + limit is greater than amount visible in front-end
+  // => slice until end of the array
+  static sliceNodeEntries = (
+    entries: Array<NodeEntry>,
+    offset: number,
+    limit: number,
+    pageIndex: number,
+  ) => ((offset + limit) < entries.length
+    ? entries.slice(offset, (pageIndex + 1) * limit)
+    : entries.slice(offset, entries.length));
+
   static getCurrentInteractionSessions = async (
     dialogueId: string,
     offset: number,
@@ -10,79 +79,69 @@ class NodeEntryResolver {
     pageIndex: number,
     orderBy: any,
     dateRange: SessionWhereInput[] | [],
-    searchTerm: string) => {
+    searchTerm: string,
+  ) => {
     let needPageReset = false;
-    let flatMerged;
-    const nodeEntriesScore = await prisma.nodeEntry.findMany(
-      {
-        where: {
-          session: {
-            dialogueId,
-            AND: dateRange,
-          },
-        },
-        include: {
-          session: {
-            select: {
-              id: true,
-              createdAt: true,
-            },
-          },
-          values: true,
-        },
+    let flatSearchTermFilteredEntries;
+
+    // Find all node entries within specified date range
+    const nodeEntries = await NodeEntryResolver.findInteractionEntries({
+      session: {
+        dialogueId,
+        AND: dateRange,
       },
-    );
+    });
 
-    const groupedScoreSessions = _.groupBy(nodeEntriesScore, (entry) => entry.sessionId);
-    let totalPages = Math.ceil(Object.keys(groupedScoreSessions).length / limit);
+    const groupedNodeEntries = _.groupBy(nodeEntries, (entry) => entry.sessionId);
+    let totalPages = Math.ceil(Object.keys(groupedNodeEntries).length / limit);
 
+    // If search term, filter out grouped representations which don't have
+    // at least one entry which fits criteria and calculate new # of pages
     if (searchTerm) {
-      const merged = _.filter(groupedScoreSessions, (session) => session.filter((entry) => entry.values[0].textValue?.toLowerCase().includes(searchTerm.toLowerCase())).length > 0);
+      // Filter every grouped representation by trying to finding at least one node entry which matches search term
+      const searchTermFilteredEntries = _.filter(
+        groupedNodeEntries, (entries) => entries.filter(
+          (entry) => NodeEntryResolver.matchText(entry, searchTerm),
+        ).length > 0,
+      );
+      totalPages = Math.ceil(searchTermFilteredEntries.length / limit);
 
-      totalPages = Math.ceil(merged.length / limit);
+      // If due to filters option current queried page doesn't exist (e.g. page 3/2),
+      // query first subset (offset = 0 -> limit) and set pageIndex to 0
       if (pageIndex + 1 > totalPages) {
         offset = 0;
         needPageReset = true;
       }
-      flatMerged = _.flatten(merged);
+      flatSearchTermFilteredEntries = _.flatten(searchTermFilteredEntries);
     }
-    const finalNodeEntryScore = flatMerged || nodeEntriesScore;
-    const filteredNodeEntresScore = _.filter(finalNodeEntryScore, (nodeEntryScore) => nodeEntryScore.depth === 0);
+    const finalNodeEntryScore = flatSearchTermFilteredEntries || nodeEntries;
+    const filteredNodeEntriesScore = _.filter(
+      finalNodeEntryScore, (nodeEntryScore) => nodeEntryScore.depth === 0,
+    );
+    const orderedNodeEntriesScore = NodeEntryResolver.orderEntriesBy(
+      filteredNodeEntriesScore, orderBy,
+    );
+    const pageNodeEntries = NodeEntryResolver.sliceNodeEntries(
+      orderedNodeEntriesScore, offset, limit, pageIndex,
+    );
 
-    let orderedNodeEntriesScore;
-    if (orderBy.id === 'score') {
-      orderedNodeEntriesScore = _.orderBy(
-        filteredNodeEntresScore, (entry) => entry.values[0].numberValue, orderBy.desc ? 'desc' : 'asc',
-      );
-    } else if (orderBy.id === 'id') {
-      orderedNodeEntriesScore = _.orderBy(
-        filteredNodeEntresScore, (entry) => entry.id, orderBy.desc ? 'desc' : 'asc',
-      );
-    } else if (orderBy.id === 'createdAt') {
-      orderedNodeEntriesScore = _.orderBy(
-        filteredNodeEntresScore, (entry) => entry.creationDate, orderBy.desc ? 'desc' : 'asc',
-      );
-    } else {
-      orderedNodeEntriesScore = filteredNodeEntresScore;
-    }
-
-    const pageNodeEntries = (offset + limit) < orderedNodeEntriesScore.length
-      ? orderedNodeEntriesScore.slice(offset, (pageIndex + 1) * limit)
-      : orderedNodeEntriesScore.slice(offset, orderedNodeEntriesScore.length);
-
-    const pageSessionIds = pageNodeEntries.map((entry) => entry.sessionId);
-    const pageSessions = pageSessionIds.map((sessionId) => sessionId !== null && groupedScoreSessions[sessionId]);
-    const mappedPageSessions = pageSessions.map((entries) => {
-      if (entries) {
-        const { sessionId, session } = entries[0];
-        const paths = entries.length;
-        const score = entries.find((entry) => entry.depth === 0)?.values[0].numberValue;
+    const pageSessions = pageNodeEntries.map((scoreEntry) => {
+      if (!scoreEntry.sessionId) {
         return {
-          id: sessionId, paths, score, createdAt: session?.createdAt, nodeEntries: entries,
+          id: 'N/A', paths: 0, score: 0, createdAt: 'N/A', nodeEntries: [],
         };
       }
+      // Use the grouped representation with matching session id to map data
+      const entries = groupedNodeEntries[scoreEntry.sessionId];
+      const { sessionId, session } = entries[0];
+      const paths = entries.length;
+      const score = entries.find((entry) => entry.depth === 0)?.values[0].numberValue;
+      return {
+        id: sessionId, paths, score, createdAt: session?.createdAt, nodeEntries: entries,
+      };
     });
-    return { pageSessions: mappedPageSessions, totalPages, resetPages: needPageReset };
+
+    return { pageSessions, totalPages, resetPages: needPageReset };
   };
 }
 
