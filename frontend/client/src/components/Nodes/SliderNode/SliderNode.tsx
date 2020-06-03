@@ -9,7 +9,6 @@ import useDialogueTree from 'providers/DialogueTreeProvider';
 import useEdgeTransition from 'hooks/use-edge-transition';
 import useProject from 'providers/ProjectProvider';
 
-import { SessionEntryDataModel } from 'models/SessionEntryModel';
 import { GenericNodeProps } from '../NodeLayout/NodeLayout';
 import { SliderNodeContainer, SliderNodeValue } from './SliderNodeStyles';
 import Slider from './Slider';

@@ -1,5 +1,5 @@
 import { CustomerFragment } from 'queries/CustomerFragment';
-import { Redirect, useHistory, useLocation, useParams } from 'react-router-dom';
+import { Redirect, useHistory, useParams } from 'react-router-dom';
 import { useQuery } from '@apollo/react-hooks';
 import Loader from 'components/Loader';
 import React from 'react';
@@ -19,7 +19,6 @@ const getCustomerFromSlug = gql`
 const CustomerPage = () => {
   const { customerSlug } = useParams();
   const history = useHistory();
-  const location = useLocation();
   const { setCustomer } = useProject();
 
   if (!customerSlug) {

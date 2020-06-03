@@ -1,29 +1,39 @@
 import { CheckCircle } from 'react-feather';
-import { Div, Grid, H2 } from '@haas/ui';
-import { InputField, InputGroup, InputLabel } from '@haas/ui/src/Form';
 import { useForm } from 'react-hook-form';
 import React from 'react';
 
 import { ButtonIcon } from '@haas/ui/src/Buttons';
-import { GenericNodeProps } from 'components/Nodes/NodeLayout/NodeLayout';
-
 import { ClientButton } from 'components/Buttons/Buttons';
-import { RegisterNodeContainer } from './RegisterNodeStyles';
+import { Div, Grid, H2 } from '@haas/ui';
+import { GenericNodeProps } from 'components/Nodes/NodeLayout/NodeLayout';
+import { InputField, InputGroup, InputLabel } from '@haas/ui/src/Form';
 import useDialogueTree from 'providers/DialogueTreeProvider';
+import useEdgeTransition from 'hooks/use-edge-transition';
+import useProject from 'providers/ProjectProvider';
+
+import { RegisterNodeContainer } from './RegisterNodeStyles';
 
 type RegisterNodeProps = GenericNodeProps;
 
-const RegisterNode = ({ node, isLeaf }: RegisterNodeProps) => {
+const RegisterNode = ({ node }: RegisterNodeProps) => {
   const { register, getValues, formState } = useForm();
-  // const {
-  //   treeDispatch: { goToChild }
-  // } = useDialogueTree();
-  const goToChild = (a: any, b: any, c: any) => {};
-  const saveEntry = (a: any, b: any, c: any) => {};
+  const store = useDialogueTree();
+  const { goToEdge } = useEdgeTransition();
+  const { dialogue, customer } = useProject();
 
   const onSubmit = () => {
     const formEntry = getValues({ nest: true });
-    goToChild(node, null, formEntry);
+
+    store.session.add(node.id, {
+      multiValues: formEntry.multiValues,
+      numberValue: null,
+      textValue: null,
+    });
+
+    if (dialogue && customer) {
+      const nextEdgeId = node.getNextEdgeIdFromKey(formEntry.multiValues);
+      goToEdge(customer.slug, dialogue.id, nextEdgeId);
+    }
   };
 
   const touched = () => 'multiValues' in formState.touched;

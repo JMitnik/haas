@@ -1,37 +1,42 @@
-import { useEffect, useRef } from 'react';
-import { useHistory, useLocation, useParams } from 'react-router-dom';
-import { useMutation } from '@apollo/react-hooks';
+import { useEffect, useRef, useState } from 'react';
 
-import uploadEntryMutation from '../mutations/UploadEntryMutation';
+import { useHistory } from 'react-router-dom';
+import { useMutation } from '@apollo/react-hooks';
+import uploadUserSessionMutation from 'mutations/UploadEntryMutation';
+import useDialogueTree from 'providers/DialogueTreeProvider';
+import useProject from 'providers/ProjectProvider';
 
 const useJourneyFinish = () => {
-  const finishedRef = useRef(false);
-  // const {
-  //   treeState: { historyStack },
-  // } = useDialogueTree();
+  const [isFinished, setIsFinished] = useState(false);
 
-  // const [submitForm] = useMutation(uploadEntryMutation, {});
-  // const history = useHistory();
-  // const { dialogueId } = useParams();
-  // const location = useLocation();
-  //  Only fires if a user arrives as a node with no more interaction (FinishNode and ShareNode)
-  // useEffect(() => {
-  //   console.log('submitting');
-  //   submitForm({
-  //     variables: {
-  //       uploadUserSessionInput: {
-  //         dialogueId,
-  //         entries: historyStack.map((nodeEntry) => {
-  //           const { node, edge, ...data } = nodeEntry;
+  const store = useDialogueTree();
+  const { dialogue } = useProject();
+  const [uploadInteraction] = useMutation(uploadUserSessionMutation, {
+    onError: (error) => {
+      console.log('error', error.message);
+    },
+  });
 
-  //           return { ...data, nodeId: node.id, edgeId: edge?.id };
-  //         }),
-  //       },
-  //     },
-  //   });
-  // }, [historyStack, submitForm, history, location.pathname, dialogueId]);
+  const entries = store.relevantSessionEntries;
 
-  return { finishedRef };
+  useEffect(() => {
+    if (entries.length && !isFinished) {
+      uploadInteraction({ variables: {
+        uploadUserSessionInput: {
+          dialogueId: dialogue?.id,
+          entries: entries.map((entry) => ({
+            nodeId: entry.node.node.id,
+            edgeId: entry.edge?.id,
+            data: entry.node?.data,
+          })),
+        },
+      } });
+
+      setIsFinished(true);
+    }
+  });
+
+  return { isFinished };
 };
 
 export default useJourneyFinish;

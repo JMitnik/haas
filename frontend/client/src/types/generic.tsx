@@ -1,5 +1,5 @@
-import { TreeEdgeProps } from 'models/TreeEdgeModel';
-import { TreeNodeProps } from 'models/TreeNodeModel';
+import { TreeEdgeProps } from 'models/Tree/TreeEdgeModel';
+import { TreeNodeProps } from 'models/Tree/TreeNodeModel';
 
 export interface HAASNodeConditions {
   renderMin?: number;

@@ -1,11 +1,11 @@
 import { ClientButton } from 'components/Buttons/Buttons';
-import { Div, Grid, H2, H5 } from '@haas/ui';
+import { Div, H2, H5 } from '@haas/ui';
 import { Variants, motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import React, { useEffect } from 'react';
 
 import { HAASFormEntry } from 'types/generic';
-import { TreeNodeOptionProps } from 'models/TreeNodeOptionModel';
+import { TreeNodeOptionProps } from 'models/Tree/TreeNodeOptionModel';
 import useDialogueTree from 'providers/DialogueTreeProvider';
 import useEdgeTransition from 'hooks/use-edge-transition';
 import useProject from 'providers/ProjectProvider';
@@ -43,7 +43,7 @@ const MultiChoiceNode = ({ node }: MultiChoiceNodeProps) => {
   const { goToEdge } = useEdgeTransition();
   const { customer, dialogue } = useProject();
 
-  const { register, setValue, triggerValidation, getValues } = useForm<HAASFormEntry>({
+  const { register, setValue, triggerValidation } = useForm<HAASFormEntry>({
     mode: 'onSubmit',
     defaultValues: {
       textValue: '',

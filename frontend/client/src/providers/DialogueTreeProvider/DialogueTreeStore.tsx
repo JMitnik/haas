@@ -1,12 +1,12 @@
 import makeInspectable from 'mobx-devtools-mst';
 
-import { defaultTreeLeaf } from 'models/TreeNodeModel';
+import { defaultPostLeafNode } from 'models/Tree/TreeNodeModel';
 import TreeStoreModel from 'models/TreeStoreModel';
 
 const treeStore = TreeStoreModel.create({
   session: {},
   tree: {
-    activeLeaf: defaultTreeLeaf.id,
+    activeLeaf: defaultPostLeafNode.id,
   },
 });
 

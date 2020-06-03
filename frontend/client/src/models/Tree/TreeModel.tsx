@@ -1,6 +1,6 @@
-import { Instance, getSnapshot, types } from 'mobx-state-tree';
+import { Instance, types } from 'mobx-state-tree';
 import { TreeEdgeModel, TreeEdgeProps } from './TreeEdgeModel';
-import { TreeNodeModel, TreeNodeProps, defaultTreeLeaf } from './TreeNodeModel';
+import { TreeNodeModel, TreeNodeProps, defaultPostLeafNode } from './TreeNodeModel';
 
 const TreeModel = types
   .model({
@@ -10,7 +10,6 @@ const TreeModel = types
     activeLeaf: types.reference(TreeNodeModel),
   })
   .actions((self) => ({
-
     /**
      * Store nodes on tree-init
      */
@@ -55,9 +54,8 @@ const TreeModel = types
         isLeaf: true,
       }));
 
-      self.leaves.replace(newLeaves);
-      self.leaves.push(defaultTreeLeaf);
-      self.activeLeaf = defaultTreeLeaf;
+      self.leaves.replace([defaultPostLeafNode, ...newLeaves]);
+      self.activeLeaf = defaultPostLeafNode;
     },
 
     /**
@@ -66,6 +64,10 @@ const TreeModel = types
      */
     getChildNodeByEdge(edgeId: string | undefined): TreeNodeProps {
       const edge: TreeEdgeProps | null = self.edges.find((edge: TreeEdgeProps) => edge.id === edgeId);
+
+      if (edgeId === String(-2)) {
+        return defaultPostLeafNode;
+      }
 
       if (edgeId === String(-1)) {
         return self.activeLeaf;
@@ -78,8 +80,11 @@ const TreeModel = types
       return edge.childNode;
     },
 
+    /**
+     * Sets the current active leaf on the tree
+     * @param node
+     */
     setActiveLeafFromNode(node: TreeNodeProps): void {
-      console.log('trees', getSnapshot(node));
       if (node.overrideLeaf) {
         self.activeLeaf = node.overrideLeaf;
       }

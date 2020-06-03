@@ -2,7 +2,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import React, { ReactNode } from 'react';
 
 import { HAASNode } from 'types/generic';
-import { TreeNodeProps } from 'models/TreeNodeModel';
+import { TreeNodeProps } from 'models/Tree/TreeNodeModel';
 
 import { ActiveNodeContainer, FloatingNodeContainer } from './NodeStyles';
 

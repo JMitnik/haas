@@ -10,6 +10,9 @@ const SessionModel = types
     add(nodeId: string, data: SessionEntryDataProps) {
       self.items.set(nodeId, { node: nodeId, data });
     },
+    reset() {
+      self.items.clear();
+    },
   }))
   .views((self) => ({
     get lastNonLeaf() {
@@ -17,6 +20,9 @@ const SessionModel = types
       const firstNonLeaf = reversedItems.find((el) => !el.node.isLeaf);
 
       return firstNonLeaf;
+    },
+    get leafs() {
+      return Array.from(self.items.toJS().values()).filter((item) => item.node.isLeaf);
     },
   }));
 export interface EntryListProps extends Instance<typeof SessionModel>{}

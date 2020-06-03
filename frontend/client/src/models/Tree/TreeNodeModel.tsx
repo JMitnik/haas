@@ -3,6 +3,11 @@ import { IAnyModelType, Instance, types } from 'mobx-state-tree';
 import { TreeEdgeModel, TreeEdgeProps } from './TreeEdgeModel';
 import TreeNodeOptionModel from './TreeNodeOptionModel';
 
+export enum SpecialEdge {
+  LEAF_EDGE_ID = '-1',
+  POST_LEAF_EDGE_ID = '-2',
+}
+
 export const TreeNodeModel = types
   .model('TreeNode', {
     id: types.identifier,
@@ -15,30 +20,25 @@ export const TreeNodeModel = types
     options: types.array(TreeNodeOptionModel),
   })
   .actions((self) => ({
-
     /**
      * Finds candidate edge child based on `key`.
      * @param key
      */
     getNextEdgeIdFromKey(key: any) {
-      const candidateEdges = self.children.filter((child: TreeEdgeProps) => child.matchesKeyByCondition(key));
+      // If we already are at leaf, go to POST-LEAF-EDGE
+      if (self.isLeaf) { return SpecialEdge.POST_LEAF_EDGE_ID; }
 
-      if (candidateEdges.length === 0) {
-        return -1;
-      }
+      const candidateEdge = self.children.find((child: TreeEdgeProps) => child.matchesKeyByCondition(key));
 
-      if (candidateEdges.length > 1) {
-        throw new Error('Not possible to have more than 1 candidate at the moment');
-      }
+      // If there are no edges (but we are not at leaf yet) => Return Leaf ID
+      if (!candidateEdge) return SpecialEdge.LEAF_EDGE_ID;
 
-      const candidateEdge = candidateEdges[0].id;
-
-      return candidateEdge;
+      return candidateEdge.id;
     },
   }));
 
-export const defaultTreeLeaf = TreeNodeModel.create({
-  id: '-1',
+export const defaultPostLeafNode = TreeNodeModel.create({
+  id: SpecialEdge.POST_LEAF_EDGE_ID,
   title: 'Thank you for participating',
   type: 'FINISH',
   isLeaf: true,

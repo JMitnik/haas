@@ -7,18 +7,21 @@ import treeStore from './DialogueTreeStore';
 
 const DialogueTreeContext = React.createContext({} as TreeStoreModelProps);
 
-// Provider which manages the state of the context
 export const DialogueTreeProvider = ({ children }: { children: React.ReactNode }) => {
-  const { customer, dialogue } = useProject();
+  const { dialogue } = useProject();
 
-  // Start the tree project
+  // When dialogue changes, set initial nodes and initial edges
   useEffect(() => {
     if (dialogue?.questions && dialogue?.edges && dialogue?.edges) {
+      // Clean existing session data
+      treeStore.session.reset();
+
+      // Initialize tree
       treeStore.tree.setInitialNodes(dialogue?.questions);
       treeStore.tree.setInitialEdges(dialogue?.edges);
       treeStore.tree.setInitialLeaves(dialogue?.leafs);
     }
-  }, [customer, dialogue]);
+  }, [dialogue]);
 
   return (
     <DialogueTreeContext.Provider value={treeStore}>
