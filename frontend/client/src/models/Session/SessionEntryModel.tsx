@@ -5,7 +5,7 @@ import { TreeNodeModel } from '../Tree/TreeNodeModel';
 export const SessionEntryDataModel = types.model({
   numberValue: types.maybeNull(types.number),
   textValue: types.maybeNull(types.string),
-  multiValues: types.maybeNull(types.array(types.reference(types.late((): IAnyModelType => SessionEntryDataModel)))),
+  multiValues: types.maybeNull(types.array(types.late((): IAnyModelType => SessionEntryDataModel))),
 });
 
 const SessionEntryModel = types

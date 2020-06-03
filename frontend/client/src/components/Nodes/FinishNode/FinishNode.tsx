@@ -11,9 +11,6 @@ const FinishNode = () => {
   return (
     <FinishNodeContainer>
       <Div>
-        {isFinished && (
-          <Div>We are done!</Div>
-        )}
         <H2>Thank you for participating!</H2>
         <H4 color="white" textAlign="center">
           We will strive towards making you
