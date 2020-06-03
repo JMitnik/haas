@@ -1,13 +1,15 @@
-import React, { useState, useEffect } from 'react';
 import { useLazyQuery } from '@apollo/react-hooks';
 import { useParams } from 'react-router';
-import { H2, Muted, Div } from '@haas/ui';
-import getInteractionsQuery from 'queries/getInteractionsQuery'
-import { InputOutputContainer, OutputContainer, InputContainer } from './InteractionOverviewStyles';
 import Papa from 'papaparse';
+import React, { useEffect, useState } from 'react';
+
+import { Div, H2, Muted } from '@haas/ui';
+import getInteractionsQuery from 'queries/getInteractionsQuery'
+
+import { InputContainer, InputOutputContainer, OutputContainer } from './InteractionOverviewStyles';
 import DatePickerComponent from './DatePickerComponent';
-import SearchBarComponent from './SearchBarComponent';
 import InteractionsView from './InteractionsView';
+import SearchBarComponent from './SearchBarComponent';
 
 interface TableProps {
   activeStartDate: Date | null;
@@ -31,8 +33,9 @@ const InteractionsOverview = () => {
       activeSearchTerm: '',
       pageIndex: 0,
       pageSize: 8,
-      sortBy: [{ id: 'id', desc: true }]
-    });
+      sortBy: [{ id: 'id', desc: true }],
+    },
+  );
 
   const interactions = data?.interactions?.sessions || []
 
@@ -47,23 +50,19 @@ const InteractionsOverview = () => {
           searchTerm: activeSearchTerm,
           offset: pageIndex * pageSize,
           limit: pageSize,
-          pageIndex: pageIndex,
+          pageIndex,
           orderBy: sortBy,
         },
-      }
+      },
     })
   }, [activeGridProperties])
 
   const handleSearchTermChange = (newSearchTerm: string) => {
-    setActiveGridProperties((prevValues) => {
-      return { ...prevValues, activeSearchTerm: newSearchTerm }
-    });
+    setActiveGridProperties((prevValues) => ({ ...prevValues, activeSearchTerm: newSearchTerm }));
   }
 
   const handleDateChange = (startDate: Date | null, endDate: Date | null) => {
-    setActiveGridProperties((prevValues) => {
-      return { ...prevValues, activeStartDate: startDate, activeEndDate: endDate };
-    })
+    setActiveGridProperties((prevValues) => ({ ...prevValues, activeStartDate: startDate, activeEndDate: endDate }))
   }
 
   const handleExport = () => {
@@ -86,10 +85,10 @@ const InteractionsOverview = () => {
       <H2 color="#3653e8" fontWeight={400} mb="10%"> Interactions </H2>
       <InputOutputContainer mb="5%">
         <OutputContainer>
-          <Div justifyContent="center" marginRight='15px'>
+          <Div justifyContent="center" marginRight="15px">
             <Muted style={{ fontWeight: 'bold' }}>Exports</Muted>
           </Div>
-          <Div padding='8px 36px' style={{ cursor: 'pointer', borderRadius: '90px' }} onClick={handleExport} useFlex flexDirection='row' alignItems='center' backgroundColor='#c4c4c4'>
+          <Div padding="8px 36px" style={{ cursor: 'pointer', borderRadius: '90px' }} onClick={handleExport} useFlex flexDirection="row" alignItems="center" backgroundColor="#c4c4c4">
             <Div style={{ fontWeight: 'bold' }}>CSV</Div>
           </Div>
         </OutputContainer>
@@ -97,15 +96,17 @@ const InteractionsOverview = () => {
           <DatePickerComponent
             activeStartDate={activeGridProperties.activeStartDate}
             activeEndDate={activeGridProperties.activeEndDate}
-            handleDateChange={handleDateChange} />
+            handleDateChange={handleDateChange}
+          />
           <SearchBarComponent activeSearchTerm={activeGridProperties.activeSearchTerm} handleSearchTermChange={handleSearchTermChange} />
         </InputContainer>
       </InputOutputContainer>
       <Div style={{ background: '#fdfbfe' }} mb="1%" height="65%">
         <InteractionsView
-          gridProperties={{...activeGridProperties, pageCount, pageIndex }}
+          gridProperties={{ ...activeGridProperties, pageCount, pageIndex }}
           onGridPropertiesChange={setActiveGridProperties}
-          interactions={interactions} />
+          interactions={interactions}
+        />
       </Div>
     </Div>
   )

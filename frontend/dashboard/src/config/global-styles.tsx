@@ -7,8 +7,6 @@ const GlobalStyle = createGlobalStyle`
     src: local('SF Pro'), url("/assets/fonts/sfpro.ttf");
   }
 
-  box-sizing: border-box;
-
   body {
     margin: 0;
     font-family: 'Rubik', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',

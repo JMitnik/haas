@@ -7,6 +7,7 @@ import {
   grid,
   GridProps,
   FlexboxProps,
+  WidthProps,
   FlexProps,
   flexDirection,
   LayoutProps,
@@ -28,8 +29,8 @@ export const Container = styled(Div)<ContainerProps>`
     ${width}
   `}
 `;
-
-interface ExtraFlexProps extends FlexboxProps, LayoutProps {
+interface ExtraGridProps extends GridProps, WidthProps {}
+interface ExtraFlexProps extends FlexboxProps, LayoutProps, WidthProps {
   growChildren?: boolean;
 }
 
@@ -57,10 +58,13 @@ export const ColumnFlex = styled.div<ExtraFlexProps>`
   `};
 `;
 
-export const Grid = styled.div<GridProps>`
+
+
+export const Grid = styled.div<ExtraGridProps>`
   ${({ theme }) => css`
     display: grid;
     grid-gap: ${theme.gutter}px;
     ${grid}
+    ${width}
   `}
 `;

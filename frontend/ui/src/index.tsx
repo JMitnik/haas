@@ -3,6 +3,7 @@ export { Form, FormGroupContainer, CheckBox, CheckBoxLabel, CheckBoxWrapper, Gri
 export { Container, Grid, Flex, ColumnFlex } from './Container';
 export { Button, DeleteButtonContainer, EditButtonContainer, EditDialogueContainer } from './Buttons';
 export { Card, CardBody, CardFooter, AddCard } from './Cards';
+export { Span } from './Span';
 export { Icon } from './Icon';
 export { Loader } from './Loader';
 export { Label } from './Labels';
