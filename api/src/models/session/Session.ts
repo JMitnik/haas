@@ -4,6 +4,7 @@ import { objectType, extendType, inputObjectType } from '@nexus/schema';
 import SessionResolver from './session-resolver';
 import NodeEntryResolver from '../nodeentry/nodeentry-resolver';
 import { QuestionNodeType } from '../question/QuestionNode';
+import { PaginationProps } from '../../types/generic';
 
 export const NodeEntryValueType = objectType({
   name: 'NodeEntryValue',
@@ -208,7 +209,7 @@ export const getSessionAnswerFlowQuery = extendType({
         filter: InteractionFilterInput,
       },
       async resolve(parent: any, args: any) {
-        const { pageIndex, offset, limit, startDate, endDate, searchTerm }: { pageIndex: number, offset: number, limit: number, startDate: Date, endDate: Date, searchTerm: string } = args.filter;
+        const { pageIndex, offset, limit, startDate, endDate, searchTerm }: PaginationProps = args.filter;
         const dateRange = SessionResolver.constructDateRangeWhereInput(startDate, endDate);
         const orderBy = args.filter.orderBy ? Object.assign({}, ...args.filter.orderBy) : null;
         const { pageSessions, totalPages, resetPages } = await NodeEntryResolver.getCurrentInteractionSessions(
