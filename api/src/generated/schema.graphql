@@ -156,6 +156,7 @@ type lineChartDataType {
 type Mutation {
   createCustomer(name: String, options: CustomerCreateOptions): Customer!
   createDialogue(customerId: String, description: String, isSeed: Boolean, publicTitle: String, title: String): Dialogue!
+  createUser: UserType!
   deleteCustomer(where: CustomerWhereUniqueInput): Customer!
   deleteDialogue(where: DialogueWhereUniqueInput): Dialogue!
   editCustomer(id: String, options: CustomerCreateOptions): Customer!
@@ -191,6 +192,12 @@ input OptionInput {
   value: String
 }
 
+type PermssionType {
+  description: String
+  id: ID!
+  name: String!
+}
+
 type Query {
   customer(id: ID, slug: String): Customer!
   customers: [Customer!]!
@@ -205,6 +212,7 @@ type Query {
   questionNodes: [QuestionNode!]!
   session(where: SessionWhereUniqueInput): Session!
   sessions(where: SessionWhereUniqueInput): [Session!]!
+  users(customerId: String): [UserType!]!
 }
 
 input QuestionConditionInput {
@@ -254,6 +262,12 @@ type QuestionOption {
   publicValue: String
   questionId: String!
   value: String!
+}
+
+type RoleType {
+  id: ID!
+  name: String!
+  permissions: [PermssionType!]!
 }
 
 type Session {
@@ -313,4 +327,12 @@ input UserSessionEntryInput {
   depth: Int
   edgeId: String
   nodeId: String
+}
+
+type UserType {
+  email: String!
+  firstName: String
+  id: ID!
+  lastName: String
+  role: RoleType!
 }
