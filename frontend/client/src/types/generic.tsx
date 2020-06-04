@@ -1,5 +1,5 @@
-import { TreeEdgeProps } from 'models/DialogueTree/TreeEdgeModel';
-import { TreeNodeProps } from 'models/DialogueTree/TreeNodeModel';
+import { TreeEdgeProps } from 'models/Tree/TreeEdgeModel';
+import { TreeNodeProps } from 'models/Tree/TreeNodeModel';
 
 export interface HAASNodeConditions {
   renderMin?: number;
@@ -84,11 +84,21 @@ export interface CustomerProps {
 }
 
 export interface Customer {
+  id: string;
   name: string;
   settings: CustomerSettingsProps;
+  slug: string;
   dialogues?: Dialogue[];
+}
+
+export interface CustomerColorSettingsProps {
+  primary: string | null;
+  primaryAlt: string | null;
+  secondary: string | null;
+  secondaryAlt: string | null;
 }
 
 export interface CustomerSettingsProps {
   logoUrl: string;
+  colourSettings: CustomerColorSettingsProps;
 }

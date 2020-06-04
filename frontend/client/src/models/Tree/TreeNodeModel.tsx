@@ -37,12 +37,16 @@ export const TreeNodeModel = types
     },
   }));
 
-export const defaultPostLeafNode = TreeNodeModel.create({
-  id: SpecialEdge.POST_LEAF_EDGE_ID,
-  title: 'Thank you for participating',
-  type: 'FINISH',
-  isLeaf: true,
-});
+export const createDefaultPostLeafNode = () => {
+  const node = TreeNodeModel.create({
+    id: SpecialEdge.POST_LEAF_EDGE_ID,
+    title: 'Thank you for participating',
+    type: 'FINISH',
+    isLeaf: true,
+  });
+
+  return node;
+};
 
 export interface TreeNodeProps extends Instance<typeof TreeNodeModel>{}
 

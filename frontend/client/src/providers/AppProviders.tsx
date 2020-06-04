@@ -5,19 +5,16 @@ import React, { ReactNode } from 'react';
 import client from 'graphql/apollo';
 
 import { DialogueTreeProvider } from './DialogueTreeProvider';
-import { ProjectProvider } from './ProjectProvider/ProjectProvider';
 import ThemeProviders from './ThemeProviders';
 
 const AppProviders = ({ children }: { children: ReactNode }) => (
   <ApolloProvider client={client}>
     <BrowserRouter>
-      <ProjectProvider>
-        <DialogueTreeProvider>
-          <ThemeProviders>
-            {children}
-          </ThemeProviders>
-        </DialogueTreeProvider>
-      </ProjectProvider>
+      <DialogueTreeProvider>
+        <ThemeProviders>
+          {children}
+        </ThemeProviders>
+      </DialogueTreeProvider>
     </BrowserRouter>
   </ApolloProvider>
 );

@@ -1,10 +1,10 @@
-import { Instance, types } from 'mobx-state-tree';
+import { Instance, applySnapshot, getSnapshot, isAlive, types } from 'mobx-state-tree';
 
 import { Dialogue } from 'types/generic';
-import { defaultPostLeafNode } from './DialogueTree/TreeNodeModel';
-import CustomerModel from './Customer/CustomerModel';
+import { createDefaultPostLeafNode } from './Tree/TreeNodeModel';
+import CustomerModel, { CustomerModelProps } from './Customer/CustomerModel';
 import SessionModel from './Session/SessionModel';
-import TreeModel from './DialogueTree/TreeModel';
+import TreeModel from './Tree/TreeModel';
 
 const TreeStoreModel = types
   .model('TreeStore', {
@@ -12,21 +12,41 @@ const TreeStoreModel = types
     tree: types.maybeNull(TreeModel),
     customer: types.maybeNull(CustomerModel),
   })
-  .actions((self) => ({
-    initTree(dialogue: Dialogue) {
-      const tree = TreeModel.create({
-        title: dialogue.title,
-        publicTitle: dialogue.publicTitle,
-        activeLeaf: defaultPostLeafNode.id,
-      });
+  .actions((self) => {
+    let initialState = {};
 
-      tree.setInitialNodes(dialogue.questions);
-      tree.setInitialEdges(dialogue.edges);
-      tree.setInitialLeaves(dialogue.leafs);
+    return {
+      afterCreate: () => {
+        initialState = getSnapshot(self);
+      },
+      initCustomer: (customer: CustomerModelProps) => {
+        const newCustomer = CustomerModel.create({
+          id: customer.id,
+          name: customer.name,
+          settings: customer.settings,
+          slug: customer.slug,
+        });
 
-      self.tree = tree;
-    },
-  }))
+        self.customer = newCustomer;
+      },
+      initTree: (dialogue: Dialogue) => {
+        const defaultPostLeafNode = createDefaultPostLeafNode();
+
+        self.tree = TreeModel.create({
+          title: dialogue.title,
+          publicTitle: dialogue.publicTitle,
+          activeLeaf: defaultPostLeafNode.id,
+        });
+
+        self.tree.setInitialNodes(dialogue.questions);
+        self.tree.setInitialEdges(dialogue.edges);
+        self.tree.setInitialLeaves(dialogue.leafs);
+      },
+      resetProject: () => {
+        applySnapshot(self, initialState);
+      },
+    };
+  })
   .views((self) => ({
     /**
      * Extract all visited nodes that lead from the root to the top.

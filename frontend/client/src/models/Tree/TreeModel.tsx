@@ -1,11 +1,11 @@
-import { Instance, types } from 'mobx-state-tree';
-import { SpecialEdge, TreeNodeModel, TreeNodeProps, defaultPostLeafNode } from './TreeNodeModel';
+import { Instance, isAlive, types } from 'mobx-state-tree';
+import { SpecialEdge, TreeNodeModel, TreeNodeProps, createDefaultPostLeafNode } from './TreeNodeModel';
 import { TreeEdgeModel, TreeEdgeProps } from './TreeEdgeModel';
 
 const TreeModel = types
   .model({
     title: types.string,
-    publicTitle: types.string,
+    publicTitle: types.maybeNull(types.string),
     nodes: types.array(TreeNodeModel),
     edges: types.array(TreeEdgeModel),
     leaves: types.array(TreeNodeModel),
@@ -49,12 +49,15 @@ const TreeModel = types
      * @param leaves
      */
     setInitialLeaves(leaves: TreeNodeProps[]) {
+      console.log(isAlive(self));
       const newLeaves = leaves.map((leaf) => TreeNodeModel.create({
         id: leaf.id,
         type: leaf.type,
         title: leaf.title,
         isLeaf: true,
       }));
+
+      const defaultPostLeafNode = createDefaultPostLeafNode();
 
       self.leaves.replace([defaultPostLeafNode, ...newLeaves]);
       self.activeLeaf = defaultPostLeafNode;
@@ -68,7 +71,7 @@ const TreeModel = types
       const edge: TreeEdgeProps | null = self.edges.find((edge: TreeEdgeProps) => edge.id === edgeId);
 
       if (edgeId === SpecialEdge.POST_LEAF_EDGE_ID) {
-        return defaultPostLeafNode;
+        return createDefaultPostLeafNode();
       }
 
       if (edgeId === SpecialEdge.LEAF_EDGE_ID) {

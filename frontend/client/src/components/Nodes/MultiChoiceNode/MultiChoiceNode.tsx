@@ -5,10 +5,9 @@ import { useForm } from 'react-hook-form';
 import React, { useEffect } from 'react';
 
 import { HAASFormEntry } from 'types/generic';
-import { TreeNodeOptionProps } from 'models/DialogueTree/TreeNodeOptionModel';
+import { TreeNodeOptionProps } from 'models/Tree/TreeNodeOptionModel';
 import useDialogueTree from 'providers/DialogueTreeProvider';
 import useEdgeTransition from 'hooks/use-edge-transition';
-import useProject from 'providers/ProjectProvider';
 
 import { GenericNodeProps } from '../NodeLayout/NodeLayout';
 import { MultiChoiceNodeContainer, MultiChoiceNodeGrid } from './MultiChoiceNodeStyles';
@@ -41,7 +40,7 @@ const multiChoiceItemAnimation: Variants = {
 const MultiChoiceNode = ({ node }: MultiChoiceNodeProps) => {
   const store = useDialogueTree();
   const { goToEdge } = useEdgeTransition();
-  const { customer, dialogue } = useProject();
+  const { customer, dialogue } = { customer: 1, dialogue: 2 };
 
   const { register, setValue, triggerValidation } = useForm<HAASFormEntry>({
     mode: 'onSubmit',
@@ -71,8 +70,8 @@ const MultiChoiceNode = ({ node }: MultiChoiceNodeProps) => {
         textValue: multiChoiceOption.value,
       });
 
-      const nextEdgeId = node.getNextEdgeIdFromKey(multiChoiceOption.value);
-      goToEdge(customer.slug, dialogue?.id, nextEdgeId);
+      // const nextEdgeId = node.getNextEdgeIdFromKey(multiChoiceOption.value);
+      // goToEdge(customer.slug, dialogue?.id, nextEdgeId);
     }
   };
 

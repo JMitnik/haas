@@ -3,13 +3,13 @@ import { useEffect, useState } from 'react';
 import { useMutation } from '@apollo/react-hooks';
 import uploadUserSessionMutation from 'mutations/UploadEntryMutation';
 import useDialogueTree from 'providers/DialogueTreeProvider';
-import useProject from 'providers/ProjectProvider';
+// import useProject from 'providers/ProjectProvider';
 
 const useJourneyFinish = (submitInstant: boolean = true) => {
   const [isFinished, setIsFinished] = useState(false);
   const [willSubmit, setWillSubmit] = useState(submitInstant);
   const store = useDialogueTree();
-  const { dialogue } = useProject();
+  // const { dialogue } = useProject();
 
   const [uploadInteraction] = useMutation(uploadUserSessionMutation, {
     onError: (error) => {
@@ -19,23 +19,23 @@ const useJourneyFinish = (submitInstant: boolean = true) => {
 
   const entries = store.relevantSessionEntries;
 
-  // Effect for submitting
-  useEffect(() => {
-    if (entries.length && !isFinished && willSubmit) {
-      uploadInteraction({ variables: {
-        uploadUserSessionInput: {
-          dialogueId: dialogue?.id,
-          entries: entries.map((entry) => ({
-            nodeId: entry.node.node.id,
-            edgeId: entry.edge?.id,
-            data: entry.node?.data,
-          })),
-        },
-      } });
+  // // Effect for submitting
+  // useEffect(() => {
+  //   if (entries.length && !isFinished && willSubmit) {
+  //     uploadInteraction({ variables: {
+  //       uploadUserSessionInput: {
+  //         dialogueId: dialogue?.id,
+  //         entries: entries.map((entry) => ({
+  //           nodeId: entry.node.node.id,
+  //           edgeId: entry.edge?.id,
+  //           data: entry.node?.data,
+  //         })),
+  //       },
+  //     } });
 
-      setIsFinished(true);
-    }
-  }, [entries, isFinished, willSubmit, uploadInteraction, dialogue]);
+  //     setIsFinished(true);
+  //   }
+  // }, [entries, isFinished, willSubmit, uploadInteraction, dialogue]);
 
   // Effect for Post-submission
   useEffect(() => {

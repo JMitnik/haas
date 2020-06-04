@@ -5,6 +5,7 @@ const CustomerModel = types
   .model('CustomerModel', {
     id: types.identifier,
     name: types.string,
+    slug: types.string,
     settings: CustomerSettingsModel,
   });
 

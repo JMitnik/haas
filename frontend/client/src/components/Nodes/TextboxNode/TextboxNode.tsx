@@ -7,7 +7,6 @@ import { ClientButton } from 'components/Buttons/Buttons';
 import { Div, H2, H3, Textbox } from '@haas/ui';
 import useDialogueTree from 'providers/DialogueTreeProvider';
 import useEdgeTransition from 'hooks/use-edge-transition';
-import useProject from 'providers/ProjectProvider';
 
 import { GenericNodeProps } from '../NodeLayout/NodeLayout';
 import { TextboxContainer } from './TextboxStyles';
@@ -19,7 +18,7 @@ interface TextboxNodeProps extends GenericNodeProps {
 const TextboxNode = ({ node }: TextboxNodeProps) => {
   const { register, getValues, formState } = useForm();
   const store = useDialogueTree();
-  const { customer, dialogue } = useProject();
+  // const { customer, dialogue } = useProject();
   const { goToEdge } = useEdgeTransition();
 
   const onSubmit = () => {
@@ -31,10 +30,10 @@ const TextboxNode = ({ node }: TextboxNodeProps) => {
       numberValue: null,
     });
 
-    if (customer && dialogue) {
-      const nextEdgeId = node.getNextEdgeIdFromKey(formEntry.textValue);
-      goToEdge(customer.slug, dialogue?.id, nextEdgeId);
-    }
+    // if (customer && dialogue) {
+    //   const nextEdgeId = node.getNextEdgeIdFromKey(formEntry.textValue);
+    //   goToEdge(customer.slug, dialogue?.id, nextEdgeId);
+    // }
   };
 
   return (

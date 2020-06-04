@@ -7,7 +7,6 @@ import { HAASFormEntry } from 'types/generic';
 import { cleanInt } from 'utils/cleanInt';
 import useDialogueTree from 'providers/DialogueTreeProvider';
 import useEdgeTransition from 'hooks/use-edge-transition';
-import useProject from 'providers/ProjectProvider';
 
 import { GenericNodeProps } from '../NodeLayout/NodeLayout';
 import { SliderNodeContainer, SliderNodeValue } from './SliderNodeStyles';
@@ -28,7 +27,6 @@ const SliderNode = ({ node }: SliderNodeProps) => {
   const store = useDialogueTree();
   const { goToEdge } = useEdgeTransition();
   const controls = useAnimation();
-  const { customer, dialogue } = useProject();
 
   const { watch, getValues, triggerValidation, register } = useForm<HAASFormEntry>({
     defaultValues: {
@@ -61,11 +59,11 @@ const SliderNode = ({ node }: SliderNodeProps) => {
 
         const nextEdgeId = node.getNextEdgeIdFromKey(formEntry.numberValue);
 
-        if (!customer || !dialogue) {
-          throw new Error('We lost customer and/or dialogue');
-        }
+        // if (!customer || !dialogue) {
+        //   throw new Error('We lost customer and/or dialogue');
+        // }
 
-        goToEdge(customer.slug, dialogue?.id, nextEdgeId);
+        // goToEdge(customer.slug, dialogue?.id, nextEdgeId);
       }
     }
   };

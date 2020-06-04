@@ -9,7 +9,6 @@ import { GenericNodeProps } from 'components/Nodes/NodeLayout/NodeLayout';
 import { InputField, InputGroup, InputLabel } from '@haas/ui/src/Form';
 import useDialogueTree from 'providers/DialogueTreeProvider';
 import useEdgeTransition from 'hooks/use-edge-transition';
-import useProject from 'providers/ProjectProvider';
 
 import { RegisterNodeContainer } from './RegisterNodeStyles';
 
@@ -19,7 +18,7 @@ const RegisterNode = ({ node }: RegisterNodeProps) => {
   const { register, getValues, formState } = useForm();
   const store = useDialogueTree();
   const { goToEdge } = useEdgeTransition();
-  const { dialogue, customer } = useProject();
+  // const { dialogue, customer } = ();
 
   const onSubmit = () => {
     const formEntry = getValues({ nest: true });
@@ -30,10 +29,10 @@ const RegisterNode = ({ node }: RegisterNodeProps) => {
       textValue: null,
     });
 
-    if (dialogue && customer) {
-      const nextEdgeId = node.getNextEdgeIdFromKey(formEntry.multiValues);
-      goToEdge(customer.slug, dialogue.id, nextEdgeId);
-    }
+    // if (dialogue && customer) {
+    //   const nextEdgeId = node.getNextEdgeIdFromKey(formEntry.multiValues);
+    //   goToEdge(customer.slug, dialogue.id, nextEdgeId);
+    // }
   };
 
   const touched = () => 'multiValues' in formState.touched;

@@ -4,10 +4,17 @@ import { CustomerOverviewContainer } from 'components/CustomerOverview/CustomerO
 import { Div, Grid, H1 } from '@haas/ui';
 import CustomerCard from 'components/CustomerCard/CustomerCard';
 import Logo from 'components/Logo';
-import useProject from 'providers/ProjectProvider';
+import useDialogueTree from 'providers/DialogueTreeProvider';
 
 const CustomerOverview = ({ customers }: { customers: any }) => {
-  const { customer, setCustomerAndDialogue } = useProject();
+  const store = useDialogueTree();
+
+  useEffect(() => {
+    if (store.customer) {
+      console.log(`Customer has changed to ${store.customer}`);
+      store.resetProject();
+    }
+  }, [store.customer, store.resetProject, store]);
 
   return (
     <CustomerOverviewContainer exit={{ opacity: 0 }}>
