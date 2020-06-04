@@ -1,7 +1,6 @@
 import React, { useContext, useEffect } from 'react';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { TreeStoreModelProps } from 'models/TreeStoreModel';
-import useProject from 'providers/ProjectProvider/ProjectProvider';
 
 import treeStore from './DialogueTreeStore';
 
@@ -12,14 +11,12 @@ export const DialogueTreeProvider = ({ children }: { children: React.ReactNode }
 
   // When dialogue changes, set initial nodes and initial edges
   useEffect(() => {
-    if (dialogue?.questions && dialogue?.edges && dialogue?.edges) {
-      // Clean existing session data
+    if (dialogue) {
+      // Clean optional existing session data
       treeStore.session.reset();
 
-      // Initialize tree
-      treeStore.tree.setInitialNodes(dialogue?.questions);
-      treeStore.tree.setInitialEdges(dialogue?.edges);
-      treeStore.tree.setInitialLeaves(dialogue?.leafs);
+      // (Re)initialize dialogue tree
+      treeStore.initTree(dialogue);
     }
   }, [dialogue]);
 

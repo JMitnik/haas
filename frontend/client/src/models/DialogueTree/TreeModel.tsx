@@ -4,9 +4,11 @@ import { TreeEdgeModel, TreeEdgeProps } from './TreeEdgeModel';
 
 const TreeModel = types
   .model({
-    nodes: types.optional(types.array(TreeNodeModel), []),
-    edges: types.optional(types.array(TreeEdgeModel), []),
-    leaves: types.optional(types.array(TreeNodeModel), []),
+    title: types.string,
+    publicTitle: types.string,
+    nodes: types.array(TreeNodeModel),
+    edges: types.array(TreeEdgeModel),
+    leaves: types.array(TreeNodeModel),
     activeLeaf: types.reference(TreeNodeModel),
   })
   .actions((self) => ({

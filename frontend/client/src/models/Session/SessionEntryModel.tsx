@@ -1,6 +1,6 @@
 import { IAnyModelType, Instance, types } from 'mobx-state-tree';
 
-import { TreeNodeModel } from '../Tree/TreeNodeModel';
+import { TreeNodeModel } from '../DialogueTree/TreeNodeModel';
 
 export const SessionEntryDataModel = types.model({
   numberValue: types.maybeNull(types.number),

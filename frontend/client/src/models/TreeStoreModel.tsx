@@ -1,18 +1,41 @@
 import { Instance, types } from 'mobx-state-tree';
 
+import { Dialogue } from 'types/generic';
+import { defaultPostLeafNode } from './DialogueTree/TreeNodeModel';
+import CustomerModel from './Customer/CustomerModel';
 import SessionModel from './Session/SessionModel';
-import TreeModel from './Tree/TreeModel';
+import TreeModel from './DialogueTree/TreeModel';
 
 const TreeStoreModel = types
   .model('TreeStore', {
     session: types.optional(SessionModel, {}),
-    tree: TreeModel,
+    tree: types.maybeNull(TreeModel),
+    customer: types.maybeNull(CustomerModel),
   })
+  .actions((self) => ({
+    initTree(dialogue: Dialogue) {
+      const tree = TreeModel.create({
+        title: dialogue.title,
+        publicTitle: dialogue.publicTitle,
+        activeLeaf: defaultPostLeafNode.id,
+      });
+
+      tree.setInitialNodes(dialogue.questions);
+      tree.setInitialEdges(dialogue.edges);
+      tree.setInitialLeaves(dialogue.leafs);
+
+      self.tree = tree;
+    },
+  }))
   .views((self) => ({
     /**
      * Extract all visited nodes that lead from the root to the top.
      */
     get relevantSessionEntries() {
+      if (!self.tree) {
+        throw new Error('Uninitialized tree!');
+      }
+
       const lastNonLeafNode = self.session.lastNonLeaf;
       const leafNodes = self.session.leafs;
       const { edges } = self.tree;

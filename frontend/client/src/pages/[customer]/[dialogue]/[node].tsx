@@ -33,7 +33,7 @@ const NodePage = observer(() => {
 
   return useObserver(() => {
     // If rootNode is unknown yet, return Loader
-    if (!store.tree.rootNode) {
+    if (!store.tree) {
       return <Loader />;
     }
 

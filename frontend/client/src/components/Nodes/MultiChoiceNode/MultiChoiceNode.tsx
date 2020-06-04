@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import React, { useEffect } from 'react';
 
 import { HAASFormEntry } from 'types/generic';
-import { TreeNodeOptionProps } from 'models/Tree/TreeNodeOptionModel';
+import { TreeNodeOptionProps } from 'models/DialogueTree/TreeNodeOptionModel';
 import useDialogueTree from 'providers/DialogueTreeProvider';
 import useEdgeTransition from 'hooks/use-edge-transition';
 import useProject from 'providers/ProjectProvider';

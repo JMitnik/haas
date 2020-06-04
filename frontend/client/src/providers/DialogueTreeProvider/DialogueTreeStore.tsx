@@ -3,9 +3,7 @@ import TreeStoreModel from 'models/TreeStoreModel';
 
 const treeStore = TreeStoreModel.create({
   session: {},
-  tree: {
-    activeLeaf: defaultPostLeafNode.id,
-  },
+  tree: null,
 });
 
 export default treeStore;

@@ -1,5 +1,5 @@
-import { TreeEdgeProps } from 'models/Tree/TreeEdgeModel';
-import { TreeNodeProps } from 'models/Tree/TreeNodeModel';
+import { TreeEdgeProps } from 'models/DialogueTree/TreeEdgeModel';
+import { TreeNodeProps } from 'models/DialogueTree/TreeNodeModel';
 
 export interface HAASNodeConditions {
   renderMin?: number;
@@ -61,6 +61,8 @@ export interface HAASFormEntry {
 
 export interface Dialogue {
   id: string;
+  title: string;
+  publicTitle: string;
   questions: TreeNodeProps[];
   edges: TreeEdgeProps[];
   leafs: TreeNodeProps[];

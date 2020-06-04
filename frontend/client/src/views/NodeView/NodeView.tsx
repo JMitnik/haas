@@ -2,7 +2,7 @@ import React from 'react';
 
 import { GenericNodeProps } from 'components/Nodes/NodeLayout/NodeLayout';
 import { Loader } from '@haas/ui';
-import { TreeNodeProps } from 'models/Tree/TreeNodeModel';
+import { TreeNodeProps } from 'models/DialogueTree/TreeNodeModel';
 import DialogueTreeLayout from 'components/DialogueTreeLayout';
 import FinishNode from 'components/Nodes/FinishNode/FinishNode';
 import MultiChoiceNode from 'components/Nodes/MultiChoiceNode/MultiChoiceNode';

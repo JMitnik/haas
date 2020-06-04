@@ -67,7 +67,7 @@ model Dialogue {
   title        String
   edges        Edge[]
   questions    QuestionNode[]
-  sessions     Session[]     
+  sessions     Session[]
 }
 
 model QuestionNode {
