@@ -1,9 +1,11 @@
+import { Facebook, Instagram, Linkedin, Twitter } from 'react-feather';
 import React from 'react';
+
 import { Flex, H2 } from '@haas/ui';
-import { Instagram, Facebook, Twitter, Linkedin } from 'react-feather';
-import { ShareItem } from './SocialShareNodeStyles';
-import { GenericNodeProps } from '../NodeLayout/NodeLayout';
 import useDialogueFinish from 'hooks/use-dialogue-finish';
+
+import { GenericNodeProps } from '../NodeLayout/NodeLayout';
+import { ShareItem } from './SocialShareNodeStyles';
 
 type SocialShareNodeProps = GenericNodeProps;
 

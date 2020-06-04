@@ -7,32 +7,24 @@ import { ClientButton } from 'components/Buttons/Buttons';
 import { Div, Grid, H2 } from '@haas/ui';
 import { GenericNodeProps } from 'components/Nodes/NodeLayout/NodeLayout';
 import { InputField, InputGroup, InputLabel } from '@haas/ui/src/Form';
-import useDialogueTree from 'providers/DialogueTreeProvider';
-import useEdgeTransition from 'hooks/use-edge-transition';
 
 import { RegisterNodeContainer } from './RegisterNodeStyles';
 
 type RegisterNodeProps = GenericNodeProps;
 
-const RegisterNode = ({ node }: RegisterNodeProps) => {
+const RegisterNode = ({ node, onEntryStore }: RegisterNodeProps) => {
   const { register, getValues, formState } = useForm();
-  const store = useDialogueTree();
-  const { goToEdge } = useEdgeTransition();
-  // const { dialogue, customer } = ();
 
   const onSubmit = () => {
     const formEntry = getValues({ nest: true });
 
-    store.session.add(node.id, {
+    const entry: any = {
       multiValues: formEntry.multiValues,
       numberValue: null,
       textValue: null,
-    });
+    };
 
-    // if (dialogue && customer) {
-    //   const nextEdgeId = node.getNextEdgeIdFromKey(formEntry.multiValues);
-    //   goToEdge(customer.slug, dialogue.id, nextEdgeId);
-    // }
+    onEntryStore(entry, formEntry.multiValues);
   };
 
   const touched = () => 'multiValues' in formState.touched;

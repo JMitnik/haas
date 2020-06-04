@@ -5,8 +5,6 @@ import React from 'react';
 import { ButtonIcon } from '@haas/ui/src/Buttons';
 import { ClientButton } from 'components/Buttons/Buttons';
 import { Div, H2, H3, Textbox } from '@haas/ui';
-import useDialogueTree from 'providers/DialogueTreeProvider';
-import useEdgeTransition from 'hooks/use-edge-transition';
 
 import { GenericNodeProps } from '../NodeLayout/NodeLayout';
 import { TextboxContainer } from './TextboxStyles';
@@ -15,25 +13,19 @@ interface TextboxNodeProps extends GenericNodeProps {
   isLeaf?: boolean;
 }
 
-const TextboxNode = ({ node }: TextboxNodeProps) => {
+const TextboxNode = ({ node, onEntryStore }: TextboxNodeProps) => {
   const { register, getValues, formState } = useForm();
-  const store = useDialogueTree();
-  // const { customer, dialogue } = useProject();
-  const { goToEdge } = useEdgeTransition();
 
   const onSubmit = () => {
     const formEntry = getValues({ nest: true });
 
-    store.session.add(node.id, {
+    const entry: any = {
       textValue: formEntry.textValue,
       multiValues: null,
       numberValue: null,
-    });
+    };
 
-    // if (customer && dialogue) {
-    //   const nextEdgeId = node.getNextEdgeIdFromKey(formEntry.textValue);
-    //   goToEdge(customer.slug, dialogue?.id, nextEdgeId);
-    // }
+    onEntryStore(entry, formEntry.textValue);
   };
 
   return (

@@ -1,4 +1,4 @@
-import { Instance, applySnapshot, getSnapshot, isAlive, types } from 'mobx-state-tree';
+import { Instance, applySnapshot, getSnapshot, types } from 'mobx-state-tree';
 
 import { Dialogue } from 'types/generic';
 import { createDefaultPostLeafNode } from './Tree/TreeNodeModel';
@@ -16,9 +16,16 @@ const TreeStoreModel = types
     let initialState = {};
 
     return {
+      /**
+       * Post-creation, store what the 'default' state looks like
+       */
       afterCreate: () => {
         initialState = getSnapshot(self);
       },
+
+      /**
+       * Create customer based on customer properties.
+       */
       initCustomer: (customer: CustomerModelProps) => {
         const newCustomer = CustomerModel.create({
           id: customer.id,
@@ -29,10 +36,15 @@ const TreeStoreModel = types
 
         self.customer = newCustomer;
       },
+
+      /**
+       * Initiate the tree.
+       */
       initTree: (dialogue: Dialogue) => {
         const defaultPostLeafNode = createDefaultPostLeafNode();
 
         self.tree = TreeModel.create({
+          id: dialogue.id,
           title: dialogue.title,
           publicTitle: dialogue.publicTitle,
           activeLeaf: defaultPostLeafNode.id,
@@ -42,6 +54,10 @@ const TreeStoreModel = types
         self.tree.setInitialEdges(dialogue.edges);
         self.tree.setInitialLeaves(dialogue.leafs);
       },
+
+      /**
+       * Reset the entire store based on the initialState's snapshot.
+       */
       resetProject: () => {
         applySnapshot(self, initialState);
       },

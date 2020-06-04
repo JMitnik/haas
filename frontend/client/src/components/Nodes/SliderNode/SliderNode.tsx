@@ -5,8 +5,6 @@ import React from 'react';
 import { Div, H2 } from '@haas/ui';
 import { HAASFormEntry } from 'types/generic';
 import { cleanInt } from 'utils/cleanInt';
-import useDialogueTree from 'providers/DialogueTreeProvider';
-import useEdgeTransition from 'hooks/use-edge-transition';
 
 import { GenericNodeProps } from '../NodeLayout/NodeLayout';
 import { SliderNodeContainer, SliderNodeValue } from './SliderNodeStyles';
@@ -23,9 +21,7 @@ const sliderValueAnimeVariants = {
   },
 };
 
-const SliderNode = ({ node }: SliderNodeProps) => {
-  const store = useDialogueTree();
-  const { goToEdge } = useEdgeTransition();
+const SliderNode = ({ node, onEntryStore }: SliderNodeProps) => {
   const controls = useAnimation();
 
   const { watch, getValues, triggerValidation, register } = useForm<HAASFormEntry>({
@@ -44,27 +40,19 @@ const SliderNode = ({ node }: SliderNodeProps) => {
     return entry;
   };
 
-  const onSubmit = async () => {
+  const handleSubmit = async () => {
     const validForm = await triggerValidation('numberValue');
 
     if (validForm) {
       const formEntry = formatSliderEntry(getValues({ nest: true }));
 
-      if (formEntry?.numberValue) {
-        store.session.add(node.id, {
-          numberValue: formEntry.numberValue,
-          textValue: null,
-          multiValues: null,
-        });
+      const entry: any = {
+        numberValue: formEntry.numberValue,
+        textValue: null,
+        multiValues: null,
+      };
 
-        const nextEdgeId = node.getNextEdgeIdFromKey(formEntry.numberValue);
-
-        // if (!customer || !dialogue) {
-        //   throw new Error('We lost customer and/or dialogue');
-        // }
-
-        // goToEdge(customer.slug, dialogue?.id, nextEdgeId);
-      }
+      onEntryStore(entry, formEntry.numberValue);
     }
   };
 
@@ -85,7 +73,7 @@ const SliderNode = ({ node }: SliderNodeProps) => {
         <SliderNodeValue initial="initial" variants={sliderValueAnimeVariants} animate={controls}>
           {showValue()}
         </SliderNodeValue>
-        <Slider onSubmit={onSubmit} register={register} animationControls={controls} />
+        <Slider onSubmit={handleSubmit} register={register} animationControls={controls} />
       </Div>
     </SliderNodeContainer>
   );

@@ -7,7 +7,7 @@ import { TreeNodeProps } from 'models/Tree/TreeNodeModel';
 import { ActiveNodeContainer, FloatingNodeContainer } from './NodeStyles';
 
 export interface GenericNodeProps {
-  isLeaf?: boolean;
+  onEntryStore: (entry: any, edgeKey: any) => void;
   node: TreeNodeProps;
 }
 

@@ -1,13 +1,9 @@
+import { Variants, motion } from 'framer-motion';
+import React from 'react';
+
 import { ClientButton } from 'components/Buttons/Buttons';
 import { Div, H2, H5 } from '@haas/ui';
-import { Variants, motion } from 'framer-motion';
-import { useForm } from 'react-hook-form';
-import React, { useEffect } from 'react';
-
-import { HAASFormEntry } from 'types/generic';
 import { TreeNodeOptionProps } from 'models/Tree/TreeNodeOptionModel';
-import useDialogueTree from 'providers/DialogueTreeProvider';
-import useEdgeTransition from 'hooks/use-edge-transition';
 
 import { GenericNodeProps } from '../NodeLayout/NodeLayout';
 import { MultiChoiceNodeContainer, MultiChoiceNodeGrid } from './MultiChoiceNodeStyles';
@@ -37,42 +33,15 @@ const multiChoiceItemAnimation: Variants = {
   },
 };
 
-const MultiChoiceNode = ({ node }: MultiChoiceNodeProps) => {
-  const store = useDialogueTree();
-  const { goToEdge } = useEdgeTransition();
-  const { customer, dialogue } = { customer: 1, dialogue: 2 };
-
-  const { register, setValue, triggerValidation } = useForm<HAASFormEntry>({
-    mode: 'onSubmit',
-    defaultValues: {
-      textValue: '',
-    },
-  });
-
-  // Register the relevant form fields
-  useEffect(() => {
-    register('textValue');
-  }, [register]);
-
-  // Apply submission
+const MultiChoiceNode = ({ node, onEntryStore }: MultiChoiceNodeProps) => {
   const onSubmit = async (multiChoiceOption: TreeNodeOptionProps) => {
-    setValue('textValue', multiChoiceOption.value);
-    const validForm = await triggerValidation('textValue');
+    const entry: any = {
+      multiValues: null,
+      numberValue: null,
+      textValue: multiChoiceOption.value,
+    };
 
-    if (validForm) {
-      if (!customer || !dialogue) {
-        throw new Error('We lost customer and/or dialogue');
-      }
-
-      store.session.add(node.id, {
-        multiValues: null,
-        numberValue: null,
-        textValue: multiChoiceOption.value,
-      });
-
-      // const nextEdgeId = node.getNextEdgeIdFromKey(multiChoiceOption.value);
-      // goToEdge(customer.slug, dialogue?.id, nextEdgeId);
-    }
+    onEntryStore(entry, multiChoiceOption.value);
   };
 
   return (
