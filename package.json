@@ -25,6 +25,7 @@
         "start:client": "yarn workspace @haas/client start",
         "start:api": "yarn workspace @haas/api start",
         "start:dashboard": "yarn workspace @haas/dashboard start",
+        "du": "yarn workspace @haas/api du",
         "debug": "concurrently \"yarn start:client\" \"yarn workspace @haas/api debug\"",
         "build:client": "yarn workspace @haas/client build",
         "build:api": "yarn workspace @haas/api generate && yarn workspace @haas/api build",

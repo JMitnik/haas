@@ -1,6 +1,6 @@
 import { Instance, types } from 'mobx-state-tree';
+import { SpecialEdge, TreeNodeModel, TreeNodeProps, defaultPostLeafNode } from './TreeNodeModel';
 import { TreeEdgeModel, TreeEdgeProps } from './TreeEdgeModel';
-import { TreeNodeModel, TreeNodeProps, defaultPostLeafNode } from './TreeNodeModel';
 
 const TreeModel = types
   .model({
@@ -65,11 +65,11 @@ const TreeModel = types
     getChildNodeByEdge(edgeId: string | undefined): TreeNodeProps {
       const edge: TreeEdgeProps | null = self.edges.find((edge: TreeEdgeProps) => edge.id === edgeId);
 
-      if (edgeId === String(-2)) {
+      if (edgeId === SpecialEdge.POST_LEAF_EDGE_ID) {
         return defaultPostLeafNode;
       }
 
-      if (edgeId === String(-1)) {
+      if (edgeId === SpecialEdge.LEAF_EDGE_ID) {
         return self.activeLeaf;
       }
 

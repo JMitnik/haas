@@ -1,22 +1,21 @@
 import { ApolloProvider } from '@apollo/react-hooks';
 import { BrowserRouter } from 'react-router-dom';
-import { ThemeProvider } from 'styled-components/macro';
 import React, { ReactNode } from 'react';
 
 import client from 'graphql/apollo';
-import theme from 'config/theme';
 
 import { DialogueTreeProvider } from './DialogueTreeProvider';
 import { ProjectProvider } from './ProjectProvider/ProjectProvider';
+import ThemeProviders from './ThemeProviders';
 
 const AppProviders = ({ children }: { children: ReactNode }) => (
   <ApolloProvider client={client}>
     <BrowserRouter>
       <ProjectProvider>
         <DialogueTreeProvider>
-          <ThemeProvider theme={theme}>
+          <ThemeProviders>
             {children}
-          </ThemeProvider>
+          </ThemeProviders>
         </DialogueTreeProvider>
       </ProjectProvider>
     </BrowserRouter>

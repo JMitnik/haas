@@ -1,5 +1,5 @@
-import styled, { css } from 'styled-components/macro';
 import { Div } from '@haas/ui';
+import styled, { css } from 'styled-components/macro';
 
 const AppContainer = styled(Div)`
   ${({ theme }) => css`
@@ -7,7 +7,6 @@ const AppContainer = styled(Div)`
     min-height: calc(var(--vh, 1vh) * 100);
     background: ${theme.colors.primary};
     display: flex;
-    min-height: 100%;
     align-items: stretch;
   `}
 `;

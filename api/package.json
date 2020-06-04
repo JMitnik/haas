@@ -10,6 +10,7 @@
     },
     "scripts": {
         "start": "nodemon",
+        "du": "docker-compose up -d",
         "serve": "ts-node -P tsconfig.json ./src/app.ts",
         "build": "yarn",
         "test": "jest --detectOpenHandles",

@@ -1,5 +1,6 @@
+import { Label } from '@haas/ui';
+import { motion } from 'framer-motion';
 import styled, { css } from 'styled-components/macro';
-import { Label, Div } from '@haas/ui';
 
 export const CustomerCardImage = styled.img`
   width: 75px;
@@ -21,9 +22,20 @@ export const CustomerCardEnqueteLabel = styled(Label)`
   `}
 `;
 
-export const CustomerOverviewContainer = styled(Div)`
-  max-width: 100%;
-  width: 1200px;
-  margin: 0 auto;
-  padding-bottom: 48px;
+export const CustomerOverviewContainer = styled(motion.div)`
+  ${({ theme }) => css`
+    max-width: 100%;
+    width: 1200px;
+    margin: 0 auto;
+    padding-bottom: 48px;
+    padding-top: 100px;
+    padding-bottom: 100px;
+
+    @media ${theme.media.mob} {
+      padding-top: 30px;
+      padding-bottom: 30px;
+      padding-left: 24px;
+      padding-right: 24px;
+    }
+  `}
 `;
