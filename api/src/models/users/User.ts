@@ -76,6 +76,31 @@ export const UserMutations = extendType({
         });
       },
     });
+    t.field('updateUser', {
+      type: UserType,
+      args: { id: 'String', input: UserInput },
+      resolve(parent: any, args: any, ctx) {
+        const { firstName, lastName, email, password, phone, roleId, customerId } = args.input;
+        // TODO: Update potential role change
+        return prisma.user.update({
+          where: {
+            id: args.id,
+          },
+          data: {
+            firstName,
+            lastName,
+            phone,
+          },
+        });
+      },
+    });
+    t.field('deleteUser', {
+      type: UserType,
+      args: { id: 'String' },
+      resolve(parent: any, args: any, ctx) {
+        return prisma.user.delete({ where: { id: args.id } });
+      },
+    });
   },
 });
 

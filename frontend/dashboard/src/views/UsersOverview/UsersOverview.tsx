@@ -25,7 +25,7 @@ interface TableProps {
 }
 
 const HEADERS = [{ Header: 'First name', accessor: 'firstName', Cell: CenterCell },
-{ Header: 'Last name', accessor: 'lastName', Cell: CenterCell }, { Header: 'Email', accessor: 'email', Cell: CenterCell }, { Header: 'Role', accessor: 'role', Cell: RoleCell }]
+{ Header: 'Last name', accessor: 'lastName', Cell: CenterCell }, { Header: 'Email', accessor: 'email', Cell: UserCell }, { Header: 'Role', accessor: 'role', Cell: RoleCell }]
 
 const UsersOverview = () => {
   const { customerId } = useParams();

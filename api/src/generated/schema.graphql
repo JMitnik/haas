@@ -161,10 +161,12 @@ type Mutation {
   createUser(data: UserInput): UserType!
   deleteCustomer(where: CustomerWhereUniqueInput): Customer!
   deleteDialogue(where: DialogueWhereUniqueInput): Dialogue!
+  deleteUser(id: String): UserType!
   editCustomer(id: String, options: CustomerCreateOptions): Customer!
   editDialogue(description: String, dialogueId: String, publicTitle: String, title: String): Dialogue!
   singleUpload(file: Upload): ImageType!
   updateTopicBuilder(id: String, topicData: TopicDataEntry): String!
+  updateUser(id: String, input: UserInput): UserType!
   uploadUserSession(uploadUserSessionInput: UploadUserSessionInput): Session!
 }
 

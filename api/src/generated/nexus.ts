@@ -366,10 +366,12 @@ export interface NexusGenFieldTypes {
     createUser: NexusGenRootTypes['UserType']; // UserType!
     deleteCustomer: NexusGenRootTypes['Customer']; // Customer!
     deleteDialogue: NexusGenRootTypes['Dialogue']; // Dialogue!
+    deleteUser: NexusGenRootTypes['UserType']; // UserType!
     editCustomer: NexusGenRootTypes['Customer']; // Customer!
     editDialogue: NexusGenRootTypes['Dialogue']; // Dialogue!
     singleUpload: NexusGenRootTypes['ImageType']; // ImageType!
     updateTopicBuilder: string; // String!
+    updateUser: NexusGenRootTypes['UserType']; // UserType!
     uploadUserSession: NexusGenRootTypes['Session']; // Session!
   }
   NodeEntry: { // field return type
@@ -500,6 +502,9 @@ export interface NexusGenArgTypes {
     deleteDialogue: { // args
       where?: NexusGenInputs['DialogueWhereUniqueInput'] | null; // DialogueWhereUniqueInput
     }
+    deleteUser: { // args
+      id?: string | null; // String
+    }
     editCustomer: { // args
       id?: string | null; // String
       options?: NexusGenInputs['CustomerCreateOptions'] | null; // CustomerCreateOptions
@@ -516,6 +521,10 @@ export interface NexusGenArgTypes {
     updateTopicBuilder: { // args
       id?: string | null; // String
       topicData?: NexusGenInputs['TopicDataEntry'] | null; // TopicDataEntry
+    }
+    updateUser: { // args
+      id?: string | null; // String
+      input?: NexusGenInputs['UserInput'] | null; // UserInput
     }
     uploadUserSession: { // args
       uploadUserSessionInput?: NexusGenInputs['UploadUserSessionInput'] | null; // UploadUserSessionInput
