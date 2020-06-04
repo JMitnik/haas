@@ -4,11 +4,12 @@ import Papa from 'papaparse';
 import React, { useEffect, useState } from 'react';
 
 import { Div, H2, Muted } from '@haas/ui';
+import InteractionsTable from 'views/InteractionsOverview/Table';
 import getInteractionsQuery from 'queries/getInteractionsQuery'
 
+import { CenterCell, ScoreCell, UserCell, WhenCell } from './CellComponents/CellComponents';
 import { InputContainer, InputOutputContainer, OutputContainer } from './InteractionOverviewStyles';
 import DatePickerComponent from './DatePickerComponent';
-import InteractionsView from './InteractionsView';
 import SearchBarComponent from './SearchBarComponent';
 
 interface TableProps {
@@ -22,6 +23,9 @@ interface TableProps {
     desc: boolean;
   }[]
 }
+
+const HEADERS = [{ Header: 'SCORE', accessor: 'score', Cell: ScoreCell },
+{ Header: 'PATHS', accessor: 'paths', Cell: CenterCell }, { Header: 'USER', accessor: 'id', Cell: UserCell }, { Header: 'WHEN', accessor: 'createdAt', Cell: WhenCell }]
 
 const InteractionsOverview = () => {
   const { topicId, customerId } = useParams();
@@ -102,10 +106,11 @@ const InteractionsOverview = () => {
         </InputContainer>
       </InputOutputContainer>
       <Div style={{ background: '#fdfbfe' }} mb="1%" height="65%">
-        <InteractionsView
+        <InteractionsTable
+          headers={HEADERS}
           gridProperties={{ ...activeGridProperties, pageCount, pageIndex }}
           onGridPropertiesChange={setActiveGridProperties}
-          interactions={interactions}
+          data={interactions}
         />
       </Div>
     </Div>
