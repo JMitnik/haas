@@ -39,7 +39,7 @@ const DatePickerFilter = ({ activeStartDate, activeEndDate, setIsActive } : Date
       {`${format(activeStartDate, 'dd-MMM-yyyy')} until ${format(activeEndDate, 'dd-MMM-yyyy')}`}
     </Div>
 )}
-    <Calendar style={{ marginLeft: '10px', color: '#6d767d' }} />
+    <Calendar color="#6d767d" style={{ marginLeft: '10px' }} />
   </Div>
     )
 

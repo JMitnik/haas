@@ -1,4 +1,4 @@
-import { Div, Grid, H3, Span } from '@haas/ui';
+import { Grid } from '@haas/ui';
 import React from 'react'
 
 import HeaderColumnComponent from './HeaderColumnComponent';

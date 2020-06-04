@@ -22,11 +22,11 @@ const SearchBarComponent = ({ activeSearchTerm, handleSearchTermChange }: Search
     );
 
     return (
-      <Div padding={15} style={{ borderRadius: '90px' }} useFlex flexDirection="row" alignItems="center" backgroundColor="#f1f5f8">
+      <Div padding={15} borderRadius="90px" useFlex flexDirection="row" alignItems="center" backgroundColor="#f1f5f8">
         { !isActive && (
         <Div useFlex alignItems="center" onClick={() => setIsActive(true)}>
-          <Div style={{ color: '#6d767d' }}>SEARCH</Div>
-          <Search style={{ color: '#6d767d', marginLeft: '10px' }} />
+          <Div color="#6d767d">SEARCH</Div>
+          <Search color="#6d767d" style={{ marginLeft: '10px' }} />
         </Div>
         )}
         { isActive && (
@@ -35,7 +35,7 @@ const SearchBarComponent = ({ activeSearchTerm, handleSearchTermChange }: Search
             defaultValue={activeSearchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-          <XCircle onClick={() => setIsActive(false)} style={{ color: '#6d767d', marginLeft: '10px' }} />
+          <XCircle onClick={() => setIsActive(false)} color="#6d767d" style={{ marginLeft: '10px' }} />
         </Div>
         )}
       </Div>

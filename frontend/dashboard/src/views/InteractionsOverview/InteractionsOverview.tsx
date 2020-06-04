@@ -3,7 +3,7 @@ import { useParams } from 'react-router';
 import Papa from 'papaparse';
 import React, { useEffect, useState } from 'react';
 
-import { Div, H2, Muted } from '@haas/ui';
+import { Div, H2, Muted, Span } from '@haas/ui';
 import InteractionsTable from 'views/InteractionsOverview/Table';
 import getInteractionsQuery from 'queries/getInteractionsQuery'
 
@@ -90,10 +90,10 @@ const InteractionsOverview = () => {
       <InputOutputContainer mb="5%">
         <OutputContainer>
           <Div justifyContent="center" marginRight="15px">
-            <Muted style={{ fontWeight: 'bold' }}>Exports</Muted>
+            <Muted fontWeight="bold">Exports</Muted>
           </Div>
-          <Div padding="8px 36px" style={{ cursor: 'pointer', borderRadius: '90px' }} onClick={handleExport} useFlex flexDirection="row" alignItems="center" backgroundColor="#c4c4c4">
-            <Div style={{ fontWeight: 'bold' }}>CSV</Div>
+          <Div padding="8px 36px" borderRadius="90px" style={{ cursor: 'pointer' }} onClick={handleExport} useFlex flexDirection="row" alignItems="center" backgroundColor="#c4c4c4">
+            <Span fontWeight="bold">CSV</Span>
           </Div>
         </OutputContainer>
         <InputContainer>
@@ -105,7 +105,7 @@ const InteractionsOverview = () => {
           <SearchBarComponent activeSearchTerm={activeGridProperties.activeSearchTerm} handleSearchTermChange={handleSearchTermChange} />
         </InputContainer>
       </InputOutputContainer>
-      <Div style={{ background: '#fdfbfe' }} mb="1%" height="65%">
+      <Div backgroundColor="#fdfbfe" mb="1%" height="65%">
         <InteractionsTable
           headers={HEADERS}
           gridProperties={{ ...activeGridProperties, pageCount, pageIndex }}

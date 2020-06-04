@@ -25,7 +25,7 @@ const DatePickerComponent = ({ activeStartDate, activeEndDate, handleDateChange 
         />
             )}
         { isActive && (
-        <Div padding={15} style={{ borderRadius: '90px' }} useFlex flexDirection="row" backgroundColor="#f1f5f8">
+        <Div padding={15} borderRadius="90px" useFlex flexDirection="row" backgroundColor="#f1f5f8">
           <DatePicker
             selected={activeStartDate}
             onChange={(date) => date !== activeStartDate && handleDateChange(date, activeEndDate)}
@@ -43,7 +43,7 @@ const DatePickerComponent = ({ activeStartDate, activeEndDate, handleDateChange 
             endDate={activeEndDate}
             minDate={activeStartDate}
           />
-          <XCircle onClick={() => setIsActive(false)} style={{ color: '#6d767d', marginLeft: '10px' }} />
+          <XCircle onClick={() => setIsActive(false)} color="#6d767d" style={{ marginLeft: '10px' }} />
         </Div>
                 )}
       </Div>

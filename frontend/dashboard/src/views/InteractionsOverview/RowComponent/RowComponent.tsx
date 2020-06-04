@@ -18,6 +18,7 @@ const RowComponent = ({ headers, data, index }: RowComponentProps) => {
         { headers && headers.map(({ accessor, Cell }) => {
             const result = Object.entries(data).find((property) => property[0] === accessor);
             if (result) return <Cell value={result[1]} key={`${index}-${result[0]}`} />
+            return null
         })}
         { isExpanded && (
         <Div useFlex flexDirection="column" backgroundColor="#f0f0f0" gridColumn="1 / -1">
@@ -54,7 +55,15 @@ const RowComponent = ({ headers, data, index }: RowComponentProps) => {
                 return (
                   <Div marginBottom={20} useFlex flexDirection="column" key={`${id}-${index}`}>
                     <Div useFlex flexDirection="row">
-                      <Div zIndex={1} alignSelf="center" padding={8} marginRight="10%" style={{ background: '#f0f0f0', borderRadius: '90px', border: '1px solid #c0bcbb' }}>
+                      <Div
+                        zIndex={1}
+                        alignSelf="center"
+                        padding={8}
+                        marginRight="10%"
+                        backgroundColor="#f0f0f0"
+                        borderRadius="90px"
+                        border="1px solid #c0bcbb"
+                      >
                         { relatedNode?.type === 'SLIDER' ? <SliderNodeIcon /> : <MultiChoiceNodeIcon /> }
                       </Div>
                       <Div useFlex flexDirection="column">
