@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 
 import { Div, Grid, H4, H5, Hr, Span } from '@haas/ui';
+import { RowComponentProps } from 'components/Table/RowComponentInterfaces';
 import MultiChoiceNodeIcon from 'components/Icons/MultiChoiceNodeIcon';
 import SliderNodeIcon from 'components/Icons/SliderNodeIcon';
 
 import { InteractionDetailQuestionEntry } from '../InteractionOverviewStyles';
-import { RowComponentProps } from './RowComponentInterfaces';
 
 const RowComponent = ({ headers, data, index }: RowComponentProps) => {
     const [isExpanded, setIsExpanded] = useState(false);

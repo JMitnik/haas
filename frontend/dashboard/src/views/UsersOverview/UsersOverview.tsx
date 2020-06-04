@@ -1,17 +1,15 @@
 import { useLazyQuery } from '@apollo/react-hooks';
 import { useParams } from 'react-router';
-import Papa from 'papaparse';
 import React, { useEffect, useState } from 'react';
 
-import { Div, H2, Muted, Span } from '@haas/ui';
-import InteractionsTable from 'views/InteractionsOverview/InteractionsTable';
+import { Div, H2 } from '@haas/ui';
+import DatePickerComponent from 'components/DatePicker/DatePickerComponent';
+import SearchBarComponent from 'components/SearchBar/SearchBarComponent';
+import UsersTable from 'views/UsersOverview/UsersTable';
 import getInteractionsQuery from 'queries/getInteractionsQuery'
 
 import { CenterCell, ScoreCell, UserCell, WhenCell } from 'components/Table/CellComponents/CellComponents';
-import DatePickerComponent from 'components/DatePicker/DatePickerComponent';
-import SearchBarComponent from 'components/SearchBar/SearchBarComponent';
-
-import { InputContainer, InputOutputContainer, OutputContainer } from './InteractionOverviewStyles';
+import { InputContainer, InputOutputContainer } from './UsersOverviewStyles';
 
 interface TableProps {
   activeStartDate: Date | null;
@@ -25,11 +23,11 @@ interface TableProps {
   }[]
 }
 
-const HEADERS = [{ Header: 'SCORE', accessor: 'score', Cell: ScoreCell },
-{ Header: 'PATHS', accessor: 'paths', Cell: CenterCell }, { Header: 'USER', accessor: 'id', Cell: UserCell }, { Header: 'WHEN', accessor: 'createdAt', Cell: WhenCell }]
+const HEADERS = [{ Header: 'First name', accessor: 'firstName', Cell: CenterCell },
+{ Header: 'Last name', accessor: 'lastName', Cell: CenterCell }, { Header: 'Email', accessor: 'email', Cell: CenterCell }, { Header: 'Role', accessor: 'role', Cell: CenterCell }]
 
-const InteractionsOverview = () => {
-  const { topicId, customerId } = useParams();
+const UsersOverview = () => {
+  const { customerId } = useParams();
   const [fetchInteractions, { loading, data }] = useLazyQuery(getInteractionsQuery, { fetchPolicy: 'cache-and-network' });
   const [activeGridProperties, setActiveGridProperties] = useState<TableProps>(
     {
@@ -44,23 +42,23 @@ const InteractionsOverview = () => {
 
   const interactions = data?.interactions?.sessions || []
 
-  useEffect(() => {
-    const { activeStartDate, activeEndDate, pageIndex, pageSize, sortBy, activeSearchTerm } = activeGridProperties;
-    fetchInteractions({
-      variables: {
-        dialogueId: topicId,
-        filter: {
-          startDate: activeStartDate,
-          endDate: activeEndDate,
-          searchTerm: activeSearchTerm,
-          offset: pageIndex * pageSize,
-          limit: pageSize,
-          pageIndex,
-          orderBy: sortBy,
-        },
-      },
-    })
-  }, [activeGridProperties])
+//   useEffect(() => {
+//     const { activeStartDate, activeEndDate, pageIndex, pageSize, sortBy, activeSearchTerm } = activeGridProperties;
+//     fetchInteractions({
+//       variables: {
+//         dialogueId: topicId,
+//         filter: {
+//           startDate: activeStartDate,
+//           endDate: activeEndDate,
+//           searchTerm: activeSearchTerm,
+//           offset: pageIndex * pageSize,
+//           limit: pageSize,
+//           pageIndex,
+//           orderBy: sortBy,
+//         },
+//       },
+//     })
+//   }, [activeGridProperties])
 
   const handleSearchTermChange = (newSearchTerm: string) => {
     setActiveGridProperties((prevValues) => ({ ...prevValues, activeSearchTerm: newSearchTerm }));
@@ -70,33 +68,13 @@ const InteractionsOverview = () => {
     setActiveGridProperties((prevValues) => ({ ...prevValues, activeStartDate: startDate, activeEndDate: endDate }))
   }
 
-  const handleExport = () => {
-    const csv = Papa.unparse(interactions);
-    const csvData = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const csvUrl = window.URL.createObjectURL(csvData);
-    const tempLink = document.createElement('a');
-    tempLink.href = csvUrl;
-    const currDate = new Date().getTime();
-    tempLink.setAttribute('download', `${currDate}-${customerId}-${topicId}.csv`);
-    tempLink.click();
-    tempLink.remove();
-  }
-
   const pageCount = data?.interactions?.pages || 1;
   const pageIndex = data?.interactions?.pageIndex || 0;
 
   return (
     <Div px="24px" margin="0 auto" width="100vh" height="100vh" maxHeight="100vh" overflow="hidden">
-      <H2 color="#3653e8" fontWeight={400} mb="10%"> Interactions </H2>
+      <H2 color="#3653e8" fontWeight={400} mb="10%">Users and roles</H2>
       <InputOutputContainer mb="5%">
-        <OutputContainer>
-          <Div justifyContent="center" marginRight="15px">
-            <Muted fontWeight="bold">Exports</Muted>
-          </Div>
-          <Div padding="8px 36px" borderRadius="90px" style={{ cursor: 'pointer' }} onClick={handleExport} useFlex flexDirection="row" alignItems="center" backgroundColor="#c4c4c4">
-            <Span fontWeight="bold">CSV</Span>
-          </Div>
-        </OutputContainer>
         <InputContainer>
           <DatePickerComponent
             activeStartDate={activeGridProperties.activeStartDate}
@@ -107,7 +85,7 @@ const InteractionsOverview = () => {
         </InputContainer>
       </InputOutputContainer>
       <Div backgroundColor="#fdfbfe" mb="1%" height="65%">
-        <InteractionsTable
+        <UsersTable
           headers={HEADERS}
           gridProperties={{ ...activeGridProperties, pageCount, pageIndex }}
           onGridPropertiesChange={setActiveGridProperties}
@@ -118,4 +96,4 @@ const InteractionsOverview = () => {
   )
 }
 
-export default InteractionsOverview;
+export default UsersOverview;

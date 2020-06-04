@@ -4,7 +4,7 @@ import DatePicker from "react-datepicker";
 import React, { useState } from 'react';
 
 import { Div } from '@haas/ui';
-import DatePickerFilter from 'components/DatePickerFilter';
+import DatePickerFilter from 'components/DatePicker/DatePickerFilter';
 
 interface DatePickerProps {
     activeStartDate: Date | null;
