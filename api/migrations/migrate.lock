@@ -6,3 +6,6 @@
 20200512103521-init
 20200604132444
 20200604132506-added-users-and-roles
+20200604154600-made-update-at-user-optional
+20200604154747-removed-edited-at-field-user
+20200604160400-made-email-field-unique-in-db

@@ -1,6 +1,6 @@
 datasource postgresql {
   provider = "postgresql"
-  url      = env("DB_STRING")
+  url = "***"
 }
 
 // binaryTargets = ["debian-openssl-1.1.x"]
@@ -182,7 +182,7 @@ model User {
   id         String    @default(cuid()) @id
   createdAt  DateTime  @default(now())
   updatedAt  DateTime?  @updatedAt
-  email      String     @unique
+  email      String
   phone      String?
   firstName  String?
   lastName   String?
