@@ -1,6 +1,6 @@
 import { useQuery } from '@apollo/react-hooks';
 import { useRouteMatch } from 'react-router-dom';
-import React, { useContext, useEffect, useReducer } from 'react';
+import React, { useCallback, useContext, useEffect, useReducer } from 'react';
 import gql from 'graphql-tag';
 
 import { CustomerFragment } from 'queries/CustomerFragment';
@@ -98,13 +98,13 @@ export const ProjectProvider = ({ children }: { children: React.ReactNode }) => 
     dispatchProjectState({ type: 'setCustomer', payload: { customer } });
   };
 
-  const setDialogue = (dialogue: Dialogue) => {
+  const setDialogue = (dialogue: Dialogue | null) => {
     dispatchProjectState({ type: 'setDialogue', payload: { dialogue } });
   };
 
-  const setCustomerAndDialogue = (customer: any, dialogue: Dialogue) => {
+  const setCustomerAndDialogue = useCallback((customer: any, dialogue: Dialogue | null) => {
     dispatchProjectState({ type: 'setCustomerAndDialogue', payload: { dialogue, customer } });
-  };
+  }, []);
 
   const customerMatch = useRouteMatch<any>('/:customerSlug');
   const dialogueMatch = useRouteMatch<any>('/:customerSlug/:dialogueId');
@@ -139,7 +139,14 @@ export const ProjectProvider = ({ children }: { children: React.ReactNode }) => 
     if (dialogueData) {
       setCustomerAndDialogue(dialogueData.dialogue.customer, dialogueData.dialogue);
     }
-  }, [dialogueData]);
+  }, [dialogueData, setCustomerAndDialogue]);
+
+  useEffect(() => {
+    if (customer && !customerMatch) {
+      console.log('Setting customer and dialogue to null');
+      setCustomerAndDialogue(null, null);
+    }
+  }, [customer, customerMatch, setCustomerAndDialogue]);
 
   return (
     <ProjectContext.Provider value={{

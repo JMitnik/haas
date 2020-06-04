@@ -6,6 +6,7 @@ import { HAASNode } from 'types/generic';
 import { Variants, motion } from 'framer-motion';
 import Loader from 'components/Loader';
 // import NodeView from 'views/NodeView';
+import { onPatch } from 'mobx-state-tree';
 import NodeView from 'views/NodeView';
 import useDialogueTree from 'providers/DialogueTreeProvider';
 

@@ -4,8 +4,8 @@ export interface ProjectContextProps {
   customer: any | null;
   dialogue: Dialogue | null;
   setCustomer: (customer: any) => void;
-  setDialogue: (dialogue: Dialogue) => void;
-  setCustomerAndDialogue: (customer: any, dialogue: Dialogue) => void;
+  setDialogue: (dialogue: Dialogue | null) => void;
+  setCustomerAndDialogue: (customer: any, dialogue: Dialogue | null) => void;
 }
 
 export interface ProjectStateProps {
@@ -18,12 +18,12 @@ export interface ProjectActionSetCustomerProps {
 }
 
 export interface ProjectActionSetDialogueProps {
-  dialogue: Dialogue;
+  dialogue: Dialogue | null;
 }
 
 export interface ProjectActionSetCustomerAndDialogueProps {
   customer: any;
-  dialogue: Dialogue;
+  dialogue: Dialogue | null;
 }
 
 export type ProjectActionProps = {
