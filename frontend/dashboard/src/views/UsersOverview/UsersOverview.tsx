@@ -7,8 +7,9 @@ import DatePickerComponent from 'components/DatePicker/DatePickerComponent';
 import SearchBarComponent from 'components/SearchBar/SearchBarComponent';
 import UsersTable from 'views/UsersOverview/UsersTable';
 import getInteractionsQuery from 'queries/getInteractionsQuery'
+import getUsersQuery from 'queries/getUsers';
 
-import { CenterCell, ScoreCell, UserCell, WhenCell } from 'components/Table/CellComponents/CellComponents';
+import { CenterCell, RoleCell, ScoreCell, UserCell, WhenCell } from 'components/Table/CellComponents/CellComponents';
 import { InputContainer, InputOutputContainer } from './UsersOverviewStyles';
 
 interface TableProps {
@@ -24,11 +25,11 @@ interface TableProps {
 }
 
 const HEADERS = [{ Header: 'First name', accessor: 'firstName', Cell: CenterCell },
-{ Header: 'Last name', accessor: 'lastName', Cell: CenterCell }, { Header: 'Email', accessor: 'email', Cell: CenterCell }, { Header: 'Role', accessor: 'role', Cell: CenterCell }]
+{ Header: 'Last name', accessor: 'lastName', Cell: CenterCell }, { Header: 'Email', accessor: 'email', Cell: CenterCell }, { Header: 'Role', accessor: 'role', Cell: RoleCell }]
 
 const UsersOverview = () => {
   const { customerId } = useParams();
-  const [fetchInteractions, { loading, data }] = useLazyQuery(getInteractionsQuery, { fetchPolicy: 'cache-and-network' });
+  const [fetchUsers, { loading, data }] = useLazyQuery(getUsersQuery, { fetchPolicy: 'cache-and-network' });
   const [activeGridProperties, setActiveGridProperties] = useState<TableProps>(
     {
       activeStartDate: null,
@@ -40,25 +41,25 @@ const UsersOverview = () => {
     },
   );
 
-  const interactions = data?.interactions?.sessions || []
-
-//   useEffect(() => {
-//     const { activeStartDate, activeEndDate, pageIndex, pageSize, sortBy, activeSearchTerm } = activeGridProperties;
-//     fetchInteractions({
-//       variables: {
-//         dialogueId: topicId,
-//         filter: {
-//           startDate: activeStartDate,
-//           endDate: activeEndDate,
-//           searchTerm: activeSearchTerm,
-//           offset: pageIndex * pageSize,
-//           limit: pageSize,
-//           pageIndex,
-//           orderBy: sortBy,
-//         },
-//       },
-//     })
-//   }, [activeGridProperties])
+  const tableData: any = data?.users || [];
+  console.log('USERS: ', data?.users);
+  useEffect(() => {
+    const { activeStartDate, activeEndDate, pageIndex, pageSize, sortBy, activeSearchTerm } = activeGridProperties;
+    fetchUsers({
+      variables: {
+        customerId,
+        // filter: {
+        //   startDate: activeStartDate,
+        //   endDate: activeEndDate,
+        //   searchTerm: activeSearchTerm,
+        //   offset: pageIndex * pageSize,
+        //   limit: pageSize,
+        //   pageIndex,
+        //   orderBy: sortBy,
+        // },
+      },
+    })
+  }, [activeGridProperties])
 
   const handleSearchTermChange = (newSearchTerm: string) => {
     setActiveGridProperties((prevValues) => ({ ...prevValues, activeSearchTerm: newSearchTerm }));
@@ -68,8 +69,8 @@ const UsersOverview = () => {
     setActiveGridProperties((prevValues) => ({ ...prevValues, activeStartDate: startDate, activeEndDate: endDate }))
   }
 
-  const pageCount = data?.interactions?.pages || 1;
-  const pageIndex = data?.interactions?.pageIndex || 0;
+  const pageCount = data?.getUsers?.pages || 1;
+  const pageIndex = data?.getUsers?.pageIndex || 0;
 
   return (
     <Div px="24px" margin="0 auto" width="100vh" height="100vh" maxHeight="100vh" overflow="hidden">
@@ -89,7 +90,7 @@ const UsersOverview = () => {
           headers={HEADERS}
           gridProperties={{ ...activeGridProperties, pageCount, pageIndex }}
           onGridPropertiesChange={setActiveGridProperties}
-          data={interactions}
+          data={tableData}
         />
       </Div>
     </Div>

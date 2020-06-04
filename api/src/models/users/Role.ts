@@ -1,6 +1,7 @@
-import { NodeEntry, NodeEntryValue, NodeEntryWhereInput, PrismaClient, Session, SessionWhereInput } from '@prisma/client';
-import { PermissionType } from './Permission';
+import { PrismaClient } from '@prisma/client';
 import { extendType, inputObjectType, objectType } from '@nexus/schema';
+
+import { PermissionType } from './Permission';
 
 const prisma = new PrismaClient();
 

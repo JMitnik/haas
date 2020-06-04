@@ -224,7 +224,6 @@ export interface NexusGenRootTypes {
     firstName?: string | null; // String
     id: string; // ID!
     lastName?: string | null; // String
-    role: NexusGenRootTypes['RoleType']; // RoleType!
   }
   lineChartDataType: { // root type
     x: string; // String!
