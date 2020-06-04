@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 
 import { autorun } from 'mobx';
 import { makeCustomTheme } from 'utils/makeCustomerTheme';
-import { useObserver } from 'mobx-react-lite';
+import { motion } from 'framer-motion';
 import defaultTheme from 'config/theme';
 import useDialogueTree from './DialogueTreeProvider';
 
@@ -22,27 +22,27 @@ const ThemeProviders = ({ children }: ThemeProvidersProps) => {
     } else {
       setCustomTheme({});
     }
-  }), []);
+  }), [store.customer]);
 
-  return useObserver(() => {
-    if (customTheme) {
-      return (
-        <ThemeProvider theme={defaultTheme}>
-          <ThemeProvider theme={makeCustomTheme(defaultTheme, customTheme)}>
-            {children}
-          </ThemeProvider>
-        </ThemeProvider>
-      );
-    }
-
+  if (customTheme) {
     return (
-      <>
-        <ThemeProvider theme={defaultTheme}>
-          {children}
+      <ThemeProvider theme={defaultTheme}>
+        <ThemeProvider theme={makeCustomTheme(defaultTheme, customTheme)}>
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+            {children}
+          </motion.div>
         </ThemeProvider>
-      </>
+      </ThemeProvider>
     );
-  });
+  }
+
+  return (
+    <>
+      <ThemeProvider theme={defaultTheme}>
+        {children}
+      </ThemeProvider>
+    </>
+  );
 };
 
 export default ThemeProviders;
