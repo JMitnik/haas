@@ -165,6 +165,7 @@ type Mutation {
   editCustomer(id: String, options: CustomerCreateOptions): Customer!
   editDialogue(description: String, dialogueId: String, publicTitle: String, title: String): Dialogue!
   singleUpload(file: Upload): ImageType!
+  updateRoles(permissions: PermissionIdsInput, roleId: String): RoleType!
   updateTopicBuilder(id: String, topicData: TopicDataEntry): String!
   updateUser(id: String, input: UserInput): UserType!
   uploadUserSession(uploadUserSessionInput: UploadUserSessionInput): Session!
@@ -196,7 +197,12 @@ input OptionInput {
   value: String
 }
 
+input PermissionIdsInput {
+  ids: [String!]
+}
+
 input PermissionInput {
+  customerId: String
   description: String
   name: String
 }

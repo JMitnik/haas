@@ -13,8 +13,22 @@ export const RoleType = objectType({
     t.string('name');
     t.list.field('permissions', {
       type: PermissionType,
-      resolve(parent: Role, args: any, ctx: any) {
-        return prisma.permission.findMany({ where: { roleId: parent.id } });
+      async resolve(parent: Role, args: any, ctx: any) {
+        const customerPermissions = await prisma.permission.findMany({
+          where: { customerId: parent.customerId },
+          include: {
+            isPermissionOfRole: {
+              select: {
+                id: true,
+              },
+            },
+          },
+        });
+        const activePermissions = customerPermissions.filter((permission) => {
+          const activeRoleIds = permission.isPermissionOfRole.map((role) => role.id);
+          return activeRoleIds.includes(parent.id);
+        });
+        return activePermissions;
       },
     });
     t.int('amtPermissions');
@@ -64,6 +78,13 @@ export const RoleQueries = extendType({
   },
 });
 
+export const PermissionIdsInput = inputObjectType({
+  name: 'PermissionIdsInput',
+  definition(t) {
+    t.list.string('ids');
+  },
+});
+
 export const RoleMutations = extendType({
   type: 'Mutation',
   definition(t) {
@@ -85,6 +106,25 @@ export const RoleMutations = extendType({
             },
           },
         });
+      },
+    });
+    t.field('updateRoles', {
+      type: RoleType,
+      args: { roleId: 'String', permissions: PermissionIdsInput },
+      async resolve(parent: any, args: any, ctx: any) {
+        const { roleId, permissions } = args;
+        const { ids }: { ids: Array<string> } = permissions;
+        const updateRole = await prisma.role.update({
+          where: {
+            id: roleId,
+          },
+          data: {
+            permissions: {
+              connect: ids.map((id) => ({ id })),
+            },
+          },
+        });
+        return updateRole;
       },
     });
   },

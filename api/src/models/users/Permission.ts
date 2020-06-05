@@ -15,6 +15,7 @@ export const PermissionType = objectType({
 export const PermissionInput = inputObjectType({
   name: 'PermissionInput',
   definition(t) {
+    t.string('customerId');
     t.string('name');
     t.string('description', { nullable: true });
   },
@@ -27,11 +28,16 @@ export const PermissionMutations = extendType({
       type: PermissionType,
       args: { data: PermissionInput },
       resolve(parent: any, args: any, ctx) {
-        const { name, description } = args.data;
+        const { name, description, customerId } = args.data;
         return prisma.permission.create({
           data: {
             name,
             description,
+            Customer: {
+              connect: {
+                id: customerId,
+              },
+            },
           },
         });
       },

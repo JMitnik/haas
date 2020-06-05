@@ -64,7 +64,11 @@ export interface NexusGenInputs {
     publicValue?: string | null; // String
     value?: string | null; // String
   }
+  PermissionIdsInput: { // input type
+    ids?: string[] | null; // [String!]
+  }
   PermissionInput: { // input type
+    customerId?: string | null; // String
     description?: string | null; // String
     name?: string | null; // String
   }
@@ -250,6 +254,7 @@ export interface NexusGenAllTypes extends NexusGenRootTypes {
   InteractionFilterInput: NexusGenInputs['InteractionFilterInput'];
   LeafNodeInput: NexusGenInputs['LeafNodeInput'];
   OptionInput: NexusGenInputs['OptionInput'];
+  PermissionIdsInput: NexusGenInputs['PermissionIdsInput'];
   PermissionInput: NexusGenInputs['PermissionInput'];
   QuestionConditionInput: NexusGenInputs['QuestionConditionInput'];
   QuestionInput: NexusGenInputs['QuestionInput'];
@@ -370,6 +375,7 @@ export interface NexusGenFieldTypes {
     editCustomer: NexusGenRootTypes['Customer']; // Customer!
     editDialogue: NexusGenRootTypes['Dialogue']; // Dialogue!
     singleUpload: NexusGenRootTypes['ImageType']; // ImageType!
+    updateRoles: NexusGenRootTypes['RoleType']; // RoleType!
     updateTopicBuilder: string; // String!
     updateUser: NexusGenRootTypes['UserType']; // UserType!
     uploadUserSession: NexusGenRootTypes['Session']; // Session!
@@ -521,6 +527,10 @@ export interface NexusGenArgTypes {
     singleUpload: { // args
       file?: any | null; // Upload
     }
+    updateRoles: { // args
+      permissions?: NexusGenInputs['PermissionIdsInput'] | null; // PermissionIdsInput
+      roleId?: string | null; // String
+    }
     updateTopicBuilder: { // args
       id?: string | null; // String
       topicData?: NexusGenInputs['TopicDataEntry'] | null; // TopicDataEntry
@@ -589,7 +599,7 @@ export interface NexusGenInheritedFields {}
 
 export type NexusGenObjectNames = "ColourSettings" | "Customer" | "CustomerSettings" | "Dialogue" | "DialogueDetailResult" | "Edge" | "EdgeCondition" | "FontSettings" | "ImageType" | "InteractionSessionType" | "InteractionType" | "Mutation" | "NodeEntry" | "NodeEntryValue" | "PermssionType" | "Query" | "QuestionNode" | "QuestionOption" | "RoleType" | "Session" | "SortFilterObject" | "UniqueDataResultEntry" | "UserType" | "lineChartDataType" | "topPathType";
 
-export type NexusGenInputNames = "CustomerCreateOptions" | "CustomerWhereUniqueInput" | "DialogueWhereUniqueInput" | "EdgeChildInput" | "EdgeNodeInput" | "InteractionFilterInput" | "LeafNodeInput" | "OptionInput" | "PermissionInput" | "QuestionConditionInput" | "QuestionInput" | "QuestionNodeWhereInput" | "QuestionNodeWhereUniqueInput" | "RoleDataInput" | "RoleInput" | "SessionWhereUniqueInput" | "SortFilterInputObject" | "TopicDataEntry" | "UploadUserSessionInput" | "UserInput" | "UserSessionEntryDataInput" | "UserSessionEntryInput";
+export type NexusGenInputNames = "CustomerCreateOptions" | "CustomerWhereUniqueInput" | "DialogueWhereUniqueInput" | "EdgeChildInput" | "EdgeNodeInput" | "InteractionFilterInput" | "LeafNodeInput" | "OptionInput" | "PermissionIdsInput" | "PermissionInput" | "QuestionConditionInput" | "QuestionInput" | "QuestionNodeWhereInput" | "QuestionNodeWhereUniqueInput" | "RoleDataInput" | "RoleInput" | "SessionWhereUniqueInput" | "SortFilterInputObject" | "TopicDataEntry" | "UploadUserSessionInput" | "UserInput" | "UserSessionEntryDataInput" | "UserSessionEntryInput";
 
 export type NexusGenEnumNames = never;
 

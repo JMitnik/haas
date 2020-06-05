@@ -1,0 +1,47 @@
+{
+  "version": "0.3.14-fixed",
+  "steps": [
+    {
+      "tag": "CreateField",
+      "model": "Permission",
+      "field": "isPermissionOfRole",
+      "type": "Role",
+      "arity": "List"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "Permission",
+          "field": "isPermissionOfRole"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "Permission",
+          "field": "isPermissionOfRole"
+        },
+        "directive": "relation"
+      },
+      "argument": "references",
+      "value": "[id]"
+    },
+    {
+      "tag": "DeleteField",
+      "model": "Permission",
+      "field": "Role"
+    },
+    {
+      "tag": "DeleteField",
+      "model": "Permission",
+      "field": "roleId"
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 datasource postgresql {
   provider = "postgresql"
-  url      = env("DB_STRING")
+  url = "***"
 }
 
 // binaryTargets = ["debian-openssl-1.1.x"]
@@ -177,7 +177,6 @@ model Permission {
 model Role {
   id          String       @default(cuid()) @id
   name        String
-  roleId      String?
   permissions Permission[] @relation(references: [id])
   User        User[]
   Customer    Customer?    @relation(fields: [customerId], references: [id])

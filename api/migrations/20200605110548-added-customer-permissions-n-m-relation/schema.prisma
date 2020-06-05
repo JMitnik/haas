@@ -1,6 +1,6 @@
 datasource postgresql {
   provider = "postgresql"
-  url      = env("DB_STRING")
+  url = "***"
 }
 
 // binaryTargets = ["debian-openssl-1.1.x"]
@@ -166,18 +166,17 @@ model NodeEntryValue {
 }
 
 model Permission {
-  id                 String    @default(cuid()) @id
-  name               String
-  description        String?
-  isPermissionOfRole Role[]    @relation(references: [id])
-  Customer           Customer? @relation(fields: [customerId], references: [id])
-  customerId         String?
+  id          String    @default(cuid()) @id
+  name        String
+  description String?
+  Role        Role[]    @relation(references: [id])
+  Customer    Customer? @relation(fields: [customerId], references: [id])
+  customerId  String?
 }
 
 model Role {
   id          String       @default(cuid()) @id
   name        String
-  roleId      String?
   permissions Permission[] @relation(references: [id])
   User        User[]
   Customer    Customer?    @relation(fields: [customerId], references: [id])

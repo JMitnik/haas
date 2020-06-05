@@ -1,0 +1,26 @@
+{
+  "version": "0.3.14-fixed",
+  "steps": [
+    {
+      "tag": "CreateField",
+      "model": "Permission",
+      "field": "roleId",
+      "type": "String",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "Permission",
+          "field": "Role"
+        },
+        "directive": "relation"
+      },
+      "argument": "fields",
+      "value": "[roleId]"
+    }
+  ]
+}

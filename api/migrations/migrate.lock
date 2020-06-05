@@ -10,3 +10,8 @@
 20200604154747-removed-edited-at-field-user
 20200604160400-made-email-field-unique-in-db
 20200605091337-added-customer-to-role-relation
+20200605105852-made-role-permission-relation-many-to-many
+20200605110548-added-customer-permissions-n-m-relation
+20200605111212-re-added-role-id-field-on-permission
+20200605121357-changed-up-active-roles-of-permission
+20200605122046-jsdfkjsdfsd
