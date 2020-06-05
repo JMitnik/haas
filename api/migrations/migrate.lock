@@ -9,3 +9,4 @@
 20200604154600-made-update-at-user-optional
 20200604154747-removed-edited-at-field-user
 20200604160400-made-email-field-unique-in-db
+20200605091337-added-customer-to-role-relation

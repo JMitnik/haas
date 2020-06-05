@@ -219,6 +219,7 @@ type Query {
   lineChartData(dialogueId: String, limit: Int, numberOfDaysBack: Int, offset: Int): [lineChartDataType!]!
   questionNode(where: QuestionNodeWhereUniqueInput): QuestionNode!
   questionNodes: [QuestionNode!]!
+  roles(customerId: String): [RoleType!]!
   session(where: SessionWhereUniqueInput): Session!
   sessions(where: SessionWhereUniqueInput): [Session!]!
   users(customerId: String): [UserType!]!
@@ -285,6 +286,7 @@ input RoleInput {
 }
 
 type RoleType {
+  customer: Customer!
   id: ID!
   name: String!
   permissions: [PermssionType!]!
