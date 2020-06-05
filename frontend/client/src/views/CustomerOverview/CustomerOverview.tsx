@@ -11,7 +11,6 @@ const CustomerOverview = ({ customers }: { customers: any }) => {
 
   useEffect(() => {
     if (store.customer) {
-      console.log(`Customer has changed to ${store.customer}`);
       store.resetProject();
     }
   }, [store.customer, store.resetProject, store]);

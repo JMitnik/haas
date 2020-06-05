@@ -41,7 +41,7 @@ export const createDefaultPostLeafNode = () => {
   const node = TreeNodeModel.create({
     id: SpecialEdge.POST_LEAF_EDGE_ID,
     title: 'Thank you for participating',
-    type: 'FINISH',
+    type: 'POST_LEAF',
     isLeaf: true,
   });
 

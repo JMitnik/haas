@@ -8,8 +8,8 @@ import NodeLayout from 'layouts/NodeLayout';
 import useDialogueTree from 'providers/DialogueTreeProvider';
 
 import { GenericNodeProps } from './nodes/types';
-import FinishNode from './nodes/FinishNode/FinishNode';
 import MultiChoiceNode from './nodes/MultiChoiceNode/MultiChoiceNode';
+import PostLeafNode from './nodes/PostLeafNode/PostLeafNode';
 import RegisterNode from './nodes/RegisterNode/RegisterNode';
 import SliderNode from './nodes/SliderNode/SliderNode';
 import SocialShareNode from './nodes/SocialShareNode/SocialShareNode';
@@ -21,7 +21,7 @@ const nodeMap: Record<string, (props: GenericNodeProps) => JSX.Element> = {
   TEXTBOX: TextboxNode,
   SOCIAL_SHARE: SocialShareNode,
   REGISTRATION: RegisterNode,
-  FINISH: FinishNode,
+  POST_LEAF: PostLeafNode,
 };
 
 const NodeType = ({ node, onEntryStore }: GenericNodeProps) => {
