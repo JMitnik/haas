@@ -1,4 +1,4 @@
-import { Instance, isAlive, types } from 'mobx-state-tree';
+import { Instance, types } from 'mobx-state-tree';
 import { SpecialEdge, TreeNodeModel, TreeNodeProps, createDefaultPostLeafNode } from './TreeNodeModel';
 import { TreeEdgeModel, TreeEdgeProps } from './TreeEdgeModel';
 
@@ -50,7 +50,6 @@ const TreeModel = types
      * @param leaves
      */
     setInitialLeaves(leaves: TreeNodeProps[]) {
-      console.log(isAlive(self));
       const newLeaves = leaves.map((leaf) => TreeNodeModel.create({
         id: leaf.id,
         type: leaf.type,

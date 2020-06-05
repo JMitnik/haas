@@ -1,8 +1,9 @@
 import { CustomerFragment } from 'queries/CustomerFragment';
-import { Redirect, useHistory, useParams } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { useHistory, useParams } from 'react-router-dom';
 import { useQuery } from '@apollo/react-hooks';
 import Loader from 'components/Loader';
-import React from 'react';
+import React, { useEffect } from 'react';
 import gql from 'graphql-tag';
 
 const getCustomerFromSlug = gql`
@@ -32,16 +33,22 @@ const CustomerPage = () => {
     },
   });
 
+  useEffect(() => {
+    if (data) {
+      history.push(`/${customerSlug}/${data?.customer?.dialogues[0].id}`);
+    }
+  }, [data, customerSlug, history]);
+
+  // TODO: Clear this up better
+
   if (loading) return <Loader />;
   if (error) return <p>An error has occured, please try again</p>;
-
-  // Extract relevant questionnaire here, either default, first, or return to the selection
   if (!data?.customer?.dialogues) return <Loader />;
 
-  // setCustomer(data?.customer);
-
   return (
-    <Redirect to={`/${customerSlug}/${data?.customer?.dialogues[0].id}`} />
+    <motion.div exit={{ opacity: 1 }}>
+      <Loader />
+    </motion.div>
   );
 };
 

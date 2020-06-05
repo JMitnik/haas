@@ -7,7 +7,6 @@ import CustomerPage from 'pages/[customer]';
 import CustomersPage from 'pages/customers';
 import GlobalAppLayout from 'layouts/GlobalAppLayout';
 
-import DialogueTreePage from './[customer]/[dialogue]';
 import NodePage from './[customer]/[dialogue]/[node]';
 
 const AppRoutes = () => {
@@ -16,11 +15,8 @@ const AppRoutes = () => {
   return (
     <AnimatePresence exitBeforeEnter>
       <Switch key={location.pathname} location={location}>
-        <Route path="/:customerSlug/:dialogueId/:edgeId">
+        <Route path={['/:customerSlug/:dialogueId', '/:customerSlug/:dialogueId/:edgeId']}>
           <NodePage />
-        </Route>
-        <Route path="/:customerSlug/:dialogueId">
-          <DialogueTreePage />
         </Route>
         <Route path="/:customerSlug">
           <CustomerPage />
