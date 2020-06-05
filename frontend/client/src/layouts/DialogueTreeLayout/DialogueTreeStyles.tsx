@@ -1,9 +1,10 @@
 import Color from 'color';
 
 import { Container, Div } from '@haas/ui';
+import { motion } from 'framer-motion';
 import styled, { css } from 'styled-components/macro';
 
-export const DialogueContainer = styled(Div)`
+export const DialogueTreeContainer = styled(Div)`
   ${({ theme }) => css`
     background: ${theme.colors.primary};
     background: linear-gradient(45deg, ${Color(theme.colors.primary).darken(0.1).hex()}, ${Color(theme.colors.primary).lighten(0.4).hex()});
@@ -63,27 +64,29 @@ export const DialogueContainer = styled(Div)`
   `}
 `;
 
-export const GoBackButton = styled(Div)`
+export const GoBackContainer = styled(motion.div)`
   ${({ theme }) => css`
-    border-radius: 100%;
-    box-shadow: 1px;
     position: absolute;
     top: ${theme.gutter}px;
-    width: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 30px;
-    box-shadow: 0px 3px 1px 1px rgba(0, 0, 0, 0.10);
     left: ${theme.gutter}px;
-
-    color: white;
-
-    i, svg {
-      width: 25px;
-      line-height: 25px;
-      height: 25px;
-      font-size: 2em;
-    }
   `}
+`;
+
+export const GoBackButton = styled(Div)`
+  border-radius: 100%;
+  box-shadow: 1px;
+  width: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 30px;
+  box-shadow: 0px 3px 1px 1px rgba(0, 0, 0, 0.10);
+  color: white;
+
+  i, svg {
+    width: 25px;
+    line-height: 25px;
+    height: 25px;
+    font-size: 2em;
+  }
 `;

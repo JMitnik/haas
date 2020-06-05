@@ -1,17 +1,18 @@
-import React from 'react';
-
-import { GenericNodeProps } from 'views/NodeView/Nodes/NodeLayout/NodeLayout';
-import { Loader } from '@haas/ui';
 import { TreeNodeProps } from 'models/Tree/TreeNodeModel';
 import { useHistory } from 'react-router-dom';
+import React from 'react';
+
+import { Loader } from '@haas/ui';
 import DialogueTreeLayout from 'layouts/DialogueTreeLayout';
-import FinishNode from 'views/NodeView/Nodes/FinishNode/FinishNode';
-import MultiChoiceNode from 'views/NodeView/Nodes/MultiChoiceNode/MultiChoiceNode';
-import RegisterNode from 'views/NodeView/Nodes/RegisterNode/RegisterNode';
-import SliderNode from 'views/NodeView/Nodes/SliderNode/SliderNode';
-import SocialShareNode from 'views/NodeView/Nodes/SocialShareNode/SocialShareNode';
-import TextboxNode from 'views/NodeView/Nodes/TextboxNode/TextboxNode';
 import useDialogueTree from 'providers/DialogueTreeProvider';
+
+import { GenericNodeProps } from './nodes/NodeLayout/NodeLayout';
+import FinishNode from './nodes/FinishNode/FinishNode';
+import MultiChoiceNode from './nodes/MultiChoiceNode/MultiChoiceNode';
+import RegisterNode from './nodes/RegisterNode/RegisterNode';
+import SliderNode from './nodes/SliderNode/SliderNode';
+import SocialShareNode from './nodes/SocialShareNode/SocialShareNode';
+import TextboxNode from './nodes/TextboxNode/TextboxNode';
 
 const nodeMap: Record<string, (props: GenericNodeProps) => JSX.Element> = {
   SLIDER: SliderNode,
@@ -50,7 +51,7 @@ const NodeView = ({ node }: NodeViewProps) => {
   };
 
   return (
-    <DialogueTreeLayout>
+    <DialogueTreeLayout node={node}>
       <NodeType onEntryStore={handleEntryStore} node={node} />
     </DialogueTreeLayout>
   );
