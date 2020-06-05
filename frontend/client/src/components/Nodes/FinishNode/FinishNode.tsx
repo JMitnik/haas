@@ -6,7 +6,7 @@ import useDialogueFinish from 'hooks/use-dialogue-finish';
 import { FinishNodeContainer } from './FinishNodeStyles';
 
 const FinishNode = () => {
-  const { isFinished } = useDialogueFinish();
+  useDialogueFinish();
 
   return (
     <FinishNodeContainer>

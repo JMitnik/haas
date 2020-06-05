@@ -2,7 +2,6 @@ import { ApolloClient } from 'apollo-client';
 import { HttpLink } from 'apollo-link-http';
 import { InMemoryCache, NormalizedCacheObject, defaultDataIdFromObject } from 'apollo-cache-inmemory';
 import { toIdValue } from 'apollo-utilities';
-import schema from './schema';
 
 const cache: InMemoryCache = new InMemoryCache({
   dataIdFromObject: defaultDataIdFromObject,
@@ -42,7 +41,6 @@ const link = new HttpLink({
 const client: ApolloClient<NormalizedCacheObject> = new ApolloClient({
   cache,
   link,
-  typeDefs: schema,
 });
 
 export default client;
