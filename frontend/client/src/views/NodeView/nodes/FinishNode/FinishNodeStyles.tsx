@@ -1,8 +1,6 @@
+import { Div } from '@haas/ui';
 import styled from 'styled-components/macro';
-import { ActiveNodeContainer } from '../NodeLayout/NodeStyles';
 
-export const FinishNodeContainer = styled(ActiveNodeContainer)`
-  height: 100%;
+export const FinishNodeContainer = styled(Div)`
   justify-content: center;
-  margin-top: 175px;
 `;

@@ -1,8 +1,7 @@
-import { H3, H2 } from '@haas/ui';
+import { Div, H2, H3 } from '@haas/ui';
 import styled, { css } from 'styled-components/macro';
-import { ActiveNodeContainer } from '../NodeLayout/NodeStyles';
 
-export const TextboxContainer = styled(ActiveNodeContainer)`
+export const TextboxContainer = styled(Div)`
   ${({ theme }) => css`
     height: 100%;
 

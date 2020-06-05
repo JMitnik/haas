@@ -2,10 +2,11 @@ import { Variants, motion } from 'framer-motion';
 import React from 'react';
 
 import { ClientButton } from 'components/Buttons/Buttons';
-import { Div, H2, H5 } from '@haas/ui';
+import { Div, H5 } from '@haas/ui';
+import { NodeTitle } from 'layouts/NodeLayout/NodeLayoutStyles';
 import { TreeNodeOptionProps } from 'models/Tree/TreeNodeOptionModel';
 
-import { GenericNodeProps } from '../NodeLayout/NodeLayout';
+import { GenericNodeProps } from '../types';
 import { MultiChoiceNodeContainer, MultiChoiceNodeGrid } from './MultiChoiceNodeStyles';
 
 type MultiChoiceNodeProps = GenericNodeProps;
@@ -46,7 +47,7 @@ const MultiChoiceNode = ({ node, onEntryStore }: MultiChoiceNodeProps) => {
 
   return (
     <MultiChoiceNodeContainer>
-      <H2>{node.title}</H2>
+      <NodeTitle>{node.title}</NodeTitle>
 
       <MultiChoiceNodeGrid
         variants={multiChoiceContainerAnimation}

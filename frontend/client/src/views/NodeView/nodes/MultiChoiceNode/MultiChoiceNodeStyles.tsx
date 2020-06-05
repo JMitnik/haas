@@ -1,11 +1,8 @@
+import { Div } from '@haas/ui';
 import { motion } from 'framer-motion';
 import styled, { css } from 'styled-components/macro';
 
-import { ActiveNodeContainer } from '../NodeLayout/NodeStyles';
-
-export const MultiChoiceNodeContainer = styled(ActiveNodeContainer)`
-  height: 100%;
-`;
+export const MultiChoiceNodeContainer = styled(Div)``;
 
 export const MultiChoiceNodeGrid = styled(motion.div)`
   ${({ theme }) => css`

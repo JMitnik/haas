@@ -1,6 +1,6 @@
 import { ChevronLeft } from 'react-feather';
 import { Container } from '@haas/ui';
-import { Variants, motion } from 'framer-motion';
+import { Variants } from 'framer-motion';
 import { useHistory } from 'react-router-dom';
 import React, { ReactNode } from 'react';
 
@@ -8,7 +8,7 @@ import { TreeNodeProps } from 'models/Tree/TreeNodeModel';
 import WatermarkLogo from 'components/WatermarkLogo';
 import useDialogueTree from 'providers/DialogueTreeProvider';
 
-import { DialogueTreeContainer, GoBackButton, GoBackContainer } from './DialogueTreeStyles';
+import { DialogueTreeContainer, GoBackButton, GoBackContainer, GoBackText } from './DialogueTreeStyles';
 
 const routerNavigationAnimation: Variants = {
   initial: {
@@ -37,9 +37,11 @@ const DialogueTreeLayout = ({ children, node }: { children: ReactNode, node:Tree
           <GoBackButton onClick={() => history.goBack()}>
             <ChevronLeft />
           </GoBackButton>
+          <GoBackText>Go back</GoBackText>
         </GoBackContainer>
       )}
-      <Container>
+
+      <Container pt={4}>
         {children}
       </Container>
 

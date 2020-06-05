@@ -64,29 +64,66 @@ export const DialogueTreeContainer = styled(Div)`
   `}
 `;
 
+export const GoBackText = styled.span`
+  opacity: 0;
+  font-size: 0.8rem;
+  color: white;
+  transition: all .3s cubic-bezier(.55,0,.1,1);
+`;
+
 export const GoBackContainer = styled(motion.div)`
   ${({ theme }) => css`
     position: absolute;
     top: ${theme.gutter}px;
     left: ${theme.gutter}px;
+
+    p, span {
+      position: absolute;
+      bottom: 0;
+      transform: translateX(-100%) translateY(100%);
+      left: 0;
+      opacity: 0;
+      width: 100px;
+      display: inline-block;
+      padding-top: ${theme.gutter / 2}px;
+    }
+
+    &:hover {
+      ${GoBackText} {
+        opacity: 1;
+        transform: translateX(0) translateY(100%);
+        transition: all .3s cubic-bezier(.55,0,.1,1);
+      }
+    }
   `}
 `;
 
-export const GoBackButton = styled(Div)`
-  border-radius: 100%;
-  box-shadow: 1px;
-  width: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 30px;
-  box-shadow: 0px 3px 1px 1px rgba(0, 0, 0, 0.10);
-  color: white;
+export const GoBackButton = styled.button`
+  ${({ theme }) => css`
+    cursor: pointer;
+    background: transparent;
+    border-radius: 100%;
+    box-shadow: 1px;
+    width: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    height: 30px;
+    box-shadow: 0px 3px 1px 1px rgba(0, 0, 0, 0.10);
+    color: white;
+    transition: all .3s cubic-bezier(.55,0,.1,1);
 
-  i, svg {
-    width: 25px;
-    line-height: 25px;
-    height: 25px;
-    font-size: 2em;
-  }
+    &:hover {
+      background: rgba(0, 0, 0, 0.05);
+      transition: all .3s cubic-bezier(.55,0,.1,1);
+    }
+
+    i, svg {
+      width: 25px;
+      line-height: 25px;
+      height: 25px;
+      font-size: 2em;
+    }
+  `}
 `;

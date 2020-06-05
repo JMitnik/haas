@@ -6,7 +6,7 @@ import { ButtonIcon } from '@haas/ui/src/Buttons';
 import { ClientButton } from 'components/Buttons/Buttons';
 import { Div, H2, H3, Textbox } from '@haas/ui';
 
-import { GenericNodeProps } from '../NodeLayout/NodeLayout';
+import { GenericNodeProps } from '../types';
 import { TextboxContainer } from './TextboxStyles';
 
 interface TextboxNodeProps extends GenericNodeProps {

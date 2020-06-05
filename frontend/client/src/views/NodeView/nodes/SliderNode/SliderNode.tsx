@@ -2,11 +2,12 @@ import { useAnimation } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import React from 'react';
 
-import { Div, H2 } from '@haas/ui';
+import { Div } from '@haas/ui';
 import { HAASFormEntry } from 'types/generic';
+import { NodeTitle } from 'layouts/NodeLayout/NodeLayoutStyles';
 import { cleanInt } from 'utils/cleanInt';
 
-import { GenericNodeProps } from '../NodeLayout/NodeLayout';
+import { GenericNodeProps } from '../types';
 import { SliderNodeContainer, SliderNodeValue } from './SliderNodeStyles';
 import Slider from './Slider';
 
@@ -67,7 +68,7 @@ const SliderNode = ({ node, onEntryStore }: SliderNodeProps) => {
   return (
     <SliderNodeContainer>
       <Div>
-        <H2>{node.title}</H2>
+        <NodeTitle>{node.title}</NodeTitle>
       </Div>
       <Div>
         <SliderNodeValue initial="initial" variants={sliderValueAnimeVariants} animate={controls}>

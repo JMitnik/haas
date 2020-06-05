@@ -2,11 +2,9 @@ import { motion } from 'framer-motion';
 import Color from 'color';
 import styled, { css } from 'styled-components/macro';
 
-import { ActiveNodeContainer } from '../NodeLayout/NodeStyles';
+import { Div } from '@haas/ui';
 
-export const SliderNodeContainer = styled(ActiveNodeContainer)`
-  height: 100%;
-`;
+export const SliderNodeContainer = styled(Div)``;
 
 export const SliderNodeValue = styled(motion.h3)`
   ${({ theme }) => css`

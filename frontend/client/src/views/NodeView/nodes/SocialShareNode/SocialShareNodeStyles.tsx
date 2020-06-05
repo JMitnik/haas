@@ -1,6 +1,8 @@
 import { Div } from '@haas/ui';
 import styled, { css } from 'styled-components/macro';
 
+export const SocialShareNodeContainer = styled(Div)``;
+
 export const ShareItem = styled(Div)`
   ${({ theme, bg }) => css`
     border-radius: 100%;

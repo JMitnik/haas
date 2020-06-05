@@ -4,9 +4,10 @@ import React from 'react';
 
 import { Loader } from '@haas/ui';
 import DialogueTreeLayout from 'layouts/DialogueTreeLayout';
+import NodeLayout from 'layouts/NodeLayout';
 import useDialogueTree from 'providers/DialogueTreeProvider';
 
-import { GenericNodeProps } from './nodes/NodeLayout/NodeLayout';
+import { GenericNodeProps } from './nodes/types';
 import FinishNode from './nodes/FinishNode/FinishNode';
 import MultiChoiceNode from './nodes/MultiChoiceNode/MultiChoiceNode';
 import RegisterNode from './nodes/RegisterNode/RegisterNode';
@@ -52,7 +53,9 @@ const NodeView = ({ node }: NodeViewProps) => {
 
   return (
     <DialogueTreeLayout node={node}>
-      <NodeType onEntryStore={handleEntryStore} node={node} />
+      <NodeLayout>
+        <NodeType onEntryStore={handleEntryStore} node={node} />
+      </NodeLayout>
     </DialogueTreeLayout>
   );
 };

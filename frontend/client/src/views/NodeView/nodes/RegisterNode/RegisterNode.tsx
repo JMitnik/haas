@@ -4,10 +4,11 @@ import React from 'react';
 
 import { ButtonIcon } from '@haas/ui/src/Buttons';
 import { ClientButton } from 'components/Buttons/Buttons';
-import { Div, Grid, H2 } from '@haas/ui';
-import { GenericNodeProps } from 'views/NodeView/nodes/NodeLayout/NodeLayout';
+import { Div, Grid } from '@haas/ui';
 import { InputField, InputGroup, InputLabel } from '@haas/ui/src/Form';
+import { NodeTitle } from 'layouts/NodeLayout/NodeLayoutStyles';
 
+import { GenericNodeProps } from '../types';
 import { RegisterNodeContainer } from './RegisterNodeStyles';
 
 type RegisterNodeProps = GenericNodeProps;
@@ -31,7 +32,7 @@ const RegisterNode = ({ node, onEntryStore }: RegisterNodeProps) => {
 
   return (
     <RegisterNodeContainer>
-      <H2>{node.title}</H2>
+      <NodeTitle>{node.title}</NodeTitle>
 
       <Div>
         <Grid gridTemplateColumns={['auto', 'repeat(auto-fit, minmax(100px, 1fr))']} gridGap="24px">

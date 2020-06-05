@@ -10,14 +10,12 @@ const FinishNode = () => {
 
   return (
     <FinishNodeContainer>
-      <Div>
-        <H2>Thank you for participating!</H2>
-        <H4 color="white" textAlign="center">
-          We will strive towards making you
-          {' '}
-          <i>happier.</i>
-        </H4>
-      </Div>
+      <H2 color="white">Thank you for participating!</H2>
+      <H4 color="white" textAlign="center">
+        We will strive towards making you
+        {' '}
+        <i>happier.</i>
+      </H4>
     </FinishNodeContainer>
   );
 };

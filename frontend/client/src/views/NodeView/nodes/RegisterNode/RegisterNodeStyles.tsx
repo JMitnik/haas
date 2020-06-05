@@ -1,12 +1,8 @@
+import { Div, H2 } from '@haas/ui';
 import styled, { css } from 'styled-components/macro';
-import { ActiveNodeContainer } from '../NodeLayout/NodeStyles';
-import { H2 } from '@haas/ui';
 
-export const RegisterNodeContainer = styled(ActiveNodeContainer)`
+export const RegisterNodeContainer = styled(Div)`
   ${({ theme }) => css`
-    height: 100%;
-
-
     @media ${theme.media.mob} {
       ${H2} {
         font-size: 1.2em;
