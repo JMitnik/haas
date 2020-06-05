@@ -5,7 +5,7 @@ import React from 'react';
 import { ButtonIcon } from '@haas/ui/src/Buttons';
 import { ClientButton } from 'components/Buttons/Buttons';
 import { Div, Grid, H2 } from '@haas/ui';
-import { GenericNodeProps } from 'components/Nodes/NodeLayout/NodeLayout';
+import { GenericNodeProps } from 'views/NodeView/Nodes/NodeLayout/NodeLayout';
 import { InputField, InputGroup, InputLabel } from '@haas/ui/src/Form';
 
 import { RegisterNodeContainer } from './RegisterNodeStyles';

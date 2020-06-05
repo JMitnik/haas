@@ -1,3 +1,3 @@
-import DialogueEnd from './DialogueEnd';
+import DialogueEndView from './DialogueEndView';
 
-export default DialogueEnd;
+export default DialogueEndView;

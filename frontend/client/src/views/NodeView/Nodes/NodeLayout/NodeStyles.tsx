@@ -1,4 +1,5 @@
 import styled, { css } from 'styled-components/macro';
+
 import { Div, H2 } from '@haas/ui';
 
 export const FloatingNodeContainer = styled(Div)`

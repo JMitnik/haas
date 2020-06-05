@@ -1,16 +1,16 @@
 import React from 'react';
 
-import { GenericNodeProps } from 'components/Nodes/NodeLayout/NodeLayout';
+import { GenericNodeProps } from 'views/NodeView/Nodes/NodeLayout/NodeLayout';
 import { Loader } from '@haas/ui';
 import { TreeNodeProps } from 'models/Tree/TreeNodeModel';
 import { useHistory } from 'react-router-dom';
 import DialogueTreeLayout from 'layouts/DialogueTreeLayout';
-import FinishNode from 'components/Nodes/FinishNode/FinishNode';
-import MultiChoiceNode from 'components/Nodes/MultiChoiceNode/MultiChoiceNode';
-import RegisterNode from 'components/Nodes/RegisterNode/RegisterNode';
-import SliderNode from 'components/Nodes/SliderNode/SliderNode';
-import SocialShareNode from 'components/Nodes/SocialShareNode/SocialShareNode';
-import TextboxNode from 'components/Nodes/TextboxNode/TextboxNode';
+import FinishNode from 'views/NodeView/Nodes/FinishNode/FinishNode';
+import MultiChoiceNode from 'views/NodeView/Nodes/MultiChoiceNode/MultiChoiceNode';
+import RegisterNode from 'views/NodeView/Nodes/RegisterNode/RegisterNode';
+import SliderNode from 'views/NodeView/Nodes/SliderNode/SliderNode';
+import SocialShareNode from 'views/NodeView/Nodes/SocialShareNode/SocialShareNode';
+import TextboxNode from 'views/NodeView/Nodes/TextboxNode/TextboxNode';
 import useDialogueTree from 'providers/DialogueTreeProvider';
 
 const nodeMap: Record<string, (props: GenericNodeProps) => JSX.Element> = {

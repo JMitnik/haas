@@ -1,7 +1,8 @@
-import styled, { css } from 'styled-components/macro';
-import Color from 'color';
-import { ActiveNodeContainer } from '../NodeLayout/NodeStyles';
 import { motion } from 'framer-motion';
+import Color from 'color';
+import styled, { css } from 'styled-components/macro';
+
+import { ActiveNodeContainer } from '../NodeLayout/NodeStyles';
 
 export const SliderNodeContainer = styled(ActiveNodeContainer)`
   height: 100%;
