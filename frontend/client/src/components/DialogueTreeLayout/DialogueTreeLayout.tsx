@@ -1,28 +1,16 @@
-import { Container } from '@haas/ui';
-import React, { ReactNode, useEffect } from 'react';
-
-import Loader from 'components/Loader';
-import WatermarkLogo from 'components/WatermarkLogo';
-
 import { ChevronLeft } from 'react-feather';
+import { Container } from '@haas/ui';
 import { useHistory } from 'react-router-dom';
+import React, { ReactNode } from 'react';
+
+import WatermarkLogo from 'components/WatermarkLogo';
+import useDialogueTree from 'providers/DialogueTreeProvider';
+
 import { DialogueContainer, GoBackButton } from './DialogueTreeStyles';
 
 const DialogueTreeLayout = ({ children }: { children: ReactNode }) => {
   const history = useHistory();
-
-  // // Customize app for customer
-  // useEffect(() => {
-  //   if (customer?.name) {
-  //     window.document.title = `${customer?.name} | Powered by HAAS`;
-  //   }
-
-  //   if (customer?.settings) {
-  //     // setCustomTheme(customerTheme);
-  //   }
-  // }, [customer]);
-
-  // if (!customer) return <Loader />;
+  const store = useDialogueTree();
 
   return (
     <DialogueContainer>
@@ -33,7 +21,7 @@ const DialogueTreeLayout = ({ children }: { children: ReactNode }) => {
         {children}
       </Container>
 
-      {/* {!!customer && <WatermarkLogo logoUrl={customer.settings.logoUrl} />} */}
+      {!!store.customer && <WatermarkLogo logoUrl={store.customer?.settings?.logoUrl} />}
     </DialogueContainer>
   );
 };

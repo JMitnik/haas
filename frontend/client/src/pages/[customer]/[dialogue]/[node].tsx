@@ -1,12 +1,10 @@
+import { Variants, motion } from 'framer-motion';
 import { observer, useObserver } from 'mobx-react-lite';
 import { useParams } from 'react-router-dom';
 import React from 'react';
 
 import { HAASNode } from 'types/generic';
-import { Variants, motion } from 'framer-motion';
 import Loader from 'components/Loader';
-// import NodeView from 'views/NodeView';
-import { onPatch } from 'mobx-state-tree';
 import NodeView from 'views/NodeView';
 import useDialogueTree from 'providers/DialogueTreeProvider';
 

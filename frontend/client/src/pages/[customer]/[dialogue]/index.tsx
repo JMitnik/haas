@@ -1,5 +1,6 @@
+import React from 'react';
+
 import NodePage from './[node]';
-import React, {  } from 'react';
 
 const DialogueTreePage = () => (
   <NodePage />

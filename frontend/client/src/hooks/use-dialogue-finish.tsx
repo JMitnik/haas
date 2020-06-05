@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 import { useMutation } from '@apollo/react-hooks';
 import uploadUserSessionMutation from 'mutations/UploadEntryMutation';
 import useDialogueTree from 'providers/DialogueTreeProvider';
-// import useProject from 'providers/ProjectProvider';
 
 const useJourneyFinish = (submitInstant: boolean = true) => {
   const [isFinished, setIsFinished] = useState(false);

@@ -23,7 +23,6 @@ export const DialogueTreeProvider = ({ children }: { children: React.ReactNode }
     path: '/:customerSlug',
     strict: true,
   });
-  const dialogueMatch = useRouteMatch<any>('/:customerSlug/:dialogueId');
 
   const { data: customerData } = useQuery<CustomerDataProps>(getCustomerFromSlug, {
     skip: !customerMatch,
@@ -34,6 +33,8 @@ export const DialogueTreeProvider = ({ children }: { children: React.ReactNode }
       slug: customerMatch?.params.customerSlug,
     },
   });
+
+  const dialogueMatch = useRouteMatch<any>('/:customerSlug/:dialogueId');
 
   const { data: dialogueData } = useQuery<DialogueDataProps>(getDialogueQuery, {
     skip: !dialogueMatch,
