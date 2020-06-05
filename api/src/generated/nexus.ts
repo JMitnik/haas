@@ -207,7 +207,6 @@ export interface NexusGenRootTypes {
   RoleType: { // root type
     id: string; // ID!
     name: string; // String!
-    permissions: NexusGenRootTypes['PermssionType'][]; // [PermssionType!]!
   }
   Session: prisma.Session;
   SortFilterObject: { // root type
@@ -409,6 +408,7 @@ export interface NexusGenFieldTypes {
     lineChartData: NexusGenRootTypes['lineChartDataType'][]; // [lineChartDataType!]!
     questionNode: NexusGenRootTypes['QuestionNode']; // QuestionNode!
     questionNodes: NexusGenRootTypes['QuestionNode'][]; // [QuestionNode!]!
+    roles: NexusGenRootTypes['RoleType'][]; // [RoleType!]!
     session: NexusGenRootTypes['Session']; // Session!
     sessions: NexusGenRootTypes['Session'][]; // [Session!]!
     users: NexusGenRootTypes['UserType'][]; // [UserType!]!
@@ -433,6 +433,7 @@ export interface NexusGenFieldTypes {
     value: string; // String!
   }
   RoleType: { // field return type
+    customer: NexusGenRootTypes['Customer']; // Customer!
     id: string; // ID!
     name: string; // String!
     permissions: NexusGenRootTypes['PermssionType'][]; // [PermssionType!]!
@@ -563,6 +564,9 @@ export interface NexusGenArgTypes {
     }
     questionNode: { // args
       where?: NexusGenInputs['QuestionNodeWhereUniqueInput'] | null; // QuestionNodeWhereUniqueInput
+    }
+    roles: { // args
+      customerId?: string | null; // String
     }
     session: { // args
       where?: NexusGenInputs['SessionWhereUniqueInput'] | null; // SessionWhereUniqueInput
