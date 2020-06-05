@@ -8,6 +8,7 @@ import EditCustomerView from 'views/EditCustomerView';
 import EditTopicView from 'views/EditTopicView';
 import InteractionsOverview from 'views/InteractionsOverview/InteractionsOverview';
 import OrganisationSettingsView from 'views/OrganisationSettingsView';
+import RolesOverview from 'views/RolesOverview/RolesOverview';
 import TopicDetail from 'views/TopicDetail/TopicDetail';
 import TopicsOverview from 'views/TopicsOverview/TopicsOverview';
 import UsersOverview from 'views/UsersOverview/UsersOverview';
@@ -23,6 +24,7 @@ const DashboardPage = () => (
       <Route path="/dashboard/c/:customerId/topic-builder" render={() => <DashboardLayout><AddTopicView /></DashboardLayout>} />
       <Route path="/dashboard/c/:customerId/edit" render={() => <DashboardLayout><EditCustomerView /></DashboardLayout>} />
       <Route path="/dashboard/c/:customerId/users" render={() => <DashboardLayout><UsersOverview /></DashboardLayout>} />
+      <Route path="/dashboard/c/:customerId/roles" render={() => <DashboardLayout><RolesOverview /></DashboardLayout>} />
       <Route
         path="/dashboard/customer-builder"
         render={() => (

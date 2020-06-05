@@ -17,6 +17,7 @@ export const RoleType = objectType({
         return prisma.permission.findMany({ where: { roleId: parent.id } });
       },
     });
+    t.int('amtPermissions');
     t.field('customer', {
       type: CustomerType,
       resolve(parent: Role, args: any, ctx: any) {
@@ -50,8 +51,14 @@ export const RoleQueries = extendType({
       type: RoleType,
       args: { customerId: 'String' },
       async resolve(parent: any, args: any, ctx: any) {
-        const roles = await prisma.role.findMany({ where: { customerId: args.customerId } });
-        return roles;
+        const roles = await prisma.role.findMany({
+          where: { customerId: args.customerId },
+          include: {
+            permissions: true,
+          },
+        });
+        const mappedRoles = roles.map((role) => ({ ...role, amtPermissions: role.permissions.length }));
+        return mappedRoles;
       },
     });
   },

@@ -205,6 +205,7 @@ export interface NexusGenRootTypes {
   QuestionNode: prisma.QuestionNode;
   QuestionOption: prisma.QuestionOption;
   RoleType: { // root type
+    amtPermissions: number; // Int!
     id: string; // ID!
     name: string; // String!
   }
@@ -433,6 +434,7 @@ export interface NexusGenFieldTypes {
     value: string; // String!
   }
   RoleType: { // field return type
+    amtPermissions: number; // Int!
     customer: NexusGenRootTypes['Customer']; // Customer!
     id: string; // ID!
     name: string; // String!

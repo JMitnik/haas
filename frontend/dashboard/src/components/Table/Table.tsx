@@ -5,7 +5,7 @@ import { Grid } from '@haas/ui';
 import HeaderComponent from 'components/Table/HeaderComponent';
 import PaginationSpinner from 'components/Table/PaginationSpinner';
 
-import UserRow from './UserRow';
+import Row from 'components/Table/Row';
 
 interface TableInputProps {
     headers: {
@@ -18,7 +18,7 @@ interface TableInputProps {
     gridProperties: DataGridProps;
 }
 
-const UsersTable = (
+const Table = (
     { headers, data, gridProperties, onGridPropertiesChange }: TableInputProps,
 ) => {
     const handlePage = (newPageIndex: number) => {
@@ -33,11 +33,11 @@ const UsersTable = (
           headers={headers}
         />
         {data && data.map(
-            (dataEntry, index) => <UserRow headers={headers} data={dataEntry} key={index} index={index} />,
+            (dataEntry, index) => <Row headers={headers} data={dataEntry} key={index} index={index} />,
         )}
         <PaginationSpinner gridProperties={gridProperties} handlePage={handlePage} />
       </Grid>
     )
 }
 
-export default UsersTable;
+export default Table;

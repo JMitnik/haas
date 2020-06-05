@@ -286,6 +286,7 @@ input RoleInput {
 }
 
 type RoleType {
+  amtPermissions: Int!
   customer: Customer!
   id: ID!
   name: String!

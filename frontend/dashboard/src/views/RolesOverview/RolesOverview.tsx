@@ -6,11 +6,10 @@ import { Div, H2 } from '@haas/ui';
 import DatePickerComponent from 'components/DatePicker/DatePickerComponent';
 import SearchBarComponent from 'components/SearchBar/SearchBarComponent';
 import Table from 'components/Table/Table';
-import getInteractionsQuery from 'queries/getInteractionsQuery'
-import getUsersQuery from 'queries/getUsers';
+import getRolesQuery from 'queries/getRoles';
 
 import { CenterCell, RoleCell, ScoreCell, UserCell, WhenCell } from 'components/Table/CellComponents/CellComponents';
-import { InputContainer, InputOutputContainer } from './UsersOverviewStyles';
+import { InputContainer, InputOutputContainer } from './RolesOverviewStyles';
 
 interface TableProps {
   activeStartDate: Date | null;
@@ -24,12 +23,15 @@ interface TableProps {
   }[]
 }
 
-const HEADERS = [{ Header: 'First name', accessor: 'firstName', Cell: CenterCell },
-{ Header: 'Last name', accessor: 'lastName', Cell: CenterCell }, { Header: 'Email', accessor: 'email', Cell: UserCell }, { Header: 'Role', accessor: 'role', Cell: RoleCell }]
+const HEADERS = [
+  { Header: 'ID', accessor: 'id', Cell: UserCell },
+  { Header: 'NAME', accessor: 'name', Cell: UserCell },
+  { Header: '# PERMISSIONS', accessor: 'amtPermissions', Cell: CenterCell },
+];
 
-const UsersOverview = () => {
+const RolesOverview = () => {
   const { customerId } = useParams();
-  const [fetchUsers, { loading, data }] = useLazyQuery(getUsersQuery, { fetchPolicy: 'cache-and-network' });
+  const [fetchRoles, { loading, data }] = useLazyQuery(getRolesQuery, { fetchPolicy: 'cache-and-network' });
   const [activeGridProperties, setActiveGridProperties] = useState<TableProps>(
     {
       activeStartDate: null,
@@ -41,11 +43,11 @@ const UsersOverview = () => {
     },
   );
 
-  const tableData: any = data?.users || [];
-  console.log('USERS: ', data?.users);
+  const tableData: any = data?.roles || [];
+  console.log('Roles: ', data?.roles);
   useEffect(() => {
     const { activeStartDate, activeEndDate, pageIndex, pageSize, sortBy, activeSearchTerm } = activeGridProperties;
-    fetchUsers({
+    fetchRoles({
       variables: {
         customerId,
         // filter: {
@@ -69,8 +71,8 @@ const UsersOverview = () => {
     setActiveGridProperties((prevValues) => ({ ...prevValues, activeStartDate: startDate, activeEndDate: endDate }))
   }
 
-  const pageCount = data?.getUsers?.pages || 1;
-  const pageIndex = data?.getUsers?.pageIndex || 0;
+  const pageCount = data?.roles?.pages || 1;
+  const pageIndex = data?.roles?.pageIndex || 0;
 
   return (
     <Div px="24px" margin="0 auto" width="100vh" height="100vh" maxHeight="100vh" overflow="hidden">
@@ -97,4 +99,4 @@ const UsersOverview = () => {
   )
 }
 
-export default UsersOverview;
+export default RolesOverview;
