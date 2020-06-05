@@ -9,7 +9,6 @@ const useJourneyFinish = (submitInstant: boolean = true) => {
   const [isFinished, setIsFinished] = useState(false);
   const [willSubmit, setWillSubmit] = useState(submitInstant);
   const store = useDialogueTree();
-  // const { dialogue } = useProject();
 
   const [uploadInteraction] = useMutation(uploadUserSessionMutation, {
     onError: (error) => {
@@ -18,24 +17,26 @@ const useJourneyFinish = (submitInstant: boolean = true) => {
   });
 
   const entries = store.relevantSessionEntries;
+  const { customer } = store;
+  const dialogue = store.tree;
 
-  // // Effect for submitting
-  // useEffect(() => {
-  //   if (entries.length && !isFinished && willSubmit) {
-  //     uploadInteraction({ variables: {
-  //       uploadUserSessionInput: {
-  //         dialogueId: dialogue?.id,
-  //         entries: entries.map((entry) => ({
-  //           nodeId: entry.node.node.id,
-  //           edgeId: entry.edge?.id,
-  //           data: entry.node?.data,
-  //         })),
-  //       },
-  //     } });
+  // Effect for submitting
+  useEffect(() => {
+    if (entries.length && !isFinished && willSubmit) {
+      uploadInteraction({ variables: {
+        uploadUserSessionInput: {
+          dialogueId: dialogue?.id,
+          entries: entries.map((entry) => ({
+            nodeId: entry.node.node.id,
+            edgeId: entry.edge?.id,
+            data: entry.node?.data,
+          })),
+        },
+      } });
 
-  //     setIsFinished(true);
-  //   }
-  // }, [entries, isFinished, willSubmit, uploadInteraction, dialogue]);
+      setIsFinished(true);
+    }
+  }, [entries, isFinished, willSubmit, uploadInteraction, customer, dialogue]);
 
   // Effect for Post-submission
   useEffect(() => {
