@@ -41,7 +41,7 @@ const DialogueTreeLayout = ({ children, node }: { children: ReactNode, node:Tree
         </GoBackContainer>
       )}
 
-      <Container pt={4}>
+      <Container mt={4}>
         {children}
       </Container>
 
