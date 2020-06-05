@@ -1,20 +1,20 @@
-import React from 'react';
+import { Div, H2, H3 } from '@haas/ui';
 import { motion } from 'framer-motion';
-import { H2, H3, Div } from '@haas/ui';
+import React from 'react';
 
-const DialogueEnd = () => {
+const DialogueEndView = () => {
   const pageVariants = {
     initial: {
       y: '100%',
-      opacity: 0
+      opacity: 0,
     },
     in: {
       y: 0,
-      opacity: 1
+      opacity: 1,
     },
     out: {
-      opacity: 0
-    }
+      opacity: 0,
+    },
   };
 
   return (
@@ -32,4 +32,4 @@ const DialogueEnd = () => {
   );
 };
 
-export default DialogueEnd;
+export default DialogueEndView;

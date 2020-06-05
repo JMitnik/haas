@@ -4,7 +4,7 @@ import { GenericNodeProps } from 'components/Nodes/NodeLayout/NodeLayout';
 import { Loader } from '@haas/ui';
 import { TreeNodeProps } from 'models/Tree/TreeNodeModel';
 import { useHistory } from 'react-router-dom';
-import DialogueTreeLayout from 'components/DialogueTreeLayout';
+import DialogueTreeLayout from 'layouts/DialogueTreeLayout';
 import FinishNode from 'components/Nodes/FinishNode/FinishNode';
 import MultiChoiceNode from 'components/Nodes/MultiChoiceNode/MultiChoiceNode';
 import RegisterNode from 'components/Nodes/RegisterNode/RegisterNode';

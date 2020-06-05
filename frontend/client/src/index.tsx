@@ -2,7 +2,7 @@ import 'mobx-react-lite/batchingForReactDom';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import 'styles/index.css';
+import 'layouts/index.css';
 
 import * as serviceWorker from './serviceWorker';
 import App from './pages';

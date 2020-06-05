@@ -1,7 +1,7 @@
 import { Div } from '@haas/ui';
 import styled, { css } from 'styled-components/macro';
 
-const AppContainer = styled(Div)`
+const GlobalAppLayout = styled(Div)`
   ${({ theme }) => css`
     min-width: 100vw;
     min-height: calc(var(--vh, 1vh) * 100);
@@ -11,4 +11,4 @@ const AppContainer = styled(Div)`
   `}
 `;
 
-export default AppContainer;
+export default GlobalAppLayout;

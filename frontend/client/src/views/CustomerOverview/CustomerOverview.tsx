@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 
-import { CustomerOverviewContainer } from 'components/CustomerOverview/CustomerOverviewStyles';
+import { CustomerOverviewContainer } from 'views/CustomerOverview/CustomerOverviewStyles';
 import { Div, Grid, H1 } from '@haas/ui';
 import CustomerCard from 'components/CustomerCard/CustomerCard';
 import Logo from 'components/Logo';

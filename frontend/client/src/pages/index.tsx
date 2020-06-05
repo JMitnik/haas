@@ -2,10 +2,11 @@ import { AnimatePresence } from 'framer-motion';
 import { Route, Switch, useLocation } from 'react-router-dom';
 import React, { useLayoutEffect } from 'react';
 
-import AppContainer from 'styles/AppStyles';
 import AppProviders from 'providers/AppProviders';
 import CustomerPage from 'pages/[customer]';
 import CustomersPage from 'pages/customers';
+import GlobalAppLayout from 'layouts/GlobalAppLayout';
+
 import DialogueTreePage from './[customer]/[dialogue]';
 import NodePage from './[customer]/[dialogue]/[node]';
 
@@ -47,9 +48,9 @@ const App = () => {
 
   return (
     <AppProviders>
-      <AppContainer>
+      <GlobalAppLayout>
         <AppRoutes />
-      </AppContainer>
+      </GlobalAppLayout>
     </AppProviders>
   );
 };
