@@ -93,7 +93,7 @@ const InteractionsOverview = () => {
   const pageIndex = data?.interactions?.pageIndex || 0;
 
   return (
-    <Div px="24px" margin="0 auto" width="100vh" height="100vh" maxHeight="100vh" overflow="hidden">
+    <Div px="24px" py="24px" margin="0 auto" width="80%" maxHeight="100vh" overflow="scroll">
       {/* TODO: Make a ViewTitle text-component */}
       <H2 color="#3653e8" fontWeight={400} mb="10%"> Interactions </H2>
       <InputOutputContainer mb="5%">
