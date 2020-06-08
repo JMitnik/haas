@@ -7,8 +7,7 @@ import { ProfilePic } from '@haas/ui/src/User';
 import Logo, { LogoContainer } from '../assets/Logo';
 
 const UserNav: FC = () => {
-  // Hardocde user
-
+  // TODO: Remove hardcoded user {Login}
   const user = { firstName: 'Markus', lastName: 'Z.' };
 
   return (

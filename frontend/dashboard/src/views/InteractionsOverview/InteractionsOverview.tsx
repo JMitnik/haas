@@ -6,7 +6,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 
 import { Div, H2, Muted, Span } from '@haas/ui';
 import InteractionsTable from 'views/InteractionsOverview/Table';
-import getInteractionsQuery from 'queries/getInteractionsQuery'
+import getInteractionsQuery from 'queries/getInteractionsQuery';
 
 import { CenterCell, ScoreCell, UserCell, WhenCell } from './CellComponents/CellComponents';
 import { InputContainer, InputOutputContainer, OutputContainer } from './InteractionOverviewStyles';
@@ -47,7 +47,7 @@ const InteractionsOverview = () => {
     sortBy: [{ id: 'id', desc: true }],
   });
 
-  const interactions = data?.interactions?.sessions || []
+  const interactions = data?.interactions?.sessions || [];
 
   useEffect(() => {
     const { activeStartDate, activeEndDate, pageIndex, pageSize, sortBy, activeSearchTerm } = activeGridProperties;
@@ -64,15 +64,15 @@ const InteractionsOverview = () => {
           orderBy: sortBy,
         },
       },
-    })
-  }, [activeGridProperties, fetchInteractions, topicId])
+    });
+  }, [activeGridProperties, fetchInteractions, topicId]);
 
   const handleSearchTermChange = useCallback(debounce((newSearchTerm: string) => {
     setActiveGridProperties((prevValues) => ({ ...prevValues, activeSearchTerm: newSearchTerm }));
   }, 250), []);
 
   const handleDateChange = useCallback(debounce((startDate: Date | null, endDate: Date | null) => {
-    setActiveGridProperties((prevValues) => ({ ...prevValues, activeStartDate: startDate, activeEndDate: endDate }))
+    setActiveGridProperties((prevValues) => ({ ...prevValues, activeStartDate: startDate, activeEndDate: endDate }));
   }, 250), []);
 
   // TODO: Make this into a custom hook / utility function
@@ -87,7 +87,7 @@ const InteractionsOverview = () => {
     tempLink.setAttribute('download', `${currDate}-${customerId}-${topicId}.csv`);
     tempLink.click();
     tempLink.remove();
-  }
+  };
 
   const pageCount = data?.interactions?.pages || 1;
   const pageIndex = data?.interactions?.pageIndex || 0;
@@ -136,7 +136,7 @@ const InteractionsOverview = () => {
         />
       </Div>
     </Div>
-  )
-}
+  );
+};
 
 export default InteractionsOverview;

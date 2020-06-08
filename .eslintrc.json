@@ -5,12 +5,15 @@
     ],
     "plugins": [
         "sort-imports-es6-autofix",
-        "import"
+        "import",
+        "react-hooks"
     ],
     "rules": {
         "sort-imports": "off",
         "import/prefer-default-export": "off",
         "@typescript-eslint/camelcase": "off",
+        "react-hooks/rules-of-hooks": "error",
+        "react-hooks/exhaustive-deps": "error",
         "@typescript-eslint/no-unused-vars": "error",
         "react/jsx-props-no-spreading": "off",
         "react/no-array-index-key": "off",
