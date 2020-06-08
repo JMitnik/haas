@@ -81,9 +81,9 @@ const InteractionsOverview = () => {
     const csvData = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const csvUrl = window.URL.createObjectURL(csvData);
     const tempLink = document.createElement('a');
-    tempLink.href = csvUrl;
-
     const currDate = new Date().getTime();
+
+    tempLink.href = csvUrl;
     tempLink.setAttribute('download', `${currDate}-${customerId}-${topicId}.csv`);
     tempLink.click();
     tempLink.remove();
