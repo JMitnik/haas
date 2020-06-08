@@ -5,10 +5,8 @@ import { H4 } from '@haas/ui';
 export const QuestionEntryHeader = styled(H4)`
 ${({ theme }) => css`
   background-color: ${theme.colors.default.light};
-`
-}
   cursor: pointer;
-`;
+`}`;
 
 export const QuestionEntryContainer = styled.div`
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);

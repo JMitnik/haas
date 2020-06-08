@@ -27,7 +27,7 @@ const TopicsOverview: FC = () => {
         {' '}
         {error.message}
       </p>
-);
+    );
   }
 
   const topics: Array<any> = data?.dialogues;
@@ -87,7 +87,7 @@ const TopicCard = ({ topic }: { topic: any }) => {
   const setEditDialogue = (event: any, topicId: string) => {
     history.push(`/dashboard/c/${customerId}/t/${topicId}/edit`);
     event.stopPropagation();
-  }
+  };
 
   return (
     <Card useFlex flexDirection="column" onClick={() => history.push(`/dashboard/c/${customerId}/t/${topic.id}`)}>

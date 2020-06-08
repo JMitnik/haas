@@ -135,7 +135,12 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
                 </Div>
                 <Div useFlex flexDirection="column">
                   <StyledLabel>Logo (Cloudinary)</StyledLabel>
-                  <StyledInput type="file" name="cloudinary" onChange={onLogoUploadChange} ref={register({ required: false })} />
+                  <StyledInput
+                    type="file"
+                    name="cloudinary"
+                    onChange={onLogoUploadChange}
+                    ref={register({ required: false })}
+                  />
                   {errors.name && <Muted color="warning">Something went wrong!</Muted>}
                 </Div>
                 <Div useFlex flexDirection="column">
@@ -170,6 +175,6 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
       </Form>
     </Container>
   );
-}
+};
 
 export default EditCustomerView;

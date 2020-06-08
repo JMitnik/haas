@@ -10,7 +10,7 @@ import getInteractionsQuery from 'queries/getInteractionsQuery';
 
 import { CenterCell, ScoreCell, UserCell, WhenCell } from './TableCell/TableCell';
 import { InputContainer, InputOutputContainer, OutputContainer } from './InteractionOverviewStyles';
-import DatePickerComponent from './DatePickerComponent';
+import DatePicker from './DatePicker';
 import SearchBar from './SearchBar';
 
 interface TableProps {
@@ -116,7 +116,7 @@ const InteractionsOverview = () => {
           </Div>
         </OutputContainer>
         <InputContainer>
-          <DatePickerComponent
+          <DatePicker
             activeStartDate={paginationProps.activeStartDate}
             activeEndDate={paginationProps.activeEndDate}
             onDateChange={handleDateChange}

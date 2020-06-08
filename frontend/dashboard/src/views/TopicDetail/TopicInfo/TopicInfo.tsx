@@ -35,9 +35,11 @@ const StatisticWidget = styled(Div)`
   }
 `;
 
-const TopicInfo = (
-  { DialogueResultProps, customerId, topicId }: { DialogueResultProps: DialogueResultProps, customerId: string, topicId: string },
-) => {
+const TopicInfo = ({
+  DialogueResultProps,
+  customerId,
+  topicId,
+}: { DialogueResultProps: DialogueResultProps, customerId: string, topicId: string }) => {
   const history = useHistory();
 
   return (
@@ -46,29 +48,26 @@ const TopicInfo = (
         <H2 color="#3e3d5a" fontWeight={400} mb={4}>
           {DialogueResultProps?.title || 'Dialogue'}
         </H2>
+
         <EditDialogueContainer onClick={() => history.push(`/dashboard/c/${customerId}/t/${topicId}/topic-builder/`)}>
           <Edit />
         </EditDialogueContainer>
-
       </Div>
-      {
-        DialogueResultProps && (
-          <StatisticWidget>
-            {
-              DialogueResultProps?.average !== 'false' && (
-                <Score>
-                  <div style={{ marginTop: '5px', alignSelf: 'centre' }}>
-                    Average score:
-                  </div>
-                  <div style={{ marginLeft: '5px', fontSize: '200%', alignSelf: 'flex-start' }}>
-                    {parseFloat(DialogueResultProps?.average).toPrecision(4)}
-                  </div>
-                </Score>
-              )
-            }
-          </StatisticWidget>
-        )
-      }
+
+      {DialogueResultProps && (
+        <StatisticWidget>
+          {DialogueResultProps?.average !== 'false' && (
+            <Score>
+              <div style={{ marginTop: '5px', alignSelf: 'centre' }}>
+                Average score:
+              </div>
+              <div style={{ marginLeft: '5px', fontSize: '200%', alignSelf: 'flex-start' }}>
+                {parseFloat(DialogueResultProps?.average).toPrecision(4)}
+              </div>
+            </Score>
+          )}
+        </StatisticWidget>
+      )}
     </TopicInfoView>
   );
 };
