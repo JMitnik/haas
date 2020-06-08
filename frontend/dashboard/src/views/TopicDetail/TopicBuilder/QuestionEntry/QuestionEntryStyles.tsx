@@ -1,5 +1,6 @@
 import styled, { css } from 'styled-components/macro';
-import { Muted, Div, H4, Button, StyledLabel, StyledInput, Hr } from '@haas/ui';
+
+import { H4 } from '@haas/ui';
 
 export const QuestionEntryHeader = styled(H4)`
 ${({ theme }) => css`

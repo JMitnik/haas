@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
-
 import { ApolloError } from 'apollo-boost';
 import { useForm } from 'react-hook-form';
-import { useMutation, useQuery } from '@apollo/react-hooks';
 import { useHistory, useParams } from 'react-router';
+import { useMutation, useQuery } from '@apollo/react-hooks';
+import React, { useState } from 'react';
+
 import {
-  Container, Flex, Grid, H2, H3, Muted, Button,
-  Div, StyledLabel, StyledInput, Hr, FormGroupContainer, Form
+  Button, Container, Div, Flex, Form, FormGroupContainer, Grid,
+  H2, H3, Hr, Muted, StyledInput, StyledLabel,
 } from '@haas/ui';
 
 import { getCustomerQuery } from '../queries/getCustomersQuery';
@@ -27,8 +27,8 @@ const EditCustomerView = () => {
 
   const { data: customerData, error, loading } = useQuery(getEditCustomerData, {
     variables: {
-      id: customerId
-    }
+      id: customerId,
+    },
   });
 
   if (loading) return null;
@@ -36,13 +36,10 @@ const EditCustomerView = () => {
 
   const customer = customerData?.customer;
 
-  console.log(customer);
-  return (
-    <EditCustomerForm customer={customer}/>
-  )
+  return <EditCustomerForm customer={customer} />;
 };
 
-const EditCustomerForm = ({ customer }: { customer: any } ) => {
+const EditCustomerForm = ({ customer }: { customer: any }) => {
   const history = useHistory();
 
   const [activePreviewUrl, setActivePreviewUrl] = useState<null | string>(null);
@@ -85,7 +82,7 @@ const EditCustomerForm = ({ customer }: { customer: any } ) => {
       logo: activePreviewUrl || formData.logo,
       slug: formData.slug,
       primaryColour: formData.primaryColour,
-      name: formData.name
+      name: formData.name,
     };
 
     editCustomer({
@@ -149,11 +146,12 @@ const EditCustomerForm = ({ customer }: { customer: any } ) => {
                         src={customer?.settings?.logoUrl}
                         height={200}
                         width={200}
+                        alt=""
                         style={{ objectFit: 'contain' }}
                       />
                     )}
 
-                    {activePreviewUrl && <img src={activePreviewUrl} height={200} width={200} />}
+                    {activePreviewUrl && <img alt="" src={activePreviewUrl} height={200} width={200} />}
                   </Div>
                 </Div>
               </Grid>
@@ -173,6 +171,5 @@ const EditCustomerForm = ({ customer }: { customer: any } ) => {
     </Container>
   );
 }
-
 
 export default EditCustomerView;

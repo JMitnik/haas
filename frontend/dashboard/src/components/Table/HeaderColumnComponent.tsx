@@ -1,5 +1,6 @@
-import { Div, Grid, H3, Span } from '@haas/ui';
 import React from 'react'
+
+import { Div, H3, Span } from '@haas/ui';
 
 interface HeaderColumnComponentProps {
     value: string;

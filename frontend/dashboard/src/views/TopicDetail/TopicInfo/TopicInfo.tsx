@@ -1,9 +1,11 @@
-import React from 'react';
-import { H2, Muted, Hr, Div, EditDialogueContainer } from '@haas/ui';
-import { TopicInfoView, Score } from './TopicInfoStyles';
-import { useParams, Switch, Route, useHistory, useLocation } from 'react-router-dom';
 import { Edit } from 'react-feather';
+import { useHistory } from 'react-router-dom';
+import React from 'react';
 import styled from 'styled-components/macro';
+
+import { Div, EditDialogueContainer, H2 } from '@haas/ui';
+
+import { Score, TopicInfoView } from './TopicInfoStyles';
 
 interface TimelineEntryProps {
   sessionId: string;

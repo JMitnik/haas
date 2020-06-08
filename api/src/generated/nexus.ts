@@ -3,7 +3,7 @@
  * Do not make changes to this file directly
  */
 
-
+import * as prisma from "@prisma/client"
 import { core } from "@nexus/schema"
 declare global {
   interface NexusGenCustomInputMethods<TypeName extends string> {
@@ -121,31 +121,10 @@ export interface NexusGenEnums {
 }
 
 export interface NexusGenRootTypes {
-  ColourSettings: { // root type
-    id: string; // ID!
-    primary: string; // String!
-    primaryAlt?: string | null; // String
-    secondary?: string | null; // String
-  }
-  Customer: { // root type
-    id: string; // ID!
-    name: string; // String!
-    slug: string; // String!
-  }
-  CustomerSettings: { // root type
-    id: string; // ID!
-    logoUrl?: string | null; // String
-  }
-  Dialogue: { // root type
-    averageScore?: string | null; // String
-    creationDate?: string | null; // String
-    customerId: string; // String!
-    description: string; // String!
-    id: string; // ID!
-    publicTitle?: string | null; // String
-    title: string; // String!
-    updatedAt?: string | null; // String
-  }
+  ColourSettings: prisma.ColourSettings;
+  Customer: prisma.Customer;
+  CustomerSettings: prisma.CustomerSettings;
+  Dialogue: prisma.Dialogue;
   DialogueDetailResult: { // root type
     average: string; // String!
     creationDate: string; // String!
@@ -159,14 +138,7 @@ export interface NexusGenRootTypes {
     totalNodeEntries: number; // Int!
     updatedAt: string; // String!
   }
-  Edge: { // root type
-    childNodeId: string; // String!
-    createdAt: string; // String!
-    dialogueId: string; // String!
-    id: string; // ID!
-    parentNodeId: string; // String!
-    updatedAt: string; // String!
-  }
+  Edge: prisma.Edge;
   EdgeCondition: { // root type
     conditionType: string; // String!
     edgeId: string; // String!
@@ -175,9 +147,7 @@ export interface NexusGenRootTypes {
     renderMax?: number | null; // Int
     renderMin?: number | null; // Int
   }
-  FontSettings: { // root type
-    id: string; // ID!
-  }
+  FontSettings: prisma.FontSettings;
   ImageType: { // root type
     encoding?: string | null; // String
     filename?: string | null; // String
@@ -202,43 +172,12 @@ export interface NexusGenRootTypes {
     startDate?: string | null; // String
   }
   Mutation: {};
-  NodeEntry: { // root type
-    creationDate: string; // String!
-    depth: number; // Int!
-    id?: string | null; // ID
-    relatedEdgeId?: string | null; // String
-    relatedNodeId?: string | null; // String
-    sessionId: string; // String!
-  }
-  NodeEntryValue: { // root type
-    id: string; // ID!
-    nodeEntryId?: string | null; // String
-    numberValue?: number | null; // Int
-    parentNodeEntryValueId?: number | null; // Int
-    textValue?: string | null; // String
-  }
+  NodeEntry: prisma.NodeEntry;
+  NodeEntryValue: prisma.NodeEntryValue;
   Query: {};
-  QuestionNode: { // root type
-    creationDate?: string | null; // String
-    id: string; // ID!
-    isLeaf: boolean; // Boolean!
-    isRoot: boolean; // Boolean!
-    overrideLeafId?: string | null; // String
-    questionDialogueId: string; // String!
-    title: string; // String!
-    type: string; // String!
-  }
-  QuestionOption: { // root type
-    id: number; // Int!
-    publicValue?: string | null; // String
-    questionId: string; // String!
-    value: string; // String!
-  }
-  Session: { // root type
-    createdAt: string; // String!
-    dialogueId: string; // String!
-    id: string; // ID!
-  }
+  QuestionNode: prisma.QuestionNode;
+  QuestionOption: prisma.QuestionOption;
+  Session: prisma.Session;
   SortFilterObject: { // root type
     desc: boolean; // Boolean!
     id: string; // String!

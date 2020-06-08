@@ -24,12 +24,21 @@ interface TableProps {
   }[]
 }
 
-const HEADERS = [{ Header: 'SCORE', accessor: 'score', Cell: ScoreCell },
-{ Header: 'PATHS', accessor: 'paths', Cell: CenterCell }, { Header: 'USER', accessor: 'id', Cell: UserCell }, { Header: 'WHEN', accessor: 'createdAt', Cell: WhenCell }]
+const HEADERS = [
+  { Header: 'SCORE', accessor: 'score', Cell: ScoreCell },
+  { Header: 'PATHS', accessor: 'paths', Cell: CenterCell },
+  { Header: 'USER', accessor: 'id', Cell: UserCell },
+  { Header: 'WHEN', accessor: 'createdAt', Cell: WhenCell },
+];
 
 const InteractionsOverview = () => {
   const { topicId, customerId } = useParams();
-  const [fetchInteractions, { loading, data }] = useLazyQuery(getInteractionsQuery, { fetchPolicy: 'cache-and-network' });
+  const [fetchInteractions, { data }] = useLazyQuery(
+    getInteractionsQuery, {
+      fetchPolicy: 'cache-and-network',
+    },
+  );
+
   const [activeGridProperties, setActiveGridProperties] = useState<TableProps>(
     {
       activeStartDate: null,
@@ -59,7 +68,7 @@ const InteractionsOverview = () => {
         },
       },
     })
-  }, [activeGridProperties])
+  }, [activeGridProperties, fetchInteractions, topicId])
 
   const handleSearchTermChange = (newSearchTerm: string) => {
     setActiveGridProperties((prevValues) => ({ ...prevValues, activeSearchTerm: newSearchTerm }));
@@ -92,7 +101,16 @@ const InteractionsOverview = () => {
           <Div justifyContent="center" marginRight="15px">
             <Muted fontWeight="bold">Exports</Muted>
           </Div>
-          <Div padding="8px 36px" borderRadius="90px" style={{ cursor: 'pointer' }} onClick={handleExport} useFlex flexDirection="row" alignItems="center" backgroundColor="#c4c4c4">
+          <Div
+            padding="8px 36px"
+            borderRadius="90px"
+            style={{ cursor: 'pointer' }}
+            onClick={handleExport}
+            useFlex
+            flexDirection="row"
+            alignItems="center"
+            backgroundColor="#c4c4c4"
+          >
             <Span fontWeight="bold">CSV</Span>
           </Div>
         </OutputContainer>
@@ -102,7 +120,10 @@ const InteractionsOverview = () => {
             activeEndDate={activeGridProperties.activeEndDate}
             handleDateChange={handleDateChange}
           />
-          <SearchBarComponent activeSearchTerm={activeGridProperties.activeSearchTerm} handleSearchTermChange={handleSearchTermChange} />
+          <SearchBarComponent
+            activeSearchTerm={activeGridProperties.activeSearchTerm}
+            handleSearchTermChange={handleSearchTermChange}
+          />
         </InputContainer>
       </InputOutputContainer>
       <Div backgroundColor="#fdfbfe" mb="1%" height="65%">

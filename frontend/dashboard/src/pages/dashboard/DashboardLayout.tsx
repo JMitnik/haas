@@ -1,14 +1,15 @@
+import { useHistory, useParams } from 'react-router';
 import React from 'react';
+
 import { DashboardContainer } from 'components/DashboardView/DashboardViewStyles';
-import { useParams, useHistory } from 'react-router';
-import Sidenav from 'components/Sidenav';
+import { Div } from '@haas/ui';
 import Logo from 'assets/Logo';
-import { Div, Button } from '@haas/ui';
+import Sidenav from 'components/Sidenav';
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const { topicId, customerId }: { topicId: string, customerId: string } = useParams<any>();
   const history = useHistory();
-  const sideNavIsActive = (customerId != undefined && topicId != undefined);
+  const sideNavIsActive = (customerId !== undefined && topicId !== undefined);
 
   return (
     <DashboardContainer>
@@ -17,8 +18,18 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
         <Div>
           <Logo isWhite={sideNavIsActive} />
         </Div>
-        <button onClick={() => history.push(`/dashboard/c/${customerId}/t/${topicId}/`)}>Dashboard</button>
-        <button onClick={() => history.push(`/dashboard/c/${customerId}/t/${topicId}/interactions`)}>Interactions overview</button>
+
+        {/* TODO: Make these into actual navlinks */}
+        {sideNavIsActive && (
+          <>
+            <button type="button" onClick={() => history.push(`/dashboard/c/${customerId}/t/${topicId}/`)}>
+              Dashboard
+            </button>
+            <button type="button" onClick={() => history.push(`/dashboard/c/${customerId}/t/${topicId}/interactions`)}>
+              Interactions overview
+            </button>
+          </>
+        )}
       </Sidenav>
       {children}
     </DashboardContainer>

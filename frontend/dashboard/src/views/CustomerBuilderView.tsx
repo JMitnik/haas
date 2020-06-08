@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
 
 import { ApolloError } from 'apollo-boost';
-import { useForm } from 'react-hook-form';
-import { useMutation } from '@apollo/react-hooks';
-import { useHistory } from 'react-router';
 import {
-  Container, Flex, Grid, H2, H3, Muted, Button,
-  Div, StyledLabel, StyledInput, Hr, FormGroupContainer, Form
+  Button, Container, Div, Flex, Form, FormGroupContainer, Grid,
+  H2, H3, Hr, Muted, StyledInput, StyledLabel,
 } from '@haas/ui';
-import { getCustomerQuery } from '../queries/getCustomersQuery';
+import { useForm } from 'react-hook-form';
+import { useHistory } from 'react-router';
+import { useMutation } from '@apollo/react-hooks';
+
 import { createNewCustomer } from '../mutations/createNewCustomer';
+import { getCustomerQuery } from '../queries/getCustomersQuery';
 import uploadSingleImage from '../mutations/uploadSingleImage';
 
 interface FormDataProps {
@@ -114,7 +115,7 @@ const CustomerBuilderView = () => {
                 <Div useFlex flexDirection="column">
                   <StyledLabel>Preview</StyledLabel>
                   <Div width={200} height={200} style={{ border: '1px solid lightgrey', borderRadius: '8px' }}>
-                    {activePreview && <img src={activePreview} height={200} width={200} />}
+                    {activePreview && <img src={activePreview} height={200} width={200} alt="" />}
                   </Div>
                 </Div>
               </Grid>
