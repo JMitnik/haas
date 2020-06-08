@@ -78,7 +78,7 @@ const RolesOverview = () => {
 
   return (
     <Div px="24px" margin="0 auto" width="100vh" height="100vh" maxHeight="100vh" overflow="hidden">
-      <H2 color="#3653e8" fontWeight={400} mb="10%">Users and roles</H2>
+      <H2 color="#3653e8" fontWeight={400} mb="10%">Roles and permissions</H2>
       <InputOutputContainer mb="5%">
         <InputContainer>
           <DatePickerComponent

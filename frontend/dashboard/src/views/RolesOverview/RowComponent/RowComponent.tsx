@@ -16,7 +16,7 @@ const RowComponent = ({ headers, data, index, permissions }: RowComponentProps) 
         { headers && headers.map(({ accessor, Cell }) => {
             const result = Object.entries(data).find((property) => property[0] === accessor);
             if (result) return <Cell value={result[1]} key={`${index}-${result[0]}`} />
-            return null
+            return null;
         })}
         { isExpanded && (
         <Div useFlex flexDirection="column" backgroundColor="#f0f0f0" gridColumn="1 / -1">
@@ -32,16 +32,22 @@ const RowComponent = ({ headers, data, index, permissions }: RowComponentProps) 
             </Div>
             <Hr style={{ marginBottom: '15px' }} color="#999999" />
             <Div useFlex flexDirection="column">
-              <Div width="100%">
+              <Div width="100%" marginBottom="15px">
                 <H4 color="#999999">PERMISSIONS</H4>
                 <H5 color="#c0bcbb">Select the permissions you want a specific role to have</H5>
               </Div>
               {/* Grid with 4 columns */}
               <Grid gridTemplateColumns="22.5% 22.5% 22.5% 22.5%">
                 {permissions && permissions.map((permission, index) => (
-                  <Div useFlex flexDirection="row" key={index}>
-                    <input type="checkbox" defaultChecked={activePermissionIds.includes(permission.id)} />
-                    <Span>{permission.name}</Span>
+                  <Div useFlex flexDirection="row" key={index} alignItems="center" justifyContent="center">
+                    <input
+                      type="checkbox"
+                      onClick={(event) => {
+                      event.stopPropagation();
+                    }}
+                      defaultChecked={activePermissionIds.includes(permission.id)}
+                    />
+                    <Span marginLeft="5px">{permission.name}</Span>
                   </Div>
               ))}
               </Grid>
