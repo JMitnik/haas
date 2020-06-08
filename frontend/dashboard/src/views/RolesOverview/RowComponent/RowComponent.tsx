@@ -42,12 +42,13 @@ const RowComponent = ({ headers, data, index, permissions }: RowComponentProps) 
                   <Div useFlex flexDirection="row" key={index} alignItems="center" justifyContent="center">
                     <input
                       type="checkbox"
+                      disabled
                       onClick={(event) => {
                       event.stopPropagation();
                     }}
                       defaultChecked={activePermissionIds.includes(permission.id)}
                     />
-                    <Span marginLeft="5px">{permission.name}</Span>
+                    <Span color="#999999" marginLeft="5px">{permission.name}</Span>
                   </Div>
               ))}
               </Grid>
