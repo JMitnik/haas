@@ -1,4 +1,4 @@
-import { Calendar } from 'react-feather'
+import { Calendar } from 'react-feather';
 import { Div } from '@haas/ui';
 import { format } from 'date-fns';
 import React from 'react';
@@ -29,13 +29,17 @@ const DatePickerFilter = ({ activeStartDate, activeEndDate, setIsActive } : Date
 
     {(activeStartDate && !activeEndDate) && (
       <Div>
-        From {format(activeStartDate, 'dd-MMM-yyyy')}
+        From
+        {' '}
+        {format(activeStartDate, 'dd-MMM-yyyy')}
       </Div>
     )}
 
     {(!activeStartDate && activeEndDate) && (
       <Div>
-        Until {format(activeEndDate, 'dd-MMM-yyyy')}
+        Until
+        {' '}
+        {format(activeEndDate, 'dd-MMM-yyyy')}
       </Div>
     )}
 
