@@ -8,10 +8,10 @@ import { Div, H2, Muted, Span } from '@haas/ui';
 import InteractionsTable from 'views/InteractionsOverview/Table';
 import getInteractionsQuery from 'queries/getInteractionsQuery';
 
-import { CenterCell, ScoreCell, UserCell, WhenCell } from './CellComponents/CellComponents';
+import { CenterCell, ScoreCell, UserCell, WhenCell } from './TableCell/TableCell';
 import { InputContainer, InputOutputContainer, OutputContainer } from './InteractionOverviewStyles';
 import DatePickerComponent from './DatePickerComponent';
-import SearchBarComponent from './SearchBarComponent';
+import SearchBar from './SearchBar';
 
 interface TableProps {
   activeStartDate: Date | null;
@@ -38,7 +38,7 @@ const InteractionsOverview = () => {
     fetchPolicy: 'cache-and-network',
   });
 
-  const [activeGridProperties, setActiveGridProperties] = useState<TableProps>({
+  const [paginationProps, setPaginationProps] = useState<TableProps>({
     activeStartDate: null,
     activeEndDate: null,
     activeSearchTerm: '',
@@ -50,7 +50,7 @@ const InteractionsOverview = () => {
   const interactions = data?.interactions?.sessions || [];
 
   useEffect(() => {
-    const { activeStartDate, activeEndDate, pageIndex, pageSize, sortBy, activeSearchTerm } = activeGridProperties;
+    const { activeStartDate, activeEndDate, pageIndex, pageSize, sortBy, activeSearchTerm } = paginationProps;
     fetchInteractions({
       variables: {
         dialogueId: topicId,
@@ -65,14 +65,14 @@ const InteractionsOverview = () => {
         },
       },
     });
-  }, [activeGridProperties, fetchInteractions, topicId]);
+  }, [paginationProps, fetchInteractions, topicId]);
 
   const handleSearchTermChange = useCallback(debounce((newSearchTerm: string) => {
-    setActiveGridProperties((prevValues) => ({ ...prevValues, activeSearchTerm: newSearchTerm }));
+    setPaginationProps((prevValues) => ({ ...prevValues, activeSearchTerm: newSearchTerm }));
   }, 250), []);
 
   const handleDateChange = useCallback(debounce((startDate: Date | null, endDate: Date | null) => {
-    setActiveGridProperties((prevValues) => ({ ...prevValues, activeStartDate: startDate, activeEndDate: endDate }));
+    setPaginationProps((prevValues) => ({ ...prevValues, activeStartDate: startDate, activeEndDate: endDate }));
   }, 250), []);
 
   // TODO: Make this into a custom hook / utility function
@@ -117,12 +117,12 @@ const InteractionsOverview = () => {
         </OutputContainer>
         <InputContainer>
           <DatePickerComponent
-            activeStartDate={activeGridProperties.activeStartDate}
-            activeEndDate={activeGridProperties.activeEndDate}
+            activeStartDate={paginationProps.activeStartDate}
+            activeEndDate={paginationProps.activeEndDate}
             onDateChange={handleDateChange}
           />
-          <SearchBarComponent
-            activeSearchTerm={activeGridProperties.activeSearchTerm}
+          <SearchBar
+            activeSearchTerm={paginationProps.activeSearchTerm}
             onSearchTermChange={handleSearchTermChange}
           />
         </InputContainer>
@@ -130,8 +130,8 @@ const InteractionsOverview = () => {
       <Div backgroundColor="#fdfbfe" mb="1%" height="65%">
         <InteractionsTable
           headers={HEADERS}
-          gridProperties={{ ...activeGridProperties, pageCount, pageIndex }}
-          onGridPropertiesChange={setActiveGridProperties}
+          gridProperties={{ ...paginationProps, pageCount, pageIndex }}
+          onPaginationChange={setPaginationProps}
           data={interactions}
         />
       </Div>

@@ -53,6 +53,6 @@ const DashboardPage = () => (
       <Route path="/dashboard" render={() => <DashboardLayout><CustomerOverview /></DashboardLayout>} />
     </Switch>
   </>
-  );
+);
 
 export default DashboardPage;

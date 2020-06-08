@@ -1,7 +1,7 @@
 import 'react-datepicker/dist/react-datepicker.css';
 import { XCircle } from 'react-feather';
-import DatePicker from 'react-datepicker';
 import React, { useState } from 'react';
+import ReactDatePicker from 'react-datepicker';
 
 import { Div } from '@haas/ui';
 import DatePickerFilter from 'components/DatePickerFilter';
@@ -12,7 +12,7 @@ interface DatePickerProps {
   onDateChange: (start: Date | null, end: Date | null) => void;
 }
 
-const DatePickerComponent = ({ activeStartDate, activeEndDate, onDateChange }: DatePickerProps) => {
+const DatePicker = ({ activeStartDate, activeEndDate, onDateChange }: DatePickerProps) => {
   const [isActive, setIsActive] = useState(false);
 
   return (
@@ -24,9 +24,9 @@ const DatePickerComponent = ({ activeStartDate, activeEndDate, onDateChange }: D
           setIsActive={setIsActive}
         />
       )}
-      { isActive && (
+      {isActive && (
         <Div padding={15} borderRadius="90px" useFlex flexDirection="row" backgroundColor="#f1f5f8">
-          <DatePicker
+          <ReactDatePicker
             selected={activeStartDate}
             onChange={(date) => date !== activeStartDate && onDateChange(date, activeEndDate)}
             selectsStart
@@ -34,7 +34,7 @@ const DatePickerComponent = ({ activeStartDate, activeEndDate, onDateChange }: D
             startDate={activeStartDate}
             endDate={activeEndDate}
           />
-          <DatePicker
+          <ReactDatePicker
             selected={activeEndDate}
             onChange={(date) => date !== activeEndDate && onDateChange(activeStartDate, date)}
             selectsEnd
@@ -50,4 +50,4 @@ const DatePickerComponent = ({ activeStartDate, activeEndDate, onDateChange }: D
   );
 };
 
-export default DatePickerComponent;
+export default DatePicker;
