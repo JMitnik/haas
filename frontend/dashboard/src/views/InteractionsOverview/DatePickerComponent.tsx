@@ -9,10 +9,10 @@ import DatePickerFilter from 'components/DatePickerFilter';
 interface DatePickerProps {
     activeStartDate: Date | null;
     activeEndDate: Date | null;
-    handleDateChange: (start: Date | null, end: Date | null) => void;
+    onDateChange: (start: Date | null, end: Date | null) => void;
 }
 
-const DatePickerComponent = ({ activeStartDate, activeEndDate, handleDateChange }: DatePickerProps) => {
+const DatePickerComponent = ({ activeStartDate, activeEndDate, onDateChange }: DatePickerProps) => {
     const [isActive, setIsActive] = useState(false);
 
     return (
@@ -28,7 +28,7 @@ const DatePickerComponent = ({ activeStartDate, activeEndDate, handleDateChange 
         <Div padding={15} borderRadius="90px" useFlex flexDirection="row" backgroundColor="#f1f5f8">
           <DatePicker
             selected={activeStartDate}
-            onChange={(date) => date !== activeStartDate && handleDateChange(date, activeEndDate)}
+            onChange={(date) => date !== activeStartDate && onDateChange(date, activeEndDate)}
             selectsStart
             isClearable
             startDate={activeStartDate}
@@ -36,7 +36,7 @@ const DatePickerComponent = ({ activeStartDate, activeEndDate, handleDateChange 
           />
           <DatePicker
             selected={activeEndDate}
-            onChange={(date) => date !== activeEndDate && handleDateChange(activeStartDate, date)}
+            onChange={(date) => date !== activeEndDate && onDateChange(activeStartDate, date)}
             selectsEnd
             isClearable
             startDate={activeStartDate}

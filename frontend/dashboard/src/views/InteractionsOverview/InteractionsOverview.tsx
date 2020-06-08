@@ -1,7 +1,8 @@
+import { debounce } from 'lodash';
 import { useLazyQuery } from '@apollo/react-hooks';
 import { useParams } from 'react-router';
 import Papa from 'papaparse';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import { Div, H2, Muted, Span } from '@haas/ui';
 import InteractionsTable from 'views/InteractionsOverview/Table';
@@ -70,13 +71,13 @@ const InteractionsOverview = () => {
     })
   }, [activeGridProperties, fetchInteractions, topicId])
 
-  const handleSearchTermChange = (newSearchTerm: string) => {
+  const handleSearchTermChange = useCallback(debounce((newSearchTerm: string) => {
     setActiveGridProperties((prevValues) => ({ ...prevValues, activeSearchTerm: newSearchTerm }));
-  }
+  }, 250), []);
 
-  const handleDateChange = (startDate: Date | null, endDate: Date | null) => {
+  const handleDateChange = useCallback(debounce((startDate: Date | null, endDate: Date | null) => {
     setActiveGridProperties((prevValues) => ({ ...prevValues, activeStartDate: startDate, activeEndDate: endDate }))
-  }
+  }, 250), []);
 
   const handleExport = () => {
     const csv = Papa.unparse(interactions);
@@ -118,11 +119,11 @@ const InteractionsOverview = () => {
           <DatePickerComponent
             activeStartDate={activeGridProperties.activeStartDate}
             activeEndDate={activeGridProperties.activeEndDate}
-            handleDateChange={handleDateChange}
+            onDateChange={handleDateChange}
           />
           <SearchBarComponent
             activeSearchTerm={activeGridProperties.activeSearchTerm}
-            handleSearchTermChange={handleSearchTermChange}
+            onSearchTermChange={handleSearchTermChange}
           />
         </InputContainer>
       </InputOutputContainer>

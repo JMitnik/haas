@@ -6,17 +6,17 @@ import useDebounce from 'hooks/useDebounce';
 
 interface SearchBarProps {
     activeSearchTerm: string;
-    handleSearchTermChange: (newSearchTerm: string) => void;
+    onSearchTermChange: (newSearchTerm: string) => void;
 }
 
-const SearchBarComponent = ({ activeSearchTerm, handleSearchTermChange }: SearchBarProps) => {
+const SearchBarComponent = ({ activeSearchTerm, onSearchTermChange }: SearchBarProps) => {
     const [isActive, setIsActive] = useState(false);
     const [searchTerm, setSearchTerm] = useState<string>(activeSearchTerm);
     const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
     useEffect(() => {
-      handleSearchTermChange(debouncedSearchTerm);
-    }, [debouncedSearchTerm, handleSearchTermChange]);
+      onSearchTermChange(debouncedSearchTerm);
+    }, [debouncedSearchTerm, onSearchTermChange]);
 
     return (
       <Div padding={15} borderRadius="90px" useFlex flexDirection="row" alignItems="center" backgroundColor="#f1f5f8">
