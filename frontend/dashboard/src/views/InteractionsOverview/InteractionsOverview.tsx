@@ -34,22 +34,18 @@ const HEADERS = [
 
 const InteractionsOverview = () => {
   const { topicId, customerId } = useParams();
-  const [fetchInteractions, { data }] = useLazyQuery(
-    getInteractionsQuery, {
-      fetchPolicy: 'cache-and-network',
-    },
-  );
+  const [fetchInteractions, { data }] = useLazyQuery(getInteractionsQuery, {
+    fetchPolicy: 'cache-and-network',
+  });
 
-  const [activeGridProperties, setActiveGridProperties] = useState<TableProps>(
-    {
-      activeStartDate: null,
-      activeEndDate: null,
-      activeSearchTerm: '',
-      pageIndex: 0,
-      pageSize: 8,
-      sortBy: [{ id: 'id', desc: true }],
-    },
-  );
+  const [activeGridProperties, setActiveGridProperties] = useState<TableProps>({
+    activeStartDate: null,
+    activeEndDate: null,
+    activeSearchTerm: '',
+    pageIndex: 0,
+    pageSize: 8,
+    sortBy: [{ id: 'id', desc: true }],
+  });
 
   const interactions = data?.interactions?.sessions || []
 
@@ -79,12 +75,14 @@ const InteractionsOverview = () => {
     setActiveGridProperties((prevValues) => ({ ...prevValues, activeStartDate: startDate, activeEndDate: endDate }))
   }, 250), []);
 
-  const handleExport = () => {
+  // TODO: Make this into a custom hook / utility function
+  const handleExportCSV = (): void => {
     const csv = Papa.unparse(interactions);
     const csvData = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const csvUrl = window.URL.createObjectURL(csvData);
     const tempLink = document.createElement('a');
     tempLink.href = csvUrl;
+
     const currDate = new Date().getTime();
     tempLink.setAttribute('download', `${currDate}-${customerId}-${topicId}.csv`);
     tempLink.click();
@@ -96,17 +94,19 @@ const InteractionsOverview = () => {
 
   return (
     <Div px="24px" margin="0 auto" width="100vh" height="100vh" maxHeight="100vh" overflow="hidden">
+      {/* TODO: Make a ViewTitle text-component */}
       <H2 color="#3653e8" fontWeight={400} mb="10%"> Interactions </H2>
       <InputOutputContainer mb="5%">
         <OutputContainer>
           <Div justifyContent="center" marginRight="15px">
             <Muted fontWeight="bold">Exports</Muted>
           </Div>
+          {/* TODO: Make a button component out of this */}
           <Div
             padding="8px 36px"
             borderRadius="90px"
             style={{ cursor: 'pointer' }}
-            onClick={handleExport}
+            onClick={handleExportCSV}
             useFlex
             flexDirection="row"
             alignItems="center"
