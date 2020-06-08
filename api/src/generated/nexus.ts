@@ -208,6 +208,10 @@ export interface NexusGenRootTypes {
   Query: {};
   QuestionNode: prisma.QuestionNode;
   QuestionOption: prisma.QuestionOption;
+  RoleTableType: { // root type
+    permissions: NexusGenRootTypes['PermssionType'][]; // [PermssionType!]!
+    roles: NexusGenRootTypes['RoleType'][]; // [RoleType!]!
+  }
   RoleType: { // root type
     amtPermissions: number; // Int!
     id: string; // ID!
@@ -416,6 +420,7 @@ export interface NexusGenFieldTypes {
     questionNode: NexusGenRootTypes['QuestionNode']; // QuestionNode!
     questionNodes: NexusGenRootTypes['QuestionNode'][]; // [QuestionNode!]!
     roles: NexusGenRootTypes['RoleType'][]; // [RoleType!]!
+    roleTable: NexusGenRootTypes['RoleTableType']; // RoleTableType!
     session: NexusGenRootTypes['Session']; // Session!
     sessions: NexusGenRootTypes['Session'][]; // [Session!]!
     users: NexusGenRootTypes['UserType'][]; // [UserType!]!
@@ -438,6 +443,10 @@ export interface NexusGenFieldTypes {
     publicValue: string | null; // String
     questionId: string; // String!
     value: string; // String!
+  }
+  RoleTableType: { // field return type
+    permissions: NexusGenRootTypes['PermssionType'][]; // [PermssionType!]!
+    roles: NexusGenRootTypes['RoleType'][]; // [RoleType!]!
   }
   RoleType: { // field return type
     amtPermissions: number; // Int!
@@ -580,6 +589,9 @@ export interface NexusGenArgTypes {
     roles: { // args
       customerId?: string | null; // String
     }
+    roleTable: { // args
+      customerId?: string | null; // String
+    }
     session: { // args
       where?: NexusGenInputs['SessionWhereUniqueInput'] | null; // SessionWhereUniqueInput
     }
@@ -597,7 +609,7 @@ export interface NexusGenAbstractResolveReturnTypes {
 
 export interface NexusGenInheritedFields {}
 
-export type NexusGenObjectNames = "ColourSettings" | "Customer" | "CustomerSettings" | "Dialogue" | "DialogueDetailResult" | "Edge" | "EdgeCondition" | "FontSettings" | "ImageType" | "InteractionSessionType" | "InteractionType" | "Mutation" | "NodeEntry" | "NodeEntryValue" | "PermssionType" | "Query" | "QuestionNode" | "QuestionOption" | "RoleType" | "Session" | "SortFilterObject" | "UniqueDataResultEntry" | "UserType" | "lineChartDataType" | "topPathType";
+export type NexusGenObjectNames = "ColourSettings" | "Customer" | "CustomerSettings" | "Dialogue" | "DialogueDetailResult" | "Edge" | "EdgeCondition" | "FontSettings" | "ImageType" | "InteractionSessionType" | "InteractionType" | "Mutation" | "NodeEntry" | "NodeEntryValue" | "PermssionType" | "Query" | "QuestionNode" | "QuestionOption" | "RoleTableType" | "RoleType" | "Session" | "SortFilterObject" | "UniqueDataResultEntry" | "UserType" | "lineChartDataType" | "topPathType";
 
 export type NexusGenInputNames = "CustomerCreateOptions" | "CustomerWhereUniqueInput" | "DialogueWhereUniqueInput" | "EdgeChildInput" | "EdgeNodeInput" | "InteractionFilterInput" | "LeafNodeInput" | "OptionInput" | "PermissionIdsInput" | "PermissionInput" | "QuestionConditionInput" | "QuestionInput" | "QuestionNodeWhereInput" | "QuestionNodeWhereUniqueInput" | "RoleDataInput" | "RoleInput" | "SessionWhereUniqueInput" | "SortFilterInputObject" | "TopicDataEntry" | "UploadUserSessionInput" | "UserInput" | "UserSessionEntryDataInput" | "UserSessionEntryInput";
 

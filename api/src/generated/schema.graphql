@@ -226,6 +226,7 @@ type Query {
   questionNode(where: QuestionNodeWhereUniqueInput): QuestionNode!
   questionNodes: [QuestionNode!]!
   roles(customerId: String): [RoleType!]!
+  roleTable(customerId: String): RoleTableType!
   session(where: SessionWhereUniqueInput): Session!
   sessions(where: SessionWhereUniqueInput): [Session!]!
   users(customerId: String): [UserType!]!
@@ -289,6 +290,11 @@ input RoleInput {
   customerId: String
   description: String
   name: String
+}
+
+type RoleTableType {
+  permissions: [PermssionType!]!
+  roles: [RoleType!]!
 }
 
 type RoleType {

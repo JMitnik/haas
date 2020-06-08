@@ -5,11 +5,12 @@ import React, { useEffect, useState } from 'react';
 import { Div, H2 } from '@haas/ui';
 import DatePickerComponent from 'components/DatePicker/DatePickerComponent';
 import SearchBarComponent from 'components/SearchBar/SearchBarComponent';
-import Table from 'components/Table/Table';
+
 import getRolesQuery from 'queries/getRoles';
 
 import { CenterCell, RoleCell, ScoreCell, UserCell, WhenCell } from 'components/Table/CellComponents/CellComponents';
 import { InputContainer, InputOutputContainer } from './RolesOverviewStyles';
+import Table from './RolesTable';
 
 interface TableProps {
   activeStartDate: Date | null;
@@ -43,8 +44,9 @@ const RolesOverview = () => {
     },
   );
 
-  const tableData: any = data?.roles || [];
-  console.log('Roles: ', data?.roles);
+  const tableData: any = data?.roleTable?.roles || [];
+  const permissions: any = data?.roleTable?.permissions || [];
+  console.log('Permissions: ', permissions);
   useEffect(() => {
     const { activeStartDate, activeEndDate, pageIndex, pageSize, sortBy, activeSearchTerm } = activeGridProperties;
     fetchRoles({
@@ -71,8 +73,8 @@ const RolesOverview = () => {
     setActiveGridProperties((prevValues) => ({ ...prevValues, activeStartDate: startDate, activeEndDate: endDate }))
   }
 
-  const pageCount = data?.roles?.pages || 1;
-  const pageIndex = data?.roles?.pageIndex || 0;
+  const pageCount = data?.roleTable?.pages || 1;
+  const pageIndex = data?.roleTable?.pageIndex || 0;
 
   return (
     <Div px="24px" margin="0 auto" width="100vh" height="100vh" maxHeight="100vh" overflow="hidden">
@@ -93,6 +95,7 @@ const RolesOverview = () => {
           gridProperties={{ ...activeGridProperties, pageCount, pageIndex }}
           onGridPropertiesChange={setActiveGridProperties}
           data={tableData}
+          permissions={permissions}
         />
       </Div>
     </Div>

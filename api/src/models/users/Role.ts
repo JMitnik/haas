@@ -3,6 +3,7 @@ import { extendType, inputObjectType, objectType } from '@nexus/schema';
 
 import { CustomerType } from '../customer/Customer';
 import { PermissionType } from './Permission';
+import RoleResolver from './role-resolver';
 
 const prisma = new PrismaClient();
 
@@ -58,21 +59,35 @@ export const RoleInput = inputObjectType({
   },
 });
 
-export const RoleQueries = extendType({
-  type: 'Query',
+export const RoleTableType = objectType({
+  name: 'RoleTableType',
   definition(t) {
     t.list.field('roles', {
       type: RoleType,
+    });
+    t.list.field('permissions', {
+      type: PermissionType,
+    });
+  },
+});
+
+export const RoleQueries = extendType({
+  type: 'Query',
+  definition(t) {
+    t.field('roleTable', {
+      type: RoleTableType,
       args: { customerId: 'String' },
       async resolve(parent: any, args: any, ctx: any) {
-        const roles = await prisma.role.findMany({
-          where: { customerId: args.customerId },
-          include: {
-            permissions: true,
-          },
-        });
-        const mappedRoles = roles.map((role) => ({ ...role, amtPermissions: role.permissions.length }));
-        return mappedRoles;
+        const roles = await RoleResolver.roles(args.customerId);
+        const permissions = await prisma.permission.findMany({ where: { customerId: args.customerId } });
+        return { roles, permissions };
+      },
+    });
+    t.list.field('roles', {
+      type: RoleType,
+      args: { customerId: 'String' },
+      resolve(parent: any, args: any, ctx: any) {
+        return RoleResolver.roles(args.customerId);
       },
     });
   },
@@ -131,6 +146,7 @@ export const RoleMutations = extendType({
 });
 
 const roleNexus = [
+  RoleTableType,
   RoleQueries,
   RoleDataInput,
   RoleInput,

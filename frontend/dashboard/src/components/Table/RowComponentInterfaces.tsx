@@ -33,10 +33,17 @@ export interface CellComponentProps {
     paths: number;
     score: number;
     nodeEntries: Array<NodeEntryProps>;
+    permissions: Array<PermissionProps>;
+}
+
+export interface PermissionProps {
+    name: string;
+    id: string;
 }
 
 export interface RowComponentProps {
     data: CellComponentProps;
-    headers: Array<HeaderColumnProps>
+    permissions?: Array<PermissionProps>;
+    headers: Array<HeaderColumnProps>;
     index: number;
 }
