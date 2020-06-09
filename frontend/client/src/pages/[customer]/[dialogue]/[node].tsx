@@ -1,7 +1,8 @@
-import { Redirect, useParams } from 'react-router-dom';
 import { Variants, motion } from 'framer-motion';
 import { observer, useObserver } from 'mobx-react-lite';
+import { useParams } from 'react-router-dom';
 import React from 'react';
+import styled from 'styled-components/macro';
 
 import { HAASNode } from 'types/generic';
 import Loader from 'components/Loader';
@@ -25,6 +26,15 @@ const nodeViewAnimation: Variants = {
   },
 };
 
+const NodePageContainer = styled(motion.div)`
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+`;
+
 const NodePage = observer(() => {
   const { edgeId } = useParams<{ edgeId?: string, leafId?: string }>();
   const store = useDialogueTree();
@@ -42,8 +52,7 @@ const NodePage = observer(() => {
     store.tree.setActiveLeafFromNode(node);
 
     return (
-      <motion.div
-        style={{ width: '100%' }}
+      <NodePageContainer
         variants={nodeViewAnimation}
         initial="initial"
         animate="animate"
@@ -51,7 +60,7 @@ const NodePage = observer(() => {
         key={edgeId}
       >
         <NodeView node={node} />
-      </motion.div>
+      </NodePageContainer>
     );
   });
 });

@@ -11,6 +11,7 @@ export const DialogueTreeContainer = styled(Div)`
     padding: 5vh ${theme.gutter}px;
     margin: 0 auto;
     display: flex;
+    overflow: hidden;
     width: 100%;
     min-height: calc(var(--vh, 1vh) * 100);
     justify-content: center;
