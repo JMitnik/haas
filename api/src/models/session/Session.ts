@@ -14,8 +14,8 @@ export const NodeEntryValueType = objectType({
     t.string('textValue', { nullable: true });
 
     t.string('nodeEntryId', { nullable: true });
-
     t.int('parentNodeEntryValueId', { nullable: true });
+
     t.list.field('multiValues', {
       type: NodeEntryValueType,
       resolve(parent: NodeEntryValue, args: any, ctx: any) {
@@ -34,7 +34,6 @@ export const NodeEntryType = objectType({
     t.int('depth');
 
     t.string('relatedEdgeId', { nullable: true });
-
     t.string('sessionId');
 
     t.string('relatedNodeId', { nullable: true });
