@@ -234,7 +234,7 @@ export const CustomerQuery = extendType({
         slug: 'String',
       },
       async resolve(parent: any, args: any, ctx: any): Promise<Customer | null> {
-        const { prisma }: { prisma: PrismaClient } = ctx;
+        const { prisma } : { prisma: PrismaClient } = ctx;
 
         if (args.slug) {
           const customer = await prisma.customer.findOne({ where: { slug: args.slug } });

@@ -1,5 +1,7 @@
 import gql from 'graphql-tag';
+
 import { CustomerFragment } from './CustomerFragment';
+import { EdgeFragment } from './EdgeFragment';
 import { QuestionFragment } from './QuestionFragment';
 
 export const getQuestionnaireQuery = gql`
@@ -19,11 +21,16 @@ export const getQuestionnaireQuery = gql`
       questions(where: { isRoot: true }) {
         ...QuestionFragment
       }
+      edges {
+        ...EdgeFragment
+      }
       customer {
         ...CustomerFragment
       }
     }
   }
+
+  ${EdgeFragment}
   ${CustomerFragment}
   ${QuestionFragment}
 `;

@@ -5,11 +5,19 @@ export const ShallowNodeFragment = gql`
     id
     title
     isRoot
-    overrideLeafId
-    overrideLeaf {
+    # overrideLeafId
+    # options {
+    #   id
+    #   value
+    #   publicValue
+    # }
+    # overrideLeaf {
+    #   id
+    #   title
+    #   type
+    # }
+    children {
       id
-      title
-      type
     }
     type
   }

@@ -1,8 +1,0 @@
-enum NodeType {
-    SLIDER
-    MULTI_CHOICE
-    TEXTBOX
-    SOCIAL_SHARE
-    REGISTRATION
-    FINISH
-}

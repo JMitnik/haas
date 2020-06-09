@@ -42,11 +42,13 @@ type Dialogue {
   customer: Customer!
   customerId: String!
   description: String!
+  edges: [Edge!]!
   id: ID!
   leafs: [QuestionNode!]!
   lineChartData: String
   publicTitle: String
   questions(where: QuestionNodeWhereInput): [QuestionNode!]!
+  rootQuestion: QuestionNode!
   title: String!
   updatedAt: String
 }

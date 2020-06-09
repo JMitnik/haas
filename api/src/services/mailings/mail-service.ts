@@ -1,5 +1,5 @@
-import nodemailer from 'nodemailer';
 import Mail from 'nodemailer/lib/mailer';
+import nodemailer from 'nodemailer';
 
 export interface MailServiceInputProps {
   container: any;
@@ -44,16 +44,16 @@ class MailService {
       throw new Error('No receiver given');
     }
 
-    this.transport.sendMail({
-      from: from || this.defaultSender,
-      to,
-      subject,
-      html: body,
-    }, (error) => {
-      if (error) {
-        console.log('error: ', error);
-      }
-    });
+    // this.transport.sendMail({
+    //   from: from || this.defaultSender,
+    //   to,
+    //   subject,
+    //   html: body,
+    // }, (error) => {
+    //   if (error) {
+    //     console.log('error: ', error);
+    //   }
+    // });
 
     console.log('Mail is sent!');
   }

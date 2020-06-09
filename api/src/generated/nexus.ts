@@ -250,11 +250,13 @@ export interface NexusGenFieldTypes {
     customer: NexusGenRootTypes['Customer']; // Customer!
     customerId: string; // String!
     description: string; // String!
+    edges: NexusGenRootTypes['Edge'][]; // [Edge!]!
     id: string; // ID!
     leafs: NexusGenRootTypes['QuestionNode'][]; // [QuestionNode!]!
     lineChartData: string | null; // String
     publicTitle: string | null; // String
     questions: NexusGenRootTypes['QuestionNode'][]; // [QuestionNode!]!
+    rootQuestion: NexusGenRootTypes['QuestionNode']; // QuestionNode!
     title: string; // String!
     updatedAt: string | null; // String
   }

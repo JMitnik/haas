@@ -25,6 +25,7 @@
         "start:client": "yarn workspace @haas/client start",
         "start:api": "yarn workspace @haas/api start",
         "start:dashboard": "yarn workspace @haas/dashboard start",
+        "du": "yarn workspace @haas/api du",
         "debug": "concurrently \"yarn start:client\" \"yarn workspace @haas/api debug\"",
         "build:client": "yarn workspace @haas/client build",
         "build:api": "yarn workspace @haas/api generate && yarn workspace @haas/api build",
@@ -41,7 +42,8 @@
         "kill": "yarn kill:api && yarn kill:client",
         "kill:api": "kill $(lsof -t -i:4000) | exit 0",
         "kill:client": "kill $(lsof -t -i:3000) | exit 0",
-        "reset:api": "yarn workspace @haas/api reset"
+        "reset:api": "yarn workspace @haas/api reset",
+        "test": "yarn workspace @haas/client test"
     },
     "devDependencies": {
         "eslint-config-prettier": "^6.10.1",

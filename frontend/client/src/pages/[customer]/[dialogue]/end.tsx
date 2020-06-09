@@ -1,8 +1,9 @@
 import React from 'react';
-import DialogueEnd from 'components/DialogueEnd';
+
+import DialogueEndView from 'views/DialogueEndView';
 
 const DialogueEndPage = () => (
-  <DialogueEnd />
+  <DialogueEndView />
 );
 
 export default DialogueEndPage;
