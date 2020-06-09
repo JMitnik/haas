@@ -18,8 +18,7 @@
         "migrate:create": "npx prisma migrate save --experimental",
         "migrate": "prisma migrate up --experimental",
         "gen": "prisma generate && ts-node ./src/schema.ts",
-        "seed": "ts-node --transpile-only src/data/main-seed.ts",
-        "reset": "prisma    "
+        "seed": "ts-node --transpile-only src/data/main-seed.ts"
     },
     "dependencies": {
         "@graphql-codegen/cli": "^1.11.2",
