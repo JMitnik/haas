@@ -18,7 +18,7 @@ const SearchBarComponent = ({ activeSearchTerm, handleSearchTermChange }: Search
     () => {
       handleSearchTermChange(debouncedSearchTerm);
     },
-    [debouncedSearchTerm, handleSearchTermChange],
+    [debouncedSearchTerm],
   );
 
   return (
