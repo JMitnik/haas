@@ -1,7 +1,8 @@
 import { NodeEntry, NodeEntryValue, Session } from '@prisma/client';
-import { objectType, extendType, inputObjectType } from '@nexus/schema';
-import SessionResolver from './session-resolver';
+import { extendType, inputObjectType, objectType } from '@nexus/schema';
+
 import { QuestionNodeType } from '../question/QuestionNode';
+import SessionResolver from './SessionResolver';
 
 export const NodeEntryValueType = objectType({
   name: 'NodeEntryValue',
@@ -9,14 +10,14 @@ export const NodeEntryValueType = objectType({
     t.id('id');
     t.int('numberValue', { nullable: true });
     t.string('textValue', { nullable: true });
+
     t.string('nodeEntryId', { nullable: true });
+
     t.int('parentNodeEntryValueId', { nullable: true });
     t.list.field('multiValues', {
       type: NodeEntryValueType,
-      resolve(parent: NodeEntryValue, args: any, ctx: any, info: any) {
-        const multiValues = ctx.prisma.nodeEntryValue.findMany(
-          { where: { parentNodeEntryValueId: parent.id } },
-        );
+      resolve(parent: NodeEntryValue, args: any, ctx: any) {
+        const multiValues = ctx.prisma.nodeEntryValue.findMany({ where: { parentNodeEntryValueId: parent.id } });
         return multiValues;
       },
     });
@@ -29,24 +30,24 @@ export const NodeEntryType = objectType({
     t.id('id');
     t.string('creationDate');
     t.int('depth');
+
     t.string('relatedEdgeId', { nullable: true });
-    t.string('relatedNodeId');
+
     t.string('sessionId');
+
+    t.string('relatedNodeId');
     t.field('relatedNode', {
       type: QuestionNodeType,
-      resolve(parent: NodeEntry, args: any, ctx: any, info: any) {
-        const relatedNode = ctx.prisma.questionNode.findOne(
-          { where: { id: parent.relatedNodeId } },
-        );
+      resolve(parent: NodeEntry, args: any, ctx: any) {
+        const relatedNode = ctx.prisma.questionNode.findOne({ where: { id: parent.relatedNodeId } });
         return relatedNode;
       },
     });
+
     t.list.field('values', {
       type: NodeEntryValueType,
-      resolve(parent: NodeEntry, args: any, ctx: any, info: any) {
-        const values = ctx.prisma.nodeEntryValue.findMany(
-          { where: { nodeEntryId: parent.id } },
-        );
+      resolve(parent: NodeEntry, args: any, ctx: any) {
+        const values = ctx.prisma.nodeEntryValue.findMany({ where: { nodeEntryId: parent.id } });
         return values;
       },
     });
@@ -59,14 +60,11 @@ export const SessionType = objectType({
     t.id('id');
     t.string('createdAt');
     t.string('dialogueId');
+
     t.list.field('nodeEntries', {
       type: NodeEntryType,
-      resolve(parent: Session, args: any, ctx: any, info: any) {
-        const nodeEntries = ctx.prisma.nodeEntry.findMany({
-          where: {
-            sessionId: parent.id,
-          },
-        });
+      resolve(parent: Session, args: any, ctx: any) {
+        const nodeEntries = ctx.prisma.nodeEntry.findMany({ where: { sessionId: parent.id } });
         return nodeEntries;
       },
     });
@@ -87,6 +85,7 @@ export const UserSessionEntryDataInput = inputObjectType({
   definition(t) {
     t.string('textValue');
     t.int('numberValue');
+
     t.list.field('multiValues', {
       type: UserSessionEntryDataInput,
     });
@@ -131,15 +130,14 @@ export const getSessionAnswerFlowQuery = extendType({
         sessionId: 'ID',
       },
     });
+
     t.field('session', {
       type: SessionType,
       args: {
         where: SessionWhereUniqueInput,
       },
-      resolve(parent: any, args: any, ctx: any, info: any) {
-        const session = ctx.prisma.session.findOne({ where: {
-          id: args.where.id,
-        } });
+      resolve(parent: any, args: any, ctx: any) {
+        const session = ctx.prisma.session.findOne({ where: { id: args.where.id } });
         return session;
       },
     });
@@ -154,15 +152,14 @@ export const uploadUserSessionMutation = extendType({
       args: {
         uploadUserSessionInput: UploadUserSessionInput,
       },
-      resolve(parent: any, args: any, ctx: any, info: any) {
-        const session = SessionResolver.uploadUserSession(parent, args, ctx);
-        return session;
+      resolve(parent: any, args: any, ctx: any) {
+        return SessionResolver.uploadUserSession(parent, args, ctx);
       },
     });
   },
 });
 
-const sessionNexus = [
+export default [
   SessionWhereUniqueInput,
   getSessionAnswerFlowQuery,
   UniqueDataResultEntry,
@@ -174,5 +171,3 @@ const sessionNexus = [
   UserSessionEntryInput,
   UserSessionEntryDataInput,
 ];
-
-export default sessionNexus;
