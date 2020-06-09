@@ -1,6 +1,6 @@
+import { Redirect, useParams } from 'react-router-dom';
 import { Variants, motion } from 'framer-motion';
 import { observer, useObserver } from 'mobx-react-lite';
-import { useParams } from 'react-router-dom';
 import React from 'react';
 
 import { HAASNode } from 'types/generic';
@@ -34,6 +34,8 @@ const NodePage = observer(() => {
     if (!store.tree) {
       return <Loader />;
     }
+
+    // TODO: Disable going back
 
     // Either we start from the 'root' (no edge) or we get the next node.
     const node = edgeId ? store.tree.getChildNodeByEdge(edgeId) : store.tree.rootNode;

@@ -4,7 +4,8 @@ import React from 'react';
 
 import { ButtonIcon } from '@haas/ui/src/Buttons';
 import { ClientButton } from 'components/Buttons/Buttons';
-import { Div, H2, H3, Textbox } from '@haas/ui';
+import { Div, H3, Textbox } from '@haas/ui';
+import { NodeTitle } from 'layouts/NodeLayout/NodeLayoutStyles';
 
 import { GenericNodeProps } from '../types';
 import { TextboxContainer } from './TextboxStyles';
@@ -30,7 +31,7 @@ const TextboxNode = ({ node, onEntryStore }: TextboxNodeProps) => {
 
   return (
     <TextboxContainer>
-      <H2>{node.title}</H2>
+      <NodeTitle>{node.title}</NodeTitle>
       <Div>
         <H3 color="white">What would you like to tell us?</H3>
         <Textbox placeholder="I have experienced ..." name="textValue" ref={register} />

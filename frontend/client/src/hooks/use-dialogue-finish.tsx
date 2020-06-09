@@ -28,6 +28,7 @@ const useJourneyFinish = (submitInstant: boolean = true) => {
           entries: entries.map((entry) => ({
             nodeId: entry.node.node.id,
             edgeId: entry.edge?.id,
+            depth: entry.depth,
             data: entry.node?.data,
           })),
         },

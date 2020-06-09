@@ -24,6 +24,9 @@ const SessionModel = types
     get leafs() {
       return Array.from(self.items.toJS().values()).filter((item) => item.node.isLeaf);
     },
+    get isEmpty() {
+      return self.items.size === 0;
+    },
   }));
 export interface EntryListProps extends Instance<typeof SessionModel>{}
 
