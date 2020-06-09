@@ -1,8 +1,10 @@
+import { useHistory, useParams } from 'react-router-dom';
 import React, { Dispatch, SetStateAction } from 'react';
-import { H2, Muted, Div, Hr } from '@haas/ui';
-import { useParams, useHistory } from 'react-router-dom';
+
+import { Div, H2 } from '@haas/ui';
+
+import { TimelineEntriesContainer, TimelineFeedOverviewContainer } from './TimelineFeedOverviewStyles';
 import TimelineEntry from './TimelineEntry/TimelineEntry';
-import { TimelineFeedOverviewContainer, TimelineEntriesContainer } from './TimelineFeedOverviewStyles';
 
 interface TimelineEntryProps {
   sessionId: string;
@@ -28,7 +30,7 @@ const TimelineFeedOverview = ({
   return (
     <TimelineFeedOverviewContainer>
       <H2 color="primary" fontWeight={400}>
-          Timeline feed
+        Timeline feed
       </H2>
       <TimelineEntriesContainer>
         {timelineEntries?.length > 0 && timelineEntries?.map((timelineEntry, index) => (

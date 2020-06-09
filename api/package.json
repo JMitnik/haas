@@ -19,18 +19,15 @@
         "migrate:create": "npx prisma migrate save --experimental",
         "migrate": "prisma migrate up --experimental",
         "gen": "prisma generate && ts-node ./src/schema.ts",
-        "seed": "ts-node --transpile-only src/data/main-seed.ts",
-        "reset": "prisma reset",
-        "token": "prisma token -e .env",
-        "token:prod": "prisma token -e .prod.env"
+        "seed": "ts-node --transpile-only src/data/main-seed.ts"
     },
     "dependencies": {
         "@graphql-codegen/cli": "^1.11.2",
         "@graphql-codegen/typescript": "^1.11.2",
         "@graphql-codegen/typescript-resolvers": "^1.11.2",
         "@nexus/schema": "^0.13.1",
-        "@prisma/cli": "^2.0.0-beta.3",
-        "@prisma/client": "^2.0.0-beta.2",
+        "@prisma/cli": "2.0.0-beta.3",
+        "@prisma/client": "2.0.0-beta.2",
         "@types/lodash": "^4.14.149",
         "@types/mjml": "^4.0.4",
         "@types/nodemailer": "^6.4.0",
@@ -62,7 +59,7 @@
         "ts-node": "^8.6.2"
     },
     "devDependencies": {
-        "@prisma/cli": "^2.0.0-beta.3",
+        "@prisma/cli": "2.0.0-beta.3",
         "@types/jest": "^25.2.1",
         "jest": "^26.0.0",
         "nodemon": "^2.0.3",

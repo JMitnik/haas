@@ -5,8 +5,12 @@ import {
   color,
   space,
   grid,
+  border,
   GridProps,
   FlexboxProps,
+  WidthProps,
+  BorderProps,
+  ColorProps,
   FlexProps,
   flexDirection,
   LayoutProps,
@@ -28,8 +32,8 @@ export const Container = styled(Div)<ContainerProps>`
     ${width}
   `}
 `;
-
-interface ExtraFlexProps extends FlexboxProps, LayoutProps {
+interface ExtraGridProps extends GridProps, WidthProps, LayoutProps, ColorProps, BorderProps {}
+interface ExtraFlexProps extends FlexboxProps, LayoutProps, WidthProps, BorderProps {
   growChildren?: boolean;
 }
 
@@ -38,6 +42,7 @@ export const Flex = styled.div<ExtraFlexProps>`
     display: flex;
     ${flexbox}
     ${layout}
+    ${border}
   `};
 `;
 
@@ -57,10 +62,16 @@ export const ColumnFlex = styled.div<ExtraFlexProps>`
   `};
 `;
 
-export const Grid = styled.div<GridProps>`
+
+
+export const Grid = styled.div<ExtraGridProps>`
   ${({ theme }) => css`
     display: grid;
     grid-gap: ${theme.gutter}px;
     ${grid}
+    ${width}
+    ${layout}
+    ${color}
+    ${border}
   `}
 `;

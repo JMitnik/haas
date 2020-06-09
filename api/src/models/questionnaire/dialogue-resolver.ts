@@ -1,8 +1,8 @@
-import _ from 'lodash';
-import { PrismaClient, Dialogue, DialogueCreateInput, NodeEntry } from '@prisma/client';
+import { Dialogue, DialogueCreateInput, NodeEntry, PrismaClient } from '@prisma/client';
 import { isAfter, subDays } from 'date-fns';
-import NodeResolver from '../question/node-resolver';
+import _ from 'lodash';
 import { leafNodes, sliderType } from '../../data/seeds/default-data';
+import NodeResolver from '../question/node-resolver';
 
 const prisma = new PrismaClient();
 interface LeafNodeProps {
@@ -96,7 +96,6 @@ class DialogueResolver {
   static getNextLineData = async (dialogueId: string, numberOfDaysBack: number, limit: number, offset: number) => {
     const currentDate = new Date();
     const filterDateTime = subDays(currentDate, numberOfDaysBack);
-    console.log('OFFSET: ', offset);
     const sessions = await prisma.session.findMany({
       skip: offset,
       first: limit,
@@ -120,7 +119,6 @@ class DialogueResolver {
         },
       },
     });
-    console.log('Sessions: ', sessions.length);
 
     const nodeEntries = sessions.flatMap((session) => session.nodeEntries);
     const nodeEntryValues = nodeEntries && nodeEntries.flatMap((nodeEntry) => (

@@ -1,20 +1,18 @@
-import React, { FC } from 'react';
-import { useQuery, useMutation } from '@apollo/react-hooks';
 import { ApolloError } from 'apollo-boost';
+import { useMutation, useQuery } from '@apollo/react-hooks';
+import React, { FC } from 'react';
 
-import { Plus, X, Edit } from 'react-feather';
-import { H2, H3, Grid, Flex, Label, Div, Card, CardBody,
-  Container, DeleteButtonContainer, EditButtonContainer } from '@haas/ui';
-import { Link, useHistory, useParams, useLocation } from 'react-router-dom';
+import { Card, CardBody, Container, DeleteButtonContainer, Div, EditButtonContainer, Flex, Grid,
+  H2, H3, Label } from '@haas/ui';
+import { Edit, Plus, X } from 'react-feather';
+import { Link, useHistory, useParams } from 'react-router-dom';
 
-import getQuestionnairesCustomerQuery from '../../queries/getQuestionnairesCustomerQuery';
-import { deleteQuestionnaireMutation } from '../../mutations/deleteQuestionnaire';
 import { AddTopicCard } from './TopicsOverviewStyles';
+import { deleteQuestionnaireMutation } from '../../mutations/deleteQuestionnaire';
+import getQuestionnairesCustomerQuery from '../../queries/getQuestionnairesCustomerQuery';
 
 const TopicsOverview: FC = () => {
-  const { topicId, customerId } = useParams();
-  const location = useLocation();
-  const history = useHistory();
+  const { customerId } = useParams();
 
   const { loading, error, data } = useQuery<any>(getQuestionnairesCustomerQuery, {
     variables: { id: customerId },
@@ -23,7 +21,13 @@ const TopicsOverview: FC = () => {
   if (loading) return <p>Loading</p>;
 
   if (error) {
-    return <p>Error: {error.message}</p>;
+    return (
+      <p>
+        Error:
+        {' '}
+        {error.message}
+      </p>
+    );
   }
 
   const topics: Array<any> = data?.dialogues;
@@ -83,7 +87,7 @@ const TopicCard = ({ topic }: { topic: any }) => {
   const setEditDialogue = (event: any, topicId: string) => {
     history.push(`/dashboard/c/${customerId}/t/${topicId}/edit`);
     event.stopPropagation();
-  }
+  };
 
   return (
     <Card useFlex flexDirection="column" onClick={() => history.push(`/dashboard/c/${customerId}/t/${topic.id}`)}>

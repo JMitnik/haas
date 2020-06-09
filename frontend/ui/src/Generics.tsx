@@ -1,24 +1,27 @@
 import styled, { css } from 'styled-components/macro';
-import { FlexboxProps,
+import { FlexboxProps, borderRadius, BorderProps,
   flexbox, width, WidthProps, color, ColorProps, space, SpaceProps, LayoutProps, layout, FlexProps, flex, PositionProps, position, grid, GridProps } from 'styled-system';
 
-export interface GenericProps extends FlexboxProps, FlexProps, WidthProps, ColorProps, SpaceProps, LayoutProps, PositionProps, GridProps {
+export interface GenericProps extends FlexboxProps, FlexProps, WidthProps, BorderProps, ColorProps, SpaceProps, LayoutProps, PositionProps, GridProps {
   useFlex?: boolean;
+  useGrid?: boolean;
   fillChildren?: boolean;
 }
 
 export const Div = styled.div<GenericProps>`
-  ${({ useFlex, fillChildren }) => css`
+  ${({ useFlex, useGrid, fillChildren }) => css`
 
 
     ${useFlex && css`display: flex;`}
+    ${useGrid && css`display: grid;`}
     ${fillChildren && css` > * {height: 100%; width: 100%;}`}
 
-
+    
     ${grid}
     ${flexbox};
     ${flex};
     ${width};
+    ${borderRadius}
     ${color};
     ${space};
     ${layout};
