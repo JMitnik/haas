@@ -1,6 +1,6 @@
 import {
-  PrismaClient,
-  Session, NodeEntry, NodeEntryCreateWithoutSessionInput, SessionWhereInput,
+  NodeEntry,
+  NodeEntryCreateWithoutSessionInput, PrismaClient, Session, SessionWhereInput,
 } from '@prisma/client';
 import cleanInt from '../../utils/cleanInt';
 
