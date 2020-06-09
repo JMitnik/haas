@@ -6,12 +6,6 @@
         "typescript",
         "typescriptreact"
     ],
-    "eslint.workingDirectories": [
-        {
-            "directory": "./client/backend",
-            "changeProcessCWD": true
-        }
-    ],
     "workbench.colorCustomizations": {
         "statusBar.background": "#2c03b8",
         "statusBarItem.hoverBackground": "#3804ea",

@@ -113,6 +113,35 @@ type ImageType {
   url: String
 }
 
+input InteractionFilterInput {
+  endDate: String
+  limit: Int
+  offset: Int
+  orderBy: [SortFilterInputObject!]
+  pageIndex: Int
+  searchTerm: String
+  startDate: String
+}
+
+type InteractionSessionType {
+  createdAt: String!
+  id: String!
+  index: Int!
+  nodeEntries: [NodeEntry!]!
+  paths: Int!
+  score: Float!
+}
+
+type InteractionType {
+  endDate: String
+  orderBy: [SortFilterObject!]!
+  pageIndex: Int!
+  pages: Int!
+  pageSize: Int!
+  sessions: [InteractionSessionType!]!
+  startDate: String
+}
+
 input LeafNodeInput {
   id: ID
   title: String
@@ -139,10 +168,10 @@ type Mutation {
 type NodeEntry {
   creationDate: String!
   depth: Int!
-  id: ID!
+  id: ID
   relatedEdgeId: String
-  relatedNode: QuestionNode!
-  relatedNodeId: String!
+  relatedNode: QuestionNode
+  relatedNodeId: String
   sessionId: String!
   values: [NodeEntryValue!]!
 }
@@ -170,10 +199,12 @@ type Query {
   edge(id: String): Edge!
   getQuestionnaireData(dialogueId: String, filter: Int): DialogueDetailResult!
   getSessionAnswerFlow(sessionId: ID): Session!
+  interactions(filter: InteractionFilterInput, where: SessionWhereUniqueInput): InteractionType!
   lineChartData(dialogueId: String, limit: Int, numberOfDaysBack: Int, offset: Int): [lineChartDataType!]!
   questionNode(where: QuestionNodeWhereUniqueInput): QuestionNode!
   questionNodes: [QuestionNode!]!
   session(where: SessionWhereUniqueInput): Session!
+  sessions(where: SessionWhereUniqueInput): [Session!]!
 }
 
 input QuestionConditionInput {
@@ -233,7 +264,18 @@ type Session {
 }
 
 input SessionWhereUniqueInput {
-  id: ID!
+  dialogueId: ID
+  id: ID
+}
+
+input SortFilterInputObject {
+  desc: Boolean
+  id: String
+}
+
+type SortFilterObject {
+  desc: Boolean!
+  id: String!
 }
 
 input TopicDataEntry {

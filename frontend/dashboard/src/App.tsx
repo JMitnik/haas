@@ -1,15 +1,14 @@
-import React, { FC } from 'react';
-import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom';
 import { ApolloProvider } from '@apollo/react-hooks';
+import { Redirect, Route, BrowserRouter as Router, Switch } from 'react-router-dom';
 import { ThemeProvider } from 'styled-components';
+import React, { FC } from 'react';
 
-import TopicsOverview from 'views/TopicsOverview/TopicsOverview';
 import DashboardPage from 'pages/dashboard';
+
 import { AppContainer } from './styles/AppStyles';
-import TopNav from './components/Nav';
 import GlobalStyle from './config/global-styles';
-import themeConfig from './config/theme';
 import client from './config/apollo';
+import themeConfig from './config/theme';
 
 const App: FC = () => (
   <>

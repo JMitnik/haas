@@ -1,7 +1,7 @@
 import { ApolloServer } from 'apollo-server-express';
 import { PrismaClient } from '@prisma/client';
-import config from './config';
 import ServiceContainer from './services/service-container';
+import config from './config';
 import schema from './schema';
 
 const prisma = new PrismaClient();
