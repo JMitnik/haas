@@ -27,23 +27,16 @@ export interface HeaderColumnProps {
   Cell: React.FC<GenericCellProps>;
 }
 
-export interface CellComponentProps {
+export interface TableCellProps {
   id: string;
   createdAt: string;
   paths: number;
   score: number;
   nodeEntries: Array<NodeEntryProps>;
-  permissions: Array<PermissionProps>;
 }
 
-export interface PermissionProps {
-  name: string;
-  id: string;
-}
-
-export interface RowComponentProps {
-  data: CellComponentProps;
-  permissions?: Array<PermissionProps>;
-  headers: Array<HeaderColumnProps>;
+export interface TableRowProps {
+  data: TableCellProps;
+  headers: Array<HeaderColumnProps>
   index: number;
 }

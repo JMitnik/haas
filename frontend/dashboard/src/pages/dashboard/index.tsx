@@ -18,20 +18,41 @@ import DashboardLayout from './DashboardLayout';
 const DashboardPage = () => (
   <>
     <Switch>
-      <Route path="/dashboard/c/:customerId/t/:topicId/edit" render={() => <DashboardLayout><EditTopicView /></DashboardLayout>} />
-      <Route path="/dashboard/c/:customerId/t/:topicId/interactions" render={() => <DashboardLayout><InteractionsOverview /></DashboardLayout>} />
-      <Route path="/dashboard/c/:customerId/t/:topicId/" render={() => <DashboardLayout><TopicDetail /></DashboardLayout>} />
-      <Route path="/dashboard/c/:customerId/topic-builder" render={() => <DashboardLayout><AddTopicView /></DashboardLayout>} />
-      <Route path="/dashboard/c/:customerId/edit" render={() => <DashboardLayout><EditCustomerView /></DashboardLayout>} />
-      <Route path="/dashboard/c/:customerId/users" render={() => <DashboardLayout><UsersOverview /></DashboardLayout>} />
-      <Route path="/dashboard/c/:customerId/roles" render={() => <DashboardLayout><RolesOverview /></DashboardLayout>} />
+      <Route
+        path="/dashboard/c/:customerId/t/:topicId/edit"
+        render={() => <DashboardLayout><EditTopicView /></DashboardLayout>}
+      />
+      <Route
+        path="/dashboard/c/:customerId/t/:topicId/interactions"
+        render={() => <DashboardLayout><InteractionsOverview /></DashboardLayout>}
+      />
+      <Route
+        path="/dashboard/c/:customerId/t/:topicId/"
+        render={() => <DashboardLayout><TopicDetail /></DashboardLayout>}
+      />
+      <Route
+        path="/dashboard/c/:customerId/topic-builder"
+        render={() => <DashboardLayout><AddTopicView /></DashboardLayout>}
+      />
+      <Route
+        path="/dashboard/c/:customerId/edit"
+        render={() => <DashboardLayout><EditCustomerView /></DashboardLayout>}
+      />
+      <Route
+        path="/dashboard/c/:customerId/users"
+        render={() => <DashboardLayout><UsersOverview /></DashboardLayout>}
+      />
+      <Route
+        path="/dashboard/c/:customerId/roles"
+        render={() => <DashboardLayout><RolesOverview /></DashboardLayout>}
+      />
       <Route
         path="/dashboard/customer-builder"
         render={() => (
           <DashboardLayout>
             <CustomerBuilderView />
           </DashboardLayout>
-)}
+        )}
       />
       <Route
         path="/dashboard/c/:customerId/"
@@ -39,7 +60,7 @@ const DashboardPage = () => (
           <DashboardLayout>
             <TopicsOverview />
           </DashboardLayout>
-)}
+        )}
       />
       <Route
         path="/dashboard/organisation-settings"
@@ -50,6 +71,6 @@ const DashboardPage = () => (
       <Route path="/dashboard" render={() => <DashboardLayout><CustomerOverview /></DashboardLayout>} />
     </Switch>
   </>
-  );
+);
 
 export default DashboardPage;

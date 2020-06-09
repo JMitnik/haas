@@ -1,14 +1,15 @@
-import React from 'react';
-
 import { ApolloError } from 'apollo-boost';
-import styled, { css } from 'styled-components/macro';
 import { useForm } from 'react-hook-form';
-import { useMutation } from '@apollo/react-hooks';
 import { useHistory, useParams } from 'react-router';
-import { Container, Flex, Grid, H2, H3, Muted, Button,
-  Div, StyledInput, StyledTextInput, StyledLabel, Hr } from '@haas/ui';
-import getQuestionnairesCustomerQuery from '../queries/getQuestionnairesCustomerQuery';
+import { useMutation } from '@apollo/react-hooks';
+import React from 'react';
+import styled, { css } from 'styled-components/macro';
+
+import { Button, Container, Div, Flex, Grid, H2, H3,
+  Hr, Muted, StyledInput, StyledLabel, StyledTextInput } from '@haas/ui';
+
 import { createNewQuestionnaire } from '../mutations/createNewQuestionnaire';
+import getQuestionnairesCustomerQuery from '../queries/getQuestionnairesCustomerQuery';
 
 interface FormDataProps {
   title: string;
@@ -20,7 +21,6 @@ interface FormDataProps {
 const AddTopicView = () => {
   const history = useHistory();
   const { register, handleSubmit, errors } = useForm<FormDataProps>();
-  const params = useParams();
   const { customerId } = useParams();
 
   const [addTopic, { loading }] = useMutation(createNewQuestionnaire, {

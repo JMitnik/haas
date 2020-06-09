@@ -8,7 +8,7 @@ import Sidenav from 'components/Sidenav';
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const { topicId, customerId }: { topicId: string, customerId: string } = useParams<any>();
   const history = useHistory();
-  const sideNavIsActive = (customerId != undefined && topicId != undefined);
+  const sideNavIsActive = (customerId !== undefined && topicId !== undefined);
 
   return (
     <DashboardContainer>
@@ -17,10 +17,24 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
         <Div>
           <Logo isWhite={sideNavIsActive} />
         </Div>
-        <button type="button" onClick={() => history.push(`/dashboard/c/${customerId}/t/${topicId}/`)}>Dashboard</button>
-        <button type="button" onClick={() => history.push(`/dashboard/c/${customerId}/users/`)}>Users</button>
-        <button type="button" onClick={() => history.push(`/dashboard/c/${customerId}/roles/`)}>Roles</button>
-        <button type="button" onClick={() => history.push(`/dashboard/c/${customerId}/t/${topicId}/interactions`)}>Interactions overview</button>
+
+        {/* TODO: Make these into actual navlinks */}
+        {sideNavIsActive && (
+          <>
+            <button type="button" onClick={() => history.push(`/dashboard/c/${customerId}/t/${topicId}/`)}>
+              Dashboard
+            </button>
+            <button type="button" onClick={() => history.push(`/dashboard/c/${customerId}/users/`)}>
+              Users
+            </button>
+            <button type="button" onClick={() => history.push(`/dashboard/c/${customerId}/roles/`)}>
+              Roles
+            </button>
+            <button type="button" onClick={() => history.push(`/dashboard/c/${customerId}/t/${topicId}/interactions`)}>
+              Interactions overview
+            </button>
+          </>
+        )}
       </Sidenav>
       {children}
     </DashboardContainer>

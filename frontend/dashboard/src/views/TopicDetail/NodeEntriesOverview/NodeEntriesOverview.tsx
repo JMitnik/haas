@@ -1,9 +1,11 @@
-import React from 'react';
 import { useQuery } from '@apollo/react-hooks';
-import { H2, Loader, Hr, Div } from '@haas/ui';
-import getSessionAnswerFlow from '../../../queries/getSessionAnswerFlow';
+import React from 'react';
+
+import { Div, H2, Loader } from '@haas/ui';
+
 import { NodeEntriesOverviewContainer, NodeEntryContainer } from './NodeEntriesOverviewStyles';
 import { NodeEntryProps } from './NodeEntriesOverviewInterfaces';
+import getSessionAnswerFlow from '../../../queries/getSessionAnswerFlow';
 
 const NodeEntriesOverview = ({ sessionId }: { sessionId: string }) => {
   const { loading, data } = useQuery(getSessionAnswerFlow, {

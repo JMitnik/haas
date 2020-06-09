@@ -60,9 +60,6 @@
         "eject": "react-scripts eject",
         "eslint": "eslint --ext .js,.jsx,.ts,.tsx ./src"
     },
-    "eslintConfig": {
-        "extends": "react-app"
-    },
     "browserslist": {
         "production": [
             ">0.2%",
@@ -77,11 +74,14 @@
     },
     "devDependencies": {
         "@typescript-eslint/eslint-plugin": "^2.15.0",
+        "@typescript-eslint/parser": "^2.15.0",
         "cra-workspaces": "^1.0.1",
         "eslint-config-airbnb-typescript": "^6.3.1",
-        "eslint-plugin-import": "^2.19.1",
+        "eslint-config-prettier": "^6.10.1",
+        "eslint-plugin-import": "2.20.2",
         "eslint-plugin-jsx-a11y": "^6.2.3",
+        "eslint-plugin-prettier": "^3.1.2",
         "eslint-plugin-react": "^7.17.0",
-        "eslint-plugin-react-hooks": "^1.7.0"
+        "eslint-plugin-react-hooks": "^4.0.4"
     }
 }

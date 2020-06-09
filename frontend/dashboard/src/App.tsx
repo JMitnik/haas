@@ -4,11 +4,9 @@ import { ThemeProvider } from 'styled-components';
 import React, { FC } from 'react';
 
 import DashboardPage from 'pages/dashboard';
-import TopicsOverview from 'views/TopicsOverview/TopicsOverview';
 
 import { AppContainer } from './styles/AppStyles';
 import GlobalStyle from './config/global-styles';
-import TopNav from './components/Nav';
 import client from './config/apollo';
 import themeConfig from './config/theme';
 
