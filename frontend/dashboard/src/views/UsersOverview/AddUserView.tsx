@@ -4,14 +4,12 @@ import { useHistory, useParams } from 'react-router';
 import { useMutation, useQuery } from '@apollo/react-hooks';
 import React, { useState } from 'react';
 import Select from 'react-select';
+import styled, { css } from 'styled-components/macro';
 
-import {
-  Button, Container, Div, Flex, Form, FormGroupContainer, Grid,
-  H2, H3, Hr, Muted, StyledInput, StyledLabel,
-} from '@haas/ui';
-import editUserMutation from 'mutations/editUser';
+import { Button, Container, Div, Flex, Grid, H2, H3,
+  Hr, Muted, StyledInput, StyledLabel, StyledTextInput } from '@haas/ui';
+import createAddMutation from 'mutations/createUser';
 import getRolesQuery from 'queries/getRoles';
-import getUserQuery from 'queries/getUser';
 
 interface FormDataProps {
   firstName?: string;
@@ -21,49 +19,15 @@ interface FormDataProps {
   role: { label: string, value: string };
 }
 
-const EditUsersView = () => {
-  const { customerId, userId } = useParams<{ customerId: string, userId: string }>();
-
-  const { data: userData, error, loading } = useQuery(getUserQuery, {
-    fetchPolicy: 'cache-and-network',
-    variables: {
-      id: userId,
-    },
-  });
-
-  const { data: rolesData, loading: rolesLoading } = useQuery(getRolesQuery, {
-    variables: {
-      customerId,
-    },
-  });
-
-  if (loading || rolesLoading) return null;
-  if (error) return <><p>{error.message}</p></>;
-
-  const user = userData?.user;
-  console.log('USER: ', user);
-  const roles: Array<any> = rolesData?.roles;
-  const mappedRoles = roles.map((role) => ({ label: role.name, value: role.id }));
-  return <EditCustomerForm user={user} roles={mappedRoles} />;
-};
-
-const EditCustomerForm = ({ user, roles }: { user: any, roles: Array<{ label: string, value: string }> }) => {
+const AddUserView = () => {
   const history = useHistory();
-  const { customerId, userId } = useParams<{ customerId: string, userId: string }>();
+  const { register, handleSubmit, errors } = useForm<FormDataProps>();
+  const { customerId } = useParams();
 
-  const userRole = user?.role ? { label: user?.role?.name, value: user?.role?.id } : null;
-  const [activeRole, setActiveRole] = useState<null | { label: string, value: string }>(userRole);
+  const [activeRole, setActiveRole] = useState<null | { label: string, value: string }>(null);
 
-  const { register, handleSubmit, errors } = useForm<FormDataProps>({
-    defaultValues: {
-      firstName: user?.firstName,
-      lastName: user?.lastName,
-      email: user.email,
-      phone: user.phone,
-    },
-  });
-
-  const [editUser, { loading }] = useMutation(editUserMutation, {
+  const { data, loading: rolesLoading } = useQuery(getRolesQuery, { variables: { customerId } });
+  const [addUser, { loading }] = useMutation(createAddMutation, {
     onCompleted: () => {
       history.push(`/dashboard/c/${customerId}/users/`);
     },
@@ -71,6 +35,9 @@ const EditCustomerForm = ({ user, roles }: { user: any, roles: Array<{ label: st
       console.log(serverError);
     },
   });
+
+  const roles: Array<{name: string, id: string}> = data?.roles;
+  const mappedRoles = roles?.map(({ name, id }) => ({ label: name, value: id }));
 
   const onSubmit = (formData: FormDataProps) => {
     const optionInput = {
@@ -80,10 +47,10 @@ const EditCustomerForm = ({ user, roles }: { user: any, roles: Array<{ label: st
       email: formData.email || '',
       phone: formData.phone || '',
     };
-    console.log(optionInput);
-    editUser({
+
+    addUser({
       variables: {
-        id: userId,
+        id: customerId,
         input: optionInput,
       },
     });
@@ -92,8 +59,8 @@ const EditCustomerForm = ({ user, roles }: { user: any, roles: Array<{ label: st
   return (
     <Container>
       <Div>
-        <H2 color="default.darkest" fontWeight={500} py={2}>User</H2>
-        <Muted pb={4}>Edit an existing user</Muted>
+        <H2 color="default.darkest" fontWeight={500} py={2}> User </H2>
+        <Muted pb={4}>Create a new user</Muted>
       </Div>
 
       <Hr />
@@ -132,7 +99,7 @@ const EditCustomerForm = ({ user, roles }: { user: any, roles: Array<{ label: st
                 <Div useFlex flexDirection="column">
                   <StyledLabel>Role</StyledLabel>
                   <Select
-                    options={roles}
+                    options={mappedRoles}
                     value={activeRole}
                     onChange={(qOption: any) => {
                       setActiveRole(qOption);
@@ -148,7 +115,7 @@ const EditCustomerForm = ({ user, roles }: { user: any, roles: Array<{ label: st
           {loading && (<Muted>Loading...</Muted>)}
 
           <Flex>
-            <Button brand="primary" mr={2} type="submit">Save user</Button>
+            <Button brand="primary" mr={2} type="submit">Create user</Button>
             <Button brand="default" type="button" onClick={() => history.push(`/dashboard/c/${customerId}/users/`)}>Cancel</Button>
           </Flex>
         </Div>
@@ -157,4 +124,12 @@ const EditCustomerForm = ({ user, roles }: { user: any, roles: Array<{ label: st
   );
 };
 
-export default EditUsersView;
+const FormGroupContainer = styled.div`
+  ${({ theme }) => css`
+    padding-bottom: ${theme.gutter * 3}px;
+  `}
+`;
+
+const Form = styled.form``;
+
+export default AddUserView;

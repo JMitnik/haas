@@ -515,7 +515,8 @@ export interface NexusGenArgTypes {
       data?: NexusGenInputs['RoleInput'] | null; // RoleInput
     }
     createUser: { // args
-      data?: NexusGenInputs['UserInput'] | null; // UserInput
+      id?: string | null; // String
+      input?: NexusGenInputs['UserInput'] | null; // UserInput
     }
     deleteCustomer: { // args
       where?: NexusGenInputs['CustomerWhereUniqueInput'] | null; // CustomerWhereUniqueInput

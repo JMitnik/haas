@@ -158,7 +158,7 @@ type Mutation {
   createDialogue(customerId: String, description: String, isSeed: Boolean, publicTitle: String, title: String): Dialogue!
   createPermission(data: PermissionInput): PermssionType!
   createRole(data: RoleInput): RoleType!
-  createUser(data: UserInput): UserType!
+  createUser(id: String, input: UserInput): UserType!
   deleteCustomer(where: CustomerWhereUniqueInput): Customer!
   deleteDialogue(where: DialogueWhereUniqueInput): Dialogue!
   deleteUser(id: String): UserType!

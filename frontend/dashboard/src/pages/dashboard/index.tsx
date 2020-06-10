@@ -2,6 +2,7 @@ import { Route, Switch } from 'react-router';
 import React from 'react';
 
 import AddTopicView from 'views/AddTopicView';
+import AddUserView from 'views/UsersOverview/AddUserView';
 import CustomerBuilderView from 'views/CustomerBuilderView';
 import CustomerOverview from 'components/DashboardView';
 import EditCustomerView from 'views/EditCustomerView';
@@ -24,6 +25,14 @@ const DashboardPage = () => (
         render={() => (
           <DashboardLayout>
             <EditUserView />
+          </DashboardLayout>
+        )}
+      />
+      <Route
+        path="/dashboard/c/:customerId/users/add"
+        render={() => (
+          <DashboardLayout>
+            <AddUserView />
           </DashboardLayout>
         )}
       />
