@@ -6,6 +6,7 @@ import CustomerBuilderView from 'views/CustomerBuilderView';
 import CustomerOverview from 'components/DashboardView';
 import EditCustomerView from 'views/EditCustomerView';
 import EditTopicView from 'views/EditTopicView';
+import EditUserView from 'views/UsersOverview/EditUserView';
 import InteractionsOverview from 'views/InteractionsOverview/InteractionsOverview';
 import OrganisationSettingsView from 'views/OrganisationSettingsView';
 import RolesOverview from 'views/RolesOverview/RolesOverview';
@@ -18,6 +19,14 @@ import DashboardLayout from './DashboardLayout';
 const DashboardPage = () => (
   <>
     <Switch>
+      <Route
+        path="/dashboard/c/:customerId/u/:userId/edit"
+        render={() => (
+          <DashboardLayout>
+            <EditUserView />
+          </DashboardLayout>
+        )}
+      />
       <Route
         path="/dashboard/c/:customerId/t/:topicId/edit"
         render={() => <DashboardLayout><EditTopicView /></DashboardLayout>}

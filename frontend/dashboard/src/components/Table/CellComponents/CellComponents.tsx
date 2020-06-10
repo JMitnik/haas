@@ -14,7 +14,7 @@ export const WhenCell = ({ value }: { value: any }) => {
   if (dateDifference <= 4 || dateDifference >= 7) {
     formatted = `${formatDistance(date, currentDate)} ago`;
   } else if (dateDifference > 4 && dateDifference < 7) {
-    formatted = format(date, 'EEEE hh:mm a')
+    formatted = format(date, 'EEEE hh:mm a');
   }
 
   return (
@@ -23,14 +23,14 @@ export const WhenCell = ({ value }: { value: any }) => {
         <Span fontSize="0.8em" fontWeight={900}>{formatted?.toUpperCase()}</Span>
       </Div>
     </Flex>
-  )
-}
+  );
+};
 
 const getBadgeBackgroundColour = (value: number) => {
   if (value >= 70) return { background: '#e2f0c7', color: '#42c355' };
   if (value > 50 && value < 70) return { background: '#f2dda5', color: '#dd992a' };
   return { background: '#f5c4c0', color: '#d5372c' };
-}
+};
 
 export const ScoreCell = ({ value }: CellProps) => {
   const { background, color } = getBadgeBackgroundColour(value);
@@ -42,8 +42,8 @@ export const ScoreCell = ({ value }: CellProps) => {
         </Span>
       </Div>
     </Flex>
-  )
-}
+  );
+};
 
 export const UserCell = ({ value }: CellProps) => (
   <Flex alignItems="center" justifyContent="center">
@@ -51,7 +51,7 @@ export const UserCell = ({ value }: CellProps) => (
       <Span fontSize="0.8em" fontWeight={900}>{value}</Span>
     </Div>
   </Flex>
-)
+);
 
 export const CenterCell = ({ value }: CellProps) => (
   <Flex alignItems="center" justifyContent="center">
@@ -59,7 +59,7 @@ export const CenterCell = ({ value }: CellProps) => (
       <Span fontSize="1.2em" fontWeight={900}>{value}</Span>
     </Div>
   </Flex>
-)
+);
 
 interface RoleColumnProps {
   name: string;
@@ -73,5 +73,5 @@ export const RoleCell = ({ value }: { value: RoleColumnProps }) => {
         <Span fontSize="0.8em" fontWeight={900}>{name}</Span>
       </Div>
     </Flex>
-  )
-}
+  );
+};

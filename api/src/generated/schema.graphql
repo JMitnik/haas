@@ -229,6 +229,7 @@ type Query {
   roleTable(customerId: String): RoleTableType!
   session(where: SessionWhereUniqueInput): Session!
   sessions(where: SessionWhereUniqueInput): [Session!]!
+  user(userId: String): UserType!
   users(customerId: String): [UserType!]!
 }
 
@@ -379,5 +380,6 @@ type UserType {
   firstName: String
   id: ID!
   lastName: String
+  phone: String
   role: RoleType!
 }

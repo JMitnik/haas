@@ -47,3 +47,11 @@ export interface RowComponentProps {
   headers: Array<HeaderColumnProps>;
   index: number;
 }
+
+export interface UserRowProps {
+  data: CellComponentProps;
+  permissions?: Array<PermissionProps>;
+  onDeleteUser: (event: any, userId: string) => Promise<void>;
+  headers: Array<HeaderColumnProps>;
+  index: number;
+}

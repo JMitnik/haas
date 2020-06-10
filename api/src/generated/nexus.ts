@@ -232,6 +232,7 @@ export interface NexusGenRootTypes {
     firstName?: string | null; // String
     id: string; // ID!
     lastName?: string | null; // String
+    phone?: string | null; // String
   }
   lineChartDataType: { // root type
     x: string; // String!
@@ -423,6 +424,7 @@ export interface NexusGenFieldTypes {
     roleTable: NexusGenRootTypes['RoleTableType']; // RoleTableType!
     session: NexusGenRootTypes['Session']; // Session!
     sessions: NexusGenRootTypes['Session'][]; // [Session!]!
+    user: NexusGenRootTypes['UserType']; // UserType!
     users: NexusGenRootTypes['UserType'][]; // [UserType!]!
   }
   QuestionNode: { // field return type
@@ -475,6 +477,7 @@ export interface NexusGenFieldTypes {
     firstName: string | null; // String
     id: string; // ID!
     lastName: string | null; // String
+    phone: string | null; // String
     role: NexusGenRootTypes['RoleType']; // RoleType!
   }
   lineChartDataType: { // field return type
@@ -597,6 +600,9 @@ export interface NexusGenArgTypes {
     }
     sessions: { // args
       where?: NexusGenInputs['SessionWhereUniqueInput'] | null; // SessionWhereUniqueInput
+    }
+    user: { // args
+      userId?: string | null; // String
     }
     users: { // args
       customerId?: string | null; // String

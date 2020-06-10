@@ -1,16 +1,17 @@
-import { useLazyQuery } from '@apollo/react-hooks';
+import { ApolloError } from 'apollo-boost';
+import { useLazyQuery, useMutation } from '@apollo/react-hooks';
 import { useParams } from 'react-router';
 import React, { useEffect, useState } from 'react';
 
 import { Div, H2 } from '@haas/ui';
 import DatePickerComponent from 'components/DatePicker/DatePickerComponent';
 import SearchBarComponent from 'components/SearchBar/SearchBarComponent';
-import Table from 'components/Table/Table';
-import getInteractionsQuery from 'queries/getInteractionsQuery'
 import getUsersQuery from 'queries/getUsers';
 
 import { CenterCell, RoleCell, ScoreCell, UserCell, WhenCell } from 'components/Table/CellComponents/CellComponents';
 import { InputContainer, InputOutputContainer } from './UsersOverviewStyles';
+import Table from './UserTable';
+import deleteUserQuery from '../../mutations/deleteUser';
 
 interface TableProps {
   activeStartDate: Date | null;
@@ -25,7 +26,7 @@ interface TableProps {
 }
 
 const HEADERS = [{ Header: 'First name', accessor: 'firstName', Cell: CenterCell },
-{ Header: 'Last name', accessor: 'lastName', Cell: CenterCell }, { Header: 'Email', accessor: 'email', Cell: UserCell }, { Header: 'Role', accessor: 'role', Cell: RoleCell }]
+  { Header: 'Last name', accessor: 'lastName', Cell: CenterCell }, { Header: 'Email', accessor: 'email', Cell: UserCell }, { Header: 'Role', accessor: 'role', Cell: RoleCell }];
 
 const UsersOverview = () => {
   const { customerId } = useParams();
@@ -40,6 +41,13 @@ const UsersOverview = () => {
       sortBy: [{ id: 'id', desc: true }],
     },
   );
+
+  const [deleteUser] = useMutation(deleteUserQuery, {
+    refetchQueries: [{ query: getUsersQuery, variables: { customerId } }], // TODO: Add filter object
+    onError: (serverError: ApolloError) => {
+      console.log(serverError);
+    },
+  });
 
   const tableData: any = data?.users || [];
   console.log('USERS: ', data?.users);
@@ -58,16 +66,25 @@ const UsersOverview = () => {
         //   orderBy: sortBy,
         // },
       },
-    })
-  }, [activeGridProperties])
+    });
+  }, [activeGridProperties]);
+
+  const handleDeleteUser = async (event: any, userId: string) => {
+    deleteUser({
+      variables: {
+        id: userId,
+      },
+    });
+    event.stopPropagation();
+  };
 
   const handleSearchTermChange = (newSearchTerm: string) => {
     setActiveGridProperties((prevValues) => ({ ...prevValues, activeSearchTerm: newSearchTerm }));
-  }
+  };
 
   const handleDateChange = (startDate: Date | null, endDate: Date | null) => {
-    setActiveGridProperties((prevValues) => ({ ...prevValues, activeStartDate: startDate, activeEndDate: endDate }))
-  }
+    setActiveGridProperties((prevValues) => ({ ...prevValues, activeStartDate: startDate, activeEndDate: endDate }));
+  };
 
   const pageCount = data?.getUsers?.pages || 1;
   const pageIndex = data?.getUsers?.pageIndex || 0;
@@ -90,11 +107,12 @@ const UsersOverview = () => {
           headers={HEADERS}
           gridProperties={{ ...activeGridProperties, pageCount, pageIndex }}
           onGridPropertiesChange={setActiveGridProperties}
+          onDeleteUser={handleDeleteUser}
           data={tableData}
         />
       </Div>
     </Div>
-  )
-}
+  );
+};
 
 export default UsersOverview;

@@ -1,15 +1,15 @@
-import React, { FC } from 'react';
-import { useQuery, useMutation } from '@apollo/react-hooks';
 import { ApolloError } from 'apollo-boost';
+import { useMutation, useQuery } from '@apollo/react-hooks';
+import React, { FC } from 'react';
 
-import { Plus, X, Edit } from 'react-feather';
-import { H2, H3, Grid, Flex, Div, Card, CardBody,
-  Container, DeleteButtonContainer, AddCard, EditButtonContainer } from '@haas/ui';
+import { AddCard, Card, CardBody, Container, DeleteButtonContainer, Div, EditButtonContainer,
+  Flex, Grid, H2, H3 } from '@haas/ui';
+import { Edit, Plus, X } from 'react-feather';
 import { Link, useHistory } from 'react-router-dom';
 
-import { getCustomerQuery } from '../../queries/getCustomersQuery';
-import { deleteFullCustomerQuery } from '../../mutations/deleteFullCustomer';
 import { CustomerCardImage } from './DashboardViewStyles';
+import { deleteFullCustomerQuery } from '../../mutations/deleteFullCustomer';
+import { getCustomerQuery } from '../../queries/getCustomersQuery';
 
 const DashboardView: FC = () => {
   const { loading, error, data } = useQuery(getCustomerQuery);
@@ -68,7 +68,7 @@ const CustomerCard = ({ customer }: { customer: any }) => {
   const setCustomerEditPath = (event: any, customerId: string) => {
     history.push(`/dashboard/c/${customerId}/edit`);
     event.stopPropagation();
-  }
+  };
 
   const [deleteCustomer] = useMutation(deleteFullCustomerQuery, {
     refetchQueries: [{ query: getCustomerQuery }],

@@ -1,7 +1,7 @@
 import { NodeEntry, NodeEntryValue, NodeEntryWhereInput, PrismaClient, Session, SessionWhereInput, User } from '@prisma/client';
-import { extendType, inputObjectType, objectType } from '@nexus/schema';
 import { PermissionType } from './Permission';
 import { RoleType } from './Role';
+import { extendType, inputObjectType, objectType } from '@nexus/schema';
 import _ from 'lodash';
 
 const prisma = new PrismaClient();
@@ -11,6 +11,7 @@ export const UserType = objectType({
   definition(t) {
     t.id('id');
     t.string('email');
+    t.string('phone', { nullable: true });
     t.string('firstName', { nullable: true });
     t.string('lastName', { nullable: true });
     t.field('role', {
@@ -43,6 +44,13 @@ export const UserQueries = extendType({
       args: { customerId: 'String' },
       resolve(parent: any, args: any, ctx: any) {
         return prisma.user.findMany({ where: { customerId: args.customerId } });
+      },
+    });
+    t.field('user', {
+      type: UserType,
+      args: { userId: 'String' },
+      resolve(parent: any, args: any, ctx: any) {
+        return prisma.user.findOne({ where: { id: args.userId } });
       },
     });
   },
@@ -98,6 +106,7 @@ export const UserMutations = extendType({
       type: UserType,
       args: { id: 'String' },
       resolve(parent: any, args: any, ctx) {
+        console.log('ARGS:', args);
         return prisma.user.delete({ where: { id: args.id } });
       },
     });
