@@ -1,7 +1,7 @@
 import { NodeEntry, NodeEntryValue, NodeEntryWhereInput, PrismaClient, Session, SessionWhereInput, User } from '@prisma/client';
-import { RoleType } from '../role/Role';
 import { extendType, inputObjectType, objectType } from '@nexus/schema';
 import _ from 'lodash';
+import { RoleType } from '../role/Role';
 
 import { PermissionInput } from '../permission/Permission';
 
@@ -66,7 +66,6 @@ export const UserMutations = extendType({
         input: UserInput },
       resolve(parent: any, args: any, ctx: any) {
         const { firstName, lastName, email, password, phone, roleId, customerId } = args.input;
-        console.log('phone: ', phone);
         return prisma.user.create({
           data: {
             email,
@@ -92,7 +91,6 @@ export const UserMutations = extendType({
       args: { id: 'String', input: UserInput },
       resolve(parent: any, args: any, ctx) {
         const { firstName, lastName, email, password, phone, roleId, customerId } = args.input;
-        console.log('phone: ', phone);
         return prisma.user.update({
           where: {
             id: args.id,
@@ -115,7 +113,6 @@ export const UserMutations = extendType({
       type: UserType,
       args: { id: 'String' },
       resolve(parent: any, args: any, ctx) {
-        console.log('ARGS:', args);
         return prisma.user.delete({ where: { id: args.id } });
       },
     });
