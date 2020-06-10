@@ -13,6 +13,7 @@ export const RoleType = objectType({
     t.id('id');
     t.string('name');
     t.list.field('permissions', {
+      nullable: true,
       type: PermissionType,
       async resolve(parent: Role, args: any, ctx: any) {
         const customerPermissions = await prisma.permission.findMany({
@@ -32,7 +33,7 @@ export const RoleType = objectType({
         return activePermissions;
       },
     });
-    t.int('amtPermissions');
+    t.int('amtPermissions', { nullable: true });
     t.field('customer', {
       type: CustomerType,
       resolve(parent: Role, args: any, ctx: any) {

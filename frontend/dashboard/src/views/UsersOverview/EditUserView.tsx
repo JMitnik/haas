@@ -9,49 +9,62 @@ import {
   Button, Container, Div, Flex, Form, FormGroupContainer, Grid,
   H2, H3, Hr, Muted, StyledInput, StyledLabel,
 } from '@haas/ui';
-
-import { getCustomerQuery } from '../../queries/getCustomersQuery';
-import editCustomerMutation from '../../mutations/editCustomer';
-import getEditCustomerData from '../../queries/getEditCustomer';
+import editUserMutation from 'mutations/editUser';
+import getRolesQuery from 'queries/getRoles';
+import getUserQuery from 'queries/getUser';
 
 interface FormDataProps {
   firstName?: string;
   lastName?: string;
   email: string;
   phone?: string;
-  role: { label: string, value: string};
+  role: { label: string, value: string };
 }
 
 const EditUsersView = () => {
-  const { customerId } = useParams();
+  const { customerId, userId } = useParams<{ customerId: string, userId: string }>();
 
-  const { data: customerData, error, loading } = useQuery(getEditCustomerData, {
+  const { data: userData, error, loading } = useQuery(getUserQuery, {
     variables: {
-      id: customerId,
+      id: userId,
     },
   });
 
-  if (loading) return null;
+  const { data: rolesData, loading: rolesLoading } = useQuery(getRolesQuery, {
+    variables: {
+      customerId,
+    },
+  });
+
+  if (loading || rolesLoading) return null;
   if (error) return <><p>{error.message}</p></>;
 
-  const customer = customerData?.customer;
-
-  return <EditCustomerForm customer={customer} />;
+  const user = userData?.user;
+  const roles: Array<any> = rolesData?.roles;
+  const mappedRoles = roles.map((role) => ({ label: role.name, value: role.id }));
+  return <EditCustomerForm user={user} roles={mappedRoles} />;
 };
 
-const EditCustomerForm = ({ customer }: { customer: any }) => {
+const EditCustomerForm = ({ user, roles }: { user: any, roles: Array<{ label: string, value: string }> }) => {
   const history = useHistory();
-  const { customerId, userId } = useParams<{customerId: string, userId: string}>();
+  const { customerId, userId } = useParams<{ customerId: string, userId: string }>();
 
-  const [activeRole, setActiveRole] = useState<null | { label: string, value: string }>(null);
+  const userRole = user?.role ? { label: user?.role?.name, value: user?.role?.id } : null;
+  const [activeRole, setActiveRole] = useState<null | { label: string, value: string }>(userRole);
 
-  const { register, handleSubmit, errors } = useForm<FormDataProps>();
+  const { register, handleSubmit, errors } = useForm<FormDataProps>({
+    defaultValues: {
+      firstName: user?.firstName,
+      lastName: user?.lastName,
+      email: user.email,
+      phone: user.phone,
+    },
+  });
 
-  const [editCustomer, { loading }] = useMutation(editCustomerMutation, {
+  const [editUser, { loading }] = useMutation(editUserMutation, {
     onCompleted: () => {
       history.push(`/dashboard/c/${customerId}/users/`);
     },
-    refetchQueries: [{ query: getCustomerQuery }],
     onError: (serverError: ApolloError) => {
       console.log(serverError);
     },
@@ -59,17 +72,17 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
 
   const onSubmit = (formData: FormDataProps) => {
     const optionInput = {
-      role: activeRole?.value || null,
-      firstName: formData.firstName,
-      lastName: formData.lastName,
-      email: formData.email,
-      phone: formData.email,
+      roleId: activeRole?.value || null,
+      firstName: formData.firstName || '',
+      lastName: formData.lastName || '',
+      email: formData.email || '',
+      phone: formData.phone || '',
     };
 
-    editCustomer({
+    editUser({
       variables: {
         id: userId,
-        options: optionInput,
+        input: optionInput,
       },
     });
   };
@@ -111,13 +124,13 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
                 </Div>
                 <Div useFlex flexDirection="column">
                   <StyledLabel>Phone number</StyledLabel>
-                  <StyledInput name="phone" ref={register({ required: true })} />
+                  <StyledInput name="phone" />
                   {errors.phone && <Muted color="warning">Something went wrong!</Muted>}
                 </Div>
                 <Div useFlex flexDirection="column">
                   <StyledLabel>Role</StyledLabel>
                   <Select
-                    options={[{ label: 'label', value: 'value' }]}
+                    options={roles}
                     value={activeRole}
                     onChange={(qOption: any) => {
                       setActiveRole(qOption);
@@ -134,7 +147,7 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
 
           <Flex>
             <Button brand="primary" mr={2} type="submit">Save user</Button>
-            <Button brand="default" type="button" onClick={() => history.push('/')}>Cancel</Button>
+            <Button brand="default" type="button" onClick={() => history.push(`/dashboard/c/${customerId}/users/`)}>Cancel</Button>
           </Flex>
         </Div>
       </Form>

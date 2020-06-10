@@ -213,7 +213,7 @@ export interface NexusGenRootTypes {
     roles: NexusGenRootTypes['RoleType'][]; // [RoleType!]!
   }
   RoleType: { // root type
-    amtPermissions: number; // Int!
+    amtPermissions?: number | null; // Int
     id: string; // ID!
     name: string; // String!
   }
@@ -379,10 +379,10 @@ export interface NexusGenFieldTypes {
     deleteUser: NexusGenRootTypes['UserType']; // UserType!
     editCustomer: NexusGenRootTypes['Customer']; // Customer!
     editDialogue: NexusGenRootTypes['Dialogue']; // Dialogue!
+    editUser: NexusGenRootTypes['UserType']; // UserType!
     singleUpload: NexusGenRootTypes['ImageType']; // ImageType!
     updateRoles: NexusGenRootTypes['RoleType']; // RoleType!
     updateTopicBuilder: string; // String!
-    updateUser: NexusGenRootTypes['UserType']; // UserType!
     uploadUserSession: NexusGenRootTypes['Session']; // Session!
   }
   NodeEntry: { // field return type
@@ -451,11 +451,11 @@ export interface NexusGenFieldTypes {
     roles: NexusGenRootTypes['RoleType'][]; // [RoleType!]!
   }
   RoleType: { // field return type
-    amtPermissions: number; // Int!
+    amtPermissions: number | null; // Int
     customer: NexusGenRootTypes['Customer']; // Customer!
     id: string; // ID!
     name: string; // String!
-    permissions: NexusGenRootTypes['PermssionType'][]; // [PermssionType!]!
+    permissions: NexusGenRootTypes['PermssionType'][] | null; // [PermssionType!]
   }
   Session: { // field return type
     createdAt: string; // String!
@@ -536,6 +536,10 @@ export interface NexusGenArgTypes {
       publicTitle?: string | null; // String
       title?: string | null; // String
     }
+    editUser: { // args
+      id?: string | null; // String
+      input?: NexusGenInputs['UserInput'] | null; // UserInput
+    }
     singleUpload: { // args
       file?: any | null; // Upload
     }
@@ -546,10 +550,6 @@ export interface NexusGenArgTypes {
     updateTopicBuilder: { // args
       id?: string | null; // String
       topicData?: NexusGenInputs['TopicDataEntry'] | null; // TopicDataEntry
-    }
-    updateUser: { // args
-      id?: string | null; // String
-      input?: NexusGenInputs['UserInput'] | null; // UserInput
     }
     uploadUserSession: { // args
       uploadUserSessionInput?: NexusGenInputs['UploadUserSessionInput'] | null; // UploadUserSessionInput

@@ -6,7 +6,7 @@ import { Div, H2 } from '@haas/ui';
 import DatePickerComponent from 'components/DatePicker/DatePickerComponent';
 import SearchBarComponent from 'components/SearchBar/SearchBarComponent';
 
-import getRolesQuery from 'queries/getRoles';
+import getRolesQuery from 'queries/getRolesTable';
 
 import { CenterCell, RoleCell, ScoreCell, UserCell, WhenCell } from 'components/Table/CellComponents/CellComponents';
 import { InputContainer, InputOutputContainer } from './RolesOverviewStyles';
@@ -62,16 +62,16 @@ const RolesOverview = () => {
         //   orderBy: sortBy,
         // },
       },
-    })
-  }, [activeGridProperties])
+    });
+  }, [activeGridProperties]);
 
   const handleSearchTermChange = (newSearchTerm: string) => {
     setActiveGridProperties((prevValues) => ({ ...prevValues, activeSearchTerm: newSearchTerm }));
-  }
+  };
 
   const handleDateChange = (startDate: Date | null, endDate: Date | null) => {
-    setActiveGridProperties((prevValues) => ({ ...prevValues, activeStartDate: startDate, activeEndDate: endDate }))
-  }
+    setActiveGridProperties((prevValues) => ({ ...prevValues, activeStartDate: startDate, activeEndDate: endDate }));
+  };
 
   const pageCount = data?.roleTable?.pages || 1;
   const pageIndex = data?.roleTable?.pageIndex || 0;
@@ -99,7 +99,7 @@ const RolesOverview = () => {
         />
       </Div>
     </Div>
-  )
-}
+  );
+};
 
 export default RolesOverview;

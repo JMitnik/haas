@@ -1,7 +1,7 @@
 import { NodeEntry, NodeEntryValue, NodeEntryWhereInput, PrismaClient, Session, SessionWhereInput, User } from '@prisma/client';
+import { extendType, inputObjectType, objectType } from '@nexus/schema';
 import { PermissionType } from './Permission';
 import { RoleType } from './Role';
-import { extendType, inputObjectType, objectType } from '@nexus/schema';
 import _ from 'lodash';
 
 const prisma = new PrismaClient();
@@ -26,7 +26,7 @@ export const UserType = objectType({
 export const UserInput = inputObjectType({
   name: 'UserInput',
   definition(t) {
-    t.string('customerId');
+    t.string('customerId', { nullable: true });
     t.string('firstName', { nullable: true });
     t.string('lastName', { nullable: true });
     t.string('email');
@@ -84,7 +84,7 @@ export const UserMutations = extendType({
         });
       },
     });
-    t.field('updateUser', {
+    t.field('editUser', {
       type: UserType,
       args: { id: 'String', input: UserInput },
       resolve(parent: any, args: any, ctx) {
@@ -98,6 +98,12 @@ export const UserMutations = extendType({
             firstName,
             lastName,
             phone,
+            email,
+            role: {
+              connect: {
+                id: roleId,
+              },
+            },
           },
         });
       },
