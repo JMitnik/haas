@@ -2,7 +2,7 @@ import { PrismaClient, Role } from '@prisma/client';
 import { extendType, inputObjectType, objectType } from '@nexus/schema';
 
 import { CustomerType } from '../customer/Customer';
-import { PermissionType } from './Permission';
+import { PermissionType } from '../permission/Permission';
 import RoleResolver from './role-resolver';
 
 const prisma = new PrismaClient();

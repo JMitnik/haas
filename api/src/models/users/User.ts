@@ -1,8 +1,9 @@
 import { NodeEntry, NodeEntryValue, NodeEntryWhereInput, PrismaClient, Session, SessionWhereInput, User } from '@prisma/client';
-import { PermissionType } from './Permission';
-import { RoleType } from './Role';
+import { RoleType } from '../role/Role';
 import { extendType, inputObjectType, objectType } from '@nexus/schema';
 import _ from 'lodash';
+
+import { PermissionInput } from '../permission/Permission';
 
 const prisma = new PrismaClient();
 

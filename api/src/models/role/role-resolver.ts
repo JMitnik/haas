@@ -13,6 +13,12 @@ class RoleResolver {
     const mappedRoles = roles.map((role) => ({ ...role, amtPermissions: role.permissions.length }));
     return mappedRoles;
   };
+
+  static deleteRoles = async (roleIds: Array<string>) => prisma.role.deleteMany({ where: {
+    id: {
+      in: roleIds,
+    },
+  } });
 }
 
 export default RoleResolver;

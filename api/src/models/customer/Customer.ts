@@ -1,15 +1,17 @@
 
 import { Customer, PrismaClient } from '@prisma/client';
 
-import { objectType, extendType, inputObjectType, scalarType } from '@nexus/schema';
+import { extendType, inputObjectType, objectType, scalarType } from '@nexus/schema';
 
 import { GraphQLUpload } from 'apollo-server-express';
 import cloudinary, { UploadApiResponse } from 'cloudinary';
 
 import { CustomerSettingsType } from '../settings/CustomerSettings';
 import { DialogueType } from '../questionnaire/Dialogue';
-import DialogueResolver from '../questionnaire/dialogue-resolver';
 import CustomerResolver from './customer-resolver';
+import DialogueResolver from '../questionnaire/dialogue-resolver';
+import PermissionResolver from '../permission/permission-resolver';
+import RoleResolver from '../role/role-resolver';
 
 export const CustomerType = objectType({
   name: 'Customer',
@@ -139,7 +141,7 @@ export const CustomerMutations = Upload && extendType({
       async resolve(parent: any, args: any, ctx: any) {
         const customerId = args.where.id;
         // TODO: Check with jonathan if this is preferred for auto completion
-        const { prisma }: { prisma: PrismaClient } = ctx.prisma;
+        const { prisma }: { prisma: PrismaClient } = ctx;
 
         const customer = await ctx.prisma.customer.findOne({
           where: { id: customerId },
@@ -194,6 +196,23 @@ export const CustomerMutations = Upload && extendType({
           await Promise.all(dialogueIds.map(async (dialogueId) => {
             await DialogueResolver.deleteDialogue(dialogueId.id);
           }));
+        }
+
+        const permissionIds = await prisma.permission.findMany({ where: { customerId }, select: { id: true } });
+        const mappedPermissionIds = permissionIds.map((permission) => permission.id);
+        if (mappedPermissionIds.length > 0) {
+          await PermissionResolver.deletePermissions(mappedPermissionIds);
+        }
+
+        console.log('delete permissions');
+
+        const userIds = await prisma.user.deleteMany({ where: { customerId } });
+
+        console.log('removed users');
+        const roleIds = await prisma.role.findMany({ where: { customerId }, select: { id: true } });
+        const mappedRoleIds = roleIds.map((role) => role.id);
+        if (mappedRoleIds.length > 0) {
+          await RoleResolver.deleteRoles(mappedRoleIds);
         }
 
         await ctx.prisma.customer.delete({
