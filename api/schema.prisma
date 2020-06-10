@@ -176,7 +176,7 @@ model Permission {
 
 model Role {
   id          String       @default(cuid()) @id
-  name        String
+  name        String       @unique
   roleId      String?
   permissions Permission[] @relation(references: [id])
   User        User[]
