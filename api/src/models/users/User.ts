@@ -1,9 +1,11 @@
-import { NodeEntry, NodeEntryValue, NodeEntryWhereInput, PrismaClient, Session, SessionWhereInput, User } from '@prisma/client';
+import { PrismaClient, User } from '@prisma/client';
 import { extendType, inputObjectType, objectType } from '@nexus/schema';
 import _ from 'lodash';
-import { RoleType } from '../role/Role';
 
-import { PermissionInput } from '../permission/Permission';
+import { FilterInput } from '../session/Session';
+import { PaginationProps } from '../../types/generic';
+import { RoleType } from '../role/Role';
+import UserResolver from './user-resolver';
 
 const prisma = new PrismaClient();
 
@@ -24,6 +26,15 @@ export const UserType = objectType({
   },
 });
 
+export const UserTable = objectType({
+  name: 'UserTable',
+  definition(t) {
+    t.list.field('users', { type: UserType });
+    t.int('pageIndex');
+    t.int('totalPages');
+  },
+});
+
 export const UserInput = inputObjectType({
   name: 'UserInput',
   definition(t) {
@@ -40,10 +51,33 @@ export const UserInput = inputObjectType({
 export const UserQueries = extendType({
   type: 'Query',
   definition(t) {
+    t.field('userTable', {
+      type: UserTable,
+      args: { customerId: 'String',
+        filter: FilterInput },
+      async resolve(parent: any, args: any, ctx: any) {
+        const { pageIndex, offset, limit, searchTerm, orderBy }: PaginationProps = args.filter;
+        if (args.filter) {
+          console.log('args.customerId', args.customerId);
+          console.log('args.filer: ', args.filter);
+          return UserResolver.paginatedUsers(args.customerId, pageIndex, offset, limit, orderBy[0], searchTerm);
+        }
+        const users = await prisma.user.findMany({ where: { customerId: args.customerId } });
+        const totalPages = Math.ceil(users.length / limit);
+        return { users, pageIndex, totalPages };
+      },
+    });
     t.list.field('users', {
       type: UserType,
-      args: { customerId: 'String' },
+      args: { customerId: 'String',
+        filter: FilterInput },
       resolve(parent: any, args: any, ctx: any) {
+        const { pageIndex, offset, limit, searchTerm, orderBy }: PaginationProps = args.filter;
+        if (args.filter) {
+          console.log('args.customerId', args.customerId);
+          console.log('args.filer: ', args.filter);
+          return UserResolver.paginatedUsers(args.customerId, pageIndex, offset, limit, orderBy[0], searchTerm);
+        }
         return prisma.user.findMany({ where: { customerId: args.customerId } });
       },
     });

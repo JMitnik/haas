@@ -52,22 +52,21 @@ const UsersOverview = () => {
     },
   });
 
-  const tableData: any = data?.users || [];
-  console.log('USERS: ', data?.users);
+  const tableData: any = data?.userTable.users || [];
   useEffect(() => {
     const { activeStartDate, activeEndDate, pageIndex, pageSize, sortBy, activeSearchTerm } = paginationProps;
     fetchUsers({
       variables: {
         customerId,
-        // filter: {
-        //   startDate: activeStartDate,
-        //   endDate: activeEndDate,
-        //   searchTerm: activeSearchTerm,
-        //   offset: pageIndex * pageSize,
-        //   limit: pageSize,
-        //   pageIndex,
-        //   orderBy: sortBy,
-        // },
+        filter: {
+          startDate: activeStartDate,
+          endDate: activeEndDate,
+          searchTerm: activeSearchTerm,
+          offset: pageIndex * pageSize,
+          limit: pageSize,
+          pageIndex,
+          orderBy: sortBy,
+        },
       },
     });
   }, [customerId, fetchUsers, paginationProps]);
@@ -99,8 +98,8 @@ const UsersOverview = () => {
     setPaginationProps((prevValues) => ({ ...prevValues, activeStartDate: startDate, activeEndDate: endDate }));
   }, 250), []);
 
-  const pageCount = data?.getUsers?.pages || 1;
-  const pageIndex = data?.getUsers?.pageIndex || 0;
+  const pageCount = data?.userTable?.totalPages || 1;
+  const pageIndex = data?.userTable?.pageIndex || 0;
 
   return (
     <Div px="24px" margin="0 auto" width="100vh" height="100vh" maxHeight="100vh" overflow="hidden">

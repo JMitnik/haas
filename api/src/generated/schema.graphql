@@ -102,6 +102,16 @@ input EdgeNodeInput {
   title: String
 }
 
+input FilterInput {
+  endDate: String
+  limit: Int
+  offset: Int
+  orderBy: [SortFilterInputObject!]
+  pageIndex: Int
+  searchTerm: String
+  startDate: String
+}
+
 type FontSettings {
   id: ID!
 }
@@ -111,16 +121,6 @@ type ImageType {
   filename: String
   mimetype: String
   url: String
-}
-
-input InteractionFilterInput {
-  endDate: String
-  limit: Int
-  offset: Int
-  orderBy: [SortFilterInputObject!]
-  pageIndex: Int
-  searchTerm: String
-  startDate: String
 }
 
 type InteractionSessionType {
@@ -221,16 +221,17 @@ type Query {
   edge(id: String): Edge!
   getQuestionnaireData(dialogueId: String, filter: Int): DialogueDetailResult!
   getSessionAnswerFlow(sessionId: ID): Session!
-  interactions(filter: InteractionFilterInput, where: SessionWhereUniqueInput): InteractionType!
+  interactions(filter: FilterInput, where: SessionWhereUniqueInput): InteractionType!
   lineChartData(dialogueId: String, limit: Int, numberOfDaysBack: Int, offset: Int): [lineChartDataType!]!
   questionNode(where: QuestionNodeWhereUniqueInput): QuestionNode!
   questionNodes: [QuestionNode!]!
   roles(customerId: String): [RoleType!]!
-  roleTable(customerId: String): RoleTableType!
+  roleTable(customerId: String, filter: FilterInput): RoleTableType!
   session(where: SessionWhereUniqueInput): Session!
   sessions(where: SessionWhereUniqueInput): [Session!]!
   user(userId: String): UserType!
-  users(customerId: String): [UserType!]!
+  users(customerId: String, filter: FilterInput): [UserType!]!
+  userTable(customerId: String, filter: FilterInput): UserTable!
 }
 
 input QuestionConditionInput {
@@ -373,6 +374,12 @@ input UserSessionEntryInput {
   depth: Int
   edgeId: String
   nodeId: String
+}
+
+type UserTable {
+  pageIndex: Int!
+  totalPages: Int!
+  users: [UserType!]!
 }
 
 type UserType {

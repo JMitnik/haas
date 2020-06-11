@@ -4,7 +4,6 @@ import { useParams } from 'react-router';
 import React, { useCallback, useEffect, useState } from 'react';
 
 import { Div, H2 } from '@haas/ui';
-import DatePicker from 'components/DatePicker/DatePickerComponent';
 import SearchBar from 'components/SearchBar/SearchBarComponent';
 import Table from 'components/Table/Table';
 import getRolesQuery from 'queries/getRolesTable';
@@ -70,10 +69,6 @@ const RolesOverview = () => {
     setPaginationProps((prevValues) => ({ ...prevValues, activeSearchTerm: newSearchTerm }));
   }, 250), []);
 
-  const handleDateChange = useCallback(debounce((startDate: Date | null, endDate: Date | null) => {
-    setPaginationProps((prevValues) => ({ ...prevValues, activeStartDate: startDate, activeEndDate: endDate }));
-  }, 250), []);
-
   const pageCount = data?.roleTable?.pages || 1;
   const pageIndex = data?.roleTable?.pageIndex || 0;
 
@@ -82,11 +77,6 @@ const RolesOverview = () => {
       <H2 color="#3653e8" fontWeight={400} mb="10%">Roles and permissions</H2>
       <InputOutputContainer mb="5%">
         <InputContainer>
-          <DatePicker
-            activeStartDate={paginationProps.activeStartDate}
-            activeEndDate={paginationProps.activeEndDate}
-            onDateChange={handleDateChange}
-          />
           <SearchBar activeSearchTerm={paginationProps.activeSearchTerm} onSearchTermChange={handleSearchTermChange} />
         </InputContainer>
       </InputOutputContainer>

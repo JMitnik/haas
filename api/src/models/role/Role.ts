@@ -2,6 +2,8 @@ import { PrismaClient, Role } from '@prisma/client';
 import { extendType, inputObjectType, objectType } from '@nexus/schema';
 
 import { CustomerType } from '../customer/Customer';
+import { FilterInput } from '../session/Session';
+import { PaginationProps } from '../../types/generic';
 import { PermissionType } from '../permission/Permission';
 import RoleResolver from './role-resolver';
 
@@ -77,8 +79,10 @@ export const RoleQueries = extendType({
   definition(t) {
     t.field('roleTable', {
       type: RoleTableType,
-      args: { customerId: 'String' },
+      args: { customerId: 'String',
+        filter: FilterInput },
       async resolve(parent: any, args: any, ctx: any) {
+        const { pageIndex, offset, limit, searchTerm }: PaginationProps = args.filter;
         const roles = await RoleResolver.roles(args.customerId);
         const permissions = await prisma.permission.findMany({ where: { customerId: args.customerId } });
         return { roles, permissions };

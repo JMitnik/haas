@@ -1,10 +1,11 @@
+import { NodeEntry, NodeEntryValue, NodeEntryWhereInput, PrismaClient, Session, SessionWhereInput } from '@prisma/client';
+import { extendType, inputObjectType, objectType } from '@nexus/schema';
 import _ from 'lodash';
-import { NodeEntry, NodeEntryValue, Session, PrismaClient, SessionWhereInput, NodeEntryWhereInput } from '@prisma/client';
-import { objectType, extendType, inputObjectType } from '@nexus/schema';
-import SessionResolver from './session-resolver';
-import NodeEntryResolver from '../nodeentry/nodeentry-resolver';
-import { QuestionNodeType } from '../question/QuestionNode';
+
 import { PaginationProps } from '../../types/generic';
+import { QuestionNodeType } from '../question/QuestionNode';
+import NodeEntryResolver from '../nodeentry/nodeentry-resolver';
+import SessionResolver from './session-resolver';
 
 export const NodeEntryValueType = objectType({
   name: 'NodeEntryValue',
@@ -177,8 +178,8 @@ export const InteractionType = objectType({
   },
 });
 
-export const InteractionFilterInput = inputObjectType({
-  name: 'InteractionFilterInput',
+export const FilterInput = inputObjectType({
+  name: 'FilterInput',
   definition(t) {
     t.string('startDate', { required: false });
     t.string('endDate', { required: false });
@@ -206,7 +207,7 @@ export const getSessionAnswerFlowQuery = extendType({
       type: InteractionType,
       args: {
         where: SessionWhereUniqueInput,
-        filter: InteractionFilterInput,
+        filter: FilterInput,
       },
       async resolve(parent: any, args: any) {
         const { pageIndex, offset, limit, startDate, endDate, searchTerm }: PaginationProps = args.filter;
@@ -291,7 +292,7 @@ const sessionNexus = [
   SortFilterObject,
   SortFilterInputObject,
   InteractionSessionType,
-  InteractionFilterInput,
+  FilterInput,
   InteractionType,
   SessionWhereUniqueInput,
   getSessionAnswerFlowQuery,
