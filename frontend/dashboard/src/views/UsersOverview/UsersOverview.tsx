@@ -1,16 +1,18 @@
 import { ApolloError } from 'apollo-boost';
+import { debounce } from 'lodash';
 import { useHistory, useParams } from 'react-router';
 import { useLazyQuery, useMutation } from '@apollo/react-hooks';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import { Div, H2 } from '@haas/ui';
 import DatePickerComponent from 'components/DatePicker/DatePickerComponent';
 import SearchBarComponent from 'components/SearchBar/SearchBarComponent';
+import Table from 'components/Table/Table';
 import getUsersQuery from 'queries/getUsers';
 
 import { CenterCell, RoleCell, ScoreCell, UserCell, WhenCell } from 'components/Table/CellComponents/CellComponents';
 import { InputContainer, InputOutputContainer } from './UsersOverviewStyles';
-import Table from './UserTable';
+import Row from './Row';
 import deleteUserQuery from '../../mutations/deleteUser';
 
 interface TableProps {
@@ -84,13 +86,18 @@ const UsersOverview = () => {
     event.stopPropagation();
   };
 
-  const handleSearchTermChange = (newSearchTerm: string) => {
-    setPaginationProps((prevValues) => ({ ...prevValues, activeSearchTerm: newSearchTerm }));
+  const handleAddUser = (event: any) => {
+    history.push(`/dashboard/c/${customerId}/users/add/`);
+    event.stopPropagation();
   };
 
-  const handleDateChange = (startDate: Date | null, endDate: Date | null) => {
+  const handleSearchTermChange = useCallback(debounce((newSearchTerm: string) => {
+    setPaginationProps((prevValues) => ({ ...prevValues, activeSearchTerm: newSearchTerm }));
+  }, 250), []);
+
+  const handleDateChange = useCallback(debounce((startDate: Date | null, endDate: Date | null) => {
     setPaginationProps((prevValues) => ({ ...prevValues, activeStartDate: startDate, activeEndDate: endDate }));
-  };
+  }, 250), []);
 
   const pageCount = data?.getUsers?.pages || 1;
   const pageIndex = data?.getUsers?.pageIndex || 0;
@@ -115,6 +122,8 @@ const UsersOverview = () => {
           onPaginationChange={setPaginationProps}
           onDeleteEntry={handleDeleteUser}
           onEditEntry={handleEditUser}
+          onAddEntry={handleAddUser}
+          CustomRow={Row}
           data={tableData}
         />
       </Div>

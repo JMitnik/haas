@@ -5,12 +5,12 @@ import React, { useEffect, useState } from 'react';
 import { Div, H2 } from '@haas/ui';
 import DatePickerComponent from 'components/DatePicker/DatePickerComponent';
 import SearchBarComponent from 'components/SearchBar/SearchBarComponent';
-
+import Table from 'components/Table/Table';
 import getRolesQuery from 'queries/getRolesTable';
 
 import { CenterCell, RoleCell, ScoreCell, UserCell, WhenCell } from 'components/Table/CellComponents/CellComponents';
 import { InputContainer, InputOutputContainer } from './RolesOverviewStyles';
-import Table from './RolesTable';
+import Row from './RowComponent/RowComponent';
 
 interface TableProps {
   activeStartDate: Date | null;
@@ -46,7 +46,7 @@ const RolesOverview = () => {
 
   const tableData: any = data?.roleTable?.roles || [];
   const permissions: any = data?.roleTable?.permissions || [];
-  console.log('Permissions: ', permissions);
+
   useEffect(() => {
     const { activeStartDate, activeEndDate, pageIndex, pageSize, sortBy, activeSearchTerm } = paginationProps;
     fetchRoles({
@@ -96,6 +96,7 @@ const RolesOverview = () => {
           onPaginationChange={setPaginationProps}
           data={tableData}
           permissions={permissions}
+          CustomRow={Row}
         />
       </Div>
     </Div>

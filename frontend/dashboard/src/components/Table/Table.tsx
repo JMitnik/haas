@@ -15,14 +15,17 @@ interface TableInputProps {
     Cell: ({ value }: { value: any }) => JSX.Element;
   }[]
   data: Array<any>;
-  addButton?: boolean;
   CustomRow?: (props: RowComponentProps) => JSX.Element;
+  permissions?: Array<any>;
   onPaginationChange: React.Dispatch<React.SetStateAction<TableProps>>;
+  onDeleteEntry?: (event: any, userId: string) => Promise<void>;
+  onEditEntry?: (event: any, userId: string) => void;
+  onAddEntry?: (event: any) => void;
   gridProperties: DataGridProps;
 }
 
 const Table = (
-  { headers, data, gridProperties, onPaginationChange, addButton, CustomRow }: TableInputProps,
+  { headers, data, gridProperties, onPaginationChange, onAddEntry, CustomRow, onEditEntry, onDeleteEntry, permissions }: TableInputProps,
 ) => {
   const handlePage = (newPageIndex: number) => {
     onPaginationChange((prevValues) => ({ ...prevValues, pageIndex: newPageIndex }));
@@ -34,12 +37,12 @@ const Table = (
         sortProperties={gridProperties.sortBy}
         onPaginationChange={onPaginationChange}
         headers={headers}
-        addButton={addButton}
+        onAddEntry={onAddEntry}
       />
       {data && data.map(
         (dataEntry, index) => (CustomRow
-          ? <CustomRow headers={headers} data={dataEntry} key={index} index={index} />
-          : <Row headers={headers} data={dataEntry} key={index} index={index} />),
+          ? <CustomRow headers={headers} onEditEntry={onEditEntry} onDeleteEntry={onDeleteEntry} permissions={permissions} data={dataEntry} key={index} index={index} />
+          : <Row headers={headers} onEditEntry={onEditEntry} onDeleteEntry={onDeleteEntry} data={dataEntry} key={index} index={index} />),
       )}
       <PaginationSpinner gridProperties={gridProperties} handlePage={handlePage} />
     </Grid>

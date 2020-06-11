@@ -31,7 +31,7 @@ interface HeaderComponentProps {
     id: string;
     desc: boolean;
   }[];
-  addButton?: boolean;
+  onAddEntry?: (event: any) => void;
   onPaginationChange: React.Dispatch<React.SetStateAction<TableProps>>;
 }
 
@@ -47,7 +47,7 @@ const AddNewUser = styled(Div)`
   }
 `;
 
-const HeaderComponent = ({ sortProperties, headers, onPaginationChange, addButton }: HeaderComponentProps) => {
+const HeaderComponent = ({ sortProperties, headers, onPaginationChange, onAddEntry }: HeaderComponentProps) => {
   const history = useHistory();
   const { customerId } = useParams<{ customerId: string }>();
   const amtHeaders = headers.length;
@@ -72,8 +72,8 @@ const HeaderComponent = ({ sortProperties, headers, onPaginationChange, addButto
           key={index}
         />
       ))}
-      { addButton && (
-      <AddNewUser onClick={() => history.push(`/dashboard/c/${customerId}/users/add/`)}>
+      { onAddEntry && (
+      <AddNewUser onClick={onAddEntry}>
         <PlusCircle />
       </AddNewUser>
       )}

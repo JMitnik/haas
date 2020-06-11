@@ -21,11 +21,12 @@ interface TableInputProps {
   onPaginationChange: React.Dispatch<React.SetStateAction<TableProps>>;
   onDeleteEntry?: (event: any, userId: string) => Promise<void>;
   onEditEntry?: (event: any, userId: string) => void;
+  onAddEntry?: (event: any) => void;
   gridProperties: DataGridProps;
 }
 
 const UserTable = (
-  { headers, data, gridProperties, onPaginationChange, onDeleteEntry, onEditEntry }: TableInputProps,
+  { headers, data, gridProperties, onPaginationChange, onDeleteEntry, onEditEntry, onAddEntry }: TableInputProps,
 ) => {
   const handlePage = (newPageIndex: number) => {
     onPaginationChange((prevValues) => ({ ...prevValues, pageIndex: newPageIndex }));
@@ -37,7 +38,7 @@ const UserTable = (
         sortProperties={gridProperties.sortBy}
         onPaginationChange={onPaginationChange}
         headers={headers}
-        addButton
+        onAddEntry={onAddEntry}
       />
       {data && data.map(
         (dataEntry, index) => <Row headers={headers} onEditEntry={onEditEntry} onDeleteEntry={onDeleteEntry} data={dataEntry} key={index} index={index} />,
