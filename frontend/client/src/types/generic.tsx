@@ -1,3 +1,5 @@
+import { TreeEdgeProps } from 'models/Tree/TreeEdgeModel';
+import { TreeNodeProps } from 'models/Tree/TreeNodeModel';
 
 export interface HAASNodeConditions {
   renderMin?: number;
@@ -35,7 +37,8 @@ export interface HAASEdge {
 export interface HAASNode {
   id: string;
   title: string;
-  type: HAASQuestionType;
+  // type: HAASQuestionType;
+  type: string;
   isRoot: boolean;
   children: Array<Edge>;
   conditions?: [HAASNodeConditions];
@@ -57,9 +60,13 @@ export interface HAASFormEntry {
 }
 
 export interface Dialogue {
-  questions: HAASNode[];
-  leafs: HAASNode[];
-  rootQuestion: HAASNode;
+  id: string;
+  title: string;
+  publicTitle: string;
+  questions: TreeNodeProps[];
+  edges: TreeEdgeProps[];
+  leafs: TreeNodeProps[];
+  rootQuestion: TreeNodeProps;
 }
 
 interface DialogueContextProps {
@@ -76,6 +83,22 @@ export interface CustomerProps {
   settings: CustomerSettingsProps;
 }
 
+export interface Customer {
+  id: string;
+  name: string;
+  settings: CustomerSettingsProps;
+  slug: string;
+  dialogues?: Dialogue[];
+}
+
+export interface CustomerColorSettingsProps {
+  primary: string | null;
+  primaryAlt: string | null;
+  secondary: string | null;
+  secondaryAlt: string | null;
+}
+
 export interface CustomerSettingsProps {
   logoUrl: string;
+  colourSettings: CustomerColorSettingsProps;
 }

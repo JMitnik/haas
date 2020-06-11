@@ -1,6 +1,6 @@
-import mjml2html from 'mjml';
-import MailService, { MailServiceInputProps } from './mail-service';
 import { Session } from '../../generated/resolver-types';
+import MailService, { MailServiceInputProps } from './mail-service';
+import mjml2html from 'mjml';
 
 interface TriggerMailServiceInputProps extends MailServiceInputProps {
 
@@ -85,12 +85,12 @@ class TriggerMailService extends MailService {
         </mjml>
     `).html;
 
-    this.sendMail({
-      from,
-      to,
-      subject: 'You have a new trigger alert from HAAS',
-      body: mailBody,
-    });
+    // this.sendMail({
+    //   from,
+    //   to,
+    //   subject: 'You have a new trigger alert from HAAS',
+    //   body: mailBody,
+    // });
   }
 }
 

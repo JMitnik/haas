@@ -5,7 +5,7 @@ import _ from 'lodash';
 import { PaginationProps } from '../../types/generic';
 import { QuestionNodeType } from '../question/QuestionNode';
 import NodeEntryResolver from '../nodeentry/nodeentry-resolver';
-import SessionResolver from './session-resolver';
+import SessionResolver from './SessionResolver';
 
 export const NodeEntryValueType = objectType({
   name: 'NodeEntryValue',
@@ -13,14 +13,14 @@ export const NodeEntryValueType = objectType({
     t.id('id');
     t.int('numberValue', { nullable: true });
     t.string('textValue', { nullable: true });
+
     t.string('nodeEntryId', { nullable: true });
     t.int('parentNodeEntryValueId', { nullable: true });
+
     t.list.field('multiValues', {
       type: NodeEntryValueType,
       resolve(parent: NodeEntryValue, args: any, ctx: any) {
-        const multiValues = ctx.prisma.nodeEntryValue.findMany(
-          { where: { parentNodeEntryValueId: parent.id } },
-        );
+        const multiValues = ctx.prisma.nodeEntryValue.findMany({ where: { parentNodeEntryValueId: parent.id } });
         return multiValues;
       },
     });
@@ -33,9 +33,11 @@ export const NodeEntryType = objectType({
     t.id('id', { nullable: true });
     t.string('creationDate');
     t.int('depth');
+
     t.string('relatedEdgeId', { nullable: true });
-    t.string('relatedNodeId', { nullable: true });
     t.string('sessionId');
+
+    t.string('relatedNodeId', { nullable: true });
     t.field('relatedNode', {
       type: QuestionNodeType,
       nullable: true,
@@ -43,18 +45,16 @@ export const NodeEntryType = objectType({
         if (!parent.relatedNodeId) {
           return null;
         }
-        const relatedNode = ctx.prisma.questionNode.findOne(
-          { where: { id: parent.relatedNodeId } },
-        );
+
+        const relatedNode = ctx.prisma.questionNode.findOne({ where: { id: parent.relatedNodeId } });
         return relatedNode;
       },
     });
+
     t.list.field('values', {
       type: NodeEntryValueType,
       resolve(parent: NodeEntry, args: any, ctx: any) {
-        const values = ctx.prisma.nodeEntryValue.findMany(
-          { where: { nodeEntryId: parent.id } },
-        );
+        const values = ctx.prisma.nodeEntryValue.findMany({ where: { nodeEntryId: parent.id } });
         return values;
       },
     });
@@ -67,14 +67,11 @@ export const SessionType = objectType({
     t.id('id');
     t.string('createdAt');
     t.string('dialogueId');
+
     t.list.field('nodeEntries', {
       type: NodeEntryType,
       resolve(parent: Session, args: any, ctx: any) {
-        const nodeEntries = ctx.prisma.nodeEntry.findMany({
-          where: {
-            sessionId: parent.id,
-          },
-        });
+        const nodeEntries = ctx.prisma.nodeEntry.findMany({ where: { sessionId: parent.id } });
         return nodeEntries;
       },
     });
@@ -95,9 +92,8 @@ export const UserSessionEntryDataInput = inputObjectType({
   definition(t) {
     t.string('textValue');
     t.int('numberValue');
-    t.list.field('multiValues', {
-      type: UserSessionEntryDataInput,
-    });
+
+    t.list.field('multiValues', { type: UserSessionEntryDataInput });
   },
 });
 
@@ -107,9 +103,8 @@ export const UserSessionEntryInput = inputObjectType({
     t.string('nodeId');
     t.string('edgeId', { nullable: true });
     t.int('depth', { nullable: true });
-    t.field('data', {
-      type: UserSessionEntryDataInput,
-    });
+
+    t.field('data', { type: UserSessionEntryDataInput });
   },
 });
 
@@ -117,9 +112,8 @@ export const UploadUserSessionInput = inputObjectType({
   name: 'UploadUserSessionInput',
   definition(t) {
     t.string('dialogueId', { required: true });
-    t.list.field('entries', {
-      type: UserSessionEntryInput,
-    });
+
+    t.list.field('entries', { type: UserSessionEntryInput });
   },
 });
 
@@ -155,26 +149,23 @@ export const InteractionSessionType = objectType({
     t.float('score');
     t.int('paths');
     t.string('createdAt');
-    t.list.field('nodeEntries', {
-      type: NodeEntryType,
-    });
+
+    t.list.field('nodeEntries', { type: NodeEntryType });
   },
 });
 
 export const InteractionType = objectType({
   name: 'InteractionType',
   definition(t) {
-    t.list.field('sessions', {
-      type: InteractionSessionType,
-    });
     t.int('pages');
     t.int('pageIndex');
     t.int('pageSize');
-    t.list.field('orderBy', {
-      type: SortFilterObject,
-    });
     t.string('startDate', { nullable: true });
     t.string('endDate', { nullable: true });
+
+    t.list.field('sessions', { type: InteractionSessionType });
+
+    t.list.field('orderBy', { type: SortFilterObject });
   },
 });
 
@@ -187,6 +178,7 @@ export const FilterInput = inputObjectType({
     t.int('offset');
     t.int('limit');
     t.int('pageIndex');
+
     t.list.field('orderBy', {
       type: SortFilterInputObject,
       required: false,
@@ -203,6 +195,7 @@ export const getSessionAnswerFlowQuery = extendType({
         sessionId: 'ID',
       },
     });
+
     t.field('interactions', {
       type: InteractionType,
       args: {
@@ -236,6 +229,7 @@ export const getSessionAnswerFlowQuery = extendType({
         };
       },
     });
+
     t.list.field('sessions', {
       type: SessionType,
       args: {
@@ -255,6 +249,7 @@ export const getSessionAnswerFlowQuery = extendType({
         return sessions;
       },
     });
+
     t.field('session', {
       type: SessionType,
       args: {
@@ -288,7 +283,7 @@ export const uploadUserSessionMutation = extendType({
   },
 });
 
-const sessionNexus = [
+export default [
   SortFilterObject,
   SortFilterInputObject,
   InteractionSessionType,
@@ -305,5 +300,3 @@ const sessionNexus = [
   UserSessionEntryInput,
   UserSessionEntryDataInput,
 ];
-
-export default sessionNexus;

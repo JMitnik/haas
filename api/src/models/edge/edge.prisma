@@ -1,9 +1,0 @@
-type Edge {
-    id: ID! @id
-    questionnaire: Questionnaire
-    createdAt: DateTime! @createdAt
-    updatedAt: DateTime! @updatedAt 
-    conditions: [QuestionCondition] @relation(name: "EdgeQQonditions", onDelete: CASCADE)
-    parentNode: QuestionNode @relation (name: "EdgeParentRelation") # , onDelete: CASCADE 
-    childNode: QuestionNode @relation (name: "EdgeChildRelation") # , onDelete: CASCADE
-}

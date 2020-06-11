@@ -1,8 +1,9 @@
-import { Dialogue } from '@prisma/client';
-import { objectType, extendType, inputObjectType } from '@nexus/schema';
-import { UniqueDataResultEntry } from '../session/Session';
-import { QuestionNodeType, QuestionNodeWhereInput } from '../question/QuestionNode';
+import { Dialogue, PrismaClient } from '@prisma/client';
 import { CustomerType } from '../customer/Customer';
+import { EdgeType } from '../edge/Edge';
+import { QuestionNodeType, QuestionNodeWhereInput } from '../question/QuestionNode';
+import { UniqueDataResultEntry } from '../session/Session';
+import { extendType, inputObjectType, objectType } from '@nexus/schema';
 import DialogueResolver from './dialogue-resolver';
 
 export const DialogueType = objectType({
@@ -34,6 +35,41 @@ export const DialogueType = objectType({
       },
     });
     t.string('customerId');
+    t.field('rootQuestion', {
+      type: QuestionNodeType,
+      async resolve(parent: Dialogue, args: any, ctx: any, info: any) {
+        const { prisma }: {prisma: PrismaClient} = ctx;
+
+        const rootQuestions = await prisma.questionNode.findMany({
+          where: {
+            isRoot: true,
+          },
+        });
+
+        return rootQuestions[0];
+      },
+    });
+
+    t.list.field('edges', {
+      type: EdgeType,
+      async resolve(parent: Dialogue, args: any, ctx: any) {
+        const { prisma }: {prisma: PrismaClient} = ctx;
+
+        const dialogue = await prisma.dialogue.findOne({
+          where: {
+            id: parent.id,
+          },
+          include: {
+            edges: {},
+          },
+        });
+
+        const edges = dialogue?.edges;
+
+        return edges;
+      },
+    });
+
     t.list.field('questions', {
       type: QuestionNodeType,
       args: {

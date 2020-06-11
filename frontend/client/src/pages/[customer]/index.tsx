@@ -1,48 +1,55 @@
-import React from 'react';
-import gql from 'graphql-tag';
-import { useParams, Redirect, useLocation, useHistory } from 'react-router-dom';
 import { CustomerFragment } from 'queries/CustomerFragment';
+import { motion } from 'framer-motion';
+import { useHistory, useParams } from 'react-router-dom';
 import { useQuery } from '@apollo/react-hooks';
 import Loader from 'components/Loader';
+import React, { useEffect } from 'react';
+import gql from 'graphql-tag';
 
 const getCustomerFromSlug = gql`
-    query customer($slug: String!) {
-        customer(slug: $slug) {
-            ...CustomerFragment
-        }
+  query customer($slug: String!) {
+    customer(slug: $slug) {
+        ...CustomerFragment
     }
+  }
 
-    ${CustomerFragment}
+  ${CustomerFragment}
 `;
 
-
 const CustomerPage = () => {
-    const { customerSlug } = useParams();
-    const history = useHistory();
-    const location = useLocation();
+  const { customerSlug } = useParams();
+  const history = useHistory();
 
-    if (!customerSlug) {
-        history.push('/');
+  if (!customerSlug) {
+    history.push('/');
+  }
+
+  const { data, error, loading } = useQuery(getCustomerFromSlug, {
+    variables: {
+      slug: customerSlug,
+    },
+    onError: () => {
+      console.log('Shit, a mistake happened');
+    },
+  });
+
+  useEffect(() => {
+    if (data) {
+      history.push(`/${customerSlug}/${data?.customer?.dialogues?.[0].id}`);
     }
+  }, [data, customerSlug, history]);
 
-    const { data, error, loading } = useQuery(getCustomerFromSlug, {
-        variables: {
-            slug: customerSlug,
-        },
-        onError: () => {
-            console.log("Shit, a mistake happened");
-        }
-    });
+  // TODO: Clear this up better
 
-    if (loading) return <Loader/>
-    if (error) return <p>Shit</p>
+  if (loading) return <Loader />;
+  if (error) return <p>An error has occured, please try again</p>;
+  if (!data?.customer?.dialogues) return <Loader />;
 
-    // Extract relevant questionnaire here, either default, first, or return to the selection
-    if (!data?.customer?.dialogues) return <Loader />
-
-    return (
-        <Redirect to={`${location.pathname}/${data?.customer?.dialogues[0].id}`} />
-    );
-}
+  return (
+    <motion.div exit={{ opacity: 1 }}>
+      <Loader />
+    </motion.div>
+  );
+};
 
 export default CustomerPage;

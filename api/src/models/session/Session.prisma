@@ -1,6 +1,0 @@
-type Session {
-    id: ID! @id
-    questionnaire: Questionnaire @relation(name: "QuestionnaireToSessions")
-    nodeEntries: [NodeEntry!] @relation(link: TABLE, name: "SessionToNodeEntries", onDelete: CASCADE)
-    createdAt: DateTime! @createdAt
-}
