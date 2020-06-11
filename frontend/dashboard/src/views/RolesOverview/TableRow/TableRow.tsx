@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { Div, Grid, H4, H5, Hr, InputLabel, Span } from '@haas/ui';
+import { Div, Grid, H4, H5, Hr, Span } from '@haas/ui';
 import { RowComponentProps } from 'components/Table/RowComponentInterfaces';
 
 const RowComponent = ({ headers, data, index, permissions }: RowComponentProps) => {
@@ -8,11 +8,15 @@ const RowComponent = ({ headers, data, index, permissions }: RowComponentProps) 
   const amtCells = headers.length;
   const percentage = 100 / amtCells;
   const templateColumns = `${percentage.toString()}% `.repeat(amtCells);
-  console.log('DATA: ', data);
   const activePermissionIds = data.permissions.map((permission) => permission.id);
 
   return (
-    <Grid gridRowGap={0} gridColumnGap={5} gridTemplateColumns={templateColumns} onClick={() => setIsExpanded(!isExpanded)}>
+    <Grid
+      gridRowGap={0}
+      gridColumnGap={5}
+      gridTemplateColumns={templateColumns}
+      onClick={() => setIsExpanded(!isExpanded)}
+    >
       { headers && headers.map(({ accessor, Cell }) => {
         const result = Object.entries(data).find((property) => property[0] === accessor);
         if (result) return <Cell value={result[1]} key={`${index}-${result[0]}`} />;

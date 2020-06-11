@@ -68,6 +68,8 @@ export const RoleTableType = objectType({
     t.list.field('roles', {
       type: RoleType,
     });
+    t.int('pageIndex', { nullable: true });
+    t.int('totalPages', { nullable: true });
     t.list.field('permissions', {
       type: PermissionType,
     });
@@ -82,10 +84,10 @@ export const RoleQueries = extendType({
       args: { customerId: 'String',
         filter: FilterInput },
       async resolve(parent: any, args: any, ctx: any) {
-        const { pageIndex, offset, limit, searchTerm }: PaginationProps = args.filter;
-        const roles = await RoleResolver.roles(args.customerId);
+        const { pageIndex, offset, limit }: PaginationProps = args.filter;
+        const { roles, totalPages, newPageIndex } = await RoleResolver.paginatedRoles(args.customerId, pageIndex, offset, limit);
         const permissions = await prisma.permission.findMany({ where: { customerId: args.customerId } });
-        return { roles, permissions };
+        return { roles, permissions, pageIndex: newPageIndex, totalPages };
       },
     });
     t.list.field('roles', {

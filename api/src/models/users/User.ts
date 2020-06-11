@@ -30,8 +30,8 @@ export const UserTable = objectType({
   name: 'UserTable',
   definition(t) {
     t.list.field('users', { type: UserType });
-    t.int('pageIndex');
-    t.int('totalPages');
+    t.int('pageIndex', { nullable: true });
+    t.int('totalPages', { nullable: true });
   },
 });
 
@@ -58,8 +58,6 @@ export const UserQueries = extendType({
       async resolve(parent: any, args: any, ctx: any) {
         const { pageIndex, offset, limit, searchTerm, orderBy }: PaginationProps = args.filter;
         if (args.filter) {
-          console.log('args.customerId', args.customerId);
-          console.log('args.filer: ', args.filter);
           return UserResolver.paginatedUsers(args.customerId, pageIndex, offset, limit, orderBy[0], searchTerm);
         }
         const users = await prisma.user.findMany({ where: { customerId: args.customerId } });

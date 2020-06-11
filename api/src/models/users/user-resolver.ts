@@ -101,15 +101,7 @@ class UserResolver {
 
     // Slice ordered filtered users
     const slicedOrderedUsers = UserResolver.sliceUsers(orderedUsers, offset, limit, pageIndex);
-    return { users: slicedOrderedUsers, pageIndex, totalPages };
-    // return {
-    //   users: slicedOrderedUsers,
-    //   pages: !needPageReset ? totalPages : 1,
-    //   offset,
-    //   limit,
-    //   pageIndex: !needPageReset ? pageIndex : 0,
-    //   orderBy: orderBy ? [orderBy] : [],
-    // };
+    return { users: slicedOrderedUsers, pageIndex: needPageReset ? 0 : pageIndex, totalPages };
   };
 }
 

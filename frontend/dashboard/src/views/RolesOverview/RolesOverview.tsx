@@ -52,34 +52,25 @@ const RolesOverview = () => {
     fetchRoles({
       variables: {
         customerId,
-        // filter: {
-        //   startDate: activeStartDate,
-        //   endDate: activeEndDate,
-        //   searchTerm: activeSearchTerm,
-        //   offset: pageIndex * pageSize,
-        //   limit: pageSize,
-        //   pageIndex,
-        //   orderBy: sortBy,
-        // },
+        filter: {
+          startDate: activeStartDate,
+          endDate: activeEndDate,
+          searchTerm: activeSearchTerm,
+          offset: pageIndex * pageSize,
+          limit: pageSize,
+          pageIndex,
+          orderBy: sortBy,
+        },
       },
     });
   }, [customerId, fetchRoles, paginationProps]);
 
-  const handleSearchTermChange = useCallback(debounce((newSearchTerm: string) => {
-    setPaginationProps((prevValues) => ({ ...prevValues, activeSearchTerm: newSearchTerm }));
-  }, 250), []);
-
-  const pageCount = data?.roleTable?.pages || 1;
+  const pageCount = data?.roleTable?.totalPages || 1;
   const pageIndex = data?.roleTable?.pageIndex || 0;
 
   return (
-    <Div px="24px" margin="0 auto" width="100vh" height="100vh" maxHeight="100vh" overflow="hidden">
+    <Div px="24px" margin="0 auto" width="100vh" height="100vh" maxHeight="100vh" overflowX="hidden" overflowY="auto">
       <H2 color="#3653e8" fontWeight={400} mb="10%">Roles and permissions</H2>
-      <InputOutputContainer mb="5%">
-        <InputContainer>
-          <SearchBar activeSearchTerm={paginationProps.activeSearchTerm} onSearchTermChange={handleSearchTermChange} />
-        </InputContainer>
-      </InputOutputContainer>
       <Div backgroundColor="#fdfbfe" mb="1%" height="65%">
         <Table
           headers={HEADERS}

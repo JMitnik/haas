@@ -209,8 +209,10 @@ export interface NexusGenRootTypes {
   QuestionNode: prisma.QuestionNode;
   QuestionOption: prisma.QuestionOption;
   RoleTableType: { // root type
+    pageIndex?: number | null; // Int
     permissions: NexusGenRootTypes['PermssionType'][]; // [PermssionType!]!
     roles: NexusGenRootTypes['RoleType'][]; // [RoleType!]!
+    totalPages?: number | null; // Int
   }
   RoleType: { // root type
     amtPermissions?: number | null; // Int
@@ -228,8 +230,8 @@ export interface NexusGenRootTypes {
     value: number; // Int!
   }
   UserTable: { // root type
-    pageIndex: number; // Int!
-    totalPages: number; // Int!
+    pageIndex?: number | null; // Int
+    totalPages?: number | null; // Int
     users: NexusGenRootTypes['UserType'][]; // [UserType!]!
   }
   UserType: { // root type
@@ -453,8 +455,10 @@ export interface NexusGenFieldTypes {
     value: string; // String!
   }
   RoleTableType: { // field return type
+    pageIndex: number | null; // Int
     permissions: NexusGenRootTypes['PermssionType'][]; // [PermssionType!]!
     roles: NexusGenRootTypes['RoleType'][]; // [RoleType!]!
+    totalPages: number | null; // Int
   }
   RoleType: { // field return type
     amtPermissions: number | null; // Int
@@ -479,8 +483,8 @@ export interface NexusGenFieldTypes {
     value: number; // Int!
   }
   UserTable: { // field return type
-    pageIndex: number; // Int!
-    totalPages: number; // Int!
+    pageIndex: number | null; // Int
+    totalPages: number | null; // Int
     users: NexusGenRootTypes['UserType'][]; // [UserType!]!
   }
   UserType: { // field return type
