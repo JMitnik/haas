@@ -79,7 +79,6 @@ const EditCustomerForm = ({ user, roles }: { user: any, roles: Array<{ label: st
       email: formData.email || '',
       phone: formData.phone || '',
     };
-    console.log(optionInput);
     editUser({
       variables: {
         id: userId,

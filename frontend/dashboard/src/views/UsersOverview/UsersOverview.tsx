@@ -45,13 +45,6 @@ const UsersOverview = () => {
     },
   );
 
-  const [deleteUser] = useMutation(deleteUserQuery, {
-    refetchQueries: [{ query: getUsersQuery, variables: { customerId } }], // TODO: Add filter object
-    onError: (serverError: ApolloError) => {
-      console.log(serverError);
-    },
-  });
-
   const tableData: any = data?.userTable.users || [];
   useEffect(() => {
     const { activeStartDate, activeEndDate, pageIndex, pageSize, sortBy, activeSearchTerm } = paginationProps;
@@ -71,13 +64,29 @@ const UsersOverview = () => {
     });
   }, [customerId, fetchUsers, paginationProps]);
 
-  const handleDeleteUser = async (event: any, userId: string) => {
+  const [deleteUser] = useMutation(deleteUserQuery, {
+    refetchQueries: [{ query: getUsersQuery,
+      variables: { customerId,
+        filter: {
+          startDate: paginationProps.activeStartDate,
+          endDate: paginationProps.activeEndDate,
+          searchTerm: paginationProps.activeSearchTerm,
+          offset: paginationProps.pageIndex * paginationProps.pageSize,
+          limit: paginationProps.pageSize,
+          pageIndex: paginationProps.pageIndex,
+          orderBy: paginationProps.sortBy,
+        } } }], // TODO: Add filter object
+    onError: (serverError: ApolloError) => {
+      console.log(serverError);
+    },
+  });
+
+  const handleDeleteUser = (event: any, userId: string) => {
     deleteUser({
       variables: {
         id: userId,
       },
     });
-    event.stopPropagation();
   };
 
   const handleEditUser = (event: any, userId: string) => {
