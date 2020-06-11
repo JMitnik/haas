@@ -5,14 +5,14 @@ import { useLazyQuery, useMutation } from '@apollo/react-hooks';
 import React, { useCallback, useEffect, useState } from 'react';
 
 import { Div, H2 } from '@haas/ui';
-import DatePickerComponent from 'components/DatePicker/DatePickerComponent';
-import SearchBarComponent from 'components/SearchBar/SearchBarComponent';
+import DatePicker from 'components/DatePicker/DatePickerComponent';
+import SearchBar from 'components/SearchBar/SearchBarComponent';
 import Table from 'components/Table/Table';
 import getUsersQuery from 'queries/getUsers';
 
 import { CenterCell, RoleCell, ScoreCell, UserCell, WhenCell } from 'components/Table/CellComponents/CellComponents';
 import { InputContainer, InputOutputContainer } from './UsersOverviewStyles';
-import Row from './Row';
+import Row from './TableRow/Row';
 import deleteUserQuery from '../../mutations/deleteUser';
 
 interface TableProps {
@@ -107,12 +107,12 @@ const UsersOverview = () => {
       <H2 color="#3653e8" fontWeight={400} mb="10%">Users and roles</H2>
       <InputOutputContainer mb="5%">
         <InputContainer>
-          <DatePickerComponent
+          <DatePicker
             activeStartDate={paginationProps.activeStartDate}
             activeEndDate={paginationProps.activeEndDate}
-            handleDateChange={handleDateChange}
+            onDateChange={handleDateChange}
           />
-          <SearchBarComponent activeSearchTerm={paginationProps.activeSearchTerm} handleSearchTermChange={handleSearchTermChange} />
+          <SearchBar activeSearchTerm={paginationProps.activeSearchTerm} onSearchTermChange={handleSearchTermChange} />
         </InputContainer>
       </InputOutputContainer>
       <Div backgroundColor="#fdfbfe" mb="1%" height="65%">

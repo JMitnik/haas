@@ -1,7 +1,7 @@
 import 'react-datepicker/dist/react-datepicker.css';
 import { XCircle } from 'react-feather';
-import DatePicker from 'react-datepicker';
 import React, { useState } from 'react';
+import ReactDatePicker from 'react-datepicker';
 
 import { Div } from '@haas/ui';
 import DatePickerFilter from 'components/DatePicker/DatePickerFilter';
@@ -9,10 +9,10 @@ import DatePickerFilter from 'components/DatePicker/DatePickerFilter';
 interface DatePickerProps {
   activeStartDate: Date | null;
   activeEndDate: Date | null;
-  handleDateChange: (start: Date | null, end: Date | null) => void;
+  onDateChange: (start: Date | null, end: Date | null) => void;
 }
 
-const DatePickerComponent = ({ activeStartDate, activeEndDate, handleDateChange }: DatePickerProps) => {
+const DatePicker = ({ activeStartDate, activeEndDate, onDateChange }: DatePickerProps) => {
   const [isActive, setIsActive] = useState(false);
 
   return (
@@ -24,19 +24,19 @@ const DatePickerComponent = ({ activeStartDate, activeEndDate, handleDateChange 
           setIsActive={setIsActive}
         />
       )}
-      { isActive && (
+      {isActive && (
         <Div padding={15} borderRadius="90px" useFlex flexDirection="row" backgroundColor="#f1f5f8">
-          <DatePicker
+          <ReactDatePicker
             selected={activeStartDate}
-            onChange={(date) => date !== activeStartDate && handleDateChange(date, activeEndDate)}
+            onChange={(date) => date !== activeStartDate && onDateChange(date, activeEndDate)}
             selectsStart
             isClearable
             startDate={activeStartDate}
             endDate={activeEndDate}
           />
-          <DatePicker
+          <ReactDatePicker
             selected={activeEndDate}
-            onChange={(date) => date !== activeEndDate && handleDateChange(activeStartDate, date)}
+            onChange={(date) => date !== activeEndDate && onDateChange(activeStartDate, date)}
             selectsEnd
             isClearable
             startDate={activeStartDate}
@@ -50,4 +50,4 @@ const DatePickerComponent = ({ activeStartDate, activeEndDate, handleDateChange 
   );
 };
 
-export default DatePickerComponent;
+export default DatePicker;

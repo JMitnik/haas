@@ -1,16 +1,17 @@
+import { debounce } from 'lodash';
 import { useLazyQuery } from '@apollo/react-hooks';
 import { useParams } from 'react-router';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import { Div, H2 } from '@haas/ui';
-import DatePickerComponent from 'components/DatePicker/DatePickerComponent';
-import SearchBarComponent from 'components/SearchBar/SearchBarComponent';
+import DatePicker from 'components/DatePicker/DatePickerComponent';
+import SearchBar from 'components/SearchBar/SearchBarComponent';
 import Table from 'components/Table/Table';
 import getRolesQuery from 'queries/getRolesTable';
 
-import { CenterCell, RoleCell, ScoreCell, UserCell, WhenCell } from 'components/Table/CellComponents/CellComponents';
+import { CenterCell, UserCell } from 'components/Table/CellComponents/CellComponents';
 import { InputContainer, InputOutputContainer } from './RolesOverviewStyles';
-import Row from './RowComponent/RowComponent';
+import Row from './TableRow/TableRow';
 
 interface TableProps {
   activeStartDate: Date | null;
@@ -65,13 +66,13 @@ const RolesOverview = () => {
     });
   }, [customerId, fetchRoles, paginationProps]);
 
-  const handleSearchTermChange = (newSearchTerm: string) => {
+  const handleSearchTermChange = useCallback(debounce((newSearchTerm: string) => {
     setPaginationProps((prevValues) => ({ ...prevValues, activeSearchTerm: newSearchTerm }));
-  };
+  }, 250), []);
 
-  const handleDateChange = (startDate: Date | null, endDate: Date | null) => {
+  const handleDateChange = useCallback(debounce((startDate: Date | null, endDate: Date | null) => {
     setPaginationProps((prevValues) => ({ ...prevValues, activeStartDate: startDate, activeEndDate: endDate }));
-  };
+  }, 250), []);
 
   const pageCount = data?.roleTable?.pages || 1;
   const pageIndex = data?.roleTable?.pageIndex || 0;
@@ -81,12 +82,12 @@ const RolesOverview = () => {
       <H2 color="#3653e8" fontWeight={400} mb="10%">Roles and permissions</H2>
       <InputOutputContainer mb="5%">
         <InputContainer>
-          <DatePickerComponent
+          <DatePicker
             activeStartDate={paginationProps.activeStartDate}
             activeEndDate={paginationProps.activeEndDate}
-            handleDateChange={handleDateChange}
+            onDateChange={handleDateChange}
           />
-          <SearchBarComponent activeSearchTerm={paginationProps.activeSearchTerm} handleSearchTermChange={handleSearchTermChange} />
+          <SearchBar activeSearchTerm={paginationProps.activeSearchTerm} onSearchTermChange={handleSearchTermChange} />
         </InputContainer>
       </InputOutputContainer>
       <Div backgroundColor="#fdfbfe" mb="1%" height="65%">
