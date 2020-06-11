@@ -131,7 +131,7 @@ const InteractionsOverview = () => {
       <Div backgroundColor="#fdfbfe" mb="1%" height="65%">
         <InteractionsTable
           headers={HEADERS}
-          gridProperties={{ ...paginationProps, pageCount, pageIndex }}
+          paginationProps={{ ...paginationProps, pageCount, pageIndex }}
           onPaginationChange={setPaginationProps}
           data={interactions}
           CustomRow={Row}

@@ -117,7 +117,7 @@ const UsersOverview = () => {
       <Div backgroundColor="#fdfbfe" mb="1%" height="65%">
         <Table
           headers={HEADERS}
-          gridProperties={{ ...paginationProps, pageCount, pageIndex }}
+          paginationProps={{ ...paginationProps, pageCount, pageIndex }}
           onPaginationChange={setPaginationProps}
           onDeleteEntry={handleDeleteUser}
           onEditEntry={handleEditUser}

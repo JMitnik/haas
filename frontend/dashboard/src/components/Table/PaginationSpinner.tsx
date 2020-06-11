@@ -2,49 +2,50 @@ import React from 'react';
 
 import { Flex } from '@haas/ui';
 
-interface DataGridProps {
-    pageIndex: number;
-    pageSize: number;
-    pageCount: number;
-    sortBy: Array<any>;
+interface PaginationProps {
+  pageIndex: number;
+  pageSize: number;
+  pageCount: number;
+  sortBy: Array<any>;
 }
 
-interface PaginationSpinnerProps {
-    gridProperties: DataGridProps;
-    handlePage: (newPageIndex: number) => void;
+interface TablePaginationControlsProps {
+  paginationProps: PaginationProps;
+  onPageChange: (newPageIndex: number) => void;
 }
 
-const PaginationSpinner = ({ gridProperties, handlePage }: PaginationSpinnerProps) => (
+const TablePaginationControls = ({ paginationProps, onPageChange }: TablePaginationControlsProps) => (
   <Flex alignItems="center" justifyContent="center">
+    {/* TODO: Make these buttons styled, use flex-properties instead of margin */}
     <button
       type="button"
       style={{ padding: '5px', margin: '5px' }}
-      onClick={() => handlePage(0)}
-      disabled={gridProperties.pageIndex === 0}
+      onClick={() => onPageChange(0)}
+      disabled={paginationProps.pageIndex === 0}
     >
       {'<<'}
     </button>
     <button
       type="button"
       style={{ padding: '5px 7.5px', margin: '5px' }}
-      onClick={() => handlePage(gridProperties.pageIndex - 1)}
-      disabled={gridProperties.pageIndex === 0}
+      onClick={() => onPageChange(paginationProps.pageIndex - 1)}
+      disabled={paginationProps.pageIndex === 0}
     >
       {'<'}
     </button>
     <button
       type="button"
       style={{ padding: '5px 7.5px', margin: '5px' }}
-      onClick={() => handlePage(gridProperties.pageIndex + 1)}
-      disabled={gridProperties.pageIndex === gridProperties.pageCount - 1}
+      onClick={() => onPageChange(paginationProps.pageIndex + 1)}
+      disabled={paginationProps.pageIndex === paginationProps.pageCount - 1}
     >
       {'>'}
     </button>
     <button
       type="button"
       style={{ padding: '5px', margin: '5px' }}
-      onClick={() => handlePage(gridProperties.pageCount - 1)}
-      disabled={gridProperties.pageIndex === gridProperties.pageCount - 1}
+      onClick={() => onPageChange(paginationProps.pageCount - 1)}
+      disabled={paginationProps.pageIndex === paginationProps.pageCount - 1}
     >
       {'>>'}
     </button>
@@ -52,14 +53,14 @@ const PaginationSpinner = ({ gridProperties, handlePage }: PaginationSpinnerProp
       Page
       {' '}
       <strong>
-        {gridProperties.pageIndex + 1}
+        {paginationProps.pageIndex + 1}
         {' '}
         of
         {' '}
-        {gridProperties.pageCount}
+        {paginationProps.pageCount}
       </strong>
     </span>
   </Flex>
-    );
+);
 
-export default PaginationSpinner;
+export default TablePaginationControls;

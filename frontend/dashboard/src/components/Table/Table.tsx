@@ -21,11 +21,11 @@ interface TableInputProps {
   onDeleteEntry?: (event: any, userId: string) => Promise<void>;
   onEditEntry?: (event: any, userId: string) => void;
   onAddEntry?: (event: any) => void;
-  gridProperties: DataGridProps;
+  paginationProps: DataGridProps;
 }
 
 const Table = (
-  { headers, data, gridProperties, onPaginationChange, onAddEntry, CustomRow, onEditEntry, onDeleteEntry, permissions }: TableInputProps,
+  { headers, data, paginationProps, onPaginationChange, onAddEntry, CustomRow, onEditEntry, onDeleteEntry, permissions }: TableInputProps,
 ) => {
   const handlePage = (newPageIndex: number) => {
     onPaginationChange((prevValues) => ({ ...prevValues, pageIndex: newPageIndex }));
@@ -34,7 +34,7 @@ const Table = (
   return (
     <Grid gridRowGap={2}>
       <HeaderComponent
-        sortProperties={gridProperties.sortBy}
+        sortProperties={paginationProps.sortBy}
         onPaginationChange={onPaginationChange}
         headers={headers}
         onAddEntry={onAddEntry}
@@ -44,7 +44,7 @@ const Table = (
           ? <CustomRow headers={headers} onEditEntry={onEditEntry} onDeleteEntry={onDeleteEntry} permissions={permissions} data={dataEntry} key={index} index={index} />
           : <Row headers={headers} onEditEntry={onEditEntry} onDeleteEntry={onDeleteEntry} data={dataEntry} key={index} index={index} />),
       )}
-      <PaginationSpinner gridProperties={gridProperties} handlePage={handlePage} />
+      <PaginationSpinner paginationProps={paginationProps} onPageChange={handlePage} />
     </Grid>
   );
 };

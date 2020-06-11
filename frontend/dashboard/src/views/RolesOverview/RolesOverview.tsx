@@ -74,7 +74,7 @@ const RolesOverview = () => {
       <Div backgroundColor="#fdfbfe" mb="1%" height="65%">
         <Table
           headers={HEADERS}
-          gridProperties={{ ...paginationProps, pageCount, pageIndex }}
+          paginationProps={{ ...paginationProps, pageCount, pageIndex }}
           onPaginationChange={setPaginationProps}
           data={tableData}
           permissions={permissions}
