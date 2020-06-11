@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
+import cuid from 'cuid';
 import CustomerResolver from '../../models/customer/customer-resolver';
-
 const prisma = new PrismaClient();
 
 const CUSTOMER = 'Mediamarkt';
@@ -19,6 +19,22 @@ const makeMediamarkt = async () => {
             },
           },
         },
+      },
+      roles: {
+        create: [
+          {
+            name: 'Admin',
+            roleId: cuid(),
+          },
+          {
+            name: 'Normal',
+            roleId: cuid(),
+          },
+          {
+            name: 'Custom role',
+            roleId: cuid(),
+          },
+        ],
       },
     },
   });

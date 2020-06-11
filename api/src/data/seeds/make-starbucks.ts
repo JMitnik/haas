@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import CustomerResolver from '../../models/customer/customer-resolver';
+import cuid from 'cuid'
 
 const prisma = new PrismaClient();
 
@@ -19,6 +20,22 @@ const makeStarbucks = async () => {
             },
           },
         },
+      },
+      roles: {
+        create: [
+          {
+            name: 'Admin',
+            roleId: cuid(),
+          },
+          {
+            name: 'Normal',
+            roleId: cuid(),
+          },
+          {
+            name: 'Custom role',
+            roleId: cuid(),
+          },
+        ],
       },
     },
   });

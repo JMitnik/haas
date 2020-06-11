@@ -1,5 +1,7 @@
-import { PrismaClient, Customer } from '@prisma/client';
+import { Customer, PrismaClient } from '@prisma/client';
 import { subDays } from 'date-fns';
+import cuid from 'cuid';
+
 import { leafNodes } from '../../data/seeds/default-data';
 import NodeResolver from '../question/node-resolver';
 
@@ -141,6 +143,22 @@ class CustomerResolver {
               },
             },
           },
+        },
+        roles: {
+          create: [
+            {
+              name: 'Admin',
+              roleId: cuid(),
+            },
+            {
+              name: 'Normal',
+              roleId: cuid(),
+            },
+            {
+              name: 'Custom role',
+              roleId: cuid(),
+            },
+          ],
         },
         dialogues: {
           create: [],
