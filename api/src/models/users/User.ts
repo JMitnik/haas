@@ -72,8 +72,6 @@ export const UserQueries = extendType({
       resolve(parent: any, args: any, ctx: any) {
         const { pageIndex, offset, limit, searchTerm, orderBy }: PaginationProps = args.filter;
         if (args.filter) {
-          console.log('args.customerId', args.customerId);
-          console.log('args.filer: ', args.filter);
           return UserResolver.paginatedUsers(args.customerId, pageIndex, offset, limit, orderBy[0], searchTerm);
         }
         return prisma.user.findMany({ where: { customerId: args.customerId } });

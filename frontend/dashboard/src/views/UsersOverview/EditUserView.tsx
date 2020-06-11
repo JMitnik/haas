@@ -41,7 +41,6 @@ const EditUsersView = () => {
   if (error) return <><p>{error.message}</p></>;
 
   const user = userData?.user;
-  console.log('USER: ', user);
   const roles: Array<any> = rolesData?.roles;
   const mappedRoles = roles.map((role) => ({ label: role.name, value: role.id }));
   return <EditCustomerForm user={user} roles={mappedRoles} />;
