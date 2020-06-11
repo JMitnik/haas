@@ -8,7 +8,7 @@ interface HeaderColumnComponentProps {
     id: string;
     desc: boolean;
   }[];
-  onGridPropertiesChange: React.Dispatch<React.SetStateAction<TableProps>>;
+  onPaginationChange: React.Dispatch<React.SetStateAction<TableProps>>;
 }
 
 interface TableProps {
@@ -24,10 +24,10 @@ interface TableProps {
 }
 
 const HeaderColumnComponent = (
-  { sortProperties, accessor, value, onGridPropertiesChange }: HeaderColumnComponentProps,
+  { sortProperties, accessor, value, onPaginationChange }: HeaderColumnComponentProps,
 ) => {
   const handleSort = () => {
-    onGridPropertiesChange((prevValues) => {
+    onPaginationChange((prevValues) => {
       const { sortBy } = prevValues;
       const newOrderBy = sortBy?.[0]?.id === accessor
         ? [{ id: sortBy?.[0]?.id, desc: !sortBy?.[0]?.desc }]

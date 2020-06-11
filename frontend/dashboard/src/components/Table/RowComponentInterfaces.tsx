@@ -51,7 +51,8 @@ export interface RowComponentProps {
 export interface UserRowProps {
   data: CellComponentProps;
   permissions?: Array<PermissionProps>;
-  onDeleteUser: (event: any, userId: string) => Promise<void>;
+  onDeleteEntry?: (event: any, userId: string) => Promise<void>;
+  onEditEntry?: (event: any, userId: string) => void;
   headers: Array<HeaderColumnProps>;
   index: number;
 }

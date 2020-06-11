@@ -31,7 +31,8 @@ interface HeaderComponentProps {
     id: string;
     desc: boolean;
   }[];
-  onGridPropertiesChange: React.Dispatch<React.SetStateAction<TableProps>>;
+  addButton?: boolean;
+  onPaginationChange: React.Dispatch<React.SetStateAction<TableProps>>;
 }
 
 const AddNewUser = styled(Div)`
@@ -46,7 +47,7 @@ const AddNewUser = styled(Div)`
   }
 `;
 
-const HeaderComponent = ({ sortProperties, headers, onGridPropertiesChange }: HeaderComponentProps) => {
+const HeaderComponent = ({ sortProperties, headers, onPaginationChange, addButton }: HeaderComponentProps) => {
   const history = useHistory();
   const { customerId } = useParams<{ customerId: string }>();
   const amtHeaders = headers.length;
@@ -65,15 +66,18 @@ const HeaderComponent = ({ sortProperties, headers, onGridPropertiesChange }: He
       { headers && headers.map((header, index) => (
         <HeaderColumnComponent
           sortProperties={sortProperties}
-          onGridPropertiesChange={onGridPropertiesChange}
+          onPaginationChange={onPaginationChange}
           accessor={header.accessor}
           value={header.Header}
           key={index}
         />
       ))}
+      { addButton && (
       <AddNewUser onClick={() => history.push(`/dashboard/c/${customerId}/users/add/`)}>
         <PlusCircle />
       </AddNewUser>
+      )}
+
     </Grid>
   );
 };

@@ -198,22 +198,11 @@ export const CustomerMutations = Upload && extendType({
           }));
         }
 
-        const permissionIds = await prisma.permission.findMany({ where: { customerId }, select: { id: true } });
-        const mappedPermissionIds = permissionIds.map((permission) => permission.id);
-        if (mappedPermissionIds.length > 0) {
-          await PermissionResolver.deletePermissions(mappedPermissionIds);
-        }
+        await prisma.permission.deleteMany({ where: { customerId } });
 
-        console.log('delete permissions');
+        await prisma.user.deleteMany({ where: { customerId } });
 
-        const userIds = await prisma.user.deleteMany({ where: { customerId } });
-
-        console.log('removed users');
-        const roleIds = await prisma.role.findMany({ where: { customerId }, select: { id: true } });
-        const mappedRoleIds = roleIds.map((role) => role.id);
-        if (mappedRoleIds.length > 0) {
-          await RoleResolver.deleteRoles(mappedRoleIds);
-        }
+        await prisma.role.deleteMany({ where: { customerId } });
 
         await ctx.prisma.customer.delete({
           where: {

@@ -5,7 +5,7 @@ import React, { useState } from 'react';
 import { DeleteButtonContainer, Div, EditButtonContainer, Grid, H4, H5, Hr, Span } from '@haas/ui';
 import { UserRowProps } from 'components/Table/RowComponentInterfaces';
 
-const UserRow = ({ headers, data, index, onDeleteUser }: UserRowProps) => {
+const UserRow = ({ headers, data, index, onDeleteEntry, onEditEntry }: UserRowProps) => {
   const history = useHistory();
   const { customerId } = useParams<{ customerId: string }>();
   const [isExpanded, setIsExpanded] = useState(false);
@@ -28,13 +28,13 @@ const UserRow = ({ headers, data, index, onDeleteUser }: UserRowProps) => {
       })}
       <EditButtonContainer
         style={{ top: '0px' }}
-        onClick={(event) => setEditUser(event, userId)}
+        onClick={(event) => onEditEntry && onEditEntry(event, userId)}
       >
         <Edit />
       </EditButtonContainer>
       <DeleteButtonContainer
         style={{ top: '0px' }}
-        onClick={(event) => onDeleteUser(event, userId)}
+        onClick={(event) => onDeleteEntry && onDeleteEntry(event, userId)}
       >
         <X />
       </DeleteButtonContainer>

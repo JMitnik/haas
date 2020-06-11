@@ -1,6 +1,6 @@
 import { ApolloError } from 'apollo-boost';
+import { useHistory, useParams } from 'react-router';
 import { useLazyQuery, useMutation } from '@apollo/react-hooks';
-import { useParams } from 'react-router';
 import React, { useEffect, useState } from 'react';
 
 import { Div, H2 } from '@haas/ui';
@@ -30,8 +30,9 @@ const HEADERS = [{ Header: 'First name', accessor: 'firstName', Cell: CenterCell
 
 const UsersOverview = () => {
   const { customerId } = useParams();
+  const history = useHistory();
   const [fetchUsers, { loading, data }] = useLazyQuery(getUsersQuery, { fetchPolicy: 'cache-and-network' });
-  const [activeGridProperties, setActiveGridProperties] = useState<TableProps>(
+  const [paginationProps, setPaginationProps] = useState<TableProps>(
     {
       activeStartDate: null,
       activeEndDate: null,
@@ -52,7 +53,7 @@ const UsersOverview = () => {
   const tableData: any = data?.users || [];
   console.log('USERS: ', data?.users);
   useEffect(() => {
-    const { activeStartDate, activeEndDate, pageIndex, pageSize, sortBy, activeSearchTerm } = activeGridProperties;
+    const { activeStartDate, activeEndDate, pageIndex, pageSize, sortBy, activeSearchTerm } = paginationProps;
     fetchUsers({
       variables: {
         customerId,
@@ -67,7 +68,7 @@ const UsersOverview = () => {
         // },
       },
     });
-  }, [activeGridProperties]);
+  }, [customerId, fetchUsers, paginationProps]);
 
   const handleDeleteUser = async (event: any, userId: string) => {
     deleteUser({
@@ -78,12 +79,17 @@ const UsersOverview = () => {
     event.stopPropagation();
   };
 
+  const handleEditUser = (event: any, userId: string) => {
+    history.push(`/dashboard/c/${customerId}/u/${userId}/edit`);
+    event.stopPropagation();
+  };
+
   const handleSearchTermChange = (newSearchTerm: string) => {
-    setActiveGridProperties((prevValues) => ({ ...prevValues, activeSearchTerm: newSearchTerm }));
+    setPaginationProps((prevValues) => ({ ...prevValues, activeSearchTerm: newSearchTerm }));
   };
 
   const handleDateChange = (startDate: Date | null, endDate: Date | null) => {
-    setActiveGridProperties((prevValues) => ({ ...prevValues, activeStartDate: startDate, activeEndDate: endDate }));
+    setPaginationProps((prevValues) => ({ ...prevValues, activeStartDate: startDate, activeEndDate: endDate }));
   };
 
   const pageCount = data?.getUsers?.pages || 1;
@@ -95,19 +101,20 @@ const UsersOverview = () => {
       <InputOutputContainer mb="5%">
         <InputContainer>
           <DatePickerComponent
-            activeStartDate={activeGridProperties.activeStartDate}
-            activeEndDate={activeGridProperties.activeEndDate}
+            activeStartDate={paginationProps.activeStartDate}
+            activeEndDate={paginationProps.activeEndDate}
             handleDateChange={handleDateChange}
           />
-          <SearchBarComponent activeSearchTerm={activeGridProperties.activeSearchTerm} handleSearchTermChange={handleSearchTermChange} />
+          <SearchBarComponent activeSearchTerm={paginationProps.activeSearchTerm} handleSearchTermChange={handleSearchTermChange} />
         </InputContainer>
       </InputOutputContainer>
       <Div backgroundColor="#fdfbfe" mb="1%" height="65%">
         <Table
           headers={HEADERS}
-          gridProperties={{ ...activeGridProperties, pageCount, pageIndex }}
-          onGridPropertiesChange={setActiveGridProperties}
-          onDeleteUser={handleDeleteUser}
+          gridProperties={{ ...paginationProps, pageCount, pageIndex }}
+          onPaginationChange={setPaginationProps}
+          onDeleteEntry={handleDeleteUser}
+          onEditEntry={handleEditUser}
           data={tableData}
         />
       </Div>

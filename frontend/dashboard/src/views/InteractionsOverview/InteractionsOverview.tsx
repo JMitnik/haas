@@ -5,7 +5,9 @@ import Papa from 'papaparse';
 import React, { useCallback, useEffect, useState } from 'react';
 
 import { Div, H2, Muted, Span } from '@haas/ui';
-import InteractionsTable from 'views/InteractionsOverview/InteractionsTable';
+// import InteractionsTable from 'views/InteractionsOverview/InteractionsTable';
+import InteractionsTable from 'components/Table/Table';
+import Row from 'components/Table/Row';
 import getInteractionsQuery from 'queries/getInteractionsQuery';
 
 import { CenterCell, ScoreCell, UserCell, WhenCell } from './TableCell/TableCell';
@@ -133,6 +135,7 @@ const InteractionsOverview = () => {
           gridProperties={{ ...paginationProps, pageCount, pageIndex }}
           onPaginationChange={setPaginationProps}
           data={interactions}
+          CustomRow={Row}
         />
       </Div>
     </Div>

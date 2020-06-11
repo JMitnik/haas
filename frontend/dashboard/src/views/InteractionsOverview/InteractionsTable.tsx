@@ -2,6 +2,7 @@ import React from 'react';
 
 import { DataGridProps, TableProps } from 'types/generic';
 import { Grid } from '@haas/ui';
+import { RowComponentProps } from 'components/Table/RowComponentInterfaces';
 import HeaderComponent from 'components/Table/TableHeader';
 import TablePaginationControls from 'components/Table/TablePaginationControls';
 
@@ -14,6 +15,7 @@ interface TableInputProps {
     Cell: ({ value }: { value: any }) => JSX.Element;
   }[]
   data: Array<any>;
+  CustomRow?: (props: RowComponentProps) => JSX.Element;
   onPaginationChange: React.Dispatch<React.SetStateAction<TableProps>>;
   gridProperties: DataGridProps;
 }
@@ -23,6 +25,7 @@ const InteractionTable = ({
   data,
   gridProperties,
   onPaginationChange,
+  CustomRow,
 }: TableInputProps) => {
   const handlePageChange = (newPageIndex: number) => {
     onPaginationChange((prevValues) => ({ ...prevValues, pageIndex: newPageIndex }));
@@ -37,7 +40,9 @@ const InteractionTable = ({
       />
 
       {data && data.map(
-        (dataEntry, index) => <TableRow headers={headers} data={dataEntry} key={index} index={index} />,
+        (dataEntry, index) => (CustomRow
+          ? <CustomRow headers={headers} data={dataEntry} key={index} index={index} />
+          : <TableRow headers={headers} data={dataEntry} key={index} index={index} />),
       )}
 
       <TablePaginationControls paginationProps={gridProperties} onPageChange={handlePageChange} />

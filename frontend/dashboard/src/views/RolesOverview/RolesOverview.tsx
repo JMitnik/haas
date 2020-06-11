@@ -33,7 +33,7 @@ const HEADERS = [
 const RolesOverview = () => {
   const { customerId } = useParams();
   const [fetchRoles, { loading, data }] = useLazyQuery(getRolesQuery, { fetchPolicy: 'cache-and-network' });
-  const [activeGridProperties, setActiveGridProperties] = useState<TableProps>(
+  const [paginationProps, setPaginationProps] = useState<TableProps>(
     {
       activeStartDate: null,
       activeEndDate: null,
@@ -48,7 +48,7 @@ const RolesOverview = () => {
   const permissions: any = data?.roleTable?.permissions || [];
   console.log('Permissions: ', permissions);
   useEffect(() => {
-    const { activeStartDate, activeEndDate, pageIndex, pageSize, sortBy, activeSearchTerm } = activeGridProperties;
+    const { activeStartDate, activeEndDate, pageIndex, pageSize, sortBy, activeSearchTerm } = paginationProps;
     fetchRoles({
       variables: {
         customerId,
@@ -63,14 +63,14 @@ const RolesOverview = () => {
         // },
       },
     });
-  }, [activeGridProperties]);
+  }, [customerId, fetchRoles, paginationProps]);
 
   const handleSearchTermChange = (newSearchTerm: string) => {
-    setActiveGridProperties((prevValues) => ({ ...prevValues, activeSearchTerm: newSearchTerm }));
+    setPaginationProps((prevValues) => ({ ...prevValues, activeSearchTerm: newSearchTerm }));
   };
 
   const handleDateChange = (startDate: Date | null, endDate: Date | null) => {
-    setActiveGridProperties((prevValues) => ({ ...prevValues, activeStartDate: startDate, activeEndDate: endDate }));
+    setPaginationProps((prevValues) => ({ ...prevValues, activeStartDate: startDate, activeEndDate: endDate }));
   };
 
   const pageCount = data?.roleTable?.pages || 1;
@@ -82,18 +82,18 @@ const RolesOverview = () => {
       <InputOutputContainer mb="5%">
         <InputContainer>
           <DatePickerComponent
-            activeStartDate={activeGridProperties.activeStartDate}
-            activeEndDate={activeGridProperties.activeEndDate}
+            activeStartDate={paginationProps.activeStartDate}
+            activeEndDate={paginationProps.activeEndDate}
             handleDateChange={handleDateChange}
           />
-          <SearchBarComponent activeSearchTerm={activeGridProperties.activeSearchTerm} handleSearchTermChange={handleSearchTermChange} />
+          <SearchBarComponent activeSearchTerm={paginationProps.activeSearchTerm} handleSearchTermChange={handleSearchTermChange} />
         </InputContainer>
       </InputOutputContainer>
       <Div backgroundColor="#fdfbfe" mb="1%" height="65%">
         <Table
           headers={HEADERS}
-          gridProperties={{ ...activeGridProperties, pageCount, pageIndex }}
-          onGridPropertiesChange={setActiveGridProperties}
+          gridProperties={{ ...paginationProps, pageCount, pageIndex }}
+          onPaginationChange={setPaginationProps}
           data={tableData}
           permissions={permissions}
         />

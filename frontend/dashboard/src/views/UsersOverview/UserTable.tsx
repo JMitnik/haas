@@ -18,27 +18,29 @@ interface TableInputProps {
     Cell: ({ value }: { value: any }) => JSX.Element;
   }[]
   data: Array<any>;
-  onGridPropertiesChange: React.Dispatch<React.SetStateAction<TableProps>>;
-  onDeleteUser: (event: any, userId: string) => Promise<void>;
+  onPaginationChange: React.Dispatch<React.SetStateAction<TableProps>>;
+  onDeleteEntry?: (event: any, userId: string) => Promise<void>;
+  onEditEntry?: (event: any, userId: string) => void;
   gridProperties: DataGridProps;
 }
 
 const UserTable = (
-  { headers, data, gridProperties, onGridPropertiesChange, onDeleteUser }: TableInputProps,
+  { headers, data, gridProperties, onPaginationChange, onDeleteEntry, onEditEntry }: TableInputProps,
 ) => {
   const handlePage = (newPageIndex: number) => {
-    onGridPropertiesChange((prevValues) => ({ ...prevValues, pageIndex: newPageIndex }));
+    onPaginationChange((prevValues) => ({ ...prevValues, pageIndex: newPageIndex }));
   };
 
   return (
     <Grid gridRowGap={2}>
       <HeaderComponent
         sortProperties={gridProperties.sortBy}
-        onGridPropertiesChange={onGridPropertiesChange}
+        onPaginationChange={onPaginationChange}
         headers={headers}
+        addButton
       />
       {data && data.map(
-        (dataEntry, index) => <Row headers={headers} onDeleteUser={onDeleteUser} data={dataEntry} key={index} index={index} />,
+        (dataEntry, index) => <Row headers={headers} onEditEntry={onEditEntry} onDeleteEntry={onDeleteEntry} data={dataEntry} key={index} index={index} />,
       )}
       <PaginationSpinner gridProperties={gridProperties} handlePage={handlePage} />
     </Grid>
