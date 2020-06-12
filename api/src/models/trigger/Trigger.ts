@@ -1,5 +1,5 @@
-import { PrismaClient, Trigger, User } from '@prisma/client';
-import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
+import { PrismaClient, Trigger, TriggerConditionCreateInput, TriggerCreateInput, User } from '@prisma/client';
+import { arg, enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
 import _ from 'lodash';
 
 import { UserType } from '../users/User';
@@ -72,12 +72,28 @@ const TriggerType = objectType({
   },
 });
 
-// const TriggerInputType = inputObjectType({
-//     name: 'TriggerInputType',
-//     definition(t) {
+const TriggerConditionInputType = inputObjectType({
+  name: 'TriggerConditionInputType',
+  definition(t) {
+    t.int('id');
+    t.field('type', {
+      type: TriggerConditionTypeEnum,
+    });
+    t.int('minValue', { nullable: true });
+    t.int('maxValue', { nullable: true });
+    t.string('textValue', { nullable: true });
+  },
+});
 
-//     }
-// })
+const TriggerInputType = inputObjectType({
+  name: 'TriggerInputType',
+  definition(t) {
+    t.string('name');
+    t.field('type', { type: TriggerTypeEnum });
+    t.field('medium', { type: TriggerMediumEnum });
+    t.list.field('conditions', { type: TriggerConditionInputType });
+  },
+});
 
 const TriggerMutations = extendType({
   type: 'Mutation',
@@ -86,26 +102,28 @@ const TriggerMutations = extendType({
       type: TriggerType,
       args: {
         userId: 'String',
-
+        trigger: TriggerInputType,
       },
       async resolve(parent: any, args: any, ctx: any) {
+        const { name, type, medium, conditions } = args.trigger;
+        const createArgs : TriggerCreateInput = { name, type, medium };
+        const triggerConditions: TriggerConditionCreateInput[] = [];
+        if (args.userId) {
+          createArgs.recipients = { connect: { id: args.userId } };
+        }
+
+        if (conditions.length > 0) {
+          _.forEach(conditions, (condition) => triggerConditions.push(
+            { type: condition.type,
+              minValue: condition.minValue,
+              maxValue: condition.maxValue,
+              textValue: condition.textValue },
+          ));
+          createArgs.conditions = { create: triggerConditions };
+        }
+
         return prisma.trigger.create({
-          data: {
-            name: 'initial trigger',
-            type: 'QUESTION',
-            medium: 'PHONE',
-            conditions: {
-              create: {
-                type: 'HIGH_THRESHOLD',
-                minValue: 39,
-              },
-            },
-            recipients: {
-              connect: {
-                id: 'ckbby8qf40000var5vqil38mf',
-              },
-            },
-          },
+          data: createArgs,
         });
       },
     });

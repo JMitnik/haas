@@ -160,7 +160,7 @@ type Mutation {
   createDialogue(customerId: String, description: String, isSeed: Boolean, publicTitle: String, title: String): Dialogue!
   createPermission(data: PermissionInput): PermssionType!
   createRole(data: RoleInput): RoleType!
-  createTrigger(userId: String): TriggerType!
+  createTrigger(trigger: TriggerInputType, userId: String): TriggerType!
   createUser(id: String, input: UserInput): UserType!
   deleteCustomer(where: CustomerWhereUniqueInput): Customer!
   deleteDialogue(where: DialogueWhereUniqueInput): Dialogue!
@@ -345,6 +345,14 @@ type topPathType {
   quantity: Int!
 }
 
+input TriggerConditionInputType {
+  id: Int
+  maxValue: Int
+  minValue: Int
+  textValue: String
+  type: TriggerConditionTypeEnum
+}
+
 type TriggerConditionType {
   id: Int!
   maxValue: Int
@@ -360,6 +368,13 @@ enum TriggerConditionTypeEnum {
   LOW_THRESHOLD
   OUTER_RANGE
   TEXT_MATCH
+}
+
+input TriggerInputType {
+  conditions: [TriggerConditionInputType!]
+  medium: TriggerMediumEnum
+  name: String
+  type: TriggerTypeEnum
 }
 
 enum TriggerMediumEnum {
