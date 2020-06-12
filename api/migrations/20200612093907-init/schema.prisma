@@ -1,6 +1,6 @@
 datasource postgresql {
   provider = "postgresql"
-  url      = env("DB_STRING")
+  url = "***"
 }
 
 // binaryTargets = ["debian-openssl-1.1.x"]
@@ -236,5 +236,4 @@ model Trigger {
   medium     TriggerMedium
   conditions TriggerCondition[]
   recipients User[]
-  // TODO: Add dialogue ID (?)
 }

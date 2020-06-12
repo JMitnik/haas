@@ -160,6 +160,7 @@ type Mutation {
   createDialogue(customerId: String, description: String, isSeed: Boolean, publicTitle: String, title: String): Dialogue!
   createPermission(data: PermissionInput): PermssionType!
   createRole(data: RoleInput): RoleType!
+  createTrigger(userId: String): TriggerType!
   createUser(id: String, input: UserInput): UserType!
   deleteCustomer(where: CustomerWhereUniqueInput): Customer!
   deleteDialogue(where: DialogueWhereUniqueInput): Dialogue!
@@ -231,6 +232,7 @@ type Query {
   roleTable(customerId: String, filter: FilterInput): RoleTableType!
   session(where: SessionWhereUniqueInput): Session!
   sessions(where: SessionWhereUniqueInput): [Session!]!
+  triggers(userId: String): [TriggerType!]!
   user(userId: String): UserType!
   users(customerId: String, filter: FilterInput): [UserType!]!
   userTable(customerId: String, filter: FilterInput): UserTable!
@@ -341,6 +343,43 @@ input TopicDataEntry {
 type topPathType {
   answer: String!
   quantity: Int!
+}
+
+type TriggerConditionType {
+  id: Int!
+  maxValue: Int
+  minValue: Int
+  textValue: String
+  triggerId: String!
+  type: TriggerConditionTypeEnum!
+}
+
+enum TriggerConditionTypeEnum {
+  HIGH_THRESHOLD
+  INNER_RANGE
+  LOW_THRESHOLD
+  OUTER_RANGE
+  TEXT_MATCH
+}
+
+enum TriggerMediumEnum {
+  BOTH
+  EMAIL
+  PHONE
+}
+
+type TriggerType {
+  conditions: [TriggerConditionType!]!
+  id: String!
+  medium: TriggerMediumEnum!
+  name: String!
+  recipients: [UserType!]!
+  type: TriggerTypeEnum!
+}
+
+enum TriggerTypeEnum {
+  QUESTION
+  SCHEDULED
 }
 
 type UniqueDataResultEntry {
