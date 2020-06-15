@@ -1,6 +1,5 @@
-import React from 'react';
-
 import { Div, H3, Span } from '@haas/ui';
+import React from 'react';
 
 interface TableHeaderColumnProps {
   value: string;
@@ -24,19 +23,15 @@ interface TableProps {
   }[]
 }
 
-const TableHeaderColumn = ({
-  sortProperties,
-  accessor,
-  value,
-  onPaginationChange,
-}: TableHeaderColumnProps) => {
+const TableHeaderColumn = (
+  { sortProperties, accessor, value, onPaginationChange }: TableHeaderColumnProps,
+) => {
   const handleSort = () => {
     onPaginationChange((prevValues) => {
       const { sortBy } = prevValues;
       const newOrderBy = sortBy?.[0]?.id === accessor
         ? [{ id: sortBy?.[0]?.id, desc: !sortBy?.[0]?.desc }]
         : [{ id: accessor, desc: true }];
-
       return { ...prevValues, sortBy: newOrderBy };
     });
   };

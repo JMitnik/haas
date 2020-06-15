@@ -41,7 +41,7 @@ export interface PermissionProps {
   id: string;
 }
 
-export interface RowComponentProps {
+export interface TableRowProps {
   data: CellComponentProps;
   permissions?: Array<PermissionProps>;
   headers: Array<HeaderColumnProps>;

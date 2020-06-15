@@ -14,12 +14,9 @@ const SearchBar = ({ activeSearchTerm, onSearchTermChange }: SearchBarProps) => 
   const [searchTerm, setSearchTerm] = useState<string>(activeSearchTerm);
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
-  useEffect(
-    () => {
-      onSearchTermChange(debouncedSearchTerm);
-    },
-    [debouncedSearchTerm, onSearchTermChange],
-  );
+  useEffect(() => {
+    onSearchTermChange(debouncedSearchTerm);
+  }, [debouncedSearchTerm, onSearchTermChange]);
 
   return (
     <Div padding={15} borderRadius="90px" useFlex flexDirection="row" alignItems="center" backgroundColor="#f1f5f8">

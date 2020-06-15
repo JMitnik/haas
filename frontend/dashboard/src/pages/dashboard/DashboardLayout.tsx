@@ -1,5 +1,5 @@
-import { Button, Div } from '@haas/ui';
 import { DashboardContainer } from 'components/DashboardView/DashboardViewStyles';
+import { Div } from '@haas/ui';
 import { useHistory, useParams } from 'react-router';
 import Logo from 'assets/Logo';
 import React from 'react';

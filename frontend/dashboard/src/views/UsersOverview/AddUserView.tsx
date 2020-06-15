@@ -7,7 +7,7 @@ import Select from 'react-select';
 import styled, { css } from 'styled-components/macro';
 
 import { Button, Container, Div, Flex, Grid, H2, H3,
-  Hr, Muted, StyledInput, StyledLabel, StyledTextInput } from '@haas/ui';
+  Hr, Muted, StyledInput, StyledLabel } from '@haas/ui';
 import createAddMutation from 'mutations/createUser';
 import getRolesQuery from 'queries/getRoles';
 
@@ -26,7 +26,7 @@ const AddUserView = () => {
 
   const [activeRole, setActiveRole] = useState<null | { label: string, value: string }>(null);
 
-  const { data, loading: rolesLoading } = useQuery(getRolesQuery, { variables: { customerId } });
+  const { data } = useQuery(getRolesQuery, { variables: { customerId } });
   const [addUser, { loading }] = useMutation(createAddMutation, {
     onCompleted: () => {
       history.push(`/dashboard/c/${customerId}/users/`);

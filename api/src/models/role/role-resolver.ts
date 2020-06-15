@@ -35,8 +35,8 @@ class RoleResolver {
     // Slice ordered filtered users
     const slicedOrderedUsers = RoleResolver.sliceRoles(roles, offset, limit, pageIndex);
 
-    const mappedRoles = slicedOrderedUsers.map((role) => ({ ...role, amtPermissions: role.permissions.length }));
-    return { roles: mappedRoles, newPageIndex: needPageReset ? 0 : pageIndex, totalPages };
+    const rolesWithNrPermisisons = slicedOrderedUsers.map((role) => ({ ...role, amtPermissions: role.permissions.length }));
+    return { roles: rolesWithNrPermisisons, newPageIndex: needPageReset ? 0 : pageIndex, totalPages };
   };
 
   static roles = async (customerId: string) => {
@@ -46,8 +46,8 @@ class RoleResolver {
         permissions: true,
       },
     });
-    const mappedRoles = roles.map((role) => ({ ...role, amtPermissions: role.permissions.length }));
-    return mappedRoles;
+    const rolesWithNrPermisisons = roles.map((role) => ({ ...role, amtPermissions: role.permissions.length }));
+    return rolesWithNrPermisisons;
   };
 
   static deleteRoles = async (roleIds: Array<string>) => prisma.role.deleteMany({ where: {
