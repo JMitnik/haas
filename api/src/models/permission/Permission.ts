@@ -29,6 +29,7 @@ export const PermissionMutations = extendType({
       args: { data: PermissionInput },
       resolve(parent: any, args: any, ctx) {
         const { name, description, customerId } = args.data;
+
         return prisma.permission.create({
           data: {
             name,
@@ -45,10 +46,8 @@ export const PermissionMutations = extendType({
   },
 });
 
-const permissionNexus = [
+export default [
   PermissionMutations,
   PermissionInput,
   PermissionType,
 ];
-
-export default permissionNexus;

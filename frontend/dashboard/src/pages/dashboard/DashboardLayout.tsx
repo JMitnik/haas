@@ -1,8 +1,9 @@
+import { useHistory, useParams } from 'react-router';
+import React from 'react';
+
 import { DashboardContainer } from 'components/DashboardView/DashboardViewStyles';
 import { Div } from '@haas/ui';
-import { useHistory, useParams } from 'react-router';
 import Logo from 'assets/Logo';
-import React from 'react';
 import Sidenav from 'components/Sidenav';
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
