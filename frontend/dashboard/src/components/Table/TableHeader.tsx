@@ -1,5 +1,9 @@
-import { Grid } from '@haas/ui';
+
+import { PlusCircle } from 'react-feather';
 import React from 'react';
+import styled from 'styled-components/macro';
+
+import { Div, Grid } from '@haas/ui';
 
 import TableHeaderColumn from './TableHeaderColumn';
 
@@ -26,23 +30,37 @@ interface TableHeaderProps {
     id: string;
     desc: boolean;
   }[];
+  onAddEntry?: (event: any) => void;
   onPaginationChange: React.Dispatch<React.SetStateAction<TableProps>>;
 }
 
-const TableHeader = ({ sortProperties, headers, onPaginationChange }: TableHeaderProps) => {
-  const nrHeaders = headers.length;
-  const percentage = 100 / nrHeaders;
-  const templateColumns = `${percentage.toString()}% `.repeat(nrHeaders);
+const AddNewUser = styled(Div)`
+  position: absolute;
+  cursor: pointer;
+  top: 17.5px;
+  right: 15px;
+  color: #6d767d;
+
+  :hover {
+    color: #000;
+  }
+`;
+
+const TableHeader = ({ sortProperties, headers, onPaginationChange, onAddEntry }: TableHeaderProps) => {
+  const amtHeaders = headers.length;
+  const percentage = 100 / amtHeaders;
+  const templateColumns = `${percentage.toString()}% `.repeat(amtHeaders);
 
   return (
     <Grid
+      position="relative"
       backgroundColor="#f1f5f8"
       color="black"
       borderRadius="90px"
       gridColumnGap={5}
       gridTemplateColumns={templateColumns}
     >
-      {headers && headers.map((header, index) => (
+      { headers && headers.map((header, index) => (
         <TableHeaderColumn
           sortProperties={sortProperties}
           onPaginationChange={onPaginationChange}
@@ -51,6 +69,12 @@ const TableHeader = ({ sortProperties, headers, onPaginationChange }: TableHeade
           key={index}
         />
       ))}
+      { onAddEntry && (
+      <AddNewUser onClick={onAddEntry}>
+        <PlusCircle />
+      </AddNewUser>
+      )}
+
     </Grid>
   );
 };

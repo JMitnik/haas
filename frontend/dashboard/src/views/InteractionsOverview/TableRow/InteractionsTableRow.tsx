@@ -7,7 +7,7 @@ import SliderNodeIcon from 'components/Icons/SliderNodeIcon';
 import { InteractionDetailQuestionEntry } from '../InteractionOverviewStyles';
 import { TableRowProps } from './TableRowTypes';
 
-const TableRow = ({ headers, data, index }: TableRowProps) => {
+const InteractionsTableRow = ({ headers, data, index }: TableRowProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const nrCells = headers.length;
   const percentage = 100 / nrCells;
@@ -77,13 +77,23 @@ const TableRow = ({ headers, data, index }: TableRowProps) => {
                         <Div useFlex flexDirection="column">
                           <Span color="#c0bcbb" fontSize="0.8rem" fontWeight="normal" fontStyle="normal">U ASKED</Span>
                           <Span fontSize="0.8rem" fontWeight={300}>{relatedNode?.title || 'N/A'}</Span>
-                          <Span color="#c0bcbb" fontSize="0.8rem" fontWeight={300} fontStyle="normal" mt="4%">THEY ANSWERED</Span>
+                          <Span
+                            color="#c0bcbb"
+                            fontSize="0.8rem"
+                            fontWeight={300}
+                            fontStyle="normal"
+                            mt="4%"
+                          >
+                            THEY ANSWERED
+
+                          </Span>
                           <Span
                             fontWeight={300}
                             fontStyle="italic"
                             fontSize="0.8rem"
                           >
-                            {textValue || numberValue || multiValues?.map((value) => value.textValue)?.join(' ') || 'N/A'}
+                            {textValue || numberValue || multiValues?.map(
+                              (value) => value.textValue)?.join(' ') || 'N/A'}
                           </Span>
                         </Div>
                       </Div>
@@ -99,4 +109,4 @@ const TableRow = ({ headers, data, index }: TableRowProps) => {
   );
 };
 
-export default TableRow;
+export default InteractionsTableRow;

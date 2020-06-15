@@ -5,14 +5,14 @@ import Papa from 'papaparse';
 import React, { useCallback, useEffect, useState } from 'react';
 
 import { Div, H2, Muted, Span } from '@haas/ui';
-import DatePicker from 'components/DatePicker/DatePickerComponent';
+import DatePicker from 'components/DatePicker/DatePicker';
 import InteractionsTable from 'components/Table/Table';
-import SearchBar from 'components/SearchBar/SearchBarComponent';
+import SearchBar from 'components/SearchBar/SearchBar';
 import getInteractionsQuery from 'queries/getInteractionsQuery';
 
 import { CenterCell, ScoreCell, UserCell, WhenCell } from './TableCell/TableCell';
 import { InputContainer, InputOutputContainer, OutputContainer } from './InteractionOverviewStyles';
-import Row from './TableRow/TableRow';
+import Row from './TableRow/InteractionsTableRow';
 
 interface TableProps {
   activeStartDate: Date | null;

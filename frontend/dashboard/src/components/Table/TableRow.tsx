@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 
-import { Div, Grid, H4, H5, Hr, Span } from '@haas/ui';
-import { RowComponentProps } from 'components/Table/RowComponentInterfaces';
+import { Grid } from '@haas/ui';
+import { TableRowProps } from 'components/Table/TableTypes';
 
-const Row = ({ headers, data, index }: RowComponentProps) => {
+const TableRow = ({ headers, data, index }: TableRowProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const amtCells = headers.length;
   const percentage = 100 / amtCells;
@@ -20,4 +20,4 @@ const Row = ({ headers, data, index }: RowComponentProps) => {
   );
 };
 
-export default Row;
+export default TableRow;

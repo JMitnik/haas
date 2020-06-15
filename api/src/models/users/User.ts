@@ -17,9 +17,10 @@ export const UserType = objectType({
     t.string('phone', { nullable: true });
     t.string('firstName', { nullable: true });
     t.string('lastName', { nullable: true });
+
     t.field('role', {
       type: RoleType,
-      resolve(parent: User, args: any, ctx: any) {
+      resolve(parent: User) {
         return prisma.role.findOne({ where: { id: parent.roleId } });
       },
     });
@@ -29,22 +30,23 @@ export const UserType = objectType({
 export const UserTable = objectType({
   name: 'UserTable',
   definition(t) {
-    t.list.field('users', { type: UserType });
     t.int('pageIndex', { nullable: true });
     t.int('totalPages', { nullable: true });
+
+    t.list.field('users', { type: UserType });
   },
 });
 
 export const UserInput = inputObjectType({
   name: 'UserInput',
   definition(t) {
+    t.string('email');
+    t.string('roleId');
     t.string('customerId', { nullable: true });
     t.string('firstName', { nullable: true });
     t.string('lastName', { nullable: true });
-    t.string('email');
     t.string('password', { nullable: true });
     t.string('phone', { nullable: true });
-    t.string('roleId');
   },
 });
 
@@ -53,15 +55,17 @@ export const UserQueries = extendType({
   definition(t) {
     t.field('userTable', {
       type: UserTable,
-      args: { customerId: 'String',
-        filter: FilterInput },
+      args: { customerId: 'String', filter: FilterInput },
       async resolve(parent: any, args: any, ctx: any) {
         const { pageIndex, offset, limit, searchTerm, orderBy }: PaginationProps = args.filter;
+
         if (args.filter) {
           return UserResolver.paginatedUsers(args.customerId, pageIndex, offset, limit, orderBy[0], searchTerm);
         }
+
         const users = await prisma.user.findMany({ where: { customerId: args.customerId } });
         const totalPages = Math.ceil(users.length / limit);
+
         return { users, pageIndex, totalPages };
       },
     });

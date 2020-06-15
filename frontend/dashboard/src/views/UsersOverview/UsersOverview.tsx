@@ -5,14 +5,14 @@ import { useLazyQuery, useMutation } from '@apollo/react-hooks';
 import React, { useCallback, useEffect, useState } from 'react';
 
 import { Div, H2 } from '@haas/ui';
-import DatePicker from 'components/DatePicker/DatePickerComponent';
-import SearchBar from 'components/SearchBar/SearchBarComponent';
+import DatePicker from 'components/DatePicker/DatePicker';
+import SearchBar from 'components/SearchBar/SearchBar';
 import Table from 'components/Table/Table';
 import getUsersQuery from 'queries/getUsers';
 
-import { CenterCell, RoleCell, ScoreCell, UserCell, WhenCell } from 'components/Table/CellComponents/CellComponents';
+import { CenterCell, RoleCell, UserCell } from 'components/Table/CellComponents/CellComponents';
 import { InputContainer, InputOutputContainer } from './UsersOverviewStyles';
-import Row from './TableRow/Row';
+import Row from './TableRow/UsersTableRow';
 import deleteUserQuery from '../../mutations/deleteUser';
 
 interface TableProps {
@@ -27,13 +27,17 @@ interface TableProps {
   }[]
 }
 
-const HEADERS = [{ Header: 'First name', accessor: 'firstName', Cell: CenterCell },
-  { Header: 'Last name', accessor: 'lastName', Cell: CenterCell }, { Header: 'Email', accessor: 'email', Cell: UserCell }, { Header: 'Role', accessor: 'role', Cell: RoleCell }];
+const HEADERS = [
+  { Header: 'First name', accessor: 'firstName', Cell: CenterCell },
+  { Header: 'Last name', accessor: 'lastName', Cell: CenterCell },
+  { Header: 'Email', accessor: 'email', Cell: UserCell },
+  { Header: 'Role', accessor: 'role', Cell: RoleCell },
+];
 
 const UsersOverview = () => {
   const { customerId } = useParams();
   const history = useHistory();
-  const [fetchUsers, { loading, data }] = useLazyQuery(getUsersQuery, { fetchPolicy: 'cache-and-network' });
+  const [fetchUsers, { data }] = useLazyQuery(getUsersQuery, { fetchPolicy: 'cache-and-network' });
   const [paginationProps, setPaginationProps] = useState<TableProps>(
     {
       activeStartDate: null,

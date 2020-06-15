@@ -1,16 +1,13 @@
-import { debounce } from 'lodash';
 import { useLazyQuery } from '@apollo/react-hooks';
 import { useParams } from 'react-router';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { Div, H2 } from '@haas/ui';
-import SearchBar from 'components/SearchBar/SearchBarComponent';
 import Table from 'components/Table/Table';
 import getRolesQuery from 'queries/getRolesTable';
 
 import { CenterCell, UserCell } from 'components/Table/CellComponents/CellComponents';
-import { InputContainer, InputOutputContainer } from './RolesOverviewStyles';
-import Row from './TableRow/TableRow';
+import Row from './TableRow/RolesTableRow';
 
 interface TableProps {
   activeStartDate: Date | null;
@@ -32,7 +29,7 @@ const HEADERS = [
 
 const RolesOverview = () => {
   const { customerId } = useParams();
-  const [fetchRoles, { loading, data }] = useLazyQuery(getRolesQuery, { fetchPolicy: 'cache-and-network' });
+  const [fetchRoles, { data }] = useLazyQuery(getRolesQuery, { fetchPolicy: 'cache-and-network' });
   const [paginationProps, setPaginationProps] = useState<TableProps>(
     {
       activeStartDate: null,
