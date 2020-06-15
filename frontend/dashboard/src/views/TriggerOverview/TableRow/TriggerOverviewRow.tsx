@@ -1,15 +1,49 @@
 import { Edit, X } from 'react-feather';
 import React, { useState } from 'react';
 
-import { DeleteButtonContainer, Div, EditButtonContainer, Grid, H4, H5, Hr } from '@haas/ui';
-import { UserRowProps } from 'components/Table/RowComponentInterfaces';
+import { DeleteButtonContainer, Div, EditButtonContainer, Flex, Grid, H4, H5, Hr } from '@haas/ui';
+import { TableRowProps } from 'components/Table/TableTypes';
+import { UserCell } from 'components/Table/CellComponents/CellComponents';
+import Table from 'components/Table/Table';
 
-const UserRow = ({ headers, data, index, onDeleteEntry, onEditEntry }: UserRowProps) => {
+import RecipientRow from '../RecipientOverview/RecipientRow';
+
+interface TableProps {
+  activeStartDate: Date | null;
+  activeEndDate: Date | null;
+  activeSearchTerm: string;
+  pageIndex: number;
+  pageSize: number;
+  sortBy: {
+    id: string;
+    desc: boolean;
+  }[]
+}
+
+const RECIPIENT_HEADERS = [
+  { Header: 'FIRST NAME', accessor: 'firstName', Cell: UserCell },
+  { Header: 'LAST NAME', accessor: 'lastName', Cell: UserCell },
+  { Header: 'EMAIL', accessor: 'email', Cell: UserCell },
+  { Header: 'PHONE', accessor: 'phone', Cell: UserCell },
+];
+const UserRow = ({ headers, data, index, onDeleteEntry, onEditEntry }: TableRowProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const amtCells = headers.length;
   const percentage = 100 / amtCells;
   const templateColumns = `${percentage.toString()}% `.repeat(amtCells);
   const userId = data.id;
+
+  const [paginationProps, setPaginationProps] = useState<TableProps>(
+    {
+      activeStartDate: null,
+      activeEndDate: null,
+      activeSearchTerm: '',
+      pageIndex: 0,
+      pageSize: 8,
+      sortBy: [{ id: 'id', desc: true }],
+    },
+  );
+  console.log('DATA TRIGGER: ', data);
 
   return (
     <Grid style={{ position: 'relative' }} gridRowGap={0} gridColumnGap={5} gridTemplateColumns={templateColumns} onClick={() => setIsExpanded(!isExpanded)}>
@@ -30,7 +64,7 @@ const UserRow = ({ headers, data, index, onDeleteEntry, onEditEntry }: UserRowPr
       >
         <X />
       </DeleteButtonContainer>
-      { isExpanded && (
+      {isExpanded && (
         <Div useFlex flexDirection="column" backgroundColor="#f0f0f0" gridColumn="1 / -1">
           <Div padding={25}>
             <Div marginBottom={10} useFlex flexDirection="column">
@@ -46,7 +80,18 @@ const UserRow = ({ headers, data, index, onDeleteEntry, onEditEntry }: UserRowPr
             <Div useFlex flexDirection="column">
               <Div width="100%" marginBottom="15px">
                 <H4 color="#999999">RECIPIENTS</H4>
-                <H5 color="#c0bcbb">Select the recipients you want a specific trigger to receive</H5>
+                <H5 color="#c0bcbb" marginBottom={5}>Select the recipients you want a specific trigger to receive</H5>
+                { /* TODO: Add proper pagination to this table (?)
+                Or just create list out of it and make page spinner optional */}
+                {data.recipients && (
+                  <Table
+                    onPaginationChange={() => null}
+                    paginationProps={{ ...paginationProps, pageCount: 1, pageIndex: 0 }}
+                    headers={RECIPIENT_HEADERS}
+                    data={data.recipients}
+                  />
+                )}
+
               </Div>
             </Div>
           </Div>

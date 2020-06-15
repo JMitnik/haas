@@ -5,14 +5,14 @@ import { useLazyQuery, useMutation } from '@apollo/react-hooks';
 import React, { useCallback, useEffect, useState } from 'react';
 
 import { Div, H2 } from '@haas/ui';
-import DatePicker from 'components/DatePicker/DatePickerComponent';
-import SearchBar from 'components/SearchBar/SearchBarComponent';
+import { UserCell } from 'components/Table/CellComponents/CellComponents';
+import DatePicker from 'components/DatePicker/DatePicker';
+import SearchBar from 'components/SearchBar/SearchBar';
 import Table from 'components/Table/Table';
-import getUsersQuery from 'queries/getUsers';
+import getTriggersQuery from 'queries/getTriggers';
 
-import { CenterCell, RoleCell, ScoreCell, UserCell, WhenCell } from 'components/Table/CellComponents/CellComponents';
 import { InputContainer, InputOutputContainer } from './TriggerOverviewStyles';
-import Row from './TableRow/Row';
+import Row from './TableRow/TriggerOverviewRow';
 import deleteUserQuery from '../../mutations/deleteUser';
 
 interface TableProps {
@@ -27,13 +27,16 @@ interface TableProps {
   }[]
 }
 
-const HEADERS = [{ Header: 'First name', accessor: 'firstName', Cell: CenterCell },
-  { Header: 'Last name', accessor: 'lastName', Cell: CenterCell }, { Header: 'Email', accessor: 'email', Cell: UserCell }, { Header: 'Role', accessor: 'role', Cell: RoleCell }];
+const HEADERS = [
+  { Header: 'NAME', accessor: 'name', Cell: UserCell },
+  { Header: 'MEDIUM', accessor: 'medium', Cell: UserCell },
+  { Header: 'TYPE', accessor: 'type', Cell: UserCell },
+];
 
 const UsersOverview = () => {
   const { customerId } = useParams();
   const history = useHistory();
-  const [fetchTriggers, { loading, data }] = useLazyQuery(getUsersQuery, { fetchPolicy: 'cache-and-network' });
+  const [fetchTriggers, { loading, data }] = useLazyQuery(getTriggersQuery, { fetchPolicy: 'cache-and-network' });
   const [paginationProps, setPaginationProps] = useState<TableProps>(
     {
       activeStartDate: null,
@@ -45,7 +48,8 @@ const UsersOverview = () => {
     },
   );
 
-  const tableData: any = data?.userTable.users || [];
+  const tableData: any = data?.triggers || [];
+  console.log('table data: ', tableData);
   useEffect(() => {
     const { activeStartDate, activeEndDate, pageIndex, pageSize, sortBy, activeSearchTerm } = paginationProps;
     fetchTriggers({
@@ -65,7 +69,7 @@ const UsersOverview = () => {
   }, [customerId, fetchTriggers, paginationProps]);
 
   const [deleteUser] = useMutation(deleteUserQuery, {
-    refetchQueries: [{ query: getUsersQuery,
+    refetchQueries: [{ query: getTriggersQuery,
       variables: { customerId,
         filter: {
           startDate: paginationProps.activeStartDate,

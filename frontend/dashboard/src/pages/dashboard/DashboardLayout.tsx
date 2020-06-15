@@ -31,6 +31,9 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
             <button type="button" onClick={() => history.push(`/dashboard/c/${customerId}/roles/`)}>
               Roles
             </button>
+            <button type="button" onClick={() => history.push(`/dashboard/c/${customerId}/triggers/`)}>
+              Triggers
+            </button>
             <button type="button" onClick={() => history.push(`/dashboard/c/${customerId}/t/${topicId}/interactions`)}>
               Interactions overview
             </button>

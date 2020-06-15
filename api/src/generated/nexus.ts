@@ -573,6 +573,7 @@ export interface NexusGenArgTypes {
       data?: NexusGenInputs['RoleInput'] | null; // RoleInput
     }
     createTrigger: { // args
+      customerId?: string | null; // String
       trigger?: NexusGenInputs['TriggerInputType'] | null; // TriggerInputType
       userId?: string | null; // String
     }
@@ -666,6 +667,8 @@ export interface NexusGenArgTypes {
       where?: NexusGenInputs['SessionWhereUniqueInput'] | null; // SessionWhereUniqueInput
     }
     triggers: { // args
+      customerId?: string | null; // String
+      filter?: NexusGenInputs['FilterInput'] | null; // FilterInput
       userId?: string | null; // String
     }
     user: { // args

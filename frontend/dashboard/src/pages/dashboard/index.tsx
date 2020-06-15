@@ -13,6 +13,7 @@ import OrganisationSettingsView from 'views/OrganisationSettingsView';
 import RolesOverview from 'views/RolesOverview/RolesOverview';
 import TopicDetail from 'views/TopicDetail/TopicDetail';
 import TopicsOverview from 'views/TopicsOverview/TopicsOverview';
+import TriggersOverview from 'views/TriggerOverview/TriggerOverview';
 import UsersOverview from 'views/UsersOverview/UsersOverview';
 
 import DashboardLayout from './DashboardLayout';
@@ -33,6 +34,14 @@ const DashboardPage = () => (
         render={() => (
           <DashboardLayout>
             <AddUserView />
+          </DashboardLayout>
+        )}
+      />
+      <Route
+        path="/dashboard/c/:customerId/triggers"
+        render={() => (
+          <DashboardLayout>
+            <TriggersOverview />
           </DashboardLayout>
         )}
       />

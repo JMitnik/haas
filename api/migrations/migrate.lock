@@ -5,3 +5,5 @@
 
 20200612093907-init
 20200612141902-added-question-node-to-triggers-relation
+20200615145310-added-customer-to-triggers-relation
+20200615145432-made-customer-trigger-relation-lower-case

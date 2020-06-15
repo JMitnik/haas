@@ -1,6 +1,6 @@
 datasource postgresql {
   provider = "postgresql"
-  url      = env("DB_STRING")
+  url = "***"
 }
 
 // binaryTargets = ["debian-openssl-1.1.x"]
@@ -241,6 +241,6 @@ model Trigger {
   relatedNode   QuestionNode?      @relation(fields: [relatedNodeId], references: [id])
   recipients    User[]
   // TODO: Add dialogue ID (?)
-  customer      Customer?          @relation(fields: [customerId], references: [id])
+  Customer      Customer?          @relation(fields: [customerId], references: [id])
   customerId    String?
 }

@@ -2,6 +2,7 @@ import { PrismaClient, Trigger, TriggerConditionCreateInput, TriggerCreateInput,
 import { arg, enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
 import _ from 'lodash';
 
+import { FilterInput } from '../session/Session';
 import { UserType } from '../users/User';
 
 const prisma = new PrismaClient();
@@ -101,6 +102,7 @@ const TriggerMutations = extendType({
     t.field('createTrigger', {
       type: TriggerType,
       args: {
+        customerId: 'String',
         userId: 'String',
         trigger: TriggerInputType,
       },
@@ -108,6 +110,12 @@ const TriggerMutations = extendType({
         const { name, type, medium, conditions } = args.trigger;
         const createArgs : TriggerCreateInput = { name, type, medium };
         const triggerConditions: TriggerConditionCreateInput[] = [];
+
+        // TODO: Add the following code to trigger seed (if it will be added)
+        if (args.customerId) {
+          createArgs.customer = { connect: { id: args.customerId } };
+        }
+
         if (args.userId) {
           createArgs.recipients = { connect: { id: args.userId } };
         }
@@ -136,18 +144,30 @@ const TriggerQueries = extendType({
     t.list.field('triggers', {
       type: TriggerType,
       args: {
+        customerId: 'String',
         userId: 'String',
+        filter: FilterInput,
       },
       resolve(parent: any, args: any, ctx: any) {
-        return prisma.trigger.findMany({
-          where: {
-            recipients: {
-              some: {
-                id: args.userId,
+        if (args.userId) {
+          return prisma.trigger.findMany({
+            where: {
+              recipients: {
+                some: {
+                  id: args.userId,
+                },
               },
             },
-          },
-        });
+          });
+        }
+        if (args.customerId) {
+          return prisma.trigger.findMany({
+            where: {
+              customerId: args.customerId,
+            },
+          });
+        }
+        return [];
       },
     });
   },

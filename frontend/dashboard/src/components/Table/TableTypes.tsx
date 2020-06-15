@@ -27,6 +27,13 @@ export interface HeaderColumnProps {
   Cell: React.FC<GenericCellProps>;
 }
 
+export interface RecipientProps {
+  firstName?: string;
+  lastName?: string;
+  email: string;
+  phone?: string;
+}
+
 export interface CellComponentProps {
   id: string;
   createdAt: string;
@@ -34,6 +41,7 @@ export interface CellComponentProps {
   score: number;
   nodeEntries: Array<NodeEntryProps>;
   permissions: Array<PermissionProps>;
+  recipients: Array<RecipientProps>;
 }
 
 export interface PermissionProps {

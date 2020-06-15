@@ -36,7 +36,9 @@ const Table = (
     permissions }: TableInputProps,
 ) => {
   const handlePage = (newPageIndex: number) => {
-    onPaginationChange((prevValues) => ({ ...prevValues, pageIndex: newPageIndex }));
+    if (onPaginationChange) {
+      onPaginationChange((prevValues) => ({ ...prevValues, pageIndex: newPageIndex }));
+    }
   };
 
   return (
