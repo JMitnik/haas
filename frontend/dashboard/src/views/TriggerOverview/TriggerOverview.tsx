@@ -99,7 +99,7 @@ const UsersOverview = () => {
   };
 
   const handleAddUser = (event: any) => {
-    history.push(`/dashboard/c/${customerId}/users/add/`);
+    history.push(`/dashboard/c/${customerId}/triggers/add/`);
     event.stopPropagation();
   };
 
