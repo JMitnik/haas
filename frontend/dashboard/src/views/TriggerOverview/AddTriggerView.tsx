@@ -14,6 +14,7 @@ import {
 import createAddMutation from 'mutations/createUser';
 import getDialoguesQuery from 'queries/getQuestionnairesCustomerQuery';
 import getQuestionsQuery from 'queries/getQuestionnaireQuery';
+import getRecipientsQuery from 'queries/getUsers';
 
 interface FormDataProps {
   name: string;
@@ -22,6 +23,29 @@ interface FormDataProps {
   phone?: string;
   role: { label: string, value: string };
 }
+
+enum TriggerConditionType {
+  LOW_THRESHOLD,
+  HIGH_THRESHOLD,
+  INNER_RANGE,
+  OUTER_RANGE,
+  TEXT_MATCH
+}
+
+interface TriggerCondition {
+  type: { label: string, value: TriggerConditionType } | null,
+  minValue?: number,
+  maxValue?: number,
+  textValue?: string
+}
+
+const TRIGGER_CONDITION_TYPES = [
+  { label: 'Low Threshold', value: TriggerConditionType.LOW_THRESHOLD },
+  { label: 'High Threshold', value: TriggerConditionType.HIGH_THRESHOLD },
+  { label: 'Text Match', value: TriggerConditionType.TEXT_MATCH },
+  { label: 'Outer Range', value: TriggerConditionType.OUTER_RANGE },
+  { label: 'Inner Range', value: TriggerConditionType.INNER_RANGE },
+];
 
 const TRIGGER_TYPES = [
   { label: 'Question', value: 'question' },
@@ -39,6 +63,7 @@ const AddTriggerView = () => {
   const { register, handleSubmit, errors } = useForm<FormDataProps>();
   const { customerId } = useParams();
   const { data: dialogueData } = useQuery(getDialoguesQuery, { variables: { id: customerId } });
+  const { data: recipientsData } = useQuery(getRecipientsQuery, { variables: { customerId } });
   const [fetchQuestions, { loading: questionsLoading, data: questionsData }] = useLazyQuery(getQuestionsQuery, { fetchPolicy: 'cache-and-network' });
 
   const [activeType, setActiveType] = useState<null | { label: string, value: string }>(null);
@@ -46,6 +71,7 @@ const AddTriggerView = () => {
   const [activeDialogue, setActiveDialogue] = useState<null | { label: string, value: string }>(null);
   const [activeQuestion, setActiveQuestion] = useState<null | { label: string, value: string }>(null);
   const [activeRecipients, setActiveRecipients] = useState<Array<null | { label: string, value: string }>>([]);
+  const [activeConditions, setActiveConditions] = useState<Array<TriggerCondition>>([]);
 
   useEffect(() => {
     if (activeDialogue) {
@@ -80,11 +106,13 @@ const AddTriggerView = () => {
   };
 
   const setRecipients = (qOption: { label: string, value: string }, index: number) => {
-    const { value } = qOption;
-    setActiveRecipients((prevRecipients) => prevRecipients);
+    setActiveRecipients((prevRecipients) => {
+      prevRecipients[index] = qOption;
+      return [...prevRecipients];
+    });
   };
 
-  const addNewRecipient = () => {
+  const addRecipient = () => {
     setActiveRecipients((prevRecipients) => [...prevRecipients, null]);
   };
 
@@ -95,10 +123,27 @@ const AddTriggerView = () => {
     });
   };
 
-  console.log('Active recipients: ', activeRecipients);
+  const setConditionsType = (qOption: any, index: number) => {
+    setActiveConditions((prevConditions) => {
+      prevConditions[index].type = qOption;
+      return [...prevConditions];
+    });
+  };
 
-  const dialogues = dialogueData?.dialogues && dialogueData?.dialogues.map((dialogue: any) => ({ label: dialogue?.title, value: dialogue?.id }));
-  const questions = questionsData?.dialogue?.questions && questionsData?.dialogue?.questions.map((question: any) => ({ label: question?.title, value: question?.id }));
+  const addCondition = () => {
+    setActiveConditions((prevConditions) => [...prevConditions, { type: null }]);
+  };
+
+  const dialogues = dialogueData?.dialogues && dialogueData?.dialogues.map((dialogue: any) => (
+    { label: dialogue?.title, value: dialogue?.id }));
+  const recipients = recipientsData?.users && recipientsData?.users.map((recipient: any) => (
+    {
+      label: `${recipient?.lastName}, ${recipient?.firstName} - E: ${recipient?.email} - P: ${recipient?.phone}`,
+      value: recipient?.id,
+    }));
+  const questions = questionsData?.dialogue?.questions && questionsData?.dialogue?.questions.map((question: any) => (
+    { label: question?.title, value: question?.id }));
+
   return (
     <Container>
       <Div>
@@ -169,8 +214,35 @@ const AddTriggerView = () => {
                 { /* conditions overview here */}
                 <Div gridColumn="1 / -1">
                   <Flex flexDirection="row" alignItems="center" justifyContent="space-between">
+                    <H4>Conditions</H4>
+                    <PlusCircle onClick={addCondition} />
+                    {/* conditions header here */}
+                  </Flex>
+                  <Hr />
+                  <Div marginTop={15}>
+                    {activeConditions.map((condition, index) => (
+                      <Flex flexDirection="column" key={index} gridColumn="1 / -1">
+                        <Select
+                          options={TRIGGER_CONDITION_TYPES}
+                          value={condition.type}
+                          onChange={(qOption: any) => setConditionsType(qOption, index)}
+                        />
+                        {condition?.type?.value === TriggerConditionType.TEXT_MATCH && (
+                        <Flex flexDirection="column">
+                          <StyledLabel>Match Text</StyledLabel>
+                          <StyledInput name="name" ref={register({ required: true })} />
+                          {errors.name && <Muted color="warning">Something went wrong!</Muted>}
+                        </Flex>
+                        )}
+
+                      </Flex>
+                    ))}
+                  </Div>
+                </Div>
+                <Div gridColumn="1 / -1">
+                  <Flex flexDirection="row" alignItems="center" justifyContent="space-between">
                     <H4>Recipients</H4>
-                    <PlusCircle onClick={addNewRecipient} />
+                    <PlusCircle onClick={addRecipient} />
                     {/* conditions header here */}
                   </Flex>
                   <Hr />
@@ -180,7 +252,7 @@ const AddTriggerView = () => {
                         <Div flexGrow={9}>
                           <Select
                             key={index}
-                            options={questions}
+                            options={recipients}
                             value={recipient}
                             onChange={(qOption: any) => {
                               setRecipients(qOption, index);
@@ -194,7 +266,6 @@ const AddTriggerView = () => {
                     ))}
                   </Div>
                 </Div>
-                { /* recipients overview here */}
               </Grid>
             </Div>
           </Grid>
