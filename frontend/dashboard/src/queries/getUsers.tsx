@@ -1,21 +1,17 @@
 import gql from 'graphql-tag';
 
-// TODO: Add filter input
 const getUsersQuery = gql`
-  query getUsers($customerId: String!,$filter: FilterInput) {
-    userTable(customerId: $customerId, filter: $filter) {
-      users {
+  query getUsers($customerId: String!) {
+    users(customerId: $customerId) {
+      id
+      firstName
+      lastName
+      email
+      phone
+      role {
         id
-        email
-        firstName
-        lastName
-        role {
-            id
-            name
-        }
+        name
       }
-      totalPages
-      pageIndex
     }
   }
 `;

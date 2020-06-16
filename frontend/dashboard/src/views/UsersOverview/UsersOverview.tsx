@@ -8,7 +8,7 @@ import { Div, H2 } from '@haas/ui';
 import DatePicker from 'components/DatePicker/DatePicker';
 import SearchBar from 'components/SearchBar/SearchBar';
 import Table from 'components/Table/Table';
-import getUsersQuery from 'queries/getUsers';
+import getUsersQuery from 'queries/getUserTable';
 
 import { CenterCell, RoleCell, UserCell } from 'components/Table/CellComponents/CellComponents';
 import { InputContainer, InputOutputContainer } from './UsersOverviewStyles';

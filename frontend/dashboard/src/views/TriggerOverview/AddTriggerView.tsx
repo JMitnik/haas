@@ -1,4 +1,5 @@
 import { ApolloError } from 'apollo-boost';
+import { MinusCircle, PlusCircle } from 'react-feather';
 import { useForm } from 'react-hook-form';
 import { useHistory, useParams } from 'react-router';
 import { useLazyQuery, useMutation, useQuery } from '@apollo/react-hooks';
@@ -7,7 +8,7 @@ import Select from 'react-select';
 import styled, { css } from 'styled-components/macro';
 
 import {
-  Button, Container, Div, Flex, Grid, H2, H3,
+  Button, Container, Div, Flex, Grid, H2, H3, H4,
   Hr, Muted, StyledInput, StyledLabel,
 } from '@haas/ui';
 import createAddMutation from 'mutations/createUser';
@@ -37,13 +38,14 @@ const AddTriggerView = () => {
   const history = useHistory();
   const { register, handleSubmit, errors } = useForm<FormDataProps>();
   const { customerId } = useParams();
-  const { data } = useQuery(getDialoguesQuery, { variables: { id: customerId } });
+  const { data: dialogueData } = useQuery(getDialoguesQuery, { variables: { id: customerId } });
   const [fetchQuestions, { loading: questionsLoading, data: questionsData }] = useLazyQuery(getQuestionsQuery, { fetchPolicy: 'cache-and-network' });
 
   const [activeType, setActiveType] = useState<null | { label: string, value: string }>(null);
   const [activeMedium, setActiveMedium] = useState<null | { label: string, value: string }>(null);
   const [activeDialogue, setActiveDialogue] = useState<null | { label: string, value: string }>(null);
   const [activeQuestion, setActiveQuestion] = useState<null | { label: string, value: string }>(null);
+  const [activeRecipients, setActiveRecipients] = useState<Array<null | { label: string, value: string }>>([]);
 
   useEffect(() => {
     if (activeDialogue) {
@@ -77,7 +79,25 @@ const AddTriggerView = () => {
     });
   };
 
-  const dialogues = data?.dialogues && data?.dialogues.map((dialogue: any) => ({ label: dialogue?.title, value: dialogue?.id }));
+  const setRecipients = (qOption: { label: string, value: string }, index: number) => {
+    const { value } = qOption;
+    setActiveRecipients((prevRecipients) => prevRecipients);
+  };
+
+  const addNewRecipient = () => {
+    setActiveRecipients((prevRecipients) => [...prevRecipients, null]);
+  };
+
+  const deleteRecipient = (index: number) => {
+    setActiveRecipients((prevRecipients) => {
+      prevRecipients.splice(index, 1);
+      return [...prevRecipients];
+    });
+  };
+
+  console.log('Active recipients: ', activeRecipients);
+
+  const dialogues = dialogueData?.dialogues && dialogueData?.dialogues.map((dialogue: any) => ({ label: dialogue?.title, value: dialogue?.id }));
   const questions = questionsData?.dialogue?.questions && questionsData?.dialogue?.questions.map((question: any) => ({ label: question?.title, value: question?.id }));
   return (
     <Container>
@@ -135,24 +155,43 @@ const AddTriggerView = () => {
                   />
                 </Div>
                 {activeType?.value === 'question' && (
-                <Div useFlex flexDirection="column" gridColumn="1 / -1">
-                  <StyledLabel>Question</StyledLabel>
-                  <Select
-                    options={questions}
-                    value={activeQuestion}
-                    onChange={(qOption: any) => {
-                      setActiveQuestion(qOption);
-                    }}
-                  />
-                </Div>
-                                )}
-                { /* conditions overview here */}
-                <Div>
-                  <Div>
-                    {/* conditions header here */}
+                  <Div useFlex flexDirection="column" gridColumn="1 / -1">
+                    <StyledLabel>Question</StyledLabel>
+                    <Select
+                      options={questions}
+                      value={activeQuestion}
+                      onChange={(qOption: any) => {
+                        setActiveQuestion(qOption);
+                      }}
+                    />
                   </Div>
-                  <Div>
-                    {/* conditions content here */}
+                )}
+                { /* conditions overview here */}
+                <Div gridColumn="1 / -1">
+                  <Flex flexDirection="row" alignItems="center" justifyContent="space-between">
+                    <H4>Recipients</H4>
+                    <PlusCircle onClick={addNewRecipient} />
+                    {/* conditions header here */}
+                  </Flex>
+                  <Hr />
+                  <Div marginTop={15}>
+                    {activeRecipients.map((recipient, index) => (
+                      <Flex marginBottom="4px" alignItems="center" key={index} gridColumn="1 / -1">
+                        <Div flexGrow={9}>
+                          <Select
+                            key={index}
+                            options={questions}
+                            value={recipient}
+                            onChange={(qOption: any) => {
+                              setRecipients(qOption, index);
+                            }}
+                          />
+                        </Div>
+                        <Flex justifyContent="center" alignContent="center" flexGrow={1}>
+                          <MinusCircle onClick={() => deleteRecipient(index)} />
+                        </Flex>
+                      </Flex>
+                    ))}
                   </Div>
                 </Div>
                 { /* recipients overview here */}

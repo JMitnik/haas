@@ -74,10 +74,10 @@ export const UserQueries = extendType({
       args: { customerId: 'String',
         filter: FilterInput },
       resolve(parent: any, args: any, ctx: any) {
-        const { pageIndex, offset, limit, searchTerm, orderBy }: PaginationProps = args.filter;
-        if (args.filter) {
-          return UserResolver.paginatedUsers(args.customerId, pageIndex, offset, limit, orderBy[0], searchTerm);
-        }
+        // const { pageIndex, offset, limit, searchTerm, orderBy }: PaginationProps = args.filter;
+        // if (args.filter) {
+        //   return UserResolver.paginatedUsers(args.customerId, pageIndex, offset, limit, orderBy[0], searchTerm);
+        // }
         return prisma.user.findMany({ where: { customerId: args.customerId } });
       },
     });
