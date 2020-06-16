@@ -160,7 +160,7 @@ type Mutation {
   createDialogue(customerId: String, description: String, isSeed: Boolean, publicTitle: String, title: String): Dialogue!
   createPermission(data: PermissionInput): PermssionType!
   createRole(data: RoleInput): RoleType!
-  createTrigger(customerId: String, trigger: TriggerInputType, userId: String): TriggerType!
+  createTrigger(customerId: String, recipients: RecipientsInputType, trigger: TriggerInputType): TriggerType!
   createUser(id: String, input: UserInput): UserType!
   deleteCustomer(where: CustomerWhereUniqueInput): Customer!
   deleteDialogue(where: DialogueWhereUniqueInput): Dialogue!
@@ -285,6 +285,10 @@ type QuestionOption {
   publicValue: String
   questionId: String!
   value: String!
+}
+
+input RecipientsInputType {
+  ids: [String!]
 }
 
 input RoleDataInput {

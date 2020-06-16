@@ -96,6 +96,13 @@ const TriggerInputType = inputObjectType({
   },
 });
 
+const RecipientsInputType = inputObjectType({
+  name: 'RecipientsInputType',
+  definition(t) {
+    t.list.string('ids');
+  },
+});
+
 const TriggerMutations = extendType({
   type: 'Mutation',
   definition(t) {
@@ -103,7 +110,7 @@ const TriggerMutations = extendType({
       type: TriggerType,
       args: {
         customerId: 'String',
-        userId: 'String',
+        recipients: RecipientsInputType,
         trigger: TriggerInputType,
       },
       async resolve(parent: any, args: any, ctx: any) {
@@ -116,8 +123,8 @@ const TriggerMutations = extendType({
           createArgs.customer = { connect: { id: args.customerId } };
         }
 
-        if (args.userId) {
-          createArgs.recipients = { connect: { id: args.userId } };
+        if (args.recipients.ids.length > 0) {
+          createArgs.recipients = { connect: args.recipients.ids.map((id: string) => ({ id })) };
         }
 
         if (conditions.length > 0) {

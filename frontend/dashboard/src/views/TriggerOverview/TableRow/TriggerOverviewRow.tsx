@@ -43,7 +43,6 @@ const UserRow = ({ headers, data, index, onDeleteEntry, onEditEntry }: TableRowP
       sortBy: [{ id: 'id', desc: true }],
     },
   );
-  console.log('DATA TRIGGER: ', data);
 
   return (
     <Grid style={{ position: 'relative' }} gridRowGap={0} gridColumnGap={5} gridTemplateColumns={templateColumns} onClick={() => setIsExpanded(!isExpanded)}>

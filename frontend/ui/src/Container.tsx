@@ -36,7 +36,7 @@ export const Container = styled(Div)<ContainerProps>`
   `}
 `;
 interface ExtraGridProps extends GridProps, WidthProps, LayoutProps, ColorProps, BorderProps, PositionProps {}
-interface ExtraFlexProps extends FlexboxProps, LayoutProps, WidthProps, BorderProps, GridProps, PositionProps, SpaceProps {
+interface ExtraFlexProps extends FlexboxProps, LayoutProps, WidthProps, BorderProps, GridProps, PositionProps, SpaceProps, ColorProps {
   growChildren?: boolean;
 }
 
@@ -49,6 +49,7 @@ export const Flex = styled.div<ExtraFlexProps>`
     ${grid}
     ${position}
     ${space}
+    ${color}
   `};
 `;
 

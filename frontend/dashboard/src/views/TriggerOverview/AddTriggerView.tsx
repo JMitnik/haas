@@ -1,17 +1,19 @@
+/* eslint-disable radix */
 import { ApolloError } from 'apollo-boost';
-import { MinusCircle, PlusCircle } from 'react-feather';
+import { MinusCircle, PlusCircle, X } from 'react-feather';
+import { debounce } from 'lodash';
 import { useForm } from 'react-hook-form';
 import { useHistory, useParams } from 'react-router';
 import { useLazyQuery, useMutation, useQuery } from '@apollo/react-hooks';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import Select from 'react-select';
 import styled, { css } from 'styled-components/macro';
 
 import {
-  Button, Container, Div, Flex, Grid, H2, H3, H4,
-  Hr, Muted, StyledInput, StyledLabel,
+  Button, Container, DeleteButtonContainer, Div, Flex, Grid, H2, H3,
+  H4, Hr, Muted, StyledInput, StyledLabel,
 } from '@haas/ui';
-import createAddMutation from 'mutations/createUser';
+import createTriggerMutation from 'mutations/createTrigger';
 import getDialoguesQuery from 'queries/getQuestionnairesCustomerQuery';
 import getQuestionsQuery from 'queries/getQuestionnaireQuery';
 import getRecipientsQuery from 'queries/getUsers';
@@ -22,14 +24,15 @@ interface FormDataProps {
   email: string;
   phone?: string;
   role: { label: string, value: string };
+  conditions: Array<TriggerCondition>
 }
 
 enum TriggerConditionType {
-  LOW_THRESHOLD,
-  HIGH_THRESHOLD,
-  INNER_RANGE,
-  OUTER_RANGE,
-  TEXT_MATCH
+  LOW_THRESHOLD='LOW_THRESHOLD',
+  HIGH_THRESHOLD='HIGH_THRESHOLD',
+  INNER_RANGE='INNER_RANGE',
+  OUTER_RANGE='OUTER_RANGE',
+  TEXT_MATCH='TEXT_MATCH',
 }
 
 interface TriggerCondition {
@@ -48,14 +51,14 @@ const TRIGGER_CONDITION_TYPES = [
 ];
 
 const TRIGGER_TYPES = [
-  { label: 'Question', value: 'question' },
-  { label: 'Scheduled', value: 'scheduled' },
+  { label: 'Question', value: 'QUESTION' },
+  { label: 'Scheduled', value: 'SCHEDULED' },
 ];
 
 const MEDIUM_TYPES = [
-  { label: 'Email', value: 'email' },
-  { label: 'Phone', value: 'phone' },
-  { label: 'Both', value: 'both' },
+  { label: 'Email', value: 'EMAIL' },
+  { label: 'Phone', value: 'PHONE' },
+  { label: 'Both', value: 'BOTH' },
 ];
 
 const AddTriggerView = () => {
@@ -79,9 +82,9 @@ const AddTriggerView = () => {
     }
   }, [activeDialogue, fetchQuestions]);
 
-  const [addUser, { loading }] = useMutation(createAddMutation, {
+  const [addTrigger, { loading }] = useMutation(createTriggerMutation, {
     onCompleted: () => {
-      history.push(`/dashboard/c/${customerId}/users/`);
+      history.push(`/dashboard/c/${customerId}/triggers/`);
     },
     onError: (serverError: ApolloError) => {
       console.log(serverError);
@@ -89,18 +92,18 @@ const AddTriggerView = () => {
   });
 
   const onSubmit = (formData: FormDataProps) => {
-    const optionInput = {
-      roleId: activeType?.value || null,
-      name: formData.name || '',
-      lastName: formData.lastName || '',
-      email: formData.email || '',
-      phone: formData.phone || '',
-    };
+    const dialogueId = activeDialogue?.value;
+    // TODO: Add activeQuestion to mutation
+    const userIds = activeRecipients.map((recipient) => recipient?.value);
+    const recipients = { ids: userIds };
+    const conditions = activeConditions.map((condition) => ({ ...condition, type: condition.type?.value }));
+    const trigger = { name: formData.name, type: activeType?.value, medium: activeMedium?.value, conditions };
 
-    addUser({
+    addTrigger({
       variables: {
-        id: customerId,
-        input: optionInput,
+        customerId,
+        trigger,
+        recipients,
       },
     });
   };
@@ -130,8 +133,38 @@ const AddTriggerView = () => {
     });
   };
 
+  const setMatchText = useCallback(debounce((value: string, index: number) => {
+    setActiveConditions((prevConditions) => {
+      prevConditions[index].textValue = value;
+      return [...prevConditions];
+    });
+  }, 250), []);
+
+  const setConditionMinValue = useCallback(debounce((value: string, index: number) => {
+    const numberValue = parseInt(value) || 0;
+    setActiveConditions((prevConditions) => {
+      prevConditions[index].minValue = numberValue;
+      return [...prevConditions];
+    });
+  }, 20), []);
+
+  const setConditionMaxValue = useCallback(debounce((value: string, index: number) => {
+    const numberValue = parseInt(value) || 0;
+    setActiveConditions((prevConditions) => {
+      prevConditions[index].maxValue = numberValue;
+      return [...prevConditions];
+    });
+  }, 200), []);
+
   const addCondition = () => {
     setActiveConditions((prevConditions) => [...prevConditions, { type: null }]);
+  };
+
+  const deleteCondition = (index: number) => {
+    setActiveConditions((prevConditions) => {
+      prevConditions.splice(index, 1);
+      return [...prevConditions];
+    });
   };
 
   const dialogues = dialogueData?.dialogues && dialogueData?.dialogues.map((dialogue: any) => (
@@ -219,22 +252,72 @@ const AddTriggerView = () => {
                     {/* conditions header here */}
                   </Flex>
                   <Hr />
-                  <Div marginTop={15}>
+                  <Div padding={10} marginTop={15}>
                     {activeConditions.map((condition, index) => (
-                      <Flex flexDirection="column" key={index} gridColumn="1 / -1">
+                      <Flex position="relative" marginBottom={5} paddingBottom={10} paddingTop={30} backgroundColor="#fdfbfe" flexDirection="column" key={index} gridColumn="1 / -1">
+                        <DeleteButtonContainer style={{ top: '5px' }} onClick={() => deleteCondition(index)}>
+                          <X />
+                        </DeleteButtonContainer>
                         <Select
                           options={TRIGGER_CONDITION_TYPES}
                           value={condition.type}
                           onChange={(qOption: any) => setConditionsType(qOption, index)}
                         />
                         {condition?.type?.value === TriggerConditionType.TEXT_MATCH && (
-                        <Flex flexDirection="column">
+                        <Flex marginTop={5} flexDirection="column">
                           <StyledLabel>Match Text</StyledLabel>
-                          <StyledInput name="name" ref={register({ required: true })} />
+                          <StyledInput onChange={(event) => setMatchText(event.currentTarget.value, index)} name="minValue" ref={register({ required: true })} />
                           {errors.name && <Muted color="warning">Something went wrong!</Muted>}
                         </Flex>
                         )}
 
+                        {condition?.type?.value === TriggerConditionType.LOW_THRESHOLD && (
+                          <Flex marginTop={5} flexDirection="column">
+                            <StyledLabel>Low Threshold</StyledLabel>
+                            <StyledInput
+                              onChange={(event) => setConditionMinValue(event.currentTarget.value, index)}
+                              name="name"
+                              ref={register({ required: true })}
+                            />
+                            {errors.name && <Muted color="warning">Something went wrong!</Muted>}
+                          </Flex>
+                        )}
+
+                        {condition?.type?.value === TriggerConditionType.HIGH_THRESHOLD && (
+                        <Flex marginTop={5} flexDirection="column">
+                          <StyledLabel>High Threshold</StyledLabel>
+                          <StyledInput
+                            onChange={(event) => setConditionMaxValue(event.currentTarget.value, index)}
+                            name="name"
+                            ref={register({ required: true })}
+                          />
+                          {errors.name && <Muted color="warning">Something went wrong!</Muted>}
+                        </Flex>
+                        )}
+
+                        {(condition?.type?.value === TriggerConditionType.OUTER_RANGE
+                        || condition?.type?.value === TriggerConditionType.INNER_RANGE) && (
+                        <Flex marginTop={5} flexDirection="row" justifyContent="space-evenly">
+                          <Flex width="49%" flexDirection="column">
+                            <StyledLabel>Low Threshold</StyledLabel>
+                            <StyledInput
+                              onChange={(event) => setConditionMinValue(event.currentTarget.value, index)}
+                              name="name"
+                              ref={register({ required: true })}
+                            />
+                            {errors.name && <Muted color="warning">Something went wrong!</Muted>}
+                          </Flex>
+                          <Flex width="49%" flexDirection="column">
+                            <StyledLabel>High Threshold</StyledLabel>
+                            <StyledInput
+                              onChange={(event) => setConditionMaxValue(event.currentTarget.value, index)}
+                              name="name"
+                              ref={register({ required: true })}
+                            />
+                            {errors.name && <Muted color="warning">Something went wrong!</Muted>}
+                          </Flex>
+                        </Flex>
+                        )}
                       </Flex>
                     ))}
                   </Div>
