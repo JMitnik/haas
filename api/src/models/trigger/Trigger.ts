@@ -106,6 +106,43 @@ const RecipientsInputType = inputObjectType({
 const TriggerMutations = extendType({
   type: 'Mutation',
   definition(t) {
+    t.field('editTrigger', {
+      type: TriggerType,
+      args: {
+        triggerId: 'String',
+        recipients: RecipientsInputType,
+        trigger: TriggerInputType,
+      },
+      async resolve(parent: any, args: any, ctx: any) {
+        const { name, type, medium, conditions } = args.trigger;
+        const dbTrigger = await prisma.trigger.findOne({
+          where: { id: args.triggerId },
+          include: {
+            conditions: true,
+            recipients: true,
+          },
+        });
+
+        // TODO: Loop through front-end conditions
+        if (dbTrigger?.conditions) {
+          await Promise.all(dbTrigger.conditions.map(async () => {
+            console.log('oi');
+          }));
+        }
+        // // Als id undefined -> Create new condition on trigger
+        // // Als id bestaat -> update bestaande condition on trigger
+
+        // // Als condition id bestaat op database trigger en niet op front-end trigger -> disconnect id van trigger
+
+        // TODO: Loop through front-end recipients
+        // // Als id undefined -> Create new recipient on trigger
+        // // Als id bestaat -> update bestaande recipient on trigger
+
+        // // Als recipient id bestaat op database trigger en niet op front-end trigger -> disconnect id van trigger
+        console.log('trigger: ', dbTrigger);
+        return dbTrigger;
+      },
+    });
     t.field('createTrigger', {
       type: TriggerType,
       args: {

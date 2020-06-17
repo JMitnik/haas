@@ -14,6 +14,7 @@ import {
   H4, Hr, Muted, StyledInput, StyledLabel,
 } from '@haas/ui';
 
+import editTriggerMutation from 'mutations/editTrigger';
 import editUserMutation from 'mutations/editUser';
 import getDialoguesQuery from 'queries/getQuestionnairesCustomerQuery';
 import getQuestionsQuery from 'queries/getQuestionnaireQuery';
@@ -46,13 +47,22 @@ interface TriggerRecipient {
 }
 
 interface TriggerCondition {
-  type: { label: string, value: TriggerConditionType } | null,
+  type: string,
+  minValue?: number,
+  maxValue?: number,
+  textValue?: string
+}
+
+interface PostMapTriggerCondition {
+  id?: string | null,
+  type: { label: string, value: string } | null,
   minValue?: number,
   maxValue?: number,
   textValue?: string
 }
 
 interface Trigger {
+  id: string;
   name: string;
   type: string;
   medium: string;
@@ -62,7 +72,8 @@ interface Trigger {
 
 interface EditTriggerProps {
   trigger: Trigger;
-  conditions: Array<TriggerCondition>;
+  type: { label: string, value: string };
+  conditions: Array<PostMapTriggerCondition>;
   medium: { label: string, value: string };
   recipients: Array<{ label: string, value: string}>;
 }
@@ -100,21 +111,24 @@ const EditTriggerView = () => {
   if (error) return <><p>{error.message}</p></>;
 
   const trigger: Trigger = triggerData?.trigger;
-  const activeType = { label: trigger?.type, value: trigger?.type }; // TODO: Change Label to proper capitalized
 
-  const conditions = trigger?.conditions;
+  const capitalizedType = `${trigger?.type.charAt(0)}${trigger?.type.slice(1).toLowerCase()}`;
+  const activeType = { label: capitalizedType, value: trigger?.type };
+
+  const conditions: Array<PostMapTriggerCondition> = trigger?.conditions.map((condition) => ({ ...condition, type: { label: condition.type, value: condition.type } })); // TODO: Make type ready for select
   const activeRecipients = trigger?.recipients?.map((recipient) => ({
     label: `${recipient?.lastName}, ${recipient?.firstName} - E: ${recipient?.email} - P: ${recipient?.phone}`,
     value: recipient?.id,
   }));
 
-  const capitalizedMedium = `${trigger?.medium.charAt(0).toUpperCase()}${trigger?.medium.slice(1)}`;
+  const capitalizedMedium = `${trigger?.medium.charAt(0)}${trigger?.medium.slice(1).toLowerCase()}`;
   const activeMedium = { label: capitalizedMedium, value: trigger?.medium };
 
   console.log('TRIGGER DATA: ', triggerData);
   return (
     <EditTriggerForm
       trigger={trigger}
+      type={activeType}
       medium={activeMedium}
       conditions={conditions}
       recipients={activeRecipients}
@@ -122,22 +136,22 @@ const EditTriggerView = () => {
   );
 };
 
-const EditTriggerForm = ({ trigger, medium, conditions }: EditTriggerProps) => {
+const EditTriggerForm = ({ trigger, type, medium, conditions, recipients }: EditTriggerProps) => {
   const history = useHistory();
   const { register, handleSubmit, errors } = useForm<FormDataProps>();
   const { customerId } = useParams();
   const { data: dialogueData } = useQuery(getDialoguesQuery, { variables: { id: customerId } });
   const { data: recipientsData } = useQuery(getRecipientsQuery, { variables: { customerId } });
   const [fetchQuestions, { loading: questionsLoading, data: questionsData }] = useLazyQuery(
-    getQuestionsQuery, { fetchPolicy: 'cache-and-network' }, // TODO: Add dialogueId as variable
+    getQuestionsQuery, { fetchPolicy: 'cache-and-network' },
   );
 
-  const [activeType, setActiveType] = useState<null | { label: string, value: string }>(null);
-  const [activeMedium, setActiveMedium] = useState<null | { label: string, value: string }>(null);
+  const [activeType, setActiveType] = useState<null | { label: string, value: string }>(type);
+  const [activeMedium, setActiveMedium] = useState<null | { label: string, value: string }>(medium);
   const [activeDialogue, setActiveDialogue] = useState<null | { label: string, value: string }>(null);
   const [activeQuestion, setActiveQuestion] = useState<null | { label: string, value: string }>(null);
-  const [activeRecipients, setActiveRecipients] = useState<Array<null | { label: string, value: string }>>([]);
-  const [activeConditions, setActiveConditions] = useState<Array<TriggerCondition>>([]);
+  const [activeRecipients, setActiveRecipients] = useState<Array<null | { label: string, value: string }>>(recipients);
+  const [activeConditions, setActiveConditions] = useState<Array<PostMapTriggerCondition>>(conditions);
 
   useEffect(() => {
     if (activeDialogue) {
@@ -145,10 +159,10 @@ const EditTriggerForm = ({ trigger, medium, conditions }: EditTriggerProps) => {
     }
   }, [activeDialogue, fetchQuestions]);
 
-  const [editTrigger, { loading }] = useMutation(editUserMutation, {
-    onCompleted: () => {
-      history.push(`/dashboard/c/${customerId}/triggers/`);
-    },
+  const [editTrigger, { loading }] = useMutation(editTriggerMutation, {
+    // onCompleted: () => {
+    //   history.push(`/dashboard/c/${customerId}/triggers/`);
+    // },
     onError: (serverError: ApolloError) => {
       console.log(serverError);
     },
@@ -159,13 +173,15 @@ const EditTriggerForm = ({ trigger, medium, conditions }: EditTriggerProps) => {
     // TODO: Add activeQuestion to mutation
     const userIds = activeRecipients.map((recipient) => recipient?.value);
     const recipients = { ids: userIds };
-    const conditions = activeConditions.map((condition) => ({ ...condition, type: condition.type?.value }));
-    const trigger = { name: formData.name, type: activeType?.value, medium: activeMedium?.value, conditions };
+    const conditions = activeConditions.map((condition) => ({
+      id: condition.id, minValue: condition.minValue, maxValue: condition.maxValue, textValue: condition.textValue, type: condition.type?.value,
+    }));
+    const triggerInput = { name: formData.name, type: activeType?.value, medium: activeMedium?.value, conditions };
 
     editTrigger({
       variables: {
-        customerId,
-        trigger,
+        triggerId: trigger?.id,
+        trigger: triggerInput,
         recipients,
       },
     });
@@ -232,14 +248,10 @@ const EditTriggerForm = ({ trigger, medium, conditions }: EditTriggerProps) => {
 
   const dialogues = dialogueData?.dialogues && dialogueData?.dialogues.map((dialogue: any) => (
     { label: dialogue?.title, value: dialogue?.id }));
-  const recipients = recipientsData?.users && recipientsData?.users.map((recipient: any) => (
-    {
-      label: `${recipient?.lastName}, ${recipient?.firstName} - E: ${recipient?.email} - P: ${recipient?.phone}`,
-      value: recipient?.id,
-    }));
+
   const questions = questionsData?.dialogue?.questions && questionsData?.dialogue?.questions.map((question: any) => (
     { label: question?.title, value: question?.id }));
-
+  console.log('Active conditions: ', activeConditions);
   return (
     <Container>
       <Div>
@@ -262,7 +274,7 @@ const EditTriggerForm = ({ trigger, medium, conditions }: EditTriggerProps) => {
               <Grid gridTemplateColumns={['1fr', '1fr 1fr']}>
                 <Flex flexDirection="column">
                   <StyledLabel>Trigger name</StyledLabel>
-                  <StyledInput name="name" ref={register({ required: true })} />
+                  <StyledInput defaultValue={trigger?.name} name="name" ref={register({ required: true })} />
                   {errors.name && <Muted color="warning">Something went wrong!</Muted>}
                 </Flex>
                 <Div useFlex flexDirection="column">
@@ -329,7 +341,7 @@ const EditTriggerForm = ({ trigger, medium, conditions }: EditTriggerProps) => {
                         {condition?.type?.value === TriggerConditionType.TEXT_MATCH && (
                         <Flex marginTop={5} flexDirection="column">
                           <StyledLabel>Match Text</StyledLabel>
-                          <StyledInput onChange={(event) => setMatchText(event.currentTarget.value, index)} name="minValue" ref={register({ required: true })} />
+                          <StyledInput defaultValue={condition?.textValue} onChange={(event) => setMatchText(event.currentTarget.value, index)} name="minValue" ref={register({ required: true })} />
                           {errors.name && <Muted color="warning">Something went wrong!</Muted>}
                         </Flex>
                         )}
@@ -339,6 +351,7 @@ const EditTriggerForm = ({ trigger, medium, conditions }: EditTriggerProps) => {
                             <StyledLabel>Low Threshold</StyledLabel>
                             <StyledInput
                               onChange={(event) => setConditionMinValue(event.currentTarget.value, index)}
+                              defaultValue={condition?.minValue}
                               name="name"
                               ref={register({ required: true })}
                             />
@@ -351,6 +364,7 @@ const EditTriggerForm = ({ trigger, medium, conditions }: EditTriggerProps) => {
                           <StyledLabel>High Threshold</StyledLabel>
                           <StyledInput
                             onChange={(event) => setConditionMaxValue(event.currentTarget.value, index)}
+                            defaultValue={condition?.maxValue}
                             name="name"
                             ref={register({ required: true })}
                           />
@@ -365,6 +379,7 @@ const EditTriggerForm = ({ trigger, medium, conditions }: EditTriggerProps) => {
                             <StyledLabel>Low Threshold</StyledLabel>
                             <StyledInput
                               onChange={(event) => setConditionMinValue(event.currentTarget.value, index)}
+                              defaultValue={condition?.minValue}
                               name="name"
                               ref={register({ required: true })}
                             />
@@ -374,6 +389,7 @@ const EditTriggerForm = ({ trigger, medium, conditions }: EditTriggerProps) => {
                             <StyledLabel>High Threshold</StyledLabel>
                             <StyledInput
                               onChange={(event) => setConditionMaxValue(event.currentTarget.value, index)}
+                              defaultValue={condition?.textValue}
                               name="name"
                               ref={register({ required: true })}
                             />
@@ -421,7 +437,7 @@ const EditTriggerForm = ({ trigger, medium, conditions }: EditTriggerProps) => {
           {loading && (<Muted>Loading...</Muted>)}
 
           <Flex>
-            <Button brand="primary" mr={2} type="submit">Create trigger</Button>
+            <Button brand="primary" mr={2} type="submit">Save trigger</Button>
             <Button brand="default" type="button" onClick={() => history.push(`/dashboard/c/${customerId}/triggers/`)}>Cancel</Button>
           </Flex>
         </Div>

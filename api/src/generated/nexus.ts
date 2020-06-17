@@ -416,6 +416,7 @@ export interface NexusGenFieldTypes {
     deleteUser: NexusGenRootTypes['UserType']; // UserType!
     editCustomer: NexusGenRootTypes['Customer']; // Customer!
     editDialogue: NexusGenRootTypes['Dialogue']; // Dialogue!
+    editTrigger: NexusGenRootTypes['TriggerType']; // TriggerType!
     editUser: NexusGenRootTypes['UserType']; // UserType!
     singleUpload: NexusGenRootTypes['ImageType']; // ImageType!
     updateRoles: NexusGenRootTypes['RoleType']; // RoleType!
@@ -604,6 +605,11 @@ export interface NexusGenArgTypes {
       dialogueId?: string | null; // String
       publicTitle?: string | null; // String
       title?: string | null; // String
+    }
+    editTrigger: { // args
+      recipients?: NexusGenInputs['RecipientsInputType'] | null; // RecipientsInputType
+      trigger?: NexusGenInputs['TriggerInputType'] | null; // TriggerInputType
+      triggerId?: string | null; // String
     }
     editUser: { // args
       id?: string | null; // String
