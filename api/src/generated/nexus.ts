@@ -461,6 +461,7 @@ export interface NexusGenFieldTypes {
     roleTable: NexusGenRootTypes['RoleTableType']; // RoleTableType!
     session: NexusGenRootTypes['Session']; // Session!
     sessions: NexusGenRootTypes['Session'][]; // [Session!]!
+    trigger: NexusGenRootTypes['TriggerType']; // TriggerType!
     triggers: NexusGenRootTypes['TriggerType'][]; // [TriggerType!]!
     user: NexusGenRootTypes['UserType']; // UserType!
     users: NexusGenRootTypes['UserType'][]; // [UserType!]!
@@ -669,6 +670,9 @@ export interface NexusGenArgTypes {
     }
     sessions: { // args
       where?: NexusGenInputs['SessionWhereUniqueInput'] | null; // SessionWhereUniqueInput
+    }
+    trigger: { // args
+      triggerId?: string | null; // String
     }
     triggers: { // args
       customerId?: string | null; // String

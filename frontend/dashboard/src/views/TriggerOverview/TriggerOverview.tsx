@@ -93,8 +93,8 @@ const UsersOverview = () => {
     });
   };
 
-  const handleEditUser = (event: any, userId: string) => {
-    history.push(`/dashboard/c/${customerId}/u/${userId}/edit`);
+  const handleEditEntry = (event: any, entryId: string) => {
+    history.push(`/dashboard/c/${customerId}/n/${entryId}/edit`);
     event.stopPropagation();
   };
 
@@ -133,7 +133,7 @@ const UsersOverview = () => {
           paginationProps={{ ...paginationProps, pageCount, pageIndex }}
           onPaginationChange={setPaginationProps}
           onDeleteEntry={handleDeleteUser}
-          onEditEntry={handleEditUser}
+          onEditEntry={handleEditEntry}
           onAddEntry={handleAddUser}
           CustomRow={Row}
           data={tableData}

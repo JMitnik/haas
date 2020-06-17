@@ -232,6 +232,7 @@ type Query {
   roleTable(customerId: String, filter: FilterInput): RoleTableType!
   session(where: SessionWhereUniqueInput): Session!
   sessions(where: SessionWhereUniqueInput): [Session!]!
+  trigger(triggerId: String): TriggerType!
   triggers(customerId: String, filter: FilterInput, userId: String): [TriggerType!]!
   user(userId: String): UserType!
   users(customerId: String, filter: FilterInput): [UserType!]!

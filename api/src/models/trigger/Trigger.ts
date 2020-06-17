@@ -148,6 +148,15 @@ const TriggerMutations = extendType({
 const TriggerQueries = extendType({
   type: 'Query',
   definition(t) {
+    t.field('trigger', {
+      type: TriggerType,
+      args: {
+        triggerId: 'String',
+      },
+      resolve(parent: any, args: any, ctx: any) {
+        return prisma.trigger.findOne({ where: { id: args.triggerId } });
+      },
+    });
     t.list.field('triggers', {
       type: TriggerType,
       args: {
