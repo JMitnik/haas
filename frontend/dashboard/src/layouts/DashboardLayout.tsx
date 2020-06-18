@@ -1,7 +1,7 @@
 import { useParams } from 'react-router';
 import React from 'react';
 
-import { DashboardContainer } from 'components/DashboardView/DashboardViewStyles';
+import { DashboardContainer } from 'views/DashboardView/DashboardViewStyles';
 import { NavItem, NavItems, Usernav } from 'components/Sidenav/Sidenav';
 import { UserProps } from 'types/generic';
 import Logo from 'components/Logo';

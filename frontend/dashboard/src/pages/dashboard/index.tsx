@@ -2,7 +2,7 @@ import { Route, Switch } from 'react-router';
 
 import AddTopicView from 'views/AddTopicView';
 import CustomerBuilderView from 'views/CustomerBuilderView';
-import CustomerOverview from 'components/DashboardView';
+import CustomerOverview from 'views/DashboardView';
 import EditCustomerView from 'views/EditCustomerView';
 import EditTopicView from 'views/EditTopicView';
 import InteractionsOverview from 'views/InteractionsOverview/InteractionsOverview';

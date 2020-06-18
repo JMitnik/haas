@@ -1,20 +1,18 @@
-import React, { FC } from 'react';
-import { useQuery, useMutation } from '@apollo/react-hooks';
 import { ApolloError } from 'apollo-boost';
+import { useMutation, useQuery } from '@apollo/react-hooks';
+import React, { FC } from 'react';
 
-import { Plus, X } from 'react-feather';
-import { H2, H3, Grid, Flex, Div, Card, CardBody,
-  Container, DeleteButtonContainer, AddCard } from '@haas/ui';
+import { AddCard, Card, CardBody, Container, DeleteButtonContainer, Div, EditButtonContainer,
+  Flex, Grid, H2, H3 } from '@haas/ui';
+import { Edit, Plus, X } from 'react-feather';
 import { Link, useHistory } from 'react-router-dom';
 
-import { getCustomerQuery } from '../../queries/getCustomersQuery';
-import { deleteFullCustomerQuery } from '../../mutations/deleteFullCustomer';
 import { CustomerCardImage } from './DashboardViewStyles';
+import { deleteFullCustomerQuery } from '../../mutations/deleteFullCustomer';
+import { getCustomerQuery } from '../../queries/getCustomersQuery';
 
 const DashboardView: FC = () => {
   const { loading, error, data } = useQuery(getCustomerQuery);
-
-  if (loading) return <p>Loading</p>;
 
   if (error) {
     return (
@@ -26,7 +24,9 @@ const DashboardView: FC = () => {
     );
   }
 
-  const topics = data?.customers;
+  if (loading) return <p>Loading</p>;
+
+  const customers = data?.customers;
 
   return (
     <>
@@ -38,10 +38,10 @@ const DashboardView: FC = () => {
           gridTemplateColumns={['1fr', '1fr 1fr 1fr']}
           gridAutoRows="minmax(150px, 1fr)"
         >
-          {topics?.map((topic: any, index: any) => topic && <CustomerCard key={index} customer={topic} />)}
+          {customers?.map((customer: any, index: any) => customer && <CustomerCard key={index} customer={customer} />)}
 
           <AddCard>
-            <Link to="dashboard/customer-builder" />
+            <Link to="/dashboard/customer-builder" />
             <Div>
               <Plus />
               <H3>
@@ -60,6 +60,11 @@ const CustomerCard = ({ customer }: { customer: any }) => {
 
   const setCustomerID = (customerId: string) => {
     history.push(`/dashboard/c/${customerId}`);
+  };
+
+  const setCustomerEditPath = (event: any, customerId: string) => {
+    history.push(`/dashboard/c/${customerId}/edit`);
+    event.stopPropagation();
   };
 
   const [deleteCustomer] = useMutation(deleteFullCustomerQuery, {
@@ -86,6 +91,9 @@ const CustomerCard = ({ customer }: { customer: any }) => {
       onClick={() => setCustomerID(customer.id)}
     >
       <CardBody flex="100%">
+        <EditButtonContainer onClick={(e) => setCustomerEditPath(e, customer.id)}>
+          <Edit />
+        </EditButtonContainer>
         <DeleteButtonContainer
           onClick={(e) => deleteClickedCustomer(e, customer.id)}
         >
@@ -95,7 +103,7 @@ const CustomerCard = ({ customer }: { customer: any }) => {
           <H3 fontWeight={500}>
             {customer.name}
           </H3>
-          <CustomerCardImage src={customer?.settings?.logoUrl ? customer?.settings?.logoUrl : ''} />
+          <CustomerCardImage src={customer?.settings?.logoUrl} />
         </Flex>
       </CardBody>
     </Card>
