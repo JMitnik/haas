@@ -9,6 +9,7 @@ import { UserCell } from 'components/Table/CellComponents/CellComponents';
 import DatePicker from 'components/DatePicker/DatePicker';
 import SearchBar from 'components/SearchBar/SearchBar';
 import Table from 'components/Table/Table';
+import deleteTriggerMutation from 'mutations/deleteTrigger';
 import getTriggersQuery from 'queries/getTriggers';
 
 import { InputContainer, InputOutputContainer } from './TriggerOverviewStyles';
@@ -68,7 +69,7 @@ const UsersOverview = () => {
     });
   }, [customerId, fetchTriggers, paginationProps]);
 
-  const [deleteUser] = useMutation(deleteUserQuery, {
+  const [deleteTrigger] = useMutation(deleteTriggerMutation, {
     refetchQueries: [{ query: getTriggersQuery,
       variables: { customerId,
         filter: {
@@ -85,22 +86,23 @@ const UsersOverview = () => {
     },
   });
 
-  const handleDeleteUser = (event: any, userId: string) => {
-    deleteUser({
+  const handleDeleteUser = (event: any, entryId: string) => {
+    event.stopPropagation();
+    deleteTrigger({
       variables: {
-        id: userId,
+        id: entryId,
       },
     });
   };
 
   const handleEditEntry = (event: any, entryId: string) => {
-    history.push(`/dashboard/c/${customerId}/n/${entryId}/edit`);
     event.stopPropagation();
+    history.push(`/dashboard/c/${customerId}/n/${entryId}/edit`);
   };
 
   const handleAddUser = (event: any) => {
-    history.push(`/dashboard/c/${customerId}/triggers/add/`);
     event.stopPropagation();
+    history.push(`/dashboard/c/${customerId}/triggers/add/`);
   };
 
   const handleSearchTermChange = useCallback(debounce((newSearchTerm: string) => {

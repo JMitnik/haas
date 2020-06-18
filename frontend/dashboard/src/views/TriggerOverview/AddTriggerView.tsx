@@ -35,6 +35,11 @@ enum TriggerConditionType {
   TEXT_MATCH='TEXT_MATCH',
 }
 
+enum TriggerQuestionType {
+  QUESTION='QUESTION',
+  SCHEDULED='SCHEDULED',
+}
+
 interface TriggerCondition {
   type: { label: string, value: TriggerConditionType } | null,
   minValue?: number,
@@ -92,8 +97,7 @@ const AddTriggerView = () => {
   });
 
   const onSubmit = (formData: FormDataProps) => {
-    const dialogueId = activeDialogue?.value;
-    // TODO: Add activeQuestion to mutation
+    const questionId = activeQuestion?.value;
     const userIds = activeRecipients.map((recipient) => recipient?.value);
     const recipients = { ids: userIds };
     const conditions = activeConditions.map((condition) => ({ ...condition, type: condition.type?.value }));
@@ -102,6 +106,7 @@ const AddTriggerView = () => {
     addTrigger({
       variables: {
         customerId,
+        questionId,
         trigger,
         recipients,
       },
@@ -146,7 +151,7 @@ const AddTriggerView = () => {
       prevConditions[index].minValue = numberValue;
       return [...prevConditions];
     });
-  }, 20), []);
+  }, 200), []);
 
   const setConditionMaxValue = useCallback(debounce((value: string, index: number) => {
     const numberValue = parseInt(value) || 0;
@@ -176,7 +181,7 @@ const AddTriggerView = () => {
     }));
   const questions = questionsData?.dialogue?.questions && questionsData?.dialogue?.questions.map((question: any) => (
     { label: question?.title, value: question?.id }));
-
+  console.log('active type: ', activeType);
   return (
     <Container>
       <Div>
@@ -232,7 +237,7 @@ const AddTriggerView = () => {
                     }}
                   />
                 </Div>
-                {activeType?.value === 'question' && (
+                {activeType?.value === TriggerQuestionType.QUESTION && (
                   <Div useFlex flexDirection="column" gridColumn="1 / -1">
                     <StyledLabel>Question</StyledLabel>
                     <Select

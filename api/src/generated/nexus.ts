@@ -413,6 +413,7 @@ export interface NexusGenFieldTypes {
     createUser: NexusGenRootTypes['UserType']; // UserType!
     deleteCustomer: NexusGenRootTypes['Customer']; // Customer!
     deleteDialogue: NexusGenRootTypes['Dialogue']; // Dialogue!
+    deleteTrigger: NexusGenRootTypes['TriggerType']; // TriggerType!
     deleteUser: NexusGenRootTypes['UserType']; // UserType!
     editCustomer: NexusGenRootTypes['Customer']; // Customer!
     editDialogue: NexusGenRootTypes['Dialogue']; // Dialogue!
@@ -524,6 +525,7 @@ export interface NexusGenFieldTypes {
     medium: NexusGenEnums['TriggerMediumEnum']; // TriggerMediumEnum!
     name: string; // String!
     recipients: NexusGenRootTypes['UserType'][]; // [UserType!]!
+    relatedNode: NexusGenRootTypes['QuestionNode']; // QuestionNode!
     type: NexusGenEnums['TriggerTypeEnum']; // TriggerTypeEnum!
   }
   UniqueDataResultEntry: { // field return type
@@ -580,6 +582,7 @@ export interface NexusGenArgTypes {
     }
     createTrigger: { // args
       customerId?: string | null; // String
+      questionId?: string | null; // String
       recipients?: NexusGenInputs['RecipientsInputType'] | null; // RecipientsInputType
       trigger?: NexusGenInputs['TriggerInputType'] | null; // TriggerInputType
     }
@@ -592,6 +595,9 @@ export interface NexusGenArgTypes {
     }
     deleteDialogue: { // args
       where?: NexusGenInputs['DialogueWhereUniqueInput'] | null; // DialogueWhereUniqueInput
+    }
+    deleteTrigger: { // args
+      id?: string | null; // String
     }
     deleteUser: { // args
       id?: string | null; // String

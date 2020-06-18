@@ -2,11 +2,12 @@ import gql from 'graphql-tag';
 
 const createTriggerMutation = gql`
   mutation createTrigger(
-      $customerId: String!, 
+      $customerId: String!,
+      $questionId: String, 
       $trigger: TriggerInputType,
       $recipients: RecipientsInputType,
      ) {
-    createTrigger(customerId: $customerId, trigger: $trigger, recipients: $recipients) {
+    createTrigger(customerId: $customerId, questionId: $questionId, trigger: $trigger, recipients: $recipients) {
         id
         name
         medium

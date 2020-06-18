@@ -38,6 +38,11 @@ enum TriggerConditionType {
   TEXT_MATCH='TEXT_MATCH',
 }
 
+enum TriggerQuestionType {
+  QUESTION='QUESTION',
+  SCHEDULED='SCHEDULED',
+}
+
 interface TriggerRecipient {
   id: string;
   firstName?: string;
@@ -61,11 +66,18 @@ interface PostMapTriggerCondition {
   textValue?: string
 }
 
+interface RelatedNode {
+  id: string;
+  title: string;
+  questionDialogueId: string;
+}
+
 interface Trigger {
   id: string;
   name: string;
   type: string;
   medium: string;
+  relatedNode?: RelatedNode;
   recipients: Array<TriggerRecipient>;
   conditions: Array<TriggerCondition>;
 }
@@ -124,7 +136,6 @@ const EditTriggerView = () => {
   const capitalizedMedium = `${trigger?.medium.charAt(0)}${trigger?.medium.slice(1).toLowerCase()}`;
   const activeMedium = { label: capitalizedMedium, value: trigger?.medium };
 
-  console.log('TRIGGER DATA: ', triggerData);
   return (
     <EditTriggerForm
       trigger={trigger}
@@ -160,9 +171,9 @@ const EditTriggerForm = ({ trigger, type, medium, conditions, recipients }: Edit
   }, [activeDialogue, fetchQuestions]);
 
   const [editTrigger, { loading }] = useMutation(editTriggerMutation, {
-    // onCompleted: () => {
-    //   history.push(`/dashboard/c/${customerId}/triggers/`);
-    // },
+    onCompleted: () => {
+      history.push(`/dashboard/c/${customerId}/triggers/`);
+    },
     onError: (serverError: ApolloError) => {
       console.log(serverError);
     },
@@ -249,9 +260,16 @@ const EditTriggerForm = ({ trigger, type, medium, conditions, recipients }: Edit
   const dialogues = dialogueData?.dialogues && dialogueData?.dialogues.map((dialogue: any) => (
     { label: dialogue?.title, value: dialogue?.id }));
 
+  console.log('trigger: ', trigger);
+
   const questions = questionsData?.dialogue?.questions && questionsData?.dialogue?.questions.map((question: any) => (
     { label: question?.title, value: question?.id }));
-  console.log('Active conditions: ', activeConditions);
+
+  const recipientOptions = recipientsData?.users.map((recipient: any) => ({
+    label: `${recipient?.lastName}, ${recipient?.firstName} - E: ${recipient?.email} - P: ${recipient?.phone}`,
+    value: recipient?.id,
+  }));
+
   return (
     <Container>
       <Div>
@@ -307,7 +325,7 @@ const EditTriggerForm = ({ trigger, type, medium, conditions, recipients }: Edit
                     }}
                   />
                 </Div>
-                {activeType?.value === 'question' && (
+                {activeType?.value === TriggerQuestionType.QUESTION && (
                   <Div useFlex flexDirection="column" gridColumn="1 / -1">
                     <StyledLabel>Question</StyledLabel>
                     <Select
@@ -414,7 +432,7 @@ const EditTriggerForm = ({ trigger, type, medium, conditions, recipients }: Edit
                         <Div flexGrow={9}>
                           <Select
                             key={index}
-                            options={recipients}
+                            options={recipientOptions}
                             value={recipient}
                             onChange={(qOption: any) => {
                               setRecipients(qOption, index);

@@ -1,9 +1,11 @@
-import { PrismaClient, Trigger, TriggerConditionCreateInput, TriggerCreateInput, User } from '@prisma/client';
+import { PrismaClient, Trigger, TriggerConditionCreateInput, TriggerCreateInput } from '@prisma/client';
 import { arg, enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
 import _ from 'lodash';
 
 import { FilterInput } from '../session/Session';
+import { QuestionNodeType } from '../question/QuestionNode';
 import { UserType } from '../users/User';
+import TriggerResolver from './trigger-resolver';
 
 const prisma = new PrismaClient();
 
@@ -50,6 +52,13 @@ const TriggerType = objectType({
     });
     t.field('medium', {
       type: TriggerMediumEnum,
+    });
+
+    t.field('relatedNode', {
+      type: QuestionNodeType,
+      resolve(parent: Trigger, args: any, ctx: any) {
+        return prisma.questionNode.findOne({ where: { id: parent.relatedNodeId } });
+      },
     });
     t.list.field('conditions', {
       type: TriggerConditionType,
@@ -106,6 +115,15 @@ const RecipientsInputType = inputObjectType({
 const TriggerMutations = extendType({
   type: 'Mutation',
   definition(t) {
+    t.field('deleteTrigger', {
+      type: TriggerType,
+      args: {
+        id: 'String',
+      },
+      resolve(parent: any, args: any, ctx: any) {
+        return prisma.trigger.delete({ where: { id: args.id } });
+      },
+    });
     t.field('editTrigger', {
       type: TriggerType,
       args: {
@@ -123,30 +141,31 @@ const TriggerMutations = extendType({
           },
         });
 
-        // TODO: Loop through front-end conditions
         if (dbTrigger?.conditions) {
-          await Promise.all(dbTrigger.conditions.map(async () => {
-            console.log('oi');
-          }));
+          await TriggerResolver.updateConditions(dbTrigger.conditions, conditions, dbTrigger.id);
         }
-        // // Als id undefined -> Create new condition on trigger
-        // // Als id bestaat -> update bestaande condition on trigger
 
-        // // Als condition id bestaat op database trigger en niet op front-end trigger -> disconnect id van trigger
+        if (dbTrigger?.recipients) {
+          await TriggerResolver.updateRecipients(dbTrigger.recipients, args.recipients.ids, dbTrigger.id);
+        }
 
-        // TODO: Loop through front-end recipients
-        // // Als id undefined -> Create new recipient on trigger
-        // // Als id bestaat -> update bestaande recipient on trigger
+        const updatedTrigger = await prisma.trigger.update({
+          where: { id: dbTrigger?.id },
+          data: {
+            name,
+            type,
+            medium,
+          },
+        });
 
-        // // Als recipient id bestaat op database trigger en niet op front-end trigger -> disconnect id van trigger
-        console.log('trigger: ', dbTrigger);
-        return dbTrigger;
+        return updatedTrigger;
       },
     });
     t.field('createTrigger', {
       type: TriggerType,
       args: {
         customerId: 'String',
+        questionId: 'String',
         recipients: RecipientsInputType,
         trigger: TriggerInputType,
       },
@@ -158,6 +177,10 @@ const TriggerMutations = extendType({
         // TODO: Add the following code to trigger seed (if it will be added)
         if (args.customerId) {
           createArgs.customer = { connect: { id: args.customerId } };
+        }
+
+        if (args.questionId) {
+          createArgs.relatedNode = { connect: { id: args.questionId } };
         }
 
         if (args.recipients.ids.length > 0) {
