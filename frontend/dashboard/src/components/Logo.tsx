@@ -1,6 +1,8 @@
 import React from 'react';
 import styled from 'styled-components/macro';
 
+import { ReactComponent as SVGLogo } from 'assets/logo.svg';
+
 export const LogoContainer = styled.div`
   display: block;
 
@@ -13,13 +15,9 @@ export const LogoContainer = styled.div`
   }
 `;
 
-const Logo = ({ isWhite = false }: { isWhite?: boolean }) => (
+const Logo = () => (
   <LogoContainer>
-    {isWhite ? (
-      <img src="/logo-white.png" alt="HAAS Logo" />
-    ): (
-      <img src="/logo.svg" alt="HAAS Logo" />
-    )}
+    <SVGLogo />
   </LogoContainer>
 );
 

@@ -16,3 +16,13 @@ export interface TableProps {
     desc: boolean;
   }[]
 }
+
+export interface BusinessProps {
+  name: string;
+}
+
+export interface UserProps {
+  firstName: string;
+  lastName: string;
+  business: BusinessProps;
+}

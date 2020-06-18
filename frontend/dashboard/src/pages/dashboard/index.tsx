@@ -11,7 +11,7 @@ import React from 'react';
 import TopicDetail from 'views/TopicDetail/TopicDetail';
 import TopicsOverview from 'views/TopicsOverview/TopicsOverview';
 
-import DashboardLayout from './DashboardLayout';
+import DashboardLayout from 'layouts/DashboardLayout';
 
 const DashboardPage = () => (
   <>

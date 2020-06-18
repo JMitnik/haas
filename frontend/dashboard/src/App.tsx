@@ -10,21 +10,24 @@ import GlobalStyle from './config/global-styles';
 import client from './config/apollo';
 import themeConfig from './config/theme';
 
+const AppRoutes = () => (
+  <Switch>
+    <Route path="/dashboard">
+      <DashboardPage />
+    </Route>
+    <Route path="/">
+      <Redirect to="/dashboard" />
+    </Route>
+  </Switch>
+);
+
 const App: FC = () => (
   <>
     <ApolloProvider client={client}>
       <Router>
         <ThemeProvider theme={themeConfig}>
           <AppContainer>
-            {/* Top-level routes */}
-            <Switch>
-              <Route path="/dashboard">
-                <DashboardPage />
-              </Route>
-              <Route path="/">
-                <Redirect to="/dashboard" />
-              </Route>
-            </Switch>
+            <AppRoutes />
           </AppContainer>
           <GlobalStyle />
         </ThemeProvider>

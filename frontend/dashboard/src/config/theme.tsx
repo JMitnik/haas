@@ -1,5 +1,4 @@
 // TODO: Export theme as type
-
 const theme = {
   colors: {
     primary: '#0866fd',
@@ -14,11 +13,15 @@ const theme = {
     default: {
       lightest: '#f7faff',
       light: '#eef1f5',
-      normal: '#d4dcea',
+      normal: '#f7f8fb',
       dark: '#657590',
       darkest: '#17263d',
       muted: '#59759c',
       text: '#4f5d6e',
+    },
+    app: {
+      sidebar: '',
+      background: '',
     },
   },
   space: [0, 6, 12, 18, 24],
@@ -45,5 +48,9 @@ const theme = {
     lg: '20px',
   },
 };
+
+// Dependent variables
+theme.colors.app.background = theme.colors.default.normal;
+theme.colors.app.sidebar = theme.colors.white;
 
 export default theme;

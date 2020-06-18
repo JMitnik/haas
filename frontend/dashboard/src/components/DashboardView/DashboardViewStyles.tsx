@@ -4,7 +4,7 @@ export const DashboardContainer = styled.div`
   ${({ theme }) => css`
     display: grid;
     grid-template-columns: 200px 1fr;
-    background: white;
+    background: ${theme.colors.app.background};
     height: 100vh;
 
     > * {

@@ -1,18 +1,18 @@
-import React from "react";
-import styled, { css } from "styled-components/macro";
+import { ColumnFlex, Div, Flex, H4 } from '@haas/ui';
+import { NavLink } from 'react-router-dom';
+import { UserProps } from 'types/generic';
+import Avatar from 'components/Avatar';
+import React from 'react';
+import styled, { css } from 'styled-components/macro';
 
 const SidenavContainer = styled.div`
-    ${({ theme, isActive }: { theme: any, isActive: boolean }) => css`
-    background: white;
+  ${({ theme }) => css`
+    background: ${theme.colors.app.sidebar};
     padding: ${theme.gutter * 1.5}px;
     display: flex;
     height: 100vh;
     flex-direction: column;
     justify-content: space-between;
-
-    ${isActive && css`
-      background: #392ab6;
-    `}
 
     ul {
         display: block;
@@ -35,26 +35,32 @@ const SidenavContainer = styled.div`
             margin-left: ${theme.gutter * 0.5}px;
             display: inline-block;
         }
-
-        &.active {
-            color: #0b1011;
-
-            ~ svg {
-            color: #0b1011;
-            }
-        }
-        }
+      }
     }
-    `}
+  `}
 `;
 
-const Sidenav = ({ children, isActive }: { children: React.ReactNode, isActive: boolean }) => {
+export const NavItems = styled.ul``;
 
-  return (
-    <SidenavContainer isActive={isActive}>
-      {children}
-    </SidenavContainer>
-  );
-};
+export const NavItem = styled(NavLink)`
+  color: red;
+`;
+
+const Sidenav = ({ children }: { children: React.ReactNode }) => (
+  <SidenavContainer>
+    {children}
+  </SidenavContainer>
+);
+
+export const Usernav = ({ user }: { user: UserProps }) => (
+  <Flex justifyContent="space-between">
+    <Avatar firstName={user.firstName} />
+    <ColumnFlex>
+      <H4>
+        {`${user.firstName} ${user.lastName}`}
+      </H4>
+    </ColumnFlex>
+  </Flex>
+);
 
 export default Sidenav;

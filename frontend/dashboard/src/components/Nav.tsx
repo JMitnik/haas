@@ -6,7 +6,7 @@ import { Div, H4 } from '@haas/ui';
 import { GenericProps } from '@haas/ui/src/Generics';
 import { ProfilePic } from '@haas/ui/src/User';
 
-import Logo, { LogoContainer } from '../assets/Logo';
+import Logo, { LogoContainer } from './Logo';
 
 const UserNav: FC = () => {
   // TODO: Remove hardcoded user {Login}
