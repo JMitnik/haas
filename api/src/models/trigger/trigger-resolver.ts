@@ -1,4 +1,4 @@
-import { PrismaClient, TriggerCondition, TriggerUpdateArgs, TriggerUpdateInput, User, UserWhereUniqueInput } from '@prisma/client';
+import { PrismaClient, TriggerCondition, TriggerUpdateArgs, TriggerUpdateInput, User, UserUpdateManyWithoutTriggersInput, UserWhereUniqueInput } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -49,7 +49,11 @@ class TriggerResolver {
     }));
   };
 
-  static updateRecipients = async (dbTriggerRecipients: Array<User>, newRecipients: Array<string>, triggerId: string) => {
+  static updateRecipients = (
+    dbTriggerRecipients: Array<User>,
+    newRecipients: Array<string>,
+    updateTriggerArgs: TriggerUpdateInput,
+  ): TriggerUpdateInput => {
     const newRecipientObjects = newRecipients.map((recipientId) => ({ id: recipientId }));
 
     const deleteRecipientObjects: UserWhereUniqueInput[] = [];
@@ -59,21 +63,22 @@ class TriggerResolver {
       }
     });
 
-    const recipientUpdateArgs: any = { recipients: { connect: newRecipientObjects } };
+    const recipientUpdateArgs: UserUpdateManyWithoutTriggersInput = {};
     if (newRecipientObjects.length > 0) {
-      recipientUpdateArgs.recipients.connect = newRecipientObjects;
+      recipientUpdateArgs.connect = newRecipientObjects;
     }
 
     if (deleteRecipientObjects.length > 0) {
-      recipientUpdateArgs.recipients.disconnect = deleteRecipientObjects;
+      recipientUpdateArgs.disconnect = deleteRecipientObjects;
     }
-
-    await prisma.trigger.update({
-      where: {
-        id: triggerId,
-      },
-      data: recipientUpdateArgs,
-    });
+    updateTriggerArgs.recipients = recipientUpdateArgs;
+    return updateTriggerArgs;
+    // await prisma.trigger.update({
+    //   where: {
+    //     id: triggerId,
+    //   },
+    //   data: recipientUpdateArgs,
+    // });
   };
 }
 

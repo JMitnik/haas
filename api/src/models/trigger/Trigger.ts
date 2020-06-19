@@ -148,13 +148,12 @@ const TriggerMutations = extendType({
         });
         let updateTriggerArgs: TriggerUpdateInput = { name, type, medium };
         updateTriggerArgs = TriggerResolver.updateRelatedQuestion(dbTrigger?.relatedNodeId, args.questionId, updateTriggerArgs);
+        if (dbTrigger?.recipients) {
+          updateTriggerArgs = TriggerResolver.updateRecipients(dbTrigger.recipients, args.recipients.ids, updateTriggerArgs);
+        }
 
         if (dbTrigger?.conditions) {
           await TriggerResolver.updateConditions(dbTrigger.conditions, conditions, dbTrigger.id);
-        }
-
-        if (dbTrigger?.recipients) {
-          await TriggerResolver.updateRecipients(dbTrigger.recipients, args.recipients.ids, dbTrigger.id);
         }
 
         const updatedTrigger = await prisma.trigger.update({
