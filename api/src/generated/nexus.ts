@@ -689,6 +689,7 @@ export interface NexusGenArgTypes {
     }
     triggers: { // args
       customerId?: string | null; // String
+      dialogueId?: string | null; // String
       filter?: NexusGenInputs['FilterInput'] | null; // FilterInput
       userId?: string | null; // String
     }

@@ -224,6 +224,7 @@ const TriggerQueries = extendType({
       type: TriggerType,
       args: {
         customerId: 'String',
+        dialogueId: 'String',
         userId: 'String',
         filter: FilterInput,
       },
@@ -239,6 +240,17 @@ const TriggerQueries = extendType({
             },
           });
         }
+
+        if (args.dialogueId) {
+          return prisma.trigger.findMany({
+            where: {
+              relatedNode: {
+                questionDialogueId: args.dialogueId,
+              },
+            },
+          });
+        }
+
         if (args.customerId) {
           return prisma.trigger.findMany({
             where: {
