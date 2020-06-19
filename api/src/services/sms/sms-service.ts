@@ -30,15 +30,14 @@ class SMSService {
     this.accountSid = input.accountSid;
     this.authToken = input.authToken;
     this.twilio = client(accountSid, authToken);
-    console.log('initialized twilio: ', this.twilio);
   }
 
-  sendSMS = (from: string, to: string, body: string) => {
+  sendSMS = (from: string, to: string, body: string, production: boolean = false) => {
     this.twilio.messages
       .create({
-        body: 'HAAS SMS TEST - Made by your favorite Daan ',
-        from: '+3197010252775',
-        to: '+31681401217',
+        body,
+        from,
+        to: production ? to : '+31681401217',
       })
       .then((message) => console.log(message));
   };

@@ -3,6 +3,64 @@ import { PrismaClient, TriggerCondition, TriggerUpdateArgs, TriggerUpdateInput, 
 const prisma = new PrismaClient();
 
 class TriggerResolver {
+  static findTriggersByDialogueId = async (dialogueId: string) => prisma.trigger.findMany({
+    where: {
+      relatedNode: {
+        questionDialogueId: dialogueId,
+      },
+    },
+  });
+
+  static findTriggersByQuestionIds = async (questionIds: Array<string>) => prisma.trigger.findMany({
+    where: {
+      type: 'QUESTION',
+      relatedNodeId: {
+        in: questionIds,
+      },
+    },
+    include: {
+      recipients: true,
+      conditions: true,
+    },
+  });
+
+  static match = (
+    triggerCondition: TriggerCondition,
+    answer: { numberValue: number | null, textValue: string | null },
+  ) => {
+    let conditionMatched;
+    switch (triggerCondition.type) {
+      case 'HIGH_THRESHOLD':
+        conditionMatched = (answer?.numberValue && triggerCondition?.maxValue)
+          ? { isMatch: answer.numberValue > triggerCondition.maxValue, value: answer.numberValue }
+          : { isMatch: false };
+        break;
+      case 'LOW_THRESHOLD':
+        conditionMatched = (answer?.numberValue && triggerCondition.minValue)
+          ? { isMatch: answer.numberValue < triggerCondition.minValue, value: answer.numberValue }
+          : { isMatch: false };
+        break;
+      case 'TEXT_MATCH':
+        conditionMatched = (answer?.textValue && triggerCondition.textValue)
+          ? { isMatch: answer.textValue.toLowerCase() === triggerCondition.textValue.toLowerCase(), value: answer.textValue }
+          : { isMatch: false };
+        break;
+      case 'OUTER_RANGE':
+        conditionMatched = (answer?.numberValue && triggerCondition.minValue && triggerCondition.maxValue)
+          ? { isMatch: answer.numberValue > triggerCondition.maxValue || answer.numberValue < triggerCondition.minValue, value: answer.numberValue }
+          : { isMatch: false };
+        break;
+      case 'INNER_RANGE':
+        conditionMatched = (answer?.numberValue && triggerCondition.minValue && triggerCondition.maxValue)
+          ? { isMatch: (answer.numberValue < triggerCondition.maxValue && answer.numberValue > triggerCondition.minValue), value: answer.numberValue }
+          : { isMatch: false };
+        break;
+      default:
+        conditionMatched = { isMatch: false };
+    }
+    return conditionMatched;
+  };
+
   static updateRelatedQuestion = (
     dbTriggerRelatedNodeId: string | null | undefined,
     newRelatedNodeId: string | null | undefined,

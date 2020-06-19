@@ -242,13 +242,7 @@ const TriggerQueries = extendType({
         }
 
         if (args.dialogueId) {
-          return prisma.trigger.findMany({
-            where: {
-              relatedNode: {
-                questionDialogueId: args.dialogueId,
-              },
-            },
-          });
+          return TriggerResolver.findTriggersByDialogueId(args.dialogueId);
         }
 
         if (args.customerId) {
