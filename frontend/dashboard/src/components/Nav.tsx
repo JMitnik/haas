@@ -28,7 +28,6 @@ const TopNavContainer = styled(Div)<GenericProps>`
   ${({ theme }) => css`
     box-shadow: 0px 5px 7px -2px rgba(0, 0, 0, 0.4);
     border-top: 5px solid ${theme.colors.primary};
-    height: ${theme.nav.height};
     padding: ${theme.gutter * 1.5}px ${theme.gutter * 2}px;
     display: flex;
     justify-content: space-between;

@@ -30,7 +30,7 @@ const DashboardView: FC = () => {
 
   return (
     <>
-      <Container>
+      <>
         <H2 color="default.primary" fontWeight={400} mb={4}>Customers</H2>
 
         <Grid
@@ -50,7 +50,7 @@ const DashboardView: FC = () => {
             </Div>
           </AddCard>
         </Grid>
-      </Container>
+      </>
     </>
   );
 };

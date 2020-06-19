@@ -1,22 +1,37 @@
 import React from 'react';
-import styled from 'styled-components/macro';
+import styled, { css } from 'styled-components/macro';
 
+import { Div, H3 } from '@haas/ui';
 import { ReactComponent as SVGLogo } from 'assets/logo.svg';
 
-export const LogoContainer = styled.div`
-  display: block;
+export const LogoContainer = styled.div<{fill?: string}>`
+  ${({ fill = '' }) => css`
+    display: flex;
+    justify-content: space-between;
 
-  /* Manual size */
-  width: 60px;
-  margin: 0 auto;
+    ${fill && css`
+      svg path {
+        fill: ${fill};
+      }
+    `}
 
-  img {
-    max-width: 100%;
-  }
+    /* Manual size */
+    width: 60px;
+
+    img {
+      max-width: 100%;
+    }
+  `}
 `;
 
-const Logo = () => (
-  <LogoContainer>
+interface LogoProps {
+  isWithTitle?: boolean;
+  isWithSubtitle?: boolean;
+  fill?: string;
+}
+
+const Logo = ({ fill = '' }: LogoProps) => (
+  <LogoContainer fill={fill}>
     <SVGLogo />
   </LogoContainer>
 );

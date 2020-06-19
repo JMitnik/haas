@@ -1,7 +1,7 @@
-import { Div, Card } from '@haas/ui';
+import { Card, Div } from '@haas/ui';
 import styled, { css } from 'styled-components';
 
-export const AddTopicCard = styled(Card)`
+export const AddDialogueCard = styled(Card)`
   ${({ theme }) => css`
     position: relative;
 

@@ -3,13 +3,13 @@ import { Route, Switch } from 'react-router';
 import AddTopicView from 'views/AddTopicView';
 import CustomerBuilderView from 'views/CustomerBuilderView';
 import CustomerOverview from 'views/DashboardView';
+import DialogueOverview from 'views/DialogueOverview';
 import EditCustomerView from 'views/EditCustomerView';
 import EditTopicView from 'views/EditTopicView';
 import InteractionsOverview from 'views/InteractionsOverview/InteractionsOverview';
 import OrganisationSettingsView from 'views/OrganisationSettingsView';
 import React from 'react';
 import TopicDetail from 'views/TopicDetail/TopicDetail';
-import TopicsOverview from 'views/TopicsOverview/TopicsOverview';
 
 import DashboardLayout from 'layouts/DashboardLayout';
 
@@ -42,7 +42,7 @@ const DashboardPage = () => (
       />
       <Route
         path="/dashboard/c/:customerId/"
-        render={() => <DashboardLayout><TopicsOverview /></DashboardLayout>}
+        render={() => <DialogueOverview />}
       />
       <Route
         path="/dashboard/organisation-settings"

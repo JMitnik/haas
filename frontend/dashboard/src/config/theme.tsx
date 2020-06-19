@@ -1,7 +1,7 @@
 // TODO: Export theme as type
 const theme = {
   colors: {
-    primary: '#0866fd',
+    primary: '#426b3a',
     primaryAlt: '#8cb6ff',
     secondary: '#6f6594',
     tertiary: 'green',
@@ -14,14 +14,18 @@ const theme = {
       lightest: '#f7faff',
       light: '#eef1f5',
       normal: '#f7f8fb',
-      dark: '#657590',
-      darkest: '#17263d',
+      dark: '#afb4c6',
+      darker: '#8e919d',
+      darkest: '#5f6167',
       muted: '#59759c',
       text: '#4f5d6e',
     },
     app: {
       sidebar: '',
       background: '',
+      onWhite: '',
+      mutedOnWhite: '',
+      mutedAltOnWhite: '',
     },
   },
   space: [0, 6, 12, 18, 24],
@@ -33,8 +37,8 @@ const theme = {
     title: '',
     special: '',
   },
-  nav: {
-    height: 80,
+  sidenav: {
+    width: 230,
   },
   fontSizes: [8, 12, 22, 28, 36, 48],
   buttonSizes: {
@@ -46,11 +50,17 @@ const theme = {
     sm: '3px',
     md: '7px',
     lg: '20px',
+    rounded: '50px',
   },
 };
 
-// Dependent variables
+// Dependent variables - Generic
 theme.colors.app.background = theme.colors.default.normal;
 theme.colors.app.sidebar = theme.colors.white;
+
+// Dependent variables - colors on white
+theme.colors.app.onWhite = theme.colors.default.darkest;
+theme.colors.app.mutedOnWhite = theme.colors.default.dark;
+theme.colors.app.mutedAltOnWhite = theme.colors.default.darker;
 
 export default theme;
