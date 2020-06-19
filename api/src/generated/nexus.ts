@@ -525,7 +525,7 @@ export interface NexusGenFieldTypes {
     medium: NexusGenEnums['TriggerMediumEnum']; // TriggerMediumEnum!
     name: string; // String!
     recipients: NexusGenRootTypes['UserType'][]; // [UserType!]!
-    relatedNode: NexusGenRootTypes['QuestionNode']; // QuestionNode!
+    relatedNode: NexusGenRootTypes['QuestionNode'] | null; // QuestionNode
     type: NexusGenEnums['TriggerTypeEnum']; // TriggerTypeEnum!
   }
   UniqueDataResultEntry: { // field return type
@@ -613,6 +613,7 @@ export interface NexusGenArgTypes {
       title?: string | null; // String
     }
     editTrigger: { // args
+      questionId?: string | null; // String
       recipients?: NexusGenInputs['RecipientsInputType'] | null; // RecipientsInputType
       trigger?: NexusGenInputs['TriggerInputType'] | null; // TriggerInputType
       triggerId?: string | null; // String

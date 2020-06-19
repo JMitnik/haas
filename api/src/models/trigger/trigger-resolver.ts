@@ -1,10 +1,21 @@
-import { filter } from 'lodash';
-
-import { PrismaClient, TriggerCondition, TriggerUpdateInput, User, UserUpdateManyWithoutTriggersInput, UserWhereUniqueInput } from '@prisma/client';
+import { PrismaClient, TriggerCondition, TriggerUpdateArgs, TriggerUpdateInput, User, UserWhereUniqueInput } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
 class TriggerResolver {
+  static updateRelatedQuestion = (
+    dbTriggerRelatedNodeId: string | null | undefined,
+    newRelatedNodeId: string | null | undefined,
+    updateTriggerArgs: TriggerUpdateInput,
+  ): TriggerUpdateInput => {
+    if (newRelatedNodeId && newRelatedNodeId !== dbTriggerRelatedNodeId) {
+      updateTriggerArgs.relatedNode = { connect: { id: newRelatedNodeId } };
+    } else if (!newRelatedNodeId) {
+      updateTriggerArgs.relatedNode = { disconnect: true };
+    }
+    return updateTriggerArgs;
+  };
+
   static updateConditions = async (dbTriggerConditions: Array<TriggerCondition>, newConditions: Array<TriggerCondition>, triggerId: string) => {
     const upsertedConditionsIds = await Promise.all(newConditions.map(async (condition) => {
       const upsertTriggerCondition = await prisma.triggerCondition.upsert({
@@ -29,15 +40,13 @@ class TriggerResolver {
       });
       return upsertTriggerCondition.id;
     }));
-    console.log('handled upsert IDs: ', upsertedConditionsIds);
-    // // Als condition id bestaat op database trigger en niet op front-end trigger -> disconnect id van trigger
-    const deletedConditionIds = await Promise.all(dbTriggerConditions.map(async (condition) => {
+
+    await Promise.all(dbTriggerConditions.map(async (condition) => {
       if (!upsertedConditionsIds.includes(condition.id)) {
         const deletedCondition = await prisma.triggerCondition.delete({ where: { id: condition.id } });
         return deletedCondition.id;
       }
     }));
-    console.log('handled deleted IDs: ', deletedConditionIds);
   };
 
   static updateRecipients = async (dbTriggerRecipients: Array<User>, newRecipients: Array<string>, triggerId: string) => {

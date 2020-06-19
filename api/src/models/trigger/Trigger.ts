@@ -1,4 +1,4 @@
-import { PrismaClient, Trigger, TriggerConditionCreateInput, TriggerCreateInput } from '@prisma/client';
+import { PrismaClient, Trigger, TriggerConditionCreateInput, TriggerCreateInput, TriggerUpdateInput } from '@prisma/client';
 import { arg, enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
 import _ from 'lodash';
 
@@ -56,8 +56,12 @@ const TriggerType = objectType({
 
     t.field('relatedNode', {
       type: QuestionNodeType,
+      nullable: true,
       resolve(parent: Trigger, args: any, ctx: any) {
-        return prisma.questionNode.findOne({ where: { id: parent.relatedNodeId } });
+        if (parent.relatedNodeId) {
+          return prisma.questionNode.findOne({ where: { id: parent.relatedNodeId } });
+        }
+        return null;
       },
     });
     t.list.field('conditions', {
@@ -128,6 +132,7 @@ const TriggerMutations = extendType({
       type: TriggerType,
       args: {
         triggerId: 'String',
+        questionId: 'String',
         recipients: RecipientsInputType,
         trigger: TriggerInputType,
       },
@@ -138,8 +143,11 @@ const TriggerMutations = extendType({
           include: {
             conditions: true,
             recipients: true,
+            relatedNode: true,
           },
         });
+        let updateTriggerArgs: TriggerUpdateInput = { name, type, medium };
+        updateTriggerArgs = TriggerResolver.updateRelatedQuestion(dbTrigger?.relatedNodeId, args.questionId, updateTriggerArgs);
 
         if (dbTrigger?.conditions) {
           await TriggerResolver.updateConditions(dbTrigger.conditions, conditions, dbTrigger.id);
@@ -151,11 +159,7 @@ const TriggerMutations = extendType({
 
         const updatedTrigger = await prisma.trigger.update({
           where: { id: dbTrigger?.id },
-          data: {
-            name,
-            type,
-            medium,
-          },
+          data: updateTriggerArgs,
         });
 
         return updatedTrigger;

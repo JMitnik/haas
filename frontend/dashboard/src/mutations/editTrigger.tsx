@@ -3,10 +3,11 @@ import gql from 'graphql-tag';
 const editTriggerMutation = gql`
   mutation editTrigger(
       $triggerId: String!, 
+      $questionId: String,
       $trigger: TriggerInputType,
       $recipients: RecipientsInputType,
      ) {
-    editTrigger(triggerId: $triggerId, trigger: $trigger, recipients: $recipients) {
+    editTrigger(triggerId: $triggerId, questionId: $questionId, trigger: $trigger, recipients: $recipients) {
         id
         name
         medium

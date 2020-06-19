@@ -31,16 +31,16 @@ interface FormDataProps {
 }
 
 enum TriggerConditionType {
-  LOW_THRESHOLD='LOW_THRESHOLD',
-  HIGH_THRESHOLD='HIGH_THRESHOLD',
-  INNER_RANGE='INNER_RANGE',
-  OUTER_RANGE='OUTER_RANGE',
-  TEXT_MATCH='TEXT_MATCH',
+  LOW_THRESHOLD = 'LOW_THRESHOLD',
+  HIGH_THRESHOLD = 'HIGH_THRESHOLD',
+  INNER_RANGE = 'INNER_RANGE',
+  OUTER_RANGE = 'OUTER_RANGE',
+  TEXT_MATCH = 'TEXT_MATCH',
 }
 
 enum TriggerQuestionType {
-  QUESTION='QUESTION',
-  SCHEDULED='SCHEDULED',
+  QUESTION = 'QUESTION',
+  SCHEDULED = 'SCHEDULED',
 }
 
 interface TriggerRecipient {
@@ -84,10 +84,19 @@ interface Trigger {
 
 interface EditTriggerProps {
   trigger: Trigger;
+  dialogues: {
+    label: string;
+    value: string;
+  }[];
+  dialogue: {
+    label: string;
+    value: string;
+  } | undefined;
   type: { label: string, value: string };
+  question: { label: string, value: string } | undefined;
   conditions: Array<PostMapTriggerCondition>;
   medium: { label: string, value: string };
-  recipients: Array<{ label: string, value: string}>;
+  recipients: Array<{ label: string, value: string }>;
 }
 
 const TRIGGER_CONDITION_TYPES = [
@@ -119,7 +128,9 @@ const EditTriggerView = () => {
     },
   });
 
-  if (loading) return null;
+  const { data: dialogueData, loading: dialoguesLoading } = useQuery(getDialoguesQuery, { variables: { id: customerId } });
+
+  if (loading || dialoguesLoading) return null;
   if (error) return <><p>{error.message}</p></>;
 
   const trigger: Trigger = triggerData?.trigger;
@@ -136,22 +147,32 @@ const EditTriggerView = () => {
   const capitalizedMedium = `${trigger?.medium.charAt(0)}${trigger?.medium.slice(1).toLowerCase()}`;
   const activeMedium = { label: capitalizedMedium, value: trigger?.medium };
 
+  const activeQuestion = { label: trigger.relatedNode?.title || '', value: trigger.relatedNode?.id || '' };
+
+  const dialogues: Array<{ label: string, value: string }> = dialogueData?.dialogues && dialogueData?.dialogues.map((dialogue: any) => (
+    { label: dialogue?.title, value: dialogue?.id }));
+  const currentDialogue = dialogues?.find((dialogue) => trigger?.relatedNode?.questionDialogueId && dialogue.value === trigger?.relatedNode?.questionDialogueId);
+
   return (
     <EditTriggerForm
       trigger={trigger}
+      dialogues={dialogues}
+      dialogue={currentDialogue}
       type={activeType}
       medium={activeMedium}
+      question={activeQuestion}
       conditions={conditions}
       recipients={activeRecipients}
     />
   );
 };
 
-const EditTriggerForm = ({ trigger, type, medium, conditions, recipients }: EditTriggerProps) => {
+const EditTriggerForm = ({ trigger, type, medium, conditions, recipients, question, dialogues, dialogue }: EditTriggerProps) => {
   const history = useHistory();
   const { register, handleSubmit, errors } = useForm<FormDataProps>();
   const { customerId } = useParams();
   const { data: dialogueData } = useQuery(getDialoguesQuery, { variables: { id: customerId } });
+
   const { data: recipientsData } = useQuery(getRecipientsQuery, { variables: { customerId } });
   const [fetchQuestions, { loading: questionsLoading, data: questionsData }] = useLazyQuery(
     getQuestionsQuery, { fetchPolicy: 'cache-and-network' },
@@ -159,8 +180,12 @@ const EditTriggerForm = ({ trigger, type, medium, conditions, recipients }: Edit
 
   const [activeType, setActiveType] = useState<null | { label: string, value: string }>(type);
   const [activeMedium, setActiveMedium] = useState<null | { label: string, value: string }>(medium);
-  const [activeDialogue, setActiveDialogue] = useState<null | { label: string, value: string }>(null);
-  const [activeQuestion, setActiveQuestion] = useState<null | { label: string, value: string }>(null);
+
+  // const dialogues: Array<{ label: string, value: string }> = dialogueData?.dialogues && dialogueData?.dialogues.map((dialogue: any) => (
+  //   { label: dialogue?.title, value: dialogue?.id }));
+  // const currentDialogue = dialogues?.find((dialogue) => trigger?.relatedNode?.questionDialogueId && dialogue.value === trigger?.relatedNode?.questionDialogueId);
+  const [activeDialogue, setActiveDialogue] = useState<null | undefined | { label: string, value: string }>(dialogue);
+  const [activeQuestion, setActiveQuestion] = useState<null | undefined | { label: string, value: string }>(question);
   const [activeRecipients, setActiveRecipients] = useState<Array<null | { label: string, value: string }>>(recipients);
   const [activeConditions, setActiveConditions] = useState<Array<PostMapTriggerCondition>>(conditions);
 
@@ -182,6 +207,7 @@ const EditTriggerForm = ({ trigger, type, medium, conditions, recipients }: Edit
   const onSubmit = (formData: FormDataProps) => {
     const dialogueId = activeDialogue?.value;
     // TODO: Add activeQuestion to mutation
+    const questionId = activeQuestion?.value;
     const userIds = activeRecipients.map((recipient) => recipient?.value);
     const recipients = { ids: userIds };
     const conditions = activeConditions.map((condition) => ({
@@ -192,6 +218,7 @@ const EditTriggerForm = ({ trigger, type, medium, conditions, recipients }: Edit
     editTrigger({
       variables: {
         triggerId: trigger?.id,
+        questionId,
         trigger: triggerInput,
         recipients,
       },
@@ -236,7 +263,7 @@ const EditTriggerForm = ({ trigger, type, medium, conditions, recipients }: Edit
       prevConditions[index].minValue = numberValue;
       return [...prevConditions];
     });
-  }, 20), []);
+  }, 200), []);
 
   const setConditionMaxValue = useCallback(debounce((value: string, index: number) => {
     const numberValue = parseInt(value) || 0;
@@ -256,11 +283,6 @@ const EditTriggerForm = ({ trigger, type, medium, conditions, recipients }: Edit
       return [...prevConditions];
     });
   };
-
-  const dialogues = dialogueData?.dialogues && dialogueData?.dialogues.map((dialogue: any) => (
-    { label: dialogue?.title, value: dialogue?.id }));
-
-  console.log('trigger: ', trigger);
 
   const questions = questionsData?.dialogue?.questions && questionsData?.dialogue?.questions.map((question: any) => (
     { label: question?.title, value: question?.id }));
@@ -357,11 +379,11 @@ const EditTriggerForm = ({ trigger, type, medium, conditions, recipients }: Edit
                           onChange={(qOption: any) => setConditionsType(qOption, index)}
                         />
                         {condition?.type?.value === TriggerConditionType.TEXT_MATCH && (
-                        <Flex marginTop={5} flexDirection="column">
-                          <StyledLabel>Match Text</StyledLabel>
-                          <StyledInput defaultValue={condition?.textValue} onChange={(event) => setMatchText(event.currentTarget.value, index)} name="minValue" ref={register({ required: true })} />
-                          {errors.name && <Muted color="warning">Something went wrong!</Muted>}
-                        </Flex>
+                          <Flex marginTop={5} flexDirection="column">
+                            <StyledLabel>Match Text</StyledLabel>
+                            <StyledInput defaultValue={condition?.textValue} onChange={(event) => setMatchText(event.currentTarget.value, index)} name="minValue" ref={register({ required: true })} />
+                            {errors.name && <Muted color="warning">Something went wrong!</Muted>}
+                          </Flex>
                         )}
 
                         {condition?.type?.value === TriggerConditionType.LOW_THRESHOLD && (
@@ -378,42 +400,42 @@ const EditTriggerForm = ({ trigger, type, medium, conditions, recipients }: Edit
                         )}
 
                         {condition?.type?.value === TriggerConditionType.HIGH_THRESHOLD && (
-                        <Flex marginTop={5} flexDirection="column">
-                          <StyledLabel>High Threshold</StyledLabel>
-                          <StyledInput
-                            onChange={(event) => setConditionMaxValue(event.currentTarget.value, index)}
-                            defaultValue={condition?.maxValue}
-                            name="name"
-                            ref={register({ required: true })}
-                          />
-                          {errors.name && <Muted color="warning">Something went wrong!</Muted>}
-                        </Flex>
-                        )}
-
-                        {(condition?.type?.value === TriggerConditionType.OUTER_RANGE
-                        || condition?.type?.value === TriggerConditionType.INNER_RANGE) && (
-                        <Flex marginTop={5} flexDirection="row" justifyContent="space-evenly">
-                          <Flex width="49%" flexDirection="column">
-                            <StyledLabel>Low Threshold</StyledLabel>
-                            <StyledInput
-                              onChange={(event) => setConditionMinValue(event.currentTarget.value, index)}
-                              defaultValue={condition?.minValue}
-                              name="name"
-                              ref={register({ required: true })}
-                            />
-                            {errors.name && <Muted color="warning">Something went wrong!</Muted>}
-                          </Flex>
-                          <Flex width="49%" flexDirection="column">
+                          <Flex marginTop={5} flexDirection="column">
                             <StyledLabel>High Threshold</StyledLabel>
                             <StyledInput
                               onChange={(event) => setConditionMaxValue(event.currentTarget.value, index)}
-                              defaultValue={condition?.textValue}
+                              defaultValue={condition?.maxValue}
                               name="name"
                               ref={register({ required: true })}
                             />
                             {errors.name && <Muted color="warning">Something went wrong!</Muted>}
                           </Flex>
-                        </Flex>
+                        )}
+
+                        {(condition?.type?.value === TriggerConditionType.OUTER_RANGE
+                          || condition?.type?.value === TriggerConditionType.INNER_RANGE) && (
+                            <Flex marginTop={5} flexDirection="row" justifyContent="space-evenly">
+                              <Flex width="49%" flexDirection="column">
+                                <StyledLabel>Low Threshold</StyledLabel>
+                                <StyledInput
+                                  onChange={(event) => setConditionMinValue(event.currentTarget.value, index)}
+                                  defaultValue={condition?.minValue}
+                                  name="name"
+                                  ref={register({ required: true })}
+                                />
+                                {errors.name && <Muted color="warning">Something went wrong!</Muted>}
+                              </Flex>
+                              <Flex width="49%" flexDirection="column">
+                                <StyledLabel>High Threshold</StyledLabel>
+                                <StyledInput
+                                  onChange={(event) => setConditionMaxValue(event.currentTarget.value, index)}
+                                  defaultValue={condition?.textValue}
+                                  name="name"
+                                  ref={register({ required: true })}
+                                />
+                                {errors.name && <Muted color="warning">Something went wrong!</Muted>}
+                              </Flex>
+                            </Flex>
                         )}
                       </Flex>
                     ))}

@@ -50,7 +50,6 @@ const UsersOverview = () => {
   );
 
   const tableData: any = data?.triggers || [];
-  console.log('table data: ', tableData);
   useEffect(() => {
     const { activeStartDate, activeEndDate, pageIndex, pageSize, sortBy, activeSearchTerm } = paginationProps;
     fetchTriggers({
