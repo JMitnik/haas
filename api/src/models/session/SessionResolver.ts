@@ -9,7 +9,7 @@ const prisma = new PrismaClient();
 class SessionResolver {
   static async uploadUserSession(obj: any, args: any, ctx: any) {
     const { dialogueId, entries } = args.uploadUserSessionInput;
-
+    console.log('entries: ', entries);
     const session = await prisma.session.create({
       data: {
         dialogue: {
