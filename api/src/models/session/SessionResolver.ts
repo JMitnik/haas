@@ -10,7 +10,6 @@ const prisma = new PrismaClient();
 class SessionResolver {
   static async uploadUserSession(obj: any, args: any, ctx: any) {
     const { dialogueId, entries } = args.uploadUserSessionInput;
-    console.log('entries: ', entries);
     const session = await prisma.session.create({
       data: {
         dialogue: {
@@ -27,11 +26,8 @@ class SessionResolver {
     });
 
     // SMS SERVICE
-    // Kijk naar dialogue triggers (alle triggers met type = QUESTION)
     const questionIds = entries.map((entry: any) => entry.nodeId);
     const dialogueTriggers = await TriggerResolver.findTriggersByQuestionIds(questionIds);
-    console.log('Potential triggers found for answered questions: ', dialogueTriggers);
-    // ALS WAARDE IN QUESTIONENTRY MATCHED MET TRIGGER VOER TRIGGER UIT
     dialogueTriggers.forEach((trigger) => {
       const { nodeId, data } = entries.find((entry: any) => entry.nodeId === trigger.relatedNodeId);
       const condition = trigger.conditions[0];
@@ -57,7 +53,6 @@ HAAS
       } else {
         console.log(`trigger condition of ${trigger.id} and question answer of ${nodeId} don't match. skipping...`);
       }
-      // TODO: TRIGGER TYPE LOGIC HERE
     });
     // TODO: Replace this with email associated to dialogue (or fallback to company)
     const dialogueAgentMail = 'jmitnik@gmail.com';
