@@ -182,7 +182,7 @@ const AddTriggerView = () => {
     }));
   const questions = questionsData?.dialogue?.questions && questionsData?.dialogue?.questions.map((question: any) => (
     { label: question?.title, value: question?.id }));
-  console.log('active type: ', activeType);
+
   return (
     <Container>
       <Div>
