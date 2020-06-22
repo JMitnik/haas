@@ -1,7 +1,7 @@
 import { ResponsiveLine as NivoLineChart } from '@nivo/line';
 import React from 'react';
 
-const DialogueScoreGraphModule = ({ data }: { data: any }) => (
+const ScoreGraphModule = ({ data }: { data: any }) => (
   <NivoLineChart
     data={data}
     margin={{ top: 50, right: 150, bottom: 100, left: 60 }}
@@ -58,4 +58,4 @@ const DialogueScoreGraphModule = ({ data }: { data: any }) => (
   />
 );
 
-export default DialogueScoreGraphModule;
+export default ScoreGraphModule;

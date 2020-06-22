@@ -1,14 +1,17 @@
 import { Div, Grid, H3, Loader } from '@haas/ui';
-import { Route, Switch, useLocation, useParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 import { useQuery } from '@apollo/react-hooks';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components/macro';
 
 import Modal from 'components/Modal';
 
-import NodeEntriesOverview from './NodeEntriesOverview/NodeEntriesOverview';
-import TimelineFeedOverview from './TimelineFeedOverview/TimelineFeedOverview';
-import TopicInfo from './TopicInfo/TopicInfo';
+import DialogueInfo from './DialogueInfo';
+import InteractionFeedModule from './Modules/InteractionFeedModule/InteractionFeedModule';
+import NegativePathsModule from './Modules/NegativePathsModule/index.tsx';
+import NodeEntriesOverview from '../NodeEntriesOverview/NodeEntriesOverview';
+import PositivePathsModule from './Modules/PositivePathsModule/PositivePathsModule';
+import ScoreGraphModule from './Modules/ScoreGraphModule';
 import getQuestionnaireData from '../../queries/getQuestionnaireData';
 
 const filterMap = new Map([
@@ -35,19 +38,6 @@ const FilterButton = styled(Div)`
       }
     `}
   `}
-`;
-
-const Widget = styled(Div)`
-  border-radius: 12px;
-  padding: 12px;
-`;
-
-const StatisticWidget = styled(Widget)`
-  background: #f7f9fe;
-
-  ol {
-    padding: 12px 24px;
-  }
 `;
 
 const DialogueView = () => {
@@ -88,9 +78,9 @@ const DialogueView = () => {
         <Div height="100vh" maxHeight="100vh" overflow="hidden">
           <Grid gridTemplateColumns="3fr 1fr">
             <Div>
-              <TopicInfo DialogueResultProps={resultData} customerId={customerId} topicId={topicId} />
+              <DialogueInfo DialogueResultProps={resultData} customerId={customerId} topicId={topicId} />
               <Grid gridTemplateColumns="1fr 1fr" gridTemplateRows="1fr 100px 3fr">
-                <Widget gridColumn="span 2">
+                <Div gridColumn="span 2">
                   <H3>Filter</H3>
                   <Div display="flex">
                     <FilterButton isActive={activeFilter === 'Last 24h'} onClick={() => setActiveFilter('Last 24h')}>Last 24h</FilterButton>
@@ -98,44 +88,25 @@ const DialogueView = () => {
                     <FilterButton isActive={activeFilter === 'Last month'} onClick={() => setActiveFilter('Last month')}>Last month</FilterButton>
                     <FilterButton isActive={activeFilter === 'Last year'} onClick={() => setActiveFilter('Last year')}>Last year</FilterButton>
                   </Div>
-                </Widget>
-                <StatisticWidget>
-                  <H3>Top positive results</H3>
-                  <ol>
-                    {
-                          resultData?.topPositivePath.map(({ answer, quantity }: { answer: string, quantity: number }) => <li key={`${answer}-${quantity}`}>{`${answer} (${quantity} answer(s))`}</li>
-                          )
-                        }
-                  </ol>
-                </StatisticWidget>
+                </Div>
 
-                <StatisticWidget>
-                  <H3>Top negative results</H3>
-                  <ol>
-                    {
-                          resultData?.topNegativePath.map(({ answer, quantity }: { answer: string, quantity: number }) => <li key={`${answer}-${quantity}`}>{`${answer} (${quantity} answer(s))`}</li>
-                          )
-                        }
-                  </ol>
-                </StatisticWidget>
-
-                <StatisticWidget gridColumn="span 2" height="300px" width="100%">
-                  {
-                        lineQueryData && <MyResponsiveLine data={lineData} />
-                      }
-                </StatisticWidget>
-
+                <PositivePathsModule positivePaths={resultData?.topPositivePath} />
+                <NegativePathsModule negativePaths={resultData?.topNegativePath} />
+                <Div gridColumn="span 2">
+                  <ScoreGraphModule data={lineData} />
+                </Div>
               </Grid>
             </Div>
 
             <Div>
-              <TimelineFeedOverview
+              <InteractionFeedModule
                 onActiveSessionChange={setActiveSession}
                 timelineEntries={timelineEntries}
               />
             </Div>
           </Grid>
         </Div>
+
         {location?.state?.modal && (
           <Modal>
             <NodeEntriesOverview sessionId={activeSession} />

@@ -1,1 +1,1 @@
-export { default } from './DialogueScoreGraphModule';
+export { default } from './ScoreGraphModule';

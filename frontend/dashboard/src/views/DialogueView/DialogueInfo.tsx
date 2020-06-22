@@ -35,7 +35,7 @@ const StatisticWidget = styled(Div)`
   }
 `;
 
-const TopicInfo = ({
+const DialogueInfo = ({
   DialogueResultProps,
   customerId,
   topicId,
@@ -72,4 +72,4 @@ const TopicInfo = ({
   );
 };
 
-export default TopicInfo;
+export default DialogueInfo;
