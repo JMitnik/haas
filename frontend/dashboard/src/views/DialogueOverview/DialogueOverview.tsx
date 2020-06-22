@@ -1,48 +1,43 @@
 import { ApolloError } from 'apollo-boost';
 import { Card, CardBody, DeleteButtonContainer, Div, EditButtonContainer, Flex, Grid,
-  H2, H3, Label } from '@haas/ui';
+  H2, H3, Label, PageHeading } from '@haas/ui';
 import { Edit, Plus, X } from 'react-feather';
 import { Link, useHistory, useParams } from 'react-router-dom';
 import { useMutation, useQuery } from '@apollo/react-hooks';
 import React, { FC } from 'react';
 
 import DashboardLayout from 'layouts/DashboardLayout';
+import Searchbar from 'components/Searchbar';
 
 import { AddDialogueCard } from './DialogueOverviewStyles';
 import { deleteQuestionnaireMutation } from '../../mutations/deleteQuestionnaire';
 import getQuestionnairesCustomerQuery from '../../queries/getQuestionnairesCustomerQuery';
 
-const DialogueOverview: FC = () => {
+// TODO: Do something about this
+const DialogueOverviewFilters = () => (
+  <div>oops</div>
+);
+
+const DialogueOverview = ({ dialogues }: { dialogues: any }) => {
   const { customerId } = useParams();
-
-  const { loading, error, data } = useQuery<any>(getQuestionnairesCustomerQuery, {
-    variables: { id: customerId },
-  });
-
-  if (loading) return <p>Loading</p>;
-
-  if (error) {
-    return (
-      <p>
-        Error:
-        {' '}
-        {error.message}
-      </p>
-    );
-  }
-
-  const dialogues: Array<any> = data?.dialogues;
 
   return (
     <DashboardLayout>
-      <H2 color="default.text" fontWeight={400} mb={4}>Dialogues</H2>
+      <PageHeading>Dialogues</PageHeading>
+
+      <Div mb={4}>
+        <Grid gridTemplateColumns="300px 1fr">
+          <Searchbar />
+          <DialogueOverviewFilters />
+        </Grid>
+      </Div>
 
       <Grid
         gridGap={4}
         gridTemplateColumns={['1fr', '1fr 1fr 1fr']}
         gridAutoRows="minmax(200px, 1fr)"
       >
-        {dialogues?.map((dialogue, index) => dialogue && <DialogueCard key={index} dialogue={dialogue} />)}
+        {dialogues?.map((dialogue: any, index: any) => dialogue && <DialogueCard key={index} dialogue={dialogue} />)}
 
         <AddDialogueCard>
           <Link to={`/dashboard/c/${customerId}/topic-builder`} />

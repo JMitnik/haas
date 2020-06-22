@@ -3,15 +3,15 @@ import { useMutation, useQuery } from '@apollo/react-hooks';
 import React, { FC } from 'react';
 
 import { AddCard, Card, CardBody, Container, DeleteButtonContainer, Div, EditButtonContainer,
-  Flex, Grid, H2, H3 } from '@haas/ui';
+  Flex, Grid, H2, H3, PageHeading } from '@haas/ui';
 import { Edit, Plus, X } from 'react-feather';
 import { Link, useHistory } from 'react-router-dom';
 
-import { CustomerCardImage } from './DashboardViewStyles';
+import { CustomerCardImage } from './CustomerOverviewStyles';
 import { deleteFullCustomerQuery } from '../../mutations/deleteFullCustomer';
 import { getCustomerQuery } from '../../queries/getCustomersQuery';
 
-const DashboardView: FC = () => {
+const CustomerOverview: FC = () => {
   const { loading, error, data } = useQuery(getCustomerQuery);
 
   if (error) {
@@ -31,7 +31,7 @@ const DashboardView: FC = () => {
   return (
     <>
       <>
-        <H2 color="default.primary" fontWeight={400} mb={4}>Customers</H2>
+        <PageHeading>Dialogues</PageHeading>
 
         <Grid
           gridGap={4}
@@ -110,4 +110,4 @@ const CustomerCard = ({ customer }: { customer: any }) => {
   );
 };
 
-export default DashboardView;
+export default CustomerOverview;

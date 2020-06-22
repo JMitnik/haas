@@ -2,6 +2,7 @@ import { ColumnFlex, Div, Flex, H4, Span } from '@haas/ui';
 import { LinkProps, NavLink } from 'react-router-dom';
 import { UserProps } from 'types/generic';
 import Avatar from 'components/Avatar';
+import Logo from 'components/Logo';
 import React from 'react';
 import styled, { css } from 'styled-components/macro';
 
@@ -58,6 +59,20 @@ export const NavItems = styled.ul`
     }
   `}
 `;
+
+export const NavLogo = () => (
+  <Flex justifyContent="center" alignItems="flex-end">
+    {/* TODO: Make generic */}
+    <Logo fill="#426b3a" />
+
+    <Div>
+      <Span fontSize="2rem" color="primary">
+        <Span fontSize="1em" display="block" fontWeight="bold">haas</Span>
+        <Span fontSize="0.6em" display="block">dashboard</Span>
+      </Span>
+    </Div>
+  </Flex>
+);
 
 export const SidenavContainer = styled.div`
   ${({ theme }) => css`

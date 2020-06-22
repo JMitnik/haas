@@ -1,7 +1,6 @@
 import React from 'react';
 import styled, { css } from 'styled-components/macro';
 
-import { Div, H3 } from '@haas/ui';
 import { ReactComponent as SVGLogo } from 'assets/logo.svg';
 
 export const LogoContainer = styled.div<{fill?: string}>`

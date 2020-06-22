@@ -14,6 +14,7 @@ const theme = {
       lightest: '#f7faff',
       light: '#eef1f5',
       normal: '#f7f8fb',
+      normalAlt: '#e6ecf4',
       dark: '#afb4c6',
       darker: '#8e919d',
       darkest: '#5f6167',
@@ -26,6 +27,9 @@ const theme = {
       onWhite: '',
       mutedOnWhite: '',
       mutedAltOnWhite: '',
+      onDefault: '',
+      mutedOnDefault: '',
+      mutedAltOnDefault: '',
     },
   },
   space: [0, 6, 12, 18, 24],
@@ -62,5 +66,10 @@ theme.colors.app.sidebar = theme.colors.white;
 theme.colors.app.onWhite = theme.colors.default.darkest;
 theme.colors.app.mutedOnWhite = theme.colors.default.dark;
 theme.colors.app.mutedAltOnWhite = theme.colors.default.darker;
+
+// Dependent variables - colors on muted
+theme.colors.app.onDefault = theme.colors.default.darkest;
+theme.colors.app.mutedOnDefault = theme.colors.default.normalAlt;
+theme.colors.app.mutedAltOnDefault = theme.colors.default.darker;
 
 export default theme;
