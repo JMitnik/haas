@@ -1,33 +1,34 @@
 import { ApolloError } from 'apollo-boost';
 import { Button, Div, H2, Loader } from '@haas/ui';
+import { orderBy } from 'lodash';
+import { useHistory, useParams } from 'react-router-dom';
+import { useMutation, useQuery } from '@apollo/react-hooks';
+import React, { useEffect, useState } from 'react';
+
+import { DialogueBuilderContainer } from './DialogueBuilderStyles';
 import {
   EdgeChildProps, QuestionEntryProps,
   QuestionOptionProps,
 } from './TopicBuilderInterfaces';
-import { TopicBuilderView } from './TopicBuilderStyles';
 import { getTopicBuilderQuery } from '../../queries/getQuestionnaireQuery';
-import { orderBy } from 'lodash';
-import { useHistory, useParams } from 'react-router-dom';
-import { useMutation, useQuery } from '@apollo/react-hooks';
 import QuestionEntry from './QuestionEntry/QuestionEntry';
-import React, { useEffect, useState } from 'react';
 import updateTopicBuilder from '../../mutations/updateTopicBuilder';
 
-const TopicBuilder = () => {
-  const { customerId, topicId } = useParams();
+const DialogueBuilderView = () => {
+  const { customerId, dialougeId } = useParams();
   const history = useHistory();
   const { loading, data } = useQuery(getTopicBuilderQuery, {
-    variables: { topicId },
+    variables: { dialougeId },
   });
 
   const [updateTopic] = useMutation(updateTopicBuilder, {
     onCompleted: () => {
-      history.push(`/dashboard/c/${customerId}/t/${topicId}/`);
+      history.push(`/dashboard/c/${customerId}/t/${dialougeId}/`);
     },
     refetchQueries: [{
       query: getTopicBuilderQuery,
       variables: {
-        topicId,
+        dialougeId,
       },
     }],
     onError: (serverError: ApolloError) => {
@@ -72,7 +73,7 @@ const TopicBuilder = () => {
     return selectLeafs;
   };
 
-  const topicBuilderData = data?.dialogue;
+  const dialogeBuilderData = data?.dialogue;
   const selectLeafs = findLeafs(data?.dialogue?.leafs);
 
   const questionsData = mapQuestionsInputData(data?.dialogue?.questions);
@@ -84,6 +85,7 @@ const TopicBuilder = () => {
     if (!data) {
       return;
     }
+
     if (data?.dialogue) {
       const questionData = mapQuestionsInputData(data?.dialogue?.questions);
       setQuestions(questionData);
@@ -209,12 +211,12 @@ const TopicBuilder = () => {
       <H2 color="default.text" fontWeight={400} mb={4}>
         Topic builder
       </H2>
-      <TopicBuilderView>
-        {
-          (questions && questions.length === 0) && (
-            <Div alignSelf="center">No question available...</Div>
-          )
-        }
+
+      <DialogueBuilderContainer>
+        {(questions && questions.length === 0) && (
+          <Div alignSelf="center">No question available...</Div>
+        )}
+
         {rootQuestion && rootQuestion.map((question: QuestionEntryProps, index: number) => (
           <QuestionEntry
             activeExpanded={activeExpanded}
@@ -236,8 +238,8 @@ const TopicBuilder = () => {
             leafs={selectLeafs}
           />
         ))}
+      </DialogueBuilderContainer>
 
-      </TopicBuilderView>
       <Div display="flex" justifyContent="space-around">
         <Button
           brand="primary"
@@ -247,8 +249,8 @@ const TopicBuilder = () => {
           onClick={(e) => {
             e.preventDefault();
             updateTopic(
-              { variables: { id: topicBuilderData.id,
-                topicData: { id: topicBuilderData.id, questions } } },
+              { variables: { id: dialogeBuilderData.id,
+                topicData: { id: dialogeBuilderData.id, questions } } },
             );
           }}
         >
@@ -268,4 +270,4 @@ const TopicBuilder = () => {
   );
 };
 
-export default TopicBuilder;
+export default DialogueBuilderView;

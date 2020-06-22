@@ -8,7 +8,6 @@ import Modal from 'components/Modal';
 
 import NodeEntriesOverview from './NodeEntriesOverview/NodeEntriesOverview';
 import TimelineFeedOverview from './TimelineFeedOverview/TimelineFeedOverview';
-import TopicBuilder from './TopicBuilder/TopicBuilder';
 import TopicInfo from './TopicInfo/TopicInfo';
 import getQuestionnaireData from '../../queries/getQuestionnaireData';
 
@@ -87,62 +86,55 @@ const DialogueView = () => {
     <>
       <Div px="24px" margin="0 auto">
         <Div height="100vh" maxHeight="100vh" overflow="hidden">
-          <Switch>
-            <Route path="/dashboard/c/:customerId/t/:topicId/topic-builder/">
-              <TopicBuilder />
-            </Route>
-            <Route>
-              <Grid gridTemplateColumns="3fr 1fr">
-                <Div>
-                  <TopicInfo DialogueResultProps={resultData} customerId={customerId} topicId={topicId} />
-                  <Grid gridTemplateColumns="1fr 1fr" gridTemplateRows="1fr 100px 3fr">
-                    <Widget gridColumn="span 2">
-                      <H3>Filter</H3>
-                      <Div display="flex">
-                        <FilterButton isActive={activeFilter === 'Last 24h'} onClick={() => setActiveFilter('Last 24h')}>Last 24h</FilterButton>
-                        <FilterButton isActive={activeFilter === 'Last week'} onClick={() => setActiveFilter('Last week')}>Last week</FilterButton>
-                        <FilterButton isActive={activeFilter === 'Last month'} onClick={() => setActiveFilter('Last month')}>Last month</FilterButton>
-                        <FilterButton isActive={activeFilter === 'Last year'} onClick={() => setActiveFilter('Last year')}>Last year</FilterButton>
-                      </Div>
-                    </Widget>
-                    <StatisticWidget>
-                      <H3>Top positive results</H3>
-                      <ol>
-                        {
+          <Grid gridTemplateColumns="3fr 1fr">
+            <Div>
+              <TopicInfo DialogueResultProps={resultData} customerId={customerId} topicId={topicId} />
+              <Grid gridTemplateColumns="1fr 1fr" gridTemplateRows="1fr 100px 3fr">
+                <Widget gridColumn="span 2">
+                  <H3>Filter</H3>
+                  <Div display="flex">
+                    <FilterButton isActive={activeFilter === 'Last 24h'} onClick={() => setActiveFilter('Last 24h')}>Last 24h</FilterButton>
+                    <FilterButton isActive={activeFilter === 'Last week'} onClick={() => setActiveFilter('Last week')}>Last week</FilterButton>
+                    <FilterButton isActive={activeFilter === 'Last month'} onClick={() => setActiveFilter('Last month')}>Last month</FilterButton>
+                    <FilterButton isActive={activeFilter === 'Last year'} onClick={() => setActiveFilter('Last year')}>Last year</FilterButton>
+                  </Div>
+                </Widget>
+                <StatisticWidget>
+                  <H3>Top positive results</H3>
+                  <ol>
+                    {
                           resultData?.topPositivePath.map(({ answer, quantity }: { answer: string, quantity: number }) => <li key={`${answer}-${quantity}`}>{`${answer} (${quantity} answer(s))`}</li>
                           )
                         }
-                      </ol>
-                    </StatisticWidget>
+                  </ol>
+                </StatisticWidget>
 
-                    <StatisticWidget>
-                      <H3>Top negative results</H3>
-                      <ol>
-                        {
+                <StatisticWidget>
+                  <H3>Top negative results</H3>
+                  <ol>
+                    {
                           resultData?.topNegativePath.map(({ answer, quantity }: { answer: string, quantity: number }) => <li key={`${answer}-${quantity}`}>{`${answer} (${quantity} answer(s))`}</li>
                           )
                         }
-                      </ol>
-                    </StatisticWidget>
+                  </ol>
+                </StatisticWidget>
 
-                    <StatisticWidget gridColumn="span 2" height="300px" width="100%">
-                      {
+                <StatisticWidget gridColumn="span 2" height="300px" width="100%">
+                  {
                         lineQueryData && <MyResponsiveLine data={lineData} />
                       }
-                    </StatisticWidget>
+                </StatisticWidget>
 
-                  </Grid>
-                </Div>
-
-                <Div>
-                  <TimelineFeedOverview
-                    onActiveSessionChange={setActiveSession}
-                    timelineEntries={timelineEntries}
-                  />
-                </Div>
               </Grid>
-            </Route>
-          </Switch>
+            </Div>
+
+            <Div>
+              <TimelineFeedOverview
+                onActiveSessionChange={setActiveSession}
+                timelineEntries={timelineEntries}
+              />
+            </Div>
+          </Grid>
         </Div>
         {location?.state?.modal && (
           <Modal>

@@ -1,7 +1,7 @@
 /* eslint-disable import/prefer-default-export */
 import styled, { css } from 'styled-components/macro';
 
-export const TimelineEntriesContainer = styled.div`
+export const InteractionFeedEntriesContainer = styled.div`
   height: 80vh;
   display: flex;
   flex-direction: column;
@@ -9,7 +9,7 @@ export const TimelineEntriesContainer = styled.div`
   overflow-y: auto;
 `;
 
-export const TimelineFeedOverviewContainer = styled.div`
+export const InteractionFeedModuleContainer = styled.div`
   ${({ theme }) => css`
     display: flex;
     flex-direction: column;

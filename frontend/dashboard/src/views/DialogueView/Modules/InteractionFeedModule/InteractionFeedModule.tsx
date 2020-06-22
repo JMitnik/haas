@@ -3,8 +3,8 @@ import React, { Dispatch, SetStateAction } from 'react';
 
 import { Div, H2 } from '@haas/ui';
 
-import { TimelineEntriesContainer, TimelineFeedOverviewContainer } from './TimelineFeedOverviewStyles';
-import TimelineEntry from './TimelineEntry/TimelineEntry';
+import { InteractionFeedEntriesContainer, InteractionFeedModuleContainer } from './InteractionFeedModuleStyles';
+import InteractionFeedEntry from './InteractionFeedEntry';
 
 interface TimelineEntryProps {
   sessionId: string;
@@ -12,8 +12,9 @@ interface TimelineEntryProps {
   createdAt: string;
 }
 
-const TimelineFeedOverview = ({
-  onActiveSessionChange, timelineEntries,
+const InteractionFeedModule = ({
+  onActiveSessionChange,
+  timelineEntries,
 } : {
   onActiveSessionChange: Dispatch<SetStateAction<string>>,
   timelineEntries: Array<TimelineEntryProps>
@@ -28,27 +29,27 @@ const TimelineFeedOverview = ({
   };
 
   return (
-    <TimelineFeedOverviewContainer>
+    <InteractionFeedModuleContainer>
       <H2 color="primary" fontWeight={400}>
         Timeline feed
       </H2>
-      <TimelineEntriesContainer>
+
+      <InteractionFeedEntriesContainer>
         {timelineEntries?.length > 0 && timelineEntries?.map((timelineEntry, index) => (
-          <TimelineEntry
+          <InteractionFeedEntry
             viewTimeLine={viewTimeLine}
             onActiveSessionChange={onActiveSessionChange}
             key={index}
             timeLineEntry={timelineEntry}
           />
-        )
-        )}
-      </TimelineEntriesContainer>
+        ))}
+      </InteractionFeedEntriesContainer>
 
       {(timelineEntries?.length === 0 || (!timelineEntries)) && (
         <Div style={{ margin: '5px 20px' }}>No data available...</Div>
       )}
-    </TimelineFeedOverviewContainer>
+    </InteractionFeedModuleContainer>
   );
 };
 
-export default TimelineFeedOverview;
+export default InteractionFeedModule;
