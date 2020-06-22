@@ -43,7 +43,7 @@ class SessionResolver {
             if (recipient.phone) {
               const twilioPhoneNumber = '+3197010252775';
               const smsBody = `'${trigger.name}' was triggered by someone who entered the value '${value}'.`;
-              ctx.services.smsService.sendSMS(twilioPhoneNumber, recipient.phone, smsBody, false);
+              ctx.services.smsService.sendSMS(twilioPhoneNumber, recipient.phone, smsBody, true);
             }
           });
         }
