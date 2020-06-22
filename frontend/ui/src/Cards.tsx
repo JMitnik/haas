@@ -9,6 +9,11 @@ export const Card = styled(Div)`
     color: ${theme.colors.default.darkest};
     border: 1px solid #fcfcfc;
     cursor: pointer;
+
+    &:hover {
+      transition: all .3s cubic-bezier(.55,0,.1,1);
+      box-shadow: 0 1px 3px 1px rgba(0,0,0,0.05);
+    }
   `}
 `;
 

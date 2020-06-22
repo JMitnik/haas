@@ -1,31 +1,9 @@
 import React, { useRef, useState } from 'react';
-import styled, { css } from 'styled-components/macro';
 
 import { Div } from '@haas/ui';
 import useOnClickOutside from 'hooks/useClickOnOutside';
 
-const DropdownContainer = styled.div`
-  position: relative;
-  height: 100%;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
-
-const DropdownOverlayContainer = styled.div`
-  ${({ theme }) => css`
-    background: ${theme.colors.white};
-    border-radius: ${theme.borderRadiuses.subtleRounded};
-    position: absolute;
-    border: 1px solid ${theme.colors.default.normalAlt};
-    left: 0;
-    top: 100%;
-    /* padding: 8px 12px; */
-    box-shadow: 0px 3px 1px 1px rgba(0, 0, 0, 0.05);
-    z-index: ${theme.zIndices.dropdown};
-  `}
-`;
+import { DropdownContainer, DropdownOverlayContainer } from './DropdownStyles';
 
 interface DropdownProps {
   renderOverlay?: React.ReactNode;
