@@ -31,7 +31,7 @@ const CustomerOverview: FC = () => {
   return (
     <>
       <>
-        <PageHeading>Dialogues</PageHeading>
+        <PageHeading>Customers</PageHeading>
 
         <Grid
           gridGap={4}

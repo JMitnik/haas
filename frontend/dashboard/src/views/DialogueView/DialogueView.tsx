@@ -6,6 +6,7 @@ import styled, { css } from 'styled-components/macro';
 
 import Modal from 'components/Modal';
 
+import DialogueLayout from 'layouts/DialogueLayout';
 import DialogueInfo from './DialogueInfo';
 import InteractionFeedModule from './Modules/InteractionFeedModule/InteractionFeedModule';
 import NegativePathsModule from './Modules/NegativePathsModule/index.tsx';
@@ -41,7 +42,7 @@ const FilterButton = styled(Div)`
 `;
 
 const DialogueView = () => {
-  const { customerId, topicId } = useParams();
+  const { customerId, dialogueId } = useParams();
   const [activeSession, setActiveSession] = useState('');
   const location = useLocation<any>();
 
@@ -51,7 +52,7 @@ const DialogueView = () => {
   // TODO: Move this to page level
   const { loading, data } = useQuery(getQuestionnaireData, {
     variables: {
-      dialogueId: topicId,
+      dialogueId,
       filter: filterMap.get(activeFilter),
     },
     pollInterval: 5000,
@@ -73,12 +74,12 @@ const DialogueView = () => {
   ];
 
   return (
-    <>
+    <DialogueLayout dialogue={data?.getQuestionnaireData}>
       <Div px="24px" margin="0 auto">
         <Div height="100vh" maxHeight="100vh" overflow="hidden">
           <Grid gridTemplateColumns="3fr 1fr">
             <Div>
-              <DialogueInfo DialogueResultProps={resultData} customerId={customerId} topicId={topicId} />
+              <DialogueInfo DialogueResultProps={resultData} customerId={customerId} dialogueId={dialogueId} />
               <Grid gridTemplateColumns="1fr 1fr" gridTemplateRows="1fr 100px 3fr">
                 <Div gridColumn="span 2">
                   <H3>Filter</H3>
@@ -93,7 +94,10 @@ const DialogueView = () => {
                 <PositivePathsModule positivePaths={resultData?.topPositivePath} />
                 <NegativePathsModule negativePaths={resultData?.topNegativePath} />
                 <Div gridColumn="span 2">
-                  <ScoreGraphModule data={lineData} />
+                  {lineData && (
+                    <p>ss</p>
+                    // <ScoreGraphModule data={lineData} />
+                  )}
                 </Div>
               </Grid>
             </Div>
@@ -113,7 +117,7 @@ const DialogueView = () => {
           </Modal>
         )}
       </Div>
-    </>
+    </DialogueLayout>
   );
 };
 

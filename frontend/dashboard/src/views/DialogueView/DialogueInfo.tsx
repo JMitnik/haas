@@ -37,23 +37,11 @@ const StatisticWidget = styled(Div)`
 
 const DialogueInfo = ({
   DialogueResultProps,
-  customerId,
-  topicId,
-}: { DialogueResultProps: DialogueResultProps, customerId: string, topicId: string }) => {
+}: { DialogueResultProps: DialogueResultProps, customerId: string, dialogueId: string }) => {
   const history = useHistory();
 
   return (
     <TopicInfoView>
-      <Div display="flex">
-        <H2 color="#3e3d5a" fontWeight={400} mb={4}>
-          {DialogueResultProps?.title || 'Dialogue'}
-        </H2>
-
-        <EditDialogueContainer onClick={() => history.push(`/dashboard/c/${customerId}/t/${topicId}/topic-builder/`)}>
-          <Edit />
-        </EditDialogueContainer>
-      </Div>
-
       {DialogueResultProps && (
         <StatisticWidget>
           {DialogueResultProps?.average !== 'false' && (
