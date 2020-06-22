@@ -1,9 +1,13 @@
+
 import { Dialogue, PrismaClient } from '@prisma/client';
+import { extendType, inputObjectType, objectType } from '@nexus/schema';
+
 import { CustomerType } from '../customer/Customer';
 import { EdgeType } from '../edge/Edge';
 import { QuestionNodeType, QuestionNodeWhereInput } from '../question/QuestionNode';
+import { TagType, TagsInputType } from '../tag/Tag';
+
 import { UniqueDataResultEntry } from '../session/Session';
-import { extendType, inputObjectType, objectType } from '@nexus/schema';
 import DialogueResolver from './dialogue-resolver';
 
 export const DialogueType = objectType({
@@ -16,6 +20,25 @@ export const DialogueType = objectType({
     t.string('creationDate', { nullable: true });
     t.string('updatedAt', { nullable: true });
     t.string('averageScore', { nullable: true });
+    t.string('customerId');
+
+    t.list.field('tags', {
+      type: TagType,
+      nullable: true,
+      resolve(parent: Dialogue, args: any, ctx: any) {
+        const { prisma }: {prisma: PrismaClient} = ctx;
+        return prisma.tag.findMany({
+          where: {
+            isTagOf: {
+              every: {
+                id: parent.id,
+              },
+            },
+          },
+        });
+      },
+    });
+
     t.field('lineChartData', {
       nullable: true,
       type: 'String', // TODO: Change to appropriate return type
@@ -34,7 +57,6 @@ export const DialogueType = objectType({
         return customer;
       },
     });
-    t.string('customerId');
     t.field('rootQuestion', {
       type: QuestionNodeType,
       async resolve(parent: Dialogue, args: any, ctx: any, info: any) {
@@ -193,6 +215,7 @@ export const deleteDialogueOfCustomerMutation = extendType({
         description: 'String',
         publicTitle: 'String',
         isSeed: 'Boolean',
+        tags: TagsInputType,
       },
       resolve(parent: any, args: any, ctx: any, info: any) {
         return DialogueResolver.createDialogue(args);

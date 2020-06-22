@@ -1,6 +1,6 @@
 datasource postgresql {
   provider = "postgresql"
-  url      = env("DB_STRING")
+  url = "***"
 }
 
 // binaryTargets = ["debian-openssl-1.1.x"]
@@ -58,15 +58,13 @@ model Customer {
   roles       Role[]
   permissions Permission[]
   triggers    Trigger[]
-  tags        Tag[]
 }
 
 model Tag {
-  id         String     @default(cuid()) @id
+  id         String    @default(cuid()) @id
   name       String
-  isTagOf    Dialogue[] @relation(references: [id])
-  customer   Customer?  @relation(fields: [customerId], references: [id])
-  customerId String?
+  dialogue   Dialogue? @relation(fields: [dialogueId], references: [id])
+  dialogueId String?
 }
 
 model Dialogue {

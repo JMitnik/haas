@@ -406,7 +406,7 @@ class DialogueResolver {
   });
 
   static createDialogue = async (args: any): Promise<Dialogue> => {
-    const { customerId, title, description, publicTitle, isSeed } = args;
+    const { customerId, title, description, publicTitle, isSeed, tags } = args;
     let questionnaire = null;
     const customer = await prisma.customer.findOne({ where: { id: customerId } });
 

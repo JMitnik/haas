@@ -49,6 +49,7 @@ type Dialogue {
   publicTitle: String
   questions(where: QuestionNodeWhereInput): [QuestionNode!]!
   rootQuestion: QuestionNode!
+  tags: [TagType!]
   title: String!
   updatedAt: String
 }
@@ -156,10 +157,12 @@ type lineChartDataType {
 }
 
 type Mutation {
+  assignTags(dialogueId: String, tags: TagsInputObjectType): Dialogue!
   createCustomer(name: String, options: CustomerCreateOptions): Customer!
-  createDialogue(customerId: String, description: String, isSeed: Boolean, publicTitle: String, title: String): Dialogue!
+  createDialogue(customerId: String, description: String, isSeed: Boolean, publicTitle: String, tags: TagsInputObjectType, title: String): Dialogue!
   createPermission(data: PermissionInput): PermssionType!
   createRole(data: RoleInput): RoleType!
+  createTag(customerId: String, name: String): TagType!
   createTrigger(customerId: String, questionId: String, recipients: RecipientsInputType, trigger: TriggerInputType): TriggerType!
   createUser(id: String, input: UserInput): UserType!
   deleteCustomer(where: CustomerWhereUniqueInput): Customer!
@@ -234,6 +237,7 @@ type Query {
   roleTable(customerId: String, filter: FilterInput): RoleTableType!
   session(where: SessionWhereUniqueInput): Session!
   sessions(where: SessionWhereUniqueInput): [Session!]!
+  tags(customerId: String): [TagType!]!
   trigger(triggerId: String): TriggerType!
   triggers(customerId: String, dialogueId: String, filter: FilterInput, userId: String): [TriggerType!]!
   user(userId: String): UserType!
@@ -340,6 +344,16 @@ input SortFilterInputObject {
 type SortFilterObject {
   desc: Boolean!
   id: String!
+}
+
+input TagsInputObjectType {
+  entries: [String!]
+}
+
+type TagType {
+  customerId: String!
+  id: String!
+  name: String!
 }
 
 input TopicDataEntry {
