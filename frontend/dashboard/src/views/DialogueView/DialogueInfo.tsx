@@ -5,7 +5,7 @@ import styled from 'styled-components/macro';
 
 import { Div, EditDialogueContainer, H2 } from '@haas/ui';
 
-import { Score, TopicInfoView } from './TopicInfoStyles';
+import { Score, TopicInfoView } from './DialogueInfoStyles';
 
 interface TimelineEntryProps {
   sessionId: string;

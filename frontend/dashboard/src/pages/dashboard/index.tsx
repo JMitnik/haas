@@ -1,10 +1,10 @@
 import { Route, Switch } from 'react-router';
 
 import AddTopicView from 'views/AddTopicView';
-import CustomerBuilderView from 'views/CustomerBuilderView';
+import CustomerBuilderView from 'views/AddCustomerView/CustomerBuilderView';
 import CustomerOverview from 'views/CustomerOverview';
-import EditCustomerView from 'views/EditCustomerView';
-import EditTopicView from 'views/EditTopicView';
+import EditCustomerView from 'views/EditCustomerView/EditCustomerView';
+import EditTopicView from 'views/EditDialogueView/EditTopicView';
 import InteractionsOverview from 'views/InteractionsOverview/InteractionsOverview';
 import OrganisationSettingsView from 'views/OrganisationSettingsView';
 import React from 'react';

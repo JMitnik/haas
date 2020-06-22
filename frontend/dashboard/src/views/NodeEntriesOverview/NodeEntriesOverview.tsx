@@ -5,7 +5,7 @@ import { Div, H2, Loader } from '@haas/ui';
 
 import { NodeEntriesOverviewContainer, NodeEntryContainer } from './NodeEntriesOverviewStyles';
 import { NodeEntryProps } from './NodeEntriesOverviewInterfaces';
-import getSessionAnswerFlow from '../../../queries/getSessionAnswerFlow';
+import getSessionAnswerFlow from '../../queries/getSessionAnswerFlow';
 
 const NodeEntriesOverview = ({ sessionId }: { sessionId: string }) => {
   const { loading, data } = useQuery(getSessionAnswerFlow, {

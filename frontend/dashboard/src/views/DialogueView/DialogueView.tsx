@@ -1,15 +1,16 @@
 import { Div, Grid, H3, Loader } from '@haas/ui';
-import { ResponsiveLine } from '@nivo/line';
 import { Route, Switch, useLocation, useParams } from 'react-router-dom';
 import { useQuery } from '@apollo/react-hooks';
-import Modal from 'components/Modal';
-import NodeEntriesOverview from './NodeEntriesOverview/NodeEntriesOverview';
 import React, { useState } from 'react';
+import styled, { css } from 'styled-components/macro';
+
+import Modal from 'components/Modal';
+
+import NodeEntriesOverview from './NodeEntriesOverview/NodeEntriesOverview';
 import TimelineFeedOverview from './TimelineFeedOverview/TimelineFeedOverview';
 import TopicBuilder from './TopicBuilder/TopicBuilder';
 import TopicInfo from './TopicInfo/TopicInfo';
 import getQuestionnaireData from '../../queries/getQuestionnaireData';
-import styled, { css } from 'styled-components/macro';
 
 const filterMap = new Map([
   ['Last 24h', 1],
@@ -18,88 +19,23 @@ const filterMap = new Map([
   ['Last year', 365],
 ]);
 
-const MyResponsiveLine = ({ data }: { data: any }) => (
-  <ResponsiveLine
-    data={data}
-    margin={{ top: 50, right: 150, bottom: 100, left: 60 }}
-    xScale={{ type: 'point' }}
-    yScale={{
-      type: 'linear', min: 'auto', max: 'auto', stacked: true, reverse: false,
-    }}
-    axisTop={null}
-    axisRight={null}
-    axisBottom={null
-      // {
-      //   orient: 'bottom',
-      //   tickSize: 5,
-      //   tickPadding: 5,
-      //   tickRotation: 45,
-      //   // legend: 'transportation',
-      //   legendOffset: 36,
-      //   legendPosition: 'middle',
-      // }
-    }
-    axisLeft={{
-      orient: 'left',
-      tickSize: 5,
-      tickPadding: 5,
-      tickRotation: 0,
-      legend: 'dialogue score',
-      legendOffset: -40,
-      legendPosition: 'middle',
-    }}
-    colors={{ scheme: 'nivo' }}
-    pointSize={10}
-    pointColor={{ theme: 'background' }}
-    pointBorderWidth={2}
-    pointBorderColor={{ from: 'serieColor' }}
-    pointLabel="y"
-    pointLabelYOffset={-12}
-    useMesh
-    legends={[
-      {
-        anchor: 'bottom-right',
-        direction: 'column',
-        justify: false,
-        translateX: 100,
-        translateY: 0,
-        itemsSpacing: 0,
-        itemDirection: 'left-to-right',
-        itemWidth: 80,
-        itemHeight: 20,
-        itemOpacity: 0.75,
-        symbolSize: 12,
-        symbolShape: 'circle',
-        symbolBorderColor: 'rgba(0, 0, 0, .5)',
-        effects: [
-          {
-            on: 'hover',
-            style: {
-              itemBackground: 'rgba(0, 0, 0, .03)',
-              itemOpacity: 1,
-            },
-          },
-        ],
-      },
-    ]}
-  />
-);
-
 const FilterButton = styled(Div)`
   ${({ theme, isActive }: { theme: any, isActive: boolean }) => css`
+    border-radius: 12px;
+    padding: 10px;
+    margin: 5px;
+    cursor: pointer;
 
-  ${isActive && css`
+    ${isActive && css`
       background: ${theme.colors.primary};
     `}
-  ${!isActive && css`&:hover {
+
+    ${!isActive && css`
+      &:hover {
         background: ${theme.colors.default.normal};
-      }`
-}
+      }
+    `}
   `}
-  border-radius: 12px;
-  padding: 10px;
-  margin: 5px;
-  cursor: pointer;
 `;
 
 const Widget = styled(Div)`
@@ -115,11 +51,15 @@ const StatisticWidget = styled(Widget)`
   }
 `;
 
-const TopicDetail = () => {
+const DialogueView = () => {
   const { customerId, topicId } = useParams();
   const [activeSession, setActiveSession] = useState('');
   const location = useLocation<any>();
-  const [activeFilter, setActiveFilter] = useState('Last 24h'); // FIXME: If this is started with anything else start result is undefined :S
+
+  // FIXME: If this is started with anything else start result is undefined :S
+  const [activeFilter, setActiveFilter] = useState('Last 24h');
+
+  // TODO: Move this to page level
   const { loading, data } = useQuery(getQuestionnaireData, {
     variables: {
       dialogueId: topicId,
@@ -214,4 +154,4 @@ const TopicDetail = () => {
   );
 };
 
-export default TopicDetail;
+export default DialogueView;

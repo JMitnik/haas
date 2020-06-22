@@ -1,16 +1,16 @@
 import React from 'react';
 
 import { ApolloError } from 'apollo-boost';
-import styled, { css } from 'styled-components/macro';
+import { Button, Container, Div, Flex, Grid, H2, H3,
+  Hr, Muted, StyledInput, StyledLabel, StyledTextInput } from '@haas/ui';
 import { useForm } from 'react-hook-form';
-import { useMutation, useQuery } from '@apollo/react-hooks';
 import { useHistory, useParams } from 'react-router';
-import { Container, Flex, Grid, H2, H3, Muted, Button,
-  Div, StyledInput, StyledTextInput, StyledLabel, Hr } from '@haas/ui';
-import getQuestionnairesCustomerQuery from '../queries/getQuestionnairesCustomerQuery';
+import { useMutation, useQuery } from '@apollo/react-hooks';
+import getQuestionnairesCustomerQuery from '../../queries/getQuestionnairesCustomerQuery';
+import styled, { css } from 'styled-components/macro';
 
-import getEditDialogueQuery from '../queries/getEditDialogue';
-import editDialogueMutation from '../mutations/editDialogue';
+import editDialogueMutation from '../../mutations/editDialogue';
+import getEditDialogueQuery from '../../queries/getEditDialogue';
 
 interface FormDataProps {
   title: string;
@@ -27,7 +27,7 @@ const EditTopicView = () => {
     variables: {
       id: topicId,
     },
-  })
+  });
 
   const [editDialogue, { loading }] = useMutation(editDialogueMutation, {
     onCompleted: () => {
@@ -41,8 +41,6 @@ const EditTopicView = () => {
       console.log(serverError);
     },
   });
-
-  
 
   if (editDialogueData.loading) return null;
 

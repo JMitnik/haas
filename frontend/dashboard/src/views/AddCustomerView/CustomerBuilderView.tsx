@@ -1,73 +1,39 @@
-import { ApolloError } from 'apollo-boost';
-import { useForm } from 'react-hook-form';
-import { useHistory, useParams } from 'react-router';
-import { useMutation, useQuery } from '@apollo/react-hooks';
 import React, { useState } from 'react';
 
+import { ApolloError } from 'apollo-boost';
 import {
   Button, Container, Div, Flex, Form, FormGroupContainer, Grid,
   H2, H3, Hr, Muted, StyledInput, StyledLabel,
 } from '@haas/ui';
+import { useForm } from 'react-hook-form';
+import { useHistory } from 'react-router';
+import { useMutation } from '@apollo/react-hooks';
 
-import { getCustomerQuery } from '../queries/getCustomersQuery';
-import editCustomerMutation from '../mutations/editCustomer';
-import getEditCustomerData from '../queries/getEditCustomer';
-import uploadSingleImage from '../mutations/uploadSingleImage';
+import { createNewCustomer } from '../../mutations/createNewCustomer';
+import { getCustomerQuery } from '../../queries/getCustomersQuery';
+import uploadSingleImage from '../../mutations/uploadSingleImage';
 
 interface FormDataProps {
   name: string;
-  logo: string;
   slug: string;
+  logo?: string;
+  cloudinary?: File;
   primaryColour?: string;
-  cloudinary?: string;
+  seed?: boolean;
 }
 
-const EditCustomerView = () => {
-  const { customerId } = useParams();
-
-  const { data: customerData, error, loading } = useQuery(getEditCustomerData, {
-    variables: {
-      id: customerId,
-    },
-  });
-
-  if (loading) return null;
-  if (error) return <><p>{error.message}</p></>;
-
-  const customer = customerData?.customer;
-
-  return <EditCustomerForm customer={customer} />;
-};
-
-const EditCustomerForm = ({ customer }: { customer: any }) => {
+const CustomerBuilderView = () => {
   const history = useHistory();
-
-  const [activePreviewUrl, setActivePreviewUrl] = useState<null | string>(null);
-
-  const { register, handleSubmit, errors } = useForm<FormDataProps>({
-    defaultValues: {
-      name: customer.name,
-      logo: customer.settings?.logoUrl,
-      primaryColour: customer.settings?.colourSettings?.primary,
-      slug: customer.slug,
-    },
-  });
+  const { register, handleSubmit, errors } = useForm<FormDataProps>();
+  const [activePreview, setActivePreview] = useState('');
 
   const [uploadFile] = useMutation(uploadSingleImage, {
     onCompleted: (result) => {
-      setActivePreviewUrl(result.singleUpload.url);
+      setActivePreview(result.singleUpload.url);
     },
   });
 
-  const onLogoUploadChange = (event: any) => {
-    const image: File = event.target.files[0];
-
-    if (image) {
-      uploadFile({ variables: { file: image } });
-    }
-  };
-
-  const [editCustomer, { loading }] = useMutation(editCustomerMutation, {
+  const [addCustomer, { loading }] = useMutation(createNewCustomer, {
     onCompleted: () => {
       history.push('/');
     },
@@ -77,17 +43,24 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
     },
   });
 
+  const onChange = (event: any) => {
+    const image: File = event.target.files[0];
+    if (image) {
+      uploadFile({ variables: { file: image } });
+    }
+  };
+
   const onSubmit = (formData: FormDataProps) => {
     const optionInput = {
-      logo: activePreviewUrl || formData.logo,
+      logo: activePreview || formData.logo,
       slug: formData.slug,
+      isSeed: formData.seed,
       primaryColour: formData.primaryColour,
-      name: formData.name,
     };
-
-    editCustomer({
+    // TODO: Make better typescript supported
+    addCustomer({
       variables: {
-        id: customer?.id,
+        name: formData.name,
         options: optionInput,
       },
     });
@@ -97,7 +70,7 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
     <Container>
       <Div>
         <H2 color="default.darkest" fontWeight={500} py={2}> Customer </H2>
-        <Muted pb={4}>Edit a new customer</Muted>
+        <Muted pb={4}>Create a new customer</Muted>
       </Div>
 
       <Hr />
@@ -120,7 +93,7 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
                 </Flex>
                 <Div useFlex flexDirection="column">
                   <StyledLabel>Logo</StyledLabel>
-                  <StyledInput name="logo" ref={register({ required: true })} />
+                  <StyledInput name="logo" ref={register({ required: false })} />
                   {errors.name && <Muted color="warning">Something went wrong!</Muted>}
                 </Div>
                 <Div useFlex flexDirection="column">
@@ -135,31 +108,26 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
                 </Div>
                 <Div useFlex flexDirection="column">
                   <StyledLabel>Logo (Cloudinary)</StyledLabel>
-                  <StyledInput
-                    type="file"
-                    name="cloudinary"
-                    onChange={onLogoUploadChange}
-                    ref={register({ required: false })}
-                  />
+                  <StyledInput type="file" name="cloudinary" onChange={onChange} ref={register({ required: false })} />
                   {errors.name && <Muted color="warning">Something went wrong!</Muted>}
+
                 </Div>
                 <Div useFlex flexDirection="column">
                   <StyledLabel>Preview</StyledLabel>
                   <Div width={200} height={200} style={{ border: '1px solid lightgrey', borderRadius: '8px' }}>
-                    {(!activePreviewUrl && customer?.settings?.logoUrl) && (
-                      <img
-                        src={customer?.settings?.logoUrl}
-                        height={200}
-                        width={200}
-                        alt=""
-                        style={{ objectFit: 'contain' }}
-                      />
-                    )}
-
-                    {activePreviewUrl && <img alt="" src={activePreviewUrl} height={200} width={200} />}
+                    {activePreview && <img src={activePreview} height={200} width={200} alt="" />}
                   </Div>
                 </Div>
               </Grid>
+              <Div py={4}>
+                <StyledInput
+                  type="checkbox"
+                  id="seed"
+                  name="seed"
+                  ref={register({ required: false })}
+                />
+                <label htmlFor="seed">Generate template topic for customer </label>
+              </Div>
             </Div>
           </Grid>
         </FormGroupContainer>
@@ -168,7 +136,7 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
           {loading && (<Muted>Loading...</Muted>)}
 
           <Flex>
-            <Button brand="primary" mr={2} type="submit">Save customer</Button>
+            <Button brand="primary" mr={2} type="submit">Create topic</Button>
             <Button brand="default" type="button" onClick={() => history.push('/')}>Cancel</Button>
           </Flex>
         </Div>
@@ -177,4 +145,4 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
   );
 };
 
-export default EditCustomerView;
+export default CustomerBuilderView;

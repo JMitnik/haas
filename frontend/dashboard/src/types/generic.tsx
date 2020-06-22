@@ -26,3 +26,9 @@ export interface UserProps {
   lastName: string;
   business: BusinessProps;
 }
+
+export interface DialogueProps {
+  id: string;
+  title: string;
+  publicTitle: string;
+}

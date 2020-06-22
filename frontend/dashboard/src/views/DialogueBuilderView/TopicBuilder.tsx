@@ -1,17 +1,17 @@
-import React, { useState, useEffect } from 'react';
 import { ApolloError } from 'apollo-boost';
-import { useQuery, useMutation } from '@apollo/react-hooks';
-import { H2, Loader, Div, Button } from '@haas/ui';
-import { useParams, useHistory } from 'react-router-dom';
-import { orderBy } from 'lodash';
-import updateTopicBuilder from '../../../mutations/updateTopicBuilder';
-import { getTopicBuilderQuery } from '../../../queries/getQuestionnaireQuery';
-import QuestionEntry from './QuestionEntry/QuestionEntry';
-import { TopicBuilderView } from './TopicBuilderStyles';
+import { Button, Div, H2, Loader } from '@haas/ui';
 import {
-  QuestionEntryProps, EdgeChildProps,
+  EdgeChildProps, QuestionEntryProps,
   QuestionOptionProps,
 } from './TopicBuilderInterfaces';
+import { TopicBuilderView } from './TopicBuilderStyles';
+import { getTopicBuilderQuery } from '../../queries/getQuestionnaireQuery';
+import { orderBy } from 'lodash';
+import { useHistory, useParams } from 'react-router-dom';
+import { useMutation, useQuery } from '@apollo/react-hooks';
+import QuestionEntry from './QuestionEntry/QuestionEntry';
+import React, { useEffect, useState } from 'react';
+import updateTopicBuilder from '../../mutations/updateTopicBuilder';
 
 const TopicBuilder = () => {
   const { customerId, topicId } = useParams();
@@ -88,7 +88,7 @@ const TopicBuilder = () => {
       const questionData = mapQuestionsInputData(data?.dialogue?.questions);
       setQuestions(questionData);
       const rootQuestion = questionData && questionData.filter((question) => question.isRoot);
-      setActiveExpanded(rootQuestion.map((question) => question.id))
+      setActiveExpanded(rootQuestion.map((question) => question.id));
     }
   }, [data]);
 
@@ -104,16 +104,14 @@ const TopicBuilder = () => {
       const collapseIndex: number = prevExpanded.indexOf(questionId);
       prevExpanded.splice(collapseIndex, 1);
       return [...prevExpanded];
-
     }
     return [questionId, ...prevExpanded];
-  }
-  )
+  });
 
   const handleTitleChange = (title: string, questionId: string) => {
     setQuestions((questionsPrev: any) => {
-      const questionIds = questions.map((question) => question.id)
-      const questionIndex = questionIds.indexOf(questionId)
+      const questionIds = questions.map((question) => question.id);
+      const questionIndex = questionIds.indexOf(questionId);
       questionsPrev[questionIndex].title = title;
       return [...questionsPrev];
     });
@@ -121,8 +119,8 @@ const TopicBuilder = () => {
 
   const handleIsRootQuestionChange = (isRoot: boolean, questionId: string) => {
     setQuestions((questionsPrev: any) => {
-      const questionIds = questions.map((question) => question.id)
-      const questionIndex = questionIds.indexOf(questionId)
+      const questionIds = questions.map((question) => question.id);
+      const questionIndex = questionIds.indexOf(questionId);
       questionsPrev[questionIndex].isRoot = isRoot;
       return [...questionsPrev];
     });
@@ -130,8 +128,8 @@ const TopicBuilder = () => {
 
   const handleLeafNodeChange = (leaf: any, questionId: string) => {
     setQuestions((questionsPrev: any) => {
-      const questionIds = questions.map((question) => question.id)
-      const questionIndex = questionIds.indexOf(questionId)
+      const questionIds = questions.map((question) => question.id);
+      const questionIndex = questionIds.indexOf(questionId);
       const question = questionsPrev[questionIndex];
       if (question.overrideLeaf?.id) {
         if (leaf?.id === 'None') {
@@ -146,8 +144,8 @@ const TopicBuilder = () => {
 
   const handleQuestionTypeChange = (value: string, questionId: string) => {
     setQuestions((questionsPrev: any) => {
-      const questionIds = questions.map((question) => question.id)
-      const questionIndex = questionIds.indexOf(questionId)
+      const questionIds = questions.map((question) => question.id);
+      const questionIndex = questionIds.indexOf(questionId);
       questionsPrev[questionIndex].type = value;
       return [...questionsPrev];
     });
@@ -155,19 +153,19 @@ const TopicBuilder = () => {
 
   const handleAddQuestionOption = (value: Array<any>, questionId: string) => {
     setQuestions((questionsPrev: any) => {
-      const questionIds = questions.map((question) => question.id)
-      const questionIndex = questionIds.indexOf(questionId)
+      const questionIds = questions.map((question) => question.id);
+      const questionIndex = questionIds.indexOf(questionId);
       questionsPrev[questionIndex].options = value;
       return [...questionsPrev];
     });
   };
 
   const handleQuestionOptionsChange = (
-    questionOptions: Array<QuestionOptionProps>, questionId: string
+    questionOptions: Array<QuestionOptionProps>, questionId: string,
   ) => {
     setQuestions((questionsPrev: any) => {
-      const questionIds = questions.map((question) => question.id)
-      const questionIndex = questionIds.indexOf(questionId)
+      const questionIds = questions.map((question) => question.id);
+      const questionIndex = questionIds.indexOf(questionId);
       questionsPrev[questionIndex].options = questionOptions;
       return [...questionsPrev];
     });
@@ -175,8 +173,8 @@ const TopicBuilder = () => {
 
   const handleEdgesChange = (children: Array<EdgeChildProps>, questionId: string) => {
     setQuestions((questionsPrev: any) => {
-      const questionIds = questions.map((question) => question.id)
-      const questionIndex = questionIds.indexOf(questionId)
+      const questionIds = questions.map((question) => question.id);
+      const questionIndex = questionIds.indexOf(questionId);
       questionsPrev[questionIndex].children = children;
       return [...questionsPrev];
     });
@@ -200,12 +198,11 @@ const TopicBuilder = () => {
     event.preventDefault();
     setQuestions((questionsPrev: any) => {
       const questionIds = questions.map((question) => question.id);
-      const questionIndex = questionIds.indexOf(questionId)
+      const questionIndex = questionIds.indexOf(questionId);
       questionsPrev.splice(questionIndex, 1);
-      return [...questionsPrev]
-    })
-  }
-
+      return [...questionsPrev];
+    });
+  };
 
   return (
     <Div>
@@ -241,8 +238,8 @@ const TopicBuilder = () => {
         ))}
 
       </TopicBuilderView>
-      <Div display='flex' justifyContent='space-around'>
-      <Button
+      <Div display="flex" justifyContent="space-around">
+        <Button
           brand="primary"
           mt={2}
           ml={4}
@@ -257,7 +254,7 @@ const TopicBuilder = () => {
         >
           Save topic
         </Button>
-      <Button
+        <Button
           brand="default"
           mt={2}
           ml={4}
