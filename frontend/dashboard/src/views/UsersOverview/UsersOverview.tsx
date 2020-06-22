@@ -79,7 +79,7 @@ const UsersOverview = () => {
           limit: paginationProps.pageSize,
           pageIndex: paginationProps.pageIndex,
           orderBy: paginationProps.sortBy,
-        } } }], // TODO: Add filter object
+        } } }],
     onError: (serverError: ApolloError) => {
       console.log(serverError);
     },
@@ -94,13 +94,13 @@ const UsersOverview = () => {
   };
 
   const handleEditUser = (event: any, userId: string) => {
-    history.push(`/dashboard/c/${customerId}/u/${userId}/edit`);
     event.stopPropagation();
+    history.push(`/dashboard/c/${customerId}/u/${userId}/edit`);
   };
 
   const handleAddUser = (event: any) => {
-    history.push(`/dashboard/c/${customerId}/users/add/`);
     event.stopPropagation();
+    history.push(`/dashboard/c/${customerId}/users/add/`);
   };
 
   const handleSearchTermChange = useCallback(debounce((newSearchTerm: string) => {

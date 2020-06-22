@@ -1,4 +1,9 @@
-import { PrismaClient, TriggerCondition, TriggerUpdateArgs, TriggerUpdateInput, User, UserUpdateManyWithoutTriggersInput, UserWhereUniqueInput } from '@prisma/client';
+import { PrismaClient,
+  TriggerCondition,
+  TriggerUpdateInput,
+  User,
+  UserUpdateManyWithoutTriggersInput,
+  UserWhereUniqueInput } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -42,17 +47,22 @@ class TriggerResolver {
         break;
       case 'TEXT_MATCH':
         conditionMatched = (answer?.textValue && triggerCondition.textValue)
-          ? { isMatch: answer.textValue.toLowerCase() === triggerCondition.textValue.toLowerCase(), value: answer.textValue }
+          ? { isMatch: answer.textValue.toLowerCase() === triggerCondition.textValue.toLowerCase(),
+            value: answer.textValue }
           : { isMatch: false };
         break;
       case 'OUTER_RANGE':
         conditionMatched = (answer?.numberValue && triggerCondition.minValue && triggerCondition.maxValue)
-          ? { isMatch: answer.numberValue > triggerCondition.maxValue || answer.numberValue < triggerCondition.minValue, value: answer.numberValue }
+          ? { isMatch: answer.numberValue > triggerCondition.maxValue
+            || answer.numberValue < triggerCondition.minValue,
+          value: answer.numberValue }
           : { isMatch: false };
         break;
       case 'INNER_RANGE':
         conditionMatched = (answer?.numberValue && triggerCondition.minValue && triggerCondition.maxValue)
-          ? { isMatch: (answer.numberValue < triggerCondition.maxValue && answer.numberValue > triggerCondition.minValue), value: answer.numberValue }
+          ? { isMatch: (answer.numberValue < triggerCondition.maxValue
+            && answer.numberValue > triggerCondition.minValue),
+          value: answer.numberValue }
           : { isMatch: false };
         break;
       default:
@@ -74,7 +84,11 @@ class TriggerResolver {
     return updateTriggerArgs;
   };
 
-  static updateConditions = async (dbTriggerConditions: Array<TriggerCondition>, newConditions: Array<TriggerCondition>, triggerId: string) => {
+  static updateConditions = async (
+    dbTriggerConditions: Array<TriggerCondition>,
+    newConditions: Array<TriggerCondition>,
+    triggerId: string,
+  ) => {
     const upsertedConditionsIds = await Promise.all(newConditions.map(async (condition) => {
       const upsertTriggerCondition = await prisma.triggerCondition.upsert({
         where: { id: condition.id || -1 },
@@ -131,12 +145,6 @@ class TriggerResolver {
     }
     updateTriggerArgs.recipients = recipientUpdateArgs;
     return updateTriggerArgs;
-    // await prisma.trigger.update({
-    //   where: {
-    //     id: triggerId,
-    //   },
-    //   data: recipientUpdateArgs,
-    // });
   };
 }
 

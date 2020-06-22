@@ -47,9 +47,6 @@ const RolesTableRow = ({ headers, data, index, permissions }: TableRowProps) => 
                     <input
                       type="checkbox"
                       disabled
-                      onClick={(event) => {
-                        event.stopPropagation();
-                      }}
                       defaultChecked={activePermissionIds.includes(permission.id)}
                     />
                     <Span color="#999999" marginLeft="5px">{permission.name}</Span>

@@ -35,7 +35,9 @@ class RoleResolver {
     // Slice ordered filtered users
     const slicedOrderedUsers = RoleResolver.sliceRoles(roles, offset, limit, pageIndex);
 
-    const rolesWithNrPermisisons = slicedOrderedUsers.map((role) => ({ ...role, amtPermissions: role.permissions.length }));
+    const rolesWithNrPermisisons = slicedOrderedUsers.map(
+      (role) => ({ ...role, amtPermissions: role.permissions.length }),
+    );
     return { roles: rolesWithNrPermisisons, newPageIndex: needPageReset ? 0 : pageIndex, totalPages };
   };
 
@@ -46,7 +48,9 @@ class RoleResolver {
         permissions: true,
       },
     });
-    const rolesWithNrPermisisons = roles.map((role) => ({ ...role, amtPermissions: role.permissions.length }));
+    const rolesWithNrPermisisons = roles.map(
+      (role) => ({ ...role, amtPermissions: role.permissions.length }),
+    );
     return rolesWithNrPermisisons;
   };
 

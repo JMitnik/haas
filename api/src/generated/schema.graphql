@@ -237,7 +237,7 @@ type Query {
   trigger(triggerId: String): TriggerType!
   triggers(customerId: String, dialogueId: String, filter: FilterInput, userId: String): [TriggerType!]!
   user(userId: String): UserType!
-  users(customerId: String, filter: FilterInput): [UserType!]!
+  users(customerId: String): [UserType!]!
   userTable(customerId: String, filter: FilterInput): UserTable!
 }
 

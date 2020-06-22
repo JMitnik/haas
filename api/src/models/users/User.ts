@@ -1,6 +1,5 @@
 import { PrismaClient, User } from '@prisma/client';
 import { extendType, inputObjectType, objectType } from '@nexus/schema';
-import _ from 'lodash';
 
 import { FilterInput } from '../session/Session';
 import { PaginationProps } from '../../types/generic';
@@ -71,13 +70,8 @@ export const UserQueries = extendType({
     });
     t.list.field('users', {
       type: UserType,
-      args: { customerId: 'String',
-        filter: FilterInput },
+      args: { customerId: 'String' },
       resolve(parent: any, args: any, ctx: any) {
-        // const { pageIndex, offset, limit, searchTerm, orderBy }: PaginationProps = args.filter;
-        // if (args.filter) {
-        //   return UserResolver.paginatedUsers(args.customerId, pageIndex, offset, limit, orderBy[0], searchTerm);
-        // }
         return prisma.user.findMany({ where: { customerId: args.customerId } });
       },
     });
@@ -99,7 +93,7 @@ export const UserMutations = extendType({
       args: { id: 'String',
         input: UserInput },
       resolve(parent: any, args: any, ctx: any) {
-        const { firstName, lastName, email, password, phone, roleId, customerId } = args.input;
+        const { firstName, lastName, email, phone, roleId } = args.input;
         return prisma.user.create({
           data: {
             email,
@@ -123,8 +117,8 @@ export const UserMutations = extendType({
     t.field('editUser', {
       type: UserType,
       args: { id: 'String', input: UserInput },
-      resolve(parent: any, args: any, ctx) {
-        const { firstName, lastName, email, password, phone, roleId, customerId } = args.input;
+      resolve(parent: any, args: any, ctx: any) {
+        const { firstName, lastName, email, phone, roleId } = args.input;
         return prisma.user.update({
           where: {
             id: args.id,

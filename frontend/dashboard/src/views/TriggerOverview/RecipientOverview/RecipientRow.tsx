@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Div, Flex } from '@haas/ui';
+import { Div } from '@haas/ui';
 import { RecipientProps } from 'components/Table/TableTypes';
 
 const RecipientRow = ({ recipient } : { recipient: RecipientProps}) => (

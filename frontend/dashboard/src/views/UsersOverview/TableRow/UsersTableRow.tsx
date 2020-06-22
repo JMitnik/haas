@@ -13,7 +13,7 @@ const UsersTableRow = ({ headers, data, index, onDeleteEntry, onEditEntry }: Use
 
   return (
     <Grid
-      style={{ position: 'relative' }}
+      position="relative"
       gridRowGap={0}
       gridColumnGap={5}
       gridTemplateColumns={templateColumns}

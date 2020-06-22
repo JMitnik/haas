@@ -3,6 +3,7 @@ import {
   NodeEntryCreateWithoutSessionInput, PrismaClient, Session, SessionWhereInput,
 } from '@prisma/client';
 import { isAfter, subSeconds } from 'date-fns';
+
 import TriggerResolver from '../trigger/trigger-resolver';
 import cleanInt from '../../utils/cleanInt';
 
@@ -35,7 +36,7 @@ class SessionResolver {
       if (safeToSend) {
         // TODO: Do we have to await this function? can just let it run on the side
         await prisma.trigger.update(({ where: { id: trigger.id }, data: { lastSent: currentDate } }));
-        const { nodeId, data } = entries.find((entry: any) => entry.nodeId === trigger.relatedNodeId);
+        const { data } = entries.find((entry: any) => entry.nodeId === trigger.relatedNodeId);
         const condition = trigger.conditions[0];
         const { isMatch, value } = TriggerResolver.match(condition, data);
         if (isMatch) {

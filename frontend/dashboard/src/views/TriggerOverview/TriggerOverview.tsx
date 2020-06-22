@@ -14,7 +14,6 @@ import getTriggersQuery from 'queries/getTriggers';
 
 import { InputContainer, InputOutputContainer } from './TriggerOverviewStyles';
 import Row from './TableRow/TriggerOverviewRow';
-import deleteUserQuery from '../../mutations/deleteUser';
 
 interface TableProps {
   activeStartDate: Date | null;
@@ -37,7 +36,7 @@ const HEADERS = [
 const UsersOverview = () => {
   const { customerId } = useParams();
   const history = useHistory();
-  const [fetchTriggers, { loading, data }] = useLazyQuery(getTriggersQuery, { fetchPolicy: 'cache-and-network' });
+  const [fetchTriggers, { data }] = useLazyQuery(getTriggersQuery, { fetchPolicy: 'cache-and-network' });
   const [paginationProps, setPaginationProps] = useState<TableProps>(
     {
       activeStartDate: null,
@@ -79,7 +78,7 @@ const UsersOverview = () => {
           limit: paginationProps.pageSize,
           pageIndex: paginationProps.pageIndex,
           orderBy: paginationProps.sortBy,
-        } } }], // TODO: Add filter object
+        } } }],
     onError: (serverError: ApolloError) => {
       console.log(serverError);
     },

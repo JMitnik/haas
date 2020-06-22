@@ -1,5 +1,9 @@
-import { PrismaClient, Trigger, TriggerConditionCreateInput, TriggerCreateInput, TriggerUpdateInput } from '@prisma/client';
-import { arg, enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
+import { PrismaClient,
+  Trigger,
+  TriggerConditionCreateInput,
+  TriggerCreateInput,
+  TriggerUpdateInput } from '@prisma/client';
+import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
 import _ from 'lodash';
 
 import { FilterInput } from '../session/Session';
@@ -147,9 +151,13 @@ const TriggerMutations = extendType({
           },
         });
         let updateTriggerArgs: TriggerUpdateInput = { name, type, medium };
-        updateTriggerArgs = TriggerResolver.updateRelatedQuestion(dbTrigger?.relatedNodeId, args.questionId, updateTriggerArgs);
+        updateTriggerArgs = TriggerResolver.updateRelatedQuestion(
+          dbTrigger?.relatedNodeId, args.questionId, updateTriggerArgs,
+        );
         if (dbTrigger?.recipients) {
-          updateTriggerArgs = TriggerResolver.updateRecipients(dbTrigger.recipients, args.recipients.ids, updateTriggerArgs);
+          updateTriggerArgs = TriggerResolver.updateRecipients(
+            dbTrigger.recipients, args.recipients.ids, updateTriggerArgs,
+          );
         }
 
         if (dbTrigger?.conditions) {
@@ -177,7 +185,6 @@ const TriggerMutations = extendType({
         const createArgs : TriggerCreateInput = { name, type, medium };
         const triggerConditions: TriggerConditionCreateInput[] = [];
 
-        // TODO: Add the following code to trigger seed (if it will be added)
         if (args.customerId) {
           createArgs.customer = { connect: { id: args.customerId } };
         }

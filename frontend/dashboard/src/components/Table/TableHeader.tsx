@@ -60,7 +60,7 @@ const TableHeader = ({ sortProperties, headers, onPaginationChange, onAddEntry }
       gridColumnGap={5}
       gridTemplateColumns={templateColumns}
     >
-      { headers && headers.map((header, index) => (
+      {headers && headers.map((header, index) => (
         <TableHeaderColumn
           sortProperties={sortProperties}
           onPaginationChange={onPaginationChange}
@@ -69,7 +69,7 @@ const TableHeader = ({ sortProperties, headers, onPaginationChange, onAddEntry }
           key={index}
         />
       ))}
-      { onAddEntry && (
+      {onAddEntry && (
       <AddNewUser onClick={onAddEntry}>
         <PlusCircle />
       </AddNewUser>

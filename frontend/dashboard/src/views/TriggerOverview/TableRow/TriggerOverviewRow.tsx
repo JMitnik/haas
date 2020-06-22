@@ -1,12 +1,10 @@
 import { Edit, X } from 'react-feather';
 import React, { useState } from 'react';
 
-import { DeleteButtonContainer, Div, EditButtonContainer, Flex, Grid, H4, H5, Hr } from '@haas/ui';
+import { DeleteButtonContainer, Div, EditButtonContainer, Grid, H4, H5, Hr } from '@haas/ui';
 import { TableRowProps } from 'components/Table/TableTypes';
 import { UserCell } from 'components/Table/CellComponents/CellComponents';
 import Table from 'components/Table/Table';
-
-import RecipientRow from '../RecipientOverview/RecipientRow';
 
 interface TableProps {
   activeStartDate: Date | null;
@@ -33,7 +31,7 @@ const UserRow = ({ headers, data, index, onDeleteEntry, onEditEntry }: TableRowP
   const templateColumns = `${percentage.toString()}% `.repeat(amtCells);
   const userId = data.id;
 
-  const [paginationProps, setPaginationProps] = useState<TableProps>(
+  const [paginationProps] = useState<TableProps>(
     {
       activeStartDate: null,
       activeEndDate: null,
@@ -45,7 +43,13 @@ const UserRow = ({ headers, data, index, onDeleteEntry, onEditEntry }: TableRowP
   );
 
   return (
-    <Grid style={{ position: 'relative' }} gridRowGap={0} gridColumnGap={5} gridTemplateColumns={templateColumns} onClick={() => setIsExpanded(!isExpanded)}>
+    <Grid
+      position="relative"
+      gridRowGap={0}
+      gridColumnGap={5}
+      gridTemplateColumns={templateColumns}
+      onClick={() => setIsExpanded(!isExpanded)}
+    >
       {headers && headers.map(({ accessor, Cell }) => {
         const result = Object.entries(data).find((property) => property[0] === accessor);
         if (result) return <Cell value={result[1]} key={`${index}-${result[0]}`} />;

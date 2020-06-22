@@ -15,7 +15,6 @@ import {
 } from '@haas/ui';
 
 import editTriggerMutation from 'mutations/editTrigger';
-import editUserMutation from 'mutations/editUser';
 import getDialoguesQuery from 'queries/getQuestionnairesCustomerQuery';
 import getQuestionsQuery from 'queries/getQuestionnaireQuery';
 import getRecipientsQuery from 'queries/getUsers';
@@ -128,7 +127,8 @@ const EditTriggerView = () => {
     },
   });
 
-  const { data: dialogueData, loading: dialoguesLoading } = useQuery(getDialoguesQuery, { variables: { id: customerId } });
+  const { data: dialogueData, loading: dialoguesLoading } = useQuery(getDialoguesQuery,
+    { variables: { id: customerId } });
 
   if (loading || dialoguesLoading) return null;
   if (error) return <><p>{error.message}</p></>;
@@ -138,7 +138,9 @@ const EditTriggerView = () => {
   const capitalizedType = `${trigger?.type.charAt(0)}${trigger?.type.slice(1).toLowerCase()}`;
   const activeType = { label: capitalizedType, value: trigger?.type };
 
-  const conditions: Array<PostMapTriggerCondition> = trigger?.conditions.map((condition) => ({ ...condition, type: { label: condition.type, value: condition.type } })); // TODO: Make type ready for select
+  const conditions: Array<PostMapTriggerCondition> = trigger?.conditions.map(
+    (condition) => ({ ...condition,
+      type: { label: condition.type, value: condition.type } }));
   const activeRecipients = trigger?.recipients?.map((recipient) => ({
     label: `${recipient?.lastName}, ${recipient?.firstName} - E: ${recipient?.email} - P: ${recipient?.phone}`,
     value: recipient?.id,
@@ -149,9 +151,13 @@ const EditTriggerView = () => {
 
   const activeQuestion = { label: trigger.relatedNode?.title || '', value: trigger.relatedNode?.id || '' };
 
-  const dialogues: Array<{ label: string, value: string }> = dialogueData?.dialogues && dialogueData?.dialogues.map((dialogue: any) => (
+  const dialogues: Array<{ label: string, value: string }> = dialogueData?.dialogues
+  && dialogueData?.dialogues.map((dialogue: any) => (
     { label: dialogue?.title, value: dialogue?.id }));
-  const currentDialogue = dialogues?.find((dialogue) => trigger?.relatedNode?.questionDialogueId && dialogue.value === trigger?.relatedNode?.questionDialogueId);
+
+  const currentDialogue = dialogues?.find(
+    (dialogue) => trigger?.relatedNode?.questionDialogueId
+    && dialogue.value === trigger?.relatedNode?.questionDialogueId);
 
   return (
     <EditTriggerForm
@@ -167,23 +173,26 @@ const EditTriggerView = () => {
   );
 };
 
-const EditTriggerForm = ({ trigger, type, medium, conditions, recipients, question, dialogues, dialogue }: EditTriggerProps) => {
+const EditTriggerForm = (
+  { trigger,
+    type,
+    medium,
+    conditions,
+    recipients,
+    question,
+    dialogues,
+    dialogue }: EditTriggerProps,
+) => {
   const history = useHistory();
   const { register, handleSubmit, errors } = useForm<FormDataProps>();
   const { customerId } = useParams();
-  const { data: dialogueData } = useQuery(getDialoguesQuery, { variables: { id: customerId } });
-
   const { data: recipientsData } = useQuery(getRecipientsQuery, { variables: { customerId } });
-  const [fetchQuestions, { loading: questionsLoading, data: questionsData }] = useLazyQuery(
+  const [fetchQuestions, { data: questionsData }] = useLazyQuery(
     getQuestionsQuery, { fetchPolicy: 'cache-and-network' },
   );
 
   const [activeType, setActiveType] = useState<null | { label: string, value: string }>(type);
   const [activeMedium, setActiveMedium] = useState<null | { label: string, value: string }>(medium);
-
-  // const dialogues: Array<{ label: string, value: string }> = dialogueData?.dialogues && dialogueData?.dialogues.map((dialogue: any) => (
-  //   { label: dialogue?.title, value: dialogue?.id }));
-  // const currentDialogue = dialogues?.find((dialogue) => trigger?.relatedNode?.questionDialogueId && dialogue.value === trigger?.relatedNode?.questionDialogueId);
   const [activeDialogue, setActiveDialogue] = useState<null | undefined | { label: string, value: string }>(dialogue);
   const [activeQuestion, setActiveQuestion] = useState<null | undefined | { label: string, value: string }>(question);
   const [activeRecipients, setActiveRecipients] = useState<Array<null | { label: string, value: string }>>(recipients);
@@ -205,13 +214,15 @@ const EditTriggerForm = ({ trigger, type, medium, conditions, recipients, questi
   });
 
   const onSubmit = (formData: FormDataProps) => {
-    const dialogueId = activeDialogue?.value;
-    // TODO: Add activeQuestion to mutation
     const questionId = activeQuestion?.value;
     const userIds = activeRecipients.map((recipient) => recipient?.value);
     const recipients = { ids: userIds };
     const conditions = activeConditions.map((condition) => ({
-      id: condition.id, minValue: condition.minValue, maxValue: condition.maxValue, textValue: condition.textValue, type: condition.type?.value,
+      id: condition.id,
+      minValue: condition.minValue,
+      maxValue: condition.maxValue,
+      textValue: condition.textValue,
+      type: condition.type?.value,
     }));
     const triggerInput = { name: formData.name, type: activeType?.value, medium: activeMedium?.value, conditions };
 
@@ -369,7 +380,16 @@ const EditTriggerForm = ({ trigger, type, medium, conditions, recipients, questi
                   <Hr />
                   <Div padding={10} marginTop={15}>
                     {activeConditions.map((condition, index) => (
-                      <Flex position="relative" marginBottom={5} paddingBottom={10} paddingTop={30} backgroundColor="#fdfbfe" flexDirection="column" key={index} gridColumn="1 / -1">
+                      <Flex
+                        position="relative"
+                        marginBottom={5}
+                        paddingBottom={10}
+                        paddingTop={30}
+                        backgroundColor="#fdfbfe"
+                        flexDirection="column"
+                        key={index}
+                        gridColumn="1 / -1"
+                      >
                         <DeleteButtonContainer style={{ top: '5px' }} onClick={() => deleteCondition(index)}>
                           <X />
                         </DeleteButtonContainer>
@@ -381,7 +401,12 @@ const EditTriggerForm = ({ trigger, type, medium, conditions, recipients, questi
                         {condition?.type?.value === TriggerConditionType.TEXT_MATCH && (
                           <Flex marginTop={5} flexDirection="column">
                             <StyledLabel>Match Text</StyledLabel>
-                            <StyledInput defaultValue={condition?.textValue} onChange={(event) => setMatchText(event.currentTarget.value, index)} name="minValue" ref={register({ required: true })} />
+                            <StyledInput
+                              defaultValue={condition?.textValue}
+                              onChange={(event) => setMatchText(event.currentTarget.value, index)}
+                              name="minValue"
+                              ref={register({ required: true })}
+                            />
                             {errors.name && <Muted color="warning">Something went wrong!</Muted>}
                           </Flex>
                         )}

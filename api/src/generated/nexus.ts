@@ -698,7 +698,6 @@ export interface NexusGenArgTypes {
     }
     users: { // args
       customerId?: string | null; // String
-      filter?: NexusGenInputs['FilterInput'] | null; // FilterInput
     }
     userTable: { // args
       customerId?: string | null; // String

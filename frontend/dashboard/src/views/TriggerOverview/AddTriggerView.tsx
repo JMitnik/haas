@@ -72,7 +72,8 @@ const AddTriggerView = () => {
   const { customerId } = useParams();
   const { data: dialogueData } = useQuery(getDialoguesQuery, { variables: { id: customerId } });
   const { data: recipientsData } = useQuery(getRecipientsQuery, { variables: { customerId } });
-  const [fetchQuestions, { loading: questionsLoading, data: questionsData }] = useLazyQuery(getQuestionsQuery, { fetchPolicy: 'cache-and-network' });
+  const [fetchQuestions, { data: questionsData }] = useLazyQuery(getQuestionsQuery,
+    { fetchPolicy: 'cache-and-network' });
 
   const [activeType, setActiveType] = useState<null | { label: string, value: string }>(null);
   const [activeMedium, setActiveMedium] = useState<null | { label: string, value: string }>(null);
@@ -259,7 +260,16 @@ const AddTriggerView = () => {
                   <Hr />
                   <Div padding={10} marginTop={15}>
                     {activeConditions.map((condition, index) => (
-                      <Flex position="relative" marginBottom={5} paddingBottom={10} paddingTop={30} backgroundColor="#fdfbfe" flexDirection="column" key={index} gridColumn="1 / -1">
+                      <Flex
+                        position="relative"
+                        marginBottom={5}
+                        paddingBottom={10}
+                        paddingTop={30}
+                        backgroundColor="#fdfbfe"
+                        flexDirection="column"
+                        key={index}
+                        gridColumn="1 / -1"
+                      >
                         <DeleteButtonContainer style={{ top: '5px' }} onClick={() => deleteCondition(index)}>
                           <X />
                         </DeleteButtonContainer>
@@ -271,7 +281,11 @@ const AddTriggerView = () => {
                         {condition?.type?.value === TriggerConditionType.TEXT_MATCH && (
                         <Flex marginTop={5} flexDirection="column">
                           <StyledLabel>Match Text</StyledLabel>
-                          <StyledInput onChange={(event) => setMatchText(event.currentTarget.value, index)} name="minValue" ref={register({ required: true })} />
+                          <StyledInput
+                            onChange={(event) => setMatchText(event.currentTarget.value, index)}
+                            name="minValue"
+                            ref={register({ required: true })}
+                          />
                           {errors.name && <Muted color="warning">Something went wrong!</Muted>}
                         </Flex>
                         )}

@@ -1,4 +1,4 @@
-import { NodeEntry, NodeEntryValue, NodeEntryWhereInput, PrismaClient, User, UserWhereInput } from '@prisma/client';
+import { PrismaClient, User, UserWhereInput } from '@prisma/client';
 import _ from 'lodash';
 
 const prisma = new PrismaClient();

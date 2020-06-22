@@ -29,7 +29,7 @@ export const InputOutputContainer = styled(FlexRow)`
 
 export const InputContainer = styled(FlexRow)`
     align-items: center;
-`
+`;
 
 export const OutputContainer = styled(FlexRow)`
     align-items: center;
