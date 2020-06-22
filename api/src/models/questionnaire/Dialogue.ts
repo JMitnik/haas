@@ -1,9 +1,11 @@
 import { Dialogue, PrismaClient } from '@prisma/client';
+import { extendType, inputObjectType, objectType } from '@nexus/schema';
+
+// eslint-disable-next-line import/no-cycle
 import { CustomerType } from '../customer/Customer';
 import { EdgeType } from '../edge/Edge';
 import { QuestionNodeType, QuestionNodeWhereInput } from '../question/QuestionNode';
 import { UniqueDataResultEntry } from '../session/Session';
-import { extendType, inputObjectType, objectType } from '@nexus/schema';
 import DialogueResolver from './dialogue-resolver';
 
 export const DialogueType = objectType({
@@ -280,7 +282,7 @@ export const DialoguesOfCustomerQuery = extendType({
   },
 });
 
-const dialogueNexus = [
+export default [
   topPathType,
   lineChartDataType,
   DialogueWhereUniqueInput,
@@ -290,5 +292,3 @@ const dialogueNexus = [
   DialogueDetailResultType,
   getQuestionnaireDataQuery,
 ];
-
-export default dialogueNexus;

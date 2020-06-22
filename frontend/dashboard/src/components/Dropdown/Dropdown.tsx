@@ -21,7 +21,7 @@ const DropdownOverlayContainer = styled.div`
     border: 1px solid ${theme.colors.default.normalAlt};
     left: 0;
     top: 100%;
-    padding: 8px 12px;
+    /* padding: 8px 12px; */
     box-shadow: 0px 3px 1px 1px rgba(0, 0, 0, 0.05);
     z-index: ${theme.zIndices.dropdown};
   `}

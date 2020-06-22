@@ -1,8 +1,9 @@
 import { ApolloError } from 'apollo-boost';
 import { Card, CardBody, ColumnFlex, Div, Flex,
   Grid, H3, PageHeading, Paragraph, Span } from '@haas/ui';
+import { Edit, Plus, Trash } from 'react-feather';
 import { Link, useHistory, useParams } from 'react-router-dom';
-import { Plus } from 'react-feather';
+import { formatDistance } from 'date-fns';
 import { useMutation } from '@apollo/react-hooks';
 import React from 'react';
 
@@ -66,8 +67,14 @@ interface DialogueCardOptionsOverlayProps {
 const DialogueCardOptionsOverlay = ({ onDelete, onEdit }: DialogueCardOptionsOverlayProps) => (
   <Menu>
     <MenuHeader>Actions</MenuHeader>
-    <MenuItem onClick={() => onDelete()}>Delete</MenuItem>
-    <MenuItem onClick={() => onEdit()}>Edit</MenuItem>
+    <MenuItem onClick={() => onDelete()}>
+      <Trash />
+      Delete
+    </MenuItem>
+    <MenuItem onClick={() => onEdit()}>
+      <Edit />
+      Edit
+    </MenuItem>
   </Menu>
 );
 
@@ -99,21 +106,33 @@ const DialogueCard = ({ dialogue }: { dialogue: any }) => {
     history.push(`/dashboard/c/${customerId}/t/${topicId}/edit`);
   };
 
+  const lastUpdated = new Date(Number.parseInt(dialogue.updatedAt, 10)) || null;
+
   return (
     <Card useFlex flexDirection="column" onClick={() => history.push(`/dashboard/c/${customerId}/t/${dialogue.id}`)}>
       <CardBody flex="100%">
         <ColumnFlex justifyContent="space-between" height="100%">
           <Div>
-            <H3 color="app.onWhite" fontWeight={500}>
+            <H3 color="app.onWhite" mb={2} fontWeight={500}>
               {dialogue.title}
             </H3>
-            <Paragraph color="app.mutedOnWhite" fontWeight="100">
+            <Paragraph fontSize="0.8rem" color="app.mutedOnWhite" fontWeight="100">
               haas.live/starbucks/default
             </Paragraph>
           </Div>
 
           <Flex justifyContent="space-between">
-            <Div />
+            <Div>
+              {lastUpdated && (
+                <Paragraph fontSize="0.8rem" color="app.mutedOnWhite">
+                  last updated
+                  {' '}
+                  {formatDistance(lastUpdated, new Date())}
+                  {' '}
+                  ago
+                </Paragraph>
+              )}
+            </Div>
             <ShowMoreButton
               renderMenu={(
                 <DialogueCardOptionsOverlay
