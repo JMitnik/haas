@@ -3,20 +3,12 @@ import { Div } from './Generics';
 
 export const Card = styled(Div)`
   ${({ theme }) => css`
-      position: relative;
-      border-radius: ${theme.borderRadiuses.md};
-      background: ${theme.colors.white};
-      color: ${theme.colors.default.darkest};
-      box-shadow: 1px 4px 5px 2px rgb(241, 242, 248);
-      border: 1px solid #fcfcfc;
-      cursor: pointer;
-      transition: all .3s cubic-bezier(.55,0,.1,1);
-
-
-      &:hover {
-        transition: all .3s cubic-bezier(.55,0,.1,1);
-        transform: scale(1.1);
-      }
+    position: relative;
+    border-radius: ${theme.borderRadiuses.somewhatRounded};
+    background: ${theme.colors.white};
+    color: ${theme.colors.default.darkest};
+    border: 1px solid #fcfcfc;
+    cursor: pointer;
   `}
 `;
 

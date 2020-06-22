@@ -17,7 +17,7 @@ const theme = {
       normalAlt: '#e6ecf4',
       dark: '#afb4c6',
       darker: '#8e919d',
-      darkest: '#5f6167',
+      darkest: '#444',
       muted: '#59759c',
       text: '#4f5d6e',
     },
@@ -44,6 +44,9 @@ const theme = {
   sidenav: {
     width: 230,
   },
+  zIndices: {
+    dropdown: 200,
+  },
   fontSizes: [8, 12, 22, 28, 36, 48],
   buttonSizes: {
     sm: '8px 12px',
@@ -54,6 +57,8 @@ const theme = {
     sm: '3px',
     md: '7px',
     lg: '20px',
+    subtleRounded: '3px',
+    somewhatRounded: '10px',
     rounded: '50px',
   },
 };

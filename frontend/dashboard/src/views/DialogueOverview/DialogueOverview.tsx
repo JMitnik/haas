@@ -1,6 +1,6 @@
 import { ApolloError } from 'apollo-boost';
-import { Card, CardBody, DeleteButtonContainer, Div, EditButtonContainer, Flex, Grid,
-  H2, H3, Label, PageHeading } from '@haas/ui';
+import { Card, CardBody, ColumnFlex, DeleteButtonContainer, Div, EditButtonContainer, Flex,
+  Grid, H2, H3, Label, PageHeading } from '@haas/ui';
 import { Edit, Plus, X } from 'react-feather';
 import { Link, useHistory, useParams } from 'react-router-dom';
 import { useMutation, useQuery } from '@apollo/react-hooks';
@@ -10,7 +10,10 @@ import DashboardLayout from 'layouts/DashboardLayout';
 import Searchbar from 'components/Searchbar';
 
 import { AddDialogueCard } from './DialogueOverviewStyles';
+import { MenuHeader, MenuItem } from 'components/Menu/Menu';
 import { deleteQuestionnaireMutation } from '../../mutations/deleteQuestionnaire';
+import Menu from 'components/Menu';
+import ShowMoreButton from 'components/ShowMoreButton';
 import getQuestionnairesCustomerQuery from '../../queries/getQuestionnairesCustomerQuery';
 
 // TODO: Do something about this
@@ -37,7 +40,9 @@ const DialogueOverview = ({ dialogues }: { dialogues: any }) => {
         gridTemplateColumns={['1fr', '1fr 1fr 1fr']}
         gridAutoRows="minmax(200px, 1fr)"
       >
-        {dialogues?.map((dialogue: any, index: any) => dialogue && <DialogueCard key={index} dialogue={dialogue} />)}
+        {dialogues?.map((dialogue: any, index: any) => dialogue && (
+          <DialogueCard key={index} dialogue={dialogue} />
+        ))}
 
         <AddDialogueCard>
           <Link to={`/dashboard/c/${customerId}/topic-builder`} />
@@ -52,6 +57,19 @@ const DialogueOverview = ({ dialogues }: { dialogues: any }) => {
     </DashboardLayout>
   );
 };
+
+interface DialogueCardOptionsOverlayProps {
+  onDelete: () => void;
+  onEdit: () => void;
+}
+
+const DialogueCardOptionsOverlay = ({ onDelete, onEdit }: DialogueCardOptionsOverlayProps) => (
+  <Menu>
+    <MenuHeader>Actions</MenuHeader>
+    <MenuItem onClick={() => onDelete()}>Delete</MenuItem>
+    <MenuItem onClick={() => onEdit()}>Edit</MenuItem>
+  </Menu>
+);
 
 const DialogueCard = ({ dialogue }: { dialogue: any }) => {
   const history = useHistory();
@@ -69,39 +87,40 @@ const DialogueCard = ({ dialogue }: { dialogue: any }) => {
     },
   });
 
-  const deleteClickedCustomer = async (event: any, topicId: string) => {
+  const deleteDialogue = async (topicId: string) => {
     deleteTopic({
       variables: {
         id: topicId,
       },
     });
-    event.stopPropagation();
   };
 
-  const setEditDialogue = (event: any, topicId: string) => {
+  const goToEditDialogue = (topicId: string) => {
     history.push(`/dashboard/c/${customerId}/t/${topicId}/edit`);
-    event.stopPropagation();
   };
 
   return (
     <Card useFlex flexDirection="column" onClick={() => history.push(`/dashboard/c/${customerId}/t/${dialogue.id}`)}>
       <CardBody flex="100%">
-        <EditButtonContainer onClick={(e) => setEditDialogue(e, dialogue.id)}>
-          <Edit />
-        </EditButtonContainer>
-        <DeleteButtonContainer
-          onClick={(e) => deleteClickedCustomer(e, dialogue.id)}
-        >
-          <X />
-        </DeleteButtonContainer>
-        <Flex alignItems="center" justifyContent="space-between">
-          <H3 fontWeight={500}>
-            {dialogue.title}
-          </H3>
-          <Label brand="success">
-            {dialogue.averageScore === 'false' ? 'N/A' : Number(dialogue.averageScore).toFixed(1)}
-          </Label>
-        </Flex>
+        <ColumnFlex justifyContent="space-between" height="100%">
+          <Flex alignItems="center" justifyContent="space-between">
+            <H3 color="app.onWhite" fontWeight={500}>
+              {dialogue.title}
+            </H3>
+          </Flex>
+
+          <Flex justifyContent="space-between">
+            <Div />
+            <ShowMoreButton
+              renderMenu={(
+                <DialogueCardOptionsOverlay
+                  onDelete={() => deleteDialogue(dialogue.id)}
+                  onEdit={() => goToEditDialogue(dialogue.id)}
+                />
+              )}
+            />
+          </Flex>
+        </ColumnFlex>
       </CardBody>
     </Card>
   );
