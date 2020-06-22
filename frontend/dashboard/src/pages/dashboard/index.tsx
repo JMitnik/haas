@@ -1,52 +1,53 @@
 import { Route, Switch } from 'react-router';
 
-import AddTopicView from 'views/AddTopicView';
-import CustomerBuilderView from 'views/AddCustomerView/CustomerBuilderView';
 import CustomerOverview from 'views/CustomerOverview';
+import DashboardLayout from 'layouts/DashboardLayout';
+import DialogueBuilderView from 'views/DialogueBuilderView/DialogueBuilderView';
 import EditCustomerView from 'views/EditCustomerView/EditCustomerView';
 import EditTopicView from 'views/EditDialogueView/EditTopicView';
 import InteractionsOverview from 'views/InteractionsOverview/InteractionsOverview';
-import OrganisationSettingsView from 'views/OrganisationSettingsView';
 import React from 'react';
-import TopicDetail from 'views/TopicDetail/TopicDetail';
 
-import DashboardLayout from 'layouts/DashboardLayout';
+import AddCustomerPage from './customers/add';
+import DialoguePage from './dialogues/dialogue';
 import DialoguesPage from './dialogues';
 
 const DashboardPage = () => (
   <>
     <Switch>
       <Route
-        path="/dashboard/c/:customerId/t/:topicId/edit"
+        path="/dashboard/c/:customerId/t/:dialogueId/edit"
         render={() => <DashboardLayout><EditTopicView /></DashboardLayout>}
       />
+
       <Route
-        path="/dashboard/c/:customerId/t/:topicId/interactions"
+        path="/dashboard/c/:customerId/t/:dialogueId/interactions"
         render={() => <DashboardLayout><InteractionsOverview /></DashboardLayout>}
       />
-      <Route
-        path="/dashboard/c/:customerId/t/:topicId/"
-        render={() => <DashboardLayout><TopicDetail /></DashboardLayout>}
-      />
-      <Route
-        path="/dashboard/c/:customerId/topic-builder"
-        render={() => <DashboardLayout><AddTopicView /></DashboardLayout>}
-      />
+
       <Route
         path="/dashboard/c/:customerId/edit"
         render={() => <DashboardLayout><EditCustomerView /></DashboardLayout>}
       />
+
       <Route
         path="/dashboard/customer-builder"
-        render={() => <DashboardLayout><CustomerBuilderView /></DashboardLayout>}
+        render={() => <AddCustomerPage />}
       />
+
+      <Route
+        path="/dashboard/c/:customerId/dialogue-builder"
+        render={() => <DashboardLayout><DialogueBuilderView /></DashboardLayout>}
+      />
+
+      <Route
+        path="/dashboard/c/:customerId/t/:dialogueId/"
+        render={() => <DialoguePage />}
+      />
+
       <Route
         path="/dashboard/c/:customerId/"
         render={() => <DialoguesPage />}
-      />
-      <Route
-        path="/dashboard/organisation-settings"
-        render={() => <OrganisationSettingsView />}
       />
 
       {/* Default-view: Ensure this is last */}

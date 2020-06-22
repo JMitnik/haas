@@ -8,8 +8,8 @@ import styled, { css } from 'styled-components/macro';
 import { Button, Container, Div, Flex, Grid, H2, H3,
   Hr, Muted, StyledInput, StyledLabel, StyledTextInput } from '@haas/ui';
 
-import { createNewQuestionnaire } from '../mutations/createNewQuestionnaire';
-import getQuestionnairesCustomerQuery from '../queries/getQuestionnairesCustomerQuery';
+import { createNewQuestionnaire } from 'mutations/createNewQuestionnaire';
+import getQuestionnairesCustomerQuery from 'queries/getQuestionnairesCustomerQuery';
 
 interface FormDataProps {
   title: string;
@@ -18,7 +18,7 @@ interface FormDataProps {
   isSeed?: boolean;
 }
 
-const AddTopicView = () => {
+const AddDialogueView = () => {
   const history = useHistory();
   const { register, handleSubmit, errors } = useForm<FormDataProps>();
   const { customerId } = useParams();
@@ -88,13 +88,16 @@ const AddTopicView = () => {
                 </Flex>
               </Div>
               <Div py={4}>
+                <label htmlFor="isSeed">
+                  Generate template topic
+                </label>
+
                 <StyledInput
                   type="checkbox"
                   id="isSeed"
                   name="isSeed"
                   ref={register({ required: false })}
                 />
-                <label htmlFor="isSeed"> Generate template topic </label>
               </Div>
             </Div>
           </Grid>
@@ -121,4 +124,4 @@ const FormGroupContainer = styled.div`
 
 const Form = styled.form``;
 
-export default AddTopicView;
+export default AddDialogueView;

@@ -22,7 +22,7 @@ interface FormDataProps {
   seed?: boolean;
 }
 
-const CustomerBuilderView = () => {
+const AddCustomerView = () => {
   const history = useHistory();
   const { register, handleSubmit, errors } = useForm<FormDataProps>();
   const [activePreview, setActivePreview] = useState('');
@@ -145,4 +145,4 @@ const CustomerBuilderView = () => {
   );
 };
 
-export default CustomerBuilderView;
+export default AddCustomerView;
