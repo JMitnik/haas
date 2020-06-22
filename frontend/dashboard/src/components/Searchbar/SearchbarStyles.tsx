@@ -8,6 +8,7 @@ export const SearchbarContainer = styled('div')`
     border-radius: ${theme.borderRadiuses.rounded};
 
     input {
+      width: 100%;
       padding: 8px 12px;
       background: none;
       color: inherit;

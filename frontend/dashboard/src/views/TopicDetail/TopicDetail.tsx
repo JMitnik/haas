@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
-import { useQuery } from '@apollo/react-hooks';
-import { Loader, Grid, Div, H3 } from '@haas/ui';
-import { useParams, Switch, Route, useLocation } from 'react-router-dom';
+import { Div, Grid, H3, Loader } from '@haas/ui';
 import { ResponsiveLine } from '@nivo/line';
-import getQuestionnaireData from '../../queries/getQuestionnaireData';
-import TimelineFeedOverview from './TimelineFeedOverview/TimelineFeedOverview';
+import { Route, Switch, useLocation, useParams } from 'react-router-dom';
+import { useQuery } from '@apollo/react-hooks';
+import Modal from 'components/Modal';
 import NodeEntriesOverview from './NodeEntriesOverview/NodeEntriesOverview';
+import React, { useState } from 'react';
+import TimelineFeedOverview from './TimelineFeedOverview/TimelineFeedOverview';
 import TopicBuilder from './TopicBuilder/TopicBuilder';
 import TopicInfo from './TopicInfo/TopicInfo';
-import Modal from 'components/Modal';
+import getQuestionnaireData from '../../queries/getQuestionnaireData';
 import styled, { css } from 'styled-components/macro';
 
 const filterMap = new Map([
@@ -87,14 +87,14 @@ const MyResponsiveLine = ({ data }: { data: any }) => (
 
 const FilterButton = styled(Div)`
   ${({ theme, isActive }: { theme: any, isActive: boolean }) => css`
-  
+
   ${isActive && css`
       background: ${theme.colors.primary};
-    `}  
+    `}
   ${!isActive && css`&:hover {
         background: ${theme.colors.default.normal};
       }`
-    }
+}
   `}
   border-radius: 12px;
   padding: 10px;
@@ -121,9 +121,9 @@ const TopicDetail = () => {
   const location = useLocation<any>();
   const [activeFilter, setActiveFilter] = useState('Last 24h'); // FIXME: If this is started with anything else start result is undefined :S
   const { loading, data } = useQuery(getQuestionnaireData, {
-    variables: { 
+    variables: {
       dialogueId: topicId,
-      filter: filterMap.get(activeFilter), 
+      filter: filterMap.get(activeFilter),
     },
     pollInterval: 5000,
   });
@@ -132,8 +132,8 @@ const TopicDetail = () => {
 
   const resultData = data?.getQuestionnaireData;
   const lineQueryData = resultData?.lineChartData;
-  let timelineEntries: Array<any> = resultData?.timelineEntries
-  timelineEntries = timelineEntries?.length > 8 ? timelineEntries.slice(0, 8) : timelineEntries
+  let timelineEntries: Array<any> = resultData?.timelineEntries;
+  timelineEntries = timelineEntries?.length > 8 ? timelineEntries.slice(0, 8) : timelineEntries;
 
   const lineData = [
     {
@@ -149,7 +149,7 @@ const TopicDetail = () => {
         <Div height="100vh" maxHeight="100vh" overflow="hidden">
           <Switch>
             <Route path="/dashboard/c/:customerId/t/:topicId/topic-builder/">
-              <TopicBuilder/> 
+              <TopicBuilder />
             </Route>
             <Route>
               <Grid gridTemplateColumns="3fr 1fr">
@@ -158,7 +158,7 @@ const TopicDetail = () => {
                   <Grid gridTemplateColumns="1fr 1fr" gridTemplateRows="1fr 100px 3fr">
                     <Widget gridColumn="span 2">
                       <H3>Filter</H3>
-                      <Div display='flex'>
+                      <Div display="flex">
                         <FilterButton isActive={activeFilter === 'Last 24h'} onClick={() => setActiveFilter('Last 24h')}>Last 24h</FilterButton>
                         <FilterButton isActive={activeFilter === 'Last week'} onClick={() => setActiveFilter('Last week')}>Last week</FilterButton>
                         <FilterButton isActive={activeFilter === 'Last month'} onClick={() => setActiveFilter('Last month')}>Last month</FilterButton>
@@ -185,13 +185,11 @@ const TopicDetail = () => {
                       </ol>
                     </StatisticWidget>
 
-
                     <StatisticWidget gridColumn="span 2" height="300px" width="100%">
                       {
                         lineQueryData && <MyResponsiveLine data={lineData} />
                       }
                     </StatisticWidget>
-
 
                   </Grid>
                 </Div>
