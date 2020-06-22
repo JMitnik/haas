@@ -1,19 +1,19 @@
 import { ApolloError } from 'apollo-boost';
-import { Card, CardBody, ColumnFlex, DeleteButtonContainer, Div, EditButtonContainer, Flex,
-  Grid, H2, H3, Label, PageHeading } from '@haas/ui';
-import { Edit, Plus, X } from 'react-feather';
+import { Card, CardBody, ColumnFlex, Div, Flex,
+  Grid, H3, PageHeading, Paragraph, Span } from '@haas/ui';
 import { Link, useHistory, useParams } from 'react-router-dom';
-import { useMutation, useQuery } from '@apollo/react-hooks';
-import React, { FC } from 'react';
+import { Plus } from 'react-feather';
+import { useMutation } from '@apollo/react-hooks';
+import React from 'react';
 
+import { MenuHeader, MenuItem } from 'components/Menu/Menu';
 import DashboardLayout from 'layouts/DashboardLayout';
+import Menu from 'components/Menu';
 import Searchbar from 'components/Searchbar';
+import ShowMoreButton from 'components/ShowMoreButton';
 
 import { AddDialogueCard } from './DialogueOverviewStyles';
-import { MenuHeader, MenuItem } from 'components/Menu/Menu';
 import { deleteQuestionnaireMutation } from '../../mutations/deleteQuestionnaire';
-import Menu from 'components/Menu';
-import ShowMoreButton from 'components/ShowMoreButton';
 import getQuestionnairesCustomerQuery from '../../queries/getQuestionnairesCustomerQuery';
 
 // TODO: Do something about this
@@ -38,7 +38,7 @@ const DialogueOverview = ({ dialogues }: { dialogues: any }) => {
       <Grid
         gridGap={4}
         gridTemplateColumns={['1fr', '1fr 1fr 1fr']}
-        gridAutoRows="minmax(200px, 1fr)"
+        gridAutoRows="minmax(300px, 1fr)"
       >
         {dialogues?.map((dialogue: any, index: any) => dialogue && (
           <DialogueCard key={index} dialogue={dialogue} />
@@ -103,11 +103,14 @@ const DialogueCard = ({ dialogue }: { dialogue: any }) => {
     <Card useFlex flexDirection="column" onClick={() => history.push(`/dashboard/c/${customerId}/t/${dialogue.id}`)}>
       <CardBody flex="100%">
         <ColumnFlex justifyContent="space-between" height="100%">
-          <Flex alignItems="center" justifyContent="space-between">
+          <Div>
             <H3 color="app.onWhite" fontWeight={500}>
               {dialogue.title}
             </H3>
-          </Flex>
+            <Paragraph color="app.mutedOnWhite" fontWeight="100">
+              haas.live/starbucks/default
+            </Paragraph>
+          </Div>
 
           <Flex justifyContent="space-between">
             <Div />

@@ -19,6 +19,7 @@ const DropdownOverlayContainer = styled.div`
     border-radius: ${theme.borderRadiuses.subtleRounded};
     position: absolute;
     left: 0;
+    top: 100%;
     padding: 8px 12px;
     box-shadow: 0px 3px 1px 1px rgba(0, 0, 0, 0.10);
     z-index: ${theme.zIndices.dropdown};
@@ -36,20 +37,27 @@ const Dropdown = ({ children, renderOverlay }: DropdownProps) => {
 
   useOnClickOutside(ref, () => setIsOpen(false));
 
-  const handleOpenDropdown = (event: any) => {
+  const handleToggleDropdown = (event: any) => {
     event.stopPropagation();
-    setIsOpen(true);
+    setIsOpen((isOpen) => !isOpen);
   };
 
   return (
-    <DropdownContainer>
+    <DropdownContainer onClick={(e) => e.stopPropagation()} ref={ref}>
       {isOpen && (
         <DropdownOverlayContainer>
           {renderOverlay}
         </DropdownOverlayContainer>
       )}
 
-      <Div onClick={(e) => handleOpenDropdown(e)} ref={ref}>
+      <Div
+        height="100%"
+        useFlex
+        alignItems="center"
+        justifyContent="center"
+        width="100%"
+        onClick={(e) => handleToggleDropdown(e)}
+      >
         {children}
       </Div>
     </DropdownContainer>
