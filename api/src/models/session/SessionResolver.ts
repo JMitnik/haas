@@ -41,11 +41,8 @@ class SessionResolver {
           const twilioPhoneNumber = '+3197010252775';
           const smsBody = `
 Dear recipient, your dialogue trigger '${trigger.name}' was triggered by someone who entered the value '${value}'.
-          
 Please see the interaction table in the dashboard for more information.
-
 Kind regards,
-
 HAAS
           `;
           ctx.services.smsService.sendSMS(twilioPhoneNumber, recipient.phone, smsBody, false);
