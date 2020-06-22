@@ -2,6 +2,7 @@ import {
   NodeEntry,
   NodeEntryCreateWithoutSessionInput, PrismaClient, Session, SessionWhereInput,
 } from '@prisma/client';
+import { isAfter, subSeconds } from 'date-fns';
 import TriggerResolver from '../trigger/trigger-resolver';
 import cleanInt from '../../utils/cleanInt';
 
@@ -28,27 +29,24 @@ class SessionResolver {
     // SMS SERVICE
     const questionIds = entries.map((entry: any) => entry.nodeId);
     const dialogueTriggers = await TriggerResolver.findTriggersByQuestionIds(questionIds);
-    dialogueTriggers.forEach((trigger) => {
-      const { nodeId, data } = entries.find((entry: any) => entry.nodeId === trigger.relatedNodeId);
-      const condition = trigger.conditions[0];
-      const { isMatch, value } = TriggerResolver.match(condition, data);
-      if (isMatch) {
-        console.log(`trigger condition of ${trigger.id} and question answer of ${nodeId} match. Sending sms...`);
-        trigger.recipients.forEach((recipient) => {
-          if (!recipient.phone) {
-            console.log('recipient was supposed to receive a sms but no phone number was found. skipping...');
-          }
-          const twilioPhoneNumber = '+3197010252775';
-          const smsBody = `
-Dear recipient, your dialogue trigger '${trigger.name}' was triggered by someone who entered the value '${value}'.
-Please see the interaction table in the dashboard for more information.
-Kind regards,
-HAAS
-          `;
-          ctx.services.smsService.sendSMS(twilioPhoneNumber, recipient.phone, smsBody, false);
-        });
-      } else {
-        console.log(`trigger condition of ${trigger.id} and question answer of ${nodeId} don't match. skipping...`);
+    dialogueTriggers.forEach(async (trigger) => {
+      const currentDate = new Date();
+      const safeToSend = !trigger.lastSent || isAfter(subSeconds(currentDate, 60), trigger.lastSent);
+      if (safeToSend) {
+        // TODO: Do we have to await this function? can just let it run on the side
+        await prisma.trigger.update(({ where: { id: trigger.id }, data: { lastSent: currentDate } }));
+        const { nodeId, data } = entries.find((entry: any) => entry.nodeId === trigger.relatedNodeId);
+        const condition = trigger.conditions[0];
+        const { isMatch, value } = TriggerResolver.match(condition, data);
+        if (isMatch) {
+          trigger.recipients.forEach((recipient) => {
+            if (recipient.phone) {
+              const twilioPhoneNumber = '+3197010252775';
+              const smsBody = `'${trigger.name}' was triggered by someone who entered the value '${value}'.`;
+              ctx.services.smsService.sendSMS(twilioPhoneNumber, recipient.phone, smsBody, false);
+            }
+          });
+        }
       }
     });
     // TODO: Replace this with email associated to dialogue (or fallback to company)

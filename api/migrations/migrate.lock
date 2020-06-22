@@ -7,3 +7,4 @@
 20200612141902-added-question-node-to-triggers-relation
 20200615145310-added-customer-to-triggers-relation
 20200615145432-made-customer-trigger-relation-lower-case
+20200622125356-add-last-sent-to-trigger-table
