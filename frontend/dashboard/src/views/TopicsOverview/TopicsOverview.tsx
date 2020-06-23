@@ -116,7 +116,7 @@ const TopicCard = ({ topic }: { topic: any }) => {
         </Flex>
         <Flex flex="100%">
           <Flex alignSelf="flex-end" marginTop="5px" flexDirection="row">
-            {topic?.tags && topic?.tags?.map((tag: any) => (<Tag tag={tag} />))}
+            {topic?.tags && topic?.tags?.map((tag: any, index: number) => (<Tag key={index} tag={tag} />))}
           </Flex>
         </Flex>
       </CardBody>

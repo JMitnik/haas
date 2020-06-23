@@ -1,8 +1,8 @@
 import { Dialogue, DialogueCreateInput, NodeEntry, PrismaClient } from '@prisma/client';
 import { isAfter, subDays } from 'date-fns';
-import _ from 'lodash';
 import { leafNodes, sliderType } from '../../data/seeds/default-data';
 import NodeResolver from '../question/node-resolver';
+import _ from 'lodash';
 
 const prisma = new PrismaClient();
 interface LeafNodeProps {
@@ -53,7 +53,9 @@ class DialogueResolver {
   static constructDialogue(customerId: string,
     title: string,
     description: string,
-    publicTitle: string = ''): DialogueCreateInput {
+    publicTitle: string = '',
+    tags: Array<{id: string}> = []): DialogueCreateInput {
+    console.log('construct tags: ', tags);
     return {
       customer: {
         connect: {
@@ -65,6 +67,9 @@ class DialogueResolver {
       publicTitle,
       questions: {
         create: [],
+      },
+      tags: {
+        connect: tags.map((tag) => ({ id: tag.id })),
       },
     };
   }
@@ -299,7 +304,6 @@ class DialogueResolver {
     });
 
     const nodeEntryIds = nodeEntries.map((nodeEntry) => nodeEntry.id);
-    // FIXME: nodeEntryValues of leaf node remain in db
     if (nodeEntryIds.length > 0) {
       await prisma.nodeEntryValue.deleteMany(
         {
@@ -399,24 +403,31 @@ class DialogueResolver {
     customerId: string,
     title: string,
     description: string,
-    publicTitle: string = '') => prisma.dialogue.create({
+    publicTitle: string = '',
+    tags: Array<{id: string}> = [],
+  ) => prisma.dialogue.create({
     data: DialogueResolver.constructDialogue(
-      customerId, title, description, publicTitle,
+      customerId, title, description, publicTitle, tags,
     ),
   });
 
   static createDialogue = async (args: any): Promise<Dialogue> => {
     const { customerId, title, description, publicTitle, isSeed, tags } = args;
     let questionnaire = null;
+    const dialogueTags = tags?.entries?.length > 0
+      ? tags?.entries?.map((tag: string) => ({ id: tag }))
+      : [];
+
+    console.log('tags: ', dialogueTags);
     const customer = await prisma.customer.findOne({ where: { id: customerId } });
 
     if (isSeed) {
       if (customer?.name) {
-        return DialogueResolver.seedQuestionnare(customerId, customer?.name, title, description);
+        return DialogueResolver.seedQuestionnare(customerId, customer?.name, title, description, dialogueTags);
       }
     }
     questionnaire = await DialogueResolver.initDialogue(
-      customerId, title, description, publicTitle,
+      customerId, title, description, publicTitle, dialogueTags,
     );
     await prisma.dialogue.update({
       where: {
@@ -442,9 +453,10 @@ class DialogueResolver {
     customerName: string,
     questionnaireTitle: string = 'Default questionnaire',
     questionnaireDescription: string = 'Default questions',
+    tags: Array<{id: string}>,
   ): Promise<Dialogue> => {
     const questionnaire = await DialogueResolver.initDialogue(
-      customerId, questionnaireTitle, questionnaireDescription, '',
+      customerId, questionnaireTitle, questionnaireDescription, '', tags,
     );
 
     const leafs = await NodeResolver.createTemplateLeafNodes(leafNodes, questionnaire.id);

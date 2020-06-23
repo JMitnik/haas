@@ -1,12 +1,15 @@
 import { ApolloError } from 'apollo-boost';
+import { Button, Container, Div, Flex, Grid, H2, H3, H4,
+  Hr, Muted, StyledInput, StyledLabel, StyledTextInput } from '@haas/ui';
+import { MinusCircle, PlusCircle } from 'react-feather';
 import { useForm } from 'react-hook-form';
 import { useHistory, useParams } from 'react-router';
-import { useMutation } from '@apollo/react-hooks';
-import React from 'react';
+import { useMutation, useQuery } from '@apollo/react-hooks';
+import React, { useState } from 'react';
+import Select from 'react-select';
 import styled, { css } from 'styled-components/macro';
 
-import { Button, Container, Div, Flex, Grid, H2, H3,
-  Hr, Muted, StyledInput, StyledLabel, StyledTextInput } from '@haas/ui';
+import getTagsQuery from 'queries/getTags';
 
 import { createNewQuestionnaire } from '../mutations/createNewQuestionnaire';
 import getQuestionnairesCustomerQuery from '../queries/getQuestionnairesCustomerQuery';
@@ -22,7 +25,8 @@ const AddTopicView = () => {
   const history = useHistory();
   const { register, handleSubmit, errors } = useForm<FormDataProps>();
   const { customerId } = useParams();
-
+  const [activeTags, setActiveTags] = useState<Array<null | {label: string, value: string}>>([]);
+  const { data, loading: tagsLoading } = useQuery(getTagsQuery, { variables: { customerId } });
   const [addTopic, { loading }] = useMutation(createNewQuestionnaire, {
     onCompleted: () => {
       history.push(`/dashboard/c/${customerId}/`);
@@ -36,8 +40,24 @@ const AddTopicView = () => {
     },
   });
 
+  const setTags = (qOption: { label: string, value: string }, index: number) => {
+    setActiveTags((prevTags) => {
+      prevTags[index] = qOption;
+      return [...prevTags];
+    });
+  };
+
+  const deleteTag = (index: number) => {
+    setActiveTags((prevTags) => {
+      prevTags.splice(index, 1);
+      return [...prevTags];
+    });
+  };
+
   const onSubmit = (formData: FormDataProps) => {
     // TODO: Make better typescript supported
+    const tagIds = activeTags.map((tag) => tag?.value);
+    const tagEntries = { entries: tagIds };
     addTopic({
       variables: {
         customerId,
@@ -45,10 +65,13 @@ const AddTopicView = () => {
         publicTitle: formData.publicTitle,
         description: formData.description,
         isSeed: formData.isSeed,
+        tags: tagEntries,
       },
     });
   };
-
+  console.log('data: ', data);
+  const tags = data?.tags && data?.tags?.map((tag: any) => (
+    { label: tag?.name, value: tag?.id }));
   return (
     <Container>
       <Div>
@@ -96,12 +119,38 @@ const AddTopicView = () => {
                 />
                 <label htmlFor="isSeed"> Generate template topic </label>
               </Div>
+              <Div gridColumn="1 / -1">
+                <Flex flexDirection="row" alignItems="center" justifyContent="space-between">
+                  <H4>Tags</H4>
+                  <PlusCircle onClick={() => setActiveTags((prevTags) => [...prevTags, null])} />
+                </Flex>
+                <Hr />
+                <Div marginTop={15}>
+                  {activeTags?.map((tag, index) => (
+                    <Flex marginBottom="4px" alignItems="center" key={index} gridColumn="1 / -1">
+                      <Div flexGrow={9}>
+                        <Select
+                          key={index}
+                          options={tags}
+                          value={tag}
+                          onChange={(qOption: any) => {
+                            setTags(qOption, index);
+                          }}
+                        />
+                      </Div>
+                      <Flex justifyContent="center" alignContent="center" flexGrow={1}>
+                        <MinusCircle onClick={() => deleteTag(index)} />
+                      </Flex>
+                    </Flex>
+                  ))}
+                </Div>
+              </Div>
             </Div>
           </Grid>
         </FormGroupContainer>
 
         <Div>
-          {loading && (<Muted>Loading...</Muted>)}
+          {(loading || tagsLoading) && (<Muted>Loading...</Muted>)}
 
           <Flex>
             <Button brand="primary" mr={2} type="submit">Create topic</Button>

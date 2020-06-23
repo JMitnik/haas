@@ -25,18 +25,6 @@ export const DialogueType = objectType({
     t.list.field('tags', {
       type: TagType,
       nullable: true,
-      resolve(parent: Dialogue, args: any, ctx: any) {
-        const { prisma }: {prisma: PrismaClient} = ctx;
-        return prisma.tag.findMany({
-          where: {
-            isTagOf: {
-              every: {
-                id: parent.id,
-              },
-            },
-          },
-        });
-      },
     });
 
     t.field('lineChartData', {
@@ -285,9 +273,13 @@ export const DialoguesOfCustomerQuery = extendType({
         customerId: 'ID',
       },
       async resolve(parent: any, args: any, ctx: any, info: any) {
-        const dialogues: Array<Dialogue> = await ctx.prisma.dialogue.findMany({
+        const { prisma } : { prisma: PrismaClient} = ctx;
+        const dialogues: Array<Dialogue> = await prisma.dialogue.findMany({
           where: {
             customerId: args.customerId,
+          },
+          include: {
+            tags: true,
           },
         });
 
