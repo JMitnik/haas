@@ -207,7 +207,8 @@ export const getSessionAnswerFlowQuery = extendType({
         const { pageIndex, offset, limit, startDate, endDate, searchTerm }: PaginationProps = args.filter;
         const dateRange = SessionResolver.constructDateRangeWhereInput(startDate, endDate);
         const orderBy = args.filter.orderBy ? Object.assign({}, ...args.filter.orderBy) : null;
-        const { pageSessions, totalPages, resetPages } = await NodeEntryResolver.getCurrentInteractionSessions(
+
+        const { pageSessions, totalPages, resetPages } = await NodeEntryService.getCurrentInteractionSessions(
           args.where.dialogueId,
           offset,
           limit,
@@ -217,9 +218,10 @@ export const getSessionAnswerFlowQuery = extendType({
           searchTerm,
         );
 
-        const finalSessions = pageSessions.map((session, index) => ({ ...session, index }));
+        const sessionsWithIndex = pageSessions.map((session: any, index: any) => ({ ...session, index }));
+
         return {
-          sessions: finalSessions,
+          sessions: sessionsWithIndex,
           pages: !resetPages ? totalPages : 1,
           offset,
           limit,
