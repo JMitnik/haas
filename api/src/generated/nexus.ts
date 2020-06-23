@@ -163,6 +163,7 @@ export interface NexusGenInputs {
 }
 
 export interface NexusGenEnums {
+  TagTypeEnum: "AGENT" | "DEFAULT" | "LOCATION"
   TriggerConditionTypeEnum: "HIGH_THRESHOLD" | "INNER_RANGE" | "LOW_THRESHOLD" | "OUTER_RANGE" | "TEXT_MATCH"
   TriggerMediumEnum: "BOTH" | "EMAIL" | "PHONE"
   TriggerTypeEnum: "QUESTION" | "SCHEDULED"
@@ -246,11 +247,7 @@ export interface NexusGenRootTypes {
     desc: boolean; // Boolean!
     id: string; // String!
   }
-  TagType: { // root type
-    customerId: string; // String!
-    id: string; // String!
-    name: string; // String!
-  }
+  TagType: prisma.TagType;
   TriggerConditionType: prisma.TriggerConditionType;
   TriggerType: prisma.TriggerType;
   UniqueDataResultEntry: { // root type
@@ -314,6 +311,7 @@ export interface NexusGenAllTypes extends NexusGenRootTypes {
   UserInput: NexusGenInputs['UserInput'];
   UserSessionEntryDataInput: NexusGenInputs['UserSessionEntryDataInput'];
   UserSessionEntryInput: NexusGenInputs['UserSessionEntryInput'];
+  TagTypeEnum: NexusGenEnums['TagTypeEnum'];
   TriggerConditionTypeEnum: NexusGenEnums['TriggerConditionTypeEnum'];
   TriggerMediumEnum: NexusGenEnums['TriggerMediumEnum'];
   TriggerTypeEnum: NexusGenEnums['TriggerTypeEnum'];
@@ -425,6 +423,7 @@ export interface NexusGenFieldTypes {
     createUser: NexusGenRootTypes['UserType']; // UserType!
     deleteCustomer: NexusGenRootTypes['Customer']; // Customer!
     deleteDialogue: NexusGenRootTypes['Dialogue']; // Dialogue!
+    deleteTag: NexusGenRootTypes['TagType']; // TagType!
     deleteTrigger: NexusGenRootTypes['TriggerType']; // TriggerType!
     deleteUser: NexusGenRootTypes['UserType']; // UserType!
     editCustomer: NexusGenRootTypes['Customer']; // Customer!
@@ -528,6 +527,7 @@ export interface NexusGenFieldTypes {
     customerId: string; // String!
     id: string; // String!
     name: string; // String!
+    type: string; // String!
   }
   TriggerConditionType: { // field return type
     id: number; // Int!
@@ -606,6 +606,7 @@ export interface NexusGenArgTypes {
     createTag: { // args
       customerId?: string | null; // String
       name?: string | null; // String
+      type?: NexusGenEnums['TagTypeEnum'] | null; // TagTypeEnum
     }
     createTrigger: { // args
       customerId?: string | null; // String
@@ -622,6 +623,9 @@ export interface NexusGenArgTypes {
     }
     deleteDialogue: { // args
       where?: NexusGenInputs['DialogueWhereUniqueInput'] | null; // DialogueWhereUniqueInput
+    }
+    deleteTag: { // args
+      tagId?: string | null; // String
     }
     deleteTrigger: { // args
       id?: string | null; // String
@@ -713,6 +717,7 @@ export interface NexusGenArgTypes {
     }
     tags: { // args
       customerId?: string | null; // String
+      dialogueId?: string | null; // String
     }
     trigger: { // args
       triggerId?: string | null; // String
@@ -745,7 +750,7 @@ export type NexusGenObjectNames = "ColourSettings" | "Customer" | "CustomerSetti
 
 export type NexusGenInputNames = "CustomerCreateOptions" | "CustomerWhereUniqueInput" | "DialogueWhereUniqueInput" | "EdgeChildInput" | "EdgeNodeInput" | "FilterInput" | "LeafNodeInput" | "OptionInput" | "PermissionIdsInput" | "PermissionInput" | "QuestionConditionInput" | "QuestionInput" | "QuestionNodeWhereInput" | "QuestionNodeWhereUniqueInput" | "RecipientsInputType" | "RoleDataInput" | "RoleInput" | "SessionWhereUniqueInput" | "SortFilterInputObject" | "TagsInputObjectType" | "TopicDataEntry" | "TriggerConditionInputType" | "TriggerInputType" | "UploadUserSessionInput" | "UserInput" | "UserSessionEntryDataInput" | "UserSessionEntryInput";
 
-export type NexusGenEnumNames = "TriggerConditionTypeEnum" | "TriggerMediumEnum" | "TriggerTypeEnum";
+export type NexusGenEnumNames = "TagTypeEnum" | "TriggerConditionTypeEnum" | "TriggerMediumEnum" | "TriggerTypeEnum";
 
 export type NexusGenInterfaceNames = never;
 

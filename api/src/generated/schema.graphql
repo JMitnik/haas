@@ -162,11 +162,12 @@ type Mutation {
   createDialogue(customerId: String, description: String, isSeed: Boolean, publicTitle: String, tags: TagsInputObjectType, title: String): Dialogue!
   createPermission(data: PermissionInput): PermssionType!
   createRole(data: RoleInput): RoleType!
-  createTag(customerId: String, name: String): TagType!
+  createTag(customerId: String, name: String, type: TagTypeEnum): TagType!
   createTrigger(customerId: String, questionId: String, recipients: RecipientsInputType, trigger: TriggerInputType): TriggerType!
   createUser(id: String, input: UserInput): UserType!
   deleteCustomer(where: CustomerWhereUniqueInput): Customer!
   deleteDialogue(where: DialogueWhereUniqueInput): Dialogue!
+  deleteTag(tagId: String): TagType!
   deleteTrigger(id: String): TriggerType!
   deleteUser(id: String): UserType!
   editCustomer(id: String, options: CustomerCreateOptions): Customer!
@@ -237,7 +238,7 @@ type Query {
   roleTable(customerId: String, filter: FilterInput): RoleTableType!
   session(where: SessionWhereUniqueInput): Session!
   sessions(where: SessionWhereUniqueInput): [Session!]!
-  tags(customerId: String): [TagType!]!
+  tags(customerId: String, dialogueId: String): [TagType!]!
   trigger(triggerId: String): TriggerType!
   triggers(customerId: String, dialogueId: String, filter: FilterInput, userId: String): [TriggerType!]!
   user(userId: String): UserType!
@@ -354,6 +355,13 @@ type TagType {
   customerId: String!
   id: String!
   name: String!
+  type: String!
+}
+
+enum TagTypeEnum {
+  AGENT
+  DEFAULT
+  LOCATION
 }
 
 input TopicDataEntry {

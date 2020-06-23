@@ -1,6 +1,6 @@
 datasource postgresql {
   provider = "postgresql"
-  url      = env("DB_STRING")
+  url = "***"
 }
 
 // binaryTargets = ["debian-openssl-1.1.x"]
@@ -69,7 +69,7 @@ enum TagType {
 
 model Tag {
   id         String     @default(cuid()) @id
-  type       TagType    
+  type       TagType
   name       String
   isTagOf    Dialogue[] @relation(references: [id])
   customer   Customer?  @relation(fields: [customerId], references: [id])

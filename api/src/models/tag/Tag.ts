@@ -12,6 +12,7 @@ export const TagType = objectType({
     t.string('id');
     t.string('name');
     t.string('customerId');
+    t.string('type');
   },
 });
 export const TagQueries = extendType({
@@ -21,8 +22,21 @@ export const TagQueries = extendType({
       type: TagType,
       args: {
         customerId: 'String',
+        dialogueId: 'String',
       },
-      resolve(parent: any, args: any, ctx: any) {
+      async resolve(parent: any, args: any, ctx: any) {
+        if (args.dialogueId) {
+          const tags = await prisma.tag.findMany({
+            where: {
+              isTagOf: {
+                some: {
+                  id: args.dialogueId,
+                },
+              },
+            },
+          });
+          return tags;
+        }
         return prisma.tag.findMany({
           where: {
             customerId: args.customerId,
@@ -38,6 +52,11 @@ export const TagsInputType = inputObjectType({
   definition(t) {
     t.list.string('entries');
   },
+});
+
+export const TagTypeEnum = enumType({
+  name: 'TagTypeEnum',
+  members: ['DEFAULT', 'LOCATION', 'AGENT'],
 });
 
 export const TagMutations = extendType({
@@ -69,11 +88,13 @@ export const TagMutations = extendType({
       args: {
         name: 'String',
         customerId: 'String',
+        type: TagTypeEnum,
       },
       resolve(parent: any, args: any, ctx: any) {
         return prisma.tag.create({
           data: {
             name: args.name,
+            type: args.type,
             customer: {
               connect: {
                 id: args.customerId,
@@ -83,10 +104,21 @@ export const TagMutations = extendType({
         });
       },
     });
+    t.field('deleteTag', {
+      type: TagType,
+      args: {
+        tagId: 'String',
+      },
+      resolve(parent: any, args: any, ctx: any) {
+        return prisma.tag.delete({ where: { id: args.tagId } });
+      },
+    });
   },
 });
 export default [
   TagType,
+  TagTypeEnum,
+  TagsInputType,
   TagQueries,
   TagMutations,
 ];
