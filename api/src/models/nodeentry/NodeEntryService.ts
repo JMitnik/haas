@@ -16,7 +16,8 @@ interface SessionWhereProps {
 }
 
 const prisma = new PrismaClient();
-class NodeEntryResolver {
+
+class NodeEntryService {
   static matchText = (
     entry: NodeEntry & EnhancedNodeEntryProps,
     searchTerm: string,
@@ -145,4 +146,4 @@ class NodeEntryResolver {
   };
 }
 
-export default NodeEntryResolver;
+export default NodeEntryService;

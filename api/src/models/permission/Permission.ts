@@ -1,7 +1,5 @@
-import { PrismaClient } from '@prisma/client';
 import { extendType, inputObjectType, objectType } from '@nexus/schema';
-
-const prisma = new PrismaClient();
+import PermissionService from './PermissionService';
 
 export const PermissionType = objectType({
   name: 'PermssionType',
@@ -27,20 +25,10 @@ export const PermissionMutations = extendType({
     t.field('createPermission', {
       type: PermissionType,
       args: { data: PermissionInput },
-      resolve(parent: any, args: any, ctx) {
+      resolve(parent: any, args: any) {
         const { name, description, customerId } = args.data;
 
-        return prisma.permission.create({
-          data: {
-            name,
-            description,
-            Customer: {
-              connect: {
-                id: customerId,
-              },
-            },
-          },
-        });
+        return PermissionService.createPermission(name, customerId, description);
       },
     });
   },

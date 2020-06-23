@@ -3,7 +3,7 @@ import { extendType, inputObjectType, objectType } from '@nexus/schema';
 
 import { PaginationProps } from '../../types/generic';
 import { QuestionNodeType } from '../question/QuestionNode';
-import NodeEntryResolver from '../nodeentry/nodeentry-resolver';
+import NodeEntryService from '../nodeentry/NodeEntryService';
 import SessionResolver from './SessionResolver';
 
 export const NodeEntryValueType = objectType({

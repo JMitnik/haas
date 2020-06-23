@@ -1,8 +1,10 @@
-import { Dialogue, DialogueCreateInput, DialogueUpdateInput, NodeEntry, PrismaClient, Tag, TagUpdateManyDataInput, TagWhereUniqueInput } from '@prisma/client';
+import { Dialogue, DialogueCreateInput,
+  DialogueUpdateInput, PrismaClient, Tag, TagWhereUniqueInput } from '@prisma/client';
 import { isAfter, subDays } from 'date-fns';
+import _ from 'lodash';
+
 import { leafNodes, sliderType } from '../../data/seeds/default-data';
 import NodeResolver from '../question/node-resolver';
-import _ from 'lodash';
 
 const prisma = new PrismaClient();
 interface LeafNodeProps {
@@ -49,13 +51,14 @@ interface QuestionProps {
   children: Array<EdgeChildProps>;
 }
 
-class DialogueResolver {
-  static constructDialogue(customerId: string,
+class DialogueService {
+  static constructDialogue(
+    customerId: string,
     title: string,
     description: string,
     publicTitle: string = '',
-    tags: Array<{id: string}> = []): DialogueCreateInput {
-    console.log('construct tags: ', tags);
+    tags: Array<{id: string}> = [],
+  ): DialogueCreateInput {
     return {
       customer: {
         connect: {
@@ -109,7 +112,7 @@ class DialogueResolver {
 
     let updateDialogueArgs: DialogueUpdateInput = { title, description, publicTitle };
     if (dbDialogue?.tags) {
-      updateDialogueArgs = DialogueResolver.updateTags(dbDialogue.tags, tags.entries, updateDialogueArgs);
+      updateDialogueArgs = DialogueService.updateTags(dbDialogue.tags, tags.entries, updateDialogueArgs);
     }
 
     return prisma.dialogue.update({
@@ -234,8 +237,8 @@ class DialogueResolver {
           textValue: nodeEntryTextValue.values.textValue }));
     const joined = _.merge(lineChartData, finalNodeEntryTextValues);
     const groupedJoined = _.groupBy(joined, (entry) => entry.y && entry.y > 50);
-    const topNegativePath = DialogueResolver.getTopPaths(groupedJoined.false);
-    const topPositivePath = DialogueResolver.getTopPaths(groupedJoined.true);
+    const topNegativePath = DialogueService.getTopPaths(groupedJoined.false);
+    const topPositivePath = DialogueService.getTopPaths(groupedJoined.true);
     return { lineChartData, topNegativePath, topPositivePath };
   };
 
@@ -296,8 +299,8 @@ class DialogueResolver {
           textValue: nodeEntryTextValue.values.textValue }));
     const joined = _.merge(lineChartData, finalNodeEntryTextValues);
     const groupedJoined = _.groupBy(joined, (entry) => entry.y && entry.y > 50);
-    const topNegativePath = DialogueResolver.getTopPaths(groupedJoined.false);
-    const topPositivePath = DialogueResolver.getTopPaths(groupedJoined.true);
+    const topNegativePath = DialogueService.getTopPaths(groupedJoined.false);
+    const topPositivePath = DialogueService.getTopPaths(groupedJoined.true);
     return { lineChartData, topNegativePath, topPositivePath };
   };
 
@@ -437,7 +440,7 @@ class DialogueResolver {
     publicTitle: string = '',
     tags: Array<{id: string}> = [],
   ) => prisma.dialogue.create({
-    data: DialogueResolver.constructDialogue(
+    data: DialogueService.constructDialogue(
       customerId, title, description, publicTitle, tags,
     ),
   });
@@ -453,10 +456,10 @@ class DialogueResolver {
 
     if (isSeed) {
       if (customer?.name) {
-        return DialogueResolver.seedQuestionnare(customerId, customer?.name, title, description, dialogueTags);
+        return DialogueService.seedQuestionnare(customerId, customer?.name, title, description, dialogueTags);
       }
     }
-    questionnaire = await DialogueResolver.initDialogue(
+    questionnaire = await DialogueService.initDialogue(
       customerId, title, description, publicTitle, dialogueTags,
     );
     await prisma.dialogue.update({
@@ -485,7 +488,7 @@ class DialogueResolver {
     questionnaireDescription: string = 'Default questions',
     tags: Array<{id: string}>,
   ): Promise<Dialogue> => {
-    const questionnaire = await DialogueResolver.initDialogue(
+    const questionnaire = await DialogueService.initDialogue(
       customerId, questionnaireTitle, questionnaireDescription, '', tags,
     );
 
@@ -541,7 +544,7 @@ class DialogueResolver {
     try {
       const questionnaireId: string = args.id || undefined;
       const { questions }: { questions: Array<any> } = args.topicData;
-      const finalQuestions = await DialogueResolver.uuidToPrismaIds(questions, questionnaireId);
+      const finalQuestions = await DialogueService.uuidToPrismaIds(questions, questionnaireId);
       await Promise.all(finalQuestions.map(async (question) => NodeResolver.updateQuestion(
         questionnaireId,
         question,
@@ -629,4 +632,4 @@ class DialogueResolver {
   };
 }
 
-export default DialogueResolver;
+export default DialogueService;

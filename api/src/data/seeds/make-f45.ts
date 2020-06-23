@@ -1,9 +1,9 @@
 import { PrismaClient } from '@prisma/client';
-import CustomerResolver from '../../models/customer/customer-resolver';
 import cuid from 'cuid';
 
-const prisma = new PrismaClient();
+import CustomerResolver from '../../models/customer/customer-resolver';
 
+const prisma = new PrismaClient();
 const CUSTOMER = 'F45 Training';
 
 const makef45 = async () => {

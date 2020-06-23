@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client';
-import CustomerResolver from '../../models/customer/customer-resolver';
 import cuid from 'cuid';
+
+import CustomerResolver from '../../models/customer/customer-resolver';
 
 const prisma = new PrismaClient();
 
