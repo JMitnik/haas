@@ -1,4 +1,4 @@
-import { Customer, PrismaClient } from '@prisma/client';
+import { Customer, PrismaClient, TagCreateWithoutCustomerInput } from '@prisma/client';
 import { subDays } from 'date-fns';
 import cuid from 'cuid';
 
@@ -10,6 +10,21 @@ function getRandomInt(max: number) {
 }
 
 const prisma = new PrismaClient();
+
+const seedCustomerData: TagCreateWithoutCustomerInput[] = [
+  {
+    name: 'Agent',
+    type: 'AGENT',
+  },
+  {
+    name: 'Amsterdam',
+    type: 'LOCATION',
+  },
+  {
+    name: 'Marketing strategy #131',
+    type: 'DEFAULT',
+  },
+];
 
 class CustomerService {
   static customers = async () => {
@@ -130,26 +145,14 @@ class CustomerService {
 
   static createCustomer = async (args: any) => {
     const { name, options } = args;
-    const { isSeed, logo, primaryColour, slug, cloudinary } = options;
+    const { isSeed, logo, primaryColour, slug } = options;
+
     const customer = await prisma.customer.create({
       data: {
         name,
         slug,
         tags: {
-          create: [
-            {
-              name: 'Agent',
-              type: 'AGENT',
-            },
-            {
-              name: 'Amsterdam',
-              type: 'LOCATION',
-            },
-            {
-              name: 'Marketing strategy #131',
-              type: 'DEFAULT',
-            },
-          ],
+          create: seedCustomerData,
         },
         settings: {
           create: {
