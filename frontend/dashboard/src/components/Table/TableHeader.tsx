@@ -47,9 +47,9 @@ const AddNewUser = styled(Div)`
 `;
 
 const TableHeader = ({ sortProperties, headers, onPaginationChange, onAddEntry }: TableHeaderProps) => {
-  const amtHeaders = headers.length;
-  const percentage = 100 / amtHeaders;
-  const templateColumns = `${percentage.toString()}% `.repeat(amtHeaders);
+  const nrHeaders = headers.length;
+  const percentage = 100 / nrHeaders;
+  const templateColumns = `${percentage.toString()}% `.repeat(nrHeaders);
 
   return (
     <Grid
@@ -60,6 +60,7 @@ const TableHeader = ({ sortProperties, headers, onPaginationChange, onAddEntry }
       gridColumnGap={5}
       gridTemplateColumns={templateColumns}
     >
+
       {headers && headers.map((header, index) => (
         <TableHeaderColumn
           sortProperties={sortProperties}
@@ -69,10 +70,11 @@ const TableHeader = ({ sortProperties, headers, onPaginationChange, onAddEntry }
           key={index}
         />
       ))}
+
       {onAddEntry && (
-      <AddNewUser onClick={onAddEntry}>
-        <PlusCircle />
-      </AddNewUser>
+        <AddNewUser onClick={onAddEntry}>
+          <PlusCircle />
+        </AddNewUser>
       )}
 
     </Grid>

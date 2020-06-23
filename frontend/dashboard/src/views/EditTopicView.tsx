@@ -5,7 +5,7 @@ import { MinusCircle, PlusCircle } from 'react-feather';
 import { useForm } from 'react-hook-form';
 import { useHistory, useParams } from 'react-router';
 import { useMutation, useQuery } from '@apollo/react-hooks';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import Select from 'react-select';
 import styled, { css } from 'styled-components/macro';
 

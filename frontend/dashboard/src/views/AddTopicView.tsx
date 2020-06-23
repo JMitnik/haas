@@ -70,8 +70,11 @@ const AddTopicView = () => {
     });
   };
 
-  const tags = data?.tags && data?.tags?.map((tag: any) => (
-    { label: tag?.name, value: tag?.id }));
+  const tags = data?.tags && data?.tags?.map((tag: any) => ({
+    label: tag?.name,
+    value: tag?.id,
+  }));
+
   return (
     <Container>
       <Div>
