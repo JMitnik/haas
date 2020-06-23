@@ -18,7 +18,7 @@ export interface ConfigProps {
   mailPassword: string;
   prismaServiceSecret: string;
   twilioAccountSid: string;
-  authToken: string;
+  twilioAuthToken: string;
 }
 
 const config: ConfigProps = {
@@ -39,7 +39,7 @@ const config: ConfigProps = {
   mailDefaultSender: process.env.MAIL_DEFAULT_SENDER || '',
   prismaServiceSecret: process.env.PRISMA_SERVICE_SECRET || '',
   twilioAccountSid: process.env.SMS_ACCOUNT_SID || '',
-  authToken: process.env.SMS_AUTH_TOKEN || '',
+  twilioAuthToken: process.env.SMS_AUTH_TOKEN || '',
 };
 
 export default config;
