@@ -4,7 +4,7 @@ import { extendType, inputObjectType, objectType } from '@nexus/schema';
 import { FilterInput } from '../session/Session';
 import { PaginationProps } from '../../types/generic';
 import { RoleType } from '../role/Role';
-import UserResolver from './user-resolver';
+import UserService from './UserService';
 
 const prisma = new PrismaClient();
 
@@ -59,7 +59,7 @@ export const UserQueries = extendType({
         const { pageIndex, offset, limit, searchTerm, orderBy }: PaginationProps = args.filter;
 
         if (args.filter) {
-          return UserResolver.paginatedUsers(args.customerId, pageIndex, offset, limit, orderBy[0], searchTerm);
+          return UserService.paginatedUsers(args.customerId, pageIndex, offset, limit, orderBy[0], searchTerm);
         }
 
         const users = await prisma.user.findMany({ where: { customerId: args.customerId } });
@@ -68,6 +68,7 @@ export const UserQueries = extendType({
         return { users, pageIndex, totalPages };
       },
     });
+
     t.list.field('users', {
       type: UserType,
       args: { customerId: 'String' },
@@ -75,6 +76,7 @@ export const UserQueries = extendType({
         return prisma.user.findMany({ where: { customerId: args.customerId } });
       },
     });
+
     t.field('user', {
       type: UserType,
       args: { userId: 'String' },
@@ -114,6 +116,7 @@ export const UserMutations = extendType({
         });
       },
     });
+
     t.field('editUser', {
       type: UserType,
       args: { id: 'String', input: UserInput },
@@ -137,6 +140,7 @@ export const UserMutations = extendType({
         });
       },
     });
+
     t.field('deleteUser', {
       type: UserType,
       args: { id: 'String' },
@@ -147,11 +151,9 @@ export const UserMutations = extendType({
   },
 });
 
-const userNexus = [
+export default [
   UserInput,
   UserQueries,
   UserMutations,
   UserType,
 ];
-
-export default userNexus;

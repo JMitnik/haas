@@ -15,6 +15,7 @@ export const TagType = objectType({
     t.string('type');
   },
 });
+
 export const TagQueries = extendType({
   type: 'Query',
   definition(t) {

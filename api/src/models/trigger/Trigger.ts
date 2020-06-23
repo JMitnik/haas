@@ -9,7 +9,7 @@ import _ from 'lodash';
 import { FilterInput } from '../session/Session';
 import { QuestionNodeType } from '../question/QuestionNode';
 import { UserType } from '../users/User';
-import TriggerResolver from './trigger-resolver';
+import TriggerService from './TriggerService';
 
 const prisma = new PrismaClient();
 
@@ -150,18 +150,21 @@ const TriggerMutations = extendType({
             relatedNode: true,
           },
         });
+
         let updateTriggerArgs: TriggerUpdateInput = { name, type, medium };
-        updateTriggerArgs = TriggerResolver.updateRelatedQuestion(
+
+        updateTriggerArgs = TriggerService.updateRelatedQuestion(
           dbTrigger?.relatedNodeId, args.questionId, updateTriggerArgs,
         );
+
         if (dbTrigger?.recipients) {
-          updateTriggerArgs = TriggerResolver.updateRecipients(
+          updateTriggerArgs = TriggerService.updateRecipients(
             dbTrigger.recipients, args.recipients.ids, updateTriggerArgs,
           );
         }
 
         if (dbTrigger?.conditions) {
-          await TriggerResolver.updateConditions(dbTrigger.conditions, conditions, dbTrigger.id);
+          await TriggerService.updateConditions(dbTrigger.conditions, conditions, dbTrigger.id);
         }
 
         const updatedTrigger = await prisma.trigger.update({
@@ -184,6 +187,8 @@ const TriggerMutations = extendType({
         const { name, type, medium, conditions } = args.trigger;
         const createArgs : TriggerCreateInput = { name, type, medium };
         const triggerConditions: TriggerConditionCreateInput[] = [];
+
+        // TODO: Put this in the TriggerService
 
         if (args.customerId) {
           createArgs.customer = { connect: { id: args.customerId } };
@@ -227,6 +232,7 @@ const TriggerQueries = extendType({
         return prisma.trigger.findOne({ where: { id: args.triggerId } });
       },
     });
+
     t.list.field('triggers', {
       type: TriggerType,
       args: {
@@ -249,7 +255,7 @@ const TriggerQueries = extendType({
         }
 
         if (args.dialogueId) {
-          return TriggerResolver.findTriggersByDialogueId(args.dialogueId);
+          return TriggerService.findTriggersByDialogueId(args.dialogueId);
         }
 
         if (args.customerId) {
@@ -265,7 +271,7 @@ const TriggerQueries = extendType({
   },
 });
 
-const triggerNexus = [
+export default [
   TriggerTypeEnum,
   TriggerMediumEnum,
   TriggerConditionTypeEnum,
@@ -274,5 +280,3 @@ const triggerNexus = [
   TriggerMutations,
   TriggerQueries,
 ];
-
-export default triggerNexus;

@@ -3,11 +3,12 @@ import _ from 'lodash';
 
 const prisma = new PrismaClient();
 
-class UserResolver {
+class UserService {
   static getSearchTermFilter = (searchTerm: string) => {
     if (!searchTerm) {
       return [];
     }
+
     const searchTermFilter: UserWhereInput[] = [
       {
         firstName: {
@@ -32,6 +33,7 @@ class UserResolver {
         },
       },
     ];
+
     return searchTermFilter;
   };
 
@@ -52,6 +54,7 @@ class UserResolver {
     } if (orderBy.id === 'role') {
       return _.orderBy(users, (user) => user.role.name, orderBy.desc ? 'desc' : 'asc');
     }
+
     return users;
   };
 
@@ -74,7 +77,8 @@ class UserResolver {
   ) => {
     let needPageReset = false;
     const userWhereInput: UserWhereInput = { customerId };
-    const searchTermFilter = UserResolver.getSearchTermFilter(searchTerm);
+    const searchTermFilter = UserService.getSearchTermFilter(searchTerm);
+
     if (searchTermFilter.length > 0) {
       userWhereInput.OR = searchTermFilter;
     }
@@ -92,17 +96,23 @@ class UserResolver {
     });
 
     const totalPages = Math.ceil(users.length / limit);
+
     if (pageIndex + 1 > totalPages) {
       offset = 0;
       needPageReset = true;
     }
     // Order filtered users
-    const orderedUsers = UserResolver.orderUsersBy(users, orderBy);
+    const orderedUsers = UserService.orderUsersBy(users, orderBy);
 
     // Slice ordered filtered users
-    const slicedOrderedUsers = UserResolver.sliceUsers(orderedUsers, offset, limit, pageIndex);
-    return { users: slicedOrderedUsers, pageIndex: needPageReset ? 0 : pageIndex, totalPages };
+    const slicedOrderedUsers = UserService.sliceUsers(orderedUsers, offset, limit, pageIndex);
+
+    return {
+      users: slicedOrderedUsers,
+      pageIndex: needPageReset ? 0 : pageIndex,
+      totalPages,
+    };
   };
 }
 
-export default UserResolver;
+export default UserService;
