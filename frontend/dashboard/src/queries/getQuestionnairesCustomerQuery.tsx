@@ -10,6 +10,11 @@ const getQuestionnairesCustomerQuery = gql`
     updatedAt
     customerId
     averageScore
+    tags {
+      id
+      type
+      name
+    }
   }
 }
 `;

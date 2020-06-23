@@ -1,15 +1,21 @@
 import { ApolloError } from 'apollo-boost';
+import { Card, CardBody, Container, DeleteButtonContainer, Div, EditButtonContainer, Flex, Grid,
+  H2, H3, Label } from '@haas/ui';
+import { Edit, MapPin, Plus, User, X } from 'react-feather';
+import { Link, useHistory, useParams } from 'react-router-dom';
 import { useMutation, useQuery } from '@apollo/react-hooks';
 import React, { FC } from 'react';
 
-import { Card, CardBody, Container, DeleteButtonContainer, Div, EditButtonContainer, Flex, Grid,
-  H2, H3, Label } from '@haas/ui';
-import { Edit, Plus, X } from 'react-feather';
-import { Link, useHistory, useParams } from 'react-router-dom';
+import SliderNodeIcon from 'components/Icons/SliderNodeIcon';
 
 import { AddTopicCard } from './TopicsOverviewStyles';
 import { deleteQuestionnaireMutation } from '../../mutations/deleteQuestionnaire';
 import getQuestionnairesCustomerQuery from '../../queries/getQuestionnairesCustomerQuery';
+
+interface TagProps {
+  name: string;
+  type: string;
+}
 
 const TopicsOverview: FC = () => {
   const { customerId } = useParams();
@@ -91,7 +97,7 @@ const TopicCard = ({ topic }: { topic: any }) => {
 
   return (
     <Card useFlex flexDirection="column" onClick={() => history.push(`/dashboard/c/${customerId}/t/${topic.id}`)}>
-      <CardBody flex="100%">
+      <CardBody useFlex flexDirection="column" flex="100%">
         <EditButtonContainer onClick={(e) => setEditDialogue(e, topic.id)}>
           <Edit />
         </EditButtonContainer>
@@ -108,9 +114,30 @@ const TopicCard = ({ topic }: { topic: any }) => {
             {topic.averageScore === 'false' ? 'N/A' : Number(topic.averageScore).toFixed(1)}
           </Label>
         </Flex>
+        <Flex flex="100%">
+          <Flex alignSelf="flex-end" marginTop="5px" flexDirection="row">
+            {topic?.tags && topic?.tags?.map((tag: any) => (<Tag tag={tag} />))}
+          </Flex>
+        </Flex>
       </CardBody>
     </Card>
   );
 };
+
+const Tag = ({ tag }: { tag: TagProps }) => (
+  <Flex marginRight="5px" borderRadius="8px" border="1px solid" padding="5px" paddingLeft="2px" alignItems="center">
+    {tag.type === 'LOCATION' && (
+    <MapPin />
+    )}
+    {tag.type === 'AGENT' && (
+    <User />
+    )}
+    {tag.type === 'DEFAULT' && (
+    <SliderNodeIcon color="black" />
+    )}
+    <Div marginLeft="2px">{tag.name}</Div>
+  </Flex>
+
+);
 
 export default TopicsOverview;
