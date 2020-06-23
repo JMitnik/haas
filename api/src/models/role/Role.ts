@@ -5,7 +5,7 @@ import { CustomerType } from '../customer/Customer';
 import { FilterInput } from '../session/Session';
 import { PaginationProps } from '../../types/generic';
 import { PermissionType } from '../permission/Permission';
-import RoleResolver from './role-resolver';
+import RoleService from './RoleService';
 
 const prisma = new PrismaClient();
 
@@ -14,6 +14,8 @@ export const RoleType = objectType({
   definition(t) {
     t.id('id');
     t.string('name');
+    t.int('amtPermissions', { nullable: true });
+
     t.list.field('permissions', {
       nullable: true,
       type: PermissionType,
@@ -28,14 +30,17 @@ export const RoleType = objectType({
             },
           },
         });
+
         const activePermissions = customerPermissions.filter((permission) => {
           const activeRoleIds = permission.isPermissionOfRole.map((role) => role.id);
           return activeRoleIds.includes(parent.id);
         });
+
         return activePermissions;
       },
     });
-    t.int('amtPermissions', { nullable: true });
+
+
     t.field('customer', {
       type: CustomerType,
       resolve(parent: Role, args: any, ctx: any) {
@@ -65,11 +70,13 @@ export const RoleInput = inputObjectType({
 export const RoleTableType = objectType({
   name: 'RoleTableType',
   definition(t) {
+    t.int('pageIndex', { nullable: true });
+    t.int('totalPages', { nullable: true });
+
     t.list.field('roles', {
       type: RoleType,
     });
-    t.int('pageIndex', { nullable: true });
-    t.int('totalPages', { nullable: true });
+
     t.list.field('permissions', {
       type: PermissionType,
     });
@@ -81,22 +88,26 @@ export const RoleQueries = extendType({
   definition(t) {
     t.field('roleTable', {
       type: RoleTableType,
-      args: { customerId: 'String',
-        filter: FilterInput },
+      args: {
+        customerId: 'String',
+        filter: FilterInput
+      },
       async resolve(parent: any, args: any, ctx: any) {
         const { pageIndex, offset, limit }: PaginationProps = args.filter;
-        const { roles, totalPages, newPageIndex } = await RoleResolver.paginatedRoles(
+        const { roles, totalPages, newPageIndex } = await RoleService.paginatedRoles(
           args.customerId, pageIndex, offset, limit,
         );
+
         const permissions = await prisma.permission.findMany({ where: { customerId: args.customerId } });
         return { roles, permissions, pageIndex: newPageIndex || pageIndex, totalPages: totalPages || 1 };
       },
     });
+
     t.list.field('roles', {
       type: RoleType,
       args: { customerId: 'String' },
       resolve(parent: any, args: any, ctx: any) {
-        return RoleResolver.roles(args.customerId);
+        return RoleService.roles(args.customerId);
       },
     });
   },
@@ -117,6 +128,7 @@ export const RoleMutations = extendType({
       args: { data: RoleInput },
       resolve(parent: any, args: any, ctx: any) {
         const { name, customerId } = args.data;
+
         return prisma.role.create({
           data: {
             name,
@@ -132,15 +144,17 @@ export const RoleMutations = extendType({
         });
       },
     });
+
     t.field('updateRoles', {
       type: RoleType,
       args: { roleId: 'String', permissions: PermissionIdsInput },
       async resolve(parent: any, args: any, ctx: any) {
         const { roleId, permissions } = args;
         const { ids }: { ids: Array<string> } = permissions;
+
         const updateRole = await prisma.role.update({
           where: {
-            id: roleId,
+            id: roleId
           },
           data: {
             permissions: {
@@ -148,13 +162,14 @@ export const RoleMutations = extendType({
             },
           },
         });
+
         return updateRole;
       },
     });
   },
 });
 
-const roleNexus = [
+export default [
   RoleTableType,
   RoleQueries,
   RoleDataInput,
@@ -162,5 +177,3 @@ const roleNexus = [
   RoleMutations,
   RoleType,
 ];
-
-export default roleNexus;

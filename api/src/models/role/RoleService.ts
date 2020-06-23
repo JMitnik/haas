@@ -2,7 +2,7 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-class RoleResolver {
+class RoleService {
   static sliceRoles = (
     entries: Array<any>,
     offset: number,
@@ -33,7 +33,7 @@ class RoleResolver {
     }
 
     // Slice ordered filtered users
-    const slicedOrderedUsers = RoleResolver.sliceRoles(roles, offset, limit, pageIndex);
+    const slicedOrderedUsers = RoleService.sliceRoles(roles, offset, limit, pageIndex);
 
     const rolesWithNrPermisisons = slicedOrderedUsers.map(
       (role) => ({ ...role, amtPermissions: role.permissions.length }),
@@ -61,4 +61,4 @@ class RoleResolver {
   } });
 }
 
-export default RoleResolver;
+export default RoleService;
