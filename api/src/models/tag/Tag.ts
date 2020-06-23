@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
-import _ from 'lodash';
 
+// eslint-disable-next-line import/no-cycle
 import { DialogueType } from '../questionnaire/Dialogue';
 
 const prisma = new PrismaClient();
@@ -24,7 +24,7 @@ export const TagQueries = extendType({
         customerId: 'String',
         dialogueId: 'String',
       },
-      async resolve(parent: any, args: any, ctx: any) {
+      async resolve(parent: any, args: any) {
         if (args.dialogueId) {
           const tags = await prisma.tag.findMany({
             where: {
@@ -35,8 +35,10 @@ export const TagQueries = extendType({
               },
             },
           });
+
           return tags;
         }
+
         return prisma.tag.findMany({
           where: {
             customerId: args.customerId,
@@ -68,7 +70,7 @@ export const TagMutations = extendType({
         dialogueId: 'String',
         tags: TagsInputType,
       },
-      resolve(parent: any, args: any, ctx: any) {
+      resolve(parent: any, args: any) {
         const tags = args.tags.entries.length > 0 ? args.tags.entries.map((entry: string) => ({ id: entry })) : [];
 
         return prisma.dialogue.update({
@@ -83,6 +85,7 @@ export const TagMutations = extendType({
         });
       },
     });
+
     t.field('createTag', {
       type: TagType,
       args: {
@@ -90,7 +93,7 @@ export const TagMutations = extendType({
         customerId: 'String',
         type: TagTypeEnum,
       },
-      resolve(parent: any, args: any, ctx: any) {
+      resolve(parent: any, args: any) {
         return prisma.tag.create({
           data: {
             name: args.name,
@@ -104,17 +107,19 @@ export const TagMutations = extendType({
         });
       },
     });
+
     t.field('deleteTag', {
       type: TagType,
       args: {
         tagId: 'String',
       },
-      resolve(parent: any, args: any, ctx: any) {
+      resolve(parent: any, args: any) {
         return prisma.tag.delete({ where: { id: args.tagId } });
       },
     });
   },
 });
+
 export default [
   TagType,
   TagTypeEnum,

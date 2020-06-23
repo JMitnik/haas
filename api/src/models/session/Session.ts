@@ -19,9 +19,8 @@ export const NodeEntryValueType = objectType({
     t.list.field('multiValues', {
       type: NodeEntryValueType,
       resolve(parent: NodeEntryValue, args: any, ctx: any) {
-        const multiValues = ctx.prisma.nodeEntryValue.findMany(
-          { where: { parentNodeEntryValueId: parent.id } },
-        );
+        const multiValues = ctx.prisma.nodeEntryValue.findMany({ where: { parentNodeEntryValueId: parent.id } });
+
         return multiValues;
       },
     });
