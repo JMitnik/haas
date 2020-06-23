@@ -7,7 +7,7 @@ import { CustomerSettingsType } from '../settings/CustomerSettings';
 // eslint-disable-next-line import/no-cycle
 import { DialogueType } from '../questionnaire/Dialogue';
 import CustomerService from './CustomerService';
-import DialogueResolver from '../questionnaire/dialogue-resolver';
+import DialogueService from '../questionnaire/DialogueService';
 
 export const CustomerType = objectType({
   name: 'Customer',
@@ -193,7 +193,7 @@ export const CustomerMutations = Upload && extendType({
 
         if (dialogueIds.length > 0) {
           await Promise.all(dialogueIds.map(async (dialogueId: any) => {
-            await DialogueResolver.deleteDialogue(dialogueId.id);
+            await DialogueService.deleteDialogue(dialogueId.id);
           }));
         }
         await prisma.tag.deleteMany({ where: { customerId } });
