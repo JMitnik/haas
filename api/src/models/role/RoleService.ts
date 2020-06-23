@@ -19,6 +19,7 @@ class RoleService {
     limit: number,
   ) => {
     let needPageReset = false;
+
     const roles = await prisma.role.findMany({
       where: { customerId },
       include: {
@@ -35,10 +36,16 @@ class RoleService {
     // Slice ordered filtered users
     const slicedOrderedUsers = RoleService.sliceRoles(roles, offset, limit, pageIndex);
 
-    const rolesWithNrPermisisons = slicedOrderedUsers.map(
-      (role) => ({ ...role, amtPermissions: role.permissions.length }),
-    );
-    return { roles: rolesWithNrPermisisons, newPageIndex: needPageReset ? 0 : pageIndex, totalPages };
+    const rolesWithNrPermisisons = slicedOrderedUsers.map((role) => ({
+      ...role,
+      amtPermissions: role.permissions.length,
+    }));
+
+    return {
+      roles: rolesWithNrPermisisons,
+      newPageIndex: needPageReset ? 0 : pageIndex,
+      totalPages,
+    };
   };
 
   static roles = async (customerId: string) => {
@@ -48,17 +55,22 @@ class RoleService {
         permissions: true,
       },
     });
-    const rolesWithNrPermisisons = roles.map(
-      (role) => ({ ...role, amtPermissions: role.permissions.length }),
-    );
+
+    const rolesWithNrPermisisons = roles.map((role) => ({
+      ...role,
+      amtPermissions: role.permissions.length,
+    }));
+
     return rolesWithNrPermisisons;
   };
 
-  static deleteRoles = async (roleIds: Array<string>) => prisma.role.deleteMany({ where: {
-    id: {
-      in: roleIds,
-    },
-  } });
+  static deleteRoles = async (roleIds: Array<string>) => {
+    prisma.role.deleteMany({
+      where: {
+        id: { in: roleIds },
+      },
+    });
+  };
 }
 
 export default RoleService;
