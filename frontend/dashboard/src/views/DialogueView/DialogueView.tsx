@@ -4,9 +4,9 @@ import { useQuery } from '@apollo/react-hooks';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components/macro';
 
+import DialogueLayout from 'layouts/DialogueLayout';
 import Modal from 'components/Modal';
 
-import DialogueLayout from 'layouts/DialogueLayout';
 import DialogueInfo from './DialogueInfo';
 import InteractionFeedModule from './Modules/InteractionFeedModule/InteractionFeedModule';
 import NegativePathsModule from './Modules/NegativePathsModule/index.tsx';

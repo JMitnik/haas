@@ -2,6 +2,7 @@ import React from 'react';
 
 import { DialogueProps } from 'types/generic';
 import { Div, Loader, PageHeading } from '@haas/ui';
+import Placeholder from 'components/Placeholder';
 import Tabbar, { Tab } from 'components/Tabbar/Tabbar';
 
 import DashboardLayout from './DashboardLayout';
@@ -17,7 +18,11 @@ const DialogueLayout = ({ dialogue, children }: DialogueLayoutProps) => {
   return (
     <DashboardLayout>
       <Div>
-        <PageHeading>{dialogue.title}</PageHeading>
+        {dialogue?.title ? (
+          <PageHeading>{dialogue?.title}</PageHeading>
+        ) : (
+          <Placeholder height="30px" width="140px" mb={4} />
+        )}
       </Div>
 
       <Tabbar>
