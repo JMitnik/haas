@@ -4,7 +4,7 @@ import { extendType, inputObjectType, objectType } from '@nexus/schema';
 import { PaginationProps } from '../../types/generic';
 import { QuestionNodeType } from '../question/QuestionNode';
 import NodeEntryService from '../nodeentry/NodeEntryService';
-import SessionResolver from './SessionResolver';
+import SessionService from './SessionService';
 
 export const NodeEntryValueType = objectType({
   name: 'NodeEntryValue',
@@ -205,7 +205,7 @@ export const getSessionAnswerFlowQuery = extendType({
       },
       async resolve(parent: any, args: any) {
         const { pageIndex, offset, limit, startDate, endDate, searchTerm }: PaginationProps = args.filter;
-        const dateRange = SessionResolver.constructDateRangeWhereInput(startDate, endDate);
+        const dateRange = SessionService.constructDateRangeWhereInput(startDate, endDate);
         const orderBy = args.filter.orderBy ? Object.assign({}, ...args.filter.orderBy) : null;
 
         const { pageSessions, totalPages, resetPages } = await NodeEntryService.getCurrentInteractionSessions(
@@ -279,7 +279,7 @@ export const uploadUserSessionMutation = extendType({
         uploadUserSessionInput: UploadUserSessionInput,
       },
       resolve(parent: any, args: any, ctx: any) {
-        const session = SessionResolver.uploadUserSession(parent, args, ctx);
+        const session = SessionService.uploadUserSession(parent, args, ctx);
         return session;
       },
     });

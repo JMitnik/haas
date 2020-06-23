@@ -7,7 +7,7 @@ import { PrismaClient,
 
 const prisma = new PrismaClient();
 
-class TriggerResolver {
+class TriggerService {
   static findTriggersByDialogueId = async (dialogueId: string) => prisma.trigger.findMany({
     where: {
       relatedNode: {
@@ -34,6 +34,7 @@ class TriggerResolver {
     answer: { numberValue: number | null, textValue: string | null },
   ) => {
     let conditionMatched;
+
     switch (triggerCondition.type) {
       case 'HIGH_THRESHOLD':
         conditionMatched = (answer?.numberValue && triggerCondition?.maxValue)
@@ -68,6 +69,7 @@ class TriggerResolver {
       default:
         conditionMatched = { isMatch: false };
     }
+
     return conditionMatched;
   };
 
@@ -110,6 +112,7 @@ class TriggerResolver {
           textValue: condition.textValue,
         },
       });
+
       return upsertTriggerCondition.id;
     }));
 
@@ -143,9 +146,10 @@ class TriggerResolver {
     if (deleteRecipientObjects.length > 0) {
       recipientUpdateArgs.disconnect = deleteRecipientObjects;
     }
+
     updateTriggerArgs.recipients = recipientUpdateArgs;
     return updateTriggerArgs;
   };
 }
 
-export default TriggerResolver;
+export default TriggerService;

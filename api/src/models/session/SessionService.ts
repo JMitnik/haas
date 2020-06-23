@@ -4,14 +4,22 @@ import {
 } from '@prisma/client';
 import { isAfter, subSeconds } from 'date-fns';
 
-import TriggerResolver from '../trigger/trigger-resolver';
+import TriggerService from '../trigger/TriggerService';
 import cleanInt from '../../utils/cleanInt';
 
 const prisma = new PrismaClient();
 
-class SessionResolver {
+// TODO: Rename Session to Interaction
+class SessionService {
+  /**
+   * Uploads a user-session from the client
+   * @param obj
+   * @param args
+   * @param ctx
+   */
   static async uploadUserSession(obj: any, args: any, ctx: any) {
     const { dialogueId, entries } = args.uploadUserSessionInput;
+
     const session = await prisma.session.create({
       data: {
         dialogue: {
@@ -20,16 +28,15 @@ class SessionResolver {
           },
         },
         nodeEntries: {
-          create: entries.map(
-            (entry: any) => SessionResolver.constructNodeEntry(entry),
-          ),
+          create: entries.map((entry: any) => SessionService.constructNodeEntry(entry)),
         },
       },
     });
 
     // SMS SERVICE
     const questionIds = entries.map((entry: any) => entry.nodeId);
-    const dialogueTriggers = await TriggerResolver.findTriggersByQuestionIds(questionIds);
+    const dialogueTriggers = await TriggerService.findTriggersByQuestionIds(questionIds);
+
     dialogueTriggers.forEach(async (trigger) => {
       const currentDate = new Date();
       const safeToSend = !trigger.lastSent || isAfter(subSeconds(currentDate, 60), trigger.lastSent);
@@ -38,7 +45,7 @@ class SessionResolver {
         await prisma.trigger.update(({ where: { id: trigger.id }, data: { lastSent: currentDate } }));
         const { data } = entries.find((entry: any) => entry.nodeId === trigger.relatedNodeId);
         const condition = trigger.conditions[0];
-        const { isMatch, value } = TriggerResolver.match(condition, data);
+        const { isMatch, value } = TriggerService.match(condition, data);
         if (isMatch) {
           trigger.recipients.forEach((recipient) => {
             if (recipient.phone) {
@@ -50,11 +57,12 @@ class SessionResolver {
         }
       }
     });
+
     // TODO: Replace this with email associated to dialogue (or fallback to company)
     const dialogueAgentMail = 'jmitnik@gmail.com';
 
     // TODO: Roundabout way, needs to be done in Prisma2 better
-    const nodeEntries = await SessionResolver.getEntriesOfSession(session);
+    const nodeEntries = await SessionService.getEntriesOfSession(session);
     const questionnaire = await prisma.dialogue.findOne({ where: { id: dialogueId } });
 
     ctx.services.triggerMailService.sendTrigger({
@@ -133,4 +141,4 @@ class SessionResolver {
   }
 }
 
-export default SessionResolver;
+export default SessionService;
