@@ -44,36 +44,38 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <DashboardLayoutContainer>
-      <Sidenav>
-        <Div>
-          <NavLogo />
+      <Div>
+        <Sidenav>
+          <Div>
+            <NavLogo />
 
-          <NavItems>
-            <NavItem to="/dashboard">
-              <SurveyIcon />
-              Dialogues
-            </NavItem>
-            <NavItem to={`/dashboard/c/${customerId}/analytics`}>
-              <PieChartIcon />
-              Analytics
-            </NavItem>
-            <NavItem to={`/dashboard/c/${customerId}/users`}>
-              <UsersIcon />
-              Users
-            </NavItem>
-            <NavItem to={`/dashboard/c/${customerId}/notifications`}>
-              <NotificationIcon />
-              Alerts
-            </NavItem>
-            <NavItem to={`/dashboard/c/${customerId}/settings`}>
-              <SettingsIcon />
-              Settings
-            </NavItem>
-          </NavItems>
-        </Div>
+            <NavItems>
+              <NavItem to="/dashboard">
+                <SurveyIcon />
+                Dialogues
+              </NavItem>
+              <NavItem to={`/dashboard/c/${customerId}/analytics`}>
+                <PieChartIcon />
+                Analytics
+              </NavItem>
+              <NavItem to={`/dashboard/c/${customerId}/users`}>
+                <UsersIcon />
+                Users
+              </NavItem>
+              <NavItem to={`/dashboard/c/${customerId}/notifications`}>
+                <NotificationIcon />
+                Alerts
+              </NavItem>
+              <NavItem to={`/dashboard/c/${customerId}/settings`}>
+                <SettingsIcon />
+                Settings
+              </NavItem>
+            </NavItems>
+          </Div>
 
-        <Usernav user={sampleUser} />
-      </Sidenav>
+          <Usernav user={sampleUser} />
+        </Sidenav>
+      </Div>
 
       <DashboardViewContainer>
         {children}

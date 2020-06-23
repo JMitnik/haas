@@ -31,7 +31,7 @@ const InteractionFeedModule = ({
   return (
     <InteractionFeedModuleContainer>
       <H2 color="primary" fontWeight={400}>
-        Timeline feed
+        Interfaction feed
       </H2>
 
       <InteractionFeedEntriesContainer>

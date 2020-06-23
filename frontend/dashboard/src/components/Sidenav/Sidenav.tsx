@@ -74,8 +74,39 @@ export const NavLogo = () => (
   </Flex>
 );
 
+const UsernavContainer = styled.div`
+  ${({ theme }) => css`
+    padding: 0 ${theme.gutter}px;
+    display: flex;
+    align-items: center;
+    color: ${theme.colors.app.mutedAltOnWhite};
+  `}
+`;
+
+export const Usernav = ({ user }: { user: UserProps }) => (
+  <UsernavContainer>
+    <Avatar name={user.firstName} />
+    <Div ml={4}>
+      <ColumnFlex>
+        <Span fontSize="0.9rem">
+          <Span color="app.mutedAltOnWhite" display="block">
+            {`${user.firstName} ${user.lastName}`}
+          </Span>
+          <Span color="app.mutedOnWhite">
+            {`${user.business.name}`}
+          </Span>
+        </Span>
+
+      </ColumnFlex>
+    </Div>
+  </UsernavContainer>
+);
+
 export const SidenavContainer = styled.div`
   ${({ theme }) => css`
+    position: fixed;
+    width: ${theme.sidenav.width}px;
+
     background: ${theme.colors.app.sidebar};
     display: flex;
     padding-top: ${theme.gutter}px;
@@ -106,34 +137,6 @@ const Sidenav = ({ children }: { children: React.ReactNode }) => (
   <SidenavContainer>
     {children}
   </SidenavContainer>
-);
-
-const UsernavContainer = styled.div`
-  ${({ theme }) => css`
-    padding: 0 ${theme.gutter}px;
-    display: flex;
-    align-items: center;
-    color: ${theme.colors.app.mutedAltOnWhite};
-  `}
-`;
-
-export const Usernav = ({ user }: { user: UserProps }) => (
-  <UsernavContainer>
-    <Avatar name={user.firstName} />
-    <Div ml={4}>
-      <ColumnFlex>
-        <Span fontSize="0.9rem">
-          <Span color="app.mutedAltOnWhite" display="block">
-            {`${user.firstName} ${user.lastName}`}
-          </Span>
-          <Span color="app.mutedOnWhite">
-            {`${user.business.name}`}
-          </Span>
-        </Span>
-
-      </ColumnFlex>
-    </Div>
-  </UsernavContainer>
 );
 
 export default Sidenav;

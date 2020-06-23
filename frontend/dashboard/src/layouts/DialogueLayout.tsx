@@ -8,33 +8,29 @@ import Tabbar, { Tab } from 'components/Tabbar/Tabbar';
 import DashboardLayout from './DashboardLayout';
 
 interface DialogueLayoutProps {
-  dialogue: DialogueProps;
   children: React.ReactNode;
+  dialogueTitle?: string;
 }
 
-const DialogueLayout = ({ dialogue, children }: DialogueLayoutProps) => {
-  console.log('Hmm');
+const DialogueLayout = ({ dialogueTitle, children }: DialogueLayoutProps) => (
+  <DashboardLayout>
+    <Div>
+      {dialogueTitle ? (
+        <PageHeading>{dialogueTitle}</PageHeading>
+      ) : (
+        <Placeholder height="30px" width="140px" mb={4} />
+      )}
+    </Div>
 
-  return (
-    <DashboardLayout>
-      <Div>
-        {dialogue?.title ? (
-          <PageHeading>{dialogue?.title}</PageHeading>
-        ) : (
-          <Placeholder height="30px" width="140px" mb={4} />
-        )}
-      </Div>
+    <Tabbar>
+      <Tab to="">General</Tab>
+      <Tab to="interactions">Interactions</Tab>
+      <Tab to="builder">Builder</Tab>
+      <Tab to="settings">Settings</Tab>
+    </Tabbar>
 
-      <Tabbar>
-        <Tab to="">General</Tab>
-        <Tab to="interactions">Interactions</Tab>
-        <Tab to="builder">Builder</Tab>
-        <Tab to="settings">Settings</Tab>
-      </Tabbar>
-
-      {children}
-    </DashboardLayout>
-  );
-};
+    {children}
+  </DashboardLayout>
+);
 
 export default DialogueLayout;
