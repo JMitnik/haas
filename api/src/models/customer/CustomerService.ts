@@ -10,7 +10,8 @@ function getRandomInt(max: number) {
 }
 
 const prisma = new PrismaClient();
-class CustomerResolver {
+
+class CustomerService {
   static customers = async () => {
     const customers = prisma.customer.findMany();
     return customers;
@@ -183,11 +184,11 @@ class CustomerResolver {
     });
 
     if (isSeed) {
-      await CustomerResolver.seed(customer);
+      await CustomerService.seed(customer);
     }
 
     return customer;
   };
 }
 
-export default CustomerResolver;
+export default CustomerService;

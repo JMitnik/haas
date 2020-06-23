@@ -1,17 +1,13 @@
-
 import { Customer, PrismaClient } from '@prisma/client';
-
-import { extendType, inputObjectType, objectType, scalarType } from '@nexus/schema';
-
 import { GraphQLUpload } from 'apollo-server-express';
+import { extendType, inputObjectType, objectType, scalarType } from '@nexus/schema';
 import cloudinary, { UploadApiResponse } from 'cloudinary';
 
 import { CustomerSettingsType } from '../settings/CustomerSettings';
+// eslint-disable-next-line import/no-cycle
 import { DialogueType } from '../questionnaire/Dialogue';
-import CustomerResolver from './customer-resolver';
+import CustomerService from './CustomerService';
 import DialogueResolver from '../questionnaire/dialogue-resolver';
-import PermissionResolver from '../permission/permission-resolver';
-import RoleResolver from '../role/role-resolver';
 
 export const CustomerType = objectType({
   name: 'Customer',
@@ -19,15 +15,18 @@ export const CustomerType = objectType({
     t.id('id');
     t.string('slug');
     t.string('name');
+
     t.field('settings', {
       type: CustomerSettingsType,
       resolve(parent: Customer, args: any, ctx: any) {
         const customerSettings = ctx.prisma.customerSettings.findOne(
           { where: { customerId: parent.id } },
         );
+
         return customerSettings;
       },
     });
+
     t.list.field('dialogues', {
       type: DialogueType,
       resolve(parent: Customer, args: any, ctx: any) {
@@ -36,6 +35,7 @@ export const CustomerType = objectType({
             customerId: parent.id,
           },
         });
+
         return dialogues;
       },
     });
@@ -71,10 +71,10 @@ export const Upload = GraphQLUpload && scalarType({
 const CustomerCreateOptionsInput = inputObjectType({
   name: 'CustomerCreateOptions',
   definition(t) {
-    t.boolean('isSeed', { default: false, required: false });
     t.string('slug', { required: true });
     t.string('logo');
     t.string('primaryColour');
+    t.boolean('isSeed', { default: false, required: false });
     t.string('name', { required: false });
   },
 });
@@ -118,9 +118,8 @@ export const CustomerMutations = Upload && extendType({
         name: 'String',
         options: CustomerCreateOptionsInput,
       },
-      async resolve(parent: any, args: any, ctx: any) {
-        const file = await args.options.file;
-        return CustomerResolver.createCustomer(args);
+      async resolve(parent: any, args: any) {
+        return CustomerService.createCustomer(args);
       },
     });
     t.field('editCustomer', {
@@ -129,8 +128,8 @@ export const CustomerMutations = Upload && extendType({
         id: 'String',
         options: CustomerCreateOptionsInput,
       },
-      resolve(parent: any, args: any, ctx: any) {
-        return CustomerResolver.editCustomer(args);
+      resolve(parent: any, args: any) {
+        return CustomerService.editCustomer(args);
       },
     });
     t.field('deleteCustomer', {
@@ -193,7 +192,7 @@ export const CustomerMutations = Upload && extendType({
         });
 
         if (dialogueIds.length > 0) {
-          await Promise.all(dialogueIds.map(async (dialogueId) => {
+          await Promise.all(dialogueIds.map(async (dialogueId: any) => {
             await DialogueResolver.deleteDialogue(dialogueId.id);
           }));
         }
@@ -263,12 +262,11 @@ export const CustomerQuery = extendType({
   },
 });
 
-const customerNexus = [
+export default [
   Upload,
   CustomersQuery,
   CustomerQuery,
   CustomerMutations,
   CustomerCreateOptionsInput,
-  CustomerType];
-
-export default customerNexus;
+  CustomerType,
+];
