@@ -197,6 +197,8 @@ export const CustomerMutations = Upload && extendType({
             await DialogueResolver.deleteDialogue(dialogueId.id);
           }));
         }
+        await prisma.tag.deleteMany({ where: { customerId } });
+
         await prisma.triggerCondition.deleteMany({ where: { trigger: { customerId } } });
         await prisma.trigger.deleteMany({ where: { customerId } });
         await prisma.permission.deleteMany({ where: { customerId } });
