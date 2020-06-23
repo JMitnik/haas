@@ -1,11 +1,11 @@
 import client from 'twilio';
 
-const accountSid = 'AC820ded78b44349f074996d94aca241ef';
+const twilioAccountSid = 'AC820ded78b44349f074996d94aca241ef';
 const authToken = '3cf6353e8400b2a08a2029e1fe93ebc3';
 
 export interface SMSServiceInputProps {
   container: any;
-  accountSid: string;
+  twilioAccountSid: string;
   authToken: string;
 }
 
@@ -19,7 +19,7 @@ export interface MailSendOptionsProps {
 class SMSService {
   container: any;
 
-  accountSid: string;
+  twilioAccountSid: string;
 
   authToken: string;
 
@@ -27,9 +27,9 @@ class SMSService {
 
   constructor(input: SMSServiceInputProps) {
     this.container = input.container;
-    this.accountSid = input.accountSid;
+    this.twilioAccountSid = input.twilioAccountSid;
     this.authToken = input.authToken;
-    this.twilio = client(accountSid, authToken);
+    this.twilio = client(twilioAccountSid, authToken);
   }
 
   sendSMS = (from: string, to: string, body: string, production: boolean = false) => {

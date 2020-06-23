@@ -37,7 +37,7 @@ class ServiceContainer implements ServiceContainerProps {
 
     this.smsService = new SMSService({
       container: this,
-      accountSid: config.accountSid,
+      twilioAccountSid: config.twilioAccountSid,
       authToken: config.authToken,
     });
   }
