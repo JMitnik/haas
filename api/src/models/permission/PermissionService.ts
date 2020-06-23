@@ -3,11 +3,11 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 class PermissionService {
-  static deletePermissions = async (permssionIds: Array<string>) => {
+  static deletePermissions = async (permissionIds: Array<string>) => {
     prisma.permission.deleteMany({
       where: {
         id: {
-          in: permssionIds,
+          in: permissionIds,
         },
       },
     });
