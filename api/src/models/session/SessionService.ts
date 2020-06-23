@@ -53,8 +53,6 @@ class SessionService {
         const condition = trigger.conditions[0];
         const { isMatch, value } = TriggerService.match(condition, data);
 
-        trigger.medium;
-
         if (isMatch) {
           trigger.recipients.forEach((recipient) => {
             // TODO: make this body the TriggerService.sendTrigger <- Confident we will send something.
