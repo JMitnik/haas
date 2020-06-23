@@ -3,7 +3,7 @@ import { useMutation, useQuery } from '@apollo/react-hooks';
 import React, { FC } from 'react';
 
 import { AddCard, Card, CardBody, Container, DeleteButtonContainer, Div, EditButtonContainer,
-  Flex, Grid, H2, H3 } from '@haas/ui';
+  Flex, Grid, H2, H3, H4 } from '@haas/ui';
 import { Edit, Plus, X } from 'react-feather';
 import { Link, useHistory } from 'react-router-dom';
 
@@ -11,19 +11,22 @@ import { CustomerCardImage } from './DashboardViewStyles';
 import { deleteFullCustomerQuery } from '../../mutations/deleteFullCustomer';
 import { getCustomerQuery } from '../../queries/getCustomersQuery';
 
+const ErrorCard = () => (
+  <Div>
+    <H2>Sorry for the inconvenience</H2>
+
+    <H4>We will be right back!</H4>
+  </Div>
+);
+
 const DashboardView: FC = () => {
   const { loading, error, data } = useQuery(getCustomerQuery);
 
-  console.log(error);
-  console.log(loading);
-
   if (error) {
     return (
-      <p>
-        Error:
-        {error.message}
-        `
-      </p>
+      <Div>
+        <ErrorCard />
+      </Div>
     );
   }
 
