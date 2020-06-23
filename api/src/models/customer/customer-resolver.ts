@@ -134,6 +134,22 @@ class CustomerResolver {
       data: {
         name,
         slug,
+        tags: {
+          create: [
+            {
+              name: 'Agent',
+              type: 'AGENT',
+            },
+            {
+              name: 'Amsterdam',
+              type: 'LOCATION',
+            },
+            {
+              name: 'Marketing strategy #131',
+              type: 'DEFAULT',
+            },
+          ],
+        },
         settings: {
           create: {
             logoUrl: logo,

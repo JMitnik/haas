@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client';
-import cuid from 'cuid';
 import CustomerResolver from '../../models/customer/customer-resolver';
+import cuid from 'cuid';
+
 const prisma = new PrismaClient();
 
 const CUSTOMER = 'Mediamarkt';
@@ -10,6 +11,22 @@ const makeMediamarkt = async () => {
     data: {
       name: CUSTOMER,
       slug: 'mediamarkt',
+      tags: {
+        create: [
+          {
+            name: 'Agent',
+            type: 'AGENT',
+          },
+          {
+            name: 'Amsterdam',
+            type: 'LOCATION',
+          },
+          {
+            name: 'Marketing strategy #131',
+            type: 'DEFAULT',
+          },
+        ],
+      },
       settings: {
         create: {
           logoUrl: 'https://pbs.twimg.com/profile_images/644430670513631232/x7TWAZrV_400x400.png',
