@@ -1,8 +1,8 @@
 import { Dialogue, DialogueCreateInput, DialogueUpdateInput, NodeEntry, PrismaClient, Tag, TagUpdateManyDataInput, TagWhereUniqueInput } from '@prisma/client';
 import { isAfter, subDays } from 'date-fns';
-import _ from 'lodash';
 import { leafNodes, sliderType } from '../../data/seeds/default-data';
 import NodeResolver from '../question/node-resolver';
+import _ from 'lodash';
 
 const prisma = new PrismaClient();
 interface LeafNodeProps {
@@ -449,7 +449,6 @@ class DialogueResolver {
       ? tags?.entries?.map((tag: string) => ({ id: tag }))
       : [];
 
-    console.log('tags: ', dialogueTags);
     const customer = await prisma.customer.findOne({ where: { id: customerId } });
 
     if (isSeed) {
