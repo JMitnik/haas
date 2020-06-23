@@ -679,6 +679,7 @@ export interface NexusGenArgTypes {
     }
     dialogues: { // args
       customerId?: string | null; // ID
+      filter?: NexusGenInputs['TagsInputObjectType'] | null; // TagsInputObjectType
     }
     edge: { // args
       id?: string | null; // String

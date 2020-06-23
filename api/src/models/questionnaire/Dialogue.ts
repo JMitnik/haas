@@ -1,5 +1,5 @@
 
-import { Dialogue, PrismaClient } from '@prisma/client';
+import { Dialogue, DialogueWhereInput, PrismaClient } from '@prisma/client';
 import { extendType, inputObjectType, objectType } from '@nexus/schema';
 
 import { CustomerType } from '../customer/Customer';
@@ -276,13 +276,23 @@ export const DialoguesOfCustomerQuery = extendType({
       type: DialogueType,
       args: {
         customerId: 'ID',
+        filter: TagsInputType,
       },
       async resolve(parent: any, args: any, ctx: any, info: any) {
         const { prisma } : { prisma: PrismaClient} = ctx;
-        const dialogues: Array<Dialogue> = await prisma.dialogue.findMany({
-          where: {
-            customerId: args.customerId,
-          },
+        const dialogueWhereInput: DialogueWhereInput = { customerId: args.customerId };
+        if (args.filter) {
+          dialogueWhereInput.tags = {
+            some: {
+              id: {
+                in: args.filter.entries,
+              },
+            },
+          };
+        }
+
+        const dialogues = await prisma.dialogue.findMany({
+          where: dialogueWhereInput,
           include: {
             tags: true,
           },
