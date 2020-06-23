@@ -217,6 +217,7 @@ export const deleteDialogueOfCustomerMutation = extendType({
         title: 'String',
         description: 'String',
         publicTitle: 'String',
+        tags: TagsInputType,
       },
       resolve(parent: any, args: any, ctx: any, info: any) {
         return DialogueResolver.editDialogue(args);
@@ -261,8 +262,12 @@ export const DialoguesOfCustomerQuery = extendType({
         where: DialogueWhereUniqueInput,
       },
       async resolve(parent: any, args: any, ctx: any, info: any) {
-        const dialogue = await ctx.prisma.dialogue.findOne({ where: {
+        const { prisma } : { prisma: PrismaClient} = ctx;
+        const dialogue = await prisma.dialogue.findOne({ where: {
           id: args.where.id,
+        },
+        include: {
+          tags: true,
         } });
         return dialogue;
       },

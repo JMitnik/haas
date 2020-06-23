@@ -641,6 +641,7 @@ export interface NexusGenArgTypes {
       description?: string | null; // String
       dialogueId?: string | null; // String
       publicTitle?: string | null; // String
+      tags?: NexusGenInputs['TagsInputObjectType'] | null; // TagsInputObjectType
       title?: string | null; // String
     }
     editTrigger: { // args

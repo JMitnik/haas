@@ -1,8 +1,8 @@
-import { Dialogue, DialogueCreateInput, NodeEntry, PrismaClient } from '@prisma/client';
+import { Dialogue, DialogueCreateInput, DialogueUpdateInput, NodeEntry, PrismaClient, Tag, TagUpdateManyDataInput, TagWhereUniqueInput } from '@prisma/client';
 import { isAfter, subDays } from 'date-fns';
+import _ from 'lodash';
 import { leafNodes, sliderType } from '../../data/seeds/default-data';
 import NodeResolver from '../question/node-resolver';
-import _ from 'lodash';
 
 const prisma = new PrismaClient();
 interface LeafNodeProps {
@@ -74,19 +74,50 @@ class DialogueResolver {
     };
   }
 
+  static updateTags = (
+    dbTags: Array<Tag>,
+    newTags: Array<string>,
+    updateDialogueArgs: DialogueUpdateInput,
+  ) => {
+    const newTagObjects = newTags.map((tag) => ({ id: tag }));
+
+    const deleteTagObjects: TagWhereUniqueInput[] = [];
+    dbTags.forEach((tag) => {
+      if (!newTags.includes(tag.id)) {
+        deleteTagObjects.push({ id: tag.id });
+      }
+    });
+
+    const tagUpdateArgs: any = {};
+    if (newTagObjects.length > 0) {
+      tagUpdateArgs.connect = newTagObjects;
+    }
+
+    if (deleteTagObjects.length > 0) {
+      tagUpdateArgs.disconnect = deleteTagObjects;
+    }
+    updateDialogueArgs.tags = tagUpdateArgs;
+    return updateDialogueArgs;
+  };
+
   static editDialogue = async (args: any) => {
-    const { dialogueId, title, description, publicTitle } = args;
-    const dialogue = await prisma.dialogue.update({
+    const { dialogueId, title, description, publicTitle, tags } = args;
+    const dbDialogue = await prisma.dialogue.findOne({ where: { id: dialogueId },
+      include: {
+        tags: true,
+      } });
+
+    let updateDialogueArgs: DialogueUpdateInput = { title, description, publicTitle };
+    if (dbDialogue?.tags) {
+      updateDialogueArgs = DialogueResolver.updateTags(dbDialogue.tags, tags.entries, updateDialogueArgs);
+    }
+
+    return prisma.dialogue.update({
       where: {
         id: dialogueId,
       },
-      data: {
-        title,
-        description,
-        publicTitle,
-      },
+      data: updateDialogueArgs,
     });
-    return dialogue;
   };
 
   static getTopPaths = (groupedJoined: any) => {
