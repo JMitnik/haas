@@ -1,12 +1,12 @@
 import { ApolloError } from 'apollo-client';
-import { Edit, Menu, Trash } from 'react-feather';
+import { Edit, Trash } from 'react-feather';
 import { formatDistance } from 'date-fns';
 import { useHistory, useParams } from 'react-router';
 import { useMutation } from '@apollo/react-hooks';
 import React from 'react';
 
 import { Card, CardBody, ColumnFlex, Div, Flex, H3, Paragraph } from '@haas/ui';
-import { MenuHeader, MenuItem } from 'components/Menu/Menu';
+import { Menu, MenuHeader, MenuItem } from 'components/Menu/Menu';
 import { deleteQuestionnaireMutation } from 'mutations/deleteQuestionnaire';
 import ShowMoreButton from 'components/ShowMoreButton';
 import getQuestionnairesCustomerQuery from 'queries/getQuestionnairesCustomerQuery';
