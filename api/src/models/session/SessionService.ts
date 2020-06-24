@@ -33,43 +33,11 @@ class SessionService {
       },
     });
 
-    // TODO: Put the rest of the block in the TriggerService (-> TriggerService.tryTriggers / deployTriggers / any plural name logical for this)
-    // TODO: => Put the resulting one-liner (TriggerService) in a try/catch block just in case.
-
-    // SMS SERVICE
-    const questionIds = entries.map((entry: any) => entry.nodeId);
-    const dialogueTriggers = await TriggerService.findTriggersByQuestionIds(questionIds);
-
-    dialogueTriggers.forEach(async (trigger) => {
-      // TODO: Make this body TriggerService.tryTrigger (singular)
-      const currentDate = new Date();
-      const safeToSend = !trigger.lastSent || isAfter(subSeconds(currentDate, 60), trigger.lastSent);
-
-      if (safeToSend) {
-        // TODO: Do we have to await this function? can just let it run on the side
-        await prisma.trigger.update(({ where: { id: trigger.id }, data: { lastSent: currentDate } }));
-
-        const { data } = entries.find((entry: any) => entry.nodeId === trigger.relatedNodeId);
-        const condition = trigger.conditions[0];
-        const { isMatch, value } = TriggerService.match(condition, data);
-
-        if (isMatch) {
-          trigger.recipients.forEach((recipient) => {
-            // TODO: make this body the TriggerService.sendTrigger <- Confident we will send something.
-
-            // TODO: Add check for medium
-            if (recipient.phone) {
-              // TODO: For better testability, make this part of the bodyTriggerService.sendSmsTrigger
-              const twilioPhoneNumber = '+3197010252775';
-              const smsBody = `'${trigger.name}' was triggered by someone who entered the value '${value}'.`;
-              ctx.services.smsService.sendSMS(twilioPhoneNumber, recipient.phone, smsBody, true);
-            }
-
-            // TODO: Add the mail check (below) in this body as well.
-          });
-        }
-      }
-    });
+    try {
+      await TriggerService.tryTriggers(entries, ctx.services.triggerSMSService);
+    } catch (e) {
+      console.log('Something went wrong while handling sms triggers: ', e);
+    }
 
     // TODO: Replace this with email associated to dialogue (or fallback to company)
     const dialogueAgentMail = 'jmitnik@gmail.com';

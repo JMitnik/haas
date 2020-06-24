@@ -20,11 +20,9 @@ import getRecipientsQuery from 'queries/getUsers';
 
 interface FormDataProps {
   name: string;
-  lastName?: string;
-  email: string;
-  phone?: string;
-  role: { label: string, value: string };
-  conditions: Array<TriggerCondition>
+  matchText: string;
+  lowThreshold: number;
+  highThreshold: number;
 }
 
 enum TriggerConditionType {
@@ -46,14 +44,6 @@ interface TriggerCondition {
   maxValue?: number,
   textValue?: string
 }
-
-const TRIGGER_CONDITION_TYPES = [
-  { label: 'Low Threshold', value: TriggerConditionType.LOW_THRESHOLD },
-  { label: 'High Threshold', value: TriggerConditionType.HIGH_THRESHOLD },
-  { label: 'Text Match', value: TriggerConditionType.TEXT_MATCH },
-  { label: 'Outer Range', value: TriggerConditionType.OUTER_RANGE },
-  { label: 'Inner Range', value: TriggerConditionType.INNER_RANGE },
-];
 
 const TRIGGER_TYPES = [
   { label: 'Question', value: 'QUESTION' },
@@ -147,20 +137,22 @@ const AddTriggerView = () => {
   }, 250), []);
 
   const setConditionMinValue = useCallback(debounce((value: string, index: number) => {
-    const numberValue = parseInt(value) || 0;
+    const numberValue = parseFloat(value) || 0;
+    const dbNumberValue = numberValue * 10;
     setActiveConditions((prevConditions) => {
-      prevConditions[index].minValue = numberValue;
+      prevConditions[index].minValue = dbNumberValue;
       return [...prevConditions];
     });
-  }, 200), []);
+  }, 300), []);
 
   const setConditionMaxValue = useCallback(debounce((value: string, index: number) => {
-    const numberValue = parseInt(value) || 0;
+    const numberValue = parseFloat(value) || 0;
+    const dbNumberValue = numberValue * 10;
     setActiveConditions((prevConditions) => {
-      prevConditions[index].maxValue = numberValue;
+      prevConditions[index].maxValue = dbNumberValue;
       return [...prevConditions];
     });
-  }, 200), []);
+  }, 300), []);
 
   const addCondition = () => {
     setActiveConditions((prevConditions) => [...prevConditions, { type: null }]);
@@ -171,6 +163,28 @@ const AddTriggerView = () => {
       prevConditions.splice(index, 1);
       return [...prevConditions];
     });
+  };
+
+  const setConditionTypeOptions = (questionId: string | undefined, questions: Array<any>) => {
+    if (!questionId || questions?.length === 0) {
+      return [];
+    }
+
+    const activeQuestionNode = questions.find((question) => question.id === questionId);
+    if (!activeQuestionNode) {
+      return [];
+    }
+    if (activeQuestionNode.type === 'SLIDER') {
+      return [
+        { label: 'Low Threshold', value: TriggerConditionType.LOW_THRESHOLD },
+        { label: 'High Threshold', value: TriggerConditionType.HIGH_THRESHOLD },
+        { label: 'Outer Range', value: TriggerConditionType.OUTER_RANGE },
+        { label: 'Inner Range', value: TriggerConditionType.INNER_RANGE },
+      ];
+    }
+    return [
+      { label: 'Text Match', value: TriggerConditionType.TEXT_MATCH },
+    ];
   };
 
   const dialogues = dialogueData?.dialogues && dialogueData?.dialogues.map((dialogue: any) => (
@@ -274,7 +288,7 @@ const AddTriggerView = () => {
                           <X />
                         </DeleteButtonContainer>
                         <Select
-                          options={TRIGGER_CONDITION_TYPES}
+                          options={setConditionTypeOptions(activeQuestion?.value, questionsData?.dialogue?.questions)}
                           value={condition.type}
                           onChange={(qOption: any) => setConditionsType(qOption, index)}
                         />
@@ -283,34 +297,38 @@ const AddTriggerView = () => {
                           <StyledLabel>Match Text</StyledLabel>
                           <StyledInput
                             onChange={(event) => setMatchText(event.currentTarget.value, index)}
-                            name="minValue"
+                            name="matchText"
                             ref={register({ required: true })}
                           />
-                          {errors.name && <Muted color="warning">Something went wrong!</Muted>}
+                          {errors.matchText && <Muted color="warning">Something went wrong!</Muted>}
                         </Flex>
                         )}
 
                         {condition?.type?.value === TriggerConditionType.LOW_THRESHOLD && (
                           <Flex marginTop={5} flexDirection="column">
-                            <StyledLabel>Low Threshold</StyledLabel>
+                            <StyledLabel>Low Threshold (0 - 10)</StyledLabel>
                             <StyledInput
+                              type="number"
+                              step="0.1"
                               onChange={(event) => setConditionMinValue(event.currentTarget.value, index)}
-                              name="name"
-                              ref={register({ required: true })}
+                              name="lowThreshold"
+                              ref={register({ required: true, min: 0, max: 10 })}
                             />
-                            {errors.name && <Muted color="warning">Something went wrong!</Muted>}
+                            {errors.lowThreshold && <Muted color="warning">Value not between 0 and 10</Muted>}
                           </Flex>
                         )}
 
                         {condition?.type?.value === TriggerConditionType.HIGH_THRESHOLD && (
                         <Flex marginTop={5} flexDirection="column">
-                          <StyledLabel>High Threshold</StyledLabel>
+                          <StyledLabel>High Threshold (0 - 10)</StyledLabel>
                           <StyledInput
+                            type="number"
+                            step="0.1"
                             onChange={(event) => setConditionMaxValue(event.currentTarget.value, index)}
-                            name="name"
-                            ref={register({ required: true })}
+                            name="highThreshold"
+                            ref={register({ required: true, min: 0, max: 10 })}
                           />
-                          {errors.name && <Muted color="warning">Something went wrong!</Muted>}
+                          {errors.highThreshold && <Muted color="warning">Value not between 0 and 10</Muted>}
                         </Flex>
                         )}
 
@@ -318,22 +336,26 @@ const AddTriggerView = () => {
                         || condition?.type?.value === TriggerConditionType.INNER_RANGE) && (
                         <Flex marginTop={5} flexDirection="row" justifyContent="space-evenly">
                           <Flex width="49%" flexDirection="column">
-                            <StyledLabel>Low Threshold</StyledLabel>
+                            <StyledLabel>Low Threshold (0 - 10)</StyledLabel>
                             <StyledInput
+                              type="number"
+                              step="0.1"
                               onChange={(event) => setConditionMinValue(event.currentTarget.value, index)}
-                              name="name"
-                              ref={register({ required: true })}
+                              name="lowThreshold"
+                              ref={register({ required: true, min: 0, max: 10 })}
                             />
-                            {errors.name && <Muted color="warning">Something went wrong!</Muted>}
+                            {errors.lowThreshold && <Muted color="warning">Value not between 0 and 10</Muted>}
                           </Flex>
                           <Flex width="49%" flexDirection="column">
-                            <StyledLabel>High Threshold</StyledLabel>
+                            <StyledLabel>High Threshold (0 - 10)</StyledLabel>
                             <StyledInput
+                              type="number"
+                              step="0.1"
                               onChange={(event) => setConditionMaxValue(event.currentTarget.value, index)}
-                              name="name"
-                              ref={register({ required: true })}
+                              name="highThreshold"
+                              ref={register({ required: true, min: 0, max: 10 })}
                             />
-                            {errors.name && <Muted color="warning">Something went wrong!</Muted>}
+                            {errors.highThreshold && <Muted color="warning">Value not between 0 and 10</Muted>}
                           </Flex>
                         </Flex>
                         )}
@@ -345,7 +367,6 @@ const AddTriggerView = () => {
                   <Flex flexDirection="row" alignItems="center" justifyContent="space-between">
                     <H4>Recipients</H4>
                     <PlusCircle onClick={addRecipient} />
-                    {/* conditions header here */}
                   </Flex>
                   <Hr />
                   <Div marginTop={15}>

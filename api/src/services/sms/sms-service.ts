@@ -9,13 +9,6 @@ export interface SMSServiceInputProps {
   twilioAuthToken: string;
 }
 
-export interface MailSendOptionsProps {
-  to: string;
-  body: string | any;
-  subject: string;
-  from?: string | null;
-}
-
 class SMSService {
   container: any;
 

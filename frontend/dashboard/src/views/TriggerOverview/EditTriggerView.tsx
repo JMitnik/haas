@@ -22,11 +22,9 @@ import getTriggerQuery from 'queries/getTrigger';
 
 interface FormDataProps {
   name: string;
-  lastName?: string;
-  email: string;
-  phone?: string;
-  role: { label: string, value: string };
-  conditions: Array<TriggerCondition>
+  matchText: string;
+  lowThreshold: number;
+  highThreshold: number;
 }
 
 enum TriggerConditionType {
@@ -97,14 +95,6 @@ interface EditTriggerProps {
   medium: { label: string, value: string };
   recipients: Array<{ label: string, value: string }>;
 }
-
-const TRIGGER_CONDITION_TYPES = [
-  { label: 'Low Threshold', value: TriggerConditionType.LOW_THRESHOLD },
-  { label: 'High Threshold', value: TriggerConditionType.HIGH_THRESHOLD },
-  { label: 'Text Match', value: TriggerConditionType.TEXT_MATCH },
-  { label: 'Outer Range', value: TriggerConditionType.OUTER_RANGE },
-  { label: 'Inner Range', value: TriggerConditionType.INNER_RANGE },
-];
 
 const TRIGGER_TYPES = [
   { label: 'Question', value: 'QUESTION' },
@@ -269,20 +259,22 @@ const EditTriggerForm = (
   }, 250), []);
 
   const setConditionMinValue = useCallback(debounce((value: string, index: number) => {
-    const numberValue = parseInt(value) || 0;
+    const numberValue = parseFloat(value) || 0;
+    const dbNumberValue = numberValue * 10;
     setActiveConditions((prevConditions) => {
-      prevConditions[index].minValue = numberValue;
+      prevConditions[index].minValue = dbNumberValue;
       return [...prevConditions];
     });
-  }, 200), []);
+  }, 300), []);
 
   const setConditionMaxValue = useCallback(debounce((value: string, index: number) => {
-    const numberValue = parseInt(value) || 0;
+    const numberValue = parseFloat(value) || 0;
+    const dbNumberValue = numberValue * 10;
     setActiveConditions((prevConditions) => {
-      prevConditions[index].maxValue = numberValue;
+      prevConditions[index].maxValue = dbNumberValue;
       return [...prevConditions];
     });
-  }, 200), []);
+  }, 300), []);
 
   const addCondition = () => {
     setActiveConditions((prevConditions) => [...prevConditions, { type: null }]);
@@ -293,6 +285,28 @@ const EditTriggerForm = (
       prevConditions.splice(index, 1);
       return [...prevConditions];
     });
+  };
+
+  const setConditionTypeOptions = (questionId: string | undefined, questions: Array<any>) => {
+    if (!questionId || questions?.length === 0) {
+      return [];
+    }
+
+    const activeQuestionNode = questions?.find((question) => question.id === questionId);
+    if (!activeQuestionNode) {
+      return [];
+    }
+    if (activeQuestionNode.type === 'SLIDER') {
+      return [
+        { label: 'Low Threshold', value: TriggerConditionType.LOW_THRESHOLD },
+        { label: 'High Threshold', value: TriggerConditionType.HIGH_THRESHOLD },
+        { label: 'Outer Range', value: TriggerConditionType.OUTER_RANGE },
+        { label: 'Inner Range', value: TriggerConditionType.INNER_RANGE },
+      ];
+    }
+    return [
+      { label: 'Text Match', value: TriggerConditionType.TEXT_MATCH },
+    ];
   };
 
   const questions = questionsData?.dialogue?.questions && questionsData?.dialogue?.questions.map((question: any) => (
@@ -394,7 +408,7 @@ const EditTriggerForm = (
                           <X />
                         </DeleteButtonContainer>
                         <Select
-                          options={TRIGGER_CONDITION_TYPES}
+                          options={setConditionTypeOptions(activeQuestion?.value, questionsData?.dialogue?.questions)}
                           value={condition.type}
                           onChange={(qOption: any) => setConditionsType(qOption, index)}
                         />
@@ -404,10 +418,10 @@ const EditTriggerForm = (
                             <StyledInput
                               defaultValue={condition?.textValue}
                               onChange={(event) => setMatchText(event.currentTarget.value, index)}
-                              name="minValue"
+                              name="matchText"
                               ref={register({ required: true })}
                             />
-                            {errors.name && <Muted color="warning">Something went wrong!</Muted>}
+                            {errors.matchText && <Muted color="warning">Something went wrong!</Muted>}
                           </Flex>
                         )}
 
@@ -415,12 +429,14 @@ const EditTriggerForm = (
                           <Flex marginTop={5} flexDirection="column">
                             <StyledLabel>Low Threshold</StyledLabel>
                             <StyledInput
+                              type="number"
+                              step="0.1"
                               onChange={(event) => setConditionMinValue(event.currentTarget.value, index)}
-                              defaultValue={condition?.minValue}
-                              name="name"
-                              ref={register({ required: true })}
+                              defaultValue={condition?.minValue && condition?.minValue / 10}
+                              name="lowThreshold"
+                              ref={register({ required: true, min: 0, max: 10 })}
                             />
-                            {errors.name && <Muted color="warning">Something went wrong!</Muted>}
+                            {errors.lowThreshold && <Muted color="warning">Value not between 0 and 10</Muted>}
                           </Flex>
                         )}
 
@@ -428,12 +444,14 @@ const EditTriggerForm = (
                           <Flex marginTop={5} flexDirection="column">
                             <StyledLabel>High Threshold</StyledLabel>
                             <StyledInput
+                              type="number"
+                              step="0.1"
                               onChange={(event) => setConditionMaxValue(event.currentTarget.value, index)}
-                              defaultValue={condition?.maxValue}
-                              name="name"
-                              ref={register({ required: true })}
+                              defaultValue={condition?.maxValue && condition?.maxValue / 10}
+                              name="highThreshold"
+                              ref={register({ required: true, min: 0, max: 10 })}
                             />
-                            {errors.name && <Muted color="warning">Something went wrong!</Muted>}
+                            {errors.highThreshold && <Muted color="warning">Value not between 0 and 10</Muted>}
                           </Flex>
                         )}
 
@@ -443,22 +461,26 @@ const EditTriggerForm = (
                               <Flex width="49%" flexDirection="column">
                                 <StyledLabel>Low Threshold</StyledLabel>
                                 <StyledInput
+                                  type="number"
+                                  step="0.1"
                                   onChange={(event) => setConditionMinValue(event.currentTarget.value, index)}
-                                  defaultValue={condition?.minValue}
-                                  name="name"
-                                  ref={register({ required: true })}
+                                  defaultValue={condition?.minValue && condition?.minValue / 10}
+                                  name="lowThreshold"
+                                  ref={register({ required: true, min: 0, max: 10 })}
                                 />
-                                {errors.name && <Muted color="warning">Something went wrong!</Muted>}
+                                {errors.lowThreshold && <Muted color="warning">Value not between 0 and 10</Muted>}
                               </Flex>
                               <Flex width="49%" flexDirection="column">
                                 <StyledLabel>High Threshold</StyledLabel>
                                 <StyledInput
+                                  type="number"
+                                  step="0.1"
                                   onChange={(event) => setConditionMaxValue(event.currentTarget.value, index)}
-                                  defaultValue={condition?.textValue}
-                                  name="name"
-                                  ref={register({ required: true })}
+                                  defaultValue={condition?.maxValue && condition?.maxValue / 10}
+                                  name="highThreshold"
+                                  ref={register({ required: true, min: 0, max: 10 })}
                                 />
-                                {errors.name && <Muted color="warning">Something went wrong!</Muted>}
+                                {errors.highThreshold && <Muted color="warning">Value not between 0 and 10</Muted>}
                               </Flex>
                             </Flex>
                         )}

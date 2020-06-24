@@ -1,13 +1,65 @@
-import { PrismaClient,
+import {
+  PrismaClient,
+  Trigger,
   TriggerCondition,
   TriggerUpdateInput,
   User,
   UserUpdateManyWithoutTriggersInput,
-  UserWhereUniqueInput } from '@prisma/client';
+  UserWhereUniqueInput,
+} from '@prisma/client';
+
+import { isAfter, subSeconds } from 'date-fns';
+import SMSService from '../../services/sms/sms-service';
+import TriggerSMSService from '../../services/sms/trigger-sms-service';
 
 const prisma = new PrismaClient();
 
 class TriggerService {
+  static sendTrigger = (
+    trigger: Trigger,
+    recipient: User,
+    value: string | number | undefined,
+    smsService: TriggerSMSService,
+  ) => {
+    if (value && recipient.phone && (trigger.medium === 'PHONE' || trigger.medium === 'BOTH')) {
+      smsService.sendTriggerSMS(trigger, recipient.phone, value);
+    }
+    // TODO: Add the mail check (below) in this body as well.
+  };
+
+  static tryTrigger = async (entries: Array<any>, trigger: Trigger & {
+    recipients: User[];
+    conditions: TriggerCondition[];
+  },
+    smsService: TriggerSMSService) => {
+    const currentDate = new Date();
+    const safeToSend = !trigger.lastSent || isAfter(subSeconds(currentDate, 60), trigger.lastSent);
+
+    if (safeToSend) {
+      // TODO: Do we have to await this function? can just let it run on the side
+      await prisma.trigger.update(({ where: { id: trigger.id }, data: { lastSent: currentDate } }));
+
+      const { data } = entries.find((entry) => entry.nodeId === trigger.relatedNodeId);
+      const condition = trigger.conditions[0];
+      const { isMatch, value } = TriggerService.match(condition, data);
+
+      if (isMatch) {
+        trigger.recipients.forEach((recipient) => {
+          TriggerService.sendTrigger(trigger, recipient, value, smsService);
+        });
+      }
+    }
+  };
+
+  static tryTriggers = async (entries: Array<any>, smsService: TriggerSMSService) => {
+    const questionIds = entries.map((entry: any) => entry.nodeId);
+    const dialogueTriggers = await TriggerService.findTriggersByQuestionIds(questionIds);
+
+    dialogueTriggers.forEach(async (trigger) => {
+      await TriggerService.tryTrigger(entries, trigger, smsService);
+    });
+  };
+
   static findTriggersByDialogueId = async (dialogueId: string) => prisma.trigger.findMany({
     where: {
       relatedNode: {
@@ -48,22 +100,28 @@ class TriggerService {
         break;
       case 'TEXT_MATCH':
         conditionMatched = (answer?.textValue && triggerCondition.textValue)
-          ? { isMatch: answer.textValue.toLowerCase() === triggerCondition.textValue.toLowerCase(),
-            value: answer.textValue }
+          ? {
+            isMatch: answer.textValue.toLowerCase() === triggerCondition.textValue.toLowerCase(),
+            value: answer.textValue,
+          }
           : { isMatch: false };
         break;
       case 'OUTER_RANGE':
         conditionMatched = (answer?.numberValue && triggerCondition.minValue && triggerCondition.maxValue)
-          ? { isMatch: answer.numberValue > triggerCondition.maxValue
-            || answer.numberValue < triggerCondition.minValue,
-          value: answer.numberValue }
+          ? {
+            isMatch: answer.numberValue > triggerCondition.maxValue
+              || answer.numberValue < triggerCondition.minValue,
+            value: answer.numberValue,
+          }
           : { isMatch: false };
         break;
       case 'INNER_RANGE':
         conditionMatched = (answer?.numberValue && triggerCondition.minValue && triggerCondition.maxValue)
-          ? { isMatch: (answer.numberValue < triggerCondition.maxValue
-            && answer.numberValue > triggerCondition.minValue),
-          value: answer.numberValue }
+          ? {
+            isMatch: (answer.numberValue < triggerCondition.maxValue
+              && answer.numberValue > triggerCondition.minValue),
+            value: answer.numberValue,
+          }
           : { isMatch: false };
         break;
       default:
