@@ -36,27 +36,25 @@ const CustomerOverview: FC = () => {
 
   return (
     <>
-      <>
-        <PageHeading>Customers</PageHeading>
+      <PageHeading>Customers</PageHeading>
 
-        <Grid
-          gridGap={4}
-          gridTemplateColumns={['1fr', '1fr 1fr 1fr']}
-          gridAutoRows="minmax(150px, 1fr)"
-        >
-          {customers?.map((customer: any, index: any) => customer && <CustomerCard key={index} customer={customer} />)}
+      <Grid
+        gridGap={4}
+        gridTemplateColumns={['1fr', '1fr 1fr 1fr']}
+        gridAutoRows="minmax(150px, 1fr)"
+      >
+        {customers?.map((customer: any, index: any) => customer && <CustomerCard key={index} customer={customer} />)}
 
-          <AddCard>
-            <Link to="/dashboard/customer-builder" />
-            <Div>
-              <Plus />
-              <H3>
-                Add new customer
-              </H3>
-            </Div>
-          </AddCard>
-        </Grid>
-      </>
+        <AddCard>
+          <Link to="/dashboard/customer-builder" />
+          <Div>
+            <Plus />
+            <H3>
+              Add new customer
+            </H3>
+          </Div>
+        </AddCard>
+      </Grid>
     </>
   );
 };

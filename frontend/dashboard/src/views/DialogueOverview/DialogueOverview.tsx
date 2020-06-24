@@ -3,8 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { Plus } from 'react-feather';
 import React from 'react';
 
-import DashboardLayout from 'layouts/DashboardLayout';
-import Searchbar from 'components/Searchbar';
+import Searchbar from 'components/SearchBar';
 
 import { AddDialogueCard } from './DialogueOverviewStyles';
 import DialogueCard from './DialogueCard';
@@ -18,12 +17,12 @@ const DialogueOverview = ({ dialogues }: { dialogues: any }) => {
   const { customerId } = useParams();
 
   return (
-    <DashboardLayout>
+    <>
       <PageHeading>Dialogues</PageHeading>
 
       <Div mb={4}>
         <Grid gridTemplateColumns="300px 1fr">
-          <Searchbar />
+          <Searchbar activeSearchTerm="" onSearchTermChange={(newTerm) => (console.log(newTerm))} />
           <DialogueOverviewFilters />
         </Grid>
       </Div>
@@ -48,7 +47,7 @@ const DialogueOverview = ({ dialogues }: { dialogues: any }) => {
           </Div>
         </AddDialogueCard>
       </Grid>
-    </DashboardLayout>
+    </>
   );
 };
 

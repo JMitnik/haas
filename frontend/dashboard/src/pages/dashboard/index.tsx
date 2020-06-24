@@ -1,27 +1,18 @@
 import { Route, Switch } from 'react-router';
 import React from 'react';
 
-import AddTopicView from 'views/AddTopicView';
 import AddTriggerView from 'views/TriggerOverview/AddTriggerView';
 import AddUserView from 'views/UsersOverview/AddUserView';
-import CustomerBuilderView from 'views/CustomerBuilderView';
-import CustomerOverview from 'components/DashboardView';
 import CustomerOverview from 'views/CustomerOverview';
 import DashboardLayout from 'layouts/DashboardLayout';
 import DialogueBuilderView from 'views/DialogueBuilderView/DialogueBuilderView';
 import EditCustomerView from 'views/EditCustomerView';
-import EditCustomerView from 'views/EditCustomerView/EditCustomerView';
-import EditTopicView from 'views/EditTopicView';
-import EditTopicView from 'views/EditDialogueView/EditTopicView';
+import EditDialogueView from 'views/EditDialogueView';
 import EditTriggerView from 'views/TriggerOverview/EditTriggerView';
 import EditUserView from 'views/UsersOverview/EditUserView';
 import InteractionsOverview from 'views/InteractionsOverview/InteractionsOverview';
 
-import OrganisationSettingsView from 'views/OrganisationSettingsView';
-
 import RolesOverview from 'views/RolesOverview/RolesOverview';
-import TopicDetail from 'views/TopicDetail/TopicDetail';
-import TopicsOverview from 'views/TopicsOverview/TopicsOverview';
 import TriggersOverview from 'views/TriggerOverview/TriggerOverview';
 import UsersOverview from 'views/UsersOverview/UsersOverview';
 
@@ -66,8 +57,8 @@ const DashboardRoutes = () => (
       />
 
       <Route
-        path="/dashboard/c/:customerId/t/:topicId/edit"
-        render={() => <EditTopicView />}
+        path="/dashboard/c/:customerId/t/:dialogueId/edit"
+        render={() => <EditDialogueView />}
       />
 
       <Route
@@ -108,7 +99,7 @@ const DashboardRoutes = () => (
         render={() => <DialoguesPage />}
       />
 
-      <Route path="/dashboard" render={() => <DashboardLayout><CustomerOverview /></DashboardLayout>} />
+      <Route path="/dashboard" render={() => <CustomerOverview />} />
 
     </Switch>
   </DashboardLayout>

@@ -13,7 +13,7 @@ interface DialogueLayoutProps {
 }
 
 const DialogueLayout = ({ dialogueTitle, children }: DialogueLayoutProps) => (
-  <DashboardLayout>
+  <>
     <Div>
       {dialogueTitle ? (
         <PageHeading>{dialogueTitle}</PageHeading>
@@ -30,7 +30,7 @@ const DialogueLayout = ({ dialogueTitle, children }: DialogueLayoutProps) => (
     </Tabbar>
 
     {children}
-  </DashboardLayout>
+  </>
 );
 
 export default DialogueLayout;

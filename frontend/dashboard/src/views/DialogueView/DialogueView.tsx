@@ -53,7 +53,6 @@ const DialogueView = () => {
 
   return (
     <DialogueLayout dialogueTitle={data?.getQuestionnaireData?.title}>
-      <DatePicker onActiveDateChange={(newActiveDate) => setActiveFilter(newActiveDate)} />
 
       <PositivePathsModule positivePaths={resultData?.topPositivePath} />
       <NegativePathsModule negativePaths={resultData?.topNegativePath} />

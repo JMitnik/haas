@@ -21,17 +21,17 @@ interface FormDataProps {
   publicTitle?: string;
 }
 
-interface EditTopicFormProps {
+interface EditDialogueFormProps {
   dialogue: any;
   currentTags: Array<{label: string, value: string}>;
   tagOptions: Array<{label: string, value: string}>;
 }
 
-const EditTopicView = () => {
-  const { customerId, topicId } = useParams();
+const EditDialogueView = () => {
+  const { customerId, dialogueId } = useParams();
   const editDialogueData = useQuery(getEditDialogueQuery, {
     variables: {
-      id: topicId,
+      id: dialogueId,
     },
   });
 
@@ -47,7 +47,7 @@ const EditTopicView = () => {
     { label: tag?.name, value: tag?.id }));
 
   return (
-    <EditTopicForm
+    <EditDialogueForm
       dialogue={editDialogueData.data?.dialogue}
       currentTags={currentTags}
       tagOptions={tagOptions}
@@ -55,10 +55,10 @@ const EditTopicView = () => {
   );
 };
 
-const EditTopicForm = ({ dialogue, currentTags, tagOptions } : EditTopicFormProps) => {
+const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFormProps) => {
   const history = useHistory();
   const { register, handleSubmit, errors } = useForm<FormDataProps>();
-  const { customerId, topicId } = useParams();
+  const { customerId, dialogueId } = useParams();
 
   const [editDialogue, { loading }] = useMutation(editDialogueMutation, {
     onCompleted: () => {
@@ -80,7 +80,7 @@ const EditTopicForm = ({ dialogue, currentTags, tagOptions } : EditTopicFormProp
     const tagEntries = { entries: tagIds };
     editDialogue({
       variables: {
-        dialogueId: topicId,
+        dialogueId,
         title: formData.title,
         publicTitle: formData.publicTitle,
         description: formData.description,
@@ -200,4 +200,4 @@ const FormGroupContainer = styled.div`
 
 const Form = styled.form``;
 
-export default EditTopicView;
+export default EditDialogueView;
