@@ -108,10 +108,6 @@ const TriggersOverview = () => {
     setPaginationProps((prevValues) => ({ ...prevValues, activeSearchTerm: newSearchTerm }));
   }, 250), []);
 
-  const handleDateChange = useCallback(debounce((startDate: Date | null, endDate: Date | null) => {
-    setPaginationProps((prevValues) => ({ ...prevValues, activeStartDate: startDate, activeEndDate: endDate }));
-  }, 250), []);
-
   const pageCount = data?.triggerTable?.totalPages || 1;
   const pageIndex = data?.triggerTable?.pageIndex || 0;
 
@@ -120,15 +116,10 @@ const TriggersOverview = () => {
       <H2 color="#3653e8" fontWeight={400} mb="10%">Triggers</H2>
       <InputOutputContainer mb="5%">
         <InputContainer>
-          <DatePicker
-            activeStartDate={paginationProps.activeStartDate}
-            activeEndDate={paginationProps.activeEndDate}
-            onDateChange={handleDateChange}
-          />
           <SearchBar activeSearchTerm={paginationProps.activeSearchTerm} onSearchTermChange={handleSearchTermChange} />
         </InputContainer>
       </InputOutputContainer>
-      <Div backgroundColor="#fdfbfe" mb="1%" height="65%">
+      <Div backgroundColor="#fdfbfe" mb="1%" height="65%" overflowX="hidden" overflowY="auto">
         <Table
           headers={HEADERS}
           paginationProps={{ ...paginationProps, pageCount, pageIndex }}

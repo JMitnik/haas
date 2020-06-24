@@ -34,12 +34,20 @@ export interface RecipientProps {
   phone?: string;
 }
 
+export interface TriggerConditonProps {
+  type: string;
+  minValue?: number;
+  maxValue?: number;
+  textValue?: string;
+}
+
 export interface CellComponentProps {
   id: string;
   createdAt: string;
   paths: number;
   score: number;
   nodeEntries: Array<NodeEntryProps>;
+  conditions: Array<TriggerConditonProps>
   permissions: Array<PermissionProps>;
   recipients: Array<RecipientProps>;
 }

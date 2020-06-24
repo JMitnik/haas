@@ -1,7 +1,7 @@
 import { Edit, X } from 'react-feather';
 import React, { useState } from 'react';
 
-import { DeleteButtonContainer, Div, EditButtonContainer, Grid, H4, H5, Hr } from '@haas/ui';
+import { DeleteButtonContainer, Div, EditButtonContainer, Flex, Grid, H4, H5, Hr, Span } from '@haas/ui';
 import { TableRowProps } from 'components/Table/TableTypes';
 import { UserCell } from 'components/Table/CellComponents/CellComponents';
 import Table from 'components/Table/Table';
@@ -82,16 +82,49 @@ const UserRow = ({ headers, data, index, onDeleteEntry, onEditEntry }: TableRowP
             <Hr style={{ marginBottom: '15px' }} color="#999999" />
             <Div useFlex flexDirection="column">
               <Div width="100%" marginBottom="15px">
+                <H4 color="#999999">Conditions</H4>
+                <H5 color="#c0bcbb" marginBottom={5}>Condition(s) when notification is sent out</H5>
+                <Flex flexDirection="row" justifyContent="space-evenly">
+                  <Span fontSize="smaller" color="#999999">
+                    Type:
+                    {' '}
+                    {data?.conditions?.[0]?.type}
+                  </Span>
+                  {data?.conditions?.[0]?.minValue && (
+                    <Span fontSize="smaller" color="#999999">
+                      Minimal value:
+                      {' '}
+                      {data?.conditions?.[0]?.minValue / 10}
+                    </Span>
+                  )}
+                  {data?.conditions?.[0]?.maxValue && (
+                    <Span fontSize="smaller" color="#999999">
+                      Maximal value:
+                      {' '}
+                      {data?.conditions?.[0]?.maxValue / 10}
+                    </Span>
+                  )}
+                  {data?.conditions?.[0]?.textValue && (
+                    <Span fontSize="smaller" color="#999999">
+                      Text match:
+                      {' '}
+                      {data?.conditions?.[0]?.textValue}
+                    </Span>
+                  )}
+                </Flex>
+
+              </Div>
+              <Div width="100%" marginBottom="15px">
                 <H4 color="#999999">RECIPIENTS</H4>
-                <H5 color="#c0bcbb" marginBottom={5}>Select the recipients you want a specific trigger to receive</H5>
-                { /* TODO: Add proper pagination to this table (?)
-                Or just create list out of it and make page spinner optional */}
+                <H5 color="#c0bcbb" marginBottom={5}>The recipients who will receive this specific trigger</H5>
                 {data.recipients && (
                   <Table
                     onPaginationChange={() => null}
                     paginationProps={{ ...paginationProps, pageCount: 1, pageIndex: 0 }}
                     headers={RECIPIENT_HEADERS}
                     data={data.recipients}
+                    hidePagination
+                    disableSorting
                   />
                 )}
 
