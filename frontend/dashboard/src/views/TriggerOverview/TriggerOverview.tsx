@@ -10,6 +10,7 @@ import DatePicker from 'components/DatePicker/DatePicker';
 import SearchBar from 'components/SearchBar/SearchBar';
 import Table from 'components/Table/Table';
 import deleteTriggerMutation from 'mutations/deleteTrigger';
+import getTriggerTableQuery from 'queries/getTriggerTable';
 import getTriggersQuery from 'queries/getTriggers';
 
 import { InputContainer, InputOutputContainer } from './TriggerOverviewStyles';
@@ -36,7 +37,7 @@ const HEADERS = [
 const TriggersOverview = () => {
   const { customerId } = useParams();
   const history = useHistory();
-  const [fetchTriggers, { data }] = useLazyQuery(getTriggersQuery, { fetchPolicy: 'cache-and-network' });
+  const [fetchTriggers, { data }] = useLazyQuery(getTriggerTableQuery, { fetchPolicy: 'cache-and-network' });
   const [paginationProps, setPaginationProps] = useState<TableProps>(
     {
       activeStartDate: null,
@@ -44,11 +45,11 @@ const TriggersOverview = () => {
       activeSearchTerm: '',
       pageIndex: 0,
       pageSize: 8,
-      sortBy: [{ id: 'id', desc: true }],
+      sortBy: [{ id: 'name', desc: true }],
     },
   );
 
-  const tableData: any = data?.triggers || [];
+  const tableData: any = data?.triggerTable?.triggers || [];
   useEffect(() => {
     const { activeStartDate, activeEndDate, pageIndex, pageSize, sortBy, activeSearchTerm } = paginationProps;
     fetchTriggers({
@@ -111,8 +112,8 @@ const TriggersOverview = () => {
     setPaginationProps((prevValues) => ({ ...prevValues, activeStartDate: startDate, activeEndDate: endDate }));
   }, 250), []);
 
-  const pageCount = data?.userTable?.totalPages || 1;
-  const pageIndex = data?.userTable?.pageIndex || 0;
+  const pageCount = data?.triggerTable?.totalPages || 1;
+  const pageIndex = data?.triggerTable?.pageIndex || 0;
 
   return (
     <Div px="24px" margin="0 auto" width="100vh" height="100vh" maxHeight="100vh" overflow="hidden">

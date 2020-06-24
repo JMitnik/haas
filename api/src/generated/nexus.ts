@@ -252,6 +252,15 @@ export interface NexusGenRootTypes {
   }
   TagType: prisma.TagType;
   TriggerConditionType: prisma.TriggerConditionType;
+  TriggerTableType: { // root type
+    endDate?: string | null; // String
+    orderBy: NexusGenRootTypes['SortFilterObject'][]; // [SortFilterObject!]!
+    pageIndex: number; // Int!
+    pageSize: number; // Int!
+    startDate?: string | null; // String
+    totalPages: number; // Int!
+    triggers: NexusGenRootTypes['TriggerType'][]; // [TriggerType!]!
+  }
   TriggerType: prisma.TriggerType;
   UniqueDataResultEntry: { // root type
     createdAt: string; // String!
@@ -481,6 +490,7 @@ export interface NexusGenFieldTypes {
     tags: NexusGenRootTypes['TagType'][]; // [TagType!]!
     trigger: NexusGenRootTypes['TriggerType']; // TriggerType!
     triggers: NexusGenRootTypes['TriggerType'][]; // [TriggerType!]!
+    triggerTable: NexusGenRootTypes['TriggerTableType']; // TriggerTableType!
     user: NexusGenRootTypes['UserType']; // UserType!
     users: NexusGenRootTypes['UserType'][]; // [UserType!]!
     userTable: NexusGenRootTypes['UserTable']; // UserTable!
@@ -540,6 +550,15 @@ export interface NexusGenFieldTypes {
     textValue: string | null; // String
     triggerId: string; // String!
     type: NexusGenEnums['TriggerConditionTypeEnum']; // TriggerConditionTypeEnum!
+  }
+  TriggerTableType: { // field return type
+    endDate: string | null; // String
+    orderBy: NexusGenRootTypes['SortFilterObject'][]; // [SortFilterObject!]!
+    pageIndex: number; // Int!
+    pageSize: number; // Int!
+    startDate: string | null; // String
+    totalPages: number; // Int!
+    triggers: NexusGenRootTypes['TriggerType'][]; // [TriggerType!]!
   }
   TriggerType: { // field return type
     conditions: NexusGenRootTypes['TriggerConditionType'][]; // [TriggerConditionType!]!
@@ -734,6 +753,10 @@ export interface NexusGenArgTypes {
       filter?: NexusGenInputs['FilterInput'] | null; // FilterInput
       userId?: string | null; // String
     }
+    triggerTable: { // args
+      customerId?: string | null; // String
+      filter?: NexusGenInputs['FilterInput'] | null; // FilterInput
+    }
     user: { // args
       userId?: string | null; // String
     }
@@ -752,7 +775,7 @@ export interface NexusGenAbstractResolveReturnTypes {
 
 export interface NexusGenInheritedFields {}
 
-export type NexusGenObjectNames = "ColourSettings" | "Customer" | "CustomerSettings" | "Dialogue" | "DialogueDetailResult" | "Edge" | "EdgeCondition" | "FontSettings" | "ImageType" | "InteractionSessionType" | "InteractionType" | "Mutation" | "NodeEntry" | "NodeEntryValue" | "PermssionType" | "Query" | "QuestionNode" | "QuestionOption" | "RoleTableType" | "RoleType" | "Session" | "SortFilterObject" | "TagType" | "TriggerConditionType" | "TriggerType" | "UniqueDataResultEntry" | "UserTable" | "UserType" | "lineChartDataType" | "topPathType";
+export type NexusGenObjectNames = "ColourSettings" | "Customer" | "CustomerSettings" | "Dialogue" | "DialogueDetailResult" | "Edge" | "EdgeCondition" | "FontSettings" | "ImageType" | "InteractionSessionType" | "InteractionType" | "Mutation" | "NodeEntry" | "NodeEntryValue" | "PermssionType" | "Query" | "QuestionNode" | "QuestionOption" | "RoleTableType" | "RoleType" | "Session" | "SortFilterObject" | "TagType" | "TriggerConditionType" | "TriggerTableType" | "TriggerType" | "UniqueDataResultEntry" | "UserTable" | "UserType" | "lineChartDataType" | "topPathType";
 
 export type NexusGenInputNames = "CustomerCreateOptions" | "CustomerWhereUniqueInput" | "DialogueFilterInputType" | "DialogueWhereUniqueInput" | "EdgeChildInput" | "EdgeNodeInput" | "FilterInput" | "LeafNodeInput" | "OptionInput" | "PermissionIdsInput" | "PermissionInput" | "QuestionConditionInput" | "QuestionInput" | "QuestionNodeWhereInput" | "QuestionNodeWhereUniqueInput" | "RecipientsInputType" | "RoleDataInput" | "RoleInput" | "SessionWhereUniqueInput" | "SortFilterInputObject" | "TagsInputObjectType" | "TopicDataEntry" | "TriggerConditionInputType" | "TriggerInputType" | "UploadUserSessionInput" | "UserInput" | "UserSessionEntryDataInput" | "UserSessionEntryInput";
 

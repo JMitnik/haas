@@ -6,7 +6,8 @@ import { PrismaClient,
 import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
 import _ from 'lodash';
 
-import { FilterInput } from '../session/Session';
+import { FilterInput, SortFilterObject } from '../session/Session';
+import { PaginationProps } from '../../types/generic';
 import { QuestionNodeType } from '../question/QuestionNode';
 import { UserType } from '../users/User';
 import TriggerService from './TriggerService';
@@ -220,9 +221,43 @@ const TriggerMutations = extendType({
   },
 });
 
+export const TriggerTableType = objectType({
+  name: 'TriggerTableType',
+  definition(t) {
+    t.int('totalPages');
+    t.int('pageIndex');
+    t.int('pageSize');
+    t.string('startDate', { nullable: true });
+    t.string('endDate', { nullable: true });
+
+    t.list.field('orderBy', { type: SortFilterObject });
+
+    t.list.field('triggers', { type: TriggerType });
+  },
+});
+
 const TriggerQueries = extendType({
   type: 'Query',
   definition(t) {
+    t.field('triggerTable', {
+      type: TriggerTableType,
+      args: {
+        customerId: 'String',
+        filter: FilterInput,
+      },
+      async resolve(parent: any, args: any, ctx: any) {
+        const { pageIndex, offset, limit, searchTerm, orderBy }: PaginationProps = args.filter;
+
+        if (args.filter) {
+          return TriggerService.paginatedTriggers(args.customerId, pageIndex, offset, limit, orderBy[0], searchTerm);
+        }
+
+        const users = await prisma.trigger.findMany({ where: { customerId: args.customerId } });
+        const totalPages = Math.ceil(users.length / limit);
+
+        return { users, pageIndex, totalPages };
+      },
+    });
     t.field('trigger', {
       type: TriggerType,
       args: {

@@ -245,6 +245,7 @@ type Query {
   tags(customerId: String, dialogueId: String): [TagType!]!
   trigger(triggerId: String): TriggerType!
   triggers(customerId: String, dialogueId: String, filter: FilterInput, userId: String): [TriggerType!]!
+  triggerTable(customerId: String, filter: FilterInput): TriggerTableType!
   user(userId: String): UserType!
   users(customerId: String): [UserType!]!
   userTable(customerId: String, filter: FilterInput): UserTable!
@@ -414,6 +415,16 @@ enum TriggerMediumEnum {
   BOTH
   EMAIL
   PHONE
+}
+
+type TriggerTableType {
+  endDate: String
+  orderBy: [SortFilterObject!]!
+  pageIndex: Int!
+  pageSize: Int!
+  startDate: String
+  totalPages: Int!
+  triggers: [TriggerType!]!
 }
 
 type TriggerType {

@@ -3,10 +3,12 @@ import {
   Trigger,
   TriggerCondition,
   TriggerUpdateInput,
+  TriggerWhereInput,
   User,
   UserUpdateManyWithoutTriggersInput,
   UserWhereUniqueInput,
 } from '@prisma/client';
+import _ from 'lodash';
 
 import { isAfter, subSeconds } from 'date-fns';
 import SMSService from '../../services/sms/sms-service';
@@ -15,6 +17,86 @@ import TriggerSMSService from '../../services/sms/trigger-sms-service';
 const prisma = new PrismaClient();
 
 class TriggerService {
+  static getSearchTermFilter = (searchTerm: string) => {
+    if (!searchTerm) {
+      return [];
+    }
+
+    const searchTermFilter: TriggerWhereInput[] = [
+      {
+        name: {
+          contains: searchTerm,
+        },
+      },
+    ];
+
+    return searchTermFilter;
+  };
+
+  static orderUsersBy = (
+    triggers: Array<Trigger>,
+    orderBy: { id: string, desc: boolean },
+  ) => {
+    if (orderBy.id === 'name') {
+      return _.orderBy(triggers, (trigger) => trigger.name, orderBy.desc ? 'desc' : 'asc');
+    } if (orderBy.id === 'medium') {
+      return _.orderBy(triggers, (trigger) => trigger.medium, orderBy.desc ? 'desc' : 'asc');
+    } if (orderBy.id === 'type') {
+      return _.orderBy(triggers, (trigger) => trigger.type, orderBy.desc ? 'desc' : 'asc');
+    }
+
+    return triggers;
+  };
+
+  static slice = (
+    entries: Array<any>,
+    offset: number,
+    limit: number,
+    pageIndex: number,
+  ) => ((offset + limit) < entries.length
+    ? entries.slice(offset, (pageIndex + 1) * limit)
+    : entries.slice(offset, entries.length));
+
+  static paginatedTriggers = async (
+    customerId: string,
+    pageIndex: number,
+    offset: number,
+    limit: number,
+    orderBy: any,
+    searchTerm: string,
+  ) => {
+    let needPageReset = false;
+    const triggerWhereInput: TriggerWhereInput = { customerId };
+    const searchTermFilter = TriggerService.getSearchTermFilter(searchTerm);
+
+    if (searchTermFilter.length > 0) {
+      triggerWhereInput.OR = searchTermFilter;
+    }
+
+    // Search term filtered users
+    const triggers = await prisma.trigger.findMany({
+      where: triggerWhereInput,
+    });
+
+    const totalPages = Math.ceil(triggers.length / limit);
+
+    if (pageIndex + 1 > totalPages) {
+      offset = 0;
+      needPageReset = true;
+    }
+    // Order filtered users
+    const orderedTriggers = TriggerService.orderUsersBy(triggers, orderBy);
+
+    // Slice ordered filtered users
+    const slicedOrderedTriggers = TriggerService.slice(orderedTriggers, offset, limit, pageIndex);
+
+    return {
+      triggers: slicedOrderedTriggers,
+      pageIndex: needPageReset ? 0 : pageIndex,
+      totalPages,
+    };
+  };
+
   static sendTrigger = (
     trigger: Trigger,
     recipient: User,
