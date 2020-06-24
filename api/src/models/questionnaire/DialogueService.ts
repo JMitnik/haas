@@ -1,6 +1,8 @@
-import { Dialogue, DialogueCreateInput, NodeEntry, PrismaClient } from '@prisma/client';
+import { Dialogue, DialogueCreateInput,
+  DialogueUpdateInput, PrismaClient, Tag, TagWhereUniqueInput } from '@prisma/client';
 import { isAfter, subDays } from 'date-fns';
 import _ from 'lodash';
+
 import { leafNodes, sliderType } from '../../data/seeds/default-data';
 import NodeResolver from '../question/node-resolver';
 
@@ -49,11 +51,14 @@ interface QuestionProps {
   children: Array<EdgeChildProps>;
 }
 
-class DialogueResolver {
-  static constructDialogue(customerId: string,
+class DialogueService {
+  static constructDialogue(
+    customerId: string,
     title: string,
     description: string,
-    publicTitle: string = ''): DialogueCreateInput {
+    publicTitle: string = '',
+    tags: Array<{id: string}> = [],
+  ): DialogueCreateInput {
     return {
       customer: {
         connect: {
@@ -66,22 +71,77 @@ class DialogueResolver {
       questions: {
         create: [],
       },
+      tags: {
+        connect: tags.map((tag) => ({ id: tag.id })),
+      },
     };
   }
 
+  static filterDialoguesBySearchTerm = (dialogues: Array<Dialogue & {
+    tags: Tag[];
+  }>, searchTerm: string) => dialogues.filter((dialogue) => {
+    if (dialogue.title.toLowerCase().includes(
+      searchTerm.toLowerCase(),
+    )) {
+      return true;
+    }
+    if (dialogue.publicTitle?.toLowerCase().includes(
+        searchTerm.toLowerCase(),
+        )) {
+      return true;
+    }
+    if (dialogue.tags.find((tag) => tag.name.toLowerCase().includes(
+      searchTerm.toLowerCase(),
+    ))) {
+      return true;
+    }
+    return false;
+  });
+
+  static updateTags = (
+    dbTags: Array<Tag>,
+    newTags: Array<string>,
+    updateDialogueArgs: DialogueUpdateInput,
+  ) => {
+    const newTagObjects = newTags.map((tag) => ({ id: tag }));
+
+    const deleteTagObjects: TagWhereUniqueInput[] = [];
+    dbTags.forEach((tag) => {
+      if (!newTags.includes(tag.id)) {
+        deleteTagObjects.push({ id: tag.id });
+      }
+    });
+
+    const tagUpdateArgs: any = {};
+    if (newTagObjects.length > 0) {
+      tagUpdateArgs.connect = newTagObjects;
+    }
+
+    if (deleteTagObjects.length > 0) {
+      tagUpdateArgs.disconnect = deleteTagObjects;
+    }
+    updateDialogueArgs.tags = tagUpdateArgs;
+    return updateDialogueArgs;
+  };
+
   static editDialogue = async (args: any) => {
-    const { dialogueId, title, description, publicTitle } = args;
-    const dialogue = await prisma.dialogue.update({
+    const { dialogueId, title, description, publicTitle, tags } = args;
+    const dbDialogue = await prisma.dialogue.findOne({ where: { id: dialogueId },
+      include: {
+        tags: true,
+      } });
+
+    let updateDialogueArgs: DialogueUpdateInput = { title, description, publicTitle };
+    if (dbDialogue?.tags) {
+      updateDialogueArgs = DialogueService.updateTags(dbDialogue.tags, tags.entries, updateDialogueArgs);
+    }
+
+    return prisma.dialogue.update({
       where: {
         id: dialogueId,
       },
-      data: {
-        title,
-        description,
-        publicTitle,
-      },
+      data: updateDialogueArgs,
     });
-    return dialogue;
   };
 
   static getTopPaths = (groupedJoined: any) => {
@@ -198,8 +258,8 @@ class DialogueResolver {
           textValue: nodeEntryTextValue.values.textValue }));
     const joined = _.merge(lineChartData, finalNodeEntryTextValues);
     const groupedJoined = _.groupBy(joined, (entry) => entry.y && entry.y > 50);
-    const topNegativePath = DialogueResolver.getTopPaths(groupedJoined.false);
-    const topPositivePath = DialogueResolver.getTopPaths(groupedJoined.true);
+    const topNegativePath = DialogueService.getTopPaths(groupedJoined.false);
+    const topPositivePath = DialogueService.getTopPaths(groupedJoined.true);
     return { lineChartData, topNegativePath, topPositivePath };
   };
 
@@ -260,8 +320,8 @@ class DialogueResolver {
           textValue: nodeEntryTextValue.values.textValue }));
     const joined = _.merge(lineChartData, finalNodeEntryTextValues);
     const groupedJoined = _.groupBy(joined, (entry) => entry.y && entry.y > 50);
-    const topNegativePath = DialogueResolver.getTopPaths(groupedJoined.false);
-    const topPositivePath = DialogueResolver.getTopPaths(groupedJoined.true);
+    const topNegativePath = DialogueService.getTopPaths(groupedJoined.false);
+    const topPositivePath = DialogueService.getTopPaths(groupedJoined.true);
     return { lineChartData, topNegativePath, topPositivePath };
   };
 
@@ -299,7 +359,6 @@ class DialogueResolver {
     });
 
     const nodeEntryIds = nodeEntries.map((nodeEntry) => nodeEntry.id);
-    // FIXME: nodeEntryValues of leaf node remain in db
     if (nodeEntryIds.length > 0) {
       await prisma.nodeEntryValue.deleteMany(
         {
@@ -399,24 +458,30 @@ class DialogueResolver {
     customerId: string,
     title: string,
     description: string,
-    publicTitle: string = '') => prisma.dialogue.create({
-    data: DialogueResolver.constructDialogue(
-      customerId, title, description, publicTitle,
+    publicTitle: string = '',
+    tags: Array<{id: string}> = [],
+  ) => prisma.dialogue.create({
+    data: DialogueService.constructDialogue(
+      customerId, title, description, publicTitle, tags,
     ),
   });
 
   static createDialogue = async (args: any): Promise<Dialogue> => {
-    const { customerId, title, description, publicTitle, isSeed } = args;
+    const { customerId, title, description, publicTitle, isSeed, tags } = args;
     let questionnaire = null;
+    const dialogueTags = tags?.entries?.length > 0
+      ? tags?.entries?.map((tag: string) => ({ id: tag }))
+      : [];
+
     const customer = await prisma.customer.findOne({ where: { id: customerId } });
 
     if (isSeed) {
       if (customer?.name) {
-        return DialogueResolver.seedQuestionnare(customerId, customer?.name, title, description);
+        return DialogueService.seedQuestionnare(customerId, customer?.name, title, description, dialogueTags);
       }
     }
-    questionnaire = await DialogueResolver.initDialogue(
-      customerId, title, description, publicTitle,
+    questionnaire = await DialogueService.initDialogue(
+      customerId, title, description, publicTitle, dialogueTags,
     );
     await prisma.dialogue.update({
       where: {
@@ -442,9 +507,10 @@ class DialogueResolver {
     customerName: string,
     questionnaireTitle: string = 'Default questionnaire',
     questionnaireDescription: string = 'Default questions',
+    tags: Array<{id: string}>,
   ): Promise<Dialogue> => {
-    const questionnaire = await DialogueResolver.initDialogue(
-      customerId, questionnaireTitle, questionnaireDescription, '',
+    const questionnaire = await DialogueService.initDialogue(
+      customerId, questionnaireTitle, questionnaireDescription, '', tags,
     );
 
     const leafs = await NodeResolver.createTemplateLeafNodes(leafNodes, questionnaire.id);
@@ -499,7 +565,7 @@ class DialogueResolver {
     try {
       const questionnaireId: string = args.id || undefined;
       const { questions }: { questions: Array<any> } = args.topicData;
-      const finalQuestions = await DialogueResolver.uuidToPrismaIds(questions, questionnaireId);
+      const finalQuestions = await DialogueService.uuidToPrismaIds(questions, questionnaireId);
       await Promise.all(finalQuestions.map(async (question) => NodeResolver.updateQuestion(
         questionnaireId,
         question,
@@ -587,4 +653,4 @@ class DialogueResolver {
   };
 }
 
-export default DialogueResolver;
+export default DialogueService;

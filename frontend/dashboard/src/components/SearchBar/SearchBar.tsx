@@ -26,7 +26,6 @@ const SearchBar = ({ activeSearchTerm, onSearchTermChange }: SearchBarProps) => 
           <Search color="#6d767d" style={{ marginLeft: '10px' }} />
         </Div>
       )}
-
       {isActive && (
         <Div useFlex alignItems="center">
           <input

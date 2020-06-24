@@ -1,5 +1,7 @@
-import { PrismaClient, Customer } from '@prisma/client';
+import { Customer, PrismaClient, TagCreateWithoutCustomerInput } from '@prisma/client';
 import { subDays } from 'date-fns';
+import cuid from 'cuid';
+
 import { leafNodes } from '../../data/seeds/default-data';
 import NodeResolver from '../question/node-resolver';
 
@@ -8,7 +10,23 @@ function getRandomInt(max: number) {
 }
 
 const prisma = new PrismaClient();
-class CustomerResolver {
+
+const seedCustomerData: TagCreateWithoutCustomerInput[] = [
+  {
+    name: 'Agent',
+    type: 'AGENT',
+  },
+  {
+    name: 'Amsterdam',
+    type: 'LOCATION',
+  },
+  {
+    name: 'Marketing strategy #131',
+    type: 'DEFAULT',
+  },
+];
+
+class CustomerService {
   static customers = async () => {
     const customers = prisma.customer.findMany();
     return customers;
@@ -127,11 +145,15 @@ class CustomerResolver {
 
   static createCustomer = async (args: any) => {
     const { name, options } = args;
-    const { isSeed, logo, primaryColour, slug, cloudinary } = options;
+    const { isSeed, logo, primaryColour, slug } = options;
+
     const customer = await prisma.customer.create({
       data: {
         name,
         slug,
+        tags: {
+          create: seedCustomerData,
+        },
         settings: {
           create: {
             logoUrl: logo,
@@ -142,6 +164,22 @@ class CustomerResolver {
             },
           },
         },
+        roles: {
+          create: [
+            {
+              name: 'Admin',
+              roleId: cuid(),
+            },
+            {
+              name: 'Normal',
+              roleId: cuid(),
+            },
+            {
+              name: 'Custom role',
+              roleId: cuid(),
+            },
+          ],
+        },
         dialogues: {
           create: [],
         },
@@ -149,11 +187,11 @@ class CustomerResolver {
     });
 
     if (isSeed) {
-      await CustomerResolver.seed(customer);
+      await CustomerService.seed(customer);
     }
 
     return customer;
   };
 }
 
-export default CustomerResolver;
+export default CustomerService;

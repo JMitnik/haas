@@ -1,7 +1,8 @@
-import express from 'express';
 import cors, { CorsOptions } from 'cors';
-import makeApollo from './apollo';
+import express from 'express';
+
 import config from './config';
+import makeApollo from './apollo';
 
 const main = async () => {
   const apollo = await makeApollo();

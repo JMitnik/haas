@@ -1,0 +1,21 @@
+{
+  "version": "0.3.14-fixed",
+  "steps": [
+    {
+      "tag": "CreateEnum",
+      "enum": "TagType",
+      "values": [
+        "DEFAULT",
+        "AGENT",
+        "LOCATION"
+      ]
+    },
+    {
+      "tag": "CreateField",
+      "model": "Tag",
+      "field": "type",
+      "type": "TagType",
+      "arity": "Required"
+    }
+  ]
+}

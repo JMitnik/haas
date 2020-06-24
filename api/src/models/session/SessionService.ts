@@ -2,11 +2,21 @@ import {
   NodeEntry,
   NodeEntryCreateWithoutSessionInput, PrismaClient, Session, SessionWhereInput,
 } from '@prisma/client';
+import { isAfter, subSeconds } from 'date-fns';
+
+import TriggerService from '../trigger/TriggerService';
 import cleanInt from '../../utils/cleanInt';
 
 const prisma = new PrismaClient();
 
-class SessionResolver {
+// TODO: Rename Session to Interaction
+class SessionService {
+  /**
+   * Uploads a user-session from the client
+   * @param obj
+   * @param args
+   * @param ctx
+   */
   static async uploadUserSession(obj: any, args: any, ctx: any) {
     const { dialogueId, entries } = args.uploadUserSessionInput;
 
@@ -18,18 +28,22 @@ class SessionResolver {
           },
         },
         nodeEntries: {
-          create: entries.map(
-            (entry: any) => SessionResolver.constructNodeEntry(entry),
-          ),
+          create: entries.map((entry: any) => SessionService.constructNodeEntry(entry)),
         },
       },
     });
+
+    try {
+      await TriggerService.tryTriggers(entries, ctx.services.triggerSMSService);
+    } catch (e) {
+      console.log('Something went wrong while handling sms triggers: ', e);
+    }
 
     // TODO: Replace this with email associated to dialogue (or fallback to company)
     const dialogueAgentMail = 'jmitnik@gmail.com';
 
     // TODO: Roundabout way, needs to be done in Prisma2 better
-    const nodeEntries = await SessionResolver.getEntriesOfSession(session);
+    const nodeEntries = await SessionService.getEntriesOfSession(session);
     const questionnaire = await prisma.dialogue.findOne({ where: { id: dialogueId } });
 
     ctx.services.triggerMailService.sendTrigger({
@@ -67,6 +81,7 @@ class SessionResolver {
 
   static constructDateRangeWhereInput(startDate: Date, endDate: Date): SessionWhereInput[] | [] {
     let dateRange: SessionWhereInput[] | [] = [];
+
     if (startDate && !endDate) {
       dateRange = [
         { createdAt: { gte: startDate } },
@@ -78,8 +93,10 @@ class SessionResolver {
     } else if (startDate && endDate) {
       dateRange = [
         { createdAt: { gte: startDate } },
-        { createdAt: { lte: endDate } }];
+        { createdAt: { lte: endDate } },
+      ];
     }
+
     return dateRange;
   }
 
@@ -108,4 +125,4 @@ class SessionResolver {
   }
 }
 
-export default SessionResolver;
+export default SessionService;

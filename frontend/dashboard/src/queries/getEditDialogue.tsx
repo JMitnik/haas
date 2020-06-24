@@ -7,6 +7,11 @@ const getEditDialogueQuery = gql`
         title
         publicTitle
         description
+        tags {
+          id
+          name
+          type
+        }
       }
   }
 `;

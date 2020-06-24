@@ -1,4 +1,4 @@
-import { PrismaClient, SessionWhereInput, NodeEntry, NodeEntryValue, NodeEntryWhereInput } from '@prisma/client';
+import { NodeEntry, NodeEntryValue, NodeEntryWhereInput, PrismaClient, SessionWhereInput } from '@prisma/client';
 import _ from 'lodash';
 
 interface EnhancedNodeEntryProps {
@@ -16,7 +16,8 @@ interface SessionWhereProps {
 }
 
 const prisma = new PrismaClient();
-class NodeEntryResolver {
+
+class NodeEntryService {
   static matchText = (
     entry: NodeEntry & EnhancedNodeEntryProps,
     searchTerm: string,
@@ -85,7 +86,7 @@ class NodeEntryResolver {
     let flatSearchTermFilteredEntries;
 
     // Find all node entries within specified date range
-    const nodeEntries = await NodeEntryResolver.findInteractionEntries({
+    const nodeEntries = await NodeEntryService.findInteractionEntries({
       session: {
         dialogueId,
         AND: dateRange,
@@ -101,7 +102,7 @@ class NodeEntryResolver {
       // Filter every grouped representation by trying to finding at least one node entry which matches search term
       const searchTermFilteredEntries = _.filter(
         groupedNodeEntries, (entries) => entries.filter(
-          (entry) => NodeEntryResolver.matchText(entry, searchTerm),
+          (entry) => NodeEntryService.matchText(entry, searchTerm),
         ).length > 0,
       );
       totalPages = Math.ceil(searchTermFilteredEntries.length / limit);
@@ -118,10 +119,10 @@ class NodeEntryResolver {
     const filteredNodeEntriesScore = _.filter(
       finalNodeEntryScore, (nodeEntryScore) => nodeEntryScore.depth === 0,
     );
-    const orderedNodeEntriesScore = NodeEntryResolver.orderEntriesBy(
+    const orderedNodeEntriesScore = NodeEntryService.orderEntriesBy(
       filteredNodeEntriesScore, orderBy,
     );
-    const pageNodeEntries = NodeEntryResolver.sliceNodeEntries(
+    const pageNodeEntries = NodeEntryService.sliceNodeEntries(
       orderedNodeEntriesScore, offset, limit, pageIndex,
     );
 
@@ -145,4 +146,4 @@ class NodeEntryResolver {
   };
 }
 
-export default NodeEntryResolver;
+export default NodeEntryService;

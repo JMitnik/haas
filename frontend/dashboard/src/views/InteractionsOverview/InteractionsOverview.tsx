@@ -5,13 +5,14 @@ import Papa from 'papaparse';
 import React, { useCallback, useEffect, useState } from 'react';
 
 import { Div, H2, Muted, Span } from '@haas/ui';
-import InteractionsTable from 'views/InteractionsOverview/Table';
+import DatePicker from 'components/DatePicker/DatePicker';
+import InteractionsTable from 'components/Table/Table';
+import SearchBar from 'components/SearchBar/SearchBar';
 import getInteractionsQuery from 'queries/getInteractionsQuery';
 
 import { CenterCell, ScoreCell, UserCell, WhenCell } from './TableCell/TableCell';
 import { InputContainer, InputOutputContainer, OutputContainer } from './InteractionOverviewStyles';
-import DatePicker from './DatePicker';
-import SearchBar from './SearchBar';
+import Row from './TableRow/InteractionsTableRow';
 
 interface TableProps {
   activeStartDate: Date | null;
@@ -130,9 +131,10 @@ const InteractionsOverview = () => {
       <Div backgroundColor="#fdfbfe" mb="1%" height="65%">
         <InteractionsTable
           headers={HEADERS}
-          gridProperties={{ ...paginationProps, pageCount, pageIndex }}
+          paginationProps={{ ...paginationProps, pageCount, pageIndex }}
           onPaginationChange={setPaginationProps}
           data={interactions}
+          CustomRow={Row}
         />
       </Div>
     </Div>

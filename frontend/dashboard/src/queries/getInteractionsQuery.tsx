@@ -1,7 +1,7 @@
 import gql from 'graphql-tag';
 
 const getInteractionsQuery = gql`
-  query getInteractions($dialogueId: ID!, $filter: InteractionFilterInput) {
+  query getInteractions($dialogueId: ID!, $filter: FilterInput) {
     interactions(where: { dialogueId: $dialogueId }, filter: $filter) {
       sessions {
         id

@@ -2,6 +2,34 @@
   "version": "0.3.14-fixed",
   "steps": [
     {
+      "tag": "CreateEnum",
+      "enum": "TriggerType",
+      "values": [
+        "QUESTION",
+        "SCHEDULED"
+      ]
+    },
+    {
+      "tag": "CreateEnum",
+      "enum": "TriggerMedium",
+      "values": [
+        "EMAIL",
+        "PHONE",
+        "BOTH"
+      ]
+    },
+    {
+      "tag": "CreateEnum",
+      "enum": "TriggerConditionType",
+      "values": [
+        "LOW_THRESHOLD",
+        "HIGH_THRESHOLD",
+        "INNER_RANGE",
+        "OUTER_RANGE",
+        "TEXT_MATCH"
+      ]
+    },
+    {
       "tag": "CreateSource",
       "source": "postgresql"
     },
@@ -568,6 +596,141 @@
       "arity": "List"
     },
     {
+      "tag": "CreateField",
+      "model": "Customer",
+      "field": "users",
+      "type": "User",
+      "arity": "List"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Customer",
+      "field": "roles",
+      "type": "Role",
+      "arity": "List"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Customer",
+      "field": "permissions",
+      "type": "Permission",
+      "arity": "List"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Customer",
+      "field": "triggers",
+      "type": "Trigger",
+      "arity": "List"
+    },
+    {
+      "tag": "CreateModel",
+      "model": "Tag"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Tag",
+      "field": "id",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "Tag",
+          "field": "id"
+        },
+        "directive": "default"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "Tag",
+          "field": "id"
+        },
+        "directive": "default"
+      },
+      "argument": "",
+      "value": "cuid()"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "Tag",
+          "field": "id"
+        },
+        "directive": "id"
+      }
+    },
+    {
+      "tag": "CreateField",
+      "model": "Tag",
+      "field": "name",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Tag",
+      "field": "dialogue",
+      "type": "Dialogue",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "Tag",
+          "field": "dialogue"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "Tag",
+          "field": "dialogue"
+        },
+        "directive": "relation"
+      },
+      "argument": "fields",
+      "value": "[dialogueId]"
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "Tag",
+          "field": "dialogue"
+        },
+        "directive": "relation"
+      },
+      "argument": "references",
+      "value": "[id]"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Tag",
+      "field": "dialogueId",
+      "type": "String",
+      "arity": "Optional"
+    },
+    {
       "tag": "CreateModel",
       "model": "Dialogue"
     },
@@ -757,6 +920,13 @@
       "model": "Dialogue",
       "field": "sessions",
       "type": "Session",
+      "arity": "List"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Dialogue",
+      "field": "tags",
+      "type": "Tag",
       "arity": "List"
     },
     {
@@ -1179,6 +1349,105 @@
       "arity": "Optional"
     },
     {
+      "tag": "CreateField",
+      "model": "QuestionNode",
+      "field": "Edge",
+      "type": "Edge",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "QuestionNode",
+          "field": "Edge"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "QuestionNode",
+          "field": "Edge"
+        },
+        "directive": "relation"
+      },
+      "argument": "",
+      "value": "\"EdgeChildrenRelation\""
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "QuestionNode",
+          "field": "Edge"
+        },
+        "directive": "relation"
+      },
+      "argument": "fields",
+      "value": "[edgeId]"
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "QuestionNode",
+          "field": "Edge"
+        },
+        "directive": "relation"
+      },
+      "argument": "references",
+      "value": "[id]"
+    },
+    {
+      "tag": "CreateField",
+      "model": "QuestionNode",
+      "field": "QuestionOption",
+      "type": "QuestionOption",
+      "arity": "List"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "QuestionNode",
+          "field": "QuestionOption"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "QuestionNode",
+          "field": "QuestionOption"
+        },
+        "directive": "relation"
+      },
+      "argument": "",
+      "value": "\"QuestionNodeOptions\""
+    },
+    {
+      "tag": "CreateField",
+      "model": "QuestionNode",
+      "field": "triggers",
+      "type": "Trigger",
+      "arity": "List"
+    },
+    {
       "tag": "CreateModel",
       "model": "Edge"
     },
@@ -1516,6 +1785,52 @@
       "arity": "Optional"
     },
     {
+      "tag": "CreateField",
+      "model": "Edge",
+      "field": "QuestionNode",
+      "type": "QuestionNode",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "Edge",
+          "field": "QuestionNode"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "Edge",
+          "field": "QuestionNode"
+        },
+        "directive": "relation"
+      },
+      "argument": "fields",
+      "value": "[questionNodeId]"
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "Edge",
+          "field": "QuestionNode"
+        },
+        "directive": "relation"
+      },
+      "argument": "references",
+      "value": "[id]"
+    },
+    {
       "tag": "CreateModel",
       "model": "QuestionCondition"
     },
@@ -1596,6 +1911,52 @@
       "field": "edgeId",
       "type": "String",
       "arity": "Optional"
+    },
+    {
+      "tag": "CreateField",
+      "model": "QuestionCondition",
+      "field": "Edge",
+      "type": "Edge",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "QuestionCondition",
+          "field": "Edge"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "QuestionCondition",
+          "field": "Edge"
+        },
+        "directive": "relation"
+      },
+      "argument": "fields",
+      "value": "[edgeId]"
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "QuestionCondition",
+          "field": "Edge"
+        },
+        "directive": "relation"
+      },
+      "argument": "references",
+      "value": "[id]"
     },
     {
       "tag": "CreateModel",
@@ -1731,6 +2092,52 @@
       "field": "questionNodeId",
       "type": "String",
       "arity": "Optional"
+    },
+    {
+      "tag": "CreateField",
+      "model": "QuestionOption",
+      "field": "QuestionNode",
+      "type": "QuestionNode",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "QuestionOption",
+          "field": "QuestionNode"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "QuestionOption",
+          "field": "QuestionNode"
+        },
+        "directive": "relation"
+      },
+      "argument": "fields",
+      "value": "[questionNodeId]"
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "QuestionOption",
+          "field": "QuestionNode"
+        },
+        "directive": "relation"
+      },
+      "argument": "references",
+      "value": "[id]"
     },
     {
       "tag": "CreateModel",
@@ -2287,6 +2694,964 @@
       "tag": "CreateField",
       "model": "NodeEntryValue",
       "field": "nodeEntryId",
+      "type": "String",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateField",
+      "model": "NodeEntryValue",
+      "field": "NodeEntry",
+      "type": "NodeEntry",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "NodeEntryValue",
+          "field": "NodeEntry"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "NodeEntryValue",
+          "field": "NodeEntry"
+        },
+        "directive": "relation"
+      },
+      "argument": "fields",
+      "value": "[nodeEntryId]"
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "NodeEntryValue",
+          "field": "NodeEntry"
+        },
+        "directive": "relation"
+      },
+      "argument": "references",
+      "value": "[id]"
+    },
+    {
+      "tag": "CreateModel",
+      "model": "Permission"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Permission",
+      "field": "id",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "Permission",
+          "field": "id"
+        },
+        "directive": "default"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "Permission",
+          "field": "id"
+        },
+        "directive": "default"
+      },
+      "argument": "",
+      "value": "cuid()"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "Permission",
+          "field": "id"
+        },
+        "directive": "id"
+      }
+    },
+    {
+      "tag": "CreateField",
+      "model": "Permission",
+      "field": "name",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Permission",
+      "field": "description",
+      "type": "String",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Permission",
+      "field": "isPermissionOfRole",
+      "type": "Role",
+      "arity": "List"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "Permission",
+          "field": "isPermissionOfRole"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "Permission",
+          "field": "isPermissionOfRole"
+        },
+        "directive": "relation"
+      },
+      "argument": "references",
+      "value": "[id]"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Permission",
+      "field": "Customer",
+      "type": "Customer",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "Permission",
+          "field": "Customer"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "Permission",
+          "field": "Customer"
+        },
+        "directive": "relation"
+      },
+      "argument": "fields",
+      "value": "[customerId]"
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "Permission",
+          "field": "Customer"
+        },
+        "directive": "relation"
+      },
+      "argument": "references",
+      "value": "[id]"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Permission",
+      "field": "customerId",
+      "type": "String",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateModel",
+      "model": "Role"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Role",
+      "field": "id",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "Role",
+          "field": "id"
+        },
+        "directive": "default"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "Role",
+          "field": "id"
+        },
+        "directive": "default"
+      },
+      "argument": "",
+      "value": "cuid()"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "Role",
+          "field": "id"
+        },
+        "directive": "id"
+      }
+    },
+    {
+      "tag": "CreateField",
+      "model": "Role",
+      "field": "name",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Role",
+      "field": "roleId",
+      "type": "String",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Role",
+      "field": "permissions",
+      "type": "Permission",
+      "arity": "List"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "Role",
+          "field": "permissions"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "Role",
+          "field": "permissions"
+        },
+        "directive": "relation"
+      },
+      "argument": "references",
+      "value": "[id]"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Role",
+      "field": "User",
+      "type": "User",
+      "arity": "List"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Role",
+      "field": "Customer",
+      "type": "Customer",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "Role",
+          "field": "Customer"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "Role",
+          "field": "Customer"
+        },
+        "directive": "relation"
+      },
+      "argument": "fields",
+      "value": "[customerId]"
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "Role",
+          "field": "Customer"
+        },
+        "directive": "relation"
+      },
+      "argument": "references",
+      "value": "[id]"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Role",
+      "field": "customerId",
+      "type": "String",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Model",
+          "model": "Role",
+          "arguments": [
+            {
+              "name": "",
+              "value": "[id, name]"
+            }
+          ]
+        },
+        "directive": "unique"
+      }
+    },
+    {
+      "tag": "CreateModel",
+      "model": "User"
+    },
+    {
+      "tag": "CreateField",
+      "model": "User",
+      "field": "id",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "User",
+          "field": "id"
+        },
+        "directive": "default"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "User",
+          "field": "id"
+        },
+        "directive": "default"
+      },
+      "argument": "",
+      "value": "cuid()"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "User",
+          "field": "id"
+        },
+        "directive": "id"
+      }
+    },
+    {
+      "tag": "CreateField",
+      "model": "User",
+      "field": "createdAt",
+      "type": "DateTime",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "User",
+          "field": "createdAt"
+        },
+        "directive": "default"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "User",
+          "field": "createdAt"
+        },
+        "directive": "default"
+      },
+      "argument": "",
+      "value": "now()"
+    },
+    {
+      "tag": "CreateField",
+      "model": "User",
+      "field": "updatedAt",
+      "type": "DateTime",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "User",
+          "field": "updatedAt"
+        },
+        "directive": "updatedAt"
+      }
+    },
+    {
+      "tag": "CreateField",
+      "model": "User",
+      "field": "email",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "User",
+          "field": "email"
+        },
+        "directive": "unique"
+      }
+    },
+    {
+      "tag": "CreateField",
+      "model": "User",
+      "field": "phone",
+      "type": "String",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateField",
+      "model": "User",
+      "field": "firstName",
+      "type": "String",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateField",
+      "model": "User",
+      "field": "lastName",
+      "type": "String",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateField",
+      "model": "User",
+      "field": "roleId",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateField",
+      "model": "User",
+      "field": "role",
+      "type": "Role",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "User",
+          "field": "role"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "User",
+          "field": "role"
+        },
+        "directive": "relation"
+      },
+      "argument": "fields",
+      "value": "[roleId]"
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "User",
+          "field": "role"
+        },
+        "directive": "relation"
+      },
+      "argument": "references",
+      "value": "[id]"
+    },
+    {
+      "tag": "CreateField",
+      "model": "User",
+      "field": "Customer",
+      "type": "Customer",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "User",
+          "field": "Customer"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "User",
+          "field": "Customer"
+        },
+        "directive": "relation"
+      },
+      "argument": "fields",
+      "value": "[customerId]"
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "User",
+          "field": "Customer"
+        },
+        "directive": "relation"
+      },
+      "argument": "references",
+      "value": "[id]"
+    },
+    {
+      "tag": "CreateField",
+      "model": "User",
+      "field": "customerId",
+      "type": "String",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateField",
+      "model": "User",
+      "field": "triggers",
+      "type": "Trigger",
+      "arity": "List"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "User",
+          "field": "triggers"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "User",
+          "field": "triggers"
+        },
+        "directive": "relation"
+      },
+      "argument": "references",
+      "value": "[id]"
+    },
+    {
+      "tag": "CreateModel",
+      "model": "TriggerCondition"
+    },
+    {
+      "tag": "CreateField",
+      "model": "TriggerCondition",
+      "field": "id",
+      "type": "Int",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "TriggerCondition",
+          "field": "id"
+        },
+        "directive": "default"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "TriggerCondition",
+          "field": "id"
+        },
+        "directive": "default"
+      },
+      "argument": "",
+      "value": "autoincrement()"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "TriggerCondition",
+          "field": "id"
+        },
+        "directive": "id"
+      }
+    },
+    {
+      "tag": "CreateField",
+      "model": "TriggerCondition",
+      "field": "type",
+      "type": "TriggerConditionType",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateField",
+      "model": "TriggerCondition",
+      "field": "minValue",
+      "type": "Int",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateField",
+      "model": "TriggerCondition",
+      "field": "maxValue",
+      "type": "Int",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateField",
+      "model": "TriggerCondition",
+      "field": "textValue",
+      "type": "String",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateField",
+      "model": "TriggerCondition",
+      "field": "trigger",
+      "type": "Trigger",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "TriggerCondition",
+          "field": "trigger"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "TriggerCondition",
+          "field": "trigger"
+        },
+        "directive": "relation"
+      },
+      "argument": "fields",
+      "value": "[triggerId]"
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "TriggerCondition",
+          "field": "trigger"
+        },
+        "directive": "relation"
+      },
+      "argument": "references",
+      "value": "[id]"
+    },
+    {
+      "tag": "CreateField",
+      "model": "TriggerCondition",
+      "field": "triggerId",
+      "type": "String",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateModel",
+      "model": "Trigger"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Trigger",
+      "field": "id",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "Trigger",
+          "field": "id"
+        },
+        "directive": "default"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "Trigger",
+          "field": "id"
+        },
+        "directive": "default"
+      },
+      "argument": "",
+      "value": "cuid()"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "Trigger",
+          "field": "id"
+        },
+        "directive": "id"
+      }
+    },
+    {
+      "tag": "CreateField",
+      "model": "Trigger",
+      "field": "lastSent",
+      "type": "DateTime",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Trigger",
+      "field": "name",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Trigger",
+      "field": "type",
+      "type": "TriggerType",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Trigger",
+      "field": "medium",
+      "type": "TriggerMedium",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Trigger",
+      "field": "conditions",
+      "type": "TriggerCondition",
+      "arity": "List"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Trigger",
+      "field": "relatedNodeId",
+      "type": "String",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Trigger",
+      "field": "relatedNode",
+      "type": "QuestionNode",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "Trigger",
+          "field": "relatedNode"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "Trigger",
+          "field": "relatedNode"
+        },
+        "directive": "relation"
+      },
+      "argument": "fields",
+      "value": "[relatedNodeId]"
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "Trigger",
+          "field": "relatedNode"
+        },
+        "directive": "relation"
+      },
+      "argument": "references",
+      "value": "[id]"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Trigger",
+      "field": "recipients",
+      "type": "User",
+      "arity": "List"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Trigger",
+      "field": "customer",
+      "type": "Customer",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "Trigger",
+          "field": "customer"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "Trigger",
+          "field": "customer"
+        },
+        "directive": "relation"
+      },
+      "argument": "fields",
+      "value": "[customerId]"
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "Trigger",
+          "field": "customer"
+        },
+        "directive": "relation"
+      },
+      "argument": "references",
+      "value": "[id]"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Trigger",
+      "field": "customerId",
       "type": "String",
       "arity": "Optional"
     }

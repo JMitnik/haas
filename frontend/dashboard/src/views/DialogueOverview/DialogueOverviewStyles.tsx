@@ -31,3 +31,12 @@ export const AddDialogueCard = styled(Card)`
     }
   `}
 `;
+
+const FlexRow = styled(Div)`
+  display: flex;
+  flex-direction: row;
+`;
+
+export const InputContainer = styled(FlexRow)`
+  align-items: center;
+`;
