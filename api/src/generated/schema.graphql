@@ -68,6 +68,10 @@ type DialogueDetailResult {
   updatedAt: String!
 }
 
+input DialogueFilterInputType {
+  searchTerm: String
+}
+
 input DialogueWhereUniqueInput {
   id: ID!
 }
@@ -226,7 +230,7 @@ type Query {
   customer(id: ID, slug: String): Customer!
   customers: [Customer!]!
   dialogue(where: DialogueWhereUniqueInput): Dialogue!
-  dialogues(customerId: ID, filter: TagsInputObjectType): [Dialogue!]!
+  dialogues(customerId: ID, filter: DialogueFilterInputType): [Dialogue!]!
   edge(id: String): Edge!
   getQuestionnaireData(dialogueId: String, filter: Int): DialogueDetailResult!
   getSessionAnswerFlow(sessionId: ID): Session!

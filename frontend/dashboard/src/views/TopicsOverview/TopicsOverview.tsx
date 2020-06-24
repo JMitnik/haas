@@ -3,12 +3,14 @@ import { Card, CardBody, Container, DeleteButtonContainer, Div, EditButtonContai
   H2, H3, Label } from '@haas/ui';
 import { Edit, MapPin, Plus, User, X } from 'react-feather';
 import { Link, useHistory, useParams } from 'react-router-dom';
+import { debounce } from 'lodash';
 import { useMutation, useQuery } from '@apollo/react-hooks';
-import React, { FC } from 'react';
+import React, { FC, useCallback, useState } from 'react';
 
+import SearchBar from 'components/SearchBar/SearchBar';
 import SliderNodeIcon from 'components/Icons/SliderNodeIcon';
 
-import { AddTopicCard } from './TopicsOverviewStyles';
+import { AddTopicCard, InputContainer } from './TopicsOverviewStyles';
 import { deleteQuestionnaireMutation } from '../../mutations/deleteQuestionnaire';
 import getQuestionnairesCustomerQuery from '../../queries/getQuestionnairesCustomerQuery';
 
@@ -19,12 +21,21 @@ interface TagProps {
 
 const TopicsOverview: FC = () => {
   const { customerId } = useParams();
+  const [activeSearchTerm, setActiveSearchTerm] = useState('');
+
+  const handleSearchTermChange = useCallback(debounce((newSearchTerm: string) => {
+    setActiveSearchTerm(newSearchTerm);
+  }, 250), []);
 
   const { loading, error, data } = useQuery<any>(getQuestionnairesCustomerQuery, {
-    variables: { id: customerId },
+    fetchPolicy: 'cache-and-network',
+    variables: {
+      id: customerId,
+      filter: { searchTerm: activeSearchTerm },
+    },
   });
 
-  if (loading) return <p>Loading</p>;
+  // if (loading) return <p>Loading</p>;
 
   if (error) {
     return (
@@ -35,20 +46,26 @@ const TopicsOverview: FC = () => {
       </p>
     );
   }
-
+  console.log('active search term: ', activeSearchTerm);
   const topics: Array<any> = data?.dialogues;
 
   return (
     <>
       <Container>
         <H2 color="default.text" fontWeight={400} mb={4}>Dialogues</H2>
-
+        <InputContainer marginBottom="20px" marginTop="5px" justifyContent="flex-end">
+          <SearchBar
+            activeSearchTerm={activeSearchTerm}
+            onSearchTermChange={handleSearchTermChange}
+          />
+        </InputContainer>
         <Grid
           gridGap={4}
           gridTemplateColumns={['1fr', '1fr 1fr 1fr']}
           gridAutoRows="minmax(200px, 1fr)"
         >
-          {topics?.map((topic, index) => topic && <TopicCard key={index} topic={topic} />)}
+
+          {!loading && topics?.map((topic, index) => topic && <TopicCard key={index} topic={topic} />)}
 
           <AddTopicCard>
             <Link to={`/dashboard/c/${customerId}/topic-builder`} />

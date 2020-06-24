@@ -1,4 +1,4 @@
-import { Div, Card } from '@haas/ui';
+import { Card, Div } from '@haas/ui';
 import styled, { css } from 'styled-components';
 
 export const AddTopicCard = styled(Card)`
@@ -30,4 +30,13 @@ export const AddTopicCard = styled(Card)`
       text-decoration: none;
     }
   `}
+`;
+
+const FlexRow = styled(Div)`
+  display: flex;
+  flex-direction: row;
+`;
+
+export const InputContainer = styled(FlexRow)`
+  align-items: center;
 `;

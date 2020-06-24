@@ -77,6 +77,27 @@ class DialogueService {
     };
   }
 
+  static filterDialoguesBySearchTerm = (dialogues: Array<Dialogue & {
+    tags: Tag[];
+  }>, searchTerm: string) => dialogues.filter((dialogue) => {
+    if (dialogue.title.toLowerCase().includes(
+      searchTerm.toLowerCase(),
+    )) {
+      return true;
+    }
+    if (dialogue.publicTitle?.toLowerCase().includes(
+        searchTerm.toLowerCase(),
+        )) {
+      return true;
+    }
+    if (dialogue.tags.find((tag) => tag.name.toLowerCase().includes(
+      searchTerm.toLowerCase(),
+    ))) {
+      return true;
+    }
+    return false;
+  });
+
   static updateTags = (
     dbTags: Array<Tag>,
     newTags: Array<string>,

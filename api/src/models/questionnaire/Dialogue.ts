@@ -52,7 +52,7 @@ export const DialogueType = objectType({
     t.field('rootQuestion', {
       type: QuestionNodeType,
       async resolve(parent: Dialogue, args: any, ctx: any) {
-        const { prisma }: {prisma: PrismaClient} = ctx;
+        const { prisma }: { prisma: PrismaClient } = ctx;
 
         const rootQuestions = await prisma.questionNode.findMany({
           where: {
@@ -67,7 +67,7 @@ export const DialogueType = objectType({
     t.list.field('edges', {
       type: EdgeType,
       async resolve(parent: Dialogue, args: any, ctx: any) {
-        const { prisma }: {prisma: PrismaClient} = ctx;
+        const { prisma }: { prisma: PrismaClient } = ctx;
 
         const dialogue = await prisma.dialogue.findOne({
           where: {
@@ -241,6 +241,13 @@ export const deleteDialogueOfCustomerMutation = extendType({
   },
 });
 
+export const DialogueFilterInputType = inputObjectType({
+  name: 'DialogueFilterInputType',
+  definition(t) {
+    t.string('searchTerm');
+  },
+});
+
 export const DialoguesOfCustomerQuery = extendType({
   type: 'Query',
   definition(t) {
@@ -268,13 +275,15 @@ export const DialoguesOfCustomerQuery = extendType({
         where: DialogueWhereUniqueInput,
       },
       async resolve(parent: any, args: any, ctx: any) {
-        const { prisma } : { prisma: PrismaClient} = ctx;
-        const dialogue = await prisma.dialogue.findOne({ where: {
-          id: args.where.id,
-        },
-        include: {
-          tags: true,
-        } });
+        const { prisma }: { prisma: PrismaClient } = ctx;
+        const dialogue = await prisma.dialogue.findOne({
+          where: {
+            id: args.where.id,
+          },
+          include: {
+            tags: true,
+          },
+        });
         return dialogue;
       },
     });
@@ -283,28 +292,24 @@ export const DialoguesOfCustomerQuery = extendType({
       type: DialogueType,
       args: {
         customerId: 'ID',
-        filter: TagsInputType,
+        filter: DialogueFilterInputType,
       },
       async resolve(parent: any, args: any, ctx: any) {
-        const { prisma } : { prisma: PrismaClient} = ctx;
+        const { prisma }: { prisma: PrismaClient } = ctx;
         const dialogueWhereInput: DialogueWhereInput = { customerId: args.customerId };
-        if (args.filter) {
-          dialogueWhereInput.tags = {
-            some: {
-              id: {
-                in: args.filter.entries,
-              },
-            },
-          };
-        }
 
-        const dialogues = await prisma.dialogue.findMany({
+        let dialogues = await prisma.dialogue.findMany({
           where: dialogueWhereInput,
           include: {
             tags: true,
           },
         });
 
+        if (args.filter) {
+          if (args.filter.searchTerm) {
+            dialogues = DialogueService.filterDialoguesBySearchTerm(dialogues, args.filter.searchTerm);
+          }
+        }
         const updatedDialogues = Promise.all(dialogues.map(async (dialogue) => {
           const arg = { dialogueId: dialogue.id };
           const aggregated = await DialogueService.getQuestionnaireAggregatedData(parent, arg);
