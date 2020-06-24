@@ -112,7 +112,7 @@ const TreeStoreModel = types
       }
 
       result.reverse();
-      const resultWithDepth = result.map((result, index) => ({ ...result, depth: index + 1 }));
+      const resultWithDepth = result.map((result, index) => ({ ...result, depth: index }));
       return resultWithDepth;
     },
   }));

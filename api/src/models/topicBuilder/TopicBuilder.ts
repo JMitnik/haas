@@ -1,5 +1,5 @@
 import { extendType, inputObjectType } from '@nexus/schema';
-import DialogueResolver from '../questionnaire/dialogue-resolver';
+import DialogueService from '../questionnaire/DialogueService';
 
 export const LeafNodeInput = inputObjectType({
   name: 'LeafNodeInput',
@@ -93,8 +93,8 @@ export const topicBuilderMutations = extendType({
         id: 'String',
         topicData: TopicDataEntryInput,
       },
-      resolve(parent: any, args: any, ctx: any, info: any) {
-        return DialogueResolver.updateTopicBuilder(args);
+      resolve(parent: any, args: any) {
+        return DialogueService.updateTopicBuilder(args);
       },
     });
   },

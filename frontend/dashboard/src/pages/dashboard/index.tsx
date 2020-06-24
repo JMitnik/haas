@@ -1,21 +1,68 @@
 import { Route, Switch } from 'react-router';
+import React from 'react';
 
 import AddTopicView from 'views/AddTopicView';
+import AddTriggerView from 'views/TriggerOverview/AddTriggerView';
+import AddUserView from 'views/UsersOverview/AddUserView';
 import CustomerBuilderView from 'views/CustomerBuilderView';
 import CustomerOverview from 'components/DashboardView';
 import EditCustomerView from 'views/EditCustomerView';
 import EditTopicView from 'views/EditTopicView';
+import EditTriggerView from 'views/TriggerOverview/EditTriggerView';
+import EditUserView from 'views/UsersOverview/EditUserView';
 import InteractionsOverview from 'views/InteractionsOverview/InteractionsOverview';
 import OrganisationSettingsView from 'views/OrganisationSettingsView';
-import React from 'react';
+import RolesOverview from 'views/RolesOverview/RolesOverview';
 import TopicDetail from 'views/TopicDetail/TopicDetail';
 import TopicsOverview from 'views/TopicsOverview/TopicsOverview';
+import TriggersOverview from 'views/TriggerOverview/TriggerOverview';
+import UsersOverview from 'views/UsersOverview/UsersOverview';
 
 import DashboardLayout from './DashboardLayout';
 
 const DashboardPage = () => (
   <>
     <Switch>
+      <Route
+        path="/dashboard/c/:customerId/n/:triggerId/edit"
+        render={() => (
+          <DashboardLayout>
+            <EditTriggerView />
+          </DashboardLayout>
+        )}
+      />
+      <Route
+        path="/dashboard/c/:customerId/u/:userId/edit"
+        render={() => (
+          <DashboardLayout>
+            <EditUserView />
+          </DashboardLayout>
+        )}
+      />
+      <Route
+        path="/dashboard/c/:customerId/users/add"
+        render={() => (
+          <DashboardLayout>
+            <AddUserView />
+          </DashboardLayout>
+        )}
+      />
+      <Route
+        path="/dashboard/c/:customerId/triggers/add"
+        render={() => (
+          <DashboardLayout>
+            <AddTriggerView />
+          </DashboardLayout>
+        )}
+      />
+      <Route
+        path="/dashboard/c/:customerId/triggers"
+        render={() => (
+          <DashboardLayout>
+            <TriggersOverview />
+          </DashboardLayout>
+        )}
+      />
       <Route
         path="/dashboard/c/:customerId/t/:topicId/edit"
         render={() => <DashboardLayout><EditTopicView /></DashboardLayout>}
@@ -37,12 +84,28 @@ const DashboardPage = () => (
         render={() => <DashboardLayout><EditCustomerView /></DashboardLayout>}
       />
       <Route
+        path="/dashboard/c/:customerId/users"
+        render={() => <DashboardLayout><UsersOverview /></DashboardLayout>}
+      />
+      <Route
+        path="/dashboard/c/:customerId/roles"
+        render={() => <DashboardLayout><RolesOverview /></DashboardLayout>}
+      />
+      <Route
         path="/dashboard/customer-builder"
-        render={() => <DashboardLayout><CustomerBuilderView /></DashboardLayout>}
+        render={() => (
+          <DashboardLayout>
+            <CustomerBuilderView />
+          </DashboardLayout>
+        )}
       />
       <Route
         path="/dashboard/c/:customerId/"
-        render={() => <DashboardLayout><TopicsOverview /></DashboardLayout>}
+        render={() => (
+          <DashboardLayout>
+            <TopicsOverview />
+          </DashboardLayout>
+        )}
       />
       <Route
         path="/dashboard/organisation-settings"

@@ -1,24 +1,41 @@
 import { ApolloError } from 'apollo-boost';
-import { useMutation, useQuery } from '@apollo/react-hooks';
-import React, { FC } from 'react';
-
 import { Card, CardBody, Container, DeleteButtonContainer, Div, EditButtonContainer, Flex, Grid,
   H2, H3, Label } from '@haas/ui';
-import { Edit, Plus, X } from 'react-feather';
+import { Edit, MapPin, Plus, User, X } from 'react-feather';
 import { Link, useHistory, useParams } from 'react-router-dom';
+import { debounce } from 'lodash';
+import { useMutation, useQuery } from '@apollo/react-hooks';
+import React, { FC, useCallback, useState } from 'react';
 
-import { AddTopicCard } from './TopicsOverviewStyles';
+import SearchBar from 'components/SearchBar/SearchBar';
+import SliderNodeIcon from 'components/Icons/SliderNodeIcon';
+
+import { AddTopicCard, InputContainer } from './TopicsOverviewStyles';
 import { deleteQuestionnaireMutation } from '../../mutations/deleteQuestionnaire';
 import getQuestionnairesCustomerQuery from '../../queries/getQuestionnairesCustomerQuery';
 
+interface TagProps {
+  name: string;
+  type: string;
+}
+
 const TopicsOverview: FC = () => {
   const { customerId } = useParams();
+  const [activeSearchTerm, setActiveSearchTerm] = useState('');
+
+  const handleSearchTermChange = useCallback(debounce((newSearchTerm: string) => {
+    setActiveSearchTerm(newSearchTerm);
+  }, 250), []);
 
   const { loading, error, data } = useQuery<any>(getQuestionnairesCustomerQuery, {
-    variables: { id: customerId },
+    fetchPolicy: 'cache-and-network',
+    variables: {
+      id: customerId,
+      filter: { searchTerm: activeSearchTerm },
+    },
   });
 
-  if (loading) return <p>Loading</p>;
+  // if (loading) return <p>Loading</p>;
 
   if (error) {
     return (
@@ -29,20 +46,26 @@ const TopicsOverview: FC = () => {
       </p>
     );
   }
-
+  console.log('active search term: ', activeSearchTerm);
   const topics: Array<any> = data?.dialogues;
 
   return (
     <>
       <Container>
         <H2 color="default.text" fontWeight={400} mb={4}>Dialogues</H2>
-
+        <InputContainer marginBottom="20px" marginTop="5px" justifyContent="flex-end">
+          <SearchBar
+            activeSearchTerm={activeSearchTerm}
+            onSearchTermChange={handleSearchTermChange}
+          />
+        </InputContainer>
         <Grid
           gridGap={4}
           gridTemplateColumns={['1fr', '1fr 1fr 1fr']}
           gridAutoRows="minmax(200px, 1fr)"
         >
-          {topics?.map((topic, index) => topic && <TopicCard key={index} topic={topic} />)}
+
+          {!loading && topics?.map((topic, index) => topic && <TopicCard key={index} topic={topic} />)}
 
           <AddTopicCard>
             <Link to={`/dashboard/c/${customerId}/topic-builder`} />
@@ -91,7 +114,7 @@ const TopicCard = ({ topic }: { topic: any }) => {
 
   return (
     <Card useFlex flexDirection="column" onClick={() => history.push(`/dashboard/c/${customerId}/t/${topic.id}`)}>
-      <CardBody flex="100%">
+      <CardBody useFlex flexDirection="column" flex="100%">
         <EditButtonContainer onClick={(e) => setEditDialogue(e, topic.id)}>
           <Edit />
         </EditButtonContainer>
@@ -108,9 +131,30 @@ const TopicCard = ({ topic }: { topic: any }) => {
             {topic.averageScore === 'false' ? 'N/A' : Number(topic.averageScore).toFixed(1)}
           </Label>
         </Flex>
+        <Flex flex="100%">
+          <Flex alignSelf="flex-end" marginTop="5px" flexDirection="row">
+            {topic?.tags && topic?.tags?.map((tag: any, index: number) => (<Tag key={index} tag={tag} />))}
+          </Flex>
+        </Flex>
       </CardBody>
     </Card>
   );
 };
+
+const Tag = ({ tag }: { tag: TagProps }) => (
+  <Flex marginRight="5px" borderRadius="8px" border="1px solid" padding="5px" paddingLeft="2px" alignItems="center">
+    {tag.type === 'LOCATION' && (
+    <MapPin />
+    )}
+    {tag.type === 'AGENT' && (
+    <User />
+    )}
+    {tag.type === 'DEFAULT' && (
+    <SliderNodeIcon color="black" />
+    )}
+    <Div marginLeft="2px">{tag.name}</Div>
+  </Flex>
+
+);
 
 export default TopicsOverview;

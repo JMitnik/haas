@@ -3,8 +3,8 @@ import { extendType, inputObjectType, objectType } from '@nexus/schema';
 
 import { PaginationProps } from '../../types/generic';
 import { QuestionNodeType } from '../question/QuestionNode';
-import NodeEntryResolver from '../nodeentry/nodeentry-resolver';
-import SessionResolver from './SessionResolver';
+import NodeEntryService from '../nodeentry/NodeEntryService';
+import SessionService from './SessionService';
 
 export const NodeEntryValueType = objectType({
   name: 'NodeEntryValue',
@@ -20,6 +20,7 @@ export const NodeEntryValueType = objectType({
       type: NodeEntryValueType,
       resolve(parent: NodeEntryValue, args: any, ctx: any) {
         const multiValues = ctx.prisma.nodeEntryValue.findMany({ where: { parentNodeEntryValueId: parent.id } });
+
         return multiValues;
       },
     });
@@ -168,8 +169,8 @@ export const InteractionType = objectType({
   },
 });
 
-export const InteractionFilterInput = inputObjectType({
-  name: 'InteractionFilterInput',
+export const FilterInput = inputObjectType({
+  name: 'FilterInput',
   definition(t) {
     t.string('startDate', { required: false });
     t.string('endDate', { required: false });
@@ -199,13 +200,14 @@ export const getSessionAnswerFlowQuery = extendType({
       type: InteractionType,
       args: {
         where: SessionWhereUniqueInput,
-        filter: InteractionFilterInput,
+        filter: FilterInput,
       },
       async resolve(parent: any, args: any) {
         const { pageIndex, offset, limit, startDate, endDate, searchTerm }: PaginationProps = args.filter;
-        const dateRange = SessionResolver.constructDateRangeWhereInput(startDate, endDate);
+        const dateRange = SessionService.constructDateRangeWhereInput(startDate, endDate);
         const orderBy = args.filter.orderBy ? Object.assign({}, ...args.filter.orderBy) : null;
-        const { pageSessions, totalPages, resetPages } = await NodeEntryResolver.getCurrentInteractionSessions(
+
+        const { pageSessions, totalPages, resetPages } = await NodeEntryService.getCurrentInteractionSessions(
           args.where.dialogueId,
           offset,
           limit,
@@ -215,9 +217,10 @@ export const getSessionAnswerFlowQuery = extendType({
           searchTerm,
         );
 
-        const finalSessions = pageSessions.map((session, index) => ({ ...session, index }));
+        const sessionsWithIndex = pageSessions.map((session: any, index: any) => ({ ...session, index }));
+
         return {
-          sessions: finalSessions,
+          sessions: sessionsWithIndex,
           pages: !resetPages ? totalPages : 1,
           offset,
           limit,
@@ -275,7 +278,7 @@ export const uploadUserSessionMutation = extendType({
         uploadUserSessionInput: UploadUserSessionInput,
       },
       resolve(parent: any, args: any, ctx: any) {
-        const session = SessionResolver.uploadUserSession(parent, args, ctx);
+        const session = SessionService.uploadUserSession(parent, args, ctx);
         return session;
       },
     });
@@ -286,7 +289,7 @@ export default [
   SortFilterObject,
   SortFilterInputObject,
   InteractionSessionType,
-  InteractionFilterInput,
+  FilterInput,
   InteractionType,
   SessionWhereUniqueInput,
   getSessionAnswerFlowQuery,

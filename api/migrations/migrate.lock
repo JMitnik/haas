@@ -3,4 +3,6 @@
 # Prisma Migrate lockfile v1
 # Read more about conflict resolution here: TODO
 
-20200512103521-init
+20200622153811-added-tag-field-to-dialogue
+20200622160134-many-to-many-tag-relation-with-dialogue
+20200623085155-added-tag-type-type-field-to-tag
