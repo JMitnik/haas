@@ -33,7 +33,7 @@ const HEADERS = [
   { Header: 'TYPE', accessor: 'type', Cell: UserCell },
 ];
 
-const UsersOverview = () => {
+const TriggersOverview = () => {
   const { customerId } = useParams();
   const history = useHistory();
   const [fetchTriggers, { data }] = useLazyQuery(getTriggersQuery, { fetchPolicy: 'cache-and-network' });
@@ -116,7 +116,7 @@ const UsersOverview = () => {
 
   return (
     <Div px="24px" margin="0 auto" width="100vh" height="100vh" maxHeight="100vh" overflow="hidden">
-      <H2 color="#3653e8" fontWeight={400} mb="10%">Users and roles</H2>
+      <H2 color="#3653e8" fontWeight={400} mb="10%">Triggers</H2>
       <InputOutputContainer mb="5%">
         <InputContainer>
           <DatePicker
@@ -143,4 +143,4 @@ const UsersOverview = () => {
   );
 };
 
-export default UsersOverview;
+export default TriggersOverview;

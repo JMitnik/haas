@@ -22,6 +22,8 @@ interface TableInputProps {
   onEditEntry?: (event: any, userId: string) => void;
   onAddEntry?: (event: any) => void;
   paginationProps: DataGridProps;
+  hidePagination?: boolean;
+  disableSorting?: boolean;
 }
 
 const Table = (
@@ -33,7 +35,9 @@ const Table = (
     CustomRow,
     onEditEntry,
     onDeleteEntry,
-    permissions }: TableInputProps,
+    permissions,
+    hidePagination,
+    disableSorting }: TableInputProps,
 ) => {
   const handlePage = (newPageIndex: number) => {
     if (onPaginationChange) {
@@ -48,6 +52,7 @@ const Table = (
         onPaginationChange={onPaginationChange}
         headers={headers}
         onAddEntry={onAddEntry}
+        disableSorting={disableSorting}
       />
       {data && data.map(
         (dataEntry, index) => (CustomRow
@@ -73,7 +78,9 @@ const Table = (
             />
           )),
       )}
-      <PaginationSpinner paginationProps={paginationProps} onPageChange={handlePage} />
+      {!hidePagination && (
+        <PaginationSpinner paginationProps={paginationProps} onPageChange={handlePage} />
+      )}
     </Grid>
   );
 };

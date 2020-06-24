@@ -76,6 +76,8 @@ const RolesOverview = () => {
           data={tableData}
           permissions={permissions}
           CustomRow={Row}
+          hidePagination
+          disableSorting
         />
       </Div>
     </Div>
