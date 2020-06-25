@@ -39,7 +39,7 @@ const PositivePathsModule = ({ positivePaths }: { positivePaths: any }) => (
   <ModuleContainer>
     <Card bg="white">
       <CardBody>
-        <H3 color="primary">
+        <H3 color="success">
           <Flex justifyContent="space-between" alignItems="center">
             <Span>Top positive paths</Span>
           </Flex>

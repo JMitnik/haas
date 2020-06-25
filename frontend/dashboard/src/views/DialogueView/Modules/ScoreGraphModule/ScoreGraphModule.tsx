@@ -1,61 +1,57 @@
+import { Card, CardBody, Flex, H3, Span } from '@haas/ui';
 import { ResponsiveLine as NivoLineChart } from '@nivo/line';
 import React from 'react';
 
-const ScoreGraphModule = ({ data }: { data: any }) => (
-  <NivoLineChart
-    data={data}
-    margin={{ top: 50, right: 150, bottom: 100, left: 60 }}
-    xScale={{ type: 'point' }}
-    yScale={{
-      type: 'linear', min: 'auto', max: 'auto', stacked: true, reverse: false,
-    }}
-    axisTop={null}
-    axisRight={null}
-    axisBottom={null}
-    axisLeft={{
-      orient: 'left',
-      tickSize: 5,
-      tickPadding: 5,
-      tickRotation: 0,
-      legend: 'dialogue score',
-      legendOffset: -40,
-      legendPosition: 'middle',
-    }}
-    colors={{ scheme: 'nivo' }}
-    pointSize={10}
-    pointColor={{ theme: 'background' }}
-    pointBorderWidth={2}
-    pointBorderColor={{ from: 'serieColor' }}
-    pointLabel="y"
-    pointLabelYOffset={-12}
-    useMesh
-    legends={[
-      {
-        anchor: 'bottom-right',
-        direction: 'column',
-        justify: false,
-        translateX: 100,
-        translateY: 0,
-        itemsSpacing: 0,
-        itemDirection: 'left-to-right',
-        itemWidth: 80,
-        itemHeight: 20,
-        itemOpacity: 0.75,
-        symbolSize: 12,
-        symbolShape: 'circle',
-        symbolBorderColor: 'rgba(0, 0, 0, .5)',
-        effects: [
-          {
-            on: 'hover',
-            style: {
-              itemBackground: 'rgba(0, 0, 0, .03)',
-              itemOpacity: 1,
-            },
-          },
-        ],
-      },
-    ]}
-  />
-);
+const ScoreGraphModule = ({ chartData }: { chartData: any }) => {
+  const data = [
+    {
+      id: 'score',
+      color: 'hsl(38, 70%, 50%)',
+      data: chartData,
+    },
+  ];
+
+  return (
+    <Card height="350px" bg="white">
+      <CardBody height="100%">
+        <H3 color="app.onWhite">
+          <Flex justifyContent="space-between" alignItems="center">
+            <Span>Score over time</Span>
+          </Flex>
+        </H3>
+        <NivoLineChart
+          data={data}
+          margin={{ top: 50, right: 30, bottom: 70, left: 60 }}
+          xScale={{ type: 'point' }}
+          yScale={{
+            type: 'linear', min: 0, max: 100, stacked: true, reverse: false,
+          }}
+          lineWidth={2}
+          axisTop={null}
+          axisRight={null}
+          enableArea
+          axisBottom={null}
+          axisLeft={{
+            orient: 'left',
+            tickSize: 5,
+            tickPadding: 5,
+            tickRotation: 0,
+            legend: 'dialogue score',
+            legendOffset: -40,
+            legendPosition: 'middle',
+          }}
+          colors={{ scheme: 'category10' }}
+          pointSize={10}
+          pointBorderWidth={2}
+          pointBorderColor={{ from: 'serieColor' }}
+          pointLabel="y"
+          curve="natural"
+          pointLabelYOffset={-12}
+          useMesh
+        />
+      </CardBody>
+    </Card>
+  );
+};
 
 export default ScoreGraphModule;

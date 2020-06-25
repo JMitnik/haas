@@ -108,11 +108,18 @@ export const DialogueType = objectType({
       },
     });
 
-    t.field('lineChartData', {
+    t.list.field('interactionFeedItems', {
       nullable: true,
-      type: 'String', // TODO: Change to appropriate return type
-      resolve() {
-        return '';
+      type: SessionType,
+      async resolve(parent) {
+        if (!parent.id) {
+          return null;
+        }
+
+        const interactionFeedItems = await DialogueService.interactionFeedItems(parent);
+        const sliceLength = Math.min(interactionFeedItems.length, 3);
+
+        return interactionFeedItems.slice(0, sliceLength);
       },
     });
 
@@ -227,25 +234,6 @@ export const DialogueWhereUniqueInput = inputObjectType({
   definition(t) {
     t.id('id');
     t.string('slug');
-  },
-});
-
-export const getQuestionnaireDataQuery = extendType({
-  type: 'Query',
-  definition(t) {
-    t.field('getQuestionnaireData', {
-      type: DialogueStatistics,
-      args: {
-        dialogueId: 'String',
-        filter: 'Int',
-      },
-      async resolve(parent: any, args: any) {
-        const aggregatedData = await DialogueService.getQuestionnaireAggregatedData(parent, args);
-        const data = await DialogueService.getLineData(args.dialogueId, args.filter);
-        const result = { ...aggregatedData, ...data };
-        return result;
-      },
-    });
   },
 });
 
@@ -377,14 +365,7 @@ export const DialoguesOfCustomerQuery = extendType({
           }
         }
 
-        // TODO: AverageSCore should be a dervied field instead
-        const updatedDialogues = Promise.all(dialogues.map(async (dialogue) => {
-          const arg = { dialogueId: dialogue.id };
-          const aggregated = await DialogueService.getQuestionnaireAggregatedData(parent, arg);
-          return { ...dialogue, averageScore: aggregated.average };
-        }));
-
-        return updatedDialogues;
+        return dialogues;
       },
     });
   },
@@ -398,5 +379,4 @@ export default [
   DialogueType,
   DialoguesOfCustomerQuery,
   DialogueStatistics,
-  getQuestionnaireDataQuery,
 ];

@@ -1,8 +1,9 @@
-import { NodeEntry, NodeEntryValue, Session } from '@prisma/client';
+import { NodeEntry, NodeEntryValue, PrismaClient, Session } from '@prisma/client';
 import { extendType, inputObjectType, objectType } from '@nexus/schema';
 
 import { PaginationProps } from '../../types/generic';
 import { QuestionNodeType } from '../question/QuestionNode';
+import { prisma } from '../../generated/prisma-client';
 import NodeEntryService from '../nodeentry/NodeEntryService';
 import SessionService from './SessionService';
 
@@ -67,6 +68,42 @@ export const SessionType = objectType({
     t.id('id');
     t.string('createdAt');
     t.string('dialogueId');
+
+    t.float('score', {
+      nullable: true,
+      async resolve(parent: Session, args: any, ctx: any) {
+        const { prisma }: { prisma: PrismaClient } = ctx;
+
+        const session = await prisma.session.findOne({
+          where: { id: parent.id },
+          include: {
+            nodeEntries: {
+              include: {
+                relatedNode: {
+                  select: {
+                    isRoot: true,
+                  },
+                },
+                values: {
+                  select: {
+                    numberValue: true,
+                    NodeEntry: {
+                      select: {
+                        depth: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        });
+
+        const nodeEntryWithValues = session?.nodeEntries.find((nodeEntry) => nodeEntry.depth === 0 && nodeEntry.relatedNode?.isRoot);
+
+        return nodeEntryWithValues?.values.find((entry) => entry.numberValue)?.numberValue;
+      },
+    });
 
     t.list.field('nodeEntries', {
       type: NodeEntryType,

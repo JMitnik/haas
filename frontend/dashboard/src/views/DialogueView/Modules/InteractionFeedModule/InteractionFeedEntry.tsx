@@ -1,13 +1,13 @@
 import { format } from 'date-fns';
 import React, { Dispatch, SetStateAction } from 'react';
 
-import { Div, H5 } from '@haas/ui';
+import { Div, H5, Span } from '@haas/ui';
 
 import { InteractionFeedEntryContainer, InteractionFeedEntryValueContainer } from './InteractionFeedEntryStyles';
 
 interface TimelineEntryProps {
-  sessionId: string;
-  value: number;
+  id: string;
+  score: number;
   createdAt: string;
 }
 
@@ -24,16 +24,18 @@ const InteractionFeedEntry = ({
 
   return (
     <InteractionFeedEntryContainer onClick={() => viewTimeLine(timeLineEntry)}>
-      <InteractionFeedEntryValueContainer value={timeLineEntry.value}>
-        {Number(timeLineEntry.value / 10).toFixed(1)}
+      <InteractionFeedEntryValueContainer value={timeLineEntry.score}>
+        {Number(timeLineEntry.score / 10).toFixed(1)}
       </InteractionFeedEntryValueContainer>
 
       <Div>
-        {`User ${timeLineEntry.sessionId} has voted `}
+        {timeLineEntry.id}
+        {' '}
+        has voted
       </Div>
 
       <Div useFlex justifyContent="flex-end" gridColumn="2">
-        <H5>
+        <H5 color="app.mutedAltOnWhite">
           {acceptedDate}
         </H5>
       </Div>

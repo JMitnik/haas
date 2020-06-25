@@ -5,20 +5,14 @@ export const InteractionFeedEntryContainer = styled.div`
     display: grid;
     grid-template-columns: 50px 1fr;
     grid-gap: 0px 24px;
-    padding: 8px 14px;
-    border-radius: 7px;
-    background: #ffffff;
+    padding: 8px 0;
     color: #323944;
-    box-shadow: 1;
-    margin: 12px 0;
+    border-bottom: 1px solid #e6ecf4;
     transition: all .3s cubic-bezier(.55,0,.1,1);
     cursor: pointer;
-    box-shadow: 0px 1px 4px 1px rgba(176, 185, 206, 0.15);
 
-    :hover {
-      transition: all .3s cubic-bezier(.55,0,.1,1);
-      transform: scale(1.1);
-      box-shadow: 0px 1px 4px 1px rgba(176, 185, 206, 0.35);
+    &:last-child {
+      border-bottom: none;
     }
   `}
 `;

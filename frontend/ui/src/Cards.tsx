@@ -1,8 +1,12 @@
 import styled, { css } from 'styled-components/macro';
 import { Div } from './Generics';
 
-export const Card = styled(Div)`
-  ${({ theme }) => css`
+interface CardProps {
+  noHover?: boolean;
+}
+
+export const Card = styled(Div)<CardProps>`
+  ${({ theme, noHover }) => css`
     position: relative;
     box-shadow: 0 1px 2px 0 rgba(0,0,0,.05);
     border-radius: ${theme.borderRadiuses.somewhatRounded};
@@ -10,10 +14,12 @@ export const Card = styled(Div)`
     border: 1px solid #fcfcfc;
     cursor: pointer;
 
-    &:hover {
-      transition: all .3s cubic-bezier(.55,0,.1,1);
-      box-shadow: 0 4px 6px -1px rgba(0,0,0,.1),0 2px 4px -1px rgba(0,0,0,.06)!important;
-    }
+    ${!noHover && css`
+      &:hover {
+        transition: all .3s cubic-bezier(.55,0,.1,1);
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,.1),0 2px 4px -1px rgba(0,0,0,.06)!important;
+      }
+    `}
   `}
 `;
 

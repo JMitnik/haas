@@ -39,7 +39,7 @@ const NegativePathsModule = ({ negativePaths }: { negativePaths: any }) => (
   <ModuleContainer>
     <Card bg="white">
       <CardBody>
-        <H3 color="primary">
+        <H3 color="error">
           <Flex justifyContent="space-between" alignItems="center">
             <Span>Top negative paths</Span>
           </Flex>

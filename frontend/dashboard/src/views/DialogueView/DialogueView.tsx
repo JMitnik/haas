@@ -8,12 +8,15 @@ import Modal from 'components/Modal';
 
 import { ReactComponent as PathsIcon } from 'assets/icons/icon-launch.svg';
 import { ReactComponent as TrendingIcon } from 'assets/icons/icon-trending-up.svg';
+import { ReactComponent as TrophyIcon } from 'assets/icons/icon-trophy.svg';
 
 import DatePicker from 'components/DatePicker';
 import gql from 'graphql-tag';
+import InteractionFeedModule from './Modules/InteractionFeedModule/InteractionFeedModule';
 import NegativePathsModule from './Modules/NegativePathsModule/index.tsx';
 import NodeEntriesOverview from '../NodeEntriesOverview/NodeEntriesOverview';
 import PositivePathsModule from './Modules/PositivePathsModule/PositivePathsModule';
+import ScoreGraphModule from './Modules/ScoreGraphModule';
 import SummaryAverageScoreModule from './Modules/SummaryModules/SummaryAverageScoreModule';
 import SummaryCallToActionModule from './Modules/SummaryModules/SummaryCallToActionModule';
 import SummaryInteractionCountModule from './Modules/SummaryModules/SummaryInteractionCountModule';
@@ -40,6 +43,11 @@ const getDialogueStatistics = gql`
       dialogue(where: { slug: $dialogueSlug }) {
         countInteractions
         averageScore
+        interactionFeedItems {
+          id
+          createdAt
+          score
+        }
         statistics {
           topPositivePath {
             answer
@@ -62,7 +70,7 @@ const getDialogueStatistics = gql`
 
 const DialogueView = () => {
   const { dialogueSlug, customerSlug } = useParams();
-  const [activeSession] = useState('');
+  const [activeSession, setActiveSession] = useState('');
   const location = useLocation<any>();
 
   // FIXME: If this is started with anything else start result is undefined :S
@@ -80,18 +88,6 @@ const DialogueView = () => {
   const dialogue = data?.customer?.dialogue;
 
   if (!dialogue) return <Loader />;
-
-  // const lineQueryData = resultData?.lineChartData;
-  // let timelineEntries: Array<any> = resultData?.timelineEntries;
-  // timelineEntries = timelineEntries?.length > 8 ? timelineEntries.slice(0, 8) : timelineEntries;
-
-  // const lineData = [
-  //   {
-  //     id: 'score',
-  //     color: 'hsl(38, 70%, 50%)',
-  //     data: lineQueryData,
-  //   },
-  // ];
 
   return (
     <DialogueViewContainer>
@@ -131,20 +127,26 @@ const DialogueView = () => {
           </Grid>
         </Div>
 
-        {/* <Div gridColumn="span 2">
-          {lineData && (
-          <p>ss</p>
-          // <ScoreGraphModule data={lineData} />
-          )}
-        </Div> */}
-        {' '}
-        {/*
-      <Div>
+        <Div gridColumn="span 3">
+          <H4 color="default.darker" mb={4}>
+            <Flex>
+              <Div width="20px">
+                <TrophyIcon fill="currentColor" />
+              </Div>
+              <Span ml={2}>
+                The latest data
+              </Span>
+            </Flex>
+          </H4>
+        </Div>
+
+        <Div gridColumn="span 2">
+          <ScoreGraphModule chartData={dialogue.statistics?.lineChartData} />
+        </Div>
         <InteractionFeedModule
           onActiveSessionChange={setActiveSession}
-          timelineEntries={timelineEntries}
+          timelineEntries={dialogue?.interactionFeedItems}
         />
-      </Div> */}
 
         {location?.state?.modal && (
         <Modal>

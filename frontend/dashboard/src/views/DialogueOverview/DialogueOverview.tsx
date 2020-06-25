@@ -10,7 +10,7 @@ import DialogueCard from './DialogueCard';
 
 // TODO: Do something about this
 const DialogueOverviewFilters = () => (
-  <div>oops</div>
+  <div></div>
 );
 
 const DialogueOverview = ({ dialogues }: { dialogues: any }) => {

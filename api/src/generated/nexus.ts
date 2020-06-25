@@ -363,8 +363,8 @@ export interface NexusGenFieldTypes {
     description: string; // String!
     edges: NexusGenRootTypes['Edge'][]; // [Edge!]!
     id: string; // ID!
+    interactionFeedItems: NexusGenRootTypes['Session'][] | null; // [Session!]
     leafs: NexusGenRootTypes['QuestionNode'][]; // [QuestionNode!]!
-    lineChartData: string | null; // String
     publicTitle: string | null; // String
     questions: NexusGenRootTypes['QuestionNode'][]; // [QuestionNode!]!
     rootQuestion: NexusGenRootTypes['QuestionNode']; // QuestionNode!
@@ -477,7 +477,6 @@ export interface NexusGenFieldTypes {
     dialogue: NexusGenRootTypes['Dialogue']; // Dialogue!
     dialogues: NexusGenRootTypes['Dialogue'][]; // [Dialogue!]!
     edge: NexusGenRootTypes['Edge']; // Edge!
-    getQuestionnaireData: NexusGenRootTypes['DialogueStatistics']; // DialogueStatistics!
     getSessionAnswerFlow: NexusGenRootTypes['Session']; // Session!
     interactions: NexusGenRootTypes['InteractionType']; // InteractionType!
     lineChartData: NexusGenRootTypes['lineChartDataType'][]; // [lineChartDataType!]!
@@ -532,6 +531,7 @@ export interface NexusGenFieldTypes {
     dialogueId: string; // String!
     id: string; // ID!
     nodeEntries: NexusGenRootTypes['NodeEntry'][]; // [NodeEntry!]!
+    score: number | null; // Float
   }
   SortFilterObject: { // field return type
     desc: boolean; // Boolean!
@@ -709,10 +709,6 @@ export interface NexusGenArgTypes {
     }
     edge: { // args
       id?: string | null; // String
-    }
-    getQuestionnaireData: { // args
-      dialogueId?: string | null; // String
-      filter?: number | null; // Int
     }
     getSessionAnswerFlow: { // args
       sessionId?: string | null; // ID

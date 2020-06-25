@@ -672,79 +672,41 @@ class DialogueService {
     return dialogue?.sessions.length;
   };
 
-  static getQuestionnaireAggregatedData = async (parent: any, args: any) => {
-    const { dialogueId } = args;
-
-    // const customerName = (await prisma.questionnaire({ id: dialogueId }).customer()).name;
-    const customer = await (prisma.dialogue.findOne({ where: { id: dialogueId } }).customer());
-    const customerName = customer?.name;
-
-    const dialogue: Dialogue | null = (await prisma.dialogue.findOne(
-      { where: { id: dialogueId } },
-    ));
-
-    if (dialogue) {
-      const { title, description, creationDate, updatedAt } = dialogue;
-
-      const questionNodes = await prisma.questionNode.findMany({
-        where: {
-          questionDialogueId: dialogueId,
-        },
-      });
-
-      const questionNodeIds = questionNodes.map((qNode) => qNode.id);
-
-      const nodeEntries = await prisma.nodeEntry.findMany({
-        where: {
-          relatedNodeId: {
-            in: questionNodeIds,
+  static interactionFeedItems = async (parent: Dialogue) => {
+    const sessions = await prisma.session.findMany({
+      where: {
+        dialogueId: parent.id,
+      },
+      include: {
+        nodeEntries: {
+          include: {
+            relatedNode: {
+              select: {
+                isRoot: true,
+              },
+            },
+            values: {
+              select: {
+                numberValue: true,
+                NodeEntry: {
+                  select: {
+                    depth: true,
+                  },
+                },
+              },
+            },
           },
         },
-      }) || [];
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
 
-      const aggregatedNodeEntries = await Promise.all(nodeEntries.map(async ({ id }) => {
-        const values = await prisma.nodeEntry.findOne({ where: { id } }).values();
-        const nodeEntry = await prisma.nodeEntry.findOne({ where: { id } });
-        const session = (await prisma.nodeEntry.findOne({ where: { id } }).session());
-        const sessionId = session?.id;
+    const sessionsWithOnlyRoots = sessions.map((session) => (
+      session?.nodeEntries.find((nodeEntry) => nodeEntry.depth === 0 && nodeEntry.relatedNode?.isRoot) ? session : null));
 
-        const mappedResult = {
-          sessionId,
-          createdAt: nodeEntry?.creationDate,
-          value: values[0].numberValue ? values[0].numberValue : -1,
-        };
-        return mappedResult;
-      })) || [];
-
-      const filterNodes = aggregatedNodeEntries.filter((node) => node?.value !== -1) || [];
-
-      const filteredNodeData = (filterNodes.map((node) => node?.value)) || [];
-
-      const nrEntries = filteredNodeData.reduce(
-        (total = 0, previousValue) => total + previousValue, 0,
-      );
-
-      const averageSliderResult = (
-        filteredNodeData.length > 0 && nrEntries / filteredNodeData.length).toString()
-        || 'N/A';
-
-      const orderedTimelineEntries = _.orderBy(filterNodes,
-        (filterNode) => filterNode.createdAt, 'desc') || [];
-
-      return {
-        customerName,
-        title,
-        timelineEntries: orderedTimelineEntries,
-        description,
-        creationDate,
-        updatedAt,
-        average: averageSliderResult,
-        totalNodeEntries: filterNodes.length,
-      };
-    }
-
-    // TODO: What will we return here?
-    return {};
+    return sessionsWithOnlyRoots.filter((session) => session);
   };
 }
 

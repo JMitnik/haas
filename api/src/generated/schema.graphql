@@ -56,8 +56,8 @@ type Dialogue {
   description: String!
   edges: [Edge!]!
   id: ID!
+  interactionFeedItems: [Session!]
   leafs: [QuestionNode!]!
-  lineChartData: String
   publicTitle: String
   questions(where: QuestionNodeWhereInput): [QuestionNode!]!
   rootQuestion: QuestionNode!
@@ -240,7 +240,6 @@ type Query {
   dialogue(where: DialogueWhereUniqueInput): Dialogue!
   dialogues(customerId: ID, filter: DialogueFilterInputType): [Dialogue!]!
   edge(id: String): Edge!
-  getQuestionnaireData(dialogueId: String, filter: Int): DialogueStatistics!
   getSessionAnswerFlow(sessionId: ID): Session!
   interactions(filter: FilterInput, where: SessionWhereUniqueInput): InteractionType!
   lineChartData(dialogueId: String, limit: Int, numberOfDaysBack: Int, offset: Int): [lineChartDataType!]!
@@ -343,6 +342,7 @@ type Session {
   dialogueId: String!
   id: ID!
   nodeEntries: [NodeEntry!]!
+  score: Float
 }
 
 input SessionWhereUniqueInput {
