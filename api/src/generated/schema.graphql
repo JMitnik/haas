@@ -10,6 +10,7 @@ type ColourSettings {
 }
 
 type Customer {
+  dialogue(where: DialogueWhereUniqueInput): Dialogue
   dialogues: [Dialogue!]!
   id: ID!
   name: String!
@@ -49,6 +50,7 @@ type Dialogue {
   publicTitle: String
   questions(where: QuestionNodeWhereInput): [QuestionNode!]!
   rootQuestion: QuestionNode!
+  slug: String!
   tags: [TagType!]
   title: String!
   updatedAt: String
@@ -73,7 +75,8 @@ input DialogueFilterInputType {
 }
 
 input DialogueWhereUniqueInput {
-  id: ID!
+  id: ID
+  slug: String
 }
 
 type Edge {

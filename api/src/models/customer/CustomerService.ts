@@ -56,6 +56,7 @@ class CustomerService {
             id: customer.id,
           },
         },
+        slug: 'default',
         title: 'Default questionnaire',
         description: 'Default questions',
         questions: {
@@ -192,6 +193,44 @@ class CustomerService {
 
     return customer;
   };
+
+  /**
+   * Gets a dialogue from the customer, by using a slug
+   * @param customerId
+   * @param dialogueSlug
+   */
+  static async getDialogueFromCustomerBySlug(customerId: string, dialogueSlug: string) {
+    const customerWithDialogue = await prisma.customer.findOne({
+      where: { id: customerId },
+      include: {
+        dialogues: {
+          where: {
+            slug: dialogueSlug,
+          },
+        },
+      },
+    });
+
+    return customerWithDialogue?.dialogues?.[0];
+  }
+
+  /**
+   * Gets a dialogue from the customer, by using an ID
+   * @param customerId
+   * @param dialogueSlug
+   */
+  static async getDialogueFromCustomerById(customerId: string, dialogueId: string) {
+    const customerWithDialogue = await prisma.customer.findOne({
+      where: { id: customerId },
+      include: {
+        dialogues: {
+          where: { id: dialogueId },
+        },
+      },
+    });
+
+    return customerWithDialogue?.dialogues?.[0];
+  }
 }
 
 export default CustomerService;

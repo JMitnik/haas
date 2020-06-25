@@ -61,6 +61,7 @@ export interface HAASFormEntry {
 
 export interface Dialogue {
   id: string;
+  slug: string;
   title: string;
   publicTitle: string;
   questions: TreeNodeProps[];

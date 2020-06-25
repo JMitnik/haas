@@ -1,8 +1,8 @@
-import React from 'react';
-import { Div, CardBody, CardFooter, H3, Flex, ColumnFlex } from '@haas/ui';
-import Select from 'react-select';
+import { CardBody, CardFooter, ColumnFlex, Div, Flex, H3 } from '@haas/ui';
+import { CustomerCardEnqueteLabel, CustomerCardImage } from './CustomerCardStyles';
 import { useHistory } from 'react-router-dom';
-import { CustomerCardImage, CustomerCardEnqueteLabel } from './CustomerCardStyles';
+import React from 'react';
+import Select from 'react-select';
 import styled, { css } from 'styled-components/macro';
 
 // TODO: Reconcile with regular Card
@@ -19,8 +19,8 @@ const Card = styled(Div)`
 
 const CustomerCard = ({ customer }: { customer: any }) => {
   const questionnaireOptions = customer?.dialogues?.map((dialogue: any) => ({
-    value: dialogue.id,
-    label: dialogue.title
+    value: dialogue.slug,
+    label: dialogue.title,
   }));
 
   const history = useHistory();

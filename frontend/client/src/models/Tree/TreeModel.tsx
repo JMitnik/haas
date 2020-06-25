@@ -5,6 +5,7 @@ import { TreeEdgeModel, TreeEdgeProps } from './TreeEdgeModel';
 const TreeModel = types
   .model({
     id: types.identifier,
+    slug: types.string,
     title: types.string,
     publicTitle: types.maybeNull(types.string),
     nodes: types.array(TreeNodeModel),

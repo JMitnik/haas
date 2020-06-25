@@ -17,6 +17,7 @@ export const DialogueType = objectType({
   definition(t) {
     t.id('id');
     t.string('title');
+    t.string('slug');
     t.string('description');
     t.string('publicTitle', { nullable: true });
     t.string('creationDate', { nullable: true });
@@ -130,7 +131,8 @@ export const DialogueType = objectType({
 export const DialogueWhereUniqueInput = inputObjectType({
   name: 'DialogueWhereUniqueInput',
   definition(t) {
-    t.id('id', { required: true });
+    t.id('id');
+    t.string('slug');
   },
 });
 
@@ -276,6 +278,13 @@ export const DialoguesOfCustomerQuery = extendType({
       },
       async resolve(parent: any, args: any, ctx: any) {
         const { prisma }: { prisma: PrismaClient } = ctx;
+
+        if (args.where.slug) {
+          console.log(parent);
+          console.log('SLUG!!!');
+          return;
+        }
+
         const dialogue = await prisma.dialogue.findOne({
           where: {
             id: args.where.id,
@@ -284,6 +293,7 @@ export const DialoguesOfCustomerQuery = extendType({
             tags: true,
           },
         });
+
         return dialogue;
       },
     });

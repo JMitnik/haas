@@ -55,6 +55,7 @@ class DialogueService {
   static constructDialogue(
     customerId: string,
     title: string,
+    slug: string,
     description: string,
     publicTitle: string = '',
     tags: Array<{id: string}> = [],
@@ -66,6 +67,7 @@ class DialogueService {
         },
       },
       title,
+      slug,
       description,
       publicTitle,
       questions: {
@@ -457,17 +459,19 @@ class DialogueService {
   static initDialogue = async (
     customerId: string,
     title: string,
+    slug: string,
     description: string,
     publicTitle: string = '',
     tags: Array<{id: string}> = [],
   ) => prisma.dialogue.create({
     data: DialogueService.constructDialogue(
-      customerId, title, description, publicTitle, tags,
+      customerId, slug, title, description, publicTitle, tags,
     ),
   });
 
   static createDialogue = async (args: any): Promise<Dialogue> => {
-    const { customerId, title, description, publicTitle, isSeed, tags } = args;
+    const { customerId, slug, title, description, publicTitle, isSeed, tags } = args;
+
     let questionnaire = null;
     const dialogueTags = tags?.entries?.length > 0
       ? tags?.entries?.map((tag: string) => ({ id: tag }))
@@ -477,12 +481,14 @@ class DialogueService {
 
     if (isSeed) {
       if (customer?.name) {
-        return DialogueService.seedQuestionnare(customerId, customer?.name, title, description, dialogueTags);
+        return DialogueService.seedQuestionnare(customerId, slug, customer?.name, title, description, dialogueTags);
       }
     }
+
     questionnaire = await DialogueService.initDialogue(
       customerId, title, description, publicTitle, dialogueTags,
     );
+
     await prisma.dialogue.update({
       where: {
         id: questionnaire.id,
@@ -497,6 +503,7 @@ class DialogueService {
         },
       },
     });
+
     await NodeResolver.createTemplateLeafNodes(leafNodes, questionnaire.id);
 
     return questionnaire;
@@ -504,13 +511,14 @@ class DialogueService {
 
   static seedQuestionnare = async (
     customerId: string,
+    customerSlug: string,
     customerName: string,
     questionnaireTitle: string = 'Default questionnaire',
     questionnaireDescription: string = 'Default questions',
     tags: Array<{id: string}>,
   ): Promise<Dialogue> => {
     const questionnaire = await DialogueService.initDialogue(
-      customerId, questionnaireTitle, questionnaireDescription, '', tags,
+      customerId, customerSlug, questionnaireTitle, questionnaireDescription, '', tags,
     );
 
     const leafs = await NodeResolver.createTemplateLeafNodes(leafNodes, questionnaire.id);

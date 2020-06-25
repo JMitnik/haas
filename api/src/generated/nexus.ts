@@ -36,7 +36,8 @@ export interface NexusGenInputs {
     searchTerm?: string | null; // String
   }
   DialogueWhereUniqueInput: { // input type
-    id: string; // ID!
+    id?: string | null; // ID
+    slug?: string | null; // String
   }
   EdgeChildInput: { // input type
     childNode?: NexusGenInputs['EdgeNodeInput'] | null; // EdgeNodeInput
@@ -338,6 +339,7 @@ export interface NexusGenFieldTypes {
     secondary: string | null; // String
   }
   Customer: { // field return type
+    dialogue: NexusGenRootTypes['Dialogue'] | null; // Dialogue
     dialogues: NexusGenRootTypes['Dialogue'][]; // [Dialogue!]!
     id: string; // ID!
     name: string; // String!
@@ -363,6 +365,7 @@ export interface NexusGenFieldTypes {
     publicTitle: string | null; // String
     questions: NexusGenRootTypes['QuestionNode'][]; // [QuestionNode!]!
     rootQuestion: NexusGenRootTypes['QuestionNode']; // QuestionNode!
+    slug: string; // String!
     tags: NexusGenRootTypes['TagType'][] | null; // [TagType!]
     title: string; // String!
     updatedAt: string | null; // String
@@ -598,6 +601,11 @@ export interface NexusGenFieldTypes {
 }
 
 export interface NexusGenArgTypes {
+  Customer: {
+    dialogue: { // args
+      where?: NexusGenInputs['DialogueWhereUniqueInput'] | null; // DialogueWhereUniqueInput
+    }
+  }
   Dialogue: {
     questions: { // args
       where?: NexusGenInputs['QuestionNodeWhereInput'] | null; // QuestionNodeWhereInput

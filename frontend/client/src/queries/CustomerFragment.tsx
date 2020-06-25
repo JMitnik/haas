@@ -17,6 +17,7 @@ export const CustomerFragment = gql`
     }
     dialogues {
       id
+      slug
       description
       title
       publicTitle
