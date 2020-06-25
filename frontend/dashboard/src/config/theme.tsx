@@ -4,7 +4,7 @@ const theme = {
     primary: '#426b3a',
     primaryAlt: '#8cb6ff',
     secondary: '#6f6594',
-    tertiary: 'green',
+    tertiary: '#3182CE',
     black: 'black',
     white: 'white',
     success: '#38B2AC',
