@@ -1,38 +1,41 @@
 import { ApolloError } from 'apollo-boost';
 import { useMutation, useQuery } from '@apollo/react-hooks';
+import Color from 'color';
 import React, { FC } from 'react';
 
-import { AddCard, Card, CardBody, DeleteButtonContainer, Div, EditButtonContainer,
-  Flex, Grid, H2, H3, H4, PageHeading } from '@haas/ui';
+import { AddCard, Card, CardBody, Container, DeleteButtonContainer, Div,
+  EditButtonContainer, Flex, Grid, H2, H3, H4, PageHeading } from '@haas/ui';
 import { Edit, Plus, X } from 'react-feather';
 import { Link, useHistory } from 'react-router-dom';
 
-import { CustomerCardImage } from './CustomerOverviewStyles';
+import { CustomerCardImage, CustomerOverviewContainer } from './CustomerOverviewStyles';
 import { deleteFullCustomerQuery } from '../../mutations/deleteFullCustomer';
 import { getCustomerQuery } from '../../queries/getCustomersQuery';
 
 const CustomerOverview = ({ customers }: { customers: any[] }) => (
-  <>
-    <PageHeading>Customers</PageHeading>
+  <CustomerOverviewContainer>
+    <Container>
+      <PageHeading>Customers</PageHeading>
 
-    <Grid
-      gridGap={4}
-      gridTemplateColumns={['1fr', '1fr 1fr 1fr']}
-      gridAutoRows="minmax(150px, 1fr)"
-    >
-      {customers?.map((customer: any, index: any) => customer && <CustomerCard key={index} customer={customer} />)}
+      <Grid
+        gridGap={4}
+        gridTemplateColumns={['1fr', '1fr 1fr 1fr']}
+        gridAutoRows="minmax(250px, 1fr)"
+      >
+        {customers?.map((customer: any, index: any) => customer && <CustomerCard key={index} customer={customer} />)}
 
-      <AddCard>
-        <Link to="/dashboard/b/add" />
-        <Div>
-          <Plus />
-          <H3>
-            Add new customer
-          </H3>
-        </Div>
-      </AddCard>
-    </Grid>
-  </>
+        <AddCard>
+          <Link to="/dashboard/b/add" />
+          <Div>
+            <Plus />
+            <H3>
+              Add new customer
+            </H3>
+          </Div>
+        </AddCard>
+      </Grid>
+    </Container>
+  </CustomerOverviewContainer>
 );
 
 const CustomerCard = ({ customer }: { customer: any }) => {
@@ -63,11 +66,14 @@ const CustomerCard = ({ customer }: { customer: any }) => {
     event.stopPropagation();
   };
 
+  const primaryColor = Color(customer.settings?.colourSettings.primary || 'white');
+
   return (
     <Card
       useFlex
       flexDirection="column"
-      bg={customer.settings?.colourSettings?.primary || 'white'}
+      backgroundColor={primaryColor.hex()}
+      color={primaryColor.isDark() ? 'white' : '#444'}
       onClick={() => setCustomerSlug(customer.slug)}
     >
       <CardBody flex="100%">

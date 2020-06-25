@@ -6,11 +6,11 @@ import DialogueOverview from 'views/DialogueOverview';
 import getQuestionnairesCustomerQuery from 'queries/getQuestionnairesCustomerQuery';
 
 const DialoguesPage = () => {
-  const { customerId } = useParams();
+  const { customerSlug } = useParams();
 
   // TODO: Handle the loading
   const { loading, error, data } = useQuery<any>(getQuestionnairesCustomerQuery, {
-    variables: { id: customerId },
+    variables: { customerSlug },
   });
 
   let dialogues: any[] = [];
@@ -26,7 +26,7 @@ const DialoguesPage = () => {
   }
 
   if (data) {
-    dialogues = data?.dialogues;
+    dialogues = data?.customer?.dialogues;
   }
 
   return <DialogueOverview dialogues={dialogues} />;

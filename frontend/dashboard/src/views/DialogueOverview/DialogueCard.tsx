@@ -62,7 +62,7 @@ const DialogueCard = ({ dialogue }: { dialogue: any }) => {
   const lastUpdated = new Date(Number.parseInt(dialogue.updatedAt, 10)) || null;
 
   return (
-    <Card useFlex flexDirection="column" onClick={() => history.push(`/dashboard/c/${customerId}/t/${dialogue.id}`)}>
+    <Card bg="white" useFlex flexDirection="column" onClick={() => history.push(`/dashboard/c/${customerId}/t/${dialogue.id}`)}>
       <CardBody flex="100%">
         <ColumnFlex justifyContent="space-between" height="100%">
           <Div>

@@ -1,8 +1,8 @@
 import gql from 'graphql-tag';
 
 const getQuestionnairesCustomerQuery = gql`
-  query getQuestionnairesOfCustomer($customerSlug: String!, $dialogueSlug: String!, $filter: DialogueFilterInputType) {
-    customer(customerSlug: $customerSlug) {
+  query getQuestionnairesOfCustomer($customerSlug: String!, $filter: DialogueFilterInputType) {
+    customer(slug: $customerSlug) {
       dialogues(filter: $filter) {
         id
         title

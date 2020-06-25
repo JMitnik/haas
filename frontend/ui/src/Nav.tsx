@@ -32,6 +32,7 @@ const UserNav: FC = () => (
 
 const StyledExtLink = styled.a`
   text-decoration: none;
+  color: inherit;
 `;
 
 export const ExtLink = ({ children, to }: { children: React.ReactNode, to: string }) => (

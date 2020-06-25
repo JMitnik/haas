@@ -5,8 +5,7 @@ export const Card = styled(Div)`
   ${({ theme }) => css`
     position: relative;
     border-radius: ${theme.borderRadiuses.somewhatRounded};
-    background: ${theme.colors.white};
-    color: ${theme.colors.default.darkest};
+    /* color: ${theme.colors.default.darkest}; */
     border: 1px solid #fcfcfc;
     cursor: pointer;
 
