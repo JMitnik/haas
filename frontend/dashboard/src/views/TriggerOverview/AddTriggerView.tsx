@@ -14,7 +14,7 @@ import {
   H4, Hr, Muted, StyledInput, StyledLabel,
 } from '@haas/ui';
 import createTriggerMutation from 'mutations/createTrigger';
-import getDialoguesQuery from 'queries/getQuestionnairesCustomerQuery';
+import getDialoguesQuery from 'queries/getDialoguesOfCustomer';
 import getQuestionsQuery from 'queries/getQuestionnaireQuery';
 import getRecipientsQuery from 'queries/getUsers';
 

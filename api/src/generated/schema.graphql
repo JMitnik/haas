@@ -2,6 +2,16 @@
 ### Do not make changes to this file directly
 
 
+input AddDialogueInput {
+  customerSlug: String
+  description: String
+  dialogueSlug: String
+  isSeed: Boolean
+  publicTitle: String
+  tags: TagsInputObjectType
+  title: String
+}
+
 type ColourSettings {
   id: ID!
   primary: String!
@@ -53,7 +63,6 @@ type Dialogue {
   rootQuestion: QuestionNode!
   sessions: [Session!]!
   slug: String!
-  statistics: DialogueStatistics!
   tags: [TagType!]
   title: String!
   updatedAt: String
@@ -67,8 +76,6 @@ type DialogueStatistics {
   averageScore: Float!
   countInteractions: Int!
   lineChartData: [lineChartDataType!]
-  topNegativePath: [topPathType!]
-  topPositivePath: [topPathType!]
 }
 
 input DialogueWhereUniqueInput {
@@ -163,7 +170,7 @@ type lineChartDataType {
 type Mutation {
   assignTags(dialogueId: String, tags: TagsInputObjectType): Dialogue!
   createCustomer(name: String, options: CustomerCreateOptions): Customer!
-  createDialogue(customerId: String, description: String, isSeed: Boolean, publicTitle: String, tags: TagsInputObjectType, title: String): Dialogue!
+  createDialogue(data: AddDialogueInput): Dialogue!
   createPermission(data: PermissionInput): PermssionType!
   createRole(data: RoleInput): RoleType!
   createTag(customerId: String, name: String, type: TagTypeEnum): TagType!

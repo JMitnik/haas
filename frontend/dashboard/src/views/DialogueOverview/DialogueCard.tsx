@@ -9,7 +9,7 @@ import { Card, CardBody, ColumnFlex, Div, ExtLink, Flex, H3, Paragraph } from '@
 import { Menu, MenuHeader, MenuItem } from 'components/Menu/Menu';
 import { deleteQuestionnaireMutation } from 'mutations/deleteQuestionnaire';
 import ShowMoreButton from 'components/ShowMoreButton';
-import getQuestionnairesCustomerQuery from 'queries/getQuestionnairesCustomerQuery';
+import getDialoguesOfCustomer from 'queries/getDialoguesOfCustomer';
 
 interface DialogueCardOptionsOverlayProps {
   onDelete: () => void;
@@ -36,9 +36,9 @@ const DialogueCard = ({ dialogue }: { dialogue: any }) => {
 
   const [deleteTopic] = useMutation(deleteQuestionnaireMutation, {
     refetchQueries: [{
-      query: getQuestionnairesCustomerQuery,
+      query: getDialoguesOfCustomer,
       variables: {
-        id: customerSlug,
+        customerSlug,
       },
     }],
     onError: (serverError: ApolloError) => {

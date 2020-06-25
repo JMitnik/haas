@@ -1,6 +1,6 @@
 import gql from 'graphql-tag';
 
-const getQuestionnairesCustomerQuery = gql`
+const getDialoguesOfCustomer = gql`
   query getQuestionnairesOfCustomer($customerSlug: String!, $filter: DialogueFilterInputType) {
     customer(slug: $customerSlug) {
       dialogues(filter: $filter) {
@@ -25,4 +25,4 @@ const getQuestionnairesCustomerQuery = gql`
   }
 `;
 
-export default getQuestionnairesCustomerQuery;
+export default getDialoguesOfCustomer;

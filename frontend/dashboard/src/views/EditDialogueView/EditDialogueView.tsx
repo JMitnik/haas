@@ -1,4 +1,4 @@
-import { ApolloError } from 'apollo-boost';
+import { ApolloError, gql } from 'apollo-boost';
 import { MinusCircle, PlusCircle } from 'react-feather';
 import { useForm } from 'react-hook-form';
 import { useHistory, useParams } from 'react-router';
@@ -11,8 +11,7 @@ import { Button, Container, Div, Flex,
 import React, { useState } from 'react';
 import Select from 'react-select';
 import editDialogueMutation from 'mutations/editDialogue';
-import getEditDialogueQuery from 'queries/getEditDialogue';
-import getQuestionnairesCustomerQuery from 'queries/getQuestionnairesCustomerQuery';
+import getQuestionnairesCustomerQuery from 'queries/getDialoguesOfCustomer';
 import getTagsQuery from 'queries/getTags';
 
 interface FormDataProps {
@@ -27,28 +26,50 @@ interface EditDialogueFormProps {
   tagOptions: Array<{label: string, value: string}>;
 }
 
+const getEditDialogueQuery = gql`
+  query getEditDialogue($customerSlug: String!, $dialogueSlug: String!) {
+    customer(slug: $customerSlug) {
+      id
+      dialogue(where: { slug: $dialogueSlug }) {
+        id
+        title
+        slug
+        publicTitle
+        description
+        
+        tags {
+          id
+          name
+          type
+        }
+      }
+    }
+  }
+`;
+
 const EditDialogueView = () => {
-  const { customerId, dialogueId } = useParams();
+  const { customerSlug, dialogueSlug } = useParams();
   const editDialogueData = useQuery(getEditDialogueQuery, {
     variables: {
-      id: dialogueId,
+      customerSlug,
+      dialogueSlug,
     },
   });
 
-  const { data: tagsData, loading: tagsLoading } = useQuery(getTagsQuery, { variables: { customerId } });
+  const { data: tagsData, loading: tagsLoading } = useQuery(getTagsQuery, { variables: { customerSlug } });
 
   if (editDialogueData.loading || tagsLoading) return null;
 
   const tagOptions: Array<{label: string, value: string}> = tagsData?.tags && tagsData?.tags?.map((tag: any) => (
     { label: tag?.name, value: tag?.id }));
 
-  const currentTags = editDialogueData.data?.dialogue?.tags
-  && editDialogueData.data?.dialogue?.tags?.map((tag: any) => (
+  const currentTags = editDialogueData.data?.customer?.dialogue?.tags
+  && editDialogueData.data?.customer?.dialogue?.tags?.map((tag: any) => (
     { label: tag?.name, value: tag?.id }));
 
   return (
     <EditDialogueForm
-      dialogue={editDialogueData.data?.dialogue}
+      dialogue={editDialogueData.data?.customer?.dialogue}
       currentTags={currentTags}
       tagOptions={tagOptions}
     />

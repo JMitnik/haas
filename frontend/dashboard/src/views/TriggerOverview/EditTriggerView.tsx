@@ -15,7 +15,7 @@ import {
 } from '@haas/ui';
 
 import editTriggerMutation from 'mutations/editTrigger';
-import getDialoguesQuery from 'queries/getQuestionnairesCustomerQuery';
+import getDialoguesQuery from 'queries/getDialoguesOfCustomer';
 import getQuestionsQuery from 'queries/getQuestionnaireQuery';
 import getRecipientsQuery from 'queries/getUsers';
 import getTriggerQuery from 'queries/getTrigger';

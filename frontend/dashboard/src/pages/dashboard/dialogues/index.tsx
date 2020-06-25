@@ -3,13 +3,13 @@ import { useQuery } from '@apollo/react-hooks';
 import React from 'react';
 
 import DialogueOverview from 'views/DialogueOverview';
-import getQuestionnairesCustomerQuery from 'queries/getQuestionnairesCustomerQuery';
+import getDialoguesOfCustomer from 'queries/getDialoguesOfCustomer';
 
 const DialoguesPage = () => {
   const { customerSlug } = useParams();
 
   // TODO: Handle the loading
-  const { loading, error, data } = useQuery<any>(getQuestionnairesCustomerQuery, {
+  const { loading, error, data } = useQuery<any>(getDialoguesOfCustomer, {
     variables: { customerSlug },
   });
 

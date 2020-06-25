@@ -36,6 +36,8 @@ export const DialogueStatistics = objectType({
         if (!parent.id) {
           return null;
         }
+
+        return DialogueService.calculateAverageScore(parent.id);
       },
     });
     t.int('countInteractions');
@@ -45,15 +47,15 @@ export const DialogueStatistics = objectType({
       type: lineChartDataType,
     });
 
-    t.list.field('topPositivePath', {
-      type: topPathType,
-      nullable: true,
-    });
+    // t.list.field('topPositivePath', {
+    //   type: topPathType,
+    //   nullable: true,
+    // });
 
-    t.list.field('topNegativePath', {
-      type: topPathType,
-      nullable: true,
-    });
+    // t.list.field('topNegativePath', {
+    //   type: topPathType,
+    //   nullable: true,
+    // });
   },
 });
 
@@ -88,16 +90,6 @@ export const DialogueType = objectType({
       },
     });
 
-    t.field('statistics', {
-      type: DialogueStatistics,
-      async resolve(parent: any, args: any) {
-        const aggregatedData = await DialogueService.getQuestionnaireAggregatedData(parent, args);
-        const data = await DialogueService.getLineData(args.dialogueId, args.filter);
-        const result = { ...aggregatedData, ...data };
-        return result;
-      },
-    });
-
     t.list.field('tags', {
       type: TagType,
       nullable: true,
@@ -120,6 +112,7 @@ export const DialogueType = objectType({
             id: parent.customerId,
           },
         });
+
         return customer;
       },
     });
@@ -243,19 +236,27 @@ export const getQuestionnaireDataQuery = extendType({
   },
 });
 
-export const deleteDialogueOfCustomerMutation = extendType({
+export const AddDialogueInput = inputObjectType({
+  name: 'AddDialogueInput',
+  definition(t) {
+    t.string('customerSlug');
+    t.string('title');
+    t.string('dialogueSlug');
+    t.string('description');
+    t.string('publicTitle');
+    t.boolean('isSeed');
+    t.field('tags', {
+      type: TagsInputType,
+    });
+  },
+});
+
+export const DialogueMutations = extendType({
   type: 'Mutation',
   definition(t) {
     t.field('createDialogue', {
       type: DialogueType,
-      args: {
-        customerId: 'String',
-        title: 'String',
-        description: 'String',
-        publicTitle: 'String',
-        isSeed: 'Boolean',
-        tags: TagsInputType,
-      },
+      args: { data: AddDialogueInput },
       resolve(parent: any, args: any) {
         return DialogueService.createDialogue(args);
       },
@@ -380,7 +381,7 @@ export default [
   topPathType,
   lineChartDataType,
   DialogueWhereUniqueInput,
-  deleteDialogueOfCustomerMutation,
+  DialogueMutations,
   DialogueType,
   DialoguesOfCustomerQuery,
   DialogueStatistics,

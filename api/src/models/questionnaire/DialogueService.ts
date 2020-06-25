@@ -3,6 +3,7 @@ import { Dialogue, DialogueCreateInput,
 import { isAfter, subDays } from 'date-fns';
 import _ from 'lodash';
 
+import { DialogueFilterInputType } from './Dialogue';
 import { leafNodes, sliderType } from '../../data/seeds/default-data';
 import NodeResolver from '../question/node-resolver';
 
@@ -51,28 +52,44 @@ interface QuestionProps {
   children: Array<EdgeChildProps>;
 }
 
+interface DialogueInputProps {
+  data: {
+    customerSlug: string;
+    dialogueSlug: string;
+    title: string;
+    description: string;
+    publicTitle: string;
+    isSeed: boolean;
+    tags: any;
+  }
+}
+
 class DialogueService {
   static constructDialogue(
     customerId: string,
     title: string,
-    slug: string,
+    dialogueSlug: string,
     description: string,
     publicTitle: string = '',
     tags: Array<{id: string}> = [],
   ): DialogueCreateInput {
-    return {
+    const constructDialogueFragment = {
       customer: {
         connect: { id: customerId },
       },
       title,
-      slug,
+      slug: dialogueSlug,
       description,
       publicTitle,
       questions: { create: [] },
-      tags: {
-        connect: tags.map((tag) => ({ id: tag.id })),
-      },
+      tags: {},
     };
+
+    if (tags.length) {
+      constructDialogueFragment.tags = { connect: tags.map((tag) => ({ id: tag.id })) };
+    }
+
+    return constructDialogueFragment;
   }
 
   static filterDialoguesBySearchTerm = (dialogues: Array<Dialogue & {
@@ -452,34 +469,62 @@ class DialogueService {
   static initDialogue = async (
     customerId: string,
     title: string,
-    slug: string,
+    dialogueSlug: string,
     description: string,
     publicTitle: string = '',
     tags: Array<{id: string}> = [],
-  ) => prisma.dialogue.create({
-    data: DialogueService.constructDialogue(
-      customerId, slug, title, description, publicTitle, tags,
-    ),
-  });
+  ) => {
+    console.log('dialogueSlug', dialogueSlug);
+    console.log('title', title);
+    console.log('customerId', customerId);
 
-  static createDialogue = async (args: any): Promise<Dialogue> => {
-    const { customerId, slug, title, description, publicTitle, isSeed, tags } = args;
+    const dialogue = prisma.dialogue.create({
+      data: DialogueService.constructDialogue(
+        customerId, title, dialogueSlug, description, publicTitle, tags,
+      ),
+    });
+
+    return dialogue;
+  };
+
+  static createDialogue = async (dialogueInputData: DialogueInputProps): Promise<Dialogue | null> => {
+    console.log('dialogueInputData', dialogueInputData);
+    const { data: { dialogueSlug, customerSlug, title, publicTitle, description, tags = [], isSeed } } = dialogueInputData;
 
     let questionnaire = null;
     const dialogueTags = tags?.entries?.length > 0
       ? tags?.entries?.map((tag: string) => ({ id: tag }))
       : [];
 
-    const customer = await prisma.customer.findOne({ where: { id: customerId } });
+    const customers = await prisma.customer.findMany({ where: { slug: customerSlug } });
+    const customer = customers?.[0];
+
+    if (!customer) {
+      return null;
+    }
 
     if (isSeed) {
       if (customer?.name) {
-        return DialogueService.seedQuestionnare(customerId, slug, customer?.name, title, description, dialogueTags);
+        return DialogueService.seedQuestionnare(
+          customer?.id,
+          dialogueSlug,
+          customer?.name,
+          title,
+          description,
+          dialogueTags,
+        );
       }
     }
 
+    console.log('About to do initDialogue');
+
     questionnaire = await DialogueService.initDialogue(
-      customerId, title, description, publicTitle, dialogueTags,
+      customer?.id,
+      title,
+      dialogueSlug,
+      description,
+      publicTitle,
+      dialogueTags,
     );
 
     await prisma.dialogue.update({

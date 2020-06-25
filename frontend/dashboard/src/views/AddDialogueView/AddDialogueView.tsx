@@ -11,12 +11,13 @@ import styled, { css } from 'styled-components/macro';
 
 import getTagsQuery from 'queries/getTags';
 
-import { createNewQuestionnaire } from 'mutations/createNewQuestionnaire';
-import getQuestionnairesCustomerQuery from 'queries/getQuestionnairesCustomerQuery';
+import { createDialogue } from 'mutations/createDialogue';
+import getDialoguesOfCustomer from 'queries/getDialoguesOfCustomer';
 
 interface FormDataProps {
   title: string;
   description: string;
+  slug: string;
   publicTitle?: string;
   isSeed?: boolean;
 }
@@ -24,17 +25,20 @@ interface FormDataProps {
 const AddDialogueView = () => {
   const history = useHistory();
   const { register, handleSubmit, errors } = useForm<FormDataProps>();
-  const { customerId } = useParams();
+  const { customerSlug } = useParams();
   const [activeTags, setActiveTags] = useState<Array<null | {label: string, value: string}>>([]);
-  const { data, loading: tagsLoading } = useQuery(getTagsQuery, { variables: { customerId } });
-  const [addTopic, { loading }] = useMutation(createNewQuestionnaire, {
+  const { data, loading: tagsLoading } = useQuery(getTagsQuery, { variables: { customerSlug } });
+
+  const [addDialogue, { loading }] = useMutation(createDialogue, {
     onCompleted: () => {
-      history.push(`/dashboard/c/${customerId}/`);
+      history.push(`/dashboard/b/${customerSlug}/`);
     },
-    refetchQueries: [{ query: getQuestionnairesCustomerQuery,
-      variables: {
-        id: customerId,
-      } }],
+    refetchQueries: [
+      {
+        query: getDialoguesOfCustomer,
+        variables: { customerSlug },
+      },
+    ],
     onError: (serverError: ApolloError) => {
       console.log(serverError);
     },
@@ -58,9 +62,11 @@ const AddDialogueView = () => {
     // TODO: Make better typescript supported
     const tagIds = activeTags.map((tag) => tag?.value);
     const tagEntries = { entries: tagIds };
-    addTopic({
+
+    addDialogue({
       variables: {
-        customerId,
+        customerSlug,
+        dialogueSlug: formData.slug,
         title: formData.title,
         publicTitle: formData.publicTitle,
         description: formData.description,
@@ -78,8 +84,8 @@ const AddDialogueView = () => {
   return (
     <Container>
       <Div>
-        <H2 color="default.darkest" fontWeight={500} py={2}> Topic Builder </H2>
-        <Muted pb={4}>Create a new topic</Muted>
+        <H2 color="default.darkest" fontWeight={500} py={2}>Add dialogue</H2>
+        <Muted pb={4}>Create a new dialogue</Muted>
       </Div>
 
       <Hr />
@@ -88,9 +94,9 @@ const AddDialogueView = () => {
         <FormGroupContainer>
           <Grid gridTemplateColumns={['1fr', '1fr 2fr']} gridColumnGap={4}>
             <Div py={4} pr={4}>
-              <H3 color="default.text" fontWeight={500} pb={2}>General topic information</H3>
+              <H3 color="default.text" fontWeight={500} pb={2}>General dialogue information</H3>
               <Muted>
-                General information about your project, such as title, descriptions, etc.
+                General information about your dialogue, such as title, descriptions, etc.
               </Muted>
             </Div>
             <Div py={4}>
@@ -105,6 +111,11 @@ const AddDialogueView = () => {
                   <StyledInput name="publicTitle" ref={register({ required: true })} />
                   {errors.publicTitle && <Muted color="warning">Something went wrong!</Muted>}
                 </Div>
+                <Div useFlex flexDirection="column">
+                  <StyledLabel>Url Slug</StyledLabel>
+                  <StyledInput name="slug" ref={register({ required: true })} />
+                  {errors.slug && <Muted color="warning">Something went wrong!</Muted>}
+                </Div>
               </Grid>
               <Div py={4}>
                 <Flex flexDirection="column">
@@ -115,7 +126,7 @@ const AddDialogueView = () => {
               </Div>
               <Div py={4}>
                 <label htmlFor="isSeed">
-                  Generate template topic
+                  Generate template dialogue
                 </label>
 
                 <StyledInput
@@ -159,8 +170,8 @@ const AddDialogueView = () => {
           {(loading || tagsLoading) && (<Muted>Loading...</Muted>)}
 
           <Flex>
-            <Button brand="primary" mr={2} type="submit">Create topic</Button>
-            <Button brand="default" type="button" onClick={() => history.push(`/dashboard/c/${customerId}/`)}>Cancel</Button>
+            <Button brand="primary" mr={2} type="submit">Create dialogue</Button>
+            <Button brand="default" type="button" onClick={() => history.push(`/dashboard/b/${customerSlug}/`)}>Cancel</Button>
           </Flex>
         </Div>
       </Form>
