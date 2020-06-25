@@ -3,7 +3,6 @@ import { useLocation, useParams } from 'react-router-dom';
 import { useQuery } from '@apollo/react-hooks';
 import React, { useState } from 'react';
 
-import DialogueLayout from 'layouts/DialogueLayout';
 import Modal from 'components/Modal';
 
 import DatePicker from 'components/DatePicker';
