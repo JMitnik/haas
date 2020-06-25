@@ -53,7 +53,6 @@ const DialogueView = () => {
 
   return (
     <>
-
       <PositivePathsModule positivePaths={resultData?.topPositivePath} />
       <NegativePathsModule negativePaths={resultData?.topNegativePath} />
       <Div gridColumn="span 2">

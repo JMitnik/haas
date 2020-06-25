@@ -78,6 +78,7 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFo
   const onSubmit = (formData: FormDataProps) => {
     const tagIds = activeTags.map((tag) => tag?.value);
     const tagEntries = { entries: tagIds };
+
     editDialogue({
       variables: {
         dialogueId,
@@ -104,7 +105,7 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFo
   };
 
   return (
-    <Container>
+    <>
       <Div>
         <H2 color="default.darkest" fontWeight={500} py={2}> Dialogue </H2>
         <Muted pb={4}>Edit a dialogue</Muted>
@@ -114,7 +115,7 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFo
 
       <Form onSubmit={handleSubmit(onSubmit)}>
         <FormGroupContainer>
-          <Grid gridTemplateColumns={['1fr', '1fr 2fr']} gridColumnGap={4}>
+          <Grid gridTemplateColumns={['1fr', '3fr 4fr']} gridColumnGap={4}>
             <Div py={4} pr={4}>
               <H3 color="default.text" fontWeight={500} pb={2}>General dialogue information</H3>
               <Muted>
@@ -156,6 +157,7 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFo
                 </Flex>
                 <Hr />
                 <Div marginTop={15}>
+
                   {activeTags?.map((tag, index) => (
                     <Flex marginBottom="4px" alignItems="center" key={index} gridColumn="1 / -1">
                       <Div flexGrow={9}>
@@ -173,6 +175,7 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFo
                       </Flex>
                     </Flex>
                   ))}
+
                 </Div>
               </Div>
             </Div>
@@ -188,7 +191,7 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFo
           </Flex>
         </Div>
       </Form>
-    </Container>
+    </>
   );
 };
 

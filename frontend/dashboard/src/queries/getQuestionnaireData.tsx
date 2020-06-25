@@ -10,18 +10,22 @@ const getQuestionnaireDataQuery = gql`
       updatedAt
       average
       totalNodeEntries
+
       lineChartData {
         x
         y
       }
+
       topPositivePath {
         answer
         quantity
       }
+
       topNegativePath {
         answer
         quantity
       }
+
       timelineEntries {
         sessionId
         value
@@ -29,7 +33,6 @@ const getQuestionnaireDataQuery = gql`
       }
     }
   }
-
 `;
 
 export default getQuestionnaireDataQuery;

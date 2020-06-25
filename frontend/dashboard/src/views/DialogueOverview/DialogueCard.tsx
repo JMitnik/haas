@@ -59,7 +59,7 @@ const DialogueCard = ({ dialogue }: { dialogue: any }) => {
     history.push(`/dashboard/b/${customerSlug}/d/${dialogue.slug}/edit`);
   };
 
-  const lastUpdated = new Date(Number.parseInt(dialogue.updatedAt, 10)) || null;
+  const lastUpdated = dialogue.updatedAt ? new Date(Number.parseInt(dialogue.updatedAt, 10)) : null;
 
   return (
     <Card bg="white" useFlex flexDirection="column" onClick={() => history.push(`/dashboard/b/${customerSlug}/d/${dialogue.slug}`)}>

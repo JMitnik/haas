@@ -1,4 +1,4 @@
-import { LinkProps, NavLink } from 'react-router-dom';
+import { NavLinkProps, NavLink } from 'react-router-dom';
 import styled, { css } from 'styled-components/macro';
 
 const Tabbar = styled.div`
@@ -10,7 +10,7 @@ const Tabbar = styled.div`
   `}
 `;
 
-export const Tab = styled(NavLink)<LinkProps>`
+export const Tab = styled(NavLink)<NavLinkProps>`
   ${({ theme }) => css`
     padding: 8px 12px;
     text-decoration: none;

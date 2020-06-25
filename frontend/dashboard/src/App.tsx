@@ -29,6 +29,7 @@ import DashboardLayout from 'layouts/DashboardLayout';
 import DialogueLayout from 'layouts/DialogueLayout';
 import client from './config/apollo';
 import themeConfig from './config/theme';
+import CustomerPage from 'pages/dashboard/customer';
 
 const AppRoutes = () => (
   <Switch>
@@ -43,19 +44,6 @@ const AppRoutes = () => (
       render={() => (
         <DashboardLayout>
           <Switch>
-            <Route
-              path="/dashboard/b/:customerSlug/triggers/add"
-              render={() => (
-                <AddTriggerView />
-              )}
-            />
-
-            <Route
-              path="/dashboard/b/:customerSlug/triggers/:triggerId/edit"
-              render={() => (
-                <EditTriggerView />
-              )}
-            />
 
             <Route
               path="/dashboard/b/:customerSlug/analytics/"
@@ -65,7 +53,21 @@ const AppRoutes = () => (
             />
 
             <Route
-              path="/dashboard/b/:customerSlug/triggers"
+              path="/dashboard/b/:customerSlug/notifications/add"
+              render={() => (
+                <AddTriggerView />
+              )}
+            />
+
+            <Route
+              path="/dashboard/b/:customerSlug/notifications/:triggerId/edit"
+              render={() => (
+                <EditTriggerView />
+              )}
+            />
+
+            <Route
+              path="/dashboard/b/:customerSlug/notifications"
               render={() => <TriggersOverview />}
             />
 
@@ -119,14 +121,19 @@ const AppRoutes = () => (
                       path="/dashboard/b/:customerSlug/d/:dialogueSlug"
                       render={() => <DialoguePage />}
                     />
+
                   </Switch>
                 </DialogueLayout>
               )}
             />
 
             <Route
-              path="/dashboard/b/:customerSlug/"
+              path="/dashboard/b/:customerSlug/d"
               render={() => <DialoguesPage />}
+            />
+            <Route
+              path="/dashboard/b/:customerSlug/"
+              render={() => <CustomerPage />}
             />
           </Switch>
         </DashboardLayout>

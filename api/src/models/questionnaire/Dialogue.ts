@@ -162,17 +162,21 @@ export const DialogueDetailResultType = objectType({
     t.string('updatedAt');
     t.string('average');
     t.int('totalNodeEntries');
+
     t.list.field('timelineEntries', {
       type: UniqueDataResultEntry,
     });
+
     t.list.field('lineChartData', {
       nullable: true,
       type: lineChartDataType,
     });
+
     t.list.field('topPositivePath', {
       type: topPathType,
       nullable: true,
     });
+
     t.list.field('topNegativePath', {
       type: topPathType,
       nullable: true,
