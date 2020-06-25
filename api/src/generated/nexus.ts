@@ -188,8 +188,9 @@ export interface NexusGenRootTypes {
   CustomerSettings: prisma.CustomerSettings;
   Dialogue: prisma.Dialogue;
   DialogueStatistics: { // root type
-    countInteractions: number; // Int!
     lineChartData?: NexusGenRootTypes['lineChartDataType'][] | null; // [lineChartDataType!]
+    topNegativePath?: NexusGenRootTypes['topPathType'][] | null; // [topPathType!]
+    topPositivePath?: NexusGenRootTypes['topPathType'][] | null; // [topPathType!]
   }
   Edge: prisma.Edge;
   EdgeCondition: { // root type
@@ -369,14 +370,15 @@ export interface NexusGenFieldTypes {
     rootQuestion: NexusGenRootTypes['QuestionNode']; // QuestionNode!
     sessions: NexusGenRootTypes['Session'][]; // [Session!]!
     slug: string; // String!
+    statistics: NexusGenRootTypes['DialogueStatistics']; // DialogueStatistics!
     tags: NexusGenRootTypes['TagType'][] | null; // [TagType!]
     title: string; // String!
     updatedAt: string | null; // String
   }
   DialogueStatistics: { // field return type
-    averageScore: number; // Float!
-    countInteractions: number; // Int!
     lineChartData: NexusGenRootTypes['lineChartDataType'][] | null; // [lineChartDataType!]
+    topNegativePath: NexusGenRootTypes['topPathType'][] | null; // [topPathType!]
+    topPositivePath: NexusGenRootTypes['topPathType'][] | null; // [topPathType!]
   }
   Edge: { // field return type
     childNode: NexusGenRootTypes['QuestionNode']; // QuestionNode!

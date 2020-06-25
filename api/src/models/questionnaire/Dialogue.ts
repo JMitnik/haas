@@ -31,31 +31,20 @@ export const topPathType = objectType({
 export const DialogueStatistics = objectType({
   name: 'DialogueStatistics',
   definition(t) {
-    t.float('averageScore', {
-      resolve(parent: any) {
-        if (!parent.id) {
-          return null;
-        }
-
-        return DialogueService.calculateAverageScore(parent.id);
-      },
+    t.list.field('topPositivePath', {
+      type: topPathType,
+      nullable: true,
     });
-    t.int('countInteractions');
+
+    t.list.field('topNegativePath', {
+      type: topPathType,
+      nullable: true,
+    });
 
     t.list.field('lineChartData', {
       nullable: true,
       type: lineChartDataType,
     });
-
-    // t.list.field('topPositivePath', {
-    //   type: topPathType,
-    //   nullable: true,
-    // });
-
-    // t.list.field('topNegativePath', {
-    //   type: topPathType,
-    //   nullable: true,
-    // });
   },
 });
 
@@ -87,6 +76,16 @@ export const DialogueType = objectType({
         }
 
         return DialogueService.countInteractions(parent.id);
+      },
+    });
+    t.field('statistics', {
+      type: DialogueStatistics,
+      resolve(parent: Dialogue, args: any, ctx: any) {
+        if (!parent.id) {
+          return null;
+        }
+
+        return DialogueService.getLineData(parent.id, 7);
       },
     });
 

@@ -63,6 +63,7 @@ type Dialogue {
   rootQuestion: QuestionNode!
   sessions: [Session!]!
   slug: String!
+  statistics: DialogueStatistics!
   tags: [TagType!]
   title: String!
   updatedAt: String
@@ -73,9 +74,9 @@ input DialogueFilterInputType {
 }
 
 type DialogueStatistics {
-  averageScore: Float!
-  countInteractions: Int!
   lineChartData: [lineChartDataType!]
+  topNegativePath: [topPathType!]
+  topPositivePath: [topPathType!]
 }
 
 input DialogueWhereUniqueInput {

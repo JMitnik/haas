@@ -1,4 +1,4 @@
-import { Div, Grid, H4, Loader, Flex } from '@haas/ui';
+import { Div, Flex, Grid, H4, Loader, Span } from '@haas/ui';
 import { useLocation, useParams } from 'react-router-dom';
 import { useQuery } from '@apollo/react-hooks';
 import React, { useState } from 'react';
@@ -6,16 +6,19 @@ import styled, { css } from 'styled-components/macro';
 
 import Modal from 'components/Modal';
 
+import { ReactComponent as PathsIcon } from 'assets/icons/icon-launch.svg';
+import { ReactComponent as TrendingIcon } from 'assets/icons/icon-trending-up.svg';
+
 import DatePicker from 'components/DatePicker';
 import gql from 'graphql-tag';
 import NegativePathsModule from './Modules/NegativePathsModule/index.tsx';
 import NodeEntriesOverview from '../NodeEntriesOverview/NodeEntriesOverview';
 import PositivePathsModule from './Modules/PositivePathsModule/PositivePathsModule';
 import SummaryAverageScoreModule from './Modules/SummaryModules/SummaryAverageScoreModule';
-import SummaryInteractionCountModule from './Modules/SummaryModules/SummaryInteractionCountModule';
-import getQuestionnaireData from '../../queries/getQuestionnaireData';
-import SummaryModuleContainer from './Modules/SummaryModules/SummaryModuleContainer';
 import SummaryCallToActionModule from './Modules/SummaryModules/SummaryCallToActionModule';
+import SummaryInteractionCountModule from './Modules/SummaryModules/SummaryInteractionCountModule';
+import SummaryModuleContainer from './Modules/SummaryModules/SummaryModuleContainer';
+import getQuestionnaireData from '../../queries/getQuestionnaireData';
 
 const filterMap = new Map([
   ['Last 24h', 1],
@@ -36,7 +39,22 @@ const getDialogueStatistics = gql`
       id
       dialogue(where: { slug: $dialogueSlug }) {
         countInteractions
-        averageScore      
+        averageScore
+        statistics {
+          topPositivePath {
+            answer
+            quantity
+          }
+          topNegativePath {
+            quantity
+            answer
+          }
+          
+          lineChartData {
+            x
+            y
+          }
+        } 
       }
     }
   }
@@ -63,8 +81,6 @@ const DialogueView = () => {
 
   if (!dialogue) return <Loader />;
 
-  console.log(data);
-
   // const lineQueryData = resultData?.lineChartData;
   // let timelineEntries: Array<any> = resultData?.timelineEntries;
   // timelineEntries = timelineEntries?.length > 8 ? timelineEntries.slice(0, 8) : timelineEntries;
@@ -79,9 +95,18 @@ const DialogueView = () => {
 
   return (
     <DialogueViewContainer>
-      <Grid gridTemplateColumns="1fr 1fr 1fr" gridTemplateRows="1fr 1fr">
+      <Grid gridTemplateColumns="1fr 1fr 1fr">
         <Div gridColumn="1 / 4">
-          <H4 color="default.darker" mb={4}>This week in summary</H4>
+          <H4 color="default.darker" mb={4}>
+            <Flex>
+              <Div width="20px">
+                <TrendingIcon fill="currentColor" />
+              </Div>
+              <Span ml={2}>
+                This week in summary
+              </Span>
+            </Flex>
+          </H4>
           <SummaryModuleContainer>
             <SummaryInteractionCountModule interactionCount={dialogue.countInteractions} />
             <SummaryAverageScoreModule averageScore={dialogue.averageScore} />
@@ -89,17 +114,30 @@ const DialogueView = () => {
           </SummaryModuleContainer>
         </Div>
 
-        <Div >
-
+        <Div mt={2} gridColumn="1 / 4">
+          <H4 color="default.darker" mb={4}>
+            <Flex>
+              <Div width="20px">
+                <PathsIcon fill="currentColor" />
+              </Div>
+              <Span ml={2}>
+                Notable paths of the week
+              </Span>
+            </Flex>
+          </H4>
+          <Grid gridTemplateColumns="1fr 1fr">
+            <PositivePathsModule positivePaths={dialogue.statistics?.topPositivePath} />
+            <NegativePathsModule negativePaths={dialogue.statistics?.topNegativePath} />
+          </Grid>
         </Div>
-        {/* <PositivePathsModule positivePaths={resultData?.topPositivePath} />
-        <NegativePathsModule negativePaths={resultData?.topNegativePath} />
-        <Div gridColumn="span 2">
+
+        {/* <Div gridColumn="span 2">
           {lineData && (
           <p>ss</p>
           // <ScoreGraphModule data={lineData} />
           )}
         </Div> */}
+        {' '}
         {/*
       <Div>
         <InteractionFeedModule
