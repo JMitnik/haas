@@ -7,6 +7,6 @@ export { Span } from './Span';
 export { Icon } from './Icon';
 export { Loader } from './Loader';
 export { Label } from './Labels';
-export { TopNav } from './Nav';
+export { ExtLink } from './Nav';
 export { H1, H2, H3, H4, H5, Muted, Paragraph, PageHeading } from './Type';
 export { Hr } from './Special';

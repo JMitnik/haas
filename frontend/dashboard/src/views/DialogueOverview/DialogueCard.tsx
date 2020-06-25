@@ -5,7 +5,7 @@ import { useHistory, useParams } from 'react-router';
 import { useMutation } from '@apollo/react-hooks';
 import React from 'react';
 
-import { Card, CardBody, ColumnFlex, Div, Flex, H3, Paragraph } from '@haas/ui';
+import { Card, CardBody, ColumnFlex, Div, ExtLink, Flex, H3, Paragraph } from '@haas/ui';
 import { Menu, MenuHeader, MenuItem } from 'components/Menu/Menu';
 import { deleteQuestionnaireMutation } from 'mutations/deleteQuestionnaire';
 import ShowMoreButton from 'components/ShowMoreButton';
@@ -54,6 +54,7 @@ const DialogueCard = ({ dialogue }: { dialogue: any }) => {
     });
   };
 
+  // TODO: Move this url to a constant or so
   const goToEditDialogue = (topicId: string) => {
     history.push(`/dashboard/c/${customerId}/t/${topicId}/edit`);
   };
@@ -69,7 +70,9 @@ const DialogueCard = ({ dialogue }: { dialogue: any }) => {
               {dialogue.title}
             </H3>
             <Paragraph fontSize="0.8rem" color="app.mutedOnWhite" fontWeight="100">
-              haas.live/starbucks/default
+              <ExtLink to={`https://haas-client.netlify.app/${dialogue.customer.slug}/${dialogue.slug}`}>
+                {`haas.live/${dialogue.customer.slug}/${dialogue.slug}`}
+              </ExtLink>
             </Paragraph>
           </Div>
 
@@ -91,7 +94,7 @@ const DialogueCard = ({ dialogue }: { dialogue: any }) => {
                   onDelete={() => deleteDialogue(dialogue.id)}
                   onEdit={() => goToEditDialogue(dialogue.id)}
                 />
-                )}
+              )}
             />
           </Flex>
         </ColumnFlex>

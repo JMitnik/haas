@@ -2,9 +2,10 @@ import styled, { css } from 'styled-components/macro';
 import React, { FC } from 'react';
 import { Link } from 'react-router-dom';
 import { Settings } from 'react-feather';
-import { Container } from './Container';
+
 import { GenericProps, Div } from './Generics';
 import { ProfilePic } from './User';
+import { Paragraph } from './Type';
 
 const TopNavContainer = styled(Div)<GenericProps>`
   ${({ theme }) => css`
@@ -27,6 +28,14 @@ const UserNav: FC = () => (
       <ProfilePic />
     </Div>
   </Div>
+);
+
+const StyledExtLink = styled.a`
+  text-decoration: none;
+`;
+
+export const ExtLink = ({ children, to }: { children: React.ReactNode, to: string }) => (
+  <StyledExtLink as="a" href={to}  target="_blank" rel="noopener noreferrer">{children}</StyledExtLink>
 );
 
 export const TopNav: FC = () => (
