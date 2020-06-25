@@ -183,7 +183,7 @@ export const InteractionSessionType = objectType({
   definition(t) {
     t.string('id');
     t.int('index');
-    t.float('score');
+    t.float('score', { nullable: true });
     t.int('paths');
     t.string('createdAt');
 

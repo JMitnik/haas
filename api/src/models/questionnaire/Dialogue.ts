@@ -9,8 +9,10 @@ import { QuestionNodeType, QuestionNodeWhereInput } from '../question/QuestionNo
 // eslint-disable-next-line import/no-cycle
 import { TagType, TagsInputType } from '../tag/Tag';
 
-import { SessionType, UniqueDataResultEntry } from '../session/Session';
+import { FilterInput, InteractionType, SessionType, UniqueDataResultEntry } from '../session/Session';
 import DialogueService from './DialogueService';
+import NodeEntryService from '../nodeentry/NodeEntryService';
+import SessionService from '../session/SessionService';
 
 export const lineChartDataType = objectType({
   name: 'lineChartDataType',
@@ -80,12 +82,44 @@ export const DialogueType = objectType({
     });
     t.field('statistics', {
       type: DialogueStatistics,
-      resolve(parent: Dialogue, args: any, ctx: any) {
+      resolve(parent: Dialogue) {
         if (!parent.id) {
           return null;
         }
 
         return DialogueService.getLineData(parent.id, 7);
+      },
+    });
+
+    t.field('interactions', {
+      type: InteractionType,
+      args: {
+        filter: FilterInput,
+      },
+      async resolve(parent: Dialogue, args: any, ctx: any) {
+        const { prisma }: { prisma: PrismaClient } = ctx;
+
+        if (!parent.id) {
+          return null;
+        }
+        const { pages, pageIndex, startDate, endDate, offset, limit, searchTerm } = args?.filter;
+        const dateRange = SessionService.constructDateRangeWhereInput(startDate, endDate);
+        const orderBy = args.filter.orderBy ? Object.assign({}, ...args.filter.orderBy) : null;
+
+        const { pageSessions, totalPages, resetPages } = await NodeEntryService.getCurrentInteractionSessions(parent.id, offset, limit, pageIndex, orderBy, dateRange, searchTerm);
+
+        const sessionsWithIndex = pageSessions.map((session: any, index: any) => ({ ...session, index }));
+
+        return {
+          sessions: sessionsWithIndex,
+          pages: !resetPages ? totalPages : 1,
+          offset,
+          limit,
+          pageIndex: !resetPages ? pageIndex : 0,
+          startDate,
+          endDate,
+          orderBy: args.filter.orderBy || [],
+        };
       },
     });
 

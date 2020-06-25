@@ -25,7 +25,7 @@ const DashboardLayoutContainer = styled.div`
     display: grid;
     grid-template-columns: ${theme.sidenav.width}px 1fr;
     background: ${theme.colors.app.background};
-    height: 100vh;
+    min-height: 100vh;
   `}
 `;
 

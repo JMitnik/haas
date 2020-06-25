@@ -49,15 +49,13 @@ const AddNewUser = styled(Div)`
 
 const TableHeader = ({ sortProperties, headers, onPaginationChange, onAddEntry, disableSorting }: TableHeaderProps) => {
   const nrHeaders = headers.length;
-  const percentage = 100 / nrHeaders;
-  const templateColumns = `${percentage.toString()}% `.repeat(nrHeaders);
+  const templateColumns = '1fr '.repeat(nrHeaders);
 
   return (
     <Grid
       position="relative"
       backgroundColor="#f1f5f8"
       color="black"
-      borderRadius="90px"
       gridColumnGap={5}
       gridTemplateColumns={templateColumns}
     >

@@ -128,7 +128,7 @@ const DialogueView = () => {
         </Div>
 
         <Div gridColumn="span 3">
-          <H4 color="default.darker" mb={4}>
+          <H4 color="default.darker">
             <Flex>
               <Div width="20px">
                 <TrophyIcon fill="currentColor" />

@@ -214,7 +214,7 @@ export interface NexusGenRootTypes {
     index: number; // Int!
     nodeEntries: NexusGenRootTypes['NodeEntry'][]; // [NodeEntry!]!
     paths: number; // Int!
-    score: number; // Float!
+    score?: number | null; // Float
   }
   InteractionType: { // root type
     endDate?: string | null; // String
@@ -364,6 +364,7 @@ export interface NexusGenFieldTypes {
     edges: NexusGenRootTypes['Edge'][]; // [Edge!]!
     id: string; // ID!
     interactionFeedItems: NexusGenRootTypes['Session'][] | null; // [Session!]
+    interactions: NexusGenRootTypes['InteractionType']; // InteractionType!
     leafs: NexusGenRootTypes['QuestionNode'][]; // [QuestionNode!]!
     publicTitle: string | null; // String
     questions: NexusGenRootTypes['QuestionNode'][]; // [QuestionNode!]!
@@ -414,7 +415,7 @@ export interface NexusGenFieldTypes {
     index: number; // Int!
     nodeEntries: NexusGenRootTypes['NodeEntry'][]; // [NodeEntry!]!
     paths: number; // Int!
-    score: number; // Float!
+    score: number | null; // Float
   }
   InteractionType: { // field return type
     endDate: string | null; // String
@@ -607,6 +608,9 @@ export interface NexusGenArgTypes {
     }
   }
   Dialogue: {
+    interactions: { // args
+      filter?: NexusGenInputs['FilterInput'] | null; // FilterInput
+    }
     questions: { // args
       where?: NexusGenInputs['QuestionNodeWhereInput'] | null; // QuestionNodeWhereInput
     }

@@ -57,6 +57,7 @@ type Dialogue {
   edges: [Edge!]!
   id: ID!
   interactionFeedItems: [Session!]
+  interactions(filter: FilterInput): InteractionType!
   leafs: [QuestionNode!]!
   publicTitle: String
   questions(where: QuestionNodeWhereInput): [QuestionNode!]!
@@ -144,7 +145,7 @@ type InteractionSessionType {
   index: Int!
   nodeEntries: [NodeEntry!]!
   paths: Int!
-  score: Float!
+  score: Float
 }
 
 type InteractionType {

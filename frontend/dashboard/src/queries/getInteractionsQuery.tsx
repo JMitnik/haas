@@ -1,39 +1,45 @@
 import gql from 'graphql-tag';
 
 const getInteractionsQuery = gql`
-  query getInteractions($dialogueId: ID!, $filter: FilterInput) {
-    interactions(where: { dialogueId: $dialogueId }, filter: $filter) {
-      sessions {
+  query getInteractions($dialogueSlug: String!, $customerSlug: String!, $filter: FilterInput) {
+    customer(slug: $customerSlug) {
+      id
+      dialogue(where: { slug: $dialogueSlug }) {
         id
-        createdAt
-        paths
-        score
-        index
-        nodeEntries {
-          id
-          depth
-          relatedNode {
-            title
-            type
-          }
-          values {
-            numberValue
-            textValue
-            multiValues {
-              textValue
-              numberValue
+        interactions(filter: $filter) {
+          sessions {
+            id
+            createdAt
+            paths
+            score
+            index
+            nodeEntries {
+              id
+              depth
+              relatedNode {
+                title
+                type
+              }
+              values {
+                numberValue
+                textValue
+                multiValues {
+                  textValue
+                  numberValue
+                }
+              }
             }
           }
+          orderBy {
+            id
+            desc
+          }
+          pages
+          pageIndex
+          startDate
+          endDate
         }
       }
-      orderBy {
-        id
-        desc
-      }
-      pages
-      pageIndex
-      startDate
-      endDate
     }
   }
 `;
