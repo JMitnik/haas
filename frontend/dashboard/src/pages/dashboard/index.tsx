@@ -1,4 +1,4 @@
-import { Route, Switch } from 'react-router';
+import { Redirect, Route, Switch } from 'react-router';
 import React from 'react';
 
 import AddTriggerView from 'views/TriggerOverview/AddTriggerView';
@@ -99,21 +99,15 @@ const DashboardRoutes = () => (
         render={() => <DialoguesPage />}
       />
 
-      <Route path="/dashboard" render={() => <CustomerOverview />} />
+      <Route path="/dashboard" render={() => <DialoguesPage />} />
 
     </Switch>
   </DashboardLayout>
 );
 
+// Here check if our account has access to more than one customer.
 const DashboardPage = () => (
-  <>
-    <Switch>
-      <Route
-        path="/dashboard"
-        render={() => <DashboardRoutes />}
-      />
-    </Switch>
-  </>
+  <Redirect to="/dashboard/b" />
 );
 
 export default DashboardPage;

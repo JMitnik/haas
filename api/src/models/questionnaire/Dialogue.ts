@@ -280,8 +280,6 @@ export const DialoguesOfCustomerQuery = extendType({
         const { prisma }: { prisma: PrismaClient } = ctx;
 
         if (args.where.slug) {
-          console.log(parent);
-          console.log('SLUG!!!');
           return;
         }
 
@@ -320,6 +318,8 @@ export const DialoguesOfCustomerQuery = extendType({
             dialogues = DialogueService.filterDialoguesBySearchTerm(dialogues, args.filter.searchTerm);
           }
         }
+
+        // TODO: AverageSCore should be a dervied field instead
         const updatedDialogues = Promise.all(dialogues.map(async (dialogue) => {
           const arg = { dialogueId: dialogue.id };
           const aggregated = await DialogueService.getQuestionnaireAggregatedData(parent, arg);

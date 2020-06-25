@@ -11,63 +11,39 @@ import { CustomerCardImage } from './CustomerOverviewStyles';
 import { deleteFullCustomerQuery } from '../../mutations/deleteFullCustomer';
 import { getCustomerQuery } from '../../queries/getCustomersQuery';
 
-const ErrorCard = () => (
-  <Div>
-    <H2>Sorry for the inconvenience</H2>
+const CustomerOverview = ({ customers }: { customers: any[] }) => (
+  <>
+    <PageHeading>Customers</PageHeading>
 
-    <H4>We will be right back!</H4>
-  </Div>
+    <Grid
+      gridGap={4}
+      gridTemplateColumns={['1fr', '1fr 1fr 1fr']}
+      gridAutoRows="minmax(150px, 1fr)"
+    >
+      {customers?.map((customer: any, index: any) => customer && <CustomerCard key={index} customer={customer} />)}
+
+      <AddCard>
+        <Link to="/dashboard/b/add" />
+        <Div>
+          <Plus />
+          <H3>
+            Add new customer
+          </H3>
+        </Div>
+      </AddCard>
+    </Grid>
+  </>
 );
-
-const CustomerOverview: FC = () => {
-  const { loading, error, data } = useQuery(getCustomerQuery);
-
-  if (error) {
-    return (
-      <Div>
-        <ErrorCard />
-      </Div>
-    );
-  }
-
-  if (loading) return <p>Loading</p>;
-
-  const customers = data?.customers;
-
-  return (
-    <>
-      <PageHeading>Customers</PageHeading>
-
-      <Grid
-        gridGap={4}
-        gridTemplateColumns={['1fr', '1fr 1fr 1fr']}
-        gridAutoRows="minmax(150px, 1fr)"
-      >
-        {customers?.map((customer: any, index: any) => customer && <CustomerCard key={index} customer={customer} />)}
-
-        <AddCard>
-          <Link to="/dashboard/customer-builder" />
-          <Div>
-            <Plus />
-            <H3>
-              Add new customer
-            </H3>
-          </Div>
-        </AddCard>
-      </Grid>
-    </>
-  );
-};
 
 const CustomerCard = ({ customer }: { customer: any }) => {
   const history = useHistory();
 
-  const setCustomerID = (customerId: string) => {
-    history.push(`/dashboard/c/${customerId}`);
+  const setCustomerSlug = (customerSlug: string) => {
+    history.push(`/dashboard/b/${customerSlug}`);
   };
 
-  const setCustomerEditPath = (event: any, customerId: string) => {
-    history.push(`/dashboard/c/${customerId}/edit`);
+  const setCustomerEditPath = (event: any, customerSlug: string) => {
+    history.push(`/dashboard/b/${customerSlug}/edit`);
     event.stopPropagation();
   };
 
@@ -78,10 +54,10 @@ const CustomerCard = ({ customer }: { customer: any }) => {
     },
   });
 
-  const deleteClickedCustomer = async (event: any, customerId: string) => {
+  const deleteClickedCustomer = async (event: any, customerSlug: string) => {
     deleteCustomer({
       variables: {
-        id: customerId,
+        id: customerSlug,
       },
     });
     event.stopPropagation();
@@ -92,7 +68,7 @@ const CustomerCard = ({ customer }: { customer: any }) => {
       useFlex
       flexDirection="column"
       bg={customer.settings?.colourSettings?.primary || 'white'}
-      onClick={() => setCustomerID(customer.id)}
+      onClick={() => setCustomerSlug(customer.slug)}
     >
       <CardBody flex="100%">
         <EditButtonContainer onClick={(e) => setCustomerEditPath(e, customer.id)}>

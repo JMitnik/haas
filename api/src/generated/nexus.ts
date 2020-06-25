@@ -605,6 +605,9 @@ export interface NexusGenArgTypes {
     dialogue: { // args
       where?: NexusGenInputs['DialogueWhereUniqueInput'] | null; // DialogueWhereUniqueInput
     }
+    dialogues: { // args
+      filter?: NexusGenInputs['DialogueFilterInputType'] | null; // DialogueFilterInputType
+    }
   }
   Dialogue: {
     questions: { // args

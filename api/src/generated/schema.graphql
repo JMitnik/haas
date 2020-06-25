@@ -11,7 +11,7 @@ type ColourSettings {
 
 type Customer {
   dialogue(where: DialogueWhereUniqueInput): Dialogue
-  dialogues: [Dialogue!]!
+  dialogues(filter: DialogueFilterInputType): [Dialogue!]!
   id: ID!
   name: String!
   settings: CustomerSettings!

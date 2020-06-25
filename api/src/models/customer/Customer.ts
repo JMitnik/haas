@@ -5,7 +5,7 @@ import cloudinary, { UploadApiResponse } from 'cloudinary';
 
 import { CustomerSettingsType } from '../settings/CustomerSettings';
 // eslint-disable-next-line import/no-cycle
-import { DialogueType, DialogueWhereUniqueInput } from '../questionnaire/Dialogue';
+import { DialogueFilterInputType, DialogueType, DialogueWhereUniqueInput } from '../questionnaire/Dialogue';
 import CustomerService from './CustomerService';
 import DialogueService from '../questionnaire/DialogueService';
 
@@ -58,12 +58,17 @@ export const CustomerType = objectType({
 
     t.list.field('dialogues', {
       type: DialogueType,
+      args: {
+        filter: DialogueFilterInputType,
+      },
       resolve(parent: Customer, args: any, ctx: any) {
-        const dialogues = ctx.prisma.dialogue.findMany({
-          where: {
-            customerId: parent.id,
-          },
+        let dialogues = ctx.prisma.dialogue.findMany({
+          where: { customerId: parent.id },
         });
+
+        if (args.filter && args.filter.searchTerm) {
+          dialogues = DialogueService.filterDialoguesBySearchTerm(dialogues, args.filter.searchTerm);
+        }
 
         return dialogues;
       },

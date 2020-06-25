@@ -62,17 +62,13 @@ class DialogueService {
   ): DialogueCreateInput {
     return {
       customer: {
-        connect: {
-          id: customerId,
-        },
+        connect: { id: customerId },
       },
       title,
       slug,
       description,
       publicTitle,
-      questions: {
-        create: [],
-      },
+      questions: { create: [] },
       tags: {
         connect: tags.map((tag) => ({ id: tag.id })),
       },
@@ -84,19 +80,16 @@ class DialogueService {
   }>, searchTerm: string) => dialogues.filter((dialogue) => {
     if (dialogue.title.toLowerCase().includes(
       searchTerm.toLowerCase(),
-    )) {
-      return true;
-    }
+    )) { return true; }
+
     if (dialogue.publicTitle?.toLowerCase().includes(
-        searchTerm.toLowerCase(),
-        )) {
-      return true;
-    }
+        searchTerm.toLowerCase()
+    )) { return true; }
+
     if (dialogue.tags.find((tag) => tag.name.toLowerCase().includes(
       searchTerm.toLowerCase(),
-    ))) {
-      return true;
-    }
+    ))) { return true; }
+
     return false;
   });
 
