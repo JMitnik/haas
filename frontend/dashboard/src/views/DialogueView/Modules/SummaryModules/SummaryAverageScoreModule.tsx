@@ -1,8 +1,8 @@
 import { ArrowRight, ChevronRight } from 'react-feather';
-import { useParams, useHistory } from 'react-router';
+import { useHistory, useParams } from 'react-router';
 import React from 'react';
 
-import { Card, CardBody, Flex, H3, Paragraph, Span } from '@haas/ui';
+import { Card, CardBody, Flex, H3, Paragraph, Span, H2 } from '@haas/ui';
 
 const SummeryAverageScoreModule = ({ averageScore }: { averageScore: number }) => {
   const { customerSlug, dialogueSlug } = useParams();
@@ -17,11 +17,19 @@ const SummeryAverageScoreModule = ({ averageScore }: { averageScore: number }) =
             {/* <ChevronRight /> */}
           </Flex>
         </H3>
-        <Paragraph my={4}>
+        <Paragraph mt={4} color="app.onWhite">
           {!averageScore ? (
             <p>No interactions yet!</p>
           ) : (
-            <p>{ averageScore } is the score of this dialogue</p>
+            <p>
+              <H2 color="default.darkest">
+                { Number(averageScore).toFixed(2) }
+              </H2>
+              {' '}
+              <Span color="default.darker">
+                is the score of this dialogue
+              </Span>
+            </p>
           )}
         </Paragraph>
       </CardBody>

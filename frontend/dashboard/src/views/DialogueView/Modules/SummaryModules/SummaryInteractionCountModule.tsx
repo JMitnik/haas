@@ -2,7 +2,7 @@ import { ArrowRight, ChevronRight } from 'react-feather';
 import { useHistory, useParams } from 'react-router';
 import React from 'react';
 
-import { Card, CardBody, Flex, H3, Paragraph, Span } from '@haas/ui';
+import { Card, CardBody, Flex, H3, Paragraph, Span, H2 } from '@haas/ui';
 
 const SummaryInteractionCountModule = ({ interactionCount }: { interactionCount: number }) => {
   const { customerSlug, dialogueSlug } = useParams();
@@ -22,9 +22,13 @@ const SummaryInteractionCountModule = ({ interactionCount }: { interactionCount:
             <h2>No interactions yet!</h2>
           ) : (
             <p>
-              { interactionCount }
+              <H2 color="default.darkest">
+                { interactionCount }
+              </H2>
               {' '}
-              user(s) have interacted
+              <Span color="default.darker">
+                user(s) have interacted
+              </Span>
             </p>
           )}
         </Paragraph>

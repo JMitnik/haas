@@ -2,7 +2,7 @@ import { ArrowRight, ChevronRight } from 'react-feather';
 import { useHistory, useParams } from 'react-router';
 import React from 'react';
 
-import { Card, CardBody, Flex, H3, Paragraph, Span } from '@haas/ui';
+import { Card, CardBody, Flex, H3, Paragraph, Span, H2 } from '@haas/ui';
 
 const SummaryCallToActionModule = ({ callToActionCount }: { callToActionCount: number }) => {
   const { customerSlug, dialogueSlug } = useParams();
@@ -10,21 +10,27 @@ const SummaryCallToActionModule = ({ callToActionCount }: { callToActionCount: n
 
   return (
     <Card bg="white" onClick={() => history.push(`/dashboard/b/${customerSlug}/d/${dialogueSlug}/interactions`)}>
-      <CardBody>
+      <CardBody useFlex flexDirection="column" justifyContent="space-between" height="100%">
         <H3 color="tertiary">
           <Flex justifyContent="space-between" alignItems="center">
             <Span>Call to actions</Span>
             {/* <ChevronRight /> */}
           </Flex>
         </H3>
-        <Paragraph color="app.onWhite" my={4}>
+        <Paragraph color="app.onWhite" mt={4}>
           {!callToActionCount ? (
-            <p>No call to actions yet!</p>
+            <H2 color="default.darkest" mb={2}>No call to actions yet!</H2>
           ) : (
             <p>
-              { callToActionCount }
+              <H2 color="default.darkest">
+                { callToActionCount }
+              </H2>
               {' '}
-              user(s) have interacted with the call to actions
+              <Span color="default.darker">
+                user(s) have interacted with the call to actions
+
+                is the score of this dialogue
+              </Span>
             </p>
           )}
         </Paragraph>
