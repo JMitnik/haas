@@ -32,13 +32,13 @@ const DialogueCardOptionsOverlay = ({ onDelete, onEdit }: DialogueCardOptionsOve
 
 const DialogueCard = ({ dialogue }: { dialogue: any }) => {
   const history = useHistory();
-  const { customerId } = useParams();
+  const { customerSlug } = useParams();
 
   const [deleteTopic] = useMutation(deleteQuestionnaireMutation, {
     refetchQueries: [{
       query: getQuestionnairesCustomerQuery,
       variables: {
-        id: customerId,
+        id: customerSlug,
       },
     }],
     onError: (serverError: ApolloError) => {
@@ -56,13 +56,13 @@ const DialogueCard = ({ dialogue }: { dialogue: any }) => {
 
   // TODO: Move this url to a constant or so
   const goToEditDialogue = (topicId: string) => {
-    history.push(`/dashboard/c/${customerId}/t/${topicId}/edit`);
+    history.push(`/dashboard/b/${customerSlug}/t/${topicId}/edit`);
   };
 
   const lastUpdated = new Date(Number.parseInt(dialogue.updatedAt, 10)) || null;
 
   return (
-    <Card bg="white" useFlex flexDirection="column" onClick={() => history.push(`/dashboard/c/${customerId}/t/${dialogue.id}`)}>
+    <Card bg="white" useFlex flexDirection="column" onClick={() => history.push(`/dashboard/b/${customerSlug}/d/${dialogue.slug}`)}>
       <CardBody flex="100%">
         <ColumnFlex justifyContent="space-between" height="100%">
           <Div>
@@ -70,6 +70,8 @@ const DialogueCard = ({ dialogue }: { dialogue: any }) => {
               {dialogue.title}
             </H3>
             <Paragraph fontSize="0.8rem" color="app.mutedOnWhite" fontWeight="100">
+
+              {/* TODO: Sanitize */}
               <ExtLink to={`https://haas-client.netlify.app/${dialogue.customer.slug}/${dialogue.slug}`}>
                 {`haas.live/${dialogue.customer.slug}/${dialogue.slug}`}
               </ExtLink>

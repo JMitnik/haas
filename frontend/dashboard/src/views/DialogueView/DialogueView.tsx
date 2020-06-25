@@ -52,7 +52,7 @@ const DialogueView = () => {
   ];
 
   return (
-    <DialogueLayout dialogueTitle={data?.getQuestionnaireData?.title}>
+    <>
 
       <PositivePathsModule positivePaths={resultData?.topPositivePath} />
       <NegativePathsModule negativePaths={resultData?.topNegativePath} />
@@ -75,7 +75,7 @@ const DialogueView = () => {
           <NodeEntriesOverview sessionId={activeSession} />
         </Modal>
       )}
-    </DialogueLayout>
+    </>
   );
 };
 

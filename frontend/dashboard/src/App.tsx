@@ -10,6 +10,7 @@ import { AppContainer } from 'styles/AppStyles';
 import AddCustomerPage from 'pages/dashboard/customers/add';
 import AddTriggerView from 'views/TriggerOverview/AddTriggerView';
 import AddUserView from 'views/UsersOverview/AddUserView';
+import AnalyticsPage from 'pages/dashboard/analytics';
 import CustomersPage from 'pages/dashboard/customers';
 import DialogueBuilderView from 'views/DialogueBuilderView/DialogueBuilderView';
 import DialoguePage from 'pages/dashboard/dialogues/dialogue';
@@ -24,6 +25,7 @@ import TriggersOverview from 'views/TriggerOverview/TriggerOverview';
 import UsersOverview from 'views/UsersOverview/UsersOverview';
 
 import DashboardLayout from 'layouts/DashboardLayout';
+import DialogueLayout from 'layouts/DialogueLayout';
 import ProtectedRoute from 'components/Route/ProtectedRoute';
 import client from './config/apollo';
 import themeConfig from './config/theme';
@@ -42,6 +44,13 @@ const AppRoutes = () => (
         <DashboardLayout>
           <Switch>
             <Route
+              path="/dashboard/b/:customerSlug/triggers/add"
+              render={() => (
+                <AddTriggerView />
+              )}
+            />
+
+            <Route
               path="/dashboard/b/:customerSlug/triggers/:triggerId/edit"
               render={() => (
                 <EditTriggerView />
@@ -49,16 +58,9 @@ const AppRoutes = () => (
             />
 
             <Route
-              path="/dashboard/b/:customerSlug/users/add"
+              path="/dashboard/b/:customerSlug/analytics/"
               render={() => (
-                <AddUserView />
-              )}
-            />
-
-            <Route
-              path="/dashboard/b/:customerSlug/triggers/add"
-              render={() => (
-                <AddTriggerView />
+                <AnalyticsPage />
               )}
             />
 
@@ -68,18 +70,15 @@ const AppRoutes = () => (
             />
 
             <Route
-              path="/dashboard/b/:customerSlug/dialogues/:dialogueSlug/edit"
-              render={() => <EditDialogueView />}
-            />
-
-            <Route
-              path="/dashboard/b/:customerSlug/:dialogueSlug/interactions"
-              render={() => <InteractionsOverview />}
-            />
-
-            <Route
               path="/dashboard/b/:customerSlug/edit"
               render={() => <EditCustomerView />}
+            />
+
+            <Route
+              path="/dashboard/b/:customerSlug/users/add"
+              render={() => (
+                <AddUserView />
+              )}
             />
 
             <Route
@@ -92,13 +91,32 @@ const AppRoutes = () => (
             />
 
             <Route
-              path="/dashboard/b/:customerSlug/dialogue-builder"
-              render={() => <DialogueBuilderView />}
-            />
+              path="/dashboard/b/:customerSlug/d/:dialogueSlug"
+              render={() => (
+                <DialogueLayout>
+                  <Switch>
+                    <Route
+                      path="/dashboard/b/:customerSlug/d/:dialogueSlug/builder"
+                      render={() => <DialogueBuilderView />}
+                    />
 
-            <Route
-              path="/dashboard/b/:customerSlug/t/:dialogueSlug/"
-              render={() => <DialoguePage />}
+                    <Route
+                      path="/dashboard/b/:customerSlug/d/:dialogueSlug/edit"
+                      render={() => <EditDialogueView />}
+                    />
+
+                    <Route
+                      path="/dashboard/b/:customerSlug/d/:dialogueSlug/interactions"
+                      render={() => <InteractionsOverview />}
+                    />
+
+                    <Route
+                      path="/dashboard/b/:customerSlug/d/:dialogueSlug"
+                      render={() => <DialoguePage />}
+                    />
+                  </Switch>
+                </DialogueLayout>
+              )}
             />
 
             <Route

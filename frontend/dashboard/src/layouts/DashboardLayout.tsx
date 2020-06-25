@@ -40,7 +40,7 @@ const DashboardViewContainer = styled(Div)`
 `;
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
-  const { customerId }: { topicId: string, customerId: string } = useParams<any>();
+  const { customerSlug }: { topicId: string, customerSlug: string } = useParams<any>();
 
   return (
     <DashboardLayoutContainer>
@@ -50,23 +50,23 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
             <NavLogo />
 
             <NavItems>
-              <NavItem to="/dashboard">
+              <NavItem to={`/dashboard/b/${customerSlug}/d`}>
                 <SurveyIcon />
                 Dialogues
               </NavItem>
-              <NavItem to={`/dashboard/c/${customerId}/analytics`}>
+              <NavItem to={`/dashboard/b/${customerSlug}/analytics`}>
                 <PieChartIcon />
                 Analytics
               </NavItem>
-              <NavItem to={`/dashboard/c/${customerId}/users`}>
+              <NavItem to={`/dashboard/b/${customerSlug}/users`}>
                 <UsersIcon />
                 Users
               </NavItem>
-              <NavItem to={`/dashboard/c/${customerId}/notifications`}>
+              <NavItem to={`/dashboard/b/${customerSlug}/notifications`}>
                 <NotificationIcon />
                 Alerts
               </NavItem>
-              <NavItem to={`/dashboard/c/${customerId}/settings`}>
+              <NavItem to={`/dashboard/b/${customerSlug}/settings`}>
                 <SettingsIcon />
                 Settings
               </NavItem>
