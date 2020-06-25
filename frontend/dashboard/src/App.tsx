@@ -8,6 +8,7 @@ import DashboardPage from 'pages/dashboard';
 
 import { AppContainer } from 'styles/AppStyles';
 import AddCustomerPage from 'pages/dashboard/customers/add';
+import AddDialogueView from 'views/AddDialogueView';
 import AddTriggerView from 'views/TriggerOverview/AddTriggerView';
 import AddUserView from 'views/UsersOverview/AddUserView';
 import AnalyticsPage from 'pages/dashboard/analytics';
@@ -26,7 +27,6 @@ import UsersOverview from 'views/UsersOverview/UsersOverview';
 
 import DashboardLayout from 'layouts/DashboardLayout';
 import DialogueLayout from 'layouts/DialogueLayout';
-import ProtectedRoute from 'components/Route/ProtectedRoute';
 import client from './config/apollo';
 import themeConfig from './config/theme';
 
@@ -88,6 +88,11 @@ const AppRoutes = () => (
             <Route
               path="/dashboard/b/:customerSlug/roles"
               render={() => <RolesOverview />}
+            />
+
+            <Route
+              path="/dashboard/b/:customerSlug/d/add"
+              render={() => <AddDialogueView />}
             />
 
             <Route

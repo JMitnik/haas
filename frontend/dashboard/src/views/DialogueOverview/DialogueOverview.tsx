@@ -14,7 +14,7 @@ const DialogueOverviewFilters = () => (
 );
 
 const DialogueOverview = ({ dialogues }: { dialogues: any }) => {
-  const { customerId } = useParams();
+  const { customerSlug } = useParams();
 
   return (
     <>
@@ -37,7 +37,7 @@ const DialogueOverview = ({ dialogues }: { dialogues: any }) => {
         ))}
 
         <AddDialogueCard>
-          <Link to={`/dashboard/c/${customerId}/topic-builder`} />
+          <Link to={`/dashboard/b/${customerSlug}/d/add`} />
 
           <Div>
             <Plus />

@@ -46,17 +46,17 @@ const DialogueCard = ({ dialogue }: { dialogue: any }) => {
     },
   });
 
-  const deleteDialogue = async (topicId: string) => {
+  const deleteDialogue = async () => {
     deleteTopic({
       variables: {
-        id: topicId,
+        id: dialogue.id,
       },
     });
   };
 
   // TODO: Move this url to a constant or so
-  const goToEditDialogue = (topicId: string) => {
-    history.push(`/dashboard/b/${customerSlug}/t/${topicId}/edit`);
+  const goToEditDialogue = () => {
+    history.push(`/dashboard/b/${customerSlug}/d/${dialogue.slug}/edit`);
   };
 
   const lastUpdated = new Date(Number.parseInt(dialogue.updatedAt, 10)) || null;
@@ -93,8 +93,8 @@ const DialogueCard = ({ dialogue }: { dialogue: any }) => {
             <ShowMoreButton
               renderMenu={(
                 <DialogueCardOptionsOverlay
-                  onDelete={() => deleteDialogue(dialogue.id)}
-                  onEdit={() => goToEditDialogue(dialogue.id)}
+                  onDelete={() => deleteDialogue()}
+                  onEdit={() => goToEditDialogue()}
                 />
               )}
             />

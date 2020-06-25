@@ -58,15 +58,15 @@ const EditDialogueView = () => {
 const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFormProps) => {
   const history = useHistory();
   const { register, handleSubmit, errors } = useForm<FormDataProps>();
-  const { customerId, dialogueId } = useParams();
+  const { customerSlug, dialogueId } = useParams();
 
   const [editDialogue, { loading }] = useMutation(editDialogueMutation, {
     onCompleted: () => {
-      history.push(`/dashboard/c/${customerId}/`);
+      history.push(`/dashboard/b/${customerSlug}/d/${dialogue.slug}`);
     },
     refetchQueries: [{ query: getQuestionnairesCustomerQuery,
       variables: {
-        id: customerId,
+        slug: customerSlug,
       } }],
     onError: (serverError: ApolloError) => {
       console.log(serverError);
@@ -184,7 +184,7 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFo
 
           <Flex>
             <Button brand="primary" mr={2} type="submit">Save dialogue</Button>
-            <Button brand="default" type="button" onClick={() => history.push(`/dashboard/c/${customerId}/`)}>Cancel</Button>
+            <Button brand="default" type="button" onClick={() => history.goBack()}>Cancel</Button>
           </Flex>
         </Div>
       </Form>
