@@ -173,7 +173,7 @@ type Mutation {
   createDialogue(data: AddDialogueInput): Dialogue!
   createPermission(data: PermissionInput): PermssionType!
   createRole(data: RoleInput): RoleType!
-  createTag(customerId: String, name: String, type: TagTypeEnum): TagType!
+  createTag(customerSlug: String, name: String, type: TagTypeEnum): TagType!
   createTrigger(customerId: String, questionId: String, recipients: RecipientsInputType, trigger: TriggerInputType): TriggerType!
   createUser(id: String, input: UserInput): UserType!
   deleteCustomer(where: CustomerWhereUniqueInput): Customer!
@@ -249,7 +249,7 @@ type Query {
   roleTable(customerId: String, filter: FilterInput): RoleTableType!
   session(where: SessionWhereUniqueInput): Session!
   sessions(where: SessionWhereUniqueInput): [Session!]!
-  tags(customerId: String, dialogueId: String): [TagType!]!
+  tags(customerSlug: String, dialogueId: String): [TagType!]!
   trigger(triggerId: String): TriggerType!
   triggers(customerId: String, dialogueId: String, filter: FilterInput, userId: String): [TriggerType!]!
   triggerTable(customerId: String, filter: FilterInput): TriggerTableType!

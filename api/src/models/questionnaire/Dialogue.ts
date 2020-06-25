@@ -93,6 +93,20 @@ export const DialogueType = objectType({
     t.list.field('tags', {
       type: TagType,
       nullable: true,
+      async resolve(parent: Dialogue, args: any, ctx: any) {
+        const { prisma }: { prisma: PrismaClient } = ctx;
+
+        if (!parent.id) {
+          return null;
+        }
+
+        const dialogue = await prisma.dialogue.findOne({
+          where: { id: parent.id },
+          include: { tags: true },
+        });
+
+        return dialogue?.tags;
+      },
     });
 
     t.field('lineChartData', {

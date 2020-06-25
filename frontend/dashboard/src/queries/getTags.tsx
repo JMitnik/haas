@@ -1,12 +1,12 @@
 import gql from 'graphql-tag';
 
 const getTagsQuery = gql`
-  query getTags($customerId: String) {
-    tags(customerId: $customerId) {
-        name
-        id
-        customerId
-        type
+  query getTags($customerSlug: String) {
+    tags(customerSlug: $customerSlug) {
+      name
+      id
+      customerId
+      type
     }
   }
 `;

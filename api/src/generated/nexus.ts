@@ -628,7 +628,7 @@ export interface NexusGenArgTypes {
       data?: NexusGenInputs['RoleInput'] | null; // RoleInput
     }
     createTag: { // args
-      customerId?: string | null; // String
+      customerSlug?: string | null; // String
       name?: string | null; // String
       type?: NexusGenEnums['TagTypeEnum'] | null; // TagTypeEnum
     }
@@ -742,7 +742,7 @@ export interface NexusGenArgTypes {
       where?: NexusGenInputs['SessionWhereUniqueInput'] | null; // SessionWhereUniqueInput
     }
     tags: { // args
-      customerId?: string | null; // String
+      customerSlug?: string | null; // String
       dialogueId?: string | null; // String
     }
     trigger: { // args
