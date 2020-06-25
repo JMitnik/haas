@@ -9,8 +9,53 @@ import { QuestionNodeType, QuestionNodeWhereInput } from '../question/QuestionNo
 // eslint-disable-next-line import/no-cycle
 import { TagType, TagsInputType } from '../tag/Tag';
 
-import { UniqueDataResultEntry } from '../session/Session';
+import { SessionType, UniqueDataResultEntry } from '../session/Session';
 import DialogueService from './DialogueService';
+
+export const lineChartDataType = objectType({
+  name: 'lineChartDataType',
+  definition(t) {
+    t.string('x');
+    t.int('y');
+  },
+});
+
+export const topPathType = objectType({
+  name: 'topPathType',
+  definition(t) {
+    t.string('answer');
+    t.int('quantity');
+  },
+});
+
+export const DialogueStatistics = objectType({
+  name: 'DialogueStatistics',
+  definition(t) {
+    t.float('averageScore', {
+      resolve(parent: any) {
+        if (!parent.id) {
+          return null;
+        }
+      },
+    });
+    t.int('countInteractions');
+
+    t.list.field('lineChartData', {
+      nullable: true,
+      type: lineChartDataType,
+    });
+
+    t.list.field('topPositivePath', {
+      type: topPathType,
+      nullable: true,
+    });
+
+    t.list.field('topNegativePath', {
+      type: topPathType,
+      nullable: true,
+    });
+  },
+});
 
 export const DialogueType = objectType({
   name: 'Dialogue',
@@ -22,7 +67,36 @@ export const DialogueType = objectType({
     t.string('publicTitle', { nullable: true });
     t.string('creationDate', { nullable: true });
     t.string('updatedAt', { nullable: true });
-    t.string('averageScore', { nullable: true });
+    t.float('averageScore', {
+      nullable: true,
+      resolve(parent: any) {
+        if (!parent.id) {
+          return null;
+        }
+
+        return DialogueService.calculateAverageScore(parent.id);
+      },
+    });
+    t.int('countInteractions', {
+      nullable: true,
+      resolve(parent: any) {
+        if (!parent.id) {
+          return null;
+        }
+
+        return DialogueService.countInteractions(parent.id);
+      },
+    });
+
+    t.field('statistics', {
+      type: DialogueStatistics,
+      async resolve(parent: any, args: any) {
+        const aggregatedData = await DialogueService.getQuestionnaireAggregatedData(parent, args);
+        const data = await DialogueService.getLineData(args.dialogueId, args.filter);
+        const result = { ...aggregatedData, ...data };
+        return result;
+      },
+    });
 
     t.list.field('tags', {
       type: TagType,
@@ -107,6 +181,20 @@ export const DialogueType = objectType({
       },
     });
 
+    t.list.field('sessions', {
+      type: SessionType,
+      async resolve(parent: Dialogue, args: any, ctx: any) {
+        const { prisma }: { prisma: PrismaClient } = ctx;
+
+        const dialogueWithSessions = await prisma.dialogue.findOne({
+          where: { id: parent.id },
+          include: { sessions: true },
+        });
+
+        return dialogueWithSessions?.sessions;
+      },
+    });
+
     t.list.field('leafs', {
       type: QuestionNodeType,
       resolve(parent: Dialogue, args: any, ctx: any) {
@@ -136,59 +224,11 @@ export const DialogueWhereUniqueInput = inputObjectType({
   },
 });
 
-export const lineChartDataType = objectType({
-  name: 'lineChartDataType',
-  definition(t) {
-    t.string('x');
-    t.int('y');
-  },
-});
-
-export const topPathType = objectType({
-  name: 'topPathType',
-  definition(t) {
-    t.string('answer');
-    t.int('quantity');
-  },
-});
-
-export const DialogueDetailResultType = objectType({
-  name: 'DialogueDetailResult',
-  definition(t) {
-    t.string('customerName');
-    t.string('title');
-    t.string('description');
-    t.string('creationDate');
-    t.string('updatedAt');
-    t.string('average');
-    t.int('totalNodeEntries');
-
-    t.list.field('timelineEntries', {
-      type: UniqueDataResultEntry,
-    });
-
-    t.list.field('lineChartData', {
-      nullable: true,
-      type: lineChartDataType,
-    });
-
-    t.list.field('topPositivePath', {
-      type: topPathType,
-      nullable: true,
-    });
-
-    t.list.field('topNegativePath', {
-      type: topPathType,
-      nullable: true,
-    });
-  },
-});
-
 export const getQuestionnaireDataQuery = extendType({
   type: 'Query',
   definition(t) {
     t.field('getQuestionnaireData', {
-      type: DialogueDetailResultType,
+      type: DialogueStatistics,
       args: {
         dialogueId: 'String',
         filter: 'Int',
@@ -343,6 +383,6 @@ export default [
   deleteDialogueOfCustomerMutation,
   DialogueType,
   DialoguesOfCustomerQuery,
-  DialogueDetailResultType,
+  DialogueStatistics,
   getQuestionnaireDataQuery,
 ];

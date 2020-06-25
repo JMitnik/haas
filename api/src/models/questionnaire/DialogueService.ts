@@ -578,6 +578,55 @@ class DialogueService {
     }
   };
 
+  static calculateAverageScore = async (dialogueId: string) => {
+    const dialogue = await prisma.dialogue.findOne({
+      where: { id: dialogueId },
+      include: {
+        sessions: {
+          include: {
+            nodeEntries: {
+              include: {
+                values: {
+                  include: {
+                    multiValues: {
+                      select: {
+                        numberValue: true,
+                      },
+                    },
+                  },
+                },
+                relatedNode: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    // For each session, get the node-entry with isRoot (for now)
+    const scores = dialogue?.sessions.map(
+      (session) => session.nodeEntries.find(
+        (entry) => entry.relatedNode?.isRoot,
+      )?.values.find(
+        (val) => val.numberValue
+      )?.numberValue).filter((val) => val);
+
+    const averageScore = _.mean(scores) || null;
+
+    return averageScore || null;
+  };
+
+  static countInteractions = async (dialogueId: string) => {
+    const dialogue = await prisma.dialogue.findOne({
+      where: { id: dialogueId },
+      include: {
+        sessions: true,
+      },
+    });
+
+    return dialogue?.sessions.length;
+  };
+
   static getQuestionnaireAggregatedData = async (parent: any, args: any) => {
     const { dialogueId } = args;
 

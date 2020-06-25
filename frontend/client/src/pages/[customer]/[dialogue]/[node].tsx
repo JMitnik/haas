@@ -8,6 +8,7 @@ import { HAASNode } from 'types/generic';
 import Loader from 'components/Loader';
 import NodeView from 'views/NodeView';
 import useDialogueTree from 'providers/DialogueTreeProvider';
+import EmptyDialogueView from 'views/NodeView/EmptyDialogueView';
 
 export interface GenericNodeProps {
   isLeaf?: boolean;
@@ -49,6 +50,11 @@ const NodePage = observer(() => {
 
     // Either we start from the 'root' (no edge) or we get the next node.
     const node = edgeId ? store.tree.getChildNodeByEdge(edgeId) : store.tree.rootNode;
+
+    if (!node) {
+      return <EmptyDialogueView />;
+    }
+
     store.tree.setActiveLeafFromNode(node);
 
     return (

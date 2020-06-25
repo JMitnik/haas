@@ -38,7 +38,8 @@ input CustomerWhereUniqueInput {
 }
 
 type Dialogue {
-  averageScore: String
+  averageScore: Float
+  countInteractions: Int
   creationDate: String
   customer: Customer!
   customerId: String!
@@ -50,28 +51,24 @@ type Dialogue {
   publicTitle: String
   questions(where: QuestionNodeWhereInput): [QuestionNode!]!
   rootQuestion: QuestionNode!
+  sessions: [Session!]!
   slug: String!
+  statistics: DialogueStatistics!
   tags: [TagType!]
   title: String!
   updatedAt: String
 }
 
-type DialogueDetailResult {
-  average: String!
-  creationDate: String!
-  customerName: String!
-  description: String!
-  lineChartData: [lineChartDataType!]
-  timelineEntries: [UniqueDataResultEntry!]!
-  title: String!
-  topNegativePath: [topPathType!]
-  topPositivePath: [topPathType!]
-  totalNodeEntries: Int!
-  updatedAt: String!
-}
-
 input DialogueFilterInputType {
   searchTerm: String
+}
+
+type DialogueStatistics {
+  averageScore: Float!
+  countInteractions: Int!
+  lineChartData: [lineChartDataType!]
+  topNegativePath: [topPathType!]
+  topPositivePath: [topPathType!]
 }
 
 input DialogueWhereUniqueInput {
@@ -235,7 +232,7 @@ type Query {
   dialogue(where: DialogueWhereUniqueInput): Dialogue!
   dialogues(customerId: ID, filter: DialogueFilterInputType): [Dialogue!]!
   edge(id: String): Edge!
-  getQuestionnaireData(dialogueId: String, filter: Int): DialogueDetailResult!
+  getQuestionnaireData(dialogueId: String, filter: Int): DialogueStatistics!
   getSessionAnswerFlow(sessionId: ID): Session!
   interactions(filter: FilterInput, where: SessionWhereUniqueInput): InteractionType!
   lineChartData(dialogueId: String, limit: Int, numberOfDaysBack: Int, offset: Int): [lineChartDataType!]!

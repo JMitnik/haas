@@ -12,6 +12,7 @@ import AddDialogueView from 'views/AddDialogueView';
 import AddTriggerView from 'views/TriggerOverview/AddTriggerView';
 import AddUserView from 'views/UsersOverview/AddUserView';
 import AnalyticsPage from 'pages/dashboard/analytics';
+import CustomerPage from 'pages/dashboard/customer';
 import CustomersPage from 'pages/dashboard/customers';
 import DialogueBuilderView from 'views/DialogueBuilderView/DialogueBuilderView';
 import DialoguePage from 'pages/dashboard/dialogues/dialogue';
@@ -29,7 +30,6 @@ import DashboardLayout from 'layouts/DashboardLayout';
 import DialogueLayout from 'layouts/DialogueLayout';
 import client from './config/apollo';
 import themeConfig from './config/theme';
-import CustomerPage from 'pages/dashboard/customer';
 
 const AppRoutes = () => (
   <Switch>

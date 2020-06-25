@@ -40,13 +40,13 @@ export const CustomerType = objectType({
           return null;
         }
 
-        if (args.where.slug) {
+        if (args?.where?.slug) {
           const dialogueSlug: string = args.where.slug;
 
           return CustomerService.getDialogueFromCustomerBySlug(customerId, dialogueSlug);
         }
 
-        if (args.where.id) {
+        if (args?.where?.id) {
           const dialogueId: string = args.where.id;
 
           return CustomerService.getDialogueFromCustomerById(customerId, dialogueId);

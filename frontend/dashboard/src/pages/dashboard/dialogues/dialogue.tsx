@@ -1,12 +1,8 @@
 import DialogueView from 'views/DialogueView';
 import React from 'react';
 
-const DialoguePage = () => {
-  console.log('Hello');
-
-  return (
-    <DialogueView />
-  );
-};
+const DialoguePage = () => (
+  <DialogueView />
+);
 
 export default DialoguePage;
