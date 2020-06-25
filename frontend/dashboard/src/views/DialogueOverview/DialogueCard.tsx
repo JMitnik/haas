@@ -4,6 +4,7 @@ import { formatDistance } from 'date-fns';
 import { useHistory, useParams } from 'react-router';
 import { useMutation } from '@apollo/react-hooks';
 import React from 'react';
+import styled, { css } from 'styled-components/macro';
 
 import { Card, CardBody, ColumnFlex, Div, ExtLink, Flex, H3, Paragraph } from '@haas/ui';
 import { Menu, MenuHeader, MenuItem } from 'components/Menu/Menu';
@@ -85,7 +86,7 @@ const DialogueCard = ({ dialogue }: { dialogue: any }) => {
                 {dialogue.tags.map((tag: any, index: number) => <Tag key={index} tag={tag} />)}
               </Flex>
             </Flex>
-            <Flex justifyContent="space-between">
+            <Flex alignItems="center" justifyContent="space-between">
               <Div>
                 {lastUpdated && (
                 <Paragraph fontSize="0.8rem" color="app.mutedOnWhite">
@@ -118,8 +119,26 @@ interface TagProps {
   type: string;
 }
 
+const TagContainer = styled(Flex)`
+  ${({ theme }) => css`
+    border: 1px solid ${theme.colors.app.mutedOnDefault};
+    padding: 4px 10px;
+    font-size: 0.8rem;
+    color: ${theme.colors.app.onDefault};
+    background: ${theme.colors.default.normal};
+    border-radius: 8px;
+    align-items: center;
+    margin-right: 5px;
+
+    svg {
+      stroke: ${theme.colors.app.mutedAltOnDefault};
+      width: 18px;
+    }
+  `}
+`;
+
 const Tag = ({ tag }: { tag: TagProps }) => (
-  <Flex marginRight="5px" borderRadius="8px" border="1px solid" padding="5px" paddingLeft="2px" alignItems="center">
+  <TagContainer>
     {tag.type === 'LOCATION' && (
       <MapPin />
     )}
@@ -133,7 +152,7 @@ const Tag = ({ tag }: { tag: TagProps }) => (
     )}
 
     <Div marginLeft="2px">{tag.name}</Div>
-  </Flex>
+  </TagContainer>
 );
 
 export default DialogueCard;
