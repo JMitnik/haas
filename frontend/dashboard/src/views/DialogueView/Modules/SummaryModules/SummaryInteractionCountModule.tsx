@@ -1,4 +1,3 @@
-import { ArrowRight, ChevronRight } from 'react-feather';
 import { useHistory, useParams } from 'react-router';
 import React from 'react';
 
@@ -19,7 +18,7 @@ const SummaryInteractionCountModule = ({ interactionCount }: { interactionCount:
         </H3>
         <Paragraph color="app.onWhite" mt={4}>
           {!interactionCount ? (
-            <h2>No interactions yet!</h2>
+            <h2>No interactions yet</h2>
           ) : (
             <p>
               <H2 color="default.darkest">

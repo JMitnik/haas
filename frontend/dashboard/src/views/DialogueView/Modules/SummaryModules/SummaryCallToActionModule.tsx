@@ -1,8 +1,7 @@
-import { ArrowRight, ChevronRight } from 'react-feather';
 import { useHistory, useParams } from 'react-router';
 import React from 'react';
 
-import { Card, CardBody, Flex, H3, Paragraph, Span, H2 } from '@haas/ui';
+import { Card, CardBody, Flex, H2, H3, Paragraph, Span } from '@haas/ui';
 
 const SummaryCallToActionModule = ({ callToActionCount }: { callToActionCount: number }) => {
   const { customerSlug, dialogueSlug } = useParams();
@@ -19,7 +18,7 @@ const SummaryCallToActionModule = ({ callToActionCount }: { callToActionCount: n
         </H3>
         <Paragraph color="app.onWhite" mt={4}>
           {!callToActionCount ? (
-            <H2 color="default.darkest" mb={2}>No call to actions yet!</H2>
+            <H2 color="default.darkest" mb={2}>No call to actions yet</H2>
           ) : (
             <p>
               <H2 color="default.darkest">

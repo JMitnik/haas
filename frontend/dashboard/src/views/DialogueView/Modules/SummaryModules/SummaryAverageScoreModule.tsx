@@ -1,4 +1,3 @@
-import { ArrowRight, ChevronRight } from 'react-feather';
 import { useHistory, useParams } from 'react-router';
 import React from 'react';
 
@@ -19,7 +18,7 @@ const SummeryAverageScoreModule = ({ averageScore }: { averageScore: number }) =
         </H3>
         <Paragraph mt={4} color="app.onWhite">
           {!averageScore ? (
-            <p>No interactions yet!</p>
+            <H2>No interactions yet</H2>
           ) : (
             <p>
               <H2 color="default.darkest">
