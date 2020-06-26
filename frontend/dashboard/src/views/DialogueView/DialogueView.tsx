@@ -41,6 +41,7 @@ const getDialogueStatistics = gql`
     customer(slug: $customerSlug) {
       id
       dialogue(where: { slug: $dialogueSlug }) {
+        id
         countInteractions
         averageScore
         interactionFeedItems {

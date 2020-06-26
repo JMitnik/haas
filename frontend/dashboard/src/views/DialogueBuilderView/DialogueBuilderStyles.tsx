@@ -1,10 +1,8 @@
 /* eslint-disable import/prefer-default-export */
-import styled from 'styled-components/macro';
+import styled, { css } from 'styled-components/macro';
 
 export const DialogueBuilderContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  height: 80vh;
-  overflow-y: auto;
-  width: 100vh;
+  ${({ theme }) => css`
+    padding: ${theme.gutter * 2}px 0;
+  `}
 `;

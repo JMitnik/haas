@@ -189,7 +189,7 @@ type Mutation {
   editUser(id: String, input: UserInput): UserType!
   singleUpload(file: Upload): ImageType!
   updateRoles(permissions: PermissionIdsInput, roleId: String): RoleType!
-  updateTopicBuilder(id: String, topicData: TopicDataEntry): String!
+  updateTopicBuilder(customerSlug: String, dialogueSlug: String, topicData: TopicDataEntry): String!
   uploadUserSession(uploadUserSessionInput: UploadUserSessionInput): Session!
 }
 

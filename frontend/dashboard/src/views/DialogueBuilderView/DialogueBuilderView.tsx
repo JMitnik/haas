@@ -1,5 +1,5 @@
 import { ApolloError } from 'apollo-boost';
-import { Button, Div, H2, Loader } from '@haas/ui';
+import { Button, ColumnFlex, Div, H2, Loader } from '@haas/ui';
 import { orderBy } from 'lodash';
 import { useHistory, useParams } from 'react-router-dom';
 import { useMutation, useQuery } from '@apollo/react-hooks';
@@ -15,20 +15,21 @@ import QuestionEntry from './QuestionEntry/QuestionEntry';
 import updateTopicBuilder from '../../mutations/updateTopicBuilder';
 
 const DialogueBuilderView = () => {
-  const { customerId, dialougeId } = useParams();
+  const { customerSlug, dialogueSlug } = useParams();
   const history = useHistory();
   const { loading, data } = useQuery(getTopicBuilderQuery, {
-    variables: { dialougeId },
+    variables: { dialogueSlug, customerSlug },
   });
 
   const [updateTopic] = useMutation(updateTopicBuilder, {
     onCompleted: () => {
-      history.push(`/dashboard/c/${customerId}/t/${dialougeId}/`);
+      history.push(`/dashboard/b/${customerSlug}/d/${dialogueSlug}`);
     },
     refetchQueries: [{
       query: getTopicBuilderQuery,
       variables: {
-        dialougeId,
+        customerSlug,
+        dialogueSlug,
       },
     }],
     onError: (serverError: ApolloError) => {
@@ -73,10 +74,10 @@ const DialogueBuilderView = () => {
     return selectLeafs;
   };
 
-  const dialogeBuilderData = data?.dialogue;
-  const selectLeafs = findLeafs(data?.dialogue?.leafs);
+  const dialogueData = data?.customer?.dialogue;
+  const selectLeafs = findLeafs(dialogueData?.leafs);
 
-  const questionsData = mapQuestionsInputData(data?.dialogue?.questions);
+  const questionsData = mapQuestionsInputData(dialogueData?.questions);
   const [questions, setQuestions] = useState(questionsData);
   const rootQuestion = questions && questions.filter((question) => question.isRoot);
   const [activeExpanded, setActiveExpanded] : [Array<string>, React.Dispatch<React.SetStateAction<string[]>>] = useState(['-1']);
@@ -86,8 +87,8 @@ const DialogueBuilderView = () => {
       return;
     }
 
-    if (data?.dialogue) {
-      const questionData = mapQuestionsInputData(data?.dialogue?.questions);
+    if (dialogueData) {
+      const questionData = mapQuestionsInputData(dialogueData?.questions);
       setQuestions(questionData);
       const rootQuestion = questionData && questionData.filter((question) => question.isRoot);
       setActiveExpanded(rootQuestion.map((question) => question.id));
@@ -207,12 +208,12 @@ const DialogueBuilderView = () => {
   };
 
   return (
-    <Div>
+    <DialogueBuilderContainer>
       <H2 color="default.text" fontWeight={400} mb={4}>
-        Topic builder
+        Dialogue builder
       </H2>
 
-      <DialogueBuilderContainer>
+      <ColumnFlex>
         {(questions && questions.length === 0) && (
           <Div alignSelf="center">No question available...</Div>
         )}
@@ -238,9 +239,9 @@ const DialogueBuilderView = () => {
             leafs={selectLeafs}
           />
         ))}
-      </DialogueBuilderContainer>
+      </ColumnFlex>
 
-      <Div display="flex" justifyContent="space-around">
+      <Div display="flex" mt={4} justifyContent="space-around">
         <Button
           brand="primary"
           mt={2}
@@ -248,13 +249,19 @@ const DialogueBuilderView = () => {
           mr={4}
           onClick={(e) => {
             e.preventDefault();
-            updateTopic(
-              { variables: { id: dialogeBuilderData.id,
-                topicData: { id: dialogeBuilderData.id, questions } } },
-            );
+            updateTopic({
+              variables: {
+                customerSlug,
+                dialogueSlug,
+                topicData: {
+                  id: dialogueData?.id,
+                  questions,
+                },
+              },
+            });
           }}
         >
-          Save topic
+          Save dialogue
         </Button>
         <Button
           brand="default"
@@ -266,7 +273,7 @@ const DialogueBuilderView = () => {
           Cancel
         </Button>
       </Div>
-    </Div>
+    </DialogueBuilderContainer>
   );
 };
 

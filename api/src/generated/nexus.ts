@@ -692,7 +692,8 @@ export interface NexusGenArgTypes {
       roleId?: string | null; // String
     }
     updateTopicBuilder: { // args
-      id?: string | null; // String
+      customerSlug?: string | null; // String
+      dialogueSlug?: string | null; // String
       topicData?: NexusGenInputs['TopicDataEntry'] | null; // TopicDataEntry
     }
     uploadUserSession: { // args
