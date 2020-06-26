@@ -15,7 +15,7 @@ const AppRoutes = () => {
   return (
     <AnimatePresence exitBeforeEnter>
       <Switch key={location.pathname} location={location}>
-        <Route path={['/:customerSlug/:dialogueId/:edgeId', '/:customerSlug/:dialogueId']}>
+        <Route path={['/:customerSlug/:dialogueSlug/:edgeId', '/:customerSlug/:dialogueSlug']}>
           <NodePage />
         </Route>
         <Route path="/:customerSlug">

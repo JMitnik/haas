@@ -45,6 +45,7 @@ const TreeStoreModel = types
 
         self.tree = TreeModel.create({
           id: dialogue.id,
+          slug: dialogue.slug,
           title: dialogue.title,
           publicTitle: dialogue.publicTitle,
           activeLeaf: defaultPostLeafNode.id,
@@ -112,7 +113,7 @@ const TreeStoreModel = types
       }
 
       result.reverse();
-      const resultWithDepth = result.map((result, index) => ({ ...result, depth: index + 1 }));
+      const resultWithDepth = result.map((result, index) => ({ ...result, depth: index }));
       return resultWithDepth;
     },
   }));

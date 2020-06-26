@@ -1,10 +1,10 @@
 import React, { useEffect } from 'react';
 
-import { CustomerOverviewContainer } from 'views/CustomerOverview/CustomerOverviewStyles';
 import { Div, Grid, H1 } from '@haas/ui';
 import CustomerCard from 'components/CustomerCard/CustomerCard';
 import Logo from 'components/Logo';
 import useDialogueTree from 'providers/DialogueTreeProvider';
+import { CustomerOverviewContainer } from './CustomerOverviewStyles';
 
 const CustomerOverview = ({ customers }: { customers: any }) => {
   const store = useDialogueTree();

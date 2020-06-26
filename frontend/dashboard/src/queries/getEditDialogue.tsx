@@ -1,13 +1,20 @@
 import gql from 'graphql-tag';
 
 const getEditDialogueQuery = gql`
-  query getEditDialogue($id: ID!) {
-    dialogue(where: { id: $id }) {
+  query getEditDialogue($slug: String!) {
+    dialogue(where: { slug: $slug }) {
+      id
+      title
+      slug
+      publicTitle
+      description
+      
+      tags {
         id
-        title
-        publicTitle
-        description
+        name
+        type
       }
+    }
   }
 `;
 

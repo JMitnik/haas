@@ -1,22 +1,25 @@
 import styled, { css } from 'styled-components/macro';
 import { Div } from './Generics';
 
-export const Card = styled(Div)`
-  ${({ theme }) => css`
-      position: relative;
-      border-radius: ${theme.borderRadiuses.md};
-      background: ${theme.colors.white};
-      color: ${theme.colors.default.darkest};
-      box-shadow: 1px 4px 5px 2px rgb(241, 242, 248);
-      border: 1px solid #fcfcfc;
-      cursor: pointer;
-      transition: all .3s cubic-bezier(.55,0,.1,1);
+interface CardProps {
+  noHover?: boolean;
+}
 
+export const Card = styled(Div)<CardProps>`
+  ${({ theme, noHover }) => css`
+    position: relative;
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,.05);
+    border-radius: ${theme.borderRadiuses.somewhatRounded};
+    /* color: ${theme.colors.default.darkest}; */
+    border: 1px solid #fcfcfc;
+    cursor: pointer;
 
+    ${!noHover && css`
       &:hover {
         transition: all .3s cubic-bezier(.55,0,.1,1);
-        transform: scale(1.1);
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,.1),0 2px 4px -1px rgba(0,0,0,.06)!important;
       }
+    `}
   `}
 `;
 
@@ -56,7 +59,7 @@ export const AddCard = styled(Card)`
 
 export const CardBody = styled(Div)`
   ${({ theme }) => css`
-    padding: ${theme.gutter}px;
+    padding: ${theme.gutter * 0.75}px;
     position: relative;
   `}
 `;

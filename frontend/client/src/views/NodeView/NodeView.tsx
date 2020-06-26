@@ -48,7 +48,7 @@ const NodeView = ({ node }: NodeViewProps) => {
 
     // Get next edge and navigate there
     const nextEdgeId = node.getNextEdgeIdFromKey(edgeKey);
-    history.push(`/${store.customer?.slug}/${store.tree?.id}/${nextEdgeId}`);
+    history.push(`/${store.customer?.slug}/${store.tree?.slug}/${nextEdgeId}`);
   };
 
   return (

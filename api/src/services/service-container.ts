@@ -1,16 +1,23 @@
-import MailService from './mailings/mail-service';
-import TriggerMailService from './mailings/trigger-mail-service';
 import { ConfigProps } from '../config';
+import MailService from './mailings/mail-service';
+import SMSService from './sms/sms-service';
+import TriggerMailService from './mailings/trigger-mail-service';
+import TriggerSMSService from './sms/trigger-sms-service';
 
 export interface ServiceContainerProps {
   mailService: MailService;
   triggerMailService: TriggerMailService;
+  smsService: SMSService;
 }
 
 class ServiceContainer implements ServiceContainerProps {
   mailService: MailService;
 
   triggerMailService: TriggerMailService;
+
+  smsService: SMSService;
+
+  triggerSMSService: TriggerSMSService;
 
   constructor(config: ConfigProps) {
     this.mailService = new MailService({
@@ -29,6 +36,18 @@ class ServiceContainer implements ServiceContainerProps {
       port: config.mailPort,
       user: config.mailUsername,
       defaultSender: config.mailDefaultSender,
+    });
+
+    this.smsService = new SMSService({
+      container: this,
+      twilioAccountSid: config.twilioAccountSid,
+      twilioAuthToken: config.twilioAuthToken,
+    });
+
+    this.triggerSMSService = new TriggerSMSService({
+      container: this,
+      twilioAccountSid: config.twilioAccountSid,
+      twilioAuthToken: config.twilioAuthToken,
     });
   }
 }

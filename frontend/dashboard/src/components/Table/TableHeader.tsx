@@ -1,5 +1,9 @@
-import { Grid } from '@haas/ui';
+
+import { PlusCircle } from 'react-feather';
 import React from 'react';
+import styled from 'styled-components/macro';
+
+import { Div, Grid } from '@haas/ui';
 
 import TableHeaderColumn from './TableHeaderColumn';
 
@@ -26,24 +30,39 @@ interface TableHeaderProps {
     id: string;
     desc: boolean;
   }[];
+  onAddEntry?: (event: any) => void;
   onPaginationChange: React.Dispatch<React.SetStateAction<TableProps>>;
+  disableSorting?: boolean;
 }
 
-const TableHeader = ({ sortProperties, headers, onPaginationChange }: TableHeaderProps) => {
+const AddNewUser = styled(Div)`
+  position: absolute;
+  cursor: pointer;
+  top: 17.5px;
+  right: 15px;
+  color: #6d767d;
+
+  :hover {
+    color: #000;
+  }
+`;
+
+const TableHeader = ({ sortProperties, headers, onPaginationChange, onAddEntry, disableSorting }: TableHeaderProps) => {
   const nrHeaders = headers.length;
-  const percentage = 100 / nrHeaders;
-  const templateColumns = `${percentage.toString()}% `.repeat(nrHeaders);
+  const templateColumns = '1fr '.repeat(nrHeaders);
 
   return (
     <Grid
+      position="relative"
       backgroundColor="#f1f5f8"
       color="black"
-      borderRadius="90px"
       gridColumnGap={5}
       gridTemplateColumns={templateColumns}
     >
+
       {headers && headers.map((header, index) => (
         <TableHeaderColumn
+          disableSorting={disableSorting}
           sortProperties={sortProperties}
           onPaginationChange={onPaginationChange}
           accessor={header.accessor}
@@ -51,6 +70,13 @@ const TableHeader = ({ sortProperties, headers, onPaginationChange }: TableHeade
           key={index}
         />
       ))}
+
+      {onAddEntry && (
+        <AddNewUser onClick={onAddEntry}>
+          <PlusCircle />
+        </AddNewUser>
+      )}
+
     </Grid>
   );
 };

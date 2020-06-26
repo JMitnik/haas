@@ -1,5 +1,6 @@
+import { PrismaClient } from '@prisma/client';
 import { extendType, inputObjectType } from '@nexus/schema';
-import DialogueResolver from '../questionnaire/dialogue-resolver';
+import DialogueService from '../questionnaire/DialogueService';
 
 export const LeafNodeInput = inputObjectType({
   name: 'LeafNodeInput',
@@ -90,11 +91,29 @@ export const topicBuilderMutations = extendType({
     t.field('updateTopicBuilder', {
       type: 'String',
       args: {
-        id: 'String',
+        dialogueSlug: 'String',
+        customerSlug: 'String',
         topicData: TopicDataEntryInput,
       },
-      resolve(parent: any, args: any, ctx: any, info: any) {
-        return DialogueResolver.updateTopicBuilder(args);
+      async resolve(parent: any, args: any, ctx: any) {
+        const { prisma }: { prisma: PrismaClient } = ctx;
+
+        if (!args.dialogueSlug || !args.customerSlug) {
+          return null;
+        }
+
+        const customer = await prisma.customer.findOne({
+          where: { slug: args.customerSlug },
+          include: {
+            dialogues: {
+              where: { slug: args.dialogueSlug },
+            },
+          },
+        });
+
+        const dialogue = customer?.dialogues?.[0];
+
+        return DialogueService.updateTopicBuilder({ ...args, id: dialogue?.id });
       },
     });
   },

@@ -49,25 +49,47 @@ model CustomerSettings {
 }
 
 model Customer {
-  id        String            @default(cuid()) @id
-  slug      String            @unique
-  name      String
-  settings  CustomerSettings?
-  dialogues Dialogue[]
+  id          String            @default(cuid()) @id
+  slug        String            @unique
+  name        String
+  settings    CustomerSettings?
+  dialogues   Dialogue[]
+  users       User[]
+  roles       Role[]
+  permissions Permission[]
+  triggers    Trigger[]
+  tags        Tag[]
+}
+
+enum TagType {
+  DEFAULT
+  AGENT
+  LOCATION
+}
+
+model Tag {
+  id         String     @default(cuid()) @id
+  type       TagType
+  name       String
+  isTagOf    Dialogue[] @relation(references: [id])
+  customer   Customer?  @relation(fields: [customerId], references: [id])
+  customerId String?
 }
 
 model Dialogue {
+  id           String         @default(cuid()) @id
+  title        String
+  slug         String
+  description  String
   creationDate DateTime       @default(now())
   updatedAt    DateTime?      @updatedAt
-  description  String
-  id           String         @default(cuid()) @id
+  publicTitle  String?
   customerId   String
   customer     Customer       @relation(fields: [customerId], references: [id])
-  publicTitle  String?
-  title        String
   edges        Edge[]
   questions    QuestionNode[]
   sessions     Session[]
+  tags         Tag[]
 }
 
 model QuestionNode {
@@ -89,6 +111,9 @@ model QuestionNode {
   isParentNodeOf             Edge[]           @relation("Edge_parentNodeToQuestionNode")
   isRelatedNodeOfNodeEntries NodeEntry[]
   edgeId                     String?
+  Edge                       Edge?            @relation("EdgeChildrenRelation", fields: [edgeId], references: [id])
+  QuestionOption             QuestionOption[] @relation("QuestionNodeOptions")
+  triggers                   Trigger[]
 }
 
 model Edge {
@@ -105,6 +130,7 @@ model Edge {
   dialogue                   Dialogue?           @relation(fields: [dialogueId], references: [id])
   isRelatedNodeOfNodeEntries NodeEntry[]
   questionNodeId             String?
+  QuestionNode               QuestionNode?       @relation(fields: [questionNodeId], references: [id])
 }
 
 model QuestionCondition {
@@ -114,6 +140,7 @@ model QuestionCondition {
   renderMax     Int?
   renderMin     Int?
   edgeId        String?
+  Edge          Edge?   @relation(fields: [edgeId], references: [id])
 }
 
 model QuestionOption {
@@ -123,6 +150,7 @@ model QuestionOption {
   questionId     String?
   question       QuestionNode? @relation("QuestionNodeOptions", fields: [questionId], references: [id])
   questionNodeId String?
+  QuestionNode   QuestionNode? @relation(fields: [questionNodeId], references: [id])
 }
 
 model Session {
@@ -154,4 +182,83 @@ model NodeEntryValue {
   parentNodeEntryValue   NodeEntryValue?  @relation("NodeEntryValueToNodeEntryValue", fields: [parentNodeEntryValueId], references: [id])
   multiValues            NodeEntryValue[] @relation("NodeEntryValueToNodeEntryValue")
   nodeEntryId            String?
+  NodeEntry              NodeEntry?       @relation(fields: [nodeEntryId], references: [id])
+}
+
+model Permission {
+  id                 String    @default(cuid()) @id
+  name               String
+  description        String?
+  isPermissionOfRole Role[]    @relation(references: [id])
+  Customer           Customer? @relation(fields: [customerId], references: [id])
+  customerId         String?
+}
+
+model Role {
+  id          String       @default(cuid()) @id
+  name        String
+  roleId      String?
+  permissions Permission[] @relation(references: [id])
+  User        User[]
+  Customer    Customer?    @relation(fields: [customerId], references: [id])
+  customerId  String?
+  @@unique([id, name])
+}
+
+model User {
+  id         String    @default(cuid()) @id
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime? @updatedAt
+  email      String    @unique
+  phone      String?
+  firstName  String?
+  lastName   String?
+  roleId     String
+  role       Role      @relation(fields: [roleId], references: [id])
+  Customer   Customer? @relation(fields: [customerId], references: [id])
+  customerId String?
+  triggers   Trigger[] @relation(references: [id])
+}
+
+enum TriggerType {
+  QUESTION
+  SCHEDULED
+}
+
+enum TriggerMedium {
+  EMAIL
+  PHONE
+  BOTH
+}
+
+enum TriggerConditionType {
+  LOW_THRESHOLD
+  HIGH_THRESHOLD
+  INNER_RANGE
+  OUTER_RANGE
+  TEXT_MATCH
+}
+
+model TriggerCondition {
+  id        Int                  @default(autoincrement()) @id
+  type      TriggerConditionType
+  minValue  Int?
+  maxValue  Int?
+  textValue String?
+  trigger   Trigger?             @relation(fields: [triggerId], references: [id])
+  triggerId String?
+}
+
+model Trigger {
+  id            String             @default(cuid()) @id
+  lastSent      DateTime?
+  name          String
+  type          TriggerType
+  medium        TriggerMedium
+  conditions    TriggerCondition[]
+  relatedNodeId String?
+  relatedNode   QuestionNode?      @relation(fields: [relatedNodeId], references: [id])
+  recipients    User[]
+  customer      Customer?          @relation(fields: [customerId], references: [id])
+  customerId    String?
 }

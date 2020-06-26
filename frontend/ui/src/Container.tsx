@@ -14,7 +14,10 @@ import {
   FlexProps,
   flexDirection,
   LayoutProps,
-  layout
+  layout,
+  PositionProps, 
+  position,
+  SpaceProps,
 } from 'styled-system';
 import { Div, GenericProps } from './Generics';
 
@@ -32,8 +35,8 @@ export const Container = styled(Div)<ContainerProps>`
     ${width}
   `}
 `;
-interface ExtraGridProps extends GridProps, WidthProps, LayoutProps, ColorProps, BorderProps {}
-interface ExtraFlexProps extends FlexboxProps, LayoutProps, WidthProps, BorderProps {
+interface ExtraGridProps extends GridProps, WidthProps, LayoutProps, ColorProps, BorderProps, PositionProps {}
+interface ExtraFlexProps extends FlexboxProps, LayoutProps, WidthProps, BorderProps, GridProps, PositionProps, SpaceProps, ColorProps {
   growChildren?: boolean;
 }
 
@@ -43,6 +46,10 @@ export const Flex = styled.div<ExtraFlexProps>`
     ${flexbox}
     ${layout}
     ${border}
+    ${grid}
+    ${position}
+    ${space}
+    ${color}
   `};
 `;
 
@@ -73,5 +80,6 @@ export const Grid = styled.div<ExtraGridProps>`
     ${layout}
     ${color}
     ${border}
+    ${position}
   `}
 `;

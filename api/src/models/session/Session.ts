@@ -1,10 +1,11 @@
-import { NodeEntry, NodeEntryValue, Session } from '@prisma/client';
+import { NodeEntry, NodeEntryValue, PrismaClient, Session } from '@prisma/client';
 import { extendType, inputObjectType, objectType } from '@nexus/schema';
 
 import { PaginationProps } from '../../types/generic';
 import { QuestionNodeType } from '../question/QuestionNode';
-import NodeEntryResolver from '../nodeentry/nodeentry-resolver';
-import SessionResolver from './SessionResolver';
+import { prisma } from '../../generated/prisma-client';
+import NodeEntryService from '../nodeentry/NodeEntryService';
+import SessionService from './SessionService';
 
 export const NodeEntryValueType = objectType({
   name: 'NodeEntryValue',
@@ -20,6 +21,7 @@ export const NodeEntryValueType = objectType({
       type: NodeEntryValueType,
       resolve(parent: NodeEntryValue, args: any, ctx: any) {
         const multiValues = ctx.prisma.nodeEntryValue.findMany({ where: { parentNodeEntryValueId: parent.id } });
+
         return multiValues;
       },
     });
@@ -66,6 +68,42 @@ export const SessionType = objectType({
     t.id('id');
     t.string('createdAt');
     t.string('dialogueId');
+
+    t.float('score', {
+      nullable: true,
+      async resolve(parent: Session, args: any, ctx: any) {
+        const { prisma }: { prisma: PrismaClient } = ctx;
+
+        const session = await prisma.session.findOne({
+          where: { id: parent.id },
+          include: {
+            nodeEntries: {
+              include: {
+                relatedNode: {
+                  select: {
+                    isRoot: true,
+                  },
+                },
+                values: {
+                  select: {
+                    numberValue: true,
+                    NodeEntry: {
+                      select: {
+                        depth: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        });
+
+        const nodeEntryWithValues = session?.nodeEntries.find((nodeEntry) => nodeEntry.depth === 0 && nodeEntry.relatedNode?.isRoot);
+
+        return nodeEntryWithValues?.values.find((entry) => entry.numberValue)?.numberValue;
+      },
+    });
 
     t.list.field('nodeEntries', {
       type: NodeEntryType,
@@ -145,7 +183,7 @@ export const InteractionSessionType = objectType({
   definition(t) {
     t.string('id');
     t.int('index');
-    t.float('score');
+    t.float('score', { nullable: true });
     t.int('paths');
     t.string('createdAt');
 
@@ -168,8 +206,8 @@ export const InteractionType = objectType({
   },
 });
 
-export const InteractionFilterInput = inputObjectType({
-  name: 'InteractionFilterInput',
+export const FilterInput = inputObjectType({
+  name: 'FilterInput',
   definition(t) {
     t.string('startDate', { required: false });
     t.string('endDate', { required: false });
@@ -199,13 +237,14 @@ export const getSessionAnswerFlowQuery = extendType({
       type: InteractionType,
       args: {
         where: SessionWhereUniqueInput,
-        filter: InteractionFilterInput,
+        filter: FilterInput,
       },
       async resolve(parent: any, args: any) {
         const { pageIndex, offset, limit, startDate, endDate, searchTerm }: PaginationProps = args.filter;
-        const dateRange = SessionResolver.constructDateRangeWhereInput(startDate, endDate);
+        const dateRange = SessionService.constructDateRangeWhereInput(startDate, endDate);
         const orderBy = args.filter.orderBy ? Object.assign({}, ...args.filter.orderBy) : null;
-        const { pageSessions, totalPages, resetPages } = await NodeEntryResolver.getCurrentInteractionSessions(
+
+        const { pageSessions, totalPages, resetPages } = await NodeEntryService.getCurrentInteractionSessions(
           args.where.dialogueId,
           offset,
           limit,
@@ -215,9 +254,10 @@ export const getSessionAnswerFlowQuery = extendType({
           searchTerm,
         );
 
-        const finalSessions = pageSessions.map((session, index) => ({ ...session, index }));
+        const sessionsWithIndex = pageSessions.map((session: any, index: any) => ({ ...session, index }));
+
         return {
-          sessions: finalSessions,
+          sessions: sessionsWithIndex,
           pages: !resetPages ? totalPages : 1,
           offset,
           limit,
@@ -275,7 +315,7 @@ export const uploadUserSessionMutation = extendType({
         uploadUserSessionInput: UploadUserSessionInput,
       },
       resolve(parent: any, args: any, ctx: any) {
-        const session = SessionResolver.uploadUserSession(parent, args, ctx);
+        const session = SessionService.uploadUserSession(parent, args, ctx);
         return session;
       },
     });
@@ -286,7 +326,7 @@ export default [
   SortFilterObject,
   SortFilterInputObject,
   InteractionSessionType,
-  InteractionFilterInput,
+  FilterInput,
   InteractionType,
   SessionWhereUniqueInput,
   getSessionAnswerFlowQuery,

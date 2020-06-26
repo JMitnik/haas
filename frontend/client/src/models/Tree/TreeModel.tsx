@@ -5,6 +5,7 @@ import { TreeEdgeModel, TreeEdgeProps } from './TreeEdgeModel';
 const TreeModel = types
   .model({
     id: types.identifier,
+    slug: types.string,
     title: types.string,
     publicTitle: types.maybeNull(types.string),
     nodes: types.array(TreeNodeModel),
@@ -97,7 +98,7 @@ const TreeModel = types
   }))
   .views((self) => ({
     get rootNode(): TreeNodeProps {
-      return self.nodes?.filter((node) => node.isRoot)[0];
+      return self.nodes?.filter((node) => node.isRoot)?.[0];
     },
   }));
 

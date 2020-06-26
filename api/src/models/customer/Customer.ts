@@ -1,15 +1,13 @@
-
 import { Customer, PrismaClient } from '@prisma/client';
-
-import { objectType, extendType, inputObjectType, scalarType } from '@nexus/schema';
-
 import { GraphQLUpload } from 'apollo-server-express';
+import { extendType, inputObjectType, objectType, scalarType } from '@nexus/schema';
 import cloudinary, { UploadApiResponse } from 'cloudinary';
 
 import { CustomerSettingsType } from '../settings/CustomerSettings';
-import { DialogueType } from '../questionnaire/Dialogue';
-import DialogueResolver from '../questionnaire/dialogue-resolver';
-import CustomerResolver from './customer-resolver';
+// eslint-disable-next-line import/no-cycle
+import { DialogueFilterInputType, DialogueType, DialogueWhereUniqueInput } from '../questionnaire/Dialogue';
+import CustomerService from './CustomerService';
+import DialogueService from '../questionnaire/DialogueService';
 
 export const CustomerType = objectType({
   name: 'Customer',
@@ -17,23 +15,61 @@ export const CustomerType = objectType({
     t.id('id');
     t.string('slug');
     t.string('name');
+
     t.field('settings', {
       type: CustomerSettingsType,
       resolve(parent: Customer, args: any, ctx: any) {
         const customerSettings = ctx.prisma.customerSettings.findOne(
           { where: { customerId: parent.id } },
         );
+
         return customerSettings;
       },
     });
+
+    t.field('dialogue', {
+      type: DialogueType,
+      nullable: true,
+      args: {
+        where: DialogueWhereUniqueInput,
+      },
+      async resolve(parent: any, args: any) {
+        const customerId = parent.id;
+
+        if (!customerId) {
+          return null;
+        }
+
+        if (args?.where?.slug) {
+          const dialogueSlug: string = args.where.slug;
+
+          return CustomerService.getDialogueFromCustomerBySlug(customerId, dialogueSlug);
+        }
+
+        if (args?.where?.id) {
+          const dialogueId: string = args.where.id;
+
+          return CustomerService.getDialogueFromCustomerById(customerId, dialogueId);
+        }
+
+        return null;
+      },
+    });
+
     t.list.field('dialogues', {
       type: DialogueType,
+      args: {
+        filter: DialogueFilterInputType,
+      },
       resolve(parent: Customer, args: any, ctx: any) {
-        const dialogues = ctx.prisma.dialogue.findMany({
-          where: {
-            customerId: parent.id,
-          },
+        let dialogues = ctx.prisma.dialogue.findMany({
+          where: { customerId: parent.id },
         });
+
+        if (args.filter && args.filter.searchTerm) {
+          dialogues = DialogueService.filterDialoguesBySearchTerm(dialogues, args.filter.searchTerm);
+        }
+
         return dialogues;
       },
     });
@@ -69,10 +105,10 @@ export const Upload = GraphQLUpload && scalarType({
 const CustomerCreateOptionsInput = inputObjectType({
   name: 'CustomerCreateOptions',
   definition(t) {
-    t.boolean('isSeed', { default: false, required: false });
     t.string('slug', { required: true });
     t.string('logo');
     t.string('primaryColour');
+    t.boolean('isSeed', { default: false, required: false });
     t.string('name', { required: false });
   },
 });
@@ -116,9 +152,8 @@ export const CustomerMutations = Upload && extendType({
         name: 'String',
         options: CustomerCreateOptionsInput,
       },
-      async resolve(parent: any, args: any, ctx: any) {
-        const file = await args.options.file;
-        return CustomerResolver.createCustomer(args);
+      async resolve(parent: any, args: any) {
+        return CustomerService.createCustomer(args);
       },
     });
     t.field('editCustomer', {
@@ -127,8 +162,8 @@ export const CustomerMutations = Upload && extendType({
         id: 'String',
         options: CustomerCreateOptionsInput,
       },
-      resolve(parent: any, args: any, ctx: any) {
-        return CustomerResolver.editCustomer(args);
+      resolve(parent: any, args: any) {
+        return CustomerService.editCustomer(args);
       },
     });
     t.field('deleteCustomer', {
@@ -139,7 +174,7 @@ export const CustomerMutations = Upload && extendType({
       async resolve(parent: any, args: any, ctx: any) {
         const customerId = args.where.id;
         // TODO: Check with jonathan if this is preferred for auto completion
-        const { prisma }: { prisma: PrismaClient } = ctx.prisma;
+        const { prisma }: { prisma: PrismaClient } = ctx;
 
         const customer = await ctx.prisma.customer.findOne({
           where: { id: customerId },
@@ -191,10 +226,19 @@ export const CustomerMutations = Upload && extendType({
         });
 
         if (dialogueIds.length > 0) {
-          await Promise.all(dialogueIds.map(async (dialogueId) => {
-            await DialogueResolver.deleteDialogue(dialogueId.id);
+          await Promise.all(dialogueIds.map(async (dialogueId: any) => {
+            await DialogueService.deleteDialogue(dialogueId.id);
           }));
         }
+        await prisma.tag.deleteMany({ where: { customerId } });
+
+        await prisma.triggerCondition.deleteMany({ where: { trigger: { customerId } } });
+        await prisma.trigger.deleteMany({ where: { customerId } });
+        await prisma.permission.deleteMany({ where: { customerId } });
+
+        await prisma.user.deleteMany({ where: { customerId } });
+
+        await prisma.role.deleteMany({ where: { customerId } });
 
         await ctx.prisma.customer.delete({
           where: {
@@ -252,12 +296,11 @@ export const CustomerQuery = extendType({
   },
 });
 
-const customerNexus = [
+export default [
   Upload,
   CustomersQuery,
   CustomerQuery,
   CustomerMutations,
   CustomerCreateOptionsInput,
-  CustomerType];
-
-export default customerNexus;
+  CustomerType,
+];
