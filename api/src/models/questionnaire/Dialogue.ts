@@ -9,30 +9,151 @@ import { QuestionNodeType, QuestionNodeWhereInput } from '../question/QuestionNo
 // eslint-disable-next-line import/no-cycle
 import { TagType, TagsInputType } from '../tag/Tag';
 
-import { UniqueDataResultEntry } from '../session/Session';
+import { FilterInput, InteractionType, SessionType, UniqueDataResultEntry } from '../session/Session';
 import DialogueService from './DialogueService';
+import NodeEntryService from '../nodeentry/NodeEntryService';
+import SessionService from '../session/SessionService';
+
+export const lineChartDataType = objectType({
+  name: 'lineChartDataType',
+  definition(t) {
+    t.string('x');
+    t.int('y');
+  },
+});
+
+export const topPathType = objectType({
+  name: 'topPathType',
+  definition(t) {
+    t.string('answer');
+    t.int('quantity');
+  },
+});
+
+export const DialogueStatistics = objectType({
+  name: 'DialogueStatistics',
+  definition(t) {
+    t.list.field('topPositivePath', {
+      type: topPathType,
+      nullable: true,
+    });
+
+    t.list.field('topNegativePath', {
+      type: topPathType,
+      nullable: true,
+    });
+
+    t.list.field('lineChartData', {
+      nullable: true,
+      type: lineChartDataType,
+    });
+  },
+});
 
 export const DialogueType = objectType({
   name: 'Dialogue',
   definition(t) {
     t.id('id');
     t.string('title');
+    t.string('slug');
     t.string('description');
     t.string('publicTitle', { nullable: true });
     t.string('creationDate', { nullable: true });
     t.string('updatedAt', { nullable: true });
-    t.string('averageScore', { nullable: true });
+    t.float('averageScore', {
+      nullable: true,
+      resolve(parent: any) {
+        if (!parent.id) {
+          return null;
+        }
+
+        return DialogueService.calculateAverageScore(parent.id);
+      },
+    });
+    t.int('countInteractions', {
+      nullable: true,
+      resolve(parent: any) {
+        if (!parent.id) {
+          return null;
+        }
+
+        return DialogueService.countInteractions(parent.id);
+      },
+    });
+    t.field('statistics', {
+      type: DialogueStatistics,
+      resolve(parent: Dialogue) {
+        if (!parent.id) {
+          return null;
+        }
+
+        return DialogueService.getLineData(parent.id, 7);
+      },
+    });
+
+    t.field('interactions', {
+      type: InteractionType,
+      args: {
+        filter: FilterInput,
+      },
+      async resolve(parent: Dialogue, args: any, ctx: any) {
+        const { prisma }: { prisma: PrismaClient } = ctx;
+
+        if (!parent.id) {
+          return null;
+        }
+        const { pages, pageIndex, startDate, endDate, offset, limit, searchTerm } = args?.filter;
+        const dateRange = SessionService.constructDateRangeWhereInput(startDate, endDate);
+        const orderBy = args.filter.orderBy ? Object.assign({}, ...args.filter.orderBy) : null;
+
+        const { pageSessions, totalPages, resetPages } = await NodeEntryService.getCurrentInteractionSessions(parent.id, offset, limit, pageIndex, orderBy, dateRange, searchTerm);
+
+        const sessionsWithIndex = pageSessions.map((session: any, index: any) => ({ ...session, index }));
+
+        return {
+          sessions: sessionsWithIndex,
+          pages: !resetPages ? totalPages : 1,
+          offset,
+          limit,
+          pageIndex: !resetPages ? pageIndex : 0,
+          startDate,
+          endDate,
+          orderBy: args.filter.orderBy || [],
+        };
+      },
+    });
 
     t.list.field('tags', {
       type: TagType,
       nullable: true,
+      async resolve(parent: Dialogue, args: any, ctx: any) {
+        const { prisma }: { prisma: PrismaClient } = ctx;
+
+        if (!parent.id) {
+          return null;
+        }
+
+        const dialogue = await prisma.dialogue.findOne({
+          where: { id: parent.id },
+          include: { tags: true },
+        });
+
+        return dialogue?.tags;
+      },
     });
 
-    t.field('lineChartData', {
+    t.list.field('interactionFeedItems', {
       nullable: true,
-      type: 'String', // TODO: Change to appropriate return type
-      resolve() {
-        return '';
+      type: SessionType,
+      async resolve(parent) {
+        if (!parent.id) {
+          return null;
+        }
+
+        const interactionFeedItems = await DialogueService.interactionFeedItems(parent);
+        const sliceLength = Math.min(interactionFeedItems.length, 3);
+
+        return interactionFeedItems.slice(0, sliceLength);
       },
     });
 
@@ -45,6 +166,7 @@ export const DialogueType = objectType({
             id: parent.customerId,
           },
         });
+
         return customer;
       },
     });
@@ -106,6 +228,20 @@ export const DialogueType = objectType({
       },
     });
 
+    t.list.field('sessions', {
+      type: SessionType,
+      async resolve(parent: Dialogue, args: any, ctx: any) {
+        const { prisma }: { prisma: PrismaClient } = ctx;
+
+        const dialogueWithSessions = await prisma.dialogue.findOne({
+          where: { id: parent.id },
+          include: { sessions: true },
+        });
+
+        return dialogueWithSessions?.sessions;
+      },
+    });
+
     t.list.field('leafs', {
       type: QuestionNodeType,
       resolve(parent: Dialogue, args: any, ctx: any) {
@@ -130,86 +266,32 @@ export const DialogueType = objectType({
 export const DialogueWhereUniqueInput = inputObjectType({
   name: 'DialogueWhereUniqueInput',
   definition(t) {
-    t.id('id', { required: true });
+    t.id('id');
+    t.string('slug');
   },
 });
 
-export const lineChartDataType = objectType({
-  name: 'lineChartDataType',
+export const AddDialogueInput = inputObjectType({
+  name: 'AddDialogueInput',
   definition(t) {
-    t.string('x');
-    t.int('y');
-  },
-});
-
-export const topPathType = objectType({
-  name: 'topPathType',
-  definition(t) {
-    t.string('answer');
-    t.int('quantity');
-  },
-});
-
-export const DialogueDetailResultType = objectType({
-  name: 'DialogueDetailResult',
-  definition(t) {
-    t.string('customerName');
+    t.string('customerSlug');
     t.string('title');
+    t.string('dialogueSlug');
     t.string('description');
-    t.string('creationDate');
-    t.string('updatedAt');
-    t.string('average');
-    t.int('totalNodeEntries');
-    t.list.field('timelineEntries', {
-      type: UniqueDataResultEntry,
-    });
-    t.list.field('lineChartData', {
-      nullable: true,
-      type: lineChartDataType,
-    });
-    t.list.field('topPositivePath', {
-      type: topPathType,
-      nullable: true,
-    });
-    t.list.field('topNegativePath', {
-      type: topPathType,
-      nullable: true,
+    t.string('publicTitle');
+    t.boolean('isSeed');
+    t.field('tags', {
+      type: TagsInputType,
     });
   },
 });
 
-export const getQuestionnaireDataQuery = extendType({
-  type: 'Query',
-  definition(t) {
-    t.field('getQuestionnaireData', {
-      type: DialogueDetailResultType,
-      args: {
-        dialogueId: 'String',
-        filter: 'Int',
-      },
-      async resolve(parent: any, args: any) {
-        const aggregatedData = await DialogueService.getQuestionnaireAggregatedData(parent, args);
-        const data = await DialogueService.getLineData(args.dialogueId, args.filter);
-        const result = { ...aggregatedData, ...data };
-        return result;
-      },
-    });
-  },
-});
-
-export const deleteDialogueOfCustomerMutation = extendType({
+export const DialogueMutations = extendType({
   type: 'Mutation',
   definition(t) {
     t.field('createDialogue', {
       type: DialogueType,
-      args: {
-        customerId: 'String',
-        title: 'String',
-        description: 'String',
-        publicTitle: 'String',
-        isSeed: 'Boolean',
-        tags: TagsInputType,
-      },
+      args: { data: AddDialogueInput },
       resolve(parent: any, args: any) {
         return DialogueService.createDialogue(args);
       },
@@ -276,6 +358,11 @@ export const DialoguesOfCustomerQuery = extendType({
       },
       async resolve(parent: any, args: any, ctx: any) {
         const { prisma }: { prisma: PrismaClient } = ctx;
+
+        if (args.where.slug) {
+          return;
+        }
+
         const dialogue = await prisma.dialogue.findOne({
           where: {
             id: args.where.id,
@@ -284,6 +371,7 @@ export const DialoguesOfCustomerQuery = extendType({
             tags: true,
           },
         });
+
         return dialogue;
       },
     });
@@ -310,13 +398,8 @@ export const DialoguesOfCustomerQuery = extendType({
             dialogues = DialogueService.filterDialoguesBySearchTerm(dialogues, args.filter.searchTerm);
           }
         }
-        const updatedDialogues = Promise.all(dialogues.map(async (dialogue) => {
-          const arg = { dialogueId: dialogue.id };
-          const aggregated = await DialogueService.getQuestionnaireAggregatedData(parent, arg);
-          return { ...dialogue, averageScore: aggregated.average };
-        }));
 
-        return updatedDialogues;
+        return dialogues;
       },
     });
   },
@@ -326,9 +409,8 @@ export default [
   topPathType,
   lineChartDataType,
   DialogueWhereUniqueInput,
-  deleteDialogueOfCustomerMutation,
+  DialogueMutations,
   DialogueType,
   DialoguesOfCustomerQuery,
-  DialogueDetailResultType,
-  getQuestionnaireDataQuery,
+  DialogueStatistics,
 ];

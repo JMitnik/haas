@@ -13,8 +13,7 @@ export const FormGroupContainer = styled.div`
 
 export const Form = styled.form``;
 
-export const InputGroup = styled.div`
-`;
+export const InputGroup = styled.div``;
 
 export const InputLabel = styled.label`
   ${({ theme }) => css`
@@ -79,6 +78,7 @@ export const CheckBoxLabel = styled.label`
   border-radius: 15px;
   background: #bebebe;
   cursor: pointer;
+
   &::after {
     content: "";
     display: block;
@@ -98,8 +98,10 @@ export const CheckBox = styled.input`
   border-radius: 15px;
   width: 42px;
   height: 26px;
+
   &:checked + ${CheckBoxLabel} {
     background: #3847B2;
+
     &::after {
       content: "";
       display: block;
@@ -120,29 +122,81 @@ export const Slider = forwardRef((props: SliderProps, ref: Ref<HTMLInputElement>
   </SliderContainer>
 ));
 
-export const InputField = styled.input`
+
+interface InputFieldProps extends InputHTMLAttributes<HTMLInputElement> {
+  icon?: React.ReactNode;
+  children?: React.ReactNode;
+}
+
+
+export const InputIconContainer = styled.div`
+  position: relative;
+`;
+
+export const InputFieldContainer = styled.div`
   ${({ theme }) => css`
-      border: none;
-      font-size: ${theme.fontSizes[1]}px;
-      border-radius: 50px;
-      padding: 12px 24px;
-      background: white;
-      text-align: center;
-      font-weight: bolder;
-      color: ${theme.colors.default.text};
-      text-align: left;
+    position: relative;
+    background: inherit;
+    border-radius: ${theme.borderRadiuses.rounded};
+    fill: currentColor;
 
-      &::placeholder {
-        color: #c6c6c6;
-        font-weight: 500;
-      }
+    ${InputIconContainer} {
+      width: ${theme.gutter * 0.75}px;
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      margin-left: ${theme.gutter * 0.5}px;
 
-      &:focus, &:active {
-        border: 1px solid #0059f8;
-        background: ${Color('#0059f8').mix(Color('white'), 0.9).hex()};
-        box-shadow: 0 0 0 4px ${Color('#0059f8').fade(0.8).string()};
-        outline: none !important;
+      /* Edge case: in case icon search */
+      .icon-search .primary {
+        fill: none;
       }
+    }
+
+    ${InputIconContainer} + ${StyledInput} {
+      margin-left: ${theme.gutter}px;
+    }
+  `}
+`;
+
+export const InputField = ({ icon, children, ...props }: InputFieldProps) => (
+  <InputFieldContainer>
+    {icon && (
+      <InputIconContainer>
+        {icon}
+      </InputIconContainer>
+    )}
+
+    <StyledInput {...props} />
+  </InputFieldContainer>
+)
+
+/**
+ * Temporary Deprecated: remove
+ */
+export const DeprecatedInput = styled.input`
+  ${({ theme }) => css`
+    border: none;
+    font-size: ${theme.fontSizes[1]}px;
+    border-radius: 50px;
+    padding: 12px 24px;
+    background: white;
+    text-align: center;
+    font-weight: bolder;
+    color: ${theme.colors.default.text};
+    text-align: left;
+
+    &::placeholder {
+      color: #c6c6c6;
+      font-weight: 500;
+    }
+
+    &:focus, &:active {
+      border: 1px solid #0059f8;
+      background: ${Color('#0059f8').mix(Color('white'), 0.9).hex()};
+      box-shadow: 0 0 0 4px ${Color('#0059f8').fade(0.8).string()};
+      outline: none !important;
+    }
   `}
 `;
 

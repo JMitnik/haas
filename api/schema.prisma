@@ -69,7 +69,7 @@ enum TagType {
 
 model Tag {
   id         String     @default(cuid()) @id
-  type       TagType    
+  type       TagType
   name       String
   isTagOf    Dialogue[] @relation(references: [id])
   customer   Customer?  @relation(fields: [customerId], references: [id])
@@ -77,14 +77,15 @@ model Tag {
 }
 
 model Dialogue {
+  id           String         @default(cuid()) @id
+  title        String
+  slug         String
+  description  String
   creationDate DateTime       @default(now())
   updatedAt    DateTime?      @updatedAt
-  description  String
-  id           String         @default(cuid()) @id
+  publicTitle  String?
   customerId   String
   customer     Customer       @relation(fields: [customerId], references: [id])
-  publicTitle  String?
-  title        String
   edges        Edge[]
   questions    QuestionNode[]
   sessions     Session[]

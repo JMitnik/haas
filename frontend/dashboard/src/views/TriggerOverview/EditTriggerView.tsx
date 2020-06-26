@@ -15,7 +15,7 @@ import {
 } from '@haas/ui';
 
 import editTriggerMutation from 'mutations/editTrigger';
-import getDialoguesQuery from 'queries/getQuestionnairesCustomerQuery';
+import getDialoguesQuery from 'queries/getDialoguesOfCustomer';
 import getQuestionsQuery from 'queries/getQuestionnaireQuery';
 import getRecipientsQuery from 'queries/getUsers';
 import getTriggerQuery from 'queries/getTrigger';
@@ -108,7 +108,7 @@ const MEDIUM_TYPES = [
 ];
 
 const EditTriggerView = () => {
-  const { customerId, triggerId } = useParams<{ customerId: string, triggerId: string }>();
+  const { customerId, triggerId, customerSlug } = useParams<{ customerId: string, triggerId: string, customerSlug: string }>();
 
   const { data: triggerData, error, loading } = useQuery(getTriggerQuery, {
     fetchPolicy: 'cache-and-network',
@@ -196,7 +196,7 @@ const EditTriggerForm = (
 
   const [editTrigger, { loading }] = useMutation(editTriggerMutation, {
     onCompleted: () => {
-      history.push(`/dashboard/c/${customerId}/triggers/`);
+      history.push(`/dashboard/b/${customerId}/triggers/`);
     },
     onError: (serverError: ApolloError) => {
       console.log(serverError);
@@ -525,7 +525,7 @@ const EditTriggerForm = (
 
           <Flex>
             <Button brand="primary" mr={2} type="submit">Save trigger</Button>
-            <Button brand="default" type="button" onClick={() => history.push(`/dashboard/c/${customerId}/triggers/`)}>Cancel</Button>
+            <Button brand="default" type="button" onClick={() => history.push(`/dashboard/b/${customerId}/triggers/`)}>Cancel</Button>
           </Flex>
         </Div>
       </Form>

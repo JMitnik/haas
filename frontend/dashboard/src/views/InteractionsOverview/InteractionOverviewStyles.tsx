@@ -37,9 +37,7 @@ export const OutputContainer = styled(FlexRow)`
 `;
 
 export const InteractionsOverviewContainer = styled(Div)`
-${({ theme }) => css`
-  margin-left: ${theme.gutter}px;
-  width: '100%';
-  height: '100%';
-  border: '1px solid black'
-`}`;
+  ${({ theme }) => css`
+    padding: ${theme.gutter * 2}px 0;
+  `}
+`;

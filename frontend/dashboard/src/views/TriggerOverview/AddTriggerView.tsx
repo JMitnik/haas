@@ -14,7 +14,7 @@ import {
   H4, Hr, Muted, StyledInput, StyledLabel,
 } from '@haas/ui';
 import createTriggerMutation from 'mutations/createTrigger';
-import getDialoguesQuery from 'queries/getQuestionnairesCustomerQuery';
+import getDialoguesQuery from 'queries/getDialoguesOfCustomer';
 import getQuestionsQuery from 'queries/getQuestionnaireQuery';
 import getRecipientsQuery from 'queries/getUsers';
 
@@ -59,7 +59,7 @@ const MEDIUM_TYPES = [
 const AddTriggerView = () => {
   const history = useHistory();
   const { register, handleSubmit, errors } = useForm<FormDataProps>();
-  const { customerId } = useParams();
+  const { customerId, customerSlug } = useParams();
   const { data: dialogueData } = useQuery(getDialoguesQuery, { variables: { id: customerId } });
   const { data: recipientsData } = useQuery(getRecipientsQuery, { variables: { customerId } });
   const [fetchQuestions, { data: questionsData }] = useLazyQuery(getQuestionsQuery,
@@ -80,7 +80,7 @@ const AddTriggerView = () => {
 
   const [addTrigger, { loading }] = useMutation(createTriggerMutation, {
     onCompleted: () => {
-      history.push(`/dashboard/c/${customerId}/triggers/`);
+      history.push(`/dashboard/b/${customerSlug}/triggers/`);
     },
     onError: (serverError: ApolloError) => {
       console.log(serverError);
@@ -399,7 +399,7 @@ const AddTriggerView = () => {
 
           <Flex>
             <Button brand="primary" mr={2} type="submit">Create trigger</Button>
-            <Button brand="default" type="button" onClick={() => history.push(`/dashboard/c/${customerId}/triggers/`)}>Cancel</Button>
+            <Button brand="default" type="button" onClick={() => history.push(`/dashboard/b/${customerSlug}/triggers/`)}>Cancel</Button>
           </Flex>
         </Div>
       </Form>

@@ -4,8 +4,8 @@ import React from 'react';
 
 import { ButtonIcon } from '@haas/ui/src/Buttons';
 import { ClientButton } from 'components/Buttons/Buttons';
+import { DeprecatedInput, InputGroup, InputLabel } from '@haas/ui/src/Form';
 import { Div, Grid } from '@haas/ui';
-import { InputField, InputGroup, InputLabel } from '@haas/ui/src/Form';
 import { NodeTitle } from 'layouts/NodeLayout/NodeLayoutStyles';
 
 import { GenericNodeProps } from '../types';
@@ -39,18 +39,18 @@ const RegisterNode = ({ node, onEntryStore }: RegisterNodeProps) => {
           <Grid gridTemplateColumns="1fr 1fr">
             <InputGroup>
               <InputLabel color="white">First name</InputLabel>
-              <InputField placeholder="Jane" name="multiValues[0].textValue" ref={register} />
+              <DeprecatedInput placeholder="Jane" name="multiValues[0].textValue" ref={register} />
             </InputGroup>
 
             <InputGroup>
               <InputLabel color="white">Last name</InputLabel>
-              <InputField placeholder="White" name="multiValues[1].textValue" ref={register} />
+              <DeprecatedInput placeholder="White" name="multiValues[1].textValue" ref={register} />
             </InputGroup>
           </Grid>
 
           <InputGroup>
             <InputLabel color="white">Email adress</InputLabel>
-            <InputField placeholder="janewhite@gmail.com" name="multiValues[2].textValue" ref={register} />
+            <DeprecatedInput placeholder="janewhite@gmail.com" name="multiValues[2].textValue" ref={register} />
           </InputGroup>
         </Grid>
         <Div mt={4}>

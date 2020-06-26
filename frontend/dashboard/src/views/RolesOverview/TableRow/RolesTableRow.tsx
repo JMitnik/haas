@@ -6,8 +6,7 @@ import { TableRowProps } from 'components/Table/TableTypes';
 const RolesTableRow = ({ headers, data, index, permissions }: TableRowProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const amtCells = headers.length;
-  const percentage = 100 / amtCells;
-  const templateColumns = `${percentage.toString()}% `.repeat(amtCells);
+  const templateColumns = '1fr '.repeat(amtCells);
   const activePermissionIds = data.permissions.map((permission) => permission.id);
 
   return (

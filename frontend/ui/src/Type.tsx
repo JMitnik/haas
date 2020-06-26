@@ -23,6 +23,12 @@ export const H2 = styled(GenericType).attrs({ as: 'h2' })`
   `}
 `;
 
+export const PageHeading = styled(H2)`
+  ${({ theme }) => css`
+    margin-bottom: ${theme.gutter}px;
+  `}
+`;
+
 export const H3 = styled(GenericType).attrs({ as: 'h3' })`
   ${({ theme }) => css`
     font-size: ${theme.fontSizes[3]}px;

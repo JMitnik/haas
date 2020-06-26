@@ -11,7 +11,7 @@ import SearchBar from 'components/SearchBar/SearchBar';
 import getInteractionsQuery from 'queries/getInteractionsQuery';
 
 import { CenterCell, ScoreCell, UserCell, WhenCell } from './TableCell/TableCell';
-import { InputContainer, InputOutputContainer, OutputContainer } from './InteractionOverviewStyles';
+import { InputContainer, InputOutputContainer, InteractionsOverviewContainer, OutputContainer } from './InteractionOverviewStyles';
 import Row from './TableRow/InteractionsTableRow';
 
 interface TableProps {
@@ -34,9 +34,14 @@ const HEADERS = [
 ];
 
 const InteractionsOverview = () => {
-  const { topicId, customerId } = useParams();
+  const { dialogueSlug, customerSlug } = useParams();
   const [fetchInteractions, { data }] = useLazyQuery(getInteractionsQuery, {
     fetchPolicy: 'cache-and-network',
+    onCompleted: () => {
+    },
+    onError: (error: any) => {
+      console.log(error);
+    }
   });
 
   const [paginationProps, setPaginationProps] = useState<TableProps>({
@@ -48,13 +53,14 @@ const InteractionsOverview = () => {
     sortBy: [{ id: 'id', desc: true }],
   });
 
-  const interactions = data?.interactions?.sessions || [];
+  const interactions = data?.customer?.dialogue?.interactions?.sessions || [];
 
   useEffect(() => {
     const { activeStartDate, activeEndDate, pageIndex, pageSize, sortBy, activeSearchTerm } = paginationProps;
     fetchInteractions({
       variables: {
-        dialogueId: topicId,
+        dialogueSlug,
+        customerSlug,
         filter: {
           startDate: activeStartDate,
           endDate: activeEndDate,
@@ -66,7 +72,7 @@ const InteractionsOverview = () => {
         },
       },
     });
-  }, [paginationProps, fetchInteractions, topicId]);
+  }, [paginationProps, fetchInteractions, dialogueSlug, customerSlug]);
 
   const handleSearchTermChange = useCallback(debounce((newSearchTerm: string) => {
     setPaginationProps((prevValues) => ({ ...prevValues, activeSearchTerm: newSearchTerm }));
@@ -85,19 +91,18 @@ const InteractionsOverview = () => {
     const currDate = new Date().getTime();
 
     tempLink.href = csvUrl;
-    tempLink.setAttribute('download', `${currDate}-${customerId}-${topicId}.csv`);
+    tempLink.setAttribute('download', `${currDate}-${customerSlug}-${dialogueSlug}.csv`);
     tempLink.click();
     tempLink.remove();
   };
 
-  const pageCount = data?.interactions?.pages || 1;
-  const pageIndex = data?.interactions?.pageIndex || 0;
+  const pageCount = data?.customer?.dialogue?.interactions?.pages || 1;
+  const pageIndex = data?.customer?.dialogue?.interactions?.pageIndex || 0;
 
   return (
-    <Div px="24px" py="24px" margin="0 auto" width="80%" maxHeight="100vh" overflow="scroll">
+    <InteractionsOverviewContainer>
       {/* TODO: Make a ViewTitle text-component */}
-      <H2 color="#3653e8" fontWeight={400} mb="10%"> Interactions </H2>
-      <InputOutputContainer mb="5%">
+      <InputOutputContainer mb={4}>
         <OutputContainer>
           <Div justifyContent="center" marginRight="15px">
             <Muted fontWeight="bold">Exports</Muted>
@@ -137,7 +142,7 @@ const InteractionsOverview = () => {
           CustomRow={Row}
         />
       </Div>
-    </Div>
+    </InteractionsOverviewContainer>
   );
 };
 

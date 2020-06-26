@@ -22,7 +22,7 @@ export const TagQueries = extendType({
     t.list.field('tags', {
       type: TagType,
       args: {
-        customerId: 'String',
+        customerSlug: 'String',
         dialogueId: 'String',
       },
       async resolve(parent: any, args: any) {
@@ -40,11 +40,14 @@ export const TagQueries = extendType({
           return tags;
         }
 
-        return prisma.tag.findMany({
-          where: {
-            customerId: args.customerId,
+        const customer = await prisma.customer.findOne({
+          where: { slug: args.customerSlug },
+          include: {
+            tags: true,
           },
         });
+
+        return customer?.tags;
       },
     });
   },
@@ -91,17 +94,25 @@ export const TagMutations = extendType({
       type: TagType,
       args: {
         name: 'String',
-        customerId: 'String',
+        customerSlug: 'String',
         type: TagTypeEnum,
       },
-      resolve(parent: any, args: any) {
+      async resolve(parent: any, args: any) {
+        if (!args.customerSlug) {
+          return null;
+        }
+
+        const customer = await prisma.customer.findOne({
+          where: { slug: args.customerSlug },
+        });
+
         return prisma.tag.create({
           data: {
             name: args.name,
             type: args.type,
             customer: {
               connect: {
-                id: args.customerId,
+                id: customer?.id,
               },
             },
           },

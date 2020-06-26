@@ -22,7 +22,7 @@ interface FormDataProps {
 }
 
 const EditUsersView = () => {
-  const { customerId, userId } = useParams<{ customerId: string, userId: string }>();
+  const { customerId, userId, customerSlug } = useParams<{ customerId: string, userId: string, customerSlug: string }>();
 
   const { data: userData, error, loading } = useQuery(getUserQuery, {
     fetchPolicy: 'cache-and-network',
@@ -48,7 +48,7 @@ const EditUsersView = () => {
 
 const EditCustomerForm = ({ user, roles }: { user: any, roles: Array<{ label: string, value: string }> }) => {
   const history = useHistory();
-  const { customerId, userId } = useParams<{ customerId: string, userId: string }>();
+  const { customerId, userId, customerSlug } = useParams<{ customerId: string, customerSlug: string, userId: string }>();
 
   const userRole = user?.role ? { label: user?.role?.name, value: user?.role?.id } : null;
   const [activeRole, setActiveRole] = useState<null | { label: string, value: string }>(userRole);
@@ -64,7 +64,7 @@ const EditCustomerForm = ({ user, roles }: { user: any, roles: Array<{ label: st
 
   const [editUser, { loading }] = useMutation(editUserMutation, {
     onCompleted: () => {
-      history.push(`/dashboard/c/${customerId}/users/`);
+      history.push(`/dashboard/b/${customerSlug}/users/`);
     },
     onError: (serverError: ApolloError) => {
       console.log(serverError);
@@ -147,7 +147,7 @@ const EditCustomerForm = ({ user, roles }: { user: any, roles: Array<{ label: st
 
           <Flex>
             <Button brand="primary" mr={2} type="submit">Save user</Button>
-            <Button brand="default" type="button" onClick={() => history.push(`/dashboard/c/${customerId}/users/`)}>Cancel</Button>
+            <Button brand="default" type="button" onClick={() => history.push(`/dashboard/b/${customerSlug}/users/`)}>Cancel</Button>
           </Flex>
         </Div>
       </Form>

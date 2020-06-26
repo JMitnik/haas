@@ -5,7 +5,7 @@ import { Customer, Dialogue } from 'types/generic';
 import { useQuery } from '@apollo/react-hooks';
 import { useRouteMatch } from 'react-router-dom';
 import getCustomerFromSlug from 'queries/getCustomerFromSluqQuery';
-import getDialogueQuery from 'queries/getDialogueQuery';
+import getDialogueFromSlug from 'queries/getDialogueFromSlugQuery';
 import treeStore from './DialogueTreeStore';
 
 const DialogueTreeContext = React.createContext({} as TreeStoreModelProps);
@@ -15,7 +15,9 @@ interface CustomerDataProps {
 }
 
 interface DialogueDataProps {
-  dialogue: Dialogue;
+  customer: {
+    dialogue: Dialogue;
+  }
 }
 
 export const DialogueTreeProvider = ({ children }: { children: React.ReactNode }) => {
@@ -34,15 +36,16 @@ export const DialogueTreeProvider = ({ children }: { children: React.ReactNode }
     },
   });
 
-  const dialogueMatch = useRouteMatch<any>('/:customerSlug/:dialogueId');
+  const dialogueMatch = useRouteMatch<any>('/:customerSlug/:dialogueSlug');
 
-  const { data: dialogueData } = useQuery<DialogueDataProps>(getDialogueQuery, {
+  const { data: dialogueData } = useQuery<DialogueDataProps>(getDialogueFromSlug, {
     skip: !dialogueMatch,
     onError: (e) => {
       console.log(e.message);
     },
     variables: {
-      id: dialogueMatch?.params.dialogueId,
+      dialogueSlug: dialogueMatch?.params.dialogueSlug,
+      customerSlug: dialogueMatch?.params.customerSlug,
     },
   });
 
@@ -56,7 +59,7 @@ export const DialogueTreeProvider = ({ children }: { children: React.ReactNode }
   // When dialogue changes, set initial nodes and initial edges
   useEffect(() => {
     if (dialogueData) {
-      treeStore.initTree(dialogueData.dialogue);
+      treeStore.initTree(dialogueData?.customer?.dialogue);
     }
   }, [dialogueData]);
 

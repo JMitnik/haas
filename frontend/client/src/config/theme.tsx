@@ -15,8 +15,11 @@ const theme = {
       dark: '#657590',
       darkest: '#17263d',
       muted: '#59759c',
-      text: '#030426'
-    }
+      text: '#030426',
+    },
+    app: {
+      background: '',
+    },
   },
   space: [0, 6, 12, 18, 24],
   gutter: 24,
@@ -25,23 +28,25 @@ const theme = {
   fontFamilies: {
     body: '',
     title: '',
-    special: ''
+    special: '',
   },
   buttonSizes: {
     sm: '4px 6px',
     md: '9px 14px',
-    lg: '18px 24px'
+    lg: '18px 24px',
   },
   borderRadiuses: {
     sm: '3px',
     md: '7px',
-    lg: '20px'
+    lg: '20px',
   },
   media: {
     mob: 'only screen and (max-width: 600px)',
-    desk: 'only screen and (min-width: 601px)'
+    desk: 'only screen and (min-width: 601px)',
   },
-  fontSizes: [12, 16.0, 21.33, 28.43, 37.9, 50.52]
+  fontSizes: [12, 16.0, 21.33, 28.43, 37.9, 50.52],
 };
+
+theme.colors.app.background = theme.colors.default.normal;
 
 export default theme;

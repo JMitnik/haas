@@ -23,7 +23,7 @@ yarn-error.log*
 mindmaps
 **/mindmaps/*
 **/.idea
-
+temp
 
 # dependencies
 /node_modules

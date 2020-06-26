@@ -3,6 +3,7 @@ import { Dialogue, DialogueCreateInput,
 import { isAfter, subDays } from 'date-fns';
 import _ from 'lodash';
 
+import { DialogueFilterInputType } from './Dialogue';
 import { leafNodes, sliderType } from '../../data/seeds/default-data';
 import NodeResolver from '../question/node-resolver';
 
@@ -51,30 +52,44 @@ interface QuestionProps {
   children: Array<EdgeChildProps>;
 }
 
+interface DialogueInputProps {
+  data: {
+    customerSlug: string;
+    dialogueSlug: string;
+    title: string;
+    description: string;
+    publicTitle: string;
+    isSeed: boolean;
+    tags: any;
+  }
+}
+
 class DialogueService {
   static constructDialogue(
     customerId: string,
     title: string,
+    dialogueSlug: string,
     description: string,
     publicTitle: string = '',
     tags: Array<{id: string}> = [],
   ): DialogueCreateInput {
-    return {
+    const constructDialogueFragment = {
       customer: {
-        connect: {
-          id: customerId,
-        },
+        connect: { id: customerId },
       },
       title,
+      slug: dialogueSlug,
       description,
       publicTitle,
-      questions: {
-        create: [],
-      },
-      tags: {
-        connect: tags.map((tag) => ({ id: tag.id })),
-      },
+      questions: { create: [] },
+      tags: {},
     };
+
+    if (tags.length) {
+      constructDialogueFragment.tags = { connect: tags.map((tag) => ({ id: tag.id })) };
+    }
+
+    return constructDialogueFragment;
   }
 
   static filterDialoguesBySearchTerm = (dialogues: Array<Dialogue & {
@@ -82,19 +97,16 @@ class DialogueService {
   }>, searchTerm: string) => dialogues.filter((dialogue) => {
     if (dialogue.title.toLowerCase().includes(
       searchTerm.toLowerCase(),
-    )) {
-      return true;
-    }
+    )) { return true; }
+
     if (dialogue.publicTitle?.toLowerCase().includes(
-        searchTerm.toLowerCase(),
-        )) {
-      return true;
-    }
+        searchTerm.toLowerCase()
+    )) { return true; }
+
     if (dialogue.tags.find((tag) => tag.name.toLowerCase().includes(
       searchTerm.toLowerCase(),
-    ))) {
-      return true;
-    }
+    ))) { return true; }
+
     return false;
   });
 
@@ -457,32 +469,64 @@ class DialogueService {
   static initDialogue = async (
     customerId: string,
     title: string,
+    dialogueSlug: string,
     description: string,
     publicTitle: string = '',
     tags: Array<{id: string}> = [],
-  ) => prisma.dialogue.create({
-    data: DialogueService.constructDialogue(
-      customerId, title, description, publicTitle, tags,
-    ),
-  });
+  ) => {
+    console.log('dialogueSlug', dialogueSlug);
+    console.log('title', title);
+    console.log('customerId', customerId);
 
-  static createDialogue = async (args: any): Promise<Dialogue> => {
-    const { customerId, title, description, publicTitle, isSeed, tags } = args;
+    const dialogue = prisma.dialogue.create({
+      data: DialogueService.constructDialogue(
+        customerId, title, dialogueSlug, description, publicTitle, tags,
+      ),
+    });
+
+    return dialogue;
+  };
+
+  static createDialogue = async (dialogueInputData: DialogueInputProps): Promise<Dialogue | null> => {
+    console.log('dialogueInputData', dialogueInputData);
+    const { data: { dialogueSlug, customerSlug, title, publicTitle, description, tags = [], isSeed } } = dialogueInputData;
+
     let questionnaire = null;
     const dialogueTags = tags?.entries?.length > 0
       ? tags?.entries?.map((tag: string) => ({ id: tag }))
       : [];
 
-    const customer = await prisma.customer.findOne({ where: { id: customerId } });
+    const customers = await prisma.customer.findMany({ where: { slug: customerSlug } });
+    const customer = customers?.[0];
+
+    if (!customer) {
+      return null;
+    }
 
     if (isSeed) {
       if (customer?.name) {
-        return DialogueService.seedQuestionnare(customerId, customer?.name, title, description, dialogueTags);
+        return DialogueService.seedQuestionnare(
+          customer?.id,
+          dialogueSlug,
+          customer?.name,
+          title,
+          description,
+          dialogueTags,
+        );
       }
     }
+
+    console.log('About to do initDialogue');
+
     questionnaire = await DialogueService.initDialogue(
-      customerId, title, description, publicTitle, dialogueTags,
+      customer?.id,
+      title,
+      dialogueSlug,
+      description,
+      publicTitle,
+      dialogueTags,
     );
+
     await prisma.dialogue.update({
       where: {
         id: questionnaire.id,
@@ -497,6 +541,7 @@ class DialogueService {
         },
       },
     });
+
     await NodeResolver.createTemplateLeafNodes(leafNodes, questionnaire.id);
 
     return questionnaire;
@@ -504,13 +549,14 @@ class DialogueService {
 
   static seedQuestionnare = async (
     customerId: string,
+    customerSlug: string,
     customerName: string,
     questionnaireTitle: string = 'Default questionnaire',
     questionnaireDescription: string = 'Default questions',
     tags: Array<{id: string}>,
   ): Promise<Dialogue> => {
     const questionnaire = await DialogueService.initDialogue(
-      customerId, questionnaireTitle, questionnaireDescription, '', tags,
+      customerId, customerSlug, questionnaireTitle, questionnaireDescription, '', tags,
     );
 
     const leafs = await NodeResolver.createTemplateLeafNodes(leafNodes, questionnaire.id);
@@ -577,79 +623,90 @@ class DialogueService {
     }
   };
 
-  static getQuestionnaireAggregatedData = async (parent: any, args: any) => {
-    const { dialogueId } = args;
-
-    // const customerName = (await prisma.questionnaire({ id: dialogueId }).customer()).name;
-    const customer = await (prisma.dialogue.findOne({ where: { id: dialogueId } }).customer());
-    const customerName = customer?.name;
-
-    const dialogue: Dialogue | null = (await prisma.dialogue.findOne(
-      { where: { id: dialogueId } },
-    ));
-
-    if (dialogue) {
-      const { title, description, creationDate, updatedAt } = dialogue;
-
-      const questionNodes = await prisma.questionNode.findMany({
-        where: {
-          questionDialogueId: dialogueId,
-        },
-      });
-
-      const questionNodeIds = questionNodes.map((qNode) => qNode.id);
-
-      const nodeEntries = await prisma.nodeEntry.findMany({
-        where: {
-          relatedNodeId: {
-            in: questionNodeIds,
+  static calculateAverageScore = async (dialogueId: string) => {
+    const dialogue = await prisma.dialogue.findOne({
+      where: { id: dialogueId },
+      include: {
+        sessions: {
+          include: {
+            nodeEntries: {
+              include: {
+                values: {
+                  include: {
+                    multiValues: {
+                      select: {
+                        numberValue: true,
+                      },
+                    },
+                  },
+                },
+                relatedNode: true,
+              },
+            },
           },
         },
-      }) || [];
+      },
+    });
 
-      const aggregatedNodeEntries = await Promise.all(nodeEntries.map(async ({ id }) => {
-        const values = await prisma.nodeEntry.findOne({ where: { id } }).values();
-        const nodeEntry = await prisma.nodeEntry.findOne({ where: { id } });
-        const session = (await prisma.nodeEntry.findOne({ where: { id } }).session());
-        const sessionId = session?.id;
+    // For each session, get the node-entry with isRoot (for now)
+    const scores = dialogue?.sessions.map(
+      (session) => session.nodeEntries.find(
+        (entry) => entry.relatedNode?.isRoot,
+      )?.values.find(
+        (val) => val.numberValue
+      )?.numberValue).filter((val) => val);
 
-        const mappedResult = {
-          sessionId,
-          createdAt: nodeEntry?.creationDate,
-          value: values[0].numberValue ? values[0].numberValue : -1,
-        };
-        return mappedResult;
-      })) || [];
+    const averageScore = _.mean(scores) || null;
 
-      const filterNodes = aggregatedNodeEntries.filter((node) => node?.value !== -1) || [];
+    return averageScore || null;
+  };
 
-      const filteredNodeData = (filterNodes.map((node) => node?.value)) || [];
+  static countInteractions = async (dialogueId: string) => {
+    const dialogue = await prisma.dialogue.findOne({
+      where: { id: dialogueId },
+      include: {
+        sessions: true,
+      },
+    });
 
-      const nrEntries = filteredNodeData.reduce(
-        (total = 0, previousValue) => total + previousValue, 0,
-      );
+    return dialogue?.sessions.length;
+  };
 
-      const averageSliderResult = (
-        filteredNodeData.length > 0 && nrEntries / filteredNodeData.length).toString()
-        || 'N/A';
+  static interactionFeedItems = async (parent: Dialogue) => {
+    const sessions = await prisma.session.findMany({
+      where: {
+        dialogueId: parent.id,
+      },
+      include: {
+        nodeEntries: {
+          include: {
+            relatedNode: {
+              select: {
+                isRoot: true,
+              },
+            },
+            values: {
+              select: {
+                numberValue: true,
+                NodeEntry: {
+                  select: {
+                    depth: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
 
-      const orderedTimelineEntries = _.orderBy(filterNodes,
-        (filterNode) => filterNode.createdAt, 'desc') || [];
+    const sessionsWithOnlyRoots = sessions.map((session) => (
+      session?.nodeEntries.find((nodeEntry) => nodeEntry.depth === 0 && nodeEntry.relatedNode?.isRoot) ? session : null));
 
-      return {
-        customerName,
-        title,
-        timelineEntries: orderedTimelineEntries,
-        description,
-        creationDate,
-        updatedAt,
-        average: averageSliderResult,
-        totalNodeEntries: filterNodes.length,
-      };
-    }
-
-    // TODO: What will we return here?
-    return {};
+    return sessionsWithOnlyRoots.filter((session) => session);
   };
 }
 

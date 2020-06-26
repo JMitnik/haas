@@ -35,7 +35,7 @@ const HEADERS = [
 ];
 
 const UsersOverview = () => {
-  const { customerId } = useParams();
+  const { customerId, customerSlug } = useParams();
   const history = useHistory();
   const [fetchUsers, { data }] = useLazyQuery(getUsersQuery, { fetchPolicy: 'cache-and-network' });
   const [paginationProps, setPaginationProps] = useState<TableProps>(
@@ -95,12 +95,12 @@ const UsersOverview = () => {
 
   const handleEditUser = (event: any, userId: string) => {
     event.stopPropagation();
-    history.push(`/dashboard/c/${customerId}/u/${userId}/edit`);
+    history.push(`/dashboard/b/${customerSlug}/u/${userId}/edit`);
   };
 
   const handleAddUser = (event: any) => {
     event.stopPropagation();
-    history.push(`/dashboard/c/${customerId}/users/add/`);
+    history.push(`/dashboard/b/${customerSlug}/users/add/`);
   };
 
   const handleSearchTermChange = useCallback(debounce((newSearchTerm: string) => {

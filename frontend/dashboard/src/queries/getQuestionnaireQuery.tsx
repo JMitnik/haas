@@ -1,22 +1,26 @@
 /* eslint-disable import/prefer-default-export */
 import gql from 'graphql-tag';
+
 import QuestionFragment from './QuestionFragment';
 
 export const getTopicBuilderQuery = gql`
-  query getTopicBuilder ($topicId: ID!) {
-    dialogue(where: { id: $topicId }) {
+  query getTopicBuilder ($customerSlug: String!, $dialogueSlug: String!) {
+    customer(slug: $customerSlug) {
       id
-      title
-      publicTitle
-      creationDate
-      updatedAt
-      leafs {
-          id
-          title
-          type
-      }
-      questions {
-        ...QuestionFragment
+      dialogue(where: { slug: $dialogueSlug }) {
+        id
+        title
+        publicTitle
+        creationDate
+        updatedAt
+        leafs {
+            id
+            title
+            type
+        }
+        questions {
+          ...QuestionFragment
+        }
       }
     }
   }

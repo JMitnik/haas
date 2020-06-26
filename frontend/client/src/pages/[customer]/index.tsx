@@ -35,7 +35,7 @@ const CustomerPage = () => {
 
   useEffect(() => {
     if (data) {
-      history.push(`/${customerSlug}/${data?.customer?.dialogues?.[0].id}`);
+      history.push(`/${customerSlug}/${data?.customer?.dialogues?.[0].slug}`);
     }
   }, [data, customerSlug, history]);
 

@@ -6,8 +6,7 @@ import { TableRowProps } from 'components/Table/TableTypes';
 const TableRow = ({ headers, data, index }: TableRowProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const nrCells = headers.length;
-  const percentage = 100 / nrCells;
-  const templateColumns = `${percentage.toString()}% `.repeat(nrCells);
+  const templateColumns = '1fr '.repeat(nrCells);
 
   return (
     <Grid

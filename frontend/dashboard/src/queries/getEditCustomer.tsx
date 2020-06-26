@@ -1,17 +1,17 @@
 import gql from 'graphql-tag';
 
 const getEditCustomerData = gql`
-  query getEditCustomer($id: ID!) {
-    customer(id: $id) {
+  query getEditCustomer($customerSlug: String!) {
+    customer(slug: $customerSlug) {
       id
       name
       slug
       settings {
-      logoUrl
-      colourSettings {
-        primary
+        logoUrl
+        colourSettings {
+          primary
+        }
       }
-    }
     }
   }
 `;

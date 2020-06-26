@@ -1,8 +1,8 @@
 import gql from 'graphql-tag';
 
 const updateTopicBuilder = gql`
-  mutation updateTopicBuilder($id: String!, $topicData: TopicDataEntry) {
-    updateTopicBuilder(id: $id, topicData: $topicData) 
+  mutation updateTopicBuilder($dialogueSlug: String!, $customerSlug: String!, $topicData: TopicDataEntry) {
+    updateTopicBuilder(dialogueSlug: $dialogueSlug, customerSlug: $customerSlug, topicData: $topicData) 
   }
 `;
 
