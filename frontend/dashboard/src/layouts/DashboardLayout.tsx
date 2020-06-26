@@ -62,11 +62,11 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                 <UsersIcon />
                 Users
               </NavItem>
-              <NavItem to={`/dashboard/b/${customerSlug}/notifications`}>
+              <NavItem to={`/dashboard/b/${customerSlug}/triggers`}>
                 <NotificationIcon />
                 Alerts
               </NavItem>
-              <NavItem to={`/dashboard/b/${customerSlug}/settings`}>
+              <NavItem to={`/dashboard/b/${customerSlug}/edit`}>
                 <SettingsIcon />
                 Settings
               </NavItem>

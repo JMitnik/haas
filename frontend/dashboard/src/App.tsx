@@ -53,21 +53,21 @@ const AppRoutes = () => (
             />
 
             <Route
-              path="/dashboard/b/:customerSlug/notifications/add"
+              path="/dashboard/b/:customerSlug/triggers/add"
               render={() => (
                 <AddTriggerView />
               )}
             />
 
             <Route
-              path="/dashboard/b/:customerSlug/notifications/:triggerId/edit"
+              path="/dashboard/b/:customerSlug/triggers/:triggerId/edit"
               render={() => (
                 <EditTriggerView />
               )}
             />
 
             <Route
-              path="/dashboard/b/:customerSlug/notifications"
+              path="/dashboard/b/:customerSlug/triggers"
               render={() => <TriggersOverview />}
             />
 

@@ -93,7 +93,7 @@ const DialogueBuilderView = () => {
       const rootQuestion = questionData && questionData.filter((question) => question.isRoot);
       setActiveExpanded(rootQuestion.map((question) => question.id));
     }
-  }, [data]);
+  }, [data, dialogueData]);
 
   if (!data || loading) {
     return <Loader />;

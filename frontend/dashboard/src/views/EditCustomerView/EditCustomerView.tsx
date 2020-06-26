@@ -23,11 +23,11 @@ interface FormDataProps {
 }
 
 const EditCustomerView = () => {
-  const { customerId } = useParams();
+  const { customerSlug } = useParams();
 
   const { data: customerData, error, loading } = useQuery(getEditCustomerData, {
     variables: {
-      id: customerId,
+      customerSlug,
     },
   });
 
