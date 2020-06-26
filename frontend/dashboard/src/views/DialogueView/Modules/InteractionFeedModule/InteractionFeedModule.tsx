@@ -24,8 +24,6 @@ const InteractionFeedModule = ({
 
   // TODO: Set setActiveSession on a context, so you dont pass it as prop around
   const viewTimeLine = (timelineEntry: any) => {
-    // history.push(`/dashboard/c/${customerId}/t/${topicId}`, { modal: true });
-    // onActiveSessionChange(timelineEntry.sessionId);
   };
 
   return (

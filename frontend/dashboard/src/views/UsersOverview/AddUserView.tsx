@@ -22,14 +22,14 @@ interface FormDataProps {
 const AddUserView = () => {
   const history = useHistory();
   const { register, handleSubmit, errors } = useForm<FormDataProps>();
-  const { customerId } = useParams();
+  const { customerId, customerSlug } = useParams();
 
   const [activeRole, setActiveRole] = useState<null | { label: string, value: string }>(null);
 
   const { data } = useQuery(getRolesQuery, { variables: { customerId } });
   const [addUser, { loading }] = useMutation(createAddMutation, {
     onCompleted: () => {
-      history.push(`/dashboard/c/${customerId}/users/`);
+      history.push(`/dashboard/b/${customerSlug}/users/`);
     },
     onError: (serverError: ApolloError) => {
       console.log(serverError);
@@ -116,7 +116,7 @@ const AddUserView = () => {
 
           <Flex>
             <Button brand="primary" mr={2} type="submit">Create user</Button>
-            <Button brand="default" type="button" onClick={() => history.push(`/dashboard/c/${customerId}/users/`)}>Cancel</Button>
+            <Button brand="default" type="button" onClick={() => history.push(`/dashboard/b/${customerSlug}/users/`)}>Cancel</Button>
           </Flex>
         </Div>
       </Form>

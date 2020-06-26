@@ -35,7 +35,7 @@ const HEADERS = [
 ];
 
 const TriggersOverview = () => {
-  const { customerId } = useParams();
+  const { customerId, customerSlug } = useParams();
   const history = useHistory();
   const [fetchTriggers, { data }] = useLazyQuery(getTriggerTableQuery, { fetchPolicy: 'cache-and-network' });
   const [paginationProps, setPaginationProps] = useState<TableProps>(
@@ -96,12 +96,12 @@ const TriggersOverview = () => {
 
   const handleEditEntry = (event: any, entryId: string) => {
     event.stopPropagation();
-    history.push(`/dashboard/c/${customerId}/n/${entryId}/edit`);
+    history.push(`/dashboard/b/${customerSlug}/n/${entryId}/edit`);
   };
 
   const handleAddUser = (event: any) => {
     event.stopPropagation();
-    history.push(`/dashboard/c/${customerId}/triggers/add/`);
+    history.push(`/dashboard/b/${customerSlug}/triggers/add/`);
   };
 
   const handleSearchTermChange = useCallback(debounce((newSearchTerm: string) => {

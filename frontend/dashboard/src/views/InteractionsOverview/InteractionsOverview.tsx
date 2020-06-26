@@ -38,14 +38,11 @@ const InteractionsOverview = () => {
   const [fetchInteractions, { data }] = useLazyQuery(getInteractionsQuery, {
     fetchPolicy: 'cache-and-network',
     onCompleted: () => {
-      console.log('Yeaaaaah');
     },
     onError: (error: any) => {
       console.log(error);
     }
   });
-
-  console.log(data);
 
   const [paginationProps, setPaginationProps] = useState<TableProps>({
     activeStartDate: null,
