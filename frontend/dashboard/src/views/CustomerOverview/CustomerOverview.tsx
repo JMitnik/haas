@@ -77,14 +77,16 @@ const CustomerCard = ({ customer }: { customer: any }) => {
       onClick={() => setCustomerSlug(customer.slug)}
     >
       <CardBody flex="100%">
-        <EditButtonContainer onClick={(e) => setCustomerEditPath(e, customer.id)}>
-          <Edit />
-        </EditButtonContainer>
-        <DeleteButtonContainer
-          onClick={(e) => deleteClickedCustomer(e, customer.id)}
-        >
-          <X />
-        </DeleteButtonContainer>
+        <Div>
+          <EditButtonContainer onClick={(e) => setCustomerEditPath(e, customer.id)}>
+            <Edit />
+          </EditButtonContainer>
+          <DeleteButtonContainer
+            onClick={(e) => deleteClickedCustomer(e, customer.id)}
+          >
+            <X />
+          </DeleteButtonContainer>
+        </Div>
         <Flex alignItems="center" justifyContent="space-between">
           <H3 fontWeight={500}>
             {customer.name}
