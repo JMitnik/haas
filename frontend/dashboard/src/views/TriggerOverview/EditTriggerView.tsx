@@ -309,7 +309,8 @@ const EditTriggerForm = (
     ];
   };
 
-  const questions = questionsData?.dialogue?.questions && questionsData?.dialogue?.questions.map((question: any) => (
+  const questions = questionsData?.customer?.dialogue?.questions
+  && questionsData?.customer?.dialogue?.questions?.map((question: any) => (
     { label: question?.title, value: question?.id }));
 
   const recipientOptions = recipientsData?.users.map((recipient: any) => ({
@@ -408,7 +409,7 @@ const EditTriggerForm = (
                           <X />
                         </DeleteButtonContainer>
                         <Select
-                          options={setConditionTypeOptions(activeQuestion?.value, questionsData?.dialogue?.questions)}
+                          options={setConditionTypeOptions(activeQuestion?.value, questionsData?.customer?.dialogue?.questions)}
                           value={condition.type}
                           onChange={(qOption: any) => setConditionsType(qOption, index)}
                         />
