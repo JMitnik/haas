@@ -94,7 +94,6 @@ const UsersOverview = () => {
   };
 
   const handleEditUser = (event: any, userId: string) => {
-    console.log('userId: ', userId);
     event.stopPropagation();
     history.push(`/dashboard/b/${customerSlug}/u/${userId}/edit`);
   };
