@@ -34,8 +34,8 @@ export interface NexusGenInputs {
   CustomerCreateOptions: { // input type
     isSeed?: boolean | null; // Boolean
     logo?: string | null; // String
-    name?: string | null; // String
-    primaryColour?: string | null; // String
+    name: string; // String!
+    primaryColour: string; // String!
     slug: string; // String!
   }
   CustomerWhereUniqueInput: { // input type

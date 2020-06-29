@@ -3,11 +3,13 @@ import { GraphQLUpload } from 'apollo-server-express';
 import { extendType, inputObjectType, objectType, scalarType } from '@nexus/schema';
 import cloudinary, { UploadApiResponse } from 'cloudinary';
 
+import { GraphQLError } from 'graphql';
 import { CustomerSettingsType } from '../settings/CustomerSettings';
 // eslint-disable-next-line import/no-cycle
 import { DialogueFilterInputType, DialogueType, DialogueWhereUniqueInput } from '../questionnaire/Dialogue';
 import CustomerService from './CustomerService';
 import DialogueService from '../questionnaire/DialogueService';
+import isValidColor from '../../utils/isValidColor';
 
 export const CustomerType = objectType({
   name: 'Customer',
@@ -107,9 +109,9 @@ const CustomerCreateOptionsInput = inputObjectType({
   definition(t) {
     t.string('slug', { required: true });
     t.string('logo');
-    t.string('primaryColour');
+    t.string('primaryColour', { required: true });
     t.boolean('isSeed', { default: false, required: false });
-    t.string('name', { required: false });
+    t.string('name', { required: true });
   },
 });
 
@@ -153,6 +155,14 @@ export const CustomerMutations = Upload && extendType({
         options: CustomerCreateOptionsInput,
       },
       async resolve(parent: any, args: any) {
+        const primaryColor: string = args?.options?.primaryColor;
+        if (primaryColor) {
+          try {
+            isValidColor(primaryColor);
+          } catch (err) {
+            throw new GraphQLError('Color is invalid due to err');
+          }
+        }
         return CustomerService.createCustomer(args);
       },
     });
@@ -163,6 +173,14 @@ export const CustomerMutations = Upload && extendType({
         options: CustomerCreateOptionsInput,
       },
       resolve(parent: any, args: any) {
+        const primaryColor: string = args?.options?.primaryColor;
+        if (primaryColor) {
+          try {
+            isValidColor(primaryColor);
+          } catch (err) {
+            throw new GraphQLError('Color is invalid due to err');
+          }
+        }
         return CustomerService.editCustomer(args);
       },
     });
@@ -278,7 +296,7 @@ export const CustomerQuery = extendType({
         slug: 'String',
       },
       async resolve(parent: any, args: any, ctx: any): Promise<Customer | null> {
-        const { prisma } : { prisma: PrismaClient } = ctx;
+        const { prisma }: { prisma: PrismaClient } = ctx;
 
         if (args.slug) {
           const customer = await prisma.customer.findOne({ where: { slug: args.slug } });
