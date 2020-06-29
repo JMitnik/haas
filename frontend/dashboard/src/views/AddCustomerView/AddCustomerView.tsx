@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-
+import * as yup from 'yup';
 import { ApolloError } from 'apollo-boost';
 import {
   Button, Container, Div, Flex, Form, FormGroupContainer, Grid,
@@ -8,6 +7,7 @@ import {
 import { useForm } from 'react-hook-form';
 import { useHistory } from 'react-router';
 import { useMutation } from '@apollo/react-hooks';
+import React, { useState } from 'react';
 
 import { createNewCustomer } from '../../mutations/createNewCustomer';
 import { getCustomerQuery } from '../../queries/getCustomersQuery';
@@ -22,9 +22,19 @@ interface FormDataProps {
   seed?: boolean;
 }
 
+const schema = yup.object().shape({
+  name: yup.string().required(),
+  logo: yup.string().url(),
+  slug: yup.string().required(),
+  primaryColour: yup.string().required().matches(/^(#(\d|\D){6}$){1}/,
+    { message: 'Provided colour is not a valid hexadecimal' }),
+});
+
 const AddCustomerView = () => {
   const history = useHistory();
-  const { register, handleSubmit, errors } = useForm<FormDataProps>();
+  const { register, handleSubmit, errors } = useForm<FormDataProps>({
+    validationSchema: schema,
+  });
   const [activePreview, setActivePreview] = useState('');
 
   const [uploadFile] = useMutation(uploadSingleImage, {
@@ -94,17 +104,17 @@ const AddCustomerView = () => {
                 <Div useFlex flexDirection="column">
                   <StyledLabel>Logo</StyledLabel>
                   <StyledInput name="logo" ref={register({ required: false })} />
-                  {errors.name && <Muted color="warning">Something went wrong!</Muted>}
+                  {errors.logo && <Muted color="warning">{errors.logo.message}</Muted>}
                 </Div>
                 <Div useFlex flexDirection="column">
                   <StyledLabel>Slug</StyledLabel>
                   <StyledInput name="slug" ref={register({ required: true })} />
-                  {errors.name && <Muted color="warning">Something went wrong!</Muted>}
+                  {errors.slug && <Muted color="warning">Something went wrong!</Muted>}
                 </Div>
                 <Div useFlex flexDirection="column">
                   <StyledLabel>Primary colour</StyledLabel>
                   <StyledInput name="primaryColour" ref={register({ required: true })} />
-                  {errors.name && <Muted color="warning">Something went wrong!</Muted>}
+                  {errors.primaryColour && <Muted color="warning">{errors.primaryColour.message}</Muted>}
                 </Div>
                 <Div useFlex flexDirection="column">
                   <StyledLabel>Logo (Cloudinary)</StyledLabel>

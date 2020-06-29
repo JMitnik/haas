@@ -108,7 +108,7 @@ const MEDIUM_TYPES = [
 ];
 
 const EditTriggerView = () => {
-  const { customerId, triggerId, customerSlug } = useParams<{ customerId: string, triggerId: string, customerSlug: string }>();
+  const { triggerId, customerSlug } = useParams<{triggerId: string, customerSlug: string }>();
 
   const { data: triggerData, error, loading } = useQuery(getTriggerQuery, {
     fetchPolicy: 'cache-and-network',
@@ -118,20 +118,20 @@ const EditTriggerView = () => {
   });
 
   const { data: dialogueData, loading: dialoguesLoading } = useQuery(getDialoguesQuery,
-    { variables: { id: customerId } });
+    { variables: { customerSlug } });
 
   if (loading || dialoguesLoading) return null;
   if (error) return <><p>{error.message}</p></>;
 
-  const trigger: Trigger = triggerData?.trigger;
+  const trigger: any = triggerData?.trigger;
 
   const capitalizedType = `${trigger?.type.charAt(0)}${trigger?.type.slice(1).toLowerCase()}`;
   const activeType = { label: capitalizedType, value: trigger?.type };
 
   const conditions: Array<PostMapTriggerCondition> = trigger?.conditions.map(
-    (condition) => ({ ...condition,
+    (condition: any) => ({ ...condition,
       type: { label: condition.type, value: condition.type } }));
-  const activeRecipients = trigger?.recipients?.map((recipient) => ({
+  const activeRecipients = trigger?.recipients?.map((recipient: any) => ({
     label: `${recipient?.lastName}, ${recipient?.firstName} - E: ${recipient?.email} - P: ${recipient?.phone}`,
     value: recipient?.id,
   }));
@@ -141,13 +141,13 @@ const EditTriggerView = () => {
 
   const activeQuestion = { label: trigger.relatedNode?.title || '', value: trigger.relatedNode?.id || '' };
 
-  const dialogues: Array<{ label: string, value: string }> = dialogueData?.dialogues
-  && dialogueData?.dialogues.map((dialogue: any) => (
-    { label: dialogue?.title, value: dialogue?.id }));
+  const dialogues: Array<{ label: string, value: string }> = dialogueData?.customer?.dialogues
+  && dialogueData?.customer?.dialogues.map((dialogue: any) => (
+    { label: dialogue?.title, value: dialogue?.slug }));
 
   const currentDialogue = dialogues?.find(
-    (dialogue) => trigger?.relatedNode?.questionDialogueId
-    && dialogue.value === trigger?.relatedNode?.questionDialogueId);
+    (dialogue) => trigger?.relatedNode?.questionDialogue?.slug
+    && dialogue.value === trigger?.relatedNode?.questionDialogue?.slug);
 
   return (
     <EditTriggerForm
@@ -175,8 +175,8 @@ const EditTriggerForm = (
 ) => {
   const history = useHistory();
   const { register, handleSubmit, errors } = useForm<FormDataProps>();
-  const { customerId } = useParams();
-  const { data: recipientsData } = useQuery(getRecipientsQuery, { variables: { customerId } });
+  const { customerId, customerSlug } = useParams();
+  const { data: recipientsData } = useQuery(getRecipientsQuery, { variables: { customerSlug } });
   const [fetchQuestions, { data: questionsData }] = useLazyQuery(
     getQuestionsQuery, { fetchPolicy: 'cache-and-network' },
   );
@@ -190,13 +190,13 @@ const EditTriggerForm = (
 
   useEffect(() => {
     if (activeDialogue) {
-      fetchQuestions({ variables: { topicId: activeDialogue.value } });
+      fetchQuestions({ variables: { customerSlug, dialogueSlug: activeDialogue.value } });
     }
   }, [activeDialogue, fetchQuestions]);
 
   const [editTrigger, { loading }] = useMutation(editTriggerMutation, {
     onCompleted: () => {
-      history.push(`/dashboard/b/${customerId}/triggers/`);
+      history.push(`/dashboard/b/${customerSlug}/triggers/`);
     },
     onError: (serverError: ApolloError) => {
       console.log(serverError);
@@ -309,7 +309,8 @@ const EditTriggerForm = (
     ];
   };
 
-  const questions = questionsData?.dialogue?.questions && questionsData?.dialogue?.questions.map((question: any) => (
+  const questions = questionsData?.customer?.dialogue?.questions
+  && questionsData?.customer?.dialogue?.questions?.map((question: any) => (
     { label: question?.title, value: question?.id }));
 
   const recipientOptions = recipientsData?.users.map((recipient: any) => ({
@@ -408,7 +409,7 @@ const EditTriggerForm = (
                           <X />
                         </DeleteButtonContainer>
                         <Select
-                          options={setConditionTypeOptions(activeQuestion?.value, questionsData?.dialogue?.questions)}
+                          options={setConditionTypeOptions(activeQuestion?.value, questionsData?.customer?.dialogue?.questions)}
                           value={condition.type}
                           onChange={(qOption: any) => setConditionsType(qOption, index)}
                         />

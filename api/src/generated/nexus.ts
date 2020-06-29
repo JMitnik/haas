@@ -34,8 +34,8 @@ export interface NexusGenInputs {
   CustomerCreateOptions: { // input type
     isSeed?: boolean | null; // Boolean
     logo?: string | null; // String
-    name?: string | null; // String
-    primaryColour?: string | null; // String
+    name: string; // String!
+    primaryColour: string; // String!
     slug: string; // String!
   }
   CustomerWhereUniqueInput: { // input type
@@ -504,6 +504,7 @@ export interface NexusGenFieldTypes {
     options: NexusGenRootTypes['QuestionOption'][]; // [QuestionOption!]!
     overrideLeaf: NexusGenRootTypes['QuestionNode'] | null; // QuestionNode
     overrideLeafId: string | null; // String
+    questionDialogue: NexusGenRootTypes['Dialogue'] | null; // Dialogue
     questionDialogueId: string; // String!
     title: string; // String!
     type: string; // String!
@@ -639,13 +640,13 @@ export interface NexusGenArgTypes {
       type?: NexusGenEnums['TagTypeEnum'] | null; // TagTypeEnum
     }
     createTrigger: { // args
-      customerId?: string | null; // String
+      customerSlug?: string | null; // String
       questionId?: string | null; // String
       recipients?: NexusGenInputs['RecipientsInputType'] | null; // RecipientsInputType
       trigger?: NexusGenInputs['TriggerInputType'] | null; // TriggerInputType
     }
     createUser: { // args
-      id?: string | null; // String
+      customerSlug?: string | null; // String
       input?: NexusGenInputs['UserInput'] | null; // UserInput
     }
     deleteCustomer: { // args
@@ -732,7 +733,7 @@ export interface NexusGenArgTypes {
       where?: NexusGenInputs['QuestionNodeWhereUniqueInput'] | null; // QuestionNodeWhereUniqueInput
     }
     roles: { // args
-      customerId?: string | null; // String
+      customerSlug?: string | null; // String
     }
     roleTable: { // args
       customerId?: string | null; // String
@@ -752,23 +753,23 @@ export interface NexusGenArgTypes {
       triggerId?: string | null; // String
     }
     triggers: { // args
-      customerId?: string | null; // String
+      customerSlug?: string | null; // String
       dialogueId?: string | null; // String
       filter?: NexusGenInputs['FilterInput'] | null; // FilterInput
       userId?: string | null; // String
     }
     triggerTable: { // args
-      customerId?: string | null; // String
+      customerSlug?: string | null; // String
       filter?: NexusGenInputs['FilterInput'] | null; // FilterInput
     }
     user: { // args
       userId?: string | null; // String
     }
     users: { // args
-      customerId?: string | null; // String
+      customerSlug?: string | null; // String
     }
     userTable: { // args
-      customerId?: string | null; // String
+      customerSlug?: string | null; // String
       filter?: NexusGenInputs['FilterInput'] | null; // FilterInput
     }
   }

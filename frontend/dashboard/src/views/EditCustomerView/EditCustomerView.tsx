@@ -1,3 +1,4 @@
+import * as yup from 'yup';
 import { ApolloError } from 'apollo-boost';
 import { useForm } from 'react-hook-form';
 import { useHistory, useParams } from 'react-router';
@@ -22,6 +23,14 @@ interface FormDataProps {
   cloudinary?: string;
 }
 
+const schema = yup.object().shape({
+  name: yup.string().required(),
+  logo: yup.string().url(),
+  slug: yup.string().required(),
+  primaryColour: yup.string().required().matches(/^(#(\d|\D){6}$){1}/,
+    { message: 'Provided colour is not a valid hexadecimal' }),
+});
+
 const EditCustomerView = () => {
   const { customerSlug } = useParams();
 
@@ -45,6 +54,7 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
   const [activePreviewUrl, setActivePreviewUrl] = useState<null | string>(null);
 
   const { register, handleSubmit, errors } = useForm<FormDataProps>({
+    validationSchema: schema,
     defaultValues: {
       name: customer.name,
       logo: customer.settings?.logoUrl,
@@ -121,17 +131,17 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
                 <Div useFlex flexDirection="column">
                   <StyledLabel>Logo</StyledLabel>
                   <StyledInput name="logo" ref={register({ required: true })} />
-                  {errors.name && <Muted color="warning">Something went wrong!</Muted>}
+                  {errors.logo && <Muted color="warning">Something went wrong!</Muted>}
                 </Div>
                 <Div useFlex flexDirection="column">
                   <StyledLabel>Slug</StyledLabel>
                   <StyledInput name="slug" ref={register({ required: true })} />
-                  {errors.name && <Muted color="warning">Something went wrong!</Muted>}
+                  {errors.slug && <Muted color="warning">Something went wrong!</Muted>}
                 </Div>
                 <Div useFlex flexDirection="column">
                   <StyledLabel>Primary colour</StyledLabel>
                   <StyledInput name="primaryColour" ref={register({ required: true })} />
-                  {errors.name && <Muted color="warning">Something went wrong!</Muted>}
+                  {errors.primaryColour && <Muted color="warning">Something went wrong!</Muted>}
                 </Div>
                 <Div useFlex flexDirection="column">
                   <StyledLabel>Logo (Cloudinary)</StyledLabel>

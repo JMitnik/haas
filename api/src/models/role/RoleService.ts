@@ -48,9 +48,11 @@ class RoleService {
     };
   };
 
-  static roles = async (customerId: string) => {
+  static roles = async (customerSlug: string) => {
     const roles = await prisma.role.findMany({
-      where: { customerId },
+      where: { Customer: {
+        slug: customerSlug,
+      } },
       include: {
         permissions: true,
       },

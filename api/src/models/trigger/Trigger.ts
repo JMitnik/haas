@@ -64,7 +64,14 @@ const TriggerType = objectType({
       nullable: true,
       resolve(parent: Trigger, args: any, ctx: any) {
         if (parent.relatedNodeId) {
-          return prisma.questionNode.findOne({ where: { id: parent.relatedNodeId } });
+          return prisma.questionNode.findOne({ where: { id: parent.relatedNodeId },
+            include: {
+              questionDialogue: {
+                select: {
+                  slug: true,
+                },
+              },
+            } });
         }
         return null;
       },
@@ -179,7 +186,7 @@ const TriggerMutations = extendType({
     t.field('createTrigger', {
       type: TriggerType,
       args: {
-        customerId: 'String',
+        customerSlug: 'String',
         questionId: 'String',
         recipients: RecipientsInputType,
         trigger: TriggerInputType,
@@ -191,8 +198,8 @@ const TriggerMutations = extendType({
 
         // TODO: Put this in the TriggerService
 
-        if (args.customerId) {
-          createArgs.customer = { connect: { id: args.customerId } };
+        if (args.customerSlug) {
+          createArgs.customer = { connect: { slug: args.customerSlug } };
         }
 
         if (args.questionId) {
@@ -242,14 +249,14 @@ const TriggerQueries = extendType({
     t.field('triggerTable', {
       type: TriggerTableType,
       args: {
-        customerId: 'String',
+        customerSlug: 'String',
         filter: FilterInput,
       },
       async resolve(parent: any, args: any, ctx: any) {
         const { pageIndex, offset, limit, searchTerm, orderBy }: PaginationProps = args.filter;
 
         if (args.filter) {
-          return TriggerService.paginatedTriggers(args.customerId, pageIndex, offset, limit, orderBy[0], searchTerm);
+          return TriggerService.paginatedTriggers(args.customerSlug, pageIndex, offset, limit, orderBy[0], searchTerm);
         }
 
         const users = await prisma.trigger.findMany({ where: { customerId: args.customerId } });
@@ -271,7 +278,7 @@ const TriggerQueries = extendType({
     t.list.field('triggers', {
       type: TriggerType,
       args: {
-        customerId: 'String',
+        customerSlug: 'String',
         dialogueId: 'String',
         userId: 'String',
         filter: FilterInput,
@@ -293,10 +300,12 @@ const TriggerQueries = extendType({
           return TriggerService.findTriggersByDialogueId(args.dialogueId);
         }
 
-        if (args.customerId) {
+        if (args.customerSlug) {
           return prisma.trigger.findMany({
             where: {
-              customerId: args.customerId,
+              customer: {
+                slug: args.customerSlug,
+              },
             },
           });
         }

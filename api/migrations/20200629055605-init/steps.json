@@ -3,6 +3,15 @@
   "steps": [
     {
       "tag": "CreateEnum",
+      "enum": "TagType",
+      "values": [
+        "DEFAULT",
+        "AGENT",
+        "LOCATION"
+      ]
+    },
+    {
+      "tag": "CreateEnum",
       "enum": "TriggerType",
       "values": [
         "QUESTION",
@@ -624,6 +633,13 @@
       "arity": "List"
     },
     {
+      "tag": "CreateField",
+      "model": "Customer",
+      "field": "tags",
+      "type": "Tag",
+      "arity": "List"
+    },
+    {
       "tag": "CreateModel",
       "model": "Tag"
     },
@@ -673,6 +689,13 @@
     {
       "tag": "CreateField",
       "model": "Tag",
+      "field": "type",
+      "type": "TagType",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Tag",
       "field": "name",
       "type": "String",
       "arity": "Required"
@@ -680,9 +703,9 @@
     {
       "tag": "CreateField",
       "model": "Tag",
-      "field": "dialogue",
+      "field": "isTagOf",
       "type": "Dialogue",
-      "arity": "Optional"
+      "arity": "List"
     },
     {
       "tag": "CreateDirective",
@@ -690,7 +713,7 @@
         "path": {
           "tag": "Field",
           "model": "Tag",
-          "field": "dialogue"
+          "field": "isTagOf"
         },
         "directive": "relation"
       }
@@ -702,21 +725,7 @@
         "path": {
           "tag": "Field",
           "model": "Tag",
-          "field": "dialogue"
-        },
-        "directive": "relation"
-      },
-      "argument": "fields",
-      "value": "[dialogueId]"
-    },
-    {
-      "tag": "CreateArgument",
-      "location": {
-        "tag": "Directive",
-        "path": {
-          "tag": "Field",
-          "model": "Tag",
-          "field": "dialogue"
+          "field": "isTagOf"
         },
         "directive": "relation"
       },
@@ -726,13 +735,123 @@
     {
       "tag": "CreateField",
       "model": "Tag",
-      "field": "dialogueId",
+      "field": "customer",
+      "type": "Customer",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "Tag",
+          "field": "customer"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "Tag",
+          "field": "customer"
+        },
+        "directive": "relation"
+      },
+      "argument": "fields",
+      "value": "[customerId]"
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "Tag",
+          "field": "customer"
+        },
+        "directive": "relation"
+      },
+      "argument": "references",
+      "value": "[id]"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Tag",
+      "field": "customerId",
       "type": "String",
       "arity": "Optional"
     },
     {
       "tag": "CreateModel",
       "model": "Dialogue"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Dialogue",
+      "field": "id",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "Dialogue",
+          "field": "id"
+        },
+        "directive": "default"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "Dialogue",
+          "field": "id"
+        },
+        "directive": "default"
+      },
+      "argument": "",
+      "value": "cuid()"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "Dialogue",
+          "field": "id"
+        },
+        "directive": "id"
+      }
+    },
+    {
+      "tag": "CreateField",
+      "model": "Dialogue",
+      "field": "title",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Dialogue",
+      "field": "slug",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Dialogue",
+      "field": "description",
+      "type": "String",
+      "arity": "Required"
     },
     {
       "tag": "CreateField",
@@ -787,52 +906,9 @@
     {
       "tag": "CreateField",
       "model": "Dialogue",
-      "field": "description",
+      "field": "publicTitle",
       "type": "String",
-      "arity": "Required"
-    },
-    {
-      "tag": "CreateField",
-      "model": "Dialogue",
-      "field": "id",
-      "type": "String",
-      "arity": "Required"
-    },
-    {
-      "tag": "CreateDirective",
-      "location": {
-        "path": {
-          "tag": "Field",
-          "model": "Dialogue",
-          "field": "id"
-        },
-        "directive": "default"
-      }
-    },
-    {
-      "tag": "CreateArgument",
-      "location": {
-        "tag": "Directive",
-        "path": {
-          "tag": "Field",
-          "model": "Dialogue",
-          "field": "id"
-        },
-        "directive": "default"
-      },
-      "argument": "",
-      "value": "cuid()"
-    },
-    {
-      "tag": "CreateDirective",
-      "location": {
-        "path": {
-          "tag": "Field",
-          "model": "Dialogue",
-          "field": "id"
-        },
-        "directive": "id"
-      }
+      "arity": "Optional"
     },
     {
       "tag": "CreateField",
@@ -886,20 +962,6 @@
       },
       "argument": "references",
       "value": "[id]"
-    },
-    {
-      "tag": "CreateField",
-      "model": "Dialogue",
-      "field": "publicTitle",
-      "type": "String",
-      "arity": "Optional"
-    },
-    {
-      "tag": "CreateField",
-      "model": "Dialogue",
-      "field": "title",
-      "type": "String",
-      "arity": "Required"
     },
     {
       "tag": "CreateField",

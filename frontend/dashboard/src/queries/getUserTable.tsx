@@ -1,8 +1,8 @@
 import gql from 'graphql-tag';
 
 const getUsersQuery = gql`
-  query getUserTable($customerId: String!,$filter: FilterInput) {
-    userTable(customerId: $customerId, filter: $filter) {
+  query getUserTable($customerSlug: String!,$filter: FilterInput) {
+    userTable(customerSlug: $customerSlug, filter: $filter) {
       users {
         id
         email

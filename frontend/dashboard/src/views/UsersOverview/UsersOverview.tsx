@@ -54,7 +54,7 @@ const UsersOverview = () => {
     const { activeStartDate, activeEndDate, pageIndex, pageSize, sortBy, activeSearchTerm } = paginationProps;
     fetchUsers({
       variables: {
-        customerId,
+        customerSlug,
         filter: {
           startDate: activeStartDate,
           endDate: activeEndDate,
@@ -66,11 +66,11 @@ const UsersOverview = () => {
         },
       },
     });
-  }, [customerId, fetchUsers, paginationProps]);
+  }, [customerSlug, fetchUsers, paginationProps]);
 
   const [deleteUser] = useMutation(deleteUserQuery, {
     refetchQueries: [{ query: getUsersQuery,
-      variables: { customerId,
+      variables: { customerSlug,
         filter: {
           startDate: paginationProps.activeStartDate,
           endDate: paginationProps.activeEndDate,

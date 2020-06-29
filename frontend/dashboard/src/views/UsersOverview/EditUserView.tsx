@@ -33,7 +33,7 @@ const EditUsersView = () => {
 
   const { data: rolesData, loading: rolesLoading } = useQuery(getRolesQuery, {
     variables: {
-      customerId,
+      customerSlug,
     },
   });
 
@@ -42,7 +42,7 @@ const EditUsersView = () => {
 
   const user = userData?.user;
   const roles: Array<any> = rolesData?.roles;
-  const mappedRoles = roles.map((role) => ({ label: role.name, value: role.id }));
+  const mappedRoles = roles?.map((role) => ({ label: role.name, value: role.id }));
   return <EditCustomerForm user={user} roles={mappedRoles} />;
 };
 
