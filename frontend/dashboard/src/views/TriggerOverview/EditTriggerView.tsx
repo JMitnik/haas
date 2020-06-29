@@ -108,7 +108,7 @@ const MEDIUM_TYPES = [
 ];
 
 const EditTriggerView = () => {
-  const { customerId, triggerId, customerSlug } = useParams<{ customerId: string, triggerId: string, customerSlug: string }>();
+  const { triggerId, customerSlug } = useParams<{triggerId: string, customerSlug: string }>();
 
   const { data: triggerData, error, loading } = useQuery(getTriggerQuery, {
     fetchPolicy: 'cache-and-network',

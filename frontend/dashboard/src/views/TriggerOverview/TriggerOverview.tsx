@@ -33,7 +33,7 @@ const HEADERS = [
 ];
 
 const TriggersOverview = () => {
-  const { customerId, customerSlug } = useParams();
+  const { customerSlug } = useParams();
   const history = useHistory();
   const [fetchTriggers, { data }] = useLazyQuery(getTriggerTableQuery, { fetchPolicy: 'cache-and-network' });
   const [paginationProps, setPaginationProps] = useState<TableProps>(
