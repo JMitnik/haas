@@ -5,13 +5,13 @@ import { Div } from '@haas/ui';
 import useDebounce from 'hooks/useDebounce';
 
 interface SearchBarProps {
-  activeSearchTerm: string;
+  activeSearchTerm?: string;
   onSearchTermChange: (newSearchTerm: string) => void;
 }
 
-const SearchBar = ({ activeSearchTerm, onSearchTermChange }: SearchBarProps) => {
+const SearchBar = ({ onSearchTermChange }: SearchBarProps) => {
   const [isActive, setIsActive] = useState(false);
-  const [searchTerm, setSearchTerm] = useState<string>(activeSearchTerm);
+  const [searchTerm, setSearchTerm] = useState<string>('');
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
   useEffect(() => {
@@ -29,7 +29,7 @@ const SearchBar = ({ activeSearchTerm, onSearchTermChange }: SearchBarProps) => 
       {isActive && (
         <Div useFlex alignItems="center">
           <input
-            defaultValue={activeSearchTerm}
+            defaultValue={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
           <XCircle onClick={() => setIsActive(false)} color="#6d767d" style={{ marginLeft: '10px' }} />

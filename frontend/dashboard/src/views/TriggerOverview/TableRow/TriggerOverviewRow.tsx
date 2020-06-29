@@ -117,7 +117,7 @@ const UserRow = ({ headers, data, index, onDeleteEntry, onEditEntry }: TableRowP
               <Div width="100%" marginBottom="15px">
                 <H4 color="#999999">RECIPIENTS</H4>
                 <H5 color="#c0bcbb" marginBottom={5}>The recipients who will receive this specific trigger</H5>
-                {data.recipients && (
+                {/* {data.recipients && (
                   <Table
                     onPaginationChange={() => null}
                     paginationProps={{ ...paginationProps, pageCount: 1, pageIndex: 0 }}
@@ -126,7 +126,7 @@ const UserRow = ({ headers, data, index, onDeleteEntry, onEditEntry }: TableRowP
                     hidePagination
                     disableSorting
                   />
-                )}
+                )} */}
 
               </Div>
             </Div>

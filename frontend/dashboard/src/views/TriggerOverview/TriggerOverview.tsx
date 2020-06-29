@@ -122,8 +122,13 @@ const TriggersOverview = () => {
       <Div backgroundColor="#fdfbfe" mb="1%" height="65%" overflowX="hidden" overflowY="auto">
         <Table
           headers={HEADERS}
-          paginationProps={{ ...paginationProps, pageCount, pageIndex }}
-          onPaginationChange={setPaginationProps}
+          paginationProps={{
+            ...paginationProps,
+            pageCount,
+            pageIndex,
+            orderBy: [{ id: 'id', desc: true }],
+            sortBy: [],
+          }} // FIXME: REMOVE THIS GARBAGE (sortBy and orderBy)
           onDeleteEntry={handleDeleteUser}
           onEditEntry={handleEditEntry}
           onAddEntry={handleAddUser}

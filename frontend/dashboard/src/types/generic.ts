@@ -2,7 +2,15 @@ export interface DataGridProps {
   pageIndex: number;
   pageSize: number;
   pageCount: number;
-  sortBy: Array<any>;
+  orderBy: Array<any>;
+  sortBy?: Array<any>;
+}
+
+export interface InteractionGridProps {
+  pageIndex: number;
+  pageSize: number;
+  pageCount: number;
+  orderBy: Array<any>;
 }
 
 export interface TableProps {
@@ -11,7 +19,7 @@ export interface TableProps {
   activeSearchTerm: string;
   pageIndex: number;
   pageSize: number;
-  sortBy: {
+  orderBy: {
     id: string;
     desc: boolean;
   }[]

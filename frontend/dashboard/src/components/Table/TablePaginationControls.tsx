@@ -6,7 +6,7 @@ interface PaginationProps {
   pageIndex: number;
   pageSize: number;
   pageCount: number;
-  sortBy: Array<any>;
+  orderBy: Array<any>;
 }
 
 interface TablePaginationControlsProps {

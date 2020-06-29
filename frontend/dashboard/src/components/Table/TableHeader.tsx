@@ -31,7 +31,8 @@ interface TableHeaderProps {
     desc: boolean;
   }[];
   onAddEntry?: (event: any) => void;
-  onPaginationChange: React.Dispatch<React.SetStateAction<TableProps>>;
+  onSortChange?: (accessor: string) => void;
+  onPaginationChange?: React.Dispatch<React.SetStateAction<TableProps>> | undefined;
   disableSorting?: boolean;
 }
 
@@ -47,7 +48,7 @@ const AddNewUser = styled(Div)`
   }
 `;
 
-const TableHeader = ({ sortProperties, headers, onPaginationChange, onAddEntry, disableSorting }: TableHeaderProps) => {
+const TableHeader = ({ sortProperties, headers, onPaginationChange, onSortChange, onAddEntry, disableSorting }: TableHeaderProps) => {
   const nrHeaders = headers.length;
   const percentage = 100 / nrHeaders;
   const templateColumns = `${percentage.toString()}% `.repeat(nrHeaders);
@@ -66,6 +67,7 @@ const TableHeader = ({ sortProperties, headers, onPaginationChange, onAddEntry, 
         <TableHeaderColumn
           disableSorting={disableSorting}
           sortProperties={sortProperties}
+          onSortChange={onSortChange}
           onPaginationChange={onPaginationChange}
           accessor={header.accessor}
           value={header.Header}

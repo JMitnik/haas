@@ -17,10 +17,11 @@ interface TableInputProps {
   data: Array<any>;
   CustomRow?: (props: TableRowProps) => JSX.Element;
   permissions?: Array<any>;
-  onPaginationChange: React.Dispatch<React.SetStateAction<TableProps>>;
   onDeleteEntry?: (event: any, userId: string) => void;
   onEditEntry?: (event: any, userId: string) => void;
   onAddEntry?: (event: any) => void;
+  onSortChange?: (accessor: string) => void;
+  onPageChange?: (newPageIndex: number) => void;
   paginationProps: DataGridProps;
   hidePagination?: boolean;
   disableSorting?: boolean;
@@ -30,26 +31,27 @@ const Table = (
   { headers,
     data,
     paginationProps,
-    onPaginationChange,
     onAddEntry,
     CustomRow,
     onEditEntry,
     onDeleteEntry,
+    onSortChange,
+    onPageChange,
     permissions,
     hidePagination,
     disableSorting }: TableInputProps,
 ) => {
   const handlePage = (newPageIndex: number) => {
-    if (onPaginationChange) {
-      onPaginationChange((prevValues) => ({ ...prevValues, pageIndex: newPageIndex }));
+    if (onPageChange) {
+      onPageChange(newPageIndex);
     }
   };
 
   return (
     <Grid gridRowGap={2}>
       <TableHeader
-        sortProperties={paginationProps.sortBy}
-        onPaginationChange={onPaginationChange}
+        sortProperties={paginationProps.orderBy}
+        onSortChange={onSortChange}
         headers={headers}
         onAddEntry={onAddEntry}
         disableSorting={disableSorting}

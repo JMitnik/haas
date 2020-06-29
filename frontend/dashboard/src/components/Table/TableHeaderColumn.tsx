@@ -8,7 +8,8 @@ interface TableHeaderColumnProps {
     id: string;
     desc: boolean;
   }[];
-  onPaginationChange: React.Dispatch<React.SetStateAction<TableProps>>;
+  onSortChange?: (accessor: string) => void;
+  onPaginationChange?: React.Dispatch<React.SetStateAction<TableProps>>;
   disableSorting?: boolean;
 }
 
@@ -25,39 +26,25 @@ interface TableProps {
 }
 
 const TableHeaderColumn = (
-  { sortProperties, accessor, value, onPaginationChange, disableSorting }: TableHeaderColumnProps,
-) => {
-  const handleSort = () => {
-    if (!disableSorting) {
-      onPaginationChange((prevValues) => {
-        const { sortBy } = prevValues;
-        const newOrderBy = sortBy?.[0]?.id === accessor
-          ? [{ id: sortBy?.[0]?.id, desc: !sortBy?.[0]?.desc }]
-          : [{ id: accessor, desc: true }];
-        return { ...prevValues, sortBy: newOrderBy };
-      });
-    }
-  };
-
-  return (
-    <Div
-      onClick={handleSort}
-      useFlex
-      flexDirection="row"
-      justifyContent="center"
-      alignItems="center"
-      borderRadius="10px 0 0 10px"
-    >
-      <Div display="inline-block" padding="10px">
-        <H3 color="#6d767d">
-          {value}
-        </H3>
-      </Div>
-      <Span>
-        {(sortProperties[0].id === accessor && !disableSorting) ? (sortProperties[0].desc ? '🔽' : '🔼') : ''}
-      </Span>
+  { sortProperties, accessor, value, onPaginationChange, onSortChange, disableSorting }: TableHeaderColumnProps,
+) => (
+  <Div
+    onClick={() => onSortChange && onSortChange(accessor)}
+    useFlex
+    flexDirection="row"
+    justifyContent="center"
+    alignItems="center"
+    borderRadius="10px 0 0 10px"
+  >
+    <Div display="inline-block" padding="10px">
+      <H3 color="#6d767d">
+        {value}
+      </H3>
     </Div>
-  );
-};
+    <Span>
+      {(sortProperties[0].id === accessor && !disableSorting) ? (sortProperties[0].desc ? '🔽' : '🔼') : ''}
+    </Span>
+  </Div>
+);
 
 export default TableHeaderColumn;

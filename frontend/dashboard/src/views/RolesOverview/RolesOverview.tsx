@@ -71,8 +71,13 @@ const RolesOverview = () => {
       <Div backgroundColor="#fdfbfe" mb="1%" height="65%">
         <Table
           headers={HEADERS}
-          paginationProps={{ ...paginationProps, pageCount, pageIndex }}
-          onPaginationChange={setPaginationProps}
+          paginationProps={{
+            ...paginationProps,
+            pageCount,
+            pageIndex,
+            orderBy: [{ id: 'id', desc: true }],
+            sortBy: [],
+          }} // FIXME: REMOVE THIS GARBAGE (sortBy and orderBy)
           data={tableData}
           permissions={permissions}
           CustomRow={Row}
