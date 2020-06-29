@@ -9,7 +9,15 @@ const main = async () => {
   const app = express();
 
   const corsOptions: CorsOptions = {
-    origin: [config.clientUrl, config.dashboardUrl],
+    // Hardcoded for the moment
+
+    origin: (origin, callback) => {
+      const validOrigins = ['haas-dashboard.netlify.app', 'haas-client.netlify.app'];
+
+      if (origin && validOrigins.find((origin: string) => origin.endsWith(origin))) {
+        callback(null, true);
+      }
+    },
     credentials: true,
   };
 
@@ -17,7 +25,7 @@ const main = async () => {
 
   apollo.applyMiddleware({
     app,
-    cors: corsOptions,
+    cors: false,
   });
 
   app.listen(config.port);
