@@ -9,11 +9,11 @@ import {
 } from '@haas/ui';
 import { Edit, Plus, X } from 'react-feather';
 import { Link, useHistory } from 'react-router-dom';
-import isValidColour from '../../utils/isValidColor';
 
 import { CustomerCardImage, CustomerOverviewContainer } from './CustomerOverviewStyles';
 import { deleteFullCustomerQuery } from '../../mutations/deleteFullCustomer';
 import { getCustomerQuery } from '../../queries/getCustomersQuery';
+import { isValidColor } from '../../utils/ColorUtils';
 
 const CustomerOverview = ({ customers }: { customers: any[] }) => (
   <CustomerOverviewContainer>
@@ -69,7 +69,7 @@ const CustomerCard = ({ customer }: { customer: any }) => {
     event.stopPropagation();
   };
 
-  const primaryColor = isValidColour(customer.settings?.colourSettings.primary)
+  const primaryColor = isValidColor(customer.settings?.colourSettings.primary)
     ? Color(customer.settings?.colourSettings.primary)
     : Color('white');
 

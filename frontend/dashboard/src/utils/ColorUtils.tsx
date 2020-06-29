@@ -12,6 +12,3 @@ export const isValidColor = (color: string) => {
   }
   return true;
 };
-
-export default isValidColor;
-
