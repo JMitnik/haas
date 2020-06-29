@@ -70,7 +70,7 @@ const CustomerCard = ({ customer }: { customer: any }) => {
   };
 
   const primaryColor = isValidColour(customer.settings?.colourSettings.primary)
-    ? Color(customer.settings?.colourSettings.primary || 'white')
+    ? Color(customer.settings?.colourSettings.primary)
     : Color('white');
 
   return (
