@@ -10,11 +10,11 @@ export const registrationType: NodeType = 'REGISTRATION';
 export const leafNodes = [
   {
     title:
-      'We are happy about your positive feedback. You matter to us! Leave your email below to receive our newsletter.',
+      'We are happy about your positive feedback. You matter to us! Leave your contact details below to receive our newsletter.',
     type: textboxType,
   },
   {
-    title: 'Thank you for your elaborate feedback. Kindly appreciated bruv!',
+    title: 'Thank you for your elaborate feedback. Kindly appreciated!',
     type: socialShareType,
   },
   {
@@ -58,7 +58,7 @@ export const leafNodes = [
   },
   {
     title:
-      'Thank you for your feedback. Our customer experience supervisor is informed. Please leave your number below so we can solve the issue.',
+      'Thank you for your feedback. Our customer experience supervisor is informed. Please leave your email below so we can solve the issue.',
     type: registrationType,
   },
   {
@@ -78,7 +78,7 @@ export const leafNodes = [
   },
   {
     title:
-      'Thank you! Please leave your number below so we can reach out to you with a solution.',
+      'Thank you! Please leave your contact details below so we can reach out to you with a solution.',
     type: registrationType,
   },
 ];
