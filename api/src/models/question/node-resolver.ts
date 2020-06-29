@@ -1,5 +1,5 @@
 import { PrismaClient, QuestionNode, QuestionNodeCreateInput } from '@prisma/client';
-import { sliderType, multiChoiceType } from '../../data/seeds/default-data';
+import { multiChoiceType, sliderType } from '../../data/seeds/default-data';
 import EdgeResolver from '../edge/edge-resolver';
 
 const prisma = new PrismaClient();
@@ -433,7 +433,7 @@ class NodeResolver {
     // Positive Sub sub child 4 (Customer Support)
     const yourEmailBelowForNewsletter = NodeResolver.getCorrectLeaf(leafs,
       'your email below to receive our newsletter');
-    await NodeResolver.createQuestionNode(
+    const whatDidYouToCustomerSupport = await NodeResolver.createQuestionNode(
       'What exactly did you like about the customer support?', questionnaireId,
       multiChoiceType, customerSupportOptions, false, yourEmailBelowForNewsletter,
     );
@@ -447,7 +447,7 @@ class NodeResolver {
     );
 
     // Neutral Sub sub child 1 (Facilities)
-    await NodeResolver.createQuestionNode('Please specify.',
+    const whatWouldYouLikeToTalkAboutToFacilities = await NodeResolver.createQuestionNode('Please specify.',
       questionnaireId, multiChoiceType, facilityOptions);
 
     // Neutral Sub sub child 2 (Website)
@@ -520,14 +520,14 @@ class NodeResolver {
     await EdgeResolver.createEdge(rootToWhatDidYou, whatDidYouToProduct,
       { conditionType: 'match', matchValue: 'Product/Services', renderMin: null, renderMax: null });
 
-    await EdgeResolver.createEdge(rootToWhatDidYou, whatDidYouToProduct,
+    await EdgeResolver.createEdge(rootToWhatDidYou, whatDidYouToCustomerSupport,
       { conditionType: 'match', matchValue: 'Customer Support', renderMin: null, renderMax: null });
 
     // Neutral edges
     await EdgeResolver.createEdge(rootQuestion, rootToWhatWouldYouLikeToTalkAbout,
       { conditionType: 'valueBoundary', matchValue: null, renderMin: 50, renderMax: 70 });
 
-    await EdgeResolver.createEdge(rootToWhatWouldYouLikeToTalkAbout, whatDidYouToFacilities,
+    await EdgeResolver.createEdge(rootToWhatWouldYouLikeToTalkAbout, whatWouldYouLikeToTalkAboutToFacilities,
       { conditionType: 'match', matchValue: 'Facilities', renderMin: null, renderMax: null });
 
     await EdgeResolver.createEdge(rootToWhatWouldYouLikeToTalkAbout,
