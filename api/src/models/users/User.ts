@@ -54,7 +54,7 @@ export const UserQueries = extendType({
   definition(t) {
     t.field('userTable', {
       type: UserTable,
-      args: { customerId: 'String', filter: FilterInput },
+      args: { customerSlug: 'String', filter: FilterInput },
       async resolve(parent: any, args: any, ctx: any) {
         const { pageIndex, offset, limit, searchTerm, orderBy }: PaginationProps = args.filter;
 
@@ -62,7 +62,9 @@ export const UserQueries = extendType({
           return UserService.paginatedUsers(args.customerId, pageIndex, offset, limit, orderBy[0], searchTerm);
         }
 
-        const users = await prisma.user.findMany({ where: { customerId: args.customerId } });
+        const users = await prisma.user.findMany({ where: { Customer: {
+          slug: args.customerSlug,
+        } } });
         const totalPages = Math.ceil(users.length / limit);
 
         return { users, pageIndex, totalPages };
@@ -71,9 +73,9 @@ export const UserQueries = extendType({
 
     t.list.field('users', {
       type: UserType,
-      args: { customerId: 'String' },
+      args: { customerSlug: 'String' },
       resolve(parent: any, args: any, ctx: any) {
-        return prisma.user.findMany({ where: { customerId: args.customerId } });
+        return prisma.user.findMany({ where: { Customer: { slug: args.customerSlug } } });
       },
     });
 
@@ -92,7 +94,7 @@ export const UserMutations = extendType({
   definition(t) {
     t.field('createUser', {
       type: UserType,
-      args: { id: 'String',
+      args: { customerSlug: 'String',
         input: UserInput },
       resolve(parent: any, args: any, ctx: any) {
         const { firstName, lastName, email, phone, roleId } = args.input;
@@ -109,7 +111,7 @@ export const UserMutations = extendType({
             },
             Customer: {
               connect: {
-                id: args.id,
+                slug: args.customerSlug,
               },
             },
           },

@@ -40,7 +40,6 @@ export const RoleType = objectType({
       },
     });
 
-
     t.field('customer', {
       type: CustomerType,
       resolve(parent: Role, args: any, ctx: any) {
@@ -90,7 +89,7 @@ export const RoleQueries = extendType({
       type: RoleTableType,
       args: {
         customerId: 'String',
-        filter: FilterInput
+        filter: FilterInput,
       },
       async resolve(parent: any, args: any, ctx: any) {
         const { pageIndex, offset, limit }: PaginationProps = args.filter;
@@ -105,9 +104,9 @@ export const RoleQueries = extendType({
 
     t.list.field('roles', {
       type: RoleType,
-      args: { customerId: 'String' },
+      args: { customerSlug: 'String' },
       resolve(parent: any, args: any, ctx: any) {
-        return RoleService.roles(args.customerId);
+        return RoleService.roles(args.customerSlug);
       },
     });
   },
@@ -154,7 +153,7 @@ export const RoleMutations = extendType({
 
         const updateRole = await prisma.role.update({
           where: {
-            id: roleId
+            id: roleId,
           },
           data: {
             permissions: {

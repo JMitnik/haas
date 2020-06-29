@@ -1,8 +1,8 @@
 import gql from 'graphql-tag';
 
 const getTriggersQuery = gql`
-  query getTriggers($customerId: String, $userId: String, $filter: FilterInput) {
-    triggers(customerId: $customerId, userId: $userId, , filter: $filter) {
+  query getTriggers($customerSlug: String, $userId: String, $filter: FilterInput) {
+    triggers(customerSlug: $customerSlug, userId: $userId, , filter: $filter) {
         id
         name
         medium

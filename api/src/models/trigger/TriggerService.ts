@@ -58,7 +58,7 @@ class TriggerService {
     : entries.slice(offset, entries.length));
 
   static paginatedTriggers = async (
-    customerId: string,
+    customerSlug: string,
     pageIndex: number,
     offset: number,
     limit: number,
@@ -66,7 +66,7 @@ class TriggerService {
     searchTerm: string,
   ) => {
     let needPageReset = false;
-    const triggerWhereInput: TriggerWhereInput = { customerId };
+    const triggerWhereInput: TriggerWhereInput = { customer: { slug: customerSlug } };
     const searchTermFilter = TriggerService.getSearchTermFilter(searchTerm);
 
     if (searchTermFilter.length > 0) {

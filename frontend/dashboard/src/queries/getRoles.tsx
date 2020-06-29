@@ -1,8 +1,8 @@
 import gql from 'graphql-tag';
 
 const getRolesQuery = gql`
-  query getRoles($customerId: String!) {
-    roles(customerId: $customerId) {
+  query getRoles($customerSlug: String!) {
+    roles(customerSlug: $customerSlug) {
         id
         name
     }

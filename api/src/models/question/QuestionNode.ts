@@ -1,6 +1,7 @@
-import { QuestionNode } from '@prisma/client';
-import { objectType, extendType, inputObjectType } from '@nexus/schema';
+import { PrismaClient, QuestionNode } from '@prisma/client';
+import { DialogueType } from '../questionnaire/Dialogue';
 import { EdgeType } from '../edge/Edge';
+import { extendType, inputObjectType, objectType } from '@nexus/schema';
 
 export const QuestionOptionType = objectType({
   name: 'QuestionOption',
@@ -23,6 +24,19 @@ export const QuestionNodeType = objectType({
     t.string('type');
     t.string('overrideLeafId', { nullable: true });
     t.string('questionDialogueId');
+
+    t.field('questionDialogue', {
+      type: DialogueType,
+      nullable: true,
+      resolve(parent: QuestionNode, args: any, ctx: any, info: any) {
+        const { prisma } : { prisma: PrismaClient } = ctx;
+        return prisma.dialogue.findOne({
+          where: {
+            id: parent.questionDialogueId,
+          },
+        });
+      },
+    });
     t.field('overrideLeaf', {
       type: QuestionNodeType,
       nullable: true,

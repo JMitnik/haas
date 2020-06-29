@@ -3,8 +3,8 @@ import { GraphQLUpload } from 'apollo-server-express';
 import { extendType, inputObjectType, objectType, scalarType } from '@nexus/schema';
 import cloudinary, { UploadApiResponse } from 'cloudinary';
 
-import { GraphQLError } from 'graphql';
 import { CustomerSettingsType } from '../settings/CustomerSettings';
+import { GraphQLError } from 'graphql';
 // eslint-disable-next-line import/no-cycle
 import { DialogueFilterInputType, DialogueType, DialogueWhereUniqueInput } from '../questionnaire/Dialogue';
 import CustomerService from './CustomerService';
@@ -63,9 +63,15 @@ export const CustomerType = objectType({
       args: {
         filter: DialogueFilterInputType,
       },
-      resolve(parent: Customer, args: any, ctx: any) {
-        let dialogues = ctx.prisma.dialogue.findMany({
-          where: { customerId: parent.id },
+      async resolve(parent: Customer, args: any, ctx: any) {
+        const { prisma }: { prisma: PrismaClient } = ctx;
+        let dialogues = await prisma.dialogue.findMany({
+          where: {
+            customerId: parent.id,
+          },
+          include: {
+            tags: true,
+          },
         });
 
         if (args.filter && args.filter.searchTerm) {
@@ -191,7 +197,6 @@ export const CustomerMutations = Upload && extendType({
       },
       async resolve(parent: any, args: any, ctx: any) {
         const customerId = args.where.id;
-        // TODO: Check with jonathan if this is preferred for auto completion
         const { prisma }: { prisma: PrismaClient } = ctx;
 
         const customer = await ctx.prisma.customer.findOne({

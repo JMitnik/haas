@@ -54,7 +54,7 @@ const UsersOverview = () => {
     const { activeStartDate, activeEndDate, pageIndex, pageSize, sortBy, activeSearchTerm } = paginationProps;
     fetchUsers({
       variables: {
-        customerId,
+        customerSlug,
         filter: {
           startDate: activeStartDate,
           endDate: activeEndDate,
@@ -66,11 +66,11 @@ const UsersOverview = () => {
         },
       },
     });
-  }, [customerId, fetchUsers, paginationProps]);
+  }, [customerSlug, fetchUsers, paginationProps]);
 
   const [deleteUser] = useMutation(deleteUserQuery, {
     refetchQueries: [{ query: getUsersQuery,
-      variables: { customerId,
+      variables: { customerSlug,
         filter: {
           startDate: paginationProps.activeStartDate,
           endDate: paginationProps.activeEndDate,
@@ -94,6 +94,7 @@ const UsersOverview = () => {
   };
 
   const handleEditUser = (event: any, userId: string) => {
+    console.log('userId: ', userId);
     event.stopPropagation();
     history.push(`/dashboard/b/${customerSlug}/u/${userId}/edit`);
   };
