@@ -13,9 +13,7 @@ interface ThemeProvidersProps {
 
 const ThemeProviders = ({ children }: ThemeProvidersProps) => {
   const [customTheme, setCustomTheme] = useState({});
-  const { activeCustomer } = useCustomer();
-  const [storageCustomer] = useLocalStorage('customer', '');
-
+  const { activeCustomer, storageCustomer } = useCustomer();
   useEffect(() => {
     if (activeCustomer) {
       const customerTheme = { colors: activeCustomer.settings?.colourSettings };
@@ -30,7 +28,7 @@ const ThemeProviders = ({ children }: ThemeProvidersProps) => {
     } else {
       setCustomTheme({});
     }
-  }, [activeCustomer, setCustomTheme]);
+  }, [activeCustomer, setCustomTheme, storageCustomer]);
 
   if (customTheme) {
     return (
