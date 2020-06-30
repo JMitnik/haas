@@ -26,12 +26,10 @@ import RolesOverview from 'views/RolesOverview/RolesOverview';
 import ThemesProvider from 'providers/ThemeProvider';
 import TriggersOverview from 'views/TriggerOverview/TriggerOverview';
 import UsersOverview from 'views/UsersOverview/UsersOverview';
-import useLocalStorage from 'hooks/useLocalStorage';
 
 import DashboardLayout from 'layouts/DashboardLayout';
 import DialogueLayout from 'layouts/DialogueLayout';
 import client from './config/apollo';
-import themeConfig from './config/theme';
 
 const AppRoutes = () => (
   <Switch>
