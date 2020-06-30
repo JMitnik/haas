@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 
 import { makeCustomTheme } from 'utils/makeCustomerTheme';
 import defaultTheme from 'config/theme';
+import useLocalStorage from 'hooks/useLocalStorage';
 
 import { useCustomer } from './CustomerProvider';
 
@@ -13,16 +14,15 @@ interface ThemeProvidersProps {
 const ThemeProviders = ({ children }: ThemeProvidersProps) => {
   const [customTheme, setCustomTheme] = useState({});
   const { activeCustomer } = useCustomer();
+  const [storageCustomer] = useLocalStorage('customer', '');
 
   useEffect(() => {
     if (activeCustomer) {
       const customerTheme = { colors: activeCustomer.settings?.colourSettings };
       setCustomTheme(customerTheme);
-    } else if (localStorage.getItem('customer') !== null) {
-      const storageCustomer = localStorage.getItem('customer');
-      const parsedCustomer = storageCustomer && JSON.parse(storageCustomer);
-      if (parsedCustomer.settings?.colourSettings) {
-        const customerTheme = { colors: parsedCustomer.settings?.colourSettings };
+    } else if (storageCustomer) {
+      if (storageCustomer.settings?.colourSettings) {
+        const customerTheme = { colors: storageCustomer.settings?.colourSettings };
         setCustomTheme(customerTheme);
       } else {
         setCustomTheme({});

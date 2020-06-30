@@ -12,6 +12,7 @@ import { UserProps } from 'types/generic';
 import { ReactComponent as UsersIcon } from 'assets/icons/icon-user-group.svg';
 import { useCustomer } from 'providers/CustomerProvider';
 import Sidenav from 'components/Sidenav';
+import useLocalStorage from 'hooks/useLocalStorage';
 
 const DashboardLayoutContainer = styled.div`
   ${({ theme }) => css`
@@ -35,11 +36,12 @@ const DashboardViewContainer = styled(Div)`
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const { customerSlug }: { topicId: string, customerSlug: string } = useParams<any>();
   const { activeCustomer } = useCustomer();
+  const [storageCustomer] = useLocalStorage('customer', '');
   const sampleUser: UserProps = {
     firstName: 'Daan',
     lastName: 'Helsloot',
     business: {
-      name: activeCustomer?.name || 'Starbucks',
+      name: activeCustomer?.name || storageCustomer?.name || 'Starbucks',
     },
   };
 
