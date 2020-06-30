@@ -23,6 +23,7 @@ import EditTriggerView from 'views/TriggerOverview/EditTriggerView';
 import GlobalStyle from 'config/global-styles';
 import InteractionsOverview from 'views/InteractionsOverview/InteractionsOverview';
 import RolesOverview from 'views/RolesOverview/RolesOverview';
+import ThemesProvider from 'providers/ThemeProvider';
 import TriggersOverview from 'views/TriggerOverview/TriggerOverview';
 import UsersOverview from 'views/UsersOverview/UsersOverview';
 
@@ -154,12 +155,12 @@ const App: FC = () => (
     <ApolloProvider client={client}>
       <CustomerProvider>
         <Router>
-          <ThemeProvider theme={themeConfig}>
+          <ThemesProvider>
             <AppContainer>
               <AppRoutes />
             </AppContainer>
             <GlobalStyle />
-          </ThemeProvider>
+          </ThemesProvider>
         </Router>
       </CustomerProvider>
     </ApolloProvider>

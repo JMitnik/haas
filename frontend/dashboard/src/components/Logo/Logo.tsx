@@ -4,13 +4,13 @@ import styled, { css } from 'styled-components/macro';
 import { ReactComponent as SVGLogo } from 'assets/logo.svg';
 
 export const LogoContainer = styled.div<{fill?: string}>`
-  ${({ fill = '' }) => css`
+  ${({ theme }) => css`
     display: flex;
     justify-content: space-between;
 
-    ${fill && css`
+    ${theme && css`
       svg path {
-        fill: ${fill};
+        fill: ${theme.colors.primary};
       }
     `}
 
@@ -29,8 +29,8 @@ interface LogoProps {
   fill?: string;
 }
 
-const Logo = ({ fill = '' }: LogoProps) => (
-  <LogoContainer fill={fill}>
+const Logo = () => (
+  <LogoContainer>
     <SVGLogo />
   </LogoContainer>
 );

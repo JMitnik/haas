@@ -62,8 +62,7 @@ export const NavItems = styled.ul`
 
 export const NavLogo = () => (
   <Flex justifyContent="center" alignItems="flex-end">
-    {/* TODO: Make generic */}
-    <Logo fill="#426b3a" />
+    <Logo />
 
     <Div>
       <Span fontSize="2rem" color="primary">
