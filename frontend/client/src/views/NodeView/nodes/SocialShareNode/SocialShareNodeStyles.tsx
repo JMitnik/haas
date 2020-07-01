@@ -1,10 +1,14 @@
-import { Div } from '@haas/ui';
+import { ColorProps, color } from 'styled-system';
+import { Div, ExtLink } from '@haas/ui';
+import { LinkProps } from 'react-router-dom';
 import styled, { css } from 'styled-components/macro';
 
 export const SocialShareNodeContainer = styled(Div)``;
 
-export const ShareItem = styled(Div)`
-  ${({ theme, bg }) => css`
+export const ShareItem = styled.a<ColorProps>`
+  ${color}
+
+  ${({ theme }) => css`
     border-radius: 100%;
     padding: 13px;
     display: flex;
@@ -13,10 +17,6 @@ export const ShareItem = styled(Div)`
 
     @media ${theme.media.mob} {
       margin-right: ${theme.gutter}px;
-    }
-
-    &:hover {
-      background: ${String(bg)};
     }
 
     svg {
