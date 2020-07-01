@@ -13,6 +13,7 @@ export const ClientButton = styled(Button)`
     background: none;
     display: flex;
     align-items: stretch;
+    background: white;
     box-shadow: 0px 3px 1px 1px rgba(0, 0, 0, 0.10);
     position: relative;
     justify-content: flex-start;
@@ -24,8 +25,7 @@ export const ClientButton = styled(Button)`
       padding-left: 24px;
 
       border-radius: 0 10px 10px 0;
-      background: white;
-      color: ${theme.colors.primary};
+      /* background: white; */
 
       h1, h2, h3, h4 ,h5 {
         height: 100%;

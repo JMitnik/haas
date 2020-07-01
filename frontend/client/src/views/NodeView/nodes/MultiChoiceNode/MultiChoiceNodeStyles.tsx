@@ -15,7 +15,7 @@ export const ChoiceIconContainer = styled.span`
     display: flex;
     align-items: center;
     justify-content: center;
-    background: ${Color(theme.colors.primary).lighten(0.3).hex()};
+    /* background: ${Color(theme.colors.primary).lighten(0.3).hex()}; */
     min-height: 24px;
 
     svg {
@@ -40,15 +40,18 @@ export const MultiChoiceNodeGrid = styled(motion.div)`
       border-radius: 10px;
       transform: none;
       padding: 12px 22px;
+      background: linear-gradient(45deg, ${Color(theme.colors.primary).lighten(0.6).hex()}, ${Color(theme.colors.primary).lighten(0.8).hex()}); 
       font-family: 'Open-sans', sans-serif;
+      color: ${Color(theme.colors.primary).saturate(0.1).hex()};
 
       h1,h2,h3,h4,h5 {
+        color: inherit;
+        font-size: 1.5rem;
         font-family: inherit;
       }
     }
 
     button:hover {
-      background: white;
       box-shadow: 0 7px 14px rgba(50,50,93,.1), 0 3px 6px rgba(0,0,0,.08);
       transform: translateY(-1px);
     }
