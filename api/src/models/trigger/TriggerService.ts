@@ -128,7 +128,7 @@ class TriggerService {
   },
     smsService: TriggerSMSService) => {
     const currentDate = new Date();
-    const safeToSend = !trigger.lastSent || isAfter(subSeconds(currentDate, 60), trigger.lastSent);
+    const safeToSend = !trigger.lastSent || isAfter(subSeconds(currentDate, 5), trigger.lastSent);
 
     if (safeToSend) {
       // TODO: Do we have to await this function? can just let it run on the side
