@@ -21,6 +21,7 @@
         "gen": "prisma generate && ts-node ./src/schema.ts",
         "seed": "ts-node --transpile-only src/data/main-seed.ts"
     },
+    r
     "dependencies": {
         "@graphql-codegen/cli": "^1.11.2",
         "@graphql-codegen/typescript": "^1.11.2",
@@ -71,5 +72,8 @@
         "nodemon": "^2.0.3",
         "ts-jest": "^25.4.0",
         "typescript": "^3.7.3"
+    },
+    "resolutions": {
+        "**/**/fs-capacitor":"^6.2.0"
     }
 }
