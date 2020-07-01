@@ -34,11 +34,6 @@ export const MultiChoiceNodeGrid = styled(motion.div)`
     display: grid;
     grid-gap: ${theme.gutter / 1.5}px;
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    align-items: stretch;
-
-    > div {
-      height: 100%;
-    }
 
     button {
       height: 100%;

@@ -17,6 +17,10 @@ export const SlideHereContainer = styled(motion.div)`
     font-family: 'Open Sans', sans-serif;
     font-size: 1rem;
     justify-content: center;
+    left: 50%;
+    transform: translateX(-50%);
+    min-width: 200px;
+    overflow: hidden;
     
     i {
       margin-left: 4px;
