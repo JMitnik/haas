@@ -6,6 +6,19 @@ import { Div } from '@haas/ui';
 
 export const SliderNodeContainer = styled(Div)``;
 
+export const SlideHereContainer = styled(motion.div)`
+  ${({ theme }) => css`
+    color: ${Color(theme.colors.primary).mix(Color('black'), 0.4).hex()};
+    opacity: 0;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 0.8rem;
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%) translateY(-100%);
+  `}
+`;
+
 export const SliderNodeValue = styled(motion.h3)`
   ${({ theme }) => css`
     color: ${theme.colors.primary};
