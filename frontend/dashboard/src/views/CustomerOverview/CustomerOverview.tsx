@@ -3,14 +3,17 @@ import { useMutation, useQuery } from '@apollo/react-hooks';
 import Color from 'color';
 import React, { FC } from 'react';
 
-import { AddCard, Card, CardBody, Container, DeleteButtonContainer, Div,
-  EditButtonContainer, Flex, Grid, H2, H3, H4, PageHeading } from '@haas/ui';
+import {
+  AddCard, Card, CardBody, Container, DeleteButtonContainer, Div,
+  EditButtonContainer, Flex, Grid, H2, H3, H4, PageHeading,
+} from '@haas/ui';
 import { Edit, Plus, X } from 'react-feather';
 import { Link, useHistory } from 'react-router-dom';
 
 import { CustomerCardImage, CustomerOverviewContainer } from './CustomerOverviewStyles';
 import { deleteFullCustomerQuery } from '../../mutations/deleteFullCustomer';
 import { getCustomerQuery } from '../../queries/getCustomersQuery';
+import { isValidColor } from '../../utils/ColorUtils';
 
 const CustomerOverview = ({ customers }: { customers: any[] }) => (
   <CustomerOverviewContainer>
@@ -66,7 +69,9 @@ const CustomerCard = ({ customer }: { customer: any }) => {
     event.stopPropagation();
   };
 
-  const primaryColor = Color(customer.settings?.colourSettings.primary || 'white');
+  const primaryColor = isValidColor(customer.settings?.colourSettings.primary)
+    ? Color(customer.settings?.colourSettings.primary)
+    : Color('white');
 
   return (
     <Card
@@ -78,7 +83,7 @@ const CustomerCard = ({ customer }: { customer: any }) => {
     >
       <CardBody flex="100%">
         <Div>
-          <EditButtonContainer onClick={(e) => setCustomerEditPath(e, customer.id)}>
+          <EditButtonContainer onClick={(e) => setCustomerEditPath(e, customer.slug)}>
             <Edit />
           </EditButtonContainer>
           <DeleteButtonContainer
@@ -91,7 +96,7 @@ const CustomerCard = ({ customer }: { customer: any }) => {
           <H3 fontWeight={500}>
             {customer.name}
           </H3>
-          <CustomerCardImage src={customer?.settings?.logoUrl} />
+          {customer?.settings?.logoUrl && <CustomerCardImage src={customer?.settings?.logoUrl} />}
         </Flex>
       </CardBody>
     </Card>

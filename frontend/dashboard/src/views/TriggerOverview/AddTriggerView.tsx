@@ -60,8 +60,8 @@ const AddTriggerView = () => {
   const history = useHistory();
   const { register, handleSubmit, errors } = useForm<FormDataProps>();
   const { customerId, customerSlug } = useParams();
-  const { data: dialogueData } = useQuery(getDialoguesQuery, { variables: { id: customerId } });
-  const { data: recipientsData } = useQuery(getRecipientsQuery, { variables: { customerId } });
+  const { data: dialogueData } = useQuery(getDialoguesQuery, { variables: { customerSlug } });
+  const { data: recipientsData } = useQuery(getRecipientsQuery, { variables: { customerSlug } });
   const [fetchQuestions, { data: questionsData }] = useLazyQuery(getQuestionsQuery,
     { fetchPolicy: 'cache-and-network' });
 
@@ -74,9 +74,9 @@ const AddTriggerView = () => {
 
   useEffect(() => {
     if (activeDialogue) {
-      fetchQuestions({ variables: { topicId: activeDialogue.value } });
+      fetchQuestions({ variables: { customerSlug, dialogueSlug: activeDialogue.value } });
     }
-  }, [activeDialogue, fetchQuestions]);
+  }, [customerSlug, activeDialogue, fetchQuestions]);
 
   const [addTrigger, { loading }] = useMutation(createTriggerMutation, {
     onCompleted: () => {
@@ -96,7 +96,7 @@ const AddTriggerView = () => {
 
     addTrigger({
       variables: {
-        customerId,
+        customerSlug,
         questionId,
         trigger,
         recipients,
@@ -187,14 +187,14 @@ const AddTriggerView = () => {
     ];
   };
 
-  const dialogues = dialogueData?.dialogues && dialogueData?.dialogues.map((dialogue: any) => (
-    { label: dialogue?.title, value: dialogue?.id }));
+  const dialogues = dialogueData?.customer?.dialogues && dialogueData?.customer?.dialogues.map((dialogue: any) => (
+    { label: dialogue?.title, value: dialogue?.slug }));
   const recipients = recipientsData?.users && recipientsData?.users.map((recipient: any) => (
     {
       label: `${recipient?.lastName}, ${recipient?.firstName} - E: ${recipient?.email} - P: ${recipient?.phone}`,
       value: recipient?.id,
     }));
-  const questions = questionsData?.dialogue?.questions && questionsData?.dialogue?.questions.map((question: any) => (
+  const questions = questionsData?.customer?.dialogue?.questions && questionsData?.customer?.dialogue?.questions.map((question: any) => (
     { label: question?.title, value: question?.id }));
 
   return (
@@ -288,7 +288,7 @@ const AddTriggerView = () => {
                           <X />
                         </DeleteButtonContainer>
                         <Select
-                          options={setConditionTypeOptions(activeQuestion?.value, questionsData?.dialogue?.questions)}
+                          options={setConditionTypeOptions(activeQuestion?.value, questionsData?.customer?.dialogue?.questions)}
                           value={condition.type}
                           onChange={(qOption: any) => setConditionsType(qOption, index)}
                         />

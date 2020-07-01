@@ -6,12 +6,10 @@ import React, { useCallback, useEffect, useState } from 'react';
 
 import { Div, H2 } from '@haas/ui';
 import { UserCell } from 'components/Table/CellComponents/CellComponents';
-import DatePicker from 'components/DatePicker/DatePicker';
 import SearchBar from 'components/SearchBar/SearchBar';
 import Table from 'components/Table/Table';
 import deleteTriggerMutation from 'mutations/deleteTrigger';
 import getTriggerTableQuery from 'queries/getTriggerTable';
-import getTriggersQuery from 'queries/getTriggers';
 
 import { InputContainer, InputOutputContainer } from './TriggerOverviewStyles';
 import Row from './TableRow/TriggerOverviewRow';
@@ -35,7 +33,7 @@ const HEADERS = [
 ];
 
 const TriggersOverview = () => {
-  const { customerId, customerSlug } = useParams();
+  const { customerSlug } = useParams();
   const history = useHistory();
   const [fetchTriggers, { data }] = useLazyQuery(getTriggerTableQuery, { fetchPolicy: 'cache-and-network' });
   const [paginationProps, setPaginationProps] = useState<TableProps>(
@@ -54,7 +52,7 @@ const TriggersOverview = () => {
     const { activeStartDate, activeEndDate, pageIndex, pageSize, sortBy, activeSearchTerm } = paginationProps;
     fetchTriggers({
       variables: {
-        customerId,
+        customerSlug,
         filter: {
           startDate: activeStartDate,
           endDate: activeEndDate,
@@ -66,11 +64,11 @@ const TriggersOverview = () => {
         },
       },
     });
-  }, [customerId, fetchTriggers, paginationProps]);
+  }, [customerSlug, fetchTriggers, paginationProps]);
 
   const [deleteTrigger] = useMutation(deleteTriggerMutation, {
-    refetchQueries: [{ query: getTriggersQuery,
-      variables: { customerId,
+    refetchQueries: [{ query: getTriggerTableQuery,
+      variables: { customerSlug,
         filter: {
           startDate: paginationProps.activeStartDate,
           endDate: paginationProps.activeEndDate,
@@ -96,7 +94,7 @@ const TriggersOverview = () => {
 
   const handleEditEntry = (event: any, entryId: string) => {
     event.stopPropagation();
-    history.push(`/dashboard/b/${customerSlug}/n/${entryId}/edit`);
+    history.push(`/dashboard/b/${customerSlug}/triggers/${entryId}/edit`);
   };
 
   const handleAddUser = (event: any) => {

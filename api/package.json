@@ -33,6 +33,7 @@
         "@types/mjml": "^4.0.4",
         "@types/nodemailer": "^6.4.0",
         "@types/twilio": "^2.11.0",
+        "@types/yup": "^0.29.3",
         "apollo-datasource": "^0.7.0",
         "apollo-datasource-rest": "^0.8.0",
         "apollo-server": "^2.11.0",
@@ -60,7 +61,8 @@
         "pg": "^8.0.2",
         "react-scripts": "^3.4.0",
         "ts-node": "^8.6.2",
-        "twilio": "^3.46.0"
+        "twilio": "^3.46.0",
+        "yup": "^0.29.1"
     },
     "devDependencies": {
         "@prisma/cli": "2.0.0-beta.3",

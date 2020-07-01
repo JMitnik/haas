@@ -26,7 +26,7 @@ const AddUserView = () => {
 
   const [activeRole, setActiveRole] = useState<null | { label: string, value: string }>(null);
 
-  const { data } = useQuery(getRolesQuery, { variables: { customerId } });
+  const { data } = useQuery(getRolesQuery, { variables: { customerSlug } });
   const [addUser, { loading }] = useMutation(createAddMutation, {
     onCompleted: () => {
       history.push(`/dashboard/b/${customerSlug}/users/`);
@@ -50,7 +50,7 @@ const AddUserView = () => {
 
     addUser({
       variables: {
-        id: customerId,
+        customerSlug,
         input: optionInput,
       },
     });

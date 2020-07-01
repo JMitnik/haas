@@ -20,6 +20,7 @@ import DialoguesPage from 'pages/dashboard/dialogues';
 import EditCustomerView from 'views/EditCustomerView';
 import EditDialogueView from 'views/EditDialogueView';
 import EditTriggerView from 'views/TriggerOverview/EditTriggerView';
+import EditUserView from 'views/UsersOverview/EditUserView';
 import GlobalStyle from 'config/global-styles';
 import InteractionsOverview from 'views/InteractionsOverview/InteractionsOverview';
 import RolesOverview from 'views/RolesOverview/RolesOverview';
@@ -74,6 +75,13 @@ const AppRoutes = () => (
             <Route
               path="/dashboard/b/:customerSlug/edit"
               render={() => <EditCustomerView />}
+            />
+
+            <Route
+              path="/dashboard/b/:customerSlug/u/:userId/edit"
+              render={() => (
+                <EditUserView />
+              )}
             />
 
             <Route
