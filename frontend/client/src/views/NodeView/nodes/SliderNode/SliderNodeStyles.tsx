@@ -21,13 +21,16 @@ export const SlideHereContainer = styled(motion.div)`
     transform: translateX(-50%);
     min-width: 200px;
     overflow: hidden;
-    
+    flex-wrap: wrap;
+    align-items: center;
+
     i {
       margin-left: 4px;
     }
 
     svg {
       width: 16px;
+      height: 16px;
       margin-right: ${theme.gutter / 4}px;
       fill: currentColor;
     }
