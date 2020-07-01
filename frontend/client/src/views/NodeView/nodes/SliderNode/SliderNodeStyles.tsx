@@ -9,12 +9,18 @@ export const SliderNodeContainer = styled(Div)``;
 export const SlideHereContainer = styled(motion.div)`
   ${({ theme }) => css`
     display: flex;
+    position: absolute;
+    top: -${theme.gutter}px;
+    width: 100%;
     color: ${Color(theme.colors.primary).mix(Color('white'), 0.6).hex()};
     opacity: 0;
     font-family: 'Open Sans', sans-serif;
     font-size: 1rem;
-    top: ${theme.gutter / 2}px;
     justify-content: center;
+    left: 50%;
+    transform: translateX(-50%);
+    min-width: 200px;
+    overflow: hidden;
     
     i {
       margin-left: 4px;
@@ -40,6 +46,7 @@ export const SliderNodeValue = styled(motion.h3)`
     background: ${Color(theme.colors.primary).mix(Color('white'), 0.9).hex()};
     height: 55px;
     margin: 100px auto;
+    margin-top: ${theme.gutter}px;
     font-weight: 1000;
     padding: 24px;
     display: flex;

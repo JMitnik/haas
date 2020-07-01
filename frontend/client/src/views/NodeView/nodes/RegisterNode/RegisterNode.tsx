@@ -14,7 +14,12 @@ import { RegisterNodeContainer } from './RegisterNodeStyles';
 type RegisterNodeProps = GenericNodeProps;
 
 const RegisterNode = ({ node, onEntryStore }: RegisterNodeProps) => {
-  const { register, getValues, formState } = useForm();
+  const { register, getValues, formState } = useForm({
+    mode: 'onChange',
+    reValidateMode: 'onChange',
+  });
+
+  const { dirty } = formState;
 
   const onSubmit = () => {
     const formEntry = getValues({ nest: true });
@@ -27,8 +32,6 @@ const RegisterNode = ({ node, onEntryStore }: RegisterNodeProps) => {
 
     onEntryStore(entry, formEntry.multiValues);
   };
-
-  const touched = () => 'multiValues' in formState.touched;
 
   return (
     <RegisterNodeContainer>
@@ -64,7 +67,7 @@ const RegisterNode = ({ node, onEntryStore }: RegisterNodeProps) => {
         </Grid>
         <Div mt={4}>
           <Grid gridTemplateColumns="2fr 1fr">
-            <ClientButton disabled={!touched()} isActive={touched()} onClick={() => onSubmit()}>
+            <ClientButton disabled={!dirty} isActive={dirty} onClick={() => onSubmit()}>
               <ButtonIcon>
                 <CheckCircle />
               </ButtonIcon>

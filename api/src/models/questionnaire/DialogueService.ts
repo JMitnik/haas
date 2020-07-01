@@ -474,10 +474,6 @@ class DialogueService {
     publicTitle: string = '',
     tags: Array<{id: string}> = [],
   ) => {
-    console.log('dialogueSlug', dialogueSlug);
-    console.log('title', title);
-    console.log('customerId', customerId);
-
     const dialogue = prisma.dialogue.create({
       data: DialogueService.constructDialogue(
         customerId, title, dialogueSlug, description, publicTitle, tags,
@@ -488,7 +484,6 @@ class DialogueService {
   };
 
   static createDialogue = async (dialogueInputData: DialogueInputProps): Promise<Dialogue | null> => {
-    console.log('dialogueInputData', dialogueInputData);
     const { data: { dialogueSlug, customerSlug, title, publicTitle, description, tags = [], isSeed } } = dialogueInputData;
 
     let questionnaire = null;
@@ -515,8 +510,6 @@ class DialogueService {
         );
       }
     }
-
-    console.log('About to do initDialogue');
 
     questionnaire = await DialogueService.initDialogue(
       customer?.id,

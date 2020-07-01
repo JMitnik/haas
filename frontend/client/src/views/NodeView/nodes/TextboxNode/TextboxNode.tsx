@@ -15,7 +15,11 @@ interface TextboxNodeProps extends GenericNodeProps {
 }
 
 const TextboxNode = ({ node, onEntryStore }: TextboxNodeProps) => {
-  const { register, getValues, formState } = useForm();
+  const { register, getValues, formState } = useForm({
+    mode: 'onChange',
+  });
+
+  const { dirty } = formState;
 
   const onSubmit = () => {
     const formEntry = getValues({ nest: true });
@@ -38,7 +42,7 @@ const TextboxNode = ({ node, onEntryStore }: TextboxNodeProps) => {
 
         <Div mt={4}>
           <Grid gridTemplateColumns="2fr 1fr">
-            <ClientButton disabled={!('textValue' in formState.touched)} isActive={('textValue' in formState.touched)} onClick={() => onSubmit()}>
+            <ClientButton disabled={!dirty} isActive={dirty} onClick={() => onSubmit()}>
               <ButtonIcon>
                 <CheckCircle />
               </ButtonIcon>

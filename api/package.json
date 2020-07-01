@@ -71,5 +71,8 @@
         "nodemon": "^2.0.3",
         "ts-jest": "^25.4.0",
         "typescript": "^3.7.3"
+    },
+    "resolutions": {
+        "**/**/fs-capacitor":"^6.2.0"
     }
 }

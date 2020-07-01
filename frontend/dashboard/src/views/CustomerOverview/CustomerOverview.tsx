@@ -45,7 +45,6 @@ const CustomerOverview = ({ customers }: { customers: any[] }) => (
 const CustomerCard = ({ customer }: { customer: any }) => {
   const history = useHistory();
   const { activeCustomer, setActiveCustomer } = useCustomer();
-  console.log(customer);
   const setCustomerSlug = (customerSlug: string) => {
     if (activeCustomer?.slug !== customerSlug) {
       // TODO: Stor active customer in LocalStorage
