@@ -6,6 +6,7 @@ import { Settings } from 'react-feather';
 import { GenericProps, Div } from './Generics';
 import { ProfilePic } from './User';
 import { Paragraph } from './Type';
+import { color, ColorProps } from 'styled-system';
 
 const TopNavContainer = styled(Div)<GenericProps>`
   ${({ theme }) => css`
@@ -30,7 +31,8 @@ const UserNav: FC = () => (
   </Div>
 );
 
-const StyledExtLink = styled.a`
+const StyledExtLink = styled.a<ColorProps>`
+  ${color};
   text-decoration: none;
   color: inherit;
 `;

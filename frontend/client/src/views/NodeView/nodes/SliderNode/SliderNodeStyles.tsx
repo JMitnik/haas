@@ -6,6 +6,28 @@ import { Div } from '@haas/ui';
 
 export const SliderNodeContainer = styled(Div)``;
 
+export const SlideHereContainer = styled(motion.div)`
+  ${({ theme }) => css`
+    display: flex;
+    color: ${Color(theme.colors.primary).mix(Color('white'), 0.6).hex()};
+    opacity: 0;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 1rem;
+    top: ${theme.gutter / 2}px;
+    justify-content: center;
+    
+    i {
+      margin-left: 4px;
+    }
+
+    svg {
+      width: 16px;
+      margin-right: ${theme.gutter / 4}px;
+      fill: currentColor;
+    }
+  `}
+`;
+
 export const SliderNodeValue = styled(motion.h3)`
   ${({ theme }) => css`
     color: ${theme.colors.primary};
@@ -31,7 +53,7 @@ export const HAASRabbit = styled.div`
   position: absolute;
   transform: translateX(-50%);
 
-  svg {
+  .rabbit svg {
     /* TODO: Find out why important is so important */
     width: auto !important;
     height: auto !important;
