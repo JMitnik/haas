@@ -138,8 +138,8 @@ export const Usernav = ({ user }: { user: UserProps }) => {
 
 const BusinessSpan = styled(Span)`
  ${({ theme }) => css`
-  text-decoration: underline;
-  text-decoration-color: ${theme.colors.primary}
+    text-decoration: underline;
+    text-decoration-color: ${theme.colors.primary}
   `}
 `;
 
