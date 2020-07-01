@@ -134,11 +134,12 @@ class NodeEntryService {
       }
       // Use the grouped representation with matching session id to map data
       const entries = groupedNodeEntries[scoreEntry.sessionId];
+      const sortedEntries = _.orderBy(entries, (entry) => entry.depth, 'asc');
       const { sessionId, session } = entries[0];
       const paths = entries.length;
       const score = entries.find((entry) => entry.depth === 0)?.values[0].numberValue;
       return {
-        id: sessionId, paths, score, createdAt: session?.createdAt, nodeEntries: entries,
+        id: sessionId, paths, score, createdAt: session?.createdAt, nodeEntries: sortedEntries,
       };
     });
 

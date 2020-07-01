@@ -526,7 +526,7 @@ const EditTriggerForm = (
 
           <Flex>
             <Button brand="primary" mr={2} type="submit">Save trigger</Button>
-            <Button brand="default" type="button" onClick={() => history.push(`/dashboard/b/${customerId}/triggers/`)}>Cancel</Button>
+            <Button brand="default" type="button" onClick={() => history.push(`/dashboard/b/${customerSlug}/triggers/`)}>Cancel</Button>
           </Flex>
         </Div>
       </Form>

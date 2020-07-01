@@ -125,7 +125,7 @@ const Slider = ({ register, onSubmit, animationControls }: SliderProps) => {
           onChange={(e) => moveBunny(e)}
           onMouseUp={() => handleSubmit()}
           onTouchEnd={() => handleSubmit()}
-          min={0}
+          min={1}
           max={100}
           defaultValue={50}
           ref={register}

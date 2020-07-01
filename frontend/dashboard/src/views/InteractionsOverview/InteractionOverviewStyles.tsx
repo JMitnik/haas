@@ -18,7 +18,7 @@ export const InteractionDetailQuestionEntry = styled(Div)`
     z-index: 0;
     top: 5%;
     bottom: 0;
-    left: 52%;
+    left: 51.25%;
     border-left: 2px solid #c0bcbb;
     transform: translate(-50%);
   }
