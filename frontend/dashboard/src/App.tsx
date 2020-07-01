@@ -1,7 +1,7 @@
 import { ApolloProvider } from '@apollo/react-hooks';
 import { Redirect, Route, BrowserRouter as Router, Switch } from 'react-router-dom';
 import { ThemeProvider } from 'styled-components';
-import React, { FC } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 
 import CustomerProvider from 'providers/CustomerProvider';
 import DashboardPage from 'pages/dashboard';
@@ -24,13 +24,13 @@ import EditUserView from 'views/UsersOverview/EditUserView';
 import GlobalStyle from 'config/global-styles';
 import InteractionsOverview from 'views/InteractionsOverview/InteractionsOverview';
 import RolesOverview from 'views/RolesOverview/RolesOverview';
+import ThemesProvider from 'providers/ThemeProvider';
 import TriggersOverview from 'views/TriggerOverview/TriggerOverview';
 import UsersOverview from 'views/UsersOverview/UsersOverview';
 
 import DashboardLayout from 'layouts/DashboardLayout';
 import DialogueLayout from 'layouts/DialogueLayout';
 import client from './config/apollo';
-import themeConfig from './config/theme';
 
 const AppRoutes = () => (
   <Switch>
@@ -162,12 +162,12 @@ const App: FC = () => (
     <ApolloProvider client={client}>
       <CustomerProvider>
         <Router>
-          <ThemeProvider theme={themeConfig}>
+          <ThemesProvider>
             <AppContainer>
               <AppRoutes />
             </AppContainer>
             <GlobalStyle />
-          </ThemeProvider>
+          </ThemesProvider>
         </Router>
       </CustomerProvider>
     </ApolloProvider>

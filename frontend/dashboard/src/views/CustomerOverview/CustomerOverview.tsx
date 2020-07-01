@@ -9,6 +9,7 @@ import {
 } from '@haas/ui';
 import { Edit, Plus, X } from 'react-feather';
 import { Link, useHistory } from 'react-router-dom';
+import { useCustomer } from 'providers/CustomerProvider';
 
 import { CustomerCardImage, CustomerOverviewContainer } from './CustomerOverviewStyles';
 import { deleteFullCustomerQuery } from '../../mutations/deleteFullCustomer';
@@ -43,8 +44,14 @@ const CustomerOverview = ({ customers }: { customers: any[] }) => (
 
 const CustomerCard = ({ customer }: { customer: any }) => {
   const history = useHistory();
-
+  const { activeCustomer, setActiveCustomer } = useCustomer();
+  console.log(customer);
   const setCustomerSlug = (customerSlug: string) => {
+    if (activeCustomer?.slug !== customerSlug) {
+      // TODO: Stor active customer in LocalStorage
+      localStorage.setItem('customer', JSON.stringify(customer));
+      setActiveCustomer(customer);
+    }
     history.push(`/dashboard/b/${customerSlug}`);
   };
 
