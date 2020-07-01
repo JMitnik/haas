@@ -83,6 +83,7 @@ export const StyledInput = styled.input`
 
 export const StyledTextInput = styled(StyledInput).attrs({ as: 'textarea' })`
   resize: none;
+  font-family: 'Open sans', sans-serif;
   min-height: 150px;
 `;
 
@@ -232,13 +233,19 @@ export const DeprecatedInputStyled = styled.input`
 export const Textbox = styled.textarea`
   ${({ theme }) => css`
     border: none;
+    
     font-size: ${theme.fontSizes[1]}px;
-    border-radius: 20px;
+    border-radius: 10px;
+    font-family: 'Open Sans', sans-serif;
     box-shadow: none;
     padding: 24px 24px;
     min-height: 200px;
     width: 100%;
     resize: none;
+
+    &::placeholder {
+      color: #e6ecf4;
+    }
 
     &:focus {
       outline: none;

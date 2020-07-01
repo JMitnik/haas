@@ -3,8 +3,8 @@ import { useForm } from 'react-hook-form';
 import React from 'react';
 
 import { ButtonIcon } from '@haas/ui/src/Buttons';
-import { ClientButton } from 'components/Buttons/Buttons';
-import { Div, H3, Textbox } from '@haas/ui';
+import { ClientButton, OutlineButton } from 'components/Buttons/Buttons';
+import { Div, Grid, H3, Textbox } from '@haas/ui';
 import { NodeTitle } from 'layouts/NodeLayout/NodeLayoutStyles';
 
 import { GenericNodeProps } from '../types';
@@ -35,12 +35,19 @@ const TextboxNode = ({ node, onEntryStore }: TextboxNodeProps) => {
       <Div>
         <H3 color="white">What would you like to tell us?</H3>
         <Textbox placeholder="I have experienced ..." name="textValue" ref={register} />
-        <ClientButton mt={4} isActive={'textValue' in formState.touched} onClick={() => onSubmit()}>
-          <ButtonIcon>
-            <CheckCircle />
-          </ButtonIcon>
-          Submit
-        </ClientButton>
+
+        <Div mt={4}>
+          <Grid gridTemplateColumns="2fr 1fr">
+            <ClientButton disabled={!('textValue' in formState.touched)} isActive={!('textValue' in formState.touched)} onClick={() => onSubmit()}>
+              <ButtonIcon>
+                <CheckCircle />
+              </ButtonIcon>
+              Submit
+            </ClientButton>
+
+            <OutlineButton onClick={() => onSubmit()}>Do not share</OutlineButton>
+          </Grid>
+        </Div>
       </Div>
     </TextboxContainer>
   );
