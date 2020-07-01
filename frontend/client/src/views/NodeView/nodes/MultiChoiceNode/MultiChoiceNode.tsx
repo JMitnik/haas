@@ -57,7 +57,7 @@ const MultiChoiceNode = ({ node, onEntryStore }: MultiChoiceNodeProps) => {
       >
         {node.options?.map((multiChoiceOption: TreeNodeOptionProps, index: number) => (
           <motion.div key={index} variants={multiChoiceItemAnimation}>
-            <Div key={index} flex={['100%', 1]}>
+            <Div key={index} height="100%" flex={['100%', 1]}>
               <ClientButton
                 brand="primary"
                 type="button"
