@@ -26,6 +26,10 @@ class SMSService {
   }
 
   sendSMS = (from: string, to: string, body: string, production: boolean = false) => {
+    if (!production) {
+      console.log('Fake send sms to: ', to);
+      return;
+    }
     this.twilio.messages
       .create({
         body,

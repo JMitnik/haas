@@ -90,7 +90,7 @@ const UserRow = ({ headers, data, index, onDeleteEntry, onEditEntry }: TableRowP
                     {' '}
                     {data?.conditions?.[0]?.type}
                   </Span>
-                  {data?.conditions?.[0]?.minValue && (
+                  {(data?.conditions?.[0]?.minValue || data?.conditions?.[0]?.minValue === 0) && (
                     <Span fontSize="smaller" color="#999999">
                       Minimal value:
                       {' '}

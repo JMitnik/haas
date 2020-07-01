@@ -98,7 +98,15 @@ class TriggerService {
   };
 
   static sendTrigger = (
-    trigger: Trigger,
+    trigger: Trigger & {
+      recipients: User[];
+      conditions: TriggerCondition[];
+      relatedNode: {
+        questionDialogue: {
+          title: string;
+        } | null;
+      } | null;
+    },
     recipient: User,
     value: string | number | undefined,
     smsService: TriggerSMSService,
@@ -112,6 +120,11 @@ class TriggerService {
   static tryTrigger = async (entries: Array<any>, trigger: Trigger & {
     recipients: User[];
     conditions: TriggerCondition[];
+    relatedNode: {
+      questionDialogue: {
+        title: string;
+      } | null;
+    } | null;
   },
     smsService: TriggerSMSService) => {
     const currentDate = new Date();
@@ -160,6 +173,15 @@ class TriggerService {
     include: {
       recipients: true,
       conditions: true,
+      relatedNode: {
+        select: {
+          questionDialogue: {
+            select: {
+              title: true,
+            },
+          },
+        },
+      },
     },
   });
 
@@ -168,16 +190,15 @@ class TriggerService {
     answer: { numberValue: number | null, textValue: string | null },
   ) => {
     let conditionMatched;
-
     switch (triggerCondition.type) {
       case 'HIGH_THRESHOLD':
-        conditionMatched = (answer?.numberValue && triggerCondition?.maxValue)
-          ? { isMatch: answer.numberValue > triggerCondition.maxValue, value: answer.numberValue }
+        conditionMatched = ((answer?.numberValue || answer?.numberValue === 0) && triggerCondition?.maxValue)
+          ? { isMatch: answer.numberValue >= triggerCondition.maxValue, value: answer.numberValue }
           : { isMatch: false };
         break;
       case 'LOW_THRESHOLD':
-        conditionMatched = (answer?.numberValue && triggerCondition.minValue)
-          ? { isMatch: answer.numberValue < triggerCondition.minValue, value: answer.numberValue }
+        conditionMatched = ((answer?.numberValue || answer?.numberValue === 0) && triggerCondition.minValue)
+          ? { isMatch: answer.numberValue <= triggerCondition.minValue, value: answer.numberValue }
           : { isMatch: false };
         break;
       case 'TEXT_MATCH':
@@ -189,19 +210,21 @@ class TriggerService {
           : { isMatch: false };
         break;
       case 'OUTER_RANGE':
-        conditionMatched = (answer?.numberValue && triggerCondition.minValue && triggerCondition.maxValue)
+        conditionMatched = ((answer?.numberValue || answer?.numberValue === 0) && triggerCondition.maxValue && (triggerCondition.minValue || triggerCondition.minValue === 0))
           ? {
-            isMatch: answer.numberValue > triggerCondition.maxValue
-              || answer.numberValue < triggerCondition.minValue,
+            isMatch: answer.numberValue >= triggerCondition.maxValue
+              || answer.numberValue <= triggerCondition.minValue,
             value: answer.numberValue,
           }
           : { isMatch: false };
         break;
       case 'INNER_RANGE':
-        conditionMatched = (answer?.numberValue && triggerCondition.minValue && triggerCondition.maxValue)
+        conditionMatched = (answer?.numberValue || answer?.numberValue === 0)
+        && triggerCondition.maxValue
+        && (triggerCondition.minValue || triggerCondition.minValue === 0)
           ? {
-            isMatch: (answer.numberValue < triggerCondition.maxValue
-              && answer.numberValue > triggerCondition.minValue),
+            isMatch: (answer.numberValue <= triggerCondition.maxValue
+              && answer.numberValue >= triggerCondition.minValue),
             value: answer.numberValue,
           }
           : { isMatch: false };
@@ -209,7 +232,6 @@ class TriggerService {
       default:
         conditionMatched = { isMatch: false };
     }
-
     return conditionMatched;
   };
 
