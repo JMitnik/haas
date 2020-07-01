@@ -1,11 +1,11 @@
-import { CheckCircle } from 'react-feather';
+import { CheckCircle, User, Mail } from 'react-feather';
 import { useForm } from 'react-hook-form';
 import React from 'react';
 
 import { ButtonIcon } from '@haas/ui/src/Buttons';
 import { ClientButton } from 'components/Buttons/Buttons';
-import { DeprecatedInput, InputGroup, InputLabel } from '@haas/ui/src/Form';
-import { Div, Grid } from '@haas/ui';
+import { DeprecatedInputContainer, DeprecatedInputStyled, InputGroup, InputLabel } from '@haas/ui/src/Form';
+import { Div, Flex, Grid } from '@haas/ui';
 import { NodeTitle } from 'layouts/NodeLayout/NodeLayoutStyles';
 
 import { GenericNodeProps } from '../types';
@@ -39,18 +39,27 @@ const RegisterNode = ({ node, onEntryStore }: RegisterNodeProps) => {
           <Grid gridTemplateColumns="1fr 1fr">
             <InputGroup>
               <InputLabel color="white">First name</InputLabel>
-              <DeprecatedInput placeholder="Jane" name="multiValues[0].textValue" ref={register} />
+              <DeprecatedInputContainer>
+                <User />
+                <DeprecatedInputStyled placeholder="Jane" name="multiValues[0].textValue" ref={register} />
+              </DeprecatedInputContainer>
             </InputGroup>
 
             <InputGroup>
               <InputLabel color="white">Last name</InputLabel>
-              <DeprecatedInput placeholder="White" name="multiValues[1].textValue" ref={register} />
+              <DeprecatedInputContainer>
+                <User />
+                <DeprecatedInputStyled placeholder="Jane" name="multiValues[0].textValue" ref={register} />
+              </DeprecatedInputContainer>
             </InputGroup>
           </Grid>
 
           <InputGroup>
             <InputLabel color="white">Email adress</InputLabel>
-            <DeprecatedInput placeholder="janewhite@gmail.com" name="multiValues[2].textValue" ref={register} />
+            <DeprecatedInputContainer>
+              <Mail />
+              <DeprecatedInputStyled placeholder="Jane" name="multiValues[0].textValue" ref={register} />
+            </DeprecatedInputContainer>
           </InputGroup>
         </Grid>
         <Div mt={4}>

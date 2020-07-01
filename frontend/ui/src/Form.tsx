@@ -4,6 +4,7 @@ import styled, { css } from 'styled-components';
 import { SpaceProps } from 'styled-system';
 import { InputHTMLAttributes } from 'react';
 import Color from 'color';
+import { Flex } from './Container';
 
 export const FormGroupContainer = styled.div`
   ${({ theme }) => css`
@@ -13,14 +14,36 @@ export const FormGroupContainer = styled.div`
 
 export const Form = styled.form``;
 
-export const InputGroup = styled.div``;
+export const InputGroup = styled.div`
+  ${({ theme }) => css`
+
+    ${DeprecatedInputStyled} {
+      border: none;
+    }
+
+    ${DeprecatedInputContainer} {
+      background: white;
+      align-items: center;
+      border-radius: 10px;
+
+      &:focus {
+        background: red;
+      }
+
+      svg {
+        stroke: #dcdcdc;
+        margin-left: ${theme.gutter / 2}px;
+      }
+    }
+  `}
+`;
 
 export const InputLabel = styled.label`
   ${({ theme }) => css`
     font-size: ${theme.fontSizes[2]}px;
     margin: 0;
     margin-bottom: ${theme.gutter / 3}px;
-    padding-left: ${theme.gutter}px;
+    padding-left: ${theme.gutter / 2}px;
     text-align: left;
     display: block;
     /* TODO: Hard-coded, needs to be determiend */
@@ -171,14 +194,21 @@ export const InputField = ({ icon, children, ...props }: InputFieldProps) => (
   </InputFieldContainer>
 )
 
-/**
- * Temporary Deprecated: remove
- */
-export const DeprecatedInput = styled.input`
+export const DeprecatedInputContainer = styled.div`
+  display: flex;
+  align-items: center;
+
+  svg {
+    margin-left: 12px;
+  }
+`;
+
+
+export const DeprecatedInputStyled = styled.input`
   ${({ theme }) => css`
     border: none;
     font-size: ${theme.fontSizes[1]}px;
-    border-radius: 50px;
+    border-radius: 10px;
     padding: 12px 24px;
     background: white;
     text-align: center;
