@@ -12,6 +12,7 @@ import {
 import editUserMutation from 'mutations/editUser';
 import getRolesQuery from 'queries/getRoles';
 import getUserQuery from 'queries/getUser';
+import getUsersQuery from 'queries/getUsers';
 
 interface FormDataProps {
   firstName?: string;
@@ -69,6 +70,12 @@ const EditCustomerForm = ({ user, roles }: { user: any, roles: Array<{ label: st
     onError: (serverError: ApolloError) => {
       console.log(serverError);
     },
+    refetchQueries: [
+      {
+        query: getUsersQuery,
+        variables: { customerSlug },
+      },
+    ],
   });
 
   const onSubmit = (formData: FormDataProps) => {
