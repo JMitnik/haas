@@ -9,19 +9,21 @@ export const SliderNodeContainer = styled(Div)``;
 export const SlideHereContainer = styled(motion.div)`
   ${({ theme }) => css`
     display: flex;
-    color: ${Color(theme.colors.primary).mix(Color('black'), 0.4).hex()};
+    color: ${Color(theme.colors.primary).mix(Color('white'), 0.6).hex()};
     opacity: 0;
     font-family: 'Open Sans', sans-serif;
-    font-size: 0.8rem;
-    position: absolute;
-    top: 0;
-    left: 50%;
-    transform: translateX(-50%) translateY(-100%);
+    font-size: 1rem;
+    top: ${theme.gutter / 2}px;
+    justify-content: center;
+    
+    i {
+      margin-left: 4px;
+    }
 
     svg {
-      stroke: black;
-      margin-right: ${theme.gutter / 2}px;
-      fill: black;
+      width: 16px;
+      margin-right: ${theme.gutter / 4}px;
+      fill: currentColor;
     }
   `}
 `;
@@ -51,7 +53,7 @@ export const HAASRabbit = styled.div`
   position: absolute;
   transform: translateX(-50%);
 
-  svg {
+  .rabbit svg {
     /* TODO: Find out why important is so important */
     width: auto !important;
     height: auto !important;
