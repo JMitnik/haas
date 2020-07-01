@@ -8,7 +8,7 @@ export const ButtonBody = styled.span``;
 export const OutlineButton = styled(Button)`
   ${({ theme }) => css`
     color: ${Color(theme.colors.primary).isDark() ? Color(theme.colors.primary).mix(Color('white'), 0.9).saturate(1).hex()
-    : Color(theme.colors.primary).mix(Color('black'), 0.8).saturate(1).hex()};
+    : Color(theme.colors.primary).mix(Color('black'), 0.5).saturate(1).hex()};
     background: transparent;
     border-radius: 10px;
     border: none;
@@ -36,11 +36,11 @@ export const ClientButton = styled(Button)`
     border-radius: 10px;
     transform: none;
     padding: 12px 22px;
-    background: linear-gradient(45deg, ${Color(theme.colors.primary).lighten(0.4).hex()}, ${Color(theme.colors.primary).lighten(0.8).hex()}); 
+    background: linear-gradient(45deg, ${Color(theme.colors.primary).lighten(0.3).hex()}, ${Color(theme.colors.primary).lighten(0.5).saturate(1).hex()}); 
     font-family: 'Open-sans', sans-serif;
     /* color: ${Color(theme.colors.primary).saturate(0.1).hex()}; */
     color: ${Color(theme.colors.primary).isDark() ? Color(theme.colors.primary).mix(Color('white'), 0.9).saturate(1).hex()
-    : Color(theme.colors.primary).mix(Color('black'), 0.8).saturate(1).hex()};
+    : Color(theme.colors.primary).mix(Color('black'), 0.5).saturate(1).hex()};
 
     ${ButtonBody} {
       width: 100%;
@@ -58,7 +58,7 @@ export const ClientButton = styled(Button)`
     }
 
     ${!isActive && css`
-      opacity: 0.6;
+      opacity: 0.4;
     `}
 
     > * {

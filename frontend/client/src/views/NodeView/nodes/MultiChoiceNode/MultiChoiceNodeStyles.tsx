@@ -40,11 +40,7 @@ export const MultiChoiceNodeGrid = styled(motion.div)`
       border-radius: 10px;
       transform: none;
       padding: 12px 22px;
-      background: linear-gradient(45deg, ${Color(theme.colors.primary).lighten(0.4).hex()}, ${Color(theme.colors.primary).lighten(0.8).hex()}); 
       font-family: 'Open-sans', sans-serif;
-      /* color: ${Color(theme.colors.primary).saturate(0.1).hex()}; */
-      color: ${Color(theme.colors.primary).isDark() ? Color(theme.colors.primary).mix(Color('white'), 0.9).saturate(1).hex()
-    : Color(theme.colors.primary).mix(Color('black'), 0.8).saturate(1).hex()
 };
  
       h1,h2,h3,h4,h5 {

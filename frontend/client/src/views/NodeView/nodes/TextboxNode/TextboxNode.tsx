@@ -38,7 +38,7 @@ const TextboxNode = ({ node, onEntryStore }: TextboxNodeProps) => {
 
         <Div mt={4}>
           <Grid gridTemplateColumns="2fr 1fr">
-            <ClientButton disabled={!('textValue' in formState.touched)} isActive={!('textValue' in formState.touched)} onClick={() => onSubmit()}>
+            <ClientButton disabled={!('textValue' in formState.touched)} isActive={('textValue' in formState.touched)} onClick={() => onSubmit()}>
               <ButtonIcon>
                 <CheckCircle />
               </ButtonIcon>
