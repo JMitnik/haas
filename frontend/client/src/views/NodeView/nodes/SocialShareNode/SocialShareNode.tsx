@@ -17,19 +17,19 @@ const SocialShareNode = ({ node }: SocialShareNodeProps) => {
     <SocialShareNodeContainer>
       <NodeTitle>{node.title}</NodeTitle>
       <Flex justifyContent="center" alignItems="center">
-        <ShareItem backgroundColor="#1da1f2">
+        <ShareItem href="https://twitter.com" target="__blank" rel="noopener noreferrer" backgroundColor="#1da1f2">
           <Twitter stroke="none" fill="white" />
         </ShareItem>
 
-        <ShareItem backgroundColor="#1877f2">
+        <ShareItem href="https://facebook.com" target="__blank" rel="noopener noreferrer" backgroundColor="#1877f2">
           <Facebook stroke="none" fill="white" />
         </ShareItem>
 
-        <ShareItem bg="#c32aa3">
+        <ShareItem href="https://instagram.com" target="__blank" rel="noopener noreferrer" bg="#c32aa3">
           <Instagram stroke="white" />
         </ShareItem>
 
-        <ShareItem bg="#007bb5">
+        <ShareItem href="https://linkedin.com" target="__blank" rel="noopener noreferrer" bg="#007bb5">
           <Linkedin stroke="none" fill="white" />
         </ShareItem>
       </Flex>

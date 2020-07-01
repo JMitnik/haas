@@ -1,3 +1,4 @@
+import Color from 'color';
 import styled, { css } from 'styled-components/macro';
 
 import { Div, H2 } from '@haas/ui';
@@ -28,5 +29,9 @@ export const NodeContainer = styled(Div)`
 `;
 
 export const NodeTitle = styled(H2)`
-  color: white;
+  ${({ theme }) => css`
+
+  color: ${Color(theme.colors.primary).isDark() ? Color(theme.colors.primary).mix(Color('white'), 0.9).saturate(1).hex()
+    : Color(theme.colors.primary).mix(Color('black'), 0.5).saturate(1).hex()};
+  `}
 `;

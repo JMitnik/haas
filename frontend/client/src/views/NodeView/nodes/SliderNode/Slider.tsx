@@ -2,10 +2,12 @@ import { AnimationControls } from 'framer-motion';
 import Lottie from 'react-lottie';
 import React, { useReducer } from 'react';
 
+import { Div, Flex, Slider as UISlider } from '@haas/ui';
+import { ReactComponent as DragIcon } from 'assets/icons/icon-order-horizontal.svg';
 import { HAASIdle, HAASRun, HAASStopping } from 'assets/animations';
-import { Slider as UISlider } from '@haas/ui';
 
-import { HAASRabbit } from './SliderNodeStyles';
+import { HAASRabbit, SlideHereContainer } from './SliderNodeStyles';
+import { SlideMeAnimation } from './SliderNodeAnimations';
 
 interface SliderAnimationStateProps {
   isStopped: boolean;
@@ -26,7 +28,7 @@ type SliderAnimationActionType =
 | { type: 'stop', payload?: AnimationPayload };
 
 const defaultSliderAnimationState: SliderAnimationStateProps = {
-  isStopped: false,
+  isStopped: true,
   speed: 2.0,
   direction: 1.0,
   position: 50,
@@ -103,20 +105,33 @@ const Slider = ({ register, onSubmit, animationControls }: SliderProps) => {
 
   return (
     <>
+
       <HAASRabbit style={{
         left: `${animationState.position}%`,
         bottom: '5px',
         transform: `translateX(-50%) scaleX(${animationState.direction})`,
       }}
       >
-        <Lottie
-          isStopped={animationState.isStopped}
-          options={{
-            animationData: animationState.animationJson,
-            loop: true,
-          }}
-          speed={animationState.speed}
-        />
+        {animationState.isStopped && (
+        <SlideHereContainer variants={SlideMeAnimation} animate="animate" initial="initial" exit="exit">
+          <Flex>
+            <DragIcon />
+            slide to
+            {' '}
+            <i>start</i>
+          </Flex>
+        </SlideHereContainer>
+        )}
+        <div className="rabbit">
+          <Lottie
+            isStopped={animationState.isStopped}
+            options={{
+              animationData: animationState.animationJson,
+              loop: true,
+            }}
+            speed={animationState.speed}
+          />
+        </div>
       </HAASRabbit>
       <form>
         <UISlider
