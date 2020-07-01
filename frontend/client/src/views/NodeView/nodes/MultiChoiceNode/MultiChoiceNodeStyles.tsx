@@ -34,14 +34,20 @@ export const MultiChoiceNodeGrid = styled(motion.div)`
     display: grid;
     grid-gap: ${theme.gutter / 1.5}px;
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    align-items: stretch;
+
+    > div {
+      height: 100%;
+    }
 
     button {
+      height: 100%;
       box-shadow: 0 4px 6px rgba(50,50,93,.11), 0 1px 3px rgba(0,0,0,.08);
       border-radius: 10px;
       transform: none;
       padding: 12px 22px;
       font-family: 'Open-sans', sans-serif;
-};
+    };
  
       h1,h2,h3,h4,h5 {
         color: inherit;
