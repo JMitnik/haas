@@ -208,13 +208,14 @@ export const DeprecatedInputStyled = styled.input`
   ${({ theme }) => css`
     border: none;
     font-size: ${theme.fontSizes[1]}px;
-    border-radius: 10px;
+    border-radius: 0 10px 10px 0;
     padding: 12px 24px;
     background: white;
     text-align: center;
     font-weight: bolder;
     color: ${theme.colors.default.text};
     text-align: left;
+    margin-left: ${theme.gutter / 2}px;
 
     &::placeholder {
       color: #c6c6c6;
@@ -222,9 +223,7 @@ export const DeprecatedInputStyled = styled.input`
     }
 
     &:focus, &:active {
-      border: 1px solid #0059f8;
-      background: ${Color('#0059f8').mix(Color('white'), 0.9).hex()};
-      box-shadow: 0 0 0 4px ${Color('#0059f8').fade(0.8).string()};
+      background: ${Color(theme.colors.primary).mix(Color('white'), 0.9).hex()};
       outline: none !important;
     }
   `}

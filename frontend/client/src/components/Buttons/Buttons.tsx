@@ -5,9 +5,21 @@ import { Button, H5 } from '@haas/ui';
 
 export const ButtonBody = styled.span``;
 
+export const OutlineButton = styled(Button)`
+  ${({ theme }) => css`
+    color: ${Color(theme.colors.primary).isDark() ? Color(theme.colors.primary).mix(Color('white'), 0.9).saturate(1).hex()
+    : Color(theme.colors.primary).mix(Color('black'), 0.8).saturate(1).hex()};
+    background: transparent;
+    border-radius: 10px;
+    border: none;
+    display: flex;
+    align-items: center;
+  `}
+`;
+
 export const ClientButton = styled(Button)`
-  ${({ isActive, theme }) => css`
-    width: 400px;
+  ${({ isActive = true, theme }) => css`
+    width: 100%;
     justify-content: flex-start;
     border: none;
     max-width: 100%;
@@ -44,6 +56,10 @@ export const ClientButton = styled(Button)`
         align-items: center;
       }
     }
+
+    ${!isActive && css`
+      opacity: 0.6;
+    `}
 
     > * {
       padding: 12px;

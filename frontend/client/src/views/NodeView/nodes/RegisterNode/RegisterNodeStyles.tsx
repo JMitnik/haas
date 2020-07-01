@@ -5,13 +5,11 @@ export const RegisterNodeContainer = styled(Div)`
   ${({ theme }) => css`
     @media ${theme.media.mob} {
       ${H2} {
-        font-size: 1.2em;
+        font-size: 1.5em;
       }
     }
 
     input {
-      border-radius: 10px;
-      border: 1px solid ${theme.colors.primary};
       font-size: ${theme.fontSizes[1]}px;
       width: 100%;
       resize: none;

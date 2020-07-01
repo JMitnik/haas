@@ -1,11 +1,11 @@
-import { CheckCircle, User, Mail } from 'react-feather';
+import { CheckCircle, Mail, User } from 'react-feather';
 import { useForm } from 'react-hook-form';
 import React from 'react';
 
 import { ButtonIcon } from '@haas/ui/src/Buttons';
-import { ClientButton } from 'components/Buttons/Buttons';
+import { ClientButton, OutlineButton } from 'components/Buttons/Buttons';
 import { DeprecatedInputContainer, DeprecatedInputStyled, InputGroup, InputLabel } from '@haas/ui/src/Form';
-import { Div, Flex, Grid } from '@haas/ui';
+import { Div, Flex, Grid, Span } from '@haas/ui';
 import { NodeTitle } from 'layouts/NodeLayout/NodeLayoutStyles';
 
 import { GenericNodeProps } from '../types';
@@ -49,7 +49,7 @@ const RegisterNode = ({ node, onEntryStore }: RegisterNodeProps) => {
               <InputLabel color="white">Last name</InputLabel>
               <DeprecatedInputContainer>
                 <User />
-                <DeprecatedInputStyled placeholder="Jane" name="multiValues[0].textValue" ref={register} />
+                <DeprecatedInputStyled placeholder="Doe" name="multiValues[0].textValue" ref={register} />
               </DeprecatedInputContainer>
             </InputGroup>
           </Grid>
@@ -58,17 +58,21 @@ const RegisterNode = ({ node, onEntryStore }: RegisterNodeProps) => {
             <InputLabel color="white">Email adress</InputLabel>
             <DeprecatedInputContainer>
               <Mail />
-              <DeprecatedInputStyled placeholder="Jane" name="multiValues[0].textValue" ref={register} />
+              <DeprecatedInputStyled placeholder="Jane@haas.live" name="multiValues[0].textValue" ref={register} />
             </DeprecatedInputContainer>
           </InputGroup>
         </Grid>
         <Div mt={4}>
-          <ClientButton isActive={touched()} onClick={() => onSubmit()}>
-            <ButtonIcon>
-              <CheckCircle />
-            </ButtonIcon>
-            Submit
-          </ClientButton>
+          <Grid gridTemplateColumns="2fr 1fr">
+            <ClientButton disabled={!touched()} isActive={touched()} onClick={() => onSubmit()}>
+              <ButtonIcon>
+                <CheckCircle />
+              </ButtonIcon>
+              Submit
+            </ClientButton>
+
+            <OutlineButton onClick={() => onSubmit()}>Do not share</OutlineButton>
+          </Grid>
         </Div>
       </Div>
     </RegisterNodeContainer>
