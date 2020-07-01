@@ -1,13 +1,14 @@
 import { Variants, motion } from 'framer-motion';
 import React from 'react';
 
-import { ClientButton } from 'components/Buttons/Buttons';
-import { Div, H5 } from '@haas/ui';
+import { ButtonBody, ClientButton } from 'components/Buttons/Buttons';
+import { Div, H5, Span } from '@haas/ui';
 import { NodeTitle } from 'layouts/NodeLayout/NodeLayoutStyles';
+import { ReactComponent as SpeechIcon } from 'assets/icons/icon-chat.svg';
 import { TreeNodeOptionProps } from 'models/Tree/TreeNodeOptionModel';
 
+import { ChoiceIconContainer, MultiChoiceNodeContainer, MultiChoiceNodeGrid } from './MultiChoiceNodeStyles';
 import { GenericNodeProps } from '../types';
-import { MultiChoiceNodeContainer, MultiChoiceNodeGrid } from './MultiChoiceNodeStyles';
 
 type MultiChoiceNodeProps = GenericNodeProps;
 
@@ -56,16 +57,21 @@ const MultiChoiceNode = ({ node, onEntryStore }: MultiChoiceNodeProps) => {
       >
         {node.options?.map((multiChoiceOption: TreeNodeOptionProps, index: number) => (
           <motion.div key={index} variants={multiChoiceItemAnimation}>
-            <Div useFlex justifyContent="center" key={index} padding={2} flex={['100%', 1]}>
+            <Div key={index} flex={['100%', 1]}>
               <ClientButton
                 brand="primary"
                 type="button"
                 onClick={() => onSubmit(multiChoiceOption)}
                 key={index}
               >
-                <H5>
-                  {(multiChoiceOption?.publicValue || multiChoiceOption?.value)}
-                </H5>
+                <ChoiceIconContainer>
+                  <SpeechIcon />
+                </ChoiceIconContainer>
+                <ButtonBody>
+                  <H5>
+                    {(multiChoiceOption?.publicValue || multiChoiceOption?.value)}
+                  </H5>
+                </ButtonBody>
               </ClientButton>
             </Div>
           </motion.div>
