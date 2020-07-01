@@ -8,6 +8,7 @@ export const SliderNodeContainer = styled(Div)``;
 
 export const SlideHereContainer = styled(motion.div)`
   ${({ theme }) => css`
+    display: flex;
     color: ${Color(theme.colors.primary).mix(Color('black'), 0.4).hex()};
     opacity: 0;
     font-family: 'Open Sans', sans-serif;
@@ -16,6 +17,12 @@ export const SlideHereContainer = styled(motion.div)`
     top: 0;
     left: 50%;
     transform: translateX(-50%) translateY(-100%);
+
+    svg {
+      stroke: black;
+      margin-right: ${theme.gutter / 2}px;
+      fill: black;
+    }
   `}
 `;
 
