@@ -39,8 +39,8 @@ export const leafNodes = [
   },
   {
     title:
-      'Thank you for your positive feedback. We think you might like this as well.',
-    type: socialShareType,
+      'Thank you for your feedback. Would you like to say anything else?',
+    type: textboxType,
   },
   {
     title:
