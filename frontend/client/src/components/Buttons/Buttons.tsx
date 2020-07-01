@@ -1,14 +1,42 @@
 import styled, { css } from 'styled-components/macro';
+
 import { Button, H5 } from '@haas/ui';
 
+export const ButtonBody = styled.span``;
+
 export const ClientButton = styled(Button)`
-  ${({ theme, isActive }) => css`
+  ${({ isActive, theme }) => css`
     width: 400px;
+    justify-content: flex-start;
     border: none;
     max-width: 100%;
-    background: rgba(0, 0, 0, 0.4);
+    background: none;
+    display: flex;
+    align-items: stretch;
     box-shadow: 0px 3px 1px 1px rgba(0, 0, 0, 0.10);
     position: relative;
+    justify-content: flex-start;
+    padding: 0 !important;
+
+    ${ButtonBody} {
+      width: 100%;
+      text-align: left;
+      padding-left: 24px;
+
+      border-radius: 0 10px 10px 0;
+      background: white;
+      color: ${theme.colors.primary};
+
+      h1, h2, h3, h4 ,h5 {
+        height: 100%;
+        display: flex;
+        align-items: center;
+      }
+    }
+
+    > * {
+      padding: 12px;
+    }
 
     ${H5} {
       z-index: 100;
@@ -23,8 +51,8 @@ export const ClientButton = styled(Button)`
       outline: none;
     }
 
-    ${isActive &&
-      css`
+    ${isActive
+      && css`
         background: white;
 
         &:hover {
