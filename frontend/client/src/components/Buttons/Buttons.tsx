@@ -42,12 +42,8 @@ export const ClientButton = styled(Button)`
       z-index: 100;
     }
 
-    &:hover {
-      background: rgba(0, 0, 0, 0.6);
-    }
 
     &:focus {
-      background: rgba(0, 0, 0, 0.1);
       outline: none;
     }
 
