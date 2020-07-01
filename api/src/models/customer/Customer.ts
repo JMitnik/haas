@@ -3,8 +3,8 @@ import { GraphQLUpload } from 'apollo-server-express';
 import { extendType, inputObjectType, objectType, scalarType } from '@nexus/schema';
 import cloudinary, { UploadApiResponse } from 'cloudinary';
 
-import { CustomerSettingsType } from '../settings/CustomerSettings';
 import { GraphQLError } from 'graphql';
+import { CustomerSettingsType } from '../settings/CustomerSettings';
 // eslint-disable-next-line import/no-cycle
 import { DialogueFilterInputType, DialogueType, DialogueWhereUniqueInput } from '../questionnaire/Dialogue';
 import CustomerService from './CustomerService';
@@ -117,7 +117,6 @@ const CustomerCreateOptionsInput = inputObjectType({
     t.string('logo');
     t.string('primaryColour', { required: true });
     t.boolean('isSeed', { default: false, required: false });
-    t.string('name', { required: true });
   },
 });
 

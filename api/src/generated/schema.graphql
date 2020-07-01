@@ -31,7 +31,6 @@ type Customer {
 input CustomerCreateOptions {
   isSeed: Boolean = false
   logo: String
-  name: String!
   primaryColour: String!
   slug: String!
 }
