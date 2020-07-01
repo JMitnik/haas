@@ -10,7 +10,7 @@ import DialogueCard from './DialogueCard';
 
 // TODO: Do something about this
 const DialogueOverviewFilters = () => (
-  <div></div>
+  <div />
 );
 
 const DialogueOverview = ({ dialogues }: { dialogues: any }) => {
@@ -22,7 +22,7 @@ const DialogueOverview = ({ dialogues }: { dialogues: any }) => {
 
       <Div mb={4}>
         <Grid gridTemplateColumns="300px 1fr">
-          <Searchbar activeSearchTerm="" onSearchTermChange={(newTerm) => (console.log(newTerm))} />
+          <Searchbar activeSearchTerm="" onSearchTermChange={(newTerm) => null} />
           <DialogueOverviewFilters />
         </Grid>
       </Div>
