@@ -17,8 +17,8 @@ import SessionService from '../session/SessionService';
 export const lineChartDataType = objectType({
   name: 'lineChartDataType',
   definition(t) {
-    t.string('x');
-    t.int('y');
+    t.string('x', { nullable: true });
+    t.int('y', { nullable: true });
   },
 });
 

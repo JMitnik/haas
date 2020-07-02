@@ -164,8 +164,8 @@ input LeafNodeInput {
 }
 
 type lineChartDataType {
-  x: String!
-  y: Int!
+  x: String
+  y: Int
 }
 
 type Mutation {

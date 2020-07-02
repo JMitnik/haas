@@ -281,8 +281,8 @@ export interface NexusGenRootTypes {
     phone?: string | null; // String
   }
   lineChartDataType: { // root type
-    x: string; // String!
-    y: number; // Int!
+    x?: string | null; // String
+    y?: number | null; // Int
   }
   topPathType: { // root type
     answer: string; // String!
@@ -589,8 +589,8 @@ export interface NexusGenFieldTypes {
     role: NexusGenRootTypes['RoleType']; // RoleType!
   }
   lineChartDataType: { // field return type
-    x: string; // String!
-    y: number; // Int!
+    x: string | null; // String
+    y: number | null; // Int
   }
   topPathType: { // field return type
     answer: string; // String!
