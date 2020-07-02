@@ -42,6 +42,7 @@ const useJourneyFinish = (submitInstant: boolean = true) => {
   useEffect(() => {
     if (isFinished) {
       store.session.reset();
+      store.restart();
     }
   }, [isFinished, store.session]);
 

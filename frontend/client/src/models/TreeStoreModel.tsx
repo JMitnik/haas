@@ -9,6 +9,7 @@ import TreeModel from './Tree/TreeModel';
 const TreeStoreModel = types
   .model('TreeStore', {
     session: types.optional(SessionModel, {}),
+    hasStarted: false,
     tree: types.maybeNull(TreeModel),
     customer: types.maybeNull(CustomerModel),
   })
@@ -35,6 +36,14 @@ const TreeStoreModel = types
         });
 
         self.customer = newCustomer;
+      },
+
+      start: () => {
+        self.hasStarted = true;
+      },
+
+      restart: () => {
+        self.hasStarted = false;
       },
 
       /**

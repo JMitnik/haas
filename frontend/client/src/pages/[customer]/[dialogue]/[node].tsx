@@ -1,14 +1,14 @@
-import { Variants, motion } from 'framer-motion';
+import { Redirect, useParams } from 'react-router-dom';
+import { Variants, motion, usePresence } from 'framer-motion';
 import { observer, useObserver } from 'mobx-react-lite';
-import { useParams } from 'react-router-dom';
 import React from 'react';
 import styled from 'styled-components/macro';
 
 import { HAASNode } from 'types/generic';
+import EmptyDialogueView from 'views/NodeView/EmptyDialogueView';
 import Loader from 'components/Loader';
 import NodeView from 'views/NodeView';
 import useDialogueTree from 'providers/DialogueTreeProvider';
-import EmptyDialogueView from 'views/NodeView/EmptyDialogueView';
 
 export interface GenericNodeProps {
   isLeaf?: boolean;
@@ -36,20 +36,30 @@ const NodePageContainer = styled(motion.div)`
   bottom: 0;
 `;
 
-const NodePage = observer(() => {
-  const { edgeId } = useParams<{ edgeId?: string, leafId?: string }>();
+const NodePage = () => {
+  const { edgeId, customerSlug, dialogueSlug } = useParams<{ customerSlug?: string, dialogueSlug?: string, edgeId?: string, leafId?: string }>();
   const store = useDialogueTree();
 
   return useObserver(() => {
-    // If rootNode is unknown yet, return Loader
     if (!store.tree) {
       return <Loader />;
     }
 
-    // TODO: Disable going back
-
-    // Either we start from the 'root' (no edge) or we get the next node.
     const node = edgeId ? store.tree.getChildNodeByEdge(edgeId) : store.tree.rootNode;
+
+    if (!node.isRoot && !node.isLeaf && !store.hasStarted) {
+      return (
+        <NodePageContainer
+          variants={nodeViewAnimation}
+          initial="initial"
+          animate="animate"
+          exit="exit"
+          key={edgeId}
+        >
+          <Redirect to={`/${customerSlug}/${dialogueSlug}`} />
+        </NodePageContainer>
+      );
+    }
 
     if (!node) {
       return <EmptyDialogueView />;
@@ -69,6 +79,6 @@ const NodePage = observer(() => {
       </NodePageContainer>
     );
   });
-});
+};
 
 export default NodePage;

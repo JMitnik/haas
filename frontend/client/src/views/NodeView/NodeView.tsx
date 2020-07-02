@@ -46,6 +46,7 @@ const NodeView = ({ node }: NodeViewProps) => {
     // Store the entry
     store.session.add(node.id, entry);
 
+    store.start();
     // Get next edge and navigate there
     const nextEdgeId = node.getNextEdgeIdFromKey(edgeKey);
     history.push(`/${store.customer?.slug}/${store.tree?.slug}/${nextEdgeId}`);

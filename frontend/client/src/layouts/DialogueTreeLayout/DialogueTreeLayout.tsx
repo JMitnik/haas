@@ -9,6 +9,7 @@ import WatermarkLogo from 'components/WatermarkLogo';
 import useDialogueTree from 'providers/DialogueTreeProvider';
 
 import { DialogueTreeContainer, GoBackButton, GoBackContainer, GoBackText } from './DialogueTreeStyles';
+import { useObserver } from 'mobx-react-lite';
 
 const routerNavigationAnimation: Variants = {
   initial: {
@@ -29,10 +30,10 @@ const DialogueTreeLayout = ({ children, node }: { children: ReactNode, node:Tree
   const history = useHistory();
   const store = useDialogueTree();
 
-  return (
+  return useObserver(() => (
     <DialogueTreeContainer>
       {/* TODO: Enable consistent animation */}
-      {!node.isRoot && (
+      {!node.isRoot && !store.session.isEmpty && (
         <GoBackContainer variants={routerNavigationAnimation} animate="animate" initial="initial" exit="exit">
           <GoBackButton onClick={() => history.goBack()}>
             <ChevronLeft />
@@ -47,7 +48,7 @@ const DialogueTreeLayout = ({ children, node }: { children: ReactNode, node:Tree
 
       {!!store.customer && <WatermarkLogo logoUrl={store.customer?.settings?.logoUrl} />}
     </DialogueTreeContainer>
-  );
+  ));
 };
 
 export default DialogueTreeLayout;
