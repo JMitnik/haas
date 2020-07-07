@@ -7,6 +7,7 @@ import CustomerProvider from 'providers/CustomerProvider';
 import DashboardPage from 'pages/dashboard';
 
 import { AppContainer } from 'styles/AppStyles';
+import ActionsPage from 'views/ActionsOverview/ActionsOverview';
 import AddCustomerPage from 'pages/dashboard/customers/add';
 import AddDialogueView from 'views/AddDialogueView';
 import AddTriggerView from 'views/TriggerOverview/AddTriggerView';
@@ -123,6 +124,11 @@ const AppRoutes = () => (
                     <Route
                       path="/dashboard/b/:customerSlug/d/:dialogueSlug/interactions"
                       render={() => <InteractionsOverview />}
+                    />
+
+                    <Route
+                      path="/dashboard/b/:customerSlug/d/:dialogueSlug/actions"
+                      render={() => <ActionsPage />}
                     />
 
                     <Route
