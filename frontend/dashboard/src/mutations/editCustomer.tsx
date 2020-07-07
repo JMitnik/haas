@@ -1,7 +1,7 @@
 import gql from 'graphql-tag';
 
 const editCustomerMutation = gql`
-  mutation editCustomer($id: String!, $options: CustomerCreateOptions) {
+  mutation editCustomer($id: String!, $options: CustomerEditOptions) {
     editCustomer(id: $id, options: $options) {
         id
     }

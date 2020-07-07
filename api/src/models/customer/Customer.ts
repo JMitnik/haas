@@ -3,8 +3,8 @@ import { GraphQLUpload } from 'apollo-server-express';
 import { extendType, inputObjectType, objectType, scalarType } from '@nexus/schema';
 import cloudinary, { UploadApiResponse } from 'cloudinary';
 
-import { GraphQLError } from 'graphql';
 import { CustomerSettingsType } from '../settings/CustomerSettings';
+import { GraphQLError } from 'graphql';
 // eslint-disable-next-line import/no-cycle
 import { DialogueFilterInputType, DialogueType, DialogueWhereUniqueInput } from '../questionnaire/Dialogue';
 import CustomerService from './CustomerService';
@@ -120,6 +120,16 @@ const CustomerCreateOptionsInput = inputObjectType({
   },
 });
 
+const CustomerEditOptionsInput = inputObjectType({
+  name: 'CustomerEditOptions',
+  definition(t) {
+    t.string('slug', { required: true });
+    t.string('name', { required: true });
+    t.string('logo');
+    t.string('primaryColour', { required: true });
+  },
+});
+
 interface test {
   url?: string;
 }
@@ -175,7 +185,7 @@ export const CustomerMutations = Upload && extendType({
       type: CustomerType,
       args: {
         id: 'String',
-        options: CustomerCreateOptionsInput,
+        options: CustomerEditOptionsInput,
       },
       resolve(parent: any, args: any) {
         const primaryColor: string = args?.options?.primaryColor;
