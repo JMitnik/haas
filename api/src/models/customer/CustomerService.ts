@@ -124,7 +124,7 @@ class CustomerService {
 
     await prisma.colourSettings.update({
       where: {
-        id: customerSettings.colourSettingsId,
+        id: customerSettings.colourSettingsId || undefined,
       },
       data: {
         primary: primaryColour,

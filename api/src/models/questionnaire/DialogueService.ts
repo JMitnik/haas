@@ -170,7 +170,7 @@ class DialogueService {
     const filterDateTime = subDays(currentDate, numberOfDaysBack);
     const sessions = await prisma.session.findMany({
       skip: offset,
-      first: limit,
+      take: limit,
       where: {
         dialogueId,
       },

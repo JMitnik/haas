@@ -3,8 +3,8 @@ import { GraphQLUpload } from 'apollo-server-express';
 import { extendType, inputObjectType, objectType, scalarType } from '@nexus/schema';
 import cloudinary, { UploadApiResponse } from 'cloudinary';
 
-import { CustomerSettingsType } from '../settings/CustomerSettings';
 import { GraphQLError } from 'graphql';
+import { CustomerSettingsType } from '../settings/CustomerSettings';
 // eslint-disable-next-line import/no-cycle
 import { DialogueFilterInputType, DialogueType, DialogueWhereUniqueInput } from '../questionnaire/Dialogue';
 import CustomerService from './CustomerService';
@@ -21,7 +21,8 @@ export const CustomerType = objectType({
     t.field('settings', {
       type: CustomerSettingsType,
       resolve(parent: Customer, args: any, ctx: any) {
-        const customerSettings = ctx.prisma.customerSettings.findOne(
+        const { prisma }: { prisma: PrismaClient } = ctx;
+        const customerSettings = prisma.customerSettings.findOne(
           { where: { customerId: parent.id } },
         );
 
@@ -225,7 +226,7 @@ export const CustomerMutations = Upload && extendType({
 
         // //// Settings-related
         if (fontSettingsId) {
-          await ctx.prisma.fontSettings.delete({
+          await prisma.fontSettings.delete({
             where: {
               id: fontSettingsId,
             },
@@ -233,7 +234,7 @@ export const CustomerMutations = Upload && extendType({
         }
 
         if (colourSettingsId) {
-          await ctx.prisma.colourSettings.delete({
+          await prisma.colourSettings.delete({
             where: {
               id: colourSettingsId,
             },
@@ -241,7 +242,7 @@ export const CustomerMutations = Upload && extendType({
         }
 
         if (customer?.settings) {
-          await ctx.prisma.customerSettings.delete({
+          await prisma.customerSettings.delete({
             where: {
               customerId,
             },
@@ -272,7 +273,7 @@ export const CustomerMutations = Upload && extendType({
 
         await prisma.role.deleteMany({ where: { customerId } });
 
-        await ctx.prisma.customer.delete({
+        await prisma.customer.delete({
           where: {
             id: customerId,
           },
@@ -289,7 +290,8 @@ export const CustomersQuery = extendType({
     t.list.field('customers', {
       type: CustomerType,
       async resolve(parent: any, args: any, ctx: any) {
-        const customers = await ctx.prisma.customer.findMany();
+        const { prisma }: { prisma: PrismaClient } = ctx;
+        const customers = await prisma.customer.findMany();
         return customers;
       },
     });

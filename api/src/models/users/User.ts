@@ -6,8 +6,6 @@ import { PaginationProps } from '../../types/generic';
 import { RoleType } from '../role/Role';
 import UserService from './UserService';
 
-const prisma = new PrismaClient();
-
 export const UserType = objectType({
   name: 'UserType',
   definition(t) {
@@ -19,7 +17,8 @@ export const UserType = objectType({
 
     t.field('role', {
       type: RoleType,
-      resolve(parent: User) {
+      resolve(parent: User, args: any, ctx: any) {
+        const { prisma }: { prisma: PrismaClient } = ctx;
         return prisma.role.findOne({ where: { id: parent.roleId } });
       },
     });
@@ -56,10 +55,11 @@ export const UserQueries = extendType({
       type: UserTable,
       args: { customerSlug: 'String', filter: FilterInput },
       async resolve(parent: any, args: any, ctx: any) {
+        const { prisma }: { prisma: PrismaClient } = ctx;
         const { pageIndex, offset, limit, searchTerm, orderBy }: PaginationProps = args.filter;
 
         if (args.filter) {
-          return UserService.paginatedUsers(args.customerId, pageIndex, offset, limit, orderBy[0], searchTerm);
+          return UserService.paginatedUsers(args.customerSlug, pageIndex, offset, limit, orderBy[0], searchTerm);
         }
 
         const users = await prisma.user.findMany({ where: { Customer: {
@@ -75,6 +75,7 @@ export const UserQueries = extendType({
       type: UserType,
       args: { customerSlug: 'String' },
       resolve(parent: any, args: any, ctx: any) {
+        const { prisma }: { prisma: PrismaClient } = ctx;
         return prisma.user.findMany({ where: { Customer: { slug: args.customerSlug } } });
       },
     });
@@ -83,6 +84,7 @@ export const UserQueries = extendType({
       type: UserType,
       args: { userId: 'String' },
       resolve(parent: any, args: any, ctx: any) {
+        const { prisma }: { prisma: PrismaClient } = ctx;
         return prisma.user.findOne({ where: { id: args.userId } });
       },
     });
@@ -97,6 +99,7 @@ export const UserMutations = extendType({
       args: { customerSlug: 'String',
         input: UserInput },
       resolve(parent: any, args: any, ctx: any) {
+        const { prisma }: { prisma: PrismaClient } = ctx;
         const { firstName, lastName, email, phone, roleId } = args.input;
         return prisma.user.create({
           data: {
@@ -123,6 +126,7 @@ export const UserMutations = extendType({
       type: UserType,
       args: { id: 'String', input: UserInput },
       resolve(parent: any, args: any, ctx: any) {
+        const { prisma }: { prisma: PrismaClient } = ctx;
         const { firstName, lastName, email, phone, roleId } = args.input;
         return prisma.user.update({
           where: {
@@ -146,7 +150,8 @@ export const UserMutations = extendType({
     t.field('deleteUser', {
       type: UserType,
       args: { id: 'String' },
-      resolve(parent: any, args: any, ctx) {
+      resolve(parent: any, args: any, ctx: any) {
+        const { prisma }: { prisma: PrismaClient } = ctx;
         return prisma.user.delete({ where: { id: args.id } });
       },
     });

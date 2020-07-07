@@ -3270,15 +3270,17 @@
     style-value-types "^3.1.7"
     tslib "^1.10.0"
 
-"@prisma/cli@2.0.0-beta.3":
-  version "2.0.0-beta.3"
-  resolved "https://registry.yarnpkg.com/@prisma/cli/-/cli-2.0.0-beta.3.tgz#54ac441bd538aade10acb07912b6751698c766df"
-  integrity sha512-VZxeTLLMenhkAyaY4tvTqChcW6QtUkiVvZj7N6A2vi6HsM1Tnf0fIZsiH1h3e/LEnaaDGIUC8F4Gkh2SeyeyCg==
+"@prisma/cli@^2.1.3":
+  version "2.1.3"
+  resolved "https://registry.yarnpkg.com/@prisma/cli/-/cli-2.1.3.tgz#f3439781f3f3cf4114183d21cd0bfe486b122cdb"
+  integrity sha512-JlLSldk21TFcU8FIORHFd/zR889TJvjnYW3ufUNjOHRwbZTkBrs+KT+aSRb9aAp0vVmEgm+T44O+6V7/iwJUIA==
 
-"@prisma/client@2.0.0-beta.2":
-  version "2.0.0-beta.2"
-  resolved "https://registry.yarnpkg.com/@prisma/client/-/client-2.0.0-beta.2.tgz#dd7b357f65e8100cd6cc1b610d848b72217640bb"
-  integrity sha512-VhNYeeGTrFfLjB/JL7XPoWpxSTCb+YV+F3ggR1X0CGa4b/u6Kxy65aElLozs+yFdMQPVNkyg2PwUO8xQ7G9fpg==
+"@prisma/client@^2.1.3":
+  version "2.1.3"
+  resolved "https://registry.yarnpkg.com/@prisma/client/-/client-2.1.3.tgz#92bcd81101a8ee939943867c134089d1bb29b2b9"
+  integrity sha512-5D8Uty1++j+rvlr0GzFGF98WjaWq61JfVYEdKe4DDubJfo6o85D/Y7TJ9IhmnMveUF3wk4CfPs8yNFt9rS0ZIA==
+  dependencies:
+    pkg-up "^3.1.0"
 
 "@protobufjs/aspromise@^1.1.1", "@protobufjs/aspromise@^1.1.2":
   version "1.1.2"
@@ -10732,9 +10734,9 @@ fs-capacitor@^2.0.4:
   integrity sha512-8S4f4WsCryNw2mJJchi46YgB6CR5Ze+4L1h8ewl9tEpL4SJ3ZO+c/bS4BWhB8bK+O3TMqhuZarTitd0S0eh2pA==
 
 fs-capacitor@^6.1.0:
-  version "6.1.0"
-  resolved "https://registry.yarnpkg.com/fs-capacitor/-/fs-capacitor-6.1.0.tgz#457f5868a743fe662caa9bd825be966c3d4641a4"
-  integrity sha512-YsKGCLAB40P3OKeciIa7cKzt7WkY8QT9ETa2wVIG3fQDHW2h3xtRo0770lUIbPrjCr5Sa+zFhixNJ+2xNxaraQ==
+  version "6.2.0"
+  resolved "https://registry.yarnpkg.com/fs-capacitor/-/fs-capacitor-6.2.0.tgz#fa79ac6576629163cb84561995602d8999afb7f5"
+  integrity sha512-nKcE1UduoSKX27NSZlg879LdQc94OtbOsEmKMN2MBNudXREvijRKx2GEBsTMTfws+BrbkJoEuynbGSVRSpauvw==
 
 fs-extra@^0.30.0:
   version "0.30.0"
@@ -11367,10 +11369,10 @@ graphql-tools@^4.0.0:
     iterall "^1.1.3"
     uuid "^3.1.0"
 
-graphql-upload@^10.0.0:
-  version "10.0.0"
-  resolved "https://registry.yarnpkg.com/graphql-upload/-/graphql-upload-10.0.0.tgz#1020c8ac6208c8cdf9de1f6ad9000eab7467e00f"
-  integrity sha512-8n11qujsqHWT48visvQbqLqAj8o6NCLJ35tGkI/RynhDs7E07TxlswVe4vPZaLiXJeemZA7xrxkMohwP//DOqA==
+graphql-upload@^11.0.0:
+  version "11.0.0"
+  resolved "https://registry.yarnpkg.com/graphql-upload/-/graphql-upload-11.0.0.tgz#24b245ff18f353bab6715e8a055db9fd73035e10"
+  integrity sha512-zsrDtu5gCbQFDWsNa5bMB4nf1LpKX9KDgh+f8oL1288ijV4RxeckhVozAjqjXAfRpxOHD1xOESsh6zq8SjdgjA==
   dependencies:
     busboy "^0.3.1"
     fs-capacitor "^6.1.0"

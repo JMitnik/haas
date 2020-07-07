@@ -1,6 +1,6 @@
-import { Edge } from '@prisma/client';
-import { objectType, extendType } from '@nexus/schema';
+import { Edge, PrismaClient } from '@prisma/client';
 import { QuestionNodeType } from '../question/QuestionNode';
+import { extendType, objectType } from '@nexus/schema';
 
 export const EdgeConditionType = objectType({
   name: 'EdgeCondition',
@@ -26,7 +26,8 @@ export const EdgeType = objectType({
     t.field('parentNode', {
       type: QuestionNodeType,
       resolve(parent: Edge, args: any, ctx: any, info: any) {
-        const parentNode = ctx.prisma.questionNode.findOne({ where: {
+        const { prisma }: { prisma: PrismaClient } = ctx;
+        const parentNode = prisma.questionNode.findOne({ where: {
           id: parent.parentNodeId,
         } });
         return parentNode;
@@ -35,7 +36,8 @@ export const EdgeType = objectType({
     t.field('childNode', {
       type: QuestionNodeType,
       resolve(parent: Edge, args: any, ctx: any, info: any) {
-        const childNode = ctx.prisma.questionNode.findOne({ where: {
+        const { prisma }: { prisma: PrismaClient } = ctx;
+        const childNode = prisma.questionNode.findOne({ where: {
           id: parent.childNodeId,
         } });
         return childNode;
@@ -44,7 +46,8 @@ export const EdgeType = objectType({
     t.list.field('conditions', {
       type: EdgeConditionType,
       resolve(parent: Edge, args: any, ctx: any, info: any) {
-        const edgeConditions = ctx.prisma.questionCondition.findMany({
+        const { prisma }: { prisma: PrismaClient } = ctx;
+        const edgeConditions = prisma.questionCondition.findMany({
           where: {
             edgeId: parent.id,
           },
@@ -64,7 +67,8 @@ export const EdgeQueries = extendType({
         id: 'String',
       },
       resolve(parent: any, args: any, ctx: any, info: any) {
-        return ctx.prisma.edge.findOne({ where: { id: args.id } });
+        const { prisma }: { prisma: PrismaClient } = ctx;
+        return prisma.edge.findOne({ where: { id: args.id } });
       },
     });
   },

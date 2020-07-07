@@ -12,8 +12,6 @@ import { QuestionNodeType } from '../question/QuestionNode';
 import { UserType } from '../users/User';
 import TriggerService from './TriggerService';
 
-const prisma = new PrismaClient();
-
 const TriggerTypeEnum = enumType({
   name: 'TriggerTypeEnum',
   members: ['QUESTION', 'SCHEDULED'],
@@ -63,6 +61,7 @@ const TriggerType = objectType({
       type: QuestionNodeType,
       nullable: true,
       resolve(parent: Trigger, args: any, ctx: any) {
+        const { prisma }: { prisma: PrismaClient } = ctx;
         if (parent.relatedNodeId) {
           return prisma.questionNode.findOne({ where: { id: parent.relatedNodeId },
             include: {
@@ -79,12 +78,14 @@ const TriggerType = objectType({
     t.list.field('conditions', {
       type: TriggerConditionType,
       resolve(parent: Trigger, args: any, ctx: any) {
+        const { prisma }: { prisma: PrismaClient } = ctx;
         return prisma.triggerCondition.findMany({ where: { triggerId: parent.id } });
       },
     });
     t.list.field('recipients', {
       type: UserType,
       async resolve(parent: Trigger, args: any, ctx: any) {
+        const { prisma }: { prisma: PrismaClient } = ctx;
         const users = await prisma.user.findMany({ where: {
           triggers: {
             some: {
@@ -137,6 +138,7 @@ const TriggerMutations = extendType({
         id: 'String',
       },
       resolve(parent: any, args: any, ctx: any) {
+        const { prisma }: { prisma: PrismaClient } = ctx;
         return prisma.trigger.delete({ where: { id: args.id } });
       },
     });
@@ -149,6 +151,7 @@ const TriggerMutations = extendType({
         trigger: TriggerInputType,
       },
       async resolve(parent: any, args: any, ctx: any) {
+        const { prisma }: { prisma: PrismaClient } = ctx;
         const { name, type, medium, conditions } = args.trigger;
         const dbTrigger = await prisma.trigger.findOne({
           where: { id: args.triggerId },
@@ -192,6 +195,7 @@ const TriggerMutations = extendType({
         trigger: TriggerInputType,
       },
       async resolve(parent: any, args: any, ctx: any) {
+        const { prisma }: { prisma: PrismaClient } = ctx;
         const { name, type, medium, conditions } = args.trigger;
         const createArgs : TriggerCreateInput = { name, type, medium };
         const triggerConditions: TriggerConditionCreateInput[] = [];
@@ -253,6 +257,7 @@ const TriggerQueries = extendType({
         filter: FilterInput,
       },
       async resolve(parent: any, args: any, ctx: any) {
+        const { prisma }: { prisma: PrismaClient } = ctx;
         const { pageIndex, offset, limit, searchTerm, orderBy }: PaginationProps = args.filter;
 
         if (args.filter) {
@@ -271,6 +276,7 @@ const TriggerQueries = extendType({
         triggerId: 'String',
       },
       resolve(parent: any, args: any, ctx: any) {
+        const { prisma }: { prisma: PrismaClient } = ctx;
         return prisma.trigger.findOne({ where: { id: args.triggerId } });
       },
     });
@@ -284,6 +290,7 @@ const TriggerQueries = extendType({
         filter: FilterInput,
       },
       resolve(parent: any, args: any, ctx: any) {
+        const { prisma }: { prisma: PrismaClient } = ctx;
         if (args.userId) {
           return prisma.trigger.findMany({
             where: {
