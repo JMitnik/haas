@@ -82,12 +82,22 @@ const OverflowSpan = styled(Span)`
   text-overflow: ellipsis;
 `;
 
+const CTAEntryIcon = styled(Div)`
+
+`;
+
 const CTAEntry = ({ title, type }: CTAEntryProps) => (
   <CTAEntryContainer alignItems="center" flexDirection="row">
     <Flex width="10%" flexDirection="column">
-      <Span>
-        {type}
-      </Span>
+      <Flex flexDirection="column" alignItems="center" justifyContent="center">
+        <Div color="white" backgroundColor="default.dark" padding="14px">
+          <Plus />
+        </Div>
+        <Span marginTop="5px" fontSize="0.8em">
+          {type}
+        </Span>
+      </Flex>
+
     </Flex>
 
     <Flex width="60%" flexDirection="column">
