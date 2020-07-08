@@ -93,6 +93,91 @@ export const QuestionNodeInput = inputObjectType({
   },
 });
 
+export const QuestionNodeMutations = extendType({
+  type: 'Mutation',
+  definition(t) {
+    t.field('updateCTA', {
+      type: QuestionNodeType,
+      args: {
+        id: 'String',
+        title: 'String',
+        type: 'String',
+      },
+      resolve(parent: any, args: any, ctx: any) {
+        const { prisma }: { prisma: PrismaClient } = ctx;
+        const { title, type, id } = args;
+
+        return prisma.questionNode.update({
+          where: {
+            id,
+          },
+          data: {
+            title,
+            type,
+          },
+        });
+      },
+    });
+
+    t.field('deleteCTA', {
+      type: QuestionNodeType,
+      args: {
+        id: 'String',
+      },
+      resolve(parent: any, args: any, ctx: any) {
+        const { prisma }: { prisma: PrismaClient } = ctx;
+        return prisma.questionNode.delete({
+          where: {
+            id: args.id,
+          },
+        });
+      },
+    });
+    t.field('createCTA', {
+      type: QuestionNodeType,
+      args: {
+        customerSlug: 'String',
+        dialogueSlug: 'String',
+        title: 'String',
+        type: 'String',
+      },
+      async resolve(parent: any, args: any, ctx: any) {
+        const { prisma }: { prisma: PrismaClient } = ctx;
+        const { customerSlug, dialogueSlug, title, type } = args;
+
+        const customer = await prisma.customer.findOne({
+          where: {
+            slug: customerSlug,
+          },
+          include: {
+            dialogues: {
+              where: {
+                slug: dialogueSlug,
+              },
+              select: {
+                id: true,
+              },
+            },
+          },
+        });
+
+        return prisma.questionNode.create({
+          data: {
+            title,
+            type,
+            isLeaf: true,
+            questionDialogue: {
+              connect: {
+                id: customer?.dialogues[0].id,
+              },
+            },
+          },
+        });
+      },
+    });
+  },
+});
+
 export const getQuestionNodeQuery = extendType({
   type: 'Query',
   definition(t) {
@@ -122,6 +207,7 @@ export const getQuestionNodeQuery = extendType({
 });
 
 const questionNodeNexus = [
+  QuestionNodeMutations,
   QuestionNodeType,
   QuestionOptionType,
   QuestionNodeWhereInput,

@@ -9,6 +9,7 @@ const getCTANodesOfDialogue = gql`
         slug
         title
         leafs {
+          id
           title
           type
         }

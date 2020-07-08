@@ -177,6 +177,7 @@ type lineChartDataType {
 
 type Mutation {
   assignTags(dialogueId: String, tags: TagsInputObjectType): Dialogue!
+  createCTA(customerSlug: String, dialogueSlug: String, title: String, type: String): QuestionNode!
   createCustomer(name: String, options: CustomerCreateOptions): Customer!
   createDialogue(data: AddDialogueInput): Dialogue!
   createPermission(data: PermissionInput): PermssionType!
@@ -184,6 +185,7 @@ type Mutation {
   createTag(customerSlug: String, name: String, type: TagTypeEnum): TagType!
   createTrigger(customerSlug: String, questionId: String, recipients: RecipientsInputType, trigger: TriggerInputType): TriggerType!
   createUser(customerSlug: String, input: UserInput): UserType!
+  deleteCTA(id: String): QuestionNode!
   deleteCustomer(where: CustomerWhereUniqueInput): Customer!
   deleteDialogue(where: DialogueWhereUniqueInput): Dialogue!
   deleteTag(tagId: String): TagType!
@@ -194,6 +196,7 @@ type Mutation {
   editTrigger(questionId: String, recipients: RecipientsInputType, trigger: TriggerInputType, triggerId: String): TriggerType!
   editUser(id: String, input: UserInput): UserType!
   singleUpload(file: Upload): ImageType!
+  updateCTA(id: String, title: String, type: String): QuestionNode!
   updateRoles(permissions: PermissionIdsInput, roleId: String): RoleType!
   updateTopicBuilder(customerSlug: String, dialogueSlug: String, topicData: TopicDataEntry): String!
   uploadUserSession(uploadUserSessionInput: UploadUserSessionInput): Session!

@@ -434,6 +434,7 @@ export interface NexusGenFieldTypes {
   }
   Mutation: { // field return type
     assignTags: NexusGenRootTypes['Dialogue']; // Dialogue!
+    createCTA: NexusGenRootTypes['QuestionNode']; // QuestionNode!
     createCustomer: NexusGenRootTypes['Customer']; // Customer!
     createDialogue: NexusGenRootTypes['Dialogue']; // Dialogue!
     createPermission: NexusGenRootTypes['PermssionType']; // PermssionType!
@@ -441,6 +442,7 @@ export interface NexusGenFieldTypes {
     createTag: NexusGenRootTypes['TagType']; // TagType!
     createTrigger: NexusGenRootTypes['TriggerType']; // TriggerType!
     createUser: NexusGenRootTypes['UserType']; // UserType!
+    deleteCTA: NexusGenRootTypes['QuestionNode']; // QuestionNode!
     deleteCustomer: NexusGenRootTypes['Customer']; // Customer!
     deleteDialogue: NexusGenRootTypes['Dialogue']; // Dialogue!
     deleteTag: NexusGenRootTypes['TagType']; // TagType!
@@ -451,6 +453,7 @@ export interface NexusGenFieldTypes {
     editTrigger: NexusGenRootTypes['TriggerType']; // TriggerType!
     editUser: NexusGenRootTypes['UserType']; // UserType!
     singleUpload: NexusGenRootTypes['ImageType']; // ImageType!
+    updateCTA: NexusGenRootTypes['QuestionNode']; // QuestionNode!
     updateRoles: NexusGenRootTypes['RoleType']; // RoleType!
     updateTopicBuilder: string; // String!
     uploadUserSession: NexusGenRootTypes['Session']; // Session!
@@ -627,6 +630,12 @@ export interface NexusGenArgTypes {
       dialogueId?: string | null; // String
       tags?: NexusGenInputs['TagsInputObjectType'] | null; // TagsInputObjectType
     }
+    createCTA: { // args
+      customerSlug?: string | null; // String
+      dialogueSlug?: string | null; // String
+      title?: string | null; // String
+      type?: string | null; // String
+    }
     createCustomer: { // args
       name?: string | null; // String
       options?: NexusGenInputs['CustomerCreateOptions'] | null; // CustomerCreateOptions
@@ -654,6 +663,9 @@ export interface NexusGenArgTypes {
     createUser: { // args
       customerSlug?: string | null; // String
       input?: NexusGenInputs['UserInput'] | null; // UserInput
+    }
+    deleteCTA: { // args
+      id?: string | null; // String
     }
     deleteCustomer: { // args
       where?: NexusGenInputs['CustomerWhereUniqueInput'] | null; // CustomerWhereUniqueInput
@@ -693,6 +705,11 @@ export interface NexusGenArgTypes {
     }
     singleUpload: { // args
       file?: any | null; // Upload
+    }
+    updateCTA: { // args
+      id?: string | null; // String
+      title?: string | null; // String
+      type?: string | null; // String
     }
     updateRoles: { // args
       permissions?: NexusGenInputs['PermissionIdsInput'] | null; // PermissionIdsInput
