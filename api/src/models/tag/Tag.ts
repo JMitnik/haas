@@ -4,8 +4,6 @@ import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema
 // eslint-disable-next-line import/no-cycle
 import { DialogueType } from '../questionnaire/Dialogue';
 
-const prisma = new PrismaClient();
-
 export const TagType = objectType({
   name: 'TagType',
   definition(t) {
@@ -25,7 +23,8 @@ export const TagQueries = extendType({
         customerSlug: 'String',
         dialogueId: 'String',
       },
-      async resolve(parent: any, args: any) {
+      async resolve(parent: any, args: any, ctx: any) {
+        const { prisma }: { prisma: PrismaClient } = ctx;
         if (args.dialogueId) {
           const tags = await prisma.tag.findMany({
             where: {
@@ -74,7 +73,8 @@ export const TagMutations = extendType({
         dialogueId: 'String',
         tags: TagsInputType,
       },
-      resolve(parent: any, args: any) {
+      resolve(parent: any, args: any, ctx: any) {
+        const { prisma }: { prisma: PrismaClient } = ctx;
         const tags = args.tags.entries.length > 0 ? args.tags.entries.map((entry: string) => ({ id: entry })) : [];
 
         return prisma.dialogue.update({
@@ -97,7 +97,8 @@ export const TagMutations = extendType({
         customerSlug: 'String',
         type: TagTypeEnum,
       },
-      async resolve(parent: any, args: any) {
+      async resolve(parent: any, args: any, ctx: any) {
+        const { prisma }: { prisma: PrismaClient } = ctx;
         if (!args.customerSlug) {
           return null;
         }
@@ -125,7 +126,8 @@ export const TagMutations = extendType({
       args: {
         tagId: 'String',
       },
-      resolve(parent: any, args: any) {
+      resolve(parent: any, args: any, ctx: any) {
+        const { prisma }: { prisma: PrismaClient } = ctx;
         return prisma.tag.delete({ where: { id: args.tagId } });
       },
     });

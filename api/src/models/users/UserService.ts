@@ -68,7 +68,7 @@ class UserService {
     : entries.slice(offset, entries.length));
 
   static paginatedUsers = async (
-    customerId: string,
+    customerSlug: string,
     pageIndex: number,
     offset: number,
     limit: number,
@@ -76,7 +76,7 @@ class UserService {
     searchTerm: string,
   ) => {
     let needPageReset = false;
-    const userWhereInput: UserWhereInput = { customerId };
+    const userWhereInput: UserWhereInput = { Customer: { slug: customerSlug } };
     const searchTermFilter = UserService.getSearchTermFilter(searchTerm);
 
     if (searchTermFilter.length > 0) {

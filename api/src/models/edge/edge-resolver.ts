@@ -1,4 +1,4 @@
-import { PrismaClient, QuestionNode, EdgeCreateInput } from '@prisma/client';
+import { EdgeCreateInput, PrismaClient, QuestionNode } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -31,7 +31,7 @@ class EdgeResolver {
     return {
       dialogue: {
         connect: {
-          id: parentNodeEntry.questionDialogueId,
+          id: parentNodeEntry.questionDialogueId || undefined,
         },
       },
       parentNode: {

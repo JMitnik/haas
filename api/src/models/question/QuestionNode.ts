@@ -30,18 +30,22 @@ export const QuestionNodeType = objectType({
       nullable: true,
       resolve(parent: QuestionNode, args: any, ctx: any, info: any) {
         const { prisma } : { prisma: PrismaClient } = ctx;
-        return prisma.dialogue.findOne({
-          where: {
-            id: parent.questionDialogueId,
-          },
-        });
+        if (parent.questionDialogueId) {
+          return prisma.dialogue.findOne({
+            where: {
+              id: parent.questionDialogueId,
+            },
+          });
+        }
+        return null;
       },
     });
     t.field('overrideLeaf', {
       type: QuestionNodeType,
       nullable: true,
       resolve(parent: QuestionNode, args: any, ctx: any, info: any) {
-        const overrideLeaf = ctx.prisma.questionNode.findOne(
+        const { prisma }: { prisma: PrismaClient } = ctx;
+        const overrideLeaf = prisma.questionNode.findOne(
           { where: { id: parent.id } },
         ).overrideLeaf();
         return overrideLeaf;
@@ -50,7 +54,8 @@ export const QuestionNodeType = objectType({
     t.list.field('options', {
       type: QuestionOptionType,
       resolve(parent: QuestionNode, args: any, ctx: any, info: any) {
-        const options = ctx.prisma.questionOption.findMany({
+        const { prisma }: { prisma: PrismaClient } = ctx;
+        const options = prisma.questionOption.findMany({
           where: {
             questionNodeId: parent.id,
           },
@@ -61,7 +66,8 @@ export const QuestionNodeType = objectType({
     t.list.field('children', {
       type: EdgeType,
       resolve(parent: QuestionNode, args: any, ctx: any, info: any) {
-        const children = ctx.prisma.edge.findMany({
+        const { prisma }: { prisma: PrismaClient } = ctx;
+        const children = prisma.edge.findMany({
           where: {
             parentNodeId: parent.id,
           },
@@ -96,7 +102,8 @@ export const getQuestionNodeQuery = extendType({
         where: QuestionNodeInput,
       },
       resolve(parent: any, args: any, ctx: any, info: any) {
-        const questionNode = ctx.prisma.questionNode.findOne({
+        const { prisma }: { prisma: PrismaClient } = ctx;
+        const questionNode = prisma.questionNode.findOne({
           where: {
             id: args.where.id,
           },
@@ -107,7 +114,8 @@ export const getQuestionNodeQuery = extendType({
     t.list.field('questionNodes', {
       type: QuestionNodeType,
       resolve(parent: any, args: any, ctx: any, info: any) {
-        return ctx.prisma.questionNode.findMany();
+        const { prisma }: { prisma: PrismaClient } = ctx;
+        return prisma.questionNode.findMany();
       },
     });
   },

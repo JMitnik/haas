@@ -1,4 +1,4 @@
-import { CustomerSettings } from '@prisma/client';
+import { CustomerSettings, PrismaClient } from '@prisma/client';
 import { objectType } from '@nexus/schema';
 
 export const ColourSettingsType = objectType({
@@ -24,10 +24,11 @@ export const CustomerSettingsType = objectType({
     t.id('id');
     t.string('logoUrl', { nullable: true });
     t.field('colourSettings', {
-      type: 'ColourSettings',
+      type: ColourSettingsType,
       resolve(parent: CustomerSettings, args: any, ctx: any, info: any) {
-        const colourSettings = ctx.prisma.colourSettings.findOne(
-          { where: { id: parent.colourSettingsId } },
+        const { prisma }: { prisma: PrismaClient } = ctx;
+        const colourSettings = prisma.colourSettings.findOne(
+          { where: { id: parent.colourSettingsId || undefined } },
         );
         return colourSettings;
       },
@@ -36,8 +37,9 @@ export const CustomerSettingsType = objectType({
       nullable: true,
       type: FontSettingsType,
       resolve(parent: CustomerSettings, args: any, ctx: any, info: any) {
-        const colourSettings = ctx.prisma.fontSettings.findOne(
-          { where: { id: parent.fontSettingsId } },
+        const { prisma }: { prisma: PrismaClient } = ctx;
+        const colourSettings = prisma.fontSettings.findOne(
+          { where: { id: parent.fontSettingsId || undefined } },
         );
         return colourSettings;
       },

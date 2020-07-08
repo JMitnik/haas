@@ -17,8 +17,8 @@ import SessionService from '../session/SessionService';
 export const lineChartDataType = objectType({
   name: 'lineChartDataType',
   definition(t) {
-    t.string('x');
-    t.int('y');
+    t.string('x', { nullable: true });
+    t.int('y', { nullable: true });
   },
 });
 
@@ -97,8 +97,6 @@ export const DialogueType = objectType({
         filter: FilterInput,
       },
       async resolve(parent: Dialogue, args: any, ctx: any) {
-        const { prisma }: { prisma: PrismaClient } = ctx;
-
         if (!parent.id) {
           return null;
         }
@@ -161,7 +159,8 @@ export const DialogueType = objectType({
     t.field('customer', {
       type: CustomerType,
       resolve(parent: Dialogue, args: any, ctx: any) {
-        const customer = ctx.prisma.customer.findOne({
+        const { prisma }: { prisma: PrismaClient } = ctx;
+        const customer = prisma.customer.findOne({
           where: {
             id: parent.customerId,
           },
@@ -212,7 +211,8 @@ export const DialogueType = objectType({
         where: QuestionNodeWhereInput,
       },
       resolve(parent: Dialogue, args: any, ctx: any) {
-        const questions = ctx.prisma.questionNode.findMany({
+        const { prisma }: { prisma: PrismaClient } = ctx;
+        const questions = prisma.questionNode.findMany({
           where: {
             AND: [
               {
@@ -245,7 +245,8 @@ export const DialogueType = objectType({
     t.list.field('leafs', {
       type: QuestionNodeType,
       resolve(parent: Dialogue, args: any, ctx: any) {
-        const leafs = ctx.prisma.questionNode.findMany({
+        const { prisma }: { prisma: PrismaClient } = ctx;
+        const leafs = prisma.questionNode.findMany({
           where: {
             AND: [
               {

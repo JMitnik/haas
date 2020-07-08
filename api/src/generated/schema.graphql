@@ -35,6 +35,13 @@ input CustomerCreateOptions {
   slug: String!
 }
 
+input CustomerEditOptions {
+  logo: String
+  name: String!
+  primaryColour: String!
+  slug: String!
+}
+
 type CustomerSettings {
   colourSettings: ColourSettings!
   fontSettings: FontSettings
@@ -164,8 +171,8 @@ input LeafNodeInput {
 }
 
 type lineChartDataType {
-  x: String!
-  y: Int!
+  x: String
+  y: Int
 }
 
 type Mutation {
@@ -182,7 +189,7 @@ type Mutation {
   deleteTag(tagId: String): TagType!
   deleteTrigger(id: String): TriggerType!
   deleteUser(id: String): UserType!
-  editCustomer(id: String, options: CustomerCreateOptions): Customer!
+  editCustomer(id: String, options: CustomerEditOptions): Customer!
   editDialogue(description: String, dialogueId: String, publicTitle: String, tags: TagsInputObjectType, title: String): Dialogue!
   editTrigger(questionId: String, recipients: RecipientsInputType, trigger: TriggerInputType, triggerId: String): TriggerType!
   editUser(id: String, input: UserInput): UserType!

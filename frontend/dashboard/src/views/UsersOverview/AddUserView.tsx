@@ -10,6 +10,7 @@ import { Button, Container, Div, Flex, Grid, H2, H3,
   Hr, Muted, StyledInput, StyledLabel } from '@haas/ui';
 import createAddMutation from 'mutations/createUser';
 import getRolesQuery from 'queries/getRoles';
+import getUsersQuery from 'queries/getUsers';
 
 interface FormDataProps {
   firstName?: string;
@@ -34,6 +35,12 @@ const AddUserView = () => {
     onError: (serverError: ApolloError) => {
       console.log(serverError);
     },
+    refetchQueries: [
+      {
+        query: getUsersQuery,
+        variables: { customerSlug },
+      },
+    ],
   });
 
   const roles: Array<{name: string, id: string}> = data?.roles;

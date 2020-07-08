@@ -37,6 +37,12 @@ export interface NexusGenInputs {
     primaryColour: string; // String!
     slug: string; // String!
   }
+  CustomerEditOptions: { // input type
+    logo?: string | null; // String
+    name: string; // String!
+    primaryColour: string; // String!
+    slug: string; // String!
+  }
   CustomerWhereUniqueInput: { // input type
     id: string; // ID!
   }
@@ -281,8 +287,8 @@ export interface NexusGenRootTypes {
     phone?: string | null; // String
   }
   lineChartDataType: { // root type
-    x: string; // String!
-    y: number; // Int!
+    x?: string | null; // String
+    y?: number | null; // Int
   }
   topPathType: { // root type
     answer: string; // String!
@@ -299,6 +305,7 @@ export interface NexusGenRootTypes {
 export interface NexusGenAllTypes extends NexusGenRootTypes {
   AddDialogueInput: NexusGenInputs['AddDialogueInput'];
   CustomerCreateOptions: NexusGenInputs['CustomerCreateOptions'];
+  CustomerEditOptions: NexusGenInputs['CustomerEditOptions'];
   CustomerWhereUniqueInput: NexusGenInputs['CustomerWhereUniqueInput'];
   DialogueFilterInputType: NexusGenInputs['DialogueFilterInputType'];
   DialogueWhereUniqueInput: NexusGenInputs['DialogueWhereUniqueInput'];
@@ -589,8 +596,8 @@ export interface NexusGenFieldTypes {
     role: NexusGenRootTypes['RoleType']; // RoleType!
   }
   lineChartDataType: { // field return type
-    x: string; // String!
-    y: number; // Int!
+    x: string | null; // String
+    y: number | null; // Int
   }
   topPathType: { // field return type
     answer: string; // String!
@@ -665,7 +672,7 @@ export interface NexusGenArgTypes {
     }
     editCustomer: { // args
       id?: string | null; // String
-      options?: NexusGenInputs['CustomerCreateOptions'] | null; // CustomerCreateOptions
+      options?: NexusGenInputs['CustomerEditOptions'] | null; // CustomerEditOptions
     }
     editDialogue: { // args
       description?: string | null; // String
@@ -781,7 +788,7 @@ export interface NexusGenInheritedFields {}
 
 export type NexusGenObjectNames = "ColourSettings" | "Customer" | "CustomerSettings" | "Dialogue" | "DialogueStatistics" | "Edge" | "EdgeCondition" | "FontSettings" | "ImageType" | "InteractionSessionType" | "InteractionType" | "Mutation" | "NodeEntry" | "NodeEntryValue" | "PermssionType" | "Query" | "QuestionNode" | "QuestionOption" | "RoleTableType" | "RoleType" | "Session" | "SortFilterObject" | "TagType" | "TriggerConditionType" | "TriggerTableType" | "TriggerType" | "UniqueDataResultEntry" | "UserTable" | "UserType" | "lineChartDataType" | "topPathType";
 
-export type NexusGenInputNames = "AddDialogueInput" | "CustomerCreateOptions" | "CustomerWhereUniqueInput" | "DialogueFilterInputType" | "DialogueWhereUniqueInput" | "EdgeChildInput" | "EdgeNodeInput" | "FilterInput" | "LeafNodeInput" | "OptionInput" | "PermissionIdsInput" | "PermissionInput" | "QuestionConditionInput" | "QuestionInput" | "QuestionNodeWhereInput" | "QuestionNodeWhereUniqueInput" | "RecipientsInputType" | "RoleDataInput" | "RoleInput" | "SessionWhereUniqueInput" | "SortFilterInputObject" | "TagsInputObjectType" | "TopicDataEntry" | "TriggerConditionInputType" | "TriggerInputType" | "UploadUserSessionInput" | "UserInput" | "UserSessionEntryDataInput" | "UserSessionEntryInput";
+export type NexusGenInputNames = "AddDialogueInput" | "CustomerCreateOptions" | "CustomerEditOptions" | "CustomerWhereUniqueInput" | "DialogueFilterInputType" | "DialogueWhereUniqueInput" | "EdgeChildInput" | "EdgeNodeInput" | "FilterInput" | "LeafNodeInput" | "OptionInput" | "PermissionIdsInput" | "PermissionInput" | "QuestionConditionInput" | "QuestionInput" | "QuestionNodeWhereInput" | "QuestionNodeWhereUniqueInput" | "RecipientsInputType" | "RoleDataInput" | "RoleInput" | "SessionWhereUniqueInput" | "SortFilterInputObject" | "TagsInputObjectType" | "TopicDataEntry" | "TriggerConditionInputType" | "TriggerInputType" | "UploadUserSessionInput" | "UserInput" | "UserSessionEntryDataInput" | "UserSessionEntryInput";
 
 export type NexusGenEnumNames = "TagTypeEnum" | "TriggerConditionTypeEnum" | "TriggerMediumEnum" | "TriggerTypeEnum";
 

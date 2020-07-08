@@ -2,7 +2,7 @@ import { AnimationControls } from 'framer-motion';
 import Lottie from 'react-lottie';
 import React, { useReducer } from 'react';
 
-import { Div, Flex, Slider as UISlider } from '@haas/ui';
+import { Div, Flex, Span, Slider as UISlider } from '@haas/ui';
 import { ReactComponent as DragIcon } from 'assets/icons/icon-order-horizontal.svg';
 import { HAASIdle, HAASRun, HAASStopping } from 'assets/animations';
 
@@ -114,12 +114,12 @@ const Slider = ({ register, onSubmit, animationControls }: SliderProps) => {
       >
         {animationState.isStopped && (
         <SlideHereContainer variants={SlideMeAnimation} animate="animate" initial="initial" exit="exit">
-          <Flex>
-            <DragIcon />
-            slide to
+          <DragIcon />
+          slide to
             {' '}
+          <Span>
             <i>start</i>
-          </Flex>
+          </Span>
         </SlideHereContainer>
         )}
         <div className="rabbit">

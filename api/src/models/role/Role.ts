@@ -7,8 +7,6 @@ import { PaginationProps } from '../../types/generic';
 import { PermissionType } from '../permission/Permission';
 import RoleService from './RoleService';
 
-const prisma = new PrismaClient();
-
 export const RoleType = objectType({
   name: 'RoleType',
   definition(t) {
@@ -20,6 +18,7 @@ export const RoleType = objectType({
       nullable: true,
       type: PermissionType,
       async resolve(parent: Role, args: any, ctx: any) {
+        const { prisma }: { prisma: PrismaClient } = ctx;
         const customerPermissions = await prisma.permission.findMany({
           where: { customerId: parent.customerId },
           include: {
@@ -43,7 +42,8 @@ export const RoleType = objectType({
     t.field('customer', {
       type: CustomerType,
       resolve(parent: Role, args: any, ctx: any) {
-        return prisma.customer.findOne({ where: { id: parent.customerId } });
+        const { prisma }: { prisma: PrismaClient } = ctx;
+        return prisma.customer.findOne({ where: { id: parent.customerId || undefined } });
       },
     });
   },
@@ -92,6 +92,7 @@ export const RoleQueries = extendType({
         filter: FilterInput,
       },
       async resolve(parent: any, args: any, ctx: any) {
+        const { prisma }: { prisma: PrismaClient } = ctx;
         const { pageIndex, offset, limit }: PaginationProps = args.filter;
         const { roles, totalPages, newPageIndex } = await RoleService.paginatedRoles(
           args.customerId, pageIndex, offset, limit,
@@ -126,6 +127,7 @@ export const RoleMutations = extendType({
       type: RoleType,
       args: { data: RoleInput },
       resolve(parent: any, args: any, ctx: any) {
+        const { prisma }: { prisma: PrismaClient } = ctx;
         const { name, customerId } = args.data;
 
         return prisma.role.create({
@@ -148,6 +150,7 @@ export const RoleMutations = extendType({
       type: RoleType,
       args: { roleId: 'String', permissions: PermissionIdsInput },
       async resolve(parent: any, args: any, ctx: any) {
+        const { prisma }: { prisma: PrismaClient } = ctx;
         const { roleId, permissions } = args;
         const { ids }: { ids: Array<string> } = permissions;
 
