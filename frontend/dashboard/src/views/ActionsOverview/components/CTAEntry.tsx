@@ -21,6 +21,7 @@ interface CTAEntryProps {
   Icon: (props: any) => JSX.Element;
   activeCTA: string | null;
   onActiveCTAChange: React.Dispatch<React.SetStateAction<string | null>>;
+  onNewCTAChange: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const CTAEntryContainer = styled(Flex) <{ activeCTA: string | null, id: string }>`
@@ -60,7 +61,7 @@ const OverflowSpan = styled(Span)`
   text-overflow: ellipsis;
 `;
 
-const CTAEntry = ({ id, activeCTA, onActiveCTAChange, title, type, Icon }: CTAEntryProps) => {
+const CTAEntry = ({ id, activeCTA, onActiveCTAChange, title, type, Icon, onNewCTAChange }: CTAEntryProps) => {
   const { customerSlug, dialogueSlug } = useParams();
 
   const [deleteEntry] = useMutation(deleteCTAMutation, {
@@ -79,9 +80,17 @@ const CTAEntry = ({ id, activeCTA, onActiveCTAChange, title, type, Icon }: CTAEn
     }],
   });
 
+  const deleteCTA = () => {
+    if (id === '-1') {
+      onNewCTAChange(false);
+      return onActiveCTAChange(null);
+    }
+    return deleteEntry();
+  };
+
   return (
     <CTAEntryContainer id={id} activeCTA={activeCTA}>
-      <DeleteCTAButton disabled={(!!activeCTA && activeCTA !== id) || false} onClick={() => deleteEntry()}>
+      <DeleteCTAButton disabled={(!!activeCTA && activeCTA !== id) || false} onClick={() => deleteCTA()}>
         <X />
       </DeleteCTAButton>
 
@@ -93,7 +102,7 @@ const CTAEntry = ({ id, activeCTA, onActiveCTAChange, title, type, Icon }: CTAEn
             Title
           </Span>
           <OverflowSpan>
-            {title}
+            {title || 'None'}
           </OverflowSpan>
         </Flex>
 
@@ -110,7 +119,7 @@ const CTAEntry = ({ id, activeCTA, onActiveCTAChange, title, type, Icon }: CTAEn
 
       {activeCTA === id
           && (
-            <CTAForm id={id} title={title} type={type} onActiveCTAChange={onActiveCTAChange} />
+            <CTAForm id={id} title={title} type={type} onActiveCTAChange={onActiveCTAChange} onNewCTAChange={onNewCTAChange} />
           )}
 
     </CTAEntryContainer>

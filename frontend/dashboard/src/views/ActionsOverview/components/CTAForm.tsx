@@ -1,13 +1,15 @@
+import * as yup from 'yup';
 import { ApolloError } from 'apollo-boost';
 import { useForm } from 'react-hook-form';
 import { useMutation } from '@apollo/react-hooks';
 import { useParams } from 'react-router-dom';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Select from 'react-select';
 
 import { Button, Div, Flex, Form, FormGroupContainer, Grid,
   H3, Muted, StyledInput, StyledLabel } from '@haas/ui';
 import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
+import createCTAMutation from 'mutations/createCTA';
 import getCTANodesQuery from 'queries/getCTANodes';
 import updateCTAMutation from 'mutations/updateCTA';
 
@@ -21,7 +23,13 @@ interface CTAFormProps {
   title: string;
   type: { label: string, value: string };
   onActiveCTAChange: React.Dispatch<React.SetStateAction<string | null>>;
+  onNewCTAChange: React.Dispatch<React.SetStateAction<boolean>>;
 }
+
+const schema = yup.object().shape({
+  title: yup.string().required(),
+  ctaType: yup.string().required(),
+});
 
 const CTA_TYPES = [
   { label: 'Opinion', value: 'TEXTBOX' },
@@ -29,7 +37,7 @@ const CTA_TYPES = [
   { label: 'Link', value: 'SOCIAL_SHARE' },
 ];
 
-const CTAForm = ({ id, title, type, onActiveCTAChange }: CTAFormProps) => {
+const CTAForm = ({ id, title, type, onActiveCTAChange, onNewCTAChange }: CTAFormProps) => {
   const { customerSlug, dialogueSlug } = useParams();
   const { register, handleSubmit, setValue, errors } = useForm<FormDataProps>({
     // validationSchema: schema,
@@ -42,38 +50,74 @@ const CTAForm = ({ id, title, type, onActiveCTAChange }: CTAFormProps) => {
     setActiveType(selectedOption);
   };
 
-  const [updateCTA, { loading }] = useMutation(updateCTAMutation, {
+  useEffect(() => {
+    handleMultiChange(activeType);
+  }, [activeType, handleMultiChange]);
+
+  const refetchingQueries = [
+    {
+      query: getCTANodesQuery,
+      variables: {
+        customerSlug,
+        dialogueSlug,
+      },
+    },
+    {
+      query: getTopicBuilderQuery,
+      variables: {
+        customerSlug,
+        dialogueSlug,
+      },
+    }];
+
+  const [addCTA] = useMutation(createCTAMutation, {
+    onCompleted: () => {
+      onNewCTAChange(false);
+      onActiveCTAChange(null);
+    },
+    onError: (serverError: ApolloError) => {
+      console.log(serverError);
+    },
+    refetchQueries: refetchingQueries,
+  });
+
+  const [updateCTA] = useMutation(updateCTAMutation, {
     onCompleted: () => {
       onActiveCTAChange(null);
     },
     onError: (serverError: ApolloError) => {
       console.log(serverError);
     },
-    refetchQueries: [
-      {
-        query: getCTANodesQuery,
-        variables: {
-          customerSlug,
-          dialogueSlug,
-        },
-      },
-      {
-        query: getTopicBuilderQuery,
-        variables: {
-          customerSlug,
-          dialogueSlug,
-        },
-      }],
+    refetchQueries: refetchingQueries,
   });
 
   const onSubmit = (formData: FormDataProps) => {
-    updateCTA({
-      variables: {
-        id,
-        title: formData.title,
-        type: formData.ctaType || undefined,
-      },
-    });
+    if (id === '-1') {
+      console.log('title:', formData.title, 'type: ', formData.ctaType);
+      addCTA({
+        variables: {
+          customerSlug,
+          dialogueSlug,
+          title: formData.title,
+          type: formData.ctaType || undefined,
+        },
+      });
+    } else {
+      updateCTA({
+        variables: {
+          id,
+          title: formData.title,
+          type: formData.ctaType || undefined,
+        },
+      });
+    }
+  };
+
+  const cancelCTA = () => {
+    if (id === '-1') {
+      onNewCTAChange(false);
+    }
+    onActiveCTAChange(null);
   };
 
   return (
@@ -121,7 +165,7 @@ const CTAForm = ({ id, title, type, onActiveCTAChange }: CTAFormProps) => {
       <Div>
         <Flex>
           <Button brand="primary" mr={2} type="submit">Save CTA</Button>
-          <Button brand="default" type="button" onClick={() => onActiveCTAChange(null)}>Cancel</Button>
+          <Button brand="default" type="button" onClick={() => cancelCTA()}>Cancel</Button>
         </Flex>
       </Div>
     </Form>
