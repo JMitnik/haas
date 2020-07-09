@@ -7,7 +7,7 @@ import CustomerProvider from 'providers/CustomerProvider';
 import DashboardPage from 'pages/dashboard';
 
 import { AppContainer } from 'styles/AppStyles';
-import ActionsPage from 'views/ActionsOverview/ActionsOverview';
+import ActionsPage from 'pages/dashboard/actions';
 import AddActionView from 'views/ActionsOverview/AddActionView';
 import AddCustomerPage from 'pages/dashboard/customers/add';
 import AddDialogueView from 'views/AddDialogueView';
