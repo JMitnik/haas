@@ -1,6 +1,8 @@
 import { Plus } from 'react-feather';
+import { QueryLazyOptions } from '@apollo/react-hooks';
+import { debounce } from 'lodash';
 import { useHistory, useParams } from 'react-router-dom';
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import styled, { css } from 'styled-components/macro';
 
 import { Div, Flex, H2, Span } from '@haas/ui';
@@ -12,6 +14,8 @@ import CTAEntry from './components/CTAEntry';
 
 interface ActionOverviewProps {
   leafs: Array<any>;
+  fetchActions: (options?: QueryLazyOptions<Record<string, any>> | undefined) => void;
+  currentSearchTerm: string;
 }
 
 const DialogueViewContainer = styled(Div)`
@@ -36,12 +40,29 @@ const initializeCTAType = (type: string) => {
   return { label: 'None', value: '' };
 };
 
-const ActionOverview = ({ leafs }: ActionOverviewProps) => {
-  const history = useHistory();
+const ActionOverview = ({ leafs, fetchActions, currentSearchTerm }: ActionOverviewProps) => {
   const { customerSlug, dialogueSlug } = useParams();
-  const handleSearchTerm = () => null;
+  // const handleSearchTermChange = () => null;
+  const [activeSearchTerm, setActiveSearchTerm] = useState(currentSearchTerm);
+
   const [newCTA, setNewCTA] = useState(false);
   const [activeCTA, setActiveCTA] = useState<null | string>(null);
+
+  const handleSearchTermChange = useCallback(debounce((newSearchTerm: string) => {
+    if (activeSearchTerm !== newSearchTerm) {
+      setActiveSearchTerm(newSearchTerm);
+    }
+  }, 250), []);
+
+  useEffect(() => {
+    if (activeSearchTerm !== currentSearchTerm) {
+      fetchActions({ variables: {
+        customerSlug,
+        dialogueSlug,
+        searchTerm: activeSearchTerm,
+      } });
+    }
+  }, [activeSearchTerm, currentSearchTerm, fetchActions, customerSlug, dialogueSlug]);
 
   const handleAddCTA = () => {
     setActiveCTA('-1');
@@ -62,7 +83,7 @@ const ActionOverview = ({ leafs }: ActionOverviewProps) => {
           </AddCTAButton>
         </Flex>
         <Div width="40%">
-          <SearchBar activeSearchTerm="" onSearchTermChange={handleSearchTerm} />
+          <SearchBar activeSearchTerm={activeSearchTerm} onSearchTermChange={handleSearchTermChange} />
         </Div>
       </Flex>
       {newCTA && (

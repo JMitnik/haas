@@ -1,11 +1,11 @@
 
-import { Dialogue, DialogueWhereInput, PrismaClient } from '@prisma/client';
+import { Dialogue, DialogueWhereInput, PrismaClient, QuestionNodeWhereInput } from '@prisma/client';
 import { extendType, inputObjectType, objectType } from '@nexus/schema';
 
 // eslint-disable-next-line import/no-cycle
 import { CustomerType } from '../customer/Customer';
 import { EdgeType } from '../edge/Edge';
-import { QuestionNodeType, QuestionNodeWhereInput } from '../question/QuestionNode';
+import { QuestionNodeType, QuestionNodeWhereInputType } from '../question/QuestionNode';
 // eslint-disable-next-line import/no-cycle
 import { TagType, TagsInputType } from '../tag/Tag';
 
@@ -208,7 +208,7 @@ export const DialogueType = objectType({
     t.list.field('questions', {
       type: QuestionNodeType,
       args: {
-        where: QuestionNodeWhereInput,
+        where: QuestionNodeWhereInputType,
       },
       resolve(parent: Dialogue, args: any, ctx: any) {
         const { prisma }: { prisma: PrismaClient } = ctx;
@@ -244,23 +244,33 @@ export const DialogueType = objectType({
 
     t.list.field('leafs', {
       type: QuestionNodeType,
-      resolve(parent: Dialogue, args: any, ctx: any) {
+      args: {
+        searchTerm: 'String',
+      },
+      async resolve(parent: Dialogue, args: any, ctx: any) {
         const { prisma }: { prisma: PrismaClient } = ctx;
-        const leafs = prisma.questionNode.findMany({
-          where: {
-            AND: [
-              {
-                questionDialogueId: parent.id,
-              },
-              {
-                isLeaf: true,
-              },
-            ],
+        const { searchTerm }: { searchTerm: string } = args;
+        console.log('search term: ', searchTerm);
+
+        const leafWhereInput: QuestionNodeWhereInput = { AND: [
+          {
+            questionDialogueId: parent.id,
           },
+          {
+            isLeaf: true,
+          },
+        ] };
+
+        const leafs = await prisma.questionNode.findMany({
+          where: leafWhereInput,
           orderBy: {
             updatedAt: 'desc',
           },
         });
+
+        if (searchTerm) {
+          return leafs.filter((leaf) => leaf.title.toLowerCase().includes(searchTerm.toLowerCase()));
+        }
         return leafs;
       },
     });

@@ -64,9 +64,9 @@ type Dialogue {
   id: ID!
   interactionFeedItems: [Session!]
   interactions(filter: FilterInput): InteractionType!
-  leafs: [QuestionNode!]!
+  leafs(searchTerm: String): [QuestionNode!]!
   publicTitle: String
-  questions(where: QuestionNodeWhereInput): [QuestionNode!]!
+  questions(where: QuestionNodeWhereInputType): [QuestionNode!]!
   rootQuestion: QuestionNode!
   sessions: [Session!]!
   slug: String!
@@ -302,7 +302,7 @@ type QuestionNode {
   type: String!
 }
 
-input QuestionNodeWhereInput {
+input QuestionNodeWhereInputType {
   id: ID
   isRoot: Boolean
 }

@@ -1,6 +1,6 @@
+import { useLazyQuery, useQuery } from '@apollo/react-hooks';
 import { useParams } from 'react-router-dom';
-import { useQuery } from '@apollo/react-hooks';
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import { Loader } from '@haas/ui';
 import ActionOverview from 'views/ActionsOverview/ActionsOverview';
@@ -11,12 +11,23 @@ import getCTANodesQuery from 'queries/getCTANodes';
 
 const ActionsPage = () => {
   const { dialogueSlug, customerSlug } = useParams();
-  const { data } = useQuery(getCTANodesQuery, {
-    variables: {
-      dialogueSlug,
-      customerSlug,
+
+  const [fetchActions, { data, variables }] = useLazyQuery(getCTANodesQuery, {
+    fetchPolicy: 'cache-and-network',
+    onCompleted: () => {
+    },
+    onError: (error: any) => {
+      console.log(error);
     },
   });
+
+  useEffect(() => {
+    fetchActions({ variables: {
+      dialogueSlug,
+      customerSlug,
+      searchTerm: '',
+    } });
+  }, [fetchActions]);
 
   const leafs = data?.customer?.dialogue?.leafs;
 
@@ -33,9 +44,10 @@ const ActionsPage = () => {
       return { ...leaf, type: 'OPINION', icon: OpinionIcon };
     }
   });
+  const { searchTerm } = variables;
 
   return (
-    <ActionOverview leafs={mappedLeafs} />
+    <ActionOverview fetchActions={fetchActions} leafs={mappedLeafs} currentSearchTerm={searchTerm} />
   );
 };
 

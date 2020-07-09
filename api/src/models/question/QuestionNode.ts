@@ -1,6 +1,6 @@
-import { PrismaClient, QuestionNode } from '@prisma/client';
 import { DialogueType } from '../questionnaire/Dialogue';
 import { EdgeType } from '../edge/Edge';
+import { PrismaClient, QuestionNode } from '@prisma/client';
 import { extendType, inputObjectType, objectType } from '@nexus/schema';
 
 export const QuestionOptionType = objectType({
@@ -78,8 +78,8 @@ export const QuestionNodeType = objectType({
   },
 });
 
-export const QuestionNodeWhereInput = inputObjectType({
-  name: 'QuestionNodeWhereInput',
+export const QuestionNodeWhereInputType = inputObjectType({
+  name: 'QuestionNodeWhereInputType',
   definition(t) {
     t.boolean('isRoot', { nullable: true });
     t.id('id', { nullable: true });
@@ -210,7 +210,7 @@ const questionNodeNexus = [
   QuestionNodeMutations,
   QuestionNodeType,
   QuestionOptionType,
-  QuestionNodeWhereInput,
+  QuestionNodeWhereInputType,
   getQuestionNodeQuery,
   QuestionNodeInput,
 ];

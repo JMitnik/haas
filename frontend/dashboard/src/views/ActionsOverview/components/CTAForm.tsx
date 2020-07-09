@@ -93,7 +93,6 @@ const CTAForm = ({ id, title, type, onActiveCTAChange, onNewCTAChange }: CTAForm
 
   const onSubmit = (formData: FormDataProps) => {
     if (id === '-1') {
-      console.log('title:', formData.title, 'type: ', formData.ctaType);
       addCTA({
         variables: {
           customerSlug,
