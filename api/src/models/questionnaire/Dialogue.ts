@@ -257,6 +257,9 @@ export const DialogueType = objectType({
               },
             ],
           },
+          orderBy: {
+            updatedAt: 'desc',
+          },
         });
         return leafs;
       },
