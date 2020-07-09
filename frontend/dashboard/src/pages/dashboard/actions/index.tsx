@@ -27,7 +27,7 @@ const ActionsPage = () => {
       customerSlug,
       searchTerm: '',
     } });
-  }, [fetchActions]);
+  }, [dialogueSlug, customerSlug, fetchActions]);
 
   const leafs = data?.customer?.dialogue?.leafs;
 

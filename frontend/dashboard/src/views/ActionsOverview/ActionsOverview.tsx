@@ -42,7 +42,6 @@ const initializeCTAType = (type: string) => {
 
 const ActionOverview = ({ leafs, fetchActions, currentSearchTerm }: ActionOverviewProps) => {
   const { customerSlug, dialogueSlug } = useParams();
-  // const handleSearchTermChange = () => null;
   const [activeSearchTerm, setActiveSearchTerm] = useState(currentSearchTerm);
 
   const [newCTA, setNewCTA] = useState(false);
@@ -74,7 +73,6 @@ const ActionOverview = ({ leafs, fetchActions, currentSearchTerm }: ActionOvervi
       <Flex flexDirection="row" justifyContent="space-between">
         <Flex marginBottom="20px" flexDirection="row" alignItems="center" width="50%">
           <H2 color="default.darkest" fontWeight={500} py={2}>Call-to-Actions</H2>
-          {/* <AddCTAButton disabled={!!activeCTA || false} onClick={() => history.push(`/dashboard/b/${customerSlug}/d/${dialogueSlug}/actions/add`)}> */}
           <AddCTAButton disabled={!!activeCTA || false} onClick={() => handleAddCTA()}>
             <Plus />
             <Span>

@@ -40,7 +40,7 @@ const CTA_TYPES = [
 const CTAForm = ({ id, title, type, onActiveCTAChange, onNewCTAChange }: CTAFormProps) => {
   const { customerSlug, dialogueSlug } = useParams();
   const { register, handleSubmit, setValue, errors } = useForm<FormDataProps>({
-    // validationSchema: schema,
+    validationSchema: schema,
   });
 
   const [activeType, setActiveType] = useState<{ label: string, value: string }>(type);
@@ -60,6 +60,7 @@ const CTAForm = ({ id, title, type, onActiveCTAChange, onNewCTAChange }: CTAForm
       variables: {
         customerSlug,
         dialogueSlug,
+        searchTerm: '',
       },
     },
     {

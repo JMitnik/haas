@@ -250,8 +250,6 @@ export const DialogueType = objectType({
       async resolve(parent: Dialogue, args: any, ctx: any) {
         const { prisma }: { prisma: PrismaClient } = ctx;
         const { searchTerm }: { searchTerm: string } = args;
-        console.log('search term: ', searchTerm);
-
         const leafWhereInput: QuestionNodeWhereInput = { AND: [
           {
             questionDialogueId: parent.id,

@@ -8,7 +8,6 @@ import DashboardPage from 'pages/dashboard';
 
 import { AppContainer } from 'styles/AppStyles';
 import ActionsPage from 'pages/dashboard/actions';
-import AddActionView from 'views/ActionsOverview/AddActionView';
 import AddCustomerPage from 'pages/dashboard/customers/add';
 import AddDialogueView from 'views/AddDialogueView';
 import AddTriggerView from 'views/TriggerOverview/AddTriggerView';
@@ -19,7 +18,6 @@ import CustomersPage from 'pages/dashboard/customers';
 import DialogueBuilderView from 'views/DialogueBuilderView/DialogueBuilderView';
 import DialoguePage from 'pages/dashboard/dialogues/dialogue';
 import DialoguesPage from 'pages/dashboard/dialogues';
-import EditActionView from 'views/ActionsOverview/EditActionView';
 import EditCustomerView from 'views/EditCustomerView';
 import EditDialogueView from 'views/EditDialogueView';
 import EditTriggerView from 'views/TriggerOverview/EditTriggerView';
@@ -106,16 +104,6 @@ const AppRoutes = () => (
             <Route
               path="/dashboard/b/:customerSlug/d/add"
               render={() => <AddDialogueView />}
-            />
-
-            <Route
-              path="/dashboard/b/:customerSlug/d/:dialogueSlug/actions/:actionId/edit"
-              render={() => <EditActionView />}
-            />
-
-            <Route
-              path="/dashboard/b/:customerSlug/d/:dialogueSlug/actions/add"
-              render={() => <AddActionView />}
             />
 
             <Route
