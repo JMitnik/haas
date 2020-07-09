@@ -1,29 +1,45 @@
-import { Edit3, Plus, X } from 'react-feather';
-import { useHistory, useParams } from 'react-router-dom';
-import React, { useState } from 'react';
-
 import { ApolloError } from 'apollo-boost';
-import { Button, Div, Flex, H2, Loader, Span } from '@haas/ui';
+import { Edit3, Plus, X } from 'react-feather';
+import { useForm } from 'react-hook-form';
+import { useHistory, useParams } from 'react-router-dom';
 import { useMutation, useQuery } from '@apollo/react-hooks';
+import React, { useState } from 'react';
+import Select from 'react-select';
+
+import { Button, Div, Flex, Form, FormGroupContainer, Grid, H2, H3, Hr, Loader, Muted, Span, StyledInput, StyledLabel } from '@haas/ui';
+
 import LinkIcon from 'components/Icons/LinkIcon';
 import OpinionIcon from 'components/Icons/OpinionIcon';
 import RegisterIcon from 'components/Icons/RegisterIcon';
 import SearchBar from 'components/SearchBar/SearchBar';
 import deleteCTAMutation from 'mutations/deleteCTA';
 import getCTANodesQuery from 'queries/getCTANodes';
+import getTopicBuilderQuery from 'queries/getQuestionnaireQuery';
 import styled, { css } from 'styled-components/macro';
+import updateCTAMutation from 'mutations/updateCTA';
 
 interface ActionOverviewProps {
   leafs: Array<any>;
 }
 
+interface FormDataProps {
+  title: string;
+  ctaType: string;
+}
+
+const CTA_TYPES = [
+  { label: 'Opinion', value: 'TEXTBOX' },
+  { label: 'Register', value: 'REGISTRATION' },
+  { label: 'Link', value: 'SOCIAL_SHARE' },
+];
+
 interface CTAEntryProps {
   id: string;
   title: string;
-  type: string;
+  type: { label: string, value: string };
   Icon: (props: any) => JSX.Element;
   activeCTA: string | null;
-  onActiveCTAChange: (cta: string) => void;
+  onActiveCTAChange: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
 const DialogueViewContainer = styled(Div)`
@@ -33,7 +49,7 @@ const DialogueViewContainer = styled(Div)`
 `;
 
 const AddCTAButton = styled(Button)`
-   ${({ theme }) => css`
+   ${({ theme, disabled }) => css`
     padding: 4px 0px;
     background-color: ${theme.colors.default.dark};
     font-size: 0.8em;
@@ -42,10 +58,12 @@ const AddCTAButton = styled(Button)`
     min-width: 80px;
     display: flex;
     margin-left: 20px;
-    &:hover {
-      transition: all 0.2s ease-in;
+    ${!disabled && css`
+      &:hover {
+        transition: all 0.2s ease-in;
       box-shadow: 0 1px 3px 1px rgba(0,0,0,0.2) !important;
-    }
+      }
+    `}
     svg {
         margin-right: 2px;
         color: ${theme.colors.default.darkest};
@@ -56,7 +74,7 @@ const AddCTAButton = styled(Button)`
 `;
 
 const EditCTAButton = styled(Button)`
-    ${({ theme }) => css`
+    ${({ theme, disabled }) => css`
     padding: 4px 0px;
     background-color: ${theme.colors.white};
     border: ${theme.colors.app.mutedOnWhite} 1px solid;
@@ -65,10 +83,12 @@ const EditCTAButton = styled(Button)`
     color: ${theme.colors.default.darkest};
     min-width: 80px;
     display: flex;
-    &:hover {
-      transition: all 0.2s ease-in;
+    ${!disabled && css`
+      &:hover {
+        transition: all 0.2s ease-in;
       box-shadow: 0 1px 3px 1px rgba(0,0,0,0.2) !important;
-    }
+      }
+    `}
     svg {
         margin-right: 10px;
         color: ${theme.colors.default.darkest};
@@ -78,15 +98,29 @@ const EditCTAButton = styled(Button)`
   `}
 `;
 
-const CTAEntryContainer = styled(Flex)`
- ${({ theme }) => css`
+const CTAEntryContainer = styled(Flex) <{ activeCTA: string | null, id: string }>`
+ ${({ id, activeCTA, theme }) => css`
     position: relative;
-    align-items: center; 
-    flex-direction: row;
+    /* align-items: center;  */
+    flex-direction: column;
     color: ${theme.colors.default.muted};
+
+    ${!activeCTA && css`
     background-color: ${theme.colors.white};
+    `};
+
+    ${activeCTA === id && css`
+    background-color: ${theme.colors.white};
+    `};
+
+    ${activeCTA && activeCTA !== id && css`
+    background-color: ${theme.colors.white};
+    opacity: 0.5;
+    `};
+
     border: ${theme.colors.app.mutedOnDefault} 1px solid;
     padding: 20px;
+    padding-left: 30px;
     margin-bottom: 20px;
     border-radius: ${theme.borderRadiuses.somewhatRounded};
  `}
@@ -112,6 +146,15 @@ const CTAEntryIcon = styled(Div)`
 `;
 
 export const DeleteButtonContainer = styled.button`
+   ${({ disabled }) => css`
+    ${!disabled && css`
+        &:hover {
+        transition: all 0.2s ease-in;
+        opacity: 0.9;
+        background: #e1e2e5;
+      }
+    `}
+  `}
   position: absolute;
   top: 10px;
   right: 10px;
@@ -129,71 +172,176 @@ export const DeleteButtonContainer = styled.button`
   opacity: 0.7;
   cursor: pointer;
   transition: all 0.2s ease-in;
-
-  &:hover {
-    transition: all 0.2s ease-in;
-    opacity: 0.9;
-    background: #e1e2e5;
-  }
 `;
+
+const initializeCTAType = (type: string) => {
+  if (type === 'OPINION') {
+    return { label: 'Opinion', value: 'TEXTBOX' };
+  }
+
+  if (type === 'REGISTER') {
+    return { label: 'Register', value: 'REGISTRATION' };
+  }
+
+  if (type === 'LINK') {
+    return { label: 'Link', value: 'SOCIAL_SHARE' };
+  }
+
+  return { label: 'None', value: '' };
+};
 
 const CTAEntry = ({ id, activeCTA, onActiveCTAChange, title, type, Icon }: CTAEntryProps) => {
   const history = useHistory();
   const { customerSlug, dialogueSlug } = useParams();
+  const { register, handleSubmit, setValue, errors } = useForm<FormDataProps>({
+    // validationSchema: schema,
+  });
 
-  const [deleteEntry] = useMutation(deleteCTAMutation, { variables: {
-    id,
-  },
-  onError: (serverError: ApolloError) => {
-    console.log(serverError);
-  },
-  refetchQueries: [{ query: getCTANodesQuery,
+  const [activeType, setActiveType] = useState<{ label: string, value: string }>(type);
+
+  const handleMultiChange = (selectedOption: any) => {
+    setValue('ctaType', selectedOption?.value);
+    setActiveType(selectedOption);
+  };
+
+  const [deleteEntry] = useMutation(deleteCTAMutation, {
     variables: {
-      customerSlug,
-      dialogueSlug,
-    } }] });
+      id,
+    },
+    onError: (serverError: ApolloError) => {
+      console.log(serverError);
+    },
+    refetchQueries: [{
+      query: getCTANodesQuery,
+      variables: {
+        customerSlug,
+        dialogueSlug,
+      },
+    }],
+  });
+
+  const [updateCTA, { loading }] = useMutation(updateCTAMutation, {
+    onCompleted: () => {
+      onActiveCTAChange(null);
+    },
+    onError: (serverError: ApolloError) => {
+      console.log(serverError);
+    },
+    refetchQueries: [
+      {
+        query: getCTANodesQuery,
+        variables: {
+          customerSlug,
+          dialogueSlug,
+        },
+      },
+      {
+        query: getTopicBuilderQuery,
+        variables: {
+          customerSlug,
+          dialogueSlug,
+        },
+      }],
+  });
+
+  const onSubmit = (formData: FormDataProps) => {
+    updateCTA({
+      variables: {
+        id,
+        title: formData.title,
+        type: formData.ctaType || undefined,
+      },
+    });
+  };
 
   return (
-    <CTAEntryContainer>
-      <DeleteButtonContainer onClick={() => deleteEntry()}>
+    <CTAEntryContainer id={id} activeCTA={activeCTA}>
+      <DeleteButtonContainer disabled={(!!activeCTA && activeCTA !== id) || false} onClick={() => deleteEntry()}>
         <X />
       </DeleteButtonContainer>
-      <Flex width="10%" flexDirection="column">
-        <Flex flexDirection="column" alignItems="center" justifyContent="center">
-          <CTAEntryIcon>
-            <Icon />
-          </CTAEntryIcon>
-          <Span marginTop="5px" fontSize="0.6em" color="default.darker">
-            {type}
-          </Span>
+      <Flex flexDirection="row" width="100%">
+        <Flex flexDirection="column" marginRight="50px">
+          <Flex flexDirection="column" alignItems="center" justifyContent="center">
+            <CTAEntryIcon>
+              <Icon />
+            </CTAEntryIcon>
+            <Span marginTop="5px" fontSize="0.6em" color="default.darker">
+              {type.label}
+            </Span>
+          </Flex>
+
         </Flex>
 
-      </Flex>
-
-      <Flex width="60%" flexDirection="column">
-        <Span fontSize="1.4em">
-          Title
-        </Span>
-        <OverflowSpan>
-          {title}
-        </OverflowSpan>
-      </Flex>
-
-      <Flex width="30%" justifyContent="center">
-        {/* <EditCTAButton onClick={() => history.push(`/dashboard/b/${customerSlug}/d/${dialogueSlug}/actions/${id}/edit`)}> */}
-        <EditCTAButton onClick={() => onActiveCTAChange(id)}>
-          <Edit3 />
-          <Span>
-            Edit
+        <Flex width="60%" flexDirection="column">
+          <Span fontSize="1.4em">
+            Title
           </Span>
-        </EditCTAButton>
+          <OverflowSpan>
+            {title}
+          </OverflowSpan>
+        </Flex>
+
+        <Flex width="30%" alignItems="center" justifyContent="center">
+          {/* <EditCTAButton onClick={() => history.push(`/dashboard/b/${customerSlug}/d/${dialogueSlug}/actions/${id}/edit`)}> */}
+          <EditCTAButton disabled={(activeCTA && activeCTA !== id) || false} onClick={() => onActiveCTAChange(id)}>
+            <Edit3 />
+            <Span>
+              Edit
+            </Span>
+          </EditCTAButton>
+        </Flex>
       </Flex>
 
       {activeCTA === id
         && (
-        <Flex>
-          Yea
-        </Flex>
+          <Form onSubmit={handleSubmit(onSubmit)}>
+            <FormGroupContainer>
+              <Grid gridTemplateColumns={['1fr', '1fr 2fr']} gridColumnGap={4}>
+                <Div py={4} pr={4}>
+                  <H3 color="default.text" fontWeight={500} pb={2}>General Call-to-Action information</H3>
+                  <Muted>
+                    General information about the CAT, such as title, type, etc.
+                  </Muted>
+                </Div>
+                <Div py={4}>
+                  <Grid gridTemplateColumns={['1fr', '1fr 1fr']}>
+                    <Flex flexDirection="column" gridColumn="1 / -1">
+                      <StyledLabel>Title</StyledLabel>
+                      <StyledInput name="title" defaultValue={title} ref={register({ required: true })} />
+                      {errors.title && <Muted color="warning">Something went wrong!</Muted>}
+                    </Flex>
+                    <Div useFlex flexDirection="column">
+                      <StyledLabel>Type</StyledLabel>
+                      <Select
+                        ref={() => register({
+                          name: 'ctaType',
+                          required: true,
+                          validate: (value) => (Array.isArray(value) ? value.length > 0 : !!value),
+                        })}
+                        options={CTA_TYPES}
+                        value={activeType}
+                        onChange={(qOption: any) => {
+                          handleMultiChange(qOption);
+                        }}
+                      />
+                      {errors.ctaType && (
+                        <Muted color="warning">
+                          {errors.ctaType.message}
+                        </Muted>
+                      )}
+                    </Div>
+                  </Grid>
+                </Div>
+              </Grid>
+            </FormGroupContainer>
+
+            <Div>
+              <Flex>
+                <Button brand="primary" mr={2} type="submit">Save CTA</Button>
+                <Button brand="default" type="button" onClick={() => onActiveCTAChange(null)}>Cancel</Button>
+              </Flex>
+            </Div>
+          </Form>
         )}
 
     </CTAEntryContainer>
@@ -241,7 +389,7 @@ const ActionOverview = ({ leafs }: ActionOverviewProps) => {
       <Flex flexDirection="row" justifyContent="space-between">
         <Flex marginBottom="20px" flexDirection="row" alignItems="center" width="50%">
           <H2 color="default.darkest" fontWeight={500} py={2}>Call-to-Actions</H2>
-          <AddCTAButton onClick={() => history.push(`/dashboard/b/${customerSlug}/d/${dialogueSlug}/actions/add`)}>
+          <AddCTAButton disabled={!!activeCTA || false} onClick={() => history.push(`/dashboard/b/${customerSlug}/d/${dialogueSlug}/actions/add`)}>
             <Plus />
             <Span>
               Add
@@ -253,7 +401,7 @@ const ActionOverview = ({ leafs }: ActionOverviewProps) => {
         </Div>
       </Flex>
       {leafs && leafs.map(
-        (leaf: any) => <CTAEntry activeCTA={activeCTA} onActiveCTAChange={setActiveCTA} id={leaf.id} Icon={leaf.icon} title={leaf.title} type={leaf.type} />,
+        (leaf: any) => <CTAEntry activeCTA={activeCTA} onActiveCTAChange={setActiveCTA} id={leaf.id} Icon={leaf.icon} title={leaf.title} type={initializeCTAType(leaf.type)} />,
       )}
     </DialogueViewContainer>
   );
