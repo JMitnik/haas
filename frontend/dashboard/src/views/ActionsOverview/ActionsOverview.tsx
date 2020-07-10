@@ -92,6 +92,7 @@ const ActionOverview = ({ leafs, fetchActions, currentSearchTerm }: ActionOvervi
           Icon={LinkIcon}
           title=""
           type={initializeCTAType('LINK')}
+          links={[]}
           onNewCTAChange={setNewCTA}
         />
       )}
@@ -104,6 +105,7 @@ const ActionOverview = ({ leafs, fetchActions, currentSearchTerm }: ActionOvervi
             Icon={leaf.icon}
             title={leaf.title}
             type={initializeCTAType(leaf.type)}
+            links={leaf.links}
             onNewCTAChange={setNewCTA}
           />
         ),

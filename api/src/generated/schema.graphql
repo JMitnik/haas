@@ -19,6 +19,19 @@ type ColourSettings {
   secondary: String
 }
 
+input CTALinkInputObjectType {
+  backgroundColor: String
+  icon: String
+  id: String
+  title: String
+  type: LinkTypeEnumType
+  url: String
+}
+
+input CTALinksInputType {
+  linkTypes: [CTALinkInputObjectType!]
+}
+
 type Customer {
   dialogue(where: DialogueWhereUniqueInput): Dialogue
   dialogues(filter: DialogueFilterInputType): [Dialogue!]!
@@ -175,6 +188,22 @@ type lineChartDataType {
   y: Int
 }
 
+type LinkType {
+  backgroundColor: String
+  icon: String
+  id: String!
+  questionNode: QuestionNode!
+  questionNodeId: String!
+  title: String
+  type: String!
+  url: String!
+}
+
+enum LinkTypeEnumType {
+  API
+  SOCIAL
+}
+
 type Mutation {
   assignTags(dialogueId: String, tags: TagsInputObjectType): Dialogue!
   createCTA(customerSlug: String, dialogueSlug: String, title: String, type: String): QuestionNode!
@@ -196,7 +225,7 @@ type Mutation {
   editTrigger(questionId: String, recipients: RecipientsInputType, trigger: TriggerInputType, triggerId: String): TriggerType!
   editUser(id: String, input: UserInput): UserType!
   singleUpload(file: Upload): ImageType!
-  updateCTA(id: String, title: String, type: String): QuestionNode!
+  updateCTA(id: String, links: CTALinksInputType, title: String, type: String): QuestionNode!
   updateRoles(permissions: PermissionIdsInput, roleId: String): RoleType!
   updateTopicBuilder(customerSlug: String, dialogueSlug: String, topicData: TopicDataEntry): String!
   uploadUserSession(uploadUserSessionInput: UploadUserSessionInput): Session!
@@ -293,6 +322,7 @@ type QuestionNode {
   id: ID!
   isLeaf: Boolean!
   isRoot: Boolean!
+  links: [LinkType!]!
   options: [QuestionOption!]!
   overrideLeaf: QuestionNode
   overrideLeafId: String

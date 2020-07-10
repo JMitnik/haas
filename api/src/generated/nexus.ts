@@ -31,6 +31,17 @@ export interface NexusGenInputs {
     tags?: NexusGenInputs['TagsInputObjectType'] | null; // TagsInputObjectType
     title?: string | null; // String
   }
+  CTALinkInputObjectType: { // input type
+    backgroundColor?: string | null; // String
+    icon?: string | null; // String
+    id?: string | null; // String
+    title?: string | null; // String
+    type?: NexusGenEnums['LinkTypeEnumType'] | null; // LinkTypeEnumType
+    url?: string | null; // String
+  }
+  CTALinksInputType: { // input type
+    linkTypes?: NexusGenInputs['CTALinkInputObjectType'][] | null; // [CTALinkInputObjectType!]
+  }
   CustomerCreateOptions: { // input type
     isSeed?: boolean | null; // Boolean
     logo?: string | null; // String
@@ -181,6 +192,7 @@ export interface NexusGenInputs {
 }
 
 export interface NexusGenEnums {
+  LinkTypeEnumType: "API" | "SOCIAL"
   TagTypeEnum: "AGENT" | "DEFAULT" | "LOCATION"
   TriggerConditionTypeEnum: "HIGH_THRESHOLD" | "INNER_RANGE" | "LOW_THRESHOLD" | "OUTER_RANGE" | "TEXT_MATCH"
   TriggerMediumEnum: "BOTH" | "EMAIL" | "PHONE"
@@ -229,6 +241,15 @@ export interface NexusGenRootTypes {
     pageSize: number; // Int!
     sessions: NexusGenRootTypes['InteractionSessionType'][]; // [InteractionSessionType!]!
     startDate?: string | null; // String
+  }
+  LinkType: { // root type
+    backgroundColor?: string | null; // String
+    icon?: string | null; // String
+    id: string; // String!
+    questionNodeId: string; // String!
+    title?: string | null; // String
+    type: string; // String!
+    url: string; // String!
   }
   Mutation: {};
   NodeEntry: prisma.NodeEntry;
@@ -304,6 +325,8 @@ export interface NexusGenRootTypes {
 
 export interface NexusGenAllTypes extends NexusGenRootTypes {
   AddDialogueInput: NexusGenInputs['AddDialogueInput'];
+  CTALinkInputObjectType: NexusGenInputs['CTALinkInputObjectType'];
+  CTALinksInputType: NexusGenInputs['CTALinksInputType'];
   CustomerCreateOptions: NexusGenInputs['CustomerCreateOptions'];
   CustomerEditOptions: NexusGenInputs['CustomerEditOptions'];
   CustomerWhereUniqueInput: NexusGenInputs['CustomerWhereUniqueInput'];
@@ -333,6 +356,7 @@ export interface NexusGenAllTypes extends NexusGenRootTypes {
   UserInput: NexusGenInputs['UserInput'];
   UserSessionEntryDataInput: NexusGenInputs['UserSessionEntryDataInput'];
   UserSessionEntryInput: NexusGenInputs['UserSessionEntryInput'];
+  LinkTypeEnumType: NexusGenEnums['LinkTypeEnumType'];
   TagTypeEnum: NexusGenEnums['TagTypeEnum'];
   TriggerConditionTypeEnum: NexusGenEnums['TriggerConditionTypeEnum'];
   TriggerMediumEnum: NexusGenEnums['TriggerMediumEnum'];
@@ -432,6 +456,16 @@ export interface NexusGenFieldTypes {
     sessions: NexusGenRootTypes['InteractionSessionType'][]; // [InteractionSessionType!]!
     startDate: string | null; // String
   }
+  LinkType: { // field return type
+    backgroundColor: string | null; // String
+    icon: string | null; // String
+    id: string; // String!
+    questionNode: NexusGenRootTypes['QuestionNode']; // QuestionNode!
+    questionNodeId: string; // String!
+    title: string | null; // String
+    type: string; // String!
+    url: string; // String!
+  }
   Mutation: { // field return type
     assignTags: NexusGenRootTypes['Dialogue']; // Dialogue!
     createCTA: NexusGenRootTypes['QuestionNode']; // QuestionNode!
@@ -510,6 +544,7 @@ export interface NexusGenFieldTypes {
     id: string; // ID!
     isLeaf: boolean; // Boolean!
     isRoot: boolean; // Boolean!
+    links: NexusGenRootTypes['LinkType'][]; // [LinkType!]!
     options: NexusGenRootTypes['QuestionOption'][]; // [QuestionOption!]!
     overrideLeaf: NexusGenRootTypes['QuestionNode'] | null; // QuestionNode
     overrideLeafId: string | null; // String
@@ -711,6 +746,7 @@ export interface NexusGenArgTypes {
     }
     updateCTA: { // args
       id?: string | null; // String
+      links?: NexusGenInputs['CTALinksInputType'] | null; // CTALinksInputType
       title?: string | null; // String
       type?: string | null; // String
     }
@@ -806,11 +842,11 @@ export interface NexusGenAbstractResolveReturnTypes {
 
 export interface NexusGenInheritedFields {}
 
-export type NexusGenObjectNames = "ColourSettings" | "Customer" | "CustomerSettings" | "Dialogue" | "DialogueStatistics" | "Edge" | "EdgeCondition" | "FontSettings" | "ImageType" | "InteractionSessionType" | "InteractionType" | "Mutation" | "NodeEntry" | "NodeEntryValue" | "PermssionType" | "Query" | "QuestionNode" | "QuestionOption" | "RoleTableType" | "RoleType" | "Session" | "SortFilterObject" | "TagType" | "TriggerConditionType" | "TriggerTableType" | "TriggerType" | "UniqueDataResultEntry" | "UserTable" | "UserType" | "lineChartDataType" | "topPathType";
+export type NexusGenObjectNames = "ColourSettings" | "Customer" | "CustomerSettings" | "Dialogue" | "DialogueStatistics" | "Edge" | "EdgeCondition" | "FontSettings" | "ImageType" | "InteractionSessionType" | "InteractionType" | "LinkType" | "Mutation" | "NodeEntry" | "NodeEntryValue" | "PermssionType" | "Query" | "QuestionNode" | "QuestionOption" | "RoleTableType" | "RoleType" | "Session" | "SortFilterObject" | "TagType" | "TriggerConditionType" | "TriggerTableType" | "TriggerType" | "UniqueDataResultEntry" | "UserTable" | "UserType" | "lineChartDataType" | "topPathType";
 
-export type NexusGenInputNames = "AddDialogueInput" | "CustomerCreateOptions" | "CustomerEditOptions" | "CustomerWhereUniqueInput" | "DialogueFilterInputType" | "DialogueWhereUniqueInput" | "EdgeChildInput" | "EdgeNodeInput" | "FilterInput" | "LeafNodeInput" | "OptionInput" | "PermissionIdsInput" | "PermissionInput" | "QuestionConditionInput" | "QuestionInput" | "QuestionNodeWhereInputType" | "QuestionNodeWhereUniqueInput" | "RecipientsInputType" | "RoleDataInput" | "RoleInput" | "SessionWhereUniqueInput" | "SortFilterInputObject" | "TagsInputObjectType" | "TopicDataEntry" | "TriggerConditionInputType" | "TriggerInputType" | "UploadUserSessionInput" | "UserInput" | "UserSessionEntryDataInput" | "UserSessionEntryInput";
+export type NexusGenInputNames = "AddDialogueInput" | "CTALinkInputObjectType" | "CTALinksInputType" | "CustomerCreateOptions" | "CustomerEditOptions" | "CustomerWhereUniqueInput" | "DialogueFilterInputType" | "DialogueWhereUniqueInput" | "EdgeChildInput" | "EdgeNodeInput" | "FilterInput" | "LeafNodeInput" | "OptionInput" | "PermissionIdsInput" | "PermissionInput" | "QuestionConditionInput" | "QuestionInput" | "QuestionNodeWhereInputType" | "QuestionNodeWhereUniqueInput" | "RecipientsInputType" | "RoleDataInput" | "RoleInput" | "SessionWhereUniqueInput" | "SortFilterInputObject" | "TagsInputObjectType" | "TopicDataEntry" | "TriggerConditionInputType" | "TriggerInputType" | "UploadUserSessionInput" | "UserInput" | "UserSessionEntryDataInput" | "UserSessionEntryInput";
 
-export type NexusGenEnumNames = "TagTypeEnum" | "TriggerConditionTypeEnum" | "TriggerMediumEnum" | "TriggerTypeEnum";
+export type NexusGenEnumNames = "LinkTypeEnumType" | "TagTypeEnum" | "TriggerConditionTypeEnum" | "TriggerMediumEnum" | "TriggerTypeEnum";
 
 export type NexusGenInterfaceNames = never;
 

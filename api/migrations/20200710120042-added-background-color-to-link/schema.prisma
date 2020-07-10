@@ -1,6 +1,6 @@
 datasource postgresql {
   provider = "postgresql"
-  url      = env("DB_STRING")
+  url = "***"
 }
 
 // binaryTargets = ["debian-openssl-1.1.x"]
@@ -126,8 +126,7 @@ model Link {
   id              String        @default(cuid()) @id
   createdAt       DateTime      @default(now())
   updatedAt       DateTime?     @updatedAt
-  title           String?
-  type            LinkTypeEnum
+  title           String
   url             String
   icon            String?
   backgroundColor String?

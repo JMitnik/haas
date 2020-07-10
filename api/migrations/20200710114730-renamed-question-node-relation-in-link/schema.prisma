@@ -1,6 +1,6 @@
 datasource postgresql {
   provider = "postgresql"
-  url      = env("DB_STRING")
+  url = "***"
 }
 
 // binaryTargets = ["debian-openssl-1.1.x"]
@@ -123,16 +123,14 @@ enum LinkTypeEnum {
 }
 
 model Link {
-  id              String        @default(cuid()) @id
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime?     @updatedAt
-  title           String?
-  type            LinkTypeEnum
-  url             String
-  icon            String?
-  backgroundColor String?
-  questionNode    QuestionNode? @relation(fields: [questionNodeId], references: [id])
-  questionNodeId  String?
+  id             String        @default(cuid()) @id
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime?     @updatedAt
+  title          String
+  url            String
+  icon           String?
+  questionNode   QuestionNode? @relation(fields: [questionNodeId], references: [id])
+  questionNodeId String?
 }
 
 model Edge {

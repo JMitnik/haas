@@ -12,6 +12,13 @@ const getCTANodesOfDialogue = gql`
           id
           title
           type
+          links {
+            url
+            title
+            icon
+            backgroundColor
+            type
+          }
         }
       }
     }

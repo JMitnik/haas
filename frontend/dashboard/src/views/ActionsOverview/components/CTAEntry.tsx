@@ -14,10 +14,19 @@ import CTAIcon from './CTAIcon';
 import DeleteCTAButton from './DeleteCTAButton';
 import EditCTAButton from './EditCTAButton';
 
+interface LinkInputProps {
+  id: string;
+  title?: string;
+  type: 'SOCIAL' | 'API';
+  url: string;
+  icon?: string;
+  backgroundColor?: string;
+}
 interface CTAEntryProps {
   id: string;
   title: string;
   type: { label: string, value: string };
+  links: Array<LinkInputProps>;
   Icon: (props: any) => JSX.Element;
   activeCTA: string | null;
   onActiveCTAChange: React.Dispatch<React.SetStateAction<string | null>>;
@@ -61,9 +70,9 @@ const OverflowSpan = styled(Span)`
   text-overflow: ellipsis;
 `;
 
-const CTAEntry = ({ id, activeCTA, onActiveCTAChange, title, type, Icon, onNewCTAChange }: CTAEntryProps) => {
+const CTAEntry = ({ id, activeCTA, onActiveCTAChange, title, type, links, Icon, onNewCTAChange }: CTAEntryProps) => {
   const { customerSlug, dialogueSlug } = useParams();
-
+  console.log('links: ', links);
   const [deleteEntry] = useMutation(deleteCTAMutation, {
     variables: {
       id,
@@ -119,7 +128,7 @@ const CTAEntry = ({ id, activeCTA, onActiveCTAChange, title, type, Icon, onNewCT
 
       {activeCTA === id
           && (
-            <CTAForm id={id} title={title} type={type} onActiveCTAChange={onActiveCTAChange} onNewCTAChange={onNewCTAChange} />
+            <CTAForm id={id} title={title} type={type} links={links} onActiveCTAChange={onActiveCTAChange} onNewCTAChange={onNewCTAChange} />
           )}
 
     </CTAEntryContainer>

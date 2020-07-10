@@ -1,4 +1,4 @@
-import { PrismaClient, QuestionNode, QuestionNodeCreateInput } from '@prisma/client';
+import { Link, LinkCreateInput, LinkUpdateManyWithoutQuestionNodeInput, PrismaClient, QuestionNode, QuestionNodeCreateInput, QuestionNodeUpdateInput, QuestionNodeWhereUniqueInput } from '@prisma/client';
 import { multiChoiceType, sliderType } from '../../data/seeds/default-data';
 import EdgeResolver from '../edge/edge-resolver';
 
@@ -53,6 +53,15 @@ interface QuestionProps {
   children: Array<EdgeChildProps>;
 }
 
+interface LinkInputProps {
+  id: string;
+  title?: string;
+  type: 'SOCIAL' | 'API';
+  url: string;
+  icon?: string;
+  backgroundColor?: string;
+}
+
 const standardOptions = [{ value: 'Facilities' },
   { value: 'Website/Mobile app' },
   { value: 'Product/Services' },
@@ -79,6 +88,48 @@ const productServicesOptions = [{ value: 'Quality' },
   { value: 'Other' }];
 
 class NodeResolver {
+  static removeNonExistingLinks = async (
+    dbLinks: Array<Link>,
+    newLinks: Array<LinkInputProps>) => {
+    const newLinkIds = newLinks?.map(({ id }) => id);
+    const removeLinkIds = dbLinks?.filter(({ id }) => (!newLinkIds.includes(id) && id)).map(({ id }) => id);
+    if (removeLinkIds?.length > 0) {
+      await prisma.link.deleteMany({ where: { id: { in: removeLinkIds } } });
+    }
+  };
+
+  static upsertLinks = async (
+    newLinks: Array<LinkInputProps>,
+    questionId: string,
+  ) => {
+    newLinks.forEach(async (link) => {
+      await prisma.link.upsert({
+        where: {
+          id: link.id || '-1',
+        },
+        create: {
+          title: link.title,
+          url: link.url,
+          type: link.type,
+          backgroundColor: link.backgroundColor,
+          icon: link.icon,
+          questionNode: {
+            connect: {
+              id: questionId,
+            },
+          },
+        },
+        update: {
+          title: link.title,
+          url: link.url,
+          type: link.type,
+          backgroundColor: link.backgroundColor,
+          icon: link.icon,
+        },
+      });
+    });
+  };
+
   static constructQuestionNode(title: string,
     questionnaireId: string,
     type: string,

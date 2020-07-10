@@ -1,7 +1,9 @@
+import { CTALinksInputType, LinkType } from '../link/Link';
 import { DialogueType } from '../questionnaire/Dialogue';
 import { EdgeType } from '../edge/Edge';
-import { PrismaClient, QuestionNode } from '@prisma/client';
+import { LinkUpdateManyWithoutQuestionNodeInput, PrismaClient, QuestionNode, QuestionNodeUpdateInput } from '@prisma/client';
 import { extendType, inputObjectType, objectType } from '@nexus/schema';
+import NodeResolver from './node-resolver';
 
 export const QuestionOptionType = objectType({
   name: 'QuestionOption',
@@ -24,6 +26,21 @@ export const QuestionNodeType = objectType({
     t.string('type');
     t.string('overrideLeafId', { nullable: true });
     t.string('questionDialogueId');
+
+    t.list.field('links', {
+      type: LinkType,
+      resolve(parent: QuestionNode, args: any, ctx: any) {
+        const { prisma } : { prisma: PrismaClient } = ctx;
+        if (parent.isLeaf) {
+          return prisma.link.findMany({
+            where: {
+              questionNodeId: parent.id,
+            },
+          });
+        }
+        return [];
+      },
+    });
 
     t.field('questionDialogue', {
       type: DialogueType,
@@ -102,19 +119,33 @@ export const QuestionNodeMutations = extendType({
         id: 'String',
         title: 'String',
         type: 'String',
+        links: CTALinksInputType,
       },
-      resolve(parent: any, args: any, ctx: any) {
+      async resolve(parent: any, args: any, ctx: any) {
         const { prisma }: { prisma: PrismaClient } = ctx;
-        const { title, type, id } = args;
+        const { title, type, id, links } = args;
+
+        const dbQuestionNode = await prisma.questionNode.findOne({
+          where: {
+            id,
+          },
+          include: {
+            links: true,
+          },
+        });
+
+        const questionNodeUpdateInput: QuestionNodeUpdateInput = { title, type };
+        if (dbQuestionNode?.links) {
+          await NodeResolver.removeNonExistingLinks(dbQuestionNode.links, links?.linkTypes);
+        }
+
+        await NodeResolver.upsertLinks(links?.linkTypes, id);
 
         return prisma.questionNode.update({
           where: {
             id,
           },
-          data: {
-            title,
-            type,
-          },
+          data: questionNodeUpdateInput,
         });
       },
     });

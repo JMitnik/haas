@@ -7,7 +7,8 @@ import React, { useEffect, useState } from 'react';
 import Select from 'react-select';
 
 import { Button, Div, Flex, Form, FormGroupContainer, Grid,
-  H3, Muted, StyledInput, StyledLabel } from '@haas/ui';
+  H3, H4, Hr, Muted, StyledInput, StyledLabel } from '@haas/ui';
+import { PlusCircle } from 'react-feather';
 import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
 import createCTAMutation from 'mutations/createCTA';
 import getCTANodesQuery from 'queries/getCTANodes';
@@ -18,9 +19,19 @@ interface FormDataProps {
   ctaType: string;
 }
 
+interface LinkInputProps {
+  id?: string | null;
+  title?: string | null;
+  type?: 'SOCIAL' | 'API' | null;
+  url?: string | null;
+  icon?: string | null;
+  backgroundColor?: string | null;
+}
+
 interface CTAFormProps {
   id: string;
   title: string;
+  links: Array<LinkInputProps>;
   type: { label: string, value: string };
   onActiveCTAChange: React.Dispatch<React.SetStateAction<string | null>>;
   onNewCTAChange: React.Dispatch<React.SetStateAction<boolean>>;
@@ -37,11 +48,13 @@ const CTA_TYPES = [
   { label: 'Link', value: 'SOCIAL_SHARE' },
 ];
 
-const CTAForm = ({ id, title, type, onActiveCTAChange, onNewCTAChange }: CTAFormProps) => {
+const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: CTAFormProps) => {
   const { customerSlug, dialogueSlug } = useParams();
   const { register, handleSubmit, setValue, errors } = useForm<FormDataProps>({
     validationSchema: schema,
   });
+
+  const [activeLinks, setActiveLinks] = useState<Array<LinkInputProps>>(links);
 
   const [activeType, setActiveType] = useState<{ label: string, value: string }>(type);
 
@@ -53,6 +66,10 @@ const CTAForm = ({ id, title, type, onActiveCTAChange, onNewCTAChange }: CTAForm
   useEffect(() => {
     handleMultiChange(activeType);
   }, [activeType, handleMultiChange]);
+
+  const addCondition = () => {
+    setActiveLinks((prevLinks) => [...prevLinks, { id: null }]);
+  };
 
   const refetchingQueries = [
     {
@@ -156,6 +173,23 @@ const CTAForm = ({ id, title, type, onActiveCTAChange, onNewCTAChange }: CTAForm
                   {errors.ctaType.message}
                 </Muted>
                 )}
+              </Div>
+              <Div gridColumn="1 / -1">
+                <Flex flexDirection="row" alignItems="center" justifyContent="space-between" marginBottom={5}>
+                  <H4>Conditions</H4>
+                  <PlusCircle onClick={addCondition} />
+                </Flex>
+                <Hr />
+
+                {activeLinks.map((link, index) => (
+                  <Div marginTop={15} gridColumn="1 / -1">
+                    <Grid border="1px solid" gridTemplateColumns={['1fr 1fr']}>
+                      <Div>hey</Div>
+                      <Div>hoi</Div>
+                    </Grid>
+                  </Div>
+                ))}
+
               </Div>
             </Grid>
           </Div>
