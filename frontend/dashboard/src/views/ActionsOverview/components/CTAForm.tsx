@@ -3,12 +3,13 @@ import { ApolloError } from 'apollo-boost';
 import { useForm } from 'react-hook-form';
 import { useMutation } from '@apollo/react-hooks';
 import { useParams } from 'react-router-dom';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import Select from 'react-select';
 
 import { Button, Div, Flex, Form, FormGroupContainer, Grid,
   H3, H4, Hr, Muted, StyledInput, StyledLabel } from '@haas/ui';
 import { PlusCircle } from 'react-feather';
+import { cloneDeep, debounce } from 'lodash';
 import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
 import createCTAMutation from 'mutations/createCTA';
 import getCTANodesQuery from 'queries/getCTANodes';
@@ -17,15 +18,20 @@ import updateCTAMutation from 'mutations/updateCTA';
 interface FormDataProps {
   title: string;
   ctaType: string;
+  url: string;
+  linkType: string;
+  tooltip?: string;
+  icon: string;
+  backgroundColor: string;
 }
 
 interface LinkInputProps {
   id?: string | null;
-  title?: string | null;
-  type?: 'SOCIAL' | 'API' | null;
-  url?: string | null;
-  icon?: string | null;
-  backgroundColor?: string | null;
+  title: string;
+  type?: { label: string, value: string };
+  url: string;
+  icon?: string;
+  backgroundColor?: string;
 }
 
 interface CTAFormProps {
@@ -37,9 +43,15 @@ interface CTAFormProps {
   onNewCTAChange: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
+const isLinkType = (ctaType: string) => ctaType === 'SOCIAL_SHARE';
+
 const schema = yup.object().shape({
   title: yup.string().required(),
   ctaType: yup.string().required(),
+  url: yup.string().notRequired().when(['ctaType'], {
+    is: (ctaType: string) => isLinkType(ctaType),
+    then: yup.string().required(),
+  }),
 });
 
 const CTA_TYPES = [
@@ -48,13 +60,18 @@ const CTA_TYPES = [
   { label: 'Link', value: 'SOCIAL_SHARE' },
 ];
 
+const LINK_TYPES = [
+  { label: 'SOCIAL', value: 'SOCIAL' },
+  { label: 'API', value: 'API' },
+];
+
 const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: CTAFormProps) => {
   const { customerSlug, dialogueSlug } = useParams();
   const { register, handleSubmit, setValue, errors } = useForm<FormDataProps>({
-    validationSchema: schema,
+    // validationSchema: schema,
   });
 
-  const [activeLinks, setActiveLinks] = useState<Array<LinkInputProps>>(links);
+  const [activeLinks, setActiveLinks] = useState<Array<LinkInputProps>>(cloneDeep(links));
 
   const [activeType, setActiveType] = useState<{ label: string, value: string }>(type);
 
@@ -68,7 +85,7 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: 
   }, [activeType, handleMultiChange]);
 
   const addCondition = () => {
-    setActiveLinks((prevLinks) => [...prevLinks, { id: null }]);
+    setActiveLinks((prevLinks) => [...prevLinks, { id: null, url: '', title: '' }]);
   };
 
   const refetchingQueries = [
@@ -110,6 +127,11 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: 
   });
 
   const onSubmit = (formData: FormDataProps) => {
+    console.log('formdata: ', formData);
+
+    const mappedLinks = { linkTypes: activeLinks.map((link) => ({ ...link, type: link.type?.value })) };
+    console.log('mappedLinks: ', mappedLinks);
+
     if (id === '-1') {
       addCTA({
         variables: {
@@ -125,6 +147,7 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: 
           id,
           title: formData.title,
           type: formData.ctaType || undefined,
+          links: mappedLinks,
         },
       });
     }
@@ -136,6 +159,45 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: 
     }
     onActiveCTAChange(null);
   };
+
+  const handleURLChange = useCallback(debounce((newUrl: string, index: number) => {
+    setActiveLinks((prevLinks) => {
+      prevLinks[index].url = newUrl;
+      return [...prevLinks];
+    });
+  }, 250), []);
+
+  const handleTooltipChange = useCallback(debounce((newTooltip: string, index: number) => {
+    setActiveLinks((prevLinks) => {
+      prevLinks[index].title = newTooltip;
+      return [...prevLinks];
+    });
+  }, 250), []);
+
+  const handleIconChange = useCallback(debounce((newIcon: string, index: number) => {
+    setActiveLinks((prevLinks) => {
+      prevLinks[index].icon = newIcon;
+      return [...prevLinks];
+    });
+  }, 250), []);
+
+  const handleBackgroundColorChange = useCallback(debounce((newColor: string, index: number) => {
+    setActiveLinks((prevLinks) => {
+      prevLinks[index].backgroundColor = newColor;
+      return [...prevLinks];
+    });
+  }, 250), []);
+
+  const handleLinkTypeChange = (qOption: any, index: number) => {
+    console.log('handleLinkType change: ', qOption);
+    // setValue('linkType', qOption?.value);
+    setActiveLinks((prevLinks) => {
+      prevLinks[index].type = qOption;
+      return [...prevLinks];
+    });
+  };
+
+  console.log('active links: ', activeLinks);
 
   return (
     <Form onSubmit={handleSubmit(onSubmit)}>
@@ -174,23 +236,89 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: 
                 </Muted>
                 )}
               </Div>
+              {activeType.value === 'SOCIAL_SHARE' && (
               <Div gridColumn="1 / -1">
                 <Flex flexDirection="row" alignItems="center" justifyContent="space-between" marginBottom={5}>
-                  <H4>Conditions</H4>
+                  <H4>Links</H4>
                   <PlusCircle onClick={addCondition} />
                 </Flex>
                 <Hr />
 
                 {activeLinks.map((link, index) => (
-                  <Div marginTop={15} gridColumn="1 / -1">
-                    <Grid border="1px solid" gridTemplateColumns={['1fr 1fr']}>
-                      <Div>hey</Div>
-                      <Div>hoi</Div>
+                  <Div key={index} marginTop={15} gridColumn="1 / -1">
+                    <Grid
+                      border="1px solid"
+                      borderColor="default.light"
+                      gridGap="12px"
+                      padding="10px"
+                      gridTemplateColumns={['1fr 1fr']}
+                    >
+                      <Flex flexDirection="column">
+                        <StyledLabel>Url</StyledLabel>
+                        <StyledInput
+                          name="url"
+                          defaultValue={link.url}
+                          onChange={(e) => handleURLChange(e.currentTarget.value, index)}
+                          ref={register({ required: true })}
+                        />
+                        {errors.url && <Muted color="warning">Something went wrong!</Muted>}
+                      </Flex>
+                      <Div useFlex flexDirection="column">
+                        <StyledLabel>Type</StyledLabel>
+                        <Select
+                          ref={() => register({
+                            name: 'linkType',
+                            required: true,
+                            validate: (value) => (Array.isArray(value) ? value.length > 0 : !!value),
+                          })}
+                          options={LINK_TYPES}
+                          value={link.type}
+                          onChange={(qOption: any) => {
+                            handleLinkTypeChange(qOption, index);
+                          }}
+                        />
+                        {errors.ctaType && (
+                        <Muted color="warning">
+                          {errors.ctaType.message}
+                        </Muted>
+                        )}
+                      </Div>
+                      <Flex flexDirection="column">
+                        <StyledLabel>Tooltip</StyledLabel>
+                        <StyledInput
+                          name="tooltip"
+                          defaultValue={link.title}
+                          onChange={(e) => handleTooltipChange(e.currentTarget.value, index)}
+                          ref={register({ required: false })}
+                        />
+                        {errors.tooltip && <Muted color="warning">Something went wrong!</Muted>}
+                      </Flex>
+                      <Flex flexDirection="column">
+                        <StyledLabel>Icon</StyledLabel>
+                        <StyledInput
+                          name="icon"
+                          defaultValue={link.icon}
+                          onChange={(e) => handleIconChange(e.currentTarget.value, index)}
+                          ref={register({ required: false })}
+                        />
+                        {errors.icon && <Muted color="warning">Something went wrong!</Muted>}
+                      </Flex>
+                      <Flex flexDirection="column">
+                        <StyledLabel>Background color</StyledLabel>
+                        <StyledInput
+                          name="icon"
+                          defaultValue={link.backgroundColor}
+                          onChange={(e) => handleBackgroundColorChange(e.currentTarget.value, index)}
+                          ref={register({ required: false })}
+                        />
+                        {errors.backgroundColor && <Muted color="warning">Something went wrong!</Muted>}
+                      </Flex>
                     </Grid>
                   </Div>
                 ))}
 
               </Div>
+              )}
             </Grid>
           </Div>
         </Grid>

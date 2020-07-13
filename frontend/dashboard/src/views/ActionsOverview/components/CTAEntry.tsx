@@ -16,8 +16,8 @@ import EditCTAButton from './EditCTAButton';
 
 interface LinkInputProps {
   id: string;
-  title?: string;
-  type: 'SOCIAL' | 'API';
+  title: string;
+  type: { label: string, value: string };
   url: string;
   icon?: string;
   backgroundColor?: string;
@@ -72,7 +72,6 @@ const OverflowSpan = styled(Span)`
 
 const CTAEntry = ({ id, activeCTA, onActiveCTAChange, title, type, links, Icon, onNewCTAChange }: CTAEntryProps) => {
   const { customerSlug, dialogueSlug } = useParams();
-  console.log('links: ', links);
   const [deleteEntry] = useMutation(deleteCTAMutation, {
     variables: {
       id,
@@ -96,7 +95,6 @@ const CTAEntry = ({ id, activeCTA, onActiveCTAChange, title, type, links, Icon, 
     }
     return deleteEntry();
   };
-
   return (
     <CTAEntryContainer id={id} activeCTA={activeCTA}>
       <DeleteCTAButton disabled={(!!activeCTA && activeCTA !== id) || false} onClick={() => deleteCTA()}>
@@ -128,7 +126,14 @@ const CTAEntry = ({ id, activeCTA, onActiveCTAChange, title, type, links, Icon, 
 
       {activeCTA === id
           && (
-            <CTAForm id={id} title={title} type={type} links={links} onActiveCTAChange={onActiveCTAChange} onNewCTAChange={onNewCTAChange} />
+            <CTAForm
+              id={id}
+              title={title}
+              type={type}
+              links={links}
+              onActiveCTAChange={onActiveCTAChange}
+              onNewCTAChange={onNewCTAChange}
+            />
           )}
 
     </CTAEntryContainer>

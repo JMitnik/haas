@@ -92,7 +92,7 @@ class NodeResolver {
     dbLinks: Array<Link>,
     newLinks: Array<LinkInputProps>) => {
     const newLinkIds = newLinks?.map(({ id }) => id);
-    const removeLinkIds = dbLinks?.filter(({ id }) => (!newLinkIds.includes(id) && id)).map(({ id }) => id);
+    const removeLinkIds = dbLinks?.filter(({ id }) => (!newLinkIds?.includes(id) && id)).map(({ id }) => id);
     if (removeLinkIds?.length > 0) {
       await prisma.link.deleteMany({ where: { id: { in: removeLinkIds } } });
     }
@@ -102,7 +102,7 @@ class NodeResolver {
     newLinks: Array<LinkInputProps>,
     questionId: string,
   ) => {
-    newLinks.forEach(async (link) => {
+    newLinks?.forEach(async (link) => {
       await prisma.link.upsert({
         where: {
           id: link.id || '-1',

@@ -124,7 +124,7 @@ export const QuestionNodeMutations = extendType({
       async resolve(parent: any, args: any, ctx: any) {
         const { prisma }: { prisma: PrismaClient } = ctx;
         const { title, type, id, links } = args;
-
+        console.log('links: ', links);
         const dbQuestionNode = await prisma.questionNode.findOne({
           where: {
             id,
@@ -136,7 +136,7 @@ export const QuestionNodeMutations = extendType({
 
         const questionNodeUpdateInput: QuestionNodeUpdateInput = { title, type };
         if (dbQuestionNode?.links) {
-          await NodeResolver.removeNonExistingLinks(dbQuestionNode.links, links?.linkTypes);
+          await NodeResolver.removeNonExistingLinks(dbQuestionNode?.links, links?.linkTypes);
         }
 
         await NodeResolver.upsertLinks(links?.linkTypes, id);

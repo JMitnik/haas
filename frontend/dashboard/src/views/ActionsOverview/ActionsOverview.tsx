@@ -97,8 +97,9 @@ const ActionOverview = ({ leafs, fetchActions, currentSearchTerm }: ActionOvervi
         />
       )}
       {leafs && leafs.map(
-        (leaf: any) => (
+        (leaf: any, index: number) => (
           <CTAEntry
+            key={index}
             activeCTA={activeCTA}
             onActiveCTAChange={setActiveCTA}
             id={leaf.id}

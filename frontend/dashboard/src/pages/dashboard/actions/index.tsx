@@ -35,7 +35,8 @@ const ActionsPage = () => {
 
   const mappedLeafs = leafs.map((leaf: any) => {
     if (leaf.type === 'SOCIAL_SHARE') {
-      return { ...leaf, type: 'LINK', icon: LinkIcon };
+      const mappedLinks = leaf.links?.map((link: any) => ({ ...link, type: { label: link.type, value: link.type } }));
+      return { ...leaf, type: 'LINK', icon: LinkIcon, links: mappedLinks };
     }
     if (leaf.type === 'REGISTRATION') {
       return { ...leaf, type: 'REGISTER', icon: RegisterIcon };
