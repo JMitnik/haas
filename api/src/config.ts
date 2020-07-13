@@ -8,7 +8,6 @@ export interface ConfigProps {
   clientUrl: string;
   dashboardUrl: string;
   cloudinaryUrl: string;
-  prismaUrl: string;
   appSchemaUrl: string;
   prismaSchemaUrl: string;
   mailDefaultSender: string;
@@ -29,7 +28,6 @@ const config: ConfigProps = {
   clientUrl: process.env.CLIENT_URL || 'http://localhost:3000',
   dashboardUrl: process.env.DASHBOARD_URL || 'http://localhost:3002',
   cloudinaryUrl: process.env.CLOUDINARY_URL || '',
-  prismaUrl: process.env.PRISMA_SERVICE_ENDPOINT || 'http://localhost:4466',
   appSchemaUrl: process.env.PATH_TO_APP_SCHEMA || './src/schema.graphql',
   prismaSchemaUrl: process.env.PATH_TO_PRISMA_GENERATED_SCHEMA || './src/generated/prisma.graphql',
   mailServer: process.env.MAIL_SERVER || '',

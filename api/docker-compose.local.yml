@@ -6,13 +6,6 @@ services:
       POSTGRES_USER: prisma
       POSTGRES_PASSWORD: prisma
     volumes:
-      - /postgresdata:/var/lib/postgresql/data
+      - /var/lib/postgresql/data
     ports:
       - '5432:5432'
-  api:
-    build: .
-    restart: always
-    ports:
-      - '4000:4000'
-    env_file:
-      - .env
