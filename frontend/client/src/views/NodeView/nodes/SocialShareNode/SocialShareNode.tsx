@@ -16,6 +16,8 @@ const SocialShareNode = ({ node }: SocialShareNodeProps) => {
   useDialogueFinish();
 
   console.log(getSnapshot(node.links));
+  // TODO: Create Twitter, Facebook, Instagram and LinkedIn links in seed for SOCIAL_SHARE CTAs
+  // (change SOCIAL_SHARE to LINK and each get own type e.g. and other get CUSTOM as type )
 
   return (
     <SocialShareNodeContainer>
@@ -48,7 +50,14 @@ const SocialShareNode = ({ node }: SocialShareNodeProps) => {
               rel="noopener noreferrer"
               bg={link.backgroundColor || '#007bb5'}
             >
-              {link.icon ? <CustomIcon logo={link.icon} /> : <Globe stroke="white" />}
+              {link.type === 'TWITTER' && <Twitter stroke="none" fill="white" />}
+              {link.type === 'FACEBOOK' && <Facebook stroke="none" fill="white" />}
+              {link.type === 'INSTAGRAM' && <Instagram stroke="white" />}
+              {link.type === 'LINKEDIN' && <Linkedin stroke="none" fill="white" />}
+              {(!['TWITTER', 'FACEBOOK', 'INSTAGRAM', 'LINKEDIN'].includes(link.type) && link.icon)
+              && <CustomIcon logo={link.icon} />}
+              {(!['TWITTER', 'FACEBOOK', 'INSTAGRAM', 'LINKEDIN'].includes(link.type) && !link.icon)
+              && <Globe stroke="white" />}
             </ShareItem>
           ),
         )}

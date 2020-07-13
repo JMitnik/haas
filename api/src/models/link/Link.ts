@@ -5,7 +5,14 @@ import { QuestionNodeType } from '../question/QuestionNode';
 
 export const LinkTypeEnumType = enumType({
   name: 'LinkTypeEnumType',
-  members: ['SOCIAL', 'API'],
+  members: [
+    'SOCIAL',
+    'API',
+    'FACEBOOK',
+    'LINKEDIN',
+    'WHATSAPP',
+    'INSTAGRAM',
+    'TWITTER'],
 });
 
 export const CTALinkInputObjectType = inputObjectType({

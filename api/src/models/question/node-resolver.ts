@@ -7,6 +7,7 @@ const prisma = new PrismaClient();
 interface LeafNodeDataEntryProps {
   title: string;
   type: string;
+  links: Array<LinkGenericInputProps>
 }
 
 interface QuestionOptionProps {
@@ -53,11 +54,14 @@ interface QuestionProps {
   children: Array<EdgeChildProps>;
 }
 
-interface LinkInputProps {
+interface LinkGenericInputProps {
+  type: 'SOCIAL' | 'API' | 'FACEBOOK' | 'LINKEDIN' | 'WHATSAPP' | 'INSTAGRAM' | 'TWITTER';
+  url: string;
+}
+
+interface LinkInputProps extends LinkGenericInputProps {
   id: string;
   title?: string;
-  type: 'SOCIAL' | 'API';
-  url: string;
   icon?: string;
   backgroundColor?: string;
 }
@@ -216,7 +220,7 @@ class NodeResolver {
   static createTemplateLeafNodes = async (
     leafNodesArray: Array<LeafNodeDataEntryProps>, dialogueId: string) => {
     const leafs = await Promise.all(
-      leafNodesArray.map(async ({ title, type }) => prisma.questionNode.create({
+      leafNodesArray.map(async ({ title, type, links }) => prisma.questionNode.create({
         data: {
           title,
           questionDialogue: {
@@ -227,6 +231,9 @@ class NodeResolver {
           type,
           isRoot: false,
           isLeaf: true,
+          links: {
+            create: links,
+          },
         },
       })),
     );

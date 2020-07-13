@@ -201,7 +201,12 @@ type LinkType {
 
 enum LinkTypeEnumType {
   API
+  FACEBOOK
+  INSTAGRAM
+  LINKEDIN
   SOCIAL
+  TWITTER
+  WHATSAPP
 }
 
 type Mutation {

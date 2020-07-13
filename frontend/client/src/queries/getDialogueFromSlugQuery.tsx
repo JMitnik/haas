@@ -21,6 +21,7 @@ const getDialogueFromSlug = gql`
           type
           links {
             url
+            type
             title
             icon
             backgroundColor
