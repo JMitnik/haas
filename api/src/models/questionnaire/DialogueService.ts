@@ -4,7 +4,7 @@ import { subDays } from 'date-fns';
 import _ from 'lodash';
 
 import { leafNodes, sliderType } from '../../data/seeds/default-data';
-import NodeResolver from '../question/node-resolver';
+import NodeResolver from '../question/NodeService';
 // eslint-disable-next-line import/no-cycle
 import SessionService from '../session/SessionService';
 
@@ -400,6 +400,7 @@ class DialogueService {
       dialogueTags,
     );
 
+    // TODO: "Include "
     await prisma.dialogue.update({
       where: {
         id: questionnaire.id,
@@ -452,9 +453,11 @@ class DialogueService {
       },
     ));
 
-    const reducer = (accumulator: object, currentValue: object) => (
-      { ...accumulator, ...currentValue }
-    );
+    const reducer = (accumulator: object, currentValue: object) => ({
+      ...accumulator,
+      ...currentValue,
+    });
+
     const finalMapping = newMappedQuestions.reduce(reducer, {});
     const finalQuestions = questions.map((question) => {
       const matchResult = question.id.match(v4) || [];

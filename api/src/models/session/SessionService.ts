@@ -110,7 +110,7 @@ class SessionService {
   static async getTextEntriesFromSession(
     session: SessionWithEntries,
   ): Promise<NodeEntryWithTypes[] | undefined | null> {
-    return session.nodeEntries.filter((entry) => entry.type in TEXT_NODES);
+    return session.nodeEntries.filter((entry) => entry?.relatedNode?.type && entry?.relatedNode?.type in TEXT_NODES);
   }
 
   static async getSessionScore(sessionId: string): Promise<number | undefined | null> {

@@ -24,7 +24,7 @@ interface TableProps {
 const HEADERS = [
   { Header: 'ID', accessor: 'id', Cell: UserCell },
   { Header: 'NAME', accessor: 'name', Cell: UserCell },
-  { Header: '# PERMISSIONS', accessor: 'amtPermissions', Cell: CenterCell },
+  { Header: '# PERMISSIONS', accessor: 'nrPermissions', Cell: CenterCell },
 ];
 
 const RolesOverview = () => {

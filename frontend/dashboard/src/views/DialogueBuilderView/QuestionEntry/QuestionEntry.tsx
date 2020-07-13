@@ -1,16 +1,17 @@
-import React, { useState } from 'react';
+import { Button, Div, H4, Hr, Muted, StyledInput, StyledLabel } from '@haas/ui';
 import { MinusCircle, PlusCircle } from 'react-feather';
-import { Muted, Div, H4, Button, StyledLabel, StyledInput, Hr } from '@haas/ui';
-import { v4 as uuidv4 } from 'uuid';
-import Select from 'react-select';
 import { useForm } from 'react-hook-form';
+import { v4 as uuidv4 } from 'uuid';
+import React, { useState } from 'react';
+import Select from 'react-select';
+
+import { DeleteQuestionOptionButtonContainer, QuestionEntryContainer, QuestionEntryHeader } from './QuestionEntryStyles';
+import { EdgeChildProps, QuestionEntryProps } from '../TopicBuilderInterfaces';
 import EdgeEntry from '../EdgeEntry/EdgeEntry';
-import { QuestionEntryContainer, DeleteQuestionOptionButtonContainer, QuestionEntryHeader } from './QuestionEntryStyles';
-import { QuestionEntryProps, EdgeChildProps } from '../TopicBuilderInterfaces';
 
 const questionTypes = [
   { value: 'SLIDER', label: 'SLIDER' },
-  { value: 'MULTI_CHOICE', label: 'MULTI_CHOICE' }];
+  { value: 'CHOICE', label: 'CHOICE' }];
 
 interface QuestionEntryItemProps {
   questionsQ: Array<QuestionEntryProps>;
@@ -54,7 +55,7 @@ const QuestionEntryItem = ({ question, leafs, ...props }: QuestionEntryItemProps
 
   const setQuestionType = (questionType: any) => {
     const { value } = questionType;
-    if (value === 'MULTI_CHOICE') {
+    if (value === 'CHOICE') {
       setOptionsExpanded(true);
     }
     props.onQuestionTypeChange(value, question.id);
@@ -125,7 +126,7 @@ const QuestionEntryItem = ({ question, leafs, ...props }: QuestionEntryItemProps
   const addNewEdge = (event: any) => {
     event.preventDefault();
     const questionUUID = uuidv4();
-    props.onAddQuestion(event, questionUUID)
+    props.onAddQuestion(event, questionUUID);
     props.onEdgesChange([
       ...activeEdges, {
         id: undefined,
@@ -133,7 +134,6 @@ const QuestionEntryItem = ({ question, leafs, ...props }: QuestionEntryItemProps
         parentNode: { id: question.id, title: question.title },
         childNode: { id: questionUUID },
       }], question.id);
-
   };
 
   const deleteEdgeEntry = (event: any, edgeIndex: number) => {
@@ -141,7 +141,7 @@ const QuestionEntryItem = ({ question, leafs, ...props }: QuestionEntryItemProps
 
     const removedEdge = activeEdges.splice(edgeIndex, 1);
     if (removedEdge?.[0].childNode?.id) {
-      props.onDeleteQuestion(event, removedEdge?.[0].childNode?.id)
+      props.onDeleteQuestion(event, removedEdge?.[0].childNode?.id);
     }
     props.onEdgesChange([...activeEdges], question.id);
   };
@@ -165,9 +165,14 @@ const QuestionEntryItem = ({ question, leafs, ...props }: QuestionEntryItemProps
       <Div margin={5} py={6}>
         <QuestionEntryHeader pl={4} pr={4} pb={2} pt={2} onClick={() => props.onQuestionExpandChange(question?.id)}>
           Question:
-            {question.title} ({question.id})
+          {question.title}
+          {' '}
+          (
+          {question.id}
+          )
         </QuestionEntryHeader>
-        {props.activeExpanded.includes(question.id) &&
+        {props.activeExpanded.includes(question.id)
+          && (
           <Div backgroundColor="#daecfc">
 
             <Div useFlex pl={4} pr={4} pb={2} flexDirection="column">
@@ -200,10 +205,16 @@ const QuestionEntryItem = ({ question, leafs, ...props }: QuestionEntryItemProps
               />
             </Div>
 
-            {activeQuestionType.value === 'MULTI_CHOICE' && (
-              <Div useFlex pl={4} pr={4} pb={2} flexDirection="column">
-                <QuestionEntryHeader onClick={() => setOptionsExpanded(!optionsExpanded)}>OPTIONS ({activeOptions.length} option(s) selected)</QuestionEntryHeader>
-                {optionsExpanded &&
+            {activeQuestionType.value === 'CHOICE' && (
+            <Div useFlex pl={4} pr={4} pb={2} flexDirection="column">
+              <QuestionEntryHeader onClick={() => setOptionsExpanded(!optionsExpanded)}>
+                OPTIONS (
+                {activeOptions.length}
+                {' '}
+                option(s) selected)
+              </QuestionEntryHeader>
+              {optionsExpanded
+                  && (
                   <Div>
                     {
                       ((activeOptions && activeOptions.length === 0) || (!activeOptions)) && (
@@ -237,11 +248,12 @@ const QuestionEntryItem = ({ question, leafs, ...props }: QuestionEntryItemProps
                       onClick={(e) => addNewOption(e)}
                     >
                       Add new option
-                </Button>
+                    </Button>
                     <Hr />
-                  </Div>}
+                  </Div>
+                  )}
 
-              </Div>
+            </Div>
             )}
 
             <Div useFlex pl={4} pr={4} pb={2} flexDirection="column">
@@ -254,8 +266,13 @@ const QuestionEntryItem = ({ question, leafs, ...props }: QuestionEntryItemProps
             </Div>
 
             <Div useFlex pl={4} pr={4} pb={2} flexDirection="column">
-              <Div useFlex justifyContent='space-between' mb={1}>
-                <H4>Edges ({activeEdges.length} selected)</H4>
+              <Div useFlex justifyContent="space-between" mb={1}>
+                <H4>
+                  Edges (
+                  {activeEdges.length}
+                  {' '}
+                  selected)
+                </H4>
                 <PlusCircle style={{ cursor: 'pointer' }} onClick={(e) => addNewEdge(e)} />
               </Div>
               <Hr />
@@ -298,10 +315,10 @@ const QuestionEntryItem = ({ question, leafs, ...props }: QuestionEntryItemProps
               }
             </Div>
           </Div>
-        }
-      </Div >
+          )}
+      </Div>
 
-    </QuestionEntryContainer >
+    </QuestionEntryContainer>
   );
 };
 

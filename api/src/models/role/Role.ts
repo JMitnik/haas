@@ -9,10 +9,11 @@ import RoleService from './RoleService';
 
 export const RoleType = objectType({
   name: 'RoleType',
+  
   definition(t) {
     t.id('id');
     t.string('name');
-    t.int('amtPermissions', { nullable: true });
+    t.int('nrPermissions', { nullable: true });
 
     t.list.field('permissions', {
       nullable: true,

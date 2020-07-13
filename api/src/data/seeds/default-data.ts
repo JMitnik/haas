@@ -1,8 +1,7 @@
-/* eslint-disable max-len */
-import { NodeType } from '../../generated/prisma-client/index';
+import { NodeType } from '@prisma/client';
 
-export const multiChoiceType: NodeType = 'MULTI_CHOICE';
-export const socialShareType: NodeType = 'SOCIAL_SHARE';
+export const choiceType: NodeType = 'CHOICE';
+export const socialShareType: NodeType = 'LINK';
 export const sliderType: NodeType = 'SLIDER';
 export const textboxType: NodeType = 'TEXTBOX';
 export const registrationType: NodeType = 'REGISTRATION';

@@ -7,7 +7,7 @@ const getRolesQuery = gql`
       roles {
         id
         name
-        amtPermissions
+        nrPermissions
         permissions {
           id
           name

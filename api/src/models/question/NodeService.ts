@@ -1,12 +1,12 @@
-import { PrismaClient, QuestionNode, QuestionNodeCreateInput } from '@prisma/client';
-import { multiChoiceType, sliderType } from '../../data/seeds/default-data';
+import { NodeType, PrismaClient, QuestionNode, QuestionNodeCreateInput } from '@prisma/client';
+import { choiceType, sliderType } from '../../data/seeds/default-data';
 import EdgeResolver from '../edge/edge-resolver';
 
 const prisma = new PrismaClient();
 
 interface LeafNodeDataEntryProps {
   title: string;
-  type: string;
+  type: NodeType;
 }
 
 interface QuestionOptionProps {
@@ -47,7 +47,7 @@ interface QuestionProps {
   title: string;
   isRoot: boolean;
   isLeaf: boolean;
-  type: string;
+  type: NodeType;
   overrideLeaf: LeafNodeProps;
   options: Array<QuestionOptionProps>;
   children: Array<EdgeChildProps>;
@@ -81,7 +81,7 @@ const productServicesOptions = [{ value: 'Quality' },
 class NodeResolver {
   static constructQuestionNode(title: string,
     questionnaireId: string,
-    type: string,
+    type: NodeType,
     options: Array<any> = [],
     isRoot: boolean = false,
     overrideLeafId: string = '',
@@ -112,7 +112,7 @@ class NodeResolver {
   static createQuestionNode = async (
     title: string,
     questionnaireId: string,
-    type: string,
+    type: NodeType,
     options: Array<any> = [],
     isRoot: boolean = false,
     overrideLeafId: string = '',
@@ -162,7 +162,9 @@ class NodeResolver {
   };
 
   static createTemplateLeafNodes = async (
-    leafNodesArray: Array<LeafNodeDataEntryProps>, dialogueId: string) => {
+    leafNodesArray: Array<LeafNodeDataEntryProps>,
+    dialogueId: string,
+  ) => {
     const leafs = await Promise.all(
       leafNodesArray.map(async ({ title, type }) => prisma.questionNode.create({
         data: {
@@ -404,7 +406,7 @@ class NodeResolver {
     // Positive Sub child 1 (What did you like?)
     const instagramNodeId = NodeResolver.getCorrectLeaf(leafs, 'Follow us on Instagram and stay');
     const rootToWhatDidYou = await NodeResolver.createQuestionNode(
-      'What did you like?', questionnaireId, multiChoiceType, standardOptions, false,
+      'What did you like?', questionnaireId, choiceType, standardOptions, false,
       instagramNodeId,
     );
 
@@ -413,13 +415,13 @@ class NodeResolver {
       'Come and join us on 1st April for our great event');
     const whatDidYouToFacilities = await NodeResolver.createQuestionNode(
       'What exactly did you like about the facilities?', questionnaireId,
-      multiChoiceType, facilityOptions, false, comeAndJoin1stAprilId,
+      choiceType, facilityOptions, false, comeAndJoin1stAprilId,
     );
 
     // Positive Sub sub child 2 (Website)
     const whatDidYouToWebsite = await NodeResolver.createQuestionNode(
       'What exactly did you like about the website?', questionnaireId,
-      multiChoiceType, websiteOptions, false, instagramNodeId,
+      choiceType, websiteOptions, false, instagramNodeId,
     );
 
     // Positive Sub sub child 3 (Product/Services)
@@ -427,7 +429,7 @@ class NodeResolver {
       'We think you might like this as');
     const whatDidYouToProduct = await NodeResolver.createQuestionNode(
       'What exactly did you like about the product / services?', questionnaireId,
-      multiChoiceType, productServicesOptions, false, weThinkYouMightLikeThis,
+      choiceType, productServicesOptions, false, weThinkYouMightLikeThis,
     );
 
     // Positive Sub sub child 4 (Customer Support)
@@ -435,60 +437,60 @@ class NodeResolver {
       'your email below to receive our newsletter');
     const whatDidYouToCustomerSupport = await NodeResolver.createQuestionNode(
       'What exactly did you like about the customer support?', questionnaireId,
-      multiChoiceType, customerSupportOptions, false, yourEmailBelowForNewsletter,
+      choiceType, customerSupportOptions, false, yourEmailBelowForNewsletter,
     );
 
     // Neutral Sub child 2
     const leaveYourEmailBelowToReceive = NodeResolver.getCorrectLeaf(leafs,
       'Leave your email below to receive our');
     const rootToWhatWouldYouLikeToTalkAbout = await NodeResolver.createQuestionNode(
-      'What would you like to talk about?', questionnaireId, multiChoiceType,
+      'What would you like to talk about?', questionnaireId, choiceType,
       standardOptions, false, leaveYourEmailBelowToReceive,
     );
 
     // Neutral Sub sub child 1 (Facilities)
     const whatWouldYouLikeToTalkAboutToFacilities = await NodeResolver.createQuestionNode('Please specify.',
-      questionnaireId, multiChoiceType, facilityOptions);
+      questionnaireId, choiceType, facilityOptions);
 
     // Neutral Sub sub child 2 (Website)
     const whatWouldYouLikeToTalkAboutToWebsite = await NodeResolver.createQuestionNode(
-      'Please specify.', questionnaireId, multiChoiceType, websiteOptions,
+      'Please specify.', questionnaireId, choiceType, websiteOptions,
     );
 
     // Neutral Sub sub child 3 (Product/Services)
     const whatWouldYouLikeToTalkAboutToProduct = await NodeResolver.createQuestionNode(
-      'Please specify.', questionnaireId, multiChoiceType, productServicesOptions,
+      'Please specify.', questionnaireId, choiceType, productServicesOptions,
     );
 
     // Neutral Sub sub child 4 (Customer Support)
     const whatWouldYouLikeToTalkAboutToCustomerSupport = await NodeResolver.createQuestionNode(
-      'Please specify.', questionnaireId, multiChoiceType, customerSupportOptions,
+      'Please specify.', questionnaireId, choiceType, customerSupportOptions,
     );
 
     // Negative Sub child 3
     const rootToWeAreSorryToHearThat = await NodeResolver.createQuestionNode(
       'We are sorry to hear that! Where can we improve?', questionnaireId,
-      multiChoiceType, standardOptions,
+      choiceType, standardOptions,
     );
 
     // Negative Sub sub child 1 (Facilities)
     const ourTeamIsOnIt = NodeResolver.getCorrectLeaf(leafs, 'Our team is on it');
     const weAreSorryToHearThatToFacilities = await NodeResolver.createQuestionNode(
-      'Please elaborate.', questionnaireId, multiChoiceType, facilityOptions, false, ourTeamIsOnIt,
+      'Please elaborate.', questionnaireId, choiceType, facilityOptions, false, ourTeamIsOnIt,
     );
 
     // Negative Sub sub child 2 (Website)
     const pleaseClickWhatsappLink = NodeResolver.getCorrectLeaf(leafs,
       'Please click on the Whatsapp link below so our service');
     const weAreSorryToHearThatToWebsite = await NodeResolver.createQuestionNode(
-      'Please elaborate.', questionnaireId, multiChoiceType, websiteOptions,
+      'Please elaborate.', questionnaireId, choiceType, websiteOptions,
       false, pleaseClickWhatsappLink,
     );
 
     // Negative Sub sub child 3 (Product/Services)
     const clickBelowForRefund = NodeResolver.getCorrectLeaf(leafs, 'Click below for your refund');
     const weAreSorryToHearThatToProduct = await NodeResolver.createQuestionNode(
-      'Please elaborate.', questionnaireId, multiChoiceType, productServicesOptions,
+      'Please elaborate.', questionnaireId, choiceType, productServicesOptions,
       false, clickBelowForRefund,
     );
 
@@ -496,7 +498,7 @@ class NodeResolver {
     const ourCustomerExperienceSupervisor = NodeResolver.getCorrectLeaf(leafs,
       'Our customer experience supervisor is');
     const weAreSorryToHearThatToCustomerSupport = await NodeResolver.createQuestionNode(
-      'Please elaborate', questionnaireId, multiChoiceType, customerSupportOptions,
+      'Please elaborate', questionnaireId, choiceType, customerSupportOptions,
       false, ourCustomerExperienceSupervisor,
     );
 

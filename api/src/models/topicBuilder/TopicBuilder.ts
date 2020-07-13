@@ -4,6 +4,7 @@ import DialogueService from '../questionnaire/DialogueService';
 
 export const LeafNodeInput = inputObjectType({
   name: 'LeafNodeInput',
+
   definition(t) {
     t.id('id');
     t.string('type');
@@ -13,6 +14,7 @@ export const LeafNodeInput = inputObjectType({
 
 export const QuestionConditionInput = inputObjectType({
   name: 'QuestionConditionInput',
+
   definition(t) {
     t.int('id');
     t.string('conditionType');
@@ -24,6 +26,7 @@ export const QuestionConditionInput = inputObjectType({
 
 export const EdgeNodeInput = inputObjectType({
   name: 'EdgeNodeInput',
+
   definition(t) {
     t.id('id');
     t.string('title');
@@ -32,14 +35,18 @@ export const EdgeNodeInput = inputObjectType({
 
 export const EdgeChildInput = inputObjectType({
   name: 'EdgeChildInput',
+
   definition(t) {
     t.id('id');
+
     t.list.field('conditions', {
       type: QuestionConditionInput,
     });
+
     t.field('parentNode', {
       type: EdgeNodeInput,
     });
+
     t.field('childNode', {
       type: EdgeNodeInput,
     });
@@ -48,6 +55,7 @@ export const EdgeChildInput = inputObjectType({
 
 export const QuestionOptionInput = inputObjectType({
   name: 'OptionInput',
+
   definition(t) {
     t.int('id');
     t.string('value');
@@ -57,18 +65,22 @@ export const QuestionOptionInput = inputObjectType({
 
 export const QuestionInput = inputObjectType({
   name: 'QuestionInput',
+
   definition(t) {
     t.id('id');
     t.string('title');
     t.boolean('isRoot');
     t.boolean('isLeaf');
     t.string('type');
+
     t.field('overrideLeaf', {
       type: LeafNodeInput,
+
     });
     t.list.field('options', {
       type: QuestionOptionInput,
     });
+
     t.list.field('children', {
       type: EdgeChildInput,
     });
@@ -77,6 +89,7 @@ export const QuestionInput = inputObjectType({
 
 export const TopicDataEntryInput = inputObjectType({
   name: 'TopicDataEntry',
+
   definition(t) {
     t.id('id');
     t.list.field('questions', {
@@ -87,6 +100,7 @@ export const TopicDataEntryInput = inputObjectType({
 
 export const topicBuilderMutations = extendType({
   type: 'Mutation',
+  
   definition(t) {
     t.field('updateTopicBuilder', {
       type: 'String',

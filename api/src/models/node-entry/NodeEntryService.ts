@@ -1,6 +1,7 @@
 import { ChoiceNodeEntry,
-  LinkNodeEntry, NodeEntry, NodeEntryCreateWithoutSessionInput, NodeEntryGetPayload, NodeEntryWhereInput,
-  PrismaClient, RegistrationNodeEntry, SessionWhereInput, SliderNodeEntry, TextboxNodeEntry } from '@prisma/client';
+  LinkNodeEntry, NodeEntry, NodeEntryCreateWithoutSessionInput, NodeEntryWhereInput,
+  PrismaClient, QuestionNode, RegistrationNodeEntry,
+  SessionWhereInput, SliderNodeEntry, TextboxNodeEntry } from '@prisma/client';
 import _ from 'lodash';
 
 import { OrderByProps } from '../../types/generic';
@@ -14,6 +15,7 @@ export interface NodeEntryWithTypes extends NodeEntry {
     id: String;
     createdAt: Date;
   } | undefined | null;
+  relatedNode?: QuestionNode | null;
   slideNodeEntry?: SliderNodeEntry | undefined | null;
   choiceNodeEntry?: ChoiceNodeEntry | undefined | null;
   registrationNodeEntry?: RegistrationNodeEntry | undefined | null;
@@ -48,15 +50,15 @@ class NodeEntryService {
   static isNodeEntryMatchText = (nodeEntry: NodeEntryWithTypes, searchTerm: string) => {
     const processedSearch = searchTerm.toLowerCase();
 
-    if (nodeEntry.type === 'CHOICE') {
+    if (nodeEntry.relatedNode?.type === 'CHOICE') {
       return nodeEntry.choiceNodeEntry?.value?.toLowerCase().includes(processedSearch);
     }
 
-    if (nodeEntry.type === 'REGISTRATION') {
+    if (nodeEntry.relatedNode?.type === 'REGISTRATION') {
       return nodeEntry.registrationNodeEntry?.value?.toString().includes(processedSearch);
     }
 
-    if (nodeEntry.type === 'TEXTBOX') {
+    if (nodeEntry.relatedNode?.type === 'TEXTBOX') {
       return nodeEntry.textboxNodeEntry?.value?.toString().includes(processedSearch);
     }
 
@@ -107,11 +109,11 @@ class NodeEntryService {
   };
 
   static getNodeEntryValue = async (nodeEntry: NodeEntryWithTypes): Promise<any> => {
-    if (nodeEntry.type === 'GENERIC') {
+    if (nodeEntry.relatedNode?.type === 'GENERIC') {
       return null;
     }
 
-    if (nodeEntry.type === 'SLIDER') {
+    if (nodeEntry.relatedNode?.type === 'SLIDER') {
       try {
         return nodeEntry?.slideNodeEntry?.value;
       } catch {
@@ -119,7 +121,7 @@ class NodeEntryService {
       }
     }
 
-    if (nodeEntry.type === 'CHOICE') {
+    if (nodeEntry.relatedNode?.type === 'CHOICE') {
       try {
         return nodeEntry?.choiceNodeEntry?.value;
       } catch {
@@ -127,7 +129,7 @@ class NodeEntryService {
       }
     }
 
-    if (nodeEntry.type === 'LINK') {
+    if (nodeEntry.relatedNode?.type === 'LINK') {
       try {
         return nodeEntry?.linkNodeEntry?.value;
       } catch {
@@ -135,7 +137,7 @@ class NodeEntryService {
       }
     }
 
-    if (nodeEntry.type === 'REGISTRATION') {
+    if (nodeEntry.relatedNode?.type === 'REGISTRATION') {
       try {
         return nodeEntry?.registrationNodeEntry?.value;
       } catch {
@@ -143,7 +145,7 @@ class NodeEntryService {
       }
     }
 
-    throw new Error(`Unable to find node entry type ${nodeEntry.type}.`);
+    throw new Error(`Unable to find node entry type ${nodeEntry.relatedNode?.type}.`);
   };
 
   // Slice node entries to match amount of nodes displayed in front-end
@@ -223,7 +225,7 @@ class NodeEntryService {
       const sortedEntries = _.orderBy(entries, (entry) => entry.depth, 'asc');
       const { sessionId, session } = entries[0];
       const paths = entries.length;
-      const score = entries.find((entry) => entry.type === 'SLIDER')?.slideNodeEntry?.value;
+      const score = entries.find((entry) => entry.relatedNode?.type === 'SLIDER')?.slideNodeEntry?.value;
 
       return {
         id: sessionId, paths, score, createdAt: session?.createdAt, nodeEntries: sortedEntries,

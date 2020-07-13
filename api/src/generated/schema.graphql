@@ -360,7 +360,7 @@ type RoleTableType {
 }
 
 type RoleType {
-  amtPermissions: Int
+  nrPermissions: Int
   customer: Customer!
   id: ID!
   name: String!

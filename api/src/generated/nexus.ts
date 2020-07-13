@@ -264,7 +264,7 @@ export interface NexusGenRootTypes {
     totalPages?: number | null; // Int
   }
   RoleType: { // root type
-    amtPermissions?: number | null; // Int
+    nrPermissions?: number | null; // Int
     id: string; // ID!
     name: string; // String!
   }
@@ -541,7 +541,7 @@ export interface NexusGenFieldTypes {
     totalPages: number | null; // Int
   }
   RoleType: { // field return type
-    amtPermissions: number | null; // Int
+    nrPermissions: number | null; // Int
     customer: NexusGenRootTypes['Customer']; // Customer!
     id: string; // ID!
     name: string; // String!

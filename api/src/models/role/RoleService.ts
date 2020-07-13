@@ -38,7 +38,7 @@ class RoleService {
 
     const rolesWithNrPermisisons = slicedOrderedUsers.map((role) => ({
       ...role,
-      amtPermissions: role.permissions.length,
+      nrPermissions: role.permissions.length,
     }));
 
     return {
@@ -60,7 +60,7 @@ class RoleService {
 
     const rolesWithNrPermisisons = roles.map((role) => ({
       ...role,
-      amtPermissions: role.permissions.length,
+      nrPermissions: role.permissions.length,
     }));
 
     return rolesWithNrPermisisons;

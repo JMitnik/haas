@@ -283,6 +283,8 @@ class TriggerService {
         const deletedCondition = await prisma.triggerCondition.delete({ where: { id: condition.id } });
         return deletedCondition.id;
       }
+
+      return null;
     }));
   };
 

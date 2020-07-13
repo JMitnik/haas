@@ -9,9 +9,9 @@ export interface HAASNodeConditions {
 
 export type HAASQuestionType =
 | 'SLIDER'
-| 'MULTI_CHOICE'
+| 'CHOICE'
 | 'TEXTBOX'
-| 'SOCIAL-SHARE'
+| 'LINK'
 | 'REGISTRATION'
 | 'FINISH';
 
