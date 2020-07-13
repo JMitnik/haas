@@ -1,5 +1,5 @@
 import { Dialogue, DialogueCreateInput,
-  DialogueUpdateInput, PrismaClient, Tag, TagWhereUniqueInput } from '@prisma/client';
+  DialogueUpdateInput, NodeType, PrismaClient, Tag, TagWhereUniqueInput } from '@prisma/client';
 import { subDays } from 'date-fns';
 import _ from 'lodash';
 
@@ -47,7 +47,7 @@ interface QuestionProps {
   title: string;
   isRoot: boolean;
   isLeaf: boolean;
-  type: string;
+  type: NodeType;
   overrideLeaf: LeafNodeProps;
   options: Array<QuestionOptionProps>;
   children: Array<EdgeChildProps>;
@@ -562,8 +562,6 @@ class DialogueService {
   //   session?.nodeEntries.find((nodeEntry) => nodeEntry.depth === 0 && nodeEntry.relatedNode?.isRoot) ? session : null));
 
   // sessionsWithOnlyRoots.filter((session) => session)
-
-  ;
 }
 
 export default DialogueService;
