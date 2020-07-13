@@ -65,6 +65,10 @@ const CTA_TYPES = [
 const LINK_TYPES = [
   { label: 'SOCIAL', value: 'SOCIAL' },
   { label: 'API', value: 'API' },
+  { label: 'FACEBOOK', value: 'FACEBOOK' },
+  { label: 'INSTAGRAM', value: 'INSTAGRAM' },
+  { label: 'LINKEDIN', value: 'LINKEDIN' },
+  { label: 'TWITTER', value: 'TWITTER' },
 ];
 
 const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: CTAFormProps) => {
