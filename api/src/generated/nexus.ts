@@ -671,6 +671,7 @@ export interface NexusGenArgTypes {
     createCTA: { // args
       customerSlug?: string | null; // String
       dialogueSlug?: string | null; // String
+      links?: NexusGenInputs['CTALinksInputType'] | null; // CTALinksInputType
       title?: string | null; // String
       type?: string | null; // String
     }

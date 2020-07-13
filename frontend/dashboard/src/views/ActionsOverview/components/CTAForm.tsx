@@ -129,19 +129,22 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: 
   const onSubmit = (formData: FormDataProps) => {
     console.log('formdata: ', formData);
 
-    const mappedLinks = { linkTypes: activeLinks.map((link) => ({ ...link, type: link.type?.value })) };
-    console.log('mappedLinks: ', mappedLinks);
-
     if (id === '-1') {
+      const mappedLinks = { linkTypes: activeLinks.map((link) => {
+        const { id, ...linkData } = link;
+        return { ...linkData, type: linkData.type?.value };
+      }) };
       addCTA({
         variables: {
           customerSlug,
           dialogueSlug,
           title: formData.title,
           type: formData.ctaType || undefined,
+          links: mappedLinks,
         },
       });
     } else {
+      const mappedLinks = { linkTypes: activeLinks.map((link) => ({ ...link, type: link.type?.value })) };
       updateCTA({
         variables: {
           id,

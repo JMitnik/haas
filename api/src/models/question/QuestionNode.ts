@@ -124,7 +124,7 @@ export const QuestionNodeMutations = extendType({
       async resolve(parent: any, args: any, ctx: any) {
         const { prisma }: { prisma: PrismaClient } = ctx;
         const { title, type, id, links } = args;
-        console.log('links: ', links);
+        console.log('links: ', links?.linkTypes);
         const dbQuestionNode = await prisma.questionNode.findOne({
           where: {
             id,
@@ -171,10 +171,12 @@ export const QuestionNodeMutations = extendType({
         dialogueSlug: 'String',
         title: 'String',
         type: 'String',
+        links: CTALinksInputType,
       },
       async resolve(parent: any, args: any, ctx: any) {
         const { prisma }: { prisma: PrismaClient } = ctx;
-        const { customerSlug, dialogueSlug, title, type } = args;
+        const { customerSlug, dialogueSlug, title, type, links } = args;
+        console.log('links: ', links?.linkTypes);
 
         const customer = await prisma.customer.findOne({
           where: {
@@ -197,6 +199,9 @@ export const QuestionNodeMutations = extendType({
             title,
             type,
             isLeaf: true,
+            links: {
+              create: [...links?.linkTypes],
+            },
             questionDialogue: {
               connect: {
                 id: customer?.dialogues[0].id,

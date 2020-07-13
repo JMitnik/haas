@@ -102,6 +102,7 @@ class NodeResolver {
     newLinks: Array<LinkInputProps>,
     questionId: string,
   ) => {
+    console.log('NEW LINKS: ', newLinks);
     newLinks?.forEach(async (link) => {
       await prisma.link.upsert({
         where: {

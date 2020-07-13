@@ -206,7 +206,7 @@ enum LinkTypeEnumType {
 
 type Mutation {
   assignTags(dialogueId: String, tags: TagsInputObjectType): Dialogue!
-  createCTA(customerSlug: String, dialogueSlug: String, title: String, type: String): QuestionNode!
+  createCTA(customerSlug: String, dialogueSlug: String, links: CTALinksInputType, title: String, type: String): QuestionNode!
   createCustomer(name: String, options: CustomerCreateOptions): Customer!
   createDialogue(data: AddDialogueInput): Dialogue!
   createPermission(data: PermissionInput): PermssionType!
