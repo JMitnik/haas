@@ -3,7 +3,7 @@ import { subDays } from 'date-fns';
 import cuid from 'cuid';
 
 import { leafNodes } from '../../data/seeds/default-data';
-import NodeResolver from '../question/node-resolver';
+import NodeService from '../question/NodeService';
 
 function getRandomInt(max: number) {
   return Math.floor(Math.random() * Math.floor(max));
@@ -65,9 +65,9 @@ class CustomerService {
       },
     });
 
-    const leafs = await NodeResolver.createTemplateLeafNodes(leafNodes, questionnaire.id);
+    const leafs = await NodeService.createTemplateLeafNodes(leafNodes, questionnaire.id);
 
-    await NodeResolver.createTemplateNodes(questionnaire.id, customer.name, leafs);
+    await NodeService.createTemplateNodes(questionnaire.id, customer.name, leafs);
 
     const currentDate = new Date();
     const amtOfDaysBack = Array.from(Array(30)).map((empty, index) => index + 1);

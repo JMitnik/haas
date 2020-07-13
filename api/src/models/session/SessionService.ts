@@ -66,14 +66,14 @@ class SessionService {
    * Get scoring entries from a list of sessions
    * @param sessions
    */
-  static async getScoringEntriesFromSessions(
+  static getScoringEntriesFromSessions(
     sessions: SessionWithEntries[],
-  ): Promise<(NodeEntryWithTypes | undefined | null)[]> {
+  ): (NodeEntryWithTypes | undefined | null)[] {
     if (!sessions.length) {
       return [];
     }
 
-    const entries = Promise.all(sessions.map(async (session) => SessionService.getScoringEntryFromSession(session)));
+    const entries = sessions.map((session) => SessionService.getScoringEntryFromSession(session));
     return entries;
   }
 
@@ -81,7 +81,7 @@ class SessionService {
    * Get the sole scoring entry a single session.
    * @param session
    */
-  static async getScoringEntryFromSession(session: SessionWithEntries): Promise<NodeEntryWithTypes | undefined | null> {
+  static getScoringEntryFromSession(session: SessionWithEntries): NodeEntryWithTypes | undefined | null {
     return session.nodeEntries.find((entry) => entry.slideNodeEntry?.value);
   }
 
@@ -96,11 +96,10 @@ class SessionService {
       return [];
     }
 
-    const entries = await Promise.all(
-      sessions.map(async (session) => SessionService.getTextEntriesFromSession(session)),
-    );
-
-    return entries.flatMap((entry) => entry);
+    return sessions.flatMap((session) => session.nodeEntries).filter((entry) => {
+      const isTextEntry = entry?.relatedNode?.type && entry?.relatedNode?.type in TEXT_NODES;
+      return isTextEntry;
+    });
   }
 
   /**

@@ -499,21 +499,18 @@ class DialogueService {
     }
   };
 
-  static calculateAverageScore = async (dialogueId: string) =>
-  // TODO: Bring it back
+  static calculateAverageDialogueScore = async (dialogueId: string) => {
+    const sessions = await SessionService.getDialogueSessions(dialogueId);
 
-  // // For each session, get the node-entry with isRoot (for now)
-  // const scores = dialogue?.sessions.map(
-  //   (session) => session.nodeEntries.find(
-  //     (entry) => entry.relatedNode?.isRoot,
-  //   )?.values.find(
-  //     (val) => val.numberValue
-  //   )?.numberValue).filter((val) => val);
+    if (!sessions) {
+      return [];
+    }
 
-  // const averageScore = _.mean(scores) || null;
+    const scoringEntries = await SessionService.getScoringEntriesFromSessions(sessions);
+    const scores = _.mean((scoringEntries).map((entry) => entry?.slideNodeEntry));
 
-    null
-  ;
+    return scores;
+  };
 
   static countInteractions = async (dialogueId: string) => {
     const dialogue = await prisma.dialogue.findOne({
@@ -526,42 +523,16 @@ class DialogueService {
     return dialogue?.sessions.length;
   };
 
-  static interactionFeedItems = async () => [];
-  // TODO: Bring it back
-  // const sessions = await prisma.session.findMany({
-  //   where: {
-  //     dialogueId: parent.id,
-  //   },
-  //   include: {
-  //     nodeEntries: {
-  //       include: {
-  //         relatedNode: {
-  //           select: {
-  //             isRoot: true,
-  //           },
-  //         },
-  //         values: {
-  //           select: {
-  //             numberValue: true,
-  //             NodeEntry: {
-  //               select: {
-  //                 depth: true,
-  //               },
-  //             },
-  //           },
-  //         },
-  //       },
-  //     },
-  //   },
-  //   orderBy: {
-  //     createdAt: 'desc',
-  //   },
-  // });
+  static getDialogueInteractionFeedItems = async (dialogueId: string) => {
+    const sessions = await SessionService.getDialogueSessions(dialogueId);
 
-  // const sessionsWithOnlyRoots = sessions.map((session) => (
-  //   session?.nodeEntries.find((nodeEntry) => nodeEntry.depth === 0 && nodeEntry.relatedNode?.isRoot) ? session : null));
+    if (!sessions) {
+      return [];
+    }
 
-  // sessionsWithOnlyRoots.filter((session) => session)
+    const scoringEntries = SessionService.getScoringEntriesFromSessions(sessions);
+    return scoringEntries;
+  };
 }
 
 export default DialogueService;

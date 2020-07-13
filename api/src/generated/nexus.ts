@@ -264,9 +264,9 @@ export interface NexusGenRootTypes {
     totalPages?: number | null; // Int
   }
   RoleType: { // root type
-    nrPermissions?: number | null; // Int
     id: string; // ID!
     name: string; // String!
+    nrPermissions?: number | null; // Int
   }
   Session: prisma.Session;
   SortFilterObject: { // root type
@@ -541,10 +541,10 @@ export interface NexusGenFieldTypes {
     totalPages: number | null; // Int
   }
   RoleType: { // field return type
-    nrPermissions: number | null; // Int
     customer: NexusGenRootTypes['Customer']; // Customer!
     id: string; // ID!
     name: string; // String!
+    nrPermissions: number | null; // Int
     permissions: NexusGenRootTypes['PermssionType'][] | null; // [PermssionType!]
   }
   Session: { // field return type

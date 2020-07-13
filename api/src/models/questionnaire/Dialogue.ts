@@ -61,6 +61,7 @@ export const DialogueStatistics = objectType({
 
 export const DialogueType = objectType({
   name: 'Dialogue',
+
   definition(t) {
     t.id('id');
     t.string('title');
@@ -69,6 +70,7 @@ export const DialogueType = objectType({
     t.string('publicTitle', { nullable: true });
     t.string('creationDate', { nullable: true });
     t.string('updatedAt', { nullable: true });
+
     t.float('averageScore', {
       nullable: true,
       resolve(parent: any) {
@@ -76,9 +78,10 @@ export const DialogueType = objectType({
           return null;
         }
 
-        return DialogueService.calculateAverageScore(parent.id);
+        return DialogueService.calculateAverageDialogueScore(parent.id);
       },
     });
+
     t.int('countInteractions', {
       nullable: true,
       resolve(parent: any) {
@@ -161,23 +164,23 @@ export const DialogueType = objectType({
     t.list.field('interactionFeedItems', {
       nullable: true,
       type: SessionType,
+
       async resolve(parent) {
         if (!parent.id) {
           return null;
         }
 
-        // TODO Bring it back
-        // const interactionFeedItems = await DialogueService.interactionFeedItems(parent);
-        const interactionFeedItems = await DialogueService.interactionFeedItems();
-        const sliceLength = Math.min(interactionFeedItems.length, 3);
+        const interactionFeedItems = await DialogueService.getDialogueInteractionFeedItems(parent.id);
+        const nrItems = Math.min(interactionFeedItems.length, 3);
 
-        return interactionFeedItems.slice(0, sliceLength);
+        return interactionFeedItems.slice(0, nrItems);
       },
     });
 
     t.string('customerId');
     t.field('customer', {
       type: CustomerType,
+
       resolve(parent: Dialogue, args: any, ctx: any) {
         const { prisma }: { prisma: PrismaClient } = ctx;
         const customer = prisma.customer.findOne({
