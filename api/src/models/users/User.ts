@@ -59,13 +59,13 @@ export const UserQueries = extendType({
         const { pageIndex, offset, limit, searchTerm, orderBy }: PaginationProps = args.filter;
 
         if (args.filter) {
-          return UserService.paginatedUsers(args.customerSlug, pageIndex, offset, limit, orderBy[0], searchTerm);
+          return UserService.paginatedUsers(args.customerSlug, pageIndex, offset, limit, orderBy?.[0], searchTerm);
         }
 
         const users = await prisma.user.findMany({ where: { Customer: {
           slug: args.customerSlug,
         } } });
-        const totalPages = Math.ceil(users.length / limit);
+        const totalPages = Math.ceil(users.length / (limit || 1));
 
         return { users, pageIndex, totalPages };
       },

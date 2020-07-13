@@ -59,15 +59,15 @@ class TriggerService {
 
   static paginatedTriggers = async (
     customerSlug: string,
-    pageIndex: number,
-    offset: number,
-    limit: number,
-    orderBy: any,
-    searchTerm: string,
+    pageIndex?: number,
+    offset?: number,
+    limit?: number,
+    orderBy?: any,
+    searchTerm?: string,
   ) => {
     let needPageReset = false;
     const triggerWhereInput: TriggerWhereInput = { customer: { slug: customerSlug } };
-    const searchTermFilter = TriggerService.getSearchTermFilter(searchTerm);
+    const searchTermFilter = TriggerService.getSearchTermFilter(searchTerm || '');
 
     if (searchTermFilter.length > 0) {
       triggerWhereInput.OR = searchTermFilter;
@@ -78,9 +78,9 @@ class TriggerService {
       where: triggerWhereInput,
     });
 
-    const totalPages = Math.ceil(triggers.length / limit);
+    const totalPages = Math.ceil(triggers.length / (limit || 1));
 
-    if (pageIndex + 1 > totalPages) {
+    if (pageIndex && pageIndex + 1 > totalPages) {
       offset = 0;
       needPageReset = true;
     }
@@ -88,7 +88,7 @@ class TriggerService {
     const orderedTriggers = TriggerService.orderUsersBy(triggers, orderBy);
 
     // Slice ordered filtered users
-    const slicedOrderedTriggers = TriggerService.slice(orderedTriggers, offset, limit, pageIndex);
+    const slicedOrderedTriggers = TriggerService.slice(orderedTriggers, (offset || 0), (limit || 1), (pageIndex || 0));
 
     return {
       triggers: slicedOrderedTriggers,

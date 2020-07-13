@@ -4,15 +4,23 @@ import { extendType, inputObjectType, objectType } from '@nexus/schema';
 
 // eslint-disable-next-line import/no-cycle
 import { CustomerType } from '../customer/Customer';
+// eslint-disable-next-line import/no-cycle
 import { EdgeType } from '../edge/Edge';
+// eslint-disable-next-line import/no-cycle
 import { QuestionNodeType, QuestionNodeWhereInput } from '../question/QuestionNode';
 // eslint-disable-next-line import/no-cycle
+import { FilterInput, InteractionType, SessionType } from '../session/Session';
+// eslint-disable-next-line import/no-cycle
 import { TagType, TagsInputType } from '../tag/Tag';
-
-import { FilterInput, InteractionType, SessionType, UniqueDataResultEntry } from '../session/Session';
+// eslint-disable-next-line import/no-cycle
 import DialogueService from './DialogueService';
-import NodeEntryService from '../nodeentry/NodeEntryService';
+import NodeEntryService from '../node-entry/NodeEntryService';
 import SessionService from '../session/SessionService';
+
+export const TEXT_NODES = [
+  'TEXTBOX',
+  'CHOICE',
+];
 
 export const lineChartDataType = objectType({
   name: 'lineChartDataType',
@@ -87,7 +95,7 @@ export const DialogueType = objectType({
           return null;
         }
 
-        return DialogueService.getLineData(parent.id, 7);
+        return DialogueService.getStatistics(parent.id, 7);
       },
     });
 
@@ -96,15 +104,24 @@ export const DialogueType = objectType({
       args: {
         filter: FilterInput,
       },
-      async resolve(parent: Dialogue, args: any, ctx: any) {
+      async resolve(parent: Dialogue, args: any) {
         if (!parent.id) {
           return null;
         }
-        const { pages, pageIndex, startDate, endDate, offset, limit, searchTerm } = args?.filter;
+
+        const { pageIndex, startDate, endDate, offset, limit, searchTerm } = args?.filter;
         const dateRange = SessionService.constructDateRangeWhereInput(startDate, endDate);
         const orderBy = args.filter.orderBy ? Object.assign({}, ...args.filter.orderBy) : null;
 
-        const { pageSessions, totalPages, resetPages } = await NodeEntryService.getCurrentInteractionSessions(parent.id, offset, limit, pageIndex, orderBy, dateRange, searchTerm);
+        const { pageSessions, totalPages, resetPages } = await NodeEntryService.getCurrentInteractionSessions(
+          parent.id,
+          offset,
+          limit,
+          pageIndex,
+          orderBy,
+          dateRange,
+          searchTerm,
+        );
 
         const sessionsWithIndex = pageSessions.map((session: any, index: any) => ({ ...session, index }));
 
@@ -148,7 +165,9 @@ export const DialogueType = objectType({
           return null;
         }
 
-        const interactionFeedItems = await DialogueService.interactionFeedItems(parent);
+        // TODO Bring it back
+        // const interactionFeedItems = await DialogueService.interactionFeedItems(parent);
+        const interactionFeedItems = await DialogueService.interactionFeedItems();
         const sliceLength = Math.min(interactionFeedItems.length, 3);
 
         return interactionFeedItems.slice(0, sliceLength);
@@ -361,7 +380,7 @@ export const DialoguesOfCustomerQuery = extendType({
         const { prisma }: { prisma: PrismaClient } = ctx;
 
         if (args.where.slug) {
-          return;
+          return {};
         }
 
         const dialogue = await prisma.dialogue.findOne({

@@ -69,15 +69,15 @@ class UserService {
 
   static paginatedUsers = async (
     customerSlug: string,
-    pageIndex: number,
-    offset: number,
-    limit: number,
-    orderBy: any,
-    searchTerm: string,
+    pageIndex?: number,
+    offset?: number,
+    limit?: number,
+    orderBy?: any,
+    searchTerm?: string,
   ) => {
     let needPageReset = false;
     const userWhereInput: UserWhereInput = { Customer: { slug: customerSlug } };
-    const searchTermFilter = UserService.getSearchTermFilter(searchTerm);
+    const searchTermFilter = UserService.getSearchTermFilter(searchTerm || '');
 
     if (searchTermFilter.length > 0) {
       userWhereInput.OR = searchTermFilter;
@@ -95,9 +95,9 @@ class UserService {
       },
     });
 
-    const totalPages = Math.ceil(users.length / limit);
+    const totalPages = Math.ceil(users.length / (limit || 1));
 
-    if (pageIndex + 1 > totalPages) {
+    if (pageIndex && pageIndex + 1 > totalPages) {
       offset = 0;
       needPageReset = true;
     }
@@ -105,7 +105,7 @@ class UserService {
     const orderedUsers = UserService.orderUsersBy(users, orderBy);
 
     // Slice ordered filtered users
-    const slicedOrderedUsers = UserService.sliceUsers(orderedUsers, offset, limit, pageIndex);
+    const slicedOrderedUsers = UserService.sliceUsers(orderedUsers, (offset || 0), (limit || 0), (pageIndex || 0));
 
     return {
       users: slicedOrderedUsers,

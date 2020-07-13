@@ -14,9 +14,9 @@ class RoleService {
 
   static paginatedRoles = async (
     customerId: string,
-    pageIndex: number,
-    offset: number,
-    limit: number,
+    pageIndex?: number,
+    offset?: number,
+    limit?: number,
   ) => {
     let needPageReset = false;
 
@@ -27,14 +27,14 @@ class RoleService {
       },
     });
 
-    const totalPages = Math.ceil(roles.length / limit);
-    if (pageIndex + 1 > totalPages) {
+    const totalPages = Math.ceil(roles.length / (limit || 0));
+    if (pageIndex && pageIndex + 1 > totalPages) {
       offset = 0;
       needPageReset = true;
     }
 
     // Slice ordered filtered users
-    const slicedOrderedUsers = RoleService.sliceRoles(roles, offset, limit, pageIndex);
+    const slicedOrderedUsers = RoleService.sliceRoles(roles, (offset || 0), (limit || 0), (pageIndex || 0));
 
     const rolesWithNrPermisisons = slicedOrderedUsers.map((role) => ({
       ...role,

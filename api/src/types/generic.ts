@@ -1,9 +1,16 @@
+export type OrderByType = 'score' | 'id' | 'createdAt';
+
+export interface OrderByProps {
+  id: OrderByType;
+  desc: boolean;
+}
+
 export interface PaginationProps {
-  pageIndex: number,
-  offset: number,
-  limit: number,
-  orderBy: Array<{ id: string, desc: boolean}>,
-  startDate: Date,
-  endDate: Date,
-  searchTerm: string
+  pageIndex?: number,
+  offset?: number,
+  limit?: number,
+  orderBy?: Array<OrderByProps>,
+  startDate?: Date,
+  endDate?: Date,
+  searchTerm?: string
 }

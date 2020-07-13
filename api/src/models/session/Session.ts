@@ -1,68 +1,12 @@
-import { NodeEntry, NodeEntryValue, PrismaClient, Session } from '@prisma/client';
-import { extendType, inputObjectType, objectType } from '@nexus/schema';
+import { PrismaClient, Session } from '@prisma/client';
+import { extendType, inputObjectType, mutationField, objectType } from '@nexus/schema';
 
 import { PaginationProps } from '../../types/generic';
-import { QuestionNodeType } from '../question/QuestionNode';
-import NodeEntryService from '../nodeentry/NodeEntryService';
+
+// eslint-disable-next-line import/no-cycle
+import { NodeEntryInput, NodeEntryType } from '../node-entry/NodeEntry';
+import NodeEntryService from '../node-entry/NodeEntryService';
 import SessionService from './SessionService';
-
-export const NodeEntryValueType = objectType({
-  name: 'NodeEntryValue',
-  definition(t) {
-    t.id('id');
-    t.int('numberValue', { nullable: true });
-    t.string('textValue', { nullable: true });
-
-    t.string('nodeEntryId', { nullable: true });
-    t.int('parentNodeEntryValueId', { nullable: true });
-
-    t.list.field('multiValues', {
-      type: NodeEntryValueType,
-      resolve(parent: NodeEntryValue, args: any, ctx: any) {
-        const { prisma }: { prisma: PrismaClient } = ctx;
-        const multiValues = prisma.nodeEntryValue.findMany({ where: { parentNodeEntryValueId: parent.id } });
-
-        return multiValues;
-      },
-    });
-  },
-});
-
-export const NodeEntryType = objectType({
-  name: 'NodeEntry',
-  definition(t) {
-    t.id('id', { nullable: true });
-    t.string('creationDate');
-    t.int('depth');
-
-    t.string('relatedEdgeId', { nullable: true });
-    t.string('sessionId');
-
-    t.string('relatedNodeId', { nullable: true });
-    t.field('relatedNode', {
-      type: QuestionNodeType,
-      nullable: true,
-      resolve(parent: NodeEntry, args: any, ctx: any) {
-        const { prisma }: { prisma: PrismaClient } = ctx;
-        if (!parent.relatedNodeId) {
-          return null;
-        }
-
-        const relatedNode = prisma.questionNode.findOne({ where: { id: parent.relatedNodeId } });
-        return relatedNode;
-      },
-    });
-
-    t.list.field('values', {
-      type: NodeEntryValueType,
-      resolve(parent: NodeEntry, args: any, ctx: any) {
-        const { prisma }: { prisma: PrismaClient } = ctx;
-        const values = prisma.nodeEntryValue.findMany({ where: { nodeEntryId: parent.id } });
-        return values;
-      },
-    });
-  },
-});
 
 export const SessionType = objectType({
   name: 'Session',
@@ -73,37 +17,8 @@ export const SessionType = objectType({
 
     t.float('score', {
       nullable: true,
-      async resolve(parent: Session, args: any, ctx: any) {
-        const { prisma }: { prisma: PrismaClient } = ctx;
-
-        const session = await prisma.session.findOne({
-          where: { id: parent.id },
-          include: {
-            nodeEntries: {
-              include: {
-                relatedNode: {
-                  select: {
-                    isRoot: true,
-                  },
-                },
-                values: {
-                  select: {
-                    numberValue: true,
-                    NodeEntry: {
-                      select: {
-                        depth: true,
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
-        });
-
-        const nodeEntryWithValues = session?.nodeEntries.find((nodeEntry) => nodeEntry.depth === 0 && nodeEntry.relatedNode?.isRoot);
-
-        return nodeEntryWithValues?.values.find((entry) => entry.numberValue)?.numberValue;
+      async resolve(parent: Session) {
+        return SessionService.getSessionScore(parent.id);
       },
     });
 
@@ -111,49 +26,20 @@ export const SessionType = objectType({
       type: NodeEntryType,
       resolve(parent: Session, args: any, ctx: any) {
         const { prisma }: { prisma: PrismaClient } = ctx;
-        const nodeEntries = prisma.nodeEntry.findMany({ where: { sessionId: parent.id } });
+        const nodeEntries = prisma.nodeEntry.findMany({
+          where: { sessionId: parent.id },
+          include: {
+            choiceNodeEntry: true,
+            linkNodeEntry: true,
+            registrationNodeEntry: true,
+            sliderNodeEntry: true,
+            textboxNodeEntry: true,
+          },
+        });
+
         return nodeEntries;
       },
     });
-  },
-});
-
-export const UniqueDataResultEntry = objectType({
-  name: 'UniqueDataResultEntry',
-  definition(t) {
-    t.string('sessionId');
-    t.string('createdAt');
-    t.int('value');
-  },
-});
-
-export const UserSessionEntryDataInput = inputObjectType({
-  name: 'UserSessionEntryDataInput',
-  definition(t) {
-    t.string('textValue');
-    t.int('numberValue');
-
-    t.list.field('multiValues', { type: UserSessionEntryDataInput });
-  },
-});
-
-export const UserSessionEntryInput = inputObjectType({
-  name: 'UserSessionEntryInput',
-  definition(t) {
-    t.string('nodeId');
-    t.string('edgeId', { nullable: true });
-    t.int('depth', { nullable: true });
-
-    t.field('data', { type: UserSessionEntryDataInput });
-  },
-});
-
-export const UploadUserSessionInput = inputObjectType({
-  name: 'UploadUserSessionInput',
-  definition(t) {
-    t.string('dialogueId', { required: true });
-
-    t.list.field('entries', { type: UserSessionEntryInput });
   },
 });
 
@@ -165,6 +51,7 @@ export const SessionWhereUniqueInput = inputObjectType({
   },
 });
 
+// TODO: Can we make this a generic type
 export const SortFilterInputObject = inputObjectType({
   name: 'SortFilterInputObject',
   definition(t) {
@@ -173,6 +60,7 @@ export const SortFilterInputObject = inputObjectType({
   },
 });
 
+// TODO: Can we make this a generic type
 export const SortFilterObject = objectType({
   name: 'SortFilterObject',
   definition(t) {
@@ -181,21 +69,26 @@ export const SortFilterObject = objectType({
   },
 });
 
+// TODO: Can we fold Interactions and Sessions together?
 export const InteractionSessionType = objectType({
   name: 'InteractionSessionType',
+
   definition(t) {
     t.string('id');
     t.int('index');
-    t.float('score', { nullable: true });
     t.int('paths');
     t.string('createdAt');
+
+    t.float('score', { nullable: true });
 
     t.list.field('nodeEntries', { type: NodeEntryType });
   },
 });
 
+// TODO: Can we fold Interactions and Sessions together?
 export const InteractionType = objectType({
   name: 'InteractionType',
+
   definition(t) {
     t.int('pages');
     t.int('pageIndex');
@@ -211,6 +104,7 @@ export const InteractionType = objectType({
 
 export const FilterInput = inputObjectType({
   name: 'FilterInput',
+
   definition(t) {
     t.string('startDate', { required: false });
     t.string('endDate', { required: false });
@@ -226,9 +120,46 @@ export const FilterInput = inputObjectType({
   },
 });
 
-export const getSessionAnswerFlowQuery = extendType({
+export const SessionQuery = extendType({
   type: 'Query',
+
   definition(t) {
+    t.list.field('sessions', {
+      type: SessionType,
+      args: { where: SessionWhereUniqueInput },
+      resolve(parent: any, args: any, ctx: any) {
+        const { prisma }: { prisma: PrismaClient } = ctx;
+
+        if (!args.where) {
+          const sessions = prisma.session.findMany();
+          return sessions;
+        }
+
+        const sessions = SessionService.getDialogueSessions(args.where.dialogueId);
+
+        return sessions;
+      },
+    });
+
+    t.field('session', {
+      type: SessionType,
+      args: {
+        where: SessionWhereUniqueInput,
+      },
+      resolve(parent: any, args: any, ctx: any) {
+        const { prisma }: { prisma: PrismaClient } = ctx;
+
+        const session = prisma.session.findOne({
+          where: {
+            id: args.where.id,
+          },
+        });
+
+        return session;
+      },
+    });
+
+    // TODO: Rename or merge with another 'resource'
     t.field('getSessionAnswerFlow', {
       type: SessionType,
       args: {
@@ -271,59 +202,30 @@ export const getSessionAnswerFlowQuery = extendType({
         };
       },
     });
-
-    t.list.field('sessions', {
-      type: SessionType,
-      args: {
-        where: SessionWhereUniqueInput,
-      },
-      resolve(parent: any, args: any, ctx: any) {
-        const { prisma }: { prisma: PrismaClient } = ctx;
-        if (!args.where) {
-          const sessions = prisma.session.findMany();
-          return sessions;
-        }
-
-        const sessions = prisma.session.findMany({
-          where: {
-            dialogueId: args.where.dialogueId,
-          },
-        });
-        return sessions;
-      },
-    });
-
-    t.field('session', {
-      type: SessionType,
-      args: {
-        where: SessionWhereUniqueInput,
-      },
-      resolve(parent: any, args: any, ctx: any) {
-        const { prisma }: { prisma: PrismaClient } = ctx;
-        const session = prisma.session.findOne({
-          where: {
-            id: args.where.id,
-          },
-        });
-        return session;
-      },
-    });
   },
 });
 
-export const uploadUserSessionMutation = extendType({
-  type: 'Mutation',
+export const SessionInput = inputObjectType({
+  name: 'SessionInput',
   definition(t) {
-    t.field('uploadUserSession', {
-      type: SessionType,
-      args: {
-        uploadUserSessionInput: UploadUserSessionInput,
-      },
-      resolve(parent: any, args: any, ctx: any) {
-        const session = SessionService.uploadUserSession(parent, args, ctx);
-        return session;
-      },
-    });
+    t.string('dialogueId', { required: true });
+
+    t.list.field('entries', { type: NodeEntryInput });
+  },
+});
+
+export const CreateSessionMutation = mutationField('createSession', {
+  type: SessionType,
+  args: { data: SessionInput },
+
+  resolve(parent: any, args: any, ctx: any) {
+    if (!args?.data) {
+      return null;
+    }
+
+    const session = SessionService.createSession(args.data, ctx);
+
+    return session;
   },
 });
 
@@ -334,13 +236,8 @@ export default [
   FilterInput,
   InteractionType,
   SessionWhereUniqueInput,
-  getSessionAnswerFlowQuery,
-  UniqueDataResultEntry,
-  NodeEntryValueType,
-  NodeEntryType,
+  SessionQuery,
   SessionType,
-  uploadUserSessionMutation,
-  UploadUserSessionInput,
-  UserSessionEntryInput,
-  UserSessionEntryDataInput,
+  CreateSessionMutation,
+  SessionInput,
 ];

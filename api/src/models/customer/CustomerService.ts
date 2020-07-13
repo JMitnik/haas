@@ -76,6 +76,7 @@ class CustomerService {
 
     await Promise.all(datesBackInTime.map(async (backDate) => {
       const randomOptionElement = options[Math.floor(Math.random() * options.length)];
+
       await prisma.session.create({
         data: {
           nodeEntries: {
@@ -83,18 +84,18 @@ class CustomerService {
               {
                 depth: 0,
                 creationDate: backDate,
-                values: {
+                sliderNodeEntry: {
                   create: {
-                    numberValue: getRandomInt(100),
+                    value: getRandomInt(100),
                   },
                 },
               },
               {
                 depth: 1,
                 creationDate: backDate,
-                values: {
+                choiceNodeEntry: {
                   create: {
-                    textValue: randomOptionElement,
+                    value: randomOptionElement,
                   },
                 },
               },

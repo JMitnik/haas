@@ -261,11 +261,11 @@ const TriggerQueries = extendType({
         const { pageIndex, offset, limit, searchTerm, orderBy }: PaginationProps = args.filter;
 
         if (args.filter) {
-          return TriggerService.paginatedTriggers(args.customerSlug, pageIndex, offset, limit, orderBy[0], searchTerm);
+          return TriggerService.paginatedTriggers(args.customerSlug, pageIndex, offset, limit, orderBy?.[0], searchTerm);
         }
 
         const users = await prisma.trigger.findMany({ where: { customerId: args.customerId } });
-        const totalPages = Math.ceil(users.length / limit);
+        const totalPages = Math.ceil(users.length / (limit || 0));
 
         return { users, pageIndex, totalPages };
       },

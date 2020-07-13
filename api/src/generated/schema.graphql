@@ -12,6 +12,11 @@ input AddDialogueInput {
   title: String
 }
 
+"""Input type for a choice node"""
+input ChoiceNodeEntryInput {
+  value: String
+}
+
 type ColourSettings {
   id: ID!
   primary: String!
@@ -181,6 +186,7 @@ type Mutation {
   createDialogue(data: AddDialogueInput): Dialogue!
   createPermission(data: PermissionInput): PermssionType!
   createRole(data: RoleInput): RoleType!
+  createSession(data: SessionInput): Session!
   createTag(customerSlug: String, name: String, type: TagTypeEnum): TagType!
   createTrigger(customerSlug: String, questionId: String, recipients: RecipientsInputType, trigger: TriggerInputType): TriggerType!
   createUser(customerSlug: String, input: UserInput): UserType!
@@ -196,7 +202,6 @@ type Mutation {
   singleUpload(file: Upload): ImageType!
   updateRoles(permissions: PermissionIdsInput, roleId: String): RoleType!
   updateTopicBuilder(customerSlug: String, dialogueSlug: String, topicData: TopicDataEntry): String!
-  uploadUserSession(uploadUserSessionInput: UploadUserSessionInput): Session!
 }
 
 type NodeEntry {
@@ -207,16 +212,33 @@ type NodeEntry {
   relatedNode: QuestionNode
   relatedNodeId: String
   sessionId: String!
-  values: [NodeEntryValue!]!
+
+  """The core scoring value associated with the node entry."""
+  value: NodeEntryValue
+}
+
+"""Input type for node-entry metadata"""
+input NodeEntryInput {
+  data: NodeEntryValueInput
+  depth: Int
+  edgeId: String
+  nodeId: String
 }
 
 type NodeEntryValue {
+  choice: String
   id: ID!
-  multiValues: [NodeEntryValue!]!
-  nodeEntryId: String
-  numberValue: Int
-  parentNodeEntryValueId: Int
-  textValue: String
+  register: String
+  slider: Int
+  textbox: String
+}
+
+"""Input type for a node-entry value in general"""
+input NodeEntryValueInput {
+  choice: ChoiceNodeEntryInput
+  register: RegisterNodeEntryInput
+  slider: SliderNodeEntryInput
+  textbox: TextboxNodeEntryInput
 }
 
 input OptionInput {
@@ -319,6 +341,11 @@ input RecipientsInputType {
   ids: [String!]
 }
 
+"""Input type for a register node"""
+input RegisterNodeEntryInput {
+  value: String
+}
+
 input RoleDataInput {
   description: String
   name: String
@@ -353,9 +380,19 @@ type Session {
   score: Float
 }
 
+input SessionInput {
+  dialogueId: String!
+  entries: [NodeEntryInput!]
+}
+
 input SessionWhereUniqueInput {
   dialogueId: ID
   id: ID
+}
+
+"""Input type for a slider node"""
+input SliderNodeEntryInput {
+  value: Int
 }
 
 input SortFilterInputObject {
@@ -383,6 +420,11 @@ enum TagTypeEnum {
   AGENT
   DEFAULT
   LOCATION
+}
+
+"""Input type for a textbox node"""
+input TextboxNodeEntryInput {
+  value: String
 }
 
 input TopicDataEntry {
@@ -458,19 +500,8 @@ enum TriggerTypeEnum {
   SCHEDULED
 }
 
-type UniqueDataResultEntry {
-  createdAt: String!
-  sessionId: String!
-  value: Int!
-}
-
 """The `Upload` scalar type represents a file upload."""
 scalar Upload
-
-input UploadUserSessionInput {
-  dialogueId: String!
-  entries: [UserSessionEntryInput!]
-}
 
 input UserInput {
   customerId: String
@@ -480,19 +511,6 @@ input UserInput {
   password: String
   phone: String
   roleId: String
-}
-
-input UserSessionEntryDataInput {
-  multiValues: [UserSessionEntryDataInput!]
-  numberValue: Int
-  textValue: String
-}
-
-input UserSessionEntryInput {
-  data: UserSessionEntryDataInput
-  depth: Int
-  edgeId: String
-  nodeId: String
 }
 
 type UserTable {

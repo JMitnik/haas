@@ -1,3 +1,4 @@
+import * as NodeEntryAPI from '../models/node-entry/NodeEntry';
 import customerNexus from '../models/customer/Customer';
 import customerSettingsNexus from '../models/settings/CustomerSettings';
 import dialogueNexus from '../models/questionnaire/Dialogue';
@@ -20,6 +21,7 @@ const nexus = [
   ...customerNexus,
   ...customerSettingsNexus,
   ...dialogueNexus,
+  // ...Array(NodeEntryAPI),
   ...sessionNexus,
   ...questionNodeNexus,
   ...topicBuilderNexus,
