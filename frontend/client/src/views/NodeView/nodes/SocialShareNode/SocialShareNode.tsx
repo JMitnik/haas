@@ -1,8 +1,10 @@
-import { Facebook, Instagram, Linkedin, Twitter } from 'react-feather';
+import { Facebook, Globe, Instagram, Linkedin, Twitter } from 'react-feather';
+import { getSnapshot } from 'mobx-state-tree';
 import React from 'react';
 
 import { Flex } from '@haas/ui';
 import { NodeTitle } from 'layouts/NodeLayout/NodeLayoutStyles';
+import CustomIcon from 'components/Icons/CustomIcon';
 import useDialogueFinish from 'hooks/use-dialogue-finish';
 
 import { GenericNodeProps } from '../types';
@@ -13,25 +15,44 @@ type SocialShareNodeProps = GenericNodeProps;
 const SocialShareNode = ({ node }: SocialShareNodeProps) => {
   useDialogueFinish();
 
+  console.log(getSnapshot(node.links));
+
   return (
     <SocialShareNodeContainer>
       <NodeTitle>{node.title}</NodeTitle>
       <Flex justifyContent="center" alignItems="center">
-        <ShareItem href="https://twitter.com" target="__blank" rel="noopener noreferrer" backgroundColor="#1da1f2">
-          <Twitter stroke="none" fill="white" />
-        </ShareItem>
+        {node.links.length === 0 && (
+          <>
+            <ShareItem href="https://twitter.com" target="__blank" rel="noopener noreferrer" backgroundColor="#1da1f2">
+              <Twitter stroke="none" fill="white" />
+            </ShareItem>
 
-        <ShareItem href="https://facebook.com" target="__blank" rel="noopener noreferrer" backgroundColor="#1877f2">
-          <Facebook stroke="none" fill="white" />
-        </ShareItem>
+            <ShareItem href="https://facebook.com" target="__blank" rel="noopener noreferrer" backgroundColor="#1877f2">
+              <Facebook stroke="none" fill="white" />
+            </ShareItem>
 
-        <ShareItem href="https://instagram.com" target="__blank" rel="noopener noreferrer" bg="#c32aa3">
-          <Instagram stroke="white" />
-        </ShareItem>
+            <ShareItem href="https://instagram.com" target="__blank" rel="noopener noreferrer" bg="#c32aa3">
+              <Instagram stroke="white" />
+            </ShareItem>
 
-        <ShareItem href="https://linkedin.com" target="__blank" rel="noopener noreferrer" bg="#007bb5">
-          <Linkedin stroke="none" fill="white" />
-        </ShareItem>
+            <ShareItem href="https://linkedin.com" target="__blank" rel="noopener noreferrer" bg="#007bb5">
+              <Linkedin stroke="none" fill="white" />
+            </ShareItem>
+          </>
+        ) }
+        {node.links.map(
+          (link) => (
+            <ShareItem
+              href={link.url}
+              target="__blank"
+              rel="noopener noreferrer"
+              bg={link.backgroundColor || '#007bb5'}
+            >
+              {link.icon ? <CustomIcon logo={link.icon} /> : <Globe stroke="white" />}
+            </ShareItem>
+          ),
+        )}
+
       </Flex>
     </SocialShareNodeContainer>
   );

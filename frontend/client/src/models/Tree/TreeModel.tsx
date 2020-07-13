@@ -56,6 +56,7 @@ const TreeModel = types
         type: leaf.type,
         title: leaf.title,
         isLeaf: true,
+        links: leaf.links,
       }));
 
       const defaultPostLeafNode = createDefaultPostLeafNode();

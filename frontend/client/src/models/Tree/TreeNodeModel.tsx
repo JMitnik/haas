@@ -1,6 +1,7 @@
 import { IAnyModelType, Instance, types } from 'mobx-state-tree';
 // eslint-disable-next-line import/no-cycle
 import { TreeEdgeModel, TreeEdgeProps } from './TreeEdgeModel';
+import TreeLinkModel from './TreeLinkModel';
 import TreeNodeOptionModel from './TreeNodeOptionModel';
 
 export enum SpecialEdge {
@@ -18,6 +19,7 @@ export const TreeNodeModel = types
     children: types.array(types.maybe(types.reference(types.late(() => TreeEdgeModel)))),
     overrideLeaf: types.maybe(types.reference(types.late((): IAnyModelType => TreeNodeModel))),
     options: types.array(TreeNodeOptionModel),
+    links: types.array(TreeLinkModel),
   })
   .actions((self) => ({
     /**
