@@ -8,12 +8,14 @@ import Select from 'react-select';
 
 import { Button, Div, Flex, Form, FormGroupContainer, Grid,
   H3, H4, Hr, Muted, StyledInput, StyledLabel } from '@haas/ui';
-import { PlusCircle } from 'react-feather';
+import { PlusCircle, X } from 'react-feather';
 import { cloneDeep, debounce } from 'lodash';
 import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
 import createCTAMutation from 'mutations/createCTA';
 import getCTANodesQuery from 'queries/getCTANodes';
 import updateCTAMutation from 'mutations/updateCTA';
+
+import DeleteLinkSesctionButton from './DeleteLinkSectionButton';
 
 interface FormDataProps {
   title: string;
@@ -127,8 +129,6 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: 
   });
 
   const onSubmit = (formData: FormDataProps) => {
-    console.log('formdata: ', formData);
-
     if (id === '-1') {
       const mappedLinks = { linkTypes: activeLinks.map((link) => {
         const { id, ...linkData } = link;
@@ -192,15 +192,19 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: 
   }, 250), []);
 
   const handleLinkTypeChange = (qOption: any, index: number) => {
-    console.log('handleLinkType change: ', qOption);
-    // setValue('linkType', qOption?.value);
+    setValue('linkType', qOption?.value);
     setActiveLinks((prevLinks) => {
       prevLinks[index].type = qOption;
       return [...prevLinks];
     });
   };
 
-  console.log('active links: ', activeLinks);
+  const handleDeleteLink = (index: number) => {
+    setActiveLinks((prevLinks) => {
+      prevLinks.splice(index, 1);
+      return [...prevLinks];
+    });
+  };
 
   return (
     <Form onSubmit={handleSubmit(onSubmit)}>
@@ -248,7 +252,7 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: 
                 <Hr />
 
                 {activeLinks.map((link, index) => (
-                  <Div key={index} marginTop={15} gridColumn="1 / -1">
+                  <Div position="relative" key={index} marginTop={15} gridColumn="1 / -1">
                     <Grid
                       border="1px solid"
                       borderColor="default.light"
@@ -256,6 +260,9 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: 
                       padding="10px"
                       gridTemplateColumns={['1fr 1fr']}
                     >
+                      <DeleteLinkSesctionButton onClick={() => handleDeleteLink(index)}>
+                        <X />
+                      </DeleteLinkSesctionButton>
                       <Flex flexDirection="column">
                         <StyledLabel>Url</StyledLabel>
                         <StyledInput
