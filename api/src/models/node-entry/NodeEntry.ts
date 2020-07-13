@@ -7,6 +7,7 @@ import NodeEntryService from './NodeEntryService';
 
 export const NodeEntryValueType = objectType({
   name: 'NodeEntryValue',
+
   definition(t) {
     t.id('id');
 
@@ -32,6 +33,7 @@ export const NodeEntryType = objectType({
     t.field('relatedNode', {
       type: QuestionNodeType,
       nullable: true,
+
       resolve(parent: NodeEntry, ctx: any) {
         const { prisma }: { prisma: PrismaClient } = ctx;
 
@@ -92,18 +94,6 @@ export const SliderNodeEntryInput = inputObjectType({
   },
 });
 
-export const NodeEntryValueInput = inputObjectType({
-  name: 'NodeEntryValueInput',
-  description: 'Input type for a node-entry value in general',
-
-  definition(t) {
-    t.field('slider', { type: SliderNodeEntryInput, nullable: true });
-    t.field('textbox', { type: TextboxNodeEntryInput, nullable: true });
-    t.field('register', { type: RegisterNodeEntryInput, nullable: true });
-    t.field('choice', { type: ChoiceNodeEntryInput, nullable: true });
-  },
-});
-
 export const NodeEntryInput = inputObjectType({
   name: 'NodeEntryInput',
   description: 'Input type for node-entry metadata',
@@ -113,6 +103,9 @@ export const NodeEntryInput = inputObjectType({
     t.string('edgeId', { nullable: true });
     t.int('depth', { nullable: true });
 
-    t.field('data', { type: NodeEntryValueInput });
+    t.field('slider', { type: SliderNodeEntryInput, nullable: true });
+    t.field('textbox', { type: TextboxNodeEntryInput, nullable: true });
+    t.field('register', { type: RegisterNodeEntryInput, nullable: true });
+    t.field('choice', { type: ChoiceNodeEntryInput, nullable: true });
   },
 });

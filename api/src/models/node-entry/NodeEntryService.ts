@@ -25,21 +25,22 @@ class NodeEntryService {
   static constructCreateNodeEntryFragment = (nodeEntryInput: any): NodeEntryCreateWithoutSessionInput => ({
     relatedNode: nodeEntryInput.nodeId && { connect: { id: nodeEntryInput.nodeId } },
     relatedEdge: nodeEntryInput.edgeId && { connect: { id: nodeEntryInput.edgeId } },
+    depth: nodeEntryInput?.depth,
 
-    choiceNodeEntry: nodeEntryInput?.data?.choice?.value && {
-      create: { value: nodeEntryInput?.data?.choice?.value },
+    choiceNodeEntry: nodeEntryInput?.choice?.value && {
+      create: { value: nodeEntryInput?.choice?.value },
     },
 
-    registrationNodeEntry: nodeEntryInput?.data?.register?.value && {
-      create: { value: nodeEntryInput?.data?.register?.value },
+    registrationNodeEntry: nodeEntryInput?.register?.value && {
+      create: { value: nodeEntryInput?.register?.value },
     },
 
-    sliderNodeEntry: nodeEntryInput?.data?.slider?.value && {
-      create: { value: nodeEntryInput?.data?.slider?.value },
+    sliderNodeEntry: nodeEntryInput?.slider?.value && {
+      create: { value: nodeEntryInput?.slider?.value },
     },
 
-    textboxNodeEntry: nodeEntryInput?.data?.textbox?.value && {
-      create: { value: nodeEntryInput?.data?.textbox?.value },
+    textboxNodeEntry: nodeEntryInput?.textbox?.value && {
+      create: { value: nodeEntryInput?.textbox?.value },
     },
   });
 

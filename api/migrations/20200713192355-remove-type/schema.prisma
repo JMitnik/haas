@@ -1,6 +1,6 @@
 datasource postgresql {
   provider = "postgresql"
-  url      = env("DB_STRING")
+  url = "***"
 }
 
 // binaryTargets = ["debian-openssl-1.1.x"]
@@ -108,7 +108,7 @@ model QuestionNode {
   isLeaf                     Boolean          @default(false)
   isRoot                     Boolean          @default(false)
   title                      String
-  type                       NodeType         @default(value: GENERIC)
+  type                       NodeType
   options                    QuestionOption[]
   children                   Edge[]
 

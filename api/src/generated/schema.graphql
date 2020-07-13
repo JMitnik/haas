@@ -219,10 +219,13 @@ type NodeEntry {
 
 """Input type for node-entry metadata"""
 input NodeEntryInput {
-  data: NodeEntryValueInput
+  choice: ChoiceNodeEntryInput
   depth: Int
   edgeId: String
   nodeId: String
+  register: RegisterNodeEntryInput
+  slider: SliderNodeEntryInput
+  textbox: TextboxNodeEntryInput
 }
 
 type NodeEntryValue {
@@ -231,14 +234,6 @@ type NodeEntryValue {
   register: String
   slider: Int
   textbox: String
-}
-
-"""Input type for a node-entry value in general"""
-input NodeEntryValueInput {
-  choice: ChoiceNodeEntryInput
-  register: RegisterNodeEntryInput
-  slider: SliderNodeEntryInput
-  textbox: TextboxNodeEntryInput
 }
 
 input OptionInput {
@@ -380,6 +375,7 @@ type Session {
   score: Float
 }
 
+"""Input for session"""
 input SessionInput {
   dialogueId: String!
   entries: [NodeEntryInput!]

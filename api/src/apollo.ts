@@ -14,6 +14,17 @@ const makeApollo = async () => {
       prisma,
       services: new ServiceContainer(config),
     }),
+    formatError(err) {
+      if (config.env === 'local') {
+        return err;
+      }
+
+      if (err.name === 'ValidationError') {
+        return new Error(`Different authentication error message, due to ${err.message}`);
+      }
+
+      return err;
+    },
   });
 
   return apollo;

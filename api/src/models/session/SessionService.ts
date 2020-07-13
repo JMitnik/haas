@@ -5,8 +5,9 @@ import {
 import { PaginationProps } from '../../types/generic';
 import { SessionWithEntries } from './SessionTypes';
 // eslint-disable-next-line import/no-cycle
-import { SessionCreateInput } from '../../generated/resolver-types';
 import { TEXT_NODES } from '../questionnaire/Dialogue';
+// eslint-disable-next-line import/no-cycle
+// eslint-disable-next-line import/no-cycle
 import NodeEntryService, { NodeEntryWithTypes } from '../node-entry/NodeEntryService';
 import TriggerService from '../trigger/TriggerService';
 
@@ -32,8 +33,6 @@ class SessionService {
         },
         nodeEntries: {
           create: entries.map((entry: any) => NodeEntryService.constructCreateNodeEntryFragment(entry)),
-          // TODO: Bring it back
-          // create: entries.map((entry: any) => NodeEntryService.constructNodeEntry(entry)),
         },
       },
     });
@@ -45,11 +44,11 @@ class SessionService {
     }
 
     // TODO: Replace this with email associated to dialogue (or fallback to company)
-    const dialogueAgentMail = 'jmitnik@gmail.com';
+    // const dialogueAgentMail = 'jmitnik@gmail.com';
 
-    // TODO: Roundabout way, needs to be done in Prisma2 better
-    const nodeEntries = await SessionService.getSessionEntries(session);
-    const questionnaire = await prisma.dialogue.findOne({ where: { id: dialogueId } });
+    // // TODO: Roundabout way, needs to be done in Prisma2 better
+    // const nodeEntries = await SessionService.getSessionEntries(session);
+    // const questionnaire = await prisma.dialogue.findOne({ where: { id: dialogueId } });
 
     // ctx.services.triggerMailService.sendTrigger({
     //   to: dialogueAgentMail,

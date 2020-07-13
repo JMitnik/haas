@@ -3,6 +3,11 @@ import { ResponsiveLine as NivoLineChart } from '@nivo/line';
 import React from 'react';
 
 const ScoreGraphModule = ({ chartData }: { chartData: any }) => {
+  // TODO: Return a nice null card or something
+  if (!chartData) {
+    return null;
+  }
+
   const data = [
     {
       id: 'score',

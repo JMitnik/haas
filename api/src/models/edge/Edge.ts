@@ -1,6 +1,8 @@
 import { Edge, PrismaClient } from '@prisma/client';
-import { QuestionNodeType } from '../question/QuestionNode';
 import { extendType, objectType } from '@nexus/schema';
+
+// eslint-disable-next-line import/no-cycle
+import { QuestionNodeType } from '../question/QuestionNode';
 
 export const EdgeConditionType = objectType({
   name: 'EdgeCondition',
@@ -25,7 +27,7 @@ export const EdgeType = objectType({
     t.string('dialogueId');
     t.field('parentNode', {
       type: QuestionNodeType,
-      resolve(parent: Edge, args: any, ctx: any, info: any) {
+      resolve(parent: Edge, args: any, ctx: any) {
         const { prisma }: { prisma: PrismaClient } = ctx;
         const parentNode = prisma.questionNode.findOne({ where: {
           id: parent.parentNodeId,
@@ -35,7 +37,7 @@ export const EdgeType = objectType({
     });
     t.field('childNode', {
       type: QuestionNodeType,
-      resolve(parent: Edge, args: any, ctx: any, info: any) {
+      resolve(parent: Edge, args: any, ctx: any) {
         const { prisma }: { prisma: PrismaClient } = ctx;
         const childNode = prisma.questionNode.findOne({ where: {
           id: parent.childNodeId,
@@ -45,7 +47,7 @@ export const EdgeType = objectType({
     });
     t.list.field('conditions', {
       type: EdgeConditionType,
-      resolve(parent: Edge, args: any, ctx: any, info: any) {
+      resolve(parent: Edge, args: any, ctx: any) {
         const { prisma }: { prisma: PrismaClient } = ctx;
         const edgeConditions = prisma.questionCondition.findMany({
           where: {
@@ -66,7 +68,7 @@ export const EdgeQueries = extendType({
       args: {
         id: 'String',
       },
-      resolve(parent: any, args: any, ctx: any, info: any) {
+      resolve(parent: any, args: any, ctx: any) {
         const { prisma }: { prisma: PrismaClient } = ctx;
         return prisma.edge.findOne({ where: { id: args.id } });
       },

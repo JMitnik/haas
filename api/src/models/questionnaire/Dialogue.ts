@@ -15,6 +15,7 @@ import { TagType, TagsInputType } from '../tag/Tag';
 // eslint-disable-next-line import/no-cycle
 import DialogueService from './DialogueService';
 import NodeEntryService from '../node-entry/NodeEntryService';
+// eslint-disable-next-line import/no-cycle
 import SessionService from '../session/SessionService';
 
 export const TEXT_NODES = [

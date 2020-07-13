@@ -6,6 +6,7 @@ import { PaginationProps } from '../../types/generic';
 // eslint-disable-next-line import/no-cycle
 import { NodeEntryInput, NodeEntryType } from '../node-entry/NodeEntry';
 import NodeEntryService from '../node-entry/NodeEntryService';
+// eslint-disable-next-line import/no-cycle
 import SessionService from './SessionService';
 
 export const SessionType = objectType({
@@ -207,6 +208,8 @@ export const SessionQuery = extendType({
 
 export const SessionInput = inputObjectType({
   name: 'SessionInput',
+  description: 'Input for session',
+
   definition(t) {
     t.string('dialogueId', { required: true });
 
@@ -223,9 +226,12 @@ export const CreateSessionMutation = mutationField('createSession', {
       return null;
     }
 
-    const session = SessionService.createSession(args.data, ctx);
-
-    return session;
+    try {
+      const session = SessionService.createSession(args.data, ctx);
+      return session;
+    } catch (error) {
+      throw new Error(`Failed making a session due to ${error}`);
+    }
   },
 });
 

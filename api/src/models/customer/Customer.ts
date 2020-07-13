@@ -1,13 +1,14 @@
 import { Customer, PrismaClient } from '@prisma/client';
+import { GraphQLError } from 'graphql';
 import { GraphQLUpload } from 'apollo-server-express';
 import { extendType, inputObjectType, objectType, scalarType } from '@nexus/schema';
 import cloudinary, { UploadApiResponse } from 'cloudinary';
 
-import { GraphQLError } from 'graphql';
 import { CustomerSettingsType } from '../settings/CustomerSettings';
 // eslint-disable-next-line import/no-cycle
 import { DialogueFilterInputType, DialogueType, DialogueWhereUniqueInput } from '../questionnaire/Dialogue';
 import CustomerService from './CustomerService';
+// eslint-disable-next-line import/no-cycle
 import DialogueService from '../questionnaire/DialogueService';
 import isValidColor from '../../utils/isValidColor';
 

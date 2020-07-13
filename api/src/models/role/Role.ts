@@ -106,7 +106,7 @@ export const RoleQueries = extendType({
     t.list.field('roles', {
       type: RoleType,
       args: { customerSlug: 'String' },
-      resolve(parent: any, args: any, ctx: any) {
+      resolve(parent: any, args: any) {
         return RoleService.roles(args.customerSlug);
       },
     });
