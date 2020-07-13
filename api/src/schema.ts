@@ -1,5 +1,7 @@
 import { makeSchema } from '@nexus/schema';
 import path from 'path';
+
+// eslint-disable-next-line import/no-cycle
 import nexus from './nexus/index';
 
 const schema = makeSchema({
@@ -13,7 +15,12 @@ const schema = makeSchema({
         source: '@prisma/client',
         alias: 'prisma',
       },
+      {
+        source: path.join(__dirname, './types/APIContext.ts'),
+        alias: 'APIContext',
+      },
     ],
+    contextType: 'APIContext.APIContext',
   },
   outputs: {
     schema: path.join(__dirname, './generated/schema.graphql'),

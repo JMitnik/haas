@@ -17,15 +17,16 @@ export const SessionType = objectType({
     t.string('dialogueId');
 
     t.float('score', {
-      nullable: true,
-      async resolve(parent: Session) {
-        return SessionService.getSessionScore(parent.id);
+      async resolve(parent) {
+        const score = await SessionService.getSessionScore(parent.id) || 0.0;
+
+        return score;
       },
     });
 
     t.list.field('nodeEntries', {
       type: NodeEntryType,
-      resolve(parent: Session, args: any, ctx: any) {
+      resolve(parent: Session, args, ctx) {
         const { prisma }: { prisma: PrismaClient } = ctx;
         const nodeEntries = prisma.nodeEntry.findMany({
           where: { sessionId: parent.id },
@@ -46,6 +47,7 @@ export const SessionType = objectType({
 
 export const SessionWhereUniqueInput = inputObjectType({
   name: 'SessionWhereUniqueInput',
+
   definition(t) {
     t.id('id', { required: false });
     t.id('dialogueId', { required: false });
@@ -55,6 +57,7 @@ export const SessionWhereUniqueInput = inputObjectType({
 // TODO: Can we make this a generic type
 export const SortFilterInputObject = inputObjectType({
   name: 'SortFilterInputObject',
+
   definition(t) {
     t.string('id', { required: false });
     t.boolean('desc', { required: false });
@@ -64,6 +67,7 @@ export const SortFilterInputObject = inputObjectType({
 // TODO: Can we make this a generic type
 export const SortFilterObject = objectType({
   name: 'SortFilterObject',
+
   definition(t) {
     t.string('id');
     t.boolean('desc');
@@ -128,15 +132,16 @@ export const SessionQuery = extendType({
     t.list.field('sessions', {
       type: SessionType,
       args: { where: SessionWhereUniqueInput },
-      resolve(parent: any, args: any, ctx: any) {
-        const { prisma }: { prisma: PrismaClient } = ctx;
-
-        if (!args.where) {
-          const sessions = prisma.session.findMany();
-          return sessions;
+      async resolve(parent, args) {
+        if (!args.where?.dialogueId) {
+          return [];
         }
 
-        const sessions = SessionService.getDialogueSessions(args.where.dialogueId);
+        const sessions = await SessionService.getDialogueSessions(args.where.dialogueId);
+
+        if (!sessions?.length) {
+          return [];
+        }
 
         return sessions;
       },
@@ -144,13 +149,15 @@ export const SessionQuery = extendType({
 
     t.field('session', {
       type: SessionType,
-      args: {
-        where: SessionWhereUniqueInput,
-      },
-      resolve(parent: any, args: any, ctx: any) {
-        const { prisma }: { prisma: PrismaClient } = ctx;
+      args: { where: SessionWhereUniqueInput },
+      nullable: true,
 
-        const session = prisma.session.findOne({
+      async resolve(parent, args, ctx) {
+        if (!args.where?.id) {
+          return null;
+        }
+
+        const session = await ctx.prisma.session.findOne({
           where: {
             id: args.where.id,
           },
@@ -160,22 +167,14 @@ export const SessionQuery = extendType({
       },
     });
 
-    // TODO: Rename or merge with another 'resource'
-    t.field('getSessionAnswerFlow', {
-      type: SessionType,
-      args: {
-        sessionId: 'ID',
-      },
-    });
-
     t.field('interactions', {
       type: InteractionType,
       args: {
         where: SessionWhereUniqueInput,
         filter: FilterInput,
       },
-      async resolve(parent: any, args: any) {
-        const { pageIndex, offset, limit, startDate, endDate, searchTerm }: PaginationProps = args.filter;
+      async resolve(parent, args) {
+        const { pageIndex, offset, limit, startDate, endDate, searchTerm } = args.filter;
         const dateRange = SessionService.constructDateRangeWhereInput(startDate, endDate);
         const orderBy = args.filter.orderBy ? Object.assign({}, ...args.filter.orderBy) : null;
 
@@ -189,7 +188,7 @@ export const SessionQuery = extendType({
           searchTerm,
         );
 
-        const sessionsWithIndex = pageSessions.map((session: any, index: any) => ({ ...session, index }));
+        const sessionsWithIndex = pageSessions.map((session, index) => ({ ...session, index }));
 
         return {
           sessions: sessionsWithIndex,
@@ -221,7 +220,7 @@ export const CreateSessionMutation = mutationField('createSession', {
   type: SessionType,
   args: { data: SessionInput },
 
-  resolve(parent: any, args: any, ctx: any) {
+  resolve(parent, args, ctx) {
     if (!args?.data) {
       return null;
     }

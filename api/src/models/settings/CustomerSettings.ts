@@ -29,6 +29,8 @@ export const CustomerSettingsType = objectType({
 
     t.field('colourSettings', {
       type: ColourSettingsType,
+      nullable: true,
+
       resolve(parent: CustomerSettings, args: any, ctx: any) {
         const { prisma }: { prisma: PrismaClient } = ctx;
         const colourSettings = prisma.colourSettings.findOne(
@@ -40,6 +42,7 @@ export const CustomerSettingsType = objectType({
     t.field('fontSettings', {
       nullable: true,
       type: FontSettingsType,
+
       resolve(parent: CustomerSettings, args: any, ctx: any) {
         const { prisma }: { prisma: PrismaClient } = ctx;
         const colourSettings = prisma.fontSettings.findOne(

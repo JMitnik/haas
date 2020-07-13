@@ -3,6 +3,7 @@
  * Do not make changes to this file directly
  */
 
+import * as APIContext from "../types/APIContext"
 import * as prisma from "@prisma/client"
 import { core } from "@nexus/schema"
 declare global {
@@ -264,6 +265,7 @@ export interface NexusGenRootTypes {
     totalPages?: number | null; // Int
   }
   RoleType: { // root type
+    customerId?: string | null; // String
     id: string; // ID!
     name: string; // String!
     nrPermissions?: number | null; // Int
@@ -365,7 +367,7 @@ export interface NexusGenFieldTypes {
     dialogues: NexusGenRootTypes['Dialogue'][]; // [Dialogue!]!
     id: string; // ID!
     name: string; // String!
-    settings: NexusGenRootTypes['CustomerSettings']; // CustomerSettings!
+    settings: NexusGenRootTypes['CustomerSettings'] | null; // CustomerSettings
     slug: string; // String!
   }
   CustomerSettings: { // field return type
@@ -497,14 +499,13 @@ export interface NexusGenFieldTypes {
     dialogue: NexusGenRootTypes['Dialogue']; // Dialogue!
     dialogues: NexusGenRootTypes['Dialogue'][]; // [Dialogue!]!
     edge: NexusGenRootTypes['Edge']; // Edge!
-    getSessionAnswerFlow: NexusGenRootTypes['Session']; // Session!
     interactions: NexusGenRootTypes['InteractionType']; // InteractionType!
     lineChartData: NexusGenRootTypes['lineChartDataType'][]; // [lineChartDataType!]!
     questionNode: NexusGenRootTypes['QuestionNode']; // QuestionNode!
     questionNodes: NexusGenRootTypes['QuestionNode'][]; // [QuestionNode!]!
-    roles: NexusGenRootTypes['RoleType'][]; // [RoleType!]!
+    roles: NexusGenRootTypes['RoleType'][] | null; // [RoleType!]
     roleTable: NexusGenRootTypes['RoleTableType']; // RoleTableType!
-    session: NexusGenRootTypes['Session']; // Session!
+    session: NexusGenRootTypes['Session'] | null; // Session
     sessions: NexusGenRootTypes['Session'][]; // [Session!]!
     tags: NexusGenRootTypes['TagType'][]; // [TagType!]!
     trigger: NexusGenRootTypes['TriggerType']; // TriggerType!
@@ -541,7 +542,8 @@ export interface NexusGenFieldTypes {
     totalPages: number | null; // Int
   }
   RoleType: { // field return type
-    customer: NexusGenRootTypes['Customer']; // Customer!
+    customer: NexusGenRootTypes['Customer'] | null; // Customer
+    customerId: string | null; // String
     id: string; // ID!
     name: string; // String!
     nrPermissions: number | null; // Int
@@ -552,7 +554,7 @@ export interface NexusGenFieldTypes {
     dialogueId: string; // String!
     id: string; // ID!
     nodeEntries: NexusGenRootTypes['NodeEntry'][]; // [NodeEntry!]!
-    score: number | null; // Float
+    score: number; // Float!
   }
   SortFilterObject: { // field return type
     desc: boolean; // Boolean!
@@ -730,9 +732,6 @@ export interface NexusGenArgTypes {
     edge: { // args
       id?: string | null; // String
     }
-    getSessionAnswerFlow: { // args
-      sessionId?: string | null; // ID
-    }
     interactions: { // args
       filter?: NexusGenInputs['FilterInput'] | null; // FilterInput
       where?: NexusGenInputs['SessionWhereUniqueInput'] | null; // SessionWhereUniqueInput
@@ -807,7 +806,7 @@ export type NexusGenScalarNames = "Boolean" | "Float" | "ID" | "Int" | "String" 
 export type NexusGenUnionNames = never;
 
 export interface NexusGenTypes {
-  context: {};
+  context: APIContext.APIContext;
   inputTypes: NexusGenInputs;
   rootTypes: NexusGenRootTypes;
   argTypes: NexusGenArgTypes;

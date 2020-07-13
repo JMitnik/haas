@@ -1,7 +1,7 @@
 import { Customer, PrismaClient } from '@prisma/client';
 import { GraphQLError } from 'graphql';
 import { GraphQLUpload } from 'apollo-server-express';
-import { extendType, inputObjectType, objectType, scalarType } from '@nexus/schema';
+import { extendType, inputObjectType, mutationField, objectType, scalarType } from '@nexus/schema';
 import cloudinary, { UploadApiResponse } from 'cloudinary';
 
 import { CustomerSettingsType } from '../settings/CustomerSettings';
@@ -21,11 +21,12 @@ export const CustomerType = objectType({
 
     t.field('settings', {
       type: CustomerSettingsType,
-      resolve(parent: Customer, args: any, ctx: any) {
-        const { prisma }: { prisma: PrismaClient } = ctx;
-        const customerSettings = prisma.customerSettings.findOne(
-          { where: { customerId: parent.id } },
-        );
+      nullable: true,
+
+      async resolve(parent: Customer, args, ctx) {
+        const customerSettings = await ctx.prisma.customerSettings.findOne({
+          where: { customerId: parent.id },
+        });
 
         return customerSettings;
       },
@@ -34,26 +35,21 @@ export const CustomerType = objectType({
     t.field('dialogue', {
       type: DialogueType,
       nullable: true,
-      args: {
-        where: DialogueWhereUniqueInput,
-      },
-      async resolve(parent: any, args: any) {
-        const customerId = parent.id;
+      args: { where: DialogueWhereUniqueInput },
 
-        if (!customerId) {
-          return null;
-        }
-
+      async resolve(parent, args) {
         if (args?.where?.slug) {
           const dialogueSlug: string = args.where.slug;
 
-          return CustomerService.getDialogueFromCustomerBySlug(customerId, dialogueSlug);
+          const customer = await CustomerService.getDialogueFromCustomerBySlug(parent.id, dialogueSlug);
+          return customer || null;
         }
 
         if (args?.where?.id) {
           const dialogueId: string = args.where.id;
 
-          return CustomerService.getDialogueFromCustomerById(customerId, dialogueId);
+          const customer = await CustomerService.getDialogueFromCustomerById(parent.id, dialogueId);
+          return customer || null;
         }
 
         return null;
@@ -62,10 +58,11 @@ export const CustomerType = objectType({
 
     t.list.field('dialogues', {
       type: DialogueType,
+      nullable: true,
       args: {
         filter: DialogueFilterInputType,
       },
-      async resolve(parent: Customer, args: any, ctx: any) {
+      async resolve(parent: Customer, args, ctx) {
         const { prisma }: { prisma: PrismaClient } = ctx;
         let dialogues = await prisma.dialogue.findMany({
           where: {
@@ -116,8 +113,8 @@ const CustomerCreateOptionsInput = inputObjectType({
   name: 'CustomerCreateOptions',
   definition(t) {
     t.string('slug', { required: true });
-    t.string('logo');
     t.string('primaryColour', { required: true });
+    t.string('logo');
     t.boolean('isSeed', { default: false, required: false });
   },
 });
@@ -144,13 +141,14 @@ export const CustomerMutations = Upload && extendType({
       args: {
         file: Upload,
       },
-      async resolve(parent: any, { file }) {
+      async resolve(parent, args) {
+        const { file } = args;
         const { createReadStream, filename, mimetype, encoding } = await file;
-        const stream = new Promise((resolve, reject) => {
+        const stream = new Promise<UploadApiResponse>((resolve, reject) => {
           const cld_upload_stream = cloudinary.v2.uploader.upload_stream({
             folder: 'company_logos',
           },
-          (error: any, result: UploadApiResponse | undefined) => {
+          (error, result: UploadApiResponse | undefined) => {
             if (result) {
               return resolve(result);
             }
@@ -160,8 +158,8 @@ export const CustomerMutations = Upload && extendType({
           return createReadStream().pipe(cld_upload_stream);
         });
 
-        const result: any = await stream;
-        const { url }: { url: string } = result;
+        const result = await stream;
+        const { url } = result;
         return { filename, mimetype, encoding, url };
       },
     });
@@ -171,8 +169,9 @@ export const CustomerMutations = Upload && extendType({
         name: 'String',
         options: CustomerCreateOptionsInput,
       },
-      async resolve(parent: any, args: any) {
-        const primaryColor: string = args?.options?.primaryColor;
+      async resolve(parent, args) {
+        const primaryColor = args?.options?.primaryColour;
+
         if (primaryColor) {
           try {
             isValidColor(primaryColor);
@@ -180,6 +179,7 @@ export const CustomerMutations = Upload && extendType({
             throw new GraphQLError('Color is invalid due to err');
           }
         }
+
         return CustomerService.createCustomer(args);
       },
     });
@@ -189,8 +189,9 @@ export const CustomerMutations = Upload && extendType({
         id: 'String',
         options: CustomerEditOptionsInput,
       },
-      resolve(parent: any, args: any) {
-        const primaryColor: string = args?.options?.primaryColor;
+      resolve(parent, args) {
+        const primaryColor = args?.options?.primaryColour;
+
         if (primaryColor) {
           try {
             isValidColor(primaryColor);
@@ -198,90 +199,96 @@ export const CustomerMutations = Upload && extendType({
             throw new GraphQLError('Color is invalid due to err');
           }
         }
+
         return CustomerService.editCustomer(args);
       },
     });
-    t.field('deleteCustomer', {
-      type: CustomerType,
-      args: {
-        where: CustomerWhereUniqueInput,
-      },
-      async resolve(parent: any, args: any, ctx: any) {
-        const customerId = args.where.id;
-        const { prisma }: { prisma: PrismaClient } = ctx;
+  },
+});
 
-        const customer = await ctx.prisma.customer.findOne({
-          where: { id: customerId },
+export const DeleteCustomerMutation = mutationField('deleteCustomer', {
+  type: CustomerType,
+  nullable: true,
+  args: { where: CustomerWhereUniqueInput },
+
+  async resolve(parent, args, ctx) {
+    const customerId = args?.where?.id;
+    if (!customerId) return null;
+
+    const customer = await ctx.prisma.customer.findOne({
+      where: { id: customerId },
+      include: {
+        settings: {
           include: {
-            settings: {
-              include: {
-                colourSettings: true,
-                fontSettings: true,
-              },
-            },
+            colourSettings: true,
+            fontSettings: true,
           },
-        });
-
-        const colourSettingsId = customer?.settings?.colourSettingsId;
-        const fontSettingsId = customer?.settings?.fontSettingsId;
-
-        // //// Settings-related
-        if (fontSettingsId) {
-          await prisma.fontSettings.delete({
-            where: {
-              id: fontSettingsId,
-            },
-          });
-        }
-
-        if (colourSettingsId) {
-          await prisma.colourSettings.delete({
-            where: {
-              id: colourSettingsId,
-            },
-          });
-        }
-
-        if (customer?.settings) {
-          await prisma.customerSettings.delete({
-            where: {
-              customerId,
-            },
-          });
-        }
-
-        const dialogueIds = await prisma.dialogue.findMany({
-          where: {
-            customerId,
-          },
-          select: {
-            id: true,
-          },
-        });
-
-        if (dialogueIds.length > 0) {
-          await Promise.all(dialogueIds.map(async (dialogueId: any) => {
-            await DialogueService.deleteDialogue(dialogueId.id);
-          }));
-        }
-        await prisma.tag.deleteMany({ where: { customerId } });
-
-        await prisma.triggerCondition.deleteMany({ where: { trigger: { customerId } } });
-        await prisma.trigger.deleteMany({ where: { customerId } });
-        await prisma.permission.deleteMany({ where: { customerId } });
-
-        await prisma.user.deleteMany({ where: { customerId } });
-
-        await prisma.role.deleteMany({ where: { customerId } });
-
-        await prisma.customer.delete({
-          where: {
-            id: customerId,
-          },
-        });
-        return customer;
+        },
       },
     });
+
+    if (!customer) return null;
+
+    const colourSettingsId = customer?.settings?.colourSettingsId;
+    const fontSettingsId = customer?.settings?.fontSettingsId;
+
+    // //// Settings-related
+    if (fontSettingsId) {
+      await ctx.prisma.fontSettings.delete({
+        where: {
+          id: fontSettingsId,
+        },
+      });
+    }
+
+    if (colourSettingsId) {
+      await ctx.prisma.colourSettings.delete({
+        where: {
+          id: colourSettingsId,
+        },
+      });
+    }
+
+    if (customer?.settings) {
+      await ctx.prisma.customerSettings.delete({
+        where: {
+          customerId,
+        },
+      });
+    }
+
+    const dialogueIds = await ctx.prisma.dialogue.findMany({
+      where: {
+        customerId,
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (dialogueIds.length > 0) {
+      await Promise.all(dialogueIds.map(async (dialogueId) => {
+        await DialogueService.deleteDialogue(dialogueId.id);
+      }));
+    }
+
+    await ctx.prisma.tag.deleteMany({ where: { customerId } });
+
+    await ctx.prisma.triggerCondition.deleteMany({ where: { trigger: { customerId } } });
+    await ctx.prisma.trigger.deleteMany({ where: { customerId } });
+    await ctx.prisma.permission.deleteMany({ where: { customerId } });
+
+    await ctx.prisma.user.deleteMany({ where: { customerId } });
+
+    await ctx.prisma.role.deleteMany({ where: { customerId } });
+
+    await ctx.prisma.customer.delete({
+      where: {
+        id: customerId,
+      },
+    });
+
+    return customer || null;
   },
 });
 
@@ -290,7 +297,7 @@ export const CustomersQuery = extendType({
   definition(t) {
     t.list.field('customers', {
       type: CustomerType,
-      async resolve(parent: any, args: any, ctx: any) {
+      async resolve(parent, args, ctx) {
         const { prisma }: { prisma: PrismaClient } = ctx;
         const customers = await prisma.customer.findMany();
         return customers;
@@ -312,7 +319,7 @@ export const CustomerQuery = extendType({
         id: 'ID',
         slug: 'String',
       },
-      async resolve(parent: any, args: any, ctx: any): Promise<Customer | null> {
+      async resolve(parent, args, ctx): Promise<Customer | null> {
         const { prisma }: { prisma: PrismaClient } = ctx;
 
         if (args.slug) {

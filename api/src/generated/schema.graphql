@@ -29,7 +29,7 @@ type Customer {
   dialogues(filter: DialogueFilterInputType): [Dialogue!]!
   id: ID!
   name: String!
-  settings: CustomerSettings!
+  settings: CustomerSettings
   slug: String!
 }
 
@@ -264,14 +264,13 @@ type Query {
   dialogue(where: DialogueWhereUniqueInput): Dialogue!
   dialogues(customerId: ID, filter: DialogueFilterInputType): [Dialogue!]!
   edge(id: String): Edge!
-  getSessionAnswerFlow(sessionId: ID): Session!
   interactions(filter: FilterInput, where: SessionWhereUniqueInput): InteractionType!
   lineChartData(dialogueId: String, limit: Int, numberOfDaysBack: Int, offset: Int): [lineChartDataType!]!
   questionNode(where: QuestionNodeWhereUniqueInput): QuestionNode!
   questionNodes: [QuestionNode!]!
-  roles(customerSlug: String): [RoleType!]!
+  roles(customerSlug: String): [RoleType!]
   roleTable(customerId: String, filter: FilterInput): RoleTableType!
-  session(where: SessionWhereUniqueInput): Session!
+  session(where: SessionWhereUniqueInput): Session
   sessions(where: SessionWhereUniqueInput): [Session!]!
   tags(customerSlug: String, dialogueId: String): [TagType!]!
   trigger(triggerId: String): TriggerType!
@@ -360,7 +359,8 @@ type RoleTableType {
 }
 
 type RoleType {
-  customer: Customer!
+  customer: Customer
+  customerId: String
   id: ID!
   name: String!
   nrPermissions: Int
@@ -372,7 +372,7 @@ type Session {
   dialogueId: String!
   id: ID!
   nodeEntries: [NodeEntry!]!
-  score: Float
+  score: Float!
 }
 
 """Input for session"""

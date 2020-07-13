@@ -1,7 +1,9 @@
-import { PrismaClient, Role } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import { extendType, inputObjectType, objectType } from '@nexus/schema';
 
+// eslint-disable-next-line import/no-cycle
 import { CustomerType } from '../customer/Customer';
+// eslint-disable-next-line import/no-cycle
 import { FilterInput } from '../session/Session';
 import { PaginationProps } from '../../types/generic';
 import { PermissionType } from '../permission/Permission';
@@ -9,17 +11,19 @@ import RoleService from './RoleService';
 
 export const RoleType = objectType({
   name: 'RoleType',
-  
+
   definition(t) {
     t.id('id');
     t.string('name');
+    t.string('customerId', { nullable: true });
     t.int('nrPermissions', { nullable: true });
 
     t.list.field('permissions', {
       nullable: true,
       type: PermissionType,
-      async resolve(parent: Role, args: any, ctx: any) {
+      async resolve(parent, args: any, ctx: any) {
         const { prisma }: { prisma: PrismaClient } = ctx;
+
         const customerPermissions = await prisma.permission.findMany({
           where: { customerId: parent.customerId },
           include: {
@@ -42,9 +46,20 @@ export const RoleType = objectType({
 
     t.field('customer', {
       type: CustomerType,
-      resolve(parent: Role, args: any, ctx: any) {
-        const { prisma }: { prisma: PrismaClient } = ctx;
-        return prisma.customer.findOne({ where: { id: parent.customerId || undefined } });
+      nullable: true,
+
+      async resolve(parent, args, ctx) {
+        const { prisma } = ctx;
+
+        if (!parent.customerId) {
+          return null;
+        }
+
+        const customer = await prisma.customer.findOne({
+          where: { id: parent.customerId },
+        });
+
+        return customer;
       },
     });
   },
@@ -107,8 +122,21 @@ export const RoleQueries = extendType({
     t.list.field('roles', {
       type: RoleType,
       args: { customerSlug: 'String' },
-      resolve(parent: any, args: any) {
-        return RoleService.roles(args.customerSlug);
+      nullable: true,
+      list: true,
+
+      async resolve(parent, args) {
+        if (!args.customerSlug) {
+          return [];
+        }
+
+        const roles = await RoleService.roles(args.customerSlug);
+
+        if (!roles) {
+          return [];
+        }
+
+        return roles;
       },
     });
   },
@@ -127,7 +155,7 @@ export const RoleMutations = extendType({
     t.field('createRole', {
       type: RoleType,
       args: { data: RoleInput },
-      resolve(parent: any, args: any, ctx: any) {
+      async resolve(parent: any, args: any, ctx: any) {
         const { prisma }: { prisma: PrismaClient } = ctx;
         const { name, customerId } = args.data;
 

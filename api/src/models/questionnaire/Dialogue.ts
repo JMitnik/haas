@@ -16,6 +16,7 @@ import { TagType, TagsInputType } from '../tag/Tag';
 import DialogueService from './DialogueService';
 import NodeEntryService from '../node-entry/NodeEntryService';
 // eslint-disable-next-line import/no-cycle
+import { APIContext } from '../../apollo';
 import SessionService from '../session/SessionService';
 
 export const TEXT_NODES = [
@@ -108,7 +109,7 @@ export const DialogueType = objectType({
       args: {
         filter: FilterInput,
       },
-      async resolve(parent: Dialogue, args: any) {
+      async resolve(parent: Dialogue, args) {
         if (!parent.id) {
           return null;
         }
@@ -253,8 +254,8 @@ export const DialogueType = objectType({
 
     t.list.field('sessions', {
       type: SessionType,
-      async resolve(parent: Dialogue, args: any, ctx: any) {
-        const { prisma }: { prisma: PrismaClient } = ctx;
+      async resolve(parent: Dialogue, args: any, ctx) {
+        const { prisma } = ctx;
 
         const dialogueWithSessions = await prisma.dialogue.findOne({
           where: { id: parent.id },
@@ -267,20 +268,16 @@ export const DialogueType = objectType({
 
     t.list.field('leafs', {
       type: QuestionNodeType,
-      resolve(parent: Dialogue, args: any, ctx: any) {
-        const { prisma }: { prisma: PrismaClient } = ctx;
-        const leafs = prisma.questionNode.findMany({
+      resolve(parent: Dialogue, args: any, ctx) {
+        const leafs = ctx.prisma.questionNode.findMany({
           where: {
             AND: [
-              {
-                questionDialogueId: parent.id,
-              },
-              {
-                isLeaf: true,
-              },
+              { questionDialogueId: parent.id },
+              { isLeaf: true },
             ],
           },
         });
+
         return leafs;
       },
     });
