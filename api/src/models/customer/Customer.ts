@@ -7,6 +7,7 @@ import cloudinary, { UploadApiResponse } from 'cloudinary';
 import { CustomerSettingsType } from '../settings/CustomerSettings';
 // eslint-disable-next-line import/no-cycle
 import { DialogueFilterInputType, DialogueType, DialogueWhereUniqueInput } from '../questionnaire/Dialogue';
+// eslint-disable-next-line import/no-cycle
 import CustomerService from './CustomerService';
 // eslint-disable-next-line import/no-cycle
 import DialogueService from '../questionnaire/DialogueService';
@@ -211,89 +212,22 @@ export const DeleteCustomerMutation = mutationField('deleteCustomer', {
   nullable: true,
   args: { where: CustomerWhereUniqueInput },
 
-  async resolve(parent, args, ctx) {
+  async resolve(parent, args) {
     const customerId = args?.where?.id;
-    if (!customerId) return null;
 
-    const customer = await ctx.prisma.customer.findOne({
-      where: { id: customerId },
-      include: {
-        settings: {
-          include: {
-            colourSettings: true,
-            fontSettings: true,
-          },
-        },
-      },
-    });
-
-    if (!customer) return null;
-
-    const colourSettingsId = customer?.settings?.colourSettingsId;
-    const fontSettingsId = customer?.settings?.fontSettingsId;
-
-    // //// Settings-related
-    if (fontSettingsId) {
-      await ctx.prisma.fontSettings.delete({
-        where: {
-          id: fontSettingsId,
-        },
-      });
+    if (!customerId) {
+      return null;
     }
 
-    if (colourSettingsId) {
-      await ctx.prisma.colourSettings.delete({
-        where: {
-          id: colourSettingsId,
-        },
-      });
-    }
+    const deletedCustomer = CustomerService.deleteCustomer(customerId);
 
-    if (customer?.settings) {
-      await ctx.prisma.customerSettings.delete({
-        where: {
-          customerId,
-        },
-      });
-    }
-
-    const dialogueIds = await ctx.prisma.dialogue.findMany({
-      where: {
-        customerId,
-      },
-      select: {
-        id: true,
-      },
-    });
-
-    if (dialogueIds.length > 0) {
-      await Promise.all(dialogueIds.map(async (dialogueId) => {
-        await DialogueService.deleteDialogue(dialogueId.id);
-      }));
-    }
-
-    await ctx.prisma.tag.deleteMany({ where: { customerId } });
-
-    await ctx.prisma.triggerCondition.deleteMany({ where: { trigger: { customerId } } });
-    await ctx.prisma.trigger.deleteMany({ where: { customerId } });
-    await ctx.prisma.permission.deleteMany({ where: { customerId } });
-
-    await ctx.prisma.user.deleteMany({ where: { customerId } });
-
-    await ctx.prisma.role.deleteMany({ where: { customerId } });
-
-    await ctx.prisma.customer.delete({
-      where: {
-        id: customerId,
-      },
-    });
-
-    return customer || null;
+    return deletedCustomer;
   },
 });
 
 export const CustomersQuery = extendType({
   type: 'Query',
+
   definition(t) {
     t.list.field('customers', {
       type: CustomerType,
@@ -319,16 +253,15 @@ export const CustomerQuery = extendType({
         id: 'ID',
         slug: 'String',
       },
-      async resolve(parent, args, ctx): Promise<Customer | null> {
-        const { prisma }: { prisma: PrismaClient } = ctx;
-
+      nullable: true,
+      async resolve(parent, args, ctx) {
         if (args.slug) {
-          const customer = await prisma.customer.findOne({ where: { slug: args.slug } });
+          const customer = await ctx.prisma.customer.findOne({ where: { slug: args.slug } });
           return customer;
         }
 
         if (args.id) {
-          const customer = await prisma.customer.findOne({ where: { id: args.id } });
+          const customer = await ctx.prisma.customer.findOne({ where: { id: args.id } });
           return customer;
         }
 

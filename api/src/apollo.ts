@@ -2,16 +2,12 @@ import { ApolloServer } from 'apollo-server-express';
 import { ExpressContext } from 'apollo-server-express/dist/ApolloServer';
 import { PrismaClient } from '@prisma/client';
 
+import { APIContext } from './types/APIContext';
+// eslint-disable-next-line import/no-cycle
 import ServiceContainer from './services/service-container';
 import config from './config';
+import prisma from './prisma';
 import schema from './schema';
-
-const prisma = new PrismaClient();
-
-export interface APIContext extends ExpressContext {
-  prisma: PrismaClient;
-  services: ServiceContainer;
-}
 
 const makeApollo = async () => {
   const apollo: ApolloServer = new ApolloServer({

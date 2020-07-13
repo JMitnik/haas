@@ -16,7 +16,6 @@ import { TagType, TagsInputType } from '../tag/Tag';
 import DialogueService from './DialogueService';
 import NodeEntryService from '../node-entry/NodeEntryService';
 // eslint-disable-next-line import/no-cycle
-import { APIContext } from '../../apollo';
 import SessionService from '../session/SessionService';
 
 export const TEXT_NODES = [

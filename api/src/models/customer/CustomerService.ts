@@ -1,15 +1,16 @@
-import { Customer, PrismaClient, TagCreateWithoutCustomerInput } from '@prisma/client';
+import { Customer, TagCreateWithoutCustomerInput } from '@prisma/client';
 import { subDays } from 'date-fns';
 import cuid from 'cuid';
 
 import { leafNodes } from '../../data/seeds/default-data';
+// eslint-disable-next-line import/no-cycle
+import DialogueService from '../questionnaire/DialogueService';
 import NodeService from '../question/NodeService';
+import prisma from '../../prisma';
 
 function getRandomInt(max: number) {
   return Math.floor(Math.random() * Math.floor(max));
 }
-
-const prisma = new PrismaClient();
 
 const seedCustomerData: TagCreateWithoutCustomerInput[] = [
   {
@@ -213,6 +214,82 @@ class CustomerService {
     });
 
     return customerWithDialogue?.dialogues?.[0];
+  }
+
+  static async deleteCustomer(customerId: string) {
+    if (!customerId) return null;
+
+    const customer = await prisma.customer.findOne({
+      where: { id: customerId },
+      include: {
+        settings: {
+          include: {
+            colourSettings: true,
+            fontSettings: true,
+          },
+        },
+      },
+    });
+
+    if (!customer) return null;
+
+    const colourSettingsId = customer?.settings?.colourSettingsId;
+    const fontSettingsId = customer?.settings?.fontSettingsId;
+
+    // //// Settings-related
+    if (fontSettingsId) {
+      await prisma.fontSettings.delete({
+        where: {
+          id: fontSettingsId,
+        },
+      });
+    }
+
+    if (colourSettingsId) {
+      await prisma.colourSettings.delete({
+        where: {
+          id: colourSettingsId,
+        },
+      });
+    }
+
+    if (customer?.settings) {
+      await prisma.customerSettings.delete({
+        where: {
+          customerId,
+        },
+      });
+    }
+
+    const dialogueIds = await prisma.dialogue.findMany({
+      where: {
+        customerId,
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (dialogueIds.length > 0) {
+      await Promise.all(dialogueIds.map(async (dialogueId) => {
+        await DialogueService.deleteDialogue(dialogueId.id);
+      }));
+    }
+
+    await prisma.tag.deleteMany({ where: { customerId } });
+    await prisma.triggerCondition.deleteMany({ where: { trigger: { customerId } } });
+    await prisma.trigger.deleteMany({ where: { customerId } });
+    await prisma.permission.deleteMany({ where: { customerId } });
+    await prisma.user.deleteMany({ where: { customerId } });
+    await prisma.role.deleteMany({ where: { customerId } });
+
+    await prisma.customer.delete({
+      where: {
+        id: customerId,
+      },
+    });
+
+    return customer || null;
   }
 
   /**

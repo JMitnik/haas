@@ -26,7 +26,7 @@ type ColourSettings {
 
 type Customer {
   dialogue(where: DialogueWhereUniqueInput): Dialogue
-  dialogues(filter: DialogueFilterInputType): [Dialogue!]!
+  dialogues(filter: DialogueFilterInputType): [Dialogue!]
   id: ID!
   name: String!
   settings: CustomerSettings
@@ -48,14 +48,10 @@ input CustomerEditOptions {
 }
 
 type CustomerSettings {
-  colourSettings: ColourSettings!
+  colourSettings: ColourSettings
   fontSettings: FontSettings
   id: ID!
   logoUrl: String
-}
-
-input CustomerWhereUniqueInput {
-  id: ID!
 }
 
 type Dialogue {
@@ -190,7 +186,6 @@ type Mutation {
   createTag(customerSlug: String, name: String, type: TagTypeEnum): TagType!
   createTrigger(customerSlug: String, questionId: String, recipients: RecipientsInputType, trigger: TriggerInputType): TriggerType!
   createUser(customerSlug: String, input: UserInput): UserType!
-  deleteCustomer(where: CustomerWhereUniqueInput): Customer!
   deleteDialogue(where: DialogueWhereUniqueInput): Dialogue!
   deleteTag(tagId: String): TagType!
   deleteTrigger(id: String): TriggerType!
@@ -259,7 +254,7 @@ type PermssionType {
 }
 
 type Query {
-  customer(id: ID, slug: String): Customer!
+  customer(id: ID, slug: String): Customer
   customers: [Customer!]!
   dialogue(where: DialogueWhereUniqueInput): Dialogue!
   dialogues(customerId: ID, filter: DialogueFilterInputType): [Dialogue!]!
