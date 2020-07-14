@@ -2,8 +2,8 @@ import { Dialogue, DialogueCreateInput,
   DialogueUpdateInput, Link, LinkCreateArgs, LinkCreateManyWithoutQuestionNodeInput, LinkCreateWithoutQuestionNodeInput, PrismaClient, QuestionNode, QuestionNodeCreateInput, QuestionOptionCreateManyWithoutQuestionNodeInput, Tag, TagWhereUniqueInput } from '@prisma/client';
 import { isAfter, subDays } from 'date-fns';
 import _ from 'lodash';
-
 import cuid from 'cuid';
+
 import { DialogueFilterInputType } from './Dialogue';
 import { leafNodes, sliderType } from '../../data/seeds/default-data';
 import NodeResolver from '../question/node-resolver';
@@ -502,6 +502,21 @@ class DialogueService {
         id: templateId,
       },
       include: {
+        edges: {
+          include: {
+            conditions: true,
+            childNode: {
+              select: {
+                id: true,
+              },
+            },
+            parentNode: {
+              select: {
+                id: true,
+              },
+            },
+          },
+        },
         questions: {
           include: {
             links: true,
@@ -550,7 +565,7 @@ class DialogueService {
         return updateLink;
       });
       const mappedOverrideLeafId = question.overrideLeafId && idMap[question.overrideLeafId];
-      const mappedOverrideLeaf = question.overrideLeafId && { id: idMap[question.overrideLeafId] };
+      const mappedOverrideLeaf = question.overrideLeafId ? { id: idMap[question.overrideLeafId] } : null;
       const mappedIsOverrideLeafOf = question.isOverrideLeafOf.map(({ id }) => ({ id: idMap[id] }));
       const mappedOptions: QuestionOptionCreateManyWithoutQuestionNodeInput = { create: question.options };
       const mappedObject = {
@@ -568,7 +583,8 @@ class DialogueService {
 
     // Create leaf nodes
     const leafs = updatedTemplateQuestions?.filter((question) => question.isLeaf);
-    const updatedDialogue = await prisma.dialogue.update({
+
+    const updatedLeafsDialogue = await prisma.dialogue.update({
       where: {
         id: questionnaire.id,
       },
@@ -601,12 +617,73 @@ class DialogueService {
       },
     });
 
-    console.dir(updatedDialogue, { depth: null });
     // Create questio nodes
+    const questions = updatedTemplateQuestions?.filter((question) => !question.isLeaf);
+    const updatedQuestionsDialogue = await prisma.dialogue.update({
+      where: {
+        id: questionnaire.id,
+      },
+      data: {
+        questions: {
+          create: questions?.map((leaf) => ({
+            id: leaf.id,
+            isRoot: leaf.isRoot,
+            isLeaf: leaf.isLeaf,
+            title: leaf.title,
+            options: leaf.options,
+            overrideLeaf: leaf.overrideLeaf && { connect: leaf.overrideLeaf },
+            type: leaf.type,
+          })),
+        },
+      },
+      include: {
+        questions: {
+          include: {
+            options: {
+              select: {
+                publicValue: true,
+                value: true,
+              },
+            },
+          },
+        },
+      },
+    });
 
     // Create edges
+    const updatedTemplateEdges = templateDialogue?.edges.map((edge) => {
+      const mappedDialogueId = edge.dialogueId && idMap[edge.dialogueId];
+      const mappedConditions = edge.conditions.map((condition) => {
+        const { id, edgeId, ...conditionData } = condition;
+        const updateCondition = { ...conditionData };
+        return updateCondition;
+      });
+      const mappedChildNode = { id: idMap[edge.childNodeId] };
+      const mappedParentNode = { id: idMap[edge.parentNodeId] };
+      const mappedObject = {
+        parentNode: { connect: mappedParentNode },
+        conditions: { create: mappedConditions },
+        childNode: { connect: mappedChildNode },
+      };
+      return mappedObject;
+    });
 
-    return templateDialogue;
+    const updatedEdgesDialogue = await prisma.dialogue.update({
+      where: {
+        id: questionnaire.id,
+      },
+      data: {
+        edges: {
+          create: updatedTemplateEdges?.map((edge) => ({
+            parentNode: edge.parentNode,
+            conditions: edge.conditions,
+            childNode: edge.childNode,
+          })),
+        },
+      },
+    });
+
+    return updatedEdgesDialogue;
   };
 
   static createDialogue = async (dialogueInputData: DialogueInputProps): Promise<Dialogue | null> => {
@@ -638,8 +715,9 @@ class DialogueService {
     }
 
     if (contentType === 'TEMPLATE' && templateDialogueId) {
-      console.log('template id: ', templateDialogueId);
-      // return DialogueService.copyDialogue(templateDialogueId);
+      return DialogueService.copyDialogue(
+        templateDialogueId, customer.id, title, dialogueSlug, description, publicTitle, tags,
+      );
     }
 
     questionnaire = await DialogueService.initDialogue(
