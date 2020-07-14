@@ -93,13 +93,12 @@ input DialogueWhereUniqueInput {
 }
 
 type Edge {
-  childNode: QuestionNode!
+  childNode: QuestionNode
   childNodeId: String!
-  conditions: [EdgeCondition!]!
+  conditions: [EdgeCondition!]
   createdAt: String!
-  dialogueId: String!
   id: ID!
-  parentNode: QuestionNode!
+  parentNode: QuestionNode
   parentNodeId: String!
   updatedAt: String!
 }
@@ -113,7 +112,7 @@ input EdgeChildInput {
 
 type EdgeCondition {
   conditionType: String!
-  edgeId: String!
+  edgeId: String
   id: Int!
   matchValue: String
   renderMax: Int
@@ -180,7 +179,7 @@ type Mutation {
   assignTags(dialogueId: String, tags: TagsInputObjectType): Dialogue!
   createCustomer(name: String, options: CustomerCreateOptions): Customer!
   createDialogue(data: AddDialogueInput): Dialogue!
-  createPermission(data: PermissionInput): PermssionType!
+  createPermission(data: PermissionInput): PermssionType
   createRole(data: RoleInput): RoleType!
   createSession(data: SessionInput): Session!
   createTag(customerSlug: String, name: String, type: TagTypeEnum): TagType!
@@ -201,12 +200,11 @@ type Mutation {
 
 type NodeEntry {
   creationDate: String!
-  depth: Int!
+  depth: Int
   id: ID
   relatedEdgeId: String
   relatedNode: QuestionNode
   relatedNodeId: String
-  sessionId: String!
 
   """The core scoring value associated with the node entry."""
   value: NodeEntryValue
@@ -248,6 +246,7 @@ input PermissionInput {
 }
 
 type PermssionType {
+  customer: Customer
   description: String
   id: ID!
   name: String!
@@ -258,10 +257,10 @@ type Query {
   customers: [Customer!]!
   dialogue(where: DialogueWhereUniqueInput): Dialogue!
   dialogues(customerId: ID, filter: DialogueFilterInputType): [Dialogue!]!
-  edge(id: String): Edge!
+  edge(id: String): Edge
   interactions(filter: FilterInput, where: SessionWhereUniqueInput): InteractionType!
   lineChartData(dialogueId: String, limit: Int, numberOfDaysBack: Int, offset: Int): [lineChartDataType!]!
-  questionNode(where: QuestionNodeWhereUniqueInput): QuestionNode!
+  questionNode(where: QuestionNodeWhereUniqueInput): QuestionNode
   questionNodes: [QuestionNode!]!
   roles(customerSlug: String): [RoleType!]
   roleTable(customerId: String, filter: FilterInput): RoleTableType!
@@ -305,7 +304,7 @@ type QuestionNode {
   overrideLeaf: QuestionNode
   overrideLeafId: String
   questionDialogue: Dialogue
-  questionDialogueId: String!
+  questionDialogueId: String
   title: String!
   type: String!
 }
@@ -322,7 +321,7 @@ input QuestionNodeWhereUniqueInput {
 type QuestionOption {
   id: Int!
   publicValue: String
-  questionId: String!
+  questionId: String
   value: String!
 }
 

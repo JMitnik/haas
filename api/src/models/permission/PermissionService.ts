@@ -13,8 +13,8 @@ class PermissionService {
     });
   };
 
-  static createPermission = async (name: string, customerId: string, description: string) => {
-    const newPermissions = prisma.permission.create({
+  static createPermission = async (name: string, customerId: string, description?: string | null | undefined) => {
+    const newPermissions = await prisma.permission.create({
       data: {
         name,
         description,
@@ -23,6 +23,9 @@ class PermissionService {
             id: customerId,
           },
         },
+      },
+      include: {
+        Customer: true,
       },
     });
 

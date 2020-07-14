@@ -1,6 +1,6 @@
 import { NodeType, PrismaClient, QuestionNode, QuestionNodeCreateInput } from '@prisma/client';
 import { choiceType, sliderType } from '../../data/seeds/default-data';
-import EdgeResolver from '../edge/edge-resolver';
+import EdgeService from '../edge/EdgeService';
 
 const prisma = new PrismaClient();
 
@@ -239,7 +239,7 @@ class NodeResolver {
       console.log('Something went wrong removing options');
     }
     try {
-      await EdgeResolver.removeNonExistingEdges(activeEdges, children, questionData.id);
+      await EdgeService.removeNonExistingEdges(activeEdges, children, questionData.id);
     } catch (e) {
       console.log('something went wrong removing edges: ', e);
     }
@@ -505,13 +505,13 @@ class NodeResolver {
     // ################################### EDGES ################################
 
     // Positive edges
-    await EdgeResolver.createEdge(rootQuestion, rootToWhatDidYou,
+    await EdgeService.createEdge(rootQuestion, rootToWhatDidYou,
       { conditionType: 'valueBoundary', matchValue: null, renderMin: 70, renderMax: 100 });
 
-    await EdgeResolver.createEdge(rootToWhatDidYou, whatDidYouToFacilities,
+    await EdgeService.createEdge(rootToWhatDidYou, whatDidYouToFacilities,
       { conditionType: 'match', matchValue: 'Facilities', renderMin: null, renderMax: null });
 
-    await EdgeResolver.createEdge(rootToWhatDidYou, whatDidYouToWebsite,
+    await EdgeService.createEdge(rootToWhatDidYou, whatDidYouToWebsite,
       {
         conditionType: 'match',
         matchValue: 'Website/Mobile app',
@@ -519,20 +519,20 @@ class NodeResolver {
         renderMax: null,
       });
 
-    await EdgeResolver.createEdge(rootToWhatDidYou, whatDidYouToProduct,
+    await EdgeService.createEdge(rootToWhatDidYou, whatDidYouToProduct,
       { conditionType: 'match', matchValue: 'Product/Services', renderMin: null, renderMax: null });
 
-    await EdgeResolver.createEdge(rootToWhatDidYou, whatDidYouToCustomerSupport,
+    await EdgeService.createEdge(rootToWhatDidYou, whatDidYouToCustomerSupport,
       { conditionType: 'match', matchValue: 'Customer Support', renderMin: null, renderMax: null });
 
     // Neutral edges
-    await EdgeResolver.createEdge(rootQuestion, rootToWhatWouldYouLikeToTalkAbout,
+    await EdgeService.createEdge(rootQuestion, rootToWhatWouldYouLikeToTalkAbout,
       { conditionType: 'valueBoundary', matchValue: null, renderMin: 50, renderMax: 70 });
 
-    await EdgeResolver.createEdge(rootToWhatWouldYouLikeToTalkAbout, whatWouldYouLikeToTalkAboutToFacilities,
+    await EdgeService.createEdge(rootToWhatWouldYouLikeToTalkAbout, whatWouldYouLikeToTalkAboutToFacilities,
       { conditionType: 'match', matchValue: 'Facilities', renderMin: null, renderMax: null });
 
-    await EdgeResolver.createEdge(rootToWhatWouldYouLikeToTalkAbout,
+    await EdgeService.createEdge(rootToWhatWouldYouLikeToTalkAbout,
       whatWouldYouLikeToTalkAboutToWebsite,
       {
         conditionType: 'match',
@@ -541,7 +541,7 @@ class NodeResolver {
         renderMax: null,
       });
 
-    await EdgeResolver.createEdge(rootToWhatWouldYouLikeToTalkAbout,
+    await EdgeService.createEdge(rootToWhatWouldYouLikeToTalkAbout,
       whatWouldYouLikeToTalkAboutToProduct, {
         conditionType: 'match',
         matchValue: 'Product/Services',
@@ -549,7 +549,7 @@ class NodeResolver {
         renderMax: null,
       });
 
-    await EdgeResolver.createEdge(rootToWhatWouldYouLikeToTalkAbout,
+    await EdgeService.createEdge(rootToWhatWouldYouLikeToTalkAbout,
       whatWouldYouLikeToTalkAboutToCustomerSupport, {
         conditionType: 'match',
         matchValue: 'Customer Support',
@@ -558,13 +558,13 @@ class NodeResolver {
       });
 
     // Negative edges
-    await EdgeResolver.createEdge(rootQuestion, rootToWeAreSorryToHearThat,
+    await EdgeService.createEdge(rootQuestion, rootToWeAreSorryToHearThat,
       { conditionType: 'valueBoundary', matchValue: null, renderMin: 0, renderMax: 50 });
 
-    await EdgeResolver.createEdge(rootToWeAreSorryToHearThat, weAreSorryToHearThatToFacilities,
+    await EdgeService.createEdge(rootToWeAreSorryToHearThat, weAreSorryToHearThatToFacilities,
       { conditionType: 'match', matchValue: 'Facilities', renderMax: null, renderMin: null });
 
-    await EdgeResolver.createEdge(rootToWeAreSorryToHearThat, weAreSorryToHearThatToWebsite,
+    await EdgeService.createEdge(rootToWeAreSorryToHearThat, weAreSorryToHearThatToWebsite,
       {
         conditionType: 'match',
         matchValue: 'Website/Mobile app',
@@ -572,10 +572,10 @@ class NodeResolver {
         renderMin: null,
       });
 
-    await EdgeResolver.createEdge(rootToWeAreSorryToHearThat, weAreSorryToHearThatToProduct,
+    await EdgeService.createEdge(rootToWeAreSorryToHearThat, weAreSorryToHearThatToProduct,
       { conditionType: 'match', matchValue: 'Product/Services', renderMax: null, renderMin: null });
 
-    await EdgeResolver.createEdge(rootToWeAreSorryToHearThat,
+    await EdgeService.createEdge(rootToWeAreSorryToHearThat,
       weAreSorryToHearThatToCustomerSupport, {
         conditionType: 'match',
         matchValue: 'Customer Support',

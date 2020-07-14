@@ -1,4 +1,4 @@
-import { NodeEntry, PrismaClient } from '@prisma/client';
+import { NodeEntry } from '@prisma/client';
 import { inputObjectType, objectType } from '@nexus/schema';
 
 // eslint-disable-next-line import/no-cycle
@@ -22,26 +22,32 @@ export const NodeEntryType = objectType({
   name: 'NodeEntry',
 
   definition(t) {
-    t.id('id', { nullable: true });
     t.string('creationDate');
-    t.int('depth');
 
+    // TODO: Make non-nullable in schema
+    t.int('depth', {
+      nullable: true,
+      resolve(parent) {
+        if (!parent.depth) return 0;
+
+        return parent.depth;
+      },
+    });
+
+    t.id('id', { nullable: true });
     t.string('relatedEdgeId', { nullable: true });
-    t.string('sessionId');
 
     t.string('relatedNodeId', { nullable: true });
     t.field('relatedNode', {
       type: QuestionNodeType,
       nullable: true,
 
-      resolve(parent: NodeEntry, ctx: any) {
-        const { prisma }: { prisma: PrismaClient } = ctx;
-
+      resolve(parent: NodeEntry, ctx) {
         if (!parent.relatedNodeId) {
           return null;
         }
 
-        const relatedNode = prisma.questionNode.findOne({ where: { id: parent.relatedNodeId } });
+        const relatedNode = ctx.prisma.questionNode.findOne({ where: { id: parent.relatedNodeId } });
         return relatedNode;
       },
     });

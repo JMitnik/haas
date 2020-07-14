@@ -208,7 +208,7 @@ export interface NexusGenRootTypes {
   Edge: prisma.Edge;
   EdgeCondition: { // root type
     conditionType: string; // String!
-    edgeId: string; // String!
+    edgeId?: string | null; // String
     id: number; // Int!
     matchValue?: string | null; // String
     renderMax?: number | null; // Int
@@ -248,6 +248,7 @@ export interface NexusGenRootTypes {
     textbox?: string | null; // String
   }
   PermssionType: { // root type
+    customer?: NexusGenRootTypes['Customer'] | null; // Customer
     description?: string | null; // String
     id: string; // ID!
     name: string; // String!
@@ -400,19 +401,18 @@ export interface NexusGenFieldTypes {
     topPositivePath: NexusGenRootTypes['topPathType'][] | null; // [topPathType!]
   }
   Edge: { // field return type
-    childNode: NexusGenRootTypes['QuestionNode']; // QuestionNode!
+    childNode: NexusGenRootTypes['QuestionNode'] | null; // QuestionNode
     childNodeId: string; // String!
-    conditions: NexusGenRootTypes['EdgeCondition'][]; // [EdgeCondition!]!
+    conditions: NexusGenRootTypes['EdgeCondition'][] | null; // [EdgeCondition!]
     createdAt: string; // String!
-    dialogueId: string; // String!
     id: string; // ID!
-    parentNode: NexusGenRootTypes['QuestionNode']; // QuestionNode!
+    parentNode: NexusGenRootTypes['QuestionNode'] | null; // QuestionNode
     parentNodeId: string; // String!
     updatedAt: string; // String!
   }
   EdgeCondition: { // field return type
     conditionType: string; // String!
-    edgeId: string; // String!
+    edgeId: string | null; // String
     id: number; // Int!
     matchValue: string | null; // String
     renderMax: number | null; // Int
@@ -448,7 +448,7 @@ export interface NexusGenFieldTypes {
     assignTags: NexusGenRootTypes['Dialogue']; // Dialogue!
     createCustomer: NexusGenRootTypes['Customer']; // Customer!
     createDialogue: NexusGenRootTypes['Dialogue']; // Dialogue!
-    createPermission: NexusGenRootTypes['PermssionType']; // PermssionType!
+    createPermission: NexusGenRootTypes['PermssionType'] | null; // PermssionType
     createRole: NexusGenRootTypes['RoleType']; // RoleType!
     createSession: NexusGenRootTypes['Session']; // Session!
     createTag: NexusGenRootTypes['TagType']; // TagType!
@@ -468,12 +468,11 @@ export interface NexusGenFieldTypes {
   }
   NodeEntry: { // field return type
     creationDate: string; // String!
-    depth: number; // Int!
+    depth: number | null; // Int
     id: string | null; // ID
     relatedEdgeId: string | null; // String
     relatedNode: NexusGenRootTypes['QuestionNode'] | null; // QuestionNode
     relatedNodeId: string | null; // String
-    sessionId: string; // String!
     value: NexusGenRootTypes['NodeEntryValue'] | null; // NodeEntryValue
   }
   NodeEntryValue: { // field return type
@@ -484,6 +483,7 @@ export interface NexusGenFieldTypes {
     textbox: string | null; // String
   }
   PermssionType: { // field return type
+    customer: NexusGenRootTypes['Customer'] | null; // Customer
     description: string | null; // String
     id: string; // ID!
     name: string; // String!
@@ -493,10 +493,10 @@ export interface NexusGenFieldTypes {
     customers: NexusGenRootTypes['Customer'][]; // [Customer!]!
     dialogue: NexusGenRootTypes['Dialogue']; // Dialogue!
     dialogues: NexusGenRootTypes['Dialogue'][]; // [Dialogue!]!
-    edge: NexusGenRootTypes['Edge']; // Edge!
+    edge: NexusGenRootTypes['Edge'] | null; // Edge
     interactions: NexusGenRootTypes['InteractionType']; // InteractionType!
     lineChartData: NexusGenRootTypes['lineChartDataType'][]; // [lineChartDataType!]!
-    questionNode: NexusGenRootTypes['QuestionNode']; // QuestionNode!
+    questionNode: NexusGenRootTypes['QuestionNode'] | null; // QuestionNode
     questionNodes: NexusGenRootTypes['QuestionNode'][]; // [QuestionNode!]!
     roles: NexusGenRootTypes['RoleType'][] | null; // [RoleType!]
     roleTable: NexusGenRootTypes['RoleTableType']; // RoleTableType!
@@ -520,14 +520,14 @@ export interface NexusGenFieldTypes {
     overrideLeaf: NexusGenRootTypes['QuestionNode'] | null; // QuestionNode
     overrideLeafId: string | null; // String
     questionDialogue: NexusGenRootTypes['Dialogue'] | null; // Dialogue
-    questionDialogueId: string; // String!
+    questionDialogueId: string | null; // String
     title: string; // String!
     type: string; // String!
   }
   QuestionOption: { // field return type
     id: number; // Int!
     publicValue: string | null; // String
-    questionId: string; // String!
+    questionId: string | null; // String
     value: string; // String!
   }
   RoleTableType: { // field return type
