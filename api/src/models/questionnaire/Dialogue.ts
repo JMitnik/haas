@@ -291,7 +291,8 @@ export const AddDialogueInput = inputObjectType({
     t.string('dialogueSlug');
     t.string('description');
     t.string('publicTitle');
-    t.boolean('isSeed');
+    t.string('contentType');
+    t.string('templateDialogueId', { nullable: true });
     t.field('tags', {
       type: TagsInputType,
     });

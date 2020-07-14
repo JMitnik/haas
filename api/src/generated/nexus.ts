@@ -23,12 +23,13 @@ declare global {
 
 export interface NexusGenInputs {
   AddDialogueInput: { // input type
+    contentType?: string | null; // String
     customerSlug?: string | null; // String
     description?: string | null; // String
     dialogueSlug?: string | null; // String
-    isSeed?: boolean | null; // Boolean
     publicTitle?: string | null; // String
     tags?: NexusGenInputs['TagsInputObjectType'] | null; // TagsInputObjectType
+    templateDialogueId?: string | null; // String
     title?: string | null; // String
   }
   CTALinkInputObjectType: { // input type

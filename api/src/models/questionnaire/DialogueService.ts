@@ -59,7 +59,8 @@ interface DialogueInputProps {
     title: string;
     description: string;
     publicTitle: string;
-    isSeed: boolean;
+    contentType: 'SCRATCH' | 'TEMPLATE' | 'SEED';
+    templateDialogueId?: string;
     tags: any;
   }
 }
@@ -483,8 +484,37 @@ class DialogueService {
     return dialogue;
   };
 
+  static copyDialogue = async (
+    templateId: string,
+    customerId: string,
+    title: string,
+    dialogueSlug: string,
+    description: string,
+    publicTitle: string = '',
+    tags: Array<{id: string}> = []) => {
+    // const templateDialogue = await prisma.dialogue.findOne({
+    //   where: {
+    //     id: templateId,
+    //   },
+    //   include: {
+    //     edges: {
+    //       select: {
+
+    //       }
+    //     }
+
+    //   }
+    // });
+
+    const questionnaire = await DialogueService.initDialogue(
+      customerId, title, dialogueSlug, description, publicTitle, tags,
+    );
+
+    return questionnaire;
+  };
+
   static createDialogue = async (dialogueInputData: DialogueInputProps): Promise<Dialogue | null> => {
-    const { data: { dialogueSlug, customerSlug, title, publicTitle, description, tags = [], isSeed } } = dialogueInputData;
+    const { data: { dialogueSlug, customerSlug, title, publicTitle, description, tags = [], contentType, templateDialogueId } } = dialogueInputData;
 
     let questionnaire = null;
     const dialogueTags = tags?.entries?.length > 0
@@ -498,7 +528,7 @@ class DialogueService {
       return null;
     }
 
-    if (isSeed) {
+    if (contentType === 'SEED') {
       if (customer?.name) {
         return DialogueService.seedQuestionnare(
           customer?.id,
@@ -509,6 +539,11 @@ class DialogueService {
           dialogueTags,
         );
       }
+    }
+
+    if (contentType === 'TEMPLATE' && templateDialogueId) {
+      console.log('template id: ', templateDialogueId);
+      return DialogueService.copyDialogue(templateDialogueId);
     }
 
     questionnaire = await DialogueService.initDialogue(

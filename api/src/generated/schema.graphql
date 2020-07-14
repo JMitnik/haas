@@ -3,12 +3,13 @@
 
 
 input AddDialogueInput {
+  contentType: String
   customerSlug: String
   description: String
   dialogueSlug: String
-  isSeed: Boolean
   publicTitle: String
   tags: TagsInputObjectType
+  templateDialogueId: String
   title: String
 }
 
