@@ -302,6 +302,28 @@ export const AddDialogueInput = inputObjectType({
 export const DialogueMutations = extendType({
   type: 'Mutation',
   definition(t) {
+    t.field('copyDialogue', {
+      type: DialogueType,
+      args: { data: AddDialogueInput },
+      async resolve(parent: any, args: any, ctx: any) {
+        const { data: { dialogueSlug, customerSlug, title, publicTitle, description, tags = [], contentType, templateDialogueId } } = args;
+        const { prisma }: { prisma: PrismaClient } = ctx;
+
+        const questionnaire = null;
+        const dialogueTags = tags?.entries?.length > 0
+          ? tags?.entries?.map((tag: string) => ({ id: tag }))
+          : [];
+
+        const customers = await prisma.customer.findMany({ where: { slug: customerSlug } });
+        const customer = customers?.[0];
+
+        if (!customer) {
+          return null;
+        }
+
+        return DialogueService.copyDialogue(templateDialogueId, customer?.id, title, dialogueSlug, description, publicTitle, dialogueTags);
+      },
+    });
     t.field('createDialogue', {
       type: DialogueType,
       args: { data: AddDialogueInput },

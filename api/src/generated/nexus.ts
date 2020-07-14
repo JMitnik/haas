@@ -469,6 +469,7 @@ export interface NexusGenFieldTypes {
   }
   Mutation: { // field return type
     assignTags: NexusGenRootTypes['Dialogue']; // Dialogue!
+    copyDialogue: NexusGenRootTypes['Dialogue']; // Dialogue!
     createCTA: NexusGenRootTypes['QuestionNode']; // QuestionNode!
     createCustomer: NexusGenRootTypes['Customer']; // Customer!
     createDialogue: NexusGenRootTypes['Dialogue']; // Dialogue!
@@ -668,6 +669,9 @@ export interface NexusGenArgTypes {
     assignTags: { // args
       dialogueId?: string | null; // String
       tags?: NexusGenInputs['TagsInputObjectType'] | null; // TagsInputObjectType
+    }
+    copyDialogue: { // args
+      data?: NexusGenInputs['AddDialogueInput'] | null; // AddDialogueInput
     }
     createCTA: { // args
       customerSlug?: string | null; // String

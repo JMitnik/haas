@@ -1,13 +1,18 @@
 import { Dialogue, DialogueCreateInput,
-  DialogueUpdateInput, PrismaClient, Tag, TagWhereUniqueInput } from '@prisma/client';
+  DialogueUpdateInput, Link, LinkCreateArgs, LinkCreateManyWithoutQuestionNodeInput, LinkCreateWithoutQuestionNodeInput, PrismaClient, QuestionNode, QuestionNodeCreateInput, QuestionOptionCreateManyWithoutQuestionNodeInput, Tag, TagWhereUniqueInput } from '@prisma/client';
 import { isAfter, subDays } from 'date-fns';
 import _ from 'lodash';
 
+import cuid from 'cuid';
 import { DialogueFilterInputType } from './Dialogue';
 import { leafNodes, sliderType } from '../../data/seeds/default-data';
 import NodeResolver from '../question/node-resolver';
 
 const prisma = new PrismaClient();
+
+interface IdMapProps {
+  [details: string] : string;
+}
 interface LeafNodeProps {
   id: string;
   nodeId?: string;
@@ -492,25 +497,116 @@ class DialogueService {
     description: string,
     publicTitle: string = '',
     tags: Array<{id: string}> = []) => {
-    // const templateDialogue = await prisma.dialogue.findOne({
-    //   where: {
-    //     id: templateId,
-    //   },
-    //   include: {
-    //     edges: {
-    //       select: {
+    const templateDialogue = await prisma.dialogue.findOne({
+      where: {
+        id: templateId,
+      },
+      include: {
+        questions: {
+          include: {
+            links: true,
+            options: {
+              select: {
+                publicValue: true,
+                value: true,
+              },
+            },
+            overrideLeaf: {
+              select: {
+                id: true,
+              },
+            },
+            isOverrideLeafOf: {
+              select: {
+                id: true,
+              },
+            },
+          },
+        },
+      },
+    });
 
-    //       }
-    //     }
-
-    //   }
-    // });
-
+    const idMap: IdMapProps = {};
     const questionnaire = await DialogueService.initDialogue(
       customerId, title, dialogueSlug, description, publicTitle, tags,
     );
 
-    return questionnaire;
+    if (templateDialogue?.id) {
+      idMap[templateDialogue?.id] = questionnaire.id;
+    }
+
+    templateDialogue?.questions.forEach((question) => {
+      if (!Object.keys(idMap).find((id) => id === question.id)) {
+        idMap[question.id] = cuid();
+      }
+    });
+
+    const updatedTemplateQuestions = templateDialogue?.questions.map((question) => {
+      const mappedId = idMap[question.id];
+      const mappedDialogueId = question.questionDialogueId && idMap[question.questionDialogueId];
+      const mappedLinks = question.links.map((link) => {
+        const { id, ...linkData } = link;
+        const updateLink = { ...linkData, questionNodeId: idMap[mappedId] };
+        return updateLink;
+      });
+      const mappedOverrideLeafId = question.overrideLeafId && idMap[question.overrideLeafId];
+      const mappedOverrideLeaf = question.overrideLeafId && { id: idMap[question.overrideLeafId] };
+      const mappedIsOverrideLeafOf = question.isOverrideLeafOf.map(({ id }) => ({ id: idMap[id] }));
+      const mappedOptions: QuestionOptionCreateManyWithoutQuestionNodeInput = { create: question.options };
+      const mappedObject = {
+        ...question,
+        id: mappedId,
+        questionDialogueId: mappedDialogueId,
+        links: { create: mappedLinks },
+        options: mappedOptions,
+        overrideLeafId: mappedOverrideLeafId,
+        overrideLeaf: mappedOverrideLeaf,
+        isOverrideLeafOf: mappedIsOverrideLeafOf,
+      };
+      return mappedObject;
+    });
+
+    // Create leaf nodes
+    const leafs = updatedTemplateQuestions?.filter((question) => question.isLeaf);
+    const updatedDialogue = await prisma.dialogue.update({
+      where: {
+        id: questionnaire.id,
+      },
+      data: {
+        questions: {
+          create: leafs?.map((leaf) => ({
+            id: leaf.id,
+            isRoot: false,
+            isLeaf: leaf.isLeaf,
+            title: leaf.title,
+            links: leaf.links,
+            type: leaf.type,
+          })),
+        },
+      },
+      include: {
+        questions: {
+          include: {
+            links: true,
+            options: {
+              select: {
+                publicValue: true,
+                value: true,
+              },
+            },
+          },
+
+        },
+
+      },
+    });
+
+    console.dir(updatedDialogue, { depth: null });
+    // Create questio nodes
+
+    // Create edges
+
+    return templateDialogue;
   };
 
   static createDialogue = async (dialogueInputData: DialogueInputProps): Promise<Dialogue | null> => {
@@ -543,7 +639,7 @@ class DialogueService {
 
     if (contentType === 'TEMPLATE' && templateDialogueId) {
       console.log('template id: ', templateDialogueId);
-      return DialogueService.copyDialogue(templateDialogueId);
+      // return DialogueService.copyDialogue(templateDialogueId);
     }
 
     questionnaire = await DialogueService.initDialogue(
