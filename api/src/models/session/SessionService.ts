@@ -68,12 +68,13 @@ class SessionService {
    */
   static getScoringEntriesFromSessions(
     sessions: SessionWithEntries[],
-  ): (NodeEntryWithTypes | undefined | null)[] {
+  ): (NodeEntryWithTypes | null)[] {
     if (!sessions.length) {
       return [];
     }
 
     const entries = sessions.map((session) => SessionService.getScoringEntryFromSession(session));
+
     return entries;
   }
 
@@ -81,8 +82,8 @@ class SessionService {
    * Get the sole scoring entry a single session.
    * @param session
    */
-  static getScoringEntryFromSession(session: SessionWithEntries): NodeEntryWithTypes | undefined | null {
-    return session.nodeEntries.find((entry) => entry.slideNodeEntry?.value);
+  static getScoringEntryFromSession(session: SessionWithEntries): NodeEntryWithTypes | null {
+    return session.nodeEntries.find((entry) => entry.slideNodeEntry?.value) || null;
   }
 
   /**

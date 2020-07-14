@@ -71,7 +71,7 @@ type Dialogue {
   rootQuestion: QuestionNode!
   sessions: [Session!]!
   slug: String!
-  statistics: DialogueStatistics!
+  statistics: DialogueStatistics
   tags: [TagType!]
   title: String!
   updatedAt: String
@@ -82,7 +82,7 @@ input DialogueFilterInputType {
 }
 
 type DialogueStatistics {
-  lineChartData: [lineChartDataType!]
+  history: [lineChartDataType!]
   topNegativePath: [topPathType!]
   topPositivePath: [topPathType!]
 }
@@ -171,6 +171,7 @@ input LeafNodeInput {
 }
 
 type lineChartDataType {
+  entryId: String
   x: String
   y: Int
 }
@@ -359,6 +360,7 @@ type RoleType {
   name: String!
   nrPermissions: Int
   permissions: [PermssionType!]
+  roleId: String
 }
 
 type Session {
@@ -423,8 +425,8 @@ input TopicDataEntry {
 }
 
 type topPathType {
-  answer: String!
-  quantity: Int!
+  answer: String
+  quantity: Int
 }
 
 input TriggerConditionInputType {
@@ -515,5 +517,5 @@ type UserType {
   id: ID!
   lastName: String
   phone: String
-  role: RoleType!
+  role: RoleType
 }

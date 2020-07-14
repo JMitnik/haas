@@ -65,9 +65,21 @@ interface DialogueInputProps {
   }
 }
 
+interface PathProps {
+  answer?: string | null;
+  quantity?: number | null;
+}
+
+interface StatisticsProps {
+  history: HistoryDataProps[];
+  topNegativePath: PathProps[];
+  topPositivePath: PathProps[];
+}
+
 interface HistoryDataProps {
-  x?: string;
-  y?: number;
+  x?: string | null;
+  y?: number | null;
+  entryId?: string | null;
 }
 
 class DialogueService {
@@ -165,10 +177,10 @@ class DialogueService {
   static getTopPaths = (groupedJoined: any) => {
     const countedPaths = _.countBy(groupedJoined, 'textValue');
     const o = _.sortBy(_.toPairs(countedPaths), 1).reverse();
-    const countedPathsObjects = o.map((array) => ({ answer: array[0], quantity: array[1] }));
+    const countedPathsObjects = o.map((array) => ({ answer: array[0] || null, quantity: array[1] || null }));
     const topPath = countedPathsObjects.length > 3
       ? countedPathsObjects.slice(0, 3) : countedPathsObjects;
-    return topPath;
+    return topPath || [];
   };
 
   static getNextLineData = async (dialogueId: string, numberOfDaysBack: number, limit: number, offset: number) => {
@@ -191,32 +203,32 @@ class DialogueService {
     return values;
   };
 
-  static getStatistics = async (dialogueId: string, numberOfDaysBack: number) => {
+  static getStatistics = async (dialogueId: string, numberOfDaysBack: number): Promise<StatisticsProps> => {
     const startDate = subDays(new Date(), numberOfDaysBack);
     const sessions = await SessionService.getDialogueSessions(dialogueId, { startDate });
 
     if (!sessions) {
-      return null;
+      throw new Error('No sessions present');
     }
 
-    const scoreEntries = await SessionService.getScoringEntriesFromSessions(sessions);
+    const scoreEntries = SessionService.getScoringEntriesFromSessions(sessions);
 
     // Then dresses it up as X/Y data for the lineChart
-    const scoreHistoryData:  = scoreEntries?.map((entry) => ({
-      x: entry?.creationDate.toUTCString(),
-      y: entry?.slideNodeEntry?.value,
-      id: entry?.id,
-    }));
+    const history: HistoryDataProps[] = scoreEntries?.map((entry) => ({
+      x: entry?.creationDate.toUTCString() || null,
+      y: entry?.slideNodeEntry?.value || null,
+      entryId: entry?.id || null,
+    })) || [];
 
     const nodeEntryTextValues = await SessionService.getTextEntriesFromSessions(sessions);
 
-    const textAndScoreEntries = _.merge(scoreHistoryData, nodeEntryTextValues);
+    const textAndScoreEntries = _.merge(history, nodeEntryTextValues);
     const isPositiveEntries = _.groupBy(textAndScoreEntries, (entry) => entry.y && entry.y > 50);
 
-    const topNegativePath = DialogueService.getTopPaths(isPositiveEntries.false);
-    const topPositivePath = DialogueService.getTopPaths(isPositiveEntries.true);
+    const topNegativePath = DialogueService.getTopPaths(isPositiveEntries.false) || [];
+    const topPositivePath = DialogueService.getTopPaths(isPositiveEntries.true) || [];
 
-    return { scoreHistoryData, topNegativePath, topPositivePath };
+    return { history, topNegativePath, topPositivePath };
   };
 
   static deleteDialogue = async (dialogueId: string) => {

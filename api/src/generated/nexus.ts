@@ -201,7 +201,7 @@ export interface NexusGenRootTypes {
   CustomerSettings: prisma.CustomerSettings;
   Dialogue: prisma.Dialogue;
   DialogueStatistics: { // root type
-    lineChartData?: NexusGenRootTypes['lineChartDataType'][] | null; // [lineChartDataType!]
+    history?: NexusGenRootTypes['lineChartDataType'][] | null; // [lineChartDataType!]
     topNegativePath?: NexusGenRootTypes['topPathType'][] | null; // [topPathType!]
     topPositivePath?: NexusGenRootTypes['topPathType'][] | null; // [topPathType!]
   }
@@ -267,6 +267,7 @@ export interface NexusGenRootTypes {
     id: string; // ID!
     name: string; // String!
     nrPermissions?: number | null; // Int
+    roleId?: string | null; // String
   }
   Session: prisma.Session;
   SortFilterObject: { // root type
@@ -298,12 +299,13 @@ export interface NexusGenRootTypes {
     phone?: string | null; // String
   }
   lineChartDataType: { // root type
+    entryId?: string | null; // String
     x?: string | null; // String
     y?: number | null; // Int
   }
   topPathType: { // root type
-    answer: string; // String!
-    quantity: number; // Int!
+    answer?: string | null; // String
+    quantity?: number | null; // Int
   }
   String: string;
   Int: number;
@@ -390,13 +392,13 @@ export interface NexusGenFieldTypes {
     rootQuestion: NexusGenRootTypes['QuestionNode']; // QuestionNode!
     sessions: NexusGenRootTypes['Session'][]; // [Session!]!
     slug: string; // String!
-    statistics: NexusGenRootTypes['DialogueStatistics']; // DialogueStatistics!
+    statistics: NexusGenRootTypes['DialogueStatistics'] | null; // DialogueStatistics
     tags: NexusGenRootTypes['TagType'][] | null; // [TagType!]
     title: string; // String!
     updatedAt: string | null; // String
   }
   DialogueStatistics: { // field return type
-    lineChartData: NexusGenRootTypes['lineChartDataType'][] | null; // [lineChartDataType!]
+    history: NexusGenRootTypes['lineChartDataType'][] | null; // [lineChartDataType!]
     topNegativePath: NexusGenRootTypes['topPathType'][] | null; // [topPathType!]
     topPositivePath: NexusGenRootTypes['topPathType'][] | null; // [topPathType!]
   }
@@ -543,6 +545,7 @@ export interface NexusGenFieldTypes {
     name: string; // String!
     nrPermissions: number | null; // Int
     permissions: NexusGenRootTypes['PermssionType'][] | null; // [PermssionType!]
+    roleId: string | null; // String
   }
   Session: { // field return type
     createdAt: string; // String!
@@ -598,15 +601,16 @@ export interface NexusGenFieldTypes {
     id: string; // ID!
     lastName: string | null; // String
     phone: string | null; // String
-    role: NexusGenRootTypes['RoleType']; // RoleType!
+    role: NexusGenRootTypes['RoleType'] | null; // RoleType
   }
   lineChartDataType: { // field return type
+    entryId: string | null; // String
     x: string | null; // String
     y: number | null; // Int
   }
   topPathType: { // field return type
-    answer: string; // String!
-    quantity: number; // Int!
+    answer: string | null; // String
+    quantity: number | null; // Int
   }
 }
 
