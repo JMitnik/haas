@@ -15,10 +15,6 @@ type SocialShareNodeProps = GenericNodeProps;
 const SocialShareNode = ({ node }: SocialShareNodeProps) => {
   useDialogueFinish();
 
-  console.log(getSnapshot(node.links));
-  // TODO: Create Twitter, Facebook, Instagram and LinkedIn links in seed for SOCIAL_SHARE CTAs
-  // (change SOCIAL_SHARE to LINK and each get own type e.g. and other get CUSTOM as type )
-
   return (
     <SocialShareNodeContainer>
       <NodeTitle>{node.title}</NodeTitle>
