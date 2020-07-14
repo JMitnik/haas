@@ -1,8 +1,8 @@
-import { PrismaClient, User } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import { extendType, inputObjectType, objectType } from '@nexus/schema';
 
-import { FilterInput } from '../session/Session';
 import { PaginationProps } from '../../types/generic';
+import { PaginationWhereInput } from '../general/Pagination';
 import { RoleType } from '../role/Role';
 import UserService from './UserService';
 
@@ -57,16 +57,15 @@ export const UserQueries = extendType({
   definition(t) {
     t.field('userTable', {
       type: UserTable,
-      args: { customerSlug: 'String', filter: FilterInput },
+      args: { customerSlug: 'String', filter: PaginationWhereInput },
       async resolve(parent, args, ctx) {
-        const { prisma }: { prisma: PrismaClient } = ctx;
         const { pageIndex, offset, limit, searchTerm, orderBy }: PaginationProps = args.filter;
 
         if (args.filter) {
           return UserService.paginatedUsers(args.customerSlug, pageIndex, offset, limit, orderBy?.[0], searchTerm);
         }
 
-        const users = await prisma.user.findMany({ where: { Customer: {
+        const users = await ctx.prisma.user.findMany({ where: { Customer: {
           slug: args.customerSlug,
         } } });
         const totalPages = Math.ceil(users.length / (limit || 1));

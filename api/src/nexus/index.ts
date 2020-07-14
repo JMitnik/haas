@@ -1,4 +1,5 @@
 import * as NodeEntryAPI from '../models/node-entry/NodeEntry';
+import * as PaginationAPI from '../models/general/Pagination';
 import customerNexus from '../models/customer/Customer';
 import customerSettingsNexus from '../models/settings/CustomerSettings';
 import dialogueNexus from '../models/questionnaire/Dialogue';
@@ -21,7 +22,8 @@ const nexus = [
   ...customerNexus,
   ...customerSettingsNexus,
   ...dialogueNexus,
-  // ...Array(NodeEntryAPI),
+  ...Array(PaginationAPI),
+  ...Array(NodeEntryAPI),
   ...sessionNexus,
   ...questionNodeNexus,
   ...topicBuilderNexus,

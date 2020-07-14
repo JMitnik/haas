@@ -1,14 +1,11 @@
 import { ChoiceNodeEntry,
   LinkNodeEntry, NodeEntry, NodeEntryCreateWithoutSessionInput, NodeEntryWhereInput,
-  PrismaClient, QuestionNode, RegistrationNodeEntry,
-  SessionWhereInput, SliderNodeEntry, TextboxNodeEntry } from '@prisma/client';
+  QuestionNode, RegistrationNodeEntry,
+  SliderNodeEntry, TextboxNodeEntry } from '@prisma/client';
 import _ from 'lodash';
 
 import { OrderByProps } from '../../types/generic';
-
-const prisma = new PrismaClient({
-  log: ['query'],
-});
+import prisma from '../../prisma';
 
 export interface NodeEntryWithTypes extends NodeEntry {
   session?: {
@@ -148,6 +145,30 @@ class NodeEntryService {
     throw new Error(`Unable to find node entry type ${nodeEntry.relatedNode?.type}.`);
   };
 
+  static constructFindWhereTextNodeEntryFragment(text: string): NodeEntryWhereInput {
+    // TODO: Figure out what to do with the texts
+    return {
+      OR: [{
+        textboxNodeEntry: {
+          value: {
+            contains: text,
+          },
+        },
+        choiceNodeEntry: {
+          value: {
+            contains: text,
+          },
+        },
+        // Ensure we can make this better searchable (JSON?)
+        registrationNodeEntry: {
+          value: {
+            equals: text,
+          },
+        },
+      }],
+    };
+  }
+
   // Slice node entries to match amount of nodes displayed in front-end
   // If offset + limit is greater than amount visible in front-end
   // => slice until end of the array
@@ -159,81 +180,6 @@ class NodeEntryService {
   ) => ((offset + limit) < entries.length
     ? entries.slice(offset, (pageIndex + 1) * limit)
     : entries.slice(offset, entries.length));
-
-  // TODO: Move to SessionService
-  static getCurrentInteractionSessions = async (
-    dialogueId: string,
-    offset?: number,
-    limit?: number,
-    pageIndex?: number,
-    orderBy?: any,
-    dateRange?: SessionWhereInput[] | [],
-    searchTerm?: string,
-  ) => {
-    let needPageReset = false;
-    let flatSearchTermFilteredEntries;
-
-    // Find all node entries within specified date range
-    const nodeEntries = await NodeEntryService.getEntries({
-      session: {
-        dialogueId,
-        AND: dateRange,
-      },
-    });
-
-    const groupedNodeEntries = _.groupBy(nodeEntries, (entry) => entry.sessionId);
-    let totalPages = Math.ceil(Object.keys(groupedNodeEntries).length / (limit || 1));
-
-    // If search term, filter out grouped representations which don't have
-    // at least one entry which fits criteria and calculate new # of pages
-    if (searchTerm) {
-      // Filter every grouped representation by trying to finding at least one node entry which matches search term
-      const searchTermFilteredEntries = _.filter(
-        groupedNodeEntries, (entries) => entries.filter(
-          (entry) => NodeEntryService.isNodeEntryMatchText(entry, searchTerm),
-        ).length > 0,
-      );
-      totalPages = Math.ceil(searchTermFilteredEntries.length / (limit || 1));
-
-      // If due to filters option current queried page doesn't exist (e.g. page 3/2),
-      // query first subset (offset = 0 -> limit) and set pageIndex to 0
-      if (pageIndex && pageIndex + 1 > totalPages) {
-        offset = 0;
-        needPageReset = true;
-      }
-      flatSearchTermFilteredEntries = _.flatten(searchTermFilteredEntries);
-    }
-    const finalNodeEntryScore = flatSearchTermFilteredEntries || nodeEntries;
-    const filteredNodeEntriesScore = _.filter(
-      finalNodeEntryScore, (nodeEntryScore) => nodeEntryScore.depth === 0,
-    );
-    const orderedNodeEntriesScore = NodeEntryService.sortEntries(
-      filteredNodeEntriesScore, orderBy,
-    );
-    const pageNodeEntries = NodeEntryService.sliceNodeEntries(
-      orderedNodeEntriesScore, (offset || 0), (limit || 0), (pageIndex || 0),
-    );
-
-    const pageSessions = pageNodeEntries.map((scoreEntry) => {
-      if (!scoreEntry.sessionId) {
-        return {
-          id: 'N/A', paths: 0, score: 0, createdAt: 'N/A', nodeEntries: [],
-        };
-      }
-      // Use the grouped representation with matching session id to map data
-      const entries = groupedNodeEntries[scoreEntry.sessionId];
-      const sortedEntries = _.orderBy(entries, (entry) => entry.depth, 'asc');
-      const { sessionId, session } = entries[0];
-      const paths = entries.length;
-      const score = entries.find((entry) => entry.relatedNode?.type === 'SLIDER')?.slideNodeEntry?.value;
-
-      return {
-        id: sessionId, paths, score, createdAt: session?.createdAt, nodeEntries: sortedEntries,
-      };
-    });
-
-    return { pageSessions, totalPages, resetPages: needPageReset };
-  };
 }
 
 export default NodeEntryService;

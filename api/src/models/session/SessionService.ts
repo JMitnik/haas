@@ -157,9 +157,17 @@ class SessionService {
       include: {
         sessions: {
           where: {
-            createdAt: paginationArgs?.startDate && {
-              lte: paginationArgs?.startDate,
-            },
+            AND: [{
+              nodeEntries: {
+                some: paginationArgs?.searchTerm
+                  ? NodeEntryService.constructFindWhereTextNodeEntryFragment(paginationArgs?.searchTerm)
+                  : undefined,
+              },
+            }, {
+              createdAt: paginationArgs?.startDate && {
+                lte: paginationArgs?.startDate,
+              },
+            }],
           },
           orderBy: {
             createdAt: 'desc',
@@ -176,6 +184,9 @@ class SessionService {
                 textboxNodeEntry: true,
                 relatedNode: true,
               },
+              orderBy: {
+                depth: 'asc',
+              },
             },
           },
         },
@@ -184,6 +195,48 @@ class SessionService {
 
     return dialougeWithSessionWithEntries?.sessions || null;
   }
+
+  static getSessionConnection = async (
+    dialogueId: string,
+    paginationArgs?: PaginationProps,
+  ) => {
+    // TODO: Do we need this?
+    const needPageReset = false;
+
+    const sessions = await SessionService.getDialogueSessions(dialogueId, paginationArgs);
+
+    if (!sessions?.length) {
+      return null;
+    }
+
+    const totalPages = paginationArgs?.limit ? Math.ceil(sessions.length / paginationArgs?.limit) : 1;
+
+    // If search term, filter out grouped representations which don't have
+    // at least one entry which fits criteria and calculate new # of pages
+
+    // Set offset to 0
+    // If due to filters option current queried page doesn't exist (e.g. page 3/2),
+    // query first subset (offset = 0 -> limit) and set pageIndex to 0
+    // TODO: Test if necessary
+    // if (pageIndex && pageIndex + 1 > totalPages) {
+    //   offset = 0;
+    //   needPageReset = true;
+    // }
+
+    // Slice / Select X entries
+    // TODO: Test if necessary
+    // const pageNodeEntries = NodeEntryService.sliceNodeEntries(
+    //   orderedNodeEntriesScore, (offset || 0), (limit || 0), (pageIndex || 0),
+    // );
+
+    const sessionsWithScores = sessions.map((session) => ({
+      ...session,
+      score: SessionService.getScoringEntryFromSession(session)?.slideNodeEntry?.value,
+      paths: session.nodeEntries.length,
+    }));
+
+    return { sessions: sessionsWithScores, totalPages, resetPages: needPageReset };
+  };
 
   static async getSessionEntries(session: Session): Promise<NodeEntry[] | []> {
     const sessionWithEntries = await prisma.session.findOne({

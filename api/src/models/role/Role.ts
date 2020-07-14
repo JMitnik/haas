@@ -4,8 +4,8 @@ import { extendType, inputObjectType, objectType } from '@nexus/schema';
 // eslint-disable-next-line import/no-cycle
 import { CustomerType } from '../customer/Customer';
 // eslint-disable-next-line import/no-cycle
-import { FilterInput } from '../session/Session';
 import { PaginationProps } from '../../types/generic';
+import { PaginationWhereInput } from '../general/Pagination';
 import { PermissionType } from '../permission/Permission';
 import RoleService from './RoleService';
 
@@ -106,7 +106,7 @@ export const RoleQueries = extendType({
       type: RoleTableType,
       args: {
         customerId: 'String',
-        filter: FilterInput,
+        filter: PaginationWhereInput,
       },
       async resolve(parent: any, args: any, ctx: any) {
         const { prisma }: { prisma: PrismaClient } = ctx;

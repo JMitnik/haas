@@ -24,6 +24,14 @@ type ColourSettings {
   secondary: String
 }
 
+interface ConnectionInterface {
+  endDate: String
+  pageIndex: Int!
+  pages: Int!
+  pageSize: Int!
+  startDate: String
+}
+
 type Customer {
   dialogue(where: DialogueWhereUniqueInput): Dialogue
   dialogues(filter: DialogueFilterInputType): [Dialogue!]
@@ -64,11 +72,11 @@ type Dialogue {
   edges: [Edge!]!
   id: ID!
   interactionFeedItems: [Session!]
-  interactions(filter: FilterInput): InteractionType!
   leafs: [QuestionNode!]!
   publicTitle: String
   questions(where: QuestionNodeWhereInput): [QuestionNode!]!
   rootQuestion: QuestionNode!
+  sessionConnection(filter: PaginationWhereInput): SessionConnection!
   sessions: [Session!]!
   slug: String!
   statistics: DialogueStatistics
@@ -124,16 +132,6 @@ input EdgeNodeInput {
   title: String
 }
 
-input FilterInput {
-  endDate: String
-  limit: Int
-  offset: Int
-  orderBy: [SortFilterInputObject!]
-  pageIndex: Int
-  searchTerm: String
-  startDate: String
-}
-
 type FontSettings {
   id: ID!
 }
@@ -152,16 +150,6 @@ type InteractionSessionType {
   nodeEntries: [NodeEntry!]!
   paths: Int!
   score: Float
-}
-
-type InteractionType {
-  endDate: String
-  orderBy: [SortFilterObject!]!
-  pageIndex: Int!
-  pages: Int!
-  pageSize: Int!
-  sessions: [InteractionSessionType!]!
-  startDate: String
 }
 
 input LeafNodeInput {
@@ -236,6 +224,21 @@ input OptionInput {
   value: String
 }
 
+input PaginationSortInput {
+  desc: Boolean
+  id: String
+}
+
+input PaginationWhereInput {
+  endDate: String
+  limit: Int
+  offset: Int
+  orderBy: [PaginationSortInput!]
+  pageIndex: Int
+  search: String
+  startDate: String
+}
+
 input PermissionIdsInput {
   ids: [String!]
 }
@@ -259,21 +262,20 @@ type Query {
   dialogue(where: DialogueWhereUniqueInput): Dialogue!
   dialogues(customerId: ID, filter: DialogueFilterInputType): [Dialogue!]!
   edge(id: String): Edge
-  interactions(filter: FilterInput, where: SessionWhereUniqueInput): InteractionType!
   lineChartData(dialogueId: String, limit: Int, numberOfDaysBack: Int, offset: Int): [lineChartDataType!]!
   questionNode(where: QuestionNodeWhereUniqueInput): QuestionNode
   questionNodes: [QuestionNode!]!
   roles(customerSlug: String): [RoleType!]
-  roleTable(customerId: String, filter: FilterInput): RoleTableType!
+  roleTable(customerId: String, filter: PaginationWhereInput): RoleTableType!
   session(where: SessionWhereUniqueInput): Session
   sessions(where: SessionWhereUniqueInput): [Session!]!
   tags(customerSlug: String, dialogueId: String): [TagType!]!
   trigger(triggerId: String): TriggerType!
-  triggers(customerSlug: String, dialogueId: String, filter: FilterInput, userId: String): [TriggerType!]!
-  triggerTable(customerSlug: String, filter: FilterInput): TriggerTableType!
+  triggers(customerSlug: String, dialogueId: String, filter: PaginationWhereInput, userId: String): [TriggerType!]!
+  triggerTable(customerSlug: String, filter: PaginationWhereInput): TriggerTableType!
   user(userId: String): UserType!
   users(customerSlug: String): [UserType!]!
-  userTable(customerSlug: String, filter: FilterInput): UserTable!
+  userTable(customerSlug: String, filter: PaginationWhereInput): UserTable!
 }
 
 input QuestionConditionInput {
@@ -371,6 +373,15 @@ type Session {
   score: Float!
 }
 
+type SessionConnection implements ConnectionInterface {
+  endDate: String
+  pageIndex: Int!
+  pages: Int!
+  pageSize: Int!
+  sessions: [Session!]!
+  startDate: String
+}
+
 """Input for session"""
 input SessionInput {
   dialogueId: String!
@@ -385,16 +396,6 @@ input SessionWhereUniqueInput {
 """Input type for a slider node"""
 input SliderNodeEntryInput {
   value: Int
-}
-
-input SortFilterInputObject {
-  desc: Boolean
-  id: String
-}
-
-type SortFilterObject {
-  desc: Boolean!
-  id: String!
 }
 
 input TagsInputObjectType {
@@ -469,7 +470,6 @@ enum TriggerMediumEnum {
 
 type TriggerTableType {
   endDate: String
-  orderBy: [SortFilterObject!]!
   pageIndex: Int!
   pageSize: Int!
   startDate: String

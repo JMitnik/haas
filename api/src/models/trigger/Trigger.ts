@@ -6,8 +6,8 @@ import { PrismaClient,
 import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
 import _ from 'lodash';
 
-import { FilterInput, SortFilterObject } from '../session/Session';
 import { PaginationProps } from '../../types/generic';
+import { PaginationSortInput, PaginationWhereInput } from '../general/Pagination';
 import { QuestionNodeType } from '../question/QuestionNode';
 import { UserType } from '../users/User';
 import TriggerService from './TriggerService';
@@ -241,8 +241,6 @@ export const TriggerTableType = objectType({
     t.string('startDate', { nullable: true });
     t.string('endDate', { nullable: true });
 
-    t.list.field('orderBy', { type: SortFilterObject });
-
     t.list.field('triggers', { type: TriggerType });
   },
 });
@@ -254,7 +252,7 @@ const TriggerQueries = extendType({
       type: TriggerTableType,
       args: {
         customerSlug: 'String',
-        filter: FilterInput,
+        filter: PaginationWhereInput,
       },
       async resolve(parent: any, args: any, ctx: any) {
         const { prisma }: { prisma: PrismaClient } = ctx;
@@ -287,7 +285,7 @@ const TriggerQueries = extendType({
         customerSlug: 'String',
         dialogueId: 'String',
         userId: 'String',
-        filter: FilterInput,
+        filter: PaginationWhereInput,
       },
       resolve(parent: any, args: any, ctx: any) {
         const { prisma }: { prisma: PrismaClient } = ctx;

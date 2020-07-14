@@ -1,5 +1,5 @@
 
-import { Dialogue, DialogueWhereInput, PrismaClient } from '@prisma/client';
+import { Dialogue } from '@prisma/client';
 import { extendType, inputObjectType, objectType } from '@nexus/schema';
 
 // eslint-disable-next-line import/no-cycle
@@ -9,13 +9,14 @@ import { EdgeType } from '../edge/Edge';
 // eslint-disable-next-line import/no-cycle
 import { QuestionNodeType, QuestionNodeWhereInput } from '../question/QuestionNode';
 // eslint-disable-next-line import/no-cycle
-import { FilterInput, InteractionType, SessionType } from '../session/Session';
+import { SessionConnection, SessionType } from '../session/Session';
 // eslint-disable-next-line import/no-cycle
 import { TagType, TagsInputType } from '../tag/Tag';
 // eslint-disable-next-line import/no-cycle
 import DialogueService from './DialogueService';
 import NodeEntryService from '../node-entry/NodeEntryService';
 // eslint-disable-next-line import/no-cycle
+import { PaginationWhereInput } from '../general/Pagination';
 import SessionService from '../session/SessionService';
 
 export const TEXT_NODES = [
@@ -116,47 +117,39 @@ export const DialogueType = objectType({
       },
     });
 
-    t.field('interactions', {
-      type: InteractionType,
-      args: { filter: FilterInput },
+    t.field('sessionConnection', {
+      type: SessionConnection,
+      args: { filter: PaginationWhereInput },
       async resolve(parent, args) {
-        if (!parent.id) {
-          return null;
-        }
+        if (!parent.id) return null;
 
-        const { pageIndex, startDate, endDate, offset, limit, searchTerm } = args?.filter;
-        const dateRange = SessionService.constructDateRangeWhereInput(startDate, endDate);
-        const orderBy = args.filter.orderBy ? Object.assign({}, ...args.filter.orderBy) : null;
-
-        const { pageSessions, totalPages, resetPages } = await NodeEntryService.getCurrentInteractionSessions(
+        const sessionConnection = await SessionService.getSessionConnection(
           parent.id,
-          offset,
-          limit,
-          pageIndex,
-          orderBy,
-          dateRange,
-          searchTerm,
+          args,
         );
 
-        const sessionsWithIndex = pageSessions.map((session, index) => ({ ...session, index }));
+        if (!sessionConnection) return null;
 
         return {
-          sessions: sessionsWithIndex,
-          pages: !resetPages ? totalPages : 1,
-          offset,
-          limit,
-          pageIndex: !resetPages ? pageIndex : 0,
-          startDate,
-          endDate,
-          orderBy: args.filter.orderBy || [],
+
         };
+
+        // return { sessionConnection.sessions, ...args,
+        //   // pages: args.pages
+        //   // offset,
+        //   // limit,
+        //   // pageIndex: !resetPages ? pageIndex : 0,
+        //   // startDate,
+        //   // endDate,
+        //   // orderBy: args.filter.orderBy || [],
+        // };
       },
     });
 
     t.list.field('tags', {
       type: TagType,
       nullable: true,
-      async resolve(parent, args, ctx) {
+      async resolve(parent, ctx) {
         if (!parent.id) {
           return null;
         }
@@ -190,7 +183,7 @@ export const DialogueType = objectType({
     t.field('customer', {
       type: CustomerType,
 
-      resolve(parent, args, ctx) {
+      resolve(parent, ctx) {
         const customer = ctx.prisma.customer.findOne({
           where: {
             id: parent.customerId,
@@ -203,7 +196,7 @@ export const DialogueType = objectType({
 
     t.field('rootQuestion', {
       type: QuestionNodeType,
-      async resolve(parent, args, ctx) {
+      async resolve(ctx) {
         const rootQuestions = await ctx.prisma.questionNode.findMany({
           where: {
             isRoot: true,
@@ -216,7 +209,7 @@ export const DialogueType = objectType({
 
     t.list.field('edges', {
       type: EdgeType,
-      async resolve(parent: Dialogue, args, ctx) {
+      async resolve(parent: Dialogue, ctx) {
         const dialogue = await ctx.prisma.dialogue.findOne({
           where: {
             id: parent.id,
@@ -237,7 +230,7 @@ export const DialogueType = objectType({
       args: {
         where: QuestionNodeWhereInput,
       },
-      resolve(parent: Dialogue, args, ctx) {
+      resolve(parent: Dialogue, ctx) {
         const questions = ctx.prisma.questionNode.findMany({
           where: {
             AND: [
@@ -256,7 +249,7 @@ export const DialogueType = objectType({
 
     t.list.field('sessions', {
       type: SessionType,
-      async resolve(parent: Dialogue, args, ctx) {
+      async resolve(parent: Dialogue, ctx) {
         const dialogueWithSessions = await ctx.prisma.dialogue.findOne({
           where: { id: parent.id },
           include: { sessions: true },
@@ -268,7 +261,7 @@ export const DialogueType = objectType({
 
     t.list.field('leafs', {
       type: QuestionNodeType,
-      resolve(parent: Dialogue, args, ctx) {
+      resolve(parent: Dialogue, ctx) {
         const leafs = ctx.prisma.questionNode.findMany({
           where: {
             AND: [
@@ -313,7 +306,7 @@ export const DialogueMutations = extendType({
     t.field('createDialogue', {
       type: DialogueType,
       args: { data: AddDialogueInput },
-      resolve(parent, args) {
+      resolve(args) {
         return DialogueService.createDialogue(args);
       },
     });
@@ -327,7 +320,7 @@ export const DialogueMutations = extendType({
         publicTitle: 'String',
         tags: TagsInputType,
       },
-      resolve(parent, args) {
+      resolve(args) {
         return DialogueService.editDialogue(args);
       },
     });
@@ -337,7 +330,7 @@ export const DialogueMutations = extendType({
       args: {
         where: DialogueWhereUniqueInput,
       },
-      resolve(parent, args) {
+      resolve(args) {
         return DialogueService.deleteDialogue(args.where.id);
       },
     });
@@ -362,7 +355,7 @@ export const DialoguesOfCustomerQuery = extendType({
         limit: 'Int',
         offset: 'Int',
       },
-      resolve(parent, args) {
+      resolve(args) {
         return DialogueService.getNextLineData(
           args.dialogueId,
           args.numberOfDaysBack,
@@ -377,7 +370,7 @@ export const DialoguesOfCustomerQuery = extendType({
       args: {
         where: DialogueWhereUniqueInput,
       },
-      async resolve(parent, args, ctx) {
+      async resolve(args, ctx) {
         if (args.where.slug) {
           return {};
         }

@@ -52,26 +52,6 @@ export const SessionWhereUniqueInput = inputObjectType({
   },
 });
 
-// TODO: Can we make this a generic type
-export const SortFilterInputObject = inputObjectType({
-  name: 'SortFilterInputObject',
-
-  definition(t) {
-    t.string('id', { required: false });
-    t.boolean('desc', { required: false });
-  },
-});
-
-// TODO: Can we make this a generic type
-export const SortFilterObject = objectType({
-  name: 'SortFilterObject',
-
-  definition(t) {
-    t.string('id');
-    t.boolean('desc');
-  },
-});
-
 // TODO: Can we fold Interactions and Sessions together?
 export const InteractionSessionType = objectType({
   name: 'InteractionSessionType',
@@ -88,38 +68,19 @@ export const InteractionSessionType = objectType({
   },
 });
 
-// TODO: Can we fold Interactions and Sessions together?
-export const InteractionType = objectType({
-  name: 'InteractionType',
+export const SessionConnection = objectType({
+  name: 'SessionConnection',
 
   definition(t) {
-    t.int('pages');
-    t.int('pageIndex');
-    t.int('pageSize');
-    t.string('startDate', { nullable: true });
-    t.string('endDate', { nullable: true });
+    t.implements('ConnectionInterface');
 
-    t.list.field('sessions', { type: InteractionSessionType });
+    // t.int('pages');
+    // t.int('pageIndex');
+    // t.int('pageSize');
+    // t.string('startDate', { nullable: true });
+    // t.string('endDate', { nullable: true });
 
-    t.list.field('orderBy', { type: SortFilterObject });
-  },
-});
-
-export const FilterInput = inputObjectType({
-  name: 'FilterInput',
-
-  definition(t) {
-    t.string('startDate', { required: false });
-    t.string('endDate', { required: false });
-    t.string('searchTerm', { required: false });
-    t.int('offset');
-    t.int('limit');
-    t.int('pageIndex');
-
-    t.list.field('orderBy', {
-      type: SortFilterInputObject,
-      required: false,
-    });
+    t.list.field('sessions', { type: SessionType });
   },
 });
 
@@ -164,42 +125,6 @@ export const SessionQuery = extendType({
         return session;
       },
     });
-
-    t.field('interactions', {
-      type: InteractionType,
-      args: {
-        where: SessionWhereUniqueInput,
-        filter: FilterInput,
-      },
-      async resolve(parent, args) {
-        const { pageIndex, offset, limit, startDate, endDate, searchTerm } = args.filter;
-        const dateRange = SessionService.constructDateRangeWhereInput(startDate, endDate);
-        const orderBy = args.filter.orderBy ? Object.assign({}, ...args.filter.orderBy) : null;
-
-        const { pageSessions, totalPages, resetPages } = await NodeEntryService.getCurrentInteractionSessions(
-          args.where.dialogueId,
-          offset,
-          limit,
-          pageIndex,
-          orderBy,
-          dateRange,
-          searchTerm,
-        );
-
-        const sessionsWithIndex = pageSessions.map((session, index) => ({ ...session, index }));
-
-        return {
-          sessions: sessionsWithIndex,
-          pages: !resetPages ? totalPages : 1,
-          offset,
-          limit,
-          pageIndex: !resetPages ? pageIndex : 0,
-          startDate,
-          endDate,
-          orderBy: args.filter.orderBy || [],
-        };
-      },
-    });
   },
 });
 
@@ -233,11 +158,8 @@ export const CreateSessionMutation = mutationField('createSession', {
 });
 
 export default [
-  SortFilterObject,
-  SortFilterInputObject,
   InteractionSessionType,
-  FilterInput,
-  InteractionType,
+  SessionConnection,
   SessionWhereUniqueInput,
   SessionQuery,
   SessionType,
