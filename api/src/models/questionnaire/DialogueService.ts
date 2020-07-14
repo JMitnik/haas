@@ -729,7 +729,7 @@ class DialogueService {
 
     if (contentType === 'TEMPLATE' && templateDialogueId) {
       return DialogueService.copyDialogue(
-        templateDialogueId, customer.id, title, dialogueSlug, description, publicTitle, tags,
+        templateDialogueId, customer.id, title, dialogueSlug, description, publicTitle, [],
       );
     }
 
