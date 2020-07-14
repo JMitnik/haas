@@ -228,7 +228,7 @@ type Mutation {
   deleteTrigger(id: String): TriggerType!
   deleteUser(id: String): UserType!
   editCustomer(id: String, options: CustomerEditOptions): Customer!
-  editDialogue(description: String, dialogueId: String, publicTitle: String, tags: TagsInputObjectType, title: String): Dialogue!
+  editDialogue(customerSlug: String, description: String, dialogueSlug: String, publicTitle: String, tags: TagsInputObjectType, title: String): Dialogue!
   editTrigger(questionId: String, recipients: RecipientsInputType, trigger: TriggerInputType, triggerId: String): TriggerType!
   editUser(id: String, input: UserInput): UserType!
   singleUpload(file: Upload): ImageType!

@@ -731,8 +731,9 @@ export interface NexusGenArgTypes {
       options?: NexusGenInputs['CustomerEditOptions'] | null; // CustomerEditOptions
     }
     editDialogue: { // args
+      customerSlug?: string | null; // String
       description?: string | null; // String
-      dialogueId?: string | null; // String
+      dialogueSlug?: string | null; // String
       publicTitle?: string | null; // String
       tags?: NexusGenInputs['TagsInputObjectType'] | null; // TagsInputObjectType
       title?: string | null; // String

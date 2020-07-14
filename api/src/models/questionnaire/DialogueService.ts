@@ -143,11 +143,24 @@ class DialogueService {
   };
 
   static editDialogue = async (args: any) => {
-    const { dialogueId, title, description, publicTitle, tags } = args;
-    const dbDialogue = await prisma.dialogue.findOne({ where: { id: dialogueId },
-      include: {
-        tags: true,
-      } });
+    const { customerSlug, dialogueSlug, title, description, publicTitle, tags } = args;
+    console.log('ARGS: ', args);
+    const customer = await prisma.customer.findOne({
+      where: {
+        slug: customerSlug,
+      },
+      select: {
+        dialogues: {
+          where: {
+            slug: dialogueSlug,
+          },
+          include: {
+            tags: true,
+          },
+        },
+      },
+    });
+    const dbDialogue = customer?.dialogues[0];
 
     let updateDialogueArgs: DialogueUpdateInput = { title, description, publicTitle };
     if (dbDialogue?.tags) {
@@ -156,7 +169,7 @@ class DialogueService {
 
     return prisma.dialogue.update({
       where: {
-        id: dialogueId,
+        id: dbDialogue?.id,
       },
       data: updateDialogueArgs,
     });

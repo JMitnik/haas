@@ -335,7 +335,8 @@ export const DialogueMutations = extendType({
     t.field('editDialogue', {
       type: DialogueType,
       args: {
-        dialogueId: 'String',
+        customerSlug: 'String',
+        dialogueSlug: 'String',
         title: 'String',
         description: 'String',
         publicTitle: 'String',
