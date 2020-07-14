@@ -65,6 +65,11 @@ interface DialogueInputProps {
   }
 }
 
+interface HistoryDataProps {
+  x?: string;
+  y?: number;
+}
+
 class DialogueService {
   static constructDialogue(
     customerId: string,
@@ -197,7 +202,7 @@ class DialogueService {
     const scoreEntries = await SessionService.getScoringEntriesFromSessions(sessions);
 
     // Then dresses it up as X/Y data for the lineChart
-    const scoreHistoryData = scoreEntries?.map((entry) => ({
+    const scoreHistoryData:  = scoreEntries?.map((entry) => ({
       x: entry?.creationDate.toUTCString(),
       y: entry?.slideNodeEntry?.value,
       id: entry?.id,
@@ -503,7 +508,7 @@ class DialogueService {
     const sessions = await SessionService.getDialogueSessions(dialogueId);
 
     if (!sessions) {
-      return [];
+      return 0;
     }
 
     const scoringEntries = await SessionService.getScoringEntriesFromSessions(sessions);

@@ -1,8 +1,6 @@
 import { PrismaClient, Session } from '@prisma/client';
 import { extendType, inputObjectType, mutationField, objectType } from '@nexus/schema';
 
-import { PaginationProps } from '../../types/generic';
-
 // eslint-disable-next-line import/no-cycle
 import { NodeEntryInput, NodeEntryType } from '../node-entry/NodeEntry';
 import NodeEntryService from '../node-entry/NodeEntryService';

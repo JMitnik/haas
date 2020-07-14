@@ -17,9 +17,13 @@ export const UserType = objectType({
 
     t.field('role', {
       type: RoleType,
-      resolve(parent: User, args: any, ctx: any) {
-        const { prisma }: { prisma: PrismaClient } = ctx;
-        return prisma.role.findOne({ where: { id: parent.roleId } });
+      nullable: true,
+      async resolve(parent, args, ctx) {
+        const role = await ctx.prisma.role.findOne({ where: { id: parent.id } });
+
+        if (!role) return null;
+
+        return role;
       },
     });
   },
@@ -54,7 +58,7 @@ export const UserQueries = extendType({
     t.field('userTable', {
       type: UserTable,
       args: { customerSlug: 'String', filter: FilterInput },
-      async resolve(parent: any, args: any, ctx: any) {
+      async resolve(parent, args, ctx) {
         const { prisma }: { prisma: PrismaClient } = ctx;
         const { pageIndex, offset, limit, searchTerm, orderBy }: PaginationProps = args.filter;
 
@@ -74,7 +78,7 @@ export const UserQueries = extendType({
     t.list.field('users', {
       type: UserType,
       args: { customerSlug: 'String' },
-      resolve(parent: any, args: any, ctx: any) {
+      resolve(parent, args, ctx) {
         const { prisma }: { prisma: PrismaClient } = ctx;
         return prisma.user.findMany({ where: { Customer: { slug: args.customerSlug } } });
       },
@@ -83,7 +87,7 @@ export const UserQueries = extendType({
     t.field('user', {
       type: UserType,
       args: { userId: 'String' },
-      resolve(parent: any, args: any, ctx: any) {
+      resolve(parent, args, ctx) {
         const { prisma }: { prisma: PrismaClient } = ctx;
         return prisma.user.findOne({ where: { id: args.userId } });
       },
@@ -98,7 +102,7 @@ export const UserMutations = extendType({
       type: UserType,
       args: { customerSlug: 'String',
         input: UserInput },
-      resolve(parent: any, args: any, ctx: any) {
+      resolve(parent, args, ctx) {
         const { prisma }: { prisma: PrismaClient } = ctx;
         const { firstName, lastName, email, phone, roleId } = args.input;
         return prisma.user.create({
@@ -125,7 +129,7 @@ export const UserMutations = extendType({
     t.field('editUser', {
       type: UserType,
       args: { id: 'String', input: UserInput },
-      resolve(parent: any, args: any, ctx: any) {
+      resolve(parent, args, ctx) {
         const { prisma }: { prisma: PrismaClient } = ctx;
         const { firstName, lastName, email, phone, roleId } = args.input;
         return prisma.user.update({
@@ -150,7 +154,7 @@ export const UserMutations = extendType({
     t.field('deleteUser', {
       type: UserType,
       args: { id: 'String' },
-      resolve(parent: any, args: any, ctx: any) {
+      resolve(parent, args, ctx) {
         const { prisma }: { prisma: PrismaClient } = ctx;
         return prisma.user.delete({ where: { id: args.id } });
       },

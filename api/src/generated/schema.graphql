@@ -55,7 +55,7 @@ type CustomerSettings {
 }
 
 type Dialogue {
-  averageScore: Float
+  averageScore: Float!
   countInteractions: Int
   creationDate: String
   customer: Customer!

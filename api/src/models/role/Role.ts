@@ -15,6 +15,7 @@ export const RoleType = objectType({
   definition(t) {
     t.id('id');
     t.string('name');
+    t.string('roleId', { nullable: true });
     t.string('customerId', { nullable: true });
     t.int('nrPermissions', { nullable: true });
 

@@ -374,7 +374,7 @@ export interface NexusGenFieldTypes {
     logoUrl: string | null; // String
   }
   Dialogue: { // field return type
-    averageScore: number | null; // Float
+    averageScore: number; // Float!
     countInteractions: number | null; // Int
     creationDate: string | null; // String
     customer: NexusGenRootTypes['Customer']; // Customer!

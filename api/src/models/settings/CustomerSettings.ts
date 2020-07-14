@@ -31,7 +31,7 @@ export const CustomerSettingsType = objectType({
       type: ColourSettingsType,
       nullable: true,
 
-      resolve(parent: CustomerSettings, args: any, ctx: any) {
+      resolve(parent, args, ctx) {
         const { prisma }: { prisma: PrismaClient } = ctx;
         const colourSettings = prisma.colourSettings.findOne(
           { where: { id: parent.colourSettingsId || undefined } },
@@ -43,7 +43,7 @@ export const CustomerSettingsType = objectType({
       nullable: true,
       type: FontSettingsType,
 
-      resolve(parent: CustomerSettings, args: any, ctx: any) {
+      resolve(parent, args, ctx) {
         const { prisma }: { prisma: PrismaClient } = ctx;
         const colourSettings = prisma.fontSettings.findOne(
           { where: { id: parent.fontSettingsId || undefined } },

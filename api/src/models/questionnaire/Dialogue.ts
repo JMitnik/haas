@@ -41,6 +41,7 @@ export const topPathType = objectType({
 
 export const DialogueStatistics = objectType({
   name: 'DialogueStatistics',
+
   definition(t) {
     t.list.field('topPositivePath', {
       type: topPathType,
@@ -72,34 +73,33 @@ export const DialogueType = objectType({
     t.string('updatedAt', { nullable: true });
 
     t.float('averageScore', {
-      nullable: true,
-      resolve(parent: any) {
+      async resolve(parent) {
         if (!parent.id) {
-          return null;
+          return 0.0;
         }
 
-        return DialogueService.calculateAverageDialogueScore(parent.id);
+        const score = await DialogueService.calculateAverageDialogueScore(parent.id);
+
+        return score;
       },
     });
 
     t.int('countInteractions', {
-      nullable: true,
-      resolve(parent: any) {
-        if (!parent.id) {
-          return null;
-        }
+      async resolve(parent) {
+        const interactions = await DialogueService.countInteractions(parent.id);
 
-        return DialogueService.countInteractions(parent.id);
+        return interactions || null;
       },
     });
+
     t.field('statistics', {
       type: DialogueStatistics,
-      resolve(parent: Dialogue) {
-        if (!parent.id) {
-          return null;
-        }
+      nullable: true,
 
-        return DialogueService.getStatistics(parent.id, 7);
+      async resolve(parent) {
+        const statistics = await DialogueService.getStatistics(parent.id, 7);
+
+        return statistics || null;
       },
     });
 
@@ -108,7 +108,7 @@ export const DialogueType = objectType({
       args: {
         filter: FilterInput,
       },
-      async resolve(parent: Dialogue, args) {
+      async resolve(parent, args) {
         if (!parent.id) {
           return null;
         }
@@ -127,7 +127,7 @@ export const DialogueType = objectType({
           searchTerm,
         );
 
-        const sessionsWithIndex = pageSessions.map((session: any, index: any) => ({ ...session, index }));
+        const sessionsWithIndex = pageSessions.map((session, index) => ({ ...session, index }));
 
         return {
           sessions: sessionsWithIndex,
@@ -145,7 +145,7 @@ export const DialogueType = objectType({
     t.list.field('tags', {
       type: TagType,
       nullable: true,
-      async resolve(parent: Dialogue, args: any, ctx: any) {
+      async resolve(parent, args, ctx) {
         const { prisma }: { prisma: PrismaClient } = ctx;
 
         if (!parent.id) {
@@ -181,8 +181,7 @@ export const DialogueType = objectType({
     t.field('customer', {
       type: CustomerType,
 
-      resolve(parent: Dialogue, args: any, ctx: any) {
-        const { prisma }: { prisma: PrismaClient } = ctx;
+      resolve(parent, args, ctx) {
         const customer = prisma.customer.findOne({
           where: {
             id: parent.customerId,
@@ -195,7 +194,7 @@ export const DialogueType = objectType({
 
     t.field('rootQuestion', {
       type: QuestionNodeType,
-      async resolve(parent: Dialogue, args: any, ctx: any) {
+      async resolve(parent, args, ctx) {
         const { prisma }: { prisma: PrismaClient } = ctx;
 
         const rootQuestions = await prisma.questionNode.findMany({
@@ -210,7 +209,7 @@ export const DialogueType = objectType({
 
     t.list.field('edges', {
       type: EdgeType,
-      async resolve(parent: Dialogue, args: any, ctx: any) {
+      async resolve(parent: Dialogue, args, ctx) {
         const { prisma }: { prisma: PrismaClient } = ctx;
 
         const dialogue = await prisma.dialogue.findOne({
@@ -233,7 +232,7 @@ export const DialogueType = objectType({
       args: {
         where: QuestionNodeWhereInput,
       },
-      resolve(parent: Dialogue, args: any, ctx: any) {
+      resolve(parent: Dialogue, args, ctx) {
         const { prisma }: { prisma: PrismaClient } = ctx;
         const questions = prisma.questionNode.findMany({
           where: {
@@ -253,7 +252,7 @@ export const DialogueType = objectType({
 
     t.list.field('sessions', {
       type: SessionType,
-      async resolve(parent: Dialogue, args: any, ctx) {
+      async resolve(parent: Dialogue, args, ctx) {
         const { prisma } = ctx;
 
         const dialogueWithSessions = await prisma.dialogue.findOne({
@@ -267,7 +266,7 @@ export const DialogueType = objectType({
 
     t.list.field('leafs', {
       type: QuestionNodeType,
-      resolve(parent: Dialogue, args: any, ctx) {
+      resolve(parent: Dialogue, args, ctx) {
         const leafs = ctx.prisma.questionNode.findMany({
           where: {
             AND: [
@@ -312,7 +311,7 @@ export const DialogueMutations = extendType({
     t.field('createDialogue', {
       type: DialogueType,
       args: { data: AddDialogueInput },
-      resolve(parent: any, args: any) {
+      resolve(parent, args) {
         return DialogueService.createDialogue(args);
       },
     });
@@ -326,7 +325,7 @@ export const DialogueMutations = extendType({
         publicTitle: 'String',
         tags: TagsInputType,
       },
-      resolve(parent: any, args: any) {
+      resolve(parent, args) {
         return DialogueService.editDialogue(args);
       },
     });
@@ -336,7 +335,7 @@ export const DialogueMutations = extendType({
       args: {
         where: DialogueWhereUniqueInput,
       },
-      resolve(parent: any, args: any) {
+      resolve(parent, args) {
         return DialogueService.deleteDialogue(args.where.id);
       },
     });
@@ -361,7 +360,7 @@ export const DialoguesOfCustomerQuery = extendType({
         limit: 'Int',
         offset: 'Int',
       },
-      resolve(parent: any, args: any) {
+      resolve(parent, args) {
         return DialogueService.getNextLineData(
           args.dialogueId,
           args.numberOfDaysBack,
@@ -376,7 +375,7 @@ export const DialoguesOfCustomerQuery = extendType({
       args: {
         where: DialogueWhereUniqueInput,
       },
-      async resolve(parent: any, args: any, ctx: any) {
+      async resolve(parent, args, ctx) {
         const { prisma }: { prisma: PrismaClient } = ctx;
 
         if (args.where.slug) {
@@ -402,7 +401,7 @@ export const DialoguesOfCustomerQuery = extendType({
         customerId: 'ID',
         filter: DialogueFilterInputType,
       },
-      async resolve(parent: any, args: any, ctx: any) {
+      async resolve(parent, args, ctx) {
         const { prisma }: { prisma: PrismaClient } = ctx;
         const dialogueWhereInput: DialogueWhereInput = { customerId: args.customerId };
 
