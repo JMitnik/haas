@@ -4,13 +4,20 @@ import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema
 // eslint-disable-next-line import/no-cycle
 import { DialogueType } from '../questionnaire/Dialogue';
 
+export const TagTypeEnum = enumType({
+  name: 'TagTypeEnum',
+  members: ['DEFAULT', 'LOCATION', 'AGENT'],
+});
+
 export const TagType = objectType({
   name: 'TagType',
+
   definition(t) {
-    t.string('id');
+    t.id('id');
     t.string('name');
-    t.string('customerId');
-    t.string('type');
+    // t.string('customerId');
+
+    t.field('type', { type: TagTypeEnum });
   },
 });
 
@@ -57,11 +64,6 @@ export const TagsInputType = inputObjectType({
   definition(t) {
     t.list.string('entries');
   },
-});
-
-export const TagTypeEnum = enumType({
-  name: 'TagTypeEnum',
-  members: ['DEFAULT', 'LOCATION', 'AGENT'],
 });
 
 export const TagMutations = extendType({

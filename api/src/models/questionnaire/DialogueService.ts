@@ -6,7 +6,8 @@ import _ from 'lodash';
 import { leafNodes, sliderType } from '../../data/seeds/default-data';
 import NodeResolver from '../question/NodeService';
 // eslint-disable-next-line import/no-cycle
-import { NexusGenRootTypes } from '../../generated/nexus';
+import { NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
+// eslint-disable-next-line import/no-cycle
 import SessionService from '../session/SessionService';
 
 const prisma = new PrismaClient();
@@ -184,7 +185,12 @@ class DialogueService {
     return topPath || [];
   };
 
-  static getNextLineData = async (dialogueId: string, numberOfDaysBack: number, limit: number, offset: number): Promise<Array<NexusGenRootTypes['lineChartDataType']>> => {
+  static getNextLineData = async (
+    dialogueId: string,
+    numberOfDaysBack: number,
+    limit: number,
+    offset: number,
+  ): Promise<Array<NexusGenRootTypes['lineChartDataType']>> => {
     const startDate = subDays(new Date(), numberOfDaysBack);
     const sessions = await SessionService.getDialogueSessions(dialogueId, { limit, offset, startDate });
 
@@ -379,49 +385,63 @@ class DialogueService {
     return dialogue;
   };
 
-  static createDialogue = async (dialogueInputData: DialogueInputProps): Promise<Dialogue | null> => {
-    const { data: {
-      dialogueSlug, customerSlug, title, publicTitle, description, tags = [], isSeed,
-    } } = dialogueInputData;
+  static createDialogue = async (input: NexusGenInputs['AddDialogueInput']): Promise<Dialogue> => {
+    const dialogueTags = input.tags?.entries?.map((tag: string) => ({ id: tag })) || [];
 
-    let questionnaire = null;
-    const dialogueTags = tags?.entries?.length > 0
-      ? tags?.entries?.map((tag: string) => ({ id: tag }))
-      : [];
+    const customers = await prisma.customer.findMany({ where: { slug: input.customerSlug || undefined } });
 
-    const customers = await prisma.customer.findMany({ where: { slug: customerSlug } });
+    // TODO: Put in validation function, or add validator service library
+    if (!input.dialogueSlug) {
+      throw new Error('Slug required, not found!');
+    }
+
+    if (!input.title) {
+      throw new Error('Title required, not found!');
+    }
+
+    if (!input.description) {
+      throw new Error('Description required, not found!');
+    }
+
+    if (!input.publicTitle) {
+      throw new Error('Public title required');
+    }
+
+    if (customers.length > 1) {
+      // TODO: Make this a logger or something
+      console.warn(`Multiple customers found with slug ${input.customerSlug}`);
+    }
+
     const customer = customers?.[0];
-
     if (!customer) {
-      return null;
+      throw new Error(`Customer not found with slug ${input.customerSlug}`);
     }
 
-    if (isSeed) {
-      if (customer?.name) {
-        return DialogueService.seedQuestionnare(
-          customer?.id,
-          dialogueSlug,
-          customer?.name,
-          title,
-          description,
-          dialogueTags,
-        );
-      }
+    // TODO: Rename seedQuestionnaire to something like createFromTemplate, add to slug a -1 iterator
+    if (input.isSeed && customer?.name) {
+      return DialogueService.seedQuestionnare(
+        customer?.id,
+        input.dialogueSlug,
+        customer?.name,
+        input.title,
+        input.description,
+        dialogueTags,
+      );
     }
 
-    questionnaire = await DialogueService.initDialogue(
+    const dialogue = await DialogueService.initDialogue(
       customer?.id,
-      title,
-      dialogueSlug,
-      description,
-      publicTitle,
+      input.title,
+      input.dialogueSlug,
+      input.description,
+      input.publicTitle,
       dialogueTags,
     );
 
     // TODO: "Include "
     await prisma.dialogue.update({
       where: {
-        id: questionnaire.id,
+        id: dialogue.id,
       },
       data: {
         questions: {
@@ -434,9 +454,9 @@ class DialogueService {
       },
     });
 
-    await NodeResolver.createTemplateLeafNodes(leafNodes, questionnaire.id);
+    await NodeResolver.createTemplateLeafNodes(leafNodes, dialogue.id);
 
-    return questionnaire;
+    return dialogue;
   };
 
   static seedQuestionnare = async (
@@ -548,7 +568,7 @@ class DialogueService {
       return [];
     }
 
-    const scoringEntries = SessionService.getScoringEntriesFromSessions(sessions);
+    const scoringEntries = SessionService.getScoringEntriesFromSessions(sessions).filter((item) => item);
     return scoringEntries;
   };
 }

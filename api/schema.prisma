@@ -61,7 +61,7 @@ model Customer {
   tags        Tag[]
 }
 
-enum TagType {
+enum TagEnum {
   DEFAULT
   AGENT
   LOCATION
@@ -69,7 +69,7 @@ enum TagType {
 
 model Tag {
   id         String     @default(cuid()) @id
-  type       TagType
+  type       TagEnum
   name       String
   isTagOf    Dialogue[] @relation(references: [id])
   customer   Customer?  @relation(fields: [customerId], references: [id])

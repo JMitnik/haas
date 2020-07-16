@@ -3,12 +3,12 @@
  * Do not make changes to this file directly
  */
 
-import * as APIContext from "../types/APIContext"
 import * as prisma from "@prisma/client"
 import { core } from "@nexus/schema"
+import * as APIContext from "../types/APIContext"
 declare global {
   interface NexusGenCustomInputMethods<TypeName extends string> {
-    upload<FieldName extends string>(fieldName: FieldName, opts?: core.ScalarInputFieldConfig<core.GetGen3<"inputTypes", TypeName, FieldName>>): void // "Upload";
+    upload<FieldName extends string>(fieldName: FieldName, opts?: core.ScalarInputFieldConfig<core.GetGen3<'inputTypes', TypeName, FieldName>>): void // "Upload";
   }
 }
 declare global {
@@ -16,7 +16,6 @@ declare global {
     upload<FieldName extends string>(fieldName: FieldName, ...opts: core.ScalarOutSpread<TypeName, FieldName>): void // "Upload";
   }
 }
-
 
 declare global {
   interface NexusGen extends NexusGenTypes {}
@@ -190,11 +189,11 @@ export interface NexusGenInputs {
 }
 
 export interface NexusGenEnums {
-  PaginationSortByEnum: "createdAt" | "id" | "score"
-  TagTypeEnum: "AGENT" | "DEFAULT" | "LOCATION"
-  TriggerConditionTypeEnum: "HIGH_THRESHOLD" | "INNER_RANGE" | "LOW_THRESHOLD" | "OUTER_RANGE" | "TEXT_MATCH"
-  TriggerMediumEnum: "BOTH" | "EMAIL" | "PHONE"
-  TriggerTypeEnum: "QUESTION" | "SCHEDULED"
+  PaginationSortByEnum: 'createdAt' | 'id' | 'score'
+  TagTypeEnum: 'AGENT' | 'DEFAULT' | 'LOCATION'
+  TriggerConditionTypeEnum: 'HIGH_THRESHOLD' | 'INNER_RANGE' | 'LOW_THRESHOLD' | 'OUTER_RANGE' | 'TEXT_MATCH'
+  TriggerMediumEnum: 'BOTH' | 'EMAIL' | 'PHONE'
+  TriggerTypeEnum: 'QUESTION' | 'SCHEDULED'
 }
 
 export interface NexusGenRootTypes {
@@ -275,7 +274,7 @@ export interface NexusGenRootTypes {
     sessions: NexusGenRootTypes['Session'][]; // [Session!]!
     startDate?: string | null; // String
   }
-  TagType: prisma.TagType;
+  TagType: prisma.Tag;
   TriggerConditionType: prisma.TriggerConditionType;
   TriggerTableType: { // root type
     endDate?: string | null; // String
@@ -787,20 +786,20 @@ export interface NexusGenArgTypes {
 }
 
 export interface NexusGenAbstractResolveReturnTypes {
-  ConnectionInterface: "SessionConnection"
+  ConnectionInterface: 'SessionConnection'
 }
 
 export interface NexusGenInheritedFields {}
 
-export type NexusGenObjectNames = "ColourSettings" | "Customer" | "CustomerSettings" | "Dialogue" | "DialogueStatistics" | "Edge" | "EdgeCondition" | "FontSettings" | "ImageType" | "InteractionSessionType" | "Mutation" | "NodeEntry" | "NodeEntryValue" | "PaginationPageInfo" | "PermssionType" | "Query" | "QuestionNode" | "QuestionOption" | "RoleTableType" | "RoleType" | "Session" | "SessionConnection" | "TagType" | "TriggerConditionType" | "TriggerTableType" | "TriggerType" | "UserTable" | "UserType" | "lineChartDataType" | "topPathType";
+export type NexusGenObjectNames = 'ColourSettings' | 'Customer' | 'CustomerSettings' | 'Dialogue' | 'DialogueStatistics' | 'Edge' | 'EdgeCondition' | 'FontSettings' | 'ImageType' | 'InteractionSessionType' | 'Mutation' | 'NodeEntry' | 'NodeEntryValue' | 'PaginationPageInfo' | 'PermssionType' | 'Query' | 'QuestionNode' | 'QuestionOption' | 'RoleTableType' | 'RoleType' | 'Session' | 'SessionConnection' | 'TagType' | 'TriggerConditionType' | 'TriggerTableType' | 'TriggerType' | 'UserTable' | 'UserType' | 'lineChartDataType' | 'topPathType';
 
-export type NexusGenInputNames = "AddDialogueInput" | "ChoiceNodeEntryInput" | "CustomerCreateOptions" | "CustomerEditOptions" | "DialogueFilterInputType" | "DialogueWhereUniqueInput" | "EdgeChildInput" | "EdgeNodeInput" | "LeafNodeInput" | "NodeEntryInput" | "OptionInput" | "PaginationSortInput" | "PaginationWhereInput" | "PermissionIdsInput" | "PermissionInput" | "QuestionConditionInput" | "QuestionInput" | "QuestionNodeWhereInput" | "QuestionNodeWhereUniqueInput" | "RecipientsInputType" | "RegisterNodeEntryInput" | "RoleDataInput" | "RoleInput" | "SessionInput" | "SessionWhereUniqueInput" | "SliderNodeEntryInput" | "TagsInputObjectType" | "TextboxNodeEntryInput" | "TopicDataEntry" | "TriggerConditionInputType" | "TriggerInputType" | "UserInput";
+export type NexusGenInputNames = 'AddDialogueInput' | 'ChoiceNodeEntryInput' | 'CustomerCreateOptions' | 'CustomerEditOptions' | 'DialogueFilterInputType' | 'DialogueWhereUniqueInput' | 'EdgeChildInput' | 'EdgeNodeInput' | 'LeafNodeInput' | 'NodeEntryInput' | 'OptionInput' | 'PaginationSortInput' | 'PaginationWhereInput' | 'PermissionIdsInput' | 'PermissionInput' | 'QuestionConditionInput' | 'QuestionInput' | 'QuestionNodeWhereInput' | 'QuestionNodeWhereUniqueInput' | 'RecipientsInputType' | 'RegisterNodeEntryInput' | 'RoleDataInput' | 'RoleInput' | 'SessionInput' | 'SessionWhereUniqueInput' | 'SliderNodeEntryInput' | 'TagsInputObjectType' | 'TextboxNodeEntryInput' | 'TopicDataEntry' | 'TriggerConditionInputType' | 'TriggerInputType' | 'UserInput';
 
-export type NexusGenEnumNames = "PaginationSortByEnum" | "TagTypeEnum" | "TriggerConditionTypeEnum" | "TriggerMediumEnum" | "TriggerTypeEnum";
+export type NexusGenEnumNames = 'PaginationSortByEnum' | 'TagTypeEnum' | 'TriggerConditionTypeEnum' | 'TriggerMediumEnum' | 'TriggerTypeEnum';
 
-export type NexusGenInterfaceNames = "ConnectionInterface";
+export type NexusGenInterfaceNames = 'ConnectionInterface';
 
-export type NexusGenScalarNames = "Boolean" | "Float" | "ID" | "Int" | "String" | "Upload";
+export type NexusGenScalarNames = 'Boolean' | 'Float' | 'ID' | 'Int' | 'String' | 'Upload';
 
 export type NexusGenUnionNames = never;
 
@@ -824,7 +823,6 @@ export interface NexusGenTypes {
   abstractTypes: NexusGenTypes['interfaceNames'] | NexusGenTypes['unionNames'];
   abstractResolveReturn: NexusGenAbstractResolveReturnTypes;
 }
-
 
 declare global {
   interface NexusGenPluginTypeConfig<TypeName extends string> {
