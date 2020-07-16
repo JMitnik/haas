@@ -28,13 +28,14 @@ interface QuestionEntryFormProps {
   type: { label: string, value: string };
   options: Array<QuestionOptionProps>;
   leafs: Array<{ label: string, value: string }>;
+  onActiveQuestionChange: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
 const questionTypes = [
   { value: 'SLIDER', label: 'SLIDER' },
   { value: 'MULTI_CHOICE', label: 'MULTI_CHOICE' }];
 
-const QuestionEntryForm = ({ id, title, overrideLeaf, isRoot, type, options, leafs }: QuestionEntryFormProps) => {
+const QuestionEntryForm = ({ id, title, overrideLeaf, isRoot, type, options, leafs, onActiveQuestionChange }: QuestionEntryFormProps) => {
   const { register, handleSubmit, setValue, errors } = useForm<FormDataProps>({
     // validationSchema: schema,
   });
@@ -172,7 +173,7 @@ const QuestionEntryForm = ({ id, title, overrideLeaf, isRoot, type, options, lea
       <Div>
         <Flex>
           <Button brand="primary" mr={2} type="submit">Save CTA</Button>
-          <Button brand="default" type="button" onClick={() => null}>Cancel</Button>
+          <Button brand="default" type="button" onClick={() => onActiveQuestionChange(null)}>Cancel</Button>
         </Flex>
       </Div>
     </Form>

@@ -79,6 +79,7 @@ const QuestionEntryItem = (
               options={question?.options || []}
               overrideLeaf={activeLeaf}
               type={activeType}
+              onActiveQuestionChange={onActiveQuestionChange}
             />
           )}
       </Div>
