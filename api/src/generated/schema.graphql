@@ -24,11 +24,12 @@ type ColourSettings {
   secondary: String
 }
 
+"""Interface all pagination-based models should implement"""
 interface ConnectionInterface {
   endDate: String
-  pageIndex: Int!
-  pages: Int!
-  pageSize: Int!
+  limit: Int!
+  offset: Int!
+  pageInfo: PaginationPageInfo!
   startDate: String
 }
 
@@ -76,7 +77,7 @@ type Dialogue {
   publicTitle: String
   questions(where: QuestionNodeWhereInput): [QuestionNode!]!
   rootQuestion: QuestionNode!
-  sessionConnection(filter: PaginationWhereInput): SessionConnection!
+  sessionConnection(filter: PaginationWhereInput): SessionConnection
   sessions: [Session!]!
   slug: String!
   statistics: DialogueStatistics
@@ -224,9 +225,23 @@ input OptionInput {
   value: String
 }
 
+"""Information with regards to current page, and total number of pages"""
+type PaginationPageInfo {
+  currentPage: Int!
+  nrPages: Int!
+}
+
+"""Ways to sort a pagination object"""
+enum PaginationSortByEnum {
+  createdAt
+  id
+  score
+}
+
+"""Sorting of pagination (type and whether it ascends)"""
 input PaginationSortInput {
-  desc: Boolean
-  id: String
+  by: PaginationSortByEnum!
+  desc: Boolean = true
 }
 
 input PaginationWhereInput {
@@ -236,6 +251,7 @@ input PaginationWhereInput {
   orderBy: [PaginationSortInput!]
   pageIndex: Int
   search: String
+  searchTerm: String
   startDate: String
 }
 
@@ -275,7 +291,7 @@ type Query {
   triggerTable(customerSlug: String, filter: PaginationWhereInput): TriggerTableType!
   user(userId: String): UserType!
   users(customerSlug: String): [UserType!]!
-  userTable(customerSlug: String, filter: PaginationWhereInput): UserTable!
+  userTable(customerSlug: String, filter: PaginationWhereInput): UserTable
 }
 
 input QuestionConditionInput {
@@ -375,9 +391,9 @@ type Session {
 
 type SessionConnection implements ConnectionInterface {
   endDate: String
-  pageIndex: Int!
-  pages: Int!
-  pageSize: Int!
+  limit: Int!
+  offset: Int!
+  pageInfo: PaginationPageInfo!
   sessions: [Session!]!
   startDate: String
 }

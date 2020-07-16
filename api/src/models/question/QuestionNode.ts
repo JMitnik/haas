@@ -49,6 +49,7 @@ export const QuestionNodeType = objectType({
     t.field('questionDialogue', {
       type: DialogueType,
       nullable: true,
+
       resolve(parent, args, ctx) {
         if (parent.questionDialogueId) {
           return ctx.prisma.dialogue.findOne({
@@ -61,6 +62,7 @@ export const QuestionNodeType = objectType({
         return null;
       },
     });
+
     t.field('overrideLeaf', {
       type: QuestionNodeType,
       nullable: true,
@@ -73,6 +75,7 @@ export const QuestionNodeType = objectType({
         return overrideLeaf;
       },
     });
+
     t.list.field('options', {
       type: QuestionOptionType,
 
@@ -84,6 +87,7 @@ export const QuestionNodeType = objectType({
         return options;
       },
     });
+
     t.list.field('children', {
       type: EdgeType,
       resolve(parent, args, ctx) {
@@ -100,6 +104,7 @@ export const QuestionNodeType = objectType({
 
 export const QuestionNodeWhereInput = inputObjectType({
   name: 'QuestionNodeWhereInput',
+
   definition(t) {
     t.boolean('isRoot', { nullable: true });
     t.id('id', { nullable: true });
@@ -108,6 +113,7 @@ export const QuestionNodeWhereInput = inputObjectType({
 
 export const QuestionNodeInput = inputObjectType({
   name: 'QuestionNodeWhereUniqueInput',
+
   definition(t) {
     t.string('id', { required: true });
   },
@@ -134,6 +140,7 @@ export const getQuestionNodeQuery = extendType({
         return questionNode;
       },
     });
+
     t.list.field('questionNodes', {
       type: QuestionNodeType,
       resolve(parent, args, ctx) {

@@ -2,12 +2,14 @@ import {
   NodeEntry, PrismaClient, Session, SessionWhereInput,
 } from '@prisma/client';
 
-import { PaginationProps } from '../../types/generic';
+import { NexusInterfaceTypeDef } from '@nexus/schema/dist/core';
+import { Nullable, PaginationProps } from '../../types/generic';
 import { SessionWithEntries } from './SessionTypes';
 // eslint-disable-next-line import/no-cycle
 import { TEXT_NODES } from '../questionnaire/Dialogue';
 // eslint-disable-next-line import/no-cycle
 // eslint-disable-next-line import/no-cycle
+import { NexusGenRootTypes } from '../../generated/nexus';
 import NodeEntryService, { NodeEntryWithTypes } from '../node-entry/NodeEntryService';
 import TriggerService from '../trigger/TriggerService';
 
@@ -144,11 +146,13 @@ class SessionService {
    */
   static async getDialogueSessions(
     dialogueId: string,
-    paginationArgs?: PaginationProps,
+    paginationArgs?: Nullable<PaginationProps>,
   ): Promise<Array<SessionWithEntries> | null | undefined> {
     // TODO AND IMPORTANT: Will the resolvers for session subchildren get called
     //  if the objects already include the props (aka double work?)
     // - It seems not?
+
+    // TODO: Only include node entries if it is required
 
     const dialougeWithSessionWithEntries = await prisma.dialogue.findOne({
       where: {
@@ -164,16 +168,16 @@ class SessionService {
                   : undefined,
               },
             }, {
-              createdAt: paginationArgs?.startDate && {
+              createdAt: (paginationArgs?.startDate && {
                 lte: paginationArgs?.startDate,
-              },
+              }) || undefined,
             }],
           },
           orderBy: {
             createdAt: 'desc',
           },
-          skip: paginationArgs?.offset,
-          take: paginationArgs?.limit,
+          skip: paginationArgs?.offset || undefined,
+          take: paginationArgs?.limit || undefined,
           include: {
             nodeEntries: {
               include: {
@@ -198,21 +202,35 @@ class SessionService {
 
   static getSessionConnection = async (
     dialogueId: string,
-    paginationArgs?: PaginationProps,
-  ) => {
+    paginationArgs?: Nullable<PaginationProps>,
+  ): Promise<NexusGenRootTypes['SessionConnection']> => {
     // TODO: Do we need this?
-    const needPageReset = false;
+    // const needPageReset = false;
 
     const sessions = await SessionService.getDialogueSessions(dialogueId, paginationArgs);
+    const totalNrOfSessions = (await SessionService.getDialogueSessions(dialogueId))?.length;
 
-    if (!sessions?.length) {
-      return null;
+    if (totalNrOfSessions === undefined) {
+      throw new Error('Unable to get total nr of Sessions, something went wrong');
     }
 
-    const totalPages = paginationArgs?.limit ? Math.ceil(sessions.length / paginationArgs?.limit) : 1;
+    if (!sessions?.length) {
+      return {
+        sessions: [],
+        limit: 0,
+        offset: 0,
+        startDate: null,
+        pageInfo: {
+          currentPage: 0,
+          nrPages: 0,
+        },
+      };
+    }
+
+    const totalPages = paginationArgs?.limit ? Math.ceil(totalNrOfSessions / paginationArgs?.limit) : 1;
 
     // If search term, filter out grouped representations which don't have
-    // at least one entry which fits criteria and calculate new # of pages
+    // at least on`e entry which fits criteria and calculate new # of pages
 
     // Set offset to 0
     // If due to filters option current queried page doesn't exist (e.g. page 3/2),
@@ -235,7 +253,20 @@ class SessionService {
       paths: session.nodeEntries.length,
     }));
 
-    return { sessions: sessionsWithScores, totalPages, resetPages: needPageReset };
+    // TODO: Type-hint this
+    const pageInfo: NexusGenRootTypes['PaginationPageInfo'] = {
+      totalPages: totalPages || 1,
+      pageIndex: paginationArgs?.pageIndex || 1,
+    };
+
+    return {
+      sessions: sessionsWithScores,
+      offset: paginationArgs?.offset || 0,
+      limit: paginationArgs?.limit || 0,
+      startDate: paginationArgs?.startDate?.toString(),
+      endDate: paginationArgs?.endDate?.toString(),
+      pageInfo,
+    };
   };
 
   static async getSessionEntries(session: Session): Promise<NodeEntry[] | []> {

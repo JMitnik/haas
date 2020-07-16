@@ -1,5 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 
+import { Nullable } from '../../types/generic';
+
 const prisma = new PrismaClient();
 
 class RoleService {
@@ -14,9 +16,9 @@ class RoleService {
 
   static paginatedRoles = async (
     customerId: string,
-    pageIndex?: number,
-    offset?: number,
-    limit?: number,
+    pageIndex?: Nullable<number>,
+    offset?: Nullable<number>,
+    limit?: Nullable<number>,
   ) => {
     let needPageReset = false;
 

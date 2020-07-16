@@ -84,8 +84,8 @@ export interface NexusGenInputs {
     value?: string | null; // String
   }
   PaginationSortInput: { // input type
+    by: NexusGenEnums['PaginationSortByEnum']; // PaginationSortByEnum!
     desc?: boolean | null; // Boolean
-    id?: string | null; // String
   }
   PaginationWhereInput: { // input type
     endDate?: string | null; // String
@@ -94,6 +94,7 @@ export interface NexusGenInputs {
     orderBy?: NexusGenInputs['PaginationSortInput'][] | null; // [PaginationSortInput!]
     pageIndex?: number | null; // Int
     search?: string | null; // String
+    searchTerm?: string | null; // String
     startDate?: string | null; // String
   }
   PermissionIdsInput: { // input type
@@ -189,6 +190,7 @@ export interface NexusGenInputs {
 }
 
 export interface NexusGenEnums {
+  PaginationSortByEnum: "createdAt" | "id" | "score"
   TagTypeEnum: "AGENT" | "DEFAULT" | "LOCATION"
   TriggerConditionTypeEnum: "HIGH_THRESHOLD" | "INNER_RANGE" | "LOW_THRESHOLD" | "OUTER_RANGE" | "TEXT_MATCH"
   TriggerMediumEnum: "BOTH" | "EMAIL" | "PHONE"
@@ -238,6 +240,10 @@ export interface NexusGenRootTypes {
     slider?: number | null; // Int
     textbox?: string | null; // String
   }
+  PaginationPageInfo: { // root type
+    currentPage: number; // Int!
+    nrPages: number; // Int!
+  }
   PermssionType: { // root type
     customer?: NexusGenRootTypes['Customer'] | null; // Customer
     description?: string | null; // String
@@ -263,9 +269,9 @@ export interface NexusGenRootTypes {
   Session: prisma.Session;
   SessionConnection: { // root type
     endDate?: string | null; // String
-    pageIndex: number; // Int!
-    pages: number; // Int!
-    pageSize: number; // Int!
+    limit: number; // Int!
+    offset: number; // Int!
+    pageInfo: NexusGenRootTypes['PaginationPageInfo']; // PaginationPageInfo!
     sessions: NexusGenRootTypes['Session'][]; // [Session!]!
     startDate?: string | null; // String
   }
@@ -343,6 +349,7 @@ export interface NexusGenAllTypes extends NexusGenRootTypes {
   TriggerConditionInputType: NexusGenInputs['TriggerConditionInputType'];
   TriggerInputType: NexusGenInputs['TriggerInputType'];
   UserInput: NexusGenInputs['UserInput'];
+  PaginationSortByEnum: NexusGenEnums['PaginationSortByEnum'];
   TagTypeEnum: NexusGenEnums['TagTypeEnum'];
   TriggerConditionTypeEnum: NexusGenEnums['TriggerConditionTypeEnum'];
   TriggerMediumEnum: NexusGenEnums['TriggerMediumEnum'];
@@ -384,7 +391,7 @@ export interface NexusGenFieldTypes {
     publicTitle: string | null; // String
     questions: NexusGenRootTypes['QuestionNode'][]; // [QuestionNode!]!
     rootQuestion: NexusGenRootTypes['QuestionNode']; // QuestionNode!
-    sessionConnection: NexusGenRootTypes['SessionConnection']; // SessionConnection!
+    sessionConnection: NexusGenRootTypes['SessionConnection'] | null; // SessionConnection
     sessions: NexusGenRootTypes['Session'][]; // [Session!]!
     slug: string; // String!
     statistics: NexusGenRootTypes['DialogueStatistics'] | null; // DialogueStatistics
@@ -470,6 +477,10 @@ export interface NexusGenFieldTypes {
     slider: number | null; // Int
     textbox: string | null; // String
   }
+  PaginationPageInfo: { // field return type
+    currentPage: number; // Int!
+    nrPages: number; // Int!
+  }
   PermssionType: { // field return type
     customer: NexusGenRootTypes['Customer'] | null; // Customer
     description: string | null; // String
@@ -495,7 +506,7 @@ export interface NexusGenFieldTypes {
     triggerTable: NexusGenRootTypes['TriggerTableType']; // TriggerTableType!
     user: NexusGenRootTypes['UserType']; // UserType!
     users: NexusGenRootTypes['UserType'][]; // [UserType!]!
-    userTable: NexusGenRootTypes['UserTable']; // UserTable!
+    userTable: NexusGenRootTypes['UserTable'] | null; // UserTable
   }
   QuestionNode: { // field return type
     children: NexusGenRootTypes['Edge'][]; // [Edge!]!
@@ -541,9 +552,9 @@ export interface NexusGenFieldTypes {
   }
   SessionConnection: { // field return type
     endDate: string | null; // String
-    pageIndex: number; // Int!
-    pages: number; // Int!
-    pageSize: number; // Int!
+    limit: number; // Int!
+    offset: number; // Int!
+    pageInfo: NexusGenRootTypes['PaginationPageInfo']; // PaginationPageInfo!
     sessions: NexusGenRootTypes['Session'][]; // [Session!]!
     startDate: string | null; // String
   }
@@ -602,9 +613,9 @@ export interface NexusGenFieldTypes {
   }
   ConnectionInterface: { // field return type
     endDate: string | null; // String
-    pageIndex: number; // Int!
-    pages: number; // Int!
-    pageSize: number; // Int!
+    limit: number; // Int!
+    offset: number; // Int!
+    pageInfo: NexusGenRootTypes['PaginationPageInfo']; // PaginationPageInfo!
     startDate: string | null; // String
   }
 }
@@ -781,11 +792,11 @@ export interface NexusGenAbstractResolveReturnTypes {
 
 export interface NexusGenInheritedFields {}
 
-export type NexusGenObjectNames = "ColourSettings" | "Customer" | "CustomerSettings" | "Dialogue" | "DialogueStatistics" | "Edge" | "EdgeCondition" | "FontSettings" | "ImageType" | "InteractionSessionType" | "Mutation" | "NodeEntry" | "NodeEntryValue" | "PermssionType" | "Query" | "QuestionNode" | "QuestionOption" | "RoleTableType" | "RoleType" | "Session" | "SessionConnection" | "TagType" | "TriggerConditionType" | "TriggerTableType" | "TriggerType" | "UserTable" | "UserType" | "lineChartDataType" | "topPathType";
+export type NexusGenObjectNames = "ColourSettings" | "Customer" | "CustomerSettings" | "Dialogue" | "DialogueStatistics" | "Edge" | "EdgeCondition" | "FontSettings" | "ImageType" | "InteractionSessionType" | "Mutation" | "NodeEntry" | "NodeEntryValue" | "PaginationPageInfo" | "PermssionType" | "Query" | "QuestionNode" | "QuestionOption" | "RoleTableType" | "RoleType" | "Session" | "SessionConnection" | "TagType" | "TriggerConditionType" | "TriggerTableType" | "TriggerType" | "UserTable" | "UserType" | "lineChartDataType" | "topPathType";
 
 export type NexusGenInputNames = "AddDialogueInput" | "ChoiceNodeEntryInput" | "CustomerCreateOptions" | "CustomerEditOptions" | "DialogueFilterInputType" | "DialogueWhereUniqueInput" | "EdgeChildInput" | "EdgeNodeInput" | "LeafNodeInput" | "NodeEntryInput" | "OptionInput" | "PaginationSortInput" | "PaginationWhereInput" | "PermissionIdsInput" | "PermissionInput" | "QuestionConditionInput" | "QuestionInput" | "QuestionNodeWhereInput" | "QuestionNodeWhereUniqueInput" | "RecipientsInputType" | "RegisterNodeEntryInput" | "RoleDataInput" | "RoleInput" | "SessionInput" | "SessionWhereUniqueInput" | "SliderNodeEntryInput" | "TagsInputObjectType" | "TextboxNodeEntryInput" | "TopicDataEntry" | "TriggerConditionInputType" | "TriggerInputType" | "UserInput";
 
-export type NexusGenEnumNames = "TagTypeEnum" | "TriggerConditionTypeEnum" | "TriggerMediumEnum" | "TriggerTypeEnum";
+export type NexusGenEnumNames = "PaginationSortByEnum" | "TagTypeEnum" | "TriggerConditionTypeEnum" | "TriggerMediumEnum" | "TriggerTypeEnum";
 
 export type NexusGenInterfaceNames = "ConnectionInterface";
 

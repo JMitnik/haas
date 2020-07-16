@@ -108,6 +108,7 @@ export const RoleQueries = extendType({
         customerId: 'String',
         filter: PaginationWhereInput,
       },
+
       async resolve(parent: any, args: any, ctx: any) {
         const { prisma }: { prisma: PrismaClient } = ctx;
         const { pageIndex, offset, limit }: PaginationProps = args.filter;
@@ -124,7 +125,6 @@ export const RoleQueries = extendType({
       type: RoleType,
       args: { customerSlug: 'String' },
       nullable: true,
-      list: true,
 
       async resolve(parent, args) {
         if (!args.customerSlug) {

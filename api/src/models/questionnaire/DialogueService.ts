@@ -6,6 +6,7 @@ import _ from 'lodash';
 import { leafNodes, sliderType } from '../../data/seeds/default-data';
 import NodeResolver from '../question/NodeService';
 // eslint-disable-next-line import/no-cycle
+import { NexusGenRootTypes } from '../../generated/nexus';
 import SessionService from '../session/SessionService';
 
 const prisma = new PrismaClient();
@@ -183,12 +184,12 @@ class DialogueService {
     return topPath || [];
   };
 
-  static getNextLineData = async (dialogueId: string, numberOfDaysBack: number, limit: number, offset: number) => {
+  static getNextLineData = async (dialogueId: string, numberOfDaysBack: number, limit: number, offset: number): Promise<Array<NexusGenRootTypes['lineChartDataType']>> => {
     const startDate = subDays(new Date(), numberOfDaysBack);
     const sessions = await SessionService.getDialogueSessions(dialogueId, { limit, offset, startDate });
 
     if (!sessions) {
-      return null;
+      return [];
     }
 
     const scoreEntries = await SessionService.getScoringEntriesFromSessions(sessions);
@@ -540,7 +541,7 @@ class DialogueService {
     return dialogue?.sessions.length;
   };
 
-  static getDialogueInteractionFeedItems = async (dialogueId: string) => {
+  static getDialogueInteractionFeedItems = async (dialogueId: string): Array<NexusGenRootTypes['NodeEntry']> => {
     const sessions = await SessionService.getDialogueSessions(dialogueId);
 
     if (!sessions) {

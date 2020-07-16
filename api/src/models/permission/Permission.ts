@@ -1,6 +1,7 @@
 import { extendType, inputObjectType, objectType } from '@nexus/schema';
-import PermissionService from './PermissionService';
+
 import { CustomerType } from '../customer/Customer';
+import PermissionService from './PermissionService';
 
 export const PermissionType = objectType({
   name: 'PermssionType',
@@ -38,9 +39,9 @@ export const PermissionMutations = extendType({
         }
 
         const permission = await PermissionService.createPermission(
-          args.data?.name, 
-          args.data?.customerId, 
-          args.data?.description
+          args.data?.name,
+          args.data?.customerId,
+          args.data?.description,
         );
 
         return permission;

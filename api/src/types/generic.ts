@@ -1,16 +1,18 @@
 export type OrderByType = 'score' | 'id' | 'createdAt';
 
 export interface OrderByProps {
-  id: OrderByType;
-  desc: boolean;
+  by: OrderByType;
+  desc?: boolean | null;
 }
 
 export interface PaginationProps {
-  pageIndex?: number,
-  offset?: number,
-  limit?: number,
-  orderBy?: Array<OrderByProps>,
-  startDate?: Date,
-  endDate?: Date,
-  searchTerm?: string
+  pageIndex?: Nullable<number>,
+  offset?: Nullable<number>,
+  limit?: Nullable<number>,
+  orderBy?: Nullable<Array<OrderByProps>>,
+  startDate?: Nullable<Date>,
+  endDate?: Nullable<Date>,
+  searchTerm?: Nullable<string>
 }
+
+export type Nullable<T> = T | null | undefined;

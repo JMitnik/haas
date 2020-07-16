@@ -58,19 +58,30 @@ export const UserQueries = extendType({
     t.field('userTable', {
       type: UserTable,
       args: { customerSlug: 'String', filter: PaginationWhereInput },
+      nullable: true,
+
       async resolve(parent, args, ctx) {
-        const { pageIndex, offset, limit, searchTerm, orderBy }: PaginationProps = args.filter;
+        if (!args.customerSlug) return null;
+        if (!args.filter) return null;
 
-        if (args.filter) {
-          return UserService.paginatedUsers(args.customerSlug, pageIndex, offset, limit, orderBy?.[0], searchTerm);
-        }
+        return UserService.paginatedUsers(
+          args.customerSlug,
+          args.filter?.pageIndex,
+          args.filter?.offset,
+          args.filter?.limit,
+          args.filter?.orderBy?.[0],
+          args.filter?.searchTerm,
+        );
 
-        const users = await ctx.prisma.user.findMany({ where: { Customer: {
-          slug: args.customerSlug,
-        } } });
-        const totalPages = Math.ceil(users.length / (limit || 1));
+        // const users = await ctx.prisma.user.findMany({ where: { Customer: {
+        //   slug: args.customerSlug,
+        // } } });
 
-        return { users, pageIndex, totalPages };
+        // TODO: Return this
+        // const totalPages = Math.ceil(users.length / (args.filter?.limit || 1));
+        // const totalPages = 1;
+
+        // return { users, pageIndex, totalPages };
       },
     });
 

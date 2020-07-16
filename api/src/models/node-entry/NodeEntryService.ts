@@ -65,15 +65,15 @@ class NodeEntryService {
   static sortEntries = (entries: NodeEntryWithTypes[], orderBy: OrderByProps) => {
     let orderedNodeEntriesScore;
 
-    if (orderBy.id === 'score') {
+    if (orderBy.by === 'score') {
       orderedNodeEntriesScore = _.orderBy(
         entries, (entry) => entry.slideNodeEntry?.value, orderBy.desc ? 'desc' : 'asc',
       );
-    } else if (orderBy.id === 'id') {
+    } else if (orderBy.by === 'id') {
       orderedNodeEntriesScore = _.orderBy(
         entries, (entry) => entry.id, orderBy.desc ? 'desc' : 'asc',
       );
-    } else if (orderBy.id === 'createdAt') {
+    } else if (orderBy.by === 'createdAt') {
       orderedNodeEntriesScore = _.orderBy(
         entries, (entry) => entry.creationDate, orderBy.desc ? 'desc' : 'asc',
       );

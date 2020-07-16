@@ -5,6 +5,7 @@ import { extendType, inputObjectType, mutationField, objectType } from '@nexus/s
 import { NodeEntryInput, NodeEntryType } from '../node-entry/NodeEntry';
 import NodeEntryService from '../node-entry/NodeEntryService';
 // eslint-disable-next-line import/no-cycle
+import { ConnectionInterface } from '../general/Pagination';
 import SessionService from './SessionService';
 
 export const SessionType = objectType({
@@ -72,14 +73,7 @@ export const SessionConnection = objectType({
   name: 'SessionConnection',
 
   definition(t) {
-    t.implements('ConnectionInterface');
-
-    // t.int('pages');
-    // t.int('pageIndex');
-    // t.int('pageSize');
-    // t.string('startDate', { nullable: true });
-    // t.string('endDate', { nullable: true });
-
+    t.implements(ConnectionInterface);
     t.list.field('sessions', { type: SessionType });
   },
 });

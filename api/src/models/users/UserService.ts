@@ -1,3 +1,4 @@
+import { Nullable } from '../../types/generic';
 import { PrismaClient, User, UserWhereInput } from '@prisma/client';
 import _ from 'lodash';
 
@@ -69,11 +70,11 @@ class UserService {
 
   static paginatedUsers = async (
     customerSlug: string,
-    pageIndex?: number,
-    offset?: number,
-    limit?: number,
-    orderBy?: any,
-    searchTerm?: string,
+    pageIndex?: Nullable<number>,
+    offset?: Nullable<number>,
+    limit?: Nullable<number>,
+    orderBy?: Nullable<any>,
+    searchTerm?: Nullable<string>,
   ) => {
     let needPageReset = false;
     const userWhereInput: UserWhereInput = { Customer: { slug: customerSlug } };

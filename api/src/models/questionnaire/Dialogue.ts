@@ -14,9 +14,10 @@ import { SessionConnection, SessionType } from '../session/Session';
 import { TagType, TagsInputType } from '../tag/Tag';
 // eslint-disable-next-line import/no-cycle
 import DialogueService from './DialogueService';
-import NodeEntryService from '../node-entry/NodeEntryService';
 // eslint-disable-next-line import/no-cycle
 import { PaginationWhereInput } from '../general/Pagination';
+// eslint-disable-next-line import/no-cycle
+import PaginationService from '../general/PaginationService';
 import SessionService from '../session/SessionService';
 
 export const TEXT_NODES = [
@@ -120,29 +121,24 @@ export const DialogueType = objectType({
     t.field('sessionConnection', {
       type: SessionConnection,
       args: { filter: PaginationWhereInput },
+      nullable: true,
+
       async resolve(parent, args) {
         if (!parent.id) return null;
 
-        const sessionConnection = await SessionService.getSessionConnection(
-          parent.id,
-          args,
-        );
+        const sessionConnection = await SessionService.getSessionConnection(parent.id, {
+          startDate: args.filter?.startDate ? PaginationService.formatDate(args.filter?.startDate) : null,
+          endDate: args.filter?.endDate ? PaginationService.formatDate(args.filter?.endDate) : null,
+          limit: args.filter?.limit,
+          offset: args.filter?.offset,
+          orderBy: args.filter?.orderBy,
+          pageIndex: args.filter?.pageIndex,
+          searchTerm: args.filter?.searchTerm,
+        });
 
         if (!sessionConnection) return null;
 
-        return {
-
-        };
-
-        // return { sessionConnection.sessions, ...args,
-        //   // pages: args.pages
-        //   // offset,
-        //   // limit,
-        //   // pageIndex: !resetPages ? pageIndex : 0,
-        //   // startDate,
-        //   // endDate,
-        //   // orderBy: args.filter.orderBy || [],
-        // };
+        return sessionConnection;
       },
     });
 
@@ -163,21 +159,22 @@ export const DialogueType = objectType({
       },
     });
 
-    t.list.field('interactionFeedItems', {
-      nullable: true,
-      type: SessionType,
+    // TODO: Put this back maybe?
+    // t.list.field('interactionFeedItems', {
+    //   nullable: true,
+    //   type: SessionType,
 
-      async resolve(parent) {
-        if (!parent.id) {
-          return null;
-        }
+    //   async resolve(parent) {
+    //     if (!parent.id) {
+    //       return null;
+    //     }
 
-        const interactionFeedItems = await DialogueService.getDialogueInteractionFeedItems(parent.id);
-        const nrItems = Math.min(interactionFeedItems.length, 3);
+    //     const interactionFeedItems = await DialogueService.getDialogueInteractionFeedItems(parent.id);
+    //     const nrItems = Math.min(interactionFeedItems.length, 3);
 
-        return interactionFeedItems.slice(0, nrItems);
-      },
-    });
+    //     return interactionFeedItems.slice(0, nrItems);
+    //   },
+    // });
 
     t.string('customerId');
     t.field('customer', {
@@ -294,6 +291,7 @@ export const AddDialogueInput = inputObjectType({
     t.string('description');
     t.string('publicTitle');
     t.boolean('isSeed');
+
     t.field('tags', {
       type: TagsInputType,
     });
@@ -306,7 +304,12 @@ export const DialogueMutations = extendType({
     t.field('createDialogue', {
       type: DialogueType,
       args: { data: AddDialogueInput },
-      resolve(args) {
+
+      resolve(parent, args) {
+        if (!args.data) {
+          throw new Error('Unable to find any input data');
+        }
+
         return DialogueService.createDialogue(args);
       },
     });
@@ -330,8 +333,13 @@ export const DialogueMutations = extendType({
       args: {
         where: DialogueWhereUniqueInput,
       },
-      resolve(args) {
-        return DialogueService.deleteDialogue(args.where.id);
+
+      resolve(parent, args) {
+        if (!args.where?.id) {
+          throw new Error('Unable to find dialogue to delete');
+        }
+
+        return DialogueService.deleteDialogue(args.where?.id);
       },
     });
   },
@@ -355,7 +363,11 @@ export const DialoguesOfCustomerQuery = extendType({
         limit: 'Int',
         offset: 'Int',
       },
-      resolve(args) {
+      resolve(parent, args) {
+        if (!args.dialogueId || !args.numberOfDaysBack || !args.limit || !args.offset) {
+          return [];
+        }
+
         return DialogueService.getNextLineData(
           args.dialogueId,
           args.numberOfDaysBack,
@@ -370,9 +382,11 @@ export const DialoguesOfCustomerQuery = extendType({
       args: {
         where: DialogueWhereUniqueInput,
       },
-      async resolve(args, ctx) {
-        if (args.where.slug) {
-          return {};
+      nullable: true,
+
+      async resolve(parent, args, ctx) {
+        if (!args.where?.id) {
+          return null;
         }
 
         const dialogue = await ctx.prisma.dialogue.findOne({
@@ -391,17 +405,16 @@ export const DialoguesOfCustomerQuery = extendType({
     t.list.field('dialogues', {
       type: DialogueType,
       args: {
-        customerId: 'ID',
         filter: DialogueFilterInputType,
       },
       async resolve(parent, args, ctx) {
         let dialogues = await ctx.prisma.dialogue.findMany({
-          where: args?.filter,
           include: {
             tags: true,
           },
         });
 
+        // TODO: Put this in a single service
         if (args.filter) {
           if (args.filter.searchTerm) {
             dialogues = DialogueService.filterDialoguesBySearchTerm(dialogues, args.filter.searchTerm);
