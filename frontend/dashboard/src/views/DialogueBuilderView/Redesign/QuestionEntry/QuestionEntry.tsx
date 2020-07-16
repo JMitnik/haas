@@ -4,9 +4,10 @@ import { v4 as uuidv4 } from 'uuid';
 import React from 'react';
 
 import EditCTAButton from 'views/ActionsOverview/components/EditCTAButton';
+import LinkIcon from 'components/Icons/LinkIcon';
 
 import { EdgeChildProps, QuestionEntryProps } from '../TopicBuilderInterfaces';
-import { OverflowSpan, QuestionEntryContainer } from './QuestionEntryStyles';
+import { LinkContainer, OverflowSpan, QuestionEntryContainer, QuestionEntryViewContainer } from './QuestionEntryStyles';
 import BuilderIcon from '../components/BuilderIcon';
 import DeleteCTAButton from '../components/DeleteCTAButton';
 import QuestionEntryForm from './QuestionEntryForm';
@@ -40,38 +41,39 @@ const QuestionEntryItem = (
   const activeLeaf = { label: question.overrideLeaf?.title, value: question.overrideLeaf?.id };
 
   return (
-    <QuestionEntryContainer activeCTA={null} id={question.id}>
-      <DeleteCTAButton disabled={(!!activeQuestion && activeQuestion !== question.id) || false} onClick={() => null}>
-        <X />
-      </DeleteCTAButton>
+    <Flex>
+      <QuestionEntryViewContainer activeCTA={null} id={question.id} flexGrow={1}>
+        <QuestionEntryContainer flexGrow={1}>
+          <DeleteCTAButton disabled={(!!activeQuestion && activeQuestion !== question.id) || false} onClick={() => null}>
+            <X />
+          </DeleteCTAButton>
 
-      <Flex flexDirection="row" width="100%">
-        <BuilderIcon type={question.type} Icon={Icon} />
+          <Flex flexDirection="row" width="100%">
+            <BuilderIcon type={question.type} Icon={Icon} />
 
-        <Flex width="60%" flexDirection="column">
-          <Span fontSize="1.4em">
-            Title
-          </Span>
-          <OverflowSpan>
-            {question.title || 'None'}
-          </OverflowSpan>
-        </Flex>
+            <Flex width="60%" flexDirection="column">
+              <Span fontSize="1.4em">
+                Title
+              </Span>
+              <OverflowSpan>
+                {question.title || 'None'}
+              </OverflowSpan>
+            </Flex>
 
-        <Flex width="30%" alignItems="center" justifyContent="center">
-          <EditCTAButton
-            disabled={(activeQuestion && activeQuestion !== question.id) || false}
-            onClick={() => onActiveQuestionChange(question.id)}
-          >
-            <Edit3 />
-            <Span>
-              Edit
-            </Span>
-          </EditCTAButton>
-        </Flex>
+            <Flex width="30%" alignItems="center" justifyContent="center">
+              <EditCTAButton
+                disabled={(activeQuestion && activeQuestion !== question.id) || false}
+                onClick={() => onActiveQuestionChange(question.id)}
+              >
+                <Edit3 />
+                <Span>
+                  Edit
+                </Span>
+              </EditCTAButton>
+            </Flex>
 
-      </Flex>
-      <Div margin={5} py={6}>
-        {activeQuestion === question.id
+          </Flex>
+          {activeQuestion === question.id
           && (
             <QuestionEntryForm
               id={question.id}
@@ -84,9 +86,15 @@ const QuestionEntryItem = (
               onActiveQuestionChange={onActiveQuestionChange}
             />
           )}
-      </Div>
 
-    </QuestionEntryContainer>
+        </QuestionEntryContainer>
+      </QuestionEntryViewContainer>
+      <LinkContainer>
+        <Div padding="25px" color="black">
+          <LinkIcon color="black" />
+        </Div>
+      </LinkContainer>
+    </Flex>
   );
 };
 

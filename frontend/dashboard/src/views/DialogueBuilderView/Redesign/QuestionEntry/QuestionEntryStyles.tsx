@@ -22,10 +22,10 @@ export const OverflowSpan = styled(Span)`
   text-overflow: ellipsis;
 `;
 
-export const QuestionEntryContainer = styled(Flex) <{ activeCTA: string | null, id: string }>`
- ${({ id, activeCTA, theme }) => css`
+export const QuestionEntryViewContainer = styled(Flex) <{ activeCTA: string | null, id: string }>`
+  ${({ id, activeCTA, theme }) => css`
     position: relative;
-    flex-direction: column;
+    flex-direction: row;
     color: ${theme.colors.default.muted};
 
     ${!activeCTA && css`
@@ -42,10 +42,35 @@ export const QuestionEntryContainer = styled(Flex) <{ activeCTA: string | null, 
     `};
 
     border: ${theme.colors.app.mutedOnDefault} 1px solid;
+    border-top-left-radius: ${theme.borderRadiuses.somewhatRounded};
+    border-bottom-left-radius: ${theme.borderRadiuses.somewhatRounded};
+
     padding: 20px;
     padding-left: 30px;
     margin-bottom: 20px;
-    border-radius: ${theme.borderRadiuses.somewhatRounded};
+ `} 
+`;
+
+export const LinkContainer = styled(Flex)`
+  ${({ theme }) => css`
+    flex-direction: column;
+    color: ${theme.colors.default.muted};
+    padding: 20px 0px; 
+    margin-bottom: 40px;
+    margin-top: 20px; 
+    justify-content: center; 
+    justify-items: center; 
+    border-bottom-right-radius: ${theme.borderRadiuses.somewhatRounded};
+    border-top-right-radius: ${theme.borderRadiuses.somewhatRounded};
+    border: 1px dashed;
+    border-left: none;
+ `}
+`;
+
+export const QuestionEntryContainer = styled(Flex)`
+ ${({ theme }) => css`
+    flex-direction: column;
+    color: ${theme.colors.default.muted};
  `}
 `;
 

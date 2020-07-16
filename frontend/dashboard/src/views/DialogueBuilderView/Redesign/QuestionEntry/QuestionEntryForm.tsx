@@ -94,6 +94,15 @@ const QuestionEntryForm = ({ id, title, overrideLeaf, isRoot, type, options, lea
                 {errors.title && <Muted color="warning">Something went wrong!</Muted>}
               </Div>
 
+              <Div useFlex pl={4} pr={4} pb={2} flexDirection="column">
+                <StyledLabel>Question type</StyledLabel>
+                <Select
+                  options={questionTypes}
+                  value={activeQuestionType}
+                  onChange={(qOption: any) => setActiveQuestionType(qOption)}
+                />
+              </Div>
+
               <Div useFlex pl={4} pr={4} pb={2} flexDirection="row">
                 <StyledLabel>Is root:</StyledLabel>
                 <input
@@ -101,15 +110,6 @@ const QuestionEntryForm = ({ id, title, overrideLeaf, isRoot, type, options, lea
                   type="checkbox"
                   checked={activeRoot}
                   onChange={() => setActiveRoot((prevRoot) => !prevRoot)}
-                />
-              </Div>
-
-              <Div useFlex pl={4} pr={4} pb={2} flexDirection="column">
-                <StyledLabel>Question type</StyledLabel>
-                <Select
-                  options={questionTypes}
-                  value={activeQuestionType}
-                  onChange={(qOption: any) => setActiveQuestionType(qOption)}
                 />
               </Div>
 
