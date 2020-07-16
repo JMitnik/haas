@@ -118,6 +118,7 @@ const DialogueLayout = ({ children }: DialogueLayoutProps) => {
         <Tab to={`/dashboard/b/${customerSlug}/d/${dialogueSlug}/interactions`}>Interactions</Tab>
         <Tab to={`/dashboard/b/${customerSlug}/d/${dialogueSlug}/actions`}>Actions</Tab>
         <Tab to={`/dashboard/b/${customerSlug}/d/${dialogueSlug}/builder`}>Builder</Tab>
+        <Tab to={`/dashboard/b/${customerSlug}/d/${dialogueSlug}/builder2`}>BuilderV2</Tab>
         <Tab to={`/dashboard/b/${customerSlug}/d/${dialogueSlug}/edit`}>Settings</Tab>
       </Tabbar>
 

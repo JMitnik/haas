@@ -223,6 +223,9 @@ export const DialogueType = objectType({
               },
             ],
           },
+          orderBy: {
+            creationDate: 'asc',
+          },
         });
         return questions;
       },

@@ -16,6 +16,7 @@ import AnalyticsPage from 'pages/dashboard/analytics';
 import CustomerPage from 'pages/dashboard/customer';
 import CustomersPage from 'pages/dashboard/customers';
 import DialogueBuilderView from 'views/DialogueBuilderView/DialogueBuilderView';
+import DialogueBuilderView2 from 'views/DialogueBuilderView/Redesign/DialogueBuilderView';
 import DialoguePage from 'pages/dashboard/dialogues/dialogue';
 import DialoguesPage from 'pages/dashboard/dialogues';
 import EditCustomerView from 'views/EditCustomerView';
@@ -111,6 +112,11 @@ const AppRoutes = () => (
               render={() => (
                 <DialogueLayout>
                   <Switch>
+                    <Route
+                      path="/dashboard/b/:customerSlug/d/:dialogueSlug/builder2"
+                      render={() => <DialogueBuilderView2 />}
+                    />
+
                     <Route
                       path="/dashboard/b/:customerSlug/d/:dialogueSlug/builder"
                       render={() => <DialogueBuilderView />}
