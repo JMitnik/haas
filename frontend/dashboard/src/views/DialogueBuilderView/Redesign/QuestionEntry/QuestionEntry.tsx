@@ -7,6 +7,7 @@ import EditCTAButton from 'views/ActionsOverview/components/EditCTAButton';
 
 import { EdgeChildProps, QuestionEntryProps } from '../TopicBuilderInterfaces';
 import { OverflowSpan, QuestionEntryContainer } from './QuestionEntryStyles';
+import BuilderIcon from '../components/BuilderIcon';
 import DeleteCTAButton from '../components/DeleteCTAButton';
 import QuestionEntryForm from './QuestionEntryForm';
 
@@ -16,6 +17,7 @@ interface QuestionEntryItemProps {
   // TODO: Use right type for leafs;
   leafs: any;
   index: number;
+  Icon: (props: any) => JSX.Element;
   activeQuestion: string | null;
   onAddQuestion: (event: any, questionUUID: string) => void;
   onDeleteQuestion: (event: any, questionId: string) => void;
@@ -32,7 +34,7 @@ interface QuestionEntryItemProps {
 }
 
 const QuestionEntryItem = (
-  { question, activeQuestion, onActiveQuestionChange, leafs }: QuestionEntryItemProps,
+  { question, activeQuestion, onActiveQuestionChange, Icon, leafs }: QuestionEntryItemProps,
 ) => {
   const activeType = { label: question.type, value: question.type };
   const activeLeaf = { label: question.overrideLeaf?.title, value: question.overrideLeaf?.id };
@@ -44,7 +46,7 @@ const QuestionEntryItem = (
       </DeleteCTAButton>
 
       <Flex flexDirection="row" width="100%">
-        {/* <CTAIcon type={question.type} Icon={Icon} /> */}
+        <BuilderIcon type={question.type} Icon={Icon} />
 
         <Flex width="60%" flexDirection="column">
           <Span fontSize="1.4em">

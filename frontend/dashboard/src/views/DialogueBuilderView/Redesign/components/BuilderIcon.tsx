@@ -4,7 +4,7 @@ import { Div, Flex, Span } from '@haas/ui';
 import styled, { css } from 'styled-components';
 
 interface CTAIconProps {
-  type: { label: string, value: string };
+  type: string;
   Icon: (props: any) => JSX.Element;
 }
 
@@ -24,7 +24,7 @@ const CTAIcon = ({ type, Icon }: CTAIconProps) => (
         <Icon />
       </CTAEntryIcon>
       <Span marginTop="5px" fontSize="0.6em" color="default.darker">
-        {type.label}
+        {type}
       </Span>
     </Flex>
   </Flex>

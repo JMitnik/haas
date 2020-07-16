@@ -6,6 +6,8 @@ import { useMutation, useQuery } from '@apollo/react-hooks';
 import React, { useEffect, useState } from 'react';
 
 import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
+import HaasNodeIcon from 'components/Icons/HaasNodeIcon';
+import MultiChoiceBuilderIcon from 'components/Icons/MultiChoiceBuilderIcon';
 import updateTopicBuilder from 'mutations/updateTopicBuilder';
 
 import { DialogueBuilderContainer } from './DialogueBuilderStyles';
@@ -16,8 +18,12 @@ import {
 
 import QuestionEntry from './QuestionEntry/QuestionEntry';
 
+interface QuestionEntryExtendedProps extends QuestionEntryProps {
+  icon: (props: any) => JSX.Element;
+}
+
 interface DialogueBuilderViewProps {
-  nodes: Array<QuestionEntryProps>;
+  nodes: Array<QuestionEntryExtendedProps>;
   selectLeafs: Array<{label: string | undefined, value: string}>;
   dialogueId: string;
 }
@@ -32,12 +38,13 @@ const mapQuestionsInputData = (nodes: Array<QuestionEntryProps>) => {
   let questions = nodes?.filter((node) => !node.isLeaf);
   questions = orderBy(questions, (question) => question.creationDate, ['asc']);
   return questions?.map(({ id,
-    title, isRoot, isLeaf, type, overrideLeaf, options, children }: QuestionEntryProps) => ({
+    title, isRoot, isLeaf, type, overrideLeaf, options, children }) => ({
     id,
     title,
     isRoot,
     isLeaf,
     type,
+    icon: type === 'MULTI_CHOICE' ? MultiChoiceBuilderIcon : HaasNodeIcon,
     overrideLeaf: !overrideLeaf
       ? undefined
       : { id: overrideLeaf?.id, title: overrideLeaf?.title, type: overrideLeaf?.type },
@@ -217,7 +224,7 @@ const DialogueBuilderView = ({ nodes, selectLeafs, dialogueId }: DialogueBuilder
           <Div alignSelf="center">No question available...</Div>
         )}
 
-        {questions?.map((question: QuestionEntryProps, index: number) => (
+        {questions?.map((question: any, index: number) => (
           <QuestionEntry
             activeQuestion={activeQuestion}
             onActiveQuestionChange={setActiveQuestion}
@@ -235,6 +242,7 @@ const DialogueBuilderView = ({ nodes, selectLeafs, dialogueId }: DialogueBuilder
             index={index}
             questionsQ={questions}
             question={question}
+            Icon={question.icon}
             leafs={selectLeafs}
           />
         ))}

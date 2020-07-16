@@ -37,7 +37,6 @@ const ActionsPage = () => {
     if (leaf.type === 'SOCIAL_SHARE') {
       const mappedLinks = leaf.links?.map((link: any) => {
         const { __typename, ...linkedData } = link;
-        console.log('linked data: ', linkedData);
         return { ...linkedData, type: { label: link.type, value: link.type } };
       });
       return { ...leaf, type: 'LINK', icon: LinkIcon, links: mappedLinks };
