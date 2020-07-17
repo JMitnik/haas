@@ -10,11 +10,12 @@ import RegisterIcon from 'components/Icons/RegisterIcon';
 import SplitArrowIcon from 'components/Icons/SplitIcon';
 
 import { AddQuestionContainer, DepthSpan } from './QuestionEntryStyles';
-import { EdgeChildProps, EdgeConditonProps, QuestionEntryProps } from '../TopicBuilderInterfaces';
+import { EdgeChildProps, EdgeConditonProps, QuestionEntryProps, QuestionOptionProps } from '../TopicBuilderInterfaces';
 import QuestionEntry from './QuestionEntry';
 import QuestionEntryForm from './QuestionEntryForm';
 
 interface QuestionSectionProps {
+  options: QuestionOptionProps[] | undefined;
   questionsQ: Array<QuestionEntryProps>;
   question: QuestionEntryProps;
   leafs: any;
@@ -28,7 +29,7 @@ interface QuestionSectionProps {
   condition: EdgeConditonProps | undefined;
 }
 
-const QuestionSection = ({ activeQuestion, onActiveQuestionChange, onAddQuestion, onDeleteQuestion, questionsQ, question, leafs, Icon, depth, condition }: QuestionSectionProps) => {
+const QuestionSection = ({ activeQuestion, onActiveQuestionChange, onAddQuestion, onDeleteQuestion, questionsQ, question, leafs, Icon, depth, condition, options }: QuestionSectionProps) => {
   const [isExpanded, setExpanded] = useState(depth === 1 || false);
   const handleExpandChange = () => {
     setExpanded((prevExpanded) => !prevExpanded);
@@ -36,11 +37,15 @@ const QuestionSection = ({ activeQuestion, onActiveQuestionChange, onAddQuestion
 
   const activeChildrenIds = question.children?.map((child) => child.childNode.id);
   const children: Array<QuestionEntryProps> = questionsQ.filter((question) => activeChildrenIds?.includes(question.id));
+  const parentOptions = question.options;
 
-  const getConditionOfQuestion = (childNodeId: string) => {
+  const getConditionOfParentQuestion = (childNodeId: string) => {
     const childNode = question.children?.find((child) => childNodeId === child.childNode.id);
     return childNode?.conditions[0];
   };
+
+  // TODO: Send options from parent to question entry
+  console.log('QUESTION SECTION: ', options);
 
   return (
     <Flex padding={`${depth * 10}px`} flexDirection="column">
@@ -55,6 +60,7 @@ const QuestionSection = ({ activeQuestion, onActiveQuestionChange, onAddQuestion
       </Flex>
       )}
       <QuestionEntry
+        parentOptions={options}
         condition={condition}
         isExpanded={isExpanded}
         onExpandChange={handleExpandChange}
@@ -72,9 +78,10 @@ const QuestionSection = ({ activeQuestion, onActiveQuestionChange, onAddQuestion
       {isExpanded && children.map(
         (child, index) => (
           <QuestionSection
-            condition={getConditionOfQuestion(child.id)}
+            options={parentOptions}
+            condition={getConditionOfParentQuestion(child.id)}
             depth={depth + 1}
-            Icon={child.icon} // child.Icon ?
+            Icon={child.icon}
             activeQuestion={activeQuestion}
             index={index}
             leafs={leafs}

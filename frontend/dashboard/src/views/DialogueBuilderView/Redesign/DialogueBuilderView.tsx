@@ -159,6 +159,7 @@ const DialogueBuilderView = ({ nodes, selectLeafs, root }: DialogueBuilderViewPr
 
         {root && (
         <QuestionSection
+          options={root.options}
           condition={undefined}
           depth={1}
           activeQuestion={activeQuestion}

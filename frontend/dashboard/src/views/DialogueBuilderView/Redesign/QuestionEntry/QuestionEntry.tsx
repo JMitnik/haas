@@ -8,7 +8,7 @@ import LinkIcon from 'components/Icons/LinkIcon';
 
 import OpinionIcon from 'components/Icons/OpinionIcon';
 import { AddChildContainer, AddChildIconContainer, LinkContainer, OverflowSpan, QuestionEntryContainer, QuestionEntryViewContainer, TypeSpan } from './QuestionEntryStyles';
-import { EdgeChildProps, EdgeConditonProps, QuestionEntryProps } from '../TopicBuilderInterfaces';
+import { EdgeChildProps, EdgeConditonProps, QuestionEntryProps, QuestionOptionProps } from '../TopicBuilderInterfaces';
 import BuilderIcon from '../components/BuilderIcon';
 import DeleteCTAButton from '../components/DeleteCTAButton';
 import QuestionEntryForm from './QuestionEntryForm';
@@ -27,6 +27,7 @@ interface QuestionEntryItemProps {
   onDeleteQuestion?: (event: any, questionId: string) => void;
   onActiveQuestionChange: React.Dispatch<React.SetStateAction<string | null>>;
   condition: EdgeConditonProps | undefined;
+  parentOptions: QuestionOptionProps[] | undefined;
 }
 
 const AddChildComponent = ({ isExpanded, onExpandChange }:{ isExpanded: Boolean, onExpandChange: () => void }) => (
@@ -41,7 +42,7 @@ const AddChildComponent = ({ isExpanded, onExpandChange }:{ isExpanded: Boolean,
 );
 
 const QuestionEntryItem = (
-  { question, activeQuestion, onActiveQuestionChange, Icon, leafs, onExpandChange, isExpanded, condition }: QuestionEntryItemProps,
+  { question, activeQuestion, onActiveQuestionChange, Icon, leafs, onExpandChange, isExpanded, condition, parentOptions }: QuestionEntryItemProps,
 ) => {
   const activeType = { label: question.type, value: question.type };
   const activeLeaf = { label: question.overrideLeaf?.title, value: question.overrideLeaf?.id };
@@ -85,6 +86,7 @@ const QuestionEntryItem = (
           {activeQuestion === question.id
           && (
             <QuestionEntryForm
+              parentOptions={parentOptions}
               condition={condition}
               id={question.id}
               title={question.title}
