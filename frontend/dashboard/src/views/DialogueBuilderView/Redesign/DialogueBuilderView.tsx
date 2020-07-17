@@ -116,113 +116,9 @@ const DialogueBuilderPage = () => {
   );
 };
 
-const DialogueBuilderView = ({ nodes, selectLeafs, dialogueId, root }: DialogueBuilderViewProps) => {
-  const { customerSlug, dialogueSlug } = useParams();
-  const history = useHistory();
-
+const DialogueBuilderView = ({ nodes, selectLeafs, root }: DialogueBuilderViewProps) => {
   const [questions, setQuestions] = useState(nodes);
   const [activeQuestion, setActiveQuestion] = useState<null | string>(null);
-
-  const [updateTopic] = useMutation(updateTopicBuilder, {
-    onCompleted: () => {
-      history.push(`/dashboard/b/${customerSlug}/d/${dialogueSlug}`);
-    },
-    refetchQueries: [{
-      query: getTopicBuilderQuery,
-      variables: {
-        customerSlug,
-        dialogueSlug,
-      },
-    }],
-    onError: (serverError: ApolloError) => {
-      // eslint-disable-next-line no-console
-      console.log(serverError);
-    },
-  });
-
-  const handleOnQuestionExpandChange = (questionId: string) => setActiveQuestion(
-    (prevActiveQuestion) => {
-      if (!questionId) {
-        return prevActiveQuestion;
-      }
-      if (questionId && prevActiveQuestion === questionId) {
-        return null;
-      }
-      return questionId;
-    },
-  );
-
-  const handleTitleChange = (title: string, questionId: string) => {
-    setQuestions((questionsPrev: any) => {
-      const questionIds = questions.map((question) => question.id);
-      const questionIndex = questionIds.indexOf(questionId);
-      questionsPrev[questionIndex].title = title;
-      return [...questionsPrev];
-    });
-  };
-
-  const handleIsRootQuestionChange = (isRoot: boolean, questionId: string) => {
-    setQuestions((questionsPrev: any) => {
-      const questionIds = questions.map((question) => question.id);
-      const questionIndex = questionIds.indexOf(questionId);
-      questionsPrev[questionIndex].isRoot = isRoot;
-      return [...questionsPrev];
-    });
-  };
-
-  const handleLeafNodeChange = (leaf: any, questionId: string) => {
-    setQuestions((questionsPrev: any) => {
-      const questionIds = questions.map((question) => question.id);
-      const questionIndex = questionIds.indexOf(questionId);
-      const question = questionsPrev[questionIndex];
-      if (question.overrideLeaf?.id) {
-        if (leaf?.id === 'None') {
-          question.overrideLeaf = undefined;
-          return [...questionsPrev];
-        }
-      }
-      question.overrideLeaf = leaf;
-      return [...questionsPrev];
-    });
-  };
-
-  const handleQuestionTypeChange = (value: string, questionId: string) => {
-    setQuestions((questionsPrev: any) => {
-      const questionIds = questions.map((question) => question.id);
-      const questionIndex = questionIds.indexOf(questionId);
-      questionsPrev[questionIndex].type = value;
-      return [...questionsPrev];
-    });
-  };
-
-  const handleAddQuestionOption = (value: Array<any>, questionId: string) => {
-    setQuestions((questionsPrev: any) => {
-      const questionIds = questions.map((question) => question.id);
-      const questionIndex = questionIds.indexOf(questionId);
-      questionsPrev[questionIndex].options = value;
-      return [...questionsPrev];
-    });
-  };
-
-  const handleQuestionOptionsChange = (
-    questionOptions: Array<QuestionOptionProps>, questionId: string,
-  ) => {
-    setQuestions((questionsPrev: any) => {
-      const questionIds = questions.map((question) => question.id);
-      const questionIndex = questionIds.indexOf(questionId);
-      questionsPrev[questionIndex].options = questionOptions;
-      return [...questionsPrev];
-    });
-  };
-
-  const handleEdgesChange = (children: Array<EdgeChildProps>, questionId: string) => {
-    setQuestions((questionsPrev: any) => {
-      const questionIds = questions.map((question) => question.id);
-      const questionIndex = questionIds.indexOf(questionId);
-      questionsPrev[questionIndex].children = children;
-      return [...questionsPrev];
-    });
-  };
 
   const handleAddQuestion = (event: any, quesionUUID: string) => {
     event.preventDefault();
@@ -263,6 +159,7 @@ const DialogueBuilderView = ({ nodes, selectLeafs, dialogueId, root }: DialogueB
 
         {root && (
         <QuestionSection
+          condition={undefined}
           depth={1}
           activeQuestion={activeQuestion}
           onActiveQuestionChange={setActiveQuestion}

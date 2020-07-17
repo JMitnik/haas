@@ -8,7 +8,7 @@ import LinkIcon from 'components/Icons/LinkIcon';
 
 import OpinionIcon from 'components/Icons/OpinionIcon';
 import { AddChildContainer, AddChildIconContainer, LinkContainer, OverflowSpan, QuestionEntryContainer, QuestionEntryViewContainer, TypeSpan } from './QuestionEntryStyles';
-import { EdgeChildProps, QuestionEntryProps } from '../TopicBuilderInterfaces';
+import { EdgeChildProps, EdgeConditonProps, QuestionEntryProps } from '../TopicBuilderInterfaces';
 import BuilderIcon from '../components/BuilderIcon';
 import DeleteCTAButton from '../components/DeleteCTAButton';
 import QuestionEntryForm from './QuestionEntryForm';
@@ -26,6 +26,7 @@ interface QuestionEntryItemProps {
   onAddQuestion?: (event: any, questionUUID: string) => void;
   onDeleteQuestion?: (event: any, questionId: string) => void;
   onActiveQuestionChange: React.Dispatch<React.SetStateAction<string | null>>;
+  condition: EdgeConditonProps | undefined;
 }
 
 const AddChildComponent = ({ isExpanded, onExpandChange }:{ isExpanded: Boolean, onExpandChange: () => void }) => (
@@ -40,16 +41,19 @@ const AddChildComponent = ({ isExpanded, onExpandChange }:{ isExpanded: Boolean,
 );
 
 const QuestionEntryItem = (
-  { question, activeQuestion, onActiveQuestionChange, Icon, leafs, onExpandChange, isExpanded }: QuestionEntryItemProps,
+  { question, activeQuestion, onActiveQuestionChange, Icon, leafs, onExpandChange, isExpanded, condition }: QuestionEntryItemProps,
 ) => {
   const activeType = { label: question.type, value: question.type };
   const activeLeaf = { label: question.overrideLeaf?.title, value: question.overrideLeaf?.id };
 
   return (
     <Flex position="relative" justifyContent="center" alignItems="center" flexGrow={1}>
-      <QuestionEntryViewContainer activeCTA={null} id={question.id} flexGrow={1}>
+      <QuestionEntryViewContainer activeCTA={activeQuestion} id={question.id} flexGrow={1}>
         <QuestionEntryContainer flexGrow={1}>
-          <DeleteCTAButton disabled={(!!activeQuestion && activeQuestion !== question.id) || false} onClick={() => null}>
+          <DeleteCTAButton
+            disabled={(!!activeQuestion && activeQuestion !== question.id) || false}
+            onClick={() => null}
+          >
             <X />
           </DeleteCTAButton>
 
@@ -81,6 +85,7 @@ const QuestionEntryItem = (
           {activeQuestion === question.id
           && (
             <QuestionEntryForm
+              condition={condition}
               id={question.id}
               title={question.title}
               isRoot={question.isRoot}

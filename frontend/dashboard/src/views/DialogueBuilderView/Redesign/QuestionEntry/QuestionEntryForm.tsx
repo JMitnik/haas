@@ -7,8 +7,8 @@ import Select from 'react-select';
 
 import { Button, Div, Flex, Form, FormGroupContainer, Grid, H3, H4, Hr, Muted, StyledInput, StyledLabel } from '@haas/ui';
 import { DeleteQuestionOptionButtonContainer, QuestionEntryHeader } from 'views/DialogueBuilderView/QuestionEntry/QuestionEntryStyles';
-import { QuestionOptionProps } from 'views/DialogueBuilderView/TopicBuilderInterfaces';
 import DeleteLinkSesctionButton from 'views/ActionsOverview/components/DeleteLinkSectionButton';
+import { EdgeConditonProps, QuestionOptionProps } from '../TopicBuilderInterfaces';
 
 interface FormDataProps {
   title: string;
@@ -29,13 +29,14 @@ interface QuestionEntryFormProps {
   options: Array<QuestionOptionProps>;
   leafs: Array<{ label: string, value: string }>;
   onActiveQuestionChange: React.Dispatch<React.SetStateAction<string | null>>;
+  condition: EdgeConditonProps | undefined;
 }
 
 const questionTypes = [
   { value: 'SLIDER', label: 'SLIDER' },
   { value: 'MULTI_CHOICE', label: 'MULTI_CHOICE' }];
 
-const QuestionEntryForm = ({ id, title, overrideLeaf, isRoot, type, options, leafs, onActiveQuestionChange }: QuestionEntryFormProps) => {
+const QuestionEntryForm = ({ id, title, overrideLeaf, type, options, leafs, onActiveQuestionChange, condition }: QuestionEntryFormProps) => {
   const { register, handleSubmit, setValue, errors } = useForm<FormDataProps>({
     // validationSchema: schema,
   });
@@ -71,6 +72,8 @@ const QuestionEntryForm = ({ id, title, overrideLeaf, isRoot, type, options, lea
   const onSubmit = (formData: FormDataProps) => {
 
   };
+
+  console.log('condition: ', condition);
 
   return (
     <Form onSubmit={handleSubmit(onSubmit)}>
