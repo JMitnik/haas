@@ -18,7 +18,7 @@ export const DeleteQuestionOptionButtonContainer = styled.button`
   opacity: 0.1;
   cursor: pointer;
   transition: all 0.2s ease-in;
-  margin-left: 1%;
+  margin-left: 10px;
   &:hover {
     transition: all 0.2s ease-in;
     opacity: 0.8;

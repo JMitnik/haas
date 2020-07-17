@@ -113,6 +113,32 @@ export const QuestionNodeInput = inputObjectType({
 export const QuestionNodeMutations = extendType({
   type: 'Mutation',
   definition(t) {
+    t.field('updateQuestion', {
+      type: QuestionNodeType,
+      args: {
+        title: 'String',
+        type: 'String',
+        overrideLeafId: 'String',
+        // TODO: Add options
+      },
+      resolve(parent: any, args: any, ctx: any) {
+        return null;
+      },
+    });
+
+    t.field('createQuestion', {
+      type: QuestionNodeType,
+      args: {
+        title: 'String',
+        type: 'String',
+        // TODO: Finish this mutation gonna work on update mutation first!
+      },
+      resolve(parent: any, args: any, ctx: any) {
+        const { prisma }: { prisma: PrismaClient } = ctx;
+        return null;
+      },
+    });
+
     t.field('updateCTA', {
       type: QuestionNodeType,
       args: {
@@ -124,7 +150,6 @@ export const QuestionNodeMutations = extendType({
       async resolve(parent: any, args: any, ctx: any) {
         const { prisma }: { prisma: PrismaClient } = ctx;
         const { title, type, id, links } = args;
-        console.log('links: ', links?.linkTypes);
         const dbQuestionNode = await prisma.questionNode.findOne({
           where: {
             id,

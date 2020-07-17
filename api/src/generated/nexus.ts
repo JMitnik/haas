@@ -474,6 +474,7 @@ export interface NexusGenFieldTypes {
     createCustomer: NexusGenRootTypes['Customer']; // Customer!
     createDialogue: NexusGenRootTypes['Dialogue']; // Dialogue!
     createPermission: NexusGenRootTypes['PermssionType']; // PermssionType!
+    createQuestion: NexusGenRootTypes['QuestionNode']; // QuestionNode!
     createRole: NexusGenRootTypes['RoleType']; // RoleType!
     createTag: NexusGenRootTypes['TagType']; // TagType!
     createTrigger: NexusGenRootTypes['TriggerType']; // TriggerType!
@@ -490,6 +491,7 @@ export interface NexusGenFieldTypes {
     editUser: NexusGenRootTypes['UserType']; // UserType!
     singleUpload: NexusGenRootTypes['ImageType']; // ImageType!
     updateCTA: NexusGenRootTypes['QuestionNode']; // QuestionNode!
+    updateQuestion: NexusGenRootTypes['QuestionNode']; // QuestionNode!
     updateRoles: NexusGenRootTypes['RoleType']; // RoleType!
     updateTopicBuilder: string; // String!
     uploadUserSession: NexusGenRootTypes['Session']; // Session!
@@ -690,6 +692,10 @@ export interface NexusGenArgTypes {
     createPermission: { // args
       data?: NexusGenInputs['PermissionInput'] | null; // PermissionInput
     }
+    createQuestion: { // args
+      title?: string | null; // String
+      type?: string | null; // String
+    }
     createRole: { // args
       data?: NexusGenInputs['RoleInput'] | null; // RoleInput
     }
@@ -754,6 +760,11 @@ export interface NexusGenArgTypes {
     updateCTA: { // args
       id?: string | null; // String
       links?: NexusGenInputs['CTALinksInputType'] | null; // CTALinksInputType
+      title?: string | null; // String
+      type?: string | null; // String
+    }
+    updateQuestion: { // args
+      overrideLeafId?: string | null; // String
       title?: string | null; // String
       type?: string | null; // String
     }

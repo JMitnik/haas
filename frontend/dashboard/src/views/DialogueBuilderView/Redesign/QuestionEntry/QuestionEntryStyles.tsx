@@ -70,7 +70,7 @@ export const QuestionEntryViewContainer = styled(Flex) <{ activeCTA: string | nu
 
     padding: 20px;
     padding-left: 30px;
-    margin-bottom: 40px;
+    margin-bottom: 25px;
  `} 
 `;
 
@@ -83,7 +83,7 @@ export const AddChildContainer = styled(Flex)`
     cursor: pointer;
     bottom: 0; 
     left: 50%;
-    transform: translate(-50%, -25px);
+    transform: translate(-50%, -10px);
     min-width: 250px;
     color: ${theme.colors.default.darkest};
     border-radius: ${theme.borderRadiuses.rounded};
@@ -98,7 +98,7 @@ export const LinkContainer = styled(Flex) <{ hasCTA?: Boolean }>`
     justify-items: center;
 
     color: ${theme.colors.default.muted};
-    margin-bottom: 40px;
+    margin-bottom: 25px;
     
     ${!hasCTA && css`
       border-color: ${theme.colors.default.darkest};

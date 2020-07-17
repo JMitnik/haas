@@ -265,6 +265,136 @@ class NodeResolver {
     return null;
   };
 
+  static updateQuestionFromBuilder = async (questionnaireId: string, questionData: QuestionProps) => {
+    const {
+      title,
+      isRoot,
+      isLeaf,
+      type,
+      overrideLeaf,
+      children,
+      options,
+    } = questionData;
+    const activeQuestion = await prisma.questionNode.findOne({ where: { id: questionData.id },
+      include: {
+        children: true,
+        options: true,
+        overrideLeaf: {
+          select: {
+            id: true,
+          },
+        },
+      } });
+    const activeEdges = activeQuestion ? activeQuestion?.children.map((edge) => edge.id) : [];
+    const activeOptions = activeQuestion ? activeQuestion?.options.map((option) => option.id) : [];
+    const currentOverrideLeafId = activeQuestion ? activeQuestion.overrideLeafId : null;
+
+    const leaf = NodeResolver.getLeafObject(currentOverrideLeafId, overrideLeaf);
+    try {
+      await NodeResolver.removeNonExistingQOptions(activeOptions, options, questionData.id);
+    } catch (e) {
+      console.log('Something went wrong removing options');
+    }
+    try {
+      await EdgeResolver.removeNonExistingEdges(activeEdges, children, questionData.id);
+    } catch (e) {
+      console.log('something went wrong removing edges: ', e);
+    }
+
+    // // Update existing EdgeChildren
+    const updatedOptionIds = await NodeResolver.updateQuestionOptions(options);
+    const updatedEdges = await Promise.all(children?.map(async (edge) => {
+      const condition = await NodeResolver.updateNewQConditions(edge);
+      return prisma.edge.upsert(
+        {
+          where: { id: edge.id ? edge.id : 'nooope' },
+          create: {
+            dialogue: {
+              connect: {
+                id: questionnaireId,
+              },
+            },
+            parentNode: {
+              connect: {
+                id: edge.parentNode.id,
+              },
+            },
+            conditions: {
+              connect: condition,
+            },
+            childNode: {
+              connect: {
+                id: edge.childNode.id,
+              },
+            },
+          },
+          update: {
+            dialogue: {
+              connect: {
+                id: questionnaireId,
+              },
+            },
+            parentNode: {
+              connect: {
+                id: edge.parentNode.id,
+              },
+            },
+            conditions: {
+              connect: condition,
+            },
+            childNode: {
+              connect: {
+                id: edge.childNode.id,
+              },
+            },
+          },
+        },
+      );
+    }));
+    const updatedEdgeIds = updatedEdges.map((edge) => ({ id: edge.id }));
+    const questionId = questionData.id;
+    const updated = leaf ? await prisma.questionNode.update({
+      where: { id: questionId },
+      data: {
+        title,
+        overrideLeaf: leaf,
+        questionDialogue: {
+          connect: {
+            id: questionnaireId,
+          },
+        },
+        isRoot,
+        isLeaf,
+        type,
+        options: {
+          connect: updatedOptionIds,
+        },
+        children: {
+          connect: updatedEdgeIds,
+        },
+      },
+    }) : await prisma.questionNode.update({
+      where: { id: questionId },
+      data: {
+        title,
+        questionDialogue: {
+          connect: {
+            id: questionnaireId,
+          },
+        },
+        isRoot,
+        isLeaf,
+        type,
+        options: {
+          connect: updatedOptionIds,
+        },
+        children: {
+          connect: updatedEdgeIds,
+        },
+      },
+    });
+  };
+
   static updateQuestion = async (questionnaireId: string, questionData: QuestionProps) => {
     const {
       title,

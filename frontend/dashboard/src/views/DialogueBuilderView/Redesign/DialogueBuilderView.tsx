@@ -276,63 +276,7 @@ const DialogueBuilderView = ({ nodes, selectLeafs, dialogueId, root }: DialogueB
           leafs={selectLeafs}
         />
         )}
-
-        {/* {questions?.map((question: any, index: number) => (
-          <QuestionEntry
-            activeQuestion={activeQuestion}
-            onActiveQuestionChange={setActiveQuestion}
-            onQuestionExpandChange={handleOnQuestionExpandChange}
-            onIsRootQuestionChange={handleIsRootQuestionChange}
-            onLeafNodeChange={handleLeafNodeChange}
-            onEdgesChange={handleEdgesChange}
-            onAddQuestion={handleAddQuestion}
-            onDeleteQuestion={handleDeleteQuestion}
-            onAddQuestionOption={handleAddQuestionOption}
-            onQuestionOptionsChange={handleQuestionOptionsChange}
-            onQuestionTypeChange={handleQuestionTypeChange}
-            onTitleChange={handleTitleChange}
-            key={index}
-            index={index}
-            questionsQ={questions}
-            question={question}
-            Icon={question.icon}
-            leafs={selectLeafs}
-          />
-        ))} */}
       </ColumnFlex>
-
-      <Div display="flex" mt={4} justifyContent="space-around">
-        <Button
-          brand="primary"
-          mt={2}
-          ml={4}
-          mr={4}
-          onClick={(e) => {
-            e.preventDefault();
-            updateTopic({
-              variables: {
-                customerSlug,
-                dialogueSlug,
-                topicData: {
-                  id: dialogueId,
-                  questions,
-                },
-              },
-            });
-          }}
-        >
-          Save dialogue
-        </Button>
-        <Button
-          brand="default"
-          mt={2}
-          ml={4}
-          mr={4}
-          onClick={() => history.goBack()}
-        >
-          Cancel
-        </Button>
-      </Div>
     </DialogueBuilderContainer>
   );
 };

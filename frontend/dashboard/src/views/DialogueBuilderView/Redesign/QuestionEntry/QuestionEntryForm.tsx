@@ -40,7 +40,6 @@ const QuestionEntryForm = ({ id, title, overrideLeaf, isRoot, type, options, lea
     // validationSchema: schema,
   });
   const [activeTitle, setActiveTitle] = useState(title);
-  const [activeRoot, setActiveRoot] = useState(isRoot);
   const [activeQuestionType, setActiveQuestionType] = useState(type);
   const [activeOptions, setActiveOptions] = useState(options);
   const [activeLeaf, setActiveLeaf] = useState(overrideLeaf);
@@ -69,7 +68,9 @@ const QuestionEntryForm = ({ id, title, overrideLeaf, isRoot, type, options, lea
     });
   };
 
-  const onSubmit = (formData: FormDataProps) => {};
+  const onSubmit = (formData: FormDataProps) => {
+
+  };
 
   return (
     <Form onSubmit={handleSubmit(onSubmit)}>
@@ -103,60 +104,6 @@ const QuestionEntryForm = ({ id, title, overrideLeaf, isRoot, type, options, lea
                 />
               </Div>
 
-              <Div useFlex pl={4} pr={4} pb={2} flexDirection="row">
-                <StyledLabel>Is root:</StyledLabel>
-                <input
-                  name="isGoing"
-                  type="checkbox"
-                  checked={activeRoot}
-                  onChange={() => setActiveRoot((prevRoot) => !prevRoot)}
-                />
-              </Div>
-
-              {activeQuestionType && activeQuestionType.value === 'MULTI_CHOICE' && (
-              <Div useFlex pl={4} pr={4} pb={2} flexDirection="column">
-                <QuestionEntryHeader>
-                  OPTIONS (
-                  {activeOptions.length}
-                  {' '}
-                  option(s) selected)
-                </QuestionEntryHeader>
-
-                <Div>
-                  {((activeOptions && activeOptions.length === 0) || (!activeOptions)) && (
-                  <Div alignSelf="center">
-                    No options available...
-                  </Div>
-                  )}
-                  {activeOptions && activeOptions.map((option, optionIndex) => (
-                    <Div key={`${optionIndex}-${option.value}`} my={1} useFlex flexDirection="row">
-                      <StyledInput
-                        key={optionIndex}
-                        name={`${id}-option-${optionIndex}`}
-                        defaultValue={option.value}
-                        onBlur={(e) => handleOptionChange(e, optionIndex)}
-                      />
-                      <DeleteQuestionOptionButtonContainer
-                        onClick={(e) => deleteOption(e, optionIndex)}
-                      >
-                        <MinusCircle />
-                      </DeleteQuestionOptionButtonContainer>
-                    </Div>
-                  ))}
-                  <Button
-                    brand="default"
-                    mt={2}
-                    ml={4}
-                    mr={4}
-                    onClick={() => addNewOption()}
-                  >
-                    Add new option
-                  </Button>
-                  <Hr />
-                </Div>
-              </Div>
-              )}
-
               <Div useFlex pl={4} pr={4} pb={2} flexDirection="column">
                 <StyledLabel>Leaf node</StyledLabel>
                 <Select
@@ -165,6 +112,42 @@ const QuestionEntryForm = ({ id, title, overrideLeaf, isRoot, type, options, lea
                   onChange={(leafOption: any) => setActiveLeaf(leafOption)}
                 />
               </Div>
+
+              {activeQuestionType && activeQuestionType.value === 'Multi-Choice' && (
+                <>
+                  <Div mb={1} gridColumn="1 / -1">
+                    <Flex justifyContent="space-between">
+                      <H4>
+                        Options
+                      </H4>
+                      <PlusCircle style={{ cursor: 'pointer' }} onClick={() => addNewOption()} />
+                    </Flex>
+
+                    <Hr />
+                  </Div>
+
+                    {((activeOptions && activeOptions.length === 0) || (!activeOptions)) && (
+                    <Div alignSelf="center">
+                      No options available...
+                    </Div>
+                    )}
+                    {activeOptions && activeOptions.map((option, optionIndex) => (
+                      <Flex pl={4} pr={4} pb={2} key={`${optionIndex}-${option.value}`} my={1} flexDirection="row">
+                        <StyledInput
+                          key={optionIndex}
+                          name={`${id}-option-${optionIndex}`}
+                          defaultValue={option.value}
+                          onBlur={(e) => handleOptionChange(e, optionIndex)}
+                        />
+                        <DeleteQuestionOptionButtonContainer
+                          onClick={(e) => deleteOption(e, optionIndex)}
+                        >
+                          <MinusCircle />
+                        </DeleteQuestionOptionButtonContainer>
+                      </Flex>
+                    ))}
+                </>
+              )}
             </Grid>
           </Div>
         </Grid>
@@ -172,7 +155,7 @@ const QuestionEntryForm = ({ id, title, overrideLeaf, isRoot, type, options, lea
 
       <Div>
         <Flex>
-          <Button brand="primary" mr={2} type="submit">Save CTA</Button>
+          <Button brand="primary" mr={2} type="submit">Save Question</Button>
           <Button brand="default" type="button" onClick={() => onActiveQuestionChange(null)}>Cancel</Button>
         </Flex>
       </Div>

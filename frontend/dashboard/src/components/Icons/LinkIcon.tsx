@@ -11,7 +11,7 @@ const Svg = styled.svg <{isCTA?: Boolean, hasCTA?: Boolean}>`
       ${!isCTA && css`
         fill: white;
       `}
-      ${!hasCTA && css`
+      ${(isCTA && !hasCTA) && css`
         fill: ${theme.colors.default.darkest};
         opacity: 0.4;
       `}
