@@ -133,6 +133,14 @@ type EdgeCondition {
   renderMin: Int
 }
 
+input EdgeConditionInputType {
+  conditionType: String
+  id: Int
+  matchValue: String
+  renderMax: Int
+  renderMin: Int
+}
+
 input EdgeNodeInput {
   id: ID
   title: String
@@ -234,7 +242,7 @@ type Mutation {
   editUser(id: String, input: UserInput): UserType!
   singleUpload(file: Upload): ImageType!
   updateCTA(id: String, links: CTALinksInputType, title: String, type: String): QuestionNode!
-  updateQuestion(overrideLeafId: String, title: String, type: String): QuestionNode!
+  updateQuestion(edgeCondition: EdgeConditionInputType, edgeId: String, id: String, options: OptionsInputType, overrideLeafId: String, title: String, type: String): QuestionNode!
   updateRoles(permissions: PermissionIdsInput, roleId: String): RoleType!
   updateTopicBuilder(customerSlug: String, dialogueSlug: String, topicData: TopicDataEntry): String!
   uploadUserSession(uploadUserSessionInput: UploadUserSessionInput): Session!
@@ -264,6 +272,16 @@ input OptionInput {
   id: Int
   publicValue: String
   value: String
+}
+
+input OptionInputType {
+  id: Int
+  publicValue: String
+  value: String
+}
+
+input OptionsInputType {
+  options: [OptionInputType!]
 }
 
 input PermissionIdsInput {

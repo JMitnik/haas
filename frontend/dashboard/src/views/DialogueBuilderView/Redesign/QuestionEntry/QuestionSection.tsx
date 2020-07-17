@@ -27,9 +27,10 @@ interface QuestionSectionProps {
   onActiveQuestionChange: React.Dispatch<React.SetStateAction<string | null>>;
   depth: number;
   condition: EdgeConditonProps | undefined;
+  edgeId: string | undefined;
 }
 
-const QuestionSection = ({ activeQuestion, onActiveQuestionChange, onAddQuestion, onDeleteQuestion, questionsQ, question, leafs, Icon, depth, condition, options }: QuestionSectionProps) => {
+const QuestionSection = ({ activeQuestion, onActiveQuestionChange, onAddQuestion, onDeleteQuestion, questionsQ, question, leafs, Icon, depth, condition, options, edgeId }: QuestionSectionProps) => {
   const [isExpanded, setExpanded] = useState(depth === 1 || false);
   const handleExpandChange = () => {
     setExpanded((prevExpanded) => !prevExpanded);
@@ -40,12 +41,14 @@ const QuestionSection = ({ activeQuestion, onActiveQuestionChange, onAddQuestion
   const parentOptions = question.options;
 
   const getConditionOfParentQuestion = (childNodeId: string) => {
-    const childNode = question.children?.find((child) => childNodeId === child.childNode.id);
-    return childNode?.conditions[0];
+    const edge = question.children?.find((child) => childNodeId === child.childNode.id);
+    return edge?.conditions[0];
   };
 
-  // TODO: Send options from parent to question entry
-  console.log('QUESTION SECTION: ', options);
+  const getEdgeIdfromParentQuestion = (childNodeId: string) => {
+    const edge = question.children?.find((child) => childNodeId === child.childNode.id);
+    return edge?.id;
+  };
 
   return (
     <Flex padding={`${depth * 10}px`} flexDirection="column">
@@ -60,6 +63,7 @@ const QuestionSection = ({ activeQuestion, onActiveQuestionChange, onAddQuestion
       </Flex>
       )}
       <QuestionEntry
+        edgeId={edgeId}
         parentOptions={options}
         condition={condition}
         isExpanded={isExpanded}
@@ -78,6 +82,7 @@ const QuestionSection = ({ activeQuestion, onActiveQuestionChange, onAddQuestion
       {isExpanded && children.map(
         (child, index) => (
           <QuestionSection
+            edgeId={getEdgeIdfromParentQuestion(child.id)}
             options={parentOptions}
             condition={getConditionOfParentQuestion(child.id)}
             depth={depth + 1}

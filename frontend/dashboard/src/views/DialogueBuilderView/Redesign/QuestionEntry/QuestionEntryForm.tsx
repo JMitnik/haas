@@ -1,14 +1,18 @@
 
 import { MinusCircle, PlusCircle, X } from 'react-feather';
 import { useForm } from 'react-hook-form';
+import { useMutation } from '@apollo/react-hooks';
 import { useParams } from 'react-router';
 import React, { useState } from 'react';
 import Select from 'react-select';
 
 import { Button, Div, Flex, Form, FormGroupContainer, Grid, H3, H4, Hr, Muted, StyledInput, StyledLabel } from '@haas/ui';
 import { DeleteQuestionOptionButtonContainer, QuestionEntryHeader } from 'views/DialogueBuilderView/QuestionEntry/QuestionEntryStyles';
-import { EdgeConditonProps, QuestionOptionProps } from '../TopicBuilderInterfaces';
 import DeleteLinkSesctionButton from 'views/ActionsOverview/components/DeleteLinkSectionButton';
+import updateQuestionMutation from 'mutations/updateQuestion';
+
+import { ApolloError } from 'apollo-client';
+import { EdgeConditonProps, QuestionOptionProps } from '../TopicBuilderInterfaces';
 
 interface FormDataProps {
   title: string;
@@ -31,6 +35,7 @@ interface QuestionEntryFormProps {
   onActiveQuestionChange: React.Dispatch<React.SetStateAction<string | null>>;
   condition: EdgeConditonProps | undefined;
   parentOptions: QuestionOptionProps[] | undefined;
+  edgeId: string | undefined;
 }
 
 const questionTypes = [
@@ -41,7 +46,7 @@ const conditionTypes = [
   { value: 'match', label: 'match' },
   { value: 'valueBoundary', label: 'valueBoundary' }];
 
-const QuestionEntryForm = ({ id, title, overrideLeaf, type, options, leafs, onActiveQuestionChange, condition, parentOptions }: QuestionEntryFormProps) => {
+const QuestionEntryForm = ({ id, title, overrideLeaf, type, options, leafs, onActiveQuestionChange, condition, parentOptions, edgeId }: QuestionEntryFormProps) => {
   const { register, handleSubmit, setValue, errors } = useForm<FormDataProps>({
     // validationSchema: schema,
   });
@@ -49,6 +54,7 @@ const QuestionEntryForm = ({ id, title, overrideLeaf, type, options, leafs, onAc
   const [activeQuestionType, setActiveQuestionType] = useState(type);
 
   const [activeOptions, setActiveOptions] = useState(options);
+  const [activematchValue, setActiveMatchValue] = useState<null | {label: string, value: string}>(condition?.matchValue ? { label: condition.matchValue, value: condition.matchValue } : null);
   const [activeLeaf, setActiveLeaf] = useState(overrideLeaf);
   const [activeConditionSelect, setactiveConditionSelect] = useState<null | { label: string, value: string}>(
     condition?.conditionType
@@ -58,6 +64,21 @@ const QuestionEntryForm = ({ id, title, overrideLeaf, type, options, leafs, onAc
       } : null,
   );
   const [activeCondition, setActiveCondition] = useState<null | EdgeConditonProps>(condition || null);
+
+  const [updateQuestion] = useMutation(updateQuestionMutation, {
+    // TODO: Refetch nodes so parentOptions are correctly updated
+    // refetchQueries: [{
+    //   query: getTopicBuilderQuery,
+    //   variables: {
+    //     customerSlug,
+    //     dialogueSlug,
+    //   },
+    // }],
+    onError: (serverError: ApolloError) => {
+      // eslint-disable-next-line no-console
+      console.log(serverError);
+    },
+  });
 
   const setMinValue = (event: React.FocusEvent<HTMLInputElement>) => {
     const minValue = Number(event.target.value);
@@ -81,13 +102,16 @@ const QuestionEntryForm = ({ id, title, overrideLeaf, type, options, leafs, onAc
     });
   };
 
-  const setConditionType = (conditionOption: any) => setActiveCondition((prevCondition) => {
-    if (!prevCondition) {
-      return { conditionType: conditionOption };
-    }
-    prevCondition.conditionType = conditionOption;
-    return prevCondition;
-  });
+  const setConditionType = (conditionOption: any) => {
+    setActiveMatchValue(conditionOption);
+    setActiveCondition((prevCondition) => {
+      if (!prevCondition) {
+        return { conditionType: conditionOption.value };
+      }
+      prevCondition.conditionType = conditionOption.value;
+      return prevCondition;
+    });
+  };
 
   const handleOptionChange = (event: any, optionIndex: number) => {
     const { value } = event.target;
@@ -114,12 +138,28 @@ const QuestionEntryForm = ({ id, title, overrideLeaf, type, options, leafs, onAc
   };
 
   const onSubmit = (formData: FormDataProps) => {
-
+    const title = activeTitle;
+    const type = activeQuestionType?.value;
+    const overrideLeafId = activeLeaf?.value;
+    const options = { options: activeOptions };
+    // TODO: Update both parent question's children property (When edge is updated -> Need edgeId) and current questionNode'
+    const edgeCondition = activeCondition;
+    // TODO: Add questionId to mutation
+    updateQuestion({
+      variables: {
+        id,
+        title,
+        type,
+        overrideLeafId,
+        edgeId,
+        options,
+        edgeCondition,
+      },
+    });
   };
 
-  // const newOptionsSelect = options?.map((option) => ({ label: option.value, value: option.value }));
   const parentOptionsSelect = parentOptions?.map((option) => ({ label: option.value, value: option.value }));
-  console.log('parent options: ', parentOptions);
+  console.log('active leaf: ', activeLeaf);
 
   return (
     <Form onSubmit={handleSubmit(onSubmit)}>
@@ -178,7 +218,7 @@ const QuestionEntryForm = ({ id, title, overrideLeaf, type, options, leafs, onAc
                   <StyledLabel>Match value</StyledLabel>
                   <Select
                     options={parentOptionsSelect}
-                    value={condition ? { label: condition.matchValue, value: condition.matchValue } : null}
+                    value={activematchValue}
                     onChange={(option: any) => {
                       setConditionType(option);
                     }}

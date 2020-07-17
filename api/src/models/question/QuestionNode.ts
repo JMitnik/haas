@@ -1,8 +1,9 @@
+import { LinkUpdateManyWithoutQuestionNodeInput, PrismaClient, QuestionNode, QuestionNodeUpdateInput } from '@prisma/client';
 import { CTALinksInputType, LinkType } from '../link/Link';
 import { DialogueType } from '../questionnaire/Dialogue';
 import { EdgeType } from '../edge/Edge';
-import { LinkUpdateManyWithoutQuestionNodeInput, PrismaClient, QuestionNode, QuestionNodeUpdateInput } from '@prisma/client';
 import { extendType, inputObjectType, objectType } from '@nexus/schema';
+import { number } from 'yup';
 import NodeResolver from './node-resolver';
 
 export const QuestionOptionType = objectType({
@@ -110,18 +111,49 @@ export const QuestionNodeInput = inputObjectType({
   },
 });
 
+export const OptionInputType = inputObjectType({
+  name: 'OptionInputType',
+  definition(t) {
+    t.int('id', { nullable: true });
+    t.string('value');
+    t.string('publicValue', { nullable: true });
+  },
+});
+
+export const OptionsInputType = inputObjectType({
+  name: 'OptionsInputType',
+  definition(t) {
+    t.list.field('options', { type: OptionInputType });
+  },
+});
+
+export const EdgeConditionInputType = inputObjectType({
+  name: 'EdgeConditionInputType',
+  definition(t) {
+    t.int('id', { nullable: true });
+    t.string('conditionType', { nullable: true });
+    t.int('renderMin', { nullable: true });
+    t.int('renderMax', { nullable: true });
+    t.string('matchValue', { nullable: true });
+  },
+});
+
 export const QuestionNodeMutations = extendType({
   type: 'Mutation',
   definition(t) {
     t.field('updateQuestion', {
       type: QuestionNodeType,
       args: {
+        id: 'String',
         title: 'String',
         type: 'String',
         overrideLeafId: 'String',
-        // TODO: Add options
+        edgeId: 'String',
+        options: OptionsInputType,
+        edgeCondition: EdgeConditionInputType,
       },
       resolve(parent: any, args: any, ctx: any) {
+        console.log('ARGS: ', args);
         return null;
       },
     });

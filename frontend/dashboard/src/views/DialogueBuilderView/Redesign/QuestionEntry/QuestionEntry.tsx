@@ -28,6 +28,7 @@ interface QuestionEntryItemProps {
   onActiveQuestionChange: React.Dispatch<React.SetStateAction<string | null>>;
   condition: EdgeConditonProps | undefined;
   parentOptions: QuestionOptionProps[] | undefined;
+  edgeId: string | undefined;
 }
 
 const AddChildComponent = ({ isExpanded, onExpandChange }:{ isExpanded: Boolean, onExpandChange: () => void }) => (
@@ -42,7 +43,7 @@ const AddChildComponent = ({ isExpanded, onExpandChange }:{ isExpanded: Boolean,
 );
 
 const QuestionEntryItem = (
-  { question, activeQuestion, onActiveQuestionChange, Icon, leafs, onExpandChange, isExpanded, condition, parentOptions }: QuestionEntryItemProps,
+  { question, activeQuestion, onActiveQuestionChange, Icon, leafs, onExpandChange, isExpanded, condition, parentOptions, edgeId }: QuestionEntryItemProps,
 ) => {
   const activeType = { label: question.type, value: question.type };
   const activeLeaf = { label: question.overrideLeaf?.title, value: question.overrideLeaf?.id };
@@ -86,6 +87,7 @@ const QuestionEntryItem = (
           {activeQuestion === question.id
           && (
             <QuestionEntryForm
+              edgeId={edgeId}
               parentOptions={parentOptions}
               condition={condition}
               id={question.id}
