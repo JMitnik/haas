@@ -17,6 +17,7 @@ import {
 } from './TopicBuilderInterfaces';
 
 import QuestionEntry from './QuestionEntry/QuestionEntry';
+import QuestionSection from './QuestionEntry/QuestionSection';
 
 interface QuestionEntryExtendedProps extends QuestionEntryProps {
   icon: (props: any) => JSX.Element;
@@ -261,7 +262,8 @@ const DialogueBuilderView = ({ nodes, selectLeafs, dialogueId, root }: DialogueB
         )}
 
         {root && (
-        <QuestionEntry
+        <QuestionSection
+          depth={1}
           activeQuestion={activeQuestion}
           onActiveQuestionChange={setActiveQuestion}
           onAddQuestion={handleAddQuestion}

@@ -5,6 +5,7 @@ export interface OverrideLeafProps {
 }
 export interface QuestionEntryProps {
   id: string;
+  icon: (props: any) => JSX.Element;
   creationDate?: string;
   title: string;
   isRoot: boolean;

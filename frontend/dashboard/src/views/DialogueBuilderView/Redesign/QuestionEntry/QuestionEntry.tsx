@@ -1,5 +1,5 @@
 import { Div, Flex, Span } from '@haas/ui';
-import { Edit3, Plus, X } from 'react-feather';
+import { Edit3, Minus, Plus, X } from 'react-feather';
 import { v4 as uuidv4 } from 'uuid';
 import React from 'react';
 
@@ -15,6 +15,8 @@ import QuestionEntryForm from './QuestionEntryForm';
 import RegisterIcon from 'components/Icons/RegisterIcon';
 
 interface QuestionEntryItemProps {
+  onExpandChange: () => void;
+  isExpanded: Boolean;
   questionsQ: Array<QuestionEntryProps>;
   question: QuestionEntryProps;
   leafs: any;
@@ -26,25 +28,25 @@ interface QuestionEntryItemProps {
   onActiveQuestionChange: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
-const AddChildComponent = () => (
-  <AddChildContainer>
+const AddChildComponent = ({ isExpanded, onExpandChange }:{ isExpanded: Boolean, onExpandChange: () => void }) => (
+  <AddChildContainer onClick={() => onExpandChange()}>
     <AddChildIconContainer>
-      <Plus />
+      {isExpanded ? <Minus /> : <Plus />}
     </AddChildIconContainer>
     <Span padding="4px">
-      Add new child
+      {isExpanded ? 'Hide children' : 'Show children'}
     </Span>
   </AddChildContainer>
 );
 
 const QuestionEntryItem = (
-  { question, activeQuestion, onActiveQuestionChange, Icon, leafs }: QuestionEntryItemProps,
+  { question, activeQuestion, onActiveQuestionChange, Icon, leafs, onExpandChange, isExpanded }: QuestionEntryItemProps,
 ) => {
   const activeType = { label: question.type, value: question.type };
   const activeLeaf = { label: question.overrideLeaf?.title, value: question.overrideLeaf?.id };
 
   return (
-    <Flex position="relative" justifyContent="center" alignItems="center">
+    <Flex position="relative" justifyContent="center" alignItems="center" flexGrow={1}>
       <QuestionEntryViewContainer activeCTA={null} id={question.id} flexGrow={1}>
         <QuestionEntryContainer flexGrow={1}>
           <DeleteCTAButton disabled={(!!activeQuestion && activeQuestion !== question.id) || false} onClick={() => null}>
@@ -111,7 +113,7 @@ const QuestionEntryItem = (
           </TypeSpan>
         </Flex>
       </LinkContainer>
-      <AddChildComponent />
+      <AddChildComponent isExpanded={isExpanded} onExpandChange={onExpandChange} />
     </Flex>
   );
 };
