@@ -1,10 +1,18 @@
+import { Edit3, Plus, X } from 'react-feather';
 import React, { useState } from 'react';
 
-import { Flex, Span } from '@haas/ui';
+import { Flex, H2 } from '@haas/ui';
+import DeleteCTAButton from 'views/ActionsOverview/components/DeleteCTAButton';
+import EditCTAButton from 'views/ActionsOverview/components/EditCTAButton';
+import LinkIcon from 'components/Icons/LinkIcon';
+import OpinionIcon from 'components/Icons/OpinionIcon';
+import RegisterIcon from 'components/Icons/RegisterIcon';
+import SplitArrowIcon from 'components/Icons/SplitIcon';
 
-import { AddChildContainer, AddChildIconContainer, LinkContainer, OverflowSpan, QuestionEntryContainer, QuestionEntryViewContainer, TypeSpan } from './QuestionEntryStyles';
+import { AddQuestionContainer, DepthSpan } from './QuestionEntryStyles';
 import { EdgeChildProps, QuestionEntryProps } from '../TopicBuilderInterfaces';
 import QuestionEntry from './QuestionEntry';
+import QuestionEntryForm from './QuestionEntryForm';
 
 interface QuestionSectionProps {
   questionsQ: Array<QuestionEntryProps>;
@@ -33,11 +41,16 @@ const QuestionSection = ({ activeQuestion, onActiveQuestionChange, onAddQuestion
 
   return (
     <Flex padding={`${depth * 10}px`} flexDirection="column">
-      <Span>
-        DEPTH
-        {' '}
-        {depth}
-      </Span>
+      { depth > 1 && (
+      <Flex marginBottom="5px" alignItems="center">
+        <SplitArrowIcon />
+        <DepthSpan fontSize="0.9em">
+          DEPTH
+          {' '}
+          {depth}
+        </DepthSpan>
+      </Flex>
+      )}
       <QuestionEntry
         isExpanded={isExpanded}
         onExpandChange={handleExpandChange}
@@ -69,6 +82,15 @@ const QuestionSection = ({ activeQuestion, onActiveQuestionChange, onAddQuestion
           />
         ),
       )}
+      {isExpanded && (
+        <AddQuestionContainer margin={`0 ${depth * 10 + 10}px`}>
+          <Plus width="35px" height="35px" />
+          <H2>
+            Add new question
+          </H2>
+        </AddQuestionContainer>
+      )}
+
     </Flex>
 
   );

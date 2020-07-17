@@ -22,6 +22,29 @@ export const OverflowSpan = styled(Span)`
   text-overflow: ellipsis;
 `;
 
+export const AddQuestionContainer = styled(Flex)`
+   ${({ theme }) => css`
+    flex-direction: row;
+    cursor: pointer;
+    flex-grow: 1;
+    justify-content: center; 
+    align-items: center;
+    background-color: ${theme.colors.default.lightest};
+    color: ${theme.colors.default.muted};
+   
+    border: ${theme.colors.app.mutedOnDefault} 1px solid;
+    border-radius: ${theme.borderRadiuses.somewhatRounded};
+    transition: all 0.2s ease-in;
+    padding: 20px;
+    padding-left: 30px;
+    margin-bottom: 40px;
+    &:hover {
+        background-color: ${theme.colors.white};
+        box-shadow: 0 1px 3px 1px rgba(0,0,0,0.1);
+      }
+ `}
+`;
+
 export const QuestionEntryViewContainer = styled(Flex) <{ activeCTA: string | null, id: string }>`
   ${({ id, activeCTA, theme }) => css`
     position: relative;
@@ -98,6 +121,14 @@ export const TypeSpan = styled(Span)`
    ${({ theme }) => css`
    color: ${theme.colors.default.darkest};
  `}
+`;
+
+export const DepthSpan = styled(Span)`
+  ${({ theme }) => css`
+  margin-left: 5px;
+  color: ${theme.colors.default.darkest};
+  opacity: 0.5;
+`}
 `;
 
 export const QuestionEntryContainer = styled(Flex)`
