@@ -1,38 +1,41 @@
 import { Div, Flex, Span } from '@haas/ui';
-import { Edit3, X } from 'react-feather';
+import { Edit3, Plus, X } from 'react-feather';
 import { v4 as uuidv4 } from 'uuid';
 import React from 'react';
 
 import EditCTAButton from 'views/ActionsOverview/components/EditCTAButton';
 import LinkIcon from 'components/Icons/LinkIcon';
 
+import OpinionIcon from 'components/Icons/OpinionIcon';
+import { AddChildContainer, AddChildIconContainer, LinkContainer, OverflowSpan, QuestionEntryContainer, QuestionEntryViewContainer, TypeSpan } from './QuestionEntryStyles';
 import { EdgeChildProps, QuestionEntryProps } from '../TopicBuilderInterfaces';
-import { LinkContainer, OverflowSpan, QuestionEntryContainer, QuestionEntryViewContainer } from './QuestionEntryStyles';
 import BuilderIcon from '../components/BuilderIcon';
 import DeleteCTAButton from '../components/DeleteCTAButton';
 import QuestionEntryForm from './QuestionEntryForm';
+import RegisterIcon from 'components/Icons/RegisterIcon';
 
 interface QuestionEntryItemProps {
   questionsQ: Array<QuestionEntryProps>;
   question: QuestionEntryProps;
-  // TODO: Use right type for leafs;
   leafs: any;
   index: number;
   Icon: (props: any) => JSX.Element;
   activeQuestion: string | null;
-  onAddQuestion: (event: any, questionUUID: string) => void;
-  onDeleteQuestion: (event: any, questionId: string) => void;
+  onAddQuestion?: (event: any, questionUUID: string) => void;
+  onDeleteQuestion?: (event: any, questionId: string) => void;
   onActiveQuestionChange: React.Dispatch<React.SetStateAction<string | null>>;
-  // TODO: Define function type, ala () => void or whatever
-  onTitleChange: (newTitle: string, questionId: string) => void;
-  onLeafNodeChange: (leaf: any, questionId: string) => void;
-  onQuestionTypeChange: (value: string, questionId: string) => void;
-  onQuestionOptionsChange: (value: Array<any>, questionId: string) => void;
-  onAddQuestionOption: (value: Array<any>, questionId: string) => void;
-  onEdgesChange: (edges: Array<EdgeChildProps>, questionId: string) => void;
-  onIsRootQuestionChange: (isRoot: boolean, questionId: string) => void;
-  onQuestionExpandChange: (question: any) => void;
 }
+
+const AddChildComponent = () => (
+  <AddChildContainer>
+    <AddChildIconContainer>
+      <Plus />
+    </AddChildIconContainer>
+    <Span padding="4px">
+      Add new child
+    </Span>
+  </AddChildContainer>
+);
 
 const QuestionEntryItem = (
   { question, activeQuestion, onActiveQuestionChange, Icon, leafs }: QuestionEntryItemProps,
@@ -41,7 +44,7 @@ const QuestionEntryItem = (
   const activeLeaf = { label: question.overrideLeaf?.title, value: question.overrideLeaf?.id };
 
   return (
-    <Flex>
+    <Flex position="relative" justifyContent="center" alignItems="center">
       <QuestionEntryViewContainer activeCTA={null} id={question.id} flexGrow={1}>
         <QuestionEntryContainer flexGrow={1}>
           <DeleteCTAButton disabled={(!!activeQuestion && activeQuestion !== question.id) || false} onClick={() => null}>
@@ -89,11 +92,26 @@ const QuestionEntryItem = (
 
         </QuestionEntryContainer>
       </QuestionEntryViewContainer>
-      <LinkContainer>
-        <Div padding="25px" color="black">
-          <LinkIcon color="black" />
-        </Div>
+      <LinkContainer hasCTA={!!question.overrideLeaf?.id}>
+        <Flex flexDirection="column" padding="25px" color="black" justifyContent="center" alignItems="center">
+          { (!question.overrideLeaf?.type || question.overrideLeaf?.type === 'Link') && (
+            <LinkIcon isCTA hasCTA />
+          )}
+
+          { question.overrideLeaf?.type === 'Opinion' && (
+            <OpinionIcon isCTA hasCTA />
+          )}
+
+          { question.overrideLeaf?.type === 'Register' && (
+          <RegisterIcon isCTA hasCTA />
+          )}
+
+          <TypeSpan fontSize="0.6em">
+            {question.overrideLeaf?.type || 'None'}
+          </TypeSpan>
+        </Flex>
       </LinkContainer>
+      <AddChildComponent />
     </Flex>
   );
 };

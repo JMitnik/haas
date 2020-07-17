@@ -1,6 +1,6 @@
 import styled, { css } from 'styled-components/macro';
 
-import { Flex, H4, Span } from '@haas/ui';
+import { Div, Flex, H4, Span } from '@haas/ui';
 
 export const QuestionEntryHeader = styled(H4)`
 ${({ theme }) => css`
@@ -47,23 +47,56 @@ export const QuestionEntryViewContainer = styled(Flex) <{ activeCTA: string | nu
 
     padding: 20px;
     padding-left: 30px;
-    margin-bottom: 20px;
+    margin-bottom: 40px;
  `} 
 `;
 
-export const LinkContainer = styled(Flex)`
+export const AddChildContainer = styled(Flex)`
   ${({ theme }) => css`
+    position: absolute; 
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    bottom: 0; 
+    left: 50%;
+    transform: translate(-50%, -25px);
+    min-width: 250px;
+    color: ${theme.colors.default.darkest};
+    border-radius: ${theme.borderRadiuses.rounded};
+    background: ${theme.colors.default.dark}; 
+ `}
+`;
+
+export const LinkContainer = styled(Flex) <{ hasCTA?: Boolean }>`
+  ${({ theme, hasCTA }) => css`
     flex-direction: column;
-    color: ${theme.colors.default.muted};
-    padding: 20px 0px; 
-    margin-bottom: 40px;
-    margin-top: 20px; 
     justify-content: center; 
-    justify-items: center; 
+    justify-items: center;
+
+    color: ${theme.colors.default.muted};
+    margin-bottom: 40px;
+    
+    ${!hasCTA && css`
+      border-color: ${theme.colors.default.darkest};
+      opacity: 0.4;
+      border: 1px dashed;
+    `}
+    
+    ${hasCTA && css`
+      border: none;
+      background: ${theme.colors.default.dark};
+    `}
+
+    border-left: none; 
     border-bottom-right-radius: ${theme.borderRadiuses.somewhatRounded};
     border-top-right-radius: ${theme.borderRadiuses.somewhatRounded};
-    border: 1px dashed;
-    border-left: none;
+ `}
+`;
+
+export const TypeSpan = styled(Span)`
+   ${({ theme }) => css`
+   color: ${theme.colors.default.darkest};
  `}
 `;
 
@@ -72,6 +105,20 @@ export const QuestionEntryContainer = styled(Flex)`
     flex-direction: column;
     color: ${theme.colors.default.muted};
  `}
+`;
+
+export const AddChildIconContainer = styled(Div)`
+   ${({ theme }) => css`
+   color: ${theme.colors.default.darkest};
+    svg {
+        color: ${theme.colors.default.darkest};
+        width: 15px;
+        height: 15px;
+    }
+  `}
+
+  opacity: 0.9;
+  cursor: pointer;
 `;
 
 export const DeleteQuestionOptionButtonContainer = styled.button`

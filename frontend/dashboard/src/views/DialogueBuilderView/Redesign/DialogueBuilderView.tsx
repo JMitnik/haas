@@ -24,9 +24,38 @@ interface QuestionEntryExtendedProps extends QuestionEntryProps {
 
 interface DialogueBuilderViewProps {
   nodes: Array<QuestionEntryExtendedProps>;
+  root: QuestionEntryExtendedProps | undefined;
   selectLeafs: Array<{label: string | undefined, value: string}>;
   dialogueId: string;
 }
+
+const initializeQuestionType = (type?: string) => {
+  if (type === 'SLIDER') {
+    return 'Slider';
+  }
+
+  if (type === 'MULTI_CHOICE') {
+    return 'Multi-Choice';
+  }
+
+  return 'Unknown';
+};
+
+const initializeCTAType = (type?: string) => {
+  if (type === 'OPINION') {
+    return 'Opinion';
+  }
+
+  if (type === 'REGISTRATION') {
+    return 'Register';
+  }
+
+  if (type === 'SOCIAL_SHARE') {
+    return 'Link';
+  }
+
+  return 'None';
+};
 
 const findLeafs = (nodes: Array<QuestionEntryProps>) => {
   const selectLeafs = nodes?.map((leaf) => ({ value: leaf.id, label: leaf.title }));
@@ -43,11 +72,11 @@ const mapQuestionsInputData = (nodes: Array<QuestionEntryProps>) => {
     title,
     isRoot,
     isLeaf,
-    type,
+    type: initializeQuestionType(type),
     icon: type === 'MULTI_CHOICE' ? MultiChoiceBuilderIcon : HaasNodeIcon,
     overrideLeaf: !overrideLeaf
       ? undefined
-      : { id: overrideLeaf?.id, title: overrideLeaf?.title, type: overrideLeaf?.type },
+      : { id: overrideLeaf?.id, title: overrideLeaf?.title, type: initializeCTAType(overrideLeaf?.type) },
     options: options?.map((option) => (
       { id: option.id, value: option.value, publicValue: option.publicValue })),
     children: children?.map((edge: EdgeChildProps) => ({
@@ -75,11 +104,18 @@ const DialogueBuilderPage = () => {
   const dialogueData = data?.customer?.dialogue;
   const selectLeafs = findLeafs(dialogueData?.leafs);
   const questionsData = mapQuestionsInputData(dialogueData?.questions);
-
-  return <DialogueBuilderView dialogueId={dialogueData.id} selectLeafs={selectLeafs} nodes={questionsData} />;
+  const rootQuestionNode = questionsData.find((question) => question.isRoot);
+  return (
+    <DialogueBuilderView
+      root={rootQuestionNode}
+      dialogueId={dialogueData.id}
+      selectLeafs={selectLeafs}
+      nodes={questionsData}
+    />
+  );
 };
 
-const DialogueBuilderView = ({ nodes, selectLeafs, dialogueId }: DialogueBuilderViewProps) => {
+const DialogueBuilderView = ({ nodes, selectLeafs, dialogueId, root }: DialogueBuilderViewProps) => {
   const { customerSlug, dialogueSlug } = useParams();
   const history = useHistory();
 
@@ -224,7 +260,22 @@ const DialogueBuilderView = ({ nodes, selectLeafs, dialogueId }: DialogueBuilder
           <Div alignSelf="center">No question available...</Div>
         )}
 
-        {questions?.map((question: any, index: number) => (
+        {root && (
+        <QuestionEntry
+          activeQuestion={activeQuestion}
+          onActiveQuestionChange={setActiveQuestion}
+          onAddQuestion={handleAddQuestion}
+          onDeleteQuestion={handleDeleteQuestion}
+          key={0}
+          index={0}
+          questionsQ={questions}
+          question={root}
+          Icon={root.icon}
+          leafs={selectLeafs}
+        />
+        )}
+
+        {/* {questions?.map((question: any, index: number) => (
           <QuestionEntry
             activeQuestion={activeQuestion}
             onActiveQuestionChange={setActiveQuestion}
@@ -245,7 +296,7 @@ const DialogueBuilderView = ({ nodes, selectLeafs, dialogueId }: DialogueBuilder
             Icon={question.icon}
             leafs={selectLeafs}
           />
-        ))}
+        ))} */}
       </ColumnFlex>
 
       <Div display="flex" mt={4} justifyContent="space-around">
