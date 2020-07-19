@@ -7,12 +7,12 @@ import React, { useState } from 'react';
 import Select from 'react-select';
 
 import { Button, Div, Flex, Form, FormGroupContainer, Grid, H3, H4, Hr, Muted, StyledInput, StyledLabel } from '@haas/ui';
-import { DeleteQuestionOptionButtonContainer, QuestionEntryHeader } from 'views/DialogueBuilderView/QuestionEntry/QuestionEntryStyles';
-import DeleteLinkSesctionButton from 'views/ActionsOverview/components/DeleteLinkSectionButton';
+import { DeleteQuestionOptionButtonContainer } from 'views/DialogueBuilderView/QuestionEntry/QuestionEntryStyles';
+import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
 import updateQuestionMutation from 'mutations/updateQuestion';
 
 import { ApolloError } from 'apollo-client';
-import { EdgeConditonProps, QuestionOptionProps } from '../TopicBuilderInterfaces';
+import { EdgeConditonProps, OverrideLeafProps, QuestionEntryProps, QuestionOptionProps } from '../TopicBuilderInterfaces';
 
 interface FormDataProps {
   title: string;
@@ -27,7 +27,7 @@ interface FormDataProps {
 interface QuestionEntryFormProps {
   id: string;
   title: string;
-  overrideLeaf: { label: string | undefined, value: string | undefined };
+  overrideLeaf?: OverrideLeafProps;
   isRoot: boolean;
   type: { label: string, value: string };
   options: Array<QuestionOptionProps>;
@@ -36,17 +36,20 @@ interface QuestionEntryFormProps {
   condition: EdgeConditonProps | undefined;
   parentOptions: QuestionOptionProps[] | undefined;
   edgeId: string | undefined;
+  question: QuestionEntryProps;
 }
 
 const questionTypes = [
-  { value: 'SLIDER', label: 'SLIDER' },
-  { value: 'MULTI_CHOICE', label: 'MULTI_CHOICE' }];
+  { value: 'SLIDER', label: 'Slider' },
+  { value: 'MULTI_CHOICE', label: 'Multi-Choice' }];
 
 const conditionTypes = [
   { value: 'match', label: 'match' },
   { value: 'valueBoundary', label: 'valueBoundary' }];
 
-const QuestionEntryForm = ({ id, title, overrideLeaf, type, options, leafs, onActiveQuestionChange, condition, parentOptions, edgeId }: QuestionEntryFormProps) => {
+const QuestionEntryForm = ({ id, title, overrideLeaf, type, options, leafs, onActiveQuestionChange, condition, parentOptions, edgeId, question }: QuestionEntryFormProps) => {
+  const { customerSlug, dialogueSlug } = useParams();
+
   const { register, handleSubmit, setValue, errors } = useForm<FormDataProps>({
     // validationSchema: schema,
   });
@@ -55,7 +58,7 @@ const QuestionEntryForm = ({ id, title, overrideLeaf, type, options, leafs, onAc
 
   const [activeOptions, setActiveOptions] = useState(options);
   const [activematchValue, setActiveMatchValue] = useState<null | {label: string, value: string}>(condition?.matchValue ? { label: condition.matchValue, value: condition.matchValue } : null);
-  const [activeLeaf, setActiveLeaf] = useState(overrideLeaf);
+  const [activeLeaf, setActiveLeaf] = useState({ label: overrideLeaf?.title, value: overrideLeaf?.id });
   const [activeConditionSelect, setactiveConditionSelect] = useState<null | { label: string, value: string}>(
     condition?.conditionType
       ? {
@@ -67,13 +70,16 @@ const QuestionEntryForm = ({ id, title, overrideLeaf, type, options, leafs, onAc
 
   const [updateQuestion] = useMutation(updateQuestionMutation, {
     // TODO: Refetch nodes so parentOptions are correctly updated
-    // refetchQueries: [{
-    //   query: getTopicBuilderQuery,
-    //   variables: {
-    //     customerSlug,
-    //     dialogueSlug,
-    //   },
-    // }],
+    onCompleted: () => {
+      onActiveQuestionChange(null);
+    },
+    refetchQueries: [{
+      query: getTopicBuilderQuery,
+      variables: {
+        customerSlug,
+        dialogueSlug,
+      },
+    }],
     onError: (serverError: ApolloError) => {
       // eslint-disable-next-line no-console
       console.log(serverError);
@@ -145,6 +151,7 @@ const QuestionEntryForm = ({ id, title, overrideLeaf, type, options, leafs, onAc
     // TODO: Update both parent question's children property (When edge is updated -> Need edgeId) and current questionNode'
     const edgeCondition = activeCondition;
     // TODO: Add questionId to mutation
+
     updateQuestion({
       variables: {
         id,
@@ -152,15 +159,13 @@ const QuestionEntryForm = ({ id, title, overrideLeaf, type, options, leafs, onAc
         type,
         overrideLeafId,
         edgeId,
-        options,
+        optionEntries: options,
         edgeCondition,
       },
     });
   };
 
   const parentOptionsSelect = parentOptions?.map((option) => ({ label: option.value, value: option.value }));
-  console.log('active leaf: ', activeLeaf);
-
   return (
     <Form onSubmit={handleSubmit(onSubmit)}>
       <FormGroupContainer>
@@ -236,16 +241,17 @@ const QuestionEntryForm = ({ id, title, overrideLeaf, type, options, leafs, onAc
                 />
               </Div>
 
-              <Div useFlex flexDirection="column">
+              <Div key={activeLeaf?.value} useFlex flexDirection="column">
                 <StyledLabel>Leaf node</StyledLabel>
                 <Select
+                  key={activeLeaf?.value}
                   options={leafs}
                   value={(activeLeaf?.value && activeLeaf) || leafs[0]}
                   onChange={(leafOption: any) => setActiveLeaf(leafOption)}
                 />
               </Div>
 
-              {activeQuestionType && activeQuestionType.value === 'Multi-Choice' && (
+              {activeQuestionType && activeQuestionType.value === 'MULTI_CHOICE' && (
                 <>
                   <Div mb={1} gridColumn="1 / -1">
                     <Flex justifyContent="space-between">
@@ -264,9 +270,9 @@ const QuestionEntryForm = ({ id, title, overrideLeaf, type, options, leafs, onAc
                     </Div>
                     )}
                     {activeOptions && activeOptions.map((option, optionIndex) => (
-                      <Flex key={`${optionIndex}-${option.value}`} my={1} flexDirection="row">
+                      <Flex key={`${option.id}-${optionIndex}-${option.value}`} my={1} flexDirection="row">
                         <StyledInput
-                          key={optionIndex}
+                          key={`input-${id}-${optionIndex}`}
                           name={`${id}-option-${optionIndex}`}
                           defaultValue={option.value}
                           onBlur={(e) => handleOptionChange(e, optionIndex)}

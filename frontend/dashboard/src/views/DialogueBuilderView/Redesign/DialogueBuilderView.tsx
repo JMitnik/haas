@@ -60,7 +60,7 @@ const initializeCTAType = (type?: string) => {
 
 const findLeafs = (nodes: Array<QuestionEntryProps>) => {
   const selectLeafs = nodes?.map((leaf) => ({ value: leaf.id, label: leaf.title }));
-  selectLeafs?.unshift({ value: 'None', label: 'None' });
+  selectLeafs?.unshift({ value: '', label: 'None' });
   return selectLeafs;
 };
 
@@ -68,8 +68,9 @@ const mapQuestionsInputData = (nodes: Array<QuestionEntryProps>) => {
   let questions = nodes?.filter((node) => !node.isLeaf);
   questions = orderBy(questions, (question) => question.creationDate, ['asc']);
   return questions?.map(({ id,
-    title, isRoot, isLeaf, type, overrideLeaf, options, children }) => ({
+    title, isRoot, isLeaf, type, overrideLeaf, options, children, updatedAt }) => ({
     id,
+    updatedAt,
     title,
     isRoot,
     isLeaf,
@@ -98,14 +99,19 @@ const mapQuestionsInputData = (nodes: Array<QuestionEntryProps>) => {
 const DialogueBuilderPage = () => {
   const { customerSlug, dialogueSlug } = useParams();
   const { loading, data } = useQuery(getTopicBuilderQuery, {
+    fetchPolicy: 'network-only',
     variables: { dialogueSlug, customerSlug },
   });
 
   if (!data || loading) return <Loader />;
   const dialogueData = data?.customer?.dialogue;
   const selectLeafs = findLeafs(dialogueData?.leafs);
+  console.log('DIALOGUE PAGE PREMAP:', dialogueData?.questions);
   const questionsData = mapQuestionsInputData(dialogueData?.questions);
   const rootQuestionNode = questionsData.find((question) => question.isRoot);
+
+  console.log('Mapped Data:', questionsData);
+
   return (
     <DialogueBuilderView
       root={rootQuestionNode}
@@ -117,34 +123,31 @@ const DialogueBuilderPage = () => {
 };
 
 const DialogueBuilderView = ({ nodes, selectLeafs, root }: DialogueBuilderViewProps) => {
-  const [questions, setQuestions] = useState(nodes);
   const [activeQuestion, setActiveQuestion] = useState<null | string>(null);
 
-  const handleAddQuestion = (event: any, quesionUUID: string) => {
-    event.preventDefault();
-    setQuestions((questionsPrev: any) => [...questionsPrev, {
-      id: quesionUUID,
-      title: undefined,
-      isRoot: false,
-      isLeaf: false,
-      options: [],
-      type: undefined,
-      overrideLeaf: undefined,
-      children: undefined,
-    }]);
-  };
+  // const handleAddQuestion = (event: any, quesionUUID: string) => {
+  //   event.preventDefault();
+  //   setQuestions((questionsPrev: any) => [...questionsPrev, {
+  //     id: quesionUUID,
+  //     title: undefined,
+  //     isRoot: false,
+  //     isLeaf: false,
+  //     options: [],
+  //     type: undefined,
+  //     overrideLeaf: undefined,
+  //     children: undefined,
+  //   }]);
+  // };
 
-  const handleDeleteQuestion = (event: any, questionId: string) => {
-    event.preventDefault();
-    setQuestions((questionsPrev: any) => {
-      const questionIds = questions.map((question) => question.id);
-      const questionIndex = questionIds.indexOf(questionId);
-      questionsPrev.splice(questionIndex, 1);
-      return [...questionsPrev];
-    });
-  };
-
-  console.log('Data:', questions);
+  // const handleDeleteQuestion = (event: any, questionId: string) => {
+  //   event.preventDefault();
+  //   setQuestions((questionsPrev: any) => {
+  //     const questionIds = questions.map((question) => question.id);
+  //     const questionIndex = questionIds.indexOf(questionId);
+  //     questionsPrev.splice(questionIndex, 1);
+  //     return [...questionsPrev];
+  //   });
+  // };
 
   return (
     <DialogueBuilderContainer>
@@ -153,7 +156,7 @@ const DialogueBuilderView = ({ nodes, selectLeafs, root }: DialogueBuilderViewPr
       </H2>
 
       <ColumnFlex>
-        {(questions && questions.length === 0) && (
+        {(nodes && nodes.length === 0) && (
           <Div alignSelf="center">No question available...</Div>
         )}
 
@@ -165,11 +168,11 @@ const DialogueBuilderView = ({ nodes, selectLeafs, root }: DialogueBuilderViewPr
           depth={1}
           activeQuestion={activeQuestion}
           onActiveQuestionChange={setActiveQuestion}
-          onAddQuestion={handleAddQuestion}
-          onDeleteQuestion={handleDeleteQuestion}
-          key={0}
+          onAddQuestion={undefined}
+          onDeleteQuestion={undefined}
+          key={`${root.id}-${root.updatedAt}`}
           index={0}
-          questionsQ={questions}
+          questionsQ={nodes}
           question={root}
           Icon={root.icon}
           leafs={selectLeafs}

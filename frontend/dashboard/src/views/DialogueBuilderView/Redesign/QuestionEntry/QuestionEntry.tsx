@@ -6,11 +6,11 @@ import React from 'react';
 import EditCTAButton from 'views/ActionsOverview/components/EditCTAButton';
 import LinkIcon from 'components/Icons/LinkIcon';
 
-import OpinionIcon from 'components/Icons/OpinionIcon';
 import { AddChildContainer, AddChildIconContainer, LinkContainer, OverflowSpan, QuestionEntryContainer, QuestionEntryViewContainer, TypeSpan } from './QuestionEntryStyles';
 import { EdgeChildProps, EdgeConditonProps, QuestionEntryProps, QuestionOptionProps } from '../TopicBuilderInterfaces';
 import BuilderIcon from '../components/BuilderIcon';
 import DeleteCTAButton from '../components/DeleteCTAButton';
+import OpinionIcon from 'components/Icons/OpinionIcon';
 import QuestionEntryForm from './QuestionEntryForm';
 import RegisterIcon from 'components/Icons/RegisterIcon';
 
@@ -45,8 +45,7 @@ const AddChildComponent = ({ isExpanded, onExpandChange }:{ isExpanded: Boolean,
 const QuestionEntryItem = (
   { question, activeQuestion, onActiveQuestionChange, Icon, leafs, onExpandChange, isExpanded, condition, parentOptions, edgeId }: QuestionEntryItemProps,
 ) => {
-  const activeType = { label: question.type, value: question.type };
-  const activeLeaf = { label: question.overrideLeaf?.title, value: question.overrideLeaf?.id };
+  const activeType = question.type === 'Multi-Choice' ? { label: question.type, value: 'MULTI_CHOICE' } : { label: question.type, value: 'SLIDER' };
 
   return (
     <Flex position="relative" justifyContent="center" alignItems="center" flexGrow={1}>
@@ -87,6 +86,8 @@ const QuestionEntryItem = (
           {activeQuestion === question.id
           && (
             <QuestionEntryForm
+              question={question}
+              key={`form-${question.id}-${question.updatedAt}`}
               edgeId={edgeId}
               parentOptions={parentOptions}
               condition={condition}
@@ -95,7 +96,7 @@ const QuestionEntryItem = (
               isRoot={question.isRoot}
               leafs={leafs}
               options={question?.options || []}
-              overrideLeaf={activeLeaf}
+              overrideLeaf={question.overrideLeaf}
               type={activeType}
               onActiveQuestionChange={onActiveQuestionChange}
             />

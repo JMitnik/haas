@@ -1,7 +1,7 @@
-import { LinkUpdateManyWithoutQuestionNodeInput, PrismaClient, QuestionNode, QuestionNodeUpdateInput } from '@prisma/client';
 import { CTALinksInputType, LinkType } from '../link/Link';
 import { DialogueType } from '../questionnaire/Dialogue';
 import { EdgeType } from '../edge/Edge';
+import { LinkUpdateManyWithoutQuestionNodeInput, PrismaClient, QuestionNode, QuestionNodeUpdateInput } from '@prisma/client';
 import { extendType, inputObjectType, objectType } from '@nexus/schema';
 import { number } from 'yup';
 import NodeResolver from './node-resolver';
@@ -21,6 +21,7 @@ export const QuestionNodeType = objectType({
   definition(t) {
     t.id('id');
     t.string('creationDate', { nullable: true });
+    t.string('updatedAt');
     t.boolean('isLeaf');
     t.boolean('isRoot');
     t.string('title');
@@ -149,12 +150,14 @@ export const QuestionNodeMutations = extendType({
         type: 'String',
         overrideLeafId: 'String',
         edgeId: 'String',
-        options: OptionsInputType,
+        optionEntries: OptionsInputType,
         edgeCondition: EdgeConditionInputType,
       },
       resolve(parent: any, args: any, ctx: any) {
-        console.log('ARGS: ', args);
-        return null;
+        const { id, title, type, overrideLeafId, edgeId, optionEntries, edgeCondition } = args;
+        const { options } = optionEntries;
+        console.log('OPTIONS: ', options);
+        return NodeResolver.updateQuestionFromBuilder(id, title, type, overrideLeafId, edgeId, options, edgeCondition);
       },
     });
 

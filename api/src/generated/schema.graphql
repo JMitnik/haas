@@ -242,7 +242,7 @@ type Mutation {
   editUser(id: String, input: UserInput): UserType!
   singleUpload(file: Upload): ImageType!
   updateCTA(id: String, links: CTALinksInputType, title: String, type: String): QuestionNode!
-  updateQuestion(edgeCondition: EdgeConditionInputType, edgeId: String, id: String, options: OptionsInputType, overrideLeafId: String, title: String, type: String): QuestionNode!
+  updateQuestion(edgeCondition: EdgeConditionInputType, edgeId: String, id: String, optionEntries: OptionsInputType, overrideLeafId: String, title: String, type: String): QuestionNode!
   updateRoles(permissions: PermissionIdsInput, roleId: String): RoleType!
   updateTopicBuilder(customerSlug: String, dialogueSlug: String, topicData: TopicDataEntry): String!
   uploadUserSession(uploadUserSessionInput: UploadUserSessionInput): Session!
@@ -357,6 +357,7 @@ type QuestionNode {
   questionDialogueId: String!
   title: String!
   type: String!
+  updatedAt: String!
 }
 
 input QuestionNodeWhereInputType {

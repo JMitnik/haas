@@ -574,6 +574,7 @@ export interface NexusGenFieldTypes {
     questionDialogueId: string; // String!
     title: string; // String!
     type: string; // String!
+    updatedAt: string; // String!
   }
   QuestionOption: { // field return type
     id: number; // Int!
@@ -785,7 +786,7 @@ export interface NexusGenArgTypes {
       edgeCondition?: NexusGenInputs['EdgeConditionInputType'] | null; // EdgeConditionInputType
       edgeId?: string | null; // String
       id?: string | null; // String
-      options?: NexusGenInputs['OptionsInputType'] | null; // OptionsInputType
+      optionEntries?: NexusGenInputs['OptionsInputType'] | null; // OptionsInputType
       overrideLeafId?: string | null; // String
       title?: string | null; // String
       type?: string | null; // String

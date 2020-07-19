@@ -72,7 +72,7 @@ const QuestionSection = ({ activeQuestion, onActiveQuestionChange, onAddQuestion
         onActiveQuestionChange={onActiveQuestionChange}
         onAddQuestion={onAddQuestion}
         onDeleteQuestion={onDeleteQuestion}
-        key={0}
+        key={`entry-${question.id}-${question.updatedAt}`}
         index={0}
         questionsQ={questionsQ}
         question={question}
@@ -93,7 +93,7 @@ const QuestionSection = ({ activeQuestion, onActiveQuestionChange, onAddQuestion
             onActiveQuestionChange={onActiveQuestionChange}
             question={child}
             questionsQ={questionsQ}
-            key={index}
+            key={`section-${child.id}-${child.updatedAt}`}
             onAddQuestion={onAddQuestion}
             onDeleteQuestion={onDeleteQuestion}
           />

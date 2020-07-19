@@ -5,6 +5,7 @@ const QuestionFragment = gql`
     id
     title
     creationDate
+    updatedAt
     isRoot
     isLeaf
     overrideLeaf {
