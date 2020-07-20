@@ -1,9 +1,9 @@
 import {
   NodeEntry, PrismaClient, Session, SessionWhereInput,
 } from '@prisma/client';
+import { isDefined, isFilled, isPresent } from 'ts-is-present';
 
-import { NexusInterfaceTypeDef } from '@nexus/schema/dist/core';
-import { Nullable, PaginationProps } from '../../types/generic';
+import { Nullable, PaginationProps, notEmpty } from '../../types/generic';
 import { SessionWithEntries } from './SessionTypes';
 // eslint-disable-next-line import/no-cycle
 import { TEXT_NODES } from '../questionnaire/Dialogue';
@@ -70,14 +70,15 @@ class SessionService {
    */
   static getScoringEntriesFromSessions(
     sessions: SessionWithEntries[],
-  ): (NodeEntryWithTypes | null)[] {
+  ): (NodeEntryWithTypes)[] {
     if (!sessions.length) {
       return [];
     }
 
     const entries = sessions.map((session) => SessionService.getScoringEntryFromSession(session));
+    const nonNullEntries = entries.filter(isPresent);
 
-    return entries;
+    return nonNullEntries;
   }
 
   /**
@@ -255,8 +256,8 @@ class SessionService {
 
     // TODO: Type-hint this
     const pageInfo: NexusGenRootTypes['PaginationPageInfo'] = {
-      totalPages: totalPages || 1,
-      pageIndex: paginationArgs?.pageIndex || 1,
+      nrPages: totalPages || 1,
+      currentPage: paginationArgs?.pageIndex || 1,
     };
 
     return {

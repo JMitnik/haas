@@ -75,8 +75,8 @@ export const QuestionInput = inputObjectType({
 
     t.field('overrideLeaf', {
       type: LeafNodeInput,
-
     });
+
     t.list.field('options', {
       type: QuestionOptionInput,
     });
@@ -92,6 +92,7 @@ export const TopicDataEntryInput = inputObjectType({
 
   definition(t) {
     t.id('id');
+
     t.list.field('questions', {
       type: QuestionInput,
     });
@@ -100,7 +101,7 @@ export const TopicDataEntryInput = inputObjectType({
 
 export const topicBuilderMutations = extendType({
   type: 'Mutation',
-  
+
   definition(t) {
     t.field('updateTopicBuilder', {
       type: 'String',
@@ -109,14 +110,13 @@ export const topicBuilderMutations = extendType({
         customerSlug: 'String',
         topicData: TopicDataEntryInput,
       },
-      async resolve(parent: any, args: any, ctx: any) {
-        const { prisma }: { prisma: PrismaClient } = ctx;
 
+      async resolve(parent, args, ctx) {
         if (!args.dialogueSlug || !args.customerSlug) {
-          return null;
+          throw new Error('No dialogue slug and customer slug provided');
         }
 
-        const customer = await prisma.customer.findOne({
+        const customer = await ctx.prisma.customer.findOne({
           where: { slug: args.customerSlug },
           include: {
             dialogues: {

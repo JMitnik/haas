@@ -1,4 +1,3 @@
-import { CustomerSettings, PrismaClient } from '@prisma/client';
 import { objectType } from '@nexus/schema';
 
 export const ColourSettingsType = objectType({
@@ -39,6 +38,7 @@ export const CustomerSettingsType = objectType({
         return colourSettings;
       },
     });
+
     t.field('fontSettings', {
       nullable: true,
       type: FontSettingsType,

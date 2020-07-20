@@ -5,7 +5,9 @@
 
 import * as prisma from "@prisma/client"
 import { core } from "@nexus/schema"
+;
 import * as APIContext from "../types/APIContext"
+;
 declare global {
   interface NexusGenCustomInputMethods<TypeName extends string> {
     upload<FieldName extends string>(fieldName: FieldName, opts?: core.ScalarInputFieldConfig<core.GetGen3<'inputTypes', TypeName, FieldName>>): void // "Upload";
@@ -275,7 +277,7 @@ export interface NexusGenRootTypes {
     startDate?: string | null; // String
   }
   TagType: prisma.Tag;
-  TriggerConditionType: prisma.TriggerConditionType;
+  TriggerConditionType: prisma.TriggerCondition;
   TriggerTableType: { // root type
     endDate?: string | null; // String
     pageIndex: number; // Int!
@@ -284,7 +286,7 @@ export interface NexusGenRootTypes {
     totalPages: number; // Int!
     triggers: NexusGenRootTypes['TriggerType'][]; // [TriggerType!]!
   }
-  TriggerType: prisma.TriggerType;
+  TriggerType: prisma.Trigger;
   UserTable: { // root type
     pageIndex?: number | null; // Int
     totalPages?: number | null; // Int

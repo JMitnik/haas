@@ -269,7 +269,7 @@ model User {
   @@unique([customerId, email])
 }
 
-enum TriggerType {
+enum TriggerEnum {
   QUESTION
   SCHEDULED
 }
@@ -280,7 +280,7 @@ enum TriggerMedium {
   BOTH
 }
 
-enum TriggerConditionType {
+enum TriggerConditionEnum {
   LOW_THRESHOLD
   HIGH_THRESHOLD
   INNER_RANGE
@@ -290,7 +290,7 @@ enum TriggerConditionType {
 
 model TriggerCondition {
   id        Int                  @default(autoincrement()) @id
-  type      TriggerConditionType
+  type      TriggerConditionEnum
   minValue  Int?
   maxValue  Int?
   textValue String?
@@ -302,7 +302,7 @@ model Trigger {
   id            String             @default(cuid()) @id
   lastSent      DateTime?
   name          String
-  type          TriggerType
+  type          TriggerEnum
   medium        TriggerMedium
   conditions    TriggerCondition[]
   relatedNodeId String?

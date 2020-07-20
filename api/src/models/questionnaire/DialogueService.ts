@@ -561,14 +561,15 @@ class DialogueService {
     return dialogue?.sessions.length;
   };
 
-  static getDialogueInteractionFeedItems = async (dialogueId: string): Array<NexusGenRootTypes['NodeEntry']> => {
+  static getDialogueInteractionFeedItems = async (dialogueId: string): Promise<Array<NexusGenRootTypes['NodeEntry']>> => {
     const sessions = await SessionService.getDialogueSessions(dialogueId);
 
     if (!sessions) {
       return [];
     }
 
-    const scoringEntries = SessionService.getScoringEntriesFromSessions(sessions).filter((item) => item);
+    const scoringEntries = SessionService.getScoringEntriesFromSessions(sessions);
+
     return scoringEntries;
   };
 }

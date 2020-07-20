@@ -1,10 +1,8 @@
-import { PrismaClient } from '@prisma/client';
 import { extendType, inputObjectType, objectType } from '@nexus/schema';
 
 // eslint-disable-next-line import/no-cycle
 import { CustomerType } from '../customer/Customer';
 // eslint-disable-next-line import/no-cycle
-import { PaginationProps } from '../../types/generic';
 import { PaginationWhereInput } from '../general/Pagination';
 import { PermissionType } from '../permission/Permission';
 import RoleService from './RoleService';
@@ -22,10 +20,9 @@ export const RoleType = objectType({
     t.list.field('permissions', {
       nullable: true,
       type: PermissionType,
-      async resolve(parent, args: any, ctx: any) {
-        const { prisma }: { prisma: PrismaClient } = ctx;
 
-        const customerPermissions = await prisma.permission.findMany({
+      async resolve(parent, args, ctx) {
+        const customerPermissions = await ctx.prisma.permission.findMany({
           where: { customerId: parent.customerId },
           include: {
             isPermissionOfRole: {
@@ -50,13 +47,9 @@ export const RoleType = objectType({
       nullable: true,
 
       async resolve(parent, args, ctx) {
-        const { prisma } = ctx;
+        if (!parent.customerId) return null;
 
-        if (!parent.customerId) {
-          return null;
-        }
-
-        const customer = await prisma.customer.findOne({
+        const customer = await ctx.prisma.customer.findOne({
           where: { id: parent.customerId },
         });
 
@@ -83,8 +76,9 @@ export const RoleInput = inputObjectType({
   },
 });
 
-export const RoleTableType = objectType({
-  name: 'RoleTableType',
+// TODO: Implement Pagination Interface
+export const RoleConnection = objectType({
+  name: 'RoleConnection',
   definition(t) {
     t.int('pageIndex', { nullable: true });
     t.int('totalPages', { nullable: true });
@@ -102,22 +96,23 @@ export const RoleTableType = objectType({
 export const RoleQueries = extendType({
   type: 'Query',
   definition(t) {
-    t.field('roleTable', {
-      type: RoleTableType,
+    t.field('roleConnection', {
+      type: RoleConnection,
       args: {
         customerId: 'String',
         filter: PaginationWhereInput,
       },
 
-      async resolve(parent: any, args: any, ctx: any) {
-        const { prisma }: { prisma: PrismaClient } = ctx;
-        const { pageIndex, offset, limit }: PaginationProps = args.filter;
+      async resolve(parent, args, ctx) {
+        if (!args.customerId) return null;
+
         const { roles, totalPages, newPageIndex } = await RoleService.paginatedRoles(
-          args.customerId, pageIndex, offset, limit,
+          args.customerId, args.filter?.pageIndex, args.filter?.offset, args.filter?.limit,
         );
 
-        const permissions = await prisma.permission.findMany({ where: { customerId: args.customerId } });
-        return { roles, permissions, pageIndex: newPageIndex || pageIndex, totalPages: totalPages || 1 };
+        const permissions = await ctx.prisma.permission.findMany({ where: { customerId: args.customerId } });
+
+        return { roles, permissions, pageIndex: newPageIndex || args.filter?.pageIndex, totalPages: totalPages || 1 };
       },
     });
 
@@ -156,19 +151,25 @@ export const RoleMutations = extendType({
     t.field('createRole', {
       type: RoleType,
       args: { data: RoleInput },
-      async resolve(parent: any, args: any, ctx: any) {
-        const { prisma }: { prisma: PrismaClient } = ctx;
-        const { name, customerId } = args.data;
 
-        return prisma.role.create({
+      async resolve(parent, args, ctx) {
+        if (!args.data?.customerId) {
+          throw new Error('Invalid customer id provided');
+        }
+
+        if (!args.data?.name) {
+          throw new Error('No role name provided');
+        }
+
+        return ctx.prisma.role.create({
           data: {
-            name,
+            name: args.data.name,
             permissions: {
               create: [],
             },
             Customer: {
               connect: {
-                id: customerId,
+                id: args.data.customerId,
               },
             },
           },
@@ -179,18 +180,19 @@ export const RoleMutations = extendType({
     t.field('updateRoles', {
       type: RoleType,
       args: { roleId: 'String', permissions: PermissionIdsInput },
-      async resolve(parent: any, args: any, ctx: any) {
-        const { prisma }: { prisma: PrismaClient } = ctx;
-        const { roleId, permissions } = args;
-        const { ids }: { ids: Array<string> } = permissions;
+      async resolve(parent, args, ctx) {
+        if (!args.roleId) {
+          throw new Error('No role provided');
+        }
 
-        const updateRole = await prisma.role.update({
+        const updateRole = await ctx.prisma.role.update({
           where: {
-            id: roleId,
+            id: args.roleId,
           },
           data: {
             permissions: {
-              connect: ids.map((id) => ({ id })),
+              // TODO: Will this set permission array to [] if no permissions are provided?
+              connect: args.permissions?.ids?.map((id) => ({ id })) || [],
             },
           },
         });
@@ -202,7 +204,7 @@ export const RoleMutations = extendType({
 });
 
 export default [
-  RoleTableType,
+  RoleConnection,
   RoleQueries,
   RoleDataInput,
   RoleInput,

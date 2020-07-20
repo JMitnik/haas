@@ -3,9 +3,9 @@ import { extendType, inputObjectType, mutationField, objectType } from '@nexus/s
 
 // eslint-disable-next-line import/no-cycle
 import { NodeEntryInput, NodeEntryType } from '../node-entry/NodeEntry';
-import NodeEntryService from '../node-entry/NodeEntryService';
 // eslint-disable-next-line import/no-cycle
 import { ConnectionInterface } from '../general/Pagination';
+// eslint-disable-next-line import/no-cycle
 import SessionService from './SessionService';
 
 export const SessionType = objectType({
@@ -139,7 +139,7 @@ export const CreateSessionMutation = mutationField('createSession', {
 
   resolve(parent, args, ctx) {
     if (!args?.data) {
-      return null;
+      throw new Error('No valid new session data provided');
     }
 
     try {

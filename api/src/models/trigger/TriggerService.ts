@@ -12,6 +12,7 @@ import _ from 'lodash';
 
 import { isAfter, subSeconds } from 'date-fns';
 
+import { NexusGenInputs } from '../../generated/nexus';
 import { Nullable } from '../../types/generic';
 import TriggerSMSService from '../../services/sms/trigger-sms-service';
 
@@ -251,10 +252,12 @@ class TriggerService {
 
   static updateConditions = async (
     dbTriggerConditions: Array<TriggerCondition>,
-    newConditions: Array<TriggerCondition>,
+    newConditions: Array<NexusGenInputs['TriggerConditionInputType']>,
     triggerId: string,
   ) => {
     const upsertedConditionsIds = await Promise.all(newConditions.map(async (condition) => {
+      if (!condition.type) return null;
+
       const upsertTriggerCondition = await prisma.triggerCondition.upsert({
         where: { id: condition.id || -1 },
         create: {
