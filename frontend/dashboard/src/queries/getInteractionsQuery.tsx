@@ -1,18 +1,18 @@
 import gql from 'graphql-tag';
 
 const getInteractionsQuery = gql`
-  query getInteractions($dialogueSlug: String!, $customerSlug: String!, $filter: FilterInput) {
+  query getInteractions($dialogueSlug: String!, $customerSlug: String!, $filter: PaginationWhereInput) {
     customer(slug: $customerSlug) {
       id
       dialogue(where: { slug: $dialogueSlug }) {
         id
-        interactions(filter: $filter) {
+        sessionConnection(filter: $filter) {
           sessions {
             id
             createdAt
             paths
             score
-            index
+
             nodeEntries {
               id
               depth
@@ -20,22 +20,18 @@ const getInteractionsQuery = gql`
                 title
                 type
               }
-              values {
-                numberValue
-                textValue
-                multiValues {
-                  textValue
-                  numberValue
-                }
+              value {
+                slider
+                textbox
+                register
+                choice
               }
             }
           }
-          orderBy {
-            id
-            desc
+          pageInfo {
+            pageIndex
+            nrPages
           }
-          pages
-          pageIndex
           startDate
           endDate
         }

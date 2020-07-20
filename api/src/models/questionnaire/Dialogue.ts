@@ -80,7 +80,7 @@ export const DialogueType = objectType({
     t.float('averageScore', {
       async resolve(parent) {
         if (!parent.id) {
-          return 0.0;
+          return 0;
         }
 
         const score = await DialogueService.calculateAverageDialogueScore(parent.id);
@@ -160,23 +160,6 @@ export const DialogueType = objectType({
       },
     });
 
-    // TODO: Put this back maybe?
-    // t.list.field('interactionFeedItems', {
-    //   nullable: true,
-    //   type: SessionType,
-
-    //   async resolve(parent) {
-    //     if (!parent.id) {
-    //       return null;
-    //     }
-
-    //     const interactionFeedItems = await DialogueService.getDialogueInteractionFeedItems(parent.id);
-    //     const nrItems = Math.min(interactionFeedItems.length, 3);
-
-    //     return interactionFeedItems.slice(0, nrItems);
-    //   },
-    // });
-
     t.string('customerId');
     t.field('customer', {
       type: CustomerType,
@@ -254,9 +237,14 @@ export const DialogueType = objectType({
 
     t.list.field('sessions', {
       type: SessionType,
+      args: { take: 'Int' },
 
-      async resolve(parent) {
+      async resolve(parent, args) {
         const dialogueWithSessions = await SessionService.getDialogueSessions(parent.id);
+
+        if (args.take) {
+          return dialogueWithSessions?.length ? dialogueWithSessions.slice(0, args.take) || [] : [];
+        }
 
         return dialogueWithSessions || [];
       },

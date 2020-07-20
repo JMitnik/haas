@@ -15,6 +15,14 @@ export const SessionType = objectType({
     t.string('createdAt');
     t.string('dialogueId');
 
+    // t.int('index');
+    t.int('paths', {
+      async resolve(parent, args, ctx) {
+        const entryCount = await ctx.prisma.nodeEntry.count({ where: { sessionId: parent.id } });
+        return entryCount;
+      },
+    });
+
     t.float('score', {
       async resolve(parent) {
         const score = await SessionService.getSessionScore(parent.id) || 0.0;
@@ -50,22 +58,6 @@ export const SessionWhereUniqueInput = inputObjectType({
   definition(t) {
     t.id('id', { required: false });
     t.id('dialogueId', { required: false });
-  },
-});
-
-// TODO: Can we fold Interactions and Sessions together?
-export const InteractionSessionType = objectType({
-  name: 'InteractionSessionType',
-
-  definition(t) {
-    t.string('id');
-    t.int('index');
-    t.int('paths');
-    t.string('createdAt');
-
-    t.float('score', { nullable: true });
-
-    t.list.field('nodeEntries', { type: NodeEntryType });
   },
 });
 
@@ -152,7 +144,6 @@ export const CreateSessionMutation = mutationField('createSession', {
 });
 
 export default [
-  InteractionSessionType,
   SessionConnection,
   SessionWhereUniqueInput,
   SessionQuery,

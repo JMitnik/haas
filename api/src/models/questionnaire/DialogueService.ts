@@ -8,81 +8,9 @@ import NodeResolver from '../question/NodeService';
 // eslint-disable-next-line import/no-cycle
 import { NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
 // eslint-disable-next-line import/no-cycle
+import { HistoryDataProps, QuestionProps, StatisticsProps } from './DialogueTypes';
 import SessionService from '../session/SessionService';
-
-const prisma = new PrismaClient();
-interface LeafNodeProps {
-  id: string;
-  nodeId?: string;
-  type?: string;
-  title: string;
-}
-
-interface QuestionConditionProps {
-  id?: number;
-  conditionType: string;
-  renderMin: number;
-  renderMax: number;
-  matchValue: string;
-}
-
-interface EdgeNodeProps {
-  id: string;
-  title: string;
-}
-
-interface EdgeChildProps {
-  id?: string;
-  conditions: [QuestionConditionProps];
-  parentNode: EdgeNodeProps;
-  childNode: EdgeNodeProps;
-}
-
-interface QuestionOptionProps {
-  id?: number;
-  value: string;
-  publicValue?: string;
-}
-
-interface QuestionProps {
-  id: string;
-  title: string;
-  isRoot: boolean;
-  isLeaf: boolean;
-  type: NodeType;
-  overrideLeaf: LeafNodeProps;
-  options: Array<QuestionOptionProps>;
-  children: Array<EdgeChildProps>;
-}
-
-interface DialogueInputProps {
-  data: {
-    customerSlug: string;
-    dialogueSlug: string;
-    title: string;
-    description: string;
-    publicTitle: string;
-    isSeed: boolean;
-    tags: any;
-  }
-}
-
-interface PathProps {
-  answer?: string | null;
-  quantity?: number | null;
-}
-
-interface StatisticsProps {
-  history: HistoryDataProps[];
-  topNegativePath: PathProps[];
-  topPositivePath: PathProps[];
-}
-
-interface HistoryDataProps {
-  x?: string | null;
-  y?: number | null;
-  entryId?: string | null;
-}
+import prisma from '../../prisma';
 
 class DialogueService {
   static constructDialogue(
@@ -553,7 +481,8 @@ class DialogueService {
     }
 
     const scoringEntries = await SessionService.getScoringEntriesFromSessions(sessions);
-    const scores = _.mean((scoringEntries).map((entry) => entry?.slideNodeEntry));
+
+    const scores = _.mean((scoringEntries).map((entry) => entry?.slideNodeEntry)) || 0;
 
     return scores;
   };
@@ -576,9 +505,9 @@ class DialogueService {
       return [];
     }
 
-    const scoringEntries = SessionService.getScoringEntriesFromSessions(sessions);
+    const scoringEntriesFromSessions = SessionService.getScoringEntriesFromSessions(sessions);
 
-    return scoringEntries;
+    return scoringEntriesFromSessions;
   };
 }
 

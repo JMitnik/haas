@@ -26,19 +26,19 @@ interface TableInputProps {
   disableSorting?: boolean;
 }
 
-const Table = (
-  { headers,
-    data,
-    paginationProps,
-    onPaginationChange,
-    onAddEntry,
-    CustomRow,
-    onEditEntry,
-    onDeleteEntry,
-    permissions,
-    hidePagination,
-    disableSorting }: TableInputProps,
-) => {
+const Table = ({
+  headers,
+  data,
+  paginationProps,
+  onPaginationChange,
+  onAddEntry,
+  CustomRow,
+  onEditEntry,
+  onDeleteEntry,
+  permissions,
+  hidePagination,
+  disableSorting,
+}: TableInputProps) => {
   const handlePage = (newPageIndex: number) => {
     if (onPaginationChange) {
       onPaginationChange((prevValues) => ({ ...prevValues, pageIndex: newPageIndex }));

@@ -21,7 +21,7 @@ interface TableProps {
   pageIndex: number;
   pageSize: number;
   sortBy: {
-    id: string;
+    by: string;
     desc: boolean;
   }[]
 }
@@ -43,7 +43,7 @@ const TriggersOverview = () => {
       activeSearchTerm: '',
       pageIndex: 0,
       pageSize: 8,
-      sortBy: [{ id: 'name', desc: true }],
+      sortBy: [{ by: 'name', desc: true }],
     },
   );
 

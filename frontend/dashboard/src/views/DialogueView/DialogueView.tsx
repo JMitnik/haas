@@ -44,7 +44,7 @@ const getDialogueStatistics = gql`
         id
         countInteractions
         averageScore
-        interactionFeedItems {
+        sessions(take: 3) {
           id
           createdAt
           score
@@ -59,7 +59,7 @@ const getDialogueStatistics = gql`
             answer
           }
           
-          lineChartData {
+          history {
             x
             y
           }
@@ -146,7 +146,7 @@ const DialogueView = () => {
         </Div>
         <InteractionFeedModule
           onActiveSessionChange={setActiveSession}
-          timelineEntries={dialogue?.interactionFeedItems}
+          timelineEntries={dialogue?.sessions}
         />
 
         {location?.state?.modal && (

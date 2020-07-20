@@ -11,6 +11,7 @@ import { TEXT_NODES } from '../questionnaire/Dialogue';
 // eslint-disable-next-line import/no-cycle
 import { NexusGenRootTypes } from '../../generated/nexus';
 import NodeEntryService, { NodeEntryWithTypes } from '../node-entry/NodeEntryService';
+// eslint-disable-next-line import/no-cycle
 import TriggerService from '../trigger/TriggerService';
 import prisma from '../../prisma';
 

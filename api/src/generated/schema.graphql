@@ -77,7 +77,7 @@ type Dialogue {
   questions(where: QuestionNodeWhereInput): [QuestionNode!]!
   rootQuestion: QuestionNode!
   sessionConnection(filter: PaginationWhereInput): SessionConnection
-  sessions: [Session!]!
+  sessions(take: Int): [Session!]!
   slug: String!
   statistics: DialogueStatistics
   tags: [TagType!]
@@ -141,15 +141,6 @@ type ImageType {
   filename: String
   mimetype: String
   url: String
-}
-
-type InteractionSessionType {
-  createdAt: String!
-  id: String!
-  index: Int!
-  nodeEntries: [NodeEntry!]!
-  paths: Int!
-  score: Float
 }
 
 input LeafNodeInput {
@@ -388,6 +379,7 @@ type Session {
   dialogueId: String!
   id: ID!
   nodeEntries: [NodeEntry!]!
+  paths: Int!
   score: Float!
 }
 

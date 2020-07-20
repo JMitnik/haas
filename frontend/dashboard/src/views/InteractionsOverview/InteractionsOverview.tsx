@@ -21,7 +21,7 @@ interface TableProps {
   pageIndex: number;
   pageSize: number;
   sortBy: {
-    id: string;
+    by: string;
     desc: boolean;
   }[]
 }
@@ -41,7 +41,7 @@ const InteractionsOverview = () => {
     },
     onError: (error: any) => {
       console.log(error);
-    }
+    },
   });
 
   const [paginationProps, setPaginationProps] = useState<TableProps>({
@@ -50,7 +50,7 @@ const InteractionsOverview = () => {
     activeSearchTerm: '',
     pageIndex: 0,
     pageSize: 8,
-    sortBy: [{ id: 'id', desc: true }],
+    sortBy: [{ by: 'score', desc: true }],
   });
 
   const interactions = data?.customer?.dialogue?.interactions?.sessions || [];

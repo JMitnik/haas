@@ -16,7 +16,7 @@ interface TableProps {
   pageIndex: number;
   pageSize: number;
   sortBy: {
-    id: string;
+    by: string;
     desc: boolean;
   }[]
 }
@@ -37,7 +37,7 @@ const RolesOverview = () => {
       activeSearchTerm: '',
       pageIndex: 0,
       pageSize: 8,
-      sortBy: [{ id: 'id', desc: true }],
+      sortBy: [{ by: 'by', desc: true }],
     },
   );
 
