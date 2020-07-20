@@ -205,16 +205,14 @@ const QuestionEntryForm = ({
     const type = activeQuestionType?.value;
     const overrideLeafId = activeLeaf?.value;
     const options = { options: activeOptions };
-    // TODO: Update both parent question's children property (When edge is updated -> Need edgeId) and current questionNode'
     const edgeCondition = activeCondition;
-    // TODO: Add questionId to mutation
     if (question.id !== '-1') {
       updateQuestion({
         variables: {
           id,
           title,
           type,
-          overrideLeafId,
+          overrideLeafId: overrideLeafId || '',
           edgeId,
           optionEntries: options,
           edgeCondition,
