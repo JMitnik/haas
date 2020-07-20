@@ -7,10 +7,11 @@ import LinkIcon from 'components/Icons/LinkIcon';
 import OpinionIcon from 'components/Icons/OpinionIcon';
 import RegisterIcon from 'components/Icons/RegisterIcon';
 
-import { AddChildContainer, AddChildIconContainer, LinkContainer, OverflowSpan, QuestionEntryContainer, QuestionEntryViewContainer, TypeSpan } from './QuestionEntryStyles';
+import { AddChildContainer, AddChildIconContainer, ConditionContainer, ConditionSpan, LinkContainer, OverflowSpan, QuestionEntryContainer, QuestionEntryViewContainer, TypeSpan } from './QuestionEntryStyles';
 import { EdgeConditonProps, QuestionEntryProps, QuestionOptionProps } from '../TopicBuilderInterfaces';
 import BuilderIcon from '../components/BuilderIcon';
 import DeleteCTAButton from '../components/DeleteCTAButton';
+import HaasNodeIcon from 'components/Icons/HaasNodeIcon';
 import QuestionEntryForm from './QuestionEntryForm';
 
 interface QuestionEntryItemProps {
@@ -30,26 +31,51 @@ interface QuestionEntryItemProps {
   parentOptions: QuestionOptionProps[] | undefined;
   edgeId: string | undefined;
   parentQuestionId?: string;
+  depth: number;
 }
 
-const AddChildComponent = ({ isExpanded, onExpandChange }:{ isExpanded: Boolean, onExpandChange: () => void }) => (
-  <AddChildContainer onClick={() => onExpandChange()}>
-    <AddChildIconContainer>
-      {isExpanded ? <Minus /> : <Plus />}
-    </AddChildIconContainer>
-    <Span padding="4px">
-      {isExpanded ? 'Hide children' : 'Show children'}
-    </Span>
-  </AddChildContainer>
+const AddChildComponent = ({ amtChildren, isExpanded, onExpandChange }:{ amtChildren?: number, isExpanded: Boolean, onExpandChange: () => void }) => {
+  console.log('Amt children: ', amtChildren);
+  return (
+    <AddChildContainer onClick={() => onExpandChange()}>
+      <AddChildIconContainer>
+        {isExpanded ? <Minus /> : <Plus />}
+      </AddChildIconContainer>
+      <Span padding="4px">
+        {isExpanded ? `Hide children (${amtChildren})` : `Show children (${amtChildren})`}
+      </Span>
+    </AddChildContainer>
+  );
+};
+
+const ConditionView = ({ condition } : { condition: EdgeConditonProps | undefined}) => (
+  <ConditionContainer>
+    <HaasNodeIcon width="25" height="25" isDark />
+    {condition?.conditionType === 'match' && (
+      <ConditionSpan fontSize="0.6em">
+        <abbr title={condition.matchValue}>{condition.matchValue}</abbr>
+      </ConditionSpan>
+    )}
+
+    {condition?.conditionType === 'valueBoundary' && (
+      <ConditionSpan fontSize="0.6em">
+        {`${condition.renderMin} - ${condition.renderMax}`}
+      </ConditionSpan>
+    )}
+
+  </ConditionContainer>
 );
 
 const QuestionEntryItem = (
-  { question, activeQuestion, onActiveQuestionChange, Icon, leafs, onExpandChange, isExpanded, condition, parentOptions, edgeId, parentQuestionId, onAddExpandChange }: QuestionEntryItemProps,
+  { depth, question, activeQuestion, onActiveQuestionChange, Icon, leafs, onExpandChange, isExpanded, condition, parentOptions, edgeId, parentQuestionId, onAddExpandChange }: QuestionEntryItemProps,
 ) => {
   const activeType = question.type === 'Multi-Choice' ? { label: question.type, value: 'MULTI_CHOICE' } : { label: question.type, value: 'SLIDER' };
 
   return (
     <Flex position="relative" justifyContent="center" alignItems="center" flexGrow={1}>
+      {depth > 1 && (
+        <ConditionView condition={condition} />
+      )}
       <QuestionEntryViewContainer activeCTA={activeQuestion} id={question.id} flexGrow={1}>
         <QuestionEntryContainer flexGrow={1}>
           <DeleteCTAButton
@@ -109,16 +135,16 @@ const QuestionEntryItem = (
       </QuestionEntryViewContainer>
       <LinkContainer hasCTA={!!question.overrideLeaf?.id}>
         <Flex flexDirection="column" padding="25px" minWidth="80px" color="black" justifyContent="center" alignItems="center">
-          { (!question.overrideLeaf?.type || question.overrideLeaf?.type === 'Link') && (
+          {(!question.overrideLeaf?.type || question.overrideLeaf?.type === 'Link') && (
             <LinkIcon isCTA hasCTA />
           )}
 
-          { question.overrideLeaf?.type === 'Opinion' && (
+          {question.overrideLeaf?.type === 'Opinion' && (
             <OpinionIcon isCTA hasCTA />
           )}
 
-          { question.overrideLeaf?.type === 'Register' && (
-          <RegisterIcon isCTA hasCTA />
+          {question.overrideLeaf?.type === 'Register' && (
+            <RegisterIcon isCTA hasCTA />
           )}
 
           <TypeSpan fontSize="0.5em">
@@ -127,7 +153,7 @@ const QuestionEntryItem = (
         </Flex>
       </LinkContainer>
       {question.id !== '-1' && (
-        <AddChildComponent isExpanded={isExpanded} onExpandChange={onExpandChange} />
+        <AddChildComponent amtChildren={question?.children?.length || 0} isExpanded={isExpanded} onExpandChange={onExpandChange} />
       )}
     </Flex>
   );

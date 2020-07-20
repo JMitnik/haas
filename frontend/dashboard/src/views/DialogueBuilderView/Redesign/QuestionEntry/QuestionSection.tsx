@@ -9,6 +9,7 @@ import OpinionIcon from 'components/Icons/OpinionIcon';
 import RegisterIcon from 'components/Icons/RegisterIcon';
 import SplitArrowIcon from 'components/Icons/SplitIcon';
 
+import HaasNodeIcon from 'components/Icons/HaasNodeIcon';
 import { AddQuestionContainer, DepthSpan } from './QuestionEntryStyles';
 import { EdgeChildProps, EdgeConditonProps, QuestionEntryProps, QuestionOptionProps } from '../TopicBuilderInterfaces';
 import QuestionEntry from './QuestionEntry';
@@ -30,7 +31,7 @@ interface QuestionSectionProps {
   edgeId: string | undefined;
 }
 
-const QuestionSection = ({ activeQuestion, onActiveQuestionChange, onAddQuestion, onDeleteQuestion, questionsQ, question, leafs, Icon, depth, condition, options, edgeId }: QuestionSectionProps) => {
+const QuestionSection = ({ index, activeQuestion, onActiveQuestionChange, onAddQuestion, onDeleteQuestion, questionsQ, question, leafs, Icon, depth, condition, options, edgeId }: QuestionSectionProps) => {
   const [isQuestionExpanded, setQuestionExpanded] = useState(depth === 1 || false);
   const [isAddExpanded, setAddExpanded] = useState(false);
   const handleExpandChange = () => {
@@ -56,10 +57,14 @@ const QuestionSection = ({ activeQuestion, onActiveQuestionChange, onAddQuestion
     onActiveQuestionChange('-1');
   };
 
+  // If you want indent
+  // 1. add paddingLeft={`${depth * 10}px`} to parent flex
+  // 2. add marginLeft={`${depth * 10 + 10}px`} to AddQuestionContainer
+  // 3. add marginLeft={`${depth * 10 + 10}px`} to Div around where (isQuestionExpanded && isAddExpanded)
   return (
-    <Flex paddingTop="10px" paddingBottom="10px" paddingLeft={`${depth * 10}px`} flexDirection="column">
-      { depth > 1 && (
-      <Flex marginBottom="5px" alignItems="center">
+    <Flex paddingTop="10px" paddingBottom="10px" flexDirection="column">
+      { depth > 1 && index === 0 && (
+      <Flex marginBottom="15px" alignItems="center">
         <SplitArrowIcon />
         <DepthSpan fontSize="0.9em">
           DEPTH
@@ -69,6 +74,7 @@ const QuestionSection = ({ activeQuestion, onActiveQuestionChange, onAddQuestion
       </Flex>
       )}
       <QuestionEntry
+        depth={depth}
         edgeId={edgeId}
         parentOptions={options}
         condition={condition}
@@ -106,8 +112,8 @@ const QuestionSection = ({ activeQuestion, onActiveQuestionChange, onAddQuestion
         ),
       )}
       {(isQuestionExpanded && !isAddExpanded) && (
-        <AddQuestionContainer margin={`0 ${depth * 10 + 10}px`}>
-          <Flex onClick={() => handleAdd()} justifyContent="center" alignItems="center">
+        <AddQuestionContainer onClick={() => handleAdd()}>
+          <Flex justifyContent="center" alignItems="center">
             <Plus width="35px" height="35px" />
             <H2>
               Add new question
@@ -116,8 +122,9 @@ const QuestionSection = ({ activeQuestion, onActiveQuestionChange, onAddQuestion
         </AddQuestionContainer>
       )}
       {(isQuestionExpanded && isAddExpanded) && (
-        <Div margin={`0 ${depth * 10 + 10}px`}>
+        <Div>
           <QuestionEntry
+            depth={depth}
             onAddExpandChange={setAddExpanded}
             parentQuestionId={question.id}
             edgeId=""

@@ -12,6 +12,23 @@ ${({ theme }) => css`
 //   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 // `;
 
+export const ConditionContainer = styled(Flex)`
+  ${({ theme }) => css`
+    color: ${theme.colors.default.darkest};
+    background: ${theme.colors.white};
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    margin-bottom: 25px;
+    width: 60px;
+    height: 60px;
+
+    border-top-left-radius: ${theme.borderRadiuses.somewhatRounded};
+    border-bottom-left-radius: ${theme.borderRadiuses.somewhatRounded};
+  `}
+`;
+
 export const OverflowSpan = styled(Span)`
   ${({ theme }) => css`
     color: ${theme.colors.default.darkest};
@@ -114,6 +131,20 @@ export const LinkContainer = styled(Flex) <{ hasCTA?: Boolean }>`
     border-left: none; 
     border-bottom-right-radius: ${theme.borderRadiuses.somewhatRounded};
     border-top-right-radius: ${theme.borderRadiuses.somewhatRounded};
+ `}
+`;
+
+export const ConditionSpan = styled(Span)`
+   ${({ theme }) => css`
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    width: 40px;
+    text-align: center;
+    color: ${theme.colors.default.darkest};
+    abbr {
+      text-decoration: none;
+    }
  `}
 `;
 
