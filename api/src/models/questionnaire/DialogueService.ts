@@ -288,6 +288,10 @@ class DialogueService {
         { where: { nodeEntryId: { in: nodeEntryIds } } },
       );
 
+      await prisma.choiceNodeEntry.deleteMany(
+        { where: { nodeEntryId: { in: nodeEntryIds } } },
+      );
+
       await prisma.nodeEntry.deleteMany(
         {
           where: {
