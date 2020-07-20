@@ -3,15 +3,26 @@ import { Edit3, Minus, Plus, X } from 'react-feather';
 import React from 'react';
 
 import EditCTAButton from 'views/ActionsOverview/components/EditCTAButton';
+import HaasNodeIcon from 'components/Icons/HaasNodeIcon';
 import LinkIcon from 'components/Icons/LinkIcon';
 import OpinionIcon from 'components/Icons/OpinionIcon';
 import RegisterIcon from 'components/Icons/RegisterIcon';
 
-import { AddChildContainer, AddChildIconContainer, ConditionContainer, ConditionSpan, LinkContainer, OverflowSpan, QuestionEntryContainer, QuestionEntryViewContainer, TypeSpan } from './QuestionEntryStyles';
+import {
+  AddChildContainer,
+  AddChildIconContainer,
+  ConditionContainer,
+  ConditionSpan,
+  LinkContainer,
+  OverflowSpan,
+  QuestionEntryContainer,
+  QuestionEntryViewContainer,
+  TypeSpan,
+} from './QuestionEntryStyles';
 import { EdgeConditonProps, QuestionEntryProps, QuestionOptionProps } from '../TopicBuilderInterfaces';
 import BuilderIcon from '../components/BuilderIcon';
 import DeleteCTAButton from '../components/DeleteCTAButton';
-import HaasNodeIcon from 'components/Icons/HaasNodeIcon';
+
 import QuestionEntryForm from './QuestionEntryForm';
 
 interface QuestionEntryItemProps {
@@ -34,19 +45,22 @@ interface QuestionEntryItemProps {
   depth: number;
 }
 
-const AddChildComponent = ({ amtChildren, isExpanded, onExpandChange }:{ amtChildren?: number, isExpanded: Boolean, onExpandChange: () => void }) => {
-  console.log('Amt children: ', amtChildren);
-  return (
-    <AddChildContainer onClick={() => onExpandChange()}>
-      <AddChildIconContainer>
-        {isExpanded ? <Minus /> : <Plus />}
-      </AddChildIconContainer>
-      <Span padding="4px">
-        {isExpanded ? `Hide children (${amtChildren})` : `Show children (${amtChildren})`}
-      </Span>
-    </AddChildContainer>
-  );
-};
+interface AddChildComponentProps {
+  amtChildren?: number;
+  isExpanded: Boolean;
+  onExpandChange: () => void;
+}
+
+const AddChildComponent = ({ amtChildren, isExpanded, onExpandChange }: AddChildComponentProps) => (
+  <AddChildContainer onClick={() => onExpandChange()}>
+    <AddChildIconContainer>
+      {isExpanded ? <Minus /> : <Plus />}
+    </AddChildIconContainer>
+    <Span padding="4px">
+      {isExpanded ? `Hide children (${amtChildren})` : `Show children (${amtChildren})`}
+    </Span>
+  </AddChildContainer>
+);
 
 const ConditionView = ({ condition } : { condition: EdgeConditonProps | undefined}) => (
   <ConditionContainer>
@@ -67,9 +81,24 @@ const ConditionView = ({ condition } : { condition: EdgeConditonProps | undefine
 );
 
 const QuestionEntryItem = (
-  { depth, question, activeQuestion, onActiveQuestionChange, Icon, leafs, onExpandChange, isExpanded, condition, parentOptions, edgeId, parentQuestionId, onAddExpandChange }: QuestionEntryItemProps,
+  { depth,
+    question,
+    activeQuestion,
+    onActiveQuestionChange,
+    Icon,
+    leafs,
+    onExpandChange,
+    isExpanded,
+    condition,
+    parentOptions,
+    edgeId,
+    parentQuestionId,
+    onAddExpandChange }
+  : QuestionEntryItemProps,
 ) => {
-  const activeType = question.type === 'Multi-Choice' ? { label: question.type, value: 'MULTI_CHOICE' } : { label: question.type, value: 'SLIDER' };
+  const activeType = question.type === 'Multi-Choice'
+    ? { label: question.type, value: 'MULTI_CHOICE' }
+    : { label: question.type, value: 'SLIDER' };
 
   return (
     <Flex position="relative" justifyContent="center" alignItems="center" flexGrow={1}>
@@ -134,7 +163,14 @@ const QuestionEntryItem = (
         </QuestionEntryContainer>
       </QuestionEntryViewContainer>
       <LinkContainer hasCTA={!!question.overrideLeaf?.id}>
-        <Flex flexDirection="column" padding="25px" minWidth="80px" color="black" justifyContent="center" alignItems="center">
+        <Flex
+          flexDirection="column"
+          padding="25px"
+          minWidth="80px"
+          color="black"
+          justifyContent="center"
+          alignItems="center"
+        >
           {(!question.overrideLeaf?.type || question.overrideLeaf?.type === 'Link') && (
             <LinkIcon isCTA hasCTA />
           )}
@@ -153,7 +189,11 @@ const QuestionEntryItem = (
         </Flex>
       </LinkContainer>
       {question.id !== '-1' && (
-        <AddChildComponent amtChildren={question?.children?.length || 0} isExpanded={isExpanded} onExpandChange={onExpandChange} />
+        <AddChildComponent
+          amtChildren={question?.children?.length || 0}
+          isExpanded={isExpanded}
+          onExpandChange={onExpandChange}
+        />
       )}
     </Flex>
   );

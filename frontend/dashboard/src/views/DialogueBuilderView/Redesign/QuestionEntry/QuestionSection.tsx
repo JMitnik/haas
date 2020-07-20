@@ -1,19 +1,12 @@
-import { Edit3, Plus, X } from 'react-feather';
+import { Plus } from 'react-feather';
 import React, { useState } from 'react';
 
 import { Div, Flex, H2 } from '@haas/ui';
-import DeleteCTAButton from 'views/ActionsOverview/components/DeleteCTAButton';
-import EditCTAButton from 'views/ActionsOverview/components/EditCTAButton';
-import LinkIcon from 'components/Icons/LinkIcon';
-import OpinionIcon from 'components/Icons/OpinionIcon';
-import RegisterIcon from 'components/Icons/RegisterIcon';
 import SplitArrowIcon from 'components/Icons/SplitIcon';
 
-import HaasNodeIcon from 'components/Icons/HaasNodeIcon';
 import { AddQuestionContainer, DepthSpan } from './QuestionEntryStyles';
-import { EdgeChildProps, EdgeConditonProps, QuestionEntryProps, QuestionOptionProps } from '../TopicBuilderInterfaces';
+import { EdgeConditonProps, QuestionEntryProps, QuestionOptionProps } from '../TopicBuilderInterfaces';
 import QuestionEntry from './QuestionEntry';
-import QuestionEntryForm from './QuestionEntryForm';
 
 interface QuestionSectionProps {
   options: QuestionOptionProps[] | undefined;
@@ -31,7 +24,23 @@ interface QuestionSectionProps {
   edgeId: string | undefined;
 }
 
-const QuestionSection = ({ index, activeQuestion, onActiveQuestionChange, onAddQuestion, onDeleteQuestion, questionsQ, question, leafs, Icon, depth, condition, options, edgeId }: QuestionSectionProps) => {
+const QuestionSection = (
+  {
+    index,
+    activeQuestion,
+    onActiveQuestionChange,
+    onAddQuestion,
+    onDeleteQuestion,
+    questionsQ,
+    question,
+    leafs,
+    Icon,
+    depth,
+    condition,
+    options,
+    edgeId,
+  }: QuestionSectionProps,
+) => {
   const [isQuestionExpanded, setQuestionExpanded] = useState(depth === 1 || false);
   const [isAddExpanded, setAddExpanded] = useState(false);
   const handleExpandChange = () => {

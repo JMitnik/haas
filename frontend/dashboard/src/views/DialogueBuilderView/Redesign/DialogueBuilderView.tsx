@@ -1,22 +1,16 @@
-import { ApolloError } from 'apollo-boost';
-import { Button, ColumnFlex, Div, H2, Loader } from '@haas/ui';
+import { ColumnFlex, Div, H2, Loader } from '@haas/ui';
 import { orderBy } from 'lodash';
-import { useHistory, useParams } from 'react-router-dom';
-import { useMutation, useQuery } from '@apollo/react-hooks';
-import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { useQuery } from '@apollo/react-hooks';
+import React, { useState } from 'react';
 
 import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
 import HaasNodeIcon from 'components/Icons/HaasNodeIcon';
 import MultiChoiceBuilderIcon from 'components/Icons/MultiChoiceBuilderIcon';
-import updateTopicBuilder from 'mutations/updateTopicBuilder';
 
 import { DialogueBuilderContainer } from './DialogueBuilderStyles';
-import {
-  EdgeChildProps, QuestionEntryProps,
-  QuestionOptionProps,
-} from './TopicBuilderInterfaces';
+import { EdgeChildProps, QuestionEntryProps } from './TopicBuilderInterfaces';
 
-import QuestionEntry from './QuestionEntry/QuestionEntry';
 import QuestionSection from './QuestionEntry/QuestionSection';
 
 interface QuestionEntryExtendedProps extends QuestionEntryProps {
@@ -106,7 +100,6 @@ const DialogueBuilderPage = () => {
   if (!data || loading) return <Loader />;
   const dialogueData = data?.customer?.dialogue;
   const selectLeafs = findLeafs(dialogueData?.leafs);
-  console.log('DIALOGUE PAGE PREMAP:', dialogueData?.questions);
   const questionsData = mapQuestionsInputData(dialogueData?.questions);
   const rootQuestionNode = questionsData.find((question) => question.isRoot);
 
@@ -124,30 +117,6 @@ const DialogueBuilderPage = () => {
 
 const DialogueBuilderView = ({ nodes, selectLeafs, root }: DialogueBuilderViewProps) => {
   const [activeQuestion, setActiveQuestion] = useState<null | string>(null);
-
-  // const handleAddQuestion = (event: any, quesionUUID: string) => {
-  //   event.preventDefault();
-  //   setQuestions((questionsPrev: any) => [...questionsPrev, {
-  //     id: quesionUUID,
-  //     title: undefined,
-  //     isRoot: false,
-  //     isLeaf: false,
-  //     options: [],
-  //     type: undefined,
-  //     overrideLeaf: undefined,
-  //     children: undefined,
-  //   }]);
-  // };
-
-  // const handleDeleteQuestion = (event: any, questionId: string) => {
-  //   event.preventDefault();
-  //   setQuestions((questionsPrev: any) => {
-  //     const questionIds = questions.map((question) => question.id);
-  //     const questionIndex = questionIds.indexOf(questionId);
-  //     questionsPrev.splice(questionIndex, 1);
-  //     return [...questionsPrev];
-  //   });
-  // };
 
   return (
     <DialogueBuilderContainer>
