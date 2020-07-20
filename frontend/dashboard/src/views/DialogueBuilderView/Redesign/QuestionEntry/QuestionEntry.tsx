@@ -1,18 +1,17 @@
 import { Div, Flex, Span } from '@haas/ui';
 import { Edit3, Minus, Plus, X } from 'react-feather';
-import { v4 as uuidv4 } from 'uuid';
 import React from 'react';
 
 import EditCTAButton from 'views/ActionsOverview/components/EditCTAButton';
 import LinkIcon from 'components/Icons/LinkIcon';
+import OpinionIcon from 'components/Icons/OpinionIcon';
+import RegisterIcon from 'components/Icons/RegisterIcon';
 
 import { AddChildContainer, AddChildIconContainer, LinkContainer, OverflowSpan, QuestionEntryContainer, QuestionEntryViewContainer, TypeSpan } from './QuestionEntryStyles';
-import { EdgeChildProps, EdgeConditonProps, QuestionEntryProps, QuestionOptionProps } from '../TopicBuilderInterfaces';
+import { EdgeConditonProps, QuestionEntryProps, QuestionOptionProps } from '../TopicBuilderInterfaces';
 import BuilderIcon from '../components/BuilderIcon';
 import DeleteCTAButton from '../components/DeleteCTAButton';
-import OpinionIcon from 'components/Icons/OpinionIcon';
 import QuestionEntryForm from './QuestionEntryForm';
-import RegisterIcon from 'components/Icons/RegisterIcon';
 
 interface QuestionEntryItemProps {
   onAddExpandChange?: React.Dispatch<React.SetStateAction<boolean>>;
@@ -109,7 +108,7 @@ const QuestionEntryItem = (
         </QuestionEntryContainer>
       </QuestionEntryViewContainer>
       <LinkContainer hasCTA={!!question.overrideLeaf?.id}>
-        <Flex flexDirection="column" padding="25px" color="black" justifyContent="center" alignItems="center">
+        <Flex flexDirection="column" padding="25px" minWidth="80px" color="black" justifyContent="center" alignItems="center">
           { (!question.overrideLeaf?.type || question.overrideLeaf?.type === 'Link') && (
             <LinkIcon isCTA hasCTA />
           )}
@@ -122,7 +121,7 @@ const QuestionEntryItem = (
           <RegisterIcon isCTA hasCTA />
           )}
 
-          <TypeSpan fontSize="0.6em">
+          <TypeSpan fontSize="0.5em">
             {question.overrideLeaf?.type || 'None'}
           </TypeSpan>
         </Flex>

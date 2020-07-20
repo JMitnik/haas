@@ -57,7 +57,7 @@ const QuestionSection = ({ activeQuestion, onActiveQuestionChange, onAddQuestion
   };
 
   return (
-    <Flex padding={`${depth * 10}px`} flexDirection="column">
+    <Flex paddingTop="10px" paddingBottom="10px" paddingLeft={`${depth * 10}px`} flexDirection="column">
       { depth > 1 && (
       <Flex marginBottom="5px" alignItems="center">
         <SplitArrowIcon />
