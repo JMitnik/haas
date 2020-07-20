@@ -12,7 +12,6 @@ export const PaginationSortInput = inputObjectType({
   description: 'Sorting of pagination (type and whether it ascends)',
 
   definition(t) {
-    // TODO: Maybe set this to be an ENUM?
     t.field('by', { type: PaginationSortByEnum, nullable: false });
     t.boolean('desc', { default: true, required: false });
   },

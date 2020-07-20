@@ -2,6 +2,8 @@ import { PrismaClient } from '@prisma/client';
 import CustomerService from './CustomerService';
 import prisma from '../../prisma';
 
+import { sampleCustomerWithDialogue } from '../../test/data/SampleCustomer';
+
 describe('CustomerService tests', () => {
   beforeEach(async () => {
     // Delete all dialogues
@@ -24,7 +26,8 @@ describe('CustomerService tests', () => {
 
   it('Creates customer', async () => {
     const customer = await prisma.customer.create({
-      data: { name: 'Starbucks', slug: 'starbucks' },
+      ...sampleCustomerWithDialogue,
+      // data: { name: 'Starbucks', slug: 'starbucks' },
     });
 
     expect(await prisma.customer.count()).toBe(1);
@@ -32,7 +35,7 @@ describe('CustomerService tests', () => {
 
   it('Deletes customer', async () => {
     const customer = await prisma.customer.create({
-      data: { name: 'Starbucks', slug: 'starbucks' },
+      ...sampleCustomerWithDialogue,
     });
 
     expect(await prisma.customer.count()).toBe(1);
@@ -44,11 +47,11 @@ describe('CustomerService tests', () => {
 
   it('Gets customer by slug', async () => {
     const customer = await prisma.customer.create({
-      data: { name: 'Starbucks', slug: 'starbucks' },
+      ...sampleCustomerWithDialogue,
     });
 
-    const fetchedCustomer = await CustomerService.customerBySlug('starbucks');
+    const fetchedCustomer = await CustomerService.customerBySlug(sampleCustomerWithDialogue.data.slug);
 
-    expect(fetchedCustomer.name).toEqual('Starbucks');
+    expect(fetchedCustomer.name).toEqual('HAAS Org');
   });
 });

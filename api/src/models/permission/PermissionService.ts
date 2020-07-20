@@ -19,9 +19,7 @@ class PermissionService {
         name,
         description,
         Customer: {
-          connect: {
-            id: customerId,
-          },
+          connect: { id: customerId },
         },
       },
       include: {
