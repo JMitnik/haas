@@ -1,7 +1,7 @@
 import { Edit3, Plus, X } from 'react-feather';
 import React, { useState } from 'react';
 
-import { Flex, H2 } from '@haas/ui';
+import { Div, Flex, H2 } from '@haas/ui';
 import DeleteCTAButton from 'views/ActionsOverview/components/DeleteCTAButton';
 import EditCTAButton from 'views/ActionsOverview/components/EditCTAButton';
 import LinkIcon from 'components/Icons/LinkIcon';
@@ -31,9 +31,10 @@ interface QuestionSectionProps {
 }
 
 const QuestionSection = ({ activeQuestion, onActiveQuestionChange, onAddQuestion, onDeleteQuestion, questionsQ, question, leafs, Icon, depth, condition, options, edgeId }: QuestionSectionProps) => {
-  const [isExpanded, setExpanded] = useState(depth === 1 || false);
+  const [isQuestionExpanded, setQuestionExpanded] = useState(depth === 1 || false);
+  const [isAddExpanded, setAddExpanded] = useState(false);
   const handleExpandChange = () => {
-    setExpanded((prevExpanded) => !prevExpanded);
+    setQuestionExpanded((prevExpanded) => !prevExpanded);
   };
 
   const activeChildrenIds = question.children?.map((child) => child.childNode.id);
@@ -48,6 +49,11 @@ const QuestionSection = ({ activeQuestion, onActiveQuestionChange, onAddQuestion
   const getEdgeIdfromParentQuestion = (childNodeId: string) => {
     const edge = question.children?.find((child) => childNodeId === child.childNode.id);
     return edge?.id;
+  };
+
+  const handleAdd = () => {
+    setAddExpanded(true);
+    onActiveQuestionChange('-1');
   };
 
   return (
@@ -66,7 +72,7 @@ const QuestionSection = ({ activeQuestion, onActiveQuestionChange, onAddQuestion
         edgeId={edgeId}
         parentOptions={options}
         condition={condition}
-        isExpanded={isExpanded}
+        isExpanded={isQuestionExpanded}
         onExpandChange={handleExpandChange}
         activeQuestion={activeQuestion}
         onActiveQuestionChange={onActiveQuestionChange}
@@ -79,7 +85,7 @@ const QuestionSection = ({ activeQuestion, onActiveQuestionChange, onAddQuestion
         Icon={Icon}
         leafs={leafs}
       />
-      {isExpanded && children.map(
+      {isQuestionExpanded && children.map(
         (child, index) => (
           <QuestionSection
             edgeId={getEdgeIdfromParentQuestion(child.id)}
@@ -99,13 +105,41 @@ const QuestionSection = ({ activeQuestion, onActiveQuestionChange, onAddQuestion
           />
         ),
       )}
-      {isExpanded && (
+      {(isQuestionExpanded && !isAddExpanded) && (
         <AddQuestionContainer margin={`0 ${depth * 10 + 10}px`}>
-          <Plus width="35px" height="35px" />
-          <H2>
-            Add new question
-          </H2>
+          <Flex onClick={() => handleAdd()} justifyContent="center" alignItems="center">
+            <Plus width="35px" height="35px" />
+            <H2>
+              Add new question
+            </H2>
+          </Flex>
         </AddQuestionContainer>
+      )}
+      {(isQuestionExpanded && isAddExpanded) && (
+        <Div margin={`0 ${depth * 10 + 10}px`}>
+          <QuestionEntry
+            onAddExpandChange={setAddExpanded}
+            parentQuestionId={question.id}
+            edgeId=""
+            parentOptions={[]}
+            condition={undefined}
+            isExpanded={isQuestionExpanded}
+            onExpandChange={handleExpandChange}
+            activeQuestion="-1"
+            onActiveQuestionChange={onActiveQuestionChange}
+            onAddQuestion={onAddQuestion}
+            onDeleteQuestion={onDeleteQuestion}
+            key={`entry-depth-${depth}-add-new`}
+            index={0}
+            questionsQ={questionsQ}
+            question={{
+              id: '-1', title: '', icon: Icon, isRoot: false, isLeaf: false, type: 'Multi-Choice',
+            }}
+            Icon={Icon}
+            leafs={leafs}
+          />
+        </Div>
+
       )}
 
     </Flex>

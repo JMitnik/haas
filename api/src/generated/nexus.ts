@@ -492,7 +492,7 @@ export interface NexusGenFieldTypes {
     createCustomer: NexusGenRootTypes['Customer']; // Customer!
     createDialogue: NexusGenRootTypes['Dialogue']; // Dialogue!
     createPermission: NexusGenRootTypes['PermssionType']; // PermssionType!
-    createQuestion: NexusGenRootTypes['QuestionNode']; // QuestionNode!
+    createQuestion: NexusGenRootTypes['QuestionNode'] | null; // QuestionNode
     createRole: NexusGenRootTypes['RoleType']; // RoleType!
     createTag: NexusGenRootTypes['TagType']; // TagType!
     createTrigger: NexusGenRootTypes['TriggerType']; // TriggerType!
@@ -712,6 +712,12 @@ export interface NexusGenArgTypes {
       data?: NexusGenInputs['PermissionInput'] | null; // PermissionInput
     }
     createQuestion: { // args
+      customerSlug?: string | null; // String
+      dialogueSlug?: string | null; // String
+      edgeCondition?: NexusGenInputs['EdgeConditionInputType'] | null; // EdgeConditionInputType
+      optionEntries?: NexusGenInputs['OptionsInputType'] | null; // OptionsInputType
+      overrideLeafId?: string | null; // String
+      parentQuestionId?: string | null; // String
       title?: string | null; // String
       type?: string | null; // String
     }

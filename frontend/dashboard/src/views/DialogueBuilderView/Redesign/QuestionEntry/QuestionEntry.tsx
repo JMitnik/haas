@@ -15,6 +15,7 @@ import QuestionEntryForm from './QuestionEntryForm';
 import RegisterIcon from 'components/Icons/RegisterIcon';
 
 interface QuestionEntryItemProps {
+  onAddExpandChange?: React.Dispatch<React.SetStateAction<boolean>>;
   onExpandChange: () => void;
   isExpanded: Boolean;
   questionsQ: Array<QuestionEntryProps>;
@@ -29,6 +30,7 @@ interface QuestionEntryItemProps {
   condition: EdgeConditonProps | undefined;
   parentOptions: QuestionOptionProps[] | undefined;
   edgeId: string | undefined;
+  parentQuestionId?: string;
 }
 
 const AddChildComponent = ({ isExpanded, onExpandChange }:{ isExpanded: Boolean, onExpandChange: () => void }) => (
@@ -43,7 +45,7 @@ const AddChildComponent = ({ isExpanded, onExpandChange }:{ isExpanded: Boolean,
 );
 
 const QuestionEntryItem = (
-  { question, activeQuestion, onActiveQuestionChange, Icon, leafs, onExpandChange, isExpanded, condition, parentOptions, edgeId }: QuestionEntryItemProps,
+  { question, activeQuestion, onActiveQuestionChange, Icon, leafs, onExpandChange, isExpanded, condition, parentOptions, edgeId, parentQuestionId, onAddExpandChange }: QuestionEntryItemProps,
 ) => {
   const activeType = question.type === 'Multi-Choice' ? { label: question.type, value: 'MULTI_CHOICE' } : { label: question.type, value: 'SLIDER' };
 
@@ -86,6 +88,8 @@ const QuestionEntryItem = (
           {activeQuestion === question.id
           && (
             <QuestionEntryForm
+              onAddExpandChange={onAddExpandChange}
+              parentQuestionId={parentQuestionId}
               question={question}
               key={`form-${question.id}-${question.updatedAt}`}
               edgeId={edgeId}
@@ -123,7 +127,9 @@ const QuestionEntryItem = (
           </TypeSpan>
         </Flex>
       </LinkContainer>
-      <AddChildComponent isExpanded={isExpanded} onExpandChange={onExpandChange} />
+      {question.id !== '-1' && (
+        <AddChildComponent isExpanded={isExpanded} onExpandChange={onExpandChange} />
+      )}
     </Flex>
   );
 };

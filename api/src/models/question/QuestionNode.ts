@@ -1,7 +1,7 @@
+import { LinkUpdateManyWithoutQuestionNodeInput, PrismaClient, QuestionNode, QuestionNodeUpdateInput } from '@prisma/client';
 import { CTALinksInputType, LinkType } from '../link/Link';
 import { DialogueType } from '../questionnaire/Dialogue';
 import { EdgeType } from '../edge/Edge';
-import { LinkUpdateManyWithoutQuestionNodeInput, PrismaClient, QuestionNode, QuestionNodeUpdateInput } from '@prisma/client';
 import { extendType, inputObjectType, objectType } from '@nexus/schema';
 import { number } from 'yup';
 import NodeResolver from './node-resolver';
@@ -163,13 +163,44 @@ export const QuestionNodeMutations = extendType({
 
     t.field('createQuestion', {
       type: QuestionNodeType,
+      nullable: true,
       args: {
+        customerSlug: 'String',
+        dialogueSlug: 'String',
         title: 'String',
         type: 'String',
-        // TODO: Finish this mutation gonna work on update mutation first!
+        overrideLeafId: 'String',
+        parentQuestionId: 'String',
+        optionEntries: OptionsInputType,
+        edgeCondition: EdgeConditionInputType,
       },
-      resolve(parent: any, args: any, ctx: any) {
+      async resolve(parent: any, args: any, ctx: any) {
         const { prisma }: { prisma: PrismaClient } = ctx;
+        const { customerSlug, dialogueSlug, title, type, overrideLeafId, parentQuestionId, optionEntries, edgeCondition } = args;
+        const { options } = optionEntries;
+
+        console.log('ARGS: ', args);
+
+        const customer = await prisma.customer.findOne({
+          where: {
+            slug: customerSlug || undefined,
+          },
+          include: {
+            dialogues: {
+              where: {
+                slug: dialogueSlug,
+              },
+            },
+          },
+        });
+
+        const dialogue = customer?.dialogues[0];
+        const dialogueId = dialogue?.id;
+
+        if (dialogueId) {
+          return NodeResolver.createQuestionFromBuilder(dialogueId, title, type, overrideLeafId, parentQuestionId, options, edgeCondition);
+        }
+
         return null;
       },
     });

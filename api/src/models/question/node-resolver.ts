@@ -307,6 +307,66 @@ class NodeResolver {
     });
   };
 
+  static createQuestionFromBuilder = async (
+    dialogueId: string,
+    title: string,
+    type: string,
+    overrideLeafId: string,
+    parentQuestionId: string,
+    options: Array<QuestionOptionProps>,
+    edgeCondition: { id: number | null, conditionType: string, renderMin: number | null, renderMax: number | null, matchValue: string | null },
+  ) => {
+    const leaf = overrideLeafId !== 'None' ? { connect: { id: overrideLeafId } } : null;
+    const newQuestion = await prisma.questionNode.create({
+      data: {
+        title,
+        type,
+        overrideLeaf: leaf,
+        options: {
+          create: options.map((option) => ({
+            value: option.value,
+            publicValue: option.publicValue,
+          })),
+        },
+        questionDialogue: {
+          connect: {
+            id: dialogueId,
+          },
+        },
+      },
+    });
+
+    // TODO: CREATE EDGE
+    const newEdge = await prisma.edge.create({
+      data: {
+        dialogue: {
+          connect: {
+            id: dialogueId,
+          },
+        },
+        parentNode: {
+          connect: {
+            id: parentQuestionId,
+          },
+        },
+        conditions: {
+          create: {
+            renderMin: edgeCondition.renderMin,
+            renderMax: edgeCondition.renderMax,
+            matchValue: edgeCondition.matchValue,
+            conditionType: edgeCondition.conditionType,
+          },
+        },
+        childNode: {
+          connect: {
+            id: newQuestion.id,
+          },
+        },
+      },
+    });
+    return newQuestion;
+  };
+
   static updateQuestionFromBuilder = async (
     questionId: string,
     title: string,

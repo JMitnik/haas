@@ -225,7 +225,7 @@ type Mutation {
   createCustomer(name: String, options: CustomerCreateOptions): Customer!
   createDialogue(data: AddDialogueInput): Dialogue!
   createPermission(data: PermissionInput): PermssionType!
-  createQuestion(title: String, type: String): QuestionNode!
+  createQuestion(customerSlug: String, dialogueSlug: String, edgeCondition: EdgeConditionInputType, optionEntries: OptionsInputType, overrideLeafId: String, parentQuestionId: String, title: String, type: String): QuestionNode
   createRole(data: RoleInput): RoleType!
   createTag(customerSlug: String, name: String, type: TagTypeEnum): TagType!
   createTrigger(customerSlug: String, questionId: String, recipients: RecipientsInputType, trigger: TriggerInputType): TriggerType!
