@@ -76,7 +76,6 @@ export const RoleInput = inputObjectType({
   },
 });
 
-// TODO: Implement Pagination Interface
 export const RoleConnection = objectType({
   name: 'RoleConnection',
   definition(t) {
@@ -102,7 +101,7 @@ export const RoleQueries = extendType({
       },
 
       async resolve(parent, args, ctx) {
-        if (!args.customerId) return null;
+        if (!args.customerId) throw new Error('Customer cant be found');
 
         const { roles, pageInfo } = await RoleService.paginatedRoles(args.customerId, {
           limit: args.filter?.limit,
@@ -112,9 +111,14 @@ export const RoleQueries = extendType({
 
         const permissions: any = await ctx.prisma.permission.findMany({ where: { customerId: args.customerId } });
 
-        const roleConnection: any = { roles, permissions, pageIndex: pageInfo.pageIndex, totalPages: pageInfo.nrPages };
-
-        return roleConnection;
+        return {
+          roles,
+          permissions,
+          pageInfo,
+          // TODO: Figure out what to do with these?
+          limit: args.filter?.limit || 0,
+          offset: args.filter?.offset || 0,
+        };
       },
     });
 

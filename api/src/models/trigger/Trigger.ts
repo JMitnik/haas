@@ -1,10 +1,8 @@
 import { PrismaClient,
-  Trigger,
   TriggerCreateInput,
   TriggerUpdateInput } from '@prisma/client';
 import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
 
-import { PaginationProps } from '../../types/generic';
 import { PaginationWhereInput } from '../general/Pagination';
 import { QuestionNodeType } from '../question/QuestionNode';
 import { UserType } from '../users/User';
