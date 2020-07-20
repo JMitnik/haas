@@ -1,7 +1,5 @@
-import { PrismaClient } from '@prisma/client';
 import { extendType, inputObjectType, objectType } from '@nexus/schema';
 
-import { PaginationProps } from '../../types/generic';
 import { PaginationWhereInput } from '../general/Pagination';
 import { RoleType } from '../role/Role';
 import UserService from './UserService';
@@ -60,7 +58,7 @@ export const UserQueries = extendType({
       args: { customerSlug: 'String', filter: PaginationWhereInput },
       nullable: true,
 
-      async resolve(parent, args, ctx) {
+      async resolve(parent, args) {
         if (!args.customerSlug) return null;
         if (!args.filter) return null;
 
@@ -88,18 +86,25 @@ export const UserQueries = extendType({
     t.list.field('users', {
       type: UserType,
       args: { customerSlug: 'String' },
+
       resolve(parent, args, ctx) {
-        const { prisma }: { prisma: PrismaClient } = ctx;
-        return prisma.user.findMany({ where: { Customer: { slug: args.customerSlug } } });
+        if (!args.customerSlug) throw new Error('No business provided');
+        return ctx.prisma.user.findMany({ where: { Customer: { slug: args.customerSlug } } });
       },
     });
 
     t.field('user', {
       type: UserType,
       args: { userId: 'String' },
-      resolve(parent, args, ctx) {
-        const { prisma }: { prisma: PrismaClient } = ctx;
-        return prisma.user.findOne({ where: { id: args.userId } });
+      nullable: true,
+
+      async resolve(parent, args, ctx) {
+        if (!args.userId) throw new Error('No valid user id provided');
+
+        const user = await ctx.prisma.user.findOne({ where: { id: args.userId } });
+
+        if (!user) throw new Error('Cant find user with this ID');
+        return user || null;
       },
     });
   },
@@ -110,12 +115,17 @@ export const UserMutations = extendType({
   definition(t) {
     t.field('createUser', {
       type: UserType,
-      args: { customerSlug: 'String',
-        input: UserInput },
+      args: { customerSlug: 'String', input: UserInput },
+
       resolve(parent, args, ctx) {
-        const { prisma }: { prisma: PrismaClient } = ctx;
+        if (!args.customerSlug) throw new Error('No customer scope provided');
+        if (!args.input) throw new Error('No input provided');
+
         const { firstName, lastName, email, phone, roleId } = args.input;
-        return prisma.user.create({
+
+        if (!email) throw new Error('No valid email provided');
+
+        return ctx.prisma.user.create({
           data: {
             email,
             firstName,
@@ -123,7 +133,7 @@ export const UserMutations = extendType({
             phone,
             role: {
               connect: {
-                id: roleId,
+                id: roleId || undefined,
               },
             },
             Customer: {
@@ -139,10 +149,17 @@ export const UserMutations = extendType({
     t.field('editUser', {
       type: UserType,
       args: { id: 'String', input: UserInput },
+
       resolve(parent, args, ctx) {
-        const { prisma }: { prisma: PrismaClient } = ctx;
+        if (!args.id) throw new Error('No valid user provided to edit');
+        if (!args.input) throw new Error('No input provided');
         const { firstName, lastName, email, phone, roleId } = args.input;
-        return prisma.user.update({
+
+        if (!email) throw new Error('No valid email provided');
+
+        // TODO: Check if user exists?
+
+        return ctx.prisma.user.update({
           where: {
             id: args.id,
           },
@@ -153,7 +170,7 @@ export const UserMutations = extendType({
             email,
             role: {
               connect: {
-                id: roleId,
+                id: roleId || undefined,
               },
             },
           },
@@ -165,8 +182,9 @@ export const UserMutations = extendType({
       type: UserType,
       args: { id: 'String' },
       resolve(parent, args, ctx) {
-        const { prisma }: { prisma: PrismaClient } = ctx;
-        return prisma.user.delete({ where: { id: args.id } });
+        if (!args.id) throw new Error('No valid user provided to delete');
+
+        return ctx.prisma.user.delete({ where: { id: args.id } });
       },
     });
   },

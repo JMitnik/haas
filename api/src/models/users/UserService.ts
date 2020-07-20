@@ -1,8 +1,8 @@
-import { Nullable } from '../../types/generic';
-import { PrismaClient, User, UserWhereInput } from '@prisma/client';
+import { User, UserWhereInput } from '@prisma/client';
 import _ from 'lodash';
 
-const prisma = new PrismaClient();
+import { Nullable } from '../../types/generic';
+import prisma from '../../prisma';
 
 class UserService {
   static getSearchTermFilter = (searchTerm: string) => {
@@ -12,26 +12,16 @@ class UserService {
 
     const searchTermFilter: UserWhereInput[] = [
       {
-        firstName: {
-          contains: searchTerm,
-        },
+        firstName: { contains: searchTerm },
       },
       {
-        lastName: {
-          contains: searchTerm,
-        },
+        lastName: { contains: searchTerm },
       },
       {
-        email: {
-          contains: searchTerm,
-        },
+        email: { contains: searchTerm },
       },
       {
-        role: {
-          name: {
-            contains: searchTerm,
-          },
-        },
+        role: { name: { contains: searchTerm } },
       },
     ];
 
