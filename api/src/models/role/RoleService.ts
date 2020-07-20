@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 
+import { NexusGenInputs, NexusGenRootTypes, NexusGenTypes } from '../../generated/nexus';
 import { Nullable } from '../../types/generic';
 import prisma from '../../prisma';
 
@@ -15,37 +16,31 @@ class RoleService {
 
   static paginatedRoles = async (
     customerId: string,
-    pageIndex?: Nullable<number>,
-    offset?: Nullable<number>,
-    limit?: Nullable<number>,
+    paginationOpts: NexusGenInputs['PaginationWhereInput'],
   ) => {
-    let needPageReset = false;
-
     const roles = await prisma.role.findMany({
       where: { customerId },
+      take: paginationOpts.limit || undefined,
+      skip: paginationOpts.offset || undefined,
       include: {
         permissions: true,
       },
     });
 
-    const totalPages = Math.ceil(roles.length / (limit || 0));
-    if (pageIndex && pageIndex + 1 > totalPages) {
-      offset = 0;
-      needPageReset = true;
-    }
+    const totalRoles = await prisma.role.count({ where: { customerId } });
+    const totalPages = paginationOpts.limit ? Math.ceil(totalRoles / (paginationOpts.limit)) : 1;
 
-    // Slice ordered filtered users
-    const slicedOrderedUsers = RoleService.sliceRoles(roles, (offset || 0), (limit || 0), (pageIndex || 0));
+    const currentPage = paginationOpts.pageIndex && paginationOpts.pageIndex <= totalPages
+      ? paginationOpts.pageIndex : 1;
 
-    const rolesWithNrPermisisons = slicedOrderedUsers.map((role) => ({
-      ...role,
-      nrPermissions: role.permissions.length,
-    }));
+    const pageInfo: NexusGenRootTypes['PaginationPageInfo'] = {
+      nrPages: totalPages,
+      pageIndex: currentPage,
+    };
 
     return {
-      roles: rolesWithNrPermisisons,
-      newPageIndex: needPageReset ? 0 : pageIndex,
-      totalPages,
+      roles: roles.map((role) => ({ ...role, nrPermissions: role.permissions.length })),
+      pageInfo,
     };
   };
 

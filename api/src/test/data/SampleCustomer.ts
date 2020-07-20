@@ -1,6 +1,9 @@
 import { CustomerCreateArgs } from '@prisma/client';
 import cuid from 'cuid';
 
+import CustomerService from '../../models/customer/CustomerService';
+import prisma from '../../prisma';
+
 export const sampleCustomerWithoutDialogue: CustomerCreateArgs = {
   data: {
     name: 'HAAS Org',
@@ -41,18 +44,56 @@ export const sampleFullCustomer: CustomerCreateArgs = {
     roles: {
       create: [
         {
-          name: 'Admin',
+          name: 'SuperAdmin (0)',
           roleId: cuid(),
         },
         {
-          name: 'Normal',
+          name: 'System Admin (1)',
           roleId: cuid(),
         },
         {
-          name: 'Custom role',
+          name: 'Admin (2)',
+          roleId: cuid(),
+        },
+        {
+          name: 'Normal (3)',
+          roleId: cuid(),
+        },
+        {
+          name: 'Business Manager (4)',
+          roleId: cuid(),
+        },
+        {
+          name: 'Agent Manager (5)',
           roleId: cuid(),
         },
       ],
     },
   },
+};
+
+export const initSampleFullCustomer = async () => {
+  const customer = await prisma.customer.create({
+    ...sampleFullCustomer,
+  });
+
+  // Seed customer
+  await CustomerService.seed(customer);
+
+  const seededCustomer = await prisma.customer.findOne({
+    where: { id: customer.id },
+    include: {
+      dialogues: {
+        include: {
+          questions: true,
+        },
+      },
+      roles: true,
+      triggers: true,
+    },
+  });
+
+  if (!seededCustomer) throw new Error('Error creating/finding customer in sample');
+
+  return seededCustomer;
 };

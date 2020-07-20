@@ -176,7 +176,7 @@ type Mutation {
   createUser(customerSlug: String, input: UserInput): UserType!
   deleteDialogue(where: DialogueWhereUniqueInput): Dialogue!
   deleteTag(tagId: String): TagType!
-  deleteTrigger(id: String): TriggerType!
+  deleteTrigger(id: String): TriggerType
   deleteUser(id: String): UserType!
   editCustomer(id: String, options: CustomerEditOptions): Customer!
   editDialogue(description: String, dialogueId: String, publicTitle: String, tags: TagsInputObjectType, title: String): Dialogue!
@@ -286,7 +286,7 @@ type Query {
   sessions(where: SessionWhereUniqueInput): [Session!]!
   tags(customerSlug: String, dialogueId: String): [TagType!]!
   trigger(triggerId: String): TriggerType
-  triggerConnection(customerSlug: String, filter: PaginationWhereInput): TriggerConnectionType!
+  triggerConnection(customerSlug: String, filter: PaginationWhereInput): TriggerConnectionType
   triggers(customerSlug: String, dialogueId: String, filter: PaginationWhereInput, userId: String): [TriggerType!]!
   user(userId: String): UserType
   users(customerSlug: String): [UserType!]!
@@ -352,11 +352,14 @@ input RegisterNodeEntryInput {
   value: String
 }
 
-type RoleConnection {
-  pageIndex: Int
+type RoleConnection implements ConnectionInterface {
+  endDate: String
+  limit: Int!
+  offset: Int!
+  pageInfo: PaginationPageInfo!
   permissions: [PermssionType!]!
   roles: [RoleType!]!
-  totalPages: Int
+  startDate: String
 }
 
 input RoleDataInput {
@@ -497,6 +500,7 @@ type TriggerType {
   name: String!
   recipients: [UserType!]!
   relatedNode: QuestionNode
+  relatedNodeId: String
   type: TriggerTypeEnum!
 }
 

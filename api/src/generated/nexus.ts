@@ -254,10 +254,13 @@ export interface NexusGenRootTypes {
   QuestionNode: prisma.QuestionNode;
   QuestionOption: prisma.QuestionOption;
   RoleConnection: { // root type
-    pageIndex?: number | null; // Int
+    endDate?: string | null; // String
+    limit: number; // Int!
+    offset: number; // Int!
+    pageInfo: NexusGenRootTypes['PaginationPageInfo']; // PaginationPageInfo!
     permissions: NexusGenRootTypes['PermssionType'][]; // [PermssionType!]!
     roles: NexusGenRootTypes['RoleType'][]; // [RoleType!]!
-    totalPages?: number | null; // Int
+    startDate?: string | null; // String
   }
   RoleType: { // root type
     customerId?: string | null; // String
@@ -299,6 +302,7 @@ export interface NexusGenRootTypes {
     id: string; // String!
     medium: NexusGenEnums['TriggerMediumEnum']; // TriggerMediumEnum!
     name: string; // String!
+    relatedNodeId?: string | null; // String
     type: NexusGenEnums['TriggerTypeEnum']; // TriggerTypeEnum!
   }
   UserTable: { // root type
@@ -322,7 +326,7 @@ export interface NexusGenRootTypes {
     answer?: string | null; // String
     quantity?: number | null; // Int
   }
-  ConnectionInterface: NexusGenRootTypes['SessionConnection'];
+  ConnectionInterface: NexusGenRootTypes['SessionConnection'] | NexusGenRootTypes['RoleConnection'];
   String: string;
   Int: number;
   Float: number;
@@ -465,7 +469,7 @@ export interface NexusGenFieldTypes {
     createUser: NexusGenRootTypes['UserType']; // UserType!
     deleteDialogue: NexusGenRootTypes['Dialogue']; // Dialogue!
     deleteTag: NexusGenRootTypes['TagType']; // TagType!
-    deleteTrigger: NexusGenRootTypes['TriggerType']; // TriggerType!
+    deleteTrigger: NexusGenRootTypes['TriggerType'] | null; // TriggerType
     deleteUser: NexusGenRootTypes['UserType']; // UserType!
     editCustomer: NexusGenRootTypes['Customer']; // Customer!
     editDialogue: NexusGenRootTypes['Dialogue']; // Dialogue!
@@ -516,7 +520,7 @@ export interface NexusGenFieldTypes {
     sessions: NexusGenRootTypes['Session'][]; // [Session!]!
     tags: NexusGenRootTypes['TagType'][]; // [TagType!]!
     trigger: NexusGenRootTypes['TriggerType'] | null; // TriggerType
-    triggerConnection: NexusGenRootTypes['TriggerConnectionType']; // TriggerConnectionType!
+    triggerConnection: NexusGenRootTypes['TriggerConnectionType'] | null; // TriggerConnectionType
     triggers: NexusGenRootTypes['TriggerType'][]; // [TriggerType!]!
     user: NexusGenRootTypes['UserType'] | null; // UserType
     users: NexusGenRootTypes['UserType'][]; // [UserType!]!
@@ -543,10 +547,13 @@ export interface NexusGenFieldTypes {
     value: string; // String!
   }
   RoleConnection: { // field return type
-    pageIndex: number | null; // Int
+    endDate: string | null; // String
+    limit: number; // Int!
+    offset: number; // Int!
+    pageInfo: NexusGenRootTypes['PaginationPageInfo']; // PaginationPageInfo!
     permissions: NexusGenRootTypes['PermssionType'][]; // [PermssionType!]!
     roles: NexusGenRootTypes['RoleType'][]; // [RoleType!]!
-    totalPages: number | null; // Int
+    startDate: string | null; // String
   }
   RoleType: { // field return type
     customer: NexusGenRootTypes['Customer'] | null; // Customer
@@ -599,6 +606,7 @@ export interface NexusGenFieldTypes {
     name: string; // String!
     recipients: NexusGenRootTypes['UserType'][]; // [UserType!]!
     relatedNode: NexusGenRootTypes['QuestionNode'] | null; // QuestionNode
+    relatedNodeId: string | null; // String
     type: NexusGenEnums['TriggerTypeEnum']; // TriggerTypeEnum!
   }
   UserTable: { // field return type
@@ -798,7 +806,7 @@ export interface NexusGenArgTypes {
 }
 
 export interface NexusGenAbstractResolveReturnTypes {
-  ConnectionInterface: "SessionConnection"
+  ConnectionInterface: "SessionConnection" | "RoleConnection"
 }
 
 export interface NexusGenInheritedFields {}

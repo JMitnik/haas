@@ -52,21 +52,24 @@ const TriggerType = objectType({
     t.field('type', { type: TriggerTypeEnum });
     t.field('medium', { type: TriggerMediumEnum });
 
+    t.string('relatedNodeId', { nullable: true });
     t.field('relatedNode', {
       type: QuestionNodeType,
       nullable: true,
-      resolve(parent: Trigger, args, ctx) {
-        if (parent.relatedNodeId) {
-          return ctx.prisma.questionNode.findOne({ where: { id: parent.relatedNodeId },
-            include: {
-              questionDialogue: {
-                select: {
-                  slug: true,
-                },
+
+      async resolve(parent, args, ctx) {
+        if (!parent.relatedNodeId) throw Error('Not good!');
+
+        return ctx.prisma.questionNode.findOne({
+          where: { id: parent.relatedNodeId },
+          include: {
+            questionDialogue: {
+              select: {
+                slug: true,
               },
-            } });
-        }
-        return null;
+            },
+          },
+        });
       },
     });
 
@@ -78,16 +81,10 @@ const TriggerType = objectType({
     });
     t.list.field('recipients', {
       type: UserType,
-      async resolve(parent: Trigger, args, ctx) {
-        const { prisma }: { prisma: PrismaClient } = ctx;
-        const users = await prisma.user.findMany({ where: {
-          triggers: {
-            some: {
-              id: parent.id,
-            },
-          },
-        } });
-        return users;
+      async resolve(parent, args, ctx) {
+        const users = await ctx.prisma.user.findMany({ where: { triggers: { some: { id: parent.id } } } });
+
+        return users || [];
       },
     });
   },
@@ -128,11 +125,16 @@ const TriggerMutations = extendType({
     t.field('deleteTrigger', {
       type: TriggerType,
       args: { id: 'String' },
+      nullable: true,
 
-      resolve(parent, args, ctx) {
+      async resolve(parent, args, ctx) {
         if (!args.id) throw new Error('No valid id for trigger provided');
 
-        return ctx.prisma.trigger.delete({ where: { id: args.id } });
+        const trigger = await ctx.prisma.trigger.delete({ where: { id: args.id } });
+
+        if (!trigger) throw new Error('Something went wrong during deletion of trigger');
+
+        return trigger as any;
       },
     });
 
@@ -184,7 +186,7 @@ const TriggerMutations = extendType({
           data: updateTriggerArgs,
         });
 
-        return updatedTrigger;
+        return updatedTrigger as any;
       },
     });
 
@@ -217,7 +219,7 @@ const TriggerMutations = extendType({
 
         return ctx.prisma.trigger.create({
           data: createArgs,
-        });
+        }) as any;
       },
     });
   },
@@ -246,25 +248,27 @@ const TriggerQueries = extendType({
         customerSlug: 'String',
         filter: PaginationWhereInput,
       },
+      nullable: true,
 
-      async resolve(parent, args, ctx) {
-        const { pageIndex, offset, limit, searchTerm, orderBy }: PaginationProps = args.filter;
+      resolve(parent, args, ctx) {
+        return {} as any;
+        // const { pageIndex, offset, limit, searchTerm, orderBy }: PaginationProps = args.filter;
 
-        if (args.filter) {
-          return TriggerService.paginatedTriggers(
-            args.customerSlug,
-            pageIndex,
-            offset,
-            limit,
-            orderBy?.[0],
-            searchTerm,
-          );
-        }
+        // if (args.filter) {
+        //   return TriggerService.paginatedTriggers(
+        //     args.customerSlug,
+        //     pageIndex,
+        //     offset,
+        //     limit,
+        //     orderBy?.[0],
+        //     searchTerm,
+        //   );
+        // }
 
-        const users = await ctx.prisma.trigger.findMany({ where: { customerId: args.customerId } });
-        const totalPages = Math.ceil(users.length / (limit || 0));
+        // const users = await ctx.prisma.trigger.findMany({ where: { customerId: args.customerId } });
+        // const totalPages = Math.ceil(users.length / (limit || 0));
 
-        return { users, pageIndex, totalPages };
+        // return { users, pageIndex, totalPages };
       },
     });
 
@@ -280,7 +284,7 @@ const TriggerQueries = extendType({
 
         if (!trigger) throw new Error('Cant find trigger');
 
-        return trigger;
+        return trigger as any;
       },
     });
 
@@ -303,11 +307,11 @@ const TriggerQueries = extendType({
                 },
               },
             },
-          });
+          }) as any;
         }
 
         if (args.dialogueId) {
-          return TriggerService.findTriggersByDialogueId(args.dialogueId);
+          return TriggerService.findTriggersByDialogueId(args.dialogueId) as any;
         }
 
         if (args.customerSlug) {
@@ -317,7 +321,7 @@ const TriggerQueries = extendType({
                 slug: args.customerSlug,
               },
             },
-          });
+          }) as any;
         }
         return [];
       },

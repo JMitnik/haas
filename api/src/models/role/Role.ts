@@ -80,9 +80,7 @@ export const RoleInput = inputObjectType({
 export const RoleConnection = objectType({
   name: 'RoleConnection',
   definition(t) {
-    t.int('pageIndex', { nullable: true });
-    t.int('totalPages', { nullable: true });
-
+    t.implements('ConnectionInterface');
     t.list.field('roles', {
       type: RoleType,
     });
@@ -106,13 +104,17 @@ export const RoleQueries = extendType({
       async resolve(parent, args, ctx) {
         if (!args.customerId) return null;
 
-        const { roles, totalPages, newPageIndex } = await RoleService.paginatedRoles(
-          args.customerId, args.filter?.pageIndex, args.filter?.offset, args.filter?.limit,
-        );
+        const { roles, pageInfo } = await RoleService.paginatedRoles(args.customerId, {
+          limit: args.filter?.limit,
+          pageIndex: args.filter?.pageIndex,
+          offset: args.filter?.offset,
+        });
 
-        const permissions = await ctx.prisma.permission.findMany({ where: { customerId: args.customerId } });
+        const permissions: any = await ctx.prisma.permission.findMany({ where: { customerId: args.customerId } });
 
-        return { roles, permissions, pageIndex: newPageIndex || args.filter?.pageIndex, totalPages: totalPages || 1 };
+        const roleConnection: any = { roles, permissions, pageIndex: pageInfo.pageIndex, totalPages: pageInfo.nrPages };
+
+        return roleConnection;
       },
     });
 
