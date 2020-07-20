@@ -227,12 +227,7 @@ const TriggerMutations = extendType({
 export const TriggerConnectionType = objectType({
   name: 'TriggerConnectionType',
   definition(t) {
-    t.int('totalPages');
-    t.int('pageIndex');
-    t.int('pageSize');
-    t.string('startDate', { nullable: true });
-    t.string('endDate', { nullable: true });
-
+    t.implements('ConnectionInterface');
     t.list.field('triggers', { type: TriggerType });
   },
 });
@@ -248,25 +243,19 @@ const TriggerQueries = extendType({
       },
       nullable: true,
 
-      resolve(parent, args, ctx) {
-        return {} as any;
-        // const { pageIndex, offset, limit, searchTerm, orderBy }: PaginationProps = args.filter;
+      async resolve(parent, args) {
+        if (!args.customerSlug) throw new Error('No customer provided');
 
-        // if (args.filter) {
-        //   return TriggerService.paginatedTriggers(
-        //     args.customerSlug,
-        //     pageIndex,
-        //     offset,
-        //     limit,
-        //     orderBy?.[0],
-        //     searchTerm,
-        //   );
-        // }
+        const { triggers, pageInfo } = await TriggerService.paginatedTriggers(args.customerSlug, {
+          limit: args.filter?.limit,
+          offset: args.filter?.offset,
+          orderBy: args.filter?.orderBy,
+        });
 
+        // TODO: Do we put this here, or extract it from the graph?
         // const users = await ctx.prisma.trigger.findMany({ where: { customerId: args.customerId } });
-        // const totalPages = Math.ceil(users.length / (limit || 0));
 
-        // return { users, pageIndex, totalPages };
+        return { triggers, pageInfo, offset: args.filter?.offset || 0, limit: args.filter?.limit || 0 };
       },
     });
 

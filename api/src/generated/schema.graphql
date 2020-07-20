@@ -471,12 +471,12 @@ type TriggerConditionType {
   type: TriggerConditionEnum!
 }
 
-type TriggerConnectionType {
+type TriggerConnectionType implements ConnectionInterface {
   endDate: String
-  pageIndex: Int!
-  pageSize: Int!
+  limit: Int!
+  offset: Int!
+  pageInfo: PaginationPageInfo!
   startDate: String
-  totalPages: Int!
   triggers: [TriggerType!]!
 }
 

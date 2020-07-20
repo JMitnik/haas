@@ -292,10 +292,10 @@ export interface NexusGenRootTypes {
   }
   TriggerConnectionType: { // root type
     endDate?: string | null; // String
-    pageIndex: number; // Int!
-    pageSize: number; // Int!
+    limit: number; // Int!
+    offset: number; // Int!
+    pageInfo: NexusGenRootTypes['PaginationPageInfo']; // PaginationPageInfo!
     startDate?: string | null; // String
-    totalPages: number; // Int!
     triggers: NexusGenRootTypes['TriggerType'][]; // [TriggerType!]!
   }
   TriggerType: { // root type
@@ -326,7 +326,7 @@ export interface NexusGenRootTypes {
     answer?: string | null; // String
     quantity?: number | null; // Int
   }
-  ConnectionInterface: NexusGenRootTypes['SessionConnection'] | NexusGenRootTypes['RoleConnection'];
+  ConnectionInterface: NexusGenRootTypes['SessionConnection'] | NexusGenRootTypes['RoleConnection'] | NexusGenRootTypes['TriggerConnectionType'];
   String: string;
   Int: number;
   Float: number;
@@ -593,10 +593,10 @@ export interface NexusGenFieldTypes {
   }
   TriggerConnectionType: { // field return type
     endDate: string | null; // String
-    pageIndex: number; // Int!
-    pageSize: number; // Int!
+    limit: number; // Int!
+    offset: number; // Int!
+    pageInfo: NexusGenRootTypes['PaginationPageInfo']; // PaginationPageInfo!
     startDate: string | null; // String
-    totalPages: number; // Int!
     triggers: NexusGenRootTypes['TriggerType'][]; // [TriggerType!]!
   }
   TriggerType: { // field return type
@@ -806,7 +806,7 @@ export interface NexusGenArgTypes {
 }
 
 export interface NexusGenAbstractResolveReturnTypes {
-  ConnectionInterface: "SessionConnection" | "RoleConnection"
+  ConnectionInterface: "SessionConnection" | "RoleConnection" | "TriggerConnectionType"
 }
 
 export interface NexusGenInheritedFields {}

@@ -1,7 +1,4 @@
-import { PrismaClient } from '@prisma/client';
-
-import { NexusGenInputs, NexusGenRootTypes, NexusGenTypes } from '../../generated/nexus';
-import { Nullable } from '../../types/generic';
+import { NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
 import prisma from '../../prisma';
 
 class RoleService {

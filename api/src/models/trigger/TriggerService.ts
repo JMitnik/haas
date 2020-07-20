@@ -12,7 +12,7 @@ import _ from 'lodash';
 
 import { isAfter, subSeconds } from 'date-fns';
 
-import { NexusGenInputs } from '../../generated/nexus';
+import { NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
 import { Nullable } from '../../types/generic';
 import TriggerSMSService from '../../services/sms/trigger-sms-service';
 import prisma from '../../prisma';
@@ -60,41 +60,36 @@ class TriggerService {
 
   static paginatedTriggers = async (
     customerSlug: string,
-    pageIndex?: Nullable<number>,
-    offset?: Nullable<number>,
-    limit?: Nullable<number>,
-    orderBy?: Nullable<any>,
-    searchTerm?: Nullable<string>,
+    paginationOpts: NexusGenInputs['PaginationWhereInput'],
   ) => {
-    let needPageReset = false;
+    const needPageReset = false;
+
+    // Build filter
     const triggerWhereInput: TriggerWhereInput = { customer: { slug: customerSlug } };
-    const searchTermFilter = TriggerService.getSearchTermFilter(searchTerm || '');
 
-    if (searchTermFilter.length > 0) {
-      triggerWhereInput.OR = searchTermFilter;
-    }
+    const searchTermFilter = TriggerService.getSearchTermFilter(paginationOpts.searchTerm || '');
+    triggerWhereInput.OR = searchTermFilter.length ? searchTermFilter : undefined;
 
-    // Search term filtered users
     const triggers = await prisma.trigger.findMany({
       where: triggerWhereInput,
+      take: paginationOpts.limit || undefined,
+      skip: paginationOpts.offset || undefined,
+      // TODO: Add back in orderBy
     });
 
-    const totalPages = Math.ceil(triggers.length / (limit || 1));
+    const triggerTotal = await prisma.trigger.count({ where: { customer: { slug: customerSlug } } });
+    const totalPages = paginationOpts.limit ? Math.ceil(triggerTotal / (paginationOpts.limit)) : 1;
+    const currentPage = paginationOpts.pageIndex && paginationOpts.pageIndex <= totalPages
+      ? paginationOpts.pageIndex : 1;
 
-    if (pageIndex && pageIndex + 1 > totalPages) {
-      offset = 0;
-      needPageReset = true;
-    }
-    // Order filtered users
-    const orderedTriggers = TriggerService.orderUsersBy(triggers, orderBy);
-
-    // Slice ordered filtered users
-    const slicedOrderedTriggers = TriggerService.slice(orderedTriggers, (offset || 0), (limit || 1), (pageIndex || 0));
+    const pageInfo: NexusGenRootTypes['PaginationPageInfo'] = {
+      nrPages: totalPages,
+      pageIndex: currentPage,
+    };
 
     return {
-      triggers: slicedOrderedTriggers,
-      pageIndex: needPageReset ? 0 : pageIndex,
-      totalPages,
+      triggers,
+      pageInfo,
     };
   };
 
