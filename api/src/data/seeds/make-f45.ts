@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import cuid from 'cuid';
 
-import CustomerResolver from '../../models/customer/customer-resolver';
+import CustomerService from '../../models/customer/CustomerService';
 
 const prisma = new PrismaClient();
 const CUSTOMER = 'F45 Training';
@@ -56,7 +56,7 @@ const makef45 = async () => {
       },
     },
   });
-  await CustomerResolver.seed(customer);
+  await CustomerService.seed(customer);
 };
 
 export default makef45;

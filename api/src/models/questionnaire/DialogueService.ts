@@ -94,9 +94,7 @@ class DialogueService {
     tags: Array<{id: string}> = [],
   ): DialogueCreateInput {
     const constructDialogueFragment = {
-      customer: {
-        connect: { id: customerId },
-      },
+      customer: { connect: { id: customerId } },
       title,
       slug: dialogueSlug,
       description,
@@ -274,15 +272,21 @@ class DialogueService {
     const nodeEntryIds = nodeEntries.map((nodeEntry) => nodeEntry.id);
     if (nodeEntryIds.length > 0) {
       // TODO: Bring it back
-      // await prisma.nodeEntryValue.deleteMany(
-      //   {
-      //     where: {
-      //       nodeEntryId: {
-      //         in: nodeEntryIds,
-      //       },
-      //     },
-      //   },
-      // );
+      await prisma.sliderNodeEntry.deleteMany(
+        { where: { nodeEntryId: { in: nodeEntryIds } } },
+      );
+
+      await prisma.textboxNodeEntry.deleteMany(
+        { where: { nodeEntryId: { in: nodeEntryIds } } },
+      );
+
+      await prisma.registrationNodeEntry.deleteMany(
+        { where: { nodeEntryId: { in: nodeEntryIds } } },
+      );
+
+      await prisma.linkNodeEntry.deleteMany(
+        { where: { nodeEntryId: { in: nodeEntryIds } } },
+      );
 
       await prisma.nodeEntry.deleteMany(
         {

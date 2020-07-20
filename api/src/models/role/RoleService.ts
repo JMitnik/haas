@@ -1,8 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 
 import { Nullable } from '../../types/generic';
-
-const prisma = new PrismaClient();
+import prisma from '../../prisma';
 
 class RoleService {
   static sliceRoles = (

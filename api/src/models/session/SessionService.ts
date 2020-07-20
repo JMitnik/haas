@@ -12,10 +12,7 @@ import { TEXT_NODES } from '../questionnaire/Dialogue';
 import { NexusGenRootTypes } from '../../generated/nexus';
 import NodeEntryService, { NodeEntryWithTypes } from '../node-entry/NodeEntryService';
 import TriggerService from '../trigger/TriggerService';
-
-const prisma = new PrismaClient({
-  log: ['query', 'info', 'warn'],
-});
+import prisma from '../../prisma';
 
 // TODO: Rename Session to Interaction
 class SessionService {

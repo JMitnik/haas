@@ -1,33 +1,29 @@
-import { PrismaClient } from '@prisma/client';
 import CustomerService from './CustomerService';
 import prisma from '../../prisma';
 
-import { sampleCustomerWithDialogue } from '../../test/data/SampleCustomer';
+import { sampleCustomerWithoutDialogue, sampleFullCustomer } from '../../test/data/SampleCustomer';
+import DialogueService from '../questionnaire/DialogueService';
 
 describe('CustomerService tests', () => {
+  // TODO: Ensure this never runs on production!
   beforeEach(async () => {
-    // Delete all dialogues
-    await prisma.dialogue.deleteMany({
-      where: {
-        id: {
-          not: undefined,
-        },
-      },
-    });
-
-    await prisma.customer.deleteMany({
-      where: {
-        id: {
-          not: undefined,
-        },
-      },
-    });
+    const dialogues = await prisma.dialogue.findMany();
+  //   await Promise.all(dialogues.map(async (dialogue) => DialogueService.deleteDialogue(dialogue.id)));
+  //   const customers = await prisma.customer.findMany();
+  //   await Promise.all(await customers.map((customer) => CustomerService.deleteCustomer(customer.id)));
+  //   // Delete all dialogues
+  //   // await prisma.dialogue.deleteMany({
+  //   //   where: {
+  //   //     id: {
+  //   //       not: undefined,
+  //   //     },
+  //   //   },
+  //   // });
   });
 
   it('Creates customer', async () => {
     const customer = await prisma.customer.create({
-      ...sampleCustomerWithDialogue,
-      // data: { name: 'Starbucks', slug: 'starbucks' },
+      ...sampleCustomerWithoutDialogue,
     });
 
     expect(await prisma.customer.count()).toBe(1);
@@ -35,7 +31,7 @@ describe('CustomerService tests', () => {
 
   it('Deletes customer', async () => {
     const customer = await prisma.customer.create({
-      ...sampleCustomerWithDialogue,
+      ...sampleCustomerWithoutDialogue,
     });
 
     expect(await prisma.customer.count()).toBe(1);
@@ -45,13 +41,14 @@ describe('CustomerService tests', () => {
     expect(await prisma.customer.count()).toBe(0);
   });
 
-  it('Gets customer by slug', async () => {
+  it('Creates customer with dialogues, then deletes them all', async () => {
     const customer = await prisma.customer.create({
-      ...sampleCustomerWithDialogue,
+      ...sampleFullCustomer,
     });
 
-    const fetchedCustomer = await CustomerService.customerBySlug(sampleCustomerWithDialogue.data.slug);
+    // Seed customer
+    await CustomerService.seed(customer);
 
-    expect(fetchedCustomer.name).toEqual('HAAS Org');
+    const seededCustomer = await prisma.customer.findOne({ where: { id: customer.id }, include: { dialogues: true } });
   });
 });

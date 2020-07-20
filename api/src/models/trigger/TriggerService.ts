@@ -15,8 +15,7 @@ import { isAfter, subSeconds } from 'date-fns';
 import { NexusGenInputs } from '../../generated/nexus';
 import { Nullable } from '../../types/generic';
 import TriggerSMSService from '../../services/sms/trigger-sms-service';
-
-const prisma = new PrismaClient();
+import prisma from '../../prisma';
 
 class TriggerService {
   static getSearchTermFilter = (searchTerm: string) => {

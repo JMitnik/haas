@@ -1,6 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import prisma from '../../prisma';
 
 class PermissionService {
   static deletePermissions = async (permissionIds: Array<string>) => {

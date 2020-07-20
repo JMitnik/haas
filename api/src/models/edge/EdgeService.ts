@@ -1,6 +1,5 @@
-import { EdgeCreateInput, PrismaClient, QuestionNode } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { EdgeCreateInput, QuestionNode } from '@prisma/client';
+import prisma from '../../prisma';
 
 interface QuestionConditionProps {
   id?: number;
