@@ -222,7 +222,7 @@ class SessionService {
         offset: 0,
         startDate: null,
         pageInfo: {
-          currentPage: 0,
+          pageIndex: 0,
           nrPages: 0,
         },
       };
@@ -257,7 +257,7 @@ class SessionService {
     // TODO: Type-hint this
     const pageInfo: NexusGenRootTypes['PaginationPageInfo'] = {
       nrPages: totalPages || 1,
-      currentPage: paginationArgs?.pageIndex || 1,
+      pageIndex: paginationArgs?.pageIndex || 1,
     };
 
     return {

@@ -67,12 +67,11 @@ type Dialogue {
   averageScore: Float!
   countInteractions: Int
   creationDate: String
-  customer: Customer!
+  customer: Customer
   customerId: String!
   description: String!
   edges: [Edge!]!
   id: ID!
-  interactionFeedItems: [Session!]
   leafs: [QuestionNode!]!
   publicTitle: String
   questions(where: QuestionNodeWhereInput): [QuestionNode!]!
@@ -227,8 +226,8 @@ input OptionInput {
 
 """Information with regards to current page, and total number of pages"""
 type PaginationPageInfo {
-  currentPage: Int!
   nrPages: Int!
+  pageIndex: Int!
 }
 
 """Ways to sort a pagination object"""
@@ -275,21 +274,21 @@ type PermssionType {
 type Query {
   customer(id: ID, slug: String): Customer
   customers: [Customer!]!
-  dialogue(where: DialogueWhereUniqueInput): Dialogue!
-  dialogues(customerId: ID, filter: DialogueFilterInputType): [Dialogue!]!
+  dialogue(where: DialogueWhereUniqueInput): Dialogue
+  dialogues(filter: DialogueFilterInputType): [Dialogue!]!
   edge(id: String): Edge
   lineChartData(dialogueId: String, limit: Int, numberOfDaysBack: Int, offset: Int): [lineChartDataType!]!
   questionNode(where: QuestionNodeWhereUniqueInput): QuestionNode
   questionNodes: [QuestionNode!]!
+  roleConnection(customerId: String, filter: PaginationWhereInput): RoleConnection!
   roles(customerSlug: String): [RoleType!]
-  roleTable(customerId: String, filter: PaginationWhereInput): RoleTableType!
   session(where: SessionWhereUniqueInput): Session
   sessions(where: SessionWhereUniqueInput): [Session!]!
   tags(customerSlug: String, dialogueId: String): [TagType!]!
-  trigger(triggerId: String): TriggerType!
+  trigger(triggerId: String): TriggerType
+  triggerConnection(customerSlug: String, filter: PaginationWhereInput): TriggerConnectionType!
   triggers(customerSlug: String, dialogueId: String, filter: PaginationWhereInput, userId: String): [TriggerType!]!
-  triggerTable(customerSlug: String, filter: PaginationWhereInput): TriggerTableType!
-  user(userId: String): UserType!
+  user(userId: String): UserType
   users(customerSlug: String): [UserType!]!
   userTable(customerSlug: String, filter: PaginationWhereInput): UserTable
 }
@@ -353,6 +352,13 @@ input RegisterNodeEntryInput {
   value: String
 }
 
+type RoleConnection {
+  pageIndex: Int
+  permissions: [PermssionType!]!
+  roles: [RoleType!]!
+  totalPages: Int
+}
+
 input RoleDataInput {
   description: String
   name: String
@@ -362,13 +368,6 @@ input RoleInput {
   customerId: String
   description: String
   name: String
-}
-
-type RoleTableType {
-  pageIndex: Int
-  permissions: [PermssionType!]!
-  roles: [RoleType!]!
-  totalPages: Int
 }
 
 type RoleType {
@@ -419,10 +418,9 @@ input TagsInputObjectType {
 }
 
 type TagType {
-  customerId: String!
-  id: String!
+  id: ID!
   name: String!
-  type: String!
+  type: TagTypeEnum!
 }
 
 enum TagTypeEnum {
@@ -446,12 +444,20 @@ type topPathType {
   quantity: Int
 }
 
+enum TriggerConditionEnum {
+  HIGH_THRESHOLD
+  INNER_RANGE
+  LOW_THRESHOLD
+  OUTER_RANGE
+  TEXT_MATCH
+}
+
 input TriggerConditionInputType {
   id: Int
   maxValue: Int
   minValue: Int
   textValue: String
-  type: TriggerConditionTypeEnum
+  type: TriggerConditionEnum
 }
 
 type TriggerConditionType {
@@ -459,16 +465,16 @@ type TriggerConditionType {
   maxValue: Int
   minValue: Int
   textValue: String
-  triggerId: String!
-  type: TriggerConditionTypeEnum!
+  type: TriggerConditionEnum!
 }
 
-enum TriggerConditionTypeEnum {
-  HIGH_THRESHOLD
-  INNER_RANGE
-  LOW_THRESHOLD
-  OUTER_RANGE
-  TEXT_MATCH
+type TriggerConnectionType {
+  endDate: String
+  pageIndex: Int!
+  pageSize: Int!
+  startDate: String
+  totalPages: Int!
+  triggers: [TriggerType!]!
 }
 
 input TriggerInputType {
@@ -482,15 +488,6 @@ enum TriggerMediumEnum {
   BOTH
   EMAIL
   PHONE
-}
-
-type TriggerTableType {
-  endDate: String
-  pageIndex: Int!
-  pageSize: Int!
-  startDate: String
-  totalPages: Int!
-  triggers: [TriggerType!]!
 }
 
 type TriggerType {

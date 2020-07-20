@@ -38,12 +38,11 @@ class CustomerService {
     return customerSettings;
   };
 
-  static customerBySlug = async (obj: any, args: any) => {
-    const { slug } = args;
-    const customer = await prisma.customer.findOne({ where: { slug } });
+  static customerBySlug = async (customerSlug: string) => {
+    const customer = await prisma.customer.findOne({ where: { slug: customerSlug } });
 
     if (!customer) {
-      throw new Error("Can't find slug, shit!");
+      throw new Error(`Unable to find customer ${customerSlug}!`);
     }
 
     return customer;
