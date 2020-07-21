@@ -233,6 +233,7 @@ type Mutation {
   deleteCTA(id: String): QuestionNode!
   deleteCustomer(where: CustomerWhereUniqueInput): Customer!
   deleteDialogue(where: DialogueWhereUniqueInput): Dialogue!
+  deleteQuestion(customerSlug: String, dialogueSlug: String, id: String): QuestionNode!
   deleteTag(tagId: String): TagType!
   deleteTrigger(id: String): TriggerType!
   deleteUser(id: String): UserType!

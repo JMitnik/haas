@@ -2,6 +2,7 @@ import { Div, Flex, Span } from '@haas/ui';
 import { Edit3, Minus, Plus, X } from 'react-feather';
 import React from 'react';
 
+import DeleteQuestionMutation from 'mutations/deleteQuestion';
 import EditCTAButton from 'views/ActionsOverview/components/EditCTAButton';
 import HaasNodeIcon from 'components/Icons/HaasNodeIcon';
 import LinkIcon from 'components/Icons/LinkIcon';
@@ -22,8 +23,13 @@ import {
 import { EdgeConditonProps, QuestionEntryProps, QuestionOptionProps } from '../TopicBuilderInterfaces';
 import BuilderIcon from '../components/BuilderIcon';
 import DeleteCTAButton from '../components/DeleteCTAButton';
+import deleteQuestionMutation from 'mutations/deleteQuestion';
 
+import { ApolloError } from 'apollo-client';
+import { useMutation } from '@apollo/react-hooks';
+import { useParams } from 'react-router';
 import QuestionEntryForm from './QuestionEntryForm';
+import getTopicBuilderQuery from 'queries/getQuestionnaireQuery';
 
 interface QuestionEntryItemProps {
   onAddExpandChange?: React.Dispatch<React.SetStateAction<boolean>>;
@@ -96,6 +102,26 @@ const QuestionEntryItem = (
     onAddExpandChange }
   : QuestionEntryItemProps,
 ) => {
+  const { customerSlug, dialogueSlug } = useParams();
+
+  const [deleteQuestion, { loading }] = useMutation(deleteQuestionMutation, {
+    variables: {
+      id: question.id,
+      customerSlug,
+      dialogueSlug,
+    },
+    refetchQueries: [{
+      query: getTopicBuilderQuery,
+      variables: {
+        customerSlug,
+        dialogueSlug,
+      },
+    }],
+    onError: (serverError: ApolloError) => {
+      console.log(serverError);
+    },
+  });
+
   const activeType = question.type === 'Multi-Choice'
     ? { label: question.type, value: 'MULTI_CHOICE' }
     : { label: question.type, value: 'SLIDER' };
@@ -109,7 +135,7 @@ const QuestionEntryItem = (
         <QuestionEntryContainer flexGrow={1}>
           <DeleteCTAButton
             disabled={(!!activeQuestion && activeQuestion !== question.id) || false}
-            onClick={() => null}
+            onClick={() => deleteQuestion()}
           >
             <X />
           </DeleteCTAButton>

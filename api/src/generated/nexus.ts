@@ -500,6 +500,7 @@ export interface NexusGenFieldTypes {
     deleteCTA: NexusGenRootTypes['QuestionNode']; // QuestionNode!
     deleteCustomer: NexusGenRootTypes['Customer']; // Customer!
     deleteDialogue: NexusGenRootTypes['Dialogue']; // Dialogue!
+    deleteQuestion: NexusGenRootTypes['QuestionNode']; // QuestionNode!
     deleteTag: NexusGenRootTypes['TagType']; // TagType!
     deleteTrigger: NexusGenRootTypes['TriggerType']; // TriggerType!
     deleteUser: NexusGenRootTypes['UserType']; // UserType!
@@ -747,6 +748,11 @@ export interface NexusGenArgTypes {
     }
     deleteDialogue: { // args
       where?: NexusGenInputs['DialogueWhereUniqueInput'] | null; // DialogueWhereUniqueInput
+    }
+    deleteQuestion: { // args
+      customerSlug?: string | null; // String
+      dialogueSlug?: string | null; // String
+      id?: string | null; // String
     }
     deleteTag: { // args
       tagId?: string | null; // String

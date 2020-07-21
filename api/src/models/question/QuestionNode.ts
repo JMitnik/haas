@@ -1,7 +1,7 @@
-import { LinkUpdateManyWithoutQuestionNodeInput, PrismaClient, QuestionNode, QuestionNodeUpdateInput } from '@prisma/client';
 import { CTALinksInputType, LinkType } from '../link/Link';
 import { DialogueType } from '../questionnaire/Dialogue';
 import { EdgeType } from '../edge/Edge';
+import { LinkUpdateManyWithoutQuestionNodeInput, PrismaClient, QuestionNode, QuestionNodeUpdateInput } from '@prisma/client';
 import { extendType, inputObjectType, objectType } from '@nexus/schema';
 import { number } from 'yup';
 import NodeResolver from './node-resolver';
@@ -142,6 +142,53 @@ export const EdgeConditionInputType = inputObjectType({
 export const QuestionNodeMutations = extendType({
   type: 'Mutation',
   definition(t) {
+    t.field('deleteQuestion', {
+      type: QuestionNodeType,
+      args: {
+        id: 'String',
+        customerSlug: 'String',
+        dialogueSlug: 'String',
+      },
+      async resolve(parent: any, args: any, ctx: any) {
+        const { id, customerSlug, dialogueSlug } = args;
+        const { prisma }: { prisma: PrismaClient } = ctx;
+
+        const customer = await prisma.customer.findOne({
+          where: {
+            slug: customerSlug || undefined,
+          },
+          include: {
+            dialogues: {
+              where: {
+                slug: dialogueSlug,
+              },
+              include: {
+                questions: {
+                  select: {
+                    id: true,
+                  },
+                },
+                edges: {
+                  select: {
+                    id: true,
+                    parentNodeId: true,
+                    childNodeId: true,
+                  },
+                },
+              },
+            },
+          },
+        });
+
+        const dialogue = customer?.dialogues[0];
+
+        if (dialogue) {
+          return NodeResolver.deleteQuestionFromBuilder(id, dialogue);
+        }
+
+        return null;
+      },
+    });
     t.field('updateQuestion', {
       type: QuestionNodeType,
       args: {

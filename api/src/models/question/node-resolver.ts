@@ -1,4 +1,6 @@
-import { Edge, Link, LinkCreateInput, LinkUpdateManyWithoutQuestionNodeInput, PrismaClient, QuestionCondition, QuestionNode, QuestionNodeCreateInput, QuestionNodeUpdateInput, QuestionNodeWhereUniqueInput } from '@prisma/client';
+import lodash from 'lodash';
+
+import { Dialogue, Edge, Link, LinkCreateInput, LinkUpdateManyWithoutQuestionNodeInput, PrismaClient, QuestionCondition, QuestionNode, QuestionNodeCreateInput, QuestionNodeUpdateInput, QuestionNodeWhereUniqueInput } from '@prisma/client';
 import { multiChoiceType, sliderType } from '../../data/seeds/default-data';
 import EdgeResolver from '../edge/edge-resolver';
 
@@ -266,7 +268,6 @@ class NodeResolver {
   };
 
   static getLeafState = (currentOverrideLeafId: string | null, newOverrideLeafId: string) => {
-    console.log(`current leaf: ${currentOverrideLeafId}, new leaf id: ${newOverrideLeafId}`);
     if (newOverrideLeafId) {
       return {
         connect: {
@@ -305,6 +306,77 @@ class NodeResolver {
         renderMax: newEdgeCondition.renderMax,
       },
     });
+  };
+
+  static getDeleteIDs = (
+    edges: Array<{id: string, childNodeId: string, parentNodeId: string}>,
+    questions: Array<{id: string}>, foundEdgeIds: Array<string>,
+    foundQuestionIds: Array<string>,
+  ): {edgeIds: Array<string>, questionIds: Array<string>} => {
+    const newlyFoundEdgeIds: Array<string> = [];
+    const newlyFoundQuestionIds: Array<string> = [];
+
+    foundQuestionIds.forEach((id) => {
+      const targetEdges = edges.filter((edge) => !foundEdgeIds.includes(edge.id) && id === edge.parentNodeId);
+      if (!targetEdges.length) {
+        return;
+      }
+      const edgeIds = targetEdges.map((edge) => edge.id);
+      const questionIds = targetEdges.map(((edge) => edge.childNodeId));
+      newlyFoundEdgeIds.push(...edgeIds);
+      newlyFoundQuestionIds.push(...questionIds);
+    });
+
+    if (newlyFoundEdgeIds.length || newlyFoundQuestionIds.length) {
+      return NodeResolver.getDeleteIDs(
+        edges.filter((edge) => !foundEdgeIds.includes(edge.id)),
+        questions.filter((question) => !foundQuestionIds.includes(question.id)),
+        [...foundEdgeIds, ...newlyFoundEdgeIds],
+        [...foundQuestionIds, ...newlyFoundQuestionIds],
+      );
+    }
+    return { edgeIds: foundEdgeIds, questionIds: foundQuestionIds };
+  };
+
+  static deleteQuestionFromBuilder = async (id: string, dialogue: Dialogue & {
+    questions: {
+      id: string;
+    }[];
+    edges: {
+      id: string;
+      parentNodeId: string;
+      childNodeId: string;
+    }[];
+  }) => {
+    const { questions, edges } = dialogue;
+    const foundEdgeIds: Array<string> = [];
+    const foundQuestionIds: Array<string> = [id];
+    const edgeToDeleteQuestion = edges.find((edge) => edge.childNodeId === id);
+    if (edgeToDeleteQuestion) {
+      foundEdgeIds.push(edgeToDeleteQuestion.id);
+    }
+    // const result = NodeResolver.getDeleteIDs(edges, questions, foundEdgeIds, foundQuestionIds);
+    console.log('ITEMS GOING TO BE DELETED: ', NodeResolver.getDeleteIDs(edges, questions, foundEdgeIds, foundQuestionIds));
+
+    const { edgeIds, questionIds } = NodeResolver.getDeleteIDs(edges, questions, foundEdgeIds, foundQuestionIds);
+    await prisma.edge.deleteMany({
+      where: {
+        id: {
+          in: edgeIds,
+        },
+      },
+    });
+
+    await prisma.questionNode.deleteMany({
+      where: {
+        id: {
+          in: questionIds,
+        },
+      },
+    });
+
+    const questionToDelete = questions.find((question) => id === question.id);
+    return questionToDelete;
   };
 
   static createQuestionFromBuilder = async (
