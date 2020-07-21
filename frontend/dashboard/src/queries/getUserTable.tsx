@@ -1,7 +1,7 @@
 import gql from 'graphql-tag';
 
 const getUsersQuery = gql`
-  query getUserTable($customerSlug: String!,$filter: FilterInput) {
+  query getUserTable($customerSlug: String!,$filter: PaginationWhereInput) {
     userTable(customerSlug: $customerSlug, filter: $filter) {
       users {
         id
@@ -9,8 +9,8 @@ const getUsersQuery = gql`
         firstName
         lastName
         role {
-            id
-            name
+          id
+          name
         }
       }
       totalPages

@@ -224,6 +224,7 @@ type PaginationPageInfo {
 """Ways to sort a pagination object"""
 enum PaginationSortByEnum {
   createdAt
+  email
   id
   score
 }

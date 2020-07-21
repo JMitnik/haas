@@ -45,7 +45,7 @@ const UsersOverview = () => {
       activeSearchTerm: '',
       pageIndex: 0,
       pageSize: 8,
-      sortBy: [{ by: 'by', desc: true }],
+      sortBy: [{ by: 'email', desc: true }],
     },
   );
 

@@ -3,6 +3,7 @@ import { enumType, inputObjectType, interfaceType, objectType } from '@nexus/sch
 const PaginationSortByEnum = enumType({
   name: 'PaginationSortByEnum',
   description: 'Ways to sort a pagination object',
+  // TODO: Make this enum overrideable?
   members: ['score', 'id', 'createdAt'],
 });
 
@@ -12,6 +13,7 @@ export const PaginationSortInput = inputObjectType({
   description: 'Sorting of pagination (type and whether it ascends)',
 
   definition(t) {
+    // t.i
     t.field('by', { type: PaginationSortByEnum, nullable: false });
     t.boolean('desc', { default: true, required: false });
   },
