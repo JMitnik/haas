@@ -108,7 +108,6 @@ class NodeResolver {
     newLinks: Array<LinkInputProps>,
     questionId: string,
   ) => {
-    console.log('NEW LINKS: ', newLinks);
     newLinks?.forEach(async (link) => {
       await prisma.link.upsert({
         where: {
@@ -289,24 +288,24 @@ class NodeResolver {
 
   static updateEdge = async (
     dbEdgeCondition: QuestionCondition,
-    newEdgeCondition: { id: number | null, conditionType: string, renderMin: number | null, renderMax: number | null, matchValue: string | null },
-  ) => {
-    // If edgeId in arguments exists update the edge, MAKE SURE TO UPDATE THE EDGE CONDITION AS WELL
-    // TODO: Create new edge when new question is created
-    // Should never have to delete and edge unless question node itself deleted
-    // but that will be done in different function
-    const updatedEdgeCondition = await prisma.questionCondition.update({
-      where: {
-        id: dbEdgeCondition.id || undefined,
-      },
-      data: {
-        conditionType: newEdgeCondition.conditionType,
-        matchValue: newEdgeCondition.matchValue,
-        renderMin: newEdgeCondition.renderMin,
-        renderMax: newEdgeCondition.renderMax,
-      },
-    });
-  };
+    newEdgeCondition: {
+      id: number | null,
+      conditionType: string,
+      renderMin: number | null,
+      renderMax: number | null,
+      matchValue: string | null
+    },
+  ) => prisma.questionCondition.update({
+    where: {
+      id: dbEdgeCondition.id || undefined,
+    },
+    data: {
+      conditionType: newEdgeCondition.conditionType,
+      matchValue: newEdgeCondition.matchValue,
+      renderMin: newEdgeCondition.renderMin,
+      renderMax: newEdgeCondition.renderMax,
+    },
+  });
 
   static getDeleteIDs = (
     edges: Array<{id: string, childNodeId: string, parentNodeId: string}>,
@@ -352,11 +351,10 @@ class NodeResolver {
     const foundEdgeIds: Array<string> = [];
     const foundQuestionIds: Array<string> = [id];
     const edgeToDeleteQuestion = edges.find((edge) => edge.childNodeId === id);
+
     if (edgeToDeleteQuestion) {
       foundEdgeIds.push(edgeToDeleteQuestion.id);
     }
-    // const result = NodeResolver.getDeleteIDs(edges, questions, foundEdgeIds, foundQuestionIds);
-    console.log('ITEMS GOING TO BE DELETED: ', NodeResolver.getDeleteIDs(edges, questions, foundEdgeIds, foundQuestionIds));
 
     const { edgeIds, questionIds } = NodeResolver.getDeleteIDs(edges, questions, foundEdgeIds, foundQuestionIds);
     await prisma.edge.deleteMany({
@@ -408,8 +406,7 @@ class NodeResolver {
       },
     });
 
-    // TODO: CREATE EDGE
-    const newEdge = await prisma.edge.create({
+    await prisma.edge.create({
       data: {
         dialogue: {
           connect: {
@@ -446,7 +443,13 @@ class NodeResolver {
     overrideLeafId: string,
     edgeId: string,
     options: Array<QuestionOptionProps>,
-    edgeCondition: { id: number | null, conditionType: string, renderMin: number | null, renderMax: number | null, matchValue: string | null },
+    edgeCondition: {
+      id: number | null,
+      conditionType: string,
+      renderMin: number | null,
+      renderMax: number | null,
+      matchValue: string | null
+    },
   ) => {
     const activeQuestion = await prisma.questionNode.findOne({ where: { id: questionId },
       include: {
@@ -476,8 +479,6 @@ class NodeResolver {
     const activeOptions = activeQuestion ? activeQuestion?.options?.map((option) => option.id) : [];
     const currentOverrideLeafId = activeQuestion?.overrideLeafId || null;
     const leaf = NodeResolver.getLeafState(currentOverrideLeafId, overrideLeafId);
-
-    console.log('LEAF: ', leaf);
 
     const dbEdgeCondition = dbEdge?.conditions && dbEdge.conditions[0];
 
@@ -555,7 +556,6 @@ class NodeResolver {
       console.log('something went wrong removing edges: ', e);
     }
 
-    // // Update existing EdgeChildren
     const updatedOptionIds = await NodeResolver.updateQuestionOptions(options);
     const updatedEdges = await Promise.all(children?.map(async (edge) => {
       const condition = await NodeResolver.updateNewQConditions(edge);

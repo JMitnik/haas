@@ -1,7 +1,7 @@
+import { LinkUpdateManyWithoutQuestionNodeInput, PrismaClient, QuestionNode, QuestionNodeUpdateInput } from '@prisma/client';
 import { CTALinksInputType, LinkType } from '../link/Link';
 import { DialogueType } from '../questionnaire/Dialogue';
 import { EdgeType } from '../edge/Edge';
-import { LinkUpdateManyWithoutQuestionNodeInput, PrismaClient, QuestionNode, QuestionNodeUpdateInput } from '@prisma/client';
 import { extendType, inputObjectType, objectType } from '@nexus/schema';
 import { number } from 'yup';
 import NodeResolver from './node-resolver';
@@ -203,7 +203,7 @@ export const QuestionNodeMutations = extendType({
       resolve(parent: any, args: any, ctx: any) {
         const { id, title, type, overrideLeafId, edgeId, optionEntries, edgeCondition } = args;
         const { options } = optionEntries;
-        console.log('OPTIONS: ', options);
+
         return NodeResolver.updateQuestionFromBuilder(id, title, type, overrideLeafId, edgeId, options, edgeCondition);
       },
     });
@@ -226,8 +226,6 @@ export const QuestionNodeMutations = extendType({
         const { customerSlug, dialogueSlug, title, type, overrideLeafId, parentQuestionId, optionEntries, edgeCondition } = args;
         const { options } = optionEntries;
 
-        console.log('ARGS: ', args);
-
         const customer = await prisma.customer.findOne({
           where: {
             slug: customerSlug || undefined,
@@ -245,7 +243,9 @@ export const QuestionNodeMutations = extendType({
         const dialogueId = dialogue?.id;
 
         if (dialogueId) {
-          return NodeResolver.createQuestionFromBuilder(dialogueId, title, type, overrideLeafId, parentQuestionId, options, edgeCondition);
+          return NodeResolver.createQuestionFromBuilder(
+            dialogueId, title, type, overrideLeafId, parentQuestionId, options, edgeCondition,
+          );
         }
 
         return null;
@@ -314,7 +314,6 @@ export const QuestionNodeMutations = extendType({
       async resolve(parent: any, args: any, ctx: any) {
         const { prisma }: { prisma: PrismaClient } = ctx;
         const { customerSlug, dialogueSlug, title, type, links } = args;
-        console.log('links: ', links?.linkTypes);
 
         const customer = await prisma.customer.findOne({
           where: {

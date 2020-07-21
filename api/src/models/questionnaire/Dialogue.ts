@@ -309,10 +309,11 @@ export const DialogueMutations = extendType({
       type: DialogueType,
       args: { data: AddDialogueInput },
       async resolve(parent: any, args: any, ctx: any) {
-        const { data: { dialogueSlug, customerSlug, title, publicTitle, description, tags = [], contentType, templateDialogueId } } = args;
+        const {
+          data: { dialogueSlug, customerSlug, title, publicTitle, description, tags = [], templateDialogueId },
+        } = args;
         const { prisma }: { prisma: PrismaClient } = ctx;
 
-        const questionnaire = null;
         const dialogueTags = tags?.entries?.length > 0
           ? tags?.entries?.map((tag: string) => ({ id: tag }))
           : [];
@@ -324,7 +325,9 @@ export const DialogueMutations = extendType({
           return null;
         }
 
-        return DialogueService.copyDialogue(templateDialogueId, customer?.id, title, dialogueSlug, description, publicTitle, dialogueTags);
+        return DialogueService.copyDialogue(
+          templateDialogueId, customer?.id, title, dialogueSlug, description, publicTitle, dialogueTags,
+        );
       },
     });
     t.field('createDialogue', {
