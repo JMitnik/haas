@@ -23,7 +23,7 @@ export const H2 = styled(GenericType).attrs({ as: 'h2' })`
   `}
 `;
 
-export const PageHeading = styled(H2)`
+export const PageHeading = styled(H2, ).attrs({ 'data-cy': 'PageHeading' })`
   ${({ theme }) => css`
     margin-bottom: ${theme.gutter}px;
   `}

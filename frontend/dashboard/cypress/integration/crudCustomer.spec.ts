@@ -27,7 +27,7 @@ const generateCustomer = (): CustomerProps => {
   return {
     name: companyName,
     logoUrl: faker.image.business(),
-    primaryColor: '#ffffff',
+    primaryColor: '#000000',
     slug: faker.helpers.slugify(companyName),
   };
 };

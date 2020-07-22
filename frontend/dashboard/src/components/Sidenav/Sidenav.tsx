@@ -181,7 +181,7 @@ export const SidenavContainer = styled.div`
 `;
 
 const Sidenav = ({ children }: { children: React.ReactNode }) => (
-  <SidenavContainer>
+  <SidenavContainer data-cy="Sidenav">
     {children}
   </SidenavContainer>
 );

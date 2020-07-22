@@ -36,7 +36,7 @@ const DialogueOverview = ({ dialogues }: { dialogues: any }) => {
           <DialogueCard key={index} dialogue={dialogue} />
         ))}
 
-        <AddDialogueCard>
+        <AddDialogueCard data-cy="AddDialogueCard">
           <Link to={`/dashboard/b/${customerSlug}/d/add`} />
 
           <Div>

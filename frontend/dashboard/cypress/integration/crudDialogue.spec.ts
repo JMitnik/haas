@@ -7,8 +7,19 @@ interface CustomerProps {
   primaryColor: string;
 }
 
+interface DialogueProps {
+  title: string;
+  publicTitle: string;
+  urlSlug: string;
+  description: string;
+}
+
+interface DialogueCreateOptions {
+  useTemplate: boolean;
+}
+
 interface CustomerCreateOptions {
-  useTemplate: boolean
+  useTemplate: boolean;
 }
 
 const createCustomerFromDashboardPage = (customer: CustomerProps, customerCreateOptions?: CustomerCreateOptions) => {
@@ -36,7 +47,7 @@ const generateCustomer = (): CustomerProps => {
   return {
     name: companyName,
     logoUrl: faker.image.business(),
-    primaryColor: '#ffffff',
+    primaryColor: '#000000',
     slug: faker.helpers.slugify(companyName),
   };
 };
@@ -67,5 +78,42 @@ describe('Creating a customer, with a default dialogue', () => {
     const tabBar = cy.get('[data-cy="DialogueTabbar"]');
     tabBar.contains('Builder').click();
     cy.contains('Dialogue builder');
+  });
+
+  it('Creates a second dialogue using the Create Dialogue screen', () => {
+    const newDialogue: DialogueProps = {
+      title: 'Test Dialogue',
+      description: 'Test dialogue to be deleted',
+      publicTitle: 'Dialogue to go!',
+      urlSlug: 'test-dialogue',
+    };
+
+    // Just in case, assume we are in dashboard already, and click
+    const sidenav = cy.get('[data-cy="Sidenav"]');
+    sidenav.contains('Dialogues').click();
+
+    // Go to add dialogue view
+    cy.get('[data-cy="AddDialogueCard"]').click();
+
+    // Fill in form
+    const form = cy.get('form');
+    form.within(() => {
+      cy.get('input[name="title"]').type(newDialogue.title);
+      cy.get('input[name="publicTitle"]').type(newDialogue.publicTitle);
+      cy.get('input[name="slug"]').type(newDialogue.urlSlug);
+      cy.get('textarea[name="description"]').type(newDialogue.description);
+    });
+
+    // Submit (save form)
+    cy.get('form').submit();
+  });
+
+  it('Deletes the second dialogue', () => {
+    // We should be back at the dialogues overview
+    const dialogueCard = cy.contains('Test Dialogue').parentsUntil('[data-cy="DialogueCard"]');
+    dialogueCard.find('[data-cy="ShowMoreButton"]').click();
+
+    // There should be a dropdown (maybe test?)
+    dialogueCard.contains('Delete').click();
   });
 });
