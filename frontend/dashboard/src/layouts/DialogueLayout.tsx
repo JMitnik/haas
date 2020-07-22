@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Div, Flex, PageHeading, Span, ExtLink, H2 } from '@haas/ui';
+import { Div, ExtLink, Flex, H2, PageHeading, Span } from '@haas/ui';
 import { MapPin, User } from 'react-feather';
 import { ReactComponent as UrlIcon } from 'assets/icons/icon-link.svg';
 import { useParams } from 'react-router';
@@ -113,7 +113,7 @@ const DialogueLayout = ({ children }: DialogueLayoutProps) => {
         </Div>
       </Flex>
 
-      <Tabbar>
+      <Tabbar data-cy="DialogueTabbar">
         <Tab to={`/dashboard/b/${customerSlug}/d/${dialogueSlug}`} exact>General</Tab>
         <Tab to={`/dashboard/b/${customerSlug}/d/${dialogueSlug}/interactions`}>Interactions</Tab>
         <Tab to={`/dashboard/b/${customerSlug}/d/${dialogueSlug}/builder`}>Builder</Tab>
