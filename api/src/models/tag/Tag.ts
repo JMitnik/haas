@@ -1,6 +1,7 @@
 import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
 
 // eslint-disable-next-line import/no-cycle
+import { CustomerType } from '../customer/Customer';
 import { DialogueType } from '../questionnaire/Dialogue';
 
 export const TagTypeEnum = enumType({
@@ -9,12 +10,13 @@ export const TagTypeEnum = enumType({
 });
 
 export const TagType = objectType({
-  name: 'TagType',
+  name: 'Tag',
 
   definition(t) {
     t.id('id');
     t.string('name');
-    // t.string('customerId');
+
+    t.string('customerId');
 
     t.field('type', { type: TagTypeEnum });
   },
@@ -34,11 +36,7 @@ export const TagQueries = extendType({
         if (args.dialogueId) {
           const tags = await ctx.prisma.tag.findMany({
             where: {
-              isTagOf: {
-                some: {
-                  id: args.dialogueId,
-                },
-              },
+              isTagOf: { some: { id: args.dialogueId } },
             },
           });
 

@@ -9,7 +9,7 @@
         ]
     },
     "scripts": {
-        "start": "nodemon",
+        "start": "nodemon --signal SIGINT",
         "build": "yarn",
         "docker:up": "docker-compose -f docker-compose.local.yml up -d ",
         "serve": "ts-node -P tsconfig.json ./src/app.ts",

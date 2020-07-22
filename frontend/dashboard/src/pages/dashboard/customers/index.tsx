@@ -1,26 +1,14 @@
-import { Div, H2, H4 } from '@haas/ui';
-import { getCustomerQuery } from 'queries/getCustomersQuery';
+import { useErrorHandler } from 'react-error-boundary';
 import { useQuery } from '@apollo/react-hooks';
-import CustomerOverview from 'views/CustomerOverview';
 import React from 'react';
 
-const ErrorCard = () => (
-  <Div>
-    <H2>Sorry for the inconvenience</H2>
-    <H4>We will be right back!</H4>
-  </Div>
-);
+import { Div, H2, H4 } from '@haas/ui';
+import { getCustomerQuery } from 'queries/getCustomersQuery';
+import CustomerOverview from 'views/CustomerOverview';
 
 const CustomersPage = () => {
   const { loading, error, data } = useQuery(getCustomerQuery);
-
-  if (error) {
-    return (
-      <Div>
-        Mistake made
-      </Div>
-    );
-  }
+  useErrorHandler(error);
 
   if (loading) return <p>Loading</p>;
 

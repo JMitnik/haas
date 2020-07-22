@@ -2,6 +2,7 @@ import { useParams } from 'react-router-dom';
 import { useQuery } from '@apollo/react-hooks';
 import React from 'react';
 
+import { useErrorHandler } from 'react-error-boundary';
 import DialogueOverview from 'views/DialogueOverview';
 import getDialoguesOfCustomer from 'queries/getDialoguesOfCustomer';
 
@@ -13,17 +14,9 @@ const DialoguesPage = () => {
     variables: { customerSlug },
   });
 
-  let dialogues: any[] = [];
+  useErrorHandler(error);
 
-  if (error) {
-    return (
-      <p>
-        Error:
-        {' '}
-        {error.message}
-      </p>
-    );
-  }
+  let dialogues: any[] = [];
 
   if (data) {
     dialogues = data?.customer?.dialogues;

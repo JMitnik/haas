@@ -28,7 +28,7 @@ const main = async () => {
     cors: false,
   });
 
-  app.listen(config.port);
+  const runningServer = app.listen(config.port);
 
   console.log(`Only intended to work on ${config.clientUrl} and ${config.dashboardUrl}`);
   console.log(`Server successfully started on port ${config.port} for graphql entrypoint at ${apollo.graphqlPath}`);

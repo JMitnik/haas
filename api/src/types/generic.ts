@@ -1,3 +1,5 @@
+import { NexusGenInputs } from '../generated/nexus';
+
 export type OrderByType = 'score' | 'id' | 'createdAt';
 
 export interface OrderByProps {
@@ -9,7 +11,7 @@ export interface PaginationProps {
   pageIndex?: Nullable<number>,
   offset?: Nullable<number>,
   limit?: Nullable<number>,
-  orderBy?: Nullable<Array<OrderByProps>>,
+  orderBy?: Nullable<Array<NexusGenInputs['PaginationSortInput']>>,
   startDate?: Nullable<Date>,
   endDate?: Nullable<Date>,
   searchTerm?: Nullable<string>

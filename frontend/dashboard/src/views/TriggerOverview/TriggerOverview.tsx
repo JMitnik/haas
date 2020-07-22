@@ -47,7 +47,7 @@ const TriggersOverview = () => {
     },
   );
 
-  const tableData: any = data?.triggerTable?.triggers || [];
+  const tableData: any = data?.triggerConnection?.triggers || [];
   useEffect(() => {
     const { activeStartDate, activeEndDate, pageIndex, pageSize, sortBy, activeSearchTerm } = paginationProps;
     fetchTriggers({

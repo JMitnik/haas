@@ -43,14 +43,11 @@ const AddCustomerView = () => {
     },
   });
 
-  const [addCustomer, { loading }] = useMutation(createNewCustomer, {
+  const [addCustomer, { loading, error: serverError }] = useMutation(createNewCustomer, {
     onCompleted: () => {
       history.push('/');
     },
     refetchQueries: [{ query: getCustomerQuery }],
-    onError: (serverError: ApolloError) => {
-      console.log(serverError);
-    },
   });
 
   const onChange = (event: any) => {
@@ -78,6 +75,9 @@ const AddCustomerView = () => {
 
   return (
     <Container>
+      {serverError && (
+        <p>{serverError.message}</p>
+      )}
       <Div>
         <H2 color="default.darkest" fontWeight={500} py={2}> Customer </H2>
         <Muted pb={4}>Create a new customer</Muted>

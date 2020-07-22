@@ -1,6 +1,4 @@
 import { ApolloServer } from 'apollo-server-express';
-import { ExpressContext } from 'apollo-server-express/dist/ApolloServer';
-import { PrismaClient } from '@prisma/client';
 
 import { APIContext } from './types/APIContext';
 // eslint-disable-next-line import/no-cycle

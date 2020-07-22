@@ -190,7 +190,7 @@ export interface NexusGenInputs {
 }
 
 export interface NexusGenEnums {
-  PaginationSortByEnum: "createdAt" | "email" | "id" | "score"
+  PaginationSortByEnum: "createdAt" | "email" | "id" | "name" | "score"
   TagTypeEnum: "AGENT" | "DEFAULT" | "LOCATION"
   TriggerConditionEnum: prisma.TriggerConditionEnum
   TriggerMediumEnum: "BOTH" | "EMAIL" | "PHONE"
@@ -270,11 +270,7 @@ export interface NexusGenRootTypes {
     sessions: NexusGenRootTypes['Session'][]; // [Session!]!
     startDate?: string | null; // String
   }
-  TagType: { // root type
-    id: string; // ID!
-    name: string; // String!
-    type: NexusGenEnums['TagTypeEnum']; // TagTypeEnum!
-  }
+  Tag: prisma.Tag;
   TriggerConditionType: { // root type
     id: number; // Int!
     maxValue?: number | null; // Int
@@ -405,7 +401,7 @@ export interface NexusGenFieldTypes {
     sessions: NexusGenRootTypes['Session'][]; // [Session!]!
     slug: string; // String!
     statistics: NexusGenRootTypes['DialogueStatistics'] | null; // DialogueStatistics
-    tags: NexusGenRootTypes['TagType'][] | null; // [TagType!]
+    tags: NexusGenRootTypes['Tag'][] | null; // [Tag!]
     title: string; // String!
     updatedAt: string | null; // String
   }
@@ -448,11 +444,11 @@ export interface NexusGenFieldTypes {
     createPermission: NexusGenRootTypes['PermssionType'] | null; // PermssionType
     createRole: NexusGenRootTypes['RoleType']; // RoleType!
     createSession: NexusGenRootTypes['Session']; // Session!
-    createTag: NexusGenRootTypes['TagType']; // TagType!
+    createTag: NexusGenRootTypes['Tag']; // Tag!
     createTrigger: NexusGenRootTypes['TriggerType']; // TriggerType!
     createUser: NexusGenRootTypes['UserType']; // UserType!
     deleteDialogue: NexusGenRootTypes['Dialogue']; // Dialogue!
-    deleteTag: NexusGenRootTypes['TagType']; // TagType!
+    deleteTag: NexusGenRootTypes['Tag']; // Tag!
     deleteTrigger: NexusGenRootTypes['TriggerType'] | null; // TriggerType
     deleteUser: NexusGenRootTypes['UserType']; // UserType!
     editCustomer: NexusGenRootTypes['Customer']; // Customer!
@@ -502,7 +498,7 @@ export interface NexusGenFieldTypes {
     roles: NexusGenRootTypes['RoleType'][] | null; // [RoleType!]
     session: NexusGenRootTypes['Session'] | null; // Session
     sessions: NexusGenRootTypes['Session'][]; // [Session!]!
-    tags: NexusGenRootTypes['TagType'][]; // [TagType!]!
+    tags: NexusGenRootTypes['Tag'][]; // [Tag!]!
     trigger: NexusGenRootTypes['TriggerType'] | null; // TriggerType
     triggerConnection: NexusGenRootTypes['TriggerConnectionType'] | null; // TriggerConnectionType
     triggers: NexusGenRootTypes['TriggerType'][]; // [TriggerType!]!
@@ -564,7 +560,8 @@ export interface NexusGenFieldTypes {
     sessions: NexusGenRootTypes['Session'][]; // [Session!]!
     startDate: string | null; // String
   }
-  TagType: { // field return type
+  Tag: { // field return type
+    customerId: string; // String!
     id: string; // ID!
     name: string; // String!
     type: NexusGenEnums['TagTypeEnum']; // TagTypeEnum!
@@ -799,7 +796,7 @@ export interface NexusGenAbstractResolveReturnTypes {
 
 export interface NexusGenInheritedFields {}
 
-export type NexusGenObjectNames = "ColourSettings" | "Customer" | "CustomerSettings" | "Dialogue" | "DialogueStatistics" | "Edge" | "EdgeCondition" | "FontSettings" | "ImageType" | "Mutation" | "NodeEntry" | "NodeEntryValue" | "PaginationPageInfo" | "PermssionType" | "Query" | "QuestionNode" | "QuestionOption" | "RoleConnection" | "RoleType" | "Session" | "SessionConnection" | "TagType" | "TriggerConditionType" | "TriggerConnectionType" | "TriggerType" | "UserTable" | "UserType" | "lineChartDataType" | "topPathType";
+export type NexusGenObjectNames = "ColourSettings" | "Customer" | "CustomerSettings" | "Dialogue" | "DialogueStatistics" | "Edge" | "EdgeCondition" | "FontSettings" | "ImageType" | "Mutation" | "NodeEntry" | "NodeEntryValue" | "PaginationPageInfo" | "PermssionType" | "Query" | "QuestionNode" | "QuestionOption" | "RoleConnection" | "RoleType" | "Session" | "SessionConnection" | "Tag" | "TriggerConditionType" | "TriggerConnectionType" | "TriggerType" | "UserTable" | "UserType" | "lineChartDataType" | "topPathType";
 
 export type NexusGenInputNames = "AddDialogueInput" | "ChoiceNodeEntryInput" | "CustomerCreateOptions" | "CustomerEditOptions" | "DialogueFilterInputType" | "DialogueWhereUniqueInput" | "EdgeChildInput" | "EdgeNodeInput" | "LeafNodeInput" | "NodeEntryInput" | "OptionInput" | "PaginationSortInput" | "PaginationWhereInput" | "PermissionIdsInput" | "PermissionInput" | "QuestionConditionInput" | "QuestionInput" | "QuestionNodeWhereInput" | "QuestionNodeWhereUniqueInput" | "RecipientsInputType" | "RegisterNodeEntryInput" | "RoleDataInput" | "RoleInput" | "SessionInput" | "SessionWhereUniqueInput" | "SliderNodeEntryInput" | "TagsInputObjectType" | "TextboxNodeEntryInput" | "TopicDataEntry" | "TriggerConditionInputType" | "TriggerInputType" | "UserInput";
 
