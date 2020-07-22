@@ -63,6 +63,10 @@ type CustomerSettings {
   logoUrl: String
 }
 
+input CustomerWhereUniqueInput {
+  id: ID!
+}
+
 type Dialogue {
   averageScore: Float!
   countInteractions: Int
@@ -165,6 +169,7 @@ type Mutation {
   createTag(customerSlug: String, name: String, type: TagTypeEnum): Tag!
   createTrigger(customerSlug: String, questionId: String, recipients: RecipientsInputType, trigger: TriggerInputType): TriggerType!
   createUser(customerSlug: String, input: UserInput): UserType!
+  deleteCustomer(where: CustomerWhereUniqueInput): Customer
   deleteDialogue(where: DialogueWhereUniqueInput): Dialogue!
   deleteTag(tagId: String): Tag!
   deleteTrigger(id: String): TriggerType

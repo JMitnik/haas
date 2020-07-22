@@ -275,6 +275,7 @@ export default [
   Upload,
   CustomersQuery,
   CustomerQuery,
+  DeleteCustomerMutation,
   CustomerMutations,
   CustomerCreateOptionsInput,
   CustomerType,

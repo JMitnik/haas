@@ -86,13 +86,18 @@ const CustomerCard = ({ customer }: { customer: any }) => {
       backgroundColor={primaryColor.hex()}
       color={primaryColor.isDark() ? 'white' : '#444'}
       onClick={() => setCustomerSlug(customer.slug)}
+      data-cy="CustomerCard"
     >
       <CardBody flex="100%">
         <Div>
-          <EditButtonContainer onClick={(e) => setCustomerEditPath(e, customer.slug)}>
+          <EditButtonContainer
+            data-cy="EditCustomerButton"
+            onClick={(e) => setCustomerEditPath(e, customer.slug)}
+          >
             <Edit />
           </EditButtonContainer>
           <DeleteButtonContainer
+            data-cy="DeleteCustomerButton"
             onClick={(e) => deleteClickedCustomer(e, customer.id)}
           >
             <X />

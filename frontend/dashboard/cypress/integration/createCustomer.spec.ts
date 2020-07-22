@@ -1,20 +1,73 @@
-describe('Creating a customer', () => {
+import faker = require('faker');
+
+interface CustomerProps {
+  name: string;
+  logoUrl: string;
+  slug: string;
+  primaryColor: string;
+}
+
+const createCustomerFromDashboardPage = (customer: CustomerProps) => {
+  cy.get('a[href*="add"]').click();
+
+  // Register form and submit
+  const form = cy.get('form');
+  form.within(() => {
+    cy.get('input[name="name"]').type(customer.name);
+    cy.get('input[name="logo"]').type(customer.logoUrl);
+    cy.get('input[name="slug"]').type(customer.slug);
+    cy.get('input[name="primaryColour"]').type(customer.primaryColor);
+  });
+  cy.get('form').submit();
+};
+
+const generateCustomer = (): CustomerProps => {
+  const companyName = faker.name.findName();
+
+  return {
+    name: companyName,
+    logoUrl: faker.image.business(),
+    primaryColor: '#ffffff',
+    slug: faker.helpers.slugify(companyName),
+  };
+};
+
+describe('Creating a customer, deleting a customer, editing a customer', () => {
+  const company = generateCustomer();
+
   it('Visits the dashboard page', () => {
-    expect(true).to.equal(true);
     cy.visit('localhost:3002');
 
-    // Find something to add
-    cy.get('a[href*="add"]').click();
+    // Expect that we are in the customersoverview
+    cy.contains('Customer');
+  });
 
-    // Register form and submit
+  it('Creates a customer', () => {
+    createCustomerFromDashboardPage(company);
+  });
+
+  it('Edits this customer', () => {
+    // Assert we are still in this page
+    cy.contains('Customers');
+
+    // Go to customer card and edit.
+    const customerCard = cy.contains(company.name).parentsUntil('[data-cy="CustomerCard"]');
+    customerCard.find('[data-cy="EditCustomerButton"]').click();
+
     const form = cy.get('form');
     form.within(() => {
-      cy.get('input[name="name"]').type('Starbucks');
-      cy.get('input[name="logo"]').type('https://www.vanatotzekerheid.nl/wp-content/uploads/2016/09/Starbucks-Logo-051711-600x566.gif');
-      cy.get('input[name="slug"]').type('starbucks');
-      cy.get('input[name="primaryColour"]').type('#ffffff');
+      cy.get('input[name="logo"]').type(faker.image.imageUrl());
     });
-
     cy.get('form').submit();
+  });
+
+  it('Delete this customer', () => {
+    // Assert we are still in this page
+    cy.contains('Customers');
+
+    // Find the customer-card
+    const customerCard = cy.contains(company.name).parentsUntil('[data-cy="CustomerCard"]');
+    customerCard.find('[data-cy="DeleteCustomerButton"]').click();
+    customerCard.should('not.exist');
   });
 });
