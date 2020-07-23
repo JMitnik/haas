@@ -12,8 +12,8 @@ ${({ theme }) => css`
 //   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 // `;
 
-export const ConditionContainer = styled(Flex)`
-  ${({ theme }) => css`
+export const ConditionContainer = styled(Flex) <{ activeCTA: string | null, id: string }>`
+  ${({ activeCTA, id, theme }) => css`
     color: ${theme.colors.default.darkest};
     background: ${theme.colors.white};
     flex-direction: column;
@@ -23,6 +23,19 @@ export const ConditionContainer = styled(Flex)`
     margin-bottom: 25px;
     width: 60px;
     height: 60px;
+
+    ${!activeCTA && css`
+    background-color: ${theme.colors.white};
+    `};
+
+    ${activeCTA === id && css`
+    background-color: ${theme.colors.white};
+    `};
+
+    ${activeCTA && activeCTA !== id && css`
+    background-color: ${theme.colors.white};
+    opacity: 0.5;
+    `};
 
     border-top-left-radius: ${theme.borderRadiuses.somewhatRounded};
     border-bottom-left-radius: ${theme.borderRadiuses.somewhatRounded};

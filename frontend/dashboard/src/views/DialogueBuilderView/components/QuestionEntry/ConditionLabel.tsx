@@ -5,8 +5,14 @@ import HaasNodeIcon from 'components/Icons/HaasNodeIcon';
 
 import { ConditionContainer, ConditionSpan } from './QuestionEntryStyles';
 
-const ConditionLabel = ({ condition } : { condition: EdgeConditonProps | undefined}) => (
-  <ConditionContainer>
+interface ConditionLabelProps {
+  condition: EdgeConditonProps | undefined;
+  id: string;
+  activeCTA: string | null;
+}
+
+const ConditionLabel = ({ activeCTA, id, condition } : ConditionLabelProps) => (
+  <ConditionContainer activeCTA={activeCTA} id={id}>
     <HaasNodeIcon width="25" height="25" isDark />
     {condition?.conditionType === 'match' && (
     <ConditionSpan fontSize="0.6em">

@@ -82,7 +82,7 @@ const QuestionEntryItem = (
   return (
     <Flex position="relative" justifyContent="center" alignItems="center" flexGrow={1}>
       {depth > 1 && (
-        <ConditionLabel condition={condition} />
+        <ConditionLabel activeCTA={activeQuestion} id={question.id} condition={condition} />
       )}
       <QuestionEntryViewContainer activeCTA={activeQuestion} id={question.id} flexGrow={1}>
         <QuestionEntryContainer flexGrow={1}>
