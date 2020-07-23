@@ -84,7 +84,7 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: 
   const handleMultiChange = useCallback((selectedOption: any) => {
     setValue('ctaType', selectedOption?.value);
     setActiveType(selectedOption);
-  }, []);
+  }, [setValue, setActiveType]);
 
   useEffect(() => {
     handleMultiChange(activeType);
