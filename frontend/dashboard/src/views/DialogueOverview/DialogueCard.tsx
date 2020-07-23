@@ -139,7 +139,7 @@ const TagContainer = styled(Flex)`
 `;
 
 const Tag = ({ tag }: { tag: TagProps }) => (
-  <TagContainer>
+  <TagContainer data-cy="TagLabel">
     {tag.type === 'LOCATION' && (
       <MapPin />
     )}

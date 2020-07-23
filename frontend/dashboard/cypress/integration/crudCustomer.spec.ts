@@ -59,7 +59,6 @@ describe('Creating a customer, deleting a customer, editing a customer', () => {
       cy.get('input[name="logo"]').type(faker.image.imageUrl());
     });
     cy.get('form').submit();
-  });
 
   it('Delete this customer', () => {
     // Assert we are still in this page

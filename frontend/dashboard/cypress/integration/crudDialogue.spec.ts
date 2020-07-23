@@ -15,7 +15,8 @@ interface DialogueProps {
 }
 
 interface DialogueCreateOptions {
-  useTemplate: boolean;
+  useTemplate?: boolean;
+  willSubmit?: boolean
 }
 
 interface CustomerCreateOptions {
@@ -41,6 +42,24 @@ const createCustomerFromDashboardPage = (customer: CustomerProps, customerCreate
   cy.get('form').submit();
 };
 
+const createDialogueFromDialoguesPage = (dialogue: DialogueProps, options?: DialogueCreateOptions) => {
+  // Go to add dialogue view
+  cy.get('[data-cy="AddDialogueCard"]').click();
+
+  // Fill in form
+  const form = cy.get('form');
+  form.within(() => {
+    cy.get('input[name="title"]').type(dialogue.title);
+    cy.get('input[name="publicTitle"]').type(dialogue.publicTitle);
+    cy.get('input[name="slug"]').type(dialogue.urlSlug);
+    cy.get('textarea[name="description"]').type(dialogue.description);
+  });
+
+  if (options?.willSubmit) {
+    cy.get('form').submit();
+  }
+};
+
 const generateCustomer = (): CustomerProps => {
   const companyName = faker.name.findName();
 
@@ -52,7 +71,14 @@ const generateCustomer = (): CustomerProps => {
   };
 };
 
-describe('Creating a customer, with a default dialogue', () => {
+const generateDialogue = (): DialogueProps => ({
+  description: 'Default',
+  publicTitle: 'Title',
+  title: 'Default test with tags',
+  urlSlug: 'Test',
+});
+
+describe('Test Dialogue operations', () => {
   const company = generateCustomer();
 
   it('Visits the dashboard page', () => {
@@ -81,6 +107,9 @@ describe('Creating a customer, with a default dialogue', () => {
   });
 
   it('Creates a second dialogue using the Create Dialogue screen', () => {
+    // Just in case, assume we are in dashboard already, and click
+    cy.get('[data-cy="Sidenav"]').contains('Dialogues').click();
+
     const newDialogue: DialogueProps = {
       title: 'Test Dialogue',
       description: 'Test dialogue to be deleted',
@@ -88,36 +117,19 @@ describe('Creating a customer, with a default dialogue', () => {
       urlSlug: 'test-dialogue',
     };
 
-    // Just in case, assume we are in dashboard already, and click
-    const sidenav = cy.get('[data-cy="Sidenav"]');
-    sidenav.contains('Dialogues').click();
-
-    // Go to add dialogue view
-    cy.get('[data-cy="AddDialogueCard"]').click();
-
-    // Fill in form
-    const form = cy.get('form');
-    form.within(() => {
-      cy.get('input[name="title"]').type(newDialogue.title);
-      cy.get('input[name="publicTitle"]').type(newDialogue.publicTitle);
-      cy.get('input[name="slug"]').type(newDialogue.urlSlug);
-      cy.get('textarea[name="description"]').type(newDialogue.description);
-    });
-
-    // Submit (save form)
+    createDialogueFromDialoguesPage(newDialogue);
     cy.get('form').submit();
   });
 
   it('Search for the newly made test dialogue', () => {
     // Just in case, assume we are in dashboard already, and click
-    const sidenav = cy.get('[data-cy="Sidenav"]');
-    sidenav.contains('Dialogues').click();
+    cy.get('[data-cy="Sidenav"]').contains('Dialogues').click();
 
     // Type test in the search bar
     cy.get('[data-cy="SearchbarInput"]').type('Test');
 
     // Wait 3 sec
-    cy.wait(3000);
+    cy.wait(1000);
     cy.get('[data-cy="DialogueCard"]').should('have.length', 1);
   });
 
@@ -128,5 +140,37 @@ describe('Creating a customer, with a default dialogue', () => {
 
     // There should be a dropdown (maybe test?)
     dialogueCard.contains('Delete').click();
+  });
+
+  it('Creates a dialogue with a tag', () => {
+    cy.visit('http://localhost:3002/b');
+
+    // Go to dashboard and create customer
+    const newCustomer = generateCustomer();
+    createCustomerFromDashboardPage(newCustomer);
+
+    // Create a new dialogue, and fill it in with basic stuff
+    cy.contains(company.name).parentsUntil('[data-cy="CustomerCard"]').first().click();
+    const newDialogue = generateDialogue();
+    createDialogueFromDialoguesPage(newDialogue, {
+      willSubmit: false,
+    });
+
+    cy.get('[data-cy="AddTagButton"]').click();
+
+    // Dealing with react dropdowns
+    cy.get('[class*="-control"]')
+      .click(0, 0, { force: true })
+      .get('[class*="-menu"]')
+      .find('[class*="-option"]')
+      .eq(2)
+      .click(0, 0, { force: true });
+
+    // Submit
+    cy.get('form').submit();
+
+    // Go to dialogueoverview, expect to see a tag on the card
+    cy.contains(newDialogue.title).parentsUntil('[data-cy="DialogueCard"]').find('[data-cy="TagLabel"]')
+      .should('have.length', 1);
   });
 });
