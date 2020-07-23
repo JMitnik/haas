@@ -35,21 +35,21 @@ const HEADERS = [
 ];
 
 const UsersOverview = () => {
-  const { customerId, customerSlug } = useParams();
+  const { customerSlug } = useParams();
   const history = useHistory();
   const [fetchUsers, { data }] = useLazyQuery(getUsersQuery, { fetchPolicy: 'cache-and-network' });
-  const [paginationProps, setPaginationProps] = useState<TableProps>(
-    {
-      activeStartDate: null,
-      activeEndDate: null,
-      activeSearchTerm: '',
-      pageIndex: 0,
-      pageSize: 8,
-      sortBy: [{ by: 'email', desc: true }],
-    },
-  );
+
+  const [paginationProps, setPaginationProps] = useState<TableProps>({
+    activeStartDate: null,
+    activeEndDate: null,
+    activeSearchTerm: '',
+    pageIndex: 0,
+    pageSize: 8,
+    sortBy: [{ by: 'email', desc: true }],
+  });
 
   const tableData: any = data?.userTable.users || [];
+
   useEffect(() => {
     const { activeStartDate, activeEndDate, pageIndex, pageSize, sortBy, activeSearchTerm } = paginationProps;
     fetchUsers({
@@ -69,8 +69,10 @@ const UsersOverview = () => {
   }, [customerSlug, fetchUsers, paginationProps]);
 
   const [deleteUser] = useMutation(deleteUserQuery, {
-    refetchQueries: [{ query: getUsersQuery,
-      variables: { customerSlug,
+    refetchQueries: [{
+      query: getUsersQuery,
+      variables: {
+        customerSlug,
         filter: {
           startDate: paginationProps.activeStartDate,
           endDate: paginationProps.activeEndDate,
@@ -79,7 +81,9 @@ const UsersOverview = () => {
           limit: paginationProps.pageSize,
           pageIndex: paginationProps.pageIndex,
           orderBy: paginationProps.sortBy,
-        } } }],
+        },
+      },
+    }],
     onError: (serverError: ApolloError) => {
       console.log(serverError);
     },
