@@ -1,12 +1,11 @@
 import { ApolloError } from 'apollo-client';
-import { Edit3, X } from 'react-feather';
 import { Flex, Span } from '@haas/ui';
+import { X } from 'react-feather';
 import { useMutation } from '@apollo/react-hooks';
 import { useParams } from 'react-router';
 import React from 'react';
 
 import EditButton from 'components/EditButton';
-import EditCTAButton from 'views/ActionsOverview/components/EditCTAButton';
 import deleteQuestionMutation from 'mutations/deleteQuestion';
 import getTopicBuilderQuery from 'queries/getQuestionnaireQuery';
 
