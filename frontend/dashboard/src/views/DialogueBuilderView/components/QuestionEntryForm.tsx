@@ -1,19 +1,23 @@
 
-import { MinusCircle, PlusCircle, X } from 'react-feather';
+import { ApolloError } from 'apollo-client';
+import { MinusCircle, PlusCircle } from 'react-feather';
 import { useForm } from 'react-hook-form';
 import { useMutation } from '@apollo/react-hooks';
 import { useParams } from 'react-router';
 import React, { useState } from 'react';
 import Select from 'react-select';
 
-import { Button, Div, Flex, Form, FormGroupContainer, Grid, H3, H4, Hr, Muted, StyledInput, StyledLabel } from '@haas/ui';
-import { DeleteQuestionOptionButtonContainer } from 'views/DialogueBuilderView/components/QuestionEntry/QuestionEntryStyles';
+import { Button, Div, Flex, Form, FormGroupContainer,
+  Grid, H3, H4, Hr, Muted, StyledInput, StyledLabel } from '@haas/ui';
+import {
+  DeleteQuestionOptionButtonContainer,
+} from 'views/DialogueBuilderView/components/QuestionEntry/QuestionEntryStyles';
 import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
+import createQuestionMutation from 'mutations/createQuestion';
 import updateQuestionMutation from 'mutations/updateQuestion';
 
-import { ApolloError } from 'apollo-client';
-import createQuestionMutation from 'mutations/createQuestion';
-import { EdgeConditonProps, OverrideLeafProps, QuestionEntryProps, QuestionOptionProps } from '../DialogueBuilderInterfaces';
+import { EdgeConditonProps,
+  OverrideLeafProps, QuestionEntryProps, QuestionOptionProps } from '../DialogueBuilderInterfaces';
 
 interface FormDataProps {
   title: string;
@@ -74,7 +78,9 @@ const QuestionEntryForm = ({
   const [activeQuestionType, setActiveQuestionType] = useState(type);
 
   const [activeOptions, setActiveOptions] = useState(options);
-  const [activematchValue, setActiveMatchValue] = useState<null | {label: string, value: string}>(condition?.matchValue ? { label: condition.matchValue, value: condition.matchValue } : null);
+
+  const matchValue = condition?.matchValue ? { label: condition.matchValue, value: condition.matchValue } : null;
+  const [activematchValue, setActiveMatchValue] = useState<null | {label: string, value: string}>(matchValue);
   const [activeLeaf, setActiveLeaf] = useState({ label: overrideLeaf?.title, value: overrideLeaf?.id });
   const [activeConditionSelect, setActiveConditionSelect] = useState<null | { label: string, value: string}>(
     condition?.conditionType
@@ -86,7 +92,6 @@ const QuestionEntryForm = ({
   const [activeCondition, setActiveCondition] = useState<null | EdgeConditonProps>(condition || null);
 
   const [createQuestion] = useMutation(createQuestionMutation, {
-    // TODO: Refetch nodes so parentOptions are correctly updated
     onCompleted: () => {
       if (onAddExpandChange) {
         onAddExpandChange(false);
@@ -107,7 +112,6 @@ const QuestionEntryForm = ({
   });
 
   const [updateQuestion] = useMutation(updateQuestionMutation, {
-    // TODO: Refetch nodes so parentOptions are correctly updated
     onCompleted: () => {
       onActiveQuestionChange(null);
     },
@@ -231,11 +235,11 @@ const QuestionEntryForm = ({
           edgeCondition,
         },
       });
-      // TODO: Add new question (and edge!!!)
     }
   };
 
   const parentOptionsSelect = parentOptions?.map((option) => ({ label: option.value, value: option.value }));
+
   return (
     <Form onSubmit={handleSubmit(onSubmit)}>
       <FormGroupContainer>

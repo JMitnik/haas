@@ -5,6 +5,7 @@ import { useMutation } from '@apollo/react-hooks';
 import { useParams } from 'react-router';
 import React from 'react';
 
+import EditButton from 'components/EditButton';
 import EditCTAButton from 'views/ActionsOverview/components/EditCTAButton';
 import deleteQuestionMutation from 'mutations/deleteQuestion';
 import getTopicBuilderQuery from 'queries/getQuestionnaireQuery';
@@ -105,15 +106,10 @@ const QuestionEntryItem = (
             </Flex>
 
             <Flex width="30%" alignItems="center" justifyContent="center">
-              <EditCTAButton
-                disabled={(activeQuestion && activeQuestion !== question.id) || false}
+              <EditButton
+                isDisabled={(activeQuestion && activeQuestion !== question.id) || false}
                 onClick={() => onActiveQuestionChange(question.id)}
-              >
-                <Edit3 />
-                <Span>
-                  Edit
-                </Span>
-              </EditCTAButton>
+              />
             </Flex>
 
           </Flex>
