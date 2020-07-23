@@ -7,13 +7,13 @@ import React, { useState } from 'react';
 import Select from 'react-select';
 
 import { Button, Div, Flex, Form, FormGroupContainer, Grid, H3, H4, Hr, Muted, StyledInput, StyledLabel } from '@haas/ui';
-import { DeleteQuestionOptionButtonContainer } from 'views/DialogueBuilderView/QuestionEntry/QuestionEntryStyles';
+import { DeleteQuestionOptionButtonContainer } from 'views/DialogueBuilderView/components/QuestionEntry/QuestionEntryStyles';
 import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
 import updateQuestionMutation from 'mutations/updateQuestion';
 
 import { ApolloError } from 'apollo-client';
 import createQuestionMutation from 'mutations/createQuestion';
-import { EdgeConditonProps, OverrideLeafProps, QuestionEntryProps, QuestionOptionProps } from '../TopicBuilderInterfaces';
+import { EdgeConditonProps, OverrideLeafProps, QuestionEntryProps, QuestionOptionProps } from '../DialogueBuilderInterfaces';
 
 interface FormDataProps {
   title: string;

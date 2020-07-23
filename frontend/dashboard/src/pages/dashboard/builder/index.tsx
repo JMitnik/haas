@@ -3,7 +3,7 @@ import { useParams } from 'react-router';
 import { useQuery } from '@apollo/react-hooks';
 import React from 'react';
 
-import { EdgeChildProps, QuestionEntryProps } from 'views/DialogueBuilderView/TopicBuilderInterfaces';
+import { EdgeChildProps, QuestionEntryProps } from 'views/DialogueBuilderView/DialogueBuilderInterfaces';
 import { Loader } from '@haas/ui';
 import DialogueBuilderView from 'views/DialogueBuilderView/DialogueBuilderView';
 import HaasNodeIcon from 'components/Icons/HaasNodeIcon';

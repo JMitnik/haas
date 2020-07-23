@@ -3,9 +3,9 @@ import { ColumnFlex, Div, H2 } from '@haas/ui';
 import React, { useState } from 'react';
 
 import { DialogueBuilderContainer } from './DialogueBuilderStyles';
-import { QuestionEntryProps } from './TopicBuilderInterfaces';
+import { QuestionEntryProps } from './DialogueBuilderInterfaces';
 
-import QuestionSection from './QuestionEntry/QuestionSection';
+import QuestionSection from './components/QuestionSection';
 
 interface QuestionEntryExtendedProps extends QuestionEntryProps {
   icon: (props: any) => JSX.Element;

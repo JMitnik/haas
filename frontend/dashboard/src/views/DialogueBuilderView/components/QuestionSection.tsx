@@ -4,9 +4,9 @@ import React, { useState } from 'react';
 import { Div, Flex, H2 } from '@haas/ui';
 import SplitArrowIcon from 'components/Icons/SplitIcon';
 
-import { AddQuestionContainer, DepthSpan } from './QuestionEntryStyles';
-import { EdgeConditonProps, QuestionEntryProps, QuestionOptionProps } from '../TopicBuilderInterfaces';
-import QuestionEntry from './QuestionEntry';
+import { AddQuestionContainer, DepthSpan } from './QuestionEntry/QuestionEntryStyles';
+import { EdgeConditonProps, QuestionEntryProps, QuestionOptionProps } from '../DialogueBuilderInterfaces';
+import QuestionEntry from './QuestionEntry/QuestionEntry';
 
 interface QuestionSectionProps {
   options: QuestionOptionProps[] | undefined;
@@ -72,7 +72,7 @@ const QuestionSection = (
   // 3. add marginLeft={`${depth * 10 + 10}px`} to Div around where (isQuestionExpanded && isAddExpanded)
   return (
     <Flex paddingTop="10px" paddingBottom="10px" flexDirection="column">
-      { depth > 1 && index === 0 && (
+      {depth > 1 && index === 0 && (
       <Flex marginBottom="15px" alignItems="center">
         <SplitArrowIcon />
         <DepthSpan fontSize="0.9em">
@@ -82,6 +82,7 @@ const QuestionSection = (
         </DepthSpan>
       </Flex>
       )}
+
       <QuestionEntry
         depth={depth}
         edgeId={edgeId}
@@ -100,6 +101,7 @@ const QuestionSection = (
         Icon={Icon}
         leafs={leafs}
       />
+
       {isQuestionExpanded && children.map(
         (child, index) => (
           <QuestionSection
@@ -120,6 +122,7 @@ const QuestionSection = (
           />
         ),
       )}
+
       {(isQuestionExpanded && !isAddExpanded) && (
         <AddQuestionContainer onClick={() => handleAdd()}>
           <Flex justifyContent="center" alignItems="center">
@@ -130,6 +133,7 @@ const QuestionSection = (
           </Flex>
         </AddQuestionContainer>
       )}
+
       {(isQuestionExpanded && isAddExpanded) && (
         <Div>
           <QuestionEntry
@@ -155,11 +159,9 @@ const QuestionSection = (
             leafs={leafs}
           />
         </Div>
-
       )}
 
     </Flex>
-
   );
 };
 

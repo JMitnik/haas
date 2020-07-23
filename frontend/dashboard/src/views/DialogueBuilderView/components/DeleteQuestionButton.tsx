@@ -1,6 +1,6 @@
 import styled, { css } from 'styled-components/macro';
 
-const DeleteCTAButton = styled.button`
+const DeleteQuestionButton = styled.button`
    ${({ disabled }) => css`
     ${!disabled && css`
         &:hover {
@@ -29,4 +29,4 @@ const DeleteCTAButton = styled.button`
   transition: all 0.2s ease-in;
 `;
 
-export default DeleteCTAButton;
+export default DeleteQuestionButton;

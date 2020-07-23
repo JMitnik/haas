@@ -1,35 +1,22 @@
-import { Div, Flex, Span } from '@haas/ui';
-import { Edit3, Minus, Plus, X } from 'react-feather';
-import React from 'react';
-
-import DeleteQuestionMutation from 'mutations/deleteQuestion';
-import EditCTAButton from 'views/ActionsOverview/components/EditCTAButton';
-import HaasNodeIcon from 'components/Icons/HaasNodeIcon';
-import LinkIcon from 'components/Icons/LinkIcon';
-import OpinionIcon from 'components/Icons/OpinionIcon';
-import RegisterIcon from 'components/Icons/RegisterIcon';
-
-import {
-  AddChildContainer,
-  AddChildIconContainer,
-  ConditionContainer,
-  ConditionSpan,
-  LinkContainer,
-  OverflowSpan,
-  QuestionEntryContainer,
-  QuestionEntryViewContainer,
-  TypeSpan,
-} from './QuestionEntryStyles';
-import { EdgeConditonProps, QuestionEntryProps, QuestionOptionProps } from '../TopicBuilderInterfaces';
-import BuilderIcon from '../components/BuilderIcon';
-import DeleteCTAButton from '../components/DeleteCTAButton';
-import deleteQuestionMutation from 'mutations/deleteQuestion';
-
 import { ApolloError } from 'apollo-client';
+import { Edit3, X } from 'react-feather';
+import { Flex, Span } from '@haas/ui';
 import { useMutation } from '@apollo/react-hooks';
 import { useParams } from 'react-router';
-import QuestionEntryForm from './QuestionEntryForm';
+import React from 'react';
+
+import EditCTAButton from 'views/ActionsOverview/components/EditCTAButton';
+import deleteQuestionMutation from 'mutations/deleteQuestion';
 import getTopicBuilderQuery from 'queries/getQuestionnaireQuery';
+
+import { EdgeConditonProps, QuestionEntryProps, QuestionOptionProps } from '../../DialogueBuilderInterfaces';
+import { OverflowSpan, QuestionEntryContainer, QuestionEntryViewContainer } from './QuestionEntryStyles';
+import BuilderIcon from '../BuilderIcon';
+import CTALabel from './CTALabel';
+import ConditionLabel from './ConditionLabel';
+import DeleteQuestionButton from '../DeleteQuestionButton';
+import QuestionEntryForm from '../QuestionEntryForm';
+import ShowChildQuestion from './ShowChildQuestion';
 
 interface QuestionEntryItemProps {
   onAddExpandChange?: React.Dispatch<React.SetStateAction<boolean>>;
@@ -51,41 +38,6 @@ interface QuestionEntryItemProps {
   depth: number;
 }
 
-interface AddChildComponentProps {
-  amtChildren?: number;
-  isExpanded: Boolean;
-  onExpandChange: () => void;
-}
-
-const AddChildComponent = ({ amtChildren, isExpanded, onExpandChange }: AddChildComponentProps) => (
-  <AddChildContainer onClick={() => onExpandChange()}>
-    <AddChildIconContainer>
-      {isExpanded ? <Minus /> : <Plus />}
-    </AddChildIconContainer>
-    <Span padding="4px">
-      {isExpanded ? `Hide children (${amtChildren})` : `Show children (${amtChildren})`}
-    </Span>
-  </AddChildContainer>
-);
-
-const ConditionView = ({ condition } : { condition: EdgeConditonProps | undefined}) => (
-  <ConditionContainer>
-    <HaasNodeIcon width="25" height="25" isDark />
-    {condition?.conditionType === 'match' && (
-      <ConditionSpan fontSize="0.6em">
-        <abbr title={condition.matchValue}>{condition.matchValue}</abbr>
-      </ConditionSpan>
-    )}
-
-    {condition?.conditionType === 'valueBoundary' && (
-      <ConditionSpan fontSize="0.6em">
-        {`${condition.renderMin} - ${condition.renderMax}`}
-      </ConditionSpan>
-    )}
-
-  </ConditionContainer>
-);
-
 const QuestionEntryItem = (
   { depth,
     question,
@@ -104,7 +56,7 @@ const QuestionEntryItem = (
 ) => {
   const { customerSlug, dialogueSlug } = useParams();
 
-  const [deleteQuestion, { loading }] = useMutation(deleteQuestionMutation, {
+  const [deleteQuestion] = useMutation(deleteQuestionMutation, {
     variables: {
       id: question.id,
       customerSlug,
@@ -129,16 +81,16 @@ const QuestionEntryItem = (
   return (
     <Flex position="relative" justifyContent="center" alignItems="center" flexGrow={1}>
       {depth > 1 && (
-        <ConditionView condition={condition} />
+        <ConditionLabel condition={condition} />
       )}
       <QuestionEntryViewContainer activeCTA={activeQuestion} id={question.id} flexGrow={1}>
         <QuestionEntryContainer flexGrow={1}>
-          <DeleteCTAButton
+          <DeleteQuestionButton
             disabled={(!!activeQuestion && activeQuestion !== question.id) || false}
             onClick={() => deleteQuestion()}
           >
             <X />
-          </DeleteCTAButton>
+          </DeleteQuestionButton>
 
           <Flex flexDirection="row" width="100%">
             <BuilderIcon type={question.type} Icon={Icon} />
@@ -188,34 +140,11 @@ const QuestionEntryItem = (
 
         </QuestionEntryContainer>
       </QuestionEntryViewContainer>
-      <LinkContainer hasCTA={!!question.overrideLeaf?.id}>
-        <Flex
-          flexDirection="column"
-          padding="25px"
-          minWidth="80px"
-          color="black"
-          justifyContent="center"
-          alignItems="center"
-        >
-          {(!question.overrideLeaf?.type || question.overrideLeaf?.type === 'Link') && (
-            <LinkIcon isCTA hasCTA />
-          )}
 
-          {question.overrideLeaf?.type === 'Opinion' && (
-            <OpinionIcon isCTA hasCTA />
-          )}
+      <CTALabel question={question} />
 
-          {question.overrideLeaf?.type === 'Register' && (
-            <RegisterIcon isCTA hasCTA />
-          )}
-
-          <TypeSpan fontSize="0.5em">
-            {question.overrideLeaf?.type || 'None'}
-          </TypeSpan>
-        </Flex>
-      </LinkContainer>
       {question.id !== '-1' && (
-        <AddChildComponent
+        <ShowChildQuestion
           amtChildren={question?.children?.length || 0}
           isExpanded={isExpanded}
           onExpandChange={onExpandChange}
