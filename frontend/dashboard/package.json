@@ -5,8 +5,6 @@
     "main": "src/index.tsx",
     "dependencies": {
         "@apollo/react-hooks": "^3.1.3",
-        "@graphql-codegen/cli": "^1.11.2",
-        "@graphql-codegen/typescript": "^1.11.2",
         "@haas/ui": "*",
         "@nivo/line": "^0.61.1",
         "@react-workspaces/react-scripts": "^3.3.0-alpha-08",
@@ -78,6 +76,7 @@
         ]
     },
     "devDependencies": {
+        "@graphql-codegen/cli": "^1.17.3",
         "@typescript-eslint/eslint-plugin": "^2.15.0",
         "@typescript-eslint/parser": "^2.15.0",
         "cra-workspaces": "^1.0.1",

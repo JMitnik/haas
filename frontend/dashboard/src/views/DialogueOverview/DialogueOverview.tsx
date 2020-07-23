@@ -6,6 +6,7 @@ import React from 'react';
 import Searchbar from 'components/SearchBar';
 
 import { AddDialogueCard } from './DialogueOverviewStyles';
+import { useLazyQuery } from '@apollo/react-hooks';
 import DialogueCard from './DialogueCard';
 
 // TODO: Do something about this
@@ -16,12 +17,18 @@ const DialogueOverviewFilters = () => (
 const DialogueOverview = ({ dialogues }: { dialogues: any }) => {
   const { customerSlug } = useParams();
 
+  // TODO: Handle the loading
+  const { loading, error, data } = useLazyQuery<any>(getDialoguesOfCustomer, {
+    variables: { customerSlug },
+  });
+
   return (
     <>
       <PageHeading>Dialogues</PageHeading>
 
       <Div mb={4}>
         <Grid gridTemplateColumns="300px 1fr">
+          {/* todo: Let the search not flicker the entire overview (do it on overview level again?) */}
           <Searchbar activeSearchTerm="" onSearchTermChange={(newTerm) => null} />
           <DialogueOverviewFilters />
         </Grid>

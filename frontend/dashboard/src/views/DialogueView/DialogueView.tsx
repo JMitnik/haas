@@ -11,7 +11,6 @@ import { ReactComponent as TrendingIcon } from 'assets/icons/icon-trending-up.sv
 import { ReactComponent as TrophyIcon } from 'assets/icons/icon-trophy.svg';
 
 import DatePicker from 'components/DatePicker';
-import gql from 'graphql-tag';
 import InteractionFeedModule from './Modules/InteractionFeedModule/InteractionFeedModule';
 import NegativePathsModule from './Modules/NegativePathsModule/index.tsx';
 import NodeEntriesOverview from '../NodeEntriesOverview/NodeEntriesOverview';
@@ -21,7 +20,7 @@ import SummaryAverageScoreModule from './Modules/SummaryModules/SummaryAverageSc
 import SummaryCallToActionModule from './Modules/SummaryModules/SummaryCallToActionModule';
 import SummaryInteractionCountModule from './Modules/SummaryModules/SummaryInteractionCountModule';
 import SummaryModuleContainer from './Modules/SummaryModules/SummaryModuleContainer';
-import getQuestionnaireData from '../../queries/getQuestionnaireData';
+import gql from 'graphql-tag';
 
 const filterMap = new Map([
   ['Last 24h', 1],

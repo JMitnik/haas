@@ -7,13 +7,18 @@ const getSessionAnswerFlowQuery = gql`
     }) {
         id
         nodeEntries {
-        values {
-          numberValue
-          textValue
-          multiValues {
-            textValue
-          }
           id
+          depth
+          relatedNode {
+            title
+            type
+          }
+          value {
+            slider
+            textbox
+            register
+            choice
+          }
         }
         relatedNode {
           title
