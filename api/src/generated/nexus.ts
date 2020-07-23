@@ -193,7 +193,7 @@ export interface NexusGenInputs {
 }
 
 export interface NexusGenEnums {
-  PaginationSortByEnum: "createdAt" | "email" | "id" | "name" | "score"
+  PaginationSortByEnum: "createdAt" | "email" | "firstName" | "id" | "lastName" | "name" | "role" | "score"
   TagTypeEnum: "AGENT" | "DEFAULT" | "LOCATION"
   TriggerConditionEnum: prisma.TriggerConditionEnum
   TriggerMediumEnum: "BOTH" | "EMAIL" | "PHONE"

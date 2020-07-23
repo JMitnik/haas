@@ -10,7 +10,7 @@ const DialoguesPage = () => {
   const { customerSlug } = useParams();
 
   // TODO: Handle the loading
-  const { loading, error, data } = useQuery<any>(getDialoguesOfCustomer, {
+  const { error, data } = useQuery<any>(getDialoguesOfCustomer, {
     variables: { customerSlug },
   });
   useErrorHandler(error);

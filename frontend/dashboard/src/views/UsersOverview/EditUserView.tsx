@@ -23,7 +23,7 @@ interface FormDataProps {
 }
 
 const EditUsersView = () => {
-  const { customerId, userId, customerSlug } = useParams<{ customerId: string, userId: string, customerSlug: string }>();
+  const { userId, customerSlug } = useParams<{ customerId: string, userId: string, customerSlug: string }>();
 
   const { data: userData, error, loading } = useQuery(getUserQuery, {
     fetchPolicy: 'cache-and-network',
@@ -49,7 +49,7 @@ const EditUsersView = () => {
 
 const EditCustomerForm = ({ user, roles }: { user: any, roles: Array<{ label: string, value: string }> }) => {
   const history = useHistory();
-  const { customerId, userId, customerSlug } = useParams<{ customerId: string, customerSlug: string, userId: string }>();
+  const { userId, customerSlug } = useParams<{ customerId: string, customerSlug: string, userId: string }>();
 
   const userRole = user?.role ? { label: user?.role?.name, value: user?.role?.id } : null;
   const [activeRole, setActiveRole] = useState<null | { label: string, value: string }>(userRole);

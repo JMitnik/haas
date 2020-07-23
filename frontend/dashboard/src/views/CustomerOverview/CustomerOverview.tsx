@@ -1,11 +1,11 @@
 import { ApolloError } from 'apollo-boost';
-import { useMutation, useQuery } from '@apollo/react-hooks';
+import { useMutation } from '@apollo/react-hooks';
 import Color from 'color';
-import React, { FC } from 'react';
+import React from 'react';
 
 import {
   AddCard, Card, CardBody, Container, DeleteButtonContainer, Div,
-  EditButtonContainer, Flex, Grid, H2, H3, H4, PageHeading,
+  EditButtonContainer, Flex, Grid, H3, PageHeading,
 } from '@haas/ui';
 import { Edit, Plus, X } from 'react-feather';
 import { Link, useHistory } from 'react-router-dom';

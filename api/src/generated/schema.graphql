@@ -230,8 +230,11 @@ type PaginationPageInfo {
 enum PaginationSortByEnum {
   createdAt
   email
+  firstName
   id
+  lastName
   name
+  role
   score
 }
 

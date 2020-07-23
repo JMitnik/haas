@@ -9,7 +9,6 @@ import Searchbar from 'components/SearchBar';
 import getDialoguesOfCustomer from 'queries/getDialoguesOfCustomer';
 
 import { AddDialogueCard } from './DialogueOverviewStyles';
-import { debounce } from 'lodash';
 import DialogueCard from './DialogueCard';
 
 const DialogueOverview = ({ dialogues }: { dialogues: any }) => {

@@ -23,7 +23,7 @@ interface FormDataProps {
 const AddUserView = () => {
   const history = useHistory();
   const { register, handleSubmit, errors } = useForm<FormDataProps>();
-  const { customerId, customerSlug } = useParams();
+  const { customerSlug } = useParams();
 
   const [activeRole, setActiveRole] = useState<null | { label: string, value: string }>(null);
 

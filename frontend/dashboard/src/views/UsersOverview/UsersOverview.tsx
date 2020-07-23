@@ -39,7 +39,6 @@ const UsersOverview = () => {
   const { customerSlug } = useParams();
   const history = useHistory();
   const [fetchUsers, { data }] = useLazyQuery(getUsersQuery, { fetchPolicy: 'cache-and-network' });
-  console.log(data);
 
   const [paginationProps, setPaginationProps] = useState<TableProps>({
     activeStartDate: null,
