@@ -535,4 +535,5 @@ type UserType {
   lastName: String
   phone: String
   role: RoleType
+  roleId: String
 }

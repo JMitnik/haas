@@ -152,6 +152,7 @@ const BusinessFlex = styled(Flex)`
 export const SidenavContainer = styled.div`
   ${({ theme }) => css`
     position: fixed;
+    z-index: 300;
     width: ${theme.sidenav.width}px;
 
     background: ${theme.colors.app.sidebar};

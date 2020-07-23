@@ -307,6 +307,7 @@ export interface NexusGenRootTypes {
     id: string; // ID!
     lastName?: string | null; // String
     phone?: string | null; // String
+    roleId?: string | null; // String
   }
   lineChartDataType: { // root type
     entryId?: string | null; // String
@@ -608,6 +609,7 @@ export interface NexusGenFieldTypes {
     lastName: string | null; // String
     phone: string | null; // String
     role: NexusGenRootTypes['RoleType'] | null; // RoleType
+    roleId: string | null; // String
   }
   lineChartDataType: { // field return type
     entryId: string | null; // String

@@ -13,11 +13,12 @@ export const UserType = objectType({
     t.string('firstName', { nullable: true });
     t.string('lastName', { nullable: true });
 
+    t.string('roleId', { nullable: true });
     t.field('role', {
       type: RoleType,
       nullable: true,
       async resolve(parent, args, ctx) {
-        const role = await ctx.prisma.role.findOne({ where: { id: parent.id } });
+        const role = await ctx.prisma.role.findOne({ where: { id: parent.roleId || undefined } });
 
         if (!role) return null;
 

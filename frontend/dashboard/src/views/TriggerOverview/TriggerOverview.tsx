@@ -110,14 +110,14 @@ const TriggersOverview = () => {
   const pageIndex = data?.triggerTable?.pageIndex || 0;
 
   return (
-    <Div px="24px" margin="0 auto" width="100vh" height="100vh" maxHeight="100vh" overflow="hidden">
+    <Div px="24px" margin="0 auto" height="100vh" maxHeight="100vh">
       <H2 color="#3653e8" fontWeight={400} mb="10%">Triggers</H2>
       <InputOutputContainer mb="5%">
         <InputContainer>
           <SearchBar activeSearchTerm={paginationProps.activeSearchTerm} onSearchTermChange={handleSearchTermChange} />
         </InputContainer>
       </InputOutputContainer>
-      <Div backgroundColor="#fdfbfe" mb="1%" height="65%" overflowX="hidden" overflowY="auto">
+      <Div backgroundColor="#fdfbfe" mb="1%" height="65%" overflowY="auto">
         <Table
           headers={HEADERS}
           paginationProps={{ ...paginationProps, pageCount, pageIndex }}

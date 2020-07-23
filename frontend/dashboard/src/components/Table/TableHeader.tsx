@@ -5,6 +5,7 @@ import styled from 'styled-components/macro';
 
 import { Div, Grid } from '@haas/ui';
 
+import { ErrorBoundary } from 'react-error-boundary';
 import TableHeaderColumn from './TableHeaderColumn';
 
 interface TableHeaderColumnProps {

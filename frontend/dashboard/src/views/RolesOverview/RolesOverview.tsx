@@ -66,7 +66,7 @@ const RolesOverview = () => {
   const pageIndex = data?.roleConnection?.pageIndex || 0;
 
   return (
-    <Div px="24px" margin="0 auto" width="100vh" height="100vh" maxHeight="100vh" overflowX="hidden" overflowY="auto">
+    <Div px="24px" margin="0 auto" height="100vh" maxHeight="100vh" overflowY="auto">
       <H2 color="#3653e8" fontWeight={400} mb="10%">Roles and permissions</H2>
       <Div backgroundColor="#fdfbfe" mb="1%" height="65%">
         <Table

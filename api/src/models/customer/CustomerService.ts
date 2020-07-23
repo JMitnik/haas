@@ -205,9 +205,7 @@ class CustomerService {
       where: { id: customerId },
       include: {
         dialogues: {
-          where: {
-            slug: dialogueSlug,
-          },
+          where: { slug: dialogueSlug },
         },
       },
     });

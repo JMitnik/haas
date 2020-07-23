@@ -4,13 +4,14 @@ import { useHistory, useParams } from 'react-router';
 import { useLazyQuery, useMutation } from '@apollo/react-hooks';
 import React, { useCallback, useEffect, useState } from 'react';
 
-import { Div, H2 } from '@haas/ui';
+import { Div, H2, PageHeading } from '@haas/ui';
 import DatePicker from 'components/DatePicker/DatePicker';
 import SearchBar from 'components/SearchBar/SearchBar';
 import Table from 'components/Table/Table';
 import getUsersQuery from 'queries/getUserTable';
 
 import { CenterCell, RoleCell, UserCell } from 'components/Table/CellComponents/CellComponents';
+import { ErrorBoundary } from 'react-error-boundary';
 import { InputContainer, InputOutputContainer } from './UsersOverviewStyles';
 import Row from './TableRow/UsersTableRow';
 import deleteUserQuery from '../../mutations/deleteUser';
@@ -38,6 +39,7 @@ const UsersOverview = () => {
   const { customerSlug } = useParams();
   const history = useHistory();
   const [fetchUsers, { data }] = useLazyQuery(getUsersQuery, { fetchPolicy: 'cache-and-network' });
+  console.log(data);
 
   const [paginationProps, setPaginationProps] = useState<TableProps>({
     activeStartDate: null,
@@ -119,8 +121,8 @@ const UsersOverview = () => {
   const pageIndex = data?.userTable?.pageIndex || 0;
 
   return (
-    <Div px="24px" margin="0 auto" width="100vh" height="100vh" maxHeight="100vh" overflow="hidden">
-      <H2 color="#3653e8" fontWeight={400} mb="10%">Users and roles</H2>
+    <Div px="24px" margin="0 auto" height="100vh" maxHeight="100vh">
+      <PageHeading fontWeight={400} mb="4">Users and roles</PageHeading>
       <InputOutputContainer mb="5%">
         <InputContainer>
           <DatePicker
@@ -132,16 +134,23 @@ const UsersOverview = () => {
         </InputContainer>
       </InputOutputContainer>
       <Div backgroundColor="#fdfbfe" mb="1%" height="65%">
-        <Table
-          headers={HEADERS}
-          paginationProps={{ ...paginationProps, pageCount, pageIndex }}
-          onPaginationChange={setPaginationProps}
-          onDeleteEntry={handleDeleteUser}
-          onEditEntry={handleEditUser}
-          onAddEntry={handleAddUser}
-          CustomRow={Row}
-          data={tableData}
-        />
+        <ErrorBoundary FallbackComponent={() => (
+          <Div>
+            We are experiencing some maintenance with the Users data. We will be back shortly.
+          </Div>
+        )}
+        >
+          <Table
+            headers={HEADERS}
+            paginationProps={{ ...paginationProps, pageCount, pageIndex }}
+            onPaginationChange={setPaginationProps}
+            onDeleteEntry={handleDeleteUser}
+            onEditEntry={handleEditUser}
+            onAddEntry={handleAddUser}
+            CustomRow={Row}
+            data={tableData}
+          />
+        </ErrorBoundary>
       </Div>
     </Div>
   );
