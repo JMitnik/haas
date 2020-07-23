@@ -1,26 +1,28 @@
 import { Div, Grid, H3, PageHeading } from '@haas/ui';
 import { Link, useParams } from 'react-router-dom';
 import { Plus } from 'react-feather';
+import { useLazyQuery } from '@apollo/react-hooks';
 import React from 'react';
 
+import { getQuestionnairesOfCustomer as CustomerData } from 'queries/__generated__/getQuestionnairesOfCustomer';
 import Searchbar from 'components/SearchBar';
+import getDialoguesOfCustomer from 'queries/getDialoguesOfCustomer';
 
 import { AddDialogueCard } from './DialogueOverviewStyles';
-import { useLazyQuery } from '@apollo/react-hooks';
+import { debounce } from 'lodash';
 import DialogueCard from './DialogueCard';
-
-// TODO: Do something about this
-const DialogueOverviewFilters = () => (
-  <div />
-);
 
 const DialogueOverview = ({ dialogues }: { dialogues: any }) => {
   const { customerSlug } = useParams();
 
   // TODO: Handle the loading
-  const { loading, error, data } = useLazyQuery<any>(getDialoguesOfCustomer, {
-    variables: { customerSlug },
+  const [loadCustomerData, { data }] = useLazyQuery<CustomerData>(getDialoguesOfCustomer, {
+    variables: {
+      customerSlug,
+    },
   });
+
+  const filteredDialogues = data?.customer?.dialogues || dialogues;
 
   return (
     <>
@@ -29,8 +31,12 @@ const DialogueOverview = ({ dialogues }: { dialogues: any }) => {
       <Div mb={4}>
         <Grid gridTemplateColumns="300px 1fr">
           {/* todo: Let the search not flicker the entire overview (do it on overview level again?) */}
-          <Searchbar activeSearchTerm="" onSearchTermChange={(newTerm) => null} />
-          <DialogueOverviewFilters />
+          <Searchbar
+            activeSearchTerm=""
+            onSearchTermChange={(newTerm) => {
+              loadCustomerData({ variables: { customerSlug, filter: { searchTerm: newTerm } } });
+            }}
+          />
         </Grid>
       </Div>
 
@@ -39,7 +45,7 @@ const DialogueOverview = ({ dialogues }: { dialogues: any }) => {
         gridTemplateColumns={['1fr', 'repeat(auto-fill, minmax(250px, 1fr))']}
         gridAutoRows="minmax(300px, 1fr)"
       >
-        {dialogues?.map((dialogue: any, index: any) => dialogue && (
+        {filteredDialogues?.map((dialogue: any, index: any) => dialogue && (
           <DialogueCard key={index} dialogue={dialogue} />
         ))}
 

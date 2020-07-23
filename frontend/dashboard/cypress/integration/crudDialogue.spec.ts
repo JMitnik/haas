@@ -108,6 +108,19 @@ describe('Creating a customer, with a default dialogue', () => {
     cy.get('form').submit();
   });
 
+  it('Search for the newly made test dialogue', () => {
+    // Just in case, assume we are in dashboard already, and click
+    const sidenav = cy.get('[data-cy="Sidenav"]');
+    sidenav.contains('Dialogues').click();
+
+    // Type test in the search bar
+    cy.get('[data-cy="SearchbarInput"]').type('Test');
+
+    // Wait 3 sec
+    cy.wait(3000);
+    cy.get('[data-cy="DialogueCard"]').should('have.length', 1);
+  });
+
   it('Deletes the second dialogue', () => {
     // We should be back at the dialogues overview
     const dialogueCard = cy.contains('Test Dialogue').parentsUntil('[data-cy="DialogueCard"]');

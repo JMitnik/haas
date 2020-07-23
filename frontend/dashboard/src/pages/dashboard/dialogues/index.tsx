@@ -13,7 +13,6 @@ const DialoguesPage = () => {
   const { loading, error, data } = useQuery<any>(getDialoguesOfCustomer, {
     variables: { customerSlug },
   });
-
   useErrorHandler(error);
 
   let dialogues: any[] = [];

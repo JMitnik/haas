@@ -41,8 +41,8 @@ const RolesOverview = () => {
     },
   );
 
-  const tableData: any = data?<div className="roleConnection"></div>?.roles || [];
-  const permissions: any = data?<div className="roleConnection"></div>?.permissions || [];
+  const tableData: any = data?.roleConnection?.roles || [];
+  const permissions: any = data?.roleConnection?.permissions || [];
 
   useEffect(() => {
     const { activeStartDate, activeEndDate, pageIndex, pageSize, sortBy, activeSearchTerm } = paginationProps;
@@ -62,8 +62,8 @@ const RolesOverview = () => {
     });
   }, [customerId, fetchRoles, paginationProps]);
 
-  const pageCount = data?<div className="roleConnection"></div>?.totalPages || 1;
-  const pageIndex = data?<div className="roleConnection"></div>?.pageIndex || 0;
+  const pageCount = data?.roleConnection?.totalPages || 1;
+  const pageIndex = data?.roleConnection?.pageIndex || 0;
 
   return (
     <Div px="24px" margin="0 auto" width="100vh" height="100vh" maxHeight="100vh" overflowX="hidden" overflowY="auto">

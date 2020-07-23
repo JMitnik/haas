@@ -1,9 +1,11 @@
 import { Crosshair, Search, X, XCircle } from 'react-feather';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import useDebounce from 'hooks/useDebounce';
 
 import { EmptyInputIcon, InputIcon, SearchbarInput, SearchbarInputContainer } from './SearchBarStyles';
+import { debounce } from 'lodash';
+import useDebouncedEffect from 'hooks/useDebouncedEffect';
 
 interface SearchBarProps {
   activeSearchTerm: string;
@@ -11,12 +13,15 @@ interface SearchBarProps {
 }
 
 const SearchBar = ({ activeSearchTerm, onSearchTermChange }: SearchBarProps) => {
-  const [searchTerm, setSearchTerm] = useState<string>(activeSearchTerm);
-  const debouncedSearchTerm = useDebounce(searchTerm, 500);
+  const [searchTerm, setSearchTerm] = useState<string>(() => activeSearchTerm);
+  const startedRef = useRef<boolean>();
 
-  useEffect(() => {
-    onSearchTermChange(debouncedSearchTerm);
-  }, [debouncedSearchTerm, onSearchTermChange]);
+  useDebouncedEffect(() => {
+    if (typeof startedRef.current !== 'undefined') {
+      onSearchTermChange(searchTerm);
+      startedRef.current = false;
+    }
+  }, 500, [searchTerm]);
 
   return (
     <SearchbarInputContainer>
@@ -24,9 +29,10 @@ const SearchBar = ({ activeSearchTerm, onSearchTermChange }: SearchBarProps) => 
         <Search />
       </InputIcon>
       <SearchbarInput
+        data-cy="SearchbarInput"
         defaultValue={activeSearchTerm}
         placeholder="Search"
-        onChange={(e) => setSearchTerm(e.target.value)}
+        onChange={(e) => { startedRef.current = true; setSearchTerm(e.target.value); }}
       />
       {!!searchTerm.length && (
         <EmptyInputIcon>

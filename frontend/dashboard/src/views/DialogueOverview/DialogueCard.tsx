@@ -36,6 +36,7 @@ const DialogueCard = ({ dialogue }: { dialogue: any }) => {
   const history = useHistory();
   const { customerSlug } = useParams();
 
+  // TODO: How to deal with refetching query when deleted card on a filtered view (fetch and update the current view somehow)
   const [deleteTopic] = useMutation(deleteQuestionnaireMutation, {
     refetchQueries: [{
       query: getDialoguesOfCustomer,

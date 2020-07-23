@@ -25,8 +25,6 @@ const getSessionAnswerFlowQuery = gql`
         }
       }
     }
-  }
-
 `;
 
 export default getSessionAnswerFlowQuery;
