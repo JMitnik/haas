@@ -2,16 +2,14 @@ import { Div, Flex, Grid, H4, Loader, Span } from '@haas/ui';
 import { useLocation, useParams } from 'react-router-dom';
 import { useQuery } from '@apollo/react-hooks';
 import React, { useState } from 'react';
+import gql from 'graphql-tag';
 import styled, { css } from 'styled-components/macro';
-
-import Modal from 'components/Modal';
 
 import { ReactComponent as PathsIcon } from 'assets/icons/icon-launch.svg';
 import { ReactComponent as TrendingIcon } from 'assets/icons/icon-trending-up.svg';
 import { ReactComponent as TrophyIcon } from 'assets/icons/icon-trophy.svg';
+import Modal from 'components/Modal';
 
-import DatePicker from 'components/DatePicker';
-import gql from 'graphql-tag';
 import InteractionFeedModule from './Modules/InteractionFeedModule/InteractionFeedModule';
 import NegativePathsModule from './Modules/NegativePathsModule/index.tsx';
 import NodeEntriesOverview from '../NodeEntriesOverview/NodeEntriesOverview';
@@ -21,14 +19,6 @@ import SummaryAverageScoreModule from './Modules/SummaryModules/SummaryAverageSc
 import SummaryCallToActionModule from './Modules/SummaryModules/SummaryCallToActionModule';
 import SummaryInteractionCountModule from './Modules/SummaryModules/SummaryInteractionCountModule';
 import SummaryModuleContainer from './Modules/SummaryModules/SummaryModuleContainer';
-import getQuestionnaireData from '../../queries/getQuestionnaireData';
-
-const filterMap = new Map([
-  ['Last 24h', 1],
-  ['Last week', 7],
-  ['Last month', 30],
-  ['Last year', 365],
-]);
 
 const DialogueViewContainer = styled(Div)`
   ${({ theme }) => css`
@@ -78,7 +68,7 @@ const DialogueView = () => {
   const [activeFilter, setActiveFilter] = useState(() => 'Last 24h');
 
   // TODO: Move this to page level
-  const { data, loading } = useQuery(getDialogueStatistics, {
+  const { data } = useQuery(getDialogueStatistics, {
     variables: {
       dialogueSlug,
       customerSlug,
