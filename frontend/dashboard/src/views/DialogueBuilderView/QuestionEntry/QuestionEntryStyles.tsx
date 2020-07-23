@@ -1,6 +1,6 @@
 import styled, { css } from 'styled-components/macro';
 
-import { H4 } from '@haas/ui';
+import { Div, Flex, H4, Span } from '@haas/ui';
 
 export const QuestionEntryHeader = styled(H4)`
 ${({ theme }) => css`
@@ -8,8 +8,179 @@ ${({ theme }) => css`
   cursor: pointer;
 `}`;
 
-export const QuestionEntryContainer = styled.div`
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+// export const QuestionEntryContainer = styled.div`
+//   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+// `;
+
+export const ConditionContainer = styled(Flex)`
+  ${({ theme }) => css`
+    color: ${theme.colors.default.darkest};
+    background: ${theme.colors.white};
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    margin-bottom: 25px;
+    width: 60px;
+    height: 60px;
+
+    border-top-left-radius: ${theme.borderRadiuses.somewhatRounded};
+    border-bottom-left-radius: ${theme.borderRadiuses.somewhatRounded};
+  `}
+`;
+
+export const OverflowSpan = styled(Span)`
+  ${({ theme }) => css`
+    color: ${theme.colors.default.darkest};
+  `}
+  font-size: 1.2em;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+`;
+
+export const AddQuestionContainer = styled(Flex)`
+   ${({ theme }) => css`
+    flex-direction: row;
+    cursor: pointer;
+    flex-grow: 1;
+    justify-content: center; 
+    align-items: center;
+    background-color: ${theme.colors.default.lightest};
+    color: ${theme.colors.default.muted};
+   
+    border: ${theme.colors.app.mutedOnDefault} 1px solid;
+    border-radius: ${theme.borderRadiuses.somewhatRounded};
+    transition: all 0.2s ease-in;
+    padding: 20px;
+    padding-left: 30px;
+    margin-bottom: 40px;
+    &:hover {
+        background-color: ${theme.colors.white};
+        box-shadow: 0 1px 3px 1px rgba(0,0,0,0.1);
+      }
+ `}
+`;
+
+export const QuestionEntryViewContainer = styled(Flex) <{ activeCTA: string | null, id: string }>`
+  ${({ id, activeCTA, theme }) => css`
+    position: relative;
+    flex-direction: row;
+    color: ${theme.colors.default.muted};
+
+    ${!activeCTA && css`
+    background-color: ${theme.colors.white};
+    `};
+
+    ${activeCTA === id && css`
+    background-color: ${theme.colors.white};
+    `};
+
+    ${activeCTA && activeCTA !== id && css`
+    background-color: ${theme.colors.white};
+    opacity: 0.5;
+    `};
+
+    border: ${theme.colors.app.mutedOnDefault} 1px solid;
+    border-top-left-radius: ${theme.borderRadiuses.somewhatRounded};
+    border-bottom-left-radius: ${theme.borderRadiuses.somewhatRounded};
+
+    padding: 20px;
+    padding-left: 30px;
+    margin-bottom: 25px;
+ `} 
+`;
+
+export const AddChildContainer = styled(Flex)`
+  ${({ theme }) => css`
+    position: absolute; 
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    bottom: 0; 
+    left: 50%;
+    transform: translate(-50%, -10px);
+    min-width: 250px;
+    color: ${theme.colors.default.darkest};
+    border-radius: ${theme.borderRadiuses.rounded};
+    background: ${theme.colors.default.dark}; 
+ `}
+`;
+
+export const LinkContainer = styled(Flex) <{ hasCTA?: Boolean }>`
+  ${({ theme, hasCTA }) => css`
+    flex-direction: column;
+    justify-content: center; 
+    justify-items: center;
+
+    color: ${theme.colors.default.muted};
+    margin-bottom: 25px;
+    
+    ${!hasCTA && css`
+      border-color: ${theme.colors.default.darkest};
+      opacity: 0.4;
+      border: 1px dashed;
+    `}
+    
+    ${hasCTA && css`
+      border: none;
+      background: ${theme.colors.default.dark};
+    `}
+
+    border-left: none; 
+    border-bottom-right-radius: ${theme.borderRadiuses.somewhatRounded};
+    border-top-right-radius: ${theme.borderRadiuses.somewhatRounded};
+ `}
+`;
+
+export const ConditionSpan = styled(Span)`
+   ${({ theme }) => css`
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    width: 40px;
+    text-align: center;
+    color: ${theme.colors.default.darkest};
+    abbr {
+      text-decoration: none;
+    }
+ `}
+`;
+
+export const TypeSpan = styled(Span)`
+   ${({ theme }) => css`
+   color: ${theme.colors.default.darkest};
+ `}
+`;
+
+export const DepthSpan = styled(Span)`
+  ${({ theme }) => css`
+  margin-left: 5px;
+  color: ${theme.colors.default.darkest};
+  opacity: 0.5;
+`}
+`;
+
+export const QuestionEntryContainer = styled(Flex)`
+ ${({ theme }) => css`
+    flex-direction: column;
+    color: ${theme.colors.default.muted};
+ `}
+`;
+
+export const AddChildIconContainer = styled(Div)`
+   ${({ theme }) => css`
+   color: ${theme.colors.default.darkest};
+    svg {
+        color: ${theme.colors.default.darkest};
+        width: 15px;
+        height: 15px;
+    }
+  `}
+
+  opacity: 0.9;
+  cursor: pointer;
 `;
 
 export const DeleteQuestionOptionButtonContainer = styled.button`
@@ -18,7 +189,7 @@ export const DeleteQuestionOptionButtonContainer = styled.button`
   opacity: 0.1;
   cursor: pointer;
   transition: all 0.2s ease-in;
-  margin-left: 10px;
+  margin-left: 1%;
   &:hover {
     transition: all 0.2s ease-in;
     opacity: 0.8;

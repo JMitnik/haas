@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import { DeleteButtonContainer, Div, StyledInput, StyledLabel } from '@haas/ui';
 import { X } from 'react-feather';
-import { Div, StyledInput, StyledLabel, DeleteButtonContainer } from '@haas/ui';
-import Select from 'react-select';
-import { QuestionEntryProps, EdgeChildProps } from '../TopicBuilderInterfaces';
 import QuestionEntry from '../QuestionEntry/QuestionEntry';
+import React, { useState } from 'react';
+import Select from 'react-select';
+import { EdgeChildProps, QuestionEntryProps } from '../TopicBuilderInterfaces';
 
 const conditionTypes = [
   { value: 'match', label: 'match' },
@@ -36,8 +36,7 @@ interface EdgeEntryItemProps {
 }
 
 const EdgeEntry = (
-  { edge, index, questions, question, ...props }:
-    EdgeEntryItemProps,
+  { edge, index, questions, question, ...props }: EdgeEntryItemProps,
 ) => {
   // TODO: Remove these states and use parent state
   const [activeCondition, setactiveCondition] = useState(
@@ -47,9 +46,7 @@ const EdgeEntry = (
     },
   );
 
-  const respectiveQuestion = questions.filter((question) => {
-    return question.id === edge.childNode.id
-  })
+  const respectiveQuestion = questions.filter((question) => question.id === edge.childNode.id);
 
   const [edgeExpanded, setEdgeExpanded] = useState(false);
 
@@ -58,7 +55,6 @@ const EdgeEntry = (
     setactiveCondition({ label, value });
     props.setConditionType(value, index);
   };
-
 
   const setMinValue = (event: React.FocusEvent<HTMLInputElement>) => {
     const minValue = Number(event.target.value);
@@ -75,11 +71,9 @@ const EdgeEntry = (
     if (respectiveQuestion[0]) {
       props.onQuestionExpandChange(respectiveQuestion[0].id);
     }
-  }
+  };
 
-  const newOptionsSelect = question.options?.map((option) => {
-    return { label: option.value, value: option.value };
-  })
+  const newOptionsSelect = question.options?.map((option) => ({ label: option.value, value: option.value }));
 
   return (
     <Div position="relative">
@@ -89,13 +83,14 @@ const EdgeEntry = (
         >
           <X />
         </DeleteButtonContainer>
-        <StyledLabel style={{ 'cursor': 'pointer', 'padding': '5px' }} onClick={() => expandEdge()} marginBottom={20}>
+        <StyledLabel style={{ cursor: 'pointer', padding: '5px' }} onClick={() => expandEdge()} marginBottom={20}>
           Child node #
           {index + 1}
           -
           {respectiveQuestion[0] ? respectiveQuestion[0].title : '(no child question selected)'}
         </StyledLabel>
-        {edgeExpanded && <Div>
+        {edgeExpanded && (
+        <Div>
 
           <Div mt={10} mb={20}>
             <StyledLabel>conditionType</StyledLabel>
@@ -138,8 +133,9 @@ const EdgeEntry = (
               )
             }
 
-            {
-              respectiveQuestion[0] && <QuestionEntry
+            {/* {
+              respectiveQuestion[0] && (
+              <QuestionEntry
                 onAddQuestion={props.onAddQuestion}
                 onDeleteQuestion={props.onDeleteQuestion}
                 onQuestionExpandChange={props.onQuestionExpandChange}
@@ -158,11 +154,12 @@ const EdgeEntry = (
                 question={respectiveQuestion[0]}
                 leafs={props.leafs}
               />
-            }
+              )
+            } */}
 
           </Div>
         </Div>
-        }
+        )}
       </Div>
 
     </Div>
