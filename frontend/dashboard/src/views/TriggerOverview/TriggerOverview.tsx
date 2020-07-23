@@ -4,7 +4,7 @@ import { useHistory, useParams } from 'react-router';
 import { useLazyQuery, useMutation } from '@apollo/react-hooks';
 import React, { useCallback, useEffect, useState } from 'react';
 
-import { Div, H2 } from '@haas/ui';
+import { Div, H2, PageHeading } from '@haas/ui';
 import { UserCell } from 'components/Table/CellComponents/CellComponents';
 import SearchBar from 'components/SearchBar/SearchBar';
 import Table from 'components/Table/Table';
@@ -111,7 +111,7 @@ const TriggersOverview = () => {
 
   return (
     <Div px="24px" margin="0 auto" height="100vh" maxHeight="100vh">
-      <H2 color="#3653e8" fontWeight={400} mb="10%">Triggers</H2>
+      <PageHeading mb="4">Triggers</PageHeading>
       <InputOutputContainer mb="5%">
         <InputContainer>
           <SearchBar activeSearchTerm={paginationProps.activeSearchTerm} onSearchTermChange={handleSearchTermChange} />

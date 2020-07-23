@@ -233,9 +233,11 @@ enum PaginationSortByEnum {
   firstName
   id
   lastName
+  medium
   name
   role
   score
+  type
 }
 
 """Sorting of pagination (type and whether it ascends)"""
