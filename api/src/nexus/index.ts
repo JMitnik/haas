@@ -8,7 +8,6 @@ import questionNodeNexus from '../models/question/QuestionNode';
 import roleNexus from '../models/role/Role';
 import sessionNexus from '../models/session/Session';
 import tagNexus from '../models/tag/Tag';
-import topicBuilderNexus from '../models/topicBuilder/TopicBuilder';
 import triggerNexus from '../models/trigger/Trigger';
 import userNexus from '../models/users/User';
 
@@ -24,7 +23,6 @@ const nexus = [
   ...dialogueNexus,
   ...sessionNexus,
   ...questionNodeNexus,
-  ...topicBuilderNexus,
   ...edgeNexus,
 ];
 

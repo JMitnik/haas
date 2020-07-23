@@ -117,13 +117,6 @@ type Edge {
   updatedAt: String!
 }
 
-input EdgeChildInput {
-  childNode: EdgeNodeInput
-  conditions: [QuestionConditionInput!]
-  id: ID
-  parentNode: EdgeNodeInput
-}
-
 type EdgeCondition {
   conditionType: String!
   edgeId: String!
@@ -139,11 +132,6 @@ input EdgeConditionInputType {
   matchValue: String
   renderMax: Int
   renderMin: Int
-}
-
-input EdgeNodeInput {
-  id: ID
-  title: String
 }
 
 input FilterInput {
@@ -184,12 +172,6 @@ type InteractionType {
   pageSize: Int!
   sessions: [InteractionSessionType!]!
   startDate: String
-}
-
-input LeafNodeInput {
-  id: ID
-  title: String
-  type: String
 }
 
 type lineChartDataType {
@@ -245,7 +227,6 @@ type Mutation {
   updateCTA(id: String, links: CTALinksInputType, title: String, type: String): QuestionNode!
   updateQuestion(edgeCondition: EdgeConditionInputType, edgeId: String, id: String, optionEntries: OptionsInputType, overrideLeafId: String, title: String, type: String): QuestionNode!
   updateRoles(permissions: PermissionIdsInput, roleId: String): RoleType!
-  updateTopicBuilder(customerSlug: String, dialogueSlug: String, topicData: TopicDataEntry): String!
   uploadUserSession(uploadUserSessionInput: UploadUserSessionInput): Session!
 }
 
@@ -267,12 +248,6 @@ type NodeEntryValue {
   numberValue: Int
   parentNodeEntryValueId: Int
   textValue: String
-}
-
-input OptionInput {
-  id: Int
-  publicValue: String
-  value: String
 }
 
 input OptionInputType {
@@ -323,25 +298,6 @@ type Query {
   user(userId: String): UserType!
   users(customerSlug: String): [UserType!]!
   userTable(customerSlug: String, filter: FilterInput): UserTable!
-}
-
-input QuestionConditionInput {
-  conditionType: String
-  id: Int
-  matchValue: String
-  renderMax: Int
-  renderMin: Int
-}
-
-input QuestionInput {
-  children: [EdgeChildInput!]
-  id: ID
-  isLeaf: Boolean
-  isRoot: Boolean
-  options: [OptionInput!]
-  overrideLeaf: LeafNodeInput
-  title: String
-  type: String
 }
 
 type QuestionNode {
@@ -445,11 +401,6 @@ enum TagTypeEnum {
   AGENT
   DEFAULT
   LOCATION
-}
-
-input TopicDataEntry {
-  id: ID
-  questions: [QuestionInput!]
 }
 
 type topPathType {

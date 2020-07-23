@@ -1,10 +1,9 @@
-import { Dialogue, DialogueCreateInput,
-  DialogueUpdateInput, Link, LinkCreateArgs, LinkCreateManyWithoutQuestionNodeInput, LinkCreateWithoutQuestionNodeInput, PrismaClient, QuestionNode, QuestionNodeCreateInput, QuestionOptionCreateManyWithoutQuestionNodeInput, Tag, TagWhereUniqueInput } from '@prisma/client';
+import { Dialogue, DialogueCreateInput, DialogueUpdateInput,
+  PrismaClient, QuestionOptionCreateManyWithoutQuestionNodeInput, Tag, TagWhereUniqueInput } from '@prisma/client';
 import { isAfter, subDays } from 'date-fns';
 import _ from 'lodash';
 import cuid from 'cuid';
 
-import { DialogueFilterInputType } from './Dialogue';
 import { leafNodes, sliderType } from '../../data/seeds/default-data';
 import NodeResolver from '../question/node-resolver';
 
@@ -596,7 +595,7 @@ class DialogueService {
     // Create leaf nodes
     const leafs = updatedTemplateQuestions?.filter((question) => question.isLeaf);
 
-    const updatedLeafsDialogue = await prisma.dialogue.update({
+    await prisma.dialogue.update({
       where: {
         id: questionnaire.id,
       },
@@ -631,7 +630,7 @@ class DialogueService {
 
     // Create questio nodes
     const questions = updatedTemplateQuestions?.filter((question) => !question.isLeaf);
-    const updatedQuestionsDialogue = await prisma.dialogue.update({
+    await prisma.dialogue.update({
       where: {
         id: questionnaire.id,
       },
@@ -664,7 +663,6 @@ class DialogueService {
 
     // Create edges
     const updatedTemplateEdges = templateDialogue?.edges.map((edge) => {
-      const mappedDialogueId = edge.dialogueId && idMap[edge.dialogueId];
       const mappedConditions = edge.conditions.map((condition) => {
         const { id, edgeId, ...conditionData } = condition;
         const updateCondition = { ...conditionData };
@@ -699,7 +697,9 @@ class DialogueService {
   };
 
   static createDialogue = async (dialogueInputData: DialogueInputProps): Promise<Dialogue | null> => {
-    const { data: { dialogueSlug, customerSlug, title, publicTitle, description, tags = [], contentType, templateDialogueId } } = dialogueInputData;
+    const {
+      data: { dialogueSlug, customerSlug, title, publicTitle, description, tags = [], contentType, templateDialogueId },
+    } = dialogueInputData;
 
     let questionnaire = null;
     const dialogueTags = tags?.entries?.length > 0
@@ -821,22 +821,6 @@ class DialogueService {
     return finalQuestions;
   };
 
-  static updateTopicBuilder = async (args: any) => {
-    try {
-      const questionnaireId: string = args.id || undefined;
-      const { questions }: { questions: Array<any> } = args.topicData;
-      const finalQuestions = await DialogueService.uuidToPrismaIds(questions, questionnaireId);
-      await Promise.all(finalQuestions.map(async (question) => NodeResolver.updateQuestion(
-        questionnaireId,
-        question,
-      )));
-
-      return 'Succesfully updated topic(?)';
-    } catch (e) {
-      return `Something went wrong in update topic builder: ${e}`;
-    }
-  };
-
   static calculateAverageScore = async (dialogueId: string) => {
     const dialogue = await prisma.dialogue.findOne({
       where: { id: dialogueId },
@@ -918,7 +902,8 @@ class DialogueService {
     });
 
     const sessionsWithOnlyRoots = sessions.map((session) => (
-      session?.nodeEntries.find((nodeEntry) => nodeEntry.depth === 0 && nodeEntry.relatedNode?.isRoot) ? session : null));
+      session?.nodeEntries.find(
+        (nodeEntry) => nodeEntry.depth === 0 && nodeEntry.relatedNode?.isRoot) ? session : null));
 
     return sessionsWithOnlyRoots.filter((session) => session);
   };
