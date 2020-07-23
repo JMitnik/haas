@@ -1,2 +1,2 @@
-cd build/api
+cd container/api
 docker-compose up -d
