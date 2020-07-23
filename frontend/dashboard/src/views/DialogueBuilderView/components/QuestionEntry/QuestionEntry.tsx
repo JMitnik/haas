@@ -12,11 +12,11 @@ import getTopicBuilderQuery from 'queries/getQuestionnaireQuery';
 
 import { EdgeConditonProps, QuestionEntryProps, QuestionOptionProps } from '../../DialogueBuilderInterfaces';
 import { OverflowSpan, QuestionEntryContainer, QuestionEntryViewContainer } from './QuestionEntryStyles';
-import BuilderIcon from '../BuilderIcon';
+import BuilderIcon from './BuilderIcon';
 import CTALabel from './CTALabel';
 import ConditionLabel from './ConditionLabel';
-import DeleteQuestionButton from '../DeleteQuestionButton';
-import QuestionEntryForm from '../QuestionEntryForm';
+import DeleteQuestionButton from './DeleteQuestionButton';
+import QuestionEntryForm from '../QuestionEntryForm/QuestionEntryForm';
 import ShowChildQuestion from './ShowChildQuestion';
 
 interface QuestionEntryItemProps {

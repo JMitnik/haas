@@ -17,7 +17,7 @@ import createQuestionMutation from 'mutations/createQuestion';
 import updateQuestionMutation from 'mutations/updateQuestion';
 
 import { EdgeConditonProps,
-  OverrideLeafProps, QuestionEntryProps, QuestionOptionProps } from '../DialogueBuilderInterfaces';
+  OverrideLeafProps, QuestionEntryProps, QuestionOptionProps } from '../../DialogueBuilderInterfaces';
 
 interface FormDataProps {
   title: string;
@@ -244,14 +244,17 @@ const QuestionEntryForm = ({
     <Form onSubmit={handleSubmit(onSubmit)}>
       <FormGroupContainer>
         <Grid gridTemplateColumns={['1fr', '1fr 2fr']} gridColumnGap={4}>
+
           <Div py={4} pr={4}>
             <H3 color="default.text" fontWeight={500} pb={2}>General question information</H3>
             <Muted>
               General information about the question, such as title, type, etc.
             </Muted>
           </Div>
+
           <Div py={4}>
             <Grid gridTemplateColumns={['1fr', '1fr 1fr']}>
+
               <Div useFlex flexDirection="column">
                 <StyledLabel>Title</StyledLabel>
                 <StyledInput
@@ -271,8 +274,8 @@ const QuestionEntryForm = ({
                   onChange={(qOption: any) => setConditionType(qOption)}
                 />
               </Flex>
-              {
-              activeConditionSelect?.value === 'valueBoundary' && (
+
+              {activeConditionSelect?.value === 'valueBoundary' && (
                 <>
                   <Flex flexDirection="column">
                     <StyledLabel>Min value</StyledLabel>
@@ -289,10 +292,9 @@ const QuestionEntryForm = ({
                     />
                   </Flex>
                 </>
-              )
-            }
-              {
-              activeConditionSelect?.value === 'match' && (
+              )}
+
+              {activeConditionSelect?.value === 'match' && (
                 <Div gridColumn="1 / -1">
                   <StyledLabel>Match value</StyledLabel>
                   <Select
@@ -303,8 +305,7 @@ const QuestionEntryForm = ({
                     }}
                   />
                 </Div>
-              )
-            }
+              )}
 
               <Div useFlex flexDirection="column">
                 <StyledLabel>Question type</StyledLabel>

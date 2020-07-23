@@ -3,12 +3,12 @@ import React from 'react';
 import { Div, Flex, Span } from '@haas/ui';
 import styled, { css } from 'styled-components';
 
-interface CTAIconProps {
+interface BuilderIconProps {
   type: string;
   Icon: (props: any) => JSX.Element;
 }
 
-const CTAEntryIcon = styled(Div)`
+const BuilderEntryIcon = styled(Div)`
    ${({ theme }) => css`
     color: ${theme.colors.white};
     background-color: ${theme.colors.default.darker};
@@ -17,12 +17,12 @@ const CTAEntryIcon = styled(Div)`
   `}
 `;
 
-const CTAIcon = ({ type, Icon }: CTAIconProps) => (
+const BuilderIcon = ({ type, Icon }: BuilderIconProps) => (
   <Flex flexDirection="column" marginRight="50px">
     <Flex flexDirection="column" alignItems="center" justifyContent="center">
-      <CTAEntryIcon>
+      <BuilderEntryIcon>
         <Icon />
-      </CTAEntryIcon>
+      </BuilderEntryIcon>
       <Span marginTop="5px" fontSize="0.6em" color="default.darker">
         {type}
       </Span>
@@ -30,4 +30,4 @@ const CTAIcon = ({ type, Icon }: CTAIconProps) => (
   </Flex>
 );
 
-export default CTAIcon;
+export default BuilderIcon;
