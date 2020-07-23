@@ -2,7 +2,7 @@ import { Variants, motion } from 'framer-motion';
 import React from 'react';
 
 import { ButtonBody, ClientButton } from 'components/Buttons/Buttons';
-import { Div, H5, Span } from '@haas/ui';
+import { Div, H5 } from '@haas/ui';
 import { NodeTitle } from 'layouts/NodeLayout/NodeLayoutStyles';
 import { ReactComponent as SpeechIcon } from 'assets/icons/icon-chat.svg';
 import { TreeNodeOptionProps } from 'models/Tree/TreeNodeOptionModel';

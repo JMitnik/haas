@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 
 import { makeCustomTheme } from 'utils/makeCustomerTheme';
 import defaultTheme from 'config/theme';
-import useLocalStorage from 'hooks/useLocalStorage';
 
 import { useCustomer } from './CustomerProvider';
 
@@ -14,6 +13,7 @@ interface ThemeProvidersProps {
 const ThemeProviders = ({ children }: ThemeProvidersProps) => {
   const [customTheme, setCustomTheme] = useState({});
   const { activeCustomer, storageCustomer } = useCustomer();
+
   useEffect(() => {
     if (activeCustomer) {
       const customerTheme = { colors: activeCustomer.settings?.colourSettings };

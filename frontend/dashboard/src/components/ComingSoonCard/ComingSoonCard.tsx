@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Card, CardBody, ColumnFlex, Div, Flex, H2, H4, Paragraph } from '@haas/ui';
+import { Card, CardBody, ColumnFlex, Div, H4, Paragraph } from '@haas/ui';
 import { ReactComponent as InDevImage } from 'assets/images/undraw_dev.svg';
 
 const ComingSoonCard = () => (

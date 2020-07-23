@@ -1,10 +1,6 @@
 import { ApolloProvider } from '@apollo/react-hooks';
 import { Redirect, Route, BrowserRouter as Router, Switch } from 'react-router-dom';
-import { ThemeProvider } from 'styled-components';
-import React, { ErrorInfo, FC, useEffect, useState } from 'react';
-
-import CustomerProvider from 'providers/CustomerProvider';
-import DashboardPage from 'pages/dashboard';
+import React, { FC } from 'react';
 
 import { AppContainer } from 'styles/AppStyles';
 import AddCustomerPage from 'pages/dashboard/customers/add';
@@ -13,7 +9,9 @@ import AddTriggerView from 'views/TriggerOverview/AddTriggerView';
 import AddUserView from 'views/UsersOverview/AddUserView';
 import AnalyticsPage from 'pages/dashboard/analytics';
 import CustomerPage from 'pages/dashboard/customer';
+import CustomerProvider from 'providers/CustomerProvider';
 import CustomersPage from 'pages/dashboard/customers';
+import DashboardPage from 'pages/dashboard';
 import DialogueBuilderView from 'views/DialogueBuilderView/DialogueBuilderView';
 import DialoguePage from 'pages/dashboard/dialogues/dialogue';
 import DialoguesPage from 'pages/dashboard/dialogues';

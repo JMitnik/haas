@@ -4,7 +4,6 @@ import React, { ReactNode } from 'react';
 
 import client from 'config/apollo';
 
-import { ErrorBoundary } from 'react-error-boundary';
 import { DialogueTreeProvider } from './DialogueTreeProvider';
 import ThemeProviders from './ThemeProviders';
 

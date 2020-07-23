@@ -2,7 +2,6 @@ import { useErrorHandler } from 'react-error-boundary';
 import { useQuery } from '@apollo/react-hooks';
 import React from 'react';
 
-import { Div, H2, H4 } from '@haas/ui';
 import { getCustomerQuery } from 'queries/getCustomersQuery';
 import CustomerOverview from 'views/CustomerOverview';
 

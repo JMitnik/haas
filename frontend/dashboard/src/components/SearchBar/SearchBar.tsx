@@ -1,11 +1,9 @@
-import { Crosshair, Search, X, XCircle } from 'react-feather';
-import React, { useEffect, useRef, useState } from 'react';
+import { Search, X } from 'react-feather';
+import React, { useRef, useState } from 'react';
 
-import useDebounce from 'hooks/useDebounce';
+import useDebouncedEffect from 'hooks/useDebouncedEffect';
 
 import { EmptyInputIcon, InputIcon, SearchbarInput, SearchbarInputContainer } from './SearchBarStyles';
-import { debounce } from 'lodash';
-import useDebouncedEffect from 'hooks/useDebouncedEffect';
 
 interface SearchBarProps {
   activeSearchTerm: string;

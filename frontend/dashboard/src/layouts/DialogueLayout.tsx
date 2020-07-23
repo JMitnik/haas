@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Div, ExtLink, Flex, H2, PageHeading, Span } from '@haas/ui';
+import { Div, ExtLink, Flex, H2, Span } from '@haas/ui';
 import { MapPin, User } from 'react-feather';
 import { ReactComponent as UrlIcon } from 'assets/icons/icon-link.svg';
 import { useParams } from 'react-router';

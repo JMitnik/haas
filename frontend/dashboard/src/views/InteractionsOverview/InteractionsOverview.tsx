@@ -4,14 +4,15 @@ import { useParams } from 'react-router';
 import Papa from 'papaparse';
 import React, { useCallback, useEffect, useState } from 'react';
 
-import { Div, H2, Muted, Span } from '@haas/ui';
+import { Div, Muted, Span } from '@haas/ui';
 import DatePicker from 'components/DatePicker/DatePicker';
 import InteractionsTable from 'components/Table/Table';
 import SearchBar from 'components/SearchBar/SearchBar';
 import getInteractionsQuery from 'queries/getInteractionsQuery';
 
 import { CenterCell, ScoreCell, UserCell, WhenCell } from './TableCell/TableCell';
-import { InputContainer, InputOutputContainer, InteractionsOverviewContainer, OutputContainer } from './InteractionOverviewStyles';
+import { InputContainer, InputOutputContainer,
+  InteractionsOverviewContainer, OutputContainer } from './InteractionOverviewStyles';
 import Row from './TableRow/InteractionsTableRow';
 
 interface TableProps {

@@ -8,7 +8,6 @@ import CustomerPage from 'pages/[customer]';
 import CustomersPage from 'pages/customers';
 import GlobalAppLayout from 'layouts/GlobalAppLayout';
 
-import { Div } from '@haas/ui';
 import NodePage from './[customer]/[dialogue]/[node]';
 
 const ErrorPage = () => (

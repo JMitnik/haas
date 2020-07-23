@@ -5,7 +5,7 @@ import { useHistory, useParams } from 'react-router';
 import { useMutation, useQuery } from '@apollo/react-hooks';
 import styled, { css } from 'styled-components/macro';
 
-import { Button, Container, Div, Flex,
+import { Button, Div, Flex,
   Grid, H2, H3, H4, Hr, Muted, StyledInput,
   StyledLabel, StyledTextInput } from '@haas/ui';
 import React, { useState } from 'react';

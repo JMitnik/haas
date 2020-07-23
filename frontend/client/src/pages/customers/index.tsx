@@ -1,4 +1,4 @@
-import { ErrorBoundary, useErrorHandler } from 'react-error-boundary';
+import { useErrorHandler } from 'react-error-boundary';
 import { useQuery } from '@apollo/react-hooks';
 import React from 'react';
 

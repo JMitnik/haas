@@ -1,5 +1,5 @@
 import { ArrowRightCircle } from 'react-feather';
-import { ColumnFlex, Div, Flex, H4, Span } from '@haas/ui';
+import { ColumnFlex, Div, Flex, Span } from '@haas/ui';
 import { LinkProps, NavLink, useHistory } from 'react-router-dom';
 import { UserProps } from 'types/generic';
 import { useCustomer } from 'providers/CustomerProvider';

@@ -2,9 +2,9 @@ import { AnimationControls } from 'framer-motion';
 import Lottie from 'react-lottie';
 import React, { useReducer } from 'react';
 
-import { Div, Flex, Span, Slider as UISlider } from '@haas/ui';
 import { ReactComponent as DragIcon } from 'assets/icons/icon-order-horizontal.svg';
 import { HAASIdle, HAASRun, HAASStopping } from 'assets/animations';
+import { Span, Slider as UISlider } from '@haas/ui';
 
 import { HAASRabbit, SlideHereContainer } from './SliderNodeStyles';
 import { SlideMeAnimation } from './SliderNodeAnimations';

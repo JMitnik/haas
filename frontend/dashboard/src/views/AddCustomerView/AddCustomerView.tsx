@@ -1,5 +1,4 @@
 import * as yup from 'yup';
-import { ApolloError } from 'apollo-boost';
 import {
   Button, Container, Div, Flex, Form, FormGroupContainer, Grid,
   H2, H3, Hr, Muted, StyledInput, StyledLabel,
