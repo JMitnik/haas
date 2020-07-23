@@ -7,6 +7,8 @@ services:
       POSTGRES_USER: prisma
       POSTGRES_PASSWORD: prisma
     volumes:
-      - /postgresdata:/var/lib/postgresql/data
+      - local-datavolume:/var/lib/postgresql/data
     ports:
       - '5432:5432'
+volumes:
+  local-datavolume:

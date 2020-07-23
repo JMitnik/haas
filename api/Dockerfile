@@ -12,6 +12,7 @@ RUN apt-get update \
   && yarn install
 
 RUN npx prisma generate
+RUN git clone https://github.com/vishnubob/wait-for-it.git
 
 from base
 

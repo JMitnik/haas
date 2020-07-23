@@ -14,7 +14,11 @@ services:
       - '3999:4000'
     env_file:
       - ../../api/.env
+    links: 
+      - "postgres: db"
     environment: 
       DB_STRING: 'postgresql://prisma:prisma@postgres:5432/postgres?schema=public'
     volumes:
         - '../../api/src:/app/src'
+    depends_on: 
+      - postgres
