@@ -142,6 +142,10 @@ class NodeEntryService {
       }
     }
 
+    if (!nodeEntry.relatedNode) {
+      return null;
+    }
+
     throw new Error(`Unable to find node entry type ${nodeEntry.relatedNode?.type}.`);
   };
 
