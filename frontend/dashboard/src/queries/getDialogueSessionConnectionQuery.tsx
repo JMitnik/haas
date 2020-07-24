@@ -1,7 +1,7 @@
 import gql from 'graphql-tag';
 
-const getInteractionsQuery = gql`
-  query getInteractions($dialogueSlug: String!, $customerSlug: String!, $filter: PaginationWhereInput) {
+const getDialogueSessionConnectionQuery = gql`
+  query getDialogueSessionConnection($dialogueSlug: String!, $customerSlug: String!, $filter: PaginationWhereInput) {
     customer(slug: $customerSlug) {
       id
       dialogue(where: { slug: $dialogueSlug }) {
@@ -41,4 +41,4 @@ const getInteractionsQuery = gql`
   }
 `;
 
-export default getInteractionsQuery;
+export default getDialogueSessionConnectionQuery;
