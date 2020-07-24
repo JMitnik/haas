@@ -3,6 +3,7 @@ import { inputObjectType, objectType } from '@nexus/schema';
 
 // eslint-disable-next-line import/no-cycle
 import { QuestionNodeType } from '../question/QuestionNode';
+// eslint-disable-next-line import/no-cycle
 import NodeEntryService from './NodeEntryService';
 
 export const NodeEntryValueType = objectType({
@@ -101,6 +102,18 @@ export const SliderNodeEntryInput = inputObjectType({
   },
 });
 
+export const NodeEntryDataInput = inputObjectType({
+  name: 'NodeEntryDataInput',
+  description: 'Data type for the actual node entry',
+
+  definition(t) {
+    t.field('slider', { type: SliderNodeEntryInput, nullable: true });
+    t.field('textbox', { type: TextboxNodeEntryInput, nullable: true });
+    t.field('register', { type: RegisterNodeEntryInput, nullable: true });
+    t.field('choice', { type: ChoiceNodeEntryInput, nullable: true });
+  },
+});
+
 export const NodeEntryInput = inputObjectType({
   name: 'NodeEntryInput',
   description: 'Input type for node-entry metadata',
@@ -110,9 +123,6 @@ export const NodeEntryInput = inputObjectType({
     t.string('edgeId', { nullable: true });
     t.int('depth', { nullable: true });
 
-    t.field('slider', { type: SliderNodeEntryInput, nullable: true });
-    t.field('textbox', { type: TextboxNodeEntryInput, nullable: true });
-    t.field('register', { type: RegisterNodeEntryInput, nullable: true });
-    t.field('choice', { type: ChoiceNodeEntryInput, nullable: true });
+    t.field('data', { type: NodeEntryDataInput });
   },
 });

@@ -72,14 +72,17 @@ export interface NexusGenInputs {
     title?: string | null; // String
     type?: string | null; // String
   }
-  NodeEntryInput: { // input type
+  NodeEntryDataInput: { // input type
     choice?: NexusGenInputs['ChoiceNodeEntryInput'] | null; // ChoiceNodeEntryInput
-    depth?: number | null; // Int
-    edgeId?: string | null; // String
-    nodeId?: string | null; // String
     register?: NexusGenInputs['RegisterNodeEntryInput'] | null; // RegisterNodeEntryInput
     slider?: NexusGenInputs['SliderNodeEntryInput'] | null; // SliderNodeEntryInput
     textbox?: NexusGenInputs['TextboxNodeEntryInput'] | null; // TextboxNodeEntryInput
+  }
+  NodeEntryInput: { // input type
+    data?: NexusGenInputs['NodeEntryDataInput'] | null; // NodeEntryDataInput
+    depth?: number | null; // Int
+    edgeId?: string | null; // String
+    nodeId?: string | null; // String
   }
   OptionInput: { // input type
     id?: number | null; // Int
@@ -339,6 +342,7 @@ export interface NexusGenAllTypes extends NexusGenRootTypes {
   EdgeChildInput: NexusGenInputs['EdgeChildInput'];
   EdgeNodeInput: NexusGenInputs['EdgeNodeInput'];
   LeafNodeInput: NexusGenInputs['LeafNodeInput'];
+  NodeEntryDataInput: NexusGenInputs['NodeEntryDataInput'];
   NodeEntryInput: NexusGenInputs['NodeEntryInput'];
   OptionInput: NexusGenInputs['OptionInput'];
   PaginationSortInput: NexusGenInputs['PaginationSortInput'];
@@ -670,7 +674,7 @@ export interface NexusGenArgTypes {
       data?: NexusGenInputs['RoleInput'] | null; // RoleInput
     }
     createSession: { // args
-      data?: NexusGenInputs['SessionInput'] | null; // SessionInput
+      input?: NexusGenInputs['SessionInput'] | null; // SessionInput
     }
     createTag: { // args
       customerSlug?: string | null; // String
@@ -810,7 +814,7 @@ export interface NexusGenInheritedFields {}
 
 export type NexusGenObjectNames = "ColourSettings" | "Customer" | "CustomerSettings" | "Dialogue" | "DialogueStatistics" | "Edge" | "EdgeCondition" | "FontSettings" | "ImageType" | "Mutation" | "NodeEntry" | "NodeEntryValue" | "PaginationPageInfo" | "PermssionType" | "Query" | "QuestionNode" | "QuestionOption" | "RoleConnection" | "RoleType" | "Session" | "SessionConnection" | "Tag" | "TriggerConditionType" | "TriggerConnectionType" | "TriggerType" | "UserTable" | "UserType" | "lineChartDataType" | "topPathType";
 
-export type NexusGenInputNames = "AddDialogueInput" | "ChoiceNodeEntryInput" | "CustomerCreateOptions" | "CustomerEditOptions" | "CustomerWhereUniqueInput" | "DialogueFilterInputType" | "DialogueWhereUniqueInput" | "EdgeChildInput" | "EdgeNodeInput" | "LeafNodeInput" | "NodeEntryInput" | "OptionInput" | "PaginationSortInput" | "PaginationWhereInput" | "PermissionIdsInput" | "PermissionInput" | "QuestionConditionInput" | "QuestionInput" | "QuestionNodeWhereInput" | "QuestionNodeWhereUniqueInput" | "RecipientsInputType" | "RegisterNodeEntryInput" | "RoleDataInput" | "RoleInput" | "SessionInput" | "SessionWhereUniqueInput" | "SliderNodeEntryInput" | "TagsInputObjectType" | "TextboxNodeEntryInput" | "TopicDataEntry" | "TriggerConditionInputType" | "TriggerInputType" | "UserInput";
+export type NexusGenInputNames = "AddDialogueInput" | "ChoiceNodeEntryInput" | "CustomerCreateOptions" | "CustomerEditOptions" | "CustomerWhereUniqueInput" | "DialogueFilterInputType" | "DialogueWhereUniqueInput" | "EdgeChildInput" | "EdgeNodeInput" | "LeafNodeInput" | "NodeEntryDataInput" | "NodeEntryInput" | "OptionInput" | "PaginationSortInput" | "PaginationWhereInput" | "PermissionIdsInput" | "PermissionInput" | "QuestionConditionInput" | "QuestionInput" | "QuestionNodeWhereInput" | "QuestionNodeWhereUniqueInput" | "RecipientsInputType" | "RegisterNodeEntryInput" | "RoleDataInput" | "RoleInput" | "SessionInput" | "SessionWhereUniqueInput" | "SliderNodeEntryInput" | "TagsInputObjectType" | "TextboxNodeEntryInput" | "TopicDataEntry" | "TriggerConditionInputType" | "TriggerInputType" | "UserInput";
 
 export type NexusGenEnumNames = "PaginationSortByEnum" | "TagTypeEnum" | "TriggerConditionEnum" | "TriggerMediumEnum" | "TriggerTypeEnum";
 

@@ -4,6 +4,7 @@ import { ChoiceNodeEntry,
   SliderNodeEntry, TextboxNodeEntry } from '@prisma/client';
 import _ from 'lodash';
 
+// eslint-disable-next-line import/no-cycle
 import { OrderByProps } from '../../types/generic';
 import prisma from '../../prisma';
 
@@ -26,20 +27,20 @@ class NodeEntryService {
     relatedEdge: nodeEntryInput.edgeId && { connect: { id: nodeEntryInput.edgeId } },
     depth: nodeEntryInput?.depth,
 
-    choiceNodeEntry: nodeEntryInput?.choice?.value && {
-      create: { value: nodeEntryInput?.choice?.value },
+    choiceNodeEntry: nodeEntryInput?.data?.choice?.value && {
+      create: { value: nodeEntryInput?.data?.choice?.value },
     },
 
-    registrationNodeEntry: nodeEntryInput?.register?.value && {
-      create: { value: nodeEntryInput?.register?.value },
+    registrationNodeEntry: nodeEntryInput?.data?.register?.value && {
+      create: { value: nodeEntryInput?.data?.register?.value },
     },
 
-    sliderNodeEntry: nodeEntryInput?.slider?.value && {
-      create: { value: nodeEntryInput?.slider?.value },
+    sliderNodeEntry: nodeEntryInput?.data?.slider?.value && {
+      create: { value: nodeEntryInput?.data?.slider?.value },
     },
 
-    textboxNodeEntry: nodeEntryInput?.textbox?.value && {
-      create: { value: nodeEntryInput?.textbox?.value },
+    textboxNodeEntry: nodeEntryInput?.data?.textbox?.value && {
+      create: { value: nodeEntryInput?.data?.textbox?.value },
     },
   });
 

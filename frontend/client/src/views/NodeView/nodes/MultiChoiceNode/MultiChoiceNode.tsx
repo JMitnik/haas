@@ -4,6 +4,7 @@ import React from 'react';
 import { ButtonBody, ClientButton } from 'components/Buttons/Buttons';
 import { Div, H5 } from '@haas/ui';
 import { NodeTitle } from 'layouts/NodeLayout/NodeLayoutStyles';
+import { SessionEntryDataProps } from 'models/Session/SessionEntryModel';
 import { ReactComponent as SpeechIcon } from 'assets/icons/icon-chat.svg';
 import { TreeNodeOptionProps } from 'models/Tree/TreeNodeOptionModel';
 
@@ -36,11 +37,12 @@ const multiChoiceItemAnimation: Variants = {
 };
 
 const MultiChoiceNode = ({ node, onEntryStore }: MultiChoiceNodeProps) => {
-  const onSubmit = async (multiChoiceOption: TreeNodeOptionProps) => {
-    const entry: any = {
-      multiValues: null,
-      numberValue: null,
-      textValue: multiChoiceOption.value,
+  const handleSubmit = async (multiChoiceOption: TreeNodeOptionProps) => {
+    const entry: SessionEntryDataProps = {
+      choice: { value: multiChoiceOption.value },
+      register: undefined,
+      slider: undefined,
+      textbox: undefined,
     };
 
     onEntryStore(entry, multiChoiceOption.value);
@@ -61,7 +63,7 @@ const MultiChoiceNode = ({ node, onEntryStore }: MultiChoiceNodeProps) => {
               <ClientButton
                 brand="primary"
                 type="button"
-                onClick={() => onSubmit(multiChoiceOption)}
+                onClick={() => handleSubmit(multiChoiceOption)}
                 key={index}
               >
                 <ChoiceIconContainer>

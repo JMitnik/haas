@@ -7,30 +7,38 @@ import { ClientButton, OutlineButton } from 'components/Buttons/Buttons';
 import { DeprecatedInputContainer, DeprecatedInputStyled, InputGroup, InputLabel } from '@haas/ui/src/Form';
 import { Div, Grid } from '@haas/ui';
 import { NodeTitle } from 'layouts/NodeLayout/NodeLayoutStyles';
+import { SessionEntryDataProps } from 'models/Session/SessionEntryModel';
 
 import { GenericNodeProps } from '../types';
 import { RegisterNodeContainer } from './RegisterNodeStyles';
 
 type RegisterNodeProps = GenericNodeProps;
 
+interface RegisterNodeFormProps {
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+}
+
 const RegisterNode = ({ node, onEntryStore }: RegisterNodeProps) => {
-  const { register, getValues, formState } = useForm({
+  const { register, getValues, formState } = useForm<RegisterNodeFormProps>({
     mode: 'onChange',
     reValidateMode: 'onChange',
   });
 
   const { dirty } = formState;
 
-  const onSubmit = () => {
+  const handleSubmit = () => {
     const formEntry = getValues({ nest: true });
 
-    const entry: any = {
-      multiValues: formEntry.multiValues,
-      numberValue: null,
-      textValue: null,
+    const entry: SessionEntryDataProps = {
+      register: { value: JSON.stringify(formEntry) },
+      slider: undefined,
+      choice: undefined,
+      textbox: undefined,
     };
 
-    onEntryStore(entry, formEntry.multiValues);
+    onEntryStore(entry, formEntry);
   };
 
   return (
@@ -44,7 +52,7 @@ const RegisterNode = ({ node, onEntryStore }: RegisterNodeProps) => {
               <InputLabel color="white">First name</InputLabel>
               <DeprecatedInputContainer>
                 <User />
-                <DeprecatedInputStyled placeholder="Jane" name="multiValues[0].textValue" ref={register} />
+                <DeprecatedInputStyled placeholder="Jane" name="firstName" ref={register} />
               </DeprecatedInputContainer>
             </InputGroup>
 
@@ -52,7 +60,7 @@ const RegisterNode = ({ node, onEntryStore }: RegisterNodeProps) => {
               <InputLabel color="white">Last name</InputLabel>
               <DeprecatedInputContainer>
                 <User />
-                <DeprecatedInputStyled placeholder="Doe" name="multiValues[0].textValue" ref={register} />
+                <DeprecatedInputStyled placeholder="Doe" name="lastName" ref={register} />
               </DeprecatedInputContainer>
             </InputGroup>
           </Grid>
@@ -61,23 +69,24 @@ const RegisterNode = ({ node, onEntryStore }: RegisterNodeProps) => {
             <InputLabel color="white">Email adress</InputLabel>
             <DeprecatedInputContainer>
               <Mail />
-              <DeprecatedInputStyled placeholder="Jane@haas.live" name="multiValues[0].textValue" ref={register} />
+              <DeprecatedInputStyled placeholder="Jane@haas.live" name="email" ref={register} />
             </DeprecatedInputContainer>
           </InputGroup>
         </Grid>
         <Div mt={4}>
           <Grid gridTemplateColumns="2fr 1fr">
-            <ClientButton disabled={!dirty} isActive={dirty} onClick={() => onSubmit()}>
+            <ClientButton disabled={!dirty} isActive={dirty} onSubmit={handleSubmit}>
               <ButtonIcon>
                 <CheckCircle />
               </ButtonIcon>
               Submit
             </ClientButton>
 
-            <OutlineButton onClick={() => onSubmit()}>Do not share</OutlineButton>
+            <OutlineButton onClick={() => handleSubmit()}>Do not share</OutlineButton>
           </Grid>
         </Div>
       </Div>
+
     </RegisterNodeContainer>
   );
 };

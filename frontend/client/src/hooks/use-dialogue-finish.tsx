@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { useMutation } from '@apollo/react-hooks';
-import uploadUserSessionMutation from 'mutations/UploadEntryMutation';
+import createSessionMutation from 'mutations/createSessionMutation';
 import useDialogueTree from 'providers/DialogueTreeProvider';
 
 const useJourneyFinish = (submitInstant: boolean = true) => {
@@ -9,7 +9,7 @@ const useJourneyFinish = (submitInstant: boolean = true) => {
   const [willSubmit, setWillSubmit] = useState(submitInstant);
   const store = useDialogueTree();
 
-  const [uploadInteraction] = useMutation(uploadUserSessionMutation, {
+  const [createSession] = useMutation(createSessionMutation, {
     onError: (error) => {
       console.log('error', error.message);
     },
@@ -22,8 +22,8 @@ const useJourneyFinish = (submitInstant: boolean = true) => {
   // Effect for submitting
   useEffect(() => {
     if (entries.length && !isFinished && willSubmit) {
-      uploadInteraction({ variables: {
-        uploadUserSessionInput: {
+      createSession({ variables: {
+        input: {
           dialogueId: dialogue?.id,
           entries: entries.map((entry) => ({
             nodeId: entry.node.node.id,
@@ -36,7 +36,7 @@ const useJourneyFinish = (submitInstant: boolean = true) => {
 
       setIsFinished(true);
     }
-  }, [entries, isFinished, willSubmit, uploadInteraction, customer, dialogue]);
+  }, [entries, isFinished, willSubmit, createSession, customer, dialogue]);
 
   // Effect for Post-submission
   useEffect(() => {

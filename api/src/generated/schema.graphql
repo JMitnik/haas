@@ -165,7 +165,7 @@ type Mutation {
   createDialogue(data: AddDialogueInput): Dialogue!
   createPermission(data: PermissionInput): PermssionType
   createRole(data: RoleInput): RoleType!
-  createSession(data: SessionInput): Session!
+  createSession(input: SessionInput): Session!
   createTag(customerSlug: String, name: String, type: TagTypeEnum): Tag!
   createTrigger(customerSlug: String, questionId: String, recipients: RecipientsInputType, trigger: TriggerInputType): TriggerType!
   createUser(customerSlug: String, input: UserInput): UserType!
@@ -195,15 +195,20 @@ type NodeEntry {
   value: NodeEntryValue
 }
 
-"""Input type for node-entry metadata"""
-input NodeEntryInput {
+"""Data type for the actual node entry"""
+input NodeEntryDataInput {
   choice: ChoiceNodeEntryInput
-  depth: Int
-  edgeId: String
-  nodeId: String
   register: RegisterNodeEntryInput
   slider: SliderNodeEntryInput
   textbox: TextboxNodeEntryInput
+}
+
+"""Input type for node-entry metadata"""
+input NodeEntryInput {
+  data: NodeEntryDataInput
+  depth: Int
+  edgeId: String
+  nodeId: String
 }
 
 type NodeEntryValue {

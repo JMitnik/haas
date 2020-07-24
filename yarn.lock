@@ -1438,7 +1438,7 @@
     "@emotion/utils" "0.11.3"
     "@emotion/weak-memoize" "0.2.5"
 
-"@emotion/core@^10.0.20", "@emotion/core@^10.0.27", "@emotion/core@^10.0.9":
+"@emotion/core@^10.0.20", "@emotion/core@^10.0.27", "@emotion/core@^10.0.28", "@emotion/core@^10.0.9":
   version "10.0.28"
   resolved "https://registry.yarnpkg.com/@emotion/core/-/core-10.0.28.tgz#bb65af7262a234593a9e952c041d0f1c9b9bef3d"
   integrity sha512-pH8UueKYO5jgg0Iq+AmCLxBsvuGtvlmiDCOuv8fGNYn3cowFpLN98L8zO56U0H1PjDIyAlXymgL3Wu7u7v6hbA==
@@ -2210,6 +2210,18 @@
   integrity sha512-tAag0jEcjwH+P2quUfipd7liWCNX2F8NvYjQp2wtInsZxnMlypdw0FtAOLxtvvkO+GSRRbmNi8m/5y42PQJYCQ==
   dependencies:
     "@hapi/hoek" "^8.3.0"
+
+"@hookform/devtools@^2.0.3":
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/@hookform/devtools/-/devtools-2.0.3.tgz#7b499d7d1e1a6bc5f2fe34408b264f81a344ba69"
+  integrity sha512-8KQIVr/vFkiZ44JK1SCwwqeie4c8oHZFtI01JqDBKi+Ql2Wh/whM0/QVErO66lETYY9oDeTfr1yB+b5Qq0TwjA==
+  dependencies:
+    "@emotion/core" "^10.0.28"
+    "@emotion/styled" "^10.0.27"
+    "@types/lodash" "^4.14.152"
+    little-state-machine "^3.0.1"
+    lodash "^4.17.15"
+    react-simple-animate "^3.3.8"
 
 "@istanbuljs/load-nyc-config@^1.0.0":
   version "1.0.0"
@@ -4734,6 +4746,11 @@
   version "4.14.150"
   resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.150.tgz#649fe44684c3f1fcb6164d943c5a61977e8cf0bd"
   integrity sha512-kMNLM5JBcasgYscD9x/Gvr6lTAv2NVgsKtet/hm93qMyf/D1pt+7jeEZklKJKxMVmXjxbRVQQGfqDSfipYCO6w==
+
+"@types/lodash@^4.14.152":
+  version "4.14.158"
+  resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.158.tgz#b38ea8b6fe799acd076d7a8d7ab71c26ef77f785"
+  integrity sha512-InCEXJNTv/59yO4VSfuvNrZHt7eeNtWQEgnieIA+mIC+MOWM9arOWG2eQ8Vhk6NbOre6/BidiXhkZYeDY9U35w==
 
 "@types/long@^4.0.0":
   version "4.0.1"
@@ -14775,6 +14792,11 @@ little-state-machine@^2.11.3:
     react-json-view "^1.19.1"
     react-simple-animate "^3.3.0"
 
+little-state-machine@^3.0.1:
+  version "3.0.3"
+  resolved "https://registry.yarnpkg.com/little-state-machine/-/little-state-machine-3.0.3.tgz#f30c536360752ef5a1a758558cb219e38ed6ef9f"
+  integrity sha512-DGhJS7YxWeiv0DnU7TaYw3xdwAHTRK67yeUPYmbMj17IYOmwtU9+4GKocSMlG09qrvRxV6/wJPuAiiD1IVadPw==
+
 load-json-file@^1.0.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/load-json-file/-/load-json-file-1.1.0.tgz#956905708d58b4bab4c2261b04f59f31c99374c0"
@@ -19146,6 +19168,11 @@ react-simple-animate@^3.3.0, react-simple-animate@^3.3.6:
   version "3.3.6"
   resolved "https://registry.yarnpkg.com/react-simple-animate/-/react-simple-animate-3.3.6.tgz#85ee92381d1ff5ffafa330ce9d0dc88fc61ca3ff"
   integrity sha512-/aURgwg/LJs5wXj1YVuyNG6L25HLkXrHcdpy42+i/AbmWHlrVBbHHeZuDdiJc5ozZ2Nghn/HTswbAXGobzM8AA==
+
+react-simple-animate@^3.3.8:
+  version "3.3.9"
+  resolved "https://registry.yarnpkg.com/react-simple-animate/-/react-simple-animate-3.3.9.tgz#5ec5f475321ab1ff1db9ffb8d51276fe3f740438"
+  integrity sha512-ADzN2NT5jD0G2Rwdw8jSTPLlKvtX2QyqW2MTUmQhh8dTBxKP39/kSjju6uVLUlYIMk93JyGpJDulsZ/p1Z9fDQ==
 
 react-sizeme@^2.6.7:
   version "2.6.12"

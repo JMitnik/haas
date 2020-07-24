@@ -127,15 +127,15 @@ export const SessionInput = inputObjectType({
 
 export const CreateSessionMutation = mutationField('createSession', {
   type: SessionType,
-  args: { data: SessionInput },
+  args: { input: SessionInput },
 
   resolve(parent, args, ctx) {
-    if (!args?.data) {
+    if (!args?.input) {
       throw new Error('No valid new session data provided');
     }
 
     try {
-      const session = SessionService.createSession(args.data, ctx);
+      const session = SessionService.createSession(args.input, ctx);
       return session;
     } catch (error) {
       throw new Error(`Failed making a session due to ${error}`);

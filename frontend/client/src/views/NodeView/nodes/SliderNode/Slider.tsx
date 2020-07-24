@@ -136,7 +136,7 @@ const Slider = ({ register, onSubmit, animationControls }: SliderProps) => {
       <form>
         <UISlider
           width={1}
-          name="numberValue"
+          name="slider"
           onChange={(e) => moveBunny(e)}
           onMouseUp={() => handleSubmit()}
           onTouchEnd={() => handleSubmit()}
