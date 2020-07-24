@@ -1,5 +1,5 @@
 import { Dialogue, DialogueCreateInput,
-  DialogueUpdateInput, NodeType, PrismaClient, Tag, TagWhereUniqueInput } from '@prisma/client';
+  DialogueUpdateInput, Tag, TagWhereUniqueInput } from '@prisma/client';
 import { subDays } from 'date-fns';
 import _ from 'lodash';
 
@@ -9,6 +9,7 @@ import NodeResolver from '../question/NodeService';
 import { NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
 // eslint-disable-next-line import/no-cycle
 import { HistoryDataProps, QuestionProps, StatisticsProps } from './DialogueTypes';
+// eslint-disable-next-line import/no-cycle
 import SessionService from '../session/SessionService';
 import prisma from '../../prisma';
 
@@ -129,7 +130,7 @@ class DialogueService {
     // Then dresses it up as X/Y data for the lineChart
     const values = scoreEntries?.map((entry) => ({
       x: entry?.creationDate.toUTCString(),
-      y: entry?.slideNodeEntry?.value,
+      y: entry?.sliderNodeEntry?.value,
       nodeEntryId: entry?.id,
     }));
 
@@ -149,14 +150,17 @@ class DialogueService {
     // Then dresses it up as X/Y data for the lineChart
     const history: HistoryDataProps[] = scoreEntries?.map((entry) => ({
       x: entry?.creationDate.toUTCString() || null,
-      y: entry?.slideNodeEntry?.value || null,
+      y: entry?.sliderNodeEntry?.value || null,
       entryId: entry?.id || null,
     })) || [];
 
     const nodeEntryTextValues = await SessionService.getTextEntriesFromSessions(sessions);
+    // console.log('text values', nodeEntryTextValues);
 
+    // TODO: This is where I left off
     const textAndScoreEntries = _.merge(history, nodeEntryTextValues);
     const isPositiveEntries = _.groupBy(textAndScoreEntries, (entry) => entry.y && entry.y > 50);
+    console.log('textAndScoreEntries', textAndScoreEntries);
 
     const topNegativePath = DialogueService.getTopPaths(isPositiveEntries.false) || [];
     const topPositivePath = DialogueService.getTopPaths(isPositiveEntries.true) || [];
@@ -482,7 +486,7 @@ class DialogueService {
 
     const scoringEntries = await SessionService.getScoringEntriesFromSessions(sessions);
 
-    const scores = _.mean((scoringEntries).map((entry) => entry?.slideNodeEntry)) || 0;
+    const scores = _.mean((scoringEntries).map((entry) => entry?.sliderNodeEntry)) || 0;
 
     return scores;
   };

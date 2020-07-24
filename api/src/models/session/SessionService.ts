@@ -1,9 +1,10 @@
+/* eslint-disable import/no-cycle */
 import {
-  NodeEntry, PrismaClient, Session, SessionWhereInput,
+  NodeEntry, Session, SessionWhereInput,
 } from '@prisma/client';
-import { isDefined, isFilled, isPresent } from 'ts-is-present';
+import { isPresent } from 'ts-is-present';
 
-import { Nullable, PaginationProps, notEmpty } from '../../types/generic';
+import { Nullable, PaginationProps } from '../../types/generic';
 import { SessionWithEntries } from './SessionTypes';
 // eslint-disable-next-line import/no-cycle
 import { TEXT_NODES } from '../questionnaire/Dialogue';
@@ -84,7 +85,7 @@ class SessionService {
    * @param session
    */
   static getScoringEntryFromSession(session: SessionWithEntries): NodeEntryWithTypes | null {
-    return session.nodeEntries.find((entry) => entry.slideNodeEntry?.value) || null;
+    return session.nodeEntries.find((entry) => entry.sliderNodeEntry?.value) || null;
   }
 
   /**
@@ -99,7 +100,9 @@ class SessionService {
     }
 
     return sessions.flatMap((session) => session.nodeEntries).filter((entry) => {
-      const isTextEntry = entry?.relatedNode?.type && entry?.relatedNode?.type in TEXT_NODES;
+      const isTextEntry = entry?.relatedNode?.type && TEXT_NODES.includes(entry?.relatedNode?.type);
+
+      console.log('The type', entry.relatedNode?.type, 'and is in TEXT_NODES', isTextEntry);
       return isTextEntry;
     });
   }
@@ -168,7 +171,7 @@ class SessionService {
               },
             }, {
               createdAt: (paginationArgs?.startDate && {
-                lte: paginationArgs?.startDate,
+                gte: paginationArgs?.startDate,
               }) || undefined,
             }],
           },
@@ -248,7 +251,7 @@ class SessionService {
 
     const sessionsWithScores = sessions.map((session) => ({
       ...session,
-      score: SessionService.getScoringEntryFromSession(session)?.slideNodeEntry?.value,
+      score: SessionService.getScoringEntryFromSession(session)?.sliderNodeEntry?.value,
       paths: session.nodeEntries.length,
     }));
 

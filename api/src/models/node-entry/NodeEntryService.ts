@@ -14,7 +14,7 @@ export interface NodeEntryWithTypes extends NodeEntry {
     createdAt: Date;
   } | undefined | null;
   relatedNode?: QuestionNode | null;
-  slideNodeEntry?: SliderNodeEntry | undefined | null;
+  sliderNodeEntry?: SliderNodeEntry | undefined | null;
   choiceNodeEntry?: ChoiceNodeEntry | undefined | null;
   registrationNodeEntry?: RegistrationNodeEntry | undefined | null;
   textboxNodeEntry?: TextboxNodeEntry | undefined | null;
@@ -68,7 +68,7 @@ class NodeEntryService {
 
     if (orderBy.by === 'score') {
       orderedNodeEntriesScore = _.orderBy(
-        entries, (entry) => entry.slideNodeEntry?.value, orderBy.desc ? 'desc' : 'asc',
+        entries, (entry) => entry.sliderNodeEntry?.value, orderBy.desc ? 'desc' : 'asc',
       );
     } else if (orderBy.by === 'id') {
       orderedNodeEntriesScore = _.orderBy(
@@ -113,9 +113,9 @@ class NodeEntryService {
 
     if (nodeEntry.relatedNode?.type === 'SLIDER') {
       try {
-        return nodeEntry?.slideNodeEntry?.value;
+        return nodeEntry?.sliderNodeEntry?.value;
       } catch {
-        throw new Error('SlideNodeEntry was not included on initial retrieval.');
+        throw new Error('sliderNodeEntry was not included on initial retrieval.');
       }
     }
 
