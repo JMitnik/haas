@@ -34,6 +34,7 @@ const DialogueBuilderView = ({ nodes, selectLeafs, root }: DialogueBuilderViewPr
 
         {root && (
         <QuestionSection
+          parentQuestionType=""
           edgeId={undefined}
           options={root.options}
           condition={undefined}

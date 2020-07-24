@@ -44,6 +44,7 @@ interface QuestionEntryFormProps {
   edgeId: string | undefined;
   question: QuestionEntryProps;
   parentQuestionId?: string;
+  parentQuestionType: string;
 }
 
 const questionTypes = [
@@ -68,6 +69,7 @@ const QuestionEntryForm = ({
   edgeId,
   question,
   parentQuestionId,
+  parentQuestionType,
 }: QuestionEntryFormProps) => {
   const { customerSlug, dialogueSlug } = useParams();
 
@@ -88,7 +90,7 @@ const QuestionEntryForm = ({
       label: condition.conditionType,
     } : null,
   );
-  const [activeCondition, setActiveCondition] = useState<null | EdgeConditonProps>(condition || null);
+  const [activeCondition, setActiveCondition] = useState<null | EdgeConditonProps>(condition || { conditionType: parentQuestionType === 'Slider' ? 'valueBoundary' : 'match' });
 
   const setConditionType = (conditionOption: any) => {
     setActiveConditionSelect(conditionOption);
@@ -282,7 +284,7 @@ const QuestionEntryForm = ({
   };
 
   const parentOptionsSelect = parentOptions?.map((option) => ({ label: option.value, value: option.value }));
-
+  console.log('Parent type: ', parentQuestionType);
   return (
     <Form onSubmit={handleSubmit(onSubmit)}>
       <FormGroupContainer>
@@ -298,7 +300,7 @@ const QuestionEntryForm = ({
           <Div py={4}>
             <Grid gridTemplateColumns={['1fr', '1fr 1fr']}>
 
-              <Div useFlex flexDirection="column">
+              <Div useFlex flexDirection="column" gridColumn="1 / -1">
                 <StyledLabel>Title</StyledLabel>
                 <StyledInput
                   name="title"
@@ -309,7 +311,7 @@ const QuestionEntryForm = ({
                 {errors.title && <Muted color="warning">Something went wrong!</Muted>}
               </Div>
 
-              <Flex flexDirection="column">
+              {/* <Flex flexDirection="column">
                 <StyledLabel>conditionType</StyledLabel>
                 <Select
                   ref={() => register({
@@ -322,9 +324,9 @@ const QuestionEntryForm = ({
                   onChange={(qOption: any) => handleConditionTypeChange(qOption)}
                 />
                 {errors.conditionType && <Muted color="warning">Something went wrong!</Muted>}
-              </Flex>
+              </Flex> */}
 
-              {activeConditionSelect?.value === 'valueBoundary' && (
+              {parentQuestionType === 'Slider' && (
                 <>
                   <Flex flexDirection="column">
                     <StyledLabel>Min value</StyledLabel>
@@ -349,7 +351,7 @@ const QuestionEntryForm = ({
                 </>
               )}
 
-              {activeConditionSelect?.value === 'match' && (
+              {parentQuestionType === 'Multi-Choice' && (
                 <Div gridColumn="1 / -1">
                   <StyledLabel>Match value</StyledLabel>
                   <Select

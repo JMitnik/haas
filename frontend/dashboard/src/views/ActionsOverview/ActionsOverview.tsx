@@ -25,7 +25,7 @@ const DialogueViewContainer = styled(Div)`
 `;
 
 const initializeCTAType = (type: string) => {
-  if (type === 'OPINION') {
+  if (type === 'TEXTBOX') {
     return { label: 'Opinion', value: 'TEXTBOX' };
   }
 

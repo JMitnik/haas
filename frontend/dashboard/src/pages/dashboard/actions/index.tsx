@@ -48,7 +48,7 @@ const ActionsPage = () => {
     }
 
     if (leaf.type === 'TEXTBOX') {
-      return { ...leaf, type: 'OPINION', icon: OpinionIcon };
+      return { ...leaf, type: 'TEXTBOX', icon: OpinionIcon };
     }
 
     return null;

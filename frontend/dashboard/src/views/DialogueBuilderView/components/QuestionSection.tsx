@@ -9,6 +9,7 @@ import { EdgeConditonProps, QuestionEntryProps, QuestionOptionProps } from '../D
 import QuestionEntry from './QuestionEntry/QuestionEntry';
 
 interface QuestionSectionProps {
+  parentQuestionType: string;
   options: QuestionOptionProps[] | undefined;
   questionsQ: Array<QuestionEntryProps>;
   question: QuestionEntryProps;
@@ -38,6 +39,7 @@ const QuestionSection = ({
   condition,
   options,
   edgeId,
+  parentQuestionType,
 }: QuestionSectionProps) => {
   const [isQuestionExpanded, setQuestionExpanded] = useState(depth === 1 || false);
   const [isAddExpanded, setAddExpanded] = useState(false);
@@ -85,6 +87,7 @@ const QuestionSection = ({
         depth={depth}
         edgeId={edgeId}
         parentOptions={options}
+        parentQuestionType={parentQuestionType}
         condition={condition}
         isExpanded={isQuestionExpanded}
         onExpandChange={handleExpandChange}
@@ -105,6 +108,7 @@ const QuestionSection = ({
           <QuestionSection
             edgeId={getEdgeIdfromParentQuestion(child.id)}
             options={parentOptions}
+            parentQuestionType={question.type}
             condition={getConditionOfParentQuestion(child.id)}
             depth={depth + 1}
             Icon={child.icon}
@@ -137,6 +141,7 @@ const QuestionSection = ({
           <QuestionEntry
             depth={depth}
             onAddExpandChange={setAddExpanded}
+            parentQuestionType={question.type}
             parentQuestionId={question.id}
             edgeId=""
             parentOptions={parentOptions}

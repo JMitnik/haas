@@ -36,9 +36,11 @@ interface QuestionEntryItemProps {
   edgeId: string | undefined;
   parentQuestionId?: string;
   depth: number;
+  parentQuestionType: string;
 }
 
 const QuestionEntryItem = ({ depth,
+  parentQuestionType,
   question,
   activeQuestion,
   onActiveQuestionChange,
@@ -114,6 +116,7 @@ const QuestionEntryItem = ({ depth,
           && (
             <QuestionEntryForm
               onAddExpandChange={onAddExpandChange}
+              parentQuestionType={parentQuestionType}
               parentQuestionId={parentQuestionId}
               question={question}
               key={`form-${question.id}-${question.updatedAt}`}
