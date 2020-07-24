@@ -50,9 +50,9 @@ const SocialShareNode = ({ node }: SocialShareNodeProps) => {
               {link.type === 'FACEBOOK' && <Facebook stroke="none" fill="white" />}
               {link.type === 'INSTAGRAM' && <Instagram stroke="white" />}
               {link.type === 'LINKEDIN' && <Linkedin stroke="none" fill="white" />}
-              {(!['TWITTER', 'FACEBOOK', 'INSTAGRAM', 'LINKEDIN'].includes(link.type) && link.icon)
-              && <CustomIcon logo={link.icon} />}
-              {(!['TWITTER', 'FACEBOOK', 'INSTAGRAM', 'LINKEDIN'].includes(link.type) && !link.icon)
+              {(!['TWITTER', 'FACEBOOK', 'INSTAGRAM', 'LINKEDIN'].includes(link.type) && link.iconUrl)
+              && <CustomIcon logo={link.iconUrl} />}
+              {(!['TWITTER', 'FACEBOOK', 'INSTAGRAM', 'LINKEDIN'].includes(link.type) && !link.iconUrl)
               && <Globe stroke="white" />}
             </ShareItem>
           ),

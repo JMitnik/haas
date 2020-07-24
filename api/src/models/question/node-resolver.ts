@@ -116,7 +116,7 @@ class NodeResolver {
           url: link.url,
           type: link.type,
           backgroundColor: link.backgroundColor,
-          icon: link.icon,
+          iconUrl: link.icon,
           questionNode: {
             connect: {
               id: questionId,
@@ -128,7 +128,7 @@ class NodeResolver {
           url: link.url,
           type: link.type,
           backgroundColor: link.backgroundColor,
-          icon: link.icon,
+          iconUrl: link.icon,
         },
       });
     });

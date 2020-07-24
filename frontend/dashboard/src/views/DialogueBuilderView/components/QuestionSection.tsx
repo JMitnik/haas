@@ -1,7 +1,7 @@
 import { Plus } from 'react-feather';
 import React, { useState } from 'react';
 
-import { Div, Flex, H2 } from '@haas/ui';
+import { Div, Flex, H4 } from '@haas/ui';
 import SplitArrowIcon from 'components/Icons/SplitIcon';
 
 import { AddQuestionContainer, DepthSpan } from './QuestionEntry/QuestionEntryStyles';
@@ -71,7 +71,7 @@ const QuestionSection = (
   // 2. add marginLeft={`${depth * 10 + 10}px`} to AddQuestionContainer
   // 3. add marginLeft={`${depth * 10 + 10}px`} to Div around where (isQuestionExpanded && isAddExpanded)
   return (
-    <Flex paddingTop="10px" paddingBottom="10px" flexDirection="column">
+    <Flex paddingTop="10px" paddingBottom="10px" flexDirection="column" paddingLeft={`${depth * 10}px`}>
       {depth > 1 && index === 0 && (
       <Flex marginBottom="15px" alignItems="center">
         <SplitArrowIcon />
@@ -126,16 +126,16 @@ const QuestionSection = (
       {(isQuestionExpanded && !isAddExpanded) && (
         <AddQuestionContainer onClick={() => handleAdd()}>
           <Flex justifyContent="center" alignItems="center">
-            <Plus width="35px" height="35px" />
-            <H2>
+            <Plus width="25px" height="25px" />
+            <H4>
               Add new question
-            </H2>
+            </H4>
           </Flex>
         </AddQuestionContainer>
       )}
 
       {(isQuestionExpanded && isAddExpanded) && (
-        <Div>
+        <Div marginLeft={`${depth * 10 + 10}px`}>
           <QuestionEntry
             depth={depth}
             onAddExpandChange={setAddExpanded}

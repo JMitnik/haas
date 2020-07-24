@@ -55,8 +55,10 @@ export const OverflowSpan = styled(Span)`
 export const AddQuestionContainer = styled(Flex)`
    ${({ theme }) => css`
     flex-direction: row;
+    align-self: center;
     cursor: pointer;
-    flex-grow: 1;
+    min-width: 500px;
+    max-width: 800px;
     justify-content: center; 
     align-items: center;
     background-color: ${theme.colors.default.lightest};
@@ -65,8 +67,7 @@ export const AddQuestionContainer = styled(Flex)`
     border: ${theme.colors.app.mutedOnDefault} 1px solid;
     border-radius: ${theme.borderRadiuses.somewhatRounded};
     transition: all 0.2s ease-in;
-    padding: 20px;
-    padding-left: 30px;
+    padding: 10px;
     margin-bottom: 40px;
     &:hover {
         background-color: ${theme.colors.white};

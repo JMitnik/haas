@@ -16,7 +16,7 @@ const getCTANodesOfDialogue = gql`
             id
             url
             title
-            icon
+            iconUrl
             backgroundColor
             type
           }

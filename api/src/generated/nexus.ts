@@ -219,7 +219,7 @@ export interface NexusGenRootTypes {
   }
   LinkType: { // root type
     backgroundColor?: string | null; // String
-    icon?: string | null; // String
+    iconUrl?: string | null; // String
     id: string; // String!
     questionNodeId: string; // String!
     title?: string | null; // String
@@ -429,7 +429,7 @@ export interface NexusGenFieldTypes {
   }
   LinkType: { // field return type
     backgroundColor: string | null; // String
-    icon: string | null; // String
+    iconUrl: string | null; // String
     id: string; // String!
     questionNode: NexusGenRootTypes['QuestionNode']; // QuestionNode!
     questionNodeId: string; // String!

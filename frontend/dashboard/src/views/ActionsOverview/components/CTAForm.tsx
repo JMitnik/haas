@@ -32,7 +32,7 @@ interface LinkInputProps {
   title: string;
   type?: { label: string, value: string };
   url: string;
-  icon?: string;
+  iconUrl?: string;
   backgroundColor?: string;
 }
 
@@ -183,7 +183,7 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: 
 
   const handleIconChange = useCallback(debounce((newIcon: string, index: number) => {
     setActiveLinks((prevLinks) => {
-      prevLinks[index].icon = newIcon;
+      prevLinks[index].iconUrl = newIcon;
       return [...prevLinks];
     });
   }, 250), []);
@@ -311,7 +311,7 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: 
                         <StyledLabel>Icon</StyledLabel>
                         <StyledInput
                           name="icon"
-                          defaultValue={link.icon}
+                          defaultValue={link.iconUrl}
                           onChange={(e) => handleIconChange(e.currentTarget.value, index)}
                           ref={register({ required: false })}
                         />
@@ -320,7 +320,7 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: 
                       <Flex flexDirection="column">
                         <StyledLabel>Background color</StyledLabel>
                         <StyledInput
-                          name="icon"
+                          name="backgroundColor"
                           defaultValue={link.backgroundColor}
                           onChange={(e) => handleBackgroundColorChange(e.currentTarget.value, index)}
                           ref={register({ required: false })}

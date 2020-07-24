@@ -181,7 +181,7 @@ type lineChartDataType {
 
 type LinkType {
   backgroundColor: String
-  icon: String
+  iconUrl: String
   id: String!
   questionNode: QuestionNode!
   questionNodeId: String!

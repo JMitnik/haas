@@ -5,7 +5,7 @@ const TreeLinkModel = types
     url: types.string,
     type: types.string,
     title: types.maybeNull(types.string),
-    icon: types.maybeNull(types.string),
+    iconUrl: types.maybeNull(types.string),
     backgroundColor: types.maybeNull(types.string),
   });
 

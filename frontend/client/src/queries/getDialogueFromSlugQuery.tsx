@@ -23,7 +23,7 @@ const getDialogueFromSlug = gql`
             url
             type
             title
-            icon
+            iconUrl
             backgroundColor
           }
         }

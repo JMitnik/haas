@@ -12,12 +12,12 @@ const main = async () => {
     // Hardcoded for the moment
 
     origin: (origin, callback) => {
-      callback(null, true);
-      // const validOrigins = ['haas-dashboard.netlify.app', 'haas-client.netlify.app'];
+      // callback(null, true);
+      const validOrigins = ['haas-dashboard.netlify.app', 'haas-client.netlify.app'];
 
-      // if (origin && validOrigins.find((origin: string) => origin.endsWith(origin))) {
-      //   callback(null, true);
-      // }
+      if (origin && validOrigins.find((origin: string) => origin.endsWith(origin))) {
+        callback(null, true);
+      }
     },
     credentials: true,
   };
