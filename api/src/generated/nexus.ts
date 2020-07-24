@@ -229,11 +229,12 @@ export interface NexusGenRootTypes {
   Mutation: {};
   NodeEntry: prisma.NodeEntry;
   NodeEntryValue: { // root type
-    choice?: string | null; // String
+    choiceNodeEntry?: string | null; // String
     id: string; // ID!
-    register?: string | null; // String
-    slider?: number | null; // Int
-    textbox?: string | null; // String
+    linkNodeEntry?: string | null; // String
+    registrationNodeEntry?: string | null; // String
+    sliderNodeEntry?: number | null; // Int
+    textboxNodeEntry?: string | null; // String
   }
   PaginationPageInfo: { // root type
     nrPages: number; // Int!
@@ -475,11 +476,12 @@ export interface NexusGenFieldTypes {
     value: NexusGenRootTypes['NodeEntryValue'] | null; // NodeEntryValue
   }
   NodeEntryValue: { // field return type
-    choice: string | null; // String
+    choiceNodeEntry: string | null; // String
     id: string; // ID!
-    register: string | null; // String
-    slider: number | null; // Int
-    textbox: string | null; // String
+    linkNodeEntry: string | null; // String
+    registrationNodeEntry: string | null; // String
+    sliderNodeEntry: number | null; // Int
+    textboxNodeEntry: string | null; // String
   }
   PaginationPageInfo: { // field return type
     nrPages: number; // Int!

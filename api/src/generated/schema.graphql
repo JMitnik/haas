@@ -207,11 +207,12 @@ input NodeEntryInput {
 }
 
 type NodeEntryValue {
-  choice: String
+  choiceNodeEntry: String
   id: ID!
-  register: String
-  slider: Int
-  textbox: String
+  linkNodeEntry: String
+  registrationNodeEntry: String
+  sliderNodeEntry: Int
+  textboxNodeEntry: String
 }
 
 input OptionInput {

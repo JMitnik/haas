@@ -21,10 +21,11 @@ const getInteractionsQuery = gql`
                 type
               }
               value {
-                slider
-                textbox
-                register
-                choice
+                sliderNodeEntry
+                textboxNodeEntry
+                registrationNodeEntry
+                choiceNodeEntry
+                linkNodeEntry
               }
             }
           }

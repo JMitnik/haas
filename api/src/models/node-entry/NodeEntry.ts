@@ -11,10 +11,11 @@ export const NodeEntryValueType = objectType({
   definition(t) {
     t.id('id');
 
-    t.int('slider', { nullable: true });
-    t.string('textbox', { nullable: true });
-    t.string('register', { nullable: true });
-    t.string('choice', { nullable: true });
+    t.int('sliderNodeEntry', { nullable: true });
+    t.string('textboxNodeEntry', { nullable: true });
+    t.string('registrationNodeEntry', { nullable: true });
+    t.string('choiceNodeEntry', { nullable: true });
+    t.string('linkNodeEntry', { nullable: true });
   },
 });
 
