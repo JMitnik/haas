@@ -12,8 +12,12 @@ import getCTANodesQuery from 'queries/getCTANodes';
 const ActionsPage = () => {
   const { dialogueSlug, customerSlug } = useParams();
 
-  const [fetchActions, { data, variables }] = useLazyQuery(getCTANodesQuery, {
-    fetchPolicy: 'cache-and-network',
+  const { data, loading } = useQuery(getCTANodesQuery, {
+    variables: {
+      dialogueSlug,
+      customerSlug,
+      searchTerm: '',
+    },
     onCompleted: () => {
     },
     onError: (error: any) => {
@@ -21,17 +25,9 @@ const ActionsPage = () => {
     },
   });
 
-  useEffect(() => {
-    fetchActions({ variables: {
-      dialogueSlug,
-      customerSlug,
-      searchTerm: '',
-    } });
-  }, [dialogueSlug, customerSlug, fetchActions]);
-
   const leafs = data?.customer?.dialogue?.leafs;
 
-  if (!leafs) return <Loader />;
+  if (!leafs || loading) return <Loader />;
 
   const mappedLeafs = leafs.map((leaf: any) => {
     if (leaf.type === 'SOCIAL_SHARE') {
@@ -54,10 +50,8 @@ const ActionsPage = () => {
     return null;
   });
 
-  const { searchTerm } = variables;
-
   return (
-    <ActionOverview fetchActions={fetchActions} leafs={mappedLeafs} currentSearchTerm={searchTerm} />
+    <ActionOverview leafs={mappedLeafs} />
   );
 };
 

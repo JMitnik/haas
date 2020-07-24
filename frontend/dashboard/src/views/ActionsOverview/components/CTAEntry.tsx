@@ -95,6 +95,7 @@ const CTAEntry = ({ id, activeCTA, onActiveCTAChange, title, type, links, Icon, 
     }
     return deleteEntry();
   };
+
   return (
     <CTAEntryContainer id={id} activeCTA={activeCTA}>
       <DeleteCTAButton disabled={(!!activeCTA && activeCTA !== id) || false} onClick={() => deleteCTA()}>
