@@ -4,7 +4,7 @@ import { MinusCircle, PlusCircle } from 'react-feather';
 import { useForm } from 'react-hook-form';
 import { useMutation } from '@apollo/react-hooks';
 import { useParams } from 'react-router';
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import Select from 'react-select';
 
 import { Button, Div, Flex, Form, FormGroupContainer,
@@ -21,12 +21,12 @@ import { EdgeConditonProps,
 
 interface FormDataProps {
   title: string;
-  ctaType: string;
-  url: string;
-  linkType: string;
-  tooltip?: string;
-  icon: string;
-  backgroundColor: string;
+  conditionType: string;
+  minValue: string;
+  maxValue: string;
+  questionType: string;
+  matchText: string;
+  activeLeaf: string;
 }
 
 interface QuestionEntryFormProps {
@@ -91,6 +91,73 @@ const QuestionEntryForm = ({
   );
   const [activeCondition, setActiveCondition] = useState<null | EdgeConditonProps>(condition || null);
 
+  const setConditionType = (conditionOption: any) => {
+    setActiveConditionSelect(conditionOption);
+    setActiveCondition((prevCondition) => {
+      if (!prevCondition) {
+        return { conditionType: conditionOption.value };
+      }
+      prevCondition.conditionType = conditionOption.value;
+      return prevCondition;
+    });
+  };
+
+  const handleQuestionTypeChange = useCallback((selectOption: any) => {
+    setValue('questionType', selectOption?.value);
+    setActiveQuestionType(selectOption);
+  }, [setValue, setActiveQuestionType]);
+
+  useEffect(() => {
+    if (activeQuestionType) {
+      handleQuestionTypeChange(activeQuestionType);
+    }
+  }, [activeQuestionType, handleQuestionTypeChange]);
+
+  const handleConditionTypeChange = useCallback((selectedOption: any) => {
+    setValue('conditionType', selectedOption?.value);
+    setConditionType(selectedOption);
+  }, [setValue, setConditionType]);
+
+  useEffect(() => {
+    if (activeConditionSelect) {
+      handleConditionTypeChange(activeConditionSelect);
+    }
+  }, [activeConditionSelect, handleConditionTypeChange]);
+
+  const handleLeafChange = useCallback((selectedOption: any) => {
+    setValue('activeLeaf', selectedOption?.value);
+    setActiveLeaf(selectedOption);
+  }, [setValue, setActiveLeaf]);
+
+  useEffect(() => {
+    if (activeLeaf) {
+      handleLeafChange(activeLeaf);
+    }
+  }, [activeLeaf, handleLeafChange]);
+
+  const setMatchTextValue = (qOption: any) => {
+    const matchText = qOption.value;
+    setActiveMatchValue(qOption);
+    return setActiveCondition((prevCondition) => {
+      if (!prevCondition) {
+        return { matchValue: matchText };
+      }
+      prevCondition.matchValue = matchText;
+      return prevCondition;
+    });
+  };
+
+  const handleMatchTextChange = useCallback((selectedOption: any) => {
+    setValue('matchText', selectedOption?.value);
+    setMatchTextValue(selectedOption);
+  }, [setValue, setMatchTextValue]);
+
+  useEffect(() => {
+    if (activematchValue) {
+      handleMatchTextChange(activematchValue);
+    }
+  }, [handleMatchTextChange, activematchValue]);
+
   const [createQuestion] = useMutation(createQuestionMutation, {
     onCompleted: () => {
       if (onAddExpandChange) {
@@ -135,18 +202,6 @@ const QuestionEntryForm = ({
     onActiveQuestionChange(null);
   };
 
-  const setMatchTextValue = (qOption: any) => {
-    const matchText = qOption.value;
-    setActiveMatchValue(qOption);
-    return setActiveCondition((prevCondition) => {
-      if (!prevCondition) {
-        return { matchValue: matchText };
-      }
-      prevCondition.matchValue = matchText;
-      return prevCondition;
-    });
-  };
-
   const setMinValue = (event: React.FocusEvent<HTMLInputElement>) => {
     const minValue = Number(event.target.value);
     return setActiveCondition((prevCondition) => {
@@ -165,17 +220,6 @@ const QuestionEntryForm = ({
         return { renderMax: maxValue };
       }
       prevCondition.renderMax = maxValue;
-      return prevCondition;
-    });
-  };
-
-  const setConditionType = (conditionOption: any) => {
-    setActiveConditionSelect(conditionOption);
-    setActiveCondition((prevCondition) => {
-      if (!prevCondition) {
-        return { conditionType: conditionOption.value };
-      }
-      prevCondition.conditionType = conditionOption.value;
       return prevCondition;
     });
   };
@@ -269,10 +313,16 @@ const QuestionEntryForm = ({
               <Flex flexDirection="column">
                 <StyledLabel>conditionType</StyledLabel>
                 <Select
+                  ref={() => register({
+                    name: 'conditionType',
+                    required: true,
+                    validate: (value) => (Array.isArray(value) ? value.length > 0 : !!value),
+                  })}
                   options={conditionTypes}
                   value={activeConditionSelect}
-                  onChange={(qOption: any) => setConditionType(qOption)}
+                  onChange={(qOption: any) => handleConditionTypeChange(qOption)}
                 />
+                {errors.conditionType && <Muted color="warning">Something went wrong!</Muted>}
               </Flex>
 
               {activeConditionSelect?.value === 'valueBoundary' && (
@@ -280,16 +330,22 @@ const QuestionEntryForm = ({
                   <Flex flexDirection="column">
                     <StyledLabel>Min value</StyledLabel>
                     <StyledInput
+                      name="minValue"
+                      ref={register({ required: false })}
                       defaultValue={condition?.renderMin}
                       onBlur={(event: React.FocusEvent<HTMLInputElement>) => setMinValue(event)}
                     />
+                    {errors.minValue && <Muted color="warning">{errors.minValue.message}</Muted>}
                   </Flex>
                   <Flex flexDirection="column">
                     <StyledLabel>Max value</StyledLabel>
                     <StyledInput
+                      name="maxValue"
+                      ref={register({ required: false })}
                       defaultValue={condition?.renderMax}
                       onBlur={(event: React.FocusEvent<HTMLInputElement>) => setMaxValue(event)}
                     />
+                    {errors.maxValue && <Muted color="warning">{errors.maxValue.message}</Muted>}
                   </Flex>
                 </>
               )}
@@ -298,32 +354,47 @@ const QuestionEntryForm = ({
                 <Div gridColumn="1 / -1">
                   <StyledLabel>Match value</StyledLabel>
                   <Select
+                    ref={() => register({
+                      name: 'matchType',
+                      required: false,
+                    })}
                     options={parentOptionsSelect}
                     value={activematchValue}
                     onChange={(option: any) => {
                       setMatchTextValue(option);
                     }}
                   />
+                  {errors.matchText && <Muted color="warning">{errors.matchText.message}</Muted>}
                 </Div>
               )}
 
               <Div useFlex flexDirection="column">
                 <StyledLabel>Question type</StyledLabel>
                 <Select
+                  ref={() => register({
+                    name: 'questionType',
+                    required: true,
+                  })}
                   options={questionTypes}
                   value={activeQuestionType}
-                  onChange={(qOption: any) => setActiveQuestionType(qOption)}
+                  onChange={(qOption: any) => handleQuestionTypeChange(qOption)}
                 />
+                {errors.questionType && <Muted color="warning">{errors.questionType.message}</Muted>}
               </Div>
 
               <Div key={activeLeaf?.value} useFlex flexDirection="column">
                 <StyledLabel>Leaf node</StyledLabel>
                 <Select
+                  ref={() => register({
+                    name: 'activeLeaf',
+                    required: true,
+                  })}
                   key={activeLeaf?.value}
                   options={leafs}
                   value={(activeLeaf?.value && activeLeaf) || leafs[0]}
-                  onChange={(leafOption: any) => setActiveLeaf(leafOption)}
+                  onChange={(leafOption: any) => handleLeafChange(leafOption)}
                 />
+                {errors.activeLeaf && <Muted color="warning">{errors.activeLeaf.message}</Muted>}
               </Div>
 
               {activeQuestionType && activeQuestionType.value === 'MULTI_CHOICE' && (
