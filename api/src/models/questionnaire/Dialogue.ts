@@ -90,12 +90,10 @@ export const DialogueType = objectType({
     });
 
     t.int('countInteractions', {
-      nullable: true,
-
       async resolve(parent) {
         const interactions = await DialogueService.countInteractions(parent.id);
 
-        return interactions || null;
+        return interactions || 0;
       },
     });
 

@@ -99,11 +99,13 @@ class SessionService {
       return [];
     }
 
-    return sessions.flatMap((session) => session.nodeEntries).filter((entry) => {
+    const textEntries = sessions.flatMap((session) => session.nodeEntries).filter((entry) => {
       const isTextEntry = entry?.relatedNode?.type && TEXT_NODES.includes(entry?.relatedNode?.type);
 
       return isTextEntry;
     });
+
+    return textEntries;
   }
 
   /**

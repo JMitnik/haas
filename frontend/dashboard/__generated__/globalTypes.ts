@@ -13,9 +13,14 @@
 export enum PaginationSortByEnum {
   createdAt = "createdAt",
   email = "email",
+  firstName = "firstName",
   id = "id",
+  lastName = "lastName",
+  medium = "medium",
   name = "name",
+  role = "role",
   score = "score",
+  type = "type",
 }
 
 export enum TagTypeEnum {

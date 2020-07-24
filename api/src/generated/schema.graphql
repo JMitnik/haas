@@ -69,7 +69,7 @@ input CustomerWhereUniqueInput {
 
 type Dialogue {
   averageScore: Float!
-  countInteractions: Int
+  countInteractions: Int!
   creationDate: String
   customer: Customer
   customerId: String!

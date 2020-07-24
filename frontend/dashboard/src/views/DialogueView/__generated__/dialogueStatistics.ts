@@ -42,7 +42,7 @@ export interface dialogueStatistics_customer_dialogue_statistics {
 export interface dialogueStatistics_customer_dialogue {
   __typename: "Dialogue";
   id: string;
-  countInteractions: number | null;
+  countInteractions: number;
   averageScore: number;
   sessions: dialogueStatistics_customer_dialogue_sessions[];
   statistics: dialogueStatistics_customer_dialogue_statistics | null;

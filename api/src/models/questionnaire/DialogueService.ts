@@ -13,6 +13,11 @@ import { HistoryDataProps, QuestionProps, StatisticsProps } from './DialogueType
 import SessionService from '../session/SessionService';
 import prisma from '../../prisma';
 
+interface PathFrequency {
+  answer: string;
+  quantity: number;
+}
+
 class DialogueService {
   static constructDialogue(
     customerId: string,
@@ -103,13 +108,26 @@ class DialogueService {
     });
   };
 
-  static getTopPaths = (groupedJoined: any) => {
+  /**
+   * Get top popular N paths based on occurence frequency.
+   * @param groupedJoined
+   * @param nPaths
+   */
+  static getTopNPaths = (groupedJoined: any, nPaths: number = 3) => {
     const countedPaths = _.countBy(groupedJoined, 'textValue');
-    const o = _.sortBy(_.toPairs(countedPaths), 1).reverse();
-    const countedPathsObjects = o.map((array) => ({ answer: array[0] || null, quantity: array[1] || null }));
-    const topPath = countedPathsObjects.length > 3
-      ? countedPathsObjects.slice(0, 3) : countedPathsObjects;
-    return topPath || [];
+
+    // Built in cleanup
+    Object.keys(countedPaths).forEach((path) => path === 'undefined' && delete countedPaths[path]);
+
+    const countTuples = _.sortBy(_.toPairs(countedPaths), 1).reverse();
+    const pathFrequencies: PathFrequency[] = countTuples.map(([answer, quantity]) => ({
+      answer,
+      quantity,
+    }));
+
+    // If there are three, grab the first three, otherwise get the entire element
+    const topNPaths = pathFrequencies.length > nPaths ? pathFrequencies.slice(0, nPaths) : pathFrequencies;
+    return topNPaths || [];
   };
 
   static getNextLineData = async (
@@ -141,9 +159,7 @@ class DialogueService {
     const startDate = subDays(new Date(), numberOfDaysBack);
     const sessions = await SessionService.getDialogueSessions(dialogueId, { startDate });
 
-    if (!sessions) {
-      throw new Error('No sessions present');
-    }
+    if (!sessions) { throw new Error('No sessions present'); }
 
     const scoreEntries = SessionService.getScoringEntriesFromSessions(sessions);
 
@@ -155,15 +171,13 @@ class DialogueService {
     })) || [];
 
     const nodeEntryTextValues = await SessionService.getTextEntriesFromSessions(sessions);
-    // console.log('text values', nodeEntryTextValues);
 
     // TODO: This is where I left off
     const textAndScoreEntries = _.merge(history, nodeEntryTextValues);
     const isPositiveEntries = _.groupBy(textAndScoreEntries, (entry) => entry.y && entry.y > 50);
-    console.log('textAndScoreEntries', textAndScoreEntries);
 
-    const topNegativePath = DialogueService.getTopPaths(isPositiveEntries.false) || [];
-    const topPositivePath = DialogueService.getTopPaths(isPositiveEntries.true) || [];
+    const topNegativePath = DialogueService.getTopNPaths(isPositiveEntries.false, 3) || [];
+    const topPositivePath = DialogueService.getTopNPaths(isPositiveEntries.true, 3) || [];
 
     return { history, topNegativePath, topPositivePath };
   };

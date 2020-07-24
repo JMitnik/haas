@@ -396,7 +396,7 @@ export interface NexusGenFieldTypes {
   }
   Dialogue: { // field return type
     averageScore: number; // Float!
-    countInteractions: number | null; // Int
+    countInteractions: number; // Int!
     creationDate: string | null; // String
     customer: NexusGenRootTypes['Customer'] | null; // Customer
     customerId: string; // String!

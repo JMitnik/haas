@@ -17,10 +17,11 @@ export interface getInteractions_customer_dialogue_sessionConnection_sessions_no
 
 export interface getInteractions_customer_dialogue_sessionConnection_sessions_nodeEntries_value {
   __typename: "NodeEntryValue";
-  slider: number | null;
-  textbox: string | null;
-  register: string | null;
-  choice: string | null;
+  sliderNodeEntry: number | null;
+  textboxNodeEntry: string | null;
+  registrationNodeEntry: string | null;
+  choiceNodeEntry: string | null;
+  linkNodeEntry: string | null;
 }
 
 export interface getInteractions_customer_dialogue_sessionConnection_sessions_nodeEntries {

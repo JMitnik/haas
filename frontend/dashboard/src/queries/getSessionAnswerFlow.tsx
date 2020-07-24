@@ -14,14 +14,12 @@ const getSessionAnswerFlowQuery = gql`
             type
           }
           value {
-            slider
-            textbox
-            register
-            choice
+            sliderNodeEntry
+            textboxNodeEntry
+            registrationNodeEntry
+            linkNodeEntry
+            choiceNodeEntry
           }
-        }
-        relatedNode {
-          title
         }
       }
     }

@@ -11,6 +11,7 @@ import { ReactComponent as PathsIcon } from 'assets/icons/icon-launch.svg';
 import { ReactComponent as TrendingIcon } from 'assets/icons/icon-trending-up.svg';
 import { ReactComponent as TrophyIcon } from 'assets/icons/icon-trophy.svg';
 
+import { dialogueStatistics as DialogueStatisticsData } from './__generated__/dialogueStatistics';
 import InteractionFeedModule from './Modules/InteractionFeedModule/InteractionFeedModule';
 import NegativePathsModule from './Modules/NegativePathsModule/index.tsx';
 import NodeEntriesOverview from '../NodeEntriesOverview/NodeEntriesOverview';
@@ -53,6 +54,7 @@ const getDialogueStatistics = gql`
             answer
             quantity
           }
+          
           topNegativePath {
             quantity
             answer
@@ -77,7 +79,7 @@ const DialogueView = () => {
   // const [activeFilter, setActiveFilter] = useState(() => 'Last 24h');
 
   // TODO: Move this to page level
-  const { data } = useQuery(getDialogueStatistics, {
+  const { data } = useQuery<DialogueStatisticsData>(getDialogueStatistics, {
     variables: {
       dialogueSlug,
       customerSlug,
@@ -141,18 +143,26 @@ const DialogueView = () => {
         </Div>
 
         <Div gridColumn="span 2">
-          <ScoreGraphModule chartData={dialogue.statistics?.lineChartData} />
+          {dialogue.statistics?.history ? (
+            <ScoreGraphModule chartData={dialogue.statistics?.history} />
+          ) : (
+            // TODO: Make a nice card for this
+            <Div>
+              Currently no history data available
+            </Div>
+          )}
         </Div>
+
         <InteractionFeedModule
           onActiveSessionChange={setActiveSession}
           timelineEntries={dialogue?.sessions}
         />
 
         {location?.state?.modal && (
-        <Modal>
-          <NodeEntriesOverview sessionId={activeSession} />
-        </Modal>
-      )}
+          <Modal>
+            <NodeEntriesOverview sessionId={activeSession} />
+          </Modal>
+        )}
       </Grid>
     </DialogueViewContainer>
   );
