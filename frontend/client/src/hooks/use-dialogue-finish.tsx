@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-
 import { useMutation } from '@apollo/react-hooks';
+
 import createSessionMutation from 'mutations/createSessionMutation';
 import useDialogueTree from 'providers/DialogueTreeProvider';
 

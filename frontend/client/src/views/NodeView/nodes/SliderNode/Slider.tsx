@@ -109,6 +109,7 @@ const Slider = ({ register, onSubmit, animationControls }: SliderProps) => {
       <HAASRabbit style={{
         left: `${animationState.position}%`,
         bottom: '5px',
+        // zIndex: 500,
         transform: `translateX(-50%) scaleX(${animationState.direction})`,
       }}
       >
@@ -137,6 +138,7 @@ const Slider = ({ register, onSubmit, animationControls }: SliderProps) => {
         <UISlider
           width={1}
           name="slider"
+          style={{ zIndex: 300 }}
           onChange={(e) => moveBunny(e)}
           onMouseUp={() => handleSubmit()}
           onTouchEnd={() => handleSubmit()}

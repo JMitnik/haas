@@ -37,7 +37,8 @@
         "kill:api": "kill $(lsof -t -i:4000) | exit 0",
         "kill:client": "kill $(lsof -t -i:3000) | exit 0",
         "test": "yarn workspace @haas/client test",
-        "test:cypress": "yarn workspace @haas/dashboard cypress open"
+        "test:cypress-dashboard": "yarn workspace @haas/dashboard cypress open",
+        "test:cypress-client": "yarn workspace @haas/client cypress open"
     },
     "devDependencies": {
         "eslint-config-prettier": "^6.10.1",
