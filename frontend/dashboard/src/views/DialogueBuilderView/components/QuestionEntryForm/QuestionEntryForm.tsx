@@ -83,11 +83,10 @@ const QuestionEntryForm = ({
   const [activematchValue, setActiveMatchValue] = useState<null | {label: string, value: string}>(matchValue);
   const [activeLeaf, setActiveLeaf] = useState({ label: overrideLeaf?.title, value: overrideLeaf?.id });
   const [activeConditionSelect, setActiveConditionSelect] = useState<null | { label: string, value: string}>(
-    condition?.conditionType
-      ? {
-        value: condition.conditionType,
-        label: condition.conditionType,
-      } : null,
+    condition?.conditionType ? {
+      value: condition.conditionType,
+      label: condition.conditionType,
+    } : null,
   );
   const [activeCondition, setActiveCondition] = useState<null | EdgeConditonProps>(condition || null);
 

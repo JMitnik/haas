@@ -19,37 +19,36 @@ export const ConditionContainer = styled(Flex) <{ activeCTA: string | null, id: 
     flex-direction: column;
     justify-content: center;
     align-items: center;
-
     margin-bottom: 25px;
     width: 60px;
     height: 60px;
 
+    border-top-left-radius: ${theme.borderRadiuses.somewhatRounded};
+    border-bottom-left-radius: ${theme.borderRadiuses.somewhatRounded};
+
     ${!activeCTA && css`
-    background-color: ${theme.colors.white};
+      background-color: ${theme.colors.white};
     `};
 
     ${activeCTA === id && css`
-    background-color: ${theme.colors.white};
+      background-color: ${theme.colors.white};
     `};
 
     ${activeCTA && activeCTA !== id && css`
-    background-color: ${theme.colors.white};
-    opacity: 0.5;
+      background-color: ${theme.colors.white};
+      opacity: 0.5;
     `};
-
-    border-top-left-radius: ${theme.borderRadiuses.somewhatRounded};
-    border-bottom-left-radius: ${theme.borderRadiuses.somewhatRounded};
   `}
 `;
 
 export const OverflowSpan = styled(Span)`
   ${({ theme }) => css`
     color: ${theme.colors.default.darkest};
+    font-size: 1.2em;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
   `}
-  font-size: 1.2em;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
 `;
 
 export const AddQuestionContainer = styled(Flex)`
@@ -68,10 +67,11 @@ export const AddQuestionContainer = styled(Flex)`
     padding: 20px;
     padding-left: 30px;
     margin-bottom: 40px;
+
     &:hover {
-        background-color: ${theme.colors.white};
-        box-shadow: 0 1px 3px 1px rgba(0,0,0,0.1);
-      }
+      background-color: ${theme.colors.white};
+      box-shadow: 0 1px 3px 1px rgba(0,0,0,0.1);
+    }
  `}
 `;
 
@@ -82,16 +82,16 @@ export const QuestionEntryViewContainer = styled(Flex) <{ activeCTA: string | nu
     color: ${theme.colors.default.muted};
 
     ${!activeCTA && css`
-    background-color: ${theme.colors.white};
+      background-color: ${theme.colors.white};
     `};
 
     ${activeCTA === id && css`
-    background-color: ${theme.colors.white};
+      background-color: ${theme.colors.white};
     `};
 
     ${activeCTA && activeCTA !== id && css`
-    background-color: ${theme.colors.white};
-    opacity: 0.5;
+      background-color: ${theme.colors.white};
+      opacity: 0.5;
     `};
 
     border: ${theme.colors.app.mutedOnDefault} 1px solid;
@@ -183,17 +183,17 @@ export const QuestionEntryContainer = styled(Flex)`
 `;
 
 export const AddChildIconContainer = styled(Div)`
-   ${({ theme }) => css`
-   color: ${theme.colors.default.darkest};
+  ${({ theme }) => css`
+    opacity: 0.9;
+    cursor: pointer;
+    color: ${theme.colors.default.darkest};
+
     svg {
-        color: ${theme.colors.default.darkest};
-        width: 15px;
-        height: 15px;
+      color: ${theme.colors.default.darkest};
+      width: 15px;
+      height: 15px;
     }
   `}
-
-  opacity: 0.9;
-  cursor: pointer;
 `;
 
 export const DeleteQuestionOptionButtonContainer = styled.button`
@@ -203,6 +203,7 @@ export const DeleteQuestionOptionButtonContainer = styled.button`
   cursor: pointer;
   transition: all 0.2s ease-in;
   margin-left: 1%;
+  
   &:hover {
     transition: all 0.2s ease-in;
     opacity: 0.8;

@@ -24,23 +24,21 @@ interface QuestionSectionProps {
   edgeId: string | undefined;
 }
 
-const QuestionSection = (
-  {
-    index,
-    activeQuestion,
-    onActiveQuestionChange,
-    onAddQuestion,
-    onDeleteQuestion,
-    questionsQ,
-    question,
-    leafs,
-    Icon,
-    depth,
-    condition,
-    options,
-    edgeId,
-  }: QuestionSectionProps,
-) => {
+const QuestionSection = ({
+  index,
+  activeQuestion,
+  onActiveQuestionChange,
+  onAddQuestion,
+  onDeleteQuestion,
+  questionsQ,
+  question,
+  leafs,
+  Icon,
+  depth,
+  condition,
+  options,
+  edgeId,
+}: QuestionSectionProps) => {
   const [isQuestionExpanded, setQuestionExpanded] = useState(depth === 1 || false);
   const [isAddExpanded, setAddExpanded] = useState(false);
   const handleExpandChange = () => {

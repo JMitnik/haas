@@ -39,15 +39,21 @@ const ActionsPage = () => {
         const { __typename, ...linkedData } = link;
         return { ...linkedData, type: { label: link.type, value: link.type } };
       });
+
       return { ...leaf, type: 'LINK', icon: LinkIcon, links: mappedLinks };
     }
+
     if (leaf.type === 'REGISTRATION') {
       return { ...leaf, type: 'REGISTER', icon: RegisterIcon };
     }
+
     if (leaf.type === 'TEXTBOX') {
       return { ...leaf, type: 'OPINION', icon: OpinionIcon };
     }
+
+    return null;
   });
+
   const { searchTerm } = variables;
 
   return (

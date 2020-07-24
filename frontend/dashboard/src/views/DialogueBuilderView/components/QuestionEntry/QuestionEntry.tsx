@@ -38,22 +38,20 @@ interface QuestionEntryItemProps {
   depth: number;
 }
 
-const QuestionEntryItem = (
-  { depth,
-    question,
-    activeQuestion,
-    onActiveQuestionChange,
-    Icon,
-    leafs,
-    onExpandChange,
-    isExpanded,
-    condition,
-    parentOptions,
-    edgeId,
-    parentQuestionId,
-    onAddExpandChange }
-  : QuestionEntryItemProps,
-) => {
+const QuestionEntryItem = ({ depth,
+  question,
+  activeQuestion,
+  onActiveQuestionChange,
+  Icon,
+  leafs,
+  onExpandChange,
+  isExpanded,
+  condition,
+  parentOptions,
+  edgeId,
+  parentQuestionId,
+  onAddExpandChange }
+: QuestionEntryItemProps) => {
   const { customerSlug, dialogueSlug } = useParams();
 
   const [deleteQuestion] = useMutation(deleteQuestionMutation, {
