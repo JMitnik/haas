@@ -14,17 +14,18 @@ interface ConditionLabelProps {
 const ConditionLabel = ({ activeCTA, id, condition } : ConditionLabelProps) => (
   <ConditionContainer activeCTA={activeCTA} id={id}>
     <HaasNodeIcon width="25" height="25" isDark />
+
     {condition?.conditionType === 'match' && (
-    <ConditionSpan fontSize="0.6em">
-      <abbr title={condition.matchValue}>{condition.matchValue}</abbr>
-    </ConditionSpan>
-      )}
+      <ConditionSpan fontSize="0.6em">
+        <abbr title={condition.matchValue}>{condition.matchValue}</abbr>
+      </ConditionSpan>
+    )}
 
     {condition?.conditionType === 'valueBoundary' && (
-    <ConditionSpan fontSize="0.6em">
-      {`${condition.renderMin} - ${condition.renderMax}`}
-    </ConditionSpan>
-      )}
+      <ConditionSpan fontSize="0.6em">
+        {`${condition.renderMin} - ${condition.renderMax}`}
+      </ConditionSpan>
+    )}
 
   </ConditionContainer>
 );

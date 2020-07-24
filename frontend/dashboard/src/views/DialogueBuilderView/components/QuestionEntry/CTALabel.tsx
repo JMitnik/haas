@@ -18,15 +18,15 @@ const CTALabel = ({ question }: { question: any }) => (
       alignItems="center"
     >
       {(!question.overrideLeaf?.type || question.overrideLeaf?.type === 'Link') && (
-      <LinkIcon isCTA hasCTA />
+        <LinkIcon isCTA hasCTA />
       )}
 
       {question.overrideLeaf?.type === 'Opinion' && (
-      <OpinionIcon isCTA hasCTA />
+        <OpinionIcon isCTA hasCTA />
       )}
 
       {question.overrideLeaf?.type === 'Register' && (
-      <RegisterIcon isCTA hasCTA />
+        <RegisterIcon isCTA hasCTA />
       )}
 
       <TypeSpan fontSize="0.5em">
