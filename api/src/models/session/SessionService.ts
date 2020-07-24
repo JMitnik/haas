@@ -102,7 +102,6 @@ class SessionService {
     return sessions.flatMap((session) => session.nodeEntries).filter((entry) => {
       const isTextEntry = entry?.relatedNode?.type && TEXT_NODES.includes(entry?.relatedNode?.type);
 
-      console.log('The type', entry.relatedNode?.type, 'and is in TEXT_NODES', isTextEntry);
       return isTextEntry;
     });
   }
