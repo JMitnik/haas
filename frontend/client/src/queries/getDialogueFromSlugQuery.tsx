@@ -19,6 +19,13 @@ const getDialogueFromSlug = gql`
           id
           title
           type
+          links {
+            url
+            type
+            title
+            iconUrl
+            backgroundColor
+          }
         }
         customerId
         rootQuestion {

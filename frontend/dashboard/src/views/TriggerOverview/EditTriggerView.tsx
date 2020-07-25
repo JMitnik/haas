@@ -192,7 +192,7 @@ const EditTriggerForm = (
     if (activeDialogue) {
       fetchQuestions({ variables: { customerSlug, dialogueSlug: activeDialogue.value } });
     }
-  }, [customerSlug, activeDialogue, fetchQuestions]);
+  }, [activeDialogue, customerSlug, fetchQuestions]);
 
   const [editTrigger, { loading }] = useMutation(editTriggerMutation, {
     onCompleted: () => {

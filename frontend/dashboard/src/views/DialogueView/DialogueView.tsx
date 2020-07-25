@@ -5,11 +5,10 @@ import React, { useState } from 'react';
 import gql from 'graphql-tag';
 import styled, { css } from 'styled-components/macro';
 
-import Modal from 'components/Modal';
-
 import { ReactComponent as PathsIcon } from 'assets/icons/icon-launch.svg';
 import { ReactComponent as TrendingIcon } from 'assets/icons/icon-trending-up.svg';
 import { ReactComponent as TrophyIcon } from 'assets/icons/icon-trophy.svg';
+import Modal from 'components/Modal';
 
 import { dialogueStatistics as DialogueStatisticsData } from './__generated__/dialogueStatistics';
 import InteractionFeedModule from './Modules/InteractionFeedModule/InteractionFeedModule';

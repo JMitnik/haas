@@ -1,8 +1,8 @@
 import gql from 'graphql-tag';
 
 const editDialogueMutation = gql`
-  mutation editDialogue($dialogueId: String, $title: String, $description: String, $publicTitle: String, $tags: TagsInputObjectType) {
-    editDialogue(dialogueId: $dialogueId, title: $title, description: $description, publicTitle: $publicTitle, tags: $tags) {
+  mutation editDialogue($customerSlug: String, $dialogueSlug: String, $title: String, $description: String, $publicTitle: String, $tags: TagsInputObjectType) {
+    editDialogue(customerSlug: $customerSlug, dialogueSlug: $dialogueSlug, title: $title, description: $description, publicTitle: $publicTitle, tags: $tags) {
         title
       }
   }

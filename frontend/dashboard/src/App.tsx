@@ -3,6 +3,7 @@ import { Redirect, Route, BrowserRouter as Router, Switch } from 'react-router-d
 import React, { FC } from 'react';
 
 import { AppContainer } from 'styles/AppStyles';
+import ActionsPage from 'pages/dashboard/actions';
 import AddCustomerPage from 'pages/dashboard/customers/add';
 import AddDialogueView from 'views/AddDialogueView';
 import AddTriggerView from 'views/TriggerOverview/AddTriggerView';
@@ -12,7 +13,7 @@ import CustomerPage from 'pages/dashboard/customer';
 import CustomerProvider from 'providers/CustomerProvider';
 import CustomersPage from 'pages/dashboard/customers';
 import DashboardPage from 'pages/dashboard';
-import DialogueBuilderView from 'views/DialogueBuilderView/DialogueBuilderView';
+import DialogueBuilderPage from 'pages/dashboard/builder';
 import DialoguePage from 'pages/dashboard/dialogues/dialogue';
 import DialoguesPage from 'pages/dashboard/dialogues';
 import EditCustomerView from 'views/EditCustomerView';
@@ -28,6 +29,7 @@ import UsersOverview from 'views/UsersOverview/UsersOverview';
 
 import { ErrorBoundary } from 'react-error-boundary';
 import DashboardLayout from 'layouts/DashboardLayout';
+
 import DialogueLayout from 'layouts/DialogueLayout';
 import client from './config/apollo';
 
@@ -111,7 +113,7 @@ const AppRoutes = () => (
                   <Switch>
                     <Route
                       path="/dashboard/b/:customerSlug/d/:dialogueSlug/builder"
-                      render={() => <DialogueBuilderView />}
+                      render={() => <DialogueBuilderPage />}
                     />
 
                     <Route
@@ -122,6 +124,11 @@ const AppRoutes = () => (
                     <Route
                       path="/dashboard/b/:customerSlug/d/:dialogueSlug/interactions"
                       render={() => <InteractionsOverview />}
+                    />
+
+                    <Route
+                      path="/dashboard/b/:customerSlug/d/:dialogueSlug/actions"
+                      render={() => <ActionsPage />}
                     />
 
                     <Route

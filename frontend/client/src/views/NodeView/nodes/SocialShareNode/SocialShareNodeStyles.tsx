@@ -18,7 +18,7 @@ export const ShareItem = styled.a<ColorProps>`
       margin-right: ${theme.gutter}px;
     }
 
-    svg {
+    svg, img {
       @media ${theme.media.desk} {
         height: 25px;
         width: 25px;

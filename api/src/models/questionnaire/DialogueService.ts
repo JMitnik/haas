@@ -1,22 +1,18 @@
-import { Dialogue, DialogueCreateInput,
-  DialogueUpdateInput, Tag, TagWhereUniqueInput } from '@prisma/client';
 import { subDays } from 'date-fns';
 import _ from 'lodash';
+import cuid from 'cuid';
 
+import { Dialogue, DialogueCreateInput, DialogueUpdateInput,
+  QuestionOptionCreateManyWithoutQuestionNodeInput, Tag, TagWhereUniqueInput } from '@prisma/client';
 import { leafNodes, sliderType } from '../../data/seeds/default-data';
-import NodeResolver from '../question/NodeService';
+import NodeService from '../question/NodeService';
 // eslint-disable-next-line import/no-cycle
 import { NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
 // eslint-disable-next-line import/no-cycle
-import { HistoryDataProps, QuestionProps, StatisticsProps } from './DialogueTypes';
+import { HistoryDataProps, IdMapProps, PathFrequency, QuestionProps, StatisticsProps } from './DialogueTypes';
 // eslint-disable-next-line import/no-cycle
 import SessionService from '../session/SessionService';
 import prisma from '../../prisma';
-
-interface PathFrequency {
-  answer: string;
-  quantity: number;
-}
 
 class DialogueService {
   static constructDialogue(
@@ -89,11 +85,23 @@ class DialogueService {
   };
 
   static editDialogue = async (args: any) => {
-    const { dialogueId, title, description, publicTitle, tags } = args;
-    const dbDialogue = await prisma.dialogue.findOne({ where: { id: dialogueId },
-      include: {
-        tags: true,
-      } });
+    const { customerSlug, dialogueSlug, title, description, publicTitle, tags } = args;
+    const customer = await prisma.customer.findOne({
+      where: {
+        slug: customerSlug,
+      },
+      select: {
+        dialogues: {
+          where: {
+            slug: dialogueSlug,
+          },
+          include: {
+            tags: true,
+          },
+        },
+      },
+    });
+    const dbDialogue = customer?.dialogues[0];
 
     let updateDialogueArgs: DialogueUpdateInput = { title, description, publicTitle };
     if (dbDialogue?.tags) {
@@ -102,7 +110,7 @@ class DialogueService {
 
     return prisma.dialogue.update({
       where: {
-        id: dialogueId,
+        id: dbDialogue?.id,
       },
       data: updateDialogueArgs,
     });
@@ -339,6 +347,204 @@ class DialogueService {
     return dialogue;
   };
 
+  static copyDialogue = async (
+    templateId: string,
+    customerId: string,
+    title: string,
+    dialogueSlug: string,
+    description: string,
+    publicTitle: string = '',
+    tags: Array<{id: string}> = []) => {
+    const templateDialogue = await prisma.dialogue.findOne({
+      where: {
+        id: templateId,
+      },
+      include: {
+        edges: {
+          include: {
+            conditions: true,
+            childNode: {
+              select: {
+                id: true,
+              },
+            },
+            parentNode: {
+              select: {
+                id: true,
+              },
+            },
+          },
+        },
+        questions: {
+          include: {
+            links: true,
+            options: {
+              select: {
+                publicValue: true,
+                value: true,
+              },
+            },
+            overrideLeaf: {
+              select: {
+                id: true,
+              },
+            },
+            isOverrideLeafOf: {
+              select: {
+                id: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    const idMap: IdMapProps = {};
+    const dialogue = await DialogueService.initDialogue(
+      customerId, title, dialogueSlug, description, publicTitle, tags,
+    );
+
+    if (templateDialogue?.id) {
+      idMap[templateDialogue?.id] = dialogue.id;
+    }
+
+    templateDialogue?.questions.forEach((question) => {
+      if (!Object.keys(idMap).find((id) => id === question.id)) {
+        idMap[question.id] = cuid();
+      }
+    });
+
+    const updatedTemplateQuestions = templateDialogue?.questions.map((question) => {
+      const mappedId = idMap[question.id];
+      const mappedDialogueId = question.questionDialogueId && idMap[question.questionDialogueId];
+
+      const mappedLinks = question.links.map((link) => {
+        const { id, ...linkData } = link;
+        const updateLink = { ...linkData, questionNodeId: idMap[mappedId] };
+        return updateLink;
+      });
+
+      const mappedOverrideLeafId = question.overrideLeafId && idMap[question.overrideLeafId];
+      const mappedOverrideLeaf = question.overrideLeafId ? { id: idMap[question.overrideLeafId] } : null;
+      const mappedIsOverrideLeafOf = question.isOverrideLeafOf.map(({ id }) => ({ id: idMap[id] }));
+      const mappedOptions: QuestionOptionCreateManyWithoutQuestionNodeInput = { create: question.options };
+      const mappedObject = {
+        ...question,
+        id: mappedId,
+        questionDialogueId: mappedDialogueId,
+        links: { create: mappedLinks },
+        options: mappedOptions,
+        overrideLeafId: mappedOverrideLeafId,
+        overrideLeaf: mappedOverrideLeaf,
+        isOverrideLeafOf: mappedIsOverrideLeafOf,
+      };
+      return mappedObject;
+    });
+
+    // Create leaf nodes
+    const leafs = updatedTemplateQuestions?.filter((question) => question.isLeaf);
+
+    await prisma.dialogue.update({
+      where: {
+        id: dialogue.id,
+      },
+      data: {
+        questions: {
+          create: leafs?.map((leaf) => ({
+            id: leaf.id,
+            isRoot: false,
+            isLeaf: leaf.isLeaf,
+            title: leaf.title,
+            links: leaf.links,
+            type: leaf.type,
+          })),
+        },
+      },
+      include: {
+        questions: {
+          include: {
+            links: true,
+            options: {
+              select: {
+                publicValue: true,
+                value: true,
+              },
+            },
+          },
+
+        },
+
+      },
+    });
+
+    // Create questio nodes
+    const questions = updatedTemplateQuestions?.filter((question) => !question.isLeaf);
+    await prisma.dialogue.update({
+      where: {
+        id: dialogue.id,
+      },
+      data: {
+        questions: {
+          create: questions?.map((leaf) => ({
+            id: leaf.id,
+            isRoot: leaf.isRoot,
+            isLeaf: leaf.isLeaf,
+            title: leaf.title,
+            options: leaf.options,
+            overrideLeaf: leaf.overrideLeaf && { connect: leaf.overrideLeaf },
+            type: leaf.type,
+          })),
+        },
+      },
+      include: {
+        questions: {
+          include: {
+            options: {
+              select: {
+                publicValue: true,
+                value: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    // Create edges
+    const updatedTemplateEdges = templateDialogue?.edges.map((edge) => {
+      const mappedConditions = edge.conditions.map((condition) => {
+        const { id, edgeId, ...conditionData } = condition;
+        const updateCondition = { ...conditionData };
+        return updateCondition;
+      });
+      const mappedChildNode = { id: idMap[edge.childNodeId] };
+      const mappedParentNode = { id: idMap[edge.parentNodeId] };
+      const mappedObject = {
+        parentNode: { connect: mappedParentNode },
+        conditions: { create: mappedConditions },
+        childNode: { connect: mappedChildNode },
+      };
+      return mappedObject;
+    });
+
+    const updatedEdgesDialogue = await prisma.dialogue.update({
+      where: {
+        id: dialogue.id,
+      },
+      data: {
+        edges: {
+          create: updatedTemplateEdges?.map((edge) => ({
+            parentNode: edge.parentNode,
+            conditions: edge.conditions,
+            childNode: edge.childNode,
+          })),
+        },
+      },
+    });
+
+    return updatedEdgesDialogue;
+  };
+
   static createDialogue = async (input: NexusGenInputs['AddDialogueInput']): Promise<Dialogue> => {
     const dialogueTags = input.tags?.entries?.map((tag: string) => ({ id: tag })) || [];
 
@@ -371,8 +577,8 @@ class DialogueService {
       throw new Error(`Customer not found with slug ${input.customerSlug}`);
     }
 
-    // TODO: Rename seedQuestionnaire to something like createFromTemplate, add to slug a -1 iterator
-    if (input.isSeed && customer?.name) {
+    // TODO: Rename seeddialogue to something like createFromTemplate, add to slug a -1 iterator
+    if (input.contentType === 'SEED' && customer?.name) {
       return DialogueService.seedQuestionnare(
         customer?.id,
         input.dialogueSlug,
@@ -380,6 +586,18 @@ class DialogueService {
         input.title,
         input.description,
         dialogueTags,
+      );
+    }
+
+    if (input.contentType === 'TEMPLATE' && input.templateDialogueId) {
+      return DialogueService.copyDialogue(
+        input.templateDialogueId,
+        customer.id,
+        input.title,
+        input.dialogueSlug,
+        input.description,
+        input.publicTitle,
+        [],
       );
     }
 
@@ -408,7 +626,7 @@ class DialogueService {
       },
     });
 
-    await NodeResolver.createTemplateLeafNodes(leafNodes, dialogue.id);
+    await NodeService.createTemplateLeafNodes(leafNodes, dialogue.id);
 
     return dialogue;
   };
@@ -417,18 +635,18 @@ class DialogueService {
     customerId: string,
     customerSlug: string,
     customerName: string,
-    questionnaireTitle: string = 'Default questionnaire',
-    questionnaireDescription: string = 'Default questions',
+    dialogueTitle: string = 'Default dialogue',
+    dialogueDescription: string = 'Default questions',
     tags: Array<{id: string}>,
   ): Promise<Dialogue> => {
-    const questionnaire = await DialogueService.initDialogue(
-      customerId, customerSlug, questionnaireTitle, questionnaireDescription, '', tags,
+    const dialogue = await DialogueService.initDialogue(
+      customerId, customerSlug, dialogueTitle, dialogueDescription, '', tags,
     );
 
-    const leafs = await NodeResolver.createTemplateLeafNodes(leafNodes, questionnaire.id);
+    const leafs = await NodeService.createTemplateLeafNodes(leafNodes, dialogue.id);
 
-    await NodeResolver.createTemplateNodes(questionnaire.id, customerName, leafs);
-    return questionnaire;
+    await NodeService.createTemplateNodes(dialogue.id, customerName, leafs);
+    return dialogue;
   };
 
   static uuidToPrismaIds = async (questions: Array<QuestionProps>, dialogueId: string) => {
@@ -440,7 +658,7 @@ class DialogueService {
 
     const newMappedQuestions = await Promise.all(newQuestions.map(
       async ({ id, title, type }) => {
-        const question = await NodeResolver.createQuestionNode(title, dialogueId, type);
+        const question = await NodeService.createQuestionNode(title, dialogueId, type);
         return { [id]: question.id };
       },
     ));
@@ -475,22 +693,6 @@ class DialogueService {
     return finalQuestions;
   };
 
-  static updateTopicBuilder = async (args: any) => {
-    try {
-      const questionnaireId: string = args.id || undefined;
-      const { questions }: { questions: Array<any> } = args.topicData;
-      const finalQuestions = await DialogueService.uuidToPrismaIds(questions, questionnaireId);
-      await Promise.all(finalQuestions.map(async (question) => NodeResolver.updateQuestion(
-        questionnaireId,
-        question,
-      )));
-
-      return 'Succesfully updated topic(?)';
-    } catch (e) {
-      return `Something went wrong in update topic builder: ${e}`;
-    }
-  };
-
   static calculateAverageDialogueScore = async (dialogueId: string) => {
     const sessions = await SessionService.getDialogueSessions(dialogueId);
 
@@ -498,7 +700,7 @@ class DialogueService {
       return 0;
     }
 
-    const scoringEntries = await SessionService.getScoringEntriesFromSessions(sessions);
+    const scoringEntries = SessionService.getScoringEntriesFromSessions(sessions);
 
     const scores = _.mean((scoringEntries).map((entry) => entry?.sliderNodeEntry)) || 0;
 
@@ -516,7 +718,9 @@ class DialogueService {
     return dialogue?.sessions.length;
   };
 
-  static getDialogueInteractionFeedItems = async (dialogueId: string): Promise<Array<NexusGenRootTypes['NodeEntry']>> => {
+  static getDialogueInteractionFeedItems = async (
+    dialogueId: string,
+  ): Promise<Array<NexusGenRootTypes['NodeEntry']>> => {
     const sessions = await SessionService.getDialogueSessions(dialogueId);
 
     if (!sessions) {

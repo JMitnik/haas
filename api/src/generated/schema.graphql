@@ -3,12 +3,13 @@
 
 
 input AddDialogueInput {
+  contentType: String
   customerSlug: String
   description: String
   dialogueSlug: String
-  isSeed: Boolean
   publicTitle: String
   tags: TagsInputObjectType
+  templateDialogueId: String
   title: String
 }
 
@@ -24,13 +25,17 @@ type ColourSettings {
   secondary: String
 }
 
-"""Interface all pagination-based models should implement"""
-interface ConnectionInterface {
-  endDate: String
-  limit: Int!
-  offset: Int!
-  pageInfo: PaginationPageInfo!
-  startDate: String
+input CTALinkInputObjectType {
+  backgroundColor: String
+  icon: String
+  id: String
+  title: String
+  type: LinkTypeEnumType
+  url: String
+}
+
+input CTALinksInputType {
+  linkTypes: [CTALinkInputObjectType!]
 }
 
 type Customer {
@@ -76,9 +81,11 @@ type Dialogue {
   description: String!
   edges: [Edge!]!
   id: ID!
-  leafs: [QuestionNode!]!
+  interactionFeedItems: [Session!]
+  interactions(filter: FilterInput): InteractionType!
+  leafs(searchTerm: String): [QuestionNode!]!
   publicTitle: String
-  questions(where: QuestionNodeWhereInput): [QuestionNode!]!
+  questions(where: QuestionNodeWhereInputType): [QuestionNode!]!
   rootQuestion: QuestionNode!
   sessionConnection(filter: PaginationWhereInput): SessionConnection
   sessions(take: Int): [Session!]!
@@ -115,13 +122,6 @@ type Edge {
   updatedAt: String!
 }
 
-input EdgeChildInput {
-  childNode: EdgeNodeInput
-  conditions: [QuestionConditionInput!]
-  id: ID
-  parentNode: EdgeNodeInput
-}
-
 type EdgeCondition {
   conditionType: String!
   edgeId: String
@@ -131,9 +131,12 @@ type EdgeCondition {
   renderMin: Int
 }
 
-input EdgeNodeInput {
-  id: ID
-  title: String
+input EdgeConditionInputType {
+  conditionType: String
+  id: Int
+  matchValue: String
+  renderMax: Int
+  renderMin: Int
 }
 
 type FontSettings {
@@ -147,10 +150,23 @@ type ImageType {
   url: String
 }
 
-input LeafNodeInput {
-  id: ID
-  title: String
-  type: String
+type InteractionSessionType {
+  createdAt: String!
+  id: String!
+  index: Int!
+  nodeEntries: [NodeEntry!]!
+  paths: Int!
+  score: Float
+}
+
+type InteractionType {
+  endDate: String
+  orderBy: [SortFilterObject!]!
+  pageIndex: Int!
+  pages: Int!
+  pageSize: Int!
+  sessions: [InteractionSessionType!]!
+  startDate: String
 }
 
 type lineChartDataType {
@@ -159,28 +175,56 @@ type lineChartDataType {
   y: Int
 }
 
+type LinkType {
+  backgroundColor: String
+  iconUrl: String
+  id: String!
+  questionNode: QuestionNode!
+  questionNodeId: String!
+  title: String
+  type: String!
+  url: String!
+}
+
+enum LinkTypeEnumType {
+  API
+  FACEBOOK
+  INSTAGRAM
+  LINKEDIN
+  SOCIAL
+  TWITTER
+  WHATSAPP
+}
+
 type Mutation {
   assignTags(dialogueId: String, tags: TagsInputObjectType): Dialogue!
+  copyDialogue(data: AddDialogueInput): Dialogue!
+  createCTA(customerSlug: String, dialogueSlug: String, links: CTALinksInputType, title: String, type: String): QuestionNode!
   createCustomer(name: String, options: CustomerCreateOptions): Customer!
   createDialogue(data: AddDialogueInput): Dialogue!
-  createPermission(data: PermissionInput): PermssionType
+  createPermission(data: PermissionInput): PermssionType!
+  createQuestion(customerSlug: String, dialogueSlug: String, edgeCondition: EdgeConditionInputType, optionEntries: OptionsInputType, overrideLeafId: String, parentQuestionId: String, title: String, type: String): QuestionNode
   createRole(data: RoleInput): RoleType!
   createSession(input: SessionInput): Session!
   createTag(customerSlug: String, name: String, type: TagTypeEnum): Tag!
   createTrigger(customerSlug: String, questionId: String, recipients: RecipientsInputType, trigger: TriggerInputType): TriggerType!
   createUser(customerSlug: String, input: UserInput): UserType!
-  deleteCustomer(where: CustomerWhereUniqueInput): Customer
+  deleteCTA(id: String): QuestionNode!
+  deleteCustomer(where: CustomerWhereUniqueInput): Customer!
   deleteDialogue(where: DialogueWhereUniqueInput): Dialogue!
-  deleteTag(tagId: String): Tag!
-  deleteTrigger(id: String): TriggerType
+  deleteQuestion(customerSlug: String, dialogueSlug: String, id: String): QuestionNode!
+  deleteTag(tagId: String): TagType!
+  deleteTrigger(id: String): TriggerType!
   deleteUser(id: String): UserType!
   editCustomer(id: String, options: CustomerEditOptions): Customer!
-  editDialogue(description: String, dialogueId: String, publicTitle: String, tags: TagsInputObjectType, title: String): Dialogue!
+  editDialogue(customerSlug: String, description: String, dialogueSlug: String, publicTitle: String, tags: TagsInputObjectType, title: String): Dialogue!
   editTrigger(questionId: String, recipients: RecipientsInputType, trigger: TriggerInputType, triggerId: String): TriggerType!
   editUser(id: String, input: UserInput): UserType!
   singleUpload(file: Upload): ImageType!
+  updateCTA(id: String, links: CTALinksInputType, title: String, type: String): QuestionNode!
+  updateQuestion(edgeCondition: EdgeConditionInputType, edgeId: String, id: String, optionEntries: OptionsInputType, overrideLeafId: String, title: String, type: String): QuestionNode!
   updateRoles(permissions: PermissionIdsInput, roleId: String): RoleType!
-  updateTopicBuilder(customerSlug: String, dialogueSlug: String, topicData: TopicDataEntry): String!
+  uploadUserSession(uploadUserSessionInput: UploadUserSessionInput): Session!
 }
 
 type NodeEntry {
@@ -219,50 +263,14 @@ type NodeEntryValue {
   textboxNodeEntry: String
 }
 
-input OptionInput {
+input OptionInputType {
   id: Int
   publicValue: String
   value: String
 }
 
-"""Information with regards to current page, and total number of pages"""
-type PaginationPageInfo {
-  nrPages: Int!
-  pageIndex: Int!
-}
-
-"""Ways to sort a pagination object"""
-enum PaginationSortByEnum {
-  createdAt
-  email
-  firstName
-  id
-  lastName
-  medium
-  name
-  paths
-  role
-  score
-  type
-  user
-  when
-}
-
-"""Sorting of pagination (type and whether it ascends)"""
-input PaginationSortInput {
-  by: PaginationSortByEnum!
-  desc: Boolean = true
-}
-
-input PaginationWhereInput {
-  endDate: String
-  limit: Int
-  offset: Int
-  orderBy: [PaginationSortInput!]
-  pageIndex: Int
-  search: String
-  searchTerm: String
-  startDate: String
+input OptionsInputType {
+  options: [OptionInputType!]
 }
 
 input PermissionIdsInput {
@@ -304,51 +312,24 @@ type Query {
   userTable(customerSlug: String, filter: PaginationWhereInput): UserTable
 }
 
-input QuestionConditionInput {
-  conditionType: String
-  id: Int
-  matchValue: String
-  renderMax: Int
-  renderMin: Int
-}
-
-input QuestionInput {
-  children: [EdgeChildInput!]
-  id: ID
-  isLeaf: Boolean
-  isRoot: Boolean
-  options: [OptionInput!]
-  overrideLeaf: LeafNodeInput
-  title: String
-  type: String
-}
-
 type QuestionNode {
   children: [Edge!]!
   creationDate: String
   id: ID!
   isLeaf: Boolean!
   isRoot: Boolean!
+  links: [LinkType!]!
   options: [QuestionOption!]!
   overrideLeaf: QuestionNode
   overrideLeafId: String
   questionDialogue: Dialogue
   questionDialogueId: String
   title: String!
-  type: QuestionNodeTypeEnum!
+  type: String!
+  updatedAt: String!
 }
 
-"""The different types a node can assume"""
-enum QuestionNodeTypeEnum {
-  CHOICE
-  GENERIC
-  LINK
-  REGISTRATION
-  SLIDER
-  TEXTBOX
-}
-
-input QuestionNodeWhereInput {
+input QuestionNodeWhereInputType {
   id: ID
   isRoot: Boolean
 }
@@ -453,16 +434,6 @@ enum TagTypeEnum {
   AGENT
   DEFAULT
   LOCATION
-}
-
-"""Input type for a textbox node"""
-input TextboxNodeEntryInput {
-  value: String
-}
-
-input TopicDataEntry {
-  id: ID
-  questions: [QuestionInput!]
 }
 
 type topPathType {

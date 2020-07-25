@@ -12,6 +12,7 @@ const main = async () => {
     // Hardcoded for the moment
 
     origin: (origin, callback) => {
+      // callback(null, true);
       const validOrigins = ['haas-dashboard.netlify.app', 'haas-client.netlify.app'];
 
       if (config.env === 'local' || (origin && validOrigins.find((origin: string) => origin.endsWith(origin)))) {
@@ -25,7 +26,7 @@ const main = async () => {
 
   apollo.applyMiddleware({
     app,
-    cors: false,
+    // cors: false,
   });
 
   const runningServer = app.listen(config.port);

@@ -79,7 +79,7 @@ const EditDialogueView = () => {
 const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFormProps) => {
   const history = useHistory();
   const { register, handleSubmit, errors } = useForm<FormDataProps>();
-  const { customerSlug, dialogueId } = useParams();
+  const { customerSlug, dialogueSlug } = useParams();
 
   const [editDialogue, { loading }] = useMutation(editDialogueMutation, {
     onCompleted: () => {
@@ -87,7 +87,7 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFo
     },
     refetchQueries: [{ query: getQuestionnairesCustomerQuery,
       variables: {
-        slug: customerSlug,
+        customerSlug,
       } }],
     onError: (serverError: ApolloError) => {
       console.log(serverError);
@@ -102,7 +102,8 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFo
 
     editDialogue({
       variables: {
-        dialogueId,
+        customerSlug,
+        dialogueSlug,
         title: formData.title,
         publicTitle: formData.publicTitle,
         description: formData.description,

@@ -1,4 +1,5 @@
 
+import { PrismaClient } from '@prisma/client';
 import { extendType, inputObjectType, objectType } from '@nexus/schema';
 
 // eslint-disable-next-line import/no-cycle
@@ -6,7 +7,7 @@ import { CustomerType } from '../customer/Customer';
 // eslint-disable-next-line import/no-cycle
 import { EdgeType } from '../edge/Edge';
 // eslint-disable-next-line import/no-cycle
-import { QuestionNodeType, QuestionNodeWhereInput } from '../question/QuestionNode';
+import { QuestionNodeType } from '../question/QuestionNode';
 // eslint-disable-next-line import/no-cycle
 import { SessionConnection, SessionType } from '../session/Session';
 // eslint-disable-next-line import/no-cycle
@@ -213,7 +214,6 @@ export const DialogueType = objectType({
 
     t.list.field('questions', {
       type: QuestionNodeType,
-      args: { where: QuestionNodeWhereInput },
 
       resolve(parent, args, ctx) {
         const questions = ctx.prisma.questionNode.findMany({
@@ -226,6 +226,9 @@ export const DialogueType = objectType({
                 isLeaf: false,
               },
             ],
+          },
+          orderBy: {
+            creationDate: 'asc',
           },
         });
 
@@ -250,16 +253,24 @@ export const DialogueType = objectType({
 
     t.list.field('leafs', {
       type: QuestionNodeType,
-
-      resolve(parent, args, ctx) {
-        const leafs = ctx.prisma.questionNode.findMany({
+      args: {
+        searchTerm: 'String',
+      },
+      async resolve(parent, args, ctx) {
+        const leafs = await ctx.prisma.questionNode.findMany({
           where: {
             AND: [
               { questionDialogueId: parent.id },
               { isLeaf: true },
             ],
           },
+          orderBy: { updatedAt: 'desc' },
         });
+
+        if (args.searchTerm) {
+          const lowerCasedSearch = args.searchTerm.toLowerCase();
+          return leafs.filter((leaf) => leaf.title.toLowerCase().includes(lowerCasedSearch));
+        }
 
         return leafs;
       },
@@ -284,6 +295,9 @@ export const AddDialogueInput = inputObjectType({
     t.string('description');
     t.string('publicTitle');
     t.boolean('isSeed');
+    t.string('contentType');
+
+    t.string('templateDialogueId', { nullable: true });
 
     t.field('tags', {
       type: TagsInputType,
@@ -294,6 +308,31 @@ export const AddDialogueInput = inputObjectType({
 export const DialogueMutations = extendType({
   type: 'Mutation',
   definition(t) {
+    t.field('copyDialogue', {
+      type: DialogueType,
+      args: { data: AddDialogueInput },
+      async resolve(parent, args: any, ctx: any) {
+        const {
+          data: { dialogueSlug, customerSlug, title, publicTitle, description, tags = [], templateDialogueId },
+        } = args;
+        const { prisma }: { prisma: PrismaClient } = ctx;
+
+        const dialogueTags = tags?.entries?.length > 0
+          ? tags?.entries?.map((tag: string) => ({ id: tag }))
+          : [];
+
+        const customers = await prisma.customer.findMany({ where: { slug: customerSlug } });
+        const customer = customers?.[0];
+
+        if (!customer) {
+          return null;
+        }
+
+        return DialogueService.copyDialogue(
+          templateDialogueId, customer?.id, title, dialogueSlug, description, publicTitle, dialogueTags,
+        );
+      },
+    });
     t.field('createDialogue', {
       type: DialogueType,
       args: { data: AddDialogueInput },
@@ -310,7 +349,8 @@ export const DialogueMutations = extendType({
     t.field('editDialogue', {
       type: DialogueType,
       args: {
-        dialogueId: 'String',
+        customerSlug: 'String',
+        dialogueSlug: 'String',
         title: 'String',
         description: 'String',
         publicTitle: 'String',
