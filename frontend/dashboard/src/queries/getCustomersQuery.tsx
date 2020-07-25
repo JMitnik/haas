@@ -11,3 +11,5 @@ export const getCustomerQuery = gql`
 
   ${CustomerFragment}
 `;
+
+export default getCustomerQuery;

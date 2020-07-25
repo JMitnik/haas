@@ -114,6 +114,30 @@ model QuestionNode {
   Edge                       Edge?            @relation("EdgeChildrenRelation", fields: [edgeId], references: [id])
   QuestionOption             QuestionOption[] @relation("QuestionNodeOptions")
   triggers                   Trigger[]
+  links                      Link[]
+}
+
+enum LinkTypeEnum {
+  SOCIAL
+  API
+  FACEBOOK
+  LINKEDIN
+  WHATSAPP
+  INSTAGRAM
+  TWITTER
+}
+
+model Link {
+  id              String        @default(cuid()) @id
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime?     @updatedAt
+  title           String?
+  type            LinkTypeEnum
+  url             String
+  iconUrl         String?
+  backgroundColor String?
+  questionNode    QuestionNode? @relation(fields: [questionNodeId], references: [id])
+  questionNodeId  String?
 }
 
 model Edge {
@@ -209,7 +233,7 @@ model User {
   id         String    @default(cuid()) @id
   createdAt  DateTime  @default(now())
   updatedAt  DateTime? @updatedAt
-  email      String    
+  email      String
   phone      String?
   firstName  String?
   lastName   String?

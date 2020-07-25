@@ -1,13 +1,17 @@
-import { Dialogue, DialogueCreateInput,
-  DialogueUpdateInput, PrismaClient, Tag, TagWhereUniqueInput } from '@prisma/client';
+import { Dialogue, DialogueCreateInput, DialogueUpdateInput,
+  PrismaClient, QuestionOptionCreateManyWithoutQuestionNodeInput, Tag, TagWhereUniqueInput } from '@prisma/client';
 import { isAfter, subDays } from 'date-fns';
 import _ from 'lodash';
+import cuid from 'cuid';
 
-import { DialogueFilterInputType } from './Dialogue';
 import { leafNodes, sliderType } from '../../data/seeds/default-data';
 import NodeResolver from '../question/node-resolver';
 
 const prisma = new PrismaClient();
+
+interface IdMapProps {
+  [details: string] : string;
+}
 interface LeafNodeProps {
   id: string;
   nodeId?: string;
@@ -59,7 +63,8 @@ interface DialogueInputProps {
     title: string;
     description: string;
     publicTitle: string;
-    isSeed: boolean;
+    contentType: 'SCRATCH' | 'TEMPLATE' | 'SEED';
+    templateDialogueId?: string;
     tags: any;
   }
 }
@@ -137,11 +142,23 @@ class DialogueService {
   };
 
   static editDialogue = async (args: any) => {
-    const { dialogueId, title, description, publicTitle, tags } = args;
-    const dbDialogue = await prisma.dialogue.findOne({ where: { id: dialogueId },
-      include: {
-        tags: true,
-      } });
+    const { customerSlug, dialogueSlug, title, description, publicTitle, tags } = args;
+    const customer = await prisma.customer.findOne({
+      where: {
+        slug: customerSlug,
+      },
+      select: {
+        dialogues: {
+          where: {
+            slug: dialogueSlug,
+          },
+          include: {
+            tags: true,
+          },
+        },
+      },
+    });
+    const dbDialogue = customer?.dialogues[0];
 
     let updateDialogueArgs: DialogueUpdateInput = { title, description, publicTitle };
     if (dbDialogue?.tags) {
@@ -150,7 +167,7 @@ class DialogueService {
 
     return prisma.dialogue.update({
       where: {
-        id: dialogueId,
+        id: dbDialogue?.id,
       },
       data: updateDialogueArgs,
     });
@@ -483,8 +500,206 @@ class DialogueService {
     return dialogue;
   };
 
+  static copyDialogue = async (
+    templateId: string,
+    customerId: string,
+    title: string,
+    dialogueSlug: string,
+    description: string,
+    publicTitle: string = '',
+    tags: Array<{id: string}> = []) => {
+    const templateDialogue = await prisma.dialogue.findOne({
+      where: {
+        id: templateId,
+      },
+      include: {
+        edges: {
+          include: {
+            conditions: true,
+            childNode: {
+              select: {
+                id: true,
+              },
+            },
+            parentNode: {
+              select: {
+                id: true,
+              },
+            },
+          },
+        },
+        questions: {
+          include: {
+            links: true,
+            options: {
+              select: {
+                publicValue: true,
+                value: true,
+              },
+            },
+            overrideLeaf: {
+              select: {
+                id: true,
+              },
+            },
+            isOverrideLeafOf: {
+              select: {
+                id: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    const idMap: IdMapProps = {};
+    const questionnaire = await DialogueService.initDialogue(
+      customerId, title, dialogueSlug, description, publicTitle, tags,
+    );
+
+    if (templateDialogue?.id) {
+      idMap[templateDialogue?.id] = questionnaire.id;
+    }
+
+    templateDialogue?.questions.forEach((question) => {
+      if (!Object.keys(idMap).find((id) => id === question.id)) {
+        idMap[question.id] = cuid();
+      }
+    });
+
+    const updatedTemplateQuestions = templateDialogue?.questions.map((question) => {
+      const mappedId = idMap[question.id];
+      const mappedDialogueId = question.questionDialogueId && idMap[question.questionDialogueId];
+      const mappedLinks = question.links.map((link) => {
+        const { id, ...linkData } = link;
+        const updateLink = { ...linkData, questionNodeId: idMap[mappedId] };
+        return updateLink;
+      });
+      const mappedOverrideLeafId = question.overrideLeafId && idMap[question.overrideLeafId];
+      const mappedOverrideLeaf = question.overrideLeafId ? { id: idMap[question.overrideLeafId] } : null;
+      const mappedIsOverrideLeafOf = question.isOverrideLeafOf.map(({ id }) => ({ id: idMap[id] }));
+      const mappedOptions: QuestionOptionCreateManyWithoutQuestionNodeInput = { create: question.options };
+      const mappedObject = {
+        ...question,
+        id: mappedId,
+        questionDialogueId: mappedDialogueId,
+        links: { create: mappedLinks },
+        options: mappedOptions,
+        overrideLeafId: mappedOverrideLeafId,
+        overrideLeaf: mappedOverrideLeaf,
+        isOverrideLeafOf: mappedIsOverrideLeafOf,
+      };
+      return mappedObject;
+    });
+
+    // Create leaf nodes
+    const leafs = updatedTemplateQuestions?.filter((question) => question.isLeaf);
+
+    await prisma.dialogue.update({
+      where: {
+        id: questionnaire.id,
+      },
+      data: {
+        questions: {
+          create: leafs?.map((leaf) => ({
+            id: leaf.id,
+            isRoot: false,
+            isLeaf: leaf.isLeaf,
+            title: leaf.title,
+            links: leaf.links,
+            type: leaf.type,
+          })),
+        },
+      },
+      include: {
+        questions: {
+          include: {
+            links: true,
+            options: {
+              select: {
+                publicValue: true,
+                value: true,
+              },
+            },
+          },
+
+        },
+
+      },
+    });
+
+    // Create questio nodes
+    const questions = updatedTemplateQuestions?.filter((question) => !question.isLeaf);
+    await prisma.dialogue.update({
+      where: {
+        id: questionnaire.id,
+      },
+      data: {
+        questions: {
+          create: questions?.map((leaf) => ({
+            id: leaf.id,
+            isRoot: leaf.isRoot,
+            isLeaf: leaf.isLeaf,
+            title: leaf.title,
+            options: leaf.options,
+            overrideLeaf: leaf.overrideLeaf && { connect: leaf.overrideLeaf },
+            type: leaf.type,
+          })),
+        },
+      },
+      include: {
+        questions: {
+          include: {
+            options: {
+              select: {
+                publicValue: true,
+                value: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    // Create edges
+    const updatedTemplateEdges = templateDialogue?.edges.map((edge) => {
+      const mappedConditions = edge.conditions.map((condition) => {
+        const { id, edgeId, ...conditionData } = condition;
+        const updateCondition = { ...conditionData };
+        return updateCondition;
+      });
+      const mappedChildNode = { id: idMap[edge.childNodeId] };
+      const mappedParentNode = { id: idMap[edge.parentNodeId] };
+      const mappedObject = {
+        parentNode: { connect: mappedParentNode },
+        conditions: { create: mappedConditions },
+        childNode: { connect: mappedChildNode },
+      };
+      return mappedObject;
+    });
+
+    const updatedEdgesDialogue = await prisma.dialogue.update({
+      where: {
+        id: questionnaire.id,
+      },
+      data: {
+        edges: {
+          create: updatedTemplateEdges?.map((edge) => ({
+            parentNode: edge.parentNode,
+            conditions: edge.conditions,
+            childNode: edge.childNode,
+          })),
+        },
+      },
+    });
+
+    return updatedEdgesDialogue;
+  };
+
   static createDialogue = async (dialogueInputData: DialogueInputProps): Promise<Dialogue | null> => {
-    const { data: { dialogueSlug, customerSlug, title, publicTitle, description, tags = [], isSeed } } = dialogueInputData;
+    const {
+      data: { dialogueSlug, customerSlug, title, publicTitle, description, tags = [], contentType, templateDialogueId },
+    } = dialogueInputData;
 
     let questionnaire = null;
     const dialogueTags = tags?.entries?.length > 0
@@ -498,7 +713,7 @@ class DialogueService {
       return null;
     }
 
-    if (isSeed) {
+    if (contentType === 'SEED') {
       if (customer?.name) {
         return DialogueService.seedQuestionnare(
           customer?.id,
@@ -509,6 +724,12 @@ class DialogueService {
           dialogueTags,
         );
       }
+    }
+
+    if (contentType === 'TEMPLATE' && templateDialogueId) {
+      return DialogueService.copyDialogue(
+        templateDialogueId, customer.id, title, dialogueSlug, description, publicTitle, [],
+      );
     }
 
     questionnaire = await DialogueService.initDialogue(
@@ -600,22 +821,6 @@ class DialogueService {
     return finalQuestions;
   };
 
-  static updateTopicBuilder = async (args: any) => {
-    try {
-      const questionnaireId: string = args.id || undefined;
-      const { questions }: { questions: Array<any> } = args.topicData;
-      const finalQuestions = await DialogueService.uuidToPrismaIds(questions, questionnaireId);
-      await Promise.all(finalQuestions.map(async (question) => NodeResolver.updateQuestion(
-        questionnaireId,
-        question,
-      )));
-
-      return 'Succesfully updated topic(?)';
-    } catch (e) {
-      return `Something went wrong in update topic builder: ${e}`;
-    }
-  };
-
   static calculateAverageScore = async (dialogueId: string) => {
     const dialogue = await prisma.dialogue.findOne({
       where: { id: dialogueId },
@@ -697,7 +902,8 @@ class DialogueService {
     });
 
     const sessionsWithOnlyRoots = sessions.map((session) => (
-      session?.nodeEntries.find((nodeEntry) => nodeEntry.depth === 0 && nodeEntry.relatedNode?.isRoot) ? session : null));
+      session?.nodeEntries.find(
+        (nodeEntry) => nodeEntry.depth === 0 && nodeEntry.relatedNode?.isRoot) ? session : null));
 
     return sessionsWithOnlyRoots.filter((session) => session);
   };

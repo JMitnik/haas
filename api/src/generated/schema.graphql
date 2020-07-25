@@ -3,12 +3,13 @@
 
 
 input AddDialogueInput {
+  contentType: String
   customerSlug: String
   description: String
   dialogueSlug: String
-  isSeed: Boolean
   publicTitle: String
   tags: TagsInputObjectType
+  templateDialogueId: String
   title: String
 }
 
@@ -17,6 +18,19 @@ type ColourSettings {
   primary: String!
   primaryAlt: String
   secondary: String
+}
+
+input CTALinkInputObjectType {
+  backgroundColor: String
+  icon: String
+  id: String
+  title: String
+  type: LinkTypeEnumType
+  url: String
+}
+
+input CTALinksInputType {
+  linkTypes: [CTALinkInputObjectType!]
 }
 
 type Customer {
@@ -64,9 +78,9 @@ type Dialogue {
   id: ID!
   interactionFeedItems: [Session!]
   interactions(filter: FilterInput): InteractionType!
-  leafs: [QuestionNode!]!
+  leafs(searchTerm: String): [QuestionNode!]!
   publicTitle: String
-  questions(where: QuestionNodeWhereInput): [QuestionNode!]!
+  questions(where: QuestionNodeWhereInputType): [QuestionNode!]!
   rootQuestion: QuestionNode!
   sessions: [Session!]!
   slug: String!
@@ -103,13 +117,6 @@ type Edge {
   updatedAt: String!
 }
 
-input EdgeChildInput {
-  childNode: EdgeNodeInput
-  conditions: [QuestionConditionInput!]
-  id: ID
-  parentNode: EdgeNodeInput
-}
-
 type EdgeCondition {
   conditionType: String!
   edgeId: String!
@@ -119,9 +126,12 @@ type EdgeCondition {
   renderMin: Int
 }
 
-input EdgeNodeInput {
-  id: ID
-  title: String
+input EdgeConditionInputType {
+  conditionType: String
+  id: Int
+  matchValue: String
+  renderMax: Int
+  renderMin: Int
 }
 
 input FilterInput {
@@ -164,38 +174,59 @@ type InteractionType {
   startDate: String
 }
 
-input LeafNodeInput {
-  id: ID
-  title: String
-  type: String
-}
-
 type lineChartDataType {
   x: String
   y: Int
 }
 
+type LinkType {
+  backgroundColor: String
+  iconUrl: String
+  id: String!
+  questionNode: QuestionNode!
+  questionNodeId: String!
+  title: String
+  type: String!
+  url: String!
+}
+
+enum LinkTypeEnumType {
+  API
+  FACEBOOK
+  INSTAGRAM
+  LINKEDIN
+  SOCIAL
+  TWITTER
+  WHATSAPP
+}
+
 type Mutation {
   assignTags(dialogueId: String, tags: TagsInputObjectType): Dialogue!
+  copyDialogue(data: AddDialogueInput): Dialogue!
+  createCTA(customerSlug: String, dialogueSlug: String, links: CTALinksInputType, title: String, type: String): QuestionNode!
   createCustomer(name: String, options: CustomerCreateOptions): Customer!
   createDialogue(data: AddDialogueInput): Dialogue!
   createPermission(data: PermissionInput): PermssionType!
+  createQuestion(customerSlug: String, dialogueSlug: String, edgeCondition: EdgeConditionInputType, optionEntries: OptionsInputType, overrideLeafId: String, parentQuestionId: String, title: String, type: String): QuestionNode
   createRole(data: RoleInput): RoleType!
   createTag(customerSlug: String, name: String, type: TagTypeEnum): TagType!
   createTrigger(customerSlug: String, questionId: String, recipients: RecipientsInputType, trigger: TriggerInputType): TriggerType!
   createUser(customerSlug: String, input: UserInput): UserType!
+  deleteCTA(id: String): QuestionNode!
   deleteCustomer(where: CustomerWhereUniqueInput): Customer!
   deleteDialogue(where: DialogueWhereUniqueInput): Dialogue!
+  deleteQuestion(customerSlug: String, dialogueSlug: String, id: String): QuestionNode!
   deleteTag(tagId: String): TagType!
   deleteTrigger(id: String): TriggerType!
   deleteUser(id: String): UserType!
   editCustomer(id: String, options: CustomerEditOptions): Customer!
-  editDialogue(description: String, dialogueId: String, publicTitle: String, tags: TagsInputObjectType, title: String): Dialogue!
+  editDialogue(customerSlug: String, description: String, dialogueSlug: String, publicTitle: String, tags: TagsInputObjectType, title: String): Dialogue!
   editTrigger(questionId: String, recipients: RecipientsInputType, trigger: TriggerInputType, triggerId: String): TriggerType!
   editUser(id: String, input: UserInput): UserType!
   singleUpload(file: Upload): ImageType!
+  updateCTA(id: String, links: CTALinksInputType, title: String, type: String): QuestionNode!
+  updateQuestion(edgeCondition: EdgeConditionInputType, edgeId: String, id: String, optionEntries: OptionsInputType, overrideLeafId: String, title: String, type: String): QuestionNode!
   updateRoles(permissions: PermissionIdsInput, roleId: String): RoleType!
-  updateTopicBuilder(customerSlug: String, dialogueSlug: String, topicData: TopicDataEntry): String!
   uploadUserSession(uploadUserSessionInput: UploadUserSessionInput): Session!
 }
 
@@ -219,10 +250,14 @@ type NodeEntryValue {
   textValue: String
 }
 
-input OptionInput {
+input OptionInputType {
   id: Int
   publicValue: String
   value: String
+}
+
+input OptionsInputType {
+  options: [OptionInputType!]
 }
 
 input PermissionIdsInput {
@@ -265,31 +300,13 @@ type Query {
   userTable(customerSlug: String, filter: FilterInput): UserTable!
 }
 
-input QuestionConditionInput {
-  conditionType: String
-  id: Int
-  matchValue: String
-  renderMax: Int
-  renderMin: Int
-}
-
-input QuestionInput {
-  children: [EdgeChildInput!]
-  id: ID
-  isLeaf: Boolean
-  isRoot: Boolean
-  options: [OptionInput!]
-  overrideLeaf: LeafNodeInput
-  title: String
-  type: String
-}
-
 type QuestionNode {
   children: [Edge!]!
   creationDate: String
   id: ID!
   isLeaf: Boolean!
   isRoot: Boolean!
+  links: [LinkType!]!
   options: [QuestionOption!]!
   overrideLeaf: QuestionNode
   overrideLeafId: String
@@ -297,9 +314,10 @@ type QuestionNode {
   questionDialogueId: String!
   title: String!
   type: String!
+  updatedAt: String!
 }
 
-input QuestionNodeWhereInput {
+input QuestionNodeWhereInputType {
   id: ID
   isRoot: Boolean
 }
@@ -383,11 +401,6 @@ enum TagTypeEnum {
   AGENT
   DEFAULT
   LOCATION
-}
-
-input TopicDataEntry {
-  id: ID
-  questions: [QuestionInput!]
 }
 
 type topPathType {

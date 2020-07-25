@@ -8,7 +8,8 @@ export const createDialogue = gql`
     $title: String, 
     $description: String, 
     $publicTitle: String, 
-    $isSeed: Boolean,
+    $contentType: String,
+    $templateDialogueId: String,
     $tags: TagsInputObjectType
   ) {
     createDialogue(data: {
@@ -17,7 +18,8 @@ export const createDialogue = gql`
       title: $title, 
       description: $description, 
       publicTitle: $publicTitle, 
-      isSeed: $isSeed,
+      contentType: $contentType,
+      templateDialogueId: $templateDialogueId,
       tags: $tags
     }) {
         id

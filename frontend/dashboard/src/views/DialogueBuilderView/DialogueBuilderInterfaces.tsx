@@ -5,11 +5,13 @@ export interface OverrideLeafProps {
 }
 export interface QuestionEntryProps {
   id: string;
+  icon: (props: any) => JSX.Element;
+  updatedAt?: string;
   creationDate?: string;
-  title?: string;
-  isRoot?: boolean;
-  isLeaf?: boolean;
-  type?: string;
+  title: string;
+  isRoot: boolean;
+  isLeaf: boolean;
+  type: string;
   overrideLeaf?: OverrideLeafProps;
   children?: Array<EdgeChildProps>;
   options?: Array<QuestionOptionProps>;

@@ -1,11 +1,11 @@
 
-import { Dialogue, DialogueWhereInput, PrismaClient } from '@prisma/client';
+import { Dialogue, DialogueWhereInput, PrismaClient, QuestionNodeWhereInput } from '@prisma/client';
 import { extendType, inputObjectType, objectType } from '@nexus/schema';
 
 // eslint-disable-next-line import/no-cycle
 import { CustomerType } from '../customer/Customer';
 import { EdgeType } from '../edge/Edge';
-import { QuestionNodeType, QuestionNodeWhereInput } from '../question/QuestionNode';
+import { QuestionNodeType, QuestionNodeWhereInputType } from '../question/QuestionNode';
 // eslint-disable-next-line import/no-cycle
 import { TagType, TagsInputType } from '../tag/Tag';
 
@@ -208,7 +208,7 @@ export const DialogueType = objectType({
     t.list.field('questions', {
       type: QuestionNodeType,
       args: {
-        where: QuestionNodeWhereInput,
+        where: QuestionNodeWhereInputType,
       },
       resolve(parent: Dialogue, args: any, ctx: any) {
         const { prisma }: { prisma: PrismaClient } = ctx;
@@ -222,6 +222,9 @@ export const DialogueType = objectType({
                 isLeaf: false,
               },
             ],
+          },
+          orderBy: {
+            creationDate: 'asc',
           },
         });
         return questions;
@@ -244,20 +247,31 @@ export const DialogueType = objectType({
 
     t.list.field('leafs', {
       type: QuestionNodeType,
-      resolve(parent: Dialogue, args: any, ctx: any) {
+      args: {
+        searchTerm: 'String',
+      },
+      async resolve(parent: Dialogue, args: any, ctx: any) {
         const { prisma }: { prisma: PrismaClient } = ctx;
-        const leafs = prisma.questionNode.findMany({
-          where: {
-            AND: [
-              {
-                questionDialogueId: parent.id,
-              },
-              {
-                isLeaf: true,
-              },
-            ],
+        const { searchTerm }: { searchTerm: string } = args;
+        const leafWhereInput: QuestionNodeWhereInput = { AND: [
+          {
+            questionDialogueId: parent.id,
+          },
+          {
+            isLeaf: true,
+          },
+        ] };
+
+        const leafs = await prisma.questionNode.findMany({
+          where: leafWhereInput,
+          orderBy: {
+            updatedAt: 'desc',
           },
         });
+
+        if (searchTerm) {
+          return leafs.filter((leaf) => leaf.title.toLowerCase().includes(searchTerm.toLowerCase()));
+        }
         return leafs;
       },
     });
@@ -280,7 +294,8 @@ export const AddDialogueInput = inputObjectType({
     t.string('dialogueSlug');
     t.string('description');
     t.string('publicTitle');
-    t.boolean('isSeed');
+    t.string('contentType');
+    t.string('templateDialogueId', { nullable: true });
     t.field('tags', {
       type: TagsInputType,
     });
@@ -290,6 +305,31 @@ export const AddDialogueInput = inputObjectType({
 export const DialogueMutations = extendType({
   type: 'Mutation',
   definition(t) {
+    t.field('copyDialogue', {
+      type: DialogueType,
+      args: { data: AddDialogueInput },
+      async resolve(parent: any, args: any, ctx: any) {
+        const {
+          data: { dialogueSlug, customerSlug, title, publicTitle, description, tags = [], templateDialogueId },
+        } = args;
+        const { prisma }: { prisma: PrismaClient } = ctx;
+
+        const dialogueTags = tags?.entries?.length > 0
+          ? tags?.entries?.map((tag: string) => ({ id: tag }))
+          : [];
+
+        const customers = await prisma.customer.findMany({ where: { slug: customerSlug } });
+        const customer = customers?.[0];
+
+        if (!customer) {
+          return null;
+        }
+
+        return DialogueService.copyDialogue(
+          templateDialogueId, customer?.id, title, dialogueSlug, description, publicTitle, dialogueTags,
+        );
+      },
+    });
     t.field('createDialogue', {
       type: DialogueType,
       args: { data: AddDialogueInput },
@@ -301,7 +341,8 @@ export const DialogueMutations = extendType({
     t.field('editDialogue', {
       type: DialogueType,
       args: {
-        dialogueId: 'String',
+        customerSlug: 'String',
+        dialogueSlug: 'String',
         title: 'String',
         description: 'String',
         publicTitle: 'String',
