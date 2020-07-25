@@ -240,9 +240,12 @@ enum PaginationSortByEnum {
   lastName
   medium
   name
+  paths
   role
   score
   type
+  user
+  when
 }
 
 """Sorting of pagination (type and whether it ascends)"""

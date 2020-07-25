@@ -196,7 +196,7 @@ export interface NexusGenInputs {
 }
 
 export interface NexusGenEnums {
-  PaginationSortByEnum: "createdAt" | "email" | "firstName" | "id" | "lastName" | "medium" | "name" | "role" | "score" | "type"
+  PaginationSortByEnum: "createdAt" | "email" | "firstName" | "id" | "lastName" | "medium" | "name" | "paths" | "role" | "score" | "type" | "user" | "when"
   QuestionNodeTypeEnum: "CHOICE" | "GENERIC" | "LINK" | "REGISTRATION" | "SLIDER" | "TEXTBOX"
   TagTypeEnum: "AGENT" | "DEFAULT" | "LOCATION"
   TriggerConditionEnum: prisma.TriggerConditionEnum
