@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { TriggerInputType, RecipientsInputType, TriggerMediumEnum, TriggerTypeEnum } from "./../../../__generated__/globalTypes";
+import { TriggerInputType, RecipientsInputType, TriggerMediumEnum, TriggerTypeEnum } from "./../../types/globalTypes";
 
 // ====================================================
 // GraphQL mutation operation: createTrigger

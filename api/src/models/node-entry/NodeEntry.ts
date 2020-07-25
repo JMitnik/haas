@@ -44,7 +44,7 @@ export const NodeEntryType = objectType({
       type: QuestionNodeType,
       nullable: true,
 
-      resolve(parent: NodeEntry, ctx) {
+      resolve(parent, args, ctx) {
         if (!parent.relatedNodeId) {
           return null;
         }

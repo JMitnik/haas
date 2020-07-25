@@ -3,6 +3,8 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
+import { QuestionNodeTypeEnum } from "./../../types/globalTypes";
+
 // ====================================================
 // GraphQL fragment: QuestionFragment
 // ====================================================
@@ -10,7 +12,7 @@
 export interface QuestionFragment_overrideLeaf {
   __typename: "QuestionNode";
   id: string;
-  type: string;
+  type: QuestionNodeTypeEnum;
   title: string;
 }
 
@@ -58,7 +60,7 @@ export interface QuestionFragment {
   isRoot: boolean;
   isLeaf: boolean;
   overrideLeaf: QuestionFragment_overrideLeaf | null;
-  type: string;
+  type: QuestionNodeTypeEnum;
   children: QuestionFragment_children[];
   options: QuestionFragment_options[];
 }

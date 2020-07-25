@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { CustomerEditOptions } from "./../../../__generated__/globalTypes";
+import { CustomerEditOptions } from "./../../types/globalTypes";
 
 // ====================================================
 // GraphQL mutation operation: editCustomer

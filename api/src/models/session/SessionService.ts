@@ -256,10 +256,10 @@ class SessionService {
       paths: session.nodeEntries.length,
     }));
 
-    // TODO: Type-hint this
     const pageInfo: NexusGenRootTypes['PaginationPageInfo'] = {
       nrPages: totalPages || 1,
-      pageIndex: paginationArgs?.pageIndex || 1,
+      pageIndex: (paginationArgs?.pageIndex !== undefined && paginationArgs?.pageIndex !== null)
+        ? paginationArgs.pageIndex : 0,
     };
 
     return {

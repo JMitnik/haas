@@ -197,6 +197,7 @@ export interface NexusGenInputs {
 
 export interface NexusGenEnums {
   PaginationSortByEnum: "createdAt" | "email" | "firstName" | "id" | "lastName" | "medium" | "name" | "role" | "score" | "type"
+  QuestionNodeTypeEnum: "CHOICE" | "GENERIC" | "LINK" | "REGISTRATION" | "SLIDER" | "TEXTBOX"
   TagTypeEnum: "AGENT" | "DEFAULT" | "LOCATION"
   TriggerConditionEnum: prisma.TriggerConditionEnum
   TriggerMediumEnum: "BOTH" | "EMAIL" | "PHONE"
@@ -367,6 +368,7 @@ export interface NexusGenAllTypes extends NexusGenRootTypes {
   TriggerInputType: NexusGenInputs['TriggerInputType'];
   UserInput: NexusGenInputs['UserInput'];
   PaginationSortByEnum: NexusGenEnums['PaginationSortByEnum'];
+  QuestionNodeTypeEnum: NexusGenEnums['QuestionNodeTypeEnum'];
   TagTypeEnum: NexusGenEnums['TagTypeEnum'];
   TriggerConditionEnum: NexusGenEnums['TriggerConditionEnum'];
   TriggerMediumEnum: NexusGenEnums['TriggerMediumEnum'];
@@ -530,7 +532,7 @@ export interface NexusGenFieldTypes {
     questionDialogue: NexusGenRootTypes['Dialogue'] | null; // Dialogue
     questionDialogueId: string | null; // String
     title: string; // String!
-    type: string; // String!
+    type: NexusGenEnums['QuestionNodeTypeEnum']; // QuestionNodeTypeEnum!
   }
   QuestionOption: { // field return type
     id: number; // Int!
@@ -816,7 +818,7 @@ export type NexusGenObjectNames = "ColourSettings" | "Customer" | "CustomerSetti
 
 export type NexusGenInputNames = "AddDialogueInput" | "ChoiceNodeEntryInput" | "CustomerCreateOptions" | "CustomerEditOptions" | "CustomerWhereUniqueInput" | "DialogueFilterInputType" | "DialogueWhereUniqueInput" | "EdgeChildInput" | "EdgeNodeInput" | "LeafNodeInput" | "NodeEntryDataInput" | "NodeEntryInput" | "OptionInput" | "PaginationSortInput" | "PaginationWhereInput" | "PermissionIdsInput" | "PermissionInput" | "QuestionConditionInput" | "QuestionInput" | "QuestionNodeWhereInput" | "QuestionNodeWhereUniqueInput" | "RecipientsInputType" | "RegisterNodeEntryInput" | "RoleDataInput" | "RoleInput" | "SessionInput" | "SessionWhereUniqueInput" | "SliderNodeEntryInput" | "TagsInputObjectType" | "TextboxNodeEntryInput" | "TopicDataEntry" | "TriggerConditionInputType" | "TriggerInputType" | "UserInput";
 
-export type NexusGenEnumNames = "PaginationSortByEnum" | "TagTypeEnum" | "TriggerConditionEnum" | "TriggerMediumEnum" | "TriggerTypeEnum";
+export type NexusGenEnumNames = "PaginationSortByEnum" | "QuestionNodeTypeEnum" | "TagTypeEnum" | "TriggerConditionEnum" | "TriggerMediumEnum" | "TriggerTypeEnum";
 
 export type NexusGenInterfaceNames = "ConnectionInterface";
 

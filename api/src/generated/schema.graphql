@@ -333,7 +333,17 @@ type QuestionNode {
   questionDialogue: Dialogue
   questionDialogueId: String
   title: String!
-  type: String!
+  type: QuestionNodeTypeEnum!
+}
+
+"""The different types a node can assume"""
+enum QuestionNodeTypeEnum {
+  CHOICE
+  GENERIC
+  LINK
+  REGISTRATION
+  SLIDER
+  TEXTBOX
 }
 
 input QuestionNodeWhereInput {

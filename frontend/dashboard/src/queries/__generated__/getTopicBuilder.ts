@@ -3,6 +3,8 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
+import { QuestionNodeTypeEnum } from "./../../types/globalTypes";
+
 // ====================================================
 // GraphQL query operation: getTopicBuilder
 // ====================================================
@@ -11,13 +13,13 @@ export interface getTopicBuilder_customer_dialogue_leafs {
   __typename: "QuestionNode";
   id: string;
   title: string;
-  type: string;
+  type: QuestionNodeTypeEnum;
 }
 
 export interface getTopicBuilder_customer_dialogue_questions_overrideLeaf {
   __typename: "QuestionNode";
   id: string;
-  type: string;
+  type: QuestionNodeTypeEnum;
   title: string;
 }
 
@@ -65,7 +67,7 @@ export interface getTopicBuilder_customer_dialogue_questions {
   isRoot: boolean;
   isLeaf: boolean;
   overrideLeaf: getTopicBuilder_customer_dialogue_questions_overrideLeaf | null;
-  type: string;
+  type: QuestionNodeTypeEnum;
   children: getTopicBuilder_customer_dialogue_questions_children[];
   options: getTopicBuilder_customer_dialogue_questions_options[];
 }

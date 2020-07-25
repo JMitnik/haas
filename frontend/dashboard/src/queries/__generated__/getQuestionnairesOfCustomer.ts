@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { DialogueFilterInputType, TagTypeEnum } from "./../../../__generated__/globalTypes";
+import { DialogueFilterInputType, TagTypeEnum } from "./../../types/globalTypes";
 
 // ====================================================
 // GraphQL query operation: getQuestionnairesOfCustomer

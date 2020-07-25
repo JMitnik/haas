@@ -1,4 +1,4 @@
-import { extendType, inputObjectType, objectType } from '@nexus/schema';
+import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
 
 // eslint-disable-next-line import/no-cycle
 import { DialogueType } from '../questionnaire/Dialogue';
@@ -25,6 +25,13 @@ export const QuestionOptionType = objectType({
   },
 });
 
+export const QuestionNodeTypeEnum = enumType({
+  name: 'QuestionNodeTypeEnum',
+  description: 'The different types a node can assume',
+
+  members: ['GENERIC', 'SLIDER', 'CHOICE', 'REGISTRATION', 'TEXTBOX', 'LINK'],
+});
+
 export const QuestionNodeType = objectType({
   name: 'QuestionNode',
   definition(t) {
@@ -32,7 +39,7 @@ export const QuestionNodeType = objectType({
     t.boolean('isLeaf');
     t.boolean('isRoot');
     t.string('title');
-    t.string('type');
+    t.field('type', { type: QuestionNodeTypeEnum });
     t.string('creationDate', { nullable: true });
     t.string('overrideLeafId', { nullable: true });
 

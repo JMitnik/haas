@@ -101,7 +101,7 @@ const InteractionsOverview = () => {
   };
 
   const pageCount = data?.customer?.dialogue?.sessionConnection?.pageInfo.nrPages || 1;
-  const pageIndex = data?.customer?.dialogue?.sessionConnection?.pageInfo.pageIndex || 1;
+  const pageIndex = data?.customer?.dialogue?.sessionConnection?.pageInfo.pageIndex || 0;
 
   return (
     <InteractionsOverviewContainer>

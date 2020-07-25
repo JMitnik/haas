@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { TriggerMediumEnum, TriggerTypeEnum, TriggerConditionEnum } from "./../../../__generated__/globalTypes";
+import { TriggerMediumEnum, TriggerTypeEnum, TriggerConditionEnum } from "./../../types/globalTypes";
 
 // ====================================================
 // GraphQL query operation: getTrigger

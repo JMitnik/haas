@@ -3,6 +3,8 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
+import { QuestionNodeTypeEnum } from "./../../types/globalTypes";
+
 // ====================================================
 // GraphQL query operation: getSessionAnswerFlow
 // ====================================================
@@ -10,7 +12,7 @@
 export interface getSessionAnswerFlow_session_nodeEntries_relatedNode {
   __typename: "QuestionNode";
   title: string;
-  type: string;
+  type: QuestionNodeTypeEnum;
 }
 
 export interface getSessionAnswerFlow_session_nodeEntries_value {

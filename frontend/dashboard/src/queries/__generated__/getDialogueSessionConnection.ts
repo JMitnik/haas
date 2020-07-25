@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { PaginationWhereInput } from "./../../../__generated__/globalTypes";
+import { PaginationWhereInput, QuestionNodeTypeEnum } from "./../../types/globalTypes";
 
 // ====================================================
 // GraphQL query operation: getDialogueSessionConnection
@@ -12,7 +12,7 @@ import { PaginationWhereInput } from "./../../../__generated__/globalTypes";
 export interface getDialogueSessionConnection_customer_dialogue_sessionConnection_sessions_nodeEntries_relatedNode {
   __typename: "QuestionNode";
   title: string;
-  type: string;
+  type: QuestionNodeTypeEnum;
 }
 
 export interface getDialogueSessionConnection_customer_dialogue_sessionConnection_sessions_nodeEntries_value {

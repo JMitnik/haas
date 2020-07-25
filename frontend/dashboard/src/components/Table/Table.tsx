@@ -14,7 +14,7 @@ interface TableInputProps {
     Cell: ({ value }: { value: any }) => JSX.Element;
   }[]
   data: Array<any>;
-  CustomRow?: (props: TableRowProps) => JSX.Element;
+  CustomRow?: any;
   permissions?: Array<any>;
   onPaginationChange: React.Dispatch<React.SetStateAction<TableProps>>;
   onDeleteEntry?: (event: any, userId: string) => void;

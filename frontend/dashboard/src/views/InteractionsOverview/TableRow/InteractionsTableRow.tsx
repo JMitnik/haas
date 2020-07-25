@@ -1,13 +1,39 @@
 import React, { useState } from 'react';
 
 import { Div, Grid, H4, H5, Hr, Span } from '@haas/ui';
+import {
+  getDialogueSessionConnection_customer_dialogue_sessionConnection_sessions_nodeEntries as NodeEntry,
+  getDialogueSessionConnection_customer_dialogue_sessionConnection_sessions as Session,
+} from 'queries/__generated__/getDialogueSessionConnection';
+import { QuestionNodeTypeEnum } from 'types/globalTypes';
 import MultiChoiceNodeIcon from 'components/Icons/MultiChoiceNodeIcon';
 import SliderNodeIcon from 'components/Icons/SliderNodeIcon';
 
 import { InteractionDetailQuestionEntry } from '../InteractionOverviewStyles';
 import { TableRowProps } from './TableRowTypes';
 
-const InteractionsTableRow = ({ headers, data, index }: TableRowProps) => {
+const InteractionTableValue = ({ entry }: { entry: NodeEntry }) => {
+  console.log(entry);
+
+  switch (entry.relatedNode?.type) {
+    case QuestionNodeTypeEnum.SLIDER:
+      return <Div>{entry.value?.sliderNodeEntry}</Div>;
+
+    case QuestionNodeTypeEnum.CHOICE:
+      return <Div>{entry.value?.choiceNodeEntry}</Div>;
+
+    case QuestionNodeTypeEnum.REGISTRATION:
+      return <Div>{entry.value?.registrationNodeEntry}</Div>;
+
+    case QuestionNodeTypeEnum.TEXTBOX:
+      return <Div>{entry.value?.textboxNodeEntry}</Div>;
+
+    default:
+      return (<Div>N/A available</Div>);
+  }
+};
+
+const InteractionsTableRow = ({ headers, data, index }: TableRowProps<Session>) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const nrCells = headers.length;
   const templateColumns = '1fr '.repeat(nrCells);
@@ -57,8 +83,8 @@ const InteractionsTableRow = ({ headers, data, index }: TableRowProps) => {
               <InteractionDetailQuestionEntry useFlex flexDirection="column" width="50%">
                 {/* TODO: Make each mapped entry an individual component */}
                 {data.nodeEntries.map((nodeEntry, index) => {
-                  const { id, values, relatedNode } = nodeEntry;
-                  const { textValue, numberValue, multiValues } = values[0];
+                  const { id, relatedNode } = nodeEntry;
+
                   return (
                     <Div marginBottom={20} useFlex flexDirection="column" key={`${id}-${index}`}>
                       <Div useFlex flexDirection="row">
@@ -71,7 +97,7 @@ const InteractionsTableRow = ({ headers, data, index }: TableRowProps) => {
                           borderRadius="90px"
                           border="1px solid #c0bcbb"
                         >
-                          { relatedNode?.type === 'SLIDER' ? <SliderNodeIcon /> : <MultiChoiceNodeIcon /> }
+                          {relatedNode?.type === 'SLIDER' ? <SliderNodeIcon /> : <MultiChoiceNodeIcon /> }
                         </Div>
                         <Div useFlex flexDirection="column">
                           <Span color="#c0bcbb" fontSize="0.8rem" fontWeight="normal" fontStyle="normal">U ASKED</Span>
@@ -84,15 +110,13 @@ const InteractionsTableRow = ({ headers, data, index }: TableRowProps) => {
                             mt="4%"
                           >
                             THEY ANSWERED
-
                           </Span>
                           <Span
                             fontWeight={300}
                             fontStyle="italic"
                             fontSize="0.8rem"
                           >
-                            {textValue || numberValue || multiValues?.map(
-                              (value) => value.textValue)?.join(' ') || 'N/A'}
+                            <InteractionTableValue entry={nodeEntry} />
                           </Span>
                         </Div>
                       </Div>

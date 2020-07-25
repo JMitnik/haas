@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { TopicDataEntry } from "./../../../__generated__/globalTypes";
+import { TopicDataEntry } from "./../../types/globalTypes";
 
 // ====================================================
 // GraphQL mutation operation: updateTopicBuilder

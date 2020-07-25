@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { TagTypeEnum } from "./../../../../__generated__/globalTypes";
+import { TagTypeEnum } from "./../../../types/globalTypes";
 
 // ====================================================
 // GraphQL query operation: getEditDialogue
