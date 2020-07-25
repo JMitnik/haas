@@ -1,3 +1,5 @@
+import { NodeType } from '@prisma/client';
+
 export interface LeafNodeProps {
   id: string;
   nodeId?: string;
@@ -31,6 +33,32 @@ export interface QuestionOptionProps {
   publicValue?: string;
 }
 
+export interface PathProps {
+  answer?: string | null;
+  quantity?: number | null;
+}
+
+export interface StatisticsProps {
+  history: HistoryDataProps[];
+  topNegativePath: PathProps[];
+  topPositivePath: PathProps[];
+}
+
+export interface HistoryDataProps {
+  x?: string | null;
+  y?: number | null;
+  entryId?: string | null;
+}
+
+export interface PathFrequency {
+  answer: string;
+  quantity: number;
+}
+
+export interface IdMapProps {
+  [details: string] : string;
+}
+
 export interface QuestionProps {
   id: string;
   title: string;
@@ -49,25 +77,8 @@ export interface DialogueInputProps {
     title: string;
     description: string;
     publicTitle: string;
-    isSeed: boolean;
+    contentType: 'SCRATCH' | 'TEMPLATE' | 'SEED';
+    templateDialogueId?: string;
     tags: any;
   }
 }
-
-export interface PathProps {
-  answer?: string | null;
-  quantity?: number | null;
-}
-
-export interface StatisticsProps {
-  history: HistoryDataProps[];
-  topNegativePath: PathProps[];
-  topPositivePath: PathProps[];
-}
-
-export interface HistoryDataProps {
-  x?: string | null;
-  y?: number | null;
-  entryId?: string | null;
-}
-

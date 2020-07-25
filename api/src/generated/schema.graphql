@@ -7,6 +7,7 @@ input AddDialogueInput {
   customerSlug: String
   description: String
   dialogueSlug: String
+  isSeed: Boolean
   publicTitle: String
   tags: TagsInputObjectType
   templateDialogueId: String
@@ -25,9 +26,18 @@ type ColourSettings {
   secondary: String
 }
 
+"""Interface all pagination-based models should implement"""
+interface ConnectionInterface {
+  endDate: String
+  limit: Int!
+  offset: Int!
+  pageInfo: PaginationPageInfo!
+  startDate: String
+}
+
 input CTALinkInputObjectType {
   backgroundColor: String
-  icon: String
+  iconUrl: String
   id: String
   title: String
   type: LinkTypeEnumType
@@ -81,11 +91,9 @@ type Dialogue {
   description: String!
   edges: [Edge!]!
   id: ID!
-  interactionFeedItems: [Session!]
-  interactions(filter: FilterInput): InteractionType!
   leafs(searchTerm: String): [QuestionNode!]!
   publicTitle: String
-  questions(where: QuestionNodeWhereInputType): [QuestionNode!]!
+  questions: [QuestionNode!]!
   rootQuestion: QuestionNode!
   sessionConnection(filter: PaginationWhereInput): SessionConnection
   sessions(take: Int): [Session!]!
@@ -150,25 +158,6 @@ type ImageType {
   url: String
 }
 
-type InteractionSessionType {
-  createdAt: String!
-  id: String!
-  index: Int!
-  nodeEntries: [NodeEntry!]!
-  paths: Int!
-  score: Float
-}
-
-type InteractionType {
-  endDate: String
-  orderBy: [SortFilterObject!]!
-  pageIndex: Int!
-  pages: Int!
-  pageSize: Int!
-  sessions: [InteractionSessionType!]!
-  startDate: String
-}
-
 type lineChartDataType {
   entryId: String
   x: String
@@ -202,7 +191,7 @@ type Mutation {
   createCTA(customerSlug: String, dialogueSlug: String, links: CTALinksInputType, title: String, type: String): QuestionNode!
   createCustomer(name: String, options: CustomerCreateOptions): Customer!
   createDialogue(data: AddDialogueInput): Dialogue!
-  createPermission(data: PermissionInput): PermssionType!
+  createPermission(data: PermissionInput): PermssionType
   createQuestion(customerSlug: String, dialogueSlug: String, edgeCondition: EdgeConditionInputType, optionEntries: OptionsInputType, overrideLeafId: String, parentQuestionId: String, title: String, type: String): QuestionNode
   createRole(data: RoleInput): RoleType!
   createSession(input: SessionInput): Session!
@@ -210,11 +199,11 @@ type Mutation {
   createTrigger(customerSlug: String, questionId: String, recipients: RecipientsInputType, trigger: TriggerInputType): TriggerType!
   createUser(customerSlug: String, input: UserInput): UserType!
   deleteCTA(id: String): QuestionNode!
-  deleteCustomer(where: CustomerWhereUniqueInput): Customer!
+  deleteCustomer(where: CustomerWhereUniqueInput): Customer
   deleteDialogue(where: DialogueWhereUniqueInput): Dialogue!
   deleteQuestion(customerSlug: String, dialogueSlug: String, id: String): QuestionNode!
-  deleteTag(tagId: String): TagType!
-  deleteTrigger(id: String): TriggerType!
+  deleteTag(tagId: String): Tag!
+  deleteTrigger(id: String): TriggerType
   deleteUser(id: String): UserType!
   editCustomer(id: String, options: CustomerEditOptions): Customer!
   editDialogue(customerSlug: String, description: String, dialogueSlug: String, publicTitle: String, tags: TagsInputObjectType, title: String): Dialogue!
@@ -224,7 +213,6 @@ type Mutation {
   updateCTA(id: String, links: CTALinksInputType, title: String, type: String): QuestionNode!
   updateQuestion(edgeCondition: EdgeConditionInputType, edgeId: String, id: String, optionEntries: OptionsInputType, overrideLeafId: String, title: String, type: String): QuestionNode!
   updateRoles(permissions: PermissionIdsInput, roleId: String): RoleType!
-  uploadUserSession(uploadUserSessionInput: UploadUserSessionInput): Session!
 }
 
 type NodeEntry {
@@ -271,6 +259,46 @@ input OptionInputType {
 
 input OptionsInputType {
   options: [OptionInputType!]
+}
+
+"""Information with regards to current page, and total number of pages"""
+type PaginationPageInfo {
+  nrPages: Int!
+  pageIndex: Int!
+}
+
+"""Ways to sort a pagination object"""
+enum PaginationSortByEnum {
+  createdAt
+  email
+  firstName
+  id
+  lastName
+  medium
+  name
+  paths
+  role
+  score
+  type
+  user
+  when
+}
+
+"""Sorting of pagination (type and whether it ascends)"""
+input PaginationSortInput {
+  by: PaginationSortByEnum!
+  desc: Boolean = true
+}
+
+input PaginationWhereInput {
+  endDate: String
+  limit: Int
+  offset: Int
+  orderBy: [PaginationSortInput!]
+  pageIndex: Int
+  search: String
+  searchTerm: String
+  startDate: String
 }
 
 input PermissionIdsInput {
@@ -325,8 +353,18 @@ type QuestionNode {
   questionDialogue: Dialogue
   questionDialogueId: String
   title: String!
-  type: String!
+  type: QuestionNodeTypeEnum!
   updatedAt: String!
+}
+
+"""The different types a node can assume"""
+enum QuestionNodeTypeEnum {
+  CHOICE
+  GENERIC
+  LINK
+  REGISTRATION
+  SLIDER
+  TEXTBOX
 }
 
 input QuestionNodeWhereInputType {
@@ -434,6 +472,11 @@ enum TagTypeEnum {
   AGENT
   DEFAULT
   LOCATION
+}
+
+"""Input type for a textbox node"""
+input TextboxNodeEntryInput {
+  value: String
 }
 
 type topPathType {

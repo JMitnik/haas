@@ -103,6 +103,7 @@ const ActionOverview = ({ leafs }: ActionOverviewProps) => {
   };
 
   const activeLeafs = mapLeafs(data?.customer?.dialogue?.leafs);
+  console.log(leafs);
 
   return (
     <DialogueViewContainer>
@@ -132,6 +133,7 @@ const ActionOverview = ({ leafs }: ActionOverviewProps) => {
           onNewCTAChange={setNewCTA}
         />
       )}
+
       {!activeLeafs && leafs && leafs.map(
         (leaf: any, index: number) => (
           <CTAEntry

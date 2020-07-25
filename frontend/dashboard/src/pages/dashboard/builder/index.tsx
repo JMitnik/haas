@@ -15,8 +15,8 @@ const initializeQuestionType = (type?: string) => {
     return 'Slider';
   }
 
-  if (type === 'MULTI_CHOICE') {
-    return 'Multi-Choice';
+  if (type === 'CHOICE') {
+    return 'Choice';
   }
 
   return 'Unknown';
@@ -31,7 +31,7 @@ const initializeCTAType = (type?: string) => {
     return 'Register';
   }
 
-  if (type === 'SOCIAL_SHARE') {
+  if (type === 'LINK') {
     return 'Link';
   }
 

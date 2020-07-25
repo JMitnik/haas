@@ -65,6 +65,7 @@ export const CustomerType = objectType({
       },
       async resolve(parent: Customer, args, ctx) {
         const { prisma }: { prisma: PrismaClient } = ctx;
+
         let dialogues = await prisma.dialogue.findMany({
           where: {
             customerId: parent.id,

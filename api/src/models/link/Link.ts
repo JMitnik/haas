@@ -23,7 +23,7 @@ export const CTALinkInputObjectType = inputObjectType({
 
     t.string('id', { nullable: true });
     t.string('title', { nullable: true });
-    t.string('icon', { nullable: true });
+    t.string('iconUrl', { nullable: true });
     t.string('backgroundColor', { nullable: true });
   },
 });
