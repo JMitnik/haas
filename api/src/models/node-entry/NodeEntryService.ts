@@ -106,6 +106,10 @@ class NodeEntryService {
     return entries;
   };
 
+  // static fetchNodeEntryValue = async (nodeEntry: NodeEntry): Promise<any> => {
+  //   if
+  // }
+
   static getNodeEntryValue = async (nodeEntry: NodeEntryWithTypes): Promise<any> => {
     if (nodeEntry.relatedNode?.type === 'GENERIC') {
       return null;

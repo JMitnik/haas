@@ -234,7 +234,6 @@ export interface NexusGenRootTypes {
   NodeEntry: prisma.NodeEntry;
   NodeEntryValue: { // root type
     choiceNodeEntry?: string | null; // String
-    id: string; // ID!
     linkNodeEntry?: string | null; // String
     registrationNodeEntry?: string | null; // String
     sliderNodeEntry?: number | null; // Int
@@ -483,7 +482,6 @@ export interface NexusGenFieldTypes {
   }
   NodeEntryValue: { // field return type
     choiceNodeEntry: string | null; // String
-    id: string; // ID!
     linkNodeEntry: string | null; // String
     registrationNodeEntry: string | null; // String
     sliderNodeEntry: number | null; // Int

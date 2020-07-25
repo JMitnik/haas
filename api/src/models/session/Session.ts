@@ -1,4 +1,3 @@
-import { PrismaClient, Session } from '@prisma/client';
 import { extendType, inputObjectType, mutationField, objectType } from '@nexus/schema';
 
 // eslint-disable-next-line import/no-cycle
@@ -33,9 +32,9 @@ export const SessionType = objectType({
 
     t.list.field('nodeEntries', {
       type: NodeEntryType,
-      resolve(parent: Session, args, ctx) {
-        const { prisma }: { prisma: PrismaClient } = ctx;
-        const nodeEntries = prisma.nodeEntry.findMany({
+
+      async resolve(parent, args, ctx) {
+        const nodeEntries = await ctx.prisma.nodeEntry.findMany({
           where: { sessionId: parent.id },
           include: {
             choiceNodeEntry: true,
@@ -43,6 +42,9 @@ export const SessionType = objectType({
             registrationNodeEntry: true,
             sliderNodeEntry: true,
             textboxNodeEntry: true,
+          },
+          orderBy: {
+            depth: 'asc',
           },
         });
 

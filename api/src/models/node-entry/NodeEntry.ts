@@ -10,8 +10,6 @@ export const NodeEntryValueType = objectType({
   name: 'NodeEntryValue',
 
   definition(t) {
-    t.id('id');
-
     t.int('sliderNodeEntry', { nullable: true });
     t.string('textboxNodeEntry', { nullable: true });
     t.string('registrationNodeEntry', { nullable: true });
@@ -59,8 +57,25 @@ export const NodeEntryType = objectType({
       description: 'The core scoring value associated with the node entry.',
       nullable: true,
 
-      resolve(parent: NodeEntry) {
-        return NodeEntryService.getNodeEntryValue(parent);
+      async resolve(parent, args, ctx) {
+        const nodeEntry = await ctx.prisma.nodeEntry.findOne({
+          where: { id: parent.id },
+          include: {
+            choiceNodeEntry: true,
+            linkNodeEntry: true,
+            registrationNodeEntry: true,
+            sliderNodeEntry: true,
+            textboxNodeEntry: true,
+          },
+        });
+
+        return {
+          choiceNodeEntry: nodeEntry?.choiceNodeEntry?.value,
+          linkNodeEntry: nodeEntry?.linkNodeEntry?.value?.toString(),
+          registrationNodeEntry: nodeEntry?.registrationNodeEntry?.value?.toString(),
+          sliderNodeEntry: nodeEntry?.sliderNodeEntry?.value,
+          textboxNodeEntry: nodeEntry?.textboxNodeEntry?.value,
+        };
       },
     });
   },

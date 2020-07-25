@@ -213,7 +213,6 @@ input NodeEntryInput {
 
 type NodeEntryValue {
   choiceNodeEntry: String
-  id: ID!
   linkNodeEntry: String
   registrationNodeEntry: String
   sliderNodeEntry: Int
