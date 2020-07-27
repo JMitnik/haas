@@ -250,6 +250,7 @@ const TriggerQueries = extendType({
           limit: args.filter?.limit,
           offset: args.filter?.offset,
           orderBy: args.filter?.orderBy,
+          search: args.filter?.searchTerm,
         });
 
         // TODO: Do we put this here, or extract it from the graph?

@@ -36,18 +36,17 @@ const TriggersOverview = () => {
   const { customerSlug } = useParams();
   const history = useHistory();
   const [fetchTriggers, { data }] = useLazyQuery(getTriggerTableQuery, { fetchPolicy: 'cache-and-network' });
-  const [paginationProps, setPaginationProps] = useState<TableProps>(
-    {
-      activeStartDate: null,
-      activeEndDate: null,
-      activeSearchTerm: '',
-      pageIndex: 0,
-      pageSize: 8,
-      sortBy: [{ by: 'name', desc: true }],
-    },
-  );
+  const [paginationProps, setPaginationProps] = useState<TableProps>({
+    activeStartDate: null,
+    activeEndDate: null,
+    activeSearchTerm: '',
+    pageIndex: 0,
+    pageSize: 8,
+    sortBy: [{ by: 'name', desc: true }],
+  });
 
   const tableData: any = data?.triggerConnection?.triggers || [];
+
   useEffect(() => {
     const { activeStartDate, activeEndDate, pageIndex, pageSize, sortBy, activeSearchTerm } = paginationProps;
     fetchTriggers({

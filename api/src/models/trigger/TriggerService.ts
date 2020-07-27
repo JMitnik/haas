@@ -2,6 +2,7 @@ import {
   PrismaClient,
   Trigger,
   TriggerCondition,
+  TriggerOrderByInput,
   TriggerUpdateInput,
   TriggerWhereInput,
   User,
@@ -14,6 +15,7 @@ import { isAfter, subSeconds } from 'date-fns';
 
 import { NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
 import { Nullable } from '../../types/generic';
+import PaginationService from '../general/PaginationService';
 import TriggerSMSService from '../../services/sms/trigger-sms-service';
 import prisma from '../../prisma';
 
@@ -58,23 +60,33 @@ class TriggerService {
     ? entries.slice(offset, (pageIndex + 1) * limit)
     : entries.slice(offset, entries.length));
 
+  static formatOrderBy(orderByArray?: NexusGenInputs['PaginationSortInput'][]): (TriggerOrderByInput|undefined) {
+    if (!orderByArray?.length) return undefined;
+
+    const orderBy = orderByArray[0];
+
+    return {
+      medium: orderBy.by === 'medium' ? orderBy.desc ? 'desc' : 'asc' : undefined,
+      type: orderBy.by === 'type' ? orderBy.desc ? 'desc' : 'asc' : undefined,
+      name: orderBy.by === 'name' ? orderBy.desc ? 'desc' : 'asc' : undefined,
+    };
+  }
+
   static paginatedTriggers = async (
     customerSlug: string,
     paginationOpts: NexusGenInputs['PaginationWhereInput'],
   ) => {
-    const needPageReset = false;
-
     // Build filter
     const triggerWhereInput: TriggerWhereInput = { customer: { slug: customerSlug } };
 
-    const searchTermFilter = TriggerService.getSearchTermFilter(paginationOpts.searchTerm || '');
+    const searchTermFilter = TriggerService.getSearchTermFilter(paginationOpts.search || '');
     triggerWhereInput.OR = searchTermFilter.length ? searchTermFilter : undefined;
 
     const triggers = await prisma.trigger.findMany({
       where: triggerWhereInput,
       take: paginationOpts.limit || undefined,
       skip: paginationOpts.offset || undefined,
-      // TODO: Add back in orderBy
+      orderBy: TriggerService.formatOrderBy(paginationOpts.orderBy || undefined),
     });
 
     const triggerTotal = await prisma.trigger.count({ where: { customer: { slug: customerSlug } } });
