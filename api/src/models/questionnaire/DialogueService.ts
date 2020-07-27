@@ -4,12 +4,15 @@ import cuid from 'cuid';
 
 import { Dialogue, DialogueCreateInput, DialogueUpdateInput,
   QuestionOptionCreateManyWithoutQuestionNodeInput, Tag, TagWhereUniqueInput } from '@prisma/client';
+import { isPresent } from 'ts-is-present';
 import { leafNodes, sliderType } from '../../data/seeds/default-data';
 import NodeService from '../question/NodeService';
 // eslint-disable-next-line import/no-cycle
 import { NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
 // eslint-disable-next-line import/no-cycle
-import { HistoryDataProps, IdMapProps, PathFrequency, QuestionProps, StatisticsProps } from './DialogueTypes';
+import { HistoryDataProps, HistoryDataWithEntry, IdMapProps, PathFrequency, QuestionProps, StatisticsProps } from './DialogueTypes';
+// eslint-disable-next-line import/no-cycle
+import NodeEntryService, { NodeEntryWithTypes } from '../node-entry/NodeEntryService';
 // eslint-disable-next-line import/no-cycle
 import SessionService from '../session/SessionService';
 import prisma from '../../prisma';
@@ -118,11 +121,16 @@ class DialogueService {
 
   /**
    * Get top popular N paths based on occurence frequency.
-   * @param groupedJoined
+   * @param entries
    * @param nPaths
    */
-  static getTopNPaths = (groupedJoined: any, nPaths: number = 3) => {
-    const countedPaths = _.countBy(groupedJoined, 'textValue');
+  static getTopNPaths = (entries: HistoryDataWithEntry[], nPaths: number = 3) => {
+    const entryWithText = entries.map((entry) => ({
+      textValue: NodeEntryService.getTextValueFromEntry(entry),
+      ...entry,
+    })).filter((entry) => entry.textValue);
+
+    const countedPaths = _.countBy(entryWithText, 'textValue');
 
     // Built in cleanup
     Object.keys(countedPaths).forEach((path) => path === 'undefined' && delete countedPaths[path]);
@@ -178,10 +186,13 @@ class DialogueService {
       entryId: entry?.id || null,
     })) || [];
 
-    const nodeEntryTextValues = await SessionService.getTextEntriesFromSessions(sessions);
+    const nodeEntryTextValues = SessionService.getTextEntriesFromSessions(sessions).filter(isPresent);
 
     // TODO: This is where I left off
-    const textAndScoreEntries = _.merge(history, nodeEntryTextValues);
+    const textAndScoreEntries: HistoryDataWithEntry[] = _.merge<HistoryDataProps[], NodeEntryWithTypes[]>(
+      history, nodeEntryTextValues,
+    );
+
     const isPositiveEntries = _.groupBy(textAndScoreEntries, (entry) => entry.y && entry.y > 50);
 
     const topNegativePath = DialogueService.getTopNPaths(isPositiveEntries.false, 3) || [];

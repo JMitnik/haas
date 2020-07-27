@@ -178,6 +178,13 @@ class NodeEntryService {
     };
   }
 
+  static getTextValueFromEntry = (entry: NodeEntryWithTypes): (string | null) => {
+    if (entry.relatedNode?.type === 'CHOICE') return entry.choiceNodeEntry?.value || null;
+    if (entry.relatedNode?.type === 'TEXTBOX') return entry.choiceNodeEntry?.value || null;
+
+    return null;
+  };
+
   // Slice node entries to match amount of nodes displayed in front-end
   // If offset + limit is greater than amount visible in front-end
   // => slice until end of the array

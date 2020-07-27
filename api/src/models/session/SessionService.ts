@@ -92,9 +92,9 @@ class SessionService {
    * Get text entries from a list of sessions
    * @param sessions
    */
-  static async getTextEntriesFromSessions(
+  static getTextEntriesFromSessions(
     sessions: SessionWithEntries[],
-  ): Promise<(NodeEntryWithTypes | undefined | null)[]> {
+  ): (NodeEntryWithTypes | undefined | null)[] {
     if (!sessions.length) {
       return [];
     }
