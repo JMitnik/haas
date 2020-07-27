@@ -30,6 +30,7 @@ import UsersOverview from 'views/UsersOverview/UsersOverview';
 import { ErrorBoundary } from 'react-error-boundary';
 import DashboardLayout from 'layouts/DashboardLayout';
 
+import AuthProvider from 'providers/AuthProvider';
 import DialogueLayout from 'layouts/DialogueLayout';
 import client from './config/apollo';
 
@@ -175,14 +176,16 @@ const App: FC = () => (
     <ApolloProvider client={client}>
       <CustomerProvider>
         <Router>
-          <ThemesProvider>
-            <AppContainer>
-              <ErrorBoundary FallbackComponent={GeneralErrorFallback}>
-                <AppRoutes />
-              </ErrorBoundary>
-            </AppContainer>
-            <GlobalStyle />
-          </ThemesProvider>
+          <AuthProvider>
+            <ThemesProvider>
+              <AppContainer>
+                <ErrorBoundary FallbackComponent={GeneralErrorFallback}>
+                  <AppRoutes />
+                </ErrorBoundary>
+              </AppContainer>
+              <GlobalStyle />
+            </ThemesProvider>
+          </AuthProvider>
         </Router>
       </CustomerProvider>
     </ApolloProvider>

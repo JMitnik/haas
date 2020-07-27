@@ -34,6 +34,7 @@
         "gen:api": "yarn workspace @haas/api gen",
         "gen:dashboard": "yarn workspace @haas/dashboard gen",
         "migrate": "yarn workspace @haas/api migrate",
+        "migrate:create": "yarn workspace @haas/api migrate:create",
         "seed:api": "yarn workspace @haas/api seed",
         "kill": "yarn kill:api && yarn kill:client",
         "kill:api": "kill $(lsof -t -i:4000) | exit 0",

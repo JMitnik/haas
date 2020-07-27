@@ -4,6 +4,7 @@ import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema
 // eslint-disable-next-line import/no-cycle
 import { CTALinksInputType, LinkType } from '../link/Link';
 // eslint-disable-next-line import/named
+// eslint-disable-next-line import/no-cycle
 import { DialogueType } from '../questionnaire/Dialogue';
 // eslint-disable-next-line import/no-cycle
 import { EdgeType } from '../edge/Edge';
@@ -40,13 +41,12 @@ export const QuestionNodeType = objectType({
   name: 'QuestionNode',
   definition(t) {
     t.id('id');
-    t.string('updatedAt');
     t.boolean('isLeaf');
     t.boolean('isRoot');
     t.string('title');
+    t.string('updatedAt');
     t.string('creationDate', { nullable: true });
     t.field('type', { type: QuestionNodeTypeEnum });
-    t.string('creationDate', { nullable: true });
     t.string('overrideLeafId', { nullable: true });
 
     // TODO: Make this required in prisma.
@@ -61,14 +61,13 @@ export const QuestionNodeType = objectType({
 
     t.list.field('links', {
       type: LinkType,
-      resolve(parent: QuestionNode, args: any, ctx: any) {
-        const { prisma } : { prisma: PrismaClient } = ctx;
+      resolve(parent: QuestionNode, args: any, ctx) {
         if (parent.isLeaf) {
-          return prisma.link.findMany({
+          return ctx.prisma.link.findMany({
             where: {
               questionNodeId: parent.id,
             },
-          });
+          }) as any || [];
         }
         return [];
       },

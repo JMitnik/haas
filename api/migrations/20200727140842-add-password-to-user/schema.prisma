@@ -1,6 +1,6 @@
 datasource postgresql {
   provider = "postgresql"
-  url      = env("DB_STRING")
+  url = "***"
 }
 
 // binaryTargets = ["debian-openssl-1.1.x"]
@@ -104,7 +104,7 @@ enum NodeType {
 model QuestionNode {
   id                         String           @default(cuid()) @id
   creationDate               DateTime         @default(now())
-  updatedAt                  DateTime         @updatedAt
+  updatedAt                  DateTime?        @updatedAt
   isLeaf                     Boolean          @default(false)
   isRoot                     Boolean          @default(false)
   title                      String

@@ -52,9 +52,9 @@ export const LinkType = objectType({
 
     t.field('questionNode', {
       type: QuestionNodeType,
-      async resolve(parent: Link, args: any, ctx: any) {
-        const { prisma } : { prisma: PrismaClient } = ctx;
-        const link = await prisma.link.findOne({
+
+      async resolve(parent, args: any, ctx) {
+        const link = await ctx.prisma.link.findOne({
           where: {
             id: parent.id,
           },
@@ -62,7 +62,8 @@ export const LinkType = objectType({
             questionNode: true,
           },
         });
-        return link?.questionNode;
+
+        return link?.questionNode as any;
       },
     });
   },

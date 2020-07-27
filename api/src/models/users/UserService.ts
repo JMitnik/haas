@@ -1,10 +1,40 @@
 import { User, UserWhereInput } from '@prisma/client';
 import _ from 'lodash';
 
+import { NexusGenFieldTypes, NexusGenInputs, NexusGenTypes } from '../../generated/nexus';
 import { Nullable } from '../../types/generic';
+
 import prisma from '../../prisma';
 
+interface CreateUserOptions {
+  customerSlug?: string;
+}
+
 class UserService {
+  static async createUser(userInput: NexusGenInputs['UserInput'], customerSlug: string) {
+    const user = await prisma.user.create({
+      data: {
+        email: userInput.email,
+        password: userInput.password,
+        firstName: userInput.firstName || 'Anonymous',
+        lastName: userInput.lastName || 'User',
+        phone: userInput.phone || '000',
+        role: {
+          connect: {
+            id: userInput.roleId || undefined,
+          },
+        },
+        Customer: {
+          connect: {
+            slug: customerSlug,
+          },
+        },
+      },
+    });
+
+    return user;
+  }
+
   static getSearchTermFilter = (searchTerm: string) => {
     if (!searchTerm) {
       return [];

@@ -322,9 +322,7 @@ export const DialogueMutations = extendType({
         const customers = await prisma.customer.findMany({ where: { slug: customerSlug } });
         const customer = customers?.[0];
 
-        if (!customer) {
-          return null;
-        }
+        if (!customer) throw new Error('Unable to return find customer');
 
         return DialogueService.copyDialogue(
           templateDialogueId, customer?.id, title, dialogueSlug, description, publicTitle, dialogueTags,

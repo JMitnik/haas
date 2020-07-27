@@ -5,6 +5,7 @@ import { useCustomer } from 'providers/CustomerProvider';
 
 const DashboardPage = () => {
   const { activeCustomer, storageCustomer } = useCustomer();
+
   if (activeCustomer) {
     return (
       <Redirect to={`/dashboard/b/${activeCustomer.slug}`} />
