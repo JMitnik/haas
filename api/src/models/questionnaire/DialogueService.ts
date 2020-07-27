@@ -188,7 +188,6 @@ class DialogueService {
 
     const nodeEntryTextValues = SessionService.getTextEntriesFromSessions(sessions).filter(isPresent);
 
-    // TODO: This is where I left off
     const textAndScoreEntries: HistoryDataWithEntry[] = _.merge<HistoryDataProps[], NodeEntryWithTypes[]>(
       history, nodeEntryTextValues,
     );
@@ -236,7 +235,6 @@ class DialogueService {
 
     const nodeEntryIds = nodeEntries.map((nodeEntry) => nodeEntry.id);
     if (nodeEntryIds.length > 0) {
-      // TODO: Bring it back
       await prisma.sliderNodeEntry.deleteMany(
         { where: { nodeEntryId: { in: nodeEntryIds } } },
       );
