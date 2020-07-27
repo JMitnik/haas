@@ -103,7 +103,7 @@ describe('Test Dialogue operations', () => {
     dialogueCards.first().click();
     const tabBar = cy.get('[data-cy="DialogueTabbar"]');
     tabBar.contains('Builder').click();
-    cy.contains('Dialogue builder');
+    cy.contains('Builder');
   });
 
   it('Creates a second dialogue using the Create Dialogue screen', () => {
@@ -159,11 +159,14 @@ describe('Test Dialogue operations', () => {
     cy.get('[data-cy="AddTagButton"]').click();
 
     // Dealing with react dropdowns
-    cy.get('[class*="-control"]')
-      .click(0, 0, { force: true })
-      .get('[class*="-menu"]')
+    cy.get('[data-cy="SelectOptions"]')
+      .find('[class*="-control"]')
+      .click(0, 0, { force: true });
+
+    cy.get('[data-cy="SelectOptions"]')
+      .find('[class*="-menu"]')
       .find('[class*="-option"]')
-      .eq(2)
+      .eq(1)
       .click(0, 0, { force: true });
 
     // Submit

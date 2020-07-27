@@ -55,7 +55,7 @@ const mapQuestionsInputData = (nodes: Array<QuestionEntryProps>) => {
     isRoot,
     isLeaf,
     type: initializeQuestionType(type),
-    icon: type === 'MULTI_CHOICE' ? MultiChoiceBuilderIcon : HaasNodeIcon,
+    icon: type === 'CHOICE' ? MultiChoiceBuilderIcon : HaasNodeIcon,
     overrideLeaf: !overrideLeaf
       ? undefined
       : { id: overrideLeaf?.id, title: overrideLeaf?.title, type: initializeCTAType(overrideLeaf?.type) },

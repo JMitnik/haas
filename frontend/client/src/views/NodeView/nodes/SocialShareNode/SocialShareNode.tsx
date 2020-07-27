@@ -15,6 +15,8 @@ type SocialShareNodeProps = GenericNodeProps;
 const SocialShareNode = ({ node }: SocialShareNodeProps) => {
   useDialogueFinish();
 
+  console.log(node.links);
+
   return (
     <SocialShareNodeContainer>
       <NodeTitle>{node.title}</NodeTitle>

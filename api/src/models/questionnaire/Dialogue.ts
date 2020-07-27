@@ -219,9 +219,7 @@ export const DialogueType = objectType({
         const questions = ctx.prisma.questionNode.findMany({
           where: {
             AND: [
-              {
-                questionDialogueId: parent.id,
-              },
+              { questionDialogueId: parent.id },
               {
                 isLeaf: false,
               },

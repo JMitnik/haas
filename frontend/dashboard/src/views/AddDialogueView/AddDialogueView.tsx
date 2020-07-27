@@ -213,9 +213,11 @@ const AddDialogueView = () => {
                 <Div marginTop={15}>
                   {activeTags?.map((tag, index) => (
                     <Flex marginBottom="4px" alignItems="center" key={index} gridColumn="1 / -1">
-                      <Div flexGrow={9}>
+                      <Div
+                        data-cy="SelectOptions"
+                        flexGrow={9}
+                      >
                         <Select
-                          data-cy="SelectOptions"
                           key={index}
                           options={tags}
                           value={tag}

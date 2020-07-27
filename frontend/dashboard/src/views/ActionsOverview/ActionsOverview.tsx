@@ -27,7 +27,7 @@ const DialogueViewContainer = styled(Div)`
 `;
 
 const mapLeafs = (leafs: any) => leafs?.map((leaf: any) => {
-  if (leaf.type === 'SOCIAL_SHARE') {
+  if (leaf.type === 'LINK') {
     const mappedLinks = leaf.links?.map((link: any) => {
       const { __typename, ...linkedData } = link;
       return { ...linkedData, type: { label: link.type, value: link.type } };
@@ -57,7 +57,7 @@ const initializeCTAType = (type: string) => {
   }
 
   if (type === 'LINK') {
-    return { label: 'Link', value: 'SOCIAL_SHARE' };
+    return { label: 'Link', value: 'LINK' };
   }
 
   return { label: 'None', value: '' };

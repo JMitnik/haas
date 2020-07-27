@@ -75,7 +75,7 @@ const QuestionEntryItem = ({ depth,
   });
 
   const activeType = question.type === 'Multi-Choice'
-    ? { label: question.type, value: 'MULTI_CHOICE' }
+    ? { label: question.type, value: 'CHOICE' }
     : { label: question.type, value: 'SLIDER' };
 
   return (

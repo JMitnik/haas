@@ -49,7 +49,7 @@ interface QuestionEntryFormProps {
 
 const questionTypes = [
   { value: 'SLIDER', label: 'Slider' },
-  { value: 'MULTI_CHOICE', label: 'Multi-Choice' }];
+  { value: 'CHOICE', label: 'Multi-Choice' }];
 
 const conditionTypes = [
   { value: 'match', label: 'match' },
@@ -398,7 +398,7 @@ const QuestionEntryForm = ({
                 {errors.activeLeaf && <Muted color="warning">{errors.activeLeaf.message}</Muted>}
               </Div>
 
-              {activeQuestionType && activeQuestionType.value === 'MULTI_CHOICE' && (
+              {activeQuestionType && activeQuestionType.value === 'CHOICE' && (
                 <>
                   <Div mb={1} gridColumn="1 / -1">
                     <Flex justifyContent="space-between">

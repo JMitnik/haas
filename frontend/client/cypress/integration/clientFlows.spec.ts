@@ -6,6 +6,7 @@ describe('Client traverses the various flows', () => {
 
     // Click the select and select first to start the dialogue
     cy.get('[class*="-control"]')
+      .eq(0)
       .click(0, 0, { force: true })
       .get('[class*="-menu"]')
       .find('[class*="-option"]')
@@ -41,6 +42,7 @@ describe('Client traverses the various flows', () => {
 
     // Click the select and select first to start the dialogue
     cy.get('[class*="-control"]')
+      .eq(0)
       .click(0, 0, { force: true })
       .get('[class*="-menu"]')
       .find('[class*="-option"]')
@@ -74,6 +76,7 @@ describe('Client traverses the various flows', () => {
 
     // Click the select and select first to start the dialogue
     cy.get('[class*="-control"]')
+      .eq(0)
       .click(0, 0, { force: true })
       .get('[class*="-menu"]')
       .find('[class*="-option"]')

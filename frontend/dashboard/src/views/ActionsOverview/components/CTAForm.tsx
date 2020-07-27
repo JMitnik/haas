@@ -45,7 +45,7 @@ interface CTAFormProps {
   onNewCTAChange: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const isLinkType = (ctaType: string) => ctaType === 'SOCIAL_SHARE';
+const isLinkType = (ctaType: string) => ctaType === 'LINK';
 
 const schema = yup.object().shape({
   title: yup.string().required(),
@@ -59,7 +59,7 @@ const schema = yup.object().shape({
 const CTA_TYPES = [
   { label: 'Opinion', value: 'TEXTBOX' },
   { label: 'Register', value: 'REGISTRATION' },
-  { label: 'Link', value: 'SOCIAL_SHARE' },
+  { label: 'Link', value: 'LINK' },
 ];
 
 const LINK_TYPES = [
@@ -247,7 +247,7 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: 
                 </Muted>
                 )}
               </Div>
-              {activeType.value === 'SOCIAL_SHARE' && (
+              {activeType.value === 'LINK' && (
               <Div gridColumn="1 / -1">
                 <Flex flexDirection="row" alignItems="center" justifyContent="space-between" marginBottom={5}>
                   <H4>Links</H4>

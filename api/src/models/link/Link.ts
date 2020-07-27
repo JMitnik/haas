@@ -1,6 +1,7 @@
 import { Link, PrismaClient } from '@prisma/client';
 import { enumType, inputObjectType, objectType } from '@nexus/schema';
 
+// eslint-disable-next-line import/no-cycle
 import { QuestionNodeType } from '../question/QuestionNode';
 
 export const LinkTypeEnumType = enumType({
