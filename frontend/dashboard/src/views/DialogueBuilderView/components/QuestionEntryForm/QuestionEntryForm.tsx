@@ -1,4 +1,5 @@
 
+import * as yup from 'yup';
 import { ApolloError } from 'apollo-client';
 import { MinusCircle, PlusCircle } from 'react-feather';
 import { useForm } from 'react-hook-form';
@@ -21,13 +22,39 @@ import { EdgeConditonProps,
 
 interface FormDataProps {
   title: string;
-  conditionType: string;
   minValue: string;
   maxValue: string;
   questionType: string;
   matchText: string;
   activeLeaf: string;
+  parentQuestionType: string;
+  options: Array<any>;
 }
+
+const schema = yup.object().shape({
+  title: yup.string().required(),
+  questionType: yup.string().required(),
+  minValue: yup.string().when(['parentQuestionType'], {
+    is: (parentQuestionType: string) => parentQuestionType === 'Slider',
+    then: yup.string().required(),
+    otherwise: yup.string().notRequired(),
+  }),
+  maxValue: yup.string().when(['parentQuestionType'], {
+    is: (parentQuestionType: string) => parentQuestionType === 'Slider',
+    then: yup.string().required(),
+    otherwise: yup.string().notRequired(),
+  }),
+  matchText: yup.string().when(['parentQuestionType'], {
+    is: (parentQuestionType: string) => parentQuestionType === 'Multi-Choice',
+    then: yup.string().required(),
+    otherwise: yup.string().notRequired(),
+  }),
+  options: yup.array().when(['questionType'], {
+    is: (questionType: string) => questionType === 'Multi-Choice',
+    then: yup.array().min(1),
+    otherwise: yup.array().notRequired(),
+  }),
+});
 
 interface QuestionEntryFormProps {
   onAddExpandChange?: React.Dispatch<React.SetStateAction<boolean>>;
@@ -51,10 +78,6 @@ const questionTypes = [
   { value: 'SLIDER', label: 'Slider' },
   { value: 'MULTI_CHOICE', label: 'Multi-Choice' }];
 
-const conditionTypes = [
-  { value: 'match', label: 'match' },
-  { value: 'valueBoundary', label: 'valueBoundary' }];
-
 const QuestionEntryForm = ({
   onAddExpandChange,
   id,
@@ -66,15 +89,18 @@ const QuestionEntryForm = ({
   onActiveQuestionChange,
   condition,
   parentOptions,
-  edgeId,
   question,
-  parentQuestionId,
   parentQuestionType,
+  parentQuestionId,
+  edgeId,
 }: QuestionEntryFormProps) => {
   const { customerSlug, dialogueSlug } = useParams();
 
-  const { register, handleSubmit, setValue, errors } = useForm<FormDataProps>({
-    // validationSchema: schema,
+  const { register, handleSubmit, setValue, errors, getValues } = useForm<FormDataProps>({
+    validationSchema: schema,
+    defaultValues: {
+      parentQuestionType,
+    },
   });
   const [activeTitle, setActiveTitle] = useState(title);
   const [activeQuestionType, setActiveQuestionType] = useState(type);
@@ -92,7 +118,7 @@ const QuestionEntryForm = ({
   );
   const [activeCondition, setActiveCondition] = useState<null | EdgeConditonProps>(condition || { conditionType: parentQuestionType === 'Slider' ? 'valueBoundary' : 'match' });
 
-  const setConditionType = (conditionOption: any) => {
+  const setConditionType = useCallback((conditionOption: any) => {
     setActiveConditionSelect(conditionOption);
     setActiveCondition((prevCondition) => {
       if (!prevCondition) {
@@ -101,12 +127,17 @@ const QuestionEntryForm = ({
       prevCondition.conditionType = conditionOption.value;
       return prevCondition;
     });
-  };
+  }, [setActiveConditionSelect, setActiveCondition]);
 
   const handleQuestionTypeChange = useCallback((selectOption: any) => {
     setValue('questionType', selectOption?.value);
     setActiveQuestionType(selectOption);
   }, [setValue, setActiveQuestionType]);
+
+  useEffect(() => {
+    register({ name: 'parentQuestionType' });
+    setValue('parentQuestionType', parentQuestionType);
+  }, [setValue, register, parentQuestionType]);
 
   useEffect(() => {
     if (activeQuestionType) {
@@ -138,6 +169,7 @@ const QuestionEntryForm = ({
 
   const setMatchTextValue = (qOption: any) => {
     const matchText = qOption.value;
+    setValue('matchText', matchText);
     setActiveMatchValue(qOption);
     return setActiveCondition((prevCondition) => {
       if (!prevCondition) {
@@ -148,16 +180,10 @@ const QuestionEntryForm = ({
     });
   };
 
-  const handleMatchTextChange = useCallback((selectedOption: any) => {
-    setValue('matchText', selectedOption?.value);
-    setMatchTextValue(selectedOption);
-  }, [setValue, setMatchTextValue]);
-
   useEffect(() => {
-    if (activematchValue) {
-      handleMatchTextChange(activematchValue);
-    }
-  }, [handleMatchTextChange, activematchValue]);
+    console.log('setting match text to: ', activematchValue?.value);
+    setValue('matchText', activematchValue?.value);
+  }, [setValue, activematchValue]);
 
   const [createQuestion] = useMutation(createQuestionMutation, {
     onCompleted: () => {
@@ -283,8 +309,16 @@ const QuestionEntryForm = ({
     }
   };
 
+  const ErrorStyle = {
+    control: (base: any) => ({
+      ...base,
+      border: '1px solid red',
+      // This line disable the blue border
+      boxShadow: 'none',
+    }),
+  };
+
   const parentOptionsSelect = parentOptions?.map((option) => ({ label: option.value, value: option.value }));
-  console.log('Parent type: ', parentQuestionType);
   return (
     <Form onSubmit={handleSubmit(onSubmit)}>
       <FormGroupContainer>
@@ -303,6 +337,7 @@ const QuestionEntryForm = ({
               <Div useFlex flexDirection="column" gridColumn="1 / -1">
                 <StyledLabel>Title</StyledLabel>
                 <StyledInput
+                  hasError={!!errors.title}
                   name="title"
                   defaultValue={activeTitle}
                   onBlur={(e) => setActiveTitle(e.currentTarget.value)}
@@ -311,26 +346,12 @@ const QuestionEntryForm = ({
                 {errors.title && <Muted color="warning">Something went wrong!</Muted>}
               </Div>
 
-              {/* <Flex flexDirection="column">
-                <StyledLabel>conditionType</StyledLabel>
-                <Select
-                  ref={() => register({
-                    name: 'conditionType',
-                    required: true,
-                    validate: (value) => (Array.isArray(value) ? value.length > 0 : !!value),
-                  })}
-                  options={conditionTypes}
-                  value={activeConditionSelect}
-                  onChange={(qOption: any) => handleConditionTypeChange(qOption)}
-                />
-                {errors.conditionType && <Muted color="warning">Something went wrong!</Muted>}
-              </Flex> */}
-
               {parentQuestionType === 'Slider' && (
                 <>
                   <Flex flexDirection="column">
                     <StyledLabel>Min value</StyledLabel>
                     <StyledInput
+                      hasError={!!errors.minValue}
                       name="minValue"
                       ref={register({ required: false })}
                       defaultValue={condition?.renderMin}
@@ -341,6 +362,7 @@ const QuestionEntryForm = ({
                   <Flex flexDirection="column">
                     <StyledLabel>Max value</StyledLabel>
                     <StyledInput
+                      hasError={!!errors.maxValue}
                       name="maxValue"
                       ref={register({ required: false })}
                       defaultValue={condition?.renderMax}
@@ -355,8 +377,9 @@ const QuestionEntryForm = ({
                 <Div gridColumn="1 / -1">
                   <StyledLabel>Match value</StyledLabel>
                   <Select
+                    styles={errors.matchText && !activematchValue ? ErrorStyle : undefined}
                     ref={() => register({
-                      name: 'matchType',
+                      name: 'matchText',
                       required: false,
                     })}
                     options={parentOptionsSelect}
@@ -365,13 +388,14 @@ const QuestionEntryForm = ({
                       setMatchTextValue(option);
                     }}
                   />
-                  {errors.matchText && <Muted color="warning">{errors.matchText.message}</Muted>}
+                  {errors.matchText && !activematchValue && <Muted color="warning">{errors.matchText.message}</Muted>}
                 </Div>
               )}
 
               <Div useFlex flexDirection="column">
                 <StyledLabel>Question type</StyledLabel>
                 <Select
+                  hasError={!!errors.questionType}
                   ref={() => register({
                     name: 'questionType',
                     required: true,
@@ -386,6 +410,7 @@ const QuestionEntryForm = ({
               <Div key={activeLeaf?.value} useFlex flexDirection="column">
                 <StyledLabel>Leaf node</StyledLabel>
                 <Select
+                  hasError={!!errors.activeLeaf}
                   ref={() => register({
                     name: 'activeLeaf',
                     required: true,
@@ -416,14 +441,18 @@ const QuestionEntryForm = ({
                       No options available...
                     </Div>
                     )}
+                    { errors.options && <Muted>something went wrong with options</Muted>}
                     {activeOptions && activeOptions.map((option, optionIndex) => (
                       <Flex key={`${option.id}-${optionIndex}-${option.value}`} my={1} flexDirection="row">
                         <StyledInput
+                          hasError={!!errors.options}
                           key={`input-${id}-${optionIndex}`}
-                          name={`${id}-option-${optionIndex}`}
+                          name={`options[${optionIndex}].value`}
+                          ref={register({ required: true })}
                           defaultValue={option.value}
                           onBlur={(e) => handleOptionChange(e, optionIndex)}
                         />
+                        {errors.options && <Muted color="warning">Something went wrong!</Muted>}
                         <DeleteQuestionOptionButtonContainer
                           onClick={(e) => deleteOption(e, optionIndex)}
                         >
