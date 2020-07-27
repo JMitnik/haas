@@ -42,7 +42,6 @@ const SliderNode = ({ node, onEntryStore }: SliderNodeProps) => {
         textbox: undefined,
       };
 
-      console.log(entry);
       onEntryStore(entry, entry.slider?.value);
     }
   };
