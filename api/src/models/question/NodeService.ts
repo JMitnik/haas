@@ -228,9 +228,9 @@ class NodeService {
           type,
           isRoot: false,
           isLeaf: true,
-          links: {
+          links: links.length ? {
             create: links,
-          },
+          } : null,
         },
       })),
     );

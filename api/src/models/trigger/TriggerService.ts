@@ -157,7 +157,6 @@ class TriggerService {
   static tryTriggers = async (entries: Array<any>, smsService: TriggerSMSService) => {
     const questionIds = entries.map((entry: any) => entry.nodeId);
     const dialogueTriggers = await TriggerService.findTriggersByQuestionIds(questionIds);
-
     dialogueTriggers.forEach(async (trigger) => {
       await TriggerService.tryTrigger(entries, trigger, smsService);
     });

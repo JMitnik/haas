@@ -291,11 +291,11 @@ export const AddDialogueInput = inputObjectType({
     t.string('title');
     t.string('dialogueSlug');
     t.string('description');
-    t.string('publicTitle');
     t.boolean('isSeed');
     t.string('contentType');
 
     t.string('templateDialogueId', { nullable: true });
+    t.string('publicTitle', { nullable: true });
 
     t.field('tags', {
       type: TagsInputType,
@@ -354,7 +354,7 @@ export const DialogueMutations = extendType({
         publicTitle: 'String',
         tags: TagsInputType,
       },
-      resolve(args) {
+      resolve(parent, args) {
         return DialogueService.editDialogue(args);
       },
     });

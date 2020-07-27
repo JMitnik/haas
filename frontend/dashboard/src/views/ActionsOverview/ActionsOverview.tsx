@@ -103,7 +103,6 @@ const ActionOverview = ({ leafs }: ActionOverviewProps) => {
   };
 
   const activeLeafs = mapLeafs(data?.customer?.dialogue?.leafs);
-  console.log(leafs);
 
   return (
     <DialogueViewContainer>

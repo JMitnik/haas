@@ -572,10 +572,6 @@ class DialogueService {
       throw new Error('Description required, not found!');
     }
 
-    if (!input.publicTitle) {
-      throw new Error('Public title required');
-    }
-
     if (customers.length > 1) {
       // TODO: Make this a logger or something
       console.warn(`Multiple customers found with slug ${input.customerSlug}`);
