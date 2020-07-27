@@ -177,7 +177,7 @@ class DialogueService {
 
     if (!sessions) { throw new Error('No sessions present'); }
 
-    const scoreEntries = SessionService.getScoringEntriesFromSessions(sessions);
+    const scoreEntries = SessionService.getScoringEntriesFromSessions(sessions) || [];
 
     // Then dresses it up as X/Y data for the lineChart
     const history: HistoryDataProps[] = scoreEntries?.map((entry) => ({
@@ -190,12 +190,12 @@ class DialogueService {
 
     const textAndScoreEntries: HistoryDataWithEntry[] = _.merge<HistoryDataProps[], NodeEntryWithTypes[]>(
       history, nodeEntryTextValues,
-    );
+    ) || [];
 
     const isPositiveEntries = _.groupBy(textAndScoreEntries, (entry) => entry.y && entry.y > 50);
 
-    const topNegativePath = DialogueService.getTopNPaths(isPositiveEntries.false, 3) || [];
-    const topPositivePath = DialogueService.getTopNPaths(isPositiveEntries.true, 3) || [];
+    const topNegativePath = DialogueService.getTopNPaths(isPositiveEntries.false || [], 3) || [];
+    const topPositivePath = DialogueService.getTopNPaths(isPositiveEntries.true || [], 3) || [];
 
     return { history, topNegativePath, topPositivePath };
   };
