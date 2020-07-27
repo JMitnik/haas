@@ -24,9 +24,13 @@ interface TableProps {
   }[]
 }
 
-const TableHeaderColumn = (
-  { sortProperties, accessor, value, onPaginationChange, disableSorting }: TableHeaderColumnProps,
-) => {
+const TableHeaderColumn = ({
+  sortProperties,
+  accessor,
+  value,
+  onPaginationChange,
+  disableSorting,
+}: TableHeaderColumnProps) => {
   const handleSort = () => {
     if (!disableSorting) {
       onPaginationChange((prevValues) => {
@@ -34,7 +38,7 @@ const TableHeaderColumn = (
         const newOrderBy = sortBy?.[0]?.by === accessor
           ? [{ by: sortBy?.[0]?.by, desc: !sortBy?.[0]?.desc }]
           : [{ by: accessor, desc: true }];
-        return { ...prevValues, sortBy: newOrderBy };
+        return { ...prevValues, sortBy: newOrderBy, pageIndex: 0 };
       });
     }
   };

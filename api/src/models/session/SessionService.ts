@@ -1,22 +1,23 @@
 /* eslint-disable import/no-cycle */
 import {
-  NodeEntry, Session, SessionWhereInput,
+  NodeEntry, Session, SessionOrderByInput, SessionWhereInput,
 } from '@prisma/client';
 import { isPresent } from 'ts-is-present';
 
 import { Nullable, PaginationProps } from '../../types/generic';
 import { SessionWithEntries } from './SessionTypes';
+import { sortBy } from 'lodash';
 // eslint-disable-next-line import/no-cycle
 import { TEXT_NODES } from '../questionnaire/Dialogue';
 // eslint-disable-next-line import/no-cycle
 // eslint-disable-next-line import/no-cycle
-import { NexusGenRootTypes } from '../../generated/nexus';
+import { NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
 import NodeEntryService, { NodeEntryWithTypes } from '../node-entry/NodeEntryService';
 // eslint-disable-next-line import/no-cycle
+import PaginationService from '../general/PaginationService';
 import TriggerService from '../trigger/TriggerService';
 import prisma from '../../prisma';
 
-// TODO: Rename Session to Interaction
 class SessionService {
   /**
    * Create a user-session from the client
@@ -70,9 +71,7 @@ class SessionService {
   static getScoringEntriesFromSessions(
     sessions: SessionWithEntries[],
   ): (NodeEntryWithTypes)[] {
-    if (!sessions.length) {
-      return [];
-    }
+    if (!sessions.length) return [];
 
     const entries = sessions.map((session) => SessionService.getScoringEntryFromSession(session));
     const nonNullEntries = entries.filter(isPresent);
@@ -86,6 +85,12 @@ class SessionService {
    */
   static getScoringEntryFromSession(session: SessionWithEntries): NodeEntryWithTypes | null {
     return session.nodeEntries.find((entry) => entry.sliderNodeEntry?.value) || null;
+  }
+
+  static getScoreFromSession(session: SessionWithEntries): number | null {
+    const entry = SessionService.getScoringEntryFromSession(session);
+
+    return entry?.sliderNodeEntry?.value || null;
   }
 
   /**
@@ -142,45 +147,56 @@ class SessionService {
     return rootedNodeEntry?.sliderNodeEntry?.value;
   }
 
+  static formatOrderBy(orderByArray?: NexusGenInputs['PaginationSortInput'][]): (SessionOrderByInput|undefined) {
+    if (!orderByArray?.length) return undefined;
+
+    const orderBy = orderByArray[0];
+
+    return {
+      id: orderBy.by === 'id' ? orderBy.desc ? 'desc' : 'asc' : undefined,
+      createdAt: orderBy.by === 'createdAt' ? orderBy.desc ? 'desc' : 'asc' : undefined,
+      // dialogueId: orderBy.by === 'dialogueId' ? orderBy.desc ? 'desc' : 'asc' : undefined,
+    };
+  }
+
   /**
    * Fetches all sessions of dialogue using dialogueId {dialogueId}
    * @param dialogueId
-   * @param paginationArgs
+   * @param paginationOpts
    */
-  static async getDialogueSessions(
+  static async fetchSessionsByDialogue(
     dialogueId: string,
-    paginationArgs?: Nullable<PaginationProps>,
+    paginationOpts?: Nullable<PaginationProps>,
   ): Promise<Array<SessionWithEntries> | null | undefined> {
-    // TODO AND IMPORTANT: Will the resolvers for session subchildren get called
-    //  if the objects already include the props (aka double work?)
-    // - It seems not?
-
-    // TODO: Only include node entries if it is required
-
     const dialougeWithSessionWithEntries = await prisma.dialogue.findOne({
-      where: {
-        id: dialogueId,
-      },
+      where: { id: dialogueId },
       include: {
         sessions: {
           where: {
             AND: [{
               nodeEntries: {
-                some: paginationArgs?.searchTerm
-                  ? NodeEntryService.constructFindWhereTextNodeEntryFragment(paginationArgs?.searchTerm)
+                some: paginationOpts?.searchTerm
+                  ? NodeEntryService.constructFindWhereTextNodeEntryFragment(paginationOpts?.searchTerm)
                   : undefined,
               },
             }, {
-              createdAt: (paginationArgs?.startDate && {
-                gte: paginationArgs?.startDate,
+              createdAt: (paginationOpts?.startDate && {
+                gte: paginationOpts?.startDate,
               }) || undefined,
+            },
+            {
+              nodeEntries: {
+                some: {
+                  sliderNodeEntry: {
+                    value: { gt: 0 },
+                  },
+                },
+              },
             }],
           },
           orderBy: {
             createdAt: 'desc',
           },
-          skip: paginationArgs?.offset || undefined,
-          take: paginationArgs?.limit || undefined,
           include: {
             nodeEntries: {
               include: {
@@ -200,18 +216,59 @@ class SessionService {
       },
     });
 
-    return dialougeWithSessionWithEntries?.sessions || null;
+    const sessions = dialougeWithSessionWithEntries?.sessions;
+    if (!sessions) return [];
+
+    if (!paginationOpts) return sessions;
+
+    // We need to manually sort and slice it due to lack of support for aggregated sorts.
+    const sortedSessions = SessionService.sortSessions(sessions, paginationOpts);
+    const slicedSessions = PaginationService.getItemsByIndex(
+      sortedSessions,
+      paginationOpts?.offset || 0,
+      paginationOpts?.limit || undefined,
+      paginationOpts?.pageIndex || 0,
+    );
+
+    return slicedSessions;
+  }
+
+  static sortSessions(
+    sessions: SessionWithEntries[],
+    paginationOpts?: Nullable<PaginationProps>,
+  ): SessionWithEntries[] {
+    const sessionsWithScores = sessions.map((session) => ({
+      score: SessionService.getScoreFromSession(session),
+      paths: session.nodeEntries.length,
+      ...session,
+    }));
+
+    let sorted = sessionsWithScores;
+    if (paginationOpts?.orderBy?.[0].by === 'score') {
+      sorted = sortBy(sessionsWithScores, 'score');
+    } else if (paginationOpts?.orderBy?.[0].by === 'paths') {
+      sorted = sortBy(sessionsWithScores, 'paths');
+    } else {
+      sorted = sortBy(sessionsWithScores, 'createdAt');
+    }
+
+    if (paginationOpts?.orderBy?.[0].desc) return sorted.reverse();
+
+    return sorted;
   }
 
   static getSessionConnection = async (
     dialogueId: string,
-    paginationArgs?: Nullable<PaginationProps>,
+    paginationOpts?: Nullable<PaginationProps>,
   ): Promise<NexusGenRootTypes['SessionConnection']> => {
     // TODO: Do we need this?
     // const needPageReset = false;
-
-    const sessions = await SessionService.getDialogueSessions(dialogueId, paginationArgs);
-    const totalNrOfSessions = (await SessionService.getDialogueSessions(dialogueId))?.length;
+    const sessions = await SessionService.fetchSessionsByDialogue(dialogueId, paginationOpts);
+    const totalNrOfSessions = (await SessionService.fetchSessionsByDialogue(dialogueId, {
+      searchTerm: paginationOpts?.searchTerm,
+      startDate: paginationOpts?.startDate,
+      endDate: paginationOpts?.endDate,
+    }))?.length;
 
     if (totalNrOfSessions === undefined) {
       throw new Error('Unable to get total nr of Sessions, something went wrong');
@@ -230,44 +287,20 @@ class SessionService {
       };
     }
 
-    const totalPages = paginationArgs?.limit ? Math.ceil(totalNrOfSessions / paginationArgs?.limit) : 1;
-
-    // If search term, filter out grouped representations which don't have
-    // at least on`e entry which fits criteria and calculate new # of pages
-
-    // Set offset to 0
-    // If due to filters option current queried page doesn't exist (e.g. page 3/2),
-    // query first subset (offset = 0 -> limit) and set pageIndex to 0
-    // TODO: Test if necessary
-    // if (pageIndex && pageIndex + 1 > totalPages) {
-    //   offset = 0;
-    //   needPageReset = true;
-    // }
-
-    // Slice / Select X entries
-    // TODO: Test if necessary
-    // const pageNodeEntries = NodeEntryService.sliceNodeEntries(
-    //   orderedNodeEntriesScore, (offset || 0), (limit || 0), (pageIndex || 0),
-    // );
-
-    const sessionsWithScores = sessions.map((session) => ({
-      ...session,
-      score: SessionService.getScoringEntryFromSession(session)?.sliderNodeEntry?.value,
-      paths: session.nodeEntries.length,
-    }));
+    const totalPages = paginationOpts?.limit ? Math.ceil(totalNrOfSessions / paginationOpts?.limit) : 1;
 
     const pageInfo: NexusGenRootTypes['PaginationPageInfo'] = {
       nrPages: totalPages || 1,
-      pageIndex: (paginationArgs?.pageIndex !== undefined && paginationArgs?.pageIndex !== null)
-        ? paginationArgs.pageIndex : 0,
+      pageIndex: (paginationOpts?.pageIndex !== undefined && paginationOpts?.pageIndex !== null)
+        ? paginationOpts.pageIndex : 0,
     };
 
     return {
-      sessions: sessionsWithScores,
-      offset: paginationArgs?.offset || 0,
-      limit: paginationArgs?.limit || 0,
-      startDate: paginationArgs?.startDate?.toString(),
-      endDate: paginationArgs?.endDate?.toString(),
+      sessions,
+      offset: paginationOpts?.offset || 0,
+      limit: paginationOpts?.limit || 0,
+      startDate: paginationOpts?.startDate?.toString(),
+      endDate: paginationOpts?.endDate?.toString(),
       pageInfo,
     };
   };

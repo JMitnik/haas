@@ -157,24 +157,25 @@ class NodeEntryService {
   static constructFindWhereTextNodeEntryFragment(text: string): NodeEntryWhereInput {
     // TODO: Figure out what to do with the texts
     return {
-      OR: [{
-        textboxNodeEntry: {
+      OR: [
+        { textboxNodeEntry: {
           value: {
             contains: text,
           },
-        },
-        choiceNodeEntry: {
+        } },
+        { choiceNodeEntry: {
           value: {
             contains: text,
           },
-        },
+        } },
+        {
         // Ensure we can make this better searchable (JSON?)
-        registrationNodeEntry: {
-          value: {
-            equals: text,
+          registrationNodeEntry: {
+            value: {
+              equals: text,
+            },
           },
-        },
-      }],
+        }],
     };
   }
 

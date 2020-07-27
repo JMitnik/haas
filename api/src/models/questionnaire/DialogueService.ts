@@ -153,7 +153,7 @@ class DialogueService {
     offset: number,
   ): Promise<Array<NexusGenRootTypes['lineChartDataType']>> => {
     const startDate = subDays(new Date(), numberOfDaysBack);
-    const sessions = await SessionService.getDialogueSessions(dialogueId, { limit, offset, startDate });
+    const sessions = await SessionService.fetchSessionsByDialogue(dialogueId, { limit, offset, startDate });
 
     if (!sessions) {
       return [];
@@ -173,7 +173,7 @@ class DialogueService {
 
   static getStatistics = async (dialogueId: string, numberOfDaysBack: number): Promise<StatisticsProps> => {
     const startDate = subDays(new Date(), numberOfDaysBack);
-    const sessions = await SessionService.getDialogueSessions(dialogueId, { startDate });
+    const sessions = await SessionService.fetchSessionsByDialogue(dialogueId, { startDate });
 
     if (!sessions) { throw new Error('No sessions present'); }
 
@@ -705,7 +705,7 @@ class DialogueService {
   };
 
   static calculateAverageDialogueScore = async (dialogueId: string) => {
-    const sessions = await SessionService.getDialogueSessions(dialogueId);
+    const sessions = await SessionService.fetchSessionsByDialogue(dialogueId);
 
     if (!sessions) {
       return 0;
@@ -732,7 +732,7 @@ class DialogueService {
   static getDialogueInteractionFeedItems = async (
     dialogueId: string,
   ): Promise<Array<NexusGenRootTypes['NodeEntry']>> => {
-    const sessions = await SessionService.getDialogueSessions(dialogueId);
+    const sessions = await SessionService.fetchSessionsByDialogue(dialogueId);
 
     if (!sessions) {
       return [];

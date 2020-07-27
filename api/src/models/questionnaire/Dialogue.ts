@@ -239,7 +239,7 @@ export const DialogueType = objectType({
       args: { take: 'Int' },
 
       async resolve(parent, args) {
-        const dialogueWithSessions = await SessionService.getDialogueSessions(parent.id);
+        const dialogueWithSessions = await SessionService.fetchSessionsByDialogue(parent.id);
 
         if (args.take) {
           return dialogueWithSessions?.length ? dialogueWithSessions.slice(0, args.take) || [] : [];

@@ -24,6 +24,9 @@ export const SessionType = objectType({
 
     t.float('score', {
       async resolve(parent) {
+        // @ts-ignore
+        if (parent.score) return parent.score;
+
         const score = await SessionService.getSessionScore(parent.id) || 0.0;
 
         return score;
@@ -84,7 +87,7 @@ export const SessionQuery = extendType({
           return [];
         }
 
-        const sessions = await SessionService.getDialogueSessions(args.where.dialogueId);
+        const sessions = await SessionService.fetchSessionsByDialogue(args.where.dialogueId);
 
         if (!sessions?.length) {
           return [];

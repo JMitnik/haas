@@ -79,11 +79,11 @@ const InteractionsOverview = () => {
   }, [paginationProps, fetchInteractions, dialogueSlug, customerSlug]);
 
   const handleSearchTermChange = useCallback(debounce((newSearchTerm: string) => {
-    setPaginationProps((prevValues) => ({ ...prevValues, activeSearchTerm: newSearchTerm }));
+    setPaginationProps((prevValues) => ({ ...prevValues, activeSearchTerm: newSearchTerm, pageIndex: 0 }));
   }, 250), []);
 
   const handleDateChange = useCallback(debounce((startDate: Date | null, endDate: Date | null) => {
-    setPaginationProps((prevValues) => ({ ...prevValues, activeStartDate: startDate, activeEndDate: endDate }));
+    setPaginationProps((prevValues) => ({ ...prevValues, activeStartDate: startDate, activeEndDate: endDate, pageIndex: 0 }));
   }, 250), []);
 
   // TODO: Make this into a custom hook / utility function
@@ -125,6 +125,7 @@ const InteractionsOverview = () => {
             <Span fontWeight="bold">CSV</Span>
           </Div>
         </OutputContainer>
+
         <InputContainer>
           <DatePicker
             activeStartDate={paginationProps.activeStartDate}
@@ -136,6 +137,7 @@ const InteractionsOverview = () => {
             onSearchTermChange={handleSearchTermChange}
           />
         </InputContainer>
+
       </InputOutputContainer>
       <Div backgroundColor="#fdfbfe" mb="1%" height="65%">
         <InteractionsTable
