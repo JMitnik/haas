@@ -41,11 +41,6 @@ const InteractionsOverview = () => {
   const { dialogueSlug, customerSlug } = useParams();
   const [fetchInteractions, { data }] = useLazyQuery<CustomerSessionConnection>(getDialogueSessionConnectionQuery, {
     fetchPolicy: 'cache-and-network',
-    onCompleted: () => {
-    },
-    onError: (error: any) => {
-      console.log(error);
-    },
   });
 
   const [paginationProps, setPaginationProps] = useState<TableProps>({
