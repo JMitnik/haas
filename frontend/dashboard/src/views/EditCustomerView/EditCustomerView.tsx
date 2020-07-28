@@ -11,6 +11,7 @@ import {
 } from '@haas/ui';
 
 import { getCustomerQuery } from '../../queries/getCustomersQuery';
+import { useToast } from '@chakra-ui/core';
 import editCustomerMutation from '../../mutations/editCustomer';
 import getEditCustomerData from '../../queries/getEditCustomer';
 import uploadSingleImage from '../../mutations/uploadSingleImage';
@@ -76,10 +77,22 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
       uploadFile({ variables: { file: image } });
     }
   };
+  const toast = useToast();
 
   const [editCustomer, { loading }] = useMutation(editCustomerMutation, {
+
     onCompleted: () => {
-      history.push('/');
+      toast({
+        title: 'Your business edited',
+        description: 'The business has been updated',
+        status: 'success',
+        position: 'bottom-left',
+        duration: 300,
+      });
+
+      setTimeout(() => {
+        history.push('/');
+      }, 300);
     },
     refetchQueries: [{ query: getCustomerQuery }],
     onError: (serverError: ApolloError) => {

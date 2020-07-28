@@ -1,6 +1,10 @@
+import { theme as chakraTheme } from '@chakra-ui/core';
+
 // TODO: Export theme as type
 const theme = {
+  ...chakraTheme,
   colors: {
+    ...chakraTheme.colors,
     primary: '#426b3a',
     primaryAlt: '#8cb6ff',
     secondary: '#6f6594',
@@ -44,9 +48,9 @@ const theme = {
   sidenav: {
     width: 230,
   },
-  zIndices: {
-    dropdown: 200,
-  },
+  // zIndices: {
+  //   dropdown: 200,
+  // },
   fontSizes: [8, 12, 22, 28, 36, 48],
   buttonSizes: {
     sm: '8px 12px',
@@ -61,6 +65,12 @@ const theme = {
     somewhatRounded: '10px',
     rounded: '50px',
   },
+};
+
+export const chakraDefaultTheme = {
+  ...theme,
+  space: chakraTheme.space,
+  fontSizes: chakraTheme.fontSizes,
 };
 
 // Dependent variables - Generic

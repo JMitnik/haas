@@ -9,6 +9,7 @@ import { Flex, Span } from '@haas/ui';
 import deleteCTAMutation from 'mutations/deleteCTA';
 import getCTANodesQuery from 'queries/getCTANodes';
 
+import { useToast } from '@chakra-ui/core';
 import CTAForm from './CTAForm';
 import CTAIcon from './CTAIcon';
 import DeleteCTAButton from './DeleteCTAButton';
@@ -70,11 +71,28 @@ const OverflowSpan = styled(Span)`
 `;
 
 const CTAEntry = ({ id, activeCTA, onActiveCTAChange, title, type, links, Icon, onNewCTAChange }: CTAEntryProps) => {
+  const toast = useToast();
+
   const { customerSlug, dialogueSlug } = useParams();
   const [deleteEntry] = useMutation(deleteCTAMutation, {
     variables: { id },
-    onError: (serverError: ApolloError) => {
-      console.log(serverError);
+    onError: () => {
+      toast({
+        title: 'Something went wrong',
+        description: 'There was a problem in deleting the call to action.',
+        status: 'success',
+        position: 'bottom-left',
+        isClosable: true,
+      });
+    },
+    onCompleted: () => {
+      toast({
+        title: 'Edit complete!',
+        description: 'The call to action has been deleted.',
+        status: 'success',
+        position: 'bottom-left',
+        duration: 1500,
+      });
     },
     refetchQueries: [{
       query: getCTANodesQuery,
