@@ -76,6 +76,8 @@
         "typescript": "^3.7.3"
     },
     "resolutions": {
-        "**/**/fs-capacitor": "^6.2.0"
+        "**/**/fs-capacitor": "^6.2.0",
+	"@prisma/cli": "2.2.0",
+    	"@prisma/client": "2.2.0"
     }
 }

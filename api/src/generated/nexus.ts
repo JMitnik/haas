@@ -234,7 +234,7 @@ export interface NexusGenRootTypes {
     backgroundColor?: string | null; // String
     iconUrl?: string | null; // String
     id: string; // String!
-    questionNodeId: string; // String!
+    questionNodeId?: string | null; // String
     title?: string | null; // String
     type: string; // String!
     url: string; // String!
@@ -292,6 +292,7 @@ export interface NexusGenRootTypes {
     maxValue?: number | null; // Int
     minValue?: number | null; // Int
     textValue?: string | null; // String
+    triggerId: string; // String!
     type: NexusGenEnums['TriggerConditionEnum']; // TriggerConditionEnum!
   }
   TriggerConnectionType: { // root type
@@ -463,7 +464,7 @@ export interface NexusGenFieldTypes {
     iconUrl: string | null; // String
     id: string; // String!
     questionNode: NexusGenRootTypes['QuestionNode']; // QuestionNode!
-    questionNodeId: string; // String!
+    questionNodeId: string | null; // String
     title: string | null; // String
     type: string; // String!
     url: string; // String!
@@ -560,7 +561,7 @@ export interface NexusGenFieldTypes {
     questionDialogueId: string | null; // String
     title: string; // String!
     type: NexusGenEnums['QuestionNodeTypeEnum']; // QuestionNodeTypeEnum!
-    updatedAt: string; // String!
+    updatedAt: string | null; // String
   }
   QuestionOption: { // field return type
     id: number; // Int!
@@ -613,6 +614,7 @@ export interface NexusGenFieldTypes {
     maxValue: number | null; // Int
     minValue: number | null; // Int
     textValue: string | null; // String
+    triggerId: string; // String!
     type: NexusGenEnums['TriggerConditionEnum']; // TriggerConditionEnum!
   }
   TriggerConnectionType: { // field return type

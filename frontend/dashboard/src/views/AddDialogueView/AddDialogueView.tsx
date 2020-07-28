@@ -150,7 +150,7 @@ const AddDialogueView = () => {
                 </Flex>
                 <Div useFlex flexDirection="column">
                   <StyledLabel>Public Title</StyledLabel>
-                  <StyledInput name="publicTitle" ref={register({ required: true })} />
+                  <StyledInput name="publicTitle" ref={register({ required: false })} />
                   {errors.publicTitle && <Muted color="warning">Something went wrong!</Muted>}
                 </Div>
                 <Div useFlex flexDirection="column">

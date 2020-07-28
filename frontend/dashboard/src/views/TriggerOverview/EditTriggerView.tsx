@@ -203,6 +203,11 @@ const EditTriggerForm = (
     },
   });
 
+  const handleDialogueChange = (questionOption: any) => {
+    setActiveDialogue(questionOption);
+    setActiveQuestion(null);
+  };
+
   const onSubmit = (formData: FormDataProps) => {
     const questionId = activeQuestion?.value;
     const userIds = activeRecipients.map((recipient) => recipient?.value);
@@ -349,7 +354,7 @@ const EditTriggerForm = (
                     options={dialogues}
                     value={activeDialogue}
                     onChange={(qOption: any) => {
-                      setActiveDialogue(qOption);
+                      handleDialogueChange(qOption);
                     }}
                   />
                 </Div>

@@ -74,9 +74,9 @@ const QuestionEntryItem = ({ depth,
     },
   });
 
-  const activeType = question.type === 'Multi-Choice'
+  const activeType = question.type === 'Choice'
     ? { label: question.type, value: 'CHOICE' }
-    : { label: question.type, value: 'SLIDER' };
+    : { label: 'Slider', value: 'SLIDER' };
 
   return (
     <Flex position="relative" justifyContent="center" alignItems="center" flexGrow={1}>

@@ -291,11 +291,11 @@ export const AddDialogueInput = inputObjectType({
     t.string('title');
     t.string('dialogueSlug');
     t.string('description');
-    t.string('publicTitle');
     t.boolean('isSeed');
     t.string('contentType');
 
     t.string('templateDialogueId', { nullable: true });
+    t.string('publicTitle', { nullable: true });
 
     t.field('tags', {
       type: TagsInputType,
@@ -309,6 +309,7 @@ export const DialogueMutations = extendType({
     t.field('copyDialogue', {
       type: DialogueType,
       args: { data: AddDialogueInput },
+
       async resolve(parent, args: any, ctx: any) {
         const {
           data: { dialogueSlug, customerSlug, title, publicTitle, description, tags = [], templateDialogueId },
@@ -322,13 +323,14 @@ export const DialogueMutations = extendType({
         const customers = await prisma.customer.findMany({ where: { slug: customerSlug } });
         const customer = customers?.[0];
 
-        if (!customer) throw new Error('Unable to return find customer');
+        if (!customer) throw new Error('Cant find customer related');
 
         return DialogueService.copyDialogue(
           templateDialogueId, customer?.id, title, dialogueSlug, description, publicTitle, dialogueTags,
         );
       },
     });
+
     t.field('createDialogue', {
       type: DialogueType,
       args: { data: AddDialogueInput },
@@ -352,7 +354,7 @@ export const DialogueMutations = extendType({
         publicTitle: 'String',
         tags: TagsInputType,
       },
-      resolve(args) {
+      resolve(parent, args) {
         return DialogueService.editDialogue(args);
       },
     });

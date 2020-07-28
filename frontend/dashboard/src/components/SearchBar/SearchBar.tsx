@@ -11,7 +11,7 @@ interface SearchBarProps {
 }
 
 const SearchBar = ({ activeSearchTerm, onSearchTermChange }: SearchBarProps) => {
-  const [searchTerm, setSearchTerm] = useState<string>(() => activeSearchTerm);
+  const [searchTerm, setSearchTerm] = useState<string>(activeSearchTerm);
   const startedRef = useRef<boolean>();
 
   useDebouncedEffect(() => {
@@ -26,17 +26,14 @@ const SearchBar = ({ activeSearchTerm, onSearchTermChange }: SearchBarProps) => 
       <InputIcon>
         <Search />
       </InputIcon>
+
       <SearchbarInput
         data-cy="SearchbarInput"
         defaultValue={activeSearchTerm}
         placeholder="Search"
         onChange={(e) => { startedRef.current = true; setSearchTerm(e.target.value); }}
       />
-      {!!searchTerm.length && (
-        <EmptyInputIcon>
-          <X />
-        </EmptyInputIcon>
-      )}
+
     </SearchbarInputContainer>
   );
 };

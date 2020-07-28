@@ -169,7 +169,7 @@ type LinkType {
   iconUrl: String
   id: String!
   questionNode: QuestionNode!
-  questionNodeId: String!
+  questionNodeId: String
   title: String
   type: String!
   url: String!
@@ -362,7 +362,7 @@ type QuestionNode {
   questionDialogueId: String
   title: String!
   type: QuestionNodeTypeEnum!
-  updatedAt: String!
+  updatedAt: String
 }
 
 """The different types a node can assume"""
@@ -523,6 +523,7 @@ type TriggerConditionType {
   maxValue: Int
   minValue: Int
   textValue: String
+  triggerId: String!
   type: TriggerConditionEnum!
 }
 

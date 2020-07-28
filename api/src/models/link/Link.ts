@@ -1,4 +1,3 @@
-import { Link, PrismaClient } from '@prisma/client';
 import { enumType, inputObjectType, objectType } from '@nexus/schema';
 
 // eslint-disable-next-line import/no-cycle
@@ -43,7 +42,7 @@ export const LinkType = objectType({
   definition(t) {
     t.string('id');
     t.string('url');
-    t.string('questionNodeId');
+    t.string('questionNodeId', { nullable: true });
     t.string('type');
 
     t.string('title', { nullable: true });
@@ -52,16 +51,13 @@ export const LinkType = objectType({
 
     t.field('questionNode', {
       type: QuestionNodeType,
-
-      async resolve(parent, args: any, ctx) {
+      async resolve(parent, args, ctx) {
         const link = await ctx.prisma.link.findOne({
-          where: {
-            id: parent.id,
-          },
-          include: {
-            questionNode: true,
-          },
+          where: { id: parent.id },
+          include: { questionNode: true },
         });
+
+        if (!link?.questionNode) throw new Error('Unable to find related node');
 
         return link?.questionNode as any;
       },

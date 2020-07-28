@@ -10,6 +10,7 @@ import {
   H2, H3, Hr, Muted, StyledInput, StyledLabel,
 } from '@haas/ui';
 
+import { useToast } from '@chakra-ui/core';
 import { getCustomerQuery } from '../../queries/getCustomersQuery';
 import editCustomerMutation from '../../mutations/editCustomer';
 import getEditCustomerData from '../../queries/getEditCustomer';
@@ -76,10 +77,22 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
       uploadFile({ variables: { file: image } });
     }
   };
+  const toast = useToast();
 
   const [editCustomer, { loading }] = useMutation(editCustomerMutation, {
+
     onCompleted: () => {
-      history.push('/');
+      toast({
+        title: 'Your business edited',
+        description: 'The business has been updated',
+        status: 'success',
+        position: 'bottom-right',
+        duration: 300,
+      });
+
+      setTimeout(() => {
+        history.push('/');
+      }, 300);
     },
     refetchQueries: [{ query: getCustomerQuery }],
     onError: (serverError: ApolloError) => {

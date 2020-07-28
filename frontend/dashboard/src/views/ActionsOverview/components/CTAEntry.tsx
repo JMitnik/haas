@@ -9,6 +9,7 @@ import { Flex, Span } from '@haas/ui';
 import deleteCTAMutation from 'mutations/deleteCTA';
 import getCTANodesQuery from 'queries/getCTANodes';
 
+import { useToast } from '@chakra-ui/core';
 import CTAForm from './CTAForm';
 import CTAIcon from './CTAIcon';
 import DeleteCTAButton from './DeleteCTAButton';
@@ -33,57 +34,72 @@ interface CTAEntryProps {
   onNewCTAChange: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const CTAEntryContainer = styled(Flex) <{ activeCTA: string | null, id: string }>`
+const CTAEntryContainer = styled(Flex)<{ activeCTA: string | null, id: string }>`
  ${({ id, activeCTA, theme }) => css`
     position: relative;
     flex-direction: column;
     color: ${theme.colors.default.muted};
-
-    ${!activeCTA && css`
-    background-color: ${theme.colors.white};
-    `};
-
-    ${activeCTA === id && css`
-    background-color: ${theme.colors.white};
-    `};
-
-    ${activeCTA && activeCTA !== id && css`
-    background-color: ${theme.colors.white};
-    opacity: 0.5;
-    `};
-
     border: ${theme.colors.app.mutedOnDefault} 1px solid;
     padding: 20px;
     padding-left: 30px;
     margin-bottom: 20px;
     border-radius: ${theme.borderRadiuses.somewhatRounded};
+
+    ${!activeCTA && css`
+      background-color: ${theme.colors.white};
+    `};
+
+    ${activeCTA === id && css`
+      background-color: ${theme.colors.white};
+    `};
+
+    ${activeCTA && activeCTA !== id && css`
+      background-color: ${theme.colors.white};
+      opacity: 0.5;
+    `};
  `}
 `;
 
 const OverflowSpan = styled(Span)`
   ${({ theme }) => css`
     color: ${theme.colors.default.darkest};
+    font-size: 1.2em;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
   `}
-  font-size: 1.2em;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
 `;
 
 const CTAEntry = ({ id, activeCTA, onActiveCTAChange, title, type, links, Icon, onNewCTAChange }: CTAEntryProps) => {
+  const toast = useToast();
+
   const { customerSlug, dialogueSlug } = useParams();
   const [deleteEntry] = useMutation(deleteCTAMutation, {
-    variables: {
-      id,
+    variables: { id },
+    onError: () => {
+      toast({
+        title: 'Something went wrong',
+        description: 'There was a problem in deleting the call to action.',
+        status: 'success',
+        position: 'bottom-right',
+        isClosable: true,
+      });
     },
-    onError: (serverError: ApolloError) => {
-      console.log(serverError);
+    onCompleted: () => {
+      toast({
+        title: 'Edit complete!',
+        description: 'The call to action has been deleted.',
+        status: 'success',
+        position: 'bottom-right',
+        duration: 1500,
+      });
     },
     refetchQueries: [{
       query: getCTANodesQuery,
       variables: {
         customerSlug,
         dialogueSlug,
+        searchTerm: '',
       },
     }],
   });
@@ -93,6 +109,7 @@ const CTAEntry = ({ id, activeCTA, onActiveCTAChange, title, type, links, Icon, 
       onNewCTAChange(false);
       return onActiveCTAChange(null);
     }
+
     return deleteEntry();
   };
 
