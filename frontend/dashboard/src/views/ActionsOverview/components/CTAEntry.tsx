@@ -33,49 +33,46 @@ interface CTAEntryProps {
   onNewCTAChange: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const CTAEntryContainer = styled(Flex) <{ activeCTA: string | null, id: string }>`
+const CTAEntryContainer = styled(Flex)<{ activeCTA: string | null, id: string }>`
  ${({ id, activeCTA, theme }) => css`
     position: relative;
     flex-direction: column;
     color: ${theme.colors.default.muted};
-
-    ${!activeCTA && css`
-    background-color: ${theme.colors.white};
-    `};
-
-    ${activeCTA === id && css`
-    background-color: ${theme.colors.white};
-    `};
-
-    ${activeCTA && activeCTA !== id && css`
-    background-color: ${theme.colors.white};
-    opacity: 0.5;
-    `};
-
     border: ${theme.colors.app.mutedOnDefault} 1px solid;
     padding: 20px;
     padding-left: 30px;
     margin-bottom: 20px;
     border-radius: ${theme.borderRadiuses.somewhatRounded};
+
+    ${!activeCTA && css`
+      background-color: ${theme.colors.white};
+    `};
+
+    ${activeCTA === id && css`
+      background-color: ${theme.colors.white};
+    `};
+
+    ${activeCTA && activeCTA !== id && css`
+      background-color: ${theme.colors.white};
+      opacity: 0.5;
+    `};
  `}
 `;
 
 const OverflowSpan = styled(Span)`
   ${({ theme }) => css`
     color: ${theme.colors.default.darkest};
+    font-size: 1.2em;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
   `}
-  font-size: 1.2em;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
 `;
 
 const CTAEntry = ({ id, activeCTA, onActiveCTAChange, title, type, links, Icon, onNewCTAChange }: CTAEntryProps) => {
   const { customerSlug, dialogueSlug } = useParams();
   const [deleteEntry] = useMutation(deleteCTAMutation, {
-    variables: {
-      id,
-    },
+    variables: { id },
     onError: (serverError: ApolloError) => {
       console.log(serverError);
     },
@@ -84,6 +81,7 @@ const CTAEntry = ({ id, activeCTA, onActiveCTAChange, title, type, links, Icon, 
       variables: {
         customerSlug,
         dialogueSlug,
+        searchTerm: '',
       },
     }],
   });
@@ -93,6 +91,7 @@ const CTAEntry = ({ id, activeCTA, onActiveCTAChange, title, type, links, Icon, 
       onNewCTAChange(false);
       return onActiveCTAChange(null);
     }
+
     return deleteEntry();
   };
 
