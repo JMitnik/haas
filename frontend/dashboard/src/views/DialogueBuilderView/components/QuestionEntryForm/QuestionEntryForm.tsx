@@ -17,6 +17,7 @@ import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
 import createQuestionMutation from 'mutations/createQuestion';
 import updateQuestionMutation from 'mutations/updateQuestion';
 
+import { debounce } from 'lodash';
 import { EdgeConditonProps,
   OverrideLeafProps, QuestionEntryProps, QuestionOptionProps } from '../../DialogueBuilderInterfaces';
 
@@ -260,13 +261,12 @@ const QuestionEntryForm = ({
     });
   };
 
-  const handleOptionChange = (event: any, optionIndex: number) => {
-    const { value } = event.target;
+  const handleOptionChange = useCallback(debounce((value: any, optionIndex: number) => {
     setActiveOptions((prevOptions) => {
       prevOptions[optionIndex] = { value: value || '', publicValue: '' };
       return [...prevOptions];
     });
-  };
+  }, 250), []);
 
   const deleteOption = (event: any, optionIndex: number) => {
     setActiveOptions((prevOptions) => {
@@ -327,7 +327,7 @@ const QuestionEntryForm = ({
       boxShadow: 'none',
     }),
   };
-
+  console.log('options errors: ', errors.options);
   const parentOptionsSelect = parentOptions?.map((option) => ({ label: option.value, value: option.value }));
   return (
     <Form onSubmit={handleSubmit(onSubmit)}>
@@ -446,12 +446,12 @@ const QuestionEntryForm = ({
                     <Hr />
                   </Div>
 
-                    { !activeOptions.length && errors.options?.length && <Muted>Please add at least one option </Muted>}
+                    { !activeOptions.length && <Muted>Please add an option </Muted>}
                     {activeOptions && activeOptions.map((option, optionIndex) => (
                       <Flex key={`${option.id}-${optionIndex}-${option.value}`} flexDirection="column">
                         <Flex my={1} flexDirection="row">
                           <StyledInput
-                            hasError={!!errors.options?.[optionIndex]}
+                            hasError={errors.options && Array.isArray(errors.options) && !!errors.options?.[optionIndex]}
                             key={`input-${id}-${optionIndex}`}
                             name={`options[${optionIndex}]`}
                             ref={register(
@@ -459,7 +459,7 @@ const QuestionEntryForm = ({
                                 minLength: 1 },
                             )}
                             defaultValue={option.value}
-                            onBlur={(e) => handleOptionChange(e, optionIndex)}
+                            onChange={(e) => handleOptionChange(e.currentTarget.value, optionIndex)}
                           />
                           <DeleteQuestionOptionButtonContainer
                             onClick={(e) => deleteOption(e, optionIndex)}
@@ -467,7 +467,7 @@ const QuestionEntryForm = ({
                             <MinusCircle />
                           </DeleteQuestionOptionButtonContainer>
                         </Flex>
-                        {/* {errors.options?.[optionIndex] && <Muted color="warning">{errors.options?.[optionIndex]?.message}</Muted>} */}
+                        {errors.options?.[optionIndex] && <Muted color="warning">Please fill in a proper value!</Muted>}
                       </Flex>
                     ))}
                 </>
