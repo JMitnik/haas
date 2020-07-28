@@ -153,6 +153,7 @@ export const SidenavContainer = styled.div`
   ${({ theme }) => css`
     position: fixed;
     z-index: 300;
+    font-weight: 1000;
     width: ${theme.sidenav.width}px;
 
     background: ${theme.colors.app.sidebar};

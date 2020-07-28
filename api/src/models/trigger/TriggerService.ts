@@ -1,7 +1,6 @@
 import {
   Trigger,
   TriggerCondition,
-  TriggerGetPayload,
   TriggerOrderByInput,
   TriggerUpdateInput,
   TriggerWhereInput,
@@ -9,12 +8,13 @@ import {
   UserUpdateManyWithoutTriggersInput,
   UserWhereUniqueInput,
 } from '@prisma/client';
-import _, { cond } from 'lodash';
-
 import { isAfter, subSeconds } from 'date-fns';
+import _ from 'lodash';
 
 // eslint-disable-next-line import/no-cycle
+import { isPresent } from 'ts-is-present';
 import { NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
+// eslint-disable-next-line import/no-cycle
 import NodeEntryService, { NodeEntryWithTypes } from '../node-entry/NodeEntryService';
 import TriggerSMSService from '../../services/sms/trigger-sms-service';
 import prisma from '../../prisma';
@@ -132,24 +132,25 @@ class TriggerService {
     const safeToSend = !trigger.lastSent || isAfter(subSeconds(currentDate, 5), trigger.lastSent);
 
     // TODO-LATER: Put this part into a queue
-    if (safeToSend) {
-      await prisma.trigger.update(({ where: { id: trigger.id }, data: { lastSent: currentDate } }));
+    if (!safeToSend) return;
 
-      const nodeEntry = entries.find((entry) => entry.relatedNodeId === trigger.relatedNodeId);
-      const condition = trigger.conditions[0];
+    await prisma.trigger.update(({ where: { id: trigger.id }, data: { lastSent: currentDate } }));
 
-      if (!nodeEntry) return;
-      const { isMatch, value } = TriggerService.match(condition, nodeEntry);
+    const nodeEntry = entries.find((entry) => entry.relatedNodeId === trigger.relatedNodeId);
+    const condition = trigger.conditions[0];
 
-      if (isMatch && value) {
-        trigger.recipients.forEach((recipient) => TriggerService.sendTrigger(trigger, recipient, value, smsService));
-      }
+    if (!nodeEntry) return;
+    const { isMatch, value } = TriggerService.match(condition, nodeEntry);
+
+    if (isMatch && value) {
+      trigger.recipients.forEach((recipient) => TriggerService.sendTrigger(trigger, recipient, value, smsService));
     }
   }
 
-  static tryTriggers = async (entries: Array<any>, smsService: TriggerSMSService) => {
-    const questionIds = entries.map((entry: any) => entry.nodeId);
+  static tryTriggers = async (entries: NodeEntryWithTypes[], smsService: TriggerSMSService) => {
+    const questionIds = entries.map((entry) => entry.relatedNodeId).filter(isPresent);
     const dialogueTriggers = await TriggerService.findTriggersByQuestionIds(questionIds);
+
     dialogueTriggers.forEach(async (trigger) => {
       await TriggerService.tryTrigger(entries, trigger, smsService);
     });
@@ -206,11 +207,11 @@ class TriggerService {
       case 'LOW_THRESHOLD': {
         conditionMatched = { isMatch: false };
 
-        if (!entry.sliderNodeEntry?.value || !triggerCondition?.maxValue) {
+        if (!entry.sliderNodeEntry?.value || !triggerCondition?.minValue) {
           break;
         }
 
-        if (entry.sliderNodeEntry?.value < triggerCondition.maxValue) {
+        if (entry.sliderNodeEntry?.value < triggerCondition.minValue) {
           conditionMatched = { isMatch: true, value: entry.sliderNodeEntry?.value };
         }
 
@@ -278,7 +279,19 @@ class TriggerService {
     return conditionMatched;
   }
 
-  static
+  static updateRelatedQuestion = (
+    dbTriggerRelatedNodeId: string | null | undefined,
+    newRelatedNodeId: string | null | undefined,
+    updateTriggerArgs: TriggerUpdateInput,
+  ): TriggerUpdateInput => {
+    if (newRelatedNodeId && newRelatedNodeId !== dbTriggerRelatedNodeId) {
+      updateTriggerArgs.relatedNode = { connect: { id: newRelatedNodeId } };
+    } else if (!newRelatedNodeId) {
+      updateTriggerArgs.relatedNode = { disconnect: true };
+    }
+    return updateTriggerArgs;
+  };
+
   static updateConditions = async (
     dbTriggerConditions: Array<TriggerCondition>,
     newConditions: Array<NexusGenInputs['TriggerConditionInputType']>,
