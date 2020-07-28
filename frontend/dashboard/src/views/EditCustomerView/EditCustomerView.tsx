@@ -10,8 +10,8 @@ import {
   H2, H3, Hr, Muted, StyledInput, StyledLabel,
 } from '@haas/ui';
 
-import { getCustomerQuery } from '../../queries/getCustomersQuery';
 import { useToast } from '@chakra-ui/core';
+import { getCustomerQuery } from '../../queries/getCustomersQuery';
 import editCustomerMutation from '../../mutations/editCustomer';
 import getEditCustomerData from '../../queries/getEditCustomer';
 import uploadSingleImage from '../../mutations/uploadSingleImage';
@@ -86,7 +86,7 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
         title: 'Your business edited',
         description: 'The business has been updated',
         status: 'success',
-        position: 'bottom-left',
+        position: 'bottom-right',
         duration: 300,
       });
 

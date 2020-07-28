@@ -1,6 +1,7 @@
 import {
   Trigger,
   TriggerCondition,
+  TriggerGetPayload,
   TriggerOrderByInput,
   TriggerUpdateInput,
   TriggerWhereInput,
@@ -8,14 +9,25 @@ import {
   UserUpdateManyWithoutTriggersInput,
   UserWhereUniqueInput,
 } from '@prisma/client';
-import _ from 'lodash';
+import _, { cond } from 'lodash';
 
 import { isAfter, subSeconds } from 'date-fns';
 
 // eslint-disable-next-line import/no-cycle
 import { NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
+import NodeEntryService, { NodeEntryWithTypes } from '../node-entry/NodeEntryService';
 import TriggerSMSService from '../../services/sms/trigger-sms-service';
 import prisma from '../../prisma';
+
+interface TriggerWithSendData extends Trigger {
+  recipients: User[];
+  conditions: TriggerCondition[];
+  relatedNode: {
+    questionDialogue: {
+      title: string;
+    } | null;
+  } | null;
+}
 
 class TriggerService {
   static getSearchTermFilter = (searchTerm: string) => {
@@ -104,15 +116,7 @@ class TriggerService {
   };
 
   static sendTrigger = (
-    trigger: Trigger & {
-      recipients: User[];
-      conditions: TriggerCondition[];
-      relatedNode: {
-        questionDialogue: {
-          title: string;
-        } | null;
-      } | null;
-    },
+    trigger: TriggerWithSendData,
     recipient: User,
     value: string | number | undefined,
     smsService: TriggerSMSService,
@@ -123,34 +127,25 @@ class TriggerService {
     // TODO: Add the mail check (below) in this body as well.
   };
 
-  static tryTrigger = async (entries: Array<any>, trigger: Trigger & {
-    recipients: User[];
-    conditions: TriggerCondition[];
-    relatedNode: {
-      questionDialogue: {
-        title: string;
-      } | null;
-    } | null;
-  },
-    smsService: TriggerSMSService) => {
+  static async tryTrigger(entries: NodeEntryWithTypes[], trigger:TriggerWithSendData, smsService: TriggerSMSService) {
     const currentDate = new Date();
     const safeToSend = !trigger.lastSent || isAfter(subSeconds(currentDate, 5), trigger.lastSent);
 
+    // TODO-LATER: Put this part into a queue
     if (safeToSend) {
-      // TODO-LATER: Put this part into a queue
       await prisma.trigger.update(({ where: { id: trigger.id }, data: { lastSent: currentDate } }));
 
-      const { data } = entries.find((entry) => entry.nodeId === trigger.relatedNodeId);
+      const nodeEntry = entries.find((entry) => entry.relatedNodeId === trigger.relatedNodeId);
       const condition = trigger.conditions[0];
-      const { isMatch, value } = TriggerService.match(condition, data);
 
-      if (isMatch) {
-        trigger.recipients.forEach((recipient) => {
-          TriggerService.sendTrigger(trigger, recipient, value, smsService);
-        });
+      if (!nodeEntry) return;
+      const { isMatch, value } = TriggerService.match(condition, nodeEntry);
+
+      if (isMatch && value) {
+        trigger.recipients.forEach((recipient) => TriggerService.sendTrigger(trigger, recipient, value, smsService));
       }
     }
-  };
+  }
 
   static tryTriggers = async (entries: Array<any>, smsService: TriggerSMSService) => {
     const questionIds = entries.map((entry: any) => entry.nodeId);
@@ -190,52 +185,91 @@ class TriggerService {
     },
   });
 
-  static match(triggerCondition: TriggerCondition, answer: { numberValue: number | null, textValue: string | null }) {
+  static match(triggerCondition: TriggerCondition, entry: NodeEntryWithTypes) {
     let conditionMatched;
 
     switch (triggerCondition.type) {
-      case 'HIGH_THRESHOLD':
-        conditionMatched = ((answer?.numberValue || answer?.numberValue === 0) && triggerCondition?.maxValue)
-          ? { isMatch: answer.numberValue >= triggerCondition.maxValue, value: answer.numberValue }
-          : { isMatch: false };
-        break;
+      case 'HIGH_THRESHOLD': {
+        conditionMatched = { isMatch: false };
 
-      case 'LOW_THRESHOLD':
-        conditionMatched = ((answer?.numberValue || answer?.numberValue === 0) && triggerCondition.minValue)
-          ? { isMatch: answer.numberValue <= triggerCondition.minValue, value: answer.numberValue }
-          : { isMatch: false };
-        break;
+        if (!entry.sliderNodeEntry?.value || !triggerCondition?.maxValue) {
+          break;
+        }
 
-      case 'TEXT_MATCH':
-        conditionMatched = (answer?.textValue && triggerCondition.textValue)
-          ? {
-            isMatch: answer.textValue.toLowerCase() === triggerCondition.textValue.toLowerCase(),
-            value: answer.textValue,
-          }
-          : { isMatch: false };
-        break;
+        if (entry.sliderNodeEntry?.value > triggerCondition.maxValue) {
+          conditionMatched = { isMatch: true, value: entry.sliderNodeEntry?.value };
+        }
 
-      case 'OUTER_RANGE':
-        conditionMatched = ((answer?.numberValue || answer?.numberValue === 0) && triggerCondition.maxValue && (triggerCondition.minValue || triggerCondition.minValue === 0))
-          ? {
-            isMatch: answer.numberValue >= triggerCondition.maxValue
-              || answer.numberValue <= triggerCondition.minValue,
-            value: answer.numberValue,
-          }
-          : { isMatch: false };
         break;
+      }
 
-      case 'INNER_RANGE':
-        conditionMatched = (answer?.numberValue || answer?.numberValue === 0)
-        && triggerCondition.maxValue
-        && (triggerCondition.minValue || triggerCondition.minValue === 0)
-          ? {
-            isMatch: (answer.numberValue <= triggerCondition.maxValue
-              && answer.numberValue >= triggerCondition.minValue),
-            value: answer.numberValue,
-          }
-          : { isMatch: false };
+      case 'LOW_THRESHOLD': {
+        conditionMatched = { isMatch: false };
+
+        if (!entry.sliderNodeEntry?.value || !triggerCondition?.maxValue) {
+          break;
+        }
+
+        if (entry.sliderNodeEntry?.value < triggerCondition.maxValue) {
+          conditionMatched = { isMatch: true, value: entry.sliderNodeEntry?.value };
+        }
+
         break;
+      }
+
+      case 'TEXT_MATCH': {
+        conditionMatched = { isMatch: false };
+
+        const textEntry = NodeEntryService.getTextValueFromEntry(entry);
+
+        if (!textEntry || !triggerCondition?.textValue) {
+          break;
+        }
+
+        if (textEntry === triggerCondition.textValue) {
+          conditionMatched = { isMatch: true, value: textEntry };
+        }
+
+        break;
+      }
+
+      case 'INNER_RANGE': {
+        conditionMatched = { isMatch: false };
+
+        const score = entry.sliderNodeEntry?.value;
+
+        if (!score || !triggerCondition.maxValue || !triggerCondition.minValue) {
+          break;
+        }
+
+        if (score > triggerCondition.maxValue) {
+          conditionMatched = {
+            isMatch: score <= triggerCondition.maxValue && triggerCondition?.minValue <= score,
+            value: score,
+          };
+        }
+
+        break;
+      }
+
+      case 'OUTER_RANGE': {
+        conditionMatched = { isMatch: false };
+
+        const score = entry.sliderNodeEntry?.value;
+
+        if (!score || !triggerCondition.maxValue || !triggerCondition.minValue) {
+          break;
+        }
+
+        if (score > triggerCondition.maxValue) {
+          conditionMatched = {
+            isMatch: score >= triggerCondition.maxValue && triggerCondition?.minValue >= score,
+            value: score,
+          };
+        }
+
+        break;
+      }
 
       default:
         conditionMatched = { isMatch: false };
@@ -244,19 +278,7 @@ class TriggerService {
     return conditionMatched;
   }
 
-  static updateRelatedQuestion = (
-    dbTriggerRelatedNodeId: string | null | undefined,
-    newRelatedNodeId: string | null | undefined,
-    updateTriggerArgs: TriggerUpdateInput,
-  ): TriggerUpdateInput => {
-    if (newRelatedNodeId && newRelatedNodeId !== dbTriggerRelatedNodeId) {
-      updateTriggerArgs.relatedNode = { connect: { id: newRelatedNodeId } };
-    } else if (!newRelatedNodeId) {
-      updateTriggerArgs.relatedNode = { disconnect: true };
-    }
-    return updateTriggerArgs;
-  };
-
+  static
   static updateConditions = async (
     dbTriggerConditions: Array<TriggerCondition>,
     newConditions: Array<NexusGenInputs['TriggerConditionInputType']>,

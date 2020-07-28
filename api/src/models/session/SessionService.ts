@@ -37,10 +37,21 @@ class SessionService {
           create: entries.map((entry: any) => NodeEntryService.constructCreateNodeEntryFragment(entry)),
         },
       },
+      include: {
+        nodeEntries: {
+          include: {
+            choiceNodeEntry: true,
+            linkNodeEntry: true,
+            registrationNodeEntry: true,
+            relatedNode: true,
+            sliderNodeEntry: true,
+          },
+        },
+      },
     });
 
     try {
-      await TriggerService.tryTriggers(entries, ctx.services.triggerSMSService);
+      await TriggerService.tryTriggers(session.nodeEntries, ctx.services.triggerSMSService);
     } catch (e) {
       console.log('Something went wrong while handling sms triggers: ', e);
     }

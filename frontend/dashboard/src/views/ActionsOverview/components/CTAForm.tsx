@@ -15,6 +15,7 @@ import createCTAMutation from 'mutations/createCTA';
 import getCTANodesQuery from 'queries/getCTANodes';
 import updateCTAMutation from 'mutations/updateCTA';
 
+import { useToast } from '@chakra-ui/core';
 import DeleteLinkSesctionButton from './DeleteLinkSectionButton';
 
 interface FormDataProps {
@@ -111,6 +112,8 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: 
       },
     }];
 
+  const toast = useToast();
+
   const [addCTA] = useMutation(createCTAMutation, {
     onCompleted: () => {
       onNewCTAChange(false);
@@ -124,7 +127,17 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: 
 
   const [updateCTA] = useMutation(updateCTAMutation, {
     onCompleted: () => {
-      onActiveCTAChange(null);
+      toast({
+        title: 'Edit complete!',
+        description: 'The call to action has been deleted.',
+        status: 'success',
+        position: 'bottom-right',
+        duration: 1500,
+      });
+
+      setTimeout(() => {
+        onActiveCTAChange(null);
+      }, 200);
     },
     onError: (serverError: ApolloError) => {
       console.log(serverError);
