@@ -1,6 +1,6 @@
 datasource postgresql {
   provider = "postgresql"
-  url      = env("DB_STRING")
+  url = "***"
 }
 
 // binaryTargets = ["debian-openssl-1.1.x"]
@@ -279,14 +279,12 @@ model User {
   id         String    @default(cuid()) @id
   createdAt  DateTime  @default(now())
   updatedAt  DateTime? @updatedAt
-  email      String    @unique
+  email      String
   password   String
   phone      String?
   firstName  String?
   lastName   String?
-  triggers   Trigger[]
   customers  UserOfCustomer[]
-  isSuperAdmin  Boolean @default(false)
 }
 
 model UserOfCustomer {
@@ -298,7 +296,9 @@ model UserOfCustomer {
 
   roleId  String
   role    Role  @relation(fields: [roleId], references: [id])
-  
+
+  triggers Trigger[]
+
   createdAt DateTime @default(now())
 
   @@id([userId, customerId])

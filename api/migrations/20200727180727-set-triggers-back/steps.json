@@ -1,0 +1,17 @@
+{
+  "version": "0.3.14-fixed",
+  "steps": [
+    {
+      "tag": "CreateField",
+      "model": "User",
+      "field": "triggers",
+      "type": "Trigger",
+      "arity": "List"
+    },
+    {
+      "tag": "DeleteField",
+      "model": "UserOfCustomer",
+      "field": "triggers"
+    }
+  ]
+}

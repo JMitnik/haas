@@ -1,6 +1,6 @@
 import { inputObjectType, mutationField } from '@nexus/schema';
 
-import { UserType, UserType } from '../users/User';
+import { UserType } from '../users/User';
 import AuthService from './AuthService';
 
 export const RegisterInput = inputObjectType({
@@ -26,7 +26,13 @@ export const RegisterMutation = mutationField('register', {
   async resolve(parent, args) {
     if (!args.input) throw new Error('Input information required');
     const user = await AuthService.registerUser(args.input);
-    const userToken = await AuthService.createToken(user);
+
+    const role = user.customers.find((customer) => customer.customer.id === args.input?.customerId)?.role;
+    const userToken = await AuthService.createToken({
+      email: user.email,
+      role: role?.name || '',
+      permissions: role?.permissions.map((permission) => permission.name) || [],
+    });
 
     return userToken;
   },
@@ -47,7 +53,7 @@ export const LoginMutation = mutationField('login', {
   nullable: true,
   args: { input: LoginInput },
 
-  resolve(parent, args) {
-    console.log(args);
+  async resolve(parent, args) {
+    const user = await AuthService.loginUser(args.input);
   },
 });

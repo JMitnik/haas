@@ -43,7 +43,7 @@ class RoleService {
 
   static async fetchDefaultRoleForCustomer(customerId: string) {
     const customerWithRoles = await prisma.customer.findOne({
-      where: { id: customerId },
+      where: { id: customerId || undefined },
       include: {
         roles: true,
       },

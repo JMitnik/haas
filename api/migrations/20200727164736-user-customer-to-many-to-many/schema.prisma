@@ -1,6 +1,6 @@
 datasource postgresql {
   provider = "postgresql"
-  url      = env("DB_STRING")
+  url = "***"
 }
 
 // binaryTargets = ["debian-openssl-1.1.x"]
@@ -54,7 +54,7 @@ model Customer {
   name        String
   settings    CustomerSettings?
   dialogues   Dialogue[]
-  users       UserOfCustomer[]
+  users       User[]
   roles       Role[]
   permissions Permission[]
   triggers    Trigger[]
@@ -271,7 +271,9 @@ model Role {
   name        String
   roleId      String?
   permissions Permission[] @relation(references: [id])
-  users       UserOfCustomer[]
+  User        User[]
+  Customer    Customer?    @relation(fields: [customerId], references: [id])
+  customerId  String?
   @@unique([id, name])
 }
 
@@ -279,29 +281,15 @@ model User {
   id         String    @default(cuid()) @id
   createdAt  DateTime  @default(now())
   updatedAt  DateTime? @updatedAt
-  email      String    @unique
+  email      String
   password   String
   phone      String?
   firstName  String?
   lastName   String?
-  triggers   Trigger[]
-  customers  UserOfCustomer[]
-  isSuperAdmin  Boolean @default(false)
-}
-
-model UserOfCustomer {
-  userId  String
-  user    User    @relation(fields: [userId], references: [id])
-
-  customerId String
-  customer  Customer  @relation(fields: [customerId], references: [id])
-
-  roleId  String
-  role    Role  @relation(fields: [roleId], references: [id])
-  
-  createdAt DateTime @default(now())
-
-  @@id([userId, customerId])
+  roleId     String
+  role       Role      @relation(fields: [roleId], references: [id])
+  Customer   Customer[]
+  triggers   Trigger[] @relation(references: [id])
 }
 
 enum TriggerEnum {

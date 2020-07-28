@@ -1,0 +1,285 @@
+{
+  "version": "0.3.14-fixed",
+  "steps": [
+    {
+      "tag": "CreateModel",
+      "model": "UserOfCustomer"
+    },
+    {
+      "tag": "CreateField",
+      "model": "UserOfCustomer",
+      "field": "userId",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateField",
+      "model": "UserOfCustomer",
+      "field": "user",
+      "type": "User",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "UserOfCustomer",
+          "field": "user"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "UserOfCustomer",
+          "field": "user"
+        },
+        "directive": "relation"
+      },
+      "argument": "fields",
+      "value": "[userId]"
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "UserOfCustomer",
+          "field": "user"
+        },
+        "directive": "relation"
+      },
+      "argument": "references",
+      "value": "[id]"
+    },
+    {
+      "tag": "CreateField",
+      "model": "UserOfCustomer",
+      "field": "customerId",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateField",
+      "model": "UserOfCustomer",
+      "field": "customer",
+      "type": "Customer",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "UserOfCustomer",
+          "field": "customer"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "UserOfCustomer",
+          "field": "customer"
+        },
+        "directive": "relation"
+      },
+      "argument": "fields",
+      "value": "[customerId]"
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "UserOfCustomer",
+          "field": "customer"
+        },
+        "directive": "relation"
+      },
+      "argument": "references",
+      "value": "[id]"
+    },
+    {
+      "tag": "CreateField",
+      "model": "UserOfCustomer",
+      "field": "roleId",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateField",
+      "model": "UserOfCustomer",
+      "field": "role",
+      "type": "Role",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "UserOfCustomer",
+          "field": "role"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "UserOfCustomer",
+          "field": "role"
+        },
+        "directive": "relation"
+      },
+      "argument": "fields",
+      "value": "[roleId]"
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "UserOfCustomer",
+          "field": "role"
+        },
+        "directive": "relation"
+      },
+      "argument": "references",
+      "value": "[id]"
+    },
+    {
+      "tag": "CreateField",
+      "model": "UserOfCustomer",
+      "field": "triggers",
+      "type": "Trigger",
+      "arity": "List"
+    },
+    {
+      "tag": "CreateField",
+      "model": "UserOfCustomer",
+      "field": "createdAt",
+      "type": "DateTime",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "UserOfCustomer",
+          "field": "createdAt"
+        },
+        "directive": "default"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "UserOfCustomer",
+          "field": "createdAt"
+        },
+        "directive": "default"
+      },
+      "argument": "",
+      "value": "now()"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Model",
+          "model": "UserOfCustomer"
+        },
+        "directive": "id"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Model",
+          "model": "UserOfCustomer"
+        },
+        "directive": "id"
+      },
+      "argument": "",
+      "value": "[userId, customerId, roleId]"
+    },
+    {
+      "tag": "UpdateField",
+      "model": "Customer",
+      "field": "users",
+      "type": "UserOfCustomer"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Role",
+      "field": "users",
+      "type": "UserOfCustomer",
+      "arity": "List"
+    },
+    {
+      "tag": "DeleteField",
+      "model": "Role",
+      "field": "User"
+    },
+    {
+      "tag": "DeleteField",
+      "model": "Role",
+      "field": "Customer"
+    },
+    {
+      "tag": "DeleteField",
+      "model": "Role",
+      "field": "customerId"
+    },
+    {
+      "tag": "CreateField",
+      "model": "User",
+      "field": "customers",
+      "type": "UserOfCustomer",
+      "arity": "List"
+    },
+    {
+      "tag": "DeleteField",
+      "model": "User",
+      "field": "roleId"
+    },
+    {
+      "tag": "DeleteField",
+      "model": "User",
+      "field": "role"
+    },
+    {
+      "tag": "DeleteField",
+      "model": "User",
+      "field": "Customer"
+    },
+    {
+      "tag": "DeleteField",
+      "model": "User",
+      "field": "triggers"
+    }
+  ]
+}

@@ -277,7 +277,7 @@ class CustomerService {
     await prisma.triggerCondition.deleteMany({ where: { trigger: { customerId } } });
     await prisma.trigger.deleteMany({ where: { customerId } });
     await prisma.permission.deleteMany({ where: { customerId } });
-    await prisma.user.deleteMany({ where: { customerId } });
+    await prisma.user.deleteMany({ where: { customers: { every: { customer: { id: customerId } } } } });
     await prisma.role.deleteMany({ where: { customerId } });
 
     await prisma.customer.delete({

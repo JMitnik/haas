@@ -6,7 +6,6 @@ import {
   TriggerUpdateInput,
   TriggerWhereInput,
   User,
-  UserUpdateManyWithoutTriggersInput,
   UserWhereUniqueInput,
 } from '@prisma/client';
 import _ from 'lodash';
@@ -312,7 +311,7 @@ class TriggerService {
       }
     });
 
-    const recipientUpdateArgs: UserUpdateManyWithoutTriggersInput = {};
+    const recipientUpdateArgs: any = {};
     if (newRecipientObjects.length > 0) {
       recipientUpdateArgs.connect = newRecipientObjects;
     }

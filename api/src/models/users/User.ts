@@ -90,7 +90,9 @@ export const UserQueries = extendType({
 
       resolve(parent, args, ctx) {
         if (!args.customerSlug) throw new Error('No business provided');
-        return ctx.prisma.user.findMany({ where: { Customer: { slug: args.customerSlug } } });
+        return ctx.prisma.user.findMany({ where: { customers: {
+          every: { customer: { slug: args.customerSlug || undefined } },
+        } } });
       },
     });
 
@@ -134,14 +136,10 @@ export const UserMutations = extendType({
             password,
             lastName,
             phone,
-            role: {
-              connect: {
-                id: roleId || undefined,
-              },
-            },
-            Customer: {
-              connect: {
-                slug: args.customerSlug,
+            customers: {
+              create: {
+                customer: { connect: { id: args.input.customerId || undefined } },
+                role: { connect: { id: roleId || undefined } },
               },
             },
           },
@@ -171,11 +169,6 @@ export const UserMutations = extendType({
             lastName,
             phone,
             email,
-            role: {
-              connect: {
-                id: roleId || undefined,
-              },
-            },
           },
         });
       },

@@ -1,0 +1,43 @@
+{
+  "version": "0.3.14-fixed",
+  "steps": [
+    {
+      "tag": "DeleteField",
+      "model": "User",
+      "field": "customerId"
+    },
+    {
+      "tag": "UpdateField",
+      "model": "User",
+      "field": "Customer",
+      "arity": "List"
+    },
+    {
+      "tag": "DeleteDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "User",
+          "field": "Customer"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "DeleteDirective",
+      "location": {
+        "path": {
+          "tag": "Model",
+          "model": "User",
+          "arguments": [
+            {
+              "name": "",
+              "value": "[customerId, email]"
+            }
+          ]
+        },
+        "directive": "unique"
+      }
+    }
+  ]
+}
