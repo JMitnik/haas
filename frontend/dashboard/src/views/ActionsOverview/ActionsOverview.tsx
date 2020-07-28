@@ -27,7 +27,7 @@ const DialogueViewContainer = styled(Div)`
 `;
 
 const mapLeafs = (leafs: any) => leafs?.map((leaf: any) => {
-  if (leaf.type === 'SOCIAL_SHARE') {
+  if (leaf.type === 'LINK') {
     const mappedLinks = leaf.links?.map((link: any) => {
       const { __typename, ...linkedData } = link;
       return { ...linkedData, type: { label: link.type, value: link.type } };
@@ -57,7 +57,7 @@ const initializeCTAType = (type: string) => {
   }
 
   if (type === 'LINK') {
-    return { label: 'Link', value: 'SOCIAL_SHARE' };
+    return { label: 'Link', value: 'LINK' };
   }
 
   return { label: 'None', value: '' };
@@ -74,7 +74,7 @@ const ActionOverview = ({ leafs }: ActionOverviewProps) => {
     setActiveSearchTerm(newSearchTerm);
   }, 250), []);
 
-  const [fetchActions, { data, variables }] = useLazyQuery(getCTANodesQuery, {
+  const [fetchActions, { data }] = useLazyQuery(getCTANodesQuery, {
     fetchPolicy: 'cache-and-network',
     onCompleted: () => {
     },
@@ -116,9 +116,9 @@ const ActionOverview = ({ leafs }: ActionOverviewProps) => {
             </Span>
           </AddCTAButton>
         </Flex>
-        <Div width="40%">
+        <Flex alignItems="center">
           <SearchBar activeSearchTerm={activeSearchTerm} onSearchTermChange={handleSearchTermChange} />
-        </Div>
+        </Flex>
       </Flex>
       {newCTA && (
         <CTAEntry
@@ -132,6 +132,7 @@ const ActionOverview = ({ leafs }: ActionOverviewProps) => {
           onNewCTAChange={setNewCTA}
         />
       )}
+
       {!activeLeafs && leafs && leafs.map(
         (leaf: any, index: number) => (
           <CTAEntry

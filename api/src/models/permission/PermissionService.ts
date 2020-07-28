@@ -1,6 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import prisma from '../../prisma';
 
 class PermissionService {
   static deletePermissions = async (permissionIds: Array<string>) => {
@@ -13,16 +12,17 @@ class PermissionService {
     });
   };
 
-  static createPermission = async (name: string, customerId: string, description: string) => {
-    const newPermissions = prisma.permission.create({
+  static createPermission = async (name: string, customerId: string, description?: string | null | undefined) => {
+    const newPermissions = await prisma.permission.create({
       data: {
         name,
         description,
         Customer: {
-          connect: {
-            id: customerId,
-          },
+          connect: { id: customerId },
         },
+      },
+      include: {
+        Customer: true,
       },
     });
 

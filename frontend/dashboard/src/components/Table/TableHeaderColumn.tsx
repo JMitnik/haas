@@ -5,7 +5,7 @@ interface TableHeaderColumnProps {
   value: string;
   accessor: string;
   sortProperties: {
-    id: string;
+    by: string;
     desc: boolean;
   }[];
   onPaginationChange: React.Dispatch<React.SetStateAction<TableProps>>;
@@ -19,22 +19,26 @@ interface TableProps {
   pageIndex: number;
   pageSize: number;
   sortBy: {
-    id: string;
+    by: string;
     desc: boolean;
   }[]
 }
 
-const TableHeaderColumn = (
-  { sortProperties, accessor, value, onPaginationChange, disableSorting }: TableHeaderColumnProps,
-) => {
+const TableHeaderColumn = ({
+  sortProperties,
+  accessor,
+  value,
+  onPaginationChange,
+  disableSorting,
+}: TableHeaderColumnProps) => {
   const handleSort = () => {
     if (!disableSorting) {
       onPaginationChange((prevValues) => {
         const { sortBy } = prevValues;
-        const newOrderBy = sortBy?.[0]?.id === accessor
-          ? [{ id: sortBy?.[0]?.id, desc: !sortBy?.[0]?.desc }]
-          : [{ id: accessor, desc: true }];
-        return { ...prevValues, sortBy: newOrderBy };
+        const newOrderBy = sortBy?.[0]?.by === accessor
+          ? [{ by: sortBy?.[0]?.by, desc: !sortBy?.[0]?.desc }]
+          : [{ by: accessor, desc: true }];
+        return { ...prevValues, sortBy: newOrderBy, pageIndex: 0 };
       });
     }
   };
@@ -54,7 +58,7 @@ const TableHeaderColumn = (
         </H3>
       </Div>
       <Span>
-        {(sortProperties[0].id === accessor && !disableSorting) ? (sortProperties[0].desc ? '🔽' : '🔼') : ''}
+        {(sortProperties[0].by === accessor && !disableSorting) ? (sortProperties[0].desc ? '🔽' : '🔼') : ''}
       </Span>
     </Div>
   );

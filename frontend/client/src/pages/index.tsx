@@ -1,4 +1,5 @@
 import { AnimatePresence } from 'framer-motion';
+import { ErrorBoundary } from 'react-error-boundary';
 import { Route, Switch, useLocation } from 'react-router-dom';
 import React, { useLayoutEffect } from 'react';
 
@@ -8,6 +9,12 @@ import CustomersPage from 'pages/customers';
 import GlobalAppLayout from 'layouts/GlobalAppLayout';
 
 import NodePage from './[customer]/[dialogue]/[node]';
+
+const ErrorPage = () => (
+  <div>
+    Something went wrong, we will fix it right away!
+  </div>
+);
 
 const AppRoutes = () => {
   const location = useLocation();
@@ -26,6 +33,7 @@ const AppRoutes = () => {
         </Route>
       </Switch>
     </AnimatePresence>
+
   );
 };
 
@@ -45,7 +53,9 @@ const App = () => {
   return (
     <AppProviders>
       <GlobalAppLayout>
-        <AppRoutes />
+        <ErrorBoundary FallbackComponent={ErrorPage}>
+          <AppRoutes />
+        </ErrorBoundary>
       </GlobalAppLayout>
     </AppProviders>
   );

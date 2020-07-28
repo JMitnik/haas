@@ -6,6 +6,7 @@ import { ButtonIcon } from '@haas/ui/src/Buttons';
 import { ClientButton, OutlineButton } from 'components/Buttons/Buttons';
 import { Div, Grid, H3, Textbox } from '@haas/ui';
 import { NodeTitle } from 'layouts/NodeLayout/NodeLayoutStyles';
+import { SessionEntryDataProps } from 'models/Session/SessionEntryModel';
 
 import { GenericNodeProps } from '../types';
 import { TextboxContainer } from './TextboxStyles';
@@ -15,22 +16,23 @@ interface TextboxNodeProps extends GenericNodeProps {
 }
 
 const TextboxNode = ({ node, onEntryStore }: TextboxNodeProps) => {
-  const { register, getValues, formState } = useForm({
+  const { register, getValues, formState } = useForm<{textbox: string}>({
     mode: 'onChange',
   });
 
   const { dirty } = formState;
 
   const onSubmit = () => {
-    const formEntry = getValues({ nest: true });
+    const formEntry = getValues({ nest: true }).textbox;
 
-    const entry: any = {
-      textValue: formEntry.textValue,
-      multiValues: null,
-      numberValue: null,
+    const entry: SessionEntryDataProps = {
+      textbox: { value: formEntry },
+      choice: undefined,
+      register: undefined,
+      slider: undefined,
     };
 
-    onEntryStore(entry, formEntry.textValue);
+    onEntryStore(entry, formEntry);
   };
 
   return (
@@ -38,7 +40,7 @@ const TextboxNode = ({ node, onEntryStore }: TextboxNodeProps) => {
       <NodeTitle>{node.title}</NodeTitle>
       <Div>
         <H3 color="white">What would you like to tell us?</H3>
-        <Textbox placeholder="I have experienced ..." name="textValue" ref={register} />
+        <Textbox placeholder="I have experienced ..." name="textbox" ref={register} />
 
         <Div mt={4}>
           <Grid gridTemplateColumns="2fr 1fr">

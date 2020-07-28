@@ -1,15 +1,12 @@
-/* eslint-disable max-len */
-import { LinkCreateInput } from '@prisma/client';
+import { NodeType } from '@prisma/client';
 
-import { NodeType } from '../../generated/prisma-client/index';
-
-export const multiChoiceType: NodeType = 'MULTI_CHOICE';
-export const socialShareType: NodeType = 'SOCIAL_SHARE';
+export const choiceType: NodeType = 'CHOICE';
+export const socialShareType: NodeType = 'LINK';
 export const sliderType: NodeType = 'SLIDER';
 export const textboxType: NodeType = 'TEXTBOX';
 export const registrationType: NodeType = 'REGISTRATION';
 
-export const STANDARD_LINKS: LinkCreateInput[] = [
+export const STANDARD_LINKS: any[] = [
   { url: 'https://facebook.com', type: 'FACEBOOK', backgroundColor: '#1877f2' },
   { url: 'https://twitter.com', type: 'TWITTER', backgroundColor: '#1da1f2' },
   { url: 'https://instagram.com', type: 'INSTAGRAM', backgroundColor: '#c32aa3' },

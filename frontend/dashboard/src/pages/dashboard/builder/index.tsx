@@ -15,8 +15,8 @@ const initializeQuestionType = (type?: string) => {
     return 'Slider';
   }
 
-  if (type === 'MULTI_CHOICE') {
-    return 'Multi-Choice';
+  if (type === 'CHOICE') {
+    return 'Choice';
   }
 
   return 'Unknown';
@@ -31,7 +31,7 @@ const initializeCTAType = (type?: string) => {
     return 'Register';
   }
 
-  if (type === 'SOCIAL_SHARE') {
+  if (type === 'LINK') {
     return 'Link';
   }
 
@@ -55,7 +55,7 @@ const mapQuestionsInputData = (nodes: Array<QuestionEntryProps>) => {
     isRoot,
     isLeaf,
     type: initializeQuestionType(type),
-    icon: type === 'MULTI_CHOICE' ? MultiChoiceBuilderIcon : HaasNodeIcon,
+    icon: type === 'CHOICE' ? MultiChoiceBuilderIcon : HaasNodeIcon,
     overrideLeaf: !overrideLeaf
       ? undefined
       : { id: overrideLeaf?.id, title: overrideLeaf?.title, type: initializeCTAType(overrideLeaf?.type) },

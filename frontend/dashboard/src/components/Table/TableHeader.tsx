@@ -19,7 +19,7 @@ interface TableProps {
   pageIndex: number;
   pageSize: number;
   sortBy: {
-    id: string;
+    by: string;
     desc: boolean;
   }[]
 }
@@ -27,7 +27,7 @@ interface TableProps {
 interface TableHeaderProps {
   headers: Array<TableHeaderColumnProps>;
   sortProperties: {
-    id: string;
+    by: string;
     desc: boolean;
   }[];
   onAddEntry?: (event: any) => void;

@@ -2,11 +2,10 @@ import React from 'react';
 
 import { DataGridProps, TableProps } from 'types/generic';
 import { Grid } from '@haas/ui';
-import PaginationSpinner from 'components/Table/TablePaginationControls';
+import { TableRowProps } from 'components/Table/TableTypes';
+import PaginationControls from 'components/Table/TablePaginationControls';
 import TableHeader from 'components/Table/TableHeader';
 import TableRow from 'components/Table/TableRow';
-
-import { TableRowProps } from 'components/Table/TableTypes';
 
 interface TableInputProps {
   headers: {
@@ -15,7 +14,7 @@ interface TableInputProps {
     Cell: ({ value }: { value: any }) => JSX.Element;
   }[]
   data: Array<any>;
-  CustomRow?: (props: TableRowProps) => JSX.Element;
+  CustomRow?: any;
   permissions?: Array<any>;
   onPaginationChange: React.Dispatch<React.SetStateAction<TableProps>>;
   onDeleteEntry?: (event: any, userId: string) => void;
@@ -26,19 +25,19 @@ interface TableInputProps {
   disableSorting?: boolean;
 }
 
-const Table = (
-  { headers,
-    data,
-    paginationProps,
-    onPaginationChange,
-    onAddEntry,
-    CustomRow,
-    onEditEntry,
-    onDeleteEntry,
-    permissions,
-    hidePagination,
-    disableSorting }: TableInputProps,
-) => {
+const Table = ({
+  headers,
+  data,
+  paginationProps,
+  onPaginationChange,
+  onAddEntry,
+  CustomRow,
+  onEditEntry,
+  onDeleteEntry,
+  permissions,
+  hidePagination,
+  disableSorting,
+}: TableInputProps) => {
   const handlePage = (newPageIndex: number) => {
     if (onPaginationChange) {
       onPaginationChange((prevValues) => ({ ...prevValues, pageIndex: newPageIndex }));
@@ -54,32 +53,32 @@ const Table = (
         onAddEntry={onAddEntry}
         disableSorting={disableSorting}
       />
-      {data && data.map(
-        (dataEntry, index) => (CustomRow
-          ? (
-            <CustomRow
-              headers={headers}
-              onEditEntry={onEditEntry}
-              onDeleteEntry={onDeleteEntry}
-              permissions={permissions}
-              data={dataEntry}
-              key={index}
-              index={index}
-            />
-          )
-          : (
-            <TableRow
-              headers={headers}
-              onEditEntry={onEditEntry}
-              onDeleteEntry={onDeleteEntry}
-              data={dataEntry}
-              key={index}
-              index={index}
-            />
-          )),
-      )}
+
+      {data && data.map((dataEntry, index) => (
+        CustomRow ? (
+          <CustomRow
+            headers={headers}
+            onEditEntry={onEditEntry}
+            onDeleteEntry={onDeleteEntry}
+            permissions={permissions}
+            data={dataEntry}
+            key={index}
+            index={index}
+          />
+        ) : (
+          <TableRow
+            headers={headers}
+            onEditEntry={onEditEntry}
+            onDeleteEntry={onDeleteEntry}
+            data={dataEntry}
+            key={index}
+            index={index}
+          />
+        )
+      ))}
+
       {!hidePagination && (
-        <PaginationSpinner paginationProps={paginationProps} onPageChange={handlePage} />
+        <PaginationControls paginationProps={paginationProps} onPageChange={handlePage} />
       )}
     </Grid>
   );

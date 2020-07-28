@@ -28,6 +28,7 @@ export const Container = styled(Div)<ContainerProps>`
     position: relative;
     margin: 0 auto;
     width: ${theme.containerWidth}px;
+    max-width: 100%;
 
     ${color}
     ${space}

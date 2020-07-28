@@ -150,7 +150,7 @@ const AddDialogueView = () => {
                 </Flex>
                 <Div useFlex flexDirection="column">
                   <StyledLabel>Public Title</StyledLabel>
-                  <StyledInput name="publicTitle" ref={register({ required: true })} />
+                  <StyledInput name="publicTitle" ref={register({ required: false })} />
                   {errors.publicTitle && <Muted color="warning">Something went wrong!</Muted>}
                 </Div>
                 <Div useFlex flexDirection="column">
@@ -206,13 +206,17 @@ const AddDialogueView = () => {
               <Div gridColumn="1 / -1">
                 <Flex flexDirection="row" alignItems="center" justifyContent="space-between">
                   <H4>Tags</H4>
-                  <PlusCircle onClick={() => setActiveTags((prevTags) => [...prevTags, null])} />
+                  {/* TODO: Make this an actual button (better semantics), rather than asisgning it to an svg */}
+                  <PlusCircle data-cy="AddTagButton" onClick={() => setActiveTags((prevTags) => [...prevTags, null])} />
                 </Flex>
                 <Hr />
                 <Div marginTop={15}>
                   {activeTags?.map((tag, index) => (
                     <Flex marginBottom="4px" alignItems="center" key={index} gridColumn="1 / -1">
-                      <Div flexGrow={9}>
+                      <Div
+                        data-cy="SelectOptions"
+                        flexGrow={9}
+                      >
                         <Select
                           key={index}
                           options={tags}

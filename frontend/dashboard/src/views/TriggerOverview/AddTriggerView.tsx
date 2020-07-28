@@ -59,11 +59,15 @@ const MEDIUM_TYPES = [
 const AddTriggerView = () => {
   const history = useHistory();
   const { register, handleSubmit, errors } = useForm<FormDataProps>();
-  const { customerId, customerSlug } = useParams();
+  const { customerSlug } = useParams();
+
+  // TODO: Make it one query
   const { data: dialogueData } = useQuery(getDialoguesQuery, { variables: { customerSlug } });
   const { data: recipientsData } = useQuery(getRecipientsQuery, { variables: { customerSlug } });
-  const [fetchQuestions, { data: questionsData }] = useLazyQuery(getQuestionsQuery,
-    { fetchPolicy: 'cache-and-network' });
+
+  const [fetchQuestions, { data: questionsData }] = useLazyQuery(getQuestionsQuery, {
+    fetchPolicy: 'cache-and-network',
+  });
 
   const [activeType, setActiveType] = useState<null | { label: string, value: string }>(null);
   const [activeMedium, setActiveMedium] = useState<null | { label: string, value: string }>(null);

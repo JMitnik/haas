@@ -1,7 +1,7 @@
 import { format } from 'date-fns';
 import React, { Dispatch, SetStateAction } from 'react';
 
-import { Div, H5, Span } from '@haas/ui';
+import { Div, H5 } from '@haas/ui';
 
 import { InteractionFeedEntryContainer, InteractionFeedEntryValueContainer } from './InteractionFeedEntryStyles';
 

@@ -1,10 +1,6 @@
 import { ApolloProvider } from '@apollo/react-hooks';
 import { Redirect, Route, BrowserRouter as Router, Switch } from 'react-router-dom';
-import { ThemeProvider } from 'styled-components';
-import React, { FC, useEffect, useState } from 'react';
-
-import CustomerProvider from 'providers/CustomerProvider';
-import DashboardPage from 'pages/dashboard';
+import React, { FC } from 'react';
 
 import { AppContainer } from 'styles/AppStyles';
 import ActionsPage from 'pages/dashboard/actions';
@@ -14,7 +10,9 @@ import AddTriggerView from 'views/TriggerOverview/AddTriggerView';
 import AddUserView from 'views/UsersOverview/AddUserView';
 import AnalyticsPage from 'pages/dashboard/analytics';
 import CustomerPage from 'pages/dashboard/customer';
+import CustomerProvider from 'providers/CustomerProvider';
 import CustomersPage from 'pages/dashboard/customers';
+import DashboardPage from 'pages/dashboard';
 import DialogueBuilderPage from 'pages/dashboard/builder';
 import DialoguePage from 'pages/dashboard/dialogues/dialogue';
 import DialoguesPage from 'pages/dashboard/dialogues';
@@ -29,7 +27,9 @@ import ThemesProvider from 'providers/ThemeProvider';
 import TriggersOverview from 'views/TriggerOverview/TriggerOverview';
 import UsersOverview from 'views/UsersOverview/UsersOverview';
 
+import { ErrorBoundary } from 'react-error-boundary';
 import DashboardLayout from 'layouts/DashboardLayout';
+
 import DialogueLayout from 'layouts/DialogueLayout';
 import client from './config/apollo';
 
@@ -163,6 +163,13 @@ const AppRoutes = () => (
   </Switch>
 );
 
+const GeneralErrorFallback = ({ error }: { error?: Error | undefined }) => (
+  <div>
+    Problem with connection, we will be back shortly!
+    {error?.message}
+  </div>
+);
+
 const App: FC = () => (
   <>
     <ApolloProvider client={client}>
@@ -170,7 +177,9 @@ const App: FC = () => (
         <Router>
           <ThemesProvider>
             <AppContainer>
-              <AppRoutes />
+              <ErrorBoundary FallbackComponent={GeneralErrorFallback}>
+                <AppRoutes />
+              </ErrorBoundary>
             </AppContainer>
             <GlobalStyle />
           </ThemesProvider>

@@ -1,8 +1,8 @@
-import { CustomerSettings, PrismaClient } from '@prisma/client';
 import { objectType } from '@nexus/schema';
 
 export const ColourSettingsType = objectType({
   name: 'ColourSettings',
+
   definition(t) {
     t.id('id');
     t.string('primary');
@@ -13,6 +13,7 @@ export const ColourSettingsType = objectType({
 
 export const FontSettingsType = objectType({
   name: 'FontSettings',
+
   definition(t) {
     t.id('id');
   },
@@ -20,27 +21,33 @@ export const FontSettingsType = objectType({
 
 export const CustomerSettingsType = objectType({
   name: 'CustomerSettings',
+
   definition(t) {
     t.id('id');
     t.string('logoUrl', { nullable: true });
+
     t.field('colourSettings', {
       type: ColourSettingsType,
-      resolve(parent: CustomerSettings, args: any, ctx: any, info: any) {
-        const { prisma }: { prisma: PrismaClient } = ctx;
-        const colourSettings = prisma.colourSettings.findOne(
-          { where: { id: parent.colourSettingsId || undefined } },
-        );
+      nullable: true,
+
+      resolve(parent, args, ctx) {
+        const colourSettings = ctx.prisma.colourSettings.findOne({
+          where: { id: parent.colourSettingsId || undefined },
+        });
+
         return colourSettings;
       },
     });
+
     t.field('fontSettings', {
       nullable: true,
       type: FontSettingsType,
-      resolve(parent: CustomerSettings, args: any, ctx: any, info: any) {
-        const { prisma }: { prisma: PrismaClient } = ctx;
-        const colourSettings = prisma.fontSettings.findOne(
-          { where: { id: parent.fontSettingsId || undefined } },
-        );
+
+      resolve(parent, args, ctx) {
+        const colourSettings = ctx.prisma.fontSettings.findOne({
+          where: { id: parent.fontSettingsId || undefined },
+        });
+
         return colourSettings;
       },
     });

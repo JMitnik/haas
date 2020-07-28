@@ -9,9 +9,9 @@ export interface HAASNodeConditions {
 
 export type HAASQuestionType =
 | 'SLIDER'
-| 'MULTI_CHOICE'
+| 'CHOICE'
 | 'TEXTBOX'
-| 'SOCIAL-SHARE'
+| 'LINK'
 | 'REGISTRATION'
 | 'FINISH';
 
@@ -49,14 +49,15 @@ export interface HAASNode {
 export interface HAASEntry {
   node: HAASNode;
   edge?: HAASEdge | null;
-  data: HAASFormEntry;
+  data: NodeEntry;
   depth: number;
 }
 
-export interface HAASFormEntry {
-  textValue?: string | null;
-  numberValue?: number | null;
-  multiValues?: HAASFormEntry[];
+export interface NodeEntry {
+  slider?: number | null;
+  textbox?: string | null;
+  register?: string | null;
+  choice?: string | null;
 }
 
 export interface Dialogue {

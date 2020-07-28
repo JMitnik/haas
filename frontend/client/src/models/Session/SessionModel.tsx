@@ -8,7 +8,10 @@ const SessionModel = types
   })
   .actions((self) => ({
     add(nodeId: string, data: SessionEntryDataProps) {
-      self.items.set(nodeId, { node: nodeId, data });
+      self.items.set(nodeId, {
+        node: nodeId,
+        data,
+      });
     },
     reset() {
       self.items.clear();
@@ -28,6 +31,7 @@ const SessionModel = types
       return self.items.size === 0;
     },
   }));
+
 export interface EntryListProps extends Instance<typeof SessionModel>{}
 
 export default SessionModel;

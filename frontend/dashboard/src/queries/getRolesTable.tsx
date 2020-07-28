@@ -2,12 +2,12 @@ import gql from 'graphql-tag';
 
 // TODO: Add filter input
 const getRolesQuery = gql`
-  query getRolesTable($customerId: String!, $filter: FilterInput) {
-    roleTable(customerId: $customerId, filter: $filter) {
+  query getRolesTable($customerId: String!, $filter: PaginationWhereInput) {
+    roleConnection(customerId: $customerId, filter: $filter) {
       roles {
         id
         name
-        amtPermissions
+        nrPermissions
         permissions {
           id
           name
@@ -17,8 +17,10 @@ const getRolesQuery = gql`
         id
         name
       }
-      totalPages
-      pageIndex
+      pageInfo {
+        pageIndex
+        nrPages
+      }
     }
   }
 `;

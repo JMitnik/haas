@@ -1,6 +1,9 @@
-import { Session } from '../../generated/resolver-types';
-import MailService, { MailServiceInputProps } from './mail-service';
 import mjml2html from 'mjml';
+
+import { SessionWithEntries } from '../../models/session/SessionTypes';
+import MailService, { MailServiceInputProps } from './mail-service';
+import SessionService from '../../models/session/SessionService';
+import NodeEntryService, { NodeEntryWithTypes } from '../../models/node-entry/NodeEntryService';
 
 interface TriggerMailServiceInputProps extends MailServiceInputProps {
 
@@ -9,7 +12,7 @@ interface TriggerMailServiceInputProps extends MailServiceInputProps {
 interface SendTriggerProps {
   from: string;
   to: string;
-  userSession: Session;
+  userSession: SessionWithEntries;
 }
 
 class TriggerMailService extends MailService {
@@ -36,7 +39,7 @@ class TriggerMailService extends MailService {
                         Dear ${to},
                         one of your set-up triggers has been activated.
 
-                        One of your customers had an opinion regarding dialogue ${userSession.questionnaire?.title},
+                        One of your customers had an opinion regarding dialogue ${userSession.dialogueId},
                         for session nr ${userSession.id}. You can find below details
                         more detail about their dialogue
                     </mj-text>
@@ -45,7 +48,7 @@ class TriggerMailService extends MailService {
             <mj-section background-color="white">
                 <mj-column>
                     <mj-text align="center">They rated your dialogue with score</mj-text>
-                    <mj-text font-size="30px" align="center">${userSession?.nodeEntries?.[0].values?.[0].numberValue}</mj-text>
+                    <mj-text font-size="30px" align="center">${SessionService.getScoringEntryFromSession(userSession)}</mj-text>
                 </mj-column>
             </mj-section>
 
@@ -65,9 +68,7 @@ class TriggerMailService extends MailService {
                             They answered:
                         </mj-text>
                         <mj-text>
-                            ${entry.values?.map((val) => `
-                                ${val.textValue || val.numberValue || 'Not supported yet!'}
-                            `)}
+                            ${NodeEntryService.getNodeEntryValue(entry)}
                         </mj-text>
                     </mj-column>
                 </mj-group>
@@ -84,6 +85,7 @@ class TriggerMailService extends MailService {
         </mj-body>
         </mjml>
     `).html;
+    console.log(this);
 
     // this.sendMail({
     //   from,

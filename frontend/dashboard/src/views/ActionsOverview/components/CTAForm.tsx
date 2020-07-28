@@ -15,6 +15,7 @@ import createCTAMutation from 'mutations/createCTA';
 import getCTANodesQuery from 'queries/getCTANodes';
 import updateCTAMutation from 'mutations/updateCTA';
 
+import { useToast } from '@chakra-ui/core';
 import DeleteLinkSesctionButton from './DeleteLinkSectionButton';
 
 interface FormDataProps {
@@ -45,7 +46,7 @@ interface CTAFormProps {
   onNewCTAChange: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const isLinkType = (ctaType: string) => ctaType === 'SOCIAL_SHARE';
+const isLinkType = (ctaType: string) => ctaType === 'LINK';
 
 const schema = yup.object().shape({
   title: yup.string().required(),
@@ -59,7 +60,7 @@ const schema = yup.object().shape({
 const CTA_TYPES = [
   { label: 'Opinion', value: 'TEXTBOX' },
   { label: 'Register', value: 'REGISTRATION' },
-  { label: 'Link', value: 'SOCIAL_SHARE' },
+  { label: 'Link', value: 'LINK' },
 ];
 
 const LINK_TYPES = [
@@ -111,6 +112,8 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: 
       },
     }];
 
+  const toast = useToast();
+
   const [addCTA] = useMutation(createCTAMutation, {
     onCompleted: () => {
       onNewCTAChange(false);
@@ -124,7 +127,17 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: 
 
   const [updateCTA] = useMutation(updateCTAMutation, {
     onCompleted: () => {
-      onActiveCTAChange(null);
+      toast({
+        title: 'Edit complete!',
+        description: 'The call to action has been deleted.',
+        status: 'success',
+        position: 'bottom-right',
+        duration: 1500,
+      });
+
+      setTimeout(() => {
+        onActiveCTAChange(null);
+      }, 200);
     },
     onError: (serverError: ApolloError) => {
       console.log(serverError);
@@ -247,7 +260,7 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: 
                 </Muted>
                 )}
               </Div>
-              {activeType.value === 'SOCIAL_SHARE' && (
+              {activeType.value === 'LINK' && (
               <Div gridColumn="1 / -1">
                 <Flex flexDirection="row" alignItems="center" justifyContent="space-between" marginBottom={5}>
                   <H4>Links</H4>

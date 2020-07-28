@@ -5,7 +5,7 @@ import { useHistory, useParams } from 'react-router';
 import { useMutation, useQuery } from '@apollo/react-hooks';
 import styled, { css } from 'styled-components/macro';
 
-import { Button, Container, Div, Flex,
+import { Button, Div, Flex,
   Grid, H2, H3, H4, Hr, Muted, StyledInput,
   StyledLabel, StyledTextInput } from '@haas/ui';
 import React, { useState } from 'react';
@@ -83,7 +83,7 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFo
 
   const [editDialogue, { loading }] = useMutation(editDialogueMutation, {
     onCompleted: () => {
-      history.push(`/dashboard/b/${customerSlug}/d/${dialogue.slug}`);
+      history.push(`/dashboard/b/${customerSlug}/d`);
     },
     refetchQueries: [{ query: getQuestionnairesCustomerQuery,
       variables: {
@@ -156,7 +156,7 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFo
                   <StyledInput
                     defaultValue={dialogue?.publicTitle}
                     name="publicTitle"
-                    ref={register({ required: true })}
+                    ref={register({ required: false })}
                   />
                   {errors.publicTitle && <Muted color="warning">Something went wrong!</Muted>}
                 </Div>

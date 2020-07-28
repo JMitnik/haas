@@ -2,9 +2,9 @@ import { AnimationControls } from 'framer-motion';
 import Lottie from 'react-lottie';
 import React, { useReducer } from 'react';
 
-import { Div, Flex, Span, Slider as UISlider } from '@haas/ui';
 import { ReactComponent as DragIcon } from 'assets/icons/icon-order-horizontal.svg';
 import { HAASIdle, HAASRun, HAASStopping } from 'assets/animations';
+import { Span, Slider as UISlider } from '@haas/ui';
 
 import { HAASRabbit, SlideHereContainer } from './SliderNodeStyles';
 import { SlideMeAnimation } from './SliderNodeAnimations';
@@ -109,6 +109,7 @@ const Slider = ({ register, onSubmit, animationControls }: SliderProps) => {
       <HAASRabbit style={{
         left: `${animationState.position}%`,
         bottom: '5px',
+        // zIndex: 500,
         transform: `translateX(-50%) scaleX(${animationState.direction})`,
       }}
       >
@@ -136,7 +137,8 @@ const Slider = ({ register, onSubmit, animationControls }: SliderProps) => {
       <form>
         <UISlider
           width={1}
-          name="numberValue"
+          name="slider"
+          style={{ zIndex: 300 }}
           onChange={(e) => moveBunny(e)}
           onMouseUp={() => handleSubmit()}
           onTouchEnd={() => handleSubmit()}

@@ -10,6 +10,7 @@ import { ReactComponent as TrendingIcon } from 'assets/icons/icon-trending-up.sv
 import { ReactComponent as TrophyIcon } from 'assets/icons/icon-trophy.svg';
 import Modal from 'components/Modal';
 
+import { dialogueStatistics as DialogueStatisticsData } from './__generated__/dialogueStatistics';
 import InteractionFeedModule from './Modules/InteractionFeedModule/InteractionFeedModule';
 import NegativePathsModule from './Modules/NegativePathsModule/index.tsx';
 import NodeEntriesOverview from '../NodeEntriesOverview/NodeEntriesOverview';
@@ -19,6 +20,14 @@ import SummaryAverageScoreModule from './Modules/SummaryModules/SummaryAverageSc
 import SummaryCallToActionModule from './Modules/SummaryModules/SummaryCallToActionModule';
 import SummaryInteractionCountModule from './Modules/SummaryModules/SummaryInteractionCountModule';
 import SummaryModuleContainer from './Modules/SummaryModules/SummaryModuleContainer';
+
+// TODO: Bring it back
+// const filterMap = new Map([
+//   ['Last 24h', 1],
+//   ['Last week', 7],
+//   ['Last month', 30],
+//   ['Last year', 365],
+// ]);
 
 const DialogueViewContainer = styled(Div)`
   ${({ theme }) => css`
@@ -34,7 +43,7 @@ const getDialogueStatistics = gql`
         id
         countInteractions
         averageScore
-        interactionFeedItems {
+        sessions(take: 3) {
           id
           createdAt
           score
@@ -44,12 +53,13 @@ const getDialogueStatistics = gql`
             answer
             quantity
           }
+          
           topNegativePath {
             quantity
             answer
           }
           
-          lineChartData {
+          history {
             x
             y
           }
@@ -65,10 +75,10 @@ const DialogueView = () => {
   const location = useLocation<any>();
 
   // FIXME: If this is started with anything else start result is undefined :S
-  const [activeFilter, setActiveFilter] = useState(() => 'Last 24h');
+  // const [activeFilter, setActiveFilter] = useState(() => 'Last 24h');
 
   // TODO: Move this to page level
-  const { data } = useQuery(getDialogueStatistics, {
+  const { data } = useQuery<DialogueStatisticsData>(getDialogueStatistics, {
     variables: {
       dialogueSlug,
       customerSlug,
@@ -132,18 +142,26 @@ const DialogueView = () => {
         </Div>
 
         <Div gridColumn="span 2">
-          <ScoreGraphModule chartData={dialogue.statistics?.lineChartData} />
+          {dialogue.statistics?.history ? (
+            <ScoreGraphModule chartData={dialogue.statistics?.history} />
+          ) : (
+            // TODO: Make a nice card for this
+            <Div>
+              Currently no history data available
+            </Div>
+          )}
         </Div>
+
         <InteractionFeedModule
           onActiveSessionChange={setActiveSession}
-          timelineEntries={dialogue?.interactionFeedItems}
+          timelineEntries={dialogue?.sessions}
         />
 
         {location?.state?.modal && (
-        <Modal>
-          <NodeEntriesOverview sessionId={activeSession} />
-        </Modal>
-      )}
+          <Modal>
+            <NodeEntriesOverview sessionId={activeSession} />
+          </Modal>
+        )}
       </Grid>
     </DialogueViewContainer>
   );

@@ -1,5 +1,4 @@
 import * as yup from 'yup';
-import { ApolloError } from 'apollo-boost';
 import {
   Button, Container, Div, Flex, Form, FormGroupContainer, Grid,
   H2, H3, Hr, Muted, StyledInput, StyledLabel,
@@ -43,14 +42,11 @@ const AddCustomerView = () => {
     },
   });
 
-  const [addCustomer, { loading }] = useMutation(createNewCustomer, {
+  const [addCustomer, { loading, error: serverError }] = useMutation(createNewCustomer, {
     onCompleted: () => {
       history.push('/');
     },
     refetchQueries: [{ query: getCustomerQuery }],
-    onError: (serverError: ApolloError) => {
-      console.log(serverError);
-    },
   });
 
   const onChange = (event: any) => {
@@ -78,6 +74,8 @@ const AddCustomerView = () => {
 
   return (
     <Container>
+      {serverError && (<p>{serverError.message}</p>)}
+
       <Div>
         <H2 color="default.darkest" fontWeight={500} py={2}> Customer </H2>
         <Muted pb={4}>Create a new customer</Muted>
@@ -136,7 +134,11 @@ const AddCustomerView = () => {
                   name="seed"
                   ref={register({ required: false })}
                 />
-                <label htmlFor="seed">Generate template topic for customer </label>
+                <label
+                  htmlFor="seed"
+                >
+                  Generate template topic for customer
+                </label>
               </Div>
             </Div>
           </Grid>
