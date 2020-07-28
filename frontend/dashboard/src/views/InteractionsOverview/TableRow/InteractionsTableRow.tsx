@@ -13,8 +13,6 @@ import { InteractionDetailQuestionEntry } from '../InteractionOverviewStyles';
 import { TableRowProps } from './TableRowTypes';
 
 const InteractionTableValue = ({ entry }: { entry: NodeEntry }) => {
-  console.log(entry);
-
   switch (entry.relatedNode?.type) {
     case QuestionNodeTypeEnum.SLIDER:
       return <Div>{entry.value?.sliderNodeEntry}</Div>;
@@ -100,7 +98,7 @@ const InteractionsTableRow = ({ headers, data, index }: TableRowProps<Session>) 
                           {relatedNode?.type === 'SLIDER' ? <SliderNodeIcon /> : <MultiChoiceNodeIcon /> }
                         </Div>
                         <Div useFlex flexDirection="column">
-                          <Span color="#c0bcbb" fontSize="0.8rem" fontWeight="normal" fontStyle="normal">U ASKED</Span>
+                          <Span color="#c0bcbb" fontSize="0.8rem" fontWeight="normal" fontStyle="normal">You asked</Span>
                           <Span fontSize="0.8rem" fontWeight={300}>{relatedNode?.title || 'N/A'}</Span>
                           <Span
                             color="#c0bcbb"
@@ -109,7 +107,7 @@ const InteractionsTableRow = ({ headers, data, index }: TableRowProps<Session>) 
                             fontStyle="normal"
                             mt="4%"
                           >
-                            THEY ANSWERED
+                            Their answer
                           </Span>
                           <Span
                             fontWeight={300}

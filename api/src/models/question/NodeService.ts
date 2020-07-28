@@ -610,11 +610,18 @@ class NodeService {
     );
 
     // Positive Sub sub child 3 (Product/Services)
-    const weThinkYouMightLikeThis = NodeService.getCorrectLeaf(leafs,
-      'We think you might like this as');
+    const weThinkYouMightLikeThis = NodeService.getCorrectLeaf(
+      leafs,
+      'We think you might like this as',
+    );
+
     const whatDidYouToProduct = await NodeService.createQuestionNode(
-      'What exactly did you like about the product / services?', questionnaireId,
-      choiceType, productServicesOptions, false, weThinkYouMightLikeThis,
+      'What exactly did you like about the product / services?',
+      questionnaireId,
+      choiceType,
+      productServicesOptions,
+      false,
+      weThinkYouMightLikeThis,
     );
 
     // Positive Sub sub child 4 (Customer Support)

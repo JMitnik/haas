@@ -74,7 +74,7 @@ const ActionOverview = ({ leafs }: ActionOverviewProps) => {
     setActiveSearchTerm(newSearchTerm);
   }, 250), []);
 
-  const [fetchActions, { data, variables }] = useLazyQuery(getCTANodesQuery, {
+  const [fetchActions, { data }] = useLazyQuery(getCTANodesQuery, {
     fetchPolicy: 'cache-and-network',
     onCompleted: () => {
     },
@@ -116,9 +116,9 @@ const ActionOverview = ({ leafs }: ActionOverviewProps) => {
             </Span>
           </AddCTAButton>
         </Flex>
-        <Div width="40%">
+        <Flex alignItems="center">
           <SearchBar activeSearchTerm={activeSearchTerm} onSearchTermChange={handleSearchTermChange} />
-        </Div>
+        </Flex>
       </Flex>
       {newCTA && (
         <CTAEntry
