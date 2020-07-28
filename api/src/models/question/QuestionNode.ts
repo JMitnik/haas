@@ -40,7 +40,6 @@ export const QuestionNodeType = objectType({
   name: 'QuestionNode',
   definition(t) {
     t.id('id');
-    t.string('updatedAt');
     t.boolean('isLeaf');
     t.boolean('isRoot');
     t.string('title');
@@ -48,6 +47,10 @@ export const QuestionNodeType = objectType({
     t.field('type', { type: QuestionNodeTypeEnum });
     t.string('creationDate', { nullable: true });
     t.string('overrideLeafId', { nullable: true });
+    t.string('updatedAt', {
+      nullable: true,
+      resolve: (parent) => parent.updatedAt?.toString() || '',
+    });
 
     // TODO: Make this required in prisma.
     t.string('questionDialogueId', {
@@ -61,15 +64,17 @@ export const QuestionNodeType = objectType({
 
     t.list.field('links', {
       type: LinkType,
-      resolve(parent: QuestionNode, args: any, ctx: any) {
-        const { prisma } : { prisma: PrismaClient } = ctx;
+      async resolve(parent, args, ctx) {
         if (parent.isLeaf) {
-          return prisma.link.findMany({
+          const links = await ctx.prisma.link.findMany({
             where: {
               questionNodeId: parent.id,
             },
           });
+
+          return links as any;
         }
+
         return [];
       },
     });

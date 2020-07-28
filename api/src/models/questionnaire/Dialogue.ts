@@ -309,6 +309,7 @@ export const DialogueMutations = extendType({
     t.field('copyDialogue', {
       type: DialogueType,
       args: { data: AddDialogueInput },
+
       async resolve(parent, args: any, ctx: any) {
         const {
           data: { dialogueSlug, customerSlug, title, publicTitle, description, tags = [], templateDialogueId },
@@ -322,15 +323,14 @@ export const DialogueMutations = extendType({
         const customers = await prisma.customer.findMany({ where: { slug: customerSlug } });
         const customer = customers?.[0];
 
-        if (!customer) {
-          return null;
-        }
+        if (!customer) throw new Error('Cant find customer related');
 
         return DialogueService.copyDialogue(
           templateDialogueId, customer?.id, title, dialogueSlug, description, publicTitle, dialogueTags,
         );
       },
     });
+
     t.field('createDialogue', {
       type: DialogueType,
       args: { data: AddDialogueInput },

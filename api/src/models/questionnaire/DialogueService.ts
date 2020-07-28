@@ -10,7 +10,8 @@ import NodeService from '../question/NodeService';
 // eslint-disable-next-line import/no-cycle
 import { NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
 // eslint-disable-next-line import/no-cycle
-import { HistoryDataProps, HistoryDataWithEntry, IdMapProps, PathFrequency, QuestionProps, StatisticsProps } from './DialogueTypes';
+import { HistoryDataProps, HistoryDataWithEntry, IdMapProps,
+  PathFrequency, QuestionProps, StatisticsProps } from './DialogueTypes';
 // eslint-disable-next-line import/no-cycle
 import NodeEntryService, { NodeEntryWithTypes } from '../node-entry/NodeEntryService';
 // eslint-disable-next-line import/no-cycle
@@ -601,7 +602,7 @@ class DialogueService {
         input.title,
         input.dialogueSlug,
         input.description,
-        input.publicTitle,
+        input.publicTitle || '',
         [],
       );
     }
@@ -611,7 +612,7 @@ class DialogueService {
       input.title,
       input.dialogueSlug,
       input.description,
-      input.publicTitle,
+      input.publicTitle || '',
       dialogueTags,
     );
 
