@@ -28,8 +28,15 @@ interface FormDataProps {
   matchText: string;
   activeLeaf: string;
   parentQuestionType: string;
-  options: Array<any>;
+  options: Array<string>;
 }
+
+const isChoiceType = (questionType: string) => {
+  if (questionType === 'CHOICE') {
+    return true;
+  }
+  return false;
+};
 
 const schema = yup.object().shape({
   title: yup.string().required(),
@@ -45,14 +52,14 @@ const schema = yup.object().shape({
     otherwise: yup.string().notRequired(),
   }),
   matchText: yup.string().when(['parentQuestionType'], {
-    is: (parentQuestionType: string) => parentQuestionType === 'Multi-Choice',
+    is: (parentQuestionType: string) => parentQuestionType === 'Choice',
     then: yup.string().required(),
     otherwise: yup.string().notRequired(),
   }),
-  options: yup.array().when(['questionType'], {
-    is: (questionType: string) => questionType === 'Multi-Choice',
-    then: yup.array().min(1),
-    otherwise: yup.array().notRequired(),
+  options: yup.array().of(yup.string().min(1)).when(['questionType'], {
+    is: (questionType: string) => isChoiceType(questionType),
+    then: yup.array(yup.string().min(1)).min(1).required(),
+    otherwise: yup.array(yup.string()).notRequired(),
   }),
 });
 
@@ -100,6 +107,7 @@ const QuestionEntryForm = ({
     validationSchema: schema,
     defaultValues: {
       parentQuestionType,
+      options: [],
     },
   });
 
@@ -255,7 +263,7 @@ const QuestionEntryForm = ({
   const handleOptionChange = (event: any, optionIndex: number) => {
     const { value } = event.target;
     setActiveOptions((prevOptions) => {
-      prevOptions[optionIndex] = { value, publicValue: '' };
+      prevOptions[optionIndex] = { value: value || '', publicValue: '' };
       return [...prevOptions];
     });
   };
@@ -282,32 +290,33 @@ const QuestionEntryForm = ({
     const overrideLeafId = activeLeaf?.value;
     const options = { options: activeOptions };
     const edgeCondition = activeCondition;
-    if (question.id !== '-1') {
-      updateQuestion({
-        variables: {
-          id,
-          title,
-          type,
-          overrideLeafId: overrideLeafId || '',
-          edgeId: edgeId || '-1',
-          optionEntries: options,
-          edgeCondition,
-        },
-      });
-    } else {
-      createQuestion({
-        variables: {
-          customerSlug,
-          dialogueSlug,
-          title,
-          type,
-          overrideLeafId: overrideLeafId || 'None',
-          parentQuestionId,
-          optionEntries: options,
-          edgeCondition,
-        },
-      });
-    }
+    console.log('form data: ', formData);
+    // if (question.id !== '-1') {
+    //   updateQuestion({
+    //     variables: {
+    //       id,
+    //       title,
+    //       type,
+    //       overrideLeafId: overrideLeafId || '',
+    //       edgeId: edgeId || '-1',
+    //       optionEntries: options,
+    //       edgeCondition,
+    //     },
+    //   });
+    // } else {
+    //   createQuestion({
+    //     variables: {
+    //       customerSlug,
+    //       dialogueSlug,
+    //       title,
+    //       type,
+    //       overrideLeafId: overrideLeafId || 'None',
+    //       parentQuestionId,
+    //       optionEntries: options,
+    //       edgeCondition,
+    //     },
+    //   });
+    // }
   };
 
   const ErrorStyle = {
@@ -437,28 +446,28 @@ const QuestionEntryForm = ({
                     <Hr />
                   </Div>
 
-                    {((activeOptions && activeOptions.length === 0) || (!activeOptions)) && (
-                    <Div alignSelf="center">
-                      No options available...
-                    </Div>
-                    )}
-                    { errors.options && <Muted>something went wrong with options</Muted>}
+                    { !activeOptions.length && errors.options?.length && <Muted>Please add at least one option </Muted>}
                     {activeOptions && activeOptions.map((option, optionIndex) => (
-                      <Flex key={`${option.id}-${optionIndex}-${option.value}`} my={1} flexDirection="row">
-                        <StyledInput
-                          hasError={!!errors.options}
-                          key={`input-${id}-${optionIndex}`}
-                          name={`options[${optionIndex}].value`}
-                          ref={register({ required: true })}
-                          defaultValue={option.value}
-                          onBlur={(e) => handleOptionChange(e, optionIndex)}
-                        />
-                        {errors.options && <Muted color="warning">Something went wrong!</Muted>}
-                        <DeleteQuestionOptionButtonContainer
-                          onClick={(e) => deleteOption(e, optionIndex)}
-                        >
-                          <MinusCircle />
-                        </DeleteQuestionOptionButtonContainer>
+                      <Flex key={`${option.id}-${optionIndex}-${option.value}`} flexDirection="column">
+                        <Flex my={1} flexDirection="row">
+                          <StyledInput
+                            hasError={!!errors.options?.[optionIndex]}
+                            key={`input-${id}-${optionIndex}`}
+                            name={`options[${optionIndex}]`}
+                            ref={register(
+                              { required: true,
+                                minLength: 1 },
+                            )}
+                            defaultValue={option.value}
+                            onBlur={(e) => handleOptionChange(e, optionIndex)}
+                          />
+                          <DeleteQuestionOptionButtonContainer
+                            onClick={(e) => deleteOption(e, optionIndex)}
+                          >
+                            <MinusCircle />
+                          </DeleteQuestionOptionButtonContainer>
+                        </Flex>
+                        {/* {errors.options?.[optionIndex] && <Muted color="warning">{errors.options?.[optionIndex]?.message}</Muted>} */}
                       </Flex>
                     ))}
                 </>
