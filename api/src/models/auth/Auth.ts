@@ -54,6 +54,6 @@ export const LoginMutation = mutationField('login', {
   args: { input: LoginInput },
 
   async resolve(parent, args) {
-    const user = await AuthService.loginUser(args.input);
+    return null;
   },
 });

@@ -79,7 +79,9 @@ const TriggerType = objectType({
     t.list.field('recipients', {
       type: UserType,
       async resolve(parent, args, ctx) {
-        const users = await ctx.prisma.user.findMany({ where: { customers: { some: { triggers: { some: { id: parent.id } } } } } });
+        const users = await ctx.prisma.user.findMany({
+          where: { triggers: { some: { id: parent.id } } },
+        });
 
         return users || [];
       },

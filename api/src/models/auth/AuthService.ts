@@ -1,8 +1,7 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
-import { AuthRegistrationsCredentialListMappingContext } from 'twilio/lib/rest/api/v2010/account/sip/domain/authTypes/authRegistrationsMapping/authRegistrationsCredentialListMapping';
-import { NexusGenFieldTypes, NexusGenInputs } from '../../generated/nexus';
+import { NexusGenInputs } from '../../generated/nexus';
 import RoleService from '../role/RoleService';
 import config from '../../config';
 import prisma from '../../prisma';
@@ -86,15 +85,17 @@ class AuthService {
   static async loginUser(userInput: NexusGenInputs['LoginInput']) {
     const user = await prisma.user.findOne({ where: { email: userInput.email } });
 
-    const isValidPassword = AuthService.checkPassword(user?.password, userInput.password);
+    if (!user?.password) throw new Error('Something seems wrong with your account. Contact the admin for more info');
+
+    const isValidPassword = AuthService.checkPassword(userInput.password, user?.password);
 
     if (!isValidPassword) throw new Error('Login credentials invalid');
 
     return user;
   }
 
-  static async checkPassword(userPassword: string, inputPassword: string) {
-    return bcrypt.compare(userPassword, userInput);
+  static async checkPassword(dbPassword: string, inputPassword: string) {
+    return bcrypt.compare(inputPassword, dbPassword);
   }
 
   static async generatePassword(passwordInput: string) {

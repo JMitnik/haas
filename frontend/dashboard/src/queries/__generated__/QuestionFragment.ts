@@ -57,6 +57,7 @@ export interface QuestionFragment {
   id: string;
   title: string;
   creationDate: string | null;
+  updatedAt: string | null;
   isRoot: boolean;
   isLeaf: boolean;
   overrideLeaf: QuestionFragment_overrideLeaf | null;

@@ -1,10 +1,15 @@
 import { Redirect } from 'react-router';
 import React from 'react';
 
+import { useAuth } from 'providers/AuthProvider';
 import { useCustomer } from 'providers/CustomerProvider';
 
 const DashboardPage = () => {
+  const { user } = useAuth();
+
   const { activeCustomer, storageCustomer } = useCustomer();
+
+  if (!user) return <Redirect to="/login" />;
 
   if (activeCustomer) {
     return (

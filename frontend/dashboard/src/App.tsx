@@ -32,6 +32,7 @@ import DashboardLayout from 'layouts/DashboardLayout';
 
 import AuthProvider from 'providers/AuthProvider';
 import DialogueLayout from 'layouts/DialogueLayout';
+import LoginPage from 'pages/login';
 import client from './config/apollo';
 
 const AppRoutes = () => (
@@ -157,6 +158,8 @@ const AppRoutes = () => (
 
     <Route path="/dashboard/b/" render={() => <CustomersPage />} />
     <Route path="/dashboard" render={() => <DashboardPage />} />
+
+    <Route path="/login"><LoginPage /></Route>
 
     <Route path="/">
       <Redirect to="/dashboard" />

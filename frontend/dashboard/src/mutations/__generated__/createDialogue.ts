@@ -25,6 +25,7 @@ export interface createDialogueVariables {
   title?: string | null;
   description?: string | null;
   publicTitle?: string | null;
-  isSeed?: boolean | null;
+  contentType?: string | null;
+  templateDialogueId?: string | null;
   tags?: TagsInputObjectType | null;
 }
