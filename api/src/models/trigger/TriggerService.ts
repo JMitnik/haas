@@ -137,7 +137,7 @@ class TriggerService {
     const safeToSend = !trigger.lastSent || isAfter(subSeconds(currentDate, 5), trigger.lastSent);
 
     if (safeToSend) {
-      // TODO: Do we have to await this function? can just let it run on the side
+      // TODO-LATER: Put this part into a queue
       await prisma.trigger.update(({ where: { id: trigger.id }, data: { lastSent: currentDate } }));
 
       const { data } = entries.find((entry) => entry.nodeId === trigger.relatedNodeId);
@@ -190,22 +190,22 @@ class TriggerService {
     },
   });
 
-  static match = (
-    triggerCondition: TriggerCondition,
-    answer: { numberValue: number | null, textValue: string | null },
-  ) => {
+  static match(triggerCondition: TriggerCondition, answer: { numberValue: number | null, textValue: string | null }) {
     let conditionMatched;
+
     switch (triggerCondition.type) {
       case 'HIGH_THRESHOLD':
         conditionMatched = ((answer?.numberValue || answer?.numberValue === 0) && triggerCondition?.maxValue)
           ? { isMatch: answer.numberValue >= triggerCondition.maxValue, value: answer.numberValue }
           : { isMatch: false };
         break;
+
       case 'LOW_THRESHOLD':
         conditionMatched = ((answer?.numberValue || answer?.numberValue === 0) && triggerCondition.minValue)
           ? { isMatch: answer.numberValue <= triggerCondition.minValue, value: answer.numberValue }
           : { isMatch: false };
         break;
+
       case 'TEXT_MATCH':
         conditionMatched = (answer?.textValue && triggerCondition.textValue)
           ? {
@@ -214,6 +214,7 @@ class TriggerService {
           }
           : { isMatch: false };
         break;
+
       case 'OUTER_RANGE':
         conditionMatched = ((answer?.numberValue || answer?.numberValue === 0) && triggerCondition.maxValue && (triggerCondition.minValue || triggerCondition.minValue === 0))
           ? {
@@ -223,6 +224,7 @@ class TriggerService {
           }
           : { isMatch: false };
         break;
+
       case 'INNER_RANGE':
         conditionMatched = (answer?.numberValue || answer?.numberValue === 0)
         && triggerCondition.maxValue
@@ -234,11 +236,13 @@ class TriggerService {
           }
           : { isMatch: false };
         break;
+
       default:
         conditionMatched = { isMatch: false };
     }
+
     return conditionMatched;
-  };
+  }
 
   static updateRelatedQuestion = (
     dbTriggerRelatedNodeId: string | null | undefined,
