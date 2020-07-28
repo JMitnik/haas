@@ -1,7 +1,7 @@
 import { useHistory, useParams } from 'react-router';
 import React from 'react';
 
-import { Card, CardBody, Flex, H3, Paragraph, Span, H2 } from '@haas/ui';
+import { Card, CardBody, Flex, H2, H3, Paragraph, Span } from '@haas/ui';
 
 const SummeryAverageScoreModule = ({ averageScore }: { averageScore: number }) => {
   const { customerSlug, dialogueSlug } = useParams();

@@ -4,14 +4,18 @@ import { useParams } from 'react-router';
 import Papa from 'papaparse';
 import React, { useCallback, useEffect, useState } from 'react';
 
-import { Div, H2, Muted, Span } from '@haas/ui';
+import {
+  getDialogueSessionConnection as CustomerSessionConnection,
+} from 'queries/__generated__/getDialogueSessionConnection';
+import { Div, Muted, Span } from '@haas/ui';
 import DatePicker from 'components/DatePicker/DatePicker';
 import InteractionsTable from 'components/Table/Table';
 import SearchBar from 'components/SearchBar/SearchBar';
-import getInteractionsQuery from 'queries/getInteractionsQuery';
+import getDialogueSessionConnectionQuery from 'queries/getDialogueSessionConnectionQuery';
 
 import { CenterCell, ScoreCell, UserCell, WhenCell } from './TableCell/TableCell';
-import { InputContainer, InputOutputContainer, InteractionsOverviewContainer, OutputContainer } from './InteractionOverviewStyles';
+import { InputContainer, InputOutputContainer,
+  InteractionsOverviewContainer, OutputContainer } from './InteractionOverviewStyles';
 import Row from './TableRow/InteractionsTableRow';
 
 interface TableProps {
@@ -21,7 +25,7 @@ interface TableProps {
   pageIndex: number;
   pageSize: number;
   sortBy: {
-    id: string;
+    by: string;
     desc: boolean;
   }[]
 }
@@ -35,13 +39,8 @@ const HEADERS = [
 
 const InteractionsOverview = () => {
   const { dialogueSlug, customerSlug } = useParams();
-  const [fetchInteractions, { data }] = useLazyQuery(getInteractionsQuery, {
+  const [fetchInteractions, { data }] = useLazyQuery<CustomerSessionConnection>(getDialogueSessionConnectionQuery, {
     fetchPolicy: 'cache-and-network',
-    onCompleted: () => {
-    },
-    onError: (error: any) => {
-      console.log(error);
-    }
   });
 
   const [paginationProps, setPaginationProps] = useState<TableProps>({
@@ -50,10 +49,10 @@ const InteractionsOverview = () => {
     activeSearchTerm: '',
     pageIndex: 0,
     pageSize: 8,
-    sortBy: [{ id: 'id', desc: true }],
+    sortBy: [{ by: 'score', desc: true }],
   });
 
-  const interactions = data?.customer?.dialogue?.interactions?.sessions || [];
+  const sessions = data?.customer?.dialogue?.sessionConnection?.sessions || [];
 
   useEffect(() => {
     const { activeStartDate, activeEndDate, pageIndex, pageSize, sortBy, activeSearchTerm } = paginationProps;
@@ -75,16 +74,16 @@ const InteractionsOverview = () => {
   }, [paginationProps, fetchInteractions, dialogueSlug, customerSlug]);
 
   const handleSearchTermChange = useCallback(debounce((newSearchTerm: string) => {
-    setPaginationProps((prevValues) => ({ ...prevValues, activeSearchTerm: newSearchTerm }));
+    setPaginationProps((prevValues) => ({ ...prevValues, activeSearchTerm: newSearchTerm, pageIndex: 0 }));
   }, 250), []);
 
   const handleDateChange = useCallback(debounce((startDate: Date | null, endDate: Date | null) => {
-    setPaginationProps((prevValues) => ({ ...prevValues, activeStartDate: startDate, activeEndDate: endDate }));
+    setPaginationProps((prevValues) => ({ ...prevValues, activeStartDate: startDate, activeEndDate: endDate, pageIndex: 0 }));
   }, 250), []);
 
   // TODO: Make this into a custom hook / utility function
   const handleExportCSV = (): void => {
-    const csv = Papa.unparse(interactions);
+    const csv = Papa.unparse(sessions);
     const csvData = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const csvUrl = window.URL.createObjectURL(csvData);
     const tempLink = document.createElement('a');
@@ -96,8 +95,8 @@ const InteractionsOverview = () => {
     tempLink.remove();
   };
 
-  const pageCount = data?.customer?.dialogue?.interactions?.pages || 1;
-  const pageIndex = data?.customer?.dialogue?.interactions?.pageIndex || 0;
+  const pageCount = data?.customer?.dialogue?.sessionConnection?.pageInfo.nrPages || 1;
+  const pageIndex = data?.customer?.dialogue?.sessionConnection?.pageInfo.pageIndex || 0;
 
   return (
     <InteractionsOverviewContainer>
@@ -121,6 +120,7 @@ const InteractionsOverview = () => {
             <Span fontWeight="bold">CSV</Span>
           </Div>
         </OutputContainer>
+
         <InputContainer>
           <DatePicker
             activeStartDate={paginationProps.activeStartDate}
@@ -132,13 +132,14 @@ const InteractionsOverview = () => {
             onSearchTermChange={handleSearchTermChange}
           />
         </InputContainer>
+
       </InputOutputContainer>
       <Div backgroundColor="#fdfbfe" mb="1%" height="65%">
         <InteractionsTable
           headers={HEADERS}
           paginationProps={{ ...paginationProps, pageCount, pageIndex }}
           onPaginationChange={setPaginationProps}
-          data={interactions}
+          data={sessions}
           CustomRow={Row}
         />
       </Div>

@@ -3,8 +3,8 @@ import { useForm } from 'react-hook-form';
 import React from 'react';
 
 import { Div } from '@haas/ui';
-import { HAASFormEntry } from 'types/generic';
 import { NodeTitle } from 'layouts/NodeLayout/NodeLayoutStyles';
+import { SessionEntryDataProps } from 'models/Session/SessionEntryModel';
 import { cleanInt } from 'utils/cleanInt';
 
 import { GenericNodeProps } from '../types';
@@ -25,40 +25,29 @@ const sliderValueAnimeVariants = {
 const SliderNode = ({ node, onEntryStore }: SliderNodeProps) => {
   const controls = useAnimation();
 
-  const { watch, getValues, triggerValidation, register } = useForm<HAASFormEntry>({
+  const { watch, getValues, triggerValidation, register } = useForm<{slider: number}>({
     defaultValues: {
-      numberValue: 50.01,
+      slider: 50.01,
     },
   });
 
-  const formatSliderEntry = (entry: HAASFormEntry) => {
-    const { numberValue, ...entryVals } = entry;
-
-    if (numberValue) {
-      return { ...entryVals, numberValue: cleanInt(numberValue) };
-    }
-
-    return entry;
-  };
-
   const handleSubmit = async () => {
-    const validForm = await triggerValidation('numberValue');
+    const validForm = await triggerValidation('slider');
 
     if (validForm) {
-      const formEntry = formatSliderEntry(getValues({ nest: true }));
-
-      const entry: any = {
-        numberValue: formEntry.numberValue,
-        textValue: null,
-        multiValues: null,
+      const entry: SessionEntryDataProps = {
+        slider: { value: cleanInt(getValues().slider) },
+        choice: undefined,
+        register: undefined,
+        textbox: undefined,
       };
 
-      onEntryStore(entry, formEntry.numberValue);
+      onEntryStore(entry, entry.slider?.value);
     }
   };
 
   const showValue = () => {
-    const val = watch({ nest: true }).numberValue;
+    const val = watch({ nest: true }).slider;
 
     if (val) return Number(val / 10).toFixed(1);
 
@@ -76,6 +65,7 @@ const SliderNode = ({ node, onEntryStore }: SliderNodeProps) => {
         </SliderNodeValue>
         <Slider onSubmit={handleSubmit} register={register} animationControls={controls} />
       </Div>
+
     </SliderNodeContainer>
   );
 };

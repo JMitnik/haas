@@ -61,7 +61,7 @@ model Customer {
   tags        Tag[]
 }
 
-enum TagType {
+enum TagEnum {
   DEFAULT
   AGENT
   LOCATION
@@ -69,11 +69,11 @@ enum TagType {
 
 model Tag {
   id         String     @default(cuid()) @id
-  type       TagType
+  type       TagEnum
   name       String
   isTagOf    Dialogue[] @relation(references: [id])
-  customer   Customer?  @relation(fields: [customerId], references: [id])
-  customerId String?
+  customer   Customer  @relation(fields: [customerId], references: [id])
+  customerId String
 }
 
 model Dialogue {
@@ -92,6 +92,15 @@ model Dialogue {
   tags         Tag[]
 }
 
+enum NodeType {
+  GENERIC
+  SLIDER
+  CHOICE
+  REGISTRATION
+  TEXTBOX
+  LINK
+}
+
 model QuestionNode {
   id                         String           @default(cuid()) @id
   creationDate               DateTime         @default(now())
@@ -99,19 +108,24 @@ model QuestionNode {
   isLeaf                     Boolean          @default(false)
   isRoot                     Boolean          @default(false)
   title                      String
-  type                       String
+  type                       NodeType         @default(value: GENERIC)
   options                    QuestionOption[]
   children                   Edge[]
+
   overrideLeafId             String?
   overrideLeaf               QuestionNode?    @relation("QNodeToOverrideLeaf", fields: [overrideLeafId], references: [id])
   isOverrideLeafOf           QuestionNode[]   @relation("QNodeToOverrideLeaf")
+  
   questionDialogue           Dialogue?        @relation(fields: [questionDialogueId], references: [id])
   questionDialogueId         String?
+  
   isChildNodeOf              Edge[]           @relation("Edge_childNodeToQuestionNode")
   isParentNodeOf             Edge[]           @relation("Edge_parentNodeToQuestionNode")
   isRelatedNodeOfNodeEntries NodeEntry[]
+  
   edgeId                     String?
   Edge                       Edge?            @relation("EdgeChildrenRelation", fields: [edgeId], references: [id])
+  
   QuestionOption             QuestionOption[] @relation("QuestionNodeOptions")
   triggers                   Trigger[]
   links                      Link[]
@@ -185,6 +199,8 @@ model Session {
   nodeEntries NodeEntry[]
 }
 
+// Node-entry types
+
 model NodeEntry {
   id            String           @default(cuid()) @id
   creationDate  DateTime         @default(now())
@@ -195,19 +211,51 @@ model NodeEntry {
   session       Session?         @relation(fields: [sessionId], references: [id])
   relatedNode   QuestionNode?    @relation(fields: [relatedNodeId], references: [id])
   relatedEdge   Edge?            @relation(fields: [relatedEdgeId], references: [id])
-  values        NodeEntryValue[]
+  
+  // Entry types
+  sliderNodeEntry SliderNodeEntry?
+  choiceNodeEntry ChoiceNodeEntry?
+  textboxNodeEntry TextboxNodeEntry?
+  registrationNodeEntry RegistrationNodeEntry?
+  linkNodeEntry LinkNodeEntry?
 }
 
-model NodeEntryValue {
-  id                     Int              @default(autoincrement()) @id
-  numberValue            Int?
-  textValue              String?
-  parentNodeEntryValueId Int?
-  parentNodeEntryValue   NodeEntryValue?  @relation("NodeEntryValueToNodeEntryValue", fields: [parentNodeEntryValueId], references: [id])
-  multiValues            NodeEntryValue[] @relation("NodeEntryValueToNodeEntryValue")
-  nodeEntryId            String?
-  NodeEntry              NodeEntry?       @relation(fields: [nodeEntryId], references: [id])
+model LinkNodeEntry {
+  id  Int  @default(autoincrement()) @id
+  value Json?
+  nodeEntryId String
+  nodeEntry NodeEntry @relation(references: [id], fields: [nodeEntryId])
 }
+
+model SliderNodeEntry {
+  id  Int  @default(autoincrement()) @id
+  value Int?
+  nodeEntryId String
+  nodeEntry NodeEntry @relation(references: [id], fields: [nodeEntryId])
+}
+
+model ChoiceNodeEntry {
+  id  Int  @default(autoincrement()) @id
+  value String?
+  nodeEntryId String
+  nodeEntry NodeEntry @relation(references: [id], fields: [nodeEntryId])
+}
+
+model TextboxNodeEntry {
+  id  Int  @default(autoincrement()) @id
+  value String?
+  nodeEntryId String
+  nodeEntry NodeEntry @relation(references: [id], fields: [nodeEntryId])
+}
+
+model RegistrationNodeEntry {
+  id  Int  @default(autoincrement()) @id
+  value Json?
+  nodeEntryId String
+  nodeEntry NodeEntry @relation(references: [id], fields: [nodeEntryId])
+}
+
+// Permissions
 
 model Permission {
   id                 String    @default(cuid()) @id
@@ -245,7 +293,7 @@ model User {
   @@unique([customerId, email])
 }
 
-enum TriggerType {
+enum TriggerEnum {
   QUESTION
   SCHEDULED
 }
@@ -256,7 +304,7 @@ enum TriggerMedium {
   BOTH
 }
 
-enum TriggerConditionType {
+enum TriggerConditionEnum {
   LOW_THRESHOLD
   HIGH_THRESHOLD
   INNER_RANGE
@@ -266,19 +314,19 @@ enum TriggerConditionType {
 
 model TriggerCondition {
   id        Int                  @default(autoincrement()) @id
-  type      TriggerConditionType
+  type      TriggerConditionEnum
   minValue  Int?
   maxValue  Int?
   textValue String?
-  trigger   Trigger?             @relation(fields: [triggerId], references: [id])
-  triggerId String?
+  trigger   Trigger             @relation(fields: [triggerId], references: [id])
+  triggerId String
 }
 
 model Trigger {
   id            String             @default(cuid()) @id
   lastSent      DateTime?
   name          String
-  type          TriggerType
+  type          TriggerEnum
   medium        TriggerMedium
   conditions    TriggerCondition[]
   relatedNodeId String?

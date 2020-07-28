@@ -203,6 +203,11 @@ const EditTriggerForm = (
     },
   });
 
+  const handleDialogueChange = (questionOption: any) => {
+    setActiveDialogue(questionOption);
+    setActiveQuestion(null);
+  };
+
   const onSubmit = (formData: FormDataProps) => {
     const questionId = activeQuestion?.value;
     const userIds = activeRecipients.map((recipient) => recipient?.value);
@@ -349,7 +354,7 @@ const EditTriggerForm = (
                     options={dialogues}
                     value={activeDialogue}
                     onChange={(qOption: any) => {
-                      setActiveDialogue(qOption);
+                      handleDialogueChange(qOption);
                     }}
                   />
                 </Div>
@@ -410,8 +415,7 @@ const EditTriggerForm = (
                         </DeleteButtonContainer>
                         <Select
                           options={setConditionTypeOptions(
-                            activeQuestion?.value,
-                            questionsData?.customer?.dialogue?.questions,
+                            activeQuestion?.value, questionsData?.customer?.dialogue?.questions,
                           )}
                           value={condition.type}
                           onChange={(qOption: any) => setConditionsType(qOption, index)}

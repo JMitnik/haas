@@ -1,3 +1,4 @@
+import { useErrorHandler } from 'react-error-boundary';
 import { useQuery } from '@apollo/react-hooks';
 import React from 'react';
 
@@ -8,9 +9,9 @@ import Loader from 'components/Loader';
 const CustomersPage = () => {
   const { data, loading, error } = useQuery(getCustomerQuery);
   const customers = data?.customers;
+  useErrorHandler(error);
 
   if (loading) return <Loader />;
-  if (error) return <p>{error.message}</p>;
 
   return <CustomerOverview customers={customers} />;
 };

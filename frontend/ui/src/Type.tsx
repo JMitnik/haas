@@ -23,7 +23,7 @@ export const H2 = styled(GenericType).attrs({ as: 'h2' })`
   `}
 `;
 
-export const PageHeading = styled(H2)`
+export const PageHeading = styled(H2, ).attrs({ 'data-cy': 'PageHeading', role: 'heading' })`
   ${({ theme }) => css`
     margin-bottom: ${theme.gutter}px;
   `}
@@ -49,7 +49,7 @@ export const H5 = styled(GenericType).attrs({ as: 'h5' })`
 
 export const Muted = styled(GenericType).attrs({ as: 'p' })`
   ${({ theme }) => css`
-    font-weight: 300;
+    font-weight: 500;
     font-size: 0.8rem;
     color: ${theme.colors.default.dark};
   `}

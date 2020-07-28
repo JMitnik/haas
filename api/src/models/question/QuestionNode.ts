@@ -1,45 +1,80 @@
-import { LinkUpdateManyWithoutQuestionNodeInput, PrismaClient, QuestionNode, QuestionNodeUpdateInput } from '@prisma/client';
+import { PrismaClient, QuestionNode, QuestionNodeUpdateInput } from '@prisma/client';
+import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
+
+// eslint-disable-next-line import/no-cycle
 import { CTALinksInputType, LinkType } from '../link/Link';
+// eslint-disable-next-line import/named
 import { DialogueType } from '../questionnaire/Dialogue';
+// eslint-disable-next-line import/no-cycle
 import { EdgeType } from '../edge/Edge';
-import { extendType, inputObjectType, objectType } from '@nexus/schema';
-import { number } from 'yup';
-import NodeResolver from './node-resolver';
+import NodeService from './NodeService';
 
 export const QuestionOptionType = objectType({
   name: 'QuestionOption',
   definition(t) {
     t.int('id');
     t.string('value');
+
+    // TODO: Make this required in prisma.
+    t.string('questionId', {
+      nullable: true,
+      resolve(parent) {
+        if (!parent.questionId) return '';
+
+        return parent.questionId;
+      },
+    });
+
     t.string('publicValue', { nullable: true });
-    t.string('questionId');
   },
+});
+
+export const QuestionNodeTypeEnum = enumType({
+  name: 'QuestionNodeTypeEnum',
+  description: 'The different types a node can assume',
+
+  members: ['GENERIC', 'SLIDER', 'CHOICE', 'REGISTRATION', 'TEXTBOX', 'LINK'],
 });
 
 export const QuestionNodeType = objectType({
   name: 'QuestionNode',
   definition(t) {
     t.id('id');
-    t.string('creationDate', { nullable: true });
-    t.string('updatedAt');
     t.boolean('isLeaf');
     t.boolean('isRoot');
     t.string('title');
-    t.string('type');
+    t.string('creationDate', { nullable: true });
+    t.field('type', { type: QuestionNodeTypeEnum });
+    t.string('creationDate', { nullable: true });
     t.string('overrideLeafId', { nullable: true });
-    t.string('questionDialogueId');
+    t.string('updatedAt', {
+      nullable: true,
+      resolve: (parent) => parent.updatedAt?.toString() || '',
+    });
+
+    // TODO: Make this required in prisma.
+    t.string('questionDialogueId', {
+      nullable: true,
+      resolve(parent) {
+        if (!parent.questionDialogueId) return '';
+
+        return parent.questionDialogueId;
+      },
+    });
 
     t.list.field('links', {
       type: LinkType,
-      resolve(parent: QuestionNode, args: any, ctx: any) {
-        const { prisma } : { prisma: PrismaClient } = ctx;
+      async resolve(parent, args, ctx) {
         if (parent.isLeaf) {
-          return prisma.link.findMany({
+          const links = await ctx.prisma.link.findMany({
             where: {
               questionNodeId: parent.id,
             },
           });
+
+          return links as any;
         }
+
         return [];
       },
     });
@@ -47,46 +82,49 @@ export const QuestionNodeType = objectType({
     t.field('questionDialogue', {
       type: DialogueType,
       nullable: true,
-      resolve(parent: QuestionNode, args: any, ctx: any, info: any) {
-        const { prisma } : { prisma: PrismaClient } = ctx;
+
+      resolve(parent, args, ctx) {
         if (parent.questionDialogueId) {
-          return prisma.dialogue.findOne({
+          return ctx.prisma.dialogue.findOne({
             where: {
               id: parent.questionDialogueId,
             },
           });
         }
+
         return null;
       },
     });
+
     t.field('overrideLeaf', {
       type: QuestionNodeType,
       nullable: true,
-      resolve(parent: QuestionNode, args: any, ctx: any, info: any) {
-        const { prisma }: { prisma: PrismaClient } = ctx;
-        const overrideLeaf = prisma.questionNode.findOne(
-          { where: { id: parent.id } },
-        ).overrideLeaf();
+
+      resolve(parent, args, ctx) {
+        const overrideLeaf = ctx.prisma.questionNode.findOne({
+          where: { id: parent.id },
+        }).overrideLeaf();
+
         return overrideLeaf;
       },
     });
+
     t.list.field('options', {
       type: QuestionOptionType,
-      resolve(parent: QuestionNode, args: any, ctx: any, info: any) {
-        const { prisma }: { prisma: PrismaClient } = ctx;
-        const options = prisma.questionOption.findMany({
-          where: {
-            questionNodeId: parent.id,
-          },
+
+      resolve(parent, args, ctx) {
+        const options = ctx.prisma.questionOption.findMany({
+          where: { questionNodeId: parent.id },
         });
+
         return options;
       },
     });
+
     t.list.field('children', {
       type: EdgeType,
-      resolve(parent: QuestionNode, args: any, ctx: any, info: any) {
-        const { prisma }: { prisma: PrismaClient } = ctx;
-        const children = prisma.edge.findMany({
+      resolve(parent, args, ctx) {
+        const children = ctx.prisma.edge.findMany({
           where: {
             parentNodeId: parent.id,
           },
@@ -107,6 +145,7 @@ export const QuestionNodeWhereInputType = inputObjectType({
 
 export const QuestionNodeInput = inputObjectType({
   name: 'QuestionNodeWhereUniqueInput',
+
   definition(t) {
     t.string('id', { required: true });
   },
@@ -149,6 +188,8 @@ export const QuestionNodeMutations = extendType({
         customerSlug: 'String',
         dialogueSlug: 'String',
       },
+      // TODO: Remove the any
+      // @ts-ignore
       async resolve(parent: any, args: any, ctx: any) {
         const { id, customerSlug, dialogueSlug } = args;
         const { prisma }: { prisma: PrismaClient } = ctx;
@@ -182,13 +223,18 @@ export const QuestionNodeMutations = extendType({
 
         const dialogue = customer?.dialogues[0];
 
-        if (dialogue) {
-          return NodeResolver.deleteQuestionFromBuilder(id, dialogue);
+        if (!dialogue) {
+          throw new Error('No dialogue found to be removed');
         }
 
-        return null;
+        const deletedDialogues = await NodeService.deleteQuestionFromBuilder(id, dialogue);
+
+        if (!deletedDialogues) throw new Error('Unable to delete dialogue');
+
+        return deletedDialogues;
       },
     });
+
     t.field('updateQuestion', {
       type: QuestionNodeType,
       args: {
@@ -200,11 +246,12 @@ export const QuestionNodeMutations = extendType({
         optionEntries: OptionsInputType,
         edgeCondition: EdgeConditionInputType,
       },
-      resolve(parent: any, args: any, ctx: any) {
+      // TODO: Remove the any
+      resolve(parent: any, args: any) {
         const { id, title, type, overrideLeafId, edgeId, optionEntries, edgeCondition } = args;
         const { options } = optionEntries;
 
-        return NodeResolver.updateQuestionFromBuilder(id, title, type, overrideLeafId, edgeId, options, edgeCondition);
+        return NodeService.updateQuestionFromBuilder(id, title, type, overrideLeafId, edgeId, options, edgeCondition);
       },
     });
 
@@ -221,8 +268,10 @@ export const QuestionNodeMutations = extendType({
         optionEntries: OptionsInputType,
         edgeCondition: EdgeConditionInputType,
       },
+      // TODO: Remove the any
       async resolve(parent: any, args: any, ctx: any) {
         const { prisma }: { prisma: PrismaClient } = ctx;
+        // eslint-disable-next-line max-len
         const { customerSlug, dialogueSlug, title, type, overrideLeafId, parentQuestionId, optionEntries, edgeCondition } = args;
         const { options } = optionEntries;
 
@@ -243,7 +292,7 @@ export const QuestionNodeMutations = extendType({
         const dialogueId = dialogue?.id;
 
         if (dialogueId) {
-          return NodeResolver.createQuestionFromBuilder(
+          return NodeService.createQuestionFromBuilder(
             dialogueId, title, type, overrideLeafId, parentQuestionId, options, edgeCondition,
           );
         }
@@ -274,10 +323,10 @@ export const QuestionNodeMutations = extendType({
 
         const questionNodeUpdateInput: QuestionNodeUpdateInput = { title, type };
         if (dbQuestionNode?.links) {
-          await NodeResolver.removeNonExistingLinks(dbQuestionNode?.links, links?.linkTypes);
+          await NodeService.removeNonExistingLinks(dbQuestionNode?.links, links?.linkTypes);
         }
 
-        await NodeResolver.upsertLinks(links?.linkTypes, id);
+        await NodeService.upsertLinks(links?.linkTypes, id);
 
         return prisma.questionNode.update({
           where: {
@@ -353,27 +402,30 @@ export const QuestionNodeMutations = extendType({
 
 export const getQuestionNodeQuery = extendType({
   type: 'Query',
+
   definition(t) {
     t.field('questionNode', {
       type: QuestionNodeType,
       args: {
         where: QuestionNodeInput,
       },
-      resolve(parent: any, args: any, ctx: any, info: any) {
-        const { prisma }: { prisma: PrismaClient } = ctx;
-        const questionNode = prisma.questionNode.findOne({
-          where: {
-            id: args.where.id,
-          },
+      nullable: true,
+
+      async resolve(parent, args, ctx) {
+        if (!args.where?.id) return null;
+
+        const questionNode = await ctx.prisma.questionNode.findOne({
+          where: { id: args.where.id },
         });
+
         return questionNode;
       },
     });
+
     t.list.field('questionNodes', {
       type: QuestionNodeType,
-      resolve(parent: any, args: any, ctx: any, info: any) {
-        const { prisma }: { prisma: PrismaClient } = ctx;
-        return prisma.questionNode.findMany();
+      resolve(parent, args, ctx) {
+        return ctx.prisma.questionNode.findMany();
       },
     });
   },

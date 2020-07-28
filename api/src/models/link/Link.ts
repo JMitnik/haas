@@ -1,6 +1,6 @@
-import { Link, PrismaClient } from '@prisma/client';
 import { enumType, inputObjectType, objectType } from '@nexus/schema';
 
+// eslint-disable-next-line import/no-cycle
 import { QuestionNodeType } from '../question/QuestionNode';
 
 export const LinkTypeEnumType = enumType({
@@ -23,7 +23,7 @@ export const CTALinkInputObjectType = inputObjectType({
 
     t.string('id', { nullable: true });
     t.string('title', { nullable: true });
-    t.string('icon', { nullable: true });
+    t.string('iconUrl', { nullable: true });
     t.string('backgroundColor', { nullable: true });
   },
 });
@@ -42,7 +42,7 @@ export const LinkType = objectType({
   definition(t) {
     t.string('id');
     t.string('url');
-    t.string('questionNodeId');
+    t.string('questionNodeId', { nullable: true });
     t.string('type');
 
     t.string('title', { nullable: true });
@@ -51,16 +51,14 @@ export const LinkType = objectType({
 
     t.field('questionNode', {
       type: QuestionNodeType,
-      async resolve(parent: Link, args: any, ctx: any) {
-        const { prisma } : { prisma: PrismaClient } = ctx;
-        const link = await prisma.link.findOne({
-          where: {
-            id: parent.id,
-          },
-          include: {
-            questionNode: true,
-          },
+      async resolve(parent, args, ctx) {
+        const link = await ctx.prisma.link.findOne({
+          where: { id: parent.id },
+          include: { questionNode: true },
         });
+
+        if (!link?.questionNode) throw new Error('Unable to find related node');
+
         return link?.questionNode;
       },
     });

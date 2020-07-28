@@ -27,16 +27,17 @@ export interface HeaderColumnProps {
   Cell: React.FC<GenericCellProps>;
 }
 
-export interface TableCellProps {
+export interface TableCellProps<TData> {
   id: string;
   createdAt: string;
   paths: number;
   score: number;
-  nodeEntries: Array<NodeEntryProps>;
+
+  // Todo: Replace by Tdata
 }
 
-export interface TableRowProps {
-  data: TableCellProps;
+export interface TableRowProps<TData> {
+  data: TData;
   headers: Array<HeaderColumnProps>
   index: number;
 }

@@ -1,4 +1,5 @@
-import { Dialogue, HAASEdge, HAASEntry, HAASFormEntry, HAASNode } from 'types/generic';
+import { Dialogue, HAASEntry, HAASNode } from 'types/generic';
+import { SessionEntryDataProps } from 'models/Session/SessionEntryModel';
 
 export interface URLParams {
   companySlug: string;
@@ -21,13 +22,13 @@ export interface TreeDispatchProps {
   saveEntry: (
     currentNode: HAASNode,
     key: string | number | null,
-    nodeEntry: HAASFormEntry,
+    nodeEntry: SessionEntryDataProps,
   ) => void;
 }
 
 interface TreeActionGotoChildProps {
   currentNode: HAASNode;
-  nodeEntry: HAASFormEntry;
+  nodeEntry: SessionEntryDataProps;
 }
 
 interface TreeActionStartProps {

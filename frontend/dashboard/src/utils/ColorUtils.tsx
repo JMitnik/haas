@@ -6,7 +6,7 @@ export const isValidColor = (color: string) => {
     return false;
   }
   try {
-    const colorInstance = Color(color, 'hex');
+    Color(color, 'hex');
   } catch (e) {
     return false;
   }

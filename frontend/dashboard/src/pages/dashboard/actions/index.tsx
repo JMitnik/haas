@@ -30,7 +30,7 @@ const ActionsPage = () => {
   if (!leafs || loading) return <Loader />;
 
   const mappedLeafs = leafs.map((leaf: any) => {
-    if (leaf.type === 'SOCIAL_SHARE') {
+    if (leaf.type === 'LINK') {
       const mappedLinks = leaf.links?.map((link: any) => {
         const { __typename, ...linkedData } = link;
         return { ...linkedData, type: { label: link.type, value: link.type } };

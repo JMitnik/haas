@@ -4,7 +4,7 @@ import { useHistory, useParams } from 'react-router';
 import { useLazyQuery, useMutation } from '@apollo/react-hooks';
 import React, { useCallback, useEffect, useState } from 'react';
 
-import { Div, H2 } from '@haas/ui';
+import { Div, PageHeading } from '@haas/ui';
 import { UserCell } from 'components/Table/CellComponents/CellComponents';
 import SearchBar from 'components/SearchBar/SearchBar';
 import Table from 'components/Table/Table';
@@ -21,7 +21,7 @@ interface TableProps {
   pageIndex: number;
   pageSize: number;
   sortBy: {
-    id: string;
+    by: string;
     desc: boolean;
   }[]
 }
@@ -36,18 +36,17 @@ const TriggersOverview = () => {
   const { customerSlug } = useParams();
   const history = useHistory();
   const [fetchTriggers, { data }] = useLazyQuery(getTriggerTableQuery, { fetchPolicy: 'cache-and-network' });
-  const [paginationProps, setPaginationProps] = useState<TableProps>(
-    {
-      activeStartDate: null,
-      activeEndDate: null,
-      activeSearchTerm: '',
-      pageIndex: 0,
-      pageSize: 8,
-      sortBy: [{ id: 'name', desc: true }],
-    },
-  );
+  const [paginationProps, setPaginationProps] = useState<TableProps>({
+    activeStartDate: null,
+    activeEndDate: null,
+    activeSearchTerm: '',
+    pageIndex: 0,
+    pageSize: 8,
+    sortBy: [{ by: 'name', desc: true }],
+  });
 
-  const tableData: any = data?.triggerTable?.triggers || [];
+  const tableData: any = data?.triggerConnection?.triggers || [];
+
   useEffect(() => {
     const { activeStartDate, activeEndDate, pageIndex, pageSize, sortBy, activeSearchTerm } = paginationProps;
     fetchTriggers({
@@ -110,14 +109,14 @@ const TriggersOverview = () => {
   const pageIndex = data?.triggerTable?.pageIndex || 0;
 
   return (
-    <Div px="24px" margin="0 auto" width="100vh" height="100vh" maxHeight="100vh" overflow="hidden">
-      <H2 color="#3653e8" fontWeight={400} mb="10%">Triggers</H2>
+    <Div px="24px" margin="0 auto" height="100vh" maxHeight="100vh">
+      <PageHeading mb="4">Triggers</PageHeading>
       <InputOutputContainer mb="5%">
         <InputContainer>
           <SearchBar activeSearchTerm={paginationProps.activeSearchTerm} onSearchTermChange={handleSearchTermChange} />
         </InputContainer>
       </InputOutputContainer>
-      <Div backgroundColor="#fdfbfe" mb="1%" height="65%" overflowX="hidden" overflowY="auto">
+      <Div backgroundColor="#fdfbfe" minHeight="65%">
         <Table
           headers={HEADERS}
           paginationProps={{ ...paginationProps, pageCount, pageIndex }}

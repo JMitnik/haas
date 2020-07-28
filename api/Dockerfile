@@ -9,10 +9,10 @@ COPY ./package.json schema.prisma ./
 
 RUN apt-get update \
   && apt-get install curl python bash \
-  && yarn add @prisma/cli@2.0.0-beta.3 \
   && yarn install
 
 RUN npx prisma generate
+RUN git clone https://github.com/vishnubob/wait-for-it.git
 
 from base
 

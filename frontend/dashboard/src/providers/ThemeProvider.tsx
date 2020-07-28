@@ -1,9 +1,9 @@
+import { ThemeProvider as ChakraThemeProvider } from '@chakra-ui/core';
 import { ThemeProvider } from 'styled-components/macro';
 import React, { useEffect, useState } from 'react';
 
 import { makeCustomTheme } from 'utils/makeCustomerTheme';
-import defaultTheme from 'config/theme';
-import useLocalStorage from 'hooks/useLocalStorage';
+import defaultTheme, { chakraDefaultTheme } from 'config/theme';
 
 import { useCustomer } from './CustomerProvider';
 
@@ -14,6 +14,7 @@ interface ThemeProvidersProps {
 const ThemeProviders = ({ children }: ThemeProvidersProps) => {
   const [customTheme, setCustomTheme] = useState({});
   const { activeCustomer, storageCustomer } = useCustomer();
+
   useEffect(() => {
     if (activeCustomer) {
       const customerTheme = { colors: activeCustomer.settings?.colourSettings };
@@ -32,11 +33,13 @@ const ThemeProviders = ({ children }: ThemeProvidersProps) => {
 
   if (customTheme) {
     return (
-      <ThemeProvider theme={defaultTheme}>
-        <ThemeProvider theme={makeCustomTheme(defaultTheme, customTheme)}>
-          {children}
+      <ChakraThemeProvider theme={chakraDefaultTheme}>
+        <ThemeProvider theme={defaultTheme}>
+          <ThemeProvider theme={makeCustomTheme(defaultTheme, customTheme)}>
+            {children}
+          </ThemeProvider>
         </ThemeProvider>
-      </ThemeProvider>
+      </ChakraThemeProvider>
     );
   }
 

@@ -76,7 +76,7 @@ interface QuestionEntryFormProps {
 
 const questionTypes = [
   { value: 'SLIDER', label: 'Slider' },
-  { value: 'MULTI_CHOICE', label: 'Multi-Choice' }];
+  { value: 'CHOICE', label: 'Choice' }];
 
 const QuestionEntryForm = ({
   onAddExpandChange,
@@ -102,6 +102,7 @@ const QuestionEntryForm = ({
       parentQuestionType,
     },
   });
+
   const [activeTitle, setActiveTitle] = useState(title);
   const [activeQuestionType, setActiveQuestionType] = useState(type);
 
@@ -288,7 +289,7 @@ const QuestionEntryForm = ({
           title,
           type,
           overrideLeafId: overrideLeafId || '',
-          edgeId,
+          edgeId: edgeId || '-1',
           optionEntries: options,
           edgeCondition,
         },
@@ -373,7 +374,7 @@ const QuestionEntryForm = ({
                 </>
               )}
 
-              {parentQuestionType === 'Multi-Choice' && (
+              {parentQuestionType === 'Choice' && (
                 <Div gridColumn="1 / -1">
                   <StyledLabel>Match value</StyledLabel>
                   <Select
@@ -423,7 +424,7 @@ const QuestionEntryForm = ({
                 {errors.activeLeaf && <Muted color="warning">{errors.activeLeaf.message}</Muted>}
               </Div>
 
-              {activeQuestionType && activeQuestionType.value === 'MULTI_CHOICE' && (
+              {activeQuestionType && activeQuestionType.value === 'CHOICE' && (
                 <>
                   <Div mb={1} gridColumn="1 / -1">
                     <Flex justifyContent="space-between">

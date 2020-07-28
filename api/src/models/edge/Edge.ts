@@ -1,16 +1,19 @@
-import { Edge, PrismaClient } from '@prisma/client';
-import { QuestionNodeType } from '../question/QuestionNode';
 import { extendType, objectType } from '@nexus/schema';
+
+// eslint-disable-next-line import/no-cycle
+import { QuestionNodeType } from '../question/QuestionNode';
 
 export const EdgeConditionType = objectType({
   name: 'EdgeCondition',
   definition(t) {
     t.int('id');
-    t.string('matchValue', { nullable: true });
     t.string('conditionType');
+    t.string('matchValue', { nullable: true });
     t.int('renderMin', { nullable: true });
     t.int('renderMax', { nullable: true });
-    t.string('edgeId');
+
+    // TODO: Make non-nullable
+    t.string('edgeId', { nullable: true });
   },
 });
 
@@ -22,37 +25,46 @@ export const EdgeType = objectType({
     t.string('updatedAt');
     t.string('parentNodeId');
     t.string('childNodeId');
-    t.string('dialogueId');
+
     t.field('parentNode', {
       type: QuestionNodeType,
-      resolve(parent: Edge, args: any, ctx: any, info: any) {
-        const { prisma }: { prisma: PrismaClient } = ctx;
-        const parentNode = prisma.questionNode.findOne({ where: {
-          id: parent.parentNodeId,
-        } });
+      nullable: true,
+
+      async resolve(parent, args, ctx) {
+        if (!parent.parentNodeId) return null;
+
+        const parentNode = await ctx.prisma.questionNode.findOne({
+          where: { id: parent.parentNodeId },
+        });
+
         return parentNode;
       },
     });
+
     t.field('childNode', {
       type: QuestionNodeType,
-      resolve(parent: Edge, args: any, ctx: any, info: any) {
-        const { prisma }: { prisma: PrismaClient } = ctx;
-        const childNode = prisma.questionNode.findOne({ where: {
-          id: parent.childNodeId,
-        } });
+      nullable: true,
+
+      async resolve(parent, args, ctx) {
+        if (!parent.parentNodeId) return null;
+
+        const childNode = await ctx.prisma.questionNode.findOne({
+          where: { id: parent.childNodeId },
+        });
+
         return childNode;
       },
     });
     t.list.field('conditions', {
       type: EdgeConditionType,
-      resolve(parent: Edge, args: any, ctx: any, info: any) {
-        const { prisma }: { prisma: PrismaClient } = ctx;
-        const edgeConditions = prisma.questionCondition.findMany({
-          where: {
-            edgeId: parent.id,
-          },
+      nullable: true,
+
+      async resolve(parent, args, ctx) {
+        const edgeConditions = await ctx.prisma.questionCondition.findMany({
+          where: { edgeId: parent.id },
         });
-        return edgeConditions;
+
+        return edgeConditions || [];
       },
     });
   },
@@ -60,22 +72,24 @@ export const EdgeType = objectType({
 
 export const EdgeQueries = extendType({
   type: 'Query',
+
   definition(t) {
     t.field('edge', {
       type: EdgeType,
-      args: {
-        id: 'String',
-      },
-      resolve(parent: any, args: any, ctx: any, info: any) {
-        const { prisma }: { prisma: PrismaClient } = ctx;
-        return prisma.edge.findOne({ where: { id: args.id } });
+      args: { id: 'String' },
+      nullable: true,
+
+      resolve(parent, args, ctx) {
+        if (!args.id) return null;
+
+        return ctx.prisma.edge.findOne({ where: { id: args.id } });
       },
     });
   },
 });
 
-const edgeNexus = [EdgeConditionType,
+export default [
+  EdgeConditionType,
   EdgeType,
-  EdgeQueries];
-
-export default edgeNexus;
+  EdgeQueries,
+];
