@@ -280,6 +280,7 @@ export interface NexusGenRootTypes {
     maxValue?: number | null; // Int
     minValue?: number | null; // Int
     textValue?: string | null; // String
+    triggerId: string; // String!
     type: NexusGenEnums['TriggerConditionEnum']; // TriggerConditionEnum!
   }
   TriggerConnectionType: { // root type
@@ -597,6 +598,7 @@ export interface NexusGenFieldTypes {
     maxValue: number | null; // Int
     minValue: number | null; // Int
     textValue: string | null; // String
+    triggerId: string; // String!
     type: NexusGenEnums['TriggerConditionEnum']; // TriggerConditionEnum!
   }
   TriggerConnectionType: { // field return type

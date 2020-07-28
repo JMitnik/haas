@@ -505,6 +505,7 @@ type TriggerConditionType {
   maxValue: Int
   minValue: Int
   textValue: String
+  triggerId: String!
   type: TriggerConditionEnum!
 }
 

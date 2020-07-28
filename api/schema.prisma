@@ -318,8 +318,8 @@ model TriggerCondition {
   minValue  Int?
   maxValue  Int?
   textValue String?
-  trigger   Trigger?             @relation(fields: [triggerId], references: [id])
-  triggerId String?
+  trigger   Trigger             @relation(fields: [triggerId], references: [id])
+  triggerId String
 }
 
 model Trigger {

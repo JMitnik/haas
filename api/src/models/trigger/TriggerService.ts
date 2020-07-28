@@ -1,5 +1,4 @@
 import {
-  PrismaClient,
   Trigger,
   TriggerCondition,
   TriggerOrderByInput,
@@ -13,9 +12,8 @@ import _ from 'lodash';
 
 import { isAfter, subSeconds } from 'date-fns';
 
+// eslint-disable-next-line import/no-cycle
 import { NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
-import { Nullable } from '../../types/generic';
-import PaginationService from '../general/PaginationService';
 import TriggerSMSService from '../../services/sms/trigger-sms-service';
 import prisma from '../../prisma';
 

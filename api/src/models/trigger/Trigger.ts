@@ -36,8 +36,7 @@ const TriggerConditionType = objectType({
     t.int('maxValue', { nullable: true });
     t.string('textValue', { nullable: true });
 
-    // TODO: Return this?
-    // t.string('triggerId', { nullable: true, resolve: (parent) => parent.triggerId });
+    t.string('triggerId');
   },
 });
 
@@ -128,6 +127,8 @@ const TriggerMutations = extendType({
       async resolve(parent, args, ctx) {
         if (!args.id) throw new Error('No valid id for trigger provided');
 
+        // Clean up trail
+        await ctx.prisma.triggerCondition.deleteMany({ where: { triggerId: args.id } });
         const trigger = await ctx.prisma.trigger.delete({ where: { id: args.id } });
 
         if (!trigger) throw new Error('Something went wrong during deletion of trigger');
