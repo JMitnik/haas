@@ -250,8 +250,8 @@ const QuestionEntryForm = ({
     });
   };
 
-  const setMaxValue = (event: React.FocusEvent<HTMLInputElement>) => {
-    const maxValue = Number(event.target.value);
+  const setMaxValue = useCallback(debounce((value: string) => {
+    const maxValue = Number(value);
     return setActiveCondition((prevCondition) => {
       if (!prevCondition) {
         return { renderMax: maxValue };
@@ -259,7 +259,7 @@ const QuestionEntryForm = ({
       prevCondition.renderMax = maxValue;
       return prevCondition;
     });
-  };
+  }, 250), []);
 
   const handleOptionChange = useCallback(debounce((value: any, optionIndex: number) => {
     setActiveOptions((prevOptions) => {
@@ -376,7 +376,7 @@ const QuestionEntryForm = ({
                       name="maxValue"
                       ref={register({ required: false })}
                       defaultValue={condition?.renderMax}
-                      onBlur={(event: React.FocusEvent<HTMLInputElement>) => setMaxValue(event)}
+                      onChange={(event) => setMaxValue(event.target.value)}
                     />
                     {errors.maxValue && <Muted color="warning">{errors.maxValue.message}</Muted>}
                   </Flex>
@@ -405,6 +405,7 @@ const QuestionEntryForm = ({
               <Div useFlex flexDirection="column">
                 <StyledLabel>Question type</StyledLabel>
                 <Select
+                  id="question-type-select"
                   hasError={!!errors.questionType}
                   ref={() => register({
                     name: 'questionType',
@@ -420,6 +421,7 @@ const QuestionEntryForm = ({
               <Div key={activeLeaf?.value} useFlex flexDirection="column">
                 <StyledLabel>Leaf node</StyledLabel>
                 <Select
+                  id="leaf-node-select"
                   hasError={!!errors.activeLeaf}
                   ref={() => register({
                     name: 'activeLeaf',
