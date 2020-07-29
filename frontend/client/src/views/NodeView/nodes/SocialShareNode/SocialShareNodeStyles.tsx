@@ -1,6 +1,5 @@
 import { ColorProps, color } from 'styled-system';
-import { Div, ExtLink } from '@haas/ui';
-import { LinkProps } from 'react-router-dom';
+import { Div } from '@haas/ui';
 import styled, { css } from 'styled-components/macro';
 
 export const SocialShareNodeContainer = styled(Div)``;
@@ -19,7 +18,7 @@ export const ShareItem = styled.a<ColorProps>`
       margin-right: ${theme.gutter}px;
     }
 
-    svg {
+    svg, img {
       @media ${theme.media.desk} {
         height: 25px;
         width: 25px;

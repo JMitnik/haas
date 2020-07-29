@@ -1,66 +1,11 @@
-import { NodeEntry, NodeEntryValue, PrismaClient, Session } from '@prisma/client';
-import { extendType, inputObjectType, objectType } from '@nexus/schema';
+import { extendType, inputObjectType, mutationField, objectType } from '@nexus/schema';
 
-import { PaginationProps } from '../../types/generic';
-import { QuestionNodeType } from '../question/QuestionNode';
-import { prisma } from '../../generated/prisma-client';
-import NodeEntryService from '../nodeentry/NodeEntryService';
+// eslint-disable-next-line import/no-cycle
+import { NodeEntryInput, NodeEntryType } from '../node-entry/NodeEntry';
+// eslint-disable-next-line import/no-cycle
+import { ConnectionInterface } from '../general/Pagination';
+// eslint-disable-next-line import/no-cycle
 import SessionService from './SessionService';
-
-export const NodeEntryValueType = objectType({
-  name: 'NodeEntryValue',
-  definition(t) {
-    t.id('id');
-    t.int('numberValue', { nullable: true });
-    t.string('textValue', { nullable: true });
-
-    t.string('nodeEntryId', { nullable: true });
-    t.int('parentNodeEntryValueId', { nullable: true });
-
-    t.list.field('multiValues', {
-      type: NodeEntryValueType,
-      resolve(parent: NodeEntryValue, args: any, ctx: any) {
-        const multiValues = ctx.prisma.nodeEntryValue.findMany({ where: { parentNodeEntryValueId: parent.id } });
-
-        return multiValues;
-      },
-    });
-  },
-});
-
-export const NodeEntryType = objectType({
-  name: 'NodeEntry',
-  definition(t) {
-    t.id('id', { nullable: true });
-    t.string('creationDate');
-    t.int('depth');
-
-    t.string('relatedEdgeId', { nullable: true });
-    t.string('sessionId');
-
-    t.string('relatedNodeId', { nullable: true });
-    t.field('relatedNode', {
-      type: QuestionNodeType,
-      nullable: true,
-      resolve(parent: NodeEntry, args: any, ctx: any) {
-        if (!parent.relatedNodeId) {
-          return null;
-        }
-
-        const relatedNode = ctx.prisma.questionNode.findOne({ where: { id: parent.relatedNodeId } });
-        return relatedNode;
-      },
-    });
-
-    t.list.field('values', {
-      type: NodeEntryValueType,
-      resolve(parent: NodeEntry, args: any, ctx: any) {
-        const values = ctx.prisma.nodeEntryValue.findMany({ where: { nodeEntryId: parent.id } });
-        return values;
-      },
-    });
-  },
-});
 
 export const SessionType = objectType({
   name: 'Session',
@@ -69,273 +14,145 @@ export const SessionType = objectType({
     t.string('createdAt');
     t.string('dialogueId');
 
+    // t.int('index');
+    t.int('paths', {
+      async resolve(parent, args, ctx) {
+        const entryCount = await ctx.prisma.nodeEntry.count({ where: { sessionId: parent.id } });
+        return entryCount;
+      },
+    });
+
     t.float('score', {
-      nullable: true,
-      async resolve(parent: Session, args: any, ctx: any) {
-        const { prisma }: { prisma: PrismaClient } = ctx;
+      async resolve(parent) {
+        // @ts-ignore
+        if (parent.score) return parent.score;
 
-        const session = await prisma.session.findOne({
-          where: { id: parent.id },
-          include: {
-            nodeEntries: {
-              include: {
-                relatedNode: {
-                  select: {
-                    isRoot: true,
-                  },
-                },
-                values: {
-                  select: {
-                    numberValue: true,
-                    NodeEntry: {
-                      select: {
-                        depth: true,
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
-        });
+        const score = await SessionService.getSessionScore(parent.id) || 0.0;
 
-        const nodeEntryWithValues = session?.nodeEntries.find((nodeEntry) => nodeEntry.depth === 0 && nodeEntry.relatedNode?.isRoot);
-
-        return nodeEntryWithValues?.values.find((entry) => entry.numberValue)?.numberValue;
+        return score;
       },
     });
 
     t.list.field('nodeEntries', {
       type: NodeEntryType,
-      resolve(parent: Session, args: any, ctx: any) {
-        const nodeEntries = ctx.prisma.nodeEntry.findMany({ where: { sessionId: parent.id } });
+
+      async resolve(parent, args, ctx) {
+        const nodeEntries = await ctx.prisma.nodeEntry.findMany({
+          where: { sessionId: parent.id },
+          include: {
+            choiceNodeEntry: true,
+            linkNodeEntry: true,
+            registrationNodeEntry: true,
+            sliderNodeEntry: true,
+            textboxNodeEntry: true,
+          },
+          orderBy: {
+            depth: 'asc',
+          },
+        });
+
         return nodeEntries;
       },
     });
   },
 });
 
-export const UniqueDataResultEntry = objectType({
-  name: 'UniqueDataResultEntry',
-  definition(t) {
-    t.string('sessionId');
-    t.string('createdAt');
-    t.int('value');
-  },
-});
-
-export const UserSessionEntryDataInput = inputObjectType({
-  name: 'UserSessionEntryDataInput',
-  definition(t) {
-    t.string('textValue');
-    t.int('numberValue');
-
-    t.list.field('multiValues', { type: UserSessionEntryDataInput });
-  },
-});
-
-export const UserSessionEntryInput = inputObjectType({
-  name: 'UserSessionEntryInput',
-  definition(t) {
-    t.string('nodeId');
-    t.string('edgeId', { nullable: true });
-    t.int('depth', { nullable: true });
-
-    t.field('data', { type: UserSessionEntryDataInput });
-  },
-});
-
-export const UploadUserSessionInput = inputObjectType({
-  name: 'UploadUserSessionInput',
-  definition(t) {
-    t.string('dialogueId', { required: true });
-
-    t.list.field('entries', { type: UserSessionEntryInput });
-  },
-});
-
 export const SessionWhereUniqueInput = inputObjectType({
   name: 'SessionWhereUniqueInput',
+
   definition(t) {
     t.id('id', { required: false });
     t.id('dialogueId', { required: false });
   },
 });
 
-export const SortFilterInputObject = inputObjectType({
-  name: 'SortFilterInputObject',
+export const SessionConnection = objectType({
+  name: 'SessionConnection',
+
   definition(t) {
-    t.string('id', { required: false });
-    t.boolean('desc', { required: false });
+    t.implements(ConnectionInterface);
+    t.list.field('sessions', { type: SessionType });
   },
 });
 
-export const SortFilterObject = objectType({
-  name: 'SortFilterObject',
-  definition(t) {
-    t.string('id');
-    t.boolean('desc');
-  },
-});
-
-export const InteractionSessionType = objectType({
-  name: 'InteractionSessionType',
-  definition(t) {
-    t.string('id');
-    t.int('index');
-    t.float('score', { nullable: true });
-    t.int('paths');
-    t.string('createdAt');
-
-    t.list.field('nodeEntries', { type: NodeEntryType });
-  },
-});
-
-export const InteractionType = objectType({
-  name: 'InteractionType',
-  definition(t) {
-    t.int('pages');
-    t.int('pageIndex');
-    t.int('pageSize');
-    t.string('startDate', { nullable: true });
-    t.string('endDate', { nullable: true });
-
-    t.list.field('sessions', { type: InteractionSessionType });
-
-    t.list.field('orderBy', { type: SortFilterObject });
-  },
-});
-
-export const FilterInput = inputObjectType({
-  name: 'FilterInput',
-  definition(t) {
-    t.string('startDate', { required: false });
-    t.string('endDate', { required: false });
-    t.string('searchTerm', { required: false });
-    t.int('offset');
-    t.int('limit');
-    t.int('pageIndex');
-
-    t.list.field('orderBy', {
-      type: SortFilterInputObject,
-      required: false,
-    });
-  },
-});
-
-export const getSessionAnswerFlowQuery = extendType({
+export const SessionQuery = extendType({
   type: 'Query',
+
   definition(t) {
-    t.field('getSessionAnswerFlow', {
-      type: SessionType,
-      args: {
-        sessionId: 'ID',
-      },
-    });
-
-    t.field('interactions', {
-      type: InteractionType,
-      args: {
-        where: SessionWhereUniqueInput,
-        filter: FilterInput,
-      },
-      async resolve(parent: any, args: any) {
-        const { pageIndex, offset, limit, startDate, endDate, searchTerm }: PaginationProps = args.filter;
-        const dateRange = SessionService.constructDateRangeWhereInput(startDate, endDate);
-        const orderBy = args.filter.orderBy ? Object.assign({}, ...args.filter.orderBy) : null;
-
-        const { pageSessions, totalPages, resetPages } = await NodeEntryService.getCurrentInteractionSessions(
-          args.where.dialogueId,
-          offset,
-          limit,
-          pageIndex,
-          orderBy,
-          dateRange,
-          searchTerm,
-        );
-
-        const sessionsWithIndex = pageSessions.map((session: any, index: any) => ({ ...session, index }));
-
-        return {
-          sessions: sessionsWithIndex,
-          pages: !resetPages ? totalPages : 1,
-          offset,
-          limit,
-          pageIndex: !resetPages ? pageIndex : 0,
-          startDate,
-          endDate,
-          orderBy: args.filter.orderBy || [],
-        };
-      },
-    });
-
     t.list.field('sessions', {
       type: SessionType,
-      args: {
-        where: SessionWhereUniqueInput,
-      },
-      resolve(parent: any, args: any, ctx: any) {
-        if (!args.where) {
-          const sessions = ctx.prisma.session.findMany();
-          return sessions;
+      args: { where: SessionWhereUniqueInput },
+      async resolve(parent, args) {
+        if (!args.where?.dialogueId) {
+          return [];
         }
 
-        const sessions = ctx.prisma.session.findMany({
-          where: {
-            dialogueId: args.where.dialogueId,
-          },
-        });
+        const sessions = await SessionService.fetchSessionsByDialogue(args.where.dialogueId);
+
+        if (!sessions?.length) {
+          return [];
+        }
+
         return sessions;
       },
     });
 
     t.field('session', {
       type: SessionType,
-      args: {
-        where: SessionWhereUniqueInput,
-      },
-      resolve(parent: any, args: any, ctx: any) {
-        const session = ctx.prisma.session.findOne({
+      args: { where: SessionWhereUniqueInput },
+      nullable: true,
+
+      async resolve(parent, args, ctx) {
+        if (!args.where?.id) {
+          return null;
+        }
+
+        const session = await ctx.prisma.session.findOne({
           where: {
             id: args.where.id,
           },
         });
+
         return session;
       },
     });
   },
 });
 
-export const uploadUserSessionMutation = extendType({
-  type: 'Mutation',
+export const SessionInput = inputObjectType({
+  name: 'SessionInput',
+  description: 'Input for session',
+
   definition(t) {
-    t.field('uploadUserSession', {
-      type: SessionType,
-      args: {
-        uploadUserSessionInput: UploadUserSessionInput,
-      },
-      resolve(parent: any, args: any, ctx: any) {
-        const session = SessionService.uploadUserSession(parent, args, ctx);
-        return session;
-      },
-    });
+    t.string('dialogueId', { required: true });
+
+    t.list.field('entries', { type: NodeEntryInput });
+  },
+});
+
+export const CreateSessionMutation = mutationField('createSession', {
+  type: SessionType,
+  args: { input: SessionInput },
+
+  resolve(parent, args, ctx) {
+    if (!args?.input) {
+      throw new Error('No valid new session data provided');
+    }
+
+    try {
+      const session = SessionService.createSession(args.input, ctx);
+      return session;
+    } catch (error) {
+      throw new Error(`Failed making a session due to ${error}`);
+    }
   },
 });
 
 export default [
-  SortFilterObject,
-  SortFilterInputObject,
-  InteractionSessionType,
-  FilterInput,
-  InteractionType,
+  SessionConnection,
   SessionWhereUniqueInput,
-  getSessionAnswerFlowQuery,
-  UniqueDataResultEntry,
-  NodeEntryValueType,
-  NodeEntryType,
+  SessionQuery,
   SessionType,
-  uploadUserSessionMutation,
-  UploadUserSessionInput,
-  UserSessionEntryInput,
-  UserSessionEntryDataInput,
+  CreateSessionMutation,
+  SessionInput,
 ];

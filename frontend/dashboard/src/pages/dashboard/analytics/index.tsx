@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { ColumnFlex, Div } from '@haas/ui';
+import { Div } from '@haas/ui';
 import ComingSoonCard from 'components/ComingSoonCard';
 
 const AnalyticsPage = () => (

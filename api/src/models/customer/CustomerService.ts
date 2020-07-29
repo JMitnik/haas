@@ -1,15 +1,17 @@
-import { Customer, PrismaClient, TagCreateWithoutCustomerInput } from '@prisma/client';
+import { Customer, TagCreateWithoutCustomerInput } from '@prisma/client';
 import { subDays } from 'date-fns';
 import cuid from 'cuid';
 
+import { cond, includes } from 'lodash';
 import { leafNodes } from '../../data/seeds/default-data';
-import NodeResolver from '../question/node-resolver';
+// eslint-disable-next-line import/no-cycle
+import DialogueService from '../questionnaire/DialogueService';
+import NodeService from '../question/NodeService';
+import prisma from '../../prisma';
 
 function getRandomInt(max: number) {
   return Math.floor(Math.random() * Math.floor(max));
 }
-
-const prisma = new PrismaClient();
 
 const seedCustomerData: TagCreateWithoutCustomerInput[] = [
   {
@@ -37,19 +39,19 @@ class CustomerService {
     return customerSettings;
   };
 
-  static customerBySlug = async (obj: any, args: any) => {
-    const { slug } = args;
-    const customer = await prisma.customer.findOne({ where: { slug } });
+  static customerBySlug = async (customerSlug: string) => {
+    const customer = await prisma.customer.findOne({ where: { slug: customerSlug } });
 
     if (!customer) {
-      throw new Error("Can't find slug, shit!");
+      throw new Error(`Unable to find customer ${customerSlug}!`);
     }
 
     return customer;
   };
 
   static seed = async (customer: Customer) => {
-    const questionnaire = await prisma.dialogue.create({
+    // Step 1: Make dialogue
+    const dialogue = await prisma.dialogue.create({
       data: {
         customer: {
           connect: {
@@ -57,7 +59,7 @@ class CustomerService {
           },
         },
         slug: 'default',
-        title: 'Default questionnaire',
+        title: 'Default dialogue',
         description: 'Default questions',
         questions: {
           create: [],
@@ -65,45 +67,78 @@ class CustomerService {
       },
     });
 
-    const leafs = await NodeResolver.createTemplateLeafNodes(leafNodes, questionnaire.id);
+    // Step 2: Make the leafs
+    const leafs = await NodeService.createTemplateLeafNodes(leafNodes, dialogue.id);
 
-    await NodeResolver.createTemplateNodes(questionnaire.id, customer.name, leafs);
+    // Step 3: Make nodes
+    await NodeService.createTemplateNodes(dialogue.id, customer.name, leafs);
 
+    // Step 4: Fill with random data
     const currentDate = new Date();
     const amtOfDaysBack = Array.from(Array(30)).map((empty, index) => index + 1);
     const datesBackInTime = amtOfDaysBack.map((amtDaysBack) => subDays(currentDate, amtDaysBack));
     const options = ['Facilities', 'Website/Mobile app', 'Product/Services', 'Customer support'];
 
+    const dialogueWithNodes = await prisma.dialogue.findOne({
+      where: { id: dialogue.id },
+      include: {
+        questions: true,
+        edges: {
+          include: {
+            conditions: true,
+            childNode: true,
+          },
+        },
+      },
+    });
+
+    const rootNode = dialogueWithNodes?.questions.find((node) => node.isRoot);
+    const edgesOfRootNode = dialogueWithNodes?.edges.filter((edge) => edge.parentNodeId === rootNode?.id);
+
+    // Stop if no rootnode
+    if (!rootNode) return;
+
     await Promise.all(datesBackInTime.map(async (backDate) => {
-      const randomOptionElement = options[Math.floor(Math.random() * options.length)];
+      const simulatedRootVote: number = getRandomInt(100);
+
+      const simulatedChoice = options[Math.floor(Math.random() * options.length)];
+      const simulatedChoiceEdge = edgesOfRootNode?.find((edge) => edge.conditions.every((condition) => {
+        if (!condition.renderMin || !condition.renderMax) return false;
+        const isValid = condition?.renderMin < simulatedRootVote && condition?.renderMax > simulatedRootVote;
+
+        return isValid;
+      }));
+
+      const simulatedChoiceNodeId = simulatedChoiceEdge?.childNode.id;
+
+      if (!simulatedChoiceNodeId) return;
+
       await prisma.session.create({
         data: {
           nodeEntries: {
-            create: [
-              {
-                depth: 0,
-                creationDate: backDate,
-                values: {
-                  create: {
-                    numberValue: getRandomInt(100),
-                  },
-                },
+            create: [{
+              depth: 0,
+              creationDate: backDate,
+              relatedNode: {
+                connect: { id: rootNode.id },
               },
-              {
-                depth: 1,
-                creationDate: backDate,
-                values: {
-                  create: {
-                    textValue: randomOptionElement,
-                  },
-                },
+              sliderNodeEntry: {
+                create: { value: simulatedRootVote },
               },
+            },
+            {
+              depth: 1,
+              creationDate: backDate,
+              relatedNode: { connect: { id: simulatedChoiceNodeId } },
+              relatedEdge: { connect: { id: simulatedChoiceEdge?.id } },
+              choiceNodeEntry: {
+                create: { value: simulatedChoice },
+              },
+            },
             ],
           },
           dialogue: {
-            connect: {
-              id: questionnaire.id,
-            },
+            connect: { id: dialogue.id },
           },
         },
       });
@@ -124,7 +159,7 @@ class CustomerService {
 
     await prisma.colourSettings.update({
       where: {
-        id: customerSettings.colourSettingsId,
+        id: customerSettings.colourSettingsId || undefined,
       },
       data: {
         primary: primaryColour,
@@ -204,14 +239,88 @@ class CustomerService {
       where: { id: customerId },
       include: {
         dialogues: {
-          where: {
-            slug: dialogueSlug,
-          },
+          where: { slug: dialogueSlug },
         },
       },
     });
 
     return customerWithDialogue?.dialogues?.[0];
+  }
+
+  static async deleteCustomer(customerId: string) {
+    if (!customerId) return null;
+
+    const customer = await prisma.customer.findOne({
+      where: { id: customerId },
+      include: {
+        settings: {
+          include: {
+            colourSettings: true,
+            fontSettings: true,
+          },
+        },
+      },
+    });
+
+    if (!customer) return null;
+
+    const colourSettingsId = customer?.settings?.colourSettingsId;
+    const fontSettingsId = customer?.settings?.fontSettingsId;
+
+    // //// Settings-related
+    if (fontSettingsId) {
+      await prisma.fontSettings.delete({
+        where: {
+          id: fontSettingsId,
+        },
+      });
+    }
+
+    if (colourSettingsId) {
+      await prisma.colourSettings.delete({
+        where: {
+          id: colourSettingsId,
+        },
+      });
+    }
+
+    if (customer?.settings) {
+      await prisma.customerSettings.delete({
+        where: {
+          customerId,
+        },
+      });
+    }
+
+    const dialogueIds = await prisma.dialogue.findMany({
+      where: {
+        customerId,
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (dialogueIds.length > 0) {
+      await Promise.all(dialogueIds.map(async (dialogueId) => {
+        await DialogueService.deleteDialogue(dialogueId.id);
+      }));
+    }
+
+    await prisma.tag.deleteMany({ where: { customerId } });
+    await prisma.triggerCondition.deleteMany({ where: { trigger: { customerId } } });
+    await prisma.trigger.deleteMany({ where: { customerId } });
+    await prisma.permission.deleteMany({ where: { customerId } });
+    await prisma.user.deleteMany({ where: { customerId } });
+    await prisma.role.deleteMany({ where: { customerId } });
+
+    await prisma.customer.delete({
+      where: {
+        id: customerId,
+      },
+    });
+
+    return customer || null;
   }
 
   /**

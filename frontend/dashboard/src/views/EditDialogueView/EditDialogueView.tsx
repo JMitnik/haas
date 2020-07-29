@@ -5,7 +5,7 @@ import { useHistory, useParams } from 'react-router';
 import { useMutation, useQuery } from '@apollo/react-hooks';
 import styled, { css } from 'styled-components/macro';
 
-import { Button, Container, Div, Flex,
+import { Button, Div, Flex,
   Grid, H2, H3, H4, Hr, Muted, StyledInput,
   StyledLabel, StyledTextInput } from '@haas/ui';
 import React, { useState } from 'react';
@@ -79,15 +79,15 @@ const EditDialogueView = () => {
 const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFormProps) => {
   const history = useHistory();
   const { register, handleSubmit, errors } = useForm<FormDataProps>();
-  const { customerSlug, dialogueId } = useParams();
+  const { customerSlug, dialogueSlug } = useParams();
 
   const [editDialogue, { loading }] = useMutation(editDialogueMutation, {
     onCompleted: () => {
-      history.push(`/dashboard/b/${customerSlug}/d/${dialogue.slug}`);
+      history.push(`/dashboard/b/${customerSlug}/d`);
     },
     refetchQueries: [{ query: getQuestionnairesCustomerQuery,
       variables: {
-        slug: customerSlug,
+        customerSlug,
       } }],
     onError: (serverError: ApolloError) => {
       console.log(serverError);
@@ -102,7 +102,8 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFo
 
     editDialogue({
       variables: {
-        dialogueId,
+        customerSlug,
+        dialogueSlug,
         title: formData.title,
         publicTitle: formData.publicTitle,
         description: formData.description,
@@ -155,7 +156,7 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFo
                   <StyledInput
                     defaultValue={dialogue?.publicTitle}
                     name="publicTitle"
-                    ref={register({ required: true })}
+                    ref={register({ required: false })}
                   />
                   {errors.publicTitle && <Muted color="warning">Something went wrong!</Muted>}
                 </Div>

@@ -175,7 +175,7 @@ const EditTriggerForm = (
 ) => {
   const history = useHistory();
   const { register, handleSubmit, errors } = useForm<FormDataProps>();
-  const { customerId, customerSlug } = useParams();
+  const { customerSlug } = useParams();
   const { data: recipientsData } = useQuery(getRecipientsQuery, { variables: { customerSlug } });
   const [fetchQuestions, { data: questionsData }] = useLazyQuery(
     getQuestionsQuery, { fetchPolicy: 'cache-and-network' },
@@ -192,7 +192,7 @@ const EditTriggerForm = (
     if (activeDialogue) {
       fetchQuestions({ variables: { customerSlug, dialogueSlug: activeDialogue.value } });
     }
-  }, [activeDialogue, fetchQuestions]);
+  }, [activeDialogue, customerSlug, fetchQuestions]);
 
   const [editTrigger, { loading }] = useMutation(editTriggerMutation, {
     onCompleted: () => {
@@ -202,6 +202,11 @@ const EditTriggerForm = (
       console.log(serverError);
     },
   });
+
+  const handleDialogueChange = (questionOption: any) => {
+    setActiveDialogue(questionOption);
+    setActiveQuestion(null);
+  };
 
   const onSubmit = (formData: FormDataProps) => {
     const questionId = activeQuestion?.value;
@@ -349,7 +354,7 @@ const EditTriggerForm = (
                     options={dialogues}
                     value={activeDialogue}
                     onChange={(qOption: any) => {
-                      setActiveDialogue(qOption);
+                      handleDialogueChange(qOption);
                     }}
                   />
                 </Div>
@@ -409,7 +414,9 @@ const EditTriggerForm = (
                           <X />
                         </DeleteButtonContainer>
                         <Select
-                          options={setConditionTypeOptions(activeQuestion?.value, questionsData?.customer?.dialogue?.questions)}
+                          options={setConditionTypeOptions(
+                            activeQuestion?.value, questionsData?.customer?.dialogue?.questions,
+                          )}
                           value={condition.type}
                           onChange={(qOption: any) => setConditionsType(qOption, index)}
                         />

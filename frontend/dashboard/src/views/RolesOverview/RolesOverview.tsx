@@ -16,7 +16,7 @@ interface TableProps {
   pageIndex: number;
   pageSize: number;
   sortBy: {
-    id: string;
+    by: string;
     desc: boolean;
   }[]
 }
@@ -24,7 +24,7 @@ interface TableProps {
 const HEADERS = [
   { Header: 'ID', accessor: 'id', Cell: UserCell },
   { Header: 'NAME', accessor: 'name', Cell: UserCell },
-  { Header: '# PERMISSIONS', accessor: 'amtPermissions', Cell: CenterCell },
+  { Header: '# PERMISSIONS', accessor: 'nrPermissions', Cell: CenterCell },
 ];
 
 const RolesOverview = () => {
@@ -37,12 +37,12 @@ const RolesOverview = () => {
       activeSearchTerm: '',
       pageIndex: 0,
       pageSize: 8,
-      sortBy: [{ id: 'id', desc: true }],
+      sortBy: [{ by: 'by', desc: true }],
     },
   );
 
-  const tableData: any = data?.roleTable?.roles || [];
-  const permissions: any = data?.roleTable?.permissions || [];
+  const tableData: any = data?.roleConnection?.roles || [];
+  const permissions: any = data?.roleConnection?.permissions || [];
 
   useEffect(() => {
     const { activeStartDate, activeEndDate, pageIndex, pageSize, sortBy, activeSearchTerm } = paginationProps;
@@ -62,11 +62,11 @@ const RolesOverview = () => {
     });
   }, [customerId, fetchRoles, paginationProps]);
 
-  const pageCount = data?.roleTable?.totalPages || 1;
-  const pageIndex = data?.roleTable?.pageIndex || 0;
+  const pageCount = data?.roleConnection?.totalPages || 1;
+  const pageIndex = data?.roleConnection?.pageIndex || 0;
 
   return (
-    <Div px="24px" margin="0 auto" width="100vh" height="100vh" maxHeight="100vh" overflowX="hidden" overflowY="auto">
+    <Div px="24px" margin="0 auto" height="100vh" maxHeight="100vh" overflowY="auto">
       <H2 color="#3653e8" fontWeight={400} mb="10%">Roles and permissions</H2>
       <Div backgroundColor="#fdfbfe" mb="1%" height="65%">
         <Table

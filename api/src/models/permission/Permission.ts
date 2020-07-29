@@ -1,17 +1,22 @@
 import { extendType, inputObjectType, objectType } from '@nexus/schema';
+
+import { CustomerType } from '../customer/Customer';
 import PermissionService from './PermissionService';
 
 export const PermissionType = objectType({
   name: 'PermssionType',
+
   definition(t) {
     t.id('id');
     t.string('name');
     t.string('description', { nullable: true });
+    t.field('customer', { type: CustomerType, nullable: true });
   },
 });
 
 export const PermissionInput = inputObjectType({
   name: 'PermissionInput',
+
   definition(t) {
     t.string('customerId');
     t.string('name');
@@ -21,14 +26,25 @@ export const PermissionInput = inputObjectType({
 
 export const PermissionMutations = extendType({
   type: 'Mutation',
+
   definition(t) {
     t.field('createPermission', {
       type: PermissionType,
       args: { data: PermissionInput },
-      resolve(parent: any, args: any) {
-        const { name, description, customerId } = args.data;
+      nullable: true,
 
-        return PermissionService.createPermission(name, customerId, description);
+      async resolve(parent, args) {
+        if (!args.data?.name || !args.data?.customerId) {
+          throw new Error('Name and/or customerID not valid!');
+        }
+
+        const permission = await PermissionService.createPermission(
+          args.data?.name,
+          args.data?.customerId,
+          args.data?.description,
+        );
+
+        return permission;
       },
     });
   },

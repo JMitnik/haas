@@ -1,7 +1,8 @@
-import { PrismaClient, User, UserWhereInput } from '@prisma/client';
+import { User, UserWhereInput } from '@prisma/client';
 import _ from 'lodash';
 
-const prisma = new PrismaClient();
+import { Nullable } from '../../types/generic';
+import prisma from '../../prisma';
 
 class UserService {
   static getSearchTermFilter = (searchTerm: string) => {
@@ -11,26 +12,16 @@ class UserService {
 
     const searchTermFilter: UserWhereInput[] = [
       {
-        firstName: {
-          contains: searchTerm,
-        },
+        firstName: { contains: searchTerm },
       },
       {
-        lastName: {
-          contains: searchTerm,
-        },
+        lastName: { contains: searchTerm },
       },
       {
-        email: {
-          contains: searchTerm,
-        },
+        email: { contains: searchTerm },
       },
       {
-        role: {
-          name: {
-            contains: searchTerm,
-          },
-        },
+        role: { name: { contains: searchTerm } },
       },
     ];
 
@@ -68,16 +59,16 @@ class UserService {
     : entries.slice(offset, entries.length));
 
   static paginatedUsers = async (
-    customerId: string,
-    pageIndex: number,
-    offset: number,
-    limit: number,
-    orderBy: any,
-    searchTerm: string,
+    customerSlug: string,
+    pageIndex?: Nullable<number>,
+    offset?: Nullable<number>,
+    limit?: Nullable<number>,
+    orderBy?: Nullable<any>,
+    searchTerm?: Nullable<string>,
   ) => {
     let needPageReset = false;
-    const userWhereInput: UserWhereInput = { customerId };
-    const searchTermFilter = UserService.getSearchTermFilter(searchTerm);
+    const userWhereInput: UserWhereInput = { Customer: { slug: customerSlug } };
+    const searchTermFilter = UserService.getSearchTermFilter(searchTerm || '');
 
     if (searchTermFilter.length > 0) {
       userWhereInput.OR = searchTermFilter;
@@ -95,9 +86,9 @@ class UserService {
       },
     });
 
-    const totalPages = Math.ceil(users.length / limit);
+    const totalPages = Math.ceil(users.length / (limit || 1));
 
-    if (pageIndex + 1 > totalPages) {
+    if (pageIndex && pageIndex + 1 > totalPages) {
       offset = 0;
       needPageReset = true;
     }
@@ -105,7 +96,7 @@ class UserService {
     const orderedUsers = UserService.orderUsersBy(users, orderBy);
 
     // Slice ordered filtered users
-    const slicedOrderedUsers = UserService.sliceUsers(orderedUsers, offset, limit, pageIndex);
+    const slicedOrderedUsers = UserService.sliceUsers(orderedUsers, (offset || 0), (limit || 0), (pageIndex || 0));
 
     return {
       users: slicedOrderedUsers,

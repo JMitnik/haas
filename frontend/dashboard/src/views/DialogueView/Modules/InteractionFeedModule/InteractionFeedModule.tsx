@@ -1,7 +1,6 @@
-import { useHistory, useParams } from 'react-router-dom';
 import React, { Dispatch, SetStateAction } from 'react';
 
-import { Card, CardBody, Div, H2, H3, Flex, Span } from '@haas/ui';
+import { Card, CardBody, Div, Flex, H3, Span } from '@haas/ui';
 
 import { InteractionFeedEntriesContainer } from './InteractionFeedModuleStyles';
 import InteractionFeedEntry from './InteractionFeedEntry';
@@ -19,12 +18,8 @@ const InteractionFeedModule = ({
   onActiveSessionChange: Dispatch<SetStateAction<string>>,
   timelineEntries: Array<TimelineEntryProps>
 }) => {
-  const history = useHistory();
-  const { customerId, topicId } = useParams();
-
   // TODO: Set setActiveSession on a context, so you dont pass it as prop around
-  const viewTimeLine = (timelineEntry: any) => {
-  };
+  const viewTimeLine = () => {};
 
   return (
     <Card bg="white" noHover>

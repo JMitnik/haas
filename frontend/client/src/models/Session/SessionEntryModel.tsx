@@ -1,11 +1,20 @@
-import { IAnyModelType, Instance, types } from 'mobx-state-tree';
+import { Instance, SnapshotIn, types } from 'mobx-state-tree';
 
 import { TreeNodeModel } from '../Tree/TreeNodeModel';
 
 export const SessionEntryDataModel = types.model({
-  numberValue: types.maybeNull(types.number),
-  textValue: types.maybeNull(types.string),
-  multiValues: types.maybeNull(types.array(types.late((): IAnyModelType => SessionEntryDataModel))),
+  slider: types.maybe(types.model({
+    value: types.number,
+  })),
+  textbox: types.maybe(types.model({
+    value: types.string,
+  })),
+  register: types.maybe(types.model({
+    value: types.string,
+  })),
+  choice: types.maybe(types.model({
+    value: types.string,
+  })),
 });
 
 const SessionEntryModel = types
@@ -15,6 +24,7 @@ const SessionEntryModel = types
   });
 
 export interface SessionEntryDataProps extends Instance<typeof SessionEntryDataModel>{}
+export interface SessionEntryDataInputProps extends SnapshotIn<typeof SessionEntryDataModel>{}
 export interface SessionEntryProps extends Instance<typeof SessionEntryModel>{}
 
 export default SessionEntryModel;

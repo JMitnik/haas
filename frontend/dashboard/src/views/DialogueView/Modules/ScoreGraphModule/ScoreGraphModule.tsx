@@ -1,8 +1,16 @@
 import { Card, CardBody, Flex, H3, Span } from '@haas/ui';
 import { ResponsiveLine as NivoLineChart } from '@nivo/line';
+import {
+  dialogueStatistics_customer_dialogue_statistics_history as SessionHistory,
+} from 'views/DialogueView/__generated__/dialogueStatistics';
 import React from 'react';
 
-const ScoreGraphModule = ({ chartData }: { chartData: any }) => {
+const ScoreGraphModule = ({ chartData }: { chartData: SessionHistory[] }) => {
+  // TODO: Return a nice null card or something
+  if (!chartData) {
+    return null;
+  }
+
   const data = [
     {
       id: 'score',

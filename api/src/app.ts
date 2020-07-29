@@ -14,7 +14,7 @@ const main = async () => {
     origin: (origin, callback) => {
       const validOrigins = ['dashboard.haas.live', 'client.haas.live', 'haas-dashboard.netlify.app', 'haas-client.netlify.app'];
 
-      if (origin && validOrigins.find((origin: string) => origin.endsWith(origin))) {
+      if (config.env === 'local' || (origin && validOrigins.find((origin: string) => origin.endsWith(origin)))) {
         callback(null, true);
       }
     },
@@ -25,10 +25,10 @@ const main = async () => {
 
   apollo.applyMiddleware({
     app,
-    cors: false,
+    // cors: false,
   });
 
-  app.listen(config.port);
+  const runningServer = app.listen(config.port);
 
   console.log(`Only intended to work on ${config.clientUrl} and ${config.dashboardUrl}`);
   console.log(`Server successfully started on port ${config.port} for graphql entrypoint at ${apollo.graphqlPath}`);

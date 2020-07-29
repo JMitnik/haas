@@ -17,9 +17,9 @@ import TextboxNode from './nodes/TextboxNode/TextboxNode';
 
 const nodeMap: Record<string, (props: GenericNodeProps) => JSX.Element> = {
   SLIDER: SliderNode,
-  MULTI_CHOICE: MultiChoiceNode,
+  CHOICE: MultiChoiceNode,
   TEXTBOX: TextboxNode,
-  SOCIAL_SHARE: SocialShareNode,
+  LINK: SocialShareNode,
   REGISTRATION: RegisterNode,
   POST_LEAF: PostLeafNode,
 };

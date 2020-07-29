@@ -1,20 +1,33 @@
 import {
-  PrismaClient,
   Trigger,
   TriggerCondition,
+  TriggerOrderByInput,
   TriggerUpdateInput,
   TriggerWhereInput,
   User,
   UserUpdateManyWithoutTriggersInput,
   UserWhereUniqueInput,
 } from '@prisma/client';
+import { isAfter, subSeconds } from 'date-fns';
 import _ from 'lodash';
 
-import { isAfter, subSeconds } from 'date-fns';
-import SMSService from '../../services/sms/sms-service';
+// eslint-disable-next-line import/no-cycle
+import { isPresent } from 'ts-is-present';
+import { NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
+// eslint-disable-next-line import/no-cycle
+import NodeEntryService, { NodeEntryWithTypes } from '../node-entry/NodeEntryService';
 import TriggerSMSService from '../../services/sms/trigger-sms-service';
+import prisma from '../../prisma';
 
-const prisma = new PrismaClient();
+interface TriggerWithSendData extends Trigger {
+  recipients: User[];
+  conditions: TriggerCondition[];
+  relatedNode: {
+    questionDialogue: {
+      title: string;
+    } | null;
+  } | null;
+}
 
 class TriggerService {
   static getSearchTermFilter = (searchTerm: string) => {
@@ -57,56 +70,53 @@ class TriggerService {
     ? entries.slice(offset, (pageIndex + 1) * limit)
     : entries.slice(offset, entries.length));
 
-  static paginatedTriggers = async (
-    customerSlug: string,
-    pageIndex: number,
-    offset: number,
-    limit: number,
-    orderBy: any,
-    searchTerm: string,
-  ) => {
-    let needPageReset = false;
-    const triggerWhereInput: TriggerWhereInput = { customer: { slug: customerSlug } };
-    const searchTermFilter = TriggerService.getSearchTermFilter(searchTerm);
+  static formatOrderBy(orderByArray?: NexusGenInputs['PaginationSortInput'][]): (TriggerOrderByInput|undefined) {
+    if (!orderByArray?.length) return undefined;
 
-    if (searchTermFilter.length > 0) {
-      triggerWhereInput.OR = searchTermFilter;
-    }
-
-    // Search term filtered users
-    const triggers = await prisma.trigger.findMany({
-      where: triggerWhereInput,
-    });
-
-    const totalPages = Math.ceil(triggers.length / limit);
-
-    if (pageIndex + 1 > totalPages) {
-      offset = 0;
-      needPageReset = true;
-    }
-    // Order filtered users
-    const orderedTriggers = TriggerService.orderUsersBy(triggers, orderBy);
-
-    // Slice ordered filtered users
-    const slicedOrderedTriggers = TriggerService.slice(orderedTriggers, offset, limit, pageIndex);
+    const orderBy = orderByArray[0];
 
     return {
-      triggers: slicedOrderedTriggers,
-      pageIndex: needPageReset ? 0 : pageIndex,
-      totalPages,
+      medium: orderBy.by === 'medium' ? orderBy.desc ? 'desc' : 'asc' : undefined,
+      type: orderBy.by === 'type' ? orderBy.desc ? 'desc' : 'asc' : undefined,
+      name: orderBy.by === 'name' ? orderBy.desc ? 'desc' : 'asc' : undefined,
+    };
+  }
+
+  static paginatedTriggers = async (
+    customerSlug: string,
+    paginationOpts: NexusGenInputs['PaginationWhereInput'],
+  ) => {
+    // Build filter
+    const triggerWhereInput: TriggerWhereInput = { customer: { slug: customerSlug } };
+
+    const searchTermFilter = TriggerService.getSearchTermFilter(paginationOpts.search || '');
+    triggerWhereInput.OR = searchTermFilter.length ? searchTermFilter : undefined;
+
+    const triggers = await prisma.trigger.findMany({
+      where: triggerWhereInput,
+      take: paginationOpts.limit || undefined,
+      skip: paginationOpts.offset || undefined,
+      orderBy: TriggerService.formatOrderBy(paginationOpts.orderBy || undefined),
+    });
+
+    const triggerTotal = await prisma.trigger.count({ where: { customer: { slug: customerSlug } } });
+    const totalPages = paginationOpts.limit ? Math.ceil(triggerTotal / (paginationOpts.limit)) : 1;
+    const currentPage = paginationOpts.pageIndex && paginationOpts.pageIndex <= totalPages
+      ? paginationOpts.pageIndex : 1;
+
+    const pageInfo: NexusGenRootTypes['PaginationPageInfo'] = {
+      nrPages: totalPages,
+      pageIndex: currentPage,
+    };
+
+    return {
+      triggers,
+      pageInfo,
     };
   };
 
   static sendTrigger = (
-    trigger: Trigger & {
-      recipients: User[];
-      conditions: TriggerCondition[];
-      relatedNode: {
-        questionDialogue: {
-          title: string;
-        } | null;
-      } | null;
-    },
+    trigger: TriggerWithSendData,
     recipient: User,
     value: string | number | undefined,
     smsService: TriggerSMSService,
@@ -117,37 +127,28 @@ class TriggerService {
     // TODO: Add the mail check (below) in this body as well.
   };
 
-  static tryTrigger = async (entries: Array<any>, trigger: Trigger & {
-    recipients: User[];
-    conditions: TriggerCondition[];
-    relatedNode: {
-      questionDialogue: {
-        title: string;
-      } | null;
-    } | null;
-  },
-    smsService: TriggerSMSService) => {
+  static async tryTrigger(entries: NodeEntryWithTypes[], trigger:TriggerWithSendData, smsService: TriggerSMSService) {
     const currentDate = new Date();
     const safeToSend = !trigger.lastSent || isAfter(subSeconds(currentDate, 5), trigger.lastSent);
 
-    if (safeToSend) {
-      // TODO: Do we have to await this function? can just let it run on the side
-      await prisma.trigger.update(({ where: { id: trigger.id }, data: { lastSent: currentDate } }));
+    // TODO-LATER: Put this part into a queue
+    if (!safeToSend) return;
 
-      const { data } = entries.find((entry) => entry.nodeId === trigger.relatedNodeId);
-      const condition = trigger.conditions[0];
-      const { isMatch, value } = TriggerService.match(condition, data);
+    await prisma.trigger.update(({ where: { id: trigger.id }, data: { lastSent: currentDate } }));
 
-      if (isMatch) {
-        trigger.recipients.forEach((recipient) => {
-          TriggerService.sendTrigger(trigger, recipient, value, smsService);
-        });
-      }
+    const nodeEntry = entries.find((entry) => entry.relatedNodeId === trigger.relatedNodeId);
+    const condition = trigger.conditions[0];
+
+    if (!nodeEntry) return;
+    const { isMatch, value } = TriggerService.match(condition, nodeEntry);
+
+    if (isMatch && value) {
+      trigger.recipients.forEach((recipient) => TriggerService.sendTrigger(trigger, recipient, value, smsService));
     }
-  };
+  }
 
-  static tryTriggers = async (entries: Array<any>, smsService: TriggerSMSService) => {
-    const questionIds = entries.map((entry: any) => entry.nodeId);
+  static tryTriggers = async (entries: NodeEntryWithTypes[], smsService: TriggerSMSService) => {
+    const questionIds = entries.map((entry) => entry.relatedNodeId).filter(isPresent);
     const dialogueTriggers = await TriggerService.findTriggersByQuestionIds(questionIds);
 
     dialogueTriggers.forEach(async (trigger) => {
@@ -185,55 +186,98 @@ class TriggerService {
     },
   });
 
-  static match = (
-    triggerCondition: TriggerCondition,
-    answer: { numberValue: number | null, textValue: string | null },
-  ) => {
+  static match(triggerCondition: TriggerCondition, entry: NodeEntryWithTypes) {
     let conditionMatched;
+
     switch (triggerCondition.type) {
-      case 'HIGH_THRESHOLD':
-        conditionMatched = ((answer?.numberValue || answer?.numberValue === 0) && triggerCondition?.maxValue)
-          ? { isMatch: answer.numberValue >= triggerCondition.maxValue, value: answer.numberValue }
-          : { isMatch: false };
+      case 'HIGH_THRESHOLD': {
+        conditionMatched = { isMatch: false };
+
+        if (!entry.sliderNodeEntry?.value || !triggerCondition?.maxValue) {
+          break;
+        }
+
+        if (entry.sliderNodeEntry?.value > triggerCondition.maxValue) {
+          conditionMatched = { isMatch: true, value: entry.sliderNodeEntry?.value };
+        }
+
         break;
-      case 'LOW_THRESHOLD':
-        conditionMatched = ((answer?.numberValue || answer?.numberValue === 0) && triggerCondition.minValue)
-          ? { isMatch: answer.numberValue <= triggerCondition.minValue, value: answer.numberValue }
-          : { isMatch: false };
+      }
+
+      case 'LOW_THRESHOLD': {
+        conditionMatched = { isMatch: false };
+
+        if (!entry.sliderNodeEntry?.value || !triggerCondition?.minValue) {
+          break;
+        }
+
+        if (entry.sliderNodeEntry?.value < triggerCondition.minValue) {
+          conditionMatched = { isMatch: true, value: entry.sliderNodeEntry?.value };
+        }
+
         break;
-      case 'TEXT_MATCH':
-        conditionMatched = (answer?.textValue && triggerCondition.textValue)
-          ? {
-            isMatch: answer.textValue.toLowerCase() === triggerCondition.textValue.toLowerCase(),
-            value: answer.textValue,
-          }
-          : { isMatch: false };
+      }
+
+      case 'TEXT_MATCH': {
+        conditionMatched = { isMatch: false };
+
+        const textEntry = NodeEntryService.getTextValueFromEntry(entry);
+
+        if (!textEntry || !triggerCondition?.textValue) {
+          break;
+        }
+
+        if (textEntry === triggerCondition.textValue) {
+          conditionMatched = { isMatch: true, value: textEntry };
+        }
+
         break;
-      case 'OUTER_RANGE':
-        conditionMatched = ((answer?.numberValue || answer?.numberValue === 0) && triggerCondition.maxValue && (triggerCondition.minValue || triggerCondition.minValue === 0))
-          ? {
-            isMatch: answer.numberValue >= triggerCondition.maxValue
-              || answer.numberValue <= triggerCondition.minValue,
-            value: answer.numberValue,
-          }
-          : { isMatch: false };
+      }
+
+      case 'INNER_RANGE': {
+        conditionMatched = { isMatch: false };
+
+        const score = entry.sliderNodeEntry?.value;
+
+        if (!score || !triggerCondition.maxValue || !triggerCondition.minValue) {
+          break;
+        }
+
+        if (score > triggerCondition.maxValue) {
+          conditionMatched = {
+            isMatch: score <= triggerCondition.maxValue && triggerCondition?.minValue <= score,
+            value: score,
+          };
+        }
+
         break;
-      case 'INNER_RANGE':
-        conditionMatched = (answer?.numberValue || answer?.numberValue === 0)
-        && triggerCondition.maxValue
-        && (triggerCondition.minValue || triggerCondition.minValue === 0)
-          ? {
-            isMatch: (answer.numberValue <= triggerCondition.maxValue
-              && answer.numberValue >= triggerCondition.minValue),
-            value: answer.numberValue,
-          }
-          : { isMatch: false };
+      }
+
+      case 'OUTER_RANGE': {
+        conditionMatched = { isMatch: false };
+
+        const score = entry.sliderNodeEntry?.value;
+
+        if (!score || !triggerCondition.maxValue || !triggerCondition.minValue) {
+          break;
+        }
+
+        if (score > triggerCondition.maxValue) {
+          conditionMatched = {
+            isMatch: score >= triggerCondition.maxValue && triggerCondition?.minValue >= score,
+            value: score,
+          };
+        }
+
         break;
+      }
+
       default:
         conditionMatched = { isMatch: false };
     }
+
     return conditionMatched;
-  };
+  }
 
   static updateRelatedQuestion = (
     dbTriggerRelatedNodeId: string | null | undefined,
@@ -250,10 +294,12 @@ class TriggerService {
 
   static updateConditions = async (
     dbTriggerConditions: Array<TriggerCondition>,
-    newConditions: Array<TriggerCondition>,
+    newConditions: Array<NexusGenInputs['TriggerConditionInputType']>,
     triggerId: string,
   ) => {
     const upsertedConditionsIds = await Promise.all(newConditions.map(async (condition) => {
+      if (!condition.type) return null;
+
       const upsertTriggerCondition = await prisma.triggerCondition.upsert({
         where: { id: condition.id || -1 },
         create: {
@@ -283,6 +329,8 @@ class TriggerService {
         const deletedCondition = await prisma.triggerCondition.delete({ where: { id: condition.id } });
         return deletedCondition.id;
       }
+
+      return null;
     }));
   };
 

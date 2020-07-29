@@ -1,18 +1,24 @@
-import { PrismaClient } from '@prisma/client';
 import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
 
 // eslint-disable-next-line import/no-cycle
+import { CustomerType } from '../customer/Customer';
 import { DialogueType } from '../questionnaire/Dialogue';
 
-const prisma = new PrismaClient();
+export const TagTypeEnum = enumType({
+  name: 'TagTypeEnum',
+  members: ['DEFAULT', 'LOCATION', 'AGENT'],
+});
 
 export const TagType = objectType({
-  name: 'TagType',
+  name: 'Tag',
+
   definition(t) {
-    t.string('id');
+    t.id('id');
     t.string('name');
+
     t.string('customerId');
-    t.string('type');
+
+    t.field('type', { type: TagTypeEnum });
   },
 });
 
@@ -25,29 +31,30 @@ export const TagQueries = extendType({
         customerSlug: 'String',
         dialogueId: 'String',
       },
-      async resolve(parent: any, args: any) {
+
+      async resolve(parent, args, ctx) {
         if (args.dialogueId) {
-          const tags = await prisma.tag.findMany({
+          const tags = await ctx.prisma.tag.findMany({
             where: {
-              isTagOf: {
-                some: {
-                  id: args.dialogueId,
-                },
-              },
+              isTagOf: { some: { id: args.dialogueId } },
             },
           });
 
           return tags;
         }
 
-        const customer = await prisma.customer.findOne({
-          where: { slug: args.customerSlug },
-          include: {
-            tags: true,
-          },
-        });
+        if (args.customerSlug) {
+          const customer = await ctx.prisma.customer.findOne({
+            where: { slug: args.customerSlug },
+            include: {
+              tags: true,
+            },
+          });
 
-        return customer?.tags;
+          return customer?.tags || [];
+        }
+
+        throw new Error('Provide a dialogue id or customer slug to find tags');
       },
     });
   },
@@ -60,11 +67,6 @@ export const TagsInputType = inputObjectType({
   },
 });
 
-export const TagTypeEnum = enumType({
-  name: 'TagTypeEnum',
-  members: ['DEFAULT', 'LOCATION', 'AGENT'],
-});
-
 export const TagMutations = extendType({
   type: 'Mutation',
   definition(t) {
@@ -74,10 +76,12 @@ export const TagMutations = extendType({
         dialogueId: 'String',
         tags: TagsInputType,
       },
-      resolve(parent: any, args: any) {
-        const tags = args.tags.entries.length > 0 ? args.tags.entries.map((entry: string) => ({ id: entry })) : [];
+      resolve(parent, args, ctx) {
+        if (!args.dialogueId) throw new Error('No dialogue provided to assign to tags');
 
-        return prisma.dialogue.update({
+        const tags = args.tags?.entries?.map((entryId) => ({ id: entryId })) || [];
+
+        return ctx.prisma.dialogue.update({
           where: {
             id: args.dialogueId,
           },
@@ -97,19 +101,17 @@ export const TagMutations = extendType({
         customerSlug: 'String',
         type: TagTypeEnum,
       },
-      async resolve(parent: any, args: any) {
-        if (!args.customerSlug) {
-          return null;
-        }
+      async resolve(parent, args, ctx) {
+        if (!args.customerSlug) throw new Error('No customer slug provided for which tag to create');
 
-        const customer = await prisma.customer.findOne({
+        const customer = await ctx.prisma.customer.findOne({
           where: { slug: args.customerSlug },
         });
 
-        return prisma.tag.create({
+        return ctx.prisma.tag.create({
           data: {
-            name: args.name,
-            type: args.type,
+            name: args.name || '',
+            type: args.type || 'DEFAULT',
             customer: {
               connect: {
                 id: customer?.id,
@@ -125,8 +127,10 @@ export const TagMutations = extendType({
       args: {
         tagId: 'String',
       },
-      resolve(parent: any, args: any) {
-        return prisma.tag.delete({ where: { id: args.tagId } });
+      resolve(parent, args, ctx) {
+        if (!args.tagId) throw new Error('No valid tag id provided');
+
+        return ctx.prisma.tag.delete({ where: { id: args.tagId } });
       },
     });
   },

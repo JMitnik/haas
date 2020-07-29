@@ -1,7 +1,7 @@
 import { ReactComponent as ShowMoreButtonSVG } from 'assets/icons/icon-more.svg';
 import Dropdown from 'components/Dropdown';
 import React from 'react';
-import styled, { css } from 'styled-components/macro';
+import styled from 'styled-components/macro';
 
 const ShowMoreButtonContainer = styled.div`
   height: 25px;
@@ -17,7 +17,7 @@ interface ShowMoreButtonProps {
 }
 
 const ShowMoreButton = ({ renderMenu }: ShowMoreButtonProps) => (
-  <ShowMoreButtonContainer>
+  <ShowMoreButtonContainer data-cy="ShowMoreButton">
     <Dropdown renderOverlay={renderMenu}>
       <ShowMoreButtonSVG />
     </Dropdown>

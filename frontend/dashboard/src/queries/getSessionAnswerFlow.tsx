@@ -7,21 +7,22 @@ const getSessionAnswerFlowQuery = gql`
     }) {
         id
         nodeEntries {
-        values {
-          numberValue
-          textValue
-          multiValues {
-            textValue
-          }
           id
-        }
-        relatedNode {
-          title
+          depth
+          relatedNode {
+            title
+            type
+          }
+          value {
+            sliderNodeEntry
+            textboxNodeEntry
+            registrationNodeEntry
+            linkNodeEntry
+            choiceNodeEntry
+          }
         }
       }
     }
-  }
-
 `;
 
 export default getSessionAnswerFlowQuery;

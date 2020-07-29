@@ -1,8 +1,8 @@
 import gql from 'graphql-tag';
 
 const getUsersQuery = gql`
-  query getTriggerTable($customerSlug: String!,$filter: FilterInput) {
-    triggerTable(customerSlug: $customerSlug, filter: $filter) {
+  query getTriggerTable($customerSlug: String!,$filter: PaginationWhereInput) {
+    triggerConnection(customerSlug: $customerSlug, filter: $filter) {
       triggers {
         id
         name
@@ -23,8 +23,10 @@ const getUsersQuery = gql`
             email
         }
       }
-      totalPages
-      pageIndex
+      pageInfo {
+        pageIndex
+        nrPages
+      }
     }
   }
 `;

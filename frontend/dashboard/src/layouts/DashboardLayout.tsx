@@ -51,7 +51,6 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
         <Sidenav>
           <Div>
             <NavLogo />
-
             <NavItems>
               <NavItem to={`/dashboard/b/${customerSlug}/d`}>
                 <SurveyIcon />

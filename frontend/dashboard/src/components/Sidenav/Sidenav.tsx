@@ -1,5 +1,5 @@
 import { ArrowRightCircle } from 'react-feather';
-import { ColumnFlex, Div, Flex, H4, Span } from '@haas/ui';
+import { ColumnFlex, Div, Flex, Span } from '@haas/ui';
 import { LinkProps, NavLink, useHistory } from 'react-router-dom';
 import { UserProps } from 'types/generic';
 import { useCustomer } from 'providers/CustomerProvider';
@@ -152,6 +152,8 @@ const BusinessFlex = styled(Flex)`
 export const SidenavContainer = styled.div`
   ${({ theme }) => css`
     position: fixed;
+    z-index: 300;
+    font-weight: 1000;
     width: ${theme.sidenav.width}px;
 
     background: ${theme.colors.app.sidebar};
@@ -181,7 +183,7 @@ export const SidenavContainer = styled.div`
 `;
 
 const Sidenav = ({ children }: { children: React.ReactNode }) => (
-  <SidenavContainer>
+  <SidenavContainer data-cy="Sidenav">
     {children}
   </SidenavContainer>
 );

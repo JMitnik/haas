@@ -1,12 +1,8 @@
-import { PrismaClient, User } from '@prisma/client';
 import { extendType, inputObjectType, objectType } from '@nexus/schema';
 
-import { FilterInput } from '../session/Session';
-import { PaginationProps } from '../../types/generic';
+import { PaginationWhereInput } from '../general/Pagination';
 import { RoleType } from '../role/Role';
 import UserService from './UserService';
-
-const prisma = new PrismaClient();
 
 export const UserType = objectType({
   name: 'UserType',
@@ -17,10 +13,16 @@ export const UserType = objectType({
     t.string('firstName', { nullable: true });
     t.string('lastName', { nullable: true });
 
+    t.string('roleId', { nullable: true });
     t.field('role', {
       type: RoleType,
-      resolve(parent: User) {
-        return prisma.role.findOne({ where: { id: parent.roleId } });
+      nullable: true,
+      async resolve(parent, args, ctx) {
+        const role = await ctx.prisma.role.findOne({ where: { id: parent.roleId || undefined } });
+
+        if (!role) return null;
+
+        return role;
       },
     });
   },
@@ -54,36 +56,56 @@ export const UserQueries = extendType({
   definition(t) {
     t.field('userTable', {
       type: UserTable,
-      args: { customerSlug: 'String', filter: FilterInput },
-      async resolve(parent: any, args: any, ctx: any) {
-        const { pageIndex, offset, limit, searchTerm, orderBy }: PaginationProps = args.filter;
+      args: { customerSlug: 'String', filter: PaginationWhereInput },
+      nullable: true,
 
-        if (args.filter) {
-          return UserService.paginatedUsers(args.customerId, pageIndex, offset, limit, orderBy[0], searchTerm);
-        }
+      async resolve(parent, args) {
+        if (!args.customerSlug) return null;
+        if (!args.filter) return null;
 
-        const users = await prisma.user.findMany({ where: { Customer: {
-          slug: args.customerSlug,
-        } } });
-        const totalPages = Math.ceil(users.length / limit);
+        return UserService.paginatedUsers(
+          args.customerSlug,
+          args.filter?.pageIndex,
+          args.filter?.offset,
+          args.filter?.limit,
+          args.filter?.orderBy?.[0],
+          args.filter?.searchTerm,
+        );
 
-        return { users, pageIndex, totalPages };
+        // const users = await ctx.prisma.user.findMany({ where: { Customer: {
+        //   slug: args.customerSlug,
+        // } } });
+
+        // TODO: Return this
+        // const totalPages = Math.ceil(users.length / (args.filter?.limit || 1));
+        // const totalPages = 1;
+
+        // return { users, pageIndex, totalPages };
       },
     });
 
     t.list.field('users', {
       type: UserType,
       args: { customerSlug: 'String' },
-      resolve(parent: any, args: any, ctx: any) {
-        return prisma.user.findMany({ where: { Customer: { slug: args.customerSlug } } });
+
+      resolve(parent, args, ctx) {
+        if (!args.customerSlug) throw new Error('No business provided');
+        return ctx.prisma.user.findMany({ where: { Customer: { slug: args.customerSlug } } });
       },
     });
 
     t.field('user', {
       type: UserType,
       args: { userId: 'String' },
-      resolve(parent: any, args: any, ctx: any) {
-        return prisma.user.findOne({ where: { id: args.userId } });
+      nullable: true,
+
+      async resolve(parent, args, ctx) {
+        if (!args.userId) throw new Error('No valid user id provided');
+
+        const user = await ctx.prisma.user.findOne({ where: { id: args.userId } });
+
+        if (!user) throw new Error('Cant find user with this ID');
+        return user || null;
       },
     });
   },
@@ -94,11 +116,17 @@ export const UserMutations = extendType({
   definition(t) {
     t.field('createUser', {
       type: UserType,
-      args: { customerSlug: 'String',
-        input: UserInput },
-      resolve(parent: any, args: any, ctx: any) {
+      args: { customerSlug: 'String', input: UserInput },
+
+      resolve(parent, args, ctx) {
+        if (!args.customerSlug) throw new Error('No customer scope provided');
+        if (!args.input) throw new Error('No input provided');
+
         const { firstName, lastName, email, phone, roleId } = args.input;
-        return prisma.user.create({
+
+        if (!email) throw new Error('No valid email provided');
+
+        return ctx.prisma.user.create({
           data: {
             email,
             firstName,
@@ -106,7 +134,7 @@ export const UserMutations = extendType({
             phone,
             role: {
               connect: {
-                id: roleId,
+                id: roleId || undefined,
               },
             },
             Customer: {
@@ -122,9 +150,17 @@ export const UserMutations = extendType({
     t.field('editUser', {
       type: UserType,
       args: { id: 'String', input: UserInput },
-      resolve(parent: any, args: any, ctx: any) {
+
+      resolve(parent, args, ctx) {
+        if (!args.id) throw new Error('No valid user provided to edit');
+        if (!args.input) throw new Error('No input provided');
         const { firstName, lastName, email, phone, roleId } = args.input;
-        return prisma.user.update({
+
+        if (!email) throw new Error('No valid email provided');
+
+        // TODO: Check if user exists?
+
+        return ctx.prisma.user.update({
           where: {
             id: args.id,
           },
@@ -135,7 +171,7 @@ export const UserMutations = extendType({
             email,
             role: {
               connect: {
-                id: roleId,
+                id: roleId || undefined,
               },
             },
           },
@@ -146,8 +182,10 @@ export const UserMutations = extendType({
     t.field('deleteUser', {
       type: UserType,
       args: { id: 'String' },
-      resolve(parent: any, args: any, ctx) {
-        return prisma.user.delete({ where: { id: args.id } });
+      resolve(parent, args, ctx) {
+        if (!args.id) throw new Error('No valid user provided to delete');
+
+        return ctx.prisma.user.delete({ where: { id: args.id } });
       },
     });
   },

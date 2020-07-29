@@ -28,6 +28,7 @@ export const Container = styled(Div)<ContainerProps>`
     position: relative;
     margin: 0 auto;
     width: ${theme.containerWidth}px;
+    max-width: 100%;
 
     ${color}
     ${space}
@@ -35,7 +36,7 @@ export const Container = styled(Div)<ContainerProps>`
     ${width}
   `}
 `;
-interface ExtraGridProps extends GridProps, WidthProps, LayoutProps, ColorProps, BorderProps, PositionProps {}
+interface ExtraGridProps extends GridProps, WidthProps, LayoutProps, ColorProps, BorderProps, PositionProps, SpaceProps, {}
 interface ExtraFlexProps extends FlexboxProps, LayoutProps, WidthProps, BorderProps, GridProps, PositionProps, SpaceProps, ColorProps {
   growChildren?: boolean;
 }
@@ -81,5 +82,6 @@ export const Grid = styled.div<ExtraGridProps>`
     ${color}
     ${border}
     ${position}
+    ${space}
   `}
 `;
