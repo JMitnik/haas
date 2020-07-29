@@ -12,8 +12,7 @@ const main = async () => {
     // Hardcoded for the moment
 
     origin: (origin, callback) => {
-      // callback(null, true);
-      const validOrigins = ['haas-dashboard.netlify.app', 'haas-client.netlify.app'];
+      const validOrigins = ['dashboard.haas.live', 'client.haas.live', 'haas-dashboard.netlify.app', 'haas-client.netlify.app'];
 
       if (config.env === 'local' || (origin && validOrigins.find((origin: string) => origin.endsWith(origin)))) {
         callback(null, true);
