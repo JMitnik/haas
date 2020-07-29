@@ -75,9 +75,10 @@ export const StyledInput = styled.input <{hasError?: boolean }>`
     /* Make somehow a color */
     border: 1px solid #dbdde0;
     box-shadow: none;
-
+    
     /* Set to variable */
     padding: 15px;
+    width: 100%;
 
     ${hasError && css`
     border: 1px solid red;

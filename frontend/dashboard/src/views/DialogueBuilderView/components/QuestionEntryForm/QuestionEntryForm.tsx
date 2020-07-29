@@ -291,32 +291,32 @@ const QuestionEntryForm = ({
     const options = { options: activeOptions };
     const edgeCondition = activeCondition;
     console.log('form data: ', formData);
-    // if (question.id !== '-1') {
-    //   updateQuestion({
-    //     variables: {
-    //       id,
-    //       title,
-    //       type,
-    //       overrideLeafId: overrideLeafId || '',
-    //       edgeId: edgeId || '-1',
-    //       optionEntries: options,
-    //       edgeCondition,
-    //     },
-    //   });
-    // } else {
-    //   createQuestion({
-    //     variables: {
-    //       customerSlug,
-    //       dialogueSlug,
-    //       title,
-    //       type,
-    //       overrideLeafId: overrideLeafId || 'None',
-    //       parentQuestionId,
-    //       optionEntries: options,
-    //       edgeCondition,
-    //     },
-    //   });
-    // }
+    if (question.id !== '-1') {
+      updateQuestion({
+        variables: {
+          id,
+          title,
+          type,
+          overrideLeafId: overrideLeafId || '',
+          edgeId: edgeId || '-1',
+          optionEntries: options,
+          edgeCondition,
+        },
+      });
+    } else {
+      createQuestion({
+        variables: {
+          customerSlug,
+          dialogueSlug,
+          title,
+          type,
+          overrideLeafId: overrideLeafId || 'None',
+          parentQuestionId,
+          optionEntries: options,
+          edgeCondition,
+        },
+      });
+    }
   };
 
   const ErrorStyle = {
@@ -446,21 +446,25 @@ const QuestionEntryForm = ({
                     <Hr />
                   </Div>
 
-                    { !activeOptions.length && <Muted>Please add an option </Muted>}
+                    {!activeOptions.length && !errors.options && <Muted>Please add an option </Muted>}
+                    {!activeOptions.length && errors.options && <Muted color="red">Please fill in at least one option!</Muted>}
                     {activeOptions && activeOptions.map((option, optionIndex) => (
                       <Flex key={`${option.id}-${optionIndex}-${option.value}`} flexDirection="column">
                         <Flex my={1} flexDirection="row">
-                          <StyledInput
-                            hasError={errors.options && Array.isArray(errors.options) && !!errors.options?.[optionIndex]}
-                            key={`input-${id}-${optionIndex}`}
-                            name={`options[${optionIndex}]`}
-                            ref={register(
-                              { required: true,
-                                minLength: 1 },
-                            )}
-                            defaultValue={option.value}
-                            onChange={(e) => handleOptionChange(e.currentTarget.value, optionIndex)}
-                          />
+                          <Flex flexGrow={1}>
+                            <StyledInput
+                              hasError={errors.options && Array.isArray(errors.options) && !!errors.options?.[optionIndex]}
+                              key={`input-${id}-${optionIndex}`}
+                              name={`options[${optionIndex}]`}
+                              ref={register(
+                                { required: true,
+                                  minLength: 1 },
+                              )}
+                              defaultValue={option.value}
+                              onChange={(e) => handleOptionChange(e.currentTarget.value, optionIndex)}
+                            />
+                          </Flex>
+
                           <DeleteQuestionOptionButtonContainer
                             onClick={(e) => deleteOption(e, optionIndex)}
                           >
