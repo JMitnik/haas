@@ -100,7 +100,7 @@ const QuestionEntryItem = ({ depth,
               <Span fontSize="1.4em">
                 Title
               </Span>
-              <OverflowSpan>
+              <OverflowSpan data-cy="OverflowSpan">
                 {question.title || 'None'}
               </OverflowSpan>
             </Flex>

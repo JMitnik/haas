@@ -104,15 +104,12 @@ describe('Test dialogue builder operations', () => {
 
   // From seed
   // // Check Parent question with child question is available
-  it('Check Parent question with child question is available', () => {
+  it('CRUD DialogueBuilder', () => {
     const DialogueBuilder = cy.get('[data-cy="DialogueBuilderContainer"]');
     const rootSection = DialogueBuilder.get('[data-cy="QuestionSection"]').first();
 
     // Test question expanding
     rootSection.get('[data-cy="QuestionEntry"]').first().contains('Edit').click();
-    // TODO: Why doesn't this selects EditButton of rootQuestion but rather all EditButtons
-    // const rootQuestion = rootSection.get('[data-cy="QuestionEntry"]').first();
-    // rootQuestion.get('[data-cy="EditButton"]').click();
     rootSection.get('[data-cy="QuestionEntry"]').first().contains('General question information');
 
     // Test other entries are disabled when question is expanded
@@ -143,8 +140,9 @@ describe('Test dialogue builder operations', () => {
 
     // Test whether created questions contains values previously entered
     const newSection = cy.get('[data-cy="QuestionSection"]').last();
-    newSection.last().contains(sliderParentQuestion.title);
-    cy.get('[data-cy="QuestionEntry"]').last().find('[data-cy="CTALabel"]').should('have.css', 'background'); // Indicating question has CTA
+    newSection.last().should('contain.text', sliderParentQuestion.title);
+    cy.get('[data-cy="QuestionEntry"]').last().find('[data-cy="CTALabel"]')
+      .should('have.css', 'background'); // Indicating question has CTA
     cy.get('[data-cy="QuestionEntry"]').last()
       .contains('Edit')
       .click();
@@ -172,6 +170,11 @@ describe('Test dialogue builder operations', () => {
 
     cy.get('[data-cy="QuestionSection"]').last().contains(editQuestionData.title);
     cy.get('[data-cy="QuestionEntry"]').last().find('[data-cy="CTALabel"]')
-      .should('not.have.css', 'background-color');
+      .should('have.css', 'border-color');
+
+    // Test whether delete button removes question
+    cy.get('[data-cy="QuestionEntry"]').last().find('[data-cy="DeleteButton"]').click();
+    cy.wait(500);
+    cy.get('[data-cy="QuestionSection"]').last().should('not.contain.text', editQuestionData.title);
   });
 });
