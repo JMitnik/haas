@@ -38,7 +38,7 @@ const AddDialogueView = () => {
   const [activeCustomerTemplate, setActiveCustomerTemplate] = useState<null | {label: string, value: string}>(null);
   const [activeDialogueTemplate, setActiveDialogueTemplate] = useState<null | {label: string, value: string}>(null);
   const [fetchCustomers, { data: customerData }] = useLazyQuery(getCustomerQuery, {
-    fetchPolicy: 'cache-first',
+    fetchPolicy: 'cache-and-network',
     onError: (error: any) => {
       console.log(error);
     },
