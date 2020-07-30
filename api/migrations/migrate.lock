@@ -14,3 +14,4 @@
 20200713192355-remove-type
 20200713192510-added
 20200721223038-make-customer-required
+20200730210828-added-unique-slug-customer-id-constraint

@@ -639,14 +639,14 @@ class DialogueService {
 
   static seedQuestionnare = async (
     customerId: string,
-    customerSlug: string,
+    dialogueSlug: string,
     customerName: string,
     dialogueTitle: string = 'Default dialogue',
     dialogueDescription: string = 'Default questions',
     tags: Array<{id: string}>,
   ): Promise<Dialogue> => {
     const dialogue = await DialogueService.initDialogue(
-      customerId, customerSlug, dialogueTitle, dialogueDescription, '', tags,
+      customerId, dialogueTitle, dialogueSlug, dialogueDescription, '', tags,
     );
 
     const leafs = await NodeService.createTemplateLeafNodes(leafNodes, dialogue.id);
