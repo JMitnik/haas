@@ -3,7 +3,7 @@
   "steps": [
     {
       "tag": "CreateEnum",
-      "enum": "TagType",
+      "enum": "TagEnum",
       "values": [
         "DEFAULT",
         "AGENT",
@@ -12,7 +12,32 @@
     },
     {
       "tag": "CreateEnum",
-      "enum": "TriggerType",
+      "enum": "NodeType",
+      "values": [
+        "GENERIC",
+        "SLIDER",
+        "CHOICE",
+        "REGISTRATION",
+        "TEXTBOX",
+        "LINK"
+      ]
+    },
+    {
+      "tag": "CreateEnum",
+      "enum": "LinkTypeEnum",
+      "values": [
+        "SOCIAL",
+        "API",
+        "FACEBOOK",
+        "LINKEDIN",
+        "WHATSAPP",
+        "INSTAGRAM",
+        "TWITTER"
+      ]
+    },
+    {
+      "tag": "CreateEnum",
+      "enum": "TriggerEnum",
       "values": [
         "QUESTION",
         "SCHEDULED"
@@ -29,7 +54,7 @@
     },
     {
       "tag": "CreateEnum",
-      "enum": "TriggerConditionType",
+      "enum": "TriggerConditionEnum",
       "values": [
         "LOW_THRESHOLD",
         "HIGH_THRESHOLD",
@@ -58,7 +83,7 @@
         "source": "postgresql"
       },
       "argument": "url",
-      "value": "env(\"DB_STRING\")"
+      "value": "\"***\""
     },
     {
       "tag": "CreateModel",
@@ -690,8 +715,33 @@
       "tag": "CreateField",
       "model": "Tag",
       "field": "type",
-      "type": "TagType",
+      "type": "TagEnum",
       "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "Tag",
+          "field": "type"
+        },
+        "directive": "default"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "Tag",
+          "field": "type"
+        },
+        "directive": "default"
+      },
+      "argument": "value",
+      "value": "DEFAULT"
     },
     {
       "tag": "CreateField",
@@ -737,7 +787,7 @@
       "model": "Tag",
       "field": "customer",
       "type": "Customer",
-      "arity": "Optional"
+      "arity": "Required"
     },
     {
       "tag": "CreateDirective",
@@ -783,7 +833,7 @@
       "model": "Tag",
       "field": "customerId",
       "type": "String",
-      "arity": "Optional"
+      "arity": "Required"
     },
     {
       "tag": "CreateModel",
@@ -1163,8 +1213,33 @@
       "tag": "CreateField",
       "model": "QuestionNode",
       "field": "type",
-      "type": "String",
+      "type": "NodeType",
       "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "QuestionNode",
+          "field": "type"
+        },
+        "directive": "default"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "QuestionNode",
+          "field": "type"
+        },
+        "directive": "default"
+      },
+      "argument": "value",
+      "value": "GENERIC"
     },
     {
       "tag": "CreateField",
@@ -1508,6 +1583,198 @@
       "field": "triggers",
       "type": "Trigger",
       "arity": "List"
+    },
+    {
+      "tag": "CreateField",
+      "model": "QuestionNode",
+      "field": "links",
+      "type": "Link",
+      "arity": "List"
+    },
+    {
+      "tag": "CreateModel",
+      "model": "Link"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Link",
+      "field": "id",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "Link",
+          "field": "id"
+        },
+        "directive": "default"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "Link",
+          "field": "id"
+        },
+        "directive": "default"
+      },
+      "argument": "",
+      "value": "cuid()"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "Link",
+          "field": "id"
+        },
+        "directive": "id"
+      }
+    },
+    {
+      "tag": "CreateField",
+      "model": "Link",
+      "field": "createdAt",
+      "type": "DateTime",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "Link",
+          "field": "createdAt"
+        },
+        "directive": "default"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "Link",
+          "field": "createdAt"
+        },
+        "directive": "default"
+      },
+      "argument": "",
+      "value": "now()"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Link",
+      "field": "updatedAt",
+      "type": "DateTime",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "Link",
+          "field": "updatedAt"
+        },
+        "directive": "updatedAt"
+      }
+    },
+    {
+      "tag": "CreateField",
+      "model": "Link",
+      "field": "title",
+      "type": "String",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Link",
+      "field": "type",
+      "type": "LinkTypeEnum",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Link",
+      "field": "url",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Link",
+      "field": "iconUrl",
+      "type": "String",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Link",
+      "field": "backgroundColor",
+      "type": "String",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Link",
+      "field": "questionNode",
+      "type": "QuestionNode",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "Link",
+          "field": "questionNode"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "Link",
+          "field": "questionNode"
+        },
+        "directive": "relation"
+      },
+      "argument": "fields",
+      "value": "[questionNodeId]"
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "Link",
+          "field": "questionNode"
+        },
+        "directive": "relation"
+      },
+      "argument": "references",
+      "value": "[id]"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Link",
+      "field": "questionNodeId",
+      "type": "String",
+      "arity": "Optional"
     },
     {
       "tag": "CreateModel",
@@ -2588,17 +2855,45 @@
     {
       "tag": "CreateField",
       "model": "NodeEntry",
-      "field": "values",
-      "type": "NodeEntryValue",
-      "arity": "List"
-    },
-    {
-      "tag": "CreateModel",
-      "model": "NodeEntryValue"
+      "field": "sliderNodeEntry",
+      "type": "SliderNodeEntry",
+      "arity": "Optional"
     },
     {
       "tag": "CreateField",
-      "model": "NodeEntryValue",
+      "model": "NodeEntry",
+      "field": "choiceNodeEntry",
+      "type": "ChoiceNodeEntry",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateField",
+      "model": "NodeEntry",
+      "field": "textboxNodeEntry",
+      "type": "TextboxNodeEntry",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateField",
+      "model": "NodeEntry",
+      "field": "registrationNodeEntry",
+      "type": "RegistrationNodeEntry",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateField",
+      "model": "NodeEntry",
+      "field": "linkNodeEntry",
+      "type": "LinkNodeEntry",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateModel",
+      "model": "LinkNodeEntry"
+    },
+    {
+      "tag": "CreateField",
+      "model": "LinkNodeEntry",
       "field": "id",
       "type": "Int",
       "arity": "Required"
@@ -2608,7 +2903,7 @@
       "location": {
         "path": {
           "tag": "Field",
-          "model": "NodeEntryValue",
+          "model": "LinkNodeEntry",
           "field": "id"
         },
         "directive": "default"
@@ -2620,7 +2915,7 @@
         "tag": "Directive",
         "path": {
           "tag": "Field",
-          "model": "NodeEntryValue",
+          "model": "LinkNodeEntry",
           "field": "id"
         },
         "directive": "default"
@@ -2633,7 +2928,7 @@
       "location": {
         "path": {
           "tag": "Field",
-          "model": "NodeEntryValue",
+          "model": "LinkNodeEntry",
           "field": "id"
         },
         "directive": "id"
@@ -2641,39 +2936,32 @@
     },
     {
       "tag": "CreateField",
-      "model": "NodeEntryValue",
-      "field": "numberValue",
-      "type": "Int",
+      "model": "LinkNodeEntry",
+      "field": "value",
+      "type": "Json",
       "arity": "Optional"
     },
     {
       "tag": "CreateField",
-      "model": "NodeEntryValue",
-      "field": "textValue",
+      "model": "LinkNodeEntry",
+      "field": "nodeEntryId",
       "type": "String",
-      "arity": "Optional"
+      "arity": "Required"
     },
     {
       "tag": "CreateField",
-      "model": "NodeEntryValue",
-      "field": "parentNodeEntryValueId",
-      "type": "Int",
-      "arity": "Optional"
-    },
-    {
-      "tag": "CreateField",
-      "model": "NodeEntryValue",
-      "field": "parentNodeEntryValue",
-      "type": "NodeEntryValue",
-      "arity": "Optional"
+      "model": "LinkNodeEntry",
+      "field": "nodeEntry",
+      "type": "NodeEntry",
+      "arity": "Required"
     },
     {
       "tag": "CreateDirective",
       "location": {
         "path": {
           "tag": "Field",
-          "model": "NodeEntryValue",
-          "field": "parentNodeEntryValue"
+          "model": "LinkNodeEntry",
+          "field": "nodeEntry"
         },
         "directive": "relation"
       }
@@ -2684,36 +2972,8 @@
         "tag": "Directive",
         "path": {
           "tag": "Field",
-          "model": "NodeEntryValue",
-          "field": "parentNodeEntryValue"
-        },
-        "directive": "relation"
-      },
-      "argument": "",
-      "value": "\"NodeEntryValueToNodeEntryValue\""
-    },
-    {
-      "tag": "CreateArgument",
-      "location": {
-        "tag": "Directive",
-        "path": {
-          "tag": "Field",
-          "model": "NodeEntryValue",
-          "field": "parentNodeEntryValue"
-        },
-        "directive": "relation"
-      },
-      "argument": "fields",
-      "value": "[parentNodeEntryValueId]"
-    },
-    {
-      "tag": "CreateArgument",
-      "location": {
-        "tag": "Directive",
-        "path": {
-          "tag": "Field",
-          "model": "NodeEntryValue",
-          "field": "parentNodeEntryValue"
+          "model": "LinkNodeEntry",
+          "field": "nodeEntry"
         },
         "directive": "relation"
       },
@@ -2721,70 +2981,13 @@
       "value": "[id]"
     },
     {
-      "tag": "CreateField",
-      "model": "NodeEntryValue",
-      "field": "multiValues",
-      "type": "NodeEntryValue",
-      "arity": "List"
-    },
-    {
-      "tag": "CreateDirective",
-      "location": {
-        "path": {
-          "tag": "Field",
-          "model": "NodeEntryValue",
-          "field": "multiValues"
-        },
-        "directive": "relation"
-      }
-    },
-    {
       "tag": "CreateArgument",
       "location": {
         "tag": "Directive",
         "path": {
           "tag": "Field",
-          "model": "NodeEntryValue",
-          "field": "multiValues"
-        },
-        "directive": "relation"
-      },
-      "argument": "",
-      "value": "\"NodeEntryValueToNodeEntryValue\""
-    },
-    {
-      "tag": "CreateField",
-      "model": "NodeEntryValue",
-      "field": "nodeEntryId",
-      "type": "String",
-      "arity": "Optional"
-    },
-    {
-      "tag": "CreateField",
-      "model": "NodeEntryValue",
-      "field": "NodeEntry",
-      "type": "NodeEntry",
-      "arity": "Optional"
-    },
-    {
-      "tag": "CreateDirective",
-      "location": {
-        "path": {
-          "tag": "Field",
-          "model": "NodeEntryValue",
-          "field": "NodeEntry"
-        },
-        "directive": "relation"
-      }
-    },
-    {
-      "tag": "CreateArgument",
-      "location": {
-        "tag": "Directive",
-        "path": {
-          "tag": "Field",
-          "model": "NodeEntryValue",
-          "field": "NodeEntry"
+          "model": "LinkNodeEntry",
+          "field": "nodeEntry"
         },
         "directive": "relation"
       },
@@ -2792,18 +2995,432 @@
       "value": "[nodeEntryId]"
     },
     {
+      "tag": "CreateModel",
+      "model": "SliderNodeEntry"
+    },
+    {
+      "tag": "CreateField",
+      "model": "SliderNodeEntry",
+      "field": "id",
+      "type": "Int",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "SliderNodeEntry",
+          "field": "id"
+        },
+        "directive": "default"
+      }
+    },
+    {
       "tag": "CreateArgument",
       "location": {
         "tag": "Directive",
         "path": {
           "tag": "Field",
-          "model": "NodeEntryValue",
-          "field": "NodeEntry"
+          "model": "SliderNodeEntry",
+          "field": "id"
+        },
+        "directive": "default"
+      },
+      "argument": "",
+      "value": "autoincrement()"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "SliderNodeEntry",
+          "field": "id"
+        },
+        "directive": "id"
+      }
+    },
+    {
+      "tag": "CreateField",
+      "model": "SliderNodeEntry",
+      "field": "value",
+      "type": "Int",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateField",
+      "model": "SliderNodeEntry",
+      "field": "nodeEntryId",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateField",
+      "model": "SliderNodeEntry",
+      "field": "nodeEntry",
+      "type": "NodeEntry",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "SliderNodeEntry",
+          "field": "nodeEntry"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "SliderNodeEntry",
+          "field": "nodeEntry"
         },
         "directive": "relation"
       },
       "argument": "references",
       "value": "[id]"
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "SliderNodeEntry",
+          "field": "nodeEntry"
+        },
+        "directive": "relation"
+      },
+      "argument": "fields",
+      "value": "[nodeEntryId]"
+    },
+    {
+      "tag": "CreateModel",
+      "model": "ChoiceNodeEntry"
+    },
+    {
+      "tag": "CreateField",
+      "model": "ChoiceNodeEntry",
+      "field": "id",
+      "type": "Int",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "ChoiceNodeEntry",
+          "field": "id"
+        },
+        "directive": "default"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "ChoiceNodeEntry",
+          "field": "id"
+        },
+        "directive": "default"
+      },
+      "argument": "",
+      "value": "autoincrement()"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "ChoiceNodeEntry",
+          "field": "id"
+        },
+        "directive": "id"
+      }
+    },
+    {
+      "tag": "CreateField",
+      "model": "ChoiceNodeEntry",
+      "field": "value",
+      "type": "String",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateField",
+      "model": "ChoiceNodeEntry",
+      "field": "nodeEntryId",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateField",
+      "model": "ChoiceNodeEntry",
+      "field": "nodeEntry",
+      "type": "NodeEntry",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "ChoiceNodeEntry",
+          "field": "nodeEntry"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "ChoiceNodeEntry",
+          "field": "nodeEntry"
+        },
+        "directive": "relation"
+      },
+      "argument": "references",
+      "value": "[id]"
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "ChoiceNodeEntry",
+          "field": "nodeEntry"
+        },
+        "directive": "relation"
+      },
+      "argument": "fields",
+      "value": "[nodeEntryId]"
+    },
+    {
+      "tag": "CreateModel",
+      "model": "TextboxNodeEntry"
+    },
+    {
+      "tag": "CreateField",
+      "model": "TextboxNodeEntry",
+      "field": "id",
+      "type": "Int",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "TextboxNodeEntry",
+          "field": "id"
+        },
+        "directive": "default"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "TextboxNodeEntry",
+          "field": "id"
+        },
+        "directive": "default"
+      },
+      "argument": "",
+      "value": "autoincrement()"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "TextboxNodeEntry",
+          "field": "id"
+        },
+        "directive": "id"
+      }
+    },
+    {
+      "tag": "CreateField",
+      "model": "TextboxNodeEntry",
+      "field": "value",
+      "type": "String",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateField",
+      "model": "TextboxNodeEntry",
+      "field": "nodeEntryId",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateField",
+      "model": "TextboxNodeEntry",
+      "field": "nodeEntry",
+      "type": "NodeEntry",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "TextboxNodeEntry",
+          "field": "nodeEntry"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "TextboxNodeEntry",
+          "field": "nodeEntry"
+        },
+        "directive": "relation"
+      },
+      "argument": "references",
+      "value": "[id]"
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "TextboxNodeEntry",
+          "field": "nodeEntry"
+        },
+        "directive": "relation"
+      },
+      "argument": "fields",
+      "value": "[nodeEntryId]"
+    },
+    {
+      "tag": "CreateModel",
+      "model": "RegistrationNodeEntry"
+    },
+    {
+      "tag": "CreateField",
+      "model": "RegistrationNodeEntry",
+      "field": "id",
+      "type": "Int",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "RegistrationNodeEntry",
+          "field": "id"
+        },
+        "directive": "default"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "RegistrationNodeEntry",
+          "field": "id"
+        },
+        "directive": "default"
+      },
+      "argument": "",
+      "value": "autoincrement()"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "RegistrationNodeEntry",
+          "field": "id"
+        },
+        "directive": "id"
+      }
+    },
+    {
+      "tag": "CreateField",
+      "model": "RegistrationNodeEntry",
+      "field": "value",
+      "type": "Json",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateField",
+      "model": "RegistrationNodeEntry",
+      "field": "nodeEntryId",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateField",
+      "model": "RegistrationNodeEntry",
+      "field": "nodeEntry",
+      "type": "NodeEntry",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "RegistrationNodeEntry",
+          "field": "nodeEntry"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "RegistrationNodeEntry",
+          "field": "nodeEntry"
+        },
+        "directive": "relation"
+      },
+      "argument": "references",
+      "value": "[id]"
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "RegistrationNodeEntry",
+          "field": "nodeEntry"
+        },
+        "directive": "relation"
+      },
+      "argument": "fields",
+      "value": "[nodeEntryId]"
     },
     {
       "tag": "CreateModel",
@@ -3225,17 +3842,6 @@
       "arity": "Required"
     },
     {
-      "tag": "CreateDirective",
-      "location": {
-        "path": {
-          "tag": "Field",
-          "model": "User",
-          "field": "email"
-        },
-        "directive": "unique"
-      }
-    },
-    {
       "tag": "CreateField",
       "model": "User",
       "field": "phone",
@@ -3395,6 +4001,22 @@
       "value": "[id]"
     },
     {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Model",
+          "model": "User",
+          "arguments": [
+            {
+              "name": "",
+              "value": "[customerId, email]"
+            }
+          ]
+        },
+        "directive": "unique"
+      }
+    },
+    {
       "tag": "CreateModel",
       "model": "TriggerCondition"
     },
@@ -3445,8 +4067,33 @@
       "tag": "CreateField",
       "model": "TriggerCondition",
       "field": "type",
-      "type": "TriggerConditionType",
+      "type": "TriggerConditionEnum",
       "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "TriggerCondition",
+          "field": "type"
+        },
+        "directive": "default"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "TriggerCondition",
+          "field": "type"
+        },
+        "directive": "default"
+      },
+      "argument": "value",
+      "value": "LOW_THRESHOLD"
     },
     {
       "tag": "CreateField",
@@ -3474,7 +4121,7 @@
       "model": "TriggerCondition",
       "field": "trigger",
       "type": "Trigger",
-      "arity": "Optional"
+      "arity": "Required"
     },
     {
       "tag": "CreateDirective",
@@ -3520,7 +4167,7 @@
       "model": "TriggerCondition",
       "field": "triggerId",
       "type": "String",
-      "arity": "Optional"
+      "arity": "Required"
     },
     {
       "tag": "CreateModel",
@@ -3587,8 +4234,33 @@
       "tag": "CreateField",
       "model": "Trigger",
       "field": "type",
-      "type": "TriggerType",
+      "type": "TriggerEnum",
       "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "Trigger",
+          "field": "type"
+        },
+        "directive": "default"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "Trigger",
+          "field": "type"
+        },
+        "directive": "default"
+      },
+      "argument": "value",
+      "value": "QUESTION"
     },
     {
       "tag": "CreateField",

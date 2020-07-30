@@ -61,7 +61,7 @@ model Customer {
   tags        Tag[]
 }
 
-enum TagType {
+enum TagEnum {
   DEFAULT
   AGENT
   LOCATION
@@ -69,11 +69,11 @@ enum TagType {
 
 model Tag {
   id         String     @default(cuid()) @id
-  type       TagType
+  type       TagEnum    @default(value: DEFAULT)
   name       String
   isTagOf    Dialogue[] @relation(references: [id])
-  customer   Customer?  @relation(fields: [customerId], references: [id])
-  customerId String?
+  customer   Customer  @relation(fields: [customerId], references: [id])
+  customerId String
 }
 
 model Dialogue {
@@ -128,6 +128,30 @@ model QuestionNode {
   
   QuestionOption             QuestionOption[] @relation("QuestionNodeOptions")
   triggers                   Trigger[]
+  links                      Link[]
+}
+
+enum LinkTypeEnum {
+  SOCIAL
+  API
+  FACEBOOK
+  LINKEDIN
+  WHATSAPP
+  INSTAGRAM
+  TWITTER
+}
+
+model Link {
+  id              String        @default(cuid()) @id
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime?     @updatedAt
+  title           String?
+  type            LinkTypeEnum
+  url             String
+  iconUrl         String?
+  backgroundColor String?
+  questionNode    QuestionNode? @relation(fields: [questionNodeId], references: [id])
+  questionNodeId  String?
 }
 
 model Edge {
@@ -257,7 +281,7 @@ model User {
   id         String    @default(cuid()) @id
   createdAt  DateTime  @default(now())
   updatedAt  DateTime? @updatedAt
-  email      String    
+  email      String
   phone      String?
   firstName  String?
   lastName   String?
@@ -269,7 +293,7 @@ model User {
   @@unique([customerId, email])
 }
 
-enum TriggerType {
+enum TriggerEnum {
   QUESTION
   SCHEDULED
 }
@@ -280,7 +304,7 @@ enum TriggerMedium {
   BOTH
 }
 
-enum TriggerConditionType {
+enum TriggerConditionEnum {
   LOW_THRESHOLD
   HIGH_THRESHOLD
   INNER_RANGE
@@ -290,19 +314,19 @@ enum TriggerConditionType {
 
 model TriggerCondition {
   id        Int                  @default(autoincrement()) @id
-  type      TriggerConditionType
+  type      TriggerConditionEnum @default(value: LOW_THRESHOLD)
   minValue  Int?
   maxValue  Int?
   textValue String?
-  trigger   Trigger?             @relation(fields: [triggerId], references: [id])
-  triggerId String?
+  trigger   Trigger             @relation(fields: [triggerId], references: [id])
+  triggerId String
 }
 
 model Trigger {
   id            String             @default(cuid()) @id
   lastSent      DateTime?
   name          String
-  type          TriggerType
+  type          TriggerEnum         @default(value: QUESTION)
   medium        TriggerMedium
   conditions    TriggerCondition[]
   relatedNodeId String?
