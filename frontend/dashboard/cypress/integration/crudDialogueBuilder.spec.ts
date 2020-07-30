@@ -29,10 +29,29 @@ const generateSliderParentQuestion = () => {
   const title = faker.name.findName();
   const minValue = '90';
   const maxValue = '100';
+  const option1 = 'Yes';
+  const option2 = 'No';
   return {
     title,
     minValue,
     maxValue,
+    option1,
+    option2,
+  };
+};
+
+const generateSliderParentQuestionEditData = () => {
+  const title = faker.name.findName();
+  const minValue = '10';
+  const maxValue = '20';
+  const option1 = 'Cheese';
+  const option2 = 'Ham';
+  return {
+    title,
+    minValue,
+    maxValue,
+    option1,
+    option2,
   };
 };
 
@@ -112,27 +131,47 @@ describe('Test dialogue builder operations', () => {
       cy.get('input[name="minValue"]').type(sliderParentQuestion.minValue);
       cy.get('input[name="maxValue"]').type(sliderParentQuestion.maxValue);
       cy.get('#question-type-select').type('Choice{enter}');
-      cy.pause();
+      cy.get('#leaf-node-select').type('Thank you{enter}');
+      cy.get('[data-cy="AddOption"]').click();
+      cy.get('input[name="options[0]"]').type(sliderParentQuestion.option1);
+      cy.get('[data-cy="AddOption"]').click();
+      cy.get('input[name="options[1]"]').type(sliderParentQuestion.option2);
+      cy.wait(300);
     });
-    cy.wait(500);
     cy.get('form').submit();
-    cy.wait(2000);
+    cy.wait(1000);
+
     // Test whether created questions contains values previously entered
-    cy.get('[data-cy="QuestionSection"]').last().contains(sliderParentQuestion.title);
-    cy.get('[data-cy="QuestionSection"]').last().find('[data-cy="QuestionEntry"]')
+    const newSection = cy.get('[data-cy="QuestionSection"]').last();
+    newSection.last().contains(sliderParentQuestion.title);
+    cy.get('[data-cy="QuestionEntry"]').last().find('[data-cy="CTALabel"]').should('have.css', 'background'); // Indicating question has CTA
+    cy.get('[data-cy="QuestionEntry"]').last()
       .contains('Edit')
       .click();
+
+    // Test whether values can be edited
+    const editQuestionData = generateSliderParentQuestionEditData();
     const newForm = cy.get('form');
     newForm.within(() => {
       cy.get('input[name="title"]').should('have.value', sliderParentQuestion.title);
       cy.get('input[name="minValue"]').should('have.value', sliderParentQuestion.minValue);
       cy.get('input[name="maxValue"]').should('have.value', sliderParentQuestion.maxValue);
+      cy.get('input[name="options[0]"]').should('have.value', sliderParentQuestion.option1);
+      cy.get('input[name="options[1]"]').should('have.value', sliderParentQuestion.option2);
+      cy.get('input[name="title"]').clear().type(editQuestionData.title);
+      cy.get('input[name="minValue"]').clear().type(editQuestionData.minValue);
+      cy.get('input[name="maxValue"]').clear().type(editQuestionData.maxValue);
+      cy.get('#leaf-node-select').type('None{enter}');
+      cy.get('input[name="options[0]"]').clear().type(editQuestionData.option1);
+      cy.get('input[name="options[1]"]').clear().type(editQuestionData.option2);
+      cy.wait(300);
     });
-    cy.get('[data-cy="QuestionSection"]').last().find('[data-cy="QuestionEntry"]').contains('Cancel')
-      .click();
 
-    // Edit Multi-choice fields
-    const firstChild = rootSection.find('[data-cy="QuestionSection"]').first();
-    firstChild.contains('Edit').click();
+    cy.get('form').submit();
+    cy.wait(1000);
+
+    cy.get('[data-cy="QuestionSection"]').last().contains(editQuestionData.title);
+    cy.get('[data-cy="QuestionEntry"]').last().find('[data-cy="CTALabel"]')
+      .should('not.have.css', 'background-color');
   });
 });

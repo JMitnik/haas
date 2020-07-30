@@ -17,9 +17,9 @@ import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
 import createQuestionMutation from 'mutations/createQuestion';
 import updateQuestionMutation from 'mutations/updateQuestion';
 
-import { debounce } from 'lodash';
 import { EdgeConditonProps,
   OverrideLeafProps, QuestionEntryProps, QuestionOptionProps } from '../../DialogueBuilderInterfaces';
+import { debounce } from 'lodash';
 
 interface FormDataProps {
   title: string;
@@ -442,7 +442,7 @@ const QuestionEntryForm = ({
                       <H4>
                         Options
                       </H4>
-                      <PlusCircle style={{ cursor: 'pointer' }} onClick={() => addNewOption()} />
+                      <PlusCircle data-cy="AddOption" style={{ cursor: 'pointer' }} onClick={() => addNewOption()} />
                     </Flex>
 
                     <Hr />
@@ -456,6 +456,7 @@ const QuestionEntryForm = ({
                           <Flex flexGrow={1}>
                             <StyledInput
                               hasError={errors.options && Array.isArray(errors.options) && !!errors.options?.[optionIndex]}
+                              id={`options[${optionIndex}]`}
                               key={`input-${id}-${optionIndex}`}
                               name={`options[${optionIndex}]`}
                               ref={register(
