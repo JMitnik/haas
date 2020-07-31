@@ -66,13 +66,14 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
     },
   });
 
-  const [uploadFile] = useMutation(uploadSingleImage, {
+  const [uploadFile, { loading: fileUploadLoading }] = useMutation(uploadSingleImage, {
     onCompleted: (result) => {
       setActivePreviewUrl(result.singleUpload.url);
     },
   });
 
   const onLogoUploadChange = (event: any) => {
+    setActivePreviewUrl('');
     const image: File = event.target.files[0];
 
     if (image) {
@@ -174,7 +175,7 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
                 <Div useFlex flexDirection="column">
                   <StyledLabel>Preview</StyledLabel>
                   <Div width={200} height={200} style={{ border: '1px solid lightgrey', borderRadius: '8px' }}>
-                    {(!activePreviewUrl && customer?.settings?.logoUrl) && (
+                    {(!activePreviewUrl && customer?.settings?.logoUrl && !fileUploadLoading) && (
                       <img
                         src={customer?.settings?.logoUrl}
                         height={200}
@@ -183,7 +184,11 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
                         style={{ objectFit: 'contain' }}
                       />
                     )}
-
+                    {fileUploadLoading && (
+                    <Flex height="100%" justifyContent="center" alignItems="center">
+                      <Div alignSelf="center">Uploading...</Div>
+                    </Flex>
+                    )}
                     {activePreviewUrl && <img alt="" src={activePreviewUrl} height={200} width={200} />}
                   </Div>
                 </Div>

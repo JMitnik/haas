@@ -36,7 +36,7 @@ const AddCustomerView = () => {
   });
   const [activePreview, setActivePreview] = useState('');
 
-  const [uploadFile] = useMutation(uploadSingleImage, {
+  const [uploadFile, { loading: fileUploadLoading }] = useMutation(uploadSingleImage, {
     onCompleted: (result) => {
       setActivePreview(result.singleUpload.url);
     },
@@ -50,6 +50,7 @@ const AddCustomerView = () => {
   });
 
   const onChange = (event: any) => {
+    setActivePreview('');
     const image: File = event.target.files[0];
     if (image) {
       uploadFile({ variables: { file: image } });
@@ -123,7 +124,12 @@ const AddCustomerView = () => {
                 <Div useFlex flexDirection="column">
                   <StyledLabel>Preview</StyledLabel>
                   <Div width={200} height={200} style={{ border: '1px solid lightgrey', borderRadius: '8px' }}>
-                    {activePreview && <img src={activePreview} height={200} width={200} alt="" />}
+                    {fileUploadLoading && (
+                    <Flex height="100%" justifyContent="center" alignItems="center">
+                      <Div alignSelf="center">Uploading...</Div>
+                    </Flex>
+                    )}
+                    {activePreview && !fileUploadLoading && <img src={activePreview} height={200} width={200} alt="" />}
                   </Div>
                 </Div>
               </Grid>
