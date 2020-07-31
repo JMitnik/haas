@@ -5,11 +5,13 @@ import React from 'react';
 
 import {
   AddCard, Card, CardBody, Container, DeleteButtonContainer, Div,
-  EditButtonContainer, Flex, Grid, H3, PageHeading,
+  EditButtonContainer, Flex, Grid, H3, H4, PageHeading,
 } from '@haas/ui';
 import { Edit, Plus, X } from 'react-feather';
 import { Link, useHistory } from 'react-router-dom';
+import { TranslatedPlus } from 'views/DialogueOverview/DialogueOverviewStyles';
 import { useCustomer } from 'providers/CustomerProvider';
+import SurveyIcon from 'components/Icons/SurveyIcon';
 
 import { CustomerCardImage, CustomerOverviewContainer } from './CustomerOverviewStyles';
 import { deleteFullCustomerQuery } from '../../mutations/deleteFullCustomer';
@@ -30,12 +32,15 @@ const CustomerOverview = ({ customers }: { customers: any[] }) => (
 
         <AddCard>
           <Link to="/dashboard/b/add" />
-          <Div>
-            <Plus />
-            <H3>
-              Add new customer
-            </H3>
-          </Div>
+          <Flex flexDirection="column" alignItems="center" justifyContent="center">
+            <SurveyIcon />
+            <TranslatedPlus>
+              <Plus strokeWidth="3px" />
+            </TranslatedPlus>
+            <H4 color="default.dark">
+              Create a customer
+            </H4>
+          </Flex>
         </AddCard>
       </Grid>
     </Container>
@@ -45,12 +50,10 @@ const CustomerOverview = ({ customers }: { customers: any[] }) => (
 const CustomerCard = ({ customer }: { customer: any }) => {
   const history = useHistory();
   const { activeCustomer, setActiveCustomer } = useCustomer();
+
   const setCustomerSlug = (customerSlug: string) => {
-    if (activeCustomer?.slug !== customerSlug) {
-      // TODO: Stor active customer in LocalStorage
-      localStorage.setItem('customer', JSON.stringify(customer));
-      setActiveCustomer(customer);
-    }
+    localStorage.setItem('customer', JSON.stringify(customer));
+    setActiveCustomer(customer);
     history.push(`/dashboard/b/${customerSlug}`);
   };
 

@@ -1,4 +1,4 @@
-import { Div, Grid, H3, PageHeading } from '@haas/ui';
+import { Div, Flex, Grid, H4, PageHeading } from '@haas/ui';
 import { Link, useParams } from 'react-router-dom';
 import { Plus } from 'react-feather';
 import { useLazyQuery } from '@apollo/react-hooks';
@@ -6,9 +6,10 @@ import React from 'react';
 
 import { getQuestionnairesOfCustomer as CustomerData } from 'queries/__generated__/getQuestionnairesOfCustomer';
 import Searchbar from 'components/SearchBar';
+import SurveyIcon from 'components/Icons/SurveyIcon';
 import getDialoguesOfCustomer from 'queries/getDialoguesOfCustomer';
 
-import { AddDialogueCard } from './DialogueOverviewStyles';
+import { AddDialogueCard, TranslatedPlus } from './DialogueOverviewStyles';
 import DialogueCard from './DialogueCard';
 
 const DialogueOverview = ({ dialogues }: { dialogues: any }) => {
@@ -51,12 +52,15 @@ const DialogueOverview = ({ dialogues }: { dialogues: any }) => {
         <AddDialogueCard data-cy="AddDialogueCard">
           <Link to={`/dashboard/b/${customerSlug}/d/add`} />
 
-          <Div>
-            <Plus />
-            <H3>
-              Add dialogue
-            </H3>
-          </Div>
+          <Flex flexDirection="column" alignItems="center" justifyContent="center">
+            <SurveyIcon />
+            <TranslatedPlus>
+              <Plus strokeWidth="3px" />
+            </TranslatedPlus>
+            <H4 color="default.dark">
+              Create a dialogue
+            </H4>
+          </Flex>
         </AddDialogueCard>
       </Grid>
     </>
