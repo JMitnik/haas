@@ -10,6 +10,8 @@ import {
   H2, H3, Hr, Muted, StyledInput, StyledLabel,
 } from '@haas/ui';
 
+import { Customer } from 'types';
+import { useCustomer } from 'providers/CustomerProvider';
 import { useToast } from '@chakra-ui/core';
 import { getCustomerQuery } from '../../queries/getCustomersQuery';
 import editCustomerMutation from '../../mutations/editCustomer';
@@ -51,7 +53,7 @@ const EditCustomerView = () => {
 
 const EditCustomerForm = ({ customer }: { customer: any }) => {
   const history = useHistory();
-
+  const { activeCustomer, setActiveCustomer } = useCustomer();
   const [activePreviewUrl, setActivePreviewUrl] = useState<null | string>(null);
 
   const { register, handleSubmit, errors } = useForm<FormDataProps>({
@@ -81,7 +83,9 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
 
   const [editCustomer, { loading }] = useMutation(editCustomerMutation, {
 
-    onCompleted: () => {
+    onCompleted: (result: any) => {
+      const customer: Customer = result.editCustomer;
+      localStorage.setItem('customer', JSON.stringify(customer));
       toast({
         title: 'Your business edited',
         description: 'The business has been updated',
@@ -91,6 +95,7 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
       });
 
       setTimeout(() => {
+        setActiveCustomer(customer);
         history.push('/');
       }, 300);
     },
