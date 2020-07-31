@@ -1,8 +1,9 @@
 import React from 'react';
 
-import { H3, Card, CardBody, Flex, Span, Div } from '@haas/ui';
+import { Card, CardBody, Div, Flex, H3, H4, Span } from '@haas/ui';
 import styled, { css } from 'styled-components/macro';
 
+import { Info } from 'react-feather';
 import ModuleContainer from '../Module';
 
 const NegativePathsModuleList = styled.ol`
@@ -37,22 +38,32 @@ const NegativePathsModuleList = styled.ol`
 
 const NegativePathsModule = ({ negativePaths }: { negativePaths: any }) => (
   <ModuleContainer>
-    <Card bg="white">
-      <CardBody>
+    <Card height="100%" bg="white">
+      <CardBody display="flex" flexDirection="column" height="100%">
         <H3 color="error">
           <Flex justifyContent="space-between" alignItems="center">
             <Span>Top negative paths</Span>
           </Flex>
         </H3>
-        <Div>
+        <Flex minHeight="200px" marginTop="10px" flexGrow={1} flexDirection="column">
+          {negativePaths.length > 0 && (
           <NegativePathsModuleList>
-            {negativePaths && negativePaths.map(({ answer, quantity }: { answer: string, quantity: number }) => (
+            {negativePaths.map(({ answer, quantity }: { answer: string, quantity: number }) => (
               <li key={`${answer}-${quantity}`}>
                 {`${answer}`}
               </li>
             ))}
           </NegativePathsModuleList>
-        </Div>
+          )}
+          {!negativePaths.length && (
+            <Flex flexGrow={1} justifyContent="center" alignItems="center">
+              <Div color="default.darker" marginRight="5px">
+                <Info />
+              </Div>
+              <H4 color="default.darker">No data available</H4>
+            </Flex>
+          )}
+        </Flex>
       </CardBody>
     </Card>
     <H3 />

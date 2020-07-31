@@ -1,7 +1,8 @@
 import React, { Dispatch, SetStateAction } from 'react';
 
-import { Card, CardBody, Div, Flex, H3, Span } from '@haas/ui';
+import { Card, CardBody, Div, Flex, H3, H4, Span } from '@haas/ui';
 
+import { Info } from 'react-feather';
 import { InteractionFeedEntriesContainer } from './InteractionFeedModuleStyles';
 import InteractionFeedEntry from './InteractionFeedEntry';
 
@@ -23,7 +24,7 @@ const InteractionFeedModule = ({
 
   return (
     <Card bg="white" noHover>
-      <CardBody useFlex height="100%" justifyContent="space-between" flexDirection="column">
+      <CardBody useFlex height="100%" flexDirection="column">
 
         <H3 color="app.onWhite">
           <Flex justifyContent="space-between" alignItems="center">
@@ -42,7 +43,12 @@ const InteractionFeedModule = ({
         </InteractionFeedEntriesContainer>
 
         {(timelineEntries?.length === 0 || (!timelineEntries)) && (
-          <Div style={{ margin: '5px 20px' }}>No data available...</Div>
+          <Flex flexGrow={1} justifyContent="center" alignItems="center">
+            <Div color="default.darker" marginRight="5px">
+              <Info />
+            </Div>
+            <H4 color="default.darker">No data available</H4>
+          </Flex>
         )}
       </CardBody>
     </Card>
