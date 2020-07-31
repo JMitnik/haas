@@ -12,12 +12,16 @@ interface DatePickerProps {
   onDateChange: (start: Date | null, end: Date | null) => void;
 }
 
-const CustomPickerInput = styled.input`
-  ${({ theme }) => css`
+const CustomPickerInput = styled.input <{hasDate?: boolean}>`
+  ${({ theme, hasDate }) => css`
     background: ${theme.colors.app.mutedOnDefault};
     border: 1px solid ${theme.colors.default.dark};
     width: 75px;
     color: ${theme.colors.default.darker};
+
+    ${hasDate && css`
+      border: none;
+    `}
 
     &:focus {
       transition: all 0.2s ease-in;
@@ -47,6 +51,7 @@ const DatePicker = ({ activeStartDate, activeEndDate, onDateChange }: DatePicker
               type="text"
               id="CustomID"
               placeholder="Date"
+              hasDate={!!activeStartDate}
             />
             )}
         />
@@ -71,6 +76,7 @@ const DatePicker = ({ activeStartDate, activeEndDate, onDateChange }: DatePicker
               type="text"
               id="CustomID"
               placeholder="Date"
+              hasDate={!!activeEndDate}
             />
             )}
         />
