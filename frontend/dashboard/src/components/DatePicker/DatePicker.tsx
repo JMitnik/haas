@@ -17,6 +17,7 @@ const CustomPickerInput = styled.input`
     background: ${theme.colors.app.mutedOnDefault};
     border: 1px solid ${theme.colors.default.dark};
     width: 75px;
+    color: ${theme.colors.default.darker};
 
     &:focus {
       transition: all 0.2s ease-in;
