@@ -1,6 +1,7 @@
 import React from 'react';
 
-import { Flex } from '@haas/ui';
+import { Div, Flex, Span } from '@haas/ui';
+import styled, { css } from 'styled-components';
 
 interface PaginationProps {
   pageIndex: number;
@@ -9,58 +10,89 @@ interface PaginationProps {
   sortBy: Array<any>;
 }
 
+const Button = styled.button`
+  ${({ theme }) => css`
+    background: none;
+    border: 1px solid ${theme.colors.default.darker};
+    border-radius: ${theme.borderRadiuses.subtleRounded};
+    color: ${theme.colors.primary};
+    padding: 5px 7.5px; 
+    margin: 10px;
+
+    &:hover {
+      cursor: pointer;
+      transition: all 0.2s ease-in;
+      outline-width: 0;
+      outline: none;
+      border: 1px solid ${theme.colors.default.darkest};
+    }
+  `}
+`;
+
+const StyledInput = styled.input`
+ ${({ theme }) => css`
+    background: none;
+    border: 1px solid ${theme.colors.default.darker};
+    border-radius: ${theme.borderRadiuses.subtleRounded};
+    padding: 5px;
+    color: ${theme.colors.primary};
+    font-family: monospace;
+    width: 30px;
+    margin: 10px;
+
+    &:focus {
+      transition: all 0.2s ease-in;
+      outline-width: 0;
+      outline: none;
+      border: 1px solid ${theme.colors.default.darkest};
+      box-shadow: none;
+    }
+  `}
+  ::-webkit-inner-spin-button{
+        -webkit-appearance: none; 
+        margin: 0; 
+    }
+    ::-webkit-outer-spin-button{
+        -webkit-appearance: none; 
+        margin: 0; 
+    }    
+`;
+
 interface TablePaginationControlsProps {
   paginationProps: PaginationProps;
   onPageChange: (newPageIndex: number) => void;
 }
 
 const TablePaginationControls = ({ paginationProps, onPageChange }: TablePaginationControlsProps) => (
-  <Flex gridRow="-1" alignItems="center" justifyContent="center">
+  <Flex gridRow="-1" alignItems="center" justifyContent="flex-end">
     {/* TODO: Make these buttons styled, use flex-properties instead of margin */}
-    <button
-      type="button"
-      style={{ padding: '5px', margin: '5px' }}
-      onClick={() => onPageChange(0)}
-      disabled={paginationProps.pageIndex === 0}
-    >
-      {'<<'}
-    </button>
-    <button
-      type="button"
-      style={{ padding: '5px 7.5px', margin: '5px' }}
-      onClick={() => onPageChange(paginationProps.pageIndex - 1)}
-      disabled={paginationProps.pageIndex === 0}
-    >
-      {'<'}
-    </button>
-    <button
-      type="button"
-      style={{ padding: '5px 7.5px', margin: '5px' }}
-      onClick={() => onPageChange(paginationProps.pageIndex + 1)}
-      disabled={paginationProps.pageIndex === paginationProps.pageCount - 1}
-    >
-      {'>'}
-    </button>
-    <button
-      type="button"
-      style={{ padding: '5px', margin: '5px' }}
-      onClick={() => onPageChange(paginationProps.pageCount - 1)}
-      disabled={paginationProps.pageIndex === paginationProps.pageCount - 1}
-    >
-      {'>>'}
-    </button>
-    <span>
-      Page
-      {' '}
-      <strong>
-        {paginationProps.pageIndex + 1}
-        {' '}
+    <Flex marginRight="20px" alignItems="center" justifyContent="center">
+      <Button
+        onClick={() => onPageChange(paginationProps.pageIndex - 1)}
+        disabled={paginationProps.pageIndex === 0}
+      >
+        {'<'}
+      </Button>
+      <Span>
+        Page
+      </Span>
+      <div style={{ textAlign: 'center' }}>
+        <StyledInput disabled type="number" value={paginationProps.pageIndex + 1} />
+      </div>
+      <Span>
         of
         {' '}
         {paginationProps.pageCount}
-      </strong>
-    </span>
+      </Span>
+      <Button
+        onClick={() => onPageChange(paginationProps.pageIndex + 1)}
+        disabled={paginationProps.pageIndex === paginationProps.pageCount - 1}
+      >
+        {'>'}
+      </Button>
+    </Flex>
   </Flex>
+
 );
 
 export default TablePaginationControls;
