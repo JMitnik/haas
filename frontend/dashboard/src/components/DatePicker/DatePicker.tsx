@@ -15,7 +15,8 @@ interface DatePickerProps {
 const CustomPickerInput = styled.input <{hasDate?: boolean}>`
   ${({ theme, hasDate }) => css`
     background: ${theme.colors.app.mutedOnDefault};
-    border: 1px solid ${theme.colors.default.dark};
+    border: transparent;
+    border-bottom: 1px solid ${theme.colors.default.dark};
     width: 75px;
     color: ${theme.colors.default.darker};
 
@@ -26,8 +27,10 @@ const CustomPickerInput = styled.input <{hasDate?: boolean}>`
     &:focus {
       transition: all 0.2s ease-in;
       outline-width: 0;
-      border: 1px solid ${theme.colors.app.mutedAltOnDefault};
-      box-shadow: 0 0 0 1px ${theme.colors.app.mutedAltOnDefault};
+      border: transparent;
+      outline: none;
+      border-bottom: 1px solid ${theme.colors.app.mutedAltOnDefault};
+      box-shadow: none;
     }
   `};
 `;
