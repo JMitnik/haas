@@ -15,7 +15,7 @@ interface TablePaginationControlsProps {
 }
 
 const TablePaginationControls = ({ paginationProps, onPageChange }: TablePaginationControlsProps) => (
-  <Flex alignItems="center" justifyContent="center">
+  <Flex gridRow="-1" alignItems="center" justifyContent="center">
     {/* TODO: Make these buttons styled, use flex-properties instead of margin */}
     <button
       type="button"

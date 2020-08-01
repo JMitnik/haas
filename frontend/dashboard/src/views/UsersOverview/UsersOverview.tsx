@@ -122,7 +122,7 @@ const UsersOverview = () => {
           <SearchBar activeSearchTerm={paginationProps.activeSearchTerm} onSearchTermChange={handleSearchTermChange} />
         </InputContainer>
       </InputOutputContainer>
-      <Div backgroundColor="#fdfbfe" mb="1%" height="65%">
+      <Div backgroundColor="#fdfbfe" mb="1%">
         <ErrorBoundary FallbackComponent={() => (
           <Div>
             We are experiencing some maintenance with the Users data. We will be back shortly.

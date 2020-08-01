@@ -1,4 +1,4 @@
-import { Div } from '@haas/ui';
+import { Div, Flex } from '@haas/ui';
 import styled, { css } from 'styled-components';
 
 const FlexRow = styled(Div)`
@@ -36,8 +36,10 @@ export const OutputContainer = styled(FlexRow)`
   align-items: center;
 `;
 
-export const InteractionsOverviewContainer = styled(Div)`
+export const InteractionsOverviewContainer = styled(Flex)`
   ${({ theme }) => css`
+    flex-direction: column;
+    flex-grow: 1;
     padding: ${theme.gutter * 2}px 0;
   `}
 `;
