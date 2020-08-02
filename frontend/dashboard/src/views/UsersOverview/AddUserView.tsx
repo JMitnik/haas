@@ -7,7 +7,7 @@ import React, { useState } from 'react';
 import Select from 'react-select';
 import styled, { css } from 'styled-components/macro';
 
-import { Button, Container, Div, Flex, Grid, H2, H3,
+import { Button, Container, Div, ErrorStyle, Flex, Grid, H2, H3,
   Hr, Muted, StyledInput, StyledLabel } from '@haas/ui';
 import createAddMutation from 'mutations/createUser';
 import getRolesQuery from 'queries/getRoles';
@@ -77,15 +77,6 @@ const AddUserView = () => {
         input: optionInput,
       },
     });
-  };
-
-  const ErrorStyle = {
-    control: (base: any) => ({
-      ...base,
-      border: '1px solid red',
-      // This line disable the blue border
-      boxShadow: 'none',
-    }),
   };
 
   return (

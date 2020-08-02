@@ -7,7 +7,7 @@ import React, { useEffect, useState } from 'react';
 import Select from 'react-select';
 
 import {
-  Button, Container, Div, Flex, Form, FormGroupContainer, Grid,
+  Button, Container, Div, ErrorStyle, Flex, Form, FormGroupContainer, Grid,
   H2, H3, Hr, Muted, StyledInput, StyledLabel,
 } from '@haas/ui';
 import editUserMutation from 'mutations/editUser';
@@ -111,15 +111,6 @@ const EditCustomerForm = ({ user, roles }: { user: any, roles: Array<{ label: st
         input: optionInput,
       },
     });
-  };
-
-  const ErrorStyle = {
-    control: (base: any) => ({
-      ...base,
-      border: '1px solid red',
-      // This line disable the blue border
-      boxShadow: 'none',
-    }),
   };
 
   return (

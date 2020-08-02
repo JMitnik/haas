@@ -1,6 +1,6 @@
 import * as yup from 'yup';
 import { ApolloError } from 'apollo-boost';
-import { Button, Container, Div, Flex, Grid, H2, H3, H4,
+import { Button, Container, Div, ErrorStyle, Flex, Grid, H2, H3, H4,
   Hr, Muted, StyledInput, StyledLabel, StyledTextInput } from '@haas/ui';
 import { MinusCircle, PlusCircle } from 'react-feather';
 import { useForm } from 'react-hook-form';
@@ -48,7 +48,7 @@ const schema = yup.object().shape({
     then: yup.string().required(),
     otherwise: yup.string().notRequired(),
   }),
-  tags: yup.array().of(yup.string().min(1)).notRequired(),
+  tags: yup.array().of(yup.string().min(1).required()).notRequired(),
 });
 
 const AddDialogueView = () => {
@@ -153,18 +153,6 @@ const AddDialogueView = () => {
     label: tag?.name,
     value: tag?.id,
   }));
-
-  console.log('errors; ', errors);
-  console.log('getValues', getValues({ nest: true }));
-
-  const ErrorStyle = {
-    control: (base: any) => ({
-      ...base,
-      border: '1px solid red',
-      // This line disable the blue border
-      boxShadow: 'none',
-    }),
-  };
 
   return (
     <Container>
@@ -281,9 +269,9 @@ const AddDialogueView = () => {
                         <Select
                           styles={errors.tags?.[index] && !activeTags?.[index] ? ErrorStyle : undefined}
                           id={`tags[${index}]`}
-                          name={`tags[${index}]`}
                           key={index}
                           ref={() => register({
+                            name: `tags[${index}]`,
                             required: true,
                             minLength: 1,
                           })}
@@ -293,6 +281,7 @@ const AddDialogueView = () => {
                             setTags(qOption, index);
                           }}
                         />
+                        {errors.tags?.[index] && !activeTags?.[index] && <Muted color="warning">{errors.tags?.[index]?.message}</Muted>}
                       </Div>
                       <Flex justifyContent="center" alignContent="center" flexGrow={1}>
                         <MinusCircle onClick={() => deleteTag(index)} />

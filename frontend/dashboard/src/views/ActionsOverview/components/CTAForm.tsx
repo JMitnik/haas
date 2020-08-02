@@ -6,7 +6,7 @@ import { useParams } from 'react-router-dom';
 import React, { useCallback, useEffect, useState } from 'react';
 import Select from 'react-select';
 
-import { Button, Div, Flex, Form, FormGroupContainer, Grid,
+import { Button, Div, ErrorStyle, Flex, Form, FormGroupContainer, Grid,
   H3, H4, Hr, Muted, StyledInput, StyledLabel } from '@haas/ui';
 import { PlusCircle, X } from 'react-feather';
 import { cloneDeep, debounce } from 'lodash';
@@ -49,8 +49,6 @@ interface CTAFormProps {
   onNewCTAChange: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const isLinkType = (ctaType: string) => ctaType === 'LINK';
-
 const schema = yup.object().shape({
   title: yup.string().required(),
   ctaType: yup.string().required(),
@@ -60,10 +58,6 @@ const schema = yup.object().shape({
       type: yup.string().required(),
     }),
   ),
-  // url: yup.string().notRequired().when(['ctaType'], {
-  //   is: (ctaType: string) => isLinkType(ctaType),
-  //   then: yup.string().required(),
-  // }),
 });
 
 const CTA_TYPES = [
@@ -237,15 +231,6 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: 
       prevLinks.splice(index, 1);
       return [...prevLinks];
     });
-  };
-
-  const ErrorStyle = {
-    control: (base: any) => ({
-      ...base,
-      border: '1px solid red',
-      // This line disable the blue border
-      boxShadow: 'none',
-    }),
   };
 
   return (

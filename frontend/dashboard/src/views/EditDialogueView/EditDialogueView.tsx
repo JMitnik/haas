@@ -6,10 +6,10 @@ import { useHistory, useParams } from 'react-router';
 import { useMutation, useQuery } from '@apollo/react-hooks';
 import styled, { css } from 'styled-components/macro';
 
-import { Button, Div, Flex,
+import { Button, Div, ErrorStyle, Flex,
   Grid, H2, H3, H4, Hr, Muted, StyledInput,
   StyledLabel, StyledTextInput } from '@haas/ui';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Select from 'react-select';
 import editDialogueMutation from 'mutations/editDialogue';
 import getQuestionnairesCustomerQuery from 'queries/getDialoguesOfCustomer';
@@ -19,6 +19,7 @@ interface FormDataProps {
   title: string;
   description: string;
   publicTitle?: string;
+  tags: Array<string>;
 }
 
 interface EditDialogueFormProps {
@@ -60,7 +61,7 @@ const schema = yup.object().shape({
   title: yup.string().required(),
   publicTitle: yup.string().notRequired(),
   description: yup.string().required(),
-  tags: yup.array().of(yup.string().min(1)).notRequired(),
+  tags: yup.array().of(yup.string().min(1).required()).notRequired(),
 });
 
 const EditDialogueView = () => {
@@ -94,7 +95,7 @@ const EditDialogueView = () => {
 
 const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFormProps) => {
   const history = useHistory();
-  const { register, handleSubmit, errors } = useForm<FormDataProps>({
+  const { register, handleSubmit, errors, setValue, getValues } = useForm<FormDataProps>({
     validationSchema: schema,
   });
   const { customerSlug, dialogueSlug } = useParams();
@@ -114,6 +115,11 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFo
 
   const [activeTags, setActiveTags] = useState<Array<null | {label: string, value: string}>>(currentTags);
 
+  useEffect(() => {
+    const mappedTags = currentTags.map(({ value }) => value);
+    setValue('tags', mappedTags);
+  }, [setValue]);
+
   const onSubmit = (formData: FormDataProps) => {
     const tagIds = activeTags.map((tag) => tag?.value);
     const tagEntries = { entries: tagIds };
@@ -131,6 +137,7 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFo
   };
 
   const setTags = (qOption: { label: string, value: string }, index: number) => {
+    setValue(`tags[${index}]`, qOption?.value);
     setActiveTags((prevTags) => {
       prevTags[index] = qOption;
       return [...prevTags];
@@ -202,15 +209,26 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFo
 
                   {activeTags?.map((tag, index) => (
                     <Flex marginBottom="4px" alignItems="center" key={index} gridColumn="1 / -1">
-                      <Div flexGrow={9}>
+                      <Div
+                        data-cy="SelectOptions"
+                        flexGrow={9}
+                      >
                         <Select
+                          styles={errors.tags?.[index] && !activeTags?.[index] ? ErrorStyle : undefined}
+                          id={`tags[${index}]`}
                           key={index}
+                          ref={() => register({
+                            name: `tags[${index}]`,
+                            required: true,
+                            minLength: 1,
+                          })}
                           options={tagOptions}
                           value={tag}
                           onChange={(qOption: any) => {
                             setTags(qOption, index);
                           }}
                         />
+                        {errors.tags?.[index] && !activeTags?.[index] && <Muted color="warning">{errors.tags?.[index]?.message}</Muted>}
                       </Div>
                       <Flex justifyContent="center" alignContent="center" flexGrow={1}>
                         <MinusCircle onClick={() => deleteTag(index)} />

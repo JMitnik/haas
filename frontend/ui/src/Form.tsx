@@ -62,6 +62,15 @@ export const StyledLabel = styled(Div).attrs({ as: 'label' })`
   `}
 `;
 
+export const ErrorStyle = {
+  control: (base: any) => ({
+    ...base,
+    border: '1px solid red',
+    // This line disable the blue border
+    boxShadow: 'none',
+  }),
+};
+
 export const StyledInput = styled.input <{hasError?: boolean }>`
   ${({ theme, hasError }) => css`
     border-radius: ${theme.borderRadiuses.sm};

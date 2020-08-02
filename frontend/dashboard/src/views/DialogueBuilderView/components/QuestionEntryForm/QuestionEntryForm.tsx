@@ -9,7 +9,7 @@ import { useParams } from 'react-router';
 import React, { useCallback, useEffect, useState } from 'react';
 import Select from 'react-select';
 
-import { Button, Div, Flex, Form, FormGroupContainer,
+import { Button, Div, ErrorStyle, Flex, Form, FormGroupContainer,
   Grid, H3, H4, Hr, Muted, StyledInput, StyledLabel } from '@haas/ui';
 import {
   DeleteQuestionOptionButtonContainer,
@@ -316,15 +316,6 @@ const QuestionEntryForm = ({
         },
       });
     }
-  };
-
-  const ErrorStyle = {
-    control: (base: any) => ({
-      ...base,
-      border: '1px solid red',
-      // This line disable the blue border
-      boxShadow: 'none',
-    }),
   };
 
   const parentOptionsSelect = parentOptions?.map((option) => ({ label: option.value, value: option.value }));

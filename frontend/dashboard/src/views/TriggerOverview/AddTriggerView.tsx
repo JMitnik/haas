@@ -11,7 +11,7 @@ import Select from 'react-select';
 import styled, { css } from 'styled-components/macro';
 
 import {
-  Button, Container, DeleteButtonContainer, Div, Flex, Grid, H2, H3,
+  Button, Container, DeleteButtonContainer, Div, ErrorStyle, Flex, Grid, H2, H3,
   H4, Hr, Muted, StyledInput, StyledLabel,
 } from '@haas/ui';
 import createTriggerMutation from 'mutations/createTrigger';
@@ -29,6 +29,7 @@ interface FormDataProps {
   matchText: string;
   lowThreshold: number;
   highThreshold: number;
+  recipients: Array<string>;
 }
 
 enum TriggerConditionType {
@@ -92,6 +93,7 @@ const schema = yup.object().shape({
     then: yup.string().required(),
     otherwise: yup.string().notRequired(),
   }),
+  recipients: yup.array().min(1).of(yup.string().required()),
 });
 
 const AddTriggerView = () => {
@@ -169,6 +171,7 @@ const AddTriggerView = () => {
   };
 
   const setRecipients = (qOption: { label: string, value: string }, index: number) => {
+    setValue(`recipients[${index}]`, qOption?.value);
     setActiveRecipients((prevRecipients) => {
       prevRecipients[index] = qOption;
       return [...prevRecipients];
@@ -261,15 +264,6 @@ const AddTriggerView = () => {
     }));
   const questions = questionsData?.customer?.dialogue?.questions && questionsData?.customer?.dialogue?.questions.map((question: any) => (
     { label: question?.title, value: question?.id }));
-
-  const ErrorStyle = {
-    control: (base: any) => ({
-      ...base,
-      border: '1px solid red',
-      // This line disable the blue border
-      boxShadow: 'none',
-    }),
-  };
 
   return (
     <Container>
@@ -481,6 +475,11 @@ const AddTriggerView = () => {
                       <Flex marginBottom="4px" alignItems="center" key={index} gridColumn="1 / -1">
                         <Div flexGrow={9}>
                           <Select
+                            styles={errors.recipients?.[index] && !activeRecipients?.[index]?.value ? ErrorStyle : undefined}
+                            ref={() => register({
+                              name: `recipients[${index}]`,
+                              required: false,
+                            })}
                             key={index}
                             options={recipients}
                             value={recipient}
@@ -488,6 +487,7 @@ const AddTriggerView = () => {
                               setRecipients(qOption, index);
                             }}
                           />
+                          {errors.recipients?.[index] && !activeRecipients?.[index]?.value && <Muted color="warning">{errors.recipients?.[index].message}</Muted>}
                         </Div>
                         <Flex justifyContent="center" alignContent="center" flexGrow={1}>
                           <MinusCircle onClick={() => deleteRecipient(index)} />
