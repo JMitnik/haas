@@ -97,28 +97,28 @@ const AddCustomerView = () => {
               <Grid gridTemplateColumns={['1fr', '1fr 1fr']}>
                 <Flex flexDirection="column">
                   <StyledLabel>Name</StyledLabel>
-                  <StyledInput name="name" ref={register({ required: true })} />
+                  <StyledInput hasError={!!errors.name} name="name" ref={register({ required: true })} />
                   {errors.name && <Muted color="warning">Something went wrong!</Muted>}
                 </Flex>
                 <Div useFlex flexDirection="column">
                   <StyledLabel>Logo</StyledLabel>
-                  <StyledInput name="logo" ref={register({ required: false })} />
+                  <StyledInput hasError={!!errors.logo} name="logo" ref={register({ required: false })} />
                   {errors.logo && <Muted color="warning">{errors.logo.message}</Muted>}
                 </Div>
                 <Div useFlex flexDirection="column">
                   <StyledLabel>Slug</StyledLabel>
-                  <StyledInput name="slug" ref={register({ required: true })} />
+                  <StyledInput hasError={!!errors.slug} name="slug" ref={register({ required: true })} />
                   {errors.slug && <Muted color="warning">Something went wrong!</Muted>}
                 </Div>
                 <Div useFlex flexDirection="column">
                   <StyledLabel>Primary colour</StyledLabel>
-                  <StyledInput name="primaryColour" ref={register({ required: true })} />
+                  <StyledInput hasError={!!errors.primaryColour} name="primaryColour" ref={register({ required: true })} />
                   {errors.primaryColour && <Muted color="warning">{errors.primaryColour.message}</Muted>}
                 </Div>
                 <Div useFlex flexDirection="column">
                   <StyledLabel>Logo (Cloudinary)</StyledLabel>
-                  <StyledInput type="file" name="cloudinary" onChange={onChange} ref={register({ required: false })} />
-                  {errors.name && <Muted color="warning">Something went wrong!</Muted>}
+                  <StyledInput hasError={!!errors.cloudinary} type="file" name="cloudinary" onChange={onChange} ref={register({ required: false })} />
+                  {errors.cloudinary && <Muted color="warning">Something went wrong!</Muted>}
 
                 </Div>
                 <Div useFlex flexDirection="column">
@@ -132,20 +132,21 @@ const AddCustomerView = () => {
                     {activePreview && !fileUploadLoading && <img src={activePreview} height={200} width={200} alt="" />}
                   </Div>
                 </Div>
+                <Flex justifyContent="space-between" alignItems="center">
+                  <label
+                    htmlFor="seed"
+                  >
+                    Generate template topic for customer
+                  </label>
+                  <StyledInput
+                    type="checkbox"
+                    id="seed"
+                    name="seed"
+                    ref={register({ required: false })}
+                  />
+                </Flex>
               </Grid>
-              <Div py={4}>
-                <StyledInput
-                  type="checkbox"
-                  id="seed"
-                  name="seed"
-                  ref={register({ required: false })}
-                />
-                <label
-                  htmlFor="seed"
-                >
-                  Generate template topic for customer
-                </label>
-              </Div>
+
             </Div>
           </Grid>
         </FormGroupContainer>

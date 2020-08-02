@@ -144,33 +144,34 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
               <Grid gridTemplateColumns={['1fr', '1fr 1fr']}>
                 <Flex flexDirection="column">
                   <StyledLabel>Name</StyledLabel>
-                  <StyledInput name="name" ref={register({ required: true })} />
+                  <StyledInput hasError={!!errors.name} name="name" ref={register({ required: true })} />
                   {errors.name && <Muted color="warning">Something went wrong!</Muted>}
                 </Flex>
                 <Div useFlex flexDirection="column">
                   <StyledLabel>Logo</StyledLabel>
-                  <StyledInput name="logo" ref={register({ required: true })} />
+                  <StyledInput hasError={!!errors.logo} name="logo" ref={register({ required: false })} />
                   {errors.logo && <Muted color="warning">Something went wrong!</Muted>}
                 </Div>
                 <Div useFlex flexDirection="column">
                   <StyledLabel>Slug</StyledLabel>
-                  <StyledInput name="slug" ref={register({ required: true })} />
+                  <StyledInput hasError={!!errors.slug} name="slug" ref={register({ required: true })} />
                   {errors.slug && <Muted color="warning">Something went wrong!</Muted>}
                 </Div>
                 <Div useFlex flexDirection="column">
                   <StyledLabel>Primary colour</StyledLabel>
-                  <StyledInput name="primaryColour" ref={register({ required: true })} />
+                  <StyledInput hasError={!!errors.primaryColour} name="primaryColour" ref={register({ required: true })} />
                   {errors.primaryColour && <Muted color="warning">Something went wrong!</Muted>}
                 </Div>
                 <Div useFlex flexDirection="column">
                   <StyledLabel>Logo (Cloudinary)</StyledLabel>
                   <StyledInput
+                    hasError={!!errors.cloudinary}
                     type="file"
                     name="cloudinary"
                     onChange={onLogoUploadChange}
                     ref={register({ required: false })}
                   />
-                  {errors.name && <Muted color="warning">Something went wrong!</Muted>}
+                  {errors.cloudinary && <Muted color="warning">Something went wrong!</Muted>}
                 </Div>
                 <Div useFlex flexDirection="column">
                   <StyledLabel>Preview</StyledLabel>

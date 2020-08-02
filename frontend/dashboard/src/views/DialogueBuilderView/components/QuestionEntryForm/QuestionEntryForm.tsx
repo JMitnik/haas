@@ -2,6 +2,7 @@
 import * as yup from 'yup';
 import { ApolloError } from 'apollo-client';
 import { MinusCircle, PlusCircle } from 'react-feather';
+import { debounce } from 'lodash';
 import { useForm } from 'react-hook-form';
 import { useMutation } from '@apollo/react-hooks';
 import { useParams } from 'react-router';
@@ -19,7 +20,6 @@ import updateQuestionMutation from 'mutations/updateQuestion';
 
 import { EdgeConditonProps,
   OverrideLeafProps, QuestionEntryProps, QuestionOptionProps } from '../../DialogueBuilderInterfaces';
-import { debounce } from 'lodash';
 
 interface FormDataProps {
   title: string;
@@ -191,7 +191,6 @@ const QuestionEntryForm = ({
   };
 
   useEffect(() => {
-    console.log('setting match text to: ', activematchValue?.value);
     setValue('matchText', activematchValue?.value);
   }, [setValue, activematchValue]);
 
@@ -327,7 +326,7 @@ const QuestionEntryForm = ({
       boxShadow: 'none',
     }),
   };
-  console.log('options errors: ', errors.options);
+
   const parentOptionsSelect = parentOptions?.map((option) => ({ label: option.value, value: option.value }));
   return (
     <Form onSubmit={handleSubmit(onSubmit)}>
