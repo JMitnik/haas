@@ -248,8 +248,6 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: 
     }),
   };
 
-  console.log('values: ', getValues({ nest: true }));
-
   return (
     <Form onSubmit={handleSubmit(onSubmit)}>
       <FormGroupContainer>
