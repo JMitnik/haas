@@ -314,7 +314,7 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: 
                           onChange={(e) => handleURLChange(e.currentTarget.value, index)}
                           ref={register({ required: true })}
                         />
-                        {errors.links?.[index]?.url && <Muted color="warning">Something went wrong!</Muted>}
+                        {errors.links?.[index]?.url && <Muted color="warning">{errors.links?.[index]?.url.message}</Muted>}
                       </Flex>
                       <Div useFlex flexDirection="column">
                         <StyledLabel>Type</StyledLabel>
@@ -345,29 +345,29 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: 
                           onChange={(e) => handleTooltipChange(e.currentTarget.value, index)}
                           ref={register({ required: false })}
                         />
-                        {errors.links?.[index]?.tooltip && <Muted color="warning">Something went wrong!</Muted>}
+                        {errors.links?.[index]?.tooltip && <Muted color="warning">{errors.links?.[index]?.tooltip.message}</Muted>}
                       </Flex>
                       <Flex flexDirection="column">
                         <StyledLabel>Icon</StyledLabel>
                         <StyledInput
-                          hasError={!!errors.links?.[index].iconUrl}
+                          hasError={!!errors.links?.[index]?.iconUrl}
                           name={`links[${index}].iconUrl`}
                           defaultValue={link.iconUrl}
                           onChange={(e) => handleIconChange(e.currentTarget.value, index)}
                           ref={register({ required: false })}
                         />
-                        {errors.links?.[index]?.iconUrl && <Muted color="warning">Something went wrong!</Muted>}
+                        {errors.links?.[index]?.iconUrl && <Muted color="warning">{errors.links?.[index]?.iconUrl?.message}</Muted>}
                       </Flex>
                       <Flex flexDirection="column">
                         <StyledLabel>Background color</StyledLabel>
                         <StyledInput
-                          hasError={!!errors.links?.[index].backgroundColor}
+                          hasError={!!errors.links?.[index]?.backgroundColor}
                           name={`links[${index}].backgroundColor`}
                           defaultValue={link.backgroundColor}
                           onChange={(e) => handleBackgroundColorChange(e.currentTarget.value, index)}
                           ref={register({ required: false })}
                         />
-                        {errors.links?.[index]?.backgroundColor && <Muted color="warning">Something went wrong!</Muted>}
+                        {errors.links?.[index]?.backgroundColor && <Muted color="warning">{errors.links?.[index]?.backgroundColor.message}</Muted>}
                       </Flex>
                     </Grid>
                   </Div>
