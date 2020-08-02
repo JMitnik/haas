@@ -125,9 +125,9 @@ const ActionOverview = ({ leafs }: ActionOverviewProps) => {
           id="-1"
           activeCTA={activeCTA}
           onActiveCTAChange={setActiveCTA}
-          Icon={LinkIcon}
+          Icon={RegisterIcon}
           title=""
-          type={initializeCTAType('LINK')}
+          type={initializeCTAType('REGISTER')}
           links={[]}
           onNewCTAChange={setNewCTA}
         />
