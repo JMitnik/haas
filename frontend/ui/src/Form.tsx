@@ -62,8 +62,8 @@ export const StyledLabel = styled(Div).attrs({ as: 'label' })`
   `}
 `;
 
-export const StyledInput = styled.input`
-  ${({ theme }) => css`
+export const StyledInput = styled.input <{hasError?: boolean }>`
+  ${({ theme, hasError }) => css`
     border-radius: ${theme.borderRadiuses.sm};
     background: ${theme.colors.white};
     border: none;
@@ -75,9 +75,15 @@ export const StyledInput = styled.input`
     /* Make somehow a color */
     border: 1px solid #dbdde0;
     box-shadow: none;
-
+    
     /* Set to variable */
     padding: 15px;
+    width: 100%;
+
+    ${hasError && css`
+    border: 1px solid red;
+    outline: none;
+    `}
   `}
 `;
 
