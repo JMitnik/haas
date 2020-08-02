@@ -314,7 +314,7 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: 
                           onChange={(e) => handleURLChange(e.currentTarget.value, index)}
                           ref={register({ required: true })}
                         />
-                        {errors.links?.[index]?.url && <Muted color="warning">{errors.links?.[index]?.url.message}</Muted>}
+                        {errors.links?.[index]?.url && <Muted color="warning">{errors.links?.[index]?.url?.message}</Muted>}
                       </Flex>
                       <Div useFlex flexDirection="column">
                         <StyledLabel>Type</StyledLabel>
@@ -345,7 +345,7 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: 
                           onChange={(e) => handleTooltipChange(e.currentTarget.value, index)}
                           ref={register({ required: false })}
                         />
-                        {errors.links?.[index]?.tooltip && <Muted color="warning">{errors.links?.[index]?.tooltip.message}</Muted>}
+                        {errors.links?.[index]?.tooltip && <Muted color="warning">{errors.links?.[index]?.tooltip?.message}</Muted>}
                       </Flex>
                       <Flex flexDirection="column">
                         <StyledLabel>Icon</StyledLabel>
@@ -367,7 +367,7 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: 
                           onChange={(e) => handleBackgroundColorChange(e.currentTarget.value, index)}
                           ref={register({ required: false })}
                         />
-                        {errors.links?.[index]?.backgroundColor && <Muted color="warning">{errors.links?.[index]?.backgroundColor.message}</Muted>}
+                        {errors.links?.[index]?.backgroundColor && <Muted color="warning">{errors.links?.[index]?.backgroundColor?.message}</Muted>}
                       </Flex>
                     </Grid>
                   </Div>
