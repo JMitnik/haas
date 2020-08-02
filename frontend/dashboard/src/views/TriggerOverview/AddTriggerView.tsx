@@ -1,4 +1,5 @@
 /* eslint-disable radix */
+import * as yup from 'yup';
 import { ApolloError } from 'apollo-boost';
 import { MinusCircle, PlusCircle, X } from 'react-feather';
 import { debounce } from 'lodash';
@@ -20,6 +21,11 @@ import getRecipientsQuery from 'queries/getUsers';
 
 interface FormDataProps {
   name: string;
+  dialogue: string;
+  type: string;
+  medium: string;
+  question: string;
+  condition: string;
   matchText: string;
   lowThreshold: number;
   highThreshold: number;
@@ -56,9 +62,43 @@ const MEDIUM_TYPES = [
   { label: 'Both', value: 'BOTH' },
 ];
 
+const schema = yup.object().shape({
+  name: yup.string().required(),
+  dialogue: yup.string().required(),
+  type: yup.string().required(),
+  medium: yup.string().required(),
+  question: yup.string().when(['type'], {
+    is: (type: string) => type === TriggerQuestionType.QUESTION,
+    then: yup.string().required(),
+    otherwise: yup.string().notRequired(),
+  }),
+  condition: yup.string().required(),
+  lowThreshold: yup.string().notRequired().when(['condition'], {
+    is: (condition: string) => condition === TriggerConditionType.LOW_THRESHOLD
+    || condition === TriggerConditionType.INNER_RANGE
+    || condition === TriggerConditionType.OUTER_RANGE,
+    then: yup.string().required(),
+    otherwise: yup.string().notRequired(),
+  }),
+  highThreshold: yup.string().when(['condition'], {
+    is: (condition: string) => condition === TriggerConditionType.HIGH_THRESHOLD
+    || condition === TriggerConditionType.INNER_RANGE
+    || condition === TriggerConditionType.OUTER_RANGE,
+    then: yup.string().required(),
+    otherwise: yup.string().notRequired(),
+  }),
+  matchText: yup.string().when(['condition'], {
+    is: (parentQuestionType: string) => parentQuestionType === TriggerConditionType.TEXT_MATCH,
+    then: yup.string().required(),
+    otherwise: yup.string().notRequired(),
+  }),
+});
+
 const AddTriggerView = () => {
   const history = useHistory();
-  const { register, handleSubmit, errors } = useForm<FormDataProps>();
+  const { register, handleSubmit, errors, setValue } = useForm<FormDataProps>({
+    validationSchema: schema,
+  });
   const { customerSlug } = useParams();
 
   // TODO: Make it one query
@@ -108,6 +148,26 @@ const AddTriggerView = () => {
     });
   };
 
+  const handleDialogueChange = (qOption: any) => {
+    setValue('dialogue', qOption?.value);
+    setActiveDialogue(qOption);
+  };
+
+  const handleTypeChange = (qOption: any) => {
+    setValue('type', qOption?.value);
+    setActiveType(qOption);
+  };
+
+  const handleMediumChange = (qOption: any) => {
+    setValue('medium', qOption?.value);
+    setActiveMedium(qOption);
+  };
+
+  const handleQuestionChange = (qOption: any) => {
+    setValue('question', qOption?.value);
+    setActiveQuestion(qOption);
+  };
+
   const setRecipients = (qOption: { label: string, value: string }, index: number) => {
     setActiveRecipients((prevRecipients) => {
       prevRecipients[index] = qOption;
@@ -127,6 +187,7 @@ const AddTriggerView = () => {
   };
 
   const setConditionsType = (qOption: any, index: number) => {
+    setValue('condition', qOption.value);
     setActiveConditions((prevConditions) => {
       prevConditions[index].type = qOption;
       return [...prevConditions];
@@ -201,6 +262,15 @@ const AddTriggerView = () => {
   const questions = questionsData?.customer?.dialogue?.questions && questionsData?.customer?.dialogue?.questions.map((question: any) => (
     { label: question?.title, value: question?.id }));
 
+  const ErrorStyle = {
+    control: (base: any) => ({
+      ...base,
+      border: '1px solid red',
+      // This line disable the blue border
+      boxShadow: 'none',
+    }),
+  };
+
   return (
     <Container>
       <Div>
@@ -223,57 +293,79 @@ const AddTriggerView = () => {
               <Grid gridTemplateColumns={['1fr', '1fr 1fr']}>
                 <Flex flexDirection="column">
                   <StyledLabel>Trigger name</StyledLabel>
-                  <StyledInput name="name" ref={register({ required: true })} />
+                  <StyledInput hasError={!!errors.name} name="name" ref={register({ required: true })} />
                   {errors.name && <Muted color="warning">Something went wrong!</Muted>}
                 </Flex>
                 <Div useFlex flexDirection="column">
                   <StyledLabel>Dialogue</StyledLabel>
                   <Select
+                    styles={errors.dialogue && !activeDialogue ? ErrorStyle : undefined}
+                    ref={() => register({
+                      name: 'dialogue',
+                      required: true,
+                    })}
                     options={dialogues}
                     value={activeDialogue}
                     onChange={(qOption: any) => {
-                      setActiveDialogue(qOption);
+                      handleDialogueChange(qOption);
                     }}
                   />
+                  {errors.dialogue && !activeDialogue && <Muted color="warning">{errors.dialogue.message}</Muted>}
                 </Div>
                 <Div useFlex flexDirection="column">
                   <StyledLabel>Type</StyledLabel>
                   <Select
+                    styles={errors.type && !activeType ? ErrorStyle : undefined}
+                    ref={() => register({
+                      name: 'type',
+                      required: true,
+                    })}
                     options={TRIGGER_TYPES}
                     value={activeType}
                     onChange={(qOption: any) => {
-                      setActiveType(qOption);
+                      handleTypeChange(qOption);
                     }}
                   />
+                  {errors.type && !activeType && <Muted color="warning">{errors.type.message}</Muted>}
                 </Div>
                 <Div useFlex flexDirection="column">
                   <StyledLabel>Medium</StyledLabel>
                   <Select
+                    styles={errors.medium && !activeMedium ? ErrorStyle : undefined}
+                    ref={() => register({
+                      name: 'medium',
+                      required: true,
+                    })}
                     options={MEDIUM_TYPES}
                     value={activeMedium}
                     onChange={(qOption: any) => {
-                      setActiveMedium(qOption);
+                      handleMediumChange(qOption);
                     }}
                   />
+                  {errors.medium && !activeMedium && <Muted color="warning">{errors.medium.message}</Muted>}
                 </Div>
                 {activeType?.value === TriggerQuestionType.QUESTION && (
                   <Div useFlex flexDirection="column" gridColumn="1 / -1">
                     <StyledLabel>Question</StyledLabel>
                     <Select
+                      styles={errors.question && !activeQuestion ? ErrorStyle : undefined}
+                      ref={() => register({
+                        name: 'question',
+                        required: false,
+                      })}
                       options={questions}
                       value={activeQuestion}
                       onChange={(qOption: any) => {
-                        setActiveQuestion(qOption);
+                        handleQuestionChange(qOption);
                       }}
                     />
+                    {errors.question && !activeQuestion && <Muted color="warning">{errors.question.message}</Muted>}
                   </Div>
                 )}
-                { /* conditions overview here */}
                 <Div gridColumn="1 / -1">
                   <Flex flexDirection="row" alignItems="center" justifyContent="space-between">
                     <H4>Conditions</H4>
                     <PlusCircle onClick={addCondition} />
-                    {/* conditions header here */}
                   </Flex>
                   <Hr />
                   <Div padding={10} marginTop={15}>
@@ -292,19 +384,26 @@ const AddTriggerView = () => {
                           <X />
                         </DeleteButtonContainer>
                         <Select
+                          styles={errors.condition && !activeConditions?.[0].type ? ErrorStyle : undefined}
+                          ref={() => register({
+                            name: 'condition',
+                            required: false,
+                          })}
                           options={setConditionTypeOptions(activeQuestion?.value, questionsData?.customer?.dialogue?.questions)}
                           value={condition.type}
                           onChange={(qOption: any) => setConditionsType(qOption, index)}
                         />
+                        {errors.condition && !activeConditions?.[0].type && <Muted color="warning">{errors.condition.message}</Muted>}
                         {condition?.type?.value === TriggerConditionType.TEXT_MATCH && (
                         <Flex marginTop={5} flexDirection="column">
                           <StyledLabel>Match Text</StyledLabel>
                           <StyledInput
+                            hasError={!!errors.matchText}
                             onChange={(event) => setMatchText(event.currentTarget.value, index)}
                             name="matchText"
                             ref={register({ required: true })}
                           />
-                          {errors.matchText && <Muted color="warning">Something went wrong!</Muted>}
+                          {errors.matchText && <Muted color="warning">{errors.matchText.message}</Muted>}
                         </Flex>
                         )}
 
@@ -312,6 +411,7 @@ const AddTriggerView = () => {
                           <Flex marginTop={5} flexDirection="column">
                             <StyledLabel>Low Threshold (0 - 10)</StyledLabel>
                             <StyledInput
+                              hasError={!!errors.lowThreshold}
                               type="number"
                               step="0.1"
                               onChange={(event) => setConditionMinValue(event.currentTarget.value, index)}
@@ -326,6 +426,7 @@ const AddTriggerView = () => {
                         <Flex marginTop={5} flexDirection="column">
                           <StyledLabel>High Threshold (0 - 10)</StyledLabel>
                           <StyledInput
+                            hasError={!!errors.highThreshold}
                             type="number"
                             step="0.1"
                             onChange={(event) => setConditionMaxValue(event.currentTarget.value, index)}
@@ -342,6 +443,7 @@ const AddTriggerView = () => {
                           <Flex width="49%" flexDirection="column">
                             <StyledLabel>Low Threshold (0 - 10)</StyledLabel>
                             <StyledInput
+                              hasError={!!errors.lowThreshold}
                               type="number"
                               step="0.1"
                               onChange={(event) => setConditionMinValue(event.currentTarget.value, index)}
@@ -353,6 +455,7 @@ const AddTriggerView = () => {
                           <Flex width="49%" flexDirection="column">
                             <StyledLabel>High Threshold (0 - 10)</StyledLabel>
                             <StyledInput
+                              hasError={!!errors.highThreshold}
                               type="number"
                               step="0.1"
                               onChange={(event) => setConditionMaxValue(event.currentTarget.value, index)}

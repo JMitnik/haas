@@ -1,3 +1,4 @@
+import * as yup from 'yup';
 import { ApolloError } from 'apollo-boost';
 import { useForm } from 'react-hook-form';
 import { useHistory, useParams } from 'react-router';
@@ -17,12 +18,22 @@ interface FormDataProps {
   lastName?: string;
   email: string;
   phone?: string;
-  role: { label: string, value: string };
+  role: string;
 }
+
+const schema = yup.object().shape({
+  email: yup.string().required(),
+  role: yup.string().required(),
+  firstName: yup.string().notRequired(),
+  lastName: yup.string().notRequired(),
+  phone: yup.string().notRequired(),
+});
 
 const AddUserView = () => {
   const history = useHistory();
-  const { register, handleSubmit, errors } = useForm<FormDataProps>();
+  const { register, handleSubmit, errors, setValue } = useForm<FormDataProps>({
+    validationSchema: schema,
+  });
   const { customerSlug } = useParams();
 
   const [activeRole, setActiveRole] = useState<null | { label: string, value: string }>(null);
@@ -43,6 +54,11 @@ const AddUserView = () => {
     ],
   });
 
+  const handleRoleChange = (qOption: any) => {
+    setValue('role', qOption?.value);
+    setActiveRole(qOption);
+  };
+
   const roles: Array<{name: string, id: string}> = data?.roles;
   const mappedRoles = roles?.map(({ name, id }) => ({ label: name, value: id }));
 
@@ -61,6 +77,15 @@ const AddUserView = () => {
         input: optionInput,
       },
     });
+  };
+
+  const ErrorStyle = {
+    control: (base: any) => ({
+      ...base,
+      border: '1px solid red',
+      // This line disable the blue border
+      boxShadow: 'none',
+    }),
   };
 
   return (
@@ -85,33 +110,39 @@ const AddUserView = () => {
               <Grid gridTemplateColumns={['1fr', '1fr 1fr']}>
                 <Flex flexDirection="column">
                   <StyledLabel>First name</StyledLabel>
-                  <StyledInput name="firstName" ref={register({ required: true })} />
-                  {errors.firstName && <Muted color="warning">Something went wrong!</Muted>}
+                  <StyledInput hasError={!!errors.firstName} name="firstName" ref={register({ required: true })} />
+                  {errors.firstName && <Muted color="warning">{errors.firstName.message}</Muted>}
                 </Flex>
                 <Div useFlex flexDirection="column">
                   <StyledLabel>Last name</StyledLabel>
-                  <StyledInput name="lastName" ref={register({ required: true })} />
-                  {errors.lastName && <Muted color="warning">Something went wrong!</Muted>}
+                  <StyledInput hasError={!!errors.lastName} name="lastName" ref={register({ required: true })} />
+                  {errors.lastName && <Muted color="warning">{errors.lastName.message}</Muted>}
                 </Div>
                 <Div useFlex flexDirection="column">
                   <StyledLabel>Email address</StyledLabel>
-                  <StyledInput name="email" ref={register({ required: true })} />
-                  {errors.email && <Muted color="warning">Something went wrong!</Muted>}
+                  <StyledInput hasError={!!errors.email} name="email" ref={register({ required: true })} />
+                  {errors.email && <Muted color="warning">{errors.email.message}</Muted>}
                 </Div>
                 <Div useFlex flexDirection="column">
                   <StyledLabel>Phone number</StyledLabel>
-                  <StyledInput name="phone" ref={register({ required: false })} />
-                  {errors.phone && <Muted color="warning">Something went wrong!</Muted>}
+                  <StyledInput hasError={!!errors.phone} name="phone" ref={register({ required: false })} />
+                  {errors.phone && <Muted color="warning">{errors.phone.message}</Muted>}
                 </Div>
                 <Div useFlex flexDirection="column">
                   <StyledLabel>Role</StyledLabel>
                   <Select
+                    styles={errors.role && !activeRole ? ErrorStyle : undefined}
+                    ref={() => register({
+                      name: 'role',
+                      required: true,
+                    })}
                     options={mappedRoles}
                     value={activeRole}
                     onChange={(qOption: any) => {
-                      setActiveRole(qOption);
+                      handleRoleChange(qOption);
                     }}
                   />
+                  {errors.role && !activeRole && <Muted color="warning">{errors.role.message}</Muted>}
                 </Div>
               </Grid>
             </Div>

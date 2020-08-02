@@ -1,3 +1,4 @@
+import * as yup from 'yup';
 import { ApolloError, gql } from 'apollo-boost';
 import { MinusCircle, PlusCircle } from 'react-feather';
 import { useForm } from 'react-hook-form';
@@ -47,6 +48,21 @@ const getEditDialogueQuery = gql`
   }
 `;
 
+interface FormDataProps {
+  title: string;
+  publicTitle?: string;
+  description: string;
+  slug: string;
+  tags: Array<string>;
+}
+
+const schema = yup.object().shape({
+  title: yup.string().required(),
+  publicTitle: yup.string().notRequired(),
+  description: yup.string().required(),
+  tags: yup.array().of(yup.string().min(1)).notRequired(),
+});
+
 const EditDialogueView = () => {
   const { customerSlug, dialogueSlug } = useParams();
   const editDialogueData = useQuery(getEditDialogueQuery, {
@@ -78,7 +94,9 @@ const EditDialogueView = () => {
 
 const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFormProps) => {
   const history = useHistory();
-  const { register, handleSubmit, errors } = useForm<FormDataProps>();
+  const { register, handleSubmit, errors } = useForm<FormDataProps>({
+    validationSchema: schema,
+  });
   const { customerSlug, dialogueSlug } = useParams();
 
   const [editDialogue, { loading }] = useMutation(editDialogueMutation, {
@@ -148,28 +166,30 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFo
               <Grid gridTemplateColumns={['1fr', '1fr 1fr']}>
                 <Flex flexDirection="column">
                   <StyledLabel>Title</StyledLabel>
-                  <StyledInput defaultValue={dialogue?.title} name="title" ref={register({ required: true })} />
-                  {errors.title && <Muted color="warning">Something went wrong!</Muted>}
+                  <StyledInput hasError={!!errors.title} defaultValue={dialogue?.title} name="title" ref={register({ required: true })} />
+                  {errors.title && <Muted color="warning">{errors.title.message}</Muted>}
                 </Flex>
                 <Div useFlex pl={4} flexDirection="column">
                   <StyledLabel>Public Title</StyledLabel>
                   <StyledInput
+                    hasError={!!errors.publicTitle}
                     defaultValue={dialogue?.publicTitle}
                     name="publicTitle"
                     ref={register({ required: false })}
                   />
-                  {errors.publicTitle && <Muted color="warning">Something went wrong!</Muted>}
+                  {errors.publicTitle && <Muted color="warning">{errors.publicTitle.message}</Muted>}
                 </Div>
               </Grid>
               <Div py={4}>
                 <Flex flexDirection="column">
                   <StyledLabel>Description</StyledLabel>
                   <StyledTextInput
+                    hasError={!!errors.description}
                     defaultValue={dialogue?.description}
                     name="description"
                     ref={register({ required: true })}
                   />
-                  {errors.description && <Muted color="warning">Something went wrong!</Muted>}
+                  {errors.description && <Muted color="warning">{errors.description.message}</Muted>}
                 </Flex>
               </Div>
               <Div gridColumn="1 / -1">
