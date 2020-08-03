@@ -2,9 +2,9 @@ import { subDays } from 'date-fns';
 import _ from 'lodash';
 import cuid from 'cuid';
 
+import { ApolloError, UserInputError } from 'apollo-server-express';
 import { Dialogue, DialogueCreateInput, DialogueUpdateInput,
   QuestionOptionCreateManyWithoutQuestionNodeInput, Tag, TagWhereUniqueInput } from '@prisma/client';
-import { UserInputError } from 'apollo-server-express';
 import { isPresent } from 'ts-is-present';
 import { leafNodes, sliderType } from '../../data/seeds/default-data';
 import NodeService from '../question/NodeService';
@@ -624,6 +624,8 @@ class DialogueService {
       input.publicTitle || '',
       dialogueTags,
     );
+
+    if (!dialogue) throw new ApolloError('customer:unable_to_create');
 
     // TODO: "Include "
     await prisma.dialogue.update({
