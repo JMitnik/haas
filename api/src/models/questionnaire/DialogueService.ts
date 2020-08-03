@@ -4,6 +4,7 @@ import cuid from 'cuid';
 
 import { Dialogue, DialogueCreateInput, DialogueUpdateInput,
   QuestionOptionCreateManyWithoutQuestionNodeInput, Tag, TagWhereUniqueInput } from '@prisma/client';
+import { UserInputError } from 'apollo-server-express';
 import { isPresent } from 'ts-is-present';
 import { leafNodes, sliderType } from '../../data/seeds/default-data';
 import NodeService from '../question/NodeService';
@@ -348,13 +349,21 @@ class DialogueService {
     publicTitle: string = '',
     tags: Array<{id: string}> = [],
   ) => {
-    const dialogue = prisma.dialogue.create({
-      data: DialogueService.constructDialogue(
-        customerId, title, dialogueSlug, description, publicTitle, tags,
-      ),
-    });
+    try {
+      const dialogue = await prisma.dialogue.create({
+        data: DialogueService.constructDialogue(
+          customerId, title, dialogueSlug, description, publicTitle, tags,
+        ),
+      });
 
-    return dialogue;
+      return dialogue;
+    } catch (error) {
+      if (error.code === 'P2002') {
+        throw new UserInputError('dialogue:existing_slug');
+      }
+
+      return null;
+    }
   };
 
   static copyDialogue = async (
