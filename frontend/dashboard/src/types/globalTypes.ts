@@ -60,7 +60,7 @@ export enum TriggerTypeEnum {
   SCHEDULED = "SCHEDULED",
 }
 
-export interface CustomerCreateOptions {
+export interface CreateOptions {
   slug: string;
   primaryColour: string;
   logo?: string | null;

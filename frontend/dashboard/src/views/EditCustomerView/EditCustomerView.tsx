@@ -10,7 +10,7 @@ import {
   H2, H3, Hr, Muted, StyledInput, StyledLabel,
 } from '@haas/ui';
 
-import { Customer } from 'types';
+// import { Customer } from 'types';
 import { useCustomer } from 'providers/CustomerProvider';
 import { useToast } from '@chakra-ui/core';
 import { getCustomerQuery } from '../../queries/getCustomersQuery';
@@ -85,8 +85,10 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
   const [editCustomer, { loading }] = useMutation(editCustomerMutation, {
 
     onCompleted: (result: any) => {
-      const customer: Customer = result.editCustomer;
+      const customer: any = result.editCustomer;
+
       localStorage.setItem('customer', JSON.stringify(customer));
+      
       toast({
         title: 'Your business edited',
         description: 'The business has been updated',
