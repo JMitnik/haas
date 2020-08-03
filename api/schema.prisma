@@ -6,6 +6,7 @@ datasource postgresql {
 // binaryTargets = ["debian-openssl-1.1.x"]
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["middlewares"]
   output   = "./node_modules/@prisma/client"
 }
 
@@ -90,6 +91,7 @@ model Dialogue {
   questions    QuestionNode[]
   sessions     Session[]
   tags         Tag[]
+  @@unique([slug, customerId])
 }
 
 enum NodeType {

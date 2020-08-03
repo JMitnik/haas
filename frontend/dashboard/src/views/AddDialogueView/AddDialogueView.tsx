@@ -11,6 +11,7 @@ import Select from 'react-select';
 import styled, { css } from 'styled-components/macro';
 
 import { createDialogue } from 'mutations/createDialogue';
+import formatServerError from 'utils/formatServerError';
 import getCustomerQuery from 'queries/getCustomersQuery';
 import getDialoguesOfCustomer from 'queries/getDialoguesOfCustomer';
 import getTagsQuery from 'queries/getTags';
@@ -70,7 +71,7 @@ const AddDialogueView = () => {
 
   const { data, loading: tagsLoading } = useQuery(getTagsQuery, { variables: { customerSlug } });
 
-  const [addDialogue, { loading }] = useMutation(createDialogue, {
+  const [addDialogue, { loading, error: serverError }] = useMutation(createDialogue, {
     onCompleted: () => {
       history.push(`/dashboard/b/${customerSlug}/`);
     },
@@ -80,8 +81,9 @@ const AddDialogueView = () => {
         variables: { customerSlug },
       },
     ],
-    onError: (serverError: ApolloError) => {
-      console.log(serverError);
+    onError: (error: ApolloError) => {
+      // TODO: Use toast here + Sentry or so?
+      console.log(`Error Name: ${error.name} \n`);
     },
   });
 
@@ -156,12 +158,15 @@ const AddDialogueView = () => {
 
   return (
     <Container>
+
       <Div>
         <H2 color="default.darkest" fontWeight={500} py={2}>Add dialogue</H2>
         <Muted pb={4}>Create a new dialogue</Muted>
       </Div>
 
       <Hr />
+
+      {serverError && formatServerError(serverError.message)}
 
       <Form onSubmit={handleSubmit(onSubmit)}>
         <FormGroupContainer>
