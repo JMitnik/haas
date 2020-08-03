@@ -2,6 +2,7 @@ import { subDays } from 'date-fns';
 import _ from 'lodash';
 import cuid from 'cuid';
 
+import { ApolloError, UserInputError } from 'apollo-server-express';
 import { Dialogue, DialogueCreateInput, DialogueUpdateInput,
   QuestionOptionCreateManyWithoutQuestionNodeInput, Tag, TagWhereUniqueInput } from '@prisma/client';
 import { isPresent } from 'ts-is-present';
@@ -348,13 +349,21 @@ class DialogueService {
     publicTitle: string = '',
     tags: Array<{id: string}> = [],
   ) => {
-    const dialogue = prisma.dialogue.create({
-      data: DialogueService.constructDialogue(
-        customerId, title, dialogueSlug, description, publicTitle, tags,
-      ),
-    });
+    try {
+      const dialogue = await prisma.dialogue.create({
+        data: DialogueService.constructDialogue(
+          customerId, title, dialogueSlug, description, publicTitle, tags,
+        ),
+      });
 
-    return dialogue;
+      return dialogue;
+    } catch (error) {
+      if (error.code === 'P2002') {
+        throw new UserInputError('dialogue:existing_slug');
+      }
+
+      return null;
+    }
   };
 
   static copyDialogue = async (
@@ -616,6 +625,8 @@ class DialogueService {
       dialogueTags,
     );
 
+    if (!dialogue) throw new ApolloError('customer:unable_to_create');
+
     // TODO: "Include "
     await prisma.dialogue.update({
       where: {
@@ -639,14 +650,14 @@ class DialogueService {
 
   static seedQuestionnare = async (
     customerId: string,
-    customerSlug: string,
+    dialogueSlug: string,
     customerName: string,
     dialogueTitle: string = 'Default dialogue',
     dialogueDescription: string = 'Default questions',
     tags: Array<{id: string}>,
   ): Promise<Dialogue> => {
     const dialogue = await DialogueService.initDialogue(
-      customerId, customerSlug, dialogueTitle, dialogueDescription, '', tags,
+      customerId, dialogueTitle, dialogueSlug, dialogueDescription, '', tags,
     );
 
     const leafs = await NodeService.createTemplateLeafNodes(leafNodes, dialogue.id);

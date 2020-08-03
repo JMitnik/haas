@@ -90,6 +90,7 @@ model Dialogue {
   questions    QuestionNode[]
   sessions     Session[]
   tags         Tag[]
+  @@unique([slug, customerId])
 }
 
 enum NodeType {

@@ -11,6 +11,7 @@ import { Edit, Plus, X } from 'react-feather';
 import { Link, useHistory } from 'react-router-dom';
 import { useCustomer } from 'providers/CustomerProvider';
 
+import { ErrorBoundary } from 'react-error-boundary';
 import { CustomerCardImage, CustomerOverviewContainer } from './CustomerOverviewStyles';
 import { deleteFullCustomerQuery } from '../../mutations/deleteFullCustomer';
 import { getCustomerQuery } from '../../queries/getCustomersQuery';
@@ -26,7 +27,11 @@ const CustomerOverview = ({ customers }: { customers: any[] }) => (
         gridTemplateColumns={['1fr', '1fr 1fr 1fr']}
         gridAutoRows="minmax(250px, 1fr)"
       >
-        {customers?.map((customer: any, index: any) => customer && <CustomerCard key={index} customer={customer} />)}
+        {customers?.map((customer: any, index: any) => customer && (
+          <ErrorBoundary FallbackComponent={() => (<></>)}>
+            <CustomerCard key={index} customer={customer} />
+          </ErrorBoundary>
+        ))}
 
         <AddCard>
           <Link to="/dashboard/b/add" />
