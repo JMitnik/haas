@@ -31,6 +31,8 @@ export const CustomerSettingsType = objectType({
       nullable: true,
 
       resolve(parent, args, ctx) {
+        if (!parent.colourSettingsId) return null;
+
         const colourSettings = ctx.prisma.colourSettings.findOne({
           where: { id: parent.colourSettingsId || undefined },
         });
