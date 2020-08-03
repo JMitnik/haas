@@ -1,6 +1,8 @@
 import Color from 'color';
 
 export const isValidColor = (color: string) => {
+  if (!color) return false;
+
   const regExp = color.match(/^(#(\d|\D){6}$){1}/);
   if (!regExp || regExp.length === 0) {
     return false;
@@ -10,5 +12,6 @@ export const isValidColor = (color: string) => {
   } catch (e) {
     return false;
   }
+
   return true;
 };
