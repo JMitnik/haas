@@ -1,13 +1,15 @@
 
+import * as yup from 'yup';
 import { ApolloError } from 'apollo-client';
 import { MinusCircle, PlusCircle } from 'react-feather';
+import { debounce } from 'lodash';
 import { useForm } from 'react-hook-form';
 import { useMutation } from '@apollo/react-hooks';
 import { useParams } from 'react-router';
 import React, { useCallback, useEffect, useState } from 'react';
 import Select from 'react-select';
 
-import { Button, Div, Flex, Form, FormGroupContainer,
+import { Button, Div, ErrorStyle, Flex, Form, FormGroupContainer,
   Grid, H3, H4, Hr, Muted, StyledInput, StyledLabel } from '@haas/ui';
 import {
   DeleteQuestionOptionButtonContainer,
@@ -21,13 +23,46 @@ import { EdgeConditonProps,
 
 interface FormDataProps {
   title: string;
-  conditionType: string;
   minValue: string;
   maxValue: string;
   questionType: string;
   matchText: string;
   activeLeaf: string;
+  parentQuestionType: string;
+  options: Array<string>;
 }
+
+const isChoiceType = (questionType: string) => {
+  if (questionType === 'CHOICE') {
+    return true;
+  }
+  return false;
+};
+
+const schema = yup.object().shape({
+  title: yup.string().required(),
+  questionType: yup.string().required(),
+  minValue: yup.string().when(['parentQuestionType'], {
+    is: (parentQuestionType: string) => parentQuestionType === 'Slider',
+    then: yup.string().required(),
+    otherwise: yup.string().notRequired(),
+  }),
+  maxValue: yup.string().when(['parentQuestionType'], {
+    is: (parentQuestionType: string) => parentQuestionType === 'Slider',
+    then: yup.string().required(),
+    otherwise: yup.string().notRequired(),
+  }),
+  matchText: yup.string().when(['parentQuestionType'], {
+    is: (parentQuestionType: string) => parentQuestionType === 'Choice',
+    then: yup.string().required(),
+    otherwise: yup.string().notRequired(),
+  }),
+  options: yup.array().of(yup.string().min(1)).when(['questionType'], {
+    is: (questionType: string) => isChoiceType(questionType),
+    then: yup.array(yup.string().min(1)).min(1).required(),
+    otherwise: yup.array(yup.string()).notRequired(),
+  }),
+});
 
 interface QuestionEntryFormProps {
   onAddExpandChange?: React.Dispatch<React.SetStateAction<boolean>>;
@@ -51,10 +86,6 @@ const questionTypes = [
   { value: 'SLIDER', label: 'Slider' },
   { value: 'CHOICE', label: 'Choice' }];
 
-const conditionTypes = [
-  { value: 'match', label: 'match' },
-  { value: 'valueBoundary', label: 'valueBoundary' }];
-
 const QuestionEntryForm = ({
   onAddExpandChange,
   id,
@@ -66,15 +97,19 @@ const QuestionEntryForm = ({
   onActiveQuestionChange,
   condition,
   parentOptions,
-  edgeId,
   question,
-  parentQuestionId,
   parentQuestionType,
+  parentQuestionId,
+  edgeId,
 }: QuestionEntryFormProps) => {
   const { customerSlug, dialogueSlug } = useParams();
 
-  const { register, handleSubmit, setValue, errors } = useForm<FormDataProps>({
-    // validationSchema: schema,
+  const { register, handleSubmit, setValue, errors, getValues } = useForm<FormDataProps>({
+    validationSchema: schema,
+    defaultValues: {
+      parentQuestionType,
+      options: [],
+    },
   });
 
   const [activeTitle, setActiveTitle] = useState(title);
@@ -93,7 +128,7 @@ const QuestionEntryForm = ({
   );
   const [activeCondition, setActiveCondition] = useState<null | EdgeConditonProps>(condition || { conditionType: parentQuestionType === 'Slider' ? 'valueBoundary' : 'match' });
 
-  const setConditionType = (conditionOption: any) => {
+  const setConditionType = useCallback((conditionOption: any) => {
     setActiveConditionSelect(conditionOption);
     setActiveCondition((prevCondition) => {
       if (!prevCondition) {
@@ -102,12 +137,17 @@ const QuestionEntryForm = ({
       prevCondition.conditionType = conditionOption.value;
       return prevCondition;
     });
-  };
+  }, [setActiveConditionSelect, setActiveCondition]);
 
   const handleQuestionTypeChange = useCallback((selectOption: any) => {
     setValue('questionType', selectOption?.value);
     setActiveQuestionType(selectOption);
   }, [setValue, setActiveQuestionType]);
+
+  useEffect(() => {
+    register({ name: 'parentQuestionType' });
+    setValue('parentQuestionType', parentQuestionType);
+  }, [setValue, register, parentQuestionType]);
 
   useEffect(() => {
     if (activeQuestionType) {
@@ -139,6 +179,7 @@ const QuestionEntryForm = ({
 
   const setMatchTextValue = (qOption: any) => {
     const matchText = qOption.value;
+    setValue('matchText', matchText);
     setActiveMatchValue(qOption);
     return setActiveCondition((prevCondition) => {
       if (!prevCondition) {
@@ -149,16 +190,9 @@ const QuestionEntryForm = ({
     });
   };
 
-  const handleMatchTextChange = useCallback((selectedOption: any) => {
-    setValue('matchText', selectedOption?.value);
-    setMatchTextValue(selectedOption);
-  }, [setValue, setMatchTextValue]);
-
   useEffect(() => {
-    if (activematchValue) {
-      handleMatchTextChange(activematchValue);
-    }
-  }, [handleMatchTextChange, activematchValue]);
+    setValue('matchText', activematchValue?.value);
+  }, [setValue, activematchValue]);
 
   const [createQuestion] = useMutation(createQuestionMutation, {
     onCompleted: () => {
@@ -215,8 +249,8 @@ const QuestionEntryForm = ({
     });
   };
 
-  const setMaxValue = (event: React.FocusEvent<HTMLInputElement>) => {
-    const maxValue = Number(event.target.value);
+  const setMaxValue = useCallback(debounce((value: string) => {
+    const maxValue = Number(value);
     return setActiveCondition((prevCondition) => {
       if (!prevCondition) {
         return { renderMax: maxValue };
@@ -224,15 +258,14 @@ const QuestionEntryForm = ({
       prevCondition.renderMax = maxValue;
       return prevCondition;
     });
-  };
+  }, 250), []);
 
-  const handleOptionChange = (event: any, optionIndex: number) => {
-    const { value } = event.target;
+  const handleOptionChange = useCallback(debounce((value: any, optionIndex: number) => {
     setActiveOptions((prevOptions) => {
-      prevOptions[optionIndex] = { value, publicValue: '' };
+      prevOptions[optionIndex] = { value: value || '', publicValue: '' };
       return [...prevOptions];
     });
-  };
+  }, 250), []);
 
   const deleteOption = (event: any, optionIndex: number) => {
     setActiveOptions((prevOptions) => {
@@ -256,6 +289,7 @@ const QuestionEntryForm = ({
     const overrideLeafId = activeLeaf?.value;
     const options = { options: activeOptions };
     const edgeCondition = activeCondition;
+    console.log('form data: ', formData);
     if (question.id !== '-1') {
       updateQuestion({
         variables: {
@@ -285,7 +319,6 @@ const QuestionEntryForm = ({
   };
 
   const parentOptionsSelect = parentOptions?.map((option) => ({ label: option.value, value: option.value }));
-
   return (
     <Form onSubmit={handleSubmit(onSubmit)}>
       <FormGroupContainer>
@@ -304,6 +337,7 @@ const QuestionEntryForm = ({
               <Div useFlex flexDirection="column" gridColumn="1 / -1">
                 <StyledLabel>Title</StyledLabel>
                 <StyledInput
+                  hasError={!!errors.title}
                   name="title"
                   defaultValue={activeTitle}
                   onBlur={(e) => setActiveTitle(e.currentTarget.value)}
@@ -312,26 +346,12 @@ const QuestionEntryForm = ({
                 {errors.title && <Muted color="warning">Something went wrong!</Muted>}
               </Div>
 
-              {/* <Flex flexDirection="column">
-                <StyledLabel>conditionType</StyledLabel>
-                <Select
-                  ref={() => register({
-                    name: 'conditionType',
-                    required: true,
-                    validate: (value) => (Array.isArray(value) ? value.length > 0 : !!value),
-                  })}
-                  options={conditionTypes}
-                  value={activeConditionSelect}
-                  onChange={(qOption: any) => handleConditionTypeChange(qOption)}
-                />
-                {errors.conditionType && <Muted color="warning">Something went wrong!</Muted>}
-              </Flex> */}
-
               {parentQuestionType === 'Slider' && (
                 <>
                   <Flex flexDirection="column">
                     <StyledLabel>Min value</StyledLabel>
                     <StyledInput
+                      hasError={!!errors.minValue}
                       name="minValue"
                       ref={register({ required: false })}
                       defaultValue={condition?.renderMin}
@@ -342,10 +362,11 @@ const QuestionEntryForm = ({
                   <Flex flexDirection="column">
                     <StyledLabel>Max value</StyledLabel>
                     <StyledInput
+                      hasError={!!errors.maxValue}
                       name="maxValue"
                       ref={register({ required: false })}
                       defaultValue={condition?.renderMax}
-                      onBlur={(event: React.FocusEvent<HTMLInputElement>) => setMaxValue(event)}
+                      onChange={(event) => setMaxValue(event.target.value)}
                     />
                     {errors.maxValue && <Muted color="warning">{errors.maxValue.message}</Muted>}
                   </Flex>
@@ -356,8 +377,9 @@ const QuestionEntryForm = ({
                 <Div gridColumn="1 / -1">
                   <StyledLabel>Match value</StyledLabel>
                   <Select
+                    styles={errors.matchText && !activematchValue ? ErrorStyle : undefined}
                     ref={() => register({
-                      name: 'matchType',
+                      name: 'matchText',
                       required: false,
                     })}
                     options={parentOptionsSelect}
@@ -366,13 +388,15 @@ const QuestionEntryForm = ({
                       setMatchTextValue(option);
                     }}
                   />
-                  {errors.matchText && <Muted color="warning">{errors.matchText.message}</Muted>}
+                  {errors.matchText && !activematchValue && <Muted color="warning">{errors.matchText.message}</Muted>}
                 </Div>
               )}
 
               <Div useFlex flexDirection="column">
                 <StyledLabel>Question type</StyledLabel>
                 <Select
+                  id="question-type-select"
+                  hasError={!!errors.questionType}
                   ref={() => register({
                     name: 'questionType',
                     required: true,
@@ -387,6 +411,8 @@ const QuestionEntryForm = ({
               <Div key={activeLeaf?.value} useFlex flexDirection="column">
                 <StyledLabel>Leaf node</StyledLabel>
                 <Select
+                  id="leaf-node-select"
+                  hasError={!!errors.activeLeaf}
                   ref={() => register({
                     name: 'activeLeaf',
                     required: true,
@@ -406,30 +432,39 @@ const QuestionEntryForm = ({
                       <H4>
                         Options
                       </H4>
-                      <PlusCircle style={{ cursor: 'pointer' }} onClick={() => addNewOption()} />
+                      <PlusCircle data-cy="AddOption" style={{ cursor: 'pointer' }} onClick={() => addNewOption()} />
                     </Flex>
 
                     <Hr />
                   </Div>
 
-                    {((activeOptions && activeOptions.length === 0) || (!activeOptions)) && (
-                    <Div alignSelf="center">
-                      No options available...
-                    </Div>
-                    )}
+                    {!activeOptions.length && !errors.options && <Muted>Please add an option </Muted>}
+                    {!activeOptions.length && errors.options && <Muted color="red">Please fill in at least one option!</Muted>}
                     {activeOptions && activeOptions.map((option, optionIndex) => (
-                      <Flex key={`${option.id}-${optionIndex}-${option.value}`} my={1} flexDirection="row">
-                        <StyledInput
-                          key={`input-${id}-${optionIndex}`}
-                          name={`${id}-option-${optionIndex}`}
-                          defaultValue={option.value}
-                          onBlur={(e) => handleOptionChange(e, optionIndex)}
-                        />
-                        <DeleteQuestionOptionButtonContainer
-                          onClick={(e) => deleteOption(e, optionIndex)}
-                        >
-                          <MinusCircle />
-                        </DeleteQuestionOptionButtonContainer>
+                      <Flex key={`${option.id}-${optionIndex}-${option.value}`} flexDirection="column">
+                        <Flex my={1} flexDirection="row">
+                          <Flex flexGrow={1}>
+                            <StyledInput
+                              hasError={errors.options && Array.isArray(errors.options) && !!errors.options?.[optionIndex]}
+                              id={`options[${optionIndex}]`}
+                              key={`input-${id}-${optionIndex}`}
+                              name={`options[${optionIndex}]`}
+                              ref={register(
+                                { required: true,
+                                  minLength: 1 },
+                              )}
+                              defaultValue={option.value}
+                              onChange={(e) => handleOptionChange(e.currentTarget.value, optionIndex)}
+                            />
+                          </Flex>
+
+                          <DeleteQuestionOptionButtonContainer
+                            onClick={(e) => deleteOption(e, optionIndex)}
+                          >
+                            <MinusCircle />
+                          </DeleteQuestionOptionButtonContainer>
+                        </Flex>
+                        {errors.options?.[optionIndex] && <Muted color="warning">Please fill in a proper value!</Muted>}
                       </Flex>
                     ))}
                 </>

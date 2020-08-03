@@ -44,6 +44,8 @@ const UserRow = ({ headers, data, index, onDeleteEntry, onEditEntry }: TableRowP
 
   return (
     <Grid
+      paddingLeft="15px"
+      paddingRight="15px"
       position="relative"
       gridRowGap={0}
       gridColumnGap={5}

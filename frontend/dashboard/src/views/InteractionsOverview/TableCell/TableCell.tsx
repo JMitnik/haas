@@ -1,5 +1,7 @@
-import { Div, Flex, Span } from '@haas/ui';
+import { Div, Flex, H4, H5, Span } from '@haas/ui';
 import { differenceInCalendarDays, format, formatDistance } from 'date-fns';
+import { maxBy } from 'lodash';
+import DesktopIcon from 'components/Icons/DesktopIcon';
 import React from 'react';
 
 interface CellProps {
@@ -28,18 +30,19 @@ export const WhenCell = ({ value }: { value: any }) => {
 };
 
 const getBadgeBackgroundColour = (value: number) => {
-  if (value >= 70) return { background: '#e2f0c7', color: '#42c355' };
-  if (value > 50 && value < 70) return { background: '#f2dda5', color: '#dd992a' };
-  return { background: '#f5c4c0', color: '#d5372c' };
+  if (value >= 70) return { background: '#58D173', color: 'white' };
+  if (value > 50 && value < 70) return { background: '#ffa500', color: 'white' };
+  return { background: '#FF3A3A', color: 'white' };
 };
 
 export const ScoreCell = ({ value }: CellProps) => {
   const { background, color } = getBadgeBackgroundColour(value);
+  const decimalScore = (value) ? (value / 10).toFixed(1) : value;
   return (
     <Flex alignItems="center" justifyContent="center">
       <Div display="inline-block" padding="10px" borderRadius="90px" backgroundColor={background} color={color}>
         <Span fontSize="1.2em" fontWeight={900}>
-          {value}
+          {decimalScore}
         </Span>
       </Div>
     </Flex>
@@ -53,6 +56,69 @@ export const UserCell = ({ value }: CellProps) => (
     </Div>
   </Flex>
 );
+
+export const InteractionUserCell = ({ value }: CellProps) => (
+  <Flex alignItems="center" justifyContent="center">
+    <Div borderRadius="lg" padding="5px" backgroundColor="default.light">
+      <DesktopIcon />
+    </Div>
+    <Flex minWidth="195px" marginLeft="15px" flexDirection="column">
+      <H4 color="default.darker">Desktop user</H4>
+      <Span color="default.dark" fontSize="0.8em" fontWeight={900}>{value}</Span>
+    </Flex>
+  </Flex>
+);
+
+export const InteractionDateCell = ({ value }: { value: any }) => {
+  const date = new Date(parseInt(value, 10));
+  const currentDate = new Date();
+  const dateDifference = differenceInCalendarDays(currentDate, date);
+
+  const formattedDate = format(date, 'LLL d');
+  const formattedTime = format(date, 'h:mm a');
+
+  return (
+    <Flex flexDirection="column" alignItems="center" justifyContent="center">
+      <Div>
+        <H4 color="default.darker">{formattedDate?.toUpperCase()}</H4>
+        <Span color="default.dark" fontSize="0.8em" fontWeight={900}>{formattedTime}</Span>
+      </Div>
+
+    </Flex>
+  );
+};
+
+export const InteractionCTACell = ({ value: nodeEntries }: CellProps) => {
+  const potentialCTA = maxBy(nodeEntries, (entry: any) => entry.depth);
+
+  console.log(potentialCTA);
+
+  const getCTAType = (potentialCTA: any) => {
+    const { value: { textboxNodeEntry, linkNodeEntry, registrationNodeEntry } } = potentialCTA;
+    if (textboxNodeEntry) {
+      return 'Feedback';
+    }
+
+    if (linkNodeEntry) {
+      return 'Link';
+    }
+
+    if (registrationNodeEntry) {
+      return 'Register';
+    }
+
+    return 'No CTA';
+  };
+
+  return (
+    <Flex alignItems="center" justifyContent="center">
+      <Flex minWidth="195px" marginLeft="15px" flexDirection="column">
+        <H4 color="default.darker">{getCTAType(potentialCTA)}</H4>
+        <Span color="default.dark" fontSize="0.8em" fontWeight={900}>No registration</Span>
+      </Flex>
+    </Flex>
+  );
+};
 
 export const CenterCell = ({ value }: CellProps) => (
   <Flex alignItems="center" justifyContent="center">

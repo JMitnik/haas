@@ -1,3 +1,4 @@
+import { maxBy } from 'lodash';
 import React, { useState } from 'react';
 
 import { Div, Grid, H4, H5, Hr, Span } from '@haas/ui';
@@ -38,6 +39,8 @@ const InteractionsTableRow = ({ headers, data, index }: TableRowProps<Session>) 
 
   return (
     <Grid
+      paddingLeft="10px"
+      paddingRight="10px"
       gridRowGap={0}
       gridColumnGap={5}
       gridTemplateColumns={templateColumns}

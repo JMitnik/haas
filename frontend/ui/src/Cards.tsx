@@ -1,5 +1,6 @@
 import styled, { css } from 'styled-components/macro';
 import { Div } from './Generics';
+import { Flex } from './Container';
 
 interface CardProps {
   noHover?: boolean;
@@ -26,24 +27,24 @@ export const Card = styled(Div)<CardProps>`
 export const AddCard = styled(Card)`
   ${({ theme }) => css`
     position: relative;
-    box-shadow: none;
-    border-radius: ${theme.borderRadiuses.md}
 
-    &:hover ${Div} {
-      transition: all 0.2s ease-in;
-      box-shadow: 0 1px 3px 1px rgba(0,0,0,0.2) !important;
-    }
+    background: none;
+    border: none;
+    border-radius: none;
 
-    ${Div} {
+    ${Flex} {
       height: 100%;
-      border-radius: ${theme.borderRadiuses.md}
-      border: 1px solid ${theme.colors.default.light};
+      border-radius: ${theme.borderRadiuses.md};
+      border: 5px solid ${theme.colors.default.normalAlt};
       transition: all 0.2s ease-in;
       display: flex;
       align-items: center;
-      flex-direciton: column;
+      flex-direction: column;
       justify-content: center;
-      background: #f7f9fe;
+
+      svg {
+        color: ${theme.colors.default.dark};
+      }
     }
 
     a {

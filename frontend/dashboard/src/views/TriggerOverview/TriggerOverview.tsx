@@ -116,7 +116,7 @@ const TriggersOverview = () => {
           <SearchBar activeSearchTerm={paginationProps.activeSearchTerm} onSearchTermChange={handleSearchTermChange} />
         </InputContainer>
       </InputOutputContainer>
-      <Div backgroundColor="#fdfbfe" minHeight="65%">
+      <Div borderRadius="lg" flexGrow={1} backgroundColor="white">
         <Table
           headers={HEADERS}
           paginationProps={{ ...paginationProps, pageCount, pageIndex }}
