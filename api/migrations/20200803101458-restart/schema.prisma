@@ -1,12 +1,11 @@
 datasource postgresql {
   provider = "postgresql"
-  url      = env("DB_STRING")
+  url = "***"
 }
 
 // binaryTargets = ["debian-openssl-1.1.x"]
 generator client {
   provider = "prisma-client-js"
-  previewFeatures = ["middlewares"]
   output   = "./node_modules/@prisma/client"
 }
 
@@ -70,7 +69,7 @@ enum TagEnum {
 
 model Tag {
   id         String     @default(cuid()) @id
-  type       TagEnum    @default(value: DEFAULT)
+  type       TagEnum
   name       String
   isTagOf    Dialogue[] @relation(references: [id])
   customer   Customer  @relation(fields: [customerId], references: [id])
@@ -316,7 +315,7 @@ enum TriggerConditionEnum {
 
 model TriggerCondition {
   id        Int                  @default(autoincrement()) @id
-  type      TriggerConditionEnum @default(value: LOW_THRESHOLD)
+  type      TriggerConditionEnum
   minValue  Int?
   maxValue  Int?
   textValue String?
@@ -328,7 +327,7 @@ model Trigger {
   id            String             @default(cuid()) @id
   lastSent      DateTime?
   name          String
-  type          TriggerEnum         @default(value: QUESTION)
+  type          TriggerEnum
   medium        TriggerMedium
   conditions    TriggerCondition[]
   relatedNodeId String?

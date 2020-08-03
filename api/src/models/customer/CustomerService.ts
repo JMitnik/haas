@@ -2,7 +2,6 @@ import { Customer, TagCreateWithoutCustomerInput } from '@prisma/client';
 import { subDays } from 'date-fns';
 import cuid from 'cuid';
 
-import { cond, includes } from 'lodash';
 import { leafNodes } from '../../data/seeds/default-data';
 // eslint-disable-next-line import/no-cycle
 import DialogueService from '../questionnaire/DialogueService';
