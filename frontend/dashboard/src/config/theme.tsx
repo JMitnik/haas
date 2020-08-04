@@ -38,7 +38,7 @@ const theme = {
   },
   space: [0, 6, 12, 18, 24],
   gutter: 24,
-  containerWidth: 1080,
+  containerWidth: 1400,
   // TODO: Add
   fontFamilies: {
     body: '',

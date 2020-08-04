@@ -31,6 +31,7 @@ import { ErrorBoundary } from 'react-error-boundary';
 import DashboardLayout from 'layouts/DashboardLayout';
 
 import DialogueLayout from 'layouts/DialogueLayout';
+import PreCustomerLayout from 'layouts/PreCustomerLayout';
 import client from './config/apollo';
 
 const AppRoutes = () => (
@@ -154,7 +155,14 @@ const AppRoutes = () => (
       )}
     />
 
-    <Route path="/dashboard/b/" render={() => <CustomersPage />} />
+    <Route
+      path="/dashboard/b/"
+      render={() => (
+        <PreCustomerLayout>
+          <CustomersPage />
+        </PreCustomerLayout>
+      )}
+    />
     <Route path="/dashboard" render={() => <DashboardPage />} />
 
     <Route path="/">

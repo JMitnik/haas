@@ -9,7 +9,7 @@ import { useMutation } from '@apollo/react-hooks';
 import React, { useState } from 'react';
 
 import { createNewCustomer } from '../../mutations/createNewCustomer';
-import { getCustomerQuery } from '../../queries/getCustomersQuery';
+import getCustomerQuery from '../../queries/getCustomersQuery';
 import uploadSingleImage from '../../mutations/uploadSingleImage';
 
 interface FormDataProps {

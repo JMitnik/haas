@@ -9,12 +9,11 @@ import {
   Button, Container, Div, Flex, Form, FormGroupContainer, Grid,
   H2, H3, Hr, Muted, StyledInput, StyledLabel,
 } from '@haas/ui';
-
-// import { Customer } from 'types';
 import { useCustomer } from 'providers/CustomerProvider';
 import { useToast } from '@chakra-ui/core';
-import { getCustomerQuery } from '../../queries/getCustomersQuery';
+
 import editCustomerMutation from '../../mutations/editCustomer';
+import getCustomerQuery from '../../queries/getCustomersQuery';
 import getEditCustomerData from '../../queries/getEditCustomer';
 import uploadSingleImage from '../../mutations/uploadSingleImage';
 
@@ -88,7 +87,7 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
       const customer: any = result.editCustomer;
 
       localStorage.setItem('customer', JSON.stringify(customer));
-      
+
       toast({
         title: 'Your business edited',
         description: 'The business has been updated',
