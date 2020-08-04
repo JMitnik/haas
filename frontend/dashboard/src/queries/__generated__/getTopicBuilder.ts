@@ -64,6 +64,7 @@ export interface getTopicBuilder_customer_dialogue_questions {
   id: string;
   title: string;
   creationDate: string | null;
+  updatedAt: string | null;
   isRoot: boolean;
   isLeaf: boolean;
   overrideLeaf: getTopicBuilder_customer_dialogue_questions_overrideLeaf | null;
