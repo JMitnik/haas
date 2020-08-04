@@ -423,6 +423,8 @@ class DialogueService {
       customerId, title, dialogueSlug, description, publicTitle, tags,
     );
 
+    if (!dialogue) throw new Error('Dialogue not copied');
+
     if (templateDialogue?.id) {
       idMap[templateDialogue?.id] = dialogue.id;
     }
@@ -582,6 +584,7 @@ class DialogueService {
       throw new Error('Description required, not found!');
     }
 
+
     if (customers.length > 1) {
       // TODO: Make this a logger or something
       console.warn(`Multiple customers found with slug ${input.customerSlug}`);
@@ -659,6 +662,8 @@ class DialogueService {
     const dialogue = await DialogueService.initDialogue(
       customerId, dialogueTitle, dialogueSlug, dialogueDescription, '', tags,
     );
+
+    if (!dialogue) throw new Error('Dialogue not seeded');
 
     const leafs = await NodeService.createTemplateLeafNodes(leafNodes, dialogue.id);
 

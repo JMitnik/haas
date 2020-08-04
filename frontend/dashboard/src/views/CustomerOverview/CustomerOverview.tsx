@@ -1,11 +1,11 @@
 import { ApolloError } from 'apollo-boost';
 import { useMutation } from '@apollo/react-hooks';
 import Color from 'color';
-import React from 'react';
+import React, { useState } from 'react';
 
 import {
   AddCard, Card, CardBody, Container, DeleteButtonContainer, Div,
-  EditButtonContainer, Flex, Grid, H3, H4, PageHeading,
+  EditButtonContainer, Flex, Grid, H3, H4, PageHeading, Button,
 } from '@haas/ui';
 import { Edit, Plus, X } from 'react-feather';
 import { Link, useHistory } from 'react-router-dom';
@@ -18,6 +18,7 @@ import { CustomerCardImage, CustomerOverviewContainer } from './CustomerOverview
 import { deleteFullCustomerQuery } from '../../mutations/deleteFullCustomer';
 import { getCustomerQuery } from '../../queries/getCustomersQuery';
 import { isValidColor } from '../../utils/ColorUtils';
+import { Popover, PopoverTrigger, PopoverContent, PopoverBody, useToast } from '@chakra-ui/core';
 
 const CustomerOverview = ({ customers }: { customers: any[] }) => (
   <CustomerOverviewContainer>
@@ -55,6 +56,8 @@ const CustomerOverview = ({ customers }: { customers: any[] }) => (
 const CustomerCard = ({ customer }: { customer: any }) => {
   const history = useHistory();
   const { activeCustomer, setActiveCustomer } = useCustomer();
+  const toast = useToast();
+  const [isOpenDelete, setIsOpenDelete] = useState(false);
 
   const setCustomerSlug = (customerSlug: string) => {
     localStorage.setItem('customer', JSON.stringify(customer));
@@ -69,8 +72,23 @@ const CustomerCard = ({ customer }: { customer: any }) => {
 
   const [deleteCustomer] = useMutation(deleteFullCustomerQuery, {
     refetchQueries: [{ query: getCustomerQuery }],
-    onError: (serverError: ApolloError) => {
-      console.log(serverError);
+    onError: () => {
+      toast({
+        title: 'Something went wrong',
+        description: 'There was a problem with deleting the customer.',
+        status: 'success',
+        position: 'bottom-right',
+        isClosable: true,
+      });
+    },
+    onCompleted: () => {
+      toast({
+        title: 'Customer deleted!',
+        description: 'The customer has been deleted.',
+        status: 'success',
+        position: 'bottom-right',
+        duration: 1500,
+      });
     },
   });
 
@@ -80,6 +98,7 @@ const CustomerCard = ({ customer }: { customer: any }) => {
         id: customerSlug,
       },
     });
+
     event.stopPropagation();
   };
 
@@ -104,13 +123,31 @@ const CustomerCard = ({ customer }: { customer: any }) => {
           >
             <Edit />
           </EditButtonContainer>
+
           <DeleteButtonContainer
             data-cy="DeleteCustomerButton"
-            onClick={(e) => deleteClickedCustomer(e, customer.id)}
+            onClick={(e) => e.stopPropagation()}
           >
-            <X />
+            <Popover 
+              usePortal
+            >
+              {({ isOpen, onClose }) => (
+                <>
+                  <PopoverTrigger>
+                    <X />
+                  </PopoverTrigger>
+                  <PopoverContent zIndex={4}>
+                    <PopoverBody>
+                      <p>Are you sure?</p>
+                      <Button onClick={(e) => {deleteClickedCustomer(e, customer.id); onClose && onClose();}}>Delete</Button>
+                    </PopoverBody>
+                  </PopoverContent>
+                </>
+              )}
+            </Popover>
           </DeleteButtonContainer>
         </Div>
+
         <Flex alignItems="center" justifyContent="space-between">
           <H3 fontWeight={500}>
             {customer.name}

@@ -19,7 +19,8 @@ export interface editDialogue {
 }
 
 export interface editDialogueVariables {
-  dialogueId?: string | null;
+  customerSlug?: string | null;
+  dialogueSlug?: string | null;
   title?: string | null;
   description?: string | null;
   publicTitle?: string | null;

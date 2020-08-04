@@ -7,6 +7,16 @@
 // START Enums and Input Objects
 //==============================================================
 
+export enum LinkTypeEnumType {
+  API = "API",
+  FACEBOOK = "FACEBOOK",
+  INSTAGRAM = "INSTAGRAM",
+  LINKEDIN = "LINKEDIN",
+  SOCIAL = "SOCIAL",
+  TWITTER = "TWITTER",
+  WHATSAPP = "WHATSAPP",
+}
+
 /**
  * Ways to sort a pagination object
  */
@@ -18,9 +28,12 @@ export enum PaginationSortByEnum {
   lastName = "lastName",
   medium = "medium",
   name = "name",
+  paths = "paths",
   role = "role",
   score = "score",
   type = "type",
+  user = "user",
+  when = "when",
 }
 
 /**
@@ -60,6 +73,19 @@ export enum TriggerTypeEnum {
   SCHEDULED = "SCHEDULED",
 }
 
+export interface CTALinkInputObjectType {
+  url?: string | null;
+  type?: LinkTypeEnumType | null;
+  id?: string | null;
+  title?: string | null;
+  iconUrl?: string | null;
+  backgroundColor?: string | null;
+}
+
+export interface CTALinksInputType {
+  linkTypes?: CTALinkInputObjectType[] | null;
+}
+
 export interface CustomerCreateOptions {
   slug: string;
   primaryColour: string;
@@ -78,28 +104,22 @@ export interface DialogueFilterInputType {
   searchTerm?: string | null;
 }
 
-export interface EdgeChildInput {
-  id?: string | null;
-  conditions?: QuestionConditionInput[] | null;
-  parentNode?: EdgeNodeInput | null;
-  childNode?: EdgeNodeInput | null;
+export interface EdgeConditionInputType {
+  id?: number | null;
+  conditionType?: string | null;
+  renderMin?: number | null;
+  renderMax?: number | null;
+  matchValue?: string | null;
 }
 
-export interface EdgeNodeInput {
-  id?: string | null;
-  title?: string | null;
-}
-
-export interface LeafNodeInput {
-  id?: string | null;
-  type?: string | null;
-  title?: string | null;
-}
-
-export interface OptionInput {
+export interface OptionInputType {
   id?: number | null;
   value?: string | null;
   publicValue?: string | null;
+}
+
+export interface OptionsInputType {
+  options?: OptionInputType[] | null;
 }
 
 /**
@@ -121,36 +141,12 @@ export interface PaginationWhereInput {
   orderBy?: PaginationSortInput[] | null;
 }
 
-export interface QuestionConditionInput {
-  id?: number | null;
-  conditionType?: string | null;
-  renderMin?: number | null;
-  renderMax?: number | null;
-  matchValue?: string | null;
-}
-
-export interface QuestionInput {
-  id?: string | null;
-  title?: string | null;
-  isRoot?: boolean | null;
-  isLeaf?: boolean | null;
-  type?: string | null;
-  overrideLeaf?: LeafNodeInput | null;
-  options?: OptionInput[] | null;
-  children?: EdgeChildInput[] | null;
-}
-
 export interface RecipientsInputType {
   ids?: string[] | null;
 }
 
 export interface TagsInputObjectType {
   entries?: string[] | null;
-}
-
-export interface TopicDataEntry {
-  id?: string | null;
-  questions?: QuestionInput[] | null;
 }
 
 export interface TriggerConditionInputType {
