@@ -5,7 +5,7 @@ import React, { useState } from 'react';
 
 import {
   AddCard, Card, CardBody, Container, DeleteButtonContainer, Div,
-  EditButtonContainer, Flex, Grid, H3, H4, PageHeading, Button,
+  EditButtonContainer, Flex, Grid, H3, H4, PageHeading, ColumnFlex, Span,
 } from '@haas/ui';
 import { Edit, Plus, X } from 'react-feather';
 import { Link, useHistory } from 'react-router-dom';
@@ -18,7 +18,8 @@ import { CustomerCardImage, CustomerOverviewContainer } from './CustomerOverview
 import { deleteFullCustomerQuery } from '../../mutations/deleteFullCustomer';
 import { getCustomerQuery } from '../../queries/getCustomersQuery';
 import { isValidColor } from '../../utils/ColorUtils';
-import { Popover, PopoverTrigger, PopoverContent, PopoverBody, useToast } from '@chakra-ui/core';
+import { Popover, PopoverTrigger, PopoverContent, PopoverBody, useToast, Menu, MenuButton, MenuGroup, MenuItem, ButtonGroup, Button, PopoverArrow, PopoverHeader, PopoverCloseButton, PopoverFooter } from '@chakra-ui/core';
+import ContextButton from 'components/ContextButton';
 
 const CustomerOverview = ({ customers }: { customers: any[] }) => (
   <CustomerOverviewContainer>
@@ -112,19 +113,20 @@ const CustomerCard = ({ customer }: { customer: any }) => {
       useFlex
       flexDirection="column"
       backgroundColor={primaryColor.hex()}
-      color={primaryColor.isDark() ? 'white' : '#444'}
       onClick={() => setCustomerSlug(customer.slug)}
       data-cy="CustomerCard"
     >
       <CardBody flex="100%">
-        <Div>
+        {/* <Div>
           <EditButtonContainer
             data-cy="EditCustomerButton"
             onClick={(e) => setCustomerEditPath(e, customer.slug)}
           >
             <Edit />
           </EditButtonContainer>
-
+          <Menu>
+            <MenuButton>Test</MenuButton>
+          </Menu>
           <DeleteButtonContainer
             data-cy="DeleteCustomerButton"
             onClick={(e) => e.stopPropagation()}
@@ -147,14 +149,71 @@ const CustomerCard = ({ customer }: { customer: any }) => {
               )}
             </Popover>
           </DeleteButtonContainer>
-        </Div>
-
-        <Flex alignItems="center" justifyContent="space-between">
-          <H3 fontWeight={500}>
+        </Div> */}
+        <ColumnFlex justifyContent="space-between">
+          <H3  
+            color={primaryColor.isDark() ? 'white' : '#444'}
+            fontWeight={500}
+          >
             {customer.name}
           </H3>
-          {customer?.settings?.logoUrl && <CustomerCardImage src={customer?.settings?.logoUrl} />}
-        </Flex>
+          <ButtonGroup zIndex={150} mt={2}>
+            <Button 
+              size="xs" 
+              variant="outline"
+              leftIcon="arrow-forward"
+              // onClick={() => }
+              color={primaryColor.lighten(0.6).hex()}
+              borderColor={primaryColor.lighten(0.6).hex()}
+            >
+              Visit
+            </Button>
+            <Button 
+              size="xs" 
+              variant="outline"
+              leftIcon="edit"
+              color={primaryColor.lighten(0.6).hex()}
+              borderColor={primaryColor.lighten(0.6).hex()}
+              onClick={(e) => setCustomerEditPath(e, customer.slug)}
+            >
+              Edit
+            </Button>
+            <Span onClick={e => e.stopPropagation()}>
+              <Popover
+                usePortal
+              >
+              {({ isOpen, onClose }) => (
+                <>
+                  <PopoverTrigger>
+                    <Button 
+                      size="xs" 
+                      variant="outline"
+                      leftIcon="delete"
+                      color={primaryColor.lighten(0.6).hex()}
+                      borderColor={primaryColor.lighten(0.6).hex()}
+                    >
+                      Delete
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent zIndex={4}>
+                    <PopoverArrow />
+                    <PopoverHeader>Delete</PopoverHeader>
+                    <PopoverCloseButton />
+                    <PopoverBody>
+                      <p>You are about to delete a customer. Are you sure?</p>
+                    </PopoverBody>
+                    <PopoverFooter>
+                      <Button variantColor="red">Delete</Button>
+                    </PopoverFooter>
+                  </PopoverContent>
+                </>
+              )}
+              </Popover>
+            </Span>
+          </ButtonGroup>
+        </ColumnFlex>
+
+        {customer?.settings?.logoUrl && <CustomerCardImage src={customer?.settings?.logoUrl} />}
       </CardBody>
     </Card>
   );

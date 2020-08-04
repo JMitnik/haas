@@ -1,4 +1,4 @@
-import { ThemeProvider as ChakraThemeProvider } from '@chakra-ui/core';
+import { ThemeProvider as ChakraThemeProvider, CSSReset } from '@chakra-ui/core';
 import { ThemeProvider } from 'styled-components/macro';
 import React, { useEffect, useState } from 'react';
 
@@ -34,6 +34,7 @@ const ThemeProviders = ({ children }: ThemeProvidersProps) => {
   if (customTheme) {
     return (
       <ChakraThemeProvider theme={chakraDefaultTheme}>
+        <CSSReset />
         <ThemeProvider theme={defaultTheme}>
           <ThemeProvider theme={makeCustomTheme(defaultTheme, customTheme)}>
             {children}
