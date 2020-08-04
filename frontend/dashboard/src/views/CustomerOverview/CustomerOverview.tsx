@@ -59,7 +59,6 @@ const CustomerCard = ({ customer }: { customer: any }) => {
   const toast = useToast();
   const [isOpenDelete, setIsOpenDelete] = useState(false);
 
-
   const setCustomerSlug = (customerSlug: string) => {
     localStorage.setItem('customer', JSON.stringify(customer));
     setActiveCustomer(customer);

@@ -10,7 +10,6 @@ import {
   H2, H3, Hr, Muted, StyledInput, StyledLabel,
 } from '@haas/ui';
 
-// import { Customer } from 'types';
 import { useCustomer } from 'providers/CustomerProvider';
 import { useToast } from '@chakra-ui/core';
 import { getCustomerQuery } from '../../queries/getCustomersQuery';

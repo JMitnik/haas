@@ -126,6 +126,14 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: 
 
   const [addCTA] = useMutation(createCTAMutation, {
     onCompleted: () => {
+      toast({
+        title: 'Added!',
+        description: 'The call to action has been created.',
+        status: 'success',
+        position: 'bottom-right',
+        duration: 1500,
+      });
+
       onNewCTAChange(false);
       onActiveCTAChange(null);
     },
@@ -139,7 +147,7 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: 
     onCompleted: () => {
       toast({
         title: 'Edit complete!',
-        description: 'The call to action has been deleted.',
+        description: 'The call to action has been edited.',
         status: 'success',
         position: 'bottom-right',
         duration: 1500,
