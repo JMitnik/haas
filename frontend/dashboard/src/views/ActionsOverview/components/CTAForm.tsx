@@ -6,7 +6,7 @@ import { useParams } from 'react-router-dom';
 import React, { useCallback, useEffect, useState } from 'react';
 import Select from 'react-select';
 
-import { Button, Div, Flex, Form, FormGroupContainer, Grid,
+import { Button, Div, ErrorStyle, Flex, Form, FormGroupContainer, Grid,
   H3, H4, Hr, Muted, StyledInput, StyledLabel } from '@haas/ui';
 import { PlusCircle, X } from 'react-feather';
 import { cloneDeep, debounce } from 'lodash';
@@ -21,11 +21,13 @@ import DeleteLinkSesctionButton from './DeleteLinkSectionButton';
 interface FormDataProps {
   title: string;
   ctaType: string;
-  url: string;
-  linkType: string;
-  tooltip?: string;
-  icon: string;
-  backgroundColor: string;
+  links: Array<{id?: string | null;
+    title: string;
+    type?: string;
+    url: string;
+    tooltip?: string;
+    iconUrl?: string;
+    backgroundColor?: string;}>;
 }
 
 interface LinkInputProps {
@@ -34,6 +36,7 @@ interface LinkInputProps {
   type?: { label: string, value: string };
   url: string;
   iconUrl?: string;
+  tooltip?: string;
   backgroundColor?: string;
 }
 
@@ -46,15 +49,15 @@ interface CTAFormProps {
   onNewCTAChange: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const isLinkType = (ctaType: string) => ctaType === 'LINK';
-
 const schema = yup.object().shape({
   title: yup.string().required(),
   ctaType: yup.string().required(),
-  url: yup.string().notRequired().when(['ctaType'], {
-    is: (ctaType: string) => isLinkType(ctaType),
-    then: yup.string().required(),
-  }),
+  links: yup.array().of(
+    yup.object().shape({
+      url: yup.string().required(),
+      type: yup.string().required(),
+    }),
+  ),
 });
 
 const CTA_TYPES = [
@@ -74,13 +77,20 @@ const LINK_TYPES = [
 
 const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: CTAFormProps) => {
   const { customerSlug, dialogueSlug } = useParams();
-  const { register, handleSubmit, setValue, errors } = useForm<FormDataProps>({
-    // validationSchema: schema,
+  const { register, handleSubmit, setValue, errors, getValues } = useForm<FormDataProps>({
+    validationSchema: schema,
   });
 
-  const [activeLinks, setActiveLinks] = useState<Array<LinkInputProps>>(cloneDeep(links));
+  const clonedLinks = cloneDeep(links);
+  const [activeLinks, setActiveLinks] = useState<Array<LinkInputProps>>(clonedLinks);
 
   const [activeType, setActiveType] = useState<{ label: string, value: string }>(type);
+
+  useEffect(() => {
+    setValue('ctaType', type?.value);
+    const mappedLinks = clonedLinks.map((link) => ({ ...link, type: link?.type?.value || '' }));
+    setValue('links', mappedLinks);
+  }, [setValue]);
 
   const handleMultiChange = useCallback((selectedOption: any) => {
     setValue('ctaType', selectedOption?.value);
@@ -217,7 +227,7 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: 
   }, 250), []);
 
   const handleLinkTypeChange = (qOption: any, index: number) => {
-    setValue('linkType', qOption?.value);
+    setValue(`links[${index}].type`, qOption?.value);
     setActiveLinks((prevLinks) => {
       prevLinks[index].type = qOption;
       return [...prevLinks];
@@ -245,16 +255,16 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: 
             <Grid gridTemplateColumns={['1fr', '1fr 1fr']}>
               <Flex flexDirection="column" gridColumn="1 / -1">
                 <StyledLabel>Title</StyledLabel>
-                <StyledInput name="title" defaultValue={title} ref={register({ required: true })} />
-                {errors.title && <Muted color="warning">Something went wrong!</Muted>}
+                <StyledInput hasError={!!errors.title} name="title" defaultValue={title} ref={register({ required: true })} />
+                {errors.title && <Muted color="warning">{errors.title.message}</Muted>}
               </Flex>
               <Div useFlex flexDirection="column">
                 <StyledLabel>Type</StyledLabel>
                 <Select
+                  styles={errors.ctaType && !activeType ? ErrorStyle : undefined}
                   ref={() => register({
                     name: 'ctaType',
                     required: true,
-                    validate: (value) => (Array.isArray(value) ? value.length > 0 : !!value),
                   })}
                   options={CTA_TYPES}
                   value={activeType}
@@ -262,7 +272,7 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: 
                     handleMultiChange(qOption);
                   }}
                 />
-                {errors.ctaType && (
+                {errors.ctaType && !activeType && (
                 <Muted color="warning">
                   {errors.ctaType.message}
                 </Muted>
@@ -291,20 +301,21 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: 
                       <Flex flexDirection="column">
                         <StyledLabel>Url</StyledLabel>
                         <StyledInput
-                          name="url"
+                          hasError={!!errors.links?.[index]?.url}
+                          name={`links[${index}].url`}
                           defaultValue={link.url}
                           onChange={(e) => handleURLChange(e.currentTarget.value, index)}
                           ref={register({ required: true })}
                         />
-                        {errors.url && <Muted color="warning">Something went wrong!</Muted>}
+                        {errors.links?.[index]?.url && <Muted color="warning">{errors.links?.[index]?.url?.message}</Muted>}
                       </Flex>
                       <Div useFlex flexDirection="column">
                         <StyledLabel>Type</StyledLabel>
                         <Select
+                          styles={errors.links?.[index]?.type && !activeLinks?.[index]?.type ? ErrorStyle : undefined}
                           ref={() => register({
-                            name: 'linkType',
+                            name: `links[${index}].type`,
                             required: true,
-                            validate: (value) => (Array.isArray(value) ? value.length > 0 : !!value),
                           })}
                           options={LINK_TYPES}
                           value={link.type}
@@ -312,41 +323,44 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: 
                             handleLinkTypeChange(qOption, index);
                           }}
                         />
-                        {errors.ctaType && (
+                        {errors.links?.[index]?.type && !activeLinks?.[index]?.type && (
                         <Muted color="warning">
-                          {errors.ctaType.message}
+                          {errors.links?.[index]?.type?.message}
                         </Muted>
                         )}
                       </Div>
                       <Flex flexDirection="column">
                         <StyledLabel>Tooltip</StyledLabel>
                         <StyledInput
-                          name="tooltip"
+                          hasError={!!errors.links?.[index]?.tooltip}
+                          name={`links[${index}].tooltip`}
                           defaultValue={link.title}
                           onChange={(e) => handleTooltipChange(e.currentTarget.value, index)}
                           ref={register({ required: false })}
                         />
-                        {errors.tooltip && <Muted color="warning">Something went wrong!</Muted>}
+                        {errors.links?.[index]?.tooltip && <Muted color="warning">{errors.links?.[index]?.tooltip?.message}</Muted>}
                       </Flex>
                       <Flex flexDirection="column">
                         <StyledLabel>Icon</StyledLabel>
                         <StyledInput
-                          name="icon"
+                          hasError={!!errors.links?.[index]?.iconUrl}
+                          name={`links[${index}].iconUrl`}
                           defaultValue={link.iconUrl}
                           onChange={(e) => handleIconChange(e.currentTarget.value, index)}
                           ref={register({ required: false })}
                         />
-                        {errors.icon && <Muted color="warning">Something went wrong!</Muted>}
+                        {errors.links?.[index]?.iconUrl && <Muted color="warning">{errors.links?.[index]?.iconUrl?.message}</Muted>}
                       </Flex>
                       <Flex flexDirection="column">
                         <StyledLabel>Background color</StyledLabel>
                         <StyledInput
-                          name="backgroundColor"
+                          hasError={!!errors.links?.[index]?.backgroundColor}
+                          name={`links[${index}].backgroundColor`}
                           defaultValue={link.backgroundColor}
                           onChange={(e) => handleBackgroundColorChange(e.currentTarget.value, index)}
                           ref={register({ required: false })}
                         />
-                        {errors.backgroundColor && <Muted color="warning">Something went wrong!</Muted>}
+                        {errors.links?.[index]?.backgroundColor && <Muted color="warning">{errors.links?.[index]?.backgroundColor?.message}</Muted>}
                       </Flex>
                     </Grid>
                   </Div>

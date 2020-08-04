@@ -79,13 +79,14 @@ const QuestionEntryItem = ({ depth,
     : { label: 'Slider', value: 'SLIDER' };
 
   return (
-    <Flex position="relative" justifyContent="center" alignItems="center" flexGrow={1}>
+    <Flex data-cy="QuestionEntry" position="relative" justifyContent="center" alignItems="center" flexGrow={1}>
       {depth > 1 && (
         <ConditionLabel activeCTA={activeQuestion} id={question.id} condition={condition} />
       )}
       <QuestionEntryViewContainer activeCTA={activeQuestion} id={question.id} flexGrow={1}>
         <QuestionEntryContainer flexGrow={1}>
           <DeleteQuestionButton
+            data-cy="DeleteButton"
             disabled={(!!activeQuestion && activeQuestion !== question.id) || false}
             onClick={() => deleteQuestion()}
           >
@@ -99,7 +100,7 @@ const QuestionEntryItem = ({ depth,
               <Span fontSize="1.4em">
                 Title
               </Span>
-              <OverflowSpan>
+              <OverflowSpan data-cy="OverflowSpan">
                 {question.title || 'None'}
               </OverflowSpan>
             </Flex>

@@ -8,7 +8,7 @@ import RegisterIcon from 'components/Icons/RegisterIcon';
 import { LinkContainer, TypeSpan } from './QuestionEntryStyles';
 
 const CTALabel = ({ question }: { question: any }) => (
-  <LinkContainer hasCTA={!!question.overrideLeaf?.id}>
+  <LinkContainer data-cy="CTALabel" hasCTA={!!question.overrideLeaf?.id}>
     <Flex
       flexDirection="column"
       padding="25px"

@@ -10,6 +10,8 @@ const TableRow = ({ headers, data, index }: TableRowProps) => {
 
   return (
     <Grid
+      paddingLeft="15px"
+      paddingRight="15px"
       gridRowGap={0}
       gridColumnGap={5}
       gridTemplateColumns={templateColumns}

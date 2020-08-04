@@ -1,4 +1,4 @@
-import { debounce } from 'lodash';
+import { debounce, maxBy } from 'lodash';
 import { useLazyQuery } from '@apollo/react-hooks';
 import { useParams } from 'react-router';
 import Papa from 'papaparse';
@@ -7,13 +7,13 @@ import React, { useCallback, useEffect, useState } from 'react';
 import {
   getDialogueSessionConnection as CustomerSessionConnection,
 } from 'queries/__generated__/getDialogueSessionConnection';
-import { Div, Muted, Span } from '@haas/ui';
+import { Div, Flex, Muted, Span } from '@haas/ui';
 import DatePicker from 'components/DatePicker/DatePicker';
 import InteractionsTable from 'components/Table/Table';
 import SearchBar from 'components/SearchBar/SearchBar';
 import getDialogueSessionConnectionQuery from 'queries/getDialogueSessionConnectionQuery';
 
-import { CenterCell, ScoreCell, UserCell, WhenCell } from './TableCell/TableCell';
+import { CenterCell, InteractionCTACell, InteractionDateCell, InteractionUserCell, ScoreCell, UserCell, WhenCell } from './TableCell/TableCell';
 import { InputContainer, InputOutputContainer,
   InteractionsOverviewContainer, OutputContainer } from './InteractionOverviewStyles';
 import Row from './TableRow/InteractionsTableRow';
@@ -31,15 +31,15 @@ interface TableProps {
 }
 
 const HEADERS = [
+  { Header: 'User', accessor: 'id', Cell: InteractionUserCell },
+  { Header: 'Date', accessor: 'createdAt', Cell: InteractionDateCell },
+  { Header: 'Call-to-action', accessor: 'nodeEntries', Cell: InteractionCTACell },
   { Header: 'SCORE', accessor: 'score', Cell: ScoreCell },
-  { Header: 'PATHS', accessor: 'paths', Cell: CenterCell },
-  { Header: 'USER', accessor: 'id', Cell: UserCell },
-  { Header: 'WHEN', accessor: 'createdAt', Cell: WhenCell },
 ];
 
 const InteractionsOverview = () => {
   const { dialogueSlug, customerSlug } = useParams();
-  const [fetchInteractions, { data }] = useLazyQuery<CustomerSessionConnection>(getDialogueSessionConnectionQuery, {
+  const [fetchInteractions, { data, loading }] = useLazyQuery<CustomerSessionConnection>(getDialogueSessionConnectionQuery, {
     fetchPolicy: 'cache-and-network',
   });
 
@@ -53,7 +53,6 @@ const InteractionsOverview = () => {
   });
 
   const sessions = data?.customer?.dialogue?.sessionConnection?.sessions || [];
-
   useEffect(() => {
     const { activeStartDate, activeEndDate, pageIndex, pageSize, sortBy, activeSearchTerm } = paginationProps;
     fetchInteractions({
@@ -134,8 +133,9 @@ const InteractionsOverview = () => {
         </InputContainer>
 
       </InputOutputContainer>
-      <Div backgroundColor="#fdfbfe" mb="1%" height="65%">
+      <Div borderRadius="lg" flexGrow={1} backgroundColor="white" mb="1%">
         <InteractionsTable
+          loading={loading}
           headers={HEADERS}
           paginationProps={{ ...paginationProps, pageCount, pageIndex }}
           onPaginationChange={setPaginationProps}

@@ -36,6 +36,7 @@ const EditButtonContainer = styled(Button)`
 
 const EditButton = ({ isDisabled, onClick } : EditButtonProps) => (
   <EditButtonContainer
+    data-cy="EditButton"
     disabled={isDisabled}
     onClick={onClick}
   >

@@ -15,6 +15,8 @@ const UsersTableRow = ({ headers, data, index, onDeleteEntry, onEditEntry }: Use
   return (
     <ErrorBoundary FallbackComponent={() => (<Div>Users table row not renderable</Div>)}>
       <Grid
+        paddingLeft="15px"
+        paddingRight="15px"
         position="relative"
         gridRowGap={0}
         gridColumnGap={5}

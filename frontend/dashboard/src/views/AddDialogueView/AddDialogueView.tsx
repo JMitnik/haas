@@ -1,5 +1,6 @@
+import * as yup from 'yup';
 import { ApolloError } from 'apollo-boost';
-import { Button, Container, Div, Flex, Grid, H2, H3, H4,
+import { Button, Container, Div, ErrorStyle, Flex, Grid, H2, H3, H4,
   Hr, Muted, StyledInput, StyledLabel, StyledTextInput } from '@haas/ui';
 import { MinusCircle, PlusCircle } from 'react-feather';
 import { useForm } from 'react-hook-form';
@@ -9,19 +10,21 @@ import React, { useState } from 'react';
 import Select from 'react-select';
 import styled, { css } from 'styled-components/macro';
 
-import getTagsQuery from 'queries/getTags';
-
 import { createDialogue } from 'mutations/createDialogue';
 import formatServerError from 'utils/formatServerError';
 import getCustomerQuery from 'queries/getCustomersQuery';
 import getDialoguesOfCustomer from 'queries/getDialoguesOfCustomer';
+import getTagsQuery from 'queries/getTags';
 
 interface FormDataProps {
   title: string;
+  publicTitle?: string;
   description: string;
   slug: string;
-  publicTitle?: string;
-  isSeed?: boolean;
+  contentOption: string;
+  customerOption: string;
+  dialogueOption: string;
+  tags: Array<string>;
 }
 
 const DIALOGUE_CONTENT_TYPES = [
@@ -30,16 +33,37 @@ const DIALOGUE_CONTENT_TYPES = [
   { label: 'From other dialogue', value: 'TEMPLATE' },
 ];
 
+const schema = yup.object().shape({
+  title: yup.string().required(),
+  publicTitle: yup.string().notRequired(),
+  description: yup.string().required(),
+  slug: yup.string().required(),
+  contentOption: yup.string().required(),
+  customerOption: yup.string().when(['contentOption'], {
+    is: (contentOption : string) => contentOption === 'TEMPLATE',
+    then: yup.string().required(),
+    otherwise: yup.string().notRequired(),
+  }),
+  dialogueOption: yup.string().when(['customerOption'], {
+    is: (customerOption : string) => customerOption,
+    then: yup.string().required(),
+    otherwise: yup.string().notRequired(),
+  }),
+  tags: yup.array().of(yup.string().min(1).required()).notRequired(),
+});
+
 const AddDialogueView = () => {
   const history = useHistory();
-  const { register, handleSubmit, errors } = useForm<FormDataProps>();
+  const { register, handleSubmit, errors, setValue, getValues } = useForm<FormDataProps>({
+    validationSchema: schema,
+  });
   const { customerSlug } = useParams();
   const [activeTags, setActiveTags] = useState<Array<null | {label: string, value: string}>>([]);
   const [activeContentOption, setActiveContentOption] = useState<null | {label: string, value: string}>(null);
   const [activeCustomerTemplate, setActiveCustomerTemplate] = useState<null | {label: string, value: string}>(null);
   const [activeDialogueTemplate, setActiveDialogueTemplate] = useState<null | {label: string, value: string}>(null);
   const [fetchCustomers, { data: customerData }] = useLazyQuery(getCustomerQuery, {
-    fetchPolicy: 'cache-first',
+    fetchPolicy: 'cache-and-network',
     onError: (error: any) => {
       console.log(error);
     },
@@ -64,6 +88,7 @@ const AddDialogueView = () => {
   });
 
   const setTags = (qOption: { label: string, value: string }, index: number) => {
+    setValue(`tags[${index}]`, qOption?.value);
     setActiveTags((prevTags) => {
       prevTags[index] = qOption;
       return [...prevTags];
@@ -97,8 +122,13 @@ const AddDialogueView = () => {
       },
     });
   };
+  const handleDialogueTemplateChange = (qOption: any) => {
+    setValue('dialogueOption', qOption?.value);
+    setActiveDialogueTemplate(qOption);
+  };
 
   const handleContentOptionChange = (qOption: any) => {
+    setValue('contentOption', qOption?.value);
     setActiveContentOption(qOption);
     setActiveCustomerTemplate(null);
     setActiveDialogueTemplate(null);
@@ -108,6 +138,7 @@ const AddDialogueView = () => {
   };
 
   const handleCustomerChange = (qOption: any) => {
+    setValue('customerOption', qOption?.value);
     setActiveCustomerTemplate(qOption);
     setActiveDialogueTemplate(null);
   };
@@ -150,7 +181,7 @@ const AddDialogueView = () => {
               <Grid gridTemplateColumns={['1fr', '1fr 1fr']}>
                 <Flex flexDirection="column">
                   <StyledLabel>Title</StyledLabel>
-                  <StyledInput name="title" ref={register({ required: true })} />
+                  <StyledInput hasError={!!errors.title} name="title" ref={register({ required: true })} />
                   {errors.title && <Muted color="warning">Something went wrong!</Muted>}
                 </Flex>
                 <Div useFlex flexDirection="column">
@@ -160,30 +191,42 @@ const AddDialogueView = () => {
                 </Div>
                 <Div useFlex flexDirection="column">
                   <StyledLabel>Url Slug</StyledLabel>
-                  <StyledInput name="slug" ref={register({ required: true })} />
+                  <StyledInput hasError={!!errors.slug} name="slug" ref={register({ required: true })} />
                   {errors.slug && <Muted color="warning">Something went wrong!</Muted>}
                 </Div>
                 <Div useFlex flexDirection="column">
                   <StyledLabel>Content option</StyledLabel>
                   <Select
+                    styles={errors.contentOption && !activeContentOption ? ErrorStyle : undefined}
+                    ref={() => register({
+                      name: 'contentOption',
+                      required: true,
+                    })}
                     options={DIALOGUE_CONTENT_TYPES}
                     value={activeContentOption}
                     onChange={(qOption: any) => {
                       handleContentOptionChange(qOption);
                     }}
                   />
+                  {errors.contentOption && !activeContentOption && <Muted color="warning">{errors.contentOption.message}</Muted>}
                 </Div>
                 {(activeContentOption?.value === 'TEMPLATE' && CUSTOMER_OPTIONS)
                   && (
                   <Div useFlex flexDirection="column">
                     <StyledLabel>Customer</StyledLabel>
                     <Select
+                      styles={errors.customerOption && !activeCustomerTemplate ? ErrorStyle : undefined}
+                      ref={() => register({
+                        name: 'customerOption',
+                        required: false,
+                      })}
                       options={CUSTOMER_OPTIONS}
                       value={activeCustomerTemplate}
                       onChange={(qOption: any) => {
                         handleCustomerChange(qOption);
                       }}
                     />
+                    {errors.customerOption && !activeCustomerTemplate && <Muted color="warning">{errors.customerOption.message}</Muted>}
                   </Div>
                   )}
                 {(activeContentOption?.value === 'TEMPLATE' && dialogueOptions)
@@ -191,18 +234,24 @@ const AddDialogueView = () => {
                   <Div useFlex flexDirection="column">
                     <StyledLabel>Template dialogue</StyledLabel>
                     <Select
+                      styles={errors.dialogueOption && !activeDialogueTemplate ? ErrorStyle : undefined}
+                      ref={() => register({
+                        name: 'dialogueOption',
+                        required: false,
+                      })}
                       options={dialogueOptions}
                       value={activeDialogueTemplate}
                       onChange={(qOption: any) => {
-                        setActiveDialogueTemplate(qOption);
+                        handleDialogueTemplateChange(qOption);
                       }}
                     />
+                    {errors.dialogueOption && !activeDialogueTemplate && <Muted color="warning">{errors.dialogueOption.message}</Muted>}
                   </Div>
                   )}
                 <Div gridColumn="1 / -1" py={4}>
                   <Flex flexDirection="column">
                     <StyledLabel>Description</StyledLabel>
-                    <StyledTextInput name="description" ref={register({ required: true })} />
+                    <StyledTextInput hasError={!!errors.description} name="description" ref={register({ required: true })} />
                     {errors.description && <Muted color="warning">Something went wrong!</Muted>}
                   </Flex>
                 </Div>
@@ -223,13 +272,21 @@ const AddDialogueView = () => {
                         flexGrow={9}
                       >
                         <Select
+                          styles={errors.tags?.[index] && !activeTags?.[index] ? ErrorStyle : undefined}
+                          id={`tags[${index}]`}
                           key={index}
+                          ref={() => register({
+                            name: `tags[${index}]`,
+                            required: true,
+                            minLength: 1,
+                          })}
                           options={tags}
                           value={tag}
                           onChange={(qOption: any) => {
                             setTags(qOption, index);
                           }}
                         />
+                        {errors.tags?.[index] && !activeTags?.[index] && <Muted color="warning">{errors.tags?.[index]?.message}</Muted>}
                       </Div>
                       <Flex justifyContent="center" alignContent="center" flexGrow={1}>
                         <MinusCircle onClick={() => deleteTag(index)} />

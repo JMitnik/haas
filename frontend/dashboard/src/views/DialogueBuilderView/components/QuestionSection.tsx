@@ -71,7 +71,7 @@ const QuestionSection = ({
   // 2. add marginLeft={`${depth * 10 + 10}px`} to AddQuestionContainer
   // 3. add marginLeft={`${depth * 10 + 10}px`} to Div around where (isQuestionExpanded && isAddExpanded)
   return (
-    <Flex paddingTop="10px" paddingBottom="10px" flexDirection="column" paddingLeft={`${depth * 10}px`}>
+    <Flex data-cy="QuestionSection" paddingTop="10px" paddingBottom="10px" flexDirection="column" paddingLeft={`${depth * 10}px`}>
       {depth > 1 && index === 0 && (
       <Flex marginBottom="15px" alignItems="center">
         <SplitArrowIcon />

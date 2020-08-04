@@ -10,6 +10,8 @@ import {
   H2, H3, Hr, Muted, StyledInput, StyledLabel,
 } from '@haas/ui';
 
+import { Customer } from 'types';
+import { useCustomer } from 'providers/CustomerProvider';
 import { useToast } from '@chakra-ui/core';
 import { getCustomerQuery } from '../../queries/getCustomersQuery';
 import editCustomerMutation from '../../mutations/editCustomer';
@@ -51,7 +53,7 @@ const EditCustomerView = () => {
 
 const EditCustomerForm = ({ customer }: { customer: any }) => {
   const history = useHistory();
-
+  const { activeCustomer, setActiveCustomer } = useCustomer();
   const [activePreviewUrl, setActivePreviewUrl] = useState<null | string>(null);
 
   const { register, handleSubmit, errors } = useForm<FormDataProps>({
@@ -64,13 +66,14 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
     },
   });
 
-  const [uploadFile] = useMutation(uploadSingleImage, {
+  const [uploadFile, { loading: fileUploadLoading }] = useMutation(uploadSingleImage, {
     onCompleted: (result) => {
       setActivePreviewUrl(result.singleUpload.url);
     },
   });
 
   const onLogoUploadChange = (event: any) => {
+    setActivePreviewUrl('');
     const image: File = event.target.files[0];
 
     if (image) {
@@ -81,7 +84,9 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
 
   const [editCustomer, { loading }] = useMutation(editCustomerMutation, {
 
-    onCompleted: () => {
+    onCompleted: (result: any) => {
+      const customer: Customer = result.editCustomer;
+      localStorage.setItem('customer', JSON.stringify(customer));
       toast({
         title: 'Your business edited',
         description: 'The business has been updated',
@@ -91,6 +96,7 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
       });
 
       setTimeout(() => {
+        setActiveCustomer(customer);
         history.push('/');
       }, 300);
     },
@@ -138,38 +144,39 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
               <Grid gridTemplateColumns={['1fr', '1fr 1fr']}>
                 <Flex flexDirection="column">
                   <StyledLabel>Name</StyledLabel>
-                  <StyledInput name="name" ref={register({ required: true })} />
+                  <StyledInput hasError={!!errors.name} name="name" ref={register({ required: true })} />
                   {errors.name && <Muted color="warning">Something went wrong!</Muted>}
                 </Flex>
                 <Div useFlex flexDirection="column">
                   <StyledLabel>Logo</StyledLabel>
-                  <StyledInput name="logo" ref={register({ required: true })} />
+                  <StyledInput hasError={!!errors.logo} name="logo" ref={register({ required: false })} />
                   {errors.logo && <Muted color="warning">Something went wrong!</Muted>}
                 </Div>
                 <Div useFlex flexDirection="column">
                   <StyledLabel>Slug</StyledLabel>
-                  <StyledInput name="slug" ref={register({ required: true })} />
+                  <StyledInput hasError={!!errors.slug} name="slug" ref={register({ required: true })} />
                   {errors.slug && <Muted color="warning">Something went wrong!</Muted>}
                 </Div>
                 <Div useFlex flexDirection="column">
                   <StyledLabel>Primary colour</StyledLabel>
-                  <StyledInput name="primaryColour" ref={register({ required: true })} />
+                  <StyledInput hasError={!!errors.primaryColour} name="primaryColour" ref={register({ required: true })} />
                   {errors.primaryColour && <Muted color="warning">Something went wrong!</Muted>}
                 </Div>
                 <Div useFlex flexDirection="column">
                   <StyledLabel>Logo (Cloudinary)</StyledLabel>
                   <StyledInput
+                    hasError={!!errors.cloudinary}
                     type="file"
                     name="cloudinary"
                     onChange={onLogoUploadChange}
                     ref={register({ required: false })}
                   />
-                  {errors.name && <Muted color="warning">Something went wrong!</Muted>}
+                  {errors.cloudinary && <Muted color="warning">Something went wrong!</Muted>}
                 </Div>
                 <Div useFlex flexDirection="column">
                   <StyledLabel>Preview</StyledLabel>
                   <Div width={200} height={200} style={{ border: '1px solid lightgrey', borderRadius: '8px' }}>
-                    {(!activePreviewUrl && customer?.settings?.logoUrl) && (
+                    {(!activePreviewUrl && customer?.settings?.logoUrl && !fileUploadLoading) && (
                       <img
                         src={customer?.settings?.logoUrl}
                         height={200}
@@ -178,7 +185,11 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
                         style={{ objectFit: 'contain' }}
                       />
                     )}
-
+                    {fileUploadLoading && (
+                    <Flex height="100%" justifyContent="center" alignItems="center">
+                      <Div alignSelf="center">Uploading...</Div>
+                    </Flex>
+                    )}
                     {activePreviewUrl && <img alt="" src={activePreviewUrl} height={200} width={200} />}
                   </Div>
                 </Div>

@@ -53,8 +53,11 @@ const TableHeader = ({ sortProperties, headers, onPaginationChange, onAddEntry, 
 
   return (
     <Grid
+      borderRadius="lg"
+      paddingLeft="15px"
+      paddingRight="15px"
       position="relative"
-      backgroundColor="#f1f5f8"
+      backgroundColor="white"
       color="black"
       gridColumnGap={5}
       gridTemplateColumns={templateColumns}

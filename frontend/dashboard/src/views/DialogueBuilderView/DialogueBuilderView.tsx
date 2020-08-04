@@ -22,7 +22,7 @@ const DialogueBuilderView = ({ nodes, selectLeafs, root }: DialogueBuilderViewPr
   const [activeQuestion, setActiveQuestion] = useState<null | string>(null);
 
   return (
-    <DialogueBuilderContainer>
+    <DialogueBuilderContainer data-cy="DialogueBuilderContainer">
       <H2 color="default.text" fontWeight={400} mb={4}>
         Builder
       </H2>
