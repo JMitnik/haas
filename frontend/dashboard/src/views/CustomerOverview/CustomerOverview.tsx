@@ -1,13 +1,11 @@
-import { ApolloError } from 'apollo-boost';
 import { useMutation } from '@apollo/react-hooks';
 import Color from 'color';
 import React, { useState } from 'react';
 
 import {
-  AddCard, Card, CardBody, Container, DeleteButtonContainer, Div,
-  EditButtonContainer, Flex, Grid, H3, H4, PageHeading, ColumnFlex, Span,
+  AddCard, Card, CardBody, Container, Flex, Grid, H3, H4, PageHeading, ColumnFlex, Span,
 } from '@haas/ui';
-import { Edit, Plus, X } from 'react-feather';
+import { Plus } from 'react-feather';
 import { Link, useHistory } from 'react-router-dom';
 import { TranslatedPlus } from 'views/DialogueOverview/DialogueOverviewStyles';
 import { useCustomer } from 'providers/CustomerProvider';
@@ -18,8 +16,7 @@ import { CustomerCardImage, CustomerOverviewContainer } from './CustomerOverview
 import { deleteFullCustomerQuery } from '../../mutations/deleteFullCustomer';
 import { getCustomerQuery } from '../../queries/getCustomersQuery';
 import { isValidColor } from '../../utils/ColorUtils';
-import { Popover, PopoverTrigger, PopoverContent, PopoverBody, useToast, Menu, MenuButton, MenuGroup, MenuItem, ButtonGroup, Button, PopoverArrow, PopoverHeader, PopoverCloseButton, PopoverFooter } from '@chakra-ui/core';
-import ContextButton from 'components/ContextButton';
+import { Popover, PopoverTrigger, PopoverContent, PopoverBody, useToast, ButtonGroup, Button, PopoverArrow, PopoverHeader, PopoverCloseButton, PopoverFooter } from '@chakra-ui/core';
 
 const CustomerOverview = ({ customers }: { customers: any[] }) => (
   <CustomerOverviewContainer>
@@ -29,10 +26,10 @@ const CustomerOverview = ({ customers }: { customers: any[] }) => (
       <Grid
         gridGap={4}
         gridTemplateColumns={['1fr', '1fr 1fr 1fr']}
-        gridAutoRows="minmax(250px, 1fr)"
+        gridAutoRows="minmax(200px, 1fr)"
       >
         {customers?.map((customer: any, index: any) => customer && (
-          <ErrorBoundary FallbackComponent={() => (<></>)}>
+          <ErrorBoundary key={index} FallbackComponent={() => (<></>)}>
             <CustomerCard key={index} customer={customer} />
           </ErrorBoundary>
         ))}
@@ -56,9 +53,9 @@ const CustomerOverview = ({ customers }: { customers: any[] }) => (
 
 const CustomerCard = ({ customer }: { customer: any }) => {
   const history = useHistory();
-  const { activeCustomer, setActiveCustomer } = useCustomer();
+  const { setActiveCustomer } = useCustomer();
   const toast = useToast();
-  const [isOpenDelete, setIsOpenDelete] = useState(false);
+  const [] = useState(false);
 
 
   const setCustomerSlug = (customerSlug: string) => {
@@ -94,14 +91,12 @@ const CustomerCard = ({ customer }: { customer: any }) => {
     },
   });
 
-  const deleteClickedCustomer = async (event: any, customerSlug: string) => {
+  const handleDeleteCustomer = async (customerId: string, onComplete: (() => void) | undefined) => {
     deleteCustomer({
       variables: {
-        id: customerSlug,
+        id: customerId,
       },
-    });
-
-    event.stopPropagation();
+    }).finally(() => onComplete && onComplete());
   };
 
   const primaryColor = isValidColor(customer.settings?.colourSettings.primary)
@@ -117,39 +112,6 @@ const CustomerCard = ({ customer }: { customer: any }) => {
       data-cy="CustomerCard"
     >
       <CardBody flex="100%">
-        {/* <Div>
-          <EditButtonContainer
-            data-cy="EditCustomerButton"
-            onClick={(e) => setCustomerEditPath(e, customer.slug)}
-          >
-            <Edit />
-          </EditButtonContainer>
-          <Menu>
-            <MenuButton>Test</MenuButton>
-          </Menu>
-          <DeleteButtonContainer
-            data-cy="DeleteCustomerButton"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <Popover 
-              usePortal
-            >
-              {({ isOpen, onClose }) => (
-                <>
-                  <PopoverTrigger>
-                    <X />
-                  </PopoverTrigger>
-                  <PopoverContent zIndex={4}>
-                    <PopoverBody>
-                      <p>Are you sure?</p>
-                      <Button onClick={(e) => {deleteClickedCustomer(e, customer.id); onClose && onClose();}}>Delete</Button>
-                    </PopoverBody>
-                  </PopoverContent>
-                </>
-              )}
-            </Popover>
-          </DeleteButtonContainer>
-        </Div> */}
         <ColumnFlex justifyContent="space-between">
           <H3  
             color={primaryColor.isDark() ? 'white' : '#444'}
@@ -162,7 +124,6 @@ const CustomerCard = ({ customer }: { customer: any }) => {
               size="xs" 
               variant="outline"
               leftIcon="arrow-forward"
-              // onClick={() => }
               color={primaryColor.lighten(0.6).hex()}
               borderColor={primaryColor.lighten(0.6).hex()}
             >
@@ -203,7 +164,7 @@ const CustomerCard = ({ customer }: { customer: any }) => {
                       <p>You are about to delete a customer. Are you sure?</p>
                     </PopoverBody>
                     <PopoverFooter>
-                      <Button variantColor="red">Delete</Button>
+                      <Button variantColor="red" onClick={(e) => handleDeleteCustomer(customer.id, onClose) }>Delete</Button>
                     </PopoverFooter>
                   </PopoverContent>
                 </>
