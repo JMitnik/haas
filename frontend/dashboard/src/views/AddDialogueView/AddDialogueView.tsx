@@ -1,7 +1,7 @@
 import * as yup from 'yup';
 import { ApolloError } from 'apollo-boost';
 import { Button, Container, Div, ErrorStyle, Flex, Grid, H2, H3, H4,
-  Hr, Muted, StyledInput, StyledLabel, StyledTextInput } from '@haas/ui';
+  Hr, Label, Muted, StyledInput, StyledTextInput } from '@haas/ui';
 import { MinusCircle, PlusCircle } from 'react-feather';
 import { useForm } from 'react-hook-form';
 import { useHistory, useParams } from 'react-router';
@@ -180,22 +180,22 @@ const AddDialogueView = () => {
             <Div py={4}>
               <Grid gridTemplateColumns={['1fr', '1fr 1fr']}>
                 <Flex flexDirection="column">
-                  <StyledLabel>Title</StyledLabel>
-                  <StyledInput hasError={!!errors.title} name="title" ref={register({ required: true })} />
+                  <Label>Title</Label>
+                  <StyledInput isInvalid={!!errors.title} name="title" ref={register({ required: true })} />
                   {errors.title && <Muted color="warning">Something went wrong!</Muted>}
                 </Flex>
                 <Div useFlex flexDirection="column">
-                  <StyledLabel>Public Title</StyledLabel>
+                  <Label>Public Title</Label>
                   <StyledInput name="publicTitle" ref={register({ required: false })} />
                   {errors.publicTitle && <Muted color="warning">Something went wrong!</Muted>}
                 </Div>
                 <Div useFlex flexDirection="column">
-                  <StyledLabel>Url Slug</StyledLabel>
-                  <StyledInput hasError={!!errors.slug} name="slug" ref={register({ required: true })} />
+                  <Label>Url Slug</Label>
+                  <StyledInput isInvalid={!!errors.slug} name="slug" ref={register({ required: true })} />
                   {errors.slug && <Muted color="warning">Something went wrong!</Muted>}
                 </Div>
                 <Div useFlex flexDirection="column">
-                  <StyledLabel>Content option</StyledLabel>
+                  <Label>Content option</Label>
                   <Select
                     styles={errors.contentOption && !activeContentOption ? ErrorStyle : undefined}
                     ref={() => register({
@@ -213,7 +213,7 @@ const AddDialogueView = () => {
                 {(activeContentOption?.value === 'TEMPLATE' && CUSTOMER_OPTIONS)
                   && (
                   <Div useFlex flexDirection="column">
-                    <StyledLabel>Customer</StyledLabel>
+                    <Label>Customer</Label>
                     <Select
                       styles={errors.customerOption && !activeCustomerTemplate ? ErrorStyle : undefined}
                       ref={() => register({
@@ -232,7 +232,7 @@ const AddDialogueView = () => {
                 {(activeContentOption?.value === 'TEMPLATE' && dialogueOptions)
                   && (
                   <Div useFlex flexDirection="column">
-                    <StyledLabel>Template dialogue</StyledLabel>
+                    <Label>Template dialogue</Label>
                     <Select
                       styles={errors.dialogueOption && !activeDialogueTemplate ? ErrorStyle : undefined}
                       ref={() => register({
@@ -250,8 +250,8 @@ const AddDialogueView = () => {
                   )}
                 <Div gridColumn="1 / -1" py={4}>
                   <Flex flexDirection="column">
-                    <StyledLabel>Description</StyledLabel>
-                    <StyledTextInput hasError={!!errors.description} name="description" ref={register({ required: true })} />
+                    <Label>Description</Label>
+                    <StyledTextInput isInvalid={!!errors.description} name="description" ref={register({ required: true })} />
                     {errors.description && <Muted color="warning">Something went wrong!</Muted>}
                   </Flex>
                 </Div>

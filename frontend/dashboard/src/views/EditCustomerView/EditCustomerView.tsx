@@ -7,7 +7,7 @@ import React, { useState } from 'react';
 
 import {
   Button, Container, Div, Flex, Form, FormGroupContainer, Grid,
-  H2, H3, Hr, Muted, StyledInput, StyledLabel,
+  H2, H3, Hr, Label, Muted, StyledInput,
 } from '@haas/ui';
 import { useCustomer } from 'providers/CustomerProvider';
 import { useToast } from '@chakra-ui/core';
@@ -144,29 +144,29 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
             <Div py={4}>
               <Grid gridTemplateColumns={['1fr', '1fr 1fr']}>
                 <Flex flexDirection="column">
-                  <StyledLabel>Name</StyledLabel>
-                  <StyledInput hasError={!!errors.name} name="name" ref={register({ required: true })} />
+                  <Label>Name</Label>
+                  <StyledInput isInvalid={!!errors.name} name="name" ref={register({ required: true })} />
                   {errors.name && <Muted color="warning">Something went wrong!</Muted>}
                 </Flex>
                 <Div useFlex flexDirection="column">
-                  <StyledLabel>Logo</StyledLabel>
-                  <StyledInput hasError={!!errors.logo} name="logo" ref={register({ required: false })} />
+                  <Label>Logo</Label>
+                  <StyledInput isInvalid={!!errors.logo} name="logo" ref={register({ required: false })} />
                   {errors.logo && <Muted color="warning">Something went wrong!</Muted>}
                 </Div>
                 <Div useFlex flexDirection="column">
-                  <StyledLabel>Slug</StyledLabel>
-                  <StyledInput hasError={!!errors.slug} name="slug" ref={register({ required: true })} />
+                  <Label>Slug</Label>
+                  <StyledInput isInvalid={!!errors.slug} name="slug" ref={register({ required: true })} />
                   {errors.slug && <Muted color="warning">Something went wrong!</Muted>}
                 </Div>
                 <Div useFlex flexDirection="column">
-                  <StyledLabel>Primary colour</StyledLabel>
-                  <StyledInput hasError={!!errors.primaryColour} name="primaryColour" ref={register({ required: true })} />
+                  <Label>Primary colour</Label>
+                  <StyledInput isInvalid={!!errors.primaryColour} name="primaryColour" ref={register({ required: true })} />
                   {errors.primaryColour && <Muted color="warning">Something went wrong!</Muted>}
                 </Div>
                 <Div useFlex flexDirection="column">
-                  <StyledLabel>Logo (Cloudinary)</StyledLabel>
+                  <Label>Logo (Cloudinary)</Label>
                   <StyledInput
-                    hasError={!!errors.cloudinary}
+                    isInvalid={!!errors.cloudinary}
                     type="file"
                     name="cloudinary"
                     onChange={onLogoUploadChange}
@@ -175,7 +175,7 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
                   {errors.cloudinary && <Muted color="warning">Something went wrong!</Muted>}
                 </Div>
                 <Div useFlex flexDirection="column">
-                  <StyledLabel>Preview</StyledLabel>
+                  <Label>Preview</Label>
                   <Div width={200} height={200} style={{ border: '1px solid lightgrey', borderRadius: '8px' }}>
                     {(!activePreviewUrl && customer?.settings?.logoUrl && !fileUploadLoading) && (
                       <img

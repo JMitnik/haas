@@ -1,20 +1,48 @@
-import React, { forwardRef, Ref } from 'react';
+import React, { forwardRef, Ref, ReactNode } from 'react';
 import { Div } from '@haas/ui';
+import { 
+  FormLabel as ChakraFormLabel,
+  Input as ChakraInput,
+  InputGroup as ChakraInputGroup,
+  InputLeftElement as ChakraInputLeftElement,
+  InputRightElement as ChakraInputRightElement,
+  InputLeftAddon as ChakraInputLeftAddOn,
+  InputRightAddon as ChakraInputRightAddOn,
+  InputProps as ChakraInputProps,
+  InputGroupProps} from '@chakra-ui/core';
 import styled, { css } from 'styled-components';
 import { SpaceProps } from 'styled-system';
 import { InputHTMLAttributes } from 'react';
 import Color from 'color';
-import { Flex } from './Container';
+import { FormLabelProps } from '@chakra-ui/core/dist/FormLabel';
+
+export const FormContainer = styled(Div)`
+  ${({ theme }) => css`
+    padding-bottom: ${theme.gutter * 3}px;
+    background: white;
+    padding: ${theme.gutter}px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  `}
+`;
 
 export const FormGroupContainer = styled.div`
   ${({ theme }) => css`
-    padding-bottom: ${theme.gutter * 3}px;
+      padding-bottom: ${theme.gutter * 3}px;
+  `}
+`;
+
+export const InputHelper = styled.p`
+  ${({ theme }) => css`
+    color: ${theme.colors.gray[400]};
+    font-size: 0.8rem;
+    margin-bottom: 8px;
   `}
 `;
 
 export const Form = styled.form``;
 
-export const InputGroup = styled.div`
+export const DeprecatedInputGroup = styled.div`
   ${({ theme }) => css`
 
     ${DeprecatedInputStyled} {
@@ -51,14 +79,61 @@ export const InputLabel = styled.label`
   `}
 `;
 
-export const StyledLabel = styled(Div).attrs({ as: 'label' })`
+export const FormLabel = forwardRef((props: FormLabelProps, ref) => (
+  <ChakraFormLabel fontSize="0.8rem" color="gray.600" {...props} ref={ref} />
+));
+
+interface InputProps extends ChakraInputProps {
+  leftEl?: ReactNode;
+  rightEl?: ReactNode;
+  leftAddOn?: ReactNode;
+  rightAddOn?: ReactNode;
+}
+
+export const Input = forwardRef((props: InputProps, ref: Ref<HTMLInputElement>) => (
+  <InputGroup>
+    {props.leftEl && (
+      <ChakraInputLeftElement color="gray.400" padding="12px" fontSize="0.5rem" {...props}>
+        {props.leftEl}
+      </ChakraInputLeftElement>
+    )}
+
+    {props.rightEl && (
+      <ChakraInputRightElement color="gray.400" padding="12px" fontSize="0.5rem" {...props}>
+        {props.rightEl}
+      </ChakraInputRightElement>
+    )}
+
+    {props.leftAddOn && (
+      <ChakraInputLeftAddOn color="gray.400" padding="12px" fontSize="0.7rem" {...props}>
+        {props.leftAddOn}
+      </ChakraInputLeftAddOn>
+    )}
+
+    {props.rightAddOn && (
+      <ChakraInputRightAddOn color="gray.400" padding="12px" fontSize="0.7rem" {...props}>
+        {props.rightAddOn}
+      </ChakraInputRightAddOn>
+    )}
+
+    <ChakraInput 
+      roundedBottomLeft={props.leftAddOn ? '0': 'auto'}
+      roundedTopLeft={props.leftAddOn ? '0': 'auto'}
+    {...props} fontSize="0.8rem" ref={ref} />
+  </InputGroup>
+));
+
+export const InputGroup = forwardRef((props: InputGroupProps, ref) => (
+  <ChakraInputGroup {...props} ref={ref} />
+));
+
+export const Label = styled(Div).attrs({ as: 'label' })`
   ${({ theme }) => css`
     font-size: 0.8rem;
-    font-weight: bold;
+    font-weight: 600;
     margin-bottom: 2px;
     display: inline-block;
-    color: ${theme.colors.default.dark}
-    text-transform: uppercase;
+    color: ${theme.colors.gray[500]};
   `}
 `;
 
@@ -71,8 +146,8 @@ export const ErrorStyle = {
   }),
 };
 
-export const StyledInput = styled.input <{hasError?: boolean }>`
-  ${({ theme, hasError }) => css`
+export const StyledInput = styled.input <{isInvalid?: boolean }>`
+  ${({ theme, isInvalid }) => css`
     border-radius: ${theme.borderRadiuses.sm};
     background: ${theme.colors.white};
     border: none;
@@ -89,14 +164,14 @@ export const StyledInput = styled.input <{hasError?: boolean }>`
     padding: 15px;
     width: 100%;
 
-    ${hasError && css`
+    ${isInvalid && css`
     border: 1px solid red;
     outline: none;
     `}
   `}
 `;
 
-export const StyledTextInput = styled(StyledInput).attrs({ as: 'textarea' })`
+export const StyledTextInput = styled(Input).attrs({ as: 'textarea' })`
   resize: none;
   font-family: 'Open sans', sans-serif;
   min-height: 150px;
@@ -161,54 +236,9 @@ export const Slider = forwardRef((props: SliderProps, ref: Ref<HTMLInputElement>
   </SliderContainer>
 ));
 
-
-interface InputFieldProps extends InputHTMLAttributes<HTMLInputElement> {
-  icon?: React.ReactNode;
-  children?: React.ReactNode;
-}
-
-
 export const InputIconContainer = styled.div`
   position: relative;
 `;
-
-export const InputFieldContainer = styled.div`
-  ${({ theme }) => css`
-    position: relative;
-    background: inherit;
-    border-radius: ${theme.borderRadiuses.rounded};
-    fill: currentColor;
-
-    ${InputIconContainer} {
-      width: ${theme.gutter * 0.75}px;
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      margin-left: ${theme.gutter * 0.5}px;
-
-      /* Edge case: in case icon search */
-      .icon-search .primary {
-        fill: none;
-      }
-    }
-
-    ${InputIconContainer} + ${StyledInput} {
-      margin-left: ${theme.gutter}px;
-    }
-  `}
-`;
-
-export const InputField = ({ icon, children, ...props }: InputFieldProps) => (
-  <InputFieldContainer>
-    {icon && (
-      <InputIconContainer>
-        {icon}
-      </InputIconContainer>
-    )}
-
-    <StyledInput {...props} />
-  </InputFieldContainer>
-)
 
 export const DeprecatedInputContainer = styled.div`
   display: flex;
@@ -269,7 +299,7 @@ export const Textbox = styled.textarea`
 `;
 
 export const SliderContainer = styled.div`
-  ${({ theme }) => css`
+  ${() => css`
 
     /* TODO: Ensure that size is defined by a variable */
     input[type=range] {
@@ -389,7 +419,7 @@ export const SliderContainer = styled.div`
 `;
 
 export const GridForm = styled.form`
-  ${({ theme }) => css`
+  ${() => css`
     display: grid;
     row-gap: 20px;
     column-gap: 10px;

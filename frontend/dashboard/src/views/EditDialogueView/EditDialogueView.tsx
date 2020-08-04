@@ -7,8 +7,8 @@ import { useMutation, useQuery } from '@apollo/react-hooks';
 import styled, { css } from 'styled-components/macro';
 
 import { Button, Div, ErrorStyle, Flex,
-  Grid, H2, H3, H4, Hr, Muted, StyledInput,
-  StyledLabel, StyledTextInput } from '@haas/ui';
+  Grid, H2, H3, H4, Hr, Label, Muted,
+  StyledInput, StyledTextInput } from '@haas/ui';
 import React, { useEffect, useState } from 'react';
 import Select from 'react-select';
 import editDialogueMutation from 'mutations/editDialogue';
@@ -172,14 +172,14 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFo
             <Div py={4}>
               <Grid gridTemplateColumns={['1fr', '1fr 1fr']}>
                 <Flex flexDirection="column">
-                  <StyledLabel>Title</StyledLabel>
-                  <StyledInput hasError={!!errors.title} defaultValue={dialogue?.title} name="title" ref={register({ required: true })} />
+                  <Label>Title</Label>
+                  <StyledInput isInvalid={!!errors.title} defaultValue={dialogue?.title} name="title" ref={register({ required: true })} />
                   {errors.title && <Muted color="warning">{errors.title.message}</Muted>}
                 </Flex>
                 <Div useFlex pl={4} flexDirection="column">
-                  <StyledLabel>Public Title</StyledLabel>
+                  <Label>Public Title</Label>
                   <StyledInput
-                    hasError={!!errors.publicTitle}
+                    isInvalid={!!errors.publicTitle}
                     defaultValue={dialogue?.publicTitle}
                     name="publicTitle"
                     ref={register({ required: false })}
@@ -189,9 +189,9 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFo
               </Grid>
               <Div py={4}>
                 <Flex flexDirection="column">
-                  <StyledLabel>Description</StyledLabel>
+                  <Label>Description</Label>
                   <StyledTextInput
-                    hasError={!!errors.description}
+                    isInvalid={!!errors.description}
                     defaultValue={dialogue?.description}
                     name="description"
                     ref={register({ required: true })}

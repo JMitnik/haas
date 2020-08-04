@@ -1,13 +1,16 @@
 import * as yup from 'yup';
+import { BlockPicker } from 'react-color';
 import {
-  Button, Container, Div, Flex, Form, FormGroupContainer, Grid,
-  H2, H3, Hr, Muted, StyledInput, StyledLabel,
+  Button, Container, Div, Flex, Form, FormContainer, FormLabel,
+  Grid, H3, Input, InputHelper, Label, Muted, StyledInput,
 } from '@haas/ui';
+import { FormControl, FormErrorMessage } from '@chakra-ui/core';
 import { useForm } from 'react-hook-form';
 import { useHistory } from 'react-router';
 import { useMutation } from '@apollo/react-hooks';
 import React, { useState } from 'react';
 
+import { Briefcase, Link } from 'react-feather';
 import { createNewCustomer } from '../../mutations/createNewCustomer';
 import getCustomerQuery from '../../queries/getCustomersQuery';
 import uploadSingleImage from '../../mutations/uploadSingleImage';
@@ -22,9 +25,9 @@ interface FormDataProps {
 }
 
 const schema = yup.object().shape({
-  name: yup.string().required(),
-  logo: yup.string().url(),
-  slug: yup.string().required(),
+  name: yup.string().required('Name is required'),
+  logo: yup.string().url('Url should be valid'),
+  slug: yup.string().required('Slug is required'),
   primaryColour: yup.string().required().matches(/^(#(\d|\D){6}$){1}/, {
     message: 'Provided colour is not a valid hexadecimal',
   }),
@@ -34,6 +37,7 @@ const AddCustomerView = () => {
   const history = useHistory();
   const { register, handleSubmit, errors } = useForm<FormDataProps>({
     validationSchema: schema,
+    mode: 'onBlur',
   });
   const [activePreview, setActivePreview] = useState('');
 
@@ -74,56 +78,84 @@ const AddCustomerView = () => {
     });
   };
 
+  console.log(errors);
+
   return (
     <Container>
-      <Div>
+      {/* <Div>
         <H2 color="default.darkest" fontWeight={500} py={2}> Customer </H2>
         <Muted pb={4}>Create a new customer</Muted>
-      </Div>
-
-      <Hr />
+      </Div> */}
 
       {serverError && (<p>{serverError.message}</p>)}
 
       <Form onSubmit={handleSubmit(onSubmit)}>
-        <FormGroupContainer>
-          <Grid gridTemplateColumns={['1fr', '1fr 2fr']} gridColumnGap={4}>
-            <Div py={4} pr={4}>
-              <H3 color="default.text" fontWeight={500} pb={2}>General customer information</H3>
-              <Muted>
-                General information about the customer, such as name, logo, etc.
+        <FormContainer>
+          <Grid gridTemplateColumns={['1fr', '1fr', '1fr 3fr']} gridColumnGap="50px">
+            <Div>
+              <H3 color="default.text" fontWeight={500} pb={2}>About</H3>
+              <Muted color="gray.600">
+                Please tell us a bit about the business, such as under which name and URL we can find it.
               </Muted>
             </Div>
             <Div py={4}>
-              <Grid gridTemplateColumns={['1fr', '1fr 1fr']}>
-                <Flex flexDirection="column">
-                  <StyledLabel>Name</StyledLabel>
-                  <StyledInput hasError={!!errors.name} name="name" ref={register({ required: true })} />
-                  {errors.name && <Muted color="warning">Something went wrong!</Muted>}
-                </Flex>
+              <Grid gridTemplateColumns={['1fr', '1fr', '1fr 1fr']}>
+                <FormControl isInvalid={!!errors.name} isRequired>
+                  <FormLabel htmlFor="name">Name</FormLabel>
+                  <InputHelper>What is the name of the business?</InputHelper>
+                  <Input placeholder="Peach inc." leftEl={<Briefcase />} name="name" ref={register({ required: true })} />
+                  <FormErrorMessage>{errors.name?.message}</FormErrorMessage>
+                </FormControl>
+
+                <FormControl isInvalid={!!errors.slug} isRequired>
+                  <FormLabel htmlFor="name">Slug</FormLabel>
+                  <InputHelper>Under which url segment will visitors find the business?</InputHelper>
+                  <Input
+                    placeholder="peach"
+                    leftAddOn="https://client.haas.live/"
+                    name="slug"
+                    ref={register({ required: true })}
+                  />
+                  <FormErrorMessage>{errors.slug?.message}</FormErrorMessage>
+                </FormControl>
+
+                <FormControl isInvalid={!!errors.primaryColour} isRequired>
+                  <FormLabel htmlFor="name">Branding color</FormLabel>
+                  <InputHelper>What is the main brand color of the company?</InputHelper>
+                  <BlockPicker />
+                  {/* <Input
+                    placeholder="peach"
+                    leftAddOn="https://client.haas.live/"
+                    name="slug"
+                    ref={register({ required: true })}
+                  />
+                  <FormErrorMessage>{errors.slug?.message}</FormErrorMessage> */}
+                </FormControl>
+
+                {/* <Flex flexDirection="column">
+                  <Label>Name</Label>
+                  <InputGroup>
+                    <ChakraInput size="md" isInvalid={!!errors.name} name="name" ref={register({ required: true })} />
+                    {errors.name && <Muted color="warning">Something went wrong!</Muted>}
+                  </InputGroup>
+                </Flex> */}
                 <Div useFlex flexDirection="column">
-                  <StyledLabel>Logo</StyledLabel>
-                  <StyledInput hasError={!!errors.logo} name="logo" ref={register({ required: false })} />
-                  {errors.logo && <Muted color="warning">{errors.logo.message}</Muted>}
-                </Div>
-                <Div useFlex flexDirection="column">
-                  <StyledLabel>Slug</StyledLabel>
-                  <StyledInput hasError={!!errors.slug} name="slug" ref={register({ required: true })} />
-                  {errors.slug && <Muted color="warning">Something went wrong!</Muted>}
-                </Div>
-                <Div useFlex flexDirection="column">
-                  <StyledLabel>Primary colour</StyledLabel>
-                  <StyledInput hasError={!!errors.primaryColour} name="primaryColour" ref={register({ required: true })} />
+                  <Label>Primary colour</Label>
+                  <StyledInput isInvalid={!!errors.primaryColour} name="primaryColour" ref={register({ required: true })} />
                   {errors.primaryColour && <Muted color="warning">{errors.primaryColour.message}</Muted>}
                 </Div>
                 <Div useFlex flexDirection="column">
-                  <StyledLabel>Logo (Cloudinary)</StyledLabel>
-                  <StyledInput hasError={!!errors.cloudinary} type="file" name="cloudinary" onChange={onChange} ref={register({ required: false })} />
+                  <Label>Logo (Cloudinary)</Label>
+                  <StyledInput isInvalid={!!errors.cloudinary} type="file" name="cloudinary" onChange={onChange} ref={register({ required: false })} />
                   {errors.cloudinary && <Muted color="warning">Something went wrong!</Muted>}
 
                 </Div>
+                <FormControl>
+                  <FormLabel htmlFor="logo">Logo</FormLabel>
+                  <Input leftEl={<Link />} name="logo" isInvalid={!!errors.logo} ref={register({ required: true })} />
+                </FormControl>
                 <Div useFlex flexDirection="column">
-                  <StyledLabel>Preview</StyledLabel>
+                  <Label>Preview</Label>
                   <Div width={200} height={200} style={{ border: '1px solid lightgrey', borderRadius: '8px' }}>
                     {fileUploadLoading && (
                     <Flex height="100%" justifyContent="center" alignItems="center">
@@ -150,7 +182,7 @@ const AddCustomerView = () => {
 
             </Div>
           </Grid>
-        </FormGroupContainer>
+        </FormContainer>
 
         <Div>
           {loading && (<Muted>Loading...</Muted>)}

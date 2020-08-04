@@ -12,7 +12,7 @@ import styled, { css } from 'styled-components/macro';
 
 import {
   Button, Container, DeleteButtonContainer, Div, ErrorStyle, Flex, Grid, H2, H3,
-  H4, Hr, Muted, StyledInput, StyledLabel,
+  H4, Hr, Label, Muted, StyledInput,
 } from '@haas/ui';
 import createTriggerMutation from 'mutations/createTrigger';
 import getDialoguesQuery from 'queries/getDialoguesOfCustomer';
@@ -286,12 +286,12 @@ const AddTriggerView = () => {
             <Div py={4}>
               <Grid gridTemplateColumns={['1fr', '1fr 1fr']}>
                 <Flex flexDirection="column">
-                  <StyledLabel>Trigger name</StyledLabel>
-                  <StyledInput hasError={!!errors.name} name="name" ref={register({ required: true })} />
+                  <Label>Trigger name</Label>
+                  <StyledInput isInvalid={!!errors.name} name="name" ref={register({ required: true })} />
                   {errors.name && <Muted color="warning">Something went wrong!</Muted>}
                 </Flex>
                 <Div useFlex flexDirection="column">
-                  <StyledLabel>Dialogue</StyledLabel>
+                  <Label>Dialogue</Label>
                   <Select
                     styles={errors.dialogue && !activeDialogue ? ErrorStyle : undefined}
                     ref={() => register({
@@ -307,7 +307,7 @@ const AddTriggerView = () => {
                   {errors.dialogue && !activeDialogue && <Muted color="warning">{errors.dialogue.message}</Muted>}
                 </Div>
                 <Div useFlex flexDirection="column">
-                  <StyledLabel>Type</StyledLabel>
+                  <Label>Type</Label>
                   <Select
                     styles={errors.type && !activeType ? ErrorStyle : undefined}
                     ref={() => register({
@@ -323,7 +323,7 @@ const AddTriggerView = () => {
                   {errors.type && !activeType && <Muted color="warning">{errors.type.message}</Muted>}
                 </Div>
                 <Div useFlex flexDirection="column">
-                  <StyledLabel>Medium</StyledLabel>
+                  <Label>Medium</Label>
                   <Select
                     styles={errors.medium && !activeMedium ? ErrorStyle : undefined}
                     ref={() => register({
@@ -340,7 +340,7 @@ const AddTriggerView = () => {
                 </Div>
                 {activeType?.value === TriggerQuestionType.QUESTION && (
                   <Div useFlex flexDirection="column" gridColumn="1 / -1">
-                    <StyledLabel>Question</StyledLabel>
+                    <Label>Question</Label>
                     <Select
                       styles={errors.question && !activeQuestion ? ErrorStyle : undefined}
                       ref={() => register({
@@ -390,9 +390,9 @@ const AddTriggerView = () => {
                         {errors.condition && !activeConditions?.[0].type && <Muted color="warning">{errors.condition.message}</Muted>}
                         {condition?.type?.value === TriggerConditionType.TEXT_MATCH && (
                         <Flex marginTop={5} flexDirection="column">
-                          <StyledLabel>Match Text</StyledLabel>
+                          <Label>Match Text</Label>
                           <StyledInput
-                            hasError={!!errors.matchText}
+                            isInvalid={!!errors.matchText}
                             onChange={(event) => setMatchText(event.currentTarget.value, index)}
                             name="matchText"
                             ref={register({ required: true })}
@@ -403,9 +403,9 @@ const AddTriggerView = () => {
 
                         {condition?.type?.value === TriggerConditionType.LOW_THRESHOLD && (
                           <Flex marginTop={5} flexDirection="column">
-                            <StyledLabel>Low Threshold (0 - 10)</StyledLabel>
+                            <Label>Low Threshold (0 - 10)</Label>
                             <StyledInput
-                              hasError={!!errors.lowThreshold}
+                              isInvalid={!!errors.lowThreshold}
                               type="number"
                               step="0.1"
                               onChange={(event) => setConditionMinValue(event.currentTarget.value, index)}
@@ -418,9 +418,9 @@ const AddTriggerView = () => {
 
                         {condition?.type?.value === TriggerConditionType.HIGH_THRESHOLD && (
                         <Flex marginTop={5} flexDirection="column">
-                          <StyledLabel>High Threshold (0 - 10)</StyledLabel>
+                          <Label>High Threshold (0 - 10)</Label>
                           <StyledInput
-                            hasError={!!errors.highThreshold}
+                            isInvalid={!!errors.highThreshold}
                             type="number"
                             step="0.1"
                             onChange={(event) => setConditionMaxValue(event.currentTarget.value, index)}
@@ -435,9 +435,9 @@ const AddTriggerView = () => {
                         || condition?.type?.value === TriggerConditionType.INNER_RANGE) && (
                         <Flex marginTop={5} flexDirection="row" justifyContent="space-evenly">
                           <Flex width="49%" flexDirection="column">
-                            <StyledLabel>Low Threshold (0 - 10)</StyledLabel>
+                            <Label>Low Threshold (0 - 10)</Label>
                             <StyledInput
-                              hasError={!!errors.lowThreshold}
+                              isInvalid={!!errors.lowThreshold}
                               type="number"
                               step="0.1"
                               onChange={(event) => setConditionMinValue(event.currentTarget.value, index)}
@@ -447,9 +447,9 @@ const AddTriggerView = () => {
                             {errors.lowThreshold && <Muted color="warning">Value not between 0 and 10</Muted>}
                           </Flex>
                           <Flex width="49%" flexDirection="column">
-                            <StyledLabel>High Threshold (0 - 10)</StyledLabel>
+                            <Label>High Threshold (0 - 10)</Label>
                             <StyledInput
-                              hasError={!!errors.highThreshold}
+                              isInvalid={!!errors.highThreshold}
                               type="number"
                               step="0.1"
                               onChange={(event) => setConditionMaxValue(event.currentTarget.value, index)}

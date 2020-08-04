@@ -10,7 +10,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import Select from 'react-select';
 
 import { Button, Div, ErrorStyle, Flex, Form, FormGroupContainer,
-  Grid, H3, H4, Hr, Muted, StyledInput, StyledLabel } from '@haas/ui';
+  Grid, H3, H4, Hr, Label, Muted, StyledInput } from '@haas/ui';
 import {
   DeleteQuestionOptionButtonContainer,
 } from 'views/DialogueBuilderView/components/QuestionEntry/QuestionEntryStyles';
@@ -335,9 +335,9 @@ const QuestionEntryForm = ({
             <Grid gridTemplateColumns={['1fr', '1fr 1fr']}>
 
               <Div useFlex flexDirection="column" gridColumn="1 / -1">
-                <StyledLabel>Title</StyledLabel>
+                <Label>Title</Label>
                 <StyledInput
-                  hasError={!!errors.title}
+                  isInvalid={!!errors.title}
                   name="title"
                   defaultValue={activeTitle}
                   onBlur={(e) => setActiveTitle(e.currentTarget.value)}
@@ -349,9 +349,9 @@ const QuestionEntryForm = ({
               {parentQuestionType === 'Slider' && (
                 <>
                   <Flex flexDirection="column">
-                    <StyledLabel>Min value</StyledLabel>
+                    <Label>Min value</Label>
                     <StyledInput
-                      hasError={!!errors.minValue}
+                      isInvalid={!!errors.minValue}
                       name="minValue"
                       ref={register({ required: false })}
                       defaultValue={condition?.renderMin}
@@ -360,9 +360,9 @@ const QuestionEntryForm = ({
                     {errors.minValue && <Muted color="warning">{errors.minValue.message}</Muted>}
                   </Flex>
                   <Flex flexDirection="column">
-                    <StyledLabel>Max value</StyledLabel>
+                    <Label>Max value</Label>
                     <StyledInput
-                      hasError={!!errors.maxValue}
+                      isInvalid={!!errors.maxValue}
                       name="maxValue"
                       ref={register({ required: false })}
                       defaultValue={condition?.renderMax}
@@ -375,7 +375,7 @@ const QuestionEntryForm = ({
 
               {parentQuestionType === 'Choice' && (
                 <Div gridColumn="1 / -1">
-                  <StyledLabel>Match value</StyledLabel>
+                  <Label>Match value</Label>
                   <Select
                     styles={errors.matchText && !activematchValue ? ErrorStyle : undefined}
                     ref={() => register({
@@ -393,10 +393,10 @@ const QuestionEntryForm = ({
               )}
 
               <Div useFlex flexDirection="column">
-                <StyledLabel>Question type</StyledLabel>
+                <Label>Question type</Label>
                 <Select
                   id="question-type-select"
-                  hasError={!!errors.questionType}
+                  isInvalid={!!errors.questionType}
                   ref={() => register({
                     name: 'questionType',
                     required: true,
@@ -409,10 +409,10 @@ const QuestionEntryForm = ({
               </Div>
 
               <Div key={activeLeaf?.value} useFlex flexDirection="column">
-                <StyledLabel>Leaf node</StyledLabel>
+                <Label>Leaf node</Label>
                 <Select
                   id="leaf-node-select"
-                  hasError={!!errors.activeLeaf}
+                  isInvalid={!!errors.activeLeaf}
                   ref={() => register({
                     name: 'activeLeaf',
                     required: true,
@@ -445,7 +445,7 @@ const QuestionEntryForm = ({
                         <Flex my={1} flexDirection="row">
                           <Flex flexGrow={1}>
                             <StyledInput
-                              hasError={errors.options && Array.isArray(errors.options) && !!errors.options?.[optionIndex]}
+                              isInvalid={errors.options && Array.isArray(errors.options) && !!errors.options?.[optionIndex]}
                               id={`options[${optionIndex}]`}
                               key={`input-${id}-${optionIndex}`}
                               name={`options[${optionIndex}]`}

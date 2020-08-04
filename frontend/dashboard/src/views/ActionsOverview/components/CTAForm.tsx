@@ -7,7 +7,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import Select from 'react-select';
 
 import { Button, Div, ErrorStyle, Flex, Form, FormGroupContainer, Grid,
-  H3, H4, Hr, Muted, StyledInput, StyledLabel } from '@haas/ui';
+  H3, H4, Hr, Label, Muted, StyledInput } from '@haas/ui';
 import { PlusCircle, X } from 'react-feather';
 import { cloneDeep, debounce } from 'lodash';
 import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
@@ -246,12 +246,12 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: 
           <Div py={4}>
             <Grid gridTemplateColumns={['1fr', '1fr 1fr']}>
               <Flex flexDirection="column" gridColumn="1 / -1">
-                <StyledLabel>Title</StyledLabel>
-                <StyledInput hasError={!!errors.title} name="title" defaultValue={title} ref={register({ required: true })} />
+                <Label>Title</Label>
+                <StyledInput isInvalid={!!errors.title} name="title" defaultValue={title} ref={register({ required: true })} />
                 {errors.title && <Muted color="warning">{errors.title.message}</Muted>}
               </Flex>
               <Div useFlex flexDirection="column">
-                <StyledLabel>Type</StyledLabel>
+                <Label>Type</Label>
                 <Select
                   styles={errors.ctaType && !activeType ? ErrorStyle : undefined}
                   ref={() => register({
@@ -291,9 +291,9 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: 
                         <X />
                       </DeleteLinkSesctionButton>
                       <Flex flexDirection="column">
-                        <StyledLabel>Url</StyledLabel>
+                        <Label>Url</Label>
                         <StyledInput
-                          hasError={!!errors.links?.[index]?.url}
+                          isInvalid={!!errors.links?.[index]?.url}
                           name={`links[${index}].url`}
                           defaultValue={link.url}
                           onChange={(e) => handleURLChange(e.currentTarget.value, index)}
@@ -302,7 +302,7 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: 
                         {errors.links?.[index]?.url && <Muted color="warning">{errors.links?.[index]?.url?.message}</Muted>}
                       </Flex>
                       <Div useFlex flexDirection="column">
-                        <StyledLabel>Type</StyledLabel>
+                        <Label>Type</Label>
                         <Select
                           styles={errors.links?.[index]?.type && !activeLinks?.[index]?.type ? ErrorStyle : undefined}
                           ref={() => register({
@@ -322,9 +322,9 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: 
                         )}
                       </Div>
                       <Flex flexDirection="column">
-                        <StyledLabel>Tooltip</StyledLabel>
+                        <Label>Tooltip</Label>
                         <StyledInput
-                          hasError={!!errors.links?.[index]?.tooltip}
+                          isInvalid={!!errors.links?.[index]?.tooltip}
                           name={`links[${index}].tooltip`}
                           defaultValue={link.title}
                           onChange={(e) => handleTooltipChange(e.currentTarget.value, index)}
@@ -333,9 +333,9 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: 
                         {errors.links?.[index]?.tooltip && <Muted color="warning">{errors.links?.[index]?.tooltip?.message}</Muted>}
                       </Flex>
                       <Flex flexDirection="column">
-                        <StyledLabel>Icon</StyledLabel>
+                        <Label>Icon</Label>
                         <StyledInput
-                          hasError={!!errors.links?.[index]?.iconUrl}
+                          isInvalid={!!errors.links?.[index]?.iconUrl}
                           name={`links[${index}].iconUrl`}
                           defaultValue={link.iconUrl}
                           onChange={(e) => handleIconChange(e.currentTarget.value, index)}
@@ -344,9 +344,9 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: 
                         {errors.links?.[index]?.iconUrl && <Muted color="warning">{errors.links?.[index]?.iconUrl?.message}</Muted>}
                       </Flex>
                       <Flex flexDirection="column">
-                        <StyledLabel>Background color</StyledLabel>
+                        <Label>Background color</Label>
                         <StyledInput
-                          hasError={!!errors.links?.[index]?.backgroundColor}
+                          isInvalid={!!errors.links?.[index]?.backgroundColor}
                           name={`links[${index}].backgroundColor`}
                           defaultValue={link.backgroundColor}
                           onChange={(e) => handleBackgroundColorChange(e.currentTarget.value, index)}

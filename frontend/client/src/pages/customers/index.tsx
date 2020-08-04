@@ -13,7 +13,7 @@ const CustomersPage = () => {
 
   if (loading) return <Loader />;
 
-  return <CustomerOverview customers={customers} isLoading />;
+  return <CustomerOverview customers={customers} />;
 };
 
 export default CustomersPage;

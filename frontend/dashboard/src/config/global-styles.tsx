@@ -13,10 +13,10 @@ const GlobalStyle = createGlobalStyle`
   }
 
   body, html, * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
   }
 
   code {
@@ -25,7 +25,7 @@ const GlobalStyle = createGlobalStyle`
   }
 
   svg {
-      display: block;
+    display: block;
   }
 `;
 
