@@ -39,7 +39,11 @@ const AppRoutes = () => (
 
     <Route
       path="/dashboard/b/add"
-      render={() => <AddCustomerPage />}
+      render={() => (
+        <PreCustomerLayout>
+          <AddCustomerPage />
+        </PreCustomerLayout>
+      )}
     />
 
     <Route
@@ -163,6 +167,7 @@ const AppRoutes = () => (
         </PreCustomerLayout>
       )}
     />
+
     <Route path="/dashboard" render={() => <DashboardPage />} />
 
     <Route path="/">

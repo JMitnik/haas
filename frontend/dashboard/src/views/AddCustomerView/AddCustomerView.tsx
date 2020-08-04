@@ -25,8 +25,9 @@ const schema = yup.object().shape({
   name: yup.string().required(),
   logo: yup.string().url(),
   slug: yup.string().required(),
-  primaryColour: yup.string().required().matches(/^(#(\d|\D){6}$){1}/,
-    { message: 'Provided colour is not a valid hexadecimal' }),
+  primaryColour: yup.string().required().matches(/^(#(\d|\D){6}$){1}/, {
+    message: 'Provided colour is not a valid hexadecimal',
+  }),
 });
 
 const AddCustomerView = () => {
