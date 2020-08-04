@@ -116,7 +116,8 @@ export const Input = forwardRef((props: InputProps, ref: Ref<HTMLInputElement>) 
       </ChakraInputRightAddOn>
     )}
 
-    <ChakraInput 
+    <ChakraInput
+      errorBorderColor="red.400"
       roundedBottomLeft={props.leftAddOn ? '0': 'auto'}
       roundedTopLeft={props.leftAddOn ? '0': 'auto'}
     {...props} fontSize="0.8rem" ref={ref} />
