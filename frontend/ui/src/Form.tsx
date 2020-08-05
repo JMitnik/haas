@@ -12,7 +12,8 @@ import {
   InputRightAddon as ChakraInputRightAddOn,
   InputProps as ChakraInputProps,
   InputGroupProps,
-  FormControlProps} from '@chakra-ui/core';
+  FormControlProps,
+  RadioButtonGroup} from '@chakra-ui/core';
 import styled, { css } from 'styled-components';
 import { SpaceProps, GridProps } from 'styled-system';
 import { InputHTMLAttributes } from 'react';
@@ -479,6 +480,30 @@ export const FormSection = forwardRef((props: FormSectionProps, ref: Ref<HTMLDiv
 interface InputGridProps extends GridProps {
   children: React.ReactNode;
 }
+
+
+export const BooleanRadioInput = ({ onChange, children, value }: any) => {
+  const handleButtonChange = (val: any) => {
+    if (val === 1) {
+      onChange(true);
+    }
+
+    if (val === -1) {
+      onChange(false);
+    }
+  };
+
+  return (
+    <RadioButtonGroup
+      defaultValue={value}
+      isInline
+      onChange={(val) => handleButtonChange(val)}
+      display="flex"
+    >
+      {children}
+    </RadioButtonGroup>
+  );
+};
 
 export const InputGrid = forwardRef((props: InputGridProps, ref: Ref<HTMLDivElement>) => (
   <Grid mb={4} gridTemplateColumns={['1fr', '1fr', '1fr 1fr']} {...props}>

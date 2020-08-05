@@ -1,22 +1,22 @@
 import * as yup from 'yup';
-import { BlockPicker, ColorResult } from 'react-color';
-import { Briefcase, Link } from 'react-feather';
-import { Button, ButtonGroup, FormErrorMessage, RadioButtonGroup, useToast } from '@chakra-ui/core';
 import {
-  ButtonRadio, Container, Div, Form, FormContainer, FormControl,
-  FormLabel, FormSection, H3, Hr, Input, InputGrid, InputHelper,
+  BooleanRadioInput, ButtonRadio, Container, Div, Form, FormContainer,
+  FormControl, FormLabel, FormSection, H3, Hr, Input, InputGrid,
+  InputHelper,
   Muted,
 } from '@haas/ui';
+import { Briefcase, Link } from 'react-feather';
+import { Button, ButtonGroup, FormErrorMessage, RadioButtonGroup, useToast } from '@chakra-ui/core';
 import { Controller, UseFormMethods, useForm } from 'react-hook-form';
 import { motion } from 'framer-motion';
 import { useHistory } from 'react-router';
 import { useMutation } from '@apollo/react-hooks';
 import { yupResolver } from '@hookform/resolvers';
 import Dropzone from 'react-dropzone';
-import React, { useRef, useState } from 'react';
-import styled, { css } from 'styled-components/macro';
+import React, { useState } from 'react';
 
-import useOnClickOutside from 'hooks/useClickOnOutside';
+import ColorPickerInput from 'components/ColorPicker';
+import parseOptionalBoolean from 'utils/parseOptionalBoolean';
 
 import { createNewCustomer } from '../../mutations/createNewCustomer';
 import getCustomerQuery from '../../queries/getCustomersQuery';
@@ -39,68 +39,6 @@ const schema = yup.object().shape({
     message: 'Provided colour is not a valid hexadecimal',
   }),
 });
-
-const ColorPickerContainer = styled(Div)`
-  ${() => css`
-    position: absolute;
-    z-index: 200;
-    /* top: 0; */
-  `}
-`;
-
-const ColorPickerInput = ({ onChange, value }: any) => {
-  const [isOpenPicker, setIsOpenPicker] = useState(false);
-  const pickerRef = useRef<HTMLDivElement | null>(null);
-  useOnClickOutside(pickerRef, () => setIsOpenPicker(false));
-
-  const handlePickerChange = (e: ColorResult) => {
-    if (e.hex) onChange(e.hex);
-  };
-
-  return (
-    <>
-      <Div>
-        <Button
-          style={{ backgroundColor: value || 'auto' }}
-          type="button"
-          size="sm"
-          onClick={() => setIsOpenPicker(!isOpenPicker)}
-        >
-          Primary
-        </Button>
-
-        <ColorPickerContainer ref={pickerRef}>
-          {isOpenPicker && (
-            <BlockPicker color={value} onChange={(e) => handlePickerChange(e)} />
-          )}
-        </ColorPickerContainer>
-      </Div>
-    </>
-  );
-};
-
-const BooleanRadioInput = ({ onChange, children, value }: any) => {
-  const handleButtonChange = (val: any) => {
-    if (val === 1) {
-      onChange(true);
-    }
-
-    if (val === -1) {
-      onChange(false);
-    }
-  };
-
-  return (
-    <RadioButtonGroup
-      defaultValue={value}
-      isInline
-      onChange={(val) => handleButtonChange(val)}
-      display="flex"
-    >
-      {children}
-    </RadioButtonGroup>
-  );
-};
 
 const CustomerLogoFormFragment = ({ form }: { form: UseFormMethods<FormDataProps> }) => {
   const [useCustomUrl, setUseCustomUrl] = useState<boolean>(true);
@@ -204,16 +142,6 @@ const AddCustomerView = () => {
     refetchQueries: [{ query: getCustomerQuery }],
   });
 
-  const parseOptionalBoolean = (optionalBoolean: number | boolean | undefined) => {
-    if (typeof optionalBoolean === 'number') {
-      return optionalBoolean === 1;
-    }
-
-    if (typeof optionalBoolean === 'boolean') return optionalBoolean;
-
-    return undefined;
-  };
-
   const onSubmit = (formData: FormDataProps) => {
     const optionInput = {
 
@@ -276,9 +204,6 @@ const AddCustomerView = () => {
                     <FormErrorMessage>{form.errors.slug?.message}</FormErrorMessage>
                   </FormControl>
                 </InputGrid>
-
-                <Div />
-
               </Div>
             </FormSection>
 
