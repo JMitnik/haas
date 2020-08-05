@@ -15,6 +15,7 @@ import {
   H4, Hr, Label, Muted, StyledInput,
 } from '@haas/ui';
 
+import { yupResolver } from '@hookform/resolvers';
 import editTriggerMutation from 'mutations/editTrigger';
 import getDialoguesQuery from 'queries/getDialoguesOfCustomer';
 import getQuestionsQuery from 'queries/getQuestionnaireQuery';
@@ -215,8 +216,9 @@ const EditTriggerForm = (
 ) => {
   const history = useHistory();
   const { register, handleSubmit, errors, setValue } = useForm<FormDataProps>({
-    validationSchema: schema,
+    resolver: yupResolver(schema),
   });
+
   const { customerSlug } = useParams();
   const { data: recipientsData } = useQuery(getRecipientsQuery, { variables: { customerSlug } });
   const [fetchQuestions, { data: questionsData }] = useLazyQuery(
@@ -615,7 +617,7 @@ const EditTriggerForm = (
                               setRecipients(qOption, index);
                             }}
                           />
-                          {errors.recipients?.[index] && !activeRecipients?.[index]?.value && <Muted color="warning">{errors.recipients?.[index].message}</Muted>}
+                          {errors.recipients?.[index] && !activeRecipients?.[index]?.value && <Muted color="warning">{errors.recipients?.[index]?.message}</Muted>}
                         </Div>
                         <Flex justifyContent="center" alignContent="center" flexGrow={1}>
                           <MinusCircle onClick={() => deleteRecipient(index)} />

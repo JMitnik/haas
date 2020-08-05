@@ -12,6 +12,7 @@ import {
 import { useCustomer } from 'providers/CustomerProvider';
 import { useToast } from '@chakra-ui/core';
 
+import { yupResolver } from '@hookform/resolvers';
 import editCustomerMutation from '../../mutations/editCustomer';
 import getCustomerQuery from '../../queries/getCustomersQuery';
 import getEditCustomerData from '../../queries/getEditCustomer';
@@ -56,7 +57,7 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
   const [activePreviewUrl, setActivePreviewUrl] = useState<null | string>(null);
 
   const { register, handleSubmit, errors } = useForm<FormDataProps>({
-    validationSchema: schema,
+    resolver: yupResolver(schema),
     defaultValues: {
       name: customer.name,
       logo: customer.settings?.logoUrl,

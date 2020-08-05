@@ -18,6 +18,7 @@ import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
 import createQuestionMutation from 'mutations/createQuestion';
 import updateQuestionMutation from 'mutations/updateQuestion';
 
+import { yupResolver } from '@hookform/resolvers';
 import { EdgeConditonProps,
   OverrideLeafProps, QuestionEntryProps, QuestionOptionProps } from '../../DialogueBuilderInterfaces';
 
@@ -105,7 +106,7 @@ const QuestionEntryForm = ({
   const { customerSlug, dialogueSlug } = useParams();
 
   const { register, handleSubmit, setValue, errors, getValues } = useForm<FormDataProps>({
-    validationSchema: schema,
+    resolver: yupResolver(schema),
     defaultValues: {
       parentQuestionType,
       options: [],

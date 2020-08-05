@@ -10,6 +10,7 @@ import {
   Button, Container, Div, ErrorStyle, Flex, Form, FormGroupContainer, Grid,
   H2, H3, Hr, Label, Muted, StyledInput,
 } from '@haas/ui';
+import { yupResolver } from '@hookform/resolvers';
 import editUserMutation from 'mutations/editUser';
 import getRolesQuery from 'queries/getRoles';
 import getUserQuery from 'queries/getUser';
@@ -64,7 +65,7 @@ const EditCustomerForm = ({ user, roles }: { user: any, roles: Array<{ label: st
   const [activeRole, setActiveRole] = useState<null | { label: string, value: string }>(userRole);
 
   const { register, handleSubmit, errors, setValue } = useForm<FormDataProps>({
-    validationSchema: schema,
+    resolver: yupResolver(schema),
     defaultValues: {
       firstName: user?.firstName,
       lastName: user?.lastName,

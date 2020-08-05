@@ -11,6 +11,7 @@ import Select from 'react-select';
 import styled, { css } from 'styled-components/macro';
 
 import { createDialogue } from 'mutations/createDialogue';
+import { yupResolver } from '@hookform/resolvers';
 import formatServerError from 'utils/formatServerError';
 import getCustomerQuery from 'queries/getCustomersQuery';
 import getDialoguesOfCustomer from 'queries/getDialoguesOfCustomer';
@@ -55,7 +56,7 @@ const schema = yup.object().shape({
 const AddDialogueView = () => {
   const history = useHistory();
   const { register, handleSubmit, errors, setValue, getValues } = useForm<FormDataProps>({
-    validationSchema: schema,
+    resolver: yupResolver(schema),
   });
   const { customerSlug } = useParams();
   const [activeTags, setActiveTags] = useState<Array<null | {label: string, value: string}>>([]);

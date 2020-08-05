@@ -9,6 +9,7 @@ import styled, { css } from 'styled-components/macro';
 
 import { Button, Container, Div, ErrorStyle, Flex, Grid, H2, H3,
   Hr, Label, Muted, StyledInput } from '@haas/ui';
+import { yupResolver } from '@hookform/resolvers';
 import createAddMutation from 'mutations/createUser';
 import getRolesQuery from 'queries/getRoles';
 import getUsersQuery from 'queries/getUsers';
@@ -32,7 +33,7 @@ const schema = yup.object().shape({
 const AddUserView = () => {
   const history = useHistory();
   const { register, handleSubmit, errors, setValue } = useForm<FormDataProps>({
-    validationSchema: schema,
+    resolver: yupResolver(schema),
   });
   const { customerSlug } = useParams();
 

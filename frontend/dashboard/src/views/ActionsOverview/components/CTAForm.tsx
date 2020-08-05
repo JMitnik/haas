@@ -3,11 +3,12 @@ import { ApolloError } from 'apollo-boost';
 import { useForm } from 'react-hook-form';
 import { useMutation } from '@apollo/react-hooks';
 import { useParams } from 'react-router-dom';
+import { yupResolver } from '@hookform/resolvers';
 import React, { useCallback, useEffect, useState } from 'react';
 import Select from 'react-select';
 
 import { Button, Div, ErrorStyle, Flex, Form, FormGroupContainer, Grid,
-  H3, H4, Hr, Label, Muted, StyledInput } from '@haas/ui';
+  H3, H4, Hr, Input, Label, Muted } from '@haas/ui';
 import { PlusCircle, X } from 'react-feather';
 import { cloneDeep, debounce } from 'lodash';
 import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
@@ -77,8 +78,8 @@ const LINK_TYPES = [
 
 const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: CTAFormProps) => {
   const { customerSlug, dialogueSlug } = useParams();
-  const { register, handleSubmit, setValue, errors, getValues } = useForm<FormDataProps>({
-    validationSchema: schema,
+  const { register, handleSubmit, setValue, errors } = useForm<FormDataProps>({
+    resolver: yupResolver(schema),
   });
 
   const clonedLinks = cloneDeep(links);
@@ -247,7 +248,7 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: 
             <Grid gridTemplateColumns={['1fr', '1fr 1fr']}>
               <Flex flexDirection="column" gridColumn="1 / -1">
                 <Label>Title</Label>
-                <StyledInput isInvalid={!!errors.title} name="title" defaultValue={title} ref={register({ required: true })} />
+                <Input isInvalid={!!errors.title} name="title" defaultValue={title} ref={register({ required: true })} />
                 {errors.title && <Muted color="warning">{errors.title.message}</Muted>}
               </Flex>
               <Div useFlex flexDirection="column">
@@ -292,14 +293,16 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: 
                       </DeleteLinkSesctionButton>
                       <Flex flexDirection="column">
                         <Label>Url</Label>
-                        <StyledInput
+                        <Input
                           isInvalid={!!errors.links?.[index]?.url}
                           name={`links[${index}].url`}
                           defaultValue={link.url}
-                          onChange={(e) => handleURLChange(e.currentTarget.value, index)}
+                          onChange={(e: any) => handleURLChange(e.currentTarget.value, index)}
                           ref={register({ required: true })}
                         />
-                        {errors.links?.[index]?.url && <Muted color="warning">{errors.links?.[index]?.url?.message}</Muted>}
+                        {errors.links?.[index]?.url && (
+                          <Muted color="warning">{errors.links?.[index]?.url?.message}</Muted>
+                        )}
                       </Flex>
                       <Div useFlex flexDirection="column">
                         <Label>Type</Label>
@@ -323,36 +326,42 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: 
                       </Div>
                       <Flex flexDirection="column">
                         <Label>Tooltip</Label>
-                        <StyledInput
+                        <Input
                           isInvalid={!!errors.links?.[index]?.tooltip}
                           name={`links[${index}].tooltip`}
                           defaultValue={link.title}
-                          onChange={(e) => handleTooltipChange(e.currentTarget.value, index)}
+                          onChange={(e:any) => handleTooltipChange(e.currentTarget.value, index)}
                           ref={register({ required: false })}
                         />
-                        {errors.links?.[index]?.tooltip && <Muted color="warning">{errors.links?.[index]?.tooltip?.message}</Muted>}
+                        {errors.links?.[index]?.tooltip && (
+                          <Muted color="warning">{errors.links?.[index]?.tooltip?.message}</Muted>
+                        )}
                       </Flex>
                       <Flex flexDirection="column">
                         <Label>Icon</Label>
-                        <StyledInput
+                        <Input
                           isInvalid={!!errors.links?.[index]?.iconUrl}
                           name={`links[${index}].iconUrl`}
                           defaultValue={link.iconUrl}
-                          onChange={(e) => handleIconChange(e.currentTarget.value, index)}
+                          onChange={(e:any) => handleIconChange(e.currentTarget.value, index)}
                           ref={register({ required: false })}
                         />
-                        {errors.links?.[index]?.iconUrl && <Muted color="warning">{errors.links?.[index]?.iconUrl?.message}</Muted>}
+                        {errors.links?.[index]?.iconUrl && (
+                          <Muted color="warning">{errors.links?.[index]?.iconUrl?.message}</Muted>
+                        )}
                       </Flex>
                       <Flex flexDirection="column">
                         <Label>Background color</Label>
-                        <StyledInput
+                        <Input
                           isInvalid={!!errors.links?.[index]?.backgroundColor}
                           name={`links[${index}].backgroundColor`}
                           defaultValue={link.backgroundColor}
-                          onChange={(e) => handleBackgroundColorChange(e.currentTarget.value, index)}
+                          onChange={(e:any) => handleBackgroundColorChange(e.currentTarget.value, index)}
                           ref={register({ required: false })}
                         />
-                        {errors.links?.[index]?.backgroundColor && <Muted color="warning">{errors.links?.[index]?.backgroundColor?.message}</Muted>}
+                        {errors.links?.[index]?.backgroundColor && (
+                          <Muted color="warning">{errors.links?.[index]?.backgroundColor?.message}</Muted>
+                        )}
                       </Flex>
                     </Grid>
                   </Div>

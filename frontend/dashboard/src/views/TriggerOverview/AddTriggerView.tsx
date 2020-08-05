@@ -14,6 +14,7 @@ import {
   Button, Container, DeleteButtonContainer, Div, ErrorStyle, Flex, Grid, H2, H3,
   H4, Hr, Label, Muted, StyledInput,
 } from '@haas/ui';
+import { yupResolver } from '@hookform/resolvers';
 import createTriggerMutation from 'mutations/createTrigger';
 import getDialoguesQuery from 'queries/getDialoguesOfCustomer';
 import getQuestionsQuery from 'queries/getQuestionnaireQuery';
@@ -99,8 +100,9 @@ const schema = yup.object().shape({
 const AddTriggerView = () => {
   const history = useHistory();
   const { register, handleSubmit, errors, setValue } = useForm<FormDataProps>({
-    validationSchema: schema,
+    resolver: yupResolver(schema),
   });
+
   const { customerSlug } = useParams();
 
   // TODO: Make it one query
@@ -487,7 +489,9 @@ const AddTriggerView = () => {
                               setRecipients(qOption, index);
                             }}
                           />
-                          {errors.recipients?.[index] && !activeRecipients?.[index]?.value && <Muted color="warning">{errors.recipients?.[index].message}</Muted>}
+                          {errors.recipients?.[index] && !activeRecipients?.[index]?.value && (
+                            <Muted color="warning">{errors.recipients?.[index]?.message}</Muted>
+                            )}
                         </Div>
                         <Flex justifyContent="center" alignContent="center" flexGrow={1}>
                           <MinusCircle onClick={() => deleteRecipient(index)} />

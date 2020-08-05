@@ -9,6 +9,7 @@ import styled, { css } from 'styled-components/macro';
 import { Button, Div, ErrorStyle, Flex,
   Grid, H2, H3, H4, Hr, Label, Muted,
   StyledInput, StyledTextInput } from '@haas/ui';
+import { yupResolver } from '@hookform/resolvers';
 import React, { useEffect, useState } from 'react';
 import Select from 'react-select';
 import editDialogueMutation from 'mutations/editDialogue';
@@ -96,7 +97,7 @@ const EditDialogueView = () => {
 const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFormProps) => {
   const history = useHistory();
   const { register, handleSubmit, errors, setValue, getValues } = useForm<FormDataProps>({
-    validationSchema: schema,
+    resolver: yupResolver(schema),
   });
   const { customerSlug, dialogueSlug } = useParams();
 

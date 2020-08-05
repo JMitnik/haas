@@ -1,20 +1,19 @@
 import * as yup from 'yup';
 import { BlockPicker, ColorResult } from 'react-color';
 import { Briefcase, Link } from 'react-feather';
-import { Button, ButtonGroup, FormErrorMessage, RadioButtonGroup } from '@chakra-ui/core';
+import { Button, ButtonGroup, FormErrorMessage, RadioButtonGroup, useToast } from '@chakra-ui/core';
 import {
-  ButtonRadio, Container, Div, Flex, Form, FormContainer, FormControl,
-  FormLabel, FormSection, Grid, H3, H4, Hr, Input, InputGrid, InputHelper,
-  Label,
+  ButtonRadio, Container, Div, Form, FormContainer, FormControl,
+  FormLabel, FormSection, H3, Hr, Input, InputGrid, InputHelper,
   Muted,
-  Paragraph,
 } from '@haas/ui';
-import { Controller, FormContextValues, useForm } from 'react-hook-form';
+import { Controller, UseFormMethods, useForm } from 'react-hook-form';
 import { motion } from 'framer-motion';
 import { useHistory } from 'react-router';
 import { useMutation } from '@apollo/react-hooks';
+import { yupResolver } from '@hookform/resolvers';
 import Dropzone from 'react-dropzone';
-import React, { forwardRef, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import styled, { css } from 'styled-components/macro';
 
 import useOnClickOutside from 'hooks/useClickOnOutside';
@@ -27,7 +26,7 @@ interface FormDataProps {
   name: string;
   slug: string;
   logo?: string;
-  cloudinary?: File;
+  // cloudinary?: File;
   primaryColour?: string;
   seed?: boolean;
 }
@@ -80,7 +79,7 @@ const ColorPickerInput = ({ onChange, value }: any) => {
   );
 };
 
-const BooleanRadioInput = ({ onChange, children }: any) => {
+const BooleanRadioInput = ({ onChange, children, value }: any) => {
   const handleButtonChange = (val: any) => {
     if (val === 1) {
       onChange(true);
@@ -93,7 +92,7 @@ const BooleanRadioInput = ({ onChange, children }: any) => {
 
   return (
     <RadioButtonGroup
-      defaultValue={-1}
+      defaultValue={value}
       isInline
       onChange={(val) => handleButtonChange(val)}
       display="flex"
@@ -103,23 +102,15 @@ const BooleanRadioInput = ({ onChange, children }: any) => {
   );
 };
 
-const CustomerLogoFormFragment = ({ form }: { form: FormContextValues<FormDataProps> }) => {
+const CustomerLogoFormFragment = ({ form }: { form: UseFormMethods<FormDataProps> }) => {
   const [useCustomUrl, setUseCustomUrl] = useState<boolean>(true);
-  const [activePreview, setActivePreview] = useState('');
+  const [, setActivePreview] = useState('');
 
-  const [uploadFile, { loading: fileUploadLoading }] = useMutation(uploadSingleImage, {
+  const [uploadFile] = useMutation(uploadSingleImage, {
     onCompleted: (result) => {
       setActivePreview(result.singleUpload.url);
     },
   });
-
-  const handleUploadChange = (event: any) => {
-    setActivePreview('');
-    const image: File = event.target.files[0];
-    if (image) {
-      uploadFile({ variables: { file: image } });
-    }
-  };
 
   const handleUrlRadioChange = (val: any) => {
     if (val === 1) {
@@ -152,6 +143,7 @@ const CustomerLogoFormFragment = ({ form }: { form: FormContextValues<FormDataPr
           <FormLabel htmlFor="logo">Logo: existing URL</FormLabel>
           <InputHelper>Use the URL of an existing logo. We recommend one with no background-colors.</InputHelper>
           <Input
+            // eslint-disable-next-line jsx-a11y/anchor-is-valid
             leftEl={<Link />}
             name="logo"
             isInvalid={!!form.errors.logo}
@@ -161,7 +153,7 @@ const CustomerLogoFormFragment = ({ form }: { form: FormContextValues<FormDataPr
 
       ) : (
         <>
-          <FormControl isInvalid={!!form.errors.cloudinary}>
+          <FormControl>
             <FormLabel htmlFor="cloudinary">Logo: upload your own logo</FormLabel>
             <InputHelper>Upload a logo (preferably SVG or PNG)</InputHelper>
 
@@ -170,14 +162,14 @@ const CustomerLogoFormFragment = ({ form }: { form: FormContextValues<FormDataPr
                 <section>
                   <div {...getRootProps()}>
                     <input {...getInputProps()} name="cloudinary" ref={form.register({ required: false })} />
-                    <p>Drag 'n' drop some files here, or click to select files</p>
+                    <p>Drag and drop some files here, or click to select files</p>
                   </div>
                 </section>
               )}
             </Dropzone>
 
             {/* <Input type="file" name="cloudinary" onChange={onChange} ref={form.register({ required: false })} /> */}
-            <FormErrorMessage>{form.errors.cloudinary?.message}</FormErrorMessage>
+            {/* <FormErrorMessage>{form.errors.cloudinary?.name}</FormErrorMessage> */}
           </FormControl>
         </>
       )}
@@ -188,20 +180,39 @@ const CustomerLogoFormFragment = ({ form }: { form: FormContextValues<FormDataPr
 
 const AddCustomerView = () => {
   const history = useHistory();
+  const toast = useToast();
 
   const form = useForm<FormDataProps>({
-    validationSchema: schema,
     mode: 'onChange',
+    resolver: yupResolver(schema),
   });
-
-  console.log(form);
 
   const [addCustomer, { loading, error: serverError }] = useMutation(createNewCustomer, {
     onCompleted: () => {
-      history.push('/');
+      toast({
+        title: 'Created!',
+        description: 'A new business has been added.',
+        status: 'success',
+        position: 'bottom-right',
+        isClosable: true,
+      });
+
+      setTimeout(() => {
+        history.push('/');
+      }, 2000);
     },
     refetchQueries: [{ query: getCustomerQuery }],
   });
+
+  const parseOptionalBoolean = (optionalBoolean: number | boolean | undefined) => {
+    if (typeof optionalBoolean === 'number') {
+      return optionalBoolean === 1;
+    }
+
+    if (typeof optionalBoolean === 'boolean') return optionalBoolean;
+
+    return undefined;
+  };
 
   const onSubmit = (formData: FormDataProps) => {
     const optionInput = {
@@ -209,7 +220,7 @@ const AddCustomerView = () => {
       // TODO: Put back
       logo: '' || formData.logo,
       slug: formData.slug,
-      isSeed: formData.seed,
+      isSeed: parseOptionalBoolean(formData.seed),
       primaryColour: formData.primaryColour,
     };
     // TODO: Make better typescript supported
@@ -244,7 +255,12 @@ const AddCustomerView = () => {
                   <FormControl isInvalid={!!form.errors.name} isRequired>
                     <FormLabel htmlFor="name">Name</FormLabel>
                     <InputHelper>What is the name of the business?</InputHelper>
-                    <Input placeholder="Peach inc." leftEl={<Briefcase />} name="name" ref={form.register({ required: true })} />
+                    <Input
+                      placeholder="Peach inc."
+                      leftEl={<Briefcase />}
+                      name="name"
+                      ref={form.register({ required: true })}
+                    />
                     <FormErrorMessage>{form.errors.name?.message}</FormErrorMessage>
                   </FormControl>
 
@@ -283,6 +299,7 @@ const AddCustomerView = () => {
                     <Controller
                       control={form.control}
                       name="primaryColour"
+                      defaultValue="#BEE3F8"
                       as={<ColorPickerInput />}
                     />
                   </FormControl>
@@ -310,14 +327,14 @@ const AddCustomerView = () => {
                     <InputHelper>Start the onboarding with a pre-existing template, or start clean.</InputHelper>
                     <Controller
                       name="seed"
-                      render={({ onChange }) => (
-                        <BooleanRadioInput onChange={onChange}>
-                          <ButtonRadio value={-1} text="Custom template" description="Start with a default dialogue" />
-                          <ButtonRadio value={1} text="Fresh start" description="Start with a clean slate" />
+                      render={({ onChange, onBlur, value }) => (
+                        <BooleanRadioInput onBlur={onBlur} value={value} onChange={onChange}>
+                          <ButtonRadio value={1} text="Custom template" description="Start with a default dialogue" />
+                          <ButtonRadio value={-1} text="Fresh start" description="Start with a clean slate" />
                         </BooleanRadioInput>
                       )}
                       control={form.control}
-                      defaultValue={0}
+                      defaultValue={1}
                     />
 
                   </FormControl>
@@ -326,7 +343,14 @@ const AddCustomerView = () => {
             </FormSection>
 
             <ButtonGroup>
-              <Button isLoading={loading} isDisabled={!form.formState.isValid} variantColor="teal" type="submit">Create</Button>
+              <Button
+                isLoading={loading}
+                isDisabled={!form.formState.isValid}
+                variantColor="teal"
+                type="submit"
+              >
+                Create
+              </Button>
               <Button variant="outline" onClick={() => history.push('/')}>Cancel</Button>
             </ButtonGroup>
           </FormContainer>
