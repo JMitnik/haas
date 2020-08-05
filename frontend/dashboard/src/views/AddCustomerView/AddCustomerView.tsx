@@ -9,16 +9,16 @@ import { Briefcase, Link } from 'react-feather';
 import { Button, ButtonGroup, FormErrorMessage, RadioButtonGroup, Spinner, useToast } from '@chakra-ui/core';
 import { Controller, UseFormMethods, useForm } from 'react-hook-form';
 import { motion } from 'framer-motion';
+import { useDropzone } from 'react-dropzone';
 import { useHistory } from 'react-router';
 import { useMutation } from '@apollo/react-hooks';
 import { yupResolver } from '@hookform/resolvers';
-import Dropzone, { useDropzone } from 'react-dropzone';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
+import styled from 'styled-components';
 
 import ColorPickerInput from 'components/ColorPicker';
 import parseOptionalBoolean from 'utils/parseOptionalBoolean';
 
-import styled from 'styled-components';
 import { createNewCustomer } from '../../mutations/createNewCustomer';
 import getCustomerQuery from '../../queries/getCustomersQuery';
 import uploadSingleImage from '../../mutations/uploadSingleImage';
@@ -236,7 +236,7 @@ const AddCustomerView = () => {
 
       setTimeout(() => {
         history.push('/');
-      }, 2000);
+      }, 500);
     },
     refetchQueries: [{ query: getCustomerQuery }],
   });
