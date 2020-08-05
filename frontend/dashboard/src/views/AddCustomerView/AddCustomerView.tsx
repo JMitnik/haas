@@ -4,7 +4,10 @@ import { Briefcase, Link } from 'react-feather';
 import { Button, ButtonGroup, FormErrorMessage, RadioButtonGroup } from '@chakra-ui/core';
 import {
   ButtonRadio, Container, Div, Flex, Form, FormContainer, FormControl,
-  FormLabel, Grid, H3, Input, InputHelper, Label, Muted, Paragraph,
+  FormLabel, FormSection, Grid, H3, H4, Hr, Input, InputGrid, InputHelper,
+  Label,
+  Muted,
+  Paragraph,
 } from '@haas/ui';
 import { Controller, FormContextValues, useForm } from 'react-hook-form';
 import { motion } from 'framer-motion';
@@ -46,7 +49,7 @@ const ColorPickerContainer = styled(Div)`
   `}
 `;
 
-const ColorPicker = ({ onChange, value }: any) => {
+const ColorPickerInput = ({ onChange, value }: any) => {
   const [isOpenPicker, setIsOpenPicker] = useState(false);
   const pickerRef = useRef<HTMLDivElement | null>(null);
   useOnClickOutside(pickerRef, () => setIsOpenPicker(false));
@@ -69,7 +72,7 @@ const ColorPicker = ({ onChange, value }: any) => {
 
         <ColorPickerContainer ref={pickerRef}>
           {isOpenPicker && (
-          <BlockPicker color={value} onChange={(e) => handlePickerChange(e)} />
+            <BlockPicker color={value} onChange={(e) => handlePickerChange(e)} />
           )}
         </ColorPickerContainer>
       </Div>
@@ -77,7 +80,30 @@ const ColorPicker = ({ onChange, value }: any) => {
   );
 };
 
-const CustomerLogoForm = ({ form }: { form: FormContextValues<FormDataProps> }) => {
+const BooleanRadioInput = ({ onChange, children }: any) => {
+  const handleButtonChange = (val: any) => {
+    if (val === 1) {
+      onChange(true);
+    }
+
+    if (val === -1) {
+      onChange(false);
+    }
+  };
+
+  return (
+    <RadioButtonGroup
+      defaultValue={-1}
+      isInline
+      onChange={(val) => handleButtonChange(val)}
+      display="flex"
+    >
+      {children}
+    </RadioButtonGroup>
+  );
+};
+
+const CustomerLogoFormFragment = ({ form }: { form: FormContextValues<FormDataProps> }) => {
   const [useCustomUrl, setUseCustomUrl] = useState<boolean>(true);
   const [activePreview, setActivePreview] = useState('');
 
@@ -108,8 +134,8 @@ const CustomerLogoForm = ({ form }: { form: FormContextValues<FormDataProps> }) 
   return (
     <>
       <FormControl>
-        <FormLabel>Use custom url</FormLabel>
-        <InputHelper>Use a custom url or not.</InputHelper>
+        <FormLabel>Logo</FormLabel>
+        <InputHelper>Switch between uploading your own logo or inserting the url of an existing one</InputHelper>
         <RadioButtonGroup
           defaultValue={1}
           isInline
@@ -123,8 +149,8 @@ const CustomerLogoForm = ({ form }: { form: FormContextValues<FormDataProps> }) 
 
       {useCustomUrl ? (
         <FormControl>
-          <FormLabel htmlFor="logo">Logo</FormLabel>
-          <InputHelper>Set an existing URL of the logo (usually ending in .png or .svg)</InputHelper>
+          <FormLabel htmlFor="logo">Logo: existing URL</FormLabel>
+          <InputHelper>Use the URL of an existing logo. We recommend one with no background-colors.</InputHelper>
           <Input
             leftEl={<Link />}
             name="logo"
@@ -136,7 +162,7 @@ const CustomerLogoForm = ({ form }: { form: FormContextValues<FormDataProps> }) 
       ) : (
         <>
           <FormControl isInvalid={!!form.errors.cloudinary}>
-            <FormLabel htmlFor="cloudinary">Upload Logo</FormLabel>
+            <FormLabel htmlFor="cloudinary">Logo: upload your own logo</FormLabel>
             <InputHelper>Upload a logo (preferably SVG or PNG)</InputHelper>
 
             <Dropzone onDrop={(acceptedFiles) => console.log(acceptedFiles)}>
@@ -167,6 +193,8 @@ const AddCustomerView = () => {
     validationSchema: schema,
     mode: 'onChange',
   });
+
+  console.log(form);
 
   const [addCustomer, { loading, error: serverError }] = useMutation(createNewCustomer, {
     onCompleted: () => {
@@ -204,7 +232,7 @@ const AddCustomerView = () => {
       <Form onSubmit={form.handleSubmit(onSubmit)}>
         <motion.div initial={{ opacity: 0, y: 100 }} animate={{ opacity: 1, y: 0 }}>
           <FormContainer>
-            <Grid gridTemplateColumns={['1fr', '1fr', '1fr 3fr']} gridColumnGap="50px">
+            <FormSection id="about">
               <Div>
                 <H3 color="default.text" fontWeight={500} pb={2}>About</H3>
                 <Muted color="gray.600">
@@ -212,7 +240,7 @@ const AddCustomerView = () => {
                 </Muted>
               </Div>
               <Div py={4}>
-                <Grid gridTemplateColumns={['1fr', '1fr', '1fr 1fr']}>
+                <InputGrid>
                   <FormControl isInvalid={!!form.errors.name} isRequired>
                     <FormLabel htmlFor="name">Name</FormLabel>
                     <InputHelper>What is the name of the business?</InputHelper>
@@ -231,40 +259,72 @@ const AddCustomerView = () => {
                     />
                     <FormErrorMessage>{form.errors.slug?.message}</FormErrorMessage>
                   </FormControl>
+                </InputGrid>
 
+                <Div />
+
+              </Div>
+            </FormSection>
+
+            <Hr />
+
+            <FormSection id="branding">
+              <Div>
+                <H3 color="default.text" fontWeight={500} pb={2}>Branding</H3>
+                <Muted color="gray.600">
+                  Describe the branding of your company, including logo and color
+                </Muted>
+              </Div>
+              <Div>
+                <InputGrid>
                   <FormControl isInvalid={!!form.errors.primaryColour} isRequired>
                     <FormLabel htmlFor="primaryColour">Branding color</FormLabel>
                     <InputHelper>What is the main brand color of the company?</InputHelper>
                     <Controller
                       control={form.control}
                       name="primaryColour"
-                      as={<ColorPicker />}
+                      as={<ColorPickerInput />}
                     />
                   </FormControl>
-                </Grid>
+                </InputGrid>
 
-                <Div />
+                <InputGrid>
+                  <CustomerLogoFormFragment form={form} />
+                </InputGrid>
+              </Div>
+            </FormSection>
 
-                <Grid mt={4} gridTemplateColumns={['1fr', '1fr', '1fr 1fr']}>
-                  <CustomerLogoForm form={form} />
-                </Grid>
+            <Hr />
 
-                <Grid mt={4} gridTemplateColumns={['1fr', '1fr', '1fr 1fr']}>
+            <FormSection id="template">
+              <Div>
+                <H3 color="default.text" fontWeight={500} pb={2}>Template</H3>
+                <Muted color="gray.600">
+                  Choose whether you have a preference what to start with.
+                </Muted>
+              </Div>
+              <Div>
+                <InputGrid>
                   <FormControl>
                     <FormLabel>Use template</FormLabel>
                     <InputHelper>Start the onboarding with a pre-existing template, or start clean.</InputHelper>
-                    <RadioButtonGroup
-                      defaultValue={1}
-                      isInline
-                      display="flex"
-                    >
-                      <ButtonRadio value={1} text="Custom template" description="Start with a default dialogue" />
-                      <ButtonRadio value={0} text="Fresh start" description="Start with a clean slate" />
-                    </RadioButtonGroup>
+                    <Controller
+                      name="seed"
+                      render={({ onChange }) => (
+                        <BooleanRadioInput onChange={onChange}>
+                          <ButtonRadio value={-1} text="Custom template" description="Start with a default dialogue" />
+                          <ButtonRadio value={1} text="Fresh start" description="Start with a clean slate" />
+                        </BooleanRadioInput>
+                      )}
+                      control={form.control}
+                      defaultValue={0}
+                    />
+
                   </FormControl>
-                </Grid>
+                </InputGrid>
               </Div>
-            </Grid>
+            </FormSection>
+
             <ButtonGroup>
               <Button isLoading={loading} isDisabled={!form.formState.isValid} variantColor="teal" type="submit">Create</Button>
               <Button variant="outline" onClick={() => history.push('/')}>Cancel</Button>

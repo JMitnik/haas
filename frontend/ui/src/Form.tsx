@@ -14,10 +14,11 @@ import {
   InputGroupProps,
   FormControlProps} from '@chakra-ui/core';
 import styled, { css } from 'styled-components';
-import { SpaceProps } from 'styled-system';
+import { SpaceProps, GridProps } from 'styled-system';
 import { InputHTMLAttributes } from 'react';
 import Color from 'color';
 import { FormLabelProps } from '@chakra-ui/core/dist/FormLabel';
+import { Grid } from './Container';
 
 export const FormContainer = styled(Div)`
   ${({ theme }) => css`
@@ -455,6 +456,35 @@ export const SliderContainer = styled.div`
     }
   `}
 `;
+
+export const FormSectionContainer = styled(Grid)`
+  ${({ theme }) => css`
+    & + & {
+      
+    }
+  `}
+`;
+
+interface FormSectionProps extends GridProps {
+  children: React.ReactNode; 
+  id?: string;
+}
+
+export const FormSection = forwardRef((props: FormSectionProps, ref: Ref<HTMLDivElement>) => (
+  <FormSectionContainer ref={ref} py={4} gridTemplateColumns={['1fr', '1fr', '1fr 3fr']} {...props}>
+    {props.children}
+  </FormSectionContainer>
+));
+
+interface InputGridProps extends GridProps {
+  children: React.ReactNode;
+}
+
+export const InputGrid = forwardRef((props: InputGridProps, ref: Ref<HTMLDivElement>) => (
+  <Grid mb={4} gridTemplateColumns={['1fr', '1fr', '1fr 1fr']} {...props}>
+    {props.children}
+  </Grid>
+));
 
 export const GridForm = styled.form`
   ${() => css`
