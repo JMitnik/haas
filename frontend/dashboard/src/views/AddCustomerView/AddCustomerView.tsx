@@ -6,18 +6,19 @@ import {
   Muted,
 } from '@haas/ui';
 import { Briefcase, Link } from 'react-feather';
-import { Button, ButtonGroup, FormErrorMessage, RadioButtonGroup, useToast } from '@chakra-ui/core';
+import { Button, ButtonGroup, FormErrorMessage, RadioButtonGroup, Spinner, useToast } from '@chakra-ui/core';
 import { Controller, UseFormMethods, useForm } from 'react-hook-form';
 import { motion } from 'framer-motion';
 import { useHistory } from 'react-router';
 import { useMutation } from '@apollo/react-hooks';
 import { yupResolver } from '@hookform/resolvers';
-import Dropzone from 'react-dropzone';
-import React, { useState } from 'react';
+import Dropzone, { useDropzone } from 'react-dropzone';
+import React, { useEffect, useState } from 'react';
 
 import ColorPickerInput from 'components/ColorPicker';
 import parseOptionalBoolean from 'utils/parseOptionalBoolean';
 
+import styled from 'styled-components';
 import { createNewCustomer } from '../../mutations/createNewCustomer';
 import getCustomerQuery from '../../queries/getCustomersQuery';
 import uploadSingleImage from '../../mutations/uploadSingleImage';
@@ -28,7 +29,9 @@ interface FormDataProps {
   logo?: string;
   // cloudinary?: File;
   primaryColour?: string;
-  seed?: boolean;
+  useCustomUrl?: number;
+  uploadLogo?: string;
+  seed?: number;
 }
 
 const schema = yup.object().shape({
@@ -40,81 +43,177 @@ const schema = yup.object().shape({
   }),
 });
 
-const CustomerLogoFormFragment = ({ form }: { form: UseFormMethods<FormDataProps> }) => {
-  const [useCustomUrl, setUseCustomUrl] = useState<boolean>(true);
-  const [, setActivePreview] = useState('');
+const getDropColor = (props: any) => {
+  if (props.isDragAccept) {
+    return '#00e676';
+  }
+  if (props.isDragReject) {
+    return '#ff1744';
+  }
+  if (props.isDragActive) {
+    return '#2196f3';
+  }
+  return '#eeeeee';
+};
 
-  const [uploadFile] = useMutation(uploadSingleImage, {
+const DropContainer = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  border-width: 2px;
+  border-radius: 2px;
+  border-color: ${(props) => getDropColor(props)};
+  border-style: dashed;
+  background-color: #fafafa;
+  color: #bdbdbd;
+  outline: none;
+  transition: border .24s ease-in-out;
+`;
+
+const FileDropInput = (props: any) => {
+  const { onDrop, isLoading } = props;
+
+  const {
+    acceptedFiles,
+    getRootProps,
+    getInputProps,
+    isDragActive,
+    isDragAccept,
+    isDragReject,
+  } = useDropzone({
+    accept: 'image/*',
+    onDrop,
+  });
+
+  const acceptedFile = acceptedFiles?.[0] || undefined;
+
+  return (
+    <section className="container">
+      <DropContainer {...getRootProps({ isDragActive, isDragAccept, isDragReject })}>
+        {isLoading ? (
+          <Spinner />
+        ) : (
+          <>
+            <input {...getInputProps()} />
+            {acceptedFile ? (
+              <p>
+                {acceptedFile?.name}
+                {' '}
+                -
+                {' '}
+                {acceptedFile?.size}
+                {' '}
+                bytes
+              </p>
+            ) : (
+              <p>Drag the logo here, or click to select it</p>
+            )}
+          </>
+        )}
+      </DropContainer>
+    </section>
+  );
+};
+
+const CustomerUploadLogoInput = ({ onChange }: any) => {
+  const toast = useToast();
+
+  const [uploadFile, { loading }] = useMutation(uploadSingleImage, {
     onCompleted: (result) => {
-      setActivePreview(result.singleUpload.url);
+      toast({
+        title: 'Uploaded!',
+        description: 'File has been uploaded.',
+        status: 'success',
+        position: 'bottom-right',
+        isClosable: true,
+      });
+
+      onChange(result.singleUpload.url);
+    },
+    onError: () => {
+      toast({
+        title: 'Something went wrong',
+        description: 'We were unable to upload file. Try again',
+        status: 'error',
+        position: 'bottom-right',
+        isClosable: true,
+      });
     },
   });
 
-  const handleUrlRadioChange = (val: any) => {
-    if (val === 1) {
-      setUseCustomUrl(true);
-    }
+  const onDrop = (files: File[]) => {
+    if (!files.length) return;
 
-    if (val === 0) {
-      setUseCustomUrl(false);
-    }
+    const [file] = files;
+    uploadFile({ variables: { file } });
   };
 
   return (
-    <>
-      <FormControl>
-        <FormLabel>Logo</FormLabel>
-        <InputHelper>Switch between uploading your own logo or inserting the url of an existing one</InputHelper>
-        <RadioButtonGroup
-          defaultValue={1}
-          isInline
-          onChange={handleUrlRadioChange}
-          display="flex"
-        >
-          <ButtonRadio value={1} text="Existing url" description="Insert Existing url" />
-          <ButtonRadio value={0} text="Upload file" description="Upload file" />
-        </RadioButtonGroup>
-      </FormControl>
-
-      {useCustomUrl ? (
-        <FormControl>
-          <FormLabel htmlFor="logo">Logo: existing URL</FormLabel>
-          <InputHelper>Use the URL of an existing logo. We recommend one with no background-colors.</InputHelper>
-          <Input
-            // eslint-disable-next-line jsx-a11y/anchor-is-valid
-            leftEl={<Link />}
-            name="logo"
-            isInvalid={!!form.errors.logo}
-            ref={form.register({ required: true })}
-          />
-        </FormControl>
-
-      ) : (
-        <>
-          <FormControl>
-            <FormLabel htmlFor="cloudinary">Logo: upload your own logo</FormLabel>
-            <InputHelper>Upload a logo (preferably SVG or PNG)</InputHelper>
-
-            <Dropzone onDrop={(acceptedFiles) => console.log(acceptedFiles)}>
-              {({ getRootProps, getInputProps }) => (
-                <section>
-                  <div {...getRootProps()}>
-                    <input {...getInputProps()} name="cloudinary" ref={form.register({ required: false })} />
-                    <p>Drag and drop some files here, or click to select files</p>
-                  </div>
-                </section>
-              )}
-            </Dropzone>
-
-            {/* <Input type="file" name="cloudinary" onChange={onChange} ref={form.register({ required: false })} /> */}
-            {/* <FormErrorMessage>{form.errors.cloudinary?.name}</FormErrorMessage> */}
-          </FormControl>
-        </>
-      )}
-
-    </>
+    <FileDropInput onDrop={onDrop} isLoading={loading} />
   );
 };
+
+const CustomerLogoFormFragment = ({ form }: { form: UseFormMethods<FormDataProps> }) => (
+  <>
+    <FormControl>
+      <FormLabel>Logo</FormLabel>
+      <InputHelper>Switch between uploading your own logo or inserting the url of an existing one</InputHelper>
+
+      <Controller
+        control={form.control}
+        name="useCustomUrl"
+        defaultValue={1}
+        render={({ onChange }) => (
+          <RadioButtonGroup
+            defaultValue={1}
+            isInline
+            onChange={onChange}
+            display="flex"
+          >
+            <ButtonRadio value={1} text="Existing url" description="Insert Existing url" />
+            <ButtonRadio value={0} text="Upload file" description="Upload file" />
+          </RadioButtonGroup>
+        )}
+      />
+
+    </FormControl>
+
+    {form.watch('useCustomUrl') ? (
+      <FormControl>
+        <FormLabel htmlFor="logo">Logo: existing URL</FormLabel>
+        <InputHelper>Use the URL of an existing logo. We recommend one with no background-colors.</InputHelper>
+        <Input
+            // eslint-disable-next-line jsx-a11y/anchor-is-valid
+          leftEl={<Link />}
+          name="logo"
+          isInvalid={!!form.errors.logo}
+          ref={form.register({ required: true })}
+        />
+      </FormControl>
+
+    ) : (
+      <>
+        <FormControl>
+          <FormLabel htmlFor="cloudinary">Logo: upload logo</FormLabel>
+          <InputHelper>Upload a logo (preferably SVG or PNG)</InputHelper>
+
+          <Controller
+            control={form.control}
+            name="uploadLogo"
+            defaultValue=""
+            render={({ onChange }) => (
+              <CustomerUploadLogoInput onChange={onChange} />
+            )}
+          />
+
+        </FormControl>
+      </>
+    )}
+
+  </>
+);
 
 const AddCustomerView = () => {
   const history = useHistory();
@@ -144,14 +243,12 @@ const AddCustomerView = () => {
 
   const onSubmit = (formData: FormDataProps) => {
     const optionInput = {
-
-      // TODO: Put back
-      logo: '' || formData.logo,
+      logo: parseOptionalBoolean(formData.useCustomUrl) ? formData.logo : formData.uploadLogo,
       slug: formData.slug,
       isSeed: parseOptionalBoolean(formData.seed),
       primaryColour: formData.primaryColour,
     };
-    // TODO: Make better typescript supported
+
     addCustomer({
       variables: {
         name: formData.name,
@@ -255,7 +352,7 @@ const AddCustomerView = () => {
                       render={({ onChange, onBlur, value }) => (
                         <BooleanRadioInput onBlur={onBlur} value={value} onChange={onChange}>
                           <ButtonRadio value={1} text="Custom template" description="Start with a default dialogue" />
-                          <ButtonRadio value={-1} text="Fresh start" description="Start with a clean slate" />
+                          <ButtonRadio value={0} text="Fresh start" description="Start with a clean slate" />
                         </BooleanRadioInput>
                       )}
                       control={form.control}

@@ -488,7 +488,7 @@ export const BooleanRadioInput = ({ onChange, children, value }: any) => {
       onChange(true);
     }
 
-    if (val === -1) {
+    if (val === 0) {
       onChange(false);
     }
   };
