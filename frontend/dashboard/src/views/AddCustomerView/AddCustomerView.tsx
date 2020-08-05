@@ -1,22 +1,24 @@
 import * as yup from 'yup';
 import { BlockPicker, ColorResult } from 'react-color';
-import { Button, ButtonGroup, FormControl, FormErrorMessage, RadioButtonGroup } from '@chakra-ui/core';
+import { Briefcase, Link } from 'react-feather';
+import { Button, ButtonGroup, FormErrorMessage, RadioButtonGroup } from '@chakra-ui/core';
 import {
-  Container, Div, Flex, Form, FormContainer, FormLabel,
-  Grid, H3, Input, InputHelper, Label, Muted, Paragraph,
+  ButtonRadio, Container, Div, Flex, Form, FormContainer, FormControl,
+  FormLabel, Grid, H3, Input, InputHelper, Label, Muted, Paragraph,
 } from '@haas/ui';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, FormContextValues, useForm } from 'react-hook-form';
 import { motion } from 'framer-motion';
 import { useHistory } from 'react-router';
 import { useMutation } from '@apollo/react-hooks';
+import Dropzone from 'react-dropzone';
 import React, { forwardRef, useRef, useState } from 'react';
 import styled, { css } from 'styled-components/macro';
 
-import { Briefcase, Link } from 'react-feather';
+import useOnClickOutside from 'hooks/useClickOnOutside';
+
 import { createNewCustomer } from '../../mutations/createNewCustomer';
 import getCustomerQuery from '../../queries/getCustomersQuery';
 import uploadSingleImage from '../../mutations/uploadSingleImage';
-import useOnClickOutside from 'hooks/useClickOnOutside';
 
 interface FormDataProps {
   name: string;
@@ -55,59 +57,115 @@ const ColorPicker = ({ onChange, value }: any) => {
 
   return (
     <>
-      <Button
-        style={{ backgroundColor: value || 'auto' }}
-        type="button"
-        size="sm"
-        onClick={() => setIsOpenPicker(!isOpenPicker)}
-      >
-        Primary
-      </Button>
+      <Div>
+        <Button
+          style={{ backgroundColor: value || 'auto' }}
+          type="button"
+          size="sm"
+          onClick={() => setIsOpenPicker(!isOpenPicker)}
+        >
+          Primary
+        </Button>
 
-      <ColorPickerContainer ref={pickerRef}>
-        {isOpenPicker && (
+        <ColorPickerContainer ref={pickerRef}>
+          {isOpenPicker && (
           <BlockPicker color={value} onChange={(e) => handlePickerChange(e)} />
-        )}
-      </ColorPickerContainer>
+          )}
+        </ColorPickerContainer>
+      </Div>
     </>
   );
 };
 
-const ButtonRadio = forwardRef((props: any, ref) => {
-  const { isChecked, isDisabled, value, text, description, ...rest } = props;
-
-  return (
-    <Button
-      variant="outline"
-      ref={ref}
-      variantColor={isChecked ? 'blue' : 'gray'}
-      aria-checked={isChecked}
-      role="radio"
-      display="block"
-      textAlign="left"
-      py="8px"
-      height="auto"
-      isDisabled={isDisabled}
-      {...rest}
-    >
-      <Paragraph color={!isChecked ? 'gray.600' : 'auto'} fontSize="0.9rem">{text}</Paragraph>
-      <Paragraph color={!isChecked ? 'gray.500' : 'auto'} fontWeight={400} mt={2} fontSize="0.7rem">{description}</Paragraph>
-    </Button>
-  );
-});
-
-const AddCustomerView = () => {
-  const history = useHistory();
-  const { register, handleSubmit, errors, control, formState } = useForm<FormDataProps>({
-    validationSchema: schema,
-    mode: 'onChange',
-  });
+const CustomerLogoForm = ({ form }: { form: FormContextValues<FormDataProps> }) => {
+  const [useCustomUrl, setUseCustomUrl] = useState<boolean>(true);
   const [activePreview, setActivePreview] = useState('');
 
   const [uploadFile, { loading: fileUploadLoading }] = useMutation(uploadSingleImage, {
     onCompleted: (result) => {
       setActivePreview(result.singleUpload.url);
     },
+  });
+
+  const handleUploadChange = (event: any) => {
+    setActivePreview('');
+    const image: File = event.target.files[0];
+    if (image) {
+      uploadFile({ variables: { file: image } });
+    }
+  };
+
+  const handleUrlRadioChange = (val: any) => {
+    if (val === 1) {
+      setUseCustomUrl(true);
+    }
+
+    if (val === 0) {
+      setUseCustomUrl(false);
+    }
+  };
+
+  return (
+    <>
+      <FormControl>
+        <FormLabel>Use custom url</FormLabel>
+        <InputHelper>Use a custom url or not.</InputHelper>
+        <RadioButtonGroup
+          defaultValue={1}
+          isInline
+          onChange={handleUrlRadioChange}
+          display="flex"
+        >
+          <ButtonRadio value={1} text="Existing url" description="Insert Existing url" />
+          <ButtonRadio value={0} text="Upload file" description="Upload file" />
+        </RadioButtonGroup>
+      </FormControl>
+
+      {useCustomUrl ? (
+        <FormControl>
+          <FormLabel htmlFor="logo">Logo</FormLabel>
+          <InputHelper>Set an existing URL of the logo (usually ending in .png or .svg)</InputHelper>
+          <Input
+            leftEl={<Link />}
+            name="logo"
+            isInvalid={!!form.errors.logo}
+            ref={form.register({ required: true })}
+          />
+        </FormControl>
+
+      ) : (
+        <>
+          <FormControl isInvalid={!!form.errors.cloudinary}>
+            <FormLabel htmlFor="cloudinary">Upload Logo</FormLabel>
+            <InputHelper>Upload a logo (preferably SVG or PNG)</InputHelper>
+
+            <Dropzone onDrop={(acceptedFiles) => console.log(acceptedFiles)}>
+              {({ getRootProps, getInputProps }) => (
+                <section>
+                  <div {...getRootProps()}>
+                    <input {...getInputProps()} name="cloudinary" ref={form.register({ required: false })} />
+                    <p>Drag 'n' drop some files here, or click to select files</p>
+                  </div>
+                </section>
+              )}
+            </Dropzone>
+
+            {/* <Input type="file" name="cloudinary" onChange={onChange} ref={form.register({ required: false })} /> */}
+            <FormErrorMessage>{form.errors.cloudinary?.message}</FormErrorMessage>
+          </FormControl>
+        </>
+      )}
+
+    </>
+  );
+};
+
+const AddCustomerView = () => {
+  const history = useHistory();
+
+  const form = useForm<FormDataProps>({
+    validationSchema: schema,
+    mode: 'onChange',
   });
 
   const [addCustomer, { loading, error: serverError }] = useMutation(createNewCustomer, {
@@ -117,17 +175,11 @@ const AddCustomerView = () => {
     refetchQueries: [{ query: getCustomerQuery }],
   });
 
-  const onChange = (event: any) => {
-    setActivePreview('');
-    const image: File = event.target.files[0];
-    if (image) {
-      uploadFile({ variables: { file: image } });
-    }
-  };
-
   const onSubmit = (formData: FormDataProps) => {
     const optionInput = {
-      logo: activePreview || formData.logo,
+
+      // TODO: Put back
+      logo: '' || formData.logo,
       slug: formData.slug,
       isSeed: formData.seed,
       primaryColour: formData.primaryColour,
@@ -149,8 +201,7 @@ const AddCustomerView = () => {
       </Div> */}
 
       {serverError && (<p>{serverError.message}</p>)}
-
-      <Form onSubmit={handleSubmit(onSubmit)}>
+      <Form onSubmit={form.handleSubmit(onSubmit)}>
         <motion.div initial={{ opacity: 0, y: 100 }} animate={{ opacity: 1, y: 0 }}>
           <FormContainer>
             <Grid gridTemplateColumns={['1fr', '1fr', '1fr 3fr']} gridColumnGap="50px">
@@ -162,60 +213,40 @@ const AddCustomerView = () => {
               </Div>
               <Div py={4}>
                 <Grid gridTemplateColumns={['1fr', '1fr', '1fr 1fr']}>
-                  <FormControl isInvalid={!!errors.name} isRequired>
+                  <FormControl isInvalid={!!form.errors.name} isRequired>
                     <FormLabel htmlFor="name">Name</FormLabel>
                     <InputHelper>What is the name of the business?</InputHelper>
-                    <Input placeholder="Peach inc." leftEl={<Briefcase />} name="name" ref={register({ required: true })} />
-                    <FormErrorMessage>{errors.name?.message}</FormErrorMessage>
+                    <Input placeholder="Peach inc." leftEl={<Briefcase />} name="name" ref={form.register({ required: true })} />
+                    <FormErrorMessage>{form.errors.name?.message}</FormErrorMessage>
                   </FormControl>
 
-                  <FormControl isInvalid={!!errors.slug} isRequired>
+                  <FormControl isInvalid={!!form.errors.slug} isRequired>
                     <FormLabel htmlFor="name">Slug</FormLabel>
                     <InputHelper>Under which url segment will visitors find the business?</InputHelper>
                     <Input
                       placeholder="peach"
                       leftAddOn="https://client.haas.live/"
                       name="slug"
-                      ref={register({ required: true })}
+                      ref={form.register({ required: true })}
                     />
-                    <FormErrorMessage>{errors.slug?.message}</FormErrorMessage>
+                    <FormErrorMessage>{form.errors.slug?.message}</FormErrorMessage>
                   </FormControl>
 
-                  <FormControl isInvalid={!!errors.primaryColour} isRequired>
+                  <FormControl isInvalid={!!form.errors.primaryColour} isRequired>
                     <FormLabel htmlFor="primaryColour">Branding color</FormLabel>
                     <InputHelper>What is the main brand color of the company?</InputHelper>
                     <Controller
-                      control={control}
+                      control={form.control}
                       name="primaryColour"
                       as={<ColorPicker />}
                     />
                   </FormControl>
                 </Grid>
 
-                <Grid mt={4} gridTemplateColumns={['1fr', '1fr', '1fr 1fr']}>
-                  <FormControl isInvalid={!!errors.cloudinary}>
-                    <FormLabel htmlFor="cloudinary">Upload Logo</FormLabel>
-                    <InputHelper>Upload a logo (preferably SVG or PNG)</InputHelper>
-                    <Input type="file" name="cloudinary" onChange={onChange} ref={register({ required: false })} />
-                    <FormErrorMessage>{errors.cloudinary?.message}</FormErrorMessage>
-                  </FormControl>
+                <Div />
 
-                  <FormControl>
-                    <FormLabel htmlFor="logo">Logo</FormLabel>
-                    <InputHelper>Set an existing URL of the logo (usually ending in .png or .svg)</InputHelper>
-                    <Input leftEl={<Link />} name="logo" isInvalid={!!errors.logo} ref={register({ required: true })} />
-                  </FormControl>
-                  <Div useFlex flexDirection="column">
-                    <Label>Preview</Label>
-                    <Div width={200} height={200} style={{ border: '1px solid lightgrey', borderRadius: '8px' }}>
-                      {fileUploadLoading && (
-                      <Flex height="100%" justifyContent="center" alignItems="center">
-                        <Div alignSelf="center">Uploading...</Div>
-                      </Flex>
-                      )}
-                      {activePreview && !fileUploadLoading && <img src={activePreview} height={200} width={200} alt="" />}
-                    </Div>
-                  </Div>
+                <Grid mt={4} gridTemplateColumns={['1fr', '1fr', '1fr 1fr']}>
+                  <CustomerLogoForm form={form} />
                 </Grid>
 
                 <Grid mt={4} gridTemplateColumns={['1fr', '1fr', '1fr 1fr']}>
@@ -235,7 +266,7 @@ const AddCustomerView = () => {
               </Div>
             </Grid>
             <ButtonGroup>
-              <Button isLoading={loading} isDisabled={!formState.isValid} variantColor="teal" type="submit">Create</Button>
+              <Button isLoading={loading} isDisabled={!form.formState.isValid} variantColor="teal" type="submit">Create</Button>
               <Button variant="outline" onClick={() => history.push('/')}>Cancel</Button>
             </ButtonGroup>
           </FormContainer>

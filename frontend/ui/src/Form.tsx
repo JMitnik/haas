@@ -1,6 +1,8 @@
 import React, { forwardRef, Ref, ReactNode } from 'react';
-import { Div } from '@haas/ui';
-import { 
+import { Div, Paragraph } from '@haas/ui';
+import {
+  Button,
+  FormControl as ChakraFormControl,
   FormLabel as ChakraFormLabel,
   Input as ChakraInput,
   InputGroup as ChakraInputGroup,
@@ -9,7 +11,8 @@ import {
   InputLeftAddon as ChakraInputLeftAddOn,
   InputRightAddon as ChakraInputRightAddOn,
   InputProps as ChakraInputProps,
-  InputGroupProps} from '@chakra-ui/core';
+  InputGroupProps,
+  FormControlProps} from '@chakra-ui/core';
 import styled, { css } from 'styled-components';
 import { SpaceProps } from 'styled-system';
 import { InputHTMLAttributes } from 'react';
@@ -25,6 +28,16 @@ export const FormContainer = styled(Div)`
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   `}
 `;
+
+export const FormControl = forwardRef((props: FormControlProps, ref) => {
+  const { children, ...restProps } = props
+
+  return (
+    <ChakraFormControl display="flex" flexDirection="column" ref={ref} {...restProps}>
+      {children}
+    </ChakraFormControl>
+  )
+});
 
 export const FormGroupContainer = styled.div`
   ${({ theme }) => css`
@@ -91,7 +104,7 @@ interface InputProps extends ChakraInputProps {
 }
 
 export const Input = forwardRef((props: InputProps, ref: Ref<HTMLInputElement>) => (
-  <InputGroup>
+  <InputGroup my="auto">
     {props.leftEl && (
       <ChakraInputLeftElement color="gray.400" padding="12px" fontSize="0.5rem" {...props}>
         {props.leftEl}
@@ -249,6 +262,30 @@ export const DeprecatedInputContainer = styled.div`
     margin-left: 12px;
   }
 `;
+
+
+export const ButtonRadio = forwardRef((props: any, ref) => {
+  const { isChecked, isDisabled, value, text, description, ...rest } = props;
+
+  return (
+    <Button
+      variant="outline"
+      ref={ref}
+      variantColor={isChecked ? 'blue' : 'gray'}
+      aria-checked={isChecked}
+      role="radio"
+      display="block"
+      textAlign="left"
+      py="8px"
+      height="auto"
+      isDisabled={isDisabled}
+      {...rest}
+    >
+      <Paragraph color={!isChecked ? 'gray.600' : 'auto'} fontSize="0.9rem">{text}</Paragraph>
+      <Paragraph color={!isChecked ? 'gray.500' : 'auto'} fontWeight={400} mt={2} fontSize="0.7rem">{description}</Paragraph>
+    </Button>
+  );
+});
 
 
 export const DeprecatedInputStyled = styled.input`
