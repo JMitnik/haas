@@ -192,16 +192,16 @@ const App: FC = () => (
     <ApolloProvider client={client}>
       <CustomerProvider>
         <Router>
-          <AuthProvider>
             <ThemesProvider>
+          <AuthProvider>
               <AppContainer>
                 <ErrorBoundary FallbackComponent={GeneralErrorFallback}>
                   <AppRoutes />
                 </ErrorBoundary>
               </AppContainer>
               <GlobalStyle />
-            </ThemesProvider>
           </AuthProvider>
+            </ThemesProvider>
         </Router>
       </CustomerProvider>
     </ApolloProvider>

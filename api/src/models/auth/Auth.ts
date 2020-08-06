@@ -2,6 +2,7 @@ import { inputObjectType, mutationField } from '@nexus/schema';
 
 import { UserType } from '../users/User';
 import AuthService from './AuthService';
+import { UserInputError } from 'apollo-server-express';
 
 export const RegisterInput = inputObjectType({
   name: 'RegisterInput',
@@ -54,6 +55,15 @@ export const LoginMutation = mutationField('login', {
   args: { input: LoginInput },
 
   async resolve(parent, args) {
-    return null;
+    console.log(args);
+    if (!args.input?.email) throw new UserInputError('login:email_missing');
+    if (!args.input?.password) throw new UserInputError('login:password_missing');
+
+    const user = await AuthService.loginUser({
+      email: args.input?.email,
+      password: args.input?.password
+    });
+
+    return user;
   },
 });

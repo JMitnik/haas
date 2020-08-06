@@ -116,8 +116,10 @@ export interface EdgeConditionInputType {
  * Login credential
  */
 export interface LoginInput {
-  email: string;
-  password: string;
+  input: {
+    email: string;
+    password: string;
+  }
 }
 
 export interface OptionInputType {
