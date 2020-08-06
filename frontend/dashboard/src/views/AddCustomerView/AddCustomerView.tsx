@@ -66,12 +66,6 @@ const AddCustomerView = () => {
         position: 'bottom-right',
         isClosable: true,
       });
-
-      console.error(`Error Name: ${error.name} \n`);
-      console.error(`Error Extra info: ${error.extraInfo} \n`);
-      console.error(`Error message: ${error.message} \n`);
-      console.error(`Error graphql errors: \n ${error.graphQLErrors.forEach((err: Error) => console.error(`\t -${err.message}`))}`);
-      console.error(`Error network error: ${error.networkError} \n`);
     },
     refetchQueries: [{ query: getCustomerQuery }],
   });

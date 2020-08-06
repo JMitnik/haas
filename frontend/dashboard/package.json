@@ -9,6 +9,7 @@
         "@emotion/core": "^10.0.28",
         "@emotion/styled": "^10.0.27",
         "@haas/ui": "*",
+        "@hookform/devtools": "^2.0.4",
         "@hookform/resolvers": "^0.1.0",
         "@nivo/line": "^0.61.1",
         "@react-workspaces/react-scripts": "^3.3.0-alpha-08",
