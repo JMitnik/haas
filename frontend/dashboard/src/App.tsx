@@ -1,5 +1,6 @@
 import { ApolloProvider } from '@apollo/react-hooks';
 import { Redirect, Route, BrowserRouter as Router, Switch } from 'react-router-dom';
+import { ErrorBoundary } from 'react-error-boundary';
 import React, { FC } from 'react';
 
 import { AppContainer } from 'styles/AppStyles';
@@ -17,6 +18,7 @@ import DialogueBuilderPage from 'pages/dashboard/builder';
 import DialoguePage from 'pages/dashboard/dialogues/dialogue';
 import DialoguesPage from 'pages/dashboard/dialogues';
 import EditCustomerView from 'views/EditCustomerView';
+import DashboardLayout from 'layouts/DashboardLayout';
 import EditDialogueView from 'views/EditDialogueView';
 import EditTriggerView from 'views/TriggerOverview/EditTriggerView';
 import EditUserView from 'views/UsersOverview/EditUserView';
@@ -27,11 +29,11 @@ import ThemesProvider from 'providers/ThemeProvider';
 import TriggersOverview from 'views/TriggerOverview/TriggerOverview';
 import UsersOverview from 'views/UsersOverview/UsersOverview';
 
-import { ErrorBoundary } from 'react-error-boundary';
-import DashboardLayout from 'layouts/DashboardLayout';
-
+import AuthProvider from 'providers/AuthProvider';
 import DialogueLayout from 'layouts/DialogueLayout';
 import PreCustomerLayout from 'layouts/PreCustomerLayout';
+import LoginPage from 'pages/login';
+
 import client from './config/apollo';
 
 const AppRoutes = () => (
@@ -170,6 +172,8 @@ const AppRoutes = () => (
 
     <Route path="/dashboard" render={() => <DashboardPage />} />
 
+    <Route path="/login"><LoginPage /></Route>
+
     <Route path="/">
       <Redirect to="/dashboard" />
     </Route>
@@ -188,14 +192,16 @@ const App: FC = () => (
     <ApolloProvider client={client}>
       <CustomerProvider>
         <Router>
-          <ThemesProvider>
-            <AppContainer>
-              <ErrorBoundary FallbackComponent={GeneralErrorFallback}>
-                <AppRoutes />
-              </ErrorBoundary>
-            </AppContainer>
-            <GlobalStyle />
-          </ThemesProvider>
+          <AuthProvider>
+            <ThemesProvider>
+              <AppContainer>
+                <ErrorBoundary FallbackComponent={GeneralErrorFallback}>
+                  <AppRoutes />
+                </ErrorBoundary>
+              </AppContainer>
+              <GlobalStyle />
+            </ThemesProvider>
+          </AuthProvider>
         </Router>
       </CustomerProvider>
     </ApolloProvider>

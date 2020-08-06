@@ -59,7 +59,7 @@ export const LinkType = objectType({
 
         if (!link?.questionNode) throw new Error('Unable to find related node');
 
-        return link?.questionNode;
+        return link?.questionNode as any;
       },
     });
   },

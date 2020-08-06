@@ -1,10 +1,31 @@
 import { User, UserWhereInput } from '@prisma/client';
 import _ from 'lodash';
 
+import { NexusGenFieldTypes, NexusGenInputs, NexusGenTypes } from '../../generated/nexus';
 import { Nullable } from '../../types/generic';
+
 import prisma from '../../prisma';
 
+interface CreateUserOptions {
+  customerSlug?: string;
+}
+
 class UserService {
+  static async createUser(userInput: NexusGenInputs['UserInput'], customerSlug: string) {
+    // TODO: Connect to multile customers
+    const user = await prisma.user.create({
+      data: {
+        email: userInput.email,
+        password: userInput.password,
+        firstName: userInput.firstName || 'Anonymous',
+        lastName: userInput.lastName || 'User',
+        phone: userInput.phone || '000',
+      },
+    });
+
+    return user;
+  }
+
   static getSearchTermFilter = (searchTerm: string) => {
     if (!searchTerm) {
       return [];
@@ -20,9 +41,10 @@ class UserService {
       {
         email: { contains: searchTerm },
       },
-      {
-        role: { name: { contains: searchTerm } },
-      },
+      // TODO: Bring back role search
+      // {
+      //   role: { name: { contains: searchTerm } },
+      // },
     ];
 
     return searchTermFilter;
@@ -67,7 +89,7 @@ class UserService {
     searchTerm?: Nullable<string>,
   ) => {
     let needPageReset = false;
-    const userWhereInput: UserWhereInput = { Customer: { slug: customerSlug } };
+    const userWhereInput: UserWhereInput = { customers: { every: { AND: { customer: { slug: customerSlug } } } } };
     const searchTermFilter = UserService.getSearchTermFilter(searchTerm || '');
 
     if (searchTermFilter.length > 0) {
@@ -78,9 +100,9 @@ class UserService {
     const users = await prisma.user.findMany({
       where: userWhereInput,
       include: {
-        role: {
-          select: {
-            name: true,
+        customers: {
+          include: {
+            role: true,
           },
         },
       },
@@ -93,10 +115,11 @@ class UserService {
       needPageReset = true;
     }
     // Order filtered users
-    const orderedUsers = UserService.orderUsersBy(users, orderBy);
+    // TODO: Brign it back
+    // const orderedUsers = UserService.orderUsersBy(users, orderBy);
 
     // Slice ordered filtered users
-    const slicedOrderedUsers = UserService.sliceUsers(orderedUsers, (offset || 0), (limit || 0), (pageIndex || 0));
+    const slicedOrderedUsers = UserService.sliceUsers(users, (offset || 0), (limit || 0), (pageIndex || 0));
 
     return {
       users: slicedOrderedUsers,

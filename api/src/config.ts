@@ -1,6 +1,7 @@
 require('dotenv').config();
 
 export interface ConfigProps {
+  jwtSecret: string;
   env: string;
   port: number;
   endpoint: string;
@@ -21,7 +22,10 @@ export interface ConfigProps {
   twilioAuthToken: string;
 }
 
+if (!process.env.JWT_SECRET) throw new Error('Ensure you set a JWT secret in your env');
+
 const config: ConfigProps = {
+  jwtSecret: process.env.JWT_SECRET,
   env: process.env.ENVIRONMENT || 'local',
   port: Number(process.env.PORT) || 4000,
   endpoint: process.env.APP_ENDPOINT || '/graphql',

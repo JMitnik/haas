@@ -41,12 +41,12 @@ export const UserTable = objectType({
 export const UserInput = inputObjectType({
   name: 'UserInput',
   definition(t) {
-    t.string('email');
+    t.string('email', { required: true });
+    t.string('password', { required: true });
+    t.string('firstName', { nullable: true });
     t.string('roleId');
     t.string('customerId', { nullable: true });
-    t.string('firstName', { nullable: true });
     t.string('lastName', { nullable: true });
-    t.string('password', { nullable: true });
     t.string('phone', { nullable: true });
   },
 });
@@ -90,7 +90,9 @@ export const UserQueries = extendType({
 
       resolve(parent, args, ctx) {
         if (!args.customerSlug) throw new Error('No business provided');
-        return ctx.prisma.user.findMany({ where: { Customer: { slug: args.customerSlug } } });
+        return ctx.prisma.user.findMany({ where: { customers: {
+          every: { customer: { slug: args.customerSlug || undefined } },
+        } } });
       },
     });
 
@@ -122,24 +124,22 @@ export const UserMutations = extendType({
         if (!args.customerSlug) throw new Error('No customer scope provided');
         if (!args.input) throw new Error('No input provided');
 
-        const { firstName, lastName, email, phone, roleId } = args.input;
+        const { firstName, lastName, email, password, phone, roleId } = args.input;
 
         if (!email) throw new Error('No valid email provided');
+        if (!password) throw new Error('No password provided');
 
         return ctx.prisma.user.create({
           data: {
             email,
             firstName,
+            password,
             lastName,
             phone,
-            role: {
-              connect: {
-                id: roleId || undefined,
-              },
-            },
-            Customer: {
-              connect: {
-                slug: args.customerSlug,
+            customers: {
+              create: {
+                customer: { connect: { id: args.input.customerId || undefined } },
+                role: { connect: { id: roleId || undefined } },
               },
             },
           },
@@ -169,11 +169,6 @@ export const UserMutations = extendType({
             lastName,
             phone,
             email,
-            role: {
-              connect: {
-                id: roleId || undefined,
-              },
-            },
           },
         });
       },

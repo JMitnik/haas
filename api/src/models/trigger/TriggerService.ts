@@ -5,7 +5,6 @@ import {
   TriggerUpdateInput,
   TriggerWhereInput,
   User,
-  UserUpdateManyWithoutTriggersInput,
   UserWhereUniqueInput,
 } from '@prisma/client';
 import { isAfter, subSeconds } from 'date-fns';
@@ -348,7 +347,7 @@ class TriggerService {
       }
     });
 
-    const recipientUpdateArgs: UserUpdateManyWithoutTriggersInput = {};
+    const recipientUpdateArgs: any = {};
     if (newRecipientObjects.length > 0) {
       recipientUpdateArgs.connect = newRecipientObjects;
     }

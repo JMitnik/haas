@@ -153,9 +153,8 @@ export const CustomerMutations = Upload && extendType({
             folder: 'company_logos',
           },
           (error, result: UploadApiResponse | undefined) => {
-            if (result) {
-              return resolve(result);
-            }
+            if (result) return resolve(result);
+
             return reject(error);
           });
 
@@ -163,8 +162,8 @@ export const CustomerMutations = Upload && extendType({
         });
 
         const result = await stream;
-        const { url } = result;
-        return { filename, mimetype, encoding, url };
+        const { secure_url } = result;
+        return { filename, mimetype, encoding, url: secure_url };
       },
     });
     t.field('createCustomer', {
