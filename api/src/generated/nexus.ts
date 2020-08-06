@@ -4,7 +4,6 @@
  */
 
 import * as APIContext from "../types/APIContext"
-import * as prisma from "@prisma/client"
 import { core } from "@nexus/schema"
 declare global {
   interface NexusGenCustomInputMethods<TypeName extends string> {
@@ -187,22 +186,49 @@ export interface NexusGenEnums {
   PaginationSortByEnum: "createdAt" | "email" | "firstName" | "id" | "lastName" | "medium" | "name" | "paths" | "role" | "score" | "type" | "user" | "when"
   QuestionNodeTypeEnum: "CHOICE" | "GENERIC" | "LINK" | "REGISTRATION" | "SLIDER" | "TEXTBOX"
   TagTypeEnum: "AGENT" | "DEFAULT" | "LOCATION"
-  TriggerConditionEnum: prisma.TriggerConditionEnum
+  TriggerConditionEnum: "HIGH_THRESHOLD" | "INNER_RANGE" | "LOW_THRESHOLD" | "OUTER_RANGE" | "TEXT_MATCH"
   TriggerMediumEnum: "BOTH" | "EMAIL" | "PHONE"
   TriggerTypeEnum: "QUESTION" | "SCHEDULED"
 }
 
 export interface NexusGenRootTypes {
-  ColourSettings: prisma.ColourSettings;
-  Customer: prisma.Customer;
-  CustomerSettings: prisma.CustomerSettings;
-  Dialogue: prisma.Dialogue;
+  ColourSettings: { // root type
+    id: string; // ID!
+    primary: string; // String!
+    primaryAlt?: string | null; // String
+    secondary?: string | null; // String
+  }
+  Customer: { // root type
+    id: string; // ID!
+    name: string; // String!
+    slug: string; // String!
+  }
+  CustomerSettings: { // root type
+    id: string; // ID!
+    logoUrl?: string | null; // String
+  }
+  Dialogue: { // root type
+    creationDate?: string | null; // String
+    customerId: string; // String!
+    description: string; // String!
+    id: string; // ID!
+    publicTitle?: string | null; // String
+    slug: string; // String!
+    title: string; // String!
+    updatedAt?: string | null; // String
+  }
   DialogueStatistics: { // root type
     history?: NexusGenRootTypes['lineChartDataType'][] | null; // [lineChartDataType!]
     topNegativePath?: NexusGenRootTypes['topPathType'][] | null; // [topPathType!]
     topPositivePath?: NexusGenRootTypes['topPathType'][] | null; // [topPathType!]
   }
-  Edge: prisma.Edge;
+  Edge: { // root type
+    childNodeId: string; // String!
+    createdAt: string; // String!
+    id: string; // ID!
+    parentNodeId: string; // String!
+    updatedAt: string; // String!
+  }
   EdgeCondition: { // root type
     conditionType: string; // String!
     edgeId?: string | null; // String
@@ -211,7 +237,9 @@ export interface NexusGenRootTypes {
     renderMax?: number | null; // Int
     renderMin?: number | null; // Int
   }
-  FontSettings: prisma.FontSettings;
+  FontSettings: { // root type
+    id: string; // ID!
+  }
   ImageType: { // root type
     encoding?: string | null; // String
     filename?: string | null; // String
@@ -228,7 +256,12 @@ export interface NexusGenRootTypes {
     url: string; // String!
   }
   Mutation: {};
-  NodeEntry: prisma.NodeEntry;
+  NodeEntry: { // root type
+    creationDate: string; // String!
+    id?: string | null; // ID
+    relatedEdgeId?: string | null; // String
+    relatedNodeId?: string | null; // String
+  }
   NodeEntryValue: { // root type
     choiceNodeEntry?: string | null; // String
     linkNodeEntry?: string | null; // String
@@ -247,8 +280,20 @@ export interface NexusGenRootTypes {
     name: string; // String!
   }
   Query: {};
-  QuestionNode: prisma.QuestionNode;
-  QuestionOption: prisma.QuestionOption;
+  QuestionNode: { // root type
+    creationDate?: string | null; // String
+    id: string; // ID!
+    isLeaf: boolean; // Boolean!
+    isRoot: boolean; // Boolean!
+    overrideLeafId?: string | null; // String
+    title: string; // String!
+    type: NexusGenEnums['QuestionNodeTypeEnum']; // QuestionNodeTypeEnum!
+  }
+  QuestionOption: { // root type
+    id: number; // Int!
+    publicValue?: string | null; // String
+    value: string; // String!
+  }
   RoleConnection: { // root type
     endDate?: string | null; // String
     limit: number; // Int!
@@ -265,7 +310,11 @@ export interface NexusGenRootTypes {
     nrPermissions?: number | null; // Int
     roleId?: string | null; // String
   }
-  Session: prisma.Session;
+  Session: { // root type
+    createdAt: string; // String!
+    dialogueId: string; // String!
+    id: string; // ID!
+  }
   SessionConnection: { // root type
     endDate?: string | null; // String
     limit: number; // Int!
@@ -274,7 +323,12 @@ export interface NexusGenRootTypes {
     sessions: NexusGenRootTypes['Session'][]; // [Session!]!
     startDate?: string | null; // String
   }
-  Tag: prisma.Tag;
+  Tag: { // root type
+    customerId: string; // String!
+    id: string; // ID!
+    name: string; // String!
+    type: NexusGenEnums['TagTypeEnum']; // TagTypeEnum!
+  }
   TriggerConditionType: { // root type
     id: number; // Int!
     maxValue?: number | null; // Int

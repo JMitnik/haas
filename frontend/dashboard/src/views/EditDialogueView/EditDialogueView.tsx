@@ -1,27 +1,22 @@
 import * as yup from 'yup';
 import { ApolloError, gql } from 'apollo-boost';
-import { MinusCircle, PlusCircle } from 'react-feather';
+import { Button, ButtonGroup, FormErrorMessage, Stack } from '@chakra-ui/core';
+import { Minus, MinusCircle, Plus, PlusCircle, Type } from 'react-feather';
+import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { useHistory, useParams } from 'react-router';
 import { useMutation, useQuery } from '@apollo/react-hooks';
+import ServerError from 'components/ServerError';
 import styled, { css } from 'styled-components/macro';
 
-import { Button, Div, ErrorStyle, Flex,
-  Grid, H2, H3, H4, Hr, Label, Muted,
-  StyledInput, StyledTextInput } from '@haas/ui';
+import { Container, Div, ErrorStyle, Flex, Form, FormContainer, FormControl, FormLabel,
+  FormSection, H2, H3, Hr, Input, InputGrid, InputHelper, Muted, Textarea } from '@haas/ui';
 import { yupResolver } from '@hookform/resolvers';
 import React, { useEffect, useState } from 'react';
 import Select from 'react-select';
 import editDialogueMutation from 'mutations/editDialogue';
 import getQuestionnairesCustomerQuery from 'queries/getDialoguesOfCustomer';
 import getTagsQuery from 'queries/getTags';
-
-interface FormDataProps {
-  title: string;
-  description: string;
-  publicTitle?: string;
-  tags: Array<string>;
-}
 
 interface EditDialogueFormProps {
   dialogue: any;
@@ -60,6 +55,7 @@ interface FormDataProps {
 
 const schema = yup.object().shape({
   title: yup.string().required(),
+  slug: yup.string().required('Slug is required'),
   publicTitle: yup.string().notRequired(),
   description: yup.string().required(),
   tags: yup.array().of(yup.string().min(1).required()).notRequired(),
@@ -96,12 +92,13 @@ const EditDialogueView = () => {
 
 const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFormProps) => {
   const history = useHistory();
-  const { register, handleSubmit, errors, setValue, getValues } = useForm<FormDataProps>({
+  const form = useForm<FormDataProps>({
     resolver: yupResolver(schema),
+    mode: 'onChange',
   });
   const { customerSlug, dialogueSlug } = useParams();
 
-  const [editDialogue, { loading }] = useMutation(editDialogueMutation, {
+  const [editDialogue, { error: serverError, loading: isLoading }] = useMutation(editDialogueMutation, {
     onCompleted: () => {
       history.push(`/dashboard/b/${customerSlug}/d`);
     },
@@ -118,8 +115,8 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFo
 
   useEffect(() => {
     const mappedTags = currentTags.map(({ value }) => value);
-    setValue('tags', mappedTags);
-  }, [setValue]);
+    form.setValue('tags', mappedTags);
+  }, []);
 
   const onSubmit = (formData: FormDataProps) => {
     const tagIds = activeTags.map((tag) => tag?.value);
@@ -138,7 +135,7 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFo
   };
 
   const setTags = (qOption: { label: string, value: string }, index: number) => {
-    setValue(`tags[${index}]`, qOption?.value);
+    form.setValue(`tags[${index}]`, qOption?.value);
     setActiveTags((prevTags) => {
       prevTags[index] = qOption;
       return [...prevTags];
@@ -153,115 +150,163 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFo
   };
 
   return (
-    <>
+    <Container>
+
       <Div>
-        <H2 color="default.darkest" fontWeight={500} py={2}> Dialogue </H2>
-        <Muted pb={4}>Edit a dialogue</Muted>
+        <H2 color="gray.700" mb={4} py={2}>Edit dialogue</H2>
       </Div>
+      <motion.div initial={{ opacity: 0, y: 100 }} animate={{ opacity: 1, y: 0 }}>
 
-      <Hr />
-
-      <Form onSubmit={handleSubmit(onSubmit)}>
-        <FormGroupContainer>
-          <Grid gridTemplateColumns={['1fr', '3fr 4fr']} gridColumnGap={4}>
-            <Div py={4} pr={4}>
-              <H3 color="default.text" fontWeight={500} pb={2}>General dialogue information</H3>
-              <Muted>
-                General information about your dialogue such as title, description, etc.
-              </Muted>
-            </Div>
-            <Div py={4}>
-              <Grid gridTemplateColumns={['1fr', '1fr 1fr']}>
-                <Flex flexDirection="column">
-                  <Label>Title</Label>
-                  <StyledInput isInvalid={!!errors.title} defaultValue={dialogue?.title} name="title" ref={register({ required: true })} />
-                  {errors.title && <Muted color="warning">{errors.title.message}</Muted>}
-                </Flex>
-                <Div useFlex pl={4} flexDirection="column">
-                  <Label>Public Title</Label>
-                  <StyledInput
-                    isInvalid={!!errors.publicTitle}
-                    defaultValue={dialogue?.publicTitle}
-                    name="publicTitle"
-                    ref={register({ required: false })}
-                  />
-                  {errors.publicTitle && <Muted color="warning">{errors.publicTitle.message}</Muted>}
-                </Div>
-              </Grid>
-              <Div py={4}>
-                <Flex flexDirection="column">
-                  <Label>Description</Label>
-                  <StyledTextInput
-                    isInvalid={!!errors.description}
-                    defaultValue={dialogue?.description}
-                    name="description"
-                    ref={register({ required: true })}
-                  />
-                  {errors.description && <Muted color="warning">{errors.description.message}</Muted>}
-                </Flex>
+        <FormContainer>
+          <Form onSubmit={form.handleSubmit(onSubmit)}>
+            <ServerError serverError={serverError} />
+            <FormSection id="general">
+              <Div>
+                <H3 color="default.text" fontWeight={500} pb={2}>About dialogue</H3>
+                <Muted color="gray.600">
+                  Tell us a bit about the dialogue
+                </Muted>
               </Div>
-              <Div gridColumn="1 / -1">
-                <Flex flexDirection="row" alignItems="center" justifyContent="space-between">
-                  <H4>Tags</H4>
-                  <PlusCircle onClick={() => setActiveTags((prevTags) => [...prevTags, null])} />
-                </Flex>
-                <Hr />
-                <Div marginTop={15}>
+              <Div>
+                <InputGrid>
+                  <FormControl isRequired isInvalid={!!form.errors.title}>
+                    <FormLabel htmlFor="title">Title</FormLabel>
+                    <InputHelper>What is the name of the dialogue?</InputHelper>
+                    <Input
+                      placeholder="Peaches or apples?"
+                      leftEl={<Type />}
+                      defaultValue={dialogue?.title}
+                      name="name"
+                      ref={form.register({ required: true })}
+                    />
+                    <FormErrorMessage>{form.errors.title?.message}</FormErrorMessage>
+                  </FormControl>
 
-                  {activeTags?.map((tag, index) => (
-                    <Flex marginBottom="4px" alignItems="center" key={index} gridColumn="1 / -1">
-                      <Div
-                        data-cy="SelectOptions"
-                        flexGrow={9}
-                      >
-                        <Select
-                          styles={errors.tags?.[index] && !activeTags?.[index] ? ErrorStyle : undefined}
-                          id={`tags[${index}]`}
-                          key={index}
-                          ref={() => register({
-                            name: `tags[${index}]`,
-                            required: true,
-                            minLength: 1,
-                          })}
-                          options={tagOptions}
-                          value={tag}
-                          onChange={(qOption: any) => {
-                            setTags(qOption, index);
-                          }}
-                        />
-                        {errors.tags?.[index] && !activeTags?.[index] && <Muted color="warning">{errors.tags?.[index]?.message}</Muted>}
-                      </Div>
-                      <Flex justifyContent="center" alignContent="center" flexGrow={1}>
-                        <MinusCircle onClick={() => deleteTag(index)} />
+                  <FormControl isInvalid={!!form.errors.publicTitle}>
+                    <FormLabel htmlFor="publicTitle">Public title</FormLabel>
+                    <InputHelper>
+                      (Optional): If set, will be used instead of the actual title to the user instead.
+                    </InputHelper>
+                    <Input
+                      placeholder="Peaches > Apples?"
+                      leftEl={<Type />}
+                      defaultValue={dialogue?.publicTitle}
+                      name="publicTitle"
+                      ref={form.register({ required: false })}
+                    />
+                    <FormErrorMessage>{form.errors.publicTitle?.message}</FormErrorMessage>
+                  </FormControl>
+
+                  <FormControl isRequired isInvalid={!!form.errors.description}>
+                    <FormLabel htmlFor="title">Description</FormLabel>
+                    <InputHelper>
+                      How would you describe the dialogue?
+                    </InputHelper>
+                    <Textarea
+                      placeholder="Describe your dialogue"
+                      defaultValue={dialogue?.description}
+                      name="description"
+                      ref={form.register({ required: true })}
+                    />
+                    <FormErrorMessage>{form.errors.title?.message}</FormErrorMessage>
+                  </FormControl>
+
+                  <FormControl isRequired isInvalid={!!form.errors.slug}>
+                    <FormLabel htmlFor="slug">Slug</FormLabel>
+                    <InputHelper>Under which url segment will visitors find the business?</InputHelper>
+                    <Input
+                      placeholder="peaches-or-apples"
+                      leftAddOn={`https://client.haas.live/${customerSlug}`}
+                      defaultValue={dialogue?.slug}
+                      name="slug"
+                      ref={form.register({ required: true })}
+                    />
+                    <FormErrorMessage>{form.errors.slug?.message}</FormErrorMessage>
+                  </FormControl>
+
+                </InputGrid>
+              </Div>
+            </FormSection>
+
+            <Hr />
+
+            <FormSection id="tags">
+              <Div>
+                <H3 color="default.text" fontWeight={500} pb={2}>Tags</H3>
+                <Muted color="gray.600">
+                  Would you like to assign tags to associate your dialogue with?
+                </Muted>
+              </Div>
+              <Div>
+                <InputGrid gridTemplateColumns="1fr">
+                  <Div>
+                    <Button
+                      leftIcon={Plus}
+                      onClick={() => setActiveTags((prevTags) => [...prevTags, null])}
+                    >
+                      Add tag
+                    </Button>
+                  </Div>
+
+                  <Stack>
+                    {activeTags?.map((tag, index) => (
+                      <Flex marginBottom="4px" alignItems="center" key={index} gridColumn="1 / -1">
+                        <Div
+                          data-cy="SelectOptions"
+                          flexGrow={9}
+                        >
+                          <Select
+                            styles={form.errors.tags?.[index] && !activeTags?.[index] ? ErrorStyle : undefined}
+                            id={`tags[${index}]`}
+                            key={index}
+                            ref={() => form.register({
+                              name: `tags[${index}]`,
+                              required: false,
+                              minLength: 1,
+                            })}
+                            options={tagOptions}
+                            value={tag}
+                            onChange={(qOption: any) => {
+                              setTags(qOption, index);
+                            }}
+                          />
+                          <FormErrorMessage>{form.errors.tags?.[index]?.message}</FormErrorMessage>
+                        </Div>
+                        <Flex justifyContent="center" alignContent="center" flexGrow={1}>
+                          <Button
+                            size="xs"
+                            variantColor="red"
+                            variant="outline"
+                            leftIcon={Minus}
+                            onClick={() => deleteTag(index)}
+                          >
+                            Remove
+                          </Button>
+                        </Flex>
                       </Flex>
-                    </Flex>
-                  ))}
+                    ))}
+                  </Stack>
+                </InputGrid>
 
-                </Div>
               </Div>
-            </Div>
-          </Grid>
-        </FormGroupContainer>
+            </FormSection>
 
-        <Div>
-          {loading && (<Muted>Loading...</Muted>)}
-
-          <Flex>
-            <Button brand="primary" mr={2} type="submit">Save dialogue</Button>
-            <Button brand="default" type="button" onClick={() => history.goBack()}>Cancel</Button>
-          </Flex>
-        </Div>
-      </Form>
-    </>
+            <ButtonGroup>
+              <Button
+                isLoading={isLoading}
+                isDisabled={!form.formState.isValid}
+                variantColor="teal"
+                type="submit"
+              >
+                Create
+              </Button>
+              <Button variant="outline" onClick={() => history.push('/')}>Cancel</Button>
+            </ButtonGroup>
+          </Form>
+        </FormContainer>
+      </motion.div>
+    </Container>
   );
 };
-
-const FormGroupContainer = styled.div`
-  ${({ theme }) => css`
-    padding-bottom: ${theme.gutter * 3}px;
-  `}
-`;
-
-const Form = styled.form``;
 
 export default EditDialogueView;
