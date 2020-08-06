@@ -10,9 +10,9 @@ import { useToast } from '@chakra-ui/core';
 import { yupResolver } from '@hookform/resolvers';
 import React from 'react';
 
+import CustomerForm from 'components/CustomerForm';
 import parseOptionalBoolean from 'utils/parseOptionalBoolean';
 
-import CustomerForm from 'components/CustomerForm';
 import { createNewCustomer } from '../../mutations/createNewCustomer';
 import getCustomerQuery from '../../queries/getCustomersQuery';
 
@@ -20,7 +20,6 @@ interface FormDataProps {
   name: string;
   slug: string;
   logo?: string;
-  // cloudinary?: File;
   primaryColour?: string;
   useCustomUrl?: number;
   uploadLogo?: string;

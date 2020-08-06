@@ -128,9 +128,13 @@ interface CustomerFormProps {
   onFormSubmit: any;
   serverErrors: any;
   isLoading: any;
+
+  // Customer-specific
+  // eslint-disable-next-line react/require-default-props
+  willShowTemplate?: boolean;
 }
 
-const CustomerForm = ({ form, onFormSubmit, isLoading, serverErrors }: CustomerFormProps) => {
+const CustomerForm = ({ form, onFormSubmit, isLoading, serverErrors, willShowTemplate = true }: CustomerFormProps) => {
   const history = useHistory();
 
   return (
@@ -201,36 +205,40 @@ const CustomerForm = ({ form, onFormSubmit, isLoading, serverErrors }: CustomerF
         </Div>
       </FormSection>
 
-      <Hr />
+      {willShowTemplate && (
+        <>
+          <Hr />
 
-      <FormSection id="template">
-        <Div>
-          <H3 color="default.text" fontWeight={500} pb={2}>Template</H3>
-          <Muted color="gray.600">
-            Choose whether you have a preference what to start with.
-          </Muted>
-        </Div>
-        <Div>
-          <InputGrid>
-            <FormControl>
-              <FormLabel>Use template</FormLabel>
-              <InputHelper>Start the onboarding with a pre-existing template, or start clean.</InputHelper>
-              <Controller
-                name="seed"
-                render={({ onChange, onBlur, value }) => (
-                  <BooleanRadioInput onBlur={onBlur} value={value} onChange={onChange}>
-                    <ButtonRadio value={1} text="Custom template" description="Start with a default dialogue" />
-                    <ButtonRadio value={0} text="Fresh start" description="Start with a clean slate" />
-                  </BooleanRadioInput>
-                )}
-                control={form.control}
-                defaultValue={1}
-              />
+          <FormSection id="template">
+            <Div>
+              <H3 color="default.text" fontWeight={500} pb={2}>Template</H3>
+              <Muted color="gray.600">
+                Choose whether you have a preference what to start with.
+              </Muted>
+            </Div>
+            <Div>
+              <InputGrid>
+                <FormControl>
+                  <FormLabel>Use template</FormLabel>
+                  <InputHelper>Start the onboarding with a pre-existing template, or start clean.</InputHelper>
+                  <Controller
+                    name="seed"
+                    render={({ onChange, onBlur, value }) => (
+                      <BooleanRadioInput onBlur={onBlur} value={value} onChange={onChange}>
+                        <ButtonRadio value={1} text="Custom template" description="Start with a default dialogue" />
+                        <ButtonRadio value={0} text="Fresh start" description="Start with a clean slate" />
+                      </BooleanRadioInput>
+                    )}
+                    control={form.control}
+                    defaultValue={1}
+                  />
 
-            </FormControl>
-          </InputGrid>
-        </Div>
-      </FormSection>
+                </FormControl>
+              </InputGrid>
+            </Div>
+          </FormSection>
+        </>
+      )}
 
       <ButtonGroup>
         <Button

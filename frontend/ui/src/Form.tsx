@@ -13,6 +13,7 @@ import {
   InputProps as ChakraInputProps,
   InputGroupProps,
   FormControlProps,
+  Textarea as ChakraTextArea,
   RadioButtonGroup} from '@chakra-ui/core';
 import styled, { css } from 'styled-components';
 import { SpaceProps, GridProps } from 'styled-system';
@@ -105,8 +106,12 @@ interface InputProps extends ChakraInputProps {
   rightAddOn?: ReactNode;
 }
 
+export const Textarea = forwardRef((props: ChakraInputProps<HTMLTextAreaElement>, ref: Ref<HTMLTextAreaElement>) => (
+  <ChakraTextArea {...props} fontSize="0.8rem" ref={ref} />
+));
+
 export const Input = forwardRef((props: InputProps, ref: Ref<HTMLInputElement>) => (
-  <InputGroup my="auto">
+  <InputGroup>
     {props.leftEl && (
       <ChakraInputLeftElement color="gray.400" padding="12px" fontSize="0.5rem" {...props}>
         {props.leftEl}
