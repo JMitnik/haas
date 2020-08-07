@@ -1,12 +1,14 @@
 import { ArrowRightCircle } from 'react-feather';
-import { ColumnFlex, Div, Flex, Span } from '@haas/ui';
+import React from 'react';
+import styled, { css } from 'styled-components/macro';
+import { ColumnFlex, Div, Flex, Span, Card } from '@haas/ui';
 import { LinkProps, NavLink, useHistory } from 'react-router-dom';
+import { Avatar as ChakraAvatar, AvatarBadge } from '@chakra-ui/core';
+
 import { UserProps } from 'types/generic';
 import { useCustomer } from 'providers/CustomerProvider';
 import Avatar from 'components/Avatar';
 import Logo from 'components/Logo';
-import React from 'react';
-import styled, { css } from 'styled-components/macro';
 
 interface NavItemProps extends LinkProps { }
 
@@ -81,6 +83,11 @@ const UsernavContainer = styled.div`
     display: flex;
     align-items: center;
     color: ${theme.colors.app.mutedAltOnWhite};
+
+    ${Card} {
+      border-radius: 5px;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    }
   `}
 `;
 
@@ -111,27 +118,23 @@ export const Usernav = ({ user }: { user: UserProps }) => {
   };
 
   return (
-    <UsernavContainer>
-      <Avatar name={user.firstName} />
-      <Div ml={4}>
-        <ColumnFlex>
-          <Span fontSize="0.9rem">
-            <Span color="app.mutedAltOnWhite" display="block">
-              {`${user.firstName} ${user.lastName}`}
+    <UsernavContainer onClick={() => goToDialoguesOverview()}>
+      <Card border="1px solid" borderColor="red.900"  useFlex alignItems="center" padding={2}>
+        <ChakraAvatar bg="gray.300" size="md" name={`${user.firstName} ${user.lastName}`}>
+          <AvatarBadge size="1em" bg="green.400" />
+        </ChakraAvatar>
+
+        <Div ml={4}>
+          <ColumnFlex>
+            <Span>
+              <Span color="app.mutedAltOnWhite" fontSize="0.8rem" display="block">
+                {`${user.firstName} ${user.lastName}`}
+              </Span>
             </Span>
-            <BusinessFlex onClick={() => goToDialoguesOverview()}>
-              <BusinessSpan color="app.mutedOnWhite">
-                {`${user.business.name}`}
-              </BusinessSpan>
-              <ArrowContainer>
-                <ArrowRightCircle />
-              </ArrowContainer>
 
-            </BusinessFlex>
-          </Span>
-
-        </ColumnFlex>
-      </Div>
+          </ColumnFlex>
+        </Div>
+      </Card>
     </UsernavContainer>
   );
 };

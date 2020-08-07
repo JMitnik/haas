@@ -40,11 +40,11 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const [storageCustomer] = useLocalStorage('customer', '');
   const { user } = useAuth();
 
-  const sampleUser: UserProps = {
+  const userData: UserProps = {
     firstName: user.firstName || 'Test',
     lastName: user.lastName || 'User',
     business: {
-      name: activeCustomer?.name || storageCustomer?.name || 'Starbucks',
+      name: activeCustomer?.name || storageCustomer?.name || '',
     },
   };
 
@@ -78,7 +78,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
             </NavItems>
           </Div>
 
-          <Usernav user={sampleUser} />
+          <Usernav user={userData} />
         </Sidenav>
       </Div>
 
