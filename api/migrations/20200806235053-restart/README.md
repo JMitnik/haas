@@ -1,82 +1,48 @@
-# Migration `20200803101458-restart`
+# Migration `20200806235053-restart`
 
-This migration has been generated at 8/3/2020, 10:14:58 AM.
+This migration has been generated at 8/6/2020, 11:50:53 PM.
 You can check out the [state of the schema](./schema.prisma) after the migration.
 
 ## Database Steps
 
 ```sql
-ALTER TABLE "public"."Tag" ALTER COLUMN "type" DROP DEFAULT;
+DROP INDEX "public"."User.customerId_email"
 
-ALTER TABLE "public"."Trigger" ALTER COLUMN "type" DROP DEFAULT;
+ALTER TABLE "public"."User" DROP CONSTRAINT "User_customerId_fkey"
 
-ALTER TABLE "public"."TriggerCondition" ALTER COLUMN "type" DROP DEFAULT;
+ALTER TABLE "public"."User" DROP CONSTRAINT "User_roleId_fkey"
 
-CREATE UNIQUE INDEX "ChoiceNodeEntry_nodeEntryId" ON "public"."ChoiceNodeEntry"("nodeEntryId")
+CREATE TABLE "public"."UserOfCustomer" (
+"userId" text  NOT NULL ,
+"customerId" text  NOT NULL ,
+"roleId" text  NOT NULL ,
+"createdAt" timestamp(3)  NOT NULL DEFAULT CURRENT_TIMESTAMP,
+PRIMARY KEY ("userId","customerId"))
 
-CREATE UNIQUE INDEX "Customer.slug" ON "public"."Customer"("slug")
+ALTER TABLE "public"."QuestionNode" ALTER COLUMN "updatedAt" SET NOT NULL;
 
-CREATE UNIQUE INDEX "CustomerSettings.customerId" ON "public"."CustomerSettings"("customerId")
+ALTER TABLE "public"."User" DROP COLUMN "customerId",
+DROP COLUMN "roleId",
+ADD COLUMN "password" text  NOT NULL ,
+ADD COLUMN "isSuperAdmin" boolean  NOT NULL DEFAULT false;
 
-CREATE UNIQUE INDEX "CustomerSettings_colourSettingsId" ON "public"."CustomerSettings"("colourSettingsId")
+CREATE UNIQUE INDEX "User.email" ON "public"."User"("email")
 
-CREATE UNIQUE INDEX "CustomerSettings_fontSettingsId" ON "public"."CustomerSettings"("fontSettingsId")
+ALTER TABLE "public"."UserOfCustomer" ADD FOREIGN KEY ("userId")REFERENCES "public"."User"("id") ON DELETE CASCADE ON UPDATE CASCADE
 
-CREATE UNIQUE INDEX "Dialogue.slug_customerId" ON "public"."Dialogue"("slug","customerId")
+ALTER TABLE "public"."UserOfCustomer" ADD FOREIGN KEY ("customerId")REFERENCES "public"."Customer"("id") ON DELETE CASCADE ON UPDATE CASCADE
 
-CREATE UNIQUE INDEX "_DialogueToTag_AB_unique" ON "public"."_DialogueToTag"("A","B")
-
-CREATE  INDEX "_DialogueToTag_B_index" ON "public"."_DialogueToTag"("B")
-
-CREATE UNIQUE INDEX "LinkNodeEntry_nodeEntryId" ON "public"."LinkNodeEntry"("nodeEntryId")
-
-CREATE UNIQUE INDEX "_PermissionToRole_AB_unique" ON "public"."_PermissionToRole"("A","B")
-
-CREATE  INDEX "_PermissionToRole_B_index" ON "public"."_PermissionToRole"("B")
-
-CREATE UNIQUE INDEX "RegistrationNodeEntry_nodeEntryId" ON "public"."RegistrationNodeEntry"("nodeEntryId")
-
-CREATE UNIQUE INDEX "Role.id_name" ON "public"."Role"("id","name")
-
-CREATE UNIQUE INDEX "SliderNodeEntry_nodeEntryId" ON "public"."SliderNodeEntry"("nodeEntryId")
-
-CREATE UNIQUE INDEX "TextboxNodeEntry_nodeEntryId" ON "public"."TextboxNodeEntry"("nodeEntryId")
-
-CREATE UNIQUE INDEX "_TriggerToUser_AB_unique" ON "public"."_TriggerToUser"("A","B")
-
-CREATE  INDEX "_TriggerToUser_B_index" ON "public"."_TriggerToUser"("B")
-
-CREATE UNIQUE INDEX "User.customerId_email" ON "public"."User"("customerId","email")
-
-ALTER TABLE "public"."ChoiceNodeEntry" ADD FOREIGN KEY ("nodeEntryId")REFERENCES "public"."NodeEntry"("id") ON DELETE CASCADE  ON UPDATE CASCADE
-
-ALTER TABLE "public"."Link" ADD FOREIGN KEY ("questionNodeId")REFERENCES "public"."QuestionNode"("id") ON DELETE SET NULL  ON UPDATE CASCADE
-
-ALTER TABLE "public"."LinkNodeEntry" ADD FOREIGN KEY ("nodeEntryId")REFERENCES "public"."NodeEntry"("id") ON DELETE CASCADE  ON UPDATE CASCADE
-
-ALTER TABLE "public"."RegistrationNodeEntry" ADD FOREIGN KEY ("nodeEntryId")REFERENCES "public"."NodeEntry"("id") ON DELETE CASCADE  ON UPDATE CASCADE
-
-ALTER TABLE "public"."SliderNodeEntry" ADD FOREIGN KEY ("nodeEntryId")REFERENCES "public"."NodeEntry"("id") ON DELETE CASCADE  ON UPDATE CASCADE
-
-ALTER TABLE "public"."TextboxNodeEntry" ADD FOREIGN KEY ("nodeEntryId")REFERENCES "public"."NodeEntry"("id") ON DELETE CASCADE  ON UPDATE CASCADE
-
-DROP TABLE "public"."NodeEntryValue";
-
-DROP TYPE "TagType"
-
-DROP TYPE "TriggerConditionType"
-
-DROP TYPE "TriggerType"
+ALTER TABLE "public"."UserOfCustomer" ADD FOREIGN KEY ("roleId")REFERENCES "public"."Role"("id") ON DELETE CASCADE ON UPDATE CASCADE
 ```
 
 ## Changes
 
 ```diff
 diff --git schema.prisma schema.prisma
-migration ..20200803101458-restart
+migration ..20200806235053-restart
 --- datamodel.dml
 +++ datamodel.dml
-@@ -1,0 +1,338 @@
+@@ -1,0 +1,350 @@
 +datasource postgresql {
 +  provider = "postgresql"
 +  url = "***"
@@ -85,6 +51,7 @@ migration ..20200803101458-restart
 +// binaryTargets = ["debian-openssl-1.1.x"]
 +generator client {
 +  provider = "prisma-client-js"
++  previewFeatures = ["middlewares"]
 +  output   = "./node_modules/@prisma/client"
 +}
 +
@@ -133,7 +100,7 @@ migration ..20200803101458-restart
 +  name        String
 +  settings    CustomerSettings?
 +  dialogues   Dialogue[]
-+  users       User[]
++  users       UserOfCustomer[]
 +  roles       Role[]
 +  permissions Permission[]
 +  triggers    Trigger[]
@@ -184,7 +151,7 @@ migration ..20200803101458-restart
 +model QuestionNode {
 +  id                         String           @default(cuid()) @id
 +  creationDate               DateTime         @default(now())
-+  updatedAt                  DateTime?        @updatedAt
++  updatedAt                  DateTime         @updatedAt
 +  isLeaf                     Boolean          @default(false)
 +  isRoot                     Boolean          @default(false)
 +  title                      String
@@ -351,9 +318,7 @@ migration ..20200803101458-restart
 +  name        String
 +  roleId      String?
 +  permissions Permission[] @relation(references: [id])
-+  User        User[]
-+  Customer    Customer?    @relation(fields: [customerId], references: [id])
-+  customerId  String?
++  users       UserOfCustomer[]
 +  @@unique([id, name])
 +}
 +
@@ -361,16 +326,29 @@ migration ..20200803101458-restart
 +  id         String    @default(cuid()) @id
 +  createdAt  DateTime  @default(now())
 +  updatedAt  DateTime? @updatedAt
-+  email      String
++  email      String    @unique
++  password   String
 +  phone      String?
 +  firstName  String?
 +  lastName   String?
-+  roleId     String
-+  role       Role      @relation(fields: [roleId], references: [id])
-+  Customer   Customer? @relation(fields: [customerId], references: [id])
-+  customerId String?
-+  triggers   Trigger[] @relation(references: [id])
-+  @@unique([customerId, email])
++  triggers   Trigger[]
++  customers  UserOfCustomer[]
++  isSuperAdmin  Boolean @default(false)
++}
++
++model UserOfCustomer {
++  userId  String
++  user    User    @relation(fields: [userId], references: [id])
++
++  customerId String
++  customer  Customer  @relation(fields: [customerId], references: [id])
++
++  roleId  String
++  role    Role  @relation(fields: [roleId], references: [id])
++  
++  createdAt DateTime @default(now())
++
++  @@id([userId, customerId])
 +}
 +
 +enum TriggerEnum {

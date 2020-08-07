@@ -3,6 +3,7 @@ const errors: {[key: string] : string } = {
   'GraphQL error: customer:existing_slug': 'Slug is already taken: try a different one.',
   'GraphQL error: login:email_missing': 'Email is missing. Did you provide it in the login?',
   'GraphQL error: login:password_missing': 'Password is missing. Did you provide it in the login?',
+  'GraphQL error: auth:account_not_found': 'Your credentials do not match our records.',
 };
 
 export default errors;

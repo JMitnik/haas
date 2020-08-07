@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import { Div, Flex, Form, FormLabel, FormControl, InputHelper, H2, H3, Input, FormContainer, InputGrid, Grid, H4, Paragraph } from '@haas/ui';
 import Logo from 'components/Logo';
@@ -6,10 +6,11 @@ import Logo from 'components/Logo';
 import { Box, Button, Icon, InputLeftElement, Stack } from '@chakra-ui/core';
 import { LoginBox, LoginViewContainer, LoginViewSideScreen, LoginContentContainer } from './LoginViewStyles';
 import { useAuth } from 'providers/AuthProvider';
-import { Mail, Lock } from 'react-feather';
+import { Mail, Lock, Send } from 'react-feather';
 import { FullLogo } from 'components/Logo/Logo';
 import { useForm } from 'react-hook-form';
 import ServerError from 'components/ServerError';
+import { useHistory } from 'react-router';
 
 interface FormData {
   email: string;
@@ -17,7 +18,8 @@ interface FormData {
 }
 
 const LoginView = () => {
-  const { login, isLoggingIn, loginServerError } = useAuth();
+  const { user, login, isLoggingIn, loginServerError } = useAuth();
+  const history = useHistory();
 
   const form = useForm<FormData>({
     mode: 'onChange'
@@ -28,9 +30,13 @@ const LoginView = () => {
       email: data.email,
       password: data.password
     });
-
-    console.log(userData);
   }
+
+  useEffect(() => {
+    if (user) {
+      history.push('/dashboard');
+    }
+  }, [user]);
 
   return (
     <LoginViewContainer>
@@ -55,7 +61,7 @@ const LoginView = () => {
                 </FormControl>
               </InputGrid>
 
-              <Button type="submit" isDisabled={!form.formState.isValid} mt={4} isLoading={isLoggingIn} loadingText="Logging in">
+              <Button leftIcon={Send} type="submit" isDisabled={!form.formState.isValid} mt={4} isLoading={isLoggingIn} loadingText="Logging in">
                 Log in
               </Button>
             </Form>

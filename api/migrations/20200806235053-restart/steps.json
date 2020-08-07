@@ -633,7 +633,7 @@
       "tag": "CreateField",
       "model": "Customer",
       "field": "users",
-      "type": "User",
+      "type": "UserOfCustomer",
       "arity": "List"
     },
     {
@@ -1116,7 +1116,7 @@
       "model": "QuestionNode",
       "field": "updatedAt",
       "type": "DateTime",
-      "arity": "Optional"
+      "arity": "Required"
     },
     {
       "tag": "CreateDirective",
@@ -3655,62 +3655,9 @@
     {
       "tag": "CreateField",
       "model": "Role",
-      "field": "User",
-      "type": "User",
+      "field": "users",
+      "type": "UserOfCustomer",
       "arity": "List"
-    },
-    {
-      "tag": "CreateField",
-      "model": "Role",
-      "field": "Customer",
-      "type": "Customer",
-      "arity": "Optional"
-    },
-    {
-      "tag": "CreateDirective",
-      "location": {
-        "path": {
-          "tag": "Field",
-          "model": "Role",
-          "field": "Customer"
-        },
-        "directive": "relation"
-      }
-    },
-    {
-      "tag": "CreateArgument",
-      "location": {
-        "tag": "Directive",
-        "path": {
-          "tag": "Field",
-          "model": "Role",
-          "field": "Customer"
-        },
-        "directive": "relation"
-      },
-      "argument": "fields",
-      "value": "[customerId]"
-    },
-    {
-      "tag": "CreateArgument",
-      "location": {
-        "tag": "Directive",
-        "path": {
-          "tag": "Field",
-          "model": "Role",
-          "field": "Customer"
-        },
-        "directive": "relation"
-      },
-      "argument": "references",
-      "value": "[id]"
-    },
-    {
-      "tag": "CreateField",
-      "model": "Role",
-      "field": "customerId",
-      "type": "String",
-      "arity": "Optional"
     },
     {
       "tag": "CreateDirective",
@@ -3833,6 +3780,24 @@
       "arity": "Required"
     },
     {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "User",
+          "field": "email"
+        },
+        "directive": "unique"
+      }
+    },
+    {
+      "tag": "CreateField",
+      "model": "User",
+      "field": "password",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
       "tag": "CreateField",
       "model": "User",
       "field": "phone",
@@ -3856,13 +3821,169 @@
     {
       "tag": "CreateField",
       "model": "User",
+      "field": "triggers",
+      "type": "Trigger",
+      "arity": "List"
+    },
+    {
+      "tag": "CreateField",
+      "model": "User",
+      "field": "customers",
+      "type": "UserOfCustomer",
+      "arity": "List"
+    },
+    {
+      "tag": "CreateField",
+      "model": "User",
+      "field": "isSuperAdmin",
+      "type": "Boolean",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "User",
+          "field": "isSuperAdmin"
+        },
+        "directive": "default"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "User",
+          "field": "isSuperAdmin"
+        },
+        "directive": "default"
+      },
+      "argument": "",
+      "value": "false"
+    },
+    {
+      "tag": "CreateModel",
+      "model": "UserOfCustomer"
+    },
+    {
+      "tag": "CreateField",
+      "model": "UserOfCustomer",
+      "field": "userId",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateField",
+      "model": "UserOfCustomer",
+      "field": "user",
+      "type": "User",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "UserOfCustomer",
+          "field": "user"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "UserOfCustomer",
+          "field": "user"
+        },
+        "directive": "relation"
+      },
+      "argument": "fields",
+      "value": "[userId]"
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "UserOfCustomer",
+          "field": "user"
+        },
+        "directive": "relation"
+      },
+      "argument": "references",
+      "value": "[id]"
+    },
+    {
+      "tag": "CreateField",
+      "model": "UserOfCustomer",
+      "field": "customerId",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateField",
+      "model": "UserOfCustomer",
+      "field": "customer",
+      "type": "Customer",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "UserOfCustomer",
+          "field": "customer"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "UserOfCustomer",
+          "field": "customer"
+        },
+        "directive": "relation"
+      },
+      "argument": "fields",
+      "value": "[customerId]"
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "UserOfCustomer",
+          "field": "customer"
+        },
+        "directive": "relation"
+      },
+      "argument": "references",
+      "value": "[id]"
+    },
+    {
+      "tag": "CreateField",
+      "model": "UserOfCustomer",
       "field": "roleId",
       "type": "String",
       "arity": "Required"
     },
     {
       "tag": "CreateField",
-      "model": "User",
+      "model": "UserOfCustomer",
       "field": "role",
       "type": "Role",
       "arity": "Required"
@@ -3872,7 +3993,7 @@
       "location": {
         "path": {
           "tag": "Field",
-          "model": "User",
+          "model": "UserOfCustomer",
           "field": "role"
         },
         "directive": "relation"
@@ -3884,7 +4005,7 @@
         "tag": "Directive",
         "path": {
           "tag": "Field",
-          "model": "User",
+          "model": "UserOfCustomer",
           "field": "role"
         },
         "directive": "relation"
@@ -3898,7 +4019,7 @@
         "tag": "Directive",
         "path": {
           "tag": "Field",
-          "model": "User",
+          "model": "UserOfCustomer",
           "field": "role"
         },
         "directive": "relation"
@@ -3908,20 +4029,20 @@
     },
     {
       "tag": "CreateField",
-      "model": "User",
-      "field": "Customer",
-      "type": "Customer",
-      "arity": "Optional"
+      "model": "UserOfCustomer",
+      "field": "createdAt",
+      "type": "DateTime",
+      "arity": "Required"
     },
     {
       "tag": "CreateDirective",
       "location": {
         "path": {
           "tag": "Field",
-          "model": "User",
-          "field": "Customer"
+          "model": "UserOfCustomer",
+          "field": "createdAt"
         },
-        "directive": "relation"
+        "directive": "default"
       }
     },
     {
@@ -3930,82 +4051,36 @@
         "tag": "Directive",
         "path": {
           "tag": "Field",
-          "model": "User",
-          "field": "Customer"
+          "model": "UserOfCustomer",
+          "field": "createdAt"
         },
-        "directive": "relation"
+        "directive": "default"
       },
-      "argument": "fields",
-      "value": "[customerId]"
-    },
-    {
-      "tag": "CreateArgument",
-      "location": {
-        "tag": "Directive",
-        "path": {
-          "tag": "Field",
-          "model": "User",
-          "field": "Customer"
-        },
-        "directive": "relation"
-      },
-      "argument": "references",
-      "value": "[id]"
-    },
-    {
-      "tag": "CreateField",
-      "model": "User",
-      "field": "customerId",
-      "type": "String",
-      "arity": "Optional"
-    },
-    {
-      "tag": "CreateField",
-      "model": "User",
-      "field": "triggers",
-      "type": "Trigger",
-      "arity": "List"
-    },
-    {
-      "tag": "CreateDirective",
-      "location": {
-        "path": {
-          "tag": "Field",
-          "model": "User",
-          "field": "triggers"
-        },
-        "directive": "relation"
-      }
-    },
-    {
-      "tag": "CreateArgument",
-      "location": {
-        "tag": "Directive",
-        "path": {
-          "tag": "Field",
-          "model": "User",
-          "field": "triggers"
-        },
-        "directive": "relation"
-      },
-      "argument": "references",
-      "value": "[id]"
+      "argument": "",
+      "value": "now()"
     },
     {
       "tag": "CreateDirective",
       "location": {
         "path": {
           "tag": "Model",
-          "model": "User",
-          "arguments": [
-            {
-              "name": "",
-              "value": "[customerId, email]"
-            }
-          ]
+          "model": "UserOfCustomer"
         },
-        "directive": "unique"
+        "directive": "id"
       }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Model",
+          "model": "UserOfCustomer"
+        },
+        "directive": "id"
+      },
+      "argument": "",
+      "value": "[userId, customerId]"
     },
     {
       "tag": "CreateModel",

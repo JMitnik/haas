@@ -6,6 +6,7 @@ datasource postgresql {
 // binaryTargets = ["debian-openssl-1.1.x"]
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["middlewares"]
   output   = "./node_modules/@prisma/client"
 }
 
@@ -54,7 +55,7 @@ model Customer {
   name        String
   settings    CustomerSettings?
   dialogues   Dialogue[]
-  users       User[]
+  users       UserOfCustomer[]
   roles       Role[]
   permissions Permission[]
   triggers    Trigger[]
@@ -90,6 +91,7 @@ model Dialogue {
   questions    QuestionNode[]
   sessions     Session[]
   tags         Tag[]
+  @@unique([slug, customerId])
 }
 
 enum NodeType {
@@ -150,8 +152,8 @@ model Link {
   url             String
   iconUrl         String?
   backgroundColor String?
-  questionNodeId  String
-  questionNode    QuestionNode @relation(fields: [questionNodeId], references: [id])
+  questionNode    QuestionNode? @relation(fields: [questionNodeId], references: [id])
+  questionNodeId  String?
 }
 
 model Edge {
@@ -271,9 +273,7 @@ model Role {
   name        String
   roleId      String?
   permissions Permission[] @relation(references: [id])
-  User        User[]
-  Customer    Customer?    @relation(fields: [customerId], references: [id])
-  customerId  String?
+  users       UserOfCustomer[]
   @@unique([id, name])
 }
 
@@ -281,17 +281,29 @@ model User {
   id         String    @default(cuid()) @id
   createdAt  DateTime  @default(now())
   updatedAt  DateTime? @updatedAt
-  email      String
+  email      String    @unique
   password   String
   phone      String?
   firstName  String?
   lastName   String?
-  roleId     String
-  role       Role      @relation(fields: [roleId], references: [id])
-  Customer   Customer? @relation(fields: [customerId], references: [id])
-  customerId String?
-  triggers   Trigger[] @relation(references: [id])
-  @@unique([customerId, email])
+  triggers   Trigger[]
+  customers  UserOfCustomer[]
+  isSuperAdmin  Boolean @default(false)
+}
+
+model UserOfCustomer {
+  userId  String
+  user    User    @relation(fields: [userId], references: [id])
+
+  customerId String
+  customer  Customer  @relation(fields: [customerId], references: [id])
+
+  roleId  String
+  role    Role  @relation(fields: [roleId], references: [id])
+  
+  createdAt DateTime @default(now())
+
+  @@id([userId, customerId])
 }
 
 enum TriggerEnum {
@@ -319,8 +331,8 @@ model TriggerCondition {
   minValue  Int?
   maxValue  Int?
   textValue String?
-  trigger   Trigger?             @relation(fields: [triggerId], references: [id])
-  triggerId String?
+  trigger   Trigger             @relation(fields: [triggerId], references: [id])
+  triggerId String
 }
 
 model Trigger {

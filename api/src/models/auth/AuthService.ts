@@ -8,7 +8,6 @@ import prisma from '../../prisma';
 
 interface UserTokenProps {
   email: string;
-  role: string;
   permissions: string[] | [];
 }
 
@@ -76,8 +75,6 @@ class AuthService {
   static async createToken(userInput: UserTokenProps) {
     return jwt.sign({
       email: userInput.email,
-      role: userInput.role,
-      test: 'test',
       permissions: userInput.permissions,
     }, config.jwtSecret);
   }
@@ -85,17 +82,24 @@ class AuthService {
   static async loginUser(userInput: NexusGenInputs['LoginInput']) {
     const user = await prisma.user.findOne({ where: { email: userInput.email } });
 
+    if (!user) throw new Error('auth:account_not_found');
     if (!user?.password) throw new Error('Something seems wrong with your account. Contact the admin for more info');
 
-    const isValidPassword = AuthService.checkPassword(userInput.password, user?.password);
+    const isValidPassword = await AuthService.checkPassword(userInput.password, user?.password);
 
     if (!isValidPassword) throw new Error('Login credentials invalid');
 
     return user;
   }
 
-  static async checkPassword(dbPassword: string, inputPassword: string) {
-    return bcrypt.compare(inputPassword, dbPassword);
+  static async checkPassword(inputPassword: string, dbPassword: string) {
+    let valid = false;
+    
+    await Promise.resolve(bcrypt.compare(inputPassword, dbPassword).then((res) => {
+      if (res) valid = true;
+    }));
+
+    return valid;
   }
 
   static async generatePassword(passwordInput: string) {

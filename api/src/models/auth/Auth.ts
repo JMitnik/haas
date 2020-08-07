@@ -1,4 +1,4 @@
-import { inputObjectType, mutationField } from '@nexus/schema';
+import { inputObjectType, mutationField, objectType } from '@nexus/schema';
 
 import { UserType } from '../users/User';
 import AuthService from './AuthService';
@@ -49,13 +49,23 @@ export const LoginInput = inputObjectType({
   },
 });
 
+export const AuthOutput = objectType({
+  name: 'LoginOutput',
+  description: 'Information you get after you log out',
+
+  definition(t) {
+    t.string('token');
+
+    t.field('user', { type: UserType });
+  }
+})
+
 export const LoginMutation = mutationField('login', {
-  type: UserType,
+  type: AuthOutput,
   nullable: true,
   args: { input: LoginInput },
 
   async resolve(parent, args) {
-    console.log(args);
     if (!args.input?.email) throw new UserInputError('login:email_missing');
     if (!args.input?.password) throw new UserInputError('login:password_missing');
 
@@ -64,6 +74,18 @@ export const LoginMutation = mutationField('login', {
       password: args.input?.password
     });
 
-    return user;
+    const permissions = [
+      user.isSuperAdmin ? 'SUPER_ADMIN' : '',
+    ];
+
+    const userToken = await AuthService.createToken({
+      email: user.email,
+      permissions,
+    })
+
+    return {
+      token: userToken,
+      user: user
+    };
   },
 });
