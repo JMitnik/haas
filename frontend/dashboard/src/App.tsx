@@ -1,5 +1,5 @@
 import { ApolloProvider } from '@apollo/react-hooks';
-import { Redirect, Route, BrowserRouter as Router, Switch } from 'react-router-dom';
+import { Redirect, Route, BrowserRouter as Router, Switch, RouteProps } from 'react-router-dom';
 import { ErrorBoundary } from 'react-error-boundary';
 import React, { FC } from 'react';
 
@@ -29,12 +29,22 @@ import ThemesProvider from 'providers/ThemeProvider';
 import TriggersOverview from 'views/TriggerOverview/TriggerOverview';
 import UsersOverview from 'views/UsersOverview/UsersOverview';
 
-import AuthProvider from 'providers/AuthProvider';
+import AuthProvider, { useAuth } from 'providers/AuthProvider';
 import DialogueLayout from 'layouts/DialogueLayout';
 import PreCustomerLayout from 'layouts/PreCustomerLayout';
 import LoginPage from 'pages/login';
 
 import client from './config/apollo';
+
+const ProtectedRoute = (props: RouteProps) => {
+  const { user } = useAuth();
+
+  if (!user) return <Redirect to="/login" />
+
+  return (
+    <Route {...props} />
+  );
+}
 
 const AppRoutes = () => (
   <Switch>
@@ -161,7 +171,7 @@ const AppRoutes = () => (
       )}
     />
 
-    <Route
+    <ProtectedRoute
       path="/dashboard/b/"
       render={() => (
         <PreCustomerLayout>
@@ -170,7 +180,7 @@ const AppRoutes = () => (
       )}
     />
 
-    <Route path="/dashboard" render={() => <DashboardPage />} />
+    <ProtectedRoute path="/dashboard" render={() => <DashboardPage />} />
 
     <Route path="/login"><LoginPage /></Route>
 
