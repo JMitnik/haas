@@ -68,7 +68,7 @@ const AddDialogueView = () => {
   const [activeContentOption, setActiveContentOption] = useState<null | {label: string, value: string}>(null);
   const [activeCustomerTemplate, setActiveCustomerTemplate] = useState<null | {label: string, value: string}>(null);
   const [activeDialogueTemplate, setActiveDialogueTemplate] = useState<null | {label: string, value: string}>(null);
-  const [fetchCustomers, { data: customerData }] = useLazyQuery(getCustomerQuery, {
+  const { data: customerData } = useQuery(getCustomerQuery, {
     fetchPolicy: 'cache-and-network',
     onError: (error: any) => {
       console.log(error);
@@ -134,17 +134,17 @@ const AddDialogueView = () => {
     setActiveDialogueTemplate(qOption);
   };
 
-  const handleContentOptionChange = (qOption: any) => {
-    form.setValue('contentOption', qOption?.value);
+  // const handleContentOptionChange = (qOption: any) => {
+  //   form.setValue('contentOption', qOption?.value);
 
-    setActiveContentOption(qOption);
-    setActiveCustomerTemplate(null);
-    setActiveDialogueTemplate(null);
+  //   setActiveContentOption(qOption);
+  //   setActiveCustomerTemplate(null);
+  //   setActiveDialogueTemplate(null);
 
-    if (qOption.value === 'TEMPLATE') {
-      fetchCustomers();
-    }
-  };
+  //   if (qOption.value === 'TEMPLATE') {
+  //     fetchCustomers();
+  //   }
+  // };
 
   const handleCustomerChange = (qOption: any) => {
     form.setValue('customerOption', qOption?.value);
@@ -166,8 +166,11 @@ const AddDialogueView = () => {
     value: tag?.id,
   }));
 
+  const watchContentOption = form.watch('contentOption');
+
   console.log('Errors:', form.errors);
   console.log(form.getValues());
+  console.log('content option: ', watchContentOption);
 
   return (
     <Container>
@@ -271,7 +274,7 @@ const AddDialogueView = () => {
                     <FormErrorMessage>{form.errors?.contentOption?.value?.message}</FormErrorMessage>
                   </FormControl>
 
-                  {(activeContentOption?.value === 'TEMPLATE' && CUSTOMER_OPTIONS) && (
+                  {(watchContentOption?.value === 'TEMPLATE' && CUSTOMER_OPTIONS) && (
                     <FormControl>
                       <FormLabel>Project for templates</FormLabel>
                       <InputHelper>Pick project to take template from</InputHelper>

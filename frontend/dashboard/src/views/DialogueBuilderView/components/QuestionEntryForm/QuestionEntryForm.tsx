@@ -1,24 +1,25 @@
 
 import * as yup from 'yup';
 import { ApolloError } from 'apollo-client';
+import { Button, ButtonGroup, FormErrorMessage, useToast } from '@chakra-ui/core';
 import { MinusCircle, PlusCircle } from 'react-feather';
 import { debounce } from 'lodash';
 import { useForm } from 'react-hook-form';
 import { useMutation } from '@apollo/react-hooks';
 import { useParams } from 'react-router';
+import { yupResolver } from '@hookform/resolvers';
 import React, { useCallback, useEffect, useState } from 'react';
 import Select from 'react-select';
 
-import { Button, Div, ErrorStyle, Flex, Form, FormGroupContainer,
-  Grid, H3, H4, Hr, Label, Muted, StyledInput } from '@haas/ui';
 import {
   DeleteQuestionOptionButtonContainer,
 } from 'views/DialogueBuilderView/components/QuestionEntry/QuestionEntryStyles';
+import { Div, ErrorStyle, Flex, Form, FormContainer, FormControl, FormLabel,
+  FormSection, Grid, H3, H4, Hr, Input, InputGrid, InputHelper, Label, Muted } from '@haas/ui';
 import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
 import createQuestionMutation from 'mutations/createQuestion';
 import updateQuestionMutation from 'mutations/updateQuestion';
 
-import { yupResolver } from '@hookform/resolvers';
 import { EdgeConditonProps,
   OverrideLeafProps, QuestionEntryProps, QuestionOptionProps } from '../../DialogueBuilderInterfaces';
 
@@ -105,8 +106,9 @@ const QuestionEntryForm = ({
 }: QuestionEntryFormProps) => {
   const { customerSlug, dialogueSlug } = useParams();
 
-  const { register, handleSubmit, setValue, errors, getValues } = useForm<FormDataProps>({
+  const { register, handleSubmit, setValue, errors, getValues, formState } = useForm<FormDataProps>({
     resolver: yupResolver(schema),
+    mode: 'onChange',
     defaultValues: {
       parentQuestionType,
       options: [],
@@ -195,7 +197,7 @@ const QuestionEntryForm = ({
     setValue('matchText', activematchValue?.value);
   }, [setValue, activematchValue]);
 
-  const [createQuestion] = useMutation(createQuestionMutation, {
+  const [createQuestion, { loading: createLoading }] = useMutation(createQuestionMutation, {
     onCompleted: () => {
       if (onAddExpandChange) {
         onAddExpandChange(false);
@@ -215,7 +217,7 @@ const QuestionEntryForm = ({
     },
   });
 
-  const [updateQuestion] = useMutation(updateQuestionMutation, {
+  const [updateQuestion, { loading: updateLoading }] = useMutation(updateQuestionMutation, {
     onCompleted: () => {
       onActiveQuestionChange(null);
     },
@@ -321,167 +323,222 @@ const QuestionEntryForm = ({
 
   const parentOptionsSelect = parentOptions?.map((option) => ({ label: option.value, value: option.value }));
   return (
-    <Form onSubmit={handleSubmit(onSubmit)}>
-      <FormGroupContainer>
-        <Grid gridTemplateColumns={['1fr', '1fr 2fr']} gridColumnGap={4}>
-
-          <Div py={4} pr={4}>
-            <H3 color="default.text" fontWeight={500} pb={2}>General question information</H3>
-            <Muted>
-              General information about the question, such as title, type, etc.
-            </Muted>
-          </Div>
-
-          <Div py={4}>
-            <Grid gridTemplateColumns={['1fr', '1fr 1fr']}>
-
-              <Div useFlex flexDirection="column" gridColumn="1 / -1">
-                <Label>Title</Label>
-                <StyledInput
-                  isInvalid={!!errors.title}
+    <FormContainer expandedForm>
+      <Hr />
+      <Form onSubmit={handleSubmit(onSubmit)}>
+        <Div py={4}>
+          <FormSection id="general">
+            <Div>
+              <H3 color="default.text" fontWeight={500} pb={2}>About question</H3>
+              <Muted color="gray.600">
+                Tell us a bit about the question
+              </Muted>
+            </Div>
+            <InputGrid>
+              <FormControl isRequired isInvalid={!!errors.title?.message}>
+                <FormLabel htmlFor="title">Title</FormLabel>
+                <InputHelper>What is the question you want to ask?</InputHelper>
+                <Input
                   name="title"
                   defaultValue={activeTitle}
-                  onBlur={(e) => setActiveTitle(e.currentTarget.value)}
+                  onBlur={(e: any) => setActiveTitle(e.currentTarget.value)}
                   ref={register({ required: true })}
                 />
-                {errors.title && <Muted color="warning">Something went wrong!</Muted>}
-              </Div>
+                <FormErrorMessage>{errors.title?.message}</FormErrorMessage>
+              </FormControl>
+            </InputGrid>
+          </FormSection>
 
-              {parentQuestionType === 'Slider' && (
-                <>
-                  <Flex flexDirection="column">
-                    <Label>Min value</Label>
-                    <StyledInput
-                      isInvalid={!!errors.minValue}
-                      name="minValue"
-                      ref={register({ required: false })}
-                      defaultValue={condition?.renderMin}
-                      onBlur={(event: React.FocusEvent<HTMLInputElement>) => setMinValue(event)}
-                    />
-                    {errors.minValue && <Muted color="warning">{errors.minValue.message}</Muted>}
-                  </Flex>
-                  <Flex flexDirection="column">
-                    <Label>Max value</Label>
-                    <StyledInput
-                      isInvalid={!!errors.maxValue}
-                      name="maxValue"
-                      ref={register({ required: false })}
-                      defaultValue={condition?.renderMax}
-                      onChange={(event) => setMaxValue(event.target.value)}
-                    />
-                    {errors.maxValue && <Muted color="warning">{errors.maxValue.message}</Muted>}
-                  </Flex>
-                </>
-              )}
+          {parentQuestionType === 'Slider' && (
+            <>
+              <Hr />
 
-              {parentQuestionType === 'Choice' && (
-                <Div gridColumn="1 / -1">
-                  <Label>Match value</Label>
-                  <Select
-                    styles={errors.matchText && !activematchValue ? ErrorStyle : undefined}
-                    ref={() => register({
-                      name: 'matchText',
-                      required: false,
-                    })}
-                    options={parentOptionsSelect}
-                    value={activematchValue}
-                    onChange={(option: any) => {
-                      setMatchTextValue(option);
-                    }}
-                  />
-                  {errors.matchText && !activematchValue && <Muted color="warning">{errors.matchText.message}</Muted>}
+              <FormSection>
+                <Div>
+                  <H3 color="default.text" fontWeight={500} pb={2}>About condition</H3>
+                  <Muted color="gray.600">
+                    When should this question be displayed
+                  </Muted>
                 </Div>
-              )}
+                <Div>
+                  <InputGrid>
+                    <FormControl isRequired isInvalid={!!errors.minValue}>
+                      <FormLabel htmlFor="minValue">Min value</FormLabel>
+                      <InputHelper>What is the minimal value to trigger this question?</InputHelper>
+                      <Input
+                        name="minValue"
+                        ref={register({ required: false })}
+                        defaultValue={condition?.renderMin}
+                        onBlur={(event: React.FocusEvent<HTMLInputElement>) => setMinValue(event)}
+                      />
+                      <FormErrorMessage>{errors.minValue?.message}</FormErrorMessage>
+                    </FormControl>
 
-              <Div useFlex flexDirection="column">
-                <Label>Question type</Label>
-                <Select
-                  id="question-type-select"
-                  isInvalid={!!errors.questionType}
-                  ref={() => register({
-                    name: 'questionType',
-                    required: true,
-                  })}
-                  options={questionTypes}
-                  value={activeQuestionType}
-                  onChange={(qOption: any) => handleQuestionTypeChange(qOption)}
-                />
-                {errors.questionType && <Muted color="warning">{errors.questionType.message}</Muted>}
-              </Div>
+                    <FormControl isRequired isInvalid={!!errors.maxValue}>
+                      <FormLabel htmlFor="maxValue">Max value</FormLabel>
+                      <InputHelper>What is the maximal value to trigger this question?</InputHelper>
+                      <Input
+                        name="maxValue"
+                        ref={register({ required: false })}
+                        defaultValue={condition?.renderMax}
+                        onChange={(event: any) => setMaxValue(event.target.value)}
+                      />
+                      <FormErrorMessage>{errors.maxValue?.message}</FormErrorMessage>
+                    </FormControl>
 
-              <Div key={activeLeaf?.value} useFlex flexDirection="column">
-                <Label>Leaf node</Label>
-                <Select
-                  id="leaf-node-select"
-                  isInvalid={!!errors.activeLeaf}
-                  ref={() => register({
-                    name: 'activeLeaf',
-                    required: true,
-                  })}
-                  key={activeLeaf?.value}
-                  options={leafs}
-                  value={(activeLeaf?.value && activeLeaf) || leafs[0]}
-                  onChange={(leafOption: any) => handleLeafChange(leafOption)}
-                />
-                {errors.activeLeaf && <Muted color="warning">{errors.activeLeaf.message}</Muted>}
-              </Div>
+                  </InputGrid>
+                </Div>
+              </FormSection>
+            </>
+          )}
+
+          {parentQuestionType === 'Choice' && (
+            <>
+              <Hr />
+
+              <FormSection>
+                <Div>
+                  <H3 color="default.text" fontWeight={500} pb={2}>About condition</H3>
+                  <Muted color="gray.600">
+                    When should this question be displayed
+                  </Muted>
+                </Div>
+                <Div>
+                  <InputGrid>
+                    <FormControl isRequired isInvalid={!!errors.matchText}>
+                      <FormLabel htmlFor="matchText">Match value</FormLabel>
+                      <InputHelper>What is the multi-choice question to trigger this question?</InputHelper>
+                      <Select
+                        styles={errors.matchText && !activematchValue ? ErrorStyle : undefined}
+                        ref={() => register({
+                          name: 'matchText',
+                          required: false,
+                        })}
+                        options={parentOptionsSelect}
+                        value={activematchValue}
+                        onChange={(option: any) => {
+                          setMatchTextValue(option);
+                        }}
+                      />
+                      <FormErrorMessage>{errors.matchText?.message}</FormErrorMessage>
+                    </FormControl>
+                  </InputGrid>
+                </Div>
+              </FormSection>
+            </>
+          )}
+
+          <Hr />
+
+          <FormSection>
+            <Div>
+              <H3 color="default.text" fontWeight={500} pb={2}>About type</H3>
+              <Muted color="gray.600">
+                Question details
+              </Muted>
+            </Div>
+            <Div>
+              <InputGrid>
+                <FormControl isRequired isInvalid={!!errors.questionType}>
+                  <FormLabel htmlFor="questionType">Question type</FormLabel>
+                  <InputHelper>What is the type of the question?</InputHelper>
+                  <Select
+                    id="question-type-select"
+                    isInvalid={!!errors.questionType}
+                    ref={() => register({
+                      name: 'questionType',
+                      required: true,
+                    })}
+                    options={questionTypes}
+                    value={activeQuestionType}
+                    onChange={(qOption: any) => handleQuestionTypeChange(qOption)}
+                  />
+                  <FormErrorMessage>{errors.questionType?.message}</FormErrorMessage>
+                </FormControl>
+
+                <FormControl isInvalid={!!errors.activeLeaf}>
+                  <FormLabel htmlFor="questionType">Call-to-action</FormLabel>
+                  <InputHelper>What CTA do you want to add?</InputHelper>
+                  <Select
+                    id="leaf-node-select"
+                    isInvalid={!!errors.activeLeaf}
+                    ref={() => register({
+                      name: 'activeLeaf',
+                      required: true,
+                    })}
+                    key={activeLeaf?.value}
+                    options={leafs}
+                    value={(activeLeaf?.value && activeLeaf) || leafs[0]}
+                    onChange={(leafOption: any) => handleLeafChange(leafOption)}
+                  />
+                  <FormErrorMessage>{errors.activeLeaf?.message}</FormErrorMessage>
+                </FormControl>
+              </InputGrid>
 
               {activeQuestionType && activeQuestionType.value === 'CHOICE' && (
-                <>
-                  <Div mb={1} gridColumn="1 / -1">
-                    <Flex justifyContent="space-between">
-                      <H4>
-                        Options
-                      </H4>
-                      <PlusCircle data-cy="AddOption" style={{ cursor: 'pointer' }} onClick={() => addNewOption()} />
-                    </Flex>
+              <>
+                <Div mb={1} gridColumn="1 / -1">
+                  <Flex justifyContent="space-between">
+                    <H4>
+                      Options
+                    </H4>
+                    <PlusCircle data-cy="AddOption" style={{ cursor: 'pointer' }} onClick={() => addNewOption()} />
+                  </Flex>
 
-                    <Hr />
-                  </Div>
+                  <Hr />
+                </Div>
 
-                    {!activeOptions.length && !errors.options && <Muted>Please add an option </Muted>}
-                    {!activeOptions.length && errors.options && <Muted color="red">Please fill in at least one option!</Muted>}
-                    {activeOptions && activeOptions.map((option, optionIndex) => (
-                      <Flex key={`${option.id}-${optionIndex}-${option.value}`} flexDirection="column">
-                        <Flex my={1} flexDirection="row">
-                          <Flex flexGrow={1}>
-                            <StyledInput
-                              isInvalid={errors.options && Array.isArray(errors.options) && !!errors.options?.[optionIndex]}
-                              id={`options[${optionIndex}]`}
-                              key={`input-${id}-${optionIndex}`}
-                              name={`options[${optionIndex}]`}
-                              ref={register(
-                                { required: true,
-                                  minLength: 1 },
-                              )}
-                              defaultValue={option.value}
-                              onChange={(e) => handleOptionChange(e.currentTarget.value, optionIndex)}
-                            />
-                          </Flex>
-
-                          <DeleteQuestionOptionButtonContainer
-                            onClick={(e) => deleteOption(e, optionIndex)}
-                          >
-                            <MinusCircle />
-                          </DeleteQuestionOptionButtonContainer>
-                        </Flex>
-                        {errors.options?.[optionIndex] && <Muted color="warning">Please fill in a proper value!</Muted>}
+                {!activeOptions.length && !errors.options && <Muted>Please add an option </Muted>}
+                {!activeOptions.length && errors.options && <Muted color="red">Please fill in at least one option!</Muted>}
+                {activeOptions && activeOptions.map((option, optionIndex) => (
+                  <Flex key={`${option.id}-${optionIndex}-${option.value}`} flexDirection="column">
+                    <Flex my={1} flexDirection="row">
+                      <Flex flexGrow={1}>
+                        <Input
+                          isInvalid={errors.options && Array.isArray(errors.options) && !!errors.options?.[optionIndex]}
+                          id={`options[${optionIndex}]`}
+                          key={`input-${id}-${optionIndex}`}
+                          name={`options[${optionIndex}]`}
+                          ref={register(
+                            { required: true,
+                              minLength: 1 },
+                          )}
+                          defaultValue={option.value}
+                          onChange={(e: any) => handleOptionChange(e.currentTarget.value, optionIndex)}
+                        />
                       </Flex>
-                    ))}
-                </>
-              )}
-            </Grid>
-          </Div>
-        </Grid>
-      </FormGroupContainer>
 
-      <Div>
-        <Flex>
-          <Button brand="primary" mr={2} type="submit">Save Question</Button>
-          <Button brand="default" type="button" onClick={() => handleCancelQuestion()}>Cancel</Button>
-        </Flex>
-      </Div>
-    </Form>
+                      <DeleteQuestionOptionButtonContainer
+                        onClick={(e: any) => deleteOption(e, optionIndex)}
+                      >
+                        <MinusCircle />
+                      </DeleteQuestionOptionButtonContainer>
+                    </Flex>
+                    {errors.options?.[optionIndex] && <Muted color="warning">Please fill in a proper value!</Muted>}
+                  </Flex>
+                ))}
+              </>
+              )}
+            </Div>
+          </FormSection>
+        </Div>
+
+        <Div>
+          <ButtonGroup>
+            <Button
+              isLoading={createLoading || updateLoading}
+              isDisabled={!formState.isValid}
+              variantColor="teal"
+              type="submit"
+            >
+              Save
+
+            </Button>
+            <Button variant="outline" onClick={() => handleCancelQuestion()}>Cancel</Button>
+          </ButtonGroup>
+        </Div>
+      </Form>
+    </FormContainer>
 
   );
 };

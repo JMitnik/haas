@@ -37,7 +37,7 @@
         "migrate:create": "yarn workspace @haas/api migrate:create",
         "seed:api": "yarn workspace @haas/api seed",
         "kill": "yarn kill:api && yarn kill:client",
-        "kill:api": "npx kill-port 4000 && npx kill-port 9229 | exit 0",
+        "kill:api": "yarn workspace @haas/api kill",
         "kill:client": "kill $(lsof -t -i:3000) | exit 0",
         "test": "yarn workspace @haas/client test",
         "test:cypress-dashboard": "yarn workspace @haas/dashboard cypress open",
