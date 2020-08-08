@@ -1,12 +1,13 @@
 
 import * as yup from 'yup';
 import { ApolloError } from 'apollo-client';
-import { Button, FormErrorMessage, useToast } from '@chakra-ui/core';
+import { Button, ButtonGroup, FormErrorMessage, useToast } from '@chakra-ui/core';
 import { MinusCircle, PlusCircle } from 'react-feather';
 import { debounce } from 'lodash';
 import { useForm } from 'react-hook-form';
 import { useMutation } from '@apollo/react-hooks';
 import { useParams } from 'react-router';
+import { yupResolver } from '@hookform/resolvers';
 import React, { useCallback, useEffect, useState } from 'react';
 import Select from 'react-select';
 
@@ -14,12 +15,11 @@ import {
   DeleteQuestionOptionButtonContainer,
 } from 'views/DialogueBuilderView/components/QuestionEntry/QuestionEntryStyles';
 import { Div, ErrorStyle, Flex, Form, FormContainer, FormControl, FormLabel,
-  FormSection, Grid, H3, H4, Hr, InputGrid, InputHelper, Label, Muted, StyledInput } from '@haas/ui';
+  FormSection, Grid, H3, H4, Hr, Input, InputGrid, InputHelper, Label, Muted } from '@haas/ui';
 import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
 import createQuestionMutation from 'mutations/createQuestion';
 import updateQuestionMutation from 'mutations/updateQuestion';
 
-import { yupResolver } from '@hookform/resolvers';
 import { EdgeConditonProps,
   OverrideLeafProps, QuestionEntryProps, QuestionOptionProps } from '../../DialogueBuilderInterfaces';
 
@@ -108,6 +108,7 @@ const QuestionEntryForm = ({
 
   const { register, handleSubmit, setValue, errors, getValues, formState } = useForm<FormDataProps>({
     resolver: yupResolver(schema),
+    mode: 'onChange',
     defaultValues: {
       parentQuestionType,
       options: [],
@@ -323,6 +324,7 @@ const QuestionEntryForm = ({
   const parentOptionsSelect = parentOptions?.map((option) => ({ label: option.value, value: option.value }));
   return (
     <FormContainer expandedForm>
+      <Hr />
       <Form onSubmit={handleSubmit(onSubmit)}>
         <Div py={4}>
           <FormSection id="general">
@@ -336,11 +338,10 @@ const QuestionEntryForm = ({
               <FormControl isRequired isInvalid={!!errors.title?.message}>
                 <FormLabel htmlFor="title">Title</FormLabel>
                 <InputHelper>What is the question you want to ask?</InputHelper>
-                <StyledInput
-                  isInvalid={!!errors.title}
+                <Input
                   name="title"
                   defaultValue={activeTitle}
-                  onBlur={(e) => setActiveTitle(e.currentTarget.value)}
+                  onBlur={(e: any) => setActiveTitle(e.currentTarget.value)}
                   ref={register({ required: true })}
                 />
                 <FormErrorMessage>{errors.title?.message}</FormErrorMessage>
@@ -349,77 +350,85 @@ const QuestionEntryForm = ({
           </FormSection>
 
           {parentQuestionType === 'Slider' && (
-            <FormSection>
-              <Div>
-                <H3 color="default.text" fontWeight={500} pb={2}>About condition</H3>
-                <Muted color="gray.600">
-                  When should this question be displayed
-                </Muted>
-              </Div>
-              <Div>
-                <InputGrid>
-                  <FormControl isRequired isInvalid={!!errors.minValue}>
-                    <FormLabel htmlFor="minValue">Min value</FormLabel>
-                    <InputHelper>What is the minimal value to trigger this question?</InputHelper>
-                    <StyledInput
-                      isInvalid={!!errors.minValue}
-                      name="minValue"
-                      ref={register({ required: false })}
-                      defaultValue={condition?.renderMin}
-                      onBlur={(event: React.FocusEvent<HTMLInputElement>) => setMinValue(event)}
-                    />
-                    <FormErrorMessage>{errors.minValue?.message}</FormErrorMessage>
-                  </FormControl>
+            <>
+              <Hr />
 
-                  <FormControl isRequired isInvalid={!!errors.maxValue}>
-                    <FormLabel htmlFor="maxValue">Max value</FormLabel>
-                    <InputHelper>What is the maximal value to trigger this question?</InputHelper>
-                    <StyledInput
-                      isInvalid={!!errors.maxValue}
-                      name="maxValue"
-                      ref={register({ required: false })}
-                      defaultValue={condition?.renderMax}
-                      onChange={(event) => setMaxValue(event.target.value)}
-                    />
-                    <FormErrorMessage>{errors.maxValue?.message}</FormErrorMessage>
-                  </FormControl>
+              <FormSection>
+                <Div>
+                  <H3 color="default.text" fontWeight={500} pb={2}>About condition</H3>
+                  <Muted color="gray.600">
+                    When should this question be displayed
+                  </Muted>
+                </Div>
+                <Div>
+                  <InputGrid>
+                    <FormControl isRequired isInvalid={!!errors.minValue}>
+                      <FormLabel htmlFor="minValue">Min value</FormLabel>
+                      <InputHelper>What is the minimal value to trigger this question?</InputHelper>
+                      <Input
+                        name="minValue"
+                        ref={register({ required: false })}
+                        defaultValue={condition?.renderMin}
+                        onBlur={(event: React.FocusEvent<HTMLInputElement>) => setMinValue(event)}
+                      />
+                      <FormErrorMessage>{errors.minValue?.message}</FormErrorMessage>
+                    </FormControl>
 
-                </InputGrid>
-              </Div>
-            </FormSection>
+                    <FormControl isRequired isInvalid={!!errors.maxValue}>
+                      <FormLabel htmlFor="maxValue">Max value</FormLabel>
+                      <InputHelper>What is the maximal value to trigger this question?</InputHelper>
+                      <Input
+                        name="maxValue"
+                        ref={register({ required: false })}
+                        defaultValue={condition?.renderMax}
+                        onChange={(event: any) => setMaxValue(event.target.value)}
+                      />
+                      <FormErrorMessage>{errors.maxValue?.message}</FormErrorMessage>
+                    </FormControl>
+
+                  </InputGrid>
+                </Div>
+              </FormSection>
+            </>
           )}
 
           {parentQuestionType === 'Choice' && (
-            <FormSection>
-              <Div>
-                <H3 color="default.text" fontWeight={500} pb={2}>About condition</H3>
-                <Muted color="gray.600">
-                  When should this question be displayed
-                </Muted>
-              </Div>
-              <Div>
-                <InputGrid>
-                  <FormControl isRequired isInvalid={!!errors.matchText}>
-                    <FormLabel htmlFor="matchText">Match value</FormLabel>
-                    <InputHelper>What is the multi-choice question to trigger this question?</InputHelper>
-                    <Select
-                      styles={errors.matchText && !activematchValue ? ErrorStyle : undefined}
-                      ref={() => register({
-                        name: 'matchText',
-                        required: false,
-                      })}
-                      options={parentOptionsSelect}
-                      value={activematchValue}
-                      onChange={(option: any) => {
-                        setMatchTextValue(option);
-                      }}
-                    />
-                    <FormErrorMessage>{errors.matchText?.message}</FormErrorMessage>
-                  </FormControl>
-                </InputGrid>
-              </Div>
-            </FormSection>
+            <>
+              <Hr />
+
+              <FormSection>
+                <Div>
+                  <H3 color="default.text" fontWeight={500} pb={2}>About condition</H3>
+                  <Muted color="gray.600">
+                    When should this question be displayed
+                  </Muted>
+                </Div>
+                <Div>
+                  <InputGrid>
+                    <FormControl isRequired isInvalid={!!errors.matchText}>
+                      <FormLabel htmlFor="matchText">Match value</FormLabel>
+                      <InputHelper>What is the multi-choice question to trigger this question?</InputHelper>
+                      <Select
+                        styles={errors.matchText && !activematchValue ? ErrorStyle : undefined}
+                        ref={() => register({
+                          name: 'matchText',
+                          required: false,
+                        })}
+                        options={parentOptionsSelect}
+                        value={activematchValue}
+                        onChange={(option: any) => {
+                          setMatchTextValue(option);
+                        }}
+                      />
+                      <FormErrorMessage>{errors.matchText?.message}</FormErrorMessage>
+                    </FormControl>
+                  </InputGrid>
+                </Div>
+              </FormSection>
+            </>
           )}
+
+          <Hr />
 
           <FormSection>
             <Div>
@@ -485,7 +494,7 @@ const QuestionEntryForm = ({
                   <Flex key={`${option.id}-${optionIndex}-${option.value}`} flexDirection="column">
                     <Flex my={1} flexDirection="row">
                       <Flex flexGrow={1}>
-                        <StyledInput
+                        <Input
                           isInvalid={errors.options && Array.isArray(errors.options) && !!errors.options?.[optionIndex]}
                           id={`options[${optionIndex}]`}
                           key={`input-${id}-${optionIndex}`}
@@ -495,12 +504,12 @@ const QuestionEntryForm = ({
                               minLength: 1 },
                           )}
                           defaultValue={option.value}
-                          onChange={(e) => handleOptionChange(e.currentTarget.value, optionIndex)}
+                          onChange={(e: any) => handleOptionChange(e.currentTarget.value, optionIndex)}
                         />
                       </Flex>
 
                       <DeleteQuestionOptionButtonContainer
-                        onClick={(e) => deleteOption(e, optionIndex)}
+                        onClick={(e: any) => deleteOption(e, optionIndex)}
                       >
                         <MinusCircle />
                       </DeleteQuestionOptionButtonContainer>
@@ -515,7 +524,7 @@ const QuestionEntryForm = ({
         </Div>
 
         <Div>
-          <Flex>
+          <ButtonGroup>
             <Button
               isLoading={createLoading || updateLoading}
               isDisabled={!formState.isValid}
@@ -526,7 +535,7 @@ const QuestionEntryForm = ({
 
             </Button>
             <Button variant="outline" onClick={() => handleCancelQuestion()}>Cancel</Button>
-          </Flex>
+          </ButtonGroup>
         </Div>
       </Form>
     </FormContainer>
