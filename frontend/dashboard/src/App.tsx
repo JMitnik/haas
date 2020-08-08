@@ -1,6 +1,7 @@
 import { ApolloProvider } from '@apollo/react-hooks';
-import { Redirect, Route, BrowserRouter as Router, Switch, RouteProps } from 'react-router-dom';
 import { ErrorBoundary } from 'react-error-boundary';
+import { I18nextProvider } from 'react-i18next';
+import { Redirect, Route, RouteProps, BrowserRouter as Router, Switch } from 'react-router-dom';
 import React, { FC } from 'react';
 
 import { AppContainer } from 'styles/AppStyles';
@@ -13,12 +14,12 @@ import AnalyticsPage from 'pages/dashboard/analytics';
 import CustomerPage from 'pages/dashboard/customer';
 import CustomerProvider from 'providers/CustomerProvider';
 import CustomersPage from 'pages/dashboard/customers';
+import DashboardLayout from 'layouts/DashboardLayout';
 import DashboardPage from 'pages/dashboard';
 import DialogueBuilderPage from 'pages/dashboard/builder';
 import DialoguePage from 'pages/dashboard/dialogues/dialogue';
 import DialoguesPage from 'pages/dashboard/dialogues';
 import EditCustomerView from 'views/EditCustomerView';
-import DashboardLayout from 'layouts/DashboardLayout';
 import EditDialogueView from 'views/EditDialogueView';
 import EditTriggerView from 'views/TriggerOverview/EditTriggerView';
 import EditUserView from 'views/UsersOverview/EditUserView';
@@ -31,20 +32,20 @@ import UsersOverview from 'views/UsersOverview/UsersOverview';
 
 import AuthProvider, { useAuth } from 'providers/AuthProvider';
 import DialogueLayout from 'layouts/DialogueLayout';
-import PreCustomerLayout from 'layouts/PreCustomerLayout';
 import LoginPage from 'pages/login';
-
-import client from './config/apollo';
+import PreCustomerLayout from 'layouts/PreCustomerLayout';
+import client from 'config/apollo';
+import lang from 'config/i18n-config';
 
 const ProtectedRoute = (props: RouteProps) => {
   const { user } = useAuth();
 
-  if (!user) return <Redirect to="/login" />
+  if (!user) return <Redirect to="/login" />;
 
   return (
     <Route {...props} />
   );
-}
+};
 
 const AppRoutes = () => (
   <Switch>
@@ -199,22 +200,24 @@ const GeneralErrorFallback = ({ error }: { error?: Error | undefined }) => (
 
 const App: FC = () => (
   <>
-    <ApolloProvider client={client}>
-      <CustomerProvider>
-        <Router>
+    <I18nextProvider i18n={lang}>
+      <ApolloProvider client={client}>
+        <CustomerProvider>
+          <Router>
             <ThemesProvider>
-          <AuthProvider>
-              <AppContainer>
-                <ErrorBoundary FallbackComponent={GeneralErrorFallback}>
-                  <AppRoutes />
-                </ErrorBoundary>
-              </AppContainer>
-              <GlobalStyle />
-          </AuthProvider>
+              <AuthProvider>
+                <AppContainer>
+                  <ErrorBoundary FallbackComponent={GeneralErrorFallback}>
+                    <AppRoutes />
+                  </ErrorBoundary>
+                </AppContainer>
+                <GlobalStyle />
+              </AuthProvider>
             </ThemesProvider>
-        </Router>
-      </CustomerProvider>
-    </ApolloProvider>
+          </Router>
+        </CustomerProvider>
+      </ApolloProvider>
+    </I18nextProvider>
   </>
 );
 
