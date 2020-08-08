@@ -1,6 +1,7 @@
-import { Minus, Plus } from 'react-feather';
+import { FolderMinus, FolderPlus, Minus, Plus } from 'react-feather';
 import React from 'react';
 
+import { Button } from '@chakra-ui/core';
 import { Span } from '@haas/ui';
 
 import { AddChildContainer, AddChildIconContainer } from './QuestionEntryStyles';
@@ -12,13 +13,12 @@ interface AddChildComponentProps {
 }
 
 const ShowChildQuestionComponent = ({ amtChildren, isExpanded, onExpandChange }: AddChildComponentProps) => (
-  <AddChildContainer onClick={() => onExpandChange()}>
-    <AddChildIconContainer>
-      {isExpanded ? <Minus /> : <Plus />}
-    </AddChildIconContainer>
-    <Span padding="4px">
-      {isExpanded ? `Hide children (${amtChildren})` : `Show children (${amtChildren})`}
-    </Span>
+  <AddChildContainer>
+    <Button leftIcon={isExpanded ? FolderMinus : FolderPlus} onClick={() => onExpandChange()}>
+      <Span padding="4px">
+        {isExpanded ? `Fold branch (${amtChildren})` : `Expand branch (${amtChildren})`}
+      </Span>
+    </Button>
   </AddChildContainer>
 );
 

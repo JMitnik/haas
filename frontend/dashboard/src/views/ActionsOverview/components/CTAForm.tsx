@@ -19,6 +19,9 @@ import updateCTAMutation from 'mutations/updateCTA';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Button, ButtonGroup, FormErrorMessage, useToast } from '@chakra-ui/core';
 import DeleteLinkSesctionButton from './DeleteLinkSectionButton';
+import LinkIcon from 'components/Icons/LinkIcon';
+import OpinionIcon from 'components/Icons/OpinionIcon';
+import RegisterIcon from 'components/Icons/RegisterIcon';
 
 interface FormDataProps {
   title: string;
@@ -63,9 +66,9 @@ const schema = yup.object().shape({
 });
 
 const CTA_TYPES = [
-  { label: 'Opinion', value: 'TEXTBOX' },
-  { label: 'Register', value: 'REGISTRATION' },
-  { label: 'Link', value: 'LINK' },
+  { label: 'Opinion', value: 'TEXTBOX', icon: OpinionIcon },
+  { label: 'Register', value: 'REGISTRATION', RegisterIcon },
+  { label: 'Link', value: 'LINK', LinkIcon },
 ];
 
 const LINK_TYPES = [
@@ -250,9 +253,9 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: 
         <Div py={4}>
           <FormSection id="general">
             <Div>
-              <H3 color="default.text" fontWeight={500} pb={2}>About dialogue</H3>
+              <H3 color="default.text" fontWeight={500} pb={2}>Call to action</H3>
               <Muted color="gray.600">
-                Tell us a bit about the dialogue
+                Information about your CTA
               </Muted>
             </Div>
             <Div>

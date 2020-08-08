@@ -126,6 +126,7 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
             isLoading={isLoading}
             onFormSubmit={onSubmit}
             serverErrors={serverErrors}
+            isInEdit
             willShowTemplate={false}
           />
         </FormContainer>

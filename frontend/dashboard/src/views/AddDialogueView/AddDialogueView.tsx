@@ -1,6 +1,6 @@
 import * as yup from 'yup';
 import { ApolloError } from 'apollo-boost';
-import { Button, ButtonGroup, FormErrorMessage, Stack } from '@chakra-ui/core';
+import { Button, ButtonGroup, FormErrorMessage, Stack, useToast } from '@chakra-ui/core';
 import { Container, Div, ErrorStyle, Flex, Form, FormContainer, FormControl, FormLabel,
   FormSection, H2, H3, Hr, Input, InputGrid, InputHelper, Muted, Textarea } from '@haas/ui';
 import { Controller, useForm } from 'react-hook-form';
@@ -32,7 +32,7 @@ interface FormDataProps {
 
 const DIALOGUE_CONTENT_TYPES = [
   { label: 'From scratch', value: 'SCRATCH' },
-  { label: 'From seed', value: 'SEED' },
+  { label: 'From default template', value: 'SEED' },
   { label: 'From other dialogue', value: 'TEMPLATE' },
 ];
 
@@ -59,6 +59,7 @@ const schema = yup.object().shape({
 
 const AddDialogueView = () => {
   const history = useHistory();
+  const toast = useToast();
   const form = useForm<FormDataProps>({
     resolver: yupResolver(schema),
     mode: 'onChange',
@@ -82,7 +83,17 @@ const AddDialogueView = () => {
 
   const [addDialogue, { error: serverError, loading: isLoading }] = useMutation(createDialogue, {
     onCompleted: () => {
-      history.push(`/dashboard/b/${customerSlug}/`);
+      toast({
+        title: 'Dialogue created!',
+        description: 'Dialogue has been created',
+        status: 'success',
+        position: 'bottom-right',
+        isClosable: true,
+      });
+
+      setTimeout(() => {
+        history.push(`/dashboard/b/${customerSlug}/`);
+      }, 500);
     },
     refetchQueries: [
       {
@@ -91,6 +102,13 @@ const AddDialogueView = () => {
       },
     ],
     onError: (error: ApolloError) => {
+      toast({
+        title: 'Something went wrong',
+        description: 'There was a problem in adding the dialogue. Please try again',
+        status: 'error',
+        position: 'bottom-right',
+        isClosable: true,
+      });
       // TODO: Use toast here + Sentry or so?
       console.log(`Error Name: ${error.name} \n`);
     },
@@ -150,8 +168,6 @@ const AddDialogueView = () => {
   // };
 
   const handleCustomerChange = (qOption: any) => {
-    form.setValue('customerOption', qOption?.value);
-
     setActiveCustomerTemplate(qOption);
     setActiveDialogueTemplate(null);
   };
@@ -159,7 +175,7 @@ const AddDialogueView = () => {
   const CUSTOMER_OPTIONS = customerData?.customers?.map(
     ({ name, id }: { name: string, id: string }) => ({ label: name, value: id }));
 
-  const dialogueOptions = activeCustomerTemplate
+  const dialogueOptions = form.watch('customerOption')
     && customerData?.customers?.find(
       (customer: any) => customer.id === activeCustomerTemplate?.value)?.dialogues?.map(
         (dialogue: any) => ({ label: dialogue.title, value: dialogue.id }));
@@ -168,8 +184,6 @@ const AddDialogueView = () => {
     label: tag?.name,
     value: tag?.id,
   }));
-
-  const watchContentOption = form.watch('contentOption');
 
   return (
     <Container>
@@ -270,46 +284,42 @@ const AddDialogueView = () => {
                       options={DIALOGUE_CONTENT_TYPES}
                       defaultValue={activeContentOption}
                     />
-                    <FormErrorMessage>{form.errors?.contentOption?.value?.message}</FormErrorMessage>
                   </FormControl>
 
-                  {(watchContentOption?.value === 'TEMPLATE' && CUSTOMER_OPTIONS) && (
+                  {(form.watch('contentOption')?.value === 'TEMPLATE' && CUSTOMER_OPTIONS) && (
                     <FormControl>
                       <FormLabel>Project for templates</FormLabel>
                       <InputHelper>Pick project to take template from</InputHelper>
-                      <Select
-                        styles={form.errors.customerOption && !activeCustomerTemplate ? ErrorStyle : undefined}
-                        ref={() => form.register({
-                          name: 'customerOption',
-                          required: false,
-                        })}
-                        options={CUSTOMER_OPTIONS}
-                        value={activeCustomerTemplate}
-                        onChange={(qOption: any) => {
-                          handleCustomerChange(qOption);
-                        }}
+                      <Controller
+                        name="customerOption"
+                        control={form.control}
+                        render={({ onChange, onBlur, value }) => (
+                          <Select
+                            options={CUSTOMER_OPTIONS}
+                            onChange={(data: any) => {
+                              handleCustomerChange(data);
+                              onChange(data.value);
+                            }}
+                          />
+                        )}
                       />
                       <FormErrorMessage>{form.errors.customerOption?.message}</FormErrorMessage>
                     </FormControl>
                   )}
 
-                  {(activeContentOption?.value === 'TEMPLATE' && dialogueOptions) && (
+                  {(form.watch('customerOption') && dialogueOptions) && (
                     <FormControl>
                       <FormLabel>Template from project</FormLabel>
                       <InputHelper>Pick template from project</InputHelper>
-                      <Select
-                        styles={form.errors.dialogueOption && !activeDialogueTemplate ? ErrorStyle : undefined}
-                        ref={() => form.register({
-                          name: 'dialogueOption',
-                          required: false,
-                        })}
+                      <Controller
+                        name="dialogueOption"
+                        control={form.control}
+                        as={Select}
                         options={dialogueOptions}
-                        value={activeDialogueTemplate}
                         onChange={(qOption: any) => {
                           handleDialogueTemplateChange(qOption);
                         }}
                       />
-                      <FormErrorMessage>{form.errors.customerOption?.message}</FormErrorMessage>
                     </FormControl>
                   )}
                 </InputGrid>

@@ -13,6 +13,7 @@ import RegisterIcon from 'components/Icons/RegisterIcon';
 import SearchBar from 'components/SearchBar/SearchBar';
 import getCTANodesQuery from 'queries/getCTANodes';
 
+import { Button } from '@chakra-ui/core';
 import { Variants, motion } from 'framer-motion';
 import AddCTAButton from './components/AddCTAButton';
 import CTAEntry from './components/CTAEntry';
@@ -121,13 +122,10 @@ const ActionOverview = ({ leafs }: ActionOverviewProps) => {
     <DialogueViewContainer>
       <Flex flexDirection="row" justifyContent="space-between">
         <Flex marginBottom="20px" flexDirection="row" alignItems="center" width="50%">
-          <H2 color="default.darkest" fontWeight={500} py={2}>Call-to-Actions</H2>
-          <AddCTAButton disabled={!!activeCTA || false} onClick={() => handleAddCTA()}>
-            <Plus />
-            <Span>
-              Add
-            </Span>
-          </AddCTAButton>
+          <H2 mr={4} color="default.darkest" fontWeight={500} py={2}>Call-to-Actions</H2>
+          <Button size="sm" variant="outline" leftIcon={Plus} isDisabled={!!activeCTA || false} onClick={() => handleAddCTA()}>
+            Add
+          </Button>
         </Flex>
         <Flex alignItems="center">
           <SearchBar activeSearchTerm={activeSearchTerm} onSearchTermChange={handleSearchTermChange} />

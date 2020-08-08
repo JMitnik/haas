@@ -111,14 +111,9 @@ export const AddChildContainer = styled(Flex)`
     flex-direction: row;
     justify-content: center;
     align-items: center;
-    cursor: pointer;
     bottom: 0; 
     left: 50%;
     transform: translate(-50%, -10px);
-    min-width: 250px;
-    color: ${theme.colors.default.darkest};
-    border-radius: ${theme.borderRadiuses.rounded};
-    background: ${theme.colors.default.dark}; 
  `}
 `;
 

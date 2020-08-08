@@ -94,7 +94,7 @@ const AddCustomerView = () => {
       </Div> */}
       <motion.div initial={{ opacity: 0, y: 100 }} animate={{ opacity: 1, y: 0 }}>
         <FormContainer>
-          <CustomerForm form={form} isLoading={loading} onFormSubmit={onSubmit} serverErrors={serverErrors} />
+          <CustomerForm isInEdit={false} form={form} isLoading={loading} onFormSubmit={onSubmit} serverErrors={serverErrors} />
         </FormContainer>
       </motion.div>
     </Container>

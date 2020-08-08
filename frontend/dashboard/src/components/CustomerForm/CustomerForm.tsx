@@ -99,7 +99,7 @@ const CustomerLogoFormFragment = ({ form }: { form: UseFormMethods<FormDataProps
           leftEl={<Link />}
           name="logo"
           isInvalid={!!form.errors.logo}
-          ref={form.register({ required: true })}
+          ref={form.register()}
         />
       </FormControl>
 
@@ -133,9 +133,10 @@ interface CustomerFormProps {
   // Customer-specific
   // eslint-disable-next-line react/require-default-props
   willShowTemplate?: boolean;
+  isInEdit?: boolean;
 }
 
-const CustomerForm = ({ form, onFormSubmit, isLoading, serverErrors, willShowTemplate = true }: CustomerFormProps) => {
+const CustomerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = false, willShowTemplate = true }: CustomerFormProps) => {
   const history = useHistory();
   const { t } = useTranslation();
 
@@ -158,7 +159,7 @@ const CustomerForm = ({ form, onFormSubmit, isLoading, serverErrors, willShowTem
                 placeholder="Peach inc."
                 leftEl={<Briefcase />}
                 name="name"
-                ref={form.register({ required: true })}
+                ref={form.register()}
               />
               <FormErrorMessage>{form.errors.name?.message}</FormErrorMessage>
             </FormControl>
@@ -170,7 +171,7 @@ const CustomerForm = ({ form, onFormSubmit, isLoading, serverErrors, willShowTem
                 placeholder="peach"
                 leftAddOn="https://client.haas.live/"
                 name="slug"
-                ref={form.register({ required: true })}
+                ref={form.register()}
               />
               <FormErrorMessage>{form.errors.slug?.message}</FormErrorMessage>
             </FormControl>
@@ -207,7 +208,7 @@ const CustomerForm = ({ form, onFormSubmit, isLoading, serverErrors, willShowTem
         </Div>
       </FormSection>
 
-      {willShowTemplate && (
+      {!isInEdit && (
         <>
           <Hr />
 
@@ -249,7 +250,7 @@ const CustomerForm = ({ form, onFormSubmit, isLoading, serverErrors, willShowTem
           variantColor="teal"
           type="submit"
         >
-          Create
+          {isInEdit ? 'Edit' : 'Create'}
         </Button>
         <Button variant="outline" onClick={() => history.push('/')}>Cancel</Button>
       </ButtonGroup>
