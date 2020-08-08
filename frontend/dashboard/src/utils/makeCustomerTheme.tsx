@@ -6,5 +6,5 @@ export const makeCustomTheme = (currTheme: any, customTheme: any) => {
     ...removeEmpty({ ...customTheme?.colors }),
   };
 
-  return { ...currTheme, colors };
+  return { ...currTheme, colors, isDarkColor: customTheme.isDarkColor };
 };

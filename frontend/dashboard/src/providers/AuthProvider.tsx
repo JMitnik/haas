@@ -1,9 +1,9 @@
 import { useMutation } from '@apollo/react-hooks';
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 
 import { LoginInput } from 'types/globalTypes';
-import loginUserMutation from 'mutations/loginUser';
 import { useToast } from '@chakra-ui/core';
+import loginUserMutation from 'mutations/loginUser';
 import useLocalStorage from 'hooks/useLocalStorage';
 
 interface AuthContext {
@@ -20,7 +20,6 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [authStorage, setAuthStorage] = useLocalStorage('auth', '');
   const toast = useToast();
 
-
   const [loginMutation, { data: loginData, loading, error: loginServerError }] = useMutation<{login: { token: string, user: any }}, LoginInput>(loginUserMutation, {
     onError: () => {
       toast({
@@ -29,7 +28,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         status: 'error',
         position: 'bottom-right',
         isClosable: true,
-      })
+      });
     },
     onCompleted: () => {
       toast({
@@ -39,7 +38,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         position: 'bottom-right',
         isClosable: true,
       });
-    }
+    },
   });
 
   const [user, setUser] = useState(() => {
@@ -58,14 +57,17 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     if (loginData) {
       setAuthStorage(JSON.stringify(loginData.login));
-      setUser(loginData.login.user)
+      setUser(loginData.login.user);
     }
   }, [loginData, setUser, setAuthStorage]);
 
   const logout = () => setUser(null);
 
   return (
-    <AuthContext.Provider value={{ user, login, isLoggingIn: loading, logout, loginServerError }}>
+    <AuthContext.Provider value={{
+      user, login, isLoggingIn: loading, logout, loginServerError,
+    }}
+    >
       {children}
     </AuthContext.Provider>
   );

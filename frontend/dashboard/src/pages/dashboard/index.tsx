@@ -9,7 +9,8 @@ const DashboardPage = () => {
 
   const { activeCustomer, storageCustomer } = useCustomer();
 
-  if (!user) return <Redirect to="/login" />;
+  // Note-Login: Uncomment this for login
+  // if (!user) return <Redirect to="/login" />;
 
   if (activeCustomer) {
     return (

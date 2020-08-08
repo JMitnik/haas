@@ -25,6 +25,9 @@ const language = {
       no_custom_template: 'Fresh start',
       no_custom_template_helper: 'Start with a clean slate',
     },
+    dialogue: {
+      slug_helper: 'Under which url segment will visitors find the dialogue?',
+    },
   },
 };
 

@@ -1,8 +1,8 @@
 import React from 'react';
 import styled, { css } from 'styled-components/macro';
 
+import { Div, GenericProps, H2 } from '@haas/ui';
 import { ReactComponent as SVGLogo } from 'assets/logo.svg';
-import { H2, Div, GenericProps } from '@haas/ui';
 
 export const LogoContainer = styled.div<{fill?: string}>`
   ${({ theme }) => css`
@@ -24,10 +24,11 @@ export const LogoContainer = styled.div<{fill?: string}>`
   `}
 `;
 
-export const FullLogoContainer = styled(Div)`
+export const FullLogoContainer = styled(Div)<GenericProps>`
   ${({ theme }) => css`
     display: flex;
     align-items: center;
+    justify-content: center;
 
     ${H2} {
       margin-left: ${theme.gutter / 2}px;
@@ -51,9 +52,9 @@ interface LogoProps {
   fill?: string;
 }
 
-export const FullLogo = (props: GenericProps) => (
-  <FullLogoContainer {...props} color="gray.600">
-    <SVGLogo/>
+export const FullLogo = (props: any) => (
+  <FullLogoContainer {...props}>
+    <SVGLogo />
     <H2>haas</H2>
   </FullLogoContainer>
 );

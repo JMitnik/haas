@@ -40,7 +40,8 @@ import lang from 'config/i18n-config';
 const ProtectedRoute = (props: RouteProps) => {
   const { user } = useAuth();
 
-  if (!user) return <Redirect to="/login" />;
+  // Note-Login: Uncomment this for login
+  // if (!user) return <Redirect to="/login" />;
 
   return (
     <Route {...props} />

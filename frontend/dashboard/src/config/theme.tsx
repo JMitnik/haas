@@ -1,12 +1,15 @@
 import { theme as chakraTheme } from '@chakra-ui/core';
+import { generatePalette } from 'utils/ColorUtils';
 
 // TODO: Export theme as type
 const theme = {
   ...chakraTheme,
+  isDarkColor: undefined,
   colors: {
     ...chakraTheme.colors,
     primary: '#426b3a',
     primaryAlt: '#8cb6ff',
+    primaries: generatePalette('#426b3a'),
     secondary: '#6f6594',
     tertiary: '#3182CE',
     black: 'black',
@@ -57,7 +60,7 @@ const theme = {
     special: '',
   },
   sidenav: {
-    width: 230,
+    width: 200,
   },
   // zIndices: {
   //   dropdown: 200,

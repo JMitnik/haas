@@ -8,11 +8,11 @@ import { Button, ButtonGroup, FormErrorMessage, RadioButtonGroup, useToast } fro
 import { Controller, UseFormMethods } from 'react-hook-form';
 import { useHistory } from 'react-router';
 import { useMutation } from '@apollo/react-hooks';
+import { useTranslation } from 'react-i18next';
 import React from 'react';
 
 import ColorPickerInput from 'components/ColorPicker';
 
-import { useTranslation } from 'react-i18next';
 import FileDropInput from 'components/FileDropInput';
 import ServerError from 'components/ServerError';
 import uploadSingleImage from '../../mutations/uploadSingleImage';

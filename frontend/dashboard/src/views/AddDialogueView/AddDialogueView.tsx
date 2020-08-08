@@ -7,6 +7,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { Minus, Plus, Type } from 'react-feather';
 import { useHistory, useParams } from 'react-router';
 import { useMutation, useQuery } from '@apollo/react-hooks';
+import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 import Select from 'react-select';
 
@@ -62,6 +63,8 @@ const AddDialogueView = () => {
     resolver: yupResolver(schema),
     mode: 'onChange',
   });
+
+  const { t } = useTranslation();
 
   const { customerSlug } = useParams();
   const [activeTags, setActiveTags] = useState<Array<null | {label: string, value: string}>>([]);
@@ -168,10 +171,6 @@ const AddDialogueView = () => {
 
   const watchContentOption = form.watch('contentOption');
 
-  console.log('Errors:', form.errors);
-  console.log(form.getValues());
-  console.log('content option: ', watchContentOption);
-
   return (
     <Container>
 
@@ -228,12 +227,12 @@ const AddDialogueView = () => {
                       name="description"
                       ref={form.register({ required: true })}
                     />
-                    <FormErrorMessage>{form.errors.title?.message}</FormErrorMessage>
+                    <FormErrorMessage>{form.errors.description?.message}</FormErrorMessage>
                   </FormControl>
 
                   <FormControl isRequired isInvalid={!!form.errors.slug}>
-                    <FormLabel htmlFor="slug">Slug</FormLabel>
-                    <InputHelper>Under which url segment will visitors find the business?</InputHelper>
+                    <FormLabel htmlFor="slug">{t('slug')}</FormLabel>
+                    <InputHelper>{t('dialogue:slug_helper')}</InputHelper>
                     <Input
                       placeholder="peaches-or-apples"
                       leftAddOn={`https://client.haas.live/${customerSlug}`}
