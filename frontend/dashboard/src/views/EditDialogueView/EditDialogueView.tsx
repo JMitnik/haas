@@ -1,19 +1,17 @@
 import * as yup from 'yup';
 import { ApolloError, gql } from 'apollo-boost';
 import { Button, ButtonGroup, FormErrorMessage, Stack } from '@chakra-ui/core';
-import { Minus, MinusCircle, Plus, PlusCircle, Type } from 'react-feather';
+import { Container, Div, Flex, Form, FormContainer, FormControl, FormLabel,
+  FormSection, H2, H3, Hr, Input, InputGrid, InputHelper, Muted, Textarea } from '@haas/ui';
+import { Controller, useForm } from 'react-hook-form';
+import { Minus, Plus, Type } from 'react-feather';
 import { motion } from 'framer-motion';
-import { useForm } from 'react-hook-form';
 import { useHistory, useParams } from 'react-router';
 import { useMutation, useQuery } from '@apollo/react-hooks';
-import ServerError from 'components/ServerError';
-import styled, { css } from 'styled-components/macro';
-
-import { Container, Div, ErrorStyle, Flex, Form, FormContainer, FormControl, FormLabel,
-  FormSection, H2, H3, Hr, Input, InputGrid, InputHelper, Muted, Textarea } from '@haas/ui';
 import { yupResolver } from '@hookform/resolvers';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import Select from 'react-select';
+import ServerError from 'components/ServerError';
 import editDialogueMutation from 'mutations/editDialogue';
 import getQuestionnairesCustomerQuery from 'queries/getDialoguesOfCustomer';
 import getTagsQuery from 'queries/getTags';
@@ -58,7 +56,7 @@ const schema = yup.object().shape({
   slug: yup.string().required('Slug is required'),
   publicTitle: yup.string().notRequired(),
   description: yup.string().required(),
-  tags: yup.array().of(yup.string().min(1).required()).notRequired(),
+  tags: yup.array().of(yup.object().shape({ label: yup.string().required(), value: yup.string().required() })).notRequired(),
 });
 
 const EditDialogueView = () => {
@@ -112,11 +110,6 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFo
   });
 
   const [activeTags, setActiveTags] = useState<Array<null | {label: string, value: string}>>(currentTags);
-
-  useEffect(() => {
-    const mappedTags = currentTags.map(({ value }) => value);
-    form.setValue('tags', mappedTags);
-  }, []);
 
   const onSubmit = (formData: FormDataProps) => {
     const tagIds = activeTags.map((tag) => tag?.value);
@@ -176,7 +169,7 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFo
                       placeholder="Peaches or apples?"
                       leftEl={<Type />}
                       defaultValue={dialogue?.title}
-                      name="name"
+                      name="title"
                       ref={form.register({ required: true })}
                     />
                     <FormErrorMessage>{form.errors.title?.message}</FormErrorMessage>
@@ -255,20 +248,12 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFo
                           data-cy="SelectOptions"
                           flexGrow={9}
                         >
-                          <Select
-                            styles={form.errors.tags?.[index] && !activeTags?.[index] ? ErrorStyle : undefined}
-                            id={`tags[${index}]`}
-                            key={index}
-                            ref={() => form.register({
-                              name: `tags[${index}]`,
-                              required: false,
-                              minLength: 1,
-                            })}
+                          <Controller
+                            name={`tags[${index}]`}
+                            control={form.control}
+                            as={Select}
                             options={tagOptions}
-                            value={tag}
-                            onChange={(qOption: any) => {
-                              setTags(qOption, index);
-                            }}
+                            defaultValue={tag}
                           />
                           <FormErrorMessage>{form.errors.tags?.[index]?.message}</FormErrorMessage>
                         </Div>
@@ -298,7 +283,7 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFo
                 variantColor="teal"
                 type="submit"
               >
-                Create
+                Save
               </Button>
               <Button variant="outline" onClick={() => history.push('/')}>Cancel</Button>
             </ButtonGroup>
