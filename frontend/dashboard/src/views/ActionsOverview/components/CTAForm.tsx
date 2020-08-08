@@ -1,13 +1,13 @@
 import * as yup from 'yup';
 import { ApolloError } from 'apollo-boost';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { useMutation } from '@apollo/react-hooks';
 import { useParams } from 'react-router-dom';
 import { yupResolver } from '@hookform/resolvers';
 import React, { useCallback, useEffect, useState } from 'react';
 import Select from 'react-select';
 
-import { Button, Div, ErrorStyle, Flex, Form, FormContainer, FormControl,
+import { Div, ErrorStyle, Flex, Form, FormContainer, FormControl,
   FormGroupContainer, FormLabel, FormSection, Grid, H3, H4, Hr, Input, InputGrid, InputHelper, Label, Muted } from '@haas/ui';
 import { PlusCircle, Type, X } from 'react-feather';
 import { cloneDeep, debounce } from 'lodash';
@@ -16,12 +16,12 @@ import createCTAMutation from 'mutations/createCTA';
 import getCTANodesQuery from 'queries/getCTANodes';
 import updateCTAMutation from 'mutations/updateCTA';
 
-import { FormErrorMessage, useToast } from '@chakra-ui/core';
+import { Button, FormErrorMessage, useToast } from '@chakra-ui/core';
 import DeleteLinkSesctionButton from './DeleteLinkSectionButton';
 
 interface FormDataProps {
   title: string;
-  ctaType: string;
+  ctaType: { label: string, value: string };
   links: Array<{id?: string | null;
     title: string;
     type?: string;
@@ -52,7 +52,7 @@ interface CTAFormProps {
 
 const schema = yup.object().shape({
   title: yup.string().required(),
-  ctaType: yup.string().required(),
+  ctaType: yup.object().shape({ label: yup.string().required(), value: yup.string().required() }).required(),
   links: yup.array().of(
     yup.object().shape({
       url: yup.string().required(),
@@ -81,6 +81,9 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: 
   const form = useForm<FormDataProps>({
     resolver: yupResolver(schema),
     mode: 'onChange',
+    defaultValues: {
+      ctaType: type,
+    },
   });
 
   const clonedLinks = cloneDeep(links);
@@ -89,13 +92,13 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: 
   const [activeType, setActiveType] = useState<{ label: string, value: string }>(type);
 
   useEffect(() => {
-    form.setValue('ctaType', type?.value);
+    // form.setValue('ctaType', type?.value);
     const mappedLinks = clonedLinks.map((link) => ({ ...link, type: link?.type?.value || '' }));
     form.setValue('links', mappedLinks);
   }, []);
 
   const handleMultiChange = useCallback((selectedOption: any) => {
-    form.setValue('ctaType', selectedOption?.value);
+    // form.setValue('ctaType', selectedOption?.value);
     setActiveType(selectedOption);
   }, [setActiveType]);
 
@@ -126,7 +129,7 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: 
 
   const toast = useToast();
 
-  const [addCTA] = useMutation(createCTAMutation, {
+  const [addCTA, { loading: addLoading }] = useMutation(createCTAMutation, {
     onCompleted: () => {
       onNewCTAChange(false);
       onActiveCTAChange(null);
@@ -137,7 +140,7 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: 
     refetchQueries: refetchingQueries,
   });
 
-  const [updateCTA] = useMutation(updateCTAMutation, {
+  const [updateCTA, { loading: updateLoading }] = useMutation(updateCTAMutation, {
     onCompleted: () => {
       toast({
         title: 'Edit complete!',
@@ -157,6 +160,8 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: 
     refetchQueries: refetchingQueries,
   });
 
+  const watchType = form.watch('ctaType');
+
   const onSubmit = (formData: FormDataProps) => {
     if (id === '-1') {
       const mappedLinks = { linkTypes: activeLinks.map((link) => {
@@ -168,7 +173,7 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: 
           customerSlug,
           dialogueSlug,
           title: formData.title,
-          type: formData.ctaType || undefined,
+          type: formData.ctaType.value || undefined,
           links: mappedLinks,
         },
       });
@@ -178,7 +183,7 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: 
         variables: {
           id,
           title: formData.title,
-          type: formData.ctaType || undefined,
+          type: formData.ctaType.value || undefined,
           links: mappedLinks,
         },
       });
@@ -235,6 +240,9 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: 
     });
   };
 
+  console.log('values: ', form.getValues());
+  console.log('watch: ', watchType);
+
   return (
     <FormContainer expandedForm>
       <Form onSubmit={form.handleSubmit(onSubmit)}>
@@ -264,179 +272,141 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: 
                 <FormControl isRequired>
                   <FormLabel htmlFor="ctaType">Type</FormLabel>
                   <InputHelper>What is the type of the CTA?</InputHelper>
-                  <Select
-                    styles={form.errors.ctaType && !activeType ? ErrorStyle : undefined}
-                    ref={() => form.register({
-                      name: 'ctaType',
-                      required: true,
-                    })}
+                  <Controller
+                    name="ctaType"
+                    control={form.control}
+                    as={<Select styles={form.errors.ctaType && !activeType ? ErrorStyle : undefined} />}
                     options={CTA_TYPES}
-                    value={activeType}
-                    onChange={(qOption: any) => {
-                      handleMultiChange(qOption);
-                    }}
+                    defaultValue={activeType}
                   />
-                  <FormErrorMessage>{form.errors.ctaType?.message}</FormErrorMessage>
+                  <FormErrorMessage>{form.errors.ctaType?.value?.message}</FormErrorMessage>
                 </FormControl>
               </InputGrid>
             </Div>
-            <Flex flexDirection="column" gridColumn="1 / -1">
-              <Label>Title</Label>
-              <Input isInvalid={!!form.errors.title} name="title" defaultValue={title} ref={form.register({ required: true })} />
-              {form.errors.title && <Muted color="warning">{form.errors.title.message}</Muted>}
-            </Flex>
-            <Div useFlex flexDirection="column">
-              <Label>Type</Label>
-              <Select
-                styles={form.errors.ctaType && !activeType ? ErrorStyle : undefined}
-                ref={() => form.register({
-                  name: 'ctaType',
-                  required: true,
-                })}
-                options={CTA_TYPES}
-                value={activeType}
-                onChange={(qOption: any) => {
-                  handleMultiChange(qOption);
-                }}
-              />
-              {form.errors.ctaType && !activeType && (
-              <Muted color="warning">
-                {form.errors.ctaType.message}
-              </Muted>
-              )}
-            </Div>
           </FormSection>
-          <Grid gridTemplateColumns={['1fr', '1fr 1fr']}>
-            <Flex flexDirection="column" gridColumn="1 / -1">
-              <Label>Title</Label>
-              <Input isInvalid={!!form.errors.title} name="title" defaultValue={title} ref={form.register({ required: true })} />
-              {form.errors.title && <Muted color="warning">{form.errors.title.message}</Muted>}
-            </Flex>
-            <Div useFlex flexDirection="column">
-              <Label>Type</Label>
-              <Select
-                styles={form.errors.ctaType && !activeType ? ErrorStyle : undefined}
-                ref={() => form.register({
-                  name: 'ctaType',
-                  required: true,
-                })}
-                options={CTA_TYPES}
-                value={activeType}
-                onChange={(qOption: any) => {
-                  handleMultiChange(qOption);
-                }}
-              />
-              {form.errors.ctaType && !activeType && (
-              <Muted color="warning">
-                {form.errors.ctaType.message}
+          {watchType?.value === 'LINK' && (
+          <FormSection id="links">
+            <Div>
+              <H3 color="default.text" fontWeight={500} pb={2}>Links</H3>
+              <Muted color="gray.600">
+                What links do you want to add to the CTA?
               </Muted>
-              )}
             </Div>
-            {activeType.value === 'LINK' && (
-            <Div gridColumn="1 / -1">
-              <Flex flexDirection="row" alignItems="center" justifyContent="space-between" marginBottom={5}>
-                <H4>Links</H4>
-                <PlusCircle onClick={addCondition} />
-              </Flex>
-              <Hr />
+            <Div>
+              <InputGrid>
+                <Div gridColumn="1 / -1">
+                  <Flex flexDirection="row" alignItems="center" justifyContent="space-between" marginBottom={5}>
+                    <H4>Links</H4>
+                    <PlusCircle onClick={addCondition} />
+                  </Flex>
+                  <Hr />
 
-              {activeLinks.map((link, index) => (
-                <Div position="relative" key={index} marginTop={15} gridColumn="1 / -1">
-                  <Grid
-                    border="1px solid"
-                    borderColor="default.light"
-                    gridGap="12px"
-                    padding="10px"
-                    gridTemplateColumns={['1fr 1fr']}
-                  >
-                    <DeleteLinkSesctionButton onClick={() => handleDeleteLink(index)}>
-                      <X />
-                    </DeleteLinkSesctionButton>
-                    <Flex flexDirection="column">
-                      <Label>Url</Label>
-                      <Input
-                        isInvalid={!!form.errors.links?.[index]?.url}
-                        name={`links[${index}].url`}
-                        defaultValue={link.url}
-                        onChange={(e: any) => handleURLChange(e.currentTarget.value, index)}
-                        ref={form.register({ required: true })}
-                      />
-                      {form.errors.links?.[index]?.url && (
-                      <Muted color="warning">{form.errors.links?.[index]?.url?.message}</Muted>
-                        )}
-                    </Flex>
-                    <Div useFlex flexDirection="column">
-                      <Label>Type</Label>
-                      <Select
-                        styles={form.errors.links?.[index]?.type && !activeLinks?.[index]?.type ? ErrorStyle : undefined}
-                        ref={() => form.register({
-                          name: `links[${index}].type`,
-                          required: true,
-                        })}
-                        options={LINK_TYPES}
-                        value={link.type}
-                        onChange={(qOption: any) => {
-                          handleLinkTypeChange(qOption, index);
-                        }}
-                      />
-                      {form.errors.links?.[index]?.type && !activeLinks?.[index]?.type && (
-                      <Muted color="warning">
-                        {form.errors.links?.[index]?.type?.message}
-                      </Muted>
-                        )}
+                  {activeLinks.map((link, index) => (
+                    <Div position="relative" key={index} marginTop={15} gridColumn="1 / -1">
+                      <Grid
+                        border="1px solid"
+                        borderColor="default.light"
+                        gridGap="12px"
+                        padding="10px"
+                        gridTemplateColumns={['1fr 1fr']}
+                      >
+                        <DeleteLinkSesctionButton onClick={() => handleDeleteLink(index)}>
+                          <X />
+                        </DeleteLinkSesctionButton>
+
+                        <FormControl isRequired isInvalid={!!form.errors?.links?.[index]?.url}>
+                          <FormLabel htmlFor={`links[${index}].url`}>Url</FormLabel>
+                          <InputHelper>What is the url the link should lead to?</InputHelper>
+                          <Input
+                            name={`links[${index}].url`}
+                            defaultValue={link.url}
+                            placeholder="https://link.to/"
+                            leftEl={<Type />}
+                            onChange={(e: any) => handleURLChange(e.currentTarget.value, index)}
+                            ref={form.register({ required: true })}
+                          />
+                          <FormErrorMessage>{!!form.errors?.links?.[index]?.url?.message}</FormErrorMessage>
+                        </FormControl>
+
+                        <FormControl isRequired>
+                          <FormLabel htmlFor={`links[${index}].type`}>Type</FormLabel>
+                          <InputHelper>What is the type of the link?</InputHelper>
+                          <Select
+                            styles={form.errors.links?.[index]?.type && !activeLinks?.[index]?.type ? ErrorStyle : undefined}
+                            ref={() => form.register({
+                              name: `links[${index}].type`,
+                              required: true,
+                            })}
+                            options={LINK_TYPES}
+                            value={link.type}
+                            onChange={(qOption: any) => {
+                              handleLinkTypeChange(qOption, index);
+                            }}
+                          />
+                          <FormErrorMessage>{!!form.errors.links?.[index]?.type}</FormErrorMessage>
+                        </FormControl>
+
+                        <FormControl>
+                          <FormLabel htmlFor={`links[${index}].tooltip`}>Tooltip</FormLabel>
+                          <InputHelper>What is the text when hovering over the link?</InputHelper>
+                          <Input
+                            isInvalid={!!form.errors.links?.[index]?.tooltip}
+                            name={`links[${index}].tooltip`}
+                            defaultValue={link.title}
+                            onChange={(e:any) => handleTooltipChange(e.currentTarget.value, index)}
+                            ref={form.register({ required: false })}
+                          />
+                          <FormErrorMessage>{!!form.errors.links?.[index]?.tooltip}</FormErrorMessage>
+                        </FormControl>
+
+                        <FormControl>
+                          <FormLabel htmlFor={`links[${index}].iconUrl`}>Icon</FormLabel>
+                          <InputHelper>What icon is displayed for the link?</InputHelper>
+                          <Input
+                            isInvalid={!!form.errors.links?.[index]?.iconUrl}
+                            name={`links[${index}].iconUrl`}
+                            defaultValue={link.iconUrl}
+                            onChange={(e:any) => handleIconChange(e.currentTarget.value, index)}
+                            ref={form.register({ required: false })}
+                          />
+                          <FormErrorMessage>{!!form.errors.links?.[index]?.iconUrl}</FormErrorMessage>
+                        </FormControl>
+
+                        <FormControl>
+                          <FormLabel htmlFor={`links[${index}].backgroundColor`}>Background color</FormLabel>
+                          <InputHelper>What icon is displayed for the link?</InputHelper>
+                          <Input
+                            isInvalid={!!form.errors.links?.[index]?.backgroundColor}
+                            name={`links[${index}].backgroundColor`}
+                            defaultValue={link.backgroundColor}
+                            onChange={(e:any) => handleBackgroundColorChange(e.currentTarget.value, index)}
+                            ref={form.register({ required: false })}
+                          />
+                          <FormErrorMessage>{!!form.errors.links?.[index]?.backgroundColor}</FormErrorMessage>
+                        </FormControl>
+                      </Grid>
                     </Div>
-                    <Flex flexDirection="column">
-                      <Label>Tooltip</Label>
-                      <Input
-                        isInvalid={!!form.errors.links?.[index]?.tooltip}
-                        name={`links[${index}].tooltip`}
-                        defaultValue={link.title}
-                        onChange={(e:any) => handleTooltipChange(e.currentTarget.value, index)}
-                        ref={form.register({ required: false })}
-                      />
-                      {form.errors.links?.[index]?.tooltip && (
-                      <Muted color="warning">{form.errors.links?.[index]?.tooltip?.message}</Muted>
-                        )}
-                    </Flex>
-                    <Flex flexDirection="column">
-                      <Label>Icon</Label>
-                      <Input
-                        isInvalid={!!form.errors.links?.[index]?.iconUrl}
-                        name={`links[${index}].iconUrl`}
-                        defaultValue={link.iconUrl}
-                        onChange={(e:any) => handleIconChange(e.currentTarget.value, index)}
-                        ref={form.register({ required: false })}
-                      />
-                      {form.errors.links?.[index]?.iconUrl && (
-                      <Muted color="warning">{form.errors.links?.[index]?.iconUrl?.message}</Muted>
-                        )}
-                    </Flex>
-                    <Flex flexDirection="column">
-                      <Label>Background color</Label>
-                      <Input
-                        isInvalid={!!form.errors.links?.[index]?.backgroundColor}
-                        name={`links[${index}].backgroundColor`}
-                        defaultValue={link.backgroundColor}
-                        onChange={(e:any) => handleBackgroundColorChange(e.currentTarget.value, index)}
-                        ref={form.register({ required: false })}
-                      />
-                      {form.errors.links?.[index]?.backgroundColor && (
-                      <Muted color="warning">{form.errors.links?.[index]?.backgroundColor?.message}</Muted>
-                        )}
-                    </Flex>
-                  </Grid>
-                </Div>
-              ))}
+                  ))}
 
+                </Div>
+              </InputGrid>
             </Div>
-            )}
-          </Grid>
+
+          </FormSection>
+          )}
         </Div>
 
         <Div>
           <Flex>
-            <Button brand="primary" mr={2} type="submit">Save CTA</Button>
-            <Button brand="default" type="button" onClick={() => cancelCTA()}>Cancel</Button>
+            <Button
+              isLoading={addLoading || updateLoading}
+              isDisabled={!form.formState.isValid}
+              variantColor="teal"
+              type="submit"
+            >
+              Save
+            </Button>
+            <Button variant="outline" onClick={() => cancelCTA()}>Cancel</Button>
           </Flex>
         </Div>
       </Form>
