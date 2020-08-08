@@ -5,7 +5,7 @@ import { LinkProps, NavLink, useHistory } from 'react-router-dom';
 import React from 'react';
 import styled, { css } from 'styled-components/macro';
 
-import { FullLogo, FullLogoContainer } from 'components/Logo/Logo';
+import { FullLogo, FullLogoContainer, LogoContainer } from 'components/Logo/Logo';
 import { UserProps } from 'types/generic';
 import { useCustomer } from 'providers/CustomerProvider';
 import Avatar from 'components/Avatar';
@@ -13,7 +13,8 @@ import Logo from 'components/Logo';
 
 interface NavItemProps extends LinkProps { }
 
-export const NavItemContainer = styled.li``;
+export const NavItemContainer = styled.li`
+`;
 
 export const NavItem = ({ children, ...props }: NavItemProps) => (
   <NavItemContainer>
@@ -28,15 +29,12 @@ export const NavLinkContainer = styled(NavLink) <LinkProps>`
     margin-left: ${theme.gutter}px;
     display: flex;
     align-items: center;
-
-    a {
-      font-size: 0.8rem;
-    }
+    flex-direction: column;
+    font-size: 0.7rem;
 
     /* For the icons */
     svg {
       width: 24px;
-      margin-right: ${theme.gutter / 2}px;
       fill: ${theme.isDarkColor ? theme.colors.primaries['400'] : theme.colors.primaries['800']};
 
       .secondary {
@@ -120,7 +118,7 @@ export const Usernav = ({ user, customer }: { user: UserProps, customer: any }) 
           <AvatarBadge size="1em" bg="green.400" />
         </ChakraAvatar>
 
-        <Div ml={4}>
+        {/* <Div ml={4}>
           <ColumnFlex>
             <Span fontSize="0.8rem" display="block">
               {`${user.firstName} ${user.lastName}`}
@@ -132,7 +130,7 @@ export const Usernav = ({ user, customer }: { user: UserProps, customer: any }) 
               </Badge>
             </Div>
           </ColumnFlex>
-        </Div>
+        </Div> */}
       </Flex>
     </UsernavContainer>
   );
@@ -157,6 +155,10 @@ export const SidenavContainer = styled.div`
       color: ${theme.isDarkColor ? theme.colors.primaries['100'] : theme.colors.primaries['800']};
     }
 
+    ${LogoContainer} {
+      color: ${theme.isDarkColor ? theme.colors.primaries['100'] : theme.colors.primaries['800']};
+    }
+
     ${NavItems} {
       padding-top: 100px;
     }
@@ -164,7 +166,6 @@ export const SidenavContainer = styled.div`
     ul {
       a {
         text-decoration: none;
-        font-size: 1rem;
         margin-left: ${theme.gutter * 0.5}px;
         margin-right: ${theme.gutter * 0.5}px;
 

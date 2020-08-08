@@ -3,7 +3,6 @@ import React from 'react';
 import styled, { css } from 'styled-components/macro';
 
 import { Div, PageHeading } from '@haas/ui';
-import { FullLogo } from 'components/Logo/Logo';
 import { NavItem, NavItems, NavLogo, Usernav } from 'components/Sidenav/Sidenav';
 import { ReactComponent as NotificationIcon } from 'assets/icons/icon-notification.svg';
 import { ReactComponent as PieChartIcon } from 'assets/icons/icon-pie-chart.svg';
@@ -13,6 +12,7 @@ import { UserProps } from 'types/generic';
 import { ReactComponent as UsersIcon } from 'assets/icons/icon-user-group.svg';
 import { useAuth } from 'providers/AuthProvider';
 import { useCustomer } from 'providers/CustomerProvider';
+import Logo, { FullLogo } from 'components/Logo/Logo';
 import Sidenav from 'components/Sidenav';
 import useLocalStorage from 'hooks/useLocalStorage';
 
@@ -56,14 +56,11 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
       <Div>
         <Sidenav>
           <Div>
-            <FullLogo />
+            <Logo justifyContent="center" />
             <NavItems>
               <NavItem to={`/dashboard/b/${params.customerSlug}/d`}>
                 <SurveyIcon />
                 Dialogues
-                {params.dialogueSlug && (
-                  <p>Test</p>
-                )}
               </NavItem>
               <NavItem to={`/dashboard/b/${params.customerSlug}/analytics`}>
                 <PieChartIcon />

@@ -4,14 +4,13 @@ import styled, { css } from 'styled-components/macro';
 import { Div, GenericProps, H2 } from '@haas/ui';
 import { ReactComponent as SVGLogo } from 'assets/logo.svg';
 
-export const LogoContainer = styled.div<{fill?: string}>`
+export const LogoContainer = styled(Div)<{fill?: string}>`
   ${({ theme }) => css`
     display: flex;
-    justify-content: space-between;
 
     ${theme && css`
       svg path {
-        fill: ${theme.colors.primary};
+        fill: currentColor;
       }
     `}
 
@@ -59,8 +58,8 @@ export const FullLogo = (props: any) => (
   </FullLogoContainer>
 );
 
-const Logo = () => (
-  <LogoContainer>
+const Logo = (props: any) => (
+  <LogoContainer {...props}>
     <SVGLogo />
   </LogoContainer>
 );

@@ -60,7 +60,9 @@ const theme = {
     special: '',
   },
   sidenav: {
-    width: 200,
+    // Note-sidenav: uncomment to get back old sidenav
+    // width: 200,
+    width: 100,
   },
   // zIndices: {
   //   dropdown: 200,

@@ -22,7 +22,7 @@ const PreCustomerLayoutContainer = styled(Div)`
 const PreCustomerLayout = ({ children }: PreCustomerLayoutProps) => (
   <PreCustomerLayoutContainer>
     <Container mb="48px">
-      <Logo />
+      <Logo justifyContent="flex-start" />
     </Container>
     {children}
   </PreCustomerLayoutContainer>
