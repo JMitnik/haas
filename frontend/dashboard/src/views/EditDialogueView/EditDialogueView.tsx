@@ -48,7 +48,7 @@ interface FormDataProps {
   publicTitle?: string;
   description: string;
   slug: string;
-  tags: Array<string>;
+  tags: Array<{label: string, value: string}>;
 }
 
 const schema = yup.object().shape({
@@ -56,7 +56,9 @@ const schema = yup.object().shape({
   slug: yup.string().required('Slug is required'),
   publicTitle: yup.string().notRequired(),
   description: yup.string().required(),
-  tags: yup.array().of(yup.object().shape({ label: yup.string().required(), value: yup.string().required() })).notRequired(),
+  tags: yup.array().of(yup.object().shape(
+    { label: yup.string().required(), value: yup.string().required() },
+  )).notRequired(),
 });
 
 const EditDialogueView = () => {
@@ -112,7 +114,7 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFo
   const [activeTags, setActiveTags] = useState<Array<null | {label: string, value: string}>>(currentTags);
 
   const onSubmit = (formData: FormDataProps) => {
-    const tagIds = activeTags.map((tag) => tag?.value);
+    const tagIds = formData.tags.map((tag) => tag?.value);
     const tagEntries = { entries: tagIds };
 
     editDialogue({
@@ -124,14 +126,6 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFo
         description: formData.description,
         tags: tagEntries,
       },
-    });
-  };
-
-  const setTags = (qOption: { label: string, value: string }, index: number) => {
-    form.setValue(`tags[${index}]`, qOption?.value);
-    setActiveTags((prevTags) => {
-      prevTags[index] = qOption;
-      return [...prevTags];
     });
   };
 
@@ -255,7 +249,7 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFo
                             options={tagOptions}
                             defaultValue={tag}
                           />
-                          <FormErrorMessage>{form.errors.tags?.[index]?.message}</FormErrorMessage>
+                          <FormErrorMessage>{form.errors.tags?.[index]?.value?.message}</FormErrorMessage>
                         </Div>
                         <Flex justifyContent="center" alignContent="center" flexGrow={1}>
                           <Button
