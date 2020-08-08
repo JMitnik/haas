@@ -6,7 +6,7 @@ import { Container, Div, ErrorStyle, Flex, Form, FormContainer, FormControl, For
 import { Controller, useForm } from 'react-hook-form';
 import { Minus, Plus, Type } from 'react-feather';
 import { useHistory, useParams } from 'react-router';
-import { useLazyQuery, useMutation, useQuery } from '@apollo/react-hooks';
+import { useMutation, useQuery } from '@apollo/react-hooks';
 import React, { useState } from 'react';
 import Select from 'react-select';
 
@@ -65,7 +65,7 @@ const AddDialogueView = () => {
 
   const { customerSlug } = useParams();
   const [activeTags, setActiveTags] = useState<Array<null | {label: string, value: string}>>([]);
-  const [activeContentOption, setActiveContentOption] = useState<null | {label: string, value: string}>(null);
+  const [activeContentOption] = useState<null | {label: string, value: string}>(null);
   const [activeCustomerTemplate, setActiveCustomerTemplate] = useState<null | {label: string, value: string}>(null);
   const [activeDialogueTemplate, setActiveDialogueTemplate] = useState<null | {label: string, value: string}>(null);
   const { data: customerData } = useQuery(getCustomerQuery, {

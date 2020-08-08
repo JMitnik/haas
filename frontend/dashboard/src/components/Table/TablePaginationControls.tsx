@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Div, Flex, Span } from '@haas/ui';
+import { Flex, Span } from '@haas/ui';
 import styled, { css } from 'styled-components';
 
 interface PaginationProps {

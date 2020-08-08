@@ -74,6 +74,7 @@ const EditCustomerForm = ({ user, roles }: { user: any, roles: Array<{ label: st
     },
   });
 
+  // TODO: Put dependency of userRole
   useEffect(() => {
     setValue('role', userRole?.value);
   }, [setValue]);

@@ -3,12 +3,12 @@
  * Do not make changes to this file directly
  */
 
+import * as APIContext from "../types/APIContext"
 import * as prisma from "@prisma/client"
 import { core } from "@nexus/schema"
-import * as APIContext from "../types/APIContext"
 declare global {
   interface NexusGenCustomInputMethods<TypeName extends string> {
-    upload<FieldName extends string>(fieldName: FieldName, opts?: core.ScalarInputFieldConfig<core.GetGen3<'inputTypes', TypeName, FieldName>>): void // "Upload";
+    upload<FieldName extends string>(fieldName: FieldName, opts?: core.ScalarInputFieldConfig<core.GetGen3<"inputTypes", TypeName, FieldName>>): void // "Upload";
   }
 }
 declare global {
@@ -16,6 +16,7 @@ declare global {
     upload<FieldName extends string>(fieldName: FieldName, ...opts: core.ScalarOutSpread<TypeName, FieldName>): void // "Upload";
   }
 }
+
 
 declare global {
   interface NexusGen extends NexusGenTypes {}
@@ -194,13 +195,13 @@ export interface NexusGenInputs {
 }
 
 export interface NexusGenEnums {
-  LinkTypeEnumType: 'API' | 'FACEBOOK' | 'INSTAGRAM' | 'LINKEDIN' | 'SOCIAL' | 'TWITTER' | 'WHATSAPP'
-  PaginationSortByEnum: 'createdAt' | 'email' | 'firstName' | 'id' | 'lastName' | 'medium' | 'name' | 'paths' | 'role' | 'score' | 'type' | 'user' | 'when'
-  QuestionNodeTypeEnum: 'CHOICE' | 'GENERIC' | 'LINK' | 'REGISTRATION' | 'SLIDER' | 'TEXTBOX'
-  TagTypeEnum: 'AGENT' | 'DEFAULT' | 'LOCATION'
+  LinkTypeEnumType: "API" | "FACEBOOK" | "INSTAGRAM" | "LINKEDIN" | "SOCIAL" | "TWITTER" | "WHATSAPP"
+  PaginationSortByEnum: "createdAt" | "email" | "firstName" | "id" | "lastName" | "medium" | "name" | "paths" | "role" | "score" | "type" | "user" | "when"
+  QuestionNodeTypeEnum: "CHOICE" | "GENERIC" | "LINK" | "REGISTRATION" | "SLIDER" | "TEXTBOX"
+  TagTypeEnum: "AGENT" | "DEFAULT" | "LOCATION"
   TriggerConditionEnum: prisma.TriggerConditionEnum
-  TriggerMediumEnum: 'BOTH' | 'EMAIL' | 'PHONE'
-  TriggerTypeEnum: 'QUESTION' | 'SCHEDULED'
+  TriggerMediumEnum: "BOTH" | "EMAIL" | "PHONE"
+  TriggerTypeEnum: "QUESTION" | "SCHEDULED"
 }
 
 export interface NexusGenRootTypes {
@@ -891,20 +892,20 @@ export interface NexusGenArgTypes {
 }
 
 export interface NexusGenAbstractResolveReturnTypes {
-  ConnectionInterface: 'SessionConnection' | 'RoleConnection' | 'TriggerConnectionType'
+  ConnectionInterface: "SessionConnection" | "RoleConnection" | "TriggerConnectionType"
 }
 
 export interface NexusGenInheritedFields {}
 
-export type NexusGenObjectNames = 'ColourSettings' | 'Customer' | 'CustomerSettings' | 'Dialogue' | 'DialogueStatistics' | 'Edge' | 'EdgeCondition' | 'FontSettings' | 'ImageType' | 'LinkType' | 'LoginOutput' | 'Mutation' | 'NodeEntry' | 'NodeEntryValue' | 'PaginationPageInfo' | 'PermssionType' | 'Query' | 'QuestionNode' | 'QuestionOption' | 'RoleConnection' | 'RoleType' | 'Session' | 'SessionConnection' | 'Tag' | 'TriggerConditionType' | 'TriggerConnectionType' | 'TriggerType' | 'UserTable' | 'UserType' | 'lineChartDataType' | 'topPathType';
+export type NexusGenObjectNames = "ColourSettings" | "Customer" | "CustomerSettings" | "Dialogue" | "DialogueStatistics" | "Edge" | "EdgeCondition" | "FontSettings" | "ImageType" | "LinkType" | "LoginOutput" | "Mutation" | "NodeEntry" | "NodeEntryValue" | "PaginationPageInfo" | "PermssionType" | "Query" | "QuestionNode" | "QuestionOption" | "RoleConnection" | "RoleType" | "Session" | "SessionConnection" | "Tag" | "TriggerConditionType" | "TriggerConnectionType" | "TriggerType" | "UserTable" | "UserType" | "lineChartDataType" | "topPathType";
 
-export type NexusGenInputNames = 'AddDialogueInput' | 'CTALinkInputObjectType' | 'CTALinksInputType' | 'ChoiceNodeEntryInput' | 'CustomerCreateOptions' | 'CustomerEditOptions' | 'CustomerWhereUniqueInput' | 'DialogueFilterInputType' | 'DialogueWhereUniqueInput' | 'EdgeConditionInputType' | 'LoginInput' | 'NodeEntryDataInput' | 'NodeEntryInput' | 'OptionInputType' | 'OptionsInputType' | 'PaginationSortInput' | 'PaginationWhereInput' | 'PermissionIdsInput' | 'PermissionInput' | 'QuestionNodeWhereInputType' | 'QuestionNodeWhereUniqueInput' | 'RecipientsInputType' | 'RegisterInput' | 'RegisterNodeEntryInput' | 'RoleDataInput' | 'RoleInput' | 'SessionInput' | 'SessionWhereUniqueInput' | 'SliderNodeEntryInput' | 'TagsInputObjectType' | 'TextboxNodeEntryInput' | 'TriggerConditionInputType' | 'TriggerInputType' | 'UserInput';
+export type NexusGenInputNames = "AddDialogueInput" | "CTALinkInputObjectType" | "CTALinksInputType" | "ChoiceNodeEntryInput" | "CustomerCreateOptions" | "CustomerEditOptions" | "CustomerWhereUniqueInput" | "DialogueFilterInputType" | "DialogueWhereUniqueInput" | "EdgeConditionInputType" | "LoginInput" | "NodeEntryDataInput" | "NodeEntryInput" | "OptionInputType" | "OptionsInputType" | "PaginationSortInput" | "PaginationWhereInput" | "PermissionIdsInput" | "PermissionInput" | "QuestionNodeWhereInputType" | "QuestionNodeWhereUniqueInput" | "RecipientsInputType" | "RegisterInput" | "RegisterNodeEntryInput" | "RoleDataInput" | "RoleInput" | "SessionInput" | "SessionWhereUniqueInput" | "SliderNodeEntryInput" | "TagsInputObjectType" | "TextboxNodeEntryInput" | "TriggerConditionInputType" | "TriggerInputType" | "UserInput";
 
-export type NexusGenEnumNames = 'LinkTypeEnumType' | 'PaginationSortByEnum' | 'QuestionNodeTypeEnum' | 'TagTypeEnum' | 'TriggerConditionEnum' | 'TriggerMediumEnum' | 'TriggerTypeEnum';
+export type NexusGenEnumNames = "LinkTypeEnumType" | "PaginationSortByEnum" | "QuestionNodeTypeEnum" | "TagTypeEnum" | "TriggerConditionEnum" | "TriggerMediumEnum" | "TriggerTypeEnum";
 
-export type NexusGenInterfaceNames = 'ConnectionInterface';
+export type NexusGenInterfaceNames = "ConnectionInterface";
 
-export type NexusGenScalarNames = 'Boolean' | 'Float' | 'ID' | 'Int' | 'String' | 'Upload';
+export type NexusGenScalarNames = "Boolean" | "Float" | "ID" | "Int" | "String" | "Upload";
 
 export type NexusGenUnionNames = never;
 
@@ -928,6 +929,7 @@ export interface NexusGenTypes {
   abstractTypes: NexusGenTypes['interfaceNames'] | NexusGenTypes['unionNames'];
   abstractResolveReturn: NexusGenAbstractResolveReturnTypes;
 }
+
 
 declare global {
   interface NexusGenPluginTypeConfig<TypeName extends string> {

@@ -1,7 +1,7 @@
 
 import * as yup from 'yup';
 import { ApolloError } from 'apollo-client';
-import { Button, ButtonGroup, FormErrorMessage, useToast } from '@chakra-ui/core';
+import { Button, ButtonGroup, FormErrorMessage } from '@chakra-ui/core';
 import { MinusCircle, PlusCircle } from 'react-feather';
 import { debounce } from 'lodash';
 import { useForm } from 'react-hook-form';
@@ -15,7 +15,7 @@ import {
   DeleteQuestionOptionButtonContainer,
 } from 'views/DialogueBuilderView/components/QuestionEntry/QuestionEntryStyles';
 import { Div, ErrorStyle, Flex, Form, FormContainer, FormControl, FormLabel,
-  FormSection, Grid, H3, H4, Hr, Input, InputGrid, InputHelper, Label, Muted } from '@haas/ui';
+  FormSection, H3, H4, Hr, Input, InputGrid, InputHelper, Muted } from '@haas/ui';
 import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
 import createQuestionMutation from 'mutations/createQuestion';
 import updateQuestionMutation from 'mutations/updateQuestion';
@@ -106,7 +106,7 @@ const QuestionEntryForm = ({
 }: QuestionEntryFormProps) => {
   const { customerSlug, dialogueSlug } = useParams();
 
-  const { register, handleSubmit, setValue, errors, getValues, formState } = useForm<FormDataProps>({
+  const { register, handleSubmit, setValue, errors, formState } = useForm<FormDataProps>({
     resolver: yupResolver(schema),
     mode: 'onChange',
     defaultValues: {

@@ -1,11 +1,11 @@
 import { Plus } from 'react-feather';
-import { QueryLazyOptions, useLazyQuery } from '@apollo/react-hooks';
 import { debounce } from 'lodash';
-import { useHistory, useParams } from 'react-router-dom';
+import { useLazyQuery } from '@apollo/react-hooks';
+import { useParams } from 'react-router-dom';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components/macro';
 
-import { Div, Flex, H2, Loader, Span } from '@haas/ui';
+import { Div, Flex, H2, Span } from '@haas/ui';
 import LinkIcon from 'components/Icons/LinkIcon';
 
 import OpinionIcon from 'components/Icons/OpinionIcon';
