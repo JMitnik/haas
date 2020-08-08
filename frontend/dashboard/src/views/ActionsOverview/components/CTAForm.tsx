@@ -328,7 +328,7 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: 
                           <FormErrorMessage>{!!form.errors?.links?.[index]?.url?.message}</FormErrorMessage>
                         </FormControl>
 
-                        <FormControl isRequired>
+                        <FormControl isRequired isInvalid={!!form.errors.links?.[index]?.type}>
                           <FormLabel htmlFor={`links[${index}].type`}>Type</FormLabel>
                           <InputHelper>What is the type of the link?</InputHelper>
                           <Select

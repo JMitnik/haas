@@ -19,9 +19,9 @@ import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
 import createQuestionMutation from 'mutations/createQuestion';
 import updateQuestionMutation from 'mutations/updateQuestion';
 
+import { yupResolver } from '@hookform/resolvers';
 import { EdgeConditonProps,
   OverrideLeafProps, QuestionEntryProps, QuestionOptionProps } from '../../DialogueBuilderInterfaces';
-import { yupResolver } from '@hookform/resolvers';
 
 interface FormDataProps {
   title: string;
@@ -333,7 +333,7 @@ const QuestionEntryForm = ({
               </Muted>
             </Div>
             <InputGrid>
-              <FormControl>
+              <FormControl isRequired isInvalid={!!errors.title?.message}>
                 <FormLabel htmlFor="title">Title</FormLabel>
                 <InputHelper>What is the question you want to ask?</InputHelper>
                 <StyledInput
@@ -399,7 +399,7 @@ const QuestionEntryForm = ({
               </Div>
               <Div>
                 <InputGrid>
-                  <FormControl>
+                  <FormControl isRequired isInvalid={!!errors.matchText}>
                     <FormLabel htmlFor="matchText">Match value</FormLabel>
                     <InputHelper>What is the multi-choice question to trigger this question?</InputHelper>
                     <Select
@@ -430,7 +430,7 @@ const QuestionEntryForm = ({
             </Div>
             <Div>
               <InputGrid>
-                <FormControl>
+                <FormControl isRequired isInvalid={!!errors.questionType}>
                   <FormLabel htmlFor="questionType">Question type</FormLabel>
                   <InputHelper>What is the type of the question?</InputHelper>
                   <Select
@@ -447,7 +447,7 @@ const QuestionEntryForm = ({
                   <FormErrorMessage>{errors.questionType?.message}</FormErrorMessage>
                 </FormControl>
 
-                <FormControl>
+                <FormControl isInvalid={!!errors.activeLeaf}>
                   <FormLabel htmlFor="questionType">Call-to-action</FormLabel>
                   <InputHelper>What CTA do you want to add?</InputHelper>
                   <Select
