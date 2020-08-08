@@ -132,13 +132,15 @@ interface CustomerFormProps {
 
   // Customer-specific
   // eslint-disable-next-line react/require-default-props
-  willShowTemplate?: boolean;
   isInEdit?: boolean;
 }
 
-const CustomerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = false, willShowTemplate = true }: CustomerFormProps) => {
+const CustomerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = false }: CustomerFormProps) => {
   const history = useHistory();
   const { t } = useTranslation();
+
+  console.log(form.formState.isValid);
+  console.log(form.errors);
 
   return (
     <Form onSubmit={form.handleSubmit(onFormSubmit)}>

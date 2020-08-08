@@ -14,6 +14,7 @@ import React from 'react';
 import CustomerForm from 'components/CustomerForm';
 import parseOptionalBoolean from 'utils/parseOptionalBoolean';
 
+import booleanToNumber from 'utils/booleanToNumber';
 import editCustomerMutation from '../../mutations/editCustomer';
 import getCustomerQuery from '../../queries/getCustomersQuery';
 import getEditCustomerData from '../../queries/getEditCustomer';
@@ -53,6 +54,8 @@ const EditCustomerView = () => {
   return <EditCustomerForm customer={customer} />;
 };
 
+const startsWithCloudinary = (url: string) => url.includes('cloudinary');
+
 const EditCustomerForm = ({ customer }: { customer: any }) => {
   const history = useHistory();
   const { setActiveCustomer } = useCustomer();
@@ -62,10 +65,14 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
     defaultValues: {
       name: customer.name,
       logo: customer.settings?.logoUrl,
+      useCustomUrl: booleanToNumber(!startsWithCloudinary(customer.settings?.logoUrl)),
       primaryColour: customer.settings?.colourSettings?.primary,
       slug: customer.slug,
     },
+    mode: 'onBlur',
   });
+
+  console.log(form.formState.isValid);
 
   const toast = useToast();
 
@@ -106,6 +113,7 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
       slug: formData.slug,
       isSeed: parseOptionalBoolean(formData.seed),
       primaryColour: formData.primaryColour,
+      name: formData.name,
     };
 
     editCustomer({
@@ -127,7 +135,6 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
             onFormSubmit={onSubmit}
             serverErrors={serverErrors}
             isInEdit
-            willShowTemplate={false}
           />
         </FormContainer>
       </motion.div>
