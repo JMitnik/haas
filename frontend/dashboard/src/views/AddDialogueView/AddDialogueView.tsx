@@ -3,8 +3,8 @@ import { ApolloError } from 'apollo-boost';
 import { Button, ButtonGroup, FormErrorMessage, Stack } from '@chakra-ui/core';
 import { Container, Div, ErrorStyle, Flex, Form, FormContainer, FormControl, FormLabel,
   FormSection, H2, H3, Hr, Input, InputGrid, InputHelper, Muted, Textarea } from '@haas/ui';
+import { Controller, useForm } from 'react-hook-form';
 import { Minus, Plus, Type } from 'react-feather';
-import { useForm } from 'react-hook-form';
 import { useHistory, useParams } from 'react-router';
 import { useLazyQuery, useMutation, useQuery } from '@apollo/react-hooks';
 import React, { useState } from 'react';
@@ -23,7 +23,7 @@ interface FormDataProps {
   publicTitle?: string;
   description: string;
   slug: string;
-  contentOption: string;
+  contentOption: {label: string, value: string};
   customerOption: string;
   dialogueOption: string;
   tags: Array<string>;
@@ -40,9 +40,11 @@ const schema = yup.object().shape({
   publicTitle: yup.string().notRequired(),
   description: yup.string().required('Description is required'),
   slug: yup.string().required('Slug is required'),
-  contentOption: yup.string().required(),
+  contentOption: yup.object().shape(
+    { label: yup.string().required(), value: yup.string().required() },
+  ).required('Content option is required'),
   customerOption: yup.string().when(['contentOption'], {
-    is: (contentOption : string) => contentOption === 'TEMPLATE',
+    is: (contentOption : { label: string, value: string}) => contentOption?.value === 'TEMPLATE',
     then: yup.string().required(),
     otherwise: yup.string().notRequired(),
   }),
@@ -193,7 +195,7 @@ const AddDialogueView = () => {
                     <Input
                       placeholder="Peaches or apples?"
                       leftEl={<Type />}
-                      name="name"
+                      name="title"
                       ref={form.register({ required: true })}
                     />
                     <FormErrorMessage>{form.errors.title?.message}</FormErrorMessage>
@@ -259,19 +261,14 @@ const AddDialogueView = () => {
                     <InputHelper>
                       Set what type of template you would like to use.
                     </InputHelper>
-                    <Select
-                      styles={form.errors.contentOption && !activeContentOption ? ErrorStyle : undefined}
-                      ref={() => form.register({
-                        name: 'contentOption',
-                        required: true,
-                      })}
+                    <Controller
+                      name="contentOption"
+                      control={form.control}
+                      as={Select}
                       options={DIALOGUE_CONTENT_TYPES}
-                      value={activeContentOption}
-                      onChange={(qOption: any) => {
-                        handleContentOptionChange(qOption);
-                      }}
+                      defaultValue={activeContentOption}
                     />
-                    <FormErrorMessage>{form.errors.contentOption?.message}</FormErrorMessage>
+                    <FormErrorMessage>{form.errors?.contentOption?.value?.message}</FormErrorMessage>
                   </FormControl>
 
                   {(activeContentOption?.value === 'TEMPLATE' && CUSTOMER_OPTIONS) && (
