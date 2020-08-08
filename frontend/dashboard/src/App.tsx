@@ -30,6 +30,7 @@ import ThemesProvider from 'providers/ThemeProvider';
 import TriggersOverview from 'views/TriggerOverview/TriggerOverview';
 import UsersOverview from 'views/UsersOverview/UsersOverview';
 
+import { AnimatePresence } from 'framer-motion';
 import AuthProvider, { useAuth } from 'providers/AuthProvider';
 import DialogueLayout from 'layouts/DialogueLayout';
 import LoginPage from 'pages/login';
@@ -63,113 +64,115 @@ const AppRoutes = () => (
     <Route
       path="/dashboard/b/:customerSlug"
       render={() => (
-        <DashboardLayout>
-          <Switch>
+        <AnimatePresence>
+          <DashboardLayout>
+            <Switch>
 
-            <Route
-              path="/dashboard/b/:customerSlug/analytics/"
-              render={() => (
-                <AnalyticsPage />
-              )}
-            />
+              <Route
+                path="/dashboard/b/:customerSlug/analytics/"
+                render={() => (
+                  <AnalyticsPage />
+                )}
+              />
 
-            <Route
-              path="/dashboard/b/:customerSlug/triggers/add"
-              render={() => (
-                <AddTriggerView />
-              )}
-            />
+              <Route
+                path="/dashboard/b/:customerSlug/triggers/add"
+                render={() => (
+                  <AddTriggerView />
+                )}
+              />
 
-            <Route
-              path="/dashboard/b/:customerSlug/triggers/:triggerId/edit"
-              render={() => (
-                <EditTriggerView />
-              )}
-            />
+              <Route
+                path="/dashboard/b/:customerSlug/triggers/:triggerId/edit"
+                render={() => (
+                  <EditTriggerView />
+                )}
+              />
 
-            <Route
-              path="/dashboard/b/:customerSlug/triggers"
-              render={() => <TriggersOverview />}
-            />
+              <Route
+                path="/dashboard/b/:customerSlug/triggers"
+                render={() => <TriggersOverview />}
+              />
 
-            <Route
-              path="/dashboard/b/:customerSlug/edit"
-              render={() => <EditCustomerView />}
-            />
+              <Route
+                path="/dashboard/b/:customerSlug/edit"
+                render={() => <EditCustomerView />}
+              />
 
-            <Route
-              path="/dashboard/b/:customerSlug/u/:userId/edit"
-              render={() => (
-                <EditUserView />
-              )}
-            />
+              <Route
+                path="/dashboard/b/:customerSlug/u/:userId/edit"
+                render={() => (
+                  <EditUserView />
+                )}
+              />
 
-            <Route
-              path="/dashboard/b/:customerSlug/users/add"
-              render={() => (
-                <AddUserView />
-              )}
-            />
+              <Route
+                path="/dashboard/b/:customerSlug/users/add"
+                render={() => (
+                  <AddUserView />
+                )}
+              />
 
-            <Route
-              path="/dashboard/b/:customerSlug/users"
-              render={() => <UsersOverview />}
-            />
-            <Route
-              path="/dashboard/b/:customerSlug/roles"
-              render={() => <RolesOverview />}
-            />
+              <Route
+                path="/dashboard/b/:customerSlug/users"
+                render={() => <UsersOverview />}
+              />
+              <Route
+                path="/dashboard/b/:customerSlug/roles"
+                render={() => <RolesOverview />}
+              />
 
-            <Route
-              path="/dashboard/b/:customerSlug/d/add"
-              render={() => <AddDialogueView />}
-            />
+              <Route
+                path="/dashboard/b/:customerSlug/d/add"
+                render={() => <AddDialogueView />}
+              />
 
-            <Route
-              path="/dashboard/b/:customerSlug/d/:dialogueSlug"
-              render={() => (
-                <DialogueLayout>
-                  <Switch>
-                    <Route
-                      path="/dashboard/b/:customerSlug/d/:dialogueSlug/builder"
-                      render={() => <DialogueBuilderPage />}
-                    />
+              <Route
+                path="/dashboard/b/:customerSlug/d/:dialogueSlug"
+                render={() => (
+                  <DialogueLayout>
+                    <Switch>
+                      <Route
+                        path="/dashboard/b/:customerSlug/d/:dialogueSlug/builder"
+                        render={() => <DialogueBuilderPage />}
+                      />
 
-                    <Route
-                      path="/dashboard/b/:customerSlug/d/:dialogueSlug/edit"
-                      render={() => <EditDialogueView />}
-                    />
+                      <Route
+                        path="/dashboard/b/:customerSlug/d/:dialogueSlug/edit"
+                        render={() => <EditDialogueView />}
+                      />
 
-                    <Route
-                      path="/dashboard/b/:customerSlug/d/:dialogueSlug/interactions"
-                      render={() => <InteractionsOverview />}
-                    />
+                      <Route
+                        path="/dashboard/b/:customerSlug/d/:dialogueSlug/interactions"
+                        render={() => <InteractionsOverview />}
+                      />
 
-                    <Route
-                      path="/dashboard/b/:customerSlug/d/:dialogueSlug/actions"
-                      render={() => <ActionsPage />}
-                    />
+                      <Route
+                        path="/dashboard/b/:customerSlug/d/:dialogueSlug/actions"
+                        render={() => <ActionsPage />}
+                      />
 
-                    <Route
-                      path="/dashboard/b/:customerSlug/d/:dialogueSlug"
-                      render={() => <DialoguePage />}
-                    />
+                      <Route
+                        path="/dashboard/b/:customerSlug/d/:dialogueSlug"
+                        render={() => <DialoguePage />}
+                      />
 
-                  </Switch>
-                </DialogueLayout>
-              )}
-            />
+                    </Switch>
+                  </DialogueLayout>
+                )}
+              />
 
-            <Route
-              path="/dashboard/b/:customerSlug/d"
-              render={() => <DialoguesPage />}
-            />
-            <Route
-              path="/dashboard/b/:customerSlug/"
-              render={() => <CustomerPage />}
-            />
-          </Switch>
-        </DashboardLayout>
+              <Route
+                path="/dashboard/b/:customerSlug/d"
+                render={() => <DialoguesPage />}
+              />
+              <Route
+                path="/dashboard/b/:customerSlug/"
+                render={() => <CustomerPage />}
+              />
+            </Switch>
+          </DashboardLayout>
+        </AnimatePresence>
       )}
     />
 

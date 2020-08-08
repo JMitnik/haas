@@ -2,6 +2,7 @@ import { useParams } from 'react-router';
 import React from 'react';
 import styled, { css } from 'styled-components/macro';
 
+import { AnimatePresence, motion } from 'framer-motion';
 import { Div, PageHeading } from '@haas/ui';
 import { NavItem, NavItems, NavLogo, Usernav } from 'components/Sidenav/Sidenav';
 import { ReactComponent as NotificationIcon } from 'assets/icons/icon-notification.svg';
@@ -54,35 +55,37 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <DashboardLayoutContainer>
       <Div>
-        <Sidenav>
-          <Div>
-            <Logo justifyContent="center" />
-            <NavItems>
-              <NavItem to={`/dashboard/b/${params.customerSlug}/d`}>
-                <SurveyIcon />
-                Dialogues
-              </NavItem>
-              <NavItem to={`/dashboard/b/${params.customerSlug}/analytics`}>
-                <PieChartIcon />
-                Analytics
-              </NavItem>
-              <NavItem to={`/dashboard/b/${params.customerSlug}/users`}>
-                <UsersIcon />
-                Users
-              </NavItem>
-              <NavItem to={`/dashboard/b/${params.customerSlug}/triggers`}>
-                <NotificationIcon />
-                Alerts
-              </NavItem>
-              <NavItem to={`/dashboard/b/${params.customerSlug}/edit`}>
-                <SettingsIcon />
-                Settings
-              </NavItem>
-            </NavItems>
-          </Div>
+        <motion.div initial={{ x: -30 }} animate={{ x: 0 }} exit={{ x: -30 }}>
+          <Sidenav>
+            <Div>
+              <Logo justifyContent="center" />
+              <NavItems>
+                <NavItem to={`/dashboard/b/${params.customerSlug}/d`}>
+                  <SurveyIcon />
+                  Dialogues
+                </NavItem>
+                <NavItem to={`/dashboard/b/${params.customerSlug}/analytics`}>
+                  <PieChartIcon />
+                  Analytics
+                </NavItem>
+                <NavItem to={`/dashboard/b/${params.customerSlug}/users`}>
+                  <UsersIcon />
+                  Users
+                </NavItem>
+                <NavItem to={`/dashboard/b/${params.customerSlug}/triggers`}>
+                  <NotificationIcon />
+                  Alerts
+                </NavItem>
+                <NavItem to={`/dashboard/b/${params.customerSlug}/edit`}>
+                  <SettingsIcon />
+                  Settings
+                </NavItem>
+              </NavItems>
+            </Div>
 
-          <Usernav customer={customer} user={userData} />
-        </Sidenav>
+            <Usernav customer={customer} user={userData} />
+          </Sidenav>
+        </motion.div>
       </Div>
 
       <DashboardViewContainer>

@@ -9,14 +9,15 @@ import Select from 'react-select';
 
 import { Div, ErrorStyle, Flex, Form, FormContainer, FormControl,
   FormGroupContainer, FormLabel, FormSection, Grid, H3, H4, Hr, Input, InputGrid, InputHelper, Label, Muted } from '@haas/ui';
-import { PlusCircle, Type, X } from 'react-feather';
+import { PlusCircle, Trash, Type, X } from 'react-feather';
 import { cloneDeep, debounce } from 'lodash';
 import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
 import createCTAMutation from 'mutations/createCTA';
 import getCTANodesQuery from 'queries/getCTANodes';
 import updateCTAMutation from 'mutations/updateCTA';
 
-import { Button, FormErrorMessage, useToast } from '@chakra-ui/core';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Button, ButtonGroup, FormErrorMessage, useToast } from '@chakra-ui/core';
 import DeleteLinkSesctionButton from './DeleteLinkSectionButton';
 
 interface FormDataProps {
@@ -297,97 +298,102 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: 
                 <Div gridColumn="1 / -1">
                   <Flex flexDirection="row" alignItems="center" justifyContent="space-between" marginBottom={5}>
                     <H4>Links</H4>
-                    <PlusCircle onClick={addCondition} />
+                    <Button leftIcon={PlusCircle} onClick={addCondition} size="sm">Add link</Button>
                   </Flex>
                   <Hr />
 
-                  {activeLinks.map((link, index) => (
-                    <Div position="relative" key={index} marginTop={15} gridColumn="1 / -1">
-                      <Grid
-                        border="1px solid"
-                        borderColor="default.light"
-                        gridGap="12px"
-                        padding="10px"
-                        gridTemplateColumns={['1fr 1fr']}
-                      >
-                        <DeleteLinkSesctionButton onClick={() => handleDeleteLink(index)}>
-                          <X />
-                        </DeleteLinkSesctionButton>
+                  <AnimatePresence>
+                    {activeLinks.map((link, index) => (
+                      <motion.div key={(link.id || link.title)} initial={{ opacity: 1 }} exit={{ opacity: 0, x: 100 }}>
+                        <Div
+                          position="relative"
+                          key={index}
+                          marginTop={15}
+                          gridColumn="1 / -1"
+                          bg="gray.100"
+                          padding={4}
+                        >
+                          <Grid
+                            gridGap="12px"
+                            gridTemplateColumns={['1fr 1fr']}
+                          >
+                            <FormControl isRequired isInvalid={!!form.errors?.links?.[index]?.url}>
+                              <FormLabel htmlFor={`links[${index}].url`}>Url</FormLabel>
+                              <InputHelper>What is the url the link should lead to?</InputHelper>
+                              <Input
+                                name={`links[${index}].url`}
+                                defaultValue={link.url}
+                                placeholder="https://link.to/"
+                                leftEl={<Type />}
+                                onChange={(e: any) => handleURLChange(e.currentTarget.value, index)}
+                                ref={form.register({ required: true })}
+                              />
+                              <FormErrorMessage>{!!form.errors?.links?.[index]?.url?.message}</FormErrorMessage>
+                            </FormControl>
 
-                        <FormControl isRequired isInvalid={!!form.errors?.links?.[index]?.url}>
-                          <FormLabel htmlFor={`links[${index}].url`}>Url</FormLabel>
-                          <InputHelper>What is the url the link should lead to?</InputHelper>
-                          <Input
-                            name={`links[${index}].url`}
-                            defaultValue={link.url}
-                            placeholder="https://link.to/"
-                            leftEl={<Type />}
-                            onChange={(e: any) => handleURLChange(e.currentTarget.value, index)}
-                            ref={form.register({ required: true })}
-                          />
-                          <FormErrorMessage>{!!form.errors?.links?.[index]?.url?.message}</FormErrorMessage>
-                        </FormControl>
+                            <FormControl isRequired isInvalid={!!form.errors.links?.[index]?.type}>
+                              <FormLabel htmlFor={`links[${index}].type`}>Type</FormLabel>
+                              <InputHelper>What is the type of the link?</InputHelper>
+                              <Select
+                                styles={form.errors.links?.[index]?.type && !activeLinks?.[index]?.type ? ErrorStyle : undefined}
+                                ref={() => form.register({
+                                  name: `links[${index}].type`,
+                                  required: true,
+                                })}
+                                options={LINK_TYPES}
+                                value={link.type}
+                                onChange={(qOption: any) => {
+                                  handleLinkTypeChange(qOption, index);
+                                }}
+                              />
+                              <FormErrorMessage>{!!form.errors.links?.[index]?.type}</FormErrorMessage>
+                            </FormControl>
 
-                        <FormControl isRequired isInvalid={!!form.errors.links?.[index]?.type}>
-                          <FormLabel htmlFor={`links[${index}].type`}>Type</FormLabel>
-                          <InputHelper>What is the type of the link?</InputHelper>
-                          <Select
-                            styles={form.errors.links?.[index]?.type && !activeLinks?.[index]?.type ? ErrorStyle : undefined}
-                            ref={() => form.register({
-                              name: `links[${index}].type`,
-                              required: true,
-                            })}
-                            options={LINK_TYPES}
-                            value={link.type}
-                            onChange={(qOption: any) => {
-                              handleLinkTypeChange(qOption, index);
-                            }}
-                          />
-                          <FormErrorMessage>{!!form.errors.links?.[index]?.type}</FormErrorMessage>
-                        </FormControl>
+                            <FormControl>
+                              <FormLabel htmlFor={`links[${index}].tooltip`}>Tooltip</FormLabel>
+                              <InputHelper>What is the text when hovering over the link?</InputHelper>
+                              <Input
+                                isInvalid={!!form.errors.links?.[index]?.tooltip}
+                                name={`links[${index}].tooltip`}
+                                defaultValue={link.title}
+                                onChange={(e:any) => handleTooltipChange(e.currentTarget.value, index)}
+                                ref={form.register({ required: false })}
+                              />
+                              <FormErrorMessage>{!!form.errors.links?.[index]?.tooltip}</FormErrorMessage>
+                            </FormControl>
 
-                        <FormControl>
-                          <FormLabel htmlFor={`links[${index}].tooltip`}>Tooltip</FormLabel>
-                          <InputHelper>What is the text when hovering over the link?</InputHelper>
-                          <Input
-                            isInvalid={!!form.errors.links?.[index]?.tooltip}
-                            name={`links[${index}].tooltip`}
-                            defaultValue={link.title}
-                            onChange={(e:any) => handleTooltipChange(e.currentTarget.value, index)}
-                            ref={form.register({ required: false })}
-                          />
-                          <FormErrorMessage>{!!form.errors.links?.[index]?.tooltip}</FormErrorMessage>
-                        </FormControl>
+                            <FormControl>
+                              <FormLabel htmlFor={`links[${index}].iconUrl`}>Icon</FormLabel>
+                              <InputHelper>What icon is displayed for the link?</InputHelper>
+                              <Input
+                                isInvalid={!!form.errors.links?.[index]?.iconUrl}
+                                name={`links[${index}].iconUrl`}
+                                defaultValue={link.iconUrl}
+                                onChange={(e:any) => handleIconChange(e.currentTarget.value, index)}
+                                ref={form.register({ required: false })}
+                              />
+                              <FormErrorMessage>{!!form.errors.links?.[index]?.iconUrl}</FormErrorMessage>
+                            </FormControl>
 
-                        <FormControl>
-                          <FormLabel htmlFor={`links[${index}].iconUrl`}>Icon</FormLabel>
-                          <InputHelper>What icon is displayed for the link?</InputHelper>
-                          <Input
-                            isInvalid={!!form.errors.links?.[index]?.iconUrl}
-                            name={`links[${index}].iconUrl`}
-                            defaultValue={link.iconUrl}
-                            onChange={(e:any) => handleIconChange(e.currentTarget.value, index)}
-                            ref={form.register({ required: false })}
-                          />
-                          <FormErrorMessage>{!!form.errors.links?.[index]?.iconUrl}</FormErrorMessage>
-                        </FormControl>
+                            <FormControl>
+                              <FormLabel htmlFor={`links[${index}].backgroundColor`}>Background color</FormLabel>
+                              <InputHelper>What icon is displayed for the link?</InputHelper>
+                              <Input
+                                isInvalid={!!form.errors.links?.[index]?.backgroundColor}
+                                name={`links[${index}].backgroundColor`}
+                                defaultValue={link.backgroundColor}
+                                onChange={(e:any) => handleBackgroundColorChange(e.currentTarget.value, index)}
+                                ref={form.register({ required: false })}
+                              />
+                              <FormErrorMessage>{!!form.errors.links?.[index]?.backgroundColor}</FormErrorMessage>
+                            </FormControl>
 
-                        <FormControl>
-                          <FormLabel htmlFor={`links[${index}].backgroundColor`}>Background color</FormLabel>
-                          <InputHelper>What icon is displayed for the link?</InputHelper>
-                          <Input
-                            isInvalid={!!form.errors.links?.[index]?.backgroundColor}
-                            name={`links[${index}].backgroundColor`}
-                            defaultValue={link.backgroundColor}
-                            onChange={(e:any) => handleBackgroundColorChange(e.currentTarget.value, index)}
-                            ref={form.register({ required: false })}
-                          />
-                          <FormErrorMessage>{!!form.errors.links?.[index]?.backgroundColor}</FormErrorMessage>
-                        </FormControl>
-                      </Grid>
-                    </Div>
-                  ))}
-
+                          </Grid>
+                          <Button mt={4} variant="outline" size="sm" variantColor="red" onClick={() => handleDeleteLink(index)}>Delete link</Button>
+                        </Div>
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
                 </Div>
               </InputGrid>
             </Div>
@@ -396,8 +402,8 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: 
           )}
         </Div>
 
-        <Div>
-          <Flex>
+        <Flex justifyContent="space-between">
+          <ButtonGroup>
             <Button
               isLoading={addLoading || updateLoading}
               isDisabled={!form.formState.isValid}
@@ -406,9 +412,10 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: 
             >
               Save
             </Button>
-            <Button variant="outline" onClick={() => cancelCTA()}>Cancel</Button>
-          </Flex>
-        </Div>
+            <Button variant="ghost" onClick={() => cancelCTA()}>Cancel</Button>
+          </ButtonGroup>
+          <Button variant="outline" variantColor="red" leftIcon={Trash}>Delete</Button>
+        </Flex>
       </Form>
     </FormContainer>
   );

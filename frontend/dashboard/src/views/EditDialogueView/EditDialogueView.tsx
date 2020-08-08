@@ -137,13 +137,11 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFo
   };
 
   return (
-    <Container>
-
+    <Div>
       <Div>
         <H2 color="gray.700" mb={4} py={2}>Edit dialogue</H2>
       </Div>
       <motion.div initial={{ opacity: 0, y: 100 }} animate={{ opacity: 1, y: 0 }}>
-
         <FormContainer>
           <Form onSubmit={form.handleSubmit(onSubmit)}>
             <ServerError serverError={serverError} />
@@ -172,7 +170,7 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFo
                   <FormControl isInvalid={!!form.errors.publicTitle}>
                     <FormLabel htmlFor="publicTitle">Public title</FormLabel>
                     <InputHelper>
-                      (Optional): If set, will be used instead of the actual title to the user instead.
+                      Optional alternative title to display in public
                     </InputHelper>
                     <Input
                       placeholder="Peaches > Apples?"
@@ -284,7 +282,7 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFo
           </Form>
         </FormContainer>
       </motion.div>
-    </Container>
+    </Div>
   );
 };
 

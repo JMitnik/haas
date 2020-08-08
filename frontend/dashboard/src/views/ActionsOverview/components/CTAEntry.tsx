@@ -116,35 +116,37 @@ const CTAEntry = ({ id, activeCTA, onActiveCTAChange, title, type, links, Icon, 
   };
 
   return (
-    <CTAEntryContainer id={id} activeCTA={activeCTA}>
-      <DeleteCTAButton disabled={(!!activeCTA && activeCTA !== id) || false} onClick={() => deleteCTA()}>
-        <X />
-      </DeleteCTAButton>
+    <motion.div initial={{ opacity: 1, y: 150 }} animate={{ opacity: 1, y: 0 }}>
 
-      <Flex flexDirection="row" width="100%">
-        <CTAIcon type={type} Icon={Icon} />
+      <CTAEntryContainer id={id} activeCTA={activeCTA}>
+        <DeleteCTAButton disabled={(!!activeCTA && activeCTA !== id) || false} onClick={() => deleteCTA()}>
+          <X />
+        </DeleteCTAButton>
 
-        <Flex width="60%" flexDirection="column">
-          <Span fontSize="1.4em">
-            Title
-          </Span>
-          <OverflowSpan>
-            {title || 'None'}
-          </OverflowSpan>
-        </Flex>
+        <Flex flexDirection="row" width="100%">
+          <CTAIcon type={type} Icon={Icon} />
 
-        <Flex width="30%" alignItems="center" justifyContent="center">
-          <EditCTAButton disabled={(activeCTA && activeCTA !== id) || false} onClick={() => onActiveCTAChange(id)}>
-            <Edit3 />
-            <Span>
-              Edit
+          <Flex width="60%" flexDirection="column">
+            <Span fontSize="1.4em">
+              Title
             </Span>
-          </EditCTAButton>
+            <OverflowSpan>
+              {title || 'None'}
+            </OverflowSpan>
+          </Flex>
+
+          <Flex width="30%" alignItems="center" justifyContent="center">
+            <EditCTAButton disabled={(activeCTA && activeCTA !== id) || false} onClick={() => onActiveCTAChange(id)}>
+              <Edit3 />
+              <Span>
+                Edit
+              </Span>
+            </EditCTAButton>
+          </Flex>
+
         </Flex>
 
-      </Flex>
-
-      {activeCTA === id
+        {activeCTA === id
           && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
               <CTAForm
@@ -159,7 +161,8 @@ const CTAEntry = ({ id, activeCTA, onActiveCTAChange, title, type, links, Icon, 
 
           )}
 
-    </CTAEntryContainer>
+      </CTAEntryContainer>
+    </motion.div>
   );
 };
 

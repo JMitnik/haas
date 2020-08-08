@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Div, ExtLink, Flex, PageHeading, Span } from '@haas/ui';
+import { Div, ExtLink, Flex, H2, Span } from '@haas/ui';
 import { MapPin, User } from 'react-feather';
 import { ReactComponent as UrlIcon } from 'assets/icons/icon-link.svg';
 import { useParams } from 'react-router';
@@ -91,14 +91,14 @@ const DialogueLayout = ({ children }: DialogueLayoutProps) => {
     <>
       <Flex mb={4}>
         {dialogue?.tags?.length === 1 && (
-          <Span pr={3}>
+          <Span pr={3} pt={2}>
             <TagIcon type={dialogue.tags[0].type} />
           </Span>
         )}
 
         <Div>
           {dialogue?.title ? (
-            <PageHeading mb={1}>{dialogue?.title}</PageHeading>
+            <H2 mb={1}>{dialogue?.title}</H2>
         ) : (
           <Placeholder height="30px" width="140px" mb={4} />
         )}

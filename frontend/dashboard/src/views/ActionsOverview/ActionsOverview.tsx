@@ -13,12 +13,25 @@ import RegisterIcon from 'components/Icons/RegisterIcon';
 import SearchBar from 'components/SearchBar/SearchBar';
 import getCTANodesQuery from 'queries/getCTANodes';
 
+import { Variants, motion } from 'framer-motion';
 import AddCTAButton from './components/AddCTAButton';
 import CTAEntry from './components/CTAEntry';
 
 interface ActionOverviewProps {
   leafs: Array<any>;
 }
+
+const actionsAnimation: Variants = {
+  initial: {
+    opacity: 0,
+  },
+  enter: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.2,
+    },
+  },
+};
 
 const DialogueViewContainer = styled(Div)`
   ${({ theme }) => css`
@@ -120,50 +133,52 @@ const ActionOverview = ({ leafs }: ActionOverviewProps) => {
           <SearchBar activeSearchTerm={activeSearchTerm} onSearchTermChange={handleSearchTermChange} />
         </Flex>
       </Flex>
-      {newCTA && (
-        <CTAEntry
-          id="-1"
-          activeCTA={activeCTA}
-          onActiveCTAChange={setActiveCTA}
-          Icon={RegisterIcon}
-          title=""
-          type={initializeCTAType('REGISTER')}
-          links={[]}
-          onNewCTAChange={setNewCTA}
-        />
-      )}
-
-      {!activeLeafs && leafs && leafs.map(
-        (leaf: any, index: number) => (
+      <motion.div variants={actionsAnimation} initial="inital" animate="animate">
+        {newCTA && (
           <CTAEntry
-            key={index}
+            id="-1"
             activeCTA={activeCTA}
             onActiveCTAChange={setActiveCTA}
-            id={leaf.id}
-            Icon={leaf.icon}
-            title={leaf.title}
-            type={initializeCTAType(leaf.type)}
-            links={leaf.links}
+            Icon={RegisterIcon}
+            title=""
+            type={initializeCTAType('REGISTER')}
+            links={[]}
             onNewCTAChange={setNewCTA}
           />
-        ),
-      )}
+        )}
 
-      {activeLeafs && activeLeafs?.map(
-        (leaf: any, index: number) => (
-          <CTAEntry
-            key={index}
-            activeCTA={activeCTA}
-            onActiveCTAChange={setActiveCTA}
-            id={leaf.id}
-            Icon={leaf.icon}
-            title={leaf.title}
-            type={initializeCTAType(leaf.type)}
-            links={leaf.links}
-            onNewCTAChange={setNewCTA}
-          />
-        ),
-      )}
+        {!activeLeafs && leafs && leafs.map(
+          (leaf: any, index: number) => (
+            <CTAEntry
+              key={index}
+              activeCTA={activeCTA}
+              onActiveCTAChange={setActiveCTA}
+              id={leaf.id}
+              Icon={leaf.icon}
+              title={leaf.title}
+              type={initializeCTAType(leaf.type)}
+              links={leaf.links}
+              onNewCTAChange={setNewCTA}
+            />
+          ),
+        )}
+
+        {activeLeafs && activeLeafs?.map(
+          (leaf: any, index: number) => (
+            <CTAEntry
+              key={index}
+              activeCTA={activeCTA}
+              onActiveCTAChange={setActiveCTA}
+              id={leaf.id}
+              Icon={leaf.icon}
+              title={leaf.title}
+              type={initializeCTAType(leaf.type)}
+              links={leaf.links}
+              onNewCTAChange={setNewCTA}
+            />
+          ),
+        )}
+      </motion.div>
     </DialogueViewContainer>
   );
 };
