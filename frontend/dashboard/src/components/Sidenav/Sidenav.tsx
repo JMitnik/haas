@@ -1,16 +1,20 @@
 import { ArrowRightCircle } from 'react-feather';
-import { ColumnFlex, Div, Flex, Span } from '@haas/ui';
+import { AvatarBadge, Badge, Avatar as ChakraAvatar } from '@chakra-ui/core';
+import { Card, ColumnFlex, Div, Flex, Span } from '@haas/ui';
 import { LinkProps, NavLink, useHistory } from 'react-router-dom';
+import React from 'react';
+import styled, { css } from 'styled-components/macro';
+
+import { FullLogo, FullLogoContainer, LogoContainer } from 'components/Logo/Logo';
 import { UserProps } from 'types/generic';
 import { useCustomer } from 'providers/CustomerProvider';
 import Avatar from 'components/Avatar';
 import Logo from 'components/Logo';
-import React from 'react';
-import styled, { css } from 'styled-components/macro';
 
 interface NavItemProps extends LinkProps { }
 
-export const NavItemContainer = styled.li``;
+export const NavItemContainer = styled.li`
+`;
 
 export const NavItem = ({ children, ...props }: NavItemProps) => (
   <NavItemContainer>
@@ -20,32 +24,29 @@ export const NavItem = ({ children, ...props }: NavItemProps) => (
 
 export const NavLinkContainer = styled(NavLink) <LinkProps>`
   ${({ theme }) => css`
-    color: ${theme.colors.app.mutedOnWhite};
-    padding: ${theme.gutter * 0.5}px ${theme.gutter * 0.75}px;
+    color: ${theme.isDarkColor ? theme.colors.primaries['100'] : theme.colors.primaries['800']};
+    padding: 8px 11px;
     margin-left: ${theme.gutter}px;
     display: flex;
     align-items: center;
-
-    a {
-      font-size: 0.8rem;
-    }
+    flex-direction: column;
+    font-size: 0.7rem;
 
     /* For the icons */
     svg {
       width: 24px;
-      margin-right: ${theme.gutter / 2}px;
-      fill: ${theme.colors.app.mutedOnWhite};
+      fill: ${theme.isDarkColor ? theme.colors.primaries['400'] : theme.colors.primaries['800']};
 
       .secondary {
-        fill: ${theme.colors.app.mutedAltOnWhite};
+        fill: ${theme.isDarkColor ? theme.colors.primaries['400'] : theme.colors.primaries['700']};
       }
     }
 
     /* If active react router */
     &.active {
-      border-radius: ${theme.borderRadiuses.rounded} 0 0 ${theme.borderRadiuses.rounded};
-      background: ${theme.colors.primary};
-      color: ${theme.colors.white};
+      background: ${theme.isDarkColor ? theme.colors.primaries['300'] : theme.colors.primaries['800']};
+      border-radius: ${theme.borderRadiuses.somewhatRounded};
+      color: white;
 
       svg {
         fill: white;
@@ -63,24 +64,25 @@ export const NavItems = styled.ul`
 `;
 
 export const NavLogo = () => (
-  <Flex justifyContent="center" alignItems="flex-end">
-    <Logo />
-
-    <Div>
-      <Span fontSize="2rem" color="primary">
-        <Span fontSize="1em" display="block" fontWeight="bold">haas</Span>
-        <Span fontSize="0.6em" display="block">dashboard</Span>
-      </Span>
-    </Div>
-  </Flex>
+  <FullLogo />
 );
 
 const UsernavContainer = styled.div`
   ${({ theme }) => css`
     padding: 0 ${theme.gutter}px;
     display: flex;
+    width: 100%;
     align-items: center;
-    color: ${theme.colors.app.mutedAltOnWhite};
+    cursor: pointer;
+    color: ${theme.isDarkColor ? theme.colors.primaries['100'] : theme.colors.primaries['800']};
+    border-top: 1px solid ${theme.isDarkColor ? theme.colors.primaries['300'] : theme.colors.primaries['600']};
+    transition: all 0.2s cubic-bezier(0.19, 1, 0.22, 1);
+
+    &:hover {
+      transition: all 0.2s cubic-bezier(0.19, 1, 0.22, 1);
+      background: ${theme.isDarkColor ? theme.colors.primaries['400'] : theme.colors.primaries['800']};
+      color: ${theme.isDarkColor ? theme.colors.primaries['600'] : theme.colors.primaries['100']};
+    }
   `}
 `;
 
@@ -88,7 +90,6 @@ export const ArrowContainer = styled.button`
   border: none;
   background: #f6f7f9;
   color: #a1a2a5;
-  /* border-radius: 100%; */
 
   svg {
     width: 16px;
@@ -100,7 +101,7 @@ export const ArrowContainer = styled.button`
   transition: all 0.2s ease-in;
 `;
 
-export const Usernav = ({ user }: { user: UserProps }) => {
+export const Usernav = ({ user, customer }: { user: UserProps, customer: any }) => {
   const history = useHistory();
   const { setActiveCustomer, setStorageCustomer } = useCustomer();
 
@@ -111,58 +112,52 @@ export const Usernav = ({ user }: { user: UserProps }) => {
   };
 
   return (
-    <UsernavContainer>
-      <Avatar name={user.firstName} />
-      <Div ml={4}>
-        <ColumnFlex>
-          <Span fontSize="0.9rem">
-            <Span color="app.mutedAltOnWhite" display="block">
+    <UsernavContainer onClick={() => goToDialoguesOverview()}>
+      <Flex py={4} alignItems="center">
+        <ChakraAvatar bg="gray.300" size="md" name={`${user.firstName} ${user.lastName}`}>
+          <AvatarBadge size="1em" bg="green.400" />
+        </ChakraAvatar>
+
+        {/* <Div ml={4}>
+          <ColumnFlex>
+            <Span fontSize="0.8rem" display="block">
               {`${user.firstName} ${user.lastName}`}
             </Span>
-            <BusinessFlex onClick={() => goToDialoguesOverview()}>
-              <BusinessSpan color="app.mutedOnWhite">
-                {`${user.business.name}`}
-              </BusinessSpan>
-              <ArrowContainer>
-                <ArrowRightCircle />
-              </ArrowContainer>
 
-            </BusinessFlex>
-          </Span>
-
-        </ColumnFlex>
-      </Div>
+            <Div>
+              <Badge>
+                {customer?.name}
+              </Badge>
+            </Div>
+          </ColumnFlex>
+        </Div> */}
+      </Flex>
     </UsernavContainer>
   );
 };
 
-const BusinessSpan = styled(Span)`
- ${({ theme }) => css`
-    text-decoration: underline;
-    text-decoration-color: ${theme.colors.primary}
-  `}
-`;
-
-const BusinessFlex = styled(Flex)`
-  justify-content: space-between;
-  align-items: center;
-  cursor: pointer;
-`;
-
 export const SidenavContainer = styled.div`
   ${({ theme }) => css`
+
     position: fixed;
     z-index: 300;
     font-weight: 1000;
     width: ${theme.sidenav.width}px;
 
-    background: ${theme.colors.app.sidebar};
+    background: ${theme.colors.primary};
     display: flex;
     padding-top: ${theme.gutter}px;
-    padding-bottom: ${theme.gutter * 2}px;
     height: 100vh;
     flex-direction: column;
     justify-content: space-between;
+
+    ${FullLogoContainer} {
+      color: ${theme.isDarkColor ? theme.colors.primaries['100'] : theme.colors.primaries['800']};
+    }
+
+    ${LogoContainer} {
+      color: ${theme.isDarkColor ? theme.colors.primaries['100'] : theme.colors.primaries['800']};
+    }
 
     ${NavItems} {
       padding-top: 100px;
@@ -171,10 +166,10 @@ export const SidenavContainer = styled.div`
     ul {
       a {
         text-decoration: none;
-        font-size: 1.3rem;
+        margin-left: ${theme.gutter * 0.5}px;
+        margin-right: ${theme.gutter * 0.5}px;
 
         span {
-            margin-left: ${theme.gutter * 0.5}px;
             display: inline-block;
         }
       }

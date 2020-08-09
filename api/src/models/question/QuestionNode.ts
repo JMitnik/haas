@@ -4,6 +4,7 @@ import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema
 // eslint-disable-next-line import/no-cycle
 import { CTALinksInputType, LinkType } from '../link/Link';
 // eslint-disable-next-line import/named
+// eslint-disable-next-line import/no-cycle
 import { DialogueType } from '../questionnaire/Dialogue';
 // eslint-disable-next-line import/no-cycle
 import { EdgeType } from '../edge/Edge';
@@ -43,9 +44,9 @@ export const QuestionNodeType = objectType({
     t.boolean('isLeaf');
     t.boolean('isRoot');
     t.string('title');
+    t.string('updatedAt');
     t.string('creationDate', { nullable: true });
     t.field('type', { type: QuestionNodeTypeEnum });
-    t.string('creationDate', { nullable: true });
     t.string('overrideLeafId', { nullable: true });
     t.string('updatedAt', {
       nullable: true,

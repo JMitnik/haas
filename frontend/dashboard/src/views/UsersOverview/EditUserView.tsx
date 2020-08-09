@@ -8,8 +8,9 @@ import Select from 'react-select';
 
 import {
   Button, Container, Div, ErrorStyle, Flex, Form, FormGroupContainer, Grid,
-  H2, H3, Hr, Muted, StyledInput, StyledLabel,
+  H2, H3, Hr, Label, Muted, StyledInput,
 } from '@haas/ui';
+import { yupResolver } from '@hookform/resolvers';
 import editUserMutation from 'mutations/editUser';
 import getRolesQuery from 'queries/getRoles';
 import getUserQuery from 'queries/getUser';
@@ -64,7 +65,7 @@ const EditCustomerForm = ({ user, roles }: { user: any, roles: Array<{ label: st
   const [activeRole, setActiveRole] = useState<null | { label: string, value: string }>(userRole);
 
   const { register, handleSubmit, errors, setValue } = useForm<FormDataProps>({
-    validationSchema: schema,
+    resolver: yupResolver(schema),
     defaultValues: {
       firstName: user?.firstName,
       lastName: user?.lastName,
@@ -73,6 +74,7 @@ const EditCustomerForm = ({ user, roles }: { user: any, roles: Array<{ label: st
     },
   });
 
+  // TODO: Put dependency of userRole
   useEffect(() => {
     setValue('role', userRole?.value);
   }, [setValue]);
@@ -134,27 +136,27 @@ const EditCustomerForm = ({ user, roles }: { user: any, roles: Array<{ label: st
             <Div py={4}>
               <Grid gridTemplateColumns={['1fr', '1fr 1fr']}>
                 <Flex flexDirection="column">
-                  <StyledLabel>First name</StyledLabel>
-                  <StyledInput hasError={!!errors.firstName} name="firstName" ref={register({ required: true })} />
+                  <Label>First name</Label>
+                  <StyledInput isInvalid={!!errors.firstName} name="firstName" ref={register({ required: true })} />
                   {errors.firstName && <Muted color="warning">{errors.firstName.message}</Muted>}
                 </Flex>
                 <Div useFlex flexDirection="column">
-                  <StyledLabel>Last name</StyledLabel>
-                  <StyledInput hasError={!!errors.lastName} name="lastName" ref={register({ required: true })} />
+                  <Label>Last name</Label>
+                  <StyledInput isInvalid={!!errors.lastName} name="lastName" ref={register({ required: true })} />
                   {errors.lastName && <Muted color="warning">{errors.lastName.message}</Muted>}
                 </Div>
                 <Div useFlex flexDirection="column">
-                  <StyledLabel>Email address</StyledLabel>
-                  <StyledInput hasError={!!errors.email} name="email" ref={register({ required: true })} />
+                  <Label>Email address</Label>
+                  <StyledInput isInvalid={!!errors.email} name="email" ref={register({ required: true })} />
                   {errors.email && <Muted color="warning">{errors.email.message}</Muted>}
                 </Div>
                 <Div useFlex flexDirection="column">
-                  <StyledLabel>Phone number</StyledLabel>
-                  <StyledInput hasError={!!errors.phone} name="phone" ref={register({ required: false })} />
+                  <Label>Phone number</Label>
+                  <StyledInput isInvalid={!!errors.phone} name="phone" ref={register({ required: false })} />
                   {errors.phone && <Muted color="warning">{errors.phone.message}</Muted>}
                 </Div>
                 <Div useFlex flexDirection="column">
-                  <StyledLabel>Role</StyledLabel>
+                  <Label>Role</Label>
                   <Select
                     styles={errors.role && !activeRole ? ErrorStyle : undefined}
                     ref={() => register({

@@ -1,17 +1,20 @@
 import * as yup from 'yup';
 import { ApolloError } from 'apollo-boost';
-import { Button, Container, Div, ErrorStyle, Flex, Grid, H2, H3, H4,
-  Hr, Muted, StyledInput, StyledLabel, StyledTextInput } from '@haas/ui';
-import { MinusCircle, PlusCircle } from 'react-feather';
-import { useForm } from 'react-hook-form';
+import { Button, ButtonGroup, FormErrorMessage, Stack, useToast } from '@chakra-ui/core';
+import { Container, Div, ErrorStyle, Flex, Form, FormContainer, FormControl, FormLabel,
+  FormSection, H2, H3, Hr, Input, InputGrid, InputHelper, Muted, Textarea } from '@haas/ui';
+import { Controller, useForm } from 'react-hook-form';
+import { Minus, Plus, Type } from 'react-feather';
 import { useHistory, useParams } from 'react-router';
-import { useLazyQuery, useMutation, useQuery } from '@apollo/react-hooks';
+import { useMutation, useQuery } from '@apollo/react-hooks';
+import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 import Select from 'react-select';
-import styled, { css } from 'styled-components/macro';
 
 import { createDialogue } from 'mutations/createDialogue';
-import formatServerError from 'utils/formatServerError';
+import { motion } from 'framer-motion';
+import { yupResolver } from '@hookform/resolvers';
+import ServerError from 'components/ServerError';
 import getCustomerQuery from 'queries/getCustomersQuery';
 import getDialoguesOfCustomer from 'queries/getDialoguesOfCustomer';
 import getTagsQuery from 'queries/getTags';
@@ -21,7 +24,7 @@ interface FormDataProps {
   publicTitle?: string;
   description: string;
   slug: string;
-  contentOption: string;
+  contentOption: {label: string, value: string};
   customerOption: string;
   dialogueOption: string;
   tags: Array<string>;
@@ -29,18 +32,20 @@ interface FormDataProps {
 
 const DIALOGUE_CONTENT_TYPES = [
   { label: 'From scratch', value: 'SCRATCH' },
-  { label: 'From seed', value: 'SEED' },
+  { label: 'From default template', value: 'SEED' },
   { label: 'From other dialogue', value: 'TEMPLATE' },
 ];
 
 const schema = yup.object().shape({
-  title: yup.string().required(),
+  title: yup.string().required('Title is required'),
   publicTitle: yup.string().notRequired(),
-  description: yup.string().required(),
-  slug: yup.string().required(),
-  contentOption: yup.string().required(),
+  description: yup.string().required('Description is required'),
+  slug: yup.string().required('Slug is required'),
+  contentOption: yup.object().shape(
+    { label: yup.string().required(), value: yup.string().required() },
+  ).required('Content option is required'),
   customerOption: yup.string().when(['contentOption'], {
-    is: (contentOption : string) => contentOption === 'TEMPLATE',
+    is: (contentOption : { label: string, value: string}) => contentOption?.value === 'TEMPLATE',
     then: yup.string().required(),
     otherwise: yup.string().notRequired(),
   }),
@@ -54,26 +59,41 @@ const schema = yup.object().shape({
 
 const AddDialogueView = () => {
   const history = useHistory();
-  const { register, handleSubmit, errors, setValue, getValues } = useForm<FormDataProps>({
-    validationSchema: schema,
+  const toast = useToast();
+  const form = useForm<FormDataProps>({
+    resolver: yupResolver(schema),
+    mode: 'onChange',
   });
+
+  const { t } = useTranslation();
+
   const { customerSlug } = useParams();
   const [activeTags, setActiveTags] = useState<Array<null | {label: string, value: string}>>([]);
-  const [activeContentOption, setActiveContentOption] = useState<null | {label: string, value: string}>(null);
+  const [activeContentOption] = useState<null | {label: string, value: string}>(null);
   const [activeCustomerTemplate, setActiveCustomerTemplate] = useState<null | {label: string, value: string}>(null);
   const [activeDialogueTemplate, setActiveDialogueTemplate] = useState<null | {label: string, value: string}>(null);
-  const [fetchCustomers, { data: customerData }] = useLazyQuery(getCustomerQuery, {
+  const { data: customerData } = useQuery(getCustomerQuery, {
     fetchPolicy: 'cache-and-network',
     onError: (error: any) => {
       console.log(error);
     },
   });
 
-  const { data, loading: tagsLoading } = useQuery(getTagsQuery, { variables: { customerSlug } });
+  const { data } = useQuery(getTagsQuery, { variables: { customerSlug } });
 
-  const [addDialogue, { loading, error: serverError }] = useMutation(createDialogue, {
+  const [addDialogue, { error: serverError, loading: isLoading }] = useMutation(createDialogue, {
     onCompleted: () => {
-      history.push(`/dashboard/b/${customerSlug}/`);
+      toast({
+        title: 'Dialogue created!',
+        description: 'Dialogue has been created',
+        status: 'success',
+        position: 'bottom-right',
+        isClosable: true,
+      });
+
+      setTimeout(() => {
+        history.push(`/dashboard/b/${customerSlug}/`);
+      }, 500);
     },
     refetchQueries: [
       {
@@ -82,13 +102,20 @@ const AddDialogueView = () => {
       },
     ],
     onError: (error: ApolloError) => {
+      toast({
+        title: 'Something went wrong',
+        description: 'There was a problem in adding the dialogue. Please try again',
+        status: 'error',
+        position: 'bottom-right',
+        isClosable: true,
+      });
       // TODO: Use toast here + Sentry or so?
       console.log(`Error Name: ${error.name} \n`);
     },
   });
 
   const setTags = (qOption: { label: string, value: string }, index: number) => {
-    setValue(`tags[${index}]`, qOption?.value);
+    form.setValue(`tags[${index}]`, qOption?.value);
     setActiveTags((prevTags) => {
       prevTags[index] = qOption;
       return [...prevTags];
@@ -123,22 +150,24 @@ const AddDialogueView = () => {
     });
   };
   const handleDialogueTemplateChange = (qOption: any) => {
-    setValue('dialogueOption', qOption?.value);
+    form.setValue('dialogueOption', qOption?.value);
+
     setActiveDialogueTemplate(qOption);
   };
 
-  const handleContentOptionChange = (qOption: any) => {
-    setValue('contentOption', qOption?.value);
-    setActiveContentOption(qOption);
-    setActiveCustomerTemplate(null);
-    setActiveDialogueTemplate(null);
-    if (qOption.value === 'TEMPLATE') {
-      fetchCustomers();
-    }
-  };
+  // const handleContentOptionChange = (qOption: any) => {
+  //   form.setValue('contentOption', qOption?.value);
+
+  //   setActiveContentOption(qOption);
+  //   setActiveCustomerTemplate(null);
+  //   setActiveDialogueTemplate(null);
+
+  //   if (qOption.value === 'TEMPLATE') {
+  //     fetchCustomers();
+  //   }
+  // };
 
   const handleCustomerChange = (qOption: any) => {
-    setValue('customerOption', qOption?.value);
     setActiveCustomerTemplate(qOption);
     setActiveDialogueTemplate(null);
   };
@@ -146,7 +175,7 @@ const AddDialogueView = () => {
   const CUSTOMER_OPTIONS = customerData?.customers?.map(
     ({ name, id }: { name: string, id: string }) => ({ label: name, value: id }));
 
-  const dialogueOptions = activeCustomerTemplate
+  const dialogueOptions = form.watch('customerOption')
     && customerData?.customers?.find(
       (customer: any) => customer.id === activeCustomerTemplate?.value)?.dialogues?.map(
         (dialogue: any) => ({ label: dialogue.title, value: dialogue.id }));
@@ -160,164 +189,222 @@ const AddDialogueView = () => {
     <Container>
 
       <Div>
-        <H2 color="default.darkest" fontWeight={500} py={2}>Add dialogue</H2>
-        <Muted pb={4}>Create a new dialogue</Muted>
+        <H2 color="gray.700" mb={4} py={2}>Add dialogue</H2>
       </Div>
+      <motion.div initial={{ opacity: 0, y: 100 }} animate={{ opacity: 1, y: 0 }}>
 
-      <Hr />
-
-      {serverError && formatServerError(serverError.message)}
-
-      <Form onSubmit={handleSubmit(onSubmit)}>
-        <FormGroupContainer>
-          <Grid gridTemplateColumns={['1fr', '1fr 2fr']} gridColumnGap={4}>
-            <Div py={4} pr={4}>
-              <H3 color="default.text" fontWeight={500} pb={2}>General dialogue information</H3>
-              <Muted>
-                General information about your dialogue, such as title, descriptions, etc.
-              </Muted>
-            </Div>
-            <Div py={4}>
-              <Grid gridTemplateColumns={['1fr', '1fr 1fr']}>
-                <Flex flexDirection="column">
-                  <StyledLabel>Title</StyledLabel>
-                  <StyledInput hasError={!!errors.title} name="title" ref={register({ required: true })} />
-                  {errors.title && <Muted color="warning">Something went wrong!</Muted>}
-                </Flex>
-                <Div useFlex flexDirection="column">
-                  <StyledLabel>Public Title</StyledLabel>
-                  <StyledInput name="publicTitle" ref={register({ required: false })} />
-                  {errors.publicTitle && <Muted color="warning">Something went wrong!</Muted>}
-                </Div>
-                <Div useFlex flexDirection="column">
-                  <StyledLabel>Url Slug</StyledLabel>
-                  <StyledInput hasError={!!errors.slug} name="slug" ref={register({ required: true })} />
-                  {errors.slug && <Muted color="warning">Something went wrong!</Muted>}
-                </Div>
-                <Div useFlex flexDirection="column">
-                  <StyledLabel>Content option</StyledLabel>
-                  <Select
-                    styles={errors.contentOption && !activeContentOption ? ErrorStyle : undefined}
-                    ref={() => register({
-                      name: 'contentOption',
-                      required: true,
-                    })}
-                    options={DIALOGUE_CONTENT_TYPES}
-                    value={activeContentOption}
-                    onChange={(qOption: any) => {
-                      handleContentOptionChange(qOption);
-                    }}
-                  />
-                  {errors.contentOption && !activeContentOption && <Muted color="warning">{errors.contentOption.message}</Muted>}
-                </Div>
-                {(activeContentOption?.value === 'TEMPLATE' && CUSTOMER_OPTIONS)
-                  && (
-                  <Div useFlex flexDirection="column">
-                    <StyledLabel>Customer</StyledLabel>
-                    <Select
-                      styles={errors.customerOption && !activeCustomerTemplate ? ErrorStyle : undefined}
-                      ref={() => register({
-                        name: 'customerOption',
-                        required: false,
-                      })}
-                      options={CUSTOMER_OPTIONS}
-                      value={activeCustomerTemplate}
-                      onChange={(qOption: any) => {
-                        handleCustomerChange(qOption);
-                      }}
-                    />
-                    {errors.customerOption && !activeCustomerTemplate && <Muted color="warning">{errors.customerOption.message}</Muted>}
-                  </Div>
-                  )}
-                {(activeContentOption?.value === 'TEMPLATE' && dialogueOptions)
-                  && (
-                  <Div useFlex flexDirection="column">
-                    <StyledLabel>Template dialogue</StyledLabel>
-                    <Select
-                      styles={errors.dialogueOption && !activeDialogueTemplate ? ErrorStyle : undefined}
-                      ref={() => register({
-                        name: 'dialogueOption',
-                        required: false,
-                      })}
-                      options={dialogueOptions}
-                      value={activeDialogueTemplate}
-                      onChange={(qOption: any) => {
-                        handleDialogueTemplateChange(qOption);
-                      }}
-                    />
-                    {errors.dialogueOption && !activeDialogueTemplate && <Muted color="warning">{errors.dialogueOption.message}</Muted>}
-                  </Div>
-                  )}
-                <Div gridColumn="1 / -1" py={4}>
-                  <Flex flexDirection="column">
-                    <StyledLabel>Description</StyledLabel>
-                    <StyledTextInput hasError={!!errors.description} name="description" ref={register({ required: true })} />
-                    {errors.description && <Muted color="warning">Something went wrong!</Muted>}
-                  </Flex>
-                </Div>
-              </Grid>
-
-              <Div gridColumn="1 / -1">
-                <Flex flexDirection="row" alignItems="center" justifyContent="space-between">
-                  <H4>Tags</H4>
-                  {/* TODO: Make this an actual button (better semantics), rather than asisgning it to an svg */}
-                  <PlusCircle data-cy="AddTagButton" onClick={() => setActiveTags((prevTags) => [...prevTags, null])} />
-                </Flex>
-                <Hr />
-                <Div marginTop={15}>
-                  {activeTags?.map((tag, index) => (
-                    <Flex marginBottom="4px" alignItems="center" key={index} gridColumn="1 / -1">
-                      <Div
-                        data-cy="SelectOptions"
-                        flexGrow={9}
-                      >
-                        <Select
-                          styles={errors.tags?.[index] && !activeTags?.[index] ? ErrorStyle : undefined}
-                          id={`tags[${index}]`}
-                          key={index}
-                          ref={() => register({
-                            name: `tags[${index}]`,
-                            required: true,
-                            minLength: 1,
-                          })}
-                          options={tags}
-                          value={tag}
-                          onChange={(qOption: any) => {
-                            setTags(qOption, index);
-                          }}
-                        />
-                        {errors.tags?.[index] && !activeTags?.[index] && <Muted color="warning">{errors.tags?.[index]?.message}</Muted>}
-                      </Div>
-                      <Flex justifyContent="center" alignContent="center" flexGrow={1}>
-                        <MinusCircle onClick={() => deleteTag(index)} />
-                      </Flex>
-                    </Flex>
-                  ))}
-                </Div>
+        <FormContainer>
+          <Form onSubmit={form.handleSubmit(onSubmit)}>
+            <ServerError serverError={serverError} />
+            <FormSection id="general">
+              <Div>
+                <H3 color="default.text" fontWeight={500} pb={2}>About dialogue</H3>
+                <Muted color="gray.600">
+                  Tell us a bit about the dialogue
+                </Muted>
               </Div>
-            </Div>
-          </Grid>
-        </FormGroupContainer>
+              <Div>
+                <InputGrid>
+                  <FormControl isRequired isInvalid={!!form.errors.title}>
+                    <FormLabel htmlFor="title">Title</FormLabel>
+                    <InputHelper>What is the name of the dialogue?</InputHelper>
+                    <Input
+                      placeholder="Peaches or apples?"
+                      leftEl={<Type />}
+                      name="title"
+                      ref={form.register({ required: true })}
+                    />
+                    <FormErrorMessage>{form.errors.title?.message}</FormErrorMessage>
+                  </FormControl>
 
-        <Div>
-          {(loading || tagsLoading) && (<Muted>Loading...</Muted>)}
+                  <FormControl isInvalid={!!form.errors.publicTitle}>
+                    <FormLabel htmlFor="publicTitle">Public title</FormLabel>
+                    <InputHelper>
+                      (Optional): If set, will be used instead of the actual title to the user instead.
+                    </InputHelper>
+                    <Input
+                      placeholder="Peaches > Apples?"
+                      leftEl={<Type />}
+                      name="publicTitle"
+                      ref={form.register({ required: false })}
+                    />
+                    <FormErrorMessage>{form.errors.publicTitle?.message}</FormErrorMessage>
+                  </FormControl>
 
-          <Flex>
-            <Button brand="primary" mr={2} type="submit">Create dialogue</Button>
-            <Button brand="default" type="button" onClick={() => history.push(`/dashboard/b/${customerSlug}/`)}>Cancel</Button>
-          </Flex>
-        </Div>
-      </Form>
+                  <FormControl isRequired isInvalid={!!form.errors.description}>
+                    <FormLabel htmlFor="title">Description</FormLabel>
+                    <InputHelper>
+                      How would you describe the dialogue?
+                    </InputHelper>
+                    <Textarea
+                      placeholder="Describe your dialogue"
+                      name="description"
+                      ref={form.register({ required: true })}
+                    />
+                    <FormErrorMessage>{form.errors.description?.message}</FormErrorMessage>
+                  </FormControl>
+
+                  <FormControl isRequired isInvalid={!!form.errors.slug}>
+                    <FormLabel htmlFor="slug">{t('slug')}</FormLabel>
+                    <InputHelper>{t('dialogue:slug_helper')}</InputHelper>
+                    <Input
+                      placeholder="peaches-or-apples"
+                      leftAddOn={`https://client.haas.live/${customerSlug}`}
+                      name="slug"
+                      ref={form.register({ required: true })}
+                    />
+                    <FormErrorMessage>{form.errors.slug?.message}</FormErrorMessage>
+                  </FormControl>
+
+                </InputGrid>
+              </Div>
+            </FormSection>
+
+            <Hr />
+
+            <FormSection id="template">
+              <Div>
+                <H3 color="default.text" fontWeight={500} pb={2}>Template</H3>
+                <Muted color="gray.600">
+                  Do you wish to start the dialogue from a clean slate,
+                  or base this on another dialogue (or HAAS template)?
+                </Muted>
+              </Div>
+              <Div>
+                <InputGrid>
+                  <FormControl isRequired>
+                    <FormLabel htmlFor="title">Use a template</FormLabel>
+                    <InputHelper>
+                      Set what type of template you would like to use.
+                    </InputHelper>
+                    <Controller
+                      name="contentOption"
+                      control={form.control}
+                      as={Select}
+                      options={DIALOGUE_CONTENT_TYPES}
+                      defaultValue={activeContentOption}
+                    />
+                  </FormControl>
+
+                  {(form.watch('contentOption')?.value === 'TEMPLATE' && CUSTOMER_OPTIONS) && (
+                    <FormControl>
+                      <FormLabel>Project for templates</FormLabel>
+                      <InputHelper>Pick project to take template from</InputHelper>
+                      <Controller
+                        name="customerOption"
+                        control={form.control}
+                        render={({ onChange, onBlur, value }) => (
+                          <Select
+                            options={CUSTOMER_OPTIONS}
+                            onChange={(data: any) => {
+                              handleCustomerChange(data);
+                              onChange(data.value);
+                            }}
+                          />
+                        )}
+                      />
+                      <FormErrorMessage>{form.errors.customerOption?.message}</FormErrorMessage>
+                    </FormControl>
+                  )}
+
+                  {(form.watch('customerOption') && dialogueOptions) && (
+                    <FormControl>
+                      <FormLabel>Template from project</FormLabel>
+                      <InputHelper>Pick template from project</InputHelper>
+                      <Controller
+                        name="dialogueOption"
+                        control={form.control}
+                        as={Select}
+                        options={dialogueOptions}
+                        onChange={(qOption: any) => {
+                          handleDialogueTemplateChange(qOption);
+                        }}
+                      />
+                    </FormControl>
+                  )}
+                </InputGrid>
+              </Div>
+            </FormSection>
+
+            <Hr />
+
+            <FormSection id="tags">
+              <Div>
+                <H3 color="default.text" fontWeight={500} pb={2}>Tags</H3>
+                <Muted color="gray.600">
+                  Would you like to assign tags to associate your dialogue with?
+                </Muted>
+              </Div>
+              <Div>
+                <InputGrid gridTemplateColumns="1fr">
+                  <Div>
+                    <Button
+                      leftIcon={Plus}
+                      onClick={() => setActiveTags((prevTags) => [...prevTags, null])}
+                    >
+                      Add tag
+                    </Button>
+                  </Div>
+
+                  <Stack>
+                    {activeTags?.map((tag, index) => (
+                      <Flex marginBottom="4px" alignItems="center" key={index} gridColumn="1 / -1">
+                        <Div
+                          data-cy="SelectOptions"
+                          flexGrow={9}
+                        >
+                          <Select
+                            styles={form.errors.tags?.[index] && !activeTags?.[index] ? ErrorStyle : undefined}
+                            id={`tags[${index}]`}
+                            key={index}
+                            ref={() => form.register({
+                              name: `tags[${index}]`,
+                              required: false,
+                              minLength: 1,
+                            })}
+                            options={tags}
+                            value={tag}
+                            onChange={(qOption: any) => {
+                              setTags(qOption, index);
+                            }}
+                          />
+                          <FormErrorMessage>{form.errors.tags?.[index]?.message}</FormErrorMessage>
+                        </Div>
+                        <Flex justifyContent="center" alignContent="center" flexGrow={1}>
+                          <Button
+                            size="xs"
+                            variantColor="red"
+                            variant="outline"
+                            leftIcon={Minus}
+                            onClick={() => deleteTag(index)}
+                          >
+                            Remove
+                          </Button>
+                        </Flex>
+                      </Flex>
+                    ))}
+                  </Stack>
+                </InputGrid>
+
+              </Div>
+            </FormSection>
+
+            <ButtonGroup>
+              <Button
+                isLoading={isLoading}
+                isDisabled={!form.formState.isValid}
+                variantColor="teal"
+                type="submit"
+              >
+                Create
+              </Button>
+              <Button variant="outline" onClick={() => history.push('/')}>Cancel</Button>
+            </ButtonGroup>
+          </Form>
+        </FormContainer>
+      </motion.div>
     </Container>
   );
 };
-
-const FormGroupContainer = styled.div`
-  ${({ theme }) => css`
-    padding-bottom: ${theme.gutter * 3}px;
-  `}
-`;
-
-const Form = styled.form``;
 
 export default AddDialogueView;

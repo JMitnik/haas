@@ -1,15 +1,32 @@
-import { ThemeProvider as ChakraThemeProvider } from '@chakra-ui/core';
+import { CSSReset, ThemeProvider as ChakraThemeProvider } from '@chakra-ui/core';
 import { ThemeProvider } from 'styled-components/macro';
 import React, { useEffect, useState } from 'react';
 
 import { makeCustomTheme } from 'utils/makeCustomerTheme';
 import defaultTheme, { chakraDefaultTheme } from 'config/theme';
 
+import { generatePalette, isDarkColor } from 'utils/ColorUtils';
 import { useCustomer } from './CustomerProvider';
 
 interface ThemeProvidersProps {
   children?: React.ReactNode;
 }
+
+const makeBrandTheme = (settings: any) => {
+  if (!settings) return {};
+
+  if (!settings.colourSettings?.primary) return {};
+
+  const brandTheme = {
+    colors: {
+      primaries: generatePalette(settings?.colourSettings.primary),
+      ...settings?.colourSettings,
+    },
+    isDarkColor: isDarkColor(settings?.colourSettings.primary),
+  };
+
+  return brandTheme;
+};
 
 const ThemeProviders = ({ children }: ThemeProvidersProps) => {
   const [customTheme, setCustomTheme] = useState({});
@@ -17,15 +34,9 @@ const ThemeProviders = ({ children }: ThemeProvidersProps) => {
 
   useEffect(() => {
     if (activeCustomer) {
-      const customerTheme = { colors: activeCustomer.settings?.colourSettings };
-      setCustomTheme(customerTheme);
-    } else if (storageCustomer) {
-      if (storageCustomer.settings?.colourSettings) {
-        const customerTheme = { colors: storageCustomer.settings?.colourSettings };
-        setCustomTheme(customerTheme);
-      } else {
-        setCustomTheme({});
-      }
+      setCustomTheme(makeBrandTheme(activeCustomer.settings));
+    } else if (storageCustomer?.settings?.colourSettings) {
+      setCustomTheme(makeBrandTheme(storageCustomer.settings));
     } else {
       setCustomTheme({});
     }
@@ -34,6 +45,7 @@ const ThemeProviders = ({ children }: ThemeProvidersProps) => {
   if (customTheme) {
     return (
       <ChakraThemeProvider theme={chakraDefaultTheme}>
+        <CSSReset />
         <ThemeProvider theme={defaultTheme}>
           <ThemeProvider theme={makeCustomTheme(defaultTheme, customTheme)}>
             {children}

@@ -2,6 +2,7 @@ import { Customer, TagCreateWithoutCustomerInput } from '@prisma/client';
 import { subDays } from 'date-fns';
 import cuid from 'cuid';
 
+import { UserInputError } from 'apollo-server-express';
 import { leafNodes } from '../../data/seeds/default-data';
 // eslint-disable-next-line import/no-cycle
 import DialogueService from '../questionnaire/DialogueService';
@@ -182,50 +183,58 @@ class CustomerService {
     const { name, options } = args;
     const { isSeed, logo, primaryColour, slug } = options;
 
-    const customer = await prisma.customer.create({
-      data: {
-        name,
-        slug,
-        tags: {
-          create: seedCustomerData,
-        },
-        settings: {
-          create: {
-            logoUrl: logo,
-            colourSettings: {
-              create: {
-                primary: primaryColour || '#4287f5',
+    try {
+      const customer = await prisma.customer.create({
+        data: {
+          name,
+          slug,
+          tags: {
+            create: seedCustomerData,
+          },
+          settings: {
+            create: {
+              logoUrl: logo,
+              colourSettings: {
+                create: {
+                  primary: primaryColour || '#4287f5',
+                },
               },
             },
           },
+          roles: {
+            create: [
+              {
+                name: 'Admin',
+                roleId: cuid(),
+              },
+              {
+                name: 'Normal',
+                roleId: cuid(),
+              },
+              {
+                name: 'Custom role',
+                roleId: cuid(),
+              },
+            ],
+          },
+          dialogues: {
+            create: [],
+          },
         },
-        roles: {
-          create: [
-            {
-              name: 'Admin',
-              roleId: cuid(),
-            },
-            {
-              name: 'Normal',
-              roleId: cuid(),
-            },
-            {
-              name: 'Custom role',
-              roleId: cuid(),
-            },
-          ],
-        },
-        dialogues: {
-          create: [],
-        },
-      },
-    });
+      });
 
-    if (isSeed) {
-      await CustomerService.seed(customer);
+      if (isSeed) {
+        await CustomerService.seed(customer);
+      }
+
+      return customer;
+    } catch (error) {
+      if (error.code === 'P2002') {
+        throw new UserInputError('customer:existing_slug');
+      }
+
+      return null;
     }
-
-    return customer;
   };
 
   /**
@@ -310,7 +319,7 @@ class CustomerService {
     await prisma.triggerCondition.deleteMany({ where: { trigger: { customerId } } });
     await prisma.trigger.deleteMany({ where: { customerId } });
     await prisma.permission.deleteMany({ where: { customerId } });
-    await prisma.user.deleteMany({ where: { customerId } });
+    await prisma.user.deleteMany({ where: { customers: { every: { customer: { id: customerId } } } } });
     await prisma.role.deleteMany({ where: { customerId } });
 
     await prisma.customer.delete({

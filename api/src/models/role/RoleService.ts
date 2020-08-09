@@ -41,6 +41,25 @@ class RoleService {
     };
   };
 
+  static async fetchDefaultRoleForCustomer(customerId: string) {
+    const customerWithRoles = await prisma.customer.findOne({
+      where: { id: customerId || undefined },
+      include: {
+        roles: true,
+      },
+    });
+
+    const guestRole = customerWithRoles?.roles.find((role) => role.name.toLowerCase().includes('guest'));
+    if (guestRole) return guestRole;
+
+    // TODO: Make this a better heuristic
+
+    const firstRole = customerWithRoles?.roles?.[0];
+    if (firstRole) return firstRole;
+
+    throw new Error('Unable to find any roles');
+  }
+
   static roles = async (customerSlug: string) => {
     const roles = await prisma.role.findMany({
       where: { Customer: {

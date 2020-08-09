@@ -146,14 +146,15 @@ export const CustomerMutations = Upload && extendType({
       async resolve(parent, args) {
         const { file } = args;
         const { createReadStream, filename, mimetype, encoding } = await file;
+        console.log(file);
+
         const stream = new Promise<UploadApiResponse>((resolve, reject) => {
           const cld_upload_stream = cloudinary.v2.uploader.upload_stream({
             folder: 'company_logos',
           },
           (error, result: UploadApiResponse | undefined) => {
-            if (result) {
-              return resolve(result);
-            }
+            if (result) return resolve(result);
+
             return reject(error);
           });
 
@@ -161,8 +162,8 @@ export const CustomerMutations = Upload && extendType({
         });
 
         const result = await stream;
-        const { url } = result;
-        return { filename, mimetype, encoding, url };
+        const { secure_url } = result;
+        return { filename, mimetype, encoding, url: secure_url };
       },
     });
     t.field('createCustomer', {

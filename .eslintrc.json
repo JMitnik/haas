@@ -10,6 +10,7 @@
     "rules": {
         "sort-imports": "off",
         "import/prefer-default-export": "off",
+        "react/require-default-props": "off",
         "@typescript-eslint/camelcase": "off",
         "@typescript-eslint/no-unused-vars": "error",
         "react/jsx-props-no-spreading": "off",

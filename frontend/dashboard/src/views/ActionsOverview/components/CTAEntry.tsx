@@ -1,5 +1,6 @@
 import { ApolloError } from 'apollo-boost';
 import { Edit3, X } from 'react-feather';
+import { motion } from 'framer-motion';
 import { useMutation } from '@apollo/react-hooks';
 import { useParams } from 'react-router-dom';
 import React from 'react';
@@ -44,6 +45,7 @@ const CTAEntryContainer = styled(Flex)<{ activeCTA: string | null, id: string }>
     padding-left: 30px;
     margin-bottom: 20px;
     border-radius: ${theme.borderRadiuses.somewhatRounded};
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 
     ${!activeCTA && css`
       background-color: ${theme.colors.white};
@@ -114,47 +116,53 @@ const CTAEntry = ({ id, activeCTA, onActiveCTAChange, title, type, links, Icon, 
   };
 
   return (
-    <CTAEntryContainer id={id} activeCTA={activeCTA}>
-      <DeleteCTAButton disabled={(!!activeCTA && activeCTA !== id) || false} onClick={() => deleteCTA()}>
-        <X />
-      </DeleteCTAButton>
+    <motion.div initial={{ opacity: 1, y: 150 }} animate={{ opacity: 1, y: 0 }}>
 
-      <Flex flexDirection="row" width="100%">
-        <CTAIcon type={type} Icon={Icon} />
+      <CTAEntryContainer id={id} activeCTA={activeCTA}>
+        <DeleteCTAButton disabled={(!!activeCTA && activeCTA !== id) || false} onClick={() => deleteCTA()}>
+          <X />
+        </DeleteCTAButton>
 
-        <Flex width="60%" flexDirection="column">
-          <Span fontSize="1.4em">
-            Title
-          </Span>
-          <OverflowSpan>
-            {title || 'None'}
-          </OverflowSpan>
-        </Flex>
+        <Flex flexDirection="row" width="100%">
+          <CTAIcon type={type} Icon={Icon} />
 
-        <Flex width="30%" alignItems="center" justifyContent="center">
-          <EditCTAButton disabled={(activeCTA && activeCTA !== id) || false} onClick={() => onActiveCTAChange(id)}>
-            <Edit3 />
-            <Span>
-              Edit
+          <Flex width="60%" flexDirection="column">
+            <Span fontSize="1.4em">
+              Title
             </Span>
-          </EditCTAButton>
+            <OverflowSpan>
+              {title || 'None'}
+            </OverflowSpan>
+          </Flex>
+
+          <Flex width="30%" alignItems="center" justifyContent="center">
+            <EditCTAButton disabled={(activeCTA && activeCTA !== id) || false} onClick={() => onActiveCTAChange(id)}>
+              <Edit3 />
+              <Span>
+                Edit
+              </Span>
+            </EditCTAButton>
+          </Flex>
+
         </Flex>
 
-      </Flex>
-
-      {activeCTA === id
+        {activeCTA === id
           && (
-            <CTAForm
-              id={id}
-              title={title}
-              type={type}
-              links={links}
-              onActiveCTAChange={onActiveCTAChange}
-              onNewCTAChange={onNewCTAChange}
-            />
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+              <CTAForm
+                id={id}
+                title={title}
+                type={type}
+                links={links}
+                onActiveCTAChange={onActiveCTAChange}
+                onNewCTAChange={onNewCTAChange}
+              />
+            </motion.div>
+
           )}
 
-    </CTAEntryContainer>
+      </CTAEntryContainer>
+    </motion.div>
   );
 };
 

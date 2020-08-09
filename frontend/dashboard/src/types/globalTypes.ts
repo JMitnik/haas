@@ -112,6 +112,16 @@ export interface EdgeConditionInputType {
   matchValue?: string | null;
 }
 
+/**
+ * Login credential
+ */
+export interface LoginInput {
+  input: {
+    email: string;
+    password: string;
+  }
+}
+
 export interface OptionInputType {
   id?: number | null;
   value?: string | null;
@@ -165,12 +175,12 @@ export interface TriggerInputType {
 }
 
 export interface UserInput {
-  email?: string | null;
+  email: string;
+  password: string;
+  firstName?: string | null;
   roleId?: string | null;
   customerId?: string | null;
-  firstName?: string | null;
   lastName?: string | null;
-  password?: string | null;
   phone?: string | null;
 }
 
