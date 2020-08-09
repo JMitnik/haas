@@ -1,8 +1,8 @@
 import { inputObjectType, mutationField, objectType } from '@nexus/schema';
 
+import { UserInputError } from 'apollo-server-express';
 import { UserType } from '../users/User';
 import AuthService from './AuthService';
-import { UserInputError } from 'apollo-server-express';
 
 export const RegisterInput = inputObjectType({
   name: 'RegisterInput',
@@ -31,7 +31,7 @@ export const RegisterMutation = mutationField('register', {
     const role = user.customers.find((customer) => customer.customer.id === args.input?.customerId)?.role;
     const userToken = await AuthService.createToken({
       email: user.email,
-      role: role?.name || '',
+      // role: role?.name || '',
       permissions: role?.permissions.map((permission) => permission.name) || [],
     });
 
@@ -57,8 +57,8 @@ export const AuthOutput = objectType({
     t.string('token');
 
     t.field('user', { type: UserType });
-  }
-})
+  },
+});
 
 export const LoginMutation = mutationField('login', {
   type: AuthOutput,
@@ -71,7 +71,7 @@ export const LoginMutation = mutationField('login', {
 
     const user = await AuthService.loginUser({
       email: args.input?.email,
-      password: args.input?.password
+      password: args.input?.password,
     });
 
     const permissions = [
@@ -81,11 +81,11 @@ export const LoginMutation = mutationField('login', {
     const userToken = await AuthService.createToken({
       email: user.email,
       permissions,
-    })
+    });
 
     return {
       token: userToken,
-      user: user
+      user,
     };
   },
 });
