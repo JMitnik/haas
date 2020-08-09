@@ -27,21 +27,21 @@ class NodeEntryService {
     relatedEdge: nodeEntryInput.edgeId && { connect: { id: nodeEntryInput.edgeId } },
     depth: nodeEntryInput?.depth,
 
-    choiceNodeEntry: nodeEntryInput?.data?.choice?.value && {
+    choiceNodeEntry: nodeEntryInput?.data?.choice?.value ? {
       create: { value: nodeEntryInput?.data?.choice?.value },
-    },
+    } : undefined,
 
-    registrationNodeEntry: nodeEntryInput?.data?.register?.value && {
+    registrationNodeEntry: nodeEntryInput?.data?.register?.value ? {
       create: { value: nodeEntryInput?.data?.register?.value },
-    },
+    } : undefined,
 
-    sliderNodeEntry: nodeEntryInput?.data?.slider?.value && {
+    sliderNodeEntry: nodeEntryInput?.data?.slider?.value ? {
       create: { value: nodeEntryInput?.data?.slider?.value },
-    },
+    } : undefined ,
 
-    textboxNodeEntry: nodeEntryInput?.data?.textbox?.value && {
+    textboxNodeEntry: nodeEntryInput?.data?.textbox?.value ? {
       create: { value: nodeEntryInput?.data?.textbox?.value },
-    },
+    }: undefined,
   });
 
   // TODO: Test

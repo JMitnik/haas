@@ -3,20 +3,20 @@ import {
   Container, FormContainer, PageHeading,
 } from '@haas/ui';
 import { motion } from 'framer-motion';
-import { useCustomer } from 'providers/CustomerProvider';
+import { useCustomer, useCustomer } from 'providers/CustomerProvider';
 import { useForm } from 'react-hook-form';
 import { useHistory, useParams } from 'react-router';
 import { useMutation, useQuery } from '@apollo/react-hooks';
-import { useToast } from '@chakra-ui/core';
+import { useToast, useToast } from '@chakra-ui/core';
 import { yupResolver } from '@hookform/resolvers';
 import React from 'react';
 
 import CustomerForm from 'components/CustomerForm';
+import booleanToNumber from 'utils/booleanToNumber';
 import parseOptionalBoolean from 'utils/parseOptionalBoolean';
 
-import booleanToNumber from 'utils/booleanToNumber';
 import editCustomerMutation from '../../mutations/editCustomer';
-import getCustomerQuery from '../../queries/getCustomersQuery';
+import getCustomerQuery, { getCustomerQuery } from '../../queries/getCustomersQuery';
 import getEditCustomerData from '../../queries/getEditCustomer';
 
 interface FormDataProps {
