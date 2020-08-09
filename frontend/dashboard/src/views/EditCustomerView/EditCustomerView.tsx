@@ -7,7 +7,7 @@ import { useCustomer } from 'providers/CustomerProvider';
 import { useForm } from 'react-hook-form';
 import { useHistory, useParams } from 'react-router';
 import { useMutation, useQuery } from '@apollo/react-hooks';
-import { useToast, useToast } from '@chakra-ui/core';
+import { useToast } from '@chakra-ui/core';
 import { yupResolver } from '@hookform/resolvers';
 import React from 'react';
 
