@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { PaginationWhereInput } from "./../../../__generated__/globalTypes";
+import { PaginationWhereInput } from "./../../types/globalTypes";
 
 // ====================================================
 // GraphQL query operation: getInteractions

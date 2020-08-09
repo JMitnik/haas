@@ -2,6 +2,7 @@ import { useParams } from 'react-router';
 import React from 'react';
 import styled, { css } from 'styled-components/macro';
 
+import { AnimatePresence, motion } from 'framer-motion';
 import { Div, PageHeading } from '@haas/ui';
 import { NavItem, NavItems, NavLogo, Usernav } from 'components/Sidenav/Sidenav';
 import { ReactComponent as NotificationIcon } from 'assets/icons/icon-notification.svg';
@@ -10,7 +11,9 @@ import { ReactComponent as SettingsIcon } from 'assets/icons/icon-cog.svg';
 import { ReactComponent as SurveyIcon } from 'assets/icons/icon-survey.svg';
 import { UserProps } from 'types/generic';
 import { ReactComponent as UsersIcon } from 'assets/icons/icon-user-group.svg';
+import { useAuth } from 'providers/AuthProvider';
 import { useCustomer } from 'providers/CustomerProvider';
+import Logo, { FullLogo } from 'components/Logo/Logo';
 import Sidenav from 'components/Sidenav';
 import useLocalStorage from 'hooks/useLocalStorage';
 
@@ -34,49 +37,55 @@ const DashboardViewContainer = styled(Div)`
 `;
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
-  const { customerSlug }: { topicId: string, customerSlug: string } = useParams<any>();
+  const params: { topicId: string, customerSlug: string, dialogueSlug: string } = useParams<any>();
   const { activeCustomer } = useCustomer();
   const [storageCustomer] = useLocalStorage('customer', '');
-  const sampleUser: UserProps = {
-    firstName: 'Daan',
-    lastName: 'Helsloot',
+  const { user } = useAuth();
+
+  const customer = activeCustomer || storageCustomer;
+
+  const userData: UserProps = {
+    firstName: user?.firstName || 'HAAS',
+    lastName: user?.lastName || 'Admin',
     business: {
-      name: activeCustomer?.name || storageCustomer?.name || 'Starbucks',
+      name: customer?.name || '',
     },
   };
 
   return (
     <DashboardLayoutContainer>
       <Div>
-        <Sidenav>
-          <Div>
-            <NavLogo />
-            <NavItems>
-              <NavItem to={`/dashboard/b/${customerSlug}/d`}>
-                <SurveyIcon />
-                Dialogues
-              </NavItem>
-              <NavItem to={`/dashboard/b/${customerSlug}/analytics`}>
-                <PieChartIcon />
-                Analytics
-              </NavItem>
-              <NavItem to={`/dashboard/b/${customerSlug}/users`}>
-                <UsersIcon />
-                Users
-              </NavItem>
-              <NavItem to={`/dashboard/b/${customerSlug}/triggers`}>
-                <NotificationIcon />
-                Alerts
-              </NavItem>
-              <NavItem to={`/dashboard/b/${customerSlug}/edit`}>
-                <SettingsIcon />
-                Settings
-              </NavItem>
-            </NavItems>
-          </Div>
+        <motion.div initial={{ x: -30 }} animate={{ x: 0 }} exit={{ x: -30 }}>
+          <Sidenav>
+            <Div>
+              <Logo justifyContent="center" />
+              <NavItems>
+                <NavItem to={`/dashboard/b/${params.customerSlug}/d`}>
+                  <SurveyIcon />
+                  Dialogues
+                </NavItem>
+                <NavItem to={`/dashboard/b/${params.customerSlug}/analytics`}>
+                  <PieChartIcon />
+                  Analytics
+                </NavItem>
+                <NavItem to={`/dashboard/b/${params.customerSlug}/users`}>
+                  <UsersIcon />
+                  Users
+                </NavItem>
+                <NavItem to={`/dashboard/b/${params.customerSlug}/triggers`}>
+                  <NotificationIcon />
+                  Alerts
+                </NavItem>
+                <NavItem to={`/dashboard/b/${params.customerSlug}/edit`}>
+                  <SettingsIcon />
+                  Settings
+                </NavItem>
+              </NavItems>
+            </Div>
 
-          <Usernav user={sampleUser} />
-        </Sidenav>
+            <Usernav customer={customer} user={userData} />
+          </Sidenav>
+        </motion.div>
       </Div>
 
       <DashboardViewContainer>

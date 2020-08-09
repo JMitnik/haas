@@ -3,7 +3,6 @@ import React from 'react';
 import { DataGridProps, TableProps } from 'types/generic';
 import { Div, Flex, Grid, H4 } from '@haas/ui';
 import { Info } from 'react-feather';
-import { TableRowProps } from 'components/Table/TableTypes';
 import PaginationControls from 'components/Table/TablePaginationControls';
 import TableHeader from 'components/Table/TableHeader';
 import TableRow from 'components/Table/TableRow';

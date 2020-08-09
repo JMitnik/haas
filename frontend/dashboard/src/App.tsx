@@ -1,5 +1,7 @@
 import { ApolloProvider } from '@apollo/react-hooks';
-import { Redirect, Route, BrowserRouter as Router, Switch } from 'react-router-dom';
+import { ErrorBoundary } from 'react-error-boundary';
+import { I18nextProvider } from 'react-i18next';
+import { Redirect, Route, RouteProps, BrowserRouter as Router, Switch } from 'react-router-dom';
 import React, { FC } from 'react';
 
 import { AppContainer } from 'styles/AppStyles';
@@ -12,6 +14,7 @@ import AnalyticsPage from 'pages/dashboard/analytics';
 import CustomerPage from 'pages/dashboard/customer';
 import CustomerProvider from 'providers/CustomerProvider';
 import CustomersPage from 'pages/dashboard/customers';
+import DashboardLayout from 'layouts/DashboardLayout';
 import DashboardPage from 'pages/dashboard';
 import DialogueBuilderPage from 'pages/dashboard/builder';
 import DialoguePage from 'pages/dashboard/dialogues/dialogue';
@@ -27,135 +30,164 @@ import ThemesProvider from 'providers/ThemeProvider';
 import TriggersOverview from 'views/TriggerOverview/TriggerOverview';
 import UsersOverview from 'views/UsersOverview/UsersOverview';
 
-import { ErrorBoundary } from 'react-error-boundary';
-import DashboardLayout from 'layouts/DashboardLayout';
-
+import { AnimatePresence } from 'framer-motion';
+import AuthProvider, { useAuth } from 'providers/AuthProvider';
 import DialogueLayout from 'layouts/DialogueLayout';
-import client from './config/apollo';
+import LoginPage from 'pages/login';
+import PreCustomerLayout from 'layouts/PreCustomerLayout';
+import client from 'config/apollo';
+import lang from 'config/i18n-config';
+
+const ProtectedRoute = (props: RouteProps) => {
+  const { user } = useAuth();
+
+  // Note-Login: Uncomment this for login
+  // if (!user) return <Redirect to="/login" />;
+
+  return (
+    <Route {...props} />
+  );
+};
 
 const AppRoutes = () => (
   <Switch>
 
     <Route
       path="/dashboard/b/add"
-      render={() => <AddCustomerPage />}
+      render={() => (
+        <PreCustomerLayout>
+          <AddCustomerPage />
+        </PreCustomerLayout>
+      )}
     />
 
     <Route
       path="/dashboard/b/:customerSlug"
       render={() => (
-        <DashboardLayout>
-          <Switch>
+        <AnimatePresence>
+          <DashboardLayout>
+            <Switch>
 
-            <Route
-              path="/dashboard/b/:customerSlug/analytics/"
-              render={() => (
-                <AnalyticsPage />
-              )}
-            />
+              <Route
+                path="/dashboard/b/:customerSlug/analytics/"
+                render={() => (
+                  <AnalyticsPage />
+                )}
+              />
 
-            <Route
-              path="/dashboard/b/:customerSlug/triggers/add"
-              render={() => (
-                <AddTriggerView />
-              )}
-            />
+              <Route
+                path="/dashboard/b/:customerSlug/triggers/add"
+                render={() => (
+                  <AddTriggerView />
+                )}
+              />
 
-            <Route
-              path="/dashboard/b/:customerSlug/triggers/:triggerId/edit"
-              render={() => (
-                <EditTriggerView />
-              )}
-            />
+              <Route
+                path="/dashboard/b/:customerSlug/triggers/:triggerId/edit"
+                render={() => (
+                  <EditTriggerView />
+                )}
+              />
 
-            <Route
-              path="/dashboard/b/:customerSlug/triggers"
-              render={() => <TriggersOverview />}
-            />
+              <Route
+                path="/dashboard/b/:customerSlug/triggers"
+                render={() => <TriggersOverview />}
+              />
 
-            <Route
-              path="/dashboard/b/:customerSlug/edit"
-              render={() => <EditCustomerView />}
-            />
+              <Route
+                path="/dashboard/b/:customerSlug/edit"
+                render={() => <EditCustomerView />}
+              />
 
-            <Route
-              path="/dashboard/b/:customerSlug/u/:userId/edit"
-              render={() => (
-                <EditUserView />
-              )}
-            />
+              <Route
+                path="/dashboard/b/:customerSlug/u/:userId/edit"
+                render={() => (
+                  <EditUserView />
+                )}
+              />
 
-            <Route
-              path="/dashboard/b/:customerSlug/users/add"
-              render={() => (
-                <AddUserView />
-              )}
-            />
+              <Route
+                path="/dashboard/b/:customerSlug/users/add"
+                render={() => (
+                  <AddUserView />
+                )}
+              />
 
-            <Route
-              path="/dashboard/b/:customerSlug/users"
-              render={() => <UsersOverview />}
-            />
-            <Route
-              path="/dashboard/b/:customerSlug/roles"
-              render={() => <RolesOverview />}
-            />
+              <Route
+                path="/dashboard/b/:customerSlug/users"
+                render={() => <UsersOverview />}
+              />
+              <Route
+                path="/dashboard/b/:customerSlug/roles"
+                render={() => <RolesOverview />}
+              />
 
-            <Route
-              path="/dashboard/b/:customerSlug/d/add"
-              render={() => <AddDialogueView />}
-            />
+              <Route
+                path="/dashboard/b/:customerSlug/d/add"
+                render={() => <AddDialogueView />}
+              />
 
-            <Route
-              path="/dashboard/b/:customerSlug/d/:dialogueSlug"
-              render={() => (
-                <DialogueLayout>
-                  <Switch>
-                    <Route
-                      path="/dashboard/b/:customerSlug/d/:dialogueSlug/builder"
-                      render={() => <DialogueBuilderPage />}
-                    />
+              <Route
+                path="/dashboard/b/:customerSlug/d/:dialogueSlug"
+                render={() => (
+                  <DialogueLayout>
+                    <Switch>
+                      <Route
+                        path="/dashboard/b/:customerSlug/d/:dialogueSlug/builder"
+                        render={() => <DialogueBuilderPage />}
+                      />
 
-                    <Route
-                      path="/dashboard/b/:customerSlug/d/:dialogueSlug/edit"
-                      render={() => <EditDialogueView />}
-                    />
+                      <Route
+                        path="/dashboard/b/:customerSlug/d/:dialogueSlug/edit"
+                        render={() => <EditDialogueView />}
+                      />
 
-                    <Route
-                      path="/dashboard/b/:customerSlug/d/:dialogueSlug/interactions"
-                      render={() => <InteractionsOverview />}
-                    />
+                      <Route
+                        path="/dashboard/b/:customerSlug/d/:dialogueSlug/interactions"
+                        render={() => <InteractionsOverview />}
+                      />
 
-                    <Route
-                      path="/dashboard/b/:customerSlug/d/:dialogueSlug/actions"
-                      render={() => <ActionsPage />}
-                    />
+                      <Route
+                        path="/dashboard/b/:customerSlug/d/:dialogueSlug/actions"
+                        render={() => <ActionsPage />}
+                      />
 
-                    <Route
-                      path="/dashboard/b/:customerSlug/d/:dialogueSlug"
-                      render={() => <DialoguePage />}
-                    />
+                      <Route
+                        path="/dashboard/b/:customerSlug/d/:dialogueSlug"
+                        render={() => <DialoguePage />}
+                      />
 
-                  </Switch>
-                </DialogueLayout>
-              )}
-            />
+                    </Switch>
+                  </DialogueLayout>
+                )}
+              />
 
-            <Route
-              path="/dashboard/b/:customerSlug/d"
-              render={() => <DialoguesPage />}
-            />
-            <Route
-              path="/dashboard/b/:customerSlug/"
-              render={() => <CustomerPage />}
-            />
-          </Switch>
-        </DashboardLayout>
+              <Route
+                path="/dashboard/b/:customerSlug/d"
+                render={() => <DialoguesPage />}
+              />
+              <Route
+                path="/dashboard/b/:customerSlug/"
+                render={() => <CustomerPage />}
+              />
+            </Switch>
+          </DashboardLayout>
+        </AnimatePresence>
       )}
     />
 
-    <Route path="/dashboard/b/" render={() => <CustomersPage />} />
-    <Route path="/dashboard" render={() => <DashboardPage />} />
+    <ProtectedRoute
+      path="/dashboard/b/"
+      render={() => (
+        <PreCustomerLayout>
+          <CustomersPage />
+        </PreCustomerLayout>
+      )}
+    />
+
+    <ProtectedRoute path="/dashboard" render={() => <DashboardPage />} />
+
+    <Route path="/login"><LoginPage /></Route>
 
     <Route path="/">
       <Redirect to="/dashboard" />
@@ -172,20 +204,24 @@ const GeneralErrorFallback = ({ error }: { error?: Error | undefined }) => (
 
 const App: FC = () => (
   <>
-    <ApolloProvider client={client}>
-      <CustomerProvider>
-        <Router>
-          <ThemesProvider>
-            <AppContainer>
-              <ErrorBoundary FallbackComponent={GeneralErrorFallback}>
-                <AppRoutes />
-              </ErrorBoundary>
-            </AppContainer>
-            <GlobalStyle />
-          </ThemesProvider>
-        </Router>
-      </CustomerProvider>
-    </ApolloProvider>
+    <I18nextProvider i18n={lang}>
+      <ApolloProvider client={client}>
+        <CustomerProvider>
+          <Router>
+            <ThemesProvider>
+              <AuthProvider>
+                <AppContainer>
+                  <ErrorBoundary FallbackComponent={GeneralErrorFallback}>
+                    <AppRoutes />
+                  </ErrorBoundary>
+                </AppContainer>
+                <GlobalStyle />
+              </AuthProvider>
+            </ThemesProvider>
+          </Router>
+        </CustomerProvider>
+      </ApolloProvider>
+    </I18nextProvider>
   </>
 );
 

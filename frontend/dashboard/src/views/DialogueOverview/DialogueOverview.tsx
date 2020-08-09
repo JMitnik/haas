@@ -9,10 +9,11 @@ import Searchbar from 'components/SearchBar';
 import SurveyIcon from 'components/Icons/SurveyIcon';
 import getDialoguesOfCustomer from 'queries/getDialoguesOfCustomer';
 
+import { Skeleton } from '@chakra-ui/core';
 import { AddDialogueCard, TranslatedPlus } from './DialogueOverviewStyles';
 import DialogueCard from './DialogueCard';
 
-const DialogueOverview = ({ dialogues }: { dialogues: any }) => {
+const DialogueOverview = ({ dialogues, isLoading }: { dialogues: any, isLoading: boolean }) => {
   const { customerSlug } = useParams();
 
   // TODO: Handle the loading
@@ -45,6 +46,7 @@ const DialogueOverview = ({ dialogues }: { dialogues: any }) => {
         gridTemplateColumns={['1fr', 'repeat(auto-fill, minmax(250px, 1fr))']}
         gridAutoRows="minmax(300px, 1fr)"
       >
+
         {filteredDialogues?.map((dialogue: any, index: any) => dialogue && (
           <DialogueCard key={index} dialogue={dialogue} />
         ))}

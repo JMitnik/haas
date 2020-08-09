@@ -1,12 +1,15 @@
 import { theme as chakraTheme } from '@chakra-ui/core';
+import { generatePalette } from 'utils/ColorUtils';
 
 // TODO: Export theme as type
 const theme = {
   ...chakraTheme,
+  isDarkColor: undefined,
   colors: {
     ...chakraTheme.colors,
     primary: '#426b3a',
     primaryAlt: '#8cb6ff',
+    primaries: generatePalette('#426b3a'),
     secondary: '#6f6594',
     tertiary: '#3182CE',
     black: 'black',
@@ -15,6 +18,17 @@ const theme = {
     warning: '#ECC94B',
     error: '#F56565',
     default: {
+      0: '#f7f8fb',
+      50: '#eef0f7',
+      100: '#ced2e0',
+      200: '#adb5cc',
+      300: '#8c97ba',
+      400: '#6b79a8',
+      500: '#536090',
+      600: '#404a6f',
+      700: '#2e354f',
+      800: '#1c202f',
+      900: '#090b11',
       lightest: '#f7faff',
       light: '#eef1f5',
       normal: '#f7f8fb',
@@ -38,7 +52,7 @@ const theme = {
   },
   space: [0, 6, 12, 18, 24],
   gutter: 24,
-  containerWidth: 1080,
+  containerWidth: 1400,
   // TODO: Add
   fontFamilies: {
     body: '',
@@ -46,7 +60,9 @@ const theme = {
     special: '',
   },
   sidenav: {
-    width: 230,
+    // Note-sidenav: uncomment to get back old sidenav
+    // width: 200,
+    width: 100,
   },
   // zIndices: {
   //   dropdown: 200,

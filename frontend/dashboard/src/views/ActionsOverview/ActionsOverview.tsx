@@ -1,11 +1,11 @@
 import { Plus } from 'react-feather';
-import { QueryLazyOptions, useLazyQuery } from '@apollo/react-hooks';
 import { debounce } from 'lodash';
-import { useHistory, useParams } from 'react-router-dom';
+import { useLazyQuery } from '@apollo/react-hooks';
+import { useParams } from 'react-router-dom';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components/macro';
 
-import { Div, Flex, H2, Loader, Span } from '@haas/ui';
+import { Div, Flex, H2, Span } from '@haas/ui';
 import LinkIcon from 'components/Icons/LinkIcon';
 
 import OpinionIcon from 'components/Icons/OpinionIcon';
@@ -13,12 +13,26 @@ import RegisterIcon from 'components/Icons/RegisterIcon';
 import SearchBar from 'components/SearchBar/SearchBar';
 import getCTANodesQuery from 'queries/getCTANodes';
 
+import { Button } from '@chakra-ui/core';
+import { Variants, motion } from 'framer-motion';
 import AddCTAButton from './components/AddCTAButton';
 import CTAEntry from './components/CTAEntry';
 
 interface ActionOverviewProps {
   leafs: Array<any>;
 }
+
+const actionsAnimation: Variants = {
+  initial: {
+    opacity: 0,
+  },
+  enter: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.2,
+    },
+  },
+};
 
 const DialogueViewContainer = styled(Div)`
   ${({ theme }) => css`
@@ -108,62 +122,61 @@ const ActionOverview = ({ leafs }: ActionOverviewProps) => {
     <DialogueViewContainer>
       <Flex flexDirection="row" justifyContent="space-between">
         <Flex marginBottom="20px" flexDirection="row" alignItems="center" width="50%">
-          <H2 color="default.darkest" fontWeight={500} py={2}>Call-to-Actions</H2>
-          <AddCTAButton disabled={!!activeCTA || false} onClick={() => handleAddCTA()}>
-            <Plus />
-            <Span>
-              Add
-            </Span>
-          </AddCTAButton>
+          <H2 mr={4} color="default.darkest" fontWeight={500} py={2}>Call-to-Actions</H2>
+          <Button size="sm" variant="outline" leftIcon={Plus} isDisabled={!!activeCTA || false} onClick={() => handleAddCTA()}>
+            Add
+          </Button>
         </Flex>
         <Flex alignItems="center">
           <SearchBar activeSearchTerm={activeSearchTerm} onSearchTermChange={handleSearchTermChange} />
         </Flex>
       </Flex>
-      {newCTA && (
-        <CTAEntry
-          id="-1"
-          activeCTA={activeCTA}
-          onActiveCTAChange={setActiveCTA}
-          Icon={RegisterIcon}
-          title=""
-          type={initializeCTAType('REGISTER')}
-          links={[]}
-          onNewCTAChange={setNewCTA}
-        />
-      )}
-
-      {!activeLeafs && leafs && leafs.map(
-        (leaf: any, index: number) => (
+      <motion.div variants={actionsAnimation} initial="inital" animate="animate">
+        {newCTA && (
           <CTAEntry
-            key={index}
+            id="-1"
             activeCTA={activeCTA}
             onActiveCTAChange={setActiveCTA}
-            id={leaf.id}
-            Icon={leaf.icon}
-            title={leaf.title}
-            type={initializeCTAType(leaf.type)}
-            links={leaf.links}
+            Icon={RegisterIcon}
+            title=""
+            type={initializeCTAType('REGISTER')}
+            links={[]}
             onNewCTAChange={setNewCTA}
           />
-        ),
-      )}
+        )}
 
-      {activeLeafs && activeLeafs?.map(
-        (leaf: any, index: number) => (
-          <CTAEntry
-            key={index}
-            activeCTA={activeCTA}
-            onActiveCTAChange={setActiveCTA}
-            id={leaf.id}
-            Icon={leaf.icon}
-            title={leaf.title}
-            type={initializeCTAType(leaf.type)}
-            links={leaf.links}
-            onNewCTAChange={setNewCTA}
-          />
-        ),
-      )}
+        {!activeLeafs && leafs && leafs.map(
+          (leaf: any, index: number) => (
+            <CTAEntry
+              key={index}
+              activeCTA={activeCTA}
+              onActiveCTAChange={setActiveCTA}
+              id={leaf.id}
+              Icon={leaf.icon}
+              title={leaf.title}
+              type={initializeCTAType(leaf.type)}
+              links={leaf.links}
+              onNewCTAChange={setNewCTA}
+            />
+          ),
+        )}
+
+        {activeLeafs && activeLeafs?.map(
+          (leaf: any, index: number) => (
+            <CTAEntry
+              key={index}
+              activeCTA={activeCTA}
+              onActiveCTAChange={setActiveCTA}
+              id={leaf.id}
+              Icon={leaf.icon}
+              title={leaf.title}
+              type={initializeCTAType(leaf.type)}
+              links={leaf.links}
+              onNewCTAChange={setNewCTA}
+            />
+          ),
+        )}
+      </motion.div>
     </DialogueViewContainer>
   );
 };

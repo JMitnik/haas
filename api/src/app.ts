@@ -25,7 +25,6 @@ const main = async () => {
 
   apollo.applyMiddleware({
     app,
-    // cors: false,
   });
 
   const runningServer = app.listen(config.port);

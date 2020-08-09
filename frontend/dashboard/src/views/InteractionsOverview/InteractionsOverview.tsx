@@ -13,7 +13,9 @@ import InteractionsTable from 'components/Table/Table';
 import SearchBar from 'components/SearchBar/SearchBar';
 import getDialogueSessionConnectionQuery from 'queries/getDialogueSessionConnectionQuery';
 
+import { Button } from '@chakra-ui/core';
 import { CenterCell, InteractionCTACell, InteractionDateCell, InteractionUserCell, ScoreCell, UserCell, WhenCell } from './TableCell/TableCell';
+import { Download } from 'react-feather';
 import { InputContainer, InputOutputContainer,
   InteractionsOverviewContainer, OutputContainer } from './InteractionOverviewStyles';
 import Row from './TableRow/InteractionsTableRow';
@@ -102,22 +104,14 @@ const InteractionsOverview = () => {
       {/* TODO: Make a ViewTitle text-component */}
       <InputOutputContainer mb={4}>
         <OutputContainer>
-          <Div justifyContent="center" marginRight="15px">
-            <Muted fontWeight="bold">Exports</Muted>
-          </Div>
           {/* TODO: Make a button component out of this */}
-          <Div
-            padding="8px 36px"
-            borderRadius="90px"
-            style={{ cursor: 'pointer' }}
+          <Button
             onClick={handleExportCSV}
-            useFlex
-            flexDirection="row"
-            alignItems="center"
-            backgroundColor="#c4c4c4"
+            leftIcon={Download}
+            size="sm"
           >
-            <Span fontWeight="bold">CSV</Span>
-          </Div>
+            <Span fontWeight="bold">Export to CSV</Span>
+          </Button>
         </OutputContainer>
 
         <InputContainer>
