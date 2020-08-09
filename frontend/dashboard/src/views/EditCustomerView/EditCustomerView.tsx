@@ -3,7 +3,7 @@ import {
   Container, FormContainer, PageHeading,
 } from '@haas/ui';
 import { motion } from 'framer-motion';
-import { useCustomer, useCustomer } from 'providers/CustomerProvider';
+import { useCustomer } from 'providers/CustomerProvider';
 import { useForm } from 'react-hook-form';
 import { useHistory, useParams } from 'react-router';
 import { useMutation, useQuery } from '@apollo/react-hooks';
@@ -16,7 +16,7 @@ import booleanToNumber from 'utils/booleanToNumber';
 import parseOptionalBoolean from 'utils/parseOptionalBoolean';
 
 import editCustomerMutation from '../../mutations/editCustomer';
-import getCustomerQuery, { getCustomerQuery } from '../../queries/getCustomersQuery';
+import getCustomerQuery from '../../queries/getCustomersQuery';
 import getEditCustomerData from '../../queries/getEditCustomer';
 
 interface FormDataProps {
