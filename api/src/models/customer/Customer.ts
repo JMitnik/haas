@@ -29,7 +29,7 @@ export const CustomerType = objectType({
           where: { customerId: parent.id },
         });
 
-        return customerSettings;
+        return customerSettings as any;
       },
     });
 
@@ -43,14 +43,14 @@ export const CustomerType = objectType({
           const dialogueSlug: string = args.where.slug;
 
           const customer = await CustomerService.getDialogueFromCustomerBySlug(parent.id, dialogueSlug);
-          return customer || null;
+          return customer || null as any;
         }
 
         if (args?.where?.id) {
           const dialogueId: string = args.where.id;
 
           const customer = await CustomerService.getDialogueFromCustomerById(parent.id, dialogueId);
-          return customer || null;
+          return customer || null as any;
         }
 
         return null;
@@ -79,7 +79,7 @@ export const CustomerType = objectType({
           dialogues = DialogueService.filterDialoguesBySearchTerm(dialogues, args.filter.searchTerm);
         }
 
-        return dialogues;
+        return dialogues as any;
       },
     });
   },
@@ -183,7 +183,9 @@ export const CustomerMutations = Upload && extendType({
           }
         }
 
-        return CustomerService.createCustomer(args);
+        const customer = CustomerService.createCustomer(args as any);
+
+        return customer as any;
       },
     });
     t.field('editCustomer', {
