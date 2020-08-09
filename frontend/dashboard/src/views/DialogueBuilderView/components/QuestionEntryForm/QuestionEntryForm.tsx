@@ -1,10 +1,10 @@
 
 import * as yup from 'yup';
 import { ApolloError } from 'apollo-client';
-import { Button, ButtonGroup, FormErrorMessage } from '@chakra-ui/core';
+import { Button, ButtonGroup, FormErrorMessage, useToast } from '@chakra-ui/core';
+import { Controller, useForm } from 'react-hook-form';
 import { MinusCircle, PlusCircle } from 'react-feather';
 import { debounce } from 'lodash';
-import { useForm } from 'react-hook-form';
 import { useMutation } from '@apollo/react-hooks';
 import { useParams } from 'react-router';
 import { yupResolver } from '@hookform/resolvers';
@@ -106,7 +106,7 @@ const QuestionEntryForm = ({
 }: QuestionEntryFormProps) => {
   const { customerSlug, dialogueSlug } = useParams();
 
-  const { register, handleSubmit, setValue, errors, formState } = useForm<FormDataProps>({
+  const form = useForm<FormDataProps>({
     resolver: yupResolver(schema),
     mode: 'onChange',
     defaultValues: {
@@ -114,7 +114,7 @@ const QuestionEntryForm = ({
       options: [],
     },
   });
-
+  const toast = useToast();
   const [activeTitle, setActiveTitle] = useState(title);
   const [activeQuestionType, setActiveQuestionType] = useState(type);
 
@@ -143,14 +143,14 @@ const QuestionEntryForm = ({
   }, [setActiveConditionSelect, setActiveCondition]);
 
   const handleQuestionTypeChange = useCallback((selectOption: any) => {
-    setValue('questionType', selectOption?.value);
+    form.setValue('questionType', selectOption?.value);
     setActiveQuestionType(selectOption);
-  }, [setValue, setActiveQuestionType]);
+  }, [form.setValue, setActiveQuestionType]);
 
   useEffect(() => {
-    register({ name: 'parentQuestionType' });
-    setValue('parentQuestionType', parentQuestionType);
-  }, [setValue, register, parentQuestionType]);
+    form.register({ name: 'parentQuestionType' });
+    form.setValue('parentQuestionType', parentQuestionType);
+  }, [form.setValue, form.register, parentQuestionType]);
 
   useEffect(() => {
     if (activeQuestionType) {
@@ -159,9 +159,9 @@ const QuestionEntryForm = ({
   }, [activeQuestionType, handleQuestionTypeChange]);
 
   const handleConditionTypeChange = useCallback((selectedOption: any) => {
-    setValue('conditionType', selectedOption?.value);
+    form.setValue('conditionType', selectedOption?.value);
     setConditionType(selectedOption);
-  }, [setValue, setConditionType]);
+  }, [form.setValue, setConditionType]);
 
   useEffect(() => {
     if (activeConditionSelect) {
@@ -170,9 +170,9 @@ const QuestionEntryForm = ({
   }, [activeConditionSelect, handleConditionTypeChange]);
 
   const handleLeafChange = useCallback((selectedOption: any) => {
-    setValue('activeLeaf', selectedOption?.value);
+    form.setValue('activeLeaf', selectedOption?.value);
     setActiveLeaf(selectedOption);
-  }, [setValue, setActiveLeaf]);
+  }, [form.setValue, setActiveLeaf]);
 
   useEffect(() => {
     if (activeLeaf) {
@@ -182,7 +182,7 @@ const QuestionEntryForm = ({
 
   const setMatchTextValue = (qOption: any) => {
     const matchText = qOption.value;
-    setValue('matchText', matchText);
+    form.setValue('matchText', matchText);
     setActiveMatchValue(qOption);
     return setActiveCondition((prevCondition) => {
       if (!prevCondition) {
@@ -194,8 +194,8 @@ const QuestionEntryForm = ({
   };
 
   useEffect(() => {
-    setValue('matchText', activematchValue?.value);
-  }, [setValue, activematchValue]);
+    form.setValue('matchText', activematchValue?.value);
+  }, [form.setValue, activematchValue]);
 
   const [createQuestion, { loading: createLoading }] = useMutation(createQuestionMutation, {
     onCompleted: () => {
@@ -203,6 +203,14 @@ const QuestionEntryForm = ({
         onAddExpandChange(false);
       }
       onActiveQuestionChange(null);
+
+      toast({
+        title: 'Node saved',
+        description: 'Node as saved',
+        status: 'success',
+        position: 'bottom-right',
+        isClosable: true,
+      });
     },
     refetchQueries: [{
       query: getTopicBuilderQuery,
@@ -214,12 +222,28 @@ const QuestionEntryForm = ({
     onError: (serverError: ApolloError) => {
       // eslint-disable-next-line no-console
       console.log(serverError);
+
+      toast({
+        title: 'Something went wrong',
+        description: 'There was a problem in saving the node. Please try again',
+        status: 'success',
+        position: 'bottom-right',
+        isClosable: true,
+      });
     },
   });
 
   const [updateQuestion, { loading: updateLoading }] = useMutation(updateQuestionMutation, {
     onCompleted: () => {
       onActiveQuestionChange(null);
+
+      toast({
+        title: 'Node saved',
+        description: 'Node as saved',
+        status: 'success',
+        position: 'bottom-right',
+        isClosable: true,
+      });
     },
     refetchQueries: [{
       query: getTopicBuilderQuery,
@@ -231,6 +255,13 @@ const QuestionEntryForm = ({
     onError: (serverError: ApolloError) => {
       // eslint-disable-next-line no-console
       console.log(serverError);
+      toast({
+        title: 'Something went wrong',
+        description: 'There was a problem in saving the node. Please try again',
+        status: 'success',
+        position: 'bottom-right',
+        isClosable: true,
+      });
     },
   });
 
@@ -325,7 +356,7 @@ const QuestionEntryForm = ({
   return (
     <FormContainer expandedForm>
       <Hr />
-      <Form onSubmit={handleSubmit(onSubmit)}>
+      <Form onSubmit={form.handleSubmit(onSubmit)}>
         <Div py={4}>
           <FormSection id="general">
             <Div>
@@ -335,16 +366,16 @@ const QuestionEntryForm = ({
               </Muted>
             </Div>
             <InputGrid>
-              <FormControl isRequired isInvalid={!!errors.title?.message}>
+              <FormControl isRequired isInvalid={!!form.errors.title?.message}>
                 <FormLabel htmlFor="title">Title</FormLabel>
                 <InputHelper>What is the question you want to ask?</InputHelper>
                 <Input
                   name="title"
                   defaultValue={activeTitle}
                   onBlur={(e: any) => setActiveTitle(e.currentTarget.value)}
-                  ref={register({ required: true })}
+                  ref={form.register({ required: true })}
                 />
-                <FormErrorMessage>{errors.title?.message}</FormErrorMessage>
+                <FormErrorMessage>{form.errors.title?.message}</FormErrorMessage>
               </FormControl>
             </InputGrid>
           </FormSection>
@@ -362,28 +393,28 @@ const QuestionEntryForm = ({
                 </Div>
                 <Div>
                   <InputGrid>
-                    <FormControl isRequired isInvalid={!!errors.minValue}>
+                    <FormControl isRequired isInvalid={!!form.errors.minValue}>
                       <FormLabel htmlFor="minValue">Min value</FormLabel>
                       <InputHelper>What is the minimal value to trigger this question?</InputHelper>
                       <Input
                         name="minValue"
-                        ref={register({ required: false })}
+                        ref={form.register({ required: false })}
                         defaultValue={condition?.renderMin}
                         onBlur={(event: React.FocusEvent<HTMLInputElement>) => setMinValue(event)}
                       />
-                      <FormErrorMessage>{errors.minValue?.message}</FormErrorMessage>
+                      <FormErrorMessage>{form.errors.minValue?.message}</FormErrorMessage>
                     </FormControl>
 
-                    <FormControl isRequired isInvalid={!!errors.maxValue}>
+                    <FormControl isRequired isInvalid={!!form.errors.maxValue}>
                       <FormLabel htmlFor="maxValue">Max value</FormLabel>
                       <InputHelper>What is the maximal value to trigger this question?</InputHelper>
                       <Input
                         name="maxValue"
-                        ref={register({ required: false })}
+                        ref={form.register({ required: false })}
                         defaultValue={condition?.renderMax}
                         onChange={(event: any) => setMaxValue(event.target.value)}
                       />
-                      <FormErrorMessage>{errors.maxValue?.message}</FormErrorMessage>
+                      <FormErrorMessage>{form.errors.maxValue?.message}</FormErrorMessage>
                     </FormControl>
 
                   </InputGrid>
@@ -405,12 +436,12 @@ const QuestionEntryForm = ({
                 </Div>
                 <Div>
                   <InputGrid>
-                    <FormControl isRequired isInvalid={!!errors.matchText}>
+                    <FormControl isRequired isInvalid={!!form.errors.matchText}>
                       <FormLabel htmlFor="matchText">Match value</FormLabel>
                       <InputHelper>What is the multi-choice question to trigger this question?</InputHelper>
                       <Select
-                        styles={errors.matchText && !activematchValue ? ErrorStyle : undefined}
-                        ref={() => register({
+                        styles={form.errors.matchText && !activematchValue ? ErrorStyle : undefined}
+                        ref={() => form.register({
                           name: 'matchText',
                           required: false,
                         })}
@@ -420,7 +451,7 @@ const QuestionEntryForm = ({
                           setMatchTextValue(option);
                         }}
                       />
-                      <FormErrorMessage>{errors.matchText?.message}</FormErrorMessage>
+                      <FormErrorMessage>{form.errors.matchText?.message}</FormErrorMessage>
                     </FormControl>
                   </InputGrid>
                 </Div>
@@ -439,39 +470,46 @@ const QuestionEntryForm = ({
             </Div>
             <Div>
               <InputGrid>
-                <FormControl isRequired isInvalid={!!errors.questionType}>
+                <FormControl isRequired isInvalid={!!form.errors.questionType}>
                   <FormLabel htmlFor="questionType">Question type</FormLabel>
                   <InputHelper>What is the type of the question?</InputHelper>
-                  <Select
+                  <Controller
                     id="question-type-select"
-                    isInvalid={!!errors.questionType}
-                    ref={() => register({
-                      name: 'questionType',
-                      required: true,
-                    })}
-                    options={questionTypes}
-                    value={activeQuestionType}
-                    onChange={(qOption: any) => handleQuestionTypeChange(qOption)}
+                    name="questionType"
+                    control={form.control}
+                    render={({ onChange, onBlur, value }) => (
+                      <Select
+                        options={questionTypes}
+                        value={activeQuestionType}
+                        onChange={(opt: any) => {
+                          handleQuestionTypeChange(opt);
+                          onChange(opt.value);
+                        }}
+                      />
+                    )}
                   />
-                  <FormErrorMessage>{errors.questionType?.message}</FormErrorMessage>
+                  <FormErrorMessage>{form.errors.questionType?.message}</FormErrorMessage>
                 </FormControl>
 
-                <FormControl isInvalid={!!errors.activeLeaf}>
+                <FormControl isInvalid={!!form.errors.activeLeaf}>
                   <FormLabel htmlFor="questionType">Call-to-action</FormLabel>
                   <InputHelper>What CTA do you want to add?</InputHelper>
-                  <Select
-                    id="leaf-node-select"
-                    isInvalid={!!errors.activeLeaf}
-                    ref={() => register({
-                      name: 'activeLeaf',
-                      required: true,
-                    })}
-                    key={activeLeaf?.value}
-                    options={leafs}
-                    value={(activeLeaf?.value && activeLeaf) || leafs[0]}
-                    onChange={(leafOption: any) => handleLeafChange(leafOption)}
+                  <Controller
+                    id="question-type-select"
+                    name="activeLeaf"
+                    control={form.control}
+                    render={({ onChange, onBlur, value }) => (
+                      <Select
+                        options={leafs}
+                        value={(activeLeaf?.value && activeLeaf) || leafs[0]}
+                        onChange={(opt: any) => {
+                          handleLeafChange(opt);
+                          onChange(opt.value);
+                        }}
+                      />
+                    )}
                   />
-                  <FormErrorMessage>{errors.activeLeaf?.message}</FormErrorMessage>
+                  <FormErrorMessage>{form.errors.activeLeaf?.message}</FormErrorMessage>
                 </FormControl>
               </InputGrid>
 
@@ -488,18 +526,18 @@ const QuestionEntryForm = ({
                   <Hr />
                 </Div>
 
-                {!activeOptions.length && !errors.options && <Muted>Please add an option </Muted>}
-                {!activeOptions.length && errors.options && <Muted color="red">Please fill in at least one option!</Muted>}
+                {!activeOptions.length && !form.errors.options && <Muted>Please add an option </Muted>}
+                {!activeOptions.length && form.errors.options && <Muted color="red">Please fill in at least one option!</Muted>}
                 {activeOptions && activeOptions.map((option, optionIndex) => (
                   <Flex key={`${option.id}-${optionIndex}-${option.value}`} flexDirection="column">
                     <Flex my={1} flexDirection="row">
                       <Flex flexGrow={1}>
                         <Input
-                          isInvalid={errors.options && Array.isArray(errors.options) && !!errors.options?.[optionIndex]}
+                          isInvalid={form.errors.options && Array.isArray(form.errors.options) && !!form.errors.options?.[optionIndex]}
                           id={`options[${optionIndex}]`}
                           key={`input-${id}-${optionIndex}`}
                           name={`options[${optionIndex}]`}
-                          ref={register(
+                          ref={form.register(
                             { required: true,
                               minLength: 1 },
                           )}
@@ -514,7 +552,7 @@ const QuestionEntryForm = ({
                         <MinusCircle />
                       </DeleteQuestionOptionButtonContainer>
                     </Flex>
-                    {errors.options?.[optionIndex] && <Muted color="warning">Please fill in a proper value!</Muted>}
+                    {form.errors.options?.[optionIndex] && <Muted color="warning">Please fill in a proper value!</Muted>}
                   </Flex>
                 ))}
               </>
@@ -527,12 +565,11 @@ const QuestionEntryForm = ({
           <ButtonGroup>
             <Button
               isLoading={createLoading || updateLoading}
-              isDisabled={!formState.isValid}
+              isDisabled={!form.formState.isValid}
               variantColor="teal"
               type="submit"
             >
               Save
-
             </Button>
             <Button variant="outline" onClick={() => handleCancelQuestion()}>Cancel</Button>
           </ButtonGroup>

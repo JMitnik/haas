@@ -1,10 +1,11 @@
+import { CSSReset, ThemeProvider as ChakraThemeProvider } from '@chakra-ui/core';
 import { ThemeProvider } from 'styled-components/macro';
 import React, { useEffect, useState } from 'react';
 
 import { autorun } from 'mobx';
 import { makeCustomTheme } from 'utils/makeCustomerTheme';
 import { motion } from 'framer-motion';
-import defaultTheme from 'config/theme';
+import defaultTheme, { chakraDefaultTheme } from 'config/theme';
 import useDialogueTree from './DialogueTreeProvider';
 
 interface ThemeProvidersProps {
@@ -28,9 +29,13 @@ const ThemeProviders = ({ children }: ThemeProvidersProps) => {
     return (
       <ThemeProvider theme={defaultTheme}>
         <ThemeProvider theme={makeCustomTheme(defaultTheme, customTheme)}>
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-            {children}
-          </motion.div>
+          <ChakraThemeProvider theme={makeCustomTheme(chakraDefaultTheme, customTheme)}>
+            <CSSReset />
+
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+              {children}
+            </motion.div>
+          </ChakraThemeProvider>
         </ThemeProvider>
       </ThemeProvider>
     );

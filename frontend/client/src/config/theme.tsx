@@ -1,5 +1,9 @@
+import { theme as chakraTheme } from '@chakra-ui/core';
+
 const theme = {
+  ...chakraTheme,
   colors: {
+    ...chakraTheme.colors,
     primary: '#0059f8',
     secondary: '#4FD1C5',
     tertiary: 'green',
@@ -45,6 +49,12 @@ const theme = {
     desk: 'only screen and (min-width: 601px)',
   },
   fontSizes: [12, 16.0, 21.33, 28.43, 37.9, 50.52],
+};
+
+export const chakraDefaultTheme = {
+  ...theme,
+  space: chakraTheme.space,
+  fontSizes: chakraTheme.fontSizes,
 };
 
 theme.colors.app.background = theme.colors.default.normal;

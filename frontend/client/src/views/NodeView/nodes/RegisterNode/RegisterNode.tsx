@@ -4,7 +4,7 @@ import React from 'react';
 
 import { ButtonIcon } from '@haas/ui/src/Buttons';
 import { ClientButton, OutlineButton } from 'components/Buttons/Buttons';
-import { DeprecatedInputContainer, DeprecatedInputStyled, InputGroup, InputLabel } from '@haas/ui/src/Form';
+import { DeprecatedInputContainer, DeprecatedInputStyled, FormControl, Input, InputGroup, InputLabel } from '@haas/ui/src/Form';
 import { Div, Grid } from '@haas/ui';
 import { NodeTitle } from 'layouts/NodeLayout/NodeLayoutStyles';
 import { SessionEntryDataProps } from 'models/Session/SessionEntryModel';
@@ -50,30 +50,21 @@ const RegisterNode = ({ node, onEntryStore }: RegisterNodeProps) => {
         <Div>
           <Grid gridTemplateColumns={['auto', 'repeat(auto-fit, minmax(100px, 1fr))']} gridGap="24px">
             <Grid gridTemplateColumns="1fr 1fr">
-              <InputGroup>
+              <Div>
                 <InputLabel color="white">First name</InputLabel>
-                <DeprecatedInputContainer>
-                  <User />
-                  <DeprecatedInputStyled placeholder="Jane" name="firstName" ref={register} />
-                </DeprecatedInputContainer>
-              </InputGroup>
+                <Input leftEl={<User />} placeholder="Jane" name="firstName" ref={register} />
+              </Div>
 
-              <InputGroup>
+              <Div>
                 <InputLabel color="white">Last name</InputLabel>
-                <DeprecatedInputContainer>
-                  <User />
-                  <DeprecatedInputStyled placeholder="Doe" name="lastName" ref={register} />
-                </DeprecatedInputContainer>
-              </InputGroup>
+                <Input leftEl={<User />} placeholder="Doe" name="lastName" ref={register} />
+              </Div>
             </Grid>
 
-            <InputGroup>
+            <Div>
               <InputLabel color="white">Email adress</InputLabel>
-              <DeprecatedInputContainer>
-                <Mail />
-                <DeprecatedInputStyled placeholder="Jane@haas.live" name="email" ref={register} />
-              </DeprecatedInputContainer>
-            </InputGroup>
+              <Input leftEl={<Mail />} placeholder="Jane@haas.live" name="email" ref={register} />
+            </Div>
           </Grid>
           <Div mt={4}>
             <Grid gridTemplateColumns="2fr 1fr">
