@@ -10,6 +10,7 @@ import { useParams } from 'react-router-dom';
 import { yupResolver } from '@hookform/resolvers';
 import React, { useCallback, useEffect, useState } from 'react';
 import Select from 'react-select';
+import cuid from 'cuid';
 
 import { Div, ErrorStyle, Flex, Form, FormContainer, FormControl,
   FormLabel, FormSection, Grid, H3, H4, Hr, Input, InputGrid, InputHelper, Label, Muted } from '@haas/ui';
@@ -109,7 +110,7 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: 
   }, [activeType, handleMultiChange]);
 
   const addCondition = () => {
-    setActiveLinks((prevLinks) => [...prevLinks, { id: null, url: '', title: '' }]);
+    setActiveLinks((prevLinks) => [...prevLinks, { id: cuid(), url: '', title: '' }]);
   };
 
   const refetchingQueries = [
@@ -310,7 +311,7 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: 
 
                   <AnimatePresence>
                     {activeLinks.map((link, index) => (
-                      <motion.div key={(link.id || link.title)} initial={{ opacity: 1 }} exit={{ opacity: 0, x: 100 }}>
+                      <motion.div key={(`${link.id}` || link.url)} initial={{ opacity: 1 }} exit={{ opacity: 0, x: 100 }}>
                         <Div
                           position="relative"
                           key={index}
