@@ -1,4 +1,4 @@
-FROM node:13 AS base
+FROM node:14 AS base
 ENV PORT 4000
 
 WORKDIR /app
