@@ -111,7 +111,6 @@ const QuestionEntryForm = ({
     mode: 'onChange',
     defaultValues: {
       parentQuestionType,
-      options: [],
     },
   });
   const toast = useToast();
@@ -296,7 +295,7 @@ const QuestionEntryForm = ({
 
   const handleOptionChange = useCallback(debounce((value: any, optionIndex: number) => {
     setActiveOptions((prevOptions) => {
-      prevOptions[optionIndex] = { value: value || '', publicValue: '' };
+      prevOptions[optionIndex].value = value;
       return [...prevOptions];
     });
   }, 250), []);
@@ -323,7 +322,7 @@ const QuestionEntryForm = ({
     const overrideLeafId = activeLeaf?.value;
     const options = { options: activeOptions };
     const edgeCondition = activeCondition;
-    console.log('form data: ', formData);
+
     if (question.id !== '-1') {
       updateQuestion({
         variables: {
@@ -477,6 +476,7 @@ const QuestionEntryForm = ({
                     id="question-type-select"
                     name="questionType"
                     control={form.control}
+                    defaultValue={activeQuestionType}
                     render={({ onChange, onBlur, value }) => (
                       <Select
                         options={questionTypes}
@@ -498,6 +498,7 @@ const QuestionEntryForm = ({
                     id="question-type-select"
                     name="activeLeaf"
                     control={form.control}
+                    defaultValue={(activeLeaf?.value && activeLeaf) || leafs[0]}
                     render={({ onChange, onBlur, value }) => (
                       <Select
                         options={leafs}
@@ -529,13 +530,13 @@ const QuestionEntryForm = ({
                 {!activeOptions.length && !form.errors.options && <Muted>Please add an option </Muted>}
                 {!activeOptions.length && form.errors.options && <Muted color="red">Please fill in at least one option!</Muted>}
                 {activeOptions && activeOptions.map((option, optionIndex) => (
-                  <Flex key={`${option.id}-${optionIndex}-${option.value}`} flexDirection="column">
+                  <Flex key={`container-${option.id}-${optionIndex}`} flexDirection="column">
                     <Flex my={1} flexDirection="row">
                       <Flex flexGrow={1}>
                         <Input
                           isInvalid={form.errors.options && Array.isArray(form.errors.options) && !!form.errors.options?.[optionIndex]}
                           id={`options[${optionIndex}]`}
-                          key={`input-${id}-${optionIndex}`}
+                          key={`input-${option.id}-${optionIndex}`}
                           name={`options[${optionIndex}]`}
                           ref={form.register(
                             { required: true,

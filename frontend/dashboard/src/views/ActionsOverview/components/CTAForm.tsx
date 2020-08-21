@@ -1,6 +1,10 @@
 import * as yup from 'yup';
+import { AnimatePresence, motion } from 'framer-motion';
 import { ApolloError } from 'apollo-boost';
+import { Button, ButtonGroup, FormErrorMessage, useToast } from '@chakra-ui/core';
 import { Controller, useForm } from 'react-hook-form';
+import { PlusCircle, Trash, Type, X } from 'react-feather';
+import { cloneDeep, debounce } from 'lodash';
 import { useMutation } from '@apollo/react-hooks';
 import { useParams } from 'react-router-dom';
 import { yupResolver } from '@hookform/resolvers';
@@ -8,20 +12,14 @@ import React, { useCallback, useEffect, useState } from 'react';
 import Select from 'react-select';
 
 import { Div, ErrorStyle, Flex, Form, FormContainer, FormControl,
-  FormGroupContainer, FormLabel, FormSection, Grid, H3, H4, Hr, Input, InputGrid, InputHelper, Label, Muted } from '@haas/ui';
-import { PlusCircle, Trash, Type, X } from 'react-feather';
-import { cloneDeep, debounce } from 'lodash';
+  FormLabel, FormSection, Grid, H3, H4, Hr, Input, InputGrid, InputHelper, Label, Muted } from '@haas/ui';
 import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
-import createCTAMutation from 'mutations/createCTA';
-import getCTANodesQuery from 'queries/getCTANodes';
-import updateCTAMutation from 'mutations/updateCTA';
-
-import { AnimatePresence, motion } from 'framer-motion';
-import { Button, ButtonGroup, FormErrorMessage, useToast } from '@chakra-ui/core';
-import DeleteLinkSesctionButton from './DeleteLinkSectionButton';
 import LinkIcon from 'components/Icons/LinkIcon';
 import OpinionIcon from 'components/Icons/OpinionIcon';
 import RegisterIcon from 'components/Icons/RegisterIcon';
+import createCTAMutation from 'mutations/createCTA';
+import getCTANodesQuery from 'queries/getCTANodes';
+import updateCTAMutation from 'mutations/updateCTA';
 
 interface FormDataProps {
   title: string;
@@ -252,9 +250,6 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: 
     });
   };
 
-  console.log('values: ', form.getValues());
-  console.log('watch: ', watchType);
-
   return (
     <FormContainer expandedForm>
       <Form onSubmit={form.handleSubmit(onSubmit)}>
@@ -345,17 +340,21 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: 
                             <FormControl isRequired isInvalid={!!form.errors.links?.[index]?.type}>
                               <FormLabel htmlFor={`links[${index}].type`}>Type</FormLabel>
                               <InputHelper>What is the type of the link?</InputHelper>
-                              <Select
-                                styles={form.errors.links?.[index]?.type && !activeLinks?.[index]?.type ? ErrorStyle : undefined}
-                                ref={() => form.register({
-                                  name: `links[${index}].type`,
-                                  required: true,
-                                })}
-                                options={LINK_TYPES}
-                                value={link.type}
-                                onChange={(qOption: any) => {
-                                  handleLinkTypeChange(qOption, index);
-                                }}
+                              <Controller
+                                id={`link-${link.id}-${index}`}
+                                name={`links[${index}].type`}
+                                control={form.control}
+                                defaultValue={link.type}
+                                render={({ onChange, onBlur, value }) => (
+                                  <Select
+                                    options={LINK_TYPES}
+                                    value={link.type}
+                                    onChange={(opt: any) => {
+                                      handleLinkTypeChange(opt, index);
+                                      onChange(opt.value);
+                                    }}
+                                  />
+                                )}
                               />
                               <FormErrorMessage>{!!form.errors.links?.[index]?.type}</FormErrorMessage>
                             </FormControl>
