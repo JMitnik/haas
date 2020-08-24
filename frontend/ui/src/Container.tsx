@@ -36,6 +36,13 @@ export const Container = styled(Div)<ContainerProps>`
     ${width}
   `}
 `;
+
+export const ViewContainer = styled(Div)`
+  ${({ theme }) => css`
+    padding: ${theme.gutter}px;
+  `}
+`;
+
 interface ExtraGridProps extends GridProps, WidthProps, LayoutProps, ColorProps, BorderProps, PositionProps, SpaceProps, {}
 interface ExtraFlexProps extends FlexboxProps, LayoutProps, WidthProps, BorderProps, GridProps, PositionProps, SpaceProps, ColorProps {
   growChildren?: boolean;

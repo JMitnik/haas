@@ -1,4 +1,4 @@
-import { Div, Flex, Grid, H4, Icon, Loader, PageTitle, Span } from '@haas/ui';
+import { Div, Flex, Grid, H4, Icon, Loader, PageTitle, Span, ViewContainer } from '@haas/ui';
 import { useLocation, useParams } from 'react-router-dom';
 import { useQuery } from '@apollo/react-hooks';
 import React, { useState } from 'react';
@@ -11,8 +11,8 @@ import { ReactComponent as TrophyIcon } from 'assets/icons/icon-trophy.svg';
 import Modal from 'components/Modal';
 
 import { BarChart } from 'react-feather';
-import { dialogueStatistics as DialogueStatisticsData } from './__generated__/dialogueStatistics';
 import { useTranslation } from 'react-i18next';
+import { dialogueStatistics as DialogueStatisticsData } from './__generated__/dialogueStatistics';
 import InteractionFeedModule from './Modules/InteractionFeedModule/InteractionFeedModule';
 import NegativePathsModule from './Modules/NegativePathsModule/index.tsx';
 import NodeEntriesOverview from '../NodeEntriesOverview/NodeEntriesOverview';
@@ -31,10 +31,8 @@ import SummaryModuleContainer from './Modules/SummaryModules/SummaryModuleContai
 //   ['Last year', 365],
 // ]);
 
-const DialogueViewContainer = styled(Div)`
+const DialogueViewContainer = styled(ViewContainer)`
   ${({ theme }) => css`
-    padding: ${theme.gutter}px 0;
-
     ${H4} {
       font-size: 1.2rem;
     }

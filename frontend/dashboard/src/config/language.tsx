@@ -27,12 +27,12 @@ const language = {
     },
     views: {
       dialogue_view: 'Overview',
+      cta_view: 'Call to actions',
+      builder_view: 'Dialogue Builder',
       interactions_view: 'Interactions',
     },
     dialogue: {
       slug_helper: 'Under which url segment will visitors find the dialogue?',
-      cta_view: 'Call to actions',
-      builder_view: 'Dialogue Builder',
     },
   },
 };

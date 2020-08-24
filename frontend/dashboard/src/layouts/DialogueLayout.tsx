@@ -158,11 +158,11 @@ const DialogueNavBar = ({ dialogue, customerSlug, dialogueSlug }: DialogueNavBar
           <Hr />
           <NavLink to={`/dashboard/b/${customerSlug}/d/${dialogueSlug}/actions`}>
             <Icon mr={2} as={Mail} />
-            {t('dialogue:cta_view')}
+            {t('views:cta_view')}
           </NavLink>
           <NavLink to={`/dashboard/b/${customerSlug}/d/${dialogueSlug}/builder`}>
             <Icon mr={2} as={Zap} />
-            {t('dialogue:builder_view')}
+            {t('views:builder_view')}
           </NavLink>
         </Div>
       </ColumnFlex>
@@ -190,7 +190,7 @@ const DialogueLayout = ({ children }: DialogueLayoutProps) => {
         <Div>
           <DialogueNavBar customerSlug={customerSlug} dialogueSlug={dialogueSlug} dialogue={dialogue} />
         </Div>
-        <Div>
+        <Div overflow="hidden">
           {children}
         </Div>
       </Grid>

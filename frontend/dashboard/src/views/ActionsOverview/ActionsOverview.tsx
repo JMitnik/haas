@@ -1,11 +1,11 @@
-import { Plus } from 'react-feather';
+import { Mail, Plus } from 'react-feather';
 import { debounce } from 'lodash';
 import { useLazyQuery } from '@apollo/react-hooks';
 import { useParams } from 'react-router-dom';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components/macro';
 
-import { Div, Flex, H2, Span } from '@haas/ui';
+import { Div, Flex, H2, PageTitle, Span, ViewContainer } from '@haas/ui';
 import LinkIcon from 'components/Icons/LinkIcon';
 
 import OpinionIcon from 'components/Icons/OpinionIcon';
@@ -13,8 +13,9 @@ import RegisterIcon from 'components/Icons/RegisterIcon';
 import SearchBar from 'components/SearchBar/SearchBar';
 import getCTANodesQuery from 'queries/getCTANodes';
 
-import { Button } from '@chakra-ui/core';
+import { Button, Icon } from '@chakra-ui/core';
 import { Variants, motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import AddCTAButton from './components/AddCTAButton';
 import CTAEntry from './components/CTAEntry';
 
@@ -34,11 +35,7 @@ const actionsAnimation: Variants = {
   },
 };
 
-const DialogueViewContainer = styled(Div)`
-  ${({ theme }) => css`
-    padding: ${theme.gutter * 2}px 0;
-  `}
-`;
+const DialogueViewContainer = styled(ViewContainer)``;
 
 const mapLeafs = (leafs: any) => leafs?.map((leaf: any) => {
   if (leaf.type === 'LINK') {
@@ -116,20 +113,21 @@ const ActionOverview = ({ leafs }: ActionOverviewProps) => {
     setNewCTA(true);
   };
 
+  const { t } = useTranslation();
+
   const activeLeafs = mapLeafs(data?.customer?.dialogue?.leafs);
 
   return (
     <DialogueViewContainer>
-      <Flex flexDirection="row" justifyContent="space-between">
-        <Flex marginBottom="20px" flexDirection="row" alignItems="center" width="50%">
-          <H2 mr={4} color="default.darkest" fontWeight={500} py={2}>Call-to-Actions</H2>
-          <Button size="sm" variant="outline" leftIcon={Plus} isDisabled={!!activeCTA || false} onClick={() => handleAddCTA()}>
-            Add
-          </Button>
-        </Flex>
-        <Flex alignItems="center">
-          <SearchBar activeSearchTerm={activeSearchTerm} onSearchTermChange={handleSearchTermChange} />
-        </Flex>
+      <PageTitle>
+        <Icon as={Mail} mr={1} />
+        {t('views:cta_view')}
+      </PageTitle>
+      <Flex flexDirection="row" justifyContent="space-between" alignItems="center" mb={4}>
+        <Button size="sm" variant="outline" leftIcon={Plus} isDisabled={!!activeCTA || false} onClick={() => handleAddCTA()}>
+          Add call to action
+        </Button>
+        <SearchBar activeSearchTerm={activeSearchTerm} onSearchTermChange={handleSearchTermChange} />
       </Flex>
       <motion.div variants={actionsAnimation} initial="inital" animate="animate">
         {newCTA && (

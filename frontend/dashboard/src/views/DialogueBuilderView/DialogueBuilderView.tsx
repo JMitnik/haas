@@ -1,10 +1,12 @@
-import { ColumnFlex, Div, H2 } from '@haas/ui';
+import { ColumnFlex, Div, H2, Icon, PageTitle } from '@haas/ui';
 
 import React, { useState } from 'react';
 
+import { useTranslation } from 'react-i18next';
 import { DialogueBuilderContainer } from './DialogueBuilderStyles';
 import { QuestionEntryProps } from './DialogueBuilderInterfaces';
 
+import { Zap } from 'react-feather';
 import QuestionSection from './components/QuestionSection';
 
 interface QuestionEntryExtendedProps extends QuestionEntryProps {
@@ -21,11 +23,14 @@ interface DialogueBuilderViewProps {
 const DialogueBuilderView = ({ nodes, selectLeafs, root }: DialogueBuilderViewProps) => {
   const [activeQuestion, setActiveQuestion] = useState<null | string>(null);
 
+  const { t } = useTranslation();
+
   return (
     <DialogueBuilderContainer data-cy="DialogueBuilderContainer">
-      <H2 color="default.text" fontWeight={400} mb={4}>
-        Builder
-      </H2>
+      <PageTitle>
+        <Icon as={Zap} mr={1} />
+        {t('views:builder_view')}
+      </PageTitle>
 
       <ColumnFlex>
         {(nodes && nodes.length === 0) && (
