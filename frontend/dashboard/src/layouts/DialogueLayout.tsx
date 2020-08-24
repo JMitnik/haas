@@ -1,18 +1,20 @@
-import React from 'react';
+import React, { useContext, useRef } from 'react';
 
-import { Activity, BarChart, List, Mail, MapPin, Settings, Triangle, User, Zap } from 'react-feather';
-import { ColumnFlex, Div, Flex, Grid, H2, Hr, Span, Text } from '@haas/ui';
-import { Icon, IconButton } from '@chakra-ui/core';
+import { Activity, BarChart, Clipboard, Download, List, Mail, MapPin, Settings, Share, Triangle, User, Zap } from 'react-feather';
+import { Button, Icon, IconButton, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useClipboard, useDisclosure } from '@chakra-ui/core';
+import { ColumnFlex, Div, ExtLink, Flex, Grid, H2, Hr, Input, Span, StyledExtLink, Text } from '@haas/ui';
 import { Link, NavLink } from 'react-router-dom';
 import { ReactComponent as UrlIcon } from 'assets/icons/icon-link.svg';
 import { useParams } from 'react-router';
+import QRCode from 'qrcode.react';
+
 import { useQuery } from '@apollo/react-hooks';
 import { useTranslation } from 'react-i18next';
 import Placeholder from 'components/Placeholder';
 import SliderNodeIcon from 'components/Icons/SliderNodeIcon';
 import Tabbar, { Tab } from 'components/Tabbar/Tabbar';
 import gql from 'graphql-tag';
-import styled, { css } from 'styled-components/macro';
+import styled, { ThemeContext, css } from 'styled-components/macro';
 
 interface DialogueLayoutProps {
   children: React.ReactNode;
@@ -86,6 +88,11 @@ const DialogueNavBarContainer = styled(Div)`
     bottom: 0;
     padding: ${theme.gutter}px ${theme.gutter}px;
 
+    ${StyledExtLink} {
+      padding: 0;
+      font-size: 0.7rem;
+    }
+
     ${Hr} {
       border-color: ${theme.isDarkColor ? theme.colors.primaries['400'] : theme.colors.primaries['300']};
       padding: ${theme.gutter / 4}px;
@@ -129,16 +136,98 @@ interface DialogueNavBarProps {
   dialogueSlug: string;
 }
 
-const DialogueNavBar = ({ dialogue, customerSlug, dialogueSlug }: DialogueNavBarProps) => {
+const ShareDialogueModal = ({ shareUrl, onClose }: { shareUrl: string, onClose: any }) => {
+  const themeContext = useContext(ThemeContext);
+
+  const qrColor = themeContext.colors.primary || '#FFFFFF';
+  // const qrRef = useRef<HTMLCanvasElement>();
+
+  const { onCopy, hasCopied } = useClipboard(shareUrl);
+
   const { t } = useTranslation();
 
   return (
+    <ModalContent>
+      <ModalHeader>Share</ModalHeader>
+      <ModalCloseButton />
+      <ModalBody>
+        <Div mb={4}>
+          <Text fontWeight={600} fontSize="1.3rem" color="gray.700">Method one: Share QR Code</Text>
+          <Hr />
+          <Grid pt={2} gridTemplateColumns="1fr 1fr">
+            <Div>
+              <Text color="gray.500" fontSize="0.8rem">
+                {t('dialogue:qr_download_helper')}
+              </Text>
+            </Div>
+            <ColumnFlex alignItems="flex-end">
+              <QRCode fgColor={qrColor} value={shareUrl} />
+              <Button variantColor="teal" mt={1} size="sm" leftIcon={Download}>Download</Button>
+            </ColumnFlex>
+          </Grid>
+        </Div>
+        <Div mb={4}>
+          <Text fontWeight={600} fontSize="1.3rem" color="gray.700">Method two: Share URL to link</Text>
+          <Hr />
+
+          <Flex>
+            <Div flexGrow={1} pt={2}>
+              <Input
+                rightEl={(
+                  <Button width="auto" size="sm" onClick={onCopy} leftIcon={Clipboard}>
+                    {hasCopied ? 'Copied' : 'Copy'}
+                  </Button>
+)}
+
+                value={shareUrl}
+                isReadOnly
+              />
+            </Div>
+
+          </Flex>
+        </Div>
+      </ModalBody>
+
+      <ModalFooter>
+        <Button variant="outline" mr={3} onClick={onClose}>
+          Close
+        </Button>
+      </ModalFooter>
+    </ModalContent>
+  );
+};
+
+const DialogueNavBar = ({ dialogue, customerSlug, dialogueSlug }: DialogueNavBarProps) => {
+  const { t } = useTranslation();
+  const { onClose, onOpen, isOpen } = useDisclosure();
+
+  const shareUrl = `https://client.haas.live/${customerSlug}/${dialogueSlug}`;
+
+  return (
     <DialogueNavBarContainer>
-      <Flex>
-        <DialogueNavBarContextHeading mb={4} fontWeight={700}>
+      <Div mb={4}>
+        <DialogueNavBarContextHeading fontWeight={700}>
           {dialogue.title}
         </DialogueNavBarContextHeading>
-      </Flex>
+        <Flex justifyContent="space-between">
+          {/* <ExtLink to={`https://client.haas.live/${customerSlug}/${dialogueSlug}`}>
+            {shareUrl}
+          </ExtLink> */}
+
+          <Div color="primaries.200" flexGrow={0}>
+            <Button size="xs" variant="ghost" onClick={onOpen}>
+              <Share size={14} />
+              <Text ml={1}>Share</Text>
+            </Button>
+            <Modal isOpen={isOpen} onClose={onClose}>
+              <ModalOverlay />
+              <ShareDialogueModal onClose={onClose} shareUrl={shareUrl} />
+            </Modal>
+          </Div>
+
+        </Flex>
+      </Div>
+      <Text />
 
       <ColumnFlex>
         <Div mb={4}>

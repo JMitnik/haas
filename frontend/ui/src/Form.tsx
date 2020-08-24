@@ -123,7 +123,7 @@ export const Input = forwardRef((props: InputProps, ref: Ref<HTMLInputElement>) 
     )}
 
     {props.rightEl && (
-      <ChakraInputRightElement color="gray.400" padding="12px" fontSize="0.5rem" {...props}>
+      <ChakraInputRightElement width="auto" color="gray.400" padding="12px" fontSize="0.5rem" {...props}>
         {props.rightEl}
       </ChakraInputRightElement>
     )}

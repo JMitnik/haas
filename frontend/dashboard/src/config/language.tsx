@@ -33,6 +33,7 @@ const language = {
     },
     dialogue: {
       slug_helper: 'Under which url segment will visitors find the dialogue?',
+      qr_download_helper: 'Share the dialogue by sharing the QR code, by either downloading the QR code or copying it.',
     },
   },
 };
