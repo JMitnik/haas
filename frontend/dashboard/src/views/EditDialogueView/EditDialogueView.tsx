@@ -8,6 +8,7 @@ import { Minus, Plus, Type } from 'react-feather';
 import { motion } from 'framer-motion';
 import { useHistory, useParams } from 'react-router';
 import { useMutation, useQuery } from '@apollo/react-hooks';
+import { useTranslation } from 'react-i18next';
 import { yupResolver } from '@hookform/resolvers';
 import React, { useState } from 'react';
 import Select from 'react-select';
@@ -136,6 +137,8 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFo
     });
   };
 
+  const { t } = useTranslation();
+
   return (
     <Div>
       <Div>
@@ -197,8 +200,8 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFo
                   </FormControl>
 
                   <FormControl isRequired isInvalid={!!form.errors.slug}>
-                    <FormLabel htmlFor="slug">Slug</FormLabel>
-                    <InputHelper>Under which url segment will visitors find the business?</InputHelper>
+                    <FormLabel htmlFor="slug">{t('slug')}</FormLabel>
+                    <InputHelper>{t('dialogue:slug_helper')}</InputHelper>
                     <Input
                       placeholder="peaches-or-apples"
                       leftAddOn={`https://client.haas.live/${customerSlug}`}
