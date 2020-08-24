@@ -1,4 +1,4 @@
-import { Div, Flex, Grid, H4, Loader, Span } from '@haas/ui';
+import { Div, Flex, Grid, H4, Icon, Loader, PageTitle, Span } from '@haas/ui';
 import { useLocation, useParams } from 'react-router-dom';
 import { useQuery } from '@apollo/react-hooks';
 import React, { useState } from 'react';
@@ -10,7 +10,9 @@ import { ReactComponent as TrendingIcon } from 'assets/icons/icon-trending-up.sv
 import { ReactComponent as TrophyIcon } from 'assets/icons/icon-trophy.svg';
 import Modal from 'components/Modal';
 
+import { BarChart } from 'react-feather';
 import { dialogueStatistics as DialogueStatisticsData } from './__generated__/dialogueStatistics';
+import { useTranslation } from 'react-i18next';
 import InteractionFeedModule from './Modules/InteractionFeedModule/InteractionFeedModule';
 import NegativePathsModule from './Modules/NegativePathsModule/index.tsx';
 import NodeEntriesOverview from '../NodeEntriesOverview/NodeEntriesOverview';
@@ -31,7 +33,11 @@ import SummaryModuleContainer from './Modules/SummaryModules/SummaryModuleContai
 
 const DialogueViewContainer = styled(Div)`
   ${({ theme }) => css`
-    padding: ${theme.gutter * 2}px 0;
+    padding: ${theme.gutter}px 0;
+
+    ${H4} {
+      font-size: 1.2rem;
+    }
   `}
 `;
 
@@ -88,10 +94,16 @@ const DialogueView = () => {
 
   const dialogue = data?.customer?.dialogue;
 
+  const { t } = useTranslation();
+
   if (!dialogue) return <Loader />;
 
   return (
     <DialogueViewContainer>
+      <PageTitle>
+        <Icon as={BarChart} mr={1} />
+        {t('views:dialogue_view')}
+      </PageTitle>
       <Grid gridTemplateColumns="1fr 1fr 1fr">
         <Div gridColumn="1 / 4">
           <H4 color="default.darker" mb={4}>

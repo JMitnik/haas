@@ -7,17 +7,18 @@ import React, { useCallback, useEffect, useState } from 'react';
 import {
   getDialogueSessionConnection as CustomerSessionConnection,
 } from 'queries/__generated__/getDialogueSessionConnection';
-import { Div, Flex, Muted, Span } from '@haas/ui';
+import { Div, Flex, Muted, PageTitle, Span } from '@haas/ui';
 import DatePicker from 'components/DatePicker/DatePicker';
 import InteractionsTable from 'components/Table/Table';
 import SearchBar from 'components/SearchBar/SearchBar';
 import getDialogueSessionConnectionQuery from 'queries/getDialogueSessionConnectionQuery';
 
-import { Button } from '@chakra-ui/core';
+import { Activity, Download } from 'react-feather';
+import { Button, Icon } from '@chakra-ui/core';
 import { CenterCell, InteractionCTACell, InteractionDateCell, InteractionUserCell, ScoreCell, UserCell, WhenCell } from './TableCell/TableCell';
-import { Download } from 'react-feather';
 import { InputContainer, InputOutputContainer,
   InteractionsOverviewContainer, OutputContainer } from './InteractionOverviewStyles';
+import { useTranslation } from 'react-i18next';
 import Row from './TableRow/InteractionsTableRow';
 
 interface TableProps {
@@ -96,11 +97,17 @@ const InteractionsOverview = () => {
     tempLink.remove();
   };
 
+  const { t } = useTranslation();
+
   const pageCount = data?.customer?.dialogue?.sessionConnection?.pageInfo.nrPages || 1;
   const pageIndex = data?.customer?.dialogue?.sessionConnection?.pageInfo.pageIndex || 0;
 
   return (
     <InteractionsOverviewContainer>
+      <PageTitle>
+        <Icon as={Activity} mr={1} />
+        {t('views:interactions_view')}
+      </PageTitle>
       {/* TODO: Make a ViewTitle text-component */}
       <InputOutputContainer mb={4}>
         <OutputContainer>

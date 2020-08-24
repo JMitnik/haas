@@ -40,6 +40,6 @@ export const InteractionsOverviewContainer = styled(Flex)`
   ${({ theme }) => css`
     flex-direction: column;
     flex-grow: 1;
-    padding: ${theme.gutter * 2}px 0;
+    padding: ${theme.gutter}px 0;
   `}
 `;

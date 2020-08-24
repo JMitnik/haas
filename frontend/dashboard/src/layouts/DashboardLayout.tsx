@@ -28,7 +28,7 @@ const DashboardLayoutContainer = styled.div`
 
 const DashboardViewContainer = styled(Div)`
   ${({ theme }) => css`
-    padding: ${theme.gutter * 2}px ${theme.gutter * 4}px;
+    /* padding: ${theme.gutter * 2}px ${theme.gutter * 4}px; */
 
     ${PageHeading} {
       color: ${theme.colors.app.onDefault};

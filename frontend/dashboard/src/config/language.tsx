@@ -25,8 +25,14 @@ const language = {
       no_custom_template: 'Fresh start',
       no_custom_template_helper: 'Start with a clean slate',
     },
+    views: {
+      dialogue_view: 'Overview',
+      interactions_view: 'Interactions',
+    },
     dialogue: {
       slug_helper: 'Under which url segment will visitors find the dialogue?',
+      cta_view: 'Call to actions',
+      builder_view: 'Dialogue Builder',
     },
   },
 };
