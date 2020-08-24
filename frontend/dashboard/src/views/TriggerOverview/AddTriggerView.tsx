@@ -1,7 +1,7 @@
 /* eslint-disable radix */
 import * as yup from 'yup';
 import { ApolloError } from 'apollo-boost';
-import { MinusCircle, PlusCircle, X } from 'react-feather';
+import { Briefcase, MinusCircle, PlusCircle, Type, X } from 'react-feather';
 import { debounce } from 'lodash';
 import { useForm } from 'react-hook-form';
 import { useHistory, useParams } from 'react-router';
@@ -11,10 +11,12 @@ import Select from 'react-select';
 import styled, { css } from 'styled-components/macro';
 
 import {
-  Button, Container, DeleteButtonContainer, Div, ErrorStyle, Flex, Grid, H2, H3,
-  H4, Hr, Label, Muted, StyledInput,
+  Button, Container, DeleteButtonContainer, Div, ErrorStyle, Flex, FormContainer, FormControl, FormLabel,
+  FormSection, Grid, H2, H3, H4, Hr, Input, InputGrid, InputHelper, Label, Muted, StyledInput,
 } from '@haas/ui';
+import { FormErrorMessage } from '@chakra-ui/core';
 import { yupResolver } from '@hookform/resolvers';
+import ServerError from 'components/ServerError';
 import createTriggerMutation from 'mutations/createTrigger';
 import getDialoguesQuery from 'queries/getDialoguesOfCustomer';
 import getQuestionsQuery from 'queries/getQuestionnaireQuery';
@@ -99,7 +101,7 @@ const schema = yup.object().shape({
 
 const AddTriggerView = () => {
   const history = useHistory();
-  const { register, handleSubmit, errors, setValue } = useForm<FormDataProps>({
+  const form = useForm<FormDataProps>({
     resolver: yupResolver(schema),
   });
 
@@ -126,7 +128,7 @@ const AddTriggerView = () => {
     }
   }, [customerSlug, activeDialogue, fetchQuestions]);
 
-  const [addTrigger, { loading }] = useMutation(createTriggerMutation, {
+  const [addTrigger, { loading, error: serverErrors }] = useMutation(createTriggerMutation, {
     onCompleted: () => {
       history.push(`/dashboard/b/${customerSlug}/triggers/`);
     },
@@ -153,27 +155,27 @@ const AddTriggerView = () => {
   };
 
   const handleDialogueChange = (qOption: any) => {
-    setValue('dialogue', qOption?.value);
+    form.setValue('dialogue', qOption?.value);
     setActiveDialogue(qOption);
   };
 
   const handleTypeChange = (qOption: any) => {
-    setValue('type', qOption?.value);
+    form.setValue('type', qOption?.value);
     setActiveType(qOption);
   };
 
   const handleMediumChange = (qOption: any) => {
-    setValue('medium', qOption?.value);
+    form.setValue('medium', qOption?.value);
     setActiveMedium(qOption);
   };
 
   const handleQuestionChange = (qOption: any) => {
-    setValue('question', qOption?.value);
+    form.setValue('question', qOption?.value);
     setActiveQuestion(qOption);
   };
 
   const setRecipients = (qOption: { label: string, value: string }, index: number) => {
-    setValue(`recipients[${index}]`, qOption?.value);
+    form.setValue(`recipients[${index}]`, qOption?.value);
     setActiveRecipients((prevRecipients) => {
       prevRecipients[index] = qOption;
       return [...prevRecipients];
@@ -192,7 +194,7 @@ const AddTriggerView = () => {
   };
 
   const setConditionsType = (qOption: any, index: number) => {
-    setValue('condition', qOption.value);
+    form.setValue('condition', qOption.value);
     setActiveConditions((prevConditions) => {
       prevConditions[index].type = qOption;
       return [...prevConditions];
@@ -270,33 +272,37 @@ const AddTriggerView = () => {
   return (
     <Container>
       <Div>
-        <H2 color="default.darkest" fontWeight={500} py={2}> Trigger </H2>
-        <Muted pb={4}>Create a new trigger</Muted>
+        <H2 color="default.darkest" fontWeight={500} py={2}>Add Trigger</H2>
       </Div>
-
-      <Hr />
-
-      <Form onSubmit={handleSubmit(onSubmit)}>
-        <FormGroupContainer>
-          <Grid gridTemplateColumns={['1fr', '1fr 2fr']} gridColumnGap={4}>
-            <Div py={4} pr={4}>
+      <FormContainer>
+        <Form onSubmit={form.handleSubmit(onSubmit)}>
+          <ServerError serverError={serverErrors} />
+          <FormSection id="general">
+            <Div>
               <H3 color="default.text" fontWeight={500} pb={2}>General trigger information</H3>
               <Muted>
                 General information about the trigger, such as name, type, medium, etc.
               </Muted>
             </Div>
             <Div py={4}>
-              <Grid gridTemplateColumns={['1fr', '1fr 1fr']}>
-                <Flex flexDirection="column">
-                  <Label>Trigger name</Label>
-                  <StyledInput isInvalid={!!errors.name} name="name" ref={register({ required: true })} />
-                  {errors.name && <Muted color="warning">Something went wrong!</Muted>}
-                </Flex>
-                <Div useFlex flexDirection="column">
-                  <Label>Dialogue</Label>
+              <InputGrid>
+                <FormControl isRequired isInvalid={!!form.errors.name}>
+                  <FormLabel htmlFor="name">Trigger name</FormLabel>
+                  <InputHelper>What is the name of the trigger?</InputHelper>
+                  <Input
+                    placeholder="Peaches or apples?"
+                    leftEl={<Type />}
+                    name="name"
+                    ref={form.register({ required: true })}
+                  />
+                  <FormErrorMessage>{form.errors.name}</FormErrorMessage>
+                </FormControl>
+                <FormControl isRequired>
+                  <FormLabel>Dialogue</FormLabel>
+                  <InputHelper>Pick a dialogue the trigger should be for</InputHelper>
                   <Select
-                    styles={errors.dialogue && !activeDialogue ? ErrorStyle : undefined}
-                    ref={() => register({
+                    styles={form.errors.dialogue && !activeDialogue ? ErrorStyle : undefined}
+                    ref={() => form.register({
                       name: 'dialogue',
                       required: true,
                     })}
@@ -306,13 +312,14 @@ const AddTriggerView = () => {
                       handleDialogueChange(qOption);
                     }}
                   />
-                  {errors.dialogue && !activeDialogue && <Muted color="warning">{errors.dialogue.message}</Muted>}
-                </Div>
-                <Div useFlex flexDirection="column">
-                  <Label>Type</Label>
+                  {form.errors.dialogue && !activeDialogue && <Muted color="warning">{form.errors.dialogue.message}</Muted>}
+                </FormControl>
+                <FormControl isRequired>
+                  <FormLabel>Type</FormLabel>
+                  <InputHelper>Pick the type of trigger</InputHelper>
                   <Select
-                    styles={errors.type && !activeType ? ErrorStyle : undefined}
-                    ref={() => register({
+                    styles={form.errors.type && !activeType ? ErrorStyle : undefined}
+                    ref={() => form.register({
                       name: 'type',
                       required: true,
                     })}
@@ -322,13 +329,14 @@ const AddTriggerView = () => {
                       handleTypeChange(qOption);
                     }}
                   />
-                  {errors.type && !activeType && <Muted color="warning">{errors.type.message}</Muted>}
-                </Div>
-                <Div useFlex flexDirection="column">
-                  <Label>Medium</Label>
+                  {form.errors.type && !activeType && <Muted color="warning">{form.errors.type.message}</Muted>}
+                </FormControl>
+                <FormControl isRequired>
+                  <FormLabel>Medium</FormLabel>
+                  <InputHelper>Pick the medium the trigger should be sent to</InputHelper>
                   <Select
-                    styles={errors.medium && !activeMedium ? ErrorStyle : undefined}
-                    ref={() => register({
+                    styles={form.errors.medium && !activeMedium ? ErrorStyle : undefined}
+                    ref={() => form.register({
                       name: 'medium',
                       required: true,
                     })}
@@ -338,14 +346,15 @@ const AddTriggerView = () => {
                       handleMediumChange(qOption);
                     }}
                   />
-                  {errors.medium && !activeMedium && <Muted color="warning">{errors.medium.message}</Muted>}
-                </Div>
+                  {form.errors.medium && !activeMedium && <Muted color="warning">{form.errors.medium.message}</Muted>}
+                </FormControl>
                 {activeType?.value === TriggerQuestionType.QUESTION && (
-                  <Div useFlex flexDirection="column" gridColumn="1 / -1">
-                    <Label>Question</Label>
+                  <FormControl isRequired gridColumn="1 / -1">
+                    <FormLabel>Question</FormLabel>
+                    <InputHelper>Pick the question the trigger should be attached to</InputHelper>
                     <Select
-                      styles={errors.question && !activeQuestion ? ErrorStyle : undefined}
-                      ref={() => register({
+                      styles={form.errors.question && !activeQuestion ? ErrorStyle : undefined}
+                      ref={() => form.register({
                         name: 'question',
                         required: false,
                       })}
@@ -355,8 +364,8 @@ const AddTriggerView = () => {
                         handleQuestionChange(qOption);
                       }}
                     />
-                    {errors.question && !activeQuestion && <Muted color="warning">{errors.question.message}</Muted>}
-                  </Div>
+                    {form.errors.question && !activeQuestion && <Muted color="warning">{form.errors.question.message}</Muted>}
+                  </FormControl>
                 )}
                 <Div gridColumn="1 / -1">
                   <Flex flexDirection="row" alignItems="center" justifyContent="space-between">
@@ -380,8 +389,8 @@ const AddTriggerView = () => {
                           <X />
                         </DeleteButtonContainer>
                         <Select
-                          styles={errors.condition && !activeConditions?.[0].type ? ErrorStyle : undefined}
-                          ref={() => register({
+                          styles={form.errors.condition && !activeConditions?.[0].type ? ErrorStyle : undefined}
+                          ref={() => form.register({
                             name: 'condition',
                             required: false,
                           })}
@@ -389,78 +398,78 @@ const AddTriggerView = () => {
                           value={condition.type}
                           onChange={(qOption: any) => setConditionsType(qOption, index)}
                         />
-                        {errors.condition && !activeConditions?.[0].type && <Muted color="warning">{errors.condition.message}</Muted>}
+                        {form.errors.condition && !activeConditions?.[0].type && <Muted color="warning">{form.errors.condition.message}</Muted>}
                         {condition?.type?.value === TriggerConditionType.TEXT_MATCH && (
-                        <Flex marginTop={5} flexDirection="column">
-                          <Label>Match Text</Label>
-                          <StyledInput
-                            isInvalid={!!errors.matchText}
-                            onChange={(event) => setMatchText(event.currentTarget.value, index)}
-                            name="matchText"
-                            ref={register({ required: true })}
-                          />
-                          {errors.matchText && <Muted color="warning">{errors.matchText.message}</Muted>}
-                        </Flex>
-                        )}
+                          <Flex marginTop={5} flexDirection="column">
+                            <Label>Match Text</Label>
+                            <StyledInput
+                              isInvalid={!!form.errors.matchText}
+                              onChange={(event) => setMatchText(event.currentTarget.value, index)}
+                              name="matchText"
+                              ref={form.register({ required: true })}
+                            />
+                            {form.errors.matchText && <Muted color="warning">{form.errors.matchText.message}</Muted>}
+                          </Flex>
+                      )}
 
                         {condition?.type?.value === TriggerConditionType.LOW_THRESHOLD && (
                           <Flex marginTop={5} flexDirection="column">
                             <Label>Low Threshold (0 - 10)</Label>
                             <StyledInput
-                              isInvalid={!!errors.lowThreshold}
+                              isInvalid={!!form.errors.lowThreshold}
                               type="number"
                               step="0.1"
                               onChange={(event) => setConditionMinValue(event.currentTarget.value, index)}
                               name="lowThreshold"
-                              ref={register({ required: true, min: 0, max: 10 })}
+                              ref={form.register({ required: true, min: 0, max: 10 })}
                             />
-                            {errors.lowThreshold && <Muted color="warning">Value not between 0 and 10</Muted>}
+                            {form.errors.lowThreshold && <Muted color="warning">Value not between 0 and 10</Muted>}
                           </Flex>
-                        )}
+                      )}
 
                         {condition?.type?.value === TriggerConditionType.HIGH_THRESHOLD && (
-                        <Flex marginTop={5} flexDirection="column">
-                          <Label>High Threshold (0 - 10)</Label>
-                          <StyledInput
-                            isInvalid={!!errors.highThreshold}
-                            type="number"
-                            step="0.1"
-                            onChange={(event) => setConditionMaxValue(event.currentTarget.value, index)}
-                            name="highThreshold"
-                            ref={register({ required: true, min: 0, max: 10 })}
-                          />
-                          {errors.highThreshold && <Muted color="warning">Value not between 0 and 10</Muted>}
-                        </Flex>
-                        )}
-
-                        {(condition?.type?.value === TriggerConditionType.OUTER_RANGE
-                        || condition?.type?.value === TriggerConditionType.INNER_RANGE) && (
-                        <Flex marginTop={5} flexDirection="row" justifyContent="space-evenly">
-                          <Flex width="49%" flexDirection="column">
-                            <Label>Low Threshold (0 - 10)</Label>
-                            <StyledInput
-                              isInvalid={!!errors.lowThreshold}
-                              type="number"
-                              step="0.1"
-                              onChange={(event) => setConditionMinValue(event.currentTarget.value, index)}
-                              name="lowThreshold"
-                              ref={register({ required: true, min: 0, max: 10 })}
-                            />
-                            {errors.lowThreshold && <Muted color="warning">Value not between 0 and 10</Muted>}
-                          </Flex>
-                          <Flex width="49%" flexDirection="column">
+                          <Flex marginTop={5} flexDirection="column">
                             <Label>High Threshold (0 - 10)</Label>
                             <StyledInput
-                              isInvalid={!!errors.highThreshold}
+                              isInvalid={!!form.errors.highThreshold}
                               type="number"
                               step="0.1"
                               onChange={(event) => setConditionMaxValue(event.currentTarget.value, index)}
                               name="highThreshold"
-                              ref={register({ required: true, min: 0, max: 10 })}
+                              ref={form.register({ required: true, min: 0, max: 10 })}
                             />
-                            {errors.highThreshold && <Muted color="warning">Value not between 0 and 10</Muted>}
+                            {form.errors.highThreshold && <Muted color="warning">Value not between 0 and 10</Muted>}
                           </Flex>
+                      )}
+
+                        {(condition?.type?.value === TriggerConditionType.OUTER_RANGE
+                      || condition?.type?.value === TriggerConditionType.INNER_RANGE) && (
+                      <Flex marginTop={5} flexDirection="row" justifyContent="space-evenly">
+                        <Flex width="49%" flexDirection="column">
+                          <Label>Low Threshold (0 - 10)</Label>
+                          <StyledInput
+                            isInvalid={!!form.errors.lowThreshold}
+                            type="number"
+                            step="0.1"
+                            onChange={(event) => setConditionMinValue(event.currentTarget.value, index)}
+                            name="lowThreshold"
+                            ref={form.register({ required: true, min: 0, max: 10 })}
+                          />
+                          {form.errors.lowThreshold && <Muted color="warning">Value not between 0 and 10</Muted>}
                         </Flex>
+                        <Flex width="49%" flexDirection="column">
+                          <Label>High Threshold (0 - 10)</Label>
+                          <StyledInput
+                            isInvalid={!!form.errors.highThreshold}
+                            type="number"
+                            step="0.1"
+                            onChange={(event) => setConditionMaxValue(event.currentTarget.value, index)}
+                            name="highThreshold"
+                            ref={form.register({ required: true, min: 0, max: 10 })}
+                          />
+                          {form.errors.highThreshold && <Muted color="warning">Value not between 0 and 10</Muted>}
+                        </Flex>
+                      </Flex>
                         )}
                       </Flex>
                     ))}
@@ -477,8 +486,8 @@ const AddTriggerView = () => {
                       <Flex marginBottom="4px" alignItems="center" key={index} gridColumn="1 / -1">
                         <Div flexGrow={9}>
                           <Select
-                            styles={errors.recipients?.[index] && !activeRecipients?.[index]?.value ? ErrorStyle : undefined}
-                            ref={() => register({
+                            styles={form.errors.recipients?.[index] && !activeRecipients?.[index]?.value ? ErrorStyle : undefined}
+                            ref={() => form.register({
                               name: `recipients[${index}]`,
                               required: false,
                             })}
@@ -489,9 +498,9 @@ const AddTriggerView = () => {
                               setRecipients(qOption, index);
                             }}
                           />
-                          {errors.recipients?.[index] && !activeRecipients?.[index]?.value && (
-                            <Muted color="warning">{errors.recipients?.[index]?.message}</Muted>
-                            )}
+                          {form.errors.recipients?.[index] && !activeRecipients?.[index]?.value && (
+                            <Muted color="warning">{form.errors.recipients?.[index]?.message}</Muted>
+                          )}
                         </Div>
                         <Flex justifyContent="center" alignContent="center" flexGrow={1}>
                           <MinusCircle onClick={() => deleteRecipient(index)} />
@@ -500,20 +509,21 @@ const AddTriggerView = () => {
                     ))}
                   </Div>
                 </Div>
-              </Grid>
+              </InputGrid>
             </Div>
-          </Grid>
-        </FormGroupContainer>
+          </FormSection>
 
-        <Div>
-          {loading && (<Muted>Loading...</Muted>)}
+          <Div>
+            {loading && (<Muted>Loading...</Muted>)}
 
-          <Flex>
-            <Button brand="primary" mr={2} type="submit">Create trigger</Button>
-            <Button brand="default" type="button" onClick={() => history.push(`/dashboard/b/${customerSlug}/triggers/`)}>Cancel</Button>
-          </Flex>
-        </Div>
-      </Form>
+            <Flex>
+              <Button brand="primary" mr={2} type="submit">Create trigger</Button>
+              <Button brand="default" type="button" onClick={() => history.push(`/dashboard/b/${customerSlug}/triggers/`)}>Cancel</Button>
+            </Flex>
+          </Div>
+        </Form>
+      </FormContainer>
+
     </Container>
   );
 };
