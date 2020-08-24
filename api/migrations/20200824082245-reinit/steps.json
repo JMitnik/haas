@@ -719,6 +719,31 @@
       "arity": "Required"
     },
     {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "Tag",
+          "field": "type"
+        },
+        "directive": "default"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "Tag",
+          "field": "type"
+        },
+        "directive": "default"
+      },
+      "argument": "value",
+      "value": "DEFAULT"
+    },
+    {
       "tag": "CreateField",
       "model": "Tag",
       "field": "name",
@@ -4137,6 +4162,31 @@
       "arity": "Required"
     },
     {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "TriggerCondition",
+          "field": "type"
+        },
+        "directive": "default"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "TriggerCondition",
+          "field": "type"
+        },
+        "directive": "default"
+      },
+      "argument": "value",
+      "value": "LOW_THRESHOLD"
+    },
+    {
       "tag": "CreateField",
       "model": "TriggerCondition",
       "field": "minValue",
@@ -4277,6 +4327,31 @@
       "field": "type",
       "type": "TriggerEnum",
       "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "Trigger",
+          "field": "type"
+        },
+        "directive": "default"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "Trigger",
+          "field": "type"
+        },
+        "directive": "default"
+      },
+      "argument": "value",
+      "value": "QUESTION"
     },
     {
       "tag": "CreateField",
