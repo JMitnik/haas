@@ -12,7 +12,7 @@ const TableGrid = styled(Grid)`
   ${({ theme }) => css`
       border-radius: ${theme.borderRadiuses.lg};
       grid-template-rows: repeat(9, minmax(50px, auto));
-      grid-row-gap: 2;
+      grid-row-gap: 4px;
   `}
 `;
 
