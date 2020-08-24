@@ -11,7 +11,7 @@ class TriggerSMSService extends SMSService {
       } | null;
     } | null;
   }, recipientPhone: string, value: string | number) => {
-    const twilioPhoneNumber = '+3197010252775';
+    const twilioPhoneNumber = '+3197010253133';
     const smsBody = `Dear recipient, ${trigger.name} of ${trigger.relatedNode?.questionDialogue?.title} has been triggered with value: '${value}'. `;
     this.sendSMS(twilioPhoneNumber, recipientPhone, smsBody, true);
   };
