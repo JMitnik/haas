@@ -136,13 +136,26 @@ interface DialogueNavBarProps {
   dialogueSlug: string;
 }
 
-const ShareDialogueModal = ({ shareUrl, onClose }: { shareUrl: string, onClose: any }) => {
+const ShareDialogueModal = ({ dialogueName, shareUrl, onClose }: { dialogueName: string, shareUrl: string, onClose: any }) => {
   const themeContext = useContext(ThemeContext);
 
   const qrColor = themeContext.colors.primary || '#FFFFFF';
-  // const qrRef = useRef<HTMLCanvasElement>();
+  const qrContainerRef = useRef<HTMLDivElement>(null);
 
   const { onCopy, hasCopied } = useClipboard(shareUrl);
+
+  const handleDownload = () => {
+    if (!qrContainerRef.current) return null;
+
+    const canvas = qrContainerRef.current.querySelector('canvas');
+    if (!canvas) return null;
+
+    const img = canvas.toDataURL('image/png');
+    const anchor = document.createElement('a');
+    anchor.href = img;
+    anchor.download = `QRCode-${dialogueName}.png`;
+    anchor.click();
+  };
 
   const { t } = useTranslation();
 
@@ -161,8 +174,10 @@ const ShareDialogueModal = ({ shareUrl, onClose }: { shareUrl: string, onClose: 
               </Text>
             </Div>
             <ColumnFlex alignItems="flex-end">
-              <QRCode fgColor={qrColor} value={shareUrl} />
-              <Button variantColor="teal" mt={1} size="sm" leftIcon={Download}>Download</Button>
+              <Div ref={qrContainerRef}>
+                <QRCode fgColor={qrColor} value={shareUrl} />
+              </Div>
+              <Button onClick={handleDownload} as="a" variantColor="teal" mt={1} size="sm" leftIcon={Download}>Download</Button>
             </ColumnFlex>
           </Grid>
         </Div>
@@ -221,7 +236,7 @@ const DialogueNavBar = ({ dialogue, customerSlug, dialogueSlug }: DialogueNavBar
             </Button>
             <Modal isOpen={isOpen} onClose={onClose}>
               <ModalOverlay />
-              <ShareDialogueModal onClose={onClose} shareUrl={shareUrl} />
+              <ShareDialogueModal dialogueName={dialogueSlug} onClose={onClose} shareUrl={shareUrl} />
             </Modal>
           </Div>
 
