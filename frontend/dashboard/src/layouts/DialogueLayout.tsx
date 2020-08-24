@@ -173,11 +173,11 @@ const ShareDialogueModal = ({ dialogueName, shareUrl, onClose }: { dialogueName:
                 {t('dialogue:qr_download_helper')}
               </Text>
             </Div>
-            <ColumnFlex alignItems="flex-end">
+            <ColumnFlex alignItems="center">
               <Div ref={qrContainerRef}>
                 <QRCode fgColor={qrColor} value={shareUrl} />
               </Div>
-              <Button onClick={handleDownload} as="a" variantColor="teal" mt={1} size="sm" leftIcon={Download}>Download</Button>
+              <Button margin="0 auto" onClick={handleDownload} as="a" variantColor="teal" mt={1} size="xs" leftIcon={() => <Download size={12} />}><Text ml={1}>Download</Text></Button>
             </ColumnFlex>
           </Grid>
         </Div>
