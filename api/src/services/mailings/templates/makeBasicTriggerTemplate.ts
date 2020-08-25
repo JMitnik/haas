@@ -1,8 +1,6 @@
 import mjml2html from "mjml";
-import { SessionWithEntries } from "../../models/session/SessionTypes";
-import NodeEntryService from "../../models/node-entry/NodeEntryService";
 
-const makeTriggerMailTemplate = (recipientName: string, userSession: SessionWithEntries, userScore: number) => {
+const makeBasicTriggerTemplate = (recipientName: string, dialogueId: string, userScore: number) => {
     return mjml2html(`
         <mjml>
         <mj-body background-color="#0059f8">
@@ -25,8 +23,8 @@ const makeTriggerMailTemplate = (recipientName: string, userSession: SessionWith
                         Dear ${recipientName},
                         one of your set-up triggers has been activated.
 
-                        One of your customers had an opinion regarding dialogue ${userSession.dialogueId},
-                        for session nr ${userSession.id}. You can find below details
+                        One of your customers had an opinion regarding dialogue "${dialogueId}". 
+                        You can find below details
                         more detail about their dialogue
                     </mj-text>
                 </mj-column>
@@ -35,36 +33,14 @@ const makeTriggerMailTemplate = (recipientName: string, userSession: SessionWith
                 <mj-column>
                     <mj-text align="center">They rated your dialogue with score</mj-text>
                     <mj-text font-size="30px" align="center">${userScore}</mj-text>
+                    <mj-text align="center"><a class="mj-content" href="https://dashboard.haas.live">Visit the dashboard for more info</a></mj-text>
                 </mj-column>
             </mj-section>
-
-            ${userSession.nodeEntries?.slice(1).map((entry) => `
-                <mj-section border-top="1px solid #ddd" background-color="white">
-                    <mj-group>
-                        <mj-column width="50%">
-                            <mj-text>
-                                You asked them:
-                            </mj-text>
-                            <mj-text>
-                                ${entry.relatedNode?.title}
-                            </mj-text>
-                        </mj-column>
-                        <mj-column width="50%">
-                            <mj-text>
-                                They answered:
-                            </mj-text>
-                            <mj-text>
-                                ${NodeEntryService.getNodeEntryValue(entry)}
-                            </mj-text>
-                        </mj-column>
-                    </mj-group>
-                </mj-section>
-            `)}
 
             <mj-section>
                 <mj-column>
                     <mj-text align="center">
-                        <a class="mj-content" href="https://haas.live/unsubscribe">Unsubscribe from these triggers</a>
+                        <a class="mj-content" href="https://haas.live/unsubscribe">Unsubscribe from the triggers</a>
                     </mj-text>
                 </mj-column>
             </mj-section>+
@@ -73,4 +49,4 @@ const makeTriggerMailTemplate = (recipientName: string, userSession: SessionWith
     `).html;
 } ;
 
-export default makeTriggerMailTemplate;
+export default makeBasicTriggerTemplate;
