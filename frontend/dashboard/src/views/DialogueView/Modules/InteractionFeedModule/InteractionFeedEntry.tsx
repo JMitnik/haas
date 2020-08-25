@@ -3,6 +3,7 @@ import React, { Dispatch, SetStateAction } from 'react';
 
 import { Div, H5 } from '@haas/ui';
 
+import { Tag } from '@chakra-ui/core';
 import { InteractionFeedEntryContainer, InteractionFeedEntryValueContainer } from './InteractionFeedEntryStyles';
 
 interface TimelineEntryProps {
@@ -29,7 +30,9 @@ const InteractionFeedEntry = ({
       </InteractionFeedEntryValueContainer>
 
       <Div>
-        {timeLineEntry.id}
+        <Tag size="sm" fontSize="0.5rem">
+          {timeLineEntry.id}
+        </Tag>
         {' '}
         has voted
       </Div>
