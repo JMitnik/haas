@@ -57,6 +57,8 @@ export const NavLinkContainer = styled(NavLink) <LinkProps>`
 
 export const NavItems = styled.ul`
   ${({ theme }) => css`
+    list-style: none;
+
     ${NavItemContainer} + ${NavItemContainer} {
       margin-top: ${theme.gutter}px;
     }
@@ -86,21 +88,6 @@ const UsernavContainer = styled.div`
   `}
 `;
 
-export const ArrowContainer = styled.button`
-  border: none;
-  background: #f6f7f9;
-  color: #a1a2a5;
-
-  svg {
-    width: 16px;
-    height: 16px;
-  }
-
-  opacity: 0.7;
-  cursor: pointer;
-  transition: all 0.2s ease-in;
-`;
-
 export const Usernav = ({ user, customer }: { user: UserProps, customer: any }) => {
   const history = useHistory();
   const { setActiveCustomer, setStorageCustomer } = useCustomer();
@@ -117,20 +104,6 @@ export const Usernav = ({ user, customer }: { user: UserProps, customer: any }) 
         <ChakraAvatar bg="gray.300" size="md" name={`${user.firstName} ${user.lastName}`}>
           <AvatarBadge size="1em" bg="green.400" />
         </ChakraAvatar>
-
-        {/* <Div ml={4}>
-          <ColumnFlex>
-            <Span fontSize="0.8rem" display="block">
-              {`${user.firstName} ${user.lastName}`}
-            </Span>
-
-            <Div>
-              <Badge>
-                {customer?.name}
-              </Badge>
-            </Div>
-          </ColumnFlex>
-        </Div> */}
       </Flex>
     </UsernavContainer>
   );
@@ -150,7 +123,7 @@ export const SidenavContainer = styled.div`
     height: 100vh;
     flex-direction: column;
     justify-content: space-between;
-
+    
     ${FullLogoContainer} {
       color: ${theme.isDarkColor ? theme.colors.primaries['100'] : theme.colors.primaries['800']};
     }

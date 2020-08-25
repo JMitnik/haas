@@ -1,6 +1,8 @@
 import { theme as chakraTheme } from '@chakra-ui/core';
 import { generatePalette } from 'utils/ColorUtils';
 
+const breakpoints = ['40em', '52em', '64em'];
+
 // TODO: Export theme as type
 const theme = {
   ...chakraTheme,
@@ -80,6 +82,16 @@ const theme = {
     subtleRounded: '3px',
     somewhatRounded: '10px',
     rounded: '50px',
+  },
+  mediaQueries: {
+    small: `@media screen and (min-width: ${breakpoints[0]})`,
+    medium: `@media screen and (min-width: ${breakpoints[1]})`,
+    large: `@media screen and (min-width: ${breakpoints[2]})`,
+  },
+  mediaSizes: {
+    sm: 0,
+    md: 768,
+    lg: 1280,
   },
 };
 

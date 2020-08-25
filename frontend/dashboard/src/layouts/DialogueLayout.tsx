@@ -1,16 +1,19 @@
-import React, { useContext, useRef } from 'react';
+import React, { useContext, useRef, useState } from 'react';
 
-import { Activity, BarChart, Clipboard, Download, Mail, Share, Zap } from 'react-feather';
+import { Activity, BarChart, Clipboard, Download, Mail, Menu, Share, Zap } from 'react-feather';
 import { Button, Icon, Modal, ModalBody, ModalCloseButton,
   ModalContent, ModalFooter, ModalHeader, ModalOverlay, useClipboard, useDisclosure } from '@chakra-ui/core';
 import { ColumnFlex, Div, Flex, Grid, Hr, Input, StyledExtLink, Text, ViewContainer } from '@haas/ui';
 import { NavLink } from 'react-router-dom';
+import { Variants, motion } from 'framer-motion';
 import { useParams } from 'react-router';
 import { useQuery } from '@apollo/react-hooks';
 import { useTranslation } from 'react-i18next';
 import QRCode from 'qrcode.react';
 import gql from 'graphql-tag';
 import styled, { ThemeContext, css } from 'styled-components/macro';
+import useMediaDevice from 'hooks/useMediaDevice';
+import useOnClickOutside from 'hooks/useClickOnOutside';
 
 interface DialogueLayoutProps {
   children: React.ReactNode;
@@ -30,11 +33,12 @@ const getSharedDialogueLayoutQuery = gql`
   }
 `;
 
-const DialogueNavBarContainer = styled(Div)`
+const DialogueNavBarContainer = motion.custom(styled(Div)`
   ${({ theme }) => css`
     height: 100%;
     background: ${theme.colors.primaries[600]};
     position: fixed;
+    z-index: 1000;
     width: 220px;
     top: 0;
     bottom: 0;
@@ -66,7 +70,7 @@ const DialogueNavBarContainer = styled(Div)`
       }
     }
   `}
-`;
+`);
 
 const DialogueNavBarContextHeading = styled(Text)`
   ${({ theme }) => css`
@@ -193,9 +197,6 @@ const DialogueNavBar = ({ dialogue, customerSlug, dialogueSlug }: DialogueNavBar
           {dialogue.title}
         </DialogueNavBarContextHeading>
         <Flex justifyContent="space-between">
-          {/* <ExtLink to={`https://client.haas.live/${customerSlug}/${dialogueSlug}`}>
-            {shareUrl}
-          </ExtLink> */}
 
           <Div color="primaries.200" flexGrow={0}>
             <Button size="xs" variant="ghost" onClick={onOpen}>
@@ -242,8 +243,34 @@ const DialogueNavBar = ({ dialogue, customerSlug, dialogueSlug }: DialogueNavBar
   );
 };
 
+const FloatingBurgerContainer = styled.button`
+  ${({ theme }) => css`
+    background: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 100%;
+    fill: ${theme.colors.primary};
+    z-index: 700;
+    position: fixed;
+    top: ${theme.gutter}px;
+    right: ${theme.gutter}px;
+  `}
+`;
+
+const FloatingBurger = ({ onClick }: { onClick: any }) => (
+  <FloatingBurgerContainer onClick={onClick}>
+    <Icon as={Menu} />
+  </FloatingBurgerContainer>
+);
+
+const menuAnimation: Variants = {
+  open: { x: 0 },
+  closed: { x: '-100%' },
+};
+
 const DialogueLayout = ({ children }: DialogueLayoutProps) => {
   const { customerSlug, dialogueSlug } = useParams<{customerSlug: string, dialogueSlug: string}>();
+  const device = useMediaDevice();
 
   const { data, loading } = useQuery(getSharedDialogueLayoutQuery, {
     variables: {
@@ -251,6 +278,11 @@ const DialogueLayout = ({ children }: DialogueLayoutProps) => {
       dialogueSlug,
     },
   });
+  const [showContextMenu, setShowContextMenu] = useState(!device.isSmall);
+
+  const navBarRef = useRef<any>();
+
+  useOnClickOutside(navBarRef, () => setShowContextMenu(false));
 
   const dialogue = data?.customer?.dialogue;
 
@@ -258,16 +290,23 @@ const DialogueLayout = ({ children }: DialogueLayoutProps) => {
 
   return (
     <>
-      <Grid gridTemplateColumns="220px 1fr">
-        <Div>
-          <DialogueNavBar customerSlug={customerSlug} dialogueSlug={dialogueSlug} dialogue={dialogue} />
-        </Div>
-        <Div overflow="hidden">
-          <ViewContainer>
-            {children}
-          </ViewContainer>
-        </Div>
-      </Grid>
+      {device.isSmall && (
+        <FloatingBurger onClick={() => setShowContextMenu((showState) => !showState)} />
+      )}
+
+      <Div>
+        <motion.div variants={menuAnimation} animate={showContextMenu ? 'open' : 'closed'}>
+          <Div ref={navBarRef}>
+            <DialogueNavBar customerSlug={customerSlug} dialogueSlug={dialogueSlug} dialogue={dialogue} />
+          </Div>
+        </motion.div>
+      </Div>
+
+      <Div overflow="hidden">
+        <ViewContainer>
+          {children}
+        </ViewContainer>
+      </Div>
     </>
   );
 };
