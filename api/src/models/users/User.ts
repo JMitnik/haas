@@ -3,6 +3,7 @@ import { extendType, inputObjectType, objectType } from '@nexus/schema';
 import { PaginationWhereInput } from '../general/Pagination';
 import { RoleType } from '../role/Role';
 import UserService from './UserService';
+import { UserInputError } from 'apollo-server-express';
 
 export const UserType = objectType({
   name: 'UserType',
@@ -89,7 +90,7 @@ export const UserQueries = extendType({
       args: { customerSlug: 'String' },
 
       resolve(parent, args, ctx) {
-        if (!args.customerSlug) throw new Error('No business provided');
+        if (!args.customerSlug) throw new UserInputError('No business provided');
         return ctx.prisma.user.findMany({ where: { customers: {
           every: { customer: { slug: args.customerSlug || undefined } },
         } } });
@@ -102,11 +103,11 @@ export const UserQueries = extendType({
       nullable: true,
 
       async resolve(parent, args, ctx) {
-        if (!args.userId) throw new Error('No valid user id provided');
+        if (!args.userId) throw new UserInputError('No valid user id provided');
 
         const user = await ctx.prisma.user.findOne({ where: { id: args.userId } });
 
-        if (!user) throw new Error('Cant find user with this ID');
+        if (!user) throw new UserInputError('Cant find user with this ID');
         return user || null;
       },
     });
@@ -121,13 +122,13 @@ export const UserMutations = extendType({
       args: { customerSlug: 'String', input: UserInput },
 
       resolve(parent, args, ctx) {
-        if (!args.customerSlug) throw new Error('No customer scope provided');
-        if (!args.input) throw new Error('No input provided');
+        if (!args.customerSlug) throw new UserInputError('No customer scope provided');
+        if (!args.input) throw new UserInputError('No input provided');
 
         const { firstName, lastName, email, password, phone, roleId } = args.input;
 
-        if (!email) throw new Error('No valid email provided');
-        if (!password) throw new Error('No password provided');
+        if (!email) throw new UserInputError('No valid email provided');
+        if (!password) throw new UserInputError('No password provided');
 
         return ctx.prisma.user.create({
           data: {
@@ -152,11 +153,11 @@ export const UserMutations = extendType({
       args: { id: 'String', input: UserInput },
 
       resolve(parent, args, ctx) {
-        if (!args.id) throw new Error('No valid user provided to edit');
-        if (!args.input) throw new Error('No input provided');
+        if (!args.id) throw new UserInputError('No valid user provided to edit');
+        if (!args.input) throw new UserInputError('No input provided');
         const { firstName, lastName, email, phone, roleId } = args.input;
 
-        if (!email) throw new Error('No valid email provided');
+        if (!email) throw new UserInputError('No valid email provided');
 
         // TODO: Check if user exists?
 
@@ -178,7 +179,7 @@ export const UserMutations = extendType({
       type: UserType,
       args: { id: 'String' },
       resolve(parent, args, ctx) {
-        if (!args.id) throw new Error('No valid user provided to delete');
+        if (!args.id) throw new UserInputError('No valid user provided to delete');
 
         return ctx.prisma.user.delete({ where: { id: args.id } });
       },

@@ -22,11 +22,5 @@ export const DebugMutation = mutationField('debugMutation', {
   async resolve(parent: any, args, ctx) {
     const body = makeBasicTriggerTemplate('Lev', '123132ae', 7.3);
 
-
-    mailService.send({
-      body,
-      recipient: 'lev@haas.live',
-      subject: 'A new trigger alert from HAAS',
-    });
   },
 });

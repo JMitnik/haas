@@ -5,6 +5,7 @@ import { NexusGenInputs } from '../../generated/nexus';
 import RoleService from '../role/RoleService';
 import config from '../../config/config';
 import prisma from '../../config/prisma';
+import { UserInputError } from 'apollo-server-express';
 
 interface UserTokenProps {
   email: string;
@@ -14,7 +15,7 @@ interface UserTokenProps {
 class AuthService {
   static async registerUser(userInput: NexusGenInputs['RegisterInput']) {
     const customerExists = prisma.customer.findOne({ where: { id: userInput.customerId } });
-    if (!customerExists) throw new Error('Customer does not exist');
+    if (!customerExists) throw new UserInputError('Customer does not exist');
 
     const userExists = await prisma.user.findMany({
       where: {
@@ -32,7 +33,7 @@ class AuthService {
       },
     });
 
-    if (userExists.length) throw new Error('User already exists');
+    if (userExists.length) throw new UserInputError('User already exists');
 
     const hashedPassword = await AuthService.generatePassword(userInput.password);
 
@@ -83,11 +84,11 @@ class AuthService {
     const user = await prisma.user.findOne({ where: { email: userInput.email } });
 
     if (!user) throw new Error('auth:account_not_found');
-    if (!user?.password) throw new Error('Something seems wrong with your account. Contact the admin for more info');
+    if (!user?.password) throw new UserInputError('Something seems wrong with your account. Contact the admin for more info');
 
     const isValidPassword = await AuthService.checkPassword(userInput.password, user?.password);
 
-    if (!isValidPassword) throw new Error('Login credentials invalid');
+    if (!isValidPassword) throw new UserInputError('Login credentials invalid');
 
     return user;
   }

@@ -1,9 +1,12 @@
-import { ApolloServer } from 'apollo-server-express';
+import { ApolloServer, ApolloError, UserInputError } from 'apollo-server-express';
 
 import { APIContext } from '../types/APIContext';
 import config from './config';
+import * as Sentry from '@sentry/node';
 import prisma from './prisma';
 import schema from './schema';
+
+Sentry.init({ dsn: 'https://4e5e8f8821354e6dbe2f3124c7a297f5@o438134.ingest.sentry.io/5402429' });
 
 const makeApollo = async () => {
   console.log('💼\tBootstrapping Graphql Engine Apollo');
@@ -14,17 +17,38 @@ const makeApollo = async () => {
       ...ctx,
       prisma,
     }),
-    formatError(err) {
-      if (config.env === 'local') {
-        return err;
-      }
+    plugins: [
+      {
+        requestDidStart: () => ({
+          didEncounterErrors: (ctx) => {
+            if (!ctx.operation) return;
 
-      if (err.name === 'ValidationError') {
-        return new Error(`Different authentication error message, due to ${err.message}`);
-      }
+            for (const error of ctx.errors) {
+              if (error instanceof ApolloError) continue;
 
-      return err;
-    },
+              Sentry.withScope(scope => {
+                scope.setTag('kind', ctx.operation?.name?.kind.toString() || '');
+                
+                scope.setExtra('query', ctx.request.query);
+
+                // TODO: Add this, but also strip password ...
+                // scope.setExtra('variables', ctx.request.variables)
+
+                if (error.path) {
+                  scope.addBreadcrumb({
+                    category: 'query-path',
+                    message: error.path.join(' > '),
+                    level: Sentry.Severity.Debug
+                  })
+                }
+
+                Sentry.captureException(error);
+              })
+            };
+          }
+        })
+      }
+    ]
   });
 
   console.log('🏁\tFinished bootstrapping Graphql Engine Apollo');
