@@ -2,7 +2,7 @@ import cors, { CorsOptions } from 'cors';
 import express from 'express';
 
 import config from './config/config';
-import makeApollo from './apollo';
+import makeApollo from './config/apollo';
 
 const main = async () => {
   console.log(config.testString);

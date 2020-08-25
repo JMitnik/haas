@@ -1,11 +1,11 @@
 import { ApolloServer } from 'apollo-server-express';
 
-import { APIContext } from './types/APIContext';
+import { APIContext } from '../types/APIContext';
 // eslint-disable-next-line import/no-cycle
-import ServiceContainer from './services/service-container';
-import config from './config/config';
-import prisma from './config/prisma';
-import schema from './config/schema';
+import ServiceContainer from '../services/service-container';
+import config from './config';
+import prisma from './prisma';
+import schema from './schema';
 
 const makeApollo = async () => {
   console.log('💼\tBootstrapping Graphql Engine Apollo');
