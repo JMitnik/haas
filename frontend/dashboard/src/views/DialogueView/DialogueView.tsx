@@ -80,7 +80,11 @@ const getDialogueStatistics = gql`
   }
 `;
 
-const calcScoreIncrease = (currentScore: number, prevScore: number) => ((currentScore / prevScore) - 1) || 0;
+const calcScoreIncrease = (currentScore: number, prevScore: number) => {
+  if (!prevScore) return 100;
+
+  return currentScore / prevScore || 0;
+};
 
 const DialogueView = () => {
   const { dialogueSlug, customerSlug } = useParams();
@@ -182,6 +186,7 @@ const DialogueView = () => {
             <SummaryModule
               heading="Frequently mentioned"
               renderIcon={MessageCircle}
+              renderFooterText="View all mentions"
               isInFallback={!dialogue.statistics?.mostPopularPath}
               onClick={() => (
                 history.push(`/dashboard/b/${customerSlug}/d/${dialogueSlug}/interactions?${makeSearchUrl()}`)

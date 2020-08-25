@@ -1,9 +1,8 @@
-import { useHistory, useParams } from 'react-router';
 import React from 'react';
 
-import { Award, Icon as IconType, Users } from 'react-feather';
-import { Card, CardBody, CardFooter, ColumnFlex, Div, Flex, H2, H3, Paragraph, Span, Text } from '@haas/ui';
+import { Card, CardBody, CardFooter, ColumnFlex, Div, Flex, Text } from '@haas/ui';
 import { Icon } from '@chakra-ui/core';
+import { Icon as IconType } from 'react-feather';
 import styled, { css } from 'styled-components';
 
 interface SummaryModuleProps {
@@ -13,6 +12,7 @@ interface SummaryModuleProps {
   fallbackMetric: string | React.ReactNode;
   isInFallback: boolean;
   renderCornerMetric?: React.ReactNode;
+  renderFooterText?: string | React.ReactNode;
   onClick?: () => void;
 }
 
@@ -57,7 +57,16 @@ const CornerMetricContainer = styled(Div)`
   `}
 `;
 
-const SummaryModule = ({ renderIcon, renderMetric, heading, onClick, isInFallback, fallbackMetric, renderCornerMetric }: SummaryModuleProps) => (
+const SummaryModule = ({
+  renderIcon,
+  renderMetric,
+  heading,
+  onClick,
+  isInFallback,
+  fallbackMetric,
+  renderFooterText,
+  renderCornerMetric,
+}: SummaryModuleProps) => (
   <Card bg="white" onClick={onClick}>
     {!isInFallback ? (
       <>
@@ -85,7 +94,7 @@ const SummaryModule = ({ renderIcon, renderMetric, heading, onClick, isInFallbac
         </CardBody>
         <CardFooter bg="gray.100">
           <Text color="gray.500">
-            View all
+            {renderFooterText || 'View all'}
           </Text>
         </CardFooter>
       </>
