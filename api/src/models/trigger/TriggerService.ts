@@ -124,7 +124,7 @@ class TriggerService {
       const twilioPhoneNumber = '+3197010252775';
       const smsBody = `Dear recipient, ${trigger.name} of ${trigger.relatedNode?.questionDialogue?.title} has been triggered with value: '${value}'. `;
 
-      smsService.sendSMS(twilioPhoneNumber, recipient.phone, smsBody, true)
+      smsService.send(twilioPhoneNumber, recipient.phone, smsBody, true)
     }
     // TODO: Add the mail check (below) in this body as well.
   };

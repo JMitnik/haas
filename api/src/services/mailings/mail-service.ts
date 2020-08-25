@@ -1,6 +1,8 @@
 import Mail from 'nodemailer/lib/mailer';
 import nodemailer from 'nodemailer';
 
+import AWS from '../../config/aws';
+
 import config from '../../config/config';
 
 export interface MailServiceInputProps {
@@ -19,21 +21,8 @@ export interface MailSendOptionsProps {
 }
 
 class MailService {
-  container: any;
-  transport: Mail;
-  defaultSender: string;
-
   constructor(input: MailServiceInputProps) {
-    this.transport = nodemailer.createTransport({
-      host: input.host,
-      port: input.port,
-      auth: {
-        user: input.user,
-        pass: input.pass,
-      },
-    });
-
-    this.defaultSender = input.defaultSender;
+    // AWS.SNS
   }
 
   sendMail({ from, to, subject, body }: MailSendOptionsProps) {
