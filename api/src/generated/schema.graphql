@@ -189,6 +189,18 @@ enum LinkTypeEnumType {
   WHATSAPP
 }
 
+"""Login credential"""
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+"""Information you get after you log out"""
+type LoginOutput {
+  token: String!
+  user: UserType!
+}
+
 type Mutation {
   assignTags(dialogueId: String, tags: TagsInputObjectType): Dialogue!
   copyDialogue(data: AddDialogueInput): Dialogue!
@@ -214,6 +226,8 @@ type Mutation {
   editDialogue(customerSlug: String, description: String, dialogueSlug: String, publicTitle: String, tags: TagsInputObjectType, title: String): Dialogue!
   editTrigger(questionId: String, recipients: RecipientsInputType, trigger: TriggerInputType, triggerId: String): TriggerType!
   editUser(id: String, input: UserInput): UserType!
+  login(input: LoginInput): LoginOutput
+  register(input: RegisterInput): String
   singleUpload(file: Upload): ImageType!
   updateCTA(id: String, links: CTALinksInputType, title: String, type: String): QuestionNode!
   updateQuestion(edgeCondition: EdgeConditionInputType, edgeId: String, id: String, optionEntries: OptionsInputType, overrideLeafId: String, title: String, type: String): QuestionNode!
@@ -390,6 +404,16 @@ type QuestionOption {
 
 input RecipientsInputType {
   ids: [String!]
+}
+
+"""Registration credentials"""
+input RegisterInput {
+  customerId: String!
+  email: String!
+  firstName: String!
+  lastName: String!
+  password: String!
+  roleId: String
 }
 
 """Input type for a register node"""

@@ -8,9 +8,9 @@ class SMSService {
     const snsInstance = new AWS.SNS();
     snsInstance.setSMSAttributes({
       attributes: {
-        'DefaultSMSType': 'Transactional'
-      }
-    })
+        DefaultSMSType: 'Transactional',
+      },
+    });
 
     // TODO: Do a phone number check
     // TODO: Do a message length check
@@ -23,7 +23,7 @@ class SMSService {
       console.log(res);
     }).catch((err) => {
       // TODO: What to do with errorful smses?
-      console.log(err)
+      console.log(err);
     });
   };
 }

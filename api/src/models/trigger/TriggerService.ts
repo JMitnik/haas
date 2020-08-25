@@ -8,14 +8,14 @@ import {
   UserWhereUniqueInput,
 } from '@prisma/client';
 import { isAfter, subSeconds } from 'date-fns';
+import { isPresent } from 'ts-is-present';
 import _ from 'lodash';
 
 // eslint-disable-next-line import/no-cycle
-import { isPresent } from 'ts-is-present';
 import { NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
 // eslint-disable-next-line import/no-cycle
-import NodeEntryService, { NodeEntryWithTypes } from '../node-entry/NodeEntryService';
 import { smsService } from '../../services/sms/SmsService';
+import NodeEntryService, { NodeEntryWithTypes } from '../node-entry/NodeEntryService';
 import prisma from '../../config/prisma';
 
 interface TriggerWithSendData extends Trigger {
@@ -35,11 +35,7 @@ class TriggerService {
     }
 
     const searchTermFilter: TriggerWhereInput[] = [
-      {
-        name: {
-          contains: searchTerm,
-        },
-      },
+      { name: { contains: searchTerm } },
     ];
 
     return searchTermFilter;
@@ -114,22 +110,44 @@ class TriggerService {
     };
   };
 
+  // static sendsMailTrigger(trigger: TriggerWithSendData, recipient: User, value)
+
   static sendTrigger = (
     trigger: TriggerWithSendData,
     recipient: User,
     value: string | number | undefined,
   ) => {
+    switch (trigger.medium) {
+      case 'EMAIL':
+        if (!recipient.email) return;
+        break;
+
+      case 'PHONE':
+        if (!recipient.phone) return;
+        break;
+
+      case 'BOTH':
+        if (recipient.email) console.log('Go');
+        if (recipient.phone) console.log('Go');
+        break;
+
+      default:
+        break;
+    }
+
     if (value && recipient.phone && (trigger.medium === 'PHONE' || trigger.medium === 'BOTH')) {
       // TODO: Change
       const twilioPhoneNumber = '+3197010252775';
       const smsBody = `Dear recipient, ${trigger.name} of ${trigger.relatedNode?.questionDialogue?.title} has been triggered with value: '${value}'. `;
 
-      smsService.send(twilioPhoneNumber, recipient.phone, smsBody, true)
+      smsService.send(twilioPhoneNumber, recipient.phone, smsBody, true);
     }
+
+    // if (value && recipient.email && (trigger.medium === 'EMAIL' || trigger.medium === '' ))
     // TODO: Add the mail check (below) in this body as well.
   };
 
-  static async tryTrigger(entries: NodeEntryWithTypes[], trigger:TriggerWithSendData, smsService: TriggerSMSService) {
+  static async tryTrigger(entries: NodeEntryWithTypes[], trigger: TriggerWithSendData) {
     const currentDate = new Date();
     const safeToSend = !trigger.lastSent || isAfter(subSeconds(currentDate, 5), trigger.lastSent);
 
@@ -145,16 +163,16 @@ class TriggerService {
     const { isMatch, value } = TriggerService.match(condition, nodeEntry);
 
     if (isMatch && value) {
-      trigger.recipients.forEach((recipient) => TriggerService.sendTrigger(trigger, recipient, value, smsService));
+      trigger.recipients.forEach((recipient) => TriggerService.sendTrigger(trigger, recipient, value));
     }
   }
 
-  static tryTriggers = async (entries: NodeEntryWithTypes[], smsService: TriggerSMSService) => {
+  static tryTriggers = async (entries: NodeEntryWithTypes[]) => {
     const questionIds = entries.map((entry) => entry.relatedNodeId).filter(isPresent);
     const dialogueTriggers = await TriggerService.findTriggersByQuestionIds(questionIds);
 
     dialogueTriggers.forEach(async (trigger) => {
-      await TriggerService.tryTrigger(entries, trigger, smsService);
+      await TriggerService.tryTrigger(entries, trigger);
     });
   };
 

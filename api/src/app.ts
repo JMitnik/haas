@@ -5,24 +5,23 @@ import config from './config/config';
 import makeApollo from './config/apollo';
 
 process.on('SIGINT', () => {
-  console.log('received sigint')
+  console.log('received sigint');
   setTimeout(() => {
-    console.log('exit')
-    process.exit(0)
-  }, 100)
-})
-
+    console.log('exit');
+    process.exit(0);
+  }, 100);
+});
 
 const main = async () => {
   console.log(config.testString);
-  console.log('🏳️\tStarting application')
+  console.log('🏳️\tStarting application');
 
   const apollo = await makeApollo();
   const app = express();
 
   process.on('SIGINT', () => {
 
-  })
+  });
 
   const corsOptions: CorsOptions = {
     // Hardcoded for the moment
@@ -49,6 +48,6 @@ const main = async () => {
 
 try {
   main();
-} catch(e) {
+} catch (e) {
   console.log(e);
 }
