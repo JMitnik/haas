@@ -10,12 +10,17 @@ export interface SMSServiceInputProps {
 class SMSService {
   private twilioAccountSid: string;
   private twilioAuthToken: string;
-  private twilio: client.Twilio;
+  private twilio: client.Twilio | undefined;
 
   constructor(input: SMSServiceInputProps) {
     this.twilioAccountSid = input.twilioAccountSid;
     this.twilioAuthToken = input.twilioAuthToken;
-    this.twilio = client(this.twilioAccountSid, this.twilioAuthToken);
+
+    try {
+      this.twilio = client(this.twilioAccountSid, this.twilioAuthToken);
+    } catch (e) {
+      console.log("Error in making Twilio client, wont make it now");
+    }
   }
 
   sendSMS = (from: string, to: string, body: string, production: boolean = false) => {
@@ -23,6 +28,7 @@ class SMSService {
       console.log('Fake send sms to: ', to);
       return;
     }
+    
     this.twilio.messages
       .create({
         body,

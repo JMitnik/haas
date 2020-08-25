@@ -9,7 +9,7 @@
         ]
     },
     "scripts": {
-        "start": "tsnd --respawn --exit-child --transpile-only -- ./src/app.ts",
+        "start": "tsnd --exit-child --transpile-only -- ./src/app.ts",
         "dev": "tsnd --respawn --exit-child --transpile-only --inspect -- ./src/app.ts",
         "build": "yarn",
         "docker:up": "docker-compose -f docker-compose.local.yml up -d ",

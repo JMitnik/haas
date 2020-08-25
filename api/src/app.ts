@@ -4,6 +4,15 @@ import express from 'express';
 import config from './config/config';
 import makeApollo from './config/apollo';
 
+process.on('SIGINT', () => {
+  console.log('received sigint')
+  setTimeout(() => {
+    console.log('exit')
+    process.exit(0)
+  }, 100)
+})
+
+
 const main = async () => {
   console.log(config.testString);
   console.log('🏳️\tStarting application')
@@ -11,9 +20,12 @@ const main = async () => {
   const apollo = await makeApollo();
   const app = express();
 
+  process.on('SIGINT', () => {
+
+  })
+
   const corsOptions: CorsOptions = {
     // Hardcoded for the moment
-
     origin: (origin, callback) => {
       const validOrigins = ['dashboard.haas.live', 'client.haas.live', 'haas-dashboard.netlify.app', 'haas-client.netlify.app'];
 
@@ -26,9 +38,7 @@ const main = async () => {
 
   app.use(cors(corsOptions));
 
-  apollo.applyMiddleware({
-    app,
-  });
+  apollo.applyMiddleware({ app });
 
   console.log('🏳️\tStarting the server');
 

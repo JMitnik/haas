@@ -15,7 +15,7 @@ const schema = makeSchema({
         alias: 'prisma',
       },
       {
-        source: path.join(__dirname, './types/APIContext.ts'),
+        source: path.join(__dirname, '../types/APIContext.ts'),
         alias: 'APIContext',
       },
     ],
@@ -23,8 +23,8 @@ const schema = makeSchema({
   },
 
   outputs: {
-    schema: path.join(__dirname, './generated/schema.graphql'),
-    typegen: path.join(__dirname, './generated/nexus.ts'),
+    schema: path.join(__dirname, '../generated/schema.graphql'),
+    typegen: path.join(__dirname, '../generated/nexus.ts'),
   },
 });
 
