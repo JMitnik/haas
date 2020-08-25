@@ -1,4 +1,4 @@
-import * as AuthAPI from '../models/auth/Auth';
+// import * as AuthAPI from '../models/auth/Auth';
 import * as DebugAPI from '../models/debug/Debug';
 import * as NodeEntryAPI from '../models/node-entry/NodeEntry';
 import * as PaginationAPI from '../models/general/Pagination';
@@ -26,7 +26,7 @@ const nexus = [
   ...customerNexus,
   ...customerSettingsNexus,
   ...dialogueNexus,
-  ...Array(AuthAPI),
+  // ...Array(AuthAPI),
   ...Array(PaginationAPI),
   ...Array(NodeEntryAPI),
   ...sessionNexus,

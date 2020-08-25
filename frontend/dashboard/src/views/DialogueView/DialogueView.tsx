@@ -11,8 +11,8 @@ import { ReactComponent as TrophyIcon } from 'assets/icons/icon-trophy.svg';
 import Modal from 'components/Modal';
 
 import { BarChart } from 'react-feather';
-import { useTranslation } from 'react-i18next';
 import { dialogueStatistics as DialogueStatisticsData } from './__generated__/dialogueStatistics';
+import { useTranslation } from 'react-i18next';
 import InteractionFeedModule from './Modules/InteractionFeedModule/InteractionFeedModule';
 import NegativePathsModule from './Modules/NegativePathsModule/index.tsx';
 import NodeEntriesOverview from '../NodeEntriesOverview/NodeEntriesOverview';
@@ -31,7 +31,7 @@ import SummaryModuleContainer from './Modules/SummaryModules/SummaryModuleContai
 //   ['Last year', 365],
 // ]);
 
-const DialogueViewContainer = styled(ViewContainer)`
+const DialogueViewContainer = styled(Div)`
   ${({ theme }) => css`
     ${H4} {
       font-size: 1.2rem;

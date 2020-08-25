@@ -36,7 +36,7 @@ export const OutputContainer = styled(FlexRow)`
   align-items: center;
 `;
 
-export const InteractionsOverviewContainer = styled(ViewContainer)`
+export const InteractionsOverviewContainer = styled(Div)`
   ${({ theme }) => css`
     display: flex;
     flex-direction: column;

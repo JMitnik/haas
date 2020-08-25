@@ -2,7 +2,7 @@ import React, { useContext, useRef } from 'react';
 
 import { Activity, BarChart, Clipboard, Download, List, Mail, MapPin, Settings, Share, Triangle, User, Zap } from 'react-feather';
 import { Button, Icon, IconButton, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useClipboard, useDisclosure } from '@chakra-ui/core';
-import { ColumnFlex, Div, ExtLink, Flex, Grid, H2, Hr, Input, Span, StyledExtLink, Text } from '@haas/ui';
+import { ColumnFlex, Div, ExtLink, Flex, Grid, H2, Hr, Input, Span, StyledExtLink, Text, ViewContainer } from '@haas/ui';
 import { Link, NavLink } from 'react-router-dom';
 import { ReactComponent as UrlIcon } from 'assets/icons/icon-link.svg';
 import { useParams } from 'react-router';
@@ -295,7 +295,9 @@ const DialogueLayout = ({ children }: DialogueLayoutProps) => {
           <DialogueNavBar customerSlug={customerSlug} dialogueSlug={dialogueSlug} dialogue={dialogue} />
         </Div>
         <Div overflow="hidden">
-          {children}
+          <ViewContainer>
+            {children}
+          </ViewContainer>
         </Div>
       </Grid>
       {/* <Tabbar data-cy="DialogueTabbar">
