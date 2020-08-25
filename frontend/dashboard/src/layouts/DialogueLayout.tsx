@@ -35,7 +35,7 @@ const DialogueNavBarContainer = styled(Div)`
     height: 100%;
     background: ${theme.colors.primaries[600]};
     position: fixed;
-    width: 250px;
+    width: 220px;
     top: 0;
     bottom: 0;
     padding: ${theme.gutter}px ${theme.gutter}px;
@@ -53,9 +53,10 @@ const DialogueNavBarContainer = styled(Div)`
     a {
       color: ${theme.isDarkColor ? theme.colors.primaries['100'] : theme.colors.primaries['300']};
       font-weight: 600;
-      padding: 10px 8px;
+      padding: 8px 6px;
       display: flex;
       align-items: center;
+      font-size: 0.9rem;
       vertical-align: middle;
 
       &.active {
@@ -70,7 +71,7 @@ const DialogueNavBarContainer = styled(Div)`
 const DialogueNavBarContextHeading = styled(Text)`
   ${({ theme }) => css`
     color: ${theme.isDarkColor ? theme.colors.primaries['100'] : theme.colors.primaries['300']};
-    font-size: 1.4rem;
+    font-size: 1rem;
   `}
 `;
 
@@ -257,7 +258,7 @@ const DialogueLayout = ({ children }: DialogueLayoutProps) => {
 
   return (
     <>
-      <Grid gridTemplateColumns="250px 1fr">
+      <Grid gridTemplateColumns="220px 1fr">
         <Div>
           <DialogueNavBar customerSlug={customerSlug} dialogueSlug={dialogueSlug} dialogue={dialogue} />
         </Div>
@@ -267,13 +268,6 @@ const DialogueLayout = ({ children }: DialogueLayoutProps) => {
           </ViewContainer>
         </Div>
       </Grid>
-      {/* <Tabbar data-cy="DialogueTabbar">
-        <Tab to={`/dashboard/b/${customerSlug}/d/${dialogueSlug}`} exact>General</Tab>
-        <Tab to={`/dashboard/b/${customerSlug}/d/${dialogueSlug}/interactions`}>Interactions</Tab>
-        <Tab to={`/dashboard/b/${customerSlug}/d/${dialogueSlug}/actions`}>Actions</Tab>
-        <Tab to={`/dashboard/b/${customerSlug}/d/${dialogueSlug}/builder`}>Builder</Tab>
-        <Tab to={`/dashboard/b/${customerSlug}/d/${dialogueSlug}/edit`}>Settings</Tab>
-      </Tabbar> */}
     </>
   );
 };
