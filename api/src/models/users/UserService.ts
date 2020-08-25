@@ -4,7 +4,7 @@ import _ from 'lodash';
 import { NexusGenFieldTypes, NexusGenInputs, NexusGenTypes } from '../../generated/nexus';
 import { Nullable } from '../../types/generic';
 
-import prisma from '../../prisma';
+import prisma from '../../config/prisma';
 
 interface CreateUserOptions {
   customerSlug?: string;

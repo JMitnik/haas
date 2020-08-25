@@ -2,7 +2,7 @@ import { CustomerCreateArgs } from '@prisma/client';
 import cuid from 'cuid';
 
 import CustomerService from '../../models/customer/CustomerService';
-import prisma from '../../prisma';
+import prisma from '../../config/prisma';
 
 export const sampleCustomerWithoutDialogue: CustomerCreateArgs = {
   data: {

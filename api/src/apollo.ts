@@ -3,11 +3,13 @@ import { ApolloServer } from 'apollo-server-express';
 import { APIContext } from './types/APIContext';
 // eslint-disable-next-line import/no-cycle
 import ServiceContainer from './services/service-container';
-import config from './config';
-import prisma from './prisma';
-import schema from './schema';
+import config from './config/config';
+import prisma from './config/prisma';
+import schema from './config/schema';
 
 const makeApollo = async () => {
+  console.log('💼\tBootstrapping Graphql Engine Apollo');
+
   const apollo: ApolloServer = new ApolloServer({
     schema,
     context: (ctx): APIContext => ({
@@ -27,6 +29,8 @@ const makeApollo = async () => {
       return err;
     },
   });
+
+  console.log('🏁\tFinished bootstrapping Graphql Engine Apollo');
 
   return apollo;
 };

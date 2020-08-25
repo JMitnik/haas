@@ -1,7 +1,7 @@
 import { clearDatabase } from '../../test/utils/clearDatabase';
 import { initSampleFullCustomer } from '../../test/data/SampleCustomer';
 import CustomerService from './CustomerService';
-import prisma from '../../prisma';
+import prisma from '../../config/prisma';
 
 describe('CustomerService tests', () => {
   // TODO: Ensure this never runs on production!

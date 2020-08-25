@@ -1,9 +1,11 @@
 import * as AuthAPI from '../models/auth/Auth';
+import config from '../config/config';
 import * as NodeEntryAPI from '../models/node-entry/NodeEntry';
 import * as PaginationAPI from '../models/general/Pagination';
 import customerNexus from '../models/customer/Customer';
 import customerSettingsNexus from '../models/settings/CustomerSettings';
 import dialogueNexus from '../models/questionnaire/Dialogue';
+import DebugAPI from '../models/debug/Debug';
 import edgeNexus from '../models/edge/Edge';
 import linkNexus from '../models/link/Link';
 import permissionNexus from '../models/permission/Permission';
@@ -30,6 +32,7 @@ const nexus = [
   ...sessionNexus,
   ...questionNodeNexus,
   ...edgeNexus,
+  // ...(config.isDebug ? Array(DebugAPI) : []),
 ];
 
 export default nexus;

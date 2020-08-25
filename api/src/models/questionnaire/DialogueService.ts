@@ -17,7 +17,7 @@ import { HistoryDataProps, HistoryDataWithEntry, IdMapProps,
 import NodeEntryService, { NodeEntryWithTypes } from '../node-entry/NodeEntryService';
 // eslint-disable-next-line import/no-cycle
 import SessionService from '../session/SessionService';
-import prisma from '../../prisma';
+import prisma from '../../config/prisma';
 
 class DialogueService {
   static constructDialogue(

@@ -16,7 +16,7 @@ import { NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
 // eslint-disable-next-line import/no-cycle
 import NodeEntryService, { NodeEntryWithTypes } from '../node-entry/NodeEntryService';
 import TriggerSMSService from '../../services/sms/trigger-sms-service';
-import prisma from '../../prisma';
+import prisma from '../../config/prisma';
 
 interface TriggerWithSendData extends Trigger {
   recipients: User[];

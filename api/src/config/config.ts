@@ -17,9 +17,12 @@ export interface ConfigProps {
   mailPort: number;
   mailUsername: string;
   mailPassword: string;
+  awsAccessKeyId: string;
+  awsSecretAccessKey: string;
   prismaServiceSecret: string;
   twilioAccountSid: string;
   twilioAuthToken: string;
+  testString: string;
 }
 
 if (!process.env.JWT_SECRET) throw new Error('Ensure you set a JWT secret in your env');
@@ -41,9 +44,14 @@ const config: ConfigProps = {
   mailUsername: process.env.MAIL_USERNAME || '',
   mailPassword: process.env.MAIL_PASSWORD || '',
   mailDefaultSender: process.env.MAIL_DEFAULT_SENDER || '',
+  awsAccessKeyId: process.env.AWS_ACCESS_KEY_ID || '',
+  awsSecretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || '',
   prismaServiceSecret: process.env.PRISMA_SERVICE_SECRET || '',
   twilioAccountSid: process.env.SMS_ACCOUNT_SID || '',
   twilioAuthToken: process.env.SMS_AUTH_TOKEN || '',
+  testString: new Date().toUTCString()
 };
+
+console.log("Test string", config.testString);
 
 export default config;

@@ -1,7 +1,7 @@
 import CustomerService from '../../models/customer/CustomerService';
 import DialogueService from '../../models/questionnaire/DialogueService';
-import config from '../../config';
-import prisma from '../../prisma';
+import config from '../../config/config';
+import prisma from '../../config/prisma';
 
 export const clearDatabase = async (): Promise<void> => {
   if (config.env === 'prod') return;

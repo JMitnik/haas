@@ -3,8 +3,8 @@ import jwt from 'jsonwebtoken';
 
 import { NexusGenInputs } from '../../generated/nexus';
 import RoleService from '../role/RoleService';
-import config from '../../config';
-import prisma from '../../prisma';
+import config from '../../config/config';
+import prisma from '../../config/prisma';
 
 interface UserTokenProps {
   email: string;

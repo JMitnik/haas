@@ -1,7 +1,7 @@
 import { Dialogue, Link, NodeType, QuestionCondition, QuestionNode, QuestionNodeCreateInput } from '@prisma/client';
 import { choiceType, sliderType } from '../../data/seeds/default-data';
 import EdgeService from '../edge/EdgeService';
-import prisma from '../../prisma';
+import prisma from '../../config/prisma';
 
 interface LeafNodeDataEntryProps {
   title: string;

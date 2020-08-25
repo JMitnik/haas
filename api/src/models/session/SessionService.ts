@@ -16,7 +16,7 @@ import NodeEntryService, { NodeEntryWithTypes } from '../node-entry/NodeEntrySer
 // eslint-disable-next-line import/no-cycle
 import PaginationService from '../general/PaginationService';
 import TriggerService from '../trigger/TriggerService';
-import prisma from '../../prisma';
+import prisma from '../../config/prisma';
 
 class SessionService {
   /**

@@ -1,4 +1,4 @@
-import { ConfigProps } from '../config';
+import { ConfigProps } from '../config/config';
 import MailService from './mailings/mail-service';
 import SMSService from './sms/sms-service';
 import TriggerMailService from './mailings/trigger-mail-service';
