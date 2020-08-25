@@ -1,6 +1,8 @@
-import { Div, Flex, Grid, H4, Icon, Loader, PageTitle, Span, ViewContainer } from '@haas/ui';
-import { useLocation, useParams } from 'react-router-dom';
+import { BarChart } from 'react-feather';
+import { Div, Flex, Grid, H4, Icon, Loader, PageTitle, Span } from '@haas/ui';
+import { useParams } from 'react-router-dom';
 import { useQuery } from '@apollo/react-hooks';
+import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 import gql from 'graphql-tag';
 import styled, { css } from 'styled-components/macro';
@@ -8,20 +10,15 @@ import styled, { css } from 'styled-components/macro';
 import { ReactComponent as PathsIcon } from 'assets/icons/icon-launch.svg';
 import { ReactComponent as TrendingIcon } from 'assets/icons/icon-trending-up.svg';
 import { ReactComponent as TrophyIcon } from 'assets/icons/icon-trophy.svg';
-import Modal from 'components/Modal';
 
-import { BarChart } from 'react-feather';
 import { dialogueStatistics as DialogueStatisticsData } from './__generated__/dialogueStatistics';
-import { useTranslation } from 'react-i18next';
 import InteractionFeedModule from './Modules/InteractionFeedModule/InteractionFeedModule';
 import NegativePathsModule from './Modules/NegativePathsModule/index.tsx';
-import NodeEntriesOverview from '../NodeEntriesOverview/NodeEntriesOverview';
 import PositivePathsModule from './Modules/PositivePathsModule/PositivePathsModule';
 import ScoreGraphModule from './Modules/ScoreGraphModule';
 import SummaryAverageScoreModule from './Modules/SummaryModules/SummaryAverageScoreModule';
 import SummaryCallToActionModule from './Modules/SummaryModules/SummaryCallToActionModule';
 import SummaryInteractionCountModule from './Modules/SummaryModules/SummaryInteractionCountModule';
-import SummaryModuleContainer from './Modules/SummaryModules/SummaryModuleContainer';
 
 // TODO: Bring it back
 // const filterMap = new Map([
@@ -32,7 +29,7 @@ import SummaryModuleContainer from './Modules/SummaryModules/SummaryModuleContai
 // ]);
 
 const DialogueViewContainer = styled(Div)`
-  ${({ theme }) => css`
+  ${() => css`
     ${H4} {
       font-size: 1.2rem;
     }
@@ -75,8 +72,7 @@ const getDialogueStatistics = gql`
 
 const DialogueView = () => {
   const { dialogueSlug, customerSlug } = useParams();
-  const [activeSession, setActiveSession] = useState('');
-  const location = useLocation<any>();
+  const [, setActiveSession] = useState('');
 
   // FIXME: If this is started with anything else start result is undefined :S
   // const [activeFilter, setActiveFilter] = useState(() => 'Last 24h');
@@ -114,11 +110,12 @@ const DialogueView = () => {
               </Span>
             </Flex>
           </H4>
-          <SummaryModuleContainer>
+
+          <Grid gridTemplateColumns={['1fr', '1fr', '1fr 1fr 1fr']}>
             <SummaryInteractionCountModule interactionCount={dialogue.countInteractions} />
             <SummaryAverageScoreModule averageScore={dialogue.averageScore} />
             <SummaryCallToActionModule callToActionCount={0} />
-          </SummaryModuleContainer>
+          </Grid>
         </Div>
 
         <Div mt={2} gridColumn="1 / 4">
@@ -166,12 +163,6 @@ const DialogueView = () => {
           onActiveSessionChange={setActiveSession}
           timelineEntries={dialogue?.sessions}
         />
-
-        {location?.state?.modal && (
-          <Modal>
-            <NodeEntriesOverview sessionId={activeSession} />
-          </Modal>
-        )}
       </Grid>
     </DialogueViewContainer>
   );

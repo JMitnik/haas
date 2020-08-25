@@ -11,7 +11,6 @@ export const Card = styled(Div)<CardProps>`
     position: relative;
     box-shadow: 0 1px 2px 0 rgba(0,0,0,.05);
     border-radius: ${theme.borderRadiuses.somewhatRounded};
-    /* color: ${theme.colors.default.darkest}; */
     border: 1px solid #fcfcfc;
     cursor: pointer;
 

@@ -4,7 +4,7 @@ import { Card, Grid } from '@haas/ui';
 
 const SummaryModuleContainer = styled(Grid)`
   grid-template-columns: 1fr 1fr 1fr;
-  grid-gap: 0;
+  /* grid-gap: 0; */
 
   > ${Card} {
       border-radius: 0;
