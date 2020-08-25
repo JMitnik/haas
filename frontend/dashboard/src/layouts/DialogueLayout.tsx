@@ -268,6 +268,15 @@ const menuAnimation: Variants = {
   closed: { x: '-100%' },
 };
 
+const DialogueLayoutContainer = styled.div<{ isMobile: boolean }>`
+  ${({ theme, isMobile = false }) => css`
+    ${!isMobile && css`
+      display: grid;
+      grid-template-columns: 220px 1fr;
+    `}
+  `}
+`;
+
 const DialogueLayout = ({ children }: DialogueLayoutProps) => {
   const { customerSlug, dialogueSlug } = useParams<{customerSlug: string, dialogueSlug: string}>();
   const device = useMediaDevice();
@@ -294,19 +303,19 @@ const DialogueLayout = ({ children }: DialogueLayoutProps) => {
         <FloatingBurger onClick={() => setShowContextMenu((showState) => !showState)} />
       )}
 
-      <Div>
+      <DialogueLayoutContainer isMobile={device.isSmall}>
         <motion.div variants={menuAnimation} animate={showContextMenu ? 'open' : 'closed'}>
           <Div ref={navBarRef}>
             <DialogueNavBar customerSlug={customerSlug} dialogueSlug={dialogueSlug} dialogue={dialogue} />
           </Div>
         </motion.div>
-      </Div>
 
-      <Div overflow="hidden">
-        <ViewContainer>
-          {children}
-        </ViewContainer>
-      </Div>
+        <Div overflow="hidden">
+          <ViewContainer>
+            {children}
+          </ViewContainer>
+        </Div>
+      </DialogueLayoutContainer>
     </>
   );
 };
