@@ -1,24 +1,19 @@
 import React, { useContext, useRef } from 'react';
 
-import { Activity, BarChart, Clipboard, Download, List, Mail, MapPin, Settings, Share, Triangle, User, Zap } from 'react-feather';
-import { Button, Icon, IconButton, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useClipboard, useDisclosure } from '@chakra-ui/core';
-import { ColumnFlex, Div, ExtLink, Flex, Grid, H2, Hr, Input, Span, StyledExtLink, Text, ViewContainer } from '@haas/ui';
-import { Link, NavLink } from 'react-router-dom';
-import { ReactComponent as UrlIcon } from 'assets/icons/icon-link.svg';
+import { Activity, BarChart, Clipboard, Download, Mail, Share, Zap } from 'react-feather';
+import { Button, Icon, Modal, ModalBody, ModalCloseButton,
+  ModalContent, ModalFooter, ModalHeader, ModalOverlay, useClipboard, useDisclosure } from '@chakra-ui/core';
+import { ColumnFlex, Div, Flex, Grid, Hr, Input, StyledExtLink, Text, ViewContainer } from '@haas/ui';
+import { NavLink } from 'react-router-dom';
 import { useParams } from 'react-router';
-import QRCode from 'qrcode.react';
-
 import { useQuery } from '@apollo/react-hooks';
 import { useTranslation } from 'react-i18next';
-import Placeholder from 'components/Placeholder';
-import SliderNodeIcon from 'components/Icons/SliderNodeIcon';
-import Tabbar, { Tab } from 'components/Tabbar/Tabbar';
+import QRCode from 'qrcode.react';
 import gql from 'graphql-tag';
 import styled, { ThemeContext, css } from 'styled-components/macro';
 
 interface DialogueLayoutProps {
   children: React.ReactNode;
-  dialogueTitle?: string;
 }
 
 const getSharedDialogueLayoutQuery = gql`
@@ -34,49 +29,6 @@ const getSharedDialogueLayoutQuery = gql`
     }
   }
 `;
-
-const TagIconContainer = styled.span`
-  ${({ theme }) => css`
-    background: ${theme.colors.primary};
-    display: inline-block;
-    text-align: center;
-    padding: 8px;
-    border-radius: ${theme.borderRadiuses.somewhatRounded};
-
-    svg {
-      fill: white;
-      stroke: transparent;
-    }
-  `}
-`;
-
-const DialogueSubHeaderContainer = styled(Flex)`
-  ${({ theme }) => css`
-    color: ${theme.colors.app.mutedAltOnDefault};
-
-    svg {
-      width: 18px;
-      margin-right: ${theme.gutter / 4}px;
-      fill: currentColor;
-    }
-  `}
-`;
-
-const TagIcon = ({ type }: { type: any }) => (
-  <TagIconContainer>
-    {type === 'LOCATION' && (
-      <MapPin />
-    )}
-
-    {type === 'AGENT' && (
-      <User />
-    )}
-
-    {type === 'DEFAULT' && (
-      <SliderNodeIcon color="black" />
-    )}
-  </TagIconContainer>
-);
 
 const DialogueNavBarContainer = styled(Div)`
   ${({ theme }) => css`
@@ -136,7 +88,13 @@ interface DialogueNavBarProps {
   dialogueSlug: string;
 }
 
-const ShareDialogueModal = ({ dialogueName, shareUrl, onClose }: { dialogueName: string, shareUrl: string, onClose: any }) => {
+interface ShareDialogueModalProps {
+  dialogueName: string;
+  shareUrl: string;
+  onClose: () => void;
+}
+
+const ShareDialogueModal = ({ dialogueName, shareUrl, onClose }: ShareDialogueModalProps) => {
   const themeContext = useContext(ThemeContext);
 
   const qrColor = themeContext.colors.primary || '#FFFFFF';
@@ -144,11 +102,11 @@ const ShareDialogueModal = ({ dialogueName, shareUrl, onClose }: { dialogueName:
 
   const { onCopy, hasCopied } = useClipboard(shareUrl);
 
-  const handleDownload = () => {
-    if (!qrContainerRef.current) return null;
+  const handleDownload = (): void => {
+    if (!qrContainerRef.current) return;
 
     const canvas = qrContainerRef.current.querySelector('canvas');
-    if (!canvas) return null;
+    if (!canvas) return;
 
     const img = canvas.toDataURL('image/png');
     const anchor = document.createElement('a');
@@ -177,7 +135,17 @@ const ShareDialogueModal = ({ dialogueName, shareUrl, onClose }: { dialogueName:
               <Div ref={qrContainerRef}>
                 <QRCode fgColor={qrColor} value={shareUrl} />
               </Div>
-              <Button margin="0 auto" onClick={handleDownload} as="a" variantColor="teal" mt={1} size="xs" leftIcon={() => <Download size={12} />}><Text ml={1}>Download</Text></Button>
+              <Button
+                margin="0 auto"
+                onClick={handleDownload}
+                as="a"
+                variantColor="teal"
+                mt={1}
+                size="xs"
+                leftIcon={() => <Download size={12} />}
+              >
+                <Text ml={1}>Download</Text>
+              </Button>
             </ColumnFlex>
           </Grid>
         </Div>
@@ -192,8 +160,7 @@ const ShareDialogueModal = ({ dialogueName, shareUrl, onClose }: { dialogueName:
                   <Button width="auto" size="sm" onClick={onCopy} leftIcon={Clipboard}>
                     {hasCopied ? 'Copied' : 'Copy'}
                   </Button>
-)}
-
+                )}
                 value={shareUrl}
                 isReadOnly
               />
