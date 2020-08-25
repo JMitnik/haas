@@ -15,7 +15,7 @@ import { isPresent } from 'ts-is-present';
 import { NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
 // eslint-disable-next-line import/no-cycle
 import NodeEntryService, { NodeEntryWithTypes } from '../node-entry/NodeEntryService';
-import TriggerSMSService from '../../services/sms/trigger-sms-service';
+import { smsService } from '../../services/sms/sms-service';
 import prisma from '../../config/prisma';
 
 interface TriggerWithSendData extends Trigger {
@@ -118,10 +118,13 @@ class TriggerService {
     trigger: TriggerWithSendData,
     recipient: User,
     value: string | number | undefined,
-    smsService: TriggerSMSService,
   ) => {
     if (value && recipient.phone && (trigger.medium === 'PHONE' || trigger.medium === 'BOTH')) {
-      smsService.sendTriggerSMS(trigger, recipient.phone, value);
+      // TODO: Change
+      const twilioPhoneNumber = '+3197010252775';
+      const smsBody = `Dear recipient, ${trigger.name} of ${trigger.relatedNode?.questionDialogue?.title} has been triggered with value: '${value}'. `;
+
+      smsService.sendSMS(twilioPhoneNumber, recipient.phone, smsBody, true)
     }
     // TODO: Add the mail check (below) in this body as well.
   };

@@ -15,7 +15,6 @@ const makeApollo = async () => {
     context: (ctx): APIContext => ({
       ...ctx,
       prisma,
-      services: new ServiceContainer(config),
     }),
     formatError(err) {
       if (config.env === 'local') {

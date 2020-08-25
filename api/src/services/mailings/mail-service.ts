@@ -1,8 +1,9 @@
 import Mail from 'nodemailer/lib/mailer';
 import nodemailer from 'nodemailer';
 
+import config from '../../config/config';
+
 export interface MailServiceInputProps {
-  container: any;
   host: string;
   port: number;
   user: string;
@@ -19,14 +20,10 @@ export interface MailSendOptionsProps {
 
 class MailService {
   container: any;
-
   transport: Mail;
-
   defaultSender: string;
 
   constructor(input: MailServiceInputProps) {
-    this.container = input.container;
-
     this.transport = nodemailer.createTransport({
       host: input.host,
       port: input.port,
@@ -44,19 +41,16 @@ class MailService {
       throw new Error('No receiver given');
     }
 
-    // this.transport.sendMail({
-    //   from: from || this.defaultSender,
-    //   to,
-    //   subject,
-    //   html: body,
-    // }, (error) => {
-    //   if (error) {
-    //     console.log('error: ', error);
-    //   }
-    // });
-
     console.log('Mail is sent!');
   }
 }
+
+export const mailService = new MailService({
+  host: config.mailServer,
+  pass: config.mailPassword,
+  port: config.mailPort,
+  user: config.mailUsername,
+  defaultSender: config.mailDefaultSender,
+});
 
 export default MailService;

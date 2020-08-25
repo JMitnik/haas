@@ -1,7 +1,6 @@
 import { makeSchema } from '@nexus/schema';
 import path from 'path';
 
-// eslint-disable-next-line import/no-cycle
 import nexus from './nexus';
 
 const schema = makeSchema({

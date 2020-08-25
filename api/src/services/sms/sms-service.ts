@@ -1,28 +1,21 @@
 import client from 'twilio';
 
-const twilioAccountSid = 'AC820ded78b44349f074996d94aca241ef';
-const twilioAuthToken = '3cf6353e8400b2a08a2029e1fe93ebc3';
+import config from '../../config/config';
 
 export interface SMSServiceInputProps {
-  container: any;
   twilioAccountSid: string;
   twilioAuthToken: string;
 }
 
 class SMSService {
-  container: any;
-
-  twilioAccountSid: string;
-
-  twilioAuthToken: string;
-
-  twilio: client.Twilio;
+  private twilioAccountSid: string;
+  private twilioAuthToken: string;
+  private twilio: client.Twilio;
 
   constructor(input: SMSServiceInputProps) {
-    this.container = input.container;
     this.twilioAccountSid = input.twilioAccountSid;
     this.twilioAuthToken = input.twilioAuthToken;
-    this.twilio = client(twilioAccountSid, twilioAuthToken);
+    this.twilio = client(this.twilioAccountSid, this.twilioAuthToken);
   }
 
   sendSMS = (from: string, to: string, body: string, production: boolean = false) => {
@@ -39,5 +32,10 @@ class SMSService {
       .then((message) => console.log(message));
   };
 }
+
+export const smsService = new SMSService({
+  twilioAccountSid: config.twilioAccountSid,
+  twilioAuthToken: config.twilioAuthToken,
+});
 
 export default SMSService;

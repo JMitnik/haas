@@ -52,6 +52,4 @@ const config: ConfigProps = {
   testString: new Date().toUTCString()
 };
 
-console.log("Test string", config.testString);
-
 export default config;

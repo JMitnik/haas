@@ -1,5 +1,4 @@
 import * as AuthAPI from '../models/auth/Auth';
-import config from './config';
 import * as NodeEntryAPI from '../models/node-entry/NodeEntry';
 import * as PaginationAPI from '../models/general/Pagination';
 import customerNexus from '../models/customer/Customer';
