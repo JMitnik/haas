@@ -1,7 +1,9 @@
+import * as qs from 'qs';
 import { Activity, Award, BarChart, MessageCircle, ThumbsDown, ThumbsUp, TrendingDown, TrendingUp } from 'react-feather';
 import { Div, Flex, Grid, H4, Icon, Loader, PageTitle, Span, Text } from '@haas/ui';
 import { Tag, TagIcon, TagLabel } from '@chakra-ui/core';
-import { useParams } from 'react-router-dom';
+import { sub } from 'date-fns';
+import { useHistory, useParams } from 'react-router-dom';
 import { useQuery } from '@apollo/react-hooks';
 import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
@@ -12,7 +14,6 @@ import { ReactComponent as PathsIcon } from 'assets/icons/icon-launch.svg';
 import { ReactComponent as TrendingIcon } from 'assets/icons/icon-trending-up.svg';
 import { ReactComponent as TrophyIcon } from 'assets/icons/icon-trophy.svg';
 
-import { sub } from 'date-fns';
 import { dialogueStatistics as DialogueStatisticsData } from './__generated__/dialogueStatistics';
 import InteractionFeedModule from './Modules/InteractionFeedModule/InteractionFeedModule';
 import NegativePathsModule from './Modules/NegativePathsModule/index.tsx';
@@ -84,9 +85,11 @@ const calcScoreIncrease = (currentScore: number, prevScore: number) => ((current
 const DialogueView = () => {
   const { dialogueSlug, customerSlug } = useParams();
   const [, setActiveSession] = useState('');
-  const [prevWeekDate, setPrevWeekDate] = useState(() => sub(new Date(), {
+  const [prevWeekDate, _] = useState(() => sub(new Date(), {
     weeks: 1,
   }).toISOString());
+
+  const history = useHistory();
 
   // FIXME: If this is started with anything else start result is undefined :S
   // const [activeFilter, setActiveFilter] = useState(() => 'Last 24h');
@@ -107,9 +110,13 @@ const DialogueView = () => {
 
   const increaseInAverageScore = calcScoreIncrease(dialogue?.thisWeekAverageScore, dialogue?.previousScore);
 
-  console.log(increaseInAverageScore);
-
   const { t } = useTranslation();
+
+  const makeSearchUrl = () => {
+    if (!dialogue.statistics?.mostPopularPath?.answer) return '';
+
+    return qs.stringify({ search: dialogue.statistics?.mostPopularPath?.answer });
+  };
 
   if (!dialogue) return <Loader />;
 
@@ -132,7 +139,7 @@ const DialogueView = () => {
             </Flex>
           </H4>
 
-          <Grid gridTemplateColumns="repeat(auto-fit, minmax(250px, 1fr))" minHeight="130px">
+          <Grid gridTemplateColumns="repeat(auto-fit, minmax(275px, 1fr))" minHeight="100px">
             <SummaryModule
               heading="Interactions"
               renderIcon={Activity}
@@ -176,16 +183,11 @@ const DialogueView = () => {
               heading="Frequently mentioned"
               renderIcon={MessageCircle}
               isInFallback={!dialogue.statistics?.mostPopularPath}
-              fallbackMetric="No keywords mentioned yet"
-              // renderMetric="test"
-              renderMetric={(
-                <Div pt={1}>
-                  <Flex>
-                    <Text mr={2}>{dialogue.statistics?.mostPopularPath?.answer}</Text>
-
-                  </Flex>
-                </Div>
+              onClick={() => (
+                history.push(`/dashboard/b/${customerSlug}/d/${dialogueSlug}/interactions?${makeSearchUrl()}`)
               )}
+              fallbackMetric="No keywords mentioned yet"
+              renderMetric={dialogue.statistics?.mostPopularPath?.answer}
               renderCornerMetric={(
                 <>
                   {dialogue.statistics?.mostPopularPath?.basicSentiment === 'positive' ? (

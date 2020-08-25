@@ -1,24 +1,26 @@
+import * as qs from 'qs';
 import { debounce, maxBy } from 'lodash';
 import { useLazyQuery } from '@apollo/react-hooks';
-import { useParams } from 'react-router';
+import { useLocation, useParams } from 'react-router';
 import Papa from 'papaparse';
 import React, { useCallback, useEffect, useState } from 'react';
 
+import { Activity, Download } from 'react-feather';
+import { Button, Icon } from '@chakra-ui/core';
 import {
   getDialogueSessionConnection as CustomerSessionConnection,
 } from 'queries/__generated__/getDialogueSessionConnection';
 import { Div, Flex, Muted, PageTitle, Span } from '@haas/ui';
+import { useTranslation } from 'react-i18next';
 import DatePicker from 'components/DatePicker/DatePicker';
 import InteractionsTable from 'components/Table/Table';
 import SearchBar from 'components/SearchBar/SearchBar';
 import getDialogueSessionConnectionQuery from 'queries/getDialogueSessionConnectionQuery';
 
-import { Activity, Download } from 'react-feather';
-import { Button, Icon } from '@chakra-ui/core';
-import { CenterCell, InteractionCTACell, InteractionDateCell, InteractionUserCell, ScoreCell, UserCell, WhenCell } from './TableCell/TableCell';
+import { CenterCell, InteractionCTACell, InteractionDateCell,
+  InteractionUserCell, ScoreCell, UserCell, WhenCell } from './TableCell/TableCell';
 import { InputContainer, InputOutputContainer,
   InteractionsOverviewContainer, OutputContainer } from './InteractionOverviewStyles';
-import { useTranslation } from 'react-i18next';
 import Row from './TableRow/InteractionsTableRow';
 
 interface TableProps {
@@ -46,10 +48,12 @@ const InteractionsOverview = () => {
     fetchPolicy: 'cache-and-network',
   });
 
+  const location = useLocation();
+
   const [paginationProps, setPaginationProps] = useState<TableProps>({
     activeStartDate: null,
     activeEndDate: null,
-    activeSearchTerm: '',
+    activeSearchTerm: qs.parse(location.search, { ignoreQueryPrefix: true })?.search || '',
     pageIndex: 0,
     pageSize: 8,
     sortBy: [{ by: 'score', desc: true }],
