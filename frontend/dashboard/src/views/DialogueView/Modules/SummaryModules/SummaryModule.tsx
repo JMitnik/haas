@@ -12,6 +12,7 @@ interface SummaryModuleProps {
   renderMetric: string | React.ReactNode;
   fallbackMetric: string | React.ReactNode;
   isInFallback: boolean;
+  renderCornerMetric?: React.ReactNode;
   onClick?: () => void;
 }
 
@@ -38,7 +39,25 @@ const FallbackContainer = styled(Div)`
   `}
 `;
 
-const SummaryModule = ({ renderIcon, renderMetric, heading, onClick, isInFallback, fallbackMetric }: SummaryModuleProps) => (
+const CornerMetricContainer = styled(Div)`
+  ${({ theme }) => css`
+    position: absolute;
+    top: ${theme.gutter / 2}px;
+    right: ${theme.gutter / 2}px;
+
+    svg {
+      fill: currentColor;
+      stroke: currentColor;
+
+      polyline {
+        fill: currentColor;
+        stroke: currentColor;
+      }
+    }
+  `}
+`;
+
+const SummaryModule = ({ renderIcon, renderMetric, heading, onClick, isInFallback, fallbackMetric, renderCornerMetric }: SummaryModuleProps) => (
   <Card bg="white" onClick={onClick}>
     {!isInFallback ? (
       <>
@@ -56,12 +75,13 @@ const SummaryModule = ({ renderIcon, renderMetric, heading, onClick, isInFallbac
                   <Text color="gray.500" pt={1} fontWeight="800">
                     {renderMetric}
                   </Text>
-                ) : (
-                  renderMetric
-                )}
+                ) : renderMetric}
               </ColumnFlex>
             </Div>
           </Flex>
+          <CornerMetricContainer>
+            {renderCornerMetric}
+          </CornerMetricContainer>
         </CardBody>
         <CardFooter bg="gray.100">
           <Text color="gray.500">

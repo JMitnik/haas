@@ -64,7 +64,9 @@ export interface NexusGenInputs {
     id: string; // ID!
   }
   DialogueFilterInputType: { // input type
+    endDate?: string | null; // String
     searchTerm?: string | null; // String
+    startDate?: string | null; // String
   }
   DialogueWhereUniqueInput: { // input type
     id?: string | null; // ID
@@ -670,6 +672,9 @@ export interface NexusGenArgTypes {
     }
   }
   Dialogue: {
+    averageScore: { // args
+      input?: NexusGenInputs['DialogueFilterInputType'] | null; // DialogueFilterInputType
+    }
     leafs: { // args
       searchTerm?: string | null; // String
     }

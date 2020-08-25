@@ -1,5 +1,6 @@
-import { Activity, Award, BarChart, MessageCircle, ThumbsDown, ThumbsUp } from 'react-feather';
+import { Activity, Award, BarChart, MessageCircle, ThumbsDown, ThumbsUp, TrendingDown, TrendingUp } from 'react-feather';
 import { Div, Flex, Grid, H4, Icon, Loader, PageTitle, Span, Text } from '@haas/ui';
+import { Tag, TagIcon, TagLabel } from '@chakra-ui/core';
 import { useParams } from 'react-router-dom';
 import { useQuery } from '@apollo/react-hooks';
 import { useTranslation } from 'react-i18next';
@@ -11,15 +12,12 @@ import { ReactComponent as PathsIcon } from 'assets/icons/icon-launch.svg';
 import { ReactComponent as TrendingIcon } from 'assets/icons/icon-trending-up.svg';
 import { ReactComponent as TrophyIcon } from 'assets/icons/icon-trophy.svg';
 
+import { sub } from 'date-fns';
 import { dialogueStatistics as DialogueStatisticsData } from './__generated__/dialogueStatistics';
-import { Tag, TagIcon, TagLabel } from '@chakra-ui/core';
 import InteractionFeedModule from './Modules/InteractionFeedModule/InteractionFeedModule';
 import NegativePathsModule from './Modules/NegativePathsModule/index.tsx';
 import PositivePathsModule from './Modules/PositivePathsModule/PositivePathsModule';
 import ScoreGraphModule from './Modules/ScoreGraphModule';
-// import SummaryAverageScoreModule from './Modules/SummaryModules/SummaryAverageScoreModule';
-import SummaryCallToActionModule from './Modules/SummaryModules/SummaryCallToActionModule';
-// import SummaryInteractionCountModule from './Modules/SummaryModules/SummaryInteractionCountModule';
 import SummaryModule from './Modules/SummaryModules/SummaryModule';
 
 // TODO: Bring it back
@@ -39,13 +37,14 @@ const DialogueViewContainer = styled(Div)`
 `;
 
 const getDialogueStatistics = gql`
-  query dialogueStatistics($customerSlug: String!, $dialogueSlug: String!) {
+  query dialogueStatistics($customerSlug: String!, $dialogueSlug: String!, $prevDateFilter: DialogueFilterInputType) {
     customer(slug: $customerSlug) {
       id
       dialogue(where: { slug: $dialogueSlug }) {
         id
         countInteractions
-        averageScore
+        thisWeekAverageScore: averageScore
+        previousScore: averageScore(input: $prevDateFilter)
         sessions(take: 3) {
           id
           createdAt
@@ -80,23 +79,35 @@ const getDialogueStatistics = gql`
   }
 `;
 
+const calcScoreIncrease = (currentScore: number, prevScore: number) => ((currentScore / prevScore) - 1) || 0;
+
 const DialogueView = () => {
   const { dialogueSlug, customerSlug } = useParams();
   const [, setActiveSession] = useState('');
+  const [prevWeekDate, setPrevWeekDate] = useState(() => sub(new Date(), {
+    weeks: 1,
+  }).toISOString());
 
   // FIXME: If this is started with anything else start result is undefined :S
   // const [activeFilter, setActiveFilter] = useState(() => 'Last 24h');
 
   // TODO: Move this to page level
-  const { data } = useQuery<DialogueStatisticsData>(getDialogueStatistics, {
+  const { data } = useQuery<any>(getDialogueStatistics, {
     variables: {
       dialogueSlug,
       customerSlug,
+      prevDateFilter: {
+        endDate: prevWeekDate,
+      },
     },
     pollInterval: 5000,
   });
 
   const dialogue = data?.customer?.dialogue;
+
+  const increaseInAverageScore = calcScoreIncrease(dialogue?.thisWeekAverageScore, dialogue?.previousScore);
+
+  console.log(increaseInAverageScore);
 
   const { t } = useTranslation();
 
@@ -133,9 +144,32 @@ const DialogueView = () => {
             <SummaryModule
               heading="Average score"
               renderIcon={Award}
-              isInFallback={dialogue.averageScore === 0}
+              isInFallback={dialogue.thisWeekAverageScore === 0}
               fallbackMetric="No score calculated yet"
-              renderMetric={`${(dialogue.averageScore / 10).toFixed(2)} score`}
+              renderMetric={`${(dialogue.thisWeekAverageScore / 10).toFixed(2)} score`}
+              renderCornerMetric={(
+                <Flex color="red">
+                  {increaseInAverageScore > 0 ? (
+                    <>
+                      <Icon size="22px" as={TrendingUp} color="green.200" />
+                      <Text fontWeight={600} fontSize="0.9rem" ml={1} color="green.400">
+                        {increaseInAverageScore.toFixed(2)}
+                        {' '}
+                        %
+                      </Text>
+                    </>
+                  ) : (
+                    <>
+                      <Icon size="22px" as={TrendingDown} color="red.200" />
+                      <Text fontWeight={600} fontSize="0.9rem" ml={1} color="red.400">
+                        {increaseInAverageScore.toFixed(2)}
+                        {' '}
+                        %
+                      </Text>
+                    </>
+                  )}
+                </Flex>
+              )}
             />
 
             <SummaryModule
@@ -148,19 +182,24 @@ const DialogueView = () => {
                 <Div pt={1}>
                   <Flex>
                     <Text mr={2}>{dialogue.statistics?.mostPopularPath?.answer}</Text>
-                    {dialogue.statistics?.mostPopularPath?.basicSentiment === 'positive' ? (
-                      <Tag size="sm" variantColor="green">
-                        <TagIcon icon={ThumbsUp} size="10px" color="green.600" />
-                        <TagLabel color="green.600">{dialogue.statistics?.mostPopularPath?.quantity}</TagLabel>
-                      </Tag>
-                    ) : (
-                      <Tag size="sm" variantColor="red">
-                        <TagIcon icon={ThumbsDown} size="10px" color="red.600" />
-                        <TagLabel color="red.600">{dialogue.statistics?.mostPopularPath?.quantity}</TagLabel>
-                      </Tag>
-                    )}
+
                   </Flex>
                 </Div>
+              )}
+              renderCornerMetric={(
+                <>
+                  {dialogue.statistics?.mostPopularPath?.basicSentiment === 'positive' ? (
+                    <Tag size="sm" variantColor="green">
+                      <TagIcon icon={ThumbsUp} size="10px" color="green.600" />
+                      <TagLabel color="green.600">{dialogue.statistics?.mostPopularPath?.quantity}</TagLabel>
+                    </Tag>
+                ) : (
+                  <Tag size="sm" variantColor="red">
+                    <TagIcon icon={ThumbsDown} size="10px" color="red.600" />
+                    <TagLabel color="red.600">{dialogue.statistics?.mostPopularPath?.quantity}</TagLabel>
+                  </Tag>
+                )}
+                </>
               )}
             />
           </Grid>

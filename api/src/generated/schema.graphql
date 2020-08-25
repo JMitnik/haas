@@ -87,7 +87,7 @@ type Debug {
 }
 
 type Dialogue {
-  averageScore: Float!
+  averageScore(input: DialogueFilterInputType): Float!
   countInteractions: Int!
   creationDate: String
   customer: Customer
@@ -109,7 +109,9 @@ type Dialogue {
 }
 
 input DialogueFilterInputType {
+  endDate: String
   searchTerm: String
+  startDate: String
 }
 
 type DialogueStatistics {

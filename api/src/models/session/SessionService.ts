@@ -4,9 +4,9 @@ import {
 } from '@prisma/client';
 import { isPresent } from 'ts-is-present';
 
+import { sortBy } from 'lodash';
 import { Nullable, PaginationProps } from '../../types/generic';
 import { SessionWithEntries } from './SessionTypes';
-import { sortBy } from 'lodash';
 // eslint-disable-next-line import/no-cycle
 import { TEXT_NODES } from '../questionnaire/Dialogue';
 // eslint-disable-next-line import/no-cycle
@@ -191,9 +191,10 @@ class SessionService {
                   : undefined,
               },
             }, {
-              createdAt: (paginationOpts?.startDate && {
-                gte: paginationOpts?.startDate,
-              }) || undefined,
+              createdAt: {
+                gte: paginationOpts?.startDate || undefined,
+                lte: paginationOpts?.endDate || undefined,
+              } || undefined,
             },
             {
               nodeEntries: {

@@ -4,6 +4,7 @@ import { extendType, inputObjectType, objectType } from '@nexus/schema';
 
 // eslint-disable-next-line import/no-cycle
 import { CustomerType } from '../customer/Customer';
+import { UserInputError } from 'apollo-server-express';
 // eslint-disable-next-line import/no-cycle
 import { EdgeType } from '../edge/Edge';
 // eslint-disable-next-line import/no-cycle
@@ -20,6 +21,7 @@ import { PaginationWhereInput } from '../general/Pagination';
 import PaginationService from '../general/PaginationService';
 // eslint-disable-next-line import/no-cycle
 import SessionService from '../session/SessionService';
+import isValidDate from '../../utils/isValidDate';
 
 export const TEXT_NODES = [
   'TEXTBOX',
@@ -72,6 +74,16 @@ export const DialogueStatistics = objectType({
   },
 });
 
+export const DialogueFilterInputType = inputObjectType({
+  name: 'DialogueFilterInputType',
+
+  definition(t) {
+    t.string('searchTerm', { nullable: true });
+    t.string('startDate', { nullable: true });
+    t.string('endDate', { nullable: true });
+  },
+});
+
 export const DialogueType = objectType({
   name: 'Dialogue',
 
@@ -84,17 +96,42 @@ export const DialogueType = objectType({
     t.string('creationDate', { nullable: true });
     t.string('updatedAt', { nullable: true });
 
-    t.float('averageScore', {
-      async resolve(parent) {
+    t.field('averageScore', {
+      type: 'Float',
+      args: { input: DialogueFilterInputType },
+      async resolve(parent, args) {
         if (!parent.id) {
           return 0;
         }
 
-        const score = await DialogueService.calculateAverageDialogueScore(parent.id);
+        if (args.input?.startDate && !isValidDate(args.input.startDate)) {
+          throw new UserInputError('Start date invalid');
+        }
+
+        if (args.input?.endDate && !isValidDate(args.input.endDate)) {
+          throw new UserInputError('End date invalid');
+        }
+
+        const score = await DialogueService.calculateAverageDialogueScore(parent.id, {
+          startDate: args.input?.startDate,
+          endDate: args.input?.endDate,
+        });
 
         return score;
       },
     });
+
+    // t.float('averageScore', {
+    //   async resolve(parent) {
+    //     if (!parent.id) {
+    //       return 0;
+    //     }
+
+    //     const score = await DialogueService.calculateAverageDialogueScore(parent.id);
+
+    //     return score;
+    //   },
+    // });
 
     t.int('countInteractions', {
       async resolve(parent) {
@@ -379,13 +416,6 @@ export const DialogueMutations = extendType({
         return DialogueService.deleteDialogue(args.where?.id);
       },
     });
-  },
-});
-
-export const DialogueFilterInputType = inputObjectType({
-  name: 'DialogueFilterInputType',
-  definition(t) {
-    t.string('searchTerm');
   },
 });
 

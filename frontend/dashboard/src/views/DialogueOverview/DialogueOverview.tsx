@@ -9,8 +9,8 @@ import Searchbar from 'components/SearchBar';
 import SurveyIcon from 'components/Icons/SurveyIcon';
 import getDialoguesOfCustomer from 'queries/getDialoguesOfCustomer';
 
-import { Skeleton } from '@chakra-ui/core';
 import { AddDialogueCard, TranslatedPlus } from './DialogueOverviewStyles';
+import { Skeleton } from '@chakra-ui/core';
 import DialogueCard from './DialogueCard';
 
 const DialogueOverview = ({ dialogues, isLoading }: { dialogues: any, isLoading: boolean }) => {
@@ -52,7 +52,7 @@ const DialogueOverview = ({ dialogues, isLoading }: { dialogues: any, isLoading:
         ))}
 
         <AddDialogueCard data-cy="AddDialogueCard">
-          <Link to={`/dashboard/b/${customerSlug}/d/add`} />
+          <Link to={`/dashboard/b/${customerSlug}/dialogue/add`} />
 
           <Flex flexDirection="column" alignItems="center" justifyContent="center">
             <SurveyIcon />

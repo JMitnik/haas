@@ -162,7 +162,7 @@ const AppRoutes = () => (
                       />
 
                       <Route
-                        path="/dashboard/b/:customerSlug/d/add"
+                        path="/dashboard/b/:customerSlug/dialogue/add"
                         render={() => <AddDialogueView />}
                       />
 

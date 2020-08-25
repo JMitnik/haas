@@ -9,13 +9,14 @@ import { isPresent } from 'ts-is-present';
 import { leafNodes, sliderType } from '../../data/seeds/default-data';
 import NodeService from '../question/NodeService';
 // eslint-disable-next-line import/no-cycle
-import { NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
+import { NexusGenFieldTypes, NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
 // eslint-disable-next-line import/no-cycle
 import { HistoryDataProps, HistoryDataWithEntry, IdMapProps,
   PathFrequency, QuestionProps, StatisticsProps } from './DialogueTypes';
 // eslint-disable-next-line import/no-cycle
 import NodeEntryService, { NodeEntryWithTypes } from '../node-entry/NodeEntryService';
 // eslint-disable-next-line import/no-cycle
+import { Nullable, PaginationProps } from '../../types/generic';
 import SessionService from '../session/SessionService';
 import prisma from '../../config/prisma';
 
@@ -720,8 +721,11 @@ class DialogueService {
     return finalQuestions;
   };
 
-  static calculateAverageDialogueScore = async (dialogueId: string) => {
-    const sessions = await SessionService.fetchSessionsByDialogue(dialogueId);
+  static calculateAverageDialogueScore = async (dialogueId: string, filters?: NexusGenInputs['DialogueFilterInputType']) => {
+    const sessions = await SessionService.fetchSessionsByDialogue(dialogueId, {
+      startDate: filters?.startDate ? new Date(filters?.startDate) : null,
+      endDate: filters?.endDate ? new Date(filters?.endDate) : null,
+    });
 
     if (!sessions) {
       return 0;
