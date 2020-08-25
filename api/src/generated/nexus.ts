@@ -200,6 +200,7 @@ export interface NexusGenRootTypes {
   Dialogue: prisma.Dialogue;
   DialogueStatistics: { // root type
     history?: NexusGenRootTypes['lineChartDataType'][] | null; // [lineChartDataType!]
+    mostPopularPath?: NexusGenRootTypes['topPathType'] | null; // topPathType
     topNegativePath?: NexusGenRootTypes['topPathType'][] | null; // [topPathType!]
     topPositivePath?: NexusGenRootTypes['topPathType'][] | null; // [topPathType!]
   }
@@ -319,6 +320,7 @@ export interface NexusGenRootTypes {
   }
   topPathType: { // root type
     answer?: string | null; // String
+    basicSentiment?: string | null; // String
     quantity?: number | null; // Int
   }
   ConnectionInterface: NexusGenRootTypes['SessionConnection'] | NexusGenRootTypes['RoleConnection'] | NexusGenRootTypes['TriggerConnectionType'];
@@ -419,6 +421,7 @@ export interface NexusGenFieldTypes {
   }
   DialogueStatistics: { // field return type
     history: NexusGenRootTypes['lineChartDataType'][] | null; // [lineChartDataType!]
+    mostPopularPath: NexusGenRootTypes['topPathType'] | null; // topPathType
     topNegativePath: NexusGenRootTypes['topPathType'][] | null; // [topPathType!]
     topPositivePath: NexusGenRootTypes['topPathType'][] | null; // [topPathType!]
   }
@@ -645,6 +648,7 @@ export interface NexusGenFieldTypes {
   }
   topPathType: { // field return type
     answer: string | null; // String
+    basicSentiment: string | null; // String
     quantity: number | null; // Int
   }
   ConnectionInterface: { // field return type

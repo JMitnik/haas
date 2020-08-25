@@ -1,5 +1,5 @@
-import { BarChart } from 'react-feather';
-import { Div, Flex, Grid, H4, Icon, Loader, PageTitle, Span } from '@haas/ui';
+import { Activity, Award, BarChart, MessageCircle, ThumbsDown, ThumbsUp } from 'react-feather';
+import { Div, Flex, Grid, H4, Icon, Loader, PageTitle, Span, Text } from '@haas/ui';
 import { useParams } from 'react-router-dom';
 import { useQuery } from '@apollo/react-hooks';
 import { useTranslation } from 'react-i18next';
@@ -12,13 +12,15 @@ import { ReactComponent as TrendingIcon } from 'assets/icons/icon-trending-up.sv
 import { ReactComponent as TrophyIcon } from 'assets/icons/icon-trophy.svg';
 
 import { dialogueStatistics as DialogueStatisticsData } from './__generated__/dialogueStatistics';
+import { Tag, TagIcon, TagLabel } from '@chakra-ui/core';
 import InteractionFeedModule from './Modules/InteractionFeedModule/InteractionFeedModule';
 import NegativePathsModule from './Modules/NegativePathsModule/index.tsx';
 import PositivePathsModule from './Modules/PositivePathsModule/PositivePathsModule';
 import ScoreGraphModule from './Modules/ScoreGraphModule';
-import SummaryAverageScoreModule from './Modules/SummaryModules/SummaryAverageScoreModule';
+// import SummaryAverageScoreModule from './Modules/SummaryModules/SummaryAverageScoreModule';
 import SummaryCallToActionModule from './Modules/SummaryModules/SummaryCallToActionModule';
-import SummaryInteractionCountModule from './Modules/SummaryModules/SummaryInteractionCountModule';
+// import SummaryInteractionCountModule from './Modules/SummaryModules/SummaryInteractionCountModule';
+import SummaryModule from './Modules/SummaryModules/SummaryModule';
 
 // TODO: Bring it back
 // const filterMap = new Map([
@@ -53,11 +55,19 @@ const getDialogueStatistics = gql`
           topPositivePath {
             answer
             quantity
+            basicSentiment
+          }
+          
+          mostPopularPath {
+            answer
+            quantity
+            basicSentiment
           }
           
           topNegativePath {
             quantity
             answer
+            basicSentiment
           }
           
           history {
@@ -111,10 +121,48 @@ const DialogueView = () => {
             </Flex>
           </H4>
 
-          <Grid gridTemplateColumns={['1fr', '1fr', '1fr 1fr 1fr']}>
-            <SummaryInteractionCountModule interactionCount={dialogue.countInteractions} />
-            <SummaryAverageScoreModule averageScore={dialogue.averageScore} />
-            <SummaryCallToActionModule callToActionCount={0} />
+          <Grid gridTemplateColumns="repeat(auto-fit, minmax(250px, 1fr))" minHeight="130px">
+            <SummaryModule
+              heading="Interactions"
+              renderIcon={Activity}
+              isInFallback={dialogue.countInteractions === 0}
+              fallbackMetric="No interactions yet"
+              renderMetric={`${dialogue.countInteractions} ${dialogue.countInteractions > 1 ? 'interactions' : 'interaction'}`}
+            />
+
+            <SummaryModule
+              heading="Average score"
+              renderIcon={Award}
+              isInFallback={dialogue.averageScore === 0}
+              fallbackMetric="No score calculated yet"
+              renderMetric={`${(dialogue.averageScore / 10).toFixed(2)} score`}
+            />
+
+            <SummaryModule
+              heading="Frequently mentioned"
+              renderIcon={MessageCircle}
+              isInFallback={!dialogue.statistics?.mostPopularPath}
+              fallbackMetric="No keywords mentioned yet"
+              // renderMetric="test"
+              renderMetric={(
+                <Div pt={1}>
+                  <Flex>
+                    <Text mr={2}>{dialogue.statistics?.mostPopularPath?.answer}</Text>
+                    {dialogue.statistics?.mostPopularPath?.basicSentiment === 'positive' ? (
+                      <Tag size="sm" variantColor="green">
+                        <TagIcon icon={ThumbsUp} size="10px" color="green.600" />
+                        <TagLabel color="green.600">{dialogue.statistics?.mostPopularPath?.quantity}</TagLabel>
+                      </Tag>
+                    ) : (
+                      <Tag size="sm" variantColor="red">
+                        <TagIcon icon={ThumbsDown} size="10px" color="red.600" />
+                        <TagLabel color="red.600">{dialogue.statistics?.mostPopularPath?.quantity}</TagLabel>
+                      </Tag>
+                    )}
+                  </Flex>
+                </Div>
+              )}
+            />
           </Grid>
         </Div>
 

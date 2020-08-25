@@ -10,8 +10,9 @@ export const Card = styled(Div)<CardProps>`
   ${({ theme, noHover }) => css`
     position: relative;
     box-shadow: 0 1px 2px 0 rgba(0,0,0,.05);
+    display: flex;
+    flex-direction: column;
     border-radius: ${theme.borderRadiuses.somewhatRounded};
-    border: 1px solid #fcfcfc;
     cursor: pointer;
 
     ${!noHover && css`
@@ -60,17 +61,16 @@ export const AddCard = styled(Card)`
 export const CardBody = styled(Div)`
   ${({ theme }) => css`
     padding: ${theme.gutter * 0.75}px;
+    flex-grow: 1;
     position: relative;
   `}
 `;
 
 export const CardFooter = styled(Div)`
   ${({ theme }) => css`
-    padding: ${theme.gutter / 1.5}px;
+    padding: 8px ${theme.gutter * 0.75}px;
     border-radius: 0 0 ${theme.borderRadiuses.md} ${theme.borderRadiuses.md};
-    background: ${theme.colors.default.light};
     color: ${theme.colors.default.text};
-    text-align: center;
   `}
 `;
 

@@ -42,6 +42,7 @@ export const topPathType = objectType({
   definition(t) {
     t.string('answer', { nullable: true });
     t.int('quantity', { nullable: true });
+    t.string('basicSentiment', { nullable: true });
   },
 });
 
@@ -55,6 +56,11 @@ export const DialogueStatistics = objectType({
     });
 
     t.list.field('topNegativePath', {
+      type: topPathType,
+      nullable: true,
+    });
+
+    t.field('mostPopularPath', {
       type: topPathType,
       nullable: true,
     });

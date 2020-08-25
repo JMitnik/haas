@@ -126,7 +126,7 @@ class DialogueService {
    * @param entries
    * @param nPaths
    */
-  static getTopNPaths = (entries: HistoryDataWithEntry[], nPaths: number = 3) => {
+  static getTopNPaths = (entries: HistoryDataWithEntry[], nPaths: number = 3, basicSentiment: string) => {
     const entryWithText = entries.map((entry) => ({
       textValue: NodeEntryService.getTextValueFromEntry(entry),
       ...entry,
@@ -141,6 +141,7 @@ class DialogueService {
     const pathFrequencies: PathFrequency[] = countTuples.map(([answer, quantity]) => ({
       answer,
       quantity,
+      basicSentiment,
     }));
 
     // If there are three, grab the first three, otherwise get the entire element
@@ -196,10 +197,15 @@ class DialogueService {
 
     const isPositiveEntries = _.groupBy(textAndScoreEntries, (entry) => entry.y && entry.y > 50);
 
-    const topNegativePath = DialogueService.getTopNPaths(isPositiveEntries.false || [], 3) || [];
-    const topPositivePath = DialogueService.getTopNPaths(isPositiveEntries.true || [], 3) || [];
+    const topNegativePath = DialogueService.getTopNPaths(isPositiveEntries.false || [], 3, 'negative') || [];
+    const topPositivePath = DialogueService.getTopNPaths(isPositiveEntries.true || [], 3, 'positive') || [];
 
-    return { history, topNegativePath, topPositivePath };
+    const mostPopularPath = _.maxBy([
+      ...topNegativePath.map((pathItem) => ({ ...pathItem, basicSentiment: 'negative' })),
+      ...topPositivePath.map((pathItem) => ({ ...pathItem, basicSentiment: 'positive' })),
+    ], ((item) => item.quantity || null)) || null;
+
+    return { history, topNegativePath, topPositivePath, mostPopularPath };
   };
 
   static deleteDialogue = async (dialogueId: string) => {
@@ -584,7 +590,6 @@ class DialogueService {
       throw new Error('Description required, not found!');
     }
 
-
     if (customers.length > 1) {
       // TODO: Make this a logger or something
       console.warn(`Multiple customers found with slug ${input.customerSlug}`);
@@ -724,7 +729,7 @@ class DialogueService {
 
     const scoringEntries = SessionService.getScoringEntriesFromSessions(sessions);
 
-    const scores = _.mean((scoringEntries).map((entry) => entry?.sliderNodeEntry)) || 0;
+    const scores = _.mean((scoringEntries).map((entry) => entry?.sliderNodeEntry?.value)) || 0;
 
     return scores;
   };

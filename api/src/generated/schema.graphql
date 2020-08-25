@@ -114,6 +114,7 @@ input DialogueFilterInputType {
 
 type DialogueStatistics {
   history: [lineChartDataType!]
+  mostPopularPath: topPathType
   topNegativePath: [topPathType!]
   topPositivePath: [topPathType!]
 }
@@ -486,6 +487,7 @@ input TextboxNodeEntryInput {
 
 type topPathType {
   answer: String
+  basicSentiment: String
   quantity: Int
 }
 
