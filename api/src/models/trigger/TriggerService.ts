@@ -15,7 +15,7 @@ import { isPresent } from 'ts-is-present';
 import { NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
 // eslint-disable-next-line import/no-cycle
 import NodeEntryService, { NodeEntryWithTypes } from '../node-entry/NodeEntryService';
-import { smsService } from '../../services/sms/sms-service';
+import { smsService } from '../../services/sms/SmsService';
 import prisma from '../../config/prisma';
 
 interface TriggerWithSendData extends Trigger {

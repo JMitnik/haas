@@ -1,6 +1,6 @@
 import { objectType, mutationField } from '@nexus/schema';
-import { mailService } from '../../services/mailings/mail-service';
-import { smsService } from '../../services/sms/sms-service';
+import { mailService } from '../../services/mailings/MailService';
+import { smsService } from '../../services/sms/SmsService';
 
 export const DebugType = objectType({
   name: 'Debug',
@@ -20,7 +20,11 @@ export const DebugMutation = mutationField('debugMutation', {
   type: 'String',
   nullable: true,
   async resolve(parent: any, args, ctx) {
-    smsService.send();
-    return 'haha'
+    
+    mailService.send({
+      body: 'Test123',
+      recipient: 'jonathan@haas.live',
+      subject: 'Test test test',
+    });
   },
 });

@@ -12,11 +12,7 @@ export interface ConfigProps {
   prismaUrl: string;
   appSchemaUrl: string;
   prismaSchemaUrl: string;
-  mailDefaultSender: string;
-  mailServer: string;
-  mailPort: number;
-  mailUsername: string;
-  mailPassword: string;
+  mailSender: string;
   awsAccessKeyId: string;
   awsSecretAccessKey: string;
   prismaServiceSecret: string;
@@ -26,6 +22,7 @@ export interface ConfigProps {
 }
 
 if (!process.env.JWT_SECRET) throw new Error('Ensure you set a JWT secret in your env');
+if (!process.env.MAIL_SENDER) console.log('Mail sender not defined; wont send mails as a result');
 
 const config: ConfigProps = {
   jwtSecret: process.env.JWT_SECRET,
@@ -39,11 +36,7 @@ const config: ConfigProps = {
   prismaUrl: process.env.PRISMA_SERVICE_ENDPOINT || 'http://localhost:4466',
   appSchemaUrl: process.env.PATH_TO_APP_SCHEMA || './src/schema.graphql',
   prismaSchemaUrl: process.env.PATH_TO_PRISMA_GENERATED_SCHEMA || './src/generated/prisma.graphql',
-  mailServer: process.env.MAIL_SERVER || '',
-  mailPort: Number(process.env.MAIL_PORT) || 22,
-  mailUsername: process.env.MAIL_USERNAME || '',
-  mailPassword: process.env.MAIL_PASSWORD || '',
-  mailDefaultSender: process.env.MAIL_DEFAULT_SENDER || '',
+  mailSender: process.env.MAIL_SENDER || '',
   awsAccessKeyId: process.env.AWS_ACCESS_KEY_ID || '',
   awsSecretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || '',
   prismaServiceSecret: process.env.PRISMA_SERVICE_SECRET || '',
