@@ -163,8 +163,8 @@ class TriggerService {
         break;
 
       case 'BOTH':
-        if (recipient.email) console.log('Go');
-        if (recipient.phone) console.log('Go');
+        if (recipient.email) TriggerService.sendMailTrigger(trigger, recipient, session, value);
+        if (recipient.phone) TriggerService.sendSmsTrigger(trigger, recipient, session, value);
         break;
 
       default:
