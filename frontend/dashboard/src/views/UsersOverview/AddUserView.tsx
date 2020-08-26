@@ -81,7 +81,7 @@ const AddUserView = () => {
   };
 
   return (
-    <Container>
+    <>
       <Div>
         <H2 color="default.darkest" fontWeight={500} py={2}> User </H2>
         <Muted pb={4}>Create a new user</Muted>
@@ -150,16 +150,8 @@ const AddUserView = () => {
           </Flex>
         </Div>
       </Form>
-    </Container>
+    </>
   );
 };
-
-const FormGroupContainer = styled.div`
-  ${({ theme }) => css`
-    padding-bottom: ${theme.gutter * 3}px;
-  `}
-`;
-
-const Form = styled.form``;
 
 export default AddUserView;

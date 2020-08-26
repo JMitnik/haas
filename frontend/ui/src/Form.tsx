@@ -274,27 +274,47 @@ export const DeprecatedInputContainer = styled.div`
   }
 `;
 
+const ButtonRadioContainer = styled.div`
+  button {
+    display: flex;
+    align-items: flex-start;
+  }
+
+  button svg {
+    vertical-align: baseline;
+    margin-top: 6px;
+  }
+
+  button + div {
+    margin-left: 4px;
+  }
+`;
 
 export const ButtonRadio = forwardRef((props: any, ref) => {
-  const { isChecked, isDisabled, value, text, description, ...rest } = props;
+  const { isChecked, isDisabled, value, text, description, icon, ...rest } = props;
 
   return (
-    <Button
-      variant="outline"
-      ref={ref}
-      variantColor={isChecked ? 'blue' : 'gray'}
-      aria-checked={isChecked}
-      role="radio"
-      display="block"
-      textAlign="left"
-      py="8px"
-      height="auto"
-      isDisabled={isDisabled}
-      {...rest}
-    >
-      <Paragraph color={!isChecked ? 'gray.600' : 'auto'} fontSize="0.9rem">{text}</Paragraph>
-      <Paragraph color={!isChecked ? 'gray.500' : 'auto'} fontWeight={400} mt={2} fontSize="0.7rem">{description}</Paragraph>
+    <ButtonRadioContainer>
+      <Button
+        variant="outline"
+        ref={ref}
+        variantColor={isChecked ? 'blue' : 'gray'}
+        aria-checked={isChecked}
+        role="radio"
+        display="block"
+        textAlign="left"
+        py="8px"
+        leftIcon={icon}
+        height="auto"
+        isDisabled={isDisabled}
+        {...rest}
+      >
+        <Div>
+          <Paragraph color={!isChecked ? 'gray.600' : 'auto'} fontSize="0.9rem">{text}</Paragraph>
+          <Paragraph color={!isChecked ? 'gray.500' : 'auto'} fontWeight={400} mt={2} fontSize="0.7rem">{description}</Paragraph>
+        </Div>
     </Button>
+    </ButtonRadioContainer>
   );
 });
 

@@ -2,7 +2,7 @@
 import * as yup from 'yup';
 import { ApolloError } from 'apollo-boost';
 import { Controller, useForm } from 'react-hook-form';
-import { Minus, MinusCircle, Plus, PlusCircle, Type, X } from 'react-feather';
+import { CornerRightDown, CornerRightUp, Key, Mail, Maximize2, Minimize2, Minus, MinusCircle, Plus, PlusCircle, Smartphone, Thermometer, Type, Watch, X } from 'react-feather';
 import { debounce } from 'lodash';
 import { useHistory, useParams } from 'react-router';
 import { useLazyQuery, useMutation, useQuery } from '@apollo/react-hooks';
@@ -10,10 +10,10 @@ import React, { useCallback, useEffect, useState } from 'react';
 import Select from 'react-select';
 import styled, { css } from 'styled-components/macro';
 
-import { Button, ButtonGroup, FormErrorMessage, Stack } from '@chakra-ui/core';
+import { Button, ButtonGroup, FormErrorMessage, RadioButtonGroup, Slider, SliderFilledTrack, SliderThumb, SliderTrack, Stack, useToast } from '@chakra-ui/core';
 import {
-  Container, DeleteButtonContainer, Div, ErrorStyle, Flex, Form, FormContainer, FormControl, FormLabel,
-  FormSection, Grid, H2, H3, H4, Hr, Input, InputGrid, InputHelper, Label, Muted, PageTitle, StyledInput, Textarea,
+  ButtonRadio, Container, DeleteButtonContainer, Div, ErrorStyle, Flex, Form, FormContainer, FormControl,
+  FormLabel, FormSection, Grid, H2, H3, H4, Hr, Input, InputGrid, InputHelper, Label, Muted, PageTitle, StyledInput, Text, Textarea,
 } from '@haas/ui';
 import { motion } from 'framer-motion';
 import { register } from 'serviceWorker';
@@ -27,12 +27,23 @@ import getDialoguesQuery from 'queries/getDialoguesOfCustomer';
 import getQuestionsQuery from 'queries/getQuestionnaireQuery';
 import getRecipientsQuery from 'queries/getUsers';
 
+interface SelectType {
+  label: string;
+  value: string;
+}
+
 interface FormDataProps {
   name: string;
-  dialogue: string;
+  dialogue: {
+    label: string;
+    value: string;
+  };
   type: string;
   medium: string;
-  question: string;
+  question: {
+    label: string;
+    value: string;
+  };
   condition: string;
   matchText: string;
   lowThreshold: number;
@@ -60,26 +71,78 @@ interface TriggerCondition {
   textValue?: string
 }
 
-const TRIGGER_TYPES = [
-  { label: 'Question', value: 'QUESTION' },
-  { label: 'Scheduled', value: 'SCHEDULED' },
-];
+const ConditionFormFragment = (
+  { activeNodeType, onChange, onBlur }: { activeNodeType: string, onChange: any, onBlur: any },
+) => {
+  if (activeNodeType === 'SLIDER') {
+    return (
+      <RadioButtonGroup
+        defaultValue="LOW_THRESHOLD"
+        isInline
+        onChange={onChange}
+        onBlur={onBlur}
+        display="flex"
+        flexWrap="wrap"
+      >
+        <ButtonRadio
+          mb={2}
+          icon={CornerRightUp}
+          value="LOW_THRESHOLD"
+          text="Low threshold"
+          description="Alert under threshold"
+        />
+        <ButtonRadio
+          mb={2}
+          icon={CornerRightDown}
+          value="HIGH_THRESHOLD"
+          text="High threshold"
+          description="Alert over threshold"
+        />
+        <ButtonRadio
+          mb={2}
+          icon={Minimize2}
+          isDisabled
+          value="INNER_RANGE"
+          text="High threshold"
+          description="Alert within range (coming soon)"
+        />
+        <ButtonRadio
+          mb={2}
+          icon={Maximize2}
+          isDisabled
+          value="OUTER_RANGE"
+          text="High threshold"
+          description="Alert out of range (coming soon)"
+        />
+      </RadioButtonGroup>
+    );
+  }
 
-const MEDIUM_TYPES = [
-  { label: 'Email', value: 'EMAIL' },
-  { label: 'Sms', value: 'PHONE' },
-  { label: 'Both', value: 'BOTH' },
-];
+  return (
+    <RadioButtonGroup
+      defaultValue="TEXT_MATCH"
+      isInline
+      onBlur={onBlur}
+      onChange={onChange}
+      display="flex"
+      flexWrap="wrap"
+    >
+      <ButtonRadio icon={Key} value="TEXT_MATCH" text="Match text" description="When text matches" />
+    </RadioButtonGroup>
+  );
+};
 
 const schema = yup.object().shape({
   name: yup.string().required(),
   dialogue: yup.string().required(),
   type: yup.string().required(),
   medium: yup.string().required(),
-  question: yup.string().when(['type'], {
-    is: (type: string) => type === TriggerQuestionType.QUESTION,
-    then: yup.string().required(),
-    otherwise: yup.string().notRequired(),
+  question: yup.object().shape({
+    value: yup.string().when(['type'], {
+      is: (type: string) => type === TriggerQuestionType.QUESTION,
+      then: yup.string().required(),
+      otherwise: yup.string().notRequired(),
+    }),
   }),
   condition: yup.string().required(),
   lowThreshold: yup.string().notRequired().when(['condition'], {
@@ -108,7 +171,10 @@ const AddTriggerView = () => {
   const history = useHistory();
   const form = useForm<FormDataProps>({
     resolver: yupResolver(schema),
+    mode: 'all',
   });
+
+  const toast = useToast();
 
   const { t } = useTranslation();
 
@@ -122,32 +188,56 @@ const AddTriggerView = () => {
     fetchPolicy: 'cache-and-network',
   });
 
-  const [activeType, setActiveType] = useState<null | { label: string, value: string }>(null);
-  const [activeMedium, setActiveMedium] = useState<null | { label: string, value: string }>(null);
-  const [activeDialogue, setActiveDialogue] = useState<null | { label: string, value: string }>(null);
-  const [activeQuestion, setActiveQuestion] = useState<null | { label: string, value: string }>(null);
+  // const [activeType, setActiveType] = useState<null | { label: string, value: string }>(null);
+  // const [activeMedium, setActiveMedium] = useState<null | { label: string, value: string }>(null);
+  // const [activeDialogue, setActiveDialogue] = useState<null | { label: string, value: string }>(null);
+  // const [activeQuestion, setActiveQuestion] = useState<null | { label: string, value: string }>(null);
   const [activeRecipients, setActiveRecipients] = useState<Array<null | { label: string, value: string }>>([]);
-  const [activeConditions, setActiveConditions] = useState<Array<TriggerCondition>>([]);
+  // const [activeConditions, setActiveConditions] = useState<Array<TriggerCondition>>([]);
+
+  const activeDialogue2 = form.watch('dialogue');
 
   useEffect(() => {
-    if (activeDialogue) {
-      fetchQuestions({ variables: { customerSlug, dialogueSlug: activeDialogue.value } });
+    if (activeDialogue2) {
+      fetchQuestions({ variables: { customerSlug, dialogueSlug: form.watch('dialogue').value } });
     }
-  }, [customerSlug, activeDialogue, fetchQuestions]);
+  }, [customerSlug, activeDialogue2, fetchQuestions]);
 
   const [addTrigger, { loading: isLoading, error: serverError }] = useMutation(createTriggerMutation, {
     onCompleted: () => {
-      history.push(`/dashboard/b/${customerSlug}/triggers/`);
+      toast({
+        title: 'Created trigger!',
+        description: 'Trigger has been created and assigned.',
+        status: 'success',
+        position: 'bottom-right',
+        duration: 1500,
+      });
+
+      setTimeout(() => {
+        history.push(`/dashboard/b/${customerSlug}/triggers/`);
+      }, 1000);
     },
 
   });
 
   const onSubmit = (formData: FormDataProps) => {
-    const questionId = activeQuestion?.value;
+    console.log(formData);
+    const questionId = formData.question.value;
     const userIds = activeRecipients.map((recipient) => recipient?.value);
     const recipients = { ids: userIds };
-    const conditions = activeConditions.map((condition) => ({ ...condition, type: condition.type?.value }));
-    const trigger = { name: formData.name, type: activeType?.value, medium: activeMedium?.value, conditions };
+    // const conditions = formactiveConditions.map((condition) => ({ ...condition, type: condition.type?.value }));
+
+    const trigger = {
+      name: formData.name,
+      type: formData?.type,
+      medium: formData?.medium,
+      conditions: [{
+        type: formData.condition,
+        minValue: formData.lowThreshold * 10,
+        maxValue: formData.highThreshold * 10,
+        textValue: formData.matchText,
+      }],
+    };
 
     addTrigger({
       variables: {
@@ -159,109 +249,125 @@ const AddTriggerView = () => {
     });
   };
 
-  const handleDialogueChange = (qOption: any) => {
-    form.setValue('dialogue', qOption?.value);
-    setActiveDialogue(qOption);
-  };
+  // const handleDialogueChange = (qOption: any) => {
+  //   form.setValue('dialogue', qOption?.value);
+  //   setActiveDialogue(qOption);
+  // };
 
-  const handleTypeChange = (qOption: any) => {
-    form.setValue('type', qOption?.value);
-    setActiveType(qOption);
-  };
+  // const handleTypeChange = (qOption: any) => {
+  //   form.setValue('type', qOption?.value);
+  //   setActiveType(qOption);
+  // };
 
-  const handleMediumChange = (qOption: any) => {
-    form.setValue('medium', qOption?.value);
-    setActiveMedium(qOption);
-  };
+  // const handleMediumChange = (qOption: any) => {
+  //   form.setValue('medium', qOption?.value);
+  //   setActiveMedium(qOption);
+  // };
 
-  const handleQuestionChange = (qOption: any) => {
-    form.setValue('question', qOption?.value);
-    setActiveQuestion(qOption);
-  };
+  // const handleQuestionChange = (qOption: any) => {
+  //   form.setValue('question', qOption?.value);
+  //   setActiveQuestion(qOption);
+  // };
 
-  const setRecipients = (qOption: { label: string, value: string }, index: number) => {
-    form.setValue(`recipients[${index}]`, qOption?.value);
-    setActiveRecipients((prevRecipients) => {
-      prevRecipients[index] = qOption;
-      return [...prevRecipients];
-    });
-  };
+  // const setRecipients = (qOption: { label: string, value: string }, index: number) => {
+  //   form.setValue(`recipients[${index}]`, qOption?.value);
+  //   setActiveRecipients((prevRecipients) => {
+  //     prevRecipients[index] = qOption;
+  //     return [...prevRecipients];
+  //   });
+  // };
 
-  const addRecipient = () => {
-    setActiveRecipients((prevRecipients) => [...prevRecipients, null]);
-  };
+  // const addRecipient = () => {
+  //   setActiveRecipients((prevRecipients) => [...prevRecipients, null]);
+  // };
 
-  const deleteRecipient = (index: number) => {
-    setActiveRecipients((prevRecipients) => {
-      prevRecipients.splice(index, 1);
-      return [...prevRecipients];
-    });
-  };
+  // const deleteRecipient = (index: number) => {
+  //   setActiveRecipients((prevRecipients) => {
+  //     prevRecipients.splice(index, 1);
+  //     return [...prevRecipients];
+  //   });
+  // };
 
-  const setConditionsType = (qOption: any, index: number) => {
-    form.setValue('condition', qOption.value);
-    setActiveConditions((prevConditions) => {
-      prevConditions[index].type = qOption;
-      return [...prevConditions];
-    });
-  };
+  // const setConditionsType = (qOption: any, index: number) => {
+  //   form.setValue('condition', qOption.value);
+  //   setActiveConditions((prevConditions) => {
+  //     prevConditions[index].type = qOption;
+  //     return [...prevConditions];
+  //   });
+  // };
 
-  const setMatchText = useCallback(debounce((value: string, index: number) => {
-    setActiveConditions((prevConditions) => {
-      prevConditions[index].textValue = value;
-      return [...prevConditions];
-    });
-  }, 250), []);
+  // const setMatchText = useCallback(debounce((value: string, index: number) => {
+  //   setActiveConditions((prevConditions) => {
+  //     prevConditions[index].textValue = value;
+  //     return [...prevConditions];
+  //   });
+  // }, 250), []);
 
-  const setConditionMinValue = useCallback(debounce((value: string, index: number) => {
-    const numberValue = parseFloat(value) || 0;
-    const dbNumberValue = numberValue * 10;
-    setActiveConditions((prevConditions) => {
-      prevConditions[index].minValue = dbNumberValue;
-      return [...prevConditions];
-    });
-  }, 300), []);
+  // const setConditionMinValue = useCallback(debounce((value: string, index: number) => {
+  //   const numberValue = parseFloat(value) || 0;
+  //   const dbNumberValue = numberValue * 10;
+  //   setActiveConditions((prevConditions) => {
+  //     prevConditions[index].minValue = dbNumberValue;
+  //     return [...prevConditions];
+  //   });
+  // }, 300), []);
 
-  const setConditionMaxValue = useCallback(debounce((value: string, index: number) => {
-    const numberValue = parseFloat(value) || 0;
-    const dbNumberValue = numberValue * 10;
-    setActiveConditions((prevConditions) => {
-      prevConditions[index].maxValue = dbNumberValue;
-      return [...prevConditions];
-    });
-  }, 300), []);
+  // const setConditionMaxValue = useCallback(debounce((value: string, index: number) => {
+  //   const numberValue = parseFloat(value) || 0;
+  //   const dbNumberValue = numberValue * 10;
+  //   setActiveConditions((prevConditions) => {
+  //     prevConditions[index].maxValue = dbNumberValue;
+  //     return [...prevConditions];
+  //   });
+  // }, 300), []);
 
-  const addCondition = () => {
-    setActiveConditions((prevConditions) => [...prevConditions, { type: null }]);
-  };
+  // const addCondition = () => {
+  //   setActiveConditions((prevConditions) => [...prevConditions, { type: null }]);
+  // };
 
-  const deleteCondition = (index: number) => {
-    setActiveConditions((prevConditions) => {
-      prevConditions.splice(index, 1);
-      return [...prevConditions];
-    });
-  };
+  // const deleteCondition = (index: number) => {
+  //   setActiveConditions((prevConditions) => {
+  //     prevConditions.splice(index, 1);
+  //     return [...prevConditions];
+  //   });
+  // };
 
-  const setConditionTypeOptions = (questionId: string | undefined, questions: Array<any>) => {
-    if (!questionId || questions?.length === 0) {
+  // const getConditionOptionsFromQuestion = (question: SelectType, questions: Array<any>) => {
+  //   console.log(question?.value);
+  //   console.log(questions);
+
+  //   if (!question?.value || questions?.length === 0) {
+  //     return [];
+  //   }
+
+  //   const activeQuestionNode = questions?.find((q) => q.id === question?.value);
+
+  //   if (!activeQuestionNode) {
+  //     return [];
+  //   }
+  //   if (activeQuestionNode.type === 'SLIDER') {
+  //     return [
+  //       { label: 'Low Threshold', value: TriggerConditionType.LOW_THRESHOLD },
+  //       { label: 'High Threshold', value: TriggerConditionType.HIGH_THRESHOLD },
+  //       { label: 'Outer Range', value: TriggerConditionType.OUTER_RANGE },
+  //       { label: 'Inner Range', value: TriggerConditionType.INNER_RANGE },
+  //     ];
+  //   }
+  //   return [
+  //     { label: 'Text Match', value: TriggerConditionType.TEXT_MATCH },
+  //   ];
+  // };
+
+  const getNodeType = (question: SelectType, questions: Array<any>) => {
+    if (!question?.value || questions?.length === 0) {
       return [];
     }
 
-    const activeQuestionNode = questions.find((question) => question.id === questionId);
-    if (!activeQuestionNode) {
-      return [];
-    }
-    if (activeQuestionNode.type === 'SLIDER') {
-      return [
-        { label: 'Low Threshold', value: TriggerConditionType.LOW_THRESHOLD },
-        { label: 'High Threshold', value: TriggerConditionType.HIGH_THRESHOLD },
-        { label: 'Outer Range', value: TriggerConditionType.OUTER_RANGE },
-        { label: 'Inner Range', value: TriggerConditionType.INNER_RANGE },
-      ];
-    }
-    return [
-      { label: 'Text Match', value: TriggerConditionType.TEXT_MATCH },
-    ];
+    const activeQuestionNode = questions?.find((q) => q.id === question?.value);
+
+    if (!activeQuestionNode) return null;
+
+    return activeQuestionNode.type;
   };
 
   const dialogues = dialogueData?.customer?.dialogues && dialogueData?.customer?.dialogues.map((dialogue: any) => (
@@ -275,6 +381,8 @@ const AddTriggerView = () => {
 
   const questions = questionsData?.customer?.dialogue?.questions && questionsData?.customer?.dialogue?.questions.map((question: any) => (
     { label: question?.title, value: question?.id }));
+
+  console.log(form.watch('question'));
 
   return (
     <>
@@ -307,24 +415,21 @@ const AddTriggerView = () => {
                     <FormErrorMessage>{form.errors.name?.message}</FormErrorMessage>
                   </FormControl>
 
-                  <FormControl isInvalid={!!form.errors.dialogue?.message}>
+                  <FormControl isInvalid={!!form.errors.dialogue?.value?.message}>
                     <FormLabel htmlFor="dialogue">{t('trigger:dialogue')}</FormLabel>
                     <InputHelper>{t('trigger:dialogue_helper')}</InputHelper>
                     <Controller
                       name="dialogue"
                       control={form.control}
-                      render={({ onChange }) => (
+                      render={({ onChange, value }) => (
                         <Select
                           options={dialogues}
-                          value={activeDialogue}
-                          onChange={(data: any) => {
-                            handleDialogueChange(data);
-                            onChange(data);
-                          }}
+                          value={value}
+                          onChange={onChange}
                         />
                       )}
                     />
-                    <FormErrorMessage>{form.errors.dialogue?.message}</FormErrorMessage>
+                    <FormErrorMessage>{form.errors.dialogue?.label?.message}</FormErrorMessage>
                   </FormControl>
 
                   <FormControl isInvalid={!!form.errors.type?.message}>
@@ -332,24 +437,41 @@ const AddTriggerView = () => {
                     <InputHelper>{t('trigger:type_helper')}</InputHelper>
 
                     <Controller
-                      name="type"
                       control={form.control}
-                      render={({ onChange }) => (
-                        <Select
-                          options={TRIGGER_TYPES}
-                          value={activeType}
-                          onChange={(data: any) => {
-                            handleTypeChange(data);
-                            onChange(data);
-                          }}
-                        />
+                      name="type"
+                      defaultValue="QUESTION"
+                      render={({ onChange, value }) => (
+                        <>
+                          <RadioButtonGroup
+                            defaultValue={value}
+                            isInline
+                            onChange={(data) => {
+                              onChange(data);
+                            }}
+                            display="flex"
+                          >
+                            <ButtonRadio
+                              icon={Thermometer}
+                              value="QUESTION"
+                              text="Question"
+                              description="Send alerts when a certain value has been reached"
+                            />
+                            <ButtonRadio
+                              isDisabled
+                              icon={Watch}
+                              value="SCHEDULED"
+                              text="Scheduled"
+                              description="Send alerts at certain times (coming soon)"
+                            />
+                          </RadioButtonGroup>
+                        </>
                       )}
                     />
 
-                    <FormErrorMessage>{form.errors.dialogue?.message}</FormErrorMessage>
+                    <FormErrorMessage>{form.errors.dialogue?.label?.message}</FormErrorMessage>
                   </FormControl>
 
-                  {activeType?.value === TriggerQuestionType.QUESTION && activeDialogue && (
+                  {form.watch('type') === TriggerQuestionType.QUESTION && form.watch('dialogue') && (
                     <FormControl isRequired isInvalid={!!form.errors.question}>
                       <FormLabel htmlFor="question">{t('trigger:question')}</FormLabel>
                       <InputHelper>
@@ -361,19 +483,133 @@ const AddTriggerView = () => {
                         render={({ onChange }) => (
                           <Select
                             options={questions}
-                            value={activeQuestion}
                             onChange={(data: any) => {
-                              handleQuestionChange(data);
                               onChange(data);
                             }}
                           />
                         )}
                       />
 
-                      <FormErrorMessage>{form.errors.question?.message}</FormErrorMessage>
+                      <FormErrorMessage>{form.errors.question?.value?.message}</FormErrorMessage>
                     </FormControl>
                   )}
                 </InputGrid>
+              </Div>
+            </FormSection>
+
+            <Hr />
+
+            <FormSection id="conditions">
+              <Div>
+                <H3 color="default.text" fontWeight={500} pb={2}>{t('trigger:conditions')}</H3>
+                <Muted color="gray.600">{t('trigger:conditions_helper')}</Muted>
+              </Div>
+              <Div>
+                <InputGrid>
+                  {form.watch('question') ? (
+                    <FormControl isRequired isInvalid={!!form.errors.condition}>
+                      <FormLabel htmlFor="condition">{t('trigger:condition')}</FormLabel>
+                      <InputHelper>
+                        {t('trigger:condition_helper')}
+                      </InputHelper>
+                      <Controller
+                        name="condition"
+                        control={form.control}
+                        render={({ onChange, onBlur }) => (
+                          <ConditionFormFragment
+                            activeNodeType={getNodeType(
+                              form.watch('question'), questionsData?.customer?.dialogue?.questions,
+                            )}
+                            onChange={onChange}
+                            onBlur={onBlur}
+                          />
+                        )}
+                      />
+
+                      <FormErrorMessage>{form.errors.condition?.message}</FormErrorMessage>
+                    </FormControl>
+                  ) : (
+                    <Text>Please select a type and/or dialogue</Text>
+                  )}
+
+                  {form.watch('condition') && form.watch('condition') === TriggerConditionType.TEXT_MATCH && (
+                    <FormControl isInvalid={!!form.errors.matchText}>
+                      <FormLabel htmlFor="matchText">{t('trigger:match_text')}</FormLabel>
+                      <InputHelper>
+                        {t('trigger:match_text_helper')}
+                      </InputHelper>
+                      <Input
+                        placeholder="Satisfied"
+                        leftEl={<Type />}
+                        name="matchText"
+                        ref={form.register({ required: true })}
+                      />
+
+                    </FormControl>
+                  )}
+
+                  {form.watch('condition') && form.watch('condition') === TriggerConditionType.LOW_THRESHOLD && (
+                    <FormControl isInvalid={!!form.errors.lowThreshold}>
+                      <FormLabel htmlFor="lowThreshold">{t('trigger:low_threshold')}</FormLabel>
+                      <InputHelper>
+                        {t('trigger:low_threshold_helper')}
+                      </InputHelper>
+                      <Controller
+                        name="lowThreshold"
+                        control={form.control}
+                        render={({ onChange, onBlur }) => (
+                          <Slider
+                            color="cyan"
+                            defaultValue={5}
+                            onChange={onChange}
+                            onBlur={onBlur}
+                            ref={form.register({ required: true })}
+                          >
+                            <SliderTrack />
+                            <SliderFilledTrack />
+                            <SliderThumb />
+                          </Slider>
+                        )}
+                      />
+                      <Text>
+                        {form.watch('lowThreshold')}
+                      </Text>
+
+                    </FormControl>
+                  )}
+
+                  {form.watch('condition') && form.watch('condition') === TriggerConditionType.HIGH_THRESHOLD && (
+                    <FormControl isInvalid={!!form.errors.highThreshold}>
+                      <FormLabel htmlFor="highThreshold">{t('trigger:high_threshold')}</FormLabel>
+                      <InputHelper>
+                        {t('trigger:high_threshold_helper')}
+                      </InputHelper>
+                      <Controller
+                        name="highThreshold"
+                        control={form.control}
+                        render={({ onChange, onBlur }) => (
+                          <Slider
+                            color="red"
+                            defaultValue={5}
+                            onChange={onChange}
+                            onBlur={onBlur}
+                            ref={form.register({ required: true })}
+                          >
+                            <SliderTrack />
+                            <SliderFilledTrack />
+                            <SliderThumb />
+                          </Slider>
+                        )}
+                      />
+                      <Text>
+                        {form.watch('highThreshold')}
+                      </Text>
+
+                    </FormControl>
+                  )}
+                  <FormControl />
+                </InputGrid>
+
               </Div>
             </FormSection>
 
@@ -386,22 +622,25 @@ const AddTriggerView = () => {
               </Div>
               <Div>
                 <InputGrid>
-                  <FormControl isInvalid={!!form.errors.medium?.message}>
+                  <FormControl isRequired isInvalid={!!form.errors.medium?.message}>
                     <FormLabel htmlFor="medium">{t('trigger:medium')}</FormLabel>
                     <InputHelper>{t('trigger:medium_helper')}</InputHelper>
 
                     <Controller
-                      name="medium"
                       control={form.control}
+                      name="medium"
+                      defaultValue="EMAIL"
                       render={({ onChange }) => (
-                        <Select
-                          options={MEDIUM_TYPES}
-                          value={activeMedium}
-                          onChange={(data: any) => {
-                            handleMediumChange(data);
-                            onChange(data);
-                          }}
-                        />
+                        <RadioButtonGroup
+                          defaultValue="EMAIL"
+                          isInline
+                          onChange={onChange}
+                          display="flex"
+                        >
+                          <ButtonRadio icon={Mail} value="EMAIL" text="Email" description="Send alerts to email" />
+                          <ButtonRadio icon={Smartphone} value="PHONE" text="Sms" description="Send alerts via sms" />
+                          <ButtonRadio value="BOTH" text="Both" description="Send via both mail and sms" />
+                        </RadioButtonGroup>
                       )}
                     />
 
