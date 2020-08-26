@@ -1,23 +1,47 @@
-# Migration `20200824082245-reinit`
+# Migration `20200826203246-start-from-zero`
 
-This migration has been generated at 8/24/2020, 8:22:45 AM.
+This migration has been generated at 8/26/2020, 8:32:46 PM.
 You can check out the [state of the schema](./schema.prisma) after the migration.
 
 ## Database Steps
 
 ```sql
-ALTER TABLE "public"."Tag" ALTER COLUMN "type" SET DEFAULT E'DEFAULT';
+DROP INDEX "public"."User.customerId_email"
 
-ALTER TABLE "public"."Trigger" ALTER COLUMN "type" SET DEFAULT E'QUESTION';
+ALTER TABLE "public"."User" DROP CONSTRAINT "User_customerId_fkey"
 
-ALTER TABLE "public"."TriggerCondition" ALTER COLUMN "type" SET DEFAULT E'LOW_THRESHOLD';
+ALTER TABLE "public"."User" DROP CONSTRAINT "User_roleId_fkey"
+
+CREATE TABLE "public"."UserOfCustomer" (
+"userId" text  NOT NULL ,
+"customerId" text  NOT NULL ,
+"roleId" text  NOT NULL ,
+"createdAt" timestamp(3)  NOT NULL DEFAULT CURRENT_TIMESTAMP,
+PRIMARY KEY ("userId","customerId"))
+
+ALTER TABLE "public"."QuestionNode" ALTER COLUMN "updatedAt" SET NOT NULL;
+
+ALTER TABLE "public"."User" DROP COLUMN "customerId",
+DROP COLUMN "roleId",
+ADD COLUMN "password" text   ,
+ADD COLUMN "isSuperAdmin" boolean  NOT NULL DEFAULT false;
+
+CREATE UNIQUE INDEX "Dialogue.slug_customerId" ON "public"."Dialogue"("slug","customerId")
+
+CREATE UNIQUE INDEX "User.email" ON "public"."User"("email")
+
+ALTER TABLE "public"."UserOfCustomer" ADD FOREIGN KEY ("userId")REFERENCES "public"."User"("id") ON DELETE CASCADE ON UPDATE CASCADE
+
+ALTER TABLE "public"."UserOfCustomer" ADD FOREIGN KEY ("customerId")REFERENCES "public"."Customer"("id") ON DELETE CASCADE ON UPDATE CASCADE
+
+ALTER TABLE "public"."UserOfCustomer" ADD FOREIGN KEY ("roleId")REFERENCES "public"."Role"("id") ON DELETE CASCADE ON UPDATE CASCADE
 ```
 
 ## Changes
 
 ```diff
 diff --git schema.prisma schema.prisma
-migration ..20200824082245-reinit
+migration ..20200826203246-start-from-zero
 --- datamodel.dml
 +++ datamodel.dml
 @@ -1,0 +1,350 @@
@@ -305,7 +329,7 @@ migration ..20200824082245-reinit
 +  createdAt  DateTime  @default(now())
 +  updatedAt  DateTime? @updatedAt
 +  email      String    @unique
-+  password   String
++  password   String?
 +  phone      String?
 +  firstName  String?
 +  lastName   String?
