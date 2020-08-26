@@ -266,7 +266,7 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: 
             </Div>
             <Div>
               <InputGrid>
-                <FormControl isRequired isInvalid={!!form.errors.title}>
+                <FormControl gridColumn="1 / -1" isRequired isInvalid={!!form.errors.title}>
                   <FormLabel htmlFor="title">Title</FormLabel>
                   <InputHelper>What is the main text of the CTA?</InputHelper>
                   <Input

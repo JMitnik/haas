@@ -115,7 +115,7 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFo
   const [activeTags, setActiveTags] = useState<Array<null | {label: string, value: string}>>(currentTags);
 
   const onSubmit = (formData: FormDataProps) => {
-    const tagIds = formData.tags.map((tag) => tag?.value);
+    const tagIds = formData.tags?.map((tag) => tag?.value) || [];
     const tagEntries = { entries: tagIds };
 
     editDialogue({

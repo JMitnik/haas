@@ -21,7 +21,7 @@ const NegativePathsModuleList = styled.ol`
       border-bottom: 1px solid ${theme.colors.default.normalAlt};
       padding: 18px 24px;
 
-      &:last-child {
+      &:last-of-type {
         border-bottom: 0;
       }
 
@@ -42,11 +42,7 @@ const NegativePathsModule = ({ negativePaths }: { negativePaths: any }) => (
   <ModuleContainer>
     <Card height="100%" bg="white">
       <CardBody display="flex" flexDirection="column" height="100%">
-        <Text fontSize="1.3rem" color="red.200">
-          <Flex justifyContent="space-between" alignItems="center">
-            <Span>Top negative paths</Span>
-          </Flex>
-        </Text>
+        <Text fontSize="1.3rem" color="red.200">Top negative paths</Text>
         <Flex marginTop="10px" flexGrow={1} flexDirection="column">
           {negativePaths.length > 0 && (
           <NegativePathsModuleList>
