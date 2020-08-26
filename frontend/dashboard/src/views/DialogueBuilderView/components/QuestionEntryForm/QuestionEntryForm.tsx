@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 
 import * as yup from 'yup';
 import { ApolloError } from 'apollo-client';
