@@ -73,6 +73,8 @@ const language = {
       recipients_helper: 'Who will receive these trigger alerts?',
       recipient: 'Recipient',
       recipient_helper: 'Select a registered user to be the receiver',
+      match_text: 'Text to match',
+      match_text_helper: 'What text should be matched to trigger the alert?',
     },
   },
 };

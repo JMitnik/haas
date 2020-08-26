@@ -1,4 +1,4 @@
-import { Div, Flex, H4, H5, Span } from '@haas/ui';
+import { Div, Flex, H4, Span } from '@haas/ui';
 import { differenceInCalendarDays, format, formatDistance } from 'date-fns';
 import { maxBy } from 'lodash';
 import DesktopIcon from 'components/Icons/DesktopIcon';
@@ -71,8 +71,8 @@ export const InteractionUserCell = ({ value }: CellProps) => (
 
 export const InteractionDateCell = ({ value }: { value: any }) => {
   const date = new Date(parseInt(value, 10));
-  const currentDate = new Date();
-  const dateDifference = differenceInCalendarDays(currentDate, date);
+  // const currentDate = new Date();
+  // const dateDifference = differenceInCalendarDays(currentDate, date);
 
   const formattedDate = format(date, 'LLL d');
   const formattedTime = format(date, 'h:mm a');

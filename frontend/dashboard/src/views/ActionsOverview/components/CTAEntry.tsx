@@ -1,4 +1,3 @@
-import { ApolloError } from 'apollo-boost';
 import { Edit3, X } from 'react-feather';
 import { motion } from 'framer-motion';
 import { useMutation } from '@apollo/react-hooks';

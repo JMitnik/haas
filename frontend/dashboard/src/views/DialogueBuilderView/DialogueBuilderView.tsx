@@ -1,12 +1,10 @@
-import { ColumnFlex, Div, H2, Icon, PageTitle } from '@haas/ui';
-
+import { ColumnFlex, Div, Icon, PageTitle } from '@haas/ui';
+import { Zap } from 'react-feather';
+import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 
-import { useTranslation } from 'react-i18next';
 import { DialogueBuilderContainer } from './DialogueBuilderStyles';
 import { QuestionEntryProps } from './DialogueBuilderInterfaces';
-
-import { Zap } from 'react-feather';
 import QuestionSection from './components/QuestionSection';
 
 interface QuestionEntryExtendedProps extends QuestionEntryProps {

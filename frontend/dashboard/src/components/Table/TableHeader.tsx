@@ -1,9 +1,6 @@
-
-import { PlusCircle } from 'react-feather';
 import React from 'react';
-import styled from 'styled-components/macro';
 
-import { Div, Grid } from '@haas/ui';
+import { Grid } from '@haas/ui';
 
 import TableHeaderColumn from './TableHeaderColumn';
 
@@ -35,18 +32,7 @@ interface TableHeaderProps {
   disableSorting?: boolean;
 }
 
-const AddNewUser = styled(Div)`
-  position: absolute;
-  cursor: pointer;
-  top: 17.5px;
-  right: 15px;
-  color: #6d767d;
-
-  :hover {
-    color: #000;
-  }
-`;
-
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const TableHeader = ({ sortProperties, headers, onPaginationChange, onAddEntry, disableSorting }: TableHeaderProps) => {
   const nrHeaders = headers.length;
   const templateColumns = '1fr '.repeat(nrHeaders);

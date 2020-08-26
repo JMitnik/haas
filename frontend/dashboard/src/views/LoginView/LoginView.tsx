@@ -26,13 +26,17 @@ const LoginView = () => {
   });
 
   const handleLogin = async (data: FormData) => {
+    login({
+      email: data.email,
+      password: data.password,
+    });
   };
 
   useEffect(() => {
     if (user) {
       history.push('/dashboard');
     }
-  }, [user]);
+  }, [user, history]);
 
   return (
     <LoginViewContainer>

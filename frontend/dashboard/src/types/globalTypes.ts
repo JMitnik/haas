@@ -102,6 +102,8 @@ export interface CustomerEditOptions {
 
 export interface DialogueFilterInputType {
   searchTerm?: string | null;
+  startDate?: string | null;
+  endDate?: string | null;
 }
 
 export interface EdgeConditionInputType {
@@ -176,8 +178,8 @@ export interface TriggerInputType {
 
 export interface UserInput {
   email: string;
-  password: string;
   firstName?: string | null;
+  password?: string | null;
   roleId?: string | null;
   customerId?: string | null;
   lastName?: string | null;

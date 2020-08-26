@@ -1,5 +1,5 @@
-import { Div, Flex, ViewContainer } from '@haas/ui';
-import styled, { css } from 'styled-components';
+import { Div } from '@haas/ui';
+import styled from 'styled-components';
 
 const FlexRow = styled(Div)`
   display: flex;
@@ -37,9 +37,7 @@ export const OutputContainer = styled(FlexRow)`
 `;
 
 export const InteractionsOverviewContainer = styled(Div)`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-  `}
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
 `;

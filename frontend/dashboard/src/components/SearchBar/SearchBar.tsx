@@ -1,10 +1,9 @@
-import { Search, X } from 'react-feather';
+import { Search } from 'react-feather';
 import React, { useRef, useState } from 'react';
 
 import useDebouncedEffect from 'hooks/useDebouncedEffect';
 
-import { Spinner } from '@chakra-ui/core';
-import { EmptyInputIcon, InputIcon, SearchbarInput, SearchbarInputContainer } from './SearchBarStyles';
+import { InputIcon, SearchbarInput, SearchbarInputContainer } from './SearchBarStyles';
 
 interface SearchBarProps {
   activeSearchTerm: string;
@@ -15,6 +14,8 @@ interface SearchBarProps {
 const SearchBar = ({ activeSearchTerm, onSearchTermChange, isSearching }: SearchBarProps) => {
   const [searchTerm, setSearchTerm] = useState<string>(activeSearchTerm);
   const startedRef = useRef<boolean>();
+
+  console.log('isSearching', isSearching);
 
   useDebouncedEffect(() => {
     if (typeof startedRef.current !== 'undefined') {

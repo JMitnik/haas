@@ -1,5 +1,5 @@
 import * as qs from 'qs';
-import { debounce, maxBy } from 'lodash';
+import { debounce } from 'lodash';
 import { useLazyQuery } from '@apollo/react-hooks';
 import { useLocation, useParams } from 'react-router';
 import Papa from 'papaparse';
@@ -10,17 +10,17 @@ import { Button, Icon } from '@chakra-ui/core';
 import {
   getDialogueSessionConnection as CustomerSessionConnection,
 } from 'queries/__generated__/getDialogueSessionConnection';
-import { Div, Flex, Muted, PageTitle, Span } from '@haas/ui';
+import { Div, PageTitle, Span } from '@haas/ui';
 import { useTranslation } from 'react-i18next';
 import DatePicker from 'components/DatePicker/DatePicker';
 import InteractionsTable from 'components/Table/Table';
 import SearchBar from 'components/SearchBar/SearchBar';
 import getDialogueSessionConnectionQuery from 'queries/getDialogueSessionConnectionQuery';
 
-import { CenterCell, InteractionCTACell, InteractionDateCell,
-  InteractionUserCell, ScoreCell, UserCell, WhenCell } from './TableCell/TableCell';
 import { InputContainer, InputOutputContainer,
   InteractionsOverviewContainer, OutputContainer } from './InteractionOverviewStyles';
+import { InteractionCTACell, InteractionDateCell,
+  InteractionUserCell, ScoreCell } from './TableCell/TableCell';
 import Row from './TableRow/InteractionsTableRow';
 
 interface TableProps {

@@ -1,5 +1,7 @@
 import { ApolloError } from 'apollo-boost';
-import { Div, Flex, PageTitle, Text } from '@haas/ui';
+import { Button } from '@chakra-ui/core';
+import { Div, Flex, PageTitle } from '@haas/ui';
+import { Plus } from 'react-feather';
 import { debounce } from 'lodash';
 import { useHistory, useParams } from 'react-router';
 import { useLazyQuery, useMutation } from '@apollo/react-hooks';
@@ -12,9 +14,6 @@ import Table from 'components/Table/Table';
 import deleteTriggerMutation from 'mutations/deleteTrigger';
 import getTriggerTableQuery from 'queries/getTriggerTable';
 
-import { Button, ButtonGroup } from '@chakra-ui/core';
-import { Plus } from 'react-feather';
-import { InputContainer, InputOutputContainer } from './TriggerOverviewStyles';
 import Row from './TableRow/TriggerOverviewRow';
 
 interface TableProps {

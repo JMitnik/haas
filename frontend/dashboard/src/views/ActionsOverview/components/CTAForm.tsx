@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { ApolloError } from 'apollo-boost';
 import { Button, ButtonGroup, FormErrorMessage, useToast } from '@chakra-ui/core';
 import { Controller, useForm } from 'react-hook-form';
-import { PlusCircle, Trash, Type, X } from 'react-feather';
+import { PlusCircle, Trash, Type } from 'react-feather';
 import { cloneDeep, debounce } from 'lodash';
 import { useMutation } from '@apollo/react-hooks';
 import { useParams } from 'react-router-dom';
@@ -13,7 +13,7 @@ import Select from 'react-select';
 import cuid from 'cuid';
 
 import { Div, ErrorStyle, Flex, Form, FormContainer, FormControl,
-  FormLabel, FormSection, Grid, H3, H4, Hr, Input, InputGrid, InputHelper, Label, Muted } from '@haas/ui';
+  FormLabel, FormSection, Grid, H3, H4, Hr, Input, InputGrid, InputHelper, Muted } from '@haas/ui';
 import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
 import LinkIcon from 'components/Icons/LinkIcon';
 import OpinionIcon from 'components/Icons/OpinionIcon';
@@ -95,9 +95,11 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: 
   const [activeType, setActiveType] = useState<{ label: string, value: string }>(type);
 
   useEffect(() => {
-    // form.setValue('ctaType', type?.value);
-    const mappedLinks = clonedLinks.map((link) => ({ ...link, type: link?.type?.value || '' }));
-    form.setValue('links', mappedLinks);
+    if (clonedLinks) {
+      const mappedLinks = clonedLinks.map((link) => ({ ...link, type: link?.type?.value || '' }));
+      form.setValue('links', mappedLinks);
+    }
+    // eslint-disable-next-line
   }, []);
 
   const handleMultiChange = useCallback((selectedOption: any) => {
@@ -346,7 +348,7 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: 
                                 name={`links[${index}].type`}
                                 control={form.control}
                                 defaultValue={link.type}
-                                render={({ onChange, onBlur, value }) => (
+                                render={({ onChange }) => (
                                   <Select
                                     options={LINK_TYPES}
                                     value={link.type}
@@ -400,7 +402,16 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: 
                             </FormControl>
 
                           </Grid>
-                          <Button mt={4} variant="outline" size="sm" variantColor="red" onClick={() => handleDeleteLink(index)}>Delete link</Button>
+                          <Button
+                            mt={4}
+                            variant="outline"
+                            size="sm"
+                            variantColor="red"
+                            onClick={() => handleDeleteLink(index)}
+                          >
+                            Delete link
+
+                          </Button>
                         </Div>
                       </motion.div>
                     ))}

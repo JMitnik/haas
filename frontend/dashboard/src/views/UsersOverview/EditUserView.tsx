@@ -76,8 +76,10 @@ const EditCustomerForm = ({ user, roles }: { user: any, roles: Array<{ label: st
 
   // TODO: Put dependency of userRole
   useEffect(() => {
-    setValue('role', userRole?.value);
-  }, [setValue]);
+    if (userRole) {
+      setValue('role', userRole?.value);
+    }
+  }, [setValue, userRole]);
 
   const handleRoleChange = (qOption: any) => {
     setValue('role', qOption?.value);

@@ -1,4 +1,5 @@
-import { Div, Flex, Grid, H4, PageHeading, PageTitle } from '@haas/ui';
+import { Button, ButtonGroup } from '@chakra-ui/core';
+import { Div, Flex, Grid, H4, PageTitle } from '@haas/ui';
 import { Grid as GridIcon, List, Plus } from 'react-feather';
 import { Link, useParams } from 'react-router-dom';
 import { useLazyQuery } from '@apollo/react-hooks';
@@ -9,11 +10,10 @@ import Searchbar from 'components/SearchBar';
 import SurveyIcon from 'components/Icons/SurveyIcon';
 import getDialoguesOfCustomer from 'queries/getDialoguesOfCustomer';
 
-import { Button, ButtonGroup, Skeleton } from '@chakra-ui/core';
 import { AddDialogueCard, TranslatedPlus } from './DialogueOverviewStyles';
 import DialogueCard from './DialogueCard';
 
-const DialogueOverview = ({ dialogues, isLoading }: { dialogues: any, isLoading: boolean }) => {
+const DialogueOverview = ({ dialogues }: { dialogues: any, isLoading: boolean }) => {
   const { customerSlug } = useParams();
 
   const [useDialogueGridView, setUseDialogueGridView] = useState(true);

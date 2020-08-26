@@ -12,7 +12,6 @@ import getUsersQuery from 'queries/getUserTable';
 import { Button } from '@chakra-ui/core';
 import { CenterCell, RoleCell, UserCell } from 'components/Table/CellComponents/CellComponents';
 import { ErrorBoundary } from 'react-error-boundary';
-import { InputContainer, InputOutputContainer } from './UsersOverviewStyles';
 import { Plus } from 'react-feather';
 import Row from './TableRow/UsersTableRow';
 import deleteUserQuery from '../../mutations/deleteUser';

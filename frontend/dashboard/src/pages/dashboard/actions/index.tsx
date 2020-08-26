@@ -1,6 +1,6 @@
-import { useLazyQuery, useQuery } from '@apollo/react-hooks';
 import { useParams } from 'react-router-dom';
-import React, { useEffect } from 'react';
+import { useQuery } from '@apollo/react-hooks';
+import React from 'react';
 
 import { Loader } from '@haas/ui';
 import ActionOverview from 'views/ActionsOverview/ActionsOverview';

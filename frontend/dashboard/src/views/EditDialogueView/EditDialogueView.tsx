@@ -1,9 +1,9 @@
 import * as yup from 'yup';
 import { ApolloError, gql } from 'apollo-boost';
 import { Button, ButtonGroup, FormErrorMessage, Stack } from '@chakra-ui/core';
-import { Container, Div, Flex, Form, FormContainer, FormControl, FormLabel,
-  FormSection, H2, H3, Hr, Input, InputGrid, InputHelper, Muted, PageTitle, Textarea } from '@haas/ui';
 import { Controller, useForm } from 'react-hook-form';
+import { Div, Flex, Form, FormContainer, FormControl, FormLabel,
+  FormSection, H3, Hr, Input, InputGrid, InputHelper, Muted, PageTitle, Textarea } from '@haas/ui';
 import { Minus, Plus, Type } from 'react-feather';
 import { motion } from 'framer-motion';
 import { useHistory, useParams } from 'react-router';

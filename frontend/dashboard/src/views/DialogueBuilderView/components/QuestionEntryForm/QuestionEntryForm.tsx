@@ -14,7 +14,7 @@ import Select from 'react-select';
 import {
   DeleteQuestionOptionButtonContainer,
 } from 'views/DialogueBuilderView/components/QuestionEntry/QuestionEntryStyles';
-import { Div, ErrorStyle, Flex, Form, FormContainer, FormControl, FormLabel,
+import { Div, Flex, Form, FormContainer, FormControl, FormLabel,
   FormSection, H3, H4, Hr, Input, InputGrid, InputHelper, Muted } from '@haas/ui';
 import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
 import createQuestionMutation from 'mutations/createQuestion';
@@ -86,7 +86,7 @@ interface QuestionEntryFormProps {
 
 const questionTypes = [
   { value: 'SLIDER', label: 'Slider' },
-  { value: 'CHOICE', label: 'Choice' }
+  { value: 'CHOICE', label: 'Choice' },
 ];
 
 const QuestionEntryForm = ({
@@ -146,12 +146,12 @@ const QuestionEntryForm = ({
   const handleQuestionTypeChange = useCallback((selectOption: any) => {
     form.setValue('questionType', selectOption?.value);
     setActiveQuestionType(selectOption);
-  }, [form.setValue, setActiveQuestionType]);
+  }, [setActiveQuestionType]);
 
   useEffect(() => {
     form.register({ name: 'parentQuestionType' });
     form.setValue('parentQuestionType', parentQuestionType);
-  }, [form.setValue, form.register, parentQuestionType]);
+  }, [parentQuestionType]);
 
   useEffect(() => {
     if (activeQuestionType) {
@@ -162,7 +162,7 @@ const QuestionEntryForm = ({
   const handleConditionTypeChange = useCallback((selectedOption: any) => {
     form.setValue('conditionType', selectedOption?.value);
     setConditionType(selectedOption);
-  }, [form.setValue, setConditionType]);
+  }, [setConditionType]);
 
   useEffect(() => {
     if (activeConditionSelect) {
@@ -173,7 +173,7 @@ const QuestionEntryForm = ({
   const handleLeafChange = useCallback((selectedOption: any) => {
     form.setValue('activeLeaf', selectedOption?.value);
     setActiveLeaf(selectedOption);
-  }, [form.setValue, setActiveLeaf]);
+  }, [setActiveLeaf]);
 
   useEffect(() => {
     if (activeLeaf) {
@@ -195,8 +195,10 @@ const QuestionEntryForm = ({
   };
 
   useEffect(() => {
-    form.setValue('matchText', activematchValue?.value);
-  }, [form.setValue, activematchValue]);
+    if (activematchValue?.value) {
+      form.setValue('matchText', activematchValue?.value);
+    }
+  }, [activematchValue]);
 
   const [createQuestion, { loading: createLoading }] = useMutation(createQuestionMutation, {
     onCompleted: () => {
@@ -440,7 +442,7 @@ const QuestionEntryForm = ({
                     <FormControl isRequired isInvalid={!!form.errors.matchText}>
                       <FormLabel htmlFor="matchText">Match value</FormLabel>
                       <InputHelper>What is the multi-choice question to trigger this question?</InputHelper>
-                      
+
                       <Controller
                         id="question-match-select"
                         name="matchText"

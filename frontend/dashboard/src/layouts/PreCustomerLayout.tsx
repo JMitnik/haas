@@ -1,4 +1,4 @@
-import { Container, Div, Flex, H3 } from '@haas/ui';
+import { Container, Div } from '@haas/ui';
 
 import { LogoContainer } from 'components/Logo/Logo';
 import Logo from 'components/Logo';
