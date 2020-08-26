@@ -2,7 +2,7 @@
 import * as yup from 'yup';
 import { ApolloError } from 'apollo-boost';
 import { Controller, useForm } from 'react-hook-form';
-import { CornerRightDown, CornerRightUp, Key, Mail, Maximize2, Minimize2, Minus, MinusCircle, Plus, PlusCircle, Smartphone, Thermometer, Type, Watch, X } from 'react-feather';
+import { CornerRightDown, CornerRightUp, Key, Mail, Maximize2, Minimize2, Minus, MinusCircle, Plus, PlusCircle, Smartphone, Thermometer, Type, UserPlus, Watch, X } from 'react-feather';
 import { debounce } from 'lodash';
 import { useHistory, useParams } from 'react-router';
 import { useLazyQuery, useMutation, useQuery } from '@apollo/react-hooks';
@@ -48,7 +48,10 @@ interface FormDataProps {
   matchText: string;
   lowThreshold: number;
   highThreshold: number;
-  recipients: Array<string>;
+  recipients: Array<{
+    label: string;
+    value: string;
+  }>;
 }
 
 enum TriggerConditionType {
@@ -77,7 +80,7 @@ const ConditionFormFragment = (
   if (activeNodeType === 'SLIDER') {
     return (
       <RadioButtonGroup
-        defaultValue="LOW_THRESHOLD"
+        defaultValue=""
         isInline
         onChange={onChange}
         onBlur={onBlur}
@@ -120,7 +123,7 @@ const ConditionFormFragment = (
 
   return (
     <RadioButtonGroup
-      defaultValue="TEXT_MATCH"
+      defaultValue=""
       isInline
       onBlur={onBlur}
       onChange={onChange}
@@ -164,7 +167,9 @@ const schema = yup.object().shape({
     then: yup.string().required(),
     otherwise: yup.string().notRequired(),
   }),
-  recipients: yup.array().min(1).of(yup.string().required()),
+  recipients: yup.array().min(1).of(yup.object().shape({
+    value: yup.string().required(),
+  })),
 });
 
 const AddTriggerView = () => {
@@ -223,9 +228,7 @@ const AddTriggerView = () => {
   const onSubmit = (formData: FormDataProps) => {
     console.log(formData);
     const questionId = formData.question.value;
-    const userIds = activeRecipients.map((recipient) => recipient?.value);
-    const recipients = { ids: userIds };
-    // const conditions = formactiveConditions.map((condition) => ({ ...condition, type: condition.type?.value }));
+    const recipients = { ids: formData.recipients?.map((recip) => recip.value).filter((val) => val) };
 
     const trigger = {
       name: formData.name,
@@ -238,6 +241,8 @@ const AddTriggerView = () => {
         textValue: formData.matchText,
       }],
     };
+
+    console.log(recipients);
 
     addTrigger({
       variables: {
@@ -277,16 +282,16 @@ const AddTriggerView = () => {
   //   });
   // };
 
-  // const addRecipient = () => {
-  //   setActiveRecipients((prevRecipients) => [...prevRecipients, null]);
-  // };
+  const addRecipient = () => {
+    setActiveRecipients((prevRecipients) => [...prevRecipients, null]);
+  };
 
-  // const deleteRecipient = (index: number) => {
-  //   setActiveRecipients((prevRecipients) => {
-  //     prevRecipients.splice(index, 1);
-  //     return [...prevRecipients];
-  //   });
-  // };
+  const deleteRecipient = (index: number) => {
+    setActiveRecipients((prevRecipients) => {
+      prevRecipients.splice(index, 1);
+      return [...prevRecipients];
+    });
+  };
 
   // const setConditionsType = (qOption: any, index: number) => {
   //   form.setValue('condition', qOption.value);
@@ -382,8 +387,6 @@ const AddTriggerView = () => {
   const questions = questionsData?.customer?.dialogue?.questions && questionsData?.customer?.dialogue?.questions.map((question: any) => (
     { label: question?.title, value: question?.id }));
 
-  console.log(form.watch('question'));
-
   return (
     <>
       <PageTitle>{t('views:create_trigger_view')}</PageTitle>
@@ -415,11 +418,12 @@ const AddTriggerView = () => {
                     <FormErrorMessage>{form.errors.name?.message}</FormErrorMessage>
                   </FormControl>
 
-                  <FormControl isInvalid={!!form.errors.dialogue?.value?.message}>
+                  <FormControl isRequired isInvalid={!!form.errors.dialogue?.value?.message}>
                     <FormLabel htmlFor="dialogue">{t('trigger:dialogue')}</FormLabel>
                     <InputHelper>{t('trigger:dialogue_helper')}</InputHelper>
                     <Controller
                       name="dialogue"
+                      defaultValue=""
                       control={form.control}
                       render={({ onChange, value }) => (
                         <Select
@@ -514,6 +518,7 @@ const AddTriggerView = () => {
                       </InputHelper>
                       <Controller
                         name="condition"
+                        defaultValue=""
                         control={form.control}
                         render={({ onChange, onBlur }) => (
                           <ConditionFormFragment
@@ -557,10 +562,10 @@ const AddTriggerView = () => {
                       <Controller
                         name="lowThreshold"
                         control={form.control}
+                        defaultValue={5}
                         render={({ onChange, onBlur }) => (
                           <Slider
                             color="cyan"
-                            defaultValue={5}
                             onChange={onChange}
                             onBlur={onBlur}
                             ref={form.register({ required: true })}
@@ -587,6 +592,7 @@ const AddTriggerView = () => {
                       <Controller
                         name="highThreshold"
                         control={form.control}
+                        defaultValue={70}
                         render={({ onChange, onBlur }) => (
                           <Slider
                             color="red"
@@ -615,12 +621,60 @@ const AddTriggerView = () => {
 
             <Hr />
 
+            <FormSection id="recipients">
+              <Div>
+                <H3 color="default.text" fontWeight={500} pb={2}>{t('trigger:recipients')}</H3>
+                <Muted color="gray.600">{t('trigger:recipients_helper')}</Muted>
+              </Div>
+              <Div>
+                <Button onClick={addRecipient} variantColor="teal" leftIcon={UserPlus}>Add user</Button>
+                {activeRecipients.map((recipient, index) => (
+                  <Div
+                    padding={4}
+                    bg="gray.100"
+                    key={index}
+                    mt={2}
+                  >
+                    <InputGrid>
+                      <FormControl isInvalid={!!form.errors.medium?.message}>
+                        <FormLabel htmlFor="medium">{t('trigger:recipient')}</FormLabel>
+                        <InputHelper>{t('trigger:recipient_helper')}</InputHelper>
+
+                        <Controller
+                          control={form.control}
+                          name={`recipients[${index}]`}
+                          defaultValue="EMAIL"
+                          options={recipients}
+                          as={Select}
+                        />
+
+                        <FormErrorMessage>{form.errors.medium?.message}</FormErrorMessage>
+                      </FormControl>
+                    </InputGrid>
+                    <Button
+                      onClick={() => deleteRecipient(index)}
+                      variantColor="red"
+                      variant="outline"
+                      size="sm"
+                    >
+                      Delete
+
+                    </Button>
+                  </Div>
+
+                ))}
+              </Div>
+            </FormSection>
+
+            <Hr />
+
             <FormSection id="delivery">
               <Div>
                 <H3 color="default.text" fontWeight={500} pb={2}>{t('trigger:delivery')}</H3>
                 <Muted color="gray.600">{t('trigger:delivery_helper')}</Muted>
               </Div>
               <Div>
+
                 <InputGrid>
                   <FormControl isRequired isInvalid={!!form.errors.medium?.message}>
                     <FormLabel htmlFor="medium">{t('trigger:medium')}</FormLabel>
@@ -630,9 +684,9 @@ const AddTriggerView = () => {
                       control={form.control}
                       name="medium"
                       defaultValue="EMAIL"
-                      render={({ onChange }) => (
+                      render={({ onChange, value }) => (
                         <RadioButtonGroup
-                          defaultValue="EMAIL"
+                          defaultValue={value}
                           isInline
                           onChange={onChange}
                           display="flex"
@@ -647,7 +701,6 @@ const AddTriggerView = () => {
                     <FormErrorMessage>{form.errors.medium?.message}</FormErrorMessage>
                   </FormControl>
                 </InputGrid>
-
               </Div>
             </FormSection>
 

@@ -178,7 +178,7 @@ export interface NexusGenInputs {
     email: string; // String!
     firstName?: string | null; // String
     lastName?: string | null; // String
-    password: string; // String!
+    password?: string | null; // String
     phone?: string | null; // String
     roleId?: string | null; // String
   }

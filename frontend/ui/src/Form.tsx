@@ -535,7 +535,7 @@ export const BooleanRadioInput = ({ onChange, children, value }: any) => {
 };
 
 export const InputGrid = forwardRef((props: InputGridProps, ref: Ref<HTMLDivElement>) => (
-  <Grid mb={4} gridTemplateColumns={['1fr', '1fr', '1fr 1fr']} {...props}>
+  <Grid mb={4} gridTemplateColumns={['1fr', '1fr', '1fr']} {...props}>
     {props.children}
   </Grid>
 ));

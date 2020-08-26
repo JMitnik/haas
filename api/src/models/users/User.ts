@@ -1,9 +1,9 @@
 import { extendType, inputObjectType, objectType } from '@nexus/schema';
 
+import { UserInputError } from 'apollo-server-express';
 import { PaginationWhereInput } from '../general/Pagination';
 import { RoleType } from '../role/Role';
 import UserService from './UserService';
-import { UserInputError } from 'apollo-server-express';
 
 export const UserType = objectType({
   name: 'UserType',
@@ -18,12 +18,23 @@ export const UserType = objectType({
     t.field('role', {
       type: RoleType,
       nullable: true,
-      async resolve(parent, args, ctx) {
-        const role = await ctx.prisma.role.findOne({ where: { id: parent.roleId || undefined } });
 
-        if (!role) return null;
+      async resolve(parent, args, ctx, info) {
+        const userWithRole = await ctx.prisma.user.findOne({
+          where: { id: parent.id || undefined },
+          include: {
+            customers: {
+              include: {
+                role: true,
+                customer: true,
+              },
+            },
+          },
+        });
 
-        return role;
+        const userCustomer = userWithRole?.customers.find((cus) => cus.customer.slug === info.variableValues.customerSlug);
+
+        return userCustomer?.role;
       },
     });
   },
@@ -43,8 +54,8 @@ export const UserInput = inputObjectType({
   name: 'UserInput',
   definition(t) {
     t.string('email', { required: true });
-    t.string('password', { required: true });
     t.string('firstName', { nullable: true });
+    t.string('password');
     t.string('roleId');
     t.string('customerId', { nullable: true });
     t.string('lastName', { nullable: true });
@@ -128,13 +139,13 @@ export const UserMutations = extendType({
         const { firstName, lastName, email, password, phone, roleId } = args.input;
 
         if (!email) throw new UserInputError('No valid email provided');
-        if (!password) throw new UserInputError('No password provided');
+        // if (!password) throw new UserInputError('No password provided');
 
         return ctx.prisma.user.create({
           data: {
             email,
             firstName,
-            password,
+            password: (password || ''),
             lastName,
             phone,
             customers: {

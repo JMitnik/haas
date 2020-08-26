@@ -564,7 +564,7 @@ input UserInput {
   email: String!
   firstName: String
   lastName: String
-  password: String!
+  password: String
   phone: String
   roleId: String
 }

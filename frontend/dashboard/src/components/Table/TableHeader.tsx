@@ -73,13 +73,6 @@ const TableHeader = ({ sortProperties, headers, onPaginationChange, onAddEntry, 
           key={index}
         />
       ))}
-
-      {onAddEntry && (
-        <AddNewUser onClick={onAddEntry}>
-          <PlusCircle />
-        </AddNewUser>
-      )}
-
     </Grid>
   );
 };
