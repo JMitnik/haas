@@ -31,6 +31,7 @@ const language = {
       cta_view: 'Call to actions',
       builder_view: 'Dialogue Builder',
       interactions_view: 'Interactions',
+      trigger_overview: 'Triggers',
     },
     dialogue: {
       slug_helper: 'Under which url segment will visitors find the dialogue?',
