@@ -1,21 +1,28 @@
 /* eslint-disable radix */
 import * as yup from 'yup';
 import { ApolloError } from 'apollo-boost';
-import { MinusCircle, PlusCircle, X } from 'react-feather';
+import { Controller, useForm } from 'react-hook-form';
+import { Minus, MinusCircle, Plus, PlusCircle, Type, X } from 'react-feather';
 import { debounce } from 'lodash';
-import { useForm } from 'react-hook-form';
 import { useHistory, useParams } from 'react-router';
 import { useLazyQuery, useMutation, useQuery } from '@apollo/react-hooks';
 import React, { useCallback, useEffect, useState } from 'react';
 import Select from 'react-select';
 import styled, { css } from 'styled-components/macro';
 
+import { Button, ButtonGroup, FormErrorMessage, Stack } from '@chakra-ui/core';
 import {
-  Button, Container, DeleteButtonContainer, Div, ErrorStyle, Flex, Grid, H2, H3,
-  H4, Hr, Label, Muted, StyledInput,
+  Container, DeleteButtonContainer, Div, ErrorStyle, Flex, Form, FormContainer, FormControl, FormLabel,
+  FormSection, Grid, H2, H3, H4, Hr, Input, InputGrid, InputHelper, Label, Muted, PageTitle, StyledInput, Textarea,
 } from '@haas/ui';
+import { motion } from 'framer-motion';
+import { register } from 'serviceWorker';
+import { setTags } from '@sentry/react';
+import { useTranslation } from 'react-i18next';
 import { yupResolver } from '@hookform/resolvers';
+import ServerError from 'components/ServerError';
 import createTriggerMutation from 'mutations/createTrigger';
+import errors from 'config/errors';
 import getDialoguesQuery from 'queries/getDialoguesOfCustomer';
 import getQuestionsQuery from 'queries/getQuestionnaireQuery';
 import getRecipientsQuery from 'queries/getUsers';
@@ -60,7 +67,7 @@ const TRIGGER_TYPES = [
 
 const MEDIUM_TYPES = [
   { label: 'Email', value: 'EMAIL' },
-  { label: 'Phone', value: 'PHONE' },
+  { label: 'Sms', value: 'PHONE' },
   { label: 'Both', value: 'BOTH' },
 ];
 
@@ -99,9 +106,11 @@ const schema = yup.object().shape({
 
 const AddTriggerView = () => {
   const history = useHistory();
-  const { register, handleSubmit, errors, setValue } = useForm<FormDataProps>({
+  const form = useForm<FormDataProps>({
     resolver: yupResolver(schema),
   });
+
+  const { t } = useTranslation();
 
   const { customerSlug } = useParams();
 
@@ -126,13 +135,11 @@ const AddTriggerView = () => {
     }
   }, [customerSlug, activeDialogue, fetchQuestions]);
 
-  const [addTrigger, { loading }] = useMutation(createTriggerMutation, {
+  const [addTrigger, { loading: isLoading, error: serverError }] = useMutation(createTriggerMutation, {
     onCompleted: () => {
       history.push(`/dashboard/b/${customerSlug}/triggers/`);
     },
-    onError: (serverError: ApolloError) => {
-      console.log(serverError);
-    },
+
   });
 
   const onSubmit = (formData: FormDataProps) => {
@@ -153,27 +160,27 @@ const AddTriggerView = () => {
   };
 
   const handleDialogueChange = (qOption: any) => {
-    setValue('dialogue', qOption?.value);
+    form.setValue('dialogue', qOption?.value);
     setActiveDialogue(qOption);
   };
 
   const handleTypeChange = (qOption: any) => {
-    setValue('type', qOption?.value);
+    form.setValue('type', qOption?.value);
     setActiveType(qOption);
   };
 
   const handleMediumChange = (qOption: any) => {
-    setValue('medium', qOption?.value);
+    form.setValue('medium', qOption?.value);
     setActiveMedium(qOption);
   };
 
   const handleQuestionChange = (qOption: any) => {
-    setValue('question', qOption?.value);
+    form.setValue('question', qOption?.value);
     setActiveQuestion(qOption);
   };
 
   const setRecipients = (qOption: { label: string, value: string }, index: number) => {
-    setValue(`recipients[${index}]`, qOption?.value);
+    form.setValue(`recipients[${index}]`, qOption?.value);
     setActiveRecipients((prevRecipients) => {
       prevRecipients[index] = qOption;
       return [...prevRecipients];
@@ -192,7 +199,7 @@ const AddTriggerView = () => {
   };
 
   const setConditionsType = (qOption: any, index: number) => {
-    setValue('condition', qOption.value);
+    form.setValue('condition', qOption.value);
     setActiveConditions((prevConditions) => {
       prevConditions[index].type = qOption;
       return [...prevConditions];
@@ -259,271 +266,169 @@ const AddTriggerView = () => {
 
   const dialogues = dialogueData?.customer?.dialogues && dialogueData?.customer?.dialogues.map((dialogue: any) => (
     { label: dialogue?.title, value: dialogue?.slug }));
+
   const recipients = recipientsData?.users && recipientsData?.users.map((recipient: any) => (
     {
       label: `${recipient?.lastName}, ${recipient?.firstName} - E: ${recipient?.email} - P: ${recipient?.phone}`,
       value: recipient?.id,
     }));
+
   const questions = questionsData?.customer?.dialogue?.questions && questionsData?.customer?.dialogue?.questions.map((question: any) => (
     { label: question?.title, value: question?.id }));
 
   return (
-    <Container>
-      <Div>
-        <H2 color="default.darkest" fontWeight={500} py={2}> Trigger </H2>
-        <Muted pb={4}>Create a new trigger</Muted>
-      </Div>
+    <>
+      <PageTitle>{t('views:create_trigger_view')}</PageTitle>
 
-      <Hr />
+      <motion.div initial={{ opacity: 0, y: 100 }} animate={{ opacity: 1, y: 0 }}>
 
-      <Form onSubmit={handleSubmit(onSubmit)}>
-        <FormGroupContainer>
-          <Grid gridTemplateColumns={['1fr', '1fr 2fr']} gridColumnGap={4}>
-            <Div py={4} pr={4}>
-              <H3 color="default.text" fontWeight={500} pb={2}>General trigger information</H3>
-              <Muted>
-                General information about the trigger, such as name, type, medium, etc.
-              </Muted>
-            </Div>
-            <Div py={4}>
-              <Grid gridTemplateColumns={['1fr', '1fr 1fr']}>
-                <Flex flexDirection="column">
-                  <Label>Trigger name</Label>
-                  <StyledInput isInvalid={!!errors.name} name="name" ref={register({ required: true })} />
-                  {errors.name && <Muted color="warning">Something went wrong!</Muted>}
-                </Flex>
-                <Div useFlex flexDirection="column">
-                  <Label>Dialogue</Label>
-                  <Select
-                    styles={errors.dialogue && !activeDialogue ? ErrorStyle : undefined}
-                    ref={() => register({
-                      name: 'dialogue',
-                      required: true,
-                    })}
-                    options={dialogues}
-                    value={activeDialogue}
-                    onChange={(qOption: any) => {
-                      handleDialogueChange(qOption);
-                    }}
-                  />
-                  {errors.dialogue && !activeDialogue && <Muted color="warning">{errors.dialogue.message}</Muted>}
-                </Div>
-                <Div useFlex flexDirection="column">
-                  <Label>Type</Label>
-                  <Select
-                    styles={errors.type && !activeType ? ErrorStyle : undefined}
-                    ref={() => register({
-                      name: 'type',
-                      required: true,
-                    })}
-                    options={TRIGGER_TYPES}
-                    value={activeType}
-                    onChange={(qOption: any) => {
-                      handleTypeChange(qOption);
-                    }}
-                  />
-                  {errors.type && !activeType && <Muted color="warning">{errors.type.message}</Muted>}
-                </Div>
-                <Div useFlex flexDirection="column">
-                  <Label>Medium</Label>
-                  <Select
-                    styles={errors.medium && !activeMedium ? ErrorStyle : undefined}
-                    ref={() => register({
-                      name: 'medium',
-                      required: true,
-                    })}
-                    options={MEDIUM_TYPES}
-                    value={activeMedium}
-                    onChange={(qOption: any) => {
-                      handleMediumChange(qOption);
-                    }}
-                  />
-                  {errors.medium && !activeMedium && <Muted color="warning">{errors.medium.message}</Muted>}
-                </Div>
-                {activeType?.value === TriggerQuestionType.QUESTION && (
-                  <Div useFlex flexDirection="column" gridColumn="1 / -1">
-                    <Label>Question</Label>
-                    <Select
-                      styles={errors.question && !activeQuestion ? ErrorStyle : undefined}
-                      ref={() => register({
-                        name: 'question',
-                        required: false,
-                      })}
-                      options={questions}
-                      value={activeQuestion}
-                      onChange={(qOption: any) => {
-                        handleQuestionChange(qOption);
-                      }}
+        <FormContainer>
+          <Form onSubmit={form.handleSubmit(onSubmit)}>
+            <ServerError serverError={serverError} />
+
+            <FormSection id="general">
+              <Div>
+                <H3 color="default.text" fontWeight={500} pb={2}>About the trigger</H3>
+                <Muted color="gray.600">
+                  Tell us about the trigger, and to which scope it applies (question/dialogue)
+                </Muted>
+              </Div>
+              <Div>
+                <InputGrid>
+                  <FormControl isRequired isInvalid={!!form.errors.name}>
+                    <FormLabel htmlFor="name">{t('name')}</FormLabel>
+                    <InputHelper>{t('trigger:name_helper')}</InputHelper>
+                    <Input
+                      placeholder="My first trigger"
+                      leftEl={<Type />}
+                      name="name"
+                      ref={form.register({ required: true })}
                     />
-                    {errors.question && !activeQuestion && <Muted color="warning">{errors.question.message}</Muted>}
-                  </Div>
-                )}
-                <Div gridColumn="1 / -1">
-                  <Flex flexDirection="row" alignItems="center" justifyContent="space-between">
-                    <H4>Conditions</H4>
-                    <PlusCircle onClick={addCondition} />
-                  </Flex>
-                  <Hr />
-                  <Div padding={10} marginTop={15}>
-                    {activeConditions.map((condition, index) => (
-                      <Flex
-                        position="relative"
-                        marginBottom={5}
-                        paddingBottom={10}
-                        paddingTop={30}
-                        backgroundColor="#fdfbfe"
-                        flexDirection="column"
-                        key={index}
-                        gridColumn="1 / -1"
-                      >
-                        <DeleteButtonContainer style={{ top: '5px' }} onClick={() => deleteCondition(index)}>
-                          <X />
-                        </DeleteButtonContainer>
+                    <FormErrorMessage>{form.errors.name?.message}</FormErrorMessage>
+                  </FormControl>
+
+                  <FormControl isInvalid={!!form.errors.dialogue?.message}>
+                    <FormLabel htmlFor="dialogue">{t('trigger:dialogue')}</FormLabel>
+                    <InputHelper>{t('trigger:dialogue_helper')}</InputHelper>
+                    <Controller
+                      name="dialogue"
+                      control={form.control}
+                      render={({ onChange }) => (
                         <Select
-                          styles={errors.condition && !activeConditions?.[0].type ? ErrorStyle : undefined}
-                          ref={() => register({
-                            name: 'condition',
-                            required: false,
-                          })}
-                          options={setConditionTypeOptions(activeQuestion?.value, questionsData?.customer?.dialogue?.questions)}
-                          value={condition.type}
-                          onChange={(qOption: any) => setConditionsType(qOption, index)}
+                          options={dialogues}
+                          value={activeDialogue}
+                          onChange={(data: any) => {
+                            handleDialogueChange(data);
+                            onChange(data);
+                          }}
                         />
-                        {errors.condition && !activeConditions?.[0].type && <Muted color="warning">{errors.condition.message}</Muted>}
-                        {condition?.type?.value === TriggerConditionType.TEXT_MATCH && (
-                        <Flex marginTop={5} flexDirection="column">
-                          <Label>Match Text</Label>
-                          <StyledInput
-                            isInvalid={!!errors.matchText}
-                            onChange={(event) => setMatchText(event.currentTarget.value, index)}
-                            name="matchText"
-                            ref={register({ required: true })}
-                          />
-                          {errors.matchText && <Muted color="warning">{errors.matchText.message}</Muted>}
-                        </Flex>
-                        )}
+                      )}
+                    />
+                    <FormErrorMessage>{form.errors.dialogue?.message}</FormErrorMessage>
+                  </FormControl>
 
-                        {condition?.type?.value === TriggerConditionType.LOW_THRESHOLD && (
-                          <Flex marginTop={5} flexDirection="column">
-                            <Label>Low Threshold (0 - 10)</Label>
-                            <StyledInput
-                              isInvalid={!!errors.lowThreshold}
-                              type="number"
-                              step="0.1"
-                              onChange={(event) => setConditionMinValue(event.currentTarget.value, index)}
-                              name="lowThreshold"
-                              ref={register({ required: true, min: 0, max: 10 })}
-                            />
-                            {errors.lowThreshold && <Muted color="warning">Value not between 0 and 10</Muted>}
-                          </Flex>
-                        )}
+                  <FormControl isInvalid={!!form.errors.type?.message}>
+                    <FormLabel htmlFor="type">{t('trigger:type')}</FormLabel>
+                    <InputHelper>{t('trigger:type_helper')}</InputHelper>
 
-                        {condition?.type?.value === TriggerConditionType.HIGH_THRESHOLD && (
-                        <Flex marginTop={5} flexDirection="column">
-                          <Label>High Threshold (0 - 10)</Label>
-                          <StyledInput
-                            isInvalid={!!errors.highThreshold}
-                            type="number"
-                            step="0.1"
-                            onChange={(event) => setConditionMaxValue(event.currentTarget.value, index)}
-                            name="highThreshold"
-                            ref={register({ required: true, min: 0, max: 10 })}
-                          />
-                          {errors.highThreshold && <Muted color="warning">Value not between 0 and 10</Muted>}
-                        </Flex>
-                        )}
+                    <Controller
+                      name="type"
+                      control={form.control}
+                      render={({ onChange }) => (
+                        <Select
+                          options={TRIGGER_TYPES}
+                          value={activeType}
+                          onChange={(data: any) => {
+                            handleTypeChange(data);
+                            onChange(data);
+                          }}
+                        />
+                      )}
+                    />
 
-                        {(condition?.type?.value === TriggerConditionType.OUTER_RANGE
-                        || condition?.type?.value === TriggerConditionType.INNER_RANGE) && (
-                        <Flex marginTop={5} flexDirection="row" justifyContent="space-evenly">
-                          <Flex width="49%" flexDirection="column">
-                            <Label>Low Threshold (0 - 10)</Label>
-                            <StyledInput
-                              isInvalid={!!errors.lowThreshold}
-                              type="number"
-                              step="0.1"
-                              onChange={(event) => setConditionMinValue(event.currentTarget.value, index)}
-                              name="lowThreshold"
-                              ref={register({ required: true, min: 0, max: 10 })}
-                            />
-                            {errors.lowThreshold && <Muted color="warning">Value not between 0 and 10</Muted>}
-                          </Flex>
-                          <Flex width="49%" flexDirection="column">
-                            <Label>High Threshold (0 - 10)</Label>
-                            <StyledInput
-                              isInvalid={!!errors.highThreshold}
-                              type="number"
-                              step="0.1"
-                              onChange={(event) => setConditionMaxValue(event.currentTarget.value, index)}
-                              name="highThreshold"
-                              ref={register({ required: true, min: 0, max: 10 })}
-                            />
-                            {errors.highThreshold && <Muted color="warning">Value not between 0 and 10</Muted>}
-                          </Flex>
-                        </Flex>
-                        )}
-                      </Flex>
-                    ))}
-                  </Div>
-                </Div>
-                <Div gridColumn="1 / -1">
-                  <Flex flexDirection="row" alignItems="center" justifyContent="space-between">
-                    <H4>Recipients</H4>
-                    <PlusCircle onClick={addRecipient} />
-                  </Flex>
-                  <Hr />
-                  <Div marginTop={15}>
-                    {activeRecipients.map((recipient, index) => (
-                      <Flex marginBottom="4px" alignItems="center" key={index} gridColumn="1 / -1">
-                        <Div flexGrow={9}>
+                    <FormErrorMessage>{form.errors.dialogue?.message}</FormErrorMessage>
+                  </FormControl>
+
+                  {activeType?.value === TriggerQuestionType.QUESTION && activeDialogue && (
+                    <FormControl isRequired isInvalid={!!form.errors.question}>
+                      <FormLabel htmlFor="question">{t('trigger:question')}</FormLabel>
+                      <InputHelper>
+                        {t('trigger:question_helper')}
+                      </InputHelper>
+                      <Controller
+                        name="question"
+                        control={form.control}
+                        render={({ onChange }) => (
                           <Select
-                            styles={errors.recipients?.[index] && !activeRecipients?.[index]?.value ? ErrorStyle : undefined}
-                            ref={() => register({
-                              name: `recipients[${index}]`,
-                              required: false,
-                            })}
-                            key={index}
-                            options={recipients}
-                            value={recipient}
-                            onChange={(qOption: any) => {
-                              setRecipients(qOption, index);
+                            options={questions}
+                            value={activeQuestion}
+                            onChange={(data: any) => {
+                              handleQuestionChange(data);
+                              onChange(data);
                             }}
                           />
-                          {errors.recipients?.[index] && !activeRecipients?.[index]?.value && (
-                            <Muted color="warning">{errors.recipients?.[index]?.message}</Muted>
-                            )}
-                        </Div>
-                        <Flex justifyContent="center" alignContent="center" flexGrow={1}>
-                          <MinusCircle onClick={() => deleteRecipient(index)} />
-                        </Flex>
-                      </Flex>
-                    ))}
-                  </Div>
-                </Div>
-              </Grid>
-            </Div>
-          </Grid>
-        </FormGroupContainer>
+                        )}
+                      />
 
-        <Div>
-          {loading && (<Muted>Loading...</Muted>)}
+                      <FormErrorMessage>{form.errors.question?.message}</FormErrorMessage>
+                    </FormControl>
+                  )}
+                </InputGrid>
+              </Div>
+            </FormSection>
 
-          <Flex>
-            <Button brand="primary" mr={2} type="submit">Create trigger</Button>
-            <Button brand="default" type="button" onClick={() => history.push(`/dashboard/b/${customerSlug}/triggers/`)}>Cancel</Button>
-          </Flex>
-        </Div>
-      </Form>
-    </Container>
+            <Hr />
+
+            <FormSection id="delivery">
+              <Div>
+                <H3 color="default.text" fontWeight={500} pb={2}>{t('trigger:delivery')}</H3>
+                <Muted color="gray.600">{t('trigger:delivery_helper')}</Muted>
+              </Div>
+              <Div>
+                <InputGrid>
+                  <FormControl isInvalid={!!form.errors.medium?.message}>
+                    <FormLabel htmlFor="medium">{t('trigger:medium')}</FormLabel>
+                    <InputHelper>{t('trigger:medium_helper')}</InputHelper>
+
+                    <Controller
+                      name="medium"
+                      control={form.control}
+                      render={({ onChange }) => (
+                        <Select
+                          options={MEDIUM_TYPES}
+                          value={activeMedium}
+                          onChange={(data: any) => {
+                            handleMediumChange(data);
+                            onChange(data);
+                          }}
+                        />
+                      )}
+                    />
+
+                    <FormErrorMessage>{form.errors.medium?.message}</FormErrorMessage>
+                  </FormControl>
+                </InputGrid>
+
+              </Div>
+            </FormSection>
+
+            <ButtonGroup>
+              <Button
+                isLoading={isLoading}
+                isDisabled={!form.formState.isValid}
+                variantColor="teal"
+                type="submit"
+              >
+                Create
+              </Button>
+              <Button variant="outline" onClick={() => history.push('/')}>Cancel</Button>
+            </ButtonGroup>
+          </Form>
+        </FormContainer>
+      </motion.div>
+
+    </>
   );
 };
-
-const FormGroupContainer = styled.div`
-  ${({ theme }) => css`
-    padding-bottom: ${theme.gutter * 3}px;
-  `}
-`;
-
-const Form = styled.form``;
 
 export default AddTriggerView;

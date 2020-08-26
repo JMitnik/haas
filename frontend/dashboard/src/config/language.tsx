@@ -32,10 +32,21 @@ const language = {
       builder_view: 'Dialogue Builder',
       interactions_view: 'Interactions',
       trigger_overview: 'Triggers',
+      create_trigger_view: 'Create trigger',
     },
     dialogue: {
       slug_helper: 'Under which url segment will visitors find the dialogue?',
       qr_download_helper: 'Share the dialogue by sharing the QR code, by either downloading the QR code or copying it.',
+    },
+    trigger: {
+      name_helper: 'What is the name of this trigger?',
+      dialogue: 'Selected dialogue',
+      dialogue_helper: 'To which dialogue will this trigger apply?',
+      type: 'Type',
+      delivery: 'Delivery',
+      delivery_helper: 'How will this trigger be delivered to the recipients (mail or SMS)?',
+      medium: 'Delivery medium',
+      medium_helper: 'Which delivery method is preferred for this trigger? Note: additional costs may be incurred for SMS',
     },
   },
 };
