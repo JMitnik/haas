@@ -1,11 +1,11 @@
 import * as yup from 'yup';
 import {
-  Container, FormContainer, PageHeading,
+  Container, FormContainer, PageHeading, PageTitle,
 } from '@haas/ui';
 import { motion } from 'framer-motion';
 import { useCustomer } from 'providers/CustomerProvider';
 import { useForm } from 'react-hook-form';
-import { useHistory, useParams } from 'react-router';
+import { useHistory, useLocation, useParams } from 'react-router';
 import { useMutation, useQuery } from '@apollo/react-hooks';
 import { useToast } from '@chakra-ui/core';
 import { yupResolver } from '@hookform/resolvers';
@@ -57,6 +57,7 @@ const EditCustomerView = () => {
 const startsWithCloudinary = (url: string) => url.includes('cloudinary');
 
 const EditCustomerForm = ({ customer }: { customer: any }) => {
+  const { dialogueSlug, customerSlug } = useParams();
   const history = useHistory();
   const { setActiveCustomer } = useCustomer();
 
@@ -121,12 +122,26 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
         id: customer?.id,
         options: optionInput,
       },
+    }).then(() => {
+      if (optionInput.slug !== customerSlug) {
+        toast({
+          title: 'Redirecting to new slug',
+          description: 'Redirecting user to new slug adress.',
+          status: 'info',
+          position: 'bottom-right',
+          duration: 1500,
+        });
+
+        setTimeout(() => {
+          history.push(`/dashboard/b/${formData.slug}`);
+        }, 1000);
+      }
     });
   };
 
   return (
-    <Container>
-      <PageHeading>Edit business settings</PageHeading>
+    <>
+      <PageTitle>Edit business settings</PageTitle>
       <motion.div initial={{ opacity: 0, y: 100 }} animate={{ opacity: 1, y: 0 }}>
         <FormContainer>
           <CustomerForm
@@ -138,7 +153,7 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
           />
         </FormContainer>
       </motion.div>
-    </Container>
+    </>
   );
 };
 
