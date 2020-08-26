@@ -86,7 +86,8 @@ interface QuestionEntryFormProps {
 
 const questionTypes = [
   { value: 'SLIDER', label: 'Slider' },
-  { value: 'CHOICE', label: 'Choice' }];
+  { value: 'CHOICE', label: 'Choice' }
+];
 
 const QuestionEntryForm = ({
   onAddExpandChange,
@@ -113,6 +114,7 @@ const QuestionEntryForm = ({
       parentQuestionType,
     },
   });
+
   const toast = useToast();
   const [activeTitle, setActiveTitle] = useState(title);
   const [activeQuestionType, setActiveQuestionType] = useState(type);
@@ -438,18 +440,23 @@ const QuestionEntryForm = ({
                     <FormControl isRequired isInvalid={!!form.errors.matchText}>
                       <FormLabel htmlFor="matchText">Match value</FormLabel>
                       <InputHelper>What is the multi-choice question to trigger this question?</InputHelper>
-                      <Select
-                        styles={form.errors.matchText && !activematchValue ? ErrorStyle : undefined}
-                        ref={() => form.register({
-                          name: 'matchText',
-                          required: false,
-                        })}
-                        options={parentOptionsSelect}
-                        value={activematchValue}
-                        onChange={(option: any) => {
-                          setMatchTextValue(option);
-                        }}
+                      
+                      <Controller
+                        id="question-match-select"
+                        name="matchText"
+                        control={form.control}
+                        defaultValue={activematchValue}
+                        render={({ onChange, onBlur, value }) => (
+                          <Select
+                            options={parentOptionsSelect}
+                            value={activematchValue}
+                            onChange={(opt: any) => {
+                              setMatchTextValue(opt);
+                            }}
+                          />
+                        )}
                       />
+
                       <FormErrorMessage>{form.errors.matchText?.message}</FormErrorMessage>
                     </FormControl>
                   </InputGrid>
