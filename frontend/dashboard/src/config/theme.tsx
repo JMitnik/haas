@@ -1,6 +1,8 @@
 import { theme as chakraTheme } from '@chakra-ui/core';
 import { generatePalette } from 'utils/ColorUtils';
 
+const breakpoints = ['40em', '52em', '64em'];
+
 // TODO: Export theme as type
 const theme = {
   ...chakraTheme,
@@ -18,17 +20,17 @@ const theme = {
     warning: '#ECC94B',
     error: '#F56565',
     default: {
-      0: '#f7f8fb',
-      50: '#eef0f7',
-      100: '#ced2e0',
-      200: '#adb5cc',
-      300: '#8c97ba',
-      400: '#6b79a8',
-      500: '#536090',
-      600: '#404a6f',
-      700: '#2e354f',
-      800: '#1c202f',
-      900: '#090b11',
+      0: '#ffffff',
+      50: '#f6f7f9',
+      100: '#eceff2 ',
+      200: '#d9dfe6',
+      300: '#c6ced9',
+      400: '#b3becd',
+      500: '#a0aec0',
+      600: '#a0aec0',
+      700: '#808b9a',
+      800: '#606873',
+      900: '#40464d',
       lightest: '#f7faff',
       light: '#eef1f5',
       normal: '#f7f8fb',
@@ -80,6 +82,16 @@ const theme = {
     subtleRounded: '3px',
     somewhatRounded: '10px',
     rounded: '50px',
+  },
+  mediaQueries: {
+    small: `@media screen and (min-width: ${breakpoints[0]})`,
+    medium: `@media screen and (min-width: ${breakpoints[1]})`,
+    large: `@media screen and (min-width: ${breakpoints[2]})`,
+  },
+  mediaSizes: {
+    sm: 0,
+    md: 768,
+    lg: 1280,
   },
 };
 

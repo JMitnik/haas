@@ -3,6 +3,7 @@ import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema
 // eslint-disable-next-line import/no-cycle
 import { CustomerType } from '../customer/Customer';
 import { DialogueType } from '../questionnaire/Dialogue';
+import { UserInputError } from 'apollo-server-express';
 
 export const TagTypeEnum = enumType({
   name: 'TagTypeEnum',
@@ -54,7 +55,7 @@ export const TagQueries = extendType({
           return customer?.tags || [];
         }
 
-        throw new Error('Provide a dialogue id or customer slug to find tags');
+        throw new UserInputError('Provide a dialogue id or customer slug to find tags');
       },
     });
   },
@@ -77,7 +78,7 @@ export const TagMutations = extendType({
         tags: TagsInputType,
       },
       resolve(parent, args, ctx) {
-        if (!args.dialogueId) throw new Error('No dialogue provided to assign to tags');
+        if (!args.dialogueId) throw new UserInputError('No dialogue provided to assign to tags');
 
         const tags = args.tags?.entries?.map((entryId) => ({ id: entryId })) || [];
 
@@ -102,7 +103,7 @@ export const TagMutations = extendType({
         type: TagTypeEnum,
       },
       async resolve(parent, args, ctx) {
-        if (!args.customerSlug) throw new Error('No customer slug provided for which tag to create');
+        if (!args.customerSlug) throw new UserInputError('No customer slug provided for which tag to create');
 
         const customer = await ctx.prisma.customer.findOne({
           where: { slug: args.customerSlug },
@@ -128,7 +129,7 @@ export const TagMutations = extendType({
         tagId: 'String',
       },
       resolve(parent, args, ctx) {
-        if (!args.tagId) throw new Error('No valid tag id provided');
+        if (!args.tagId) throw new UserInputError('No valid tag id provided');
 
         return ctx.prisma.tag.delete({ where: { id: args.tagId } });
       },

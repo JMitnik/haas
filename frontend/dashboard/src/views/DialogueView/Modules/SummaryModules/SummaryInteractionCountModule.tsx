@@ -1,7 +1,9 @@
 import { useHistory, useParams } from 'react-router';
 import React from 'react';
 
-import { Card, CardBody, Flex, H3, Paragraph, Span, H2 } from '@haas/ui';
+import { Activity } from 'react-feather';
+import { Card, CardBody, CardFooter, ColumnFlex, Div, Flex, Grid, H3, Paragraph, Span, Text } from '@haas/ui';
+import { Icon } from '@chakra-ui/core';
 
 const SummaryInteractionCountModule = ({ interactionCount }: { interactionCount: number }) => {
   const { customerSlug, dialogueSlug } = useParams();
@@ -10,28 +12,27 @@ const SummaryInteractionCountModule = ({ interactionCount }: { interactionCount:
   return (
     <Card bg="white" onClick={() => history.push(`/dashboard/b/${customerSlug}/d/${dialogueSlug}/interactions`)}>
       <CardBody>
-        <H3 color="primary">
-          <Flex justifyContent="space-between" alignItems="center">
-            <Span>Interactions</Span>
-            {/* <ChevronRight /> */}
-          </Flex>
-        </H3>
-        <Paragraph color="app.onWhite" mt={4}>
-          {!interactionCount ? (
-            <h2>No interactions yet</h2>
-          ) : (
-            <p>
-              <H2 color="default.darkest">
-                { interactionCount }
-              </H2>
-              {' '}
-              <Span color="default.darker">
-                user(s) have interacted
-              </Span>
-            </p>
-          )}
-        </Paragraph>
+        <Flex>
+          <Div p={2} mr={2}>
+            <Icon size="20px" color="gray.400" as={Activity} />
+          </Div>
+          <Div>
+            <ColumnFlex>
+              <Text fontSize="1rem" fontWeight="400" color="gray.400">
+                Interactions
+              </Text>
+              <Text color="gray.500" pt={1} fontWeight="800">
+                210 interactions
+              </Text>
+            </ColumnFlex>
+          </Div>
+        </Flex>
       </CardBody>
+      <CardFooter bg="gray.100">
+        <Text color="gray.500">
+          View all
+        </Text>
+      </CardFooter>
     </Card>
   );
 };

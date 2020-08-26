@@ -2,12 +2,13 @@ import * as yup from 'yup';
 import { ApolloError, gql } from 'apollo-boost';
 import { Button, ButtonGroup, FormErrorMessage, Stack } from '@chakra-ui/core';
 import { Container, Div, Flex, Form, FormContainer, FormControl, FormLabel,
-  FormSection, H2, H3, Hr, Input, InputGrid, InputHelper, Muted, Textarea } from '@haas/ui';
+  FormSection, H2, H3, Hr, Input, InputGrid, InputHelper, Muted, PageTitle, Textarea } from '@haas/ui';
 import { Controller, useForm } from 'react-hook-form';
 import { Minus, Plus, Type } from 'react-feather';
 import { motion } from 'framer-motion';
 import { useHistory, useParams } from 'react-router';
 import { useMutation, useQuery } from '@apollo/react-hooks';
+import { useTranslation } from 'react-i18next';
 import { yupResolver } from '@hookform/resolvers';
 import React, { useState } from 'react';
 import Select from 'react-select';
@@ -136,11 +137,13 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFo
     });
   };
 
+  const { t } = useTranslation();
+
   return (
     <Div>
-      <Div>
-        <H2 color="gray.700" mb={4} py={2}>Edit dialogue</H2>
-      </Div>
+      <PageTitle>
+        {t('views:edit_dialogue_view')}
+      </PageTitle>
       <motion.div initial={{ opacity: 0, y: 100 }} animate={{ opacity: 1, y: 0 }}>
         <FormContainer>
           <Form onSubmit={form.handleSubmit(onSubmit)}>
@@ -197,8 +200,8 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFo
                   </FormControl>
 
                   <FormControl isRequired isInvalid={!!form.errors.slug}>
-                    <FormLabel htmlFor="slug">Slug</FormLabel>
-                    <InputHelper>Under which url segment will visitors find the business?</InputHelper>
+                    <FormLabel htmlFor="slug">{t('slug')}</FormLabel>
+                    <InputHelper>{t('dialogue:slug_helper')}</InputHelper>
                     <Input
                       placeholder="peaches-or-apples"
                       leftAddOn={`https://client.haas.live/${customerSlug}`}

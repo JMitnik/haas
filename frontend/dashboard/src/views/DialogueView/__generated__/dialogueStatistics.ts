@@ -17,6 +17,7 @@ export interface dialogueStatistics_customer_dialogue_sessions {
 export interface dialogueStatistics_customer_dialogue_statistics_topPositivePath {
   __typename: "topPathType";
   answer: string | null;
+  basicSentiment: string | null;
   quantity: number | null;
 }
 
@@ -24,6 +25,14 @@ export interface dialogueStatistics_customer_dialogue_statistics_topNegativePath
   __typename: "topPathType";
   quantity: number | null;
   answer: string | null;
+  basicSentiment: string | null;
+}
+
+export interface dialogueStatistics_customer_dialogue_statistics_mostPopularPath {
+  __typename: "topPathType";
+  quantity: number | null;
+  answer: string | null;
+  basicSentiment: string | null;
 }
 
 export interface dialogueStatistics_customer_dialogue_statistics_history {
@@ -36,6 +45,7 @@ export interface dialogueStatistics_customer_dialogue_statistics {
   __typename: "DialogueStatistics";
   topPositivePath: dialogueStatistics_customer_dialogue_statistics_topPositivePath[] | null;
   topNegativePath: dialogueStatistics_customer_dialogue_statistics_topNegativePath[] | null;
+  mostPopularPath: dialogueStatistics_customer_dialogue_statistics_mostPopularPath | null;
   history: dialogueStatistics_customer_dialogue_statistics_history[] | null;
 }
 

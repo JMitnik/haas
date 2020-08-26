@@ -82,8 +82,12 @@ input CustomerWhereUniqueInput {
   id: ID!
 }
 
+type Debug {
+  debugResolver: String
+}
+
 type Dialogue {
-  averageScore: Float!
+  averageScore(input: DialogueFilterInputType): Float!
   countInteractions: Int!
   creationDate: String
   customer: Customer
@@ -105,11 +109,14 @@ type Dialogue {
 }
 
 input DialogueFilterInputType {
+  endDate: String
   searchTerm: String
+  startDate: String
 }
 
 type DialogueStatistics {
   history: [lineChartDataType!]
+  mostPopularPath: topPathType
   topNegativePath: [topPathType!]
   topPositivePath: [topPathType!]
 }
@@ -185,18 +192,6 @@ enum LinkTypeEnumType {
   WHATSAPP
 }
 
-"""Login credential"""
-input LoginInput {
-  email: String!
-  password: String!
-}
-
-"""Information you get after you log out"""
-type LoginOutput {
-  token: String!
-  user: UserType!
-}
-
 type Mutation {
   assignTags(dialogueId: String, tags: TagsInputObjectType): Dialogue!
   copyDialogue(data: AddDialogueInput): Dialogue!
@@ -210,6 +205,7 @@ type Mutation {
   createTag(customerSlug: String, name: String, type: TagTypeEnum): Tag!
   createTrigger(customerSlug: String, questionId: String, recipients: RecipientsInputType, trigger: TriggerInputType): TriggerType!
   createUser(customerSlug: String, input: UserInput): UserType!
+  debugMutation: String
   deleteCTA(id: String): QuestionNode!
   deleteCustomer(where: CustomerWhereUniqueInput): Customer
   deleteDialogue(where: DialogueWhereUniqueInput): Dialogue!
@@ -221,8 +217,6 @@ type Mutation {
   editDialogue(customerSlug: String, description: String, dialogueSlug: String, publicTitle: String, tags: TagsInputObjectType, title: String): Dialogue!
   editTrigger(questionId: String, recipients: RecipientsInputType, trigger: TriggerInputType, triggerId: String): TriggerType!
   editUser(id: String, input: UserInput): UserType!
-  login(input: LoginInput): LoginOutput
-  register(input: RegisterInput): String
   singleUpload(file: Upload): ImageType!
   updateCTA(id: String, links: CTALinksInputType, title: String, type: String): QuestionNode!
   updateQuestion(edgeCondition: EdgeConditionInputType, edgeId: String, id: String, optionEntries: OptionsInputType, overrideLeafId: String, title: String, type: String): QuestionNode!
@@ -401,16 +395,6 @@ input RecipientsInputType {
   ids: [String!]
 }
 
-"""Registration credentials"""
-input RegisterInput {
-  customerId: String!
-  email: String!
-  firstName: String!
-  lastName: String!
-  password: String!
-  roleId: String
-}
-
 """Input type for a register node"""
 input RegisterNodeEntryInput {
   value: String
@@ -505,6 +489,7 @@ input TextboxNodeEntryInput {
 
 type topPathType {
   answer: String
+  basicSentiment: String
   quantity: Int
 }
 
@@ -579,7 +564,7 @@ input UserInput {
   email: String!
   firstName: String
   lastName: String
-  password: String!
+  password: String
   phone: String
   roleId: String
 }

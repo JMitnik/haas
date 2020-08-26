@@ -31,7 +31,7 @@ const UserNav: FC = () => (
   </Div>
 );
 
-const StyledExtLink = styled.a<ColorProps>`
+export const StyledExtLink = styled.a<ColorProps>`
   ${color};
   text-decoration: none;
   color: inherit;

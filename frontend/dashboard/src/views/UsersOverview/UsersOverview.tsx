@@ -4,14 +4,16 @@ import { useHistory, useParams } from 'react-router';
 import { useLazyQuery, useMutation } from '@apollo/react-hooks';
 import React, { useCallback, useEffect, useState } from 'react';
 
-import { Div, PageHeading } from '@haas/ui';
+import { Div, Flex, PageTitle } from '@haas/ui';
 import SearchBar from 'components/SearchBar/SearchBar';
 import Table from 'components/Table/Table';
 import getUsersQuery from 'queries/getUserTable';
 
+import { Button } from '@chakra-ui/core';
 import { CenterCell, RoleCell, UserCell } from 'components/Table/CellComponents/CellComponents';
 import { ErrorBoundary } from 'react-error-boundary';
 import { InputContainer, InputOutputContainer } from './UsersOverviewStyles';
+import { Plus } from 'react-feather';
 import Row from './TableRow/UsersTableRow';
 import deleteUserQuery from '../../mutations/deleteUser';
 
@@ -115,13 +117,20 @@ const UsersOverview = () => {
   const pageIndex = data?.userTable?.pageIndex || 0;
 
   return (
-    <Div px="24px" margin="0 auto" height="100vh" maxHeight="100vh">
-      <PageHeading fontWeight={400} mb="4">Users and roles</PageHeading>
-      <InputOutputContainer mb="5%">
-        <InputContainer>
-          <SearchBar activeSearchTerm={paginationProps.activeSearchTerm} onSearchTermChange={handleSearchTermChange} />
-        </InputContainer>
-      </InputOutputContainer>
+    <>
+      <PageTitle>Users and roles</PageTitle>
+
+      <Div mb={4} width="100%">
+        <Flex justifyContent="space-between">
+          <Div mr={4}>
+            <Button onClick={handleAddUser} leftIcon={Plus} variantColor="teal">Create user</Button>
+          </Div>
+          <Div>
+            <SearchBar activeSearchTerm={paginationProps.activeSearchTerm} onSearchTermChange={handleSearchTermChange} />
+          </Div>
+        </Flex>
+      </Div>
+
       <Div borderRadius="lg" flexGrow={1} backgroundColor="white" mb="1%">
         <ErrorBoundary FallbackComponent={() => (
           <Div>
@@ -141,7 +150,7 @@ const UsersOverview = () => {
           />
         </ErrorBoundary>
       </Div>
-    </Div>
+    </>
   );
 };
 

@@ -9,6 +9,7 @@ import { FullLogo, FullLogoContainer, LogoContainer } from 'components/Logo/Logo
 import { UserProps } from 'types/generic';
 import { useCustomer } from 'providers/CustomerProvider';
 import Avatar from 'components/Avatar';
+import Color from 'color';
 import Logo from 'components/Logo';
 
 interface NavItemProps extends LinkProps { }
@@ -24,7 +25,7 @@ export const NavItem = ({ children, ...props }: NavItemProps) => (
 
 export const NavLinkContainer = styled(NavLink) <LinkProps>`
   ${({ theme }) => css`
-    color: ${theme.isDarkColor ? theme.colors.primaries['100'] : theme.colors.primaries['800']};
+    color: ${theme.isDarkColor ? Color(theme.colors.primaries['100']).lighten(0.2).hex() : theme.colors.primaries['300']};
     padding: 8px 11px;
     margin-left: ${theme.gutter}px;
     display: flex;
@@ -35,10 +36,10 @@ export const NavLinkContainer = styled(NavLink) <LinkProps>`
     /* For the icons */
     svg {
       width: 24px;
-      fill: ${theme.isDarkColor ? theme.colors.primaries['400'] : theme.colors.primaries['800']};
+      fill: ${theme.isDarkColor ? theme.colors.primaries['100'] : theme.colors.primaries['300']};
 
       .secondary {
-        fill: ${theme.isDarkColor ? theme.colors.primaries['400'] : theme.colors.primaries['700']};
+        fill: ${theme.isDarkColor ? theme.colors.primaries['100'] : theme.colors.primaries['600']};
       }
     }
 
@@ -57,6 +58,8 @@ export const NavLinkContainer = styled(NavLink) <LinkProps>`
 
 export const NavItems = styled.ul`
   ${({ theme }) => css`
+    list-style: none;
+
     ${NavItemContainer} + ${NavItemContainer} {
       margin-top: ${theme.gutter}px;
     }
@@ -86,21 +89,6 @@ const UsernavContainer = styled.div`
   `}
 `;
 
-export const ArrowContainer = styled.button`
-  border: none;
-  background: #f6f7f9;
-  color: #a1a2a5;
-
-  svg {
-    width: 16px;
-    height: 16px;
-  }
-
-  opacity: 0.7;
-  cursor: pointer;
-  transition: all 0.2s ease-in;
-`;
-
 export const Usernav = ({ user, customer }: { user: UserProps, customer: any }) => {
   const history = useHistory();
   const { setActiveCustomer, setStorageCustomer } = useCustomer();
@@ -117,20 +105,6 @@ export const Usernav = ({ user, customer }: { user: UserProps, customer: any }) 
         <ChakraAvatar bg="gray.300" size="md" name={`${user.firstName} ${user.lastName}`}>
           <AvatarBadge size="1em" bg="green.400" />
         </ChakraAvatar>
-
-        {/* <Div ml={4}>
-          <ColumnFlex>
-            <Span fontSize="0.8rem" display="block">
-              {`${user.firstName} ${user.lastName}`}
-            </Span>
-
-            <Div>
-              <Badge>
-                {customer?.name}
-              </Badge>
-            </Div>
-          </ColumnFlex>
-        </Div> */}
       </Flex>
     </UsernavContainer>
   );
@@ -138,21 +112,20 @@ export const Usernav = ({ user, customer }: { user: UserProps, customer: any }) 
 
 export const SidenavContainer = styled.div`
   ${({ theme }) => css`
-
     position: fixed;
     z-index: 300;
     font-weight: 1000;
     width: ${theme.sidenav.width}px;
 
-    background: ${theme.colors.primary};
+    background: ${theme.isDarkColor ? theme.colors.primary : theme.colors.primaries['700']};
     display: flex;
     padding-top: ${theme.gutter}px;
     height: 100vh;
     flex-direction: column;
     justify-content: space-between;
-
+    
     ${FullLogoContainer} {
-      color: ${theme.isDarkColor ? theme.colors.primaries['100'] : theme.colors.primaries['800']};
+      color: ${theme.isDarkColor ? theme.colors.primaries['100'] : theme.colors.primaries['300']};
     }
 
     ${LogoContainer} {

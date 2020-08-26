@@ -1,16 +1,30 @@
 import cors, { CorsOptions } from 'cors';
 import express from 'express';
 
-import config from './config';
-import makeApollo from './apollo';
+import config from './config/config';
+import makeApollo from './config/apollo';
+
+process.on('SIGINT', () => {
+  console.log('received sigint');
+  setTimeout(() => {
+    console.log('exit');
+    process.exit(0);
+  }, 100);
+});
 
 const main = async () => {
+  console.log(config.testString);
+  console.log('🏳️\tStarting application');
+
   const apollo = await makeApollo();
   const app = express();
 
+  process.on('SIGINT', () => {
+
+  });
+
   const corsOptions: CorsOptions = {
     // Hardcoded for the moment
-
     origin: (origin, callback) => {
       const validOrigins = ['dashboard.haas.live', 'client.haas.live', 'haas-dashboard.netlify.app', 'haas-client.netlify.app'];
 
@@ -23,14 +37,17 @@ const main = async () => {
 
   app.use(cors(corsOptions));
 
-  apollo.applyMiddleware({
-    app,
-  });
+  apollo.applyMiddleware({ app });
 
-  const runningServer = app.listen(config.port);
+  console.log('🏳️\tStarting the server');
 
-  console.log(`Only intended to work on ${config.clientUrl} and ${config.dashboardUrl}`);
-  console.log(`Server successfully started on port ${config.port} for graphql entrypoint at ${apollo.graphqlPath}`);
+  app.listen(config.port);
+
+  console.log('🏁\tStarted the server!');
 };
 
-main();
+try {
+  main();
+} catch (e) {
+  console.log(e);
+}

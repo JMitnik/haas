@@ -9,6 +9,19 @@ export const GenericType = styled.p<GenericTypeProps>`
   ${typography}
 `;
 
+export const Text = styled(GenericType).attrs({ as: 'p' })``;
+
+export const PageTitle = styled(Text)`
+  ${({ theme }) => css`
+    margin-bottom: ${theme.gutter}px;
+    color: ${theme.colors.gray[500]};
+    font-size: 1.6rem;
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+  `}
+`;
+
 export const Paragraph = styled(GenericType).attrs({ as: 'p' })``;
 
 export const H1 = styled(GenericType).attrs({ as: 'h1' })`

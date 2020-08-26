@@ -1,6 +1,8 @@
-import * as AuthAPI from '../models/auth/Auth';
+// import * as AuthAPI from '../models/auth/Auth';
+import * as DebugAPI from '../models/debug/Debug';
 import * as NodeEntryAPI from '../models/node-entry/NodeEntry';
 import * as PaginationAPI from '../models/general/Pagination';
+import config from './config';
 import customerNexus from '../models/customer/Customer';
 import customerSettingsNexus from '../models/settings/CustomerSettings';
 import dialogueNexus from '../models/questionnaire/Dialogue';
@@ -24,12 +26,13 @@ const nexus = [
   ...customerNexus,
   ...customerSettingsNexus,
   ...dialogueNexus,
-  ...Array(AuthAPI),
+  // ...Array(AuthAPI),
   ...Array(PaginationAPI),
   ...Array(NodeEntryAPI),
   ...sessionNexus,
   ...questionNodeNexus,
   ...edgeNexus,
+  ...(config.isDebug ? Array(DebugAPI) : []),
 ];
 
 export default nexus;

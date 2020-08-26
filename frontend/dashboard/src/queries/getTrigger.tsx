@@ -13,6 +13,7 @@ const getTriggerQuery = gql`
         questionDialogueId
         questionDialogue {
           slug
+          title
         }
       }
       conditions {

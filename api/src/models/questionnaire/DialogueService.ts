@@ -9,15 +9,16 @@ import { isPresent } from 'ts-is-present';
 import { leafNodes, sliderType } from '../../data/seeds/default-data';
 import NodeService from '../question/NodeService';
 // eslint-disable-next-line import/no-cycle
-import { NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
+import { NexusGenFieldTypes, NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
 // eslint-disable-next-line import/no-cycle
 import { HistoryDataProps, HistoryDataWithEntry, IdMapProps,
   PathFrequency, QuestionProps, StatisticsProps } from './DialogueTypes';
 // eslint-disable-next-line import/no-cycle
 import NodeEntryService, { NodeEntryWithTypes } from '../node-entry/NodeEntryService';
 // eslint-disable-next-line import/no-cycle
+import { Nullable, PaginationProps } from '../../types/generic';
 import SessionService from '../session/SessionService';
-import prisma from '../../prisma';
+import prisma from '../../config/prisma';
 
 class DialogueService {
   static constructDialogue(
@@ -126,7 +127,7 @@ class DialogueService {
    * @param entries
    * @param nPaths
    */
-  static getTopNPaths = (entries: HistoryDataWithEntry[], nPaths: number = 3) => {
+  static getTopNPaths = (entries: HistoryDataWithEntry[], nPaths: number = 3, basicSentiment: string) => {
     const entryWithText = entries.map((entry) => ({
       textValue: NodeEntryService.getTextValueFromEntry(entry),
       ...entry,
@@ -141,6 +142,7 @@ class DialogueService {
     const pathFrequencies: PathFrequency[] = countTuples.map(([answer, quantity]) => ({
       answer,
       quantity,
+      basicSentiment,
     }));
 
     // If there are three, grab the first three, otherwise get the entire element
@@ -196,10 +198,15 @@ class DialogueService {
 
     const isPositiveEntries = _.groupBy(textAndScoreEntries, (entry) => entry.y && entry.y > 50);
 
-    const topNegativePath = DialogueService.getTopNPaths(isPositiveEntries.false || [], 3) || [];
-    const topPositivePath = DialogueService.getTopNPaths(isPositiveEntries.true || [], 3) || [];
+    const topNegativePath = DialogueService.getTopNPaths(isPositiveEntries.false || [], 3, 'negative') || [];
+    const topPositivePath = DialogueService.getTopNPaths(isPositiveEntries.true || [], 3, 'positive') || [];
 
-    return { history, topNegativePath, topPositivePath };
+    const mostPopularPath = _.maxBy([
+      ...topNegativePath.map((pathItem) => ({ ...pathItem, basicSentiment: 'negative' })),
+      ...topPositivePath.map((pathItem) => ({ ...pathItem, basicSentiment: 'positive' })),
+    ], ((item) => item.quantity || null)) || null;
+
+    return { history, topNegativePath, topPositivePath, mostPopularPath };
   };
 
   static deleteDialogue = async (dialogueId: string) => {
@@ -584,7 +591,6 @@ class DialogueService {
       throw new Error('Description required, not found!');
     }
 
-
     if (customers.length > 1) {
       // TODO: Make this a logger or something
       console.warn(`Multiple customers found with slug ${input.customerSlug}`);
@@ -715,8 +721,11 @@ class DialogueService {
     return finalQuestions;
   };
 
-  static calculateAverageDialogueScore = async (dialogueId: string) => {
-    const sessions = await SessionService.fetchSessionsByDialogue(dialogueId);
+  static calculateAverageDialogueScore = async (dialogueId: string, filters?: NexusGenInputs['DialogueFilterInputType']) => {
+    const sessions = await SessionService.fetchSessionsByDialogue(dialogueId, {
+      startDate: filters?.startDate ? new Date(filters?.startDate) : null,
+      endDate: filters?.endDate ? new Date(filters?.endDate) : null,
+    });
 
     if (!sessions) {
       return 0;
@@ -724,7 +733,7 @@ class DialogueService {
 
     const scoringEntries = SessionService.getScoringEntriesFromSessions(sessions);
 
-    const scores = _.mean((scoringEntries).map((entry) => entry?.sliderNodeEntry)) || 0;
+    const scores = _.mean((scoringEntries).map((entry) => entry?.sliderNodeEntry?.value)) || 0;
 
     return scores;
   };
