@@ -1,134 +1,26 @@
-# Migration `20200730063001-restart`
+# Migration `20200824082245-reinit`
 
-This migration has been generated at 7/30/2020, 6:30:01 AM.
+This migration has been generated at 8/24/2020, 8:22:45 AM.
 You can check out the [state of the schema](./schema.prisma) after the migration.
 
 ## Database Steps
 
 ```sql
-ALTER TABLE "public"."NodeEntryValue" DROP CONSTRAINT "NodeEntryValue_nodeEntryId_fkey"
+ALTER TABLE "public"."Tag" ALTER COLUMN "type" SET DEFAULT E'DEFAULT';
 
-ALTER TABLE "public"."NodeEntryValue" DROP CONSTRAINT "NodeEntryValue_parentNodeEntryValueId_fkey"
+ALTER TABLE "public"."Trigger" ALTER COLUMN "type" SET DEFAULT E'QUESTION';
 
-CREATE TABLE "public"."Link" (
-"backgroundColor" text   ,
-"createdAt" timestamp(3)  NOT NULL DEFAULT CURRENT_TIMESTAMP,
-"iconUrl" text   ,
-"id" text  NOT NULL ,
-"questionNodeId" text   ,
-"title" text   ,
-"type" "LinkTypeEnum" NOT NULL ,
-"updatedAt" timestamp(3)   ,
-"url" text  NOT NULL ,
-    PRIMARY KEY ("id"))
-
-CREATE TABLE "public"."LinkNodeEntry" (
-"id" SERIAL,
-"nodeEntryId" text  NOT NULL ,
-"value" jsonb   ,
-    PRIMARY KEY ("id"))
-
-CREATE TABLE "public"."SliderNodeEntry" (
-"id" SERIAL,
-"nodeEntryId" text  NOT NULL ,
-"value" integer   ,
-    PRIMARY KEY ("id"))
-
-CREATE TABLE "public"."ChoiceNodeEntry" (
-"id" SERIAL,
-"nodeEntryId" text  NOT NULL ,
-"value" text   ,
-    PRIMARY KEY ("id"))
-
-CREATE TABLE "public"."TextboxNodeEntry" (
-"id" SERIAL,
-"nodeEntryId" text  NOT NULL ,
-"value" text   ,
-    PRIMARY KEY ("id"))
-
-CREATE TABLE "public"."RegistrationNodeEntry" (
-"id" SERIAL,
-"nodeEntryId" text  NOT NULL ,
-"value" jsonb   ,
-    PRIMARY KEY ("id"))
-
-ALTER TABLE "public"."QuestionNode" DROP COLUMN "type",
-ADD COLUMN "type" "NodeType" NOT NULL DEFAULT E'GENERIC';
-
-ALTER TABLE "public"."Tag" ALTER COLUMN "customerId" SET NOT NULL,
-DROP COLUMN "type",
-ADD COLUMN "type" "TagEnum" NOT NULL DEFAULT E'DEFAULT';
-
-ALTER TABLE "public"."Trigger" DROP COLUMN "type",
-ADD COLUMN "type" "TriggerEnum" NOT NULL DEFAULT E'QUESTION';
-
-ALTER TABLE "public"."TriggerCondition" ALTER COLUMN "triggerId" SET NOT NULL,
-DROP COLUMN "type",
-ADD COLUMN "type" "TriggerConditionEnum" NOT NULL DEFAULT E'LOW_THRESHOLD';
-
-CREATE UNIQUE INDEX "LinkNodeEntry_nodeEntryId" ON "public"."LinkNodeEntry"("nodeEntryId")
-
-CREATE UNIQUE INDEX "SliderNodeEntry_nodeEntryId" ON "public"."SliderNodeEntry"("nodeEntryId")
-
-CREATE UNIQUE INDEX "ChoiceNodeEntry_nodeEntryId" ON "public"."ChoiceNodeEntry"("nodeEntryId")
-
-CREATE UNIQUE INDEX "TextboxNodeEntry_nodeEntryId" ON "public"."TextboxNodeEntry"("nodeEntryId")
-
-CREATE UNIQUE INDEX "RegistrationNodeEntry_nodeEntryId" ON "public"."RegistrationNodeEntry"("nodeEntryId")
-
-CREATE UNIQUE INDEX "Customer.slug" ON "public"."Customer"("slug")
-
-CREATE UNIQUE INDEX "CustomerSettings.customerId" ON "public"."CustomerSettings"("customerId")
-
-CREATE UNIQUE INDEX "CustomerSettings_colourSettingsId" ON "public"."CustomerSettings"("colourSettingsId")
-
-CREATE UNIQUE INDEX "CustomerSettings_fontSettingsId" ON "public"."CustomerSettings"("fontSettingsId")
-
-CREATE UNIQUE INDEX "_DialogueToTag_AB_unique" ON "public"."_DialogueToTag"("A","B")
-
-CREATE  INDEX "_DialogueToTag_B_index" ON "public"."_DialogueToTag"("B")
-
-CREATE UNIQUE INDEX "_PermissionToRole_AB_unique" ON "public"."_PermissionToRole"("A","B")
-
-CREATE  INDEX "_PermissionToRole_B_index" ON "public"."_PermissionToRole"("B")
-
-CREATE UNIQUE INDEX "Role.id_name" ON "public"."Role"("id","name")
-
-CREATE UNIQUE INDEX "_TriggerToUser_AB_unique" ON "public"."_TriggerToUser"("A","B")
-
-CREATE  INDEX "_TriggerToUser_B_index" ON "public"."_TriggerToUser"("B")
-
-CREATE UNIQUE INDEX "User.customerId_email" ON "public"."User"("customerId","email")
-
-ALTER TABLE "public"."Link" ADD FOREIGN KEY ("questionNodeId")REFERENCES "public"."QuestionNode"("id") ON DELETE SET NULL  ON UPDATE CASCADE
-
-ALTER TABLE "public"."LinkNodeEntry" ADD FOREIGN KEY ("nodeEntryId")REFERENCES "public"."NodeEntry"("id") ON DELETE CASCADE  ON UPDATE CASCADE
-
-ALTER TABLE "public"."SliderNodeEntry" ADD FOREIGN KEY ("nodeEntryId")REFERENCES "public"."NodeEntry"("id") ON DELETE CASCADE  ON UPDATE CASCADE
-
-ALTER TABLE "public"."ChoiceNodeEntry" ADD FOREIGN KEY ("nodeEntryId")REFERENCES "public"."NodeEntry"("id") ON DELETE CASCADE  ON UPDATE CASCADE
-
-ALTER TABLE "public"."TextboxNodeEntry" ADD FOREIGN KEY ("nodeEntryId")REFERENCES "public"."NodeEntry"("id") ON DELETE CASCADE  ON UPDATE CASCADE
-
-ALTER TABLE "public"."RegistrationNodeEntry" ADD FOREIGN KEY ("nodeEntryId")REFERENCES "public"."NodeEntry"("id") ON DELETE CASCADE  ON UPDATE CASCADE
-
-DROP TABLE "public"."NodeEntryValue";
-
-DROP TYPE "TagType"
-
-DROP TYPE "TriggerConditionType"
-
-DROP TYPE "TriggerType"
+ALTER TABLE "public"."TriggerCondition" ALTER COLUMN "type" SET DEFAULT E'LOW_THRESHOLD';
 ```
 
 ## Changes
 
 ```diff
 diff --git schema.prisma schema.prisma
-migration ..20200730063001-restart
+migration ..20200824082245-reinit
 --- datamodel.dml
 +++ datamodel.dml
-@@ -1,0 +1,337 @@
+@@ -1,0 +1,350 @@
 +datasource postgresql {
 +  provider = "postgresql"
 +  url = "***"
@@ -137,6 +29,7 @@ migration ..20200730063001-restart
 +// binaryTargets = ["debian-openssl-1.1.x"]
 +generator client {
 +  provider = "prisma-client-js"
++  previewFeatures = ["middlewares"]
 +  output   = "./node_modules/@prisma/client"
 +}
 +
@@ -185,7 +78,7 @@ migration ..20200730063001-restart
 +  name        String
 +  settings    CustomerSettings?
 +  dialogues   Dialogue[]
-+  users       User[]
++  users       UserOfCustomer[]
 +  roles       Role[]
 +  permissions Permission[]
 +  triggers    Trigger[]
@@ -221,6 +114,7 @@ migration ..20200730063001-restart
 +  questions    QuestionNode[]
 +  sessions     Session[]
 +  tags         Tag[]
++  @@unique([slug, customerId])
 +}
 +
 +enum NodeType {
@@ -235,7 +129,7 @@ migration ..20200730063001-restart
 +model QuestionNode {
 +  id                         String           @default(cuid()) @id
 +  creationDate               DateTime         @default(now())
-+  updatedAt                  DateTime?        @updatedAt
++  updatedAt                  DateTime         @updatedAt
 +  isLeaf                     Boolean          @default(false)
 +  isRoot                     Boolean          @default(false)
 +  title                      String
@@ -402,9 +296,7 @@ migration ..20200730063001-restart
 +  name        String
 +  roleId      String?
 +  permissions Permission[] @relation(references: [id])
-+  User        User[]
-+  Customer    Customer?    @relation(fields: [customerId], references: [id])
-+  customerId  String?
++  users       UserOfCustomer[]
 +  @@unique([id, name])
 +}
 +
@@ -412,16 +304,29 @@ migration ..20200730063001-restart
 +  id         String    @default(cuid()) @id
 +  createdAt  DateTime  @default(now())
 +  updatedAt  DateTime? @updatedAt
-+  email      String
++  email      String    @unique
++  password   String
 +  phone      String?
 +  firstName  String?
 +  lastName   String?
-+  roleId     String
-+  role       Role      @relation(fields: [roleId], references: [id])
-+  Customer   Customer? @relation(fields: [customerId], references: [id])
-+  customerId String?
-+  triggers   Trigger[] @relation(references: [id])
-+  @@unique([customerId, email])
++  triggers   Trigger[]
++  customers  UserOfCustomer[]
++  isSuperAdmin  Boolean @default(false)
++}
++
++model UserOfCustomer {
++  userId  String
++  user    User    @relation(fields: [userId], references: [id])
++
++  customerId String
++  customer  Customer  @relation(fields: [customerId], references: [id])
++
++  roleId  String
++  role    Role  @relation(fields: [roleId], references: [id])
++  
++  createdAt DateTime @default(now())
++
++  @@id([userId, customerId])
 +}
 +
 +enum TriggerEnum {

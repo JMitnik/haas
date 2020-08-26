@@ -70,7 +70,7 @@ enum TagEnum {
 
 model Tag {
   id         String     @default(cuid()) @id
-  type       TagEnum
+  type       TagEnum    @default(value: DEFAULT)
   name       String
   isTagOf    Dialogue[] @relation(references: [id])
   customer   Customer  @relation(fields: [customerId], references: [id])
@@ -327,7 +327,7 @@ enum TriggerConditionEnum {
 
 model TriggerCondition {
   id        Int                  @default(autoincrement()) @id
-  type      TriggerConditionEnum
+  type      TriggerConditionEnum @default(value: LOW_THRESHOLD)
   minValue  Int?
   maxValue  Int?
   textValue String?
@@ -339,7 +339,7 @@ model Trigger {
   id            String             @default(cuid()) @id
   lastSent      DateTime?
   name          String
-  type          TriggerEnum
+  type          TriggerEnum         @default(value: QUESTION)
   medium        TriggerMedium
   conditions    TriggerCondition[]
   relatedNodeId String?

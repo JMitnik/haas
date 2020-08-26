@@ -3,9 +3,23 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import 'layouts/index.css';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+// import sentryInstance from 'config/sentry';
+import * as Sentry from '@sentry/react';
+import { Integrations } from '@sentry/apm';
 
 import * as serviceWorker from './serviceWorker';
 import App from './pages';
+
+const sentryDSN = process.env.SENTRY_DSN || 'https://0530140060cb4ffaa6cea16b258866c0@o438134.ingest.sentry.io/5401517';
+
+Sentry.init({
+  dsn: sentryDSN,
+  integrations: [
+    new Integrations.Tracing(),
+  ],
+  tracesSampleRate: 1.0,
+});
 
 ReactDOM.render(<App />, document.getElementById('root'));
 

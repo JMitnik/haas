@@ -10,9 +10,6 @@ const useJourneyFinish = (submitInstant: boolean = true) => {
   const store = useDialogueTree();
 
   const [createSession] = useMutation(createSessionMutation, {
-    onError: (error) => {
-      console.log('error', error.message);
-    },
   });
 
   const entries = store.relevantSessionEntries;

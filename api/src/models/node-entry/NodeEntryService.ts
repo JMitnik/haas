@@ -6,7 +6,7 @@ import _ from 'lodash';
 
 // eslint-disable-next-line import/no-cycle
 import { OrderByProps } from '../../types/generic';
-import prisma from '../../prisma';
+import prisma from '../../config/prisma';
 
 export interface NodeEntryWithTypes extends NodeEntry {
   session?: {

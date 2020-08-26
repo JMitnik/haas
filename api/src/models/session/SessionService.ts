@@ -16,7 +16,7 @@ import NodeEntryService, { NodeEntryWithTypes } from '../node-entry/NodeEntrySer
 // eslint-disable-next-line import/no-cycle
 import PaginationService from '../general/PaginationService';
 import TriggerService from '../trigger/TriggerService';
-import prisma from '../../prisma';
+import prisma from '../../config/prisma';
 
 class SessionService {
   /**
@@ -51,26 +51,10 @@ class SessionService {
     });
 
     try {
-      await TriggerService.tryTriggers(session.nodeEntries, ctx.services.triggerSMSService);
+      await TriggerService.tryTriggers(session);
     } catch (e) {
       console.log('Something went wrong while handling sms triggers: ', e);
     }
-
-    // TODO: Replace this with email associated to dialogue (or fallback to company)
-    // const dialogueAgentMail = 'jmitnik@gmail.com';
-
-    // // TODO: Roundabout way, needs to be done in Prisma2 better
-    // const nodeEntries = await SessionService.getSessionEntries(session);
-    // const questionnaire = await prisma.dialogue.findOne({ where: { id: dialogueId } });
-
-    // ctx.services.triggerMailService.sendTrigger({
-    //   to: dialogueAgentMail,
-    //   userSession: {
-    //     id: session.id,
-    //     nodeEntries,
-    //     questionnaire,
-    //   },
-    // });
 
     return session;
   }
@@ -191,9 +175,10 @@ class SessionService {
                   : undefined,
               },
             }, {
-              createdAt: (paginationOpts?.startDate && {
-                gte: paginationOpts?.startDate,
-              }) || undefined,
+              createdAt: {
+                gte: paginationOpts?.startDate || undefined,
+                lte: paginationOpts?.endDate || undefined,
+              } || undefined,
             },
             {
               nodeEntries: {

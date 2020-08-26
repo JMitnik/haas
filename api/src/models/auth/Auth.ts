@@ -1,6 +1,6 @@
 import { inputObjectType, mutationField, objectType } from '@nexus/schema';
 
-import { UserInputError } from 'apollo-server-express';
+import { UserInputError, ApolloError } from 'apollo-server-express';
 import { UserType } from '../users/User';
 import AuthService from './AuthService';
 
@@ -25,7 +25,7 @@ export const RegisterMutation = mutationField('register', {
   args: { input: RegisterInput },
 
   async resolve(parent, args) {
-    if (!args.input) throw new Error('Input information required');
+    if (!args.input) throw new ApolloError('Input information required');
     const user = await AuthService.registerUser(args.input);
 
     const role = user.customers.find((customer) => customer.customer.id === args.input?.customerId)?.role;

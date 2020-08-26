@@ -7,7 +7,7 @@ import { leafNodes } from '../../data/seeds/default-data';
 // eslint-disable-next-line import/no-cycle
 import DialogueService from '../questionnaire/DialogueService';
 import NodeService from '../question/NodeService';
-import prisma from '../../prisma';
+import prisma from '../../config/prisma';
 
 function getRandomInt(max: number) {
   return Math.floor(Math.random() * Math.floor(max));
