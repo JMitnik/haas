@@ -1,6 +1,6 @@
 import * as yup from 'yup';
 import { ApolloError } from 'apollo-boost';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { useHistory, useParams } from 'react-router';
 import { useMutation, useQuery } from '@apollo/react-hooks';
 import React, { useState } from 'react';
@@ -32,7 +32,7 @@ const schema = yup.object().shape({
 
 const AddUserView = () => {
   const history = useHistory();
-  const { register, handleSubmit, errors, setValue } = useForm<FormDataProps>({
+  const { register, handleSubmit, errors, setValue, control } = useForm<FormDataProps>({
     resolver: yupResolver(schema),
   });
   const { customerSlug } = useParams();
@@ -70,6 +70,7 @@ const AddUserView = () => {
       lastName: formData.lastName || '',
       email: formData.email || '',
       phone: formData.phone || '',
+      password: 'test123',
     };
 
     addUser({
@@ -79,6 +80,8 @@ const AddUserView = () => {
       },
     });
   };
+
+  console.log('errors: ', errors);
 
   return (
     <Container>
@@ -122,7 +125,22 @@ const AddUserView = () => {
                 </Div>
                 <Div useFlex flexDirection="column">
                   <Label>Role</Label>
-                  <Select
+                  <Controller
+                    control={control}
+                    render={({ onChange }) => (
+                      <Select
+                        options={mappedRoles}
+                        value={activeRole}
+                        onChange={(data: any) => {
+                          handleRoleChange(data);
+                          onChange(data.value);
+                        }}
+                      />
+                    )}
+                    name="role"
+                    defaultValue={activeRole}
+                  />
+                  {/* <Select
                     styles={errors.role && !activeRole ? ErrorStyle : undefined}
                     ref={() => register({
                       name: 'role',
@@ -133,7 +151,7 @@ const AddUserView = () => {
                     onChange={(qOption: any) => {
                       handleRoleChange(qOption);
                     }}
-                  />
+                  /> */}
                   {errors.role && !activeRole && <Muted color="warning">{errors.role.message}</Muted>}
                 </Div>
               </Grid>
