@@ -156,7 +156,8 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
   }, [customerSlug, activeDialogue, fetchQuestions]);
 
   // Dealing with recipients
-  const [activeRecipients, setActiveRecipients] = useState<Array<null | { label: string, value: string }>>([]);
+  const [activeRecipients, setActiveRecipients] = useState<Array<null | { label: string, value: string }>>(() => form.getValues().recipients || []);
+
   const addRecipient = () => setActiveRecipients((prevRecipients) => [...prevRecipients, null]);
 
   const deleteRecipient = (index: number) => {
@@ -165,8 +166,6 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
       return [...prevRecipients];
     });
   };
-
-  console.log(form.getValues({ nest: true }));
 
   return (
     <Form onSubmit={form.handleSubmit(onFormSubmit)}>
@@ -333,13 +332,16 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
               <Controller
                 name="lowThreshold"
                 control={form.control}
-                defaultValue={5}
+                // defaultValue={5}
                 render={({ onChange, onBlur, value }) => (
                   <Slider
                     color="cyan"
                     onChange={onChange}
                     onBlur={onBlur}
                     defaultValue={value}
+                    max={10}
+                    min={0.1}
+                    step={0.5}
                   >
                     <SliderTrack />
                     <SliderFilledTrack />
@@ -370,6 +372,9 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                     defaultValue={value}
                     onChange={onChange}
                     onBlur={onBlur}
+                    max={10}
+                    min={0.1}
+                    step={0.5}
                   >
                     <SliderTrack />
                     <SliderFilledTrack />

@@ -4,9 +4,9 @@ import {
 } from '@prisma/client';
 import { isPresent } from 'ts-is-present';
 
-import { sortBy } from 'lodash';
 import { Nullable, PaginationProps } from '../../types/generic';
 import { SessionWithEntries } from './SessionTypes';
+import { sortBy } from 'lodash';
 // eslint-disable-next-line import/no-cycle
 import { TEXT_NODES } from '../questionnaire/Dialogue';
 // eslint-disable-next-line import/no-cycle
@@ -51,26 +51,10 @@ class SessionService {
     });
 
     try {
-      await TriggerService.tryTriggers(session.nodeEntries, ctx.services.triggerSMSService);
+      await TriggerService.tryTriggers(session);
     } catch (e) {
       console.log('Something went wrong while handling sms triggers: ', e);
     }
-
-    // TODO: Replace this with email associated to dialogue (or fallback to company)
-    // const dialogueAgentMail = 'jmitnik@gmail.com';
-
-    // // TODO: Roundabout way, needs to be done in Prisma2 better
-    // const nodeEntries = await SessionService.getSessionEntries(session);
-    // const questionnaire = await prisma.dialogue.findOne({ where: { id: dialogueId } });
-
-    // ctx.services.triggerMailService.sendTrigger({
-    //   to: dialogueAgentMail,
-    //   userSession: {
-    //     id: session.id,
-    //     nodeEntries,
-    //     questionnaire,
-    //   },
-    // });
 
     return session;
   }

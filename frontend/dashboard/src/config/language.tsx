@@ -27,6 +27,7 @@ const language = {
     },
     views: {
       edit_dialogue_view: 'Edit dialogue',
+      edit_trigger_view: 'Edit trigger',
       dialogue_view: 'Overview',
       cta_view: 'Call to actions',
       builder_view: 'Dialogue Builder',

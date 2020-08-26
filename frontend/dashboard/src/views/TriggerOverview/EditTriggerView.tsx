@@ -8,13 +8,13 @@ import { useMutation, useQuery } from '@apollo/react-hooks';
 import { useToast } from '@chakra-ui/core';
 import { useTranslation } from 'react-i18next';
 import { yupResolver } from '@hookform/resolvers';
-import React from 'react';
+import React, { useEffect } from 'react';
 
-import createTriggerMutation from 'mutations/createTrigger';
 import getTriggerQuery from 'queries/getTrigger';
 
 import { ApolloError } from 'apollo-client';
 import TriggerForm from './TriggerForm';
+import editTriggerMutation from 'mutations/editTrigger';
 
 interface FormDataProps {
   name: string;
@@ -107,12 +107,12 @@ const EditTriggerView = () => {
 };
 
 const EditTriggerForm = ({ trigger }: {trigger: any}) => {
-  const { customerSlug } = useParams<{triggerId: string, customerSlug: string }>();
+  const { triggerId } = useParams<{triggerId: string, customerSlug: string }>();
 
   const { t } = useTranslation();
   const toast = useToast();
 
-  const form = useForm<FormDataProps>({
+  const form = useForm<any>({
     resolver: yupResolver(schema),
     defaultValues: {
       name: trigger.name,
@@ -121,25 +121,20 @@ const EditTriggerForm = ({ trigger }: {trigger: any}) => {
         label: trigger.relatedNode.questionDialogue.title,
         value: trigger.relatedNode.questionDialogue.slug,
       },
-
-      highThreshold: trigger.conditions[0].maxValue,
-      lowThreshold: trigger.conditions[0].minValue,
+      highThreshold: trigger.conditions[0].maxValue / 10,
+      lowThreshold: trigger.conditions[0].minValue / 10,
       matchText: trigger.conditions[0].textValue,
       medium: trigger.medium,
       question: {
         label: trigger.relatedNode.title,
         value: trigger.relatedNode.id,
       },
-      recipients: trigger.recipients.map((recip: any) => ({
-        label: `${recip?.lastName}, ${recip?.firstName} - E: ${recip?.email} - P: ${recip?.phone}`,
-        value: recip.id,
-      })),
       type: trigger.type,
     },
     mode: 'onBlur',
   });
 
-  const [editTrigger, { loading: isLoading, error: serverError }] = useMutation(createTriggerMutation, {
+  const [editTrigger, { loading: isLoading, error: serverError }] = useMutation(editTriggerMutation, {
     onCompleted: () => {
       toast({
         title: 'Edited trigger!',
@@ -153,7 +148,7 @@ const EditTriggerForm = ({ trigger }: {trigger: any}) => {
       toast({
         title: 'Something went wrong!',
         description: 'Trigger could not be created.',
-        status: 'success',
+        status: 'error',
         position: 'bottom-right',
         duration: 1500,
       });
@@ -179,7 +174,7 @@ const EditTriggerForm = ({ trigger }: {trigger: any}) => {
 
     editTrigger({
       variables: {
-        customerSlug,
+        triggerId,
         questionId,
         trigger,
         recipients,

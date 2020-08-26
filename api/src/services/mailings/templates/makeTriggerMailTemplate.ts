@@ -1,18 +1,22 @@
-import mjml2html from "mjml";
-import { SessionWithEntries } from "../../../models/session/SessionTypes";
-import NodeEntryService from "../../../models/node-entry/NodeEntryService";
+import Color from 'color';
+import mjml2html from 'mjml';
 
-const makeTriggerMailTemplate = (recipientName: string, userSession: SessionWithEntries, userScore: number) => {
-    return mjml2html(`
+import { SessionWithEntries } from '../../../models/session/SessionTypes';
+import NodeEntryService from '../../../models/node-entry/NodeEntryService';
+
+const makeTriggerMailTemplate = (recipientName: string, userSession: SessionWithEntries, userScore: number, bgColor: string = '#0059f8') => {
+  const lighterBg = Color(bgColor).darken(0.1).hex();
+
+  return mjml2html(`
         <mjml>
-        <mj-body background-color="#0059f8">
+        <mj-body background-color=${bgColor}>
             <mj-section text-align="center">
                 <mj-column>
                     <mj-image align="center" src="https://res.cloudinary.com/dx8khik9g/image/upload/v1586902351/haas/logo-haas.png" width="125px" alt="" />
                 </mj-column>
             </mj-section>
             <mj-spacer height="30px" />
-            <mj-section border-radius="5px 5px 0 0"  background-color="#6597fd">
+            <mj-section border-radius="5px 5px 0 0"  background-color=${lighterBg}>
                 <mj-column>
                     <mj-text font-size="20px" color="white" align="left">
                         Notification: A new trigger has been activated!
@@ -71,6 +75,6 @@ const makeTriggerMailTemplate = (recipientName: string, userSession: SessionWith
         </mj-body>
         </mjml>
     `).html;
-} ;
+};
 
 export default makeTriggerMailTemplate;

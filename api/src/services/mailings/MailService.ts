@@ -1,3 +1,4 @@
+/* eslint-disable class-methods-use-this */
 import AWS from '../../config/aws';
 
 import config from '../../config/config';
@@ -18,28 +19,28 @@ class MailService {
     const sendPromise = mailDriver.sendEmail({
       Destination: {
         ToAddresses: [
-          input.recipient
+          input.recipient,
         ],
       },
       Message: {
         Subject: {
           Charset: 'UTF-8',
-          Data: input.subject
+          Data: input.subject,
         },
         Body: {
           Html: {
             Charset: 'UTF-8',
-            Data: input.body
-          }
+            Data: input.body,
+          },
         },
       },
-      Source: config.mailSender
+      Source: config.mailSender,
     }).promise();
 
     sendPromise.then((res) => {
-      console.log("Res!:", res)
-    }).catch(err => {
-      console.error('Error!:', err)
+      console.log('Res!:', res);
+    }).catch((err) => {
+      console.error('Error!:', err);
     });
   }
 }
