@@ -6,7 +6,7 @@ import { useMutation } from '@apollo/react-hooks';
 import React from 'react';
 import styled, { css } from 'styled-components/macro';
 
-import { Card, CardBody, ColumnFlex, Div, ExtLink, Flex, H3, Paragraph } from '@haas/ui';
+import { Card, CardBody, ColumnFlex, Div, ExtLink, Flex, Paragraph, Text } from '@haas/ui';
 import { Menu, MenuHeader, MenuItem } from 'components/Menu/Menu';
 import { deleteQuestionnaireMutation } from 'mutations/deleteQuestionnaire';
 import ShowMoreButton from 'components/ShowMoreButton';
@@ -32,7 +32,7 @@ const DialogueCardOptionsOverlay = ({ onDelete, onEdit }: DialogueCardOptionsOve
   </Menu>
 );
 
-const DialogueCard = ({ dialogue }: { dialogue: any }) => {
+const DialogueCard = ({ dialogue, isCompact }: { dialogue: any, isCompact?: boolean }) => {
   const history = useHistory();
   const { customerSlug } = useParams();
 
@@ -69,24 +69,30 @@ const DialogueCard = ({ dialogue }: { dialogue: any }) => {
       <CardBody flex="100%">
         <ColumnFlex justifyContent="space-between" height="100%">
           <Div>
-            <H3 color="app.onWhite" mb={2} fontWeight={500}>
+            <Text fontSize={isCompact ? '1.1rem' : '1.4rem'} color="app.onWhite" mb={2} fontWeight={500}>
               {dialogue.title}
-            </H3>
-            <Paragraph fontSize="0.8rem" color="app.mutedOnWhite" fontWeight="100">
+            </Text>
 
-              {/* TODO: Sanitize */}
-              <ExtLink to={`https://haas-client.netlify.app/${dialogue.customer.slug}/${dialogue.slug}`}>
-                {`haas.live/${dialogue.customer.slug}/${dialogue.slug}`}
-              </ExtLink>
-            </Paragraph>
+            {!isCompact && (
+              <Paragraph fontSize="0.8rem" color="app.mutedOnWhite" fontWeight="100">
+
+                {/* TODO: Sanitize */}
+                <ExtLink to={`https://haas-client.netlify.app/${dialogue.customer.slug}/${dialogue.slug}`}>
+                  {`haas.live/${dialogue.customer.slug}/${dialogue.slug}`}
+                </ExtLink>
+              </Paragraph>
+            )}
           </Div>
 
           <Div>
-            <Flex mb={4} flex="100%">
-              <Flex flexWrap="wrap" alignSelf="flex-end" marginTop="5px" flexDirection="row">
-                {dialogue.tags.map((tag: any, index: number) => <Tag key={index} tag={tag} />)}
+            {!isCompact && (
+              <Flex mb={4} flex="100%">
+                <Flex flexWrap="wrap" alignSelf="flex-end" marginTop="5px" flexDirection="row">
+                  {dialogue.tags.map((tag: any, index: number) => <Tag key={index} tag={tag} />)}
+                </Flex>
               </Flex>
-            </Flex>
+            )}
+
             <Flex alignItems="center" justifyContent="space-between">
               <Div>
                 {lastUpdated && (
