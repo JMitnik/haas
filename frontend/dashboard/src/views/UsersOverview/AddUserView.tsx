@@ -3,13 +3,12 @@ import { ApolloError } from 'apollo-boost';
 import { Controller, useForm } from 'react-hook-form';
 import { useHistory, useParams } from 'react-router';
 import { useMutation, useQuery } from '@apollo/react-hooks';
-import React, { useState } from 'react';
+import React from 'react';
 import Select from 'react-select';
-import styled, { css } from 'styled-components/macro';
 
 import { Button, ButtonGroup, FormErrorMessage } from '@chakra-ui/core';
-import { Container, Div, ErrorStyle, Flex, Form, FormContainer, FormControl,
-  FormGroupContainer, FormLabel, FormSection, Grid, H2, H3, Hr, Input, InputGrid, InputHelper, Label, Muted, PageTitle, StyledInput } from '@haas/ui';
+import { Div, Form, FormContainer, FormControl,
+  FormLabel, FormSection, H3, Hr, Input, InputGrid, InputHelper, Muted, PageTitle } from '@haas/ui';
 import { Mail, Phone, User } from 'react-feather';
 import { motion } from 'framer-motion';
 import { useCustomer } from 'providers/CustomerProvider';
@@ -53,8 +52,6 @@ const AddUserView = () => {
 
   const { t } = useTranslation();
 
-  const [activeRole, setActiveRole] = useState<null | { label: string, value: string }>(null);
-
   const { data } = useQuery(getRolesQuery, { variables: { customerSlug } });
   const [addUser, { loading: isLoading }] = useMutation(createAddMutation, {
     onCompleted: () => {
@@ -70,11 +67,6 @@ const AddUserView = () => {
       },
     ],
   });
-
-  const handleRoleChange = (qOption: any) => {
-    form.setValue('role', qOption?.value);
-    setActiveRole(qOption);
-  };
 
   const roles: Array<{name: string, id: string}> = data?.roles;
   const mappedRoles = roles?.map(({ name, id }) => ({ label: name, value: id }));

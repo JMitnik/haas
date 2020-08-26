@@ -1,11 +1,11 @@
 import * as yup from 'yup';
 import {
-  Container, FormContainer, PageHeading, PageTitle,
+  FormContainer, PageTitle,
 } from '@haas/ui';
 import { motion } from 'framer-motion';
 import { useCustomer } from 'providers/CustomerProvider';
 import { useForm } from 'react-hook-form';
-import { useHistory, useLocation, useParams } from 'react-router';
+import { useHistory, useParams } from 'react-router';
 import { useMutation, useQuery } from '@apollo/react-hooks';
 import { useToast } from '@chakra-ui/core';
 import { yupResolver } from '@hookform/resolvers';
@@ -57,7 +57,7 @@ const EditCustomerView = () => {
 const startsWithCloudinary = (url: string) => url.includes('cloudinary');
 
 const EditCustomerForm = ({ customer }: { customer: any }) => {
-  const { dialogueSlug, customerSlug } = useParams();
+  const { customerSlug } = useParams();
   const history = useHistory();
   const { setActiveCustomer } = useCustomer();
 

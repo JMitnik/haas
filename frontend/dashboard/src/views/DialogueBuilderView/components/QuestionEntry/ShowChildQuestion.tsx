@@ -1,10 +1,10 @@
-import { FolderMinus, FolderPlus, Minus, Plus } from 'react-feather';
+import { FolderMinus, FolderPlus } from 'react-feather';
 import React from 'react';
 
 import { Button } from '@chakra-ui/core';
 import { Span } from '@haas/ui';
 
-import { AddChildContainer, AddChildIconContainer } from './QuestionEntryStyles';
+import { AddChildContainer } from './QuestionEntryStyles';
 
 interface AddChildComponentProps {
   amtChildren?: number;

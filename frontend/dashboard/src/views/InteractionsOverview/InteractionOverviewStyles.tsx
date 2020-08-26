@@ -1,6 +1,5 @@
-import { Div, Flex, Grid, ViewContainer } from '@haas/ui';
-
-import styled, { css } from 'styled-components';
+import { Div, Grid } from '@haas/ui';
+import styled from 'styled-components/macro';
 
 const FlexRow = styled(Div)`
   display: flex;
@@ -8,10 +7,11 @@ const FlexRow = styled(Div)`
 `;
 
 export const RowContainer = styled(Grid) <{isExpanded?: boolean}>`
- 
   cursor: pointer;
   padding-left: 10px;
   padding-right: 10px;
+  padding-top: 4px;
+  padding-bottom: 4px;
   grid-row-gap: 0;
   grid-column-gap: 5;
   border-top: ${(props) => (props.isExpanded ? '1px solid rgba(0,0,0,.05)' : '1px solid transparent')};
@@ -56,9 +56,7 @@ export const OutputContainer = styled(FlexRow)`
 `;
 
 export const InteractionsOverviewContainer = styled(Div)`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-  `}
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
 `;

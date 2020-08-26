@@ -3820,7 +3820,7 @@
       "model": "User",
       "field": "password",
       "type": "String",
-      "arity": "Required"
+      "arity": "Optional"
     },
     {
       "tag": "CreateField",

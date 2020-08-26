@@ -1,4 +1,3 @@
-import { maxBy } from 'lodash';
 import React, { useState } from 'react';
 
 import { Div, Grid, H4, H5, Hr, Span } from '@haas/ui';

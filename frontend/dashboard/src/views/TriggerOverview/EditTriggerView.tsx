@@ -1,20 +1,20 @@
 /* eslint-disable radix */
 import * as yup from 'yup';
-import { Div, FormContainer, PageTitle } from '@haas/ui';
+import { ApolloError } from 'apollo-client';
+import { FormContainer, PageTitle } from '@haas/ui';
 import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
-import { useHistory, useParams } from 'react-router';
 import { useMutation, useQuery } from '@apollo/react-hooks';
+import { useParams } from 'react-router';
 import { useToast } from '@chakra-ui/core';
 import { useTranslation } from 'react-i18next';
 import { yupResolver } from '@hookform/resolvers';
-import React, { useEffect } from 'react';
+import React from 'react';
 
+import editTriggerMutation from 'mutations/editTrigger';
 import getTriggerQuery from 'queries/getTrigger';
 
-import { ApolloError } from 'apollo-client';
 import TriggerForm from './TriggerForm';
-import editTriggerMutation from 'mutations/editTrigger';
 
 interface FormDataProps {
   name: string;

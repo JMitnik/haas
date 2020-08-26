@@ -1,6 +1,6 @@
 import { ApolloProvider } from '@apollo/react-hooks';
 import { ErrorBoundary } from 'react-error-boundary';
-import { I18nextProvider } from 'react-i18next';
+import { I18nextProvider, useTranslation } from 'react-i18next';
 import { Redirect, Route, RouteProps, BrowserRouter as Router, Switch } from 'react-router-dom';
 import React, { FC } from 'react';
 
@@ -32,7 +32,7 @@ import UsersOverview from 'views/UsersOverview/UsersOverview';
 
 import { AnimatePresence } from 'framer-motion';
 import { ViewContainer } from '@haas/ui';
-import AuthProvider, { useAuth } from 'providers/AuthProvider';
+import AuthProvider from 'providers/AuthProvider';
 import DialogueLayout from 'layouts/DialogueLayout';
 import LoginPage from 'pages/login';
 import PreCustomerLayout from 'layouts/PreCustomerLayout';
@@ -40,8 +40,8 @@ import client from 'config/apollo';
 import lang from 'config/i18n-config';
 
 const ProtectedRoute = (props: RouteProps) => {
-  const { user } = useAuth();
-
+  useTranslation();
+  // const { user } = useAuth();
   // Note-Login: Uncomment this for login
   // if (!user) return <Redirect to="/login" />;
 

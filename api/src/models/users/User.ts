@@ -33,8 +33,9 @@ export const UserType = objectType({
         });
 
         const userCustomer = userWithRole?.customers.find((cus) => cus.customer.slug === info.variableValues.customerSlug);
+        const role = userCustomer?.role || null;
 
-        return userCustomer?.role;
+        return role;
       },
     });
   },

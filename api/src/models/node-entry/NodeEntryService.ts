@@ -37,11 +37,11 @@ class NodeEntryService {
 
     sliderNodeEntry: nodeEntryInput?.data?.slider?.value ? {
       create: { value: nodeEntryInput?.data?.slider?.value },
-    } : undefined ,
+    } : undefined,
 
     textboxNodeEntry: nodeEntryInput?.data?.textbox?.value ? {
       create: { value: nodeEntryInput?.data?.textbox?.value },
-    }: undefined,
+    } : undefined,
   });
 
   // TODO: Test
@@ -110,7 +110,7 @@ class NodeEntryService {
   //   if
   // }
 
-  static getNodeEntryValue = async (nodeEntry: NodeEntryWithTypes): Promise<any> => {
+  static getNodeEntryValue = (nodeEntry: NodeEntryWithTypes): any => {
     if (nodeEntry.relatedNode?.type === 'GENERIC') {
       return null;
     }

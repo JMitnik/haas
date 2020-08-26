@@ -1,9 +1,11 @@
 import React from 'react';
 
-import { Card, CardBody, Div, Flex, H3, H4, Span } from '@haas/ui';
+import { Card, CardBody, Div, Flex, Span, Text } from '@haas/ui';
 import styled, { css } from 'styled-components/macro';
 
-import { Info } from 'react-feather';
+import { Icon } from '@chakra-ui/core';
+import { Smile } from 'react-feather';
+import FallbackContainer from '../FallbackContainer';
 import ModuleContainer from '../Module';
 
 const PostivePathsModuleList = styled.ol`
@@ -11,7 +13,6 @@ const PostivePathsModuleList = styled.ol`
    list-style: none;
    padding: 12px 0 0 0 !important;
    counter-reset: item;
-   
  
     li {
       counter-increment: item;
@@ -19,7 +20,7 @@ const PostivePathsModuleList = styled.ol`
       border-bottom: 1px solid ${theme.colors.default.normalAlt};
       padding: 18px 24px;
 
-      &:last-child {
+      &:last-of-type {
         border-bottom: 0;
       }
 
@@ -38,14 +39,10 @@ const PostivePathsModuleList = styled.ol`
 
 const PositivePathsModule = ({ positivePaths }: { positivePaths: any }) => (
   <ModuleContainer>
-    <Card height="100%" bg="white">
-      <CardBody display="flex" flexDirection="column" height="100%">
-        <H3 color="success">
-          <Flex justifyContent="space-between" alignItems="center">
-            <Span>Top positive paths</Span>
-          </Flex>
-        </H3>
-        <Flex minHeight="200px" marginTop="10px" flexGrow={1} flexDirection="column">
+    <Card bg="white">
+      <CardBody display="flex" flexDirection="column">
+        <Text fontSize="1.3rem" color="teal.200">Top positive paths</Text>
+        <Flex marginTop="10px" flexGrow={1} flexDirection="column">
           {positivePaths.length > 0 && (
           <PostivePathsModuleList>
             {positivePaths.map(({ answer, quantity }: { answer: string, quantity: number }) => (
@@ -56,20 +53,17 @@ const PositivePathsModule = ({ positivePaths }: { positivePaths: any }) => (
           </PostivePathsModuleList>
           )}
 
-          {!positivePaths.length && (
-          <Flex flexGrow={1} justifyContent="center" alignItems="center">
-            <Div color="default.darker" marginRight="5px">
-              <Info />
-            </Div>
-            <H4 color="default.darker">No data available</H4>
-          </Flex>
-          )}
-
         </Flex>
       </CardBody>
+      {!positivePaths.length && (
+        <FallbackContainer>
+          <Text fontWeight="600" fontSize="1.2rem" color="gray.400">No positive paths recorded yet</Text>
+          <Div>
+            <Icon size="175px" color="gray.50" as={Smile} />
+          </Div>
+        </FallbackContainer>
+      )}
     </Card>
-    <H3 />
-
   </ModuleContainer>
 );
 

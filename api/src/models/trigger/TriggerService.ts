@@ -140,7 +140,7 @@ class TriggerService {
   static sendSmsTrigger(trigger: TriggerWithSendData, recipient: User, session: SessionWithEntries, value: any) {
     if (!recipient.phone) return;
 
-    smsService.send(recipient.phone, `A trigger alert has been triggered. One of your dialogues ${trigger.name} of ${trigger.relatedNode?.questionDialogue?.title} has been triggered with value: '${value}'`);
+    smsService.send(recipient.phone, `HAAS: An alert has been triggered. Your trigger "${trigger.name}" has spotted value: '${value}'`);
   }
 
   static sendTrigger = (
@@ -163,8 +163,8 @@ class TriggerService {
         break;
 
       case 'BOTH':
-        if (recipient.email) console.log('Go');
-        if (recipient.phone) console.log('Go');
+        if (recipient.email) TriggerService.sendMailTrigger(trigger, recipient, session, value);
+        if (recipient.phone) TriggerService.sendSmsTrigger(trigger, recipient, session, value);
         break;
 
       default:

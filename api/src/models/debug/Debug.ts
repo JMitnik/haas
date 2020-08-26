@@ -28,5 +28,7 @@ export const DebugMutation = mutationField('debugMutation', {
       recipient: 'jonathan@onecommunity.nl',
       subject: 'Test from HAAS',
     });
+
+    return 'test';
   },
 });

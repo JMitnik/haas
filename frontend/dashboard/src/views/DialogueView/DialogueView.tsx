@@ -1,5 +1,6 @@
 import * as qs from 'qs';
-import { Activity, Award, BarChart, MessageCircle, ThumbsDown, ThumbsUp, TrendingDown, TrendingUp } from 'react-feather';
+import { Activity, Award, BarChart, MessageCircle,
+  ThumbsDown, ThumbsUp, TrendingDown, TrendingUp } from 'react-feather';
 import { Div, Flex, Grid, H4, Icon, Loader, PageTitle, Span, Text } from '@haas/ui';
 import { Tag, TagIcon, TagLabel } from '@chakra-ui/core';
 import { sub } from 'date-fns';
@@ -14,7 +15,6 @@ import { ReactComponent as PathsIcon } from 'assets/icons/icon-launch.svg';
 import { ReactComponent as TrendingIcon } from 'assets/icons/icon-trending-up.svg';
 import { ReactComponent as TrophyIcon } from 'assets/icons/icon-trophy.svg';
 
-import { dialogueStatistics as DialogueStatisticsData } from './__generated__/dialogueStatistics';
 import InteractionFeedModule from './Modules/InteractionFeedModule/InteractionFeedModule';
 import NegativePathsModule from './Modules/NegativePathsModule/index.tsx';
 import PositivePathsModule from './Modules/PositivePathsModule/PositivePathsModule';
@@ -50,6 +50,19 @@ const getDialogueStatistics = gql`
           id
           createdAt
           score
+          nodeEntries {
+            relatedNode {
+              title
+              type
+            }
+            value {
+              sliderNodeEntry
+              textboxNodeEntry
+              registrationNodeEntry
+              choiceNodeEntry
+              linkNodeEntry
+            }
+          }
         }
         statistics {
           topPositivePath {
@@ -88,8 +101,7 @@ const calcScoreIncrease = (currentScore: number, prevScore: number) => {
 
 const DialogueView = () => {
   const { dialogueSlug, customerSlug } = useParams();
-  const [, setActiveSession] = useState('');
-  const [prevWeekDate, _] = useState(() => sub(new Date(), {
+  const [prevWeekDate] = useState(() => sub(new Date(), {
     weeks: 1,
   }).toISOString());
 
@@ -253,10 +265,7 @@ const DialogueView = () => {
           )}
         </Div>
 
-        <InteractionFeedModule
-          onActiveSessionChange={setActiveSession}
-          timelineEntries={dialogue?.sessions}
-        />
+        <InteractionFeedModule interactions={dialogue?.sessions} />
       </Grid>
     </DialogueViewContainer>
   );

@@ -12,6 +12,7 @@ import { TriggerMediumEnum, TriggerTypeEnum, TriggerConditionEnum } from "./../.
 export interface getTrigger_trigger_relatedNode_questionDialogue {
   __typename: "Dialogue";
   slug: string;
+  title: string;
 }
 
 export interface getTrigger_trigger_relatedNode {

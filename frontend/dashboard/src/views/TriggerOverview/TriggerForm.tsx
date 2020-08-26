@@ -151,7 +151,7 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
 
   useEffect(() => {
     if (activeDialogue) {
-      fetchQuestions({ variables: { customerSlug, dialogueSlug: form.watch('dialogue').value } });
+      fetchQuestions({ variables: { customerSlug, dialogueSlug: activeDialogue.value } });
     }
   }, [customerSlug, activeDialogue, fetchQuestions]);
 

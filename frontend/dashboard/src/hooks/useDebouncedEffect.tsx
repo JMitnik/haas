@@ -1,3 +1,6 @@
+// eslint-disable-next-line react-hooks/exhaustive-deps
+/* eslint-disable react-hooks/exhaustive-deps */
+
 import { useEffect } from 'react';
 
 const useDebouncedEffect = (

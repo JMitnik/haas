@@ -1,6 +1,5 @@
-import { ArrowRightCircle } from 'react-feather';
-import { AvatarBadge, Badge, Avatar as ChakraAvatar } from '@chakra-ui/core';
-import { Card, ColumnFlex, Div, Flex, Span } from '@haas/ui';
+import { AvatarBadge, Avatar as ChakraAvatar } from '@chakra-ui/core';
+import { Flex } from '@haas/ui';
 import { LinkProps, NavLink, useHistory } from 'react-router-dom';
 import React from 'react';
 import styled, { css } from 'styled-components/macro';
@@ -8,9 +7,7 @@ import styled, { css } from 'styled-components/macro';
 import { FullLogo, FullLogoContainer, LogoContainer } from 'components/Logo/Logo';
 import { UserProps } from 'types/generic';
 import { useCustomer } from 'providers/CustomerProvider';
-import Avatar from 'components/Avatar';
 import Color from 'color';
-import Logo from 'components/Logo';
 
 interface NavItemProps extends LinkProps { }
 
@@ -89,7 +86,7 @@ const UsernavContainer = styled.div`
   `}
 `;
 
-export const Usernav = ({ user, customer }: { user: UserProps, customer: any }) => {
+export const Usernav = ({ user }: { user: UserProps, customer: any }) => {
   const history = useHistory();
   const { setActiveCustomer, setStorageCustomer } = useCustomer();
 

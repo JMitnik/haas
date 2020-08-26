@@ -3,9 +3,9 @@ import { debounce } from 'lodash';
 import { useLazyQuery } from '@apollo/react-hooks';
 import { useParams } from 'react-router-dom';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import styled, { css } from 'styled-components/macro';
+import styled from 'styled-components/macro';
 
-import { Div, Flex, H2, PageTitle, Span, ViewContainer } from '@haas/ui';
+import { Div, Flex, PageTitle } from '@haas/ui';
 import LinkIcon from 'components/Icons/LinkIcon';
 
 import OpinionIcon from 'components/Icons/OpinionIcon';
@@ -16,7 +16,6 @@ import getCTANodesQuery from 'queries/getCTANodes';
 import { Button, Icon } from '@chakra-ui/core';
 import { Variants, motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import AddCTAButton from './components/AddCTAButton';
 import CTAEntry from './components/CTAEntry';
 
 interface ActionOverviewProps {
