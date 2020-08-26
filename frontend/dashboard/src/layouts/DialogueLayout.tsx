@@ -1,12 +1,12 @@
 import React, { useContext, useRef, useState } from 'react';
 
-import { Activity, BarChart, Clipboard, Download, Mail, Menu, Share, Zap } from 'react-feather';
-import { Button, Icon, Modal, ModalBody, ModalCloseButton,
-  ModalContent, ModalFooter, ModalHeader, ModalOverlay, useClipboard, useDisclosure } from '@chakra-ui/core';
+import { Activity, BarChart, Clipboard, Download, Mail, Menu, Share, Sliders, Zap } from 'react-feather';
+import { Button, Icon, IconButton, Modal, ModalBody,
+  ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useClipboard, useDisclosure } from '@chakra-ui/core';
 import { ColumnFlex, Div, Flex, Grid, Hr, Input, StyledExtLink, Text, ViewContainer } from '@haas/ui';
 import { NavLink } from 'react-router-dom';
 import { Variants, motion } from 'framer-motion';
-import { useParams } from 'react-router';
+import { useHistory, useParams } from 'react-router';
 import { useQuery } from '@apollo/react-hooks';
 import { useTranslation } from 'react-i18next';
 import QRCode from 'qrcode.react';
@@ -184,18 +184,48 @@ const ShareDialogueModal = ({ dialogueName, shareUrl, onClose }: ShareDialogueMo
   );
 };
 
+const IconButtonContainer = styled.div`
+  ${({ theme }) => css`
+
+    button {
+      background: ${theme.colors.primaries['700']};
+      margin-left: ${theme.gutter / 2}px;
+    
+      svg {
+        padding: 4px;
+        stroke: ${theme.colors.primaries['100']};
+      }    
+    }
+  `}
+`;
+
 const DialogueNavBar = ({ dialogue, customerSlug, dialogueSlug }: DialogueNavBarProps) => {
   const { t } = useTranslation();
   const { onClose, onOpen, isOpen } = useDisclosure();
+  const history = useHistory();
 
   const shareUrl = `https://client.haas.live/${customerSlug}/${dialogueSlug}`;
 
   return (
     <DialogueNavBarContainer>
       <Div mb={4}>
-        <DialogueNavBarContextHeading fontWeight={700}>
-          {dialogue.title}
-        </DialogueNavBarContextHeading>
+        <Flex>
+          <DialogueNavBarContextHeading fontWeight={700}>
+            {dialogue.title}
+          </DialogueNavBarContextHeading>
+          <IconButtonContainer>
+            <IconButton
+              onClick={() => (
+                history.push(`/dashboard/b/${customerSlug}/d/${dialogueSlug}/edit`)
+              )}
+              fontSize="0.7rem"
+              size="xs"
+              variant="ghost"
+              aria-label="settings"
+              icon={Sliders}
+            />
+          </IconButtonContainer>
+        </Flex>
         <Flex justifyContent="space-between">
 
           <Div color="primaries.200" flexGrow={0}>

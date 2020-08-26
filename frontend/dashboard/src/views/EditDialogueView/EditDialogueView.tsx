@@ -2,7 +2,7 @@ import * as yup from 'yup';
 import { ApolloError, gql } from 'apollo-boost';
 import { Button, ButtonGroup, FormErrorMessage, Stack } from '@chakra-ui/core';
 import { Container, Div, Flex, Form, FormContainer, FormControl, FormLabel,
-  FormSection, H2, H3, Hr, Input, InputGrid, InputHelper, Muted, Textarea } from '@haas/ui';
+  FormSection, H2, H3, Hr, Input, InputGrid, InputHelper, Muted, PageTitle, Textarea } from '@haas/ui';
 import { Controller, useForm } from 'react-hook-form';
 import { Minus, Plus, Type } from 'react-feather';
 import { motion } from 'framer-motion';
@@ -141,9 +141,9 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFo
 
   return (
     <Div>
-      <Div>
-        <H2 color="gray.700" mb={4} py={2}>Edit dialogue</H2>
-      </Div>
+      <PageTitle>
+        {t('views:edit_dialogue_view')}
+      </PageTitle>
       <motion.div initial={{ opacity: 0, y: 100 }} animate={{ opacity: 1, y: 0 }}>
         <FormContainer>
           <Form onSubmit={form.handleSubmit(onSubmit)}>

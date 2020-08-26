@@ -26,6 +26,7 @@ const language = {
       no_custom_template_helper: 'Start with a clean slate',
     },
     views: {
+      edit_dialogue_view: 'Edit dialogue',
       dialogue_view: 'Overview',
       cta_view: 'Call to actions',
       builder_view: 'Dialogue Builder',
