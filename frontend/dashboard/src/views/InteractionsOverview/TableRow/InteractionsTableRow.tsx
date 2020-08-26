@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { Div, Grid, H4, H5, Hr, Span } from '@haas/ui';
+import { Div, H4, H5, Hr, Span } from '@haas/ui';
 import {
   getDialogueSessionConnection_customer_dialogue_sessionConnection_sessions_nodeEntries as NodeEntry,
   getDialogueSessionConnection_customer_dialogue_sessionConnection_sessions as Session,
