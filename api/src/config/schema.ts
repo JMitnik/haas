@@ -1,8 +1,7 @@
 import { makeSchema } from '@nexus/schema';
 import path from 'path';
 
-// eslint-disable-next-line import/no-cycle
-import nexus from './nexus/index';
+import nexus from './nexus';
 
 const schema = makeSchema({
   shouldGenerateArtifacts: true,
@@ -16,7 +15,7 @@ const schema = makeSchema({
         alias: 'prisma',
       },
       {
-        source: path.join(__dirname, './types/APIContext.ts'),
+        source: path.join(__dirname, '../types/APIContext.ts'),
         alias: 'APIContext',
       },
     ],
@@ -24,8 +23,8 @@ const schema = makeSchema({
   },
 
   outputs: {
-    schema: path.join(__dirname, './generated/schema.graphql'),
-    typegen: path.join(__dirname, './generated/nexus.ts'),
+    schema: path.join(__dirname, '../generated/schema.graphql'),
+    typegen: path.join(__dirname, '../generated/nexus.ts'),
   },
 });
 

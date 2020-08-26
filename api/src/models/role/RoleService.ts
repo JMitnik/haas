@@ -1,5 +1,5 @@
 import { NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
-import prisma from '../../prisma';
+import prisma from '../../config/prisma';
 
 class RoleService {
   static sliceRoles = (

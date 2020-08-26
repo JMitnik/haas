@@ -6,6 +6,5 @@ import ServiceContainer from '../services/service-container';
 
 export interface APIContext extends ExpressContext {
   prisma: PrismaClient;
-  services: ServiceContainer;
 }
 

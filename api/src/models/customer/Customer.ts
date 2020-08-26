@@ -1,6 +1,6 @@
 import { Customer, PrismaClient } from '@prisma/client';
 import { GraphQLError } from 'graphql';
-import { GraphQLUpload } from 'apollo-server-express';
+import { GraphQLUpload, UserInputError } from 'apollo-server-express';
 import { extendType, inputObjectType, mutationField, objectType, scalarType } from '@nexus/schema';
 import cloudinary, { UploadApiResponse } from 'cloudinary';
 
@@ -269,7 +269,7 @@ export const CustomerQuery = extendType({
           return customer;
         }
 
-        throw new Error('Cant find the customer here');
+        throw new UserInputError('Cant find the customer here');
       },
     });
   },

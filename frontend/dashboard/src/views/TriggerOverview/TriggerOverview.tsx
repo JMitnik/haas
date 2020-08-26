@@ -1,16 +1,19 @@
 import { ApolloError } from 'apollo-boost';
+import { Div, Flex, PageTitle, Text } from '@haas/ui';
 import { debounce } from 'lodash';
 import { useHistory, useParams } from 'react-router';
 import { useLazyQuery, useMutation } from '@apollo/react-hooks';
+import { useTranslation } from 'react-i18next';
 import React, { useCallback, useEffect, useState } from 'react';
 
-import { Div, PageHeading } from '@haas/ui';
 import { UserCell } from 'components/Table/CellComponents/CellComponents';
 import SearchBar from 'components/SearchBar/SearchBar';
 import Table from 'components/Table/Table';
 import deleteTriggerMutation from 'mutations/deleteTrigger';
 import getTriggerTableQuery from 'queries/getTriggerTable';
 
+import { Button, ButtonGroup } from '@chakra-ui/core';
+import { Plus } from 'react-feather';
 import { InputContainer, InputOutputContainer } from './TriggerOverviewStyles';
 import Row from './TableRow/TriggerOverviewRow';
 
@@ -27,9 +30,9 @@ interface TableProps {
 }
 
 const HEADERS = [
-  { Header: 'NAME', accessor: 'name', Cell: UserCell },
-  { Header: 'MEDIUM', accessor: 'medium', Cell: UserCell },
-  { Header: 'TYPE', accessor: 'type', Cell: UserCell },
+  { Header: 'Name', accessor: 'name', Cell: UserCell },
+  { Header: 'Medium', accessor: 'medium', Cell: UserCell },
+  { Header: 'Type', accessor: 'type', Cell: UserCell },
 ];
 
 const TriggersOverview = () => {
@@ -108,14 +111,23 @@ const TriggersOverview = () => {
   const pageCount = data?.triggerTable?.totalPages || 1;
   const pageIndex = data?.triggerTable?.pageIndex || 0;
 
+  const { t } = useTranslation();
+
   return (
-    <Div px="24px" margin="0 auto" height="100vh" maxHeight="100vh">
-      <PageHeading mb="4">Triggers</PageHeading>
-      <InputOutputContainer mb="5%">
-        <InputContainer>
-          <SearchBar activeSearchTerm={paginationProps.activeSearchTerm} onSearchTermChange={handleSearchTermChange} />
-        </InputContainer>
-      </InputOutputContainer>
+    <Div margin="0 auto" height="100vh" maxHeight="100vh">
+      <PageTitle>{t('views:trigger_overview')}</PageTitle>
+
+      <Div mb={4} width="100%">
+        <Flex justifyContent="space-between">
+          <Div mr={4}>
+            <Button onClick={handleAddUser} leftIcon={Plus} variantColor="teal">Create trigger</Button>
+          </Div>
+          <Div>
+            <SearchBar activeSearchTerm={paginationProps.activeSearchTerm} onSearchTermChange={handleSearchTermChange} />
+          </Div>
+        </Flex>
+      </Div>
+
       <Div borderRadius="lg" flexGrow={1} backgroundColor="white">
         <Table
           headers={HEADERS}

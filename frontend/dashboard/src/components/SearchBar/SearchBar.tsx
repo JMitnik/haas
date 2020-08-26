@@ -3,14 +3,16 @@ import React, { useRef, useState } from 'react';
 
 import useDebouncedEffect from 'hooks/useDebouncedEffect';
 
+import { Spinner } from '@chakra-ui/core';
 import { EmptyInputIcon, InputIcon, SearchbarInput, SearchbarInputContainer } from './SearchBarStyles';
 
 interface SearchBarProps {
   activeSearchTerm: string;
   onSearchTermChange: (newSearchTerm: string) => void;
+  isSearching?: boolean;
 }
 
-const SearchBar = ({ activeSearchTerm, onSearchTermChange }: SearchBarProps) => {
+const SearchBar = ({ activeSearchTerm, onSearchTermChange, isSearching }: SearchBarProps) => {
   const [searchTerm, setSearchTerm] = useState<string>(activeSearchTerm);
   const startedRef = useRef<boolean>();
 

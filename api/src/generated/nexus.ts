@@ -4,6 +4,7 @@
  */
 
 import * as APIContext from "../types/APIContext"
+import * as prisma from "@prisma/client"
 import { core } from "@nexus/schema"
 declare global {
   interface NexusGenCustomInputMethods<TypeName extends string> {
@@ -63,7 +64,9 @@ export interface NexusGenInputs {
     id: string; // ID!
   }
   DialogueFilterInputType: { // input type
+    endDate?: string | null; // String
     searchTerm?: string | null; // String
+    startDate?: string | null; // String
   }
   DialogueWhereUniqueInput: { // input type
     id?: string | null; // ID
@@ -75,10 +78,6 @@ export interface NexusGenInputs {
     matchValue?: string | null; // String
     renderMax?: number | null; // Int
     renderMin?: number | null; // Int
-  }
-  LoginInput: { // input type
-    email: string; // String!
-    password: string; // String!
   }
   NodeEntryDataInput: { // input type
     choice?: NexusGenInputs['ChoiceNodeEntryInput'] | null; // ChoiceNodeEntryInput
@@ -132,14 +131,6 @@ export interface NexusGenInputs {
   RecipientsInputType: { // input type
     ids?: string[] | null; // [String!]
   }
-  RegisterInput: { // input type
-    customerId: string; // String!
-    email: string; // String!
-    firstName: string; // String!
-    lastName: string; // String!
-    password: string; // String!
-    roleId?: string | null; // String
-  }
   RegisterNodeEntryInput: { // input type
     value?: string | null; // String
   }
@@ -187,7 +178,7 @@ export interface NexusGenInputs {
     email: string; // String!
     firstName?: string | null; // String
     lastName?: string | null; // String
-    password: string; // String!
+    password?: string | null; // String
     phone?: string | null; // String
     roleId?: string | null; // String
   }
@@ -198,49 +189,24 @@ export interface NexusGenEnums {
   PaginationSortByEnum: "createdAt" | "email" | "firstName" | "id" | "lastName" | "medium" | "name" | "paths" | "role" | "score" | "type" | "user" | "when"
   QuestionNodeTypeEnum: "CHOICE" | "GENERIC" | "LINK" | "REGISTRATION" | "SLIDER" | "TEXTBOX"
   TagTypeEnum: "AGENT" | "DEFAULT" | "LOCATION"
-  TriggerConditionEnum: "HIGH_THRESHOLD" | "INNER_RANGE" | "LOW_THRESHOLD" | "OUTER_RANGE" | "TEXT_MATCH"
+  TriggerConditionEnum: prisma.TriggerConditionEnum
   TriggerMediumEnum: "BOTH" | "EMAIL" | "PHONE"
   TriggerTypeEnum: "QUESTION" | "SCHEDULED"
 }
 
 export interface NexusGenRootTypes {
-  ColourSettings: { // root type
-    id: string; // ID!
-    primary: string; // String!
-    primaryAlt?: string | null; // String
-    secondary?: string | null; // String
-  }
-  Customer: { // root type
-    id: string; // ID!
-    name: string; // String!
-    slug: string; // String!
-  }
-  CustomerSettings: { // root type
-    id: string; // ID!
-    logoUrl?: string | null; // String
-  }
-  Dialogue: { // root type
-    creationDate?: string | null; // String
-    customerId: string; // String!
-    description: string; // String!
-    id: string; // ID!
-    publicTitle?: string | null; // String
-    slug: string; // String!
-    title: string; // String!
-    updatedAt?: string | null; // String
-  }
+  ColourSettings: prisma.ColourSettings;
+  Customer: prisma.Customer;
+  CustomerSettings: prisma.CustomerSettings;
+  Debug: {};
+  Dialogue: prisma.Dialogue;
   DialogueStatistics: { // root type
     history?: NexusGenRootTypes['lineChartDataType'][] | null; // [lineChartDataType!]
+    mostPopularPath?: NexusGenRootTypes['topPathType'] | null; // topPathType
     topNegativePath?: NexusGenRootTypes['topPathType'][] | null; // [topPathType!]
     topPositivePath?: NexusGenRootTypes['topPathType'][] | null; // [topPathType!]
   }
-  Edge: { // root type
-    childNodeId: string; // String!
-    createdAt: string; // String!
-    id: string; // ID!
-    parentNodeId: string; // String!
-    updatedAt: string; // String!
-  }
+  Edge: prisma.Edge;
   EdgeCondition: { // root type
     conditionType: string; // String!
     edgeId?: string | null; // String
@@ -249,9 +215,7 @@ export interface NexusGenRootTypes {
     renderMax?: number | null; // Int
     renderMin?: number | null; // Int
   }
-  FontSettings: { // root type
-    id: string; // ID!
-  }
+  FontSettings: prisma.FontSettings;
   ImageType: { // root type
     encoding?: string | null; // String
     filename?: string | null; // String
@@ -267,17 +231,8 @@ export interface NexusGenRootTypes {
     type: string; // String!
     url: string; // String!
   }
-  LoginOutput: { // root type
-    token: string; // String!
-    user: NexusGenRootTypes['UserType']; // UserType!
-  }
   Mutation: {};
-  NodeEntry: { // root type
-    creationDate: string; // String!
-    id?: string | null; // ID
-    relatedEdgeId?: string | null; // String
-    relatedNodeId?: string | null; // String
-  }
+  NodeEntry: prisma.NodeEntry;
   NodeEntryValue: { // root type
     choiceNodeEntry?: string | null; // String
     linkNodeEntry?: string | null; // String
@@ -296,20 +251,8 @@ export interface NexusGenRootTypes {
     name: string; // String!
   }
   Query: {};
-  QuestionNode: { // root type
-    creationDate?: string | null; // String
-    id: string; // ID!
-    isLeaf: boolean; // Boolean!
-    isRoot: boolean; // Boolean!
-    overrideLeafId?: string | null; // String
-    title: string; // String!
-    type: NexusGenEnums['QuestionNodeTypeEnum']; // QuestionNodeTypeEnum!
-  }
-  QuestionOption: { // root type
-    id: number; // Int!
-    publicValue?: string | null; // String
-    value: string; // String!
-  }
+  QuestionNode: prisma.QuestionNode;
+  QuestionOption: prisma.QuestionOption;
   RoleConnection: { // root type
     endDate?: string | null; // String
     limit: number; // Int!
@@ -326,11 +269,7 @@ export interface NexusGenRootTypes {
     nrPermissions?: number | null; // Int
     roleId?: string | null; // String
   }
-  Session: { // root type
-    createdAt: string; // String!
-    dialogueId: string; // String!
-    id: string; // ID!
-  }
+  Session: prisma.Session;
   SessionConnection: { // root type
     endDate?: string | null; // String
     limit: number; // Int!
@@ -339,12 +278,7 @@ export interface NexusGenRootTypes {
     sessions: NexusGenRootTypes['Session'][]; // [Session!]!
     startDate?: string | null; // String
   }
-  Tag: { // root type
-    customerId: string; // String!
-    id: string; // ID!
-    name: string; // String!
-    type: NexusGenEnums['TagTypeEnum']; // TagTypeEnum!
-  }
+  Tag: prisma.Tag;
   TriggerConditionType: { // root type
     id: number; // Int!
     maxValue?: number | null; // Int
@@ -388,6 +322,7 @@ export interface NexusGenRootTypes {
   }
   topPathType: { // root type
     answer?: string | null; // String
+    basicSentiment?: string | null; // String
     quantity?: number | null; // Int
   }
   ConnectionInterface: NexusGenRootTypes['SessionConnection'] | NexusGenRootTypes['RoleConnection'] | NexusGenRootTypes['TriggerConnectionType'];
@@ -410,7 +345,6 @@ export interface NexusGenAllTypes extends NexusGenRootTypes {
   DialogueFilterInputType: NexusGenInputs['DialogueFilterInputType'];
   DialogueWhereUniqueInput: NexusGenInputs['DialogueWhereUniqueInput'];
   EdgeConditionInputType: NexusGenInputs['EdgeConditionInputType'];
-  LoginInput: NexusGenInputs['LoginInput'];
   NodeEntryDataInput: NexusGenInputs['NodeEntryDataInput'];
   NodeEntryInput: NexusGenInputs['NodeEntryInput'];
   OptionInputType: NexusGenInputs['OptionInputType'];
@@ -422,7 +356,6 @@ export interface NexusGenAllTypes extends NexusGenRootTypes {
   QuestionNodeWhereInputType: NexusGenInputs['QuestionNodeWhereInputType'];
   QuestionNodeWhereUniqueInput: NexusGenInputs['QuestionNodeWhereUniqueInput'];
   RecipientsInputType: NexusGenInputs['RecipientsInputType'];
-  RegisterInput: NexusGenInputs['RegisterInput'];
   RegisterNodeEntryInput: NexusGenInputs['RegisterNodeEntryInput'];
   RoleDataInput: NexusGenInputs['RoleDataInput'];
   RoleInput: NexusGenInputs['RoleInput'];
@@ -464,6 +397,9 @@ export interface NexusGenFieldTypes {
     id: string; // ID!
     logoUrl: string | null; // String
   }
+  Debug: { // field return type
+    debugResolver: string | null; // String
+  }
   Dialogue: { // field return type
     averageScore: number; // Float!
     countInteractions: number; // Int!
@@ -487,6 +423,7 @@ export interface NexusGenFieldTypes {
   }
   DialogueStatistics: { // field return type
     history: NexusGenRootTypes['lineChartDataType'][] | null; // [lineChartDataType!]
+    mostPopularPath: NexusGenRootTypes['topPathType'] | null; // topPathType
     topNegativePath: NexusGenRootTypes['topPathType'][] | null; // [topPathType!]
     topPositivePath: NexusGenRootTypes['topPathType'][] | null; // [topPathType!]
   }
@@ -527,10 +464,6 @@ export interface NexusGenFieldTypes {
     type: string; // String!
     url: string; // String!
   }
-  LoginOutput: { // field return type
-    token: string; // String!
-    user: NexusGenRootTypes['UserType']; // UserType!
-  }
   Mutation: { // field return type
     assignTags: NexusGenRootTypes['Dialogue']; // Dialogue!
     copyDialogue: NexusGenRootTypes['Dialogue']; // Dialogue!
@@ -544,6 +477,7 @@ export interface NexusGenFieldTypes {
     createTag: NexusGenRootTypes['Tag']; // Tag!
     createTrigger: NexusGenRootTypes['TriggerType']; // TriggerType!
     createUser: NexusGenRootTypes['UserType']; // UserType!
+    debugMutation: string | null; // String
     deleteCTA: NexusGenRootTypes['QuestionNode']; // QuestionNode!
     deleteCustomer: NexusGenRootTypes['Customer'] | null; // Customer
     deleteDialogue: NexusGenRootTypes['Dialogue']; // Dialogue!
@@ -555,8 +489,6 @@ export interface NexusGenFieldTypes {
     editDialogue: NexusGenRootTypes['Dialogue']; // Dialogue!
     editTrigger: NexusGenRootTypes['TriggerType']; // TriggerType!
     editUser: NexusGenRootTypes['UserType']; // UserType!
-    login: NexusGenRootTypes['LoginOutput'] | null; // LoginOutput
-    register: string | null; // String
     singleUpload: NexusGenRootTypes['ImageType']; // ImageType!
     updateCTA: NexusGenRootTypes['QuestionNode']; // QuestionNode!
     updateQuestion: NexusGenRootTypes['QuestionNode']; // QuestionNode!
@@ -718,6 +650,7 @@ export interface NexusGenFieldTypes {
   }
   topPathType: { // field return type
     answer: string | null; // String
+    basicSentiment: string | null; // String
     quantity: number | null; // Int
   }
   ConnectionInterface: { // field return type
@@ -739,6 +672,9 @@ export interface NexusGenArgTypes {
     }
   }
   Dialogue: {
+    averageScore: { // args
+      input?: NexusGenInputs['DialogueFilterInputType'] | null; // DialogueFilterInputType
+    }
     leafs: { // args
       searchTerm?: string | null; // String
     }
@@ -850,12 +786,6 @@ export interface NexusGenArgTypes {
       id?: string | null; // String
       input?: NexusGenInputs['UserInput'] | null; // UserInput
     }
-    login: { // args
-      input?: NexusGenInputs['LoginInput'] | null; // LoginInput
-    }
-    register: { // args
-      input?: NexusGenInputs['RegisterInput'] | null; // RegisterInput
-    }
     singleUpload: { // args
       file?: any | null; // Upload
     }
@@ -951,9 +881,9 @@ export interface NexusGenAbstractResolveReturnTypes {
 
 export interface NexusGenInheritedFields {}
 
-export type NexusGenObjectNames = "ColourSettings" | "Customer" | "CustomerSettings" | "Dialogue" | "DialogueStatistics" | "Edge" | "EdgeCondition" | "FontSettings" | "ImageType" | "LinkType" | "LoginOutput" | "Mutation" | "NodeEntry" | "NodeEntryValue" | "PaginationPageInfo" | "PermssionType" | "Query" | "QuestionNode" | "QuestionOption" | "RoleConnection" | "RoleType" | "Session" | "SessionConnection" | "Tag" | "TriggerConditionType" | "TriggerConnectionType" | "TriggerType" | "UserTable" | "UserType" | "lineChartDataType" | "topPathType";
+export type NexusGenObjectNames = "ColourSettings" | "Customer" | "CustomerSettings" | "Debug" | "Dialogue" | "DialogueStatistics" | "Edge" | "EdgeCondition" | "FontSettings" | "ImageType" | "LinkType" | "Mutation" | "NodeEntry" | "NodeEntryValue" | "PaginationPageInfo" | "PermssionType" | "Query" | "QuestionNode" | "QuestionOption" | "RoleConnection" | "RoleType" | "Session" | "SessionConnection" | "Tag" | "TriggerConditionType" | "TriggerConnectionType" | "TriggerType" | "UserTable" | "UserType" | "lineChartDataType" | "topPathType";
 
-export type NexusGenInputNames = "AddDialogueInput" | "CTALinkInputObjectType" | "CTALinksInputType" | "ChoiceNodeEntryInput" | "CustomerCreateOptions" | "CustomerEditOptions" | "CustomerWhereUniqueInput" | "DialogueFilterInputType" | "DialogueWhereUniqueInput" | "EdgeConditionInputType" | "LoginInput" | "NodeEntryDataInput" | "NodeEntryInput" | "OptionInputType" | "OptionsInputType" | "PaginationSortInput" | "PaginationWhereInput" | "PermissionIdsInput" | "PermissionInput" | "QuestionNodeWhereInputType" | "QuestionNodeWhereUniqueInput" | "RecipientsInputType" | "RegisterInput" | "RegisterNodeEntryInput" | "RoleDataInput" | "RoleInput" | "SessionInput" | "SessionWhereUniqueInput" | "SliderNodeEntryInput" | "TagsInputObjectType" | "TextboxNodeEntryInput" | "TriggerConditionInputType" | "TriggerInputType" | "UserInput";
+export type NexusGenInputNames = "AddDialogueInput" | "CTALinkInputObjectType" | "CTALinksInputType" | "ChoiceNodeEntryInput" | "CustomerCreateOptions" | "CustomerEditOptions" | "CustomerWhereUniqueInput" | "DialogueFilterInputType" | "DialogueWhereUniqueInput" | "EdgeConditionInputType" | "NodeEntryDataInput" | "NodeEntryInput" | "OptionInputType" | "OptionsInputType" | "PaginationSortInput" | "PaginationWhereInput" | "PermissionIdsInput" | "PermissionInput" | "QuestionNodeWhereInputType" | "QuestionNodeWhereUniqueInput" | "RecipientsInputType" | "RegisterNodeEntryInput" | "RoleDataInput" | "RoleInput" | "SessionInput" | "SessionWhereUniqueInput" | "SliderNodeEntryInput" | "TagsInputObjectType" | "TextboxNodeEntryInput" | "TriggerConditionInputType" | "TriggerInputType" | "UserInput";
 
 export type NexusGenEnumNames = "LinkTypeEnumType" | "PaginationSortByEnum" | "QuestionNodeTypeEnum" | "TagTypeEnum" | "TriggerConditionEnum" | "TriggerMediumEnum" | "TriggerTypeEnum";
 
