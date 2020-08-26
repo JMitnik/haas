@@ -1,9 +1,28 @@
-import { Div, Flex, ViewContainer } from '@haas/ui';
+import { Div, Flex, Grid, ViewContainer } from '@haas/ui';
+
 import styled, { css } from 'styled-components';
 
 const FlexRow = styled(Div)`
   display: flex;
   flex-direction: row;
+`;
+
+export const RowContainer = styled(Grid) <{isExpanded?: boolean}>`
+ 
+  cursor: pointer;
+  padding-left: 10px;
+  padding-right: 10px;
+  grid-row-gap: 0;
+  grid-column-gap: 5;
+  border-top: ${(props) => (props.isExpanded ? '1px solid rgba(0,0,0,.05)' : '1px solid transparent')};
+  box-shadow: ${(props) => (props.isExpanded ? '0 4px 6px -1px rgba(0,0,0,.05),0 2px 4px -1px rgba(0,0,0,.06)!important' : 'none')};
+  
+  &:hover {
+    transition: all .2s cubic-bezier(.55,0,.1,1);
+    border-top:  ${(props) => (!props.isExpanded && '1px solid rgba(0,0,0,.05)')};
+    box-shadow: ${(props) => (!props.isExpanded && '0 4px 6px -1px rgba(0,0,0,.1),0 2px 4px -1px rgba(0,0,0,.06)!important')};
+  }
+
 `;
 
 export const InteractionDetailQuestionEntry = styled(Div)`

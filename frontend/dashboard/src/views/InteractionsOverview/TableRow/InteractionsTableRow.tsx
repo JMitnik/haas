@@ -10,7 +10,7 @@ import { QuestionNodeTypeEnum } from 'types/globalTypes';
 import MultiChoiceNodeIcon from 'components/Icons/MultiChoiceNodeIcon';
 import SliderNodeIcon from 'components/Icons/SliderNodeIcon';
 
-import { InteractionDetailQuestionEntry } from '../InteractionOverviewStyles';
+import { InteractionDetailQuestionEntry, RowContainer } from '../InteractionOverviewStyles';
 import { TableRowProps } from './TableRowTypes';
 
 const InteractionTableValue = ({ entry }: { entry: NodeEntry }) => {
@@ -38,11 +38,8 @@ const InteractionsTableRow = ({ headers, data, index }: TableRowProps<Session>) 
   const templateColumns = '1fr '.repeat(nrCells);
 
   return (
-    <Grid
-      paddingLeft="10px"
-      paddingRight="10px"
-      gridRowGap={0}
-      gridColumnGap={5}
+    <RowContainer
+      isExpanded={isExpanded}
       gridTemplateColumns={templateColumns}
       onClick={() => setIsExpanded(!isExpanded)}
     >
@@ -129,7 +126,7 @@ const InteractionsTableRow = ({ headers, data, index }: TableRowProps<Session>) 
           </Div>
         </Div>
       )}
-    </Grid>
+    </RowContainer>
   );
 };
 
