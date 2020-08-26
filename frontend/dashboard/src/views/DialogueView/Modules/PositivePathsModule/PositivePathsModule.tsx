@@ -13,7 +13,6 @@ const PostivePathsModuleList = styled.ol`
    list-style: none;
    padding: 12px 0 0 0 !important;
    counter-reset: item;
-   
  
     li {
       counter-increment: item;
@@ -21,7 +20,7 @@ const PostivePathsModuleList = styled.ol`
       border-bottom: 1px solid ${theme.colors.default.normalAlt};
       padding: 18px 24px;
 
-      &:last-child {
+      &:last-of-type {
         border-bottom: 0;
       }
 
@@ -42,11 +41,7 @@ const PositivePathsModule = ({ positivePaths }: { positivePaths: any }) => (
   <ModuleContainer>
     <Card bg="white">
       <CardBody display="flex" flexDirection="column">
-        <Text fontSize="1.3rem" color="teal.200">
-          <Flex justifyContent="space-between" alignItems="center">
-            <Span>Top positive paths</Span>
-          </Flex>
-        </Text>
+        <Text fontSize="1.3rem" color="teal.200">Top positive paths</Text>
         <Flex marginTop="10px" flexGrow={1} flexDirection="column">
           {positivePaths.length > 0 && (
           <PostivePathsModuleList>
