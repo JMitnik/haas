@@ -138,7 +138,6 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
     label: `${recipient?.lastName}, ${recipient?.firstName} - E: ${recipient?.email} - P: ${recipient?.phone}`,
     value: recipient?.id,
   }));
-
   // Fetching questions data
   const [fetchQuestions, { data: questionsData }] = useLazyQuery(getQuestionsQuery, {
     fetchPolicy: 'cache-and-network',
@@ -148,6 +147,7 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
   })) || [];
 
   const activeDialogue = form.watch('dialogue');
+  const databaseRecipients = form.watch('recipients');
 
   useEffect(() => {
     if (activeDialogue) {
@@ -156,7 +156,7 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
   }, [customerSlug, activeDialogue, fetchQuestions]);
 
   // Dealing with recipients
-  const [activeRecipients, setActiveRecipients] = useState<Array<null | { label: string, value: string }>>(() => form.getValues().recipients || []);
+  const [activeRecipients, setActiveRecipients] = useState<Array<null | { label: string, value: string }>>(() => databaseRecipients || []);
 
   const addRecipient = () => setActiveRecipients((prevRecipients) => [...prevRecipients, null]);
 
@@ -166,6 +166,10 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
       return [...prevRecipients];
     });
   };
+
+  console.log('get values: ', form.getValues());
+
+  console.log('errors: ', form.errors);
 
   return (
     <Form onSubmit={form.handleSubmit(onFormSubmit)}>
@@ -418,9 +422,16 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                   <Controller
                     control={form.control}
                     name={`recipients[${index}]`}
-                    defaultValue="EMAIL"
-                    options={recipients}
-                    as={Select}
+                    defaultValue={recipient}
+                    render={({ onChange, onBlur, value }) => (
+                      <Select
+                        options={recipients}
+                        defaultValue={recipient}
+                        onChange={(data: any) => {
+                          onChange(data);
+                        }}
+                      />
+                    )}
                   />
 
                   <FormErrorMessage>{form.errors.medium?.message}</FormErrorMessage>

@@ -129,9 +129,11 @@ const EditTriggerForm = ({ trigger }: {trigger: any}) => {
         label: trigger.relatedNode.title,
         value: trigger.relatedNode.id,
       },
+      recipients: trigger.recipients.map((recipient: any) => ({ label: `${recipient?.lastName}, ${recipient?.firstName} - E: ${recipient?.email} - P: ${recipient?.phone}`,
+        value: recipient?.id })),
       type: trigger.type,
     },
-    mode: 'onBlur',
+    mode: 'onChange',
   });
 
   const [editTrigger, { loading: isLoading, error: serverError }] = useMutation(editTriggerMutation, {
