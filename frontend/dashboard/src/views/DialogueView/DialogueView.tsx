@@ -159,6 +159,9 @@ const DialogueView = () => {
             <SummaryModule
               heading="Interactions"
               renderIcon={Activity}
+              onClick={() => (
+                history.push(`/dashboard/b/${customerSlug}/d/${dialogueSlug}/interactions`)
+              )}
               isInFallback={dialogue.countInteractions === 0}
               fallbackMetric="No interactions yet"
               renderMetric={`${dialogue.countInteractions} ${dialogue.countInteractions > 1 ? 'interactions' : 'interaction'}`}
