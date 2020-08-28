@@ -147,6 +147,8 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
   })) || [];
 
   const activeDialogue = form.watch('dialogue');
+  const activeCondition = form.watch('condition');
+
   const databaseRecipients = form.watch('recipients');
 
   useEffect(() => {
@@ -166,10 +168,6 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
       return [...prevRecipients];
     });
   };
-
-  console.log('get values: ', form.getValues());
-
-  console.log('errors: ', form.errors);
 
   return (
     <Form onSubmit={form.handleSubmit(onFormSubmit)}>
@@ -201,7 +199,7 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
               <InputHelper>{t('trigger:dialogue_helper')}</InputHelper>
               <Controller
                 name="dialogue"
-                defaultValue=""
+                options={dialogues}
                 control={form.control}
                 render={({ onChange, value }) => (
                   <Select
@@ -221,11 +219,10 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
               <Controller
                 control={form.control}
                 name="type"
-                defaultValue="QUESTION"
-                render={({ onChange, value }) => (
+                render={({ onChange }) => (
                   <>
                     <RadioButtonGroup
-                      defaultValue={value}
+                      defaultValue="QUESTION"
                       isInline
                       onChange={(data) => {
                         onChange(data);
@@ -261,7 +258,6 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
               </InputHelper>
               <Controller
                 name="question"
-                defaultValue=""
                 control={form.control}
                 as={Select}
                 options={questions}
@@ -291,7 +287,7 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                 </InputHelper>
                 <Controller
                   name="condition"
-                  defaultValue={form.getValues().condition}
+                  defaultValue={activeCondition}
                   control={form.control}
                   render={({ onChange, onBlur, value }) => (
                     <ConditionFormFragment
@@ -423,15 +419,8 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                     control={form.control}
                     name={`recipients[${index}]`}
                     defaultValue={recipient}
-                    render={({ onChange, onBlur, value }) => (
-                      <Select
-                        options={recipients}
-                        defaultValue={recipient}
-                        onChange={(data: any) => {
-                          onChange(data);
-                        }}
-                      />
-                    )}
+                    options={recipients}
+                    as={<Select />}
                   />
 
                   <FormErrorMessage>{form.errors.medium?.message}</FormErrorMessage>
