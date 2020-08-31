@@ -46,7 +46,7 @@ const getDialogueStatistics = gql`
         countInteractions
         thisWeekAverageScore: averageScore
         previousScore: averageScore(input: $prevDateFilter)
-        sessions(take: 3) {
+        sessions(take: 4) {
           id
           createdAt
           score
@@ -142,7 +142,7 @@ const DialogueView = () => {
         <Icon as={BarChart} mr={1} />
         {t('views:dialogue_view')}
       </PageTitle>
-      <Grid gridTemplateColumns="1fr 1fr 1fr">
+      <Grid gridTemplateColumns={['1fr', '1fr', '1fr 1fr 1fr']}>
         <Div gridColumn="1 / 4">
           <H4 color="default.darker" mb={4}>
             <Flex>

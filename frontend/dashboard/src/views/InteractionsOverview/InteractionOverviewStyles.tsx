@@ -22,7 +22,6 @@ export const RowContainer = styled(Grid) <{isExpanded?: boolean}>`
     border-top:  ${(props) => (!props.isExpanded && '1px solid rgba(0,0,0,.05)')};
     box-shadow: ${(props) => (!props.isExpanded && '0 4px 6px -1px rgba(0,0,0,.1),0 2px 4px -1px rgba(0,0,0,.06)!important')};
   }
-
 `;
 
 export const InteractionDetailQuestionEntry = styled(Div)`
