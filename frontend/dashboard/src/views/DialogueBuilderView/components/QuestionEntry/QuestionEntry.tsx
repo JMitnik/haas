@@ -69,6 +69,11 @@ const QuestionEntryItem = ({ depth,
         dialogueSlug,
       },
     }],
+    onCompleted: () => {
+      if (activeQuestion === question.id) {
+        onActiveQuestionChange(null);
+      }
+    },
     onError: (serverError: ApolloError) => {
       console.log(serverError);
     },
@@ -143,6 +148,7 @@ const QuestionEntryItem = ({ depth,
       {question.id !== '-1' && (
         <ShowChildQuestion
           amtChildren={question?.children?.length || 0}
+          isDisabled={!!activeQuestion && activeQuestion !== question.id}
           isExpanded={isExpanded}
           onExpandChange={onExpandChange}
         />

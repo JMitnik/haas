@@ -105,8 +105,8 @@ export const QuestionEntryViewContainer = styled(Flex) <{ activeCTA: string | nu
  `} 
 `;
 
-export const AddChildContainer = styled(Flex)`
-  ${({ theme }) => css`
+export const AddChildContainer = styled(Flex) <{isDisabled?: Boolean}>`
+  ${({ theme, isDisabled }) => css`
     position: absolute; 
     flex-direction: row;
     justify-content: center;
@@ -114,6 +114,15 @@ export const AddChildContainer = styled(Flex)`
     bottom: 0; 
     left: 50%;
     transform: translate(-50%, -10px);
+
+    ${isDisabled && css`
+      div > button {
+        background-color: ${theme.colors.white};
+        opacity: 0.5;
+      }
+      pointer-events: none;
+    `}
+    
  `}
 `;
 
