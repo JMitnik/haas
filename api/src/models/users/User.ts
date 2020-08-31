@@ -1,6 +1,6 @@
+import { UserInputError } from 'apollo-server-express';
 import { extendType, inputObjectType, objectType } from '@nexus/schema';
 
-import { UserInputError } from 'apollo-server-express';
 import { PaginationWhereInput } from '../general/Pagination';
 import { RoleType } from '../role/Role';
 import UserService from './UserService';

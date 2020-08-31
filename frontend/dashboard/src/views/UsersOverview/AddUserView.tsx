@@ -45,7 +45,7 @@ const AddUserView = () => {
   const history = useHistory();
   const form = useForm<FormDataProps>({
     resolver: yupResolver(schema),
-    mode: 'onBlur',
+    mode: 'onChange',
   });
   const { customerSlug } = useParams();
   const customer = useCustomer();
@@ -72,6 +72,7 @@ const AddUserView = () => {
   const mappedRoles = roles?.map(({ name, id }) => ({ label: name, value: id }));
 
   const handleSubmit = (formData: FormDataProps) => {
+    console.log('form data: ', formData);
     const optionInput = {
       // TODO: Not robust yet
       customerId: customer.storageCustomer.id,
@@ -165,27 +166,16 @@ const AddUserView = () => {
                 </Muted>
               </Div>
               <Div>
-                <FormControl isInvalid={!!form.errors.phone}>
+                <FormControl isInvalid={!!form.errors.role}>
                   <FormLabel htmlFor="pgone">{t('role_selector')}</FormLabel>
                   <InputHelper>{t('role_selector_helper')}</InputHelper>
                   <Controller
                     name="role"
                     as={Select}
+                    defaultValue={null}
                     control={form.control}
                     options={mappedRoles}
                   />
-                  {/* <Select
-                    styles={form.errors.role && !activeRole ? ErrorStyle : undefined}
-                    ref={() => form.register({
-                      name: 'role',
-                      required: true,
-                    })}
-                    options={mappedRoles}
-                    value={activeRole}
-                    onChange={(qOption: any) => {
-                      handleRoleChange(qOption);
-                    }}
-                  /> */}
                 </FormControl>
               </Div>
             </FormSection>
@@ -199,7 +189,7 @@ const AddUserView = () => {
               >
                 Create
               </Button>
-              <Button variant="outline" onClick={() => history.push('/')}>Cancel</Button>
+              <Button variant="outline" onClick={() => history.push(`/dashboard/b/${customerSlug}/users`)}>Cancel</Button>
             </ButtonGroup>
           </Form>
         </FormContainer>

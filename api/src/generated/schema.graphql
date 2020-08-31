@@ -82,10 +82,6 @@ input CustomerWhereUniqueInput {
   id: ID!
 }
 
-type Debug {
-  debugResolver: String
-}
-
 type Dialogue {
   averageScore(input: DialogueFilterInputType): Float!
   countInteractions: Int!
@@ -217,7 +213,6 @@ type Mutation {
   createTag(customerSlug: String, name: String, type: TagTypeEnum): Tag!
   createTrigger(customerSlug: String, questionId: String, recipients: RecipientsInputType, trigger: TriggerInputType): TriggerType!
   createUser(customerSlug: String, input: UserInput): UserType!
-  debugMutation: String
   deleteCTA(id: String): QuestionNode!
   deleteCustomer(where: CustomerWhereUniqueInput): Customer
   deleteDialogue(where: DialogueWhereUniqueInput): Dialogue!
