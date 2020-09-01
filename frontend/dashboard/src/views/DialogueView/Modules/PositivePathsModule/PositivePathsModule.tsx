@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Card, CardBody, Div, Flex, Span, Text } from '@haas/ui';
+import { Card, CardBody, Div, Flex, Text } from '@haas/ui';
 import styled, { css } from 'styled-components/macro';
 
 import { Icon } from '@chakra-ui/core';

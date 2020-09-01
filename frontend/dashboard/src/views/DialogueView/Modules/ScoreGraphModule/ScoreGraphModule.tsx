@@ -1,4 +1,4 @@
-import { Card, CardBody, Flex, H3, Span, Text } from '@haas/ui';
+import { Card, CardBody, Flex, Span, Text } from '@haas/ui';
 import { ResponsiveLine as NivoLineChart } from '@nivo/line';
 import {
   dialogueStatistics_customer_dialogue_statistics_history as SessionHistory,

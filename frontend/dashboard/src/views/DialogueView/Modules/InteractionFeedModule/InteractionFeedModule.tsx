@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Card, CardBody, Div, Flex, H3, H4, Text } from '@haas/ui';
+import { Card, CardBody, Div, Flex, H4, Text } from '@haas/ui';
 
 import { Info } from 'react-feather';
 import {

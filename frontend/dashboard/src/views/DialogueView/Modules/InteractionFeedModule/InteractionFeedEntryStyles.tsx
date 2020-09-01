@@ -1,4 +1,3 @@
-import { background } from 'styled-system';
 import scoreToColors from 'utils/scoreToColors';
 import styled, { css } from 'styled-components/macro';
 
