@@ -20,7 +20,7 @@ const ScoreGraphModule = ({ chartData }: { chartData: SessionHistory[] }) => {
   ];
 
   return (
-    <Card height="350px" bg="white">
+    <Card height="400px" bg="white">
       <CardBody height="100%">
         <Text fontSize="1.2rem" color="gray.400">
           <Flex justifyContent="space-between" alignItems="center">

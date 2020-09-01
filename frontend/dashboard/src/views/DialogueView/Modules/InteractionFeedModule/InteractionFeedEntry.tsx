@@ -1,9 +1,9 @@
-import { Clipboard, Link as LinkIcon, MessageCircle, Target } from 'react-feather';
-import { Tooltip } from '@chakra-ui/core';
+import { Clipboard, Link as LinkIcon, MessageCircle, Target, Clock } from 'react-feather';
+import { Tooltip, Icon } from '@chakra-ui/core';
 import React from 'react';
 import styled, { css } from 'styled-components/macro';
 
-import { Div, Flex, Text } from '@haas/ui';
+import { Div, Flex, Text, Span } from '@haas/ui';
 import {
   dialogueStatistics_customer_dialogue_sessions_nodeEntries_relatedNode as Node,
   dialogueStatistics_customer_dialogue_sessions_nodeEntries as NodeEntry,
@@ -14,6 +14,7 @@ import parseNodeEntryValue from 'utils/parseNodeEntryValue';
 import scoreToColors from 'utils/scoreToColors';
 
 import { InteractionFeedEntryContainer, InteractionFeedEntryValueContainer } from './InteractionFeedEntryStyles';
+import { formatDistanceToNow } from 'date-fns';
 
 const NodeTypeIcon = ({ node }: { node: Node | null }) => {
   if (!node?.type) return <Div />;
@@ -101,6 +102,7 @@ const CompactEntriesPath = ({ nodeEntries }: { nodeEntries: NodeEntry[] }) => (
 
 const InteractionFeedEntry = ({ interaction }: { interaction: Session }) => {
   const date = new Date(parseInt(interaction.createdAt, 10));
+  const dist = formatDistanceToNow(date);
 
   return (
     <InteractionFeedEntryContainer>
@@ -109,6 +111,7 @@ const InteractionFeedEntry = ({ interaction }: { interaction: Session }) => {
           <InteractionFeedEntryValueContainer value={interaction.score}>
             {Number(interaction.score / 10).toFixed(1)}
           </InteractionFeedEntryValueContainer>
+
           {interaction?.nodeEntries[1]?.value ? (
             <Div ml={2}>
               <Text color="gray.400">
@@ -120,8 +123,10 @@ const InteractionFeedEntry = ({ interaction }: { interaction: Session }) => {
               </Text>
             </Div>
           ) : (
-            <Div>
-              only voting
+            <Div ml={2}>
+              <Text color="gray.400">
+                Voting only
+              </Text>
             </Div>
           )}
         </Flex>
@@ -129,6 +134,14 @@ const InteractionFeedEntry = ({ interaction }: { interaction: Session }) => {
         <Div ml="auto">
           <CompactEntriesPath nodeEntries={interaction.nodeEntries} />
         </Div>
+      </Flex>
+      <Flex>
+        <Text mt={2} color="gray.300" fontWeight="600" textAlign="right">
+          <Icon
+            as={Clock}
+          />
+          <Span ml={1}>{dist} ago</Span>
+        </Text>
       </Flex>
     </InteractionFeedEntryContainer>
   );
