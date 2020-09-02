@@ -21,11 +21,9 @@ export const WhenCell = ({ value }: { value: any }) => {
   }
 
   return (
-    <Flex alignItems="center" justifyContent="center">
-      <Div display="inline-block" padding="4px 24px" borderRadius="90px" backgroundColor="#f1f5f8" color="#6d767d">
-        <Span fontSize="0.8em" fontWeight={900}>{formatted?.toUpperCase()}</Span>
-      </Div>
-    </Flex>
+    <Div m="0" padding="4px 24px" borderRadius="90px" backgroundColor="#f1f5f8" color="#6d767d">
+      <Span fontSize="0.8em" fontWeight={900}>{formatted?.toUpperCase()}</Span>
+    </Div>
   );
 };
 
@@ -39,7 +37,7 @@ export const ScoreCell = ({ value }: CellProps) => {
   const { background, color } = getBadgeBackgroundColour(value);
   const decimalScore = (value) ? (value / 10).toFixed(1) : value;
   return (
-    <Flex alignItems="center" justifyContent="center">
+    <Flex alignItems="center">
       <Div display="inline-block" padding="10px" borderRadius="90px" backgroundColor={background} color={color}>
         <Span fontSize="1.2em" fontWeight={900}>
           {decimalScore}
@@ -50,7 +48,7 @@ export const ScoreCell = ({ value }: CellProps) => {
 };
 
 export const UserCell = ({ value }: CellProps) => (
-  <Flex alignItems="center" justifyContent="center">
+  <Flex alignItems="center">
     <Div display="inline-block" padding="4px 24px" borderRadius="90px" backgroundColor="#f1f5f8" color="#6d767d">
       <Span fontSize="0.8em" fontWeight={900}>{value}</Span>
     </Div>
@@ -58,7 +56,7 @@ export const UserCell = ({ value }: CellProps) => (
 );
 
 export const InteractionUserCell = ({ value }: CellProps) => (
-  <Flex alignItems="center" justifyContent="center">
+  <Flex alignItems="center">
     <Div borderRadius="lg" padding="5px" backgroundColor="default.light">
       <DesktopIcon />
     </Div>
@@ -78,7 +76,7 @@ export const InteractionDateCell = ({ value }: { value: any }) => {
   const formattedTime = format(date, 'h:mm a');
 
   return (
-    <Flex flexDirection="column" alignItems="center" justifyContent="center">
+    <Flex flexDirection="column" alignItems="center">
       <Div>
         <H4 color="default.darker">{formattedDate?.toUpperCase()}</H4>
         <Span color="default.dark" fontSize="0.8em" fontWeight={900}>{formattedTime}</Span>
@@ -90,8 +88,6 @@ export const InteractionDateCell = ({ value }: { value: any }) => {
 
 export const InteractionCTACell = ({ value: nodeEntries }: CellProps) => {
   const potentialCTA = maxBy(nodeEntries, (entry: any) => entry.depth);
-
-  console.log(potentialCTA);
 
   const getCTAType = (potentialCTA: any) => {
     const { value: { textboxNodeEntry, linkNodeEntry, registrationNodeEntry } } = potentialCTA;
@@ -111,7 +107,7 @@ export const InteractionCTACell = ({ value: nodeEntries }: CellProps) => {
   };
 
   return (
-    <Flex alignItems="center" justifyContent="center">
+    <Flex alignItems="center">
       <Flex minWidth="195px" marginLeft="15px" flexDirection="column">
         <H4 color="default.darker">{getCTAType(potentialCTA)}</H4>
         <Span color="default.dark" fontSize="0.8em" fontWeight={900}>No registration</Span>
@@ -121,7 +117,7 @@ export const InteractionCTACell = ({ value: nodeEntries }: CellProps) => {
 };
 
 export const CenterCell = ({ value }: CellProps) => (
-  <Flex alignItems="center" justifyContent="center">
+  <Flex alignItems="center">
     <Div display="inline-block">
       <Span fontSize="1.2em" fontWeight={900}>{value}</Span>
     </Div>

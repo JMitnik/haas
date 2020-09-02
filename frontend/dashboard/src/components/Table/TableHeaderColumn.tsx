@@ -1,4 +1,5 @@
-import { Div, H3, Span } from '@haas/ui';
+import { Div, Span, Text } from '@haas/ui';
+import { useTranslation } from 'react-i18next';
 import React from 'react';
 
 interface TableHeaderColumnProps {
@@ -43,19 +44,20 @@ const TableHeaderColumn = ({
     }
   };
 
+  const { t } = useTranslation();
+
   return (
     <Div
       onClick={handleSort}
       useFlex
       flexDirection="row"
-      justifyContent="center"
       alignItems="center"
       borderRadius="10px 0 0 10px"
     >
       <Div display="inline-block" padding="10px">
-        <H3 color="#6d767d">
-          {value}
-        </H3>
+        <Text color="gray.600" fontSize="1.4rem">
+          {t(value)}
+        </Text>
       </Div>
       <Span>
         {(sortProperties[0].by === accessor && !disableSorting) ? (sortProperties[0].desc ? '🔽' : '🔼') : ''}

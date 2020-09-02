@@ -1,18 +1,21 @@
 import React from 'react';
 
 import { DataGridProps, TableProps } from 'types/generic';
-import { Div, Flex, Grid, H4 } from '@haas/ui';
+import { Div, Flex, H4 } from '@haas/ui';
 import { Info } from 'react-feather';
+import { useTranslation } from 'react-i18next';
 import PaginationControls from 'components/Table/TablePaginationControls';
 import TableHeader from 'components/Table/TableHeader';
 import TableRow from 'components/Table/TableRow';
 import styled, { css } from 'styled-components';
 
-const TableGrid = styled(Grid)`
+const TableGrid = styled(Div)`
   ${({ theme }) => css`
-      border-radius: ${theme.borderRadiuses.lg};
-      grid-template-rows: repeat(9, minmax(50px, auto));
-      grid-row-gap: 4px;
+    background: white;
+    border-radius: ${theme.borderRadiuses.lg};
+    grid-template-rows: repeat(9, minmax(50px, auto));
+    grid-row-gap: 4px;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   `}
 `;
 
@@ -49,6 +52,7 @@ const Table = ({
   hidePagination,
   disableSorting,
 }: TableInputProps) => {
+  const { t } = useTranslation();
   const handlePage = (newPageIndex: number) => {
     if (onPaginationChange) {
       onPaginationChange((prevValues) => ({ ...prevValues, pageIndex: newPageIndex }));
@@ -93,7 +97,7 @@ const Table = ({
           <Div color="default.darker" marginRight="5px">
             <Info />
           </Div>
-          <H4 color="default.darker">No data available</H4>
+          <H4 color="default.darker">{t('no_data')}</H4>
         </Flex>
       )}
 

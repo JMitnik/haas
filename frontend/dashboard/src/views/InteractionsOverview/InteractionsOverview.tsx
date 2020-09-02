@@ -35,11 +35,11 @@ interface TableProps {
   }[]
 }
 
-const HEADERS = [
-  { Header: 'User', accessor: 'id', Cell: InteractionUserCell },
-  { Header: 'Date', accessor: 'createdAt', Cell: InteractionDateCell },
-  { Header: 'Call-to-action', accessor: 'nodeEntries', Cell: InteractionCTACell },
-  { Header: 'SCORE', accessor: 'score', Cell: ScoreCell },
+const tableHeaders = [
+  { Header: 'user', accessor: 'id', Cell: InteractionUserCell },
+  { Header: 'date', accessor: 'createdAt', Cell: InteractionDateCell },
+  { Header: 'call_to_action', accessor: 'nodeEntries', Cell: InteractionCTACell },
+  { Header: 'score', accessor: 'score', Cell: ScoreCell },
 ];
 
 const InteractionsOverview = () => {
@@ -112,16 +112,14 @@ const InteractionsOverview = () => {
         <Icon as={Activity} mr={1} />
         {t('views:interactions_view')}
       </PageTitle>
-      {/* TODO: Make a ViewTitle text-component */}
       <InputOutputContainer mb={4}>
         <OutputContainer>
-          {/* TODO: Make a button component out of this */}
           <Button
             onClick={handleExportCSV}
             leftIcon={Download}
             size="sm"
           >
-            <Span fontWeight="bold">Export to CSV</Span>
+            <Span fontWeight="bold">{t('export_to_csv')}</Span>
           </Button>
         </OutputContainer>
 
@@ -138,16 +136,14 @@ const InteractionsOverview = () => {
         </InputContainer>
 
       </InputOutputContainer>
-      <Div borderRadius="lg" flexGrow={1} backgroundColor="white" mb="1%">
-        <InteractionsTable
-          loading={loading}
-          headers={HEADERS}
-          paginationProps={{ ...paginationProps, pageCount, pageIndex }}
-          onPaginationChange={setPaginationProps}
-          data={sessions}
-          CustomRow={Row}
-        />
-      </Div>
+      <InteractionsTable
+        loading={loading}
+        headers={tableHeaders}
+        paginationProps={{ ...paginationProps, pageCount, pageIndex }}
+        onPaginationChange={setPaginationProps}
+        data={sessions}
+        CustomRow={Row}
+      />
     </InteractionsOverviewContainer>
   );
 };

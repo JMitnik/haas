@@ -3,6 +3,34 @@ const language = {
     about: {
       en: 'About',
     },
+    start: {
+      en: 'Start',
+      de: 'Anfang',
+    },
+    end: {
+      en: 'End',
+      de: 'Ende',
+    },
+    search: {
+      en: 'Search',
+      de: 'Suche',
+    },
+    date: {
+      en: 'Date',
+      de: 'Datum',
+    },
+    page: {
+      en: 'Page',
+      de: 'Seite',
+    },
+    user: {
+      en: 'User',
+      de: 'User',
+    },
+    call_to_action: {
+      en: 'Call to action',
+      de: 'Call to action',
+    },
     dialogues: {
       en: 'Dialogues',
       de: 'Dialogo',
@@ -10,6 +38,10 @@ const language = {
     score: {
       en: 'Score',
       de: 'Ergebnis',
+    },
+    export_to_csv: {
+      en: 'CSV export',
+      de: 'CSV export',
     },
     user_actions: {
       en: 'User actions',
@@ -273,6 +305,9 @@ const language = {
       en: 'This week in summary',
       de: 'Wochenansicht',
     },
+  },
+  interaction: {
+
   },
   toast: {
     locale_switch: {

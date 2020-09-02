@@ -124,7 +124,7 @@ const ShareDialogueModal = ({ dialogueName, shareUrl, onClose }: ShareDialogueMo
 
   return (
     <ModalContent>
-      <ModalHeader>Share</ModalHeader>
+      <ModalHeader>{t('share')}</ModalHeader>
       <ModalCloseButton />
       <ModalBody>
         <Div mb={4}>

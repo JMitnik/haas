@@ -39,16 +39,14 @@ const TableHeader = ({ sortProperties, headers, onPaginationChange, onAddEntry, 
 
   return (
     <Grid
-      borderRadius="lg"
+      borderRadius="10px 10px 0 0"
       paddingLeft="15px"
       paddingRight="15px"
       position="relative"
-      backgroundColor="white"
-      color="black"
+      backgroundColor="gray.100"
       gridColumnGap={5}
       gridTemplateColumns={templateColumns}
     >
-
       {headers && headers.map((header, index) => (
         <TableHeaderColumn
           disableSorting={disableSorting}
