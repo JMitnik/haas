@@ -18,9 +18,33 @@ const language = {
       en: 'No data available',
       de: 'Keine daten verfügbar',
     },
+    personalize: {
+      en: 'Personalize',
+      de: 'Personalisieren',
+    },
+    share: {
+      en: 'Share',
+      de: 'Teilen',
+    },
     language: {
       en: 'Language',
       de: 'Sprache',
+    },
+    analytics: {
+      en: 'Analytics',
+      de: 'Analyse',
+    },
+    users: {
+      en: 'Users',
+      de: 'Users',
+    },
+    alerts: {
+      en: 'Alerts',
+      de: 'Alarms',
+    },
+    settings: {
+      en: 'Settings',
+      de: 'Einstellungen',
     },
     latest_interactions: {
       en: 'Latest interactions',
@@ -156,12 +180,19 @@ const language = {
     },
     cta_view: {
       en: 'Call to actions',
+      de: 'Call to actions',
     },
     builder_view: {
       en: 'Dialogue Builder',
+      de: 'Dialogkonstruktor',
     },
     interactions_view: {
       en: 'Interactions',
+      de: 'Interaktionen',
+    },
+    personalize: {
+      en: 'Personalize',
+      de: 'Personalisieren',
     },
     trigger_overview: {
       en: 'Triggers',
@@ -226,8 +257,17 @@ const language = {
     slug_helper: {
       en: 'Under which url segment will visitors find the dialogue?',
     },
+    share_qr: {
+      en: 'Method one: Share QR Code',
+      de: 'Methode eins: QR-Code teilen',
+    },
+    share_link: {
+      en: 'Method two: Share URL to link',
+      de: 'Methode zwei: URL zum Verknüpfen freigeben',
+    },
     qr_download_helper: {
       en: 'Share the dialogue by sharing the QR code, by either downloading the QR code or copying it.',
+      de: 'Teilen Sie den Dialog, indem Sie den QR-Code freigeben, indem Sie entweder den QR-Code herunterladen oder kopieren.',
     },
     week_summary: {
       en: 'This week in summary',

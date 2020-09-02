@@ -128,7 +128,7 @@ const ShareDialogueModal = ({ dialogueName, shareUrl, onClose }: ShareDialogueMo
       <ModalCloseButton />
       <ModalBody>
         <Div mb={4}>
-          <Text fontWeight={600} fontSize="1.3rem" color="gray.700">Method one: Share QR Code</Text>
+          <Text fontWeight={600} fontSize="1.3rem" color="gray.700">{t('dialogue:share_qr')}</Text>
           <Hr />
           <Grid pt={2} gridTemplateColumns="1fr 1fr">
             <Div>
@@ -155,7 +155,7 @@ const ShareDialogueModal = ({ dialogueName, shareUrl, onClose }: ShareDialogueMo
           </Grid>
         </Div>
         <Div mb={4}>
-          <Text fontWeight={600} fontSize="1.3rem" color="gray.700">Method two: Share URL to link</Text>
+          <Text fontWeight={600} fontSize="1.3rem" color="gray.700">{t('dialogue:share_link')}</Text>
           <Hr />
 
           <Flex>
@@ -231,7 +231,7 @@ const DialogueNavBar = ({ dialogue, customerSlug, dialogueSlug }: DialogueNavBar
           <Div color="primaries.200" flexGrow={0}>
             <Button size="xs" variant="ghost" onClick={onOpen}>
               <Share size={14} />
-              <Text ml={1}>Share</Text>
+              <Text ml={1}>{t('share')}</Text>
             </Button>
             <Modal isOpen={isOpen} onClose={onClose}>
               <ModalOverlay />
@@ -245,7 +245,7 @@ const DialogueNavBar = ({ dialogue, customerSlug, dialogueSlug }: DialogueNavBar
 
       <ColumnFlex>
         <Div mb={4}>
-          <DialogueNavBarHeading mb={1} mt={2} fontWeight="400" color="primaries.100">Analytics</DialogueNavBarHeading>
+          <DialogueNavBarHeading mb={1} mt={2} fontWeight="400" color="primaries.100">{t('analytics')}</DialogueNavBarHeading>
           <Hr />
           <NavLink exact to={`/dashboard/b/${customerSlug}/d/${dialogueSlug}`}>
             <Icon mr={2} as={BarChart} />
@@ -257,7 +257,7 @@ const DialogueNavBar = ({ dialogue, customerSlug, dialogueSlug }: DialogueNavBar
           </NavLink>
         </Div>
         <Div>
-          <DialogueNavBarHeading mb={1} mt={2} fontWeight="400" color="primaries.100">Customize</DialogueNavBarHeading>
+          <DialogueNavBarHeading mb={1} mt={2} fontWeight="400" color="primaries.100">{t('personalize')}</DialogueNavBarHeading>
           <Hr />
           <NavLink to={`/dashboard/b/${customerSlug}/d/${dialogueSlug}/actions`}>
             <Icon mr={2} as={Mail} />
