@@ -9,10 +9,11 @@ import { Flex, Span } from '@haas/ui';
 import deleteCTAMutation from 'mutations/deleteCTA';
 import getCTANodesQuery from 'queries/getCTANodes';
 
-import { useToast } from '@chakra-ui/core';
+import { Button, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast } from '@chakra-ui/core';
 import CTAForm from './CTAForm';
 import CTAIcon from './CTAIcon';
 import DeleteCTAButton from './DeleteCTAButton';
+import DeleteQuestionButton from 'views/DialogueBuilderView/components/QuestionEntry/DeleteQuestionButton';
 import EditCTAButton from './EditCTAButton';
 
 interface LinkInputProps {
@@ -105,22 +106,52 @@ const CTAEntry = ({ id, activeCTA, onActiveCTAChange, title, type, links, Icon, 
     }],
   });
 
-  const deleteCTA = () => {
+  const deleteCTA = (onComplete: (() => void) | undefined) => {
     if (id === '-1') {
       onNewCTAChange(false);
-      return onActiveCTAChange(null);
+      onActiveCTAChange(null);
+      return onComplete && onComplete();
     }
 
-    return deleteEntry();
+    return deleteEntry().finally(() => onComplete && onComplete());
   };
 
   return (
     <motion.div initial={{ opacity: 1, y: 150 }} animate={{ opacity: 1, y: 0 }}>
 
       <CTAEntryContainer id={id} activeCTA={activeCTA}>
-        <DeleteCTAButton disabled={(!!activeCTA && activeCTA !== id) || false} onClick={() => deleteCTA()}>
-          <X />
-        </DeleteCTAButton>
+
+        <Span onClick={(e) => e.stopPropagation()}>
+          <Popover
+            usePortal
+          >
+            {({ onClose }) => (
+              <>
+                <PopoverTrigger>
+                  <DeleteCTAButton disabled={(!!activeCTA && activeCTA !== id) || false}>
+                    <X />
+                  </DeleteCTAButton>
+                </PopoverTrigger>
+                <PopoverContent zIndex={4}>
+                  <PopoverArrow />
+                  <PopoverHeader>Delete</PopoverHeader>
+                  <PopoverCloseButton />
+                  <PopoverBody>
+                    <p>You are about to delete a CTA. THIS ACTION IS IRREVERSIBLE! Are you sure?</p>
+                  </PopoverBody>
+                  <PopoverFooter>
+                    <Button
+                      variantColor="red"
+                      onClick={() => deleteCTA(onClose)}
+                    >
+                      Delete
+                    </Button>
+                  </PopoverFooter>
+                </PopoverContent>
+              </>
+            )}
+          </Popover>
+        </Span>
 
         <Flex flexDirection="row" width="100%">
           <CTAIcon type={type} Icon={Icon} />

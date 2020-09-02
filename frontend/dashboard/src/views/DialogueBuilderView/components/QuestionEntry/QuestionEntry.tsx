@@ -1,4 +1,5 @@
 import { ApolloError } from 'apollo-client';
+import { Button, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger } from '@chakra-ui/core';
 import { Flex, Span } from '@haas/ui';
 import { X } from 'react-feather';
 import { useMutation } from '@apollo/react-hooks';
@@ -85,13 +86,40 @@ const QuestionEntryItem = ({ depth,
       )}
       <QuestionEntryViewContainer activeCTA={activeQuestion} id={question.id} flexGrow={1}>
         <QuestionEntryContainer flexGrow={1}>
-          <DeleteQuestionButton
-            data-cy="DeleteButton"
-            disabled={(!!activeQuestion && activeQuestion !== question.id) || false}
-            onClick={() => deleteQuestion()}
-          >
-            <X />
-          </DeleteQuestionButton>
+          <Span onClick={(e) => e.stopPropagation()}>
+            <Popover
+              usePortal
+            >
+              {({ onClose }) => (
+                <>
+                  <PopoverTrigger>
+                    <DeleteQuestionButton
+                      data-cy="DeleteButton"
+                      disabled={(!!activeQuestion && activeQuestion !== question.id) || false}
+                    >
+                      <X />
+                    </DeleteQuestionButton>
+                  </PopoverTrigger>
+                  <PopoverContent zIndex={4}>
+                    <PopoverArrow />
+                    <PopoverHeader>Delete</PopoverHeader>
+                    <PopoverCloseButton />
+                    <PopoverBody>
+                      <p>You are about to delete a question (and all its child questions). THIS ACTION IS IRREVERSIBLE! Are you sure?</p>
+                    </PopoverBody>
+                    <PopoverFooter>
+                      <Button
+                        variantColor="red"
+                        onClick={() => deleteQuestion()}
+                      >
+                        Delete
+                      </Button>
+                    </PopoverFooter>
+                  </PopoverContent>
+                </>
+              )}
+            </Popover>
+          </Span>
 
           <Flex flexDirection="row" width="100%">
             <BuilderIcon type={question.type} Icon={Icon} />
