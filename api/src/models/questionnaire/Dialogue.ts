@@ -3,8 +3,8 @@ import { PrismaClient } from '@prisma/client';
 import { extendType, inputObjectType, objectType } from '@nexus/schema';
 
 // eslint-disable-next-line import/no-cycle
-import { CustomerType } from '../customer/Customer';
 import { UserInputError } from 'apollo-server-express';
+import { CustomerType } from '../customer/Customer';
 // eslint-disable-next-line import/no-cycle
 import { EdgeType } from '../edge/Edge';
 // eslint-disable-next-line import/no-cycle

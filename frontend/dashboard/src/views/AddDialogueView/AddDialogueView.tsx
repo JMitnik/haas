@@ -133,8 +133,6 @@ const AddDialogueView = () => {
     // TODO: Make better typescript supported
     const tagIds = activeTags.map((tag) => tag?.value);
     const tagEntries = { entries: tagIds };
-    const contentType = activeContentOption?.value;
-    const templateDialogueId = activeDialogueTemplate?.value;
 
     addDialogue({
       variables: {
@@ -143,8 +141,8 @@ const AddDialogueView = () => {
         title: formData.title,
         publicTitle: formData.publicTitle,
         description: formData.description,
-        contentType,
-        templateDialogueId,
+        contentType: formData.contentOption.value,
+        templateDialogueId: formData.dialogueOption,
         tags: tagEntries,
       },
     });
@@ -154,18 +152,6 @@ const AddDialogueView = () => {
 
     setActiveDialogueTemplate(qOption);
   };
-
-  // const handleContentOptionChange = (qOption: any) => {
-  //   form.setValue('contentOption', qOption?.value);
-
-  //   setActiveContentOption(qOption);
-  //   setActiveCustomerTemplate(null);
-  //   setActiveDialogueTemplate(null);
-
-  //   if (qOption.value === 'TEMPLATE') {
-  //     fetchCustomers();
-  //   }
-  // };
 
   const handleCustomerChange = (qOption: any) => {
     setActiveCustomerTemplate(qOption);
@@ -293,6 +279,7 @@ const AddDialogueView = () => {
                       <Controller
                         name="customerOption"
                         control={form.control}
+                        defaultValue={activeCustomerTemplate}
                         render={({ onChange, onBlur, value }) => (
                           <Select
                             options={CUSTOMER_OPTIONS}
@@ -314,11 +301,16 @@ const AddDialogueView = () => {
                       <Controller
                         name="dialogueOption"
                         control={form.control}
-                        as={Select}
-                        options={dialogueOptions}
-                        onChange={(qOption: any) => {
-                          handleDialogueTemplateChange(qOption);
-                        }}
+                        defaultValue={activeDialogueTemplate}
+                        render={({ onChange, onBlur, value }) => (
+                          <Select
+                            options={dialogueOptions}
+                            onChange={(data: any) => {
+                              handleDialogueTemplateChange(data);
+                              onChange(data.value);
+                            }}
+                          />
+                        )}
                       />
                     </FormControl>
                   )}
