@@ -70,6 +70,9 @@ const QuestionEntryItem = ({ depth,
         dialogueSlug,
       },
     }],
+    onCompleted: () => {
+      onActiveQuestionChange(null);
+    },
     onError: (serverError: ApolloError) => {
       console.log(serverError);
     },
@@ -86,40 +89,6 @@ const QuestionEntryItem = ({ depth,
       )}
       <QuestionEntryViewContainer activeCTA={activeQuestion} id={question.id} flexGrow={1}>
         <QuestionEntryContainer flexGrow={1}>
-          <Span onClick={(e) => e.stopPropagation()}>
-            <Popover
-              usePortal
-            >
-              {({ onClose }) => (
-                <>
-                  <PopoverTrigger>
-                    <DeleteQuestionButton
-                      data-cy="DeleteButton"
-                      disabled={(!!activeQuestion && activeQuestion !== question.id) || false}
-                    >
-                      <X />
-                    </DeleteQuestionButton>
-                  </PopoverTrigger>
-                  <PopoverContent zIndex={4}>
-                    <PopoverArrow />
-                    <PopoverHeader>Delete</PopoverHeader>
-                    <PopoverCloseButton />
-                    <PopoverBody>
-                      <p>You are about to delete a question (and all its child questions). THIS ACTION IS IRREVERSIBLE! Are you sure?</p>
-                    </PopoverBody>
-                    <PopoverFooter>
-                      <Button
-                        variantColor="red"
-                        onClick={() => deleteQuestion()}
-                      >
-                        Delete
-                      </Button>
-                    </PopoverFooter>
-                  </PopoverContent>
-                </>
-              )}
-            </Popover>
-          </Span>
 
           <Flex flexDirection="row" width="100%">
             <BuilderIcon type={question.type} Icon={Icon} />
@@ -144,6 +113,7 @@ const QuestionEntryItem = ({ depth,
           {activeQuestion === question.id
           && (
             <QuestionEntryForm
+              onDeleteEntry={deleteQuestion}
               onAddExpandChange={onAddExpandChange}
               parentQuestionType={parentQuestionType}
               parentQuestionId={parentQuestionId}

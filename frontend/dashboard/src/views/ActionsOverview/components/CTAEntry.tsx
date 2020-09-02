@@ -106,52 +106,19 @@ const CTAEntry = ({ id, activeCTA, onActiveCTAChange, title, type, links, Icon, 
     }],
   });
 
-  const deleteCTA = (onComplete: (() => void) | undefined) => {
+  const deleteCTA = () => {
     if (id === '-1') {
       onNewCTAChange(false);
-      onActiveCTAChange(null);
-      return onComplete && onComplete();
+      return onActiveCTAChange(null);
     }
-
-    return deleteEntry().finally(() => onComplete && onComplete());
+    onActiveCTAChange(null);
+    return deleteEntry();
   };
 
   return (
     <motion.div initial={{ opacity: 1, y: 150 }} animate={{ opacity: 1, y: 0 }}>
 
       <CTAEntryContainer id={id} activeCTA={activeCTA}>
-
-        <Span onClick={(e) => e.stopPropagation()}>
-          <Popover
-            usePortal
-          >
-            {({ onClose }) => (
-              <>
-                <PopoverTrigger>
-                  <DeleteCTAButton disabled={(!!activeCTA && activeCTA !== id) || false}>
-                    <X />
-                  </DeleteCTAButton>
-                </PopoverTrigger>
-                <PopoverContent zIndex={4}>
-                  <PopoverArrow />
-                  <PopoverHeader>Delete</PopoverHeader>
-                  <PopoverCloseButton />
-                  <PopoverBody>
-                    <p>You are about to delete a CTA. THIS ACTION IS IRREVERSIBLE! Are you sure?</p>
-                  </PopoverBody>
-                  <PopoverFooter>
-                    <Button
-                      variantColor="red"
-                      onClick={() => deleteCTA(onClose)}
-                    >
-                      Delete
-                    </Button>
-                  </PopoverFooter>
-                </PopoverContent>
-              </>
-            )}
-          </Popover>
-        </Span>
 
         <Flex flexDirection="row" width="100%">
           <CTAIcon type={type} Icon={Icon} />
@@ -184,6 +151,7 @@ const CTAEntry = ({ id, activeCTA, onActiveCTAChange, title, type, links, Icon, 
                 title={title}
                 type={type}
                 links={links}
+                onDeleteCTA={deleteCTA}
                 onActiveCTAChange={onActiveCTAChange}
                 onNewCTAChange={onNewCTAChange}
               />

@@ -1,6 +1,7 @@
 import { Edit, X } from 'react-feather';
 import React, { useState } from 'react';
 
+import { Button, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger } from '@chakra-ui/core';
 import { DeleteButtonContainer, Div, EditButtonContainer, Flex, Grid, H4, H5, Hr, Span } from '@haas/ui';
 import { TableRowProps } from 'components/Table/TableTypes';
 import { UserCell } from 'components/Table/CellComponents/CellComponents';
@@ -63,12 +64,39 @@ const UserRow = ({ headers, data, index, onDeleteEntry, onEditEntry }: TableRowP
       >
         <Edit />
       </EditButtonContainer>
-      <DeleteButtonContainer
-        style={{ top: '0px' }}
-        onClick={(event) => onDeleteEntry && onDeleteEntry(event, userId)}
-      >
-        <X />
-      </DeleteButtonContainer>
+      <Span onClick={(e) => e.stopPropagation()}>
+        <Popover
+          usePortal
+        >
+          {({ onClose }) => (
+            <>
+              <PopoverTrigger>
+                <DeleteButtonContainer
+                  style={{ top: '0px' }}
+                >
+                  <X />
+                </DeleteButtonContainer>
+              </PopoverTrigger>
+              <PopoverContent zIndex={4}>
+                <PopoverArrow />
+                <PopoverHeader>Delete</PopoverHeader>
+                <PopoverCloseButton />
+                <PopoverBody>
+                  <p>You are about to delete a trigger. THIS ACTION IS IRREVERSIBLE! Are you sure?</p>
+                </PopoverBody>
+                <PopoverFooter>
+                  <Button
+                    variantColor="red"
+                    onClick={(event) => onDeleteEntry && onDeleteEntry(event, userId, onClose)}
+                  >
+                    Delete
+                  </Button>
+                </PopoverFooter>
+              </PopoverContent>
+            </>
+          )}
+        </Popover>
+      </Span>
       {isExpanded && (
         <Div useFlex flexDirection="column" backgroundColor="#f0f0f0" gridColumn="1 / -1">
           <Div padding={25}>

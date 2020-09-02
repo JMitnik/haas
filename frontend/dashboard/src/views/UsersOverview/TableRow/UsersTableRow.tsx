@@ -2,8 +2,11 @@ import { Edit, X } from 'react-feather';
 import { ErrorBoundary } from 'react-error-boundary';
 import React, { useState } from 'react';
 
-import { DeleteButtonContainer, Div, EditButtonContainer, Grid } from '@haas/ui';
+import { Button, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger } from '@chakra-ui/core';
+import { DeleteButtonContainer, Div, EditButtonContainer, Grid, Span } from '@haas/ui';
 import { UserRowProps } from 'components/Table/TableTypes';
+import { id } from 'date-fns/locale';
+import DeleteCTAButton from 'views/ActionsOverview/components/DeleteCTAButton';
 
 const UsersTableRow = ({ headers, data, index, onDeleteEntry, onEditEntry }: UserRowProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -41,12 +44,40 @@ const UsersTableRow = ({ headers, data, index, onDeleteEntry, onEditEntry }: Use
         >
           <Edit />
         </EditButtonContainer>
-        <DeleteButtonContainer
-          style={{ top: '0px' }}
-          onClick={(event) => onDeleteEntry && onDeleteEntry(event, userId)}
-        >
-          <X />
-        </DeleteButtonContainer>
+        <Span onClick={(e) => e.stopPropagation()}>
+          <Popover
+            usePortal
+          >
+            {({ onClose }) => (
+              <>
+                <PopoverTrigger>
+                  <DeleteButtonContainer
+                    style={{ top: '0px' }}
+                  >
+                    <X />
+                  </DeleteButtonContainer>
+                </PopoverTrigger>
+                <PopoverContent zIndex={4}>
+                  <PopoverArrow />
+                  <PopoverHeader>Delete</PopoverHeader>
+                  <PopoverCloseButton />
+                  <PopoverBody>
+                    <p>You are about to delete a User. THIS ACTION IS IRREVERSIBLE! Are you sure?</p>
+                  </PopoverBody>
+                  <PopoverFooter>
+                    <Button
+                      variantColor="red"
+                      onClick={(event) => onDeleteEntry && onDeleteEntry(event, userId, onClose)}
+                    >
+                      Delete
+                    </Button>
+                  </PopoverFooter>
+                </PopoverContent>
+              </>
+            )}
+          </Popover>
+        </Span>
+
       </Grid>
     </ErrorBoundary>
   );

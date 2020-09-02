@@ -62,14 +62,14 @@ export interface TableRowProps {
   permissions?: Array<PermissionProps>;
   headers: Array<HeaderColumnProps>;
   index: number;
-  onDeleteEntry?: (event: any, userId: string) => void;
+  onDeleteEntry?: (event: any, userId: string, onComplete: (() => void) | undefined) => void;
   onEditEntry?: (event: any, userId: string) => void;
 }
 
 export interface UserRowProps {
   data: CellComponentProps;
   permissions?: Array<PermissionProps>;
-  onDeleteEntry?: (event: any, userId: string) => void;
+  onDeleteEntry?: (event: any, userId: string, onComplete: (() => void) | undefined) => void;
   onEditEntry?: (event: any, userId: string) => void;
   headers: Array<HeaderColumnProps>;
   index: number;
