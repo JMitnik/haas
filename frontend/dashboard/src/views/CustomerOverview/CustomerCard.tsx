@@ -15,7 +15,7 @@ import { CustomerCardImage } from './CustomerOverviewStyles';
 
 const CustomerCard = ({ customer }: { customer: any }) => {
   const history = useHistory();
-  const { setActiveCustomer } = useCustomer();
+  const { setActiveCustomer, setStorageCustomer } = useCustomer();
   const toast = useToast();
 
   const setCustomerSlug = (customerSlug: string) => {
@@ -48,6 +48,7 @@ const CustomerCard = ({ customer }: { customer: any }) => {
         position: 'bottom-right',
         duration: 1500,
       });
+      setStorageCustomer(null);
     },
   });
 

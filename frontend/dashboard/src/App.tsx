@@ -214,8 +214,8 @@ const App: FC = () => (
   <>
     <I18nextProvider i18n={lang}>
       <ApolloProvider client={client}>
-        <CustomerProvider>
-          <Router>
+        <Router>
+          <CustomerProvider>
             <ThemesProvider>
               <AuthProvider>
                 <AppContainer>
@@ -226,8 +226,8 @@ const App: FC = () => (
                 <GlobalStyle />
               </AuthProvider>
             </ThemesProvider>
-          </Router>
-        </CustomerProvider>
+          </CustomerProvider>
+        </Router>
       </ApolloProvider>
     </I18nextProvider>
   </>
