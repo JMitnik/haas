@@ -577,7 +577,7 @@ class DialogueService {
     const dialogueTags = input.tags?.entries?.map((tag: string) => ({ id: tag })) || [];
 
     const customers = await prisma.customer.findMany({ where: { slug: input.customerSlug || undefined } });
-
+    console.log('INPUT: ', input);
     // TODO: Put in validation function, or add validator service library
     if (!input.dialogueSlug) {
       throw new Error('Slug required, not found!');
