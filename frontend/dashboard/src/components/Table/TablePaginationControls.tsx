@@ -69,7 +69,6 @@ const TablePaginationControls = ({ paginationProps, onPageChange }: TablePaginat
 
   return (
     <Flex gridRow="-1" alignItems="center" justifyContent="flex-end">
-      {/* TODO: Make these buttons styled, use flex-properties instead of margin */}
       <Flex marginRight="20px" alignItems="center" justifyContent="center">
         <Button
           onClick={() => onPageChange(paginationProps.pageIndex - 1)}
@@ -77,9 +76,7 @@ const TablePaginationControls = ({ paginationProps, onPageChange }: TablePaginat
         >
           {'<'}
         </Button>
-        <Span>
-          {t('page')}
-        </Span>
+        <Span>{t('page')}</Span>
         <div style={{ textAlign: 'center' }}>
           <StyledInput disabled type="number" value={paginationProps.pageIndex + 1} />
         </div>

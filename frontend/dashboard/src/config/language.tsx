@@ -44,7 +44,8 @@ const language = {
       de: 'CSV export',
     },
     user_actions: {
-      en: 'User actions',
+      en: 'Actions',
+      de: 'Aktionen',
     },
     no_data: {
       en: 'No data available',

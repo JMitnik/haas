@@ -1,4 +1,4 @@
-import { Div, Flex, H4, Span } from '@haas/ui';
+import { Div, Flex, H4, Span, Text } from '@haas/ui';
 import { differenceInCalendarDays, format, formatDistance } from 'date-fns';
 import { maxBy } from 'lodash';
 import DesktopIcon from 'components/Icons/DesktopIcon';
@@ -61,8 +61,8 @@ export const InteractionUserCell = ({ value }: CellProps) => (
       <DesktopIcon />
     </Div>
     <Flex minWidth="195px" marginLeft="15px" flexDirection="column">
-      <H4 color="default.darker">Desktop user</H4>
-      <Span color="default.dark" fontSize="0.8em" fontWeight={900}>{value}</Span>
+      <Text color="gray.500" fontWeight="600">Desktop user</Text>
+      <Span color="gray.400" fontWeight="400" fontSize="0.8em">{value}</Span>
     </Flex>
   </Flex>
 );
@@ -76,12 +76,11 @@ export const InteractionDateCell = ({ value }: { value: any }) => {
   const formattedTime = format(date, 'h:mm a');
 
   return (
-    <Flex flexDirection="column" alignItems="center">
+    <Flex alignItems="center">
       <Div>
-        <H4 color="default.darker">{formattedDate?.toUpperCase()}</H4>
-        <Span color="default.dark" fontSize="0.8em" fontWeight={900}>{formattedTime}</Span>
+        <Text color="gray.500" fontWeight="600">{formattedDate?.toUpperCase()}</Text>
+        <Span color="gray.400" fontWeight="400" fontSize="0.8em">{formattedTime}</Span>
       </Div>
-
     </Flex>
   );
 };
@@ -108,9 +107,9 @@ export const InteractionCTACell = ({ value: nodeEntries }: CellProps) => {
 
   return (
     <Flex alignItems="center">
-      <Flex minWidth="195px" marginLeft="15px" flexDirection="column">
-        <H4 color="default.darker">{getCTAType(potentialCTA)}</H4>
-        <Span color="default.dark" fontSize="0.8em" fontWeight={900}>No registration</Span>
+      <Flex minWidth="195px" flexDirection="column">
+        <Text color="gray.500" fontWeight="600">{getCTAType(potentialCTA)}</Text>
+        <Span color="gray.400" fontWeight="400" fontSize="0.8em">No registration</Span>
       </Flex>
     </Flex>
   );

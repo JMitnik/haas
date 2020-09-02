@@ -10,17 +10,14 @@ const TableRow = ({ headers, data, index }: TableRowProps) => {
 
   return (
     <Grid
-      paddingLeft="15px"
-      paddingRight="15px"
-      gridRowGap={0}
-      gridColumnGap={5}
+      px={4}
       gridTemplateColumns={templateColumns}
       onClick={() => setIsExpanded(!isExpanded)}
     >
       {headers && headers.map(({ accessor, Cell }) => {
         const result = Object.entries(data).find((property) => property[0] === accessor);
 
-        if (result) {
+        if (result && Cell) {
           return (
             <Cell value={result[1]} key={`${index}-${result[0]}`} />
           );
