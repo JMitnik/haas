@@ -1,12 +1,14 @@
-import { AvatarBadge, Avatar as ChakraAvatar } from '@chakra-ui/core';
-import { Flex } from '@haas/ui';
+import { AvatarBadge, Avatar as ChakraAvatar, Icon, Menu, MenuButton, MenuDivider, MenuGroup, MenuItem, MenuList, useToast } from '@chakra-ui/core';
+import { Flex, Text } from '@haas/ui';
 import { LinkProps, NavLink, useHistory } from 'react-router-dom';
 import React from 'react';
 import styled, { css } from 'styled-components/macro';
 
+import { ExternalLink, LogOut } from 'react-feather';
 import { FullLogo, FullLogoContainer, LogoContainer } from 'components/Logo/Logo';
 import { UserProps } from 'types/generic';
 import { useCustomer } from 'providers/CustomerProvider';
+import { useTranslation } from 'react-i18next';
 import Color from 'color';
 
 interface NavItemProps extends LinkProps { }
@@ -89,6 +91,8 @@ const UsernavContainer = styled.div`
 export const Usernav = ({ user }: { user: UserProps, customer: any }) => {
   const history = useHistory();
   const { setActiveCustomer, setStorageCustomer } = useCustomer();
+  const { t, i18n } = useTranslation();
+  const toast = useToast();
 
   const goToDialoguesOverview = () => {
     setStorageCustomer(null);
@@ -96,21 +100,87 @@ export const Usernav = ({ user }: { user: UserProps, customer: any }) => {
     history.push('/dashboard');
   };
 
+  const switchToGerman = () => {
+    i18n.changeLanguage('de');
+    localStorage.setItem('language', 'de');
+
+    setTimeout(() => {
+      toast({
+        title: t('toast:locale_switch'),
+        description: t('toast:locale_switch_german'),
+        status: 'success',
+        position: 'bottom-right',
+        duration: 1500,
+      });
+    }, 400);
+  };
+
+  const switchToEnglish = () => {
+    i18n.changeLanguage('en');
+    localStorage.setItem('language', 'en');
+
+    setTimeout(() => {
+      toast({
+        title: t('toast:locale_switch'),
+        description: t('toast:locale_switch_english'),
+        status: 'success',
+        position: 'bottom-right',
+        duration: 1500,
+      });
+    }, 400);
+  };
+
   return (
-    <UsernavContainer onClick={() => goToDialoguesOverview()}>
-      <Flex py={4} alignItems="center">
-        <ChakraAvatar bg="gray.300" size="md" name={`${user.firstName} ${user.lastName}`}>
-          <AvatarBadge size="1em" bg="green.400" />
-        </ChakraAvatar>
-      </Flex>
-    </UsernavContainer>
+    <Menu>
+      <MenuButton>
+        <UsernavContainer>
+          <Flex py={4} alignItems="center">
+            <ChakraAvatar bg="gray.300" size="md" name={`${user.firstName} ${user.lastName}`}>
+              <AvatarBadge size="1em" bg="green.400" />
+            </ChakraAvatar>
+
+          </Flex>
+        </UsernavContainer>
+      </MenuButton>
+      <MenuList>
+        <MenuGroup title={t('language')}>
+          <MenuItem onClick={switchToEnglish} color="gray.600">
+            <Icon as={ExternalLink} />
+            <Text ml={2}>
+              {t('english')}
+            </Text>
+          </MenuItem>
+          <MenuItem onClick={switchToGerman} color="gray.600">
+            <Icon as={LogOut} />
+            <Text ml={2}>
+              {t('german')}
+            </Text>
+          </MenuItem>
+        </MenuGroup>
+        <MenuDivider />
+        <MenuGroup title={t('user_actions')}>
+          <MenuItem color="gray.600" onClick={goToDialoguesOverview}>
+            <Icon as={ExternalLink} />
+            <Text ml={2}>
+              Switch customer
+            </Text>
+          </MenuItem>
+          <MenuItem color="gray.600">
+            <Icon as={LogOut} />
+            <Text ml={2}>
+              Logout
+            </Text>
+          </MenuItem>
+        </MenuGroup>
+      </MenuList>
+    </Menu>
   );
 };
 
 export const SidenavContainer = styled.div`
   ${({ theme }) => css`
     position: fixed;
-    z-index: 300;
+    z-index: 1200;
     font-weight: 1000;
     width: ${theme.sidenav.width}px;
 

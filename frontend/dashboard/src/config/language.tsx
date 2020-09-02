@@ -1,82 +1,352 @@
 const language = {
-  en: {
-    general: {
-      about: 'About',
-      about_helper: 'About',
-      branding: 'Branding',
-      branding_color: 'Branding color',
-      name: 'Name',
-      first_name: 'First Name',
-      first_name_helper: 'What is the user\'s first name?',
-      last_name: 'Last name',
-      last_name_helper: 'What is the user\'s last name?',
-      email: 'Email adress',
-      email_helper: 'What is the user\'s email adress?',
-      phone: 'Phone number',
-      phone_helper: 'What is the user\'s phone number? (Note: Start with country code, e.g. +316123456)',
-      name_helper: 'What is the name of the business?',
-      role_selector: 'User role',
-      role_selector_helper: 'What will be the user\'s role?',
-      slug: 'Url Extension',
-      slug_helper: 'Under which url segment will visitors find the business?',
-      template: 'Template',
+  general: {
+    about: {
+      en: 'About',
     },
-    customer: {
-      about_helper: 'Please tell us a bit about the business, such as under which name and URL we can find it.',
-      branding_color_helper: 'What is the main brand color of the company?',
-      branding_helper: 'Describe the branding of your company, including logo and color',
-      name_helper: 'What is the name of the business?',
-      slug_helper: 'Under which url segment will visitors find the business?',
-      use_template: 'Use template',
-      use_template_helper: 'Start the onboarding with a pre-existing template, or start clean.',
-      template_helper: 'Choose whether you have a preference what to start with.',
-      custom_template: 'Custom template',
-      custom_template_helper: 'Start with a default dialogue',
-      no_custom_template: 'Fresh start',
-      no_custom_template_helper: 'Start with a clean slate',
+    dialogues: {
+      en: 'Dialogues',
+      de: 'Dialogo',
     },
-    views: {
-      edit_dialogue_view: 'Edit dialogue',
-      edit_trigger_view: 'Edit trigger',
-      dialogue_view: 'Overview',
-      cta_view: 'Call to actions',
-      builder_view: 'Dialogue Builder',
-      interactions_view: 'Interactions',
-      trigger_overview: 'Triggers',
-      create_trigger_view: 'Create trigger',
+    score: {
+      en: 'Score',
+      de: 'Ergebnis',
     },
-    dialogue: {
-      slug_helper: 'Under which url segment will visitors find the dialogue?',
-      qr_download_helper: 'Share the dialogue by sharing the QR code, by either downloading the QR code or copying it.',
+    user_actions: {
+      en: 'User actions',
     },
-    trigger: {
-      conditions: 'Conditions',
-      conditions_helper: 'What are the conditions for sending out the trigger?',
-      name_helper: 'What is the name of this trigger?',
-      dialogue: 'Selected dialogue',
-      dialogue_helper: 'To which dialogue will this trigger apply?',
-      type: 'Type trigger',
-      type_helper: 'What type of trigger is this?',
-      delivery: 'Delivery',
-      low_threshold: 'Low Threshold',
-      low_threshold_helper: 'Set a low threshold: if a score is recorded underneath, a trigger will be sent',
-      high_threshold: 'High Threshold',
-      high_threshold_helper: 'Set a top-threshold: if a score is recorded over, a trigger will be sent',
-      delivery_helper: 'How will this trigger be delivered to the recipients (mail or SMS)?',
-      medium: 'Delivery medium',
-      medium_helper: 'Which delivery method is preferred for this trigger? Note: additional costs may be incurred for SMS',
-      question: 'Selected question',
-      question_helper: 'Which question will the trigger be watching?',
-      condition: 'Condition type',
-      condition_helper: 'Which condition should apply to the trigger for this question to the currently selected question?',
-      recipients: 'Recipients',
-      recipients_helper: 'Who will receive these trigger alerts?',
-      recipient: 'Recipient',
-      recipient_helper: 'Select a registered user to be the receiver',
-      match_text: 'Text to match',
-      match_text_helper: 'What text should be matched to trigger the alert?',
+    no_data: {
+      en: 'No data available',
+      de: 'Keine daten verfügbar',
+    },
+    language: {
+      en: 'Language',
+      de: 'Sprache',
+    },
+    latest_interactions: {
+      en: 'Latest interactions',
+      de: 'Die letzten interaktionen',
+    },
+    overview: {
+      en: 'Overview',
+      de: 'Übersicht',
+    },
+    interactions: {
+      en: 'Interactions',
+      de: 'Interaktionen',
+    },
+    interaction: {
+      en: 'Interaction',
+      de: 'Interaktion',
+    },
+    view_all: {
+      en: 'View all',
+      de: 'Siehe alle',
+    },
+    english: {
+      en: 'English',
+      de: 'Englisch',
+    },
+    german: {
+      en: 'German',
+      de: 'Deutsche',
+    },
+    about_helper: {
+      en: 'About',
+    },
+    branding: {
+      en: 'Branding',
+    },
+    branding_color: {
+      en: 'Branding color',
+    },
+    name: {
+      en: 'Name',
+    },
+    first_name: {
+      en: 'First Name',
+    },
+    first_name_helper: {
+      en: 'What is the user\'s first name?',
+    },
+    last_name: {
+      en: 'Last name',
+    },
+    last_name_helper: {
+      en: 'What is the user\'s last name?',
+    },
+    email: {
+      en: 'Email adress',
+    },
+    email_helper: {
+      en: 'What is the user\'s email adress?',
+    },
+    phone: {
+      en: 'Phone number',
+    },
+    phone_helper: {
+      en: 'What is the user\'s phone number? (Note: Start with country code, e.g. +316123456)',
+    },
+    name_helper: {
+      en: 'What is the name of the business?',
+    },
+    role_selector: {
+      en: 'User role',
+    },
+    role_selector_helper: {
+      en: 'What will be the user\'s role?',
+    },
+    slug: {
+      en: 'Url Extension',
+    },
+    slug_helper: {
+      en: 'Under which url segment will visitors find the business?',
+    },
+    template: {
+      en: 'Template',
     },
   },
+  customer: {
+    about_helper: {
+      en: 'Please tell us a bit about the business, such as under which name and URL we can find it.',
+    },
+    branding_color_helper: {
+      en: 'What is the main brand color of the company?',
+    },
+    branding_helper: {
+      en: 'Describe the branding of your company, including logo and color',
+    },
+    name_helper: {
+      en: 'What is the name of the business?',
+    },
+    slug_helper: {
+      en: 'Under which url segment will visitors find the business?',
+    },
+    use_template: {
+      en: 'Use template',
+    },
+    use_template_helper: {
+      en: 'Start the onboarding with a pre-existing template, or start clean.',
+    },
+    template_helper: {
+      en: 'Choose whether you have a preference what to start with.',
+    },
+    custom_template: {
+      en: 'Custom template',
+    },
+    custom_template_helper: {
+      en: 'Start with a default dialogue',
+    },
+    no_custom_template: {
+      en: 'Fresh start',
+    },
+    no_custom_template_helper: {
+      en: 'Start with a clean slate',
+    },
+  },
+  views: {
+    edit_dialogue_view: {
+      en: 'Edit dialogue',
+    },
+    edit_trigger_view: {
+      en: 'Edit trigger',
+    },
+    dialogue_view: {
+      en: 'Overview',
+      de: 'Übersicht',
+    },
+    cta_view: {
+      en: 'Call to actions',
+    },
+    builder_view: {
+      en: 'Dialogue Builder',
+    },
+    interactions_view: {
+      en: 'Interactions',
+    },
+    trigger_overview: {
+      en: 'Triggers',
+    },
+    create_trigger_view: {
+      en: 'Create trigger',
+    },
+  },
+  dialogue: {
+    average_score: {
+      en: 'Average score',
+      de: 'Durchschnittlich',
+    },
+    frequently_mentioned: {
+      en: 'Frequently mentioned',
+      de: 'Häufig erwähnt',
+    },
+    notable_paths_of_the_week: {
+      en: 'Notable paths of the week',
+      de: 'Dialogue der woche',
+    },
+    score_over_time: {
+      en: 'Score over time',
+      de: 'Bewertungsgraph',
+    },
+    top_positive_paths: {
+      en: 'Top positive paths',
+      de: 'Top positive dialogue',
+    },
+    top_negative_paths: {
+      en: 'Top negative paths',
+      de: 'Top negative dialogue',
+    },
+    fallback_no_positive_paths: {
+      en: 'No positive paths recorded yet',
+      de: 'Noch kein positiv aufgezeichnet',
+    },
+    fallback_no_negative_paths: {
+      en: 'No negative paths recorded yet',
+      de: 'Noch kein negative aufgezeichnet',
+    },
+    fallback_no_keywords: {
+      en: 'No keywords mentioned yet',
+      de: 'Noch keine keywords erwähnt',
+    },
+    view_all_mentions: {
+      en: 'View all mentions',
+      de: 'Alle erwähnungen anzeigen',
+    },
+    fallback_no_score: {
+      en: 'No score calculated yet',
+      de: 'Noch keine ergebnis berechnet',
+    },
+    fallback_no_interactions: {
+      en: 'No interactions yet',
+      de: 'Noch keine interaktionen',
+    },
+    latest_data: {
+      en: 'The latest data',
+      de: 'Aktuelle trends',
+    },
+    slug_helper: {
+      en: 'Under which url segment will visitors find the dialogue?',
+    },
+    qr_download_helper: {
+      en: 'Share the dialogue by sharing the QR code, by either downloading the QR code or copying it.',
+    },
+    week_summary: {
+      en: 'This week in summary',
+      de: 'Wochenansicht',
+    },
+  },
+  toast: {
+    locale_switch: {
+      en: 'Switched language',
+      de: 'Sprache gewechselt',
+    },
+    locale_switch_german: {
+      en: 'Switched language to German',
+      de: 'Sprache auf Deutsch umgestellt',
+    },
+    locale_switch_english: {
+      en: 'Switched language to English',
+      de: 'Sprache auf Englisch umgestellt',
+    },
+  },
+  trigger: {
+    conditions: {
+      en: 'Conditions',
+    },
+    conditions_helper: {
+      en: 'What are the conditions for sending out the trigger?',
+    },
+    name_helper: {
+      en: 'What is the name of this trigger?',
+    },
+    dialogue: {
+      en: 'Selected dialogue',
+    },
+    dialogue_helper: {
+      en: 'To which dialogue will this trigger apply?',
+    },
+    type: {
+      en: 'Type trigger',
+    },
+    type_helper: {
+      en: 'What type of trigger is this?',
+    },
+    delivery: {
+      en: 'Delivery',
+    },
+    low_threshold: {
+      en: 'Low Threshold',
+    },
+    low_threshold_helper: {
+      en: 'Set a low threshold: if a score is recorded underneath, a trigger will be sent',
+    },
+    high_threshold: {
+      en: 'High Threshold',
+    },
+    high_threshold_helper: {
+      en: 'Set a top-threshold: if a score is recorded over, a trigger will be sent',
+    },
+    delivery_helper: {
+      en: 'How will this trigger be delivered to the recipients (mail or SMS)?',
+    },
+    medium: {
+      en: 'Delivery medium',
+    },
+    medium_helper: {
+      en: 'Which delivery method is preferred for this trigger? Note: additional costs may be incurred for SMS',
+    },
+    question: {
+      en: 'Selected question',
+    },
+    question_helper: {
+      en: 'Which question will the trigger be watching?',
+    },
+    condition: {
+      en: 'Condition type',
+    },
+    condition_helper: {
+      en: 'Which condition should apply to the trigger for this question to the currently selected question?',
+    },
+    recipients: {
+      en: 'Recipients',
+    },
+    recipients_helper: {
+      en: 'Who will receive these trigger alerts?',
+    },
+    recipient: {
+      en: 'Recipient',
+    },
+    recipient_helper: {
+      en: 'Select a registered user to be the receiver',
+    },
+    match_text: {
+      en: 'Text to match',
+    },
+    match_text_helper: {
+      en: 'What text should be matched to trigger the alert?',
+    },
+  },
+};
+
+export const parseLanguages = (language: string, input: any, output?: any) => {
+  output = output || {};
+
+  Object.keys(input).forEach((key) => {
+    const value = input[key];
+
+    const leaf = typeof value[Object.keys(value)[0]] === 'string';
+
+    if (leaf) {
+      if (language in value) {
+        output[key] = value[language];
+      }
+    } else {
+      output[key] = {};
+
+      parseLanguages(language, value, output[key]);
+    }
+  });
+
+  return output;
 };
 
 export default language;

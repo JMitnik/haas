@@ -3,6 +3,7 @@ import { Div, Flex, Grid, H4, PageTitle } from '@haas/ui';
 import { Grid as GridIcon, List, Plus } from 'react-feather';
 import { Link, useParams } from 'react-router-dom';
 import { useLazyQuery } from '@apollo/react-hooks';
+import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 
 import { getQuestionnairesOfCustomer as CustomerData } from 'queries/__generated__/getQuestionnairesOfCustomer';
@@ -15,6 +16,7 @@ import DialogueCard from './DialogueCard';
 
 const DialogueOverview = ({ dialogues }: { dialogues: any, isLoading: boolean }) => {
   const { customerSlug } = useParams();
+  const { t } = useTranslation();
 
   const [useDialogueGridView, setUseDialogueGridView] = useState(true);
 
@@ -29,7 +31,7 @@ const DialogueOverview = ({ dialogues }: { dialogues: any, isLoading: boolean })
 
   return (
     <>
-      <PageTitle>Dialogues</PageTitle>
+      <PageTitle>{t('dialogues')}</PageTitle>
 
       <Div mb={4} maxWidth="800px" width="100%">
         <Flex>

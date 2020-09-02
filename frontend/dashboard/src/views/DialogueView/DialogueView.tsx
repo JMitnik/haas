@@ -150,29 +150,29 @@ const DialogueView = () => {
                 <TrendingIcon fill="currentColor" />
               </Div>
               <Span ml={2}>
-                This week in summary
+                {t('dialogue:week_summary')}
               </Span>
             </Flex>
           </H4>
 
           <Grid gridTemplateColumns="repeat(auto-fit, minmax(275px, 1fr))" minHeight="100px">
             <SummaryModule
-              heading="Interactions"
+              heading={t('interactions')}
               renderIcon={Activity}
               onClick={() => (
                 history.push(`/dashboard/b/${customerSlug}/d/${dialogueSlug}/interactions`)
               )}
               isInFallback={dialogue.countInteractions === 0}
-              fallbackMetric="No interactions yet"
-              renderMetric={`${dialogue.countInteractions} ${dialogue.countInteractions > 1 ? 'interactions' : 'interaction'}`}
+              fallbackMetric={t('fallback_no_interactions')}
+              renderMetric={`${dialogue.countInteractions} ${dialogue.countInteractions > 1 ? t('interactions') : t('interaction')}`}
             />
 
             <SummaryModule
-              heading="Average score"
+              heading={t('dialogue:average_score')}
               renderIcon={Award}
               isInFallback={dialogue.thisWeekAverageScore === 0}
-              fallbackMetric="No score calculated yet"
-              renderMetric={`${(dialogue.thisWeekAverageScore / 10).toFixed(2)} score`}
+              fallbackMetric={t('fallback_no_interactions')}
+              renderMetric={`${(dialogue.thisWeekAverageScore / 10).toFixed(2)} ${t('score')}`}
               renderCornerMetric={(
                 <Flex color="red">
                   {increaseInAverageScore > 0 ? (
@@ -199,14 +199,14 @@ const DialogueView = () => {
             />
 
             <SummaryModule
-              heading="Frequently mentioned"
+              heading={t('dialogue:frequently_mentioned')}
               renderIcon={MessageCircle}
-              renderFooterText="View all mentions"
+              renderFooterText={t('dialogue:view_all_mentions')}
               isInFallback={!dialogue.statistics?.mostPopularPath}
               onClick={() => (
                 history.push(`/dashboard/b/${customerSlug}/d/${dialogueSlug}/interactions?${makeSearchUrl()}`)
               )}
-              fallbackMetric="No keywords mentioned yet"
+              fallbackMetric={t('dialogue:fallback_no_keywords')}
               renderMetric={dialogue.statistics?.mostPopularPath?.answer}
               renderCornerMetric={(
                 <>
@@ -234,7 +234,7 @@ const DialogueView = () => {
                 <PathsIcon fill="currentColor" />
               </Div>
               <Span ml={2}>
-                Notable paths of the week
+                {t('dialogue:notable_paths_of_the_week')}
               </Span>
             </Flex>
           </H4>
@@ -251,7 +251,7 @@ const DialogueView = () => {
                 <TrophyIcon fill="currentColor" />
               </Div>
               <Span ml={2}>
-                The latest data
+                {t('dialogue:latest_data')}
               </Span>
             </Flex>
           </H4>
@@ -261,10 +261,7 @@ const DialogueView = () => {
           {dialogue.statistics?.history ? (
             <ScoreGraphModule chartData={dialogue.statistics?.history} />
           ) : (
-            // TODO: Make a nice card for this
-            <Div>
-              Currently no history data available
-            </Div>
+            <Div>{t('no_data')}</Div>
           )}
         </Div>
 

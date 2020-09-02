@@ -1,12 +1,24 @@
 import { initReactI18next } from 'react-i18next';
 import i18n from 'i18next';
 
-import language from './language';
+import language, { parseLanguages } from './language';
+
+let storedLanguage = localStorage.getItem('language');
+if (!storedLanguage) {
+  storedLanguage = 'en';
+}
 
 const lang = i18n.use(initReactI18next);
 lang.init({
-  resources: language,
-  lng: 'en',
+  resources: {
+    de: {
+      ...parseLanguages('de', language),
+    },
+    en: {
+      ...parseLanguages('en', language),
+    },
+  },
+  lng: storedLanguage,
   ns: ['general', 'customer'],
   defaultNS: 'general',
 
