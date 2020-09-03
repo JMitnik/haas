@@ -656,6 +656,14 @@ const language = {
     },
   },
   trigger: {
+    about_trigger: {
+      en: 'About the trigger',
+      de: 'Über alarm',
+    },
+    about_trigger_helper: {
+      en: 'Tell us about the trigger, and to which scope it applies (question/dialogue)',
+      de: 'Erzählen Sie uns von dem Auslöser und für welchen Umfang er gilt (Frage / Dialog)',
+    },
     conditions: {
       en: 'Conditions',
       de: 'Bedingungen',

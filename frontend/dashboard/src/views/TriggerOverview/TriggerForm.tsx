@@ -175,9 +175,9 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
 
       <FormSection id="general">
         <Div>
-          <H3 color="default.text" fontWeight={500} pb={2}>About the trigger</H3>
+          <H3 color="default.text" fontWeight={500} pb={2}>{t('trigger:about_trigger')}</H3>
           <Muted color="gray.600">
-            Tell us about the trigger, and to which scope it applies (question/dialogue)
+            {t('trigger:about_trigger_helper')}
           </Muted>
         </Div>
         <Div>
