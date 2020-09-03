@@ -10,7 +10,7 @@ import Table from 'components/Table/Table';
 import getUsersQuery from 'queries/getUserTable';
 
 import { Button } from '@chakra-ui/core';
-import { CenterCell, RoleCell, UserCell } from 'components/Table/CellComponents/CellComponents';
+import { CenterCell, GenericCell, RoleCell } from 'components/Table/CellComponents/CellComponents';
 import { ErrorBoundary } from 'react-error-boundary';
 import { Plus } from 'react-feather';
 import Row from './TableRow/UsersTableRow';
@@ -31,7 +31,7 @@ interface TableProps {
 const HEADERS = [
   { Header: 'First name', accessor: 'firstName', Cell: CenterCell },
   { Header: 'Last name', accessor: 'lastName', Cell: CenterCell },
-  { Header: 'Email', accessor: 'email', Cell: UserCell },
+  { Header: 'Email', accessor: 'email', Cell: GenericCell },
   { Header: 'Role', accessor: 'role', Cell: RoleCell },
 ];
 

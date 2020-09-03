@@ -8,7 +8,7 @@ import { useLazyQuery, useMutation } from '@apollo/react-hooks';
 import { useTranslation } from 'react-i18next';
 import React, { useCallback, useEffect, useState } from 'react';
 
-import { UserCell } from 'components/Table/CellComponents/CellComponents';
+import { GenericCell } from 'components/Table/CellComponents/CellComponents';
 import SearchBar from 'components/SearchBar/SearchBar';
 import Table from 'components/Table/Table';
 import deleteTriggerMutation from 'mutations/deleteTrigger';
@@ -29,9 +29,9 @@ interface TableProps {
 }
 
 const HEADERS = [
-  { Header: 'Name', accessor: 'name', Cell: UserCell },
-  { Header: 'Medium', accessor: 'medium', Cell: UserCell },
-  { Header: 'Type', accessor: 'type', Cell: UserCell },
+  { Header: 'Name', accessor: 'name', Cell: GenericCell },
+  { Header: 'Medium', accessor: 'medium', Cell: GenericCell },
+  { Header: 'Type', accessor: 'type', Cell: GenericCell },
 ];
 
 const TriggersOverview = () => {
@@ -119,10 +119,19 @@ const TriggersOverview = () => {
       <Div mb={4} width="100%">
         <Flex justifyContent="space-between">
           <Div mr={4}>
-            <Button onClick={handleAddUser} leftIcon={Plus} variantColor="teal">Create trigger</Button>
+            <Button
+              onClick={handleAddUser}
+              leftIcon={Plus}
+              variantColor="teal"
+            >
+              {t('create_trigger')}
+            </Button>
           </Div>
           <Div>
-            <SearchBar activeSearchTerm={paginationProps.activeSearchTerm} onSearchTermChange={handleSearchTermChange} />
+            <SearchBar
+              activeSearchTerm={paginationProps.activeSearchTerm}
+              onSearchTermChange={handleSearchTermChange}
+            />
           </Div>
         </Flex>
       </Div>

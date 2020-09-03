@@ -19,6 +19,10 @@ const language = {
       en: 'Date',
       de: 'Datum',
     },
+    create_trigger: {
+      en: 'Create trigger',
+      de: 'Alarm erstellen',
+    },
     page: {
       en: 'Page',
       de: 'Seite',
@@ -229,6 +233,7 @@ const language = {
     },
     trigger_overview: {
       en: 'Triggers',
+      de: 'Alarms',
     },
     create_trigger_view: {
       en: 'Create trigger',

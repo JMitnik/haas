@@ -2,8 +2,8 @@ import { Edit, X } from 'react-feather';
 import React, { useState } from 'react';
 
 import { DeleteButtonContainer, Div, EditButtonContainer, Flex, Grid, H4, H5, Hr, Span } from '@haas/ui';
+import { GenericCell } from 'components/Table/CellComponents/CellComponents';
 import { TableRowProps } from 'components/Table/TableTypes';
-import { UserCell } from 'components/Table/CellComponents/CellComponents';
 import Table from 'components/Table/Table';
 
 interface TableProps {
@@ -19,10 +19,10 @@ interface TableProps {
 }
 
 const RECIPIENT_HEADERS = [
-  { Header: 'FIRST NAME', accessor: 'firstName', Cell: UserCell },
-  { Header: 'LAST NAME', accessor: 'lastName', Cell: UserCell },
-  { Header: 'EMAIL', accessor: 'email', Cell: UserCell },
-  { Header: 'PHONE', accessor: 'phone', Cell: UserCell },
+  { Header: 'FIRST NAME', accessor: 'firstName', Cell: GenericCell },
+  { Header: 'LAST NAME', accessor: 'lastName', Cell: GenericCell },
+  { Header: 'EMAIL', accessor: 'email', Cell: GenericCell },
+  { Header: 'PHONE', accessor: 'phone', Cell: GenericCell },
 ];
 const UserRow = ({ headers, data, index, onDeleteEntry, onEditEntry }: TableRowProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
