@@ -154,6 +154,7 @@ export interface NexusGenInputs {
     customerId?: string | null; // String
     description?: string | null; // String
     name?: string | null; // String
+    permissions?: NexusGenEnums['SystemPermission'][] | null; // [SystemPermission!]
   }
   SessionInput: { // input type
     dialogueId: string; // String!
@@ -200,6 +201,7 @@ export interface NexusGenEnums {
   LinkTypeEnumType: "API" | "FACEBOOK" | "INSTAGRAM" | "LINKEDIN" | "SOCIAL" | "TWITTER" | "WHATSAPP"
   PaginationSortByEnum: "createdAt" | "email" | "firstName" | "id" | "lastName" | "medium" | "name" | "paths" | "role" | "score" | "type" | "user" | "when"
   QuestionNodeTypeEnum: "CHOICE" | "GENERIC" | "LINK" | "REGISTRATION" | "SLIDER" | "TEXTBOX"
+  SystemPermission: "CAN_ACCESS_ADMIN_PANEL" | "CAN_BUILD_DIALOGUES" | "CAN_VIEW_DIALOGUES"
   TagTypeEnum: "AGENT" | "DEFAULT" | "LOCATION"
   TriggerConditionEnum: prisma.TriggerConditionEnum
   TriggerMediumEnum: "BOTH" | "EMAIL" | "PHONE"
@@ -274,7 +276,6 @@ export interface NexusGenRootTypes {
     limit: number; // Int!
     offset: number; // Int!
     pageInfo: NexusGenRootTypes['PaginationPageInfo']; // PaginationPageInfo!
-    permissions: NexusGenRootTypes['PermssionType'][]; // [PermssionType!]!
     roles: NexusGenRootTypes['RoleType'][]; // [RoleType!]!
     startDate?: string | null; // String
   }
@@ -388,6 +389,7 @@ export interface NexusGenAllTypes extends NexusGenRootTypes {
   LinkTypeEnumType: NexusGenEnums['LinkTypeEnumType'];
   PaginationSortByEnum: NexusGenEnums['PaginationSortByEnum'];
   QuestionNodeTypeEnum: NexusGenEnums['QuestionNodeTypeEnum'];
+  SystemPermission: NexusGenEnums['SystemPermission'];
   TagTypeEnum: NexusGenEnums['TagTypeEnum'];
   TriggerConditionEnum: NexusGenEnums['TriggerConditionEnum'];
   TriggerMediumEnum: NexusGenEnums['TriggerMediumEnum'];
@@ -592,17 +594,15 @@ export interface NexusGenFieldTypes {
     limit: number; // Int!
     offset: number; // Int!
     pageInfo: NexusGenRootTypes['PaginationPageInfo']; // PaginationPageInfo!
-    permissions: NexusGenRootTypes['PermssionType'][]; // [PermssionType!]!
     roles: NexusGenRootTypes['RoleType'][]; // [RoleType!]!
     startDate: string | null; // String
   }
   RoleType: { // field return type
-    customer: NexusGenRootTypes['Customer'] | null; // Customer
     customerId: string | null; // String
     id: string; // ID!
     name: string; // String!
     nrPermissions: number | null; // Int
-    permissions: NexusGenRootTypes['PermssionType'][] | null; // [PermssionType!]
+    permissions: NexusGenEnums['SystemPermission'][] | null; // [SystemPermission!]
     roleId: string | null; // String
   }
   Session: { // field return type
@@ -915,7 +915,7 @@ export type NexusGenObjectNames = "ColourSettings" | "Customer" | "CustomerSetti
 
 export type NexusGenInputNames = "AddDialogueInput" | "CTALinkInputObjectType" | "CTALinksInputType" | "ChoiceNodeEntryInput" | "CustomerCreateOptions" | "CustomerEditOptions" | "CustomerWhereUniqueInput" | "DialogueFilterInputType" | "DialogueWhereUniqueInput" | "EdgeConditionInputType" | "LoginInput" | "NodeEntryDataInput" | "NodeEntryInput" | "OptionInputType" | "OptionsInputType" | "PaginationSortInput" | "PaginationWhereInput" | "PermissionIdsInput" | "PermissionInput" | "QuestionNodeWhereInputType" | "QuestionNodeWhereUniqueInput" | "RecipientsInputType" | "RegisterInput" | "RegisterNodeEntryInput" | "RoleDataInput" | "RoleInput" | "SessionInput" | "SessionWhereUniqueInput" | "SliderNodeEntryInput" | "TagsInputObjectType" | "TextboxNodeEntryInput" | "TriggerConditionInputType" | "TriggerInputType" | "UserInput";
 
-export type NexusGenEnumNames = "LinkTypeEnumType" | "PaginationSortByEnum" | "QuestionNodeTypeEnum" | "TagTypeEnum" | "TriggerConditionEnum" | "TriggerMediumEnum" | "TriggerTypeEnum";
+export type NexusGenEnumNames = "LinkTypeEnumType" | "PaginationSortByEnum" | "QuestionNodeTypeEnum" | "SystemPermission" | "TagTypeEnum" | "TriggerConditionEnum" | "TriggerMediumEnum" | "TriggerTypeEnum";
 
 export type NexusGenInterfaceNames = "ConnectionInterface";
 

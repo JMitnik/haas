@@ -7,7 +7,7 @@ import { PaginationWhereInput } from '../general/Pagination';
 import { PermissionType } from '../permission/Permission';
 import RoleService from './RoleService';
 
-export const SystemPerisson = enumType({
+export const SystemPermission = enumType({
   name: 'SystemPermission',
   members: ['CAN_ACCESS_ADMIN_PANEL', 'CAN_BUILD_DIALOGUES', 'CAN_VIEW_DIALOGUES'],
 });
@@ -24,41 +24,14 @@ export const RoleType = objectType({
 
     t.list.field('permissions', {
       nullable: true,
-      type: SystemPerisson,
+      type: SystemPermission,
 
       async resolve(parent, args, ctx) {
-        const customerPermissions = await ctx.prisma.permission.findMany({
-          where: { customerId: parent.customerId },
-          include: {
-            isPermissionOfRole: {
-              select: {
-                id: true,
-              },
-            },
-          },
+        const fetchedRole = await ctx.prisma.role.findOne({
+          where: { id: parent.id },
         });
 
-        const activePermissions = customerPermissions.filter((permission) => {
-          const activeRoleIds = permission.isPermissionOfRole.map((role) => role.id);
-          return activeRoleIds.includes(parent.id);
-        });
-
-        return activePermissions;
-      },
-    });
-
-    t.field('customer', {
-      type: CustomerType,
-      nullable: true,
-
-      async resolve(parent, args, ctx) {
-        if (!parent.customerId) return null;
-
-        const customer = await ctx.prisma.customer.findOne({
-          where: { id: parent.customerId },
-        });
-
-        return customer;
+        return fetchedRole?.permissions as any;
       },
     });
   },
@@ -78,6 +51,7 @@ export const RoleInput = inputObjectType({
     t.string('customerId');
     t.string('name');
     t.string('description', { nullable: true });
+    t.list.field('permissions', { type: SystemPermission });
   },
 });
 
@@ -85,13 +59,7 @@ export const RoleConnection = objectType({
   name: 'RoleConnection',
   definition(t) {
     t.implements('ConnectionInterface');
-    t.list.field('roles', {
-      type: RoleType,
-    });
-
-    t.list.field('permissions', {
-      type: PermissionType,
-    });
+    t.list.field('roles', { type: RoleType });
   },
 });
 
@@ -176,7 +144,9 @@ export const RoleMutations = extendType({
           data: {
             name: args.data.name,
             permissions: {
-              create: [],
+              set: [
+                'CAN_BUILD_DIALOGUES', '',
+              ],
             },
             Customer: {
               connect: {
@@ -202,8 +172,8 @@ export const RoleMutations = extendType({
           },
           data: {
             permissions: {
-              // TODO: Will this set permission array to [] if no permissions are provided?
-              connect: args.permissions?.ids?.map((id) => ({ id })) || [],
+              // TODO: Set to appropriate logic
+              set: [],
             },
           },
         });

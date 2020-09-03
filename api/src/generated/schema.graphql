@@ -429,7 +429,6 @@ type RoleConnection implements ConnectionInterface {
   limit: Int!
   offset: Int!
   pageInfo: PaginationPageInfo!
-  permissions: [PermssionType!]!
   roles: [RoleType!]!
   startDate: String
 }
@@ -443,15 +442,15 @@ input RoleInput {
   customerId: String
   description: String
   name: String
+  permissions: [SystemPermission!]
 }
 
 type RoleType {
-  customer: Customer
   customerId: String
   id: ID!
   name: String!
   nrPermissions: Int
-  permissions: [PermssionType!]
+  permissions: [SystemPermission!]
   roleId: String
 }
 
@@ -487,6 +486,12 @@ input SessionWhereUniqueInput {
 """Input type for a slider node"""
 input SliderNodeEntryInput {
   value: Int
+}
+
+enum SystemPermission {
+  CAN_ACCESS_ADMIN_PANEL
+  CAN_BUILD_DIALOGUES
+  CAN_VIEW_DIALOGUES
 }
 
 type Tag {
