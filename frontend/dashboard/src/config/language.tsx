@@ -11,6 +11,14 @@ const language = {
       en: 'End',
       de: 'Ende',
     },
+    edit: {
+      en: 'Edit',
+      de: 'Ändern',
+    },
+    add_call_to_action: {
+      en: 'Add call to action',
+      de: 'Call-to-action hinzufügen',
+    },
     search: {
       en: 'Search',
       de: 'Suche',
@@ -30,6 +38,10 @@ const language = {
     user: {
       en: 'User',
       de: 'User',
+    },
+    no_registration: {
+      en: 'No registration',
+      de: 'Keine registration',
     },
     call_to_action: {
       en: 'Call to action',

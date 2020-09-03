@@ -3,6 +3,7 @@ import { Icon } from '@chakra-ui/core';
 import { User } from 'react-feather';
 import { differenceInCalendarDays, format, formatDistance } from 'date-fns';
 import { maxBy } from 'lodash';
+import { useTranslation } from 'react-i18next';
 import DesktopIcon from 'components/Icons/DesktopIcon';
 import React from 'react';
 
@@ -100,6 +101,7 @@ export const InteractionDateCell = ({ value }: { value: any }) => {
 };
 
 export const InteractionCTACell = ({ value: nodeEntries }: CellProps) => {
+  const { t } = useTranslation();
   const potentialCTA = maxBy(nodeEntries, (entry: any) => entry.depth);
 
   const getCTAType = (potentialCTA: any) => {
@@ -123,7 +125,7 @@ export const InteractionCTACell = ({ value: nodeEntries }: CellProps) => {
     <Flex alignItems="center">
       <Flex minWidth="195px" flexDirection="column">
         <Text color="gray.500" fontWeight="600">{getCTAType(potentialCTA)}</Text>
-        <Span color="gray.400" fontWeight="400" fontSize="0.8em">No registration</Span>
+        <Span color="gray.400" fontWeight="400" fontSize="0.8em">{t('no_registration')}</Span>
       </Flex>
     </Flex>
   );
