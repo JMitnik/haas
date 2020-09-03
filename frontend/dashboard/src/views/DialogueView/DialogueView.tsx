@@ -163,7 +163,7 @@ const DialogueView = () => {
                 history.push(`/dashboard/b/${customerSlug}/d/${dialogueSlug}/interactions`)
               )}
               isInFallback={dialogue.countInteractions === 0}
-              fallbackMetric={t('fallback_no_interactions')}
+              fallbackMetric={t('dialogue:fallback_no_interactions')}
               renderMetric={`${dialogue.countInteractions} ${dialogue.countInteractions > 1 ? t('interactions') : t('interaction')}`}
             />
 
@@ -171,7 +171,7 @@ const DialogueView = () => {
               heading={t('dialogue:average_score')}
               renderIcon={Award}
               isInFallback={dialogue.thisWeekAverageScore === 0}
-              fallbackMetric={t('fallback_no_interactions')}
+              fallbackMetric={t('dialogue:fallback_no_score')}
               renderMetric={`${(dialogue.thisWeekAverageScore / 10).toFixed(2)} ${t('score')}`}
               renderCornerMetric={(
                 <Flex color="red">

@@ -12,6 +12,10 @@ const language = {
       en: 'Grid',
       de: 'Raster',
     },
+    roles: {
+      en: 'Roles',
+      de: 'Roles',
+    },
     create: {
       en: 'Create',
       de: 'Erstellen',
@@ -314,9 +318,11 @@ const language = {
     },
     email_helper: {
       en: 'What is the user\'s email adress?',
+      de: 'Was ist die E-Mail?',
     },
     phone: {
       en: 'Phone number',
+      de: 'Telefonnummer',
     },
     last_updated: {
       en: 'Last update {{date}} ago',
@@ -324,24 +330,30 @@ const language = {
     },
     phone_helper: {
       en: 'What is the user\'s phone number? (Note: Start with country code, e.g. +316123456)',
+      de: 'Wie lautet die Telefonnummer des Benutzers? (Beginnen Sie mit der Landesvorwahl, e.g. +316123456)',
     },
     name_helper: {
       en: 'What is the name of the business?',
     },
     role_selector: {
       en: 'User role',
+      de: 'Benutzer rolle',
     },
     role_selector_helper: {
       en: 'What will be the user\'s role?',
+      de: 'Welche Rolle wird der Benutzer spielen?',
     },
     slug: {
       en: 'Url Extension',
+      de: 'URL Erweiterung',
     },
     slug_helper: {
       en: 'Under which url segment will visitors find the business?',
+      de: 'Unter welcher URL Erganzüng sollen Besucher dich finden?',
     },
     template: {
       en: 'Template',
+      de: 'Muster',
     },
   },
   customer: {
@@ -375,24 +387,31 @@ const language = {
     },
     use_template: {
       en: 'Use template',
+      de: 'Benutze ein Muster',
     },
     use_template_helper: {
       en: 'Start the onboarding with a pre-existing template, or start clean.',
+      de: 'Beginnen Sie mit einer bereits vorhandenen Muster oder beginnen Sie mit der Bereinigung',
     },
     template_helper: {
       en: 'Choose whether you have a preference what to start with.',
+      de: 'Wählen Sie aus, ob Sie eine Präferenz haben, mit der Sie beginnen möchten.',
     },
     custom_template: {
       en: 'Custom template',
+      de: 'Benutzerdefinierte Muster',
     },
     custom_template_helper: {
       en: 'Start with a default dialogue',
+      de: 'Beginnen Sie mit einem Standarddialog',
     },
     no_custom_template: {
       en: 'Fresh start',
+      de: 'Neuanfang',
     },
     no_custom_template_helper: {
       en: 'Start with a clean slate',
+      de: 'Beginnen Sie mit einer sauberen Tafel',
     },
   },
   views: {
@@ -440,15 +459,31 @@ const language = {
       en: 'Create trigger',
       de: 'Neuer alarm',
     },
+    create_user_view: {
+      en: 'Create user',
+      de: 'Benutzer erstellen',
+    },
     users_overview: {
       en: 'Users and roles',
       de: 'User und Rollen',
     },
   },
   user: {
+    roles_helper: {
+      en: 'Decide and assign roles for control access',
+      de: 'Entscheiden Sie Rollen für den Steuerungszugriff und weisen Sie sie zu',
+    },
     create_user: {
       en: 'Create user',
-      de: 'User erstellen',
+      de: 'Benutzer erstellen',
+    },
+    about_user: {
+      en: 'About the user',
+      de: 'Über den Benutzer',
+    },
+    about_user_helper: {
+      en: 'Tell us about the user',
+      de: 'Erzählen Sie uns von dem Benutzer',
     },
   },
   dialogue: {
