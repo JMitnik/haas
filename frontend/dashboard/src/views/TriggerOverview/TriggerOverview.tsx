@@ -135,7 +135,6 @@ const TriggersOverview = () => {
           onDeleteEntry={handleDeleteUser}
           onEditEntry={handleEditEntry}
           onAddEntry={handleAddUser}
-          CustomRow={Row}
           data={tableData}
         />
       </Div>

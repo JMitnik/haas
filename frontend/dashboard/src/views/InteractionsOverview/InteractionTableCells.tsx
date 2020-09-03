@@ -1,4 +1,6 @@
 import { Div, Flex, H4, Span, Text } from '@haas/ui';
+import { Icon } from '@chakra-ui/core';
+import { User } from 'react-feather';
 import { differenceInCalendarDays, format, formatDistance } from 'date-fns';
 import { maxBy } from 'lodash';
 import DesktopIcon from 'components/Icons/DesktopIcon';
@@ -57,12 +59,24 @@ export const UserCell = ({ value }: CellProps) => (
 
 export const InteractionUserCell = ({ value }: CellProps) => (
   <Flex alignItems="center">
-    <Div borderRadius="lg" padding="5px" backgroundColor="default.light">
-      <DesktopIcon />
+    <Div
+      borderRadius="lg"
+      padding="5px"
+      backgroundColor="gray.300"
+      display="flex"
+      alignItems="center"
+      width="30px"
+      height="30px"
+      justifyContent="center"
+    >
+      <Icon
+        as={User}
+        color="gray.500"
+      />
     </Div>
     <Flex minWidth="195px" marginLeft="15px" flexDirection="column">
-      <Text color="gray.500" fontWeight="600">Desktop user</Text>
-      <Span color="gray.400" fontWeight="400" fontSize="0.8em">{value}</Span>
+      <Text color="gray.500" fontWeight="600">User</Text>
+      <Span color="gray.400" fontWeight="400" fontSize="0.5em">{value}</Span>
     </Flex>
   </Flex>
 );
