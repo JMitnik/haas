@@ -147,9 +147,12 @@ const EditTriggerForm = ({ trigger }: {trigger: any}) => {
         position: 'bottom-right',
         duration: 1500,
       });
-      history.push(`/dashboard/b/${customerSlug}/triggers/`);
+
+      setTimeout(() => {
+        history.push(`/dashboard/b/${customerSlug}/triggers/`);
+      }, 400);
     },
-    onError: (error: ApolloError) => {
+    onError: () => {
       toast({
         title: 'Something went wrong!',
         description: 'Trigger could not be created.',
@@ -157,7 +160,6 @@ const EditTriggerForm = ({ trigger }: {trigger: any}) => {
         position: 'bottom-right',
         duration: 1500,
       });
-      console.log(error);
     },
   });
 
