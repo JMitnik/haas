@@ -71,7 +71,8 @@ const CustomerRoute = (props: RouteProps) => {
         },
       });
     }
-  }, [customerSlug, storageSlug]);
+  }, [customerSlug, storageSlug, fetchCustomer]);
+
   return (
     <Route {...props} />
   );
