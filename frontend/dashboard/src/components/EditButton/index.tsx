@@ -19,6 +19,7 @@ const EditButtonContainer = styled(Button)`
     color: ${theme.colors.default.darkest};
     min-width: 80px;
     display: flex;
+    
     ${!disabled && css`
       &:hover {
         transition: all 0.2s ease-in;

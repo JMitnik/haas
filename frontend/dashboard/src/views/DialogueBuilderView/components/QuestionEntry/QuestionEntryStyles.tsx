@@ -8,10 +8,6 @@ ${({ theme }) => css`
   cursor: pointer;
 `}`;
 
-// export const QuestionEntryContainer = styled.div`
-//   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-// `;
-
 export const ConditionContainer = styled(Flex) <{ activeCTA: string | null, id: string }>`
   ${({ activeCTA, id, theme }) => css`
     color: ${theme.colors.default.darkest};
@@ -81,6 +77,12 @@ export const QuestionEntryViewContainer = styled(Flex) <{ activeCTA: string | nu
     position: relative;
     flex-direction: row;
     color: ${theme.colors.default.muted};
+    border: ${theme.colors.app.mutedOnDefault} 1px solid;
+    border-top-left-radius: ${theme.borderRadiuses.somewhatRounded};
+    border-bottom-left-radius: ${theme.borderRadiuses.somewhatRounded};
+    padding: 20px;
+    padding-left: 30px;
+    margin-bottom: 25px;
 
     ${!activeCTA && css`
       background-color: ${theme.colors.white};
@@ -94,14 +96,6 @@ export const QuestionEntryViewContainer = styled(Flex) <{ activeCTA: string | nu
       background-color: ${theme.colors.white};
       opacity: 0.5;
     `};
-
-    border: ${theme.colors.app.mutedOnDefault} 1px solid;
-    border-top-left-radius: ${theme.borderRadiuses.somewhatRounded};
-    border-bottom-left-radius: ${theme.borderRadiuses.somewhatRounded};
-
-    padding: 20px;
-    padding-left: 30px;
-    margin-bottom: 25px;
  `} 
 `;
 
@@ -116,11 +110,12 @@ export const AddChildContainer = styled(Flex) <{isDisabled?: Boolean}>`
     transform: translate(-50%, -10px);
 
     ${isDisabled && css`
+      pointer-events: none;
+      
       div > button {
         background-color: ${theme.colors.white};
         opacity: 0.5;
       }
-      pointer-events: none;
     `}
     
  `}
@@ -131,7 +126,9 @@ export const LinkContainer = styled(Flex) <{ hasCTA?: Boolean }>`
     flex-direction: column;
     justify-content: center; 
     justify-items: center;
-
+    border-left: none; 
+    border-bottom-right-radius: ${theme.borderRadiuses.somewhatRounded};
+    border-top-right-radius: ${theme.borderRadiuses.somewhatRounded};
     color: ${theme.colors.default.muted};
     margin-bottom: 25px;
     
@@ -145,10 +142,6 @@ export const LinkContainer = styled(Flex) <{ hasCTA?: Boolean }>`
       border: none;
       background: ${theme.colors.default.dark};
     `}
-
-    border-left: none; 
-    border-bottom-right-radius: ${theme.borderRadiuses.somewhatRounded};
-    border-top-right-radius: ${theme.borderRadiuses.somewhatRounded};
  `}
 `;
 
@@ -160,6 +153,7 @@ export const ConditionSpan = styled(Span)`
     width: 40px;
     text-align: center;
     color: ${theme.colors.default.darkest};
+
     abbr {
       text-decoration: none;
     }
@@ -167,17 +161,17 @@ export const ConditionSpan = styled(Span)`
 `;
 
 export const TypeSpan = styled(Span)`
-   ${({ theme }) => css`
-   color: ${theme.colors.default.darkest};
+  ${({ theme }) => css`
+    color: ${theme.colors.default.darkest};
  `}
 `;
 
 export const DepthSpan = styled(Span)`
   ${({ theme }) => css`
-  margin-left: 5px;
-  color: ${theme.colors.default.darkest};
-  opacity: 0.5;
-`}
+    margin-left: 5px;
+    color: ${theme.colors.default.darkest};
+    opacity: 0.5;
+  `}
 `;
 
 export const QuestionEntryContainer = styled(Flex)`

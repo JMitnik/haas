@@ -118,8 +118,7 @@ const QuestionEntryItem = ({ depth,
             </Flex>
 
           </Flex>
-          {activeQuestion === question.id
-          && (
+          {activeQuestion === question.id && (
             <QuestionEntryForm
               onAddExpandChange={onAddExpandChange}
               parentQuestionType={parentQuestionType}
