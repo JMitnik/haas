@@ -1,9 +1,9 @@
-import { Clipboard, Link as LinkIcon, MessageCircle, Target, Clock } from 'react-feather';
-import { Tooltip, Icon } from '@chakra-ui/core';
+import { Clipboard, Clock, Link as LinkIcon, MessageCircle, Target } from 'react-feather';
+import { Icon, Tooltip } from '@chakra-ui/core';
 import React from 'react';
 import styled, { css } from 'styled-components/macro';
 
-import { Div, Flex, Text, Span } from '@haas/ui';
+import { Div, Flex, Span, Text } from '@haas/ui';
 import {
   dialogueStatistics_customer_dialogue_sessions_nodeEntries_relatedNode as Node,
   dialogueStatistics_customer_dialogue_sessions_nodeEntries as NodeEntry,
@@ -77,7 +77,7 @@ const EntryBreadCrumbContainer = styled(Div)<{ score?: number | null }>`
   `}
 `;
 
-const CompactEntriesPath = ({ nodeEntries }: { nodeEntries: NodeEntry[] }) => (
+export const CompactEntriesPath = ({ nodeEntries }: { nodeEntries: NodeEntry[] }) => (
   <Flex>
     {nodeEntries.map((entry, index) => (
       <Tooltip
@@ -140,7 +140,11 @@ const InteractionFeedEntry = ({ interaction }: { interaction: Session }) => {
           <Icon
             as={Clock}
           />
-          <Span ml={1}>{dist} ago</Span>
+          <Span ml={1}>
+            {dist}
+            {' '}
+            ago
+          </Span>
         </Text>
       </Flex>
     </InteractionFeedEntryContainer>

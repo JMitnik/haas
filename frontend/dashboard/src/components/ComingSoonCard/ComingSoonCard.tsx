@@ -1,23 +1,26 @@
 import React from 'react';
 
-import { Card, CardBody, ColumnFlex, Div, H4, Paragraph } from '@haas/ui';
+import { Div, Text } from '@haas/ui';
 import { ReactComponent as InDevImage } from 'assets/images/undraw_dev.svg';
+import { useTranslation } from 'react-i18next';
 
-const ComingSoonCard = () => (
-  <Div>
-    <Card bg="white" p="4">
-      <CardBody>
-        <ColumnFlex alignItems="center">
-          <H4>Stay Tuned!</H4>
-          <Paragraph>Our engineers will make you even more happy soon!</Paragraph>
-        </ColumnFlex>
-
-        <Div margin="0 auto" maxWidth="50%" mt="4">
-          <InDevImage width="100%" height="auto" />
-        </Div>
-      </CardBody>
-    </Card>
-  </Div>
-);
+const ComingSoonCard = () => {
+  const { t } = useTranslation();
+  return (
+    <Div maxWidth="600px" width="100%" margin="0 auto" mt="4">
+      <Div mb={100}>
+        <Text textAlign="center" color="gray.500" fontSize="2rem" fontWeight="200">
+          {t('stay_tuned')}
+        </Text>
+        <Text textAlign="center" color="gray.300" fontSize="1.5rem" fontWeight="100">
+          {t('stay_tuned_helper')}
+        </Text>
+      </Div>
+      <Div pt={4} opacity={0.4}>
+        <InDevImage width="100%" height="auto" />
+      </Div>
+    </Div>
+  );
+};
 
 export default ComingSoonCard;

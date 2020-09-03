@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { useMutation } from '@apollo/react-hooks';
 import { useParams } from 'react-router-dom';
 import { useToast } from '@chakra-ui/core';
+import { useTranslation } from 'react-i18next';
 import React from 'react';
 import styled, { css } from 'styled-components/macro';
 
@@ -72,6 +73,7 @@ const OverflowSpan = styled(Span)`
 
 const CTAEntry = ({ id, activeCTA, onActiveCTAChange, title, type, links, Icon, onNewCTAChange }: CTAEntryProps) => {
   const toast = useToast();
+  const { t } = useTranslation();
 
   const { customerSlug, dialogueSlug } = useParams();
   const [deleteEntry] = useMutation(deleteCTAMutation, {
@@ -123,10 +125,10 @@ const CTAEntry = ({ id, activeCTA, onActiveCTAChange, title, type, links, Icon, 
 
           <Flex width="60%" flexDirection="column">
             <Span fontSize="1.4em">
-              Title
+              {t('title')}
             </Span>
             <OverflowSpan>
-              {title || 'None'}
+              {title || t('none')}
             </OverflowSpan>
           </Flex>
 
@@ -134,7 +136,7 @@ const CTAEntry = ({ id, activeCTA, onActiveCTAChange, title, type, links, Icon, 
             <EditCTAButton disabled={(activeCTA && activeCTA !== id) || false} onClick={() => onActiveCTAChange(id)}>
               <Edit3 />
               <Span>
-                Edit
+                {t('edit')}
               </Span>
             </EditCTAButton>
           </Flex>

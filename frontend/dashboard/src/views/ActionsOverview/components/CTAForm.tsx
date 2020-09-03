@@ -272,7 +272,7 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange, on
             <Div>
               <InputGrid>
                 <FormControl gridColumn="1 / -1" isRequired isInvalid={!!form.errors.title}>
-                  <FormLabel htmlFor="title">Title</FormLabel>
+                  <FormLabel htmlFor="title">{t('title')}</FormLabel>
                   <InputHelper>What is the main text of the CTA?</InputHelper>
                   <Input
                     name="title"
@@ -437,7 +437,7 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange, on
               variantColor="teal"
               type="submit"
             >
-              Save
+              {t('save')}
             </Button>
             <Button variant="ghost" onClick={() => cancelCTA()}>Cancel</Button>
           </ButtonGroup>

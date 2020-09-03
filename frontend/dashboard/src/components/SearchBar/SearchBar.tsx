@@ -1,4 +1,5 @@
 import { Search } from 'react-feather';
+import { useTranslation } from 'react-i18next';
 import React, { useRef, useState } from 'react';
 
 import useDebouncedEffect from 'hooks/useDebouncedEffect';
@@ -15,7 +16,7 @@ const SearchBar = ({ activeSearchTerm, onSearchTermChange, isSearching }: Search
   const [searchTerm, setSearchTerm] = useState<string>(activeSearchTerm);
   const startedRef = useRef<boolean>();
 
-  console.log('isSearching', isSearching);
+  const { t } = useTranslation();
 
   useDebouncedEffect(() => {
     if (typeof startedRef.current !== 'undefined') {
@@ -33,7 +34,7 @@ const SearchBar = ({ activeSearchTerm, onSearchTermChange, isSearching }: Search
       <SearchbarInput
         data-cy="SearchbarInput"
         defaultValue={activeSearchTerm}
-        placeholder="Search"
+        placeholder={t('search')}
         onChange={(e) => { startedRef.current = true; setSearchTerm(e.target.value); }}
       />
 

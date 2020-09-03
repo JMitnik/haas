@@ -3,9 +3,12 @@ import { ResponsiveLine as NivoLineChart } from '@nivo/line';
 import {
   dialogueStatistics_customer_dialogue_statistics_history as SessionHistory,
 } from 'views/DialogueView/__generated__/dialogueStatistics';
+import { useTranslation } from 'react-i18next';
 import React from 'react';
 
 const ScoreGraphModule = ({ chartData }: { chartData: SessionHistory[] }) => {
+  const { t } = useTranslation();
+
   // TODO: Return a nice null card or something
   if (!chartData) {
     return null;
@@ -24,7 +27,7 @@ const ScoreGraphModule = ({ chartData }: { chartData: SessionHistory[] }) => {
       <CardBody height="100%">
         <Text fontSize="1.2rem" color="gray.400">
           <Flex justifyContent="space-between" alignItems="center">
-            <Span>Score over time</Span>
+            <Span>{t('dialogue:score_over_time')}</Span>
           </Flex>
         </Text>
         <NivoLineChart

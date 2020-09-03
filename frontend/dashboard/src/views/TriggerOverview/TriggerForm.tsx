@@ -175,9 +175,9 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
 
       <FormSection id="general">
         <Div>
-          <H3 color="default.text" fontWeight={500} pb={2}>About the trigger</H3>
+          <H3 color="default.text" fontWeight={500} pb={2}>{t('trigger:about_trigger')}</H3>
           <Muted color="gray.600">
-            Tell us about the trigger, and to which scope it applies (question/dialogue)
+            {t('trigger:about_trigger_helper')}
           </Muted>
         </Div>
         <Div>
@@ -186,7 +186,7 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
               <FormLabel htmlFor="name">{t('name')}</FormLabel>
               <InputHelper>{t('trigger:name_helper')}</InputHelper>
               <Input
-                placeholder="My first trigger"
+                placeholder={t('trigger:my_first_trigger')}
                 leftEl={<Type />}
                 name="name"
                 ref={form.register({ required: true })}
@@ -232,15 +232,15 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                       <ButtonRadio
                         icon={Thermometer}
                         value="QUESTION"
-                        text="Question"
-                        description="Send alerts when a certain value has been reached"
+                        text={t('question')}
+                        description={t('trigger:trigger_question_alarm')}
                       />
                       <ButtonRadio
                         isDisabled
                         icon={Watch}
                         value="SCHEDULED"
-                        text="Scheduled"
-                        description="Send alerts at certain times (coming soon)"
+                        text={t('scheduled')}
+                        description={t('trigger:trigger_schedulled_alarm')}
                       />
                     </RadioButtonGroup>
                   </>
@@ -304,7 +304,7 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                 <FormErrorMessage>{form.errors.condition?.message}</FormErrorMessage>
               </FormControl>
             ) : (
-              <Text>Please select a type and/or dialogue</Text>
+              <Text>{t('trigger:select_dialogue_reminder')}</Text>
             )}
 
             {form.watch('condition') && form.watch('condition') === TriggerConditionType.TEXT_MATCH && (
@@ -402,7 +402,7 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
           <Muted color="gray.600">{t('trigger:recipients_helper')}</Muted>
         </Div>
         <Div>
-          <Button onClick={addRecipient} variantColor="teal" leftIcon={UserPlus}>Add user</Button>
+          <Button onClick={addRecipient} variantColor="teal" leftIcon={UserPlus}>{t('add_user')}</Button>
           {activeRecipients.map((recipient, index) => (
             <Div
               padding={4}
@@ -466,9 +466,9 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                     onChange={onChange}
                     display="flex"
                   >
-                    <ButtonRadio icon={Mail} value="EMAIL" text="Email" description="Send alerts to email" />
-                    <ButtonRadio icon={Smartphone} value="PHONE" text="Sms" description="Send alerts via sms" />
-                    <ButtonRadio value="BOTH" text="Both" description="Send via both mail and sms" />
+                    <ButtonRadio icon={Mail} value="EMAIL" text={t('email')} description={t('trigger:alert_email')} />
+                    <ButtonRadio icon={Smartphone} value="PHONE" text={t('sms')} description={t('trigger:alert_sms')} />
+                    <ButtonRadio value="BOTH" text={t('both')} description={t('trigger:alert_both')} />
                   </RadioButtonGroup>
                 )}
               />

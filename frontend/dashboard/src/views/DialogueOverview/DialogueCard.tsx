@@ -1,6 +1,7 @@
 import { ApolloError } from 'apollo-client';
 import { Edit, MapPin, Trash, User } from 'react-feather';
 import { formatDistance } from 'date-fns';
+
 import { useHistory, useParams } from 'react-router';
 import { useMutation } from '@apollo/react-hooks';
 import React from 'react';
@@ -9,32 +10,39 @@ import styled, { css } from 'styled-components/macro';
 import { Card, CardBody, ColumnFlex, Div, ExtLink, Flex, Paragraph, Text } from '@haas/ui';
 import { Menu, MenuHeader, MenuItem } from 'components/Menu/Menu';
 import { deleteQuestionnaireMutation } from 'mutations/deleteQuestionnaire';
+import { useTranslation } from 'react-i18next';
 import ShowMoreButton from 'components/ShowMoreButton';
 import SliderNodeIcon from 'components/Icons/SliderNodeIcon';
 import getDialoguesOfCustomer from 'queries/getDialoguesOfCustomer';
+import getLocale from 'utils/getLocale';
 
 interface DialogueCardOptionsOverlayProps {
   onDelete: () => void;
   onEdit: () => void;
 }
 
-const DialogueCardOptionsOverlay = ({ onDelete, onEdit }: DialogueCardOptionsOverlayProps) => (
-  <Menu>
-    <MenuHeader>Actions</MenuHeader>
-    <MenuItem onClick={() => onDelete()}>
-      <Trash />
-      Delete
-    </MenuItem>
-    <MenuItem onClick={() => onEdit()}>
-      <Edit />
-      Edit
-    </MenuItem>
-  </Menu>
-);
+const DialogueCardOptionsOverlay = ({ onDelete, onEdit }: DialogueCardOptionsOverlayProps) => {
+  const { t } = useTranslation();
+
+  return (
+    <Menu>
+      <MenuHeader>{t('actions')}</MenuHeader>
+      <MenuItem onClick={() => onDelete()}>
+        <Trash />
+        {t('delete')}
+      </MenuItem>
+      <MenuItem onClick={() => onEdit()}>
+        <Edit />
+        {t('edit')}
+      </MenuItem>
+    </Menu>
+  );
+};
 
 const DialogueCard = ({ dialogue, isCompact }: { dialogue: any, isCompact?: boolean }) => {
   const history = useHistory();
   const { customerSlug } = useParams();
+  const { t } = useTranslation();
 
   // TODO: How to deal with refetching query when deleted card on a filtered view (fetch and update the current view somehow   )
   const [deleteTopic] = useMutation(deleteQuestionnaireMutation, {
@@ -75,8 +83,6 @@ const DialogueCard = ({ dialogue, isCompact }: { dialogue: any, isCompact?: bool
 
             {!isCompact && (
               <Paragraph fontSize="0.8rem" color="app.mutedOnWhite" fontWeight="100">
-
-                {/* TODO: Sanitize */}
                 <ExtLink to={`https://haas-client.netlify.app/${dialogue.customer.slug}/${dialogue.slug}`}>
                   {`haas.live/${dialogue.customer.slug}/${dialogue.slug}`}
                 </ExtLink>
@@ -96,13 +102,11 @@ const DialogueCard = ({ dialogue, isCompact }: { dialogue: any, isCompact?: bool
             <Flex alignItems="center" justifyContent="space-between">
               <Div>
                 {lastUpdated && (
-                <Paragraph fontSize="0.8rem" color="app.mutedOnWhite">
-                  last updated
-                  {' '}
-                  {formatDistance(lastUpdated, new Date())}
-                  {' '}
-                  ago
-                </Paragraph>
+                  <Text fontSize="0.7rem" color="gray.300">
+                    {t('last_updated', { date: formatDistance(lastUpdated, new Date(), {
+                      locale: getLocale(),
+                    }) })}
+                  </Text>
                 )}
               </Div>
               <ShowMoreButton

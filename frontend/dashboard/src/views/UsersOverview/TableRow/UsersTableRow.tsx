@@ -30,7 +30,7 @@ const UsersTableRow = ({ headers, data, index, onDeleteEntry, onEditEntry }: Use
         {headers && headers.map(({ accessor, Cell }) => {
           const result = Object.entries(data).find((property) => property[0] === accessor);
 
-          if (result && result[1]) {
+          if (result && result[1] && Cell) {
             return <Cell value={result[1]} key={`${index}-${result[0]}`} />;
           }
 

@@ -1,10 +1,13 @@
 import { Edit, X } from 'react-feather';
 import React, { useState } from 'react';
 
-import { Button, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger } from '@chakra-ui/core';
+import { Button, Popover, PopoverArrow, PopoverBody, PopoverCloseButton,
+  PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger } from '@chakra-ui/core';
 import { DeleteButtonContainer, Div, EditButtonContainer, Flex, Grid, H4, H5, Hr, Span, Text } from '@haas/ui';
+
+import { GenericCell } from 'components/Table/CellComponents/CellComponents';
 import { TableRowProps } from 'components/Table/TableTypes';
-import { UserCell } from 'components/Table/CellComponents/CellComponents';
+
 import { useTranslation } from 'react-i18next';
 import Table from 'components/Table/Table';
 
@@ -21,10 +24,10 @@ interface TableProps {
 }
 
 const RECIPIENT_HEADERS = [
-  { Header: 'FIRST NAME', accessor: 'firstName', Cell: UserCell },
-  { Header: 'LAST NAME', accessor: 'lastName', Cell: UserCell },
-  { Header: 'EMAIL', accessor: 'email', Cell: UserCell },
-  { Header: 'PHONE', accessor: 'phone', Cell: UserCell },
+  { Header: 'FIRST NAME', accessor: 'firstName', Cell: GenericCell },
+  { Header: 'LAST NAME', accessor: 'lastName', Cell: GenericCell },
+  { Header: 'EMAIL', accessor: 'email', Cell: GenericCell },
+  { Header: 'PHONE', accessor: 'phone', Cell: GenericCell },
 ];
 const UserRow = ({ headers, data, index, onDeleteEntry, onEditEntry }: TableRowProps) => {
   const { t } = useTranslation();
@@ -57,7 +60,7 @@ const UserRow = ({ headers, data, index, onDeleteEntry, onEditEntry }: TableRowP
     >
       {headers && headers.map(({ accessor, Cell }) => {
         const result = Object.entries(data).find((property) => property[0] === accessor);
-        if (result) return <Cell value={result[1]} key={`${index}-${result[0]}`} />;
+        if (result && Cell) return <Cell value={result[1]} key={`${index}-${result[0]}`} />;
         return null;
       })}
       <EditButtonContainer

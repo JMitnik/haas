@@ -40,6 +40,9 @@ export const Container = styled(Div)<ContainerProps>`
 export const ViewContainer = styled(Div)`
   ${({ theme }) => css`
     padding: ${theme.gutter}px;
+    max-width: 1400px;
+    margin: 0 auto;
+    min-height: 100vh;
   `}
 `;
 
