@@ -138,7 +138,6 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
     label: `${recipient?.lastName}, ${recipient?.firstName} - E: ${recipient?.email} - P: ${recipient?.phone}`,
     value: recipient?.id,
   }));
-
   // Fetching questions data
   const [fetchQuestions, { data: questionsData }] = useLazyQuery(getQuestionsQuery, {
     fetchPolicy: 'cache-and-network',
@@ -148,6 +147,9 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
   })) || [];
 
   const activeDialogue = form.watch('dialogue');
+  const activeCondition = form.watch('condition');
+
+  const databaseRecipients = form.watch('recipients');
 
   useEffect(() => {
     if (activeDialogue) {
@@ -156,7 +158,7 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
   }, [customerSlug, activeDialogue, fetchQuestions]);
 
   // Dealing with recipients
-  const [activeRecipients, setActiveRecipients] = useState<Array<null | { label: string, value: string }>>(() => form.getValues().recipients || []);
+  const [activeRecipients, setActiveRecipients] = useState<Array<null | { label: string, value: string }>>(() => databaseRecipients || []);
 
   const addRecipient = () => setActiveRecipients((prevRecipients) => [...prevRecipients, null]);
 
@@ -197,7 +199,7 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
               <InputHelper>{t('trigger:dialogue_helper')}</InputHelper>
               <Controller
                 name="dialogue"
-                defaultValue=""
+                options={dialogues}
                 control={form.control}
                 render={({ onChange, value }) => (
                   <Select
@@ -217,11 +219,10 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
               <Controller
                 control={form.control}
                 name="type"
-                defaultValue="QUESTION"
-                render={({ onChange, value }) => (
+                render={({ onChange }) => (
                   <>
                     <RadioButtonGroup
-                      defaultValue={value}
+                      defaultValue="QUESTION"
                       isInline
                       onChange={(data) => {
                         onChange(data);
@@ -257,7 +258,6 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
               </InputHelper>
               <Controller
                 name="question"
-                defaultValue=""
                 control={form.control}
                 as={Select}
                 options={questions}
@@ -287,7 +287,7 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                 </InputHelper>
                 <Controller
                   name="condition"
-                  defaultValue={form.getValues().condition}
+                  defaultValue={activeCondition}
                   control={form.control}
                   render={({ onChange, onBlur, value }) => (
                     <ConditionFormFragment
@@ -418,9 +418,9 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                   <Controller
                     control={form.control}
                     name={`recipients[${index}]`}
-                    defaultValue="EMAIL"
+                    defaultValue={recipient}
                     options={recipients}
-                    as={Select}
+                    as={<Select />}
                   />
 
                   <FormErrorMessage>{form.errors.medium?.message}</FormErrorMessage>
