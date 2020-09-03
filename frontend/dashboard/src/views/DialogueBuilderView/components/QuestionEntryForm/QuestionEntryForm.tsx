@@ -611,7 +611,7 @@ const QuestionEntryForm = ({
                     <PopoverHeader>{t('delete')}</PopoverHeader>
                     <PopoverCloseButton />
                     <PopoverBody>
-                      <Text>{t('delete_question_popover_heading')}</Text>
+                      <Text>{t('delete_question_popover')}</Text>
                     </PopoverBody>
                     <PopoverFooter>
                       <Button

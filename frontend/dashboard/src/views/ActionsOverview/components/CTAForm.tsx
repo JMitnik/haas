@@ -14,8 +14,9 @@ import Select from 'react-select';
 import cuid from 'cuid';
 
 import { Div, ErrorStyle, Flex, Form, FormContainer,
-  FormControl, FormLabel, FormSection, Grid, H3, H4, Hr, Input, InputGrid, InputHelper, Muted, Span } from '@haas/ui';
+  FormControl, FormLabel, FormSection, Grid, H3, H4, Hr, Input, InputGrid, InputHelper, Muted, Span, Text } from '@haas/ui';
 import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
+import { useTranslation } from 'react-i18next';
 import LinkIcon from 'components/Icons/LinkIcon';
 import OpinionIcon from 'components/Icons/OpinionIcon';
 import RegisterIcon from 'components/Icons/RegisterIcon';
@@ -90,6 +91,8 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange, on
       ctaType: type,
     },
   });
+
+  const { t } = useTranslation();
 
   const clonedLinks = cloneDeep(links);
   const [activeLinks, setActiveLinks] = useState<Array<LinkInputProps>>(clonedLinks);
@@ -450,16 +453,15 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange, on
                       variantColor="red"
                       leftIcon={Trash}
                     >
-                      Delete
-
+                      {t('delete')}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent zIndex={4}>
                     <PopoverArrow />
-                    <PopoverHeader>Delete</PopoverHeader>
+                    <PopoverHeader>{t('delete')}</PopoverHeader>
                     <PopoverCloseButton />
                     <PopoverBody>
-                      <p>You are about to delete a CTA. THIS ACTION IS IRREVERSIBLE! Are you sure?</p>
+                      <Text>{t('delete_cta_popover')}</Text>
                     </PopoverBody>
                     <PopoverFooter>
                       <Button
@@ -467,8 +469,7 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange, on
                         variantColor="red"
                         onClick={() => onDeleteCTA && onDeleteCTA(onClose)}
                       >
-                        Delete
-
+                        {t('delete')}
                       </Button>
                     </PopoverFooter>
                   </PopoverContent>

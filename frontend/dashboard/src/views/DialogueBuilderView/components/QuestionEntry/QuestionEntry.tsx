@@ -68,7 +68,6 @@ const QuestionEntryItem = ({ depth,
       },
     }],
     onCompleted: () => {
-      // Deze
       onActiveQuestionChange(null);
     },
     onError: (serverError: ApolloError) => {

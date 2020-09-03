@@ -2,9 +2,10 @@ import { Edit, X } from 'react-feather';
 import React, { useState } from 'react';
 
 import { Button, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger } from '@chakra-ui/core';
-import { DeleteButtonContainer, Div, EditButtonContainer, Flex, Grid, H4, H5, Hr, Span } from '@haas/ui';
+import { DeleteButtonContainer, Div, EditButtonContainer, Flex, Grid, H4, H5, Hr, Span, Text } from '@haas/ui';
 import { TableRowProps } from 'components/Table/TableTypes';
 import { UserCell } from 'components/Table/CellComponents/CellComponents';
+import { useTranslation } from 'react-i18next';
 import Table from 'components/Table/Table';
 
 interface TableProps {
@@ -26,6 +27,7 @@ const RECIPIENT_HEADERS = [
   { Header: 'PHONE', accessor: 'phone', Cell: UserCell },
 ];
 const UserRow = ({ headers, data, index, onDeleteEntry, onEditEntry }: TableRowProps) => {
+  const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
   const amtCells = headers.length;
   const percentage = 100 / amtCells;
@@ -79,17 +81,17 @@ const UserRow = ({ headers, data, index, onDeleteEntry, onEditEntry }: TableRowP
               </PopoverTrigger>
               <PopoverContent zIndex={4}>
                 <PopoverArrow />
-                <PopoverHeader>Delete</PopoverHeader>
+                <PopoverHeader>{t('delete')}</PopoverHeader>
                 <PopoverCloseButton />
                 <PopoverBody>
-                  <p>You are about to delete a trigger. THIS ACTION IS IRREVERSIBLE! Are you sure?</p>
+                  <Text>{t('delete_user_popover')}</Text>
                 </PopoverBody>
                 <PopoverFooter>
                   <Button
                     variantColor="red"
                     onClick={(event) => onDeleteEntry && onDeleteEntry(event, userId, onClose)}
                   >
-                    Delete
+                    {t('delete')}
                   </Button>
                 </PopoverFooter>
               </PopoverContent>
