@@ -9,13 +9,12 @@ import SearchBar from 'components/SearchBar/SearchBar';
 import Table from 'components/Table/Table';
 import getUsersQuery from 'queries/getUserTable';
 
-import { Button, MenuItem,
-  Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger } from '@chakra-ui/core';
-import { CenterCell, GenericCell, RoleCell } from 'components/Table/CellComponents/CellComponents';
+import { Button } from '@chakra-ui/core';
 import { ErrorBoundary } from 'react-error-boundary';
+import { GenericCell } from 'components/Table/CellComponents/CellComponents';
 import { Plus } from 'react-feather';
 import { useTranslation } from 'react-i18next';
-import Row from './TableRow/UsersTableRow';
+// import Row from './TableRow/UsersTableRow';
 import deleteUserQuery from '../../mutations/deleteUser';
 
 interface TableProps {

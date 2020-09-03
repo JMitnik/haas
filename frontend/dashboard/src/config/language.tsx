@@ -1,5 +1,9 @@
 const language = {
   general: {
+    description: {
+      en: 'Description',
+      de: 'Beschreibung',
+    },
     switch_project: {
       en: 'Switch project',
       de: 'Project wechseln',
@@ -15,6 +19,18 @@ const language = {
     add_user: {
       en: 'Add user',
       de: 'Nutzer hinzufügen',
+    },
+    tags: {
+      en: 'Tags',
+      de: 'Tags',
+    },
+    add_tag: {
+      en: 'Add tag',
+      de: 'Tag hinzufügen',
+    },
+    remove: {
+      en: 'Remove',
+      de: 'Entfernen',
     },
     scheduled: {
       en: 'Scheduled',
@@ -519,6 +535,58 @@ const language = {
     },
   },
   dialogue: {
+    tag_helper: {
+      en: 'Would you like to assign tags to associate your dialogue with?',
+      de: 'Möchtest du deinen Dialog mit einem Tag verbinden?',
+    },
+    use_template: {
+      en: 'Use template',
+      de: 'Benutze ein Muster',
+    },
+    use_template_helper: {
+      en: 'Set what type of template you would like to use.',
+      de: 'Welches Muster möchtest du gerne benutzen?',
+    },
+    about: {
+      en: 'About the dialogue',
+      de: 'Informationen zum Dialog',
+    },
+    description_helper: {
+      en: 'How would you describe the dialogue?',
+      de: 'Wie beschreibst du den Dialog?',
+    },
+    description_placeholder: {
+      en: 'Describe your dialogue',
+      de: 'Gib eine kurze Beschreibung',
+    },
+    about_helper: {
+      de: 'Erzähle uns von deinem Dialog',
+      en: 'Tell us about the dialogue',
+    },
+    title_helper: {
+      en: 'What is the name of the dialogue?',
+      de: 'Wie soll dein Dialog heißen?',
+    },
+    title_placeholder: {
+      en: 'Peaches or Apples?',
+      de: 'Pfirsche oder äpfel?',
+    },
+    public_title: {
+      en: 'Display title',
+      de: 'Öffentlicher Titel',
+    },
+    public_title_helper: {
+      en: '(Optional): If set, will be used instead of the actual title to the user instead.',
+      de: '(Optional): Wenn festgelegt, wird stattdessen anstelle des tatsächlichen Titels für den Benutzer verwendet.',
+    },
+    public_title_placeholder: {
+      en: 'Peaches > Apples?',
+      de: 'Pfirsche oder äpfel?',
+    },
+    template_helper: {
+      en: 'Do you wish to start the dialogue from a clean slate or base this on another dialogue (or HAAS template)?',
+      de: 'Möchtest du von Anfang an beginner oder deinen Dialog auf einem Muster basieren?',
+    },
     min_value_helper: {
       en: 'What is the minimal value to trigger this question?',
       de: 'Welche Mindestwert soll die Folgefrage auslösen?',
@@ -633,6 +701,7 @@ const language = {
     },
     slug_helper: {
       en: 'Under which url segment will visitors find the dialogue?',
+      de: 'Unter welcher URL Erganzüng sollen Besucher deinen Dialog finden?',
     },
     share_qr: {
       en: 'Method one: Share QR Code',
