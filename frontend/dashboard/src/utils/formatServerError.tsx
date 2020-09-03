@@ -5,7 +5,7 @@ const formatServerError = (errorMessage: string): string => {
     return errors[errorMessage];
   }
 
-  return errorMessage;
+  return 'Something went wrong in the server, try again';
 };
 
 export default formatServerError;

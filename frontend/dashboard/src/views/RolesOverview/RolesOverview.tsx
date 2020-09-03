@@ -6,7 +6,7 @@ import { Div, H2 } from '@haas/ui';
 import Table from 'components/Table/Table';
 import getRolesQuery from 'queries/getRolesTable';
 
-import { CenterCell, UserCell } from 'components/Table/CellComponents/CellComponents';
+import { CenterCell, GenericCell } from 'components/Table/CellComponents/CellComponents';
 import Row from './TableRow/RolesTableRow';
 
 interface TableProps {
@@ -22,8 +22,8 @@ interface TableProps {
 }
 
 const HEADERS = [
-  { Header: 'ID', accessor: 'id', Cell: UserCell },
-  { Header: 'NAME', accessor: 'name', Cell: UserCell },
+  { Header: 'ID', accessor: 'id', Cell: GenericCell },
+  { Header: 'NAME', accessor: 'name', Cell: GenericCell },
   { Header: '# PERMISSIONS', accessor: 'nrPermissions', Cell: CenterCell },
 ];
 

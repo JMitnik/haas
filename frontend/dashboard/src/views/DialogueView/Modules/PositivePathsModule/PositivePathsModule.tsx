@@ -1,10 +1,11 @@
 import React from 'react';
 
-import { Card, CardBody, Div, Flex, Span, Text } from '@haas/ui';
+import { Card, CardBody, Div, Flex, Text } from '@haas/ui';
 import styled, { css } from 'styled-components/macro';
 
 import { Icon } from '@chakra-ui/core';
 import { Smile } from 'react-feather';
+import { useTranslation } from 'react-i18next';
 import FallbackContainer from '../FallbackContainer';
 import ModuleContainer from '../Module';
 
@@ -37,34 +38,38 @@ const PostivePathsModuleList = styled.ol`
   `} 
 `;
 
-const PositivePathsModule = ({ positivePaths }: { positivePaths: any }) => (
-  <ModuleContainer>
-    <Card bg="white">
-      <CardBody display="flex" flexDirection="column">
-        <Text fontSize="1.3rem" color="teal.200">Top positive paths</Text>
-        <Flex marginTop="10px" flexGrow={1} flexDirection="column">
-          {positivePaths.length > 0 && (
-          <PostivePathsModuleList>
-            {positivePaths.map(({ answer, quantity }: { answer: string, quantity: number }) => (
-              <li key={`${answer}-${quantity}`}>
-                {`${answer}`}
-              </li>
-            ))}
-          </PostivePathsModuleList>
-          )}
+const PositivePathsModule = ({ positivePaths }: { positivePaths: any }) => {
+  const { t } = useTranslation();
 
-        </Flex>
-      </CardBody>
-      {!positivePaths.length && (
-        <FallbackContainer>
-          <Text fontWeight="600" fontSize="1.2rem" color="gray.400">No positive paths recorded yet</Text>
-          <Div>
-            <Icon size="175px" color="gray.50" as={Smile} />
-          </Div>
-        </FallbackContainer>
-      )}
-    </Card>
-  </ModuleContainer>
-);
+  return (
+    <ModuleContainer>
+      <Card bg="white">
+        <CardBody display="flex" flexDirection="column">
+          <Text fontSize="1.3rem" color="teal.200">{t('dialogue:top_positive_paths')}</Text>
+          <Flex marginTop="10px" flexGrow={1} flexDirection="column">
+            {positivePaths.length > 0 && (
+              <PostivePathsModuleList>
+                {positivePaths.map(({ answer, quantity }: { answer: string, quantity: number }) => (
+                  <li key={`${answer}-${quantity}`}>
+                    {`${answer}`}
+                  </li>
+                ))}
+              </PostivePathsModuleList>
+            )}
+
+          </Flex>
+        </CardBody>
+        {!positivePaths.length && (
+          <FallbackContainer>
+            <Text fontWeight="600" fontSize="1.2rem" color="gray.400">{t('dialogue:fallback_no_positive_paths')}</Text>
+            <Div>
+              <Icon size="175px" color="gray.50" as={Smile} />
+            </Div>
+          </FallbackContainer>
+        )}
+      </Card>
+    </ModuleContainer>
+  );
+};
 
 export default PositivePathsModule;

@@ -10,10 +10,11 @@ import Table from 'components/Table/Table';
 import getUsersQuery from 'queries/getUserTable';
 
 import { Button } from '@chakra-ui/core';
-import { CenterCell, RoleCell, UserCell } from 'components/Table/CellComponents/CellComponents';
 import { ErrorBoundary } from 'react-error-boundary';
+import { GenericCell } from 'components/Table/CellComponents/CellComponents';
 import { Plus } from 'react-feather';
-import Row from './TableRow/UsersTableRow';
+import { useTranslation } from 'react-i18next';
+// import Row from './TableRow/UsersTableRow';
 import deleteUserQuery from '../../mutations/deleteUser';
 
 interface TableProps {
@@ -29,14 +30,52 @@ interface TableProps {
 }
 
 const HEADERS = [
-  { Header: 'First name', accessor: 'firstName', Cell: CenterCell },
-  { Header: 'Last name', accessor: 'lastName', Cell: CenterCell },
-  { Header: 'Email', accessor: 'email', Cell: UserCell },
-  { Header: 'Role', accessor: 'role', Cell: RoleCell },
+  { Header: 'first_name', accessor: 'firstName', Cell: GenericCell },
+  { Header: 'last_name', accessor: 'lastName', Cell: GenericCell },
+  { Header: 'email', accessor: 'email', Cell: GenericCell },
+  { Header: 'role', accessor: 'role', Cell: GenericCell },
 ];
+
+// const UserOptions = ({ onDeleteEntry }: { onDeleteEntry: () => void; }) => {
+//   const { t } = useTranslation();
+
+//   return (
+//     <MenuItem>
+//       <Popover
+//         usePortal
+//       >
+//         {({ onClose }) => (
+//           <>
+//             <PopoverTrigger>
+//               Delete
+//             </PopoverTrigger>
+//             <PopoverContent zIndex={4}>
+//               <PopoverArrow />
+//               <PopoverHeader>Delete</PopoverHeader>
+//               <PopoverCloseButton />
+//               <PopoverBody>
+//                 <p>You are about to delete a User. THIS ACTION IS IRREVERSIBLE! Are you sure?</p>
+//               </PopoverBody>
+//               <PopoverFooter>
+//                 <Button
+//                   variantColor="red"
+//                   onClick={(event) => onDeleteEntry && onDeleteEntry(event, userId, onClose)}
+//                 >
+//                   Delete
+//                 </Button>
+//               </PopoverFooter>
+//             </PopoverContent>
+//           </>
+//         )}
+//       </Popover>
+//       {t('test')}
+//     </MenuItem>
+//   );
+// };
 
 const UsersOverview = () => {
   const { customerSlug } = useParams();
+  const { t } = useTranslation();
   const history = useHistory();
   const [fetchUsers, { data }] = useLazyQuery(getUsersQuery, { fetchPolicy: 'cache-and-network' });
 
@@ -90,12 +129,12 @@ const UsersOverview = () => {
     },
   });
 
-  const handleDeleteUser = (event: any, userId: string) => {
+  const handleDeleteUser = (event: any, userId: string, onComplete: (() => void) | undefined) => {
     deleteUser({
       variables: {
         id: userId,
       },
-    });
+    }).finally(() => onComplete && onComplete());
   };
 
   const handleEditUser = (event: any, userId: string) => {
@@ -117,12 +156,12 @@ const UsersOverview = () => {
 
   return (
     <>
-      <PageTitle>Users and roles</PageTitle>
+      <PageTitle>{t('views:users_overview')}</PageTitle>
 
       <Div mb={4} width="100%">
         <Flex justifyContent="space-between">
           <Div mr={4}>
-            <Button onClick={handleAddUser} leftIcon={Plus} variantColor="teal">Create user</Button>
+            <Button onClick={handleAddUser} leftIcon={Plus} variantColor="teal">{t('user:create_user')}</Button>
           </Div>
           <Div>
             <SearchBar activeSearchTerm={paginationProps.activeSearchTerm} onSearchTermChange={handleSearchTermChange} />
@@ -144,7 +183,6 @@ const UsersOverview = () => {
             onDeleteEntry={handleDeleteUser}
             onEditEntry={handleEditUser}
             onAddEntry={handleAddUser}
-            CustomRow={Row}
             data={tableData}
           />
         </ErrorBoundary>

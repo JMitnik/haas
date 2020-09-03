@@ -92,7 +92,7 @@ const AddUserView = () => {
 
   return (
     <>
-      <PageTitle>Create a new user</PageTitle>
+      <PageTitle>{t('views:create_user_view')}</PageTitle>
 
       <motion.div initial={{ opacity: 0, y: 100 }} animate={{ opacity: 1, y: 0 }}>
 
@@ -100,9 +100,9 @@ const AddUserView = () => {
           <Form onSubmit={form.handleSubmit(handleSubmit)}>
             <FormSection id="about">
               <Div>
-                <H3 color="default.text" fontWeight={500} pb={2}>About the user</H3>
+                <H3 color="default.text" fontWeight={500} pb={2}>{t('user:about_user')}</H3>
                 <Muted color="gray.600">
-                  Tell us about the user, and to which scope it applies (question/dialogue)
+                  {t('user:about_user_helper')}
                 </Muted>
               </Div>
               <Div>
@@ -159,9 +159,9 @@ const AddUserView = () => {
 
             <FormSection id="roles">
               <Div>
-                <H3 color="default.text" fontWeight={500} pb={2}>Roles</H3>
+                <H3 color="default.text" fontWeight={500} pb={2}>{t('roles')}</H3>
                 <Muted color="gray.600">
-                  Decide and assign roles for control access
+                  {t('user:roles_helper')}
                 </Muted>
               </Div>
               <Div>

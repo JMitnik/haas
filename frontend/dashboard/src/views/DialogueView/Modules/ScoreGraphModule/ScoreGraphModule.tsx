@@ -1,11 +1,14 @@
-import { Card, CardBody, Flex, H3, Span } from '@haas/ui';
+import { Card, CardBody, Flex, Span, Text } from '@haas/ui';
 import { ResponsiveLine as NivoLineChart } from '@nivo/line';
 import {
   dialogueStatistics_customer_dialogue_statistics_history as SessionHistory,
 } from 'views/DialogueView/__generated__/dialogueStatistics';
+import { useTranslation } from 'react-i18next';
 import React from 'react';
 
 const ScoreGraphModule = ({ chartData }: { chartData: SessionHistory[] }) => {
+  const { t } = useTranslation();
+
   // TODO: Return a nice null card or something
   if (!chartData) {
     return null;
@@ -20,13 +23,13 @@ const ScoreGraphModule = ({ chartData }: { chartData: SessionHistory[] }) => {
   ];
 
   return (
-    <Card height="350px" bg="white">
+    <Card height="400px" bg="white">
       <CardBody height="100%">
-        <H3 color="app.onWhite">
+        <Text fontSize="1.2rem" color="gray.400">
           <Flex justifyContent="space-between" alignItems="center">
-            <Span>Score over time</Span>
+            <Span>{t('dialogue:score_over_time')}</Span>
           </Flex>
-        </H3>
+        </Text>
         <NivoLineChart
           data={data}
           margin={{ top: 50, right: 30, bottom: 70, left: 60 }}

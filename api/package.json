@@ -10,7 +10,7 @@
     },
     "scripts": {
         "start": "tsnd --exit-child --transpile-only -- ./src/app.ts",
-        "dev": "tsnd --respawn --exit-child --transpile-only --inspect -- ./src/app.ts",
+        "dev": "npx nodemon --watch src ./src/app.ts",
         "build": "yarn",
         "docker:up": "docker-compose -f docker-compose.local.yml up -d ",
         "kill": "npx kill-port 4000 && npx kill-port 9229 | exit 0",

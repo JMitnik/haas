@@ -1,3 +1,5 @@
+import { DataGridProps } from 'types/generic';
+
 export interface NodeEntryValueProps {
   numberValue?: number;
   textValue?: string;
@@ -17,14 +19,8 @@ export interface NodeEntryProps {
   relatedNode: RelatedNodeProps;
 }
 
-interface GenericCellProps {
-  value: string | number;
-}
-
-export interface HeaderColumnProps {
-  Header: string;
-  accessor: string;
-  Cell: React.FC<GenericCellProps>;
+export interface GenericCellProps {
+  value: any;
 }
 
 export interface RecipientProps {
@@ -57,20 +53,79 @@ export interface PermissionProps {
   id: string;
 }
 
+export interface TableInputProps {
+  headers: TableHeaderColumnProps[]
+  data: Array<any>;
+  onPaginationChange: React.Dispatch<React.SetStateAction<TableProps>>;
+  CustomRow?: any;
+  renderExpandedRowContainer?: (input: any) => React.ReactNode;
+  renderOptions?: React.ReactNode;
+  permissions?: Array<any>;
+  onDeleteEntry?: (event: any, userId: string, onComplete: (() => void) | undefined) => void;
+  onEditEntry?: (event: any, userId: string) => void;
+  onAddEntry?: (event: any) => void;
+  paginationProps: DataGridProps;
+  hidePagination?: boolean;
+  disableSorting?: boolean;
+  loading?: boolean;
+}
+
+export interface TableHeaderColumnProps {
+  Header: string;
+  accessor: string;
+  sortProperties?: {
+    by: string;
+    desc: boolean;
+  }[];
+  onPaginationChange?: React.Dispatch<React.SetStateAction<TableProps>>;
+  Cell?: React.FC<GenericCellProps>;
+  disableSorting?: boolean;
+}
+
+export interface TableCellProps {
+  renderCell?: React.FC<GenericCellProps>;
+  accessor: string;
+}
+
+export interface TableProps {
+  activeStartDate: Date | null;
+  activeEndDate: Date | null;
+  activeSearchTerm: string;
+  pageIndex: number;
+  pageSize: number;
+  sortBy: {
+    by: string;
+    desc: boolean;
+  }[]
+}
+
+export interface TableHeaderProps {
+  headers: Array<TableHeaderColumnProps>;
+  sortProperties?: {
+    by: string;
+    desc: boolean;
+  }[];
+  onAddEntry?: (event: any) => void;
+  onPaginationChange: React.Dispatch<React.SetStateAction<TableProps>>;
+  disableSorting?: boolean;
+}
+
 export interface TableRowProps {
   data: CellComponentProps;
   permissions?: Array<PermissionProps>;
-  headers: Array<HeaderColumnProps>;
+  headers: Array<TableHeaderColumnProps>;
   index: number;
-  onDeleteEntry?: (event: any, userId: string) => void;
+  onDeleteEntry?: (event: any, userId: string, onComplete: (() => void) | undefined) => void;
   onEditEntry?: (event: any, userId: string) => void;
+  renderExpandedRow?: React.ReactNode | undefined;
+  renderOptions?: React.ReactNode;
 }
 
 export interface UserRowProps {
   data: CellComponentProps;
   permissions?: Array<PermissionProps>;
-  onDeleteEntry?: (event: any, userId: string) => void;
+  onDeleteEntry?: (event: any, userId: string, onComplete: (() => void) | undefined) => void;
   onEditEntry?: (event: any, userId: string) => void;
-  headers: Array<HeaderColumnProps>;
+  headers: Array<TableHeaderColumnProps>;
   index: number;
 }

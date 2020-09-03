@@ -124,7 +124,7 @@ const ActionOverview = ({ leafs }: ActionOverviewProps) => {
       </PageTitle>
       <Flex flexDirection="row" justifyContent="space-between" alignItems="center" mb={4}>
         <Button size="sm" variant="outline" leftIcon={Plus} isDisabled={!!activeCTA || false} onClick={() => handleAddCTA()}>
-          Add call to action
+          {t('add_call_to_action')}
         </Button>
         <SearchBar activeSearchTerm={activeSearchTerm} onSearchTermChange={handleSearchTermChange} />
       </Flex>

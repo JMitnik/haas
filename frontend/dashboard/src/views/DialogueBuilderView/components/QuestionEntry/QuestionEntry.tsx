@@ -1,6 +1,5 @@
 import { ApolloError } from 'apollo-client';
 import { Flex, Span } from '@haas/ui';
-import { X } from 'react-feather';
 import { useMutation } from '@apollo/react-hooks';
 import { useParams } from 'react-router';
 import React from 'react';
@@ -9,12 +8,12 @@ import EditButton from 'components/EditButton';
 import deleteQuestionMutation from 'mutations/deleteQuestion';
 import getTopicBuilderQuery from 'queries/getQuestionnaireQuery';
 
+import { useTranslation } from 'react-i18next';
 import { EdgeConditonProps, QuestionEntryProps, QuestionOptionProps } from '../../DialogueBuilderInterfaces';
 import { OverflowSpan, QuestionEntryContainer, QuestionEntryViewContainer } from './QuestionEntryStyles';
 import BuilderIcon from './BuilderIcon';
 import CTALabel from './CTALabel';
 import ConditionLabel from './ConditionLabel';
-import DeleteQuestionButton from './DeleteQuestionButton';
 import QuestionEntryForm from '../QuestionEntryForm/QuestionEntryForm';
 import ShowChildQuestion from './ShowChildQuestion';
 
@@ -55,6 +54,7 @@ const QuestionEntryItem = ({ depth,
   onAddExpandChange }
 : QuestionEntryItemProps) => {
   const { customerSlug, dialogueSlug } = useParams();
+  const { t } = useTranslation();
 
   const [deleteQuestion] = useMutation(deleteQuestionMutation, {
     variables: {
@@ -69,6 +69,9 @@ const QuestionEntryItem = ({ depth,
         dialogueSlug,
       },
     }],
+    onCompleted: () => {
+      onActiveQuestionChange(null);
+    },
     onError: (serverError: ApolloError) => {
       console.log(serverError);
     },
@@ -85,23 +88,16 @@ const QuestionEntryItem = ({ depth,
       )}
       <QuestionEntryViewContainer activeCTA={activeQuestion} id={question.id} flexGrow={1}>
         <QuestionEntryContainer flexGrow={1}>
-          <DeleteQuestionButton
-            data-cy="DeleteButton"
-            disabled={(!!activeQuestion && activeQuestion !== question.id) || false}
-            onClick={() => deleteQuestion()}
-          >
-            <X />
-          </DeleteQuestionButton>
 
           <Flex flexDirection="row" width="100%">
             <BuilderIcon type={question.type} Icon={Icon} />
 
             <Flex width="60%" flexDirection="column">
               <Span fontSize="1.4em">
-                Title
+                {t('title')}
               </Span>
               <OverflowSpan data-cy="OverflowSpan">
-                {question.title || 'None'}
+                {question.title || t('none')}
               </OverflowSpan>
             </Flex>
 
@@ -113,9 +109,9 @@ const QuestionEntryItem = ({ depth,
             </Flex>
 
           </Flex>
-          {activeQuestion === question.id
-          && (
+          {activeQuestion === question.id && (
             <QuestionEntryForm
+              onDeleteEntry={deleteQuestion}
               onAddExpandChange={onAddExpandChange}
               parentQuestionType={parentQuestionType}
               parentQuestionId={parentQuestionId}
@@ -143,6 +139,7 @@ const QuestionEntryItem = ({ depth,
       {question.id !== '-1' && (
         <ShowChildQuestion
           amtChildren={question?.children?.length || 0}
+          isDisabled={!!activeQuestion && activeQuestion !== question.id}
           isExpanded={isExpanded}
           onExpandChange={onExpandChange}
         />

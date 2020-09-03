@@ -1,10 +1,11 @@
 import { Button, ButtonGroup, Popover, PopoverArrow, PopoverBody,
   PopoverCloseButton, PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast } from '@chakra-ui/core';
 import { useHistory } from 'react-router';
+import { useTranslation } from 'react-i18next';
 import Color from 'color';
 import React from 'react';
 
-import { Card, CardBody, ColumnFlex, H3, Span } from '@haas/ui';
+import { Card, CardBody, ColumnFlex, H3, Span, Text } from '@haas/ui';
 import { deleteFullCustomerQuery } from 'mutations/deleteFullCustomer';
 import { isValidColor } from 'utils/ColorUtils';
 import { useCustomer } from 'providers/CustomerProvider';
@@ -17,6 +18,7 @@ const CustomerCard = ({ customer }: { customer: any }) => {
   const history = useHistory();
   const { setActiveCustomer } = useCustomer();
   const toast = useToast();
+  const { t } = useTranslation();
 
   const setCustomerSlug = (customerSlug: string) => {
     localStorage.setItem('customer', JSON.stringify(customer));
@@ -88,7 +90,7 @@ const CustomerCard = ({ customer }: { customer: any }) => {
               color={primaryColor.lighten(0.6).hex()}
               borderColor={primaryColor.lighten(0.6).hex()}
             >
-              Visit
+              {t('visit')}
             </Button>
             <Button
               size="xs"
@@ -98,7 +100,7 @@ const CustomerCard = ({ customer }: { customer: any }) => {
               borderColor={primaryColor.lighten(0.6).hex()}
               onClick={(e) => setCustomerEditPath(e, customer.slug)}
             >
-              Edit
+              {t('edit')}
             </Button>
             <Span onClick={(e) => e.stopPropagation()}>
               <Popover
@@ -114,22 +116,22 @@ const CustomerCard = ({ customer }: { customer: any }) => {
                         color={primaryColor.lighten(0.6).hex()}
                         borderColor={primaryColor.lighten(0.6).hex()}
                       >
-                        Delete
+                        {t('delete')}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent zIndex={4}>
                       <PopoverArrow />
-                      <PopoverHeader>Delete</PopoverHeader>
+                      <PopoverHeader>{t('delete')}</PopoverHeader>
                       <PopoverCloseButton />
                       <PopoverBody>
-                        <p>You are about to delete a customer. Are you sure?</p>
+                        <Text>{t('delete_customer_popover')}</Text>
                       </PopoverBody>
                       <PopoverFooter>
                         <Button
                           variantColor="red"
                           onClick={() => handleDeleteCustomer(customer.id, onClose)}
                         >
-                          Delete
+                          {t('delete')}
                         </Button>
                       </PopoverFooter>
                     </PopoverContent>

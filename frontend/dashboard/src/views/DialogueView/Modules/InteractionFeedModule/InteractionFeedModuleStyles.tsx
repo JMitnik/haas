@@ -6,4 +6,6 @@ export const InteractionFeedEntriesContainer = styled.div`
   flex-direction: column;
   overflow-x: hidden;
   overflow-y: auto;
+  justify-content: space-evenly;
+  flex: 100%;
 `;

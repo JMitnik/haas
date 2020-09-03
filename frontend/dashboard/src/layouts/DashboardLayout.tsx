@@ -13,6 +13,7 @@ import { ReactComponent as UsersIcon } from 'assets/icons/icon-user-group.svg';
 import { motion } from 'framer-motion';
 import { useAuth } from 'providers/AuthProvider';
 import { useCustomer } from 'providers/CustomerProvider';
+import { useTranslation } from 'react-i18next';
 import Logo from 'components/Logo/Logo';
 import MobileBottomNav from 'components/MobileBottomNav';
 import Sidenav from 'components/Sidenav';
@@ -36,38 +37,40 @@ const DashboardLayoutContainer = styled(Div)<{ isMobile?: boolean }>`
 
 const DashboardViewContainer = styled(Div)`
   ${({ theme }) => css`
-    /* padding: ${theme.gutter * 2}px ${theme.gutter * 4}px; */
-
     ${PageHeading} {
       color: ${theme.colors.app.onDefault};
     }
   `}
 `;
 
-const DashboardNav = ({ customerSlug }: { customerSlug: string }) => (
-  <NavItems>
-    <NavItem to={`/dashboard/b/${customerSlug}/d`}>
-      <SurveyIcon />
-      Dialogues
-    </NavItem>
-    <NavItem to={`/dashboard/b/${customerSlug}/analytics`}>
-      <PieChartIcon />
-      Analytics
-    </NavItem>
-    <NavItem to={`/dashboard/b/${customerSlug}/users`}>
-      <UsersIcon />
-      Users
-    </NavItem>
-    <NavItem to={`/dashboard/b/${customerSlug}/triggers`}>
-      <NotificationIcon />
-      Alerts
-    </NavItem>
-    <NavItem to={`/dashboard/b/${customerSlug}/edit`}>
-      <SettingsIcon />
-      Settings
-    </NavItem>
-  </NavItems>
-);
+const DashboardNav = ({ customerSlug }: { customerSlug: string }) => {
+  const { t } = useTranslation();
+
+  return (
+    <NavItems>
+      <NavItem to={`/dashboard/b/${customerSlug}/d`}>
+        <SurveyIcon />
+        {t('dialogues')}
+      </NavItem>
+      <NavItem to={`/dashboard/b/${customerSlug}/analytics`}>
+        <PieChartIcon />
+        {t('analytics')}
+      </NavItem>
+      <NavItem to={`/dashboard/b/${customerSlug}/users`}>
+        <UsersIcon />
+        {t('users')}
+      </NavItem>
+      <NavItem to={`/dashboard/b/${customerSlug}/triggers`}>
+        <NotificationIcon />
+        {t('alerts')}
+      </NavItem>
+      <NavItem to={`/dashboard/b/${customerSlug}/edit`}>
+        <SettingsIcon />
+        {t('settings')}
+      </NavItem>
+    </NavItems>
+  );
+};
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const params: { topicId: string, customerSlug: string, dialogueSlug: string } = useParams<any>();
@@ -98,7 +101,10 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                 <DashboardNav customerSlug={params.customerSlug} />
               </Div>
 
-              <Usernav customer={customer} user={userData} />
+              <Usernav
+                customer={customer}
+                user={userData}
+              />
             </Sidenav>
           </motion.div>
         ) : (

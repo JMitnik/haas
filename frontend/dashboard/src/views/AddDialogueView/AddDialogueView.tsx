@@ -2,7 +2,7 @@ import * as yup from 'yup';
 import { ApolloError } from 'apollo-boost';
 import { Button, ButtonGroup, FormErrorMessage, Stack, useToast } from '@chakra-ui/core';
 import { Container, Div, ErrorStyle, Flex, Form, FormContainer, FormControl, FormLabel,
-  FormSection, H2, H3, Hr, Input, InputGrid, InputHelper, Muted, Textarea } from '@haas/ui';
+  FormSection, H3, Hr, Input, InputGrid, InputHelper, Muted, PageTitle, Textarea } from '@haas/ui';
 import { Controller, useForm } from 'react-hook-form';
 import { Minus, Plus, Type } from 'react-feather';
 import { useHistory, useParams } from 'react-router';
@@ -173,29 +173,26 @@ const AddDialogueView = () => {
 
   return (
     <Container>
+      <PageTitle>{t('views:add_dialogue_view')}</PageTitle>
 
-      <Div>
-        <H2 color="gray.700" mb={4} py={2}>Add dialogue</H2>
-      </Div>
       <motion.div initial={{ opacity: 0, y: 100 }} animate={{ opacity: 1, y: 0 }}>
-
         <FormContainer>
           <Form onSubmit={form.handleSubmit(onSubmit)}>
             <ServerError serverError={serverError} />
             <FormSection id="general">
               <Div>
-                <H3 color="default.text" fontWeight={500} pb={2}>About dialogue</H3>
+                <H3 color="default.text" fontWeight={500} pb={2}>{t('dialogue:about')}</H3>
                 <Muted color="gray.600">
-                  Tell us a bit about the dialogue
+                  {t('dialogue:about_helper')}
                 </Muted>
               </Div>
               <Div>
                 <InputGrid>
                   <FormControl isRequired isInvalid={!!form.errors.title}>
-                    <FormLabel htmlFor="title">Title</FormLabel>
-                    <InputHelper>What is the name of the dialogue?</InputHelper>
+                    <FormLabel htmlFor="title">{t('title')}</FormLabel>
+                    <InputHelper>{t('dialogue:title_helper')}</InputHelper>
                     <Input
-                      placeholder="Peaches or apples?"
+                      placeholder={t('dialogue:title_placeholder')}
                       leftEl={<Type />}
                       name="title"
                       ref={form.register({ required: true })}
@@ -204,12 +201,14 @@ const AddDialogueView = () => {
                   </FormControl>
 
                   <FormControl isInvalid={!!form.errors.publicTitle}>
-                    <FormLabel htmlFor="publicTitle">Public title</FormLabel>
+                    <FormLabel htmlFor="publicTitle">
+                      {t('dialogue:public_title')}
+                    </FormLabel>
                     <InputHelper>
-                      (Optional): If set, will be used instead of the actual title to the user instead.
+                      {t('dialogue:public_title_helper')}
                     </InputHelper>
                     <Input
-                      placeholder="Peaches > Apples?"
+                      placeholder={t('dialogue:public_title_placeholder')}
                       leftEl={<Type />}
                       name="publicTitle"
                       ref={form.register({ required: false })}
@@ -218,9 +217,9 @@ const AddDialogueView = () => {
                   </FormControl>
 
                   <FormControl isRequired isInvalid={!!form.errors.description}>
-                    <FormLabel htmlFor="title">Description</FormLabel>
+                    <FormLabel htmlFor="title">{t('description')}</FormLabel>
                     <InputHelper>
-                      How would you describe the dialogue?
+                      {t('dialogue:description_helper')}
                     </InputHelper>
                     <Textarea
                       placeholder="Describe your dialogue"
@@ -250,18 +249,19 @@ const AddDialogueView = () => {
 
             <FormSection id="template">
               <Div>
-                <H3 color="default.text" fontWeight={500} pb={2}>Template</H3>
+                <H3 color="default.text" fontWeight={500} pb={2}>{t('template')}</H3>
                 <Muted color="gray.600">
-                  Do you wish to start the dialogue from a clean slate,
-                  or base this on another dialogue (or HAAS template)?
+                  {t('dialogue:template_helper')}
                 </Muted>
               </Div>
               <Div>
                 <InputGrid>
                   <FormControl isRequired>
-                    <FormLabel htmlFor="title">Use a template</FormLabel>
+                    <FormLabel htmlFor="title">
+                      {t('dialogue:use_template')}
+                    </FormLabel>
                     <InputHelper>
-                      Set what type of template you would like to use.
+                      {t('dialogue:use_template_helper')}
                     </InputHelper>
                     <Controller
                       name="contentOption"
@@ -324,7 +324,7 @@ const AddDialogueView = () => {
               <Div>
                 <H3 color="default.text" fontWeight={500} pb={2}>Tags</H3>
                 <Muted color="gray.600">
-                  Would you like to assign tags to associate your dialogue with?
+                  {t('dialogue:tag_helper')}
                 </Muted>
               </Div>
               <Div>
@@ -334,7 +334,7 @@ const AddDialogueView = () => {
                       leftIcon={Plus}
                       onClick={() => setActiveTags((prevTags) => [...prevTags, null])}
                     >
-                      Add tag
+                      {t('add_tag')}
                     </Button>
                   </Div>
 
@@ -370,7 +370,7 @@ const AddDialogueView = () => {
                             leftIcon={Minus}
                             onClick={() => deleteTag(index)}
                           >
-                            Remove
+                            {t('remove')}
                           </Button>
                         </Flex>
                       </Flex>
@@ -388,9 +388,11 @@ const AddDialogueView = () => {
                 variantColor="teal"
                 type="submit"
               >
-                Create
+                {t('create')}
               </Button>
-              <Button variant="outline" onClick={() => history.push('/')}>Cancel</Button>
+              <Button variant="outline" onClick={() => history.push('/')}>
+                {t('cancel')}
+              </Button>
             </ButtonGroup>
           </Form>
         </FormContainer>
