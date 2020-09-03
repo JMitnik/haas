@@ -26,7 +26,7 @@ interface TableInputProps {
   CustomRow?: any;
   permissions?: Array<any>;
   onPaginationChange: React.Dispatch<React.SetStateAction<TableProps>>;
-  onDeleteEntry?: (event: any, userId: string) => void;
+  onDeleteEntry?: (event: any, userId: string, onComplete: (() => void) | undefined) => void;
   onEditEntry?: (event: any, userId: string) => void;
   onAddEntry?: (event: any) => void;
   paginationProps: DataGridProps;

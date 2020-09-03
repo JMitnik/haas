@@ -1,9 +1,11 @@
 import { Edit, X } from 'react-feather';
 import React, { useState } from 'react';
 
-import { DeleteButtonContainer, Div, EditButtonContainer, Flex, Grid, H4, H5, Hr, Span } from '@haas/ui';
+import { Button, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger } from '@chakra-ui/core';
+import { DeleteButtonContainer, Div, EditButtonContainer, Flex, Grid, H4, H5, Hr, Span, Text } from '@haas/ui';
 import { TableRowProps } from 'components/Table/TableTypes';
 import { UserCell } from 'components/Table/CellComponents/CellComponents';
+import { useTranslation } from 'react-i18next';
 import Table from 'components/Table/Table';
 
 interface TableProps {
@@ -25,6 +27,7 @@ const RECIPIENT_HEADERS = [
   { Header: 'PHONE', accessor: 'phone', Cell: UserCell },
 ];
 const UserRow = ({ headers, data, index, onDeleteEntry, onEditEntry }: TableRowProps) => {
+  const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
   const amtCells = headers.length;
   const percentage = 100 / amtCells;
@@ -63,12 +66,39 @@ const UserRow = ({ headers, data, index, onDeleteEntry, onEditEntry }: TableRowP
       >
         <Edit />
       </EditButtonContainer>
-      <DeleteButtonContainer
-        style={{ top: '0px' }}
-        onClick={(event) => onDeleteEntry && onDeleteEntry(event, userId)}
-      >
-        <X />
-      </DeleteButtonContainer>
+      <Span onClick={(e) => e.stopPropagation()}>
+        <Popover
+          usePortal
+        >
+          {({ onClose }) => (
+            <>
+              <PopoverTrigger>
+                <DeleteButtonContainer
+                  style={{ top: '0px' }}
+                >
+                  <X />
+                </DeleteButtonContainer>
+              </PopoverTrigger>
+              <PopoverContent zIndex={4}>
+                <PopoverArrow />
+                <PopoverHeader>{t('delete')}</PopoverHeader>
+                <PopoverCloseButton />
+                <PopoverBody>
+                  <Text>{t('delete_user_popover')}</Text>
+                </PopoverBody>
+                <PopoverFooter>
+                  <Button
+                    variantColor="red"
+                    onClick={(event) => onDeleteEntry && onDeleteEntry(event, userId, onClose)}
+                  >
+                    {t('delete')}
+                  </Button>
+                </PopoverFooter>
+              </PopoverContent>
+            </>
+          )}
+        </Popover>
+      </Span>
       {isExpanded && (
         <Div useFlex flexDirection="column" backgroundColor="#f0f0f0" gridColumn="1 / -1">
           <Div padding={25}>

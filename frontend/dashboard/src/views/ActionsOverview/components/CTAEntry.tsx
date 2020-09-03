@@ -1,7 +1,8 @@
-import { Edit3, X } from 'react-feather';
+import { Edit3 } from 'react-feather';
 import { motion } from 'framer-motion';
 import { useMutation } from '@apollo/react-hooks';
 import { useParams } from 'react-router-dom';
+import { useToast } from '@chakra-ui/core';
 import React from 'react';
 import styled, { css } from 'styled-components/macro';
 
@@ -9,10 +10,8 @@ import { Flex, Span } from '@haas/ui';
 import deleteCTAMutation from 'mutations/deleteCTA';
 import getCTANodesQuery from 'queries/getCTANodes';
 
-import { useToast } from '@chakra-ui/core';
 import CTAForm from './CTAForm';
 import CTAIcon from './CTAIcon';
-import DeleteCTAButton from './DeleteCTAButton';
 import EditCTAButton from './EditCTAButton';
 
 interface LinkInputProps {
@@ -110,7 +109,7 @@ const CTAEntry = ({ id, activeCTA, onActiveCTAChange, title, type, links, Icon, 
       onNewCTAChange(false);
       return onActiveCTAChange(null);
     }
-
+    onActiveCTAChange(null);
     return deleteEntry();
   };
 
@@ -118,9 +117,6 @@ const CTAEntry = ({ id, activeCTA, onActiveCTAChange, title, type, links, Icon, 
     <motion.div initial={{ opacity: 1, y: 150 }} animate={{ opacity: 1, y: 0 }}>
 
       <CTAEntryContainer id={id} activeCTA={activeCTA}>
-        <DeleteCTAButton disabled={(!!activeCTA && activeCTA !== id) || false} onClick={() => deleteCTA()}>
-          <X />
-        </DeleteCTAButton>
 
         <Flex flexDirection="row" width="100%">
           <CTAIcon type={type} Icon={Icon} />
@@ -153,6 +149,7 @@ const CTAEntry = ({ id, activeCTA, onActiveCTAChange, title, type, links, Icon, 
                 title={title}
                 type={type}
                 links={links}
+                onDeleteCTA={deleteCTA}
                 onActiveCTAChange={onActiveCTAChange}
                 onNewCTAChange={onNewCTAChange}
               />

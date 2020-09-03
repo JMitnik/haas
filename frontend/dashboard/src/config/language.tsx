@@ -20,6 +20,11 @@ const language = {
       slug: 'Url Extension',
       slug_helper: 'Under which url segment will visitors find the business?',
       template: 'Template',
+      delete: 'Delete',
+      delete_question_popover: 'You are about to delete a question (and all its child questions). Note: THIS ACTION IS IRREVERSIBLE! Are you sure?',
+      delete_cta_popover: 'You are about to delete a CTA. Note: THIS ACTION IS IRREVERSIBLE! Are you sure?',
+      delete_trigger_popover: 'You are about to delete a trigger. Note: THIS ACTION IS IRREVERSIBLE! Are you sure?',
+      delete_user_popover: 'You are about to delete a User. Note: THIS ACTION IS IRREVERSIBLE! Are you sure?',
     },
     customer: {
       about_helper: 'Please tell us a bit about the business, such as under which name and URL we can find it.',

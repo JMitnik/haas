@@ -1,6 +1,5 @@
 import { ApolloError } from 'apollo-client';
 import { Flex, Span } from '@haas/ui';
-import { X } from 'react-feather';
 import { useMutation } from '@apollo/react-hooks';
 import { useParams } from 'react-router';
 import React from 'react';
@@ -14,7 +13,6 @@ import { OverflowSpan, QuestionEntryContainer, QuestionEntryViewContainer } from
 import BuilderIcon from './BuilderIcon';
 import CTALabel from './CTALabel';
 import ConditionLabel from './ConditionLabel';
-import DeleteQuestionButton from './DeleteQuestionButton';
 import QuestionEntryForm from '../QuestionEntryForm/QuestionEntryForm';
 import ShowChildQuestion from './ShowChildQuestion';
 
@@ -70,9 +68,7 @@ const QuestionEntryItem = ({ depth,
       },
     }],
     onCompleted: () => {
-      if (activeQuestion === question.id) {
-        onActiveQuestionChange(null);
-      }
+      onActiveQuestionChange(null);
     },
     onError: (serverError: ApolloError) => {
       console.log(serverError);
@@ -90,13 +86,6 @@ const QuestionEntryItem = ({ depth,
       )}
       <QuestionEntryViewContainer activeCTA={activeQuestion} id={question.id} flexGrow={1}>
         <QuestionEntryContainer flexGrow={1}>
-          <DeleteQuestionButton
-            data-cy="DeleteButton"
-            disabled={(!!activeQuestion && activeQuestion !== question.id) || false}
-            onClick={() => deleteQuestion()}
-          >
-            <X />
-          </DeleteQuestionButton>
 
           <Flex flexDirection="row" width="100%">
             <BuilderIcon type={question.type} Icon={Icon} />
@@ -120,6 +109,7 @@ const QuestionEntryItem = ({ depth,
           </Flex>
           {activeQuestion === question.id && (
             <QuestionEntryForm
+              onDeleteEntry={deleteQuestion}
               onAddExpandChange={onAddExpandChange}
               parentQuestionType={parentQuestionType}
               parentQuestionId={parentQuestionId}

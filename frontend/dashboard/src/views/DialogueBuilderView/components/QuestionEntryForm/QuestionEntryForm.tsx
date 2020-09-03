@@ -2,12 +2,14 @@
 
 import * as yup from 'yup';
 import { ApolloError } from 'apollo-client';
-import { Button, ButtonGroup, FormErrorMessage, useToast } from '@chakra-ui/core';
+import { Button, ButtonGroup, FormErrorMessage, Popover, PopoverArrow,
+  PopoverBody, PopoverCloseButton, PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast } from '@chakra-ui/core';
 import { Controller, useForm } from 'react-hook-form';
-import { MinusCircle, PlusCircle } from 'react-feather';
+import { MinusCircle, PlusCircle, Trash } from 'react-feather';
 import { debounce } from 'lodash';
 import { useMutation } from '@apollo/react-hooks';
 import { useParams } from 'react-router';
+import { useTranslation } from 'react-i18next';
 import { yupResolver } from '@hookform/resolvers';
 import React, { useCallback, useEffect, useState } from 'react';
 import Select from 'react-select';
@@ -16,7 +18,7 @@ import {
   DeleteQuestionOptionButtonContainer,
 } from 'views/DialogueBuilderView/components/QuestionEntry/QuestionEntryStyles';
 import { Div, Flex, Form, FormContainer, FormControl, FormLabel,
-  FormSection, H3, H4, Hr, Input, InputGrid, InputHelper, Muted } from '@haas/ui';
+  FormSection, H3, H4, Hr, Input, InputGrid, InputHelper, Muted, Span, Text } from '@haas/ui';
 import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
 import createQuestionMutation from 'mutations/createQuestion';
 import updateQuestionMutation from 'mutations/updateQuestion';
@@ -83,6 +85,7 @@ interface QuestionEntryFormProps {
   question: QuestionEntryProps;
   parentQuestionId?: string;
   parentQuestionType: string;
+  onDeleteEntry: any;
 }
 
 const questionTypes = [
@@ -105,8 +108,11 @@ const QuestionEntryForm = ({
   parentQuestionType,
   parentQuestionId,
   edgeId,
+  onDeleteEntry,
 }: QuestionEntryFormProps) => {
   const { customerSlug, dialogueSlug } = useParams();
+
+  const { t } = useTranslation();
 
   const form = useForm<FormDataProps>({
     resolver: yupResolver(schema),
@@ -572,7 +578,7 @@ const QuestionEntryForm = ({
           </FormSection>
         </Div>
 
-        <Div>
+        <Flex justifyContent="space-between">
           <ButtonGroup>
             <Button
               isLoading={createLoading || updateLoading}
@@ -584,7 +590,44 @@ const QuestionEntryForm = ({
             </Button>
             <Button variant="outline" onClick={() => handleCancelQuestion()}>Cancel</Button>
           </ButtonGroup>
-        </Div>
+          <Span onClick={(e) => e.stopPropagation()}>
+            <Popover
+              usePortal
+            >
+              {({ onClose }) => (
+                <>
+                  <PopoverTrigger>
+                    <Button
+                      variant="outline"
+                      variantColor="red"
+                      leftIcon={Trash}
+                    >
+                      Delete
+
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent zIndex={4}>
+                    <PopoverArrow />
+                    <PopoverHeader>{t('delete')}</PopoverHeader>
+                    <PopoverCloseButton />
+                    <PopoverBody>
+                      <Text>{t('delete_question_popover')}</Text>
+                    </PopoverBody>
+                    <PopoverFooter>
+                      <Button
+                        variant="outline"
+                        variantColor="red"
+                        onClick={() => onDeleteEntry && onDeleteEntry()}
+                      >
+                        {t('delete')}
+                      </Button>
+                    </PopoverFooter>
+                  </PopoverContent>
+                </>
+              )}
+            </Popover>
+          </Span>
+        </Flex>
       </Form>
     </FormContainer>
 
