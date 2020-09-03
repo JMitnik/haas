@@ -145,7 +145,7 @@ export const RoleMutations = extendType({
             name: args.data.name,
             permissions: {
               set: [
-                'CAN_BUILD_DIALOGUES', '',
+                'CAN_BUILD_DIALOGUES',
               ],
             },
             Customer: {
