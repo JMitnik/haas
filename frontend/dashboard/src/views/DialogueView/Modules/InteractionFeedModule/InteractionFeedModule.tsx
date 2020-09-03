@@ -1,6 +1,7 @@
-import { Card, CardBody, Div, Flex, H3, H4, Span } from '@haas/ui';
-import { useTranslation } from 'react-i18next';
 import React from 'react';
+
+import { Card, CardBody, Div, Flex, H4, Text } from '@haas/ui';
+import { useTranslation } from 'react-i18next';
 
 import { Info } from 'react-feather';
 import {
@@ -16,12 +17,7 @@ const InteractionFeedModule = ({ interactions } : { interactions: Session[] }) =
   return (
     <Card bg="white" noHover>
       <CardBody useFlex height="100%" flexDirection="column">
-
-        <H3 color="app.onWhite">
-          <Flex justifyContent="space-between" alignItems="center">
-            <Span>{t('latest_interactions')}</Span>
-          </Flex>
-        </H3>
+        <Text mb={2} fontSize="1.2rem" color="gray.400">{t('latest_interactions')}</Text>
 
         <InteractionFeedEntriesContainer>
           {interactions?.length > 0 && interactions?.map((interaction, index) => (

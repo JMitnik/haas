@@ -1,3 +1,4 @@
+import { CompactEntriesPath } from 'views/DialogueView/Modules/InteractionFeedModule/InteractionFeedEntry';
 import { Div, Flex, Span, Text } from '@haas/ui';
 import { Icon } from '@chakra-ui/core';
 import { User } from 'react-feather';
@@ -5,6 +6,7 @@ import { differenceInCalendarDays, format, formatDistance } from 'date-fns';
 import { maxBy } from 'lodash';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
+import scoreToColors from 'utils/scoreToColors';
 
 interface CellProps {
   value: any;
@@ -29,14 +31,8 @@ export const WhenCell = ({ value }: { value: any }) => {
   );
 };
 
-const getBadgeBackgroundColour = (value: number) => {
-  if (value >= 70) return { background: '#58D173', color: 'white' };
-  if (value > 50 && value < 70) return { background: '#ffa500', color: 'white' };
-  return { background: '#FF3A3A', color: 'white' };
-};
-
 export const ScoreCell = ({ value }: CellProps) => {
-  const { background, color } = getBadgeBackgroundColour(value);
+  const { background, color } = scoreToColors(value);
   const decimalScore = (value) ? (value / 10).toFixed(1) : value;
   return (
     <Flex alignItems="center">
@@ -99,7 +95,7 @@ export const InteractionDateCell = ({ value }: { value: any }) => {
   );
 };
 
-export const InteractionCTACell = ({ value: nodeEntries }: CellProps) => {
+export const InteractionPathCell = ({ value: nodeEntries }: CellProps) => {
   const { t } = useTranslation();
   const potentialCTA = maxBy(nodeEntries, (entry: any) => entry.depth);
 
@@ -123,8 +119,7 @@ export const InteractionCTACell = ({ value: nodeEntries }: CellProps) => {
   return (
     <Flex alignItems="center">
       <Flex minWidth="195px" flexDirection="column">
-        <Text color="gray.500" fontWeight="600">{getCTAType(potentialCTA)}</Text>
-        <Span color="gray.400" fontWeight="400" fontSize="0.8em">{t('no_registration')}</Span>
+        <CompactEntriesPath nodeEntries={nodeEntries} />
       </Flex>
     </Flex>
   );

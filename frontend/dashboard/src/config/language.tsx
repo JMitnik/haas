@@ -8,6 +8,10 @@ const language = {
       en: 'Logout',
       de: 'Logout',
     },
+    interaction_path: {
+      en: 'Path',
+      de: 'Pfad',
+    },
     add_user: {
       en: 'Add user',
       de: 'Nutzer hinzufügen',

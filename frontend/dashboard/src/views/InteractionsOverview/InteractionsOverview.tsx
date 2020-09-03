@@ -23,7 +23,7 @@ import SliderNodeIcon from 'components/Icons/SliderNodeIcon';
 import Table from 'components/Table/Table';
 import getDialogueSessionConnectionQuery from 'queries/getDialogueSessionConnectionQuery';
 
-import { InteractionCTACell, InteractionDateCell,
+import { InteractionDateCell, InteractionPathCell,
   InteractionUserCell, ScoreCell } from './InteractionTableCells';
 import { InteractionDetailQuestionEntry, InteractionsOverviewContainer } from './InteractionOverviewStyles';
 
@@ -42,7 +42,7 @@ interface TableProps {
 const tableHeaders = [
   { Header: 'user', accessor: 'id', Cell: InteractionUserCell },
   { Header: 'date', accessor: 'createdAt', Cell: InteractionDateCell },
-  { Header: 'call_to_action', accessor: 'nodeEntries', Cell: InteractionCTACell },
+  { Header: 'interaction_path', accessor: 'nodeEntries', Cell: InteractionPathCell },
   { Header: 'score', accessor: 'score', Cell: ScoreCell },
 ];
 
@@ -56,16 +56,6 @@ const ExpandedInteractionRow = ({ data }: { data: Session }) => {
             <Div width="51%">
               <Text color="gray.400" fontSize="1.2rem" fontWeight="600">{t('interactions:user_data')}</Text>
               <Text color="gray.400" fontWeight="300">{t('interactions:user_information')}</Text>
-            </Div>
-            <Div width="49%" useFlex>
-              {/* <Div useFlex flexDirection="column" width="25%">
-                <Span fontWeight="bold" color="#999999">OS</Span>
-                <Span color="#c0bcbb">Android</Span>
-              </Div>
-              <Div useFlex flexDirection="column">
-                <Span fontWeight="bold" color="#999999">Location</Span>
-                <Span color="#c0bcbb">Noord Holland</Span>
-              </Div> */}
             </Div>
           </Div>
           <Div />
@@ -152,7 +142,7 @@ const InteractionsOverview = () => {
     activeSearchTerm: qs.parse(location.search, { ignoreQueryPrefix: true })?.search || '',
     pageIndex: 0,
     pageSize: 8,
-    sortBy: [{ by: 'score', desc: true }],
+    sortBy: [{ by: 'createdAt', desc: true }],
   });
 
   const sessions = data?.customer?.dialogue?.sessionConnection?.sessions || [];
