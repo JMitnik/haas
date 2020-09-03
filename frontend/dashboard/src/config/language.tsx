@@ -1,5 +1,13 @@
 const language = {
   general: {
+    switch_project: {
+      en: 'Switch project',
+      de: 'Project wechseln',
+    },
+    logout: {
+      en: 'Logout',
+      de: 'Logout',
+    },
     add_user: {
       en: 'Add user',
       de: 'Nutzer hinzufügen',

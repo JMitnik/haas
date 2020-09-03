@@ -1,10 +1,12 @@
 import { AvatarBadge, Avatar as ChakraAvatar, Icon, Menu, MenuButton, MenuDivider, MenuGroup, MenuItem, MenuList, useToast } from '@chakra-ui/core';
+import { ExternalLink, LogOut } from 'react-feather';
 import { Flex, Text } from '@haas/ui';
 import { LinkProps, NavLink, useHistory } from 'react-router-dom';
 import React from 'react';
 import styled, { css } from 'styled-components/macro';
 
-import { ExternalLink, LogOut } from 'react-feather';
+import { ReactComponent as DeFlag } from 'assets/images/de.svg';
+import { ReactComponent as EnFlag } from 'assets/images/en.svg';
 import { FullLogo, FullLogoContainer, LogoContainer } from 'components/Logo/Logo';
 import { UserProps } from 'types/generic';
 import { useCustomer } from 'providers/CustomerProvider';
@@ -138,20 +140,19 @@ export const Usernav = ({ user }: { user: UserProps, customer: any }) => {
             <ChakraAvatar bg="gray.300" size="md" name={`${user.firstName} ${user.lastName}`}>
               <AvatarBadge size="1em" bg="green.400" />
             </ChakraAvatar>
-
           </Flex>
         </UsernavContainer>
       </MenuButton>
       <MenuList>
         <MenuGroup title={t('language')}>
           <MenuItem onClick={switchToEnglish} color="gray.600">
-            <Icon as={ExternalLink} />
+            <Icon as={EnFlag} overflow="visible" />
             <Text ml={2}>
               {t('english')}
             </Text>
           </MenuItem>
           <MenuItem onClick={switchToGerman} color="gray.600">
-            <Icon as={LogOut} />
+            <Icon as={DeFlag} />
             <Text ml={2}>
               {t('german')}
             </Text>
@@ -162,13 +163,13 @@ export const Usernav = ({ user }: { user: UserProps, customer: any }) => {
           <MenuItem color="gray.600" onClick={goToDialoguesOverview}>
             <Icon as={ExternalLink} />
             <Text ml={2}>
-              Switch customer
+              {t('switch_project')}
             </Text>
           </MenuItem>
           <MenuItem color="gray.600">
             <Icon as={LogOut} />
             <Text ml={2}>
-              Logout
+              {t('logout')}
             </Text>
           </MenuItem>
         </MenuGroup>
