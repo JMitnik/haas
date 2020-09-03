@@ -1,11 +1,11 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
+import { UserInputError } from 'apollo-server-express';
 import { NexusGenInputs } from '../../generated/nexus';
 import RoleService from '../role/RoleService';
 import config from '../../config/config';
 import prisma from '../../config/prisma';
-import { UserInputError } from 'apollo-server-express';
 
 interface UserTokenProps {
   email: string;
@@ -57,11 +57,7 @@ class AuthService {
       include: {
         customers: {
           include: {
-            role: {
-              include: {
-                permissions: true,
-              },
-            },
+            role: true,
             customer: true,
           },
         },
@@ -95,7 +91,7 @@ class AuthService {
 
   static async checkPassword(inputPassword: string, dbPassword: string) {
     let valid = false;
-    
+
     await Promise.resolve(bcrypt.compare(inputPassword, dbPassword).then((res) => {
       if (res) valid = true;
     }));

@@ -1,4 +1,4 @@
-import { extendType, inputObjectType, objectType } from '@nexus/schema';
+import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
 
 // eslint-disable-next-line import/no-cycle
 import { CustomerType } from '../customer/Customer';
@@ -6,6 +6,11 @@ import { CustomerType } from '../customer/Customer';
 import { PaginationWhereInput } from '../general/Pagination';
 import { PermissionType } from '../permission/Permission';
 import RoleService from './RoleService';
+
+export const SystemPerisson = enumType({
+  name: 'SystemPermission',
+  members: ['CAN_ACCESS_ADMIN_PANEL', 'CAN_BUILD_DIALOGUES', 'CAN_VIEW_DIALOGUES'],
+});
 
 export const RoleType = objectType({
   name: 'RoleType',
@@ -19,7 +24,7 @@ export const RoleType = objectType({
 
     t.list.field('permissions', {
       nullable: true,
-      type: PermissionType,
+      type: SystemPerisson,
 
       async resolve(parent, args, ctx) {
         const customerPermissions = await ctx.prisma.permission.findMany({

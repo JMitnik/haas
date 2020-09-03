@@ -1,0 +1,48 @@
+{
+  "version": "0.3.14-fixed",
+  "steps": [
+    {
+      "tag": "CreateEnum",
+      "enum": "SystemPermissionEnum",
+      "values": [
+        "CAN_ACCESS_ADMIN_PANEL",
+        "CAN_BUILD_DIALOGUES",
+        "CAN_VIEW_DIALOGUES"
+      ]
+    },
+    {
+      "tag": "DeleteField",
+      "model": "Permission",
+      "field": "isPermissionOfRole"
+    },
+    {
+      "tag": "UpdateField",
+      "model": "Role",
+      "field": "permissions",
+      "type": "SystemPermissionEnum"
+    },
+    {
+      "tag": "DeleteDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "Role",
+          "field": "permissions"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateField",
+      "model": "User",
+      "field": "globalPermissions",
+      "type": "Permission",
+      "arity": "List"
+    },
+    {
+      "tag": "DeleteField",
+      "model": "User",
+      "field": "isSuperAdmin"
+    }
+  ]
+}

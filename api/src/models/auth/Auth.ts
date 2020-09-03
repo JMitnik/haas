@@ -1,8 +1,9 @@
 import { inputObjectType, mutationField, objectType } from '@nexus/schema';
 
-import { UserInputError, ApolloError } from 'apollo-server-express';
+import { ApolloError, UserInputError } from 'apollo-server-express';
 import { UserType } from '../users/User';
 import AuthService from './AuthService';
+import prisma from '../../config/prisma';
 
 export const RegisterInput = inputObjectType({
   name: 'RegisterInput',
@@ -28,14 +29,17 @@ export const RegisterMutation = mutationField('register', {
     if (!args.input) throw new ApolloError('Input information required');
     const user = await AuthService.registerUser(args.input);
 
-    const role = user.customers.find((customer) => customer.customer.id === args.input?.customerId)?.role;
-    const userToken = await AuthService.createToken({
-      email: user.email,
-      // role: role?.name || '',
-      permissions: role?.permissions.map((permission) => permission.name) || [],
-    });
+    // const role = user.find((customer) => customer.customer.id === args.input?.customerId)?.role;
+    // const userToken = await AuthService.createToken({
+    //   email: user.email,
+    //   // role: role?.name || '',
+    //   permissions: role?.permissions.map((permission) => permission.name) || [],
+    // });
 
-    return userToken;
+    // return userToken;
+    return {
+
+    } as any;
   },
 });
 
@@ -74,13 +78,15 @@ export const LoginMutation = mutationField('login', {
       password: args.input?.password,
     });
 
-    const permissions = [
-      user.isSuperAdmin ? 'SUPER_ADMIN' : '',
-    ];
+    prisma.role.findMany({
+      select: {
+
+      },
+    });
 
     const userToken = await AuthService.createToken({
       email: user.email,
-      permissions,
+      permissions: [],
     });
 
     return {
