@@ -11,7 +11,7 @@ import getUsersQuery from 'queries/getUserTable';
 
 import { Button } from '@chakra-ui/core';
 import { ErrorBoundary } from 'react-error-boundary';
-import { GenericCell } from 'components/Table/CellComponents/CellComponents';
+import { GenericCell, RoleCell } from 'components/Table/CellComponents/CellComponents';
 import { Plus } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 // import Row from './TableRow/UsersTableRow';
@@ -33,7 +33,7 @@ const HEADERS = [
   { Header: 'first_name', accessor: 'firstName', Cell: GenericCell },
   { Header: 'last_name', accessor: 'lastName', Cell: GenericCell },
   { Header: 'email', accessor: 'email', Cell: GenericCell },
-  { Header: 'role', accessor: 'role', Cell: GenericCell },
+  { Header: 'role', accessor: 'role', Cell: RoleCell },
 ];
 
 // const UserOptions = ({ onDeleteEntry }: { onDeleteEntry: () => void; }) => {
@@ -164,7 +164,10 @@ const UsersOverview = () => {
             <Button onClick={handleAddUser} leftIcon={Plus} variantColor="teal">{t('user:create_user')}</Button>
           </Div>
           <Div>
-            <SearchBar activeSearchTerm={paginationProps.activeSearchTerm} onSearchTermChange={handleSearchTermChange} />
+            <SearchBar
+              activeSearchTerm={paginationProps.activeSearchTerm}
+              onSearchTermChange={handleSearchTermChange}
+            />
           </Div>
         </Flex>
       </Div>
