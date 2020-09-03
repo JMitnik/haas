@@ -658,78 +658,102 @@ const language = {
   trigger: {
     conditions: {
       en: 'Conditions',
+      de: 'Bedingungen',
     },
     conditions_helper: {
       en: 'What are the conditions for sending out the trigger?',
+      de: 'Was sind die Bedingungen für das Aussenden des Triggers?',
     },
     name_helper: {
       en: 'What is the name of this trigger?',
+      de: 'Wie heißt dieser Alarm?',
     },
     dialogue: {
       en: 'Selected dialogue',
+      de: 'Ausgewählter Dialog',
     },
     dialogue_helper: {
-      en: 'To which dialogue will this trigger apply?',
+      en: 'For which dialogue will this trigger apply?',
+      de: 'Für welchen Dialog gilt dieser Alarm?',
     },
     type: {
       en: 'Type trigger',
+      de: 'Typ alarm',
     },
     type_helper: {
       en: 'What type of trigger is this?',
+      de: 'Was für ein alarm ist das?',
     },
     delivery: {
       en: 'Delivery',
+      de: 'Lieferung',
     },
     low_threshold: {
       en: 'Low Threshold',
+      de: 'Niedrige Schwelle',
     },
     low_threshold_helper: {
       en: 'Set a low threshold: if a score is recorded underneath, a trigger will be sent',
+      de: 'Legen Sie einen niedrigen Schwellenwert fest: Wenn darunter eine Punktzahl aufgezeichnet wird, wird ein Alarm gesendet',
     },
     high_threshold: {
       en: 'High Threshold',
+      de: 'Hoher Schwelle',
     },
     high_threshold_helper: {
       en: 'Set a top-threshold: if a score is recorded over, a trigger will be sent',
+      de: 'Festlegen eines oberen Schwellenwerts: Wenn eine Punktzahl aufgezeichnet wird, wird ein Alarm gesendet',
     },
     delivery_helper: {
       en: 'How will this trigger be delivered to the recipients (mail or SMS)?',
     },
     medium: {
       en: 'Delivery medium',
+      de: 'Wie wird dieser Alarm an die Empfänger übermittelt (Mail oder SMS)?',
     },
     medium_helper: {
       en: 'Which delivery method is preferred for this trigger? Note: additional costs may be incurred for SMS',
+      de: 'Welche Versandart wird für diesen Trigger bevorzugt? Hinweis: Für SMS können zusätzliche Kosten anfallen',
     },
     question: {
       en: 'Selected question',
+      de: 'Ausgewählte Frage',
     },
     question_helper: {
       en: 'Which question will the trigger be watching?',
+      de: 'Welche Frage wird der Auslöser beobachten?',
     },
     condition: {
       en: 'Condition type',
+      de: 'Konditionsart type',
     },
     condition_helper: {
       en: 'Which condition should apply to the trigger for this question to the currently selected question?',
+      de: 'Welche Bedingung sollte für den Auslöser für diese Frage für die aktuell ausgewählte Frage gelten?',
     },
     recipients: {
       en: 'Recipients',
+      de: 'Empfängers',
     },
     recipients_helper: {
       en: 'Who will receive these trigger alerts?',
+      de: 'Wer erhält diese Alarm-Warnungen?',
     },
     recipient: {
       en: 'Recipient',
+      de: 'Empfänger',
     },
     recipient_helper: {
       en: 'Select a registered user to be the receiver',
+      de: 'Wählen Sie einen registrierten Benutzer als Empfänger aus',
     },
     match_text: {
       en: 'Text to match',
+      de: 'Passender Text',
     },
     match_text_helper: {
       en: 'What text should be matched to trigger the alert?',
+      de: 'Welcher Text sollte übereinstimmen, um die Warnung auszulösen?',
     },
   },
 };
