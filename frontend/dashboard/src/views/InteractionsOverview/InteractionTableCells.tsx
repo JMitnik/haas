@@ -3,8 +3,6 @@ import { Div, Flex, Span, Text } from '@haas/ui';
 import { Icon } from '@chakra-ui/core';
 import { User } from 'react-feather';
 import { differenceInCalendarDays, format, formatDistance } from 'date-fns';
-import { maxBy } from 'lodash';
-import { useTranslation } from 'react-i18next';
 import React from 'react';
 import scoreToColors from 'utils/scoreToColors';
 
@@ -79,8 +77,6 @@ export const InteractionUserCell = ({ value }: CellProps) => (
 
 export const InteractionDateCell = ({ value }: { value: any }) => {
   const date = new Date(parseInt(value, 10));
-  // const currentDate = new Date();
-  // const dateDifference = differenceInCalendarDays(currentDate, date);
 
   const formattedDate = format(date, 'LLL d');
   const formattedTime = format(date, 'h:mm a');
@@ -95,32 +91,10 @@ export const InteractionDateCell = ({ value }: { value: any }) => {
   );
 };
 
-export const InteractionPathCell = ({ value: nodeEntries }: CellProps) => {
-  const { t } = useTranslation();
-  const potentialCTA = maxBy(nodeEntries, (entry: any) => entry.depth);
-
-  const getCTAType = (potentialCTA: any) => {
-    const { value: { textboxNodeEntry, linkNodeEntry, registrationNodeEntry } } = potentialCTA;
-    if (textboxNodeEntry) {
-      return 'Feedback';
-    }
-
-    if (linkNodeEntry) {
-      return 'Link';
-    }
-
-    if (registrationNodeEntry) {
-      return 'Register';
-    }
-
-    return 'No CTA';
-  };
-
-  return (
-    <Flex alignItems="center">
-      <Flex minWidth="195px" flexDirection="column">
-        <CompactEntriesPath nodeEntries={nodeEntries} />
-      </Flex>
+export const InteractionPathCell = ({ value: nodeEntries }: CellProps) => (
+  <Flex alignItems="center">
+    <Flex minWidth="195px" flexDirection="column">
+      <CompactEntriesPath nodeEntries={nodeEntries} />
     </Flex>
-  );
-};
+  </Flex>
+);

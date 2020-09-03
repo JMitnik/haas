@@ -2,7 +2,7 @@ import * as yup from 'yup';
 import { ApolloError } from 'apollo-boost';
 import { Button, ButtonGroup, FormErrorMessage, Stack, useToast } from '@chakra-ui/core';
 import { Container, Div, ErrorStyle, Flex, Form, FormContainer, FormControl, FormLabel,
-  FormSection, H2, H3, Hr, Input, InputGrid, InputHelper, Muted, PageTitle, Textarea } from '@haas/ui';
+  FormSection, H3, Hr, Input, InputGrid, InputHelper, Muted, PageTitle, Textarea } from '@haas/ui';
 import { Controller, useForm } from 'react-hook-form';
 import { Minus, Plus, Type } from 'react-feather';
 import { useHistory, useParams } from 'react-router';

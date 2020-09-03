@@ -1,7 +1,5 @@
-import { Button } from '@haas/ui';
 import { ReactComponent as ContextButtonSVG } from 'assets/icons/icon-more.svg';
 import { Menu, MenuButton, MenuList } from '@chakra-ui/core';
-import Dropdown from 'components/Dropdown';
 import React from 'react';
 import styled from 'styled-components/macro';
 

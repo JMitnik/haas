@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import styled from 'styled-components/macro';
 
-import { ReactComponent as ContextButtonSVG } from 'assets/icons/icon-more.svg';
-import { TableRowProps } from 'components/Table/TableTypes';
-import ContextButton from 'components/ContextButton';
-
 import { Button, Grid, Menu, MenuButton, MenuList } from '@chakra-ui/core';
+import { ReactComponent as ContextButtonSVG } from 'assets/icons/icon-more.svg';
 import { Div } from '@haas/ui';
+import { TableRowProps } from 'components/Table/TableTypes';
+
 import { ExpandedRowContainer, RowContainer } from './TableStyles';
 
 const TableOptionsContainer = styled(Div)`

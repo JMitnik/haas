@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Div, H4, Paragraph, Text } from '@haas/ui';
+import { Div, Text } from '@haas/ui';
 import { ReactComponent as InDevImage } from 'assets/images/undraw_dev.svg';
 import { useTranslation } from 'react-i18next';
 

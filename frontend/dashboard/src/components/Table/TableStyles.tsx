@@ -1,6 +1,5 @@
 import { ContextButtonContainer } from 'components/ContextButton/ContextButton';
 import { Div } from '@haas/ui';
-import ContextButton from 'components/ContextButton';
 import styled, { css } from 'styled-components';
 
 export const ExpandedRowContainer = styled(Div)``;
