@@ -1,5 +1,25 @@
 const language = {
   general: {
+    add_user: {
+      en: 'Add user',
+      de: 'Nutzer hinzufügen',
+    },
+    scheduled: {
+      en: 'Scheduled',
+      de: 'Geplant',
+    },
+    question: {
+      en: 'Question',
+      de: 'Frage',
+    },
+    both: {
+      en: 'Both',
+      de: 'Beide',
+    },
+    sms: {
+      en: 'Sms',
+      de: 'Sms',
+    },
     about: {
       en: 'About',
       de: 'Allgemeine informationen',
@@ -656,6 +676,34 @@ const language = {
     },
   },
   trigger: {
+    alert_email: {
+      en: 'Send alerts to emai',
+      de: 'Senden per E-Mail',
+    },
+    alert_sms: {
+      en: 'Send alerts via SMS',
+      de: 'Senden per SMS',
+    },
+    alert_both: {
+      en: 'Send alerts via all channels',
+      de: 'Senden über alle Kanäle',
+    },
+    trigger_schedulled_alarm: {
+      en: 'Send alerts at certain times (coming soon)',
+      de: 'Senden Sie Benachrichtigungen zu bestimmten Zeiten (in Kürze)',
+    },
+    my_first_trigger: {
+      en: 'My first trigger',
+      de: 'Mein erster Alarm',
+    },
+    trigger_question_alarm: {
+      en: 'Send alerts when a certain value has been reached',
+      de: 'Senden Sie Warnungen, wenn ein bestimmter Wert erreicht wurde',
+    },
+    select_dialogue_reminder: {
+      en: 'Please select a type and/or dialogue',
+      de: 'Bitte wählen Sie einen Typ und / oder Dialog',
+    },
     about_trigger: {
       en: 'About the trigger',
       de: 'Über alarm',
