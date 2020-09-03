@@ -9,19 +9,20 @@ import { Activity, Download } from 'react-feather';
 import { Button, Icon } from '@chakra-ui/core';
 import {
   getDialogueSessionConnection as CustomerSessionConnection,
+  getDialogueSessionConnection_customer_dialogue_sessionConnection_sessions_nodeEntries as NodeEntry,
 } from 'queries/__generated__/getDialogueSessionConnection';
-import { Div, PageTitle, Span } from '@haas/ui';
+import { Div, Flex, PageTitle, Span } from '@haas/ui';
 import { useTranslation } from 'react-i18next';
+
+import { QuestionNodeTypeEnum } from 'types/globalTypes';
 import DatePicker from 'components/DatePicker/DatePicker';
 import InteractionsTable from 'components/Table/Table';
 import SearchBar from 'components/SearchBar/SearchBar';
 import getDialogueSessionConnectionQuery from 'queries/getDialogueSessionConnectionQuery';
 
-import { InputContainer, InputOutputContainer,
-  InteractionsOverviewContainer, OutputContainer } from './InteractionOverviewStyles';
 import { InteractionCTACell, InteractionDateCell,
-  InteractionUserCell, ScoreCell } from './TableCell/TableCell';
-import Row from './TableRow/InteractionsTableRow';
+  InteractionUserCell, ScoreCell } from './InteractionTableCells';
+import { InteractionsOverviewContainer } from './InteractionOverviewStyles';
 
 interface TableProps {
   activeStartDate: Date | null;
@@ -41,6 +42,25 @@ const tableHeaders = [
   { Header: 'call_to_action', accessor: 'nodeEntries', Cell: InteractionCTACell },
   { Header: 'score', accessor: 'score', Cell: ScoreCell },
 ];
+
+const InteractionTableValue = ({ entry }: { entry: NodeEntry }) => {
+  switch (entry.relatedNode?.type) {
+    case QuestionNodeTypeEnum.SLIDER:
+      return <Div>{entry.value?.sliderNodeEntry}</Div>;
+
+    case QuestionNodeTypeEnum.CHOICE:
+      return <Div>{entry.value?.choiceNodeEntry}</Div>;
+
+    case QuestionNodeTypeEnum.REGISTRATION:
+      return <Div>{entry.value?.registrationNodeEntry}</Div>;
+
+    case QuestionNodeTypeEnum.TEXTBOX:
+      return <Div>{entry.value?.textboxNodeEntry}</Div>;
+
+    default:
+      return (<Div>N/A available</Div>);
+  }
+};
 
 const InteractionsOverview = () => {
   const { dialogueSlug, customerSlug } = useParams();
@@ -112,18 +132,17 @@ const InteractionsOverview = () => {
         <Icon as={Activity} mr={1} />
         {t('views:interactions_view')}
       </PageTitle>
-      <InputOutputContainer mb={4}>
-        <OutputContainer>
-          <Button
-            onClick={handleExportCSV}
-            leftIcon={Download}
-            size="sm"
-          >
-            <Span fontWeight="bold">{t('export_to_csv')}</Span>
-          </Button>
-        </OutputContainer>
 
-        <InputContainer>
+      <Flex mb={4} alignItems="center" justifyContent="space-between">
+        <Button
+          onClick={handleExportCSV}
+          leftIcon={Download}
+          size="sm"
+        >
+          <Span fontWeight="bold">{t('export_to_csv')}</Span>
+        </Button>
+
+        <Flex alignItems="center">
           <DatePicker
             activeStartDate={paginationProps.activeStartDate}
             activeEndDate={paginationProps.activeEndDate}
@@ -133,16 +152,14 @@ const InteractionsOverview = () => {
             activeSearchTerm={paginationProps.activeSearchTerm}
             onSearchTermChange={handleSearchTermChange}
           />
-        </InputContainer>
-
-      </InputOutputContainer>
+        </Flex>
+      </Flex>
       <InteractionsTable
         loading={loading}
         headers={tableHeaders}
         paginationProps={{ ...paginationProps, pageCount, pageIndex }}
         onPaginationChange={setPaginationProps}
         data={sessions}
-        CustomRow={Row}
       />
     </InteractionsOverviewContainer>
   );

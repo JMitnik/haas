@@ -80,6 +80,11 @@ export interface TableHeaderColumnProps {
   disableSorting?: boolean;
 }
 
+export interface TableCellProps {
+  renderCell?: React.FC<GenericCellProps>;
+  accessor: string;
+}
+
 export interface TableProps {
   activeStartDate: Date | null;
   activeEndDate: Date | null;
@@ -110,6 +115,7 @@ export interface TableRowProps {
   index: number;
   onDeleteEntry?: (event: any, userId: string) => void;
   onEditEntry?: (event: any, userId: string) => void;
+  renderExpandedRow?: React.ReactNode;
 }
 
 export interface UserRowProps {

@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 
-import { Grid } from '@haas/ui';
 import { TableRowProps } from 'components/Table/TableTypes';
 
-const TableRow = ({ headers, data, index }: TableRowProps) => {
+import { RowContainer } from './TableStyles';
+
+const TableRow = ({ headers, data, index, renderExpandedRow }: TableRowProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const nrCells = headers.length;
   const templateColumns = '1fr '.repeat(nrCells);
 
   return (
-    <Grid
-      px={4}
+    <RowContainer
       gridTemplateColumns={templateColumns}
       onClick={() => setIsExpanded(!isExpanded)}
     >
@@ -26,7 +26,8 @@ const TableRow = ({ headers, data, index }: TableRowProps) => {
         return null;
       })}
 
-    </Grid>
+      {isExpanded && renderExpandedRow}
+    </RowContainer>
   );
 };
 

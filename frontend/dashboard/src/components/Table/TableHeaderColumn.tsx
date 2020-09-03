@@ -27,6 +27,8 @@ const TableHeaderColumn = ({
     });
   };
 
+  const isInActiveSort = sortProperties && sortProperties[0].by === accessor && !disableSorting;
+
   return (
     <Div
       onClick={handleSort}
@@ -36,12 +38,13 @@ const TableHeaderColumn = ({
       borderRadius="10px 0 0 10px"
     >
       <Div display="inline-block">
-        <Text color="gray.600" fontSize="1.1rem" fontWeight="600">
+        <Text color={isInActiveSort ? 'gray.600' : 'gray.400'} fontSize="1.1rem" fontWeight="600">
           {t(Header)}
         </Text>
       </Div>
+
       <Span>
-        {(sortProperties && sortProperties[0].by === accessor && !disableSorting) ? (sortProperties[0].desc ? (
+        {(isInActiveSort && sortProperties) ? (sortProperties[0].desc ? (
           <Icon as={ChevronDown} />
         ) : (
           <Icon as={ChevronUp} />

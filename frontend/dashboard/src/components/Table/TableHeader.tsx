@@ -14,6 +14,7 @@ const TableHeader = ({ sortProperties, headers, onPaginationChange, onAddEntry, 
     <Grid
       borderRadius="10px 10px 0 0"
       py={2}
+      gridGap={0}
       px={4}
       position="relative"
       backgroundColor="gray.100"

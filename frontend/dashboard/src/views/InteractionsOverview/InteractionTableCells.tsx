@@ -114,11 +114,3 @@ export const InteractionCTACell = ({ value: nodeEntries }: CellProps) => {
     </Flex>
   );
 };
-
-export const CenterCell = ({ value }: CellProps) => (
-  <Flex alignItems="center">
-    <Div display="inline-block">
-      <Span fontSize="1.2em" fontWeight={900}>{value}</Span>
-    </Div>
-  </Flex>
-);
