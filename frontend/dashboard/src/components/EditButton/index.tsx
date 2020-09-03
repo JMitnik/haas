@@ -19,12 +19,18 @@ const EditButtonContainer = styled(Button)`
     color: ${theme.colors.default.darkest};
     min-width: 80px;
     display: flex;
+    
     ${!disabled && css`
       &:hover {
         transition: all 0.2s ease-in;
-      box-shadow: 0 1px 3px 1px rgba(0,0,0,0.2) !important;
+        box-shadow: 0 1px 3px 1px rgba(0,0,0,0.2) !important;
       }
     `}
+
+    ${disabled && css`
+      pointer-events: none;
+    `}
+
     svg {
         margin-right: 10px;
         color: ${theme.colors.default.darkest};
