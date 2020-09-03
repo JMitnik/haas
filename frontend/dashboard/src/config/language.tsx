@@ -16,6 +16,14 @@ const language = {
       en: 'Path',
       de: 'Pfad',
     },
+    server_down: {
+      en: 'Oops! There was a problem with the server.',
+      de: 'Hoppla! Es gab ein Problem mit dem Server.',
+    },
+    server_down_helper: {
+      en: 'Try again in a second while we take care of the problem',
+      de: 'Versuchen Sie es in einer Sekunde erneut, während wir uns um das Problem kümmern',
+    },
     add_user: {
       en: 'Add user',
       de: 'Nutzer hinzufügen',

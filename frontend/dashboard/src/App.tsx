@@ -32,10 +32,11 @@ import TriggersOverview from 'views/TriggerOverview/TriggerOverview';
 import UsersOverview from 'views/UsersOverview/UsersOverview';
 
 import { AnimatePresence } from 'framer-motion';
-import { ViewContainer } from '@haas/ui';
+import { Div, ViewContainer } from '@haas/ui';
 import AuthProvider from 'providers/AuthProvider';
 import CustomerRoute from 'components/Auth/CustomerRoute';
 import DialogueLayout from 'layouts/DialogueLayout';
+import FallbackServerError from 'components/FallbackServerError';
 import LoginPage from 'pages/login';
 import PreCustomerLayout from 'layouts/PreCustomerLayout';
 import client from 'config/apollo';
@@ -207,10 +208,9 @@ const AppRoutes = () => (
 );
 
 const GeneralErrorFallback = ({ error }: { error?: Error | undefined }) => (
-  <div>
-    Problem with connection, we will be back shortly!
-    {error?.message}
-  </div>
+  <Div minHeight="100vh" display="flex" alignItems="center">
+    <FallbackServerError />
+  </Div>
 );
 
 const App: FC = () => (
