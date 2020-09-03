@@ -1,7 +1,5 @@
 import { ApolloError } from 'apollo-client';
-import { Button, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger } from '@chakra-ui/core';
 import { Flex, Span } from '@haas/ui';
-import { X } from 'react-feather';
 import { useMutation } from '@apollo/react-hooks';
 import { useParams } from 'react-router';
 import React from 'react';
@@ -15,7 +13,6 @@ import { OverflowSpan, QuestionEntryContainer, QuestionEntryViewContainer } from
 import BuilderIcon from './BuilderIcon';
 import CTALabel from './CTALabel';
 import ConditionLabel from './ConditionLabel';
-import DeleteQuestionButton from './DeleteQuestionButton';
 import QuestionEntryForm from '../QuestionEntryForm/QuestionEntryForm';
 import ShowChildQuestion from './ShowChildQuestion';
 
@@ -110,8 +107,7 @@ const QuestionEntryItem = ({ depth,
             </Flex>
 
           </Flex>
-          {activeQuestion === question.id
-          && (
+          {activeQuestion === question.id && (
             <QuestionEntryForm
               onDeleteEntry={deleteQuestion}
               onAddExpandChange={onAddExpandChange}
@@ -141,6 +137,7 @@ const QuestionEntryItem = ({ depth,
       {question.id !== '-1' && (
         <ShowChildQuestion
           amtChildren={question?.children?.length || 0}
+          isDisabled={!!activeQuestion && activeQuestion !== question.id}
           isExpanded={isExpanded}
           onExpandChange={onExpandChange}
         />

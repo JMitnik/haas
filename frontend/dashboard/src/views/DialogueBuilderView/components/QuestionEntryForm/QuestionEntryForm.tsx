@@ -2,12 +2,14 @@
 
 import * as yup from 'yup';
 import { ApolloError } from 'apollo-client';
-import { Button, ButtonGroup, FormErrorMessage, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast } from '@chakra-ui/core';
+import { Button, ButtonGroup, FormErrorMessage, Popover, PopoverArrow,
+  PopoverBody, PopoverCloseButton, PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast } from '@chakra-ui/core';
 import { Controller, useForm } from 'react-hook-form';
 import { MinusCircle, PlusCircle, Trash } from 'react-feather';
 import { debounce } from 'lodash';
 import { useMutation } from '@apollo/react-hooks';
 import { useParams } from 'react-router';
+import { useTranslation } from 'react-i18next';
 import { yupResolver } from '@hookform/resolvers';
 import React, { useCallback, useEffect, useState } from 'react';
 import Select from 'react-select';
@@ -16,7 +18,7 @@ import {
   DeleteQuestionOptionButtonContainer,
 } from 'views/DialogueBuilderView/components/QuestionEntry/QuestionEntryStyles';
 import { Div, Flex, Form, FormContainer, FormControl, FormLabel,
-  FormSection, H3, H4, Hr, Input, InputGrid, InputHelper, Muted, Span } from '@haas/ui';
+  FormSection, H3, H4, Hr, Input, InputGrid, InputHelper, Muted, Span, Text } from '@haas/ui';
 import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
 import createQuestionMutation from 'mutations/createQuestion';
 import updateQuestionMutation from 'mutations/updateQuestion';
@@ -109,6 +111,8 @@ const QuestionEntryForm = ({
   onDeleteEntry,
 }: QuestionEntryFormProps) => {
   const { customerSlug, dialogueSlug } = useParams();
+
+  const { t } = useTranslation();
 
   const form = useForm<FormDataProps>({
     resolver: yupResolver(schema),
@@ -604,10 +608,10 @@ const QuestionEntryForm = ({
                   </PopoverTrigger>
                   <PopoverContent zIndex={4}>
                     <PopoverArrow />
-                    <PopoverHeader>Delete</PopoverHeader>
+                    <PopoverHeader>{t('delete')}</PopoverHeader>
                     <PopoverCloseButton />
                     <PopoverBody>
-                      <p>You are about to delete a question (and all its child questions). THIS ACTION IS IRREVERSIBLE! Are you sure?</p>
+                      <Text>{t('delete_question_popover')}</Text>
                     </PopoverBody>
                     <PopoverFooter>
                       <Button
@@ -615,8 +619,7 @@ const QuestionEntryForm = ({
                         variantColor="red"
                         onClick={() => onDeleteEntry && onDeleteEntry()}
                       >
-                        Delete
-
+                        {t('delete')}
                       </Button>
                     </PopoverFooter>
                   </PopoverContent>
