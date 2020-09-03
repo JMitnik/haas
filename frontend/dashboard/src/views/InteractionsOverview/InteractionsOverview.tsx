@@ -48,7 +48,6 @@ const tableHeaders = [
 
 const ExpandedInteractionRow = ({ data }: { data: Session }) => {
   const { t } = useTranslation();
-
   return (
     <Div mx={-4} useFlex flexDirection="column" backgroundColor="gray.100" gridColumn="1 / -1">
       <Div padding={25}>
