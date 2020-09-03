@@ -19,6 +19,10 @@ const DeleteQuestionButton = styled.button`
       height: 15px;
     }
 
+    ${disabled && css`
+      pointer-events: none;
+    `}
+
     ${!disabled && css`
       &:hover {
         transition: all 0.2s ease-in;

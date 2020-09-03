@@ -1,10 +1,9 @@
-import { Div, Flex, H4, Span, Text } from '@haas/ui';
+import { Div, Flex, Span, Text } from '@haas/ui';
 import { Icon } from '@chakra-ui/core';
 import { User } from 'react-feather';
 import { differenceInCalendarDays, format, formatDistance } from 'date-fns';
 import { maxBy } from 'lodash';
 import { useTranslation } from 'react-i18next';
-import DesktopIcon from 'components/Icons/DesktopIcon';
 import React from 'react';
 
 interface CellProps {

@@ -14,8 +14,6 @@ import Table from 'components/Table/Table';
 import deleteTriggerMutation from 'mutations/deleteTrigger';
 import getTriggerTableQuery from 'queries/getTriggerTable';
 
-import Row from './TableRow/TriggerOverviewRow';
-
 interface TableProps {
   activeStartDate: Date | null;
   activeEndDate: Date | null;
@@ -84,13 +82,13 @@ const TriggersOverview = () => {
     },
   });
 
-  const handleDeleteUser = (event: any, entryId: string) => {
+  const handleDeleteUser = (event: any, entryId: string, onComplete: (() => void) | undefined) => {
     event.stopPropagation();
     deleteTrigger({
       variables: {
         id: entryId,
       },
-    });
+    }).finally(() => onComplete && onComplete());
   };
 
   const handleEditEntry = (event: any, entryId: string) => {

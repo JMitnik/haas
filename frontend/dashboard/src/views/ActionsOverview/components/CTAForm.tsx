@@ -1,7 +1,8 @@
 import * as yup from 'yup';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ApolloError } from 'apollo-boost';
-import { Button, ButtonGroup, FormErrorMessage, useToast } from '@chakra-ui/core';
+import { ApolloError, ExecutionResult } from 'apollo-boost';
+import { Button, ButtonGroup, FormErrorMessage, Popover, PopoverArrow, PopoverBody, PopoverCloseButton,
+  PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast } from '@chakra-ui/core';
 import { Controller, useForm } from 'react-hook-form';
 import { PlusCircle, Trash, Type } from 'react-feather';
 import { cloneDeep, debounce } from 'lodash';
@@ -12,9 +13,10 @@ import React, { useCallback, useEffect, useState } from 'react';
 import Select from 'react-select';
 import cuid from 'cuid';
 
-import { Div, ErrorStyle, Flex, Form, FormContainer, FormControl,
-  FormLabel, FormSection, Grid, H3, H4, Hr, Input, InputGrid, InputHelper, Muted } from '@haas/ui';
+import { Div, ErrorStyle, Flex, Form, FormContainer,
+  FormControl, FormLabel, FormSection, Grid, H3, H4, Hr, Input, InputGrid, InputHelper, Muted, Span, Text } from '@haas/ui';
 import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
+import { useTranslation } from 'react-i18next';
 import LinkIcon from 'components/Icons/LinkIcon';
 import OpinionIcon from 'components/Icons/OpinionIcon';
 import RegisterIcon from 'components/Icons/RegisterIcon';
@@ -51,6 +53,7 @@ interface CTAFormProps {
   type: { label: string, value: string };
   onActiveCTAChange: React.Dispatch<React.SetStateAction<string | null>>;
   onNewCTAChange: React.Dispatch<React.SetStateAction<boolean>>;
+  onDeleteCTA: (onComplete: (() => void) | undefined) => void | Promise<ExecutionResult<any>>
 }
 
 const schema = yup.object().shape({
@@ -79,7 +82,7 @@ const LINK_TYPES = [
   { label: 'TWITTER', value: 'TWITTER' },
 ];
 
-const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: CTAFormProps) => {
+const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange, onDeleteCTA }: CTAFormProps) => {
   const { customerSlug, dialogueSlug } = useParams();
   const form = useForm<FormDataProps>({
     resolver: yupResolver(schema),
@@ -88,6 +91,8 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: 
       ctaType: type,
     },
   });
+
+  const { t } = useTranslation();
 
   const clonedLinks = cloneDeep(links);
   const [activeLinks, setActiveLinks] = useState<Array<LinkInputProps>>(clonedLinks);
@@ -436,7 +441,42 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange }: 
             </Button>
             <Button variant="ghost" onClick={() => cancelCTA()}>Cancel</Button>
           </ButtonGroup>
-          <Button variant="outline" variantColor="red" leftIcon={Trash}>Delete</Button>
+          <Span onClick={(e) => e.stopPropagation()}>
+            <Popover
+              usePortal
+            >
+              {({ onClose }) => (
+                <>
+                  <PopoverTrigger>
+                    <Button
+                      variant="outline"
+                      variantColor="red"
+                      leftIcon={Trash}
+                    >
+                      {t('delete')}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent zIndex={4}>
+                    <PopoverArrow />
+                    <PopoverHeader>{t('delete')}</PopoverHeader>
+                    <PopoverCloseButton />
+                    <PopoverBody>
+                      <Text>{t('delete_cta_popover')}</Text>
+                    </PopoverBody>
+                    <PopoverFooter>
+                      <Button
+                        variant="outline"
+                        variantColor="red"
+                        onClick={() => onDeleteCTA && onDeleteCTA(onClose)}
+                      >
+                        {t('delete')}
+                      </Button>
+                    </PopoverFooter>
+                  </PopoverContent>
+                </>
+              )}
+            </Popover>
+          </Span>
         </Flex>
       </Form>
     </FormContainer>

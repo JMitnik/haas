@@ -12,7 +12,7 @@ import {
   getDialogueSessionConnection_customer_dialogue_sessionConnection_sessions_nodeEntries as NodeEntry,
   getDialogueSessionConnection_customer_dialogue_sessionConnection_sessions as Session,
 } from 'queries/__generated__/getDialogueSessionConnection';
-import { Div, Flex, H4, H5, Hr, PageTitle, Span, Text } from '@haas/ui';
+import { Div, Flex, Hr, PageTitle, Span, Text } from '@haas/ui';
 import { useTranslation } from 'react-i18next';
 
 import { QuestionNodeTypeEnum } from 'types/globalTypes';
@@ -55,7 +55,7 @@ const ExpandedInteractionRow = ({ data }: { data: Session }) => {
         <Div marginBottom={10} useFlex flexDirection="column">
           <Div useFlex flexDirection="row">
             <Div width="51%">
-              <Text color="gray.400" fontSize="1.2rem" fontWeight="600">User data</Text>
+              <Text color="gray.400" fontSize="1.2rem" fontWeight="600">{t('interactions:user_data')}</Text>
               <Text color="gray.400" fontWeight="300">User information</Text>
             </Div>
             <Div width="49%" useFlex>

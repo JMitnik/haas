@@ -60,7 +60,7 @@ export interface TableInputProps {
   renderExpandedRowContainer?: (input: any) => React.ReactNode;
   permissions?: Array<any>;
   onPaginationChange: React.Dispatch<React.SetStateAction<TableProps>>;
-  onDeleteEntry?: (event: any, userId: string) => void;
+  onDeleteEntry?: (event: any, userId: string, onComplete: (() => void) | undefined) => void;
   onEditEntry?: (event: any, userId: string) => void;
   onAddEntry?: (event: any) => void;
   paginationProps: DataGridProps;
@@ -114,7 +114,7 @@ export interface TableRowProps {
   permissions?: Array<PermissionProps>;
   headers: Array<TableHeaderColumnProps>;
   index: number;
-  onDeleteEntry?: (event: any, userId: string) => void;
+  onDeleteEntry?: (event: any, userId: string, onComplete: (() => void) | undefined) => void;
   onEditEntry?: (event: any, userId: string) => void;
   renderExpandedRow?: React.ReactNode | undefined;
 }
@@ -122,7 +122,7 @@ export interface TableRowProps {
 export interface UserRowProps {
   data: CellComponentProps;
   permissions?: Array<PermissionProps>;
-  onDeleteEntry?: (event: any, userId: string) => void;
+  onDeleteEntry?: (event: any, userId: string, onComplete: (() => void) | undefined) => void;
   onEditEntry?: (event: any, userId: string) => void;
   headers: Array<TableHeaderColumnProps>;
   index: number;

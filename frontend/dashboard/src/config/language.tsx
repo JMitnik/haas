@@ -27,6 +27,22 @@ const language = {
       en: 'Date',
       de: 'Datum',
     },
+    delete: {
+      en: 'Delete',
+      de: 'Löschen',
+    },
+    delete_question_popover: {
+      en: 'You are about to delete a question (and all its child questions). Note: THIS ACTION IS IRREVERSIBLE! Are you sure?',
+    },
+    delete_cta_popover: {
+      en: 'You are about to delete a CTA. Note: THIS ACTION IS IRREVERSIBLE! Are you sure?',
+    },
+    delete_trigger_popover: {
+      en: 'You are about to delete a trigger. Note: THIS ACTION IS IRREVERSIBLE! Are you sure?',
+    },
+    delete_user_popover: {
+      en: 'You are about to delete a User. Note: THIS ACTION IS IRREVERSIBLE! Are you sure?',
+    },
     create_trigger: {
       en: 'Create trigger',
       de: 'Alarm erstellen',
@@ -325,7 +341,10 @@ const language = {
     },
   },
   interaction: {
-
+    user_data: {
+      en: 'User data',
+      de: 'Benutzerdaten',
+    },
   },
   toast: {
     locale_switch: {

@@ -90,12 +90,12 @@ const UsersOverview = () => {
     },
   });
 
-  const handleDeleteUser = (event: any, userId: string) => {
+  const handleDeleteUser = (event: any, userId: string, onComplete: (() => void) | undefined) => {
     deleteUser({
       variables: {
         id: userId,
       },
-    });
+    }).finally(() => onComplete && onComplete());
   };
 
   const handleEditUser = (event: any, userId: string) => {
