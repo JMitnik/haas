@@ -44,12 +44,22 @@ const DialogueOverview = ({ dialogues }: { dialogues: any, isLoading: boolean })
               isSearching={isSearching}
             />
           </Div>
-          <ButtonGroup>
-            <Button onClick={() => setUseDialogueGridView(true)} variantColor={useDialogueGridView ? 'blue' : 'gray'} leftIcon={GridIcon}>
-              Grid
+          <ButtonGroup display="flex" alignItems="center">
+            <Button
+              size="sm"
+              onClick={() => setUseDialogueGridView(true)}
+              variantColor={useDialogueGridView ? 'blue' : 'gray'}
+              leftIcon={GridIcon}
+            >
+              {t('grid')}
             </Button>
-            <Button onClick={() => setUseDialogueGridView(false)} variantColor={useDialogueGridView ? 'gray' : 'blue'} leftIcon={List}>
-              List
+            <Button
+              size="sm"
+              onClick={() => setUseDialogueGridView(false)}
+              variantColor={useDialogueGridView ? 'gray' : 'blue'}
+              leftIcon={List}
+            >
+              {t('list')}
             </Button>
           </ButtonGroup>
         </Flex>
@@ -75,7 +85,7 @@ const DialogueOverview = ({ dialogues }: { dialogues: any, isLoading: boolean })
                 <Plus strokeWidth="3px" />
               </TranslatedPlus>
               <H4 color="default.dark">
-                Create a dialogue
+                {t('create_dialogue')}
               </H4>
             </Flex>
           </AddDialogueCard>

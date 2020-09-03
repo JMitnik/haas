@@ -2,10 +2,75 @@ const language = {
   general: {
     about: {
       en: 'About',
+      de: 'Allgemeine informationen',
+    },
+    logo: {
+      en: 'Logo',
+      de: 'Logo',
+    },
+    grid: {
+      en: 'Grid',
+      de: 'Raster',
+    },
+    list: {
+      en: 'List',
+      de: 'Liste',
     },
     start: {
       en: 'Start',
       de: 'Anfang',
+    },
+    actions: {
+      en: 'Actions',
+      de: 'Aktionen',
+    },
+    stay_tuned: {
+      en: 'Stay tuned',
+      de: 'Bleib dabei',
+    },
+    projects: {
+      en: 'Projects',
+      de: 'Projekte',
+    },
+    existing_url: {
+      en: 'Existing URL',
+      de: 'Existierende URL',
+    },
+    existing_url_helper: {
+      en: 'Insert existing URL',
+      de: 'Füge neueu URL hinzu',
+    },
+    upload_file: {
+      en: 'Upload file',
+      de: 'Date hochladen',
+    },
+    upload_file_helper: {
+      en: 'Upload a file',
+      de: 'Wähle eine Datei aus',
+    },
+    logo_existing_url: {
+      en: 'Logo: existing URL',
+      de: 'Logo: vorhandene URL',
+    },
+    logo_existing_url_helper: {
+      en: 'Use the URL of an existing logo. We recommend one with no background-colors.',
+      de: 'Verwenden Sie die URL eines vorhandenen Logos. Wir empfehlen eine ohne Hintergrundfarben.',
+    },
+    logo_upload: {
+      en: 'Logo: Drag and Drop',
+      de: 'Logo: Drag and Drop',
+    },
+    logo_upload_helper: {
+      en: 'Upload a logo (preferably SVG or PNG).',
+      de: 'Lade ein Logo hoch. Am besten als SVG oder PNG',
+    },
+    active_projects: {
+      en: 'Active projects',
+      de: 'Aktuelle Partner',
+    },
+    stay_tuned_helper: {
+      en: 'A new feature is coming soon',
+      de: 'Bald kommen neue Funktionen',
     },
     end: {
       en: 'End',
@@ -30,6 +95,10 @@ const language = {
     depth: {
       en: 'Depth',
       de: 'Tiefe',
+    },
+    role: {
+      en: 'Role',
+      de: 'Rolle',
     },
     min_value: {
       en: 'Minimal value',
@@ -62,6 +131,14 @@ const language = {
     none: {
       en: 'None',
       de: 'Keiner',
+    },
+    visit: {
+      en: 'Visit',
+      de: 'Besuchen',
+    },
+    delete_customer_popover: {
+      en: 'You are about to delete a customer (and all its child questions). Note: THIS ACTION IS IRREVERSIBLE! Are you sure?',
+      de: 'Du bist dabei eine Project zu löschen. Dies kann nicht rückgängig gemacht werden! Bist du dir sicher?',
     },
     delete_question_popover: {
       en: 'You are about to delete a question (and all its child questions). Note: THIS ACTION IS IRREVERSIBLE! Are you sure?',
@@ -98,6 +175,10 @@ const language = {
     call_to_action: {
       en: 'Call to action',
       de: 'Call to action',
+    },
+    create_dialogue: {
+      en: 'Create dialogue',
+      de: 'Erstelle dialog',
     },
     dialogues: {
       en: 'Dialogues',
@@ -225,6 +306,10 @@ const language = {
     phone: {
       en: 'Phone number',
     },
+    last_updated: {
+      en: 'Last update {{date}} ago',
+      de: 'Letzes update vor {{date}}',
+    },
     phone_helper: {
       en: 'What is the user\'s phone number? (Note: Start with country code, e.g. +316123456)',
     },
@@ -248,20 +333,33 @@ const language = {
     },
   },
   customer: {
+    logo_helper: {
+      en: 'Switch between uploading your own logo or inserting the url of an existing one',
+      de: 'Lade dein Logo hoch oder verweise mit einer URL',
+    },
+    create_customer: {
+      en: 'Create customer',
+      de: 'Project erstellen',
+    },
     about_helper: {
       en: 'Please tell us a bit about the business, such as under which name and URL we can find it.',
+      de: 'Erzähle uns etwas zu deinem Unternehmen',
     },
     branding_color_helper: {
       en: 'What is the main brand color of the company?',
+      de: 'Was ist die Hauptfarbe deines Unternehmens?',
     },
     branding_helper: {
       en: 'Describe the branding of your company, including logo and color',
+      de: 'Beschreibe die Marke deiner Firma',
     },
     name_helper: {
       en: 'What is the name of the business?',
+      de: 'Wie heißt dein Unternehmen?',
     },
     slug_helper: {
       en: 'Under which url segment will visitors find the business?',
+      de: 'Unter welcher URL Erganzüng sollen Besucher dich finden?',
     },
     use_template: {
       en: 'Use template',
@@ -286,11 +384,17 @@ const language = {
     },
   },
   views: {
+    add_dialogue_view: {
+      en: 'Add dialogue',
+      de: 'Neuer Dialog',
+    },
     edit_dialogue_view: {
       en: 'Edit dialogue',
+      de: 'Ändere Dialog',
     },
     edit_trigger_view: {
       en: 'Edit trigger',
+      de: 'Ändere alarm',
     },
     dialogue_view: {
       en: 'Overview',
@@ -316,8 +420,23 @@ const language = {
       en: 'Triggers',
       de: 'Alarms',
     },
+    edit_business_settings_view: {
+      en: 'Edit business settings',
+      de: 'Ändere Businesseinstellungen',
+    },
     create_trigger_view: {
       en: 'Create trigger',
+      de: 'Neuer alarm',
+    },
+    users_overview: {
+      en: 'Users and roles',
+      de: 'User und Rollen',
+    },
+  },
+  user: {
+    create_user: {
+      en: 'Create user',
+      de: 'User erstellen',
     },
   },
   dialogue: {

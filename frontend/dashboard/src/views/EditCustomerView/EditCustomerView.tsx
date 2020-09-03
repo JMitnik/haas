@@ -15,6 +15,7 @@ import CustomerForm from 'components/CustomerForm';
 import booleanToNumber from 'utils/booleanToNumber';
 import parseOptionalBoolean from 'utils/parseOptionalBoolean';
 
+import { useTranslation } from 'react-i18next';
 import editCustomerMutation from '../../mutations/editCustomer';
 import getCustomerQuery from '../../queries/getCustomersQuery';
 import getEditCustomerData from '../../queries/getEditCustomer';
@@ -60,6 +61,8 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
   const { customerSlug } = useParams();
   const history = useHistory();
   const { setActiveCustomer } = useCustomer();
+  const { t } = useTranslation();
+  const toast = useToast();
 
   const form = useForm<FormDataProps>({
     resolver: yupResolver(schema),
@@ -72,10 +75,6 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
     },
     mode: 'onBlur',
   });
-
-  console.log(form.formState.isValid);
-
-  const toast = useToast();
 
   const [editCustomer, { loading: isLoading, error: serverErrors }] = useMutation(editCustomerMutation, {
     onCompleted: (result: any) => {
@@ -141,7 +140,7 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
 
   return (
     <>
-      <PageTitle>Edit business settings</PageTitle>
+      <PageTitle>{t('views:edit_business_settings_view')}</PageTitle>
       <motion.div initial={{ opacity: 0, y: 100 }} animate={{ opacity: 1, y: 0 }}>
         <FormContainer>
           <CustomerForm

@@ -24,6 +24,7 @@ const Table = ({
   hidePagination,
   disableSorting,
   renderExpandedRowContainer,
+  renderOptions,
 }: TableInputProps) => {
   const { t } = useTranslation();
 
@@ -43,7 +44,7 @@ const Table = ({
         disableSorting={disableSorting}
       />
 
-      <Div py={1}>
+      <Div>
         {data && data.map((dataEntry, index) => (
           CustomRow ? (
             <CustomRow
@@ -63,6 +64,7 @@ const Table = ({
               data={dataEntry}
               key={index}
               renderExpandedRow={renderExpandedRowContainer && renderExpandedRowContainer(dataEntry)}
+              renderOptions={renderOptions}
               index={index}
             />
           )

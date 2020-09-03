@@ -2,7 +2,7 @@ import * as yup from 'yup';
 import { ApolloError } from 'apollo-boost';
 import { Button, ButtonGroup, FormErrorMessage, Stack, useToast } from '@chakra-ui/core';
 import { Container, Div, ErrorStyle, Flex, Form, FormContainer, FormControl, FormLabel,
-  FormSection, H2, H3, Hr, Input, InputGrid, InputHelper, Muted, Textarea } from '@haas/ui';
+  FormSection, H2, H3, Hr, Input, InputGrid, InputHelper, Muted, PageTitle, Textarea } from '@haas/ui';
 import { Controller, useForm } from 'react-hook-form';
 import { Minus, Plus, Type } from 'react-feather';
 import { useHistory, useParams } from 'react-router';
@@ -173,12 +173,9 @@ const AddDialogueView = () => {
 
   return (
     <Container>
+      <PageTitle>{t('views:add_dialogue_view')}</PageTitle>
 
-      <Div>
-        <H2 color="gray.700" mb={4} py={2}>Add dialogue</H2>
-      </Div>
       <motion.div initial={{ opacity: 0, y: 100 }} animate={{ opacity: 1, y: 0 }}>
-
         <FormContainer>
           <Form onSubmit={form.handleSubmit(onSubmit)}>
             <ServerError serverError={serverError} />

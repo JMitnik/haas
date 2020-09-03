@@ -49,7 +49,7 @@ const tableHeaders = [
 const ExpandedInteractionRow = ({ data }: { data: Session }) => {
   const { t } = useTranslation();
   return (
-    <Div mx={-4} useFlex flexDirection="column" backgroundColor="gray.100" gridColumn="1 / -1">
+    <Div useFlex flexDirection="column" backgroundColor="gray.100" gridColumn="1 / -1">
       <Div padding={25}>
         <Div marginBottom={10} useFlex flexDirection="column">
           <Div useFlex flexDirection="row">
@@ -236,11 +236,7 @@ const InteractionsOverview = () => {
         paginationProps={{ ...paginationProps, pageCount, pageIndex }}
         onPaginationChange={setPaginationProps}
         data={sessions}
-        renderExpandedRowContainer={(input) => (
-          <>
-            <ExpandedInteractionRow data={input} />
-          </>
-        )}
+        renderExpandedRowContainer={(input) => <ExpandedInteractionRow data={input} />}
       />
     </InteractionsOverviewContainer>
   );
