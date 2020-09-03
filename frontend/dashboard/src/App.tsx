@@ -1,8 +1,8 @@
-import { ApolloProvider } from '@apollo/react-hooks';
+import { ApolloProvider, useLazyQuery } from '@apollo/react-hooks';
 import { ErrorBoundary } from 'react-error-boundary';
 import { I18nextProvider, useTranslation } from 'react-i18next';
-import { Redirect, Route, RouteProps, BrowserRouter as Router, Switch } from 'react-router-dom';
-import React, { FC } from 'react';
+import { Redirect, Route, RouteProps, BrowserRouter as Router, Switch, useParams } from 'react-router-dom';
+import React, { FC, useEffect } from 'react';
 
 import { AppContainer } from 'styles/AppStyles';
 import ActionsPage from 'pages/dashboard/actions';
@@ -12,7 +12,7 @@ import AddTriggerView from 'views/TriggerOverview/AddTriggerView';
 import AddUserView from 'views/UsersOverview/AddUserView';
 import AnalyticsPage from 'pages/dashboard/analytics';
 import CustomerPage from 'pages/dashboard/customer';
-import CustomerProvider from 'providers/CustomerProvider';
+import CustomerProvider, { useCustomer } from 'providers/CustomerProvider';
 import CustomersPage from 'pages/dashboard/customers';
 import DashboardLayout from 'layouts/DashboardLayout';
 import DashboardPage from 'pages/dashboard';
@@ -29,6 +29,7 @@ import RolesOverview from 'views/RolesOverview/RolesOverview';
 import ThemesProvider from 'providers/ThemeProvider';
 import TriggersOverview from 'views/TriggerOverview/TriggerOverview';
 import UsersOverview from 'views/UsersOverview/UsersOverview';
+import getCustomerQuery from 'queries/getEditCustomer';
 
 import { AnimatePresence } from 'framer-motion';
 import { ViewContainer } from '@haas/ui';
@@ -45,6 +46,34 @@ const ProtectedRoute = (props: RouteProps) => {
   // Note-Login: Uncomment this for login
   // if (!user) return <Redirect to="/login" />;
 
+  return (
+    <Route {...props} />
+  );
+};
+
+const CustomerRoute = (props: RouteProps) => {
+  const { customerSlug } = useParams();
+  const { storageCustomer, setActiveCustomer, setStorageCustomer } = useCustomer();
+  const storageSlug = storageCustomer && storageCustomer?.slug;
+
+  const [fetchCustomer, { loading }] = useLazyQuery(getCustomerQuery, {
+    onCompleted: (result: any) => {
+      console.log('result: ', result);
+      setActiveCustomer(result?.customer);
+      setStorageCustomer(result?.customer);
+    },
+  });
+
+  useEffect(() => {
+    if ((customerSlug && storageSlug) && customerSlug !== storageSlug) {
+      console.log('should update theme here');
+      fetchCustomer({
+        variables: {
+          customerSlug,
+        },
+      });
+    }
+  }, [customerSlug, storageSlug]);
   return (
     <Route {...props} />
   );
@@ -102,7 +131,7 @@ const AppRoutes = () => (
                   </DialogueLayout>
                 )}
               />
-              <Route
+              <CustomerRoute
                 path="/dashboard/b/:customerSlug"
                 render={() => (
                   <ViewContainer>
