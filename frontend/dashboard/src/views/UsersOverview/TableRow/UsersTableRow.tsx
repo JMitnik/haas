@@ -2,11 +2,10 @@ import { Edit, X } from 'react-feather';
 import { ErrorBoundary } from 'react-error-boundary';
 import React, { useState } from 'react';
 
-import { Button, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger } from '@chakra-ui/core';
+import { Button, Popover, PopoverArrow,
+  PopoverBody, PopoverCloseButton, PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger } from '@chakra-ui/core';
 import { DeleteButtonContainer, Div, EditButtonContainer, Grid, Span } from '@haas/ui';
 import { UserRowProps } from 'components/Table/TableTypes';
-import { id } from 'date-fns/locale';
-import DeleteCTAButton from 'views/ActionsOverview/components/DeleteCTAButton';
 
 const UsersTableRow = ({ headers, data, index, onDeleteEntry, onEditEntry }: UserRowProps) => {
   const [isExpanded, setIsExpanded] = useState(false);

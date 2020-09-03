@@ -1,7 +1,8 @@
-import { Edit3, X } from 'react-feather';
+import { Edit3 } from 'react-feather';
 import { motion } from 'framer-motion';
 import { useMutation } from '@apollo/react-hooks';
 import { useParams } from 'react-router-dom';
+import { useToast } from '@chakra-ui/core';
 import React from 'react';
 import styled, { css } from 'styled-components/macro';
 
@@ -9,11 +10,8 @@ import { Flex, Span } from '@haas/ui';
 import deleteCTAMutation from 'mutations/deleteCTA';
 import getCTANodesQuery from 'queries/getCTANodes';
 
-import { Button, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast } from '@chakra-ui/core';
 import CTAForm from './CTAForm';
 import CTAIcon from './CTAIcon';
-import DeleteCTAButton from './DeleteCTAButton';
-import DeleteQuestionButton from 'views/DialogueBuilderView/components/QuestionEntry/DeleteQuestionButton';
 import EditCTAButton from './EditCTAButton';
 
 interface LinkInputProps {

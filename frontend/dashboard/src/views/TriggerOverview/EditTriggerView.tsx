@@ -1,6 +1,5 @@
 /* eslint-disable radix */
 import * as yup from 'yup';
-import { ApolloError } from 'apollo-client';
 import { FormContainer, PageTitle } from '@haas/ui';
 import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';

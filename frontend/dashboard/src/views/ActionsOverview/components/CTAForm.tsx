@@ -1,9 +1,10 @@
 import * as yup from 'yup';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ApolloError, ExecutionResult } from 'apollo-boost';
-import { Button, ButtonGroup, FormErrorMessage, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast } from '@chakra-ui/core';
+import { Button, ButtonGroup, FormErrorMessage, Popover, PopoverArrow, PopoverBody, PopoverCloseButton,
+  PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast } from '@chakra-ui/core';
 import { Controller, useForm } from 'react-hook-form';
-import { PlusCircle, Trash, Type, X } from 'react-feather';
+import { PlusCircle, Trash, Type } from 'react-feather';
 import { cloneDeep, debounce } from 'lodash';
 import { useMutation } from '@apollo/react-hooks';
 import { useParams } from 'react-router-dom';
@@ -12,7 +13,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import Select from 'react-select';
 import cuid from 'cuid';
 
-import { DeleteButtonContainer, Div, ErrorStyle, Flex, Form, FormContainer,
+import { Div, ErrorStyle, Flex, Form, FormContainer,
   FormControl, FormLabel, FormSection, Grid, H3, H4, Hr, Input, InputGrid, InputHelper, Muted, Span } from '@haas/ui';
 import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
 import LinkIcon from 'components/Icons/LinkIcon';

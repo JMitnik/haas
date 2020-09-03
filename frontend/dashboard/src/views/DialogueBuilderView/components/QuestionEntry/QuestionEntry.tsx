@@ -1,6 +1,5 @@
 import { ApolloError } from 'apollo-client';
 import { Flex, Span } from '@haas/ui';
-import { X } from 'react-feather';
 import { useMutation } from '@apollo/react-hooks';
 import { useParams } from 'react-router';
 import React from 'react';
@@ -14,7 +13,6 @@ import { OverflowSpan, QuestionEntryContainer, QuestionEntryViewContainer } from
 import BuilderIcon from './BuilderIcon';
 import CTALabel from './CTALabel';
 import ConditionLabel from './ConditionLabel';
-import DeleteQuestionButton from './DeleteQuestionButton';
 import QuestionEntryForm from '../QuestionEntryForm/QuestionEntryForm';
 import ShowChildQuestion from './ShowChildQuestion';
 
