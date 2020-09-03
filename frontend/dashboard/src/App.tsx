@@ -2,6 +2,7 @@ import { ApolloProvider } from '@apollo/react-hooks';
 import { ErrorBoundary } from 'react-error-boundary';
 import { I18nextProvider, useTranslation } from 'react-i18next';
 import { Redirect, Route, RouteProps, BrowserRouter as Router, Switch } from 'react-router-dom';
+import CustomerProvider from 'providers/CustomerProvider';
 import React, { FC } from 'react';
 
 import { AppContainer } from 'styles/AppStyles';
@@ -12,7 +13,7 @@ import AddTriggerView from 'views/TriggerOverview/AddTriggerView';
 import AddUserView from 'views/UsersOverview/AddUserView';
 import AnalyticsPage from 'pages/dashboard/analytics';
 import CustomerPage from 'pages/dashboard/customer';
-import CustomerProvider from 'providers/CustomerProvider';
+
 import CustomersPage from 'pages/dashboard/customers';
 import DashboardLayout from 'layouts/DashboardLayout';
 import DashboardPage from 'pages/dashboard';
@@ -33,6 +34,7 @@ import UsersOverview from 'views/UsersOverview/UsersOverview';
 import { AnimatePresence } from 'framer-motion';
 import { ViewContainer } from '@haas/ui';
 import AuthProvider from 'providers/AuthProvider';
+import CustomerRoute from 'components/Auth/CustomerRoute';
 import DialogueLayout from 'layouts/DialogueLayout';
 import LoginPage from 'pages/login';
 import PreCustomerLayout from 'layouts/PreCustomerLayout';
@@ -68,7 +70,7 @@ const AppRoutes = () => (
         <AnimatePresence>
           <DashboardLayout>
             <Switch>
-              <Route
+              <CustomerRoute
                 path="/dashboard/b/:customerSlug/d/:dialogueSlug"
                 render={() => (
                   <DialogueLayout>
@@ -102,7 +104,8 @@ const AppRoutes = () => (
                   </DialogueLayout>
                 )}
               />
-              <Route
+
+              <CustomerRoute
                 path="/dashboard/b/:customerSlug"
                 render={() => (
                   <ViewContainer>
