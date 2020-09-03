@@ -56,9 +56,8 @@ const CustomerRoute = (props: RouteProps) => {
   const { storageCustomer, setActiveCustomer, setStorageCustomer } = useCustomer();
   const storageSlug = storageCustomer && storageCustomer?.slug;
 
-  const [fetchCustomer, { loading }] = useLazyQuery(getCustomerQuery, {
+  const [fetchCustomer] = useLazyQuery(getCustomerQuery, {
     onCompleted: (result: any) => {
-      console.log('result: ', result);
       setActiveCustomer(result?.customer);
       setStorageCustomer(result?.customer);
     },
@@ -66,7 +65,6 @@ const CustomerRoute = (props: RouteProps) => {
 
   useEffect(() => {
     if ((customerSlug && storageSlug) && customerSlug !== storageSlug) {
-      console.log('should update theme here');
       fetchCustomer({
         variables: {
           customerSlug,
@@ -97,7 +95,7 @@ const AppRoutes = () => (
         <AnimatePresence>
           <DashboardLayout>
             <Switch>
-              <Route
+              <CustomerRoute
                 path="/dashboard/b/:customerSlug/d/:dialogueSlug"
                 render={() => (
                   <DialogueLayout>
