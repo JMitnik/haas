@@ -142,9 +142,6 @@ const CustomerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = 
   const history = useHistory();
   const { t } = useTranslation();
 
-  console.log(form.formState.isValid);
-  console.log(form.errors);
-
   return (
     <Form onSubmit={form.handleSubmit(onFormSubmit)}>
       <ServerError serverError={serverErrors} />
@@ -255,9 +252,9 @@ const CustomerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = 
           variantColor="teal"
           type="submit"
         >
-          {isInEdit ? 'Edit' : 'Create'}
+          {isInEdit ? t('edit') : t('create')}
         </Button>
-        <Button variant="outline" onClick={() => history.push('/')}>Cancel</Button>
+        <Button variant="outline" onClick={() => history.push('/')}>{t('cancel')}</Button>
       </ButtonGroup>
     </Form>
   );

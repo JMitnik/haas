@@ -1,5 +1,6 @@
 import { Spinner } from '@chakra-ui/core';
 import { useDropzone } from 'react-dropzone';
+import { useTranslation } from 'react-i18next';
 import React from 'react';
 import styled from 'styled-components/macro';
 
@@ -49,6 +50,8 @@ const FileDropInput = (props: any) => {
 
   const acceptedFile = acceptedFiles?.[0] || undefined;
 
+  const { t } = useTranslation();
+
   return (
     <section className="container">
       <DropContainer {...getRootProps({ isDragActive, isDragAccept, isDragReject })}>
@@ -68,7 +71,7 @@ const FileDropInput = (props: any) => {
                 bytes
               </p>
             ) : (
-              <p>Drag the logo here, or click to select it</p>
+              <p>{t('upload_zone')}</p>
             )}
           </>
         )}

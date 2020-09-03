@@ -12,6 +12,18 @@ const language = {
       en: 'Grid',
       de: 'Raster',
     },
+    create: {
+      en: 'Create',
+      de: 'Erstellen',
+    },
+    cancel: {
+      en: 'Cancel',
+      de: 'Abbrechen',
+    },
+    upload_zone: {
+      en: 'Drag the logo here, or click here to upload',
+      de: 'Ziehe dein Logo hierhin oder klicke um eins auszuwählen',
+    },
     list: {
       en: 'List',
       de: 'Liste',
