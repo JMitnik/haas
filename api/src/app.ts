@@ -18,11 +18,6 @@ const main = async () => {
 
   const apollo = await makeApollo();
   const app = express();
-
-  process.on('SIGINT', () => {
-
-  });
-
   const corsOptions: CorsOptions = {
     // Hardcoded for the moment
     origin: (origin, callback) => {
@@ -47,6 +42,7 @@ const main = async () => {
 };
 
 try {
+  console.log('Starting app');
   main();
 } catch (e) {
   console.log(e);

@@ -3,6 +3,7 @@ import { differenceInCalendarDays, format, formatDistance } from 'date-fns';
 import { maxBy } from 'lodash';
 import DesktopIcon from 'components/Icons/DesktopIcon';
 import React from 'react';
+import scoreToColors from 'utils/scoreToColors';
 
 interface CellProps {
   value: any;
@@ -29,14 +30,8 @@ export const WhenCell = ({ value }: { value: any }) => {
   );
 };
 
-const getBadgeBackgroundColour = (value: number) => {
-  if (value >= 70) return { background: '#58D173', color: 'white' };
-  if (value > 50 && value < 70) return { background: '#ffa500', color: 'white' };
-  return { background: '#FF3A3A', color: 'white' };
-};
-
 export const ScoreCell = ({ value }: CellProps) => {
-  const { background, color } = getBadgeBackgroundColour(value);
+  const { background, color } = scoreToColors(value);
   const decimalScore = (value) ? (value / 10).toFixed(1) : value;
   return (
     <Flex alignItems="center" justifyContent="center">
