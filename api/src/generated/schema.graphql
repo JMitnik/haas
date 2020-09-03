@@ -605,6 +605,7 @@ type UserTable {
 }
 
 type UserType {
+  customers: [Customer!]!
   email: String!
   firstName: String
   id: ID!

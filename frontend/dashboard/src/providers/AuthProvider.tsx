@@ -42,10 +42,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   });
 
   const [user, setUser] = useState(() => {
-    if (authStorage) {
-      const authData = JSON.parse(authStorage);
-      return authData.user;
-    }
+    if (authStorage) return authStorage?.user;
 
     return null;
   });
@@ -56,7 +53,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     if (loginData) {
-      setAuthStorage(JSON.stringify(loginData.login));
+      setAuthStorage(loginData.login);
       setUser(loginData.login.user);
     }
   }, [loginData, setUser, setAuthStorage]);

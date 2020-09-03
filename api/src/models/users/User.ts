@@ -1,6 +1,7 @@
 import { extendType, inputObjectType, objectType } from '@nexus/schema';
 
 import { UserInputError } from 'apollo-server-express';
+import { DialogueType } from '../questionnaire/Dialogue';
 import { PaginationWhereInput } from '../general/Pagination';
 import { RoleType } from '../role/Role';
 import UserService from './UserService';
@@ -13,6 +14,27 @@ export const UserType = objectType({
     t.string('phone', { nullable: true });
     t.string('firstName', { nullable: true });
     t.string('lastName', { nullable: true });
+
+    t.list.field('customers', {
+      type: 'Customer',
+
+      async resolve(parent, args, ctx) {
+        const userWithCustomers = await ctx.prisma.user.findOne({
+          where: { id: parent.id },
+          include: {
+            customers: {
+              include: {
+                customer: true,
+              },
+            },
+          },
+        });
+
+        const customers = userWithCustomers?.customers.map((customerOfUser) => customerOfUser.customer);
+
+        return customers || [];
+      },
+    });
 
     t.string('roleId', { nullable: true });
     t.field('role', {
@@ -32,7 +54,10 @@ export const UserType = objectType({
           },
         });
 
-        const userCustomer = userWithRole?.customers.find((cus) => cus.customer.slug === info.variableValues.customerSlug);
+        const userCustomer = userWithRole?.customers.find((cus) => (
+          cus.customer.slug === info.variableValues.customerSlug
+        ));
+
         const role = userCustomer?.role || null;
 
         return role;
@@ -84,16 +109,6 @@ export const UserQueries = extendType({
           args.filter?.orderBy?.[0],
           args.filter?.searchTerm,
         );
-
-        // const users = await ctx.prisma.user.findMany({ where: { Customer: {
-        //   slug: args.customerSlug,
-        // } } });
-
-        // TODO: Return this
-        // const totalPages = Math.ceil(users.length / (args.filter?.limit || 1));
-        // const totalPages = 1;
-
-        // return { users, pageIndex, totalPages };
       },
     });
 
@@ -170,8 +185,6 @@ export const UserMutations = extendType({
         const { firstName, lastName, email, phone, roleId } = args.input;
 
         if (!email) throw new UserInputError('No valid email provided');
-
-        // TODO: Check if user exists?
 
         return ctx.prisma.user.update({
           where: {

@@ -1,17 +1,54 @@
 import { ApolloError, ApolloServer } from 'apollo-server-express';
-
 import { APIContext } from '../types/APIContext';
+import { applyMiddleware } from 'graphql-middleware';
 import Sentry from './sentry';
+import authShield from './auth';
+import config from './config';
+import jwt from 'jsonwebtoken';
 import prisma from './prisma';
 import schema from './schema';
+
+const verifyUser = async (authHeader: string | undefined) => {
+  if (!authHeader) return null;
+
+  const bearerToken = authHeader.slice(7);
+
+  if (!bearerToken) return null;
+
+  const isValid = await jwt.verify(bearerToken, config.jwtSecret);
+  if (!isValid) return null;
+
+  const decodedUser = jwt.decode(bearerToken);
+  // @ts-ignore
+  const decodedUserMail = decodedUser?.email;
+
+  if (!decodedUserMail) return null;
+
+  const user = await prisma.user.findOne({
+    where: {
+      email: decodedUserMail,
+    },
+    include: {
+      customers: {
+        include: {
+          customer: true,
+          role: true,
+        },
+      },
+    },
+  });
+
+  return user;
+};
 
 const makeApollo = async () => {
   console.log('💼\tBootstrapping Graphql Engine Apollo');
 
   const apollo: ApolloServer = new ApolloServer({
-    schema,
-    context: (ctx): APIContext => ({
+    schema: applyMiddleware(schema, authShield),
+    context: async (ctx): Promise<APIContext> => ({
       ...ctx,
+      user: await verifyUser(ctx.req.headers.authorization),
       prisma,
     }),
     plugins: [

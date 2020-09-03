@@ -334,7 +334,12 @@ const DialogueLayout = ({ children }: DialogueLayoutProps) => {
       )}
 
       <DialogueLayoutContainer isMobile={device.isSmall}>
-        <motion.div initial="closed" variants={menuAnimation} animate={showContextMenu || !device.isSmall ? 'open' : 'closed'}>
+        <motion.div
+          initial="closed"
+          transition={{ bounceStiffness: 300 }}
+          variants={menuAnimation}
+          animate={showContextMenu || !device.isSmall ? 'open' : 'closed'}
+        >
           <Div ref={navBarRef}>
             <DialogueNavBar customerSlug={customerSlug} dialogueSlug={dialogueSlug} dialogue={dialogue} />
           </Div>

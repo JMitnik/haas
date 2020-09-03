@@ -659,6 +659,7 @@ export interface NexusGenFieldTypes {
     users: NexusGenRootTypes['UserType'][]; // [UserType!]!
   }
   UserType: { // field return type
+    customers: NexusGenRootTypes['Customer'][]; // [Customer!]!
     email: string; // String!
     firstName: string | null; // String
     id: string; // ID!

@@ -90,13 +90,9 @@ class AuthService {
   }
 
   static async checkPassword(inputPassword: string, dbPassword: string) {
-    let valid = false;
+    const res = await bcrypt.compare(inputPassword, dbPassword);
 
-    await Promise.resolve(bcrypt.compare(inputPassword, dbPassword).then((res) => {
-      if (res) valid = true;
-    }));
-
-    return valid;
+    return res;
   }
 
   static async generatePassword(passwordInput: string) {
