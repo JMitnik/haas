@@ -57,6 +57,7 @@ export interface TableInputProps {
   headers: TableHeaderColumnProps[]
   data: Array<any>;
   CustomRow?: any;
+  renderExpandedRowContainer?: (input: any) => React.ReactNode;
   permissions?: Array<any>;
   onPaginationChange: React.Dispatch<React.SetStateAction<TableProps>>;
   onDeleteEntry?: (event: any, userId: string) => void;
@@ -115,7 +116,7 @@ export interface TableRowProps {
   index: number;
   onDeleteEntry?: (event: any, userId: string) => void;
   onEditEntry?: (event: any, userId: string) => void;
-  renderExpandedRow?: React.ReactNode;
+  renderExpandedRow?: React.ReactNode | undefined;
 }
 
 export interface UserRowProps {

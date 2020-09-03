@@ -23,6 +23,7 @@ const Table = ({
   permissions,
   hidePagination,
   disableSorting,
+  renderExpandedRowContainer,
 }: TableInputProps) => {
   const { t } = useTranslation();
 
@@ -61,6 +62,7 @@ const Table = ({
               onDeleteEntry={onDeleteEntry}
               data={dataEntry}
               key={index}
+              renderExpandedRow={renderExpandedRowContainer && renderExpandedRowContainer(dataEntry)}
               index={index}
             />
           )
