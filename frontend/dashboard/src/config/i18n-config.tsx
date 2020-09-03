@@ -18,6 +18,7 @@ lang.init({
       ...parseLanguages('en', language),
     },
   },
+  fallbackLng: 'en',
   lng: storedLanguage,
   ns: ['general', 'customer'],
   defaultNS: 'general',

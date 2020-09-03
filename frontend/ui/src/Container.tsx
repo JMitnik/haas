@@ -42,6 +42,7 @@ export const ViewContainer = styled(Div)`
     padding: ${theme.gutter}px;
     max-width: 1400px;
     margin: 0 auto;
+    min-height: 100vh;
   `}
 `;
 

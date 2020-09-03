@@ -19,9 +19,33 @@ const language = {
       en: 'Add call to action',
       de: 'Call-to-action hinzufügen',
     },
+    options: {
+      en: 'Options',
+      de: 'Optionen',
+    },
+    add_question: {
+      en: 'Add question',
+      de: 'Frage hinzufügen',
+    },
+    depth: {
+      en: 'Depth',
+      de: 'Tiefe',
+    },
+    min_value: {
+      en: 'Minimal value',
+      de: 'Minimalwert',
+    },
+    max_value: {
+      en: 'Maximimal value',
+      de: 'Maximalwert',
+    },
     search: {
       en: 'Search',
       de: 'Suche',
+    },
+    save: {
+      en: 'Save',
+      de: 'Sparen',
     },
     date: {
       en: 'Date',
@@ -31,17 +55,29 @@ const language = {
       en: 'Delete',
       de: 'Löschen',
     },
+    title: {
+      en: 'Title',
+      de: 'Titel',
+    },
+    none: {
+      en: 'None',
+      de: 'Keiner',
+    },
     delete_question_popover: {
       en: 'You are about to delete a question (and all its child questions). Note: THIS ACTION IS IRREVERSIBLE! Are you sure?',
+      de: 'Du bist dabei eine Frage zu löschen. Dies kann nicht rückgängig gemacht werden! Bist du dir sicher?',
     },
     delete_cta_popover: {
       en: 'You are about to delete a CTA. Note: THIS ACTION IS IRREVERSIBLE! Are you sure?',
+      de: 'Du bist dabei eine CTA zu löschen. Dies kann nicht rückgängig gemacht werden! Bist du dir sicher?',
     },
     delete_trigger_popover: {
       en: 'You are about to delete a trigger. Note: THIS ACTION IS IRREVERSIBLE! Are you sure?',
+      de: 'Du bist dabei eine alarm zu löschen. Dies kann nicht rückgängig gemacht werden! Bist du dir sicher?',
     },
     delete_user_popover: {
       en: 'You are about to delete a User. Note: THIS ACTION IS IRREVERSIBLE! Are you sure?',
+      de: 'Du bist dabei ein User zu löschen. Dies kann nicht rückgängig gemacht werden! Bist du dir sicher?',
     },
     create_trigger: {
       en: 'Create trigger',
@@ -74,6 +110,14 @@ const language = {
     export_to_csv: {
       en: 'CSV export',
       de: 'CSV export',
+    },
+    match_value: {
+      en: 'Match value',
+      de: 'Übereinstimmungswert',
+    },
+    match_value_helper: {
+      en: 'What is the multi-choice question to trigger this question?',
+      de: 'Was ist die Multi-Choice-Frage, um diese Frage auszulösen?',
     },
     user_actions: {
       en: 'Actions',
@@ -141,30 +185,39 @@ const language = {
     },
     about_helper: {
       en: 'About',
+      de: 'Über',
     },
     branding: {
       en: 'Branding',
+      de: 'Warenzeichen',
     },
     branding_color: {
       en: 'Branding color',
+      de: 'Markenfarbe',
     },
     name: {
       en: 'Name',
+      de: 'Name',
     },
     first_name: {
       en: 'First Name',
+      de: 'Vorname',
     },
     first_name_helper: {
       en: 'What is the user\'s first name?',
+      de: 'Was ist der Vorname des Benutzers?',
     },
     last_name: {
       en: 'Last name',
+      de: 'Nachname',
     },
     last_name_helper: {
       en: 'What is the user\'s last name?',
+      de: 'Was ist der Nachname des Benutzers?',
     },
     email: {
       en: 'Email adress',
+      de: 'Email adress',
     },
     email_helper: {
       en: 'What is the user\'s email adress?',
@@ -268,9 +321,69 @@ const language = {
     },
   },
   dialogue: {
+    min_value_helper: {
+      en: 'What is the minimal value to trigger this question?',
+      de: 'Welche Mindestwert soll die Folgefrage auslösen?',
+    },
+    max_value_helper: {
+      en: 'What is the maximal value to trigger this question?',
+      de: 'Welche Maximalwert soll die Folgefrage auslösen?',
+    },
+    about_type_helper: {
+      en: 'Describe the type of the question',
+      de: 'Details zur Frage',
+    },
+    question_type: {
+      en: 'Question type',
+      de: 'Fragentyp',
+    },
+    question_type_helper: {
+      en: 'What is the type of the question?',
+      de: 'Welche art von Frage soll gestellt worden?',
+    },
+    cta_helper: {
+      en: 'What CTA do you want to add?',
+      de: 'Welchen CTA möchtest du hinzufügen?',
+    },
+    add_option_reminder: {
+      en: 'Please add an option',
+      de: 'Bitte fügen Sie eine Option hinzu',
+    },
+    empty_option_reminder: {
+      en: 'Please fill in at least one option',
+      de: 'Bitte füllen Sie mindestens eine Option aus',
+    },
+    about_question: {
+      en: 'About question',
+      de: 'Frage',
+    },
+    condition: {
+      en: 'Condition',
+      de: 'Kondition',
+    },
+    condition_helper: {
+      en: 'When should this question be displayed?',
+      de: 'Wann soll die Frage gestellt worden?',
+    },
+    title_question_helper: {
+      en: 'What is the question you want to ask?',
+      de: 'Welche Frage möchtest du stellen?',
+    },
+    about_question_helper: {
+      en: 'Tell us about your question',
+      de: 'Was ist deine Hauptfrage?',
+    },
     average_score: {
       en: 'Average score',
       de: 'Durchschnittlich',
+    },
+    fold_branch: {
+      en: 'Fold branch',
+      de: 'Zweig verstecken',
+    },
+    expand_branch: {
+      en: 'Expand branch',
+      de: 'Zweig zeigen',
     },
     frequently_mentioned: {
       en: 'Frequently mentioned',
@@ -340,10 +453,26 @@ const language = {
       de: 'Wochenansicht',
     },
   },
-  interaction: {
+  interactions: {
     user_data: {
       en: 'User data',
       de: 'Benutzerdaten',
+    },
+    user_information: {
+      en: 'User information',
+      de: 'Nutzerinformation',
+    },
+    watch_journey_heading: {
+      en: 'Follow a user\'s journey',
+      de: 'Folgen sie der reise eines benutzers',
+    },
+    you_asked: {
+      en: 'You asked',
+      de: 'Du hast gefragt',
+    },
+    they_answered: {
+      de: 'Sie antworteten',
+      en: 'They answered',
     },
   },
   toast: {

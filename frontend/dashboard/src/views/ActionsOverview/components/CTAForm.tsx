@@ -437,7 +437,7 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange, on
               variantColor="teal"
               type="submit"
             >
-              Save
+              {t('save')}
             </Button>
             <Button variant="ghost" onClick={() => cancelCTA()}>Cancel</Button>
           </ButtonGroup>

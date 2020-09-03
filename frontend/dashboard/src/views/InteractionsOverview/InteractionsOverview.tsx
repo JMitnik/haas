@@ -56,7 +56,7 @@ const ExpandedInteractionRow = ({ data }: { data: Session }) => {
           <Div useFlex flexDirection="row">
             <Div width="51%">
               <Text color="gray.400" fontSize="1.2rem" fontWeight="600">{t('interactions:user_data')}</Text>
-              <Text color="gray.400" fontWeight="300">User information</Text>
+              <Text color="gray.400" fontWeight="300">{t('interactions:user_information')}</Text>
             </Div>
             <Div width="49%" useFlex>
               {/* <Div useFlex flexDirection="column" width="25%">
@@ -74,8 +74,7 @@ const ExpandedInteractionRow = ({ data }: { data: Session }) => {
         <Hr style={{ marginBottom: '15px' }} color="#999999" />
         <Div position="relative" useFlex flexDirection="row">
           <Div width="50%">
-            <Text color="gray.400" fontSize="1.2rem" fontWeight="600">Journey through dialogue</Text>
-            <Text color="gray.400" fontWeight="300">See what the user shared when</Text>
+            <Text color="gray.400" fontSize="1.2rem" fontWeight="600">{t('interactions:watch_journey_heading')}</Text>
           </Div>
           <InteractionDetailQuestionEntry useFlex flexDirection="column" width="50%">
             {/* TODO: Make each mapped entry an individual component */}
@@ -98,11 +97,11 @@ const ExpandedInteractionRow = ({ data }: { data: Session }) => {
                     </Div>
                     <Div useFlex flexDirection="column">
                       <Div>
-                        <Text fontWeight="300" color="gray.500" fontSize="0.8rem">You asked</Text>
+                        <Text fontWeight="300" color="gray.500" fontSize="0.8rem">{t('interactions:you_asked')}</Text>
                         <Text fontWeight="600" color="gray.500" fontSize="0.8rem">{relatedNode?.title || 'N/A'}</Text>
                       </Div>
                       <Div mt={4}>
-                        <Text fontWeight="300" color="gray.500" fontSize="0.8rem">Their answer</Text>
+                        <Text fontWeight="300" color="gray.500" fontSize="0.8rem">{t('interactions:they_answered')}</Text>
                         <Text fontWeight="600" color="gray.500" fontSize="0.8rem">
                           <InteractionTableValue entry={nodeEntry} />
                         </Text>

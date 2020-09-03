@@ -125,10 +125,10 @@ const CTAEntry = ({ id, activeCTA, onActiveCTAChange, title, type, links, Icon, 
 
           <Flex width="60%" flexDirection="column">
             <Span fontSize="1.4em">
-              Title
+              {t('title')}
             </Span>
             <OverflowSpan>
-              {title || 'None'}
+              {title || t('none')}
             </OverflowSpan>
           </Flex>
 

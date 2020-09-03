@@ -8,6 +8,7 @@ import EditButton from 'components/EditButton';
 import deleteQuestionMutation from 'mutations/deleteQuestion';
 import getTopicBuilderQuery from 'queries/getQuestionnaireQuery';
 
+import { useTranslation } from 'react-i18next';
 import { EdgeConditonProps, QuestionEntryProps, QuestionOptionProps } from '../../DialogueBuilderInterfaces';
 import { OverflowSpan, QuestionEntryContainer, QuestionEntryViewContainer } from './QuestionEntryStyles';
 import BuilderIcon from './BuilderIcon';
@@ -53,6 +54,7 @@ const QuestionEntryItem = ({ depth,
   onAddExpandChange }
 : QuestionEntryItemProps) => {
   const { customerSlug, dialogueSlug } = useParams();
+  const { t } = useTranslation();
 
   const [deleteQuestion] = useMutation(deleteQuestionMutation, {
     variables: {
@@ -92,10 +94,10 @@ const QuestionEntryItem = ({ depth,
 
             <Flex width="60%" flexDirection="column">
               <Span fontSize="1.4em">
-                Title
+                {t('title')}
               </Span>
               <OverflowSpan data-cy="OverflowSpan">
-                {question.title || 'None'}
+                {question.title || t('none')}
               </OverflowSpan>
             </Flex>
 

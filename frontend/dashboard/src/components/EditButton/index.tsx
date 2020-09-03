@@ -3,6 +3,7 @@ import styled, { css } from 'styled-components/macro';
 
 import { Button, Span } from '@haas/ui';
 import { Edit3 } from 'react-feather';
+import { useTranslation } from 'react-i18next';
 
 interface EditButtonProps {
   isDisabled: boolean | undefined;
@@ -40,17 +41,21 @@ const EditButtonContainer = styled(Button)`
   `}
 `;
 
-const EditButton = ({ isDisabled, onClick } : EditButtonProps) => (
-  <EditButtonContainer
-    data-cy="EditButton"
-    disabled={isDisabled}
-    onClick={onClick}
-  >
-    <Edit3 />
-    <Span>
-      Edit
-    </Span>
-  </EditButtonContainer>
-);
+const EditButton = ({ isDisabled, onClick } : EditButtonProps) => {
+  const { t } = useTranslation();
+
+  return (
+    <EditButtonContainer
+      data-cy="EditButton"
+      disabled={isDisabled}
+      onClick={onClick}
+    >
+      <Edit3 />
+      <Span>
+        {t('edit')}
+      </Span>
+    </EditButtonContainer>
+  );
+};
 
 export default EditButton;
