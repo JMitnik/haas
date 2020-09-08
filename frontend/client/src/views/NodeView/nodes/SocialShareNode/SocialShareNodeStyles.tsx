@@ -22,8 +22,6 @@ export const ShareItem = styled.a<ColorProps>`
       transition: all 0.3s ease-in-out;
     }
 
- 
-
     > span {
       color: white;
       font-size: 1.1em;
