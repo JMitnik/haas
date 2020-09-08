@@ -8,11 +8,29 @@ export const ShareItem = styled.a<ColorProps>`
   ${color}
 
   ${({ theme }) => css`
-    border-radius: 100%;
-    padding: 13px;
+    border-radius: 6px;
+    padding: 10px;
     display: flex;
+    align-items: center;
+    min-width: 16px;
     margin-right: ${theme.gutter / 2}px;
     cursor: pointer;
+    opacity: 1;
+
+    &:hover{ 
+      opacity: 0.8; 
+      transition: all 0.3s ease-in-out;
+    }
+
+    &:first-of-type {
+      margin-left: ${theme.gutter}px;
+    }
+
+    > span {
+      color: white;
+      font-size: 1.1em;
+      margin-left: 7.5px;
+    }
 
     @media ${theme.media.mob} {
       margin-right: ${theme.gutter}px;

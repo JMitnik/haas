@@ -54,6 +54,9 @@ const SocialShareNode = ({ node }: SocialShareNodeProps) => {
               && <CustomIcon logo={link.iconUrl} />}
               {(!['TWITTER', 'FACEBOOK', 'INSTAGRAM', 'LINKEDIN'].includes(link.type) && !link.iconUrl)
               && <Globe stroke="white" />}
+              {link.title && (
+              <span>{link.title}</span>
+              )}
             </ShareItem>
           ),
         )}
