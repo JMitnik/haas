@@ -22,9 +22,7 @@ export const ShareItem = styled.a<ColorProps>`
       transition: all 0.3s ease-in-out;
     }
 
-    &:first-of-type {
-      margin-left: ${theme.gutter}px;
-    }
+ 
 
     > span {
       color: white;
@@ -34,6 +32,9 @@ export const ShareItem = styled.a<ColorProps>`
 
     @media ${theme.media.mob} {
       margin-right: ${theme.gutter}px;
+      &:first-of-type {
+        margin-left: ${theme.gutter}px;
+      }
     }
 
     svg, img {
