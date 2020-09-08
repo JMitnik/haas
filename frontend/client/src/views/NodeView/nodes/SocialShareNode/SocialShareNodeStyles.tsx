@@ -8,13 +8,13 @@ export const ShareItem = styled.a<ColorProps>`
   ${color}
 
   ${({ theme }) => css`
-    border-radius: 6px;
-    padding: 10px;
     display: flex;
     align-items: center;
+    cursor: pointer;
+    border-radius: 6px;
+    padding: 10px;
     min-width: 16px;
     margin-right: ${theme.gutter / 2}px;
-    cursor: pointer;
     opacity: 1;
 
     &:hover{ 
