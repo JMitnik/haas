@@ -75,8 +75,13 @@ export const GoBackText = styled.span`
 export const GoBackContainer = styled(motion.div)`
   ${({ theme }) => css`
     position: absolute;
-    top: ${theme.gutter}px;
-    left: ${theme.gutter}px;
+    top: ${theme.gutter * 3.5}px;
+    left: ${theme.gutter * 5}px;
+    
+    @media ${theme.media.mob} {
+      top: ${theme.gutter}px;
+      left: ${theme.gutter}px;
+      }
 
     p, span {
       position: absolute;
@@ -111,7 +116,8 @@ export const GoBackButton = styled.button`
     justify-content: center;
     border: 1px solid rgba(255, 255, 255, 0.05);
     height: 30px;
-    box-shadow: 0px 3px 1px 1px rgba(0, 0, 0, 0.10);
+    background-color: ${Color(theme.colors.primary).mix(Color('white'), 0.4).hex()};
+    box-shadow: 0px 2px 1px 1px rgba(0, 0, 0, 0.10);
     color: white;
     transition: all .3s cubic-bezier(.55,0,.1,1);
 

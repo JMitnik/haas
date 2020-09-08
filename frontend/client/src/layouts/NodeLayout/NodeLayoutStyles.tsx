@@ -13,6 +13,10 @@ export const NodeContainer = styled(Div)`
     display: flex;
     height: 100%;
 
+    @media (min-width: 601px) {
+      height: 90%;
+    }
+    
     > ${Div} {
       text-align: center;
       width: 100%;
