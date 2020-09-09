@@ -35,6 +35,10 @@ export const NodeContainer = styled(Div)`
 export const NodeTitle = styled(H2)`
   ${({ theme }) => css`
 
+  @media (min-width: 601px) {
+    margin-top: 2rem;
+  }
+  
   color: ${Color(theme.colors.primary).isDark() ? Color(theme.colors.primary).mix(Color('white'), 0.9).saturate(1).hex()
     : Color(theme.colors.primary).mix(Color('black'), 0.5).saturate(1).hex()};
   `}

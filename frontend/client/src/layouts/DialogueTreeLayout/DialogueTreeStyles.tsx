@@ -75,7 +75,7 @@ export const GoBackText = styled.span`
 export const GoBackContainer = styled(motion.div)`
   ${({ theme }) => css`
     position: absolute;
-    top: ${theme.gutter * 3.5}px;
+    top: ${theme.gutter * 4}px;
     left: ${theme.gutter * 5}px;
     
     @media ${theme.media.mob} {
