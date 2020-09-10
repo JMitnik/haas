@@ -2,6 +2,7 @@ import { ErrorBoundary } from 'react-error-boundary';
 import { Link } from 'react-router-dom';
 import { Plus } from 'react-feather';
 import { Variants, motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import React from 'react';
 
 import {
@@ -12,7 +13,6 @@ import { TranslatedPlus } from 'views/DialogueOverview/DialogueOverviewStyles';
 import SurveyIcon from 'components/Icons/SurveyIcon';
 
 import { CustomerOverviewContainer } from './CustomerOverviewStyles';
-import { useTranslation } from 'react-i18next';
 import CustomerCard from './CustomerCard';
 
 const cardContainerAnimation: Variants = {

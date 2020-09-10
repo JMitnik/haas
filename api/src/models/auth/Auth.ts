@@ -59,6 +59,7 @@ export const AuthOutput = objectType({
 
   definition(t) {
     t.string('token');
+    t.int('expiryDate');
 
     t.field('user', { type: UserType });
   },
@@ -69,7 +70,7 @@ export const LoginMutation = mutationField('login', {
   nullable: true,
   args: { input: LoginInput },
 
-  async resolve(parent, args) {
+  async resolve(parent, args, ctx) {
     if (!args.input?.email) throw new UserInputError('login:email_missing');
     if (!args.input?.password) throw new UserInputError('login:password_missing');
 
@@ -78,18 +79,19 @@ export const LoginMutation = mutationField('login', {
       password: args.input?.password,
     });
 
-    prisma.role.findMany({
-      select: {
-
-      },
+    const userToken = await AuthService.createToken({
+      id: user.id,
+      email: user.email,
     });
 
-    const userToken = await AuthService.createToken({
-      email: user.email,
-      permissions: [],
+    const expiryDate = AuthService.getExpiryTimeFromToken(userToken);
+
+    ctx.res.cookie('token', userToken, {
+      httpOnly: true,
     });
 
     return {
+      expiryDate,
       token: userToken,
       user,
     };

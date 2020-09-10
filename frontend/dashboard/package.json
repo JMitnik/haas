@@ -59,6 +59,7 @@
         "graphql": "^14.5.8",
         "graphql-tag": "^2.10.3",
         "i18next": "^19.6.3",
+        "js-cookie": "^2.2.1",
         "lodash": "^4.17.15",
         "papaparse": "^5.2.0",
         "qrcode.react": "^1.0.0",
@@ -102,6 +103,7 @@
     },
     "devDependencies": {
         "@graphql-codegen/cli": "^1.17.3",
+        "@types/js-cookie": "^2.2.6",
         "@typescript-eslint/eslint-plugin": "^2.15.0",
         "@typescript-eslint/parser": "^2.15.0",
         "cra-workspaces": "^1.0.1",

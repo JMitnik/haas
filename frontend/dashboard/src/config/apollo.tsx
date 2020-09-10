@@ -1,23 +1,43 @@
-import { createUploadLink } from 'apollo-upload-client';
-
 import { ApolloClient } from 'apollo-client';
 import { InMemoryCache } from 'apollo-cache-inmemory';
+import { createUploadLink } from 'apollo-upload-client';
+import { from } from 'apollo-link';
+import { onError } from 'apollo-link-error';
+import Cookies from 'js-cookie';
 
 const getHeader = () => {
-  const auth = localStorage.getItem('auth');
+  const authToken = Cookies.get('token');
+  // const auth = localStorage.getItem('auth');
 
-  if (!auth) return null;
+  if (!authToken) return null;
 
-  return JSON.parse(auth).token;
+  return authToken;
 };
 
 const client = new ApolloClient({
-  link: createUploadLink({
-    uri: process.env.REACT_APP_API_ENDPOINT || 'http://localhost:4000/graphql',
-    headers: {
-      authorization: `Bearer:${getHeader()}`,
-    },
-  }),
+  link: from([
+    onError(({ graphQLErrors, networkError, operation, response }) => {
+      if (graphQLErrors) {
+        const authorizedErrors = graphQLErrors.filter((error) => (
+          error?.extensions?.code === 'UNAUTHENTICATED'
+        ));
+
+        if (authorizedErrors.length) {
+          localStorage.setItem('auth', '');
+          window.location.href = '/';
+        }
+      }
+      console.log('Error!');
+      console.log(graphQLErrors);
+      console.log(operation);
+      console.log(response);
+      console.log(networkError);
+    }),
+    createUploadLink({
+      credentials: 'include',
+      uri: process.env.REACT_APP_API_ENDPOINT || 'http://localhost:4000/graphql',
+    }),
+  ]),
   cache: new InMemoryCache(),
 });
 

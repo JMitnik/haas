@@ -4,18 +4,21 @@ import React from 'react';
 
 import { useAuth } from 'providers/AuthProvider';
 import CustomerOverview from 'views/CustomerOverview';
-import getCustomerQuery from 'queries/getCustomersQuery';
+import getCustomersQuery from 'queries/getCustomersQuery';
 
 const CustomersPage = () => {
   const { user } = useAuth();
-  const { loading, error, data } = useQuery(getCustomerQuery, {
+
+  console.log(user);
+
+  const { loading, error, data } = useQuery(getCustomersQuery, {
     variables: {
       userId: user?.id,
     },
   });
   useErrorHandler(error);
 
-  const customers = data?.customers;
+  const customers = data?.user?.customers || [];
 
   return <CustomerOverview isLoading={loading} customers={customers} />;
 };

@@ -1,22 +1,55 @@
-import { allow, and, deny, not, or, rule, shield } from 'graphql-shield';
+import { allow, deny, or, rule, shield } from 'graphql-shield';
 
-const isLoggedIn = rule({ cache: 'strict' })(
-  async (parent, args, ctx, info) => ctx.user !== null,
-);
+import { ApolloError, ValidationError } from 'apollo-server-express';
+import { APIContext } from '../types/APIContext';
+import AuthorizationError from '../models/auth/AuthorizationError';
 
-const isSuperAdmin = rule({ cache: 'contextual' })(
-  async (parent, args, ctx, info) => ctx.user.globalPermissions.includes('CAN_ACCESS_ADMIN_PANEL'),
-);
+// const isLoggedIn = rule({ cache: 'strict' })(
+//   async (parent, args, ctx: APIContext) => ctx.user !== null,
+// );
 
-const belongsToCustomer = rule({ cache: 'strict' })(
-  async (parent, args, ctx) => !!ctx.user.customers.find((customer: any) => customer.customerId === parent.id),
+// const isSuperAdmin = rule({ cache: 'no_cache' })(
+//   async (parent, args, ctx: APIContext) => {
+//     if (!ctx.session?.userId) return false;
+
+//     // console.log(ctx.session?.userId?.globalPermissions?.includes('CAN_ACCESS_ADMIN_PANEL'));
+
+//     // return ctx.session?.userId?.globalPermissions?.includes('CAN_ACCESS_ADMIN_PANEL');
+//   },
+// );
+
+const canAccessCompany = rule({ cache: 'no_cache' })(
+  async (parent, args, ctx: APIContext) => {
+    console.log(parent);
+    console.log(ctx);
+    if (!ctx.session?.userId || !parent.id) return new ApolloError('Unauthorized', 'UNAUTHORIZED');
+
+    const customerWithUsers = await ctx.prisma.userOfCustomer.findOne({
+      where: {
+        userId_customerId: {
+          customerId: parent.id,
+          userId: ctx.session?.userId,
+        },
+      },
+    });
+
+    console.log(customerWithUsers);
+    if (!customerWithUsers) return new ApolloError('Unauthorized', 'UNAUTHORIZED');
+
+    return true;
+  },
 );
 
 const authShield = shield({
-  Query: {
-    customers: isLoggedIn,
+  // Query: {
+  //   customers: isLoggedIn,
+  // },
+  Customer: canAccessCompany,
+  Mutation: {
+    '*': deny,
+    login: allow,
+    // createCustomer: isSuperAdmin,
   },
-  Customer: or(belongsToCustomer, isSuperAdmin),
-}, { fallbackRule: deny });
+}, { fallbackRule: allow });
 
 export default authShield;

@@ -3,6 +3,7 @@ import React from 'react';
 import styled, { css } from 'styled-components/macro';
 
 import { Div, PageHeading } from '@haas/ui';
+import { ErrorBoundary } from 'react-error-boundary';
 import { NavItem, NavItems, Usernav } from 'components/Sidenav/Sidenav';
 import { ReactComponent as NotificationIcon } from 'assets/icons/icon-notification.svg';
 import { ReactComponent as PieChartIcon } from 'assets/icons/icon-pie-chart.svg';
@@ -16,6 +17,7 @@ import { useCustomer } from 'providers/CustomerProvider';
 import { useTranslation } from 'react-i18next';
 import Logo from 'components/Logo/Logo';
 import MobileBottomNav from 'components/MobileBottomNav';
+import NotAuthorizedView from './NotAuthorizedView';
 import Sidenav from 'components/Sidenav';
 import useLocalStorage from 'hooks/useLocalStorage';
 import useMediaDevice from 'hooks/useMediaDevice';
@@ -91,33 +93,35 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const device = useMediaDevice();
 
   return (
-    <DashboardLayoutContainer isMobile={device.isSmall}>
-      <Div>
-        {!device.isSmall ? (
-          <motion.div initial={{ x: -30 }} animate={{ x: 0 }} exit={{ x: -30 }}>
-            <Sidenav>
-              <Div>
-                <Logo justifyContent="center" />
-                <DashboardNav customerSlug={params.customerSlug} />
-              </Div>
+    <ErrorBoundary FallbackComponent={NotAuthorizedView}>
+      <DashboardLayoutContainer isMobile={device.isSmall}>
+        <Div>
+          {!device.isSmall ? (
+            <motion.div initial={{ x: -30 }} animate={{ x: 0 }} exit={{ x: -30 }}>
+              <Sidenav>
+                <Div>
+                  <Logo justifyContent="center" />
+                  <DashboardNav customerSlug={params.customerSlug} />
+                </Div>
 
-              <Usernav
-                customer={customer}
-                user={userData}
-              />
-            </Sidenav>
-          </motion.div>
-        ) : (
-          <MobileBottomNav>
-            <DashboardNav customerSlug={params.customerSlug} />
-          </MobileBottomNav>
-        )}
-      </Div>
+                <Usernav
+                  customer={customer}
+                  user={userData}
+                />
+              </Sidenav>
+            </motion.div>
+          ) : (
+            <MobileBottomNav>
+              <DashboardNav customerSlug={params.customerSlug} />
+            </MobileBottomNav>
+          )}
+        </Div>
 
-      <DashboardViewContainer>
-        {children}
-      </DashboardViewContainer>
-    </DashboardLayoutContainer>
+        <DashboardViewContainer>
+          {children}
+        </DashboardViewContainer>
+      </DashboardLayoutContainer>
+    </ErrorBoundary>
   );
 };
 

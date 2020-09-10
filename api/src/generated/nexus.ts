@@ -246,6 +246,7 @@ export interface NexusGenRootTypes {
     url: string; // String!
   }
   LoginOutput: { // root type
+    expiryDate: number; // Int!
     token: string; // String!
     user: NexusGenRootTypes['UserType']; // UserType!
   }
@@ -485,6 +486,7 @@ export interface NexusGenFieldTypes {
     url: string; // String!
   }
   LoginOutput: { // field return type
+    expiryDate: number; // Int!
     token: string; // String!
     user: NexusGenRootTypes['UserType']; // UserType!
   }

@@ -24,6 +24,7 @@ const CustomerRoute = (props: RouteProps) => {
       fetchCustomer({
         variables: {
           customerSlug,
+          userId: user.id,
         },
       });
     }

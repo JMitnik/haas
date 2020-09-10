@@ -11,6 +11,7 @@ interface AuthContext {
   login: (userData: { email: string, password: string }) => Promise<any>;
   isLoggingIn: boolean;
   loginServerError?: Error;
+  userIsValid?: () => boolean;
   logout: () => void;
 }
 
@@ -47,6 +48,17 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return null;
   });
 
+  const userIsValid = () => {
+    if (!authStorage?.auth?.expiryDate) return false;
+
+    const date = new Date(authStorage?.auth?.expiryDate);
+    const nowDate = new Date();
+
+    if (date >= nowDate) return false;
+
+    return true;
+  };
+
   const login = async ({ email, password }: { email: string, password: string }) => {
     await loginMutation({ variables: { input: { email, password } } });
   };
@@ -54,7 +66,6 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     if (loginData) {
       setAuthStorage(loginData.login);
-      setUser(loginData.login.user);
     }
   }, [loginData, setUser, setAuthStorage]);
 
@@ -62,7 +73,12 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <AuthContext.Provider value={{
-      user, login, isLoggingIn: loading, logout, loginServerError,
+      user,
+      login,
+      isLoggingIn: loading,
+      logout,
+      loginServerError,
+      userIsValid,
     }}
     >
       {children}

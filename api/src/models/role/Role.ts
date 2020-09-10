@@ -5,11 +5,12 @@ import { CustomerType } from '../customer/Customer';
 // eslint-disable-next-line import/no-cycle
 import { PaginationWhereInput } from '../general/Pagination';
 import { PermissionType } from '../permission/Permission';
+import { SystemPermissions } from './Permissions';
 import RoleService from './RoleService';
 
 export const SystemPermission = enumType({
   name: 'SystemPermission',
-  members: ['CAN_ACCESS_ADMIN_PANEL', 'CAN_BUILD_DIALOGUES', 'CAN_VIEW_DIALOGUES'],
+  members: SystemPermissions,
 });
 
 export const RoleType = objectType({

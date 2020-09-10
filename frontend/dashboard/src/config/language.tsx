@@ -36,6 +36,14 @@ const language = {
       en: 'Add tag',
       de: 'Tag hinzufügen',
     },
+    unauthorized: {
+      en: 'Whoops! You are unauthorized.',
+      de: 'Hoppla! Sie haben keine Erlaubnis.',
+    },
+    unauthorized_helper: {
+      en: 'You do not have the permissions to access this page.',
+      de: 'Sie haben nicht die Berechtigung, auf diese Seite zuzugreifen.',
+    },
     remove: {
       en: 'Remove',
       de: 'Entfernen',

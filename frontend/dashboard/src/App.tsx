@@ -33,7 +33,7 @@ import UsersOverview from 'views/UsersOverview/UsersOverview';
 
 import { AnimatePresence } from 'framer-motion';
 import { Div, ViewContainer } from '@haas/ui';
-import AuthProvider from 'providers/AuthProvider';
+import AuthProvider, { useAuth } from 'providers/AuthProvider';
 import CustomerRoute from 'components/Auth/CustomerRoute';
 import DialogueLayout from 'layouts/DialogueLayout';
 import FallbackServerError from 'components/FallbackServerError';
@@ -42,20 +42,160 @@ import PreCustomerLayout from 'layouts/PreCustomerLayout';
 import client from 'config/apollo';
 import lang from 'config/i18n-config';
 
-const ProtectedRoute = (props: RouteProps) => {
+const DashboardRoute = (props: RouteProps) => {
   useTranslation();
-  // const { user } = useAuth();
-  // Note-Login: Uncomment this for login
-  // if (!user) return <Redirect to="/login" />;
+  const { user, userIsValid } = useAuth();
+
+  // If user is not even logged in, send to public
+  if (!user) return <Redirect to="/public/" />;
 
   return (
     <Route {...props} />
   );
 };
 
+const CustomerRoutes = () => (
+  <AnimatePresence>
+    <DashboardLayout>
+      <Switch>
+        <CustomerRoute
+          path="/dashboard/b/:customerSlug/d/:dialogueSlug"
+          render={() => (
+            <DialogueLayout>
+              <Switch>
+                <DashboardRoute
+                  path="/dashboard/b/:customerSlug/d/:dialogueSlug/builder"
+                  render={() => <DialogueBuilderPage />}
+                />
+
+                <DashboardRoute
+                  path="/dashboard/b/:customerSlug/d/:dialogueSlug/edit"
+                  render={() => <EditDialogueView />}
+                />
+
+                <DashboardRoute
+                  path="/dashboard/b/:customerSlug/d/:dialogueSlug/interactions"
+                  render={() => <InteractionsOverview />}
+                />
+
+                <DashboardRoute
+                  path="/dashboard/b/:customerSlug/d/:dialogueSlug/actions"
+                  render={() => <ActionsPage />}
+                />
+
+                <DashboardRoute
+                  path="/dashboard/b/:customerSlug/d/:dialogueSlug"
+                  render={() => <DialoguePage />}
+                />
+
+              </Switch>
+            </DialogueLayout>
+          )}
+        />
+
+        <CustomerRoute
+          path="/dashboard/b/:customerSlug"
+          render={() => (
+            <ViewContainer>
+              <Switch>
+                <DashboardRoute
+                  path="/dashboard/b/:customerSlug/analytics/"
+                  render={() => (
+                    <AnalyticsPage />
+                  )}
+                />
+
+                <DashboardRoute
+                  path="/dashboard/b/:customerSlug/triggers/add"
+                  render={() => (
+                    <AddTriggerView />
+                  )}
+                />
+
+                <DashboardRoute
+                  path="/dashboard/b/:customerSlug/triggers/:triggerId/edit"
+                  render={() => (
+                    <EditTriggerView />
+                  )}
+                />
+
+                <DashboardRoute
+                  path="/dashboard/b/:customerSlug/triggers"
+                  render={() => <TriggersOverview />}
+                />
+
+                <DashboardRoute
+                  path="/dashboard/b/:customerSlug/edit"
+                  render={() => <EditCustomerView />}
+                />
+
+                <DashboardRoute
+                  path="/dashboard/b/:customerSlug/u/:userId/edit"
+                  render={() => (
+                    <EditUserView />
+                  )}
+                />
+
+                <DashboardRoute
+                  path="/dashboard/b/:customerSlug/users/add"
+                  render={() => (
+                    <AddUserView />
+                  )}
+                />
+
+                <DashboardRoute
+                  path="/dashboard/b/:customerSlug/users"
+                  render={() => <UsersOverview />}
+                />
+                <DashboardRoute
+                  path="/dashboard/b/:customerSlug/roles"
+                  render={() => <RolesOverview />}
+                />
+
+                <DashboardRoute
+                  path="/dashboard/b/:customerSlug/dialogue/add"
+                  render={() => <AddDialogueView />}
+                />
+
+                <DashboardRoute
+                  path="/dashboard/b/:customerSlug/d"
+                  render={() => <DialoguesPage />}
+                />
+                <DashboardRoute
+                  path="/dashboard/b/:customerSlug/"
+                  render={() => <CustomerPage />}
+                />
+              </Switch>
+            </ViewContainer>
+          )}
+        />
+      </Switch>
+    </DashboardLayout>
+  </AnimatePresence>
+);
+
+const PublicRoutes = () => (
+  <Switch>
+    <Route
+      path="/public/login"
+    >
+      <LoginPage />
+    </Route>
+
+    <Route path="/public"><Redirect to="/public/login" /></Route>
+  </Switch>
+);
+
+const RootAppRoute = () => {
+  const { user } = useAuth();
+
+  if (!user) return <Redirect to="/public" />;
+
+  return <Redirect to="/dashboard" />;
+};
+
 const AppRoutes = () => (
   <Switch>
-
     <Route
       path="/dashboard/b/add"
       render={() => (
@@ -67,128 +207,10 @@ const AppRoutes = () => (
 
     <Route
       path="/dashboard/b/:customerSlug"
-      render={() => (
-        <AnimatePresence>
-          <DashboardLayout>
-            <Switch>
-              <CustomerRoute
-                path="/dashboard/b/:customerSlug/d/:dialogueSlug"
-                render={() => (
-                  <DialogueLayout>
-                    <Switch>
-                      <Route
-                        path="/dashboard/b/:customerSlug/d/:dialogueSlug/builder"
-                        render={() => <DialogueBuilderPage />}
-                      />
-
-                      <Route
-                        path="/dashboard/b/:customerSlug/d/:dialogueSlug/edit"
-                        render={() => <EditDialogueView />}
-                      />
-
-                      <Route
-                        path="/dashboard/b/:customerSlug/d/:dialogueSlug/interactions"
-                        render={() => <InteractionsOverview />}
-                      />
-
-                      <Route
-                        path="/dashboard/b/:customerSlug/d/:dialogueSlug/actions"
-                        render={() => <ActionsPage />}
-                      />
-
-                      <Route
-                        path="/dashboard/b/:customerSlug/d/:dialogueSlug"
-                        render={() => <DialoguePage />}
-                      />
-
-                    </Switch>
-                  </DialogueLayout>
-                )}
-              />
-
-              <CustomerRoute
-                path="/dashboard/b/:customerSlug"
-                render={() => (
-                  <ViewContainer>
-                    <Switch>
-                      <Route
-                        path="/dashboard/b/:customerSlug/analytics/"
-                        render={() => (
-                          <AnalyticsPage />
-                        )}
-                      />
-
-                      <Route
-                        path="/dashboard/b/:customerSlug/triggers/add"
-                        render={() => (
-                          <AddTriggerView />
-                        )}
-                      />
-
-                      <Route
-                        path="/dashboard/b/:customerSlug/triggers/:triggerId/edit"
-                        render={() => (
-                          <EditTriggerView />
-                        )}
-                      />
-
-                      <Route
-                        path="/dashboard/b/:customerSlug/triggers"
-                        render={() => <TriggersOverview />}
-                      />
-
-                      <Route
-                        path="/dashboard/b/:customerSlug/edit"
-                        render={() => <EditCustomerView />}
-                      />
-
-                      <Route
-                        path="/dashboard/b/:customerSlug/u/:userId/edit"
-                        render={() => (
-                          <EditUserView />
-                        )}
-                      />
-
-                      <Route
-                        path="/dashboard/b/:customerSlug/users/add"
-                        render={() => (
-                          <AddUserView />
-                        )}
-                      />
-
-                      <Route
-                        path="/dashboard/b/:customerSlug/users"
-                        render={() => <UsersOverview />}
-                      />
-                      <Route
-                        path="/dashboard/b/:customerSlug/roles"
-                        render={() => <RolesOverview />}
-                      />
-
-                      <Route
-                        path="/dashboard/b/:customerSlug/dialogue/add"
-                        render={() => <AddDialogueView />}
-                      />
-
-                      <Route
-                        path="/dashboard/b/:customerSlug/d"
-                        render={() => <DialoguesPage />}
-                      />
-                      <Route
-                        path="/dashboard/b/:customerSlug/"
-                        render={() => <CustomerPage />}
-                      />
-                    </Switch>
-                  </ViewContainer>
-                )}
-              />
-            </Switch>
-          </DashboardLayout>
-        </AnimatePresence>
-      )}
+      render={() => <CustomerRoutes />}
     />
 
-    <ProtectedRoute
+    <DashboardRoute
       path="/dashboard/b/"
       render={() => (
         <PreCustomerLayout>
@@ -197,12 +219,16 @@ const AppRoutes = () => (
       )}
     />
 
-    <ProtectedRoute path="/dashboard" render={() => <DashboardPage />} />
+    <DashboardRoute path="/dashboard">
+      <DashboardPage />
+    </DashboardRoute>
 
-    <Route path="/login"><LoginPage /></Route>
+    <Route path="/public">
+      <PublicRoutes />
+    </Route>
 
     <Route path="/">
-      <Redirect to="/dashboard" />
+      <RootAppRoute />
     </Route>
   </Switch>
 );
@@ -216,9 +242,9 @@ const GeneralErrorFallback = ({ error }: { error?: Error | undefined }) => (
 const App: FC = () => (
   <>
     <I18nextProvider i18n={lang}>
-      <ApolloProvider client={client}>
-        <CustomerProvider>
-          <Router>
+      <Router>
+        <ApolloProvider client={client}>
+          <CustomerProvider>
             <ThemesProvider>
               <AuthProvider>
                 <AppContainer>
@@ -229,9 +255,9 @@ const App: FC = () => (
                 <GlobalStyle />
               </AuthProvider>
             </ThemesProvider>
-          </Router>
-        </CustomerProvider>
-      </ApolloProvider>
+          </CustomerProvider>
+        </ApolloProvider>
+      </Router>
     </I18nextProvider>
   </>
 );

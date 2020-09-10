@@ -200,6 +200,7 @@ input LoginInput {
 
 """Information you get after you log out"""
 type LoginOutput {
+  expiryDate: Int!
   token: String!
   user: UserType!
 }

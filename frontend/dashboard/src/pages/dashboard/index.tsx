@@ -11,17 +11,18 @@ const DashboardPage = () => {
   // Note-Login: Uncomment this for login
   // if (!user) return <Redirect to="/login" />;
 
-  if (activeCustomer) {
-    return (
-      <Redirect to={`/dashboard/b/${activeCustomer.slug}`} />
-    );
-  }
+  // if (activeCustomer) {
+  //   return (
+  //     <Redirect to={`/dashboard/b/${activeCustomer.slug}`} />
+  //   );
+  // }
 
-  if (storageCustomer) {
-    return (
-      <Redirect to={`/dashboard/b/${storageCustomer.slug}`} />
-    );
-  }
+  // if (storageCustomer) {
+  //   return (
+  //     <Redirect to={`/dashboard/b/${storageCustomer.slug}`} />
+  //   );
+  // }
+
   return (
     <Redirect to="/dashboard/b" />
   );

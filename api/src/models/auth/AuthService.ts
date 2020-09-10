@@ -1,15 +1,15 @@
+import { UserInputError } from 'apollo-server-express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
-import { UserInputError } from 'apollo-server-express';
 import { NexusGenInputs } from '../../generated/nexus';
 import RoleService from '../role/RoleService';
 import config from '../../config/config';
 import prisma from '../../config/prisma';
 
 interface UserTokenProps {
+  id: string;
   email: string;
-  permissions: string[] | [];
 }
 
 class AuthService {
@@ -72,8 +72,20 @@ class AuthService {
   static async createToken(userInput: UserTokenProps) {
     return jwt.sign({
       email: userInput.email,
-      permissions: userInput.permissions,
+      id: userInput.id,
+      // 5 minutes
+      exp: Math.floor(Date.now() / 1000) + (5 * 60),
     }, config.jwtSecret);
+  }
+
+  static getExpiryTimeFromToken(token: string): number {
+    const decoded = jwt.decode(token);
+
+    // @ts-ignore
+    if (!decoded?.exp) throw new Error('Something is not right');
+
+    // @ts-ignore
+    return decoded.exp;
   }
 
   static async loginUser(userInput: NexusGenInputs['LoginInput']) {
