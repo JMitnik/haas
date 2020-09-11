@@ -8,7 +8,7 @@ import CustomIcon from 'components/Icons/CustomIcon';
 import useDialogueFinish from 'hooks/use-dialogue-finish';
 
 import { GenericNodeProps } from '../types';
-import { ShareItem, SocialShareNodeContainer } from './SocialShareNodeStyles';
+import { ItemContainer, ShareItem, SocialShareNodeContainer } from './SocialShareNodeStyles';
 
 type SocialShareNodeProps = GenericNodeProps;
 
@@ -18,14 +18,14 @@ const SocialShareNode = ({ node }: SocialShareNodeProps) => {
   return (
     <SocialShareNodeContainer>
       <NodeTitle>{node.title}</NodeTitle>
-      <Flex justifyContent="center" alignItems="center">
+      <ItemContainer>
         {node.links.length === 0 && (
           <>
-            <ShareItem href="https://twitter.com" target="__blank" rel="noopener noreferrer" backgroundColor="#1da1f2">
+            <ShareItem href="https://twitter.com" target="__blank" rel="noopener noreferrer" bg="#1da1f2">
               <Twitter stroke="none" fill="white" />
             </ShareItem>
 
-            <ShareItem href="https://facebook.com" target="__blank" rel="noopener noreferrer" backgroundColor="#1877f2">
+            <ShareItem href="https://facebook.com" target="__blank" rel="noopener noreferrer" bg="#1877f2">
               <Facebook stroke="none" fill="white" />
             </ShareItem>
 
@@ -61,7 +61,7 @@ const SocialShareNode = ({ node }: SocialShareNodeProps) => {
           ),
         )}
 
-      </Flex>
+      </ItemContainer>
     </SocialShareNodeContainer>
   );
 };
