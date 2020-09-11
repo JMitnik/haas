@@ -5,17 +5,35 @@ import styled, { css } from 'styled-components/macro';
 
 export const SocialShareNodeContainer = styled(Div)``;
 
+export const ShareContainer = styled(Div)`
+    ${({ theme }) => css`
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+    border-radius: 6px;
+    background: rgba(0,0,0,0.5);
+    box-shadow: 0 4px 6px rgba(50,50,93,.11), 0 1px 3px rgba(0,0,0,.08);
+    backdrop-filter: saturate(180%) blur(20px);
+    div > span {
+      align-self: flex-start;
+      color: ${Color(theme.colors.primary).lighten(0.35).hex()};
+      margin-left: 5px;
+    }
+
+    div > svg {
+      height: 1.2em;
+      width: 1.2em;
+      color: ${Color(theme.colors.primary).lighten(0.35).hex()};
+    }
+  `}
+  
+`;
+
 export const ItemContainer = styled(Flex)`
   ${({ theme }) => css`
   flex-wrap: wrap;
   justify-content: center;
   align-items: center; 
-
-  padding: 5px;
-  border-radius: 6px;
-  box-shadow: 0 4px 6px rgba(50,50,93,.11), 0 1px 3px rgba(0,0,0,.08);
-
-  background: ${Color(theme.colors.primary).lighten(0.2).hex()};
 
   @media ${theme.media.mob} {
     justify-content: start;
@@ -34,7 +52,8 @@ export const ShareItem = styled.a<ColorProps>`
     cursor: pointer;
     border-radius: 6px;
     padding: 10px;
-    min-width: 16px;
+    min-width: 45px;
+    min-height: 45px;
     margin-right: ${theme.gutter / 2}px;
     margin-bottom: ${theme.gutter / 2}px;
     opacity: 1;
@@ -45,8 +64,13 @@ export const ShareItem = styled.a<ColorProps>`
 
     > span {
       color: white;
-      font-size: 1.1em;
+      font-size: 1em;
       margin-left: 7.5px;
+    }
+
+    svg, img {
+      width: 16px;
+      height: 16px;
     }
 
 
@@ -54,8 +78,8 @@ export const ShareItem = styled.a<ColorProps>`
       @media ${theme.media.desk} {
         margin-bottom: 0;
         svg, img {
-          height: 25px;
-          width: 25px;
+          height: 20px;
+          width: 20px;
         }
       }
    

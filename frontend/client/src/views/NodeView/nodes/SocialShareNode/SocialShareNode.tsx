@@ -1,14 +1,14 @@
-import { Facebook, Globe, Instagram, Linkedin, Twitter } from 'react-feather';
+import { Facebook, Globe, Instagram, Linkedin, Share2, Twitter } from 'react-feather';
 import { getSnapshot } from 'mobx-state-tree';
 import React from 'react';
 
-import { Flex } from '@haas/ui';
+import { Flex, H3, Span } from '@haas/ui';
 import { NodeTitle } from 'layouts/NodeLayout/NodeLayoutStyles';
 import CustomIcon from 'components/Icons/CustomIcon';
 import useDialogueFinish from 'hooks/use-dialogue-finish';
 
 import { GenericNodeProps } from '../types';
-import { ItemContainer, ShareItem, SocialShareNodeContainer } from './SocialShareNodeStyles';
+import { ItemContainer, ShareContainer, ShareItem, SocialShareNodeContainer } from './SocialShareNodeStyles';
 
 type SocialShareNodeProps = GenericNodeProps;
 
@@ -18,8 +18,14 @@ const SocialShareNode = ({ node }: SocialShareNodeProps) => {
   return (
     <SocialShareNodeContainer>
       <NodeTitle>{node.title}</NodeTitle>
-      <ItemContainer>
-        {node.links.length === 0 && (
+      <ShareContainer>
+        <Flex paddingBottom="15px" alignItems="center">
+          <Share2 />
+          <Span fontSize="1.2em">Share</Span>
+        </Flex>
+
+        <ItemContainer>
+          {node.links.length === 0 && (
           <>
             <ShareItem href="https://twitter.com" target="__blank" rel="noopener noreferrer" bg="#1da1f2">
               <Twitter stroke="none" fill="white" />
@@ -37,31 +43,33 @@ const SocialShareNode = ({ node }: SocialShareNodeProps) => {
               <Linkedin stroke="none" fill="white" />
             </ShareItem>
           </>
-        ) }
-        {node.links.map(
-          (link) => (
-            <ShareItem
-              href={link.url}
-              target="__blank"
-              rel="noopener noreferrer"
-              bg={link.backgroundColor || '#007bb5'}
-            >
-              {link.type === 'TWITTER' && <Twitter stroke="none" fill="white" />}
-              {link.type === 'FACEBOOK' && <Facebook stroke="none" fill="white" />}
-              {link.type === 'INSTAGRAM' && <Instagram stroke="white" />}
-              {link.type === 'LINKEDIN' && <Linkedin stroke="none" fill="white" />}
-              {(!['TWITTER', 'FACEBOOK', 'INSTAGRAM', 'LINKEDIN'].includes(link.type) && link.iconUrl)
+          ) }
+          {node.links.map(
+            (link) => (
+              <ShareItem
+                href={link.url}
+                target="__blank"
+                rel="noopener noreferrer"
+                bg={link.backgroundColor || '#007bb5'}
+              >
+                {link.type === 'TWITTER' && <Twitter stroke="none" fill="white" />}
+                {link.type === 'FACEBOOK' && <Facebook stroke="none" fill="white" />}
+                {link.type === 'INSTAGRAM' && <Instagram stroke="white" />}
+                {link.type === 'LINKEDIN' && <Linkedin stroke="none" fill="white" />}
+                {(!['TWITTER', 'FACEBOOK', 'INSTAGRAM', 'LINKEDIN'].includes(link.type) && link.iconUrl)
               && <CustomIcon logo={link.iconUrl} />}
-              {(!['TWITTER', 'FACEBOOK', 'INSTAGRAM', 'LINKEDIN'].includes(link.type) && !link.iconUrl)
+                {(!['TWITTER', 'FACEBOOK', 'INSTAGRAM', 'LINKEDIN'].includes(link.type) && !link.iconUrl)
               && <Globe stroke="white" />}
-              {link.title && (
-              <span>{link.title}</span>
-              )}
-            </ShareItem>
-          ),
-        )}
+                {link.title && (
+                <span>{link.title}</span>
+                )}
+              </ShareItem>
+            ),
+          )}
 
-      </ItemContainer>
+        </ItemContainer>
+      </ShareContainer>
+
     </SocialShareNodeContainer>
   );
 };
