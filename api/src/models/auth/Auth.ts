@@ -1,9 +1,11 @@
-import { inputObjectType, mutationField, objectType } from '@nexus/schema';
+import { inputObjectType, mutationField, objectType, queryField, unionType } from '@nexus/schema';
 
-import { ApolloError, UserInputError } from 'apollo-server-express';
+import { ApolloError, AuthenticationError, UserInputError } from 'apollo-server-express';
+import { resolve } from 'path';
 import { UserType } from '../users/User';
 import AuthService from './AuthService';
 import prisma from '../../config/prisma';
+import verifyAndDecodeToken from './verifyAndDecodeToken';
 
 export const RegisterInput = inputObjectType({
   name: 'RegisterInput',
@@ -86,7 +88,7 @@ export const LoginMutation = mutationField('login', {
 
     const expiryDate = AuthService.getExpiryTimeFromToken(userToken);
 
-    ctx.res.cookie('token', userToken, {
+    ctx.res.cookie('haas_token', userToken, {
       httpOnly: true,
     });
 
@@ -95,5 +97,41 @@ export const LoginMutation = mutationField('login', {
       token: userToken,
       user,
     };
+  },
+});
+
+export const VerifyUserTokenMutation = mutationField('verifyUserToken', {
+  description: 'Given a token, checks in the database whether token has been set and has not expired yet',
+  type: UserType,
+  args: { token: 'String' },
+
+  async resolve(parent, args, ctx) {
+    if (!args.token) throw new UserInputError('No token could be found');
+    // const decodedToken = verifyAndDecodeToken(args.token);
+    const decodedToken = '123123';
+
+    const validUsers = await ctx.prisma.user.findMany({
+      where: { loginToken: decodedToken },
+      include: {
+        customers: {
+          include: {
+            customer: true,
+            role: true,
+          },
+        },
+      },
+    });
+
+    // Check edge cases
+    if (!validUsers.length) throw new ApolloError('No token has been found for this user');
+    if (validUsers.length > 1) throw new Error('Internal server error. Please try again later');
+
+    // Check whether expiration-date is still valid.
+    const [validUser] = validUsers;
+
+    if (!validUser.loginTokenExpiry) throw new ApolloError('Your token is invalid. Please request a new token.');
+    if (validUser.loginTokenExpiry > new Date(Date.now())) throw new ApolloError('Your token has expired. Please request a new token.');
+
+    return validUser;
   },
 });

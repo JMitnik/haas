@@ -16,13 +16,11 @@ import { CustomerCardImage } from './CustomerOverviewStyles';
 
 const CustomerCard = ({ customer }: { customer: any }) => {
   const history = useHistory();
-  const { setActiveCustomer } = useCustomer();
   const toast = useToast();
   const { t } = useTranslation();
 
   const setCustomerSlug = (customerSlug: string) => {
     localStorage.setItem('customer', JSON.stringify(customer));
-    setActiveCustomer(customer);
     history.push(`/dashboard/b/${customerSlug}`);
   };
 

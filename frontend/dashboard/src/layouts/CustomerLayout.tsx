@@ -2,6 +2,7 @@ import { useParams } from 'react-router';
 import React from 'react';
 import styled, { css } from 'styled-components/macro';
 
+import { CustomThemeProviders } from 'providers/ThemeProvider';
 import { Div, PageHeading } from '@haas/ui';
 import { ErrorBoundary } from 'react-error-boundary';
 import { NavItem, NavItems, Usernav } from 'components/Sidenav/Sidenav';
@@ -17,12 +18,12 @@ import { useCustomer } from 'providers/CustomerProvider';
 import { useTranslation } from 'react-i18next';
 import Logo from 'components/Logo/Logo';
 import MobileBottomNav from 'components/MobileBottomNav';
-import NotAuthorizedView from './NotAuthorizedView';
 import Sidenav from 'components/Sidenav';
 import useLocalStorage from 'hooks/useLocalStorage';
 import useMediaDevice from 'hooks/useMediaDevice';
+import NotAuthorizedView from './NotAuthorizedView';
 
-const DashboardLayoutContainer = styled(Div)<{ isMobile?: boolean }>`
+const CustomerLayoutContainer = styled(Div)<{ isMobile?: boolean }>`
   ${({ theme, isMobile = false }) => css`
     display: grid;
     background: ${theme.colors.app.background};
@@ -74,13 +75,12 @@ const DashboardNav = ({ customerSlug }: { customerSlug: string }) => {
   );
 };
 
-const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
+const CustomerLayout = ({ children }: { children: React.ReactNode }) => {
   const params: { topicId: string, customerSlug: string, dialogueSlug: string } = useParams<any>();
   const { activeCustomer } = useCustomer();
-  const [storageCustomer] = useLocalStorage('customer', '');
   const { user } = useAuth();
 
-  const customer = activeCustomer || storageCustomer;
+  const customer = activeCustomer;
 
   const userData: UserProps = {
     firstName: user?.firstName || 'HAAS',
@@ -94,35 +94,38 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <ErrorBoundary FallbackComponent={NotAuthorizedView}>
-      <DashboardLayoutContainer isMobile={device.isSmall}>
-        <Div>
-          {!device.isSmall ? (
-            <motion.div initial={{ x: -30 }} animate={{ x: 0 }} exit={{ x: -30 }}>
-              <Sidenav>
-                <Div>
-                  <Logo justifyContent="center" />
-                  <DashboardNav customerSlug={params.customerSlug} />
-                </Div>
+      <CustomThemeProviders>
 
-                <Usernav
-                  customer={customer}
-                  user={userData}
-                />
-              </Sidenav>
-            </motion.div>
-          ) : (
-            <MobileBottomNav>
-              <DashboardNav customerSlug={params.customerSlug} />
-            </MobileBottomNav>
-          )}
-        </Div>
+        <CustomerLayoutContainer isMobile={device.isSmall}>
+          <Div>
+            {!device.isSmall ? (
+              <motion.div initial={{ x: -30 }} animate={{ x: 0 }} exit={{ x: -30 }}>
+                <Sidenav>
+                  <Div>
+                    <Logo justifyContent="center" />
+                    <DashboardNav customerSlug={params.customerSlug} />
+                  </Div>
 
-        <DashboardViewContainer>
-          {children}
-        </DashboardViewContainer>
-      </DashboardLayoutContainer>
+                  <Usernav
+                    customer={customer}
+                    user={userData}
+                  />
+                </Sidenav>
+              </motion.div>
+            ) : (
+              <MobileBottomNav>
+                <DashboardNav customerSlug={params.customerSlug} />
+              </MobileBottomNav>
+            )}
+          </Div>
+
+          <DashboardViewContainer>
+            {children}
+          </DashboardViewContainer>
+        </CustomerLayoutContainer>
+      </CustomThemeProviders>
     </ErrorBoundary>
   );
 };
 
-export default DashboardLayout;
+export default CustomerLayout;

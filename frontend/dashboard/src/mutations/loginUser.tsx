@@ -10,6 +10,15 @@ const loginUserMutation = gql`
                 firstName
                 lastName
                 id
+                userCustomers {
+                    customer {
+                        id
+                        name
+                    }
+                    role {
+                        permissions
+                    }
+                }
             }
         }
     }

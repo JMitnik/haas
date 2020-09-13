@@ -27,11 +27,6 @@ const client = new ApolloClient({
           window.location.href = '/';
         }
       }
-      console.log('Error!');
-      console.log(graphQLErrors);
-      console.log(operation);
-      console.log(response);
-      console.log(networkError);
     }),
     createUploadLink({
       credentials: 'include',

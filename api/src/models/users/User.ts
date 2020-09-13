@@ -4,7 +4,18 @@ import { UserInputError } from 'apollo-server-express';
 import { DialogueType } from '../questionnaire/Dialogue';
 import { PaginationWhereInput } from '../general/Pagination';
 import { RoleType } from '../role/Role';
+import Customer from '../customer/Customer';
 import UserService from './UserService';
+
+export const UserCustomer = objectType({
+  name: 'UserCustomer',
+
+  definition(t) {
+    t.field('user', { type: 'UserType' });
+    t.field('customer', { type: 'Customer' });
+    t.field('role', { type: 'RoleType' });
+  },
+});
 
 export const UserType = objectType({
   name: 'UserType',
@@ -14,6 +25,34 @@ export const UserType = objectType({
     t.string('phone', { nullable: true });
     t.string('firstName', { nullable: true });
     t.string('lastName', { nullable: true });
+
+    t.list.field('userCustomers', {
+      type: UserCustomer,
+
+      async resolve(parent, args, ctx) {
+        const userWithCustomers = await ctx.prisma.user.findOne({
+          where: { id: parent.id },
+          include: {
+            customers: {
+              include: {
+                customer: true,
+                role: true,
+                user: true,
+              },
+            },
+          },
+        });
+
+        const customers = userWithCustomers?.customers;
+
+        return customers?.map((customerOfUser) => ({
+          id: '',
+          customer: customerOfUser.customer,
+          role: customerOfUser.role,
+          user: parent,
+        })) || [];
+      },
+    });
 
     t.list.field('customers', {
       type: 'Customer',

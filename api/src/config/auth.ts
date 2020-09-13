@@ -1,7 +1,7 @@
 import { allow, deny, or, rule, shield } from 'graphql-shield';
 
-import { ApolloError, ValidationError } from 'apollo-server-express';
 import { APIContext } from '../types/APIContext';
+import { ApolloError, ValidationError } from 'apollo-server-express';
 import AuthorizationError from '../models/auth/AuthorizationError';
 
 // const isLoggedIn = rule({ cache: 'strict' })(
@@ -20,36 +20,25 @@ import AuthorizationError from '../models/auth/AuthorizationError';
 
 const canAccessCompany = rule({ cache: 'no_cache' })(
   async (parent, args, ctx: APIContext) => {
-    console.log(parent);
-    console.log(ctx);
     if (!ctx.session?.userId || !parent.id) return new ApolloError('Unauthorized', 'UNAUTHORIZED');
 
-    const customerWithUsers = await ctx.prisma.userOfCustomer.findOne({
-      where: {
-        userId_customerId: {
-          customerId: parent.id,
-          userId: ctx.session?.userId,
-        },
-      },
-    });
-
-    console.log(customerWithUsers);
-    if (!customerWithUsers) return new ApolloError('Unauthorized', 'UNAUTHORIZED');
+    if (!ctx.session.customersAndPermissions?.find((customer) => customer.id === parent.id)) {
+      return new ApolloError('Unauthorized', 'UNAUTHORIZED');
+    }
 
     return true;
   },
 );
 
 const authShield = shield({
-  // Query: {
-  //   customers: isLoggedIn,
-  // },
-  Customer: canAccessCompany,
+  Customer: {
+    dialogues: canAccessCompany,
+  },
   Mutation: {
     '*': deny,
     login: allow,
-    // createCustomer: isSuperAdmin,
+    verifyUserToken: allow,
   },
-}, { fallbackRule: allow });
+}, { fallbackRule: allow, allowExternalErrors: true });
 
 export default authShield;

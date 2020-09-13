@@ -236,6 +236,11 @@ type Mutation {
   updateCTA(id: String, links: CTALinksInputType, title: String, type: String): QuestionNode!
   updateQuestion(edgeCondition: EdgeConditionInputType, edgeId: String, id: String, optionEntries: OptionsInputType, overrideLeafId: String, title: String, type: String): QuestionNode!
   updateRoles(permissions: PermissionIdsInput, roleId: String): RoleType!
+
+  """
+  Given a token, checks in the database whether token has been set and has not expired yet
+  """
+  verifyUserToken(token: String): UserType!
 }
 
 type NodeEntry {
@@ -589,6 +594,12 @@ enum TriggerTypeEnum {
 """The `Upload` scalar type represents a file upload."""
 scalar Upload
 
+type UserCustomer {
+  customer: Customer!
+  role: RoleType!
+  user: UserType!
+}
+
 input UserInput {
   customerId: String
   email: String!
@@ -614,4 +625,5 @@ type UserType {
   phone: String
   role: RoleType
   roleId: String
+  userCustomers: [UserCustomer!]!
 }

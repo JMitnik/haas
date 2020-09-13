@@ -9,12 +9,13 @@ import readBearerToken from './readBearerToken';
 
 const constructContextSession = async (context: ExpressContext): Promise<ContextSessionType | null> => {
   // Support auth use-case if a token is supported using cookie (should be HTTP-only)
-  const cookieToken: string | null = context.req.cookies?.token;
+  const cookieToken: string | null = context.req.cookies?.haas_token;
   console.log(cookieToken);
 
   // Support auth-use case if a token is submitted using a Bearer token
   const authHeader = context.req.headers.authorization || '';
   const bearerToken = readBearerToken(authHeader);
+  console.log(bearerToken);
 
   // Prefer cookie-token over bearer-token
   const authToken = cookieToken || bearerToken || null;
@@ -25,7 +26,7 @@ const constructContextSession = async (context: ExpressContext): Promise<Context
   try {
     isValid = jwt.verify(authToken, config.jwtSecret);
   } catch (e) {
-    context.res.cookie('token', '');
+    context.res.cookie('haas_token', '');
     throw new AuthenticationError('UNAUTHENTICATED');
   }
 
@@ -54,8 +55,14 @@ const constructContextSession = async (context: ExpressContext): Promise<Context
     },
   });
 
+  const customersAndPermissions = user?.customers.map((customer) => ({
+    permissions: customer.role.permissions,
+    id: customer.customer.id,
+  }));
+
   return {
     userId: user?.id,
+    customersAndPermissions,
     expiresAt: decodedExpAt,
     globalPermissions: user?.globalPermissions || [],
     token: authToken,

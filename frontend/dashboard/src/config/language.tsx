@@ -1,5 +1,13 @@
 const language = {
   general: {
+    register: {
+      en: 'Register',
+      de: 'Registrieren',
+    },
+    register_helper: {
+      en: 'Welcome to HAAS! Finish your registration by filling in some last details.',
+      de: 'Willkommen! Kasse Anmeldung von in einigen Details füllen.',
+    },
     description: {
       en: 'Description',
       de: 'Beschreibung',
@@ -418,6 +426,16 @@ const language = {
     template: {
       en: 'Template',
       de: 'Muster',
+    },
+  },
+  register: {
+    token_not_found: {
+      en: 'Token not found',
+      de: 'Token nicht gefunden',
+    },
+    token_not_found_helper: {
+      en: 'Your invitation token cant be found in your URL. Try requesting your login again.',
+      de: 'Ihre Einladung Token kann nicht in der URL gefunden werden. Versuchen Sie, Ihre Login erneut anfordern.',
     },
   },
   customer: {

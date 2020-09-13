@@ -9,6 +9,7 @@ import getCustomerQuery from 'queries/getEditCustomer';
 const CustomerRoute = (props: RouteProps) => {
   const { user } = useAuth();
   const { customerSlug } = useParams();
+
   const { storageCustomer, setActiveCustomer, setStorageCustomer } = useCustomer();
   const storageSlug = storageCustomer && storageCustomer?.slug;
 

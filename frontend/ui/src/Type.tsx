@@ -22,6 +22,24 @@ export const PageTitle = styled(Text)`
   `}
 `;
 
+export const SubtlePageHeading = styled(Text)`
+  ${({ theme }) => css`
+    text-align: center;
+    color: ${theme.colors.gray[500]};
+    font-size: 2rem;
+    font-weight: 200;
+  `}
+`;
+
+export const SubtlePageSubHeading = styled(Text)`
+  ${({ theme }) => css`
+    text-align: center;
+    color: ${theme.colors.gray[300]};
+    font-size: 1.5rem;
+    font-weight: 100;
+  `}
+`;
+
 export const Paragraph = styled(GenericType).attrs({ as: 'p' })``;
 
 export const H1 = styled(GenericType).attrs({ as: 'h1' })`

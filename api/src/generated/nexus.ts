@@ -320,6 +320,11 @@ export interface NexusGenRootTypes {
     relatedNodeId?: string | null; // String
     type: NexusGenEnums['TriggerTypeEnum']; // TriggerTypeEnum!
   }
+  UserCustomer: { // root type
+    customer: NexusGenRootTypes['Customer']; // Customer!
+    role: NexusGenRootTypes['RoleType']; // RoleType!
+    user: NexusGenRootTypes['UserType']; // UserType!
+  }
   UserTable: { // root type
     pageIndex?: number | null; // Int
     totalPages?: number | null; // Int
@@ -521,6 +526,7 @@ export interface NexusGenFieldTypes {
     updateCTA: NexusGenRootTypes['QuestionNode']; // QuestionNode!
     updateQuestion: NexusGenRootTypes['QuestionNode']; // QuestionNode!
     updateRoles: NexusGenRootTypes['RoleType']; // RoleType!
+    verifyUserToken: NexusGenRootTypes['UserType']; // UserType!
   }
   NodeEntry: { // field return type
     creationDate: string; // String!
@@ -655,6 +661,11 @@ export interface NexusGenFieldTypes {
     relatedNodeId: string | null; // String
     type: NexusGenEnums['TriggerTypeEnum']; // TriggerTypeEnum!
   }
+  UserCustomer: { // field return type
+    customer: NexusGenRootTypes['Customer']; // Customer!
+    role: NexusGenRootTypes['RoleType']; // RoleType!
+    user: NexusGenRootTypes['UserType']; // UserType!
+  }
   UserTable: { // field return type
     pageIndex: number | null; // Int
     totalPages: number | null; // Int
@@ -669,6 +680,7 @@ export interface NexusGenFieldTypes {
     phone: string | null; // String
     role: NexusGenRootTypes['RoleType'] | null; // RoleType
     roleId: string | null; // String
+    userCustomers: NexusGenRootTypes['UserCustomer'][]; // [UserCustomer!]!
   }
   lineChartDataType: { // field return type
     entryId: string | null; // String
@@ -841,6 +853,9 @@ export interface NexusGenArgTypes {
       permissions?: NexusGenInputs['PermissionIdsInput'] | null; // PermissionIdsInput
       roleId?: string | null; // String
     }
+    verifyUserToken: { // args
+      token?: string | null; // String
+    }
   }
   Query: {
     customer: { // args
@@ -914,7 +929,7 @@ export interface NexusGenAbstractResolveReturnTypes {
 
 export interface NexusGenInheritedFields {}
 
-export type NexusGenObjectNames = "ColourSettings" | "Customer" | "CustomerSettings" | "Debug" | "Dialogue" | "DialogueStatistics" | "Edge" | "EdgeCondition" | "FontSettings" | "ImageType" | "LinkType" | "LoginOutput" | "Mutation" | "NodeEntry" | "NodeEntryValue" | "PaginationPageInfo" | "PermssionType" | "Query" | "QuestionNode" | "QuestionOption" | "RoleConnection" | "RoleType" | "Session" | "SessionConnection" | "Tag" | "TriggerConditionType" | "TriggerConnectionType" | "TriggerType" | "UserTable" | "UserType" | "lineChartDataType" | "topPathType";
+export type NexusGenObjectNames = "ColourSettings" | "Customer" | "CustomerSettings" | "Debug" | "Dialogue" | "DialogueStatistics" | "Edge" | "EdgeCondition" | "FontSettings" | "ImageType" | "LinkType" | "LoginOutput" | "Mutation" | "NodeEntry" | "NodeEntryValue" | "PaginationPageInfo" | "PermssionType" | "Query" | "QuestionNode" | "QuestionOption" | "RoleConnection" | "RoleType" | "Session" | "SessionConnection" | "Tag" | "TriggerConditionType" | "TriggerConnectionType" | "TriggerType" | "UserCustomer" | "UserTable" | "UserType" | "lineChartDataType" | "topPathType";
 
 export type NexusGenInputNames = "AddDialogueInput" | "CTALinkInputObjectType" | "CTALinksInputType" | "ChoiceNodeEntryInput" | "CustomerCreateOptions" | "CustomerEditOptions" | "CustomerWhereUniqueInput" | "DialogueFilterInputType" | "DialogueWhereUniqueInput" | "EdgeConditionInputType" | "LoginInput" | "NodeEntryDataInput" | "NodeEntryInput" | "OptionInputType" | "OptionsInputType" | "PaginationSortInput" | "PaginationWhereInput" | "PermissionIdsInput" | "PermissionInput" | "QuestionNodeWhereInputType" | "QuestionNodeWhereUniqueInput" | "RecipientsInputType" | "RegisterInput" | "RegisterNodeEntryInput" | "RoleDataInput" | "RoleInput" | "SessionInput" | "SessionWhereUniqueInput" | "SliderNodeEntryInput" | "TagsInputObjectType" | "TextboxNodeEntryInput" | "TriggerConditionInputType" | "TriggerInputType" | "UserInput";
 

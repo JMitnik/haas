@@ -28,11 +28,22 @@ const makeBrandTheme = (settings: any) => {
   return brandTheme;
 };
 
-const ThemeProviders = ({ children }: ThemeProvidersProps) => {
+export const DefaultThemeProviders = ({ children }: ThemeProvidersProps) => (
+  <ChakraThemeProvider theme={chakraDefaultTheme}>
+    <CSSReset />
+    <ThemeProvider theme={defaultTheme}>
+      {children}
+    </ThemeProvider>
+  </ChakraThemeProvider>
+);
+
+export const CustomThemeProviders = ({ children }: { children: React.ReactNode }) => {
   const [customTheme, setCustomTheme] = useState({});
   const { activeCustomer, storageCustomer } = useCustomer();
 
   useEffect(() => {
+    console.log(activeCustomer);
+
     if (activeCustomer) {
       setCustomTheme(makeBrandTheme(activeCustomer.settings));
     } else if (storageCustomer?.settings?.colourSettings) {
@@ -42,26 +53,11 @@ const ThemeProviders = ({ children }: ThemeProvidersProps) => {
     }
   }, [activeCustomer, setCustomTheme, storageCustomer]);
 
-  if (customTheme) {
-    return (
-      <ChakraThemeProvider theme={chakraDefaultTheme}>
-        <CSSReset />
-        <ThemeProvider theme={defaultTheme}>
-          <ThemeProvider theme={makeCustomTheme(defaultTheme, customTheme)}>
-            {children}
-          </ThemeProvider>
-        </ThemeProvider>
-      </ChakraThemeProvider>
-    );
-  }
-
   return (
-    <>
-      <ThemeProvider theme={defaultTheme}>
-        {children}
-      </ThemeProvider>
-    </>
+    <ThemeProvider theme={makeCustomTheme(defaultTheme, customTheme)}>
+      {children}
+    </ThemeProvider>
   );
 };
 
-export default ThemeProviders;
+export default DefaultThemeProviders;

@@ -74,7 +74,7 @@ class AuthService {
       email: userInput.email,
       id: userInput.id,
       // 5 minutes
-      exp: Math.floor(Date.now() / 1000) + (5 * 60),
+      exp: Math.floor(Date.now() / 1000) + (30 * 60),
     }, config.jwtSecret);
   }
 

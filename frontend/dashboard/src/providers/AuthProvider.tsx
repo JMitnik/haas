@@ -13,11 +13,14 @@ interface AuthContext {
   loginServerError?: Error;
   userIsValid?: () => boolean;
   logout: () => void;
+  activeRole: any;
+  setActiveRole: any;
 }
 
 const AuthContext = React.createContext({} as AuthContext);
 
 const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+  const [activeRole, setActiveRole] = useState<any>({});
   const [authStorage, setAuthStorage] = useLocalStorage('auth', '');
   const toast = useToast();
 
@@ -79,6 +82,8 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       logout,
       loginServerError,
       userIsValid,
+      activeRole,
+      setActiveRole,
     }}
     >
       {children}
