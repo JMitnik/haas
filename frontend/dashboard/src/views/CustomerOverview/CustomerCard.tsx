@@ -8,7 +8,6 @@ import React from 'react';
 import { Card, CardBody, ColumnFlex, H3, Span, Text } from '@haas/ui';
 import { deleteFullCustomerQuery } from 'mutations/deleteFullCustomer';
 import { isValidColor } from 'utils/ColorUtils';
-import { useCustomer } from 'providers/CustomerProvider';
 import { useMutation } from '@apollo/react-hooks';
 import getCustomerQuery from 'queries/getCustomersQuery';
 

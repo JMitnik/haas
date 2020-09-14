@@ -8,7 +8,7 @@ import getCustomerQuery from 'queries/getEditCustomer';
 
 const CustomerRoute = (props: RouteProps) => {
   const { user } = useAuth();
-  const { customerSlug } = useParams();
+  const { customerSlug } = useParams<{ customerSlug: string }>();
 
   const { storageCustomer, setActiveCustomer, setStorageCustomer } = useCustomer();
   const storageSlug = storageCustomer && storageCustomer?.slug;
@@ -29,7 +29,7 @@ const CustomerRoute = (props: RouteProps) => {
         },
       });
     }
-  }, [customerSlug, storageSlug, fetchCustomer]);
+  }, [customerSlug, storageSlug, fetchCustomer, user.id]);
 
   if (!user) return <Redirect to="/login" />;
 

@@ -19,8 +19,8 @@ import { useTranslation } from 'react-i18next';
 import Logo from 'components/Logo/Logo';
 import MobileBottomNav from 'components/MobileBottomNav';
 import Sidenav from 'components/Sidenav';
-import useLocalStorage from 'hooks/useLocalStorage';
 import useMediaDevice from 'hooks/useMediaDevice';
+
 import NotAuthorizedView from './NotAuthorizedView';
 
 const CustomerLayoutContainer = styled(Div)<{ isMobile?: boolean }>`

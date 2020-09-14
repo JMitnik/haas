@@ -9,12 +9,11 @@ import Select from 'react-select';
 import { Button, ButtonGroup, FormErrorMessage } from '@chakra-ui/core';
 import { Div, Form, FormContainer, FormControl,
   FormLabel, FormSection, H3, Hr, Input, InputGrid, InputHelper, Muted, PageTitle } from '@haas/ui';
-import { Mail, Phone, User } from 'react-feather';
+import { Mail } from 'react-feather';
 import { motion } from 'framer-motion';
 import { useCustomer } from 'providers/CustomerProvider';
 import { useTranslation } from 'react-i18next';
 import { yupResolver } from '@hookform/resolvers';
-import createAddMutation from 'mutations/createUser';
 import getRolesQuery from 'queries/getRoles';
 import getUsersQuery from 'queries/getUsers';
 

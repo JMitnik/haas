@@ -1,9 +1,9 @@
 import { Div, Flex, Span, Text } from '@haas/ui';
+import { User } from 'react-feather';
 import React from 'react';
 
-import { Badge, Icon, Tag } from '@chakra-ui/core';
+import { Badge, Icon } from '@chakra-ui/core';
 import { GenericCellProps } from '../TableTypes';
-import { User } from 'react-feather';
 
 export const GenericCell = ({ value }: GenericCellProps) => (
   <Div>

@@ -4,7 +4,7 @@ import { Div, Form, FormControl, FormLabel, Grid, H2, Input, InputGrid, Paragrap
 
 import { Button } from '@chakra-ui/core';
 import { FullLogo } from 'components/Logo/Logo';
-import { Lock, Mail, Send } from 'react-feather';
+import { Mail, Send } from 'react-feather';
 import { useAuth } from 'providers/AuthProvider';
 import { useForm } from 'react-hook-form';
 import { useHistory } from 'react-router';
@@ -50,17 +50,32 @@ const LoginView = () => {
             {!isWaitingForInvite ? (
               <Form onSubmit={form.handleSubmit(handleLogin)}>
                 <H2 color="gray.800" mb={2}>Log in</H2>
-                <Paragraph fontSize="0.9rem" color="gray.500" mb={4}>Login using the credentials provided by the system admin</Paragraph>
+                <Paragraph fontSize="0.9rem" color="gray.500" mb={4}>
+                  Login using the credentials provided by the system admin
+
+                </Paragraph>
                 <ServerError serverError={loginServerError} />
 
                 <InputGrid gridTemplateColumns="1fr">
                   <FormControl>
                     <FormLabel htmlFor="email">Email</FormLabel>
-                    <Input name="email" ref={form.register({ required: true })} leftEl={<Mail />} placeholder="bunny@haas.live" />
+                    <Input
+                      name="email"
+                      ref={form.register({ required: true })}
+                      leftEl={<Mail />}
+                      placeholder="bunny@haas.live"
+                    />
                   </FormControl>
                 </InputGrid>
 
-                <Button leftIcon={Send} type="submit" isDisabled={!form.formState.isValid} mt={4} isLoading={isLoggingIn} loadingText="Logging in">
+                <Button
+                  leftIcon={Send}
+                  type="submit"
+                  isDisabled={!form.formState.isValid}
+                  mt={4}
+                  isLoading={isLoggingIn}
+                  loadingText="Logging in"
+                >
                   Request login
                 </Button>
               </Form>

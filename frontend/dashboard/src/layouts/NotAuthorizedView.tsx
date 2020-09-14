@@ -1,12 +1,9 @@
-import { ColumnFlex, Div, Text } from '@haas/ui';
+import { Div, Text } from '@haas/ui';
 import { ReactComponent as ServerDownImage } from 'assets/images/undraw_auth.svg';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
 
-const NotAuthorizedView = ({ error, componentStack, resetErrorBoundary }: any) => {
-  console.log('An error, eh?');
-  console.log(error);
-
+const NotAuthorizedView = () => {
   const { t } = useTranslation();
 
   return (

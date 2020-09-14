@@ -34,14 +34,6 @@ export const RegisterMutation = mutationField('register', {
     if (!args.input) throw new ApolloError('Input information required');
     const user = await AuthService.registerUser(args.input);
 
-    // const role = user.find((customer) => customer.customer.id === args.input?.customerId)?.role;
-    // const userToken = await AuthService.createToken({
-    //   email: user.email,
-    //   // role: role?.name || '',
-    //   permissions: role?.permissions.map((permission) => permission.name) || [],
-    // });
-
-    // return userToken;
     return {
 
     } as any;
@@ -68,38 +60,6 @@ export const AuthOutput = objectType({
     t.field('user', { type: UserType });
   },
 });
-
-// export const LoginMutation = mutationField('login', {
-//   type: AuthOutput,
-//   nullable: true,
-//   args: { input: LoginInput },
-
-//   async resolve(parent, args, ctx) {
-//     if (!args.input?.email) throw new UserInputError('login:email_missing');
-//     if (!args.input?.password) throw new UserInputError('login:password_missing');
-
-//     const user = await AuthService.loginUser({
-//       email: args.input?.email,
-//     });
-
-//     const userToken = await AuthService.createToken({
-//       id: user.id,
-//       email: user.email,
-//     });
-
-//     const expiryDate = AuthService.getExpiryTimeFromToken(userToken);
-
-//     ctx.res.cookie('haas_token', userToken, {
-//       httpOnly: true,
-//     });
-
-//     return {
-//       expiryDate,
-//       token: userToken,
-//       user,
-//     };
-//   },
-// });
 
 export const VerifyUserTokenOutput = objectType({
   name: 'VerifyUserTokenOutput',

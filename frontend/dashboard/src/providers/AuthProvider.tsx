@@ -1,12 +1,9 @@
-import { useApolloClient, useMutation, useQuery } from '@apollo/react-hooks';
+import { useMutation, useQuery } from '@apollo/react-hooks';
 import React, { useContext, useEffect, useState } from 'react';
 
-import { LoginInput } from 'types/globalTypes';
 import { useHistory } from 'react-router';
 import { useToast } from '@chakra-ui/core';
 import gql from 'graphql-tag';
-import loginUserMutation from 'mutations/loginUser';
-import useLocalStorage from 'hooks/useLocalStorage';
 
 const requestInviteMutation = gql`
   mutation requestInvite($input: RequestInviteInput) {
@@ -32,6 +29,7 @@ interface AuthContext {
   userIsValid?: () => boolean;
   logout: () => void;
   setAccessToken: (token: string) => void;
+  setUser: (userData: any) => void;
 }
 
 const AuthContext = React.createContext({} as AuthContext);
@@ -39,7 +37,6 @@ const AuthContext = React.createContext({} as AuthContext);
 const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<any>(localStorage.getItem('user_data'));
   const [accessToken, setAccessToken] = useState<any>(() => localStorage.getItem('access_token'));
-  const [authStorage, setAuthStorage] = useLocalStorage('auth', '');
   const toast = useToast();
   const history = useHistory();
 
@@ -47,7 +44,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     pollInterval: 300 * 1000,
   });
 
-  const [loginMutation, { data: loginData, loading, error: loginServerError }] = useMutation(requestInviteMutation, {
+  const [loginMutation, { loading, error: loginServerError }] = useMutation(requestInviteMutation, {
     onError: () => {
       toast({
         title: 'Unexpected error!',
@@ -59,25 +56,14 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     },
     onCompleted: () => {
       toast({
-        title: 'Logged in!',
-        description: 'Welcome back!',
+        title: 'Token has been sent!',
+        description: 'Check the email adres for more information',
         status: 'success',
         position: 'bottom-right',
         isClosable: true,
       });
     },
   });
-
-  const userIsValid = () => {
-    if (!authStorage?.auth?.expiryDate) return false;
-
-    const date = new Date(authStorage?.auth?.expiryDate);
-    const nowDate = new Date();
-
-    if (date >= nowDate) return false;
-
-    return true;
-  };
 
   const login = async ({ email }: { email: string }) => {
     await loginMutation({ variables: { input: { email } } });
@@ -105,7 +91,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       isLoggingIn: loading,
       logout,
       loginServerError,
-      userIsValid,
+      setUser,
       setAccessToken,
     }}
     >

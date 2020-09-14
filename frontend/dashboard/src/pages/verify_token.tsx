@@ -1,9 +1,9 @@
 import * as qs from 'qs';
 import { Div,
   Loader, PageContainer, SubtlePageHeading, SubtlePageSubHeading } from '@haas/ui';
-import { Redirect, useLocation } from 'react-router';
 import { useAuth } from 'providers/AuthProvider';
-import { useMutation, useQuery } from '@apollo/react-hooks';
+import { useLocation } from 'react-router';
+import { useMutation } from '@apollo/react-hooks';
 import { useTranslation } from 'react-i18next';
 import React, { useEffect } from 'react';
 import formatServerError from 'utils/formatServerError';
@@ -23,22 +23,23 @@ const verifyUserTokenQuery = gql`
   }
 `;
 
-const RegisterPageContainer = styled(PageContainer)`
+const VerifyTokenPageContainer = styled(PageContainer)`
   display: flex;
   align-items: center;
   justify-content: center;
 `;
 
-const RegisterPage = () => {
+const VerifyTokenPage = () => {
   const location = useLocation();
   const { t } = useTranslation();
-  const { setAccessToken } = useAuth();
+  const { setAccessToken, setUser } = useAuth();
 
   const urlToken: string = qs.parse(location.search, { ignoreQueryPrefix: true })?.token;
 
-  const [verifyUserToken, { loading, data, error, called }] = useMutation(verifyUserTokenQuery, {
+  const [verifyUserToken, { loading, data, error }] = useMutation(verifyUserTokenQuery, {
     onCompleted: (data) => {
       setAccessToken(data.verifyUserToken.accessToken);
+      setUser(data.userData);
     },
   });
 
@@ -54,43 +55,49 @@ const RegisterPage = () => {
 
   if (loading) {
     return (
-      <RegisterPageContainer>
+      <VerifyTokenPageContainer>
         <Div>
           <Loader />
         </Div>
-      </RegisterPageContainer>
+      </VerifyTokenPageContainer>
     );
   }
 
   if (!urlToken) {
     return (
-      <RegisterPageContainer>
+      <VerifyTokenPageContainer>
         <Div>
           <SubtlePageHeading>{t('register:token_not_found')}</SubtlePageHeading>
           <SubtlePageSubHeading>{t('register:token_not_found_helper')}</SubtlePageSubHeading>
         </Div>
-      </RegisterPageContainer>
+      </VerifyTokenPageContainer>
     );
   }
 
   if (error) {
     return (
-      <RegisterPageContainer>
+      <VerifyTokenPageContainer>
         <Div>
           <SubtlePageHeading>{formatServerError(error.message)}</SubtlePageHeading>
         </Div>
-      </RegisterPageContainer>
+      </VerifyTokenPageContainer>
+    );
+  }
+
+  if (data) {
+    return (
+      <VerifyTokenPageContainer>
+        <Div>
+          <SubtlePageHeading>{t('register')}</SubtlePageHeading>
+          <SubtlePageSubHeading>{t('register_helper')}</SubtlePageSubHeading>
+        </Div>
+      </VerifyTokenPageContainer>
     );
   }
 
   return (
-    <RegisterPageContainer>
-      <Div>
-        <SubtlePageHeading>{t('register')}</SubtlePageHeading>
-        <SubtlePageSubHeading>{t('register_helper')}</SubtlePageSubHeading>
-      </Div>
-    </RegisterPageContainer>
+    <VerifyTokenPageContainer />
   );
 };
 
-export default RegisterPage;
+export default VerifyTokenPage;

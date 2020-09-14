@@ -3,15 +3,6 @@ import { ApolloLink, from } from 'apollo-link';
 import { InMemoryCache } from 'apollo-cache-inmemory';
 import { createUploadLink } from 'apollo-upload-client';
 import { onError } from 'apollo-link-error';
-import Cookies from 'js-cookie';
-
-const getToken = () => {
-  const token = localStorage.getItem('access-token');
-
-  if (!token) return '';
-
-  return token;
-};
 
 const authorizeLink = new ApolloLink((operation, forward) => {
   operation.setContext({
@@ -25,16 +16,16 @@ const authorizeLink = new ApolloLink((operation, forward) => {
 
 const client = new ApolloClient({
   link: from([
-    onError(({ graphQLErrors, networkError, operation, response }) => {
+    onError(({ graphQLErrors }) => {
       if (graphQLErrors) {
         const authorizedErrors = graphQLErrors.filter((error) => (
           error?.extensions?.code === 'UNAUTHENTICATED'
         ));
 
-        // if (authorizedErrors.length) {
-        //   localStorage.setItem('auth', '');
-        //   window.location.href = '/';
-        // }
+        if (authorizedErrors.length) {
+          localStorage.setItem('auth', '');
+          window.location.href = '/';
+        }
       }
     }),
     authorizeLink,

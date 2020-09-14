@@ -33,7 +33,7 @@ const makeInviteTemplate = ({ recipientMail, customerName, token, bgColor = '#00
             Dear ${recipientMail},
             you have been invited to join ${customerName}'s workspace.
             
-            ${token && `To sign in, please click on the following link: <a href="https://dashboard.haas.live/register?token=${token}">Sign in</a>`}
+            ${token && `To sign in, please click on the following link: <a href="https://dashboard.haas.live/verify_token?token=${token}">Sign in</a>`}
                     </mj-text>
                 </mj-column>
             </mj-section>

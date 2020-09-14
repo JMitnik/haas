@@ -32,7 +32,7 @@ const makeSignInTemplate = ({ recipientMail, token, bgColor = '#0059f8' }: makeS
             Dear ${recipientMail},
             you have requested a sign in link.
             
-            ${token && `To sign in, please click on the following link: <a href="https://dashboard.haas.live/register?token=${token}">Sign in</a>`}
+            ${token && `To sign in, please click on the following link: <a href="https://dashboard.haas.live/verify_token?token=${token}">Sign in</a>`}
                     </mj-text>
                 </mj-column>
             </mj-section>
