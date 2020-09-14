@@ -39,17 +39,15 @@ import DialogueLayout from 'layouts/DialogueLayout';
 import FallbackServerError from 'components/FallbackServerError';
 import InviteUserView from 'views/UsersOverview/InviteUserView';
 import LoginPage from 'pages/login';
+import NotAuthorizedView from 'layouts/NotAuthorizedView';
 import PreCustomerLayout from 'layouts/PreCustomerLayout';
 import VerifyTokenPage from 'pages/verify_token';
 import client from 'config/apollo';
 import lang from 'config/i18n-config';
 
 const DashboardRoute = (props: RouteProps) => {
-  useTranslation();
   const { user } = useAuth();
-
-  // If user is not even logged in, send to public
-  if (!user) return <Redirect to="/public/" />;
+  if (!user) return <Redirect to="/public/login" />;
 
   return (
     <Route {...props} />
@@ -200,7 +198,6 @@ const PublicRoutes = () => (
 
 const RootAppRoute = () => {
   const { user } = useAuth();
-  if (!user) return <Redirect to="/public" />;
 
   return <Redirect to="/dashboard" />;
 };
@@ -240,6 +237,10 @@ const AppRoutes = () => (
 
     <Route path="/public">
       <PublicRoutes />
+    </Route>
+
+    <Route path="/unauthorized">
+      <NotAuthorizedView />
     </Route>
 
     <Route path="/">

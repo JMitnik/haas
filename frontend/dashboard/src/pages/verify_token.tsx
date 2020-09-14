@@ -18,6 +18,15 @@ const verifyUserTokenQuery = gql`
       userData {
         id
         email
+        userCustomers {
+          role {
+            permissions
+          }
+          customer {
+            id
+            slug
+          }
+        }
       }
     }
   }
@@ -39,7 +48,7 @@ const VerifyTokenPage = () => {
   const [verifyUserToken, { loading, data, error }] = useMutation(verifyUserTokenQuery, {
     onCompleted: (data) => {
       setAccessToken(data.verifyUserToken.accessToken);
-      setUser(data.userData);
+      setUser(data.verifyUserToken.userData);
     },
   });
 

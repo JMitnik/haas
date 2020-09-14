@@ -15,7 +15,6 @@ const NotAuthorizedView = () => {
       maxWidth="600px"
       width="100%"
       margin="0 auto"
-      mt="4"
     >
       <Div mb={100}>
         <Text textAlign="center" color="gray.500" fontSize="2rem" fontWeight="200">

@@ -3,39 +3,22 @@ import { useLazyQuery } from '@apollo/react-hooks';
 import React, { useEffect } from 'react';
 
 import { useAuth } from 'providers/AuthProvider';
-import { useCustomer } from 'providers/CustomerProvider';
-import getCustomerQuery from 'queries/getEditCustomer';
 
 const CustomerRoute = (props: RouteProps) => {
   const { user } = useAuth();
   const { customerSlug } = useParams<{ customerSlug: string }>();
 
-  const { storageCustomer, setActiveCustomer, setStorageCustomer } = useCustomer();
-  const storageSlug = storageCustomer && storageCustomer?.slug;
+  if (!user.id) return <Redirect to="/" />;
 
-  const [fetchCustomer] = useLazyQuery(getCustomerQuery, {
-    onCompleted: (result: any) => {
-      setActiveCustomer(result?.customer);
-      setStorageCustomer(result?.customer);
-    },
-  });
+  const customer = user?.userCustomers.find((userCustomer: any) => userCustomer.customer.slug === customerSlug);
 
-  useEffect(() => {
-    if ((customerSlug && storageSlug) && customerSlug !== storageSlug) {
-      fetchCustomer({
-        variables: {
-          customerSlug,
-          userId: user.id,
-        },
-      });
-    }
-  }, [customerSlug, storageSlug, fetchCustomer, user.id]);
+  if (customer) {
+    return (
+      <Route {...props} />
+    );
+  }
 
-  if (!user) return <Redirect to="/login" />;
-
-  return (
-    <Route {...props} />
-  );
+  return <Redirect to="/unauthorized" />;
 };
 
 export default CustomerRoute;

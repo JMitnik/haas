@@ -1,19 +1,67 @@
-import { extendType, inputObjectType, objectType } from '@nexus/schema';
-
 import { UserInputError } from 'apollo-server-express';
-import { DialogueType } from '../questionnaire/Dialogue';
+import { extendType, inputObjectType, objectType, queryField } from '@nexus/schema';
+
 import { PaginationWhereInput } from '../general/Pagination';
 import { RoleType } from '../role/Role';
-import Customer from '../customer/Customer';
 import UserService from './UserService';
 
-export const UserCustomer = objectType({
+export const UserCustomerType = objectType({
   name: 'UserCustomer',
 
   definition(t) {
     t.field('user', { type: 'UserType' });
     t.field('customer', { type: 'Customer' });
     t.field('role', { type: 'RoleType' });
+  },
+});
+
+export const UserOfCustomerInput = inputObjectType({
+  name: 'UserOfCustomerInput',
+  definition(t) {
+    t.string('userId');
+
+    // Provide one of the two
+    t.string('customerId', { required: false });
+    t.string('customerSlug', { required: false });
+  },
+});
+
+export const UserOfCustomerQuery = queryField('UserOfCustomer', {
+  type: UserCustomerType,
+  args: { input: UserOfCustomerInput },
+  nullable: true,
+
+  async resolve(parent, args, ctx) {
+    if (!args.input?.userId) throw new UserInputError('User not provided');
+    if (!args.input?.customerId && !args.input?.customerSlug) throw new UserInputError('Neither slug nor id of Customer was provided');
+
+    let customerId = '';
+    if (!args.input?.customerId && args.input?.customerSlug) {
+      const customer = await ctx.prisma.customer.findOne({
+        where: { slug: args.input.customerSlug },
+      });
+      customerId = customer?.id || '';
+    } else {
+      customerId = args.input.customerId || '';
+    }
+
+    const userWithCustomer = await ctx.prisma.userOfCustomer.findOne({
+      where: {
+        userId_customerId: {
+          customerId,
+          userId: args.input.userId,
+        },
+      },
+      include: {
+        customer: true,
+        role: true,
+        user: true,
+      },
+    });
+
+    if (!userWithCustomer) return null;
+
+    return userWithCustomer;
   },
 });
 
@@ -27,7 +75,7 @@ export const UserType = objectType({
     t.string('lastName', { nullable: true });
 
     t.list.field('userCustomers', {
-      type: UserCustomer,
+      type: UserCustomerType,
 
       async resolve(parent, args, ctx) {
         const userWithCustomers = await ctx.prisma.user.findOne({
@@ -47,6 +95,10 @@ export const UserType = objectType({
 
         return customers?.map((customerOfUser) => ({
           id: '',
+          roleId: '',
+          createdAt: new Date(),
+          customerId: '',
+          userId: '',
           customer: customerOfUser.customer,
           role: customerOfUser.role,
           user: parent,
@@ -250,10 +302,3 @@ export const UserMutations = extendType({
     });
   },
 });
-
-export default [
-  UserInput,
-  UserQueries,
-  UserMutations,
-  UserType,
-];

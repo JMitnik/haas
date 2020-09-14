@@ -92,12 +92,11 @@ const UsernavContainer = styled.div`
 
 export const Usernav = ({ user }: { user: UserProps, customer: any }) => {
   const history = useHistory();
-  const { setActiveCustomer, setStorageCustomer } = useCustomer();
+  const { setActiveCustomer } = useCustomer();
   const { t, i18n } = useTranslation();
   const toast = useToast();
 
   const goToDialoguesOverview = () => {
-    setStorageCustomer(null);
     setActiveCustomer(null);
     history.push('/dashboard');
   };

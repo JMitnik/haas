@@ -35,10 +35,16 @@ interface AuthContext {
 const AuthContext = React.createContext({} as AuthContext);
 
 const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<any>(localStorage.getItem('user_data'));
+  const [user, setUser] = useState<any>(() => {
+    const localUser = JSON.parse(localStorage.getItem('user_data') || '{}');
+
+    if (!localUser?.id) return '';
+
+    return localUser;
+  });
+
   const [accessToken, setAccessToken] = useState<any>(() => localStorage.getItem('access_token'));
   const toast = useToast();
-  const history = useHistory();
 
   const { data: refreshTokenData } = useQuery(refreshAccessTokenQuery, {
     pollInterval: 300 * 1000,
@@ -71,7 +77,6 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const logout = () => {
     localStorage.setItem('access_token', '');
-    history.push('/');
   };
 
   useEffect(() => {
@@ -83,6 +88,10 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     localStorage.setItem('access_token', accessToken);
   }, [accessToken]);
+
+  useEffect(() => {
+    localStorage.setItem('user_data', JSON.stringify(user));
+  }, [user]);
 
   return (
     <AuthContext.Provider value={{

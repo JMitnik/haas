@@ -378,6 +378,7 @@ type Query {
   triggerConnection(customerSlug: String, filter: PaginationWhereInput): TriggerConnectionType
   triggers(customerSlug: String, dialogueId: String, filter: PaginationWhereInput, userId: String): [TriggerType!]!
   user(userId: String): UserType
+  UserOfCustomer(input: UserOfCustomerInput): UserCustomer
   users(customerSlug: String): [UserType!]!
   userTable(customerSlug: String, filter: PaginationWhereInput): UserTable
 }
@@ -634,6 +635,12 @@ input UserInput {
   password: String
   phone: String
   roleId: String
+}
+
+input UserOfCustomerInput {
+  customerId: String
+  customerSlug: String
+  userId: String
 }
 
 type UserTable {

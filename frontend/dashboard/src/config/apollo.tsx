@@ -23,8 +23,9 @@ const client = new ApolloClient({
         ));
 
         if (authorizedErrors.length) {
-          localStorage.setItem('auth', '');
-          window.location.href = '/';
+          localStorage.setItem('user_data', '');
+          localStorage.setItem('access_token', '');
+          // window.location.href = '/';
         }
       }
     }),

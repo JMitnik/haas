@@ -202,6 +202,11 @@ export interface NexusGenInputs {
     phone?: string | null; // String
     roleId?: string | null; // String
   }
+  UserOfCustomerInput: { // input type
+    customerId?: string | null; // String
+    customerSlug?: string | null; // String
+    userId?: string | null; // String
+  }
 }
 
 export interface NexusGenEnums {
@@ -416,6 +421,7 @@ export interface NexusGenAllTypes extends NexusGenRootTypes {
   TriggerConditionInputType: NexusGenInputs['TriggerConditionInputType'];
   TriggerInputType: NexusGenInputs['TriggerInputType'];
   UserInput: NexusGenInputs['UserInput'];
+  UserOfCustomerInput: NexusGenInputs['UserOfCustomerInput'];
   LinkTypeEnumType: NexusGenEnums['LinkTypeEnumType'];
   PaginationSortByEnum: NexusGenEnums['PaginationSortByEnum'];
   QuestionNodeTypeEnum: NexusGenEnums['QuestionNodeTypeEnum'];
@@ -602,6 +608,7 @@ export interface NexusGenFieldTypes {
     triggerConnection: NexusGenRootTypes['TriggerConnectionType'] | null; // TriggerConnectionType
     triggers: NexusGenRootTypes['TriggerType'][]; // [TriggerType!]!
     user: NexusGenRootTypes['UserType'] | null; // UserType
+    UserOfCustomer: NexusGenRootTypes['UserCustomer'] | null; // UserCustomer
     users: NexusGenRootTypes['UserType'][]; // [UserType!]!
     userTable: NexusGenRootTypes['UserTable'] | null; // UserTable
   }
@@ -957,6 +964,9 @@ export interface NexusGenArgTypes {
     user: { // args
       userId?: string | null; // String
     }
+    UserOfCustomer: { // args
+      input?: NexusGenInputs['UserOfCustomerInput'] | null; // UserOfCustomerInput
+    }
     users: { // args
       customerSlug?: string | null; // String
     }
@@ -975,7 +985,7 @@ export interface NexusGenInheritedFields {}
 
 export type NexusGenObjectNames = "ColourSettings" | "Customer" | "CustomerSettings" | "Debug" | "Dialogue" | "DialogueStatistics" | "Edge" | "EdgeCondition" | "FontSettings" | "ImageType" | "InviteUserOutput" | "LinkType" | "LoginOutput" | "Mutation" | "NodeEntry" | "NodeEntryValue" | "PaginationPageInfo" | "PermssionType" | "Query" | "QuestionNode" | "QuestionOption" | "RefreshAccessTokenOutput" | "RequestInviteOutput" | "RoleConnection" | "RoleType" | "Session" | "SessionConnection" | "Tag" | "TriggerConditionType" | "TriggerConnectionType" | "TriggerType" | "UserCustomer" | "UserTable" | "UserType" | "VerifyUserTokenOutput" | "lineChartDataType" | "topPathType";
 
-export type NexusGenInputNames = "AddDialogueInput" | "CTALinkInputObjectType" | "CTALinksInputType" | "ChoiceNodeEntryInput" | "CustomerCreateOptions" | "CustomerEditOptions" | "CustomerWhereUniqueInput" | "DialogueFilterInputType" | "DialogueWhereUniqueInput" | "EdgeConditionInputType" | "InviteUserInput" | "LoginInput" | "NodeEntryDataInput" | "NodeEntryInput" | "OptionInputType" | "OptionsInputType" | "PaginationSortInput" | "PaginationWhereInput" | "PermissionIdsInput" | "PermissionInput" | "QuestionNodeWhereInputType" | "QuestionNodeWhereUniqueInput" | "RecipientsInputType" | "RegisterInput" | "RegisterNodeEntryInput" | "RequestInviteInput" | "RoleDataInput" | "RoleInput" | "SessionInput" | "SessionWhereUniqueInput" | "SliderNodeEntryInput" | "TagsInputObjectType" | "TextboxNodeEntryInput" | "TriggerConditionInputType" | "TriggerInputType" | "UserInput";
+export type NexusGenInputNames = "AddDialogueInput" | "CTALinkInputObjectType" | "CTALinksInputType" | "ChoiceNodeEntryInput" | "CustomerCreateOptions" | "CustomerEditOptions" | "CustomerWhereUniqueInput" | "DialogueFilterInputType" | "DialogueWhereUniqueInput" | "EdgeConditionInputType" | "InviteUserInput" | "LoginInput" | "NodeEntryDataInput" | "NodeEntryInput" | "OptionInputType" | "OptionsInputType" | "PaginationSortInput" | "PaginationWhereInput" | "PermissionIdsInput" | "PermissionInput" | "QuestionNodeWhereInputType" | "QuestionNodeWhereUniqueInput" | "RecipientsInputType" | "RegisterInput" | "RegisterNodeEntryInput" | "RequestInviteInput" | "RoleDataInput" | "RoleInput" | "SessionInput" | "SessionWhereUniqueInput" | "SliderNodeEntryInput" | "TagsInputObjectType" | "TextboxNodeEntryInput" | "TriggerConditionInputType" | "TriggerInputType" | "UserInput" | "UserOfCustomerInput";
 
 export type NexusGenEnumNames = "LinkTypeEnumType" | "PaginationSortByEnum" | "QuestionNodeTypeEnum" | "SystemPermission" | "TagTypeEnum" | "TriggerConditionEnum" | "TriggerMediumEnum" | "TriggerTypeEnum";
 
