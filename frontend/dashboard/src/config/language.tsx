@@ -4,6 +4,10 @@ const language = {
       en: 'Register',
       de: 'Registrieren',
     },
+    invite_user: {
+      en: 'Invite user',
+      de: 'Laden Benutzer',
+    },
     register_helper: {
       en: 'Welcome to HAAS! Finish your registration by filling in some last details.',
       de: 'Willkommen! Kasse Anmeldung von in einigen Details füllen.',
@@ -497,6 +501,10 @@ const language = {
     },
   },
   views: {
+    invite_user: {
+      en: 'Invite user',
+      de: 'Laden Benutzer',
+    },
     add_dialogue_view: {
       en: 'Add dialogue',
       de: 'Neuer Dialog',

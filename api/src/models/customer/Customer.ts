@@ -1,4 +1,4 @@
-import { Customer, PrismaClient } from '@prisma/client';
+import { ColourSettings, Customer, CustomerSettings, PrismaClient } from '@prisma/client';
 import { GraphQLError } from 'graphql';
 import { GraphQLUpload, UserInputError } from 'apollo-server-express';
 import { extendType, inputObjectType, mutationField, objectType, scalarType } from '@nexus/schema';
@@ -12,6 +12,14 @@ import CustomerService from './CustomerService';
 // eslint-disable-next-line import/no-cycle
 import DialogueService from '../questionnaire/DialogueService';
 import isValidColor from '../../utils/isValidColor';
+
+export interface CustomerSettingsWithColour extends CustomerSettings {
+  colourSettings?: ColourSettings | null;
+}
+
+export interface CustomerWithCustomerSettings extends Customer {
+  settings?: CustomerSettingsWithColour | null;
+}
 
 export const CustomerType = objectType({
   name: 'Customer',

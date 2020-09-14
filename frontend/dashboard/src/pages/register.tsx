@@ -2,6 +2,7 @@ import * as qs from 'qs';
 import { Div,
   Loader, PageContainer, SubtlePageHeading, SubtlePageSubHeading } from '@haas/ui';
 import { Redirect, useLocation } from 'react-router';
+import { useAuth } from 'providers/AuthProvider';
 import { useMutation, useQuery } from '@apollo/react-hooks';
 import { useTranslation } from 'react-i18next';
 import React, { useEffect } from 'react';
@@ -12,8 +13,12 @@ import styled from 'styled-components/macro';
 const verifyUserTokenQuery = gql`
   mutation verifyUserToken($token: String!) {
     verifyUserToken(token: $token) {
-      id
-      email
+      accessToken
+      accessTokenExpiry
+      userData {
+        id
+        email
+      }
     }
   }
 `;
@@ -27,10 +32,15 @@ const RegisterPageContainer = styled(PageContainer)`
 const RegisterPage = () => {
   const location = useLocation();
   const { t } = useTranslation();
+  const { setAccessToken } = useAuth();
 
   const urlToken: string = qs.parse(location.search, { ignoreQueryPrefix: true })?.token;
 
-  const [verifyUserToken, { loading, data, error, called }] = useMutation(verifyUserTokenQuery);
+  const [verifyUserToken, { loading, data, error, called }] = useMutation(verifyUserTokenQuery, {
+    onCompleted: (data) => {
+      setAccessToken(data.verifyUserToken.accessToken);
+    },
+  });
 
   useEffect(() => {
     if (urlToken) {

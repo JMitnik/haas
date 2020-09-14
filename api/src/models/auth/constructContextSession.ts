@@ -9,15 +9,15 @@ import readBearerToken from './readBearerToken';
 
 const constructContextSession = async (context: ExpressContext): Promise<ContextSessionType | null> => {
   // Support auth use-case if a token is supported using cookie (should be HTTP-only)
-  const cookieToken: string | null = context.req.cookies?.haas_token;
-  console.log(cookieToken);
+  const cookieToken: string | null = context.req.cookies?.access_token;
 
   // Support auth-use case if a token is submitted using a Bearer token
   const authHeader = context.req.headers.authorization || '';
   const bearerToken = readBearerToken(authHeader);
-  console.log(bearerToken);
 
   // Prefer cookie-token over bearer-token
+
+  console.log(bearerToken);
   const authToken = cookieToken || bearerToken || null;
 
   if (!authToken) return null;
@@ -26,7 +26,7 @@ const constructContextSession = async (context: ExpressContext): Promise<Context
   try {
     isValid = jwt.verify(authToken, config.jwtSecret);
   } catch (e) {
-    context.res.cookie('haas_token', '');
+    context.res.cookie('access_token', '');
     throw new AuthenticationError('UNAUTHENTICATED');
   }
 
@@ -34,16 +34,16 @@ const constructContextSession = async (context: ExpressContext): Promise<Context
 
   const decodedUser = jwt.decode(authToken);
   // @ts-ignore
-  const decodedUserMail = decodedUser?.email;
+  const decodedUserId = decodedUser?.id;
   // @ts-ignore
   const decodedExpAt = decodedUser?.iat;
 
-  if (!decodedUserMail) return null;
+  if (!decodedUserId) return null;
   if (!decodedExpAt) return null;
 
   const user = await prisma.user.findOne({
     where: {
-      email: decodedUserMail,
+      id: decodedUserId,
     },
     include: {
       customers: {

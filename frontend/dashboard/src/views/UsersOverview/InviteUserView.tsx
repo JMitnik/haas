@@ -1,5 +1,5 @@
 import * as yup from 'yup';
-import { ApolloError } from 'apollo-boost';
+import { ApolloError, gql } from 'apollo-boost';
 import { Controller, useForm } from 'react-hook-form';
 import { useHistory, useParams } from 'react-router';
 import { useMutation, useQuery } from '@apollo/react-hooks';
@@ -36,12 +36,18 @@ const schema = yup.object().shape({
   role: yup.object().shape({
     value: yup.string().required(),
   }),
-  firstName: yup.string().notRequired(),
-  lastName: yup.string().notRequired(),
-  phone: yup.string().notRequired(),
 });
 
-const AddUserView = () => {
+const inviteUserMutation = gql`
+  mutation inviteUser($input: InviteUserInput) {
+    inviteUser(input: $input) {
+      didInvite
+      didAlreadyExist
+    }
+  }
+`;
+
+const InviteUserView = () => {
   const history = useHistory();
   const form = useForm<FormDataProps>({
     resolver: yupResolver(schema),
@@ -53,7 +59,7 @@ const AddUserView = () => {
   const { t } = useTranslation();
 
   const { data } = useQuery(getRolesQuery, { variables: { customerSlug } });
-  const [addUser, { loading: isLoading }] = useMutation(createAddMutation, {
+  const [addUser, { loading: isLoading }] = useMutation(inviteUserMutation, {
     onCompleted: () => {
       history.push(`/dashboard/b/${customerSlug}/users/`);
     },
@@ -76,15 +82,11 @@ const AddUserView = () => {
       // TODO: Not robust yet
       customerId: customer.storageCustomer.id,
       roleId: formData.role?.value || null,
-      firstName: formData.firstName || '',
-      lastName: formData.lastName || '',
       email: formData.email || '',
-      phone: formData.phone || '',
     };
 
     addUser({
       variables: {
-        customerSlug,
         input: optionInput,
       },
     });
@@ -92,7 +94,7 @@ const AddUserView = () => {
 
   return (
     <>
-      <PageTitle>{t('views:create_user_view')}</PageTitle>
+      <PageTitle>{t('views:invite_user')}</PageTitle>
 
       <motion.div initial={{ opacity: 0, y: 100 }} animate={{ opacity: 1, y: 0 }}>
         <FormContainer>
@@ -106,28 +108,6 @@ const AddUserView = () => {
               </Div>
               <Div>
                 <InputGrid>
-                  <FormControl isRequired isInvalid={!!form.errors.firstName}>
-                    <FormLabel htmlFor="firstName">{t('first_name')}</FormLabel>
-                    <InputHelper>{t('first_name_helper')}</InputHelper>
-                    <Input
-                      placeholder="Jane"
-                      leftEl={<User />}
-                      name="firstName"
-                      ref={form.register()}
-                    />
-                    <FormErrorMessage>{form.errors.firstName?.message}</FormErrorMessage>
-                  </FormControl>
-                  <FormControl isRequired isInvalid={!!form.errors.lastName}>
-                    <FormLabel htmlFor="lastName">{t('last_name')}</FormLabel>
-                    <InputHelper>{t('last_name_helper')}</InputHelper>
-                    <Input
-                      placeholder="Doe"
-                      leftEl={<User />}
-                      name="lastName"
-                      ref={form.register()}
-                    />
-                    <FormErrorMessage>{form.errors.lastName?.message}</FormErrorMessage>
-                  </FormControl>
                   <FormControl isRequired isInvalid={!!form.errors.email}>
                     <FormLabel htmlFor="email">{t('email')}</FormLabel>
                     <InputHelper>{t('email_helper')}</InputHelper>
@@ -138,17 +118,6 @@ const AddUserView = () => {
                       ref={form.register()}
                     />
                     <FormErrorMessage>{form.errors.email?.message}</FormErrorMessage>
-                  </FormControl>
-                  <FormControl isInvalid={!!form.errors.phone}>
-                    <FormLabel htmlFor="pgone">{t('phone')}</FormLabel>
-                    <InputHelper>{t('phone_helper')}</InputHelper>
-                    <Input
-                      placeholder="Doe"
-                      leftEl={<Phone />}
-                      name="phone"
-                      ref={form.register()}
-                    />
-                    <FormErrorMessage>{form.errors.phone?.message}</FormErrorMessage>
                   </FormControl>
                 </InputGrid>
               </Div>
@@ -173,18 +142,6 @@ const AddUserView = () => {
                     control={form.control}
                     options={mappedRoles}
                   />
-                  {/* <Select
-                    styles={form.errors.role && !activeRole ? ErrorStyle : undefined}
-                    ref={() => form.register({
-                      name: 'role',
-                      required: true,
-                    })}
-                    options={mappedRoles}
-                    value={activeRole}
-                    onChange={(qOption: any) => {
-                      handleRoleChange(qOption);
-                    }}
-                  /> */}
                 </FormControl>
               </Div>
             </FormSection>
@@ -196,7 +153,7 @@ const AddUserView = () => {
                 variantColor="teal"
                 type="submit"
               >
-                Create
+                Send invite
               </Button>
               <Button variant="outline" onClick={() => history.push('/')}>Cancel</Button>
             </ButtonGroup>
@@ -207,4 +164,4 @@ const AddUserView = () => {
   );
 };
 
-export default AddUserView;
+export default InviteUserView;

@@ -1,10 +1,28 @@
-import { useMutation } from '@apollo/react-hooks';
+import { useApolloClient, useMutation, useQuery } from '@apollo/react-hooks';
 import React, { useContext, useEffect, useState } from 'react';
 
 import { LoginInput } from 'types/globalTypes';
+import { useHistory } from 'react-router';
 import { useToast } from '@chakra-ui/core';
+import gql from 'graphql-tag';
 import loginUserMutation from 'mutations/loginUser';
 import useLocalStorage from 'hooks/useLocalStorage';
+
+const requestInviteMutation = gql`
+  mutation requestInvite($input: RequestInviteInput) {
+    requestInvite(input: $input) {
+      didInvite
+    }
+  }
+`;
+
+const refreshAccessTokenQuery = gql`
+  query refreshAccessToken {
+    refreshAccessToken {
+      accessToken
+    }
+  }
+`;
 
 interface AuthContext {
   user: any;
@@ -13,18 +31,23 @@ interface AuthContext {
   loginServerError?: Error;
   userIsValid?: () => boolean;
   logout: () => void;
-  activeRole: any;
-  setActiveRole: any;
+  setAccessToken: (token: string) => void;
 }
 
 const AuthContext = React.createContext({} as AuthContext);
 
 const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [activeRole, setActiveRole] = useState<any>({});
+  const [user, setUser] = useState<any>(localStorage.getItem('user_data'));
+  const [accessToken, setAccessToken] = useState<any>(() => localStorage.getItem('access_token'));
   const [authStorage, setAuthStorage] = useLocalStorage('auth', '');
   const toast = useToast();
+  const history = useHistory();
 
-  const [loginMutation, { data: loginData, loading, error: loginServerError }] = useMutation<{login: { token: string, user: any }}, LoginInput>(loginUserMutation, {
+  const { data: refreshTokenData } = useQuery(refreshAccessTokenQuery, {
+    pollInterval: 300 * 1000,
+  });
+
+  const [loginMutation, { data: loginData, loading, error: loginServerError }] = useMutation(requestInviteMutation, {
     onError: () => {
       toast({
         title: 'Unexpected error!',
@@ -45,12 +68,6 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     },
   });
 
-  const [user, setUser] = useState(() => {
-    if (authStorage) return authStorage?.user;
-
-    return null;
-  });
-
   const userIsValid = () => {
     if (!authStorage?.auth?.expiryDate) return false;
 
@@ -62,17 +79,24 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return true;
   };
 
-  const login = async ({ email, password }: { email: string, password: string }) => {
-    await loginMutation({ variables: { input: { email, password } } });
+  const login = async ({ email }: { email: string }) => {
+    await loginMutation({ variables: { input: { email } } });
+  };
+
+  const logout = () => {
+    localStorage.setItem('access_token', '');
+    history.push('/');
   };
 
   useEffect(() => {
-    if (loginData) {
-      setAuthStorage(loginData.login);
+    if (refreshTokenData?.refreshAccessToken.accessToken) {
+      setAccessToken(refreshTokenData?.refreshAccessToken.accessToken);
     }
-  }, [loginData, setUser, setAuthStorage]);
+  }, [refreshTokenData]);
 
-  const logout = () => setUser(null);
+  useEffect(() => {
+    localStorage.setItem('access_token', accessToken);
+  }, [accessToken]);
 
   return (
     <AuthContext.Provider value={{
@@ -82,8 +106,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       logout,
       loginServerError,
       userIsValid,
-      activeRole,
-      setActiveRole,
+      setAccessToken,
     }}
     >
       {children}

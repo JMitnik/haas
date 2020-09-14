@@ -36,8 +36,10 @@ const authShield = shield({
   },
   Mutation: {
     '*': deny,
-    login: allow,
+    // login: allow,
     verifyUserToken: allow,
+    inviteUser: allow,
+    requestInvite: allow,
   },
 }, { fallbackRule: allow, allowExternalErrors: true });
 

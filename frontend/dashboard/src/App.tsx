@@ -37,6 +37,7 @@ import AuthProvider, { useAuth } from 'providers/AuthProvider';
 import CustomerRoute from 'components/Auth/CustomerRoute';
 import DialogueLayout from 'layouts/DialogueLayout';
 import FallbackServerError from 'components/FallbackServerError';
+import InviteUserView from 'views/UsersOverview/InviteUserView';
 import LoginPage from 'pages/login';
 import PreCustomerLayout from 'layouts/PreCustomerLayout';
 import RegisterPage from 'pages/register';
@@ -138,10 +139,18 @@ const CustomerRoutes = () => (
                     )}
                   />
 
+                  {/* Possible deprecate this */}
                   <DashboardRoute
                     path="/dashboard/b/:customerSlug/users/add"
                     render={() => (
                       <AddUserView />
+                    )}
+                  />
+
+                  <DashboardRoute
+                    path="/dashboard/b/:customerSlug/users/invite"
+                    render={() => (
+                      <InviteUserView />
                     )}
                   />
 

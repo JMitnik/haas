@@ -1,9 +1,12 @@
 import { User, UserWhereInput } from '@prisma/client';
 import _ from 'lodash';
 
-import { NexusGenFieldTypes, NexusGenInputs, NexusGenTypes } from '../../generated/nexus';
+import { NexusGenInputs } from '../../generated/nexus';
 import { Nullable } from '../../types/generic';
 
+import { mailService } from '../../services/mailings/MailService';
+import AuthService from '../auth/AuthService';
+import makeInviteTemplate from '../../services/mailings/templates/makeInviteTemplate';
 import prisma from '../../config/prisma';
 
 interface CreateUserOptions {
@@ -11,7 +14,7 @@ interface CreateUserOptions {
 }
 
 class UserService {
-  static async createUser(userInput: NexusGenInputs['UserInput'], customerSlug: string) {
+  static async createUser(userInput: NexusGenInputs['UserInput']) {
     // TODO: Connect to multile customers
     const user = await prisma.user.create({
       data: {
@@ -24,6 +27,100 @@ class UserService {
     });
 
     return user;
+  }
+
+  static async inviteNewUserToCustomer(email: string, customerId: string, roleId: string) {
+    const createdUser = await prisma.user.create({
+      data: {
+        email,
+        customers: {
+          create: {
+            customer: { connect: { id: customerId } },
+            role: { connect: { id: roleId } },
+          },
+        },
+      },
+      include: {
+        customers: {
+          include: {
+            customer: {
+              include: {
+                settings: {
+                  include: {
+                    colourSettings: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    const inviteLoginToken = AuthService.createUserToken(createdUser.id);
+
+    await prisma.user.update({
+      where: {
+        id: createdUser.id,
+      },
+      data: {
+        loginToken: inviteLoginToken,
+      },
+    });
+
+    const emailBody = makeInviteTemplate({
+      customerName: createdUser.customers[0].customer.name,
+      recipientMail: email,
+      token: inviteLoginToken,
+      bgColor: createdUser.customers[0].customer.settings?.colourSettings?.primary,
+    });
+
+    mailService.send({
+      recipient: email,
+      subject: 'Welcome to HAAS!',
+      body: emailBody,
+    });
+  }
+
+  static async inviteExistingUserToCustomer(user: User, customerId: string, roleId: string) {
+    const updatedUser = await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        customers: {
+          create: {
+            customer: { connect: { id: customerId } },
+            role: { connect: { id: roleId } },
+          },
+        },
+      },
+      include: {
+        customers: {
+          include: {
+            customer: {
+              include: {
+                settings: {
+                  include: {
+                    colourSettings: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    const emailBody = makeInviteTemplate({
+      customerName: updatedUser.customers[0].customer.name,
+      recipientMail: user.email,
+      bgColor: updatedUser.customers[0].customer.settings?.colourSettings?.primary,
+    });
+
+    mailService.send({
+      recipient: user.email,
+      subject: 'HAAS: You have been added to a new workspace!',
+      body: emailBody,
+    });
   }
 
   static getSearchTermFilter = (searchTerm: string) => {

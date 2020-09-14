@@ -9,8 +9,6 @@ import getCustomersQuery from 'queries/getCustomersQuery';
 const CustomersPage = () => {
   const { user } = useAuth();
 
-  console.log(user);
-
   const { loading, error, data } = useQuery(getCustomersQuery, {
     variables: {
       userId: user?.id,

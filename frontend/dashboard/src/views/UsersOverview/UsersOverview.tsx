@@ -144,7 +144,7 @@ const UsersOverview = () => {
 
   const handleAddUser = (event: any) => {
     event.stopPropagation();
-    history.push(`/dashboard/b/${customerSlug}/users/add/`);
+    history.push(`/dashboard/b/${customerSlug}/users/invite/`);
   };
 
   const handleSearchTermChange = useCallback(debounce((newSearchTerm: string) => {
@@ -161,7 +161,7 @@ const UsersOverview = () => {
       <Div mb={4} width="100%">
         <Flex justifyContent="space-between">
           <Div mr={4}>
-            <Button onClick={handleAddUser} leftIcon={Plus} variantColor="teal">{t('user:create_user')}</Button>
+            <Button onClick={handleAddUser} leftIcon={Plus} variantColor="teal">{t('invite_user')}</Button>
           </Div>
           <Div>
             <SearchBar

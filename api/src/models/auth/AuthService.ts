@@ -69,6 +69,16 @@ class AuthService {
     return user;
   }
 
+  static createUserToken(userId: string, duration: number | null = null) {
+    const tokenMinutes = duration || config.jwtExpiryMinutes;
+
+    return jwt.sign({
+      id: userId,
+      // 5 minutes
+      exp: Math.floor(Date.now() / 1000) + (tokenMinutes * 60),
+    }, config.jwtSecret);
+  }
+
   static async createToken(userInput: UserTokenProps) {
     return jwt.sign({
       email: userInput.email,
@@ -88,18 +98,18 @@ class AuthService {
     return decoded.exp;
   }
 
-  static async loginUser(userInput: NexusGenInputs['LoginInput']) {
-    const user = await prisma.user.findOne({ where: { email: userInput.email } });
+  // static async loginUser(userInput: NexusGenInputs['LoginInput']) {
+  //   const user = await prisma.user.findOne({ where: { email: userInput.email } });
 
-    if (!user) throw new Error('auth:account_not_found');
-    if (!user?.password) throw new UserInputError('Something seems wrong with your account. Contact the admin for more info');
+  //   if (!user) throw new Error('auth:account_not_found');
+  //   if (!user?.password) throw new UserInputError('Something seems wrong with your account. Contact the admin for more info');
 
-    const isValidPassword = await AuthService.checkPassword(userInput.password, user?.password);
+  //   const isValidPassword = await AuthService.checkPassword(userInput.password, user?.password);
 
-    if (!isValidPassword) throw new UserInputError('Login credentials invalid');
+  //   if (!isValidPassword) throw new UserInputError('Login credentials invalid');
 
-    return user;
-  }
+  //   return user;
+  // }
 
   static async checkPassword(inputPassword: string, dbPassword: string) {
     const res = await bcrypt.compare(inputPassword, dbPassword);
