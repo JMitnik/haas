@@ -75,9 +75,9 @@ export const GoBackText = styled.span`
 export const GoBackContainer = styled(motion.div)`
   ${({ theme }) => css`
     position: absolute;
-    top: ${theme.gutter * 4}px;
-    left: ${theme.gutter * 5}px;
-    
+    top: 50vh;
+    left: 0;
+
     @media ${theme.media.mob} {
       top: ${theme.gutter}px;
       left: ${theme.gutter}px;
@@ -109,6 +109,14 @@ export const GoBackButton = styled.button`
     cursor: pointer;
     background: transparent;
     border-radius: 100%;
+
+    @media ${theme.media.desk} {
+      border-top-left-radius: 0px;
+      border-bottom-left-radius: 0px;
+      padding: 40px 0;
+      transform: translateY(-50%);
+    }
+    
     box-shadow: 1px;
     width: 30px;
     display: flex;
@@ -116,6 +124,7 @@ export const GoBackButton = styled.button`
     justify-content: center;
     border: 1px solid rgba(255, 255, 255, 0.05);
     height: 30px;
+    
     background-color: ${Color(theme.colors.primary).mix(Color('white'), 0.4).hex()};
     box-shadow: 0px 2px 1px 1px rgba(0, 0, 0, 0.10);
     color: white;
@@ -127,6 +136,7 @@ export const GoBackButton = styled.button`
     }
 
     i, svg {
+      position: absolute;
       width: 25px;
       line-height: 25px;
       height: 25px;
