@@ -15,7 +15,8 @@ class MailService {
     // if (config.env === 'local') return;
     if (config.env !== 'local') this.sendWithSES(input);
 
-    if (config.env === 'local') this.sendToLog(input);
+    // if (config.env === 'local') this.sendToLog(input);
+    if (config.env === 'local') this.sendWithSES(input);
   }
 
   sendToLog(input: MailSendInput) {

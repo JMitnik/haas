@@ -1,9 +1,9 @@
 import { inputObjectType, mutationField, objectType, queryField, unionType } from '@nexus/schema';
 
 import { ApolloError, AuthenticationError, UserInputError } from 'apollo-server-express';
+import { resolve } from 'path';
 import { UserInput, UserType } from '../users/User';
 import { mailService } from '../../services/mailings/MailService';
-import { resolve } from 'path';
 import AuthService from './AuthService';
 import UserService from '../users/UserService';
 import makeSignInTemplate from '../../services/mailings/templates/makeSignInTemplate';
@@ -216,7 +216,7 @@ export const RefreshAccessTokenQuery = queryField('refreshAccessToken', {
   type: RefreshAccessTokenOutput,
 
   async resolve(parent, args, ctx) {
-    if (!ctx.session?.userId) throw new ApolloError('Please log in again');
+    if (!ctx.session?.userId) throw new ApolloError('No verified user');
     const newToken = AuthService.createUserToken(ctx.session?.userId);
 
     return {
@@ -248,7 +248,7 @@ export const InviteUserMutation = mutationField('inviteUser', {
       },
     });
 
-    // If user completely does not exist in our database yet, create a new entry and login-token
+    // Case 1: If user completely does not exist in our database yet, create a new entry and login-token
     if (!users.length) {
       await UserService.inviteNewUserToCustomer(email, customerId, roleId);
 
@@ -259,16 +259,38 @@ export const InviteUserMutation = mutationField('inviteUser', {
     }
 
     const [user] = users;
+    console.log(user);
 
-    // It exists
+    // Case 2: If user-customer relation already exists, just update the role itself
     if (user.customers.length) {
+      await ctx.prisma.userOfCustomer.update({
+        where: {
+          userId_customerId: {
+            customerId,
+            userId: user.id,
+          },
+        },
+        data: {
+          role: { connect: { id: roleId } },
+        },
+      });
+
       return {
         didInvite: false,
         didAlreadyExist: true,
       };
     }
 
-    await UserService.inviteExistingUserToCustomer(user, customerId, roleId);
+    // Cas 3: user exists but not with this customer yet.
+    await ctx.prisma.userOfCustomer.create({
+      data: {
+        customer: { connect: { id: customerId } },
+        role: { connect: { id: roleId } },
+        user: { connect: { id: user.id } },
+      },
+    });
+
+    console.log(user);
 
     return {
       didAlreadyExist: true,

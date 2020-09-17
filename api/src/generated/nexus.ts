@@ -79,6 +79,13 @@ export interface NexusGenInputs {
     renderMax?: number | null; // Int
     renderMin?: number | null; // Int
   }
+  EditUserInput: { // input type
+    customerId?: string | null; // String
+    email: string; // String!
+    firstName?: string | null; // String
+    lastName?: string | null; // String
+    phone?: string | null; // String
+  }
   InviteUserInput: { // input type
     customerId: string; // String!
     email: string; // String!
@@ -395,6 +402,7 @@ export interface NexusGenAllTypes extends NexusGenRootTypes {
   DialogueFilterInputType: NexusGenInputs['DialogueFilterInputType'];
   DialogueWhereUniqueInput: NexusGenInputs['DialogueWhereUniqueInput'];
   EdgeConditionInputType: NexusGenInputs['EdgeConditionInputType'];
+  EditUserInput: NexusGenInputs['EditUserInput'];
   InviteUserInput: NexusGenInputs['InviteUserInput'];
   LoginInput: NexusGenInputs['LoginInput'];
   NodeEntryDataInput: NexusGenInputs['NodeEntryDataInput'];
@@ -870,8 +878,8 @@ export interface NexusGenArgTypes {
       triggerId?: string | null; // String
     }
     editUser: { // args
-      id?: string | null; // String
-      input?: NexusGenInputs['UserInput'] | null; // UserInput
+      input?: NexusGenInputs['EditUserInput'] | null; // EditUserInput
+      userId?: string | null; // String
     }
     inviteUser: { // args
       input?: NexusGenInputs['InviteUserInput'] | null; // InviteUserInput
@@ -985,7 +993,7 @@ export interface NexusGenInheritedFields {}
 
 export type NexusGenObjectNames = "ColourSettings" | "Customer" | "CustomerSettings" | "Debug" | "Dialogue" | "DialogueStatistics" | "Edge" | "EdgeCondition" | "FontSettings" | "ImageType" | "InviteUserOutput" | "LinkType" | "LoginOutput" | "Mutation" | "NodeEntry" | "NodeEntryValue" | "PaginationPageInfo" | "PermssionType" | "Query" | "QuestionNode" | "QuestionOption" | "RefreshAccessTokenOutput" | "RequestInviteOutput" | "RoleConnection" | "RoleType" | "Session" | "SessionConnection" | "Tag" | "TriggerConditionType" | "TriggerConnectionType" | "TriggerType" | "UserCustomer" | "UserTable" | "UserType" | "VerifyUserTokenOutput" | "lineChartDataType" | "topPathType";
 
-export type NexusGenInputNames = "AddDialogueInput" | "CTALinkInputObjectType" | "CTALinksInputType" | "ChoiceNodeEntryInput" | "CustomerCreateOptions" | "CustomerEditOptions" | "CustomerWhereUniqueInput" | "DialogueFilterInputType" | "DialogueWhereUniqueInput" | "EdgeConditionInputType" | "InviteUserInput" | "LoginInput" | "NodeEntryDataInput" | "NodeEntryInput" | "OptionInputType" | "OptionsInputType" | "PaginationSortInput" | "PaginationWhereInput" | "PermissionIdsInput" | "PermissionInput" | "QuestionNodeWhereInputType" | "QuestionNodeWhereUniqueInput" | "RecipientsInputType" | "RegisterInput" | "RegisterNodeEntryInput" | "RequestInviteInput" | "RoleDataInput" | "RoleInput" | "SessionInput" | "SessionWhereUniqueInput" | "SliderNodeEntryInput" | "TagsInputObjectType" | "TextboxNodeEntryInput" | "TriggerConditionInputType" | "TriggerInputType" | "UserInput" | "UserOfCustomerInput";
+export type NexusGenInputNames = "AddDialogueInput" | "CTALinkInputObjectType" | "CTALinksInputType" | "ChoiceNodeEntryInput" | "CustomerCreateOptions" | "CustomerEditOptions" | "CustomerWhereUniqueInput" | "DialogueFilterInputType" | "DialogueWhereUniqueInput" | "EdgeConditionInputType" | "EditUserInput" | "InviteUserInput" | "LoginInput" | "NodeEntryDataInput" | "NodeEntryInput" | "OptionInputType" | "OptionsInputType" | "PaginationSortInput" | "PaginationWhereInput" | "PermissionIdsInput" | "PermissionInput" | "QuestionNodeWhereInputType" | "QuestionNodeWhereUniqueInput" | "RecipientsInputType" | "RegisterInput" | "RegisterNodeEntryInput" | "RequestInviteInput" | "RoleDataInput" | "RoleInput" | "SessionInput" | "SessionWhereUniqueInput" | "SliderNodeEntryInput" | "TagsInputObjectType" | "TextboxNodeEntryInput" | "TriggerConditionInputType" | "TriggerInputType" | "UserInput" | "UserOfCustomerInput";
 
 export type NexusGenEnumNames = "LinkTypeEnumType" | "PaginationSortByEnum" | "QuestionNodeTypeEnum" | "SystemPermission" | "TagTypeEnum" | "TriggerConditionEnum" | "TriggerMediumEnum" | "TriggerTypeEnum";
 

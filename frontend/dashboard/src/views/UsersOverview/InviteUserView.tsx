@@ -53,7 +53,7 @@ const InviteUserView = () => {
     mode: 'onBlur',
   });
   const { customerSlug } = useParams();
-  const customer = useCustomer();
+  const { activeCustomer } = useCustomer();
 
   const { t } = useTranslation();
 
@@ -78,8 +78,7 @@ const InviteUserView = () => {
 
   const handleSubmit = (formData: FormDataProps) => {
     const optionInput = {
-      // TODO: Not robust yet
-      customerId: customer.storageCustomer.id,
+      customerId: activeCustomer.id,
       roleId: formData.role?.value || null,
       email: formData.email || '',
     };

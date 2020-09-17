@@ -180,6 +180,18 @@ export const UserInput = inputObjectType({
   },
 });
 
+export const EditUserInput = inputObjectType({
+  name: 'EditUserInput',
+
+  definition(t) {
+    t.string('email', { required: true });
+    t.string('firstName', { nullable: true });
+    t.string('customerId', { nullable: true });
+    t.string('lastName', { nullable: true });
+    t.string('phone', { nullable: true });
+  },
+});
+
 export const UserQueries = extendType({
   type: 'Query',
   definition(t) {
@@ -190,7 +202,7 @@ export const UserQueries = extendType({
 
       async resolve(parent, args) {
         if (!args.customerSlug) return null;
-        if (!args.filter) return null;
+        // if (!args.filter) return null;
 
         return UserService.paginatedUsers(
           args.customerSlug,
@@ -268,18 +280,29 @@ export const UserMutations = extendType({
 
     t.field('editUser', {
       type: UserType,
-      args: { id: 'String', input: UserInput },
+      args: { userId: 'String', input: EditUserInput },
 
-      resolve(parent, args, ctx) {
-        if (!args.id) throw new UserInputError('No valid user provided to edit');
+      async resolve(parent, args, ctx) {
+        if (!args.userId) throw new UserInputError('No valid user provided to edit');
         if (!args.input) throw new UserInputError('No input provided');
-        const { firstName, lastName, email, phone, roleId } = args.input;
+        const { firstName, lastName, email, phone } = args.input;
+
+        const otherMails = await ctx.prisma.user.findMany({
+          where: {
+            AND: {
+              email: { equals: email },
+              id: { not: args.userId },
+            },
+          },
+        });
+
+        if (otherMails.length) throw new UserInputError('Email is already taken');
 
         if (!email) throw new UserInputError('No valid email provided');
 
         return ctx.prisma.user.update({
           where: {
-            id: args.id,
+            id: args.userId,
           },
           data: {
             firstName,

@@ -37,7 +37,9 @@ import AuthProvider, { useAuth } from 'providers/AuthProvider';
 import CustomerRoute from 'components/Auth/CustomerRoute';
 import DialogueLayout from 'layouts/DialogueLayout';
 import FallbackServerError from 'components/FallbackServerError';
+import FirstTimePage from 'pages/dashboard/first_time';
 import InviteUserView from 'views/UsersOverview/InviteUserView';
+import LoggedOutView from 'layouts/LoggedOutView';
 import LoginPage from 'pages/login';
 import NotAuthorizedView from 'layouts/NotAuthorizedView';
 import PreCustomerLayout from 'layouts/PreCustomerLayout';
@@ -46,8 +48,8 @@ import client from 'config/apollo';
 import lang from 'config/i18n-config';
 
 const DashboardRoute = (props: RouteProps) => {
-  const { user } = useAuth();
-  if (!user) return <Redirect to="/public/login" />;
+  const { isLoggedIn } = useAuth();
+  if (!isLoggedIn) return <Redirect to="/public/login" />;
 
   return (
     <Route {...props} />
@@ -196,11 +198,7 @@ const PublicRoutes = () => (
   </Switch>
 );
 
-const RootAppRoute = () => {
-  const { user } = useAuth();
-
-  return <Redirect to="/dashboard" />;
-};
+const RootAppRoute = () => <Redirect to="/dashboard" />;
 
 const AppRoutes = () => (
   <Switch>
@@ -227,6 +225,10 @@ const AppRoutes = () => (
       )}
     />
 
+    <DashboardRoute path="/dashboard/first_time">
+      <FirstTimePage />
+    </DashboardRoute>
+
     <DashboardRoute path="/dashboard">
       <DashboardPage />
     </DashboardRoute>
@@ -241,6 +243,10 @@ const AppRoutes = () => (
 
     <Route path="/unauthorized">
       <NotAuthorizedView />
+    </Route>
+
+    <Route path="/logged_out">
+      <LoggedOutView />
     </Route>
 
     <Route path="/">

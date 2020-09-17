@@ -1,8 +1,8 @@
 import * as qs from 'qs';
 import { Div,
   Loader, PageContainer, SubtlePageHeading, SubtlePageSubHeading } from '@haas/ui';
+import { Redirect, useHistory, useLocation } from 'react-router';
 import { useAuth } from 'providers/AuthProvider';
-import { useLocation } from 'react-router';
 import { useMutation } from '@apollo/react-hooks';
 import { useTranslation } from 'react-i18next';
 import React, { useEffect } from 'react';
@@ -17,6 +17,8 @@ const verifyUserTokenQuery = gql`
       accessTokenExpiry
       userData {
         id
+        firstName
+        lastName
         email
         userCustomers {
           role {
@@ -40,8 +42,9 @@ const VerifyTokenPageContainer = styled(PageContainer)`
 
 const VerifyTokenPage = () => {
   const location = useLocation();
+  const history = useHistory();
   const { t } = useTranslation();
-  const { setAccessToken, setUser } = useAuth();
+  const { setAccessToken, setUser, isLoggedIn, user } = useAuth();
 
   const urlToken: string = qs.parse(location.search, { ignoreQueryPrefix: true })?.token;
 
@@ -51,6 +54,18 @@ const VerifyTokenPage = () => {
       setUser(data.verifyUserToken.userData);
     },
   });
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      console.log(user.firstName);
+
+      if (!user.firstName) {
+        history.push('/dashboard/first_time');
+      } else {
+        history.push('/dashboard');
+      }
+    }
+  }, [isLoggedIn, user]);
 
   useEffect(() => {
     if (urlToken) {
@@ -88,17 +103,6 @@ const VerifyTokenPage = () => {
       <VerifyTokenPageContainer>
         <Div>
           <SubtlePageHeading>{formatServerError(error.message)}</SubtlePageHeading>
-        </Div>
-      </VerifyTokenPageContainer>
-    );
-  }
-
-  if (data) {
-    return (
-      <VerifyTokenPageContainer>
-        <Div>
-          <SubtlePageHeading>{t('register')}</SubtlePageHeading>
-          <SubtlePageSubHeading>{t('register_helper')}</SubtlePageSubHeading>
         </Div>
       </VerifyTokenPageContainer>
     );

@@ -5,11 +5,16 @@ import { createUploadLink } from 'apollo-upload-client';
 import { onError } from 'apollo-link-error';
 
 const authorizeLink = new ApolloLink((operation, forward) => {
-  operation.setContext({
-    headers: {
-      Authorization: `Bearer:${localStorage.getItem('access_token') || ''}`,
-    },
-  });
+  const localToken = localStorage.getItem('access_token');
+
+  if (localToken) {
+    console.log(typeof localToken);
+    operation.setContext({
+      headers: {
+        Authorization: `Bearer:${localToken}`,
+      },
+    });
+  }
 
   return forward(operation);
 });
@@ -23,9 +28,13 @@ const client = new ApolloClient({
         ));
 
         if (authorizedErrors.length) {
-          localStorage.setItem('user_data', '');
-          localStorage.setItem('access_token', '');
-          // window.location.href = '/';
+          debugger;
+          // TODO: Make this better
+          localStorage.removeItem('user_data');
+          localStorage.removeItem('access_token');
+          localStorage.removeItem('customer');
+          localStorage.removeItem('role');
+          window.location.href = '/logged_out';
         }
       }
     }),

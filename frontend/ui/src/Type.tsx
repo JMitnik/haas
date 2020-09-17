@@ -34,6 +34,9 @@ export const SubtlePageHeading = styled(Text)`
 export const SubtlePageSubHeading = styled(Text)`
   ${({ theme }) => css`
     text-align: center;
+    max-width: 100%;
+    width: 750px;
+    margin: 0 auto;
     color: ${theme.colors.gray[300]};
     font-size: 1.5rem;
     font-weight: 100;

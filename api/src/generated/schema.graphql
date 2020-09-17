@@ -154,6 +154,14 @@ input EdgeConditionInputType {
   renderMin: Int
 }
 
+input EditUserInput {
+  customerId: String
+  email: String!
+  firstName: String
+  lastName: String
+  phone: String
+}
+
 type FontSettings {
   id: ID!
 }
@@ -239,7 +247,7 @@ type Mutation {
   editCustomer(id: String, options: CustomerEditOptions): Customer!
   editDialogue(customerSlug: String, description: String, dialogueSlug: String, publicTitle: String, tags: TagsInputObjectType, title: String): Dialogue!
   editTrigger(questionId: String, recipients: RecipientsInputType, trigger: TriggerInputType, triggerId: String): TriggerType!
-  editUser(id: String, input: UserInput): UserType!
+  editUser(input: EditUserInput, userId: String): UserType!
 
   """Invite a user to a particular customer domain, given an email and role"""
   inviteUser(input: InviteUserInput): InviteUserOutput!

@@ -28,6 +28,8 @@ interface AuthContext {
   loginServerError?: Error;
   userIsValid?: () => boolean;
   logout: () => void;
+  accessToken: string;
+  isLoggedIn: boolean;
   setAccessToken: (token: string) => void;
   setUser: (userData: any) => void;
 }
@@ -35,6 +37,7 @@ interface AuthContext {
 const AuthContext = React.createContext({} as AuthContext);
 
 const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+  const history = useHistory();
   const [user, setUser] = useState<any>(() => {
     const localUser = JSON.parse(localStorage.getItem('user_data') || '{}');
 
@@ -48,6 +51,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const { data: refreshTokenData } = useQuery(refreshAccessTokenQuery, {
     pollInterval: 300 * 1000,
+    skip: !accessToken,
   });
 
   const [loginMutation, { loading, error: loginServerError }] = useMutation(requestInviteMutation, {
@@ -76,7 +80,10 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const logout = () => {
-    localStorage.setItem('access_token', '');
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('user_data');
+    localStorage.removeItem('customer');
+    history.push('/logged_out');
   };
 
   useEffect(() => {
@@ -86,7 +93,11 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, [refreshTokenData]);
 
   useEffect(() => {
-    localStorage.setItem('access_token', accessToken);
+    if (accessToken) {
+      localStorage.setItem('access_token', accessToken);
+    } else {
+      localStorage.removeItem('access_token');
+    }
   }, [accessToken]);
 
   useEffect(() => {
@@ -98,6 +109,8 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       user,
       login,
       isLoggingIn: loading,
+      isLoggedIn: user?.id && accessToken,
+      accessToken,
       logout,
       loginServerError,
       setUser,

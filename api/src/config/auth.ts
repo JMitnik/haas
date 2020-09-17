@@ -8,15 +8,25 @@ import AuthorizationError from '../models/auth/AuthorizationError';
 //   async (parent, args, ctx: APIContext) => ctx.user !== null,
 // );
 
-// const isSuperAdmin = rule({ cache: 'no_cache' })(
-//   async (parent, args, ctx: APIContext) => {
-//     if (!ctx.session?.userId) return false;
+const isSuperAdmin = rule({ cache: 'no_cache' })(
+  async (parent, args, ctx: APIContext) => {
+    if (!ctx.session?.userId) return false;
 
-//     // console.log(ctx.session?.userId?.globalPermissions?.includes('CAN_ACCESS_ADMIN_PANEL'));
+    return ctx.session?.globalPermissions?.includes('CAN_ACCESS_ADMIN_PANEL');
+  },
+);
 
-//     // return ctx.session?.userId?.globalPermissions?.includes('CAN_ACCESS_ADMIN_PANEL');
-//   },
-// );
+const isSelf = rule({ cache: 'no_cache' })(
+  async (parent, args, ctx: APIContext) => {
+    console.log(args.userId);
+    if (!ctx.session?.userId || !args.userId) return new ApolloError('Unauthenticated', 'UNAUTHENTICATED');
+
+    // For now, assume there is always a userId (representing the sender)
+    if (args.userId === ctx.session.userId) return true;
+
+    return false;
+  },
+);
 
 const canAccessCompany = rule({ cache: 'no_cache' })(
   async (parent, args, ctx: APIContext) => {
@@ -40,6 +50,7 @@ const authShield = shield({
     verifyUserToken: allow,
     inviteUser: allow,
     requestInvite: allow,
+    editUser: or(isSelf, isSuperAdmin),
   },
 }, { fallbackRule: allow, allowExternalErrors: true });
 

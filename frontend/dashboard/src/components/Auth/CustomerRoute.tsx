@@ -5,10 +5,10 @@ import React, { useEffect } from 'react';
 import { useAuth } from 'providers/AuthProvider';
 
 const CustomerRoute = (props: RouteProps) => {
-  const { user } = useAuth();
+  const { user, isLoggedIn } = useAuth();
   const { customerSlug } = useParams<{ customerSlug: string }>();
 
-  if (!user.id) return <Redirect to="/" />;
+  if (!isLoggedIn) return <Redirect to="/" />;
 
   const customer = user?.userCustomers.find((userCustomer: any) => userCustomer.customer.slug === customerSlug);
 

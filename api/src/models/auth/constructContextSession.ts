@@ -16,8 +16,6 @@ const constructContextSession = async (context: ExpressContext): Promise<Context
   const bearerToken = readBearerToken(authHeader);
 
   // Prefer cookie-token over bearer-token
-
-  console.log(bearerToken);
   const authToken = cookieToken || bearerToken || null;
 
   if (!authToken) return null;
