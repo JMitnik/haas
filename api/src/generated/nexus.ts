@@ -604,6 +604,7 @@ export interface NexusGenFieldTypes {
     dialogues: NexusGenRootTypes['Dialogue'][]; // [Dialogue!]!
     edge: NexusGenRootTypes['Edge'] | null; // Edge
     lineChartData: NexusGenRootTypes['lineChartDataType'][]; // [lineChartDataType!]!
+    me: NexusGenRootTypes['UserType']; // UserType!
     questionNode: NexusGenRootTypes['QuestionNode'] | null; // QuestionNode
     questionNodes: NexusGenRootTypes['QuestionNode'][]; // [QuestionNode!]!
     refreshAccessToken: NexusGenRootTypes['RefreshAccessTokenOutput']; // RefreshAccessTokenOutput!

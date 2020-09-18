@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import React, { useContext, useEffect, useState } from 'react';
 import gql from 'graphql-tag';
 
-import { useAuth } from './AuthProvider';
+import { useUser } from './UserProvider';
 
 const CustomerContext = React.createContext({} as any);
 
@@ -32,7 +32,7 @@ const getCustomerOfUser = gql`
 `;
 
 const CustomerProvider = ({ children }: { children: React.ReactNode }) => {
-  const auth = useAuth();
+  const auth = useUser();
   const { customerSlug } = useParams<{ customerSlug: string }>();
 
   // Synchronize customer with localstorage

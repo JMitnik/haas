@@ -3,7 +3,7 @@ import { Div, Form, FormContainer,
   FormControl, FormLabel, FormSection, H3, Hr, Input, InputGrid, InputHelper, Muted, SubtlePageHeading, SubtlePageSubHeading, ViewContainer } from '@haas/ui';
 import { Mail, Phone, User } from 'react-feather';
 import { Variants, motion } from 'framer-motion';
-import { useAuth } from 'providers/AuthProvider';
+import { useUser } from 'providers/UserProvider';
 import { useForm } from 'react-hook-form';
 import { useHistory } from 'react-router';
 import { useMutation } from '@apollo/react-hooks';
@@ -62,7 +62,7 @@ const editUserMutation = gql`
 
 const FirstTimeForm = () => {
   const { t } = useTranslation();
-  const { user } = useAuth();
+  const { user } = useUser();
   const toast = useToast();
   const history = useHistory();
 

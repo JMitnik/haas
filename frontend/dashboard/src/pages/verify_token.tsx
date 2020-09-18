@@ -2,10 +2,10 @@ import * as qs from 'qs';
 import { Div,
   Loader, PageContainer, SubtlePageHeading, SubtlePageSubHeading } from '@haas/ui';
 import { Redirect, useHistory, useLocation } from 'react-router';
-import { useAuth } from 'providers/AuthProvider';
 import { useMutation } from '@apollo/react-hooks';
 import { useTranslation } from 'react-i18next';
-import React, { useEffect } from 'react';
+import { useUser } from 'providers/UserProvider';
+import React, { useEffect, useRef } from 'react';
 import formatServerError from 'utils/formatServerError';
 import gql from 'graphql-tag';
 import styled from 'styled-components/macro';
@@ -44,21 +44,19 @@ const VerifyTokenPage = () => {
   const location = useLocation();
   const history = useHistory();
   const { t } = useTranslation();
-  const { setAccessToken, setUser, isLoggedIn, user } = useAuth();
-
-  const urlToken: string = qs.parse(location.search, { ignoreQueryPrefix: true })?.token;
+  const { setAccessToken, setUser, isLoggedIn, user } = useUser();
+  const verifiedRef = useRef(false);
 
   const [verifyUserToken, { loading, data, error }] = useMutation(verifyUserTokenQuery, {
     onCompleted: (data) => {
       setAccessToken(data.verifyUserToken.accessToken);
-      setUser(data.verifyUserToken.userData);
+      // setUser(data.verifyUserToken.userData);
     },
   });
 
   useEffect(() => {
+    console.log(user);
     if (isLoggedIn) {
-      console.log(user.firstName);
-
       if (!user.firstName) {
         history.push('/dashboard/first_time');
       } else {
@@ -68,14 +66,19 @@ const VerifyTokenPage = () => {
   }, [isLoggedIn, user]);
 
   useEffect(() => {
-    if (urlToken) {
+    const urlToken: string = qs.parse(location.search, { ignoreQueryPrefix: true })?.token;
+
+    if (urlToken && !verifiedRef.current) {
+      console.log('Huuh');
+      verifiedRef.current = true;
+
       verifyUserToken({
         variables: {
           token: urlToken,
         },
       });
     }
-  }, [verifyUserToken, urlToken]);
+  }, [verifyUserToken]);
 
   if (loading) {
     return (
@@ -87,16 +90,16 @@ const VerifyTokenPage = () => {
     );
   }
 
-  if (!urlToken) {
-    return (
-      <VerifyTokenPageContainer>
-        <Div>
-          <SubtlePageHeading>{t('register:token_not_found')}</SubtlePageHeading>
-          <SubtlePageSubHeading>{t('register:token_not_found_helper')}</SubtlePageSubHeading>
-        </Div>
-      </VerifyTokenPageContainer>
-    );
-  }
+  // if (!urlToken) {
+  //   return (
+  //     <VerifyTokenPageContainer>
+  //       <Div>
+  //         <SubtlePageHeading>{t('register:token_not_found')}</SubtlePageHeading>
+  //         <SubtlePageSubHeading>{t('register:token_not_found_helper')}</SubtlePageSubHeading>
+  //       </Div>
+  //     </VerifyTokenPageContainer>
+  //   );
+  // }
 
   if (error) {
     return (

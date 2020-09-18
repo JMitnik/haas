@@ -13,7 +13,7 @@ import { ReactComponent as SurveyIcon } from 'assets/icons/icon-survey.svg';
 import { UserProps } from 'types/generic';
 import { ReactComponent as UsersIcon } from 'assets/icons/icon-user-group.svg';
 import { motion } from 'framer-motion';
-import { useAuth } from 'providers/AuthProvider';
+import { useUser } from 'providers/UserProvider';
 import { useCustomer } from 'providers/CustomerProvider';
 import { useTranslation } from 'react-i18next';
 import Logo from 'components/Logo/Logo';
@@ -78,7 +78,7 @@ const DashboardNav = ({ customerSlug }: { customerSlug: string }) => {
 const CustomerLayout = ({ children }: { children: React.ReactNode }) => {
   const params: { topicId: string, customerSlug: string, dialogueSlug: string } = useParams<any>();
   const { activeCustomer } = useCustomer();
-  const { user } = useAuth();
+  const { user } = useUser();
 
   const customer = activeCustomer;
 

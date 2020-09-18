@@ -1,6 +1,6 @@
 import { ApolloProvider } from '@apollo/react-hooks';
 import { ErrorBoundary } from 'react-error-boundary';
-import { I18nextProvider, useTranslation } from 'react-i18next';
+import { I18nextProvider } from 'react-i18next';
 import { Redirect, Route, RouteProps, BrowserRouter as Router, Switch } from 'react-router-dom';
 import CustomerProvider from 'providers/CustomerProvider';
 import React, { FC } from 'react';
@@ -32,9 +32,9 @@ import TriggersOverview from 'views/TriggerOverview/TriggerOverview';
 import UsersOverview from 'views/UsersOverview/UsersOverview';
 
 import { AnimatePresence } from 'framer-motion';
-import { Div, ViewContainer } from '@haas/ui';
-import AuthProvider, { useAuth } from 'providers/AuthProvider';
-import CustomerRoute from 'components/Auth/CustomerRoute';
+import { Div, Loader, ViewContainer } from '@haas/ui';
+import AnimatedRoute from 'components/Routes/AnimatedRoute';
+import CustomerRoute from 'components/Routes/CustomerRoute';
 import DialogueLayout from 'layouts/DialogueLayout';
 import FallbackServerError from 'components/FallbackServerError';
 import FirstTimePage from 'pages/dashboard/first_time';
@@ -43,13 +43,16 @@ import LoggedOutView from 'layouts/LoggedOutView';
 import LoginPage from 'pages/login';
 import NotAuthorizedView from 'layouts/NotAuthorizedView';
 import PreCustomerLayout from 'layouts/PreCustomerLayout';
+import UserProvider, { useUser } from 'providers/UserProvider';
 import VerifyTokenPage from 'pages/verify_token';
 import client from 'config/apollo';
 import lang from 'config/i18n-config';
+import styled from 'styled-components';
 
 const DashboardRoute = (props: RouteProps) => {
-  const { isLoggedIn } = useAuth();
-  if (!isLoggedIn) return <Redirect to="/public/login" />;
+  const { isLoggedIn, isInitializingUser } = useUser();
+
+  if (!isLoggedIn && !isInitializingUser) return <Redirect to="/public/login" />;
 
   return (
     <Route {...props} />
@@ -255,11 +258,41 @@ const AppRoutes = () => (
   </Switch>
 );
 
-const GeneralErrorFallback = ({ error }: { error?: Error | undefined }) => (
-  <Div minHeight="100vh" display="flex" alignItems="center">
-    <FallbackServerError />
-  </Div>
-);
+const GeneralErrorFallback = ({ error }: { error?: Error | undefined }) => {
+  console.log(error);
+
+  return (
+    <Div minHeight="100vh" display="flex" alignItems="center">
+      <FallbackServerError />
+    </Div>
+  );
+};
+
+const Overlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1111;
+  background: rgba(255, 255, 255, 1);
+`;
+
+const BaseRootApp = ({ children }: { children: React.ReactNode }) => {
+  const { isInitializingUser, isLoggingIn, isLoggedIn } = useUser();
+
+  if (isInitializingUser && !isLoggedIn) {
+    return (
+      <>
+        <Overlay>
+          <Loader />
+        </Overlay>
+      </>
+    );
+  }
+
+  return (<>{children}</>);
+};
 
 const App: FC = () => (
   <>
@@ -267,14 +300,16 @@ const App: FC = () => (
       <Router>
         <ApolloProvider client={client}>
           <DefaultThemeProviders>
-            <AuthProvider>
+            <UserProvider>
               <AppContainer>
                 <ErrorBoundary FallbackComponent={GeneralErrorFallback}>
-                  <AppRoutes />
+                  <BaseRootApp>
+                    <AppRoutes />
+                  </BaseRootApp>
                 </ErrorBoundary>
               </AppContainer>
               <GlobalStyle />
-            </AuthProvider>
+            </UserProvider>
           </DefaultThemeProviders>
         </ApolloProvider>
       </Router>

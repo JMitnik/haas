@@ -2,12 +2,12 @@ import { useErrorHandler } from 'react-error-boundary';
 import { useQuery } from '@apollo/react-hooks';
 import React from 'react';
 
-import { useAuth } from 'providers/AuthProvider';
+import { useUser } from 'providers/UserProvider';
 import CustomerOverview from 'views/CustomerOverview';
 import getCustomersQuery from 'queries/getCustomersQuery';
 
 const CustomersPage = () => {
-  const { user } = useAuth();
+  const { user } = useUser();
 
   const { loading, error, data } = useQuery(getCustomersQuery, {
     variables: {

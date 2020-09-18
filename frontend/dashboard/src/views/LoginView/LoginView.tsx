@@ -5,12 +5,15 @@ import { Div, Form, FormControl, FormLabel, Grid, H2, Input, InputGrid, Paragrap
 import { Button } from '@chakra-ui/core';
 import { FullLogo } from 'components/Logo/Logo';
 import { Mail, Send } from 'react-feather';
-import { Route, Switch, useHistory } from 'react-router';
-import { useAuth } from 'providers/AuthProvider';
+import { Redirect, Route, Switch, useHistory, useLocation } from 'react-router';
 import { useForm } from 'react-hook-form';
+import { useUser } from 'providers/UserProvider';
 import ServerError from 'components/ServerError';
 
+import { AnimatePresence } from 'framer-motion';
 import { LoginContentContainer, LoginViewContainer, LoginViewSideScreen } from './LoginViewStyles';
+import AnimatedRoute from 'components/Routes/AnimatedRoute';
+import AnimatedRoutes from 'components/Routes/AnimatedRoutes';
 
 interface FormData {
   email: string;
@@ -20,8 +23,9 @@ interface FormData {
 const baseRoute = '/public/login';
 
 const LoginView = () => {
-  const { login, isLoggingIn, loginServerError } = useAuth();
+  const { login, isLoggingIn, loginServerError } = useUser();
   const history = useHistory();
+  const location = useLocation();
 
   const form = useForm<FormData>({
     mode: 'onChange',
@@ -42,8 +46,8 @@ const LoginView = () => {
         <Div bg="white">
           <LoginContentContainer padding={['4', '15%']}>
             <FullLogo mb="84px" />
-            <Switch>
-              <Route exact path={`${baseRoute}`}>
+            <AnimatedRoutes>
+              <AnimatedRoute exact path={`${baseRoute}`}>
                 <Form onSubmit={form.handleSubmit(handleLogin)}>
                   <H2 color="gray.800" mb={2}>Log in</H2>
                   <Paragraph fontSize="0.9rem" color="gray.500" mb={4}>
@@ -74,13 +78,13 @@ const LoginView = () => {
                     Request login
                   </Button>
                 </Form>
-              </Route>
-              <Route path={`${baseRoute}/waiting`}>
+              </AnimatedRoute>
+              <AnimatedRoute path={`${baseRoute}/waiting`}>
                 <Div>
                   Waiting for mail
                 </Div>
-              </Route>
-            </Switch>
+              </AnimatedRoute>
+            </AnimatedRoutes>
           </LoginContentContainer>
         </Div>
         <LoginViewSideScreen order={[1, 2]} />

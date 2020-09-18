@@ -9,7 +9,7 @@ import { ReactComponent as DeFlag } from 'assets/images/de.svg';
 import { ReactComponent as EnFlag } from 'assets/images/en.svg';
 import { FullLogo, FullLogoContainer, LogoContainer } from 'components/Logo/Logo';
 import { UserProps } from 'types/generic';
-import { useAuth } from 'providers/AuthProvider';
+import { useUser } from 'providers/UserProvider';
 import { useCustomer } from 'providers/CustomerProvider';
 import { useTranslation } from 'react-i18next';
 import Color from 'color';
@@ -93,7 +93,7 @@ const UsernavContainer = styled.div`
 
 export const Usernav = ({ user }: { user: UserProps, customer: any }) => {
   const history = useHistory();
-  const { logout } = useAuth();
+  const { logout } = useUser();
   const { setActiveCustomer } = useCustomer();
   const { t, i18n } = useTranslation();
   const toast = useToast();

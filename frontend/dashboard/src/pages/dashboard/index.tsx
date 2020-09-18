@@ -4,7 +4,7 @@ import React from 'react';
 import { useCustomer } from 'providers/CustomerProvider';
 
 const DashboardPage = () => {
-  // const { user } = useAuth();
+  // const { user } = useUser();
 
   const { activeCustomer, storageCustomer } = useCustomer();
 

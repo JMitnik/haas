@@ -2,10 +2,10 @@ import { Redirect, Route, RouteProps, useParams } from 'react-router-dom';
 import { useLazyQuery } from '@apollo/react-hooks';
 import React, { useEffect } from 'react';
 
-import { useAuth } from 'providers/AuthProvider';
+import { useUser } from 'providers/UserProvider';
 
 const CustomerRoute = (props: RouteProps) => {
-  const { user, isLoggedIn } = useAuth();
+  const { user, isLoggedIn } = useUser();
   const { customerSlug } = useParams<{ customerSlug: string }>();
 
   if (!isLoggedIn) return <Redirect to="/" />;

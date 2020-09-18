@@ -1,7 +1,7 @@
 import { allow, deny, or, rule, shield } from 'graphql-shield';
 
-import { APIContext } from '../types/APIContext';
 import { ApolloError, ValidationError } from 'apollo-server-express';
+import { APIContext } from '../types/APIContext';
 import AuthorizationError from '../models/auth/AuthorizationError';
 
 // const isLoggedIn = rule({ cache: 'strict' })(

@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@apollo/react-hooks';
+import { useLazyQuery, useMutation, useQuery } from '@apollo/react-hooks';
 import React, { useContext, useEffect, useState } from 'react';
 
 import { useHistory } from 'react-router';
@@ -21,7 +21,28 @@ const refreshAccessTokenQuery = gql`
   }
 `;
 
-interface AuthContext {
+const queryMe = gql`
+  query me {
+    me {
+        email
+        firstName
+        lastName
+        id
+        userCustomers {
+            customer {
+                id
+                name
+                slug
+            }
+            role {
+                permissions
+            }
+        }
+    }
+  }
+`;
+
+interface AuthContextProps {
   user: any;
   login: (userData: { email: string, password: string }) => Promise<any>;
   isLoggingIn: boolean;
@@ -30,28 +51,33 @@ interface AuthContext {
   logout: () => void;
   accessToken: string;
   isLoggedIn: boolean;
+  isInitializingUser: boolean;
   setAccessToken: (token: string) => void;
   setUser: (userData: any) => void;
 }
 
-const AuthContext = React.createContext({} as AuthContext);
+const UserContext = React.createContext({} as AuthContextProps);
 
-const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const history = useHistory();
-  const [user, setUser] = useState<any>(() => {
-    const localUser = JSON.parse(localStorage.getItem('user_data') || '{}');
-
-    if (!localUser?.id) return '';
-
-    return localUser;
-  });
+  const [user, setUser] = useState<any>();
 
   const [accessToken, setAccessToken] = useState<any>(() => localStorage.getItem('access_token'));
   const toast = useToast();
 
-  const { data: refreshTokenData } = useQuery(refreshAccessTokenQuery, {
+  const { data: refreshTokenData, loading: isFetchingTokenData } = useQuery(refreshAccessTokenQuery, {
     pollInterval: 300 * 1000,
     skip: !accessToken,
+  });
+
+  const [getUser, { loading: isQueryingUser, data: userData }] = useLazyQuery(queryMe, {
+    onCompleted: (fetchedUserData) => {
+      setUser({
+        id: fetchedUserData.me.id,
+        email: fetchedUserData.me.email,
+        userCustomers: fetchedUserData.me.userCustomers,
+      });
+    },
   });
 
   const [loginMutation, { loading, error: loginServerError }] = useMutation(requestInviteMutation, {
@@ -80,8 +106,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const logout = () => {
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('user_data');
+    setUser(null);
     localStorage.removeItem('customer');
     history.push('/logged_out');
   };
@@ -95,19 +120,17 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     if (accessToken) {
       localStorage.setItem('access_token', accessToken);
+      getUser();
     } else {
       localStorage.removeItem('access_token');
     }
   }, [accessToken]);
 
-  useEffect(() => {
-    localStorage.setItem('user_data', JSON.stringify(user));
-  }, [user]);
-
   return (
-    <AuthContext.Provider value={{
+    <UserContext.Provider value={{
       user,
       login,
+      isInitializingUser: !user?.id && (isQueryingUser),
       isLoggingIn: loading,
       isLoggedIn: user?.id && accessToken,
       accessToken,
@@ -118,10 +141,10 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }}
     >
       {children}
-    </AuthContext.Provider>
+    </UserContext.Provider>
   );
 };
 
-export const useAuth = () => useContext(AuthContext);
+export const useUser = () => useContext(UserContext);
 
-export default AuthProvider;
+export default UserProvider;

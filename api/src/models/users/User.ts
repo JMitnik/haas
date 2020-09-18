@@ -1,4 +1,4 @@
-import { UserInputError } from 'apollo-server-express';
+import { ApolloError, UserInputError } from 'apollo-server-express';
 import { extendType, inputObjectType, objectType, queryField } from '@nexus/schema';
 
 import { PaginationWhereInput } from '../general/Pagination';
@@ -93,7 +93,7 @@ export const UserType = objectType({
 
         const customers = userWithCustomers?.customers;
 
-        return customers?.map((customerOfUser) => ({
+        return customers?.map((customerOfUser: any) => ({
           id: '',
           roleId: '',
           createdAt: new Date(),
@@ -121,7 +121,7 @@ export const UserType = objectType({
           },
         });
 
-        const customers = userWithCustomers?.customers.map((customerOfUser) => customerOfUser.customer);
+        const customers = userWithCustomers?.customers.map((customerOfUser: any) => customerOfUser.customer);
 
         return customers || [];
       },
@@ -145,7 +145,7 @@ export const UserType = objectType({
           },
         });
 
-        const userCustomer = userWithRole?.customers.find((cus) => (
+        const userCustomer = userWithRole?.customers.find((cus: any) => (
           cus.customer.slug === info.variableValues.customerSlug
         ));
 
@@ -224,6 +224,37 @@ export const UserQueries = extendType({
         return ctx.prisma.user.findMany({ where: { customers: {
           every: { customer: { slug: args.customerSlug || undefined } },
         } } });
+      },
+    });
+
+    t.field('me', {
+      type: UserType,
+
+      async resolve(parent, args, ctx) {
+        const userId = ctx.session?.userId;
+
+        const user = await ctx.prisma.user.findOne({
+          where: { id: userId },
+          include: {
+            customers: {
+              include: {
+                customer: true,
+                role: true,
+                user: true,
+              },
+            },
+          },
+        });
+
+        if (!user) throw new ApolloError('There is something wrong in our records. Please contact an admin.', 'UNAUTHENTIC');
+
+        return {
+          email: user?.email,
+          id: user?.id,
+          firstName: user?.firstName,
+          lastName: user?.lastName,
+          phone: user?.phone,
+        };
       },
     });
 
