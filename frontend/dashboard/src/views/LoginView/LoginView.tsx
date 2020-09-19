@@ -62,7 +62,6 @@ const LoginView = () => {
   });
 
   const handleRequestInvite = async (data: FormData) => {
-    console.log(data);
     requestInvite({
       variables: { input: { email: data.email } },
     });

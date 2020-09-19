@@ -4,6 +4,8 @@ import React, { useContext, useEffect, useState } from 'react';
 import { useHistory } from 'react-router';
 import gql from 'graphql-tag';
 
+const POLL_INTERVAL_SECONDS = 15;
+
 const refreshAccessTokenQuery = gql`
   query refreshAccessToken {
     refreshAccessToken {
@@ -33,7 +35,7 @@ const queryMe = gql`
   }
 `;
 
-interface UserContextProps {
+interface AuthContextProps {
   user: any;
   userIsValid?: () => boolean;
   logout: () => void;
@@ -44,7 +46,7 @@ interface UserContextProps {
   setUser: (userData: any) => void;
 }
 
-const UserContext = React.createContext({} as UserContextProps);
+const UserContext = React.createContext({} as AuthContextProps);
 
 const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const history = useHistory();
@@ -52,11 +54,6 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<any>();
   const [accessToken, setAccessToken] = useState<string | null>(() => localStorage.getItem('access_token'));
   const [isInitializingUser, setIsInitializingUser] = useState<boolean>(() => !!accessToken);
-
-  const { data: refreshTokenData } = useQuery(refreshAccessTokenQuery, {
-    pollInterval: 300 * 1000,
-    skip: !accessToken,
-  });
 
   const [getUser] = useLazyQuery(queryMe, {
     onCompleted: (data) => {
@@ -67,12 +64,17 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
         email: data.me.email,
         userCustomers: data.me.userCustomers,
       });
-
       setIsInitializingUser(false);
     },
     onError: () => {
       setIsInitializingUser(false);
     },
+    fetchPolicy: 'network-only',
+  });
+
+  const { data: refreshTokenData } = useQuery(refreshAccessTokenQuery, {
+    pollInterval: POLL_INTERVAL_SECONDS * 1000,
+    skip: !accessToken,
   });
 
   const logout = () => {
@@ -94,7 +96,7 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
     } else {
       localStorage.removeItem('access_token');
     }
-  }, [accessToken]);
+  }, [accessToken, getUser]);
 
   return (
     <UserContext.Provider value={{

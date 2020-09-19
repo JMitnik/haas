@@ -87,17 +87,6 @@ const VerifyTokenPage = () => {
     );
   }
 
-  // if (!urlToken) {
-  //   return (
-  //     <VerifyTokenPageContainer>
-  //       <Div>
-  //         <SubtlePageHeading>{t('register:token_not_found')}</SubtlePageHeading>
-  //         <SubtlePageSubHeading>{t('register:token_not_found_helper')}</SubtlePageSubHeading>
-  //       </Div>
-  //     </VerifyTokenPageContainer>
-  //   );
-  // }
-
   if (error) {
     return (
       <VerifyTokenPageContainer>
