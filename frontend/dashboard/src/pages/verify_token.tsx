@@ -44,18 +44,16 @@ const VerifyTokenPage = () => {
   const location = useLocation();
   const history = useHistory();
   const { t } = useTranslation();
-  const { setAccessToken, setUser, isLoggedIn, user } = useUser();
+  const { setAccessToken, isLoggedIn, user } = useUser();
   const verifiedRef = useRef(false);
 
-  const [verifyUserToken, { loading, data, error }] = useMutation(verifyUserTokenQuery, {
+  const [verifyUserToken, { loading, error }] = useMutation(verifyUserTokenQuery, {
     onCompleted: (data) => {
       setAccessToken(data.verifyUserToken.accessToken);
-      // setUser(data.verifyUserToken.userData);
     },
   });
 
   useEffect(() => {
-    console.log(user);
     if (isLoggedIn) {
       if (!user.firstName) {
         history.push('/dashboard/first_time');
@@ -69,7 +67,6 @@ const VerifyTokenPage = () => {
     const urlToken: string = qs.parse(location.search, { ignoreQueryPrefix: true })?.token;
 
     if (urlToken && !verifiedRef.current) {
-      console.log('Huuh');
       verifiedRef.current = true;
 
       verifyUserToken({

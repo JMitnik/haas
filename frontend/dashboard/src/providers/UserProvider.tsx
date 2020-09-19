@@ -1,17 +1,8 @@
-import { useLazyQuery, useMutation, useQuery } from '@apollo/react-hooks';
+import { useLazyQuery, useQuery } from '@apollo/react-hooks';
 import React, { useContext, useEffect, useState } from 'react';
 
 import { useHistory } from 'react-router';
-import { useToast } from '@chakra-ui/core';
 import gql from 'graphql-tag';
-
-const requestInviteMutation = gql`
-  mutation requestInvite($input: RequestInviteInput) {
-    requestInvite(input: $input) {
-      didInvite
-    }
-  }
-`;
 
 const refreshAccessTokenQuery = gql`
   query refreshAccessToken {
@@ -24,86 +15,65 @@ const refreshAccessTokenQuery = gql`
 const queryMe = gql`
   query me {
     me {
-        email
-        firstName
-        lastName
-        id
-        userCustomers {
-            customer {
-                id
-                name
-                slug
-            }
-            role {
-                permissions
-            }
+      email
+      firstName
+      lastName
+      id
+      userCustomers {
+        customer {
+          id
+          name
+          slug
         }
+        role {
+          permissions
+        }
+      }
     }
   }
 `;
 
-interface AuthContextProps {
+interface UserContextProps {
   user: any;
-  login: (userData: { email: string, password: string }) => Promise<any>;
-  isLoggingIn: boolean;
-  loginServerError?: Error;
   userIsValid?: () => boolean;
   logout: () => void;
-  accessToken: string;
+  accessToken: string | null;
   isLoggedIn: boolean;
   isInitializingUser: boolean;
   setAccessToken: (token: string) => void;
   setUser: (userData: any) => void;
 }
 
-const UserContext = React.createContext({} as AuthContextProps);
+const UserContext = React.createContext({} as UserContextProps);
 
 const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const history = useHistory();
+
   const [user, setUser] = useState<any>();
+  const [accessToken, setAccessToken] = useState<string | null>(() => localStorage.getItem('access_token'));
+  const [isInitializingUser, setIsInitializingUser] = useState<boolean>(() => !!accessToken);
 
-  const [accessToken, setAccessToken] = useState<any>(() => localStorage.getItem('access_token'));
-  const toast = useToast();
-
-  const { data: refreshTokenData, loading: isFetchingTokenData } = useQuery(refreshAccessTokenQuery, {
+  const { data: refreshTokenData } = useQuery(refreshAccessTokenQuery, {
     pollInterval: 300 * 1000,
     skip: !accessToken,
   });
 
-  const [getUser, { loading: isQueryingUser, data: userData }] = useLazyQuery(queryMe, {
-    onCompleted: (fetchedUserData) => {
+  const [getUser] = useLazyQuery(queryMe, {
+    onCompleted: (data) => {
       setUser({
-        id: fetchedUserData.me.id,
-        email: fetchedUserData.me.email,
-        userCustomers: fetchedUserData.me.userCustomers,
+        id: data.me.id,
+        firstName: data.me.firstName,
+        lastName: data.me.lastName,
+        email: data.me.email,
+        userCustomers: data.me.userCustomers,
       });
-    },
-  });
 
-  const [loginMutation, { loading, error: loginServerError }] = useMutation(requestInviteMutation, {
+      setIsInitializingUser(false);
+    },
     onError: () => {
-      toast({
-        title: 'Unexpected error!',
-        description: 'See the form for more information.',
-        status: 'error',
-        position: 'bottom-right',
-        isClosable: true,
-      });
-    },
-    onCompleted: () => {
-      toast({
-        title: 'Token has been sent!',
-        description: 'Check the email adres for more information',
-        status: 'success',
-        position: 'bottom-right',
-        isClosable: true,
-      });
+      setIsInitializingUser(false);
     },
   });
-
-  const login = async ({ email }: { email: string }) => {
-    await loginMutation({ variables: { input: { email } } });
-  };
 
   const logout = () => {
     setUser(null);
@@ -129,13 +99,10 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
   return (
     <UserContext.Provider value={{
       user,
-      login,
-      isInitializingUser: !user?.id && (isQueryingUser),
-      isLoggingIn: loading,
-      isLoggedIn: user?.id && accessToken,
+      isInitializingUser,
+      isLoggedIn: !!(user?.id && accessToken),
       accessToken,
       logout,
-      loginServerError,
       setUser,
       setAccessToken,
     }}

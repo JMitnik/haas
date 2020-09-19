@@ -1,42 +1,70 @@
-import React, { useEffect, useState } from 'react';
-
+import { Button, useToast } from '@chakra-ui/core';
 import { Div, Form, FormControl, FormLabel, Grid, H2, Input, InputGrid, Paragraph } from '@haas/ui';
-
-import { Button } from '@chakra-ui/core';
-import { FullLogo } from 'components/Logo/Logo';
 import { Mail, Send } from 'react-feather';
-import { Redirect, Route, Switch, useHistory, useLocation } from 'react-router';
 import { useForm } from 'react-hook-form';
-import { useUser } from 'providers/UserProvider';
-import ServerError from 'components/ServerError';
+import { useHistory } from 'react-router';
+import { useMutation } from '@apollo/react-hooks';
+import React from 'react';
+import gql from 'graphql-tag';
 
-import { AnimatePresence } from 'framer-motion';
-import { LoginContentContainer, LoginViewContainer, LoginViewSideScreen } from './LoginViewStyles';
+import { FullLogo } from 'components/Logo/Logo';
 import AnimatedRoute from 'components/Routes/AnimatedRoute';
 import AnimatedRoutes from 'components/Routes/AnimatedRoutes';
+import ServerError from 'components/ServerError';
+
+import { LoginContentContainer,
+  LoginViewContainer, LoginViewSideScreen } from './LoginViewStyles';
 
 interface FormData {
   email: string;
   password: string;
 }
 
+const requestInviteMutation = gql`
+  mutation requestInvite($input: RequestInviteInput) {
+    requestInvite(input: $input) {
+      didInvite
+    }
+  }
+`;
+
 const baseRoute = '/public/login';
 
 const LoginView = () => {
-  const { login, isLoggingIn, loginServerError } = useUser();
   const history = useHistory();
-  const location = useLocation();
+  const toast = useToast();
+
+  const [requestInvite, { error: loginServerError, loading: isRequestingInvite }] = useMutation(requestInviteMutation, {
+    onError: () => {
+      toast({
+        title: 'Unexpected error!',
+        description: 'See the form for more information.',
+        status: 'error',
+        position: 'bottom-right',
+        isClosable: true,
+      });
+    },
+    onCompleted: () => {
+      toast({
+        title: 'Invite has been sent!',
+        description: 'Check your email for your invitation',
+        status: 'success',
+        position: 'bottom-right',
+        isClosable: true,
+      });
+
+      history.push(`${baseRoute}/waiting`);
+    },
+  });
 
   const form = useForm<FormData>({
     mode: 'onChange',
   });
 
-  const handleLogin = async (data: FormData) => {
-    login({
-      email: data.email,
-      password: data.password,
-    }).then(() => {
-      history.push(`${baseRoute}/waiting`);
+  const handleRequestInvite = async (data: FormData) => {
+    console.log(data);
+    requestInvite({
+      variables: { input: { email: data.email } },
     });
   };
 
@@ -48,7 +76,7 @@ const LoginView = () => {
             <FullLogo mb="84px" />
             <AnimatedRoutes>
               <AnimatedRoute exact path={`${baseRoute}`}>
-                <Form onSubmit={form.handleSubmit(handleLogin)}>
+                <Form onSubmit={form.handleSubmit(handleRequestInvite)}>
                   <H2 color="gray.800" mb={2}>Log in</H2>
                   <Paragraph fontSize="0.9rem" color="gray.500" mb={4}>
                     Login using the credentials provided by the system admin
@@ -72,7 +100,7 @@ const LoginView = () => {
                     type="submit"
                     isDisabled={!form.formState.isValid}
                     mt={4}
-                    isLoading={isLoggingIn}
+                    isLoading={isRequestingInvite}
                     loadingText="Logging in"
                   >
                     Request login
