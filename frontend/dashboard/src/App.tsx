@@ -31,6 +31,7 @@ import EditTriggerView from 'views/TriggerOverview/EditTriggerView';
 import EditUserView from 'views/UsersOverview/EditUserView';
 import FallbackServerError from 'components/FallbackServerError';
 import FirstTimePage from 'pages/dashboard/first_time';
+import GlobalLoader from 'components/GlobalLoader';
 import GlobalStyle from 'config/global-styles';
 import InteractionsOverview from 'views/InteractionsOverview/InteractionsOverview';
 import InviteUserView from 'views/UsersOverview/InviteUserView';
@@ -251,7 +252,7 @@ const AppRoutes = () => (
 const RootApp = ({ children }: { children: React.ReactNode }) => {
   const { isInitializingUser } = useUser();
 
-  if (isInitializingUser) return <>Loading!</>;
+  if (isInitializingUser) return <GlobalLoader />;
 
   return <>{children}</>;
 };

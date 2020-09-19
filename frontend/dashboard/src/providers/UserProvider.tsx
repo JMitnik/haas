@@ -55,6 +55,12 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [accessToken, setAccessToken] = useState<string | null>(() => localStorage.getItem('access_token'));
   const [isInitializingUser, setIsInitializingUser] = useState<boolean>(() => !!accessToken);
 
+  const stopInitializingUser = () => {
+    setTimeout(() => {
+      setIsInitializingUser(false);
+    }, 1000);
+  };
+
   const [getUser] = useLazyQuery(queryMe, {
     onCompleted: (data) => {
       setUser({
@@ -64,10 +70,10 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
         email: data.me.email,
         userCustomers: data.me.userCustomers,
       });
-      setIsInitializingUser(false);
+      stopInitializingUser();
     },
     onError: () => {
-      setIsInitializingUser(false);
+      stopInitializingUser();
     },
     fetchPolicy: 'network-only',
   });
