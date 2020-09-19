@@ -36,45 +36,8 @@ const HEADERS = [
   { Header: 'role', accessor: 'role', Cell: RoleCell },
 ];
 
-// const UserOptions = ({ onDeleteEntry }: { onDeleteEntry: () => void; }) => {
-//   const { t } = useTranslation();
-
-//   return (
-//     <MenuItem>
-//       <Popover
-//         usePortal
-//       >
-//         {({ onClose }) => (
-//           <>
-//             <PopoverTrigger>
-//               Delete
-//             </PopoverTrigger>
-//             <PopoverContent zIndex={4}>
-//               <PopoverArrow />
-//               <PopoverHeader>Delete</PopoverHeader>
-//               <PopoverCloseButton />
-//               <PopoverBody>
-//                 <p>You are about to delete a User. THIS ACTION IS IRREVERSIBLE! Are you sure?</p>
-//               </PopoverBody>
-//               <PopoverFooter>
-//                 <Button
-//                   variantColor="red"
-//                   onClick={(event) => onDeleteEntry && onDeleteEntry(event, userId, onClose)}
-//                 >
-//                   Delete
-//                 </Button>
-//               </PopoverFooter>
-//             </PopoverContent>
-//           </>
-//         )}
-//       </Popover>
-//       {t('test')}
-//     </MenuItem>
-//   );
-// };
-
 const UsersOverview = () => {
-  const { customerSlug } = useParams();
+  const { customerSlug } = useParams<{ customerSlug: string }>();
   const { t } = useTranslation();
   const history = useHistory();
   const [fetchUsers, { data }] = useLazyQuery(getUsersQuery, { fetchPolicy: 'cache-and-network' });
