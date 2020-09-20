@@ -89,11 +89,6 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
         position: 'bottom-right',
         duration: 300,
       });
-
-      setTimeout(() => {
-        setActiveCustomer(customer);
-        history.push('/');
-      }, 300);
     },
     refetchQueries: [{ query: getCustomerQuery }],
     onError: () => {
@@ -134,6 +129,8 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
         setTimeout(() => {
           history.push(`/dashboard/b/${formData.slug}`);
         }, 1000);
+      } else {
+        history.push(`/dashboard/b/${customerSlug}`);
       }
     });
   };

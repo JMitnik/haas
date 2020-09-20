@@ -93,7 +93,7 @@ const UsernavContainer = styled.div`
 
 export const Usernav = ({ user }: { user: UserProps, customer: any }) => {
   const history = useHistory();
-  const { logout } = useUser();
+  const { user: activeUser, logout } = useUser();
   const { setActiveCustomer } = useCustomer();
   const { t, i18n } = useTranslation();
   const toast = useToast();
@@ -161,12 +161,14 @@ export const Usernav = ({ user }: { user: UserProps, customer: any }) => {
         </MenuGroup>
         <MenuDivider />
         <MenuGroup title={t('user_actions')}>
-          <MenuItem color="gray.600" onClick={goToDialoguesOverview}>
-            <Icon as={ExternalLink} />
-            <Text ml={2}>
-              {t('switch_project')}
-            </Text>
-          </MenuItem>
+          {activeUser.userCustomers.length > 1 && (
+            <MenuItem color="gray.600" onClick={goToDialoguesOverview}>
+              <Icon as={ExternalLink} />
+              <Text ml={2}>
+                {t('switch_project')}
+              </Text>
+            </MenuItem>
+          )}
           <MenuItem onClick={logout} color="gray.600">
             <Icon as={LogOut} />
             <Text ml={2}>
