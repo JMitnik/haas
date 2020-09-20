@@ -1,9 +1,9 @@
 import { inputObjectType, mutationField, objectType, queryField, unionType } from '@nexus/schema';
 
 import { ApolloError, AuthenticationError, UserInputError } from 'apollo-server-express';
+import { resolve } from 'path';
 import { UserInput, UserType } from '../users/User';
 import { mailService } from '../../services/mailings/MailService';
-import { resolve } from 'path';
 import AuthService from './AuthService';
 import UserService from '../users/UserService';
 import makeSignInTemplate from '../../services/mailings/templates/makeSignInTemplate';
@@ -259,7 +259,6 @@ export const InviteUserMutation = mutationField('inviteUser', {
     }
 
     const [user] = users;
-    console.log(user);
 
     // Case 2: If user-customer relation already exists, just update the role itself
     if (user.customers.length) {

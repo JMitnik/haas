@@ -78,7 +78,7 @@ const InviteUserView = () => {
 
   const handleSubmit = (formData: FormDataProps) => {
     const optionInput = {
-      customerId: activeCustomer.id,
+      customerId: activeCustomer?.id,
       roleId: formData.role?.value || null,
       email: formData.email || '',
     };

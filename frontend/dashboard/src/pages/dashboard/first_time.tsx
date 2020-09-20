@@ -3,11 +3,11 @@ import { Div, Form, FormContainer,
   FormControl, FormLabel, FormSection, H3, Hr, Input, InputGrid, InputHelper, Muted, SubtlePageHeading, SubtlePageSubHeading, ViewContainer } from '@haas/ui';
 import { Mail, Phone, User } from 'react-feather';
 import { Variants, motion } from 'framer-motion';
-import { useUser } from 'providers/UserProvider';
 import { useForm } from 'react-hook-form';
 import { useHistory } from 'react-router';
 import { useMutation } from '@apollo/react-hooks';
 import { useTranslation } from 'react-i18next';
+import { useUser } from 'providers/UserProvider';
 import React from 'react';
 import ServerError from 'components/ServerError';
 import gql from 'graphql-tag';
@@ -41,7 +41,7 @@ const FirstTimeFormContainerAnimation: Variants = {
 };
 
 const editUserMutation = gql`
-  mutation editUser($userId: String!, $input: EditUserInput) {
+  mutation FirstTimeEditUser($userId: String!, $input: EditUserInput) {
     editUser(userId: $userId, input: $input) {
       id
       firstName

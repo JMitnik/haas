@@ -141,12 +141,13 @@ export const RoleMutations = extendType({
           throw new Error('No role name provided');
         }
 
+        // Rudimentary
         return ctx.prisma.role.create({
           data: {
             name: args.data.name,
             permissions: {
               set: [
-                'CAN_BUILD_DIALOGUES',
+                'CAN_VIEW_DIALOGUE',
               ],
             },
             Customer: {

@@ -1,6 +1,7 @@
 # Prisma Migrate lockfile v1
 
-20200826203246-start-from-zero
-20200903205443-add-system-permissions
-20200904001945-set-globalpermissions-to-be-system-permissions
-20200913165326-add-tokens
+20200920204706-reinit
+20200920204820-test
+20200920204834-test2
+20200920204850-test3
+20200920204900-test4

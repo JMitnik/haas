@@ -1,7 +1,4 @@
 import { SystemPermissionEnum } from '@prisma/client';
+import { isPresent } from 'ts-is-present';
 
-export const SystemPermissions: SystemPermissionEnum[] = [
-  'CAN_ACCESS_ADMIN_PANEL',
-  'CAN_BUILD_DIALOGUES',
-  'CAN_VIEW_DIALOGUES',
-];
+export const SystemPermissions: SystemPermissionEnum[] = Object.values(SystemPermissionEnum).filter(isPresent);

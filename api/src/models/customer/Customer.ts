@@ -180,7 +180,7 @@ export const CustomerMutations = Upload && extendType({
         name: 'String',
         options: CustomerCreateOptionsInput,
       },
-      async resolve(parent, args) {
+      async resolve(parent, args, ctx) {
         const primaryColor = args?.options?.primaryColour;
 
         if (primaryColor) {
@@ -191,7 +191,7 @@ export const CustomerMutations = Upload && extendType({
           }
         }
 
-        const customer = CustomerService.createCustomer(args as any);
+        const customer = CustomerService.createCustomer(args as any, ctx.session?.userId);
 
         return customer as any;
       },

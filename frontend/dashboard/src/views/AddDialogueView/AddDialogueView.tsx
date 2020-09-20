@@ -18,6 +18,7 @@ import ServerError from 'components/ServerError';
 import getCustomerQuery from 'queries/getCustomersQuery';
 import getDialoguesOfCustomer from 'queries/getDialoguesOfCustomer';
 import getTagsQuery from 'queries/getTags';
+import useAuth from 'hooks/useAuth';
 
 interface FormDataProps {
   title: string;
@@ -58,6 +59,8 @@ const schema = yup.object().shape({
 });
 
 const AddDialogueView = () => {
+  const { canAccessAdmin } = useAuth();
+
   const history = useHistory();
   const toast = useToast();
   const form = useForm<FormDataProps>({

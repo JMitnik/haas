@@ -37,6 +37,24 @@
     },
     {
       "tag": "CreateEnum",
+      "enum": "SystemPermissionEnum",
+      "values": [
+        "CAN_ACCESS_ADMIN_PANEL"
+      ]
+    },
+    {
+      "tag": "CreateEnum",
+      "enum": "RoleTypeEnum",
+      "values": [
+        "ADMIN",
+        "MANAGER",
+        "USER",
+        "GUEST",
+        "CUSTOM"
+      ]
+    },
+    {
+      "tag": "CreateEnum",
       "enum": "TriggerEnum",
       "values": [
         "QUESTION",
@@ -1040,6 +1058,38 @@
       "field": "tags",
       "type": "Tag",
       "arity": "List"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Dialogue",
+      "field": "isOnline",
+      "type": "Boolean",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "Dialogue",
+          "field": "isOnline"
+        },
+        "directive": "default"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "Dialogue",
+          "field": "isOnline"
+        },
+        "directive": "default"
+      },
+      "argument": "value",
+      "value": "false"
     },
     {
       "tag": "CreateDirective",
@@ -3502,38 +3552,6 @@
     {
       "tag": "CreateField",
       "model": "Permission",
-      "field": "isPermissionOfRole",
-      "type": "Role",
-      "arity": "List"
-    },
-    {
-      "tag": "CreateDirective",
-      "location": {
-        "path": {
-          "tag": "Field",
-          "model": "Permission",
-          "field": "isPermissionOfRole"
-        },
-        "directive": "relation"
-      }
-    },
-    {
-      "tag": "CreateArgument",
-      "location": {
-        "tag": "Directive",
-        "path": {
-          "tag": "Field",
-          "model": "Permission",
-          "field": "isPermissionOfRole"
-        },
-        "directive": "relation"
-      },
-      "argument": "references",
-      "value": "[id]"
-    },
-    {
-      "tag": "CreateField",
-      "model": "Permission",
       "field": "Customer",
       "type": "Customer",
       "arity": "Optional"
@@ -3641,16 +3659,9 @@
     {
       "tag": "CreateField",
       "model": "Role",
-      "field": "roleId",
-      "type": "String",
-      "arity": "Optional"
-    },
-    {
-      "tag": "CreateField",
-      "model": "Role",
-      "field": "permissions",
-      "type": "Permission",
-      "arity": "List"
+      "field": "type",
+      "type": "RoleTypeEnum",
+      "arity": "Required"
     },
     {
       "tag": "CreateDirective",
@@ -3658,9 +3669,9 @@
         "path": {
           "tag": "Field",
           "model": "Role",
-          "field": "permissions"
+          "field": "type"
         },
-        "directive": "relation"
+        "directive": "default"
       }
     },
     {
@@ -3670,12 +3681,51 @@
         "path": {
           "tag": "Field",
           "model": "Role",
-          "field": "permissions"
+          "field": "type"
         },
-        "directive": "relation"
+        "directive": "default"
       },
-      "argument": "references",
-      "value": "[id]"
+      "argument": "value",
+      "value": "USER"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Role",
+      "field": "isPrivate",
+      "type": "Boolean",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "Role",
+          "field": "isPrivate"
+        },
+        "directive": "default"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "Role",
+          "field": "isPrivate"
+        },
+        "directive": "default"
+      },
+      "argument": "",
+      "value": "false"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Role",
+      "field": "permissions",
+      "type": "SystemPermissionEnum",
+      "arity": "List"
     },
     {
       "tag": "CreateField",
@@ -3860,34 +3910,37 @@
     {
       "tag": "CreateField",
       "model": "User",
-      "field": "isSuperAdmin",
-      "type": "Boolean",
-      "arity": "Required"
+      "field": "globalPermissions",
+      "type": "SystemPermissionEnum",
+      "arity": "List"
     },
     {
-      "tag": "CreateDirective",
-      "location": {
-        "path": {
-          "tag": "Field",
-          "model": "User",
-          "field": "isSuperAdmin"
-        },
-        "directive": "default"
-      }
+      "tag": "CreateField",
+      "model": "User",
+      "field": "loginToken",
+      "type": "String",
+      "arity": "Optional"
     },
     {
-      "tag": "CreateArgument",
-      "location": {
-        "tag": "Directive",
-        "path": {
-          "tag": "Field",
-          "model": "User",
-          "field": "isSuperAdmin"
-        },
-        "directive": "default"
-      },
-      "argument": "",
-      "value": "false"
+      "tag": "CreateField",
+      "model": "User",
+      "field": "loginTokenExpiry",
+      "type": "DateTime",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateField",
+      "model": "User",
+      "field": "refreshToken",
+      "type": "String",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateField",
+      "model": "User",
+      "field": "refreshTokenExpiry",
+      "type": "DateTime",
+      "arity": "Optional"
     },
     {
       "tag": "CreateModel",

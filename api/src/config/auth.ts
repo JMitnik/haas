@@ -1,7 +1,7 @@
 import { allow, deny, or, rule, shield } from 'graphql-shield';
 
-import { ApolloError, ValidationError } from 'apollo-server-express';
 import { APIContext } from '../types/APIContext';
+import { ApolloError, ValidationError } from 'apollo-server-express';
 import AuthorizationError from '../models/auth/AuthorizationError';
 
 // const isLoggedIn = rule({ cache: 'strict' })(
@@ -45,8 +45,7 @@ const authShield = shield({
     dialogues: canAccessCompany,
   },
   Mutation: {
-    '*': deny,
-    // login: allow,
+    '*': isSuperAdmin,
     verifyUserToken: allow,
     inviteUser: allow,
     requestInvite: allow,

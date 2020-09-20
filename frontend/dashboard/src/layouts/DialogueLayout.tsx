@@ -12,6 +12,7 @@ import { useTranslation } from 'react-i18next';
 import QRCode from 'qrcode.react';
 import gql from 'graphql-tag';
 import styled, { ThemeContext, css } from 'styled-components/macro';
+import useAuth from 'hooks/useAuth';
 import useMediaDevice from 'hooks/useMediaDevice';
 import useOnClickOutside from 'hooks/useClickOnOutside';
 
@@ -202,6 +203,8 @@ const IconButtonContainer = styled.div`
 const DialogueNavBar = ({ dialogue, customerSlug, dialogueSlug }: DialogueNavBarProps) => {
   const { t } = useTranslation();
   const { onClose, onOpen, isOpen } = useDisclosure();
+  const { canBuildDialogues } = useAuth();
+
   const history = useHistory();
 
   const shareUrl = `https://client.haas.live/${customerSlug}/${dialogueSlug}`;
@@ -256,18 +259,27 @@ const DialogueNavBar = ({ dialogue, customerSlug, dialogueSlug }: DialogueNavBar
             {t('views:interactions_view')}
           </NavLink>
         </Div>
-        <Div>
-          <DialogueNavBarHeading mb={1} mt={2} fontWeight="400" color="primaries.100">{t('personalize')}</DialogueNavBarHeading>
-          <Hr />
-          <NavLink to={`/dashboard/b/${customerSlug}/d/${dialogueSlug}/actions`}>
-            <Icon mr={2} as={Mail} />
-            {t('views:cta_view')}
-          </NavLink>
-          <NavLink to={`/dashboard/b/${customerSlug}/d/${dialogueSlug}/builder`}>
-            <Icon mr={2} as={Zap} />
-            {t('views:builder_view')}
-          </NavLink>
-        </Div>
+        {canBuildDialogues && (
+          <Div>
+            <DialogueNavBarHeading
+              mb={1}
+              mt={2}
+              fontWeight="400"
+              color="primaries.100"
+            >
+              {t('personalize')}
+            </DialogueNavBarHeading>
+            <Hr />
+            <NavLink to={`/dashboard/b/${customerSlug}/d/${dialogueSlug}/actions`}>
+              <Icon mr={2} as={Mail} />
+              {t('views:cta_view')}
+            </NavLink>
+            <NavLink to={`/dashboard/b/${customerSlug}/d/${dialogueSlug}/builder`}>
+              <Icon mr={2} as={Zap} />
+              {t('views:builder_view')}
+            </NavLink>
+          </Div>
+        )}
       </ColumnFlex>
     </DialogueNavBarContainer>
   );

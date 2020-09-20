@@ -4,7 +4,9 @@ import React, { useContext, useEffect, useState } from 'react';
 import { useHistory } from 'react-router';
 import gql from 'graphql-tag';
 
-const POLL_INTERVAL_SECONDS = 15;
+import { me as GetUserData, me_me as User } from './__generated__/me';
+
+const POLL_INTERVAL_SECONDS = 120;
 
 const refreshAccessTokenQuery = gql`
   query refreshAccessToken {
@@ -17,10 +19,11 @@ const refreshAccessTokenQuery = gql`
 const queryMe = gql`
   query me {
     me {
+      id
       email
       firstName
       lastName
-      id
+      globalPermissions
       userCustomers {
         customer {
           id
@@ -28,6 +31,7 @@ const queryMe = gql`
           slug
         }
         role {
+          name
           permissions
         }
       }
@@ -36,21 +40,21 @@ const queryMe = gql`
 `;
 
 interface AuthContextProps {
-  user: any;
+  user: User;
   userIsValid?: () => boolean;
   logout: () => void;
   accessToken: string | null;
   isLoggedIn: boolean;
   isInitializingUser: boolean;
   setAccessToken: (token: string) => void;
-  setUser: (userData: any) => void;
+  setUser: (userData: User) => void;
+  refreshUser: () => void;
 }
 
 const UserContext = React.createContext({} as AuthContextProps);
 
 const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const history = useHistory();
-
   const [user, setUser] = useState<any>();
   const [accessToken, setAccessToken] = useState<string | null>(() => localStorage.getItem('access_token'));
   const [isInitializingUser, setIsInitializingUser] = useState<boolean>(() => !!accessToken);
@@ -61,8 +65,9 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
     }, 1000);
   };
 
-  const [getUser] = useLazyQuery(queryMe, {
+  const [getUser] = useLazyQuery<GetUserData>(queryMe, {
     onCompleted: (data) => {
+      console.log('hmm');
       setUser({
         id: data.me.id,
         firstName: data.me.firstName,
@@ -112,6 +117,7 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
       accessToken,
       logout,
       setUser,
+      refreshUser: getUser,
       setAccessToken,
     }}
     >

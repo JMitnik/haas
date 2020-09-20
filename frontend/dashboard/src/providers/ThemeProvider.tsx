@@ -39,19 +39,17 @@ export const DefaultThemeProviders = ({ children }: ThemeProvidersProps) => (
 
 export const CustomThemeProviders = ({ children }: { children: React.ReactNode }) => {
   const [customTheme, setCustomTheme] = useState({});
-  const { activeCustomer, storageCustomer } = useCustomer();
+  const { activeCustomer } = useCustomer();
 
   useEffect(() => {
     console.log(activeCustomer);
 
     if (activeCustomer) {
       setCustomTheme(makeBrandTheme(activeCustomer.settings));
-    } else if (storageCustomer?.settings?.colourSettings) {
-      setCustomTheme(makeBrandTheme(storageCustomer.settings));
     } else {
       setCustomTheme({});
     }
-  }, [activeCustomer, setCustomTheme, storageCustomer]);
+  }, [activeCustomer, setCustomTheme]);
 
   return (
     <ThemeProvider theme={makeCustomTheme(defaultTheme, customTheme)}>

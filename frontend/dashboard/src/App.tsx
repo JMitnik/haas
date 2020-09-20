@@ -1,6 +1,6 @@
 import { AnimatePresence } from 'framer-motion';
 import { ApolloProvider } from '@apollo/react-hooks';
-import { Div, Loader, ViewContainer } from '@haas/ui';
+import { Div, ViewContainer } from '@haas/ui';
 import { ErrorBoundary } from 'react-error-boundary';
 import { I18nextProvider } from 'react-i18next';
 import { Redirect, Route, BrowserRouter as Router, Switch } from 'react-router-dom';
@@ -8,6 +8,7 @@ import React, { FC } from 'react';
 
 import { AppContainer } from 'styles/AppStyles';
 import { DefaultThemeProviders } from 'providers/ThemeProvider';
+import { SystemPermission } from 'types/globalTypes';
 import ActionsPage from 'pages/dashboard/actions';
 import AddCustomerPage from 'pages/dashboard/customers/add';
 import AddDialogueView from 'views/AddDialogueView';
@@ -33,13 +34,13 @@ import FallbackServerError from 'components/FallbackServerError';
 import FirstTimePage from 'pages/dashboard/first_time';
 import GlobalLoader from 'components/GlobalLoader';
 import GlobalStyle from 'config/global-styles';
+import GuardedRoute from 'components/Routes/GuardedRoute';
 import InteractionsOverview from 'views/InteractionsOverview/InteractionsOverview';
 import InviteUserView from 'views/UsersOverview/InviteUserView';
 import LoggedOutView from 'layouts/LoggedOutView';
 import LoginPage from 'pages/login';
 import NotAuthorizedView from 'layouts/NotAuthorizedView';
 import PreCustomerLayout from 'layouts/PreCustomerLayout';
-import RolesOverview from 'views/RolesOverview/RolesOverview';
 import TriggersOverview from 'views/TriggerOverview/TriggerOverview';
 import UserProvider, { useUser } from 'providers/UserProvider';
 import UsersOverview from 'views/UsersOverview/UsersOverview';
@@ -57,12 +58,13 @@ const CustomerRoutes = () => (
             render={() => (
               <DialogueLayout>
                 <Switch>
-                  <DashboardRoute
+                  <GuardedRoute
+                    allowedPermission={SystemPermission.CAN_BUILD_DIALOGUES}
                     path="/dashboard/b/:customerSlug/d/:dialogueSlug/builder"
                     render={() => <DialogueBuilderPage />}
                   />
 
-                  <DashboardRoute
+                  <GuardedRoute
                     path="/dashboard/b/:customerSlug/d/:dialogueSlug/edit"
                     render={() => <EditDialogueView />}
                   />
@@ -149,10 +151,10 @@ const CustomerRoutes = () => (
                     path="/dashboard/b/:customerSlug/users"
                     render={() => <UsersOverview />}
                   />
-                  <DashboardRoute
+                  {/* <DashboardRoute
                     path="/dashboard/b/:customerSlug/roles"
                     render={() => <RolesOverview />}
-                  />
+                  /> */}
 
                   <DashboardRoute
                     path="/dashboard/b/:customerSlug/dialogue/add"
@@ -250,7 +252,7 @@ const AppRoutes = () => (
 );
 
 const RootApp = ({ children }: { children: React.ReactNode }) => {
-  const { isInitializingUser } = useUser();
+  const { isInitializingUser, user } = useUser();
 
   if (isInitializingUser) return <GlobalLoader />;
 

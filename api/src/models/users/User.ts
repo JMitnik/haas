@@ -2,7 +2,7 @@ import { ApolloError, UserInputError } from 'apollo-server-express';
 import { extendType, inputObjectType, objectType, queryField } from '@nexus/schema';
 
 import { PaginationWhereInput } from '../general/Pagination';
-import { RoleType } from '../role/Role';
+import { RoleType, SystemPermission } from '../role/Role';
 import UserService from './UserService';
 
 export const UserCustomerType = objectType({
@@ -73,6 +73,19 @@ export const UserType = objectType({
     t.string('phone', { nullable: true });
     t.string('firstName', { nullable: true });
     t.string('lastName', { nullable: true });
+
+    t.list.field('globalPermissions', {
+      nullable: true,
+      type: SystemPermission,
+
+      async resolve(parent, args, ctx) {
+        const user = await ctx.prisma.user.findOne({
+          where: { id: parent.id },
+        });
+
+        return user?.globalPermissions as any;
+      },
+    });
 
     t.list.field('userCustomers', {
       type: UserCustomerType,

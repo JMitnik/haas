@@ -2,6 +2,7 @@ import { AvatarBadge, Avatar as ChakraAvatar, Icon, Menu, MenuButton, MenuDivide
 import { ExternalLink, LogOut } from 'react-feather';
 import { Flex, Text } from '@haas/ui';
 import { LinkProps, NavLink, useHistory } from 'react-router-dom';
+import Color from 'color';
 import React from 'react';
 import styled, { css } from 'styled-components/macro';
 
@@ -9,10 +10,9 @@ import { ReactComponent as DeFlag } from 'assets/images/de.svg';
 import { ReactComponent as EnFlag } from 'assets/images/en.svg';
 import { FullLogo, FullLogoContainer, LogoContainer } from 'components/Logo/Logo';
 import { UserProps } from 'types/generic';
-import { useUser } from 'providers/UserProvider';
 import { useCustomer } from 'providers/CustomerProvider';
 import { useTranslation } from 'react-i18next';
-import Color from 'color';
+import { useUser } from 'providers/UserProvider';
 
 interface NavItemProps extends LinkProps { }
 

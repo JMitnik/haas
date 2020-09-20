@@ -6,7 +6,7 @@ import { useCustomer } from 'providers/CustomerProvider';
 const DashboardPage = () => {
   // const { user } = useUser();
 
-  const { activeCustomer, storageCustomer } = useCustomer();
+  const { activeCustomer } = useCustomer();
 
   // Note-Login: Uncomment this for login
   // if (!user) return <Redirect to="/login" />;

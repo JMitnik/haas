@@ -48,6 +48,12 @@ export enum QuestionNodeTypeEnum {
   TEXTBOX = "TEXTBOX",
 }
 
+export enum SystemPermission {
+  CAN_ACCESS_ADMIN_PANEL = "CAN_ACCESS_ADMIN_PANEL",
+  CAN_BUILD_DIALOGUES = "CAN_BUILD_DIALOGUES",
+  CAN_VIEW_DIALOGUES = "CAN_VIEW_DIALOGUES",
+}
+
 export enum TagTypeEnum {
   AGENT = "AGENT",
   DEFAULT = "DEFAULT",
@@ -114,14 +120,18 @@ export interface EdgeConditionInputType {
   matchValue?: string | null;
 }
 
-/**
- * Login credential
- */
-export interface LoginInput {
-  input: {
-    email: string;
-    password: string;
-  }
+export interface EditUserInput {
+  email: string;
+  firstName?: string | null;
+  customerId?: string | null;
+  lastName?: string | null;
+  phone?: string | null;
+}
+
+export interface InviteUserInput {
+  roleId: string;
+  email: string;
+  customerId: string;
 }
 
 export interface OptionInputType {
@@ -157,6 +167,10 @@ export interface RecipientsInputType {
   ids?: string[] | null;
 }
 
+export interface RequestInviteInput {
+  email: string;
+}
+
 export interface TagsInputObjectType {
   entries?: string[] | null;
 }
@@ -184,6 +198,12 @@ export interface UserInput {
   customerId?: string | null;
   lastName?: string | null;
   phone?: string | null;
+}
+
+export interface UserOfCustomerInput {
+  userId?: string | null;
+  customerId?: string | null;
+  customerSlug?: string | null;
 }
 
 //==============================================================
