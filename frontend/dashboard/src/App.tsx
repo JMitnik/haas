@@ -59,12 +59,13 @@ const CustomerRoutes = () => (
               <DialogueLayout>
                 <Switch>
                   <GuardedRoute
-                    allowedPermission={SystemPermission.CAN_BUILD_DIALOGUES}
+                    allowedPermission={SystemPermission.CAN_BUILD_DIALOGUE}
                     path="/dashboard/b/:customerSlug/d/:dialogueSlug/builder"
                     render={() => <DialogueBuilderPage />}
                   />
 
                   <GuardedRoute
+                    allowedPermission={SystemPermission.CAN_EDIT_DIALOGUE}
                     path="/dashboard/b/:customerSlug/d/:dialogueSlug/edit"
                     render={() => <EditDialogueView />}
                   />
@@ -74,7 +75,8 @@ const CustomerRoutes = () => (
                     render={() => <InteractionsOverview />}
                   />
 
-                  <DashboardRoute
+                  <GuardedRoute
+                    allowedPermission={SystemPermission.CAN_BUILD_DIALOGUE}
                     path="/dashboard/b/:customerSlug/d/:dialogueSlug/actions"
                     render={() => <ActionsPage />}
                   />
@@ -120,7 +122,8 @@ const CustomerRoutes = () => (
                     render={() => <TriggersOverview />}
                   />
 
-                  <DashboardRoute
+                  <GuardedRoute
+                    allowedPermission={SystemPermission.CAN_EDIT_WORKSPACE}
                     path="/dashboard/b/:customerSlug/edit"
                     render={() => <EditCustomerView />}
                   />
@@ -133,21 +136,23 @@ const CustomerRoutes = () => (
                   />
 
                   {/* Possible deprecate this */}
-                  <DashboardRoute
+                  {/* <DashboardRoute
                     path="/dashboard/b/:customerSlug/users/add"
                     render={() => (
                       <AddUserView />
                     )}
-                  />
+                  /> */}
 
-                  <DashboardRoute
+                  <GuardedRoute
+                    allowedPermission={SystemPermission.CAN_ADD_USERS}
                     path="/dashboard/b/:customerSlug/users/invite"
                     render={() => (
                       <InviteUserView />
                     )}
                   />
 
-                  <DashboardRoute
+                  <GuardedRoute
+                    allowedPermission={SystemPermission.CAN_VIEW_USERS}
                     path="/dashboard/b/:customerSlug/users"
                     render={() => <UsersOverview />}
                   />

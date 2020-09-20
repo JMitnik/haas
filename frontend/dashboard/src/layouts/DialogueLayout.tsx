@@ -216,18 +216,20 @@ const DialogueNavBar = ({ dialogue, customerSlug, dialogueSlug }: DialogueNavBar
           <DialogueNavBarContextHeading fontWeight={700}>
             {dialogue.title}
           </DialogueNavBarContextHeading>
-          <IconButtonContainer>
-            <IconButton
-              onClick={() => (
-                history.push(`/dashboard/b/${customerSlug}/d/${dialogueSlug}/edit`)
-              )}
-              fontSize="0.7rem"
-              size="xs"
-              variant="ghost"
-              aria-label="settings"
-              icon={Sliders}
-            />
-          </IconButtonContainer>
+          {canBuildDialogues && (
+            <IconButtonContainer>
+              <IconButton
+                onClick={() => (
+                  history.push(`/dashboard/b/${customerSlug}/d/${dialogueSlug}/edit`)
+                )}
+                fontSize="0.7rem"
+                size="xs"
+                variant="ghost"
+                aria-label="settings"
+                icon={Sliders}
+              />
+            </IconButtonContainer>
+          )}
         </Flex>
         <Flex justifyContent="space-between">
 

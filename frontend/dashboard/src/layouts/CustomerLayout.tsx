@@ -13,14 +13,15 @@ import { ReactComponent as SurveyIcon } from 'assets/icons/icon-survey.svg';
 import { UserProps } from 'types/generic';
 import { ReactComponent as UsersIcon } from 'assets/icons/icon-user-group.svg';
 import { motion } from 'framer-motion';
-import { useUser } from 'providers/UserProvider';
 import { useCustomer } from 'providers/CustomerProvider';
 import { useTranslation } from 'react-i18next';
+import { useUser } from 'providers/UserProvider';
 import Logo from 'components/Logo/Logo';
 import MobileBottomNav from 'components/MobileBottomNav';
 import Sidenav from 'components/Sidenav';
 import useMediaDevice from 'hooks/useMediaDevice';
 
+import useAuth from 'hooks/useAuth';
 import NotAuthorizedView from './NotAuthorizedView';
 
 const CustomerLayoutContainer = styled(Div)<{ isMobile?: boolean }>`
@@ -48,6 +49,7 @@ const DashboardViewContainer = styled(Div)`
 
 const DashboardNav = ({ customerSlug }: { customerSlug: string }) => {
   const { t } = useTranslation();
+  const { canViewUsers, canEditCustomer } = useAuth();
 
   return (
     <NavItems>
@@ -59,18 +61,22 @@ const DashboardNav = ({ customerSlug }: { customerSlug: string }) => {
         <PieChartIcon />
         {t('analytics')}
       </NavItem>
-      <NavItem to={`/dashboard/b/${customerSlug}/users`}>
-        <UsersIcon />
-        {t('users')}
-      </NavItem>
+      {canViewUsers && (
+        <NavItem to={`/dashboard/b/${customerSlug}/users`}>
+          <UsersIcon />
+          {t('users')}
+        </NavItem>
+      )}
       <NavItem to={`/dashboard/b/${customerSlug}/triggers`}>
         <NotificationIcon />
         {t('alerts')}
       </NavItem>
-      <NavItem to={`/dashboard/b/${customerSlug}/edit`}>
-        <SettingsIcon />
-        {t('settings')}
-      </NavItem>
+      {canEditCustomer && (
+        <NavItem to={`/dashboard/b/${customerSlug}/edit`}>
+          <SettingsIcon />
+          {t('settings')}
+        </NavItem>
+      )}
     </NavItems>
   );
 };

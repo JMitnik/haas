@@ -4,9 +4,11 @@ import { useUser } from 'providers/UserProvider';
 import { SystemPermission } from 'types/globalTypes';
 
 interface UseAuthProps {
+  canEditCustomer: boolean;
   canAccessAdmin: boolean;
   canViewDialogueBuilder: boolean;
   canBuildDialogues: boolean;
+  canViewUsers: boolean;
   hasPermission: (permission: SystemPermission) => boolean;
 }
 
@@ -22,14 +24,18 @@ const useAuth = (): UseAuthProps => {
   // const hasAllPermissions = (permission: SystemPermission) => authPermissions.includes(permission);
 
   const canAccessAdmin = authPermissions?.includes(SystemPermission.CAN_ACCESS_ADMIN_PANEL) || false;
+  const canViewUsers = authPermissions?.includes(SystemPermission.CAN_VIEW_USERS) || false;
 
   // Workspace-specific actions
-  const canViewDialogueBuilder = authPermissions?.includes(SystemPermission.CAN_VIEW_DIALOGUES) || false;
-  const canBuildDialogues = authPermissions?.includes(SystemPermission.CAN_BUILD_DIALOGUES) || false;
+  const canEditCustomer = authPermissions?.includes(SystemPermission.CAN_EDIT_WORKSPACE) || false;
+  const canViewDialogueBuilder = authPermissions?.includes(SystemPermission.CAN_VIEW_DIALOGUE) || false;
+  const canBuildDialogues = authPermissions?.includes(SystemPermission.CAN_BUILD_DIALOGUE) || false;
 
   return {
+    canEditCustomer,
     hasPermission,
     canAccessAdmin,
+    canViewUsers,
     canViewDialogueBuilder,
     canBuildDialogues,
   };
