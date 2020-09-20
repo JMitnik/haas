@@ -41,11 +41,13 @@ const canAccessCompany = rule({ cache: 'no_cache' })(
 );
 
 const authShield = shield({
-  Customer: {
-    dialogues: canAccessCompany,
+  Dialogue: {
+    // Write this up
+    // statistics: canAccessCompany,
   },
   Mutation: {
     '*': isSuperAdmin,
+    createSession: allow,
     verifyUserToken: allow,
     inviteUser: allow,
     requestInvite: allow,
