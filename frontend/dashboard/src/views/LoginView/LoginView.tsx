@@ -87,6 +87,10 @@ const LoginView = () => {
                       <FormLabel htmlFor="email">Email</FormLabel>
                       <Input
                         name="email"
+                        id="email"
+                        autoFocus
+                        type="email"
+                        autoComplete="username"
                         ref={form.register({ required: true })}
                         leftEl={<Mail />}
                         placeholder="bunny@haas.live"

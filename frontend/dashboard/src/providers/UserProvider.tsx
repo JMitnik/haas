@@ -6,7 +6,7 @@ import gql from 'graphql-tag';
 
 import { me as GetUserData, me_me as User } from './__generated__/me';
 
-const POLL_INTERVAL_SECONDS = 120;
+const POLL_INTERVAL_SECONDS = 20;
 
 const refreshAccessTokenQuery = gql`
   query refreshAccessToken {
@@ -73,6 +73,7 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
   const [getUser] = useLazyQuery<GetUserData>(queryMe, {
     onCompleted: (data) => {
+      console.log('hmmm');
       setUser({
         id: data.me.id,
         firstName: data.me.firstName,
@@ -90,19 +91,24 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
   const [logout] = useMutation(logoutMutation, {
     onCompleted: () => {
+      setAccessToken(null);
       setUser(null);
       localStorage.removeItem('customer');
       history.push('/logged_out');
     },
   });
 
-  useQuery(refreshAccessTokenQuery, {
+  const { data: refreshTokenData } = useQuery(refreshAccessTokenQuery, {
     pollInterval: POLL_INTERVAL_SECONDS * 1000,
     skip: !accessToken,
-    onCompleted: (refreshTokenData) => {
-      setAccessToken(refreshTokenData?.refreshAccessToken.accessToken);
-    },
+    fetchPolicy: 'network-only',
   });
+
+  useEffect(() => {
+    if (refreshTokenData) {
+      setAccessToken(refreshTokenData?.refreshAccessToken.accessToken);
+    }
+  }, [refreshTokenData]);
 
   useEffect(() => {
     if (accessToken) {

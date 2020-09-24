@@ -1,7 +1,6 @@
 import { inputObjectType, mutationField, objectType, queryField, unionType } from '@nexus/schema';
 
 import { ApolloError, AuthenticationError, UserInputError } from 'apollo-server-express';
-import { resolve } from 'path';
 import { UserInput, UserType } from '../users/User';
 import { mailService } from '../../services/mailings/MailService';
 import AuthService from './AuthService';
@@ -238,7 +237,7 @@ export const LogoutMutation = mutationField('logout', {
   async resolve(parent, args, ctx) {
     if (!ctx.session?.user?.id) throw new ApolloError('No user found');
     ctx.res.cookie('refresh_token', null);
-    ctx.prisma.user.update({
+    await ctx.prisma.user.update({
       where: { id: ctx.session.user.id },
       data: { refreshToken: null },
     });
