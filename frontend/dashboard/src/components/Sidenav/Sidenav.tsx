@@ -98,6 +98,7 @@ export const UsernavContainer = styled.div`
 export const AvatarContainer = styled(Div)`
   ${({ theme }) => css`
     padding: ${theme.gutter}px;
+    z-index: 1200;
 
     &:hover {
       cursor: pointer;

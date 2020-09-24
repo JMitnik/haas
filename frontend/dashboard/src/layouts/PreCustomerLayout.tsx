@@ -16,7 +16,8 @@ const PreCustomerLayoutContainer = styled(Div)`
     padding: ${theme.gutter}px;
 
     ${UsernavContainer} {
-      position: absolute;
+      position: fixed;
+      z-index: 1200;
       bottom: ${theme.gutter}px;
       left: ${theme.gutter}px;
     }
