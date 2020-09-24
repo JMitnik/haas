@@ -25,7 +25,7 @@ const makeApollo = async () => {
             if (!ctx.operation) return;
 
             ctx.errors.forEach((error) => {
-              if (error instanceof ApolloError) return;
+              if (error.originalError instanceof ApolloError) return;
 
               Sentry.withScope((scope) => {
                 scope.setTag('kind', ctx.operation?.name?.kind.toString() || '');

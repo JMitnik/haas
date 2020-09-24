@@ -245,6 +245,7 @@ export const RootUserQueries = extendType({
       type: UserType,
 
       async resolve(parent, args, ctx) {
+        if (ctx.session?.user?.id) throw new ApolloError('No valid user');
         const userId = ctx.session?.user?.id;
 
         const user = await ctx.prisma.user.findOne({
