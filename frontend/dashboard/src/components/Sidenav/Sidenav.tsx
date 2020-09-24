@@ -95,6 +95,22 @@ export const UsernavContainer = styled.div`
   `}
 `;
 
+export const AvatarContainer = styled(Div)`
+  ${({ theme }) => css`
+    padding: ${theme.gutter}px;
+
+
+    &:hover {
+      cursor: pointer;
+
+      > * {
+        transition: all cubic-bezier(0.6, -0.28, 0.735, 0.045) 0.2s;
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.45);
+      }
+    }
+  `}
+`;
+
 export const UsernavDropdown = () => {
   const history = useHistory();
   const { user, logout } = useUser();
@@ -245,11 +261,11 @@ export const Usernav = () => {
   return (
     <UsernavContainer>
       <Dropdown left="24px" bottom="100%" renderOverlay={<UsernavDropdown />}>
-        <Flex py={4} alignItems="center">
+        <AvatarContainer>
           <ChakraAvatar bg="gray.300" size="md" name={`${user?.firstName} ${user?.lastName}`}>
             <AvatarBadge size="1em" bg="green.400" />
           </ChakraAvatar>
-        </Flex>
+        </AvatarContainer>
       </Dropdown>
     </UsernavContainer>
   );
