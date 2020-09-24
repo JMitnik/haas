@@ -161,7 +161,7 @@ export const Usernav = ({ user }: { user: UserProps, customer: any }) => {
         </MenuGroup>
         <MenuDivider />
         <MenuGroup title={t('user_actions')}>
-          {activeUser.userCustomers.length > 1 && (
+          {activeUser?.userCustomers?.length && activeUser.userCustomers.length > 1 && (
             <MenuItem color="gray.600" onClick={goToDialoguesOverview}>
               <Icon as={ExternalLink} />
               <Text ml={2}>
