@@ -12,6 +12,7 @@ import { Skeleton } from '@chakra-ui/core';
 import { TranslatedPlus } from 'views/DialogueOverview/DialogueOverviewStyles';
 import SurveyIcon from 'components/Icons/SurveyIcon';
 
+import useAuth from 'hooks/useAuth';
 import { CustomerOverviewContainer } from './CustomerOverviewStyles';
 import CustomerCard from './CustomerCard';
 
@@ -42,6 +43,7 @@ const MotionGrid = motion.custom(Grid);
 
 const CustomerOverview = ({ customers, isLoading }: { customers: any[], isLoading: boolean }) => {
   const { t } = useTranslation();
+  const { canCreateCustomers } = useAuth();
 
   return (
     <CustomerOverviewContainer>
@@ -72,18 +74,20 @@ const CustomerOverview = ({ customers, isLoading }: { customers: any[], isLoadin
                 </motion.div>
               ))}
 
-              <AddCard>
-                <Link to="/dashboard/b/add" />
-                <Flex flexDirection="column" alignItems="center" justifyContent="center">
-                  <SurveyIcon />
-                  <TranslatedPlus>
-                    <Plus strokeWidth="3px" />
-                  </TranslatedPlus>
-                  <H4 color="default.dark">
-                    {t('customer:create_customer')}
-                  </H4>
-                </Flex>
-              </AddCard>
+              {canCreateCustomers && (
+                <AddCard>
+                  <Link to="/dashboard/b/add" />
+                  <Flex flexDirection="column" alignItems="center" justifyContent="center">
+                    <SurveyIcon />
+                    <TranslatedPlus>
+                      <Plus strokeWidth="3px" />
+                    </TranslatedPlus>
+                    <H4 color="default.dark">
+                      {t('customer:create_customer')}
+                    </H4>
+                  </Flex>
+                </AddCard>
+              )}
             </>
           )}
         </MotionGrid>

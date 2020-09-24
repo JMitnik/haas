@@ -1,6 +1,8 @@
 import { ApolloError, UserInputError } from 'apollo-server-express';
-import { extendType, inputObjectType, objectType, queryField } from '@nexus/schema';
+import { differenceInMinutes } from 'date-fns';
+import { extendType, inputObjectType, objectType, queryField, scalarType } from '@nexus/schema';
 
+import { Kind } from 'graphql';
 import { PaginationWhereInput } from '../general/Pagination';
 import { RoleType, SystemPermission } from '../role/Role';
 import UserService from './UserService';
@@ -65,6 +67,24 @@ export const UserOfCustomerQuery = queryField('UserOfCustomer', {
   },
 });
 
+export const DateScalar = scalarType({
+  name: 'Date',
+  asNexusMethod: 'date',
+  description: 'Date custom scalar type',
+  parseValue(value) {
+    return new Date(value);
+  },
+  serialize(value) {
+    return value.getTime();
+  },
+  parseLiteral(ast) {
+    if (ast.kind === Kind.INT) {
+      return new Date(ast.value);
+    }
+    return null;
+  },
+});
+
 export const UserType = objectType({
   name: 'UserType',
   definition(t) {
@@ -73,6 +93,19 @@ export const UserType = objectType({
     t.string('phone', { nullable: true });
     t.string('firstName', { nullable: true });
     t.string('lastName', { nullable: true });
+
+    // t.boolean('isOnline', {
+    //   resolve(parent, args, ctx) {
+    //     if (!parent.lastActivity) return false;
+    //     const minutesSinceOnline = differenceInMinutes(new Date(parent.lastActivity), Date.now());
+
+    //     if (minutesSinceOnline > 5) {
+    //       return true;
+    //     }
+
+    //     return false;
+    //   },
+    // });
 
     t.list.field('globalPermissions', {
       nullable: true,
@@ -170,8 +203,8 @@ export const UserType = objectType({
   },
 });
 
-export const UserTable = objectType({
-  name: 'UserTable',
+export const UserConnection = objectType({
+  name: 'UserConnection',
   definition(t) {
     t.int('pageIndex', { nullable: true });
     t.int('totalPages', { nullable: true });
@@ -205,41 +238,9 @@ export const EditUserInput = inputObjectType({
   },
 });
 
-export const UserQueries = extendType({
+export const RootUserQueries = extendType({
   type: 'Query',
   definition(t) {
-    t.field('userTable', {
-      type: UserTable,
-      args: { customerSlug: 'String', filter: PaginationWhereInput },
-      nullable: true,
-
-      async resolve(parent, args) {
-        if (!args.customerSlug) return null;
-        // if (!args.filter) return null;
-
-        return UserService.paginatedUsers(
-          args.customerSlug,
-          args.filter?.pageIndex,
-          args.filter?.offset,
-          args.filter?.limit,
-          args.filter?.orderBy?.[0],
-          args.filter?.searchTerm,
-        );
-      },
-    });
-
-    t.list.field('users', {
-      type: UserType,
-      args: { customerSlug: 'String' },
-
-      resolve(parent, args, ctx) {
-        if (!args.customerSlug) throw new UserInputError('No business provided');
-        return ctx.prisma.user.findMany({ where: { customers: {
-          every: { customer: { slug: args.customerSlug || undefined } },
-        } } });
-      },
-    });
-
     t.field('me', {
       type: UserType,
 
@@ -271,6 +272,17 @@ export const UserQueries = extendType({
       },
     });
 
+    t.list.field('users', {
+      type: UserType,
+      args: { customerSlug: 'String' },
+
+      resolve(parent, args, ctx) {
+        if (!args.customerSlug) throw new UserInputError('No business provided');
+        return ctx.prisma.user.findMany({ where: { customers: {
+          every: { customer: { slug: args.customerSlug || undefined } },
+        } } });
+      },
+    });
     t.field('user', {
       type: UserType,
       args: { userId: 'String' },

@@ -1,0 +1,25 @@
+import gql from 'graphql-tag';
+
+const getPaginatedUsers = gql`
+  query getPaginatedUsers($customerSlug: String!, $filter: PaginationWhereInput) {
+    customer(slug: $customerSlug) {
+      usersConnection(filter: $filter) {
+        users {
+          id
+          email
+          firstName
+          lastName
+          role {
+            id
+            name
+          }
+        }
+
+        totalPages
+        pageIndex
+      }
+    }
+  }
+`;
+
+export default getPaginatedUsers;

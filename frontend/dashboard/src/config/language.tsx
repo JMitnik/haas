@@ -8,6 +8,10 @@ const language = {
       en: 'Invite user',
       de: 'Laden Benutzer',
     },
+    edit_user: {
+      en: 'Edit user',
+      de: 'Benutzer bearbeiten',
+    },
     logged_out: {
       en: 'Your session has expired',
       de: 'Deine Sitzung ist abgelaufen',
@@ -836,6 +840,14 @@ const language = {
     locale_switch_english: {
       en: 'Switched language to English',
       de: 'Sprache auf Englisch umgestellt',
+    },
+    user_edited: {
+      en: 'User edited!',
+      de: 'Benutzer bearbeitet',
+    },
+    user_edited_helper: {
+      en: 'Your details have been saved!',
+      de: 'Ihre Daten wurden gespeichert',
     },
   },
   trigger: {

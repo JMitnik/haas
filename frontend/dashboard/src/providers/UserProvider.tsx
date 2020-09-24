@@ -23,6 +23,7 @@ export const queryMe = gql`
       email
       firstName
       lastName
+      phone
       globalPermissions
       userCustomers {
         customer {

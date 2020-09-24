@@ -34,6 +34,7 @@ export interface me_me {
   email: string;
   firstName: string | null;
   lastName: string | null;
+  phone: string | null;
   globalPermissions: SystemPermission[] | null;
   userCustomers: me_me_userCustomers[];
 }

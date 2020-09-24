@@ -27,6 +27,7 @@ import DialoguePage from 'pages/dashboard/dialogues/dialogue';
 import DialoguesPage from 'pages/dashboard/dialogues';
 import EditCustomerView from 'views/EditCustomerView';
 import EditDialogueView from 'views/EditDialogueView';
+import EditMePage from 'pages/me/edit';
 import EditTriggerView from 'views/TriggerOverview/EditTriggerView';
 import EditUserView from 'views/UsersOverview/EditUserView';
 import FallbackServerError from 'components/FallbackServerError';
@@ -226,6 +227,10 @@ const AppRoutes = () => (
           </PreCustomerLayout>
         )}
       />
+
+      <GuardedRoute path="/dashboard/me/edit">
+        <EditMePage />
+      </GuardedRoute>
 
       <GuardedRoute path="/dashboard/first_time">
         <FirstTimePage />

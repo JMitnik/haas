@@ -1,7 +1,7 @@
-import { AvatarBadge, Avatar as ChakraAvatar, Icon, Menu, MenuButton, MenuDivider, MenuGroup, MenuItem, MenuList, useToast } from '@chakra-ui/core';
+import { AvatarBadge, Badge, Button, Avatar as ChakraAvatar, Icon, useToast } from '@chakra-ui/core';
+import { Div, Flex, Text } from '@haas/ui';
 import { ExternalLink, LogOut } from 'react-feather';
-import { Flex, Text } from '@haas/ui';
-import { LinkProps, NavLink, useHistory } from 'react-router-dom';
+import { Link, LinkProps, NavLink, useHistory } from 'react-router-dom';
 import Color from 'color';
 import React from 'react';
 import styled, { css } from 'styled-components/macro';
@@ -14,6 +14,10 @@ import { useCustomer } from 'providers/CustomerProvider';
 import { useTranslation } from 'react-i18next';
 import { useUser } from 'providers/UserProvider';
 import useAuth from 'hooks/useAuth';
+
+import Dropdown from 'components/Dropdown';
+import List from 'components/List/List';
+import ListItem from 'components/List/ListItem';
 
 interface NavItemProps extends LinkProps { }
 
@@ -73,28 +77,131 @@ export const NavLogo = () => (
   <FullLogo />
 );
 
-const UsernavContainer = styled.div`
+export const UsernavContainer = styled.div`
   ${({ theme }) => css`
-    padding: 0 ${theme.gutter}px;
-    display: flex;
-    width: 100%;
+    /* padding: 0 ${theme.gutter}px; */
+    /* display: flex;
     align-items: center;
     cursor: pointer;
     color: ${theme.isDarkColor ? theme.colors.primaries['100'] : theme.colors.primaries['800']};
-    border-top: 1px solid ${theme.isDarkColor ? theme.colors.primaries['300'] : theme.colors.primaries['600']};
     transition: all 0.2s cubic-bezier(0.19, 1, 0.22, 1);
+    position: relative;
 
     &:hover {
       transition: all 0.2s cubic-bezier(0.19, 1, 0.22, 1);
       background: ${theme.isDarkColor ? theme.colors.primaries['400'] : theme.colors.primaries['800']};
       color: ${theme.isDarkColor ? theme.colors.primaries['600'] : theme.colors.primaries['100']};
-    }
+    } */
   `}
 `;
 
-export const Usernav = ({ user }: { user: UserProps, customer: any }) => {
+export const UsernavDropdown = () => {
   const history = useHistory();
-  const { user: activeUser, logout } = useUser();
+  const { user, logout } = useUser();
+  const { activeCustomer, setActiveCustomer } = useCustomer();
+  const { canAccessAdmin } = useAuth();
+  const { t, i18n } = useTranslation();
+  const toast = useToast();
+
+  const goToDialoguesOverview = () => {
+    setActiveCustomer(null);
+    history.push('/dashboard');
+  };
+
+  const switchToGerman = () => {
+    i18n.changeLanguage('de');
+    localStorage.setItem('language', 'de');
+
+    setTimeout(() => {
+      toast({
+        title: t('toast:locale_switch'),
+        description: t('toast:locale_switch_german'),
+        status: 'success',
+        position: 'bottom-right',
+        duration: 1500,
+      });
+    }, 400);
+  };
+
+  const switchToEnglish = () => {
+    i18n.changeLanguage('en');
+    localStorage.setItem('language', 'en');
+
+    setTimeout(() => {
+      toast({
+        title: t('toast:locale_switch'),
+        description: t('toast:locale_switch_english'),
+        status: 'success',
+        position: 'bottom-right',
+        duration: 1500,
+      });
+    }, 400);
+  };
+  return (
+    <List>
+      <ListItem isHeader>
+        <Div py={2}>
+          <Flex justifyContent="space-between">
+            <Div>
+              <ChakraAvatar bg="gray.300" size="md" name={`${user?.firstName} ${user?.lastName}`}>
+                <AvatarBadge size="1em" bg="green.400" />
+              </ChakraAvatar>
+            </Div>
+            <Div ml={4}>
+              <Text>{`${user?.firstName} ${user?.lastName}`}</Text>
+              {activeCustomer && (
+                <Text mt={1} color="gray.400" fontSize="0.7rem">
+                  in
+                  {' '}
+                  {activeCustomer?.name}
+                  {' '}
+                  as
+                  {' '}
+                  <Badge variantColor="default" fontSize="0.5rem">
+                    {activeCustomer?.userRole?.name}
+                  </Badge>
+                </Text>
+              )}
+              <Button size="sm" fontSize="0.8rem" mt={3}>
+                <Link to="/dashboard/me/edit">{t('edit_user')}</Link>
+              </Button>
+            </Div>
+          </Flex>
+        </Div>
+      </ListItem>
+      <Div>
+        <ListItem onClick={switchToEnglish}>
+          <Text ml={2}>
+            {t('english')}
+          </Text>
+        </ListItem>
+        <ListItem onClick={switchToGerman}>
+          <Text ml={2}>
+            {t('german')}
+          </Text>
+        </ListItem>
+      </Div>
+      <Div>
+        {((user?.userCustomers?.length && user?.userCustomers.length > 1) || canAccessAdmin) && setActiveCustomer && (
+          <ListItem renderLeftIcon={<ExternalLink />} onClick={goToDialoguesOverview}>
+            <Text ml={2}>
+              {t('switch_project')}
+            </Text>
+          </ListItem>
+        )}
+        <ListItem renderLeftIcon={<LogOut />} onClick={logout}>
+          <Text ml={2}>
+            {t('logout')}
+          </Text>
+        </ListItem>
+      </Div>
+    </List>
+  );
+};
+
+export const Usernav = () => {
+  const history = useHistory();
+  const { user, logout } = useUser();
   const { setActiveCustomer } = useCustomer();
   const { canAccessAdmin } = useAuth();
   const { t, i18n } = useTranslation();
@@ -136,50 +243,15 @@ export const Usernav = ({ user }: { user: UserProps, customer: any }) => {
   };
 
   return (
-    <Menu>
-      <MenuButton>
-        <UsernavContainer>
-          <Flex py={4} alignItems="center">
-            <ChakraAvatar bg="gray.300" size="md" name={`${user.firstName} ${user.lastName}`}>
-              <AvatarBadge size="1em" bg="green.400" />
-            </ChakraAvatar>
-          </Flex>
-        </UsernavContainer>
-      </MenuButton>
-      <MenuList>
-        <MenuGroup title={t('language')}>
-          <MenuItem onClick={switchToEnglish} color="gray.600">
-            <Icon as={EnFlag} overflow="visible" />
-            <Text ml={2}>
-              {t('english')}
-            </Text>
-          </MenuItem>
-          <MenuItem onClick={switchToGerman} color="gray.600">
-            <Icon as={DeFlag} />
-            <Text ml={2}>
-              {t('german')}
-            </Text>
-          </MenuItem>
-        </MenuGroup>
-        <MenuDivider />
-        <MenuGroup title={t('user_actions')}>
-          {((activeUser?.userCustomers?.length && activeUser.userCustomers.length > 1) || canAccessAdmin) && (
-            <MenuItem color="gray.600" onClick={goToDialoguesOverview}>
-              <Icon as={ExternalLink} />
-              <Text ml={2}>
-                {t('switch_project')}
-              </Text>
-            </MenuItem>
-          )}
-          <MenuItem onClick={logout} color="gray.600">
-            <Icon as={LogOut} />
-            <Text ml={2}>
-              {t('logout')}
-            </Text>
-          </MenuItem>
-        </MenuGroup>
-      </MenuList>
-    </Menu>
+    <UsernavContainer>
+      <Dropdown left="24px" bottom="100%" renderOverlay={<UsernavDropdown />}>
+        <Flex py={4} alignItems="center">
+          <ChakraAvatar bg="gray.300" size="md" name={`${user?.firstName} ${user?.lastName}`}>
+            <AvatarBadge size="1em" bg="green.400" />
+          </ChakraAvatar>
+        </Flex>
+      </Dropdown>
+    </UsernavContainer>
   );
 };
 

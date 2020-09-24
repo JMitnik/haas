@@ -194,29 +194,25 @@ class UserService {
     }
 
     // Search term filtered users
-    const users = await prisma.user.findMany({
-      where: userWhereInput,
+    const usersOfCustomers = await prisma.userOfCustomer.findMany({
+      where: {
+        customer: { slug: customerSlug },
+      },
       include: {
-        customers: {
-          include: {
-            role: true,
-          },
-        },
+        role: true,
+        user: true,
       },
     });
 
-    const totalPages = Math.ceil(users.length / (limit || 1));
+    const totalPages = Math.ceil(usersOfCustomers.length / (limit || 1));
 
     if (pageIndex && pageIndex + 1 > totalPages) {
       offset = 0;
       needPageReset = true;
     }
-    // Order filtered users
-    // TODO: Brign it back
-    // const orderedUsers = UserService.orderUsersBy(users, orderBy);
 
     // Slice ordered filtered users
-    const slicedOrderedUsers = UserService.sliceUsers(users, (offset || 0), (limit || 0), (pageIndex || 0));
+    const slicedOrderedUsers = UserService.sliceUsers(usersOfCustomers, (offset || 0), (limit || 0), (pageIndex || 0));
 
     return {
       users: slicedOrderedUsers,

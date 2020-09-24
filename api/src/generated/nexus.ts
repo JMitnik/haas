@@ -9,11 +9,13 @@ import { core } from "@nexus/schema"
 declare global {
   interface NexusGenCustomInputMethods<TypeName extends string> {
     upload<FieldName extends string>(fieldName: FieldName, opts?: core.ScalarInputFieldConfig<core.GetGen3<"inputTypes", TypeName, FieldName>>): void // "Upload";
+    date<FieldName extends string>(fieldName: FieldName, opts?: core.ScalarInputFieldConfig<core.GetGen3<"inputTypes", TypeName, FieldName>>): void // "Date";
   }
 }
 declare global {
   interface NexusGenCustomOutputMethods<TypeName extends string> {
     upload<FieldName extends string>(fieldName: FieldName, ...opts: core.ScalarOutSpread<TypeName, FieldName>): void // "Upload";
+    date<FieldName extends string>(fieldName: FieldName, ...opts: core.ScalarOutSpread<TypeName, FieldName>): void // "Date";
   }
 }
 
@@ -349,15 +351,15 @@ export interface NexusGenRootTypes {
     relatedNodeId?: string | null; // String
     type: NexusGenEnums['TriggerTypeEnum']; // TriggerTypeEnum!
   }
+  UserConnection: { // root type
+    pageIndex?: number | null; // Int
+    totalPages?: number | null; // Int
+    users: NexusGenRootTypes['UserType'][]; // [UserType!]!
+  }
   UserCustomer: { // root type
     customer: NexusGenRootTypes['Customer']; // Customer!
     role: NexusGenRootTypes['RoleType']; // RoleType!
     user: NexusGenRootTypes['UserType']; // UserType!
-  }
-  UserTable: { // root type
-    pageIndex?: number | null; // Int
-    totalPages?: number | null; // Int
-    users: NexusGenRootTypes['UserType'][]; // [UserType!]!
   }
   UserType: { // root type
     email: string; // String!
@@ -388,6 +390,7 @@ export interface NexusGenRootTypes {
   Float: number;
   Boolean: boolean;
   ID: string;
+  Date: any;
   Upload: any;
 }
 
@@ -454,6 +457,7 @@ export interface NexusGenFieldTypes {
     name: string; // String!
     settings: NexusGenRootTypes['CustomerSettings'] | null; // CustomerSettings
     slug: string; // String!
+    usersConnection: NexusGenRootTypes['UserConnection'] | null; // UserConnection
   }
   CustomerSettings: { // field return type
     colourSettings: NexusGenRootTypes['ColourSettings'] | null; // ColourSettings
@@ -620,7 +624,6 @@ export interface NexusGenFieldTypes {
     user: NexusGenRootTypes['UserType'] | null; // UserType
     UserOfCustomer: NexusGenRootTypes['UserCustomer'] | null; // UserCustomer
     users: NexusGenRootTypes['UserType'][]; // [UserType!]!
-    userTable: NexusGenRootTypes['UserTable'] | null; // UserTable
   }
   QuestionNode: { // field return type
     children: NexusGenRootTypes['Edge'][]; // [Edge!]!
@@ -714,15 +717,15 @@ export interface NexusGenFieldTypes {
     relatedNodeId: string | null; // String
     type: NexusGenEnums['TriggerTypeEnum']; // TriggerTypeEnum!
   }
+  UserConnection: { // field return type
+    pageIndex: number | null; // Int
+    totalPages: number | null; // Int
+    users: NexusGenRootTypes['UserType'][]; // [UserType!]!
+  }
   UserCustomer: { // field return type
     customer: NexusGenRootTypes['Customer']; // Customer!
     role: NexusGenRootTypes['RoleType']; // RoleType!
     user: NexusGenRootTypes['UserType']; // UserType!
-  }
-  UserTable: { // field return type
-    pageIndex: number | null; // Int
-    totalPages: number | null; // Int
-    users: NexusGenRootTypes['UserType'][]; // [UserType!]!
   }
   UserType: { // field return type
     customers: NexusGenRootTypes['Customer'][]; // [Customer!]!
@@ -767,6 +770,10 @@ export interface NexusGenArgTypes {
     }
     dialogues: { // args
       filter?: NexusGenInputs['DialogueFilterInputType'] | null; // DialogueFilterInputType
+    }
+    usersConnection: { // args
+      customerSlug?: string | null; // String
+      filter?: NexusGenInputs['PaginationWhereInput'] | null; // PaginationWhereInput
     }
   }
   Dialogue: {
@@ -981,10 +988,6 @@ export interface NexusGenArgTypes {
     users: { // args
       customerSlug?: string | null; // String
     }
-    userTable: { // args
-      customerSlug?: string | null; // String
-      filter?: NexusGenInputs['PaginationWhereInput'] | null; // PaginationWhereInput
-    }
   }
 }
 
@@ -994,7 +997,7 @@ export interface NexusGenAbstractResolveReturnTypes {
 
 export interface NexusGenInheritedFields {}
 
-export type NexusGenObjectNames = "ColourSettings" | "Customer" | "CustomerSettings" | "Debug" | "Dialogue" | "DialogueStatistics" | "Edge" | "EdgeCondition" | "FontSettings" | "ImageType" | "InviteUserOutput" | "LinkType" | "LoginOutput" | "Mutation" | "NodeEntry" | "NodeEntryValue" | "PaginationPageInfo" | "PermssionType" | "Query" | "QuestionNode" | "QuestionOption" | "RefreshAccessTokenOutput" | "RequestInviteOutput" | "RoleConnection" | "RoleType" | "Session" | "SessionConnection" | "Tag" | "TriggerConditionType" | "TriggerConnectionType" | "TriggerType" | "UserCustomer" | "UserTable" | "UserType" | "VerifyUserTokenOutput" | "lineChartDataType" | "topPathType";
+export type NexusGenObjectNames = "ColourSettings" | "Customer" | "CustomerSettings" | "Debug" | "Dialogue" | "DialogueStatistics" | "Edge" | "EdgeCondition" | "FontSettings" | "ImageType" | "InviteUserOutput" | "LinkType" | "LoginOutput" | "Mutation" | "NodeEntry" | "NodeEntryValue" | "PaginationPageInfo" | "PermssionType" | "Query" | "QuestionNode" | "QuestionOption" | "RefreshAccessTokenOutput" | "RequestInviteOutput" | "RoleConnection" | "RoleType" | "Session" | "SessionConnection" | "Tag" | "TriggerConditionType" | "TriggerConnectionType" | "TriggerType" | "UserConnection" | "UserCustomer" | "UserType" | "VerifyUserTokenOutput" | "lineChartDataType" | "topPathType";
 
 export type NexusGenInputNames = "AddDialogueInput" | "CTALinkInputObjectType" | "CTALinksInputType" | "ChoiceNodeEntryInput" | "CustomerCreateOptions" | "CustomerEditOptions" | "CustomerWhereUniqueInput" | "DialogueFilterInputType" | "DialogueWhereUniqueInput" | "EdgeConditionInputType" | "EditUserInput" | "InviteUserInput" | "LoginInput" | "NodeEntryDataInput" | "NodeEntryInput" | "OptionInputType" | "OptionsInputType" | "PaginationSortInput" | "PaginationWhereInput" | "PermissionIdsInput" | "PermissionInput" | "QuestionNodeWhereInputType" | "QuestionNodeWhereUniqueInput" | "RecipientsInputType" | "RegisterInput" | "RegisterNodeEntryInput" | "RequestInviteInput" | "RoleDataInput" | "RoleInput" | "SessionInput" | "SessionWhereUniqueInput" | "SliderNodeEntryInput" | "TagsInputObjectType" | "TextboxNodeEntryInput" | "TriggerConditionInputType" | "TriggerInputType" | "UserInput" | "UserOfCustomerInput";
 
@@ -1002,7 +1005,7 @@ export type NexusGenEnumNames = "LinkTypeEnumType" | "PaginationSortByEnum" | "Q
 
 export type NexusGenInterfaceNames = "ConnectionInterface";
 
-export type NexusGenScalarNames = "Boolean" | "Float" | "ID" | "Int" | "String" | "Upload";
+export type NexusGenScalarNames = "Boolean" | "Date" | "Float" | "ID" | "Int" | "String" | "Upload";
 
 export type NexusGenUnionNames = never;
 

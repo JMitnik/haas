@@ -114,10 +114,7 @@ const CustomerLayout = ({ children }: { children: React.ReactNode }) => {
                     <DashboardNav customerSlug={params.customerSlug} />
                   </Div>
 
-                  <Usernav
-                    customer={customer}
-                    user={userData}
-                  />
+                  <Usernav />
                 </Sidenav>
               </motion.div>
             ) : (

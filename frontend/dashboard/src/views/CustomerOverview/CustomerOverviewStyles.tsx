@@ -20,7 +20,7 @@ export const CustomerCardImage = styled.img`
 
 export const CustomerOverviewContainer = styled.div`
   ${({ theme }) => css`
-    min-height: 100vh;
+    /* min-height: 100vh; */
     /* padding: ${theme.gutter * 3}px; */
 
     ${Card}:hover {

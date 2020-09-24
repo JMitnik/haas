@@ -7,7 +7,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Div, Flex, PageTitle } from '@haas/ui';
 import SearchBar from 'components/SearchBar/SearchBar';
 import Table from 'components/Table/Table';
-import getUsersQuery from 'queries/getUserTable';
+import getPaginatedUsers from 'queries/getPaginatedUsers';
 
 import { Button } from '@chakra-ui/core';
 import { ErrorBoundary } from 'react-error-boundary';
@@ -40,7 +40,7 @@ const UsersOverview = () => {
   const { customerSlug } = useParams<{ customerSlug: string }>();
   const { t } = useTranslation();
   const history = useHistory();
-  const [fetchUsers, { data }] = useLazyQuery(getUsersQuery, { fetchPolicy: 'cache-and-network' });
+  const [fetchUsers, { data }] = useLazyQuery(getPaginatedUsers, { fetchPolicy: 'cache-and-network' });
 
   const [paginationProps, setPaginationProps] = useState<TableProps>({
     activeStartDate: null,
@@ -73,7 +73,7 @@ const UsersOverview = () => {
 
   const [deleteUser] = useMutation(deleteUserQuery, {
     refetchQueries: [{
-      query: getUsersQuery,
+      query: getPaginatedUsers,
       variables: {
         customerSlug,
         filter: {

@@ -4,6 +4,8 @@ import { useUser } from 'providers/UserProvider';
 import { SystemPermission } from 'types/globalTypes';
 
 interface UseAuthProps {
+  canCreateCustomers: boolean;
+  canDeleteCustomers: boolean;
   canCreateTriggers: boolean;
   canEditCustomer: boolean;
   canAccessAdmin: boolean;
@@ -24,6 +26,8 @@ const useAuth = (): UseAuthProps => {
   const hasPermission = (permission: SystemPermission) => authPermissions?.includes(permission) || false;
   // const hasAllPermissions = (permission: SystemPermission) => authPermissions.includes(permission);
 
+  const canDeleteCustomers = authPermissions?.includes(SystemPermission.CAN_ACCESS_ADMIN_PANEL) || false;
+  const canCreateCustomers = authPermissions?.includes(SystemPermission.CAN_ACCESS_ADMIN_PANEL) || false;
   const canAccessAdmin = authPermissions?.includes(SystemPermission.CAN_ACCESS_ADMIN_PANEL) || false;
   const canViewUsers = authPermissions?.includes(SystemPermission.CAN_VIEW_USERS) || false;
 
@@ -35,6 +39,8 @@ const useAuth = (): UseAuthProps => {
   const canCreateTriggers = authPermissions?.includes(SystemPermission.CAN_CREATE_TRIGGERS) || false;
 
   return {
+    canCreateCustomers,
+    canDeleteCustomers,
     canCreateTriggers,
     canEditCustomer,
     hasPermission,

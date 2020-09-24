@@ -10,7 +10,10 @@ import { DialogueFilterInputType, DialogueType, DialogueWhereUniqueInput } from 
 // eslint-disable-next-line import/no-cycle
 import CustomerService from './CustomerService';
 // eslint-disable-next-line import/no-cycle
+import { PaginationWhereInput } from '../general/Pagination';
+import { UserConnection } from '../users/User';
 import DialogueService from '../questionnaire/DialogueService';
+import UserService from '../users/UserService';
 import isValidColor from '../../utils/isValidColor';
 
 export interface CustomerSettingsWithColour extends CustomerSettings {
@@ -38,6 +41,25 @@ export const CustomerType = objectType({
         });
 
         return customerSettings as any;
+      },
+    });
+
+    t.field('usersConnection', {
+      type: UserConnection,
+      args: { customerSlug: 'String', filter: PaginationWhereInput },
+      nullable: true,
+
+      async resolve(parent, args) {
+        const users = await UserService.paginatedUsers(
+          parent.slug,
+          args.filter?.pageIndex,
+          args.filter?.offset,
+          args.filter?.limit,
+          args.filter?.orderBy?.[0],
+          args.filter?.searchTerm,
+        );
+
+        return users;
       },
     });
 

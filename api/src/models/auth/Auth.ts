@@ -125,7 +125,9 @@ export const VerifyUserTokenMutation = mutationField('verifyUserToken', {
     });
 
     return {
-      userData: validUser,
+      userData: {
+        ...validUser,
+      },
       accessToken,
       accessTokenExpiry,
     };

@@ -55,6 +55,7 @@ type Customer {
   name: String!
   settings: CustomerSettings
   slug: String!
+  usersConnection(customerSlug: String, filter: PaginationWhereInput): UserConnection
 }
 
 input CustomerCreateOptions {
@@ -81,6 +82,9 @@ type CustomerSettings {
 input CustomerWhereUniqueInput {
   id: ID!
 }
+
+"""Date custom scalar type"""
+scalar Date
 
 type Debug {
   debugResolver: String
@@ -392,7 +396,6 @@ type Query {
   user(userId: String): UserType
   UserOfCustomer(input: UserOfCustomerInput): UserCustomer
   users(customerSlug: String): [UserType!]!
-  userTable(customerSlug: String, filter: PaginationWhereInput): UserTable
 }
 
 type QuestionNode {
@@ -644,6 +647,12 @@ enum TriggerTypeEnum {
 """The `Upload` scalar type represents a file upload."""
 scalar Upload
 
+type UserConnection {
+  pageIndex: Int
+  totalPages: Int
+  users: [UserType!]!
+}
+
 type UserCustomer {
   customer: Customer!
   role: RoleType!
@@ -664,12 +673,6 @@ input UserOfCustomerInput {
   customerId: String
   customerSlug: String
   userId: String
-}
-
-type UserTable {
-  pageIndex: Int
-  totalPages: Int
-  users: [UserType!]!
 }
 
 type UserType {
