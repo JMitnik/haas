@@ -21,7 +21,6 @@ import CustomerProvider from 'providers/CustomerProvider';
 import CustomerRoute from 'components/Routes/CustomerRoute';
 import CustomersPage from 'pages/dashboard/customers';
 import DashboardPage from 'pages/dashboard';
-import DashboardRoute from 'components/Routes/DashboardRoute';
 import DialogueBuilderPage from 'pages/dashboard/builder';
 import DialogueLayout from 'layouts/DialogueLayout';
 import DialoguePage from 'pages/dashboard/dialogues/dialogue';
@@ -70,7 +69,7 @@ const CustomerRoutes = () => (
                     render={() => <EditDialogueView />}
                   />
 
-                  <DashboardRoute
+                  <GuardedRoute
                     path="/dashboard/b/:customerSlug/d/:dialogueSlug/interactions"
                     render={() => <InteractionsOverview />}
                   />
@@ -81,7 +80,7 @@ const CustomerRoutes = () => (
                     render={() => <ActionsPage />}
                   />
 
-                  <DashboardRoute
+                  <GuardedRoute
                     path="/dashboard/b/:customerSlug/d/:dialogueSlug"
                     render={() => <DialoguePage />}
                   />
@@ -96,28 +95,31 @@ const CustomerRoutes = () => (
             render={() => (
               <ViewContainer>
                 <Switch>
-                  <DashboardRoute
+                  <GuardedRoute
                     path="/dashboard/b/:customerSlug/analytics/"
                     render={() => (
                       <AnalyticsPage />
                     )}
                   />
 
-                  <DashboardRoute
+                  <GuardedRoute
+                    allowedPermission={SystemPermission.CAN_CREATE_TRIGGERS}
                     path="/dashboard/b/:customerSlug/triggers/add"
                     render={() => (
                       <AddTriggerView />
                     )}
                   />
 
-                  <DashboardRoute
+                  <GuardedRoute
+                    allowedPermission={SystemPermission.CAN_CREATE_TRIGGERS}
                     path="/dashboard/b/:customerSlug/triggers/:triggerId/edit"
                     render={() => (
                       <EditTriggerView />
                     )}
                   />
 
-                  <DashboardRoute
+                  <GuardedRoute
+                    allowedPermission={SystemPermission.CAN_CREATE_TRIGGERS}
                     path="/dashboard/b/:customerSlug/triggers"
                     render={() => <TriggersOverview />}
                   />
@@ -128,7 +130,7 @@ const CustomerRoutes = () => (
                     render={() => <EditCustomerView />}
                   />
 
-                  <DashboardRoute
+                  <GuardedRoute
                     path="/dashboard/b/:customerSlug/u/:userId/edit"
                     render={() => (
                       <EditUserView />
@@ -136,7 +138,7 @@ const CustomerRoutes = () => (
                   />
 
                   {/* Possible deprecate this */}
-                  {/* <DashboardRoute
+                  {/* <GuardedRoute
                     path="/dashboard/b/:customerSlug/users/add"
                     render={() => (
                       <AddUserView />
@@ -156,21 +158,21 @@ const CustomerRoutes = () => (
                     path="/dashboard/b/:customerSlug/users"
                     render={() => <UsersOverview />}
                   />
-                  {/* <DashboardRoute
+                  {/* <GuardedRoute
                     path="/dashboard/b/:customerSlug/roles"
                     render={() => <RolesOverview />}
                   /> */}
 
-                  <DashboardRoute
+                  <GuardedRoute
                     path="/dashboard/b/:customerSlug/dialogue/add"
                     render={() => <AddDialogueView />}
                   />
 
-                  <DashboardRoute
+                  <GuardedRoute
                     path="/dashboard/b/:customerSlug/d"
                     render={() => <DialoguesPage />}
                   />
-                  <DashboardRoute
+                  <GuardedRoute
                     path="/dashboard/b/:customerSlug/"
                     render={() => <CustomerPage />}
                   />
@@ -216,7 +218,7 @@ const AppRoutes = () => (
         render={() => <CustomerRoutes />}
       />
 
-      <DashboardRoute
+      <GuardedRoute
         path="/dashboard/b/"
         render={() => (
           <PreCustomerLayout>
@@ -225,13 +227,13 @@ const AppRoutes = () => (
         )}
       />
 
-      <DashboardRoute path="/dashboard/first_time">
+      <GuardedRoute path="/dashboard/first_time">
         <FirstTimePage />
-      </DashboardRoute>
+      </GuardedRoute>
 
-      <DashboardRoute path="/dashboard">
+      <GuardedRoute path="/dashboard">
         <DashboardPage />
-      </DashboardRoute>
+      </GuardedRoute>
 
       <Route path="/verify_token">
         <VerifyTokenPage />

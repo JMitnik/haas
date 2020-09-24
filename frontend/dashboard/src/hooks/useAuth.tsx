@@ -4,6 +4,7 @@ import { useUser } from 'providers/UserProvider';
 import { SystemPermission } from 'types/globalTypes';
 
 interface UseAuthProps {
+  canCreateTriggers: boolean;
   canEditCustomer: boolean;
   canAccessAdmin: boolean;
   canViewDialogueBuilder: boolean;
@@ -18,7 +19,7 @@ const useAuth = (): UseAuthProps => {
   // Technically this should not work in views without CustomerProvider <- Will return undefined thus
   const { activePermissions } = useCustomer();
 
-  const authPermissions = activePermissions || user.globalPermissions;
+  const authPermissions = activePermissions || user?.globalPermissions;
 
   const hasPermission = (permission: SystemPermission) => authPermissions?.includes(permission) || false;
   // const hasAllPermissions = (permission: SystemPermission) => authPermissions.includes(permission);
@@ -31,7 +32,10 @@ const useAuth = (): UseAuthProps => {
   const canViewDialogueBuilder = authPermissions?.includes(SystemPermission.CAN_VIEW_DIALOGUE) || false;
   const canBuildDialogues = authPermissions?.includes(SystemPermission.CAN_BUILD_DIALOGUE) || false;
 
+  const canCreateTriggers = authPermissions?.includes(SystemPermission.CAN_CREATE_TRIGGERS) || false;
+
   return {
+    canCreateTriggers,
     canEditCustomer,
     hasPermission,
     canAccessAdmin,

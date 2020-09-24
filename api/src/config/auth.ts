@@ -10,7 +10,7 @@ import AuthorizationError from '../models/auth/AuthorizationError';
 
 const isSuperAdmin = rule({ cache: 'no_cache' })(
   async (parent, args, ctx: APIContext) => {
-    if (!ctx.session?.user?.id) return false;
+    if (!ctx.session?.user?.id) return new ApolloError('Unauthenticated', 'UNAUTHENTICATED');
 
     return ctx.session?.globalPermissions?.includes('CAN_ACCESS_ADMIN_PANEL');
   },
@@ -47,9 +47,11 @@ const authShield = shield({
   },
   Mutation: {
     '*': isSuperAdmin,
+    logout: allow,
     createSession: allow,
     verifyUserToken: allow,
-    inviteUser: allow,
+    // TODO: Allow managers to do the same
+    inviteUser: isSuperAdmin,
     requestInvite: allow,
     editUser: or(isSelf, isSuperAdmin),
   },

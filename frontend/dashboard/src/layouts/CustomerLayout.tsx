@@ -21,8 +21,8 @@ import MobileBottomNav from 'components/MobileBottomNav';
 import Sidenav from 'components/Sidenav';
 import useMediaDevice from 'hooks/useMediaDevice';
 
-import useAuth from 'hooks/useAuth';
 import NotAuthorizedView from './NotAuthorizedView';
+import useAuth from 'hooks/useAuth';
 
 const CustomerLayoutContainer = styled(Div)<{ isMobile?: boolean }>`
   ${({ theme, isMobile = false }) => css`
@@ -49,7 +49,7 @@ const DashboardViewContainer = styled(Div)`
 
 const DashboardNav = ({ customerSlug }: { customerSlug: string }) => {
   const { t } = useTranslation();
-  const { canViewUsers, canEditCustomer } = useAuth();
+  const { canViewUsers, canEditCustomer, canCreateTriggers } = useAuth();
 
   return (
     <NavItems>
@@ -67,10 +67,12 @@ const DashboardNav = ({ customerSlug }: { customerSlug: string }) => {
           {t('users')}
         </NavItem>
       )}
-      <NavItem to={`/dashboard/b/${customerSlug}/triggers`}>
-        <NotificationIcon />
-        {t('alerts')}
-      </NavItem>
+      {canCreateTriggers && (
+        <NavItem to={`/dashboard/b/${customerSlug}/triggers`}>
+          <NotificationIcon />
+          {t('alerts')}
+        </NavItem>
+      )}
       {canEditCustomer && (
         <NavItem to={`/dashboard/b/${customerSlug}/edit`}>
           <SettingsIcon />

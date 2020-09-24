@@ -219,10 +219,11 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
               <Controller
                 control={form.control}
                 name="type"
-                render={({ onChange }) => (
+                defaultValue="QUESTION"
+                render={({ onChange, value }) => (
                   <>
                     <RadioButtonGroup
-                      defaultValue="QUESTION"
+                      defaultValue={value}
                       isInline
                       onChange={(data) => {
                         onChange(data);

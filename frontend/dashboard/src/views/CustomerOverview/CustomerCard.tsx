@@ -89,16 +89,6 @@ const CustomerCard = ({ customer }: { customer: any }) => {
             >
               {t('visit')}
             </Button>
-            <Button
-              size="xs"
-              variant="outline"
-              leftIcon="edit"
-              color={primaryColor.lighten(0.6).hex()}
-              borderColor={primaryColor.lighten(0.6).hex()}
-              onClick={(e) => setCustomerEditPath(e, customer.slug)}
-            >
-              {t('edit')}
-            </Button>
             <Span onClick={(e) => e.stopPropagation()}>
               <Popover
                 usePortal

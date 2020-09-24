@@ -801,6 +801,22 @@ const language = {
     },
   },
   toast: {
+    delete_node: {
+      en: '',
+      de: '',
+    },
+    delete_node_helper: {
+      en: '',
+      de: '',
+    },
+    delete_node_error_helper: {
+      en: '',
+      de: '',
+    },
+    something_went_wrong: {
+      en: 'Something went wrong',
+      de: 'Etwas ist schief gelaufen',
+    },
     welcome: {
       en: 'Welcome!',
       de: 'Wilkommen!',

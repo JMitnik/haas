@@ -6,7 +6,7 @@ import { useMutation, useQuery } from '@apollo/react-hooks';
 import React from 'react';
 import Select from 'react-select';
 
-import { Button, ButtonGroup, FormErrorMessage } from '@chakra-ui/core';
+import { Button, ButtonGroup, FormErrorMessage, useToast } from '@chakra-ui/core';
 import { Div, Form, FormContainer, FormControl,
   FormLabel, FormSection, H3, Hr, Input, InputGrid, InputHelper, Muted, PageTitle } from '@haas/ui';
 import { Mail } from 'react-feather';
@@ -50,17 +50,40 @@ const InviteUserView = () => {
   const history = useHistory();
   const form = useForm<FormDataProps>({
     resolver: yupResolver(schema),
-    mode: 'onBlur',
+    mode: 'onChange',
   });
   const { customerSlug } = useParams();
   const { activeCustomer } = useCustomer();
-
+  const toast = useToast();
   const { t } = useTranslation();
 
   const { data } = useQuery(getRolesQuery, { variables: { customerSlug } });
   const [addUser, { loading: isLoading }] = useMutation(inviteUserMutation, {
-    onCompleted: () => {
-      history.push(`/dashboard/b/${customerSlug}/users/`);
+    onCompleted: (data) => {
+      const userDidExist = data?.inviteUser?.didAlreadyExist;
+      const didInviteUser = data?.inviteUser?.didInvite;
+
+      if (!userDidExist && didInviteUser) {
+        toast({
+          title: 'Invited new user!',
+          description: 'The user has been invited to the workspace.',
+          status: 'success',
+          position: 'bottom-right',
+          duration: 1500,
+        });
+      } else {
+        toast({
+          title: 'User already exists!',
+          description: 'The user already exists in your workspace. Any changes have been applied.',
+          status: 'warning',
+          position: 'bottom-right',
+          duration: 1500,
+        });
+      }
+
+      setTimeout(() => {
+        history.push(`/dashboard/b/${customerSlug}/users/`);
+      }, 300);
     },
     onError: (serverError: ApolloError) => {
       console.log(serverError);

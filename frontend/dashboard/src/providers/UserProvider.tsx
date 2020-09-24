@@ -55,6 +55,7 @@ interface AuthContextProps {
   setAccessToken: (token: string) => void;
   setUser: (userData: User) => void;
   refreshUser: () => void;
+  hardRefreshUser: () => void;
 }
 
 const UserContext = React.createContext({} as AuthContextProps);
@@ -71,14 +72,14 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
     }, 1000);
   };
 
-  const [getUser] = useLazyQuery<GetUserData>(queryMe, {
+  const [getUser, { loading: isGettingUser }] = useLazyQuery<GetUserData>(queryMe, {
     onCompleted: (data) => {
-      console.log('hmmm');
       setUser({
         id: data.me.id,
         firstName: data.me.firstName,
         lastName: data.me.lastName,
         email: data.me.email,
+        globalPermissions: data.me.globalPermissions,
         userCustomers: data.me.userCustomers,
       });
       stopInitializingUser();
@@ -104,6 +105,11 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
     fetchPolicy: 'network-only',
   });
 
+  const startInitializingUser = () => {
+    setIsInitializingUser(true);
+    getUser();
+  };
+
   useEffect(() => {
     if (refreshTokenData) {
       setAccessToken(refreshTokenData?.refreshAccessToken.accessToken);
@@ -123,11 +129,12 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
     <UserContext.Provider value={{
       user,
       isInitializingUser,
-      isLoggedIn: !!(user?.id && accessToken),
+      isLoggedIn: !!(user?.id && accessToken && localStorage.getItem('access_token')),
       accessToken,
       logout,
       setUser,
       refreshUser: getUser,
+      hardRefreshUser: startInitializingUser,
       setAccessToken,
     }}
     >

@@ -8,7 +8,7 @@ const authorizeLink = new ApolloLink((operation, forward) => {
   const localToken = localStorage.getItem('access_token');
 
   if (localToken) {
-    console.log(typeof localToken);
+    console.log(localToken);
     operation.setContext({
       headers: {
         Authorization: `Bearer:${localToken}`,
@@ -22,6 +22,8 @@ const authorizeLink = new ApolloLink((operation, forward) => {
 const client = new ApolloClient({
   link: from([
     onError(({ graphQLErrors }) => {
+      console.log(graphQLErrors);
+
       if (graphQLErrors) {
         const authorizedErrors = graphQLErrors.filter((error) => (
           error?.extensions?.code === 'UNAUTHENTICATED'

@@ -111,7 +111,7 @@ const CustomerProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, [customerSlug, refetch]);
 
-  const activePermissions = [...user?.globalPermissions || [], ...activeCustomer?.userRole?.permissions || []];
+  const activePermissions = [...(user?.globalPermissions || []), ...(activeCustomer?.userRole?.permissions || [])];
 
   return (
     <CustomerContext.Provider value={{ activeCustomer, setActiveCustomer, activePermissions }}>

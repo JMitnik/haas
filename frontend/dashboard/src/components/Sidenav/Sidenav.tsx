@@ -13,6 +13,7 @@ import { UserProps } from 'types/generic';
 import { useCustomer } from 'providers/CustomerProvider';
 import { useTranslation } from 'react-i18next';
 import { useUser } from 'providers/UserProvider';
+import useAuth from 'hooks/useAuth';
 
 interface NavItemProps extends LinkProps { }
 
@@ -95,6 +96,7 @@ export const Usernav = ({ user }: { user: UserProps, customer: any }) => {
   const history = useHistory();
   const { user: activeUser, logout } = useUser();
   const { setActiveCustomer } = useCustomer();
+  const { canAccessAdmin } = useAuth();
   const { t, i18n } = useTranslation();
   const toast = useToast();
 
@@ -161,7 +163,7 @@ export const Usernav = ({ user }: { user: UserProps, customer: any }) => {
         </MenuGroup>
         <MenuDivider />
         <MenuGroup title={t('user_actions')}>
-          {activeUser?.userCustomers?.length && activeUser.userCustomers.length > 1 && (
+          {((activeUser?.userCustomers?.length && activeUser.userCustomers.length > 1) || canAccessAdmin) && (
             <MenuItem color="gray.600" onClick={goToDialoguesOverview}>
               <Icon as={ExternalLink} />
               <Text ml={2}>

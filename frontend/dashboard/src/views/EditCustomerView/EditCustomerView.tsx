@@ -16,6 +16,7 @@ import booleanToNumber from 'utils/booleanToNumber';
 import parseOptionalBoolean from 'utils/parseOptionalBoolean';
 
 import { useTranslation } from 'react-i18next';
+import { useUser } from 'providers/UserProvider';
 import editCustomerMutation from '../../mutations/editCustomer';
 import getCustomerQuery from '../../queries/getCustomersQuery';
 import getEditCustomerData from '../../queries/getEditCustomer';
@@ -61,6 +62,7 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
   const { customerSlug } = useParams();
   const history = useHistory();
   const { setActiveCustomer } = useCustomer();
+  const { hardRefreshUser } = useUser();
   const { t } = useTranslation();
   const toast = useToast();
 
@@ -87,10 +89,9 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
         description: 'The business has been updated',
         status: 'success',
         position: 'bottom-right',
-        duration: 300,
+        duration: 1500,
       });
     },
-    refetchQueries: [{ query: getCustomerQuery }],
     onError: () => {
       toast({
         title: 'Error',
@@ -125,6 +126,9 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
           position: 'bottom-right',
           duration: 1500,
         });
+
+        // @ts-ignore
+        hardRefreshUser();
 
         setTimeout(() => {
           history.push(`/dashboard/b/${formData.slug}`);

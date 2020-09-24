@@ -12,7 +12,7 @@ const GuardedRoute = ({ allowedPermission, ...routeProps }: GuardedRouteProps) =
   const { isLoggedIn } = useUser();
   const { hasPermission } = useAuth();
 
-  if (!isLoggedIn) return <Redirect to="/public/login" />;
+  if (!isLoggedIn) return <Redirect to="/logged_out" />;
 
   if (allowedPermission && !hasPermission(allowedPermission)) {
     return <Redirect to="/unauthorized" />;
