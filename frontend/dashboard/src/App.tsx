@@ -199,7 +199,13 @@ const PublicRoutes = () => (
   </Switch>
 );
 
-const RootAppRoute = () => <Redirect to="/dashboard" />;
+const RootAppRoute = () => {
+  const { isLoggedIn } = useUser();
+
+  if (isLoggedIn) return <Redirect to="/dashboard" />;
+
+  return <Redirect to="/public/login" />;
+};
 
 const AppRoutes = () => (
   <RootApp>
