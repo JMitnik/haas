@@ -254,7 +254,7 @@ const CustomerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = 
         >
           {isInEdit ? t('edit') : t('create')}
         </Button>
-        <Button variant="outline" onClick={() => history.push('/')}>{t('cancel')}</Button>
+        <Button variant="outline" onClick={() => history.goBack()}>{t('cancel')}</Button>
       </ButtonGroup>
     </Form>
   );

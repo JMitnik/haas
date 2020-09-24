@@ -197,7 +197,7 @@ const AddUserView = () => {
               >
                 Create
               </Button>
-              <Button variant="outline" onClick={() => history.push('/')}>Cancel</Button>
+              <Button variant="outline" onClick={() => history.goBack()}>Cancel</Button>
             </ButtonGroup>
           </Form>
         </FormContainer>

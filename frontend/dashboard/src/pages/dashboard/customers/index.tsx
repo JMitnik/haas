@@ -6,14 +6,14 @@ import { getCustomers as CustomerData } from 'queries/__generated__/getCustomers
 import { Redirect } from 'react-router';
 import { useUser } from 'providers/UserProvider';
 import CustomerOverview from 'views/CustomerOverview';
-import getCustomersQuery from 'queries/getCustomersQuery';
+import getCustomersOfUser from 'queries/getCustomersOfUser';
 import useAuth from 'hooks/useAuth';
 
 const CustomersPage = () => {
   const { user } = useUser();
   const { canAccessAdmin } = useAuth();
 
-  const { loading, error, data } = useQuery<CustomerData>(getCustomersQuery, {
+  const { loading, error, data } = useQuery<CustomerData>(getCustomersOfUser, {
     variables: {
       userId: user?.id,
     },
@@ -23,7 +23,7 @@ const CustomersPage = () => {
   const customers = data?.user?.customers || [];
 
   // Redirect to single customer
-  if (user.userCustomers?.length === 1 && !canAccessAdmin) {
+  if (user?.userCustomers?.length === 1 && !canAccessAdmin) {
     const [userCustomer] = user.userCustomers;
     const redirectSlug = userCustomer.customer.slug;
 

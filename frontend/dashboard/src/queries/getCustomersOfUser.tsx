@@ -2,7 +2,7 @@ import gql from 'graphql-tag';
 
 import { CustomerFragment } from './CustomerFragment';
 
-const getCustomerQuery = gql`
+const getCustomersOfUser = gql`
   query getCustomers($userId: String!) {
     user(userId: $userId) {
       customers {
@@ -14,4 +14,4 @@ const getCustomerQuery = gql`
   ${CustomerFragment}
 `;
 
-export default getCustomerQuery;
+export default getCustomersOfUser;

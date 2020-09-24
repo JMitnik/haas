@@ -55,7 +55,7 @@ const VerifyTokenPage = () => {
 
   useEffect(() => {
     if (isLoggedIn) {
-      if (!user.firstName) {
+      if (!user?.firstName) {
         history.push('/dashboard/first_time');
       } else {
         history.push('/dashboard');

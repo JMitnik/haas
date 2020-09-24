@@ -105,12 +105,6 @@ const CustomerProvider = ({ children }: { children: React.ReactNode }) => {
     },
   });
 
-  useEffect(() => {
-    if ((customerSlug)) {
-      refetch();
-    }
-  }, [customerSlug, refetch]);
-
   const activePermissions = [...(user?.globalPermissions || []), ...(activeCustomer?.userRole?.permissions || [])];
 
   return (

@@ -8,8 +8,9 @@ import React from 'react';
 import { Card, CardBody, ColumnFlex, H3, Span, Text } from '@haas/ui';
 import { deleteFullCustomerQuery } from 'mutations/deleteFullCustomer';
 import { isValidColor } from 'utils/ColorUtils';
+import { queryMe, useUser } from 'providers/UserProvider';
 import { useMutation } from '@apollo/react-hooks';
-import getCustomerQuery from 'queries/getCustomersQuery';
+import getCustomersOfUser from 'queries/getCustomersOfUser';
 
 import { CustomerCardImage } from './CustomerOverviewStyles';
 
@@ -17,6 +18,7 @@ const CustomerCard = ({ customer }: { customer: any }) => {
   const history = useHistory();
   const toast = useToast();
   const { t } = useTranslation();
+  const { user } = useUser();
 
   const setCustomerSlug = (customerSlug: string) => {
     localStorage.setItem('customer', JSON.stringify(customer));
@@ -29,7 +31,7 @@ const CustomerCard = ({ customer }: { customer: any }) => {
   };
 
   const [deleteCustomer] = useMutation(deleteFullCustomerQuery, {
-    refetchQueries: [{ query: getCustomerQuery }],
+    refetchQueries: [{ query: queryMe }, { query: getCustomersOfUser, variables: { userId: user?.id } }],
     onError: () => {
       toast({
         title: 'Something went wrong',

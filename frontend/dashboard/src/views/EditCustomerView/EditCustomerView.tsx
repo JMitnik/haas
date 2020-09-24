@@ -15,10 +15,10 @@ import CustomerForm from 'components/CustomerForm';
 import booleanToNumber from 'utils/booleanToNumber';
 import parseOptionalBoolean from 'utils/parseOptionalBoolean';
 
+import { queryMe, useUser } from 'providers/UserProvider';
 import { useTranslation } from 'react-i18next';
-import { useUser } from 'providers/UserProvider';
 import editCustomerMutation from '../../mutations/editCustomer';
-import getCustomerQuery from '../../queries/getCustomersQuery';
+import getCustomersOfUser from '../../queries/getCustomersOfUser';
 import getEditCustomerData from '../../queries/getEditCustomer';
 
 interface FormDataProps {
@@ -126,9 +126,6 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
           position: 'bottom-right',
           duration: 1500,
         });
-
-        // @ts-ignore
-        hardRefreshUser();
 
         setTimeout(() => {
           history.push(`/dashboard/b/${formData.slug}`);

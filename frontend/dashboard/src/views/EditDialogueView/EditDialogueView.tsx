@@ -279,7 +279,7 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFo
               >
                 {t('save')}
               </Button>
-              <Button variant="outline" onClick={() => history.push('/')}>{t('cancel')}</Button>
+              <Button variant="outline" onClick={() => history.goBack()}>{t('cancel')}</Button>
             </ButtonGroup>
           </Form>
         </FormContainer>

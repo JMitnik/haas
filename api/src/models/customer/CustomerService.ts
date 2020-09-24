@@ -303,18 +303,26 @@ class CustomerService {
       }));
     }
 
-    await prisma.tag.deleteMany({ where: { customerId } });
-    await prisma.triggerCondition.deleteMany({ where: { trigger: { customerId } } });
-    await prisma.trigger.deleteMany({ where: { customerId } });
-    await prisma.permission.deleteMany({ where: { customerId } });
-    await prisma.user.deleteMany({ where: { customers: { every: { customer: { id: customerId } } } } });
-    await prisma.role.deleteMany({ where: { customerId } });
-
-    await prisma.customer.delete({
+    const deletionOfTags = prisma.tag.deleteMany({ where: { customerId } });
+    const deletionOfTriggers = prisma.triggerCondition.deleteMany({ where: { trigger: { customerId } } });
+    const deletionOfPermissions = prisma.permission.deleteMany({ where: { customerId } });
+    const deletionOfUserCustomerRoles = prisma.userOfCustomer.deleteMany({
       where: {
-        id: customerId,
+        customerId,
       },
     });
+
+    const deletionOfRoles = prisma.role.deleteMany({ where: { customerId } });
+    const deletionOfCustomer = prisma.customer.delete({ where: { id: customerId } });
+
+    await prisma.transaction([
+      deletionOfTags,
+      deletionOfTriggers,
+      deletionOfPermissions,
+      deletionOfUserCustomerRoles,
+      deletionOfRoles,
+      deletionOfCustomer,
+    ]);
 
     return customer || null;
   }

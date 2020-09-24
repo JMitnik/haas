@@ -42,8 +42,6 @@ export const CustomThemeProviders = ({ children }: { children: React.ReactNode }
   const { activeCustomer } = useCustomer();
 
   useEffect(() => {
-    console.log(activeCustomer);
-
     if (activeCustomer) {
       setCustomTheme(makeBrandTheme(activeCustomer.settings));
     } else {

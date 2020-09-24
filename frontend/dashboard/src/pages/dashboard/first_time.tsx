@@ -96,7 +96,7 @@ const FirstTimeForm = () => {
       firstName: '',
       lastName: '',
       phone: '',
-      email: user.email,
+      email: user?.email,
     },
     mode: 'onBlur',
   });

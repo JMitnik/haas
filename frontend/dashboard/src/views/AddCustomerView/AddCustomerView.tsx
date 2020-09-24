@@ -15,7 +15,7 @@ import parseOptionalBoolean from 'utils/parseOptionalBoolean';
 
 import { createNewCustomer } from '../../mutations/createNewCustomer';
 import { useUser } from '../../providers/UserProvider';
-import getCustomerQuery from '../../queries/getCustomersQuery';
+import getCustomersOfUser from '../../queries/getCustomersOfUser';
 
 interface FormDataProps {
   name: string;
@@ -72,7 +72,7 @@ const AddCustomerView = () => {
       });
     },
     refetchQueries: [{
-      query: getCustomerQuery,
+      query: getCustomersOfUser,
       variables: {
         userId: user?.id,
       },

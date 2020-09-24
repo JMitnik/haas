@@ -16,7 +16,7 @@ const refreshAccessTokenQuery = gql`
   }
 `;
 
-const queryMe = gql`
+export const queryMe = gql`
   query me {
     me {
       id
@@ -46,7 +46,7 @@ const logoutMutation = gql`
 `;
 
 interface AuthContextProps {
-  user: User;
+  user: User | null;
   userIsValid?: () => boolean;
   logout: () => void;
   accessToken: string | null;
@@ -62,7 +62,7 @@ const UserContext = React.createContext({} as AuthContextProps);
 
 const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const history = useHistory();
-  const [user, setUser] = useState<any>();
+  // const [user, setUser] = useState<any>();
   const [accessToken, setAccessToken] = useState<string | null>(() => localStorage.getItem('access_token'));
   const [isInitializingUser, setIsInitializingUser] = useState<boolean>(() => !!accessToken);
 
@@ -72,16 +72,8 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
     }, 1000);
   };
 
-  const [getUser, { loading: isGettingUser }] = useLazyQuery<GetUserData>(queryMe, {
+  const { loading: isGettingUser, data, refetch: getUser } = useQuery<GetUserData>(queryMe, {
     onCompleted: (data) => {
-      setUser({
-        id: data.me.id,
-        firstName: data.me.firstName,
-        lastName: data.me.lastName,
-        email: data.me.email,
-        globalPermissions: data.me.globalPermissions,
-        userCustomers: data.me.userCustomers,
-      });
       stopInitializingUser();
     },
     onError: () => {
@@ -90,10 +82,12 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
     fetchPolicy: 'network-only',
   });
 
+  const setUser = () => {};
+
   const [logout] = useMutation(logoutMutation, {
     onCompleted: () => {
       setAccessToken(null);
-      setUser(null);
+      // setUser(null);
       localStorage.removeItem('customer');
       history.push('/logged_out');
     },
@@ -127,9 +121,9 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <UserContext.Provider value={{
-      user,
+      user: data?.me || null,
       isInitializingUser,
-      isLoggedIn: !!(user?.id && accessToken && localStorage.getItem('access_token')),
+      isLoggedIn: !!(data?.me?.id && accessToken && localStorage.getItem('access_token')),
       accessToken,
       logout,
       setUser,
