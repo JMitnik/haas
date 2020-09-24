@@ -354,7 +354,7 @@ export interface NexusGenRootTypes {
   UserConnection: { // root type
     pageIndex?: number | null; // Int
     totalPages?: number | null; // Int
-    users: NexusGenRootTypes['UserType'][]; // [UserType!]!
+    userCustomers: NexusGenRootTypes['UserCustomer'][]; // [UserCustomer!]!
   }
   UserCustomer: { // root type
     customer: NexusGenRootTypes['Customer']; // Customer!
@@ -720,7 +720,7 @@ export interface NexusGenFieldTypes {
   UserConnection: { // field return type
     pageIndex: number | null; // Int
     totalPages: number | null; // Int
-    users: NexusGenRootTypes['UserType'][]; // [UserType!]!
+    userCustomers: NexusGenRootTypes['UserCustomer'][]; // [UserCustomer!]!
   }
   UserCustomer: { // field return type
     customer: NexusGenRootTypes['Customer']; // Customer!

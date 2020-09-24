@@ -209,7 +209,7 @@ export const UserConnection = objectType({
     t.int('pageIndex', { nullable: true });
     t.int('totalPages', { nullable: true });
 
-    t.list.field('users', { type: UserType });
+    t.list.field('userCustomers', { type: UserCustomerType });
   },
 });
 

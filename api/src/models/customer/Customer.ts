@@ -59,7 +59,7 @@ export const CustomerType = objectType({
           args.filter?.searchTerm,
         );
 
-        return users;
+        return users as any;
       },
     });
 

@@ -194,17 +194,18 @@ class UserService {
     }
 
     // Search term filtered users
-    const usersOfCustomers = await prisma.userOfCustomer.findMany({
+    const usersOfCustomer = await prisma.userOfCustomer.findMany({
       where: {
         customer: { slug: customerSlug },
       },
       include: {
+        customer: true,
         role: true,
         user: true,
       },
     });
 
-    const totalPages = Math.ceil(usersOfCustomers.length / (limit || 1));
+    const totalPages = Math.ceil(usersOfCustomer.length / (limit || 1));
 
     if (pageIndex && pageIndex + 1 > totalPages) {
       offset = 0;
@@ -212,10 +213,10 @@ class UserService {
     }
 
     // Slice ordered filtered users
-    const slicedOrderedUsers = UserService.sliceUsers(usersOfCustomers, (offset || 0), (limit || 0), (pageIndex || 0));
+    const slicedOrderedUsers = UserService.sliceUsers(usersOfCustomer, (offset || 0), (limit || 0), (pageIndex || 0));
 
     return {
-      users: slicedOrderedUsers,
+      userCustomers: slicedOrderedUsers,
       pageIndex: needPageReset ? 0 : pageIndex,
       totalPages,
     };

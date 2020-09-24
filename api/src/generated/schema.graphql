@@ -650,7 +650,7 @@ scalar Upload
 type UserConnection {
   pageIndex: Int
   totalPages: Int
-  users: [UserType!]!
+  userCustomers: [UserCustomer!]!
 }
 
 type UserCustomer {

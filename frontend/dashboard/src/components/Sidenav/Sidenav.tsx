@@ -99,7 +99,6 @@ export const AvatarContainer = styled(Div)`
   ${({ theme }) => css`
     padding: ${theme.gutter}px;
 
-
     &:hover {
       cursor: pointer;
 

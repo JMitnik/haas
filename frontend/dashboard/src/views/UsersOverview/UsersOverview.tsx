@@ -40,7 +40,7 @@ const UsersOverview = () => {
   const { customerSlug } = useParams<{ customerSlug: string }>();
   const { t } = useTranslation();
   const history = useHistory();
-  const [fetchUsers, { data }] = useLazyQuery(getPaginatedUsers, { fetchPolicy: 'cache-and-network' });
+  const [fetchUsers, { data }] = useLazyQuery(getPaginatedUsers, { fetchPolicy: 'no-cache' });
 
   const [paginationProps, setPaginationProps] = useState<TableProps>({
     activeStartDate: null,
@@ -51,7 +51,10 @@ const UsersOverview = () => {
     sortBy: [{ by: 'email', desc: true }],
   });
 
-  const tableData: any = data?.userTable.users || [];
+  const tableData: any = data?.customer?.usersConnection?.userCustomers?.map((userCustomer: any) => ({
+    ...userCustomer.user,
+    role: userCustomer.role,
+  })) || [];
 
   useEffect(() => {
     const { activeStartDate, activeEndDate, pageIndex, pageSize, sortBy, activeSearchTerm } = paginationProps;
