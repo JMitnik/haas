@@ -1,5 +1,5 @@
 import { Button, useToast } from '@chakra-ui/core';
-import { Div, Form, FormControl, FormLabel, Grid, H2, Input, InputGrid, Paragraph } from '@haas/ui';
+import { Div, Form, FormControl, FormLabel, Grid, H2, Input, InputGrid, Paragraph, Text } from '@haas/ui';
 import { Mail, Send } from 'react-feather';
 import { useForm } from 'react-hook-form';
 import { useHistory } from 'react-router';
@@ -78,24 +78,26 @@ const LoginView = () => {
                 <Form onSubmit={form.handleSubmit(handleRequestInvite)}>
                   <H2 color="gray.800" mb={2}>Log in</H2>
                   <Paragraph fontSize="0.9rem" color="gray.500" mb={4}>
-                    Login using the credentials provided by the system admin
+                    Login using your email adres
                   </Paragraph>
                   <ServerError serverError={loginServerError} />
 
                   <InputGrid gridTemplateColumns="1fr">
-                    <FormControl>
-                      <FormLabel htmlFor="email">Email</FormLabel>
-                      <Input
-                        name="email"
-                        id="email"
-                        autoFocus
-                        type="email"
-                        autoComplete="username"
-                        ref={form.register({ required: true })}
-                        leftEl={<Mail />}
-                        placeholder="bunny@haas.live"
-                      />
-                    </FormControl>
+                    <Div maxWidth="500px">
+                      <FormControl>
+                        <FormLabel htmlFor="email">Email</FormLabel>
+                        <Input
+                          name="email"
+                          id="email"
+                          autoFocus
+                          type="email"
+                          autoComplete="username"
+                          ref={form.register({ required: true })}
+                          leftEl={<Mail />}
+                          placeholder="bunny@haas.live"
+                        />
+                      </FormControl>
+                    </Div>
                   </InputGrid>
 
                   <Button
@@ -111,9 +113,12 @@ const LoginView = () => {
                 </Form>
               </AnimatedRoute>
               <AnimatedRoute path={`${baseRoute}/waiting`}>
-                <Div>
-                  Waiting for mail
-                </Div>
+                <Text fontSize="1.8rem" color="gray.600" textAlign="center">
+                  Check your mail!
+                </Text>
+                <Text textAlign="center" fontSize="1rem" fontWeight="300" color="gray.500">
+                  You should receive an invitation link very soon!
+                </Text>
               </AnimatedRoute>
             </AnimatedRoutes>
           </LoginContentContainer>
