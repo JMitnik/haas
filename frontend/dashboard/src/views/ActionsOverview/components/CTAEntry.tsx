@@ -78,22 +78,22 @@ const CTAEntry = ({ id, activeCTA, onActiveCTAChange, title, type, links, Icon, 
   const { customerSlug, dialogueSlug } = useParams();
   const [deleteEntry] = useMutation(deleteCTAMutation, {
     variables: { id },
-    onError: () => {
-      toast({
-        title: 'Something went wrong',
-        description: 'There was a problem in deleting the call to action.',
-        status: 'success',
-        position: 'bottom-right',
-        isClosable: true,
-      });
-    },
     onCompleted: () => {
       toast({
-        title: 'Edit complete!',
+        title: 'CTA deleted!',
         description: 'The call to action has been deleted.',
         status: 'success',
         position: 'bottom-right',
         duration: 1500,
+      });
+    },
+    onError: () => {
+      toast({
+        title: 'Something went wrong',
+        description: 'There was a problem in deleting the call to action.',
+        status: 'error',
+        position: 'bottom-right',
+        isClosable: true,
       });
     },
     refetchQueries: [{

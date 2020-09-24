@@ -18,20 +18,13 @@ import _ from 'lodash';
 // eslint-disable-next-line import/no-cycle
 import { NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
 // eslint-disable-next-line import/no-cycle
+import { CustomerWithCustomerSettings } from '../customer/Customer';
 import { SessionWithEntries } from '../session/SessionTypes';
 import { mailService } from '../../services/mailings/MailService';
 import { smsService } from '../../services/sms/SmsService';
 import NodeEntryService, { NodeEntryWithTypes } from '../node-entry/NodeEntryService';
 import makeTriggerMailTemplate from '../../services/mailings/templates/makeTriggerMailTemplate';
 import prisma from '../../config/prisma';
-
-interface CustomerSettingsWithColour extends CustomerSettings {
-  colourSettings?: ColourSettings | null;
-}
-
-interface CustomerWithCustomerSettings extends Customer {
-  settings?: CustomerSettingsWithColour | null;
-}
 
 interface TriggerWithSendData extends Trigger {
   recipients: User[];

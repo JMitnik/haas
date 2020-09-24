@@ -1,6 +1,6 @@
-import React from 'react';
 import { HAASRun } from 'assets/animations';
 import Lottie from 'react-lottie';
+import React from 'react';
 import styled from 'styled-components/macro';
 
 const LoaderContainer = styled.div`
@@ -17,15 +17,15 @@ const LoaderContainer = styled.div`
 `;
 
 const Loader = () => (
-    <LoaderContainer>
-        <Lottie
-            options={{
-                animationData: HAASRun,
-                loop: true,
-            }}
-            speed={1}
-        />
-    </LoaderContainer>
-)
+  <LoaderContainer>
+    <Lottie
+      options={{
+        animationData: HAASRun,
+        loop: true,
+      }}
+      speed={1}
+    />
+  </LoaderContainer>
+);
 
 export default Loader;

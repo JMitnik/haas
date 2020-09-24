@@ -7,7 +7,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Div, Flex, PageTitle } from '@haas/ui';
 import SearchBar from 'components/SearchBar/SearchBar';
 import Table from 'components/Table/Table';
-import getUsersQuery from 'queries/getUserTable';
+import getPaginatedUsers from 'queries/getPaginatedUsers';
 
 import { Button } from '@chakra-ui/core';
 import { ErrorBoundary } from 'react-error-boundary';
@@ -36,48 +36,11 @@ const HEADERS = [
   { Header: 'role', accessor: 'role', Cell: RoleCell },
 ];
 
-// const UserOptions = ({ onDeleteEntry }: { onDeleteEntry: () => void; }) => {
-//   const { t } = useTranslation();
-
-//   return (
-//     <MenuItem>
-//       <Popover
-//         usePortal
-//       >
-//         {({ onClose }) => (
-//           <>
-//             <PopoverTrigger>
-//               Delete
-//             </PopoverTrigger>
-//             <PopoverContent zIndex={4}>
-//               <PopoverArrow />
-//               <PopoverHeader>Delete</PopoverHeader>
-//               <PopoverCloseButton />
-//               <PopoverBody>
-//                 <p>You are about to delete a User. THIS ACTION IS IRREVERSIBLE! Are you sure?</p>
-//               </PopoverBody>
-//               <PopoverFooter>
-//                 <Button
-//                   variantColor="red"
-//                   onClick={(event) => onDeleteEntry && onDeleteEntry(event, userId, onClose)}
-//                 >
-//                   Delete
-//                 </Button>
-//               </PopoverFooter>
-//             </PopoverContent>
-//           </>
-//         )}
-//       </Popover>
-//       {t('test')}
-//     </MenuItem>
-//   );
-// };
-
 const UsersOverview = () => {
-  const { customerSlug } = useParams();
+  const { customerSlug } = useParams<{ customerSlug: string }>();
   const { t } = useTranslation();
   const history = useHistory();
-  const [fetchUsers, { data }] = useLazyQuery(getUsersQuery, { fetchPolicy: 'cache-and-network' });
+  const [fetchUsers, { data }] = useLazyQuery(getPaginatedUsers, { fetchPolicy: 'no-cache' });
 
   const [paginationProps, setPaginationProps] = useState<TableProps>({
     activeStartDate: null,
@@ -88,7 +51,10 @@ const UsersOverview = () => {
     sortBy: [{ by: 'email', desc: true }],
   });
 
-  const tableData: any = data?.userTable.users || [];
+  const tableData: any = data?.customer?.usersConnection?.userCustomers?.map((userCustomer: any) => ({
+    ...userCustomer.user,
+    role: userCustomer.role,
+  })) || [];
 
   useEffect(() => {
     const { activeStartDate, activeEndDate, pageIndex, pageSize, sortBy, activeSearchTerm } = paginationProps;
@@ -110,7 +76,7 @@ const UsersOverview = () => {
 
   const [deleteUser] = useMutation(deleteUserQuery, {
     refetchQueries: [{
-      query: getUsersQuery,
+      query: getPaginatedUsers,
       variables: {
         customerSlug,
         filter: {
@@ -144,7 +110,7 @@ const UsersOverview = () => {
 
   const handleAddUser = (event: any) => {
     event.stopPropagation();
-    history.push(`/dashboard/b/${customerSlug}/users/add/`);
+    history.push(`/dashboard/b/${customerSlug}/users/invite/`);
   };
 
   const handleSearchTermChange = useCallback(debounce((newSearchTerm: string) => {
@@ -161,7 +127,7 @@ const UsersOverview = () => {
       <Div mb={4} width="100%">
         <Flex justifyContent="space-between">
           <Div mr={4}>
-            <Button onClick={handleAddUser} leftIcon={Plus} variantColor="teal">{t('user:create_user')}</Button>
+            <Button onClick={handleAddUser} leftIcon={Plus} variantColor="teal">{t('invite_user')}</Button>
           </Div>
           <Div>
             <SearchBar

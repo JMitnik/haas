@@ -1,9 +1,89 @@
-import { extendType, inputObjectType, objectType } from '@nexus/schema';
+import { ApolloError, UserInputError } from 'apollo-server-express';
+import { differenceInMinutes } from 'date-fns';
+import { extendType, inputObjectType, objectType, queryField, scalarType } from '@nexus/schema';
 
-import { UserInputError } from 'apollo-server-express';
+import { Kind } from 'graphql';
 import { PaginationWhereInput } from '../general/Pagination';
-import { RoleType } from '../role/Role';
+import { RoleType, SystemPermission } from '../role/Role';
 import UserService from './UserService';
+
+export const UserCustomerType = objectType({
+  name: 'UserCustomer',
+
+  definition(t) {
+    t.field('user', { type: 'UserType' });
+    t.field('customer', { type: 'Customer' });
+    t.field('role', { type: 'RoleType' });
+  },
+});
+
+export const UserOfCustomerInput = inputObjectType({
+  name: 'UserOfCustomerInput',
+  definition(t) {
+    t.string('userId');
+
+    // Provide one of the two
+    t.string('customerId', { required: false });
+    t.string('customerSlug', { required: false });
+  },
+});
+
+export const UserOfCustomerQuery = queryField('UserOfCustomer', {
+  type: UserCustomerType,
+  args: { input: UserOfCustomerInput },
+  nullable: true,
+
+  async resolve(parent, args, ctx) {
+    if (!args.input?.userId) throw new UserInputError('User not provided');
+    if (!args.input?.customerId && !args.input?.customerSlug) throw new UserInputError('Neither slug nor id of Customer was provided');
+
+    let customerId = '';
+    if (!args.input?.customerId && args.input?.customerSlug) {
+      const customer = await ctx.prisma.customer.findOne({
+        where: { slug: args.input.customerSlug },
+      });
+      customerId = customer?.id || '';
+    } else {
+      customerId = args.input.customerId || '';
+    }
+
+    const userWithCustomer = await ctx.prisma.userOfCustomer.findOne({
+      where: {
+        userId_customerId: {
+          customerId,
+          userId: args.input.userId,
+        },
+      },
+      include: {
+        customer: true,
+        role: true,
+        user: true,
+      },
+    });
+
+    if (!userWithCustomer) return null;
+
+    return userWithCustomer;
+  },
+});
+
+export const DateScalar = scalarType({
+  name: 'Date',
+  asNexusMethod: 'date',
+  description: 'Date custom scalar type',
+  parseValue(value) {
+    return new Date(value);
+  },
+  serialize(value) {
+    return value.getTime();
+  },
+  parseLiteral(ast) {
+    if (ast.kind === Kind.INT) {
+      return new Date(ast.value);
+    }
+    return null;
+  },
+});
 
 export const UserType = objectType({
   name: 'UserType',
@@ -13,6 +93,85 @@ export const UserType = objectType({
     t.string('phone', { nullable: true });
     t.string('firstName', { nullable: true });
     t.string('lastName', { nullable: true });
+
+    // t.boolean('isOnline', {
+    //   resolve(parent, args, ctx) {
+    //     if (!parent.lastActivity) return false;
+    //     const minutesSinceOnline = differenceInMinutes(new Date(parent.lastActivity), Date.now());
+
+    //     if (minutesSinceOnline > 5) {
+    //       return true;
+    //     }
+
+    //     return false;
+    //   },
+    // });
+
+    t.list.field('globalPermissions', {
+      nullable: true,
+      type: SystemPermission,
+
+      async resolve(parent, args, ctx) {
+        const user = await ctx.prisma.user.findOne({
+          where: { id: parent.id },
+        });
+
+        return user?.globalPermissions as any;
+      },
+    });
+
+    t.list.field('userCustomers', {
+      type: UserCustomerType,
+
+      async resolve(parent, args, ctx) {
+        const userWithCustomers = await ctx.prisma.user.findOne({
+          where: { id: parent.id },
+          include: {
+            customers: {
+              include: {
+                customer: true,
+                role: true,
+                user: true,
+              },
+            },
+          },
+        });
+
+        const customers = userWithCustomers?.customers;
+
+        return customers?.map((customerOfUser: any) => ({
+          id: '',
+          roleId: '',
+          createdAt: new Date(),
+          customerId: '',
+          userId: '',
+          customer: customerOfUser.customer,
+          role: customerOfUser.role,
+          user: parent,
+        })) || [];
+      },
+    });
+
+    t.list.field('customers', {
+      type: 'Customer',
+
+      async resolve(parent, args, ctx) {
+        const userWithCustomers = await ctx.prisma.user.findOne({
+          where: { id: parent.id },
+          include: {
+            customers: {
+              include: {
+                customer: true,
+              },
+            },
+          },
+        });
+
+        const customers = userWithCustomers?.customers.map((customerOfUser: any) => customerOfUser.customer);
+
+        return customers || [];
+      },
+    });
 
     t.string('roleId', { nullable: true });
     t.field('role', {
@@ -32,7 +191,10 @@ export const UserType = objectType({
           },
         });
 
-        const userCustomer = userWithRole?.customers.find((cus) => cus.customer.slug === info.variableValues.customerSlug);
+        const userCustomer = userWithRole?.customers.find((cus: any) => (
+          cus.customer.slug === info.variableValues.customerSlug
+        ));
+
         const role = userCustomer?.role || null;
 
         return role;
@@ -41,13 +203,13 @@ export const UserType = objectType({
   },
 });
 
-export const UserTable = objectType({
-  name: 'UserTable',
+export const UserConnection = objectType({
+  name: 'UserConnection',
   definition(t) {
     t.int('pageIndex', { nullable: true });
     t.int('totalPages', { nullable: true });
 
-    t.list.field('users', { type: UserType });
+    t.list.field('userCustomers', { type: UserCustomerType });
   },
 });
 
@@ -64,36 +226,49 @@ export const UserInput = inputObjectType({
   },
 });
 
-export const UserQueries = extendType({
+export const EditUserInput = inputObjectType({
+  name: 'EditUserInput',
+
+  definition(t) {
+    t.string('email', { required: true });
+    t.string('firstName', { nullable: true });
+    t.string('customerId', { nullable: true });
+    t.string('lastName', { nullable: true });
+    t.string('phone', { nullable: true });
+  },
+});
+
+export const RootUserQueries = extendType({
   type: 'Query',
   definition(t) {
-    t.field('userTable', {
-      type: UserTable,
-      args: { customerSlug: 'String', filter: PaginationWhereInput },
-      nullable: true,
+    t.field('me', {
+      type: UserType,
 
-      async resolve(parent, args) {
-        if (!args.customerSlug) return null;
-        if (!args.filter) return null;
+      async resolve(parent, args, ctx) {
+        const userId = ctx.session?.user?.id;
 
-        return UserService.paginatedUsers(
-          args.customerSlug,
-          args.filter?.pageIndex,
-          args.filter?.offset,
-          args.filter?.limit,
-          args.filter?.orderBy?.[0],
-          args.filter?.searchTerm,
-        );
+        const user = await ctx.prisma.user.findOne({
+          where: { id: userId },
+          include: {
+            customers: {
+              include: {
+                customer: true,
+                role: true,
+                user: true,
+              },
+            },
+          },
+        });
 
-        // const users = await ctx.prisma.user.findMany({ where: { Customer: {
-        //   slug: args.customerSlug,
-        // } } });
+        if (!user) throw new ApolloError('There is something wrong in our records. Please contact an admin.', 'UNAUTHENTIC');
 
-        // TODO: Return this
-        // const totalPages = Math.ceil(users.length / (args.filter?.limit || 1));
-        // const totalPages = 1;
-
-        // return { users, pageIndex, totalPages };
+        return {
+          email: user?.email,
+          id: user?.id,
+          firstName: user?.firstName,
+          lastName: user?.lastName,
+          phone: user?.phone,
+        };
       },
     });
 
@@ -108,7 +283,6 @@ export const UserQueries = extendType({
         } } });
       },
     });
-
     t.field('user', {
       type: UserType,
       args: { userId: 'String' },
@@ -162,20 +336,29 @@ export const UserMutations = extendType({
 
     t.field('editUser', {
       type: UserType,
-      args: { id: 'String', input: UserInput },
+      args: { userId: 'String', input: EditUserInput },
 
-      resolve(parent, args, ctx) {
-        if (!args.id) throw new UserInputError('No valid user provided to edit');
+      async resolve(parent, args, ctx) {
+        if (!args.userId) throw new UserInputError('No valid user provided to edit');
         if (!args.input) throw new UserInputError('No input provided');
-        const { firstName, lastName, email, phone, roleId } = args.input;
+        const { firstName, lastName, email, phone } = args.input;
+
+        const otherMails = await ctx.prisma.user.findMany({
+          where: {
+            AND: {
+              email: { equals: email },
+              id: { not: args.userId },
+            },
+          },
+        });
+
+        if (otherMails.length) throw new UserInputError('Email is already taken');
 
         if (!email) throw new UserInputError('No valid email provided');
 
-        // TODO: Check if user exists?
-
         return ctx.prisma.user.update({
           where: {
-            id: args.id,
+            id: args.userId,
           },
           data: {
             firstName,
@@ -198,10 +381,3 @@ export const UserMutations = extendType({
     });
   },
 });
-
-export default [
-  UserInput,
-  UserQueries,
-  UserMutations,
-  UserType,
-];

@@ -6,7 +6,7 @@ datasource postgresql {
 // binaryTargets = ["debian-openssl-1.1.x"]
 generator client {
   provider = "prisma-client-js"
-  previewFeatures = ["middlewares"]
+  previewFeatures = ["middlewares", "transactionApi"]
   output   = "./node_modules/@prisma/client"
 }
 
@@ -91,6 +91,7 @@ model Dialogue {
   questions    QuestionNode[]
   sessions     Session[]
   tags         Tag[]
+  isOnline     Boolean        @default(value: false)
   @@unique([slug, customerId])
 }
 
@@ -258,21 +259,45 @@ model RegistrationNodeEntry {
 }
 
 // Permissions
-
 model Permission {
   id                 String    @default(cuid()) @id
   name               String
   description        String?
-  isPermissionOfRole Role[]    @relation(references: [id])
   Customer           Customer? @relation(fields: [customerId], references: [id])
   customerId         String?
+}
+
+enum SystemPermissionEnum {
+  CAN_ACCESS_ADMIN_PANEL
+  CAN_EDIT_DIALOGUE
+  CAN_BUILD_DIALOGUE
+  CAN_VIEW_DIALOGUE
+  CAN_DELETE_DIALOGUE
+  CAN_VIEW_DIALOGUE_ANALYTICS
+  CAN_VIEW_USERS
+  CAN_ADD_USERS
+  CAN_DELETE_USERS
+  CAN_EDIT_USERS
+  CAN_CREATE_TRIGGERS
+  CAN_DELETE_TRIGGERS
+  CAN_DELETE_WORKSPACE
+  CAN_EDIT_WORKSPACE
+}
+
+enum RoleTypeEnum {
+  ADMIN
+  MANAGER
+  USER
+  GUEST
+  CUSTOM
 }
 
 model Role {
   id          String       @default(cuid()) @id
   name        String
-  roleId      String?
-  permissions Permission[] @relation(references: [id])
+  type        RoleTypeEnum  @default(value: USER)
+  isPrivate   Boolean       @default(false)
+  permissions SystemPermissionEnum[]
   users       UserOfCustomer[]
   @@unique([id, name])
 }
@@ -288,7 +313,12 @@ model User {
   lastName   String?
   triggers   Trigger[]
   customers  UserOfCustomer[]
-  isSuperAdmin  Boolean @default(false)
+  globalPermissions SystemPermissionEnum[]
+  loginToken  String?
+  loginTokenExpiry DateTime?
+  refreshToken  String? 
+  refreshTokenExpiry  DateTime? 
+  lastActivity DateTime?
 }
 
 model UserOfCustomer {

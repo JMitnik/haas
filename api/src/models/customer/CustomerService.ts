@@ -7,26 +7,12 @@ import { leafNodes } from '../../data/seeds/default-data';
 // eslint-disable-next-line import/no-cycle
 import DialogueService from '../questionnaire/DialogueService';
 import NodeService from '../question/NodeService';
+import defaultWorkspaceTemplate from '../templates/defaultWorkspaceTemplate';
 import prisma from '../../config/prisma';
 
 function getRandomInt(max: number) {
   return Math.floor(Math.random() * Math.floor(max));
 }
-
-const seedCustomerData: TagCreateWithoutCustomerInput[] = [
-  {
-    name: 'Agent',
-    type: 'AGENT',
-  },
-  {
-    name: 'Amsterdam',
-    type: 'LOCATION',
-  },
-  {
-    name: 'Marketing strategy #131',
-    type: 'DEFAULT',
-  },
-];
 
 class CustomerService {
   static customers = async () => {
@@ -179,7 +165,7 @@ class CustomerService {
     return customer;
   };
 
-  static createCustomer = async (args: any) => {
+  static createCustomer = async (args: any, createdUserId?: string) => {
     const { name, options } = args;
     const { isSeed, logo, primaryColour, slug } = options;
 
@@ -189,7 +175,7 @@ class CustomerService {
           name,
           slug,
           tags: {
-            create: seedCustomerData,
+            create: defaultWorkspaceTemplate.tags,
           },
           settings: {
             create: {
@@ -202,29 +188,31 @@ class CustomerService {
             },
           },
           roles: {
-            create: [
-              {
-                name: 'Admin',
-                roleId: cuid(),
-              },
-              {
-                name: 'Normal',
-                roleId: cuid(),
-              },
-              {
-                name: 'Custom role',
-                roleId: cuid(),
-              },
-            ],
+            create: defaultWorkspaceTemplate.roles,
           },
           dialogues: {
             create: [],
           },
         },
+        include: {
+          roles: true,
+        },
       });
 
       if (isSeed) {
         await CustomerService.seed(customer);
+      }
+
+      // If customer is created by user, make them an "Admin"
+      if (createdUserId) {
+        const adminRole = customer.roles.find((role) => role.type === 'ADMIN');
+        const userOfCustomer = await prisma.userOfCustomer.create({
+          data: {
+            customer: { connect: { id: customer.id } },
+            role: { connect: { id: adminRole?.id } },
+            user: { connect: { id: createdUserId } },
+          },
+        });
       }
 
       return customer;
@@ -315,18 +303,26 @@ class CustomerService {
       }));
     }
 
-    await prisma.tag.deleteMany({ where: { customerId } });
-    await prisma.triggerCondition.deleteMany({ where: { trigger: { customerId } } });
-    await prisma.trigger.deleteMany({ where: { customerId } });
-    await prisma.permission.deleteMany({ where: { customerId } });
-    await prisma.user.deleteMany({ where: { customers: { every: { customer: { id: customerId } } } } });
-    await prisma.role.deleteMany({ where: { customerId } });
-
-    await prisma.customer.delete({
+    const deletionOfTags = prisma.tag.deleteMany({ where: { customerId } });
+    const deletionOfTriggers = prisma.triggerCondition.deleteMany({ where: { trigger: { customerId } } });
+    const deletionOfPermissions = prisma.permission.deleteMany({ where: { customerId } });
+    const deletionOfUserCustomerRoles = prisma.userOfCustomer.deleteMany({
       where: {
-        id: customerId,
+        customerId,
       },
     });
+
+    const deletionOfRoles = prisma.role.deleteMany({ where: { customerId } });
+    const deletionOfCustomer = prisma.customer.delete({ where: { id: customerId } });
+
+    await prisma.transaction([
+      deletionOfTags,
+      deletionOfTriggers,
+      deletionOfPermissions,
+      deletionOfUserCustomerRoles,
+      deletionOfRoles,
+      deletionOfCustomer,
+    ]);
 
     return customer || null;
   }

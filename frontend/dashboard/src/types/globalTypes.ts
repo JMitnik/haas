@@ -48,6 +48,23 @@ export enum QuestionNodeTypeEnum {
   TEXTBOX = "TEXTBOX",
 }
 
+export enum SystemPermission {
+  CAN_ACCESS_ADMIN_PANEL = "CAN_ACCESS_ADMIN_PANEL",
+  CAN_ADD_USERS = "CAN_ADD_USERS",
+  CAN_BUILD_DIALOGUE = "CAN_BUILD_DIALOGUE",
+  CAN_CREATE_TRIGGERS = "CAN_CREATE_TRIGGERS",
+  CAN_DELETE_DIALOGUE = "CAN_DELETE_DIALOGUE",
+  CAN_DELETE_TRIGGERS = "CAN_DELETE_TRIGGERS",
+  CAN_DELETE_USERS = "CAN_DELETE_USERS",
+  CAN_DELETE_WORKSPACE = "CAN_DELETE_WORKSPACE",
+  CAN_EDIT_DIALOGUE = "CAN_EDIT_DIALOGUE",
+  CAN_EDIT_USERS = "CAN_EDIT_USERS",
+  CAN_EDIT_WORKSPACE = "CAN_EDIT_WORKSPACE",
+  CAN_VIEW_DIALOGUE = "CAN_VIEW_DIALOGUE",
+  CAN_VIEW_DIALOGUE_ANALYTICS = "CAN_VIEW_DIALOGUE_ANALYTICS",
+  CAN_VIEW_USERS = "CAN_VIEW_USERS",
+}
+
 export enum TagTypeEnum {
   AGENT = "AGENT",
   DEFAULT = "DEFAULT",
@@ -114,14 +131,18 @@ export interface EdgeConditionInputType {
   matchValue?: string | null;
 }
 
-/**
- * Login credential
- */
-export interface LoginInput {
-  input: {
-    email: string;
-    password: string;
-  }
+export interface EditUserInput {
+  email: string;
+  firstName?: string | null;
+  customerId?: string | null;
+  lastName?: string | null;
+  phone?: string | null;
+}
+
+export interface InviteUserInput {
+  roleId: string;
+  email: string;
+  customerId: string;
 }
 
 export interface OptionInputType {
@@ -157,6 +178,10 @@ export interface RecipientsInputType {
   ids?: string[] | null;
 }
 
+export interface RequestInviteInput {
+  email: string;
+}
+
 export interface TagsInputObjectType {
   entries?: string[] | null;
 }
@@ -184,6 +209,12 @@ export interface UserInput {
   customerId?: string | null;
   lastName?: string | null;
   phone?: string | null;
+}
+
+export interface UserOfCustomerInput {
+  userId?: string | null;
+  customerId?: string | null;
+  customerSlug?: string | null;
 }
 
 //==============================================================

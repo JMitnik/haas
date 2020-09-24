@@ -8,9 +8,10 @@ import EditButton from 'components/EditButton';
 import deleteQuestionMutation from 'mutations/deleteQuestion';
 import getTopicBuilderQuery from 'queries/getQuestionnaireQuery';
 
-import { useTranslation } from 'react-i18next';
+import { useToast } from '@chakra-ui/core';
 import { EdgeConditonProps, QuestionEntryProps, QuestionOptionProps } from '../../DialogueBuilderInterfaces';
 import { OverflowSpan, QuestionEntryContainer, QuestionEntryViewContainer } from './QuestionEntryStyles';
+import { useTranslation } from 'react-i18next';
 import BuilderIcon from './BuilderIcon';
 import CTALabel from './CTALabel';
 import ConditionLabel from './ConditionLabel';
@@ -55,6 +56,7 @@ const QuestionEntryItem = ({ depth,
 : QuestionEntryItemProps) => {
   const { customerSlug, dialogueSlug } = useParams();
   const { t } = useTranslation();
+  const toast = useToast();
 
   const [deleteQuestion] = useMutation(deleteQuestionMutation, {
     variables: {
@@ -70,10 +72,23 @@ const QuestionEntryItem = ({ depth,
       },
     }],
     onCompleted: () => {
+      toast({
+        title: t('toast:delete_node'),
+        description: t('toast:delete_node_helper'),
+        status: 'success',
+        position: 'bottom-right',
+        duration: 1500,
+      });
       onActiveQuestionChange(null);
     },
-    onError: (serverError: ApolloError) => {
-      console.log(serverError);
+    onError: () => {
+      toast({
+        title: t('toast:something_went_wrong'),
+        description: t('toast:delete_node_error_helper'),
+        status: 'error',
+        position: 'bottom-right',
+        duration: 1500,
+      });
     },
   });
 
