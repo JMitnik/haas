@@ -216,12 +216,34 @@ export const RefreshAccessTokenQuery = queryField('refreshAccessToken', {
   type: RefreshAccessTokenOutput,
 
   async resolve(parent, args, ctx) {
-    if (!ctx.session?.userId) throw new ApolloError('No verified user');
-    const newToken = AuthService.createUserToken(ctx.session?.userId);
+    if (!ctx.session?.user?.id) throw new ApolloError('No verified user');
+    const refreshTokenIsValid = await AuthService.verifyUserRefreshToken(ctx.session.user?.id);
+
+    if (!refreshTokenIsValid) {
+      throw new ApolloError('Unauthenticated', 'UNAUTHENTICATED');
+    }
+
+    const newToken = AuthService.createUserToken(ctx.session?.user?.id);
 
     return {
       accessToken: newToken,
     };
+  },
+});
+
+export const LogoutMutation = mutationField('logout', {
+  description: 'Logs a user out by removing their refresh token',
+  type: 'String',
+
+  async resolve(parent, args, ctx) {
+    if (!ctx.session?.user?.id) throw new ApolloError('No user found');
+    ctx.res.cookie('refresh_token', null);
+    ctx.prisma.user.update({
+      where: { id: ctx.session.user.id },
+      data: { refreshToken: null },
+    });
+
+    return 'Logged out';
   },
 });
 

@@ -1,4 +1,4 @@
-import { useLazyQuery, useQuery } from '@apollo/react-hooks';
+import { useLazyQuery, useMutation, useQuery } from '@apollo/react-hooks';
 import React, { useContext, useEffect, useState } from 'react';
 
 import { useHistory } from 'react-router';
@@ -39,6 +39,12 @@ const queryMe = gql`
   }
 `;
 
+const logoutMutation = gql`
+  mutation logout {
+    logout
+  }
+`;
+
 interface AuthContextProps {
   user: User;
   userIsValid?: () => boolean;
@@ -67,7 +73,6 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
   const [getUser] = useLazyQuery<GetUserData>(queryMe, {
     onCompleted: (data) => {
-      console.log('hmm');
       setUser({
         id: data.me.id,
         firstName: data.me.firstName,
@@ -83,22 +88,21 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
     fetchPolicy: 'network-only',
   });
 
-  const { data: refreshTokenData } = useQuery(refreshAccessTokenQuery, {
-    pollInterval: POLL_INTERVAL_SECONDS * 1000,
-    skip: !accessToken,
+  const [logout] = useMutation(logoutMutation, {
+    onCompleted: () => {
+      setUser(null);
+      localStorage.removeItem('customer');
+      history.push('/logged_out');
+    },
   });
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem('customer');
-    history.push('/logged_out');
-  };
-
-  useEffect(() => {
-    if (refreshTokenData?.refreshAccessToken.accessToken) {
+  useQuery(refreshAccessTokenQuery, {
+    pollInterval: POLL_INTERVAL_SECONDS * 1000,
+    skip: !accessToken,
+    onCompleted: (refreshTokenData) => {
       setAccessToken(refreshTokenData?.refreshAccessToken.accessToken);
-    }
-  }, [refreshTokenData]);
+    },
+  });
 
   useEffect(() => {
     if (accessToken) {

@@ -191,7 +191,7 @@ export const CustomerMutations = Upload && extendType({
           }
         }
 
-        const customer = CustomerService.createCustomer(args as any, ctx.session?.userId);
+        const customer = CustomerService.createCustomer(args as any, ctx.session?.user?.id);
 
         return customer as any;
       },

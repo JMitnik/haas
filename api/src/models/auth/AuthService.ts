@@ -69,6 +69,21 @@ class AuthService {
     return user;
   }
 
+  static async verifyUserRefreshToken(userId: string): Promise<boolean> {
+    try {
+      const user = await prisma.user.findOne({
+        where: { id: userId },
+      });
+
+      if (!user?.refreshToken) return false;
+      jwt.verify(user?.refreshToken, config.jwtSecret);
+
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
   static createUserToken(userId: string, duration: number | null = null) {
     const tokenMinutes = duration || config.jwtExpiryMinutes;
 

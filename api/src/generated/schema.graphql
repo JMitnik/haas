@@ -251,6 +251,9 @@ type Mutation {
 
   """Invite a user to a particular customer domain, given an email and role"""
   inviteUser(input: InviteUserInput): InviteUserOutput!
+
+  """Logs a user out by removing their refresh token"""
+  logout: String!
   register(input: RegisterInput): String
   requestInvite(input: RequestInviteInput): RequestInviteOutput!
   singleUpload(file: Upload): ImageType!

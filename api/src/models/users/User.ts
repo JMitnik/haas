@@ -244,8 +244,7 @@ export const UserQueries = extendType({
       type: UserType,
 
       async resolve(parent, args, ctx) {
-        console.log(parent);
-        const userId = ctx.session?.userId;
+        const userId = ctx.session?.user?.id;
 
         const user = await ctx.prisma.user.findOne({
           where: { id: userId },

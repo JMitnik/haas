@@ -59,7 +59,7 @@ const constructContextSession = async (context: ExpressContext): Promise<Context
   }));
 
   return {
-    userId: user?.id,
+    user,
     customersAndPermissions,
     expiresAt: decodedExpAt,
     globalPermissions: user?.globalPermissions || [],

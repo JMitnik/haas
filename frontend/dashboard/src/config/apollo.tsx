@@ -28,7 +28,7 @@ const client = new ApolloClient({
         ));
 
         if (authorizedErrors.length) {
-          debugger;
+          console.log('Unauthenticated flow');
           // TODO: Make this better
           localStorage.removeItem('user_data');
           localStorage.removeItem('access_token');

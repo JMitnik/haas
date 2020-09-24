@@ -563,6 +563,7 @@ export interface NexusGenFieldTypes {
     editTrigger: NexusGenRootTypes['TriggerType']; // TriggerType!
     editUser: NexusGenRootTypes['UserType']; // UserType!
     inviteUser: NexusGenRootTypes['InviteUserOutput']; // InviteUserOutput!
+    logout: string; // String!
     register: string | null; // String
     requestInvite: NexusGenRootTypes['RequestInviteOutput']; // RequestInviteOutput!
     singleUpload: NexusGenRootTypes['ImageType']; // ImageType!
