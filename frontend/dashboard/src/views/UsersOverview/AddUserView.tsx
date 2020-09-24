@@ -47,15 +47,14 @@ const AddUserView = () => {
     resolver: yupResolver(schema),
     mode: 'onBlur',
   });
-  const { customerSlug } = useParams();
-  const customer = useCustomer();
+  const { activeCustomer } = useCustomer();
 
   const { t } = useTranslation();
 
-  const { data } = useQuery(getRolesQuery, { variables: { customerSlug } });
+  const { data } = useQuery(getRolesQuery, { variables: { customerSlug: activeCustomer?.slug } });
   const [addUser, { loading: isLoading }] = useMutation(createAddMutation, {
     onCompleted: () => {
-      history.push(`/dashboard/b/${customerSlug}/users/`);
+      history.push(`/dashboard/b/${activeCustomer?.slug}/users/`);
     },
     onError: (serverError: ApolloError) => {
       console.log(serverError);
@@ -63,7 +62,7 @@ const AddUserView = () => {
     refetchQueries: [
       {
         query: getUsersQuery,
-        variables: { customerSlug },
+        variables: { customerSlug: activeCustomer?.slug },
       },
     ],
   });
@@ -74,7 +73,7 @@ const AddUserView = () => {
   const handleSubmit = (formData: FormDataProps) => {
     const optionInput = {
       // TODO: Not robust yet
-      customerId: customer.storageCustomer.id,
+      customerId: activeCustomer?.id,
       roleId: formData.role?.value || null,
       firstName: formData.firstName || '',
       lastName: formData.lastName || '',
@@ -84,7 +83,7 @@ const AddUserView = () => {
 
     addUser({
       variables: {
-        customerSlug,
+        slug: activeCustomer?.slug,
         input: optionInput,
       },
     });
@@ -95,7 +94,6 @@ const AddUserView = () => {
       <PageTitle>{t('views:create_user_view')}</PageTitle>
 
       <motion.div initial={{ opacity: 0, y: 100 }} animate={{ opacity: 1, y: 0 }}>
-
         <FormContainer>
           <Form onSubmit={form.handleSubmit(handleSubmit)}>
             <FormSection id="about">
@@ -199,7 +197,7 @@ const AddUserView = () => {
               >
                 Create
               </Button>
-              <Button variant="outline" onClick={() => history.push('/')}>Cancel</Button>
+              <Button variant="outline" onClick={() => history.goBack()}>Cancel</Button>
             </ButtonGroup>
           </Form>
         </FormContainer>

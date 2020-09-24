@@ -235,8 +235,8 @@ const QuestionEntryForm = ({
 
       toast({
         title: 'Something went wrong',
-        description: 'There was a problem in saving the node. Please try again',
-        status: 'success',
+        description: 'There was a problem saving the node. Please try again',
+        status: 'error',
         position: 'bottom-right',
         isClosable: true,
       });
@@ -268,7 +268,7 @@ const QuestionEntryForm = ({
       toast({
         title: 'Something went wrong',
         description: 'There was a problem in saving the node. Please try again',
-        status: 'success',
+        status: 'error',
         position: 'bottom-right',
         isClosable: true,
       });

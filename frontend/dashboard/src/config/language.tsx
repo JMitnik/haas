@@ -1,5 +1,29 @@
 const language = {
   general: {
+    register: {
+      en: 'Register',
+      de: 'Registrieren',
+    },
+    invite_user: {
+      en: 'Invite user',
+      de: 'Laden Benutzer',
+    },
+    edit_user: {
+      en: 'Edit user',
+      de: 'Benutzer bearbeiten',
+    },
+    logged_out: {
+      en: 'Your session has expired',
+      de: 'Deine Sitzung ist abgelaufen',
+    },
+    go_to_login: {
+      en: 'Go to login',
+      de: 'Go Login',
+    },
+    register_helper: {
+      en: 'Welcome to HAAS! Finish your registration by filling in some last details.',
+      de: 'Willkommen! Kasse Anmeldung von in einigen Details füllen.',
+    },
     description: {
       en: 'Description',
       de: 'Beschreibung',
@@ -16,6 +40,14 @@ const language = {
       en: 'Path',
       de: 'Pfad',
     },
+    server_down: {
+      en: 'Oops! There was a problem with the server.',
+      de: 'Hoppla! Es gab ein Problem mit dem Server.',
+    },
+    server_down_helper: {
+      en: 'Try again in a second while we take care of the problem',
+      de: 'Versuchen Sie es in einer Sekunde erneut, während wir uns um das Problem kümmern',
+    },
     add_user: {
       en: 'Add user',
       de: 'Nutzer hinzufügen',
@@ -27,6 +59,14 @@ const language = {
     add_tag: {
       en: 'Add tag',
       de: 'Tag hinzufügen',
+    },
+    unauthorized: {
+      en: 'Whoops! You are unauthorized.',
+      de: 'Hoppla! Sie haben keine Erlaubnis.',
+    },
+    unauthorized_helper: {
+      en: 'You do not have the permissions to access this page.',
+      de: 'Sie haben nicht die Berechtigung, auf diese Seite zuzugreifen.',
     },
     remove: {
       en: 'Remove',
@@ -93,7 +133,7 @@ const language = {
       de: 'Bleib dabei',
     },
     projects: {
-      en: 'Projects',
+      en: 'Workspaces',
       de: 'Projekte',
     },
     existing_url: {
@@ -129,8 +169,16 @@ const language = {
       de: 'Lade ein Logo hoch. Am besten als SVG oder PNG',
     },
     active_projects: {
-      en: 'Active projects',
+      en: 'Active workspaces',
       de: 'Aktuelle Partner',
+    },
+    welcome_to_haas: {
+      en: 'Welcome to HAAS!',
+      de: 'Herzlich wilkommen bei HAAS!',
+    },
+    welcome_to_haas_helper: {
+      en: 'It seems like this is your first time using HAAS. For starters, feel free to fill in the following information to help you get set-up.',
+      de: 'Es scheint, dass Sie HAAS zum ersten Mal verwenden. Für den Anfang können Sie die folgenden Informationen eingeben, um die Einrichtung zu erleichtern.',
     },
     stay_tuned_helper: {
       en: 'A new feature is coming soon',
@@ -404,6 +452,16 @@ const language = {
       de: 'Muster',
     },
   },
+  register: {
+    token_not_found: {
+      en: 'Token not found',
+      de: 'Token nicht gefunden',
+    },
+    token_not_found_helper: {
+      en: 'Your invitation token cant be found in your URL. Try requesting your login again.',
+      de: 'Ihre Einladung Token kann nicht in der URL gefunden werden. Versuchen Sie, Ihre Login erneut anfordern.',
+    },
+  },
   customer: {
     logo_helper: {
       en: 'Switch between uploading your own logo or inserting the url of an existing one',
@@ -463,6 +521,10 @@ const language = {
     },
   },
   views: {
+    invite_user: {
+      en: 'Invite user',
+      de: 'Laden Benutzer',
+    },
     add_dialogue_view: {
       en: 'Add dialogue',
       de: 'Neuer Dialog',
@@ -743,6 +805,30 @@ const language = {
     },
   },
   toast: {
+    delete_node: {
+      en: '',
+      de: '',
+    },
+    delete_node_helper: {
+      en: '',
+      de: '',
+    },
+    delete_node_error_helper: {
+      en: '',
+      de: '',
+    },
+    something_went_wrong: {
+      en: 'Something went wrong',
+      de: 'Etwas ist schief gelaufen',
+    },
+    welcome: {
+      en: 'Welcome!',
+      de: 'Wilkommen!',
+    },
+    welcome_on_board_helper: {
+      en: 'Welcome on board!',
+      de: 'Willkommen an Bord!',
+    },
     locale_switch: {
       en: 'Switched language',
       de: 'Sprache gewechselt',
@@ -754,6 +840,14 @@ const language = {
     locale_switch_english: {
       en: 'Switched language to English',
       de: 'Sprache auf Englisch umgestellt',
+    },
+    user_edited: {
+      en: 'User edited!',
+      de: 'Benutzer bearbeitet',
+    },
+    user_edited_helper: {
+      en: 'Your details have been saved!',
+      de: 'Ihre Daten wurden gespeichert',
     },
   },
   trigger: {

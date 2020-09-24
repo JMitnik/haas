@@ -12,8 +12,17 @@ export interface MailSendInput {
 
 class MailService {
   send(input: MailSendInput) {
-    // if (config.env === 'local') return;
+    if (config.env !== 'local') this.sendWithSES(input);
 
+    if (config.env === 'local') this.sendToLog(input);
+  }
+
+  sendToLog(input: MailSendInput) {
+    console.info(input);
+  }
+
+  sendWithSES(input: MailSendInput) {
+    let isSent: boolean;
     const mailDriver = new AWS.SES();
 
     const sendPromise = mailDriver.sendEmail({

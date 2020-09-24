@@ -5,6 +5,10 @@ const formatServerError = (errorMessage: string): string => {
     return errors[errorMessage];
   }
 
+  if (errorMessage.startsWith('GraphQL')) {
+    return errorMessage.slice(14);
+  }
+
   return 'Something went wrong in the server, try again';
 };
 

@@ -2,6 +2,7 @@ import { ErrorBoundary } from 'react-error-boundary';
 import { Link } from 'react-router-dom';
 import { Plus } from 'react-feather';
 import { Variants, motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import React from 'react';
 
 import {
@@ -11,8 +12,8 @@ import { Skeleton } from '@chakra-ui/core';
 import { TranslatedPlus } from 'views/DialogueOverview/DialogueOverviewStyles';
 import SurveyIcon from 'components/Icons/SurveyIcon';
 
+import useAuth from 'hooks/useAuth';
 import { CustomerOverviewContainer } from './CustomerOverviewStyles';
-import { useTranslation } from 'react-i18next';
 import CustomerCard from './CustomerCard';
 
 const cardContainerAnimation: Variants = {
@@ -42,6 +43,7 @@ const MotionGrid = motion.custom(Grid);
 
 const CustomerOverview = ({ customers, isLoading }: { customers: any[], isLoading: boolean }) => {
   const { t } = useTranslation();
+  const { canCreateCustomers } = useAuth();
 
   return (
     <CustomerOverviewContainer>
@@ -72,18 +74,20 @@ const CustomerOverview = ({ customers, isLoading }: { customers: any[], isLoadin
                 </motion.div>
               ))}
 
-              <AddCard>
-                <Link to="/dashboard/b/add" />
-                <Flex flexDirection="column" alignItems="center" justifyContent="center">
-                  <SurveyIcon />
-                  <TranslatedPlus>
-                    <Plus strokeWidth="3px" />
-                  </TranslatedPlus>
-                  <H4 color="default.dark">
-                    {t('customer:create_customer')}
-                  </H4>
-                </Flex>
-              </AddCard>
+              {canCreateCustomers && (
+                <AddCard>
+                  <Link to="/dashboard/b/add" />
+                  <Flex flexDirection="column" alignItems="center" justifyContent="center">
+                    <SurveyIcon />
+                    <TranslatedPlus>
+                      <Plus strokeWidth="3px" />
+                    </TranslatedPlus>
+                    <H4 color="default.dark">
+                      {t('customer:create_customer')}
+                    </H4>
+                  </Flex>
+                </AddCard>
+              )}
             </>
           )}
         </MotionGrid>

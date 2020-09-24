@@ -219,10 +219,11 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
               <Controller
                 control={form.control}
                 name="type"
-                render={({ onChange }) => (
+                defaultValue="QUESTION"
+                render={({ onChange, value }) => (
                   <>
                     <RadioButtonGroup
-                      defaultValue="QUESTION"
+                      defaultValue={value}
                       isInline
                       onChange={(data) => {
                         onChange(data);
@@ -488,7 +489,7 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
         >
           {isInEdit ? 'Edit' : 'Create'}
         </Button>
-        <Button variant="outline" onClick={() => history.push('/')}>Cancel</Button>
+        <Button variant="outline" onClick={() => history.goBack()}>Cancel</Button>
       </ButtonGroup>
     </Form>
   );

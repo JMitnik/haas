@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { UserInput } from "./../../types/globalTypes";
+import { EditUserInput } from "./../../types/globalTypes";
 
 // ====================================================
 // GraphQL mutation operation: editUser
@@ -20,5 +20,5 @@ export interface editUser {
 
 export interface editUserVariables {
   id: string;
-  input?: UserInput | null;
+  input?: EditUserInput | null;
 }

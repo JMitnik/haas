@@ -10,6 +10,7 @@ import styled, { css } from 'styled-components/macro';
 import { Card, CardBody, ColumnFlex, Div, ExtLink, Flex, Paragraph, Text } from '@haas/ui';
 import { Menu, MenuHeader, MenuItem } from 'components/Menu/Menu';
 import { deleteQuestionnaireMutation } from 'mutations/deleteQuestionnaire';
+import { useToast } from '@chakra-ui/core';
 import { useTranslation } from 'react-i18next';
 import ShowMoreButton from 'components/ShowMoreButton';
 import SliderNodeIcon from 'components/Icons/SliderNodeIcon';
@@ -43,6 +44,7 @@ const DialogueCard = ({ dialogue, isCompact }: { dialogue: any, isCompact?: bool
   const history = useHistory();
   const { customerSlug } = useParams();
   const { t } = useTranslation();
+  const toast = useToast();
 
   // TODO: How to deal with refetching query when deleted card on a filtered view (fetch and update the current view somehow   )
   const [deleteTopic] = useMutation(deleteQuestionnaireMutation, {
@@ -52,8 +54,23 @@ const DialogueCard = ({ dialogue, isCompact }: { dialogue: any, isCompact?: bool
         customerSlug,
       },
     }],
-    onError: (serverError: ApolloError) => {
-      console.log(serverError);
+    onCompleted: () => {
+      toast({
+        title: 'Dialogue deleted',
+        description: 'The dialogue has been deleted.',
+        status: 'success',
+        position: 'bottom-right',
+        duration: 1500,
+      });
+    },
+    onError: () => {
+      toast({
+        title: 'Something went wrong!',
+        description: 'The dialogue was not deleted.',
+        status: 'error',
+        position: 'bottom-right',
+        duration: 1500,
+      });
     },
   });
 

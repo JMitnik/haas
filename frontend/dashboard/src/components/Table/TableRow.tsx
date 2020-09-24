@@ -39,7 +39,7 @@ const TableRow = ({ headers, data, index, renderExpandedRow, renderOptions }: Ta
 
           if (result && Cell) {
             return (
-              <Cell value={result[1]} key={`${index}-${result[0]}`} />
+              <Cell value={result[1]} key={`${index}-${result[0]}`} {...data} />
             );
           }
 
