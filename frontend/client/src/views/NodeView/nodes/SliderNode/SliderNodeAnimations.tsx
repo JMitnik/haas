@@ -6,9 +6,9 @@ export const SlideMeAnimation: Variants = {
     transition: {
       times: [0, 0.1, 0.3, 0.9, 1],
       loop: Infinity,
-      delay: 1,
-      repeatDelay: 2,
-      duration: 4,
+      delay: 0.8,
+      repeatDelay: 2.8,
+      duration: 1.6,
     },
   },
 };

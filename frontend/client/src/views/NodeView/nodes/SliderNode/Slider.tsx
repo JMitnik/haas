@@ -106,6 +106,18 @@ const Slider = ({ register, onSubmit, animationControls }: SliderProps) => {
 
   return (
     <>
+      {animationState.isStopped && (
+      <SlideHereContainer variants={SlideMeAnimation} animate="animate" initial="initial" exit="exit">
+        {/* <DragIcon />
+        slide to
+        {' '}
+        <Span>
+          <i>start</i>
+        </Span> */}
+        <span>Unhappy</span>
+        <span>Happy</span>
+      </SlideHereContainer>
+      )}
       <HAASRabbit style={{
         left: `${animationState.position}%`,
         bottom: '10px',
@@ -113,16 +125,6 @@ const Slider = ({ register, onSubmit, animationControls }: SliderProps) => {
         transform: `translateX(-50%) scaleX(${animationState.direction})`,
       }}
       >
-        {animationState.isStopped && (
-        <SlideHereContainer variants={SlideMeAnimation} animate="animate" initial="initial" exit="exit">
-          <DragIcon />
-          slide to
-            {' '}
-          <Span>
-            <i>start</i>
-          </Span>
-        </SlideHereContainer>
-        )}
         <div className="rabbit">
           <Lottie
             isStopped={animationState.isStopped}
@@ -152,13 +154,14 @@ const Slider = ({ register, onSubmit, animationControls }: SliderProps) => {
       {animationState.isStopped && (
         <FingerPrintContainer
           animate={{
-            marginLeft: ['0%', '20%', '40%', '20%', '0%', '-20%', '-40%', '-55%'],
-            opacity: [0, 1, 1, 1, 1, 1, 1, 0],
+            marginLeft: ['0%', '10%', '30%', '10%', '0%', '-10%', '-30%', '-10%', '0%'],
+            opacity: [0, 1, 1, 1, 1, 1, 1, 1, 0],
             transition: {
               loop: Infinity,
               delay: 1,
               repeatDelay: 3,
               duration: 1.4,
+              damping: 200,
             },
           }}
         >
