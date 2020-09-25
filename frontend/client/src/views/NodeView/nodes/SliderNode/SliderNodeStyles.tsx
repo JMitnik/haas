@@ -51,8 +51,8 @@ export const FingerPrintContainer = styled(motion.div)`
     width: fit-content;
 
     svg {
-      width: 48px;
-      height: 48px;
+      width: 36px;
+      height: 36px;
       > g {
         stroke-width: 1;
         stroke: ${Color(theme.colors.primary).mix(Color('white'), 0.9).hex()};;

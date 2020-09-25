@@ -160,7 +160,7 @@ const Slider = ({ register, onSubmit, animationControls }: SliderProps) => {
               loop: Infinity,
               delay: 1,
               repeatDelay: 3,
-              duration: 1.4,
+              duration: 2.4,
               damping: 200,
             },
           }}

@@ -8,7 +8,7 @@ export const SlideMeAnimation: Variants = {
       loop: Infinity,
       delay: 0.8,
       repeatDelay: 2.6,
-      duration: 1.8,
+      duration: 2.8,
     },
   },
 };
