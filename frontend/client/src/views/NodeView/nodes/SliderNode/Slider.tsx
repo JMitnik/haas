@@ -108,7 +108,7 @@ const Slider = ({ register, onSubmit, animationControls }: SliderProps) => {
     <>
       <HAASRabbit style={{
         left: `${animationState.position}%`,
-        bottom: '90px',
+        bottom: '10px',
         // zIndex: 500,
         transform: `translateX(-50%) scaleX(${animationState.direction})`,
       }}
@@ -148,11 +148,11 @@ const Slider = ({ register, onSubmit, animationControls }: SliderProps) => {
           ref={register}
         />
       </form>
-      <div style={{ display: 'flex', minHeight: '86px', justifyContent: 'center' }}>
-        {animationState.isStopped && (
+
+      {animationState.isStopped && (
         <FingerPrintContainer
           animate={{
-            marginLeft: ['0%', '40%', '80%'],
+            marginLeft: ['0%', '20%', '40%'],
             opacity: [0, 1, 0],
             transition: {
               loop: Infinity,
@@ -163,11 +163,8 @@ const Slider = ({ register, onSubmit, animationControls }: SliderProps) => {
           }}
         >
           <FingerIcon />
-          <span>Drag</span>
-          <span>bunny</span>
         </FingerPrintContainer>
-        )}
-      </div>
+      )}
 
     </>
   );
