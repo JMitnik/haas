@@ -3,10 +3,11 @@ import Lottie from 'react-lottie';
 import React, { useReducer } from 'react';
 
 import { ReactComponent as DragIcon } from 'assets/icons/icon-order-horizontal.svg';
+import { ReactComponent as FingerIcon } from 'assets/icons/icon-fingerprint.svg';
 import { HAASIdle, HAASRun, HAASStopping } from 'assets/animations';
 import { Span, Slider as UISlider } from '@haas/ui';
 
-import { HAASRabbit, SlideHereContainer } from './SliderNodeStyles';
+import { FingerPrintContainer, HAASRabbit, SlideHereContainer } from './SliderNodeStyles';
 import { SlideMeAnimation } from './SliderNodeAnimations';
 
 interface SliderAnimationStateProps {
@@ -105,10 +106,9 @@ const Slider = ({ register, onSubmit, animationControls }: SliderProps) => {
 
   return (
     <>
-
       <HAASRabbit style={{
         left: `${animationState.position}%`,
-        bottom: '5px',
+        bottom: '90px',
         // zIndex: 500,
         transform: `translateX(-50%) scaleX(${animationState.direction})`,
       }}
@@ -148,6 +148,27 @@ const Slider = ({ register, onSubmit, animationControls }: SliderProps) => {
           ref={register}
         />
       </form>
+      <div style={{ display: 'flex', minHeight: '86px', justifyContent: 'center' }}>
+        {animationState.isStopped && (
+        <FingerPrintContainer
+          animate={{
+            marginLeft: ['0%', '40%', '80%'],
+            opacity: [0, 1, 0],
+            transition: {
+              loop: Infinity,
+              delay: 1,
+              repeatDelay: 4,
+              duration: 0.8,
+            },
+          }}
+        >
+          <FingerIcon />
+          <span>Drag</span>
+          <span>bunny</span>
+        </FingerPrintContainer>
+        )}
+      </div>
+
     </>
   );
 };

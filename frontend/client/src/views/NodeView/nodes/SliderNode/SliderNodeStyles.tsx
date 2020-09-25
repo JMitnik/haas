@@ -37,6 +37,25 @@ export const SlideHereContainer = styled(motion.div)`
   `}
 `;
 
+export const FingerPrintContainer = styled(motion.div)`
+  ${({ theme }) => css`
+    display: flex;
+    flex-direction: column;
+    width: fit-content;
+    
+    span { 
+      font-size: 0.8rem;
+    }
+
+    svg {
+      width: 48px;
+      height: 48px;
+      fill: currentColor;
+      stroke: white;
+    }
+  `}
+`;
+
 export const SliderNodeValue = styled(motion.h3)`
   ${({ theme }) => css`
     color: ${theme.colors.primary};
