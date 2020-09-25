@@ -152,13 +152,13 @@ const Slider = ({ register, onSubmit, animationControls }: SliderProps) => {
       {animationState.isStopped && (
         <FingerPrintContainer
           animate={{
-            marginLeft: ['0%', '20%', '40%'],
-            opacity: [0, 1, 0],
+            marginLeft: ['0%', '20%', '40%', '20%', '0%', '-20%', '-40%', '-55%'],
+            opacity: [0, 1, 1, 1, 1, 1, 1, 0],
             transition: {
               loop: Infinity,
               delay: 1,
-              repeatDelay: 4,
-              duration: 0.8,
+              repeatDelay: 3,
+              duration: 1.4,
             },
           }}
         >
