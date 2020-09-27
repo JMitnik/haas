@@ -31,7 +31,7 @@ interface FormDataProps {
 }
 
 const schema = yup.object().shape({
-  email: yup.string().required(),
+  email: yup.string().email('Expected email format').required(),
   role: yup.object().shape({
     value: yup.string().required(),
   }),

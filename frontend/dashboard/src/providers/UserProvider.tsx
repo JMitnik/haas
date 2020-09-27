@@ -6,7 +6,7 @@ import gql from 'graphql-tag';
 
 import { me as GetUserData, me_me as User } from './__generated__/me';
 
-const POLL_INTERVAL_SECONDS = 20;
+const POLL_INTERVAL_SECONDS = 60;
 
 const refreshAccessTokenQuery = gql`
   query refreshAccessToken {
