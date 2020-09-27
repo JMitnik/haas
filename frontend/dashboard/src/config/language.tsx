@@ -6,7 +6,7 @@ const language = {
     },
     invite_user: {
       en: 'Invite user',
-      de: 'Laden Benutzer',
+      de: 'Benutzer einladen',
     },
     edit_user: {
       en: 'Edit user',
@@ -18,11 +18,11 @@ const language = {
     },
     go_to_login: {
       en: 'Go to login',
-      de: 'Go Login',
+      de: 'Zum Login gehen',
     },
     register_helper: {
-      en: 'Welcome to HAAS! Finish your registration by filling in some last details.',
-      de: 'Willkommen! Kasse Anmeldung von in einigen Details füllen.',
+      en: 'Welcome to haas! Finish your registration by filling in some last details.',
+      de: 'Willkommen! Wir brauchen nur noch ein paar letzte Informationen zum Abschließen der Registration.',
     },
     description: {
       en: 'Description',
@@ -30,7 +30,7 @@ const language = {
     },
     switch_project: {
       en: 'Switch project',
-      de: 'Project wechseln',
+      de: 'Projekt wechseln',
     },
     logout: {
       en: 'Logout',
@@ -45,8 +45,8 @@ const language = {
       de: 'Hoppla! Es gab ein Problem mit dem Server.',
     },
     server_down_helper: {
-      en: 'Try again in a second while we take care of the problem',
-      de: 'Versuchen Sie es in einer Sekunde erneut, während wir uns um das Problem kümmern',
+      en: 'Try again in a second while we take care of the proble.',
+      de: 'Versuchen Sie es gleich erneut. Wir kümmern uns um das Problem.',
     },
     add_user: {
       en: 'Add user',
@@ -62,11 +62,11 @@ const language = {
     },
     unauthorized: {
       en: 'Whoops! You are unauthorized.',
-      de: 'Hoppla! Sie haben keine Erlaubnis.',
+      de: 'Hoppla! Sie haben dazu keine Erlaubnis.',
     },
     unauthorized_helper: {
       en: 'You do not have the permissions to access this page.',
-      de: 'Sie haben nicht die Berechtigung, auf diese Seite zuzugreifen.',
+      de: 'Sie haben nicht die Berechtigung auf diese Seite zuzugreifen.',
     },
     remove: {
       en: 'Remove',
@@ -82,15 +82,15 @@ const language = {
     },
     both: {
       en: 'Both',
-      de: 'Beide',
+      de: 'Beides',
     },
     sms: {
-      en: 'Sms',
-      de: 'Sms',
+      en: 'Text-Message',
+      de: 'SMS',
     },
     about: {
       en: 'About',
-      de: 'Allgemeine informationen',
+      de: 'Allgemeine Informationen',
     },
     logo: {
       en: 'Logo',
@@ -102,7 +102,7 @@ const language = {
     },
     roles: {
       en: 'Roles',
-      de: 'Roles',
+      de: 'Rollen',
     },
     create: {
       en: 'Create',
@@ -113,8 +113,8 @@ const language = {
       de: 'Abbrechen',
     },
     upload_zone: {
-      en: 'Drag the logo here, or click here to upload',
-      de: 'Ziehe dein Logo hierhin oder klicke um eins auszuwählen',
+      en: 'Drag the logo here, or click here to upload.',
+      de: 'Ziehe dein Logo hierher oder klicke um es auszuwählen.',
     },
     list: {
       en: 'List',
@@ -142,7 +142,7 @@ const language = {
     },
     existing_url_helper: {
       en: 'Insert existing URL',
-      de: 'Füge neueu URL hinzu',
+      de: 'Füge eine existierende URL hinzu',
     },
     upload_file: {
       en: 'Upload file',
@@ -157,44 +157,44 @@ const language = {
       de: 'Logo: vorhandene URL',
     },
     logo_existing_url_helper: {
-      en: 'Use the URL of an existing logo. We recommend one with no background-colors.',
-      de: 'Verwenden Sie die URL eines vorhandenen Logos. Wir empfehlen eine ohne Hintergrundfarben.',
+      en: 'Use the URL of an existing logo. We recommend one with no background colors.',
+      de: 'Verwenden Sie die URL eines vorhandenen Logos. Am besten klappt es wenn es keine Hintergrundfarbe hat.',
     },
     logo_upload: {
       en: 'Logo: Drag and Drop',
       de: 'Logo: Drag and Drop',
     },
     logo_upload_helper: {
-      en: 'Upload a logo (preferably SVG or PNG).',
-      de: 'Lade ein Logo hoch. Am besten als SVG oder PNG',
+      en: 'Upload a logo. For better quality choose SVG or PNG.',
+      de: 'Lade ein Logo hoch. SVG oder PNG Dateien haben oft bessere Qualität.',
     },
     active_projects: {
       en: 'Active workspaces',
       de: 'Aktuelle Partner',
     },
     welcome_to_haas: {
-      en: 'Welcome to HAAS!',
-      de: 'Herzlich wilkommen bei HAAS!',
+      en: 'Welcome to haas!',
+      de: 'Willkommen bei haas!',
     },
     welcome_to_haas_helper: {
-      en: 'It seems like this is your first time using HAAS. For starters, feel free to fill in the following information to help you get set-up.',
-      de: 'Es scheint, dass Sie HAAS zum ersten Mal verwenden. Für den Anfang können Sie die folgenden Informationen eingeben, um die Einrichtung zu erleichtern.',
+      en: 'It seems like this is your first time using haas. For starters, feel free to fill in the following information get set-up.',
+      de: 'Es scheint so als würdest du haas zum ersten Mal verwenden. Für den Anfang, kannst du die folgenden Informationen eingeben, um die Einrichtung zu erleichtern.',
     },
     stay_tuned_helper: {
-      en: 'A new feature is coming soon',
-      de: 'Bald kommen neue Funktionen',
+      en: 'A new feature is coming soon.',
+      de: 'Bald kommt eine neue Funktion.',
     },
     end: {
       en: 'End',
       de: 'Ende',
     },
     edit: {
-      en: 'Edit',
-      de: 'Ändern',
+      en: 'Confirm',
+      de: 'Bestätigen',
     },
     add_call_to_action: {
-      en: 'Add call to action',
-      de: 'Call-to-action hinzufügen',
+      en: 'Add Call-to-Action',
+      de: 'Call-to-Action hinzufügen',
     },
     options: {
       en: 'Options',
@@ -213,11 +213,11 @@ const language = {
       de: 'Rolle',
     },
     min_value: {
-      en: 'Minimal value',
+      en: 'Minimum value',
       de: 'Minimalwert',
     },
     max_value: {
-      en: 'Maximimal value',
+      en: 'Maximum value',
       de: 'Maximalwert',
     },
     search: {
@@ -226,7 +226,7 @@ const language = {
     },
     save: {
       en: 'Save',
-      de: 'Sparen',
+      de: 'Speichern',
     },
     date: {
       en: 'Date',
@@ -249,28 +249,28 @@ const language = {
       de: 'Besuchen',
     },
     delete_customer_popover: {
-      en: 'You are about to delete a customer (and all its child questions). Note: THIS ACTION IS IRREVERSIBLE! Are you sure?',
-      de: 'Du bist dabei eine Project zu löschen. Dies kann nicht rückgängig gemacht werden! Bist du dir sicher?',
+      en: 'You are about to delete a customer and all related questions. This cannot be undone! Are you sure?',
+      de: 'Du bist dabei ein Projekt mit allen dazugehörigen Fragen zu löschen. Dies kann nicht rückgängig gemacht werden! Bist du dir sicher?',
     },
     delete_question_popover: {
-      en: 'You are about to delete a question (and all its child questions). Note: THIS ACTION IS IRREVERSIBLE! Are you sure?',
-      de: 'Du bist dabei eine Frage zu löschen. Dies kann nicht rückgängig gemacht werden! Bist du dir sicher?',
+      en: 'You are about to delete a question and all attached sub-questions. This cannot be undone! Are you sure?',
+      de: 'Du bist dabei eine Frage und alle dazugehörigen Unterfragen zu löschen. Dies kann nicht rückgängig gemacht werden! Bist du dir sicher?',
     },
     delete_cta_popover: {
-      en: 'You are about to delete a CTA. Note: THIS ACTION IS IRREVERSIBLE! Are you sure?',
-      de: 'Du bist dabei eine CTA zu löschen. Dies kann nicht rückgängig gemacht werden! Bist du dir sicher?',
+      en: 'You are about to delete a Call-to-Action. This cannot be undone! Are you sure?',
+      de: 'Du bist dabei einen Call-To-Action zu löschen. Dies kann nicht rückgängig gemacht werden! Bist du dir sicher?',
     },
     delete_trigger_popover: {
-      en: 'You are about to delete a trigger. Note: THIS ACTION IS IRREVERSIBLE! Are you sure?',
-      de: 'Du bist dabei eine alarm zu löschen. Dies kann nicht rückgängig gemacht werden! Bist du dir sicher?',
+      en: 'You are about to delete a trigger-alert. This cannot be undone! Are you sure?',
+      de: 'Du bist dabei eine Push-Benachrichtugung zu löschen. Dies kann nicht rückgängig gemacht werden! Bist du dir sicher?',
     },
     delete_user_popover: {
-      en: 'You are about to delete a User. Note: THIS ACTION IS IRREVERSIBLE! Are you sure?',
-      de: 'Du bist dabei ein User zu löschen. Dies kann nicht rückgängig gemacht werden! Bist du dir sicher?',
+      en: 'You are about to delete a user. This cannot be undone! Are you sure?',
+      de: 'Du bist dabei einen Benutzer zu löschen. Dies kann nicht rückgängig gemacht werden! Bist du dir sicher?',
     },
     create_trigger: {
-      en: 'Create trigger',
-      de: 'Alarm erstellen',
+      en: 'Create trigger-allert',
+      de: 'Push-Benachrichtung erstellen',
     },
     page: {
       en: 'Page',
@@ -278,23 +278,23 @@ const language = {
     },
     user: {
       en: 'User',
-      de: 'User',
+      de: 'Benutzer',
     },
     no_registration: {
       en: 'No registration',
-      de: 'Keine registration',
+      de: 'Keine Registrierung',
     },
     call_to_action: {
-      en: 'Call to action',
-      de: 'Call to action',
+      en: 'Call-to-Action',
+      de: 'Call-to-Action',
     },
     create_dialogue: {
       en: 'Create dialogue',
-      de: 'Erstelle dialog',
+      de: 'Dialog erstellen',
     },
     dialogues: {
       en: 'Dialogues',
-      de: 'Dialogo',
+      de: 'Dialog',
     },
     score: {
       en: 'Score',
@@ -302,15 +302,15 @@ const language = {
     },
     export_to_csv: {
       en: 'CSV export',
-      de: 'CSV export',
+      de: 'CSV Export',
     },
     match_value: {
       en: 'Match value',
       de: 'Übereinstimmungswert',
     },
     match_value_helper: {
-      en: 'What is the multi-choice question to trigger this question?',
-      de: 'Was ist die Multi-Choice-Frage, um diese Frage auszulösen?',
+      en: 'What is the multiple choice question to trigger this follow-up?',
+      de: 'Wie lautet die Multiple-Choice-Frage um zu diesem Punkt zu gelangen?',
     },
     user_actions: {
       en: 'Actions',
@@ -318,7 +318,7 @@ const language = {
     },
     no_data: {
       en: 'No data available',
-      de: 'Keine daten verfügbar',
+      de: 'Keine Daten verfügbar',
     },
     personalize: {
       en: 'Personalize',
@@ -338,11 +338,11 @@ const language = {
     },
     users: {
       en: 'Users',
-      de: 'Users',
+      de: 'Benutzer',
     },
     alerts: {
-      en: 'Alerts',
-      de: 'Alarms',
+      en: 'Trigger-alerts',
+      de: 'Push-Benachrichtigungen',
     },
     settings: {
       en: 'Settings',
@@ -350,7 +350,7 @@ const language = {
     },
     latest_interactions: {
       en: 'Latest interactions',
-      de: 'Die letzten interaktionen',
+      de: 'Die letzten Interaktionen',
     },
     overview: {
       en: 'Overview',
@@ -366,7 +366,7 @@ const language = {
     },
     view_all: {
       en: 'View all',
-      de: 'Siehe alle',
+      de: 'Alle anzeigen',
     },
     english: {
       en: 'English',
@@ -374,15 +374,15 @@ const language = {
     },
     german: {
       en: 'German',
-      de: 'Deutsche',
+      de: 'Deutsch',
     },
     about_helper: {
       en: 'About',
-      de: 'Über',
+      de: 'Allgemeines',
     },
     branding: {
       en: 'Branding',
-      de: 'Warenzeichen',
+      de: 'Branding',
     },
     branding_color: {
       en: 'Branding color',
@@ -398,7 +398,7 @@ const language = {
     },
     first_name_helper: {
       en: 'What is the user\'s first name?',
-      de: 'Was ist der Vorname des Benutzers?',
+      de: 'Wie lautet der Vorname des Benutzers?',
     },
     last_name: {
       en: 'Last name',
@@ -406,15 +406,15 @@ const language = {
     },
     last_name_helper: {
       en: 'What is the user\'s last name?',
-      de: 'Was ist der Nachname des Benutzers?',
+      de: 'Wie lautet der Nachname des Benutzers?',
     },
     email: {
-      en: 'Email adress',
-      de: 'Email adress',
+      en: 'Email address',
+      de: 'Emailadresse',
     },
     email_helper: {
-      en: 'What is the user\'s email adress?',
-      de: 'Was ist die E-Mail?',
+      en: 'What is the user\'s email address?',
+      de: 'Was lautet die E-Mail?',
     },
     phone: {
       en: 'Phone number',
@@ -422,30 +422,31 @@ const language = {
     },
     last_updated: {
       en: 'Last update {{date}} ago',
-      de: 'Letzes update vor {{date}}',
+      de: 'Das letzte Update war vor: {{date}}',
     },
     phone_helper: {
-      en: 'What is the user\'s phone number? (Note: Start with country code, e.g. +316123456)',
-      de: 'Wie lautet die Telefonnummer des Benutzers? (Beginnen Sie mit der Landesvorwahl, e.g. +316123456)',
+      en: 'What is the user\'s phone number? Start with the country code. Example: +316123456',
+      de: 'Wie lautet die Telefonnummer des Benutzers? Beginne mit der Landesvorwahl. Beispiel: +496123456',
     },
     name_helper: {
-      en: 'What is the name of the business?',
+      en: 'What is the name of your business?',
+      de: 'Wie lautet der Name deines Unternehmens?'
     },
     role_selector: {
       en: 'User role',
-      de: 'Benutzer rolle',
+      de: 'Benutzerrolle',
     },
     role_selector_helper: {
       en: 'What will be the user\'s role?',
-      de: 'Welche Rolle wird der Benutzer spielen?',
+      de: 'Welche Rolle soll der Benutzer haben?',
     },
     slug: {
-      en: 'Url Extension',
+      en: 'URL extension',
       de: 'URL Erweiterung',
     },
     slug_helper: {
-      en: 'Under which url segment will visitors find the business?',
-      de: 'Unter welcher URL Erganzüng sollen Besucher dich finden?',
+      en: 'What should be your unique URL-addition?',
+      de: 'Was möchtest du für eine URL-Erganzüng?',
     },
     template: {
       en: 'Template',
@@ -458,58 +459,58 @@ const language = {
       de: 'Token nicht gefunden',
     },
     token_not_found_helper: {
-      en: 'Your invitation token cant be found in your URL. Try requesting your login again.',
-      de: 'Ihre Einladung Token kann nicht in der URL gefunden werden. Versuchen Sie, Ihre Login erneut anfordern.',
+      en: 'Your invitation token cannot be found. Try requesting your login again.',
+      de: 'Dein Einladungstoken kann nicht gefunden werden. Versuche einen erneuten Login.',
     },
   },
   customer: {
     logo_helper: {
-      en: 'Switch between uploading your own logo or inserting the url of an existing one',
-      de: 'Lade dein Logo hoch oder verweise mit einer URL',
+      en: 'Choose between uploading your logo or inserting an existing URL.',
+      de: 'Verweise mit einer URL auf deine Logo oder lade es selbst hoch.',
     },
     create_customer: {
-      en: 'Create customer',
-      de: 'Project erstellen',
+      en: 'Create workspace',
+      de: 'Projekt erstellen',
     },
     about_helper: {
-      en: 'Please tell us a bit about the business, such as under which name and URL we can find it.',
-      de: 'Erzähle uns etwas zu deinem Unternehmen',
+      en: 'Please tell us a bit about the business. What should be its name and URL.',
+      de: 'Erzähle uns etwas zu deinem Unternehmen. Wie sollen der Name und die URL lauten.',
     },
     branding_color_helper: {
-      en: 'What is the main brand color of the company?',
-      de: 'Was ist die Hauptfarbe deines Unternehmens?',
+      en: 'What is the company\'s main brand color?',
+      de: 'Was ist die Hauptfarbe deiner Marke?',
     },
     branding_helper: {
-      en: 'Describe the branding of your company, including logo and color',
-      de: 'Beschreibe die Marke deiner Firma',
+      en: 'Describe the branding of your company, including logo and color.',
+      de: 'Beschreibe die Marke deiner Firma.',
     },
     name_helper: {
-      en: 'What is the name of the business?',
+      en: 'What is the name of your business?',
       de: 'Wie heißt dein Unternehmen?',
     },
     slug_helper: {
-      en: 'Under which url segment will visitors find the business?',
+      en: 'Under which URL segment will visitors find the business?',
       de: 'Unter welcher URL Erganzüng sollen Besucher dich finden?',
     },
     use_template: {
-      en: 'Use template',
+      en: 'Use a template',
       de: 'Benutze ein Muster',
     },
     use_template_helper: {
-      en: 'Start the onboarding with a pre-existing template, or start clean.',
-      de: 'Beginnen Sie mit einer bereits vorhandenen Muster oder beginnen Sie mit der Bereinigung',
+      en: 'Start the onboarding with a pre-existing template, or start fresh.',
+      de: 'Beginne mit einem Muster oder starte neu.',
     },
     template_helper: {
-      en: 'Choose whether you have a preference what to start with.',
-      de: 'Wählen Sie aus, ob Sie eine Präferenz haben, mit der Sie beginnen möchten.',
+      en: 'Choose a startup preference.',
+      de: 'Wähle deine Starteinstellung.',
     },
     custom_template: {
       en: 'Custom template',
-      de: 'Benutzerdefinierte Muster',
+      de: 'Benutzerdefiniertes Muster',
     },
     custom_template_helper: {
-      en: 'Start with a default dialogue',
-      de: 'Beginnen Sie mit einem Standarddialog',
+      en: 'Start with a default dialogue.',
+      de: 'Neuanfang mit einem Standarddialog.',
     },
     no_custom_template: {
       en: 'Fresh start',
@@ -517,33 +518,33 @@ const language = {
     },
     no_custom_template_helper: {
       en: 'Start with a clean slate',
-      de: 'Beginnen Sie mit einer sauberen Tafel',
+      de: 'Beginne komplett neu',
     },
   },
   views: {
     invite_user: {
       en: 'Invite user',
-      de: 'Laden Benutzer',
+      de: 'Benutzer einladen',
     },
     add_dialogue_view: {
       en: 'Add dialogue',
-      de: 'Neuer Dialog',
+      de: 'Dialog hinzufügen',
     },
     edit_dialogue_view: {
       en: 'Edit dialogue',
-      de: 'Ändere Dialog',
+      de: 'Dialog einstellen',
     },
     edit_trigger_view: {
       en: 'Edit trigger',
-      de: 'Ändere alarm',
+      de: 'Push-Benachrichtigung einstellen',
     },
     dialogue_view: {
       en: 'Overview',
       de: 'Übersicht',
     },
     cta_view: {
-      en: 'Call to actions',
-      de: 'Call to actions',
+      en: 'Call-to-Actions',
+      de: 'Call-to-Actions',
     },
     builder_view: {
       en: 'Dialogue Builder',
@@ -558,16 +559,16 @@ const language = {
       de: 'Personalisieren',
     },
     trigger_overview: {
-      en: 'Triggers',
-      de: 'Alarms',
+      en: 'Trigger-alerts',
+      de: 'Push-Benachrichtigungen',
     },
     edit_business_settings_view: {
       en: 'Edit business settings',
-      de: 'Ändere Businesseinstellungen',
+      de: 'Wähle Unternehmenseinstellungen',
     },
     create_trigger_view: {
-      en: 'Create trigger',
-      de: 'Neuer alarm',
+      en: 'Create trigger-alert',
+      de: 'Neue Push-Benachrichtigung',
     },
     create_user_view: {
       en: 'Create user',
@@ -575,13 +576,13 @@ const language = {
     },
     users_overview: {
       en: 'Users and roles',
-      de: 'User und Rollen',
+      de: 'Benutzer und Rollen',
     },
   },
   user: {
     roles_helper: {
-      en: 'Decide and assign roles for control access',
-      de: 'Entscheiden Sie Rollen für den Steuerungszugriff und weisen Sie sie zu',
+      en: 'Decide and assign roles for access control.',
+      de: 'Entscheiden Sie Rollen für Zugriffsberechtigungen.',
     },
     create_user: {
       en: 'Create user',
@@ -589,24 +590,24 @@ const language = {
     },
     about_user: {
       en: 'About the user',
-      de: 'Über den Benutzer',
+      de: 'Benutzerinformationen',
     },
     about_user_helper: {
-      en: 'Tell us about the user',
-      de: 'Erzählen Sie uns von dem Benutzer',
+      en: 'Tell us about the user.',
+      de: 'Erzählen Sie uns etwas über den Benutzer.',
     },
   },
   dialogue: {
     tag_helper: {
-      en: 'Would you like to assign tags to associate your dialogue with?',
-      de: 'Möchtest du deinen Dialog mit einem Tag verbinden?',
+      en: 'Would you like to assign tags for your dialogue?',
+      de: 'Möchtest du deinen Dialog mit einem "Tag" verbinden?',
     },
     use_template: {
       en: 'Use template',
       de: 'Benutze ein Muster',
     },
     use_template_helper: {
-      en: 'Set what type of template you would like to use.',
+      en: 'Choose what type of template you would like to use.',
       de: 'Welches Muster möchtest du gerne benutzen?',
     },
     about: {
@@ -615,75 +616,75 @@ const language = {
     },
     description_helper: {
       en: 'How would you describe the dialogue?',
-      de: 'Wie beschreibst du den Dialog?',
+      de: 'Hier kannst du den Dialog allgemein beschreiben.',
     },
     description_placeholder: {
-      en: 'Describe your dialogue',
-      de: 'Gib eine kurze Beschreibung',
+      en: 'Description',
+      de: 'Beschreibung',
     },
     about_helper: {
-      de: 'Erzähle uns von deinem Dialog',
+      de: 'Beschreibe deinen Dialog',
       en: 'Tell us about the dialogue',
     },
     title_helper: {
       en: 'What is the name of the dialogue?',
-      de: 'Wie soll dein Dialog heißen?',
+      de: 'Welchen Titel soll der Dialog haben?',
     },
     title_placeholder: {
-      en: 'Peaches or Apples?',
-      de: 'Pfirsche oder äpfel?',
+      en: 'Title',
+      de: 'Titel',
     },
     public_title: {
       en: 'Display title',
       de: 'Öffentlicher Titel',
     },
     public_title_helper: {
-      en: '(Optional): If set, will be used instead of the actual title to the user instead.',
-      de: '(Optional): Wenn festgelegt, wird stattdessen anstelle des tatsächlichen Titels für den Benutzer verwendet.',
+      en: '(Optional): If set, will be shown to the user instead of actual title.',
+      de: '(Optional): Wird dem Nutzer anstelle des eigentlichen Titels gezeigt.',
     },
     public_title_placeholder: {
-      en: 'Peaches > Apples?',
-      de: 'Pfirsche oder äpfel?',
+      en: 'Display Title',
+      de: 'Angezeigter Titel',
     },
     template_helper: {
-      en: 'Do you wish to start the dialogue from a clean slate or base this on another dialogue (or HAAS template)?',
-      de: 'Möchtest du von Anfang an beginner oder deinen Dialog auf einem Muster basieren?',
+      en: 'Do you wish to start a fresh dialogue or use a haas template for reference?',
+      de: 'Möchtest du einen neuen Dialog erstellen oder mit einem haas Muster anfangen?',
     },
     min_value_helper: {
-      en: 'What is the minimal value to trigger this question?',
-      de: 'Welche Mindestwert soll die Folgefrage auslösen?',
+      en: 'What is the minimum value to trigger the following question?',
+      de: 'Welcher Mindestwert soll die Folgefrage auslösen?',
     },
     max_value_helper: {
-      en: 'What is the maximal value to trigger this question?',
-      de: 'Welche Maximalwert soll die Folgefrage auslösen?',
+      en: 'What is the maximum value to trigger the following question?',
+      de: 'Welcher Maximalwert soll die Folgefrage auslösen?',
     },
     about_type_helper: {
-      en: 'Describe the type of the question',
+      en: 'Describe the question type',
       de: 'Details zur Frage',
     },
     question_type: {
       en: 'Question type',
-      de: 'Fragentyp',
+      de: 'Art der Frage',
     },
     question_type_helper: {
-      en: 'What is the type of the question?',
-      de: 'Welche art von Frage soll gestellt worden?',
+      en: 'What is question type?',
+      de: 'Welche Art von Frage soll gestellt werden?',
     },
     cta_helper: {
-      en: 'What CTA do you want to add?',
-      de: 'Welchen CTA möchtest du hinzufügen?',
+      en: 'Which Call-to-Action do you want to add?',
+      de: 'Welchen Call-to-Action möchtest du hinzufügen?',
     },
     add_option_reminder: {
       en: 'Please add an option',
-      de: 'Bitte fügen Sie eine Option hinzu',
+      de: 'Füge ein Option hinzu',
     },
     empty_option_reminder: {
-      en: 'Please fill in at least one option',
-      de: 'Bitte füllen Sie mindestens eine Option aus',
+      en: 'Please fill in at least one option.',
+      de: 'Bitte triff mindestens eine Auswahl.',
     },
     about_question: {
       en: 'About question',
-      de: 'Frage',
+      de: 'Hauptfrage',
     },
     condition: {
       en: 'Condition',
@@ -691,94 +692,94 @@ const language = {
     },
     condition_helper: {
       en: 'When should this question be displayed?',
-      de: 'Wann soll die Frage gestellt worden?',
+      de: 'Wann soll diese Frage gestellt werden?',
     },
     title_question_helper: {
       en: 'What is the question you want to ask?',
-      de: 'Welche Frage möchtest du stellen?',
+      de: 'Welche Frage soll gestellt werden?',
     },
     about_question_helper: {
-      en: 'Tell us about your question',
-      de: 'Was ist deine Hauptfrage?',
+      en: 'Tell us about your question.',
+      de: 'Wie lautet deine Hauptfrage?',
     },
     average_score: {
       en: 'Average score',
-      de: 'Durchschnittlich',
+      de: 'Durchschnittliche Bewertung',
     },
     fold_branch: {
       en: 'Fold branch',
-      de: 'Zweig verstecken',
+      de: 'Abzweigung verstecken',
     },
     expand_branch: {
       en: 'Expand branch',
-      de: 'Zweig zeigen',
+      de: 'Abzweigung zeigen',
     },
     frequently_mentioned: {
       en: 'Frequently mentioned',
       de: 'Häufig erwähnt',
     },
     notable_paths_of_the_week: {
-      en: 'Notable paths of the week',
-      de: 'Dialogue der woche',
+      en: 'Most frequent interactions of the week',
+      de: 'Die häufigsten Interaktionen der Woche',
     },
     score_over_time: {
       en: 'Score over time',
-      de: 'Bewertungsgraph',
+      de: 'Bewertungsdiagramm',
     },
     top_positive_paths: {
-      en: 'Top positive paths',
-      de: 'Top positive dialogue',
+      en: 'Positive interactions',
+      de: 'Positive Interaktionen',
     },
     top_negative_paths: {
-      en: 'Top negative paths',
-      de: 'Top negative dialogue',
+      en: 'Negative interactions',
+      de: 'Negative Interaktionen',
     },
     fallback_no_positive_paths: {
-      en: 'No positive paths recorded yet',
-      de: 'Noch kein positiv aufgezeichnet',
+      en: 'No positive interactions recorded so far.',
+      de: 'Bisher gab es noch keine positiven Interaktionen.',
     },
     fallback_no_negative_paths: {
-      en: 'No negative paths recorded yet',
-      de: 'Noch kein negative aufgezeichnet',
+      en: 'No negative interactions recorded so far.',
+      de: 'Bisher gab es noch keine negativen Interaktionen.',
     },
     fallback_no_keywords: {
       en: 'No keywords mentioned yet',
-      de: 'Noch keine keywords erwähnt',
+      de: 'Bisher noch keine Themen',
     },
     view_all_mentions: {
-      en: 'View all mentions',
-      de: 'Alle erwähnungen anzeigen',
+      en: 'View all',
+      de: 'Alle anzeigen',
     },
     fallback_no_score: {
       en: 'No score calculated yet',
-      de: 'Noch keine ergebnis berechnet',
+      de: 'Noch kein Ergebnis berechenbar',
     },
     fallback_no_interactions: {
       en: 'No interactions yet',
-      de: 'Noch keine interaktionen',
+      de: 'Es gab noch keine Interaktionen',
     },
     latest_data: {
-      en: 'The latest data',
-      de: 'Aktuelle trends',
+      en: 'Latest data',
+      de: 'Aktuelle Trends',
     },
     slug_helper: {
-      en: 'Under which url segment will visitors find the dialogue?',
-      de: 'Unter welcher URL Erganzüng sollen Besucher deinen Dialog finden?',
+      en: 'Which URL-segment should lead to the dialogue?',
+      de: 'Unter welcher URL-Erganzüng sollen Besucher deinen Dialog finden?',
     },
     share_qr: {
-      en: 'Method one: Share QR Code',
-      de: 'Methode eins: QR-Code teilen',
+      en: 'Method one: Share the QR Code',
+      de: 'Erste Methode: Teile den QR-Code',
     },
     share_link: {
-      en: 'Method two: Share URL to link',
-      de: 'Methode zwei: URL zum Verknüpfen freigeben',
+      en: 'Method two: Share the link',
+      de: 'Zweite Methode: Teile den Link',
     },
     qr_download_helper: {
-      en: 'Share the dialogue by sharing the QR code, by either downloading the QR code or copying it.',
-      de: 'Teilen Sie den Dialog, indem Sie den QR-Code freigeben, indem Sie entweder den QR-Code herunterladen oder kopieren.',
+      en: 'Give access to the dialogue by sharing the QR code. It can be copied or downloaded.',
+      de: 'Teile den QR-Code, um Zugang zu dem Dialog zu geben. Er steht zum kopieren oder downloaded bereit.',
     },
     week_summary: {
-      en: 'This week in summary',
+      en: 'This week\'s summary',
       de: 'Wochenansicht',
     },
   },
@@ -789,11 +790,11 @@ const language = {
     },
     user_information: {
       en: 'User information',
-      de: 'Nutzerinformation',
+      de: 'Benutzerinformation',
     },
     watch_journey_heading: {
       en: 'Follow a user\'s journey',
-      de: 'Folgen sie der reise eines benutzers',
+      de: 'Folge eine Benutzererfahrung',
     },
     you_asked: {
       en: 'You asked',
@@ -823,7 +824,7 @@ const language = {
     },
     welcome: {
       en: 'Welcome!',
-      de: 'Wilkommen!',
+      de: 'Willkommen!',
     },
     welcome_on_board_helper: {
       en: 'Welcome on board!',
@@ -846,74 +847,74 @@ const language = {
       de: 'Benutzer bearbeitet',
     },
     user_edited_helper: {
-      en: 'Your details have been saved!',
-      de: 'Ihre Daten wurden gespeichert',
+      en: 'Your details have been saved.',
+      de: 'Ihre Daten wurden gespeichert.',
     },
   },
   trigger: {
     alert_email: {
-      en: 'Send alerts to emai',
+      en: 'Send trigger-alerts to emai',
       de: 'Senden per E-Mail',
     },
     alert_sms: {
-      en: 'Send alerts via SMS',
+      en: 'Send trigger-alerts via SMS',
       de: 'Senden per SMS',
     },
     alert_both: {
       en: 'Send alerts via all channels',
-      de: 'Senden über alle Kanäle',
+      de: 'Alle Sendemethoden auswählen',
     },
     trigger_schedulled_alarm: {
-      en: 'Send alerts at certain times (coming soon)',
-      de: 'Senden Sie Benachrichtigungen zu bestimmten Zeiten (in Kürze)',
+      en: 'Send trigger-alerts at certain times (coming soon)',
+      de: 'Senden der Push-Benachrichtigungen zu bestimmten Zeiten (bald verfügbar)',
     },
     my_first_trigger: {
-      en: 'My first trigger',
-      de: 'Mein erster Alarm',
+      en: 'My first trigger-alert',
+      de: 'Meine erste Push-Notification',
     },
     trigger_question_alarm: {
-      en: 'Send alerts when a certain value has been reached',
-      de: 'Senden Sie Warnungen, wenn ein bestimmter Wert erreicht wurde',
+      en: 'Send trigger-alerts when a certain value has been reached',
+      de: 'Sende eine Push-Benachrichtigung beim erreichen eines bestimmten Wertes.',
     },
     select_dialogue_reminder: {
       en: 'Please select a type and/or dialogue',
-      de: 'Bitte wählen Sie einen Typ und / oder Dialog',
+      de: 'Bitte wähle eine Methode und/oder einen Dialog',
     },
     about_trigger: {
-      en: 'About the trigger',
-      de: 'Über alarm',
+      en: 'About the trigger-alert',
+      de: 'Allgemeine Beschreibung zur Push-Benachrichtigung',
     },
     about_trigger_helper: {
-      en: 'Tell us about the trigger, and to which scope it applies (question/dialogue)',
-      de: 'Erzählen Sie uns von dem Auslöser und für welchen Umfang er gilt (Frage / Dialog)',
+      en: 'Tell us about the trigger-alert, and to which question or dialogue it applies.',
+      de: 'Beschreibe die Push-Benachrichtigung und für welche Frage oder welchen Dialog Sie gilt.',
     },
     conditions: {
       en: 'Conditions',
       de: 'Bedingungen',
     },
     conditions_helper: {
-      en: 'What are the conditions for sending out the trigger?',
-      de: 'Was sind die Bedingungen für das Aussenden des Triggers?',
+      en: 'What are the conditions for sending out the trigger-alert?',
+      de: 'Welche Bedingungen sollen für das Senden der Push-Benachrichtgung zutreffen?',
     },
     name_helper: {
-      en: 'What is the name of this trigger?',
-      de: 'Wie heißt dieser Alarm?',
+      en: 'What is the name of this trigger-alert?',
+      de: 'Wie soll diese Push-Benachrichtigung heißen?',
     },
     dialogue: {
       en: 'Selected dialogue',
       de: 'Ausgewählter Dialog',
     },
     dialogue_helper: {
-      en: 'For which dialogue will this trigger apply?',
-      de: 'Für welchen Dialog gilt dieser Alarm?',
+      en: 'For which dialogue will this trigger-alert apply?',
+      de: 'Für welchen Dialog gilt diese Push-Benachrichtigung?',
     },
     type: {
-      en: 'Type trigger',
-      de: 'Typ alarm',
+      en: 'Trigger-alert type',
+      de: 'Art der Push-Benachrichtigung',
     },
     type_helper: {
-      en: 'What type of trigger is this?',
-      de: 'Was für ein alarm ist das?',
+      en: 'What type of trigger-alert is this?',
+      de: 'Um was für eine Art Push-Benachrichtigung handelt es sich?',
     },
     delivery: {
       en: 'Delivery',
@@ -921,54 +922,55 @@ const language = {
     },
     low_threshold: {
       en: 'Low Threshold',
-      de: 'Niedrige Schwelle',
+      de: 'Unterer Schwellenwert',
     },
     low_threshold_helper: {
-      en: 'Set a low threshold: if a score is recorded underneath, a trigger will be sent',
-      de: 'Legen Sie einen niedrigen Schwellenwert fest: Wenn darunter eine Punktzahl aufgezeichnet wird, wird ein Alarm gesendet',
+      en: 'Set a low threshold: if a score underneath is recorded, a trigger-alert will be sent.',
+      de: 'Festlegen eines unteren Schwellenwerts: Eine Aufzeichnung unter diesem Wert löst eine Push-Benachrichtigung aus.',
     },
     high_threshold: {
       en: 'High Threshold',
-      de: 'Hoher Schwelle',
+      de: 'Oberer Schwellenwert',
     },
     high_threshold_helper: {
-      en: 'Set a top-threshold: if a score is recorded over, a trigger will be sent',
-      de: 'Festlegen eines oberen Schwellenwerts: Wenn eine Punktzahl aufgezeichnet wird, wird ein Alarm gesendet',
+      en: 'Set a high threshold: if a score above is recorded, a trigger-alert will be sent',
+      de: 'Festlegen eines oberen Schwellenwerts: Eine Aufzeichung über diesem Wert löst eine Push-Benachrichtigung aus.',
     },
     delivery_helper: {
-      en: 'How will this trigger be delivered to the recipients (mail or SMS)?',
+      en: 'Shall this trigger-alert be deliver via email or text message?',
+      de: 'Soll diese Push-Benachrichtigung per Email oder SMS versandt werden?'
     },
     medium: {
       en: 'Delivery medium',
-      de: 'Wie wird dieser Alarm an die Empfänger übermittelt (Mail oder SMS)?',
+      de: 'Art des Versandts',
     },
     medium_helper: {
-      en: 'Which delivery method is preferred for this trigger? Note: additional costs may be incurred for SMS',
-      de: 'Welche Versandart wird für diesen Trigger bevorzugt? Hinweis: Für SMS können zusätzliche Kosten anfallen',
+      en: 'Which delivery method is preferred for this trigger-alert? Note: additional costs may occur for text messages.',
+      de: 'Welche Versandart wird für diese Push-Benachrichtigung bevorzugt? Hinweis: Für SMS können zusätzliche Kosten anfallen.',
     },
     question: {
       en: 'Selected question',
       de: 'Ausgewählte Frage',
     },
     question_helper: {
-      en: 'Which question will the trigger be watching?',
-      de: 'Welche Frage wird der Auslöser beobachten?',
+      en: 'Which question will the trigger-alert be watching?',
+      de: 'Auf welche Frage bezieht sich die Push-Benachrichtigung?',
     },
     condition: {
-      en: 'Condition type',
-      de: 'Konditionsart type',
+      en: 'Type of condition',
+      de: 'Bedingungsart',
     },
     condition_helper: {
-      en: 'Which condition should apply to the trigger for this question to the currently selected question?',
-      de: 'Welche Bedingung sollte für den Auslöser für diese Frage für die aktuell ausgewählte Frage gelten?',
+      en: 'Which condition should apply to the trigger-alert for this question?',
+      de: 'Welche Bedingung sollte für den Auslöser Push-Benachrichtigung gelten?',
     },
     recipients: {
       en: 'Recipients',
-      de: 'Empfängers',
+      de: 'Empfänger',
     },
     recipients_helper: {
-      en: 'Who will receive these trigger alerts?',
-      de: 'Wer erhält diese Alarm-Warnungen?',
+      en: 'Who will receive these trigger-alerts?',
+      de: 'Wer erhält die Push-Benachrichtigung?',
     },
     recipient: {
       en: 'Recipient',
@@ -976,7 +978,7 @@ const language = {
     },
     recipient_helper: {
       en: 'Select a registered user to be the receiver',
-      de: 'Wählen Sie einen registrierten Benutzer als Empfänger aus',
+      de: 'Wähle einen registrierten Benutzer als Empfänger aus',
     },
     match_text: {
       en: 'Text to match',
@@ -984,7 +986,7 @@ const language = {
     },
     match_text_helper: {
       en: 'What text should be matched to trigger the alert?',
-      de: 'Welcher Text sollte übereinstimmen, um die Warnung auszulösen?',
+      de: 'Welche Textübereinstimmung soll die Push-Benachrichtigung auslösen?',
     },
   },
 };
