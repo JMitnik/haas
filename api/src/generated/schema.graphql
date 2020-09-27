@@ -248,7 +248,7 @@ type Mutation {
   deleteTag(tagId: String): Tag!
   deleteTrigger(id: String): TriggerType
   deleteUser(id: String): UserType!
-  editCustomer(id: String, options: CustomerEditOptions): Customer!
+  editCustomer(customerId: String, options: CustomerEditOptions): Customer!
   editDialogue(customerSlug: String, description: String, dialogueSlug: String, publicTitle: String, tags: TagsInputObjectType, title: String): Dialogue!
   editTrigger(questionId: String, recipients: RecipientsInputType, trigger: TriggerInputType, triggerId: String): TriggerType!
   editUser(input: EditUserInput, userId: String): UserType!

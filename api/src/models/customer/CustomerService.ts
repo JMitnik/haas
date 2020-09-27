@@ -132,11 +132,11 @@ class CustomerService {
   };
 
   static editCustomer = async (args: any) => {
-    const { id, options } = args;
+    const { customerId, options } = args;
     const { logo, primaryColour, slug, name } = options;
     const customerSettings = await prisma.customerSettings.update({
       where: {
-        customerId: id,
+        customerId,
       },
       data: {
         logoUrl: logo,
@@ -154,7 +154,7 @@ class CustomerService {
 
     const customer = await prisma.customer.update({
       where: {
-        id,
+        id: customerId,
       },
       data: {
         slug,

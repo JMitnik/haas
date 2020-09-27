@@ -870,7 +870,7 @@ export interface NexusGenArgTypes {
       id?: string | null; // String
     }
     editCustomer: { // args
-      id?: string | null; // String
+      customerId?: string | null; // String
       options?: NexusGenInputs['CustomerEditOptions'] | null; // CustomerEditOptions
     }
     editDialogue: { // args

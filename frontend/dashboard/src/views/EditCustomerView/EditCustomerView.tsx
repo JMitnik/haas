@@ -114,7 +114,7 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
 
     editCustomer({
       variables: {
-        id: customer?.id,
+        customerId: customer?.id,
         options: optionInput,
       },
     }).then(() => {

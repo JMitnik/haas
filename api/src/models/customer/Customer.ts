@@ -218,10 +218,11 @@ export const CustomerMutations = Upload && extendType({
         return customer as any;
       },
     });
+
     t.field('editCustomer', {
       type: CustomerType,
       args: {
-        id: 'String',
+        customerId: 'String',
         options: CustomerEditOptionsInput,
       },
       resolve(parent, args) {
