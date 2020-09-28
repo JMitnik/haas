@@ -86,7 +86,7 @@ export const GoBackContainer = styled(motion.div)`
     p, span {
       position: absolute;
       bottom: 0;
-      transform: translateX(-100%) translateY(100%);
+      transform: translateX(-100%);
       left: 0;
       opacity: 0;
       width: 100px;
@@ -97,7 +97,7 @@ export const GoBackContainer = styled(motion.div)`
     &:hover {
       ${GoBackText} {
         opacity: 1;
-        transform: translateX(0) translateY(100%);
+        transform: translateX(8px);
         transition: all .3s cubic-bezier(.55,0,.1,1);
       }
     }
@@ -109,14 +109,6 @@ export const GoBackButton = styled.button`
     cursor: pointer;
     background: transparent;
     border-radius: 100%;
-
-    @media ${theme.media.desk} {
-      border-top-left-radius: 0px;
-      border-bottom-left-radius: 0px;
-      padding: 40px 0;
-      transform: translateY(-50%);
-    }
-    
     box-shadow: 1px;
     width: 30px;
     display: flex;
@@ -124,11 +116,22 @@ export const GoBackButton = styled.button`
     justify-content: center;
     border: 1px solid rgba(255, 255, 255, 0.05);
     height: 30px;
-    
     background-color: ${Color(theme.colors.primary).mix(Color('white'), 0.4).hex()};
     box-shadow: 0px 2px 1px 1px rgba(0, 0, 0, 0.10);
     color: white;
     transition: all .3s cubic-bezier(.55,0,.1,1);
+
+    @media ${theme.media.desk} {
+      width: 30px;
+    }
+
+    @media ${theme.media.desk} {
+      width: 50px;
+      border-top-left-radius: 0px;
+      border-bottom-left-radius: 0px;
+      padding: 40px 0;
+      transform: translateY(-50%);
+    }
 
     &:hover {
       background: rgba(0, 0, 0, 0.05);

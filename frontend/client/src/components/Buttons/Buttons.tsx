@@ -13,7 +13,6 @@ export const OutlineButton = styled(Button)`
     border-radius: 10px;
     border: none;
     display: flex;
-    /* padding-left: 0; */
     justify-content: flex-start;
     align-items: center;
   `}
@@ -29,7 +28,6 @@ export const ClientButton = styled(Button)`
     background: none;
     display: flex;
     align-items: stretch;
-    /* background: ${Color(theme.colors.primary).mix(Color('white'), 0.8).hex()}; */
     box-shadow: 0px 3px 1px 1px rgba(0, 0, 0, 0.10);
     position: relative;
     justify-content: flex-start;
@@ -41,17 +39,14 @@ export const ClientButton = styled(Button)`
     padding: 12px 22px;
     background: linear-gradient(45deg, ${Color(theme.colors.primary).lighten(0.3).hex()}, ${Color(theme.colors.primary).lighten(0.3).saturate(1).hex()}); 
     font-family: 'Open-sans', sans-serif;
-    /* color: ${Color(theme.colors.primary).saturate(0.1).hex()}; */
-    color: ${Color(theme.colors.primary).isDark() ? Color(theme.colors.primary).mix(Color('white'), 0.9).saturate(1).hex()
+    color: ${Color(theme.colors.primary).isDark() ? Color(theme.colors.primary).mix(Color('white'), 0.8).saturate(1).hex()
     : Color(theme.colors.primary).mix(Color('black'), 0.5).saturate(1).hex()};
 
     ${ButtonBody} {
       width: 100%;
       text-align: left;
       padding-left: 24px;
-
       border-radius: 0 10px 10px 0;
-      /* background: white; */
 
       h1, h2, h3, h4 ,h5 {
         height: 100%;
