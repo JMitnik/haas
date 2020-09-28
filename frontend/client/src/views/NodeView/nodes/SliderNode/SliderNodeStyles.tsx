@@ -28,7 +28,6 @@ export const SlideHereContainer = styled(motion.div)`
       width: 16px;
       height: 16px;
       margin-right: ${theme.gutter / 4}px;
-      fill: currentColor;
     }
   `}
 `;
@@ -51,9 +50,7 @@ export const FingerPrintContainer = styled(motion.div)`
       > g {
         stroke-width: 1;
         stroke: ${Color(theme.colors.primary).mix(Color('white'), 0.9).hex()};;
-        
       }
-      
     }
   `}
 `;
