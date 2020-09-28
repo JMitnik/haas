@@ -1,5 +1,4 @@
 import { Facebook, Globe, Instagram, Linkedin, Twitter } from 'react-feather';
-import { getSnapshot } from 'mobx-state-tree';
 import React from 'react';
 
 import { Flex } from '@haas/ui';

@@ -1,12 +1,12 @@
-import { CheckCircle, Mail, User } from 'react-feather';
+import { CheckCircle } from 'react-feather';
 import { useForm } from 'react-hook-form';
 import React from 'react';
 
 import { ButtonIcon } from '@haas/ui/src/Buttons';
 import { ClientButton, OutlineButton } from 'components/Buttons/Buttons';
-import { DeprecatedInputContainer, DeprecatedInputStyled, FormControl, Input, InputGroup, InputLabel } from '@haas/ui/src/Form';
 import { Div, Grid } from '@haas/ui';
 import { ReactComponent as EmailIcon } from 'assets/icons/icon-email.svg';
+import { Input, InputLabel } from '@haas/ui/src/Form';
 import { ReactComponent as LastNameIcon } from 'assets/icons/icon-last-name.svg';
 import { NodeTitle } from 'layouts/NodeLayout/NodeLayoutStyles';
 import { SessionEntryDataProps } from 'models/Session/SessionEntryModel';
