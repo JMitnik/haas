@@ -49,15 +49,20 @@ export const InputContainer = styled(Div)`
       }
     }
 
-    input {
-      border-radius: 6px;
-      color: black;
-      opacity: 0.8; 
-      ::placeholder {
-      color: black;
-      opacity: 0.8; 
+    svg {
+      color: ${Color(theme.colors.primary).mix(Color('black'), 0.1).hex()};
     }
+    
+    input {
       background-color: ${Color(theme.colors.primary).mix(Color('white'), 0.8).hex()};
+      border-radius: 6px;
+      color: ${Color(theme.colors.primary).mix(Color('black'), 0.8).hex()};
+      opacity: 0.8; 
+
+      ::placeholder {
+        color: ${Color(theme.colors.primary).mix(Color('black'), 0.5).hex()};
+        opacity: 0.5; 
+      }
     }
   `}
 `;
