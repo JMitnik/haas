@@ -9,7 +9,6 @@ export const SliderNodeContainer = styled(Div)``;
 export const SlideHereContainer = styled(motion.div)`
   ${({ theme }) => css`
     display: flex;
-    /* position: absolute; */
     top: -${theme.gutter}px;
     width: 100%;
     color: ${Color(theme.colors.primary).mix(Color('white'), 0.6).hex()};
@@ -17,9 +16,6 @@ export const SlideHereContainer = styled(motion.div)`
     font-family: 'Open Sans', sans-serif;
     font-size: 1rem;
     justify-content: space-between;
-    /* left: 50%; */
-    /* transform: translateX(-50%); */
-    /* min-width: 200px; */
     overflow: hidden;
     flex-wrap: wrap;
     align-items: center;
@@ -43,7 +39,6 @@ export const FingerPrintContainer = styled(motion.div)`
     bottom: -15px;
     left: 50%;
     transform: translateX(-50%);
-    /* min-width: 150px;  */
     min-height: 48px;
     display: flex;
     justify-content: center;
