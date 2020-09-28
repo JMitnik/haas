@@ -40,7 +40,7 @@ export const SlideHereContainer = styled(motion.div)`
 export const FingerPrintContainer = styled(motion.div)`
   ${({ theme }) => css`
     position: absolute; 
-    bottom: 15px;
+    bottom: -15px;
     left: 50%;
     transform: translateX(-50%);
     /* min-width: 150px;  */
