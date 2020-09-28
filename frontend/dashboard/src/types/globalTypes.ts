@@ -12,6 +12,7 @@ export enum LinkTypeEnumType {
   FACEBOOK = "FACEBOOK",
   INSTAGRAM = "INSTAGRAM",
   LINKEDIN = "LINKEDIN",
+  SHARE = "SHARE",
   SOCIAL = "SOCIAL",
   TWITTER = "TWITTER",
   WHATSAPP = "WHATSAPP",
@@ -44,6 +45,7 @@ export enum QuestionNodeTypeEnum {
   GENERIC = "GENERIC",
   LINK = "LINK",
   REGISTRATION = "REGISTRATION",
+  SHARE = "SHARE",
   SLIDER = "SLIDER",
   TEXTBOX = "TEXTBOX",
 }

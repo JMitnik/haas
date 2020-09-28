@@ -1,4 +1,4 @@
-import { PrismaClient, QuestionNode, QuestionNodeUpdateInput } from '@prisma/client';
+import { PrismaClient, QuestionNode, QuestionNodeUpdateInput, Share } from '@prisma/client';
 import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
 
 // eslint-disable-next-line import/no-cycle
@@ -49,9 +49,23 @@ export const QuestionNodeTypeEnum = enumType({
 });
 
 export const ShareNodeType = objectType({
-  name: 'ShareNode',
+  name: 'ShareNodeType',
   definition(t) {
     t.string('id');
+    t.string('url');
+    t.string('title');
+
+    // Deze is net nullable geworden, om de nullable aspect van je prc
+    t.string('tooltip', { nullable: true });
+    t.string('createdAt', { nullable: true });
+    t.string('updatedAt', { nullable: true });
+  },
+});
+
+export const ShareNodeInputType = inputObjectType({
+  name: 'ShareNodeInputType',
+  definition(t) {
+    t.string('id', { nullable: true });
     t.string('tooltip');
     t.string('url');
     t.string('title');
@@ -72,6 +86,32 @@ export const QuestionNodeType = objectType({
     t.string('updatedAt', {
       nullable: true,
       resolve: (parent) => parent.updatedAt?.toString() || '',
+    });
+
+    t.field('share', {
+      type: ShareNodeType,
+      nullable: true,
+      async resolve(parent, args, ctx) {
+        if (!parent.isLeaf || !parent.id) {
+          return null;
+        }
+
+        const [share] = await ctx.prisma.share.findMany({
+          where: {
+            questionNodeId: parent.id,
+          },
+        });
+
+        if (!share) return null;
+
+        return {
+          id: share.id,
+          title: share.title,
+          // share.tooltip was potentieel nullable, maar je ShareNodeType liet dat niet toe. Heb dat net aangepast
+          tooltip: share.tooltip,
+          url: share.url,
+        };
+      },
     });
 
     // TODO: Make this required in prisma.
@@ -381,10 +421,11 @@ export const QuestionNodeMutations = extendType({
         title: 'String',
         type: 'String',
         links: CTALinksInputType,
+        share: ShareNodeInputType,
       },
       async resolve(parent: any, args: any, ctx: any) {
         const { prisma }: { prisma: PrismaClient } = ctx;
-        const { customerSlug, dialogueSlug, title, type, links } = args;
+        const { customerSlug, dialogueSlug, title, type, links, share } = args;
 
         const customer = await prisma.customer.findOne({
           where: {
@@ -409,6 +450,9 @@ export const QuestionNodeMutations = extendType({
             isLeaf: true,
             links: {
               create: [...links?.linkTypes],
+            },
+            share: {
+              create: share,
             },
             questionDialogue: {
               connect: {
@@ -452,14 +496,3 @@ export const getQuestionNodeQuery = extendType({
     });
   },
 });
-
-const questionNodeNexus = [
-  QuestionNodeMutations,
-  QuestionNodeType,
-  QuestionOptionType,
-  QuestionNodeWhereInputType,
-  getQuestionNodeQuery,
-  QuestionNodeInput,
-];
-
-export default questionNodeNexus;

@@ -138,6 +138,7 @@ const ActionOverview = ({ leafs }: ActionOverviewProps) => {
             title=""
             type={initializeCTAType('REGISTER')}
             links={[]}
+            share={null}
             onNewCTAChange={setNewCTA}
           />
         )}
@@ -153,6 +154,7 @@ const ActionOverview = ({ leafs }: ActionOverviewProps) => {
               title={leaf.title}
               type={initializeCTAType(leaf.type)}
               links={leaf.links}
+              share={leaf?.share}
               onNewCTAChange={setNewCTA}
             />
           ),
@@ -169,6 +171,7 @@ const ActionOverview = ({ leafs }: ActionOverviewProps) => {
               title={leaf.title}
               type={initializeCTAType(leaf.type)}
               links={leaf.links}
+              share={leaf?.share}
               onNewCTAChange={setNewCTA}
             />
           ),

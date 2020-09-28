@@ -48,6 +48,13 @@ input CTALinksInputType {
   linkTypes: [CTALinkInputObjectType!]
 }
 
+input CTAShareInputObjectType {
+  id: String
+  title: String
+  tooltip: String
+  url: String
+}
+
 type Customer {
   dialogue(where: DialogueWhereUniqueInput): Dialogue
   dialogues(filter: DialogueFilterInputType): [Dialogue!]
@@ -227,7 +234,7 @@ type LoginOutput {
 type Mutation {
   assignTags(dialogueId: String, tags: TagsInputObjectType): Dialogue!
   copyDialogue(data: AddDialogueInput): Dialogue!
-  createCTA(customerSlug: String, dialogueSlug: String, links: CTALinksInputType, title: String, type: String): QuestionNode!
+  createCTA(customerSlug: String, dialogueSlug: String, links: CTALinksInputType, share: ShareNodeInputType, title: String, type: String): QuestionNode!
   createCustomer(name: String, options: CustomerCreateOptions): Customer!
   createDialogue(data: AddDialogueInput): Dialogue!
   createPermission(data: PermissionInput): PermssionType
@@ -406,6 +413,7 @@ type QuestionNode {
   overrideLeafId: String
   questionDialogue: Dialogue
   questionDialogueId: String
+  share: ShareNodeType
   title: String!
   type: QuestionNodeTypeEnum!
   updatedAt: String
@@ -526,6 +534,22 @@ input SessionInput {
 input SessionWhereUniqueInput {
   dialogueId: ID
   id: ID
+}
+
+input ShareNodeInputType {
+  id: String
+  title: String
+  tooltip: String
+  url: String
+}
+
+type ShareNodeType {
+  createdAt: String
+  id: String!
+  title: String!
+  tooltip: String
+  updatedAt: String
+  url: String!
 }
 
 """Input type for a slider node"""
