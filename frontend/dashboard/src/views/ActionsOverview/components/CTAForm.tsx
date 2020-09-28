@@ -56,15 +56,29 @@ interface CTAFormProps {
   onDeleteCTA: (onComplete: (() => void) | undefined) => void | Promise<ExecutionResult<any>>
 }
 
+const isShareType = (ctaType: any) => {
+  console.log('CTA TYPE: ', ctaType);
+  return ctaType?.value === 'SHARE';
+};
+
 const schema = yup.object().shape({
   title: yup.string().required(),
-  ctaType: yup.object().shape({ label: yup.string().required(), value: yup.string().required() }).required(),
-  links: yup.array().of(
-    yup.object().shape({
+  ctaType: yup.object().shape(
+    { label: yup.string().required(), value: yup.string().required() },
+  ).required('CTA type is required'),
+  links: yup.array().when('ctaType', {
+    is: (ctaType : { label: string, value: string }) => isShareType(ctaType),
+    then: yup.array().of(yup.object().shape({
       url: yup.string().required(),
+      tooltip: yup.string().required(),
+      type: yup.string().notRequired(),
+    })),
+    otherwise: yup.array().of(yup.object().shape({
+      url: yup.string().required(),
+      tooltip: yup.string().notRequired(),
       type: yup.string().required(),
-    }),
-  ),
+    })),
+  }),
 });
 
 const CTA_TYPES = [
@@ -109,7 +123,7 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange, on
   }, []);
 
   const handleMultiChange = useCallback((selectedOption: any) => {
-    // form.setValue('ctaType', selectedOption?.value);
+    form.setValue('ctaType', selectedOption?.value);
     setActiveType(selectedOption);
   }, [setActiveType]);
 
@@ -218,6 +232,10 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange, on
 
   const handleURLChange = useCallback(debounce((newUrl: string, index: number) => {
     setActiveLinks((prevLinks) => {
+      if (!prevLinks?.length) {
+        prevLinks[0] = { title: '', url: newUrl };
+        return [...prevLinks];
+      }
       prevLinks[index].url = newUrl;
       return [...prevLinks];
     });
@@ -225,6 +243,10 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange, on
 
   const handleTooltipChange = useCallback(debounce((newTooltip: string, index: number) => {
     setActiveLinks((prevLinks) => {
+      if (!prevLinks?.length) {
+        prevLinks[0] = { title: newTooltip, url: '' };
+        return [...prevLinks];
+      }
       prevLinks[index].title = newTooltip;
       return [...prevLinks];
     });
@@ -259,6 +281,9 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange, on
     });
   };
 
+  console.log('getValues: ', form.getValues());
+  console.log('errors: ', form.errors);
+
   return (
     <FormContainer expandedForm>
       <Form onSubmit={form.handleSubmit(onSubmit)}>
@@ -291,7 +316,7 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange, on
                   <Controller
                     name="ctaType"
                     control={form.control}
-                    as={<Select styles={form.errors.ctaType && !activeType ? ErrorStyle : undefined} />}
+                    as={<Select />}
                     options={CTA_TYPES}
                     defaultValue={activeType}
                   />
@@ -302,27 +327,29 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange, on
                   <>
                     {/* TODO: Change default value and error */}
                     <FormControl isRequired>
-                      <FormLabel htmlFor="ctaType">Button text</FormLabel>
+                      <FormLabel htmlFor="tooltip">Button text</FormLabel>
                       <InputHelper>What is the text on the share button?</InputHelper>
                       <Input
-                        name="tooltip"
+                        name="links[0].tooltip"
                         placeholder="Share..."
                         leftEl={<Type />}
-                        defaultValue={title}
+                        defaultValue={links?.[0]?.tooltip}
+                        onChange={(e: any) => handleTooltipChange(e.currentTarget.value, 0)}
                         ref={form.register({ required: true })}
                       />
-                      <FormErrorMessage>{form.errors.ctaType?.value?.message}</FormErrorMessage>
+                      <FormErrorMessage>{form.errors.links?.[0]?.type}</FormErrorMessage>
                     </FormControl>
 
                     {/* TODO: Change default value and error */}
                     <FormControl isRequired>
-                      <FormLabel htmlFor="url">Url</FormLabel>
-                      <InputHelper>What is the text on the share button?</InputHelper>
+                      <FormLabel htmlFor="shareUrl">Url</FormLabel>
+                      <InputHelper>What is the url to be shared?</InputHelper>
                       <Input
-                        name="url"
+                        name="links[0].url"
                         placeholder="https://share/url..."
                         leftEl={<Type />}
-                        defaultValue={title}
+                        defaultValue={links?.[0]?.url}
+                        onChange={(e: any) => handleURLChange(e.currentTarget.value, 0)}
                         ref={form.register({ required: true })}
                       />
                       <FormErrorMessage>{form.errors.ctaType?.value?.message}</FormErrorMessage>
@@ -469,7 +496,7 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange, on
           <ButtonGroup>
             <Button
               isLoading={addLoading || updateLoading}
-              isDisabled={!form.formState.isValid}
+              // isDisabled={!form.formState.isValid}
               variantColor="teal"
               type="submit"
             >

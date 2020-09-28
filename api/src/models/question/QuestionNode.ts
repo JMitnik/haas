@@ -10,6 +10,17 @@ import { DialogueType } from '../questionnaire/Dialogue';
 import { EdgeType } from '../edge/Edge';
 import NodeService from './NodeService';
 
+export const CTAShareInputObjectType = inputObjectType({
+  name: 'CTAShareInputObjectType',
+  definition(t) {
+    t.string('url');
+    t.string('tooltip');
+
+    t.string('title', { nullable: true });
+    t.string('id', { nullable: true });
+  },
+});
+
 export const QuestionOptionType = objectType({
   name: 'QuestionOption',
   definition(t) {
@@ -34,7 +45,17 @@ export const QuestionNodeTypeEnum = enumType({
   name: 'QuestionNodeTypeEnum',
   description: 'The different types a node can assume',
 
-  members: ['GENERIC', 'SLIDER', 'CHOICE', 'REGISTRATION', 'TEXTBOX', 'LINK'],
+  members: ['GENERIC', 'SLIDER', 'CHOICE', 'REGISTRATION', 'TEXTBOX', 'LINK', 'SHARE'],
+});
+
+export const ShareNodeType = objectType({
+  name: 'ShareNode',
+  definition(t) {
+    t.string('id');
+    t.string('tooltip');
+    t.string('url');
+    t.string('title');
+  },
 });
 
 export const QuestionNodeType = objectType({

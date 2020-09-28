@@ -206,6 +206,7 @@ enum LinkTypeEnumType {
   FACEBOOK
   INSTAGRAM
   LINKEDIN
+  SHARE
   SOCIAL
   TWITTER
   WHATSAPP
@@ -416,6 +417,7 @@ enum QuestionNodeTypeEnum {
   GENERIC
   LINK
   REGISTRATION
+  SHARE
   SLIDER
   TEXTBOX
 }
