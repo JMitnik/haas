@@ -2,11 +2,13 @@ import { AnimationControls } from 'framer-motion';
 import Lottie from 'react-lottie';
 import React, { useReducer } from 'react';
 
-import { ReactComponent as DragIcon } from 'assets/icons/icon-order-horizontal.svg';
+import { ReactComponent as FingerIcon } from 'assets/icons/icon-fingerprint.svg';
+import { Flex, Text, Slider as UISlider } from '@haas/ui';
 import { HAASIdle, HAASRun, HAASStopping } from 'assets/animations';
-import { Span, Slider as UISlider } from '@haas/ui';
+import { ReactComponent as HappyIcon } from 'assets/icons/icon-happy.svg';
+import { ReactComponent as UnhappyIcon } from 'assets/icons/icon-unhappy.svg';
 
-import { HAASRabbit, SlideHereContainer } from './SliderNodeStyles';
+import { FingerPrintContainer, HAASRabbit, SlideHereContainer } from './SliderNodeStyles';
 import { SlideMeAnimation } from './SliderNodeAnimations';
 
 interface SliderAnimationStateProps {
@@ -105,24 +107,28 @@ const Slider = ({ register, onSubmit, animationControls }: SliderProps) => {
 
   return (
     <>
-
+      {animationState.isStopped && (
+      <SlideHereContainer variants={SlideMeAnimation} animate="animate" initial="initial" exit="exit">
+        <Flex alignItems="center">
+          <UnhappyIcon />
+          <Text fontSize="0.8rem">
+            Unhappy
+          </Text>
+        </Flex>
+        <Flex alignItems="center">
+          <Text mr={1} fontSize="0.8rem">
+            Happy
+          </Text>
+          <HappyIcon />
+        </Flex>
+      </SlideHereContainer>
+      )}
       <HAASRabbit style={{
         left: `${animationState.position}%`,
-        bottom: '5px',
-        // zIndex: 500,
+        bottom: '10px',
         transform: `translateX(-50%) scaleX(${animationState.direction})`,
       }}
       >
-        {animationState.isStopped && (
-        <SlideHereContainer variants={SlideMeAnimation} animate="animate" initial="initial" exit="exit">
-          <DragIcon />
-          slide to
-            {' '}
-          <Span>
-            <i>start</i>
-          </Span>
-        </SlideHereContainer>
-        )}
         <div className="rabbit">
           <Lottie
             isStopped={animationState.isStopped}
@@ -148,6 +154,25 @@ const Slider = ({ register, onSubmit, animationControls }: SliderProps) => {
           ref={register}
         />
       </form>
+
+      {animationState.isStopped && (
+        <FingerPrintContainer
+          animate={{
+            marginLeft: ['0%', '30%', '0%', '-30%', '0%', '0%'],
+            opacity: [0, 1, 1, 1, 0.5, 0],
+            transition: {
+              mass: 0.2,
+              loop: Infinity,
+              delay: 1,
+              repeatDelay: 3,
+              duration: 2.8,
+            },
+          }}
+        >
+          <FingerIcon />
+        </FingerPrintContainer>
+      )}
+
     </>
   );
 };
