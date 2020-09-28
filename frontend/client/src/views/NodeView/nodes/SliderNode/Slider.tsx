@@ -108,12 +108,6 @@ const Slider = ({ register, onSubmit, animationControls }: SliderProps) => {
     <>
       {animationState.isStopped && (
       <SlideHereContainer variants={SlideMeAnimation} animate="animate" initial="initial" exit="exit">
-        {/* <DragIcon />
-        slide to
-        {' '}
-        <Span>
-          <i>start</i>
-        </Span> */}
         <span>Unhappy</span>
         <span>Happy</span>
       </SlideHereContainer>
@@ -121,7 +115,6 @@ const Slider = ({ register, onSubmit, animationControls }: SliderProps) => {
       <HAASRabbit style={{
         left: `${animationState.position}%`,
         bottom: '10px',
-        // zIndex: 500,
         transform: `translateX(-50%) scaleX(${animationState.direction})`,
       }}
       >
@@ -161,7 +154,6 @@ const Slider = ({ register, onSubmit, animationControls }: SliderProps) => {
               delay: 1,
               repeatDelay: 3,
               duration: 2.4,
-              damping: 200,
             },
           }}
         >
