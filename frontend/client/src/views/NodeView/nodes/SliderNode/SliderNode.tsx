@@ -1,5 +1,6 @@
-import { useAnimation } from 'framer-motion';
+import { Variants, motion, transform, useAnimation } from 'framer-motion';
 import { useForm } from 'react-hook-form';
+import Color from 'color';
 import React from 'react';
 
 import { Div } from '@haas/ui';
@@ -13,12 +14,15 @@ import Slider from './Slider';
 
 type SliderNodeProps = GenericNodeProps;
 
-const sliderValueAnimeVariants = {
+const sliderValueAnimeVariants: Variants = {
   initial: {
+    opacity: 0,
+    y: '100px',
     transform: 'scale(1)',
   },
   active: {
-    transform: 'scale(1.5)',
+    opacity: 1,
+    y: 0,
   },
 };
 
@@ -30,6 +34,9 @@ const SliderNode = ({ node, onEntryStore }: SliderNodeProps) => {
       slider: 50.01,
     },
   });
+
+  const sliderValue = Number(watch({ nest: true }).slider / 10);
+  const sliderColor = transform(sliderValue, [0, 5, 10], ['#E53E3E', '#F6AD55', '#38B2AC']);
 
   const handleSubmit = async () => {
     const validForm = await triggerValidation('slider');
@@ -46,14 +53,6 @@ const SliderNode = ({ node, onEntryStore }: SliderNodeProps) => {
     }
   };
 
-  const showValue = () => {
-    const val = watch({ nest: true }).slider;
-
-    if (val) return Number(val / 10).toFixed(1);
-
-    return 0;
-  };
-
   return (
     <SliderNodeContainer>
       <Div>
@@ -61,7 +60,9 @@ const SliderNode = ({ node, onEntryStore }: SliderNodeProps) => {
       </Div>
       <Div>
         <SliderNodeValue initial="initial" variants={sliderValueAnimeVariants} animate={controls}>
-          {showValue()}
+          <motion.p animate={{ color: sliderColor, borderColor: Color(sliderColor).lighten(0.3).hex() }}>
+            {sliderValue.toFixed(1)}
+          </motion.p>
         </SliderNodeValue>
         <Slider onSubmit={handleSubmit} register={register} animationControls={controls} />
       </Div>

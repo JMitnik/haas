@@ -1,16 +1,19 @@
-import { CheckCircle, Mail, User } from 'react-feather';
+import { CheckCircle } from 'react-feather';
 import { useForm } from 'react-hook-form';
 import React from 'react';
 
 import { ButtonIcon } from '@haas/ui/src/Buttons';
 import { ClientButton, OutlineButton } from 'components/Buttons/Buttons';
-import { DeprecatedInputContainer, DeprecatedInputStyled, FormControl, Input, InputGroup, InputLabel } from '@haas/ui/src/Form';
 import { Div, Grid } from '@haas/ui';
+import { ReactComponent as EmailIcon } from 'assets/icons/icon-email.svg';
+import { Input, InputLabel } from '@haas/ui/src/Form';
+import { ReactComponent as LastNameIcon } from 'assets/icons/icon-last-name.svg';
 import { NodeTitle } from 'layouts/NodeLayout/NodeLayoutStyles';
 import { SessionEntryDataProps } from 'models/Session/SessionEntryModel';
+import { ReactComponent as UserIcon } from 'assets/icons/icon-user.svg';
 
 import { GenericNodeProps } from '../types';
-import { RegisterNodeContainer } from './RegisterNodeStyles';
+import { IconContainer, InputContainer, RegisterNodeContainer } from './RegisterNodeStyles';
 
 type RegisterNodeProps = GenericNodeProps;
 
@@ -50,34 +53,46 @@ const RegisterNode = ({ node, onEntryStore }: RegisterNodeProps) => {
         <Div>
           <Grid gridTemplateColumns={['auto', 'repeat(auto-fit, minmax(100px, 1fr))']} gridGap="24px">
             <Grid gridTemplateColumns="1fr 1fr">
-              <Div>
-                <InputLabel color="white">First name</InputLabel>
-                <Input leftEl={<User />} placeholder="Jane" name="firstName" ref={register} />
-              </Div>
+              <InputContainer>
+                <InputLabel>First name</InputLabel>
+                <Input
+                  leftEl={<IconContainer><UserIcon /></IconContainer>}
+                  placeholder="Jane"
+                  name="firstName"
+                  ref={register}
+                />
+              </InputContainer>
 
-              <Div>
+              <InputContainer>
                 <InputLabel color="white">Last name</InputLabel>
-                <Input leftEl={<User />} placeholder="Doe" name="lastName" ref={register} />
-              </Div>
+                <Input
+                  leftEl={<IconContainer><LastNameIcon /></IconContainer>}
+                  placeholder="Doe"
+                  name="lastName"
+                  ref={register}
+                />
+              </InputContainer>
             </Grid>
 
-            <Div>
-              <InputLabel color="white">Email adress</InputLabel>
-              <Input leftEl={<Mail />} placeholder="Jane@haas.live" name="email" ref={register} />
-            </Div>
+            <InputContainer>
+              <InputLabel color="white">Email address</InputLabel>
+              <Input
+                leftEl={<IconContainer><EmailIcon /></IconContainer>}
+                placeholder="Jane@haas.live"
+                name="email"
+                ref={register}
+              />
+            </InputContainer>
           </Grid>
-          <Div mt={4}>
-            <Grid gridTemplateColumns="2fr 1fr">
-              <ClientButton type="submit" disabled={!dirty} isActive={dirty}>
-                <ButtonIcon>
-                  <CheckCircle />
-                </ButtonIcon>
-                Submit
-              </ClientButton>
-
-              <OutlineButton type="submit">Do not share</OutlineButton>
-            </Grid>
-          </Div>
+          <Grid paddingTop={4} gridTemplateColumns={['1fr 1fr', '1fr 1fr']}>
+            <ClientButton type="submit" disabled={!dirty} isActive={dirty}>
+              <ButtonIcon>
+                <CheckCircle />
+              </ButtonIcon>
+              Submit
+            </ClientButton>
+            <OutlineButton type="submit">Do not share</OutlineButton>
+          </Grid>
         </Div>
       </form>
     </RegisterNodeContainer>
