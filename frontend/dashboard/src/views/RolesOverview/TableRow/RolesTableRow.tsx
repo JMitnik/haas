@@ -18,7 +18,7 @@ const RolesTableRow = ({ headers, data, index, permissions }: TableRowProps) => 
     >
       {headers && headers.map(({ accessor, Cell }) => {
         const result = Object.entries(data).find((property) => property[0] === accessor);
-        if (result) return <Cell value={result[1]} key={`${index}-${result[0]}`} />;
+        if (result && Cell) return <Cell value={result[1]} key={`${index}-${result[0]}`} />;
 
         return null;
       })}

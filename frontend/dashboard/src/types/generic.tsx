@@ -5,18 +5,6 @@ export interface DataGridProps {
   sortBy: Array<any>;
 }
 
-export interface TableProps {
-  activeStartDate: Date | null;
-  activeEndDate: Date | null;
-  activeSearchTerm: string;
-  pageIndex: number;
-  pageSize: number;
-  sortBy: {
-    by: string;
-    desc: boolean;
-  }[]
-}
-
 export interface BusinessProps {
   name: string;
 }

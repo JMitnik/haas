@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { Flex, Span } from '@haas/ui';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 interface PaginationProps {
@@ -63,36 +64,36 @@ interface TablePaginationControlsProps {
   onPageChange: (newPageIndex: number) => void;
 }
 
-const TablePaginationControls = ({ paginationProps, onPageChange }: TablePaginationControlsProps) => (
-  <Flex gridRow="-1" alignItems="center" justifyContent="flex-end">
-    {/* TODO: Make these buttons styled, use flex-properties instead of margin */}
-    <Flex marginRight="20px" alignItems="center" justifyContent="center">
-      <Button
-        onClick={() => onPageChange(paginationProps.pageIndex - 1)}
-        disabled={paginationProps.pageIndex === 0}
-      >
-        {'<'}
-      </Button>
-      <Span>
-        Page
-      </Span>
-      <div style={{ textAlign: 'center' }}>
-        <StyledInput disabled type="number" value={paginationProps.pageIndex + 1} />
-      </div>
-      <Span>
-        of
-        {' '}
-        {paginationProps.pageCount}
-      </Span>
-      <Button
-        onClick={() => onPageChange(paginationProps.pageIndex + 1)}
-        disabled={paginationProps.pageIndex === paginationProps.pageCount - 1}
-      >
-        {'>'}
-      </Button>
-    </Flex>
-  </Flex>
+const TablePaginationControls = ({ paginationProps, onPageChange }: TablePaginationControlsProps) => {
+  const { t } = useTranslation();
 
-);
+  return (
+    <Flex gridRow="-1" alignItems="center" justifyContent="flex-end">
+      <Flex marginRight="20px" alignItems="center" justifyContent="center">
+        <Button
+          onClick={() => onPageChange(paginationProps.pageIndex - 1)}
+          disabled={paginationProps.pageIndex === 0}
+        >
+          {'<'}
+        </Button>
+        <Span>{t('page')}</Span>
+        <div style={{ textAlign: 'center' }}>
+          <StyledInput disabled type="number" value={paginationProps.pageIndex + 1} />
+        </div>
+        <Span>
+          of
+          {' '}
+          {paginationProps.pageCount}
+        </Span>
+        <Button
+          onClick={() => onPageChange(paginationProps.pageIndex + 1)}
+          disabled={paginationProps.pageIndex === paginationProps.pageCount - 1}
+        >
+          {'>'}
+        </Button>
+      </Flex>
+    </Flex>
+  );
+};
 
 export default TablePaginationControls;

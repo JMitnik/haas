@@ -2,12 +2,14 @@
 
 import * as yup from 'yup';
 import { ApolloError } from 'apollo-client';
-import { Button, ButtonGroup, FormErrorMessage, useToast } from '@chakra-ui/core';
+import { Button, ButtonGroup, FormErrorMessage, Popover, PopoverArrow,
+  PopoverBody, PopoverCloseButton, PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast } from '@chakra-ui/core';
 import { Controller, useForm } from 'react-hook-form';
-import { MinusCircle, PlusCircle } from 'react-feather';
+import { MinusCircle, PlusCircle, Trash } from 'react-feather';
 import { debounce } from 'lodash';
 import { useMutation } from '@apollo/react-hooks';
 import { useParams } from 'react-router';
+import { useTranslation } from 'react-i18next';
 import { yupResolver } from '@hookform/resolvers';
 import React, { useCallback, useEffect, useState } from 'react';
 import Select from 'react-select';
@@ -16,7 +18,7 @@ import {
   DeleteQuestionOptionButtonContainer,
 } from 'views/DialogueBuilderView/components/QuestionEntry/QuestionEntryStyles';
 import { Div, Flex, Form, FormContainer, FormControl, FormLabel,
-  FormSection, H3, H4, Hr, Input, InputGrid, InputHelper, Muted } from '@haas/ui';
+  FormSection, H3, H4, Hr, Input, InputGrid, InputHelper, Muted, Span, Text } from '@haas/ui';
 import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
 import createQuestionMutation from 'mutations/createQuestion';
 import updateQuestionMutation from 'mutations/updateQuestion';
@@ -83,6 +85,7 @@ interface QuestionEntryFormProps {
   question: QuestionEntryProps;
   parentQuestionId?: string;
   parentQuestionType: string;
+  onDeleteEntry: any;
 }
 
 const questionTypes = [
@@ -105,8 +108,11 @@ const QuestionEntryForm = ({
   parentQuestionType,
   parentQuestionId,
   edgeId,
+  onDeleteEntry,
 }: QuestionEntryFormProps) => {
   const { customerSlug, dialogueSlug } = useParams();
+
+  const { t } = useTranslation();
 
   const form = useForm<FormDataProps>({
     resolver: yupResolver(schema),
@@ -229,8 +235,8 @@ const QuestionEntryForm = ({
 
       toast({
         title: 'Something went wrong',
-        description: 'There was a problem in saving the node. Please try again',
-        status: 'success',
+        description: 'There was a problem saving the node. Please try again',
+        status: 'error',
         position: 'bottom-right',
         isClosable: true,
       });
@@ -262,7 +268,7 @@ const QuestionEntryForm = ({
       toast({
         title: 'Something went wrong',
         description: 'There was a problem in saving the node. Please try again',
-        status: 'success',
+        status: 'error',
         position: 'bottom-right',
         isClosable: true,
       });
@@ -364,15 +370,15 @@ const QuestionEntryForm = ({
         <Div py={4}>
           <FormSection id="general">
             <Div>
-              <H3 color="default.text" fontWeight={500} pb={2}>About question</H3>
+              <H3 color="default.text" fontWeight={500} pb={2}>{t('dialogue:about_question')}</H3>
               <Muted color="gray.600">
-                Tell us a bit about the question
+                {t('dialogue:about_question_helper')}
               </Muted>
             </Div>
             <InputGrid>
               <FormControl isRequired isInvalid={!!form.errors.title?.message}>
-                <FormLabel htmlFor="title">Title</FormLabel>
-                <InputHelper>What is the question you want to ask?</InputHelper>
+                <FormLabel htmlFor="title">{t('title')}</FormLabel>
+                <InputHelper>{t('dialogue:title_question_helper')}</InputHelper>
                 <Input
                   name="title"
                   defaultValue={activeTitle}
@@ -390,16 +396,20 @@ const QuestionEntryForm = ({
 
               <FormSection>
                 <Div>
-                  <H3 color="default.text" fontWeight={500} pb={2}>About condition</H3>
+                  <H3 color="default.text" fontWeight={500} pb={2}>{t('dialogue:condition')}</H3>
                   <Muted color="gray.600">
-                    When should this question be displayed
+                    {t('dialogue:condition_helper')}
                   </Muted>
                 </Div>
                 <Div>
                   <InputGrid>
                     <FormControl isRequired isInvalid={!!form.errors.minValue}>
-                      <FormLabel htmlFor="minValue">Min value</FormLabel>
-                      <InputHelper>What is the minimal value to trigger this question?</InputHelper>
+                      <FormLabel htmlFor="minValue">
+                        {t('min_value')}
+                      </FormLabel>
+                      <InputHelper>
+                        {t('dialogue:min_value_helper')}
+                      </InputHelper>
                       <Input
                         name="minValue"
                         ref={form.register({ required: false })}
@@ -410,8 +420,12 @@ const QuestionEntryForm = ({
                     </FormControl>
 
                     <FormControl isRequired isInvalid={!!form.errors.maxValue}>
-                      <FormLabel htmlFor="maxValue">Max value</FormLabel>
-                      <InputHelper>What is the maximal value to trigger this question?</InputHelper>
+                      <FormLabel htmlFor="maxValue">
+                        {t('max_value')}
+                      </FormLabel>
+                      <InputHelper>
+                        {t('dialogue:max_value_helper')}
+                      </InputHelper>
                       <Input
                         name="maxValue"
                         ref={form.register({ required: false })}
@@ -433,15 +447,15 @@ const QuestionEntryForm = ({
 
               <FormSection>
                 <Div>
-                  <H3 color="default.text" fontWeight={500} pb={2}>About condition</H3>
+                  <H3 color="default.text" fontWeight={500} pb={2}>{t('dialogue:condition')}</H3>
                   <Muted color="gray.600">
-                    When should this question be displayed
+                    {t('dialogue:condition_helper')}
                   </Muted>
                 </Div>
                 <Div>
                   <InputGrid>
                     <FormControl isRequired isInvalid={!!form.errors.matchText}>
-                      <FormLabel htmlFor="matchText">Match value</FormLabel>
+                      <FormLabel htmlFor="matchText">{t('dialogue:match_value')}</FormLabel>
                       <InputHelper>What is the multi-choice question to trigger this question?</InputHelper>
 
                       <Controller
@@ -472,16 +486,22 @@ const QuestionEntryForm = ({
 
           <FormSection>
             <Div>
-              <H3 color="default.text" fontWeight={500} pb={2}>About type</H3>
+              <H3 color="default.text" fontWeight={500} pb={2}>
+                {t('dialogue:question_type')}
+              </H3>
               <Muted color="gray.600">
-                Question details
+                {t('dialogue:about_type_helper')}
               </Muted>
             </Div>
             <Div>
               <InputGrid>
                 <FormControl isRequired isInvalid={!!form.errors.questionType}>
-                  <FormLabel htmlFor="questionType">Question type</FormLabel>
-                  <InputHelper>What is the type of the question?</InputHelper>
+                  <FormLabel htmlFor="questionType">
+                    {t('dialogue:question_type')}
+                  </FormLabel>
+                  <InputHelper>
+                    {t('dialogue:question_type_helper')}
+                  </InputHelper>
                   <Controller
                     id="question-type-select"
                     name="questionType"
@@ -502,8 +522,12 @@ const QuestionEntryForm = ({
                 </FormControl>
 
                 <FormControl isInvalid={!!form.errors.activeLeaf}>
-                  <FormLabel htmlFor="questionType">Call-to-action</FormLabel>
-                  <InputHelper>What CTA do you want to add?</InputHelper>
+                  <FormLabel htmlFor="questionType">
+                    {t('call_to_action')}
+                  </FormLabel>
+                  <InputHelper>
+                    {t('dialogue:cta_helper')}
+                  </InputHelper>
                   <Controller
                     id="question-type-select"
                     name="activeLeaf"
@@ -529,7 +553,7 @@ const QuestionEntryForm = ({
                 <Div mb={1} gridColumn="1 / -1">
                   <Flex justifyContent="space-between">
                     <H4>
-                      Options
+                      {t('options')}
                     </H4>
                     <PlusCircle data-cy="AddOption" style={{ cursor: 'pointer' }} onClick={() => addNewOption()} />
                   </Flex>
@@ -537,8 +561,8 @@ const QuestionEntryForm = ({
                   <Hr />
                 </Div>
 
-                {!activeOptions.length && !form.errors.options && <Muted>Please add an option </Muted>}
-                {!activeOptions.length && form.errors.options && <Muted color="red">Please fill in at least one option!</Muted>}
+                {!activeOptions.length && !form.errors.options && <Muted>{t('dialogue:add_option_reminder')}</Muted>}
+                {!activeOptions.length && form.errors.options && <Muted color="red">{t('dialogue:empty_option_reminder')}</Muted>}
                 {activeOptions && activeOptions.map((option, optionIndex) => (
                   <Flex key={`container-${option.id}-${optionIndex}`} flexDirection="column">
                     <Flex my={1} flexDirection="row">
@@ -572,7 +596,7 @@ const QuestionEntryForm = ({
           </FormSection>
         </Div>
 
-        <Div>
+        <Flex justifyContent="space-between">
           <ButtonGroup>
             <Button
               isLoading={createLoading || updateLoading}
@@ -580,11 +604,47 @@ const QuestionEntryForm = ({
               variantColor="teal"
               type="submit"
             >
-              Save
+              {t('save')}
             </Button>
             <Button variant="outline" onClick={() => handleCancelQuestion()}>Cancel</Button>
           </ButtonGroup>
-        </Div>
+          <Span onClick={(e) => e.stopPropagation()}>
+            <Popover
+              usePortal
+            >
+              {({ onClose }) => (
+                <>
+                  <PopoverTrigger>
+                    <Button
+                      variant="outline"
+                      variantColor="red"
+                      leftIcon={Trash}
+                    >
+                      {t('delete')}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent zIndex={4}>
+                    <PopoverArrow />
+                    <PopoverHeader>{t('delete')}</PopoverHeader>
+                    <PopoverCloseButton />
+                    <PopoverBody>
+                      <Text>{t('delete_question_popover')}</Text>
+                    </PopoverBody>
+                    <PopoverFooter>
+                      <Button
+                        variant="outline"
+                        variantColor="red"
+                        onClick={() => onDeleteEntry && onDeleteEntry()}
+                      >
+                        {t('delete')}
+                      </Button>
+                    </PopoverFooter>
+                  </PopoverContent>
+                </>
+              )}
+            </Popover>
+          </Span>
+        </Flex>
       </Form>
     </FormContainer>
 

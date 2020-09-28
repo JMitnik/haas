@@ -1,35 +1,75 @@
 import React, { useState } from 'react';
+import styled from 'styled-components/macro';
 
-import { Grid } from '@haas/ui';
+import { Button, Grid, Menu, MenuButton, MenuList } from '@chakra-ui/core';
+import { ReactComponent as ContextButtonSVG } from 'assets/icons/icon-more.svg';
+import { Div } from '@haas/ui';
 import { TableRowProps } from 'components/Table/TableTypes';
 
-const TableRow = ({ headers, data, index }: TableRowProps) => {
+import { ExpandedRowContainer, RowContainer } from './TableStyles';
+
+const TableOptionsContainer = styled(Div)`
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  right: 0;
+  width: 3em;
+
+  button {
+    max-width: 100%;
+  }
+`;
+
+const TableRow = ({ headers, data, index, renderExpandedRow, renderOptions }: TableRowProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const nrCells = headers.length;
   const templateColumns = '1fr '.repeat(nrCells);
 
   return (
-    <Grid
-      paddingLeft="15px"
-      paddingRight="15px"
-      gridRowGap={0}
-      gridColumnGap={5}
-      gridTemplateColumns={templateColumns}
+    <RowContainer
       onClick={() => setIsExpanded(!isExpanded)}
+      mr={renderOptions ? '1em' : ''}
+      enableHover={!!renderExpandedRow}
     >
-      {headers && headers.map(({ accessor, Cell }) => {
-        const result = Object.entries(data).find((property) => property[0] === accessor);
+      <Grid
+        gridTemplateColumns={templateColumns}
+      >
+        {headers && headers.map(({ accessor, Cell }) => {
+          const result = Object.entries(data).find((property) => property[0] === accessor);
 
-        if (result) {
-          return (
-            <Cell value={result[1]} key={`${index}-${result[0]}`} />
-          );
-        }
+          if (result && Cell) {
+            return (
+              <Cell value={result[1]} key={`${index}-${result[0]}`} {...data} />
+            );
+          }
 
-        return null;
-      })}
+          return null;
+        })}
+      </Grid>
 
-    </Grid>
+      <Div>
+        {!!renderOptions && (
+        <TableOptionsContainer>
+          <Menu>
+            <MenuButton size="sm" as={Button}>
+              <ContextButtonSVG />
+            </MenuButton>
+            <MenuList>
+              <>
+                {renderOptions}
+              </>
+            </MenuList>
+          </Menu>
+        </TableOptionsContainer>
+        )}
+      </Div>
+
+      {isExpanded && (
+        <ExpandedRowContainer>
+          {renderExpandedRow}
+        </ExpandedRowContainer>
+      )}
+    </RowContainer>
   );
 };
 

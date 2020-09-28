@@ -1,3 +1,4 @@
+import cookieParser from 'cookie-parser';
 import cors, { CorsOptions } from 'cors';
 import express from 'express';
 
@@ -18,26 +19,23 @@ const main = async () => {
 
   const apollo = await makeApollo();
   const app = express();
-
-  process.on('SIGINT', () => {
-
-  });
-
   const corsOptions: CorsOptions = {
     // Hardcoded for the moment
     origin: (origin, callback) => {
-      const validOrigins = ['dashboard.haas.live', 'client.haas.live', 'haas-dashboard.netlify.app', 'haas-client.netlify.app'];
+      callback(null, true);
+      const validOrigins = ['http://localhost:3002', 'dashboard.haas.live', 'client.haas.live', 'haas-dashboard.netlify.app', 'haas-client.netlify.app'];
 
       if (config.env === 'local' || (origin && validOrigins.find((origin: string) => origin.endsWith(origin)))) {
-        callback(null, true);
+        // callback()
       }
     },
     credentials: true,
   };
 
+  app.use(cookieParser());
   app.use(cors(corsOptions));
 
-  apollo.applyMiddleware({ app });
+  apollo.applyMiddleware({ app, cors: false });
 
   console.log('🏳️\tStarting the server');
 
@@ -47,6 +45,7 @@ const main = async () => {
 };
 
 try {
+  console.log('Starting app');
   main();
 } catch (e) {
   console.log(e);

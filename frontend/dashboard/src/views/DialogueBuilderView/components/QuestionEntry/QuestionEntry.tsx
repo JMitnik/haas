@@ -1,6 +1,5 @@
 import { ApolloError } from 'apollo-client';
 import { Flex, Span } from '@haas/ui';
-import { X } from 'react-feather';
 import { useMutation } from '@apollo/react-hooks';
 import { useParams } from 'react-router';
 import React from 'react';
@@ -9,12 +8,13 @@ import EditButton from 'components/EditButton';
 import deleteQuestionMutation from 'mutations/deleteQuestion';
 import getTopicBuilderQuery from 'queries/getQuestionnaireQuery';
 
+import { useToast } from '@chakra-ui/core';
 import { EdgeConditonProps, QuestionEntryProps, QuestionOptionProps } from '../../DialogueBuilderInterfaces';
 import { OverflowSpan, QuestionEntryContainer, QuestionEntryViewContainer } from './QuestionEntryStyles';
+import { useTranslation } from 'react-i18next';
 import BuilderIcon from './BuilderIcon';
 import CTALabel from './CTALabel';
 import ConditionLabel from './ConditionLabel';
-import DeleteQuestionButton from './DeleteQuestionButton';
 import QuestionEntryForm from '../QuestionEntryForm/QuestionEntryForm';
 import ShowChildQuestion from './ShowChildQuestion';
 
@@ -55,6 +55,8 @@ const QuestionEntryItem = ({ depth,
   onAddExpandChange }
 : QuestionEntryItemProps) => {
   const { customerSlug, dialogueSlug } = useParams();
+  const { t } = useTranslation();
+  const toast = useToast();
 
   const [deleteQuestion] = useMutation(deleteQuestionMutation, {
     variables: {
@@ -69,8 +71,24 @@ const QuestionEntryItem = ({ depth,
         dialogueSlug,
       },
     }],
-    onError: (serverError: ApolloError) => {
-      console.log(serverError);
+    onCompleted: () => {
+      toast({
+        title: t('toast:delete_node'),
+        description: t('toast:delete_node_helper'),
+        status: 'success',
+        position: 'bottom-right',
+        duration: 1500,
+      });
+      onActiveQuestionChange(null);
+    },
+    onError: () => {
+      toast({
+        title: t('toast:something_went_wrong'),
+        description: t('toast:delete_node_error_helper'),
+        status: 'error',
+        position: 'bottom-right',
+        duration: 1500,
+      });
     },
   });
 
@@ -85,23 +103,16 @@ const QuestionEntryItem = ({ depth,
       )}
       <QuestionEntryViewContainer activeCTA={activeQuestion} id={question.id} flexGrow={1}>
         <QuestionEntryContainer flexGrow={1}>
-          <DeleteQuestionButton
-            data-cy="DeleteButton"
-            disabled={(!!activeQuestion && activeQuestion !== question.id) || false}
-            onClick={() => deleteQuestion()}
-          >
-            <X />
-          </DeleteQuestionButton>
 
           <Flex flexDirection="row" width="100%">
             <BuilderIcon type={question.type} Icon={Icon} />
 
             <Flex width="60%" flexDirection="column">
               <Span fontSize="1.4em">
-                Title
+                {t('title')}
               </Span>
               <OverflowSpan data-cy="OverflowSpan">
-                {question.title || 'None'}
+                {question.title || t('none')}
               </OverflowSpan>
             </Flex>
 
@@ -113,9 +124,9 @@ const QuestionEntryItem = ({ depth,
             </Flex>
 
           </Flex>
-          {activeQuestion === question.id
-          && (
+          {activeQuestion === question.id && (
             <QuestionEntryForm
+              onDeleteEntry={deleteQuestion}
               onAddExpandChange={onAddExpandChange}
               parentQuestionType={parentQuestionType}
               parentQuestionId={parentQuestionId}
@@ -143,6 +154,7 @@ const QuestionEntryItem = ({ depth,
       {question.id !== '-1' && (
         <ShowChildQuestion
           amtChildren={question?.children?.length || 0}
+          isDisabled={!!activeQuestion && activeQuestion !== question.id}
           isExpanded={isExpanded}
           onExpandChange={onExpandChange}
         />

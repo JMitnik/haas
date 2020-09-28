@@ -3,6 +3,7 @@ import React from 'react';
 import { Card, CardBody, CardFooter, ColumnFlex, Div, Flex, Text } from '@haas/ui';
 import { Icon } from '@chakra-ui/core';
 import { Icon as IconType } from 'react-feather';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 interface SummaryModuleProps {
@@ -66,47 +67,51 @@ const SummaryModule = ({
   fallbackMetric,
   renderFooterText,
   renderCornerMetric,
-}: SummaryModuleProps) => (
-  <Card bg="white" onClick={onClick}>
-    {!isInFallback ? (
-      <>
-        <CardBody>
-          <Flex>
-            <Div p={2} mr={2}>
-              <Icon size="24px" color="gray.300" as={renderIcon} />
-            </Div>
-            <Div>
-              <ColumnFlex>
-                <Text fontSize="1rem" fontWeight="400" color="gray.400">
-                  {heading}
-                </Text>
-                {typeof renderMetric === 'string' ? (
-                  <Text color="gray.500" pt={1} fontWeight="800">
-                    {renderMetric}
+}: SummaryModuleProps) => {
+  const { t } = useTranslation();
+
+  return (
+    <Card bg="white" onClick={onClick}>
+      {!isInFallback ? (
+        <>
+          <CardBody>
+            <Flex>
+              <Div p={2} mr={2}>
+                <Icon size="24px" color="gray.300" as={renderIcon} />
+              </Div>
+              <Div>
+                <ColumnFlex>
+                  <Text fontSize="1rem" fontWeight="400" color="gray.400">
+                    {heading}
                   </Text>
-                ) : renderMetric}
-              </ColumnFlex>
-            </Div>
-          </Flex>
-          <CornerMetricContainer>
-            {renderCornerMetric}
-          </CornerMetricContainer>
-        </CardBody>
-        <CardFooter bg="gray.100">
-          <Text color="gray.500">
-            {renderFooterText || 'View all'}
-          </Text>
-        </CardFooter>
-      </>
-    ) : (
-      <FallbackContainer>
-        <Text color="gray.400" fontWeight="600" fontSize="1rem">{fallbackMetric}</Text>
-        <Div>
-          <Icon size="150px" color="gray.50" as={renderIcon} />
-        </Div>
-      </FallbackContainer>
-    )}
-  </Card>
-);
+                  {typeof renderMetric === 'string' ? (
+                    <Text color="gray.500" pt={1} fontWeight="800">
+                      {renderMetric}
+                    </Text>
+                  ) : renderMetric}
+                </ColumnFlex>
+              </Div>
+            </Flex>
+            <CornerMetricContainer>
+              {renderCornerMetric}
+            </CornerMetricContainer>
+          </CardBody>
+          <CardFooter bg="gray.100">
+            <Text color="gray.500">
+              {renderFooterText || t('view_all')}
+            </Text>
+          </CardFooter>
+        </>
+      ) : (
+        <FallbackContainer>
+          <Text color="gray.400" fontWeight="600" fontSize="1rem">{fallbackMetric}</Text>
+          <Div>
+            <Icon size="150px" color="gray.50" as={renderIcon} />
+          </Div>
+        </FallbackContainer>
+      )}
+    </Card>
+  );
+};
 
 export default SummaryModule;

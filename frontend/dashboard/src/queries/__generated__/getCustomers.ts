@@ -7,19 +7,19 @@
 // GraphQL query operation: getCustomers
 // ====================================================
 
-export interface getCustomers_customers_settings_colourSettings {
+export interface getCustomers_user_customers_settings_colourSettings {
   __typename: "ColourSettings";
   primary: string;
   secondary: string | null;
 }
 
-export interface getCustomers_customers_settings {
+export interface getCustomers_user_customers_settings {
   __typename: "CustomerSettings";
   logoUrl: string | null;
-  colourSettings: getCustomers_customers_settings_colourSettings | null;
+  colourSettings: getCustomers_user_customers_settings_colourSettings | null;
 }
 
-export interface getCustomers_customers_dialogues {
+export interface getCustomers_user_customers_dialogues {
   __typename: "Dialogue";
   id: string;
   description: string;
@@ -27,15 +27,24 @@ export interface getCustomers_customers_dialogues {
   publicTitle: string | null;
 }
 
-export interface getCustomers_customers {
+export interface getCustomers_user_customers {
   __typename: "Customer";
   id: string;
   name: string;
   slug: string;
-  settings: getCustomers_customers_settings | null;
-  dialogues: getCustomers_customers_dialogues[] | null;
+  settings: getCustomers_user_customers_settings | null;
+  dialogues: getCustomers_user_customers_dialogues[] | null;
+}
+
+export interface getCustomers_user {
+  __typename: "UserType";
+  customers: getCustomers_user_customers[];
 }
 
 export interface getCustomers {
-  customers: getCustomers_customers[];
+  user: getCustomers_user | null;
+}
+
+export interface getCustomersVariables {
+  userId: string;
 }

@@ -1,7 +1,10 @@
 import { ApolloError, ApolloServer } from 'apollo-server-express';
+import { applyMiddleware } from 'graphql-middleware';
 
 import { APIContext } from '../types/APIContext';
 import Sentry from './sentry';
+import authShield from './auth';
+import constructSession from '../models/auth/constructContextSession';
 import prisma from './prisma';
 import schema from './schema';
 
@@ -9,9 +12,10 @@ const makeApollo = async () => {
   console.log('💼\tBootstrapping Graphql Engine Apollo');
 
   const apollo: ApolloServer = new ApolloServer({
-    schema,
-    context: (ctx): APIContext => ({
+    schema: applyMiddleware(schema, authShield),
+    context: async (ctx): Promise<APIContext> => ({
       ...ctx,
+      session: await constructSession(ctx),
       prisma,
     }),
     plugins: [
@@ -21,7 +25,7 @@ const makeApollo = async () => {
             if (!ctx.operation) return;
 
             ctx.errors.forEach((error) => {
-              if (error instanceof ApolloError) return;
+              if (error.originalError instanceof ApolloError) return;
 
               Sentry.withScope((scope) => {
                 scope.setTag('kind', ctx.operation?.name?.kind.toString() || '');

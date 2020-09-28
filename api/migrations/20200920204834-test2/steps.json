@@ -1,0 +1,14 @@
+{
+  "version": "0.3.14-fixed",
+  "steps": [
+    {
+      "tag": "UpdateEnum",
+      "enum": "SystemPermissionEnum",
+      "createdValues": [
+        "CAN_BUILD_DIALOGUE",
+        "CAN_VIEW_DIALOGUE",
+        "CAN_DELETE_DIALOGUE"
+      ]
+    }
+  ]
+}

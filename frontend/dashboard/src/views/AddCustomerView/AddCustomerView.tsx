@@ -14,7 +14,8 @@ import CustomerForm from 'components/CustomerForm';
 import parseOptionalBoolean from 'utils/parseOptionalBoolean';
 
 import { createNewCustomer } from '../../mutations/createNewCustomer';
-import getCustomerQuery from '../../queries/getCustomersQuery';
+import { useUser } from '../../providers/UserProvider';
+import getCustomersOfUser from '../../queries/getCustomersOfUser';
 
 interface FormDataProps {
   name: string;
@@ -38,6 +39,7 @@ const schema = yup.object().shape({
 const AddCustomerView = () => {
   const history = useHistory();
   const toast = useToast();
+  const { user, refreshUser } = useUser();
 
   const form = useForm<FormDataProps>({
     mode: 'onChange',
@@ -54,6 +56,8 @@ const AddCustomerView = () => {
         isClosable: true,
       });
 
+      refreshUser();
+
       setTimeout(() => {
         history.push('/');
       }, 500);
@@ -67,7 +71,12 @@ const AddCustomerView = () => {
         isClosable: true,
       });
     },
-    refetchQueries: [{ query: getCustomerQuery }],
+    refetchQueries: [{
+      query: getCustomersOfUser,
+      variables: {
+        userId: user?.id,
+      },
+    }],
   });
 
   const onSubmit = (formData: FormDataProps) => {

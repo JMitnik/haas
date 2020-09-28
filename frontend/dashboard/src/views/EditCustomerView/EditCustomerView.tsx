@@ -15,8 +15,10 @@ import CustomerForm from 'components/CustomerForm';
 import booleanToNumber from 'utils/booleanToNumber';
 import parseOptionalBoolean from 'utils/parseOptionalBoolean';
 
+import { queryMe, useUser } from 'providers/UserProvider';
+import { useTranslation } from 'react-i18next';
 import editCustomerMutation from '../../mutations/editCustomer';
-import getCustomerQuery from '../../queries/getCustomersQuery';
+import getCustomersOfUser from '../../queries/getCustomersOfUser';
 import getEditCustomerData from '../../queries/getEditCustomer';
 
 interface FormDataProps {
@@ -60,6 +62,9 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
   const { customerSlug } = useParams();
   const history = useHistory();
   const { setActiveCustomer } = useCustomer();
+  const { hardRefreshUser } = useUser();
+  const { t } = useTranslation();
+  const toast = useToast();
 
   const form = useForm<FormDataProps>({
     resolver: yupResolver(schema),
@@ -73,10 +78,6 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
     mode: 'onBlur',
   });
 
-  console.log(form.formState.isValid);
-
-  const toast = useToast();
-
   const [editCustomer, { loading: isLoading, error: serverErrors }] = useMutation(editCustomerMutation, {
     onCompleted: (result: any) => {
       const customer: any = result.editCustomer;
@@ -88,15 +89,9 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
         description: 'The business has been updated',
         status: 'success',
         position: 'bottom-right',
-        duration: 300,
+        duration: 1500,
       });
-
-      setTimeout(() => {
-        setActiveCustomer(customer);
-        history.push('/');
-      }, 300);
     },
-    refetchQueries: [{ query: getCustomerQuery }],
     onError: () => {
       toast({
         title: 'Error',
@@ -135,13 +130,15 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
         setTimeout(() => {
           history.push(`/dashboard/b/${formData.slug}`);
         }, 1000);
+      } else {
+        history.push(`/dashboard/b/${customerSlug}`);
       }
     });
   };
 
   return (
     <>
-      <PageTitle>Edit business settings</PageTitle>
+      <PageTitle>{t('views:edit_business_settings_view')}</PageTitle>
       <motion.div initial={{ opacity: 0, y: 100 }} animate={{ opacity: 1, y: 0 }}>
         <FormContainer>
           <CustomerForm

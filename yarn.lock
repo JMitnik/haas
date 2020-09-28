@@ -3767,12 +3767,12 @@
     style-value-types "^3.1.7"
     tslib "^1.10.0"
 
-"@prisma/cli@^2.3.0":
+"@prisma/cli@2.3.0":
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/@prisma/cli/-/cli-2.3.0.tgz#ddc89de63c2fcb88199fdd1b490a7616a2d32de1"
   integrity sha512-S84VeeUR3I2Z1fkBh3x42KmVyFgiX4USzIN5N5EDyoWC8BSlMVs2eHeLlhHOtx68sDz5oNo/YEIM2bkU8cUZKA==
 
-"@prisma/client@^2.3.0":
+"@prisma/client@2.3.0":
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/@prisma/client/-/client-2.3.0.tgz#3979d973e0eececad5387c791aa1dd63316fc690"
   integrity sha512-mlXV/VdOKjEEoZPOmFOy7KJPecYGV5XSVXGsti0F1kkShpGcMvhPkpKhNOwIb/8muUTeN5NoNqEGqKDD5XKw3w==
@@ -4844,7 +4844,7 @@
   resolved "https://registry.yarnpkg.com/@types/color-name/-/color-name-1.1.1.tgz#1c1261bbeaa10a8055bbc5d8ab84b7b2afc846a0"
   integrity sha512-rr+OQyAjxze7GgWrSaJwydHStIhHq2lvY3BOC2Mj7KnzI7XK0Uw1TOOdI9lDoajEbSWLiYgoo4f1R51erQfhPQ==
 
-"@types/color@^3.0.1":
+"@types/color@3.0.1", "@types/color@^3.0.1":
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/@types/color/-/color-3.0.1.tgz#2900490ed04da8116c5058cd5dba3572d5a25071"
   integrity sha512-oeUWVaAwI+xINDUx+3F2vJkl/vVB03VChFF/Gl3iQCdbcakjuoJyMOba+3BXRtnBhxZ7uBYqQBi9EpLnvSoztA==
@@ -4862,6 +4862,13 @@
   version "0.5.3"
   resolved "https://registry.yarnpkg.com/@types/content-disposition/-/content-disposition-0.5.3.tgz#0aa116701955c2faa0717fc69cd1596095e49d96"
   integrity sha512-P1bffQfhD3O4LW0ioENXUhZ9OIa0Zn+P7M+pWgkCKaT53wVLSq0mrKksCID/FGHpFhRSxRGhgrQmfhRuzwtKdg==
+
+"@types/cookie-parser@^1.4.2":
+  version "1.4.2"
+  resolved "https://registry.yarnpkg.com/@types/cookie-parser/-/cookie-parser-1.4.2.tgz#e4d5c5ffda82b80672a88a4281aaceefb1bd9df5"
+  integrity sha512-uwcY8m6SDQqciHsqcKDGbo10GdasYsPCYkH3hVegj9qAah6pX5HivOnOuI3WYmyQMnOATV39zv/Ybs0bC/6iVg==
+  dependencies:
+    "@types/express" "*"
 
 "@types/cookies@*":
   version "0.7.4"
@@ -5061,6 +5068,11 @@
   dependencies:
     jest-diff "^25.2.1"
     pretty-format "^25.2.1"
+
+"@types/js-cookie@^2.2.6":
+  version "2.2.6"
+  resolved "https://registry.yarnpkg.com/@types/js-cookie/-/js-cookie-2.2.6.tgz#f1a1cb35aff47bc5cfb05cb0c441ca91e914c26f"
+  integrity sha512-+oY0FDTO2GYKEV0YPvSshGq9t7YozVkgvXLty7zogQNuCxBhT9/3INX9Q7H1aRZ4SUDRXAKlJuA4EA5nTt7SNw==
 
 "@types/json-schema@^7.0.3":
   version "7.0.4"
@@ -5579,6 +5591,11 @@
   integrity sha512-9T1auFmbPZoxHz0enUFlUuKRy3it01R+hlggyVUMtnCTQRunsQYifnSGb8hET4Xo8yiC0o0r1paW3ud5+rbURg==
   dependencies:
     "@types/yargs-parser" "*"
+
+"@types/yup@0.29.6":
+  version "0.29.6"
+  resolved "https://registry.yarnpkg.com/@types/yup/-/yup-0.29.6.tgz#0920303c0298ac53945e9feb0b4dcad79cc755b2"
+  integrity sha512-YPDo5L5uHyxQ4UkyJST+33stD8Z6IT9fvmKyaPAGxkZ6q19foEi6sQGkmqBvzSyRPdstFEeJiS2rKuTn8rfO5g==
 
 "@types/yup@^0.29.3":
   version "0.29.3"
@@ -9147,6 +9164,14 @@ convert-source-map@^0.3.3:
   resolved "https://registry.yarnpkg.com/convert-source-map/-/convert-source-map-0.3.5.tgz#f1d802950af7dd2631a1febe0596550c86ab3190"
   integrity sha1-8dgClQr33SYxof6+BZZVDIarMZA=
 
+cookie-parser@^1.4.5:
+  version "1.4.5"
+  resolved "https://registry.yarnpkg.com/cookie-parser/-/cookie-parser-1.4.5.tgz#3e572d4b7c0c80f9c61daf604e4336831b5d1d49"
+  integrity sha512-f13bPUj/gG/5mDr+xLmSxxDsB9DQiTIfhJS/sqjrmfAWiAN+x2O4i/XguTL9yDZ+/IFDanJ+5x7hC4CXT9Tdzw==
+  dependencies:
+    cookie "0.4.0"
+    cookie-signature "1.0.6"
+
 cookie-signature@1.0.6:
   version "1.0.6"
   resolved "https://registry.yarnpkg.com/cookie-signature/-/cookie-signature-1.0.6.tgz#e303a882b342cc3ee8ca513a79999734dab3ae2c"
@@ -12662,12 +12687,28 @@ graphql-import@^1.0.0-beta.1:
     "@graphql-toolkit/schema-merging" "0.10.3"
     "@graphql-toolkit/url-loader" "0.10.3"
 
+graphql-middleware@^4.0.2:
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/graphql-middleware/-/graphql-middleware-4.0.2.tgz#eb589bf428e1795e48cd6a3cfeeba0807b996ebd"
+  integrity sha512-ESVDvMXeN00S1BNsjNS18uExcR16J8zbT31CuKcpyeBa7IMbidG0Pnqnu5P1wKkJLmPmKOfCljWlhXpD/Fawqg==
+  dependencies:
+    graphql-tools "^4.0.5"
+
 graphql-request@^1.5.0:
   version "1.8.2"
   resolved "https://registry.yarnpkg.com/graphql-request/-/graphql-request-1.8.2.tgz#398d10ae15c585676741bde3fc01d5ca948f8fbe"
   integrity sha512-dDX2M+VMsxXFCmUX0Vo0TopIZIX4ggzOtiCsThgtrKR4niiaagsGTDIHj3fsOMFETpa064vzovI+4YV4QnMbcg==
   dependencies:
     cross-fetch "2.2.2"
+
+graphql-shield@^7.3.5:
+  version "7.3.5"
+  resolved "https://registry.yarnpkg.com/graphql-shield/-/graphql-shield-7.3.5.tgz#7514028c73f2dc858924a17b342e576ea0132f32"
+  integrity sha512-4NtGoEGTXMj4FzXM0zZur9Vp8+psDVQmJ93yr3KT2dU36Pr7yKvddPKE/0/3m9UoRGywIEoAFt0RnOsBRNFl0w==
+  dependencies:
+    "@types/yup" "0.29.6"
+    object-hash "^2.0.3"
+    yup "^0.29.0"
 
 graphql-subscriptions@^1.0.0:
   version "1.1.0"
@@ -12709,7 +12750,7 @@ graphql-tools@5.0.0:
     tslib "^1.11.1"
     uuid "^7.0.3"
 
-graphql-tools@^4.0.0:
+graphql-tools@^4.0.0, graphql-tools@^4.0.5:
   version "4.0.8"
   resolved "https://registry.yarnpkg.com/graphql-tools/-/graphql-tools-4.0.8.tgz#e7fb9f0d43408fb0878ba66b522ce871bafe9d30"
   integrity sha512-MW+ioleBrwhRjalKjYaLQbr+920pHBgy9vM/n47sswtns8+96sRn5M/G+J1eu7IMeKWiN/9p6tmwCHU7552VJg==
@@ -15087,6 +15128,11 @@ js-beautify@^1.6.14:
     glob "^7.1.3"
     mkdirp "~1.0.3"
     nopt "^4.0.3"
+
+js-cookie@^2.2.1:
+  version "2.2.1"
+  resolved "https://registry.yarnpkg.com/js-cookie/-/js-cookie-2.2.1.tgz#69e106dc5d5806894562902aa5baec3744e9b2b8"
+  integrity sha512-HvdH2LzI/EAZcUwA8+0nKNtWHqS+ZmijLA30RwZA0bo7ToCckjK5MkGhjED9KoRcXO6BaGI3I9UIzSA1FKFPOQ==
 
 "js-tokens@^3.0.0 || ^4.0.0", js-tokens@^4.0.0:
   version "4.0.0"
@@ -17518,7 +17564,7 @@ object-hash@^1.3.1:
   resolved "https://registry.yarnpkg.com/object-hash/-/object-hash-1.3.1.tgz#fde452098a951cb145f039bb7d455449ddc126df"
   integrity sha512-OSuu/pU4ENM9kmREg0BdNrUDIl1heYa4mBZacJc+vVWz4GtAwu7jO8s4AIt2aGRUTqxykpWzI3Oqnsm13tTMDA==
 
-object-hash@^2.0.1:
+object-hash@^2.0.1, object-hash@^2.0.3:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/object-hash/-/object-hash-2.0.3.tgz#d12db044e03cd2ca3d77c0570d87225b02e1e6ea"
   integrity sha512-JPKn0GMu+Fa3zt3Bmr66JhokJU5BaNBIh4ZeTlaCBzrBsOeXzwcKKAK1tbLiPKgvwmPXsDvvLHoWh5Bm7ofIYg==
@@ -22183,7 +22229,7 @@ symbol.prototype.description@^1.0.0:
     es-abstract "^1.17.0-next.1"
     has-symbols "^1.0.1"
 
-synchronous-promise@^2.0.10:
+synchronous-promise@^2.0.10, synchronous-promise@^2.0.13:
   version "2.0.13"
   resolved "https://registry.yarnpkg.com/synchronous-promise/-/synchronous-promise-2.0.13.tgz#9d8c165ddee69c5a6542862b405bc50095926702"
   integrity sha512-R9N6uDkVsghHePKh1TEqbnLddO2IY25OcsksyFp/qBe7XYd0PVbKEWxhcdMhpLzE1I6skj5l4aEZ3CRxcbArlA==
@@ -24342,6 +24388,19 @@ yn@3.1.1:
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/yn/-/yn-3.1.1.tgz#1e87401a09d767c1d5eab26a6e4c185182d2eb50"
   integrity sha512-Ux4ygGWsu2c7isFWe8Yu1YluJmqVhxqK2cLXNQA5AcC3QfbGNpM7fu0Y8b/z16pXLnFxZYvWhd3fhBY9DLmC6Q==
+
+yup@^0.29.0:
+  version "0.29.3"
+  resolved "https://registry.yarnpkg.com/yup/-/yup-0.29.3.tgz#69a30fd3f1c19f5d9e31b1cf1c2b851ce8045fea"
+  integrity sha512-RNUGiZ/sQ37CkhzKFoedkeMfJM0vNQyaz+wRZJzxdKE7VfDeVKH8bb4rr7XhRLbHJz5hSjoDNwMEIaKhuMZ8gQ==
+  dependencies:
+    "@babel/runtime" "^7.10.5"
+    fn-name "~3.0.0"
+    lodash "^4.17.15"
+    lodash-es "^4.17.11"
+    property-expr "^2.0.2"
+    synchronous-promise "^2.0.13"
+    toposort "^2.0.2"
 
 yup@^0.29.1:
   version "0.29.1"

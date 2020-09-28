@@ -19,9 +19,6 @@ class RoleService {
       where: { customerId },
       take: paginationOpts.limit || undefined,
       skip: paginationOpts.offset || undefined,
-      include: {
-        permissions: true,
-      },
     });
 
     const totalRoles = await prisma.role.count({ where: { customerId } });
@@ -65,9 +62,6 @@ class RoleService {
       where: { Customer: {
         slug: customerSlug,
       } },
-      include: {
-        permissions: true,
-      },
     });
 
     const rolesWithNrPermisisons = roles.map((role) => ({

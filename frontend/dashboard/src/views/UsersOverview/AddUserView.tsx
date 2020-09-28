@@ -47,15 +47,14 @@ const AddUserView = () => {
     resolver: yupResolver(schema),
     mode: 'onBlur',
   });
-  const { customerSlug } = useParams();
-  const customer = useCustomer();
+  const { activeCustomer } = useCustomer();
 
   const { t } = useTranslation();
 
-  const { data } = useQuery(getRolesQuery, { variables: { customerSlug } });
+  const { data } = useQuery(getRolesQuery, { variables: { customerSlug: activeCustomer?.slug } });
   const [addUser, { loading: isLoading }] = useMutation(createAddMutation, {
     onCompleted: () => {
-      history.push(`/dashboard/b/${customerSlug}/users/`);
+      history.push(`/dashboard/b/${activeCustomer?.slug}/users/`);
     },
     onError: (serverError: ApolloError) => {
       console.log(serverError);
@@ -63,7 +62,7 @@ const AddUserView = () => {
     refetchQueries: [
       {
         query: getUsersQuery,
-        variables: { customerSlug },
+        variables: { customerSlug: activeCustomer?.slug },
       },
     ],
   });
@@ -74,7 +73,7 @@ const AddUserView = () => {
   const handleSubmit = (formData: FormDataProps) => {
     const optionInput = {
       // TODO: Not robust yet
-      customerId: customer.storageCustomer.id,
+      customerId: activeCustomer?.id,
       roleId: formData.role?.value || null,
       firstName: formData.firstName || '',
       lastName: formData.lastName || '',
@@ -84,7 +83,7 @@ const AddUserView = () => {
 
     addUser({
       variables: {
-        customerSlug,
+        slug: activeCustomer?.slug,
         input: optionInput,
       },
     });
@@ -92,17 +91,16 @@ const AddUserView = () => {
 
   return (
     <>
-      <PageTitle>Create a new user</PageTitle>
+      <PageTitle>{t('views:create_user_view')}</PageTitle>
 
       <motion.div initial={{ opacity: 0, y: 100 }} animate={{ opacity: 1, y: 0 }}>
-
         <FormContainer>
           <Form onSubmit={form.handleSubmit(handleSubmit)}>
             <FormSection id="about">
               <Div>
-                <H3 color="default.text" fontWeight={500} pb={2}>About the user</H3>
+                <H3 color="default.text" fontWeight={500} pb={2}>{t('user:about_user')}</H3>
                 <Muted color="gray.600">
-                  Tell us about the user, and to which scope it applies (question/dialogue)
+                  {t('user:about_user_helper')}
                 </Muted>
               </Div>
               <Div>
@@ -159,9 +157,9 @@ const AddUserView = () => {
 
             <FormSection id="roles">
               <Div>
-                <H3 color="default.text" fontWeight={500} pb={2}>Roles</H3>
+                <H3 color="default.text" fontWeight={500} pb={2}>{t('roles')}</H3>
                 <Muted color="gray.600">
-                  Decide and assign roles for control access
+                  {t('user:roles_helper')}
                 </Muted>
               </Div>
               <Div>
@@ -199,7 +197,7 @@ const AddUserView = () => {
               >
                 Create
               </Button>
-              <Button variant="outline" onClick={() => history.push('/')}>Cancel</Button>
+              <Button variant="outline" onClick={() => history.goBack()}>Cancel</Button>
             </ButtonGroup>
           </Form>
         </FormContainer>

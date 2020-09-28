@@ -9,19 +9,23 @@ import { Activity, Download } from 'react-feather';
 import { Button, Icon } from '@chakra-ui/core';
 import {
   getDialogueSessionConnection as CustomerSessionConnection,
+  getDialogueSessionConnection_customer_dialogue_sessionConnection_sessions_nodeEntries as NodeEntry,
+  getDialogueSessionConnection_customer_dialogue_sessionConnection_sessions as Session,
 } from 'queries/__generated__/getDialogueSessionConnection';
-import { Div, PageTitle, Span } from '@haas/ui';
+import { Div, Flex, Hr, PageTitle, Span, Text } from '@haas/ui';
 import { useTranslation } from 'react-i18next';
+
+import { QuestionNodeTypeEnum } from 'types/globalTypes';
 import DatePicker from 'components/DatePicker/DatePicker';
-import InteractionsTable from 'components/Table/Table';
+import MultiChoiceNodeIcon from 'components/Icons/MultiChoiceNodeIcon';
 import SearchBar from 'components/SearchBar/SearchBar';
+import SliderNodeIcon from 'components/Icons/SliderNodeIcon';
+import Table from 'components/Table/Table';
 import getDialogueSessionConnectionQuery from 'queries/getDialogueSessionConnectionQuery';
 
-import { InputContainer, InputOutputContainer,
-  InteractionsOverviewContainer, OutputContainer } from './InteractionOverviewStyles';
-import { InteractionCTACell, InteractionDateCell,
-  InteractionUserCell, ScoreCell } from './TableCell/TableCell';
-import Row from './TableRow/InteractionsTableRow';
+import { InteractionDateCell, InteractionPathCell,
+  InteractionUserCell, ScoreCell } from './InteractionTableCells';
+import { InteractionDetailQuestionEntry, InteractionsOverviewContainer } from './InteractionOverviewStyles';
 
 interface TableProps {
   activeStartDate: Date | null;
@@ -35,12 +39,94 @@ interface TableProps {
   }[]
 }
 
-const HEADERS = [
-  { Header: 'User', accessor: 'id', Cell: InteractionUserCell },
-  { Header: 'Date', accessor: 'createdAt', Cell: InteractionDateCell },
-  { Header: 'Call-to-action', accessor: 'nodeEntries', Cell: InteractionCTACell },
-  { Header: 'SCORE', accessor: 'score', Cell: ScoreCell },
+const tableHeaders = [
+  { Header: 'user', accessor: 'id', Cell: InteractionUserCell },
+  { Header: 'date', accessor: 'createdAt', Cell: InteractionDateCell },
+  { Header: 'interaction_path', accessor: 'nodeEntries', Cell: InteractionPathCell },
+  { Header: 'score', accessor: 'score', Cell: ScoreCell },
 ];
+
+const ExpandedInteractionRow = ({ data }: { data: Session }) => {
+  const { t } = useTranslation();
+  return (
+    <Div useFlex flexDirection="column" backgroundColor="gray.100" gridColumn="1 / -1">
+      <Div padding={25}>
+        <Div marginBottom={10} useFlex flexDirection="column">
+          <Div useFlex flexDirection="row">
+            <Div width="51%">
+              <Text color="gray.400" fontSize="1.2rem" fontWeight="600">{t('interactions:user_data')}</Text>
+              <Text color="gray.400" fontWeight="300">{t('interactions:user_information')}</Text>
+            </Div>
+          </Div>
+          <Div />
+        </Div>
+        <Hr style={{ marginBottom: '15px' }} color="#999999" />
+        <Div position="relative" useFlex flexDirection="row">
+          <Div width="50%">
+            <Text color="gray.400" fontSize="1.2rem" fontWeight="600">{t('interactions:watch_journey_heading')}</Text>
+          </Div>
+          <InteractionDetailQuestionEntry useFlex flexDirection="column" width="50%">
+            {/* TODO: Make each mapped entry an individual component */}
+            {data.nodeEntries.map((nodeEntry: any, index: any) => {
+              const { id, relatedNode } = nodeEntry;
+
+              return (
+                <Div marginBottom={20} useFlex flexDirection="column" key={`${id}-${index}`}>
+                  <Div useFlex flexDirection="row">
+                    <Div
+                      zIndex={1}
+                      alignSelf="center"
+                      padding={8}
+                      marginRight="10%"
+                      backgroundColor="gray.100"
+                      borderRadius="90px"
+                      border="1px solid #c0bcbb"
+                    >
+                      {relatedNode?.type === 'SLIDER' ? <SliderNodeIcon /> : <MultiChoiceNodeIcon /> }
+                    </Div>
+                    <Div useFlex flexDirection="column">
+                      <Div>
+                        <Text fontWeight="300" color="gray.500" fontSize="0.8rem">{t('interactions:you_asked')}</Text>
+                        <Text fontWeight="600" color="gray.500" fontSize="0.8rem">{relatedNode?.title || 'N/A'}</Text>
+                      </Div>
+                      <Div mt={4}>
+                        <Text fontWeight="300" color="gray.500" fontSize="0.8rem">{t('interactions:they_answered')}</Text>
+                        <Text fontWeight="600" color="gray.500" fontSize="0.8rem">
+                          <InteractionTableValue entry={nodeEntry} />
+                        </Text>
+                      </Div>
+                    </Div>
+                  </Div>
+                </Div>
+              );
+            })}
+          </InteractionDetailQuestionEntry>
+        </Div>
+      </Div>
+    </Div>
+  );
+};
+
+const InteractionTableValue = ({ entry }: { entry: NodeEntry }) => {
+  if (!entry) return <Div>test</Div>;
+
+  switch (entry.relatedNode?.type) {
+    case QuestionNodeTypeEnum.SLIDER:
+      return <>{entry.value?.sliderNodeEntry}</>;
+
+    case QuestionNodeTypeEnum.CHOICE:
+      return <>{entry.value?.choiceNodeEntry}</>;
+
+    case QuestionNodeTypeEnum.REGISTRATION:
+      return <>{entry.value?.registrationNodeEntry}</>;
+
+    case QuestionNodeTypeEnum.TEXTBOX:
+      return <>{entry.value?.textboxNodeEntry}</>;
+
+    default:
+      return (<>N/A available</>);
+  }
+};
 
 const InteractionsOverview = () => {
   const { dialogueSlug, customerSlug } = useParams();
@@ -56,7 +142,7 @@ const InteractionsOverview = () => {
     activeSearchTerm: qs.parse(location.search, { ignoreQueryPrefix: true })?.search || '',
     pageIndex: 0,
     pageSize: 8,
-    sortBy: [{ by: 'score', desc: true }],
+    sortBy: [{ by: 'createdAt', desc: true }],
   });
 
   const sessions = data?.customer?.dialogue?.sessionConnection?.sessions || [];
@@ -112,20 +198,17 @@ const InteractionsOverview = () => {
         <Icon as={Activity} mr={1} />
         {t('views:interactions_view')}
       </PageTitle>
-      {/* TODO: Make a ViewTitle text-component */}
-      <InputOutputContainer mb={4}>
-        <OutputContainer>
-          {/* TODO: Make a button component out of this */}
-          <Button
-            onClick={handleExportCSV}
-            leftIcon={Download}
-            size="sm"
-          >
-            <Span fontWeight="bold">Export to CSV</Span>
-          </Button>
-        </OutputContainer>
 
-        <InputContainer>
+      <Flex mb={4} alignItems="center" justifyContent="space-between">
+        <Button
+          onClick={handleExportCSV}
+          leftIcon={Download}
+          size="sm"
+        >
+          <Span fontWeight="bold">{t('export_to_csv')}</Span>
+        </Button>
+
+        <Flex alignItems="center">
           <DatePicker
             activeStartDate={paginationProps.activeStartDate}
             activeEndDate={paginationProps.activeEndDate}
@@ -135,19 +218,16 @@ const InteractionsOverview = () => {
             activeSearchTerm={paginationProps.activeSearchTerm}
             onSearchTermChange={handleSearchTermChange}
           />
-        </InputContainer>
-
-      </InputOutputContainer>
-      <Div borderRadius="lg" flexGrow={1} backgroundColor="white" mb="1%">
-        <InteractionsTable
-          loading={loading}
-          headers={HEADERS}
-          paginationProps={{ ...paginationProps, pageCount, pageIndex }}
-          onPaginationChange={setPaginationProps}
-          data={sessions}
-          CustomRow={Row}
-        />
-      </Div>
+        </Flex>
+      </Flex>
+      <Table
+        loading={loading}
+        headers={tableHeaders}
+        paginationProps={{ ...paginationProps, pageCount, pageIndex }}
+        onPaginationChange={setPaginationProps}
+        data={sessions}
+        renderExpandedRowContainer={(input) => <ExpandedInteractionRow data={input} />}
+      />
     </InteractionsOverviewContainer>
   );
 };
