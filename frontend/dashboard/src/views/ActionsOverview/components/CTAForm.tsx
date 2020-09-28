@@ -71,6 +71,7 @@ const CTA_TYPES = [
   { label: 'Opinion', value: 'TEXTBOX', icon: OpinionIcon },
   { label: 'Register', value: 'REGISTRATION', RegisterIcon },
   { label: 'Link', value: 'LINK', LinkIcon },
+  { label: 'Share', value: 'SHARE', LinkIcon },
 ];
 
 const LINK_TYPES = [
@@ -296,9 +297,44 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange, on
                   />
                   <FormErrorMessage>{form.errors.ctaType?.value?.message}</FormErrorMessage>
                 </FormControl>
+
+                {watchType?.value === 'SHARE' && (
+                  <>
+                    {/* TODO: Change default value and error */}
+                    <FormControl isRequired>
+                      <FormLabel htmlFor="ctaType">Button text</FormLabel>
+                      <InputHelper>What is the text on the share button?</InputHelper>
+                      <Input
+                        name="tooltip"
+                        placeholder="Share..."
+                        leftEl={<Type />}
+                        defaultValue={title}
+                        ref={form.register({ required: true })}
+                      />
+                      <FormErrorMessage>{form.errors.ctaType?.value?.message}</FormErrorMessage>
+                    </FormControl>
+
+                    {/* TODO: Change default value and error */}
+                    <FormControl isRequired>
+                      <FormLabel htmlFor="url">Url</FormLabel>
+                      <InputHelper>What is the text on the share button?</InputHelper>
+                      <Input
+                        name="url"
+                        placeholder="https://share/url..."
+                        leftEl={<Type />}
+                        defaultValue={title}
+                        ref={form.register({ required: true })}
+                      />
+                      <FormErrorMessage>{form.errors.ctaType?.value?.message}</FormErrorMessage>
+                    </FormControl>
+                  </>
+
+          )}
+
               </InputGrid>
             </Div>
           </FormSection>
+
           {watchType?.value === 'LINK' && (
           <FormSection id="links">
             <Div>
