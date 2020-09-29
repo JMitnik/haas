@@ -7,7 +7,7 @@ import { sub } from 'date-fns';
 import { useHistory, useParams } from 'react-router-dom';
 import { useQuery } from '@apollo/react-hooks';
 import { useTranslation } from 'react-i18next';
-import React, { useState } from 'react';
+import React, { useReducer, useState } from 'react';
 import gql from 'graphql-tag';
 import styled, { css } from 'styled-components/macro';
 
@@ -21,13 +21,13 @@ import PositivePathsModule from './Modules/PositivePathsModule/PositivePathsModu
 import ScoreGraphModule from './Modules/ScoreGraphModule';
 import SummaryModule from './Modules/SummaryModules/SummaryModule';
 
-// TODO: Bring it back
-// const filterMap = new Map([
-//   ['Last 24h', 1],
-//   ['Last week', 7],
-//   ['Last month', 30],
-//   ['Last year', 365],
-// ]);
+type ActiveDateType = 'last_hour' | 'last_day' | 'last_week' | 'last_month' | 'last_year';
+
+interface ActiveDateState {
+  dateLabel: string;
+  startDate: Date;
+  compareStatisticStartDate: Date;
+}
 
 const DialogueViewContainer = styled(Div)`
   ${() => css`
@@ -37,16 +37,62 @@ const DialogueViewContainer = styled(Div)`
   `}
 `;
 
+interface ActiveDateAction {
+  type: ActiveDateType;
+  payload: ActiveDateState;
+}
+
+const dateReducer = (state: ActiveDateState, action: ActiveDateAction): ActiveDateState => {
+  switch (action.type) {
+    case 'last_hour':
+      return {
+        startDate: sub(new Date(), { hours: 1 }),
+        compareStatisticStartDate: sub(new Date(), { hours: 2 }),
+        dateLabel: 'last_hour',
+      };
+
+    case 'last_day':
+      return {
+        startDate: sub(new Date(), { hours: 24 }),
+        compareStatisticStartDate: sub(new Date(), { days: 2 }),
+        dateLabel: 'last_day',
+      };
+    case 'last_month':
+      return {
+        startDate: sub(new Date(), { months: 1 }),
+        compareStatisticStartDate: sub(new Date(), { months: 2 }),
+        dateLabel: 'last_month',
+      };
+    case 'last_week':
+      return {
+        startDate: sub(new Date(), { weeks: 1 }),
+        compareStatisticStartDate: sub(new Date(), { weeks: 2 }),
+        dateLabel: 'last_week',
+      };
+    case 'last_year':
+      return {
+        startDate: sub(new Date(), { years: 1 }),
+        compareStatisticStartDate: sub(new Date(), { years: 2 }),
+        dateLabel: 'last_year',
+      };
+    default:
+      return {
+        startDate: sub(new Date(), { weeks: 1 }),
+        compareStatisticStartDate: sub(new Date(), { weeks: 2 }),
+        dateLabel: 'last_month',
+      };
+  }
+};
 const getDialogueStatistics = gql`
-  query dialogueStatistics($customerSlug: String!, $dialogueSlug: String!, $prevDateFilter: DialogueFilterInputType) {
+  query dialogueStatistics($customerSlug: String!, $dialogueSlug: String!, $prevDateFilter: DialogueFilterInputType, $statisticsDateFilter: DialogueFilterInputType) {
     customer(slug: $customerSlug) {
       id
       dialogue(where: { slug: $dialogueSlug }) {
         id
-        countInteractions
+        countInteractions(input: $statisticsDateFilter)
         thisWeekAverageScore: averageScore
         previousScore: averageScore(input: $prevDateFilter)
-        sessions(take: 4) {
+        sessions(take: 3) {
           id
           createdAt
           score
@@ -64,7 +110,7 @@ const getDialogueStatistics = gql`
             }
           }
         }
-        statistics {
+        statistics(input: $statisticsDateFilter) {
           topPositivePath {
             answer
             quantity
@@ -101,22 +147,24 @@ const calcScoreIncrease = (currentScore: number, prevScore: number) => {
 
 const DialogueView = () => {
   const { dialogueSlug, customerSlug } = useParams();
-  const [prevWeekDate] = useState(() => sub(new Date(), {
-    weeks: 1,
-  }).toISOString());
+  const [activeDateState, dispatch] = useReducer(dateReducer, {
+    startDate: sub(new Date(), { weeks: 1 }),
+    compareStatisticStartDate: sub(new Date(), { weeks: 2 }),
+    dateLabel: 'last_week',
+  });
 
   const history = useHistory();
-
-  // FIXME: If this is started with anything else start result is undefined :S
-  // const [activeFilter, setActiveFilter] = useState(() => 'Last 24h');
 
   // TODO: Move this to page level
   const { data } = useQuery<any>(getDialogueStatistics, {
     variables: {
       dialogueSlug,
       customerSlug,
+      statisticsDateFilter: {
+        startDate: activeDateState.startDate.toISOString(),
+      },
       prevDateFilter: {
-        endDate: prevWeekDate,
+        endDate: activeDateState.compareStatisticStartDate.toISOString(),
       },
     },
     pollInterval: 5000,

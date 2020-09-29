@@ -8,6 +8,7 @@ import { Dialogue, DialogueCreateInput, DialogueUpdateInput,
 import { isPresent } from 'ts-is-present';
 import { leafNodes, sliderType } from '../../data/seeds/default-data';
 import NodeService from '../question/NodeService';
+import filterDate from '../../utils/filterDate';
 // eslint-disable-next-line import/no-cycle
 import { NexusGenFieldTypes, NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
 // eslint-disable-next-line import/no-cycle
@@ -175,9 +176,8 @@ class DialogueService {
     return values;
   };
 
-  static getStatistics = async (dialogueId: string, numberOfDaysBack: number): Promise<StatisticsProps> => {
-    const startDate = subDays(new Date(), numberOfDaysBack);
-    const sessions = await SessionService.fetchSessionsByDialogue(dialogueId, { startDate });
+  static getStatistics = async (dialogueId: string, startDate?: Date | null, endDate?: Date | null): Promise<StatisticsProps> => {
+    const sessions = await SessionService.fetchSessionsByDialogue(dialogueId, { startDate, endDate });
 
     if (!sessions) { throw new Error('No sessions present'); }
 
@@ -738,11 +738,17 @@ class DialogueService {
     return scores;
   };
 
-  static countInteractions = async (dialogueId: string) => {
+  static countInteractions = async (dialogueId: string, startDate?: Date | null, endDate?: Date | null) => {
     const dialogue = await prisma.dialogue.findOne({
       where: { id: dialogueId },
       include: {
-        sessions: true,
+        sessions: {
+          where: {
+            AND: [
+              ...filterDate(startDate, endDate),
+            ],
+          },
+        },
       },
     });
 
