@@ -189,7 +189,7 @@ const language = {
       de: 'Ende',
     },
     edit: {
-      en: 'Confirm',
+      en: 'Edit',
       de: 'Bestätigen',
     },
     add_call_to_action: {
@@ -430,7 +430,7 @@ const language = {
     },
     name_helper: {
       en: 'What is the name of your business?',
-      de: 'Wie lautet der Name deines Unternehmens?'
+      de: 'Wie lautet der Name deines Unternehmens?',
     },
     role_selector: {
       en: 'User role',
@@ -938,7 +938,7 @@ const language = {
     },
     delivery_helper: {
       en: 'Shall this trigger-alert be deliver via email or text message?',
-      de: 'Soll diese Push-Benachrichtigung per Email oder SMS versandt werden?'
+      de: 'Soll diese Push-Benachrichtigung per Email oder SMS versandt werden?',
     },
     medium: {
       en: 'Delivery medium',

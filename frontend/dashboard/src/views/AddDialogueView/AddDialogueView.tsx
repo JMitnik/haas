@@ -11,6 +11,7 @@ import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 import Select from 'react-select';
 
+import { getCustomers as CustomerData } from 'queries/__generated__/getCustomers';
 import { createDialogue } from 'mutations/createDialogue';
 import { motion } from 'framer-motion';
 import { useUser } from 'providers/UserProvider';
@@ -21,24 +22,13 @@ import getDialoguesOfCustomer from 'queries/getDialoguesOfCustomer';
 import getTagsQuery from 'queries/getTags';
 import useAuth from 'hooks/useAuth';
 
-interface FormDataProps {
-  title: string;
-  publicTitle?: string;
-  description: string;
-  slug: string;
-  contentOption: {label: string, value: string};
-  customerOption: string;
-  dialogueOption: string;
-  tags: Array<string>;
-}
-
 const DIALOGUE_CONTENT_TYPES = [
   { label: 'From scratch', value: 'SCRATCH' },
   { label: 'From default template', value: 'SEED' },
   { label: 'From other dialogue', value: 'TEMPLATE' },
 ];
 
-const schema = yup.object().shape({
+const schema = yup.object({
   title: yup.string().required('Title is required'),
   publicTitle: yup.string().notRequired(),
   description: yup.string().required('Description is required'),
@@ -46,22 +36,30 @@ const schema = yup.object().shape({
   contentOption: yup.object().shape(
     { label: yup.string().required(), value: yup.string().required() },
   ).required('Content option is required'),
-  customerOption: yup.string().when(['contentOption'], {
-    is: (contentOption : { label: string, value: string}) => contentOption?.value === 'TEMPLATE',
-    then: yup.string().required(),
-    otherwise: yup.string().notRequired(),
+  customerOption: yup.object().shape({
+    label: yup.string(),
+    value: yup.string().when(['contentOption'], {
+      is: (contentOption : { label: string, value: string}) => contentOption?.value === 'TEMPLATE',
+      then: yup.string().required(),
+      otherwise: yup.string().notRequired(),
+    }),
   }),
-  dialogueOption: yup.string().when(['customerOption'], {
-    is: (customerOption : string) => customerOption,
-    then: yup.string().required(),
-    otherwise: yup.string().notRequired(),
+  dialogueOption: yup.object().shape({
+    label: yup.string(),
+    value: yup.string().when(['customerOption'], {
+      is: (customerOption : string) => customerOption,
+      then: yup.string().required(),
+      otherwise: yup.string().notRequired(),
+    }),
   }),
   tags: yup.array().of(yup.string().min(1).required()).notRequired(),
-});
+}).required();
+
+type FormDataProps = yup.InferType<typeof schema>;
 
 const AddDialogueView = () => {
-  const { canAccessAdmin } = useAuth();
   const { user } = useUser();
+  const { customerSlug } = useParams();
 
   const history = useHistory();
   const toast = useToast();
@@ -72,12 +70,8 @@ const AddDialogueView = () => {
 
   const { t } = useTranslation();
 
-  const { customerSlug } = useParams();
   const [activeTags, setActiveTags] = useState<Array<null | {label: string, value: string}>>([]);
-  const [activeContentOption] = useState<null | {label: string, value: string}>(null);
-  const [activeCustomerTemplate, setActiveCustomerTemplate] = useState<null | {label: string, value: string}>(null);
-  const [activeDialogueTemplate, setActiveDialogueTemplate] = useState<null | {label: string, value: string}>(null);
-  const { data: customerData } = useQuery(getCustomersOfUser, {
+  const { data: customerData } = useQuery<CustomerData>(getCustomersOfUser, {
     fetchPolicy: 'cache-and-network',
     variables: {
       userId: user?.id,
@@ -150,29 +144,30 @@ const AddDialogueView = () => {
         publicTitle: formData.publicTitle,
         description: formData.description,
         contentType: formData.contentOption.value,
-        templateDialogueId: formData.dialogueOption,
+        templateDialogueId: formData.dialogueOption?.value,
         tags: tagEntries,
       },
     });
   };
-  const handleDialogueTemplateChange = (qOption: any) => {
-    form.setValue('dialogueOption', qOption?.value);
 
-    setActiveDialogueTemplate(qOption);
-  };
+  const contentOption = form.watch('contentOption');
+  const customerOption = form.watch('customerOption');
 
-  const handleCustomerChange = (qOption: any) => {
-    setActiveCustomerTemplate(qOption);
-    setActiveDialogueTemplate(null);
-  };
+  const customerOptions = customerData?.user?.customers?.map((customer) => ({
+    label: customer.name,
+    value: customer.id,
+  }));
 
-  const CUSTOMER_OPTIONS = customerData?.customers?.map(
-    ({ name, id }: { name: string, id: string }) => ({ label: name, value: id }));
+  const selectedCustomer = customerData?.user?.customers?.find((customer) => {
+    if (customer.id === customerOption?.value) return true;
 
-  const dialogueOptions = form.watch('customerOption')
-    && customerData?.customers?.find(
-      (customer: any) => customer.id === activeCustomerTemplate?.value)?.dialogues?.map(
-        (dialogue: any) => ({ label: dialogue.title, value: dialogue.id }));
+    return false;
+  });
+
+  const dialogues = selectedCustomer?.dialogues?.map((dialogue) => ({
+    label: dialogue.title,
+    value: dialogue.id,
+  })) || [];
 
   const tags = data?.tags && data?.tags?.map((tag: any) => ({
     label: tag?.name,
@@ -276,52 +271,38 @@ const AddDialogueView = () => {
                       control={form.control}
                       as={Select}
                       options={DIALOGUE_CONTENT_TYPES}
-                      defaultValue={activeContentOption}
+                      defaultValue="SEED"
                     />
                   </FormControl>
 
-                  {(form.watch('contentOption')?.value === 'TEMPLATE' && CUSTOMER_OPTIONS) && (
+                  {(contentOption?.value === 'TEMPLATE' && customerOptions) && (
                     <FormControl>
                       <FormLabel>Project for templates</FormLabel>
                       <InputHelper>Pick project to take template from</InputHelper>
                       <Controller
                         name="customerOption"
                         control={form.control}
-                        defaultValue={activeCustomerTemplate}
-                        render={({ onChange, onBlur, value }) => (
-                          <Select
-                            options={CUSTOMER_OPTIONS}
-                            onChange={(data: any) => {
-                              handleCustomerChange(data);
-                              onChange(data.value);
-                            }}
-                          />
-                        )}
+                        as={Select}
+                        options={customerOptions}
+                        defaultValue={null}
                       />
-                      <FormErrorMessage>{form.errors.customerOption?.message}</FormErrorMessage>
+                      <FormErrorMessage>{form.errors.customerOption?.value?.message}</FormErrorMessage>
                     </FormControl>
                   )}
 
-                  {(form.watch('customerOption') && dialogueOptions) && (
+                  {(customerOption && dialogues && (
                     <FormControl>
                       <FormLabel>Template from project</FormLabel>
                       <InputHelper>Pick template from project</InputHelper>
                       <Controller
                         name="dialogueOption"
                         control={form.control}
-                        defaultValue={activeDialogueTemplate}
-                        render={({ onChange, onBlur, value }) => (
-                          <Select
-                            options={dialogueOptions}
-                            onChange={(data: any) => {
-                              handleDialogueTemplateChange(data);
-                              onChange(data.value);
-                            }}
-                          />
-                        )}
+                        defaultValue={null}
+                        as={Select}
+                        options={dialogues}
                       />
                     </FormControl>
-                  )}
+                  ))}
                 </InputGrid>
               </Div>
             </FormSection>
