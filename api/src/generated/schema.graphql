@@ -55,6 +55,7 @@ type Customer {
   name: String!
   settings: CustomerSettings
   slug: String!
+  users: [UserType!]
   usersConnection(customerSlug: String, filter: PaginationWhereInput): UserConnection
 }
 

@@ -112,6 +112,36 @@ export const CustomerType = objectType({
         return dialogues as any;
       },
     });
+
+    t.list.field('users', {
+      type: 'UserType',
+      nullable: true,
+
+      async resolve(parent, args, ctx) {
+        const customer = await ctx.prisma.customer.findOne({
+          where: { id: parent.id },
+          include: {
+            users: {
+              include: {
+                user: {
+                  select: {
+                    id: true,
+                    firstName: true,
+                    lastName: true,
+                    email: true,
+                    phone: true,
+                  },
+                },
+              },
+            },
+          },
+        });
+
+        const users = customer?.users.map((userCustomer) => userCustomer.user) || null as any;
+
+        return users;
+      },
+    });
   },
 });
 
@@ -160,10 +190,6 @@ const CustomerEditOptionsInput = inputObjectType({
     t.string('primaryColour', { required: true });
   },
 });
-
-interface test {
-  url?: string;
-}
 
 export const CustomerMutations = Upload && extendType({
   type: 'Mutation',

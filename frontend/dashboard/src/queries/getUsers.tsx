@@ -2,15 +2,17 @@ import gql from 'graphql-tag';
 
 const getUsersQuery = gql`
   query getUsers($customerSlug: String!) {
-    users(customerSlug: $customerSlug) {
-      id
-      firstName
-      lastName
-      email
-      phone
-      role {
+    customer(slug: $customerSlug) {
+      users {
         id
-        name
+        firstName
+        lastName
+        email
+        phone
+        role {
+          id
+          name
+        }
       }
     }
   }
