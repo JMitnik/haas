@@ -21,6 +21,7 @@ export const TreeNodeModel = types
     overrideLeaf: types.maybe(types.reference(types.late((): IAnyModelType => TreeNodeModel))),
     options: types.array(TreeNodeOptionModel),
     links: types.array(TreeLinkModel),
+    share: types.maybe(TreeShareModel),
   })
   .actions((self) => ({
     /**
