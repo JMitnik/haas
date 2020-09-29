@@ -370,20 +370,50 @@ export const QuestionNodeMutations = extendType({
         title: 'String',
         type: 'String',
         links: CTALinksInputType,
+        share: ShareNodeInputType,
       },
-      async resolve(parent: any, args: any, ctx: any) {
+      async resolve(parent: any, args: any, ctx) {
         const { prisma }: { prisma: PrismaClient } = ctx;
-        const { title, type, id, links } = args;
+        const { title, type, id, links, share } = args;
         const dbQuestionNode = await prisma.questionNode.findOne({
           where: {
             id,
           },
           include: {
             links: true,
+            share: true,
           },
         });
-
+        console.log('share: ', share, 'type: ', type);
         const questionNodeUpdateInput: QuestionNodeUpdateInput = { title, type };
+
+        if (dbQuestionNode?.share && (!share || type !== 'SHARE')) {
+          await ctx.prisma.share.delete({ where: { id: dbQuestionNode.share.id } });
+        }
+
+        if (share && type === 'SHARE') {
+          await prisma.share.upsert({
+            where: {
+              id: share.id || '-1',
+            },
+            create: {
+              title: share.title,
+              url: share.url,
+              tooltip: share.tooltip,
+              questionNode: {
+                connect: {
+                  id: dbQuestionNode?.id,
+                },
+              },
+            },
+            update: {
+              title: share.title,
+              url: share.url,
+              tooltip: share.tooltip,
+            },
+          });
+        }
+
         if (dbQuestionNode?.links) {
           await NodeService.removeNonExistingLinks(dbQuestionNode?.links, links?.linkTypes);
         }
@@ -404,8 +434,13 @@ export const QuestionNodeMutations = extendType({
       args: {
         id: 'String',
       },
-      resolve(parent: any, args: any, ctx: any) {
+      async resolve(parent: any, args: any, ctx: any) {
         const { prisma }: { prisma: PrismaClient } = ctx;
+
+        await prisma.share.deleteMany({ where: {
+          questionNodeId: args.id,
+        } });
+
         return prisma.questionNode.delete({
           where: {
             id: args.id,

@@ -159,6 +159,7 @@ const CTAEntry = ({ id, activeCTA, onActiveCTAChange, title, type, links, share,
                 title={title}
                 type={type}
                 links={links}
+                share={share}
                 onDeleteCTA={deleteCTA}
                 onActiveCTAChange={onActiveCTAChange}
                 onNewCTAChange={onNewCTAChange}

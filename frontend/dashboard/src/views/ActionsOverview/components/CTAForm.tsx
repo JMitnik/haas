@@ -34,6 +34,7 @@ interface FormDataProps {
     tooltip?: string;
     iconUrl?: string;
     backgroundColor?: string;}>;
+  share: { id?: string, tooltip: string, url: string, title: string };
 }
 
 interface LinkInputProps {
@@ -46,20 +47,25 @@ interface LinkInputProps {
   backgroundColor?: string;
 }
 
+interface ShareProps {
+  id?: string;
+  title: string;
+  url: string;
+  tooltip: string;
+}
+
 interface CTAFormProps {
   id: string;
   title: string;
   links: Array<LinkInputProps>;
   type: { label: string, value: string };
+  share: ShareProps | null;
   onActiveCTAChange: React.Dispatch<React.SetStateAction<string | null>>;
   onNewCTAChange: React.Dispatch<React.SetStateAction<boolean>>;
   onDeleteCTA: (onComplete: (() => void) | undefined) => void | Promise<ExecutionResult<any>>
 }
 
-const isShareType = (ctaType: any) => {
-  console.log('CTA TYPE: ', ctaType);
-  return ctaType?.value === 'SHARE';
-};
+const isShareType = (ctaType: any) => ctaType?.value === 'SHARE';
 
 const schema = yup.object().shape({
   title: yup.string().required(),
@@ -79,6 +85,30 @@ const schema = yup.object().shape({
       type: yup.string().required(),
     })),
   }),
+  share: yup.object().when('ctaType', {
+    is: (ctaType : { label: string, value: string }) => isShareType(ctaType),
+    then: yup.object().shape(
+      {
+        id: yup.string().notRequired(),
+        tooltip: yup.string().when('ctaType', {
+          is: (ctaType : { label: string, value: string }) => isShareType(ctaType),
+          then: yup.string().required(),
+          otherwise: yup.string().notRequired(),
+        }),
+        url: yup.string().when('ctaType', {
+          is: (ctaType : { label: string, value: string }) => isShareType(ctaType),
+          then: yup.string().required(),
+          otherwise: yup.string().notRequired(),
+        }),
+        title: yup.string().when('ctaType', {
+          is: (ctaType : { label: string, value: string }) => isShareType(ctaType),
+          then: yup.string().required(),
+          otherwise: yup.string().notRequired(),
+        }),
+      },
+    ),
+    otherwise: yup.object().notRequired(),
+  }),
 });
 
 const CTA_TYPES = [
@@ -97,13 +127,14 @@ const LINK_TYPES = [
   { label: 'TWITTER', value: 'TWITTER' },
 ];
 
-const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange, onDeleteCTA }: CTAFormProps) => {
+const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTAChange, onDeleteCTA }: CTAFormProps) => {
   const { customerSlug, dialogueSlug } = useParams();
   const form = useForm<FormDataProps>({
     resolver: yupResolver(schema),
     mode: 'onChange',
     defaultValues: {
       ctaType: type,
+      share: { id: share?.id, title: share?.title, tooltip: share?.tooltip, url: share?.url },
     },
   });
 
@@ -123,7 +154,6 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange, on
   }, []);
 
   const handleMultiChange = useCallback((selectedOption: any) => {
-    form.setValue('ctaType', selectedOption?.value);
     setActiveType(selectedOption);
   }, [setActiveType]);
 
@@ -201,6 +231,7 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange, on
         const { id, ...linkData } = link;
         return { ...linkData, type: linkData.type?.value };
       }) };
+
       addCTA({
         variables: {
           customerSlug,
@@ -208,6 +239,7 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange, on
           title: formData.title,
           type: formData.ctaType.value || undefined,
           links: mappedLinks,
+          share: formData.share,
         },
       });
     } else {
@@ -218,6 +250,7 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange, on
           title: formData.title,
           type: formData.ctaType.value || undefined,
           links: mappedLinks,
+          share: formData.share,
         },
       });
     }
@@ -318,41 +351,55 @@ const CTAForm = ({ id, title, type, links, onActiveCTAChange, onNewCTAChange, on
                     control={form.control}
                     as={<Select />}
                     options={CTA_TYPES}
-                    defaultValue={activeType}
+                    // defaultValue={activeType}
                   />
                   <FormErrorMessage>{form.errors.ctaType?.value?.message}</FormErrorMessage>
                 </FormControl>
 
                 {watchType?.value === 'SHARE' && (
                   <>
-                    {/* TODO: Change default value and error */}
                     <FormControl isRequired>
-                      <FormLabel htmlFor="tooltip">Button text</FormLabel>
-                      <InputHelper>What is the text on the share button?</InputHelper>
+                      <FormLabel htmlFor="share.title">Title</FormLabel>
+                      <InputHelper>What is the title of the shared item?</InputHelper>
                       <Input
-                        name="links[0].tooltip"
-                        placeholder="Share..."
+                        name="share.title"
+                        placeholder="Get a discount..."
                         leftEl={<Type />}
-                        defaultValue={links?.[0]?.tooltip}
-                        onChange={(e: any) => handleTooltipChange(e.currentTarget.value, 0)}
+                        defaultValue={share?.title}
+                        // onChange={(e: any) => handleTooltipChange(e.currentTarget.value, 0)}
                         ref={form.register({ required: true })}
                       />
-                      <FormErrorMessage>{form.errors.links?.[0]?.type}</FormErrorMessage>
+                      <FormErrorMessage>{form.errors.share?.title}</FormErrorMessage>
                     </FormControl>
 
                     {/* TODO: Change default value and error */}
                     <FormControl isRequired>
-                      <FormLabel htmlFor="shareUrl">Url</FormLabel>
+                      <FormLabel htmlFor="share.url">Url</FormLabel>
                       <InputHelper>What is the url to be shared?</InputHelper>
                       <Input
-                        name="links[0].url"
+                        name="share.url"
                         placeholder="https://share/url..."
                         leftEl={<Type />}
-                        defaultValue={links?.[0]?.url}
-                        onChange={(e: any) => handleURLChange(e.currentTarget.value, 0)}
+                        defaultValue={share?.url}
+                        // onChange={(e: any) => handleURLChange(e.currentTarget.value, 0)}
                         ref={form.register({ required: true })}
                       />
-                      <FormErrorMessage>{form.errors.ctaType?.value?.message}</FormErrorMessage>
+                      <FormErrorMessage>{form.errors.share?.url}</FormErrorMessage>
+                    </FormControl>
+
+                    {/* TODO: Change default value and error */}
+                    <FormControl isRequired>
+                      <FormLabel htmlFor="share.tooltip">Button text</FormLabel>
+                      <InputHelper>What is the text on the share button?</InputHelper>
+                      <Input
+                        name="share.tooltip"
+                        placeholder="Share..."
+                        leftEl={<Type />}
+                        defaultValue={share?.tooltip}
+                        // onChange={(e: any) => handleTooltipChange(e.currentTarget.value, 0)}
+                        ref={form.register({ required: true })}
+                      />
+                      <FormErrorMessage>{form.errors.share?.tooltip}</FormErrorMessage>
                     </FormControl>
                   </>
 

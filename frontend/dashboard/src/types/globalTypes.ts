@@ -184,6 +184,13 @@ export interface RequestInviteInput {
   email: string;
 }
 
+export interface ShareNodeInputType {
+  id?: string | null;
+  tooltip?: string | null;
+  url?: string | null;
+  title?: string | null;
+}
+
 export interface TagsInputObjectType {
   entries?: string[] | null;
 }

@@ -17,7 +17,7 @@ const CTALabel = ({ question }: { question: any }) => (
       justifyContent="center"
       alignItems="center"
     >
-      {(!question.overrideLeaf?.type || question.overrideLeaf?.type === 'Link') && (
+      {(!question.overrideLeaf?.type || question.overrideLeaf?.type === 'Link' || question.overrideLeaf?.type === 'Share') && (
         <LinkIcon isCTA hasCTA />
       )}
 
@@ -30,7 +30,7 @@ const CTALabel = ({ question }: { question: any }) => (
       )}
 
       <TypeSpan fontSize="0.5em">
-        {question.overrideLeaf?.type || 'None'}
+        {question.overrideLeaf?.type || (question.type === 'SHARE' && 'Share') || 'None'}
       </TypeSpan>
     </Flex>
   </LinkContainer>

@@ -264,7 +264,7 @@ type Mutation {
   register(input: RegisterInput): String
   requestInvite(input: RequestInviteInput): RequestInviteOutput!
   singleUpload(file: Upload): ImageType!
-  updateCTA(id: String, links: CTALinksInputType, title: String, type: String): QuestionNode!
+  updateCTA(id: String, links: CTALinksInputType, share: ShareNodeInputType, title: String, type: String): QuestionNode!
   updateQuestion(edgeCondition: EdgeConditionInputType, edgeId: String, id: String, optionEntries: OptionsInputType, overrideLeafId: String, title: String, type: String): QuestionNode!
   updateRoles(permissions: PermissionIdsInput, roleId: String): RoleType!
 

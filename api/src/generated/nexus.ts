@@ -933,6 +933,7 @@ export interface NexusGenArgTypes {
     updateCTA: { // args
       id?: string | null; // String
       links?: NexusGenInputs['CTALinksInputType'] | null; // CTALinksInputType
+      share?: NexusGenInputs['ShareNodeInputType'] | null; // ShareNodeInputType
       title?: string | null; // String
       type?: string | null; // String
     }

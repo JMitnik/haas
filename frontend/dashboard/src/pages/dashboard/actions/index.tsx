@@ -47,7 +47,11 @@ const ActionsPage = () => {
       return { ...leaf, type: 'TEXTBOX', icon: OpinionIcon };
     }
 
-    return null;
+    if (leaf.type === 'SHARE') {
+      return { ...leaf, type: 'SHARE', icon: LinkIcon };
+    }
+
+    return { ...leaf, icon: RegisterIcon };
   });
 
   return (

@@ -70,6 +70,10 @@ const initializeCTAType = (type: string) => {
     return { label: 'Link', value: 'LINK' };
   }
 
+  if (type === 'SHARE') {
+    return { label: 'Share', value: 'SHARE' };
+  }
+
   return { label: 'None', value: '' };
 };
 
@@ -138,7 +142,7 @@ const ActionOverview = ({ leafs }: ActionOverviewProps) => {
             title=""
             type={initializeCTAType('REGISTER')}
             links={[]}
-            share={null}
+            share={{ title: '', url: '', tooltip: '' }}
             onNewCTAChange={setNewCTA}
           />
         )}
