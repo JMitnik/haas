@@ -8,6 +8,10 @@ const language = {
       en: 'Invite user',
       de: 'Benutzer einladen',
     },
+    date_range: {
+      en: 'Date range',
+      de: 'Datumsbereich',
+    },
     edit_user: {
       en: 'Edit user',
       de: 'Benutzer bearbeiten',
@@ -113,7 +117,11 @@ const language = {
       de: 'Abbrechen',
     },
     upload_zone: {
-      en: 'Drag the logo here, or click here to upload.',
+      en: 'Drag the image here, or click here to upload.',
+      de: 'Ziehe dein Logo hierher oder klicke um es auszuwählen.',
+    },
+    upload_zone_replace: {
+      en: 'To replace existing image, drag a new image here, or click here to upload.',
       de: 'Ziehe dein Logo hierher oder klicke um es auszuwählen.',
     },
     list: {
@@ -718,9 +726,21 @@ const language = {
       en: 'Frequently mentioned',
       de: 'Häufig erwähnt',
     },
-    notable_paths_of_the_week: {
-      en: 'Most frequent interactions of the week',
+    notable_paths_of_last_week: {
+      en: 'Most frequent interactions of last week',
       de: 'Die häufigsten Interaktionen der Woche',
+    },
+    notable_paths_of_last_hour: {
+      en: 'Most frequent interactions of last hour',
+      de: 'Die häufigsten Interaktionen der Stunde',
+    },
+    notable_paths_of_last_day: {
+      en: 'Most frequent interactions of today',
+      de: 'Die häufigsten Interaktionen heute',
+    },
+    notable_paths_of_last_month: {
+      en: 'Most frequent interactions of last month',
+      de: 'Die häufigsten Interaktionen der Monat',
     },
     score_over_time: {
       en: 'Score over time',
@@ -778,9 +798,37 @@ const language = {
       en: 'Give access to the dialogue by sharing the QR code. It can be copied or downloaded.',
       de: 'Teile den QR-Code, um Zugang zu dem Dialog zu geben. Er steht zum kopieren oder downloaded bereit.',
     },
-    week_summary: {
+    last_week: {
+      en: 'Last 7 days',
+      de: 'Letzten 7 Tage',
+    },
+    last_week_summary: {
       en: 'This week\'s summary',
       de: 'Wochenansicht',
+    },
+    last_month: {
+      en: 'Last month',
+      de: 'Im vergangenen Monat',
+    },
+    last_month_summary: {
+      en: 'This month\'s summary',
+      de: 'Monat Zusammenfassung',
+    },
+    last_day: {
+      en: 'Last 24 hours',
+      de: 'Letzte 24 Stunden',
+    },
+    last_day_summary: {
+      en: 'Today\'s summary',
+      de: 'Heuete Zusammenfassung',
+    },
+    last_hour: {
+      en: 'Last hour',
+      de: 'Letzte Stunde',
+    },
+    last_hour_summary: {
+      en: 'Hourly\'s summary',
+      de: 'Stündliche Zusammenfassung',
     },
   },
   interactions: {

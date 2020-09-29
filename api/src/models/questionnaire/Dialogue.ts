@@ -3,8 +3,8 @@ import { PrismaClient } from '@prisma/client';
 import { extendType, inputObjectType, objectType } from '@nexus/schema';
 
 // eslint-disable-next-line import/no-cycle
-import { UserInputError } from 'apollo-server-express';
 import { CustomerType } from '../customer/Customer';
+import { UserInputError } from 'apollo-server-express';
 // eslint-disable-next-line import/no-cycle
 import { EdgeType } from '../edge/Edge';
 // eslint-disable-next-line import/no-cycle
@@ -20,7 +20,9 @@ import { PaginationWhereInput } from '../general/Pagination';
 // eslint-disable-next-line import/no-cycle
 import PaginationService from '../general/PaginationService';
 // eslint-disable-next-line import/no-cycle
+import { subDays } from 'date-fns';
 import SessionService from '../session/SessionService';
+import formatDate from '../../utils/formatDate';
 import isValidDate from '../../utils/isValidDate';
 
 export const TEXT_NODES = [
@@ -121,21 +123,20 @@ export const DialogueType = objectType({
       },
     });
 
-    // t.float('averageScore', {
-    //   async resolve(parent) {
-    //     if (!parent.id) {
-    //       return 0;
-    //     }
+    t.field('countInteractions', {
+      type: 'Int',
+      description: 'Count number of interactions between start-date and end-date',
+      args: { input: DialogueFilterInputType },
 
-    //     const score = await DialogueService.calculateAverageDialogueScore(parent.id);
+      async resolve(parent, args) {
+        const startDate = args.input?.startDate ? formatDate(args.input.startDate) : subDays(new Date(), 7);
+        const endDate = args.input?.endDate ? formatDate(args.input.endDate) : null;
 
-    //     return score;
-    //   },
-    // });
-
-    t.int('countInteractions', {
-      async resolve(parent) {
-        const interactions = await DialogueService.countInteractions(parent.id);
+        const interactions = await DialogueService.countInteractions(
+          parent.id,
+          startDate,
+          endDate,
+        );
 
         return interactions || 0;
       },
@@ -143,10 +144,18 @@ export const DialogueType = objectType({
 
     t.field('statistics', {
       type: DialogueStatistics,
+      args: { input: DialogueFilterInputType },
       nullable: true,
 
-      async resolve(parent) {
-        const statistics = await DialogueService.getStatistics(parent.id, 7);
+      async resolve(parent, args) {
+        const startDate = args.input?.startDate ? formatDate(args.input.startDate) : subDays(new Date(), 7);
+        const endDate = args.input?.endDate ? formatDate(args.input.endDate) : null;
+
+        const statistics = await DialogueService.getStatistics(
+          parent.id,
+          startDate,
+          endDate,
+        );
 
         if (!statistics) {
           return {

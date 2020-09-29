@@ -13,7 +13,6 @@ import ActionsPage from 'pages/dashboard/actions';
 import AddCustomerPage from 'pages/dashboard/customers/add';
 import AddDialogueView from 'views/AddDialogueView';
 import AddTriggerView from 'views/TriggerOverview/AddTriggerView';
-import AddUserView from 'views/UsersOverview/AddUserView';
 import AnalyticsPage from 'pages/dashboard/analytics';
 import CustomerLayout from 'layouts/CustomerLayout';
 import CustomerPage from 'pages/dashboard/customer';
@@ -270,7 +269,7 @@ const AppRoutes = () => (
 );
 
 const RootApp = ({ children }: { children: React.ReactNode }) => {
-  const { isInitializingUser, user } = useUser();
+  const { isInitializingUser } = useUser();
 
   if (isInitializingUser) return <GlobalLoader />;
 

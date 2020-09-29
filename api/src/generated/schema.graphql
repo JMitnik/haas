@@ -55,6 +55,7 @@ type Customer {
   name: String!
   settings: CustomerSettings
   slug: String!
+  users: [UserType!]
   usersConnection(customerSlug: String, filter: PaginationWhereInput): UserConnection
 }
 
@@ -92,7 +93,9 @@ type Debug {
 
 type Dialogue {
   averageScore(input: DialogueFilterInputType): Float!
-  countInteractions: Int!
+
+  """Count number of interactions between start-date and end-date"""
+  countInteractions(input: DialogueFilterInputType): Int!
   creationDate: String
   customer: Customer
   customerId: String!
@@ -106,7 +109,7 @@ type Dialogue {
   sessionConnection(filter: PaginationWhereInput): SessionConnection
   sessions(take: Int): [Session!]!
   slug: String!
-  statistics: DialogueStatistics
+  statistics(input: DialogueFilterInputType): DialogueStatistics
   tags: [Tag!]
   title: String!
   updatedAt: String

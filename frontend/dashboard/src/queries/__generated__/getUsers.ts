@@ -7,24 +7,29 @@
 // GraphQL query operation: getUsers
 // ====================================================
 
-export interface getUsers_users_role {
+export interface getUsers_customer_users_role {
   __typename: "RoleType";
   id: string;
   name: string;
 }
 
-export interface getUsers_users {
+export interface getUsers_customer_users {
   __typename: "UserType";
   id: string;
   firstName: string | null;
   lastName: string | null;
   email: string;
   phone: string | null;
-  role: getUsers_users_role | null;
+  role: getUsers_customer_users_role | null;
+}
+
+export interface getUsers_customer {
+  __typename: "Customer";
+  users: getUsers_customer_users[] | null;
 }
 
 export interface getUsers {
-  users: getUsers_users[];
+  customer: getUsers_customer | null;
 }
 
 export interface getUsersVariables {

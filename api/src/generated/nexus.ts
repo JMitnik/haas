@@ -457,6 +457,7 @@ export interface NexusGenFieldTypes {
     name: string; // String!
     settings: NexusGenRootTypes['CustomerSettings'] | null; // CustomerSettings
     slug: string; // String!
+    users: NexusGenRootTypes['UserType'][] | null; // [UserType!]
     usersConnection: NexusGenRootTypes['UserConnection'] | null; // UserConnection
   }
   CustomerSettings: { // field return type
@@ -780,6 +781,9 @@ export interface NexusGenArgTypes {
     averageScore: { // args
       input?: NexusGenInputs['DialogueFilterInputType'] | null; // DialogueFilterInputType
     }
+    countInteractions: { // args
+      input?: NexusGenInputs['DialogueFilterInputType'] | null; // DialogueFilterInputType
+    }
     leafs: { // args
       searchTerm?: string | null; // String
     }
@@ -788,6 +792,9 @@ export interface NexusGenArgTypes {
     }
     sessions: { // args
       take?: number | null; // Int
+    }
+    statistics: { // args
+      input?: NexusGenInputs['DialogueFilterInputType'] | null; // DialogueFilterInputType
     }
   }
   Mutation: {

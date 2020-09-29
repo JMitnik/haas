@@ -1,6 +1,5 @@
 import { Redirect, Route, RouteProps, useParams } from 'react-router-dom';
-import { useLazyQuery } from '@apollo/react-hooks';
-import React, { useEffect } from 'react';
+import React from 'react';
 
 import { useUser } from 'providers/UserProvider';
 
