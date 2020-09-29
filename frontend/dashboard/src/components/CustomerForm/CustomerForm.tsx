@@ -27,7 +27,7 @@ interface FormDataProps {
   seed?: number;
 }
 
-const CustomerUploadLogoInput = ({ onChange }: any) => {
+const CustomerUploadLogoInput = ({ onChange, value }: any) => {
   const toast = useToast();
 
   const [uploadFile, { loading }] = useMutation(uploadSingleImage, {
@@ -61,12 +61,15 @@ const CustomerUploadLogoInput = ({ onChange }: any) => {
   };
 
   return (
-    <FileDropInput onDrop={onDrop} isLoading={loading} />
+    <>
+      <FileDropInput value={value} onDrop={onDrop} isLoading={loading} />
+    </>
   );
 };
 
 const CustomerLogoFormFragment = ({ form }: { form: UseFormMethods<FormDataProps> }) => {
   const { t } = useTranslation();
+
   return (
     <>
       <FormControl>
@@ -77,9 +80,9 @@ const CustomerLogoFormFragment = ({ form }: { form: UseFormMethods<FormDataProps
           control={form.control}
           name="useCustomUrl"
           defaultValue={1}
-          render={({ onChange }) => (
+          render={({ onChange, value }) => (
             <RadioButtonGroup
-              defaultValue={1}
+              value={value}
               isInline
               onChange={onChange}
               display="flex"
@@ -115,11 +118,10 @@ const CustomerLogoFormFragment = ({ form }: { form: UseFormMethods<FormDataProps
               control={form.control}
               name="uploadLogo"
               defaultValue=""
-              render={({ onChange }) => (
-                <CustomerUploadLogoInput onChange={onChange} />
+              render={({ onChange, value }) => (
+                <CustomerUploadLogoInput value={value} onChange={onChange} />
               )}
             />
-
           </FormControl>
         </>
       )}

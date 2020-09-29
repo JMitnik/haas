@@ -1,6 +1,4 @@
 import { Div, Span } from '@haas/ui';
-import { Icon } from '@chakra-ui/core';
-import { useTranslation } from 'react-i18next';
 import React, { ReactNode } from 'react';
 import styled, { css } from 'styled-components/macro';
 
@@ -11,7 +9,7 @@ interface ListItemContainerProps {
 }
 
 export const ListItemContainer = styled(Div)<ListItemContainerProps>`
-  ${({ theme, hasNoIcon = false, isHeader = false }) => css`
+  ${({ theme, isHeader = false }) => css`
     padding: 6px 16px;
     background: white;
     color: ${theme.colors.gray[600]};
@@ -42,18 +40,14 @@ interface ListItemProps {
   isHeader?: boolean;
 }
 
-const ListItem = ({ children, renderLeftIcon, onClick, isHeader }: ListItemProps) => {
-  const { t } = useTranslation();
+const ListItem = ({ children, renderLeftIcon, onClick, isHeader }: ListItemProps) => (
+  <ListItemContainer hasNoIcon={!renderLeftIcon} isHeader={isHeader} onClick={onClick}>
+    {renderLeftIcon}
+    <Span pl={!renderLeftIcon ? '0.9rem' : 'auto'}>
 
-  return (
-    <ListItemContainer hasNoIcon={!renderLeftIcon} isHeader={isHeader} onClick={onClick}>
-      {renderLeftIcon}
-      <Span pl={!renderLeftIcon ? '0.9rem' : 'auto'}>
-
-        {children}
-      </Span>
-    </ListItemContainer>
-  );
-};
+      {children}
+    </Span>
+  </ListItemContainer>
+);
 
 export default ListItem;

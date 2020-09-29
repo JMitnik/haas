@@ -11,8 +11,8 @@ import { isValidColor } from 'utils/ColorUtils';
 import { queryMe, useUser } from 'providers/UserProvider';
 import { useMutation } from '@apollo/react-hooks';
 import getCustomersOfUser from 'queries/getCustomersOfUser';
-
 import useAuth from 'hooks/useAuth';
+
 import { CustomerCardImage } from './CustomerOverviewStyles';
 
 const CustomerCard = ({ customer }: { customer: any }) => {
@@ -25,11 +25,6 @@ const CustomerCard = ({ customer }: { customer: any }) => {
   const setCustomerSlug = (customerSlug: string) => {
     localStorage.setItem('customer', JSON.stringify(customer));
     history.push(`/dashboard/b/${customerSlug}`);
-  };
-
-  const setCustomerEditPath = (event: any, customerSlug: string) => {
-    history.push(`/dashboard/b/${customerSlug}/edit`);
-    event.stopPropagation();
   };
 
   const [deleteCustomer] = useMutation(deleteFullCustomerQuery, {

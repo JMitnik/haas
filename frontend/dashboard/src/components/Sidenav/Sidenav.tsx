@@ -1,4 +1,4 @@
-import { AvatarBadge, Badge, Button, Avatar as ChakraAvatar, Icon, useToast } from '@chakra-ui/core';
+import { AvatarBadge, Badge, Button, Avatar as ChakraAvatar, useToast } from '@chakra-ui/core';
 import { Div, Flex, Text } from '@haas/ui';
 import { ExternalLink, LogOut } from 'react-feather';
 import { Link, LinkProps, NavLink, useHistory } from 'react-router-dom';
@@ -6,10 +6,7 @@ import Color from 'color';
 import React from 'react';
 import styled, { css } from 'styled-components/macro';
 
-import { ReactComponent as DeFlag } from 'assets/images/de.svg';
-import { ReactComponent as EnFlag } from 'assets/images/en.svg';
 import { FullLogo, FullLogoContainer, LogoContainer } from 'components/Logo/Logo';
-import { UserProps } from 'types/generic';
 import { useCustomer } from 'providers/CustomerProvider';
 import { useTranslation } from 'react-i18next';
 import { useUser } from 'providers/UserProvider';
@@ -216,47 +213,7 @@ export const UsernavDropdown = () => {
 };
 
 export const Usernav = () => {
-  const history = useHistory();
-  const { user, logout } = useUser();
-  const { setActiveCustomer } = useCustomer();
-  const { canAccessAdmin } = useAuth();
-  const { t, i18n } = useTranslation();
-  const toast = useToast();
-
-  const goToDialoguesOverview = () => {
-    setActiveCustomer(null);
-    history.push('/dashboard');
-  };
-
-  const switchToGerman = () => {
-    i18n.changeLanguage('de');
-    localStorage.setItem('language', 'de');
-
-    setTimeout(() => {
-      toast({
-        title: t('toast:locale_switch'),
-        description: t('toast:locale_switch_german'),
-        status: 'success',
-        position: 'bottom-right',
-        duration: 1500,
-      });
-    }, 400);
-  };
-
-  const switchToEnglish = () => {
-    i18n.changeLanguage('en');
-    localStorage.setItem('language', 'en');
-
-    setTimeout(() => {
-      toast({
-        title: t('toast:locale_switch'),
-        description: t('toast:locale_switch_english'),
-        status: 'success',
-        position: 'bottom-right',
-        duration: 1500,
-      });
-    }, 400);
-  };
+  const { user } = useUser();
 
   return (
     <UsernavContainer>

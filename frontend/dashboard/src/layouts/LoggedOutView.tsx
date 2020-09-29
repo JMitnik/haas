@@ -1,7 +1,7 @@
 import { Button } from '@chakra-ui/core';
 import { Div, Flex, Text } from '@haas/ui';
-import { NavLink, useHistory } from 'react-router-dom';
 import { ReactComponent as ServerDownImage } from 'assets/images/undraw_auth.svg';
+import { useHistory } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
 
