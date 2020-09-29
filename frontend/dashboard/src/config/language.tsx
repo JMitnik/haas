@@ -113,7 +113,11 @@ const language = {
       de: 'Abbrechen',
     },
     upload_zone: {
-      en: 'Drag the logo here, or click here to upload.',
+      en: 'Drag the image here, or click here to upload.',
+      de: 'Ziehe dein Logo hierher oder klicke um es auszuwählen.',
+    },
+    upload_zone_replace: {
+      en: 'To replace existing image, drag a new image here, or click here to upload.',
       de: 'Ziehe dein Logo hierher oder klicke um es auszuwählen.',
     },
     list: {

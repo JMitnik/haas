@@ -1,5 +1,5 @@
 import {
-  BooleanRadioInput, ButtonRadio, Div, Form, FormControl, FormLabel, FormSection, H3, Hr, Input, InputGrid,
+  BooleanRadioInput, ButtonRadio, Div, Flex, Form, FormControl, FormLabel, FormSection, H3, Hr, Input, InputGrid,
   InputHelper,
   Muted,
 } from '@haas/ui';
@@ -15,6 +15,7 @@ import ColorPickerInput from 'components/ColorPicker';
 
 import FileDropInput from 'components/FileDropInput';
 import ServerError from 'components/ServerError';
+import styled, { css } from 'styled-components/macro';
 import uploadSingleImage from '../../mutations/uploadSingleImage';
 
 interface FormDataProps {
@@ -27,7 +28,7 @@ interface FormDataProps {
   seed?: number;
 }
 
-const CustomerUploadLogoInput = ({ onChange }: any) => {
+const CustomerUploadLogoInput = ({ onChange, value }: any) => {
   const toast = useToast();
 
   const [uploadFile, { loading }] = useMutation(uploadSingleImage, {
@@ -61,12 +62,16 @@ const CustomerUploadLogoInput = ({ onChange }: any) => {
   };
 
   return (
-    <FileDropInput onDrop={onDrop} isLoading={loading} />
+    <>
+      <FileDropInput value={value} onDrop={onDrop} isLoading={loading} />
+    </>
   );
 };
 
 const CustomerLogoFormFragment = ({ form }: { form: UseFormMethods<FormDataProps> }) => {
   const { t } = useTranslation();
+  const formLogo = form.watch('logo');
+
   return (
     <>
       <FormControl>
@@ -77,9 +82,9 @@ const CustomerLogoFormFragment = ({ form }: { form: UseFormMethods<FormDataProps
           control={form.control}
           name="useCustomUrl"
           defaultValue={1}
-          render={({ onChange }) => (
+          render={({ onChange, value }) => (
             <RadioButtonGroup
-              defaultValue={1}
+              value={value}
               isInline
               onChange={onChange}
               display="flex"
@@ -115,11 +120,10 @@ const CustomerLogoFormFragment = ({ form }: { form: UseFormMethods<FormDataProps
               control={form.control}
               name="uploadLogo"
               defaultValue=""
-              render={({ onChange }) => (
-                <CustomerUploadLogoInput onChange={onChange} />
+              render={({ onChange, value }) => (
+                <CustomerUploadLogoInput value={value} onChange={onChange} />
               )}
             />
-
           </FormControl>
         </>
       )}
