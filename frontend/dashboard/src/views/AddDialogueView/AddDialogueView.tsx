@@ -20,7 +20,6 @@ import ServerError from 'components/ServerError';
 import getCustomersOfUser from 'queries/getCustomersOfUser';
 import getDialoguesOfCustomer from 'queries/getDialoguesOfCustomer';
 import getTagsQuery from 'queries/getTags';
-import useAuth from 'hooks/useAuth';
 
 const DIALOGUE_CONTENT_TYPES = [
   { label: 'From scratch', value: 'SCRATCH' },
@@ -59,7 +58,7 @@ type FormDataProps = yup.InferType<typeof schema>;
 
 const AddDialogueView = () => {
   const { user } = useUser();
-  const { customerSlug } = useParams();
+  const { customerSlug } = useParams<{ customerSlug: string }>();
 
   const history = useHistory();
   const toast = useToast();

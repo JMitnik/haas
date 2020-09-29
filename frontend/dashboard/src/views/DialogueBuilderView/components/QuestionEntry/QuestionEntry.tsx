@@ -1,17 +1,16 @@
-import { ApolloError } from 'apollo-client';
 import { Flex, Span } from '@haas/ui';
 import { useMutation } from '@apollo/react-hooks';
 import { useParams } from 'react-router';
+import { useToast } from '@chakra-ui/core';
+import { useTranslation } from 'react-i18next';
 import React from 'react';
 
+import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
 import EditButton from 'components/EditButton';
 import deleteQuestionMutation from 'mutations/deleteQuestion';
-import getTopicBuilderQuery from 'queries/getQuestionnaireQuery';
 
-import { useToast } from '@chakra-ui/core';
 import { EdgeConditonProps, QuestionEntryProps, QuestionOptionProps } from '../../DialogueBuilderInterfaces';
 import { OverflowSpan, QuestionEntryContainer, QuestionEntryViewContainer } from './QuestionEntryStyles';
-import { useTranslation } from 'react-i18next';
 import BuilderIcon from './BuilderIcon';
 import CTALabel from './CTALabel';
 import ConditionLabel from './ConditionLabel';

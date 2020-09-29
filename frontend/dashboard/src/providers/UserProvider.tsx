@@ -1,4 +1,4 @@
-import { useLazyQuery, useMutation, useQuery } from '@apollo/react-hooks';
+import { useMutation, useQuery } from '@apollo/react-hooks';
 import React, { useContext, useEffect, useState } from 'react';
 
 import { useHistory } from 'react-router';
@@ -63,7 +63,6 @@ const UserContext = React.createContext({} as AuthContextProps);
 
 const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const history = useHistory();
-  // const [user, setUser] = useState<any>();
   const [accessToken, setAccessToken] = useState<string | null>(() => localStorage.getItem('access_token'));
   const [isInitializingUser, setIsInitializingUser] = useState<boolean>(() => !!accessToken);
 
@@ -73,8 +72,8 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
     }, 1000);
   };
 
-  const { loading: isGettingUser, data, refetch: getUser } = useQuery<GetUserData>(queryMe, {
-    onCompleted: (data) => {
+  const { data, refetch: getUser } = useQuery<GetUserData>(queryMe, {
+    onCompleted: () => {
       stopInitializingUser();
     },
     onError: () => {

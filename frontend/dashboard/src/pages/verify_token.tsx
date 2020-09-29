@@ -1,9 +1,8 @@
 import * as qs from 'qs';
 import { Div,
-  Loader, PageContainer, SubtlePageHeading, SubtlePageSubHeading } from '@haas/ui';
-import { Redirect, useHistory, useLocation } from 'react-router';
+  Loader, PageContainer, SubtlePageHeading } from '@haas/ui';
+import { useHistory, useLocation } from 'react-router';
 import { useMutation } from '@apollo/react-hooks';
-import { useTranslation } from 'react-i18next';
 import { useUser } from 'providers/UserProvider';
 import React, { useEffect, useRef } from 'react';
 import formatServerError from 'utils/formatServerError';
@@ -43,7 +42,6 @@ const VerifyTokenPageContainer = styled(PageContainer)`
 const VerifyTokenPage = () => {
   const location = useLocation();
   const history = useHistory();
-  const { t } = useTranslation();
   const { setAccessToken, isLoggedIn, user } = useUser();
   const verifiedRef = useRef(false);
 
@@ -61,7 +59,7 @@ const VerifyTokenPage = () => {
         history.push('/dashboard');
       }
     }
-  }, [isLoggedIn, user]);
+  }, [isLoggedIn, user, history]);
 
   useEffect(() => {
     const urlToken: string = qs.parse(location.search, { ignoreQueryPrefix: true })?.token;
@@ -75,7 +73,7 @@ const VerifyTokenPage = () => {
         },
       });
     }
-  }, [verifyUserToken]);
+  }, [verifyUserToken, user, location.search]);
 
   if (loading) {
     return (

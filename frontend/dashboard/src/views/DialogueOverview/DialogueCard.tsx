@@ -1,4 +1,3 @@
-import { ApolloError } from 'apollo-client';
 import { Edit, MapPin, Trash, User } from 'react-feather';
 import { formatDistance } from 'date-fns';
 
@@ -16,7 +15,6 @@ import ShowMoreButton from 'components/ShowMoreButton';
 import SliderNodeIcon from 'components/Icons/SliderNodeIcon';
 import getDialoguesOfCustomer from 'queries/getDialoguesOfCustomer';
 import getLocale from 'utils/getLocale';
-import useContextMenu from 'hooks/useContextMenu';
 
 interface DialogueCardOptionsOverlayProps {
   onDelete: () => void;

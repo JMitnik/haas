@@ -1,13 +1,13 @@
 import * as qs from 'qs';
 import { Activity, Award, BarChart, MessageCircle,
   ThumbsDown, ThumbsUp, TrendingDown, TrendingUp } from 'react-feather';
+import { Button, Tag, TagIcon, TagLabel } from '@chakra-ui/core';
 import { Div, Flex, Grid, H4, Icon, Loader, PageTitle, Span, Text } from '@haas/ui';
-import { Tag, TagIcon, TagLabel } from '@chakra-ui/core';
 import { sub } from 'date-fns';
 import { useHistory, useParams } from 'react-router-dom';
 import { useQuery } from '@apollo/react-hooks';
 import { useTranslation } from 'react-i18next';
-import React, { useReducer, useState } from 'react';
+import React, { useReducer } from 'react';
 import gql from 'graphql-tag';
 import styled, { css } from 'styled-components/macro';
 
@@ -24,7 +24,7 @@ import SummaryModule from './Modules/SummaryModules/SummaryModule';
 type ActiveDateType = 'last_hour' | 'last_day' | 'last_week' | 'last_month' | 'last_year';
 
 interface ActiveDateState {
-  dateLabel: string;
+  dateLabel: ActiveDateType;
   startDate: Date;
   compareStatisticStartDate: Date;
 }
@@ -39,8 +39,45 @@ const DialogueViewContainer = styled(Div)`
 
 interface ActiveDateAction {
   type: ActiveDateType;
-  payload: ActiveDateState;
 }
+
+const DatePickerExpanded = ({ activeLabel, dispatch }: { activeLabel: ActiveDateType, dispatch: React.Dispatch<ActiveDateAction> }) => {
+  const { t } = useTranslation();
+  return (
+    <Div>
+      <Div>
+        <Button size="sm" isActive={activeLabel === 'last_hour'} onClick={() => dispatch({ type: 'last_hour' })}>{t('dialogue:last_hour')}</Button>
+        <Button
+          ml={1}
+          size="sm"
+          isActive={activeLabel === 'last_day'}
+          onClick={() => dispatch({ type: 'last_day' })}
+        >
+          {t('dialogue:last_day')}
+
+        </Button>
+        <Button
+          ml={1}
+          size="sm"
+          isActive={activeLabel === 'last_week'}
+          onClick={() => dispatch({ type: 'last_week' })}
+        >
+          {t('dialogue:last_week')}
+
+        </Button>
+        <Button
+          size="sm"
+          ml={1}
+          isActive={activeLabel === 'last_month'}
+          onClick={() => dispatch({ type: 'last_month' })}
+        >
+          {t('dialogue:last_month')}
+
+        </Button>
+      </Div>
+    </Div>
+  );
+};
 
 const dateReducer = (state: ActiveDateState, action: ActiveDateAction): ActiveDateState => {
   switch (action.type) {
@@ -90,7 +127,7 @@ const getDialogueStatistics = gql`
       dialogue(where: { slug: $dialogueSlug }) {
         id
         countInteractions(input: $statisticsDateFilter)
-        thisWeekAverageScore: averageScore
+        thisWeekAverageScore: averageScore(input: $statisticsDateFilter)
         previousScore: averageScore(input: $prevDateFilter)
         sessions(take: 3) {
           id
@@ -186,10 +223,13 @@ const DialogueView = () => {
 
   return (
     <DialogueViewContainer>
-      <PageTitle>
-        <Icon as={BarChart} mr={1} />
-        {t('views:dialogue_view')}
-      </PageTitle>
+      <Flex justifyContent="space-between">
+        <PageTitle>
+          <Icon as={BarChart} mr={1} />
+          {t('views:dialogue_view')}
+        </PageTitle>
+        <DatePickerExpanded activeLabel={activeDateState.dateLabel} dispatch={dispatch} />
+      </Flex>
       <Grid gridTemplateColumns={['1fr', '1fr', '1fr 1fr 1fr']}>
         <Div gridColumn="1 / 4">
           <H4 color="default.darker" mb={4}>
@@ -198,7 +238,7 @@ const DialogueView = () => {
                 <TrendingIcon fill="currentColor" />
               </Div>
               <Span ml={2}>
-                {t('dialogue:week_summary')}
+                {t(`dialogue:${activeDateState.dateLabel}_summary`)}
               </Span>
             </Flex>
           </H4>
@@ -282,7 +322,7 @@ const DialogueView = () => {
                 <PathsIcon fill="currentColor" />
               </Div>
               <Span ml={2}>
-                {t('dialogue:notable_paths_of_the_week')}
+                {t(`dialogue:notable_paths_of_${activeDateState.dateLabel}`)}
               </Span>
             </Flex>
           </H4>

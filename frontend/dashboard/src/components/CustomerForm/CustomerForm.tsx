@@ -1,5 +1,5 @@
 import {
-  BooleanRadioInput, ButtonRadio, Div, Flex, Form, FormControl, FormLabel, FormSection, H3, Hr, Input, InputGrid,
+  BooleanRadioInput, ButtonRadio, Div, Form, FormControl, FormLabel, FormSection, H3, Hr, Input, InputGrid,
   InputHelper,
   Muted,
 } from '@haas/ui';
@@ -15,7 +15,6 @@ import ColorPickerInput from 'components/ColorPicker';
 
 import FileDropInput from 'components/FileDropInput';
 import ServerError from 'components/ServerError';
-import styled, { css } from 'styled-components/macro';
 import uploadSingleImage from '../../mutations/uploadSingleImage';
 
 interface FormDataProps {
@@ -70,7 +69,6 @@ const CustomerUploadLogoInput = ({ onChange, value }: any) => {
 
 const CustomerLogoFormFragment = ({ form }: { form: UseFormMethods<FormDataProps> }) => {
   const { t } = useTranslation();
-  const formLogo = form.watch('logo');
 
   return (
     <>

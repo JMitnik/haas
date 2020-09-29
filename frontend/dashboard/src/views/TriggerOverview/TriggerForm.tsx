@@ -15,9 +15,7 @@ import {
 } from '@haas/ui';
 import { useTranslation } from 'react-i18next';
 import ServerError from 'components/ServerError';
-import getDialoguesQuery from 'queries/getDialoguesOfCustomer';
 import getQuestionsQuery from 'queries/getQuestionnaireQuery';
-import getRecipientsQuery from 'queries/getUsers';
 import gql from 'graphql-tag';
 
 import { getCustomerTriggerData as CustomerTriggerData } from './__generated__/getCustomerTriggerData';
