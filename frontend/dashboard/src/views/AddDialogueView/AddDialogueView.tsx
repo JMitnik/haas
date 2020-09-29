@@ -37,20 +37,20 @@ const schema = yup.object({
     { label: yup.string().required(), value: yup.string().required() },
   ).required('Content option is required'),
   customerOption: yup.object().shape({
-    label: yup.string(),
-    value: yup.string().when(['contentOption'], {
-      is: (contentOption : { label: string, value: string}) => contentOption?.value === 'TEMPLATE',
-      then: yup.string().required(),
-      otherwise: yup.string().notRequired(),
-    }),
+    label: yup.string().ensure(),
+    value: yup.string(),
+  }).when(['contentOption'], {
+    is: (contentOption : { label: string, value: string} | undefined) => contentOption?.value === 'TEMPLATE',
+    then: () => yup.object().required(),
+    otherwise: () => yup.object().notRequired(),
   }),
-  dialogueOption: yup.object().shape({
-    label: yup.string(),
-    value: yup.string().when(['customerOption'], {
-      is: (customerOption : string) => customerOption,
-      then: yup.string().required(),
-      otherwise: yup.string().notRequired(),
-    }),
+  dialogueOption: yup.object().notRequired().shape({
+    label: yup.string().ensure(),
+    value: yup.string().ensure(),
+  }).when(['customerOption'], {
+    is: (customerOption : string) => customerOption,
+    then: yup.object().required(),
+    otherwise: yup.object().notRequired(),
   }),
   tags: yup.array().of(yup.string().min(1).required()).notRequired(),
 }).required();
@@ -271,7 +271,7 @@ const AddDialogueView = () => {
                       control={form.control}
                       as={Select}
                       options={DIALOGUE_CONTENT_TYPES}
-                      defaultValue="SEED"
+                      defaultValue={{ label: 'From default template', value: 'SEED' }}
                     />
                   </FormControl>
 
@@ -284,7 +284,7 @@ const AddDialogueView = () => {
                         control={form.control}
                         as={Select}
                         options={customerOptions}
-                        defaultValue={null}
+                        defaultValue=""
                       />
                       <FormErrorMessage>{form.errors.customerOption?.value?.message}</FormErrorMessage>
                     </FormControl>
@@ -297,7 +297,7 @@ const AddDialogueView = () => {
                       <Controller
                         name="dialogueOption"
                         control={form.control}
-                        defaultValue={null}
+                        defaultValue=""
                         as={Select}
                         options={dialogues}
                       />
@@ -372,8 +372,8 @@ const AddDialogueView = () => {
 
             <ButtonGroup>
               <Button
-                isLoading={isLoading}
                 isDisabled={!form.formState.isValid}
+                isLoading={isLoading}
                 variantColor="teal"
                 type="submit"
               >
