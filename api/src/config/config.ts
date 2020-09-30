@@ -25,6 +25,8 @@ export interface ConfigProps {
 if (!process.env.JWT_SECRET) throw new Error('Ensure you set a JWT secret in your env');
 if (!process.env.MAIL_SENDER) console.log('Mail sender not defined; wont send mails as a result');
 
+console.log('api: ', process.env.REACT_APP_API_ENDPOINT);
+
 const config: ConfigProps = {
   jwtSecret: process.env.JWT_SECRET,
   jwtExpiryMinutes: 30,

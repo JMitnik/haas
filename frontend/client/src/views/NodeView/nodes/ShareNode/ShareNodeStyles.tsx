@@ -10,7 +10,10 @@ export const ShareNodeContainer = styled(Div)`
 `;
 
 export const ShareButtonContainer = styled(Flex)`
+    /* flex-direction: column; */
+    flex-direction: column;
     justify-content: center;
+    align-items: center;
 `;
 
 export const ShareButton = styled(Button)`
@@ -23,8 +26,10 @@ export const ShareButton = styled(Button)`
         border-radius: 10px;
         padding: 12px 22px;
         background: ${Color(theme.colors.primary).lighten(0.75).hex()};
+        color: ${Color(theme.colors.primary).darken(0.75).hex()};
 
         svg {
+            color: currentColor;
             margin-right: 5px;
         }
     `}
