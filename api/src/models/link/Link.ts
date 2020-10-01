@@ -12,8 +12,7 @@ export const LinkTypeEnumType = enumType({
     'LINKEDIN',
     'WHATSAPP',
     'INSTAGRAM',
-    'TWITTER',
-    'SHARE'],
+    'TWITTER'],
 });
 
 export const CTALinkInputObjectType = inputObjectType({

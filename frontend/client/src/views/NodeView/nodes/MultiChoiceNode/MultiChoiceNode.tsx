@@ -48,8 +48,6 @@ const MultiChoiceNode = ({ node, onEntryStore }: MultiChoiceNodeProps) => {
     onEntryStore(entry, multiChoiceOption.value);
   };
 
-  console.log('social share node: ', node);
-
   return (
     <MultiChoiceNodeContainer>
       <NodeTitle>{node.title}</NodeTitle>

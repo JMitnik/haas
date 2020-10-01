@@ -11,7 +11,6 @@ export const ShareNodeContainer = styled(Div)`
 `;
 
 export const ShareButtonContainer = styled(Flex)`
-    /* flex-direction: column; */
     flex-direction: column;
     justify-content: center;
     align-items: center;

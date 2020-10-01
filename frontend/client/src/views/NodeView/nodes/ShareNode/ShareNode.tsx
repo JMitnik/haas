@@ -16,13 +16,13 @@ const ShareNode = ({ node }: SocialShareNodeProps) => {
     copiedTimeout: 1000,
   });
 
-  const newVariable: any = window.navigator;
+  const navi: any = window.navigator;
 
   const { share } = node;
   const handleCopy = () => {
-    if (newVariable?.share) {
+    if (navi?.share) {
       // Web Share API is supported
-      newVariable.share({
+      navi.share({
         title: `${share?.title}`,
         url: `${share?.url}`,
         text: 'Here is your discount code. Please go to following link',

@@ -44,6 +44,4 @@ const client: ApolloClient<NormalizedCacheObject> = new ApolloClient({
   link,
 });
 
-console.log('client: ', client);
-
 export default client;
