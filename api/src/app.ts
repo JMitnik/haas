@@ -23,15 +23,15 @@ const main = async () => {
   const app = express();
   const corsOptions: CorsOptions = {
     // Hardcoded for the moment
-    // origin: (origin, callback) => {
-    // callback(null, true);
-    // const validOrigins = ['http://localhost:3002', 'http://192.168.0.22:3000', 'dashboard.haas.live', 'client.haas.live', 'haas-dashboard.netlify.app', 'haas-client.netlify.app'];
-    //
-    // if (config.env === 'local' || (origin && validOrigins.find((origin: string) => origin.endsWith(origin)))) {
-    // callback(null, true);
-    // }
-    // },
-    origin: 'https://192.168.68.114:3000',
+    origin: (origin, callback) => {
+      callback(null, true);
+      const validOrigins = ['http://localhost:3002', 'https://192.168.68.114:3000/', 'dashboard.haas.live', 'client.haas.live', 'haas-dashboard.netlify.app', 'haas-client.netlify.app'];
+
+      if (config.env === 'local' || (origin && validOrigins.find((origin: string) => origin.endsWith(origin)))) {
+        // callback(null, true);
+      }
+    },
+
     credentials: true,
   };
 
