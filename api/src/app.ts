@@ -41,10 +41,12 @@ const main = async () => {
   apollo.applyMiddleware({ app, cors: corsOptions }); // , cors: false
 
   console.log('🏳️\tStarting the server');
+  const key: any = process.env.HTTPS_SERVER_KEY_PATH;
+  const certificate: any = process.env.HTTPS_SERVER_CERT_PATH;
 
   https.createServer({
-    key: fs.readFileSync('/home/daan/haas/api/src/server.key'),
-    cert: fs.readFileSync('/home/daan/haas/api/src/server.cert'),
+    key: fs.readFileSync(key),
+    cert: fs.readFileSync(certificate),
   }, app).listen(config.port);
 
   console.log('🏁\tStarted the server!');

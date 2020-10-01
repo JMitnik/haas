@@ -2,7 +2,7 @@ import { Share2 } from 'react-feather';
 import { useClipboard } from 'use-clipboard-copy';
 import React from 'react';
 
-import { Div, Flex, H2 } from '@haas/ui';
+import { Flex, H2 } from '@haas/ui';
 import useDialogueFinish from 'hooks/use-dialogue-finish';
 
 import { GenericNodeProps } from '../types';
