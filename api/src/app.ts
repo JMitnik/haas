@@ -31,7 +31,7 @@ const main = async () => {
     // callback(null, true);
     // }
     // },
-    origin: 'https://192.168.0.22:3000',
+    origin: 'https://192.168.68.114:3000',
     credentials: true,
   };
 

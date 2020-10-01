@@ -36,7 +36,7 @@ const cache: InMemoryCache = new InMemoryCache({
 });
 
 const link = new HttpLink({
-  uri: 'https://192.168.0.22:4000/graphql', // process.env.REACT_APP_API_ENDPOINT || 'http://localhost:4000/graphql',
+  uri: 'https://192.168.68.114:4000/graphql', // process.env.REACT_APP_API_ENDPOINT || 'http://localhost:4000/graphql',
 });
 
 const client: ApolloClient<NormalizedCacheObject> = new ApolloClient({
