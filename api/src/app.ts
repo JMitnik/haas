@@ -36,9 +36,9 @@ const main = async () => {
   };
 
   app.use(cookieParser());
-  app.use(cors(corsOptions)); // corsOptions
+  app.use(cors(corsOptions));
 
-  apollo.applyMiddleware({ app, cors: corsOptions }); // , cors: false
+  apollo.applyMiddleware({ app, cors: false });
 
   console.log('🏳️\tStarting the server');
   const key: any = process.env.HTTPS_SERVER_KEY_PATH;
