@@ -33,7 +33,7 @@ const language = {
       de: 'Beschreibung',
     },
     switch_project: {
-      en: 'Switch project',
+      en: 'Switch workspace',
       de: 'Projekt wechseln',
     },
     logout: {
@@ -257,7 +257,7 @@ const language = {
       de: 'Besuchen',
     },
     delete_customer_popover: {
-      en: 'You are about to delete a customer and all related questions. This cannot be undone! Are you sure?',
+      en: 'You are about to delete a workspace and all related questions. This cannot be undone! Are you sure?',
       de: 'Du bist dabei ein Projekt mit allen dazugehörigen Fragen zu löschen. Dies kann nicht rückgängig gemacht werden! Bist du dir sicher?',
     },
     delete_question_popover: {
@@ -437,7 +437,7 @@ const language = {
       de: 'Wie lautet die Telefonnummer des Benutzers? Beginne mit der Landesvorwahl. Beispiel: +496123456',
     },
     name_helper: {
-      en: 'What is the name of your business?',
+      en: 'What is the name of your workspace?',
       de: 'Wie lautet der Name deines Unternehmens?',
     },
     role_selector: {
@@ -481,7 +481,7 @@ const language = {
       de: 'Projekt erstellen',
     },
     about_helper: {
-      en: 'Please tell us a bit about the business. What should be its name and URL.',
+      en: 'Please tell us a bit about the workspace. What should be its name and URL.',
       de: 'Erzähle uns etwas zu deinem Unternehmen. Wie sollen der Name und die URL lauten.',
     },
     branding_color_helper: {
@@ -493,11 +493,11 @@ const language = {
       de: 'Beschreibe die Marke deiner Firma.',
     },
     name_helper: {
-      en: 'What is the name of your business?',
+      en: 'What is the name of your workspace?',
       de: 'Wie heißt dein Unternehmen?',
     },
     slug_helper: {
-      en: 'Under which URL segment will visitors find the business?',
+      en: 'Under which URL segment will visitors find the workspace?',
       de: 'Unter welcher URL Erganzüng sollen Besucher dich finden?',
     },
     use_template: {
@@ -571,7 +571,7 @@ const language = {
       de: 'Alerts',
     },
     edit_business_settings_view: {
-      en: 'Edit business settings',
+      en: 'Edit workspace settings',
       de: 'Wähle Unternehmenseinstellungen',
     },
     create_trigger_view: {
