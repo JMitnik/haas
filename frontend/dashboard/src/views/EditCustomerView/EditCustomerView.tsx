@@ -3,11 +3,11 @@ import {
   FormContainer, PageTitle,
 } from '@haas/ui';
 import { motion } from 'framer-motion';
-import { useCustomer } from 'providers/CustomerProvider';
 import { useForm } from 'react-hook-form';
 import { useHistory, useParams } from 'react-router';
 import { useMutation, useQuery } from '@apollo/react-hooks';
 import { useToast } from '@chakra-ui/core';
+import { useTranslation } from 'react-i18next';
 import { yupResolver } from '@hookform/resolvers';
 import React from 'react';
 
@@ -15,32 +15,22 @@ import CustomerForm from 'components/CustomerForm';
 import booleanToNumber from 'utils/booleanToNumber';
 import parseOptionalBoolean from 'utils/parseOptionalBoolean';
 
-import { queryMe, useUser } from 'providers/UserProvider';
-import { useTranslation } from 'react-i18next';
 import editCustomerMutation from '../../mutations/editCustomer';
-import getCustomersOfUser from '../../queries/getCustomersOfUser';
 import getEditCustomerData from '../../queries/getEditCustomer';
-
-interface FormDataProps {
-  name: string;
-  slug: string;
-  logo?: string;
-  primaryColour?: string;
-  useCustomUrl?: number;
-  uploadLogo?: string;
-  seed?: number;
-}
 
 const schema = yup.object().shape({
   name: yup.string().required(),
   logo: yup.string().url(),
+  uploadLogo: yup.string().url(),
   slug: yup.string().required(),
-  primaryColour: yup.string().required().matches(/^(#(\d|\D){6}$){1}/,
-    { message: 'Provided colour is not a valid hexadecimal' }),
-});
+  primaryColour: yup.string().required().matches(/^(#(\d|\D){6}$){1}/, { message: 'Provided colour is not a valid hexadecimal' }),
+  useCustomUrl: yup.number(),
+}).required();
+
+type FormDataProps = yup.InferType<typeof schema>;
 
 const EditCustomerView = () => {
-  const { customerSlug } = useParams();
+  const { customerSlug } = useParams<{ customerSlug: string }>();
 
   const { data: customerData, error, loading } = useQuery(getEditCustomerData, {
     variables: {
@@ -59,10 +49,8 @@ const EditCustomerView = () => {
 const startsWithCloudinary = (url: string) => url.includes('cloudinary');
 
 const EditCustomerForm = ({ customer }: { customer: any }) => {
-  const { customerSlug } = useParams();
+  const { customerSlug } = useParams<{ customerSlug: string }>();
   const history = useHistory();
-  const { setActiveCustomer } = useCustomer();
-  const { hardRefreshUser } = useUser();
   const { t } = useTranslation();
   const toast = useToast();
 
@@ -71,11 +59,12 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
     defaultValues: {
       name: customer.name,
       logo: customer.settings?.logoUrl,
+      uploadLogo: customer.settings?.logoUrl,
       useCustomUrl: booleanToNumber(!startsWithCloudinary(customer.settings?.logoUrl)),
       primaryColour: customer.settings?.colourSettings?.primary,
       slug: customer.slug,
     },
-    mode: 'onBlur',
+    mode: 'onChange',
   });
 
   const [editCustomer, { loading: isLoading, error: serverErrors }] = useMutation(editCustomerMutation, {
@@ -107,7 +96,6 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
     const optionInput = {
       logo: parseOptionalBoolean(formData.useCustomUrl) ? formData.logo : formData.uploadLogo,
       slug: formData.slug,
-      isSeed: parseOptionalBoolean(formData.seed),
       primaryColour: formData.primaryColour,
       name: formData.name,
     };

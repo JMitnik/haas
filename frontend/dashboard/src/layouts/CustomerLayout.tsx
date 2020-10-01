@@ -10,19 +10,16 @@ import { ReactComponent as NotificationIcon } from 'assets/icons/icon-notificati
 import { ReactComponent as PieChartIcon } from 'assets/icons/icon-pie-chart.svg';
 import { ReactComponent as SettingsIcon } from 'assets/icons/icon-cog.svg';
 import { ReactComponent as SurveyIcon } from 'assets/icons/icon-survey.svg';
-import { UserProps } from 'types/generic';
 import { ReactComponent as UsersIcon } from 'assets/icons/icon-user-group.svg';
 import { motion } from 'framer-motion';
-import { useCustomer } from 'providers/CustomerProvider';
 import { useTranslation } from 'react-i18next';
-import { useUser } from 'providers/UserProvider';
 import Logo from 'components/Logo/Logo';
 import MobileBottomNav from 'components/MobileBottomNav';
 import Sidenav from 'components/Sidenav';
+import useAuth from 'hooks/useAuth';
 import useMediaDevice from 'hooks/useMediaDevice';
 
 import NotAuthorizedView from './NotAuthorizedView';
-import useAuth from 'hooks/useAuth';
 
 const CustomerLayoutContainer = styled(Div)<{ isMobile?: boolean }>`
   ${({ theme, isMobile = false }) => css`
@@ -85,19 +82,6 @@ const DashboardNav = ({ customerSlug }: { customerSlug: string }) => {
 
 const CustomerLayout = ({ children }: { children: React.ReactNode }) => {
   const params: { topicId: string, customerSlug: string, dialogueSlug: string } = useParams<any>();
-  const { activeCustomer } = useCustomer();
-  const { user } = useUser();
-
-  const customer = activeCustomer;
-
-  const userData: UserProps = {
-    firstName: user?.firstName || 'HAAS',
-    lastName: user?.lastName || 'Admin',
-    business: {
-      name: customer?.name || '',
-    },
-  };
-
   const device = useMediaDevice();
 
   return (

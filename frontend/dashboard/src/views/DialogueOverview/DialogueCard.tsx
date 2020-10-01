@@ -1,10 +1,9 @@
-import { ApolloError } from 'apollo-client';
 import { Edit, MapPin, Trash, User } from 'react-feather';
 import { formatDistance } from 'date-fns';
 
 import { useHistory, useParams } from 'react-router';
 import { useMutation } from '@apollo/react-hooks';
-import React from 'react';
+import React, { useRef } from 'react';
 import styled, { css } from 'styled-components/macro';
 
 import { Card, CardBody, ColumnFlex, Div, ExtLink, Flex, Paragraph, Text } from '@haas/ui';
@@ -43,6 +42,7 @@ const DialogueCardOptionsOverlay = ({ onDelete, onEdit }: DialogueCardOptionsOve
 const DialogueCard = ({ dialogue, isCompact }: { dialogue: any, isCompact?: boolean }) => {
   const history = useHistory();
   const { customerSlug } = useParams();
+  const ref = useRef(null);
   const { t } = useTranslation();
   const toast = useToast();
 
@@ -90,7 +90,7 @@ const DialogueCard = ({ dialogue, isCompact }: { dialogue: any, isCompact?: bool
   const lastUpdated = dialogue.updatedAt ? new Date(Number.parseInt(dialogue.updatedAt, 10)) : null;
 
   return (
-    <Card data-cy="DialogueCard" bg="white" useFlex flexDirection="column" onClick={() => history.push(`/dashboard/b/${customerSlug}/d/${dialogue.slug}`)}>
+    <Card ref={ref} data-cy="DialogueCard" bg="white" useFlex flexDirection="column" onClick={() => history.push(`/dashboard/b/${customerSlug}/d/${dialogue.slug}`)}>
       <CardBody flex="100%">
         <ColumnFlex justifyContent="space-between" height="100%">
           <Div>

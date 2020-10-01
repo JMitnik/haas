@@ -15,9 +15,10 @@ import {
 } from '@haas/ui';
 import { useTranslation } from 'react-i18next';
 import ServerError from 'components/ServerError';
-import getDialoguesQuery from 'queries/getDialoguesOfCustomer';
 import getQuestionsQuery from 'queries/getQuestionnaireQuery';
-import getRecipientsQuery from 'queries/getUsers';
+import gql from 'graphql-tag';
+
+import { getCustomerTriggerData as CustomerTriggerData } from './__generated__/getCustomerTriggerData';
 
 interface SelectType {
   label: string;
@@ -36,6 +37,44 @@ enum TriggerQuestionType {
   QUESTION='QUESTION',
   SCHEDULED='SCHEDULED',
 }
+
+const getCustomerTriggerData = gql`
+  query getCustomerTriggerData($customerSlug: String!, $filter: DialogueFilterInputType) {
+    customer(slug: $customerSlug) {
+      id
+      dialogues(filter: $filter) {
+        id
+        title
+        slug
+        publicTitle
+        creationDate
+        updatedAt
+        customerId
+        averageScore
+        customer {
+          slug
+        }
+        tags {
+          id
+          type
+          name
+        }
+      }
+
+      users {
+        id
+        firstName
+        lastName
+        email
+        phone
+        role {
+          id
+          name
+        }
+      }
+    }
+  }
+`;
 
 const ConditionFormFragment = (
   { activeNodeType, onChange, onBlur, value }: { activeNodeType: string, onChange: any, onBlur: any, value: any },
@@ -121,34 +160,31 @@ const getNodeType = (question: SelectType, questions: Array<any>) => {
 const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = false }: TriggerFormProps) => {
   const history = useHistory();
   const { t } = useTranslation();
-  const { customerSlug } = useParams();
-
-  // TODO: Make it one query
+  const { customerSlug } = useParams<{ customerSlug: string }>();
 
   // Fetching dialogue data
-  const { data: dialogueData } = useQuery(getDialoguesQuery, { variables: { customerSlug } });
-  const dialogues = dialogueData?.customer?.dialogues.map((dialogue: any) => ({
+  const { data: triggerData } = useQuery<CustomerTriggerData>(getCustomerTriggerData, { variables: { customerSlug } });
+  const dialogues = triggerData?.customer?.dialogues?.map((dialogue) => ({
     label: dialogue?.title,
     value: dialogue?.slug,
   })) || [];
 
-  // Fetching recipient data
-  const { data: recipientsData } = useQuery(getRecipientsQuery, { variables: { customerSlug } });
-  const recipients = recipientsData?.users && recipientsData?.users.map((recipient: any) => ({
+  const recipients = triggerData?.customer?.users?.map((recipient) => ({
     label: `${recipient?.lastName}, ${recipient?.firstName} - E: ${recipient?.email} - P: ${recipient?.phone}`,
     value: recipient?.id,
   }));
+
   // Fetching questions data
   const [fetchQuestions, { data: questionsData }] = useLazyQuery(getQuestionsQuery, {
     fetchPolicy: 'cache-and-network',
   });
+
   const questions = questionsData?.customer?.dialogue?.questions.map((question: any) => ({
     label: question?.title, value: question?.id,
   })) || [];
 
   const activeDialogue = form.watch('dialogue');
   const activeCondition = form.watch('condition');
-
   const databaseRecipients = form.watch('recipients');
 
   useEffect(() => {
@@ -434,7 +470,6 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                 size="sm"
               >
                 Delete
-
               </Button>
             </Div>
 
