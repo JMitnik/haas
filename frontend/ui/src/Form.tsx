@@ -94,8 +94,7 @@ export const InputLabel = styled.label`
     padding-left: ${theme.gutter / 2}px;
     text-align: left;
     display: block;
-    /* TODO: Hard-coded, needs to be determiend */
-    color: white;
+    color: ${Color(theme.colors.primary).mix(Color('white'), 0.8).hex()};
   `}
 `;
 
@@ -117,7 +116,7 @@ export const Textarea = forwardRef((props: ChakraInputProps<HTMLTextAreaElement>
 export const Input = forwardRef((props: InputProps, ref: Ref<HTMLInputElement>) => (
   <InputGroup>
     {props.leftEl && (
-      <ChakraInputLeftElement color="gray.400" padding="12px" fontSize="0.5rem" {...props}>
+      <ChakraInputLeftElement color="gray.400" padding="12px"  fontSize="0.5rem" {...props}>
         {props.leftEl}
       </ChakraInputLeftElement>
     )}

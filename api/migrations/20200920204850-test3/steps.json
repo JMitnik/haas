@@ -1,0 +1,18 @@
+{
+  "version": "0.3.14-fixed",
+  "steps": [
+    {
+      "tag": "UpdateEnum",
+      "enum": "SystemPermissionEnum",
+      "createdValues": [
+        "CAN_VIEW_DIALOGUE_ANALYTICS",
+        "CAN_VIEW_USERS",
+        "CAN_ADD_USERS",
+        "CAN_DELETE_USERS",
+        "CAN_EDIT_USERS",
+        "CAN_CREATE_TRIGGERS",
+        "CAN_DELETE_TRIGGERS"
+      ]
+    }
+  ]
+}

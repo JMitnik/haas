@@ -55,6 +55,8 @@ type Customer {
   name: String!
   settings: CustomerSettings
   slug: String!
+  users: [UserType!]
+  usersConnection(customerSlug: String, filter: PaginationWhereInput): UserConnection
 }
 
 input CustomerCreateOptions {
@@ -82,9 +84,18 @@ input CustomerWhereUniqueInput {
   id: ID!
 }
 
+"""Date custom scalar type"""
+scalar Date
+
+type Debug {
+  debugResolver: String
+}
+
 type Dialogue {
   averageScore(input: DialogueFilterInputType): Float!
-  countInteractions: Int!
+
+  """Count number of interactions between start-date and end-date"""
+  countInteractions(input: DialogueFilterInputType): Int!
   creationDate: String
   customer: Customer
   customerId: String!
@@ -98,7 +109,7 @@ type Dialogue {
   sessionConnection(filter: PaginationWhereInput): SessionConnection
   sessions(take: Int): [Session!]!
   slug: String!
-  statistics: DialogueStatistics
+  statistics(input: DialogueFilterInputType): DialogueStatistics
   tags: [Tag!]
   title: String!
   updatedAt: String
@@ -150,6 +161,14 @@ input EdgeConditionInputType {
   renderMin: Int
 }
 
+input EditUserInput {
+  customerId: String
+  email: String!
+  firstName: String
+  lastName: String
+  phone: String
+}
+
 type FontSettings {
   id: ID!
 }
@@ -159,6 +178,17 @@ type ImageType {
   filename: String
   mimetype: String
   url: String
+}
+
+input InviteUserInput {
+  customerId: String!
+  email: String!
+  roleId: String!
+}
+
+type InviteUserOutput {
+  didAlreadyExist: Boolean!
+  didInvite: Boolean!
 }
 
 type lineChartDataType {
@@ -191,11 +221,11 @@ enum LinkTypeEnumType {
 """Login credential"""
 input LoginInput {
   email: String!
-  password: String!
 }
 
 """Information you get after you log out"""
 type LoginOutput {
+  expiryDate: Int!
   token: String!
   user: UserType!
 }
@@ -213,6 +243,7 @@ type Mutation {
   createTag(customerSlug: String, name: String, type: TagTypeEnum): Tag!
   createTrigger(customerSlug: String, questionId: String, recipients: RecipientsInputType, trigger: TriggerInputType): TriggerType!
   createUser(customerSlug: String, input: UserInput): UserType!
+  debugMutation: String
   deleteCTA(id: String): QuestionNode!
   deleteCustomer(where: CustomerWhereUniqueInput): Customer
   deleteDialogue(where: DialogueWhereUniqueInput): Dialogue!
@@ -223,13 +254,24 @@ type Mutation {
   editCustomer(id: String, options: CustomerEditOptions): Customer!
   editDialogue(customerSlug: String, description: String, dialogueSlug: String, publicTitle: String, tags: TagsInputObjectType, title: String): Dialogue!
   editTrigger(questionId: String, recipients: RecipientsInputType, trigger: TriggerInputType, triggerId: String): TriggerType!
-  editUser(id: String, input: UserInput): UserType!
-  login(input: LoginInput): LoginOutput
+  editUser(input: EditUserInput, userId: String): UserType!
+
+  """Invite a user to a particular customer domain, given an email and role"""
+  inviteUser(input: InviteUserInput): InviteUserOutput!
+
+  """Logs a user out by removing their refresh token"""
+  logout: String!
   register(input: RegisterInput): String
+  requestInvite(input: RequestInviteInput): RequestInviteOutput!
   singleUpload(file: Upload): ImageType!
   updateCTA(id: String, links: CTALinksInputType, title: String, type: String): QuestionNode!
   updateQuestion(edgeCondition: EdgeConditionInputType, edgeId: String, id: String, optionEntries: OptionsInputType, overrideLeafId: String, title: String, type: String): QuestionNode!
   updateRoles(permissions: PermissionIdsInput, roleId: String): RoleType!
+
+  """
+  Given a token, checks in the database whether token has been set and has not expired yet
+  """
+  verifyUserToken(token: String): VerifyUserTokenOutput!
 }
 
 type NodeEntry {
@@ -342,8 +384,10 @@ type Query {
   dialogues(filter: DialogueFilterInputType): [Dialogue!]!
   edge(id: String): Edge
   lineChartData(dialogueId: String, limit: Int, numberOfDaysBack: Int, offset: Int): [lineChartDataType!]!
+  me: UserType!
   questionNode(where: QuestionNodeWhereUniqueInput): QuestionNode
   questionNodes: [QuestionNode!]!
+  refreshAccessToken: RefreshAccessTokenOutput!
   roleConnection(customerId: String, filter: PaginationWhereInput): RoleConnection!
   roles(customerSlug: String): [RoleType!]
   session(where: SessionWhereUniqueInput): Session
@@ -353,8 +397,8 @@ type Query {
   triggerConnection(customerSlug: String, filter: PaginationWhereInput): TriggerConnectionType
   triggers(customerSlug: String, dialogueId: String, filter: PaginationWhereInput, userId: String): [TriggerType!]!
   user(userId: String): UserType
+  UserOfCustomer(input: UserOfCustomerInput): UserCustomer
   users(customerSlug: String): [UserType!]!
-  userTable(customerSlug: String, filter: PaginationWhereInput): UserTable
 }
 
 type QuestionNode {
@@ -404,6 +448,10 @@ input RecipientsInputType {
   ids: [String!]
 }
 
+type RefreshAccessTokenOutput {
+  accessToken: String!
+}
+
 """Registration credentials"""
 input RegisterInput {
   customerId: String!
@@ -419,12 +467,19 @@ input RegisterNodeEntryInput {
   value: String
 }
 
+input RequestInviteInput {
+  email: String!
+}
+
+type RequestInviteOutput {
+  didInvite: Boolean!
+}
+
 type RoleConnection implements ConnectionInterface {
   endDate: String
   limit: Int!
   offset: Int!
   pageInfo: PaginationPageInfo!
-  permissions: [PermssionType!]!
   roles: [RoleType!]!
   startDate: String
 }
@@ -438,15 +493,15 @@ input RoleInput {
   customerId: String
   description: String
   name: String
+  permissions: [SystemPermission!]
 }
 
 type RoleType {
-  customer: Customer
   customerId: String
   id: ID!
   name: String!
   nrPermissions: Int
-  permissions: [PermssionType!]
+  permissions: [SystemPermission!]
   roleId: String
 }
 
@@ -482,6 +537,23 @@ input SessionWhereUniqueInput {
 """Input type for a slider node"""
 input SliderNodeEntryInput {
   value: Int
+}
+
+enum SystemPermission {
+  CAN_ACCESS_ADMIN_PANEL
+  CAN_ADD_USERS
+  CAN_BUILD_DIALOGUE
+  CAN_CREATE_TRIGGERS
+  CAN_DELETE_DIALOGUE
+  CAN_DELETE_TRIGGERS
+  CAN_DELETE_USERS
+  CAN_DELETE_WORKSPACE
+  CAN_EDIT_DIALOGUE
+  CAN_EDIT_USERS
+  CAN_EDIT_WORKSPACE
+  CAN_VIEW_DIALOGUE
+  CAN_VIEW_DIALOGUE_ANALYTICS
+  CAN_VIEW_USERS
 }
 
 type Tag {
@@ -578,6 +650,18 @@ enum TriggerTypeEnum {
 """The `Upload` scalar type represents a file upload."""
 scalar Upload
 
+type UserConnection {
+  pageIndex: Int
+  totalPages: Int
+  userCustomers: [UserCustomer!]!
+}
+
+type UserCustomer {
+  customer: Customer!
+  role: RoleType!
+  user: UserType!
+}
+
 input UserInput {
   customerId: String
   email: String!
@@ -588,18 +672,27 @@ input UserInput {
   roleId: String
 }
 
-type UserTable {
-  pageIndex: Int
-  totalPages: Int
-  users: [UserType!]!
+input UserOfCustomerInput {
+  customerId: String
+  customerSlug: String
+  userId: String
 }
 
 type UserType {
+  customers: [Customer!]!
   email: String!
   firstName: String
+  globalPermissions: [SystemPermission!]
   id: ID!
   lastName: String
   phone: String
   role: RoleType
   roleId: String
+  userCustomers: [UserCustomer!]!
+}
+
+type VerifyUserTokenOutput {
+  accessToken: String!
+  accessTokenExpiry: Int!
+  userData: UserType!
 }

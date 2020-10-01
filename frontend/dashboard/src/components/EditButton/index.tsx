@@ -3,6 +3,7 @@ import styled, { css } from 'styled-components/macro';
 
 import { Button, Span } from '@haas/ui';
 import { Edit3 } from 'react-feather';
+import { useTranslation } from 'react-i18next';
 
 interface EditButtonProps {
   isDisabled: boolean | undefined;
@@ -19,12 +20,18 @@ const EditButtonContainer = styled(Button)`
     color: ${theme.colors.default.darkest};
     min-width: 80px;
     display: flex;
+    
     ${!disabled && css`
       &:hover {
         transition: all 0.2s ease-in;
-      box-shadow: 0 1px 3px 1px rgba(0,0,0,0.2) !important;
+        box-shadow: 0 1px 3px 1px rgba(0,0,0,0.2) !important;
       }
     `}
+
+    ${disabled && css`
+      pointer-events: none;
+    `}
+
     svg {
         margin-right: 10px;
         color: ${theme.colors.default.darkest};
@@ -34,17 +41,21 @@ const EditButtonContainer = styled(Button)`
   `}
 `;
 
-const EditButton = ({ isDisabled, onClick } : EditButtonProps) => (
-  <EditButtonContainer
-    data-cy="EditButton"
-    disabled={isDisabled}
-    onClick={onClick}
-  >
-    <Edit3 />
-    <Span>
-      Edit
-    </Span>
-  </EditButtonContainer>
-);
+const EditButton = ({ isDisabled, onClick } : EditButtonProps) => {
+  const { t } = useTranslation();
+
+  return (
+    <EditButtonContainer
+      data-cy="EditButton"
+      disabled={isDisabled}
+      onClick={onClick}
+    >
+      <Edit3 />
+      <Span>
+        {t('edit')}
+      </Span>
+    </EditButtonContainer>
+  );
+};
 
 export default EditButton;

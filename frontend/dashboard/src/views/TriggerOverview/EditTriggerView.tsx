@@ -1,11 +1,10 @@
 /* eslint-disable radix */
 import * as yup from 'yup';
-import { ApolloError } from 'apollo-client';
 import { FormContainer, PageTitle } from '@haas/ui';
 import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
+import { useHistory, useParams } from 'react-router';
 import { useMutation, useQuery } from '@apollo/react-hooks';
-import { useParams } from 'react-router';
 import { useToast } from '@chakra-ui/core';
 import { useTranslation } from 'react-i18next';
 import { yupResolver } from '@hookform/resolvers';
@@ -71,7 +70,7 @@ const schema = yup.object().shape({
     then: yup.string().required(),
     otherwise: yup.string().notRequired(),
   }),
-  highThreshold: yup.string().when(['condition'], {
+  highThreshold: yup.string().notRequired().when(['condition'], {
     is: (condition: string) => condition === TriggerConditionType.HIGH_THRESHOLD
     || condition === TriggerConditionType.INNER_RANGE
     || condition === TriggerConditionType.OUTER_RANGE,
@@ -83,9 +82,10 @@ const schema = yup.object().shape({
     then: yup.string().required(),
     otherwise: yup.string().notRequired(),
   }),
-  recipients: yup.array().min(1).of(yup.object().shape({
+  recipients: yup.array().of(yup.object().shape({
     value: yup.string().required(),
-  })),
+    label: yup.string().required(),
+  })).notRequired(),
 });
 
 const EditTriggerView = () => {
@@ -108,7 +108,8 @@ const EditTriggerView = () => {
 
 const EditTriggerForm = ({ trigger }: {trigger: any}) => {
   const { triggerId } = useParams<{triggerId: string, customerSlug: string }>();
-
+  const history = useHistory();
+  const { customerSlug } = useParams();
   const { t } = useTranslation();
   const toast = useToast();
 
@@ -129,9 +130,11 @@ const EditTriggerForm = ({ trigger }: {trigger: any}) => {
         label: trigger.relatedNode.title,
         value: trigger.relatedNode.id,
       },
+      recipients: trigger.recipients.map((recipient: any) => ({ label: `${recipient?.lastName}, ${recipient?.firstName} - E: ${recipient?.email} - P: ${recipient?.phone}`,
+        value: recipient?.id })),
       type: trigger.type,
     },
-    mode: 'onBlur',
+    mode: 'all',
   });
 
   const [editTrigger, { loading: isLoading, error: serverError }] = useMutation(editTriggerMutation, {
@@ -143,8 +146,12 @@ const EditTriggerForm = ({ trigger }: {trigger: any}) => {
         position: 'bottom-right',
         duration: 1500,
       });
+
+      setTimeout(() => {
+        history.push(`/dashboard/b/${customerSlug}/triggers/`);
+      }, 400);
     },
-    onError: (error: ApolloError) => {
+    onError: () => {
       toast({
         title: 'Something went wrong!',
         description: 'Trigger could not be created.',
@@ -152,7 +159,6 @@ const EditTriggerForm = ({ trigger }: {trigger: any}) => {
         position: 'bottom-right',
         duration: 1500,
       });
-      console.log(error);
     },
   });
 

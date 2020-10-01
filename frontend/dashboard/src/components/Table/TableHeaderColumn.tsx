@@ -1,64 +1,54 @@
-import { Div, H3, Span } from '@haas/ui';
+import { ChevronDown, ChevronUp } from 'react-feather';
+import { Div, Span, Text } from '@haas/ui';
+import { Icon } from '@chakra-ui/core';
+import { useTranslation } from 'react-i18next';
 import React from 'react';
 
-interface TableHeaderColumnProps {
-  value: string;
-  accessor: string;
-  sortProperties: {
-    by: string;
-    desc: boolean;
-  }[];
-  onPaginationChange: React.Dispatch<React.SetStateAction<TableProps>>;
-  disableSorting?: boolean;
-}
-
-interface TableProps {
-  activeStartDate: Date | null;
-  activeEndDate: Date | null;
-  activeSearchTerm: string;
-  pageIndex: number;
-  pageSize: number;
-  sortBy: {
-    by: string;
-    desc: boolean;
-  }[]
-}
+import { TableHeaderColumnProps } from './TableTypes';
 
 const TableHeaderColumn = ({
   sortProperties,
   accessor,
-  value,
+  Header,
   onPaginationChange,
   disableSorting,
 }: TableHeaderColumnProps) => {
+  const { t } = useTranslation();
+
   const handleSort = () => {
-    if (!disableSorting) {
-      onPaginationChange((prevValues) => {
-        const { sortBy } = prevValues;
-        const newOrderBy = sortBy?.[0]?.by === accessor
-          ? [{ by: sortBy?.[0]?.by, desc: !sortBy?.[0]?.desc }]
-          : [{ by: accessor, desc: true }];
-        return { ...prevValues, sortBy: newOrderBy, pageIndex: 0 };
-      });
-    }
+    if (disableSorting || !onPaginationChange) return;
+
+    onPaginationChange((prevValues) => {
+      const { sortBy } = prevValues;
+      const newOrderBy = sortBy?.[0]?.by === accessor
+        ? [{ by: sortBy?.[0]?.by, desc: !sortBy?.[0]?.desc }]
+        : [{ by: accessor, desc: true }];
+      return { ...prevValues, sortBy: newOrderBy, pageIndex: 0 };
+    });
   };
+
+  const isInActiveSort = sortProperties && sortProperties[0].by === accessor && !disableSorting;
 
   return (
     <Div
       onClick={handleSort}
       useFlex
       flexDirection="row"
-      justifyContent="center"
       alignItems="center"
       borderRadius="10px 0 0 10px"
     >
-      <Div display="inline-block" padding="10px">
-        <H3 color="#6d767d">
-          {value}
-        </H3>
+      <Div display="inline-block">
+        <Text color={isInActiveSort ? 'gray.600' : 'gray.400'} fontSize="1.1rem" fontWeight="600">
+          {t(Header)}
+        </Text>
       </Div>
+
       <Span>
-        {(sortProperties[0].by === accessor && !disableSorting) ? (sortProperties[0].desc ? '🔽' : '🔼') : ''}
+        {(isInActiveSort && sortProperties) ? (sortProperties[0].desc ? (
+          <Icon as={ChevronDown} />
+        ) : (
+          <Icon as={ChevronUp} />
+        )) : ''}
       </Span>
     </Div>
   );

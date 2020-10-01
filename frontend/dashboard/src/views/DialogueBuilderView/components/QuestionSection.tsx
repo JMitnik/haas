@@ -6,6 +6,7 @@ import SplitArrowIcon from 'components/Icons/SplitIcon';
 
 import { AddQuestionContainer, DepthSpan } from './QuestionEntry/QuestionEntryStyles';
 import { EdgeConditonProps, QuestionEntryProps, QuestionOptionProps } from '../DialogueBuilderInterfaces';
+import { useTranslation } from 'react-i18next';
 import QuestionEntry from './QuestionEntry/QuestionEntry';
 
 interface QuestionSectionProps {
@@ -41,6 +42,7 @@ const QuestionSection = ({
   edgeId,
   parentQuestionType,
 }: QuestionSectionProps) => {
+  const { t } = useTranslation();
   const [isQuestionExpanded, setQuestionExpanded] = useState(depth === 1 || false);
   const [isAddExpanded, setAddExpanded] = useState(false);
   const handleExpandChange = () => {
@@ -66,17 +68,13 @@ const QuestionSection = ({
     onActiveQuestionChange('-1');
   };
 
-  // If you want indent
-  // 1. add paddingLeft={`${depth * 10}px`} to parent flex
-  // 2. add marginLeft={`${depth * 10 + 10}px`} to AddQuestionContainer
-  // 3. add marginLeft={`${depth * 10 + 10}px`} to Div around where (isQuestionExpanded && isAddExpanded)
   return (
     <Flex data-cy="QuestionSection" paddingTop="10px" paddingBottom="10px" flexDirection="column" paddingLeft={`${depth * 10}px`}>
       {depth > 1 && index === 0 && (
       <Flex marginBottom="15px" alignItems="center">
         <SplitArrowIcon />
         <DepthSpan fontSize="0.9em">
-          DEPTH
+          {t('depth')}
           {' '}
           {depth}
         </DepthSpan>
@@ -130,7 +128,7 @@ const QuestionSection = ({
           <Flex justifyContent="center" alignItems="center">
             <Plus width="25px" height="25px" />
             <H4>
-              Add new question
+              {t('add_question')}
             </H4>
           </Flex>
         </AddQuestionContainer>

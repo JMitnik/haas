@@ -23,6 +23,11 @@ import { Div, GenericProps } from './Generics';
 
 interface ContainerProps extends GenericProps {}
 
+export const PageContainer = styled(Div)`
+  width: 100%;
+  height: 100vh;
+`
+
 export const Container = styled(Div)<ContainerProps>`
   ${({ theme }) => css`
     position: relative;
@@ -40,6 +45,9 @@ export const Container = styled(Div)<ContainerProps>`
 export const ViewContainer = styled(Div)`
   ${({ theme }) => css`
     padding: ${theme.gutter}px;
+    max-width: 1400px;
+    margin: 0 auto;
+    min-height: 100vh;
   `}
 `;
 

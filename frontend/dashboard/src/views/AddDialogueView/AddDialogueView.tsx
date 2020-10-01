@@ -2,7 +2,7 @@ import * as yup from 'yup';
 import { ApolloError } from 'apollo-boost';
 import { Button, ButtonGroup, FormErrorMessage, Stack, useToast } from '@chakra-ui/core';
 import { Container, Div, ErrorStyle, Flex, Form, FormContainer, FormControl, FormLabel,
-  FormSection, H2, H3, Hr, Input, InputGrid, InputHelper, Muted, Textarea } from '@haas/ui';
+  FormSection, H3, Hr, Input, InputGrid, InputHelper, Muted, PageTitle, Textarea } from '@haas/ui';
 import { Controller, useForm } from 'react-hook-form';
 import { Minus, Plus, Type } from 'react-feather';
 import { useHistory, useParams } from 'react-router';
@@ -11,24 +11,15 @@ import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 import Select from 'react-select';
 
+import { getCustomers as CustomerData } from 'queries/__generated__/getCustomers';
 import { createDialogue } from 'mutations/createDialogue';
 import { motion } from 'framer-motion';
+import { useUser } from 'providers/UserProvider';
 import { yupResolver } from '@hookform/resolvers';
 import ServerError from 'components/ServerError';
-import getCustomerQuery from 'queries/getCustomersQuery';
+import getCustomersOfUser from 'queries/getCustomersOfUser';
 import getDialoguesOfCustomer from 'queries/getDialoguesOfCustomer';
 import getTagsQuery from 'queries/getTags';
-
-interface FormDataProps {
-  title: string;
-  publicTitle?: string;
-  description: string;
-  slug: string;
-  contentOption: {label: string, value: string};
-  customerOption: string;
-  dialogueOption: string;
-  tags: Array<string>;
-}
 
 const DIALOGUE_CONTENT_TYPES = [
   { label: 'From scratch', value: 'SCRATCH' },
@@ -36,7 +27,7 @@ const DIALOGUE_CONTENT_TYPES = [
   { label: 'From other dialogue', value: 'TEMPLATE' },
 ];
 
-const schema = yup.object().shape({
+const schema = yup.object({
   title: yup.string().required('Title is required'),
   publicTitle: yup.string().notRequired(),
   description: yup.string().required('Description is required'),
@@ -44,20 +35,31 @@ const schema = yup.object().shape({
   contentOption: yup.object().shape(
     { label: yup.string().required(), value: yup.string().required() },
   ).required('Content option is required'),
-  customerOption: yup.string().when(['contentOption'], {
-    is: (contentOption : { label: string, value: string}) => contentOption?.value === 'TEMPLATE',
-    then: yup.string().required(),
-    otherwise: yup.string().notRequired(),
+  customerOption: yup.object().shape({
+    label: yup.string().ensure(),
+    value: yup.string(),
+  }).when(['contentOption'], {
+    is: (contentOption : { label: string, value: string} | undefined) => contentOption?.value === 'TEMPLATE',
+    then: () => yup.object().required(),
+    otherwise: () => yup.object().notRequired(),
   }),
-  dialogueOption: yup.string().when(['customerOption'], {
+  dialogueOption: yup.object().notRequired().shape({
+    label: yup.string().ensure(),
+    value: yup.string().ensure(),
+  }).when(['customerOption'], {
     is: (customerOption : string) => customerOption,
-    then: yup.string().required(),
-    otherwise: yup.string().notRequired(),
+    then: yup.object().required(),
+    otherwise: yup.object().notRequired(),
   }),
   tags: yup.array().of(yup.string().min(1).required()).notRequired(),
-});
+}).required();
+
+type FormDataProps = yup.InferType<typeof schema>;
 
 const AddDialogueView = () => {
+  const { user } = useUser();
+  const { customerSlug } = useParams<{ customerSlug: string }>();
+
   const history = useHistory();
   const toast = useToast();
   const form = useForm<FormDataProps>({
@@ -67,13 +69,12 @@ const AddDialogueView = () => {
 
   const { t } = useTranslation();
 
-  const { customerSlug } = useParams();
   const [activeTags, setActiveTags] = useState<Array<null | {label: string, value: string}>>([]);
-  const [activeContentOption] = useState<null | {label: string, value: string}>(null);
-  const [activeCustomerTemplate, setActiveCustomerTemplate] = useState<null | {label: string, value: string}>(null);
-  const [activeDialogueTemplate, setActiveDialogueTemplate] = useState<null | {label: string, value: string}>(null);
-  const { data: customerData } = useQuery(getCustomerQuery, {
+  const { data: customerData } = useQuery<CustomerData>(getCustomersOfUser, {
     fetchPolicy: 'cache-and-network',
+    variables: {
+      userId: user?.id,
+    },
     onError: (error: any) => {
       console.log(error);
     },
@@ -142,29 +143,30 @@ const AddDialogueView = () => {
         publicTitle: formData.publicTitle,
         description: formData.description,
         contentType: formData.contentOption.value,
-        templateDialogueId: formData.dialogueOption,
+        templateDialogueId: formData.dialogueOption?.value,
         tags: tagEntries,
       },
     });
   };
-  const handleDialogueTemplateChange = (qOption: any) => {
-    form.setValue('dialogueOption', qOption?.value);
 
-    setActiveDialogueTemplate(qOption);
-  };
+  const contentOption = form.watch('contentOption');
+  const customerOption = form.watch('customerOption');
 
-  const handleCustomerChange = (qOption: any) => {
-    setActiveCustomerTemplate(qOption);
-    setActiveDialogueTemplate(null);
-  };
+  const customerOptions = customerData?.user?.customers?.map((customer) => ({
+    label: customer.name,
+    value: customer.id,
+  }));
 
-  const CUSTOMER_OPTIONS = customerData?.customers?.map(
-    ({ name, id }: { name: string, id: string }) => ({ label: name, value: id }));
+  const selectedCustomer = customerData?.user?.customers?.find((customer) => {
+    if (customer.id === customerOption?.value) return true;
 
-  const dialogueOptions = form.watch('customerOption')
-    && customerData?.customers?.find(
-      (customer: any) => customer.id === activeCustomerTemplate?.value)?.dialogues?.map(
-        (dialogue: any) => ({ label: dialogue.title, value: dialogue.id }));
+    return false;
+  });
+
+  const dialogues = selectedCustomer?.dialogues?.map((dialogue) => ({
+    label: dialogue.title,
+    value: dialogue.id,
+  })) || [];
 
   const tags = data?.tags && data?.tags?.map((tag: any) => ({
     label: tag?.name,
@@ -173,29 +175,26 @@ const AddDialogueView = () => {
 
   return (
     <Container>
+      <PageTitle>{t('views:add_dialogue_view')}</PageTitle>
 
-      <Div>
-        <H2 color="gray.700" mb={4} py={2}>Add dialogue</H2>
-      </Div>
       <motion.div initial={{ opacity: 0, y: 100 }} animate={{ opacity: 1, y: 0 }}>
-
         <FormContainer>
           <Form onSubmit={form.handleSubmit(onSubmit)}>
             <ServerError serverError={serverError} />
             <FormSection id="general">
               <Div>
-                <H3 color="default.text" fontWeight={500} pb={2}>About dialogue</H3>
+                <H3 color="default.text" fontWeight={500} pb={2}>{t('dialogue:about')}</H3>
                 <Muted color="gray.600">
-                  Tell us a bit about the dialogue
+                  {t('dialogue:about_helper')}
                 </Muted>
               </Div>
               <Div>
                 <InputGrid>
                   <FormControl isRequired isInvalid={!!form.errors.title}>
-                    <FormLabel htmlFor="title">Title</FormLabel>
-                    <InputHelper>What is the name of the dialogue?</InputHelper>
+                    <FormLabel htmlFor="title">{t('title')}</FormLabel>
+                    <InputHelper>{t('dialogue:title_helper')}</InputHelper>
                     <Input
-                      placeholder="Peaches or apples?"
+                      placeholder={t('dialogue:title_placeholder')}
                       leftEl={<Type />}
                       name="title"
                       ref={form.register({ required: true })}
@@ -204,12 +203,14 @@ const AddDialogueView = () => {
                   </FormControl>
 
                   <FormControl isInvalid={!!form.errors.publicTitle}>
-                    <FormLabel htmlFor="publicTitle">Public title</FormLabel>
+                    <FormLabel htmlFor="publicTitle">
+                      {t('dialogue:public_title')}
+                    </FormLabel>
                     <InputHelper>
-                      (Optional): If set, will be used instead of the actual title to the user instead.
+                      {t('dialogue:public_title_helper')}
                     </InputHelper>
                     <Input
-                      placeholder="Peaches > Apples?"
+                      placeholder={t('dialogue:public_title_placeholder')}
                       leftEl={<Type />}
                       name="publicTitle"
                       ref={form.register({ required: false })}
@@ -218,9 +219,9 @@ const AddDialogueView = () => {
                   </FormControl>
 
                   <FormControl isRequired isInvalid={!!form.errors.description}>
-                    <FormLabel htmlFor="title">Description</FormLabel>
+                    <FormLabel htmlFor="title">{t('description')}</FormLabel>
                     <InputHelper>
-                      How would you describe the dialogue?
+                      {t('dialogue:description_helper')}
                     </InputHelper>
                     <Textarea
                       placeholder="Describe your dialogue"
@@ -250,70 +251,57 @@ const AddDialogueView = () => {
 
             <FormSection id="template">
               <Div>
-                <H3 color="default.text" fontWeight={500} pb={2}>Template</H3>
+                <H3 color="default.text" fontWeight={500} pb={2}>{t('template')}</H3>
                 <Muted color="gray.600">
-                  Do you wish to start the dialogue from a clean slate,
-                  or base this on another dialogue (or HAAS template)?
+                  {t('dialogue:template_helper')}
                 </Muted>
               </Div>
               <Div>
                 <InputGrid>
                   <FormControl isRequired>
-                    <FormLabel htmlFor="title">Use a template</FormLabel>
+                    <FormLabel htmlFor="title">
+                      {t('dialogue:use_template')}
+                    </FormLabel>
                     <InputHelper>
-                      Set what type of template you would like to use.
+                      {t('dialogue:use_template_helper')}
                     </InputHelper>
                     <Controller
                       name="contentOption"
                       control={form.control}
                       as={Select}
                       options={DIALOGUE_CONTENT_TYPES}
-                      defaultValue={activeContentOption}
+                      defaultValue={{ label: 'From default template', value: 'SEED' }}
                     />
                   </FormControl>
 
-                  {(form.watch('contentOption')?.value === 'TEMPLATE' && CUSTOMER_OPTIONS) && (
+                  {(contentOption?.value === 'TEMPLATE' && customerOptions) && (
                     <FormControl>
                       <FormLabel>Project for templates</FormLabel>
                       <InputHelper>Pick project to take template from</InputHelper>
                       <Controller
                         name="customerOption"
                         control={form.control}
-                        defaultValue={activeCustomerTemplate}
-                        render={({ onChange, onBlur, value }) => (
-                          <Select
-                            options={CUSTOMER_OPTIONS}
-                            onChange={(data: any) => {
-                              handleCustomerChange(data);
-                              onChange(data.value);
-                            }}
-                          />
-                        )}
+                        as={Select}
+                        options={customerOptions}
+                        defaultValue=""
                       />
-                      <FormErrorMessage>{form.errors.customerOption?.message}</FormErrorMessage>
+                      <FormErrorMessage>{form.errors.customerOption?.value?.message}</FormErrorMessage>
                     </FormControl>
                   )}
 
-                  {(form.watch('customerOption') && dialogueOptions) && (
+                  {(customerOption && dialogues && (
                     <FormControl>
                       <FormLabel>Template from project</FormLabel>
                       <InputHelper>Pick template from project</InputHelper>
                       <Controller
                         name="dialogueOption"
                         control={form.control}
-                        defaultValue={activeDialogueTemplate}
-                        render={({ onChange, onBlur, value }) => (
-                          <Select
-                            options={dialogueOptions}
-                            onChange={(data: any) => {
-                              handleDialogueTemplateChange(data);
-                              onChange(data.value);
-                            }}
-                          />
-                        )}
+                        defaultValue=""
+                        as={Select}
+                        options={dialogues}
                       />
                     </FormControl>
-                  )}
+                  ))}
                 </InputGrid>
               </Div>
             </FormSection>
@@ -324,7 +312,7 @@ const AddDialogueView = () => {
               <Div>
                 <H3 color="default.text" fontWeight={500} pb={2}>Tags</H3>
                 <Muted color="gray.600">
-                  Would you like to assign tags to associate your dialogue with?
+                  {t('dialogue:tag_helper')}
                 </Muted>
               </Div>
               <Div>
@@ -334,7 +322,7 @@ const AddDialogueView = () => {
                       leftIcon={Plus}
                       onClick={() => setActiveTags((prevTags) => [...prevTags, null])}
                     >
-                      Add tag
+                      {t('add_tag')}
                     </Button>
                   </Div>
 
@@ -370,7 +358,7 @@ const AddDialogueView = () => {
                             leftIcon={Minus}
                             onClick={() => deleteTag(index)}
                           >
-                            Remove
+                            {t('remove')}
                           </Button>
                         </Flex>
                       </Flex>
@@ -383,14 +371,16 @@ const AddDialogueView = () => {
 
             <ButtonGroup>
               <Button
-                isLoading={isLoading}
                 isDisabled={!form.formState.isValid}
+                isLoading={isLoading}
                 variantColor="teal"
                 type="submit"
               >
-                Create
+                {t('create')}
               </Button>
-              <Button variant="outline" onClick={() => history.push('/')}>Cancel</Button>
+              <Button variant="outline" onClick={() => history.push('/')}>
+                {t('cancel')}
+              </Button>
             </ButtonGroup>
           </Form>
         </FormContainer>

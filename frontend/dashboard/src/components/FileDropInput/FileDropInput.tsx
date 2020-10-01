@@ -1,7 +1,9 @@
+import { Div } from '@haas/ui';
 import { Spinner } from '@chakra-ui/core';
 import { useDropzone } from 'react-dropzone';
+import { useTranslation } from 'react-i18next';
 import React from 'react';
-import styled from 'styled-components/macro';
+import styled, { css } from 'styled-components/macro';
 
 const getDropColor = (props: any) => {
   if (props.isDragAccept) {
@@ -32,8 +34,28 @@ const DropContainer = styled.div`
   transition: border .24s ease-in-out;
 `;
 
+const UploadPreviewContainer = styled(Div)`
+  ${({ theme }) => css`
+    border-radius: 10px;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+    height: 100%;
+    display: flex;
+    background: ${theme.colors.primaries[500]};
+    padding: ${theme.gutter / 2}px;
+    
+    img {
+      max-width: 150px;
+      max-height: 150px;
+      border-radius: 10px;
+      height: 100%;
+      width: 100%;
+      object-fit: contain;
+    }
+  `}
+`;
+
 const FileDropInput = (props: any) => {
-  const { onDrop, isLoading } = props;
+  const { onDrop, isLoading, value } = props;
 
   const {
     acceptedFiles,
@@ -49,9 +71,18 @@ const FileDropInput = (props: any) => {
 
   const acceptedFile = acceptedFiles?.[0] || undefined;
 
+  const { t } = useTranslation();
+
   return (
     <section className="container">
       <DropContainer {...getRootProps({ isDragActive, isDragAccept, isDragReject })}>
+        {value && (
+          <UploadPreviewContainer mb={2}>
+            <Div>
+              <img src={value} alt="" />
+            </Div>
+          </UploadPreviewContainer>
+        )}
         {isLoading ? (
           <Spinner />
         ) : (
@@ -68,7 +99,13 @@ const FileDropInput = (props: any) => {
                 bytes
               </p>
             ) : (
-              <p>Drag the logo here, or click to select it</p>
+              <>
+                {value ? (
+                  <p>{t('upload_zone_replace')}</p>
+                ) : (
+                  <p>{t('upload_zone')}</p>
+                )}
+              </>
             )}
           </>
         )}

@@ -2,6 +2,7 @@ require('dotenv').config();
 
 export interface ConfigProps {
   jwtSecret: string;
+  jwtExpiryMinutes: number;
   env: string;
   port: number;
   endpoint: string;
@@ -26,6 +27,7 @@ if (!process.env.MAIL_SENDER) console.log('Mail sender not defined; wont send ma
 
 const config: ConfigProps = {
   jwtSecret: process.env.JWT_SECRET,
+  jwtExpiryMinutes: 30,
   env: process.env.ENVIRONMENT || 'local',
   port: Number(process.env.PORT) || 4000,
   endpoint: process.env.APP_ENDPOINT || '/graphql',
@@ -42,7 +44,7 @@ const config: ConfigProps = {
   prismaServiceSecret: process.env.PRISMA_SERVICE_SECRET || '',
   twilioAccountSid: process.env.SMS_ACCOUNT_SID || '',
   twilioAuthToken: process.env.SMS_AUTH_TOKEN || '',
-  testString: new Date().toUTCString()
+  testString: new Date().toUTCString(),
 };
 
 export default config;

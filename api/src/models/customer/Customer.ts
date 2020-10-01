@@ -1,4 +1,4 @@
-import { Customer, PrismaClient } from '@prisma/client';
+import { ColourSettings, Customer, CustomerSettings, PrismaClient } from '@prisma/client';
 import { GraphQLError } from 'graphql';
 import { GraphQLUpload, UserInputError } from 'apollo-server-express';
 import { extendType, inputObjectType, mutationField, objectType, scalarType } from '@nexus/schema';
@@ -10,8 +10,19 @@ import { DialogueFilterInputType, DialogueType, DialogueWhereUniqueInput } from 
 // eslint-disable-next-line import/no-cycle
 import CustomerService from './CustomerService';
 // eslint-disable-next-line import/no-cycle
+import { PaginationWhereInput } from '../general/Pagination';
+import { UserConnection } from '../users/User';
 import DialogueService from '../questionnaire/DialogueService';
+import UserService from '../users/UserService';
 import isValidColor from '../../utils/isValidColor';
+
+export interface CustomerSettingsWithColour extends CustomerSettings {
+  colourSettings?: ColourSettings | null;
+}
+
+export interface CustomerWithCustomerSettings extends Customer {
+  settings?: CustomerSettingsWithColour | null;
+}
 
 export const CustomerType = objectType({
   name: 'Customer',
@@ -30,6 +41,25 @@ export const CustomerType = objectType({
         });
 
         return customerSettings as any;
+      },
+    });
+
+    t.field('usersConnection', {
+      type: UserConnection,
+      args: { customerSlug: 'String', filter: PaginationWhereInput },
+      nullable: true,
+
+      async resolve(parent, args) {
+        const users = await UserService.paginatedUsers(
+          parent.slug,
+          args.filter?.pageIndex,
+          args.filter?.offset,
+          args.filter?.limit,
+          args.filter?.orderBy?.[0],
+          args.filter?.searchTerm,
+        );
+
+        return users as any;
       },
     });
 
@@ -82,6 +112,36 @@ export const CustomerType = objectType({
         return dialogues as any;
       },
     });
+
+    t.list.field('users', {
+      type: 'UserType',
+      nullable: true,
+
+      async resolve(parent, args, ctx) {
+        const customer = await ctx.prisma.customer.findOne({
+          where: { id: parent.id },
+          include: {
+            users: {
+              include: {
+                user: {
+                  select: {
+                    id: true,
+                    firstName: true,
+                    lastName: true,
+                    email: true,
+                    phone: true,
+                  },
+                },
+              },
+            },
+          },
+        });
+
+        const users = customer?.users.map((userCustomer) => userCustomer.user) || null as any;
+
+        return users;
+      },
+    });
   },
 });
 
@@ -131,10 +191,6 @@ const CustomerEditOptionsInput = inputObjectType({
   },
 });
 
-interface test {
-  url?: string;
-}
-
 export const CustomerMutations = Upload && extendType({
   type: 'Mutation',
   definition(t) {
@@ -172,7 +228,7 @@ export const CustomerMutations = Upload && extendType({
         name: 'String',
         options: CustomerCreateOptionsInput,
       },
-      async resolve(parent, args) {
+      async resolve(parent, args, ctx) {
         const primaryColor = args?.options?.primaryColour;
 
         if (primaryColor) {
@@ -183,7 +239,7 @@ export const CustomerMutations = Upload && extendType({
           }
         }
 
-        const customer = CustomerService.createCustomer(args as any);
+        const customer = CustomerService.createCustomer(args as any, ctx.session?.user?.id);
 
         return customer as any;
       },

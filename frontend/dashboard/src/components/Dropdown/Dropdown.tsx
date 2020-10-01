@@ -8,9 +8,13 @@ import { DropdownContainer, DropdownOverlayContainer } from './DropdownStyles';
 interface DropdownProps {
   renderOverlay?: React.ReactNode;
   children?: React.ReactNode;
+  left?: string;
+  right?: string;
+  top?: string;
+  bottom?: string;
 }
 
-const Dropdown = ({ children, renderOverlay }: DropdownProps) => {
+const Dropdown = ({ children, renderOverlay, left, right, top, bottom }: DropdownProps) => {
   const ref = useRef<any>();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -21,10 +25,15 @@ const Dropdown = ({ children, renderOverlay }: DropdownProps) => {
     setIsOpen((isOpen) => !isOpen);
   };
 
+  const handleDropdownClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    e.preventDefault();
+    setIsOpen(false);
+  };
+
   return (
-    <DropdownContainer onClick={(e) => e.stopPropagation()} ref={ref}>
+    <DropdownContainer onClick={handleDropdownClick} ref={ref}>
       {isOpen && (
-        <DropdownOverlayContainer>
+        <DropdownOverlayContainer left={left} right={right} top={top} bottom={bottom}>
           {renderOverlay}
         </DropdownOverlayContainer>
       )}

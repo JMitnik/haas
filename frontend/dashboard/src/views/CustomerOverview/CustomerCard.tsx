@@ -1,36 +1,34 @@
 import { Button, ButtonGroup, Popover, PopoverArrow, PopoverBody,
   PopoverCloseButton, PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast } from '@chakra-ui/core';
 import { useHistory } from 'react-router';
+import { useTranslation } from 'react-i18next';
 import Color from 'color';
 import React from 'react';
 
-import { Card, CardBody, ColumnFlex, H3, Span } from '@haas/ui';
+import { Card, CardBody, ColumnFlex, H3, Span, Text } from '@haas/ui';
 import { deleteFullCustomerQuery } from 'mutations/deleteFullCustomer';
 import { isValidColor } from 'utils/ColorUtils';
-import { useCustomer } from 'providers/CustomerProvider';
+import { queryMe, useUser } from 'providers/UserProvider';
 import { useMutation } from '@apollo/react-hooks';
-import getCustomerQuery from 'queries/getCustomersQuery';
+import getCustomersOfUser from 'queries/getCustomersOfUser';
+import useAuth from 'hooks/useAuth';
 
 import { CustomerCardImage } from './CustomerOverviewStyles';
 
 const CustomerCard = ({ customer }: { customer: any }) => {
   const history = useHistory();
-  const { setActiveCustomer } = useCustomer();
   const toast = useToast();
+  const { t } = useTranslation();
+  const { user } = useUser();
+  const { canDeleteCustomers } = useAuth();
 
   const setCustomerSlug = (customerSlug: string) => {
     localStorage.setItem('customer', JSON.stringify(customer));
-    setActiveCustomer(customer);
     history.push(`/dashboard/b/${customerSlug}`);
   };
 
-  const setCustomerEditPath = (event: any, customerSlug: string) => {
-    history.push(`/dashboard/b/${customerSlug}/edit`);
-    event.stopPropagation();
-  };
-
   const [deleteCustomer] = useMutation(deleteFullCustomerQuery, {
-    refetchQueries: [{ query: getCustomerQuery }],
+    refetchQueries: [{ query: queryMe }, { query: getCustomersOfUser, variables: { userId: user?.id } }],
     onError: () => {
       toast({
         title: 'Something went wrong',
@@ -88,55 +86,47 @@ const CustomerCard = ({ customer }: { customer: any }) => {
               color={primaryColor.lighten(0.6).hex()}
               borderColor={primaryColor.lighten(0.6).hex()}
             >
-              Visit
+              {t('visit')}
             </Button>
-            <Button
-              size="xs"
-              variant="outline"
-              leftIcon="edit"
-              color={primaryColor.lighten(0.6).hex()}
-              borderColor={primaryColor.lighten(0.6).hex()}
-              onClick={(e) => setCustomerEditPath(e, customer.slug)}
-            >
-              Edit
-            </Button>
-            <Span onClick={(e) => e.stopPropagation()}>
-              <Popover
-                usePortal
-              >
-                {({ onClose }) => (
-                  <>
-                    <PopoverTrigger>
-                      <Button
-                        size="xs"
-                        variant="outline"
-                        leftIcon="delete"
-                        color={primaryColor.lighten(0.6).hex()}
-                        borderColor={primaryColor.lighten(0.6).hex()}
-                      >
-                        Delete
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent zIndex={4}>
-                      <PopoverArrow />
-                      <PopoverHeader>Delete</PopoverHeader>
-                      <PopoverCloseButton />
-                      <PopoverBody>
-                        <p>You are about to delete a customer. Are you sure?</p>
-                      </PopoverBody>
-                      <PopoverFooter>
+            {canDeleteCustomers && (
+              <Span onClick={(e) => e.stopPropagation()}>
+                <Popover
+                  usePortal
+                >
+                  {({ onClose }) => (
+                    <>
+                      <PopoverTrigger>
                         <Button
-                          variantColor="red"
-                          onClick={() => handleDeleteCustomer(customer.id, onClose)}
+                          size="xs"
+                          variant="outline"
+                          leftIcon="delete"
+                          color={primaryColor.lighten(0.6).hex()}
+                          borderColor={primaryColor.lighten(0.6).hex()}
                         >
-                          Delete
+                          {t('delete')}
                         </Button>
-                      </PopoverFooter>
-                    </PopoverContent>
-                  </>
-                )}
-              </Popover>
-            </Span>
+                      </PopoverTrigger>
+                      <PopoverContent zIndex={4}>
+                        <PopoverArrow />
+                        <PopoverHeader>{t('delete')}</PopoverHeader>
+                        <PopoverCloseButton />
+                        <PopoverBody>
+                          <Text>{t('delete_customer_popover')}</Text>
+                        </PopoverBody>
+                        <PopoverFooter>
+                          <Button
+                            variantColor="red"
+                            onClick={() => handleDeleteCustomer(customer.id, onClose)}
+                          >
+                            {t('delete')}
+                          </Button>
+                        </PopoverFooter>
+                      </PopoverContent>
+                    </>
+                  )}
+                </Popover>
+              </Span>
+            )}
           </ButtonGroup>
         </ColumnFlex>
 

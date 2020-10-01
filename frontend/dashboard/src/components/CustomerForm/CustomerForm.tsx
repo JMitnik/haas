@@ -27,7 +27,7 @@ interface FormDataProps {
   seed?: number;
 }
 
-const CustomerUploadLogoInput = ({ onChange }: any) => {
+const CustomerUploadLogoInput = ({ onChange, value }: any) => {
   const toast = useToast();
 
   const [uploadFile, { loading }] = useMutation(uploadSingleImage, {
@@ -61,68 +61,73 @@ const CustomerUploadLogoInput = ({ onChange }: any) => {
   };
 
   return (
-    <FileDropInput onDrop={onDrop} isLoading={loading} />
+    <>
+      <FileDropInput value={value} onDrop={onDrop} isLoading={loading} />
+    </>
   );
 };
 
-const CustomerLogoFormFragment = ({ form }: { form: UseFormMethods<FormDataProps> }) => (
-  <>
-    <FormControl>
-      <FormLabel>Logo</FormLabel>
-      <InputHelper>Switch between uploading your own logo or inserting the url of an existing one</InputHelper>
+const CustomerLogoFormFragment = ({ form }: { form: UseFormMethods<FormDataProps> }) => {
+  const { t } = useTranslation();
 
-      <Controller
-        control={form.control}
-        name="useCustomUrl"
-        defaultValue={1}
-        render={({ onChange }) => (
-          <RadioButtonGroup
-            defaultValue={1}
-            isInline
-            onChange={onChange}
-            display="flex"
-          >
-            <ButtonRadio value={1} text="Existing url" description="Insert Existing url" />
-            <ButtonRadio value={0} text="Upload file" description="Upload file" />
-          </RadioButtonGroup>
-        )}
-      />
-
-    </FormControl>
-
-    {form.watch('useCustomUrl') ? (
+  return (
+    <>
       <FormControl>
-        <FormLabel htmlFor="logo">Logo: existing URL</FormLabel>
-        <InputHelper>Use the URL of an existing logo. We recommend one with no background-colors.</InputHelper>
-        <Input
-            // eslint-disable-next-line jsx-a11y/anchor-is-valid
-          leftEl={<Link />}
-          name="logo"
-          isInvalid={!!form.errors.logo}
-          ref={form.register()}
+        <FormLabel>{t('logo')}</FormLabel>
+        <InputHelper>{t('customer:logo_helper')}</InputHelper>
+
+        <Controller
+          control={form.control}
+          name="useCustomUrl"
+          defaultValue={1}
+          render={({ onChange, value }) => (
+            <RadioButtonGroup
+              value={value}
+              isInline
+              onChange={onChange}
+              display="flex"
+            >
+              <ButtonRadio value={1} text={t('existing_url')} description={t('existing_url_helper')} />
+              <ButtonRadio value={0} text={t('upload_file')} description={t('upload_file_helper')} />
+            </RadioButtonGroup>
+          )}
         />
+
       </FormControl>
 
-    ) : (
-      <>
+      {form.watch('useCustomUrl') ? (
         <FormControl>
-          <FormLabel htmlFor="cloudinary">Logo: upload logo</FormLabel>
-          <InputHelper>Upload a logo (preferably SVG or PNG)</InputHelper>
-
-          <Controller
-            control={form.control}
-            name="uploadLogo"
-            defaultValue=""
-            render={({ onChange }) => (
-              <CustomerUploadLogoInput onChange={onChange} />
-            )}
+          <FormLabel htmlFor="logo">{t('logo_existing_url')}</FormLabel>
+          <InputHelper>{t('logo_existing_url_helper')}</InputHelper>
+          <Input
+              // eslint-disable-next-line jsx-a11y/anchor-is-valid
+            leftEl={<Link />}
+            name="logo"
+            isInvalid={!!form.errors.logo}
+            ref={form.register()}
           />
-
         </FormControl>
-      </>
-    )}
-  </>
-);
+
+      ) : (
+        <>
+          <FormControl>
+            <FormLabel htmlFor="cloudinary">{t('logo_upload')}</FormLabel>
+            <InputHelper>{t('logo_upload_helper')}</InputHelper>
+
+            <Controller
+              control={form.control}
+              name="uploadLogo"
+              defaultValue=""
+              render={({ onChange, value }) => (
+                <CustomerUploadLogoInput value={value} onChange={onChange} />
+              )}
+            />
+          </FormControl>
+        </>
+      )}
+    </>
+  );
+};
 
 interface CustomerFormProps {
   form: any;
@@ -138,9 +143,6 @@ interface CustomerFormProps {
 const CustomerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = false }: CustomerFormProps) => {
   const history = useHistory();
   const { t } = useTranslation();
-
-  console.log(form.formState.isValid);
-  console.log(form.errors);
 
   return (
     <Form onSubmit={form.handleSubmit(onFormSubmit)}>
@@ -252,9 +254,9 @@ const CustomerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = 
           variantColor="teal"
           type="submit"
         >
-          {isInEdit ? 'Edit' : 'Create'}
+          {isInEdit ? t('edit') : t('create')}
         </Button>
-        <Button variant="outline" onClick={() => history.push('/')}>Cancel</Button>
+        <Button variant="outline" onClick={() => history.goBack()}>{t('cancel')}</Button>
       </ButtonGroup>
     </Form>
   );

@@ -1,10 +1,9 @@
 import { ExpressContext } from 'apollo-server-express/dist/ApolloServer';
 import { PrismaClient } from '@prisma/client';
 
-// eslint-disable-next-line import/no-cycle
-import ServiceContainer from '../services/service-container';
+import { ContextSessionType } from '../models/auth/ContextSessionType';
 
 export interface APIContext extends ExpressContext {
   prisma: PrismaClient;
+  session: ContextSessionType | null;
 }
-

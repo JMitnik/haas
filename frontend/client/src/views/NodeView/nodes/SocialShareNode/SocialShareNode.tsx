@@ -1,8 +1,7 @@
 import { Facebook, Globe, Instagram, Linkedin, Share2, Twitter } from 'react-feather';
-import { getSnapshot } from 'mobx-state-tree';
 import React from 'react';
 
-import { Flex, H3, Span } from '@haas/ui';
+import { Flex, Span } from '@haas/ui';
 import { NodeTitle } from 'layouts/NodeLayout/NodeLayoutStyles';
 import CustomIcon from 'components/Icons/CustomIcon';
 import useDialogueFinish from 'hooks/use-dialogue-finish';

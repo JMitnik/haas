@@ -3,11 +3,11 @@ import {
   FormContainer, PageTitle,
 } from '@haas/ui';
 import { motion } from 'framer-motion';
-import { useCustomer } from 'providers/CustomerProvider';
 import { useForm } from 'react-hook-form';
 import { useHistory, useParams } from 'react-router';
 import { useMutation, useQuery } from '@apollo/react-hooks';
 import { useToast } from '@chakra-ui/core';
+import { useTranslation } from 'react-i18next';
 import { yupResolver } from '@hookform/resolvers';
 import React from 'react';
 
@@ -16,29 +16,21 @@ import booleanToNumber from 'utils/booleanToNumber';
 import parseOptionalBoolean from 'utils/parseOptionalBoolean';
 
 import editCustomerMutation from '../../mutations/editCustomer';
-import getCustomerQuery from '../../queries/getCustomersQuery';
 import getEditCustomerData from '../../queries/getEditCustomer';
-
-interface FormDataProps {
-  name: string;
-  slug: string;
-  logo?: string;
-  primaryColour?: string;
-  useCustomUrl?: number;
-  uploadLogo?: string;
-  seed?: number;
-}
 
 const schema = yup.object().shape({
   name: yup.string().required(),
   logo: yup.string().url(),
+  uploadLogo: yup.string().url(),
   slug: yup.string().required(),
-  primaryColour: yup.string().required().matches(/^(#(\d|\D){6}$){1}/,
-    { message: 'Provided colour is not a valid hexadecimal' }),
-});
+  primaryColour: yup.string().required().matches(/^(#(\d|\D){6}$){1}/, { message: 'Provided colour is not a valid hexadecimal' }),
+  useCustomUrl: yup.number(),
+}).required();
+
+type FormDataProps = yup.InferType<typeof schema>;
 
 const EditCustomerView = () => {
-  const { customerSlug } = useParams();
+  const { customerSlug } = useParams<{ customerSlug: string }>();
 
   const { data: customerData, error, loading } = useQuery(getEditCustomerData, {
     variables: {
@@ -57,25 +49,23 @@ const EditCustomerView = () => {
 const startsWithCloudinary = (url: string) => url.includes('cloudinary');
 
 const EditCustomerForm = ({ customer }: { customer: any }) => {
-  const { customerSlug } = useParams();
+  const { customerSlug } = useParams<{ customerSlug: string }>();
   const history = useHistory();
-  const { setActiveCustomer } = useCustomer();
+  const { t } = useTranslation();
+  const toast = useToast();
 
   const form = useForm<FormDataProps>({
     resolver: yupResolver(schema),
     defaultValues: {
       name: customer.name,
       logo: customer.settings?.logoUrl,
+      uploadLogo: customer.settings?.logoUrl,
       useCustomUrl: booleanToNumber(!startsWithCloudinary(customer.settings?.logoUrl)),
       primaryColour: customer.settings?.colourSettings?.primary,
       slug: customer.slug,
     },
-    mode: 'onBlur',
+    mode: 'onChange',
   });
-
-  console.log(form.formState.isValid);
-
-  const toast = useToast();
 
   const [editCustomer, { loading: isLoading, error: serverErrors }] = useMutation(editCustomerMutation, {
     onCompleted: (result: any) => {
@@ -88,15 +78,9 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
         description: 'The business has been updated',
         status: 'success',
         position: 'bottom-right',
-        duration: 300,
+        duration: 1500,
       });
-
-      setTimeout(() => {
-        setActiveCustomer(customer);
-        history.push('/');
-      }, 300);
     },
-    refetchQueries: [{ query: getCustomerQuery }],
     onError: () => {
       toast({
         title: 'Error',
@@ -112,7 +96,6 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
     const optionInput = {
       logo: parseOptionalBoolean(formData.useCustomUrl) ? formData.logo : formData.uploadLogo,
       slug: formData.slug,
-      isSeed: parseOptionalBoolean(formData.seed),
       primaryColour: formData.primaryColour,
       name: formData.name,
     };
@@ -135,13 +118,15 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
         setTimeout(() => {
           history.push(`/dashboard/b/${formData.slug}`);
         }, 1000);
+      } else {
+        history.push(`/dashboard/b/${customerSlug}`);
       }
     });
   };
 
   return (
     <>
-      <PageTitle>Edit business settings</PageTitle>
+      <PageTitle>{t('views:edit_business_settings_view')}</PageTitle>
       <motion.div initial={{ opacity: 0, y: 100 }} animate={{ opacity: 1, y: 0 }}>
         <FormContainer>
           <CustomerForm

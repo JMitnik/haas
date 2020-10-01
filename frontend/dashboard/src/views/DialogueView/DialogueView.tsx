@@ -1,13 +1,13 @@
 import * as qs from 'qs';
 import { Activity, Award, BarChart, MessageCircle,
   ThumbsDown, ThumbsUp, TrendingDown, TrendingUp } from 'react-feather';
+import { Button, Tag, TagIcon, TagLabel } from '@chakra-ui/core';
 import { Div, Flex, Grid, H4, Icon, Loader, PageTitle, Span, Text } from '@haas/ui';
-import { Tag, TagIcon, TagLabel } from '@chakra-ui/core';
 import { sub } from 'date-fns';
 import { useHistory, useParams } from 'react-router-dom';
 import { useQuery } from '@apollo/react-hooks';
 import { useTranslation } from 'react-i18next';
-import React, { useState } from 'react';
+import React, { useReducer } from 'react';
 import gql from 'graphql-tag';
 import styled, { css } from 'styled-components/macro';
 
@@ -21,13 +21,13 @@ import PositivePathsModule from './Modules/PositivePathsModule/PositivePathsModu
 import ScoreGraphModule from './Modules/ScoreGraphModule';
 import SummaryModule from './Modules/SummaryModules/SummaryModule';
 
-// TODO: Bring it back
-// const filterMap = new Map([
-//   ['Last 24h', 1],
-//   ['Last week', 7],
-//   ['Last month', 30],
-//   ['Last year', 365],
-// ]);
+type ActiveDateType = 'last_hour' | 'last_day' | 'last_week' | 'last_month' | 'last_year';
+
+interface ActiveDateState {
+  dateLabel: ActiveDateType;
+  startDate: Date;
+  compareStatisticStartDate: Date;
+}
 
 const DialogueViewContainer = styled(Div)`
   ${() => css`
@@ -37,14 +37,97 @@ const DialogueViewContainer = styled(Div)`
   `}
 `;
 
+interface ActiveDateAction {
+  type: ActiveDateType;
+}
+
+const DatePickerExpanded = ({ activeLabel, dispatch }: { activeLabel: ActiveDateType, dispatch: React.Dispatch<ActiveDateAction> }) => {
+  const { t } = useTranslation();
+  return (
+    <Div>
+      <Div>
+        <Button size="sm" isActive={activeLabel === 'last_hour'} onClick={() => dispatch({ type: 'last_hour' })}>{t('dialogue:last_hour')}</Button>
+        <Button
+          ml={1}
+          size="sm"
+          isActive={activeLabel === 'last_day'}
+          onClick={() => dispatch({ type: 'last_day' })}
+        >
+          {t('dialogue:last_day')}
+
+        </Button>
+        <Button
+          ml={1}
+          size="sm"
+          isActive={activeLabel === 'last_week'}
+          onClick={() => dispatch({ type: 'last_week' })}
+        >
+          {t('dialogue:last_week')}
+
+        </Button>
+        <Button
+          size="sm"
+          ml={1}
+          isActive={activeLabel === 'last_month'}
+          onClick={() => dispatch({ type: 'last_month' })}
+        >
+          {t('dialogue:last_month')}
+
+        </Button>
+      </Div>
+    </Div>
+  );
+};
+
+const dateReducer = (state: ActiveDateState, action: ActiveDateAction): ActiveDateState => {
+  switch (action.type) {
+    case 'last_hour':
+      return {
+        startDate: sub(new Date(), { hours: 1 }),
+        compareStatisticStartDate: sub(new Date(), { hours: 2 }),
+        dateLabel: 'last_hour',
+      };
+
+    case 'last_day':
+      return {
+        startDate: sub(new Date(), { hours: 24 }),
+        compareStatisticStartDate: sub(new Date(), { days: 2 }),
+        dateLabel: 'last_day',
+      };
+    case 'last_month':
+      return {
+        startDate: sub(new Date(), { months: 1 }),
+        compareStatisticStartDate: sub(new Date(), { months: 2 }),
+        dateLabel: 'last_month',
+      };
+    case 'last_week':
+      return {
+        startDate: sub(new Date(), { weeks: 1 }),
+        compareStatisticStartDate: sub(new Date(), { weeks: 2 }),
+        dateLabel: 'last_week',
+      };
+    case 'last_year':
+      return {
+        startDate: sub(new Date(), { years: 1 }),
+        compareStatisticStartDate: sub(new Date(), { years: 2 }),
+        dateLabel: 'last_year',
+      };
+    default:
+      return {
+        startDate: sub(new Date(), { weeks: 1 }),
+        compareStatisticStartDate: sub(new Date(), { weeks: 2 }),
+        dateLabel: 'last_month',
+      };
+  }
+};
 const getDialogueStatistics = gql`
-  query dialogueStatistics($customerSlug: String!, $dialogueSlug: String!, $prevDateFilter: DialogueFilterInputType) {
+  query dialogueStatistics($customerSlug: String!, $dialogueSlug: String!, $prevDateFilter: DialogueFilterInputType, $statisticsDateFilter: DialogueFilterInputType) {
     customer(slug: $customerSlug) {
       id
       dialogue(where: { slug: $dialogueSlug }) {
         id
-        countInteractions
-        thisWeekAverageScore: averageScore
+        countInteractions(input: $statisticsDateFilter)
+        thisWeekAverageScore: averageScore(input: $statisticsDateFilter)
         previousScore: averageScore(input: $prevDateFilter)
         sessions(take: 3) {
           id
@@ -64,7 +147,7 @@ const getDialogueStatistics = gql`
             }
           }
         }
-        statistics {
+        statistics(input: $statisticsDateFilter) {
           topPositivePath {
             answer
             quantity
@@ -101,22 +184,24 @@ const calcScoreIncrease = (currentScore: number, prevScore: number) => {
 
 const DialogueView = () => {
   const { dialogueSlug, customerSlug } = useParams();
-  const [prevWeekDate] = useState(() => sub(new Date(), {
-    weeks: 1,
-  }).toISOString());
+  const [activeDateState, dispatch] = useReducer(dateReducer, {
+    startDate: sub(new Date(), { weeks: 1 }),
+    compareStatisticStartDate: sub(new Date(), { weeks: 2 }),
+    dateLabel: 'last_week',
+  });
 
   const history = useHistory();
-
-  // FIXME: If this is started with anything else start result is undefined :S
-  // const [activeFilter, setActiveFilter] = useState(() => 'Last 24h');
 
   // TODO: Move this to page level
   const { data } = useQuery<any>(getDialogueStatistics, {
     variables: {
       dialogueSlug,
       customerSlug,
+      statisticsDateFilter: {
+        startDate: activeDateState.startDate.toISOString(),
+      },
       prevDateFilter: {
-        endDate: prevWeekDate,
+        endDate: activeDateState.compareStatisticStartDate.toISOString(),
       },
     },
     pollInterval: 5000,
@@ -138,11 +223,14 @@ const DialogueView = () => {
 
   return (
     <DialogueViewContainer>
-      <PageTitle>
-        <Icon as={BarChart} mr={1} />
-        {t('views:dialogue_view')}
-      </PageTitle>
-      <Grid gridTemplateColumns="1fr 1fr 1fr">
+      <Flex justifyContent="space-between">
+        <PageTitle>
+          <Icon as={BarChart} mr={1} />
+          {t('views:dialogue_view')}
+        </PageTitle>
+        <DatePickerExpanded activeLabel={activeDateState.dateLabel} dispatch={dispatch} />
+      </Flex>
+      <Grid gridTemplateColumns={['1fr', '1fr', '1fr 1fr 1fr']}>
         <Div gridColumn="1 / 4">
           <H4 color="default.darker" mb={4}>
             <Flex>
@@ -150,29 +238,29 @@ const DialogueView = () => {
                 <TrendingIcon fill="currentColor" />
               </Div>
               <Span ml={2}>
-                This week in summary
+                {t(`dialogue:${activeDateState.dateLabel}_summary`)}
               </Span>
             </Flex>
           </H4>
 
           <Grid gridTemplateColumns="repeat(auto-fit, minmax(275px, 1fr))" minHeight="100px">
             <SummaryModule
-              heading="Interactions"
+              heading={t('interactions')}
               renderIcon={Activity}
               onClick={() => (
                 history.push(`/dashboard/b/${customerSlug}/d/${dialogueSlug}/interactions`)
               )}
               isInFallback={dialogue.countInteractions === 0}
-              fallbackMetric="No interactions yet"
-              renderMetric={`${dialogue.countInteractions} ${dialogue.countInteractions > 1 ? 'interactions' : 'interaction'}`}
+              fallbackMetric={t('dialogue:fallback_no_interactions')}
+              renderMetric={`${dialogue.countInteractions} ${dialogue.countInteractions > 1 ? t('interactions') : t('interaction')}`}
             />
 
             <SummaryModule
-              heading="Average score"
+              heading={t('dialogue:average_score')}
               renderIcon={Award}
               isInFallback={dialogue.thisWeekAverageScore === 0}
-              fallbackMetric="No score calculated yet"
-              renderMetric={`${(dialogue.thisWeekAverageScore / 10).toFixed(2)} score`}
+              fallbackMetric={t('dialogue:fallback_no_score')}
+              renderMetric={`${(dialogue.thisWeekAverageScore / 10).toFixed(2)} ${t('score')}`}
               renderCornerMetric={(
                 <Flex color="red">
                   {increaseInAverageScore > 0 ? (
@@ -199,14 +287,14 @@ const DialogueView = () => {
             />
 
             <SummaryModule
-              heading="Frequently mentioned"
+              heading={t('dialogue:frequently_mentioned')}
               renderIcon={MessageCircle}
-              renderFooterText="View all mentions"
+              renderFooterText={t('dialogue:view_all_mentions')}
               isInFallback={!dialogue.statistics?.mostPopularPath}
               onClick={() => (
                 history.push(`/dashboard/b/${customerSlug}/d/${dialogueSlug}/interactions?${makeSearchUrl()}`)
               )}
-              fallbackMetric="No keywords mentioned yet"
+              fallbackMetric={t('dialogue:fallback_no_keywords')}
               renderMetric={dialogue.statistics?.mostPopularPath?.answer}
               renderCornerMetric={(
                 <>
@@ -234,7 +322,7 @@ const DialogueView = () => {
                 <PathsIcon fill="currentColor" />
               </Div>
               <Span ml={2}>
-                Notable paths of the week
+                {t(`dialogue:notable_paths_of_${activeDateState.dateLabel}`)}
               </Span>
             </Flex>
           </H4>
@@ -251,7 +339,7 @@ const DialogueView = () => {
                 <TrophyIcon fill="currentColor" />
               </Div>
               <Span ml={2}>
-                The latest data
+                {t('dialogue:latest_data')}
               </Span>
             </Flex>
           </H4>
@@ -261,10 +349,7 @@ const DialogueView = () => {
           {dialogue.statistics?.history ? (
             <ScoreGraphModule chartData={dialogue.statistics?.history} />
           ) : (
-            // TODO: Make a nice card for this
-            <Div>
-              Currently no history data available
-            </Div>
+            <Div>{t('no_data')}</Div>
           )}
         </Div>
 

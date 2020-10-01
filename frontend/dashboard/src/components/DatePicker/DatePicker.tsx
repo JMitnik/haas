@@ -4,6 +4,7 @@ import React from 'react';
 import ReactDatePicker from 'react-datepicker';
 
 import { Div, Flex, Span } from '@haas/ui';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 interface DatePickerProps {
@@ -35,57 +36,61 @@ const CustomPickerInput = styled.input <{hasDate?: boolean}>`
   `};
 `;
 
-const DatePicker = ({ activeStartDate, activeEndDate, onDateChange }: DatePickerProps) => (
-  <Div mr="5px">
-    <Div padding="4.5px 12px" borderRadius="6px" useFlex flexDirection="row" backgroundColor="app.mutedOnDefault">
-      <Flex>
-        <Span fontWeight="200" color="app.mutedAltOnDefault">
-          Start
-        </Span>
-        <Calendar stroke="#838890" width="1em" style={{ marginLeft: '5px', marginRight: '5px' }} />
-        <ReactDatePicker
-          selected={activeStartDate}
-          onChange={(date) => date !== activeStartDate && onDateChange(date, activeEndDate)}
-          selectsStart
-          startDate={activeStartDate}
-          endDate={activeEndDate}
-          customInput={(
-            <CustomPickerInput
-              type="text"
-              id="CustomID"
-              placeholder="Date"
-              hasDate={!!activeStartDate}
-            />
+const DatePicker = ({ activeStartDate, activeEndDate, onDateChange }: DatePickerProps) => {
+  const { t } = useTranslation();
+
+  return (
+    <Div mr="5px">
+      <Div padding="4.5px 12px" borderRadius="6px" useFlex flexDirection="row" backgroundColor="app.mutedOnDefault">
+        <Flex>
+          <Span fontWeight="200" color="app.mutedAltOnDefault">
+            {t('start')}
+          </Span>
+          <Calendar stroke="#838890" width="1em" style={{ marginLeft: '5px', marginRight: '5px' }} />
+          <ReactDatePicker
+            selected={activeStartDate}
+            onChange={(date) => date !== activeStartDate && onDateChange(date, activeEndDate)}
+            selectsStart
+            startDate={activeStartDate}
+            endDate={activeEndDate}
+            customInput={(
+              <CustomPickerInput
+                type="text"
+                id="CustomID"
+                placeholder="Date"
+                hasDate={!!activeStartDate}
+              />
             )}
-        />
-      </Flex>
-      <Span padding="0 5px" color="app.mutedAltOnDefault">
-        |
-      </Span>
-      <Flex>
-        <Span fontWeight="200" color="app.mutedAltOnDefault">
-          End
+          />
+        </Flex>
+        <Span padding="0 5px" color="app.mutedAltOnDefault">
+          |
         </Span>
-        <Calendar stroke="#838890" width="1em" style={{ marginLeft: '5px', marginRight: '5px' }} />
-        <ReactDatePicker
-          selected={activeEndDate}
-          onChange={(date) => date !== activeEndDate && onDateChange(activeStartDate, date)}
-          selectsEnd
-          startDate={activeStartDate}
-          endDate={activeEndDate}
-          minDate={activeStartDate}
-          customInput={(
-            <CustomPickerInput
-              type="text"
-              id="CustomID"
-              placeholder="Date"
-              hasDate={!!activeEndDate}
-            />
+        <Flex>
+          <Span fontWeight="200" color="app.mutedAltOnDefault">
+            {t('end')}
+          </Span>
+          <Calendar stroke="#838890" width="1em" style={{ marginLeft: '5px', marginRight: '5px' }} />
+          <ReactDatePicker
+            selected={activeEndDate}
+            onChange={(date) => date !== activeEndDate && onDateChange(activeStartDate, date)}
+            selectsEnd
+            startDate={activeStartDate}
+            endDate={activeEndDate}
+            minDate={activeStartDate}
+            customInput={(
+              <CustomPickerInput
+                type="text"
+                id="CustomID"
+                placeholder="Date"
+                hasDate={!!activeEndDate}
+              />
             )}
-        />
-      </Flex>
+          />
+        </Flex>
+      </Div>
     </Div>
-  </Div>
-);
+  );
+};
 
 export default DatePicker;
