@@ -87,10 +87,6 @@ input CustomerWhereUniqueInput {
 """Date custom scalar type"""
 scalar Date
 
-type Debug {
-  debugResolver: String
-}
-
 type Dialogue {
   averageScore(input: DialogueFilterInputType): Float!
 
@@ -243,7 +239,6 @@ type Mutation {
   createTag(customerSlug: String, name: String, type: TagTypeEnum): Tag!
   createTrigger(customerSlug: String, questionId: String, recipients: RecipientsInputType, trigger: TriggerInputType): TriggerType!
   createUser(customerSlug: String, input: UserInput): UserType!
-  debugMutation: String
   deleteCTA(id: String): QuestionNode!
   deleteCustomer(where: CustomerWhereUniqueInput): Customer
   deleteDialogue(where: DialogueWhereUniqueInput): Dialogue!
