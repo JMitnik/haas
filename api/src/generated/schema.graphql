@@ -91,6 +91,15 @@ type Debug {
   debugResolver: String
 }
 
+input DeleteUserInput {
+  customerId: ID
+  userId: ID
+}
+
+type DeleteUserOutput {
+  deletedUser: Boolean!
+}
+
 type Dialogue {
   averageScore(input: DialogueFilterInputType): Float!
 
@@ -250,7 +259,7 @@ type Mutation {
   deleteQuestion(customerSlug: String, dialogueSlug: String, id: String): QuestionNode!
   deleteTag(tagId: String): Tag!
   deleteTrigger(id: String): TriggerType
-  deleteUser(id: String): UserType!
+  deleteUser(input: DeleteUserInput): DeleteUserOutput!
   editCustomer(id: String, options: CustomerEditOptions): Customer!
   editDialogue(customerSlug: String, description: String, dialogueSlug: String, publicTitle: String, tags: TagsInputObjectType, title: String): Dialogue!
   editTrigger(questionId: String, recipients: RecipientsInputType, trigger: TriggerInputType, triggerId: String): TriggerType!

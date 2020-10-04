@@ -11,13 +11,10 @@ import { ExpandedRowContainer, RowContainer } from './TableStyles';
 const TableOptionsContainer = styled(Div)`
   position: absolute;
   top: 50%;
+  z-index: 300;
   transform: translateY(-50%);
   right: 0;
   width: 3em;
-
-  button {
-    max-width: 100%;
-  }
 `;
 
 const TableRow = ({ headers, data, index, renderExpandedRow, renderOptions }: TableRowProps) => {
@@ -50,16 +47,7 @@ const TableRow = ({ headers, data, index, renderExpandedRow, renderOptions }: Ta
       <Div>
         {!!renderOptions && (
         <TableOptionsContainer>
-          <Menu>
-            <MenuButton size="sm" as={Button}>
-              <ContextButtonSVG />
-            </MenuButton>
-            <MenuList>
-              <>
-                {renderOptions}
-              </>
-            </MenuList>
-          </Menu>
+          <>{renderOptions(data)}</>
         </TableOptionsContainer>
         )}
       </Div>

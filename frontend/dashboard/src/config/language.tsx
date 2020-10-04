@@ -4,6 +4,10 @@ const language = {
       en: 'Register',
       de: 'Registrieren',
     },
+    delete_user: {
+      en: 'Delete user',
+      de: 'Benutzer zu löschen',
+    },
     invite_user: {
       en: 'Invite user',
       de: 'Benutzer einladen',

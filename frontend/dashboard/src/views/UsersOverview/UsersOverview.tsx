@@ -9,13 +9,18 @@ import SearchBar from 'components/SearchBar/SearchBar';
 import Table from 'components/Table/Table';
 import getPaginatedUsers from 'queries/getPaginatedUsers';
 
-import { Button } from '@chakra-ui/core';
+import { Button, useToast } from '@chakra-ui/core';
+import { Delete, Edit, Plus, Trash } from 'react-feather';
 import { ErrorBoundary } from 'react-error-boundary';
 import { GenericCell, RoleCell } from 'components/Table/CellComponents/CellComponents';
-import { Plus } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 // import Row from './TableRow/UsersTableRow';
+import { useCustomer } from 'providers/CustomerProvider';
+import List from 'components/List/List';
+import ListItem from 'components/List/ListItem';
+import ShowMoreButton from 'components/ShowMoreButton';
 import deleteUserQuery from '../../mutations/deleteUser';
+import useAuth from 'hooks/useAuth';
 
 interface TableProps {
   activeStartDate: Date | null;
@@ -37,10 +42,13 @@ const HEADERS = [
 ];
 
 const UsersOverview = () => {
+  const { canDeleteUsers } = useAuth();
+  const { activeCustomer } = useCustomer();
   const { customerSlug } = useParams<{ customerSlug: string }>();
   const { t } = useTranslation();
   const history = useHistory();
-  const [fetchUsers, { data }] = useLazyQuery(getPaginatedUsers, { fetchPolicy: 'no-cache' });
+  const toast = useToast();
+  const [fetchUsers, { data, refetch }] = useLazyQuery(getPaginatedUsers, { fetchPolicy: 'no-cache' });
 
   const [paginationProps, setPaginationProps] = useState<TableProps>({
     activeStartDate: null,
@@ -75,9 +83,8 @@ const UsersOverview = () => {
   }, [customerSlug, fetchUsers, paginationProps]);
 
   const [deleteUser] = useMutation(deleteUserQuery, {
-    refetchQueries: [{
-      query: getPaginatedUsers,
-      variables: {
+    onCompleted: () => {
+      refetch({
         customerSlug,
         filter: {
           startDate: paginationProps.activeStartDate,
@@ -88,19 +95,37 @@ const UsersOverview = () => {
           pageIndex: paginationProps.pageIndex,
           orderBy: paginationProps.sortBy,
         },
-      },
-    }],
-    onError: (serverError: ApolloError) => {
-      console.log(serverError);
+      });
+      toast({
+        title: 'User removed!',
+        description: 'The user has been removed from the workspace.',
+        status: 'success',
+        position: 'bottom-right',
+        duration: 1500,
+      });
+    },
+    onError: () => {
+      toast({
+        title: 'An error ocurred!',
+        description: 'It was not possible to remove user.',
+        status: 'error',
+        position: 'bottom-right',
+        duration: 1500,
+      });
     },
   });
 
-  const handleDeleteUser = (event: any, userId: string, onComplete: (() => void) | undefined) => {
+  const handleDeleteUser = (event: any, userId: string) => {
+    event.stopPropagation();
+
     deleteUser({
       variables: {
-        id: userId,
+        input: {
+          userId,
+          customerId: activeCustomer?.id,
+        },
       },
-    }).finally(() => onComplete && onComplete());
+    });
   };
 
   const handleEditUser = (event: any, userId: string) => {
@@ -149,10 +174,26 @@ const UsersOverview = () => {
             headers={HEADERS}
             paginationProps={{ ...paginationProps, pageCount, pageIndex }}
             onPaginationChange={setPaginationProps}
-            onDeleteEntry={handleDeleteUser}
-            onEditEntry={handleEditUser}
-            onAddEntry={handleAddUser}
             data={tableData}
+            renderOptions={
+              (data: any) => (
+                <ShowMoreButton
+                  renderMenu={(
+                    <List>
+                      {canDeleteUsers && (
+                        <ListItem
+                          onClick={(e: any) => handleDeleteUser(e, data?.id)}
+                          renderLeftIcon={<Trash />}
+                        >
+                          {t('delete_user')}
+                        </ListItem>
+                      )}
+                      <ListItem renderLeftIcon={<Edit />}>{t('edit_user')}</ListItem>
+                    </List>
+                )}
+                />
+              )
+            }
           />
         </ErrorBoundary>
       </Div>

@@ -238,6 +238,23 @@ export const EditUserInput = inputObjectType({
   },
 });
 
+export const DeleteUserInput = inputObjectType({
+  name: 'DeleteUserInput',
+
+  definition(t) {
+    t.id('userId');
+    t.id('customerId');
+  },
+});
+
+export const DeleteUserOuput = objectType({
+  name: 'DeleteUserOutput',
+
+  definition(t) {
+    t.boolean('deletedUser');
+  },
+});
+
 export const RootUserQueries = extendType({
   type: 'Query',
   definition(t) {
@@ -372,12 +389,24 @@ export const UserMutations = extendType({
     });
 
     t.field('deleteUser', {
-      type: UserType,
-      args: { id: 'String' },
-      resolve(parent, args, ctx) {
-        if (!args.id) throw new UserInputError('No valid user provided to delete');
+      type: DeleteUserOuput,
+      args: { input: DeleteUserInput },
+      async resolve(parent, args, ctx) {
+        if (!args.input?.customerId) throw new UserInputError('No workspace provided');
+        if (!args.input?.userId) throw new UserInputError('No user provided');
 
-        return ctx.prisma.user.delete({ where: { id: args.id } });
+        const removedUser = await ctx.prisma.userOfCustomer.delete({
+          where: {
+            userId_customerId: {
+              customerId: args.input.customerId,
+              userId: args.input.userId,
+            },
+          },
+        });
+
+        if (removedUser) return { deletedUser: true };
+
+        return { deletedUser: false };
       },
     });
   },

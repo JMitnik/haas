@@ -11,31 +11,30 @@ import { Menu, MenuHeader, MenuItem } from 'components/Menu/Menu';
 import { deleteQuestionnaireMutation } from 'mutations/deleteQuestionnaire';
 import { useToast } from '@chakra-ui/core';
 import { useTranslation } from 'react-i18next';
+import List from 'components/List/List';
+import ListItem from 'components/List/ListItem';
 import ShowMoreButton from 'components/ShowMoreButton';
 import SliderNodeIcon from 'components/Icons/SliderNodeIcon';
 import getDialoguesOfCustomer from 'queries/getDialoguesOfCustomer';
 import getLocale from 'utils/getLocale';
 
 interface DialogueCardOptionsOverlayProps {
-  onDelete: () => void;
-  onEdit: () => void;
+  onDelete: (e: React.MouseEvent<HTMLElement>) => void;
+  onEdit: (e: React.MouseEvent<HTMLElement>) => void;
 }
 
 const DialogueCardOptionsOverlay = ({ onDelete, onEdit }: DialogueCardOptionsOverlayProps) => {
   const { t } = useTranslation();
 
   return (
-    <Menu>
-      <MenuHeader>{t('actions')}</MenuHeader>
-      <MenuItem onClick={() => onDelete()}>
-        <Trash />
+    <List>
+      <ListItem renderLeftIcon={<Trash />} onClick={onDelete}>
         {t('delete')}
-      </MenuItem>
-      <MenuItem onClick={() => onEdit()}>
-        <Edit />
+      </ListItem>
+      <ListItem renderLeftIcon={<Edit />} onClick={onEdit}>
         {t('edit')}
-      </MenuItem>
-    </Menu>
+      </ListItem>
+    </List>
   );
 };
 
@@ -74,7 +73,9 @@ const DialogueCard = ({ dialogue, isCompact }: { dialogue: any, isCompact?: bool
     },
   });
 
-  const deleteDialogue = async () => {
+  const deleteDialogue = async (e: React.MouseEvent<HTMLElement>) => {
+    e.stopPropagation();
+
     deleteTopic({
       variables: {
         id: dialogue.id,
@@ -83,14 +84,22 @@ const DialogueCard = ({ dialogue, isCompact }: { dialogue: any, isCompact?: bool
   };
 
   // TODO: Move this url to a constant or so
-  const goToEditDialogue = () => {
+  const goToEditDialogue = (e: React.MouseEvent<HTMLElement>) => {
+    e.stopPropagation();
     history.push(`/dashboard/b/${customerSlug}/d/${dialogue.slug}/edit`);
   };
 
   const lastUpdated = dialogue.updatedAt ? new Date(Number.parseInt(dialogue.updatedAt, 10)) : null;
 
   return (
-    <Card ref={ref} data-cy="DialogueCard" bg="white" useFlex flexDirection="column" onClick={() => history.push(`/dashboard/b/${customerSlug}/d/${dialogue.slug}`)}>
+    <Card
+      ref={ref}
+      data-cy="DialogueCard"
+      bg="white"
+      useFlex
+      flexDirection="column"
+      onClick={() => history.push(`/dashboard/b/${customerSlug}/d/${dialogue.slug}`)}
+    >
       <CardBody flex="100%">
         <ColumnFlex justifyContent="space-between" height="100%">
           <Div>
@@ -129,8 +138,8 @@ const DialogueCard = ({ dialogue, isCompact }: { dialogue: any, isCompact?: bool
               <ShowMoreButton
                 renderMenu={(
                   <DialogueCardOptionsOverlay
-                    onDelete={() => deleteDialogue()}
-                    onEdit={() => goToEditDialogue()}
+                    onDelete={deleteDialogue}
+                    onEdit={goToEditDialogue}
                   />
               )}
               />
