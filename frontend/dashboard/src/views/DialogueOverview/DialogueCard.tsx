@@ -7,7 +7,6 @@ import React, { useRef } from 'react';
 import styled, { css } from 'styled-components/macro';
 
 import { Card, CardBody, ColumnFlex, Div, ExtLink, Flex, Paragraph, Text } from '@haas/ui';
-import { Menu, MenuHeader, MenuItem } from 'components/Menu/Menu';
 import { deleteQuestionnaireMutation } from 'mutations/deleteQuestionnaire';
 import { useToast } from '@chakra-ui/core';
 import { useTranslation } from 'react-i18next';

@@ -7,6 +7,7 @@ interface UseAuthProps {
   canCreateCustomers: boolean;
   canDeleteCustomers: boolean;
   canCreateTriggers: boolean;
+  canInviteUsers: boolean;
   canEditCustomer: boolean;
   canAccessAdmin: boolean;
   canViewDialogueBuilder: boolean;
@@ -30,6 +31,7 @@ const useAuth = (): UseAuthProps => {
   const canDeleteCustomers = authPermissions?.includes(SystemPermission.CAN_ACCESS_ADMIN_PANEL) || false;
   const canCreateCustomers = authPermissions?.includes(SystemPermission.CAN_ACCESS_ADMIN_PANEL) || false;
   const canAccessAdmin = authPermissions?.includes(SystemPermission.CAN_ACCESS_ADMIN_PANEL) || false;
+  const canInviteUsers = authPermissions?.includes(SystemPermission.CAN_ADD_USERS) || false;
   const canViewUsers = authPermissions?.includes(SystemPermission.CAN_VIEW_USERS) || false;
   const canDeleteUsers = authPermissions?.includes(SystemPermission.CAN_DELETE_USERS) || false;
 
@@ -45,6 +47,7 @@ const useAuth = (): UseAuthProps => {
     canDeleteCustomers,
     canCreateTriggers,
     canEditCustomer,
+    canInviteUsers,
     hasPermission,
     canAccessAdmin,
     canViewUsers,

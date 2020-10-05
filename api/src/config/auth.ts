@@ -50,8 +50,8 @@ const authShield = shield({
     verifyUserToken: allow,
     requestInvite: allow,
     deleteCustomer: isSuperAdmin,
-    inviteUser: containsWorkspacePermission(SystemPermissionEnum.CAN_ADD_USERS),
-    editCustomer: containsWorkspacePermission(SystemPermissionEnum.CAN_EDIT_WORKSPACE),
+    // inviteUser: containsWorkspacePermission(SystemPermissionEnum.CAN_ADD_USERS),
+    // editCustomer: containsWorkspacePermission(SystemPermissionEnum.CAN_EDIT_WORKSPACE),
     editUser: or(isSelf, isSuperAdmin),
 
     // // Dialogue-specific settings

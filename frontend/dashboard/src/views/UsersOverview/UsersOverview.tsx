@@ -41,7 +41,7 @@ const HEADERS = [
 ];
 
 const UsersOverview = () => {
-  const { canDeleteUsers } = useAuth();
+  const { canDeleteUsers, canInviteUsers } = useAuth();
   const { activeCustomer } = useCustomer();
   const { customerSlug } = useParams<{ customerSlug: string }>();
   const { t } = useTranslation();
@@ -150,9 +150,11 @@ const UsersOverview = () => {
 
       <Div mb={4} width="100%">
         <Flex justifyContent="space-between">
-          <Div mr={4}>
-            <Button onClick={handleAddUser} leftIcon={Plus} variantColor="teal">{t('invite_user')}</Button>
-          </Div>
+          {canInviteUsers && (
+            <Div mr={4}>
+              <Button onClick={handleAddUser} leftIcon={Plus} variantColor="teal">{t('invite_user')}</Button>
+            </Div>
+          )}
           <Div>
             <SearchBar
               activeSearchTerm={paginationProps.activeSearchTerm}
