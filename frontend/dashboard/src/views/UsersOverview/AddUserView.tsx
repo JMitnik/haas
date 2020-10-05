@@ -1,7 +1,7 @@
 import * as yup from 'yup';
 import { ApolloError } from 'apollo-boost';
 import { Controller, useForm } from 'react-hook-form';
-import { useHistory, useParams } from 'react-router';
+import { useHistory } from 'react-router';
 import { useMutation, useQuery } from '@apollo/react-hooks';
 import React from 'react';
 import Select from 'react-select';
@@ -172,18 +172,6 @@ const AddUserView = () => {
                     control={form.control}
                     options={mappedRoles}
                   />
-                  {/* <Select
-                    styles={form.errors.role && !activeRole ? ErrorStyle : undefined}
-                    ref={() => form.register({
-                      name: 'role',
-                      required: true,
-                    })}
-                    options={mappedRoles}
-                    value={activeRole}
-                    onChange={(qOption: any) => {
-                      handleRoleChange(qOption);
-                    }}
-                  /> */}
                 </FormControl>
               </Div>
             </FormSection>

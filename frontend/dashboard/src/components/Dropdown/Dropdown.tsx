@@ -3,7 +3,6 @@ import React, { useRef, useState } from 'react';
 import { Div } from '@haas/ui';
 import { Placement } from '@popperjs/core';
 import { usePopper } from 'react-popper';
-import styled from 'styled-components/macro';
 import useOnClickOutside from 'hooks/useClickOnOutside';
 
 import { DropdownContainer, DropdownOverlayContainer } from './DropdownStyles';

@@ -176,21 +176,32 @@ const UsersOverview = () => {
             data={tableData}
             renderOptions={
               (data: any) => (
-                <ShowMoreButton
-                  renderMenu={(
-                    <List>
-                      {canDeleteUsers && (
-                        <ListItem
-                          onClick={(e: any) => handleDeleteUser(e, data?.id)}
-                          renderLeftIcon={<Trash />}
-                        >
-                          {t('delete_user')}
-                        </ListItem>
-                      )}
-                      <ListItem renderLeftIcon={<Edit />}>{t('edit_user')}</ListItem>
-                    </List>
+                <>
+                  {canDeleteUsers && (
+                  <ShowMoreButton
+                    renderMenu={(
+                      <List>
+                        {canDeleteUsers && (
+                          <>
+                            <ListItem
+                              onClick={(e: any) => handleEditUser(e, data?.id)}
+                              renderLeftIcon={<Edit />}
+                            >
+                              {t('edit_user')}
+                            </ListItem>
+                            <ListItem
+                              onClick={(e: any) => handleDeleteUser(e, data?.id)}
+                              renderLeftIcon={<Trash />}
+                            >
+                              {t('delete_user')}
+                            </ListItem>
+                          </>
+                        )}
+                      </List>
                 )}
-                />
+                  />
+                  )}
+                </>
               )
             }
           />

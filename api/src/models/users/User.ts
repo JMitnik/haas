@@ -231,6 +231,7 @@ export const EditUserInput = inputObjectType({
 
   definition(t) {
     t.string('email', { required: true });
+    t.string('roleId');
     t.string('firstName', { nullable: true });
     t.string('customerId', { nullable: true });
     t.string('lastName', { nullable: true });
@@ -359,7 +360,7 @@ export const UserMutations = extendType({
       async resolve(parent, args, ctx) {
         if (!args.userId) throw new UserInputError('No valid user provided to edit');
         if (!args.input) throw new UserInputError('No input provided');
-        const { firstName, lastName, email, phone } = args.input;
+        const { firstName, lastName, email, phone, roleId } = args.input;
 
         const otherMails = await ctx.prisma.user.findMany({
           where: {
@@ -373,6 +374,22 @@ export const UserMutations = extendType({
         if (otherMails.length) throw new UserInputError('Email is already taken');
 
         if (!email) throw new UserInputError('No valid email provided');
+
+        if (args.input.customerId) {
+          await ctx.prisma.userOfCustomer.update({
+            where: { userId_customerId: {
+              userId: args?.userId,
+              customerId: args.input.customerId,
+            } },
+            data: {
+              role: {
+                connect: {
+                  id: roleId || undefined,
+                },
+              },
+            },
+          });
+        }
 
         return ctx.prisma.user.update({
           where: {
