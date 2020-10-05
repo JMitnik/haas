@@ -35,6 +35,15 @@ interface ConnectionInterface {
   startDate: String
 }
 
+input CreateCTAInputType {
+  customerSlug: String
+  dialogueSlug: String
+  links: CTALinksInputType
+  share: ShareNodeInputType
+  title: String
+  type: String
+}
+
 input CTALinkInputObjectType {
   backgroundColor: String
   iconUrl: String
@@ -236,7 +245,7 @@ type LoginOutput {
 type Mutation {
   assignTags(dialogueId: String, tags: TagsInputObjectType): Dialogue!
   copyDialogue(data: AddDialogueInput): Dialogue!
-  createCTA(customerSlug: String, dialogueSlug: String, links: CTALinksInputType, share: ShareNodeInputType, title: String, type: String): QuestionNode!
+  createCTA(input: CreateCTAInputType): QuestionNode!
   createCustomer(name: String, options: CustomerCreateOptions): Customer!
   createDialogue(data: AddDialogueInput): Dialogue!
   createPermission(data: PermissionInput): PermssionType
@@ -266,7 +275,7 @@ type Mutation {
   register(input: RegisterInput): String
   requestInvite(input: RequestInviteInput): RequestInviteOutput!
   singleUpload(file: Upload): ImageType!
-  updateCTA(id: String, links: CTALinksInputType, share: ShareNodeInputType, title: String, type: String): QuestionNode!
+  updateCTA(input: UpdateCTAInpuType): QuestionNode!
   updateQuestion(edgeCondition: EdgeConditionInputType, edgeId: String, id: String, optionEntries: OptionsInputType, overrideLeafId: String, title: String, type: String): QuestionNode!
   updateRoles(permissions: PermissionIdsInput, roleId: String): RoleType!
 
@@ -665,6 +674,14 @@ type TriggerType {
 enum TriggerTypeEnum {
   QUESTION
   SCHEDULED
+}
+
+input UpdateCTAInpuType {
+  id: String
+  links: CTALinksInputType
+  share: ShareNodeInputType
+  title: String
+  type: String
 }
 
 """The `Upload` scalar type represents a file upload."""

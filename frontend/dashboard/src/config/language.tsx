@@ -460,6 +460,22 @@ const language = {
       en: 'Template',
       de: 'Muster',
     },
+    add_complete_title: {
+      en: 'Added!',
+      de: 'Hinzugefügt!',
+    },
+    add_complete_description: {
+      en: 'The CTA has been created.',
+      de: 'Der CTA wurde erstellt.',
+    },
+    edit_complete_title: {
+      en: 'Edit complete',
+      de: 'Bearbeiten abgeschlossen',
+    },
+    edit_complete_description: {
+      en: 'The CTA has been edited.',
+      de: 'Der CTA wurde bearbeitet.',
+    },
   },
   register: {
     token_not_found: {

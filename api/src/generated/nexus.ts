@@ -56,6 +56,14 @@ export interface NexusGenInputs {
   ChoiceNodeEntryInput: { // input type
     value?: string | null; // String
   }
+  CreateCTAInputType: { // input type
+    customerSlug?: string | null; // String
+    dialogueSlug?: string | null; // String
+    links?: NexusGenInputs['CTALinksInputType'] | null; // CTALinksInputType
+    share?: NexusGenInputs['ShareNodeInputType'] | null; // ShareNodeInputType
+    title?: string | null; // String
+    type?: string | null; // String
+  }
   CustomerCreateOptions: { // input type
     isSeed?: boolean | null; // Boolean
     logo?: string | null; // String
@@ -213,6 +221,13 @@ export interface NexusGenInputs {
     medium?: NexusGenEnums['TriggerMediumEnum'] | null; // TriggerMediumEnum
     name?: string | null; // String
     type?: NexusGenEnums['TriggerTypeEnum'] | null; // TriggerTypeEnum
+  }
+  UpdateCTAInpuType: { // input type
+    id?: string | null; // String
+    links?: NexusGenInputs['CTALinksInputType'] | null; // CTALinksInputType
+    share?: NexusGenInputs['ShareNodeInputType'] | null; // ShareNodeInputType
+    title?: string | null; // String
+    type?: string | null; // String
   }
   UserInput: { // input type
     customerId?: string | null; // String
@@ -419,6 +434,7 @@ export interface NexusGenAllTypes extends NexusGenRootTypes {
   CTALinksInputType: NexusGenInputs['CTALinksInputType'];
   CTAShareInputObjectType: NexusGenInputs['CTAShareInputObjectType'];
   ChoiceNodeEntryInput: NexusGenInputs['ChoiceNodeEntryInput'];
+  CreateCTAInputType: NexusGenInputs['CreateCTAInputType'];
   CustomerCreateOptions: NexusGenInputs['CustomerCreateOptions'];
   CustomerEditOptions: NexusGenInputs['CustomerEditOptions'];
   CustomerWhereUniqueInput: NexusGenInputs['CustomerWhereUniqueInput'];
@@ -452,6 +468,7 @@ export interface NexusGenAllTypes extends NexusGenRootTypes {
   TextboxNodeEntryInput: NexusGenInputs['TextboxNodeEntryInput'];
   TriggerConditionInputType: NexusGenInputs['TriggerConditionInputType'];
   TriggerInputType: NexusGenInputs['TriggerInputType'];
+  UpdateCTAInpuType: NexusGenInputs['UpdateCTAInpuType'];
   UserInput: NexusGenInputs['UserInput'];
   UserOfCustomerInput: NexusGenInputs['UserOfCustomerInput'];
   LinkTypeEnumType: NexusGenEnums['LinkTypeEnumType'];
@@ -832,12 +849,7 @@ export interface NexusGenArgTypes {
       data?: NexusGenInputs['AddDialogueInput'] | null; // AddDialogueInput
     }
     createCTA: { // args
-      customerSlug?: string | null; // String
-      dialogueSlug?: string | null; // String
-      links?: NexusGenInputs['CTALinksInputType'] | null; // CTALinksInputType
-      share?: NexusGenInputs['ShareNodeInputType'] | null; // ShareNodeInputType
-      title?: string | null; // String
-      type?: string | null; // String
+      input?: NexusGenInputs['CreateCTAInputType'] | null; // CreateCTAInputType
     }
     createCustomer: { // args
       name?: string | null; // String
@@ -938,11 +950,7 @@ export interface NexusGenArgTypes {
       file?: any | null; // Upload
     }
     updateCTA: { // args
-      id?: string | null; // String
-      links?: NexusGenInputs['CTALinksInputType'] | null; // CTALinksInputType
-      share?: NexusGenInputs['ShareNodeInputType'] | null; // ShareNodeInputType
-      title?: string | null; // String
-      type?: string | null; // String
+      input?: NexusGenInputs['UpdateCTAInpuType'] | null; // UpdateCTAInpuType
     }
     updateQuestion: { // args
       edgeCondition?: NexusGenInputs['EdgeConditionInputType'] | null; // EdgeConditionInputType
@@ -1034,7 +1042,7 @@ export interface NexusGenInheritedFields {}
 
 export type NexusGenObjectNames = "ColourSettings" | "Customer" | "CustomerSettings" | "Dialogue" | "DialogueStatistics" | "Edge" | "EdgeCondition" | "FontSettings" | "ImageType" | "InviteUserOutput" | "LinkType" | "LoginOutput" | "Mutation" | "NodeEntry" | "NodeEntryValue" | "PaginationPageInfo" | "PermssionType" | "Query" | "QuestionNode" | "QuestionOption" | "RefreshAccessTokenOutput" | "RequestInviteOutput" | "RoleConnection" | "RoleType" | "Session" | "SessionConnection" | "ShareNodeType" | "Tag" | "TriggerConditionType" | "TriggerConnectionType" | "TriggerType" | "UserConnection" | "UserCustomer" | "UserType" | "VerifyUserTokenOutput" | "lineChartDataType" | "topPathType";
 
-export type NexusGenInputNames = "AddDialogueInput" | "CTALinkInputObjectType" | "CTALinksInputType" | "CTAShareInputObjectType" | "ChoiceNodeEntryInput" | "CustomerCreateOptions" | "CustomerEditOptions" | "CustomerWhereUniqueInput" | "DialogueFilterInputType" | "DialogueWhereUniqueInput" | "EdgeConditionInputType" | "EditUserInput" | "InviteUserInput" | "LoginInput" | "NodeEntryDataInput" | "NodeEntryInput" | "OptionInputType" | "OptionsInputType" | "PaginationSortInput" | "PaginationWhereInput" | "PermissionIdsInput" | "PermissionInput" | "QuestionNodeWhereInputType" | "QuestionNodeWhereUniqueInput" | "RecipientsInputType" | "RegisterInput" | "RegisterNodeEntryInput" | "RequestInviteInput" | "RoleDataInput" | "RoleInput" | "SessionInput" | "SessionWhereUniqueInput" | "ShareNodeInputType" | "SliderNodeEntryInput" | "TagsInputObjectType" | "TextboxNodeEntryInput" | "TriggerConditionInputType" | "TriggerInputType" | "UserInput" | "UserOfCustomerInput";
+export type NexusGenInputNames = "AddDialogueInput" | "CTALinkInputObjectType" | "CTALinksInputType" | "CTAShareInputObjectType" | "ChoiceNodeEntryInput" | "CreateCTAInputType" | "CustomerCreateOptions" | "CustomerEditOptions" | "CustomerWhereUniqueInput" | "DialogueFilterInputType" | "DialogueWhereUniqueInput" | "EdgeConditionInputType" | "EditUserInput" | "InviteUserInput" | "LoginInput" | "NodeEntryDataInput" | "NodeEntryInput" | "OptionInputType" | "OptionsInputType" | "PaginationSortInput" | "PaginationWhereInput" | "PermissionIdsInput" | "PermissionInput" | "QuestionNodeWhereInputType" | "QuestionNodeWhereUniqueInput" | "RecipientsInputType" | "RegisterInput" | "RegisterNodeEntryInput" | "RequestInviteInput" | "RoleDataInput" | "RoleInput" | "SessionInput" | "SessionWhereUniqueInput" | "ShareNodeInputType" | "SliderNodeEntryInput" | "TagsInputObjectType" | "TextboxNodeEntryInput" | "TriggerConditionInputType" | "TriggerInputType" | "UpdateCTAInpuType" | "UserInput" | "UserOfCustomerInput";
 
 export type NexusGenEnumNames = "LinkTypeEnumType" | "PaginationSortByEnum" | "QuestionNodeTypeEnum" | "SystemPermission" | "TagTypeEnum" | "TriggerConditionEnum" | "TriggerMediumEnum" | "TriggerTypeEnum";
 

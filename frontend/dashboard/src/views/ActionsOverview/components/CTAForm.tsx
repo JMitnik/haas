@@ -189,8 +189,8 @@ const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTACha
   const [addCTA, { loading: addLoading }] = useMutation(createCTAMutation, {
     onCompleted: () => {
       toast({
-        title: 'Added!',
-        description: 'The call to action has been created.',
+        title: t('cta:add_complete_title'),
+        description: t('cta:add_complete_description'),
         status: 'success',
         position: 'bottom-right',
         duration: 1500,
@@ -208,8 +208,8 @@ const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTACha
   const [updateCTA, { loading: updateLoading }] = useMutation(updateCTAMutation, {
     onCompleted: () => {
       toast({
-        title: 'Edit complete!',
-        description: 'The call to action has been edited.',
+        title: t('cta:edit_complete_title'),
+        description: t('cta:edit_complete_description'),
         status: 'success',
         position: 'bottom-right',
         duration: 1500,
@@ -236,23 +236,27 @@ const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTACha
 
       addCTA({
         variables: {
-          customerSlug,
-          dialogueSlug,
-          title: formData.title,
-          type: formData.ctaType.value || undefined,
-          links: mappedLinks,
-          share: formData.share,
+          input: {
+            customerSlug,
+            dialogueSlug,
+            title: formData.title,
+            type: formData.ctaType.value || undefined,
+            links: mappedLinks,
+            share: formData.share,
+          },
         },
       });
     } else {
       const mappedLinks = { linkTypes: activeLinks.map((link) => ({ ...link, type: link.type?.value })) };
       updateCTA({
         variables: {
-          id,
-          title: formData.title,
-          type: formData.ctaType.value || undefined,
-          links: mappedLinks,
-          share: formData.share,
+          input: {
+            id,
+            title: formData.title,
+            type: formData.ctaType.value || undefined,
+            links: mappedLinks,
+            share: formData.share,
+          },
         },
       });
     }

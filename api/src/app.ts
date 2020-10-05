@@ -41,14 +41,17 @@ const main = async () => {
   apollo.applyMiddleware({ app, cors: false });
 
   console.log('🏳️\tStarting the server');
-  const key: any = process.env.HTTPS_SERVER_KEY_PATH;
-  const certificate: any = process.env.HTTPS_SERVER_CERT_PATH;
+  if (config.env === 'local') {
+    const key: any = process.env.HTTPS_SERVER_KEY_PATH;
+    const certificate: any = process.env.HTTPS_SERVER_CERT_PATH;
 
-  https.createServer({
-    key: fs.readFileSync(key),
-    cert: fs.readFileSync(certificate),
-  }, app).listen(config.port);
-
+    https.createServer({
+      key: fs.readFileSync(key),
+      cert: fs.readFileSync(certificate),
+    }, app).listen(config.port);
+  } else {
+    app.listen(config.port);
+  }
   console.log('🏁\tStarted the server!');
 };
 

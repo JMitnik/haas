@@ -238,6 +238,39 @@ export const EdgeConditionInputType = inputObjectType({
   },
 });
 
+export const CreateCTAInputType = inputObjectType({
+  name: 'CreateCTAInputType',
+  definition(t) {
+    t.string('customerSlug');
+    t.string('dialogueSlug');
+    t.string('title');
+    t.string('type');
+
+    t.field('links', {
+      type: CTALinksInputType,
+    });
+    t.field('share', {
+      type: ShareNodeInputType,
+    });
+  },
+});
+
+export const UpdateCTAInpuType = inputObjectType({
+  name: 'UpdateCTAInpuType',
+  definition(t) {
+    t.string('id');
+    t.string('title');
+    t.string('type');
+
+    t.field('links', {
+      type: CTALinksInputType,
+    });
+    t.field('share', {
+      type: ShareNodeInputType,
+    });
+  },
+});
+
 export const QuestionNodeMutations = extendType({
   type: 'Mutation',
   definition(t) {
@@ -364,15 +397,11 @@ export const QuestionNodeMutations = extendType({
     t.field('updateCTA', {
       type: QuestionNodeType,
       args: {
-        id: 'String',
-        title: 'String',
-        type: 'String',
-        links: CTALinksInputType,
-        share: ShareNodeInputType,
+        input: UpdateCTAInpuType,
       },
       async resolve(parent: any, args: any, ctx) {
         const { prisma }: { prisma: PrismaClient } = ctx;
-        const { title, type, id, links, share } = args;
+        const { title, type, id, links, share } = args.input;
         const dbQuestionNode = await prisma.questionNode.findOne({
           where: {
             id,
@@ -382,7 +411,7 @@ export const QuestionNodeMutations = extendType({
             share: true,
           },
         });
-        console.log('share: ', share, 'type: ', type);
+
         const questionNodeUpdateInput: QuestionNodeUpdateInput = { title, type };
 
         if (dbQuestionNode?.share && (!share || type !== 'SHARE')) {
@@ -449,16 +478,11 @@ export const QuestionNodeMutations = extendType({
     t.field('createCTA', {
       type: QuestionNodeType,
       args: {
-        customerSlug: 'String',
-        dialogueSlug: 'String',
-        title: 'String',
-        type: 'String',
-        links: CTALinksInputType,
-        share: ShareNodeInputType,
+        input: CreateCTAInputType,
       },
       async resolve(parent: any, args: any, ctx: any) {
         const { prisma }: { prisma: PrismaClient } = ctx;
-        const { customerSlug, dialogueSlug, title, type, links, share } = args;
+        const { customerSlug, dialogueSlug, title, type, links, share } = args.input;
 
         const customer = await prisma.customer.findOne({
           where: {
