@@ -899,6 +899,88 @@ const language = {
       de: 'Ihre Daten wurden gespeichert.',
     },
   },
+  cta: {
+    information_header: {
+      en: 'Information about your CTA',
+      de: 'Informationen zu Ihrem CTA',
+    },
+    title_helper: {
+      en: 'What is the main text of the CTA?',
+      de: 'Was ist der Haupttext des CTA?',
+    },
+    shared_item_title_helper: {
+      en: 'What is the title of the shared item?',
+      de: 'Wie lautet der Titel des freigegebenen Elements?',
+    },
+    type: {
+      en: 'type',
+      de: 'typ',
+    },
+    share_type_helper: {
+      en: 'What is the type of the CTA?',
+      de: 'Was ist der Typ des CTA?',
+    },
+    url: {
+      en: 'url',
+      de: 'url',
+    },
+    url_share_helper: {
+      en: 'What is the url to be shared?',
+      de: 'Welche URL soll geteilt werden?',
+    },
+    button_text: {
+      en: 'Button text',
+      de: 'Schaltflächentext',
+    },
+    button_text_helper: {
+      en: 'What is the text on the share button?',
+      de: 'Was ist der Text der Share-Schaltfläche',
+    },
+    link_header: {
+      en: 'What links do you want to add to the CTA',
+      de: 'Welche Links möchten Sie zum CTA hinzufügen?',
+    },
+    add_link: {
+      en: 'Add link',
+      de: 'Link hinzufügen',
+    },
+    link_url_helper: {
+      en: 'What is the url the link should lead to?',
+      de: 'Zu welcher URL sollte der Link führen?',
+    },
+    link_type_helper: {
+      en: 'What is the type of the link?',
+      de: 'Was ist der typ des Links?',
+    },
+    link_tooltip: {
+      en: 'Tooltip',
+      de: 'Tooltip',
+    },
+    link_tooltip_helper: {
+      en: 'What is the text when hovering over the link?',
+      de: 'Was ist der Text, wenn Sie mit der Maus über den Link fahren?',
+    },
+    link_icon: {
+      en: 'Icon',
+      de: 'Symbol',
+    },
+    link_icon_helper: {
+      en: 'What icon is displayed for the link?',
+      de: 'Welches Symbol wird für den Link angezeigt?',
+    },
+    background_color: {
+      en: 'Background color',
+      de: 'Hintergrundfarbe',
+    },
+    background_color_helper: {
+      en: 'What is the background color for the link?',
+      de: 'Was ist die Hintergrundfarbe für den Link?',
+    },
+    delete_link: {
+      en: 'Delete link',
+      de: 'Link löschen',
+    },
+  },
   trigger: {
     alert_email: {
       en: 'Send trigger-alerts to emai',

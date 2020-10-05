@@ -8,6 +8,7 @@ import { PlusCircle, Trash, Type } from 'react-feather';
 import { cloneDeep, debounce } from 'lodash';
 import { useMutation } from '@apollo/react-hooks';
 import { useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { yupResolver } from '@hookform/resolvers';
 import React, { useCallback, useEffect, useState } from 'react';
 import Select from 'react-select';
@@ -16,7 +17,7 @@ import cuid from 'cuid';
 import { Div, ErrorStyle, Flex, Form, FormContainer,
   FormControl, FormLabel, FormSection, Grid, H3, H4, Hr, Input, InputGrid, InputHelper, Muted, Span, Text } from '@haas/ui';
 import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
-import { useTranslation } from 'react-i18next';
+
 import LinkIcon from 'components/Icons/LinkIcon';
 import OpinionIcon from 'components/Icons/OpinionIcon';
 import RegisterIcon from 'components/Icons/RegisterIcon';
@@ -129,6 +130,7 @@ const LINK_TYPES = [
 
 const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTAChange, onDeleteCTA }: CTAFormProps) => {
   const { customerSlug, dialogueSlug } = useParams();
+
   const form = useForm<FormDataProps>({
     resolver: yupResolver(schema),
     mode: 'onChange',
@@ -314,9 +316,6 @@ const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTACha
     });
   };
 
-  console.log('getValues: ', form.getValues());
-  console.log('errors: ', form.errors);
-
   return (
     <FormContainer expandedForm>
       <Form onSubmit={form.handleSubmit(onSubmit)}>
@@ -325,14 +324,14 @@ const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTACha
             <Div>
               <H3 color="default.text" fontWeight={500} pb={2}>Call to action</H3>
               <Muted color="gray.600">
-                Information about your CTA
+                {t('cta:information_header')}
               </Muted>
             </Div>
             <Div>
               <InputGrid>
                 <FormControl gridColumn="1 / -1" isRequired isInvalid={!!form.errors.title}>
                   <FormLabel htmlFor="title">{t('title')}</FormLabel>
-                  <InputHelper>What is the main text of the CTA?</InputHelper>
+                  <InputHelper>{t('cta:title_helper')}</InputHelper>
                   <Input
                     name="title"
                     placeholder="Thank you for..."
@@ -344,8 +343,8 @@ const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTACha
                 </FormControl>
 
                 <FormControl isRequired>
-                  <FormLabel htmlFor="ctaType">Type</FormLabel>
-                  <InputHelper>What is the type of the CTA?</InputHelper>
+                  <FormLabel htmlFor="ctaType">{t('cta:type')}</FormLabel>
+                  <InputHelper>{t('cta:share_type_helper')}</InputHelper>
                   <Controller
                     name="ctaType"
                     control={form.control}
@@ -359,8 +358,8 @@ const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTACha
                 {watchType?.value === 'SHARE' && (
                   <>
                     <FormControl isRequired>
-                      <FormLabel htmlFor="share.title">Title</FormLabel>
-                      <InputHelper>What is the title of the shared item?</InputHelper>
+                      <FormLabel htmlFor="share.title">{t('general:title')}</FormLabel>
+                      <InputHelper>{t('cta:shared_item_title_helper')}</InputHelper>
                       <Input
                         name="share.title"
                         placeholder="Get a discount..."
@@ -374,8 +373,8 @@ const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTACha
 
                     {/* TODO: Change default value and error */}
                     <FormControl isRequired>
-                      <FormLabel htmlFor="share.url">Url</FormLabel>
-                      <InputHelper>What is the url to be shared?</InputHelper>
+                      <FormLabel htmlFor="share.url">{t('cta:url')}</FormLabel>
+                      <InputHelper>{t('cta:url_share_helper')}</InputHelper>
                       <Input
                         name="share.url"
                         placeholder="https://share/url..."
@@ -389,8 +388,8 @@ const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTACha
 
                     {/* TODO: Change default value and error */}
                     <FormControl isRequired>
-                      <FormLabel htmlFor="share.tooltip">Button text</FormLabel>
-                      <InputHelper>What is the text on the share button?</InputHelper>
+                      <FormLabel htmlFor="share.tooltip">{t('cta:button_text')}</FormLabel>
+                      <InputHelper>{t('cta:button_text_helper')}</InputHelper>
                       <Input
                         name="share.tooltip"
                         placeholder="Share..."
@@ -414,7 +413,7 @@ const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTACha
             <Div>
               <H3 color="default.text" fontWeight={500} pb={2}>Links</H3>
               <Muted color="gray.600">
-                What links do you want to add to the CTA?
+                {t('cta:link_header')}
               </Muted>
             </Div>
             <Div>
@@ -422,7 +421,7 @@ const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTACha
                 <Div gridColumn="1 / -1">
                   <Flex flexDirection="row" alignItems="center" justifyContent="space-between" marginBottom={5}>
                     <H4>Links</H4>
-                    <Button leftIcon={PlusCircle} onClick={addCondition} size="sm">Add link</Button>
+                    <Button leftIcon={PlusCircle} onClick={addCondition} size="sm">{t('cta:add_link')}</Button>
                   </Flex>
                   <Hr />
 
@@ -442,8 +441,8 @@ const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTACha
                             gridTemplateColumns={['1fr 1fr']}
                           >
                             <FormControl isRequired isInvalid={!!form.errors?.links?.[index]?.url}>
-                              <FormLabel htmlFor={`links[${index}].url`}>Url</FormLabel>
-                              <InputHelper>What is the url the link should lead to?</InputHelper>
+                              <FormLabel htmlFor={`links[${index}].url`}>{t('cta:url')}</FormLabel>
+                              <InputHelper>{t('cta:link_url_helper')}</InputHelper>
                               <Input
                                 name={`links[${index}].url`}
                                 defaultValue={link.url}
@@ -456,8 +455,8 @@ const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTACha
                             </FormControl>
 
                             <FormControl isRequired isInvalid={!!form.errors.links?.[index]?.type}>
-                              <FormLabel htmlFor={`links[${index}].type`}>Type</FormLabel>
-                              <InputHelper>What is the type of the link?</InputHelper>
+                              <FormLabel htmlFor={`links[${index}].type`}>{t('cta:type')}</FormLabel>
+                              <InputHelper>{t('cta:link_type_helper')}</InputHelper>
                               <Controller
                                 id={`link-${link.id}-${index}`}
                                 name={`links[${index}].type`}
@@ -478,8 +477,8 @@ const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTACha
                             </FormControl>
 
                             <FormControl>
-                              <FormLabel htmlFor={`links[${index}].tooltip`}>Tooltip</FormLabel>
-                              <InputHelper>What is the text when hovering over the link?</InputHelper>
+                              <FormLabel htmlFor={`links[${index}].tooltip`}>{t('cta:tooltip')}</FormLabel>
+                              <InputHelper>{t('cta:link_tooltip_helper')}</InputHelper>
                               <Input
                                 isInvalid={!!form.errors.links?.[index]?.tooltip}
                                 name={`links[${index}].tooltip`}
@@ -491,8 +490,8 @@ const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTACha
                             </FormControl>
 
                             <FormControl>
-                              <FormLabel htmlFor={`links[${index}].iconUrl`}>Icon</FormLabel>
-                              <InputHelper>What icon is displayed for the link?</InputHelper>
+                              <FormLabel htmlFor={`links[${index}].iconUrl`}>{t('cta:link_icon')}</FormLabel>
+                              <InputHelper>{t('cta:link_icon_helper')}</InputHelper>
                               <Input
                                 isInvalid={!!form.errors.links?.[index]?.iconUrl}
                                 name={`links[${index}].iconUrl`}
@@ -504,8 +503,8 @@ const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTACha
                             </FormControl>
 
                             <FormControl>
-                              <FormLabel htmlFor={`links[${index}].backgroundColor`}>Background color</FormLabel>
-                              <InputHelper>What icon is displayed for the link?</InputHelper>
+                              <FormLabel htmlFor={`links[${index}].backgroundColor`}>{t('cta:background_color')}</FormLabel>
+                              <InputHelper>{t('cta:background_color_helper')}</InputHelper>
                               <Input
                                 isInvalid={!!form.errors.links?.[index]?.backgroundColor}
                                 name={`links[${index}].backgroundColor`}
@@ -524,8 +523,7 @@ const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTACha
                             variantColor="red"
                             onClick={() => handleDeleteLink(index)}
                           >
-                            Delete link
-
+                            {t('cta:delete_link')}
                           </Button>
                         </Div>
                       </motion.div>

@@ -55,7 +55,6 @@ export const ShareNodeType = objectType({
     t.string('url');
     t.string('title');
 
-    // Deze is net nullable geworden, om de nullable aspect van je prc
     t.string('tooltip', { nullable: true });
     t.string('createdAt', { nullable: true });
     t.string('updatedAt', { nullable: true });
@@ -107,7 +106,6 @@ export const QuestionNodeType = objectType({
         return {
           id: share.id,
           title: share.title,
-          // share.tooltip was potentieel nullable, maar je ShareNodeType liet dat niet toe. Heb dat net aangepast
           tooltip: share.tooltip,
           url: share.url,
         };
