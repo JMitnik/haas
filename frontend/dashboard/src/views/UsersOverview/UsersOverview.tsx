@@ -1,4 +1,3 @@
-import { ApolloError } from 'apollo-boost';
 import { debounce } from 'lodash';
 import { useHistory, useParams } from 'react-router';
 import { useLazyQuery, useMutation } from '@apollo/react-hooks';
@@ -10,17 +9,17 @@ import Table from 'components/Table/Table';
 import getPaginatedUsers from 'queries/getPaginatedUsers';
 
 import { Button, useToast } from '@chakra-ui/core';
-import { Delete, Edit, Plus, Trash } from 'react-feather';
+import { Edit, Plus, Trash } from 'react-feather';
 import { ErrorBoundary } from 'react-error-boundary';
 import { GenericCell, RoleCell } from 'components/Table/CellComponents/CellComponents';
-import { useTranslation } from 'react-i18next';
-// import Row from './TableRow/UsersTableRow';
 import { useCustomer } from 'providers/CustomerProvider';
+import { useTranslation } from 'react-i18next';
 import List from 'components/List/List';
 import ListItem from 'components/List/ListItem';
 import ShowMoreButton from 'components/ShowMoreButton';
-import deleteUserQuery from '../../mutations/deleteUser';
 import useAuth from 'hooks/useAuth';
+
+import deleteUserQuery from '../../mutations/deleteUser';
 
 interface TableProps {
   activeStartDate: Date | null;
