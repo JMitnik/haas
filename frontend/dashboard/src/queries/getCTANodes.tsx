@@ -20,6 +20,12 @@ const getCTANodesOfDialogue = gql`
             backgroundColor
             type
           }
+          share {
+            id
+            title
+            url
+            tooltip
+          }
         }
       }
     }

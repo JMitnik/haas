@@ -17,6 +17,7 @@ import { Button, Icon } from '@chakra-ui/core';
 import { Variants, motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import CTAEntry from './components/CTAEntry';
+import ShareIcon from 'components/Icons/ShareIcon';
 
 interface ActionOverviewProps {
   leafs: Array<any>;
@@ -54,6 +55,10 @@ const mapLeafs = (leafs: any) => leafs?.map((leaf: any) => {
     return { ...leaf, type: 'TEXTBOX', icon: OpinionIcon };
   }
 
+  if (leaf.type === 'SHARE') {
+    return { ...leaf, type: 'SHARE', icon: ShareIcon };
+  }
+
   return null;
 });
 
@@ -68,6 +73,10 @@ const initializeCTAType = (type: string) => {
 
   if (type === 'LINK') {
     return { label: 'Link', value: 'LINK' };
+  }
+
+  if (type === 'SHARE') {
+    return { label: 'Share', value: 'SHARE' };
   }
 
   return { label: 'None', value: '' };
@@ -115,6 +124,7 @@ const ActionOverview = ({ leafs }: ActionOverviewProps) => {
   const { t } = useTranslation();
 
   const activeLeafs = mapLeafs(data?.customer?.dialogue?.leafs);
+  console.log(leafs);
 
   return (
     <DialogueViewContainer>
@@ -138,6 +148,7 @@ const ActionOverview = ({ leafs }: ActionOverviewProps) => {
             title=""
             type={initializeCTAType('REGISTER')}
             links={[]}
+            share={{ title: '', url: '', tooltip: '' }}
             onNewCTAChange={setNewCTA}
           />
         )}
@@ -153,6 +164,7 @@ const ActionOverview = ({ leafs }: ActionOverviewProps) => {
               title={leaf.title}
               type={initializeCTAType(leaf.type)}
               links={leaf.links}
+              share={leaf?.share}
               onNewCTAChange={setNewCTA}
             />
           ),
@@ -169,6 +181,7 @@ const ActionOverview = ({ leafs }: ActionOverviewProps) => {
               title={leaf.title}
               type={initializeCTAType(leaf.type)}
               links={leaf.links}
+              share={leaf?.share}
               onNewCTAChange={setNewCTA}
             />
           ),

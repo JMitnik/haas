@@ -26,6 +26,12 @@ const getDialogueFromSlug = gql`
             iconUrl
             backgroundColor
           }
+          share {
+            id
+            title
+            url
+            tooltip
+          }
         }
         customerId
         rootQuestion {

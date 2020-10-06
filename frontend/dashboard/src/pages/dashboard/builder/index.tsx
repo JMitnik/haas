@@ -35,6 +35,10 @@ const initializeCTAType = (type?: string) => {
     return 'Link';
   }
 
+  if (type === 'SHARE') {
+    return 'Share';
+  }
+
   return 'None';
 };
 

@@ -23,11 +23,19 @@ interface LinkInputProps {
   icon?: string;
   backgroundColor?: string;
 }
+
+interface ShareProps {
+  id?: string;
+  title: string;
+  url: string;
+  tooltip: string;
+}
 interface CTAEntryProps {
   id: string;
   title: string;
   type: { label: string, value: string };
   links: Array<LinkInputProps>;
+  share: ShareProps | null;
   Icon: (props: any) => JSX.Element;
   activeCTA: string | null;
   onActiveCTAChange: React.Dispatch<React.SetStateAction<string | null>>;
@@ -71,7 +79,7 @@ const OverflowSpan = styled(Span)`
   `}
 `;
 
-const CTAEntry = ({ id, activeCTA, onActiveCTAChange, title, type, links, Icon, onNewCTAChange }: CTAEntryProps) => {
+const CTAEntry = ({ id, activeCTA, onActiveCTAChange, title, type, links, share, Icon, onNewCTAChange }: CTAEntryProps) => {
   const toast = useToast();
   const { t } = useTranslation();
 
@@ -151,6 +159,7 @@ const CTAEntry = ({ id, activeCTA, onActiveCTAChange, title, type, links, Icon, 
                 title={title}
                 type={type}
                 links={links}
+                share={share}
                 onDeleteCTA={deleteCTA}
                 onActiveCTAChange={onActiveCTAChange}
                 onNewCTAChange={onNewCTAChange}
