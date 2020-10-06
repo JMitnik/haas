@@ -16,6 +16,7 @@ import ShowMoreButton from 'components/ShowMoreButton';
 import SliderNodeIcon from 'components/Icons/SliderNodeIcon';
 import getDialoguesOfCustomer from 'queries/getDialoguesOfCustomer';
 import getLocale from 'utils/getLocale';
+import useAuth from 'hooks/useAuth';
 
 interface DialogueCardOptionsOverlayProps {
   onDelete: (e: React.MouseEvent<HTMLElement>) => void;
@@ -40,6 +41,7 @@ const DialogueCardOptionsOverlay = ({ onDelete, onEdit }: DialogueCardOptionsOve
 const DialogueCard = ({ dialogue, isCompact }: { dialogue: any, isCompact?: boolean }) => {
   const history = useHistory();
   const { customerSlug } = useParams();
+  const { canAccessAdmin } = useAuth();
   const ref = useRef(null);
   const { t } = useTranslation();
   const toast = useToast();
@@ -134,14 +136,16 @@ const DialogueCard = ({ dialogue, isCompact }: { dialogue: any, isCompact?: bool
                   </Text>
                 )}
               </Div>
-              <ShowMoreButton
-                renderMenu={(
-                  <DialogueCardOptionsOverlay
-                    onDelete={deleteDialogue}
-                    onEdit={goToEditDialogue}
-                  />
+              {canAccessAdmin && (
+                <ShowMoreButton
+                  renderMenu={(
+                    <DialogueCardOptionsOverlay
+                      onDelete={deleteDialogue}
+                      onEdit={goToEditDialogue}
+                    />
               )}
-              />
+                />
+              )}
             </Flex>
           </Div>
         </ColumnFlex>
