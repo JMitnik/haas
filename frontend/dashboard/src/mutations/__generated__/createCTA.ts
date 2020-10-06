@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { CTALinksInputType } from "./../../types/globalTypes";
+import { CTALinksInputType, ShareNodeInputType } from "./../../types/globalTypes";
 
 // ====================================================
 // GraphQL mutation operation: createCTA
@@ -24,4 +24,5 @@ export interface createCTAVariables {
   title: string;
   type: string;
   links?: CTALinksInputType | null;
+  share?: ShareNodeInputType | null;
 }

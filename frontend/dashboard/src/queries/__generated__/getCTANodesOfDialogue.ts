@@ -19,12 +19,21 @@ export interface getCTANodesOfDialogue_customer_dialogue_leafs_links {
   type: string;
 }
 
+export interface getCTANodesOfDialogue_customer_dialogue_leafs_share {
+  __typename: "ShareNodeType";
+  id: string;
+  title: string;
+  url: string;
+  tooltip: string | null;
+}
+
 export interface getCTANodesOfDialogue_customer_dialogue_leafs {
   __typename: "QuestionNode";
   id: string;
   title: string;
   type: QuestionNodeTypeEnum;
   links: getCTANodesOfDialogue_customer_dialogue_leafs_links[];
+  share: getCTANodesOfDialogue_customer_dialogue_leafs_share | null;
 }
 
 export interface getCTANodesOfDialogue_customer_dialogue {

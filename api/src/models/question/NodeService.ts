@@ -1,4 +1,4 @@
-import { Dialogue, Link, NodeType, QuestionCondition, QuestionNode, QuestionNodeCreateInput } from '@prisma/client';
+import { Dialogue, Link, NodeType, QuestionCondition, QuestionNode, QuestionNodeCreateInput, QuestionNodeUpdateInput, Share } from '@prisma/client';
 import { choiceType, sliderType } from '../../data/seeds/default-data';
 import EdgeService from '../edge/EdgeService';
 import prisma from '../../config/prisma';
@@ -359,6 +359,12 @@ class NodeService {
         id: {
           in: edgeIds,
         },
+      },
+    });
+
+    await prisma.share.deleteMany({
+      where: {
+        questionNodeId: id,
       },
     });
 

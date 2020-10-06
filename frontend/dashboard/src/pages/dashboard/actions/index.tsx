@@ -7,6 +7,7 @@ import ActionOverview from 'views/ActionsOverview/ActionsOverview';
 import LinkIcon from 'components/Icons/LinkIcon';
 import OpinionIcon from 'components/Icons/OpinionIcon';
 import RegisterIcon from 'components/Icons/RegisterIcon';
+import ShareIcon from 'components/Icons/ShareIcon';
 import getCTANodesQuery from 'queries/getCTANodes';
 
 const ActionsPage = () => {
@@ -47,7 +48,11 @@ const ActionsPage = () => {
       return { ...leaf, type: 'TEXTBOX', icon: OpinionIcon };
     }
 
-    return null;
+    if (leaf.type === 'SHARE') {
+      return { ...leaf, type: 'SHARE', icon: ShareIcon };
+    }
+
+    return { ...leaf, icon: RegisterIcon };
   });
 
   return (

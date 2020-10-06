@@ -4,6 +4,7 @@ import React from 'react';
 import LinkIcon from 'components/Icons/LinkIcon';
 import OpinionIcon from 'components/Icons/OpinionIcon';
 import RegisterIcon from 'components/Icons/RegisterIcon';
+import ShareIcon from 'components/Icons/ShareIcon';
 
 import { LinkContainer, TypeSpan } from './QuestionEntryStyles';
 
@@ -29,8 +30,12 @@ const CTALabel = ({ question }: { question: any }) => (
         <RegisterIcon isCTA hasCTA />
       )}
 
+      {question.overrideLeaf?.type === 'Share' && (
+        <ShareIcon isCTA hasCTA />
+      )}
+
       <TypeSpan fontSize="0.5em">
-        {question.overrideLeaf?.type || 'None'}
+        {question.overrideLeaf?.type || (question.type === 'SHARE' && 'Share') || 'None'}
       </TypeSpan>
     </Flex>
   </LinkContainer>

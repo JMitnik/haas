@@ -3,6 +3,7 @@ import { IAnyModelType, Instance, types } from 'mobx-state-tree';
 import { TreeEdgeModel, TreeEdgeProps } from './TreeEdgeModel';
 import TreeLinkModel from './TreeLinkModel';
 import TreeNodeOptionModel from './TreeNodeOptionModel';
+import TreeShareModel from './TreeShareModel';
 
 export enum SpecialEdge {
   LEAF_EDGE_ID = '-1',
@@ -20,6 +21,7 @@ export const TreeNodeModel = types
     overrideLeaf: types.maybe(types.reference(types.late((): IAnyModelType => TreeNodeModel))),
     options: types.array(TreeNodeOptionModel),
     links: types.array(TreeLinkModel),
+    share: types.maybe(TreeShareModel),
   })
   .actions((self) => ({
     /**
