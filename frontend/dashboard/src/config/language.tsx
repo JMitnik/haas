@@ -4,6 +4,10 @@ const language = {
       en: 'Register',
       de: 'Registrieren',
     },
+    url: {
+      en: 'Link',
+      de: 'Link',
+    },
     invite_user: {
       en: 'Invite user',
       de: 'Benutzer einladen',
@@ -929,8 +933,8 @@ const language = {
       de: 'Wie lautet der Titel des freigegebenen Elements?',
     },
     type: {
-      en: 'type',
-      de: 'typ',
+      en: 'Type',
+      de: 'Typ',
     },
     share_type_helper: {
       en: 'What is the type of the CTA?',
@@ -941,7 +945,7 @@ const language = {
       de: 'url',
     },
     url_share_helper: {
-      en: 'What is the url to be shared?',
+      en: 'What is the link you wish to share?',
       de: 'Welche URL soll geteilt werden?',
     },
     button_text: {

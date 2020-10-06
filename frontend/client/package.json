@@ -71,6 +71,7 @@
   },
   "scripts": {
     "start": "cra-workspaces start",
+    "start:https": "HTTPS=true SSL_CERT_FILE=secrets/server.cert SSL_KEY_FILE=server.key cra-workspaces start",
     "build": "cra-workspaces build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"

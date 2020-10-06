@@ -5,6 +5,8 @@ node_modules
 build
 dist
 .rpt2_cache
+secrets
+ssl
 
 # misc
 .DS_Store

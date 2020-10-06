@@ -25,11 +25,11 @@ const ShareNode = ({ node }: SocialShareNodeProps) => {
       navi.share({
         title: `${share?.title}`,
         url: `${share?.url}`,
-        text: 'Here is your discount code. Please go to following link',
+        text: 'I would like to share this with you:',
       });
     } else {
       const copiedText = `${share?.title}
-      Here is your discount code. Please go to following link:
+      I would like to share this with you:
       ${share?.url}`;
       return copy(copiedText);
     }
@@ -40,7 +40,7 @@ const ShareNode = ({ node }: SocialShareNodeProps) => {
       <H2 color="white">{node.title}</H2>
       <ShareButtonContainer flexGrow={1}>
         <Flex position="relative" width="100%" alignItems="center" justifyContent="center">
-          <ShareButton onClick={() => handleCopy()}>
+          <ShareButton onClick={handleCopy}>
             <Share2 />
             <span>
               {share?.tooltip || 'Share'}

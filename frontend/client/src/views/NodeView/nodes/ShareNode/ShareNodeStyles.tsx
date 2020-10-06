@@ -60,6 +60,9 @@ export const ShareButton = styled(Button)`
 `;
 
 export const SuccesMessageContainer = styled(motion.div)`
-  position: absolute;
-  bottom: -40px;
+  ${({ theme }) => css`
+    color: ${Color(theme.colors.primary).darken(0.6).hex()};
+    bottom: -40px;
+    position: absolute;
+  `}
 `;

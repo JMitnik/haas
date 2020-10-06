@@ -48,9 +48,13 @@ const main = async () => {
     https.createServer({
       key: fs.readFileSync(key),
       cert: fs.readFileSync(certificate),
-    }, app).listen(config.port);
+    }, app).listen(config.port, () => {
+      console.log('🏁\Listening on https server!');
+      console.log(`Listening on port ${config.port}!`);
+    });
   } else {
     app.listen(config.port);
+    console.log('🏁\Listening on standard server!');
   }
   console.log('🏁\tStarted the server!');
 };

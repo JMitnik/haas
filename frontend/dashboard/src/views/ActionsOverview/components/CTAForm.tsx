@@ -4,7 +4,7 @@ import { ApolloError, ExecutionResult } from 'apollo-boost';
 import { Button, ButtonGroup, FormErrorMessage, Popover, PopoverArrow, PopoverBody, PopoverCloseButton,
   PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast } from '@chakra-ui/core';
 import { Controller, useForm } from 'react-hook-form';
-import { PlusCircle, Trash, Type } from 'react-feather';
+import { Link, PlusCircle, Trash, Type } from 'react-feather';
 import { cloneDeep, debounce } from 'lodash';
 import { useMutation } from '@apollo/react-hooks';
 import { useParams } from 'react-router-dom';
@@ -14,13 +14,14 @@ import React, { useCallback, useEffect, useState } from 'react';
 import Select from 'react-select';
 import cuid from 'cuid';
 
-import { Div, ErrorStyle, Flex, Form, FormContainer,
+import { Div, Flex, Form, FormContainer,
   FormControl, FormLabel, FormSection, Grid, H3, H4, Hr, Input, InputGrid, InputHelper, Muted, Span, Text } from '@haas/ui';
 import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
 
 import LinkIcon from 'components/Icons/LinkIcon';
 import OpinionIcon from 'components/Icons/OpinionIcon';
 import RegisterIcon from 'components/Icons/RegisterIcon';
+import ShareIcon from 'components/Icons/ShareIcon';
 import createCTAMutation from 'mutations/createCTA';
 import getCTANodesQuery from 'queries/getCTANodes';
 import updateCTAMutation from 'mutations/updateCTA';
@@ -116,7 +117,7 @@ const CTA_TYPES = [
   { label: 'Opinion', value: 'TEXTBOX', icon: OpinionIcon },
   { label: 'Register', value: 'REGISTRATION', RegisterIcon },
   { label: 'Link', value: 'LINK', LinkIcon },
-  { label: 'Share', value: 'SHARE', LinkIcon },
+  { label: 'Share', value: 'SHARE', ShareIcon },
 ];
 
 const LINK_TYPES = [
@@ -369,7 +370,6 @@ const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTACha
                         placeholder="Get a discount..."
                         leftEl={<Type />}
                         defaultValue={share?.title}
-                        // onChange={(e: any) => handleTooltipChange(e.currentTarget.value, 0)}
                         ref={form.register({ required: true })}
                       />
                       <FormErrorMessage>{form.errors.share?.title}</FormErrorMessage>
@@ -377,14 +377,13 @@ const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTACha
 
                     {/* TODO: Change default value and error */}
                     <FormControl isRequired>
-                      <FormLabel htmlFor="share.url">{t('cta:url')}</FormLabel>
+                      <FormLabel htmlFor="share.url">{t('url')}</FormLabel>
                       <InputHelper>{t('cta:url_share_helper')}</InputHelper>
                       <Input
                         name="share.url"
-                        placeholder="https://share/url..."
-                        leftEl={<Type />}
+                        placeholder="https://share/url"
+                        leftEl={<Link />}
                         defaultValue={share?.url}
-                        // onChange={(e: any) => handleURLChange(e.currentTarget.value, 0)}
                         ref={form.register({ required: true })}
                       />
                       <FormErrorMessage>{form.errors.share?.url}</FormErrorMessage>
