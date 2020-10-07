@@ -21,7 +21,7 @@ const getWorkSpaceFromReq = async (req: Request) => {
     return customer;
   }
 
-  if (vars?.customerId || vars?.input?.customer) {
+  if (vars?.customerId || vars?.input?.customerId) {
     const customer = await prisma.customer.findOne({
       where: {
         id: vars?.customerId || vars?.input?.customerId,

@@ -255,19 +255,61 @@ export const CreateCTAInputType = inputObjectType({
   },
 });
 
-export const UpdateCTAInpuType = inputObjectType({
-  name: 'UpdateCTAInpuType',
+export const CreateQuestionNodeInputType = inputObjectType({
+  name: 'CreateQuestionNodeInputType',
+
   definition(t) {
-    t.string('id');
+    t.id('customerId');
+    t.id('overrideLeafId');
+    t.id('parentQuestionId');
+
+    t.string('dialogueSlug');
     t.string('title');
     t.string('type');
 
-    t.field('links', {
-      type: CTALinksInputType,
-    });
-    t.field('share', {
-      type: ShareNodeInputType,
-    });
+    t.field('optionEntries', { type: OptionsInputType });
+    t.field('edgeCondition', { type: EdgeConditionInputType });
+  },
+});
+
+export const UpdateQuestionNodeInputType = inputObjectType({
+  name: 'UpdateQuestionNodeInputType',
+
+  definition(t) {
+    t.id('id');
+    t.id('customerId');
+    t.id('overrideLeafId');
+    t.id('edgeId');
+
+    t.string('title');
+    t.string('type');
+
+    t.field('optionEntries', { type: OptionsInputType });
+    t.field('edgeCondition', { type: EdgeConditionInputType });
+  },
+});
+
+export const UpdateCTAInputType = inputObjectType({
+  name: 'UpdateCTAInputType',
+  definition(t) {
+    t.string('id');
+    t.id('customerId');
+    t.string('title');
+    t.string('type');
+
+    t.field('links', { type: CTALinksInputType });
+    t.field('share', { type: ShareNodeInputType });
+  },
+});
+
+export const DeleteNodeInputType = inputObjectType({
+  name: 'DeleteNodeInputType',
+  description: 'Delete Node Input type',
+
+  definition(t) {
+    t.string('id');
+    t.id('customerId');
+    t.string('dialogueSlug');
   },
 });
 
@@ -276,20 +318,16 @@ export const QuestionNodeMutations = extendType({
   definition(t) {
     t.field('deleteQuestion', {
       type: QuestionNodeType,
-      args: {
-        id: 'String',
-        customerSlug: 'String',
-        dialogueSlug: 'String',
-      },
+      args: { input: DeleteNodeInputType },
       // TODO: Remove the any
       // @ts-ignore
       async resolve(parent: any, args: any, ctx: any) {
-        const { id, customerSlug, dialogueSlug } = args;
+        const { id, customerId, dialogueSlug } = args.input;
         const { prisma }: { prisma: PrismaClient } = ctx;
 
         const customer = await prisma.customer.findOne({
           where: {
-            slug: customerSlug || undefined,
+            id: customerId || undefined,
           },
           include: {
             dialogues: {
@@ -330,19 +368,10 @@ export const QuestionNodeMutations = extendType({
 
     t.field('updateQuestion', {
       type: QuestionNodeType,
-      args: {
-        id: 'String',
-        title: 'String',
-        type: 'String',
-        overrideLeafId: 'String',
-        edgeId: 'String',
-        optionEntries: OptionsInputType,
-        edgeCondition: EdgeConditionInputType,
-      },
+      args: { input: UpdateQuestionNodeInputType },
       // TODO: Remove the any
       resolve(parent: any, args: any) {
-        const { id, title, type, overrideLeafId, edgeId, optionEntries, edgeCondition } = args;
-        const { options } = optionEntries;
+        const { id, title, type, overrideLeafId, edgeId, optionEntries: { options }, edgeCondition } = args?.input;
 
         return NodeService.updateQuestionFromBuilder(id, title, type, overrideLeafId, edgeId, options, edgeCondition);
       },
@@ -352,25 +381,18 @@ export const QuestionNodeMutations = extendType({
       type: QuestionNodeType,
       nullable: true,
       args: {
-        customerSlug: 'String',
-        dialogueSlug: 'String',
-        title: 'String',
-        type: 'String',
-        overrideLeafId: 'String',
-        parentQuestionId: 'String',
-        optionEntries: OptionsInputType,
-        edgeCondition: EdgeConditionInputType,
+        input: CreateQuestionNodeInputType,
       },
       // TODO: Remove the any
       async resolve(parent: any, args: any, ctx: any) {
         const { prisma }: { prisma: PrismaClient } = ctx;
         // eslint-disable-next-line max-len
-        const { customerSlug, dialogueSlug, title, type, overrideLeafId, parentQuestionId, optionEntries, edgeCondition } = args;
+        const { customerId, dialogueSlug, title, type, overrideLeafId, parentQuestionId, optionEntries, edgeCondition } = args.input;
         const { options } = optionEntries;
 
         const customer = await prisma.customer.findOne({
           where: {
-            slug: customerSlug || undefined,
+            id: customerId,
           },
           include: {
             dialogues: {
@@ -397,7 +419,7 @@ export const QuestionNodeMutations = extendType({
     t.field('updateCTA', {
       type: QuestionNodeType,
       args: {
-        input: UpdateCTAInpuType,
+        input: UpdateCTAInputType,
       },
       async resolve(parent: any, args: any, ctx) {
         const { prisma }: { prisma: PrismaClient } = ctx;
@@ -458,28 +480,28 @@ export const QuestionNodeMutations = extendType({
 
     t.field('deleteCTA', {
       type: QuestionNodeType,
-      args: {
-        id: 'String',
-      },
+      args: { input: DeleteNodeInputType },
+
       async resolve(parent: any, args: any, ctx: any) {
         const { prisma }: { prisma: PrismaClient } = ctx;
 
         await prisma.share.deleteMany({ where: {
-          questionNodeId: args.id,
+          questionNodeId: args?.input?.id,
         } });
 
         return prisma.questionNode.delete({
           where: {
-            id: args.id,
+            id: args?.input?.id,
           },
         });
       },
     });
+
     t.field('createCTA', {
+      description: 'Create Call to Actions',
       type: QuestionNodeType,
-      args: {
-        input: CreateCTAInputType,
-      },
+      args: { input: CreateCTAInputType },
+
       async resolve(parent: any, args: any, ctx: any) {
         const { prisma }: { prisma: PrismaClient } = ctx;
         const { customerSlug, dialogueSlug, title, type, links, share } = args.input;

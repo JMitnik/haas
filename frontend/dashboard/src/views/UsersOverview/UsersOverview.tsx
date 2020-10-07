@@ -42,7 +42,7 @@ const HEADERS = [
 ];
 
 const UsersOverview = () => {
-  const { canDeleteUsers, canInviteUsers } = useAuth();
+  const { canDeleteUsers, canInviteUsers, canEditUsers } = useAuth();
   const { activeCustomer } = useCustomer();
   const { customerSlug } = useParams<{ customerSlug: string }>();
   const { t } = useTranslation();
@@ -186,12 +186,14 @@ const UsersOverview = () => {
                       <List>
                         {canDeleteUsers && (
                           <>
-                            <ListItem
-                              onClick={(e: any) => handleEditUser(e, data?.id)}
-                              renderLeftIcon={<Edit />}
-                            >
-                              {t('edit_user')}
-                            </ListItem>
+                            {canEditUsers && (
+                              <ListItem
+                                onClick={(e: any) => handleEditUser(e, data?.id)}
+                                renderLeftIcon={<Edit />}
+                              >
+                                {t('edit_user')}
+                              </ListItem>
+                            )}
                             <Popover>
                               {() => (
                                 <>

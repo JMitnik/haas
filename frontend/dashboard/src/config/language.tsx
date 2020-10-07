@@ -265,6 +265,10 @@ const language = {
       en: 'Visit',
       de: 'Besuchen',
     },
+    delete_dialogue_popover: {
+      en: 'You are about to delete a dialogue and all related data. This cannot be undone! Are you sure?',
+      de: 'Du bist dabei ein Dialog mit allen dazugehörigen data zu löschen. Dies kann nicht rückgängig gemacht werden! Bist du dir sicher?',
+    },
     delete_customer_popover: {
       en: 'You are about to delete a workspace and all related questions. This cannot be undone! Are you sure?',
       de: 'Du bist dabei ein Projekt mit allen dazugehörigen Fragen zu löschen. Dies kann nicht rückgängig gemacht werden! Bist du dir sicher?',
@@ -925,6 +929,22 @@ const language = {
     },
   },
   cta: {
+    add_complete_title: {
+      en: 'Added!',
+      de: 'Hinzugefügt!',
+    },
+    add_complete_description: {
+      en: 'The CTA has been created.',
+      de: 'Der CTA wurde erstellt.',
+    },
+    edit_complete_title: {
+      en: 'Edit complete',
+      de: 'Bearbeiten abgeschlossen',
+    },
+    edit_complete_description: {
+      en: 'The CTA has been edited.',
+      de: 'Der CTA wurde bearbeitet.',
+    },
     information_header: {
       en: 'Information about your CTA',
       de: 'Informationen zu Ihrem CTA',

@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import React from 'react';
 
 import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
+import { useCustomer } from 'providers/CustomerProvider';
 import EditButton from 'components/EditButton';
 import deleteQuestionMutation from 'mutations/deleteQuestion';
 
@@ -53,20 +54,23 @@ const QuestionEntryItem = ({ depth,
   parentQuestionId,
   onAddExpandChange }
 : QuestionEntryItemProps) => {
-  const { customerSlug, dialogueSlug } = useParams();
+  const { activeCustomer } = useCustomer();
+  const { dialogueSlug } = useParams<{ dialogueSlug: string }>();
   const { t } = useTranslation();
   const toast = useToast();
 
   const [deleteQuestion] = useMutation(deleteQuestionMutation, {
     variables: {
-      id: question.id,
-      customerSlug,
-      dialogueSlug,
+      input: {
+        id: question.id,
+        customerId: activeCustomer?.id,
+        dialogueSlug,
+      },
     },
     refetchQueries: [{
       query: getTopicBuilderQuery,
       variables: {
-        customerSlug,
+        customerSlug: activeCustomer?.slug,
         dialogueSlug,
       },
     }],

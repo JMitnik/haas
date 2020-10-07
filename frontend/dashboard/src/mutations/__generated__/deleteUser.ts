@@ -3,13 +3,15 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
+import { DeleteUserInput } from "./../../types/globalTypes";
+
 // ====================================================
 // GraphQL mutation operation: deleteUser
 // ====================================================
 
 export interface deleteUser_deleteUser {
-  __typename: "UserType";
-  id: string;
+  __typename: "DeleteUserOutput";
+  deletedUser: boolean;
 }
 
 export interface deleteUser {
@@ -17,5 +19,5 @@ export interface deleteUser {
 }
 
 export interface deleteUserVariables {
-  id: string;
+  input: DeleteUserInput;
 }

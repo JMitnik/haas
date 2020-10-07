@@ -18,6 +18,7 @@ import { Div, Flex, Form, FormContainer,
   FormControl, FormLabel, FormSection, Grid, H3, H4, Hr, Input, InputGrid, InputHelper, Muted, Span, Text } from '@haas/ui';
 import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
 
+import { useCustomer } from 'providers/CustomerProvider';
 import LinkIcon from 'components/Icons/LinkIcon';
 import OpinionIcon from 'components/Icons/OpinionIcon';
 import RegisterIcon from 'components/Icons/RegisterIcon';
@@ -130,6 +131,7 @@ const LINK_TYPES = [
 ];
 
 const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTAChange, onDeleteCTA }: CTAFormProps) => {
+  const { activeCustomer } = useCustomer();
   const { customerSlug, dialogueSlug } = useParams();
 
   const form = useForm<FormDataProps>({
@@ -253,6 +255,7 @@ const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTACha
         variables: {
           input: {
             id,
+            customerId: activeCustomer?.id,
             title: formData.title,
             type: formData.ctaType.value || undefined,
             links: mappedLinks,
