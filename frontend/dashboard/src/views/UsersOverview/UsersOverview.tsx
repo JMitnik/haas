@@ -221,11 +221,10 @@ const UsersOverview = () => {
                                 </>
                               )}
                             </Popover>
-
                           </>
                         )}
                       </List>
-                )}
+                    )}
                   />
                   )}
                 </>

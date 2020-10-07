@@ -24,7 +24,6 @@ const TableRow = ({ headers, data, index, renderExpandedRow, renderOptions }: Ta
   return (
     <RowContainer
       onClick={() => setIsExpanded(!isExpanded)}
-      mr={renderOptions ? '1em' : ''}
       enableHover={!!renderExpandedRow}
     >
       <Grid

@@ -5,6 +5,7 @@ import { Placement } from '@popperjs/core';
 import { usePopper } from 'react-popper';
 import useOnClickOutside from 'hooks/useClickOnOutside';
 
+import { AnimatePresence, motion } from 'framer-motion';
 import { DropdownContainer, DropdownOverlayContainer } from './DropdownStyles';
 
 interface DropdownProps {
@@ -38,12 +39,22 @@ const Dropdown = ({ children, renderOverlay, placement = 'right-start', offset =
   };
 
   return (
-    <DropdownContainer ref={ref}>
-      {isOpen ? (
-        <DropdownOverlayContainer ref={setOverlay} style={styles.popper} {...attributes.popper}>
-          {renderOverlay}
-        </DropdownOverlayContainer>
-      ) : null}
+    <DropdownContainer ref={ref} onClick={(e) => e.stopPropagation()}>
+      <AnimatePresence>
+        {isOpen ? (
+          <Div ref={setOverlay} style={styles.popper} {...attributes.popper}>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1, transition: { duration: 0.2 } }}
+              exit={{ opacity: 0, scale: 0.8, transition: { duration: 0.2 } }}
+            >
+              <DropdownOverlayContainer>
+                {renderOverlay}
+              </DropdownOverlayContainer>
+            </motion.div>
+          </Div>
+        ) : null}
+      </AnimatePresence>
 
       <Div
         height="100%"
