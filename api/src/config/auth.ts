@@ -39,8 +39,6 @@ const containsWorkspacePermission = (guardedPermission: SystemPermissionEnum) =>
     if (!ctx.session?.activeWorkspace) return false;
     if (!ctx.session.activeWorkspace?.permissions?.includes(guardedPermission)) return false;
 
-    console.log(ctx.session.activeWorkspace);
-
     return true;
   },
 );
