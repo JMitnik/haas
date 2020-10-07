@@ -43,6 +43,7 @@
     "react-test-renderer": "^16.12.0",
     "styled-components": "^5.0.1",
     "typescript": "~3.7.2",
+    "use-clipboard-copy": "^0.1.2",
     "waait": "^1.0.5"
   },
   "settings": {
@@ -70,6 +71,7 @@
   },
   "scripts": {
     "start": "cra-workspaces start",
+    "start:https": "HTTPS=true SSL_CERT_FILE=secrets/server.cert SSL_KEY_FILE=server.key cra-workspaces start",
     "build": "cra-workspaces build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"

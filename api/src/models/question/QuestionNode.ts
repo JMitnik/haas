@@ -1,4 +1,4 @@
-import { PrismaClient, QuestionNode, QuestionNodeUpdateInput } from '@prisma/client';
+import { PrismaClient, QuestionNode, QuestionNodeUpdateInput, Share } from '@prisma/client';
 import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
 
 // eslint-disable-next-line import/no-cycle
@@ -9,6 +9,17 @@ import { DialogueType } from '../questionnaire/Dialogue';
 // eslint-disable-next-line import/no-cycle
 import { EdgeType } from '../edge/Edge';
 import NodeService from './NodeService';
+
+export const CTAShareInputObjectType = inputObjectType({
+  name: 'CTAShareInputObjectType',
+  definition(t) {
+    t.string('url');
+    t.string('tooltip');
+
+    t.string('title', { nullable: true });
+    t.string('id', { nullable: true });
+  },
+});
 
 export const QuestionOptionType = objectType({
   name: 'QuestionOption',
@@ -34,7 +45,30 @@ export const QuestionNodeTypeEnum = enumType({
   name: 'QuestionNodeTypeEnum',
   description: 'The different types a node can assume',
 
-  members: ['GENERIC', 'SLIDER', 'CHOICE', 'REGISTRATION', 'TEXTBOX', 'LINK'],
+  members: ['GENERIC', 'SLIDER', 'CHOICE', 'REGISTRATION', 'TEXTBOX', 'LINK', 'SHARE'],
+});
+
+export const ShareNodeType = objectType({
+  name: 'ShareNodeType',
+  definition(t) {
+    t.string('id');
+    t.string('url');
+    t.string('title');
+
+    t.string('tooltip', { nullable: true });
+    t.string('createdAt', { nullable: true });
+    t.string('updatedAt', { nullable: true });
+  },
+});
+
+export const ShareNodeInputType = inputObjectType({
+  name: 'ShareNodeInputType',
+  definition(t) {
+    t.string('id', { nullable: true });
+    t.string('tooltip');
+    t.string('url');
+    t.string('title');
+  },
 });
 
 export const QuestionNodeType = objectType({
@@ -51,6 +85,31 @@ export const QuestionNodeType = objectType({
     t.string('updatedAt', {
       nullable: true,
       resolve: (parent) => parent.updatedAt?.toString() || '',
+    });
+
+    t.field('share', {
+      type: ShareNodeType,
+      nullable: true,
+      async resolve(parent, args, ctx) {
+        if (!parent.isLeaf || !parent.id) {
+          return null;
+        }
+
+        const [share] = await ctx.prisma.share.findMany({
+          where: {
+            questionNodeId: parent.id,
+          },
+        });
+
+        if (!share) return null;
+
+        return {
+          id: share.id,
+          title: share.title,
+          tooltip: share.tooltip,
+          url: share.url,
+        };
+      },
     });
 
     // TODO: Make this required in prisma.
@@ -176,6 +235,39 @@ export const EdgeConditionInputType = inputObjectType({
     t.int('renderMin', { nullable: true });
     t.int('renderMax', { nullable: true });
     t.string('matchValue', { nullable: true });
+  },
+});
+
+export const CreateCTAInputType = inputObjectType({
+  name: 'CreateCTAInputType',
+  definition(t) {
+    t.string('customerSlug');
+    t.string('dialogueSlug');
+    t.string('title');
+    t.string('type');
+
+    t.field('links', {
+      type: CTALinksInputType,
+    });
+    t.field('share', {
+      type: ShareNodeInputType,
+    });
+  },
+});
+
+export const UpdateCTAInpuType = inputObjectType({
+  name: 'UpdateCTAInpuType',
+  definition(t) {
+    t.string('id');
+    t.string('title');
+    t.string('type');
+
+    t.field('links', {
+      type: CTALinksInputType,
+    });
+    t.field('share', {
+      type: ShareNodeInputType,
+    });
   },
 });
 
@@ -305,24 +397,50 @@ export const QuestionNodeMutations = extendType({
     t.field('updateCTA', {
       type: QuestionNodeType,
       args: {
-        id: 'String',
-        title: 'String',
-        type: 'String',
-        links: CTALinksInputType,
+        input: UpdateCTAInpuType,
       },
-      async resolve(parent: any, args: any, ctx: any) {
+      async resolve(parent: any, args: any, ctx) {
         const { prisma }: { prisma: PrismaClient } = ctx;
-        const { title, type, id, links } = args;
+        const { title, type, id, links, share } = args.input;
         const dbQuestionNode = await prisma.questionNode.findOne({
           where: {
             id,
           },
           include: {
             links: true,
+            share: true,
           },
         });
 
         const questionNodeUpdateInput: QuestionNodeUpdateInput = { title, type };
+
+        if (dbQuestionNode?.share && (!share || type !== 'SHARE')) {
+          await ctx.prisma.share.delete({ where: { id: dbQuestionNode.share.id } });
+        }
+
+        if (share && type === 'SHARE') {
+          await prisma.share.upsert({
+            where: {
+              id: share.id || '-1',
+            },
+            create: {
+              title: share.title,
+              url: share.url,
+              tooltip: share.tooltip,
+              questionNode: {
+                connect: {
+                  id: dbQuestionNode?.id,
+                },
+              },
+            },
+            update: {
+              title: share.title,
+              url: share.url,
+              tooltip: share.tooltip,
+            },
+          });
+        }
+
         if (dbQuestionNode?.links) {
           await NodeService.removeNonExistingLinks(dbQuestionNode?.links, links?.linkTypes);
         }
@@ -343,8 +461,13 @@ export const QuestionNodeMutations = extendType({
       args: {
         id: 'String',
       },
-      resolve(parent: any, args: any, ctx: any) {
+      async resolve(parent: any, args: any, ctx: any) {
         const { prisma }: { prisma: PrismaClient } = ctx;
+
+        await prisma.share.deleteMany({ where: {
+          questionNodeId: args.id,
+        } });
+
         return prisma.questionNode.delete({
           where: {
             id: args.id,
@@ -355,15 +478,11 @@ export const QuestionNodeMutations = extendType({
     t.field('createCTA', {
       type: QuestionNodeType,
       args: {
-        customerSlug: 'String',
-        dialogueSlug: 'String',
-        title: 'String',
-        type: 'String',
-        links: CTALinksInputType,
+        input: CreateCTAInputType,
       },
       async resolve(parent: any, args: any, ctx: any) {
         const { prisma }: { prisma: PrismaClient } = ctx;
-        const { customerSlug, dialogueSlug, title, type, links } = args;
+        const { customerSlug, dialogueSlug, title, type, links, share } = args.input;
 
         const customer = await prisma.customer.findOne({
           where: {
@@ -388,6 +507,9 @@ export const QuestionNodeMutations = extendType({
             isLeaf: true,
             links: {
               create: [...links?.linkTypes],
+            },
+            share: {
+              create: share,
             },
             questionDialogue: {
               connect: {
@@ -431,14 +553,3 @@ export const getQuestionNodeQuery = extendType({
     });
   },
 });
-
-const questionNodeNexus = [
-  QuestionNodeMutations,
-  QuestionNodeType,
-  QuestionOptionType,
-  QuestionNodeWhereInputType,
-  getQuestionNodeQuery,
-  QuestionNodeInput,
-];
-
-export default questionNodeNexus;

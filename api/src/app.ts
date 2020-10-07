@@ -1,6 +1,8 @@
 import cookieParser from 'cookie-parser';
 import cors, { CorsOptions } from 'cors';
 import express from 'express';
+import fs from 'fs';
+import https from 'https';
 
 import config from './config/config';
 import makeApollo from './config/apollo';
@@ -23,12 +25,13 @@ const main = async () => {
     // Hardcoded for the moment
     origin: (origin, callback) => {
       callback(null, true);
-      const validOrigins = ['http://localhost:3002', 'dashboard.haas.live', 'client.haas.live', 'haas-dashboard.netlify.app', 'haas-client.netlify.app'];
+      const validOrigins = ['http://localhost:3002', 'https://192.168.68.114:3000/', 'dashboard.haas.live', 'client.haas.live', 'haas-dashboard.netlify.app', 'haas-client.netlify.app'];
 
       if (config.env === 'local' || (origin && validOrigins.find((origin: string) => origin.endsWith(origin)))) {
-        // callback()
+        // callback(null, true);
       }
     },
+
     credentials: true,
   };
 
@@ -38,9 +41,21 @@ const main = async () => {
   apollo.applyMiddleware({ app, cors: false });
 
   console.log('🏳️\tStarting the server');
+  if (config.useSSL) {
+    const key: any = process.env.HTTPS_SERVER_KEY_PATH;
+    const certificate: any = process.env.HTTPS_SERVER_CERT_PATH;
 
-  app.listen(config.port);
-
+    https.createServer({
+      key: fs.readFileSync(key),
+      cert: fs.readFileSync(certificate),
+    }, app).listen(config.port, () => {
+      console.log('🏁\Listening on https server!');
+      console.log(`Listening on port ${config.port}!`);
+    });
+  } else {
+    app.listen(config.port);
+    console.log('🏁\Listening on standard server!');
+  }
   console.log('🏁\tStarted the server!');
 };
 

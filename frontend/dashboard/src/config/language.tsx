@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 const language = {
   general: {
     register: {
@@ -7,6 +8,10 @@ const language = {
     delete_user: {
       en: 'Delete user',
       de: 'Benutzer zu löschen',
+    },
+    url: {
+      en: 'Link',
+      de: 'Link',
     },
     invite_user: {
       en: 'Invite user',
@@ -464,6 +469,22 @@ const language = {
       en: 'Template',
       de: 'Muster',
     },
+    add_complete_title: {
+      en: 'Added!',
+      de: 'Hinzugefügt!',
+    },
+    add_complete_description: {
+      en: 'The CTA has been created.',
+      de: 'Der CTA wurde erstellt.',
+    },
+    edit_complete_title: {
+      en: 'Edit complete',
+      de: 'Bearbeiten abgeschlossen',
+    },
+    edit_complete_description: {
+      en: 'The CTA has been edited.',
+      de: 'Der CTA wurde bearbeitet.',
+    },
   },
   register: {
     token_not_found: {
@@ -901,6 +922,88 @@ const language = {
     user_edited_helper: {
       en: 'Your details have been saved.',
       de: 'Ihre Daten wurden gespeichert.',
+    },
+  },
+  cta: {
+    information_header: {
+      en: 'Information about your CTA',
+      de: 'Informationen zu Ihrem CTA',
+    },
+    title_helper: {
+      en: 'What is the main text of the CTA?',
+      de: 'Was ist der Haupttext des CTA?',
+    },
+    shared_item_title_helper: {
+      en: 'What is the title of the shared item?',
+      de: 'Wie lautet der Titel des freigegebenen Elements?',
+    },
+    type: {
+      en: 'Type',
+      de: 'Typ',
+    },
+    share_type_helper: {
+      en: 'What is the type of the CTA?',
+      de: 'Was ist der Typ des CTA?',
+    },
+    url: {
+      en: 'url',
+      de: 'url',
+    },
+    url_share_helper: {
+      en: 'What is the link you wish to share?',
+      de: 'Welche URL soll geteilt werden?',
+    },
+    button_text: {
+      en: 'Button text',
+      de: 'Schaltflächentext',
+    },
+    button_text_helper: {
+      en: 'What is the text on the share button?',
+      de: 'Was ist der Text der Share-Schaltfläche',
+    },
+    link_header: {
+      en: 'What links do you want to add to the CTA',
+      de: 'Welche Links möchten Sie zum CTA hinzufügen?',
+    },
+    add_link: {
+      en: 'Add link',
+      de: 'Link hinzufügen',
+    },
+    link_url_helper: {
+      en: 'What is the url the link should lead to?',
+      de: 'Zu welcher URL sollte der Link führen?',
+    },
+    link_type_helper: {
+      en: 'What is the type of the link?',
+      de: 'Was ist der typ des Links?',
+    },
+    link_tooltip: {
+      en: 'Tooltip',
+      de: 'Tooltip',
+    },
+    link_tooltip_helper: {
+      en: 'What is the text when hovering over the link?',
+      de: 'Was ist der Text, wenn Sie mit der Maus über den Link fahren?',
+    },
+    link_icon: {
+      en: 'Icon',
+      de: 'Symbol',
+    },
+    link_icon_helper: {
+      en: 'What icon is displayed for the link?',
+      de: 'Welches Symbol wird für den Link angezeigt?',
+    },
+    background_color: {
+      en: 'Background color',
+      de: 'Hintergrundfarbe',
+    },
+    background_color_helper: {
+      en: 'What is the background color for the link?',
+      de: 'Was ist die Hintergrundfarbe für den Link?',
+    },
+    delete_link: {
+      en: 'Delete link',
+      de: 'Link löschen',
     },
   },
   trigger: {

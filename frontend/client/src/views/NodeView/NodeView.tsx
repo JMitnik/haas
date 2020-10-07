@@ -11,6 +11,7 @@ import { GenericNodeProps } from './nodes/types';
 import MultiChoiceNode from './nodes/MultiChoiceNode/MultiChoiceNode';
 import PostLeafNode from './nodes/PostLeafNode/PostLeafNode';
 import RegisterNode from './nodes/RegisterNode/RegisterNode';
+import ShareNode from './nodes/ShareNode/ShareNode';
 import SliderNode from './nodes/SliderNode/SliderNode';
 import SocialShareNode from './nodes/SocialShareNode/SocialShareNode';
 import TextboxNode from './nodes/TextboxNode/TextboxNode';
@@ -22,6 +23,7 @@ const nodeMap: Record<string, (props: GenericNodeProps) => JSX.Element> = {
   LINK: SocialShareNode,
   REGISTRATION: RegisterNode,
   POST_LEAF: PostLeafNode,
+  SHARE: ShareNode,
 };
 
 const NodeType = ({ node, onEntryStore }: GenericNodeProps) => {
