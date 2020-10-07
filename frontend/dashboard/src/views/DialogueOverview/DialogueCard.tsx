@@ -6,9 +6,10 @@ import { useMutation } from '@apollo/react-hooks';
 import React, { useRef } from 'react';
 import styled, { css } from 'styled-components/macro';
 
+import { Button, Popover, PopoverArrow, PopoverBody, PopoverCloseButton,
+  PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast } from '@chakra-ui/core';
 import { Card, CardBody, ColumnFlex, Div, ExtLink, Flex, Paragraph, Text } from '@haas/ui';
 import { deleteQuestionnaireMutation } from 'mutations/deleteQuestionnaire';
-import { useToast } from '@chakra-ui/core';
 import { useTranslation } from 'react-i18next';
 import List from 'components/List/List';
 import ListItem from 'components/List/ListItem';
@@ -28,9 +29,33 @@ const DialogueCardOptionsOverlay = ({ onDelete, onEdit }: DialogueCardOptionsOve
 
   return (
     <List>
-      <ListItem renderLeftIcon={<Trash />} onClick={onDelete}>
-        {t('delete')}
-      </ListItem>
+      <Popover>
+        {() => (
+          <>
+            <PopoverTrigger>
+              <ListItem renderLeftIcon={<Trash />}>
+                {t('delete')}
+              </ListItem>
+            </PopoverTrigger>
+            <PopoverContent zIndex={4}>
+              <PopoverArrow />
+              <PopoverHeader>{t('delete')}</PopoverHeader>
+              <PopoverCloseButton />
+              <PopoverBody>
+                <Text>{t('delete_dialogue_popover')}</Text>
+              </PopoverBody>
+              <PopoverFooter>
+                <Button
+                  variantColor="red"
+                  onClick={onDelete}
+                >
+                  {t('delete')}
+                </Button>
+              </PopoverFooter>
+            </PopoverContent>
+          </>
+        )}
+      </Popover>
       <ListItem renderLeftIcon={<Edit />} onClick={onEdit}>
         {t('edit')}
       </ListItem>

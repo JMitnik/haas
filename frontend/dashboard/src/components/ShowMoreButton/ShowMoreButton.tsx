@@ -29,7 +29,7 @@ interface ShowMoreButtonProps {
 }
 
 const ShowMoreButton = ({ renderMenu }: ShowMoreButtonProps) => (
-  <ShowMoreButtonContainer data-cy="ShowMoreButton">
+  <ShowMoreButtonContainer onClick={(e) => e.stopPropagation()} data-cy="ShowMoreButton">
     <Dropdown renderOverlay={renderMenu}>
       <ShowMoreButtonSVG />
     </Dropdown>

@@ -3,12 +3,13 @@ import { useHistory, useParams } from 'react-router';
 import { useLazyQuery, useMutation } from '@apollo/react-hooks';
 import React, { useCallback, useEffect, useState } from 'react';
 
-import { Div, Flex, PageTitle } from '@haas/ui';
+import { Div, Flex, PageTitle, Text } from '@haas/ui';
 import SearchBar from 'components/SearchBar/SearchBar';
 import Table from 'components/Table/Table';
 import getPaginatedUsers from 'queries/getPaginatedUsers';
 
-import { Button, useToast } from '@chakra-ui/core';
+import { Button, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent,
+  PopoverFooter, PopoverHeader, PopoverTrigger, useToast } from '@chakra-ui/core';
 import { Edit, Plus, Trash } from 'react-feather';
 import { ErrorBoundary } from 'react-error-boundary';
 import { GenericCell, RoleCell } from 'components/Table/CellComponents/CellComponents';
@@ -191,12 +192,36 @@ const UsersOverview = () => {
                             >
                               {t('edit_user')}
                             </ListItem>
-                            <ListItem
-                              onClick={(e: any) => handleDeleteUser(e, data?.id)}
-                              renderLeftIcon={<Trash />}
-                            >
-                              {t('delete_user')}
-                            </ListItem>
+                            <Popover>
+                              {() => (
+                                <>
+                                  <PopoverTrigger>
+                                    <ListItem
+                                      renderLeftIcon={<Trash />}
+                                    >
+                                      {t('delete_user')}
+                                    </ListItem>
+                                  </PopoverTrigger>
+                                  <PopoverContent zIndex={4}>
+                                    <PopoverArrow />
+                                    <PopoverHeader>{t('delete')}</PopoverHeader>
+                                    <PopoverCloseButton />
+                                    <PopoverBody>
+                                      <Text>{t('delete_user_popover')}</Text>
+                                    </PopoverBody>
+                                    <PopoverFooter>
+                                      <Button
+                                        variantColor="red"
+                                        onClick={(e: any) => handleDeleteUser(e, data?.id)}
+                                      >
+                                        {t('delete')}
+                                      </Button>
+                                    </PopoverFooter>
+                                  </PopoverContent>
+                                </>
+                              )}
+                            </Popover>
+
                           </>
                         )}
                       </List>
