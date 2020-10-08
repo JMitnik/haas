@@ -265,6 +265,10 @@ const language = {
       en: 'Visit',
       de: 'Besuchen',
     },
+    delete_dialogue_popover: {
+      en: 'You are about to delete a dialogue. This cannot be undone! Are you sure?',
+      de: 'Sie sind dabei, einen Dialog zu löschen. Das kann nicht rückgängig gemacht werden! Bist du sicher?',
+    },
     delete_customer_popover: {
       en: 'You are about to delete a workspace and all related questions. This cannot be undone! Are you sure?',
       de: 'Du bist dabei ein Projekt mit allen dazugehörigen Fragen zu löschen. Dies kann nicht rückgängig gemacht werden! Bist du dir sicher?',
