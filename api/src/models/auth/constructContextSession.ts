@@ -1,11 +1,38 @@
 import { AuthenticationError } from 'apollo-server-express';
 import { ExpressContext } from 'apollo-server-express/dist/ApolloServer';
+import { Request } from 'express';
 import jwt from 'jsonwebtoken';
 
 import { ContextSessionType } from './ContextSessionType';
 import config from '../../config/config';
 import prisma from '../../config/prisma';
 import readBearerToken from './readBearerToken';
+
+const getWorkSpaceFromReq = async (req: Request) => {
+  const vars = req.body.variables;
+
+  if (vars?.customerSlug || vars?.input?.customerSlug) {
+    const customer = await prisma.customer.findOne({
+      where: {
+        slug: vars?.customerSlug || vars?.input?.customerSlug,
+      },
+    });
+
+    return customer;
+  }
+
+  if (vars?.customerId || vars?.input?.customerId) {
+    const customer = await prisma.customer.findOne({
+      where: {
+        id: vars?.customerId || vars?.input?.customerId,
+      },
+    });
+
+    return customer;
+  }
+
+  return null;
+};
 
 const constructContextSession = async (context: ExpressContext): Promise<ContextSessionType | null> => {
   // Support auth use-case if a token is supported using cookie (should be HTTP-only)
@@ -58,12 +85,16 @@ const constructContextSession = async (context: ExpressContext): Promise<Context
     id: customer.customer.id,
   }));
 
+  const workspace = await getWorkSpaceFromReq(context.req);
+  const activeWorkspace = customersAndPermissions?.find((userCustomer) => userCustomer.id === workspace?.id) || null;
+
   return {
     user,
     customersAndPermissions,
     expiresAt: decodedExpAt,
     globalPermissions: user?.globalPermissions || [],
     token: authToken,
+    activeWorkspace,
   };
 };
 

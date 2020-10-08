@@ -1,9 +1,5 @@
 import { mutationField, objectType } from '@nexus/schema';
 
-import { mailService } from '../../services/mailings/MailService';
-import makeBasicTriggerTemplate from '../../services/mailings/templates/makeBasicTriggerTemplate';
-import prisma from '../../config/prisma';
-
 export const DebugType = objectType({
   name: 'Debug',
   definition(t) {
@@ -11,7 +7,7 @@ export const DebugType = objectType({
       type: 'String',
       nullable: true,
 
-      async resolve(parent: any, args, ctx) {
+      async resolve() {
         return {} as any;
       },
     });
@@ -21,14 +17,12 @@ export const DebugType = objectType({
 export const DebugMutation = mutationField('debugMutation', {
   type: 'String',
   nullable: true,
-  async resolve(parent: any, args, ctx) {
-    const roles = await prisma.role.findOne({
-      where: { id: '1' },
-      select: {
-        permissions: true,
-      },
-    });
+  async resolve() {
+    // heapdump.writeSnapshot(`heapDump-${Date.now()}.heapsnapshot`, (err, filename) => {
+    //   console.log('Heap dump of a bloated server written to', filename);
 
+    //   return 'Saved heap dump';
+    // });
     return 'test';
   },
 });

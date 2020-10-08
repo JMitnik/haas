@@ -3,8 +3,8 @@ import { PrismaClient } from '@prisma/client';
 import { extendType, inputObjectType, objectType } from '@nexus/schema';
 
 // eslint-disable-next-line import/no-cycle
-import { CustomerType } from '../customer/Customer';
 import { UserInputError } from 'apollo-server-express';
+import { CustomerType } from '../customer/Customer';
 // eslint-disable-next-line import/no-cycle
 import { EdgeType } from '../edge/Edge';
 // eslint-disable-next-line import/no-cycle
@@ -336,8 +336,16 @@ export const DialogueWhereUniqueInput = inputObjectType({
   },
 });
 
-export const AddDialogueInput = inputObjectType({
-  name: 'AddDialogueInput',
+export const DeleteDialogueInputType = inputObjectType({
+  name: 'DeleteDialogueInputType',
+  definition(t) {
+    t.id('id');
+    t.string('customerSlug');
+  },
+});
+
+export const CreateDialogueInputType = inputObjectType({
+  name: 'CreateDialogueInputType',
   definition(t) {
     t.string('customerSlug');
     t.string('title');
@@ -360,11 +368,11 @@ export const DialogueMutations = extendType({
   definition(t) {
     t.field('copyDialogue', {
       type: DialogueType,
-      args: { data: AddDialogueInput },
+      args: { input: CreateDialogueInputType },
 
       async resolve(parent, args: any, ctx: any) {
         const {
-          data: { dialogueSlug, customerSlug, title, publicTitle, description, tags = [], templateDialogueId },
+          input: { dialogueSlug, customerSlug, title, publicTitle, description, tags = [], templateDialogueId },
         } = args;
         const { prisma }: { prisma: PrismaClient } = ctx;
 
@@ -385,14 +393,14 @@ export const DialogueMutations = extendType({
 
     t.field('createDialogue', {
       type: DialogueType,
-      args: { data: AddDialogueInput },
+      args: { input: CreateDialogueInputType },
 
       async resolve(parent, args) {
-        if (!args.data) {
+        if (!args.input) {
           throw new Error('Unable to find any input data');
         }
 
-        return DialogueService.createDialogue(args.data);
+        return DialogueService.createDialogue(args.input);
       },
     });
 
@@ -413,16 +421,14 @@ export const DialogueMutations = extendType({
 
     t.field('deleteDialogue', {
       type: DialogueType,
-      args: {
-        where: DialogueWhereUniqueInput,
-      },
+      args: { input: DeleteDialogueInputType },
 
       resolve(parent, args) {
-        if (!args.where?.id) {
+        if (!args.input?.id) {
           throw new Error('Unable to find dialogue to delete');
         }
 
-        return DialogueService.deleteDialogue(args.where?.id);
+        return DialogueService.deleteDialogue(args.input?.id);
       },
     });
   },

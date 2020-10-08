@@ -1,15 +1,27 @@
 import { ReactComponent as ShowMoreButtonSVG } from 'assets/icons/icon-more.svg';
 import Dropdown from 'components/Dropdown';
 import React from 'react';
-import styled from 'styled-components/macro';
+import styled, { css } from 'styled-components/macro';
 
 const ShowMoreButtonContainer = styled.div`
-  height: 25px;
-  width: 40px;
+  ${({ theme }) => css`
+    height: 25px;
+    width: 40px;
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    svg circle {
+      fill: ${theme.colors.gray[400]};
+      transition: all cubic-bezier(0.6, -0.28, 0.735, 0.045) 0.2s;
+    }
+
+    &:hover svg circle {
+      fill: ${theme.colors.gray[700]};
+      transition: all cubic-bezier(0.6, -0.28, 0.735, 0.045) 0.2s;
+    }
+  `}
 `;
 
 interface ShowMoreButtonProps {
@@ -17,7 +29,7 @@ interface ShowMoreButtonProps {
 }
 
 const ShowMoreButton = ({ renderMenu }: ShowMoreButtonProps) => (
-  <ShowMoreButtonContainer data-cy="ShowMoreButton">
+  <ShowMoreButtonContainer onClick={(e) => e.stopPropagation()} data-cy="ShowMoreButton">
     <Dropdown renderOverlay={renderMenu}>
       <ShowMoreButtonSVG />
     </Dropdown>

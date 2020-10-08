@@ -1,9 +1,9 @@
 import gql from 'graphql-tag';
 
 const deleteUser = gql`
-  mutation deleteUser($id: String!) {
-    deleteUser( id: $id ) {
-      id
+  mutation deleteUser($input: DeleteUserInput!) {
+    deleteUser( input: $input ) {
+      deletedUser
     }
 }
 `;

@@ -25,6 +25,7 @@ export interface getUsers_customer_users {
 
 export interface getUsers_customer {
   __typename: "Customer";
+  id: string;
   users: getUsers_customer_users[] | null;
 }
 

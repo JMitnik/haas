@@ -1,42 +1,60 @@
 import React, { useRef, useState } from 'react';
 
 import { Div } from '@haas/ui';
+import { Placement } from '@popperjs/core';
+import { usePopper } from 'react-popper';
 import useOnClickOutside from 'hooks/useClickOnOutside';
 
+import { AnimatePresence, motion } from 'framer-motion';
 import { DropdownContainer, DropdownOverlayContainer } from './DropdownStyles';
 
 interface DropdownProps {
   renderOverlay?: React.ReactNode;
   children?: React.ReactNode;
-  left?: string;
-  right?: string;
-  top?: string;
-  bottom?: string;
+  placement?: Placement;
+  offset?: [number, number];
 }
 
-const Dropdown = ({ children, renderOverlay, left, right, top, bottom }: DropdownProps) => {
-  const ref = useRef<any>();
+const Dropdown = ({ children, renderOverlay, placement = 'right-start', offset = [0, 12] }: DropdownProps) => {
+  const ref = useRef<HTMLDivElement | null>(null);
+  const [overlay, setOverlay] = useState<HTMLDivElement | null>(null);
+  const [toggleRef, setToggleRef] = useState<HTMLDivElement | null>(null);
   const [isOpen, setIsOpen] = useState(false);
 
   useOnClickOutside(ref, () => setIsOpen(false));
+  const { styles, attributes } = usePopper(toggleRef, overlay, {
+    placement,
+    modifiers: [{
+      name: 'offset',
+      options: {
+        offset,
+      },
+    },
+    ],
+  });
 
   const handleToggleDropdown = (event: any) => {
     event.stopPropagation();
     setIsOpen((isOpen) => !isOpen);
   };
 
-  const handleDropdownClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-    e.preventDefault();
-    setIsOpen(false);
-  };
-
   return (
-    <DropdownContainer onClick={handleDropdownClick} ref={ref}>
-      {isOpen && (
-        <DropdownOverlayContainer left={left} right={right} top={top} bottom={bottom}>
-          {renderOverlay}
-        </DropdownOverlayContainer>
-      )}
+    <DropdownContainer ref={ref} onClick={(e) => e.stopPropagation()}>
+      <AnimatePresence>
+        {isOpen ? (
+          <Div ref={setOverlay} style={styles.popper} {...attributes.popper}>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1, transition: { duration: 0.2 } }}
+              exit={{ opacity: 0, scale: 0.8, transition: { duration: 0.2 } }}
+            >
+              <DropdownOverlayContainer>
+                {renderOverlay}
+              </DropdownOverlayContainer>
+            </motion.div>
+          </Div>
+        ) : null}
+      </AnimatePresence>
 
       <Div
         height="100%"
@@ -44,9 +62,12 @@ const Dropdown = ({ children, renderOverlay, left, right, top, bottom }: Dropdow
         alignItems="center"
         justifyContent="center"
         width="100%"
+        ref={setToggleRef}
         onClick={(e) => handleToggleDropdown(e)}
       >
-        {children}
+        <>
+          {children}
+        </>
       </Div>
     </DropdownContainer>
   );

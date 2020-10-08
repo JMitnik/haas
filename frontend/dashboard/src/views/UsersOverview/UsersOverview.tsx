@@ -1,20 +1,25 @@
-import { ApolloError } from 'apollo-boost';
 import { debounce } from 'lodash';
 import { useHistory, useParams } from 'react-router';
 import { useLazyQuery, useMutation } from '@apollo/react-hooks';
 import React, { useCallback, useEffect, useState } from 'react';
 
-import { Div, Flex, PageTitle } from '@haas/ui';
+import { Div, Flex, PageTitle, Text } from '@haas/ui';
 import SearchBar from 'components/SearchBar/SearchBar';
 import Table from 'components/Table/Table';
 import getPaginatedUsers from 'queries/getPaginatedUsers';
 
-import { Button } from '@chakra-ui/core';
+import { Button, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent,
+  PopoverFooter, PopoverHeader, PopoverTrigger, useToast } from '@chakra-ui/core';
+import { Edit, Plus, Trash } from 'react-feather';
 import { ErrorBoundary } from 'react-error-boundary';
 import { GenericCell, RoleCell } from 'components/Table/CellComponents/CellComponents';
-import { Plus } from 'react-feather';
+import { useCustomer } from 'providers/CustomerProvider';
 import { useTranslation } from 'react-i18next';
-// import Row from './TableRow/UsersTableRow';
+import List from 'components/List/List';
+import ListItem from 'components/List/ListItem';
+import ShowMoreButton from 'components/ShowMoreButton';
+import useAuth from 'hooks/useAuth';
+
 import deleteUserQuery from '../../mutations/deleteUser';
 
 interface TableProps {
@@ -37,10 +42,13 @@ const HEADERS = [
 ];
 
 const UsersOverview = () => {
+  const { canDeleteUsers, canInviteUsers, canEditUsers } = useAuth();
+  const { activeCustomer } = useCustomer();
   const { customerSlug } = useParams<{ customerSlug: string }>();
   const { t } = useTranslation();
   const history = useHistory();
-  const [fetchUsers, { data }] = useLazyQuery(getPaginatedUsers, { fetchPolicy: 'no-cache' });
+  const toast = useToast();
+  const [fetchUsers, { data, refetch }] = useLazyQuery(getPaginatedUsers, { fetchPolicy: 'no-cache' });
 
   const [paginationProps, setPaginationProps] = useState<TableProps>({
     activeStartDate: null,
@@ -75,9 +83,8 @@ const UsersOverview = () => {
   }, [customerSlug, fetchUsers, paginationProps]);
 
   const [deleteUser] = useMutation(deleteUserQuery, {
-    refetchQueries: [{
-      query: getPaginatedUsers,
-      variables: {
+    onCompleted: () => {
+      refetch({
         customerSlug,
         filter: {
           startDate: paginationProps.activeStartDate,
@@ -88,19 +95,37 @@ const UsersOverview = () => {
           pageIndex: paginationProps.pageIndex,
           orderBy: paginationProps.sortBy,
         },
-      },
-    }],
-    onError: (serverError: ApolloError) => {
-      console.log(serverError);
+      });
+      toast({
+        title: 'User removed!',
+        description: 'The user has been removed from the workspace.',
+        status: 'success',
+        position: 'bottom-right',
+        duration: 1500,
+      });
+    },
+    onError: () => {
+      toast({
+        title: 'An error ocurred!',
+        description: 'It was not possible to remove user.',
+        status: 'error',
+        position: 'bottom-right',
+        duration: 1500,
+      });
     },
   });
 
-  const handleDeleteUser = (event: any, userId: string, onComplete: (() => void) | undefined) => {
+  const handleDeleteUser = (event: any, userId: string) => {
+    event.stopPropagation();
+
     deleteUser({
       variables: {
-        id: userId,
+        input: {
+          userId,
+          customerId: activeCustomer?.id,
+        },
       },
-    }).finally(() => onComplete && onComplete());
+    });
   };
 
   const handleEditUser = (event: any, userId: string) => {
@@ -126,9 +151,11 @@ const UsersOverview = () => {
 
       <Div mb={4} width="100%">
         <Flex justifyContent="space-between">
-          <Div mr={4}>
-            <Button onClick={handleAddUser} leftIcon={Plus} variantColor="teal">{t('invite_user')}</Button>
-          </Div>
+          {canInviteUsers && (
+            <Div mr={4}>
+              <Button onClick={handleAddUser} leftIcon={Plus} variantColor="teal">{t('invite_user')}</Button>
+            </Div>
+          )}
           <Div>
             <SearchBar
               activeSearchTerm={paginationProps.activeSearchTerm}
@@ -149,10 +176,62 @@ const UsersOverview = () => {
             headers={HEADERS}
             paginationProps={{ ...paginationProps, pageCount, pageIndex }}
             onPaginationChange={setPaginationProps}
-            onDeleteEntry={handleDeleteUser}
-            onEditEntry={handleEditUser}
-            onAddEntry={handleAddUser}
             data={tableData}
+            renderOptions={
+              (data: any) => (
+                <>
+                  {canDeleteUsers && (
+                  <ShowMoreButton
+                    renderMenu={(
+                      <List>
+                        {canDeleteUsers && (
+                          <>
+                            {canEditUsers && (
+                              <ListItem
+                                onClick={(e: any) => handleEditUser(e, data?.id)}
+                                renderLeftIcon={<Edit />}
+                              >
+                                {t('edit_user')}
+                              </ListItem>
+                            )}
+                            <Popover>
+                              {() => (
+                                <>
+                                  <PopoverTrigger>
+                                    <ListItem
+                                      renderLeftIcon={<Trash />}
+                                    >
+                                      {t('delete_user')}
+                                    </ListItem>
+                                  </PopoverTrigger>
+                                  <PopoverContent zIndex={4}>
+                                    <PopoverArrow />
+                                    <PopoverHeader>{t('delete')}</PopoverHeader>
+                                    <PopoverCloseButton />
+                                    <PopoverBody>
+                                      <Text>{t('delete_user_popover')}</Text>
+                                    </PopoverBody>
+                                    <PopoverFooter>
+                                      <Button
+                                        variantColor="red"
+                                        onClick={(e: any) => handleDeleteUser(e, data?.id)}
+                                      >
+                                        {t('delete')}
+                                      </Button>
+                                    </PopoverFooter>
+                                  </PopoverContent>
+                                </>
+                              )}
+                            </Popover>
+                          </>
+                        )}
+                      </List>
+                    )}
+                  />
+                  )}
+                </>
+              )
+            }
           />
         </ErrorBoundary>
       </Div>

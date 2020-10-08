@@ -1,8 +1,13 @@
+/* eslint-disable max-len */
 const language = {
   general: {
     register: {
       en: 'Register',
       de: 'Registrieren',
+    },
+    delete_user: {
+      en: 'Delete user',
+      de: 'Benutzer zu löschen',
     },
     url: {
       en: 'Link',
@@ -37,7 +42,7 @@ const language = {
       de: 'Beschreibung',
     },
     switch_project: {
-      en: 'Switch project',
+      en: 'Switch workspace',
       de: 'Projekt wechseln',
     },
     logout: {
@@ -260,8 +265,12 @@ const language = {
       en: 'Visit',
       de: 'Besuchen',
     },
+    delete_dialogue_popover: {
+      en: 'You are about to delete a dialogue and all related data. This cannot be undone! Are you sure?',
+      de: 'Du bist dabei ein Dialog mit allen dazugehörigen data zu löschen. Dies kann nicht rückgängig gemacht werden! Bist du dir sicher?',
+    },
     delete_customer_popover: {
-      en: 'You are about to delete a customer and all related questions. This cannot be undone! Are you sure?',
+      en: 'You are about to delete a workspace and all related questions. This cannot be undone! Are you sure?',
       de: 'Du bist dabei ein Projekt mit allen dazugehörigen Fragen zu löschen. Dies kann nicht rückgängig gemacht werden! Bist du dir sicher?',
     },
     delete_question_popover: {
@@ -273,7 +282,7 @@ const language = {
       de: 'Du bist dabei einen Call-To-Action zu löschen. Dies kann nicht rückgängig gemacht werden! Bist du dir sicher?',
     },
     delete_trigger_popover: {
-      en: 'You are about to delete a trigger-alert. This cannot be undone! Are you sure?',
+      en: 'You are about to delete an alert. This cannot be undone! Are you sure?',
       de: 'Du bist dabei eine Push-Benachrichtugung zu löschen. Dies kann nicht rückgängig gemacht werden! Bist du dir sicher?',
     },
     delete_user_popover: {
@@ -281,7 +290,7 @@ const language = {
       de: 'Du bist dabei einen Benutzer zu löschen. Dies kann nicht rückgängig gemacht werden! Bist du dir sicher?',
     },
     create_trigger: {
-      en: 'Create trigger-allert',
+      en: 'Create alert',
       de: 'Push-Benachrichtung erstellen',
     },
     page: {
@@ -353,8 +362,8 @@ const language = {
       de: 'Benutzer',
     },
     alerts: {
-      en: 'Trigger-alerts',
-      de: 'Push-Benachrichtigungen',
+      en: 'Alerts',
+      de: 'Alerts',
     },
     settings: {
       en: 'Settings',
@@ -441,7 +450,7 @@ const language = {
       de: 'Wie lautet die Telefonnummer des Benutzers? Beginne mit der Landesvorwahl. Beispiel: +496123456',
     },
     name_helper: {
-      en: 'What is the name of your business?',
+      en: 'What is the name of your workspace?',
       de: 'Wie lautet der Name deines Unternehmens?',
     },
     role_selector: {
@@ -501,7 +510,7 @@ const language = {
       de: 'Projekt erstellen',
     },
     about_helper: {
-      en: 'Please tell us a bit about the business. What should be its name and URL.',
+      en: 'Please tell us a bit about the workspace. What should be its name and URL.',
       de: 'Erzähle uns etwas zu deinem Unternehmen. Wie sollen der Name und die URL lauten.',
     },
     branding_color_helper: {
@@ -513,11 +522,11 @@ const language = {
       de: 'Beschreibe die Marke deiner Firma.',
     },
     name_helper: {
-      en: 'What is the name of your business?',
+      en: 'What is the name of your workspace?',
       de: 'Wie heißt dein Unternehmen?',
     },
     slug_helper: {
-      en: 'Under which URL segment will visitors find the business?',
+      en: 'Under which URL segment will visitors find the workspace?',
       de: 'Unter welcher URL Erganzüng sollen Besucher dich finden?',
     },
     use_template: {
@@ -563,8 +572,8 @@ const language = {
       de: 'Dialog einstellen',
     },
     edit_trigger_view: {
-      en: 'Edit trigger',
-      de: 'Push-Benachrichtigung einstellen',
+      en: 'Edit alert',
+      de: 'Alert einstellen',
     },
     dialogue_view: {
       en: 'Overview',
@@ -587,15 +596,15 @@ const language = {
       de: 'Personalisieren',
     },
     trigger_overview: {
-      en: 'Trigger-alerts',
-      de: 'Push-Benachrichtigungen',
+      en: 'Alerts',
+      de: 'Alerts',
     },
     edit_business_settings_view: {
-      en: 'Edit business settings',
+      en: 'Edit workspace settings',
       de: 'Wähle Unternehmenseinstellungen',
     },
     create_trigger_view: {
-      en: 'Create trigger-alert',
+      en: 'Create alert',
       de: 'Neue Push-Benachrichtigung',
     },
     create_user_view: {
@@ -920,6 +929,22 @@ const language = {
     },
   },
   cta: {
+    add_complete_title: {
+      en: 'Added!',
+      de: 'Hinzugefügt!',
+    },
+    add_complete_description: {
+      en: 'The CTA has been created.',
+      de: 'Der CTA wurde erstellt.',
+    },
+    edit_complete_title: {
+      en: 'Edit complete',
+      de: 'Bearbeiten abgeschlossen',
+    },
+    edit_complete_description: {
+      en: 'The CTA has been edited.',
+      de: 'Der CTA wurde bearbeitet.',
+    },
     information_header: {
       en: 'Information about your CTA',
       de: 'Informationen zu Ihrem CTA',
@@ -1003,11 +1028,11 @@ const language = {
   },
   trigger: {
     alert_email: {
-      en: 'Send trigger-alerts to emai',
+      en: 'Send alerts to emai',
       de: 'Senden per E-Mail',
     },
     alert_sms: {
-      en: 'Send trigger-alerts via SMS',
+      en: 'Send alerts via SMS',
       de: 'Senden per SMS',
     },
     alert_both: {
@@ -1015,15 +1040,15 @@ const language = {
       de: 'Alle Sendemethoden auswählen',
     },
     trigger_schedulled_alarm: {
-      en: 'Send trigger-alerts at certain times (coming soon)',
+      en: 'Send alerts at certain times (coming soon)',
       de: 'Senden der Push-Benachrichtigungen zu bestimmten Zeiten (bald verfügbar)',
     },
     my_first_trigger: {
-      en: 'My first trigger-alert',
+      en: 'My first alert',
       de: 'Meine erste Push-Notification',
     },
     trigger_question_alarm: {
-      en: 'Send trigger-alerts when a certain value has been reached',
+      en: 'Send alerts when a certain value has been reached',
       de: 'Sende eine Push-Benachrichtigung beim erreichen eines bestimmten Wertes.',
     },
     select_dialogue_reminder: {
@@ -1031,11 +1056,11 @@ const language = {
       de: 'Bitte wähle eine Methode und/oder einen Dialog',
     },
     about_trigger: {
-      en: 'About the trigger-alert',
+      en: 'About the alert',
       de: 'Allgemeine Beschreibung zur Push-Benachrichtigung',
     },
     about_trigger_helper: {
-      en: 'Tell us about the trigger-alert, and to which question or dialogue it applies.',
+      en: 'Tell us about the alert, and to which question or dialogue it applies.',
       de: 'Beschreibe die Push-Benachrichtigung und für welche Frage oder welchen Dialog Sie gilt.',
     },
     conditions: {
@@ -1043,11 +1068,11 @@ const language = {
       de: 'Bedingungen',
     },
     conditions_helper: {
-      en: 'What are the conditions for sending out the trigger-alert?',
+      en: 'What are the conditions for sending out the alert?',
       de: 'Welche Bedingungen sollen für das Senden der Push-Benachrichtgung zutreffen?',
     },
     name_helper: {
-      en: 'What is the name of this trigger-alert?',
+      en: 'What is the name of this alert?',
       de: 'Wie soll diese Push-Benachrichtigung heißen?',
     },
     dialogue: {
@@ -1055,15 +1080,15 @@ const language = {
       de: 'Ausgewählter Dialog',
     },
     dialogue_helper: {
-      en: 'For which dialogue will this trigger-alert apply?',
+      en: 'For which dialogue will this alert apply?',
       de: 'Für welchen Dialog gilt diese Push-Benachrichtigung?',
     },
     type: {
-      en: 'Trigger-alert type',
+      en: 'Alert type',
       de: 'Art der Push-Benachrichtigung',
     },
     type_helper: {
-      en: 'What type of trigger-alert is this?',
+      en: 'What type of alert is this?',
       de: 'Um was für eine Art Push-Benachrichtigung handelt es sich?',
     },
     delivery: {
@@ -1075,7 +1100,7 @@ const language = {
       de: 'Unterer Schwellenwert',
     },
     low_threshold_helper: {
-      en: 'Set a low threshold: if a score underneath is recorded, a trigger-alert will be sent.',
+      en: 'Set a low threshold: if a score underneath is recorded, an alert will be sent.',
       de: 'Festlegen eines unteren Schwellenwerts: Eine Aufzeichnung unter diesem Wert löst eine Push-Benachrichtigung aus.',
     },
     high_threshold: {
@@ -1083,11 +1108,11 @@ const language = {
       de: 'Oberer Schwellenwert',
     },
     high_threshold_helper: {
-      en: 'Set a high threshold: if a score above is recorded, a trigger-alert will be sent',
+      en: 'Set a high threshold: if a score above is recorded, an alert will be sent',
       de: 'Festlegen eines oberen Schwellenwerts: Eine Aufzeichung über diesem Wert löst eine Push-Benachrichtigung aus.',
     },
     delivery_helper: {
-      en: 'Shall this trigger-alert be deliver via email or text message?',
+      en: 'Shall this alert be deliver via email or text message?',
       de: 'Soll diese Push-Benachrichtigung per Email oder SMS versandt werden?',
     },
     medium: {
@@ -1095,7 +1120,7 @@ const language = {
       de: 'Art des Versandts',
     },
     medium_helper: {
-      en: 'Which delivery method is preferred for this trigger-alert? Note: additional costs may occur for text messages.',
+      en: 'Which delivery method is preferred for this alert? Note: additional costs may occur for text messages.',
       de: 'Welche Versandart wird für diese Push-Benachrichtigung bevorzugt? Hinweis: Für SMS können zusätzliche Kosten anfallen.',
     },
     question: {
@@ -1103,7 +1128,7 @@ const language = {
       de: 'Ausgewählte Frage',
     },
     question_helper: {
-      en: 'Which question will the trigger-alert be watching?',
+      en: 'Which question will the alert be watching?',
       de: 'Auf welche Frage bezieht sich die Push-Benachrichtigung?',
     },
     condition: {
@@ -1111,7 +1136,7 @@ const language = {
       de: 'Bedingungsart',
     },
     condition_helper: {
-      en: 'Which condition should apply to the trigger-alert for this question?',
+      en: 'Which condition should apply to the alert for this question?',
       de: 'Welche Bedingung sollte für den Auslöser Push-Benachrichtigung gelten?',
     },
     recipients: {
@@ -1119,7 +1144,7 @@ const language = {
       de: 'Empfänger',
     },
     recipients_helper: {
-      en: 'Who will receive these trigger-alerts?',
+      en: 'Who will receive these alerts?',
       de: 'Wer erhält die Push-Benachrichtigung?',
     },
     recipient: {

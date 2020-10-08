@@ -2,18 +2,6 @@
 ### Do not make changes to this file directly
 
 
-input AddDialogueInput {
-  contentType: String
-  customerSlug: String
-  description: String
-  dialogueSlug: String
-  isSeed: Boolean
-  publicTitle: String
-  tags: TagsInputObjectType
-  templateDialogueId: String
-  title: String
-}
-
 """Input type for a choice node"""
 input ChoiceNodeEntryInput {
   value: String
@@ -40,6 +28,29 @@ input CreateCTAInputType {
   dialogueSlug: String
   links: CTALinksInputType
   share: ShareNodeInputType
+  title: String
+  type: String
+}
+
+input CreateDialogueInputType {
+  contentType: String
+  customerSlug: String
+  description: String
+  dialogueSlug: String
+  isSeed: Boolean
+  publicTitle: String
+  tags: TagsInputObjectType
+  templateDialogueId: String
+  title: String
+}
+
+input CreateQuestionNodeInputType {
+  customerId: ID
+  dialogueSlug: String
+  edgeCondition: EdgeConditionInputType
+  optionEntries: OptionsInputType
+  overrideLeafId: ID
+  parentQuestionId: ID
   title: String
   type: String
 }
@@ -71,6 +82,7 @@ type Customer {
   name: String!
   settings: CustomerSettings
   slug: String!
+  userCustomer(userId: String): UserCustomer
   users: [UserType!]
   usersConnection(customerSlug: String, filter: PaginationWhereInput): UserConnection
 }
@@ -102,6 +114,31 @@ input CustomerWhereUniqueInput {
 
 """Date custom scalar type"""
 scalar Date
+
+type Debug {
+  debugResolver: String
+}
+
+input DeleteDialogueInputType {
+  customerSlug: String
+  id: ID
+}
+
+"""Delete Node Input type"""
+input DeleteNodeInputType {
+  customerId: ID
+  dialogueSlug: String
+  id: String
+}
+
+input DeleteUserInput {
+  customerId: ID
+  userId: ID
+}
+
+type DeleteUserOutput {
+  deletedUser: Boolean!
+}
 
 type Dialogue {
   averageScore(input: DialogueFilterInputType): Float!
@@ -179,6 +216,7 @@ input EditUserInput {
   firstName: String
   lastName: String
   phone: String
+  roleId: String
 }
 
 type FontSettings {
@@ -244,24 +282,27 @@ type LoginOutput {
 
 type Mutation {
   assignTags(dialogueId: String, tags: TagsInputObjectType): Dialogue!
-  copyDialogue(data: AddDialogueInput): Dialogue!
+  copyDialogue(input: CreateDialogueInputType): Dialogue!
+
+  """Create Call to Actions"""
   createCTA(input: CreateCTAInputType): QuestionNode!
   createCustomer(name: String, options: CustomerCreateOptions): Customer!
-  createDialogue(data: AddDialogueInput): Dialogue!
+  createDialogue(input: CreateDialogueInputType): Dialogue!
   createPermission(data: PermissionInput): PermssionType
-  createQuestion(customerSlug: String, dialogueSlug: String, edgeCondition: EdgeConditionInputType, optionEntries: OptionsInputType, overrideLeafId: String, parentQuestionId: String, title: String, type: String): QuestionNode
+  createQuestion(input: CreateQuestionNodeInputType): QuestionNode
   createRole(data: RoleInput): RoleType!
   createSession(input: SessionInput): Session!
   createTag(customerSlug: String, name: String, type: TagTypeEnum): Tag!
   createTrigger(customerSlug: String, questionId: String, recipients: RecipientsInputType, trigger: TriggerInputType): TriggerType!
   createUser(customerSlug: String, input: UserInput): UserType!
-  deleteCTA(id: String): QuestionNode!
+  debugMutation: String
+  deleteCTA(input: DeleteNodeInputType): QuestionNode!
   deleteCustomer(where: CustomerWhereUniqueInput): Customer
-  deleteDialogue(where: DialogueWhereUniqueInput): Dialogue!
-  deleteQuestion(customerSlug: String, dialogueSlug: String, id: String): QuestionNode!
+  deleteDialogue(input: DeleteDialogueInputType): Dialogue!
+  deleteQuestion(input: DeleteNodeInputType): QuestionNode!
   deleteTag(tagId: String): Tag!
   deleteTrigger(id: String): TriggerType
-  deleteUser(id: String): UserType!
+  deleteUser(input: DeleteUserInput): DeleteUserOutput!
   editCustomer(id: String, options: CustomerEditOptions): Customer!
   editDialogue(customerSlug: String, description: String, dialogueSlug: String, publicTitle: String, tags: TagsInputObjectType, title: String): Dialogue!
   editTrigger(questionId: String, recipients: RecipientsInputType, trigger: TriggerInputType, triggerId: String): TriggerType!
@@ -275,8 +316,8 @@ type Mutation {
   register(input: RegisterInput): String
   requestInvite(input: RequestInviteInput): RequestInviteOutput!
   singleUpload(file: Upload): ImageType!
-  updateCTA(input: UpdateCTAInpuType): QuestionNode!
-  updateQuestion(edgeCondition: EdgeConditionInputType, edgeId: String, id: String, optionEntries: OptionsInputType, overrideLeafId: String, title: String, type: String): QuestionNode!
+  updateCTA(input: UpdateCTAInputType): QuestionNode!
+  updateQuestion(input: UpdateQuestionNodeInputType): QuestionNode!
   updateRoles(permissions: PermissionIdsInput, roleId: String): RoleType!
 
   """
@@ -676,10 +717,22 @@ enum TriggerTypeEnum {
   SCHEDULED
 }
 
-input UpdateCTAInpuType {
+input UpdateCTAInputType {
+  customerId: ID
   id: String
   links: CTALinksInputType
   share: ShareNodeInputType
+  title: String
+  type: String
+}
+
+input UpdateQuestionNodeInputType {
+  customerId: ID
+  edgeCondition: EdgeConditionInputType
+  edgeId: ID
+  id: ID
+  optionEntries: OptionsInputType
+  overrideLeafId: ID
   title: String
   type: String
 }

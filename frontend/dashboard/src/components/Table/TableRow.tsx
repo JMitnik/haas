@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import styled from 'styled-components/macro';
 
-import { Button, Grid, Menu, MenuButton, MenuList } from '@chakra-ui/core';
-import { ReactComponent as ContextButtonSVG } from 'assets/icons/icon-more.svg';
 import { Div } from '@haas/ui';
+import { Grid } from '@chakra-ui/core';
 import { TableRowProps } from 'components/Table/TableTypes';
 
 import { ExpandedRowContainer, RowContainer } from './TableStyles';
@@ -11,13 +10,10 @@ import { ExpandedRowContainer, RowContainer } from './TableStyles';
 const TableOptionsContainer = styled(Div)`
   position: absolute;
   top: 50%;
+  z-index: 300;
   transform: translateY(-50%);
   right: 0;
   width: 3em;
-
-  button {
-    max-width: 100%;
-  }
 `;
 
 const TableRow = ({ headers, data, index, renderExpandedRow, renderOptions }: TableRowProps) => {
@@ -28,7 +24,6 @@ const TableRow = ({ headers, data, index, renderExpandedRow, renderOptions }: Ta
   return (
     <RowContainer
       onClick={() => setIsExpanded(!isExpanded)}
-      mr={renderOptions ? '1em' : ''}
       enableHover={!!renderExpandedRow}
     >
       <Grid
@@ -50,16 +45,7 @@ const TableRow = ({ headers, data, index, renderExpandedRow, renderOptions }: Ta
       <Div>
         {!!renderOptions && (
         <TableOptionsContainer>
-          <Menu>
-            <MenuButton size="sm" as={Button}>
-              <ContextButtonSVG />
-            </MenuButton>
-            <MenuList>
-              <>
-                {renderOptions}
-              </>
-            </MenuList>
-          </Menu>
+          <>{renderOptions(data)}</>
         </TableOptionsContainer>
         )}
       </Div>

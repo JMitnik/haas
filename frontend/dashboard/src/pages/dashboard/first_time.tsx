@@ -47,6 +47,7 @@ const editUserMutation = gql`
       firstName
       lastName
       email
+      phone
       userCustomers {
         role {
           permissions

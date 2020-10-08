@@ -132,6 +132,7 @@ const CustomerRoutes = () => (
 
                   <GuardedRoute
                     path="/dashboard/b/:customerSlug/u/:userId/edit"
+                    allowedPermission={SystemPermission.CAN_EDIT_USERS}
                     render={() => (
                       <EditUserView />
                     )}
