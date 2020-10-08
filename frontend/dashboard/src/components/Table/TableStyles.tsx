@@ -8,7 +8,7 @@ export const RowContainer = styled(Div)<{enableHover?: boolean}>`
   ${({ theme, enableHover }) => css`
     cursor: pointer;
     position: relative;
-    z-index: 200;
+    /* z-index: 200; */
     padding-left: ${theme.gutter}px;
     padding-right: ${theme.gutter}px;
     padding-top: ${theme.gutter / 3}px;
@@ -21,7 +21,7 @@ export const RowContainer = styled(Div)<{enableHover?: boolean}>`
     ${enableHover && css`
       &:hover {
         position: relative;
-        z-index: 100;
+        /* z-index: 100; */
         background: ${theme.colors.gray[100]};
         transition: all .2s cubic-bezier(.55,0,.1,1);
       }

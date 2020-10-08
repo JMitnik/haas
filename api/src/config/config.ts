@@ -5,6 +5,7 @@ export interface ConfigProps {
   jwtExpiryMinutes: number;
   env: string;
   port: number;
+  useSSL: boolean;
   endpoint: string;
   isDebug: boolean;
   clientUrl: string;
@@ -30,6 +31,7 @@ const config: ConfigProps = {
   jwtExpiryMinutes: 30,
   env: process.env.ENVIRONMENT || 'local',
   port: Number(process.env.PORT) || 4000,
+  useSSL: Boolean(process.env.useSSL) || false,
   endpoint: process.env.APP_ENDPOINT || '/graphql',
   isDebug: Boolean(process.env.ENABLE_DEBUG) || false,
   clientUrl: process.env.CLIENT_URL || 'http://localhost:3000',

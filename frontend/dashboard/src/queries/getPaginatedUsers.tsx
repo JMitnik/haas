@@ -3,6 +3,8 @@ import gql from 'graphql-tag';
 const getPaginatedUsers = gql`
   query getPaginatedUsers($customerSlug: String!, $filter: PaginationWhereInput) {
     customer(slug: $customerSlug) {
+      id
+      
       usersConnection(filter: $filter) {
         userCustomers {
           user {

@@ -6,42 +6,67 @@ import { useMutation } from '@apollo/react-hooks';
 import React, { useRef } from 'react';
 import styled, { css } from 'styled-components/macro';
 
+import { Button, Popover, PopoverArrow, PopoverBody, PopoverCloseButton,
+  PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast } from '@chakra-ui/core';
 import { Card, CardBody, ColumnFlex, Div, ExtLink, Flex, Paragraph, Text } from '@haas/ui';
-import { Menu, MenuHeader, MenuItem } from 'components/Menu/Menu';
 import { deleteQuestionnaireMutation } from 'mutations/deleteQuestionnaire';
-import { useToast } from '@chakra-ui/core';
 import { useTranslation } from 'react-i18next';
+import List from 'components/List/List';
+import ListItem from 'components/List/ListItem';
 import ShowMoreButton from 'components/ShowMoreButton';
 import SliderNodeIcon from 'components/Icons/SliderNodeIcon';
 import getDialoguesOfCustomer from 'queries/getDialoguesOfCustomer';
 import getLocale from 'utils/getLocale';
+import useAuth from 'hooks/useAuth';
 
 interface DialogueCardOptionsOverlayProps {
-  onDelete: () => void;
-  onEdit: () => void;
+  onDelete: (e: React.MouseEvent<HTMLElement>) => void;
+  onEdit: (e: React.MouseEvent<HTMLElement>) => void;
 }
 
 const DialogueCardOptionsOverlay = ({ onDelete, onEdit }: DialogueCardOptionsOverlayProps) => {
   const { t } = useTranslation();
 
   return (
-    <Menu>
-      <MenuHeader>{t('actions')}</MenuHeader>
-      <MenuItem onClick={() => onDelete()}>
-        <Trash />
-        {t('delete')}
-      </MenuItem>
-      <MenuItem onClick={() => onEdit()}>
-        <Edit />
+    <List>
+      <Popover>
+        {() => (
+          <>
+            <PopoverTrigger>
+              <ListItem renderLeftIcon={<Trash />}>
+                {t('delete')}
+              </ListItem>
+            </PopoverTrigger>
+            <PopoverContent zIndex={4}>
+              <PopoverArrow />
+              <PopoverHeader>{t('delete')}</PopoverHeader>
+              <PopoverCloseButton />
+              <PopoverBody>
+                <Text>{t('delete_dialogue_popover')}</Text>
+              </PopoverBody>
+              <PopoverFooter>
+                <Button
+                  variantColor="red"
+                  onClick={onDelete}
+                >
+                  {t('delete')}
+                </Button>
+              </PopoverFooter>
+            </PopoverContent>
+          </>
+        )}
+      </Popover>
+      <ListItem renderLeftIcon={<Edit />} onClick={onEdit}>
         {t('edit')}
-      </MenuItem>
-    </Menu>
+      </ListItem>
+    </List>
   );
 };
 
 const DialogueCard = ({ dialogue, isCompact }: { dialogue: any, isCompact?: boolean }) => {
   const history = useHistory();
   const { customerSlug } = useParams();
+  const { canAccessAdmin } = useAuth();
   const ref = useRef(null);
   const { t } = useTranslation();
   const toast = useToast();
@@ -74,7 +99,9 @@ const DialogueCard = ({ dialogue, isCompact }: { dialogue: any, isCompact?: bool
     },
   });
 
-  const deleteDialogue = async () => {
+  const deleteDialogue = async (e: React.MouseEvent<HTMLElement>) => {
+    e.stopPropagation();
+
     deleteTopic({
       variables: {
         id: dialogue.id,
@@ -83,14 +110,22 @@ const DialogueCard = ({ dialogue, isCompact }: { dialogue: any, isCompact?: bool
   };
 
   // TODO: Move this url to a constant or so
-  const goToEditDialogue = () => {
+  const goToEditDialogue = (e: React.MouseEvent<HTMLElement>) => {
+    e.stopPropagation();
     history.push(`/dashboard/b/${customerSlug}/d/${dialogue.slug}/edit`);
   };
 
   const lastUpdated = dialogue.updatedAt ? new Date(Number.parseInt(dialogue.updatedAt, 10)) : null;
 
   return (
-    <Card ref={ref} data-cy="DialogueCard" bg="white" useFlex flexDirection="column" onClick={() => history.push(`/dashboard/b/${customerSlug}/d/${dialogue.slug}`)}>
+    <Card
+      ref={ref}
+      data-cy="DialogueCard"
+      bg="white"
+      useFlex
+      flexDirection="column"
+      onClick={() => history.push(`/dashboard/b/${customerSlug}/d/${dialogue.slug}`)}
+    >
       <CardBody flex="100%">
         <ColumnFlex justifyContent="space-between" height="100%">
           <Div>
@@ -126,14 +161,16 @@ const DialogueCard = ({ dialogue, isCompact }: { dialogue: any, isCompact?: bool
                   </Text>
                 )}
               </Div>
-              <ShowMoreButton
-                renderMenu={(
-                  <DialogueCardOptionsOverlay
-                    onDelete={() => deleteDialogue()}
-                    onEdit={() => goToEditDialogue()}
-                  />
+              {canAccessAdmin && (
+                <ShowMoreButton
+                  renderMenu={(
+                    <DialogueCardOptionsOverlay
+                      onDelete={deleteDialogue}
+                      onEdit={goToEditDialogue}
+                    />
               )}
-              />
+                />
+              )}
             </Flex>
           </Div>
         </ColumnFlex>

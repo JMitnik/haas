@@ -11,7 +11,7 @@ import { DialogueFilterInputType, DialogueType, DialogueWhereUniqueInput } from 
 import CustomerService from './CustomerService';
 // eslint-disable-next-line import/no-cycle
 import { PaginationWhereInput } from '../general/Pagination';
-import { UserConnection } from '../users/User';
+import { UserConnection, UserCustomerType } from '../users/User';
 import DialogueService from '../questionnaire/DialogueService';
 import UserService from '../users/UserService';
 import isValidColor from '../../utils/isValidColor';
@@ -84,6 +84,38 @@ export const CustomerType = objectType({
         }
 
         return null;
+      },
+    });
+
+    t.field('userCustomer', {
+      type: UserCustomerType,
+      args: { userId: 'String' },
+      nullable: true,
+
+      async resolve(parent, args, ctx) {
+        if (!args.userId) throw new UserInputError('No valid user id provided');
+
+        const customerWithUsers = await ctx.prisma.customer.findOne({
+          where: { id: parent.id },
+          include: {
+            users: {
+              where: {
+                userId: args.userId,
+              },
+              include: {
+                user: true,
+                role: true,
+                customer: true,
+              },
+            },
+          },
+        });
+
+        const user = customerWithUsers?.users[0];
+
+        if (!user) throw new UserInputError('Cant find user with this ID');
+
+        return user as any;
       },
     });
 

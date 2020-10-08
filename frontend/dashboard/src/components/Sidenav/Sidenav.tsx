@@ -74,23 +74,7 @@ export const NavLogo = () => (
   <FullLogo />
 );
 
-export const UsernavContainer = styled.div`
-  ${({ theme }) => css`
-    /* padding: 0 ${theme.gutter}px; */
-    /* display: flex;
-    align-items: center;
-    cursor: pointer;
-    color: ${theme.isDarkColor ? theme.colors.primaries['100'] : theme.colors.primaries['800']};
-    transition: all 0.2s cubic-bezier(0.19, 1, 0.22, 1);
-    position: relative;
-
-    &:hover {
-      transition: all 0.2s cubic-bezier(0.19, 1, 0.22, 1);
-      background: ${theme.isDarkColor ? theme.colors.primaries['400'] : theme.colors.primaries['800']};
-      color: ${theme.isDarkColor ? theme.colors.primaries['600'] : theme.colors.primaries['100']};
-    } */
-  `}
-`;
+export const UsernavContainer = styled.div``;
 
 export const AvatarContainer = styled(Div)`
   ${({ theme }) => css`
@@ -184,12 +168,12 @@ export const UsernavDropdown = () => {
       </ListItem>
       <Div>
         <ListItem onClick={switchToEnglish}>
-          <Text ml={2}>
+          <Text>
             {t('english')}
           </Text>
         </ListItem>
         <ListItem onClick={switchToGerman}>
-          <Text ml={2}>
+          <Text>
             {t('german')}
           </Text>
         </ListItem>
@@ -197,13 +181,13 @@ export const UsernavDropdown = () => {
       <Div>
         {((user?.userCustomers?.length && user?.userCustomers.length > 1) || canAccessAdmin) && setActiveCustomer && (
           <ListItem renderLeftIcon={<ExternalLink />} onClick={goToDialoguesOverview}>
-            <Text ml={2}>
+            <Text>
               {t('switch_project')}
             </Text>
           </ListItem>
         )}
         <ListItem renderLeftIcon={<LogOut />} onClick={logout}>
-          <Text ml={2}>
+          <Text>
             {t('logout')}
           </Text>
         </ListItem>
@@ -217,9 +201,13 @@ export const Usernav = () => {
 
   return (
     <UsernavContainer>
-      <Dropdown left="24px" bottom="100%" renderOverlay={<UsernavDropdown />}>
+      <Dropdown renderOverlay={<UsernavDropdown />} placement="top-start" offset={[24, 0]}>
         <AvatarContainer>
-          <ChakraAvatar bg="gray.300" size="md" name={`${user?.firstName} ${user?.lastName}`}>
+          <ChakraAvatar
+            bg="gray.300"
+            size="md"
+            name={`${user?.firstName} ${user?.lastName}`}
+          >
             <AvatarBadge size="1em" bg="green.400" />
           </ChakraAvatar>
         </AvatarContainer>

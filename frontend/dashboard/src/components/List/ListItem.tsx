@@ -10,12 +10,13 @@ interface ListItemContainerProps {
 
 export const ListItemContainer = styled(Div)<ListItemContainerProps>`
   ${({ theme, isHeader = false }) => css`
-    padding: 6px 16px;
+    padding: 8px 20px;
     background: white;
-    color: ${theme.colors.gray[600]};
+    color: ${theme.colors.gray[400]};
     display: flex;
     align-items: center;
-    font-weight: 500;
+    font-weight: 600;
+    font-size: 0.9rem;
     
     ${isHeader && css`
       border-bottom: 1px solid ${theme.colors.gray[200]};
@@ -28,7 +29,8 @@ export const ListItemContainer = styled(Div)<ListItemContainerProps>`
 
     &:hover {
       cursor: pointer;
-      background: ${theme.colors.gray[100]};
+      color: ${theme.colors.primaries[700]};
+      transition: all cubic-bezier(0.6, -0.28, 0.735, 0.045) 0.2s;
     }
   `}
 `;
@@ -43,8 +45,7 @@ interface ListItemProps {
 const ListItem = ({ children, renderLeftIcon, onClick, isHeader }: ListItemProps) => (
   <ListItemContainer hasNoIcon={!renderLeftIcon} isHeader={isHeader} onClick={onClick}>
     {renderLeftIcon}
-    <Span pl={!renderLeftIcon ? '0.9rem' : 'auto'}>
-
+    <Span pl={2}>
       {children}
     </Span>
   </ListItemContainer>

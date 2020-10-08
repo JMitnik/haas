@@ -231,10 +231,28 @@ export const EditUserInput = inputObjectType({
 
   definition(t) {
     t.string('email', { required: true });
+    t.string('roleId');
     t.string('firstName', { nullable: true });
     t.string('customerId', { nullable: true });
     t.string('lastName', { nullable: true });
     t.string('phone', { nullable: true });
+  },
+});
+
+export const DeleteUserInput = inputObjectType({
+  name: 'DeleteUserInput',
+
+  definition(t) {
+    t.id('userId');
+    t.id('customerId');
+  },
+});
+
+export const DeleteUserOuput = objectType({
+  name: 'DeleteUserOutput',
+
+  definition(t) {
+    t.boolean('deletedUser');
   },
 });
 
@@ -342,7 +360,7 @@ export const UserMutations = extendType({
       async resolve(parent, args, ctx) {
         if (!args.userId) throw new UserInputError('No valid user provided to edit');
         if (!args.input) throw new UserInputError('No input provided');
-        const { firstName, lastName, email, phone } = args.input;
+        const { firstName, lastName, email, phone, roleId } = args.input;
 
         const otherMails = await ctx.prisma.user.findMany({
           where: {
@@ -356,6 +374,22 @@ export const UserMutations = extendType({
         if (otherMails.length) throw new UserInputError('Email is already taken');
 
         if (!email) throw new UserInputError('No valid email provided');
+
+        if (args.input.customerId) {
+          await ctx.prisma.userOfCustomer.update({
+            where: { userId_customerId: {
+              userId: args?.userId,
+              customerId: args.input.customerId,
+            } },
+            data: {
+              role: {
+                connect: {
+                  id: roleId || undefined,
+                },
+              },
+            },
+          });
+        }
 
         return ctx.prisma.user.update({
           where: {
@@ -372,12 +406,24 @@ export const UserMutations = extendType({
     });
 
     t.field('deleteUser', {
-      type: UserType,
-      args: { id: 'String' },
-      resolve(parent, args, ctx) {
-        if (!args.id) throw new UserInputError('No valid user provided to delete');
+      type: DeleteUserOuput,
+      args: { input: DeleteUserInput },
+      async resolve(parent, args, ctx) {
+        if (!args.input?.customerId) throw new UserInputError('No workspace provided');
+        if (!args.input?.userId) throw new UserInputError('No user provided');
 
-        return ctx.prisma.user.delete({ where: { id: args.id } });
+        const removedUser = await ctx.prisma.userOfCustomer.delete({
+          where: {
+            userId_customerId: {
+              customerId: args.input.customerId,
+              userId: args.input.userId,
+            },
+          },
+        });
+
+        if (removedUser) return { deletedUser: true };
+
+        return { deletedUser: false };
       },
     });
   },

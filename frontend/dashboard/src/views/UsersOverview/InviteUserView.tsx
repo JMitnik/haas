@@ -71,11 +71,19 @@ const InviteUserView = () => {
           position: 'bottom-right',
           duration: 1500,
         });
-      } else {
+      } else if (!didInviteUser && userDidExist) {
         toast({
           title: 'User already exists!',
           description: 'The user already exists in your workspace. Any changes have been applied.',
           status: 'warning',
+          position: 'bottom-right',
+          duration: 1500,
+        });
+      } else {
+        toast({
+          title: 'Existing user added!',
+          description: 'User has been added to this workspace.',
+          status: 'success',
           position: 'bottom-right',
           duration: 1500,
         });

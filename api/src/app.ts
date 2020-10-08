@@ -41,7 +41,7 @@ const main = async () => {
   apollo.applyMiddleware({ app, cors: false });
 
   console.log('🏳️\tStarting the server');
-  if (config.env === 'local') {
+  if (config.useSSL) {
     const key: any = process.env.HTTPS_SERVER_KEY_PATH;
     const certificate: any = process.env.HTTPS_SERVER_CERT_PATH;
 

@@ -7,11 +7,13 @@ interface UseAuthProps {
   canCreateCustomers: boolean;
   canDeleteCustomers: boolean;
   canCreateTriggers: boolean;
+  canInviteUsers: boolean;
   canEditCustomer: boolean;
   canAccessAdmin: boolean;
   canViewDialogueBuilder: boolean;
   canBuildDialogues: boolean;
   canViewUsers: boolean;
+  canDeleteUsers: boolean;
   hasPermission: (permission: SystemPermission) => boolean;
 }
 
@@ -29,7 +31,9 @@ const useAuth = (): UseAuthProps => {
   const canDeleteCustomers = authPermissions?.includes(SystemPermission.CAN_ACCESS_ADMIN_PANEL) || false;
   const canCreateCustomers = authPermissions?.includes(SystemPermission.CAN_ACCESS_ADMIN_PANEL) || false;
   const canAccessAdmin = authPermissions?.includes(SystemPermission.CAN_ACCESS_ADMIN_PANEL) || false;
+  const canInviteUsers = authPermissions?.includes(SystemPermission.CAN_ADD_USERS) || false;
   const canViewUsers = authPermissions?.includes(SystemPermission.CAN_VIEW_USERS) || false;
+  const canDeleteUsers = authPermissions?.includes(SystemPermission.CAN_DELETE_USERS) || false;
 
   // Workspace-specific actions
   const canEditCustomer = authPermissions?.includes(SystemPermission.CAN_EDIT_WORKSPACE) || false;
@@ -43,9 +47,11 @@ const useAuth = (): UseAuthProps => {
     canDeleteCustomers,
     canCreateTriggers,
     canEditCustomer,
+    canInviteUsers,
     hasPermission,
     canAccessAdmin,
     canViewUsers,
+    canDeleteUsers,
     canViewDialogueBuilder,
     canBuildDialogues,
   };
