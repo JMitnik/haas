@@ -59,7 +59,7 @@ const authShield = shield({
     // editCustomer: containsWorkspacePermission(SystemPermissionEnum.CAN_EDIT_WORKSPACE),
     editUser: or(isSelf, isSuperAdmin),
 
-    debugMutation: isLocal,
+    // debugMutation: isLocal,
 
     // // Dialogue-specific settings
     deleteQuestion: containsWorkspacePermission(SystemPermissionEnum.CAN_BUILD_DIALOGUE),
