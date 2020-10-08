@@ -79,6 +79,9 @@ export interface dialogueStatistics_customer_dialogue_statistics {
 export interface dialogueStatistics_customer_dialogue {
   __typename: "Dialogue";
   id: string;
+  /**
+   * Count number of interactions between start-date and end-date
+   */
   countInteractions: number;
   thisWeekAverageScore: number;
   previousScore: number;
@@ -100,4 +103,5 @@ export interface dialogueStatisticsVariables {
   customerSlug: string;
   dialogueSlug: string;
   prevDateFilter?: DialogueFilterInputType | null;
+  statisticsDateFilter?: DialogueFilterInputType | null;
 }

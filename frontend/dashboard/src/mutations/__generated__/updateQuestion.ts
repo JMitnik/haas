@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { OptionsInputType, EdgeConditionInputType } from "./../../types/globalTypes";
+import { UpdateQuestionNodeInputType } from "./../../types/globalTypes";
 
 // ====================================================
 // GraphQL mutation operation: updateQuestion
@@ -19,11 +19,5 @@ export interface updateQuestion {
 }
 
 export interface updateQuestionVariables {
-  id: string;
-  title: string;
-  type: string;
-  overrideLeafId: string;
-  edgeId?: string | null;
-  optionEntries?: OptionsInputType | null;
-  edgeCondition?: EdgeConditionInputType | null;
+  input?: UpdateQuestionNodeInputType | null;
 }

@@ -11,6 +11,7 @@ interface UseAuthProps {
   canEditCustomer: boolean;
   canAccessAdmin: boolean;
   canViewDialogueBuilder: boolean;
+  canEditUsers: boolean;
   canBuildDialogues: boolean;
   canViewUsers: boolean;
   canDeleteUsers: boolean;
@@ -34,6 +35,7 @@ const useAuth = (): UseAuthProps => {
   const canInviteUsers = authPermissions?.includes(SystemPermission.CAN_ADD_USERS) || false;
   const canViewUsers = authPermissions?.includes(SystemPermission.CAN_VIEW_USERS) || false;
   const canDeleteUsers = authPermissions?.includes(SystemPermission.CAN_DELETE_USERS) || false;
+  const canEditUsers = authPermissions?.includes(SystemPermission.CAN_EDIT_USERS) || false;
 
   // Workspace-specific actions
   const canEditCustomer = authPermissions?.includes(SystemPermission.CAN_EDIT_WORKSPACE) || false;
@@ -46,6 +48,7 @@ const useAuth = (): UseAuthProps => {
     canCreateCustomers,
     canDeleteCustomers,
     canCreateTriggers,
+    canEditUsers,
     canEditCustomer,
     canInviteUsers,
     hasPermission,

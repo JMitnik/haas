@@ -23,6 +23,7 @@ import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
 import createQuestionMutation from 'mutations/createQuestion';
 import updateQuestionMutation from 'mutations/updateQuestion';
 
+import { useCustomer } from 'providers/CustomerProvider';
 import { EdgeConditonProps,
   OverrideLeafProps, QuestionEntryProps, QuestionOptionProps } from '../../DialogueBuilderInterfaces';
 
@@ -110,6 +111,7 @@ const QuestionEntryForm = ({
   edgeId,
   onDeleteEntry,
 }: QuestionEntryFormProps) => {
+  const { activeCustomer } = useCustomer();
   const { customerSlug, dialogueSlug } = useParams();
 
   const { t } = useTranslation();
@@ -337,26 +339,31 @@ const QuestionEntryForm = ({
     if (question.id !== '-1') {
       updateQuestion({
         variables: {
-          id,
-          title,
-          type,
-          overrideLeafId: overrideLeafId || '',
-          edgeId: edgeId || '-1',
-          optionEntries: options,
-          edgeCondition,
+          input: {
+            id,
+            customerId: activeCustomer?.id,
+            overrideLeafId: overrideLeafId || '',
+            edgeId: edgeId || '-1',
+            title,
+            type,
+            optionEntries: options,
+            edgeCondition,
+          },
         },
       });
     } else {
       createQuestion({
         variables: {
-          customerSlug,
-          dialogueSlug,
-          title,
-          type,
-          overrideLeafId: overrideLeafId || 'None',
-          parentQuestionId,
-          optionEntries: options,
-          edgeCondition,
+          input: {
+            customerId: activeCustomer?.id,
+            dialogueSlug,
+            title,
+            type,
+            overrideLeafId: overrideLeafId || 'None',
+            parentQuestionId,
+            optionEntries: options,
+            edgeCondition,
+          },
         },
       });
     }

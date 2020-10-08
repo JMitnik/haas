@@ -12,7 +12,6 @@ export enum LinkTypeEnumType {
   FACEBOOK = "FACEBOOK",
   INSTAGRAM = "INSTAGRAM",
   LINKEDIN = "LINKEDIN",
-  SHARE = "SHARE",
   SOCIAL = "SOCIAL",
   TWITTER = "TWITTER",
   WHATSAPP = "WHATSAPP",
@@ -105,6 +104,26 @@ export interface CTALinksInputType {
   linkTypes?: CTALinkInputObjectType[] | null;
 }
 
+export interface CreateCTAInputType {
+  customerSlug?: string | null;
+  dialogueSlug?: string | null;
+  title?: string | null;
+  type?: string | null;
+  links?: CTALinksInputType | null;
+  share?: ShareNodeInputType | null;
+}
+
+export interface CreateQuestionNodeInputType {
+  customerId?: string | null;
+  overrideLeafId?: string | null;
+  parentQuestionId?: string | null;
+  dialogueSlug?: string | null;
+  title?: string | null;
+  type?: string | null;
+  optionEntries?: OptionsInputType | null;
+  edgeCondition?: EdgeConditionInputType | null;
+}
+
 export interface CustomerCreateOptions {
   slug: string;
   primaryColour: string;
@@ -117,6 +136,20 @@ export interface CustomerEditOptions {
   name: string;
   logo?: string | null;
   primaryColour: string;
+}
+
+/**
+ * Delete Node Input type
+ */
+export interface DeleteNodeInputType {
+  id?: string | null;
+  customerId?: string | null;
+  dialogueSlug?: string | null;
+}
+
+export interface DeleteUserInput {
+  userId?: string | null;
+  customerId?: string | null;
 }
 
 export interface DialogueFilterInputType {
@@ -135,6 +168,7 @@ export interface EdgeConditionInputType {
 
 export interface EditUserInput {
   email: string;
+  roleId?: string | null;
   firstName?: string | null;
   customerId?: string | null;
   lastName?: string | null;
@@ -208,6 +242,26 @@ export interface TriggerInputType {
   type?: TriggerTypeEnum | null;
   medium?: TriggerMediumEnum | null;
   conditions?: TriggerConditionInputType[] | null;
+}
+
+export interface UpdateCTAInputType {
+  id?: string | null;
+  customerId?: string | null;
+  title?: string | null;
+  type?: string | null;
+  links?: CTALinksInputType | null;
+  share?: ShareNodeInputType | null;
+}
+
+export interface UpdateQuestionNodeInputType {
+  id?: string | null;
+  customerId?: string | null;
+  overrideLeafId?: string | null;
+  edgeId?: string | null;
+  title?: string | null;
+  type?: string | null;
+  optionEntries?: OptionsInputType | null;
+  edgeCondition?: EdgeConditionInputType | null;
 }
 
 export interface UserInput {

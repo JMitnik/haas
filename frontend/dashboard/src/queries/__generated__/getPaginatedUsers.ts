@@ -38,6 +38,7 @@ export interface getPaginatedUsers_customer_usersConnection {
 
 export interface getPaginatedUsers_customer {
   __typename: "Customer";
+  id: string;
   usersConnection: getPaginatedUsers_customer_usersConnection | null;
 }
 

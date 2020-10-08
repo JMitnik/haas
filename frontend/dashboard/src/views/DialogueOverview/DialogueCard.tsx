@@ -9,7 +9,7 @@ import styled, { css } from 'styled-components/macro';
 import { Button, Popover, PopoverArrow, PopoverBody, PopoverCloseButton,
   PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast } from '@chakra-ui/core';
 import { Card, CardBody, ColumnFlex, Div, ExtLink, Flex, Paragraph, Text } from '@haas/ui';
-import { deleteQuestionnaireMutation } from 'mutations/deleteQuestionnaire';
+import { deleteDialogueMutation } from 'mutations/deleteDialogue';
 import { useTranslation } from 'react-i18next';
 import List from 'components/List/List';
 import ListItem from 'components/List/ListItem';
@@ -65,14 +65,14 @@ const DialogueCardOptionsOverlay = ({ onDelete, onEdit }: DialogueCardOptionsOve
 
 const DialogueCard = ({ dialogue, isCompact }: { dialogue: any, isCompact?: boolean }) => {
   const history = useHistory();
-  const { customerSlug } = useParams();
+  const { customerSlug } = useParams<{ customerSlug: string }>();
   const { canAccessAdmin } = useAuth();
   const ref = useRef(null);
   const { t } = useTranslation();
   const toast = useToast();
 
   // TODO: How to deal with refetching query when deleted card on a filtered view (fetch and update the current view somehow   )
-  const [deleteTopic] = useMutation(deleteQuestionnaireMutation, {
+  const [deleteDialogue] = useMutation(deleteDialogueMutation, {
     refetchQueries: [{
       query: getDialoguesOfCustomer,
       variables: {
@@ -99,12 +99,15 @@ const DialogueCard = ({ dialogue, isCompact }: { dialogue: any, isCompact?: bool
     },
   });
 
-  const deleteDialogue = async (e: React.MouseEvent<HTMLElement>) => {
+  const handleDeleteDialogue = async (e: React.MouseEvent<HTMLElement>) => {
     e.stopPropagation();
 
-    deleteTopic({
+    deleteDialogue({
       variables: {
-        id: dialogue.id,
+        input: {
+          id: dialogue.id,
+          customerSlug,
+        },
       },
     });
   };
@@ -165,7 +168,7 @@ const DialogueCard = ({ dialogue, isCompact }: { dialogue: any, isCompact?: bool
                 <ShowMoreButton
                   renderMenu={(
                     <DialogueCardOptionsOverlay
-                      onDelete={deleteDialogue}
+                      onDelete={handleDeleteDialogue}
                       onEdit={goToEditDialogue}
                     />
               )}

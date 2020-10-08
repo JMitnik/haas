@@ -55,22 +55,22 @@ const authShield = shield({
     verifyUserToken: allow,
     requestInvite: allow,
     deleteCustomer: isSuperAdmin,
-    // inviteUser: containsWorkspacePermission(SystemPermissionEnum.CAN_ADD_USERS),
+    inviteUser: containsWorkspacePermission(SystemPermissionEnum.CAN_ADD_USERS),
     // editCustomer: containsWorkspacePermission(SystemPermissionEnum.CAN_EDIT_WORKSPACE),
     editUser: or(isSelf, isSuperAdmin),
 
     // debugMutation: isLocal,
 
     // // Dialogue-specific settings
-    // deleteQuestion: containsWorkspacePermission(SystemPermissionEnum.CAN_BUILD_DIALOGUE),
-    // updateQuestion: containsWorkspacePermission(SystemPermissionEnum.CAN_BUILD_DIALOGUE),
-    // createQuestion: containsWorkspacePermission(SystemPermissionEnum.CAN_BUILD_DIALOGUE),
-    // updateCTA: containsWorkspacePermission(SystemPermissionEnum.CAN_BUILD_DIALOGUE),
-    // deleteCTA: containsWorkspacePermission(SystemPermissionEnum.CAN_BUILD_DIALOGUE),
-    // createCTA: containsWorkspacePermission(SystemPermissionEnum.CAN_BUILD_DIALOGUE),
-    // copyDialogue: isSuperAdmin,
-    // createDialogue: containsWorkspacePermission(SystemPermissionEnum.CAN_BUILD_DIALOGUE),
-    // deleteDialogue: containsWorkspacePermission(SystemPermissionEnum.CAN_DELETE_DIALOGUE),
+    deleteQuestion: containsWorkspacePermission(SystemPermissionEnum.CAN_BUILD_DIALOGUE),
+    updateQuestion: containsWorkspacePermission(SystemPermissionEnum.CAN_BUILD_DIALOGUE),
+    createQuestion: containsWorkspacePermission(SystemPermissionEnum.CAN_BUILD_DIALOGUE),
+    updateCTA: containsWorkspacePermission(SystemPermissionEnum.CAN_BUILD_DIALOGUE),
+    deleteCTA: containsWorkspacePermission(SystemPermissionEnum.CAN_BUILD_DIALOGUE),
+    createCTA: containsWorkspacePermission(SystemPermissionEnum.CAN_BUILD_DIALOGUE),
+    copyDialogue: isSuperAdmin,
+    createDialogue: containsWorkspacePermission(SystemPermissionEnum.CAN_BUILD_DIALOGUE),
+    deleteDialogue: containsWorkspacePermission(SystemPermissionEnum.CAN_DELETE_DIALOGUE),
 
     // // Workspace-trigger specific settings
     // deleteTrigger: containsWorkspacePermission(SystemPermissionEnum.CAN_DELETE_TRIGGERS),

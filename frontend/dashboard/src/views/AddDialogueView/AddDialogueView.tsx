@@ -131,20 +131,21 @@ const AddDialogueView = () => {
   };
 
   const onSubmit = (formData: FormDataProps) => {
-    // TODO: Make better typescript supported
     const tagIds = activeTags.map((tag) => tag?.value);
     const tagEntries = { entries: tagIds };
 
     addDialogue({
       variables: {
-        customerSlug,
-        dialogueSlug: formData.slug,
-        title: formData.title,
-        publicTitle: formData.publicTitle,
-        description: formData.description,
-        contentType: formData.contentOption.value,
-        templateDialogueId: formData.dialogueOption?.value,
-        tags: tagEntries,
+        input: {
+          customerSlug,
+          dialogueSlug: formData.slug,
+          title: formData.title,
+          publicTitle: formData.publicTitle,
+          description: formData.description,
+          contentType: formData.contentOption.value,
+          templateDialogueId: formData.dialogueOption?.value,
+          tags: tagEntries,
+        },
       },
     });
   };

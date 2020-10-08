@@ -11,6 +11,7 @@ import { Flex, Span } from '@haas/ui';
 import deleteCTAMutation from 'mutations/deleteCTA';
 import getCTANodesQuery from 'queries/getCTANodes';
 
+import { useCustomer } from 'providers/CustomerProvider';
 import CTAForm from './CTAForm';
 import CTAIcon from './CTAIcon';
 import EditCTAButton from './EditCTAButton';
@@ -82,10 +83,17 @@ const OverflowSpan = styled(Span)`
 const CTAEntry = ({ id, activeCTA, onActiveCTAChange, title, type, links, share, Icon, onNewCTAChange }: CTAEntryProps) => {
   const toast = useToast();
   const { t } = useTranslation();
+  const { activeCustomer } = useCustomer();
 
-  const { customerSlug, dialogueSlug } = useParams();
+  const { customerSlug, dialogueSlug } = useParams<{ customerSlug: string, dialogueSlug: string }>();
   const [deleteEntry] = useMutation(deleteCTAMutation, {
-    variables: { id },
+    variables: {
+      input: {
+        customerId: activeCustomer?.id,
+        dialogueSlug,
+        id,
+      },
+    },
     onCompleted: () => {
       toast({
         title: 'CTA deleted!',

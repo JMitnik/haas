@@ -573,7 +573,7 @@ class DialogueService {
     return updatedEdgesDialogue;
   };
 
-  static createDialogue = async (input: NexusGenInputs['AddDialogueInput']): Promise<Dialogue> => {
+  static createDialogue = async (input: NexusGenInputs['CreateDialogueInputType']): Promise<Dialogue> => {
     const dialogueTags = input.tags?.entries?.map((tag: string) => ({ id: tag })) || [];
 
     const customers = await prisma.customer.findMany({ where: { slug: input.customerSlug || undefined } });

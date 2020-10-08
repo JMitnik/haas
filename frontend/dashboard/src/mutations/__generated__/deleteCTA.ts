@@ -3,6 +3,8 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
+import { DeleteNodeInputType } from "./../../types/globalTypes";
+
 // ====================================================
 // GraphQL mutation operation: deleteCTA
 // ====================================================
@@ -17,5 +19,5 @@ export interface deleteCTA {
 }
 
 export interface deleteCTAVariables {
-  id: string;
+  input?: DeleteNodeInputType | null;
 }

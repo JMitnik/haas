@@ -1,8 +1,8 @@
 import gql from 'graphql-tag';
 
 const deleteCTA = gql`
-  mutation deleteCTA($id: String!) {
-    deleteCTA( id: $id ) {
+  mutation deleteCTA($input: DeleteNodeInputType) {
+    deleteCTA(input: $input) {
       id
     }
 }
