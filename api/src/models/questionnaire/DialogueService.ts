@@ -95,7 +95,9 @@ class DialogueService {
   };
 
   static editDialogue = async (args: any) => {
+    console.log(args);
     const { customerSlug, dialogueSlug, title, description, publicTitle, tags } = args;
+
     const customer = await prisma.customer.findOne({
       where: {
         slug: customerSlug,

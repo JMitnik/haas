@@ -118,6 +118,7 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFo
     const tagIds = formData.tags?.map((tag) => tag?.value) || [];
     const tagEntries = { entries: tagIds };
 
+    // TODO: Ensure we can edit the dialogue slug (uneditable atm)
     editDialogue({
       variables: {
         customerSlug,
