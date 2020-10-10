@@ -272,6 +272,7 @@ export const WorkspaceMutations = Upload && extendType({
       args: { input: CreateWorkspaceInput },
 
       async resolve(parent, args, ctx) {
+        if (!args.input) throw new UserInputError('No input provided');
         const primaryColor = args?.input?.primaryColour;
 
         if (primaryColor) {
@@ -282,7 +283,7 @@ export const WorkspaceMutations = Upload && extendType({
           }
         }
 
-        const workspace = CustomerService.createWorkspace(args as any, ctx.session?.user?.id);
+        const workspace = CustomerService.createWorkspace(args?.input, ctx.session?.user?.id);
 
         return workspace as any;
       },
@@ -293,6 +294,7 @@ export const WorkspaceMutations = Upload && extendType({
       args: { input: EditWorkspaceInput },
 
       resolve(parent, args) {
+        if (!args.input) throw new UserInputError('No input provided');
         const primaryColor = args?.input?.primaryColour;
 
         if (primaryColor) {
@@ -303,7 +305,7 @@ export const WorkspaceMutations = Upload && extendType({
           }
         }
 
-        return CustomerService.editCustomer(args);
+        return CustomerService.editWorkspace(args.input);
       },
     });
   },

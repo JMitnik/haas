@@ -501,6 +501,30 @@ const language = {
     },
   },
   customer: {
+    fake_data: {
+      en: 'Placeholder data',
+      de: 'Platzhalter-Daten',
+    },
+    fake_data_helper: {
+      en: 'Start with placeholder data',
+      de: 'Beginnen Sie mit Platzhalter-Daten',
+    },
+    use_fake_data: {
+      en: 'Generate data',
+      de: 'Erzeugen Daten',
+    },
+    use_fake_data_helper: {
+      en: 'Fake data will be generated for your templated dialogue',
+      de: 'Gefälschte Daten werden für Ihren Templat-Dialog erzeugt werden',
+    },
+    no_use_fake_data: {
+      en: 'Start with no data',
+      de: 'Starten Sie ohne Daten',
+    },
+    no_use_fake_data_helper: {
+      en: 'No data will be generated, for a complete fresh slate.',
+      de: 'Es werden keine Daten erzeugt, für einen vollständigen frischen Schiefer.',
+    },
     logo_helper: {
       en: 'Choose between uploading your logo or inserting an existing URL.',
       de: 'Verweise mit einer URL auf deine Logo oder lade es selbst hoch.',

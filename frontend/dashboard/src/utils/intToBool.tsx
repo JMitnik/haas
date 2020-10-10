@@ -1,4 +1,4 @@
-const parseOptionalBoolean = (optionalBoolean: number | boolean | undefined) => {
+const intToBool = (optionalBoolean: number | boolean | undefined) => {
   if (typeof optionalBoolean === 'number') {
     return optionalBoolean === 1;
   }
@@ -8,4 +8,4 @@ const parseOptionalBoolean = (optionalBoolean: number | boolean | undefined) => 
   return undefined;
 };
 
-export default parseOptionalBoolean;
+export default intToBool;

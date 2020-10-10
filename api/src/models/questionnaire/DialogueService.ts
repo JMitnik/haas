@@ -17,11 +17,13 @@ import { HistoryDataProps, HistoryDataWithEntry, IdMapProps,
 // eslint-disable-next-line import/no-cycle
 import NodeEntryService, { NodeEntryWithTypes } from '../node-entry/NodeEntryService';
 // eslint-disable-next-line import/no-cycle
-import { Nullable, PaginationProps } from '../../types/generic';
 import SessionService from '../session/SessionService';
+import defaultWorkspaceTemplate, { WorkspaceTemplate } from '../templates/defaultWorkspaceTemplate';
 import prisma from '../../config/prisma';
-import defaultWorkspaceTemplate from '../templates/defaultWorkspaceTemplate';
 
+function getRandomInt(max: number) {
+  return Math.floor(Math.random() * Math.floor(max));
+}
 class DialogueService {
   static constructDialogue(
     customerId: string,
@@ -175,6 +177,79 @@ class DialogueService {
     }));
 
     return values;
+  };
+
+  static generateFakeData = async (dialogueId: string, template: WorkspaceTemplate) => {
+    const currentDate = new Date();
+    const nrDaysBack = Array.from(Array(30)).map((empty, index) => index + 1);
+    const datesBackInTime = nrDaysBack.map((amtDaysBack) => subDays(currentDate, amtDaysBack));
+
+    const dialogueWithNodes = await prisma.dialogue.findOne({
+      where: { id: dialogueId },
+      include: {
+        questions: true,
+        edges: {
+          include: {
+            conditions: true,
+            childNode: true,
+          },
+        },
+      },
+    });
+
+    const rootNode = dialogueWithNodes?.questions.find((node) => node.isRoot);
+    const edgesOfRootNode = dialogueWithNodes?.edges.filter((edge) => edge.parentNodeId === rootNode?.id);
+
+    // Stop if no rootnode
+    if (!rootNode) return;
+
+    // For every particular date, generate a fake score
+    await Promise.all(datesBackInTime.map(async (backDate) => {
+      const simulatedRootVote: number = getRandomInt(100);
+
+      const simulatedChoice = template.topics[Math.floor(Math.random() * template.topics.length)];
+      const simulatedChoiceEdge = edgesOfRootNode?.find((edge) => edge.conditions.every((condition) => {
+        if ((!condition.renderMin && !(condition.renderMin === 0)) || !condition.renderMax) return false;
+        const isValid = condition?.renderMin < simulatedRootVote && condition?.renderMax > simulatedRootVote;
+
+        return isValid;
+      }));
+
+      const simulatedChoiceNodeId = simulatedChoiceEdge?.childNode.id;
+
+      if (!simulatedChoiceNodeId) return;
+
+      await prisma.session.create({
+        data: {
+          nodeEntries: {
+            create: [{
+              depth: 0,
+              creationDate: backDate,
+              relatedNode: {
+                connect: { id: rootNode.id },
+              },
+              sliderNodeEntry: {
+                create: { value: simulatedRootVote },
+              },
+              inputSource: 'INIT_GENERATED',
+            },
+            {
+              depth: 1,
+              creationDate: backDate,
+              relatedNode: { connect: { id: simulatedChoiceNodeId } },
+              relatedEdge: { connect: { id: simulatedChoiceEdge?.id } },
+              choiceNodeEntry: {
+                create: { value: simulatedChoice },
+              },
+            },
+            ],
+          },
+          dialogue: {
+            connect: { id: dialogueId },
+          },
+        },
+      });
+    }));
   };
 
   static getStatistics = async (dialogueId: string, startDate?: Date | null, endDate?: Date | null): Promise<StatisticsProps> => {

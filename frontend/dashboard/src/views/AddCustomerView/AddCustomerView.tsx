@@ -9,13 +9,22 @@ import { useMutation } from '@apollo/react-hooks';
 import { useToast } from '@chakra-ui/core';
 import { yupResolver } from '@hookform/resolvers';
 import React from 'react';
+import gql from 'graphql-tag';
 
 import CustomerForm from 'components/CustomerForm';
-import parseOptionalBoolean from 'utils/parseOptionalBoolean';
+import intToBool from 'utils/intToBool';
 
+import { CreateWorkspaceInput } from 'types/globalTypes';
 import { useUser } from '../../providers/UserProvider';
-import createWorkspaceMutation from '../../mutations/createWorkspace';
 import getCustomersOfUser from '../../queries/getCustomersOfUser';
+
+const createWorkspaceMutation = gql`
+  mutation createWorkspace($input: CreateWorkspaceInput) {
+    createWorkspace(input: $input) {
+        name
+    }
+  }
+`;
 
 const schema = yup.object().shape({
   name: yup.string().required('Name is required'),
@@ -24,9 +33,10 @@ const schema = yup.object().shape({
   primaryColour: yup.string().required().matches(/^(#(\d|\D){6}$){1}/, {
     message: 'Provided colour is not a valid hexadecimal',
   }),
-  useSeed: yup.number(),
+  seed: yup.number(),
   willGenerateFakeData: yup.number(),
   useCustomUrl: yup.number(),
+  uploadLogo: yup.string().url(),
 }).required();
 
 type FormDataProps = yup.InferType<typeof schema>;
@@ -41,7 +51,7 @@ const AddCustomerView = () => {
     resolver: yupResolver(schema),
   });
 
-  const [createWorkspace, { loading, error: serverErrors }] = useMutation(createWorkspaceMutation, {
+  const [createWorkspace, { loading, error: serverErrors }] = useMutation<null, {input: CreateWorkspaceInput}>(createWorkspaceMutation, {
     onCompleted: () => {
       toast({
         title: 'Created!',
@@ -75,17 +85,16 @@ const AddCustomerView = () => {
   });
 
   const onSubmit = (formData: FormDataProps) => {
-    const optionInput = {
-      logo: parseOptionalBoolean(formData.useCustomUrl) ? formData.logo : formData.uploadLogo,
-      slug: formData.slug,
-      isSeed: parseOptionalBoolean(formData.seed),
-      primaryColour: formData.primaryColour,
-    };
-
     createWorkspace({
       variables: {
-        name: formData.name,
-        options: optionInput,
+        input: {
+          name: formData.name,
+          logo: intToBool(formData.useCustomUrl) ? formData.logo : formData.uploadLogo,
+          slug: formData.slug,
+          isSeed: intToBool(formData.seed),
+          willGenerateFakeData: intToBool(formData.willGenerateFakeData),
+          primaryColour: formData.primaryColour,
+        },
       },
     });
   };

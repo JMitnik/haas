@@ -98,16 +98,19 @@ const defaultWorkspaceTemplate: WorkspaceTemplate = {
   ],
   leafNodes: [
     {
-      title: 'We are happy about your positive feedback. If you wish to let us know anything else, let us know below.',
+      title:
+        'We are happy about your positive feedback. You matter to us! Leave your contact details below to receive our newsletter.',
       type: NodeType.TEXTBOX,
+      links: [],
     },
     {
-      title: 'Thank you for your elaborate feedback. Follow us on our social media.',
+      title: 'Thank you for your elaborate feedback. Kindly appreciated!',
       type: NodeType.LINK,
       links: defaultLinks,
     },
     {
-      title: 'Thank you for your feedback on our facilities. We hope to see you soon again!',
+      title:
+        'Thank you for your feedback on our facilities. We hope to see you soon again!',
       type: NodeType.LINK,
       links: defaultLinks,
     },

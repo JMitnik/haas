@@ -1,21 +1,23 @@
+import { Activity, Briefcase, Clipboard, Database, Link, Link2, Loader, Minus, TrendingUp, Upload } from 'react-feather';
 import {
   BooleanRadioInput, ButtonRadio, Div, Form, FormControl, FormLabel, FormSection, H3, Hr, Input, InputGrid,
   InputHelper,
   Muted,
 } from '@haas/ui';
-import { Briefcase, Link } from 'react-feather';
 import { Button, ButtonGroup, FormErrorMessage, RadioButtonGroup, useToast } from '@chakra-ui/core';
 import { Controller, UseFormMethods } from 'react-hook-form';
 import { useHistory } from 'react-router';
 import { useMutation } from '@apollo/react-hooks';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
+import intToBool from 'utils/intToBool';
 
 import ColorPickerInput from 'components/ColorPicker';
 
 import FileDropInput from 'components/FileDropInput';
 import ServerError from 'components/ServerError';
 import uploadSingleImage from '../../mutations/uploadSingleImage';
+import useAuth from 'hooks/useAuth';
 
 interface FormDataProps {
   name: string;
@@ -23,6 +25,7 @@ interface FormDataProps {
   logo?: string;
   primaryColour?: string;
   useCustomUrl?: number;
+  willGenerateFakeData?: number,
   uploadLogo?: string;
   seed?: number;
 }
@@ -87,8 +90,8 @@ const CustomerLogoFormFragment = ({ form }: { form: UseFormMethods<FormDataProps
               onChange={onChange}
               display="flex"
             >
-              <ButtonRadio value={1} text={t('existing_url')} description={t('existing_url_helper')} />
-              <ButtonRadio value={0} text={t('upload_file')} description={t('upload_file_helper')} />
+              <ButtonRadio icon={Link2} value={1} text={t('existing_url')} description={t('existing_url_helper')} />
+              <ButtonRadio icon={Upload} value={0} text={t('upload_file')} description={t('upload_file_helper')} />
             </RadioButtonGroup>
           )}
         />
@@ -143,6 +146,9 @@ interface CustomerFormProps {
 const CustomerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = false }: CustomerFormProps) => {
   const history = useHistory();
   const { t } = useTranslation();
+  const { canAccessAdmin } = useAuth();
+
+  const usesSeed = intToBool(form.watch('seed'));
 
   return (
     <Form onSubmit={form.handleSubmit(onFormSubmit)}>
@@ -212,7 +218,7 @@ const CustomerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = 
         </Div>
       </FormSection>
 
-      {!isInEdit && (
+      {!isInEdit && canAccessAdmin && (
         <>
           <Hr />
 
@@ -232,8 +238,8 @@ const CustomerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = 
                     name="seed"
                     render={({ onChange, onBlur, value }) => (
                       <BooleanRadioInput onBlur={onBlur} value={value} onChange={onChange}>
-                        <ButtonRadio value={1} text={(t('customer:custom_template'))} description={t('customer:custom_template_helper')} />
-                        <ButtonRadio value={0} text={(t('customer:no_custom_template'))} description={t('customer:no_custom_template_helper')} />
+                        <ButtonRadio icon={Clipboard} value={1} text={(t('customer:custom_template'))} description={t('customer:custom_template_helper')} />
+                        <ButtonRadio icon={Loader} value={0} text={(t('customer:no_custom_template'))} description={t('customer:no_custom_template_helper')} />
                       </BooleanRadioInput>
                     )}
                     control={form.control}
@@ -241,6 +247,35 @@ const CustomerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = 
                   />
 
                 </FormControl>
+
+                {usesSeed && (
+                  <FormControl>
+                    <FormLabel>{t('customer:fake_data')}</FormLabel>
+                    <InputHelper>{t('customer:fake_data_helper')}</InputHelper>
+                    <Controller
+                      name="willGenerateFakeData"
+                      render={({ onChange, onBlur, value }) => (
+                        <BooleanRadioInput onBlur={onBlur} value={value} onChange={onChange}>
+                          <ButtonRadio
+                            icon={Activity}
+                            value={1}
+                            text={(t('customer:use_fake_data'))}
+                            description={t('customer:fake_data_helper')}
+                          />
+                          <ButtonRadio
+                            icon={Minus}
+                            value={0}
+                            text={(t('customer:no_use_fake_data'))}
+                            description={t('customer:no_use_fake_data_helper')}
+                          />
+                        </BooleanRadioInput>
+                      )}
+                      control={form.control}
+                      defaultValue={1}
+                    />
+
+                  </FormControl>
+                )}
               </InputGrid>
             </Div>
           </FormSection>
