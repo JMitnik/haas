@@ -1,6 +1,10 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    data: {
+      en: 'Data',
+      de: 'Data',
+    },
     register: {
       en: 'Register',
       de: 'Registrieren',
@@ -659,6 +663,30 @@ const language = {
     },
   },
   dialogue: {
+    data_helper: {
+      en: 'Your data settings, such as data-sources, will be set here.',
+      de: 'Ihre Dateneinstellungen, wie z. B. Datenquellen, werden hier festgelegt',
+    },
+    hide_fake_data: {
+      en: 'Hide placeholder data',
+      de: 'Ausblenden Platzhalter-Daten',
+    },
+    hide_fake_data_helper: {
+      en: 'Decide whether to use placeholder data in your analytics',
+      de: 'Entscheiden Sie, ob Platzhalterdaten in Ihrer Analyse verwendet werden sollen',
+    },
+    do_hide_fake_data_helper: {
+      en: 'Don\'t include placeholder data in the analytics.',
+      de: 'Platzhalterdaten nicht in die Analyse einbeziehen.',
+    },
+    no_hide_fake_data: {
+      en: 'Show placeholder data.',
+      de: 'Platzhalterdaten anzeigen.',
+    },
+    no_hide_fake_data_helper: {
+      en: 'Show placeholder data in the analytics.',
+      de: 'Platzhalterdaten in der Analyse anzeigen',
+    },
     tag_helper: {
       en: 'Would you like to assign tags for your dialogue?',
       de: 'Möchtest du deinen Dialog mit einem "Tag" verbinden?',

@@ -306,6 +306,7 @@ export interface NexusGenRootTypes {
   DialogueStatistics: { // root type
     history?: NexusGenRootTypes['lineChartDataType'][] | null; // [lineChartDataType!]
     mostPopularPath?: NexusGenRootTypes['topPathType'] | null; // topPathType
+    nrInteractions: number; // Int!
     topNegativePath?: NexusGenRootTypes['topPathType'][] | null; // [topPathType!]
     topPositivePath?: NexusGenRootTypes['topPathType'][] | null; // [topPathType!]
   }
@@ -560,7 +561,6 @@ export interface NexusGenFieldTypes {
   }
   Dialogue: { // field return type
     averageScore: number; // Float!
-    countInteractions: number; // Int!
     creationDate: string | null; // String
     customer: NexusGenRootTypes['Customer'] | null; // Customer
     customerId: string; // String!
@@ -582,6 +582,7 @@ export interface NexusGenFieldTypes {
   DialogueStatistics: { // field return type
     history: NexusGenRootTypes['lineChartDataType'][] | null; // [lineChartDataType!]
     mostPopularPath: NexusGenRootTypes['topPathType'] | null; // topPathType
+    nrInteractions: number; // Int!
     topNegativePath: NexusGenRootTypes['topPathType'][] | null; // [topPathType!]
     topPositivePath: NexusGenRootTypes['topPathType'][] | null; // [topPathType!]
   }
@@ -882,9 +883,6 @@ export interface NexusGenArgTypes {
     averageScore: { // args
       input?: NexusGenInputs['DialogueFilterInputType'] | null; // DialogueFilterInputType
     }
-    countInteractions: { // args
-      input?: NexusGenInputs['DialogueFilterInputType'] | null; // DialogueFilterInputType
-    }
     leafs: { // args
       searchTerm?: string | null; // String
     }
@@ -967,6 +965,7 @@ export interface NexusGenArgTypes {
       customerSlug?: string | null; // String
       description?: string | null; // String
       dialogueSlug?: string | null; // String
+      isWithoutGenData?: boolean | null; // Boolean
       publicTitle?: string | null; // String
       tags?: NexusGenInputs['TagsInputObjectType'] | null; // TagsInputObjectType
       title?: string | null; // String

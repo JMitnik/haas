@@ -16,8 +16,9 @@ import ColorPickerInput from 'components/ColorPicker';
 
 import FileDropInput from 'components/FileDropInput';
 import ServerError from 'components/ServerError';
-import uploadSingleImage from '../../mutations/uploadSingleImage';
 import useAuth from 'hooks/useAuth';
+
+import uploadSingleImage from '../../mutations/uploadSingleImage';
 
 interface FormDataProps {
   name: string;

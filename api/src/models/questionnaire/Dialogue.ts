@@ -1,9 +1,10 @@
 
 import { PrismaClient } from '@prisma/client';
+import { UserInputError } from 'apollo-server-express';
 import { extendType, inputObjectType, objectType } from '@nexus/schema';
+import { subDays } from 'date-fns';
 
 // eslint-disable-next-line import/no-cycle
-import { UserInputError } from 'apollo-server-express';
 import { CustomerType } from '../customer/Customer';
 // eslint-disable-next-line import/no-cycle
 import { EdgeType } from '../edge/Edge';
@@ -20,7 +21,6 @@ import { PaginationWhereInput } from '../general/Pagination';
 // eslint-disable-next-line import/no-cycle
 import PaginationService from '../general/PaginationService';
 // eslint-disable-next-line import/no-cycle
-import { subDays } from 'date-fns';
 import SessionService from '../session/SessionService';
 import formatDate from '../../utils/formatDate';
 import isValidDate from '../../utils/isValidDate';
@@ -54,6 +54,8 @@ export const DialogueStatistics = objectType({
   name: 'DialogueStatistics',
 
   definition(t) {
+    t.int('nrInteractions');
+
     t.list.field('topPositivePath', {
       type: topPathType,
       nullable: true,
@@ -123,25 +125,6 @@ export const DialogueType = objectType({
       },
     });
 
-    t.field('countInteractions', {
-      type: 'Int',
-      description: 'Count number of interactions between start-date and end-date',
-      args: { input: DialogueFilterInputType },
-
-      async resolve(parent, args) {
-        const startDate = args.input?.startDate ? formatDate(args.input.startDate) : subDays(new Date(), 7);
-        const endDate = args.input?.endDate ? formatDate(args.input.endDate) : null;
-
-        const interactions = await DialogueService.countInteractions(
-          parent.id,
-          startDate,
-          endDate,
-        );
-
-        return interactions || 0;
-      },
-    });
-
     t.field('statistics', {
       type: DialogueStatistics,
       args: { input: DialogueFilterInputType },
@@ -159,6 +142,7 @@ export const DialogueType = objectType({
 
         if (!statistics) {
           return {
+            nrInteractions: 0,
             history: [],
             topNegativePath: [],
             topPositivePath: [],
@@ -412,6 +396,7 @@ export const DialogueMutations = extendType({
         title: 'String',
         description: 'String',
         publicTitle: 'String',
+        isWithoutGenData: 'Boolean',
         tags: TagsInputType,
       },
       resolve(parent, args) {

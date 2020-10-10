@@ -1,5 +1,5 @@
 import { subDays } from 'date-fns';
-import _ from 'lodash';
+import _, { cloneDeep } from 'lodash';
 import cuid from 'cuid';
 
 import { ApolloError, UserInputError } from 'apollo-server-express';
@@ -95,8 +95,7 @@ class DialogueService {
   };
 
   static editDialogue = async (args: any) => {
-    console.log(args);
-    const { customerSlug, dialogueSlug, title, description, publicTitle, tags } = args;
+    const { customerSlug, dialogueSlug, title, description, publicTitle, tags, isWithoutGenData } = args;
 
     const customer = await prisma.customer.findOne({
       where: {
@@ -115,7 +114,7 @@ class DialogueService {
     });
     const dbDialogue = customer?.dialogues[0];
 
-    let updateDialogueArgs: DialogueUpdateInput = { title, description, publicTitle };
+    let updateDialogueArgs: DialogueUpdateInput = { title, description, publicTitle, isWithoutGenData };
     if (dbDialogue?.tags) {
       updateDialogueArgs = DialogueService.updateTags(dbDialogue.tags, tags.entries, updateDialogueArgs);
     }
@@ -259,14 +258,14 @@ class DialogueService {
 
     if (!sessions) { throw new Error('No sessions present'); }
 
-    const scoreEntries = SessionService.getScoringEntriesFromSessions(sessions) || [];
-
+    const scoreEntries = SessionService.getScoringEntriesFromSessions(sessions).filter(isPresent) || [];
     // Then dresses it up as X/Y data for the lineChart
     const history: HistoryDataProps[] = scoreEntries?.map((entry) => ({
       x: entry?.creationDate.toUTCString() || null,
       y: entry?.sliderNodeEntry?.value || null,
       entryId: entry?.id || null,
-    })) || [];
+    })).filter(isPresent) || [];
+    const historyCloned = [...history];
 
     const nodeEntryTextValues = SessionService.getTextEntriesFromSessions(sessions).filter(isPresent);
 
@@ -284,7 +283,9 @@ class DialogueService {
       ...topPositivePath.map((pathItem) => ({ ...pathItem, basicSentiment: 'positive' })),
     ], ((item) => item.quantity || null)) || null;
 
-    return { history, topNegativePath, topPositivePath, mostPopularPath };
+    return {
+      history, topNegativePath, topPositivePath, mostPopularPath, nrInteractions: historyCloned.length || 0,
+    };
   };
 
   static deleteDialogue = async (dialogueId: string) => {
@@ -816,23 +817,6 @@ class DialogueService {
     const scores = _.mean((scoringEntries).map((entry) => entry?.sliderNodeEntry?.value)) || 0;
 
     return scores;
-  };
-
-  static countInteractions = async (dialogueId: string, startDate?: Date | null, endDate?: Date | null) => {
-    const dialogue = await prisma.dialogue.findOne({
-      where: { id: dialogueId },
-      include: {
-        sessions: {
-          where: {
-            AND: [
-              ...filterDate(startDate, endDate),
-            ],
-          },
-        },
-      },
-    });
-
-    return dialogue?.sessions.length;
   };
 
   static getDialogueInteractionFeedItems = async (

@@ -1,10 +1,10 @@
 import * as yup from 'yup';
+import { Activity, Minus, Plus, Type } from 'react-feather';
 import { ApolloError, gql } from 'apollo-boost';
-import { Button, ButtonGroup, FormErrorMessage, Stack } from '@chakra-ui/core';
-import { Controller, useForm } from 'react-hook-form';
-import { Div, Flex, Form, FormContainer, FormControl, FormLabel,
+import { BooleanRadioInput, ButtonRadio, Div, Flex, Form, FormContainer, FormControl, FormLabel,
   FormSection, H3, Hr, Input, InputGrid, InputHelper, Muted, PageTitle, Textarea } from '@haas/ui';
-import { Minus, Plus, Type } from 'react-feather';
+import { Button, ButtonGroup, FormErrorMessage, RadioButtonGroup, Stack } from '@chakra-ui/core';
+import { Controller, useForm } from 'react-hook-form';
 import { motion } from 'framer-motion';
 import { useHistory, useParams } from 'react-router';
 import { useMutation, useQuery } from '@apollo/react-hooks';
@@ -13,9 +13,11 @@ import { yupResolver } from '@hookform/resolvers';
 import React, { useState } from 'react';
 import Select from 'react-select';
 import ServerError from 'components/ServerError';
+import booleanToNumber from 'utils/booleanToNumber';
 import editDialogueMutation from 'mutations/editDialogue';
 import getQuestionnairesCustomerQuery from 'queries/getDialoguesOfCustomer';
 import getTagsQuery from 'queries/getTags';
+import intToBool from 'utils/intToBool';
 
 interface EditDialogueFormProps {
   dialogue: any;
@@ -50,6 +52,7 @@ interface FormDataProps {
   description: string;
   slug: string;
   tags: Array<{label: string, value: string}>;
+  isWithoutGenData: number;
 }
 
 const schema = yup.object().shape({
@@ -57,13 +60,16 @@ const schema = yup.object().shape({
   slug: yup.string().required('Slug is required'),
   publicTitle: yup.string().notRequired(),
   description: yup.string().required(),
-  tags: yup.array().of(yup.object().shape(
-    { label: yup.string().required(), value: yup.string().required() },
-  )).notRequired(),
+  tags: yup.array().of(yup.object().shape({
+    label: yup.string().required(),
+    value: yup.string().required(),
+  })).notRequired(),
+  // /isWithoutGenData: yup.number().notRequired(),
+  isWithoutGenData: yup.boolean(),
 });
 
 const EditDialogueView = () => {
-  const { customerSlug, dialogueSlug } = useParams();
+  const { customerSlug, dialogueSlug } = useParams<{ customerSlug: string, dialogueSlug: string }>();
   const editDialogueData = useQuery(getEditDialogueQuery, {
     variables: {
       customerSlug,
@@ -96,7 +102,17 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFo
   const form = useForm<FormDataProps>({
     resolver: yupResolver(schema),
     mode: 'onChange',
+    defaultValues: {
+      title: dialogue.title,
+      description: dialogue.description,
+      isWithoutGenData: booleanToNumber(dialogue.isWithoutGenData || false),
+      // isWithoutGenData: 1,
+      publicTitle: dialogue.publicTitle,
+      slug: dialogue.slug,
+    },
   });
+
+  console.log(form.errors);
   const { customerSlug, dialogueSlug } = useParams();
 
   const [editDialogue, { error: serverError, loading: isLoading }] = useMutation(editDialogueMutation, {
@@ -127,6 +143,7 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFo
         publicTitle: formData.publicTitle,
         description: formData.description,
         tags: tagEntries,
+        isWithoutGenData: intToBool(formData.isWithoutGenData),
       },
     });
   };
@@ -164,7 +181,6 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFo
                     <Input
                       placeholder={t('dialogue:title_placeholder')}
                       leftEl={<Type />}
-                      defaultValue={dialogue?.title}
                       name="title"
                       ref={form.register({ required: true })}
                     />
@@ -179,7 +195,6 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFo
                     <Input
                       placeholder={t('dialogue:public_title_placeholder')}
                       leftEl={<Type />}
-                      defaultValue={dialogue?.publicTitle}
                       name="publicTitle"
                       ref={form.register({ required: false })}
                     />
@@ -193,7 +208,6 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFo
                     </InputHelper>
                     <Textarea
                       placeholder={t('dialogue:description_placeholder')}
-                      defaultValue={dialogue?.description}
                       name="description"
                       ref={form.register({ required: true })}
                     />
@@ -206,7 +220,6 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFo
                     <Input
                       placeholder="peaches-or-apples"
                       leftAddOn={`https://client.haas.live/${customerSlug}`}
-                      defaultValue={dialogue?.slug}
                       name="slug"
                       ref={form.register({ required: true })}
                     />
@@ -271,10 +284,49 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFo
               </Div>
             </FormSection>
 
+            <FormSection id="data">
+              <Div>
+                <H3 color="default.text" fontWeight={500} pb={2}>{t('data')}</H3>
+                <Muted color="gray.600">
+                  {t('dialogue:data_helper')}
+                </Muted>
+              </Div>
+              <Div>
+                <InputGrid gridTemplateColumns="1fr">
+                  <FormControl>
+                    <FormLabel>{t('dialogue:hide_fake_data')}</FormLabel>
+                    <InputHelper>{t('dialogue:hide_fake_data_helper')}</InputHelper>
+                    <Controller
+                      name="isWithoutGenData"
+                      control={form.control}
+                      render={({ onChange, onBlur, value }) => (
+                        <RadioButtonGroup onBlur={onBlur} value={value} onChange={onChange} display="flex">
+                          <ButtonRadio
+                            icon={Minus}
+                            value={1}
+                            mr={2}
+                            text={(t('dialogue:hide_fake_data'))}
+                            description={t('dialogue:do_hide_fake_data_helper')}
+                          />
+                          <ButtonRadio
+                            icon={Activity}
+                            value={0}
+                            text={(t('dialogue:no_hide_fake_data'))}
+                            description={t('dialogue:no_hide_fake_data_helper')}
+                          />
+                        </RadioButtonGroup>
+                      )}
+                    />
+
+                  </FormControl>
+                </InputGrid>
+              </Div>
+            </FormSection>
+
             <ButtonGroup>
               <Button
                 isLoading={isLoading}
-                isDisabled={!form.formState.isValid}
+                // isDisabled={!form.for  mState.isValid}
                 variantColor="teal"
                 type="submit"
               >

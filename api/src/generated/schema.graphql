@@ -138,9 +138,6 @@ type DeleteUserOutput {
 
 type Dialogue {
   averageScore(input: DialogueFilterInputType): Float!
-
-  """Count number of interactions between start-date and end-date"""
-  countInteractions(input: DialogueFilterInputType): Int!
   creationDate: String
   customer: Customer
   customerId: String!
@@ -169,6 +166,7 @@ input DialogueFilterInputType {
 type DialogueStatistics {
   history: [lineChartDataType!]
   mostPopularPath: topPathType
+  nrInteractions: Int!
   topNegativePath: [topPathType!]
   topPositivePath: [topPathType!]
 }
@@ -308,7 +306,7 @@ type Mutation {
   deleteTag(tagId: String): Tag!
   deleteTrigger(id: String): TriggerType
   deleteUser(input: DeleteUserInput): DeleteUserOutput!
-  editDialogue(customerSlug: String, description: String, dialogueSlug: String, publicTitle: String, tags: TagsInputObjectType, title: String): Dialogue!
+  editDialogue(customerSlug: String, description: String, dialogueSlug: String, isWithoutGenData: Boolean, publicTitle: String, tags: TagsInputObjectType, title: String): Dialogue!
   editTrigger(questionId: String, recipients: RecipientsInputType, trigger: TriggerInputType, triggerId: String): TriggerType!
   editUser(input: EditUserInput, userId: String): UserType!
   editWorkspace(input: EditWorkspaceInput): Customer!
