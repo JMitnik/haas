@@ -55,6 +55,16 @@ input CreateQuestionNodeInputType {
   type: String
 }
 
+"""Creates a workspace"""
+input CreateWorkspaceInput {
+  isSeed: Boolean = false
+  logo: String
+  name: String!
+  primaryColour: String!
+  slug: String!
+  willGenerateFakeData: Boolean = false
+}
+
 input CTALinkInputObjectType {
   backgroundColor: String
   iconUrl: String
@@ -85,20 +95,6 @@ type Customer {
   userCustomer(userId: String): UserCustomer
   users: [UserType!]
   usersConnection(customerSlug: String, filter: PaginationWhereInput): UserConnection
-}
-
-input CustomerCreateOptions {
-  isSeed: Boolean = false
-  logo: String
-  primaryColour: String!
-  slug: String!
-}
-
-input CustomerEditOptions {
-  logo: String
-  name: String!
-  primaryColour: String!
-  slug: String!
 }
 
 type CustomerSettings {
@@ -219,6 +215,15 @@ input EditUserInput {
   roleId: String
 }
 
+"""Edit a workspace"""
+input EditWorkspaceInput {
+  id: ID!
+  logo: String
+  name: String!
+  primaryColour: String!
+  slug: String!
+}
+
 type FontSettings {
   id: ID!
 }
@@ -286,7 +291,6 @@ type Mutation {
 
   """Create Call to Actions"""
   createCTA(input: CreateCTAInputType): QuestionNode!
-  createCustomer(name: String, options: CustomerCreateOptions): Customer!
   createDialogue(input: CreateDialogueInputType): Dialogue!
   createPermission(data: PermissionInput): PermssionType
   createQuestion(input: CreateQuestionNodeInputType): QuestionNode
@@ -295,6 +299,7 @@ type Mutation {
   createTag(customerSlug: String, name: String, type: TagTypeEnum): Tag!
   createTrigger(customerSlug: String, questionId: String, recipients: RecipientsInputType, trigger: TriggerInputType): TriggerType!
   createUser(customerSlug: String, input: UserInput): UserType!
+  createWorkspace(input: CreateWorkspaceInput): Customer!
   debugMutation: String
   deleteCTA(input: DeleteNodeInputType): QuestionNode!
   deleteCustomer(where: CustomerWhereUniqueInput): Customer
@@ -303,10 +308,10 @@ type Mutation {
   deleteTag(tagId: String): Tag!
   deleteTrigger(id: String): TriggerType
   deleteUser(input: DeleteUserInput): DeleteUserOutput!
-  editCustomer(id: String, options: CustomerEditOptions): Customer!
   editDialogue(customerSlug: String, description: String, dialogueSlug: String, publicTitle: String, tags: TagsInputObjectType, title: String): Dialogue!
   editTrigger(questionId: String, recipients: RecipientsInputType, trigger: TriggerInputType, triggerId: String): TriggerType!
   editUser(input: EditUserInput, userId: String): UserType!
+  editWorkspace(input: EditWorkspaceInput): Customer!
 
   """Invite a user to a particular customer domain, given an email and role"""
   inviteUser(input: InviteUserInput): InviteUserOutput!

@@ -1,5 +1,4 @@
 import { Dialogue, Link, NodeType, QuestionCondition, QuestionNode, QuestionNodeCreateInput, QuestionNodeUpdateInput, Share } from '@prisma/client';
-import { choiceType, sliderType } from '../../data/seeds/default-data';
 import EdgeService from '../edge/EdgeService';
 import prisma from '../../config/prisma';
 
@@ -587,17 +586,17 @@ class NodeService {
   };
 
   static createTemplateNodes = async (
-    questionnaireId: string,
-    customerName: string,
+    dialogueId: string,
+    workspaceName: string,
     leafs: QuestionNode[],
   ) => {
     // Root question (How do you feel about?)
-    const rootQuestion = await NodeService.createQuestionNode(`How do you feel about ${customerName}?`, questionnaireId, sliderType, standardOptions, true);
+    const rootQuestion = await NodeService.createQuestionNode(`How do you feel about ${workspaceName}?`, dialogueId, NodeType.SLIDER, standardOptions, true);
 
     // Positive Sub child 1 (What did you like?)
     const instagramNodeId = NodeService.getCorrectLeaf(leafs, 'Follow us on Instagram and stay');
     const rootToWhatDidYou = await NodeService.createQuestionNode(
-      'What did you like?', questionnaireId, choiceType, standardOptions, false,
+      'What did you like?', dialogueId, NodeType.CHOICE, standardOptions, false,
       instagramNodeId,
     );
 
@@ -605,14 +604,14 @@ class NodeService {
     const comeAndJoin1stAprilId = NodeService.getCorrectLeaf(leafs,
       'Come and join us on 1st April for our great event');
     const whatDidYouToFacilities = await NodeService.createQuestionNode(
-      'What exactly did you like about the facilities?', questionnaireId,
-      choiceType, facilityOptions, false, comeAndJoin1stAprilId,
+      'What exactly did you like about the facilities?', dialogueId,
+      NodeType.CHOICE, facilityOptions, false, comeAndJoin1stAprilId,
     );
 
     // Positive Sub sub child 2 (Website)
     const whatDidYouToWebsite = await NodeService.createQuestionNode(
-      'What exactly did you like about the website?', questionnaireId,
-      choiceType, websiteOptions, false, instagramNodeId,
+      'What exactly did you like about the website?', dialogueId,
+      NodeType.CHOICE, websiteOptions, false, instagramNodeId,
     );
 
     // Positive Sub sub child 3 (Product/Services)
@@ -623,8 +622,8 @@ class NodeService {
 
     const whatDidYouToProduct = await NodeService.createQuestionNode(
       'What exactly did you like about the product / services?',
-      questionnaireId,
-      choiceType,
+      dialogueId,
+      NodeType.CHOICE,
       productServicesOptions,
       false,
       weThinkYouMightLikeThis,
@@ -634,61 +633,61 @@ class NodeService {
     const yourEmailBelowForNewsletter = NodeService.getCorrectLeaf(leafs,
       'your email below to receive our newsletter');
     const whatDidYouToCustomerSupport = await NodeService.createQuestionNode(
-      'What exactly did you like about the customer support?', questionnaireId,
-      choiceType, customerSupportOptions, false, yourEmailBelowForNewsletter,
+      'What exactly did you like about the customer support?', dialogueId,
+      NodeType.CHOICE, customerSupportOptions, false, yourEmailBelowForNewsletter,
     );
 
     // Neutral Sub child 2
     const leaveYourEmailBelowToReceive = NodeService.getCorrectLeaf(leafs,
       'Leave your email below to receive our');
     const rootToWhatWouldYouLikeToTalkAbout = await NodeService.createQuestionNode(
-      'What would you like to talk about?', questionnaireId, choiceType,
+      'What would you like to talk about?', dialogueId, NodeType.CHOICE,
       standardOptions, false, leaveYourEmailBelowToReceive,
     );
 
     // Neutral Sub sub child 1 (Facilities)
     const whatWouldYouLikeToTalkAboutToFacilities = await NodeService.createQuestionNode('Please specify.',
-      questionnaireId, choiceType, facilityOptions);
+      dialogueId, NodeType.CHOICE, facilityOptions);
 
     // Neutral Sub sub child 2 (Website)
     const whatWouldYouLikeToTalkAboutToWebsite = await NodeService.createQuestionNode(
-      'Please specify.', questionnaireId, choiceType, websiteOptions,
+      'Please specify.', dialogueId, NodeType.CHOICE, websiteOptions,
     );
 
     // Neutral Sub sub child 3 (Product/Services)
     const whatWouldYouLikeToTalkAboutToProduct = await NodeService.createQuestionNode(
-      'Please specify.', questionnaireId, choiceType, productServicesOptions,
+      'Please specify.', dialogueId, NodeType.CHOICE, productServicesOptions,
     );
 
     // Neutral Sub sub child 4 (Customer Support)
     const whatWouldYouLikeToTalkAboutToCustomerSupport = await NodeService.createQuestionNode(
-      'Please specify.', questionnaireId, choiceType, customerSupportOptions,
+      'Please specify.', dialogueId, NodeType.CHOICE, customerSupportOptions,
     );
 
     // Negative Sub child 3
     const rootToWeAreSorryToHearThat = await NodeService.createQuestionNode(
-      'We are sorry to hear that! Where can we improve?', questionnaireId,
-      choiceType, standardOptions,
+      'We are sorry to hear that! Where can we improve?', dialogueId,
+      NodeType.CHOICE, standardOptions,
     );
 
     // Negative Sub sub child 1 (Facilities)
     const ourTeamIsOnIt = NodeService.getCorrectLeaf(leafs, 'Our team is on it');
     const weAreSorryToHearThatToFacilities = await NodeService.createQuestionNode(
-      'Please elaborate.', questionnaireId, choiceType, facilityOptions, false, ourTeamIsOnIt,
+      'Please elaborate.', dialogueId, NodeType.CHOICE, facilityOptions, false, ourTeamIsOnIt,
     );
 
     // Negative Sub sub child 2 (Website)
     const pleaseClickWhatsappLink = NodeService.getCorrectLeaf(leafs,
       'Please click on the Whatsapp link below so our service');
     const weAreSorryToHearThatToWebsite = await NodeService.createQuestionNode(
-      'Please elaborate.', questionnaireId, choiceType, websiteOptions,
+      'Please elaborate.', dialogueId, NodeType.CHOICE, websiteOptions,
       false, pleaseClickWhatsappLink,
     );
 
     // Negative Sub sub child 3 (Product/Services)
     const clickBelowForRefund = NodeService.getCorrectLeaf(leafs, 'Click below for your refund');
     const weAreSorryToHearThatToProduct = await NodeService.createQuestionNode(
-      'Please elaborate.', questionnaireId, choiceType, productServicesOptions,
+      'Please elaborate.', dialogueId, NodeType.CHOICE, productServicesOptions,
       false, clickBelowForRefund,
     );
 
@@ -696,7 +695,7 @@ class NodeService {
     const ourCustomerExperienceSupervisor = NodeService.getCorrectLeaf(leafs,
       'Our customer experience supervisor is');
     const weAreSorryToHearThatToCustomerSupport = await NodeService.createQuestionNode(
-      'Please elaborate', questionnaireId, choiceType, customerSupportOptions,
+      'Please elaborate', dialogueId, NodeType.CHOICE, customerSupportOptions,
       false, ourCustomerExperienceSupervisor,
     );
 

@@ -13,19 +13,9 @@ import React from 'react';
 import CustomerForm from 'components/CustomerForm';
 import parseOptionalBoolean from 'utils/parseOptionalBoolean';
 
-import { createNewCustomer } from '../../mutations/createNewCustomer';
 import { useUser } from '../../providers/UserProvider';
+import createWorkspaceMutation from '../../mutations/createWorkspace';
 import getCustomersOfUser from '../../queries/getCustomersOfUser';
-
-interface FormDataProps {
-  name: string;
-  slug: string;
-  logo?: string;
-  primaryColour?: string;
-  useCustomUrl?: number;
-  uploadLogo?: string;
-  seed?: number;
-}
 
 const schema = yup.object().shape({
   name: yup.string().required('Name is required'),
@@ -34,7 +24,12 @@ const schema = yup.object().shape({
   primaryColour: yup.string().required().matches(/^(#(\d|\D){6}$){1}/, {
     message: 'Provided colour is not a valid hexadecimal',
   }),
-});
+  useSeed: yup.number(),
+  willGenerateFakeData: yup.number(),
+  useCustomUrl: yup.number(),
+}).required();
+
+type FormDataProps = yup.InferType<typeof schema>;
 
 const AddCustomerView = () => {
   const history = useHistory();
@@ -46,7 +41,7 @@ const AddCustomerView = () => {
     resolver: yupResolver(schema),
   });
 
-  const [addCustomer, { loading, error: serverErrors }] = useMutation(createNewCustomer, {
+  const [createWorkspace, { loading, error: serverErrors }] = useMutation(createWorkspaceMutation, {
     onCompleted: () => {
       toast({
         title: 'Created!',
@@ -62,7 +57,7 @@ const AddCustomerView = () => {
         history.push('/');
       }, 500);
     },
-    onError: (error) => {
+    onError: () => {
       toast({
         title: 'Unexpected error!',
         description: 'See the form for more information.',
@@ -87,7 +82,7 @@ const AddCustomerView = () => {
       primaryColour: formData.primaryColour,
     };
 
-    addCustomer({
+    createWorkspace({
       variables: {
         name: formData.name,
         options: optionInput,
@@ -97,13 +92,15 @@ const AddCustomerView = () => {
 
   return (
     <Container>
-      {/* <Div>
-        <H2 color="default.darkest" fontWeight={500} py={2}> Customer </H2>
-        <Muted pb={4}>Create a new customer</Muted>
-      </Div> */}
       <motion.div initial={{ opacity: 0, y: 100 }} animate={{ opacity: 1, y: 0 }}>
         <FormContainer>
-          <CustomerForm isInEdit={false} form={form} isLoading={loading} onFormSubmit={onSubmit} serverErrors={serverErrors} />
+          <CustomerForm
+            isInEdit={false}
+            form={form}
+            isLoading={loading}
+            onFormSubmit={onSubmit}
+            serverErrors={serverErrors}
+          />
         </FormContainer>
       </motion.div>
     </Container>

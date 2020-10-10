@@ -220,6 +220,10 @@ model Session {
 }
 
 // Node-entry types
+enum InputSource {
+  CLIENT
+  INIT_GENERATED
+}
 
 model NodeEntry {
   id            String        @default(cuid()) @id
@@ -231,6 +235,7 @@ model NodeEntry {
   session       Session?      @relation(fields: [sessionId], references: [id])
   relatedNode   QuestionNode? @relation(fields: [relatedNodeId], references: [id])
   relatedEdge   Edge?         @relation(fields: [relatedEdgeId], references: [id])
+  inputSource   InputSource   @default(value: CLIENT)
 
   // Entry types
   sliderNodeEntry       SliderNodeEntry?

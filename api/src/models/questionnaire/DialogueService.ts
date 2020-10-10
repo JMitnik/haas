@@ -4,13 +4,13 @@ import cuid from 'cuid';
 
 import { ApolloError, UserInputError } from 'apollo-server-express';
 import { Dialogue, DialogueCreateInput, DialogueUpdateInput,
+  NodeType,
   QuestionOptionCreateManyWithoutQuestionNodeInput, Tag, TagWhereUniqueInput } from '@prisma/client';
 import { isPresent } from 'ts-is-present';
-import { leafNodes, sliderType } from '../../data/seeds/default-data';
 import NodeService from '../question/NodeService';
 import filterDate from '../../utils/filterDate';
 // eslint-disable-next-line import/no-cycle
-import { NexusGenFieldTypes, NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
+import { NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
 // eslint-disable-next-line import/no-cycle
 import { HistoryDataProps, HistoryDataWithEntry, IdMapProps,
   PathFrequency, QuestionProps, StatisticsProps } from './DialogueTypes';
@@ -20,6 +20,7 @@ import NodeEntryService, { NodeEntryWithTypes } from '../node-entry/NodeEntrySer
 import { Nullable, PaginationProps } from '../../types/generic';
 import SessionService from '../session/SessionService';
 import prisma from '../../config/prisma';
+import defaultWorkspaceTemplate from '../templates/defaultWorkspaceTemplate';
 
 class DialogueService {
   static constructDialogue(
@@ -645,14 +646,15 @@ class DialogueService {
         questions: {
           create: {
             title: `What do you think about ${customer?.name} ?`,
-            type: sliderType,
+            type: NodeType.SLIDER,
             isRoot: true,
           },
         },
       },
     });
 
-    await NodeService.createTemplateLeafNodes(leafNodes, dialogue.id);
+    // TODO: Make this dependent on input "template"
+    await NodeService.createTemplateLeafNodes(defaultWorkspaceTemplate.leafNodes, dialogue.id);
 
     return dialogue;
   };
@@ -671,9 +673,10 @@ class DialogueService {
 
     if (!dialogue) throw new Error('Dialogue not seeded');
 
-    const leafs = await NodeService.createTemplateLeafNodes(leafNodes, dialogue.id);
-
+    // TODO: Make this dependent on input "template"
+    const leafs = await NodeService.createTemplateLeafNodes(defaultWorkspaceTemplate.leafNodes, dialogue.id);
     await NodeService.createTemplateNodes(dialogue.id, customerName, leafs);
+
     return dialogue;
   };
 

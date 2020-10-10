@@ -4,8 +4,8 @@ import * as NodeEntryAPI from '../models/node-entry/NodeEntry';
 import * as PaginationAPI from '../models/general/Pagination';
 import * as QuestionNodeAPI from '../models/question/QuestionNode';
 import * as UserAPI from '../models/users/User';
+import * as WorkspaceAPI from '../models/customer/Customer';
 import config from './config';
-import customerNexus from '../models/customer/Customer';
 import customerSettingsNexus from '../models/settings/CustomerSettings';
 import dialogueNexus from '../models/questionnaire/Dialogue';
 import edgeNexus from '../models/edge/Edge';
@@ -22,7 +22,7 @@ const nexus = [
   ...triggerNexus,
   ...permissionNexus,
   ...roleNexus,
-  ...customerNexus,
+  ...Array(WorkspaceAPI),
   ...Array(UserAPI),
   ...customerSettingsNexus,
   ...dialogueNexus,
