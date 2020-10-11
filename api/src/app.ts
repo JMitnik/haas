@@ -54,7 +54,7 @@ const main = async () => {
     });
   } else {
     app.listen(config.port);
-    console.log('🏁\Listening on standard server!');
+    console.log(`Listening on standard server, using port ${config.port}!`);
   }
   console.log('🏁\tStarted the server!');
 };

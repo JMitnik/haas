@@ -32,7 +32,8 @@ COPY ./src/ ./src/
 # Build the actual app now (instead of ts-node)
 RUN npx tsc -p ./tsconfig.json --outDir dist
 
-RUN echo $(ls /app/dist/generated)
+# Put the schema.graphql in the dist as well
+COPY ./src/generated/schema.graphql ./dist/generated/schema.graphql
 
 # Step 3: Prep for production
 FROM base
@@ -47,6 +48,7 @@ COPY --from=prodBuilder /app/node_modules/.prisma/client ./node_modules/.prisma/
 COPY --from=prodBuilder /app/dist ./dist
 
 EXPOSE ${PORT}
+EXPOSE 4000
 
 ENV NODE_ENV=production
 

@@ -4,7 +4,7 @@ import path from 'path';
 import nexus from './nexus';
 
 const schema = makeSchema({
-  shouldGenerateArtifacts: true,
+  shouldGenerateArtifacts: !(process.env.NODE_ENV === 'production'),
   types: [
     ...nexus,
   ],
