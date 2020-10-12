@@ -27,7 +27,7 @@ const ShareNode = ({ node }: SocialShareNodeProps) => {
   const { share } = node;
   const handleCopy = async (): Promise<void> => {
     if (navi?.share) {
-      // Web Share API is supported
+      // If Web Share API is supported
       navi.share({
         text: `${share?.title} , with <3 from Haas`,
         url: formatUrl(`${share?.url}`),
