@@ -27,6 +27,7 @@ const ShareNode = ({ node }: SocialShareNodeProps) => {
   const { share } = node;
   const handleCopy = async (): Promise<void> => {
     if (navi?.share) {
+      console.log(navi.share);
       // Web Share API is supported
       navi.share({
         text: `${share?.title}`,
