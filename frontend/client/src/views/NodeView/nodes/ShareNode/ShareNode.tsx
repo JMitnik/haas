@@ -29,9 +29,11 @@ const ShareNode = ({ node }: SocialShareNodeProps) => {
     if (navi?.share) {
       // Web Share API is supported
       navi.share({
-        text: `${share?.title}`,
+        text: `${share?.title} , with <3 from Haas`,
         url: formatUrl(`${share?.url}`),
-      });
+      })
+        .then(() => alert('Done'))
+        .catch(() => alert('err'));
     } else {
       const copiedText = `${share?.title} \n
       formatUrl(${share?.url})`;
