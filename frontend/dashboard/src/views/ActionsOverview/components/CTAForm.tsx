@@ -358,7 +358,6 @@ const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTACha
                     control={form.control}
                     as={<Select />}
                     options={CTA_TYPES}
-                    // defaultValue={activeType}
                   />
                   <FormErrorMessage>{form.errors.ctaType?.value?.message}</FormErrorMessage>
                 </FormControl>

@@ -25,19 +25,20 @@ const ShareNode = ({ node }: SocialShareNodeProps) => {
   const navi: any = window.navigator;
 
   const { share } = node;
-  const handleCopy = async (): Promise<void> => {
+  const handleCopy = async (): Promise<any> => {
     if (navi?.share) {
-      console.log(navi.share);
-      // Web Share API is supported
-      navi.share({
-        text: `${share?.title}`,
-        url: formatUrl(`${share?.url}`),
-      });
+      // If Web Share API is supported
+      await navi.share({
+        text: `${share?.title} \n ${formatUrl(share?.url || '')}`,
+      })
+        .then(() => alert('Done'))
+        .catch((err: any) => alert(err));
     } else {
       const copiedText = `${share?.title} \n
-      ${formatUrl(share?.url || '')}`;
+        ${formatUrl(share?.url || '')}`;
       copy(copiedText);
     }
+    return '';
   };
 
   return (
