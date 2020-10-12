@@ -1,6 +1,10 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    text: {
+      en: 'Text',
+      de: 'Text',
+    },
     register: {
       en: 'Register',
       de: 'Registrieren',
@@ -929,6 +933,10 @@ const language = {
     },
   },
   cta: {
+    shared_item_text_helper: {
+      en: 'What text should be shared the link?',
+      de: 'Was Text soll den Link geteilt werden',
+    },
     add_complete_title: {
       en: 'Added!',
       de: 'Hinzugefügt!',
@@ -950,7 +958,7 @@ const language = {
       de: 'Informationen zu Ihrem CTA',
     },
     title_helper: {
-      en: 'What is the main text of the CTA?',
+      en: 'What is the header text of the CTA?',
       de: 'Was ist der Haupttext des CTA?',
     },
     shared_item_title_helper: {

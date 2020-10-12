@@ -21,15 +21,14 @@ const ShareNode = ({ node }: SocialShareNodeProps) => {
   const { share } = node;
   const handleCopy = () => {
     if (navi?.share) {
+      console.log(share);
       // Web Share API is supported
       navi.share({
-        title: `${share?.title}`,
+        text: `${share?.title}`,
         url: `${share?.url}`,
-        text: 'I would like to share this with you:',
       });
     } else {
       const copiedText = `${share?.title}
-      I would like to share this with you:
       ${share?.url}`;
       return copy(copiedText);
     }
