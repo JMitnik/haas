@@ -29,7 +29,7 @@ const ShareNode = ({ node }: SocialShareNodeProps) => {
     if (navi?.share) {
       // If Web Share API is supported
       await navi.share({
-        text: `${share?.title} , with <3 from Haas`,
+        title: `${share?.title} , with <3 from Haas`,
         url: formatUrl(`${share?.url}` || ''),
       })
         .then(() => alert('Done'))
