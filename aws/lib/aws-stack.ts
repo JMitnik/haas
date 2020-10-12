@@ -4,6 +4,10 @@ import * as ecr from '@aws-cdk/aws-ecr';
 import * as ecs from '@aws-cdk/aws-ecs';
 import * as ecs_patterns from '@aws-cdk/aws-ecs-patterns';
 import * as rds from '@aws-cdk/aws-rds';
+import * as secretsmanager from '@aws-cdk/aws-secretsmanager';
+import * as ssm from '@aws-cdk/aws-ssm';
+import { StorageType } from '@aws-cdk/aws-rds';
+import { SubnetType } from '@aws-cdk/aws-ec2';
 
 export class AwsStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
@@ -16,6 +20,17 @@ export class AwsStack extends cdk.Stack {
 
     const cluster = new ecs.Cluster(this, 'HAAS_API_CLUSTER', {
       vpc,
+    });
+
+    const db = new rds.DatabaseInstance(this, 'HAAS_DB', {
+      engine: rds.DatabaseInstanceEngine.postgres({ version: rds.PostgresEngineVersion.VER_12 }),
+      instanceType: ec2.InstanceType.of(ec2.InstanceClass.BURSTABLE3, ec2.InstanceSize.SMALL),
+      vpc,
+      deletionProtection: true,
+      storageType: StorageType.GP2,
+      vpcSubnets: {
+        subnetType: SubnetType.PUBLIC,
+      },
     });
 
     const fargate = new ecs_patterns.ApplicationLoadBalancedFargateService(this, 'HAAS_FARGATE_SERVICE', {

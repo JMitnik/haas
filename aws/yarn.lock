@@ -509,7 +509,7 @@
     "@aws-cdk/core" "1.67.0"
     constructs "^3.0.4"
 
-"@aws-cdk/aws-secretsmanager@1.67.0":
+"@aws-cdk/aws-secretsmanager@1.67.0", "@aws-cdk/aws-secretsmanager@^1.67.0":
   version "1.67.0"
   resolved "https://registry.yarnpkg.com/@aws-cdk/aws-secretsmanager/-/aws-secretsmanager-1.67.0.tgz#05ae5477b978b09ec32b02fb8570ac953f49548b"
   integrity sha512-fuL8Q1zL2v6RP7SSzGoit86w13S9Y8Y8qWcmSx+3waWtwsDJjTuiAY8MuaPPlYDqYSmtOkvecn4TyUhyQI5wrw==
@@ -569,7 +569,7 @@
     "@aws-cdk/core" "1.67.0"
     constructs "^3.0.4"
 
-"@aws-cdk/aws-ssm@1.67.0":
+"@aws-cdk/aws-ssm@1.67.0", "@aws-cdk/aws-ssm@^1.67.0":
   version "1.67.0"
   resolved "https://registry.yarnpkg.com/@aws-cdk/aws-ssm/-/aws-ssm-1.67.0.tgz#45eaaf790e89dd52bf3d1f195a9b58cff2d7dcef"
   integrity sha512-1JQ4hx+/NqaerSzDEeOkg3by6fd8iDvmUsIBXM0kJ0JXJtRcoCXaXGeCR8n1kqGY8kajrX+MyIde4gWaG2SF1w==
