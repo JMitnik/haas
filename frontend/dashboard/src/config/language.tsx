@@ -933,8 +933,12 @@ const language = {
     },
   },
   cta: {
+    text: {
+      en: 'Text to share',
+      de: 'Text zum Teilen',
+    },
     shared_item_text_helper: {
-      en: 'What text should be shared the link?',
+      en: 'What text should be shared with the link?',
       de: 'Was Text soll den Link geteilt werden',
     },
     add_complete_title: {

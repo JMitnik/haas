@@ -366,7 +366,7 @@ const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTACha
                 {watchType?.value === 'SHARE' && (
                   <>
                     <FormControl isRequired>
-                      <FormLabel htmlFor="share.title">{t('general:text')}</FormLabel>
+                      <FormLabel htmlFor="share.title">{t('cta:text')}</FormLabel>
                       <InputHelper>{t('cta:shared_item_text_helper')}</InputHelper>
                       <Input
                         name="share.title"

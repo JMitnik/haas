@@ -234,7 +234,6 @@ export const CustomerMutations = Upload && extendType({
       async resolve(parent, args) {
         const { file } = args;
         const { createReadStream, filename, mimetype, encoding } = await file;
-        console.log(file);
 
         const stream = new Promise<UploadApiResponse>((resolve, reject) => {
           const cld_upload_stream = cloudinary.v2.uploader.upload_stream({

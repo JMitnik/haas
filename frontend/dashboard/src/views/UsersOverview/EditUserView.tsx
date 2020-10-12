@@ -119,8 +119,6 @@ const EditUserForm = ({ userCustomer }: { userCustomer: any }) => {
     },
   });
 
-  console.log(form.getValues());
-
   const [editUser, { loading: isLoading }] = useMutation(editUserMutation, {
     onCompleted: () => {
       toast({
