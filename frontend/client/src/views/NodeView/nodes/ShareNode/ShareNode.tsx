@@ -30,13 +30,13 @@ const ShareNode = ({ node }: SocialShareNodeProps) => {
       // If Web Share API is supported
       await navi.share({
         text: `${share?.title} , with <3 from Haas`,
-        url: formatUrl(`${share?.url}`),
+        url: formatUrl(`${share?.url}` || ''),
       })
         .then(() => alert('Done'))
         .catch((err: any) => alert(err));
     } else {
       const copiedText = `${share?.title} \n
-        formatUrl(${share?.url})`;
+        ${formatUrl(share?.url || '')}`;
       copy(copiedText);
     }
 
