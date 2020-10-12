@@ -34,7 +34,7 @@ const ShareNode = ({ node }: SocialShareNodeProps) => {
       });
     } else {
       const copiedText = `${share?.title} \n
-      formatUrl(${share?.url})`;
+      ${formatUrl(share?.url || '')}`;
       copy(copiedText);
     }
   };
