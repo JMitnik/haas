@@ -33,7 +33,7 @@ const ShareNode = ({ node }: SocialShareNodeProps) => {
         url: formatUrl(`${share?.url}`),
       })
         .then(() => alert('Done'))
-        .catch(() => alert('err'));
+        .catch((err: any) => alert(err));
     } else {
       const copiedText = `${share?.title} \n
       formatUrl(${share?.url})`;
