@@ -38,7 +38,6 @@ const ShareNode = ({ node }: SocialShareNodeProps) => {
         ${formatUrl(share?.url || '')}`;
       copy(copiedText);
     }
-
     return '';
   };
 
