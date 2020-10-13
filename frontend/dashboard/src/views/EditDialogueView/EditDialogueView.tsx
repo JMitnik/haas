@@ -64,7 +64,6 @@ const schema = yup.object().shape({
     label: yup.string().required(),
     value: yup.string().required(),
   })).notRequired(),
-  // /isWithoutGenData: yup.number().notRequired(),
   isWithoutGenData: yup.boolean(),
 });
 
@@ -107,13 +106,11 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFo
       title: dialogue.title,
       description: dialogue.description,
       isWithoutGenData: booleanToNumber(dialogue.isWithoutGenData || false),
-      // isWithoutGenData: 1,
       publicTitle: dialogue.publicTitle,
       slug: dialogue.slug,
     },
   });
 
-  console.log(form.errors);
   const { customerSlug, dialogueSlug } = useParams();
 
   const [editDialogue, { error: serverError, loading: isLoading }] = useMutation(editDialogueMutation, {
@@ -327,7 +324,7 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFo
             <ButtonGroup>
               <Button
                 isLoading={isLoading}
-                // isDisabled={!form.for  mState.isValid}
+                isDisabled={!form.formState.isValid}
                 variantColor="teal"
                 type="submit"
               >

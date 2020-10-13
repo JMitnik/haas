@@ -4,7 +4,6 @@ const booleanToNumber = (optionalBoolean: number | boolean | undefined) => {
   }
 
   if (typeof optionalBoolean === 'boolean') {
-    console.log(optionalBoolean);
     return optionalBoolean ? 1 : 0;
   }
 

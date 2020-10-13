@@ -513,11 +513,11 @@ interface InputGridProps extends GridProps {
 export const BooleanRadioInput = ({ onChange, children, value }: any) => {
   const handleButtonChange = (val: any) => {
     if (val === 1) {
-      onChange("true");
+      onChange(true);
     }
 
     if (val === 0) {
-      onChange("false");
+      onChange(false);
     }
   };
 
