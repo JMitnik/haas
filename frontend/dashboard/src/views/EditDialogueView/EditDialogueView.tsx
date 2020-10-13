@@ -35,7 +35,7 @@ const getEditDialogueQuery = gql`
         slug
         publicTitle
         description
-        
+        isWithoutGenData
         tags {
           id
           name
@@ -75,6 +75,7 @@ const EditDialogueView = () => {
       customerSlug,
       dialogueSlug,
     },
+    fetchPolicy: 'network-only',
   });
 
   const { data: tagsData, loading: tagsLoading } = useQuery(getTagsQuery, { variables: { customerSlug } });

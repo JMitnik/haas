@@ -144,6 +144,7 @@ type Dialogue {
   description: String!
   edges: [Edge!]!
   id: ID!
+  isWithoutGenData: Boolean!
   leafs(searchTerm: String): [QuestionNode!]!
   publicTitle: String
   questions: [QuestionNode!]!
