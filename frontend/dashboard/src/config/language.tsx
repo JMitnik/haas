@@ -1,6 +1,14 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    edit_trigger: {
+      en: 'Edit alert',
+      de: 'Alert bearbeiten',
+    },
+    delete_trigger: {
+      en: 'Delete alert',
+      de: 'Alert zu löschen',
+    },
     text: {
       en: 'Text',
       de: 'Text',
