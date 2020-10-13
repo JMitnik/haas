@@ -238,10 +238,21 @@ const CustomerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = 
                   <Controller
                     name="seed"
                     render={({ onChange, onBlur, value }) => (
-                      <BooleanRadioInput onBlur={onBlur} value={value} onChange={onChange}>
-                        <ButtonRadio icon={Clipboard} value={1} text={(t('customer:custom_template'))} description={t('customer:custom_template_helper')} />
-                        <ButtonRadio icon={Loader} value={0} text={(t('customer:no_custom_template'))} description={t('customer:no_custom_template_helper')} />
-                      </BooleanRadioInput>
+                      <RadioButtonGroup display="flex" onBlur={onBlur} value={value} onChange={onChange}>
+                        <ButtonRadio
+                          icon={Clipboard}
+                          value={1}
+                          mr={2}
+                          text={(t('customer:custom_template'))}
+                          description={t('customer:custom_template_helper')}
+                        />
+                        <ButtonRadio
+                          icon={Loader}
+                          value={0}
+                          text={(t('customer:no_custom_template'))}
+                          description={t('customer:no_custom_template_helper')}
+                        />
+                      </RadioButtonGroup>
                     )}
                     control={form.control}
                     defaultValue={1}
@@ -256,10 +267,11 @@ const CustomerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = 
                     <Controller
                       name="willGenerateFakeData"
                       render={({ onChange, onBlur, value }) => (
-                        <BooleanRadioInput onBlur={onBlur} value={value} onChange={onChange}>
+                        <RadioButtonGroup display="flex" onBlur={onBlur} value={value} onChange={onChange}>
                           <ButtonRadio
                             icon={Activity}
                             value={1}
+                            mr={2}
                             text={(t('customer:use_fake_data'))}
                             description={t('customer:fake_data_helper')}
                           />
@@ -269,7 +281,7 @@ const CustomerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = 
                             text={(t('customer:no_use_fake_data'))}
                             description={t('customer:no_use_fake_data_helper')}
                           />
-                        </BooleanRadioInput>
+                        </RadioButtonGroup>
                       )}
                       control={form.control}
                       defaultValue={1}
