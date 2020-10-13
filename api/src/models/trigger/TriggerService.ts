@@ -183,7 +183,6 @@ class TriggerService {
     const { isMatch, value } = TriggerService.match(condition, nodeEntry);
 
     if (isMatch && value) {
-      console.log(trigger);
       trigger.recipients.forEach((recipient) => TriggerService.sendTrigger(trigger, recipient, session, value));
     }
   }

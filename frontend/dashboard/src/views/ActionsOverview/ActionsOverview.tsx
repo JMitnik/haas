@@ -16,8 +16,8 @@ import getCTANodesQuery from 'queries/getCTANodes';
 import { Button, Icon } from '@chakra-ui/core';
 import { Variants, motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import CTAEntry from './components/CTAEntry';
 import ShareIcon from 'components/Icons/ShareIcon';
+import CTAEntry from './components/CTAEntry';
 
 interface ActionOverviewProps {
   leafs: Array<any>;
@@ -124,7 +124,6 @@ const ActionOverview = ({ leafs }: ActionOverviewProps) => {
   const { t } = useTranslation();
 
   const activeLeafs = mapLeafs(data?.customer?.dialogue?.leafs);
-  console.log(leafs);
 
   return (
     <DialogueViewContainer>

@@ -10,6 +10,12 @@ import { ShareButton, ShareButtonContainer, ShareNodeContainer, SuccesMessageCon
 
 type SocialShareNodeProps = GenericNodeProps;
 
+const formatUrl = (url: string) => {
+  if (url.startsWith('http')) return url;
+
+  return `https://${url}`;
+};
+
 const ShareNode = ({ node }: SocialShareNodeProps) => {
   useDialogueFinish();
   const { copied, copy } = useClipboard({
@@ -19,20 +25,20 @@ const ShareNode = ({ node }: SocialShareNodeProps) => {
   const navi: any = window.navigator;
 
   const { share } = node;
-  const handleCopy = () => {
+  const handleCopy = async (): Promise<any> => {
     if (navi?.share) {
-      // Web Share API is supported
-      navi.share({
-        title: `${share?.title}`,
-        url: `${share?.url}`,
-        text: 'I would like to share this with you:',
-      });
+      // If Web Share API is supported
+      await navi.share({
+        text: `${share?.title} \n ${formatUrl(share?.url || '')}`,
+      })
+        .then(() => alert('Done'))
+        .catch((err: any) => alert(err));
     } else {
-      const copiedText = `${share?.title}
-      I would like to share this with you:
-      ${share?.url}`;
-      return copy(copiedText);
+      const copiedText = `${share?.title} \n
+        ${formatUrl(share?.url || '')}`;
+      copy(copiedText);
     }
+    return '';
   };
 
   return (

@@ -358,7 +358,6 @@ const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTACha
                     control={form.control}
                     as={<Select />}
                     options={CTA_TYPES}
-                    // defaultValue={activeType}
                   />
                   <FormErrorMessage>{form.errors.ctaType?.value?.message}</FormErrorMessage>
                 </FormControl>
@@ -366,8 +365,8 @@ const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTACha
                 {watchType?.value === 'SHARE' && (
                   <>
                     <FormControl isRequired>
-                      <FormLabel htmlFor="share.title">{t('general:title')}</FormLabel>
-                      <InputHelper>{t('cta:shared_item_title_helper')}</InputHelper>
+                      <FormLabel htmlFor="share.title">{t('cta:text')}</FormLabel>
+                      <InputHelper>{t('cta:shared_item_text_helper')}</InputHelper>
                       <Input
                         name="share.title"
                         placeholder="Get a discount..."
