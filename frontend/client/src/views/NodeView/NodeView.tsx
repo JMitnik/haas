@@ -49,8 +49,14 @@ const NodeView = ({ node }: NodeViewProps) => {
     store.session.add(node.id, entry);
 
     // Get next edge and navigate there
-    const nextEdgeId = node.getNextEdgeIdFromKey(edgeKey);
-    history.push(`/${store.customer?.slug}/${store.tree?.slug}/${nextEdgeId}`);
+    const { edgeId, isAtLeaf } = node.getNextEdgeIdFromKey(edgeKey);
+
+    if (isAtLeaf) {
+      const activeLeaf = store.tree?.activeLeaf;
+      return history.push(`/${store.customer?.slug}/${store.tree?.slug}/n/${activeLeaf?.id}`);
+    }
+
+    return history.push(`/${store.customer?.slug}/${store.tree?.slug}/${edgeId}`);
   };
 
   return (

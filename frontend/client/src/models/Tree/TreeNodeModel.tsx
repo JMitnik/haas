@@ -10,6 +10,11 @@ export enum SpecialEdge {
   POST_LEAF_EDGE_ID = '-2',
 }
 
+interface EdgeOutput {
+  edgeId: string;
+  isAtLeaf: boolean;
+}
+
 export const TreeNodeModel = types
   .model('TreeNode', {
     id: types.identifier,
@@ -28,16 +33,29 @@ export const TreeNodeModel = types
      * Finds candidate edge child based on `key`.
      * @param key
      */
-    getNextEdgeIdFromKey(key: any) {
+    getNextEdgeIdFromKey(key: any): EdgeOutput {
       // If we already are at leaf, go to POST-LEAF-EDGE
-      if (self.isLeaf) { return SpecialEdge.POST_LEAF_EDGE_ID; }
+      if (self.isLeaf) {
+        return {
+          isAtLeaf: true,
+          edgeId: SpecialEdge.POST_LEAF_EDGE_ID,
+        };
+      }
 
       const candidateEdge = self.children.find((child: TreeEdgeProps) => child.matchesKeyByCondition(key));
 
       // If there are no edges (but we are not at leaf yet) => Return Leaf ID
-      if (!candidateEdge) return SpecialEdge.LEAF_EDGE_ID;
+      if (!candidateEdge) {
+        return {
+          isAtLeaf: true,
+          edgeId: SpecialEdge.POST_LEAF_EDGE_ID,
+        };
+      }
 
-      return candidateEdge.id;
+      return {
+        isAtLeaf: false,
+        edgeId: candidateEdge.id,
+      };
     },
   }));
 
