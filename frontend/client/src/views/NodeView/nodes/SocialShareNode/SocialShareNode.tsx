@@ -38,10 +38,11 @@ const SocialShareNode = ({ node }: SocialShareNodeProps) => {
           </>
         ) }
         {node.links.map(
-          (link) => (
+          (link, index) => (
             <ShareItem
               href={link.url}
               target="__blank"
+              key={index}
               rel="noopener noreferrer"
               bg={link.backgroundColor || '#007bb5'}
             >

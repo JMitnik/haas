@@ -1,5 +1,6 @@
 import * as AuthAPI from '../models/auth/Auth';
 import * as DebugAPI from '../models/debug/Debug';
+import * as InteractionAPI from '../models/session/Session';
 import * as NodeEntryAPI from '../models/node-entry/NodeEntry';
 import * as PaginationAPI from '../models/general/Pagination';
 import * as QuestionNodeAPI from '../models/question/QuestionNode';
@@ -12,7 +13,6 @@ import edgeNexus from '../models/edge/Edge';
 import linkNexus from '../models/link/Link';
 import permissionNexus from '../models/permission/Permission';
 import roleNexus from '../models/role/Role';
-import sessionNexus from '../models/session/Session';
 import tagNexus from '../models/tag/Tag';
 import triggerNexus from '../models/trigger/Trigger';
 
@@ -30,7 +30,7 @@ const nexus = [
   ...Array(AuthAPI),
   ...Array(PaginationAPI),
   ...Array(NodeEntryAPI),
-  ...sessionNexus,
+  ...Array(InteractionAPI),
   ...Array(QuestionNodeAPI),
   ...edgeNexus,
   ...(config.isDebug ? Array(DebugAPI) : []),
