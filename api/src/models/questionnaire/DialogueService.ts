@@ -519,9 +519,11 @@ class DialogueService {
             isLeaf: leaf.isLeaf,
             title: leaf.title,
             options: leaf.options,
-            overrideLeaf: leaf.overrideLeaf && { connect: leaf.overrideLeaf },
+            overrideLeaf: leaf.overrideLeaf?.id ? { connect: {
+              id: leaf.overrideLeaf.id,
+            } } : undefined,
             type: leaf.type,
-          })),
+          })) || [],
         },
       },
       include: {
