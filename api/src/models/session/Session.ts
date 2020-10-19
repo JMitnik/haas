@@ -178,6 +178,6 @@ export const AppendToInteractionMutation = mutationField('appendToInteraction', 
       },
     });
 
-    return updatedInteraction;
+    return updatedInteraction as any;
   },
 });

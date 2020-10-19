@@ -15,6 +15,7 @@ import ShareNode from './nodes/ShareNode/ShareNode';
 import SliderNode from './nodes/SliderNode/SliderNode';
 import SocialShareNode from './nodes/SocialShareNode/SocialShareNode';
 import TextboxNode from './nodes/TextboxNode/TextboxNode';
+import useJourneyFinish from 'hooks/use-dialogue-finish';
 
 const nodeMap: Record<string, (props: GenericNodeProps) => JSX.Element> = {
   SLIDER: SliderNode,
@@ -43,10 +44,15 @@ interface NodeViewProps {
 const NodeView = ({ node }: NodeViewProps) => {
   const store = useDialogueTree();
   const history = useHistory();
+  const { appendToInteraction, createInteraction, isFinished } = useJourneyFinish();
 
   const handleEntryStore = (entry: any, edgeKey: any) => {
     // Store the entry
     store.session.add(node.id, entry);
+
+    if (isFinished) {
+      appendToInteraction(entry);
+    }
 
     // Get next edge and navigate there
     const { edgeId, isAtLeaf } = node.getNextEdgeIdFromKey(edgeKey);

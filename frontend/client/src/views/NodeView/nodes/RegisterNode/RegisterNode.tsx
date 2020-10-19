@@ -1,6 +1,6 @@
 import { CheckCircle } from 'react-feather';
 import { useForm } from 'react-hook-form';
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import { ButtonIcon } from '@haas/ui/src/Buttons';
 import { ClientButton, OutlineButton } from 'components/Buttons/Buttons';
@@ -11,6 +11,7 @@ import { ReactComponent as LastNameIcon } from 'assets/icons/icon-last-name.svg'
 import { NodeTitle } from 'layouts/NodeLayout/NodeLayoutStyles';
 import { SessionEntryDataProps } from 'models/Session/SessionEntryModel';
 import { ReactComponent as UserIcon } from 'assets/icons/icon-user.svg';
+import useJourneyFinish from 'hooks/use-dialogue-finish';
 
 import { GenericNodeProps } from '../types';
 import { IconContainer, InputContainer, RegisterNodeContainer } from './RegisterNodeStyles';
@@ -24,6 +25,12 @@ interface RegisterNodeFormProps {
 }
 
 const RegisterNode = ({ node, onEntryStore }: RegisterNodeProps) => {
+  const { appendToInteraction, createInteraction, isFinished } = useJourneyFinish();
+
+  useEffect(() => {
+    createInteraction();
+  }, []);
+
   const { register, getValues, formState } = useForm<RegisterNodeFormProps>({
     mode: 'onChange',
     reValidateMode: 'onChange',

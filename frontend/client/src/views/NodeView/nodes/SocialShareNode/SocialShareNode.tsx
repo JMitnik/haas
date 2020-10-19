@@ -1,5 +1,5 @@
 import { Facebook, Globe, Instagram, Linkedin, Twitter } from 'react-feather';
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import { Flex } from '@haas/ui';
 import { NodeTitle } from 'layouts/NodeLayout/NodeLayoutStyles';
@@ -12,7 +12,11 @@ import { ShareItem, SocialShareNodeContainer } from './SocialShareNodeStyles';
 type SocialShareNodeProps = GenericNodeProps;
 
 const SocialShareNode = ({ node }: SocialShareNodeProps) => {
-  useDialogueFinish();
+  const { createInteraction } = useDialogueFinish();
+
+  useEffect(() => {
+    createInteraction();
+  }, []);
 
   return (
     <SocialShareNodeContainer>

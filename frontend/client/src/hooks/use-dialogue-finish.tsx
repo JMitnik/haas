@@ -15,7 +15,6 @@ const appendToInteractionMutation = gql`
 
 const useJourneyFinish = (submitInstant: boolean = true) => {
   const [isFinished, setIsFinished] = useState(false);
-  const [willSubmit, setWillSubmit] = useState(submitInstant);
   const [postSessionCreateQueue, setPostSessionCreateQueue] = useState<any[]>([]);
   const [retryCounter, setRetryCounter] = useState<number>(0);
   const isUpdatingQueue = useRef<boolean>(false);
@@ -37,12 +36,15 @@ const useJourneyFinish = (submitInstant: boolean = true) => {
         })),
       },
     },
+    onCompleted: () => {
+      setIsFinished(true);
+    },
   });
 
   const [appendToInteraction] = useMutation(appendToInteractionMutation, {
     variables: {
       input: {
-        sessionId: createdSessionData.id,
+        sessionId: createdSessionData?.id,
       },
     },
     onError: () => {
@@ -63,10 +65,14 @@ const useJourneyFinish = (submitInstant: boolean = true) => {
     },
   });
 
-  const createInitialInteraction = () => {
+  const handleCreateInteraction = () => {
     if (entries.length && !isFinished) {
       createInteraction();
     }
+  };
+
+  const handleAppendToInteraction = (entry: any) => {
+    setPostSessionCreateQueue((queue) => [...queue, entry]);
   };
 
   useEffect(() => {
@@ -93,10 +99,9 @@ const useJourneyFinish = (submitInstant: boolean = true) => {
   }, [isFinished, store.session]);
 
   return {
-    createInteraction,
-    appendToInteraction,
+    createInteraction: handleCreateInteraction,
+    appendToInteraction: handleAppendToInteraction,
     isFinished,
-    setWillSubmit,
   };
 };
 
