@@ -1,4 +1,5 @@
-import { AnimationControls } from 'framer-motion';
+import { AnimationControls, Variants, motion, transform, useAnimation } from 'framer-motion';
+import Color from 'color';
 import Lottie from 'react-lottie';
 import React, { useReducer } from 'react';
 
@@ -8,7 +9,7 @@ import { HAASIdle, HAASRun, HAASStopping } from 'assets/animations';
 import { ReactComponent as HappyIcon } from 'assets/icons/icon-happy.svg';
 import { ReactComponent as UnhappyIcon } from 'assets/icons/icon-unhappy.svg';
 
-import { FingerPrintContainer, HAASRabbit, SlideHereContainer } from './SliderNodeStyles';
+import { FingerPrintContainer, HAASRabbit, SlideHereContainer, SliderNodeValue } from './SliderNodeStyles';
 import { SlideMeAnimation } from './SliderNodeAnimations';
 
 interface SliderAnimationStateProps {
@@ -37,13 +38,28 @@ const defaultSliderAnimationState: SliderAnimationStateProps = {
   animationJson: HAASIdle,
 };
 
+const sliderValueAnimeVariants: Variants = {
+  initial: {
+    opacity: 0,
+    transform: 'scale(1)',
+  },
+  active: {
+    opacity: 1,
+    y: 0,
+  },
+};
+
 interface SliderProps {
+  form: any;
   register: any;
   onSubmit: () => void;
-  animationControls: AnimationControls;
 }
 
-const Slider = ({ register, onSubmit, animationControls }: SliderProps) => {
+const Slider = ({ form, register, onSubmit }: SliderProps) => {
+  const animationControls = useAnimation();
+  const sliderValue = Number(form.watch({ nest: true }).slider / 10);
+  const sliderColor = transform(sliderValue, [0, 5, 10], ['#E53E3E', '#F6AD55', '#38B2AC']);
+
   const [animationState, dispatchAnimationState] = useReducer((
     state: SliderAnimationStateProps,
     action: SliderAnimationActionType,
@@ -126,10 +142,20 @@ const Slider = ({ register, onSubmit, animationControls }: SliderProps) => {
       <HAASRabbit style={{
         left: `${animationState.position}%`,
         bottom: '10px',
-        transform: `translateX(-50%) scaleX(${animationState.direction})`,
+        transform: 'translateX(-50%)',
       }}
       >
-        <div className="rabbit">
+        <SliderNodeValue initial="initial" variants={sliderValueAnimeVariants} animate={animationControls}>
+          <motion.p animate={{ color: sliderColor, borderColor: Color(sliderColor).lighten(0.3).hex() }}>
+            {sliderValue.toFixed(0)}
+          </motion.p>
+        </SliderNodeValue>
+        <div
+          className="rabbit"
+          style={{
+            transform: `scaleX(${animationState.direction})`,
+          }}
+        >
           <Lottie
             isStopped={animationState.isStopped}
             options={{
@@ -146,8 +172,8 @@ const Slider = ({ register, onSubmit, animationControls }: SliderProps) => {
           name="slider"
           style={{ zIndex: 300 }}
           onChange={(e) => moveBunny(e)}
-          onMouseUp={() => handleSubmit()}
-          onTouchEnd={() => handleSubmit()}
+          // onMouseUp={() => handleSubmit()}
+          // onTouchEnd={() => }
           min={1}
           max={100}
           defaultValue={50}

@@ -57,22 +57,23 @@ export const FingerPrintContainer = styled(motion.div)`
 
 export const SliderNodeValue = styled(motion.h3)`
   ${({ theme }) => css`
+    background: white;
     color: ${theme.colors.primary};
     display: inline-block;
     text-align: center;
     font-size: 1.5rem;
-    width: 75px;
-    height: 75px;
-    margin: 100px auto;
-    margin-top: ${theme.gutter}px;
+    margin: 0 auto;
     font-weight: 1000;
     position: relative;
+    border-radius: 30px;
+    display: flex;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
 
     p {
       opacity: 1;
-      width: 100%;
-      height: 100%;
-      box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+      width: 50px;
+      padding: 8px;
+      height: 50px;
       background: white;
       border: 4px solid white;
       border-radius: 50px;
