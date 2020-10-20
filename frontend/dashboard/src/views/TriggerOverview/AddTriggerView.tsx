@@ -26,6 +26,7 @@ interface FormDataProps {
     label: string;
     value: string;
   };
+  conditions: Array<any>;
   condition: string;
   matchText: string;
   lowThreshold: number;
@@ -61,6 +62,7 @@ const schema = yup.object().shape({
       otherwise: yup.string().notRequired(),
     }),
   }),
+  conditions: yup.array().min(1),
   condition: yup.string().required(),
   lowThreshold: yup.string().notRequired().when(['condition'], {
     is: (condition: string) => condition === TriggerConditionType.LOW_THRESHOLD

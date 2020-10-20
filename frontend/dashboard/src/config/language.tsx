@@ -1127,6 +1127,10 @@ const language = {
       en: 'Tell us about the alert, and to which question or dialogue it applies.',
       de: 'Beschreibe die Push-Benachrichtigung und für welche Frage oder welchen Dialog Sie gilt.',
     },
+    add_condition: {
+      en: 'Add condition',
+      de: 'Bedingung hinzufügen',
+    },
     conditions: {
       en: 'Conditions',
       de: 'Bedingungen',
