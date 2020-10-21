@@ -92,7 +92,8 @@ const TriggerType = objectType({
 const TriggerConditionInputType = inputObjectType({
   name: 'TriggerConditionInputType',
   definition(t) {
-    t.int('id');
+    t.int('id'); // TODO: Zou dit ook niet nullable moeten zijn (is leeg tijdens AddTrigger als het goed is)
+    t.string('questionId', { nullable: false });
     t.field('type', { type: TriggerConditionEnum });
     t.int('minValue', { nullable: true });
     t.int('maxValue', { nullable: true });
@@ -195,7 +196,6 @@ const TriggerMutations = extendType({
       type: TriggerType,
       args: {
         customerSlug: 'String',
-        questionId: 'String',
         recipients: RecipientsInputType,
         trigger: TriggerInputType,
       },
@@ -208,19 +208,46 @@ const TriggerMutations = extendType({
           medium: args.trigger?.medium || 'EMAIL',
           type: args.trigger?.type || 'QUESTION',
           customer: { connect: { slug: args.customerSlug } },
-          relatedNode: { connect: { id: args.questionId || undefined } },
+          // TODO: check if removing of this causes any problems { connect: { id: args.questionId || undefined } },
+          relatedNode: null,
           recipients: { connect: args.recipients?.ids?.map((id: string) => ({ id })) },
-          conditions: { create: args.trigger?.conditions?.map((condition) => ({
-            type: condition.type || 'TEXT_MATCH',
-            maxValue: condition.maxValue,
-            minValue: condition.minValue,
-            textValue: condition.textValue,
-          })) },
         };
 
-        return ctx.prisma.trigger.create({
+        const trigger = await ctx.prisma.trigger.create({
           data: createArgs,
-        }) as any;
+        });
+
+        const questionOfTriggers = await args.trigger?.conditions?.map(async (condition) => ctx.prisma.questionOfTrigger.create({
+          data: {
+            question: {
+              connect: {
+                id: condition?.questionId || undefined,
+              },
+            },
+            trigger: {
+              connect: {
+                id: trigger.id,
+              },
+            },
+            triggerCondition: {
+              create: {
+                type: condition.type || 'TEXT_MATCH',
+                maxValue: condition.maxValue,
+                minValue: condition.minValue,
+                textValue: condition.textValue,
+                trigger: {
+                  connect: {
+                    id: trigger.id,
+                  },
+                },
+              },
+            },
+          },
+        }));
+
+        console.log('questionOfTriggers: ', questionOfTriggers);
+
+        return trigger as any;
       },
     });
   },

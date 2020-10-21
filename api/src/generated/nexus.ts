@@ -240,6 +240,7 @@ export interface NexusGenInputs {
     id?: number | null; // Int
     maxValue?: number | null; // Int
     minValue?: number | null; // Int
+    questionId: string; // String!
     textValue?: string | null; // String
     type?: NexusGenEnums['TriggerConditionEnum'] | null; // TriggerConditionEnum
   }
@@ -925,7 +926,6 @@ export interface NexusGenArgTypes {
     }
     createTrigger: { // args
       customerSlug?: string | null; // String
-      questionId?: string | null; // String
       recipients?: NexusGenInputs['RecipientsInputType'] | null; // RecipientsInputType
       trigger?: NexusGenInputs['TriggerInputType'] | null; // TriggerInputType
     }

@@ -292,7 +292,7 @@ type Mutation {
   createRole(data: RoleInput): RoleType!
   createSession(input: SessionInput): Session!
   createTag(customerSlug: String, name: String, type: TagTypeEnum): Tag!
-  createTrigger(customerSlug: String, questionId: String, recipients: RecipientsInputType, trigger: TriggerInputType): TriggerType!
+  createTrigger(customerSlug: String, recipients: RecipientsInputType, trigger: TriggerInputType): TriggerType!
   createUser(customerSlug: String, input: UserInput): UserType!
   createWorkspace(input: CreateWorkspaceInput): Customer!
   deleteCTA(input: DeleteNodeInputType): QuestionNode!
@@ -665,6 +665,7 @@ input TriggerConditionInputType {
   id: Int
   maxValue: Int
   minValue: Int
+  questionId: String!
   textValue: String
   type: TriggerConditionEnum
 }
