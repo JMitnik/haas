@@ -6,14 +6,6 @@ import CustomerOverview from 'views/CustomerOverview/CustomerOverview';
 import Loader from 'components/Loader';
 import getCustomerQuery from 'queries/getCustomerQuery';
 
-const CustomersPage = () => {
-  const { data, loading, error } = useQuery(getCustomerQuery);
-  const customers = data?.customers;
-  useErrorHandler(error);
-
-  if (loading) return <Loader />;
-
-  return <CustomerOverview customers={customers} />;
-};
+const CustomersPage = () => <CustomerOverview />;
 
 export default CustomersPage;

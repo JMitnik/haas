@@ -1,7 +1,7 @@
 import { ApolloError } from 'apollo-boost';
-import { Button } from '@chakra-ui/core';
-import { Div, Flex, PageTitle } from '@haas/ui';
-import { Plus } from 'react-feather';
+import { Button, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast } from '@chakra-ui/core';
+import { Div, Flex, PageTitle, Text } from '@haas/ui';
+import { Edit, Plus, Trash } from 'react-feather';
 import { debounce } from 'lodash';
 import { useHistory, useParams } from 'react-router';
 import { useLazyQuery, useMutation } from '@apollo/react-hooks';
@@ -9,10 +9,14 @@ import { useTranslation } from 'react-i18next';
 import React, { useCallback, useEffect, useState } from 'react';
 
 import { GenericCell } from 'components/Table/CellComponents/CellComponents';
+import List from 'components/List/List';
+import ListItem from 'components/List/ListItem';
 import SearchBar from 'components/SearchBar/SearchBar';
+import ShowMoreButton from 'components/ShowMoreButton';
 import Table from 'components/Table/Table';
 import deleteTriggerMutation from 'mutations/deleteTrigger';
 import getTriggerTableQuery from 'queries/getTriggerTable';
+import useAuth from 'hooks/useAuth';
 
 interface TableProps {
   activeStartDate: Date | null;
@@ -34,6 +38,8 @@ const HEADERS = [
 
 const TriggersOverview = () => {
   const { customerSlug } = useParams();
+  const toast = useToast();
+  const { canEditTriggers, canDeleteTriggers } = useAuth();
   const history = useHistory();
   const [fetchTriggers, { data }] = useLazyQuery(getTriggerTableQuery, { fetchPolicy: 'cache-and-network' });
   const [paginationProps, setPaginationProps] = useState<TableProps>({
@@ -80,15 +86,24 @@ const TriggersOverview = () => {
     onError: (serverError: ApolloError) => {
       console.log(serverError);
     },
+    onCompleted: () => {
+      toast({
+        title: 'Alert removed!',
+        description: 'The alert has been removed from the workspace',
+        status: 'success',
+        position: 'bottom-right',
+        duration: 1500,
+      });
+    },
   });
 
-  const handleDeleteUser = (event: any, entryId: string, onComplete: (() => void) | undefined) => {
+  const handleDeleteTrigger = (event: any, entryId: string) => {
     event.stopPropagation();
     deleteTrigger({
       variables: {
         id: entryId,
       },
-    }).finally(() => onComplete && onComplete());
+    });
   };
 
   const handleEditEntry = (event: any, entryId: string) => {
@@ -139,9 +154,64 @@ const TriggersOverview = () => {
           headers={HEADERS}
           paginationProps={{ ...paginationProps, pageCount, pageIndex }}
           onPaginationChange={setPaginationProps}
-          onDeleteEntry={handleDeleteUser}
+          onDeleteEntry={handleDeleteTrigger}
           onEditEntry={handleEditEntry}
           onAddEntry={handleAddUser}
+          renderOptions={
+            (data: any) => (
+              <>
+                {canDeleteTriggers && (
+                <ShowMoreButton
+                  renderMenu={(
+                    <List>
+                      {canDeleteTriggers && (
+                        <>
+                          {canEditTriggers && (
+                            <ListItem
+                              onClick={(e: any) => handleEditEntry(e, data?.id)}
+                              renderLeftIcon={<Edit />}
+                            >
+                              {t('edit_trigger')}
+                            </ListItem>
+                          )}
+                          <Popover>
+                            {() => (
+                              <>
+                                <PopoverTrigger>
+                                  <ListItem
+                                    renderLeftIcon={<Trash />}
+                                  >
+                                    {t('delete_trigger')}
+                                  </ListItem>
+                                </PopoverTrigger>
+                                <PopoverContent zIndex={4}>
+                                  <PopoverArrow />
+                                  <PopoverHeader>{t('delete')}</PopoverHeader>
+                                  <PopoverCloseButton />
+                                  <PopoverBody>
+                                    <Text>{t('delete_trigger_popover')}</Text>
+                                  </PopoverBody>
+                                  <PopoverFooter>
+                                    <Button
+                                      variantColor="red"
+                                      onClick={(e: any) => handleDeleteTrigger(e, data?.id)}
+                                    >
+                                      {t('delete')}
+                                    </Button>
+                                  </PopoverFooter>
+                                </PopoverContent>
+                              </>
+                            )}
+                          </Popover>
+                        </>
+                      )}
+                    </List>
+                  )}
+                />
+                )}
+              </>
+            )
+          }
           data={tableData}
         />
       </Div>

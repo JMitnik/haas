@@ -353,12 +353,14 @@ const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTACha
                 <FormControl isRequired>
                   <FormLabel htmlFor="ctaType">{t('cta:type')}</FormLabel>
                   <InputHelper>{t('cta:share_type_helper')}</InputHelper>
+
                   <Controller
                     name="ctaType"
                     control={form.control}
                     as={<Select />}
                     options={CTA_TYPES}
                   />
+
                   <FormErrorMessage>{form.errors.ctaType?.value?.message}</FormErrorMessage>
                 </FormControl>
 
