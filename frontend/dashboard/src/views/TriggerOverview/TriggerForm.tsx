@@ -384,23 +384,37 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                   </InputHelper>
                   <Controller
                     name={`conditions[${index}].questionId`}
-                    defaultValue={null}
-                    control={form.control}
                     render={({ onChange }) => (
                       <Select
                         options={questions}
                         onChange={(e: any) => {
-                          handleConditionQuestionChange(e.value, index);
                           onChange(e.value);
                         }}
                       />
                     )}
+                    control={form.control}
+                    options={questions}
                   />
+                  {/* <Controller
+                    name={`conditions[${index}].questionId`}
+                    // defaultValue={null}
+                    control={form.control}
+                    render={({ onChange, value }) => (
+                      <Select
+                        options={questions}
+                        value={value}
+                        onChange={(e: any) => {
+                          handleConditionQuestionChange(e.value, index);
+                          onChange(e);
+                        }}
+                      />
+                    )}
+                  /> */}
 
                   <FormErrorMessage>{form.errors.conditions?.[index]?.questionId?.message}</FormErrorMessage>
                 </FormControl>
                 )}
-                {condition?.questionId ? (
+                {form.watch('conditions')?.[index]?.questionId ? (
                   <FormControl isRequired isInvalid={!!form.errors.conditions?.[index]?.conditionType}>
                     <FormLabel htmlFor="condition">{t('trigger:condition')}</FormLabel>
                     <InputHelper>
@@ -413,7 +427,7 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                       render={({ onChange, onBlur, value }) => (
                         <ConditionFormFragment
                           activeNodeType={getNodeType(
-                            condition?.questionId, questionsData?.customer?.dialogue?.questions,
+                            form.watch('conditions')?.[index]?.questionId, questionsData?.customer?.dialogue?.questions,
                           )}
                           value={value}
                           onChange={(e: any) => {
@@ -431,9 +445,9 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                   <Text>{t('trigger:select_dialogue_reminder')}</Text>
                 )}
 
-                {condition?.conditionType === TriggerConditionType.TEXT_MATCH && (
+                {form.watch('conditions')?.[index]?.conditionType === TriggerConditionType.TEXT_MATCH && (
                 <FormControl isInvalid={!!form.errors.conditions?.[index]?.matchText}>
-                  <FormLabel htmlFor={`conditions[${index}].matchText`}>{t('triggerch_text')}</FormLabel>
+                  <FormLabel htmlFor={`conditions[${index}].matchText`}>{t('trigger:match_text')}</FormLabel>
                   <InputHelper>
                     {t('trigger:match_text_helper')}
                   </InputHelper>
@@ -448,7 +462,7 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                 </FormControl>
                 )}
 
-                {condition?.conditionType === TriggerConditionType.LOW_THRESHOLD && (
+                {form.watch('conditions')?.[index]?.conditionType === TriggerConditionType.LOW_THRESHOLD && (
                 <FormControl isInvalid={!!form.errors.conditions?.[index]?.lowThreshold}>
                   <FormLabel htmlFor={`conditions[${index}].lowThreshold`}>{t('trigger:low_threshold')}</FormLabel>
                   <InputHelper>
@@ -484,7 +498,7 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                 </FormControl>
                 )}
 
-                {condition?.conditionType === TriggerConditionType.HIGH_THRESHOLD && (
+                {form.watch('conditions')?.[index]?.conditionType === TriggerConditionType.HIGH_THRESHOLD && (
                 <FormControl isInvalid={!!form.errors.conditions?.[index]?.highThreshold}>
                   <FormLabel htmlFor={`conditions[${index}].highThreshold`}>{t('trigger:high_threshold')}</FormLabel>
                   <InputHelper>
