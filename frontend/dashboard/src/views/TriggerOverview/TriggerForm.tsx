@@ -2,10 +2,12 @@
 import { Controller, UseFormMethods } from 'react-hook-form';
 import { CornerRightDown, CornerRightUp, Key, Mail, Maximize2,
   Minimize2, PlusCircle, Smartphone, Thermometer, Type, UserPlus, Watch } from 'react-feather';
+import { debounce } from 'lodash';
 import { useHistory, useParams } from 'react-router';
 import { useLazyQuery, useQuery } from '@apollo/react-hooks';
 import React, { useCallback, useEffect, useState } from 'react';
 import Select from 'react-select';
+import cuid from 'cuid';
 
 import { Button, ButtonGroup, FormErrorMessage, RadioButtonGroup,
   Slider, SliderFilledTrack, SliderThumb, SliderTrack } from '@chakra-ui/core';
@@ -19,7 +21,6 @@ import getQuestionsQuery from 'queries/getQuestionnaireQuery';
 import gql from 'graphql-tag';
 
 import { getCustomerTriggerData as CustomerTriggerData } from './__generated__/getCustomerTriggerData';
-import { debounce } from 'lodash';
 
 interface FormDataProps {
   name: string;
@@ -229,7 +230,7 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
   };
 
   const addCondition = () => setActiveConditions((prevConditions) => [...prevConditions, {
-    questionId: null, conditionType: null, matchText: null, lowThreshold: null, highThreshold: null,
+    id: cuid(), questionId: null, conditionType: null, matchText: null, lowThreshold: null, highThreshold: null,
   }]);
 
   const handleDeleteCondition = (index: number) => setActiveConditions((prevConditions) => {
@@ -369,7 +370,7 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
             <Hr />
             {activeConditions?.map((condition, index) => (
               <Div
-                key={`${condition?.questionId}`}
+                key={`${condition?.questionId || condition.id}`}
                 marginTop={15}
                 gridColumn="1 / -1"
                 bg="gray.100"

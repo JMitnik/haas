@@ -119,9 +119,8 @@ class TriggerService {
     };
   };
 
-  static sendMailTrigger(trigger: TriggerWithSendData, recipient: User, session: SessionWithEntries, value: any) {
-    console.log(trigger?.customer?.settings?.colourSettings);
-    const triggerBody = makeTriggerMailTemplate(recipient.firstName || 'User', session, value, trigger?.customer?.settings?.colourSettings?.primary);
+  static sendMailTrigger(trigger: TriggerWithSendData, recipient: User, session: SessionWithEntries) {
+    const triggerBody = makeTriggerMailTemplate(recipient.firstName || 'User', session, trigger?.customer?.settings?.colourSettings?.primary);
 
     mailService.send({
       body: triggerBody,
@@ -130,34 +129,35 @@ class TriggerService {
     });
   }
 
-  static sendSmsTrigger(trigger: TriggerWithSendData, recipient: User, session: SessionWithEntries, value: any) {
+  static sendSmsTrigger(trigger: TriggerWithSendData, recipient: User, session: SessionWithEntries, values: Array<{value: string | number | undefined, type: string}>) {
     if (!recipient.phone) return;
 
-    smsService.send(recipient.phone, `HAAS: An alert has been triggered. Your trigger "${trigger.name}" has spotted value: '${value}'`);
+    const mappedValues = values.map((value) => `${value.type} -> ${value.value}`);
+    const joinedValues = mappedValues.join(', ');
+
+    smsService.send(recipient.phone, `HAAS: Your Alert "${trigger.name}" was triggered because of the following condition(s): ${joinedValues}`);
   }
 
   static sendTrigger = (
     trigger: TriggerWithSendData,
     recipient: User,
     session: SessionWithEntries,
-    value: string | number | undefined,
+    values: any,
   ) => {
-    console.log('Time to send triggers');
-
     switch (trigger.medium) {
       case 'EMAIL':
         if (!recipient.email) return;
-        TriggerService.sendMailTrigger(trigger, recipient, session, value);
+        TriggerService.sendMailTrigger(trigger, recipient, session);
         break;
 
       case 'PHONE':
         if (!recipient.phone) return;
-        TriggerService.sendSmsTrigger(trigger, recipient, session, value);
+        TriggerService.sendSmsTrigger(trigger, recipient, session, values);
         break;
 
       case 'BOTH':
-        if (recipient.email) TriggerService.sendMailTrigger(trigger, recipient, session, value);
-        if (recipient.phone) TriggerService.sendSmsTrigger(trigger, recipient, session, value);
+        if (recipient.email) TriggerService.sendMailTrigger(trigger, recipient, session);
+        if (recipient.phone) TriggerService.sendSmsTrigger(trigger, recipient, session, values);
         break;
 
       default:
@@ -176,14 +176,30 @@ class TriggerService {
 
     await prisma.trigger.update(({ where: { id: trigger.id }, data: { lastSent: currentDate } }));
 
-    const nodeEntry = session.nodeEntries.find((entry) => entry.relatedNodeId === trigger.relatedNodeId);
-    const condition = trigger.conditions[0];
+    const questionsOfTrigger = await prisma.questionOfTrigger.findMany({
+      where: {
+        triggerId: trigger.id,
+      },
+      include: {
+        question: true,
+        triggerCondition: true,
+      },
+    });
 
-    if (!nodeEntry) return;
-    const { isMatch, value } = TriggerService.match(condition, nodeEntry);
+    const triggerTargets = questionsOfTrigger.map((questionOfTrigger) => {
+      const { questionId, triggerCondition } = questionOfTrigger;
+      const nodeEntry = session.nodeEntries.find((entry) => entry.relatedNodeId && questionId === entry.relatedNodeId);
+      return { condition: triggerCondition, nodeEntry };
+    });
 
-    if (isMatch && value) {
-      trigger.recipients.forEach((recipient) => TriggerService.sendTrigger(trigger, recipient, session, value));
+    if (!triggerTargets.length) return;
+    const matchResults = TriggerService.matchMulti(triggerTargets);
+
+    const rejected = _.reject(matchResults, (matchResult) => matchResult?.isMatch === true);
+
+    if (!rejected.length) {
+      const values = matchResults.map((result) => ({ value: result?.value, type: result?.conditionType }));
+      trigger.recipients.forEach((recipient) => TriggerService.sendTrigger(trigger, recipient, session, values));
     }
   }
 
@@ -215,36 +231,56 @@ class TriggerService {
     },
   });
 
-  static findTriggersByQuestionIds = async (questionIds: Array<string>) => prisma.trigger.findMany({
-    where: {
-      type: 'QUESTION',
-      relatedNodeId: {
-        in: questionIds,
+  static findTriggersByQuestionIds = async (questionIds: Array<string>) => {
+    const questionOfTriggerEntries = await prisma.questionOfTrigger.findMany({
+      where: {
+        questionId: {
+          in: questionIds,
+        },
       },
-    },
-    include: {
-      recipients: true,
-      conditions: true,
-      customer: {
-        include: {
-          settings: {
-            include: {
-              colourSettings: true,
+    });
+
+    const triggerIds = questionOfTriggerEntries.map((entry) => entry.triggerId);
+
+    return prisma.trigger.findMany({
+      where: {
+        type: 'QUESTION',
+        id: {
+          in: triggerIds,
+        },
+      },
+      include: {
+        recipients: true,
+        conditions: true,
+        customer: {
+          include: {
+            settings: {
+              include: {
+                colourSettings: true,
+              },
+            },
+          },
+        },
+        relatedNode: {
+          select: {
+            questionDialogue: {
+              select: {
+                title: true,
+              },
             },
           },
         },
       },
-      relatedNode: {
-        select: {
-          questionDialogue: {
-            select: {
-              title: true,
-            },
-          },
-        },
-      },
-    },
-  });
+    });
+  };
+
+  static matchMulti(triggerTargets: {
+    condition: TriggerCondition;
+    nodeEntry: NodeEntryWithTypes | undefined;
+  }[]) {
+    const matchResults = triggerTargets.map((triggerTarget) => triggerTarget.nodeEntry && TriggerService.match(triggerTarget.condition, triggerTarget.nodeEntry));
+    return matchResults;
+  }
 
   static match(triggerCondition: TriggerCondition, entry: NodeEntryWithTypes) {
     let conditionMatched;
@@ -258,7 +294,7 @@ class TriggerService {
         }
 
         if (entry.sliderNodeEntry?.value > triggerCondition.maxValue) {
-          conditionMatched = { isMatch: true, value: entry.sliderNodeEntry?.value };
+          conditionMatched = { isMatch: true, value: entry.sliderNodeEntry?.value, conditionType: triggerCondition.type };
         }
 
         break;
@@ -272,7 +308,7 @@ class TriggerService {
         }
 
         if (entry.sliderNodeEntry?.value < triggerCondition.minValue) {
-          conditionMatched = { isMatch: true, value: entry.sliderNodeEntry?.value };
+          conditionMatched = { isMatch: true, value: entry.sliderNodeEntry?.value, conditionType: triggerCondition.type };
         }
 
         break;
@@ -280,7 +316,6 @@ class TriggerService {
 
       case 'TEXT_MATCH': {
         conditionMatched = { isMatch: false };
-
         const textEntry = NodeEntryService.getTextValueFromEntry(entry);
 
         if (!textEntry || !triggerCondition?.textValue) {
@@ -288,7 +323,7 @@ class TriggerService {
         }
 
         if (textEntry === triggerCondition.textValue) {
-          conditionMatched = { isMatch: true, value: textEntry };
+          conditionMatched = { isMatch: true, value: textEntry, conditionType: triggerCondition.type };
         }
 
         break;
@@ -307,6 +342,7 @@ class TriggerService {
           conditionMatched = {
             isMatch: score <= triggerCondition.maxValue && triggerCondition?.minValue <= score,
             value: score,
+            conditionType: triggerCondition.type,
           };
         }
 
@@ -326,6 +362,7 @@ class TriggerService {
           conditionMatched = {
             isMatch: score >= triggerCondition.maxValue && triggerCondition?.minValue >= score,
             value: score,
+            conditionType: triggerCondition.type,
           };
         }
 
