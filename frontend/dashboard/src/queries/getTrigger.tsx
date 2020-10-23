@@ -13,6 +13,7 @@ const getTriggerQuery = gql`
       }
       conditions {
           id
+          questionId
           type
           minValue
           maxValue

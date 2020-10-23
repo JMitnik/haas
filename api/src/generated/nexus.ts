@@ -792,6 +792,7 @@ export interface NexusGenFieldTypes {
     id: number; // Int!
     maxValue: number | null; // Int
     minValue: number | null; // Int
+    questionId: string | null; // String
     textValue: string | null; // String
     triggerId: string; // String!
     type: NexusGenEnums['TriggerConditionEnum']; // TriggerConditionEnum!

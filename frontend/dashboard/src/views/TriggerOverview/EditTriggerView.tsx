@@ -124,15 +124,15 @@ const EditTriggerForm = ({ trigger }: {trigger: any}) => {
         label: trigger.relatedDialogue.title,
         value: trigger.relatedDialogue.slug,
       },
-      // conditions: trigger.conditions.map((condition) => )
-      // highThreshold: trigger.conditions[0].maxValue / 10,
-      // lowThreshold: trigger.conditions[0].minValue / 10,
-      // matchText: trigger.conditions[0].textValue,
+      conditions: trigger.conditions.map((condition: any) => (
+        {
+          questionId: condition.questionId,
+          conditionType: condition.type,
+          lowThreshold: condition?.minValue ? condition?.minValue / 10 : null,
+          highThreshold: condition?.maxValue ? condition.maxValue / 10 : null,
+          matchText: condition?.textValue || null,
+        })),
       medium: trigger.medium,
-      // question: {
-      //   label: trigger.relatedNode.title,
-      //   value: trigger.relatedNode.id,
-      // },
       recipients: trigger.recipients.map((recipient: any) => ({ label: `${recipient?.lastName}, ${recipient?.firstName} - E: ${recipient?.email} - P: ${recipient?.phone}`,
         value: recipient?.id })),
       type: trigger.type,

@@ -187,6 +187,10 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
   const { customerSlug } = useParams<{ customerSlug: string }>();
   const [activeConditions, setActiveConditions] = useState<Array<any>>([]);
 
+  useEffect(() => {
+    console.log('useEffect conditions: ', form.watch('conditions'));
+    setActiveConditions(form.watch('conditions'));
+  }, []);
   // Fetching dialogue data
   const { data: triggerData } = useQuery<CustomerTriggerData>(getCustomerTriggerData, { variables: { customerSlug } });
   const dialogues = triggerData?.customer?.dialogues?.map((dialogue) => ({

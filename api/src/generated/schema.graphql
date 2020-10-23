@@ -674,6 +674,7 @@ type TriggerConditionType {
   id: Int!
   maxValue: Int
   minValue: Int
+  questionId: String
   textValue: String
   triggerId: String!
   type: TriggerConditionEnum!

@@ -3,11 +3,11 @@ import { PrismaClient,
   TriggerUpdateInput } from '@prisma/client';
 import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
 
+import { resolve } from 'path';
 import { DialogueType } from '../questionnaire/Dialogue';
 import { PaginationWhereInput } from '../general/Pagination';
 import { QuestionNodeType } from '../question/QuestionNode';
 import { UserType } from '../users/User';
-import { resolve } from 'path';
 import TriggerService from './TriggerService';
 
 const TriggerTypeEnum = enumType({
@@ -39,6 +39,21 @@ const TriggerConditionType = objectType({
     t.string('textValue', { nullable: true });
 
     t.string('triggerId');
+    t.string('questionId', {
+      nullable: true,
+      async resolve(parent, args, ctx) {
+        const questionOfTrigger = await ctx.prisma.questionOfTrigger.findMany({
+          where: {
+            triggerId: parent.triggerId,
+            triggerConditionId: parent.id,
+          },
+        });
+
+        if (!questionOfTrigger.length) return null;
+
+        return questionOfTrigger[0].questionId;
+      },
+    });
   },
 });
 
