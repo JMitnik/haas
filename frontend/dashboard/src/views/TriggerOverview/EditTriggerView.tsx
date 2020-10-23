@@ -28,6 +28,7 @@ interface FormDataProps {
     value: string;
   };
   condition: string;
+  conditions: Array<{ questionId: { label: string, value: string }, conditionType: string, highThreshold: number, lowThreshold: number, matchText: string }>;
   matchText: string;
   lowThreshold: number;
   highThreshold: number;
@@ -126,7 +127,7 @@ const EditTriggerForm = ({ trigger }: {trigger: any}) => {
       },
       conditions: trigger.conditions.map((condition: any) => (
         {
-          questionId: condition.questionId,
+          questionId: { label: condition.question.title, value: condition.question.id },
           conditionType: condition.type,
           lowThreshold: condition?.minValue ? condition?.minValue / 10 : null,
           highThreshold: condition?.maxValue ? condition.maxValue / 10 : null,

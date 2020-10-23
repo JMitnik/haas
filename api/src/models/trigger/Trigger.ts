@@ -39,19 +39,23 @@ const TriggerConditionType = objectType({
     t.string('textValue', { nullable: true });
 
     t.string('triggerId');
-    t.string('questionId', {
+    t.field('question', {
       nullable: true,
+      type: QuestionNodeType,
       async resolve(parent, args, ctx) {
         const questionOfTrigger = await ctx.prisma.questionOfTrigger.findMany({
           where: {
             triggerId: parent.triggerId,
             triggerConditionId: parent.id,
           },
+          include: {
+            question: true,
+          },
         });
 
         if (!questionOfTrigger.length) return null;
 
-        return questionOfTrigger[0].questionId;
+        return questionOfTrigger[0].question;
       },
     });
   },

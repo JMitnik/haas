@@ -26,7 +26,7 @@ interface FormDataProps {
     label: string;
     value: string;
   };
-  conditions: Array<{ questionId: string, conditionType: string, highThreshold: number, lowThreshold: number, matchText: string }>;
+  conditions: Array<{ questionId: { label: string, value: string }, conditionType: string, highThreshold: number, lowThreshold: number, matchText: string }>;
   condition: string;
   matchText: string;
   lowThreshold: number;
