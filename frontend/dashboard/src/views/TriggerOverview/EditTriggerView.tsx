@@ -28,7 +28,7 @@ interface FormDataProps {
     value: string;
   };
   condition: string;
-  conditions: Array<{ questionId: { label: string, value: string }, conditionType: string, highThreshold: number, lowThreshold: number, matchText: string }>;
+  conditions: Array<{ id: string, questionId: { label: string, value: string }, conditionType: string, highThreshold: number, lowThreshold: number, matchText: string }>;
   matchText: string;
   lowThreshold: number;
   highThreshold: number;
@@ -124,6 +124,7 @@ const EditTriggerForm = ({ trigger }: {trigger: any}) => {
       },
       conditions: trigger.conditions.map((condition: any) => (
         {
+          id: condition.id,
           questionId: { label: condition.question.title, value: condition.question.id },
           conditionType: condition.type,
           lowThreshold: condition?.minValue ? condition?.minValue / 10 : null,
@@ -167,6 +168,7 @@ const EditTriggerForm = ({ trigger }: {trigger: any}) => {
     const recipients = { ids: formData.recipients?.map((recip) => recip.value).filter((val) => val) };
     const conditions = formData.conditions.map((condition) => (
       {
+        id: parseInt(condition?.id),
         questionId: condition.questionId.value,
         type: condition.conditionType,
         minValue: condition?.lowThreshold ? condition?.lowThreshold * 10 : null,

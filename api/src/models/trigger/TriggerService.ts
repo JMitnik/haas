@@ -444,7 +444,10 @@ class TriggerService {
           },
         },
       });
+      return upsertQuestionOfTrigger.triggerConditionId;
     }));
+
+    console.log('upserted condition IDS: ', upsertedConditionsIds);
 
     //   if (!condition.type) return null;
 
@@ -472,14 +475,15 @@ class TriggerService {
     //   return upsertTriggerCondition.id;
     // }));
 
-    // await Promise.all(dbTriggerConditions.map(async (condition) => {
-    //   if (!upsertedConditionsIds.includes(condition.id)) {
-    //     const deletedCondition = await prisma.triggerCondition.delete({ where: { id: condition.id } });
-    //     return deletedCondition.id;
-    //   }
+    await Promise.all(dbTriggerConditions.map(async (condition) => {
+      if (!upsertedConditionsIds.includes(condition.id)) {
+        await prisma.questionOfTrigger.deleteMany({ where: { triggerConditionId: condition.id } });
+        const deletedCondition = await prisma.triggerCondition.delete({ where: { id: condition.id } });
+        return deletedCondition.id;
+      }
 
-    //   return null;
-    // }));
+      return null;
+    }));
   };
 
   static updateRecipients = (

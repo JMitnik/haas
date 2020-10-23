@@ -34,7 +34,7 @@ interface FormDataProps {
     label: string;
     value: string;
   };
-  conditions: Array<{ questionId: { label: string, value: string }, conditionType: string, highThreshold: number, lowThreshold: number, matchText: string }>;
+  conditions: Array<{ id: string, questionId: { label: string, value: string }, conditionType: string, highThreshold: number, lowThreshold: number, matchText: string }>;
   condition: string;
   matchText: string;
   lowThreshold: number;
@@ -378,6 +378,7 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                 bg="gray.100"
                 padding={4}
               >
+                <input type="hidden" ref={form.register} name={`conditions[${index}].id`} />
                 {form.watch('type') === TriggerQuestionType.QUESTION && activeDialogue && (
                 <FormControl isRequired isInvalid={!!form.errors.conditions?.[index]?.questionId}>
                   <FormLabel htmlFor={`conditions[${index}].questionId`}>{t('trigger:question')}</FormLabel>
