@@ -188,14 +188,13 @@ const TriggerMutations = extendType({
       type: TriggerType,
       args: {
         triggerId: 'String',
-        questionId: 'String',
         recipients: RecipientsInputType,
         trigger: TriggerInputType,
       },
 
       async resolve(parent, args, ctx) {
         if (!args.triggerId) throw new Error('No valid trigger ID provided');
-
+        console.log('inside editTrigger');
         const dbTrigger = await ctx.prisma.trigger.findOne({
           where: { id: args.triggerId },
           include: {
@@ -213,9 +212,9 @@ const TriggerMutations = extendType({
           medium: args.trigger?.medium || 'EMAIL',
         };
 
-        updateTriggerArgs = TriggerService.updateRelatedQuestion(
-          dbTrigger?.relatedNodeId, args.questionId, updateTriggerArgs,
-        );
+        // updateTriggerArgs = TriggerService.updateRelatedQuestion(
+        //   dbTrigger?.relatedNodeId, args.questionId, updateTriggerArgs,
+        // );
 
         if (dbTrigger?.recipients) {
           updateTriggerArgs = TriggerService.updateRecipients(

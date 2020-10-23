@@ -968,7 +968,6 @@ export interface NexusGenArgTypes {
       title?: string | null; // String
     }
     editTrigger: { // args
-      questionId?: string | null; // String
       recipients?: NexusGenInputs['RecipientsInputType'] | null; // RecipientsInputType
       trigger?: NexusGenInputs['TriggerInputType'] | null; // TriggerInputType
       triggerId?: string | null; // String

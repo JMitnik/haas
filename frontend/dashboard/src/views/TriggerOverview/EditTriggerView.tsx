@@ -164,25 +164,26 @@ const EditTriggerForm = ({ trigger }: {trigger: any}) => {
   });
 
   const onSubmit = (formData: FormDataProps) => {
-    const questionId = formData.question.value;
     const recipients = { ids: formData.recipients?.map((recip) => recip.value).filter((val) => val) };
+    const conditions = formData.conditions.map((condition) => (
+      {
+        questionId: condition.questionId.value,
+        type: condition.conditionType,
+        minValue: condition?.lowThreshold ? condition?.lowThreshold * 10 : null,
+        maxValue: condition?.highThreshold ? condition.highThreshold * 10 : null,
+        textValue: condition?.matchText || null,
+      }));
 
     const trigger = {
       name: formData.name,
       type: formData?.type,
       medium: formData?.medium,
-      conditions: [{
-        type: formData.condition,
-        minValue: formData.lowThreshold * 10,
-        maxValue: formData.highThreshold * 10,
-        textValue: formData.matchText,
-      }],
+      conditions,
     };
 
     editTrigger({
       variables: {
         triggerId,
-        questionId,
         trigger,
         recipients,
       },

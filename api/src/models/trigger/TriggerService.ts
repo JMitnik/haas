@@ -394,41 +394,42 @@ class TriggerService {
     newConditions: Array<NexusGenInputs['TriggerConditionInputType']>,
     triggerId: string,
   ) => {
-    const upsertedConditionsIds = await Promise.all(newConditions.map(async (condition) => {
-      if (!condition.type) return null;
+    console.log('new Conditions: ', newConditions);
+    // const upsertedConditionsIds = await Promise.all(newConditions.map(async (condition) => {
+    //   if (!condition.type) return null;
 
-      const upsertTriggerCondition = await prisma.triggerCondition.upsert({
-        where: { id: condition.id || -1 },
-        create: {
-          type: condition.type,
-          minValue: condition.minValue,
-          maxValue: condition.maxValue,
-          textValue: condition.textValue,
-          trigger: {
-            connect: {
-              id: triggerId,
-            },
-          },
-        },
-        update: {
-          type: condition.type,
-          minValue: condition.minValue,
-          maxValue: condition.maxValue,
-          textValue: condition.textValue,
-        },
-      });
+    //   const upsertTriggerCondition = await prisma.triggerCondition.upsert({
+    //     where: { id: condition.id || -1 },
+    //     create: {
+    //       type: condition.type,
+    //       minValue: condition.minValue,
+    //       maxValue: condition.maxValue,
+    //       textValue: condition.textValue,
+    //       trigger: {
+    //         connect: {
+    //           id: triggerId,
+    //         },
+    //       },
+    //     },
+    //     update: {
+    //       type: condition.type,
+    //       minValue: condition.minValue,
+    //       maxValue: condition.maxValue,
+    //       textValue: condition.textValue,
+    //     },
+    //   });
 
-      return upsertTriggerCondition.id;
-    }));
+    //   return upsertTriggerCondition.id;
+    // }));
 
-    await Promise.all(dbTriggerConditions.map(async (condition) => {
-      if (!upsertedConditionsIds.includes(condition.id)) {
-        const deletedCondition = await prisma.triggerCondition.delete({ where: { id: condition.id } });
-        return deletedCondition.id;
-      }
+    // await Promise.all(dbTriggerConditions.map(async (condition) => {
+    //   if (!upsertedConditionsIds.includes(condition.id)) {
+    //     const deletedCondition = await prisma.triggerCondition.delete({ where: { id: condition.id } });
+    //     return deletedCondition.id;
+    //   }
 
-      return null;
-    }));
+    //   return null;
+    // }));
   };
 
   static updateRecipients = (
