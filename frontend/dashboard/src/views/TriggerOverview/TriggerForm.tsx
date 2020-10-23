@@ -185,7 +185,7 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
   const history = useHistory();
   const { t } = useTranslation();
   const { customerSlug } = useParams<{ customerSlug: string }>();
-  const [activeConditions, setActiveConditions] = useState<Array<any>>([]); // {questionId: null, conditionType: null, matchText: null, lowThreshold: null, highThreshold: null, }
+  const [activeConditions, setActiveConditions] = useState<Array<any>>([]);
 
   // Fetching dialogue data
   const { data: triggerData } = useQuery<CustomerTriggerData>(getCustomerTriggerData, { variables: { customerSlug } });
@@ -263,10 +263,6 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
     prevConditions[index].highThreshold = highThreshold;
     return [...prevConditions];
   });
-  // console.log('form values: ', form.getValues());
-  // const useConditions = form.watch('conditions');
-  console.log('use conditions: ', activeConditions);
-  console.log('form conditions: ', form.watch('conditions'));
 
   return (
     <Form onSubmit={form.handleSubmit(onFormSubmit)}>
@@ -395,22 +391,6 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                     control={form.control}
                     options={questions}
                   />
-                  {/* <Controller
-                    name={`conditions[${index}].questionId`}
-                    // defaultValue={null}
-                    control={form.control}
-                    render={({ onChange, value }) => (
-                      <Select
-                        options={questions}
-                        value={value}
-                        onChange={(e: any) => {
-                          handleConditionQuestionChange(e.value, index);
-                          onChange(e);
-                        }}
-                      />
-                    )}
-                  /> */}
-
                   <FormErrorMessage>{form.errors.conditions?.[index]?.questionId?.message}</FormErrorMessage>
                 </FormControl>
                 )}
@@ -540,7 +520,7 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                   variantColor="red"
                   onClick={() => handleDeleteCondition(index)}
                 >
-                  {t('cta:delete_link')}
+                  {t('delete_trigger')}
                 </Button>
                 <FormControl />
               </Div>

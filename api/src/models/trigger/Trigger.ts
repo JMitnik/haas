@@ -3,9 +3,11 @@ import { PrismaClient,
   TriggerUpdateInput } from '@prisma/client';
 import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
 
+import { DialogueType } from '../questionnaire/Dialogue';
 import { PaginationWhereInput } from '../general/Pagination';
 import { QuestionNodeType } from '../question/QuestionNode';
 import { UserType } from '../users/User';
+import { resolve } from 'path';
 import TriggerService from './TriggerService';
 
 const TriggerTypeEnum = enumType({
@@ -50,25 +52,48 @@ const TriggerType = objectType({
     t.field('medium', { type: TriggerMediumEnum });
 
     t.string('relatedNodeId', { nullable: true });
-    t.field('relatedNode', {
-      type: QuestionNodeType,
+    t.field('relatedDialogue', {
+      type: DialogueType,
       nullable: true,
 
       async resolve(parent, args, ctx) {
-        if (!parent.relatedNodeId) throw Error('Not good!');
-
-        return ctx.prisma.questionNode.findOne({
-          where: { id: parent.relatedNodeId },
+        const questionsOfTrigger = await ctx.prisma.questionOfTrigger.findMany({
+          where: {
+            triggerId: parent.id,
+          },
           include: {
-            questionDialogue: {
+            question: {
               select: {
-                slug: true,
+                questionDialogue: true,
               },
             },
           },
         });
+
+        if (!questionsOfTrigger.length) return null;
+
+        return questionsOfTrigger[0].question.questionDialogue;
       },
     });
+    // t.field('relatedNode', {
+    //   type: QuestionNodeType,
+    //   nullable: true,
+
+    //   async resolve(parent, args, ctx) {
+    //     if (!parent.relatedNodeId) throw Error('Not good!');
+
+    //     return ctx.prisma.questionNode.findOne({
+    //       where: { id: parent.relatedNodeId },
+    //       include: {
+    //         questionDialogue: {
+    //           select: {
+    //             slug: true,
+    //           },
+    //         },
+    //       },
+    //     });
+    //   },
+    // });
 
     t.list.field('conditions', {
       type: TriggerConditionType,

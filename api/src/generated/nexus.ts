@@ -810,7 +810,7 @@ export interface NexusGenFieldTypes {
     medium: NexusGenEnums['TriggerMediumEnum']; // TriggerMediumEnum!
     name: string; // String!
     recipients: NexusGenRootTypes['UserType'][]; // [UserType!]!
-    relatedNode: NexusGenRootTypes['QuestionNode'] | null; // QuestionNode
+    relatedDialogue: NexusGenRootTypes['Dialogue'] | null; // Dialogue
     relatedNodeId: string | null; // String
     type: NexusGenEnums['TriggerTypeEnum']; // TriggerTypeEnum!
   }

@@ -707,7 +707,7 @@ type TriggerType {
   medium: TriggerMediumEnum!
   name: String!
   recipients: [UserType!]!
-  relatedNode: QuestionNode
+  relatedDialogue: Dialogue
   relatedNodeId: String
   type: TriggerTypeEnum!
 }

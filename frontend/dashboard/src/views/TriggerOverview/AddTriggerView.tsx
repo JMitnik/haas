@@ -55,37 +55,32 @@ const schema = yup.object().shape({
   dialogue: yup.string().required(),
   type: yup.string().required(),
   medium: yup.string().required(),
-  // question: yup.object().shape({
-  //   value: yup.string().when(['type'], {
-  //     is: (type: string) => type === TriggerQuestionType.QUESTION,
-  //     then: yup.string().required(),
-  //     otherwise: yup.string().notRequired(),
-  //   }),
-  // }),
-  conditions: yup.array().min(1),
-  // condition: yup.string().required(),
-  // lowThreshold: yup.string().notRequired().when(['condition'], {
-  //   is: (condition: string) => condition === TriggerConditionType.LOW_THRESHOLD
-  //   || condition === TriggerConditionType.INNER_RANGE
-  //   || condition === TriggerConditionType.OUTER_RANGE,
-  //   then: yup.string().required(),
-  //   otherwise: yup.string().notRequired(),
-  // }),
-  // highThreshold: yup.string().when(['condition'], {
-  //   is: (condition: string) => condition === TriggerConditionType.HIGH_THRESHOLD
-  //   || condition === TriggerConditionType.INNER_RANGE
-  //   || condition === TriggerConditionType.OUTER_RANGE,
-  //   then: yup.string().required(),
-  //   otherwise: yup.string().notRequired(),
-  // }),
-  // matchText: yup.string().when(['condition'], {
-  //   is: (parentQuestionType: string) => parentQuestionType === TriggerConditionType.TEXT_MATCH,
-  //   then: yup.string().required(),
-  //   otherwise: yup.string().notRequired(),
-  // }),
-  // recipients: yup.array().min(1).of(yup.object().shape({
-  //   value: yup.string().required(),
-  // })),
+  conditions: yup.array().min(1).required().of(yup.object().shape({
+    questionId: yup.string().required(),
+    conditionType: yup.string().required(),
+    lowThreshold: yup.string().notRequired().when('conditionType', {
+      is: (condition: string) => condition === TriggerConditionType.LOW_THRESHOLD
+      || condition === TriggerConditionType.INNER_RANGE
+      || condition === TriggerConditionType.OUTER_RANGE,
+      then: yup.string().required(),
+      otherwise: yup.string().notRequired(),
+    }),
+    highThreshold: yup.number().when('conditionType', {
+      is: (conditionType: string) => conditionType === TriggerConditionType.HIGH_THRESHOLD
+        || conditionType === TriggerConditionType.INNER_RANGE
+        || conditionType === TriggerConditionType.OUTER_RANGE,
+      then: yup.number().required(),
+      otherwise: yup.number().notRequired(),
+    }),
+    matchText: yup.string().when('conditionType', {
+      is: (conditionType: string) => conditionType === TriggerConditionType.TEXT_MATCH,
+      then: yup.string().required(),
+      otherwise: yup.string().notRequired(),
+    }),
+  })),
+  recipients: yup.array().min(1).required().of(yup.object().shape({
+    value: yup.string().required(),
+  })),
 });
 
 const AddTriggerView = () => {

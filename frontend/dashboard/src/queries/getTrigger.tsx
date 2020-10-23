@@ -7,14 +7,9 @@ const getTriggerQuery = gql`
       name
       medium
       type
-      relatedNode {
-        id
+      relatedDialogue {
+        slug
         title
-        questionDialogueId
-        questionDialogue {
-          slug
-          title
-        }
       }
       conditions {
           id

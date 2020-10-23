@@ -180,9 +180,6 @@ class NodeEntryService {
   }
 
   static getTextValueFromEntry = (entry: NodeEntryWithTypes): (string | null) => {
-    console.log('related node type: ', entry.relatedNode?.type);
-    console.log('TEXT ENTRY SLIDER NODE VALUE WTF?: ', entry.sliderNodeEntry);
-    console.log('text entry choice value: ', entry.choiceNodeEntry);
     if (entry.relatedNode?.type === 'CHOICE') return entry.choiceNodeEntry?.value || null;
     if (entry.relatedNode?.type === 'TEXTBOX') return entry.choiceNodeEntry?.value || null;
 

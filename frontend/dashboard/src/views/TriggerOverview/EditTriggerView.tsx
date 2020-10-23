@@ -103,6 +103,8 @@ const EditTriggerView = () => {
 
   const trigger = triggerData?.trigger;
 
+  console.log('trigger: ', trigger);
+
   return <EditTriggerForm trigger={trigger} />;
 };
 
@@ -119,17 +121,18 @@ const EditTriggerForm = ({ trigger }: {trigger: any}) => {
       name: trigger.name,
       condition: trigger.conditions[0].type,
       dialogue: {
-        label: trigger.relatedNode.questionDialogue.title,
-        value: trigger.relatedNode.questionDialogue.slug,
+        label: trigger.relatedDialogue.title,
+        value: trigger.relatedDialogue.slug,
       },
-      highThreshold: trigger.conditions[0].maxValue / 10,
-      lowThreshold: trigger.conditions[0].minValue / 10,
-      matchText: trigger.conditions[0].textValue,
+      // conditions: trigger.conditions.map((condition) => )
+      // highThreshold: trigger.conditions[0].maxValue / 10,
+      // lowThreshold: trigger.conditions[0].minValue / 10,
+      // matchText: trigger.conditions[0].textValue,
       medium: trigger.medium,
-      question: {
-        label: trigger.relatedNode.title,
-        value: trigger.relatedNode.id,
-      },
+      // question: {
+      //   label: trigger.relatedNode.title,
+      //   value: trigger.relatedNode.id,
+      // },
       recipients: trigger.recipients.map((recipient: any) => ({ label: `${recipient?.lastName}, ${recipient?.firstName} - E: ${recipient?.email} - P: ${recipient?.phone}`,
         value: recipient?.id })),
       type: trigger.type,
