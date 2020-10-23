@@ -395,7 +395,57 @@ class TriggerService {
     triggerId: string,
   ) => {
     console.log('new Conditions: ', newConditions);
-    // const upsertedConditionsIds = await Promise.all(newConditions.map(async (condition) => {
+    const upsertedConditionsIds = await Promise.all(newConditions.map(async (condition) => {
+      const upsertQuestionOfTrigger = await prisma.questionOfTrigger.upsert({
+        where: {
+          questionId_triggerId: {
+            questionId: condition.questionId || '-1',
+            triggerId: triggerId || '-1',
+          },
+        },
+        create: {
+          question: {
+            connect: {
+              id: condition.questionId,
+            },
+          },
+          trigger: {
+            connect: {
+              id: triggerId,
+            },
+          },
+          triggerCondition: {
+            create: {
+              type: condition.type || undefined,
+              minValue: condition.minValue,
+              maxValue: condition.maxValue,
+              textValue: condition.textValue,
+              trigger: {
+                connect: {
+                  id: triggerId,
+                },
+              },
+            },
+          },
+        },
+        update: {
+          question: {
+            connect: {
+              id: condition.questionId,
+            },
+          },
+          triggerCondition: {
+            update: {
+              type: condition.type || undefined,
+              minValue: condition.minValue,
+              maxValue: condition.maxValue,
+              textValue: condition.textValue,
+            },
+          },
+        },
+      });
+    }));
+
     //   if (!condition.type) return null;
 
     //   const upsertTriggerCondition = await prisma.triggerCondition.upsert({
