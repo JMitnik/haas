@@ -397,33 +397,84 @@ class TriggerService {
     const upsertedConditionsIds = await Promise.all(newConditions.map(async (condition) => {
       if (!condition.type) return null;
 
-      const upsertTriggerCondition = await prisma.triggerCondition.upsert({
-        where: { id: condition.id || -1 },
+      // TODO: Update questionOfTrigger table
+      const upsertQuestionOfTrigger = await prisma.questionOfTrigger.upsert({
+        where: {
+          questionId_triggerId: {
+            questionId: condition.questionId || '-1',
+            triggerId: triggerId || '-1',
+          },
+        },
         create: {
-          type: condition.type,
-          minValue: condition.minValue,
-          maxValue: condition.maxValue,
-          textValue: condition.textValue,
+          question: {
+            connect: {
+              id: condition.questionId,
+            },
+          },
           trigger: {
             connect: {
               id: triggerId,
             },
           },
+          triggerCondition: {
+            create: {
+              type: condition.type,
+              minValue: condition.minValue,
+              maxValue: condition.maxValue,
+              textValue: condition.textValue,
+              trigger: {
+                connect: {
+                  id: triggerId,
+                },
+              },
+            },
+          },
         },
         update: {
-          type: condition.type,
-          minValue: condition.minValue,
-          maxValue: condition.maxValue,
-          textValue: condition.textValue,
+          question: {
+            connect: {
+              id: condition.questionId,
+            },
+          },
+          triggerCondition: {
+            update: {
+              type: condition.type,
+              minValue: condition.minValue,
+              maxValue: condition.maxValue,
+              textValue: condition.textValue,
+            },
+          },
         },
       });
 
-      return upsertTriggerCondition.id;
+      // const upsertTriggerCondition = await prisma.triggerCondition.upsert({
+      //   where: { id: condition.id || -1 },
+      //   create: {
+      //     type: condition.type,
+      //     minValue: condition.minValue,
+      //     maxValue: condition.maxValue,
+      //     textValue: condition.textValue,
+      //     trigger: {
+      //       connect: {
+      //         id: triggerId,
+      //       },
+      //     },
+      //   },
+      //   update: {
+      //     type: condition.type,
+      //     minValue: condition.minValue,
+      //     maxValue: condition.maxValue,
+      //     textValue: condition.textValue,
+      //   },
+      // });
+
+      return upsertQuestionOfTrigger.triggerConditionId;
     }));
 
     await Promise.all(dbTriggerConditions.map(async (condition) => {
       if (!upsertedConditionsIds.includes(condition.id)) {
         const deletedCondition = await prisma.triggerCondition.delete({ where: { id: condition.id } });
+        await prisma.questionOfTrigger.deleteMany({ where: { triggerConditionId: condition.id } });
         return deletedCondition.id;
       }
 

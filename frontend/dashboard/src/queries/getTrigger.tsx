@@ -13,11 +13,14 @@ const getTriggerQuery = gql`
       }
       conditions {
           id
-          questionId
           type
           minValue
           maxValue
           textValue
+          question {
+            id
+            title
+          }
       }
       recipients {
           id

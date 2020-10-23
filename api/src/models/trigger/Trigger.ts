@@ -39,7 +39,8 @@ const TriggerConditionType = objectType({
     t.string('textValue', { nullable: true });
 
     t.string('triggerId');
-    t.string('questionId', {
+    t.field('question', {
+      type: QuestionNodeType,
       nullable: true,
       async resolve(parent, args, ctx) {
         const questionOfTrigger = await ctx.prisma.questionOfTrigger.findMany({
@@ -47,11 +48,14 @@ const TriggerConditionType = objectType({
             triggerId: parent.triggerId,
             triggerConditionId: parent.id,
           },
+          include: {
+            question: true,
+          },
         });
 
         if (!questionOfTrigger.length) return null;
 
-        return questionOfTrigger[0].questionId;
+        return questionOfTrigger[0].question;
       },
     });
   },
@@ -184,7 +188,6 @@ const TriggerMutations = extendType({
       type: TriggerType,
       args: {
         triggerId: 'String',
-        questionId: 'String',
         recipients: RecipientsInputType,
         trigger: TriggerInputType,
       },
@@ -209,9 +212,9 @@ const TriggerMutations = extendType({
           medium: args.trigger?.medium || 'EMAIL',
         };
 
-        updateTriggerArgs = TriggerService.updateRelatedQuestion(
-          dbTrigger?.relatedNodeId, args.questionId, updateTriggerArgs,
-        );
+        // updateTriggerArgs = TriggerService.updateRelatedQuestion(
+        //   dbTrigger?.relatedNodeId, args.questionId, updateTriggerArgs,
+        // );
 
         if (dbTrigger?.recipients) {
           updateTriggerArgs = TriggerService.updateRecipients(

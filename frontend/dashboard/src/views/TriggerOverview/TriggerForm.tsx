@@ -1,5 +1,5 @@
 /* eslint-disable radix */
-import { Controller, UseFormMethods } from 'react-hook-form';
+import { Controller, UseFormMethods, useWatch } from 'react-hook-form';
 import { CornerRightDown, CornerRightUp, Key, Mail, Maximize2,
   Minimize2, PlusCircle, Smartphone, Thermometer, Type, UserPlus, Watch } from 'react-feather';
 import { debounce } from 'lodash';
@@ -34,7 +34,7 @@ interface FormDataProps {
     label: string;
     value: string;
   };
-  conditions: Array<{ questionId: string, conditionType: string, highThreshold: number, lowThreshold: number, matchText: string }>;
+  conditions: Array<{ questionId: { label: string, value: string }, conditionType: string, highThreshold: number, lowThreshold: number, matchText: string }>;
   condition: string;
   matchText: string;
   lowThreshold: number;
@@ -189,8 +189,9 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
 
   useEffect(() => {
     console.log('useEffect conditions: ', form.watch('conditions'));
-    setActiveConditions(form.watch('conditions'));
+    setActiveConditions(form.watch('conditions') || []);
   }, []);
+
   // Fetching dialogue data
   const { data: triggerData } = useQuery<CustomerTriggerData>(getCustomerTriggerData, { variables: { customerSlug } });
   const dialogues = triggerData?.customer?.dialogues?.map((dialogue) => ({
@@ -267,6 +268,9 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
     prevConditions[index].highThreshold = highThreshold;
     return [...prevConditions];
   });
+
+  console.log('form errors: ', form.errors);
+  console.log('form conditions: ', form.watch('conditions'));
 
   return (
     <Form onSubmit={form.handleSubmit(onFormSubmit)}>
@@ -370,32 +374,25 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
             <Hr />
             {activeConditions?.map((condition, index) => (
               <Div
-                key={`${condition?.questionId || condition.id}`}
+                key={`${form.watch('conditions')?.[index]?.questionId.value || condition.id}`}
                 marginTop={15}
                 gridColumn="1 / -1"
                 bg="gray.100"
                 padding={4}
               >
                 {form.watch('type') === TriggerQuestionType.QUESTION && activeDialogue && (
-                <FormControl isRequired isInvalid={!!form.errors.conditions?.[index]?.questionId}>
+                <FormControl isRequired isInvalid={!!form.errors.conditions?.[index]?.questionId?.value}>
                   <FormLabel htmlFor={`conditions[${index}].questionId`}>{t('trigger:question')}</FormLabel>
                   <InputHelper>
                     {t('trigger:question_helper')}
                   </InputHelper>
                   <Controller
                     name={`conditions[${index}].questionId`}
-                    render={({ onChange }) => (
-                      <Select
-                        options={questions}
-                        onChange={(e: any) => {
-                          onChange(e.value);
-                        }}
-                      />
-                    )}
+                    as={<Select />}
                     control={form.control}
                     options={questions}
                   />
-                  <FormErrorMessage>{form.errors.conditions?.[index]?.questionId?.message}</FormErrorMessage>
+                  <FormErrorMessage>{form.errors.conditions?.[index]?.questionId?.value?.message}</FormErrorMessage>
                 </FormControl>
                 )}
                 {form.watch('conditions')?.[index]?.questionId ? (
@@ -411,7 +408,7 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                       render={({ onChange, onBlur, value }) => (
                         <ConditionFormFragment
                           activeNodeType={getNodeType(
-                            form.watch('conditions')?.[index]?.questionId, questionsData?.customer?.dialogue?.questions,
+                            form.watch('conditions')?.[index]?.questionId?.value, questionsData?.customer?.dialogue?.questions,
                           )}
                           value={value}
                           onChange={(e: any) => {
