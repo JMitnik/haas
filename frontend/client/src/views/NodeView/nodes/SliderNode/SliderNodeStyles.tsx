@@ -57,7 +57,7 @@ export const FingerPrintContainer = styled(motion.div)`
 
 export const SliderNodeValue = styled(motion.h3)`
   ${({ theme }) => css`
-    background: white;
+    background: rgba(255, 255, 255, 0.4);
     color: ${theme.colors.primary};
     display: inline-block;
     text-align: center;
