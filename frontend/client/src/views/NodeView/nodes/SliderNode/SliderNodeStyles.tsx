@@ -68,12 +68,25 @@ export const SliderNodeValue = styled(motion.h3)`
     border-radius: 30px;
     display: flex;
     box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+    width: 50px;
+    height: 50px;
+
+    svg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: 100%;
+      height: 100%;
+      fill: none;
+    }
 
     p {
       opacity: 1;
-      width: 50px;
+      width: 100%;
+      height: 100%;
       padding: 8px;
-      height: 50px;
       background: white;
       border: 4px solid white;
       border-radius: 50px;

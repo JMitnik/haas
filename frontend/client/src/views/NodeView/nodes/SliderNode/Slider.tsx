@@ -1,4 +1,4 @@
-import { AnimationControls, Variants, motion, transform, useAnimation } from 'framer-motion';
+import { AnimationControls, Variants, motion, transform, useAnimation, useMotionValue, useTransform } from 'framer-motion';
 import Color from 'color';
 import Lottie from 'react-lottie';
 import React, { useReducer, useState } from 'react';
@@ -12,6 +12,7 @@ import { ReactComponent as UnhappyIcon } from 'assets/icons/icon-unhappy.svg';
 import { FingerPrintContainer, HAASRabbit, SlideHereContainer, SliderNodeValue } from './SliderNodeStyles';
 import { SlideMeAnimation } from './SliderNodeAnimations';
 import { usePopper } from 'react-popper';
+import { useTimer } from 'use-timer';
 
 interface SliderAnimationStateProps {
   isStopped: boolean;
@@ -58,6 +59,21 @@ interface SliderProps {
 
 const Slider = ({ form, register, onSubmit }: SliderProps) => {
   const animationControls = useAnimation();
+  const timerProgressAbs = useMotionValue(0);
+
+  const { start, status, reset } = useTimer({
+    endTime: 30,
+    interval: 10,
+    onTimeUpdate: (time) => {
+      timerProgressAbs.set(time);
+    },
+    onTimeOver: () => {
+      onSubmit();
+    },
+  });
+
+  const timerProgress = useTransform(timerProgressAbs, [0, 30], [0, 1]);
+
   const sliderValue = Number(form.watch({ nest: true }).slider / 10);
   const sliderColor = transform(sliderValue, [0, 5, 10], ['#E53E3E', '#F6AD55', '#38B2AC']);
 
@@ -123,6 +139,7 @@ const Slider = ({ form, register, onSubmit }: SliderProps) => {
   }, defaultSliderAnimationState);
 
   const moveBunny = (event: React.FormEvent<HTMLInputElement>) => {
+    reset();
     const val = Number(event.currentTarget.value);
     animationControls.start('active');
 
@@ -133,26 +150,26 @@ const Slider = ({ form, register, onSubmit }: SliderProps) => {
 
   const handleSubmit = () => {
     dispatchAnimationState({ type: 'idle' });
-    onSubmit();
+    start();
   };
 
   return (
     <>
       {animationState.isStopped && (
-      <SlideHereContainer variants={SlideMeAnimation} animate="animate" initial="initial" exit="exit">
-        <Flex alignItems="center">
-          <UnhappyIcon />
-          <Text fontSize="0.8rem">
-            Unhappy
-          </Text>
-        </Flex>
-        <Flex alignItems="center">
-          <Text mr={1} fontSize="0.8rem">
-            Happy
-          </Text>
-          <HappyIcon />
-        </Flex>
-      </SlideHereContainer>
+        <SlideHereContainer variants={SlideMeAnimation} animate="animate" initial="initial" exit="exit">
+          <Flex alignItems="center">
+            <UnhappyIcon />
+            <Text fontSize="0.8rem">
+              Unhappy
+            </Text>
+          </Flex>
+          <Flex alignItems="center">
+            <Text mr={1} fontSize="0.8rem">
+              Happy
+            </Text>
+            <HappyIcon />
+          </Flex>
+        </SlideHereContainer>
       )}
 
       <HAASRabbit
@@ -172,7 +189,15 @@ const Slider = ({ form, register, onSubmit }: SliderProps) => {
           {...attributes.popper}
         >
           <SliderNodeValue initial="initial" variants={sliderValueAnimeVariants} animate={animationControls}>
-            <motion.p animate={{ color: sliderColor, borderColor: Color(sliderColor).lighten(0.3).hex() }}>
+
+            <motion.svg viewBox="0 0 40 40">
+              <motion.path
+                d="M 0, 20 a 20, 20 0 1,0 40,0 a 20, 20 0 1,0 -40,0"
+                style={{ pathLength: timerProgress, stroke: sliderColor, strokeWidth: '3px' }}
+              />
+            </motion.svg>
+
+            <motion.p animate={{ color: sliderColor }}>
               {sliderValue.toFixed(0)}
             </motion.p>
           </SliderNodeValue>
@@ -199,7 +224,7 @@ const Slider = ({ form, register, onSubmit }: SliderProps) => {
           name="slider"
           style={{ zIndex: 300 }}
           onChange={(e) => moveBunny(e)}
-          // onMouseUp={() => handleSubmit()}
+          onMouseUp={() => handleSubmit()}
           // onTouchEnd={() => }
           min={1}
           max={100}
