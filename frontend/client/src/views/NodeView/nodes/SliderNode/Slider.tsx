@@ -57,12 +57,14 @@ interface SliderProps {
   onSubmit: () => void;
 }
 
+const endTime = 60;
+
 const Slider = ({ form, register, onSubmit }: SliderProps) => {
   const animationControls = useAnimation();
   const timerProgressAbs = useMotionValue(0);
 
   const { start, status, reset } = useTimer({
-    endTime: 30,
+    endTime,
     interval: 10,
     onTimeUpdate: (time) => {
       timerProgressAbs.set(time);
@@ -72,7 +74,7 @@ const Slider = ({ form, register, onSubmit }: SliderProps) => {
     },
   });
 
-  const timerProgress = useTransform(timerProgressAbs, [0, 30], [0, 1]);
+  const timerProgress = useTransform(timerProgressAbs, [0, endTime], [0, 1]);
 
   const sliderValue = Number(form.watch({ nest: true }).slider / 10);
   const sliderColor = transform(sliderValue, [0, 5, 10], ['#E53E3E', '#F6AD55', '#38B2AC']);
@@ -225,7 +227,7 @@ const Slider = ({ form, register, onSubmit }: SliderProps) => {
           style={{ zIndex: 300 }}
           onChange={(e) => moveBunny(e)}
           onMouseUp={() => handleSubmit()}
-          // onTouchEnd={() => }
+          onTouchEnd={() => handleSubmit()}
           min={1}
           max={100}
           defaultValue={50}
