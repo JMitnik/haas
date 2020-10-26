@@ -40,6 +40,12 @@ const NodePage = observer(() => {
   const { edgeId, nodeId } = useParams<{ edgeId?: string, leafId?: string, nodeId?: string }>();
   const store = useDialogueTree();
 
+  if (!edgeId && nodeId) {
+    store.session.setIsAtLeaf(true);
+  } else {
+    store.session.setIsAtLeaf(false);
+  }
+
   return useObserver(() => {
     // If rootNode is unknown yet, return Loader
     if (!store.tree) {
@@ -49,9 +55,15 @@ const NodePage = observer(() => {
     // TODO: Disable going back
 
     // Either we start from the 'root' (no edge) or we get the next node.
-    const node = edgeId
-      ? store.tree.getChildNodeByEdge(edgeId) : nodeId
-        ? store.tree.getNodeById(nodeId) : store.tree.rootNode;
+    let node = store.tree.rootNode;
+
+    if (edgeId) {
+      node = store.tree.getChildNodeByEdge(edgeId) || store.tree.rootNode;
+    } else if (!edgeId && nodeId) {
+      node = store.tree.getNodeById(nodeId) || store.tree.rootNode;
+    } else {
+      node = store.tree.rootNode;
+    }
 
     if (!node) {
       return <EmptyDialogueView />;

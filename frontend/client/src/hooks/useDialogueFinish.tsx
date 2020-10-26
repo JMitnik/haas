@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { useMutation } from '@apollo/react-hooks';
 
-import createSessionMutation from 'mutations/createSessionMutation';
+import { autorun } from 'mobx';
+import createInteractionMutation from 'mutations/createSessionMutation';
 import gql from 'graphql-tag';
 import useDialogueTree from 'providers/DialogueTreeProvider';
 
@@ -13,18 +14,17 @@ const appendToInteractionMutation = gql`
   }
 `;
 
-const useJourneyFinish = (submitInstant: boolean = true) => {
-  const [isFinished, setIsFinished] = useState(false);
-  const [postSessionCreateQueue, setPostSessionCreateQueue] = useState<any[]>([]);
+const useDialogueFinish = () => {
+  const [hasCreatedSession, setHasCreatedSession] = useState(false);
+  const [entryQueue, setEntryQueue] = useState<any[]>([]);
   const [retryCounter, setRetryCounter] = useState<number>(0);
   const isUpdatingQueue = useRef<boolean>(false);
   const store = useDialogueTree();
 
   const entries = store.relevantSessionEntries;
-  const { customer } = store;
   const dialogue = store.tree;
 
-  const [createInteraction, { data: createdSessionData, loading: isCreatingSession }] = useMutation(createSessionMutation, {
+  const [createInteraction, { data: createdSessionData }] = useMutation(createInteractionMutation, {
     variables: {
       input: {
         dialogueId: dialogue?.id,
@@ -37,7 +37,7 @@ const useJourneyFinish = (submitInstant: boolean = true) => {
       },
     },
     onCompleted: () => {
-      setIsFinished(true);
+      setHasCreatedSession(true);
     },
   });
 
@@ -57,52 +57,57 @@ const useJourneyFinish = (submitInstant: boolean = true) => {
     onCompleted: () => {
       isUpdatingQueue.current = false;
 
-      setPostSessionCreateQueue((el) => {
-        const [_, ...restQueue] = el;
-
-        return restQueue;
-      });
+      // TODO: Remove this item from the queue (ENSURE WE REMOVE IT!)
     },
   });
 
+  /**
+   * Add items to the queue
+   * @param entry
+   */
+  const enqueueEntry = (entry: any) => {
+    setEntryQueue((entries) => [entry, ...entries]);
+  };
+
+  useEffect(() => {
+    // If we have entries in our queue, and we are done uploading our session
+    if (entryQueue.length && hasCreatedSession) {
+      appendToInteraction().
+    }
+  }, [entryQueue]);
+
   const handleCreateInteraction = () => {
-    if (entries.length && !isFinished) {
+    if (entries.length && !hasCreatedSession) {
       createInteraction();
     }
   };
 
-  const handleAppendToInteraction = (entry: any) => {
-    setPostSessionCreateQueue((queue) => [...queue, entry]);
+  /**
+   * Either uploads using the `create` mutation, or appends using the `append` mutation.
+   */
+  const handleUploadInteraction = (entry?: any) => {
+    if (entry && hasCreatedSession) {
+      enqueueEntry(entry);
+      return;
+    }
+
+    if (entries.length) {
+      createInteraction();
+    }
   };
 
+  // Effect to cleanup store for post-submission
   useEffect(() => {
-    const willUpdateToQueue = createdSessionData && !isUpdatingQueue.current && postSessionCreateQueue.length && !isCreatingSession;
-
-    // In case
-    if (willUpdateToQueue) {
-      isUpdatingQueue.current = true;
-      const [addedNodeEntry] = postSessionCreateQueue;
-
-      appendToInteraction({
-        variables: {
-          input: addedNodeEntry,
-        },
-      });
-    }
-  }, [createdSessionData, postSessionCreateQueue, retryCounter]);
-
-  // Effect for Post-submission
-  useEffect(() => {
-    if (isFinished) {
+    if (hasCreatedSession) {
       store.session.reset();
     }
-  }, [isFinished, store.session]);
+  }, [hasCreatedSession, store.session]);
 
   return {
+    uploadInteraction: handleUploadInteraction,
     createInteraction: handleCreateInteraction,
-    appendToInteraction: handleAppendToInteraction,
-    isFinished,
+    hasCreatedSession,
   };
 };
 
-export default useJourneyFinish;
+export default useDialogueFinish;

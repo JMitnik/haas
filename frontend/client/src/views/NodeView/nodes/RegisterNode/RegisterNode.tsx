@@ -11,7 +11,7 @@ import { ReactComponent as LastNameIcon } from 'assets/icons/icon-last-name.svg'
 import { NodeTitle } from 'layouts/NodeLayout/NodeLayoutStyles';
 import { SessionEntryDataProps } from 'models/Session/SessionEntryModel';
 import { ReactComponent as UserIcon } from 'assets/icons/icon-user.svg';
-import useJourneyFinish from 'hooks/use-dialogue-finish';
+import useDialogueFinish from 'hooks/useDialogueFinish';
 
 import { GenericNodeProps } from '../types';
 import { IconContainer, InputContainer, RegisterNodeContainer } from './RegisterNodeStyles';
@@ -25,12 +25,6 @@ interface RegisterNodeFormProps {
 }
 
 const RegisterNode = ({ node, onEntryStore }: RegisterNodeProps) => {
-  const { appendToInteraction, createInteraction, isFinished } = useJourneyFinish();
-
-  useEffect(() => {
-    createInteraction();
-  }, []);
-
   const { register, getValues, formState } = useForm<RegisterNodeFormProps>({
     mode: 'onChange',
     reValidateMode: 'onChange',

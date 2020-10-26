@@ -4,7 +4,7 @@ import React, { useEffect } from 'react';
 import { Flex } from '@haas/ui';
 import { NodeTitle } from 'layouts/NodeLayout/NodeLayoutStyles';
 import CustomIcon from 'components/Icons/CustomIcon';
-import useDialogueFinish from 'hooks/use-dialogue-finish';
+import useDialogueFinish from 'hooks/useDialogueFinish';
 
 import { GenericNodeProps } from '../types';
 import { ShareItem, SocialShareNodeContainer } from './SocialShareNodeStyles';

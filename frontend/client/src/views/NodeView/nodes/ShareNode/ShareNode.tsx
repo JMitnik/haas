@@ -3,7 +3,7 @@ import { useClipboard } from 'use-clipboard-copy';
 import React from 'react';
 
 import { Flex, H2 } from '@haas/ui';
-import useDialogueFinish from 'hooks/use-dialogue-finish';
+import useDialogueFinish from 'hooks/useDialogueFinish';
 
 import { GenericNodeProps } from '../types';
 import { ShareButton, ShareButtonContainer, ShareNodeContainer, SuccesMessageContainer } from './ShareNodeStyles';

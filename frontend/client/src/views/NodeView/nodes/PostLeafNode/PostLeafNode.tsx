@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { H2, H4 } from '@haas/ui';
-import useDialogueFinish from 'hooks/use-dialogue-finish';
+import useDialogueFinish from 'hooks/useDialogueFinish';
 
 import { PostLeafNodeContainer } from './PostLeafNodeStyles';
 

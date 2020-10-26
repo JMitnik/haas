@@ -9,31 +9,38 @@ haas:
     children: 
     
     # Positive
-    - condition: { min: 60, max: 100 }
-      node: { heading: 'Why do you feel good?', type: 'Choice', options: ['Application', 'Facilities']  }
-      cta: { byHandle: 'CTA-SHARE' }
-      children:
-        - condition: { matchValue: 'Application' }
-          node: { heading: 'What did you like about the Application?', type: 'Choice', options: ['Application Design', 'Website design', 'Good AI Partner'] }
-        - condition: { matchValue: 'Facilities' }
-          node: { heading: 'What did you like about the Facilities?', type: 'Choice', options: ['Clean bathroom', 'Happy smiles', 'Unhappy customer'] }
+    - node: {
+        condition: { min: 60, max: 100 },
+        node: { heading: 'Why do you feel good?', type: 'Choice', options: ['Application', 'Facilities']  },
+        cta: { byHandle: 'CTA-SHARE' },
+        children: [
+          node: {
+            condition: { matchValue: 'Application' },
+            heading: 'What did you like about the Application?', type: 'Choice', options: ['Application Design', 'Website design', 'Good AI Partner'],
+          },
+          node: {
+            condition: { matchValue: 'Facilities' },
+            heading: 'What did you like about the Facilities?', type: 'Choice', options: ['Application Design', 'Website design', 'Good AI Partner'],
+          },
+        ]
+      }
     
-    # Neutral
-    - condition: { min: 30, max: 60 }
-      node: { heading: 'Why do you feel neutral?', type: 'Choice', options: ['Application', 'Facilities']  }
-      cta: { byHandle: 'CTA-OPINION' }
-      children:
-        - condition: { matchValue: 'Application' }
-          node: { heading: 'What did you find neutral about the Application?', type: 'Choice', options: ['Meh Application Design', 'Meh Website design', 'Meh AI Partner'] }
-        - condition: { matchValue: 'Facilities' }
-          node: { heading: 'What did you find neutral about the Facilities?', type: 'Choice', options: ['Meh bathroom', 'Meh smiles', 'Meh customer'] }
+    # # Neutral
+    # - condition: { min: 30, max: 60 }
+    #   node: { heading: 'Why do you feel neutral?', type: 'Choice', options: ['Application', 'Facilities']  }
+    #   cta: { byHandle: 'CTA-OPINION' }
+    #   children:
+    #     - condition: { matchValue: 'Application' }
+    #       node: { heading: 'What did you find neutral about the Application?', type: 'Choice', options: ['Meh Application Design', 'Meh Website design', 'Meh AI Partner'] }
+    #     - condition: { matchValue: 'Facilities' }
+    #       node: { heading: 'What did you find neutral about the Facilities?', type: 'Choice', options: ['Meh bathroom', 'Meh smiles', 'Meh customer'] }
     
-    # Negative
-    - condition: { min: 0, max: 30 }
-      node: { heading: 'Why do you feel bad?', type: 'Choice', options: ['Application', 'Facilities']  }
-      cta: { byHandle: 'CTA-OPINION-2' }
-      children:
-        - condition: { matchValue: 'Application' }
-          node: { heading: 'What did you find bad about the Application?', type: 'Choice', options: ['Bad Application Design', 'Bad Website design', 'Bad AI Partner'] }
-        - condition: { matchValue: 'Facilities' }
-          node: { heading: 'What did you find bad about the Facilities?', type: 'Choice', options: ['Bad bathroom', 'Bad smiles', 'Bad customer'] }
+    # # Negative
+    # - condition: { min: 0, max: 30 }
+    #   node: { heading: 'Why do you feel bad?', type: 'Choice', options: ['Application', 'Facilities']  }
+    #   cta: { byHandle: 'CTA-OPINION-2' }
+    #   children:
+    #     - condition: { matchValue: 'Application' }
+    #       node: { heading: 'What did you find bad about the Application?', type: 'Choice', options: ['Bad Application Design', 'Bad Website design', 'Bad AI Partner'] }
+    #     - condition: { matchValue: 'Facilities' }
+    #       node: { heading: 'What did you find bad about the Facilities?', type: 'Choice', options: ['Bad bathroom', 'Bad smiles', 'Bad customer'] }

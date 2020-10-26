@@ -15,7 +15,7 @@ import ShareNode from './nodes/ShareNode/ShareNode';
 import SliderNode from './nodes/SliderNode/SliderNode';
 import SocialShareNode from './nodes/SocialShareNode/SocialShareNode';
 import TextboxNode from './nodes/TextboxNode/TextboxNode';
-import useJourneyFinish from 'hooks/use-dialogue-finish';
+import useDialogueFinish from 'hooks/useDialogueFinish';
 
 const nodeMap: Record<string, (props: GenericNodeProps) => JSX.Element> = {
   SLIDER: SliderNode,
@@ -44,23 +44,19 @@ interface NodeViewProps {
 const NodeView = ({ node }: NodeViewProps) => {
   const store = useDialogueTree();
   const history = useHistory();
-  const { appendToInteraction, createInteraction, isFinished } = useJourneyFinish();
+  const { uploadInteraction } = useDialogueFinish();
 
   const handleEntryStore = (entry: any, edgeKey: any) => {
-    console.log(entry);
     // Store the entry
     store.session.add(node.id, entry);
 
-    if (isFinished) {
-      appendToInteraction(entry);
-    }
-    console.log(isFinished);
-
-    // Get next edge and navigate there
     const { edgeId, isAtLeaf } = node.getNextEdgeIdFromKey(edgeKey);
 
+    if (store.session.isAtLeaf) {
+      uploadInteraction(entry);
+    }
+
     if (isAtLeaf) {
-      console.log('Is at leaf', edgeId);
       const activeLeaf = store.tree?.activeLeaf;
       return history.push(`/${store.customer?.slug}/${store.tree?.slug}/n/${activeLeaf?.id}`);
     }
