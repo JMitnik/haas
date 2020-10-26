@@ -28,6 +28,7 @@ export const DialogueTreeProvider = ({ children }: { children: React.ReactNode }
 
   const { data: customerData } = useQuery<CustomerDataProps>(getCustomerFromSlug, {
     skip: !customerMatch,
+    fetchPolicy: 'network-only',
     onError: (e) => {
       console.log(e.message);
     },
@@ -40,6 +41,7 @@ export const DialogueTreeProvider = ({ children }: { children: React.ReactNode }
 
   const { data: dialogueData } = useQuery<DialogueDataProps>(getDialogueFromSlug, {
     skip: !dialogueMatch,
+    fetchPolicy: 'network-only',
     onError: (e) => {
       console.log(e.message);
     },

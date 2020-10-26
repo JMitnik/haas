@@ -1,0 +1,5 @@
+query customer($slug: String!) {
+  customer(slug: $slug) {
+    ...CustomerFragment
+  }
+}

@@ -1,0 +1,16 @@
+fragment EdgeFragment on Edge {
+  id
+  conditions {
+    id
+    conditionType
+    matchValue
+    renderMin
+    renderMax
+  }
+  parentNode {
+    id
+  }
+  childNode {
+    id
+  }
+}

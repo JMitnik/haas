@@ -12,16 +12,16 @@ export const EdgeFragment = gql`
     }
     parentNode {
       id
-      title
+      # title
     }
     childNode {
       id
-      title
-      isRoot
-      children {
-        id
-      }
-      type
+      # title
+      # isRoot
+      # children {
+      #   id
+      # }
+      # type
     }
   }
 `;

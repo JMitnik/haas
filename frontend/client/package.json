@@ -31,6 +31,7 @@
     "mobx-devtools-mst": "^0.9.22",
     "mobx-react-lite": "^2.0.7",
     "mobx-state-tree": "^3.16.0",
+    "msw": "^0.21.3",
     "mutationobserver-shim": "^0.3.5",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
@@ -57,7 +58,12 @@
   },
   "devDependencies": {
     "@apollo/react-testing": "^3.1.4",
-    "@graphql-codegen/cli": "^1.17.3",
+    "@graphql-codegen/cli": "1.17.7",
+    "@graphql-codegen/introspection": "1.17.7",
+    "@graphql-codegen/typescript": "^1.17.11",
+    "@graphql-codegen/typescript-operations": "^1.17.8",
+    "@graphql-codegen/typescript-react-apollo": "1.17.7",
+    "@graphql-codegen/typescript-type-graphql": "^1.18.1",
     "@hookform/devtools": "^2.0.3",
     "@types/mobx-devtools-mst": "0.9.0",
     "@typescript-eslint/eslint-plugin": "^2.15.0",
@@ -78,7 +84,9 @@
     "start:https": "HTTPS=true SSL_CERT_FILE=secrets/server.cert SSL_KEY_FILE=server.key cra-workspaces start",
     "build": "cra-workspaces build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "cypress": "",
+    "eject": "react-scripts eject",
+    "gen": "graphql-codegen --config codegen.yml"
   },
   "browserslist": {
     "production": [

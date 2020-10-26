@@ -43,9 +43,9 @@ const getDialogueFromSlug = gql`
         edges {
           ...EdgeFragment
         }
-        customer {
-          ...CustomerFragment
-        }
+        # customer {
+        #   ...CustomerFragment
+        # }
       }
     }
   }

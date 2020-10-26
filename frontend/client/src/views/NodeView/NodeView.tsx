@@ -47,17 +47,20 @@ const NodeView = ({ node }: NodeViewProps) => {
   const { appendToInteraction, createInteraction, isFinished } = useJourneyFinish();
 
   const handleEntryStore = (entry: any, edgeKey: any) => {
+    console.log(entry);
     // Store the entry
     store.session.add(node.id, entry);
 
     if (isFinished) {
       appendToInteraction(entry);
     }
+    console.log(isFinished);
 
     // Get next edge and navigate there
     const { edgeId, isAtLeaf } = node.getNextEdgeIdFromKey(edgeKey);
 
     if (isAtLeaf) {
+      console.log('Is at leaf', edgeId);
       const activeLeaf = store.tree?.activeLeaf;
       return history.push(`/${store.customer?.slug}/${store.tree?.slug}/n/${activeLeaf?.id}`);
     }

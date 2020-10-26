@@ -111,6 +111,7 @@ const TreeModel = types
   }))
   .views((self) => ({
     get rootNode(): TreeNodeProps {
+      console.log('searing for root');
       return self.nodes?.filter((node) => node.isRoot)?.[0];
     },
   }));
