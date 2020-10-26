@@ -1,5 +1,5 @@
+import { CustomerStub, CustomerWithDialogueStub } from '../stubs/DialogueStub';
 import { graphql, rest } from 'msw';
-import CustomerWithDialogueStub from '../stubs/DialogueStub';
 
 const getCustomerWithDialogue = graphql.query('getDialogue', (req, res, ctx) => {
   console.log('Ahhh!');
@@ -17,7 +17,7 @@ const getCustomer = graphql.query('getCustomer', (req, res, ctx) => {
   return res(
     ctx.data({
       customer: {
-        name: 'test',
+        ...CustomerStub,
       },
     }),
   );

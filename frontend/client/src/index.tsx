@@ -22,12 +22,13 @@ Sentry.init({
   tracesSampleRate: 1.0,
 });
 
-if (process.env.NODE_ENV === 'development') {
+if (true) {
   worker.start({
     quiet: false,
     onUnhandledRequest: 'warn',
     waitUntilReady: true,
   }).then(() => {
+    console.log('Starting worker');
     ReactDOM.render(<App />, document.getElementById('root'));
   });
 } else {
@@ -37,4 +38,4 @@ if (process.env.NODE_ENV === 'development') {
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
 // Learn more about service workers: https://bit.ly/CRA-PWA
-serviceWorker.unregister();
+// serviceWorker.unregister();

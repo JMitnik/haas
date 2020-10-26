@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-import { Customer, Dialogue, Edge, EdgeCondition, GetDialogueQuery, QuestionNode, QuestionNodeTypeEnum, QuestionOption } from 'generated/graphql';
+import { CustomerFragmentFragment, EdgeCondition, EdgeFragmentFragment, GetDialogueQuery, QuestionFragmentFragment, QuestionNodeTypeEnum } from 'generated/graphql';
 
 // 0. Define all readable-identifiers
 const QuestionIds = [
@@ -111,12 +111,10 @@ const AllParentChildren: ParentChildren[] = [
 
 const rootNode = QuestionNodes[0];
 
-const flattenParentChildrenToEdges = (parentChildren: ParentChildren): any[] => parentChildren.childrenNodes.map((child) => ({
+const flattenParentChildrenToEdges = (parentChildren: ParentChildren): EdgeFragmentFragment[] => parentChildren.childrenNodes.map((child) => ({
   __typename: 'Edge',
   id: `${parentChildren.parentNodeId}-${child.childNodeId}`,
   parentNodeId: parentChildren.parentNodeId,
-  createdAt: '',
-  updatedAt: '',
   conditions: [{ __typename: 'EdgeCondition', ...child.condition }],
   childNodeId: child.childNodeId,
   childNode: {
@@ -129,18 +127,14 @@ const flattenParentChildrenToEdges = (parentChildren: ParentChildren): any[] => 
   },
 }));
 
-const getEdgesFromNode = (node: BasicQuestionNode): any[] => {
+const getEdgesFromNode = (node: BasicQuestionNode): EdgeFragmentFragment[] => {
   const edges = AllParentChildren.find((edge) => edge.parentNodeId === node.id)?.childrenNodes;
 
   if (!edges?.length) return [];
 
   return edges.map((edge) => ({
     __typename: 'Edge',
-    childNodeId: edge.childNodeId,
-    createdAt: '',
     id: `${node.id}-${edge.childNodeId}`,
-    parentNodeId: node.id,
-    updatedAt: '',
     conditions: [{
       __typename: 'EdgeCondition', matchValue: '', renderMax: 0, renderMin: 0, ...edge.condition,
     }],
@@ -155,26 +149,41 @@ const getEdgesFromNode = (node: BasicQuestionNode): any[] => {
   }));
 };
 
-const mapBasicQuestionToReal = (questionNode: BasicQuestionNode): QuestionNode => ({
+const mapBasicQuestionToReal = (questionNode: BasicQuestionNode): QuestionFragmentFragment => ({
   __typename: 'QuestionNode',
-  overrideLeafId: questionNode.leafId || undefined,
-  overrideLeaf: null,
   id: questionNode.id,
   isLeaf: false,
   isRoot: questionNode.id.includes('0'),
-  links: [],
   options: questionNode.type === QuestionNodeTypeEnum.Choice ? Topics.map((topic) => ({
     id: getRandomInt(1000000), value: topic, __typename: 'QuestionOption', questionId: '', publicValue: '',
   })) : [],
+  overrideLeaf: null,
   title: questionNode.title,
   type: questionNode.type,
   children: getEdgesFromNode(questionNode),
 });
 
-const CustomerWithDialogueStub: GetDialogueQuery = {
+export const CustomerStub: CustomerFragmentFragment = {
+  __typename: 'Customer',
+  id: 'test',
+  name: 'Test',
+  slug: 'test',
+  settings: {
+    id: '21312312',
+    __typename: 'CustomerSettings',
+    logoUrl: 'https://test123.com',
+    colourSettings: {
+      __typename: 'ColourSettings',
+      id: 'asdasd',
+      primary: '#000',
+    },
+  },
+};
+
+export const CustomerWithDialogueStub: GetDialogueQuery = {
   customer: {
     __typename: 'Customer',
-    id: '',
+    id: 'test',
     dialogue: {
       __typename: 'Dialogue',
       creationDate: null,
@@ -190,10 +199,10 @@ const CustomerWithDialogueStub: GetDialogueQuery = {
         id: '0-SLIDER',
         isRoot: true,
         isLeaf: false,
-        children: getEdgesFromNode(rootNode),
-        overrideLeaf: null,
+        children: [],
         options: [],
       },
+      customer: CustomerStub,
       customerId: '',
       title: 'How do you feel about Organization X?',
       slug: 'org-x',

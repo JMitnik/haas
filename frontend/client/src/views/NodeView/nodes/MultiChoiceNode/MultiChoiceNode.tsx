@@ -53,6 +53,7 @@ const MultiChoiceNode = ({ node, onEntryStore }: MultiChoiceNodeProps) => {
       <NodeTitle>{node.title}</NodeTitle>
 
       <MultiChoiceNodeGrid
+        data-cy="Choices"
         variants={multiChoiceContainerAnimation}
         initial="initial"
         animate="animate"
@@ -61,6 +62,7 @@ const MultiChoiceNode = ({ node, onEntryStore }: MultiChoiceNodeProps) => {
           <motion.div key={index} variants={multiChoiceItemAnimation}>
             <Div key={index} flex={['100%', 1]}>
               <ClientButton
+                data-cy="Option"
                 brand="primary"
                 type="button"
                 onClick={() => handleSubmit(multiChoiceOption)}

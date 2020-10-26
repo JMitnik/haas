@@ -5,11 +5,21 @@ import { CustomerFragment } from './CustomerFragment';
 const getCustomerFromSlug = gql`
   query getCustomer($slug: String!) {
     customer(slug: $slug) {
-        ...CustomerFragment
+      id
+    name
+    slug
+    settings {
+      id
+      logoUrl
+      colourSettings {
+        id
+        primary
+        primaryAlt
+        secondary
+      }
+    }
     }
   }
-
-  ${CustomerFragment}
 `;
 
 export default getCustomerFromSlug;

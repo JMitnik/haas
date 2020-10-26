@@ -9,8 +9,15 @@ fragment EdgeFragment on Edge {
   }
   parentNode {
     id
+    title
   }
   childNode {
     id
+    title
+    isRoot
+    children {
+      id
+    }
+    type
   }
 }

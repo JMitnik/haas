@@ -222,6 +222,7 @@ const Slider = ({ form, register, onSubmit }: SliderProps) => {
       </HAASRabbit>
       <form>
         <UISlider
+          data-cy="Slider"
           width={1}
           name="slider"
           style={{ zIndex: 300 }}
