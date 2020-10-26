@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/indent */
 /* eslint-disable max-len */
 import { CustomerFragmentFragment, EdgeCondition, EdgeFragmentFragment, GetDialogueQuery, QuestionFragmentFragment, QuestionNodeTypeEnum } from 'generated/graphql';
 
@@ -61,21 +62,21 @@ function getRandomInt(max: number) {
 // 2. Define all nodes, each with some readable-identifier (unique)
 const QuestionNodes: BasicQuestionNode[] = [
   { id: '0-SLIDER', title: 'How do you feel?', type: QuestionNodeTypeEnum.Slider },
-  { id: '1-POSITIVE', title: 'Why good?', type: QuestionNodeTypeEnum.Choice, leafId: 'CTA-LINK' },
-  { id: '2-POSITIVE-TOPIC-A', title: 'Why good about [[topic]]?', type: QuestionNodeTypeEnum.Choice },
-  { id: '2-POSITIVE-TOPIC-B', title: 'Why good about [[topic]]?', type: QuestionNodeTypeEnum.Choice },
-  { id: '2-POSITIVE-TOPIC-C', title: 'Why good about [[topic]]?', type: QuestionNodeTypeEnum.Choice },
-  { id: '2-POSITIVE-TOPIC-D', title: 'Why good about [[topic]]?', type: QuestionNodeTypeEnum.Choice },
-  { id: '1-NEUTRAL', title: 'Why neutral?', type: QuestionNodeTypeEnum.Choice, leafId: 'CTA-OPINION' },
-  { id: '2-NEUTRAL-TOPIC-A', title: 'Why neutral about [[topic]]?', type: QuestionNodeTypeEnum.Choice },
-  { id: '2-NEUTRAL-TOPIC-B', title: 'Why neutral about [[topic]]?', type: QuestionNodeTypeEnum.Choice },
-  { id: '2-NEUTRAL-TOPIC-C', title: 'Why neutral about [[topic]]?', type: QuestionNodeTypeEnum.Choice },
-  { id: '2-NEUTRAL-TOPIC-D', title: 'Why neutral about [[topic]]?', type: QuestionNodeTypeEnum.Choice },
-  { id: '1-NEGATIVE', title: 'Why negative?', type: QuestionNodeTypeEnum.Choice, leafId: 'CTA-TEXTBOX' },
-  { id: '2-NEGATIVE-TOPIC-A', title: 'Why negative about [[topic]]?', type: QuestionNodeTypeEnum.Choice },
-  { id: '2-NEGATIVE-TOPIC-B', title: 'Why negative about [[topic]]?', type: QuestionNodeTypeEnum.Choice },
-  { id: '2-NEGATIVE-TOPIC-C', title: 'Why negative about [[topic]]?', type: QuestionNodeTypeEnum.Choice },
-  { id: '2-NEGATIVE-TOPIC-D', title: 'Why negative about [[topic]]?', type: QuestionNodeTypeEnum.Choice },
+    { id: '1-POSITIVE', title: 'Why good?', type: QuestionNodeTypeEnum.Choice, leafId: 'CTA-LINK' },
+      { id: '2-POSITIVE-TOPIC-A', title: 'Why good about [[topic]]?', type: QuestionNodeTypeEnum.Choice },
+      { id: '2-POSITIVE-TOPIC-B', title: 'Why good about [[topic]]?', type: QuestionNodeTypeEnum.Choice },
+      { id: '2-POSITIVE-TOPIC-C', title: 'Why good about [[topic]]?', type: QuestionNodeTypeEnum.Choice },
+      { id: '2-POSITIVE-TOPIC-D', title: 'Why good about [[topic]]?', type: QuestionNodeTypeEnum.Choice },
+    { id: '1-NEUTRAL', title: 'Why neutral?', type: QuestionNodeTypeEnum.Choice, leafId: 'CTA-OPINION' },
+      { id: '2-NEUTRAL-TOPIC-A', title: 'Why neutral about [[topic]]?', type: QuestionNodeTypeEnum.Choice },
+      { id: '2-NEUTRAL-TOPIC-B', title: 'Why neutral about [[topic]]?', type: QuestionNodeTypeEnum.Choice },
+      { id: '2-NEUTRAL-TOPIC-C', title: 'Why neutral about [[topic]]?', type: QuestionNodeTypeEnum.Choice },
+      { id: '2-NEUTRAL-TOPIC-D', title: 'Why neutral about [[topic]]?', type: QuestionNodeTypeEnum.Choice },
+    { id: '1-NEGATIVE', title: 'Why negative?', type: QuestionNodeTypeEnum.Choice, leafId: 'CTA-TEXTBOX' },
+      { id: '2-NEGATIVE-TOPIC-A', title: 'Why negative about [[topic]]?', type: QuestionNodeTypeEnum.Choice },
+      { id: '2-NEGATIVE-TOPIC-B', title: 'Why negative about [[topic]]?', type: QuestionNodeTypeEnum.Choice },
+      { id: '2-NEGATIVE-TOPIC-C', title: 'Why negative about [[topic]]?', type: QuestionNodeTypeEnum.Choice },
+      { id: '2-NEGATIVE-TOPIC-D', title: 'Why negative about [[topic]]?', type: QuestionNodeTypeEnum.Choice },
 ];
 
 // 3. Define for each topic
