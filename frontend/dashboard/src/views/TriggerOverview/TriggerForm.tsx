@@ -1,5 +1,5 @@
 /* eslint-disable radix */
-import { Controller, UseFormMethods } from 'react-hook-form';
+import { Controller, UseFormMethods, useFieldArray } from 'react-hook-form';
 import { CornerRightDown, CornerRightUp, Key, Mail, Maximize2,
   Minimize2, PlusCircle, Smartphone, Thermometer, Type, UserPlus, Watch } from 'react-feather';
 import { debounce } from 'lodash';
@@ -185,12 +185,15 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
   const history = useHistory();
   const { t } = useTranslation();
   const { customerSlug } = useParams<{ customerSlug: string }>();
-  const [activeConditions, setActiveConditions] = useState<Array<any>>([]);
 
-  useEffect(() => {
-    console.log('useEffect conditions: ', form.watch('conditions'));
-    setActiveConditions(form.watch('conditions') || []);
-  }, []);
+  const { fields, append, remove } = useFieldArray(
+    {
+      control: form.control,
+      name: 'conditions',
+      keyName: 'indexKey',
+    },
+  );
+
   // Fetching dialogue data
   const { data: triggerData } = useQuery<CustomerTriggerData>(getCustomerTriggerData, { variables: { customerSlug } });
   const dialogues = triggerData?.customer?.dialogues?.map((dialogue) => ({
@@ -233,42 +236,14 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
     });
   };
 
-  const addCondition = () => setActiveConditions((prevConditions) => [...prevConditions, {
-    id: cuid(), questionId: null, conditionType: null, matchText: null, lowThreshold: null, highThreshold: null,
-  }]);
-
-  const handleDeleteCondition = (index: number) => setActiveConditions((prevConditions) => {
-    prevConditions.splice(index, 1);
-    return [...prevConditions];
+  const addCondition = () => append({
+    id: null, questionId: null, conditionType: null, matchText: null, lowThreshold: null, highThreshold: null,
   });
 
-  const handleConditionQuestionChange = (questionId: string, index: number) => setActiveConditions((prevConditions) => {
-    prevConditions[index].questionId = questionId;
-
-    return [...prevConditions];
-  });
-
-  const handleConditionTypeChange = (conditionType: string, index: number) => setActiveConditions((prevConditions) => {
-    prevConditions[index].conditionType = conditionType;
-    return [...prevConditions];
-  });
-
-  const handleConditionMatchTextChange = useCallback(debounce((matchText: string, index: number) => setActiveConditions((prevConditions) => {
-    prevConditions[index].matchText = matchText;
-    return [...prevConditions];
-  }), 250), []);
-
-  const handleConditionLowThreshold = (lowThreshold: any, index: number) => setActiveConditions((prevConditions) => {
-    prevConditions[index].lowThreshold = lowThreshold;
-    return [...prevConditions];
-  });
-
-  const handleConditionHighThreshold = (highThreshold: any, index: number) => setActiveConditions((prevConditions) => {
-    prevConditions[index].highThreshold = highThreshold;
-    return [...prevConditions];
-  });
+  const handleDeleteCondition = (index: number) => remove(index);
 
   console.log('watch conditions: ', form.watch('conditions'));
+  console.log('fields:', fields);
 
   return (
     <Form onSubmit={form.handleSubmit(onFormSubmit)}>
@@ -370,17 +345,17 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
               <Button leftIcon={PlusCircle} onClick={addCondition} isDisabled={!activeDialogue} size="sm">{t('trigger:add_condition')}</Button>
             </Flex>
             <Hr />
-            {activeConditions?.map((condition, index) => (
+            {fields?.map((condition, index) => (
               <Div
-                key={`${condition?.questionId || condition.id}`}
+                key={condition.indexKey}
                 marginTop={15}
                 gridColumn="1 / -1"
                 bg="gray.100"
                 padding={4}
               >
-                <input type="hidden" ref={form.register} name={`conditions[${index}].id`} />
+                <input type="hidden" ref={form.register()} name={`conditions[${index}].id`} />
                 {form.watch('type') === TriggerQuestionType.QUESTION && activeDialogue && (
-                <FormControl isRequired isInvalid={!!form.errors.conditions?.[index]?.questionId}>
+                <FormControl key={`questionId-${condition.indexKey}`} isRequired isInvalid={!!form.errors.conditions?.[index]?.questionId}>
                   <FormLabel htmlFor={`conditions[${index}].questionId`}>{t('trigger:question')}</FormLabel>
                   <InputHelper>
                     {t('trigger:question_helper')}
@@ -388,14 +363,7 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                   <Controller
                     name={`conditions[${index}].questionId`}
                     as={<Select />}
-                    // render={({ onChange }) => (
-                    //   <Select
-                    //     options={questions}
-                    //     onChange={(e: any) => {
-                    //       onChange(e.value);
-                    //     }}
-                    //   />
-                    // )}
+                    defaultValue={condition?.questionId}
                     control={form.control}
                     options={questions}
                   />
@@ -419,7 +387,7 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                           )}
                           value={value}
                           onChange={(e: any) => {
-                            handleConditionTypeChange(e, index);
+                            // handleConditionTypeChange(e, index);
                             onChange(e);
                           }}
                           onBlur={onBlur}
@@ -443,7 +411,7 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                     placeholder="Satisfied"
                     leftEl={<Type />}
                     name={`conditions[${index}].matchText`}
-                    onChange={(e: any) => handleConditionMatchTextChange(e.target.value, index)}
+                    // onChange={(e: any) => handleConditionMatchTextChange(e.target.value, index)}
                     ref={form.register({ required: true })}
                   />
 
@@ -459,12 +427,12 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                   <Controller
                     name={`conditions[${index}].lowThreshold`}
                     control={form.control}
-                    defaultValue={0}
+                    defaultValue={form.watch('conditions')?.[index]?.lowThreshold}
                     render={({ onChange, onBlur, value }) => (
                       <Slider
                         color="cyan"
                         onChange={(e) => {
-                          handleConditionLowThreshold(e, index);
+                          // handleConditionLowThreshold(e, index);
                           onChange(e);
                         }}
                         onBlur={onBlur}
@@ -480,7 +448,7 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                     )}
                   />
                   <Text>
-                    {condition?.lowThreshold}
+                    {form.watch('conditions')?.[index]?.lowThreshold}
                   </Text>
 
                 </FormControl>
@@ -501,7 +469,7 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                         color="red"
                         defaultValue={value}
                         onChange={(e) => {
-                          handleConditionHighThreshold(e, index);
+                          // handleConditionHighThreshold(e, index);
                           onChange(e);
                         }}
                         onBlur={onBlur}
@@ -516,7 +484,7 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                     )}
                   />
                   <Text>
-                    {condition?.highThreshold}
+                    {form.watch('conditions')?.[index]?.highThreshold}
                   </Text>
 
                 </FormControl>
