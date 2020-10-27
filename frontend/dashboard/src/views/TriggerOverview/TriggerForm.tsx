@@ -261,9 +261,6 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
 
   const handleDeleteCondition = (index: number) => remove(index);
 
-  console.log('watch conditions: ', form.watch('conditions'));
-  console.log('fields:', fields);
-
   return (
     <Form onSubmit={form.handleSubmit(onFormSubmit)}>
       <ServerError serverError={serverErrors} />
@@ -467,7 +464,7 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                   <Controller
                     name={`conditions[${index}].highThreshold`}
                     control={form.control}
-                    defaultValue={form.watch('conditions')?.[index]?.highThreshold || null}
+                    defaultValue={10 - form.watch('conditions')?.[index]?.highThreshold || null}
                     render={({ onChange, value }) => (
                       <Slider
                         step={0.5}
@@ -477,7 +474,6 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                         defaultValue={value}
                         reverse
                         onAfterChange={(e: number) => {
-                          console.log(e);
                           onChange(10 - e);
                         }}
                       />
