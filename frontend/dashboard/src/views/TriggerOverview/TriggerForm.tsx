@@ -3,14 +3,13 @@ import { Controller, UseFormMethods, useFieldArray } from 'react-hook-form';
 import { CornerRightDown, CornerRightUp, Key, Mail, Maximize2,
   Minimize2, PlusCircle, Smartphone, Thermometer, Type, UserPlus, Watch } from 'react-feather';
 import { Slider } from 'antd';
-import { debounce } from 'lodash';
 import { useHistory, useParams } from 'react-router';
 import { useLazyQuery, useQuery } from '@apollo/react-hooks';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Select from 'react-select';
-import cuid from 'cuid';
+import styled, { css } from 'styled-components/macro';
 
-import { Button, ButtonGroup, FormErrorMessage, RadioButtonGroup, SliderFilledTrack, SliderThumb, SliderTrack } from '@chakra-ui/core'; // Slider,
+import { Button, ButtonGroup, FormErrorMessage, RadioButtonGroup } from '@chakra-ui/core'; // Slider,
 import {
   ButtonRadio, Div, Flex, Form,
   FormControl, FormLabel, FormSection, H3, H4, Hr, Input, InputGrid, InputHelper, Muted, Text,
@@ -62,6 +61,27 @@ enum TriggerQuestionType {
   QUESTION='QUESTION',
   SCHEDULED='SCHEDULED',
 }
+
+const OuterSliderContainer = styled(Div)`
+  div.ant-slider-rail {
+      position: absolute;
+      width: 100%;
+      height: 4px;
+      background-color: #91d5ff;
+      border-radius: 2px;
+      -webkit-transition: background-color 0.3s;
+      transition: background-color 0.3s;
+  }
+
+  div > div.ant-slider-track {
+    position: absolute;
+    height: 4px;
+    background-color: #f5f5f5;
+    border-radius: 2px;
+    -webkit-transition: background-color 0.3s;
+    transition: background-color 0.3s;
+  }
+`;
 
 const getCustomerTriggerData = gql`
   query getCustomerTriggerData($customerSlug: String!, $filter: DialogueFilterInputType) {
@@ -138,7 +158,6 @@ const ConditionFormFragment = (
         <ButtonRadio
           mb={2}
           icon={Maximize2}
-          isDisabled
           value="OUTER_RANGE"
           text="Outer range"
           description="Alert out of range"
@@ -471,9 +490,41 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                 </FormControl>
                 )}
 
-                {form.watch('conditions')?.[index]?.conditionType === TriggerConditionType.INNER_RANGE && (
+                {form.watch('conditions')?.[index]?.conditionType === TriggerConditionType.OUTER_RANGE && (
                 <FormControl isInvalid={!!form.errors.conditions?.[index]?.highThreshold}>
                   <FormLabel htmlFor={`conditions[${index}].highThreshold`}>{t('trigger:high_threshold')}</FormLabel>
+                  <InputHelper>
+                    {t('trigger:high_threshold_helper')}
+                  </InputHelper>
+                  <Controller
+                    name={`conditions[${index}].range`}
+                    control={form.control}
+                    defaultValue={[
+                      form.watch('conditions')?.[index]?.range?.[0] || form.watch('conditions')?.[index]?.lowThreshold,
+                      form.watch('conditions')?.[index]?.range?.[1] || form.watch('conditions')?.[index]?.highThreshold]}
+                    render={({ onChange, value }) => (
+                      <OuterSliderContainer>
+                        <Slider
+                          range
+                          step={0.5}
+                          min={0}
+                          max={10}
+                          defaultValue={value}
+                          onAfterChange={onChange}
+                        />
+                      </OuterSliderContainer>
+                    )}
+                  />
+                  <Text>
+                    {`${form.watch('conditions')?.[index]?.range?.[0]} - ${form.watch('conditions')?.[index]?.range?.[1]}`}
+                  </Text>
+
+                </FormControl>
+                )}
+
+                {form.watch('conditions')?.[index]?.conditionType === TriggerConditionType.INNER_RANGE && (
+                <FormControl isInvalid={!!form.errors.conditions?.[index]?.range}>
+                  <FormLabel htmlFor={`conditions[${index}].range`}>{t('trigger:high_threshold')}</FormLabel>
                   <InputHelper>
                     {t('trigger:high_threshold_helper')}
                   </InputHelper>
@@ -500,6 +551,7 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
 
                 </FormControl>
                 )}
+
                 <Button
                   mt={4}
                   variant="outline"
