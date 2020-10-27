@@ -3,11 +3,11 @@ import { PrismaClient,
   TriggerUpdateInput } from '@prisma/client';
 import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
 
-import { resolve } from 'path';
 import { DialogueType } from '../questionnaire/Dialogue';
 import { PaginationWhereInput } from '../general/Pagination';
 import { QuestionNodeType } from '../question/QuestionNode';
 import { UserType } from '../users/User';
+import { resolve } from 'path';
 import TriggerService from './TriggerService';
 
 const TriggerTypeEnum = enumType({
@@ -175,6 +175,7 @@ const TriggerMutations = extendType({
         if (!args.id) throw new Error('No valid id for trigger provided');
 
         // Clean up trail
+        await ctx.prisma.questionOfTrigger.deleteMany({ where: { triggerId: args.id } });
         await ctx.prisma.triggerCondition.deleteMany({ where: { triggerId: args.id } });
         const trigger = await ctx.prisma.trigger.delete({ where: { id: args.id } });
 

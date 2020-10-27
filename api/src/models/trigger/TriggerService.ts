@@ -394,7 +394,6 @@ class TriggerService {
     newConditions: Array<NexusGenInputs['TriggerConditionInputType']>,
     triggerId: string,
   ) => {
-    console.log('new Conditions: ', newConditions);
     const upsertedConditionsIds = await Promise.all(newConditions.map(async (condition) => {
       const upsertQuestionOfTrigger = await prisma.questionOfTrigger.upsert({
         where: {
@@ -446,34 +445,6 @@ class TriggerService {
       });
       return upsertQuestionOfTrigger.triggerConditionId;
     }));
-
-    console.log('upserted condition IDS: ', upsertedConditionsIds);
-
-    //   if (!condition.type) return null;
-
-    //   const upsertTriggerCondition = await prisma.triggerCondition.upsert({
-    //     where: { id: condition.id || -1 },
-    //     create: {
-    //       type: condition.type,
-    //       minValue: condition.minValue,
-    //       maxValue: condition.maxValue,
-    //       textValue: condition.textValue,
-    //       trigger: {
-    //         connect: {
-    //           id: triggerId,
-    //         },
-    //       },
-    //     },
-    //     update: {
-    //       type: condition.type,
-    //       minValue: condition.minValue,
-    //       maxValue: condition.maxValue,
-    //       textValue: condition.textValue,
-    //     },
-    //   });
-
-    //   return upsertTriggerCondition.id;
-    // }));
 
     await Promise.all(dbTriggerConditions.map(async (condition) => {
       if (!upsertedConditionsIds.includes(condition.id)) {
