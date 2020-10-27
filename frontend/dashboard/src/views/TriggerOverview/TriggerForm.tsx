@@ -492,9 +492,9 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
 
                 {form.watch('conditions')?.[index]?.conditionType === TriggerConditionType.OUTER_RANGE && (
                 <FormControl isInvalid={!!form.errors.conditions?.[index]?.highThreshold}>
-                  <FormLabel htmlFor={`conditions[${index}].highThreshold`}>{t('trigger:high_threshold')}</FormLabel>
+                  <FormLabel htmlFor={`conditions[${index}].range`}>{t('trigger:outer_range')}</FormLabel>
                   <InputHelper>
-                    {t('trigger:high_threshold_helper')}
+                    {t('trigger:outer_range_helper')}
                   </InputHelper>
                   <Controller
                     name={`conditions[${index}].range`}
@@ -524,9 +524,9 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
 
                 {form.watch('conditions')?.[index]?.conditionType === TriggerConditionType.INNER_RANGE && (
                 <FormControl isInvalid={!!form.errors.conditions?.[index]?.range}>
-                  <FormLabel htmlFor={`conditions[${index}].range`}>{t('trigger:high_threshold')}</FormLabel>
+                  <FormLabel htmlFor={`conditions[${index}].range`}>{t('trigger:inner_range')}</FormLabel>
                   <InputHelper>
-                    {t('trigger:high_threshold_helper')}
+                    {t('trigger:inner_range_helper')}
                   </InputHelper>
                   <Controller
                     name={`conditions[${index}].range`}

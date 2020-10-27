@@ -1187,6 +1187,22 @@ const language = {
       en: 'Set a high threshold: if a score above is recorded, an alert will be sent',
       de: 'Festlegen eines oberen Schwellenwerts: Eine Aufzeichung über diesem Wert löst eine Push-Benachrichtigung aus.',
     },
+    outer_range: {
+      en: 'Outer range',
+      de: 'äußerer Bereich',
+    },
+    outer_range_helper: {
+      en: 'Set an outer range threshold: if a score outside the range is recorded, an alert will be sent',
+      de: 'Festlegen eines Schwellenwerts für den äußeren Bereich: Wenn eine Punktzahl außerhalb des Bereichs aufgezeichnet wird, wird eine Warnung gesendet',
+    },
+    inner_range: {
+      en: 'Inner range',
+      de: 'Innerer Bereich',
+    },
+    inner_range_helper: {
+      en: 'Set an inner range threshold: if a score within the range is recorded, an alert will be sent',
+      de: 'Festlegen eines Schwellenwerts für den inneren Bereich: Wenn eine Punktzahl innerhalb des Bereichs aufgezeichnet wird, wird eine Warnung gesendet',
+    },
     delivery_helper: {
       en: 'Shall this alert be deliver via email or text message?',
       de: 'Soll diese Push-Benachrichtigung per Email oder SMS versandt werden?',
