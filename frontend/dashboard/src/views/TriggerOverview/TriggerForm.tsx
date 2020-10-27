@@ -35,7 +35,7 @@ interface FormDataProps {
     label: string;
     value: string;
   };
-  conditions: Array<{ id: string, questionId: { label: string, value: string }, conditionType: string, highThreshold: number, lowThreshold: number, matchText: string }>;
+  conditions: Array<{ id: string, questionId: { label: string, value: string }, conditionType: string, range: Array<number>, highThreshold: number, lowThreshold: number, matchText: string }>;
   condition: string;
   matchText: string;
   lowThreshold: number;
@@ -131,18 +131,17 @@ const ConditionFormFragment = (
         <ButtonRadio
           mb={2}
           icon={Minimize2}
-          isDisabled
           value="INNER_RANGE"
-          text="High threshold"
-          description="Alert within range (coming soon)"
+          text="Inner range"
+          description="Alert within range"
         />
         <ButtonRadio
           mb={2}
           icon={Maximize2}
           isDisabled
           value="OUTER_RANGE"
-          text="High threshold"
-          description="Alert out of range (coming soon)"
+          text="Outer range"
+          description="Alert out of range"
         />
       </RadioButtonGroup>
     );
@@ -467,6 +466,36 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                   />
                   <Text>
                     {form.watch('conditions')?.[index]?.highThreshold}
+                  </Text>
+
+                </FormControl>
+                )}
+
+                {form.watch('conditions')?.[index]?.conditionType === TriggerConditionType.INNER_RANGE && (
+                <FormControl isInvalid={!!form.errors.conditions?.[index]?.highThreshold}>
+                  <FormLabel htmlFor={`conditions[${index}].highThreshold`}>{t('trigger:high_threshold')}</FormLabel>
+                  <InputHelper>
+                    {t('trigger:high_threshold_helper')}
+                  </InputHelper>
+                  <Controller
+                    name={`conditions[${index}].range`}
+                    control={form.control}
+                    defaultValue={[
+                      form.watch('conditions')?.[index]?.range?.[0] || form.watch('conditions')?.[index]?.lowThreshold,
+                      form.watch('conditions')?.[index]?.range?.[1] || form.watch('conditions')?.[index]?.highThreshold]}
+                    render={({ onChange, value }) => (
+                      <Slider
+                        range
+                        step={0.5}
+                        min={0}
+                        max={10}
+                        defaultValue={value}
+                        onAfterChange={onChange}
+                      />
+                    )}
+                  />
+                  <Text>
+                    {`${form.watch('conditions')?.[index]?.range?.[0]} - ${form.watch('conditions')?.[index]?.range?.[1]}`}
                   </Text>
 
                 </FormControl>
