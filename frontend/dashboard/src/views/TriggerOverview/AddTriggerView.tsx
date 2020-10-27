@@ -124,12 +124,9 @@ const AddTriggerView = () => {
   });
 
   const onSubmit = (formData: FormDataProps) => {
-    // TODO: Remove questionId from AddTriggerInput
-    // const questionId = formData.question.value;
     const recipients = { ids: formData.recipients?.map((recip) => recip.value).filter((val) => val) };
     const conditions = formData.conditions.map((condition) => (
       {
-        // TODO: Add questionID to ConditionsInput
         questionId: condition.questionId.value,
         type: condition.conditionType,
         minValue: condition?.lowThreshold ? condition?.lowThreshold * 10 : null,
@@ -143,11 +140,11 @@ const AddTriggerView = () => {
       conditions,
     };
 
+    const input = { trigger, recipients, customerSlug };
+
     addTrigger({
       variables: {
-        customerSlug,
-        trigger,
-        recipients,
+        input,
       },
     });
   };

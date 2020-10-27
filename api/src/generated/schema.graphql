@@ -55,6 +55,12 @@ input CreateQuestionNodeInputType {
   type: String
 }
 
+input CreateTriggerInputType {
+  customerSlug: String
+  recipients: RecipientsInputType
+  trigger: TriggerInputType
+}
+
 """Creates a workspace"""
 input CreateWorkspaceInput {
   isSeed: Boolean = false
@@ -292,7 +298,7 @@ type Mutation {
   createRole(data: RoleInput): RoleType!
   createSession(input: SessionInput): Session!
   createTag(customerSlug: String, name: String, type: TagTypeEnum): Tag!
-  createTrigger(customerSlug: String, recipients: RecipientsInputType, trigger: TriggerInputType): TriggerType!
+  createTrigger(input: CreateTriggerInputType): TriggerType!
   createUser(customerSlug: String, input: UserInput): UserType!
   createWorkspace(input: CreateWorkspaceInput): Customer!
   deleteCTA(input: DeleteNodeInputType): QuestionNode!
@@ -665,7 +671,7 @@ input TriggerConditionInputType {
   id: Int
   maxValue: Int
   minValue: Int
-  questionId: String!
+  questionId: String
   textValue: String
   type: TriggerConditionEnum
 }

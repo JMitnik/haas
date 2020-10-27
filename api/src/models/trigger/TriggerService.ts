@@ -405,7 +405,7 @@ class TriggerService {
         create: {
           question: {
             connect: {
-              id: condition.questionId,
+              id: condition.questionId || undefined,
             },
           },
           trigger: {
@@ -430,7 +430,7 @@ class TriggerService {
         update: {
           question: {
             connect: {
-              id: condition.questionId,
+              id: condition.questionId || undefined,
             },
           },
           triggerCondition: {

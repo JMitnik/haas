@@ -3,11 +3,11 @@ import { PrismaClient,
   TriggerUpdateInput } from '@prisma/client';
 import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
 
+import { resolve } from 'path';
 import { DialogueType } from '../questionnaire/Dialogue';
 import { PaginationWhereInput } from '../general/Pagination';
 import { QuestionNodeType } from '../question/QuestionNode';
 import { UserType } from '../users/User';
-import { resolve } from 'path';
 import TriggerService from './TriggerService';
 
 const TriggerTypeEnum = enumType({
@@ -94,25 +94,6 @@ const TriggerType = objectType({
         return questionsOfTrigger[0].question.questionDialogue;
       },
     });
-    // t.field('relatedNode', {
-    //   type: QuestionNodeType,
-    //   nullable: true,
-
-    //   async resolve(parent, args, ctx) {
-    //     if (!parent.relatedNodeId) throw Error('Not good!');
-
-    //     return ctx.prisma.questionNode.findOne({
-    //       where: { id: parent.relatedNodeId },
-    //       include: {
-    //         questionDialogue: {
-    //           select: {
-    //             slug: true,
-    //           },
-    //         },
-    //       },
-    //     });
-    //   },
-    // });
 
     t.list.field('conditions', {
       type: TriggerConditionType,
@@ -136,8 +117,8 @@ const TriggerType = objectType({
 const TriggerConditionInputType = inputObjectType({
   name: 'TriggerConditionInputType',
   definition(t) {
-    t.int('id'); // TODO: Zou dit ook niet nullable moeten zijn (is leeg tijdens AddTrigger als het goed is)
-    t.string('questionId', { nullable: false });
+    t.int('id');
+    t.string('questionId');
     t.field('type', { type: TriggerConditionEnum });
     t.int('minValue', { nullable: true });
     t.int('maxValue', { nullable: true });
@@ -159,6 +140,19 @@ const RecipientsInputType = inputObjectType({
   name: 'RecipientsInputType',
   definition(t) {
     t.list.string('ids');
+  },
+});
+
+const CreateTriggerInputType = inputObjectType({
+  name: 'CreateTriggerInputType',
+  definition(t) {
+    t.string('customerSlug');
+    t.field('recipients', {
+      type: RecipientsInputType,
+    });
+    t.field('trigger', {
+      type: TriggerInputType,
+    });
   },
 });
 
@@ -195,7 +189,6 @@ const TriggerMutations = extendType({
 
       async resolve(parent, args, ctx) {
         if (!args.triggerId) throw new Error('No valid trigger ID provided');
-        console.log('inside editTrigger');
         const dbTrigger = await ctx.prisma.trigger.findOne({
           where: { id: args.triggerId },
           include: {
@@ -212,10 +205,6 @@ const TriggerMutations = extendType({
           type: args.trigger?.type || 'QUESTION',
           medium: args.trigger?.medium || 'EMAIL',
         };
-
-        // updateTriggerArgs = TriggerService.updateRelatedQuestion(
-        //   dbTrigger?.relatedNodeId, args.questionId, updateTriggerArgs,
-        // );
 
         if (dbTrigger?.recipients) {
           updateTriggerArgs = TriggerService.updateRecipients(
@@ -239,29 +228,26 @@ const TriggerMutations = extendType({
     t.field('createTrigger', {
       type: TriggerType,
       args: {
-        customerSlug: 'String',
-        recipients: RecipientsInputType,
-        trigger: TriggerInputType,
+        input: CreateTriggerInputType, // FIXME: args is still considered pre-input so if i don't make it any it won't work
       },
-      async resolve(parent, args, ctx) {
-        if (!args.customerSlug) throw new Error('No provided customer found');
+      async resolve(parent, args: any, ctx) {
+        if (!args.input.customerSlug) throw new Error('No provided customer found');
 
         // TODO: Setup sensible defaults instead of these?
         const createArgs : TriggerCreateInput = {
-          name: args.trigger?.name || '',
-          medium: args.trigger?.medium || 'EMAIL',
-          type: args.trigger?.type || 'QUESTION',
-          customer: { connect: { slug: args.customerSlug } },
-          // TODO: check if removing of this causes any problems { connect: { id: args.questionId || undefined } },
+          name: args.input.trigger?.name || '',
+          medium: args.input.trigger?.medium || 'EMAIL',
+          type: args.input.trigger?.type || 'QUESTION',
+          customer: { connect: { slug: args.input.customerSlug } },
           relatedNode: null,
-          recipients: { connect: args.recipients?.ids?.map((id: string) => ({ id })) },
+          recipients: { connect: args.input.recipients?.ids?.map((id: string) => ({ id })) },
         };
 
         const trigger = await ctx.prisma.trigger.create({
           data: createArgs,
         });
 
-        const questionOfTriggers = await args.trigger?.conditions?.map(async (condition) => ctx.prisma.questionOfTrigger.create({
+        const questionOfTriggers = await args.input.trigger?.conditions?.map(async (condition: any) => ctx.prisma.questionOfTrigger.create({
           data: {
             question: {
               connect: {
@@ -288,8 +274,6 @@ const TriggerMutations = extendType({
             },
           },
         }));
-
-        console.log('questionOfTriggers: ', questionOfTriggers);
 
         return trigger as any;
       },
