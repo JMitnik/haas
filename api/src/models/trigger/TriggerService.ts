@@ -338,9 +338,9 @@ class TriggerService {
           break;
         }
 
-        if (score > triggerCondition.maxValue) {
+        if (score <= triggerCondition.maxValue && score >= triggerCondition.minValue) {
           conditionMatched = {
-            isMatch: score <= triggerCondition.maxValue && triggerCondition?.minValue <= score,
+            isMatch: true,
             value: score,
             conditionType: triggerCondition.type,
           };
@@ -351,16 +351,15 @@ class TriggerService {
 
       case 'OUTER_RANGE': {
         conditionMatched = { isMatch: false };
-
         const score = entry.sliderNodeEntry?.value;
 
         if (!score || !triggerCondition.maxValue || !triggerCondition.minValue) {
           break;
         }
 
-        if (score > triggerCondition.maxValue) {
+        if (score > triggerCondition.maxValue || score < triggerCondition.minValue) {
           conditionMatched = {
-            isMatch: score >= triggerCondition.maxValue && triggerCondition?.minValue >= score,
+            isMatch: true,
             value: score,
             conditionType: triggerCondition.type,
           };
