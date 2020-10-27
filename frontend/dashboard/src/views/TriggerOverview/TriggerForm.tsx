@@ -2,6 +2,7 @@
 import { Controller, UseFormMethods, useFieldArray } from 'react-hook-form';
 import { CornerRightDown, CornerRightUp, Key, Mail, Maximize2,
   Minimize2, PlusCircle, Smartphone, Thermometer, Type, UserPlus, Watch } from 'react-feather';
+import { Slider } from 'antd';
 import { debounce } from 'lodash';
 import { useHistory, useParams } from 'react-router';
 import { useLazyQuery, useQuery } from '@apollo/react-hooks';
@@ -9,8 +10,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import Select from 'react-select';
 import cuid from 'cuid';
 
-import { Button, ButtonGroup, FormErrorMessage, RadioButtonGroup,
-  Slider, SliderFilledTrack, SliderThumb, SliderTrack } from '@chakra-ui/core';
+import { Button, ButtonGroup, FormErrorMessage, RadioButtonGroup, SliderFilledTrack, SliderThumb, SliderTrack } from '@chakra-ui/core'; // Slider,
 import {
   ButtonRadio, Div, Flex, Form,
   FormControl, FormLabel, FormSection, H3, H4, Hr, Input, InputGrid, InputHelper, Muted, Text,
@@ -20,6 +20,7 @@ import ServerError from 'components/ServerError';
 import getQuestionsQuery from 'queries/getQuestionnaireQuery';
 import gql from 'graphql-tag';
 
+import 'antd/dist/antd.css';
 import { getCustomerTriggerData as CustomerTriggerData } from './__generated__/getCustomerTriggerData';
 
 interface FormDataProps {
@@ -378,7 +379,7 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                     </InputHelper>
                     <Controller
                       name={`conditions[${index}].conditionType`}
-                      defaultValue={null}
+                      defaultValue={form.watch('conditions')?.[index]?.conditionType}
                       control={form.control}
                       render={({ onChange, onBlur, value }) => (
                         <ConditionFormFragment
@@ -428,23 +429,8 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                     name={`conditions[${index}].lowThreshold`}
                     control={form.control}
                     defaultValue={form.watch('conditions')?.[index]?.lowThreshold}
-                    render={({ onChange, onBlur, value }) => (
-                      <Slider
-                        color="cyan"
-                        onChange={(e) => {
-                          // handleConditionLowThreshold(e, index);
-                          onChange(e);
-                        }}
-                        onBlur={onBlur}
-                        defaultValue={value}
-                        max={10}
-                        min={0.1}
-                        step={0.5}
-                      >
-                        <SliderTrack />
-                        <SliderFilledTrack />
-                        <SliderThumb />
-                      </Slider>
+                    render={({ onChange, value }) => (
+                      <Slider step={0.5} min={0} max={10} defaultValue={value} onAfterChange={onChange} />
                     )}
                   />
                   <Text>
@@ -463,24 +449,20 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                   <Controller
                     name={`conditions[${index}].highThreshold`}
                     control={form.control}
-                    defaultValue={70}
-                    render={({ onChange, onBlur, value }) => (
+                    defaultValue={form.watch('conditions')?.[index]?.highThreshold || null}
+                    render={({ onChange, value }) => (
                       <Slider
-                        color="red"
-                        defaultValue={value}
-                        onChange={(e) => {
-                          // handleConditionHighThreshold(e, index);
-                          onChange(e);
-                        }}
-                        onBlur={onBlur}
-                        max={10}
-                        min={0.1}
                         step={0.5}
-                      >
-                        <SliderTrack />
-                        <SliderFilledTrack />
-                        <SliderThumb />
-                      </Slider>
+                        min={0}
+                        max={10}
+                        tipFormatter={(value) => (value ? `${10 - value}` : 10)}
+                        defaultValue={value}
+                        reverse
+                        onAfterChange={(e: number) => {
+                          console.log(e);
+                          onChange(10 - e);
+                        }}
+                      />
                     )}
                   />
                   <Text>
