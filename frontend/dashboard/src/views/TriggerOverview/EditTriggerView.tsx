@@ -46,11 +46,6 @@ enum TriggerConditionType {
   TEXT_MATCH='TEXT_MATCH',
 }
 
-enum TriggerQuestionType {
-  QUESTION='QUESTION',
-  SCHEDULED='SCHEDULED',
-}
-
 const schema = yup.object().shape({
   name: yup.string().required(),
   dialogue: yup.string().required(),
@@ -102,8 +97,6 @@ const EditTriggerView = () => {
   if (error) return <><p>{error.message}</p></>;
 
   const trigger = triggerData?.trigger;
-
-  console.log('trigger: ', trigger);
 
   return <EditTriggerForm trigger={trigger} />;
 };
@@ -168,12 +161,9 @@ const EditTriggerForm = ({ trigger }: {trigger: any}) => {
 
   const getThresholdValue = (conditionType: string, range: Array<number>, value: number, index: number) => {
     if (conditionType === TriggerConditionType.INNER_RANGE || conditionType === TriggerConditionType.OUTER_RANGE) {
-      const result = range?.[index] ? range[index] * 10 : null;
-      // console.log('result: ', result);
       return range?.[index] ? range[index] * 10 : null;
     }
     const result = value ? value * 10 : null;
-    console.log('result: ', result);
     return result;
   };
 

@@ -1,10 +1,10 @@
-import { Activity, Briefcase, Clipboard, Database, Link, Link2, Loader, Minus, TrendingUp, Upload } from 'react-feather';
+import { Activity, Briefcase, Clipboard, Link, Link2, Loader, Minus, Upload } from 'react-feather';
+import { Button, ButtonGroup, FormErrorMessage, RadioButtonGroup, useToast } from '@chakra-ui/core';
 import {
-  BooleanRadioInput, ButtonRadio, Div, Form, FormControl, FormLabel, FormSection, H3, Hr, Input, InputGrid,
+  ButtonRadio, Div, Form, FormControl, FormLabel, FormSection, H3, Hr, Input, InputGrid,
   InputHelper,
   Muted,
 } from '@haas/ui';
-import { Button, ButtonGroup, FormErrorMessage, RadioButtonGroup, useToast } from '@chakra-ui/core';
 import { Controller, UseFormMethods } from 'react-hook-form';
 import { useHistory } from 'react-router';
 import { useMutation } from '@apollo/react-hooks';

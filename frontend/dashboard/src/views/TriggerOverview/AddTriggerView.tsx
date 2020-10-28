@@ -45,11 +45,6 @@ enum TriggerConditionType {
   TEXT_MATCH='TEXT_MATCH',
 }
 
-enum TriggerQuestionType {
-  QUESTION='QUESTION',
-  SCHEDULED='SCHEDULED',
-}
-
 const schema = yup.object().shape({
   name: yup.string().required(),
   dialogue: yup.string().required(),

@@ -7,7 +7,7 @@ import { useHistory, useParams } from 'react-router';
 import { useLazyQuery, useQuery } from '@apollo/react-hooks';
 import React, { useEffect, useState } from 'react';
 import Select from 'react-select';
-import styled, { css } from 'styled-components/macro';
+import styled from 'styled-components/macro';
 
 import { Button, ButtonGroup, FormErrorMessage, RadioButtonGroup } from '@chakra-ui/core'; // Slider,
 import {
