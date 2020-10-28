@@ -1,10 +1,9 @@
 import { Facebook, Globe, Instagram, Linkedin, Twitter } from 'react-feather';
-import React, { useEffect } from 'react';
+import React from 'react';
 
 import { Flex } from '@haas/ui';
 import { NodeTitle } from 'layouts/NodeLayout/NodeLayoutStyles';
 import CustomIcon from 'components/Icons/CustomIcon';
-import useDialogueFinish from 'hooks/useDialogueFinish';
 
 import { GenericNodeProps } from '../types';
 import { ShareItem, SocialShareNodeContainer } from './SocialShareNodeStyles';

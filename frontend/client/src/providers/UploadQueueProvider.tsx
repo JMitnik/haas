@@ -65,6 +65,7 @@ export const UploadQueueProvider = ({ children }: { children: React.ReactNode })
     })
       .catch((err) => console.error(err))
       .finally(() => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const [_, ...tempQueue] = queue.current;
         queue.current = tempQueue;
 

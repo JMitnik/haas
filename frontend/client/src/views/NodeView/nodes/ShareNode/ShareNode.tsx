@@ -3,7 +3,6 @@ import { useClipboard } from 'use-clipboard-copy';
 import React from 'react';
 
 import { Flex, H2 } from '@haas/ui';
-import useDialogueFinish from 'hooks/useDialogueFinish';
 
 import { GenericNodeProps } from '../types';
 import { ShareButton, ShareButtonContainer, ShareNodeContainer, SuccesMessageContainer } from './ShareNodeStyles';
@@ -17,7 +16,6 @@ const formatUrl = (url: string) => {
 };
 
 const ShareNode = ({ node }: SocialShareNodeProps) => {
-  useDialogueFinish();
   const { copied, copy } = useClipboard({
     copiedTimeout: 1000,
   });

@@ -1,5 +1,6 @@
-import { AnimationControls, Variants, motion, transform, useAnimation, useMotionValue, useTransform } from 'framer-motion';
-import Color from 'color';
+import { Variants, motion, transform, useAnimation, useMotionValue, useTransform } from 'framer-motion';
+import { usePopper } from 'react-popper';
+import { useTimer } from 'use-timer';
 import Lottie from 'react-lottie';
 import React, { useReducer, useState } from 'react';
 
@@ -11,8 +12,6 @@ import { ReactComponent as UnhappyIcon } from 'assets/icons/icon-unhappy.svg';
 
 import { FingerPrintContainer, HAASRabbit, SlideHereContainer, SliderNodeValue } from './SliderNodeStyles';
 import { SlideMeAnimation } from './SliderNodeAnimations';
-import { usePopper } from 'react-popper';
-import { useTimer } from 'use-timer';
 
 interface SliderAnimationStateProps {
   isStopped: boolean;
@@ -63,7 +62,7 @@ const Slider = ({ form, register, onSubmit }: SliderProps) => {
   const animationControls = useAnimation();
   const timerProgressAbs = useMotionValue(0);
 
-  const { start, status, reset } = useTimer({
+  const { start, reset } = useTimer({
     endTime,
     interval: 10,
     onTimeUpdate: (time) => {

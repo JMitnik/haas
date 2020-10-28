@@ -618,6 +618,11 @@ input SliderNodeEntryInput {
   value: Int
 }
 
+"""Details regarding interaction with social node"""
+input SocialNodeEntryInput {
+  visitedLink: String
+}
+
 enum SystemPermission {
   CAN_ACCESS_ADMIN_PANEL
   CAN_ADD_USERS

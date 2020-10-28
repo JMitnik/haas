@@ -1,14 +1,13 @@
 import { Redirect, useHistory } from 'react-router-dom';
 import { TreeNodeProps } from 'models/Tree/TreeNodeModel';
-import React, { useEffect } from 'react';
+import React from 'react';
 
 import { Loader } from '@haas/ui';
 import DialogueTreeLayout from 'layouts/DialogueTreeLayout';
 import NodeLayout from 'layouts/NodeLayout';
-import useDialogueFinish from 'hooks/useDialogueFinish';
 import useDialogueTree from 'providers/DialogueTreeProvider';
-
 import useUploadQueue from 'providers/UploadQueueProvider';
+
 import { GenericNodeProps } from './nodes/types';
 import MultiChoiceNode from './nodes/MultiChoiceNode/MultiChoiceNode';
 import PostLeafNode from './nodes/PostLeafNode/PostLeafNode';
@@ -100,8 +99,13 @@ const NodeView = ({ node }: NodeViewProps) => {
     store.start();
   }
 
+  // Do the main check in
   if ((!node.isLeaf && !node.isRoot && !store.hasStarted) || (node.isPostLeaf && !store.hasStarted)) {
     return <Redirect to={`/${store.customer?.slug}/${store.tree?.slug}`} />;
+  }
+
+  if (node.isPostLeaf) {
+    store.stop();
   }
 
   return (

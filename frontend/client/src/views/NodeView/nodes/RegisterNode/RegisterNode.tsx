@@ -1,6 +1,6 @@
 import { CheckCircle } from 'react-feather';
 import { useForm } from 'react-hook-form';
-import React, { useEffect } from 'react';
+import React from 'react';
 
 import { ButtonIcon } from '@haas/ui/src/Buttons';
 import { ClientButton, OutlineButton } from 'components/Buttons/Buttons';
@@ -11,7 +11,6 @@ import { ReactComponent as LastNameIcon } from 'assets/icons/icon-last-name.svg'
 import { NodeTitle } from 'layouts/NodeLayout/NodeLayoutStyles';
 import { SessionEntryDataProps } from 'models/Session/SessionEntryModel';
 import { ReactComponent as UserIcon } from 'assets/icons/icon-user.svg';
-import useDialogueFinish from 'hooks/useDialogueFinish';
 
 import { GenericNodeProps } from '../types';
 import { IconContainer, InputContainer, RegisterNodeContainer } from './RegisterNodeStyles';

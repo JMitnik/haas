@@ -1,6 +1,4 @@
-import { Variants, motion, transform, useAnimation } from 'framer-motion';
 import { useForm } from 'react-hook-form';
-import Color from 'color';
 import React from 'react';
 
 import { Div } from '@haas/ui';
@@ -9,7 +7,7 @@ import { SessionEntryDataProps } from 'models/Session/SessionEntryModel';
 import { cleanInt } from 'utils/cleanInt';
 
 import { GenericNodeProps } from '../types';
-import { SliderNodeContainer, SliderNodeValue } from './SliderNodeStyles';
+import { SliderNodeContainer } from './SliderNodeStyles';
 import Slider from './Slider';
 
 type SliderNodeProps = GenericNodeProps;
