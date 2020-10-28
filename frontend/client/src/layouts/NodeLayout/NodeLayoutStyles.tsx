@@ -34,8 +34,10 @@ export const NodeContainer = styled(Div)`
 
 export const NodeTitle = styled(H2)`
   ${({ theme }) => css`
+  font-size: 1.5rem;
 
   @media (min-width: 601px) {
+    font-size: 2.5rem;
     margin-top: 2rem;
   }
   

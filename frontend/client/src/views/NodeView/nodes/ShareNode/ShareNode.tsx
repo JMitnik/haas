@@ -2,7 +2,8 @@ import { Share2 } from 'react-feather';
 import { useClipboard } from 'use-clipboard-copy';
 import React from 'react';
 
-import { Flex, H2 } from '@haas/ui';
+import { Flex } from '@haas/ui';
+import { NodeTitle } from 'layouts/NodeLayout/NodeLayoutStyles';
 
 import { GenericNodeProps } from '../types';
 import { ShareButton, ShareButtonContainer, ShareNodeContainer, SuccesMessageContainer } from './ShareNodeStyles';
@@ -41,7 +42,7 @@ const ShareNode = ({ node }: SocialShareNodeProps) => {
 
   return (
     <ShareNodeContainer>
-      <H2 color="white">{node.title}</H2>
+      <NodeTitle>{node.title}</NodeTitle>
       <ShareButtonContainer flexGrow={1}>
         <Flex position="relative" width="100%" alignItems="center" justifyContent="center">
           <ShareButton onClick={handleCopy}>
