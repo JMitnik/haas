@@ -16,6 +16,7 @@ import ShareNode from './nodes/ShareNode/ShareNode';
 import SliderNode from './nodes/SliderNode/SliderNode';
 import SocialShareNode from './nodes/SocialShareNode/SocialShareNode';
 import TextboxNode from './nodes/TextboxNode/TextboxNode';
+import useUploadQueue from 'providers/UploadQueueProvider';
 
 const nodeMap: Record<string, (props: GenericNodeProps) => JSX.Element> = {
   SLIDER: SliderNode,
@@ -44,12 +45,7 @@ interface NodeViewProps {
 const NodeView = ({ node }: NodeViewProps) => {
   const store = useDialogueTree();
   const history = useHistory();
-
-  // useEffect(() => {
-  //   if (store.session.isAtLeaf && !hasCreatedSession && !isCreatingSession) {
-  //     uploadInteraction();
-  //   }
-  // }, [store.session.isAtLeaf, hasCreatedSession, uploadInteraction, isCreatingSession]);
+  const { queueEntry, willQueueEntry } = useUploadQueue();
 
   const handleEntryStore = (entry: any, edgeKey: any) => {
     // Store the entry
@@ -57,7 +53,15 @@ const NodeView = ({ node }: NodeViewProps) => {
 
     const { edgeId, isAtLeaf } = node.getNextEdgeIdFromKey(edgeKey);
 
+    if (entry && willQueueEntry) {
+      queueEntry({
+        nodeId: node.id,
+        data: entry,
+      });
+    }
+
     if (isAtLeaf) {
+      console.log(store.tree?.activeLeaf);
       const activeLeaf = store.tree?.activeLeaf;
       return history.push(`/${store.customer?.slug}/${store.tree?.slug}/n/${activeLeaf?.id}`);
     }

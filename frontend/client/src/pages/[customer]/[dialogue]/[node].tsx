@@ -39,7 +39,7 @@ const NodePageContainer = styled(motion.div)`
 
 const NodePage = observer(() => {
   const { edgeId, nodeId } = useParams<{ edgeId?: string, leafId?: string, nodeId?: string }>();
-  const { uploadInteraction } = useUploadQueue();
+  const { uploadInteraction, willQueueEntry } = useUploadQueue();
   const store = useDialogueTree();
 
   // if (!edgeId && nodeId && !store.session.isAtLeaf) {
@@ -49,10 +49,10 @@ const NodePage = observer(() => {
   // }
 
   useEffect(() => {
-    if (!edgeId && nodeId) {
+    if (!edgeId && nodeId && !willQueueEntry) {
       uploadInteraction();
     }
-  }, [uploadInteraction, edgeId, nodeId]);
+  }, [uploadInteraction, edgeId, nodeId, willQueueEntry]);
 
   return useObserver(() => {
     // If rootNode is unknown yet, return Loader

@@ -1,5 +1,5 @@
 import { useMutation } from '@apollo/react-hooks';
-import React, { useCallback, useContext } from 'react';
+import React, { useCallback, useContext, useRef } from 'react';
 
 import createInteractionMutation from 'mutations/createSessionMutation';
 import gql from 'graphql-tag';
@@ -8,7 +8,7 @@ import useDialogueTree from 'providers/DialogueTreeProvider';
 const UploadQueueContext = React.createContext({} as any);
 
 const appendToInteractionMutation = gql`
-  mutation appendToInteraction($input: AppendToInteractionMutation) {
+  mutation appendToInteraction($input: AppendToInteractionInput) {
     appendToInteraction(input: $input) {
       id
     }
@@ -16,17 +16,19 @@ const appendToInteractionMutation = gql`
 `;
 
 export const UploadQueueProvider = ({ children }: { children: React.ReactNode }) => {
+  const queue = useRef<any>([]);
   const store = useDialogueTree();
-  const [createInteraction, { data }] = useMutation(createInteractionMutation);
+  const [createInteraction, { data: interactionData }] = useMutation(createInteractionMutation);
+  const [appendToInteraction] = useMutation(appendToInteractionMutation);
 
   /**
-   * Either uploads using the `create` mutation, or appends using the `append` mutation.
+   * Upload the main interaction
   */
   const handleUploadInteraction = useCallback(() => {
     const uploadEntries = store.relevantSessionEntries;
 
-    // Case 1: We have no uploaded data, yet.
-    if (!data && uploadEntries.length) {
+    // We only upload if we have not done so before, and also, as long as we have any entries to upload after all.
+    if (!interactionData && uploadEntries.length) {
       createInteraction({
         variables: {
           input: {
@@ -41,14 +43,50 @@ export const UploadQueueProvider = ({ children }: { children: React.ReactNode })
         },
       });
     }
-  }, [createInteraction, store]);
+  }, [createInteraction, store, interactionData]);
+
+  /**
+   * Dequeue the first item in our queue.
+   */
+  const dequeueEntry = () => {
+    if (!queue.current.length || !interactionData) return;
+
+    const entry = queue.current[0];
+
+    appendToInteraction({
+      variables: {
+        input: {
+          sessionId: interactionData?.createSession?.id,
+          nodeId: entry.nodeId,
+          edgeId: entry.edgeId,
+          data: { ...entry.data },
+        },
+      },
+    })
+      .catch((err) => console.error(err))
+      .finally(() => {
+        const [_, ...tempQueue] = queue.current;
+        queue.current = tempQueue;
+
+        if (queue.current.length) dequeueEntry();
+      });
+  };
+
+  /**
+   * Queue an item to the end of our list, and instantly dequeue it.
+   */
+  const queueEntry = (entry: any) => {
+    queue.current = [...queue.current, entry];
+    dequeueEntry();
+  };
 
   return (
     <UploadQueueContext.Provider value={{
-      isCreatingSession: false,
+      queueEntry,
+      dequeueEntry,
       uploadInteraction: handleUploadInteraction,
-      createInteraction: null,
-      hasCreatedSession: false,
+      appendToInteraction: null,
+      willQueueEntry: !!interactionData,
     }}
     >
       {children}
