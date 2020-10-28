@@ -11,6 +11,7 @@ const TreeStoreModel = types
     session: types.optional(SessionModel, {}),
     tree: types.maybeNull(TreeModel),
     customer: types.maybeNull(CustomerModel),
+    hasStarted: types.boolean,
   })
   .actions((self) => {
     let initialState = {};
@@ -61,6 +62,12 @@ const TreeStoreModel = types
        */
       resetProject: () => {
         applySnapshot(self, initialState);
+      },
+      start: () => {
+        self.hasStarted = true;
+      },
+      stop: () => {
+        self.hasStarted = false;
       },
     };
   })

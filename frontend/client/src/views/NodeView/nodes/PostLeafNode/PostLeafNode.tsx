@@ -3,10 +3,14 @@ import React from 'react';
 import { H2, H4 } from '@haas/ui';
 import useDialogueFinish from 'hooks/useDialogueFinish';
 
+import useDialogueTree from 'providers/DialogueTreeProvider';
+
 import { PostLeafNodeContainer } from './PostLeafNodeStyles';
 
 const PostLeafNode = () => {
-  useDialogueFinish();
+  const store = useDialogueTree();
+
+  store.stop();
 
   return (
     <PostLeafNodeContainer>

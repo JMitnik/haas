@@ -1,6 +1,6 @@
+import { Redirect, useParams } from 'react-router-dom';
 import { Variants, motion } from 'framer-motion';
 import { observer, useObserver } from 'mobx-react-lite';
-import { useParams } from 'react-router-dom';
 import React, { useEffect } from 'react';
 import styled from 'styled-components/macro';
 
@@ -38,7 +38,7 @@ const NodePageContainer = styled(motion.div)`
 `;
 
 const NodePage = observer(() => {
-  const { edgeId, nodeId } = useParams<{ edgeId?: string, leafId?: string, nodeId?: string }>();
+  const { dialogueSlug, customerSlug, edgeId, nodeId } = useParams<{ dialogueSlug: string, customerSlug: string, edgeId?: string, leafId?: string, nodeId?: string }>();
   const { uploadInteraction, willQueueEntry } = useUploadQueue();
   const store = useDialogueTree();
 
