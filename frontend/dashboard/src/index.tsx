@@ -15,6 +15,7 @@ ReactDOM.render(<App />, document.getElementById('root'));
 // Learn more about service workers: https://bit.ly/CRA-PWA
 const toast = useToast();
 
+
 serviceWorker.register({
   onUpdate: (registration) => {
     toast({
