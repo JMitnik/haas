@@ -39,8 +39,7 @@ const TextboxNode = ({ node, onEntryStore }: TextboxNodeProps) => {
     <TextboxContainer>
       <NodeTitle>{node.title}</NodeTitle>
       <Div>
-        <H3 color="white">What would you like to tell us?</H3>
-        <Textbox placeholder="I have experienced ..." name="textbox" ref={register} />
+        <Textbox name="textbox" ref={register} />
 
         <Div mt={4}>
           <Grid gridTemplateColumns="2fr 1fr">
