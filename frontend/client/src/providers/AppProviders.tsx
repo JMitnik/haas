@@ -5,15 +5,18 @@ import React, { ReactNode } from 'react';
 import client from 'config/apollo';
 
 import { DialogueTreeProvider } from './DialogueTreeProvider';
+import { UploadQueueProvider } from './UploadQueueProvider';
 import ThemeProviders from './ThemeProviders';
 
 const AppProviders = ({ children }: { children: ReactNode }) => (
   <ApolloProvider client={client}>
     <BrowserRouter>
       <DialogueTreeProvider>
-        <ThemeProviders>
-          {children}
-        </ThemeProviders>
+        <UploadQueueProvider>
+          <ThemeProviders>
+            {children}
+          </ThemeProviders>
+        </UploadQueueProvider>
       </DialogueTreeProvider>
     </BrowserRouter>
   </ApolloProvider>

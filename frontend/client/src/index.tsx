@@ -22,13 +22,10 @@ Sentry.init({
   tracesSampleRate: 1.0,
 });
 
-if (true) {
+if (process.env.NODE_ENV === 'test') {
   worker.start({
-    quiet: false,
-    onUnhandledRequest: 'warn',
     waitUntilReady: true,
   }).then(() => {
-    console.log('Starting worker');
     ReactDOM.render(<App />, document.getElementById('root'));
   });
 } else {

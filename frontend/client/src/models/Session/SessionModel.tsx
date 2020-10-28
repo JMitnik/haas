@@ -31,6 +31,9 @@ const SessionModel = types
     get leafs() {
       return Array.from(self.items.toJS().values()).filter((item) => item.node.isLeaf);
     },
+    get testArr() {
+      return [12312, 123123, 767976];
+    },
     get isEmpty() {
       return self.items.size === 0;
     },

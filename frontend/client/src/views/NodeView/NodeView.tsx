@@ -1,10 +1,11 @@
 import { TreeNodeProps } from 'models/Tree/TreeNodeModel';
 import { useHistory } from 'react-router-dom';
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import { Loader } from '@haas/ui';
 import DialogueTreeLayout from 'layouts/DialogueTreeLayout';
 import NodeLayout from 'layouts/NodeLayout';
+import useDialogueFinish from 'hooks/useDialogueFinish';
 import useDialogueTree from 'providers/DialogueTreeProvider';
 
 import { GenericNodeProps } from './nodes/types';
@@ -15,7 +16,6 @@ import ShareNode from './nodes/ShareNode/ShareNode';
 import SliderNode from './nodes/SliderNode/SliderNode';
 import SocialShareNode from './nodes/SocialShareNode/SocialShareNode';
 import TextboxNode from './nodes/TextboxNode/TextboxNode';
-import useDialogueFinish from 'hooks/useDialogueFinish';
 
 const nodeMap: Record<string, (props: GenericNodeProps) => JSX.Element> = {
   SLIDER: SliderNode,
@@ -44,17 +44,18 @@ interface NodeViewProps {
 const NodeView = ({ node }: NodeViewProps) => {
   const store = useDialogueTree();
   const history = useHistory();
-  const { uploadInteraction } = useDialogueFinish();
+
+  // useEffect(() => {
+  //   if (store.session.isAtLeaf && !hasCreatedSession && !isCreatingSession) {
+  //     uploadInteraction();
+  //   }
+  // }, [store.session.isAtLeaf, hasCreatedSession, uploadInteraction, isCreatingSession]);
 
   const handleEntryStore = (entry: any, edgeKey: any) => {
     // Store the entry
     store.session.add(node.id, entry);
 
     const { edgeId, isAtLeaf } = node.getNextEdgeIdFromKey(edgeKey);
-
-    if (store.session.isAtLeaf) {
-      uploadInteraction(entry);
-    }
 
     if (isAtLeaf) {
       const activeLeaf = store.tree?.activeLeaf;

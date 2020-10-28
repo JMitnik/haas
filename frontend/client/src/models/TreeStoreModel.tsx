@@ -69,9 +69,7 @@ const TreeStoreModel = types
      * Extract all visited nodes that lead from the root to the top.
      */
     get relevantSessionEntries() {
-      if (!self.tree) {
-        throw new Error('Uninitialized tree!');
-      }
+      if (!self.tree) return [];
 
       const lastNonLeafNode = self.session.lastNonLeaf;
       const leafNodes = self.session.leafs;
