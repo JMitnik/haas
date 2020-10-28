@@ -2,7 +2,6 @@
 /* eslint-disable max-len */
 import { CustomerFragmentFragment, EdgeCondition, EdgeFragmentFragment, GetDialogueQuery, QuestionFragmentFragment, QuestionNodeTypeEnum } from 'generated/graphql';
 import DialogueTemplate from './DialogueTemplate';
-import yaml from 'js-yaml';
 
 // 0. Define all readable-identifiers
 const QuestionIds = [
@@ -182,9 +181,6 @@ export const CustomerStub: CustomerFragmentFragment = {
     },
   },
 };
-
-const doc = yaml.load(DialogueTemplate);
-console.log(doc);
 
 export const CustomerWithDialogueStub: GetDialogueQuery = {
   customer: {

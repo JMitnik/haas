@@ -61,7 +61,6 @@ const NodePage = observer(() => {
     }
 
     if (store.session.isAtLeaf) {
-      console.log('Is at leaf');
       uploadInteraction();
     }
 
