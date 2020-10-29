@@ -32,7 +32,7 @@ const DialogueTreeLayout = ({ children, node }: { children: ReactNode, node:Tree
   return (
     <DialogueTreeContainer>
       {/* TODO: Enable consistent animation */}
-      {!node.isRoot && (
+      {!node.isRoot && !node.isPostLeaf && (
         <GoBackContainer variants={routerNavigationAnimation} animate="animate" initial="initial" exit="exit">
           <GoBackButton onClick={() => history.goBack()}>
             <ChevronLeft />
