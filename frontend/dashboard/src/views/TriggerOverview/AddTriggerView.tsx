@@ -87,6 +87,9 @@ const AddTriggerView = () => {
   const form = useForm<FormDataProps>({
     resolver: yupResolver(schema),
     mode: 'all',
+    defaultValues: {
+      conditions: [],
+    },
   });
 
   const toast = useToast();

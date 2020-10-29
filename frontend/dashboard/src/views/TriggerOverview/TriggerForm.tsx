@@ -213,6 +213,8 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
     },
   );
 
+  const watchConditions = form.watch('conditions');
+
   // Fetching dialogue data
   const { data: triggerData } = useQuery<CustomerTriggerData>(getCustomerTriggerData, { variables: { customerSlug } });
   const dialogues = triggerData?.customer?.dialogues?.map((dialogue) => ({
@@ -256,7 +258,7 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
   };
 
   const addCondition = () => append({
-    id: null, questionId: null, conditionType: null, matchText: null, lowThreshold: null, highThreshold: null,
+    id: null, // questionId: null, conditionType: null, matchText: null, lowThreshold: null, highThreshold: null,
   });
 
   const handleDeleteCondition = (index: number) => remove(index);
@@ -371,12 +373,13 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
               >
                 <input type="hidden" ref={form.register()} name={`conditions[${index}].id`} />
                 {form.watch('type') === TriggerQuestionType.QUESTION && activeDialogue && (
-                <FormControl key={`questionId-${condition.indexKey}`} isRequired isInvalid={!!form.errors.conditions?.[index]?.questionId}>
+                <FormControl mb={4} key={`questionId-${condition.indexKey}`} isRequired isInvalid={!!form.errors.conditions?.[index]?.questionId}>
                   <FormLabel htmlFor={`conditions[${index}].questionId`}>{t('trigger:question')}</FormLabel>
                   <InputHelper>
                     {t('trigger:question_helper')}
                   </InputHelper>
                   <Controller
+                    key={condition.indexKey}
                     name={`conditions[${index}].questionId`}
                     as={<Select />}
                     defaultValue={condition?.questionId}
@@ -386,24 +389,26 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                   <FormErrorMessage>{form.errors.conditions?.[index]?.questionId?.value?.message}</FormErrorMessage>
                 </FormControl>
                 )}
-                {form.watch('conditions')?.[index]?.questionId ? (
-                  <FormControl isRequired isInvalid={!!form.errors.conditions?.[index]?.conditionType}>
+
+                {watchConditions?.[index]?.questionId ? (
+                  <FormControl id={`questionCondition-${condition.indexKey}`} mb={4} isRequired isInvalid={!!form.errors.conditions?.[index]?.conditionType}>
                     <FormLabel htmlFor="condition">{t('trigger:condition')}</FormLabel>
                     <InputHelper>
                       {t('trigger:condition_helper')}
                     </InputHelper>
                     <Controller
+                      key={condition.indexKey}
                       name={`conditions[${index}].conditionType`}
-                      defaultValue={form.watch('conditions')?.[index]?.conditionType}
+                      defaultValue={watchConditions?.[index]?.conditionType}
                       control={form.control}
                       render={({ onChange, onBlur, value }) => (
                         <ConditionFormFragment
                           activeNodeType={getNodeType(
-                            form.watch('conditions')?.[index]?.questionId?.value, questionsData?.customer?.dialogue?.questions,
+                            watchConditions?.[index]?.questionId?.value,
+                            questionsData?.customer?.dialogue?.questions,
                           )}
                           value={value}
                           onChange={(e: any) => {
-                            // handleConditionTypeChange(e, index);
                             onChange(e);
                           }}
                           onBlur={onBlur}
@@ -417,54 +422,56 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                   <Text>{t('trigger:select_dialogue_reminder')}</Text>
                 )}
 
-                {form.watch('conditions')?.[index]?.conditionType === TriggerConditionType.TEXT_MATCH && (
+                {watchConditions?.[index]?.conditionType === TriggerConditionType.TEXT_MATCH && (
                 <FormControl isInvalid={!!form.errors.conditions?.[index]?.matchText}>
                   <FormLabel htmlFor={`conditions[${index}].matchText`}>{t('trigger:match_text')}</FormLabel>
                   <InputHelper>
                     {t('trigger:match_text_helper')}
                   </InputHelper>
                   <Input
+                    key={condition.indexKey}
                     placeholder="Satisfied"
                     leftEl={<Type />}
                     name={`conditions[${index}].matchText`}
-                    // onChange={(e: any) => handleConditionMatchTextChange(e.target.value, index)}
                     ref={form.register({ required: true })}
                   />
 
                 </FormControl>
                 )}
 
-                {form.watch('conditions')?.[index]?.conditionType === TriggerConditionType.LOW_THRESHOLD && (
+                {watchConditions?.[index]?.conditionType === TriggerConditionType.LOW_THRESHOLD && (
                 <FormControl isInvalid={!!form.errors.conditions?.[index]?.lowThreshold}>
                   <FormLabel htmlFor={`conditions[${index}].lowThreshold`}>{t('trigger:low_threshold')}</FormLabel>
                   <InputHelper>
                     {t('trigger:low_threshold_helper')}
                   </InputHelper>
                   <Controller
+                    key={condition.indexKey}
                     name={`conditions[${index}].lowThreshold`}
                     control={form.control}
-                    defaultValue={form.watch('conditions')?.[index]?.lowThreshold}
+                    defaultValue={watchConditions?.[index]?.lowThreshold}
                     render={({ onChange, value }) => (
                       <Slider step={0.5} min={0} max={10} defaultValue={value} onAfterChange={onChange} />
                     )}
                   />
                   <Text>
-                    {form.watch('conditions')?.[index]?.lowThreshold}
+                    {watchConditions?.[index]?.lowThreshold}
                   </Text>
 
                 </FormControl>
                 )}
 
-                {form.watch('conditions')?.[index]?.conditionType === TriggerConditionType.HIGH_THRESHOLD && (
+                {watchConditions?.[index]?.conditionType === TriggerConditionType.HIGH_THRESHOLD && (
                 <FormControl isInvalid={!!form.errors.conditions?.[index]?.highThreshold}>
                   <FormLabel htmlFor={`conditions[${index}].highThreshold`}>{t('trigger:high_threshold')}</FormLabel>
                   <InputHelper>
                     {t('trigger:high_threshold_helper')}
                   </InputHelper>
                   <Controller
+                    key={condition.indexKey}
                     name={`conditions[${index}].highThreshold`}
                     control={form.control}
-                    defaultValue={10 - form.watch('conditions')?.[index]?.highThreshold || null}
+                    defaultValue={10 - condition?.highThreshold || null}
                     render={({ onChange, value }) => (
                       <Slider
                         step={0.5}
@@ -480,24 +487,25 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                     )}
                   />
                   <Text>
-                    {form.watch('conditions')?.[index]?.highThreshold}
+                    {watchConditions?.[index]?.highThreshold || 'no value set'}
                   </Text>
 
                 </FormControl>
                 )}
 
-                {form.watch('conditions')?.[index]?.conditionType === TriggerConditionType.OUTER_RANGE && (
+                {watchConditions?.[index]?.conditionType === TriggerConditionType.OUTER_RANGE && (
                 <FormControl isInvalid={!!form.errors.conditions?.[index]?.highThreshold}>
                   <FormLabel htmlFor={`conditions[${index}].range`}>{t('trigger:outer_range')}</FormLabel>
                   <InputHelper>
                     {t('trigger:outer_range_helper')}
                   </InputHelper>
                   <Controller
+                    key={condition.indexKey}
                     name={`conditions[${index}].range`}
                     control={form.control}
                     defaultValue={[
-                      form.watch('conditions')?.[index]?.range?.[0] || form.watch('conditions')?.[index]?.lowThreshold,
-                      form.watch('conditions')?.[index]?.range?.[1] || form.watch('conditions')?.[index]?.highThreshold]}
+                      watchConditions?.[index]?.range?.[0] || watchConditions?.[index]?.lowThreshold,
+                      watchConditions?.[index]?.range?.[1] || watchConditions?.[index]?.highThreshold]}
                     render={({ onChange, value }) => (
                       <OuterSliderContainer>
                         <Slider
@@ -512,24 +520,25 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                     )}
                   />
                   <Text>
-                    {`${form.watch('conditions')?.[index]?.range?.[0]} - ${form.watch('conditions')?.[index]?.range?.[1]}`}
+                    {`${watchConditions?.[index]?.range?.[0]} - ${watchConditions?.[index]?.range?.[1]}`}
                   </Text>
 
                 </FormControl>
                 )}
 
-                {form.watch('conditions')?.[index]?.conditionType === TriggerConditionType.INNER_RANGE && (
+                {watchConditions?.[index]?.conditionType === TriggerConditionType.INNER_RANGE && (
                 <FormControl isInvalid={!!form.errors.conditions?.[index]?.range}>
                   <FormLabel htmlFor={`conditions[${index}].range`}>{t('trigger:inner_range')}</FormLabel>
                   <InputHelper>
                     {t('trigger:inner_range_helper')}
                   </InputHelper>
                   <Controller
+                    key={condition.indexKey}
                     name={`conditions[${index}].range`}
                     control={form.control}
                     defaultValue={[
-                      form.watch('conditions')?.[index]?.range?.[0] || form.watch('conditions')?.[index]?.lowThreshold,
-                      form.watch('conditions')?.[index]?.range?.[1] || form.watch('conditions')?.[index]?.highThreshold]}
+                      watchConditions?.[index]?.range?.[0] || watchConditions?.[index]?.lowThreshold,
+                      watchConditions?.[index]?.range?.[1] || watchConditions?.[index]?.highThreshold]}
                     render={({ onChange, value }) => (
                       <Slider
                         range
@@ -542,7 +551,7 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                     )}
                   />
                   <Text>
-                    {`${form.watch('conditions')?.[index]?.range?.[0]} - ${form.watch('conditions')?.[index]?.range?.[1]}`}
+                    {`${watchConditions?.[index]?.range?.[0]} - ${watchConditions?.[index]?.range?.[1]}`}
                   </Text>
 
                 </FormControl>
