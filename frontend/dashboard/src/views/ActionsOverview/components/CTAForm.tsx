@@ -350,6 +350,9 @@ const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTACha
                       <SimpleMDE
                         value={value}
                         onChange={onChange}
+                        options={{
+                          toolbar: ['bold', 'italic', 'preview', 'guide'],
+                        }}
                       />
                     )}
                   />
