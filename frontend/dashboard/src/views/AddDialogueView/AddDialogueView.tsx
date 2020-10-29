@@ -166,8 +166,6 @@ const AddDialogueView = () => {
   const { setValue } = form;
 
   useEffect(() => {
-    console.log('customerOption reset!');
-    // change bitch
     setValue('dialogueOption', null, { shouldValidate: true });
   }, [customerOption, setValue]);
 
@@ -192,8 +190,6 @@ const AddDialogueView = () => {
     value: tag?.id,
   }));
 
-  // console.log('form watches: ', form.watch());
-  console.log('form errors: ', form.errors);
   return (
     <Container>
       <PageTitle>{t('views:add_dialogue_view')}</PageTitle>
