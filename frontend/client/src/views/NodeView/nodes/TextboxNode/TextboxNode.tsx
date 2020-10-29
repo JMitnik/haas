@@ -8,6 +8,7 @@ import { Div, Grid, H3, Textbox } from '@haas/ui';
 import { NodeTitle } from 'layouts/NodeLayout/NodeLayoutStyles';
 import { SessionEntryDataProps } from 'models/Session/SessionEntryModel';
 
+import ReactMarkdown from 'react-markdown';
 import { GenericNodeProps } from '../types';
 import { TextboxContainer } from './TextboxStyles';
 
@@ -37,7 +38,7 @@ const TextboxNode = ({ node, onEntryStore }: TextboxNodeProps) => {
 
   return (
     <TextboxContainer>
-      <NodeTitle>{node.title}</NodeTitle>
+      <NodeTitle><ReactMarkdown>{node.title}</ReactMarkdown></NodeTitle>
       <Div>
         <H3 color="white">What would you like to tell us?</H3>
         <Textbox placeholder="I have experienced ..." name="textbox" ref={register} />
