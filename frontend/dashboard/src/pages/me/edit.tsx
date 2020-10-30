@@ -80,9 +80,9 @@ const EditMeForm = () => {
 
   const form = useForm({
     defaultValues: {
-      firstName: user?.firstName,
-      lastName: user?.lastName,
-      phone: user?.phone,
+      firstName: user?.firstName || '',
+      lastName: user?.lastName || '',
+      phone: user?.phone || '',
       email: user?.email,
     },
     mode: 'onChange',
