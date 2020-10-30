@@ -347,7 +347,7 @@ const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTACha
                     defaultValue={title}
                     ref={form.register({ required: true })}
                   />
-                  <FormErrorMessage>{form.errors.title?.message}</FormErrorMessage>
+                  <FormErrorMessage>{form.errors.title}</FormErrorMessage>
                 </FormControl>
 
                 <FormControl isRequired>
@@ -361,7 +361,7 @@ const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTACha
                     options={CTA_TYPES}
                   />
 
-                  <FormErrorMessage>{form.errors.ctaType?.value?.message}</FormErrorMessage>
+                  <FormErrorMessage>{form.errors.ctaType?.value}</FormErrorMessage>
                 </FormControl>
 
                 {watchType?.value === 'SHARE' && (
@@ -458,7 +458,7 @@ const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTACha
                                 onChange={(e: any) => handleURLChange(e.currentTarget.value, index)}
                                 ref={form.register({ required: true })}
                               />
-                              <FormErrorMessage>{!!form.errors?.links?.[index]?.url?.message}</FormErrorMessage>
+                              <FormErrorMessage>{!!form.errors?.links?.[index]?.url}</FormErrorMessage>
                             </FormControl>
 
                             <FormControl isRequired isInvalid={!!form.errors.links?.[index]?.type}>

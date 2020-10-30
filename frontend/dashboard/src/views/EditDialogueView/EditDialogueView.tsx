@@ -182,7 +182,7 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFo
                       name="title"
                       ref={form.register({ required: true })}
                     />
-                    <FormErrorMessage>{form.errors.title?.message}</FormErrorMessage>
+                    <FormErrorMessage>{form.errors.title}</FormErrorMessage>
                   </FormControl>
 
                   <FormControl isInvalid={!!form.errors.publicTitle}>
@@ -196,7 +196,7 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFo
                       name="publicTitle"
                       ref={form.register({ required: false })}
                     />
-                    <FormErrorMessage>{form.errors.publicTitle?.message}</FormErrorMessage>
+                    <FormErrorMessage>{form.errors.publicTitle}</FormErrorMessage>
                   </FormControl>
 
                   <FormControl isRequired isInvalid={!!form.errors.description}>
@@ -209,7 +209,7 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFo
                       name="description"
                       ref={form.register({ required: true })}
                     />
-                    <FormErrorMessage>{form.errors.title?.message}</FormErrorMessage>
+                    <FormErrorMessage>{form.errors.title}</FormErrorMessage>
                   </FormControl>
 
                   <FormControl isRequired isInvalid={!!form.errors.slug}>
@@ -221,7 +221,7 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFo
                       name="slug"
                       ref={form.register({ required: true })}
                     />
-                    <FormErrorMessage>{form.errors.slug?.message}</FormErrorMessage>
+                    <FormErrorMessage>{form.errors.slug}</FormErrorMessage>
                   </FormControl>
 
                 </InputGrid>
@@ -262,7 +262,7 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFo
                             options={tagOptions}
                             defaultValue={tag}
                           />
-                          <FormErrorMessage>{form.errors.tags?.[index]?.value?.message}</FormErrorMessage>
+                          <FormErrorMessage>{form.errors.tags?.[index]?.value}</FormErrorMessage>
                         </Div>
                         <Flex justifyContent="center" alignContent="center" flexGrow={1}>
                           <Button

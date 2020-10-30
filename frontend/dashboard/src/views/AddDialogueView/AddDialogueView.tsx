@@ -201,7 +201,7 @@ const AddDialogueView = () => {
                       name="title"
                       ref={form.register({ required: true })}
                     />
-                    <FormErrorMessage>{form.errors.title?.message}</FormErrorMessage>
+                    <FormErrorMessage>{form.errors.title}</FormErrorMessage>
                   </FormControl>
 
                   <FormControl isInvalid={!!form.errors.publicTitle}>
@@ -217,7 +217,7 @@ const AddDialogueView = () => {
                       name="publicTitle"
                       ref={form.register({ required: false })}
                     />
-                    <FormErrorMessage>{form.errors.publicTitle?.message}</FormErrorMessage>
+                    <FormErrorMessage>{form.errors.publicTitle}</FormErrorMessage>
                   </FormControl>
 
                   <FormControl isRequired isInvalid={!!form.errors.description}>
@@ -230,7 +230,7 @@ const AddDialogueView = () => {
                       name="description"
                       ref={form.register({ required: true })}
                     />
-                    <FormErrorMessage>{form.errors.description?.message}</FormErrorMessage>
+                    <FormErrorMessage>{form.errors.description}</FormErrorMessage>
                   </FormControl>
 
                   <FormControl isRequired isInvalid={!!form.errors.slug}>
@@ -242,7 +242,7 @@ const AddDialogueView = () => {
                       name="slug"
                       ref={form.register({ required: true })}
                     />
-                    <FormErrorMessage>{form.errors.slug?.message}</FormErrorMessage>
+                    <FormErrorMessage>{form.errors.slug}</FormErrorMessage>
                   </FormControl>
 
                 </InputGrid>
@@ -287,7 +287,7 @@ const AddDialogueView = () => {
                         options={customerOptions}
                         defaultValue=""
                       />
-                      <FormErrorMessage>{form.errors.customerOption?.value?.message}</FormErrorMessage>
+                      <FormErrorMessage>{form.errors.customerOption?.value}</FormErrorMessage>
                     </FormControl>
                   )}
 
@@ -350,7 +350,7 @@ const AddDialogueView = () => {
                               setTags(qOption, index);
                             }}
                           />
-                          <FormErrorMessage>{form.errors.tags?.[index]?.message}</FormErrorMessage>
+                          <FormErrorMessage>{form.errors.tags?.[index]}</FormErrorMessage>
                         </Div>
                         <Flex justifyContent="center" alignContent="center" flexGrow={1}>
                           <Button

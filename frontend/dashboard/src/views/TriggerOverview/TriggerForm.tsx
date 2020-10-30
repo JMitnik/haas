@@ -2,7 +2,6 @@
 import { Controller, UseFormMethods, useFieldArray, useWatch } from 'react-hook-form';
 import { CornerRightDown, CornerRightUp, Key, Mail, Maximize2,
   Minimize2, PlusCircle, Smartphone, Thermometer, Type, UserPlus, Watch } from 'react-feather';
-import { DevTool } from '@hookform/devtools';
 import { Slider } from 'antd';
 import { useHistory, useParams } from 'react-router';
 import { useLazyQuery, useQuery } from '@apollo/react-hooks';
@@ -229,7 +228,7 @@ const FormConditionFragment = ({ form, condition: fieldCondition, fieldIndex, on
             control={form.control}
             options={questionsSelect}
           />
-          <FormErrorMessage>{form.errors.conditions?.[fieldIndex]?.questionId?.value?.message}</FormErrorMessage>
+          <FormErrorMessage>{form.errors.conditions?.[fieldIndex]?.questionId?.value}</FormErrorMessage>
         </FormControl>
       )}
 
@@ -258,7 +257,7 @@ const FormConditionFragment = ({ form, condition: fieldCondition, fieldIndex, on
             )}
           />
 
-          <FormErrorMessage>{form.errors.conditions?.[fieldIndex]?.conditionType?.message}</FormErrorMessage>
+          <FormErrorMessage>{form.errors.conditions?.[fieldIndex]?.conditionType}</FormErrorMessage>
         </FormControl>
       )}
 
@@ -484,7 +483,6 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
 
   return (
     <Form onSubmit={form.handleSubmit(onFormSubmit)}>
-      <DevTool control={form.control} />
       <ServerError serverError={serverErrors} />
 
       <FormSection id="general">
@@ -505,10 +503,10 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                 name="name"
                 ref={form.register({ required: true })}
               />
-              <FormErrorMessage>{form.errors.name?.message}</FormErrorMessage>
+              <FormErrorMessage>{form.errors.name}</FormErrorMessage>
             </FormControl>
 
-            <FormControl isRequired isInvalid={!!form.errors.dialogue?.value?.message}>
+            <FormControl isRequired isInvalid={!!form.errors.dialogue?.value}>
               <FormLabel htmlFor="dialogue">{t('trigger:dialogue')}</FormLabel>
               <InputHelper>{t('trigger:dialogue_helper')}</InputHelper>
               <Controller
@@ -524,10 +522,10 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                   />
                 )}
               />
-              <FormErrorMessage>{form.errors.dialogue?.label?.message}</FormErrorMessage>
+              <FormErrorMessage>{form.errors.dialogue?.label}</FormErrorMessage>
             </FormControl>
 
-            <FormControl isInvalid={!!form.errors.type?.message}>
+            <FormControl isInvalid={!!form.errors.type}>
               <FormLabel htmlFor="type">{t('trigger:type')}</FormLabel>
               <InputHelper>{t('trigger:type_helper')}</InputHelper>
 
@@ -563,7 +561,7 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                 )}
               />
 
-              <FormErrorMessage>{form.errors.dialogue?.label?.message}</FormErrorMessage>
+              <FormErrorMessage>{form.errors.dialogue?.label}</FormErrorMessage>
             </FormControl>
           </InputGrid>
         </Div>
@@ -618,7 +616,7 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
               mt={2}
             >
               <InputGrid>
-                <FormControl isInvalid={!!form.errors.medium?.message}>
+                <FormControl isInvalid={!!form.errors.medium}>
                   <FormLabel htmlFor="medium">{t('trigger:recipient')}</FormLabel>
                   <InputHelper>{t('trigger:recipient_helper')}</InputHelper>
 
@@ -630,7 +628,7 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                     as={<Select />}
                   />
 
-                  <FormErrorMessage>{form.errors.medium?.message}</FormErrorMessage>
+                  <FormErrorMessage>{form.errors.medium}</FormErrorMessage>
                 </FormControl>
               </InputGrid>
               <Button
@@ -657,7 +655,7 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
         <Div>
 
           <InputGrid>
-            <FormControl isRequired isInvalid={!!form.errors.medium?.message}>
+            <FormControl isRequired isInvalid={!!form.errors.medium}>
               <FormLabel htmlFor="medium">{t('trigger:medium')}</FormLabel>
               <InputHelper>{t('trigger:medium_helper')}</InputHelper>
 
@@ -679,7 +677,7 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                 )}
               />
 
-              <FormErrorMessage>{form.errors.medium?.message}</FormErrorMessage>
+              <FormErrorMessage>{form.errors.medium}</FormErrorMessage>
             </FormControl>
           </InputGrid>
         </Div>
