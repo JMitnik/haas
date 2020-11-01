@@ -5,7 +5,7 @@ import { CornerRightDown, CornerRightUp, Key, Mail, Maximize2,
 import { Slider } from 'antd';
 import { useHistory, useParams } from 'react-router';
 import { useLazyQuery, useQuery } from '@apollo/react-hooks';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Select from 'react-select';
 import styled from 'styled-components/macro';
 
@@ -202,10 +202,48 @@ const getNodeType = (question: string, questions: Array<any>) => {
 
 const FormConditionFragment = ({ form, condition: fieldCondition, fieldIndex, onDelete, questions, questionsSelect, activeDialogue }: any) => {
   const { t } = useTranslation();
+  const hasRenderedConditionType = useRef<boolean>(false);
 
-  const watchCondition = form.watch(`conditions[${fieldIndex}]`, fieldCondition);
-  console.log('WatchCondition', watchCondition);
-  console.log('FieldCondition', fieldCondition);
+  const watchConditionType = useWatch({
+    control: form.control,
+    name: `conditions[${fieldIndex}].conditionType`,
+    defaultValue: fieldCondition.conditionType,
+  });
+
+  const watchConditionQuestion = useWatch({
+    control: form.control,
+    name: `conditions[${fieldIndex}].questionId`,
+    defaultValue: fieldCondition.questionId,
+  });
+
+  const watchConditionRange = useWatch({
+    control: form.control,
+    name: `conditions[${fieldIndex}].range`,
+    defaultValue: fieldCondition.range,
+  });
+
+  useEffect(() => {
+    console.log('Watch condition type has changed', watchConditionType);
+  }, [watchConditionType]);
+
+  // TODO: @DAAN play around with this, and see how to make it work
+  useEffect(() => {
+    console.log('Watch condition Q has changed', watchConditionQuestion);
+
+    if (!hasRenderedConditionType.current) {
+      hasRenderedConditionType.current = true;
+    } else {
+      form.setValue(`conditions[${fieldIndex}].conditionType`, '');
+      form.setValue(`conditions[${fieldIndex}].matchText`, '');
+      form.setValue(`conditions[${fieldIndex}].minThreshold`, 3);
+      form.setValue(`conditions[${fieldIndex}].maxThreshold`, 6);
+      form.setValue(`conditions[${fieldIndex}].range`, [3, 6]);
+    }
+  }, [watchConditionQuestion, form]);
+
+  useEffect(() => {
+    console.log('Watch range has changed', watchConditionRange);
+  }, [watchConditionRange]);
 
   return (
     <Div
@@ -232,7 +270,7 @@ const FormConditionFragment = ({ form, condition: fieldCondition, fieldIndex, on
         </FormControl>
       )}
 
-      {watchCondition?.questionId?.value && (
+      {watchConditionQuestion && (
         <FormControl mb={4} isRequired isInvalid={!!form.errors.conditions?.[fieldIndex]?.conditionType}>
           <FormLabel htmlFor="condition">{t('trigger:condition')}</FormLabel>
           <InputHelper>
@@ -245,7 +283,7 @@ const FormConditionFragment = ({ form, condition: fieldCondition, fieldIndex, on
             render={({ onChange, onBlur, value }) => (
               <ConditionFormFragment
                 activeNodeType={
-                    getNodeType(watchCondition?.questionId?.value,
+                    getNodeType(watchConditionQuestion.value,
                       questions?.customer?.dialogue?.questions)
                   }
                 value={value}
@@ -263,7 +301,7 @@ const FormConditionFragment = ({ form, condition: fieldCondition, fieldIndex, on
 
       {/* <Text>{t('trigger:select_dialogue_reminder')}</Text> */}
 
-      {watchCondition?.conditionType === TriggerConditionType.TEXT_MATCH && (
+      {watchConditionType === TriggerConditionType.TEXT_MATCH && (
         <FormControl isInvalid={!!form.errors.conditions?.[fieldIndex]?.matchText}>
           <FormLabel htmlFor={`conditions[${fieldIndex}].matchText`}>{t('trigger:match_text')}</FormLabel>
           <InputHelper>
@@ -280,7 +318,7 @@ const FormConditionFragment = ({ form, condition: fieldCondition, fieldIndex, on
         </FormControl>
       )}
 
-      {watchCondition?.conditionType === TriggerConditionType.LOW_THRESHOLD && (
+      {watchConditionType === TriggerConditionType.LOW_THRESHOLD && (
       <FormControl isInvalid={!!form.errors.conditions?.[fieldIndex]?.lowThreshold}>
         <FormLabel htmlFor={`conditions[${fieldIndex}].lowThreshold`}>{t('trigger:low_threshold')}</FormLabel>
         <InputHelper>
@@ -295,13 +333,13 @@ const FormConditionFragment = ({ form, condition: fieldCondition, fieldIndex, on
           )}
         />
         <Text>
-          {watchCondition?.lowThreshold}
+          {/* {watchCondition?.lowThreshold} */}
         </Text>
 
       </FormControl>
       )}
 
-      {watchCondition?.conditionType === TriggerConditionType.HIGH_THRESHOLD && (
+      {watchConditionType === TriggerConditionType.HIGH_THRESHOLD && (
         <FormControl isInvalid={!!form.errors.conditions?.[fieldIndex]?.highThreshold}>
           <FormLabel htmlFor={`conditions[${fieldIndex}].highThreshold`}>{t('trigger:high_threshold')}</FormLabel>
           <InputHelper>
@@ -327,13 +365,13 @@ const FormConditionFragment = ({ form, condition: fieldCondition, fieldIndex, on
           />
 
           <Text>
-            {watchCondition?.highThreshold || ''}
+            {/* {watchCondition?.highThreshold || ''} */}
           </Text>
 
         </FormControl>
       )}
 
-      {watchCondition?.conditionType === TriggerConditionType.OUTER_RANGE && (
+      {watchConditionType === TriggerConditionType.OUTER_RANGE && (
         <>
           <FormControl>
             <FormLabel htmlFor={`conditions[${fieldIndex}].range`}>{t('trigger:outer_range')}</FormLabel>
@@ -343,7 +381,7 @@ const FormConditionFragment = ({ form, condition: fieldCondition, fieldIndex, on
             <Controller
               name={`conditions[${fieldIndex}].range`}
               control={form.control}
-              defaultValue={[fieldCondition.lowThreshold, fieldCondition.highThreshold]}
+              defaultValue={fieldCondition?.range?.length === 2 ? fieldCondition.range : [3, 6]}
               render={({ value, onChange }) => (
                 <OuterSliderContainer>
                   <Slider
@@ -354,21 +392,20 @@ const FormConditionFragment = ({ form, condition: fieldCondition, fieldIndex, on
                     defaultValue={value}
                     onAfterChange={(value) => {
                       onChange(value);
-                      form.trigger();
                     }}
                   />
                 </OuterSliderContainer>
               )}
             />
             <Text>
-              {`${watchCondition?.range?.[0]} - ${watchCondition?.range?.[1]}`}
+              {/* {`${watchCondition?.range?.[0]} - ${watchCondition?.range?.[1]}`} */}
             </Text>
 
           </FormControl>
         </>
       )}
 
-      {watchCondition?.conditionType === TriggerConditionType.INNER_RANGE && (
+      {watchConditionType === TriggerConditionType.INNER_RANGE && (
         <FormControl isInvalid={!!form.errors.conditions?.[fieldIndex]?.range}>
           <FormLabel htmlFor={`conditions[${fieldIndex}].range`}>{t('trigger:inner_range')}</FormLabel>
           <InputHelper>
@@ -377,23 +414,22 @@ const FormConditionFragment = ({ form, condition: fieldCondition, fieldIndex, on
           <Controller
             name={`conditions[${fieldIndex}].range`}
             control={form.control}
-            defaultValue={[fieldCondition.lowThreshold, fieldCondition.highThreshold]}
+            defaultValue={fieldCondition?.range?.length === 2 ? fieldCondition.range : [3, 6]}
             render={({ onChange, value }) => (
               <Slider
                 range
+                defaultValue={value}
                 step={0.5}
                 min={0}
                 max={10}
-                defaultValue={value}
                 onAfterChange={(value) => {
                   onChange(value);
-                  form.trigger();
                 }}
               />
             )}
           />
           <Text>
-            {`${watchCondition?.range?.[0]} - ${watchCondition?.range?.[1]}`}
+            {/* {`${watchCondition?.range?.[0]} - ${watchCondition?.range?.[1]}`} */}
           </Text>
 
         </FormControl>
@@ -423,8 +459,6 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
     name: 'conditions',
     keyName: 'indexKey',
   });
-
-  console.log(fields);
 
   // Fetching dialogue data
   const { data: triggerData } = useQuery<CustomerTriggerData>(getCustomerTriggerData, { variables: { customerSlug } });
@@ -473,11 +507,17 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
   // });
 
   const addCondition = () => append({
-    questionId: null, conditionType: null, matchText: null, lowThreshold: 3, highThreshold: null, range: [],
+    questionId: null,
+    conditionType: null,
+    matchText: null,
+    lowThreshold: 3,
+    highThreshold: 6,
+    range: [
+      3, 5,
+    ],
   });
 
   const handleDeleteCondition = (index: number) => {
-    console.log('Index to be removed', index);
     remove(index);
   };
 
@@ -503,7 +543,7 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                 name="name"
                 ref={form.register({ required: true })}
               />
-              <FormErrorMessage>{form.errors.name}</FormErrorMessage>
+              <FormErrorMessage>{form.errors.name?.message}</FormErrorMessage>
             </FormControl>
 
             <FormControl isRequired isInvalid={!!form.errors.dialogue?.value}>
@@ -578,7 +618,14 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
           <InputGrid>
             <Flex flexDirection="row" alignItems="center" justifyContent="space-between" marginBottom={5}>
               <H4>Conditions</H4>
-              <Button leftIcon={PlusCircle} onClick={addCondition} isDisabled={!activeDialogue} size="sm">{t('trigger:add_condition')}</Button>
+              <Button
+                leftIcon={PlusCircle}
+                onClick={addCondition}
+                isDisabled={!activeDialogue}
+                size="sm"
+              >
+                {t('trigger:add_condition')}
+              </Button>
             </Flex>
             <Hr />
             {fields?.map((condition, index) => (

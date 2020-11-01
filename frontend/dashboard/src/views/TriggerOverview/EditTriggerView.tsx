@@ -124,6 +124,7 @@ const EditTriggerForm = ({ trigger }: {trigger: any}) => {
           conditionType: condition.type,
           lowThreshold: condition?.minValue ? condition?.minValue / 10 : null,
           highThreshold: condition?.maxValue ? condition.maxValue / 10 : null,
+          range: [condition?.minValue ? condition?.minValue / 10 : null, condition?.maxValue ? condition.maxValue / 10 : null],
           matchText: condition?.textValue || null,
         })),
       medium: trigger.medium,
