@@ -78,7 +78,7 @@ const LoginView = () => {
                 <Form onSubmit={form.handleSubmit(handleRequestInvite)}>
                   <H2 color="gray.800" mb={2}>Log in</H2>
                   <Paragraph fontSize="0.9rem" color="gray.500" mb={4}>
-                    Login using your email adres
+                    Login using your email address
                   </Paragraph>
                   <ServerError serverError={loginServerError} />
 
