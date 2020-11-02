@@ -8,6 +8,7 @@ import { SessionEntryDataProps } from 'models/Session/SessionEntryModel';
 import { ReactComponent as SpeechIcon } from 'assets/icons/icon-chat.svg';
 import { TreeNodeOptionProps } from 'models/Tree/TreeNodeOptionModel';
 
+import ReactMarkdown from 'react-markdown';
 import { ChoiceIconContainer, MultiChoiceNodeContainer, MultiChoiceNodeGrid } from './MultiChoiceNodeStyles';
 import { GenericNodeProps } from '../types';
 
@@ -50,7 +51,7 @@ const MultiChoiceNode = ({ node, onEntryStore }: MultiChoiceNodeProps) => {
 
   return (
     <MultiChoiceNodeContainer>
-      <NodeTitle>{node.title}</NodeTitle>
+      <NodeTitle><ReactMarkdown>{node.title}</ReactMarkdown></NodeTitle>
 
       <MultiChoiceNodeGrid
         data-cy="Choices"

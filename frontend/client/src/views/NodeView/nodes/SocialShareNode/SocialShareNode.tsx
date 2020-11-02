@@ -1,5 +1,6 @@
 import { Facebook, Globe, Instagram, Linkedin, Twitter } from 'react-feather';
 import React from 'react';
+import ReactMarkdown from 'react-markdown';
 
 import { Flex } from '@haas/ui';
 import { NodeTitle } from 'layouts/NodeLayout/NodeLayoutStyles';
@@ -62,7 +63,7 @@ const SocialShareNode = ({ node, onQueueOnlyStore }: SocialShareNodeProps) => {
 
   return (
     <SocialShareNodeContainer>
-      <NodeTitle>{node.title}</NodeTitle>
+      <NodeTitle><ReactMarkdown>{node.title}</ReactMarkdown></NodeTitle>
       <Flex justifyContent="center" alignItems="center">
         {node.links.length === 0 && <DefaultSocialItems />}
         {node.links.map((link, index) => (

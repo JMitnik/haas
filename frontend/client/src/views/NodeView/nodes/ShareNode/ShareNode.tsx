@@ -1,6 +1,7 @@
 import { Share2 } from 'react-feather';
 import { useClipboard } from 'use-clipboard-copy';
 import React from 'react';
+import ReactMarkdown from 'react-markdown';
 
 import { Flex } from '@haas/ui';
 import { NodeTitle } from 'layouts/NodeLayout/NodeLayoutStyles';

@@ -5,6 +5,7 @@ import { Div } from '@haas/ui';
 import { NodeTitle } from 'layouts/NodeLayout/NodeLayoutStyles';
 import { SessionEntryDataProps } from 'models/Session/SessionEntryModel';
 import { cleanInt } from 'utils/cleanInt';
+import ReactMarkdown from 'react-markdown';
 
 import { GenericNodeProps } from '../types';
 import { SliderNodeContainer } from './SliderNodeStyles';
@@ -37,7 +38,7 @@ const SliderNode = ({ node, onEntryStore }: SliderNodeProps) => {
   return (
     <SliderNodeContainer>
       <Div>
-        <NodeTitle>{node.title}</NodeTitle>
+        <NodeTitle><ReactMarkdown>{node.title}</ReactMarkdown></NodeTitle>
       </Div>
       <Div>
         <Slider form={form} onSubmit={handleSubmit} register={form.register} />
