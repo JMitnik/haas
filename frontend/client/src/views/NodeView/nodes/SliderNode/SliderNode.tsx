@@ -10,6 +10,7 @@ import { cleanInt } from 'utils/cleanInt';
 
 import { GenericNodeProps } from '../types';
 import { SliderNodeContainer, SliderNodeValue } from './SliderNodeStyles';
+import ReactMarkdown from 'react-markdown';
 import Slider from './Slider';
 
 type SliderNodeProps = GenericNodeProps;
@@ -56,7 +57,7 @@ const SliderNode = ({ node, onEntryStore }: SliderNodeProps) => {
   return (
     <SliderNodeContainer>
       <Div>
-        <NodeTitle>{node.title}</NodeTitle>
+        <NodeTitle><ReactMarkdown>{node.title}</ReactMarkdown></NodeTitle>
       </Div>
       <Div>
         <SliderNodeValue initial="initial" variants={sliderValueAnimeVariants} animate={controls}>

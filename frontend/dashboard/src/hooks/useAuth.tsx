@@ -7,6 +7,8 @@ interface UseAuthProps {
   canCreateCustomers: boolean;
   canDeleteCustomers: boolean;
   canCreateTriggers: boolean;
+  canEditTriggers: boolean;
+  canDeleteTriggers: boolean;
   canInviteUsers: boolean;
   canEditCustomer: boolean;
   canAccessAdmin: boolean;
@@ -43,8 +45,12 @@ const useAuth = (): UseAuthProps => {
   const canBuildDialogues = authPermissions?.includes(SystemPermission.CAN_BUILD_DIALOGUE) || false;
 
   const canCreateTriggers = authPermissions?.includes(SystemPermission.CAN_CREATE_TRIGGERS) || false;
+  const canEditTriggers = authPermissions?.includes(SystemPermission.CAN_CREATE_TRIGGERS) || false;
+  const canDeleteTriggers = authPermissions?.includes(SystemPermission.CAN_DELETE_TRIGGERS) || false;
 
   return {
+    canEditTriggers,
+    canDeleteTriggers,
     canCreateCustomers,
     canDeleteCustomers,
     canCreateTriggers,

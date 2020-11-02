@@ -4,6 +4,7 @@ import React from 'react';
 import { Flex } from '@haas/ui';
 import { NodeTitle } from 'layouts/NodeLayout/NodeLayoutStyles';
 import CustomIcon from 'components/Icons/CustomIcon';
+import ReactMarkdown from 'react-markdown';
 import useDialogueFinish from 'hooks/use-dialogue-finish';
 
 import { GenericNodeProps } from '../types';
@@ -16,7 +17,7 @@ const SocialShareNode = ({ node }: SocialShareNodeProps) => {
 
   return (
     <SocialShareNodeContainer>
-      <NodeTitle>{node.title}</NodeTitle>
+      <NodeTitle><ReactMarkdown>{node.title}</ReactMarkdown></NodeTitle>
       <Flex justifyContent="center" alignItems="center">
         {node.links.length === 0 && (
           <>

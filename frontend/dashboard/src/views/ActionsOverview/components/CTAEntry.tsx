@@ -12,6 +12,7 @@ import deleteCTAMutation from 'mutations/deleteCTA';
 import getCTANodesQuery from 'queries/getCTANodes';
 
 import { useCustomer } from 'providers/CustomerProvider';
+import ReactMarkdown from 'react-markdown';
 import CTAForm from './CTAForm';
 import CTAIcon from './CTAIcon';
 import EditCTAButton from './EditCTAButton';
@@ -144,7 +145,9 @@ const CTAEntry = ({ id, activeCTA, onActiveCTAChange, title, type, links, share,
               {t('title')}
             </Span>
             <OverflowSpan>
-              {title || t('none')}
+              <ReactMarkdown>
+                {title || t('none') || ''}
+              </ReactMarkdown>
             </OverflowSpan>
           </Flex>
 
