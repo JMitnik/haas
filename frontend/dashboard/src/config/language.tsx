@@ -4,6 +4,7 @@ const language = {
     data: {
       en: 'Data',
       de: 'Data',
+    },
     edit_trigger: {
       en: 'Edit alert',
       de: 'Alert bearbeiten',

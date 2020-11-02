@@ -1,7 +1,7 @@
 import * as yup from 'yup';
 import { Activity, Minus, Plus, Type } from 'react-feather';
 import { ApolloError, gql } from 'apollo-boost';
-import { BooleanRadioInput, ButtonRadio, Div, Flex, Form, FormContainer, FormControl, FormLabel,
+import { ButtonRadio, Div, Flex, Form, FormContainer, FormControl, FormLabel,
   FormSection, H3, Hr, Input, InputGrid, InputHelper, Muted, PageTitle, Textarea } from '@haas/ui';
 import { Button, ButtonGroup, FormErrorMessage, RadioButtonGroup, Stack } from '@chakra-ui/core';
 import { Controller, useForm } from 'react-hook-form';
