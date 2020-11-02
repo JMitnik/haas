@@ -93,6 +93,8 @@ model Dialogue {
   tags         Tag[]
   isOnline     Boolean        @default(value: false)
   isWithoutGenData Boolean @default(value: false)
+  
+  wasGeneratedWithGenData Boolean @default(value: false)
   @@unique([slug, customerId])
 }
 

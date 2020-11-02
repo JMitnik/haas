@@ -96,7 +96,11 @@ export const DialogueType = objectType({
     t.string('title');
     t.string('slug');
     t.string('description');
+
+    // Placeholder data related properties
     t.boolean('isWithoutGenData');
+    t.boolean('wasGeneratedWithGenData');
+
     t.string('publicTitle', { nullable: true });
     t.string('creationDate', { nullable: true });
     t.string('updatedAt', { nullable: true });

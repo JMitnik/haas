@@ -579,6 +579,7 @@ export interface NexusGenFieldTypes {
     tags: NexusGenRootTypes['Tag'][] | null; // [Tag!]
     title: string; // String!
     updatedAt: string | null; // String
+    wasGeneratedWithGenData: boolean; // Boolean!
   }
   DialogueStatistics: { // field return type
     history: NexusGenRootTypes['lineChartDataType'][] | null; // [lineChartDataType!]
