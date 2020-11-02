@@ -198,6 +198,11 @@ class DialogueService {
       },
     });
 
+    await prisma.dialogue.update({
+      where: { id: dialogueId },
+      data: { wasGeneratedWithGenData: true },
+    });
+
     const rootNode = dialogueWithNodes?.questions.find((node) => node.isRoot);
     const edgesOfRootNode = dialogueWithNodes?.edges.filter((edge) => edge.parentNodeId === rootNode?.id);
 

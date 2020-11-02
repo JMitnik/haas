@@ -36,6 +36,8 @@ const getEditDialogueQuery = gql`
         publicTitle
         description
         isWithoutGenData
+        wasGeneratedWithGenData
+        
         tags {
           id
           name
@@ -282,44 +284,45 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFo
               </Div>
             </FormSection>
 
-            <FormSection id="data">
-              <Div>
-                <H3 color="default.text" fontWeight={500} pb={2}>{t('data')}</H3>
-                <Muted color="gray.600">
-                  {t('dialogue:data_helper')}
-                </Muted>
-              </Div>
-              <Div>
-                <InputGrid gridTemplateColumns="1fr">
-                  <FormControl>
-                    <FormLabel>{t('dialogue:hide_fake_data')}</FormLabel>
-                    <InputHelper>{t('dialogue:hide_fake_data_helper')}</InputHelper>
-                    <Controller
-                      name="isWithoutGenData"
-                      control={form.control}
-                      render={({ onChange, onBlur, value }) => (
-                        <RadioButtonGroup onBlur={onBlur} value={value} onChange={onChange} display="flex">
-                          <ButtonRadio
-                            icon={Minus}
-                            value={1}
-                            mr={2}
-                            text={(t('dialogue:hide_fake_data'))}
-                            description={t('dialogue:do_hide_fake_data_helper')}
-                          />
-                          <ButtonRadio
-                            icon={Activity}
-                            value={0}
-                            text={(t('dialogue:no_hide_fake_data'))}
-                            description={t('dialogue:no_hide_fake_data_helper')}
-                          />
-                        </RadioButtonGroup>
-                      )}
-                    />
-
-                  </FormControl>
-                </InputGrid>
-              </Div>
-            </FormSection>
+            {dialogue.wasGeneratedWithGenData && (
+              <FormSection id="data">
+                <Div>
+                  <H3 color="default.text" fontWeight={500} pb={2}>{t('data')}</H3>
+                  <Muted color="gray.600">
+                    {t('dialogue:data_helper')}
+                  </Muted>
+                </Div>
+                <Div>
+                  <InputGrid gridTemplateColumns="1fr">
+                    <FormControl>
+                      <FormLabel>{t('dialogue:hide_fake_data')}</FormLabel>
+                      <InputHelper>{t('dialogue:hide_fake_data_helper')}</InputHelper>
+                      <Controller
+                        name="isWithoutGenData"
+                        control={form.control}
+                        render={({ onChange, onBlur, value }) => (
+                          <RadioButtonGroup onBlur={onBlur} value={value} onChange={onChange} display="flex">
+                            <ButtonRadio
+                              icon={Minus}
+                              value={1}
+                              mr={2}
+                              text={(t('dialogue:hide_fake_data'))}
+                              description={t('dialogue:do_hide_fake_data_helper')}
+                            />
+                            <ButtonRadio
+                              icon={Activity}
+                              value={0}
+                              text={(t('dialogue:no_hide_fake_data'))}
+                              description={t('dialogue:no_hide_fake_data_helper')}
+                            />
+                          </RadioButtonGroup>
+                        )}
+                      />
+                    </FormControl>
+                  </InputGrid>
+                </Div>
+              </FormSection>
+            )}
 
             <ButtonGroup>
               <Button
