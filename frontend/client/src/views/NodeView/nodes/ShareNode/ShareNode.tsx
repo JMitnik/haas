@@ -8,6 +8,7 @@ import { NodeTitle } from 'layouts/NodeLayout/NodeLayoutStyles';
 
 import { GenericNodeProps } from '../types';
 import { ShareButton, ShareButtonContainer, ShareNodeContainer, SuccesMessageContainer } from './ShareNodeStyles';
+import { useLocation } from 'react-router-dom';
 
 type SocialShareNodeProps = GenericNodeProps;
 
@@ -30,9 +31,8 @@ const ShareNode = ({ node }: SocialShareNodeProps) => {
       // If Web Share API is supported
       await navi.share({
         text: `${share?.title} \n ${formatUrl(share?.url || '')}`,
-      })
-        .then(() => alert('Done'))
-        .catch((err: any) => alert(err));
+      });
+      window.location.reload();
     } else {
       const copiedText = `${share?.title} \n
         ${formatUrl(share?.url || '')}`;

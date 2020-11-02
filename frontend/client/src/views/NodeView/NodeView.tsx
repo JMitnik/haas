@@ -100,7 +100,11 @@ const NodeView = ({ node }: NodeViewProps) => {
   }
 
   // Do the main check in
-  if ((!node.isLeaf && !node.isRoot && !store.hasStarted) || (node.isPostLeaf && !store.hasStarted)) {
+  const suddenlyStarted = !node.isLeaf && !node.isRoot && !store.hasStarted;
+  const inPostLeafAfterRefresh = node.isPostLeaf && !store.hasStarted;
+  const inTreeWithNoResults = !node.isLeaf && !node.isRoot && store.session.isEmpty;
+
+  if ((suddenlyStarted) || (inPostLeafAfterRefresh) || inTreeWithNoResults) {
     return <Redirect to={`/${store.customer?.slug}/${store.tree?.slug}`} />;
   }
 

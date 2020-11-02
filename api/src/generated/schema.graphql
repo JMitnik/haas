@@ -123,6 +123,10 @@ input CustomerWhereUniqueInput {
 """Date custom scalar type"""
 scalar Date
 
+type Debug {
+  debugResolver: String
+}
+
 input DeleteDialogueInputType {
   customerSlug: String
   id: ID
@@ -300,6 +304,7 @@ type Mutation {
   createTag(customerSlug: String, name: String, type: TagTypeEnum): Tag!
   createTrigger(customerSlug: String, questionId: String, recipients: RecipientsInputType, trigger: TriggerInputType): TriggerType!
   createUser(customerSlug: String, input: UserInput): UserType!
+  debugMutation: String
   deleteCTA(input: DeleteNodeInputType): QuestionNode!
   deleteCustomer(where: CustomerWhereUniqueInput): Customer
   deleteDialogue(input: DeleteDialogueInputType): Dialogue!

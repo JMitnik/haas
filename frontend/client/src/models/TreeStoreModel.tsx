@@ -66,6 +66,12 @@ const TreeStoreModel = types
       start: () => {
         self.hasStarted = true;
       },
+      /**
+       * Reach the final state: dont store anymore session information, and if user goes "back", it bring them back to the start
+       */
+      finalize: () => {
+        self.session.reset();
+      },
       stop: () => {
         self.hasStarted = false;
       },

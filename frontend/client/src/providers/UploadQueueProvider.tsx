@@ -41,6 +41,8 @@ export const UploadQueueProvider = ({ children }: { children: React.ReactNode })
             })),
           },
         },
+      }).then(() => {
+        store.finalize();
       });
     }
   }, [createInteraction, store, interactionData]);
