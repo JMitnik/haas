@@ -1,4 +1,5 @@
 import { mutationField, objectType } from '@nexus/schema';
+import prisma from '../../config/prisma';
 
 export const DebugType = objectType({
   name: 'Debug',

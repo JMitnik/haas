@@ -150,7 +150,7 @@ class NodeService {
         connect: {
           id: overrideLeafId,
         },
-      } : null,
+      } : undefined,
       type,
       isRoot,
       isLeaf,
@@ -229,7 +229,7 @@ class NodeService {
           isLeaf: true,
           links: links.length ? {
             create: links,
-          } : null,
+          } : undefined,
         },
       })),
     );
@@ -399,7 +399,7 @@ class NodeService {
       data: {
         title,
         type,
-        overrideLeaf: leaf,
+        overrideLeaf: leaf || undefined,
         options: {
           create: options.map((option) => ({
             value: option.value,
@@ -502,7 +502,7 @@ class NodeService {
         throw Error;
       }
     } catch (e) {
-      console.log('something went wrong updating edges: ', e);
+      console.log('something went wrong updating edges: ', e.message);
     }
 
     const updatedOptionIds = await NodeService.updateQuestionOptions(options);

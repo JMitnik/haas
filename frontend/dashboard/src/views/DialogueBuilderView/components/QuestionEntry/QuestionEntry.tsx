@@ -4,6 +4,7 @@ import { useParams } from 'react-router';
 import { useToast } from '@chakra-ui/core';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
+import ReactMarkdown from 'react-markdown';
 
 import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
 import { useCustomer } from 'providers/CustomerProvider';
@@ -115,7 +116,9 @@ const QuestionEntryItem = ({ depth,
                 {t('title')}
               </Span>
               <OverflowSpan data-cy="OverflowSpan">
-                {question.title || t('none')}
+                <ReactMarkdown>
+                  {question.title || t('none') || ''}
+                </ReactMarkdown>
               </OverflowSpan>
             </Flex>
 
