@@ -1,5 +1,6 @@
 /* eslint-disable radix */
 import * as yup from 'yup';
+import { DevTool } from '@hookform/devtools';
 import { FormContainer, PageTitle } from '@haas/ui';
 import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
@@ -8,7 +9,7 @@ import { useMutation, useQuery } from '@apollo/react-hooks';
 import { useToast } from '@chakra-ui/core';
 import { useTranslation } from 'react-i18next';
 import { yupResolver } from '@hookform/resolvers';
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import editTriggerMutation from 'mutations/editTrigger';
 import getTriggerQuery from 'queries/getTrigger';
@@ -160,6 +161,19 @@ const EditTriggerForm = ({ trigger }: {trigger: any}) => {
     },
   });
 
+  function isEmpty(obj: any) {
+    for (const key in obj) {
+      if (obj.hasOwnProperty(key)) { return false; }
+    }
+    return true;
+  }
+
+  useEffect(() => {
+    if (isEmpty(form.errors)) {
+      form.control.updateFormState({ isValid: true });
+    }
+  }, [form.formState.isValid]);
+
   const getThresholdValue = (conditionType: string, range: Array<number>, value: number, index: number) => {
     if (conditionType === TriggerConditionType.INNER_RANGE || conditionType === TriggerConditionType.OUTER_RANGE) {
       return range?.[index] ? range[index] * 10 : null;
@@ -196,6 +210,8 @@ const EditTriggerForm = ({ trigger }: {trigger: any}) => {
     });
   };
 
+  console.log('form valid?: ', form.formState.isValid);
+
   return (
     <>
       <PageTitle>{t('views:edit_trigger_view')}</PageTitle>
@@ -203,6 +219,7 @@ const EditTriggerForm = ({ trigger }: {trigger: any}) => {
       <motion.div initial={{ opacity: 0, y: 100 }} animate={{ opacity: 1, y: 0 }}>
 
         <FormContainer>
+          <DevTool control={form.control} />
           <TriggerForm
             form={form}
             isLoading={isLoading}

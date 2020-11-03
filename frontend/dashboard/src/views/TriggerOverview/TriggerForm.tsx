@@ -202,7 +202,6 @@ const getNodeType = (question: string, questions: Array<any>) => {
 
 const FormConditionFragment = ({ form, condition: fieldCondition, fieldIndex, onDelete, questions, questionsSelect, activeDialogue }: any) => {
   const { t } = useTranslation();
-  const hasRenderedConditionType = useRef<boolean>(false);
 
   const watchConditionType = useWatch({
     control: form.control,
@@ -216,34 +215,26 @@ const FormConditionFragment = ({ form, condition: fieldCondition, fieldIndex, on
     defaultValue: fieldCondition.questionId,
   });
 
-  const watchConditionRange = useWatch({
-    control: form.control,
-    name: `conditions[${fieldIndex}].range`,
-    defaultValue: fieldCondition.range,
-  });
+  const handleQuestionReset = () => {
+    form.setValue(`conditions[${fieldIndex}].conditionType`, '');
+    form.setValue(`conditions[${fieldIndex}].matchText`, '');
+    form.setValue(`conditions[${fieldIndex}].minThreshold`, 3);
+    form.setValue(`conditions[${fieldIndex}].maxThreshold`, 6);
+    form.setValue(`conditions[${fieldIndex}].range`, [3, 6]);
+  };
 
-  useEffect(() => {
-    console.log('Watch condition type has changed', watchConditionType);
-  }, [watchConditionType]);
-
-  // TODO: @DAAN play around with this, and see how to make it work
-  useEffect(() => {
-    console.log('Watch condition Q has changed', watchConditionQuestion);
-
-    if (!hasRenderedConditionType.current) {
-      hasRenderedConditionType.current = true;
-    } else {
-      form.setValue(`conditions[${fieldIndex}].conditionType`, '');
-      form.setValue(`conditions[${fieldIndex}].matchText`, '');
-      form.setValue(`conditions[${fieldIndex}].minThreshold`, 3);
-      form.setValue(`conditions[${fieldIndex}].maxThreshold`, 6);
-      form.setValue(`conditions[${fieldIndex}].range`, [3, 6]);
+  const resetConditionType = () => {
+    if (watchConditionType) {
+      form.trigger(`conditions[${fieldIndex}].conditionType`);
     }
-  }, [watchConditionQuestion, form]);
+  };
 
-  useEffect(() => {
-    console.log('Watch range has changed', watchConditionRange);
-  }, [watchConditionRange]);
+  // useEffect(() => {
+  //   if (watchConditionType) {
+  //     console.log('changed!');
+  //     form.trigger(`conditions[${fieldIndex}].conditionType`);
+  //   }
+  // }, [watchConditionType]);
 
   return (
     <Div
@@ -254,17 +245,26 @@ const FormConditionFragment = ({ form, condition: fieldCondition, fieldIndex, on
     >
       {/* <input type="hidden" ref={form.register()} name={`conditions[${fieldIndex}].id`} /> */}
       {form.watch('type') === TriggerQuestionType.QUESTION && activeDialogue && (
-        <FormControl mb={4} isRequired isInvalid={!!form.errors.conditions?.[fieldIndex]?.questionId}>
+        <FormControl mb={4}>
           <FormLabel htmlFor={`conditions[${fieldIndex}].questionId`}>{t('trigger:question')}</FormLabel>
           <InputHelper>
             {t('trigger:question_helper')}
           </InputHelper>
           <Controller
             name={`conditions[${fieldIndex}].questionId`}
-            as={<Select />}
             defaultValue={fieldCondition?.questionId}
             control={form.control}
             options={questionsSelect}
+            render={({ onChange, value }) => (
+              <Select
+                options={questionsSelect}
+                value={value}
+                onChange={(opt: any) => {
+                  onChange(opt);
+                  handleQuestionReset();
+                }}
+              />
+            )}
           />
           <FormErrorMessage>{form.errors.conditions?.[fieldIndex]?.questionId?.value}</FormErrorMessage>
         </FormControl>
@@ -288,14 +288,17 @@ const FormConditionFragment = ({ form, condition: fieldCondition, fieldIndex, on
                   }
                 value={value}
                 onChange={(e: any) => {
-                  onChange(e);
+                  // onChange(e);
+                  // console.log('form.');
+                  form.setValue(`conditions[${fieldIndex}].conditionType`, e);
+                  resetConditionType();
                 }}
                 onBlur={onBlur}
               />
             )}
           />
 
-          <FormErrorMessage>{form.errors.conditions?.[fieldIndex]?.conditionType}</FormErrorMessage>
+          <FormErrorMessage>{form.errors.conditions?.[fieldIndex]?.conditionType?.message}</FormErrorMessage>
         </FormControl>
       )}
 
@@ -502,14 +505,10 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
     });
   };
 
-  // const addCondition = () => append({
-  //   id: null, questionId: null, conditionType: null, matchText: null, lowThreshold: null, highThreshold: null,
-  // });
-
   const addCondition = () => append({
-    questionId: null,
-    conditionType: null,
-    matchText: null,
+    questionId: '',
+    conditionType: '',
+    matchText: '',
     lowThreshold: 3,
     highThreshold: 6,
     range: [
@@ -518,8 +517,12 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
   });
 
   const handleDeleteCondition = (index: number) => {
+    form.control.updateFormState({ isValid: true });
+    console.log('form state: ', form.formState.isValid);
     remove(index);
   };
+
+  // console.log('form state', );
 
   return (
     <Form onSubmit={form.handleSubmit(onFormSubmit)}>
@@ -630,7 +633,7 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
             <Hr />
             {fields?.map((condition, index) => (
               <FormConditionFragment
-                key={condition.indexKey}
+                key={condition?.indexKey}
                 // watchConditions={watchConditions}
                 condition={condition}
                 activeDialogue={activeDialogue}
@@ -737,7 +740,7 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
           variantColor="teal"
           type="submit"
         >
-          {isInEdit ? 'Edit' : 'Create'}
+          {isInEdit ? 'Save' : 'Create'}
         </Button>
         <Button variant="outline" onClick={() => history.goBack()}>Cancel</Button>
       </ButtonGroup>

@@ -8,7 +8,7 @@
         "@emotion/core": "^10.0.28",
         "@emotion/styled": "^10.0.27",
         "@haas/ui": "*",
-        "@hookform/devtools": "^2.0.4",
+        "@hookform/devtools": "^2.2.1",
         "@hookform/resolvers": "^0.1.0",
         "@nivo/line": "^0.61.1",
         "@popperjs/core": "^2.5.3",
@@ -106,6 +106,7 @@
     },
     "devDependencies": {
         "@graphql-codegen/cli": "^1.17.3",
+        "@hookform/devtools": "^2.2.1",
         "@types/js-cookie": "^2.2.6",
         "@typescript-eslint/eslint-plugin": "^2.15.0",
         "@typescript-eslint/parser": "^2.15.0",

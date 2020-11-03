@@ -124,7 +124,7 @@ const AddTriggerView = () => {
   });
 
   const getThresholdValue = (conditionType: string, range: Array<number>, value: number, index: number) => {
-    if (conditionType === TriggerConditionType.INNER_RANGE || TriggerConditionType.OUTER_RANGE) {
+    if (conditionType === TriggerConditionType.INNER_RANGE || conditionType === TriggerConditionType.OUTER_RANGE) {
       return range?.[index] ? range[index] * 10 : null;
     }
     return value ? value * 10 : null;
