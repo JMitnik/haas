@@ -34,7 +34,7 @@ interface FormDataProps {
     label: string;
     value: string;
   };
-  conditions: Array<{ id: string, questionId: { label: string, value: string }, conditionType: string, range: Array<number>, highThreshold: number, lowThreshold: number, matchText: string }>;
+  conditions: Array<{ id: string, questionId: { label: string, value: string }, conditionType: { label: string, value: string }, range: Array<number>, highThreshold: number, lowThreshold: number, matchText: string }>;
   condition: string;
   matchText: string;
   lowThreshold: number;
@@ -48,6 +48,17 @@ interface SelectType {
   label: string;
   value: string;
 }
+
+const conditionTypeSelect = [
+  { label: 'Low threshold', value: 'LOW_THRESHOLD' },
+  { label: 'High threshold', value: 'HIGH_THRESHOLD' },
+  { label: 'Inner range', value: 'INNER_RANGE' },
+  { label: 'Outer range', value: 'OUTER_RANGE' },
+];
+
+const TextSelect = [
+  { label: 'Match text', value: 'TEXT_MATCH' },
+];
 
 enum TriggerConditionType {
   LOW_THRESHOLD='LOW_THRESHOLD',
@@ -216,25 +227,12 @@ const FormConditionFragment = ({ form, condition: fieldCondition, fieldIndex, on
   });
 
   const handleQuestionReset = () => {
-    form.setValue(`conditions[${fieldIndex}].conditionType`, '');
+    form.setValue(`conditions[${fieldIndex}].conditionType`, null);
     form.setValue(`conditions[${fieldIndex}].matchText`, '');
     form.setValue(`conditions[${fieldIndex}].minThreshold`, 3);
     form.setValue(`conditions[${fieldIndex}].maxThreshold`, 6);
     form.setValue(`conditions[${fieldIndex}].range`, [3, 6]);
   };
-
-  const resetConditionType = () => {
-    if (watchConditionType) {
-      form.trigger(`conditions[${fieldIndex}].conditionType`);
-    }
-  };
-
-  // useEffect(() => {
-  //   if (watchConditionType) {
-  //     console.log('changed!');
-  //     form.trigger(`conditions[${fieldIndex}].conditionType`);
-  //   }
-  // }, [watchConditionType]);
 
   return (
     <Div
@@ -280,31 +278,40 @@ const FormConditionFragment = ({ form, condition: fieldCondition, fieldIndex, on
             name={`conditions[${fieldIndex}].conditionType`}
             defaultValue={fieldCondition?.conditionType}
             control={form.control}
-            render={({ onChange, onBlur, value }) => (
-              <ConditionFormFragment
-                activeNodeType={
-                    getNodeType(watchConditionQuestion.value,
-                      questions?.customer?.dialogue?.questions)
-                  }
+            options={conditionTypeSelect}
+            render={({ onChange, value }) => (
+              <Select
                 value={value}
-                onChange={(e: any) => {
-                  // onChange(e);
-                  // console.log('form.');
-                  form.setValue(`conditions[${fieldIndex}].conditionType`, e);
-                  resetConditionType();
+                options={getNodeType(watchConditionQuestion.value,
+                          questions?.customer?.dialogue?.questions) === 'SLIDER' ? conditionTypeSelect : TextSelect}
+                onChange={(opt: any) => {
+                  onChange(opt);
                 }}
-                onBlur={onBlur}
               />
+              // <ConditionFormFragment
+              //   activeNodeType={
+              //       getNodeType(watchConditionQuestion.value,
+              //         questions?.customer?.dialogue?.questions)
+              //     }
+              //   value={value}
+              //   onChange={(e: any) => {
+              //     // onChange(e);
+              //     // console.log('form.');
+              //     form.setValue(`conditions[${fieldIndex}].conditionType`, e);
+              //     resetConditionType();
+              //   }}
+              //   onBlur={onBlur}
+              // />
             )}
           />
 
-          <FormErrorMessage>{form.errors.conditions?.[fieldIndex]?.conditionType?.message}</FormErrorMessage>
+          <FormErrorMessage>{form.errors.conditions?.[fieldIndex]?.conditionType?.value?.message}</FormErrorMessage>
         </FormControl>
       )}
 
       {/* <Text>{t('trigger:select_dialogue_reminder')}</Text> */}
 
-      {watchConditionType === TriggerConditionType.TEXT_MATCH && (
+      {watchConditionType?.value === TriggerConditionType.TEXT_MATCH && (
         <FormControl isInvalid={!!form.errors.conditions?.[fieldIndex]?.matchText}>
           <FormLabel htmlFor={`conditions[${fieldIndex}].matchText`}>{t('trigger:match_text')}</FormLabel>
           <InputHelper>
@@ -321,7 +328,7 @@ const FormConditionFragment = ({ form, condition: fieldCondition, fieldIndex, on
         </FormControl>
       )}
 
-      {watchConditionType === TriggerConditionType.LOW_THRESHOLD && (
+      {watchConditionType?.value === TriggerConditionType.LOW_THRESHOLD && (
       <FormControl isInvalid={!!form.errors.conditions?.[fieldIndex]?.lowThreshold}>
         <FormLabel htmlFor={`conditions[${fieldIndex}].lowThreshold`}>{t('trigger:low_threshold')}</FormLabel>
         <InputHelper>
@@ -342,7 +349,7 @@ const FormConditionFragment = ({ form, condition: fieldCondition, fieldIndex, on
       </FormControl>
       )}
 
-      {watchConditionType === TriggerConditionType.HIGH_THRESHOLD && (
+      {watchConditionType?.value === TriggerConditionType.HIGH_THRESHOLD && (
         <FormControl isInvalid={!!form.errors.conditions?.[fieldIndex]?.highThreshold}>
           <FormLabel htmlFor={`conditions[${fieldIndex}].highThreshold`}>{t('trigger:high_threshold')}</FormLabel>
           <InputHelper>
@@ -374,7 +381,7 @@ const FormConditionFragment = ({ form, condition: fieldCondition, fieldIndex, on
         </FormControl>
       )}
 
-      {watchConditionType === TriggerConditionType.OUTER_RANGE && (
+      {watchConditionType?.value === TriggerConditionType.OUTER_RANGE && (
         <>
           <FormControl>
             <FormLabel htmlFor={`conditions[${fieldIndex}].range`}>{t('trigger:outer_range')}</FormLabel>
@@ -408,7 +415,7 @@ const FormConditionFragment = ({ form, condition: fieldCondition, fieldIndex, on
         </>
       )}
 
-      {watchConditionType === TriggerConditionType.INNER_RANGE && (
+      {watchConditionType?.value === TriggerConditionType.INNER_RANGE && (
         <FormControl isInvalid={!!form.errors.conditions?.[fieldIndex]?.range}>
           <FormLabel htmlFor={`conditions[${fieldIndex}].range`}>{t('trigger:inner_range')}</FormLabel>
           <InputHelper>
@@ -506,7 +513,7 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
   };
 
   const addCondition = () => append({
-    questionId: '',
+    questionId: null,
     conditionType: '',
     matchText: '',
     lowThreshold: 3,
@@ -517,8 +524,6 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
   });
 
   const handleDeleteCondition = (index: number) => {
-    form.control.updateFormState({ isValid: true });
-    console.log('form state: ', form.formState.isValid);
     remove(index);
   };
 
@@ -634,7 +639,6 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
             {fields?.map((condition, index) => (
               <FormConditionFragment
                 key={condition?.indexKey}
-                // watchConditions={watchConditions}
                 condition={condition}
                 activeDialogue={activeDialogue}
                 questions={questionsData}

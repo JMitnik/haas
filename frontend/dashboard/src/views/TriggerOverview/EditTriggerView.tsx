@@ -28,7 +28,7 @@ interface FormDataProps {
     label: string;
     value: string;
   };
-  conditions: Array<{ id: string, questionId: { label: string, value: string }, conditionType: string, range: Array<number>, highThreshold: number, lowThreshold: number, matchText: string }>;
+  conditions: Array<{ id: string, questionId: { label: string, value: string }, conditionType: {label: string, value: string}, range: Array<number>, highThreshold: number, lowThreshold: number, matchText: string }>;
   condition: string;
   matchText: string;
   lowThreshold: number;
@@ -56,7 +56,9 @@ const schema = yup.object().shape({
     questionId: yup.object().shape({
       value: yup.string().required(),
     }),
-    conditionType: yup.string().required(),
+    conditionType: yup.object().shape({
+      value: yup.string().required(),
+    }),
     range: yup.array().when('conditionType', {
       is: (condition: string) => condition === TriggerConditionType.INNER_RANGE
       || condition === TriggerConditionType.INNER_RANGE,
@@ -83,6 +85,35 @@ const schema = yup.object().shape({
     value: yup.string().required(),
   })),
 });
+
+const getConditionType = (type: string) => {
+  let conditionTypeSelectOption;
+  switch (type) {
+    case 'INNER_RANGE':
+      conditionTypeSelectOption = { label: 'Inner range', value: type };
+      break;
+
+    case 'OUTER_RANGE':
+      conditionTypeSelectOption = { label: 'Outer range', value: type };
+      break;
+
+    case 'LOW_THRESHOLD':
+      conditionTypeSelectOption = { label: 'Low threshold', value: type };
+      break;
+
+    case 'HIGH_THRESHOLD':
+      conditionTypeSelectOption = { label: 'High threshold', value: type };
+      break;
+
+    case 'TEXT_MATCH':
+      conditionTypeSelectOption = { label: 'Match text', value: type };
+      break;
+
+    default:
+      conditionTypeSelectOption = null;
+  }
+  return conditionTypeSelectOption;
+};
 
 const EditTriggerView = () => {
   const { triggerId } = useParams<{triggerId: string, customerSlug: string }>();
@@ -122,7 +153,7 @@ const EditTriggerForm = ({ trigger }: {trigger: any}) => {
         {
           id: condition.id,
           questionId: { label: condition.question.title, value: condition.question.id },
-          conditionType: condition.type,
+          conditionType: getConditionType(condition.type),
           lowThreshold: condition?.minValue ? condition?.minValue / 10 : null,
           highThreshold: condition?.maxValue ? condition.maxValue / 10 : null,
           range: [condition?.minValue ? condition?.minValue / 10 : null, condition?.maxValue ? condition.maxValue / 10 : null],
@@ -161,19 +192,6 @@ const EditTriggerForm = ({ trigger }: {trigger: any}) => {
     },
   });
 
-  function isEmpty(obj: any) {
-    for (const key in obj) {
-      if (obj.hasOwnProperty(key)) { return false; }
-    }
-    return true;
-  }
-
-  useEffect(() => {
-    if (isEmpty(form.errors)) {
-      form.control.updateFormState({ isValid: true });
-    }
-  }, [form.formState.isValid]);
-
   const getThresholdValue = (conditionType: string, range: Array<number>, value: number, index: number) => {
     if (conditionType === TriggerConditionType.INNER_RANGE || conditionType === TriggerConditionType.OUTER_RANGE) {
       return range?.[index] ? range[index] * 10 : null;
@@ -188,9 +206,9 @@ const EditTriggerForm = ({ trigger }: {trigger: any}) => {
       {
         id: parseInt(condition?.id),
         questionId: condition.questionId.value,
-        type: condition.conditionType,
-        minValue: getThresholdValue(condition.conditionType, condition?.range, condition.lowThreshold, 0),
-        maxValue: getThresholdValue(condition.conditionType, condition?.range, condition.highThreshold, 1),
+        type: condition.conditionType?.value,
+        minValue: getThresholdValue(condition.conditionType?.value, condition?.range, condition.lowThreshold, 0),
+        maxValue: getThresholdValue(condition.conditionType?.value, condition?.range, condition.highThreshold, 1),
         textValue: condition?.matchText || null,
       }));
 
@@ -209,8 +227,6 @@ const EditTriggerForm = ({ trigger }: {trigger: any}) => {
       },
     });
   };
-
-  console.log('form valid?: ', form.formState.isValid);
 
   return (
     <>

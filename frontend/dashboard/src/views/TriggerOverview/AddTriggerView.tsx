@@ -26,7 +26,7 @@ interface FormDataProps {
     label: string;
     value: string;
   };
-  conditions: Array<{ id: string, questionId: { label: string, value: string }, conditionType: string, range: Array<number>, highThreshold: number, lowThreshold: number, matchText: string }>;
+  conditions: Array<{ id: string, questionId: { label: string, value: string }, conditionType: { label: string, value: string }, range: Array<number>, highThreshold: number, lowThreshold: number, matchText: string }>;
   condition: string;
   matchText: string;
   lowThreshold: number;
@@ -54,7 +54,9 @@ const schema = yup.object().shape({
     questionId: yup.object().shape({
       value: yup.string().required(),
     }),
-    conditionType: yup.string().required(),
+    conditionType: yup.object().shape({
+      value: yup.string().required(),
+    }),
     range: yup.array().when('conditionType', {
       is: (condition: string) => condition === TriggerConditionType.INNER_RANGE
       || condition === TriggerConditionType.INNER_RANGE,
@@ -135,9 +137,9 @@ const AddTriggerView = () => {
     const conditions = formData.conditions.map((condition) => (
       {
         questionId: condition.questionId.value,
-        type: condition.conditionType,
-        minValue: getThresholdValue(condition.conditionType, condition?.range, condition.lowThreshold, 0),
-        maxValue: getThresholdValue(condition.conditionType, condition?.range, condition.highThreshold, 1),
+        type: condition.conditionType?.value,
+        minValue: getThresholdValue(condition.conditionType?.value, condition?.range, condition.lowThreshold, 0),
+        maxValue: getThresholdValue(condition.conditionType?.value, condition?.range, condition.highThreshold, 1),
         textValue: condition?.matchText || null,
       }));
     const trigger = {
