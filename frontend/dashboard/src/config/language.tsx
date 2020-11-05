@@ -1,6 +1,10 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    data: {
+      en: 'Data',
+      de: 'Data',
+    },
     edit_trigger: {
       en: 'Edit alert',
       de: 'Alert bearbeiten',
@@ -513,6 +517,30 @@ const language = {
     },
   },
   customer: {
+    fake_data: {
+      en: 'Placeholder data',
+      de: 'Platzhalter-Daten',
+    },
+    fake_data_helper: {
+      en: 'Start with placeholder data',
+      de: 'Beginnen Sie mit Platzhalter-Daten',
+    },
+    use_fake_data: {
+      en: 'Generate data',
+      de: 'Erzeugen Daten',
+    },
+    use_fake_data_helper: {
+      en: 'Fake data will be generated for your templated dialogue',
+      de: 'Gefälschte Daten werden für Ihren Templat-Dialog erzeugt werden',
+    },
+    no_use_fake_data: {
+      en: 'Start with no data',
+      de: 'Starten Sie ohne Daten',
+    },
+    no_use_fake_data_helper: {
+      en: 'No data will be generated, for a complete fresh slate.',
+      de: 'Es werden keine Daten erzeugt, für einen vollständigen frischen Schiefer.',
+    },
     logo_helper: {
       en: 'Choose between uploading your logo or inserting an existing URL.',
       de: 'Verweise mit einer URL auf deine Logo oder lade es selbst hoch.',
@@ -647,6 +675,30 @@ const language = {
     },
   },
   dialogue: {
+    data_helper: {
+      en: 'Your data settings, such as data-sources, will be set here.',
+      de: 'Ihre Dateneinstellungen, wie z. B. Datenquellen, werden hier festgelegt',
+    },
+    hide_fake_data: {
+      en: 'Hide placeholder data',
+      de: 'Ausblenden Platzhalter-Daten',
+    },
+    hide_fake_data_helper: {
+      en: 'Decide whether to use placeholder data in your analytics',
+      de: 'Entscheiden Sie, ob Platzhalterdaten in Ihrer Analyse verwendet werden sollen',
+    },
+    do_hide_fake_data_helper: {
+      en: 'Don\'t include placeholder data in the analytics.',
+      de: 'Platzhalterdaten nicht in die Analyse einbeziehen.',
+    },
+    no_hide_fake_data: {
+      en: 'Show placeholder data.',
+      de: 'Platzhalterdaten anzeigen.',
+    },
+    no_hide_fake_data_helper: {
+      en: 'Show placeholder data in the analytics.',
+      de: 'Platzhalterdaten in der Analyse anzeigen',
+    },
     tag_helper: {
       en: 'Would you like to assign tags for your dialogue?',
       de: 'Möchtest du deinen Dialog mit einem "Tag" verbinden?',

@@ -60,6 +60,7 @@ const schema = yup.object({
       }).nullable(true),
     }),
   tags: yup.array().of(yup.string().min(1).required()).notRequired(),
+  isWithoutGenData: yup.number(),
 }).required();
 
 type FormDataProps = yup.InferType<typeof schema>;
