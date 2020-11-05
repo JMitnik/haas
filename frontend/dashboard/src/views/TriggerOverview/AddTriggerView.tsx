@@ -58,23 +58,23 @@ const schema = yup.object().shape({
       value: yup.string().required(),
     }),
     range: yup.array().when('conditionType', {
-      is: (condition: string) => condition === TriggerConditionType.INNER_RANGE
-      || condition === TriggerConditionType.INNER_RANGE,
+      is: (condition: { label: string, value: string }) => condition?.value === TriggerConditionType.INNER_RANGE
+      || condition?.value === TriggerConditionType.OUTER_RANGE,
       then: yup.array().min(2).required(),
       otherwise: yup.array().notRequired(),
     }),
     lowThreshold: yup.string().notRequired().when('conditionType', {
-      is: (condition: string) => condition === TriggerConditionType.LOW_THRESHOLD,
+      is: (condition: { label: string, value: string }) => condition?.value === TriggerConditionType.LOW_THRESHOLD,
       then: yup.string().required(),
       otherwise: yup.string().notRequired(),
     }),
     highThreshold: yup.number().when('conditionType', {
-      is: (conditionType: string) => conditionType === TriggerConditionType.HIGH_THRESHOLD,
+      is: (conditionType: { label: string, value: string }) => conditionType?.value === TriggerConditionType.HIGH_THRESHOLD,
       then: yup.number().required(),
       otherwise: yup.number().notRequired(),
     }),
     matchText: yup.string().when('conditionType', {
-      is: (conditionType: string) => conditionType === TriggerConditionType.TEXT_MATCH,
+      is: (conditionType: { label: string, value: string }) => conditionType?.value === TriggerConditionType.TEXT_MATCH,
       then: yup.string().required(),
       otherwise: yup.string().notRequired(),
     }),
@@ -157,6 +157,7 @@ const AddTriggerView = () => {
       },
     });
   };
+
   return (
     <>
       <PageTitle>{t('views:create_trigger_view')}</PageTitle>
