@@ -3,11 +3,11 @@ import { PrismaClient,
   TriggerUpdateInput } from '@prisma/client';
 import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
 
-import { resolve } from 'path';
 import { DialogueType } from '../questionnaire/Dialogue';
 import { PaginationWhereInput } from '../general/Pagination';
 import { QuestionNodeType } from '../question/QuestionNode';
 import { UserType } from '../users/User';
+import { resolve } from 'path';
 import TriggerService from './TriggerService';
 
 const TriggerTypeEnum = enumType({
@@ -239,7 +239,7 @@ const TriggerMutations = extendType({
           medium: args.input.trigger?.medium || 'EMAIL',
           type: args.input.trigger?.type || 'QUESTION',
           customer: { connect: { slug: args.input.customerSlug } },
-          relatedNode: null,
+          relatedNode: undefined,
           recipients: { connect: args.input.recipients?.ids?.map((id: string) => ({ id })) },
         };
 
