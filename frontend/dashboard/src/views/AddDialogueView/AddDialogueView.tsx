@@ -303,7 +303,6 @@ const AddDialogueView = () => {
                         options={customerOptions}
                         defaultValue={null}
                       />
-                      <FormErrorMessage>{form.errors.customerOption?.value}</FormErrorMessage>
                     </FormControl>
                   )}
 
