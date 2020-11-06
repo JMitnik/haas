@@ -293,12 +293,9 @@ const FormConditionFragment = ({ form, condition: fieldCondition, fieldIndex, on
               //       getNodeType(watchConditionQuestion.value,
               //         questions?.customer?.dialogue?.questions)
               //     }
-              //   value={value}
+              //   value={value?.value}
               //   onChange={(e: any) => {
-              //     // onChange(e);
-              //     // console.log('form.');
-              //     form.setValue(`conditions[${fieldIndex}].conditionType`, e);
-              //     resetConditionType();
+              //     onChange({ label: e, value: e });
               //   }}
               //   onBlur={onBlur}
               // />
