@@ -227,7 +227,6 @@ const FormConditionFragment = ({ form, condition: fieldCondition, fieldIndex, on
   });
 
   const handleQuestionReset = () => {
-    console.log('reset!');
     form.setValue(`conditions[${fieldIndex}].conditionType`, null);
     form.setValue(`conditions[${fieldIndex}].matchText`, '');
     form.setValue(`conditions[${fieldIndex}].minThreshold`, 3);
@@ -242,7 +241,7 @@ const FormConditionFragment = ({ form, condition: fieldCondition, fieldIndex, on
       bg="gray.100"
       padding={4}
     >
-      {/* <input type="hidden" ref={form.register()} name={`conditions[${fieldIndex}].id`} /> */}
+      <input type="hidden" ref={form.register()} name={`conditions[${fieldIndex}].id`} />
       {form.watch('type') === TriggerQuestionType.QUESTION && activeDialogue && (
         <FormControl mb={4}>
           <FormLabel htmlFor={`conditions[${fieldIndex}].questionId`}>{t('trigger:question')}</FormLabel>
@@ -526,11 +525,7 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
 
   const handleDeleteCondition = (index: number) => {
     remove(index);
-    form.trigger();
   };
-
-  // console.log('form state', );
-  // console.log('fields: ', fields);
 
   return (
     <Form onSubmit={form.handleSubmit(onFormSubmit)}>

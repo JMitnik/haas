@@ -1,6 +1,5 @@
 /* eslint-disable radix */
 import * as yup from 'yup';
-import { DevTool } from '@hookform/devtools';
 import { FormContainer, PageTitle } from '@haas/ui';
 import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
@@ -9,7 +8,7 @@ import { useMutation, useQuery } from '@apollo/react-hooks';
 import { useToast } from '@chakra-ui/core';
 import { useTranslation } from 'react-i18next';
 import { yupResolver } from '@hookform/resolvers';
-import React, { useEffect } from 'react';
+import React from 'react';
 
 import editTriggerMutation from 'mutations/editTrigger';
 import getTriggerQuery from 'queries/getTrigger';
@@ -24,10 +23,6 @@ interface FormDataProps {
   };
   type: string;
   medium: string;
-  question: {
-    label: string;
-    value: string;
-  };
   conditions: Array<{
     id: string,
     questionId: { label: string, value: string },
@@ -36,10 +31,6 @@ interface FormDataProps {
     highThreshold: number,
     lowThreshold: number,
     matchText: string }>;
-  condition: string;
-  matchText: string;
-  lowThreshold: number;
-  highThreshold: number;
   recipients: Array<{
     label: string;
     value: string;
@@ -66,44 +57,25 @@ const schema = yup.object().shape({
       value: yup.string().required(),
     }),
     range: yup.array().when('conditionType', {
-      is: (condition: { label: string, value: string }) => {
-        // console.log(condition);
-        if (condition?.value === TriggerConditionType.INNER_RANGE
-          || condition?.value === TriggerConditionType.OUTER_RANGE) {
-          console.log('condition inner range');
-          return true;
-        }
-        return false;
-      },
-      then: yup.array().required(),
+      is: (condition: { label: string, value: string }) => condition?.value === TriggerConditionType.INNER_RANGE
+      || condition?.value === TriggerConditionType.OUTER_RANGE,
+      then: yup.array().min(2).required(),
       otherwise: yup.array().notRequired(),
     }),
-    lowThreshold: yup.number().when('conditionType', {
-      is: (condition: { label: string, value: string }) => {
-        if (condition?.value === TriggerConditionType.LOW_THRESHOLD) {
-          console.log('CONDITION IS LOW_THRESHOLD');
-          return true;
-        }
-        return false;
-      },
-      then: yup.number().required(),
-      otherwise: yup.number().notRequired(),
+    lowThreshold: yup.string().notRequired().when('conditionType', {
+      is: (condition: { label: string, value: string }) => condition?.value === TriggerConditionType.LOW_THRESHOLD,
+      then: yup.string().required(),
+      otherwise: yup.string().notRequired().nullable(),
     }),
     highThreshold: yup.number().when('conditionType', {
       is: (conditionType: { label: string, value: string }) => conditionType?.value === TriggerConditionType.HIGH_THRESHOLD,
       then: yup.number().required(),
-      otherwise: yup.number().notRequired(),
+      otherwise: yup.number().notRequired().nullable(),
     }),
     matchText: yup.string().when('conditionType', {
-      is: (conditionType: { label: string, value: string }) => {
-        if (conditionType?.value === TriggerConditionType.TEXT_MATCH) {
-          console.log('type is MATCH_TEXT');
-          return true;
-        }
-        return false;
-      },
+      is: (conditionType: { label: string, value: string }) => conditionType?.value === TriggerConditionType.TEXT_MATCH,
       then: yup.string().required(),
-      otherwise: yup.string().notRequired(),
+      otherwise: yup.string().notRequired().nullable(),
     }),
   })),
   recipients: yup.array().min(1).required().of(yup.object().shape({
@@ -166,7 +138,14 @@ const EditTriggerForm = ({ trigger }: {trigger: any}) => {
   const toast = useToast();
 
   const form = useForm<any>({
-    resolver: yupResolver(schema),
+    resolver: async (data) => {
+      const output = await yupResolver(schema)(data);
+      const hasError = output.errors;
+      if (Object.keys(hasError).length !== 0) {
+        console.log('Error:', output);
+      }
+      return output;
+    },
     defaultValues: {
       name: trigger.name,
       condition: trigger.conditions[0].type,
@@ -181,7 +160,9 @@ const EditTriggerForm = ({ trigger }: {trigger: any}) => {
           conditionType: getConditionType(condition.type),
           lowThreshold: condition?.minValue ? condition?.minValue / 10 : null,
           highThreshold: condition?.maxValue ? condition.maxValue / 10 : null,
-          range: [condition?.minValue ? condition?.minValue / 10 : null, condition?.maxValue ? condition.maxValue / 10 : null],
+          range: [condition?.minValue
+            ? condition?.minValue / 10
+            : null, condition?.maxValue ? condition.maxValue / 10 : null],
           matchText: condition?.textValue || null,
         })),
       medium: trigger.medium,
@@ -252,7 +233,7 @@ const EditTriggerForm = ({ trigger }: {trigger: any}) => {
       },
     });
   };
-  console.log('form state: ', form.formState.isValid);
+
   return (
     <>
       <PageTitle>{t('views:edit_trigger_view')}</PageTitle>
@@ -260,7 +241,6 @@ const EditTriggerForm = ({ trigger }: {trigger: any}) => {
       <motion.div initial={{ opacity: 0, y: 100 }} animate={{ opacity: 1, y: 0 }}>
 
         <FormContainer>
-          <DevTool control={form.control} />
           <TriggerForm
             form={form}
             isLoading={isLoading}

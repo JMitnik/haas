@@ -26,7 +26,14 @@ interface FormDataProps {
     label: string;
     value: string;
   };
-  conditions: Array<{ id: string, questionId: { label: string, value: string }, conditionType: { label: string, value: string }, range: Array<number>, highThreshold: number, lowThreshold: number, matchText: string }>;
+  conditions: Array<{
+    id: string,
+    questionId: { label: string, value: string },
+    conditionType: {label: string, value: string},
+    range: Array<number>,
+    highThreshold: number,
+    lowThreshold: number,
+    matchText: string }>;
   condition: string;
   matchText: string;
   lowThreshold: number;
@@ -47,7 +54,9 @@ enum TriggerConditionType {
 
 const schema = yup.object().shape({
   name: yup.string().required(),
-  dialogue: yup.string().required(),
+  dialogue: yup.object().shape({
+    value: yup.string().required(),
+  }),
   type: yup.string().required(),
   medium: yup.string().required(),
   conditions: yup.array().min(1).required().of(yup.object().shape({
@@ -66,17 +75,17 @@ const schema = yup.object().shape({
     lowThreshold: yup.string().notRequired().when('conditionType', {
       is: (condition: { label: string, value: string }) => condition?.value === TriggerConditionType.LOW_THRESHOLD,
       then: yup.string().required(),
-      otherwise: yup.string().notRequired(),
+      otherwise: yup.string().notRequired().nullable(),
     }),
     highThreshold: yup.number().when('conditionType', {
       is: (conditionType: { label: string, value: string }) => conditionType?.value === TriggerConditionType.HIGH_THRESHOLD,
       then: yup.number().required(),
-      otherwise: yup.number().notRequired(),
+      otherwise: yup.number().notRequired().nullable(),
     }),
     matchText: yup.string().when('conditionType', {
       is: (conditionType: { label: string, value: string }) => conditionType?.value === TriggerConditionType.TEXT_MATCH,
       then: yup.string().required(),
-      otherwise: yup.string().notRequired(),
+      otherwise: yup.string().notRequired().nullable(),
     }),
   })),
   recipients: yup.array().min(1).required().of(yup.object().shape({
