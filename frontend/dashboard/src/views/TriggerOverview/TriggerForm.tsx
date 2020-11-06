@@ -5,7 +5,7 @@ import { CornerRightDown, CornerRightUp, Key, Mail, Maximize2,
 import { Slider } from 'antd';
 import { useHistory, useParams } from 'react-router';
 import { useLazyQuery, useQuery } from '@apollo/react-hooks';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Select from 'react-select';
 import styled from 'styled-components/macro';
 
