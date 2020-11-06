@@ -1,5 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 
+import 'easymde/dist/easymde.min.css';
 import * as yup from 'yup';
 import { ApolloError } from 'apollo-client';
 import { Button, ButtonGroup, FormErrorMessage, Popover, PopoverArrow,
@@ -13,6 +14,7 @@ import { useTranslation } from 'react-i18next';
 import { yupResolver } from '@hookform/resolvers';
 import React, { useCallback, useEffect, useState } from 'react';
 import Select from 'react-select';
+import SimpleMDE from 'react-simplemde-editor';
 
 import {
   DeleteQuestionOptionButtonContainer,
@@ -20,10 +22,10 @@ import {
 import { Div, Flex, Form, FormContainer, FormControl, FormLabel,
   FormSection, H3, H4, Hr, Input, InputGrid, InputHelper, Muted, Span, Text } from '@haas/ui';
 import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
+import { useCustomer } from 'providers/CustomerProvider';
 import createQuestionMutation from 'mutations/createQuestion';
 import updateQuestionMutation from 'mutations/updateQuestion';
 
-import { useCustomer } from 'providers/CustomerProvider';
 import { EdgeConditonProps,
   OverrideLeafProps, QuestionEntryProps, QuestionOptionProps } from '../../DialogueBuilderInterfaces';
 
@@ -125,7 +127,6 @@ const QuestionEntryForm = ({
   });
 
   const toast = useToast();
-  const [activeTitle, setActiveTitle] = useState(title);
   const [activeQuestionType, setActiveQuestionType] = useState(type);
 
   const [activeOptions, setActiveOptions] = useState(options);
@@ -330,7 +331,7 @@ const QuestionEntryForm = ({
   };
 
   const onSubmit = (formData: FormDataProps) => {
-    const title = activeTitle;
+    const { title } = formData;
     const type = activeQuestionType?.value;
     const overrideLeafId = activeLeaf?.value;
     const options = { options: activeOptions };
@@ -386,11 +387,19 @@ const QuestionEntryForm = ({
               <FormControl isRequired isInvalid={!!form.errors.title}>
                 <FormLabel htmlFor="title">{t('title')}</FormLabel>
                 <InputHelper>{t('dialogue:title_question_helper')}</InputHelper>
-                <Input
+                <Controller
                   name="title"
-                  defaultValue={activeTitle}
-                  onBlur={(e: any) => setActiveTitle(e.currentTarget.value)}
-                  ref={form.register({ required: true })}
+                  control={form.control}
+                  defaultValue={title}
+                  render={({ value, onChange }) => (
+                    <SimpleMDE
+                      value={value}
+                      onChange={onChange}
+                      options={{
+                        toolbar: ['bold', 'italic', 'preview', 'guide'],
+                      }}
+                    />
+                  )}
                 />
                 <FormErrorMessage>{form.errors.title}</FormErrorMessage>
               </FormControl>

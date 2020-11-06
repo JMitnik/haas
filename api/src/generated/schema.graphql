@@ -158,6 +158,7 @@ type Dialogue {
   tags: [Tag!]
   title: String!
   updatedAt: String
+  wasGeneratedWithGenData: Boolean!
 }
 
 input DialogueFilterInputType {

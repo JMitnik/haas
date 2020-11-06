@@ -1,6 +1,6 @@
 datasource postgresql {
   provider = "postgresql"
-  url      = env("DB_STRING")
+  url = "***"
 }
 
 // binaryTargets = ["debian-openssl-1.1.x"]
@@ -404,19 +404,4 @@ model Trigger {
   recipients    User[]
   customer      Customer?          @relation(fields: [customerId], references: [id])
   customerId    String?
-}
-
-model QuestionOfTrigger {
-  questionId String
-  question   QuestionNode   @relation(fields: [questionId], references: [id])
-
-  triggerId String
-  trigger   Trigger @relation(fields: [triggerId], references: [id])
-
-  triggerConditionId Int
-  triggerCondition   TriggerCondition   @relation(fields: [triggerConditionId], references: [id])
-
-  createdAt DateTime @default(now())
-
-  @@id([questionId, triggerId])
 }

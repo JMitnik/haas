@@ -8,7 +8,7 @@ import { Minus, Plus, Type } from 'react-feather';
 import { useHistory, useParams } from 'react-router';
 import { useMutation, useQuery } from '@apollo/react-hooks';
 import { useTranslation } from 'react-i18next';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Select from 'react-select';
 
 import { getCustomers as CustomerData } from 'queries/__generated__/getCustomers';
@@ -32,25 +32,33 @@ const schema = yup.object({
   publicTitle: yup.string().notRequired(),
   description: yup.string().required('Description is required'),
   slug: yup.string().required('Slug is required'),
-  contentOption: yup.object().shape(
+  contentOption: yup.object().nullable(true).shape(
     { label: yup.string().required(), value: yup.string().required() },
   ).required('Content option is required'),
-  customerOption: yup.object().shape({
+  customerOption: yup.object().required().nullable(true).shape({
     label: yup.string().ensure(),
     value: yup.string(),
-  }).when(['contentOption'], {
-    is: (contentOption : { label: string, value: string} | undefined) => contentOption?.value === 'TEMPLATE',
-    then: () => yup.object().required(),
-    otherwise: () => yup.object().notRequired(),
-  }),
-  dialogueOption: yup.object().notRequired().shape({
-    label: yup.string().ensure(),
-    value: yup.string().ensure(),
-  }).when(['customerOption'], {
-    is: (customerOption : string) => customerOption,
-    then: yup.object().required(),
-    otherwise: yup.object().notRequired(),
-  }),
+  })
+    .when(['contentOption'], {
+      is: (contentOption : { label: string, value: string} | undefined) => contentOption?.value === 'TEMPLATE',
+      then: () => yup.object().required(),
+      otherwise: () => yup.object().notRequired(),
+    }),
+  dialogueOption: yup.object().shape({
+    label: yup.string().notRequired(),
+    value: yup.string().notRequired(),
+  }).nullable(true)
+    .when(['customerOption'], {
+      is: (customerOption: { label: string, value: string} | undefined) => typeof customerOption?.value !== 'undefined',
+      then: yup.object().required().shape({
+        label: yup.string().required(),
+        value: yup.string().required(),
+      }),
+      otherwise: yup.object().notRequired().shape({
+        label: yup.string().notRequired(),
+        value: yup.string().notRequired(),
+      }).nullable(true),
+    }),
   tags: yup.array().of(yup.string().min(1).required()).notRequired(),
   isWithoutGenData: yup.number(),
 }).required();
@@ -66,6 +74,9 @@ const AddDialogueView = () => {
   const form = useForm<FormDataProps>({
     resolver: yupResolver(schema),
     mode: 'onChange',
+    defaultValues: {
+      dialogueOption: null,
+    },
   });
 
   const { t } = useTranslation();
@@ -153,6 +164,11 @@ const AddDialogueView = () => {
 
   const contentOption = form.watch('contentOption');
   const customerOption = form.watch('customerOption');
+  const { setValue } = form;
+
+  useEffect(() => {
+    setValue('dialogueOption', null, { shouldValidate: true });
+  }, [customerOption, setValue]);
 
   const customerOptions = customerData?.user?.customers?.map((customer) => ({
     label: customer.name,
@@ -285,7 +301,7 @@ const AddDialogueView = () => {
                         control={form.control}
                         as={Select}
                         options={customerOptions}
-                        defaultValue=""
+                        defaultValue={null}
                       />
                       <FormErrorMessage>{form.errors.customerOption?.value}</FormErrorMessage>
                     </FormControl>
@@ -298,10 +314,10 @@ const AddDialogueView = () => {
                       <Controller
                         name="dialogueOption"
                         control={form.control}
-                        defaultValue=""
                         as={Select}
                         options={dialogues}
                       />
+                      <FormErrorMessage>{form.errors.dialogueOption?.message}</FormErrorMessage>
                     </FormControl>
                   ))}
                 </InputGrid>

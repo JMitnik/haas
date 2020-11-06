@@ -502,7 +502,7 @@ class NodeService {
         throw Error;
       }
     } catch (e) {
-      console.log('something went wrong updating edges: ', e);
+      console.log('something went wrong updating edges: ', e.message);
     }
 
     const updatedOptionIds = await NodeService.updateQuestionOptions(options);
