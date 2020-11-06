@@ -13,6 +13,7 @@ import React from 'react';
 import editTriggerMutation from 'mutations/editTrigger';
 import getTriggerQuery from 'queries/getTrigger';
 
+import { max, min } from 'lodash';
 import TriggerForm from './TriggerForm';
 
 interface FormDataProps {
@@ -198,9 +199,9 @@ const EditTriggerForm = ({ trigger }: {trigger: any}) => {
     },
   });
 
-  const getThresholdValue = (conditionType: string, range: Array<number>, value: number, index: number) => {
+  const getThresholdValue = (conditionType: string, range: Array<number>, value: number, cb: Function) => {
     if (conditionType === TriggerConditionType.INNER_RANGE || conditionType === TriggerConditionType.OUTER_RANGE) {
-      return range?.[index] ? range[index] * 10 : null;
+      return range.length === 2 && cb ? cb(range) * 10 : null;
     }
     const result = value ? value * 10 : null;
     return result;
@@ -213,8 +214,8 @@ const EditTriggerForm = ({ trigger }: {trigger: any}) => {
         id: parseInt(condition?.id),
         questionId: condition.questionId.value,
         type: condition.conditionType?.value,
-        minValue: getThresholdValue(condition.conditionType?.value, condition?.range, condition.lowThreshold, 0),
-        maxValue: getThresholdValue(condition.conditionType?.value, condition?.range, condition.highThreshold, 1),
+        minValue: getThresholdValue(condition.conditionType?.value, condition?.range, condition.lowThreshold, min),
+        maxValue: getThresholdValue(condition.conditionType?.value, condition?.range, condition.highThreshold, max),
         textValue: condition?.matchText || null,
       }));
 

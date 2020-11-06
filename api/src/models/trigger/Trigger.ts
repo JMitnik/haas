@@ -98,7 +98,7 @@ const TriggerType = objectType({
     t.list.field('conditions', {
       type: TriggerConditionType,
       resolve(parent, args, ctx) {
-        return ctx.prisma.triggerCondition.findMany({ where: { triggerId: parent.id } });
+        return ctx.prisma.triggerCondition.findMany({ where: { triggerId: parent.id }, orderBy: { createdAt: 'asc' } });
       },
     });
     t.list.field('recipients', {

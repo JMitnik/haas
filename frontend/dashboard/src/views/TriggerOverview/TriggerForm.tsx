@@ -285,6 +285,7 @@ const FormConditionFragment = ({ form, condition: fieldCondition, fieldIndex, on
                 options={getNodeType(watchConditionQuestion.value,
                           questions?.customer?.dialogue?.questions) === 'SLIDER' ? conditionTypeSelect : TextSelect}
                 onChange={(opt: any) => {
+                  handleQuestionReset();
                   onChange(opt);
                 }}
               />
@@ -336,7 +337,7 @@ const FormConditionFragment = ({ form, condition: fieldCondition, fieldIndex, on
           control={form.control}
           defaultValue={fieldCondition?.lowThreshold}
           render={({ onChange, value }) => (
-            <Slider step={0.5} min={0} max={10} defaultValue={value} onAfterChange={onChange} />
+            <Slider value={value} step={0.5} min={0} max={10} defaultValue={value} onAfterChange={onChange} />
           )}
         />
         <Text>
@@ -449,7 +450,7 @@ const FormConditionFragment = ({ form, condition: fieldCondition, fieldIndex, on
         variantColor="red"
         onClick={() => onDelete(fieldIndex)}
       >
-        {t('delete_trigger')}
+        {t('delete')}
       </Button>
       <FormControl />
     </Div>
@@ -711,7 +712,6 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
               <Controller
                 control={form.control}
                 name="medium"
-                defaultValue="EMAIL"
                 render={({ onChange, value }) => (
                   <RadioButtonGroup
                     defaultValue={value}
