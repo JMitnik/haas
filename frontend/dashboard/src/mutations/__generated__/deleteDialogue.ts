@@ -3,6 +3,8 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
+import { DeleteDialogueInputType } from "./../../types/globalTypes";
+
 // ====================================================
 // GraphQL mutation operation: deleteDialogue
 // ====================================================
@@ -17,5 +19,5 @@ export interface deleteDialogue {
 }
 
 export interface deleteDialogueVariables {
-  id: string;
+  input?: DeleteDialogueInputType | null;
 }

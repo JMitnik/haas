@@ -1,5 +1,5 @@
-import { NodeEntryWithTypes } from '../node-entry/NodeEntryService';
 import { NodeType } from '@prisma/client';
+import { NodeEntryWithTypes } from '../node-entry/NodeEntryService';
 
 export interface LeafNodeProps {
   id: string;
@@ -43,6 +43,7 @@ export interface PathProps {
 export type HistoryDataWithEntry = (HistoryDataProps & NodeEntryWithTypes);
 
 export interface StatisticsProps {
+  nrInteractions: number;
   history: HistoryDataProps[];
   topNegativePath: PathProps[];
   topPositivePath: PathProps[];

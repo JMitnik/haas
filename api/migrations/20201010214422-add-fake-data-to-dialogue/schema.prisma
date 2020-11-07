@@ -1,12 +1,12 @@
 datasource postgresql {
   provider = "postgresql"
-  url      = env("DB_STRING")
+  url = "***"
 }
 
 // binaryTargets = ["debian-openssl-1.1.x"]
 generator client {
   provider        = "prisma-client-js"
-  previewFeatures = ["transactionApi"]
+  previewFeatures = ["middlewares", "transactionApi"]
   output          = "./node_modules/@prisma/client"
 }
 
@@ -93,8 +93,6 @@ model Dialogue {
   tags         Tag[]
   isOnline     Boolean        @default(value: false)
   isWithoutGenData Boolean @default(value: false)
-  
-  wasGeneratedWithGenData Boolean @default(value: false)
   @@unique([slug, customerId])
 }
 

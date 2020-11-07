@@ -173,13 +173,16 @@ export const RequestInviteMutation = mutationField('requestInvite', {
   async resolve(parent, args, ctx) {
     if (!args?.input?.email) throw new UserInputError('No email provided');
 
-    const users = await ctx.prisma.user.findMany({
-      where: { email: args.input.email },
+    const user = await ctx.prisma.user.findFirst({
+      where: {
+        email: {
+          equals: args.input.email,
+          mode: 'insensitive',
+        },
+      },
     });
 
-    if (!users.length) return { didInvite: false };
-
-    const [user] = users;
+    if (!user) return { didInvite: false };
 
     const loginToken = AuthService.createUserToken(user.id);
 
