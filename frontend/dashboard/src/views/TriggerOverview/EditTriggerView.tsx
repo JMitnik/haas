@@ -50,9 +50,6 @@ const schema = yup.object().shape({
   name: yup.string().required(),
   type: yup.string().required(),
   medium: yup.string().required(),
-  dialogue: yup.object().shape({
-    value: yup.string().required(),
-  }).required(),
   conditions: yup.array().of(yup.object().shape({ // .min(1).required()
     questionId: yup.object().shape({
       value: yup.string().required(),
@@ -222,7 +219,6 @@ const EditTriggerForm = ({ trigger }: {trigger: any}) => {
       name: formData.name,
       type: formData?.type,
       medium: formData?.medium,
-      dialogue: formData?.dialogue.value,
       conditions,
     };
 

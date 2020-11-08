@@ -79,10 +79,6 @@ const conditionTypeSelect = [
   { label: 'Outer range', value: 'OUTER_RANGE' },
 ];
 
-const TextSelect = [
-  { label: 'Match text', value: 'TEXT_MATCH' },
-];
-
 enum TriggerConditionType {
   LOW_THRESHOLD='LOW_THRESHOLD',
   HIGH_THRESHOLD='HIGH_THRESHOLD',
