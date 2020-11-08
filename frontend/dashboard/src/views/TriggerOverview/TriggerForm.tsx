@@ -93,11 +93,6 @@ const OuterSliderContainer = styled(Div)`
       background-color: #e1e1e1;
     }
   }
-  div.ant-slider-rail:hover {
-      /* position: absolute; */
-      /* width: 100%; */
-      /* height: 4px; */
-  }
 
   div > div.ant-slider-track {
     position: absolute;
