@@ -84,6 +84,21 @@ const OuterSliderContainer = styled(Div)`
       transition: background-color 0.3s;
   }
 
+  .ant-slider:hover {
+    .ant-slider-rail {
+      background-color: #91d5ff;
+    }
+
+    .ant-slider-track {
+      background-color: #e1e1e1;
+    }
+  }
+  div.ant-slider-rail:hover {
+      /* position: absolute; */
+      /* width: 100%; */
+      /* height: 4px; */
+  }
+
   div > div.ant-slider-track {
     position: absolute;
     height: 4px;
@@ -337,7 +352,7 @@ const FormConditionFragment = ({ form, condition: fieldCondition, fieldIndex, on
           control={form.control}
           defaultValue={fieldCondition?.lowThreshold}
           render={({ onChange, value }) => (
-            <Slider value={value} step={0.5} min={0} max={10} defaultValue={value} onAfterChange={onChange} />
+            <Slider step={0.5} min={0} max={10} defaultValue={value} onAfterChange={onChange} />
           )}
         />
         <Text>

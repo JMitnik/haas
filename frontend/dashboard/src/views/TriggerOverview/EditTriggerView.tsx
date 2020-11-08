@@ -151,13 +151,13 @@ const EditTriggerForm = ({ trigger }: {trigger: any}) => {
       name: trigger.name,
       condition: trigger.conditions[0].type,
       dialogue: {
-        label: trigger.relatedDialogue.title,
-        value: trigger.relatedDialogue.slug,
+        label: trigger.relatedDialogue?.title,
+        value: trigger.relatedDialogue?.slug,
       },
       conditions: trigger.conditions.map((condition: any) => (
         {
           id: condition.id,
-          questionId: { label: condition.question.title, value: condition.question.id },
+          questionId: { label: condition.question?.title, value: condition.question?.id },
           conditionType: getConditionType(condition.type),
           lowThreshold: condition?.minValue ? condition?.minValue / 10 : null,
           highThreshold: condition?.maxValue ? condition.maxValue / 10 : null,
