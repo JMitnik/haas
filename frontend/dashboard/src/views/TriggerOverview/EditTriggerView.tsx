@@ -27,7 +27,7 @@ interface FormDataProps {
   conditions: Array<{
     id: string,
     questionId: { label: string, value: string },
-    conditionType: {label: string, value: string},
+    conditionType: string,
     range: Array<number>,
     highThreshold: number,
     lowThreshold: number,
@@ -50,31 +50,32 @@ const schema = yup.object().shape({
   name: yup.string().required(),
   type: yup.string().required(),
   medium: yup.string().required(),
+  dialogue: yup.object().shape({
+    value: yup.string().required(),
+  }).required(),
   conditions: yup.array().of(yup.object().shape({ // .min(1).required()
     questionId: yup.object().shape({
       value: yup.string().required(),
     }),
-    conditionType: yup.object().shape({
-      value: yup.string().required(),
-    }),
+    conditionType: yup.string().nullable(),
     range: yup.array().when('conditionType', {
-      is: (condition: { label: string, value: string }) => condition?.value === TriggerConditionType.INNER_RANGE
-      || condition?.value === TriggerConditionType.OUTER_RANGE,
+      is: (condition: string) => condition === TriggerConditionType.INNER_RANGE
+      || condition === TriggerConditionType.OUTER_RANGE,
       then: yup.array().min(2).required(),
       otherwise: yup.array().notRequired(),
     }),
     lowThreshold: yup.string().notRequired().when('conditionType', {
-      is: (condition: { label: string, value: string }) => condition?.value === TriggerConditionType.LOW_THRESHOLD,
+      is: (condition: string) => condition === TriggerConditionType.LOW_THRESHOLD,
       then: yup.string().required(),
       otherwise: yup.string().notRequired().nullable(),
     }),
     highThreshold: yup.number().when('conditionType', {
-      is: (conditionType: { label: string, value: string }) => conditionType?.value === TriggerConditionType.HIGH_THRESHOLD,
+      is: (conditionType: string) => conditionType === TriggerConditionType.HIGH_THRESHOLD,
       then: yup.number().required(),
       otherwise: yup.number().notRequired().nullable(),
     }),
     matchText: yup.string().when('conditionType', {
-      is: (conditionType: { label: string, value: string }) => conditionType?.value === TriggerConditionType.TEXT_MATCH,
+      is: (conditionType: string) => conditionType === TriggerConditionType.TEXT_MATCH,
       then: yup.string().required(),
       otherwise: yup.string().notRequired().nullable(),
     }),
@@ -88,23 +89,23 @@ const getConditionType = (type: string) => {
   let conditionTypeSelectOption;
   switch (type) {
     case 'INNER_RANGE':
-      conditionTypeSelectOption = { label: 'Inner range', value: type };
+      conditionTypeSelectOption = type;
       break;
 
     case 'OUTER_RANGE':
-      conditionTypeSelectOption = { label: 'Outer range', value: type };
+      conditionTypeSelectOption = type;
       break;
 
     case 'LOW_THRESHOLD':
-      conditionTypeSelectOption = { label: 'Low threshold', value: type };
+      conditionTypeSelectOption = type;
       break;
 
     case 'HIGH_THRESHOLD':
-      conditionTypeSelectOption = { label: 'High threshold', value: type };
+      conditionTypeSelectOption = type;
       break;
 
     case 'TEXT_MATCH':
-      conditionTypeSelectOption = { label: 'Match text', value: type };
+      conditionTypeSelectOption = type;
       break;
 
     default:
@@ -149,25 +150,24 @@ const EditTriggerForm = ({ trigger }: {trigger: any}) => {
     },
     defaultValues: {
       name: trigger.name,
-      condition: trigger.conditions[0].type,
+      condition: trigger.conditions?.[0]?.type,
       dialogue: {
         label: trigger.relatedDialogue?.title,
         value: trigger.relatedDialogue?.slug,
       },
-      conditions: trigger.conditions.map((condition: any) => (
-        {
-          id: condition.id,
-          questionId: { label: condition.question?.title, value: condition.question?.id },
-          conditionType: getConditionType(condition.type),
-          lowThreshold: condition?.minValue ? condition?.minValue / 10 : null,
-          highThreshold: condition?.maxValue ? condition.maxValue / 10 : null,
-          range: [condition?.minValue
-            ? condition?.minValue / 10
-            : null, condition?.maxValue ? condition.maxValue / 10 : null],
-          matchText: condition?.textValue || null,
-        })),
+      conditions: trigger.conditions?.map((condition: any) => ({
+        id: condition.id,
+        questionId: { label: condition.question?.title, value: condition.question?.id },
+        conditionType: getConditionType(condition.type),
+        lowThreshold: condition?.minValue ? condition?.minValue / 10 : null,
+        highThreshold: condition?.maxValue ? condition.maxValue / 10 : null,
+        range: [condition?.minValue
+          ? condition?.minValue / 10
+          : null, condition?.maxValue ? condition.maxValue / 10 : null],
+        matchText: condition?.textValue || null,
+      })),
       medium: trigger.medium,
-      recipients: trigger.recipients.map((recipient: any) => ({ label: `${recipient?.lastName}, ${recipient?.firstName} - E: ${recipient?.email} - P: ${recipient?.phone}`,
+      recipients: trigger.recipients?.map((recipient: any) => ({ label: `${recipient?.lastName}, ${recipient?.firstName} - E: ${recipient?.email} - P: ${recipient?.phone}`,
         value: recipient?.id })),
       type: trigger.type,
     },
@@ -209,20 +209,20 @@ const EditTriggerForm = ({ trigger }: {trigger: any}) => {
 
   const onSubmit = (formData: FormDataProps) => {
     const recipients = { ids: formData.recipients?.map((recip) => recip.value).filter((val) => val) };
-    const conditions = formData.conditions.map((condition) => (
-      {
-        id: parseInt(condition?.id),
-        questionId: condition.questionId.value,
-        type: condition.conditionType?.value,
-        minValue: getThresholdValue(condition.conditionType?.value, condition?.range, condition.lowThreshold, min),
-        maxValue: getThresholdValue(condition.conditionType?.value, condition?.range, condition.highThreshold, max),
-        textValue: condition?.matchText || null,
-      }));
+    const conditions = formData.conditions?.map((condition) => ({
+      id: parseInt(condition?.id),
+      questionId: condition.questionId.value,
+      type: condition.conditionType,
+      minValue: getThresholdValue(condition.conditionType, condition?.range, condition.lowThreshold, min),
+      maxValue: getThresholdValue(condition.conditionType, condition?.range, condition.highThreshold, max),
+      textValue: condition?.matchText || null,
+    })) || [];
 
     const trigger = {
       name: formData.name,
       type: formData?.type,
       medium: formData?.medium,
+      dialogue: formData?.dialogue.value,
       conditions,
     };
 

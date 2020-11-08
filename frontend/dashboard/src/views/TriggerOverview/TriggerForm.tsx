@@ -1,7 +1,7 @@
 /* eslint-disable radix */
 import { Controller, UseFormMethods, useFieldArray, useWatch } from 'react-hook-form';
 import { CornerRightDown, CornerRightUp, Key, Mail, Maximize2,
-  Minimize2, PlusCircle, Smartphone, Thermometer, Type, UserPlus, Watch } from 'react-feather';
+  Minimize2, PlusCircle, Smartphone, Target, Thermometer, Type, UserPlus, Watch } from 'react-feather';
 import { Slider } from 'antd';
 import { useHistory, useParams } from 'react-router';
 import { useLazyQuery, useQuery } from '@apollo/react-hooks';
@@ -9,10 +9,10 @@ import React, { useEffect, useState } from 'react';
 import Select from 'react-select';
 import styled from 'styled-components/macro';
 
-import { Button, ButtonGroup, FormErrorMessage, RadioButtonGroup } from '@chakra-ui/core'; // Slider,
+import { Button, ButtonGroup, FormErrorMessage, RadioButtonGroup, Tag, TagIcon } from '@chakra-ui/core'; // Slider,
 import {
-  ButtonRadio, Div, Flex, Form,
-  FormControl, FormLabel, FormSection, H3, H4, Hr, Input, InputGrid, InputHelper, Muted, Text,
+  ButtonRadio, Div, Flex, Form, FormControl,
+  FormLabel, FormSection, H3, H4, Hr, Input, InputGrid, InputHelper, Muted, Span, Text,
 } from '@haas/ui';
 import { useTranslation } from 'react-i18next';
 import ServerError from 'components/ServerError';
@@ -21,6 +21,29 @@ import gql from 'graphql-tag';
 
 import 'antd/dist/antd.css';
 import { getCustomerTriggerData as CustomerTriggerData } from './__generated__/getCustomerTriggerData';
+
+const SingleScore = ({ form, fieldIndex, conditionKey, defaultValue, icon }: any) => {
+  const score = useWatch({
+    control: form.control,
+    name: `conditions[${fieldIndex}].${conditionKey}`,
+    defaultValue,
+  });
+
+  return (
+    <>
+      {score && (
+        <Span>
+          <Tag variantColor="cyan">
+            <TagIcon size="12px" icon={icon} />
+            <Span>
+              {score}
+            </Span>
+          </Tag>
+        </Span>
+      )}
+    </>
+  );
+};
 
 interface FormDataProps {
   name: string;
@@ -34,7 +57,7 @@ interface FormDataProps {
     label: string;
     value: string;
   };
-  conditions: Array<{ id: string, questionId: { label: string, value: string }, conditionType: { label: string, value: string }, range: Array<number>, highThreshold: number, lowThreshold: number, matchText: string }>;
+  conditions: Array<{ id: string, questionId: { label: string, value: string }, conditionType: string, range: Array<number>, highThreshold: number, lowThreshold: number, matchText: string }>;
   condition: string;
   matchText: string;
   lowThreshold: number;
@@ -141,66 +164,6 @@ const getCustomerTriggerData = gql`
     }
   }
 `;
-
-const ConditionFormFragment = (
-  { activeNodeType, onChange, onBlur, value }: { activeNodeType: string, onChange: any, onBlur: any, value: any },
-) => {
-  if (activeNodeType === 'SLIDER') {
-    return (
-      <RadioButtonGroup
-        defaultValue={value}
-        isInline
-        onChange={onChange}
-        onBlur={onBlur}
-        display="flex"
-        flexWrap="wrap"
-      >
-        <ButtonRadio
-          mb={2}
-          icon={CornerRightUp}
-          value="LOW_THRESHOLD"
-          text="Low threshold"
-          description="Alert under threshold"
-        />
-        <ButtonRadio
-          mb={2}
-          icon={CornerRightDown}
-          value="HIGH_THRESHOLD"
-          text="High threshold"
-          description="Alert over threshold"
-        />
-        <ButtonRadio
-          mb={2}
-          icon={Minimize2}
-          value="INNER_RANGE"
-          text="Inner range"
-          description="Alert within range"
-        />
-        <ButtonRadio
-          mb={2}
-          icon={Maximize2}
-          value="OUTER_RANGE"
-          text="Outer range"
-          description="Alert out of range"
-        />
-      </RadioButtonGroup>
-    );
-  }
-
-  return (
-    <RadioButtonGroup
-      defaultValue={value}
-      isInline
-      onBlur={onBlur}
-      onChange={onChange}
-      display="flex"
-      flexWrap="wrap"
-    >
-      <ButtonRadio icon={Key} value="TEXT_MATCH" text="Match text" description="When text matches" />
-    </RadioButtonGroup>
-  );
-};
-
 interface TriggerFormProps {
   form: UseFormMethods<FormDataProps>;
   onFormSubmit: any;
@@ -289,37 +252,75 @@ const FormConditionFragment = ({ form, condition: fieldCondition, fieldIndex, on
             defaultValue={fieldCondition?.conditionType}
             control={form.control}
             options={conditionTypeSelect}
-            render={({ onChange, value }) => (
-              <Select
-                value={value}
-                options={getNodeType(watchConditionQuestion.value,
-                          questions?.customer?.dialogue?.questions) === 'SLIDER' ? conditionTypeSelect : TextSelect}
-                onChange={(opt: any) => {
-                  handleQuestionReset();
-                  onChange(opt);
-                }}
-              />
-              // <ConditionFormFragment
-              //   activeNodeType={
-              //       getNodeType(watchConditionQuestion.value,
-              //         questions?.customer?.dialogue?.questions)
-              //     }
-              //   value={value?.value}
-              //   onChange={(e: any) => {
-              //     onChange({ label: e, value: e });
-              //   }}
-              //   onBlur={onBlur}
-              // />
+            render={({ onBlur, onChange, value }) => (
+              <>
+                {getNodeType(watchConditionQuestion.value, questions?.customer?.dialogue?.questions) === 'SLIDER' ? (
+                  <RadioButtonGroup
+                    display="flex"
+                    onBlur={onBlur}
+                    value={value}
+                    onChange={(val) => {
+                      handleQuestionReset();
+                      onChange(val);
+                    }}
+                  >
+                    <ButtonRadio
+                      mr={2}
+                      icon={CornerRightDown}
+                      value="LOW_THRESHOLD"
+                      text="Low threshold"
+                      description="Alert under threshold"
+                    />
+                    <ButtonRadio
+                      mr={2}
+                      icon={CornerRightUp}
+                      value="HIGH_THRESHOLD"
+                      text="High threshold"
+                      description="Alert over threshold"
+                    />
+                    <ButtonRadio
+                      mr={2}
+                      icon={Minimize2}
+                      value="INNER_RANGE"
+                      text="Inner range"
+                      description="Alert within range"
+                    />
+                    <ButtonRadio
+                      mb={2}
+                      icon={Maximize2}
+                      value="OUTER_RANGE"
+                      text="Outer range"
+                      description="Alert out of range"
+                    />
+                  </RadioButtonGroup>
+                ) : (
+                  <RadioButtonGroup
+                    display="flex"
+                    onBlur={onBlur}
+                    value={value}
+                    onChange={(val) => {
+                      handleQuestionReset();
+                      onChange(val);
+                    }}
+                  >
+                    <ButtonRadio
+                      mr={2}
+                      icon={Target}
+                      value="TEXT_MATCH"
+                      text="Match text"
+                      description="Match specific text"
+                    />
+                  </RadioButtonGroup>
+                )}
+              </>
             )}
           />
 
-          <FormErrorMessage>{form.errors.conditions?.[fieldIndex]?.conditionType?.value?.message}</FormErrorMessage>
+          <FormErrorMessage>{form.errors.conditions?.[fieldIndex]?.conditionType?.message}</FormErrorMessage>
         </FormControl>
       )}
 
-      {/* <Text>{t('trigger:select_dialogue_reminder')}</Text> */}
-
-      {watchConditionType?.value === TriggerConditionType.TEXT_MATCH && (
+      {watchConditionType === TriggerConditionType.TEXT_MATCH && (
         <FormControl isInvalid={!!form.errors.conditions?.[fieldIndex]?.matchText}>
           <FormLabel htmlFor={`conditions[${fieldIndex}].matchText`}>{t('trigger:match_text')}</FormLabel>
           <InputHelper>
@@ -327,7 +328,6 @@ const FormConditionFragment = ({ form, condition: fieldCondition, fieldIndex, on
           </InputHelper>
           <Input
             defaultValue={fieldCondition.matchText}
-            // key={fieldCondition.id}
             placeholder="Satisfied"
             leftEl={<Type />}
             name={`conditions[${fieldIndex}].matchText`}
@@ -336,7 +336,7 @@ const FormConditionFragment = ({ form, condition: fieldCondition, fieldIndex, on
         </FormControl>
       )}
 
-      {watchConditionType?.value === TriggerConditionType.LOW_THRESHOLD && (
+      {watchConditionType === TriggerConditionType.LOW_THRESHOLD && (
       <FormControl isInvalid={!!form.errors.conditions?.[fieldIndex]?.lowThreshold}>
         <FormLabel htmlFor={`conditions[${fieldIndex}].lowThreshold`}>{t('trigger:low_threshold')}</FormLabel>
         <InputHelper>
@@ -350,14 +350,18 @@ const FormConditionFragment = ({ form, condition: fieldCondition, fieldIndex, on
             <Slider step={0.5} min={0} max={10} defaultValue={value} onAfterChange={onChange} />
           )}
         />
-        <Text>
-          {/* {watchCondition?.lowThreshold} */}
-        </Text>
+        <SingleScore
+          form={form}
+          fieldIndex={fieldIndex}
+          conditionKey="lowThreshold"
+          icon={CornerRightDown}
+          defaultValue={fieldCondition?.lowThreshold}
+        />
 
       </FormControl>
       )}
 
-      {watchConditionType?.value === TriggerConditionType.HIGH_THRESHOLD && (
+      {watchConditionType === TriggerConditionType.HIGH_THRESHOLD && (
         <FormControl isInvalid={!!form.errors.conditions?.[fieldIndex]?.highThreshold}>
           <FormLabel htmlFor={`conditions[${fieldIndex}].highThreshold`}>{t('trigger:high_threshold')}</FormLabel>
           <InputHelper>
@@ -382,14 +386,18 @@ const FormConditionFragment = ({ form, condition: fieldCondition, fieldIndex, on
             )}
           />
 
-          <Text>
-            {/* {watchCondition?.highThreshold || ''} */}
-          </Text>
+          <SingleScore
+            form={form}
+            fieldIndex={fieldIndex}
+            conditionKey="highThreshold"
+            icon={CornerRightUp}
+            defaultValue={fieldCondition?.highThreshold}
+          />
 
         </FormControl>
       )}
 
-      {watchConditionType?.value === TriggerConditionType.OUTER_RANGE && (
+      {watchConditionType === TriggerConditionType.OUTER_RANGE && (
         <>
           <FormControl>
             <FormLabel htmlFor={`conditions[${fieldIndex}].range`}>{t('trigger:outer_range')}</FormLabel>
@@ -415,15 +423,12 @@ const FormConditionFragment = ({ form, condition: fieldCondition, fieldIndex, on
                 </OuterSliderContainer>
               )}
             />
-            <Text>
-              {/* {`${watchCondition?.range?.[0]} - ${watchCondition?.range?.[1]}`} */}
-            </Text>
 
           </FormControl>
         </>
       )}
 
-      {watchConditionType?.value === TriggerConditionType.INNER_RANGE && (
+      {watchConditionType === TriggerConditionType.INNER_RANGE && (
         <FormControl isInvalid={!!form.errors.conditions?.[fieldIndex]?.range}>
           <FormLabel htmlFor={`conditions[${fieldIndex}].range`}>{t('trigger:inner_range')}</FormLabel>
           <InputHelper>
@@ -446,9 +451,6 @@ const FormConditionFragment = ({ form, condition: fieldCondition, fieldIndex, on
               />
             )}
           />
-          <Text>
-            {/* {`${watchCondition?.range?.[0]} - ${watchCondition?.range?.[1]}`} */}
-          </Text>
 
         </FormControl>
       )}

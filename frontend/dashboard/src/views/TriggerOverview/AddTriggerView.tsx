@@ -29,7 +29,7 @@ interface FormDataProps {
   conditions: Array<{
     id: string,
     questionId: { label: string, value: string },
-    conditionType: {label: string, value: string},
+    conditionType: string,
     range: Array<number>,
     highThreshold: number,
     lowThreshold: number,
@@ -63,27 +63,25 @@ const schema = yup.object().shape({
     questionId: yup.object().shape({
       value: yup.string().required(),
     }),
-    conditionType: yup.object().shape({
-      value: yup.string().required(),
-    }),
+    conditionType: yup.string(),
     range: yup.array().when('conditionType', {
-      is: (condition: { label: string, value: string }) => condition?.value === TriggerConditionType.INNER_RANGE
-      || condition?.value === TriggerConditionType.OUTER_RANGE,
+      is: (condition: string) => condition === TriggerConditionType.INNER_RANGE
+      || condition === TriggerConditionType.OUTER_RANGE,
       then: yup.array().min(2).required(),
       otherwise: yup.array().notRequired(),
     }),
     lowThreshold: yup.string().notRequired().when('conditionType', {
-      is: (condition: { label: string, value: string }) => condition?.value === TriggerConditionType.LOW_THRESHOLD,
+      is: (condition: string) => condition === TriggerConditionType.LOW_THRESHOLD,
       then: yup.string().required(),
       otherwise: yup.string().notRequired().nullable(),
     }),
     highThreshold: yup.number().when('conditionType', {
-      is: (conditionType: { label: string, value: string }) => conditionType?.value === TriggerConditionType.HIGH_THRESHOLD,
+      is: (conditionType: string) => conditionType === TriggerConditionType.HIGH_THRESHOLD,
       then: yup.number().required(),
       otherwise: yup.number().notRequired().nullable(),
     }),
     matchText: yup.string().when('conditionType', {
-      is: (conditionType: { label: string, value: string }) => conditionType?.value === TriggerConditionType.TEXT_MATCH,
+      is: (conditionType: string) => conditionType === TriggerConditionType.TEXT_MATCH,
       then: yup.string().required(),
       otherwise: yup.string().notRequired().nullable(),
     }),
@@ -143,14 +141,13 @@ const AddTriggerView = () => {
 
   const onSubmit = (formData: FormDataProps) => {
     const recipients = { ids: formData.recipients?.map((recip) => recip.value).filter((val) => val) };
-    const conditions = formData.conditions.map((condition) => (
-      {
-        questionId: condition.questionId.value,
-        type: condition.conditionType?.value,
-        minValue: getThresholdValue(condition.conditionType?.value, condition?.range, condition.lowThreshold, 0),
-        maxValue: getThresholdValue(condition.conditionType?.value, condition?.range, condition.highThreshold, 1),
-        textValue: condition?.matchText || null,
-      }));
+    const conditions = formData.conditions?.map((condition) => ({
+      questionId: condition.questionId.value,
+      type: condition.conditionType,
+      minValue: getThresholdValue(condition.conditionType, condition?.range, condition.lowThreshold, 0),
+      maxValue: getThresholdValue(condition.conditionType, condition?.range, condition.highThreshold, 1),
+      textValue: condition?.matchText || null,
+    })) || [];
     const trigger = {
       name: formData.name,
       type: formData?.type,
