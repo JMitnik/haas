@@ -304,7 +304,6 @@ export interface NexusGenRootTypes {
   ColourSettings: prisma.ColourSettings;
   Customer: prisma.Customer;
   CustomerSettings: prisma.CustomerSettings;
-  Debug: {};
   DeleteUserOutput: { // root type
     deletedUser: boolean; // Boolean!
   }
@@ -560,9 +559,6 @@ export interface NexusGenFieldTypes {
     id: string; // ID!
     logoUrl: string | null; // String
   }
-  Debug: { // field return type
-    debugResolver: string | null; // String
-  }
   DeleteUserOutput: { // field return type
     deletedUser: boolean; // Boolean!
   }
@@ -654,7 +650,6 @@ export interface NexusGenFieldTypes {
     createTrigger: NexusGenRootTypes['TriggerType']; // TriggerType!
     createUser: NexusGenRootTypes['UserType']; // UserType!
     createWorkspace: NexusGenRootTypes['Customer']; // Customer!
-    debugMutation: string | null; // String
     deleteCTA: NexusGenRootTypes['QuestionNode']; // QuestionNode!
     deleteCustomer: NexusGenRootTypes['Customer'] | null; // Customer
     deleteDialogue: NexusGenRootTypes['Dialogue']; // Dialogue!
@@ -1086,7 +1081,7 @@ export interface NexusGenAbstractResolveReturnTypes {
 
 export interface NexusGenInheritedFields {}
 
-export type NexusGenObjectNames = "ColourSettings" | "Customer" | "CustomerSettings" | "Debug" | "DeleteUserOutput" | "Dialogue" | "DialogueStatistics" | "Edge" | "EdgeCondition" | "FontSettings" | "ImageType" | "InviteUserOutput" | "LinkType" | "LoginOutput" | "Mutation" | "NodeEntry" | "NodeEntryValue" | "PaginationPageInfo" | "PermssionType" | "Query" | "QuestionNode" | "QuestionOption" | "RefreshAccessTokenOutput" | "RequestInviteOutput" | "RoleConnection" | "RoleType" | "Session" | "SessionConnection" | "ShareNodeType" | "Tag" | "TriggerConditionType" | "TriggerConnectionType" | "TriggerType" | "UserConnection" | "UserCustomer" | "UserType" | "VerifyUserTokenOutput" | "lineChartDataType" | "topPathType";
+export type NexusGenObjectNames = "ColourSettings" | "Customer" | "CustomerSettings" | "DeleteUserOutput" | "Dialogue" | "DialogueStatistics" | "Edge" | "EdgeCondition" | "FontSettings" | "ImageType" | "InviteUserOutput" | "LinkType" | "LoginOutput" | "Mutation" | "NodeEntry" | "NodeEntryValue" | "PaginationPageInfo" | "PermssionType" | "Query" | "QuestionNode" | "QuestionOption" | "RefreshAccessTokenOutput" | "RequestInviteOutput" | "RoleConnection" | "RoleType" | "Session" | "SessionConnection" | "ShareNodeType" | "Tag" | "TriggerConditionType" | "TriggerConnectionType" | "TriggerType" | "UserConnection" | "UserCustomer" | "UserType" | "VerifyUserTokenOutput" | "lineChartDataType" | "topPathType";
 
 export type NexusGenInputNames = "CTALinkInputObjectType" | "CTALinksInputType" | "CTAShareInputObjectType" | "ChoiceNodeEntryInput" | "CreateCTAInputType" | "CreateDialogueInputType" | "CreateQuestionNodeInputType" | "CreateTriggerInputType" | "CreateWorkspaceInput" | "CustomerWhereUniqueInput" | "DeleteDialogueInputType" | "DeleteNodeInputType" | "DeleteUserInput" | "DialogueFilterInputType" | "DialogueWhereUniqueInput" | "EdgeConditionInputType" | "EditUserInput" | "EditWorkspaceInput" | "InviteUserInput" | "LoginInput" | "NodeEntryDataInput" | "NodeEntryInput" | "OptionInputType" | "OptionsInputType" | "PaginationSortInput" | "PaginationWhereInput" | "PermissionIdsInput" | "PermissionInput" | "QuestionNodeWhereInputType" | "QuestionNodeWhereUniqueInput" | "RecipientsInputType" | "RegisterInput" | "RegisterNodeEntryInput" | "RequestInviteInput" | "RoleDataInput" | "RoleInput" | "SessionInput" | "SessionWhereUniqueInput" | "ShareNodeInputType" | "SliderNodeEntryInput" | "TagsInputObjectType" | "TextboxNodeEntryInput" | "TriggerConditionInputType" | "TriggerInputType" | "UpdateCTAInputType" | "UpdateQuestionNodeInputType" | "UserInput" | "UserOfCustomerInput";
 
