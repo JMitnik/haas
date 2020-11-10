@@ -1,6 +1,6 @@
+import { NexusGenEnums, NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
 import { Object } from 'lodash';
 import { TriggerWhereInput } from '@prisma/client';
-import { NexusGenEnums, NexusGenInputs } from '../../generated/nexus';
 
 export const slice = (
   entries: Array<any>,
@@ -68,6 +68,11 @@ type findManyInput = {
   orderBy?: any,
 };
 
+type TableProps = {
+  findMany: (findManyProps: findManyInput) => Promise<Array<any>>,
+  count: (countWhereProps: any) => Promise<number>,
+};
+
 export const constructFindManyInput = (
   whereInput: any,
   paginationOpts: NexusGenInputs['PaginationWhereInput'],
@@ -81,12 +86,27 @@ export const constructFindManyInput = (
 };
 
 export const paginate = async (
-  findManyCallback: (findManyProps: findManyInput) => Promise<Array<any>>,
-  whereInput: any,
+  table: TableProps,
+  findManyWhereInput: any,
   searchFields: NexusGenEnums['PaginationSearchEnum'][],
   paginationOpts: NexusGenInputs['PaginationWhereInput'],
   orderFields: NexusGenEnums['PaginationSortByEnum'][],
+  countWhereInput: any,
 ) => {
-  const findManyInput = constructFindManyInput(whereInput, paginationOpts, searchFields, orderFields);
-  return findManyCallback(findManyInput);
+  const findManyInput = constructFindManyInput(findManyWhereInput, paginationOpts, searchFields, orderFields);
+  const entries = await table.findMany(findManyInput);
+  const triggerTotal = await table.count(countWhereInput);
+  const totalPages = paginationOpts.limit ? Math.ceil(triggerTotal / (paginationOpts.limit)) : 1;
+  const currentPage = paginationOpts.pageIndex && paginationOpts.pageIndex <= totalPages
+    ? paginationOpts.pageIndex : 1;
+
+  const pageInfo: NexusGenRootTypes['PaginationPageInfo'] = {
+    nrPages: totalPages,
+    pageIndex: currentPage,
+  };
+
+  return {
+    entries,
+    pageInfo,
+  };
 };

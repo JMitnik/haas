@@ -3,6 +3,7 @@ import {
   Customer,
   CustomerInclude,
   CustomerSettings,
+  FindManyTriggerArgs,
   Trigger,
   TriggerCondition,
   TriggerOrderByInput,
@@ -56,35 +57,17 @@ class TriggerService {
     customerSlug: string,
     paginationOpts: NexusGenInputs['PaginationWhereInput'],
   ) => {
-    // Build filter
     const triggerWhereInput: TriggerWhereInput = { customer: { slug: customerSlug } };
+    const countWhereInput: FindManyTriggerArgs = { where: { customer: { slug: customerSlug } } };
 
-    // const searchTermFilter = TriggerService.getSearchTermFilter(paginationOpts.search || '');
-    // triggerWhereInput.OR = searchTermFilter.length ? searchTermFilter : undefined;
-
-    // const triggers = await prisma.trigger.findMany({
-    //   where: triggerWhereInput,
-    //   take: paginationOpts.limit || undefined,
-    //   skip: paginationOpts.offset || undefined,
-    //   orderBy: constructSortInput(['medium', 'type', 'name'], paginationOpts.orderBy || undefined),
-    // });
-
-    const triggers: Trigger[] = await paginate(prisma.trigger.findMany, triggerWhereInput, ['name'], paginationOpts, ['medium', 'type', 'name']);
-
-    const triggerTotal = await prisma.trigger.count({ where: { customer: { slug: customerSlug } } });
-    const totalPages = paginationOpts.limit ? Math.ceil(triggerTotal / (paginationOpts.limit)) : 1;
-    const currentPage = paginationOpts.pageIndex && paginationOpts.pageIndex <= totalPages
-      ? paginationOpts.pageIndex : 1;
-
-    const pageInfo: NexusGenRootTypes['PaginationPageInfo'] = {
-      nrPages: totalPages,
-      pageIndex: currentPage,
-    };
-
-    return {
-      triggers,
-      pageInfo,
-    };
+    return paginate(
+      prisma.trigger,
+      triggerWhereInput,
+      ['name'],
+      paginationOpts,
+      ['medium', 'type', 'name'],
+      countWhereInput,
+    );
   };
 
   static sendMailTrigger(trigger: TriggerWithSendData, recipient: User, session: SessionWithEntries) {
