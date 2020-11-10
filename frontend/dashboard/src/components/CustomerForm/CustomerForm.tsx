@@ -172,7 +172,7 @@ const CustomerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = 
                 name="name"
                 ref={form.register()}
               />
-              <FormErrorMessage>{form.errors.name?.message}</FormErrorMessage>
+              <FormErrorMessage>{form.errors.name}</FormErrorMessage>
             </FormControl>
 
             <FormControl isInvalid={!!form.errors.slug} isRequired>
@@ -184,7 +184,7 @@ const CustomerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = 
                 name="slug"
                 ref={form.register()}
               />
-              <FormErrorMessage>{form.errors.slug?.message}</FormErrorMessage>
+              <FormErrorMessage>{form.errors.slug}</FormErrorMessage>
             </FormControl>
           </InputGrid>
         </Div>

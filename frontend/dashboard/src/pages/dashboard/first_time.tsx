@@ -138,7 +138,7 @@ const FirstTimeForm = () => {
                   name="firstName"
                   ref={form.register()}
                 />
-                <FormErrorMessage>{form.errors.firstName?.message}</FormErrorMessage>
+                <FormErrorMessage>{form.errors.firstName}</FormErrorMessage>
               </FormControl>
               <FormControl isRequired isInvalid={!!form.errors.lastName}>
                 <FormLabel htmlFor="lastName">{t('last_name')}</FormLabel>
@@ -149,7 +149,7 @@ const FirstTimeForm = () => {
                   name="lastName"
                   ref={form.register()}
                 />
-                <FormErrorMessage>{form.errors.lastName?.message}</FormErrorMessage>
+                <FormErrorMessage>{form.errors.lastName}</FormErrorMessage>
               </FormControl>
               <FormControl isRequired isInvalid={!!form.errors.email}>
                 <FormLabel htmlFor="email">{t('email')}</FormLabel>
@@ -160,7 +160,7 @@ const FirstTimeForm = () => {
                   name="email"
                   ref={form.register()}
                 />
-                <FormErrorMessage>{form.errors.email?.message}</FormErrorMessage>
+                <FormErrorMessage>{form.errors.email}</FormErrorMessage>
               </FormControl>
               <FormControl isInvalid={!!form.errors.phone}>
                 <FormLabel htmlFor="phone">{t('phone')}</FormLabel>
@@ -171,7 +171,7 @@ const FirstTimeForm = () => {
                   name="phone"
                   ref={form.register()}
                 />
-                <FormErrorMessage>{form.errors.phone?.message}</FormErrorMessage>
+                <FormErrorMessage>{form.errors.phone}</FormErrorMessage>
               </FormControl>
             </InputGrid>
           </Div>

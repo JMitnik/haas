@@ -4,9 +4,9 @@ import React, { useState } from 'react';
 import { Div, Flex, H4 } from '@haas/ui';
 import SplitArrowIcon from 'components/Icons/SplitIcon';
 
+import { useTranslation } from 'react-i18next';
 import { AddQuestionContainer, DepthSpan } from './QuestionEntry/QuestionEntryStyles';
 import { EdgeConditonProps, QuestionEntryProps, QuestionOptionProps } from '../DialogueBuilderInterfaces';
-import { useTranslation } from 'react-i18next';
 import QuestionEntry from './QuestionEntry/QuestionEntry';
 
 interface QuestionSectionProps {

@@ -384,7 +384,7 @@ const QuestionEntryForm = ({
               </Muted>
             </Div>
             <InputGrid>
-              <FormControl isRequired isInvalid={!!form.errors.title?.message}>
+              <FormControl isRequired isInvalid={!!form.errors.title}>
                 <FormLabel htmlFor="title">{t('title')}</FormLabel>
                 <InputHelper>{t('dialogue:title_question_helper')}</InputHelper>
                 <Controller
@@ -401,7 +401,7 @@ const QuestionEntryForm = ({
                     />
                   )}
                 />
-                <FormErrorMessage>{form.errors.title?.message}</FormErrorMessage>
+                <FormErrorMessage>{form.errors.title}</FormErrorMessage>
               </FormControl>
             </InputGrid>
           </FormSection>
@@ -432,7 +432,7 @@ const QuestionEntryForm = ({
                         defaultValue={condition?.renderMin}
                         onBlur={(event: React.FocusEvent<HTMLInputElement>) => setMinValue(event)}
                       />
-                      <FormErrorMessage>{form.errors.minValue?.message}</FormErrorMessage>
+                      <FormErrorMessage>{form.errors.minValue}</FormErrorMessage>
                     </FormControl>
 
                     <FormControl isRequired isInvalid={!!form.errors.maxValue}>
@@ -448,7 +448,7 @@ const QuestionEntryForm = ({
                         defaultValue={condition?.renderMax}
                         onChange={(event: any) => setMaxValue(event.target.value)}
                       />
-                      <FormErrorMessage>{form.errors.maxValue?.message}</FormErrorMessage>
+                      <FormErrorMessage>{form.errors.maxValue}</FormErrorMessage>
                     </FormControl>
 
                   </InputGrid>
@@ -490,7 +490,7 @@ const QuestionEntryForm = ({
                         )}
                       />
 
-                      <FormErrorMessage>{form.errors.matchText?.message}</FormErrorMessage>
+                      <FormErrorMessage>{form.errors.matchText}</FormErrorMessage>
                     </FormControl>
                   </InputGrid>
                 </Div>
@@ -534,7 +534,7 @@ const QuestionEntryForm = ({
                       />
                     )}
                   />
-                  <FormErrorMessage>{form.errors.questionType?.message}</FormErrorMessage>
+                  <FormErrorMessage>{form.errors.questionType}</FormErrorMessage>
                 </FormControl>
 
                 <FormControl isInvalid={!!form.errors.activeLeaf}>
@@ -560,7 +560,7 @@ const QuestionEntryForm = ({
                       />
                     )}
                   />
-                  <FormErrorMessage>{form.errors.activeLeaf?.message}</FormErrorMessage>
+                  <FormErrorMessage>{form.errors.activeLeaf}</FormErrorMessage>
                 </FormControl>
               </InputGrid>
 

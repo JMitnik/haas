@@ -1,9 +1,9 @@
 import * as yup from 'yup';
 import { Activity, Minus, Plus, Type } from 'react-feather';
 import { ApolloError, gql } from 'apollo-boost';
+import { Button, ButtonGroup, FormErrorMessage, RadioButtonGroup, Stack } from '@chakra-ui/core';
 import { ButtonRadio, Div, Flex, Form, FormContainer, FormControl, FormLabel,
   FormSection, H3, Hr, Input, InputGrid, InputHelper, Muted, PageTitle, Textarea } from '@haas/ui';
-import { Button, ButtonGroup, FormErrorMessage, RadioButtonGroup, Stack } from '@chakra-ui/core';
 import { Controller, useForm } from 'react-hook-form';
 import { motion } from 'framer-motion';
 import { useHistory, useParams } from 'react-router';
@@ -12,6 +12,7 @@ import { useTranslation } from 'react-i18next';
 import { yupResolver } from '@hookform/resolvers';
 import React, { useState } from 'react';
 import Select from 'react-select';
+
 import ServerError from 'components/ServerError';
 import booleanToNumber from 'utils/booleanToNumber';
 import editDialogueMutation from 'mutations/editDialogue';
@@ -184,7 +185,7 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFo
                       name="title"
                       ref={form.register({ required: true })}
                     />
-                    <FormErrorMessage>{form.errors.title?.message}</FormErrorMessage>
+                    <FormErrorMessage>{form.errors.title}</FormErrorMessage>
                   </FormControl>
 
                   <FormControl isInvalid={!!form.errors.publicTitle}>
@@ -198,7 +199,7 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFo
                       name="publicTitle"
                       ref={form.register({ required: false })}
                     />
-                    <FormErrorMessage>{form.errors.publicTitle?.message}</FormErrorMessage>
+                    <FormErrorMessage>{form.errors.publicTitle}</FormErrorMessage>
                   </FormControl>
 
                   <FormControl isRequired isInvalid={!!form.errors.description}>
@@ -211,7 +212,7 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFo
                       name="description"
                       ref={form.register({ required: true })}
                     />
-                    <FormErrorMessage>{form.errors.title?.message}</FormErrorMessage>
+                    <FormErrorMessage>{form.errors.title}</FormErrorMessage>
                   </FormControl>
 
                   <FormControl isRequired isInvalid={!!form.errors.slug}>
@@ -223,7 +224,7 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFo
                       name="slug"
                       ref={form.register({ required: true })}
                     />
-                    <FormErrorMessage>{form.errors.slug?.message}</FormErrorMessage>
+                    <FormErrorMessage>{form.errors.slug}</FormErrorMessage>
                   </FormControl>
 
                 </InputGrid>
@@ -264,7 +265,7 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFo
                             options={tagOptions}
                             defaultValue={tag}
                           />
-                          <FormErrorMessage>{form.errors.tags?.[index]?.value?.message}</FormErrorMessage>
+                          <FormErrorMessage>{form.errors.tags?.[index]?.value}</FormErrorMessage>
                         </Div>
                         <Flex justifyContent="center" alignContent="center" flexGrow={1}>
                           <Button

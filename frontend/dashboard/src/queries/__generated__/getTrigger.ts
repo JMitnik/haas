@@ -9,18 +9,16 @@ import { TriggerMediumEnum, TriggerTypeEnum, TriggerConditionEnum } from "./../.
 // GraphQL query operation: getTrigger
 // ====================================================
 
-export interface getTrigger_trigger_relatedNode_questionDialogue {
+export interface getTrigger_trigger_relatedDialogue {
   __typename: "Dialogue";
   slug: string;
   title: string;
 }
 
-export interface getTrigger_trigger_relatedNode {
+export interface getTrigger_trigger_conditions_question {
   __typename: "QuestionNode";
-  id: string;
   title: string;
-  questionDialogueId: string | null;
-  questionDialogue: getTrigger_trigger_relatedNode_questionDialogue | null;
+  id: string;
 }
 
 export interface getTrigger_trigger_conditions {
@@ -30,6 +28,7 @@ export interface getTrigger_trigger_conditions {
   minValue: number | null;
   maxValue: number | null;
   textValue: string | null;
+  question: getTrigger_trigger_conditions_question | null;
 }
 
 export interface getTrigger_trigger_recipients {
@@ -47,7 +46,7 @@ export interface getTrigger_trigger {
   name: string;
   medium: TriggerMediumEnum;
   type: TriggerTypeEnum;
-  relatedNode: getTrigger_trigger_relatedNode | null;
+  relatedDialogue: getTrigger_trigger_relatedDialogue | null;
   conditions: getTrigger_trigger_conditions[];
   recipients: getTrigger_trigger_recipients[];
 }

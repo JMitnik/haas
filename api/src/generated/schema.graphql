@@ -55,6 +55,12 @@ input CreateQuestionNodeInputType {
   type: String
 }
 
+input CreateTriggerInputType {
+  customerSlug: String
+  recipients: RecipientsInputType
+  trigger: TriggerInputType
+}
+
 """Creates a workspace"""
 input CreateWorkspaceInput {
   isSeed: Boolean = false
@@ -297,7 +303,7 @@ type Mutation {
   createRole(data: RoleInput): RoleType!
   createSession(input: SessionInput): Session!
   createTag(customerSlug: String, name: String, type: TagTypeEnum): Tag!
-  createTrigger(customerSlug: String, questionId: String, recipients: RecipientsInputType, trigger: TriggerInputType): TriggerType!
+  createTrigger(input: CreateTriggerInputType): TriggerType!
   createUser(customerSlug: String, input: UserInput): UserType!
   createWorkspace(input: CreateWorkspaceInput): Customer!
   debugMutation: String
@@ -309,7 +315,7 @@ type Mutation {
   deleteTrigger(id: String): TriggerType
   deleteUser(input: DeleteUserInput): DeleteUserOutput!
   editDialogue(customerSlug: String, description: String, dialogueSlug: String, isWithoutGenData: Boolean, publicTitle: String, tags: TagsInputObjectType, title: String): Dialogue!
-  editTrigger(questionId: String, recipients: RecipientsInputType, trigger: TriggerInputType, triggerId: String): TriggerType!
+  editTrigger(recipients: RecipientsInputType, trigger: TriggerInputType, triggerId: String): TriggerType!
   editUser(input: EditUserInput, userId: String): UserType!
   editWorkspace(input: EditWorkspaceInput): Customer!
 
@@ -671,6 +677,7 @@ input TriggerConditionInputType {
   id: Int
   maxValue: Int
   minValue: Int
+  questionId: String
   textValue: String
   type: TriggerConditionEnum
 }
@@ -679,6 +686,7 @@ type TriggerConditionType {
   id: Int!
   maxValue: Int
   minValue: Int
+  question: QuestionNode
   textValue: String
   triggerId: String!
   type: TriggerConditionEnum!
@@ -712,7 +720,7 @@ type TriggerType {
   medium: TriggerMediumEnum!
   name: String!
   recipients: [UserType!]!
-  relatedNode: QuestionNode
+  relatedDialogue: Dialogue
   relatedNodeId: String
   type: TriggerTypeEnum!
 }
