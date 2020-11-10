@@ -9,6 +9,7 @@ import useDialogueTree from 'providers/DialogueTreeProvider';
 import useUploadQueue from 'providers/UploadQueueProvider';
 
 import { GenericNodeProps } from './nodes/types';
+import { useNavigator } from 'providers/NavigationProvider';
 import MultiChoiceNode from './nodes/MultiChoiceNode/MultiChoiceNode';
 import PostLeafNode from './nodes/PostLeafNode/PostLeafNode';
 import RegisterNode from './nodes/RegisterNode/RegisterNode';
@@ -16,6 +17,7 @@ import ShareNode from './nodes/ShareNode/ShareNode';
 import SliderNode from './nodes/SliderNode/SliderNode';
 import SocialShareNode from './nodes/SocialShareNode/SocialShareNode';
 import TextboxNode from './nodes/TextboxNode/TextboxNode';
+import useDebugReference from 'hooks/useDebugReference';
 
 const nodeMap: Record<string, (props: GenericNodeProps) => JSX.Element> = {
   SLIDER: SliderNode,
@@ -43,8 +45,8 @@ interface NodeViewProps {
 
 const NodeView = ({ node }: NodeViewProps) => {
   const store = useDialogueTree();
-  const history = useHistory();
-  const { queueEntry, willQueueEntry } = useUploadQueue();
+  const { queueEntry, reset } = useUploadQueue();
+  const { routes, goToActiveLeaf, goToNodeByEdge, goToPostLeafByEdge } = useNavigator();
 
   /**
    * Stores entry and proceeds to next node
@@ -59,26 +61,18 @@ const NodeView = ({ node }: NodeViewProps) => {
     const { edgeId, goesToLeaf, goesToPostLeaf } = node.getNextEdgeIdFromKey(edgeKey);
 
     // If our entry is valid, and we will queue the entry (meaning, a session has been uploaded)
-    if (entry && willQueueEntry) {
+    if (entry) {
       queueEntry({
         nodeId: node.id,
         data: entry,
       });
     }
 
-    // Navigation: go to post-leaf
-    if (goesToPostLeaf) {
-      return history.push(`/${store.customer?.slug}/${store.tree?.slug}/${edgeId}`);
-    }
-
-    // Navigation: go to active-leaf
-    if (goesToLeaf) {
-      const activeLeaf = store.tree?.activeLeaf;
-      return history.push(`/${store.customer?.slug}/${store.tree?.slug}/n/${activeLeaf?.id}`);
-    }
+    if (goesToPostLeaf) return goToPostLeafByEdge(edgeId);
+    if (goesToLeaf) return goToActiveLeaf();
 
     // Navigation: go to next node
-    return history.push(`/${store.customer?.slug}/${store.tree?.slug}/${edgeId}`);
+    return goToNodeByEdge(edgeId);
   };
 
   /**
@@ -87,7 +81,7 @@ const NodeView = ({ node }: NodeViewProps) => {
    * @param edgeKey
    */
   const handleQueueEntryOnly = (entry: any) => {
-    if (entry && willQueueEntry) {
+    if (entry) {
       queueEntry({
         nodeId: node.id,
         data: entry,
@@ -105,7 +99,7 @@ const NodeView = ({ node }: NodeViewProps) => {
   const inTreeWithNoResults = !node.isLeaf && !node.isRoot && store.session.isEmpty;
 
   if ((suddenlyStarted) || (inPostLeafAfterRefresh) || inTreeWithNoResults) {
-    return <Redirect to={`/${store.customer?.slug}/${store.tree?.slug}`} />;
+    return <Redirect to={routes.start} />;
   }
 
   if (node.isPostLeaf) {

@@ -1,8 +1,9 @@
 import { useMutation } from '@apollo/react-hooks';
-import React, { useCallback, useContext, useRef } from 'react';
+import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
 
 import createInteractionMutation from 'mutations/createSessionMutation';
 import gql from 'graphql-tag';
+import useDebugReference from 'hooks/useDebugReference';
 import useDialogueTree from 'providers/DialogueTreeProvider';
 
 const UploadQueueContext = React.createContext({} as any);
@@ -16,6 +17,7 @@ const appendToInteractionMutation = gql`
 `;
 
 export const UploadQueueProvider = ({ children }: { children: React.ReactNode }) => {
+  const willAppend = useRef(false);
   const queue = useRef<any>([]);
   const store = useDialogueTree();
   const [createInteraction, { data: interactionData }] = useMutation(createInteractionMutation);
@@ -28,7 +30,7 @@ export const UploadQueueProvider = ({ children }: { children: React.ReactNode })
     const uploadEntries = store.relevantSessionEntries;
 
     // We only upload if we have not done so before, and also, as long as we have any entries to upload after all.
-    if (!interactionData && uploadEntries.length) {
+    if (!willAppend.current && uploadEntries.length) {
       createInteraction({
         variables: {
           input: {
@@ -43,15 +45,16 @@ export const UploadQueueProvider = ({ children }: { children: React.ReactNode })
         },
       }).then(() => {
         store.finalize();
+        willAppend.current = true;
       });
     }
-  }, [createInteraction, store, interactionData]);
+  }, [createInteraction, store, willAppend]);
 
   /**
    * Dequeue the first item in our queue.
    */
   const dequeueEntry = () => {
-    if (!queue.current.length || !interactionData) return;
+    if (!queue.current.length || !interactionData || !willAppend.current) return;
 
     const entry = queue.current[0];
 
@@ -75,21 +78,34 @@ export const UploadQueueProvider = ({ children }: { children: React.ReactNode })
       });
   };
 
+  const reset = () => {
+    console.log('Gonna reset now');
+
+    if (willAppend.current) {
+      queue.current = [];
+      willAppend.current = false;
+    }
+  };
+
   /**
    * Queue an item to the end of our list, and instantly dequeue it.
    */
   const queueEntry = (entry: any) => {
-    queue.current = [...queue.current, entry];
-    dequeueEntry();
+    console.log('Willapend?', willAppend.current);
+    if (willAppend.current) {
+      queue.current = [...queue.current, entry];
+      dequeueEntry();
+    }
   };
 
   return (
     <UploadQueueContext.Provider value={{
+      reset,
       queueEntry,
       dequeueEntry,
       uploadInteraction: handleUploadInteraction,
       appendToInteraction: null,
-      willQueueEntry: !!interactionData,
+      willQueueEntry: willAppend,
     }}
     >
       {children}

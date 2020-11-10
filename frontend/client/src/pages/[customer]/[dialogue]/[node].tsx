@@ -49,10 +49,10 @@ const NodePage = observer(() => {
   // }
 
   useEffect(() => {
-    if (!edgeId && nodeId && !willQueueEntry) {
+    if (!edgeId && nodeId) {
       uploadInteraction();
     }
-  }, [uploadInteraction, edgeId, nodeId, willQueueEntry]);
+  }, [uploadInteraction, edgeId, nodeId]);
 
   return useObserver(() => {
     // If rootNode is unknown yet, return Loader
