@@ -4,9 +4,9 @@ import mjml2html from 'mjml';
 import { SessionWithEntries } from '../../../models/session/SessionTypes';
 import NodeEntryService from '../../../models/node-entry/NodeEntryService';
 
-const makeTriggerMailTemplate = (recipientName: string, userSession: SessionWithEntries, userScore: number, bgColor: string = '#0059f8') => {
+const makeTriggerMailTemplate = (recipientName: string, userSession: SessionWithEntries, bgColor: string = '#0059f8') => {
   const lighterBg = Color(bgColor).darken(0.1).hex();
-
+  const score = userSession.nodeEntries.find((entry) => entry.depth === 0)?.sliderNodeEntry?.value;
   return mjml2html(`
         <mjml>
         <mj-body background-color=${bgColor}>
@@ -30,15 +30,15 @@ const makeTriggerMailTemplate = (recipientName: string, userSession: SessionWith
                         one of your set-up triggers has been activated.
 
                         One of your customers had an opinion regarding dialogue ${userSession.dialogueId},
-                        for session nr ${userSession.id}. You can find below details
-                        more detail about their dialogue
+                        for session nr ${userSession.id}. You can find more details
+                        about their dialogue below
                     </mj-text>
                 </mj-column>
             </mj-section>
             <mj-section background-color="white">
                 <mj-column>
                     <mj-text align="center">They rated your dialogue with score</mj-text>
-                    <mj-text font-size="30px" align="center">${userScore}</mj-text>
+                    <mj-text font-size="30px" align="center">${score}</mj-text>
                 </mj-column>
             </mj-section>
 

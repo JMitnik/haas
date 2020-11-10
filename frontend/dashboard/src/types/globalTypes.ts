@@ -136,6 +136,12 @@ export interface CreateQuestionNodeInputType {
   edgeCondition?: EdgeConditionInputType | null;
 }
 
+export interface CreateTriggerInputType {
+  customerSlug?: string | null;
+  recipients?: RecipientsInputType | null;
+  trigger?: TriggerInputType | null;
+}
+
 /**
  * Creates a workspace
  */
@@ -257,6 +263,7 @@ export interface TagsInputObjectType {
 
 export interface TriggerConditionInputType {
   id?: number | null;
+  questionId?: string | null;
   type?: TriggerConditionEnum | null;
   minValue?: number | null;
   maxValue?: number | null;
