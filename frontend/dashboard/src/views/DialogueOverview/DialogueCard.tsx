@@ -138,7 +138,7 @@ const DialogueCard = ({ dialogue, isCompact }: { dialogue: any, isCompact?: bool
 
             {!isCompact && (
               <Paragraph fontSize="0.8rem" color="app.mutedOnWhite" fontWeight="100">
-                <ExtLink to={`https://haas-client.netlify.app/${dialogue.customer.slug}/${dialogue.slug}`}>
+                <ExtLink to={`https://client.haas.live/${dialogue.customer.slug}/${dialogue.slug}`}>
                   {`haas.live/${dialogue.customer.slug}/${dialogue.slug}`}
                 </ExtLink>
               </Paragraph>
