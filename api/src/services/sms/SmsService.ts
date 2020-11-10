@@ -3,7 +3,7 @@ import config from '../../config/config';
 
 class SMSService {
   send = (recipientNumber: string, message: string) => {
-    if (config.env === 'local') return;
+    if (config.env === 'local') return console.log('text message: ', message);
 
     const snsInstance = new AWS.SNS();
     snsInstance.setSMSAttributes({

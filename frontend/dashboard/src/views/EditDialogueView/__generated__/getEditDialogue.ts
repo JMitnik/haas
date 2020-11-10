@@ -23,6 +23,7 @@ export interface getEditDialogue_customer_dialogue {
   slug: string;
   publicTitle: string | null;
   description: string;
+  isWithoutGenData: boolean;
   tags: getEditDialogue_customer_dialogue_tags[] | null;
 }
 

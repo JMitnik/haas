@@ -7,14 +7,9 @@ const getTriggerQuery = gql`
       name
       medium
       type
-      relatedNode {
-        id
+      relatedDialogue {
+        slug
         title
-        questionDialogueId
-        questionDialogue {
-          slug
-          title
-        }
       }
       conditions {
           id
@@ -22,6 +17,10 @@ const getTriggerQuery = gql`
           minValue
           maxValue
           textValue
+          question {
+            title
+            id
+          }
       }
       recipients {
           id

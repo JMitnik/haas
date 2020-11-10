@@ -42,7 +42,6 @@ export interface editTrigger {
 
 export interface editTriggerVariables {
   triggerId: string;
-  questionId?: string | null;
   trigger?: TriggerInputType | null;
   recipients?: RecipientsInputType | null;
 }

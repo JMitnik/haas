@@ -13,6 +13,7 @@ import React from 'react';
 import editTriggerMutation from 'mutations/editTrigger';
 import getTriggerQuery from 'queries/getTrigger';
 
+import { max, min } from 'lodash';
 import TriggerForm from './TriggerForm';
 
 interface FormDataProps {
@@ -23,14 +24,14 @@ interface FormDataProps {
   };
   type: string;
   medium: string;
-  question: {
-    label: string;
-    value: string;
-  };
-  condition: string;
-  matchText: string;
-  lowThreshold: number;
-  highThreshold: number;
+  conditions: Array<{
+    id: string,
+    questionId: { label: string, value: string },
+    conditionType: string,
+    range: Array<number>,
+    highThreshold: number,
+    lowThreshold: number,
+    matchText: string }>;
   recipients: Array<{
     label: string;
     value: string;
@@ -45,48 +46,70 @@ enum TriggerConditionType {
   TEXT_MATCH='TEXT_MATCH',
 }
 
-enum TriggerQuestionType {
-  QUESTION='QUESTION',
-  SCHEDULED='SCHEDULED',
-}
-
 const schema = yup.object().shape({
   name: yup.string().required(),
-  dialogue: yup.string().required(),
   type: yup.string().required(),
   medium: yup.string().required(),
-  question: yup.object().shape({
-    value: yup.string().when(['type'], {
-      is: (type: string) => type === TriggerQuestionType.QUESTION,
-      then: yup.string().required(),
-      otherwise: yup.string().notRequired(),
+  conditions: yup.array().of(yup.object().shape({ // .min(1).required()
+    questionId: yup.object().shape({
+      value: yup.string().required(),
     }),
-  }),
-  condition: yup.string().required(),
-  lowThreshold: yup.string().notRequired().when(['condition'], {
-    is: (condition: string) => condition === TriggerConditionType.LOW_THRESHOLD
-    || condition === TriggerConditionType.INNER_RANGE
-    || condition === TriggerConditionType.OUTER_RANGE,
-    then: yup.string().required(),
-    otherwise: yup.string().notRequired(),
-  }),
-  highThreshold: yup.string().notRequired().when(['condition'], {
-    is: (condition: string) => condition === TriggerConditionType.HIGH_THRESHOLD
-    || condition === TriggerConditionType.INNER_RANGE
-    || condition === TriggerConditionType.OUTER_RANGE,
-    then: yup.string().required(),
-    otherwise: yup.string().notRequired(),
-  }),
-  matchText: yup.string().when(['condition'], {
-    is: (parentQuestionType: string) => parentQuestionType === TriggerConditionType.TEXT_MATCH,
-    then: yup.string().required(),
-    otherwise: yup.string().notRequired(),
-  }),
-  recipients: yup.array().of(yup.object().shape({
+    conditionType: yup.string().nullable(),
+    range: yup.array().when('conditionType', {
+      is: (condition: string) => condition === TriggerConditionType.INNER_RANGE
+      || condition === TriggerConditionType.OUTER_RANGE,
+      then: yup.array().min(2).required(),
+      otherwise: yup.array().notRequired(),
+    }),
+    lowThreshold: yup.string().notRequired().when('conditionType', {
+      is: (condition: string) => condition === TriggerConditionType.LOW_THRESHOLD,
+      then: yup.string().required(),
+      otherwise: yup.string().notRequired().nullable(),
+    }),
+    highThreshold: yup.number().when('conditionType', {
+      is: (conditionType: string) => conditionType === TriggerConditionType.HIGH_THRESHOLD,
+      then: yup.number().required(),
+      otherwise: yup.number().notRequired().nullable(),
+    }),
+    matchText: yup.string().when('conditionType', {
+      is: (conditionType: string) => conditionType === TriggerConditionType.TEXT_MATCH,
+      then: yup.string().required(),
+      otherwise: yup.string().notRequired().nullable(),
+    }),
+  })),
+  recipients: yup.array().min(1).required().of(yup.object().shape({
     value: yup.string().required(),
-    label: yup.string().required(),
-  })).notRequired(),
+  })),
 });
+
+const getConditionType = (type: string) => {
+  let conditionTypeSelectOption;
+  switch (type) {
+    case 'INNER_RANGE':
+      conditionTypeSelectOption = type;
+      break;
+
+    case 'OUTER_RANGE':
+      conditionTypeSelectOption = type;
+      break;
+
+    case 'LOW_THRESHOLD':
+      conditionTypeSelectOption = type;
+      break;
+
+    case 'HIGH_THRESHOLD':
+      conditionTypeSelectOption = type;
+      break;
+
+    case 'TEXT_MATCH':
+      conditionTypeSelectOption = type;
+      break;
+
+    default:
+      conditionTypeSelectOption = null;
+  }
+  return conditionTypeSelectOption;
+};
 
 const EditTriggerView = () => {
   const { triggerId } = useParams<{triggerId: string, customerSlug: string }>();
@@ -114,23 +137,34 @@ const EditTriggerForm = ({ trigger }: {trigger: any}) => {
   const toast = useToast();
 
   const form = useForm<any>({
-    resolver: yupResolver(schema),
+    resolver: async (data) => {
+      const output = await yupResolver(schema)(data);
+      const hasError = output.errors;
+      if (Object.keys(hasError).length !== 0) {
+        console.log('Error:', output);
+      }
+      return output;
+    },
     defaultValues: {
       name: trigger.name,
-      condition: trigger.conditions[0].type,
+      condition: trigger.conditions?.[0]?.type,
       dialogue: {
-        label: trigger.relatedNode.questionDialogue.title,
-        value: trigger.relatedNode.questionDialogue.slug,
+        label: trigger.relatedDialogue?.title,
+        value: trigger.relatedDialogue?.slug,
       },
-      highThreshold: trigger.conditions[0].maxValue / 10,
-      lowThreshold: trigger.conditions[0].minValue / 10,
-      matchText: trigger.conditions[0].textValue,
+      conditions: trigger.conditions?.map((condition: any) => ({
+        id: condition.id,
+        questionId: { label: condition.question?.title, value: condition.question?.id },
+        conditionType: getConditionType(condition.type),
+        lowThreshold: condition?.minValue ? condition?.minValue / 10 : null,
+        highThreshold: condition?.maxValue ? condition.maxValue / 10 : null,
+        range: [condition?.minValue
+          ? condition?.minValue / 10
+          : null, condition?.maxValue ? condition.maxValue / 10 : null],
+        matchText: condition?.textValue || null,
+      })),
       medium: trigger.medium,
-      question: {
-        label: trigger.relatedNode.title,
-        value: trigger.relatedNode.id,
-      },
-      recipients: trigger.recipients.map((recipient: any) => ({ label: `${recipient?.lastName}, ${recipient?.firstName} - E: ${recipient?.email} - P: ${recipient?.phone}`,
+      recipients: trigger.recipients?.map((recipient: any) => ({ label: `${recipient?.lastName}, ${recipient?.firstName} - E: ${recipient?.email} - P: ${recipient?.phone}`,
         value: recipient?.id })),
       type: trigger.type,
     },
@@ -162,26 +196,35 @@ const EditTriggerForm = ({ trigger }: {trigger: any}) => {
     },
   });
 
+  const getThresholdValue = (conditionType: string, range: Array<number>, value: number, cb: Function) => {
+    if (conditionType === TriggerConditionType.INNER_RANGE || conditionType === TriggerConditionType.OUTER_RANGE) {
+      return range.length === 2 && cb ? cb(range) * 10 : null;
+    }
+    const result = value ? value * 10 : null;
+    return result;
+  };
+
   const onSubmit = (formData: FormDataProps) => {
-    const questionId = formData.question.value;
     const recipients = { ids: formData.recipients?.map((recip) => recip.value).filter((val) => val) };
+    const conditions = formData.conditions?.map((condition) => ({
+      id: parseInt(condition?.id),
+      questionId: condition.questionId.value,
+      type: condition.conditionType,
+      minValue: getThresholdValue(condition.conditionType, condition?.range, condition.lowThreshold, min),
+      maxValue: getThresholdValue(condition.conditionType, condition?.range, condition.highThreshold, max),
+      textValue: condition?.matchText || null,
+    })) || [];
 
     const trigger = {
       name: formData.name,
       type: formData?.type,
       medium: formData?.medium,
-      conditions: [{
-        type: formData.condition,
-        minValue: formData.lowThreshold * 10,
-        maxValue: formData.highThreshold * 10,
-        textValue: formData.matchText,
-      }],
+      conditions,
     };
 
     editTrigger({
       variables: {
         triggerId,
-        questionId,
         trigger,
         recipients,
       },

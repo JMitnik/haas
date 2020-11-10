@@ -1,0 +1,58 @@
+{
+  "version": "0.3.14-fixed",
+  "steps": [
+    {
+      "tag": "CreateField",
+      "model": "QuestionNode",
+      "field": "QuestionOfTrigger",
+      "type": "QuestionOfTrigger",
+      "arity": "List"
+    },
+    {
+      "tag": "CreateField",
+      "model": "TriggerCondition",
+      "field": "createdAt",
+      "type": "DateTime",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "TriggerCondition",
+          "field": "createdAt"
+        },
+        "directive": "default"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "TriggerCondition",
+          "field": "createdAt"
+        },
+        "directive": "default"
+      },
+      "argument": "",
+      "value": "now()"
+    },
+    {
+      "tag": "CreateField",
+      "model": "TriggerCondition",
+      "field": "QuestionOfTrigger",
+      "type": "QuestionOfTrigger",
+      "arity": "List"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Trigger",
+      "field": "QuestionOfTrigger",
+      "type": "QuestionOfTrigger",
+      "arity": "List"
+    }
+  ]
+}
