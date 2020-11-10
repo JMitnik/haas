@@ -117,10 +117,6 @@ input CustomerWhereUniqueInput {
 """Date custom scalar type"""
 scalar Date
 
-type Debug {
-  debugResolver: String
-}
-
 input DeleteDialogueInputType {
   customerSlug: String
   id: ID
@@ -306,7 +302,6 @@ type Mutation {
   createTrigger(input: CreateTriggerInputType): TriggerType!
   createUser(customerSlug: String, input: UserInput): UserType!
   createWorkspace(input: CreateWorkspaceInput): Customer!
-  debugMutation: String
   deleteCTA(input: DeleteNodeInputType): QuestionNode!
   deleteCustomer(where: CustomerWhereUniqueInput): Customer
   deleteDialogue(input: DeleteDialogueInputType): Dialogue!
@@ -387,6 +382,16 @@ input OptionsInputType {
 type PaginationPageInfo {
   nrPages: Int!
   pageIndex: Int!
+}
+
+"""Fields that can be used for free text search on tables"""
+enum PaginationSearchEnum {
+  email
+  firstName
+  lastName
+  name
+  publicTitle
+  title
 }
 
 """Ways to sort a pagination object"""

@@ -20,7 +20,9 @@ import { NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
 // eslint-disable-next-line import/no-cycle
 import { CustomerWithCustomerSettings } from '../customer/Customer';
 import { SessionWithEntries } from '../session/SessionTypes';
+import { constructSortInput, paginate } from '../../utils/table/pagination';
 import { mailService } from '../../services/mailings/MailService';
+
 import { smsService } from '../../services/sms/SmsService';
 import NodeEntryService, { NodeEntryWithTypes } from '../node-entry/NodeEntryService';
 import makeTriggerMailTemplate from '../../services/mailings/templates/makeTriggerMailTemplate';
@@ -50,42 +52,6 @@ class TriggerService {
     return searchTermFilter;
   };
 
-  static orderUsersBy = (
-    triggers: Array<Trigger>,
-    orderBy: { id: string, desc: boolean },
-  ) => {
-    if (orderBy.id === 'name') {
-      return _.orderBy(triggers, (trigger) => trigger.name, orderBy.desc ? 'desc' : 'asc');
-    } if (orderBy.id === 'medium') {
-      return _.orderBy(triggers, (trigger) => trigger.medium, orderBy.desc ? 'desc' : 'asc');
-    } if (orderBy.id === 'type') {
-      return _.orderBy(triggers, (trigger) => trigger.type, orderBy.desc ? 'desc' : 'asc');
-    }
-
-    return triggers;
-  };
-
-  static slice = (
-    entries: Array<any>,
-    offset: number,
-    limit: number,
-    pageIndex: number,
-  ) => ((offset + limit) < entries.length
-    ? entries.slice(offset, (pageIndex + 1) * limit)
-    : entries.slice(offset, entries.length));
-
-  static formatOrderBy(orderByArray?: NexusGenInputs['PaginationSortInput'][]): (TriggerOrderByInput|undefined) {
-    if (!orderByArray?.length) return undefined;
-
-    const orderBy = orderByArray[0];
-
-    return {
-      medium: orderBy.by === 'medium' ? orderBy.desc ? 'desc' : 'asc' : undefined,
-      type: orderBy.by === 'type' ? orderBy.desc ? 'desc' : 'asc' : undefined,
-      name: orderBy.by === 'name' ? orderBy.desc ? 'desc' : 'asc' : undefined,
-    };
-  }
-
   static paginatedTriggers = async (
     customerSlug: string,
     paginationOpts: NexusGenInputs['PaginationWhereInput'],
@@ -93,15 +59,17 @@ class TriggerService {
     // Build filter
     const triggerWhereInput: TriggerWhereInput = { customer: { slug: customerSlug } };
 
-    const searchTermFilter = TriggerService.getSearchTermFilter(paginationOpts.search || '');
-    triggerWhereInput.OR = searchTermFilter.length ? searchTermFilter : undefined;
+    // const searchTermFilter = TriggerService.getSearchTermFilter(paginationOpts.search || '');
+    // triggerWhereInput.OR = searchTermFilter.length ? searchTermFilter : undefined;
 
-    const triggers = await prisma.trigger.findMany({
-      where: triggerWhereInput,
-      take: paginationOpts.limit || undefined,
-      skip: paginationOpts.offset || undefined,
-      orderBy: TriggerService.formatOrderBy(paginationOpts.orderBy || undefined),
-    });
+    // const triggers = await prisma.trigger.findMany({
+    //   where: triggerWhereInput,
+    //   take: paginationOpts.limit || undefined,
+    //   skip: paginationOpts.offset || undefined,
+    //   orderBy: constructSortInput(['medium', 'type', 'name'], paginationOpts.orderBy || undefined),
+    // });
+
+    const triggers: Trigger[] = await paginate(prisma.trigger.findMany, triggerWhereInput, ['name'], paginationOpts, ['medium', 'type', 'name']);
 
     const triggerTotal = await prisma.trigger.count({ where: { customer: { slug: customerSlug } } });
     const totalPages = paginationOpts.limit ? Math.ceil(triggerTotal / (paginationOpts.limit)) : 1;

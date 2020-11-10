@@ -5,6 +5,7 @@ import { NexusGenInputs } from '../../generated/nexus';
 import { Nullable } from '../../types/generic';
 
 import { mailService } from '../../services/mailings/MailService';
+import { slice } from '../../utils/table/pagination';
 import AuthService from '../auth/AuthService';
 import makeInviteTemplate from '../../services/mailings/templates/makeInviteTemplate';
 import prisma from '../../config/prisma';
@@ -213,7 +214,7 @@ class UserService {
     }
 
     // Slice ordered filtered users
-    const slicedOrderedUsers = UserService.sliceUsers(usersOfCustomer, (offset || 0), (limit || 0), (pageIndex || 0));
+    const slicedOrderedUsers = slice(usersOfCustomer, (offset || 0), (limit || 0), (pageIndex || 0));
 
     return {
       userCustomers: slicedOrderedUsers,
