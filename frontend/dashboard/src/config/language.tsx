@@ -1,6 +1,14 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    recipient: {
+      en: 'Recipient',
+      de: 'Empfänger',
+    },
+    condition: {
+      en: 'Condition',
+      de: 'Bedingung',
+    },
     data: {
       en: 'Data',
       de: 'Data',
@@ -77,8 +85,8 @@ const language = {
       en: 'Try again in a second while we take care of the proble.',
       de: 'Versuchen Sie es gleich erneut. Wir kümmern uns um das Problem.',
     },
-    add_user: {
-      en: 'Add user',
+    add_recipient: {
+      en: 'Add recipient',
       de: 'Nutzer hinzufügen',
     },
     tags: {
@@ -1099,6 +1107,22 @@ const language = {
     },
   },
   trigger: {
+    condition_placeholder: {
+      en: 'Start by adding a condition.',
+      de: 'Beginnen Sie mit einer Bedingung hinzugefügt wird.',
+    },
+    sms_placeholder: {
+      en: 'Select one or more recipients to receive the alert notifications.',
+      de: 'Wählen Sie einen oder mehrere Empfänger aus, um die Warnmeldungen zu erhalten.',
+    },
+    select_a_dialogue: {
+      en: 'Select a dialogue',
+      de: 'Wählen Sie einen Dialog',
+    },
+    select_dialogue_placeholder: {
+      en: 'Before we can setup conditions, you should select a dialogue first.',
+      de: 'Bevor wir können Setup Bedingungen, sollten Sie einen Dialog zuerst auswählen.',
+    },
     alert_email: {
       en: 'Send alerts to emai',
       de: 'Senden per E-Mail',
