@@ -46,7 +46,7 @@ const LoginView = () => {
     },
     onCompleted: () => {
       toast({
-        title: 'Invite has been sent!',
+        title: 'Invite has been sent in case the mail matches!',
         description: 'Check your email for your invitation',
         status: 'success',
         position: 'bottom-right',
