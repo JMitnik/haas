@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { TriggerInputType, RecipientsInputType, TriggerMediumEnum, TriggerTypeEnum } from "./../../types/globalTypes";
+import { CreateTriggerInputType, TriggerMediumEnum, TriggerTypeEnum } from "./../../types/globalTypes";
 
 // ====================================================
 // GraphQL mutation operation: createTrigger
@@ -41,8 +41,5 @@ export interface createTrigger {
 }
 
 export interface createTriggerVariables {
-  customerSlug: string;
-  questionId?: string | null;
-  trigger?: TriggerInputType | null;
-  recipients?: RecipientsInputType | null;
+  input?: CreateTriggerInputType | null;
 }

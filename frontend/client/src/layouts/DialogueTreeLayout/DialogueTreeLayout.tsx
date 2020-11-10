@@ -1,5 +1,6 @@
 import { ChevronLeft } from 'react-feather';
 import { Container } from '@haas/ui';
+import { Helmet } from 'react-helmet';
 import { Variants } from 'framer-motion';
 import { useHistory } from 'react-router-dom';
 import React, { ReactNode } from 'react';
@@ -44,6 +45,17 @@ const DialogueTreeLayout = ({ children, node }: { children: ReactNode, node:Tree
       <Container mt={4}>
         {children}
       </Container>
+
+      {!!store.customer && (
+        <Helmet>
+          <title>
+            haas -
+            {' '}
+            {store?.tree?.title || ''}
+          </title>
+          <meta name="description" content={store.tree?.title} />
+        </Helmet>
+      )}
 
       {!!store.customer && <WatermarkLogo logoUrl={store.customer?.settings?.logoUrl} />}
     </DialogueTreeContainer>

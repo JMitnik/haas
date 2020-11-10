@@ -1,6 +1,18 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    recipient: {
+      en: 'Recipient',
+      de: 'Empfänger',
+    },
+    condition: {
+      en: 'Condition',
+      de: 'Bedingung',
+    },
+    data: {
+      en: 'Data',
+      de: 'Data',
+    },
     edit_trigger: {
       en: 'Edit alert',
       de: 'Alert bearbeiten',
@@ -73,8 +85,8 @@ const language = {
       en: 'Try again in a second while we take care of the proble.',
       de: 'Versuchen Sie es gleich erneut. Wir kümmern uns um das Problem.',
     },
-    add_user: {
-      en: 'Add user',
+    add_recipient: {
+      en: 'Add recipient',
       de: 'Nutzer hinzufügen',
     },
     tags: {
@@ -513,6 +525,30 @@ const language = {
     },
   },
   customer: {
+    fake_data: {
+      en: 'Placeholder data',
+      de: 'Platzhalter-Daten',
+    },
+    fake_data_helper: {
+      en: 'Start with placeholder data',
+      de: 'Beginnen Sie mit Platzhalter-Daten',
+    },
+    use_fake_data: {
+      en: 'Generate data',
+      de: 'Erzeugen Daten',
+    },
+    use_fake_data_helper: {
+      en: 'Fake data will be generated for your templated dialogue',
+      de: 'Gefälschte Daten werden für Ihren Templat-Dialog erzeugt werden',
+    },
+    no_use_fake_data: {
+      en: 'Start with no data',
+      de: 'Starten Sie ohne Daten',
+    },
+    no_use_fake_data_helper: {
+      en: 'No data will be generated, for a complete fresh slate.',
+      de: 'Es werden keine Daten erzeugt, für einen vollständigen frischen Schiefer.',
+    },
     logo_helper: {
       en: 'Choose between uploading your logo or inserting an existing URL.',
       de: 'Verweise mit einer URL auf deine Logo oder lade es selbst hoch.',
@@ -647,6 +683,30 @@ const language = {
     },
   },
   dialogue: {
+    data_helper: {
+      en: 'Your data settings, such as data-sources, will be set here.',
+      de: 'Ihre Dateneinstellungen, wie z. B. Datenquellen, werden hier festgelegt',
+    },
+    hide_fake_data: {
+      en: 'Hide placeholder data',
+      de: 'Ausblenden Platzhalter-Daten',
+    },
+    hide_fake_data_helper: {
+      en: 'Decide whether to use placeholder data in your analytics',
+      de: 'Entscheiden Sie, ob Platzhalterdaten in Ihrer Analyse verwendet werden sollen',
+    },
+    do_hide_fake_data_helper: {
+      en: 'Don\'t include placeholder data in the analytics.',
+      de: 'Platzhalterdaten nicht in die Analyse einbeziehen.',
+    },
+    no_hide_fake_data: {
+      en: 'Show placeholder data.',
+      de: 'Platzhalterdaten anzeigen.',
+    },
+    no_hide_fake_data_helper: {
+      en: 'Show placeholder data in the analytics.',
+      de: 'Platzhalterdaten in der Analyse anzeigen',
+    },
     tag_helper: {
       en: 'Would you like to assign tags for your dialogue?',
       de: 'Möchtest du deinen Dialog mit einem "Tag" verbinden?',
@@ -1047,6 +1107,22 @@ const language = {
     },
   },
   trigger: {
+    condition_placeholder: {
+      en: 'Start by adding a condition.',
+      de: 'Beginnen Sie mit einer Bedingung hinzugefügt wird.',
+    },
+    sms_placeholder: {
+      en: 'Select one or more recipients to receive the alert notifications.',
+      de: 'Wählen Sie einen oder mehrere Empfänger aus, um die Warnmeldungen zu erhalten.',
+    },
+    select_a_dialogue: {
+      en: 'Select a dialogue',
+      de: 'Wählen Sie einen Dialog',
+    },
+    select_dialogue_placeholder: {
+      en: 'Before we can setup conditions, you should select a dialogue first.',
+      de: 'Bevor wir können Setup Bedingungen, sollten Sie einen Dialog zuerst auswählen.',
+    },
     alert_email: {
       en: 'Send alerts to emai',
       de: 'Senden per E-Mail',
@@ -1082,6 +1158,10 @@ const language = {
     about_trigger_helper: {
       en: 'Tell us about the alert, and to which question or dialogue it applies.',
       de: 'Beschreibe die Push-Benachrichtigung und für welche Frage oder welchen Dialog Sie gilt.',
+    },
+    add_condition: {
+      en: 'Add condition',
+      de: 'Bedingung hinzufügen',
     },
     conditions: {
       en: 'Conditions',
@@ -1130,6 +1210,22 @@ const language = {
     high_threshold_helper: {
       en: 'Set a high threshold: if a score above is recorded, an alert will be sent',
       de: 'Festlegen eines oberen Schwellenwerts: Eine Aufzeichung über diesem Wert löst eine Push-Benachrichtigung aus.',
+    },
+    outer_range: {
+      en: 'Outer range',
+      de: 'äußerer Bereich',
+    },
+    outer_range_helper: {
+      en: 'Set an outer range threshold: if a score outside the range is recorded, an alert will be sent',
+      de: 'Festlegen eines Schwellenwerts für den äußeren Bereich: Wenn eine Punktzahl außerhalb des Bereichs aufgezeichnet wird, wird eine Warnung gesendet',
+    },
+    inner_range: {
+      en: 'Inner range',
+      de: 'Innerer Bereich',
+    },
+    inner_range_helper: {
+      en: 'Set an inner range threshold: if a score within the range is recorded, an alert will be sent',
+      de: 'Festlegen eines Schwellenwerts für den inneren Bereich: Wenn eine Punktzahl innerhalb des Bereichs aufgezeichnet wird, wird eine Warnung gesendet',
     },
     delivery_helper: {
       en: 'Shall this alert be deliver via email or text message?',

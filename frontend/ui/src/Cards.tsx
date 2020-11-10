@@ -1,21 +1,29 @@
 import styled, { css } from 'styled-components/macro';
 import { Div } from './Generics';
 import { Flex } from './Container';
+import { Span } from './Span';
+
 
 interface CardProps {
   noHover?: boolean;
+  outline?: boolean;
 }
 
 export const Card = styled(Div)<CardProps>`
-  ${({ theme, noHover }) => css`
+  ${({ theme, noHover, outline }) => css`
     position: relative;
     box-shadow: 0 1px 2px 0 rgba(0,0,0,.05);
     display: flex;
     flex-direction: column;
     border-radius: ${theme.borderRadiuses.somewhatRounded};
-    cursor: pointer;
+
+    ${!!outline && css`
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px;
+    `}
 
     ${!noHover && css`
+      cursor: pointer;
+
       &:hover {
         transition: all .3s cubic-bezier(.55,0,.1,1);
         box-shadow: 0 4px 6px -1px rgba(0,0,0,.1),0 2px 4px -1px rgba(0,0,0,.06)!important;
@@ -71,6 +79,22 @@ export const CardFooter = styled(Div)`
     padding: 8px ${theme.gutter * 0.75}px;
     border-radius: 0 0 ${theme.borderRadiuses.md} ${theme.borderRadiuses.md};
     color: ${theme.colors.default.text};
+  `}
+`;
+
+export const CardScore = styled(Span)`
+  ${({ theme }) => css`
+    text-align: center;
+    font-weight: 800;
+    padding: 4px 8px;
+    margin-bottom: 12px;
+    font-size: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid ${theme.colors.gray['400']};
+    color: ${theme.colors.gray['400']};
+    border-radius: 30px;
   `}
 `;
 

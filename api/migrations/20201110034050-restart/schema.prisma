@@ -6,7 +6,7 @@ datasource postgresql {
 // binaryTargets = ["debian-openssl-1.1.x"]
 generator client {
   provider        = "prisma-client-js"
-  previewFeatures = ["middlewares", "transactionApi"]
+  previewFeatures = ["transactionApi"]
   output          = "./node_modules/@prisma/client"
 }
 
@@ -14,7 +14,7 @@ model ColourSettings {
   dark             String?
   darkest          String?
   error            String?
-  id               Int               @default(autoincrement()) @id
+  id               Int               @id @default(autoincrement())
   light            String?
   lightest         String?
   muted            String?
@@ -32,14 +32,14 @@ model ColourSettings {
 model FontSettings {
   body             String?
   fontTitle        String?
-  id               Int               @default(autoincrement()) @id
+  id               Int               @id @default(autoincrement())
   settingTitle     String?
   special          String?
   customerSettings CustomerSettings?
 }
 
 model CustomerSettings {
-  id               Int             @default(autoincrement()) @id
+  id               Int             @id @default(autoincrement())
   logoUrl          String?
   colourSettingsId Int?
   colourSettings   ColourSettings? @relation(fields: [colourSettingsId], references: [id])
@@ -50,7 +50,7 @@ model CustomerSettings {
 }
 
 model Customer {
-  id          String            @default(cuid()) @id
+  id          String            @id @default(cuid())
   slug        String            @unique
   name        String
   settings    CustomerSettings?
@@ -69,7 +69,7 @@ enum TagEnum {
 }
 
 model Tag {
-  id         String     @default(cuid()) @id
+  id         String     @id @default(cuid())
   type       TagEnum    @default(value: DEFAULT)
   name       String
   isTagOf    Dialogue[] @relation(references: [id])
@@ -78,20 +78,23 @@ model Tag {
 }
 
 model Dialogue {
-  id           String         @default(cuid()) @id
-  title        String
-  slug         String
-  description  String
-  creationDate DateTime       @default(now())
-  updatedAt    DateTime?      @updatedAt
-  publicTitle  String?
-  customerId   String
-  customer     Customer       @relation(fields: [customerId], references: [id])
-  edges        Edge[]
-  questions    QuestionNode[]
-  sessions     Session[]
-  tags         Tag[]
-  isOnline     Boolean        @default(value: false)
+  id               String         @id @default(cuid())
+  title            String
+  slug             String
+  description      String
+  creationDate     DateTime       @default(now())
+  updatedAt        DateTime?      @updatedAt
+  publicTitle      String?
+  customerId       String
+  customer         Customer       @relation(fields: [customerId], references: [id])
+  edges            Edge[]
+  questions        QuestionNode[]
+  sessions         Session[]
+  tags             Tag[]
+  isOnline         Boolean        @default(value: false)
+  isWithoutGenData Boolean        @default(value: false)
+
+  wasGeneratedWithGenData Boolean @default(value: false)
   @@unique([slug, customerId])
 }
 
@@ -106,7 +109,7 @@ enum NodeType {
 }
 
 model QuestionNode {
-  id           String           @default(cuid()) @id
+  id           String           @id @default(cuid())
   creationDate DateTime         @default(now())
   updatedAt    DateTime         @updatedAt
   isLeaf       Boolean          @default(false)
@@ -135,7 +138,8 @@ model QuestionNode {
 
   share Share?
 
-  links Link[]
+  links             Link[]
+  QuestionOfTrigger QuestionOfTrigger[]
 }
 
 enum LinkTypeEnum {
@@ -149,7 +153,7 @@ enum LinkTypeEnum {
 }
 
 model Share {
-  id        String   @default(cuid()) @id
+  id        String    @id @default(cuid())
   createdAt DateTime? @default(now())
   updatedAt DateTime? @updatedAt
 
@@ -162,7 +166,7 @@ model Share {
 }
 
 model Link {
-  id              String        @default(cuid()) @id
+  id              String        @id @default(cuid())
   createdAt       DateTime      @default(now())
   updatedAt       DateTime?     @updatedAt
   title           String?
@@ -178,7 +182,7 @@ model Edge {
   childNodeId                String
   createdAt                  DateTime            @default(now())
   updatedAt                  DateTime            @updatedAt
-  id                         String              @default(cuid()) @id
+  id                         String              @id @default(cuid())
   parentNodeId               String
   dialogueId                 String?
   conditions                 QuestionCondition[]
@@ -193,7 +197,7 @@ model Edge {
 
 model QuestionCondition {
   conditionType String
-  id            Int     @default(autoincrement()) @id
+  id            Int     @id @default(autoincrement())
   matchValue    String?
   renderMax     Int?
   renderMin     Int?
@@ -202,7 +206,7 @@ model QuestionCondition {
 }
 
 model QuestionOption {
-  id             Int           @default(autoincrement()) @id
+  id             Int           @id @default(autoincrement())
   publicValue    String?
   value          String
   questionId     String?
@@ -213,16 +217,20 @@ model QuestionOption {
 
 model Session {
   createdAt   DateTime    @default(now())
-  id          String      @default(cuid()) @id
+  id          String      @id @default(cuid())
   dialogueId  String
   dialogue    Dialogue    @relation(fields: [dialogueId], references: [id])
   nodeEntries NodeEntry[]
 }
 
 // Node-entry types
+enum InputSource {
+  CLIENT
+  INIT_GENERATED
+}
 
 model NodeEntry {
-  id            String        @default(cuid()) @id
+  id            String        @id @default(cuid())
   creationDate  DateTime      @default(now())
   depth         Int?
   relatedEdgeId String?
@@ -231,6 +239,7 @@ model NodeEntry {
   session       Session?      @relation(fields: [sessionId], references: [id])
   relatedNode   QuestionNode? @relation(fields: [relatedNodeId], references: [id])
   relatedEdge   Edge?         @relation(fields: [relatedEdgeId], references: [id])
+  inputSource   InputSource   @default(value: CLIENT)
 
   // Entry types
   sliderNodeEntry       SliderNodeEntry?
@@ -241,35 +250,35 @@ model NodeEntry {
 }
 
 model LinkNodeEntry {
-  id          Int       @default(autoincrement()) @id
+  id          Int       @id @default(autoincrement())
   value       Json?
   nodeEntryId String
   nodeEntry   NodeEntry @relation(references: [id], fields: [nodeEntryId])
 }
 
 model SliderNodeEntry {
-  id          Int       @default(autoincrement()) @id
+  id          Int       @id @default(autoincrement())
   value       Int?
   nodeEntryId String
   nodeEntry   NodeEntry @relation(references: [id], fields: [nodeEntryId])
 }
 
 model ChoiceNodeEntry {
-  id          Int       @default(autoincrement()) @id
+  id          Int       @id @default(autoincrement())
   value       String?
   nodeEntryId String
   nodeEntry   NodeEntry @relation(references: [id], fields: [nodeEntryId])
 }
 
 model TextboxNodeEntry {
-  id          Int       @default(autoincrement()) @id
+  id          Int       @id @default(autoincrement())
   value       String?
   nodeEntryId String
   nodeEntry   NodeEntry @relation(references: [id], fields: [nodeEntryId])
 }
 
 model RegistrationNodeEntry {
-  id          Int       @default(autoincrement()) @id
+  id          Int       @id @default(autoincrement())
   value       Json?
   nodeEntryId String
   nodeEntry   NodeEntry @relation(references: [id], fields: [nodeEntryId])
@@ -277,7 +286,7 @@ model RegistrationNodeEntry {
 
 // Permissions
 model Permission {
-  id          String    @default(cuid()) @id
+  id          String    @id @default(cuid())
   name        String
   description String?
   Customer    Customer? @relation(fields: [customerId], references: [id])
@@ -310,19 +319,20 @@ enum RoleTypeEnum {
 }
 
 model Role {
-  id          String                 @default(cuid()) @id
+  id          String                 @id @default(cuid())
   name        String
   type        RoleTypeEnum           @default(value: USER)
   isPrivate   Boolean                @default(false)
   permissions SystemPermissionEnum[]
   users       UserOfCustomer[]
+  Customer    Customer?              @relation(fields: [customerId], references: [id])
+  customerId  String?
+
   @@unique([id, name])
-  Customer   Customer? @relation(fields: [customerId], references: [id])
-  customerId String?
 }
 
 model User {
-  id                 String                 @default(cuid()) @id
+  id                 String                 @id @default(cuid())
   createdAt          DateTime               @default(now())
   updatedAt          DateTime?              @updatedAt
   email              String                 @unique
@@ -375,25 +385,43 @@ enum TriggerConditionEnum {
 }
 
 model TriggerCondition {
-  id        Int                  @default(autoincrement()) @id
-  type      TriggerConditionEnum @default(value: LOW_THRESHOLD)
-  minValue  Int?
-  maxValue  Int?
-  textValue String?
-  trigger   Trigger              @relation(fields: [triggerId], references: [id])
-  triggerId String
+  id                Int                  @id @default(autoincrement())
+  createdAt         DateTime?             @default(now())
+  type              TriggerConditionEnum @default(value: LOW_THRESHOLD)
+  minValue          Int?
+  maxValue          Int?
+  textValue         String?
+  trigger           Trigger              @relation(fields: [triggerId], references: [id])
+  triggerId         String
+  QuestionOfTrigger QuestionOfTrigger[]
 }
 
 model Trigger {
-  id            String             @default(cuid()) @id
-  lastSent      DateTime?
-  name          String
-  type          TriggerEnum        @default(value: QUESTION)
-  medium        TriggerMedium
-  conditions    TriggerCondition[]
-  relatedNodeId String?
-  relatedNode   QuestionNode?      @relation(fields: [relatedNodeId], references: [id])
-  recipients    User[]
-  customer      Customer?          @relation(fields: [customerId], references: [id])
-  customerId    String?
+  id                String              @id @default(cuid())
+  lastSent          DateTime?
+  name              String
+  type              TriggerEnum         @default(value: QUESTION)
+  medium            TriggerMedium
+  conditions        TriggerCondition[]
+  relatedNodeId     String?
+  relatedNode       QuestionNode?       @relation(fields: [relatedNodeId], references: [id])
+  recipients        User[]
+  customer          Customer?           @relation(fields: [customerId], references: [id])
+  customerId        String?
+  QuestionOfTrigger QuestionOfTrigger[]
+}
+
+model QuestionOfTrigger {
+  questionId String
+  question   QuestionNode @relation(fields: [questionId], references: [id])
+
+  triggerId String
+  trigger   Trigger @relation(fields: [triggerId], references: [id])
+
+  triggerConditionId Int
+  triggerCondition   TriggerCondition @relation(fields: [triggerConditionId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@id([questionId, triggerId])
 }

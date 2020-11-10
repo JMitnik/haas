@@ -1,26 +1,29 @@
 import { subDays } from 'date-fns';
-import _ from 'lodash';
+import _, { cloneDeep } from 'lodash';
 import cuid from 'cuid';
 
 import { ApolloError, UserInputError } from 'apollo-server-express';
 import { Dialogue, DialogueCreateInput, DialogueUpdateInput,
+  NodeType,
   QuestionOptionCreateManyWithoutQuestionNodeInput, Tag, TagWhereUniqueInput } from '@prisma/client';
 import { isPresent } from 'ts-is-present';
-import { leafNodes, sliderType } from '../../data/seeds/default-data';
 import NodeService from '../question/NodeService';
 import filterDate from '../../utils/filterDate';
 // eslint-disable-next-line import/no-cycle
-import { NexusGenFieldTypes, NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
+import { NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
 // eslint-disable-next-line import/no-cycle
 import { HistoryDataProps, HistoryDataWithEntry, IdMapProps,
   PathFrequency, QuestionProps, StatisticsProps } from './DialogueTypes';
 // eslint-disable-next-line import/no-cycle
 import NodeEntryService, { NodeEntryWithTypes } from '../node-entry/NodeEntryService';
 // eslint-disable-next-line import/no-cycle
-import { Nullable, PaginationProps } from '../../types/generic';
 import SessionService from '../session/SessionService';
+import defaultWorkspaceTemplate, { WorkspaceTemplate } from '../templates/defaultWorkspaceTemplate';
 import prisma from '../../config/prisma';
 
+function getRandomInt(max: number) {
+  return Math.floor(Math.random() * Math.floor(max));
+}
 class DialogueService {
   static constructDialogue(
     customerId: string,
@@ -92,7 +95,8 @@ class DialogueService {
   };
 
   static editDialogue = async (args: any) => {
-    const { customerSlug, dialogueSlug, title, description, publicTitle, tags } = args;
+    const { customerSlug, dialogueSlug, title, description, publicTitle, tags, isWithoutGenData } = args;
+
     const customer = await prisma.customer.findOne({
       where: {
         slug: customerSlug,
@@ -110,7 +114,7 @@ class DialogueService {
     });
     const dbDialogue = customer?.dialogues[0];
 
-    let updateDialogueArgs: DialogueUpdateInput = { title, description, publicTitle };
+    let updateDialogueArgs: DialogueUpdateInput = { title, description, publicTitle, isWithoutGenData };
     if (dbDialogue?.tags) {
       updateDialogueArgs = DialogueService.updateTags(dbDialogue.tags, tags.entries, updateDialogueArgs);
     }
@@ -176,19 +180,97 @@ class DialogueService {
     return values;
   };
 
+  static generateFakeData = async (dialogueId: string, template: WorkspaceTemplate) => {
+    const currentDate = new Date();
+    const nrDaysBack = Array.from(Array(30)).map((empty, index) => index + 1);
+    const datesBackInTime = nrDaysBack.map((amtDaysBack) => subDays(currentDate, amtDaysBack));
+
+    const dialogueWithNodes = await prisma.dialogue.findOne({
+      where: { id: dialogueId },
+      include: {
+        questions: true,
+        edges: {
+          include: {
+            conditions: true,
+            childNode: true,
+          },
+        },
+      },
+    });
+
+    await prisma.dialogue.update({
+      where: { id: dialogueId },
+      data: { wasGeneratedWithGenData: true },
+    });
+
+    const rootNode = dialogueWithNodes?.questions.find((node) => node.isRoot);
+    const edgesOfRootNode = dialogueWithNodes?.edges.filter((edge) => edge.parentNodeId === rootNode?.id);
+
+    // Stop if no rootnode
+    if (!rootNode) return;
+
+    // For every particular date, generate a fake score
+    await Promise.all(datesBackInTime.map(async (backDate) => {
+      const simulatedRootVote: number = getRandomInt(100);
+
+      const simulatedChoice = template.topics[Math.floor(Math.random() * template.topics.length)];
+      const simulatedChoiceEdge = edgesOfRootNode?.find((edge) => edge.conditions.every((condition) => {
+        if ((!condition.renderMin && !(condition.renderMin === 0)) || !condition.renderMax) return false;
+        const isValid = condition?.renderMin < simulatedRootVote && condition?.renderMax > simulatedRootVote;
+
+        return isValid;
+      }));
+
+      const simulatedChoiceNodeId = simulatedChoiceEdge?.childNode.id;
+
+      if (!simulatedChoiceNodeId) return;
+
+      await prisma.session.create({
+        data: {
+          nodeEntries: {
+            create: [{
+              depth: 0,
+              creationDate: backDate,
+              relatedNode: {
+                connect: { id: rootNode.id },
+              },
+              sliderNodeEntry: {
+                create: { value: simulatedRootVote },
+              },
+              inputSource: 'INIT_GENERATED',
+            },
+            {
+              depth: 1,
+              creationDate: backDate,
+              relatedNode: { connect: { id: simulatedChoiceNodeId } },
+              relatedEdge: { connect: { id: simulatedChoiceEdge?.id } },
+              choiceNodeEntry: {
+                create: { value: simulatedChoice },
+              },
+            },
+            ],
+          },
+          dialogue: {
+            connect: { id: dialogueId },
+          },
+        },
+      });
+    }));
+  };
+
   static getStatistics = async (dialogueId: string, startDate?: Date | null, endDate?: Date | null): Promise<StatisticsProps> => {
     const sessions = await SessionService.fetchSessionsByDialogue(dialogueId, { startDate, endDate });
 
     if (!sessions) { throw new Error('No sessions present'); }
 
-    const scoreEntries = SessionService.getScoringEntriesFromSessions(sessions) || [];
-
+    const scoreEntries = SessionService.getScoringEntriesFromSessions(sessions).filter(isPresent) || [];
     // Then dresses it up as X/Y data for the lineChart
     const history: HistoryDataProps[] = scoreEntries?.map((entry) => ({
       x: entry?.creationDate.toUTCString() || null,
       y: entry?.sliderNodeEntry?.value || null,
       entryId: entry?.id || null,
-    })) || [];
+    })).filter(isPresent) || [];
+    const historyCloned = [...history];
 
     const nodeEntryTextValues = SessionService.getTextEntriesFromSessions(sessions).filter(isPresent);
 
@@ -206,7 +288,9 @@ class DialogueService {
       ...topPositivePath.map((pathItem) => ({ ...pathItem, basicSentiment: 'positive' })),
     ], ((item) => item.quantity || null)) || null;
 
-    return { history, topNegativePath, topPositivePath, mostPopularPath };
+    return {
+      history, topNegativePath, topPositivePath, mostPopularPath, nrInteractions: historyCloned.length || 0,
+    };
   };
 
   static deleteDialogue = async (dialogueId: string) => {
@@ -647,14 +731,15 @@ class DialogueService {
         questions: {
           create: {
             title: `What do you think about ${customer?.name} ?`,
-            type: sliderType,
+            type: NodeType.SLIDER,
             isRoot: true,
           },
         },
       },
     });
 
-    await NodeService.createTemplateLeafNodes(leafNodes, dialogue.id);
+    // TODO: Make this dependent on input "template"
+    await NodeService.createTemplateLeafNodes(defaultWorkspaceTemplate.leafNodes, dialogue.id);
 
     return dialogue;
   };
@@ -673,9 +758,10 @@ class DialogueService {
 
     if (!dialogue) throw new Error('Dialogue not seeded');
 
-    const leafs = await NodeService.createTemplateLeafNodes(leafNodes, dialogue.id);
-
+    // TODO: Make this dependent on input "template"
+    const leafs = await NodeService.createTemplateLeafNodes(defaultWorkspaceTemplate.leafNodes, dialogue.id);
     await NodeService.createTemplateNodes(dialogue.id, customerName, leafs);
+
     return dialogue;
   };
 
@@ -738,23 +824,6 @@ class DialogueService {
     const scores = _.mean((scoringEntries).map((entry) => entry?.sliderNodeEntry?.value)) || 0;
 
     return scores;
-  };
-
-  static countInteractions = async (dialogueId: string, startDate?: Date | null, endDate?: Date | null) => {
-    const dialogue = await prisma.dialogue.findOne({
-      where: { id: dialogueId },
-      include: {
-        sessions: {
-          where: {
-            AND: [
-              ...filterDate(startDate, endDate),
-            ],
-          },
-        },
-      },
-    });
-
-    return dialogue?.sessions.length;
   };
 
   static getDialogueInteractionFeedItems = async (

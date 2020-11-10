@@ -63,6 +63,22 @@ input CreateQuestionNodeInputType {
   type: String
 }
 
+input CreateTriggerInputType {
+  customerSlug: String
+  recipients: RecipientsInputType
+  trigger: TriggerInputType
+}
+
+"""Creates a workspace"""
+input CreateWorkspaceInput {
+  isSeed: Boolean = false
+  logo: String
+  name: String!
+  primaryColour: String!
+  slug: String!
+  willGenerateFakeData: Boolean = false
+}
+
 input CTALinkInputObjectType {
   backgroundColor: String
   iconUrl: String
@@ -93,20 +109,6 @@ type Customer {
   userCustomer(userId: String): UserCustomer
   users: [UserType!]
   usersConnection(customerSlug: String, filter: PaginationWhereInput): UserConnection
-}
-
-input CustomerCreateOptions {
-  isSeed: Boolean = false
-  logo: String
-  primaryColour: String!
-  slug: String!
-}
-
-input CustomerEditOptions {
-  logo: String
-  name: String!
-  primaryColour: String!
-  slug: String!
 }
 
 type CustomerSettings {
@@ -150,15 +152,13 @@ type DeleteUserOutput {
 
 type Dialogue {
   averageScore(input: DialogueFilterInputType): Float!
-
-  """Count number of interactions between start-date and end-date"""
-  countInteractions(input: DialogueFilterInputType): Int!
   creationDate: String
   customer: Customer
   customerId: String!
   description: String!
   edges: [Edge!]!
   id: ID!
+  isWithoutGenData: Boolean!
   leafs(searchTerm: String): [QuestionNode!]!
   publicTitle: String
   questions: [QuestionNode!]!
@@ -170,6 +170,7 @@ type Dialogue {
   tags: [Tag!]
   title: String!
   updatedAt: String
+  wasGeneratedWithGenData: Boolean!
 }
 
 input DialogueFilterInputType {
@@ -181,6 +182,7 @@ input DialogueFilterInputType {
 type DialogueStatistics {
   history: [lineChartDataType!]
   mostPopularPath: topPathType
+  nrInteractions: Int!
   topNegativePath: [topPathType!]
   topPositivePath: [topPathType!]
 }
@@ -225,6 +227,15 @@ input EditUserInput {
   lastName: String
   phone: String
   roleId: String
+}
+
+"""Edit a workspace"""
+input EditWorkspaceInput {
+  id: ID!
+  logo: String
+  name: String!
+  primaryColour: String!
+  slug: String!
 }
 
 type FontSettings {
@@ -295,15 +306,15 @@ type Mutation {
 
   """Create Call to Actions"""
   createCTA(input: CreateCTAInputType): QuestionNode!
-  createCustomer(name: String, options: CustomerCreateOptions): Customer!
   createDialogue(input: CreateDialogueInputType): Dialogue!
   createPermission(data: PermissionInput): PermssionType
   createQuestion(input: CreateQuestionNodeInputType): QuestionNode
   createRole(data: RoleInput): RoleType!
   createSession(input: SessionInput): Session!
   createTag(customerSlug: String, name: String, type: TagTypeEnum): Tag!
-  createTrigger(customerSlug: String, questionId: String, recipients: RecipientsInputType, trigger: TriggerInputType): TriggerType!
+  createTrigger(input: CreateTriggerInputType): TriggerType!
   createUser(customerSlug: String, input: UserInput): UserType!
+  createWorkspace(input: CreateWorkspaceInput): Customer!
   debugMutation: String
   deleteCTA(input: DeleteNodeInputType): QuestionNode!
   deleteCustomer(where: CustomerWhereUniqueInput): Customer
@@ -312,10 +323,10 @@ type Mutation {
   deleteTag(tagId: String): Tag!
   deleteTrigger(id: String): TriggerType
   deleteUser(input: DeleteUserInput): DeleteUserOutput!
-  editCustomer(id: String, options: CustomerEditOptions): Customer!
-  editDialogue(customerSlug: String, description: String, dialogueSlug: String, publicTitle: String, tags: TagsInputObjectType, title: String): Dialogue!
-  editTrigger(questionId: String, recipients: RecipientsInputType, trigger: TriggerInputType, triggerId: String): TriggerType!
+  editDialogue(customerSlug: String, description: String, dialogueSlug: String, isWithoutGenData: Boolean, publicTitle: String, tags: TagsInputObjectType, title: String): Dialogue!
+  editTrigger(recipients: RecipientsInputType, trigger: TriggerInputType, triggerId: String): TriggerType!
   editUser(input: EditUserInput, userId: String): UserType!
+  editWorkspace(input: EditWorkspaceInput): Customer!
 
   """Invite a user to a particular customer domain, given an email and role"""
   inviteUser(input: InviteUserInput): InviteUserOutput!
@@ -680,6 +691,7 @@ input TriggerConditionInputType {
   id: Int
   maxValue: Int
   minValue: Int
+  questionId: String
   textValue: String
   type: TriggerConditionEnum
 }
@@ -688,6 +700,7 @@ type TriggerConditionType {
   id: Int!
   maxValue: Int
   minValue: Int
+  question: QuestionNode
   textValue: String
   triggerId: String!
   type: TriggerConditionEnum!
@@ -721,7 +734,7 @@ type TriggerType {
   medium: TriggerMediumEnum!
   name: String!
   recipients: [UserType!]!
-  relatedNode: QuestionNode
+  relatedDialogue: Dialogue
   relatedNodeId: String
   type: TriggerTypeEnum!
 }

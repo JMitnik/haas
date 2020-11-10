@@ -25,4 +25,5 @@ export interface editDialogueVariables {
   description?: string | null;
   publicTitle?: string | null;
   tags?: TagsInputObjectType | null;
+  isWithoutGenData?: boolean | null;
 }

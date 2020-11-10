@@ -126,7 +126,6 @@ const getDialogueStatistics = gql`
       id
       dialogue(where: { slug: $dialogueSlug }) {
         id
-        countInteractions(input: $statisticsDateFilter)
         thisWeekAverageScore: averageScore(input: $statisticsDateFilter)
         previousScore: averageScore(input: $prevDateFilter)
         sessions(take: 3) {
@@ -148,6 +147,7 @@ const getDialogueStatistics = gql`
           }
         }
         statistics(input: $statisticsDateFilter) {
+          nrInteractions
           topPositivePath {
             answer
             quantity
@@ -250,9 +250,9 @@ const DialogueView = () => {
               onClick={() => (
                 history.push(`/dashboard/b/${customerSlug}/d/${dialogueSlug}/interactions`)
               )}
-              isInFallback={dialogue.countInteractions === 0}
+              isInFallback={dialogue.statistics.nrInteractions === 0}
               fallbackMetric={t('dialogue:fallback_no_interactions')}
-              renderMetric={`${dialogue.countInteractions} ${dialogue.countInteractions > 1 ? t('interactions') : t('interaction')}`}
+              renderMetric={`${dialogue.statistics.nrInteractions} ${dialogue.statistics.nrInteractions > 1 ? t('interactions') : t('interaction')}`}
             />
 
             <SummaryModule

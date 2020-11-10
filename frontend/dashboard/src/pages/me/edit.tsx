@@ -80,9 +80,9 @@ const EditMeForm = () => {
 
   const form = useForm({
     defaultValues: {
-      firstName: user?.firstName,
-      lastName: user?.lastName,
-      phone: user?.phone,
+      firstName: user?.firstName || '',
+      lastName: user?.lastName || '',
+      phone: user?.phone || '',
       email: user?.email,
     },
     mode: 'onChange',
@@ -124,7 +124,7 @@ const EditMeForm = () => {
                   name="firstName"
                   ref={form.register()}
                 />
-                <FormErrorMessage>{form.errors.firstName?.message}</FormErrorMessage>
+                <FormErrorMessage>{form.errors.firstName}</FormErrorMessage>
               </FormControl>
               <FormControl isRequired isInvalid={!!form.errors.lastName}>
                 <FormLabel htmlFor="lastName">{t('last_name')}</FormLabel>
@@ -135,7 +135,7 @@ const EditMeForm = () => {
                   name="lastName"
                   ref={form.register()}
                 />
-                <FormErrorMessage>{form.errors.lastName?.message}</FormErrorMessage>
+                <FormErrorMessage>{form.errors.lastName}</FormErrorMessage>
               </FormControl>
               <FormControl isRequired isInvalid={!!form.errors.email}>
                 <FormLabel htmlFor="email">{t('email')}</FormLabel>
@@ -146,7 +146,7 @@ const EditMeForm = () => {
                   name="email"
                   ref={form.register()}
                 />
-                <FormErrorMessage>{form.errors.email?.message}</FormErrorMessage>
+                <FormErrorMessage>{form.errors.email}</FormErrorMessage>
               </FormControl>
               <FormControl isInvalid={!!form.errors.phone}>
                 <FormLabel htmlFor="phone">{t('phone')}</FormLabel>
@@ -157,7 +157,7 @@ const EditMeForm = () => {
                   name="phone"
                   ref={form.register()}
                 />
-                <FormErrorMessage>{form.errors.phone?.message}</FormErrorMessage>
+                <FormErrorMessage>{form.errors.phone}</FormErrorMessage>
               </FormControl>
             </InputGrid>
           </Div>

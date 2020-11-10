@@ -1,18 +1,13 @@
-import { Customer, TagCreateWithoutCustomerInput } from '@prisma/client';
-import { subDays } from 'date-fns';
-import cuid from 'cuid';
+import { Customer } from '@prisma/client';
 
 import { UserInputError } from 'apollo-server-express';
-import { leafNodes } from '../../data/seeds/default-data';
+// eslint-disable-next-line import/no-cycle
+import { NexusGenInputs } from '../../generated/nexus';
 // eslint-disable-next-line import/no-cycle
 import DialogueService from '../questionnaire/DialogueService';
 import NodeService from '../question/NodeService';
-import defaultWorkspaceTemplate from '../templates/defaultWorkspaceTemplate';
+import defaultWorkspaceTemplate, { WorkspaceTemplate } from '../templates/defaultWorkspaceTemplate';
 import prisma from '../../config/prisma';
-
-function getRandomInt(max: number) {
-  return Math.floor(Math.random() * Math.floor(max));
-}
 
 class CustomerService {
   static customers = async () => {
@@ -35,7 +30,7 @@ class CustomerService {
     return customer;
   };
 
-  static seed = async (customer: Customer) => {
+  static seedByTemplate = async (customer: Customer, template: WorkspaceTemplate = defaultWorkspaceTemplate, willGenerateFakeData: boolean = false) => {
     // Step 1: Make dialogue
     const dialogue = await prisma.dialogue.create({
       data: {
@@ -44,9 +39,9 @@ class CustomerService {
             id: customer.id,
           },
         },
-        slug: 'default',
-        title: 'Default dialogue',
-        description: 'Default questions',
+        slug: template.slug,
+        title: template.title,
+        description: template.description,
         questions: {
           create: [],
         },
@@ -54,92 +49,24 @@ class CustomerService {
     });
 
     // Step 2: Make the leafs
-    const leafs = await NodeService.createTemplateLeafNodes(leafNodes, dialogue.id);
+    const leafs = await NodeService.createTemplateLeafNodes(template.leafNodes, dialogue.id);
 
     // Step 3: Make nodes
     await NodeService.createTemplateNodes(dialogue.id, customer.name, leafs);
 
-    // Step 4: Fill with random data
-    const currentDate = new Date();
-    const amtOfDaysBack = Array.from(Array(30)).map((empty, index) => index + 1);
-    const datesBackInTime = amtOfDaysBack.map((amtDaysBack) => subDays(currentDate, amtDaysBack));
-    const options = ['Facilities', 'Website/Mobile app', 'Product/Services', 'Customer support'];
-
-    const dialogueWithNodes = await prisma.dialogue.findOne({
-      where: { id: dialogue.id },
-      include: {
-        questions: true,
-        edges: {
-          include: {
-            conditions: true,
-            childNode: true,
-          },
-        },
-      },
-    });
-
-    const rootNode = dialogueWithNodes?.questions.find((node) => node.isRoot);
-    const edgesOfRootNode = dialogueWithNodes?.edges.filter((edge) => edge.parentNodeId === rootNode?.id);
-
-    // Stop if no rootnode
-    if (!rootNode) return;
-
-    await Promise.all(datesBackInTime.map(async (backDate) => {
-      const simulatedRootVote: number = getRandomInt(100);
-
-      const simulatedChoice = options[Math.floor(Math.random() * options.length)];
-      const simulatedChoiceEdge = edgesOfRootNode?.find((edge) => edge.conditions.every((condition) => {
-        if (!condition.renderMin || !condition.renderMax) return false;
-        const isValid = condition?.renderMin < simulatedRootVote && condition?.renderMax > simulatedRootVote;
-
-        return isValid;
-      }));
-
-      const simulatedChoiceNodeId = simulatedChoiceEdge?.childNode.id;
-
-      if (!simulatedChoiceNodeId) return;
-
-      await prisma.session.create({
-        data: {
-          nodeEntries: {
-            create: [{
-              depth: 0,
-              creationDate: backDate,
-              relatedNode: {
-                connect: { id: rootNode.id },
-              },
-              sliderNodeEntry: {
-                create: { value: simulatedRootVote },
-              },
-            },
-            {
-              depth: 1,
-              creationDate: backDate,
-              relatedNode: { connect: { id: simulatedChoiceNodeId } },
-              relatedEdge: { connect: { id: simulatedChoiceEdge?.id } },
-              choiceNodeEntry: {
-                create: { value: simulatedChoice },
-              },
-            },
-            ],
-          },
-          dialogue: {
-            connect: { id: dialogue.id },
-          },
-        },
-      });
-    }));
+    // Step 4: possibly
+    if (willGenerateFakeData) {
+      await DialogueService.generateFakeData(dialogue.id, template);
+    }
   };
 
-  static editCustomer = async (args: any) => {
-    const { id, options } = args;
-    const { logo, primaryColour, slug, name } = options;
+  static editWorkspace = async (input: NexusGenInputs['EditWorkspaceInput']) => {
     const customerSettings = await prisma.customerSettings.update({
       where: {
-        customerId: id,
+        customerId: input.id,
       },
       data: {
-        logoUrl: logo,
+        logoUrl: input.logo,
       },
     });
 
@@ -148,65 +75,57 @@ class CustomerService {
         id: customerSettings.colourSettingsId || undefined,
       },
       data: {
-        primary: primaryColour,
+        primary: input.primaryColour,
       },
     });
 
     const customer = await prisma.customer.update({
       where: {
-        id,
+        id: input.id,
       },
       data: {
-        slug,
-        name,
+        slug: input.slug,
+        name: input.name,
       },
     });
 
     return customer;
   };
 
-  static createCustomer = async (args: any, createdUserId?: string) => {
-    const { name, options } = args;
-    const { isSeed, logo, primaryColour, slug } = options;
-
+  static createWorkspace = async (input: NexusGenInputs['CreateWorkspaceInput'], createdUserId?: string) => {
     try {
       const customer = await prisma.customer.create({
         data: {
-          name,
-          slug,
-          tags: {
-            create: defaultWorkspaceTemplate.tags,
-          },
+          name: input.name,
+          slug: input.slug,
+          tags: { create: defaultWorkspaceTemplate.tags },
           settings: {
             create: {
-              logoUrl: logo,
+              logoUrl: input.logo,
               colourSettings: {
                 create: {
-                  primary: primaryColour || '#4287f5',
+                  primary: input.primaryColour || defaultWorkspaceTemplate.primaryColor,
                 },
               },
             },
           },
-          roles: {
-            create: defaultWorkspaceTemplate.roles,
-          },
-          dialogues: {
-            create: [],
-          },
+          roles: { create: defaultWorkspaceTemplate.roles },
+          dialogues: { create: [] },
         },
         include: {
           roles: true,
         },
       });
 
-      if (isSeed) {
-        await CustomerService.seed(customer);
+      if (input.isSeed) {
+        await CustomerService.seedByTemplate(customer, defaultWorkspaceTemplate, input.willGenerateFakeData || false);
       }
 
       // If customer is created by user, make them an "Admin"
       if (createdUserId) {
         const adminRole = customer.roles.find((role) => role.type === 'ADMIN');
-        const userOfCustomer = await prisma.userOfCustomer.create({
+
+        await prisma.userOfCustomer.create({
           data: {
             customer: { connect: { id: customer.id } },
             role: { connect: { id: adminRole?.id } },

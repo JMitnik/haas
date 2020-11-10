@@ -4,9 +4,9 @@ import {
 } from '@prisma/client';
 import { isPresent } from 'ts-is-present';
 
-import { sortBy } from 'lodash';
 import { Nullable, PaginationProps } from '../../types/generic';
 import { SessionWithEntries } from './SessionTypes';
+import { sortBy } from 'lodash';
 // eslint-disable-next-line import/no-cycle
 import { TEXT_NODES } from '../questionnaire/Dialogue';
 // eslint-disable-next-line import/no-cycle
@@ -163,6 +163,12 @@ class SessionService {
     dialogueId: string,
     paginationOpts?: Nullable<PaginationProps>,
   ): Promise<Array<SessionWithEntries> | null | undefined> {
+    const dialogue = await prisma.dialogue.findOne({
+      where: {
+        id: dialogueId,
+      },
+    });
+
     const dialougeWithSessionWithEntries = await prisma.dialogue.findOne({
       where: { id: dialogueId },
       include: {
@@ -182,13 +188,20 @@ class SessionService {
             },
             {
               nodeEntries: {
+                every: dialogue?.isWithoutGenData ? {
+                  inputSource: 'CLIENT',
+                } : undefined,
+              },
+            },
+            {
+              nodeEntries: {
                 some: {
                   sliderNodeEntry: {
                     value: { gt: 0 },
                   },
                 },
               },
-            }],
+            }, {}],
           },
           orderBy: {
             createdAt: 'desc',
@@ -257,8 +270,6 @@ class SessionService {
     dialogueId: string,
     paginationOpts?: Nullable<PaginationProps>,
   ): Promise<NexusGenRootTypes['SessionConnection']> => {
-    // TODO: Do we need this?
-    // const needPageReset = false;
     const sessions = await SessionService.fetchSessionsByDialogue(dialogueId, paginationOpts);
     const totalNrOfSessions = (await SessionService.fetchSessionsByDialogue(dialogueId, {
       searchTerm: paginationOpts?.searchTerm,

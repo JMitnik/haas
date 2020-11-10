@@ -9,23 +9,22 @@ import { useMutation } from '@apollo/react-hooks';
 import { useToast } from '@chakra-ui/core';
 import { yupResolver } from '@hookform/resolvers';
 import React from 'react';
+import gql from 'graphql-tag';
 
 import CustomerForm from 'components/CustomerForm';
-import parseOptionalBoolean from 'utils/parseOptionalBoolean';
+import intToBool from 'utils/intToBool';
 
-import { createNewCustomer } from '../../mutations/createNewCustomer';
+import { CreateWorkspaceInput } from 'types/globalTypes';
 import { useUser } from '../../providers/UserProvider';
 import getCustomersOfUser from '../../queries/getCustomersOfUser';
 
-interface FormDataProps {
-  name: string;
-  slug: string;
-  logo?: string;
-  primaryColour?: string;
-  useCustomUrl?: number;
-  uploadLogo?: string;
-  seed?: number;
-}
+const createWorkspaceMutation = gql`
+  mutation createWorkspace($input: CreateWorkspaceInput) {
+    createWorkspace(input: $input) {
+        name
+    }
+  }
+`;
 
 const schema = yup.object().shape({
   name: yup.string().required('Name is required'),
@@ -34,7 +33,13 @@ const schema = yup.object().shape({
   primaryColour: yup.string().required().matches(/^(#(\d|\D){6}$){1}/, {
     message: 'Provided colour is not a valid hexadecimal',
   }),
-});
+  seed: yup.number(),
+  willGenerateFakeData: yup.number(),
+  useCustomUrl: yup.number(),
+  uploadLogo: yup.string().url(),
+}).required();
+
+type FormDataProps = yup.InferType<typeof schema>;
 
 const AddCustomerView = () => {
   const history = useHistory();
@@ -46,7 +51,7 @@ const AddCustomerView = () => {
     resolver: yupResolver(schema),
   });
 
-  const [addCustomer, { loading, error: serverErrors }] = useMutation(createNewCustomer, {
+  const [createWorkspace, { loading, error: serverErrors }] = useMutation<null, {input: CreateWorkspaceInput}>(createWorkspaceMutation, {
     onCompleted: () => {
       toast({
         title: 'Created!',
@@ -62,7 +67,7 @@ const AddCustomerView = () => {
         history.push('/');
       }, 500);
     },
-    onError: (error) => {
+    onError: () => {
       toast({
         title: 'Unexpected error!',
         description: 'See the form for more information.',
@@ -80,30 +85,31 @@ const AddCustomerView = () => {
   });
 
   const onSubmit = (formData: FormDataProps) => {
-    const optionInput = {
-      logo: parseOptionalBoolean(formData.useCustomUrl) ? formData.logo : formData.uploadLogo,
-      slug: formData.slug,
-      isSeed: parseOptionalBoolean(formData.seed),
-      primaryColour: formData.primaryColour,
-    };
-
-    addCustomer({
+    createWorkspace({
       variables: {
-        name: formData.name,
-        options: optionInput,
+        input: {
+          name: formData.name,
+          logo: intToBool(formData.useCustomUrl) ? formData.logo : formData.uploadLogo,
+          slug: formData.slug,
+          isSeed: intToBool(formData.seed),
+          willGenerateFakeData: intToBool(formData.willGenerateFakeData),
+          primaryColour: formData.primaryColour,
+        },
       },
     });
   };
 
   return (
     <Container>
-      {/* <Div>
-        <H2 color="default.darkest" fontWeight={500} py={2}> Customer </H2>
-        <Muted pb={4}>Create a new customer</Muted>
-      </Div> */}
       <motion.div initial={{ opacity: 0, y: 100 }} animate={{ opacity: 1, y: 0 }}>
         <FormContainer>
-          <CustomerForm isInEdit={false} form={form} isLoading={loading} onFormSubmit={onSubmit} serverErrors={serverErrors} />
+          <CustomerForm
+            isInEdit={false}
+            form={form}
+            isLoading={loading}
+            onFormSubmit={onSubmit}
+            serverErrors={serverErrors}
+          />
         </FormContainer>
       </motion.div>
     </Container>
