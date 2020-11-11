@@ -1,6 +1,6 @@
+import { NexusGenEnums, NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
 import { Object } from 'lodash';
 import { TriggerWhereInput } from '@prisma/client';
-import { NexusGenEnums, NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
 
 export const slice = (
   entries: Array<any>,
@@ -78,14 +78,13 @@ export const constructFindManyInput = (
   findManyArgs: ConstructFindManyProps,
 ): findManyInput => {
   const { findArgs, orderFields, searchFields, paginationOpts } = findManyArgs;
-  const { where: findManyWhereArgs, include } = findArgs;
-  const where = constructWhereInput(findManyWhereArgs, paginationOpts, searchFields);
+  const where = findArgs?.where ? constructWhereInput(findArgs?.where, paginationOpts, searchFields) : null;
   const orderBy = constructSortInput(orderFields, paginationOpts.orderBy || undefined);
 
   return {
     orderBy,
     where,
-    include,
+    include: findArgs?.include || null,
     skip: paginationOpts.offset || undefined,
     take: paginationOpts.limit || undefined,
   };

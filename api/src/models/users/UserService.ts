@@ -206,7 +206,10 @@ class UserService {
       customer: { slug: customerSlug },
     } };
 
-    const findManyUsers = async ({ props }: FindManyCallBackProps) => prisma.userOfCustomer.findMany(props);
+    const findManyUsers = async ({ props, rest }: FindManyCallBackProps) => {
+      console.log('rest: ', rest);
+      return prisma.userOfCustomer.findMany(props);
+    };
     const countUsers = async ({ props: countArgs }: FindManyCallBackProps) => prisma.userOfCustomer.count(countArgs);
 
     const paginateProps: PaginateProps = {
@@ -215,6 +218,7 @@ class UserService {
         searchFields: ['firstName', 'lastName', 'email'],
         orderFields: ['firstName', 'lastName', 'email', 'role'],
         findManyCallBack: findManyUsers,
+        dialogueId: 'dslfsdj324234dfgfdg',
       },
       countArgs: {
         countWhereInput,

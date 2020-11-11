@@ -14,7 +14,7 @@ import { TEXT_NODES } from '../questionnaire/Dialogue';
 import { NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
 import NodeEntryService, { NodeEntryWithTypes } from '../node-entry/NodeEntryService';
 // eslint-disable-next-line import/no-cycle
-import { FindManyCallBackProps, PaginateProps, findManyInput } from '../../utils/table/pagination';
+import { FindManyCallBackProps, PaginateProps, findManyInput, paginate } from '../../utils/table/pagination';
 import PaginationService from '../general/PaginationService';
 import TriggerService from '../trigger/TriggerService';
 import prisma from '../../config/prisma';
@@ -231,16 +231,10 @@ class SessionService {
 
     if (!paginationOpts) return sessions;
 
-    // We need to manually sort and slice it due to lack of support for aggregated sorts.
+    // We need to manually sort
     const sortedSessions = SessionService.sortSessions(sessions, paginationOpts);
-    const slicedSessions = PaginationService.getItemsByIndex(
-      sortedSessions,
-      paginationOpts?.offset || 0,
-      paginationOpts?.limit || undefined,
-      paginationOpts?.pageIndex || 0,
-    );
 
-    return slicedSessions;
+    return sortedSessions;
   }
 
   static sortSessions(
@@ -273,10 +267,12 @@ class SessionService {
   ): Promise<NexusGenRootTypes['SessionConnection']> => {
     const findManySessions = async ({ paginationOpts: paginationOptions, rest }: FindManyCallBackProps) => {
       const { dialogueId } = rest;
+      console.log('paginationArgs: ', paginationOptions);
       const startDate = paginationOptions?.startDate ? new Date(paginationOptions?.startDate) : null;
       const endDate = paginationOptions?.endDate ? new Date(paginationOptions?.endDate) : null;
       const paginationArgs = { ...paginationOptions, startDate, endDate };
       const sessions = await SessionService.fetchSessionsByDialogue(dialogueId, paginationArgs);
+      console.log('sessions: ', sessions);
       return sessions || [];
     };
 
@@ -294,54 +290,64 @@ class SessionService {
       return totalNrOfSessions || 0;
     };
 
-    // const paginateProps: PaginateProps = {
-    //   findManyArgs: {
-    //     findArgs: null,
-    //     searchFields: ['firstName', 'lastName', 'email'],
-    //     orderFields: ['firstName', 'lastName', 'email', 'role'],
-    //     findManyCallBack: findManySessions,
-    //   },
-    //   countArgs: {
-    //     countWhereInput: null,
-    //     countCallBack: countSessions,
-    //   },
-    //   paginationOpts,
-    // };
+    const pageOpts: NexusGenInputs['PaginationWhereInput'] = {
+      ...paginationOpts,
+      startDate: paginationOpts?.startDate?.toDateString() || null,
+      endDate: paginationOpts?.endDate?.toDateString() || null,
+    };
 
-    const sessions = await SessionService.fetchSessionsByDialogue(dialogueId, paginationOpts);
-    const totalNrOfSessions = (await SessionService.fetchSessionsByDialogue(dialogueId, {
-      searchTerm: paginationOpts?.searchTerm,
-      startDate: paginationOpts?.startDate,
-      endDate: paginationOpts?.endDate,
-    }))?.length;
+    const paginateProps: PaginateProps = {
+      findManyArgs: {
+        findArgs: null,
+        searchFields: ['firstName', 'lastName', 'email'],
+        orderFields: ['firstName', 'lastName', 'email', 'role'],
+        findManyCallBack: findManySessions,
+        dialogueId,
+      },
+      countArgs: {
+        countWhereInput: null,
+        countCallBack: countSessions,
+        dialogueId,
+      },
+      paginationOpts: pageOpts,
+    };
 
-    if (totalNrOfSessions === undefined) {
-      throw new Error('Unable to get total nr of Sessions, something went wrong');
-    }
+    const { entries, pageInfo: paginateInfo } = await paginate(paginateProps);
 
-    if (!sessions?.length) {
-      return {
-        sessions: [],
-        limit: 0,
-        offset: 0,
-        startDate: null,
-        pageInfo: {
-          pageIndex: 0,
-          nrPages: 0,
-        },
-      };
-    }
+    // const sessions = await SessionService.fetchSessionsByDialogue(dialogueId, paginationOpts);
+    // const totalNrOfSessions = (await SessionService.fetchSessionsByDialogue(dialogueId, {
+    //   searchTerm: paginationOpts?.searchTerm,
+    //   startDate: paginationOpts?.startDate,
+    //   endDate: paginationOpts?.endDate,
+    // }))?.length;
 
-    const totalPages = paginationOpts?.limit ? Math.ceil(totalNrOfSessions / paginationOpts?.limit) : 1;
+    // if (totalNrOfSessions === undefined) {
+    //   throw new Error('Unable to get total nr of Sessions, something went wrong');
+    // }
+
+    // if (!sessions?.length) {
+    //   return {
+    //     sessions: [],
+    //     limit: 0,
+    //     offset: 0,
+    //     startDate: null,
+    //     pageInfo: {
+    //       pageIndex: 0,
+    //       nrPages: 0,
+    //     },
+    //   };
+    // }
+
+    // const totalPages = paginationOpts?.limit ? Math.ceil(totalNrOfSessions / paginationOpts?.limit) : 1;
 
     const pageInfo: NexusGenRootTypes['PaginationPageInfo'] = {
-      nrPages: totalPages || 1,
+      nrPages: paginateInfo?.nrPages || 1,
       pageIndex: (paginationOpts?.pageIndex !== undefined && paginationOpts?.pageIndex !== null)
         ? paginationOpts.pageIndex : 0,
     };
 
     return {
-      sessions,
+      sessions: entries,
       offset: paginationOpts?.offset || 0,
       limit: paginationOpts?.limit || 0,
       startDate: paginationOpts?.startDate?.toString(),
