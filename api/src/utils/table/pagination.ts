@@ -1,6 +1,6 @@
+import { NexusGenEnums, NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
 import { Object } from 'lodash';
 import { TriggerWhereInput } from '@prisma/client';
-import { NexusGenEnums, NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
 
 export const slice = (
   entries: Array<any>,
@@ -61,7 +61,7 @@ export const constructSortInput = (
   return sortObject;
 };
 
-type findManyInput = {
+export type findManyInput = {
   where: any,
   take?: number | undefined,
   skip?: number | undefined,
@@ -75,12 +75,10 @@ type TableProps = {
 };
 
 export const constructFindManyInput = (
-  findManyArgs: any,
-  paginationOpts: NexusGenInputs['PaginationWhereInput'],
-  searchFields: NexusGenEnums['PaginationSearchEnum'][],
-  orderFields: NexusGenEnums['PaginationSortByEnum'][],
+  findManyArgs: ConstructFindManyProps,
 ): findManyInput => {
-  const { where: findManyWhereArgs, include } = findManyArgs;
+  const { findArgs, orderFields, searchFields, paginationOpts } = findManyArgs;
+  const { where: findManyWhereArgs, include } = findArgs;
   const where = constructWhereInput(findManyWhereArgs, paginationOpts, searchFields);
   const orderBy = constructSortInput(orderFields, paginationOpts.orderBy || undefined);
 
@@ -93,28 +91,40 @@ export const constructFindManyInput = (
   };
 };
 
-export interface PaginateProps {
-  table: TableProps;
-  findManyArgs: any;
+export interface FindManyProps {
+  findArgs: any;
   searchFields: NexusGenEnums['PaginationSearchEnum'][];
-  paginationOpts: NexusGenInputs['PaginationWhereInput'];
   orderFields: NexusGenEnums['PaginationSortByEnum'][];
+}
+
+export interface ConstructFindManyProps extends FindManyProps {
+  paginationOpts: NexusGenInputs['PaginationWhereInput'];
+}
+
+export interface PaginateProps {
+  findManyArgs: {
+    findArgs: any;
+    searchFields: NexusGenEnums['PaginationSearchEnum'][];
+    orderFields: NexusGenEnums['PaginationSortByEnum'][];
+  };
+  findManyCallBack: (props: findManyInput) => Promise<Array<any>>;
+  paginationOpts: NexusGenInputs['PaginationWhereInput'];
   countWhereInput: any;
+  countCallBack: (props: findManyInput) => Promise<number>;
 }
 
 export const paginate = async ({
-  table,
   findManyArgs,
-  searchFields,
+  findManyCallBack,
   paginationOpts,
-  orderFields,
   countWhereInput,
+  countCallBack,
 } : PaginateProps,
 ) => {
   const { offset, limit, pageIndex } = paginationOpts;
-  const findManyInput = constructFindManyInput(findManyArgs, paginationOpts, searchFields, orderFields);
-  const entries = await table.findMany(findManyInput);
-  const triggerTotal = await table.count(countWhereInput);
+  const findManyInput = constructFindManyInput({ ...findManyArgs, paginationOpts });
+  const entries = await findManyCallBack(findManyInput);
+  const triggerTotal = await countCallBack(countWhereInput);
   const totalPages = paginationOpts.limit ? Math.ceil(triggerTotal / (paginationOpts.limit)) : 1;
   const currentPage = paginationOpts.pageIndex && paginationOpts.pageIndex <= totalPages
     ? paginationOpts.pageIndex : 1;

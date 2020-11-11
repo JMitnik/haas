@@ -17,10 +17,10 @@ import { isPresent } from 'ts-is-present';
 import _ from 'lodash';
 
 // eslint-disable-next-line import/no-cycle
-import { NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
+import { NexusGenEnums, NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
 // eslint-disable-next-line import/no-cycle
 import { CustomerWithCustomerSettings } from '../customer/Customer';
-import { PaginateProps, constructSortInput, paginate } from '../../utils/table/pagination';
+import { PaginateProps, constructFindManyInput, constructSortInput, findManyInput, paginate } from '../../utils/table/pagination';
 import { SessionWithEntries } from '../session/SessionTypes';
 import { mailService } from '../../services/mailings/MailService';
 
@@ -59,13 +59,19 @@ class TriggerService {
   ) => {
     const findManyTriggerArgs: FindManyTriggerArgs = { where: { customer: { slug: customerSlug } } };
 
+    const findManyTriggers = async (findManyArgs: findManyInput) => prisma.trigger.findMany(findManyArgs);
+    const countTriggers = async (countArgs: findManyInput) => prisma.trigger.count(countArgs);
+
     const paginateProps: PaginateProps = {
-      table: prisma.trigger,
-      findManyArgs: findManyTriggerArgs,
-      searchFields: ['name'],
+      findManyArgs: {
+        findArgs: findManyTriggerArgs,
+        searchFields: ['name'],
+        orderFields: ['medium', 'type', 'name'],
+      },
+      findManyCallBack: findManyTriggers,
       paginationOpts,
-      orderFields: ['medium', 'type', 'name'],
       countWhereInput: findManyTriggerArgs,
+      countCallBack: countTriggers,
     };
 
     return paginate(paginateProps);
