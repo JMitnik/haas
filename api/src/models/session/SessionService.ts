@@ -4,9 +4,9 @@ import {
 } from '@prisma/client';
 import { isPresent } from 'ts-is-present';
 
-import { sortBy } from 'lodash';
 import { Nullable, PaginationProps } from '../../types/generic';
 import { SessionWithEntries } from './SessionTypes';
+import { sortBy } from 'lodash';
 // eslint-disable-next-line import/no-cycle
 import { TEXT_NODES } from '../questionnaire/Dialogue';
 // eslint-disable-next-line import/no-cycle
@@ -14,6 +14,7 @@ import { TEXT_NODES } from '../questionnaire/Dialogue';
 import { NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
 import NodeEntryService, { NodeEntryWithTypes } from '../node-entry/NodeEntryService';
 // eslint-disable-next-line import/no-cycle
+import { FindManyCallBackProps, findManyInput } from '../../utils/table/pagination';
 import PaginationService from '../general/PaginationService';
 import TriggerService from '../trigger/TriggerService';
 import prisma from '../../config/prisma';
@@ -270,6 +271,29 @@ class SessionService {
     dialogueId: string,
     paginationOpts?: Nullable<PaginationProps>,
   ): Promise<NexusGenRootTypes['SessionConnection']> => {
+    const findManySessions = async ({ paginationOpts: paginationOptions, rest }: FindManyCallBackProps) => {
+      const { dialogueId } = rest;
+      const startDate = paginationOptions?.startDate ? new Date(paginationOptions?.startDate) : null;
+      const endDate = paginationOptions?.endDate ? new Date(paginationOptions?.endDate) : null;
+      const paginationArgs = { ...paginationOptions, startDate, endDate };
+      const sessions = await SessionService.fetchSessionsByDialogue(dialogueId, paginationArgs);
+      return sessions || [];
+    };
+
+    const countSessions = async ({ paginationOpts: paginationOptions, rest } : FindManyCallBackProps) => {
+      const { dialogueId } = rest;
+      const startDate = paginationOptions?.startDate ? new Date(paginationOptions?.startDate) : null;
+      const endDate = paginationOptions?.endDate ? new Date(paginationOptions?.endDate) : null;
+
+      const totalNrOfSessions = (await SessionService.fetchSessionsByDialogue(dialogueId, {
+        searchTerm: paginationOpts?.searchTerm,
+        startDate,
+        endDate,
+      }))?.length;
+
+      return totalNrOfSessions || 0;
+    };
+
     const sessions = await SessionService.fetchSessionsByDialogue(dialogueId, paginationOpts);
     const totalNrOfSessions = (await SessionService.fetchSessionsByDialogue(dialogueId, {
       searchTerm: paginationOpts?.searchTerm,

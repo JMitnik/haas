@@ -20,7 +20,7 @@ import _ from 'lodash';
 import { NexusGenEnums, NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
 // eslint-disable-next-line import/no-cycle
 import { CustomerWithCustomerSettings } from '../customer/Customer';
-import { PaginateProps, constructFindManyInput, constructSortInput, findManyInput, paginate } from '../../utils/table/pagination';
+import { FindManyCallBackProps, PaginateProps, constructFindManyInput, constructSortInput, findManyInput, paginate } from '../../utils/table/pagination';
 import { SessionWithEntries } from '../session/SessionTypes';
 import { mailService } from '../../services/mailings/MailService';
 
@@ -59,7 +59,7 @@ class TriggerService {
   ) => {
     const findManyTriggerArgs: FindManyTriggerArgs = { where: { customer: { slug: customerSlug } } };
 
-    const findManyTriggers = async (findManyArgs: findManyInput) => prisma.trigger.findMany(findManyArgs);
+    const findManyTriggers = async ({ props: findManyArgs } : FindManyCallBackProps) => prisma.trigger.findMany(findManyArgs);
     const countTriggers = async (countArgs: findManyInput) => prisma.trigger.count(countArgs);
 
     const paginateProps: PaginateProps = {

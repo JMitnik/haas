@@ -4,7 +4,7 @@ import _ from 'lodash';
 import { NexusGenInputs } from '../../generated/nexus';
 import { Nullable } from '../../types/generic';
 
-import { PaginateProps, findManyInput, paginate, slice } from '../../utils/table/pagination';
+import { FindManyCallBackProps, PaginateProps, findManyInput, paginate, slice } from '../../utils/table/pagination';
 import { mailService } from '../../services/mailings/MailService';
 
 import AuthService from '../auth/AuthService';
@@ -206,7 +206,7 @@ class UserService {
       customer: { slug: customerSlug },
     } };
 
-    const findManyUsers = async (findManyArgs: findManyInput) => prisma.userOfCustomer.findMany(findManyArgs);
+    const findManyUsers = async ({ props }: FindManyCallBackProps) => prisma.userOfCustomer.findMany(props);
     const countUsers = async (countArgs: findManyInput) => prisma.userOfCustomer.count(countArgs);
 
     const paginateProps: PaginateProps = {
