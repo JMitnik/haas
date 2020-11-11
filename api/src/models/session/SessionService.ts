@@ -14,7 +14,7 @@ import { TEXT_NODES } from '../questionnaire/Dialogue';
 import { NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
 import NodeEntryService, { NodeEntryWithTypes } from '../node-entry/NodeEntryService';
 // eslint-disable-next-line import/no-cycle
-import { FindManyCallBackProps, findManyInput } from '../../utils/table/pagination';
+import { FindManyCallBackProps, PaginateProps, findManyInput } from '../../utils/table/pagination';
 import PaginationService from '../general/PaginationService';
 import TriggerService from '../trigger/TriggerService';
 import prisma from '../../config/prisma';
@@ -293,6 +293,20 @@ class SessionService {
 
       return totalNrOfSessions || 0;
     };
+
+    // const paginateProps: PaginateProps = {
+    //   findManyArgs: {
+    //     findArgs: null,
+    //     searchFields: ['firstName', 'lastName', 'email'],
+    //     orderFields: ['firstName', 'lastName', 'email', 'role'],
+    //     findManyCallBack: findManySessions,
+    //   },
+    //   countArgs: {
+    //     countWhereInput: null,
+    //     countCallBack: countSessions,
+    //   },
+    //   paginationOpts,
+    // };
 
     const sessions = await SessionService.fetchSessionsByDialogue(dialogueId, paginationOpts);
     const totalNrOfSessions = (await SessionService.fetchSessionsByDialogue(dialogueId, {

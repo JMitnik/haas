@@ -60,7 +60,7 @@ class TriggerService {
     const findManyTriggerArgs: FindManyTriggerArgs = { where: { customer: { slug: customerSlug } } };
 
     const findManyTriggers = async ({ props: findManyArgs } : FindManyCallBackProps) => prisma.trigger.findMany(findManyArgs);
-    const countTriggers = async (countArgs: findManyInput) => prisma.trigger.count(countArgs);
+    const countTriggers = async ({ props: countArgs } : FindManyCallBackProps) => prisma.trigger.count(countArgs);
 
     const paginateProps: PaginateProps = {
       findManyArgs: {

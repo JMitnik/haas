@@ -119,7 +119,8 @@ export interface FindManyArgsProps {
 
 export interface CountArgsProps {
   countWhereInput: any;
-  countCallBack: (props: findManyInput) => Promise<number>;
+  countCallBack: (args: FindManyCallBackProps) => Promise<number>;
+  [k : string]: any;
 }
 
 export interface PaginateProps {
@@ -135,16 +136,19 @@ export const paginate = async ({
 } : PaginateProps,
 ) => {
   const { offset, limit, pageIndex } = paginationOpts;
-  const { countCallBack, countWhereInput } = countArgs;
+  const { countCallBack, countWhereInput, ...countRest } = countArgs;
   const { findArgs, findManyCallBack, orderFields, searchFields, ...rest } = findManyArgs;
+
+  // Find entries logic
   const findManyInput = constructFindManyInput({ ...findManyArgs, paginationOpts });
   const entries = await findManyArgs.findManyCallBack({ props: findManyInput, paginationOpts, rest });
-  const triggerTotal = await countCallBack(countWhereInput);
+  const slicedEntries = slice(entries, (offset || 0), (limit || 0), (pageIndex || 0));
+
+  // Page logic
+  const triggerTotal = await countCallBack({ props: countWhereInput, paginationOpts, rest: countRest });
   const totalPages = paginationOpts.limit ? Math.ceil(triggerTotal / (paginationOpts.limit)) : 1;
   const currentPage = paginationOpts.pageIndex && paginationOpts.pageIndex <= totalPages
     ? paginationOpts.pageIndex : 1;
-
-  const slicedEntries = slice(entries, (offset || 0), (limit || 0), (pageIndex || 0));
 
   const pageInfo: NexusGenRootTypes['PaginationPageInfo'] = {
     nrPages: totalPages,
