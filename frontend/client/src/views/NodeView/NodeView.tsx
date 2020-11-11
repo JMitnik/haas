@@ -8,8 +8,8 @@ import NodeLayout from 'layouts/NodeLayout';
 import useDialogueTree from 'providers/DialogueTreeProvider';
 import useUploadQueue from 'providers/UploadQueueProvider';
 
-import { GenericNodeProps } from './nodes/types';
 import { useNavigator } from 'providers/NavigationProvider';
+import { GenericNodeProps } from './nodes/types';
 import MultiChoiceNode from './nodes/MultiChoiceNode/MultiChoiceNode';
 import PostLeafNode from './nodes/PostLeafNode/PostLeafNode';
 import RegisterNode from './nodes/RegisterNode/RegisterNode';
@@ -44,8 +44,8 @@ interface NodeViewProps {
 }
 
 const NodeView = ({ node }: NodeViewProps) => {
-  const store = useDialogueTree();
-  const { queueEntry, reset } = useUploadQueue();
+  const { store } = useDialogueTree();
+  const { uploadInteraction, queueEntry, reset } = useUploadQueue();
   const { routes, goToActiveLeaf, goToNodeByEdge, goToPostLeafByEdge } = useNavigator();
 
   /**
@@ -69,7 +69,11 @@ const NodeView = ({ node }: NodeViewProps) => {
     }
 
     if (goesToPostLeaf) return goToPostLeafByEdge(edgeId);
-    if (goesToLeaf) return goToActiveLeaf();
+    if (goesToLeaf) {
+      uploadInteraction();
+
+      return goToActiveLeaf();
+    }
 
     // Navigation: go to next node
     return goToNodeByEdge(edgeId);
@@ -99,6 +103,7 @@ const NodeView = ({ node }: NodeViewProps) => {
   const inTreeWithNoResults = !node.isLeaf && !node.isRoot && store.session.isEmpty;
 
   if ((suddenlyStarted) || (inPostLeafAfterRefresh) || inTreeWithNoResults) {
+    reset();
     return <Redirect to={routes.start} />;
   }
 

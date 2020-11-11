@@ -8,7 +8,12 @@ import getCustomerFromSlug from 'queries/getCustomerFromSluqQuery';
 import getDialogueFromSlug from 'queries/getDialogueFromSlugQuery';
 import treeStore from './DialogueTreeStore';
 
-const DialogueTreeContext = React.createContext({} as TreeStoreModelProps);
+interface DialogueTreeContextType {
+  store: TreeStoreModelProps;
+  getNode: any;
+}
+
+const DialogueTreeContext = React.createContext({} as DialogueTreeContextType);
 
 interface CustomerDataProps {
   customer: Customer;
@@ -65,8 +70,28 @@ export const DialogueTreeProvider = ({ children }: { children: React.ReactNode }
     }
   }, [dialogueData]);
 
+  const getNode = (edgeId: string, nodeId: string) => {
+    if (!treeStore.tree?.rootNode) return null;
+    // Either we  from the 'root' (no edge) or we get the next node.
+    let node = treeStore.tree.rootNode;
+
+    if (edgeId) {
+      node = treeStore.tree.getChildNodeByEdge(edgeId) || treeStore.tree.rootNode;
+    } else if (!edgeId && nodeId) {
+      node = treeStore.tree.getNodeById(nodeId) || treeStore.tree.rootNode;
+    } else {
+      node = treeStore.tree.rootNode;
+    }
+
+    return node;
+  };
+
   return (
-    <DialogueTreeContext.Provider value={treeStore}>
+    <DialogueTreeContext.Provider value={{
+      store: treeStore,
+      getNode,
+    }}
+    >
       {children}
     </DialogueTreeContext.Provider>
   );

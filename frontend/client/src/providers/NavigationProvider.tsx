@@ -2,7 +2,7 @@ import { useHistory } from 'react-router-dom';
 import useDialogueTree from './DialogueTreeProvider';
 
 export const useNavigator = () => {
-  const store = useDialogueTree();
+  const { store } = useDialogueTree();
   const history = useHistory();
 
   const routes = {

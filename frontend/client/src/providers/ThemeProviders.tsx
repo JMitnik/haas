@@ -14,7 +14,7 @@ interface ThemeProvidersProps {
 
 const ThemeProviders = ({ children }: ThemeProvidersProps) => {
   const [customTheme, setCustomTheme] = useState({});
-  const store = useDialogueTree();
+  const { store } = useDialogueTree();
 
   useEffect(() => autorun(() => {
     if (store.customer) {

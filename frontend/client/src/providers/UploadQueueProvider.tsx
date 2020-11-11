@@ -1,9 +1,8 @@
 import { useMutation } from '@apollo/react-hooks';
-import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useContext, useRef } from 'react';
 
 import createInteractionMutation from 'mutations/createSessionMutation';
 import gql from 'graphql-tag';
-import useDebugReference from 'hooks/useDebugReference';
 import useDialogueTree from 'providers/DialogueTreeProvider';
 
 const UploadQueueContext = React.createContext({} as any);
@@ -19,7 +18,7 @@ const appendToInteractionMutation = gql`
 export const UploadQueueProvider = ({ children }: { children: React.ReactNode }) => {
   const willAppend = useRef(false);
   const queue = useRef<any>([]);
-  const store = useDialogueTree();
+  const { store } = useDialogueTree();
   const [createInteraction, { data: interactionData }] = useMutation(createInteractionMutation);
   const [appendToInteraction] = useMutation(appendToInteractionMutation);
 
@@ -79,8 +78,6 @@ export const UploadQueueProvider = ({ children }: { children: React.ReactNode })
   };
 
   const reset = () => {
-    console.log('Gonna reset now');
-
     if (willAppend.current) {
       queue.current = [];
       willAppend.current = false;
@@ -91,7 +88,6 @@ export const UploadQueueProvider = ({ children }: { children: React.ReactNode })
    * Queue an item to the end of our list, and instantly dequeue it.
    */
   const queueEntry = (entry: any) => {
-    console.log('Willapend?', willAppend.current);
     if (willAppend.current) {
       queue.current = [...queue.current, entry];
       dequeueEntry();

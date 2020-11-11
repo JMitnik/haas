@@ -28,7 +28,7 @@ const routerNavigationAnimation: Variants = {
 
 const DialogueTreeLayout = ({ children, node }: { children: ReactNode, node:TreeNodeProps }) => {
   const history = useHistory();
-  const store = useDialogueTree();
+  const { store } = useDialogueTree();
 
   return (
     <DialogueTreeContainer>
