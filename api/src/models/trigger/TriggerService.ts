@@ -67,11 +67,13 @@ class TriggerService {
         findArgs: findManyTriggerArgs,
         searchFields: ['name'],
         orderFields: ['medium', 'type', 'name'],
+        findManyCallBack: findManyTriggers,
       },
-      findManyCallBack: findManyTriggers,
+      countArgs: {
+        countWhereInput: findManyTriggerArgs,
+        countCallBack: countTriggers,
+      },
       paginationOpts,
-      countWhereInput: findManyTriggerArgs,
-      countCallBack: countTriggers,
     };
 
     return paginate(paginateProps);

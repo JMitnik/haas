@@ -214,11 +214,13 @@ class UserService {
         findArgs: userOfCustomerFindManyArgs,
         searchFields: ['firstName', 'lastName', 'email'],
         orderFields: ['firstName', 'lastName', 'email', 'role'],
+        findManyCallBack: findManyUsers,
       },
-      findManyCallBack: findManyUsers,
+      countArgs: {
+        countWhereInput,
+        countCallBack: countUsers,
+      },
       paginationOpts,
-      countWhereInput,
-      countCallBack: countUsers,
     };
 
     const { entries, pageInfo } = await paginate(paginateProps);
