@@ -1,5 +1,3 @@
-import { Object } from 'lodash';
-import { TriggerWhereInput } from '@prisma/client';
 import { NexusGenEnums, NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
 
 export interface FindManyProps {

@@ -1,5 +1,4 @@
 import { FindManyUserOfCustomerArgs, User } from '@prisma/client';
-import _ from 'lodash';
 
 import { NexusGenInputs } from '../../generated/nexus';
 import { Nullable } from '../../types/generic';
@@ -10,10 +9,6 @@ import { mailService } from '../../services/mailings/MailService';
 import AuthService from '../auth/AuthService';
 import makeInviteTemplate from '../../services/mailings/templates/makeInviteTemplate';
 import prisma from '../../config/prisma';
-
-interface CreateUserOptions {
-  customerSlug?: string;
-}
 
 class UserService {
   static async createUser(userInput: NexusGenInputs['UserInput']) {

@@ -1,12 +1,7 @@
 import {
-  ColourSettings,
-  Customer,
-  CustomerInclude,
-  CustomerSettings,
   FindManyTriggerArgs,
   Trigger,
   TriggerCondition,
-  TriggerOrderByInput,
   TriggerUpdateInput,
   TriggerWhereInput,
   User,
@@ -17,10 +12,10 @@ import { isPresent } from 'ts-is-present';
 import _ from 'lodash';
 
 // eslint-disable-next-line import/no-cycle
-import { NexusGenEnums, NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
+import { NexusGenInputs } from '../../generated/nexus';
 // eslint-disable-next-line import/no-cycle
 import { CustomerWithCustomerSettings } from '../customer/Customer';
-import { FindManyCallBackProps, PaginateProps, constructFindManyInput, constructSortInput, findManyInput, paginate } from '../../utils/table/pagination';
+import { FindManyCallBackProps, PaginateProps, paginate } from '../../utils/table/pagination';
 import { SessionWithEntries } from '../session/SessionTypes';
 import { mailService } from '../../services/mailings/MailService';
 
@@ -59,7 +54,9 @@ class TriggerService {
   ) => {
     const findManyTriggerArgs: FindManyTriggerArgs = { where: { customer: { slug: customerSlug } } };
 
-    const findManyTriggers = async ({ props: findManyArgs } : FindManyCallBackProps) => prisma.trigger.findMany(findManyArgs);
+    const findManyTriggers = async (
+      { props: findManyArgs } : FindManyCallBackProps,
+    ) => prisma.trigger.findMany(findManyArgs);
     const countTriggers = async ({ props: countArgs } : FindManyCallBackProps) => prisma.trigger.count(countArgs);
 
     const paginateProps: PaginateProps = {
@@ -80,7 +77,10 @@ class TriggerService {
   };
 
   static sendMailTrigger(trigger: TriggerWithSendData, recipient: User, session: SessionWithEntries) {
-    const triggerBody = makeTriggerMailTemplate(recipient.firstName || 'User', session, trigger?.customer?.settings?.colourSettings?.primary);
+    const triggerBody = makeTriggerMailTemplate(
+      recipient.firstName || 'User',
+      session, trigger?.customer?.settings?.colourSettings?.primary,
+    );
 
     mailService.send({
       body: triggerBody,
@@ -89,7 +89,11 @@ class TriggerService {
     });
   }
 
-  static sendSmsTrigger(trigger: TriggerWithSendData, recipient: User, session: SessionWithEntries, values: Array<{value: string | number | undefined, type: string}>) {
+  static sendSmsTrigger(
+    trigger: TriggerWithSendData,
+    recipient: User, session: SessionWithEntries,
+    values: Array<{value: string | number | undefined, type: string}>,
+  ) {
     if (!recipient.phone) return;
 
     const mappedValues = values.map((value) => `${value.type} -> ${value.value}`);
@@ -123,8 +127,6 @@ class TriggerService {
       default:
         break;
     }
-    // if (value && recipient.email && (trigger.medium === 'EMAIL' || trigger.medium === '' ))
-    // TODO: Add the mail check (below) in this body as well.
   };
 
   static async tryTrigger(session: SessionWithEntries, trigger: TriggerWithSendData) {
