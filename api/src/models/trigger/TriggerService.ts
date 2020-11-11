@@ -20,8 +20,8 @@ import _ from 'lodash';
 import { NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
 // eslint-disable-next-line import/no-cycle
 import { CustomerWithCustomerSettings } from '../customer/Customer';
+import { PaginateProps, constructSortInput, paginate } from '../../utils/table/pagination';
 import { SessionWithEntries } from '../session/SessionTypes';
-import { constructSortInput, paginate } from '../../utils/table/pagination';
 import { mailService } from '../../services/mailings/MailService';
 
 import { smsService } from '../../services/sms/SmsService';
@@ -57,17 +57,18 @@ class TriggerService {
     customerSlug: string,
     paginationOpts: NexusGenInputs['PaginationWhereInput'],
   ) => {
-    const triggerWhereInput: TriggerWhereInput = { customer: { slug: customerSlug } };
-    const countWhereInput: FindManyTriggerArgs = { where: { customer: { slug: customerSlug } } };
+    const findManyTriggerArgs: FindManyTriggerArgs = { where: { customer: { slug: customerSlug } } };
 
-    return paginate(
-      prisma.trigger,
-      triggerWhereInput,
-      ['name'],
+    const paginateProps: PaginateProps = {
+      table: prisma.trigger,
+      findManyArgs: findManyTriggerArgs,
+      searchFields: ['name'],
       paginationOpts,
-      ['medium', 'type', 'name'],
-      countWhereInput,
-    );
+      orderFields: ['medium', 'type', 'name'],
+      countWhereInput: findManyTriggerArgs,
+    };
+
+    return paginate(paginateProps);
   };
 
   static sendMailTrigger(trigger: TriggerWithSendData, recipient: User, session: SessionWithEntries) {

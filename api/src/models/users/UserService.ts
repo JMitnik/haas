@@ -1,11 +1,12 @@
-import { User, UserWhereInput } from '@prisma/client';
+import { FindManyUserOfCustomerArgs, User, UserOfCustomerWhereInput, UserWhereInput } from '@prisma/client';
 import _ from 'lodash';
 
 import { NexusGenInputs } from '../../generated/nexus';
 import { Nullable } from '../../types/generic';
 
+import { PaginateProps, paginate, slice } from '../../utils/table/pagination';
 import { mailService } from '../../services/mailings/MailService';
-import { slice } from '../../utils/table/pagination';
+
 import AuthService from '../auth/AuthService';
 import makeInviteTemplate from '../../services/mailings/templates/makeInviteTemplate';
 import prisma from '../../config/prisma';
@@ -186,16 +187,11 @@ class UserService {
     orderBy?: Nullable<any>,
     searchTerm?: Nullable<string>,
   ) => {
-    let needPageReset = false;
-    const userWhereInput: UserWhereInput = { customers: { every: { AND: { customer: { slug: customerSlug } } } } };
-    const searchTermFilter = UserService.getSearchTermFilter(searchTerm || '');
+    const paginationOpts: NexusGenInputs['PaginationWhereInput'] = {
+      pageIndex, offset, limit, orderBy, searchTerm,
+    };
 
-    if (searchTermFilter.length > 0) {
-      userWhereInput.OR = searchTermFilter;
-    }
-
-    // Search term filtered users
-    const usersOfCustomer = await prisma.userOfCustomer.findMany({
+    const userOfCustomerFindManyArgs: FindManyUserOfCustomerArgs = {
       where: {
         customer: { slug: customerSlug },
       },
@@ -204,22 +200,27 @@ class UserService {
         role: true,
         user: true,
       },
-    });
+    };
 
-    const totalPages = Math.ceil(usersOfCustomer.length / (limit || 1));
+    const countWhereInput: FindManyUserOfCustomerArgs = { where: {
+      customer: { slug: customerSlug },
+    } };
 
-    if (pageIndex && pageIndex + 1 > totalPages) {
-      offset = 0;
-      needPageReset = true;
-    }
+    const paginateProps: PaginateProps = {
+      table: prisma.userOfCustomer,
+      findManyArgs: userOfCustomerFindManyArgs,
+      searchFields: ['firstName', 'lastName', 'email'],
+      paginationOpts,
+      orderFields: ['firstName', 'lastName', 'email', 'role'],
+      countWhereInput,
+    };
 
-    // Slice ordered filtered users
-    const slicedOrderedUsers = slice(usersOfCustomer, (offset || 0), (limit || 0), (pageIndex || 0));
+    const { entries, pageInfo } = await paginate(paginateProps);
 
     return {
-      userCustomers: slicedOrderedUsers,
-      pageIndex: needPageReset ? 0 : pageIndex,
-      totalPages,
+      userCustomers: entries,
+      pageIndex: pageInfo.pageIndex,
+      totalPages: pageInfo.nrPages,
     };
   };
 }

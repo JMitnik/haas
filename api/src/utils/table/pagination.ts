@@ -1,6 +1,6 @@
-import { NexusGenEnums, NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
 import { Object } from 'lodash';
 import { TriggerWhereInput } from '@prisma/client';
+import { NexusGenEnums, NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
 
 export const slice = (
   entries: Array<any>,
@@ -66,6 +66,7 @@ type findManyInput = {
   take?: number | undefined,
   skip?: number | undefined,
   orderBy?: any,
+  include?: any,
 };
 
 type TableProps = {
@@ -74,31 +75,51 @@ type TableProps = {
 };
 
 export const constructFindManyInput = (
-  whereInput: any,
+  findManyArgs: any,
   paginationOpts: NexusGenInputs['PaginationWhereInput'],
   searchFields: NexusGenEnums['PaginationSearchEnum'][],
   orderFields: NexusGenEnums['PaginationSortByEnum'][],
 ): findManyInput => {
-  const where = constructWhereInput(whereInput, paginationOpts, searchFields);
+  const { where: findManyWhereArgs, include } = findManyArgs;
+  const where = constructWhereInput(findManyWhereArgs, paginationOpts, searchFields);
   const orderBy = constructSortInput(orderFields, paginationOpts.orderBy || undefined);
 
-  return { orderBy, where, skip: paginationOpts.offset || undefined, take: paginationOpts.limit || undefined };
+  return {
+    orderBy,
+    where,
+    include,
+    skip: paginationOpts.offset || undefined,
+    take: paginationOpts.limit || undefined,
+  };
 };
 
-export const paginate = async (
-  table: TableProps,
-  findManyWhereInput: any,
-  searchFields: NexusGenEnums['PaginationSearchEnum'][],
-  paginationOpts: NexusGenInputs['PaginationWhereInput'],
-  orderFields: NexusGenEnums['PaginationSortByEnum'][],
-  countWhereInput: any,
+export interface PaginateProps {
+  table: TableProps;
+  findManyArgs: any;
+  searchFields: NexusGenEnums['PaginationSearchEnum'][];
+  paginationOpts: NexusGenInputs['PaginationWhereInput'];
+  orderFields: NexusGenEnums['PaginationSortByEnum'][];
+  countWhereInput: any;
+}
+
+export const paginate = async ({
+  table,
+  findManyArgs,
+  searchFields,
+  paginationOpts,
+  orderFields,
+  countWhereInput,
+} : PaginateProps,
 ) => {
-  const findManyInput = constructFindManyInput(findManyWhereInput, paginationOpts, searchFields, orderFields);
+  const { offset, limit, pageIndex } = paginationOpts;
+  const findManyInput = constructFindManyInput(findManyArgs, paginationOpts, searchFields, orderFields);
   const entries = await table.findMany(findManyInput);
   const triggerTotal = await table.count(countWhereInput);
   const totalPages = paginationOpts.limit ? Math.ceil(triggerTotal / (paginationOpts.limit)) : 1;
   const currentPage = paginationOpts.pageIndex && paginationOpts.pageIndex <= totalPages
     ? paginationOpts.pageIndex : 1;
+
+  const slicedEntries = slice(entries, (offset || 0), (limit || 0), (pageIndex || 0));
 
   const pageInfo: NexusGenRootTypes['PaginationPageInfo'] = {
     nrPages: totalPages,
@@ -106,7 +127,7 @@ export const paginate = async (
   };
 
   return {
-    entries,
+    entries: slicedEntries,
     pageInfo,
   };
 };
