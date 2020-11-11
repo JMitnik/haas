@@ -1,10 +1,10 @@
-import { FindManyUserOfCustomerArgs, User, UserOfCustomerWhereInput, UserWhereInput } from '@prisma/client';
+import { FindManyUserOfCustomerArgs, User } from '@prisma/client';
 import _ from 'lodash';
 
 import { NexusGenInputs } from '../../generated/nexus';
 import { Nullable } from '../../types/generic';
 
-import { CountArgsProps, FindManyCallBackProps, PaginateProps, findManyInput, paginate, slice } from '../../utils/table/pagination';
+import { FindManyCallBackProps, PaginateProps, paginate } from '../../utils/table/pagination';
 import { mailService } from '../../services/mailings/MailService';
 
 import AuthService from '../auth/AuthService';
@@ -125,60 +125,6 @@ class UserService {
     });
   }
 
-  static getSearchTermFilter = (searchTerm: string) => {
-    if (!searchTerm) {
-      return [];
-    }
-
-    const searchTermFilter: UserWhereInput[] = [
-      {
-        firstName: { contains: searchTerm },
-      },
-      {
-        lastName: { contains: searchTerm },
-      },
-      {
-        email: { contains: searchTerm },
-      },
-      // TODO: Bring back role search
-      // {
-      //   role: { name: { contains: searchTerm } },
-      // },
-    ];
-
-    return searchTermFilter;
-  };
-
-  static orderUsersBy = (
-    users: (User & {
-      role: {
-        name: string;
-      };
-    })[],
-    orderBy: { id: string, desc: boolean },
-  ) => {
-    if (orderBy.id === 'firstName') {
-      return _.orderBy(users, (user) => user.firstName, orderBy.desc ? 'desc' : 'asc');
-    } if (orderBy.id === 'lastName') {
-      return _.orderBy(users, (user) => user.lastName, orderBy.desc ? 'desc' : 'asc');
-    } if (orderBy.id === 'email') {
-      return _.orderBy(users, (user) => user.email, orderBy.desc ? 'desc' : 'asc');
-    } if (orderBy.id === 'role') {
-      return _.orderBy(users, (user) => user.role.name, orderBy.desc ? 'desc' : 'asc');
-    }
-
-    return users;
-  };
-
-  static sliceUsers = (
-    entries: Array<any>,
-    offset: number,
-    limit: number,
-    pageIndex: number,
-  ) => ((offset + limit) < entries.length
-    ? entries.slice(offset, (pageIndex + 1) * limit)
-    : entries.slice(offset, entries.length));
-
   static paginatedUsers = async (
     customerSlug: string,
     pageIndex?: Nullable<number>,
@@ -206,10 +152,7 @@ class UserService {
       customer: { slug: customerSlug },
     } };
 
-    const findManyUsers = async ({ props, rest }: FindManyCallBackProps) => {
-      console.log('rest: ', rest);
-      return prisma.userOfCustomer.findMany(props);
-    };
+    const findManyUsers = async ({ props }: FindManyCallBackProps) => prisma.userOfCustomer.findMany(props);
     const countUsers = async ({ props: countArgs }: FindManyCallBackProps) => prisma.userOfCustomer.count(countArgs);
 
     const paginateProps: PaginateProps = {
@@ -218,7 +161,6 @@ class UserService {
         searchFields: ['firstName', 'lastName', 'email'],
         orderFields: ['firstName', 'lastName', 'email', 'role'],
         findManyCallBack: findManyUsers,
-        dialogueId: 'dslfsdj324234dfgfdg',
       },
       countArgs: {
         countWhereInput,
