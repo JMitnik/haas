@@ -61,15 +61,15 @@ export const SliderNodeValue = styled(motion.span)`
     color: ${theme.colors.primary};
     display: inline-block;
     text-align: center;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     font-weight: 1000;
     position: relative;
     border-radius: 30px;
     display: flex;
     box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
     overflow: hidden;
-    width: 50px;
-    height: 50px;
+    width: 45px;
+    height: 45px;
 
     > svg {
       position: absolute;

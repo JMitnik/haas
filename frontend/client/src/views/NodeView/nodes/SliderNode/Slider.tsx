@@ -88,7 +88,7 @@ const SliderText = ({ color, adaptedColor, score, isEarly }: { color: string, ad
       subText = 'Tap me again if you are sure.';
       break;
 
-    case !isEarly && score > 5 && score < 9.5:
+    case !isEarly && score >= 6 && score < 9.5:
       text = 'Good!';
       subText = 'This gives a good impression.';
       break;
@@ -96,13 +96,17 @@ const SliderText = ({ color, adaptedColor, score, isEarly }: { color: string, ad
       text = 'Amazing!';
       subText = 'This given an excellent impression.';
       break;
-    case !isEarly && score > 3 && score < 5:
-      text = 'Meh';
-      subText = 'Something is not right.';
+    case !isEarly && score > 5 && score < 6:
+      text = 'Neutral';
+      subText = 'Something is not great.';
       break;
-    case !isEarly && score <= 3:
+    case !isEarly && score <= 5 && score > 3:
       text = 'Bad';
       subText = 'This gives a bad impression.';
+      break;
+    case !isEarly && score <= 3:
+      text = 'Terrible';
+      subText = 'This gives a terrible impression.';
       break;
 
     default:
