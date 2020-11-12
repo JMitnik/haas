@@ -84,7 +84,9 @@ export const constructSortInput = (
 ) => {
   if (!orderByArray?.length) return undefined;
 
-  const orderBy = orderByArray[0];
+  const orderBy = orderByArray?.[0];
+  if (!orderBy) return null;
+
   const sortObject: Record<any, string> = {};
 
   orderFields.forEach((sortOption) => {
@@ -102,6 +104,7 @@ export const constructFindManyInput = (
 ): findManyInput => {
   const { findArgs, orderFields, searchFields, paginationOpts } = findManyArgs;
   const where = findArgs?.where ? constructWhereInput(findArgs?.where, paginationOpts, searchFields) : null;
+  console.log('orderBy: ', paginationOpts.orderBy);
   const orderBy = constructSortInput(orderFields, paginationOpts.orderBy || undefined);
 
   return {

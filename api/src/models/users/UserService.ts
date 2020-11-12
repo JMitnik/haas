@@ -122,15 +122,11 @@ class UserService {
 
   static paginatedUsers = async (
     customerSlug: string,
-    pageIndex?: Nullable<number>,
-    offset?: Nullable<number>,
-    limit?: Nullable<number>,
-    orderBy?: Nullable<any>,
-    searchTerm?: Nullable<string>,
+    paginationOpts: NexusGenInputs['PaginationWhereInput'],
   ) => {
-    const paginationOpts: NexusGenInputs['PaginationWhereInput'] = {
-      pageIndex, offset, limit, orderBy, searchTerm,
-    };
+    // const paginationOpts: NexusGenInputs['PaginationWhereInput'] = {
+    //   pageIndex, offset, limit, orderBy, searchTerm,
+    // };
 
     const userOfCustomerFindManyArgs: FindManyUserOfCustomerArgs = {
       where: {
@@ -147,14 +143,17 @@ class UserService {
       customer: { slug: customerSlug },
     } };
 
-    const findManyUsers = async ({ props }: FindManyCallBackProps) => prisma.userOfCustomer.findMany(props);
+    const findManyUsers = async ({ props }: FindManyCallBackProps) => {
+      console.log('props: ', props);
+      return prisma.userOfCustomer.findMany(props);
+    };
     const countUsers = async ({ props: countArgs }: FindManyCallBackProps) => prisma.userOfCustomer.count(countArgs);
 
     const paginateProps: PaginateProps = {
       findManyArgs: {
         findArgs: userOfCustomerFindManyArgs,
         searchFields: ['firstName', 'lastName', 'email'],
-        orderFields: ['firstName', 'lastName', 'email', 'role'],
+        orderFields: [],
         findManyCallBack: findManyUsers,
       },
       countArgs: {

@@ -3,11 +3,11 @@ import { PrismaClient,
   TriggerUpdateInput } from '@prisma/client';
 import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
 
-import { resolve } from 'path';
 import { DialogueType } from '../questionnaire/Dialogue';
 import { PaginationWhereInput } from '../general/Pagination';
 import { QuestionNodeType } from '../question/QuestionNode';
 import { UserType } from '../users/User';
+
 import TriggerService from './TriggerService';
 
 const TriggerTypeEnum = enumType({
