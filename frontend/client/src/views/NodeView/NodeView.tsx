@@ -46,7 +46,7 @@ interface NodeViewProps {
 const NodeView = ({ node }: NodeViewProps) => {
   const { store } = useDialogueTree();
   const { uploadInteraction, queueEntry, reset } = useUploadQueue();
-  const { routes, goToActiveLeaf, goToNodeByEdge, goToPostLeafByEdge } = useNavigator();
+  const { routes, goToActiveLeaf, goToNodeByEdge, goToPostLeafByEdge, checkIfReset } = useNavigator();
 
   /**
    * Stores entry and proceeds to next node
@@ -97,13 +97,11 @@ const NodeView = ({ node }: NodeViewProps) => {
     store.start();
   }
 
-  // Do the main check in
-  const suddenlyStarted = !node.isLeaf && !node.isRoot && !store.hasStarted;
-  const inPostLeafAfterRefresh = node.isPostLeaf && !store.hasStarted;
-  const inTreeWithNoResults = !node.isLeaf && !node.isRoot && store.session.isEmpty;
-
-  if ((suddenlyStarted) || (inPostLeafAfterRefresh) || inTreeWithNoResults) {
+  // Check if we will reset
+  const willReset = checkIfReset(node);
+  if (willReset) {
     reset();
+    store.finalize();
     return <Redirect to={routes.start} />;
   }
 

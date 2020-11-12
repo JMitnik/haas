@@ -1,10 +1,11 @@
+import { Redirect, useParams } from 'react-router-dom';
 import { Variants, motion } from 'framer-motion';
 import { observer, useObserver } from 'mobx-react-lite';
-import { useParams } from 'react-router-dom';
 import React, { useEffect } from 'react';
 import styled from 'styled-components/macro';
 
 import { HAASNode, UrlParams } from 'types/generic';
+import { useNavigator } from 'providers/NavigationProvider';
 import EmptyDialogueView from 'views/NodeView/EmptyDialogueView';
 import Loader from 'components/Loader';
 import NodeView from 'views/NodeView';
@@ -40,6 +41,8 @@ const NodePageContainer = styled(motion.div)`
 const NodePage = observer(() => {
   const { edgeId, nodeId } = useParams<UrlParams>();
   const { store, getNode } = useDialogueTree();
+  const { reset } = useUploadQueue();
+  const { routes, checkIfReset } = useNavigator();
 
   return useObserver(() => {
     const node = getNode(edgeId, nodeId);
