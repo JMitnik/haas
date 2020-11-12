@@ -1,16 +1,14 @@
-import { Redirect, useParams } from 'react-router-dom';
 import { Variants, motion } from 'framer-motion';
 import { observer, useObserver } from 'mobx-react-lite';
-import React, { useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import React from 'react';
 import styled from 'styled-components/macro';
 
 import { HAASNode, UrlParams } from 'types/generic';
-import { useNavigator } from 'providers/NavigationProvider';
 import EmptyDialogueView from 'views/NodeView/EmptyDialogueView';
 import Loader from 'components/Loader';
 import NodeView from 'views/NodeView';
 import useDialogueTree from 'providers/DialogueTreeProvider';
-import useUploadQueue from 'providers/UploadQueueProvider';
 
 export interface GenericNodeProps {
   isLeaf?: boolean;

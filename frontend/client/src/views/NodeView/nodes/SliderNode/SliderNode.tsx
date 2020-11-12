@@ -5,7 +5,6 @@ import { Div } from '@haas/ui';
 import { NodeTitle } from 'layouts/NodeLayout/NodeLayoutStyles';
 import { SessionEntryDataProps } from 'models/Session/SessionEntryModel';
 import { cleanInt } from 'utils/cleanInt';
-import ReactMarkdown from 'react-markdown';
 
 import { GenericNodeProps } from '../types';
 import { SliderNodeContainer } from './SliderNodeStyles';

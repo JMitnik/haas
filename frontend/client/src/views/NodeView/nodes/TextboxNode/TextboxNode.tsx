@@ -4,13 +4,12 @@ import React from 'react';
 
 import { ButtonIcon } from '@haas/ui/src/Buttons';
 import { ClientButton, OutlineButton } from 'components/Buttons/Buttons';
-import { Div, Grid, H3, Textbox } from '@haas/ui';
+import { Div, Grid, Textbox } from '@haas/ui';
 import { NodeTitle } from 'layouts/NodeLayout/NodeLayoutStyles';
 import { SessionEntryDataProps } from 'models/Session/SessionEntryModel';
 
 import { GenericNodeProps } from '../types';
 import { TextboxContainer } from './TextboxStyles';
-import ReactMarkdown from 'react-markdown';
 
 interface TextboxNodeProps extends GenericNodeProps {
   isLeaf?: boolean;

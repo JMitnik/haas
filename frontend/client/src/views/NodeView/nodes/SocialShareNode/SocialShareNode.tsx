@@ -1,6 +1,5 @@
 import { Facebook, Globe, Instagram, Linkedin, Twitter } from 'react-feather';
 import React from 'react';
-import ReactMarkdown from 'react-markdown';
 
 import { Flex } from '@haas/ui';
 import { NodeTitle } from 'layouts/NodeLayout/NodeLayoutStyles';

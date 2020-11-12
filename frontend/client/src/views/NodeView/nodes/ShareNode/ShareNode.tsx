@@ -1,14 +1,12 @@
 import { Share2 } from 'react-feather';
 import { useClipboard } from 'use-clipboard-copy';
 import React from 'react';
-import ReactMarkdown from 'react-markdown';
 
 import { Flex } from '@haas/ui';
 import { NodeTitle } from 'layouts/NodeLayout/NodeLayoutStyles';
 
 import { GenericNodeProps } from '../types';
 import { ShareButton, ShareButtonContainer, ShareNodeContainer, SuccesMessageContainer } from './ShareNodeStyles';
-import { useLocation } from 'react-router-dom';
 
 type SocialShareNodeProps = GenericNodeProps;
 

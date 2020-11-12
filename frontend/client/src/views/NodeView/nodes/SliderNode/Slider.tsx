@@ -1,9 +1,11 @@
-import { AnimatePresence, Variants, motion, transform, useAnimation, useMotionValue, useTransform } from 'framer-motion';
+import { AnimatePresence, Variants, motion, transform,
+  useAnimation, useMotionValue, useTransform } from 'framer-motion';
 import { usePopper } from 'react-popper';
 import { useTimer } from 'use-timer';
 import Color from 'color';
 import Lottie from 'react-lottie';
 import React, { useEffect, useReducer, useState } from 'react';
+import styled from 'styled-components';
 
 import { Div, Flex, Span, Text, Slider as UISlider } from '@haas/ui';
 import { ReactComponent as FingerIcon } from 'assets/icons/icon-fingerprint.svg';
@@ -13,9 +15,6 @@ import { ReactComponent as UnhappyIcon } from 'assets/icons/icon-unhappy.svg';
 
 import { FingerPrintContainer, HAASRabbit, SlideHereContainer, SliderNodeValue } from './SliderNodeStyles';
 import { SlideMeAnimation } from './SliderNodeAnimations';
-import { Smile } from 'react-feather';
-import { colors } from 'react-select/src/theme';
-import styled from 'styled-components';
 
 interface SliderAnimationStateProps {
   isStopped: boolean;
@@ -90,11 +89,11 @@ const SliderText = ({ color, adaptedColor, score, isEarly }: { color: string, ad
 
     case !isEarly && score >= 6 && score < 9.5:
       text = 'Good!';
-      subText = 'This gives a good impression.';
+      subText = 'This is good.';
       break;
     case !isEarly && score >= 9.5:
       text = 'Amazing!';
-      subText = 'This given an excellent impression.';
+      subText = 'This is excellent.';
       break;
     case !isEarly && score > 5 && score < 6:
       text = 'Neutral';
@@ -102,11 +101,11 @@ const SliderText = ({ color, adaptedColor, score, isEarly }: { color: string, ad
       break;
     case !isEarly && score <= 5 && score > 3:
       text = 'Bad';
-      subText = 'This gives a bad impression.';
+      subText = 'This is bad.';
       break;
     case !isEarly && score <= 3:
       text = 'Terrible';
-      subText = 'This gives a terrible impression.';
+      subText = 'This is terrible.';
       break;
 
     default:
@@ -133,7 +132,7 @@ interface SliderProps {
 }
 
 const endTime = 40;
-const initialWindUpSec = 3;
+const initialWindUpSec = 5;
 
 const Slider = ({ form, register, onSubmit }: SliderProps) => {
   const [isValid, setIsValid] = useState(false);
@@ -162,14 +161,16 @@ const Slider = ({ form, register, onSubmit }: SliderProps) => {
     },
   });
 
+  // Use-effect to submit: show the transition, and then submit the slider entry afterwards
   useEffect(() => {
     if (isComplete) {
       setTimeout(() => {
         onSubmit();
       }, 1000);
     }
-  }, [isComplete]);
+  }, [isComplete, onSubmit]);
 
+  //
   useEffect(() => {
     if (showIsEarly) {
       setIsValid(true);
@@ -244,6 +245,10 @@ const Slider = ({ form, register, onSubmit }: SliderProps) => {
   }, defaultSliderAnimationState);
 
   const moveBunny = (event: React.FormEvent<HTMLInputElement>) => {
+    if (isValid && showIsEarly) {
+      setShowIsEarly(false);
+    }
+
     reset();
     const val = Number(event.currentTarget.value);
     animationControls.start('active');

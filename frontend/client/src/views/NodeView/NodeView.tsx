@@ -1,14 +1,14 @@
-import { Redirect, useHistory } from 'react-router-dom';
+import { Redirect } from 'react-router-dom';
 import { TreeNodeProps } from 'models/Tree/TreeNodeModel';
 import React from 'react';
 
 import { Loader } from '@haas/ui';
+import { useNavigator } from 'providers/NavigationProvider';
 import DialogueTreeLayout from 'layouts/DialogueTreeLayout';
 import NodeLayout from 'layouts/NodeLayout';
 import useDialogueTree from 'providers/DialogueTreeProvider';
 import useUploadQueue from 'providers/UploadQueueProvider';
 
-import { useNavigator } from 'providers/NavigationProvider';
 import { GenericNodeProps } from './nodes/types';
 import MultiChoiceNode from './nodes/MultiChoiceNode/MultiChoiceNode';
 import PostLeafNode from './nodes/PostLeafNode/PostLeafNode';
@@ -17,7 +17,6 @@ import ShareNode from './nodes/ShareNode/ShareNode';
 import SliderNode from './nodes/SliderNode/SliderNode';
 import SocialShareNode from './nodes/SocialShareNode/SocialShareNode';
 import TextboxNode from './nodes/TextboxNode/TextboxNode';
-import useDebugReference from 'hooks/useDebugReference';
 
 const nodeMap: Record<string, (props: GenericNodeProps) => JSX.Element> = {
   SLIDER: SliderNode,
