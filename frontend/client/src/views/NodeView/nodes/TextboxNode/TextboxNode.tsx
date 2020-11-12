@@ -8,9 +8,9 @@ import { Div, Grid, H3, Textbox } from '@haas/ui';
 import { NodeTitle } from 'layouts/NodeLayout/NodeLayoutStyles';
 import { SessionEntryDataProps } from 'models/Session/SessionEntryModel';
 
-import ReactMarkdown from 'react-markdown';
 import { GenericNodeProps } from '../types';
 import { TextboxContainer } from './TextboxStyles';
+import ReactMarkdown from 'react-markdown';
 
 interface TextboxNodeProps extends GenericNodeProps {
   isLeaf?: boolean;
@@ -38,7 +38,7 @@ const TextboxNode = ({ node, onEntryStore }: TextboxNodeProps) => {
 
   return (
     <TextboxContainer>
-      <NodeTitle><ReactMarkdown>{node.title}</ReactMarkdown></NodeTitle>
+      <NodeTitle>{node.title}</NodeTitle>
       <Div>
         <Textbox name="textbox" ref={register} />
 

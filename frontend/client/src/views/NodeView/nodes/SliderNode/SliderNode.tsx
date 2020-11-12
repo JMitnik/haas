@@ -38,7 +38,7 @@ const SliderNode = ({ node, onEntryStore }: SliderNodeProps) => {
   return (
     <SliderNodeContainer>
       <Div>
-        <NodeTitle><ReactMarkdown>{node.title}</ReactMarkdown></NodeTitle>
+        <NodeTitle>{node.title}</NodeTitle>
       </Div>
       <Div>
         <Slider form={form} onSubmit={handleSubmit} register={form.register} />

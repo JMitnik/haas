@@ -63,7 +63,7 @@ const SocialShareNode = ({ node, onQueueOnlyStore }: SocialShareNodeProps) => {
 
   return (
     <SocialShareNodeContainer>
-      <NodeTitle><ReactMarkdown>{node.title}</ReactMarkdown></NodeTitle>
+      <NodeTitle>{node.title}</NodeTitle>
       <Flex justifyContent="center" alignItems="center">
         {node.links.length === 0 && <DefaultSocialItems />}
         {node.links.map((link, index) => (

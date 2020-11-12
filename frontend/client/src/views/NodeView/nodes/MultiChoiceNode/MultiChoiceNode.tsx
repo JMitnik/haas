@@ -51,7 +51,7 @@ const MultiChoiceNode = ({ node, onEntryStore }: MultiChoiceNodeProps) => {
 
   return (
     <MultiChoiceNodeContainer>
-      <NodeTitle><ReactMarkdown>{node.title}</ReactMarkdown></NodeTitle>
+      <NodeTitle>{node.title}</NodeTitle>
 
       <MultiChoiceNodeGrid
         data-cy="Choices"
@@ -74,7 +74,9 @@ const MultiChoiceNode = ({ node, onEntryStore }: MultiChoiceNodeProps) => {
                 </ChoiceIconContainer>
                 <ButtonBody>
                   <H5>
-                    {(multiChoiceOption?.publicValue || multiChoiceOption?.value)}
+                    <ReactMarkdown>
+                      {(multiChoiceOption?.publicValue || multiChoiceOption?.value)}
+                    </ReactMarkdown>
                   </H5>
                 </ButtonBody>
               </ClientButton>
