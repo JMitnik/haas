@@ -132,7 +132,7 @@ interface SliderProps {
 }
 
 const endTime = 40;
-const initialWindUpSec = 5;
+const initialWindUpSec = 3;
 
 const Slider = ({ form, register, onSubmit }: SliderProps) => {
   const [isValid, setIsValid] = useState(false);
@@ -268,6 +268,12 @@ const Slider = ({ form, register, onSubmit }: SliderProps) => {
     }
   };
 
+  const handleEarlyClick = () => {
+    if (showIsEarly) {
+      start();
+    }
+  };
+
   const adaptedColor = adaptColor(sliderColor);
 
   const adjustedScore = (Math.round(sliderValue * 2) / 2);
@@ -300,6 +306,7 @@ const Slider = ({ form, register, onSubmit }: SliderProps) => {
         ref={setSliderRef}
       >
         <SliderSpeechWrapper
+          onClick={() => handleEarlyClick()}
           ref={setOverlay}
           style={{
             width: '250px',
@@ -310,7 +317,11 @@ const Slider = ({ form, register, onSubmit }: SliderProps) => {
         >
           {!animationState.isStopped && (
             <Div>
-              <SliderNodeValue initial="initial" variants={sliderValueAnimeVariants} animate={animationControls}>
+              <SliderNodeValue
+                initial="initial"
+                variants={sliderValueAnimeVariants}
+                animate={animationControls}
+              >
                 <motion.svg viewBox="0 0 50 50">
                   <motion.circle
                     cx="25"
