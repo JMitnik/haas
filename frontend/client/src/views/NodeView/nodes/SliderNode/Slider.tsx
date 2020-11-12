@@ -341,7 +341,7 @@ const Slider = ({ form, register, onSubmit }: SliderProps) => {
                   <AnimatePresence exitBeforeEnter>
                     {!isComplete ? (
                       <motion.div key="score" initial={{ y: 0 }} exit={{ y: -30 }} style={{ width: '100%' }}>
-                        {adjustedScore.toFixed()}
+                        {adjustedScore.toFixed(1)}
                       </motion.div>
                     ) : (
                       <motion.div
