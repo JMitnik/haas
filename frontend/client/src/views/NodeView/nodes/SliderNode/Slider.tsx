@@ -136,7 +136,7 @@ interface SliderProps {
 }
 
 const endTime = 40;
-const initialWindUpSec = 3;
+const initialWindUpSec = 2;
 
 const Slider = ({ form, register, onSubmit }: SliderProps) => {
   const [isValid, setIsValid] = useState(false);
@@ -320,7 +320,7 @@ const Slider = ({ form, register, onSubmit }: SliderProps) => {
           {...attributes.popper}
         >
           {!animationState.isStopped && (
-            <motion.div whileHover={{ scale: 1.1 }}>
+            <motion.div initial={{ opacity: 0, y: 70, x: 10 }} animate={{ opacity: 1, y: 0 }} whileHover={{ scale: 1.1 }}>
               <SliderNodeValue
                 initial="initial"
                 variants={sliderValueAnimeVariants}
