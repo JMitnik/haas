@@ -11,11 +11,11 @@ import { HAASIdle, HAASRun, HAASStopping } from 'assets/animations';
 import { ReactComponent as HappyIcon } from 'assets/icons/icon-happy.svg';
 import { ReactComponent as UnhappyIcon } from 'assets/icons/icon-unhappy.svg';
 
+import { FingerPrintContainer, HAASRabbit, SlideHereContainer, SliderNodeValue } from './SliderNodeStyles';
 import { SlideMeAnimation } from './SliderNodeAnimations';
 import { Smile } from 'react-feather';
 import { colors } from 'react-select/src/theme';
 import styled from 'styled-components';
-import { FingerPrintContainer, HAASRabbit, SlideHereContainer, SliderNodeValue } from './SliderNodeStyles';
 
 interface SliderAnimationStateProps {
   isStopped: boolean;
@@ -55,6 +55,7 @@ const adaptColor = (colorHex: string) => {
 
 const SliderSpeechWrapper = styled(Div)`
   > div {
+    width: 100%;
     display: flex;
     align-items: center;
 
@@ -88,20 +89,20 @@ const SliderText = ({ color, adaptedColor, score, isEarly }: { color: string, ad
       break;
 
     case !isEarly && score > 5 && score < 9.5:
-      text = 'Nice.';
-      subText = 'This is nice.';
+      text = 'Good!';
+      subText = 'This gives a good impression.';
       break;
     case !isEarly && score >= 9.5:
       text = 'Amazing!';
-      subText = 'This is great!';
+      subText = 'This given an excellent impression.';
       break;
     case !isEarly && score > 3 && score < 5:
       text = 'Meh';
-      subText = 'Something is not right';
+      subText = 'Something is not right.';
       break;
     case !isEarly && score <= 3:
       text = 'Bad';
-      subText = 'This is not good.';
+      subText = 'This gives a bad impression.';
       break;
 
     default:
@@ -114,7 +115,7 @@ const SliderText = ({ color, adaptedColor, score, isEarly }: { color: string, ad
       <Text fontSize="1rem" color={color}>
         {text}
       </Text>
-      <Text fontSize="0.8rem" color={adaptedColor}>
+      <Text fontSize="0.7rem" color={adaptedColor}>
         {subText}
       </Text>
     </Span>
