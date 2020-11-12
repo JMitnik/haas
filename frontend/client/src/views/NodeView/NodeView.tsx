@@ -109,7 +109,7 @@ const NodeView = ({ node }: NodeViewProps) => {
   }
 
   return (
-    <DialogueTreeLayout node={node}>
+    <DialogueTreeLayout isAtLeaf={node.isLeaf} node={node}>
       <NodeLayout>
         <NodeType onQueueOnlyStore={handleQueueEntryOnly} onEntryStore={handleEntryStore} node={node} />
       </NodeLayout>

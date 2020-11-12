@@ -270,6 +270,8 @@ const Slider = ({ form, register, onSubmit }: SliderProps) => {
 
   const adaptedColor = adaptColor(sliderColor);
 
+  const adjustedScore = (Math.round(sliderValue * 2) / 2);
+
   return (
     <>
       {animationState.isStopped && (
@@ -328,7 +330,7 @@ const Slider = ({ form, register, onSubmit }: SliderProps) => {
                   <AnimatePresence exitBeforeEnter>
                     {!isComplete ? (
                       <motion.div key="score" initial={{ y: 0 }} exit={{ y: -30 }} style={{ width: '100%' }}>
-                        {(Math.round(sliderValue * 2) / 2).toFixed(1)}
+                        {adjustedScore.toFixed()}
                       </motion.div>
                     ) : (
                       <motion.div
@@ -348,7 +350,7 @@ const Slider = ({ form, register, onSubmit }: SliderProps) => {
                   </AnimatePresence>
                 </motion.span>
               </SliderNodeValue>
-              <SliderText color={sliderColor} adaptedColor={adaptedColor} score={sliderValue} isEarly={showIsEarly} />
+              <SliderText color={sliderColor} adaptedColor={adaptedColor} score={adjustedScore} isEarly={showIsEarly} />
             </Div>
           )}
         </SliderSpeechWrapper>
