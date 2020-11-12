@@ -1,6 +1,6 @@
 import gql from 'graphql-tag';
 
-const createSessionMutation = gql`
+const createInteractionMutation = gql`
     mutation createSession($input: SessionInput) {
         createSession(input: $input) {
             id
@@ -8,4 +8,4 @@ const createSessionMutation = gql`
     }
 `;
 
-export default createSessionMutation;
+export default createInteractionMutation;

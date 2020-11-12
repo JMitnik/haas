@@ -2,6 +2,14 @@
 ### Do not make changes to this file directly
 
 
+"""Append new data to an uploaded session"""
+input AppendToInteractionInput {
+  data: NodeEntryDataInput
+  edgeId: String
+  nodeId: String
+  sessionId: ID
+}
+
 """Input type for a choice node"""
 input ChoiceNodeEntryInput {
   value: String
@@ -292,6 +300,7 @@ type LoginOutput {
 }
 
 type Mutation {
+  appendToInteraction(input: AppendToInteractionInput): Session!
   assignTags(dialogueId: String, tags: TagsInputObjectType): Dialogue!
   copyDialogue(input: CreateDialogueInputType): Dialogue!
 
@@ -618,6 +627,11 @@ type ShareNodeType {
 """Input type for a slider node"""
 input SliderNodeEntryInput {
   value: Int
+}
+
+"""Details regarding interaction with social node"""
+input SocialNodeEntryInput {
+  visitedLink: String
 }
 
 enum SystemPermission {

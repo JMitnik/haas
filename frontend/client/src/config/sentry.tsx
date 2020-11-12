@@ -9,6 +9,7 @@ const sentryInstance = Sentry.init({
   integrations: [
     new Integrations.Tracing(),
   ],
+  denyUrls: ['localhost', '127.0.0.1'],
   tracesSampleRate: 1.0,
 });
 

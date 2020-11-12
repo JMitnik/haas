@@ -117,6 +117,15 @@ export const SliderNodeEntryInput = inputObjectType({
   },
 });
 
+export const SocialNodeEntryInput = inputObjectType({
+  name: 'SocialNodeEntryInput',
+  description: 'Details regarding interaction with social node',
+
+  definition(t) {
+    t.string('visitedLink');
+  },
+});
+
 export const NodeEntryDataInput = inputObjectType({
   name: 'NodeEntryDataInput',
   description: 'Data type for the actual node entry',

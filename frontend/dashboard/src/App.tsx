@@ -138,14 +138,6 @@ const CustomerRoutes = () => (
                     )}
                   />
 
-                  {/* Possible deprecate this */}
-                  {/* <GuardedRoute
-                    path="/dashboard/b/:customerSlug/users/add"
-                    render={() => (
-                      <AddUserView />
-                    )}
-                  /> */}
-
                   <GuardedRoute
                     allowedPermission={SystemPermission.CAN_ADD_USERS}
                     path="/dashboard/b/:customerSlug/users/invite"
@@ -159,10 +151,6 @@ const CustomerRoutes = () => (
                     path="/dashboard/b/:customerSlug/users"
                     render={() => <UsersOverview />}
                   />
-                  {/* <GuardedRoute
-                    path="/dashboard/b/:customerSlug/roles"
-                    render={() => <RolesOverview />}
-                  /> */}
 
                   <GuardedRoute
                     path="/dashboard/b/:customerSlug/dialogue/add"

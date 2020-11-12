@@ -1,6 +1,5 @@
 import gql from 'graphql-tag';
 
-import { CustomerFragment } from './CustomerFragment';
 import { EdgeFragment } from './EdgeFragment';
 import { QuestionFragment } from './QuestionFragment';
 
@@ -43,15 +42,11 @@ const getDialogueFromSlug = gql`
         edges {
           ...EdgeFragment
         }
-        customer {
-          ...CustomerFragment
-        }
       }
     }
   }
 
   ${EdgeFragment}
-  ${CustomerFragment}
   ${QuestionFragment}
 `;
 
