@@ -38,6 +38,7 @@ type NodeTitleSize = 'xs' | 'sm' | 'md' | 'lg';
 
 const NodeTitleWrapper = styled(H2)<{ size: NodeTitleSize }>`
   white-space: pre-line;
+  text-align: left;
   
   ${({ theme, size }) => css`
     ${size === 'xs' && css`

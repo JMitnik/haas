@@ -41,8 +41,6 @@ const NodePageContainer = styled(motion.div)`
 const NodePage = observer(() => {
   const { edgeId, nodeId } = useParams<UrlParams>();
   const { store, getNode } = useDialogueTree();
-  const { reset } = useUploadQueue();
-  const { routes, checkIfReset } = useNavigator();
 
   return useObserver(() => {
     const node = getNode(edgeId, nodeId);
