@@ -55,23 +55,23 @@ export const FingerPrintContainer = styled(motion.div)`
   `}
 `;
 
-export const SliderNodeValue = styled(motion.h3)`
+export const SliderNodeValue = styled(motion.span)`
   ${({ theme }) => css`
     background: rgba(255, 255, 255, 0.4);
     color: ${theme.colors.primary};
     display: inline-block;
     text-align: center;
-    font-size: 1.5rem;
-    margin: 0 auto;
+    font-size: 1.2rem;
     font-weight: 1000;
     position: relative;
     border-radius: 30px;
     display: flex;
     box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+    overflow: hidden;
     width: 50px;
     height: 50px;
 
-    svg {
+    > svg {
       position: absolute;
       top: 0;
       left: 0;
@@ -82,17 +82,29 @@ export const SliderNodeValue = styled(motion.h3)`
       fill: none;
     }
 
-    p {
+    > span {
       opacity: 1;
-      width: 100%;
-      height: 100%;
-      padding: 8px;
       background: white;
-      border: 4px solid white;
       border-radius: 50px;
       display: flex;
       align-items: center;
       justify-content: center;
+      display: flex;
+
+      .signal {
+        width: 100%;
+        height: 100%;
+        border-radius: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        svg {
+          stroke: currentColor;
+          width: 80%;
+          height: 80%;
+        }
+      }
     }
   `}
 `;

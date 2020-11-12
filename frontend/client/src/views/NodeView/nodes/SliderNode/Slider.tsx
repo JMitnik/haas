@@ -1,17 +1,21 @@
-import { Variants, motion, transform, useAnimation, useMotionValue, useTransform } from 'framer-motion';
+import { AnimatePresence, Variants, motion, transform, useAnimation, useMotionValue, useTransform } from 'framer-motion';
 import { usePopper } from 'react-popper';
 import { useTimer } from 'use-timer';
+import Color from 'color';
 import Lottie from 'react-lottie';
-import React, { useReducer, useState } from 'react';
+import React, { useEffect, useReducer, useState } from 'react';
 
-import { Div, Flex, Text, Slider as UISlider } from '@haas/ui';
+import { Div, Flex, Span, Text, Slider as UISlider } from '@haas/ui';
 import { ReactComponent as FingerIcon } from 'assets/icons/icon-fingerprint.svg';
 import { HAASIdle, HAASRun, HAASStopping } from 'assets/animations';
 import { ReactComponent as HappyIcon } from 'assets/icons/icon-happy.svg';
 import { ReactComponent as UnhappyIcon } from 'assets/icons/icon-unhappy.svg';
 
-import { FingerPrintContainer, HAASRabbit, SlideHereContainer, SliderNodeValue } from './SliderNodeStyles';
 import { SlideMeAnimation } from './SliderNodeAnimations';
+import { Smile } from 'react-feather';
+import { colors } from 'react-select/src/theme';
+import styled from 'styled-components';
+import { FingerPrintContainer, HAASRabbit, SlideHereContainer, SliderNodeValue } from './SliderNodeStyles';
 
 interface SliderAnimationStateProps {
   isStopped: boolean;
@@ -39,6 +43,29 @@ const defaultSliderAnimationState: SliderAnimationStateProps = {
   animationJson: HAASIdle,
 };
 
+const adaptColor = (colorHex: string) => {
+  const color = Color(colorHex);
+
+  if (color.isLight()) {
+    return color.mix(Color('black'), 0.4).saturate(1).hex();
+  }
+
+  return color.mix(Color('white'), 0.4).saturate(1).hex();
+};
+
+const SliderSpeechWrapper = styled(Div)`
+  > div {
+    display: flex;
+    align-items: center;
+
+    border-radius: 30px;
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(5px);
+    padding: 12px;
+    box-shadow: rgba(0, 0, 0, 0.08) 0px 4px 12px;
+  }
+`;
+
 const sliderValueAnimeVariants: Variants = {
   initial: {
     opacity: 0,
@@ -50,15 +77,63 @@ const sliderValueAnimeVariants: Variants = {
   },
 };
 
+const SliderText = ({ color, adaptedColor, score, isEarly }: { color: string, adaptedColor:string, score: number, isEarly: boolean }) => {
+  let text = 'Thanks for voting';
+  let subText = 'Let us continue';
+
+  switch (true) {
+    case isEarly:
+      text = 'That was quick!';
+      subText = 'Tap me again if you are sure.';
+      break;
+
+    case !isEarly && score > 5 && score < 9.5:
+      text = 'Nice.';
+      subText = 'This is nice.';
+      break;
+    case !isEarly && score >= 9.5:
+      text = 'Amazing!';
+      subText = 'This is great!';
+      break;
+    case !isEarly && score > 3 && score < 5:
+      text = 'Meh';
+      subText = 'Something is not right';
+      break;
+    case !isEarly && score <= 3:
+      text = 'Bad';
+      subText = 'This is not good.';
+      break;
+
+    default:
+      text = 'Thanks for voting';
+      break;
+  }
+
+  return (
+    <Span ml={2} textAlign="left">
+      <Text fontSize="1rem" color={color}>
+        {text}
+      </Text>
+      <Text fontSize="0.8rem" color={adaptedColor}>
+        {subText}
+      </Text>
+    </Span>
+  );
+};
+
 interface SliderProps {
   form: any;
   register: any;
   onSubmit: () => void;
 }
 
-const endTime = 60;
+const endTime = 40;
+const initialWindUpSec = 3;
 
 const Slider = ({ form, register, onSubmit }: SliderProps) => {
+  const [isValid, setIsValid] = useState(false);
+  const [isComplete, setIsComplete] = useState(false);
+  const [showIsEarly, setShowIsEarly] = useState(false);
   const animationControls = useAnimation();
   const timerProgressAbs = useMotionValue(0);
 
@@ -69,11 +144,35 @@ const Slider = ({ form, register, onSubmit }: SliderProps) => {
       timerProgressAbs.set(time);
     },
     onTimeOver: () => {
-      onSubmit();
+      setIsComplete(true);
     },
   });
 
-  const timerProgress = useTransform(timerProgressAbs, [0, endTime], [0, 1]);
+  // Initial timer for Client
+  useTimer({
+    endTime: initialWindUpSec,
+    autostart: true,
+    onTimeOver: () => {
+      setIsValid(true);
+    },
+  });
+
+  useEffect(() => {
+    if (isComplete) {
+      setTimeout(() => {
+        onSubmit();
+      }, 1000);
+    }
+  }, [isComplete]);
+
+  useEffect(() => {
+    if (showIsEarly) {
+      setIsValid(true);
+    }
+  }, [showIsEarly, setIsValid]);
+
+  // Hardcoded
+  const timerProgress = useTransform(timerProgressAbs, [0, endTime], [151, 202]);
 
   const sliderValue = Number(form.watch({ nest: true }).slider / 10);
   const sliderColor = transform(sliderValue, [0, 5, 10], ['#E53E3E', '#F6AD55', '#38B2AC']);
@@ -151,8 +250,15 @@ const Slider = ({ form, register, onSubmit }: SliderProps) => {
 
   const handleSubmit = () => {
     dispatchAnimationState({ type: 'idle' });
-    start();
+
+    if (!isValid) {
+      setShowIsEarly(true);
+    } else {
+      start();
+    }
   };
+
+  const adaptedColor = adaptColor(sliderColor);
 
   return (
     <>
@@ -181,28 +287,61 @@ const Slider = ({ form, register, onSubmit }: SliderProps) => {
         }}
         ref={setSliderRef}
       >
-        <Div
+        <SliderSpeechWrapper
           ref={setOverlay}
           style={{
-            width: '200px',
+            width: '250px',
+            display: 'flex',
             ...styles.popper,
           }}
           {...attributes.popper}
         >
-          <SliderNodeValue initial="initial" variants={sliderValueAnimeVariants} animate={animationControls}>
+          {!animationState.isStopped && (
+            <Div>
+              <SliderNodeValue initial="initial" variants={sliderValueAnimeVariants} animate={animationControls}>
+                <motion.svg viewBox="0 0 50 50">
+                  <motion.circle
+                    cx="25"
+                    cy="25"
+                    r="24"
+                    style={{
+                      strokeDashoffset: 453,
+                      strokeDasharray: timerProgress,
+                      fill: 'transparent',
+                      stroke: sliderColor,
+                      strokeWidth: '2px',
+                    }}
+                  />
+                </motion.svg>
 
-            <motion.svg viewBox="0 0 40 40">
-              <motion.path
-                d="M 0, 20 a 20, 20 0 1,0 40,0 a 20, 20 0 1,0 -40,0"
-                style={{ pathLength: timerProgress, stroke: sliderColor, strokeWidth: '3px' }}
-              />
-            </motion.svg>
-
-            <motion.p animate={{ color: sliderColor }}>
-              {sliderValue.toFixed(0)}
-            </motion.p>
-          </SliderNodeValue>
-        </Div>
+                <motion.span animate={{ color: sliderColor }} style={{ width: '100%' }}>
+                  <AnimatePresence exitBeforeEnter>
+                    {!isComplete ? (
+                      <motion.div key="score" initial={{ y: 0 }} exit={{ y: -30 }} style={{ width: '100%' }}>
+                        {(Math.round(sliderValue * 2) / 2).toFixed(1)}
+                      </motion.div>
+                    ) : (
+                      <motion.div
+                        style={{ background: sliderColor, color: adaptedColor }}
+                        className="signal"
+                        key="signal"
+                        initial={{ y: 30 }}
+                        animate={{ y: 0 }}
+                      >
+                        {sliderValue > 5 ? (
+                          <HappyIcon />
+                        ) : (
+                          <UnhappyIcon />
+                        )}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.span>
+              </SliderNodeValue>
+              <SliderText color={sliderColor} adaptedColor={adaptedColor} score={sliderValue} isEarly={showIsEarly} />
+            </Div>
+          )}
+        </SliderSpeechWrapper>
         <div
           className="rabbit"
           style={{
