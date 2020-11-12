@@ -63,6 +63,10 @@ const SliderSpeechWrapper = styled(Div)`
     backdrop-filter: blur(5px);
     padding: 12px;
     box-shadow: rgba(0, 0, 0, 0.08) 0px 4px 12px;
+
+    &:hover {
+      cursor: pointer;
+    }
   }
 `;
 
@@ -270,7 +274,7 @@ const Slider = ({ form, register, onSubmit }: SliderProps) => {
 
   const handleEarlyClick = () => {
     if (showIsEarly) {
-      start();
+      setIsComplete(true);
     }
   };
 
@@ -316,7 +320,7 @@ const Slider = ({ form, register, onSubmit }: SliderProps) => {
           {...attributes.popper}
         >
           {!animationState.isStopped && (
-            <Div>
+            <motion.div whileHover={{ scale: 1.1 }}>
               <SliderNodeValue
                 initial="initial"
                 variants={sliderValueAnimeVariants}
@@ -362,7 +366,7 @@ const Slider = ({ form, register, onSubmit }: SliderProps) => {
                 </motion.span>
               </SliderNodeValue>
               <SliderText color={sliderColor} adaptedColor={adaptedColor} score={adjustedScore} isEarly={showIsEarly} />
-            </Div>
+            </motion.div>
           )}
         </SliderSpeechWrapper>
         <div
