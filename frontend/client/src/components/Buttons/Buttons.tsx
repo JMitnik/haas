@@ -46,7 +46,6 @@ export const ClientButton = styled(Button)`
     ${ButtonBody} {
       width: 100%;
       text-align: left;
-      padding-left: 24px;
       border-radius: 0 10px 10px 0;
 
       h1, h2, h3, h4 ,h5 {
