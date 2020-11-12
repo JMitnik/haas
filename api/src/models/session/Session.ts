@@ -1,10 +1,12 @@
 import { extendType, inputObjectType, mutationField, objectType } from '@nexus/schema';
 
 // eslint-disable-next-line import/no-cycle
-import { NodeEntryInput, NodeEntryType } from '../node-entry/NodeEntry';
+import { UserInputError } from 'apollo-server-express';
+import { NodeEntryDataInput, NodeEntryInput, NodeEntryType } from '../node-entry/NodeEntry';
 // eslint-disable-next-line import/no-cycle
 import { ConnectionInterface } from '../general/Pagination';
 // eslint-disable-next-line import/no-cycle
+import NodeEntryService from '../node-entry/NodeEntryService';
 import SessionService from './SessionService';
 
 export const SessionType = objectType({
@@ -148,11 +150,34 @@ export const CreateSessionMutation = mutationField('createSession', {
   },
 });
 
-export default [
-  SessionConnection,
-  SessionWhereUniqueInput,
-  SessionQuery,
-  SessionType,
-  CreateSessionMutation,
-  SessionInput,
-];
+export const AppendToInteractionInput = inputObjectType({
+  name: 'AppendToInteractionInput',
+  description: 'Append new data to an uploaded session',
+
+  definition(t) {
+    t.id('sessionId');
+    t.string('nodeId');
+    t.string('edgeId', { nullable: true });
+
+    t.field('data', { type: NodeEntryDataInput });
+  },
+});
+
+export const AppendToInteractionMutation = mutationField('appendToInteraction', {
+  type: SessionType,
+  args: { input: AppendToInteractionInput },
+
+  resolve(parent, args, ctx) {
+    if (!args?.input) throw new UserInputError('No valid new interaction data provided');
+    if (!args?.input.sessionId) throw new UserInputError('No valid existing interaction found');
+
+    const updatedInteraction = ctx.prisma.nodeEntry.create({
+      data: {
+        session: { connect: { id: args.input.sessionId } },
+        ...NodeEntryService.constructCreateNodeEntryFragment(args.input),
+      },
+    });
+
+    return updatedInteraction as any;
+  },
+});

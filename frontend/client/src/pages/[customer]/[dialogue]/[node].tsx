@@ -4,11 +4,11 @@ import { useParams } from 'react-router-dom';
 import React from 'react';
 import styled from 'styled-components/macro';
 
-import { HAASNode } from 'types/generic';
+import { HAASNode, UrlParams } from 'types/generic';
+import EmptyDialogueView from 'views/NodeView/EmptyDialogueView';
 import Loader from 'components/Loader';
 import NodeView from 'views/NodeView';
 import useDialogueTree from 'providers/DialogueTreeProvider';
-import EmptyDialogueView from 'views/NodeView/EmptyDialogueView';
 
 export interface GenericNodeProps {
   isLeaf?: boolean;
@@ -37,19 +37,15 @@ const NodePageContainer = styled(motion.div)`
 `;
 
 const NodePage = observer(() => {
-  const { edgeId } = useParams<{ edgeId?: string, leafId?: string }>();
-  const store = useDialogueTree();
+  const { edgeId, nodeId } = useParams<UrlParams>();
+  const { store, getNode } = useDialogueTree();
 
   return useObserver(() => {
+    const node = getNode(edgeId, nodeId);
     // If rootNode is unknown yet, return Loader
     if (!store.tree) {
       return <Loader />;
     }
-
-    // TODO: Disable going back
-
-    // Either we start from the 'root' (no edge) or we get the next node.
-    const node = edgeId ? store.tree.getChildNodeByEdge(edgeId) : store.tree.rootNode;
 
     if (!node) {
       return <EmptyDialogueView />;

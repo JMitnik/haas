@@ -5,6 +5,7 @@ import SessionEntryModel, { SessionEntryDataProps } from './SessionEntryModel';
 const SessionModel = types
   .model({
     items: types.map(SessionEntryModel),
+    isAtLeaf: types.optional(types.boolean, false),
   })
   .actions((self) => ({
     add(nodeId: string, data: SessionEntryDataProps) {
@@ -15,6 +16,9 @@ const SessionModel = types
     },
     reset() {
       self.items.clear();
+    },
+    setIsAtLeaf(isAtLeaf: boolean) {
+      self.isAtLeaf = isAtLeaf;
     },
   }))
   .views((self) => ({

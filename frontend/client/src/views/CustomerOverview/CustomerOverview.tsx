@@ -8,7 +8,7 @@ import useDialogueTree from 'providers/DialogueTreeProvider';
 import { CustomerOverviewContainer } from './CustomerOverviewStyles';
 
 const CustomerOverview = () => {
-  const store = useDialogueTree();
+  const { store } = useDialogueTree();
 
   useEffect(() => {
     if (store.customer) {
