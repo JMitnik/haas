@@ -435,8 +435,11 @@ export interface NexusGenRootTypes {
     type: NexusGenEnums['TriggerTypeEnum']; // TriggerTypeEnum!
   }
   UserConnection: { // root type
-    pageIndex?: number | null; // Int
-    totalPages?: number | null; // Int
+    endDate?: string | null; // String
+    limit: number; // Int!
+    offset: number; // Int!
+    pageInfo: NexusGenRootTypes['PaginationPageInfo']; // PaginationPageInfo!
+    startDate?: string | null; // String
     userCustomers: NexusGenRootTypes['UserCustomer'][]; // [UserCustomer!]!
   }
   UserCustomer: { // root type
@@ -467,7 +470,7 @@ export interface NexusGenRootTypes {
     basicSentiment?: string | null; // String
     quantity?: number | null; // Int
   }
-  ConnectionInterface: NexusGenRootTypes['SessionConnection'] | NexusGenRootTypes['RoleConnection'] | NexusGenRootTypes['TriggerConnectionType'];
+  ConnectionInterface: NexusGenRootTypes['SessionConnection'] | NexusGenRootTypes['UserConnection'] | NexusGenRootTypes['RoleConnection'] | NexusGenRootTypes['TriggerConnectionType'];
   String: string;
   Int: number;
   Float: number;
@@ -825,8 +828,11 @@ export interface NexusGenFieldTypes {
     type: NexusGenEnums['TriggerTypeEnum']; // TriggerTypeEnum!
   }
   UserConnection: { // field return type
-    pageIndex: number | null; // Int
-    totalPages: number | null; // Int
+    endDate: string | null; // String
+    limit: number; // Int!
+    offset: number; // Int!
+    pageInfo: NexusGenRootTypes['PaginationPageInfo']; // PaginationPageInfo!
+    startDate: string | null; // String
     userCustomers: NexusGenRootTypes['UserCustomer'][]; // [UserCustomer!]!
   }
   UserCustomer: { // field return type
@@ -1078,7 +1084,7 @@ export interface NexusGenArgTypes {
 }
 
 export interface NexusGenAbstractResolveReturnTypes {
-  ConnectionInterface: "SessionConnection" | "RoleConnection" | "TriggerConnectionType"
+  ConnectionInterface: "SessionConnection" | "UserConnection" | "RoleConnection" | "TriggerConnectionType"
 }
 
 export interface NexusGenInheritedFields {}

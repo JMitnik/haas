@@ -1,8 +1,8 @@
 import { FindManyUserOfCustomerArgs, User, UserOfCustomer } from '@prisma/client';
 
+import _ from 'lodash';
 import { NexusGenInputs } from '../../generated/nexus';
 import { Nullable } from '../../types/generic';
-import _ from 'lodash';
 
 import { FindManyCallBackProps, PaginateProps, paginate } from '../../utils/table/pagination';
 import { mailService } from '../../services/mailings/MailService';
@@ -223,8 +223,11 @@ class UserService {
 
     return {
       userCustomers: entries,
-      pageIndex: pageInfo.pageIndex,
-      totalPages: pageInfo.nrPages,
+      offset: paginationOpts?.offset || 0,
+      limit: paginationOpts?.limit || 0,
+      startDate: paginationOpts?.startDate?.toString(),
+      endDate: paginationOpts?.endDate?.toString(),
+      pageInfo,
     };
   };
 }

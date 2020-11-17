@@ -758,9 +758,12 @@ input UpdateQuestionNodeInputType {
 """The `Upload` scalar type represents a file upload."""
 scalar Upload
 
-type UserConnection {
-  pageIndex: Int
-  totalPages: Int
+type UserConnection implements ConnectionInterface {
+  endDate: String
+  limit: Int!
+  offset: Int!
+  pageInfo: PaginationPageInfo!
+  startDate: String
   userCustomers: [UserCustomer!]!
 }
 
