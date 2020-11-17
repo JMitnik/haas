@@ -42,7 +42,7 @@ interface TableProps {
 const tableHeaders = [
   { Header: 'user', accessor: 'id', Cell: InteractionUserCell },
   { Header: 'date', accessor: 'createdAt', Cell: InteractionDateCell },
-  { Header: 'interaction_path', accessor: 'nodeEntries', Cell: InteractionPathCell },
+  { Header: 'interaction_path', accessor: 'nodeEntries', Cell: InteractionPathCell, disableSorting: true },
   { Header: 'score', accessor: 'score', Cell: ScoreCell },
 ];
 

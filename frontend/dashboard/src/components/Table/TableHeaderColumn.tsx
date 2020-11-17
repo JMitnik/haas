@@ -33,6 +33,7 @@ const TableHeaderColumn = ({
     <Div
       onClick={handleSort}
       useFlex
+      style={{ cursor: !disableSorting ? 'pointer' : 'auto' }}
       flexDirection="row"
       alignItems="center"
       borderRadius="10px 0 0 10px"

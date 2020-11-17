@@ -104,7 +104,6 @@ export const constructFindManyInput = (
 ): findManyInput => {
   const { findArgs, orderFields, searchFields, paginationOpts } = findManyArgs;
   const where = findArgs?.where ? constructWhereInput(findArgs?.where, paginationOpts, searchFields) : null;
-  console.log('orderBy: ', paginationOpts.orderBy);
   const orderBy = constructSortInput(orderFields, paginationOpts.orderBy || undefined);
 
   return {
