@@ -33,12 +33,11 @@ const TableHeaderColumn = ({
     <Div
       onClick={handleSort}
       useFlex
-      style={{ cursor: !disableSorting ? 'pointer' : 'auto' }}
       flexDirection="row"
       alignItems="center"
       borderRadius="10px 0 0 10px"
     >
-      <Div display="inline-block">
+      <Div style={{ cursor: !disableSorting ? 'pointer' : 'auto' }} display="inline-block">
         <Text color={isInActiveSort ? 'gray.600' : 'gray.400'} fontSize="1.1rem" fontWeight="600">
           {t(Header)}
         </Text>
