@@ -1,7 +1,8 @@
-import { FindManyUserOfCustomerArgs, User } from '@prisma/client';
+import { FindManyUserOfCustomerArgs, User, UserOfCustomer } from '@prisma/client';
 
 import { NexusGenInputs } from '../../generated/nexus';
 import { Nullable } from '../../types/generic';
+import _ from 'lodash';
 
 import { FindManyCallBackProps, PaginateProps, paginate } from '../../utils/table/pagination';
 import { mailService } from '../../services/mailings/MailService';
@@ -120,14 +121,67 @@ class UserService {
     });
   }
 
+  static filterBySearchTerm = (
+    usersOfCustomer: (UserOfCustomer & {
+      user: {
+        firstName: string;
+        lastName: string;
+        email: string;
+      },
+      role: {
+        name: string;
+      };
+    })[],
+    searchTerm: string | null | undefined,
+  ) => {
+    if (!searchTerm) return usersOfCustomer;
+
+    const filtered = usersOfCustomer.filter((userOfCustomer) => {
+      if (userOfCustomer?.user?.email?.toLowerCase().includes(searchTerm.toLowerCase())) {
+        return true;
+      }
+      if (userOfCustomer?.user?.firstName?.toLowerCase().includes(searchTerm.toLowerCase())) {
+        return true;
+      }
+      if (userOfCustomer?.user?.lastName?.toLowerCase().includes(searchTerm.toLowerCase())) {
+        return true;
+      }
+      return false;
+    });
+
+    return filtered;
+  };
+
+  static orderUsersBy = (
+    usersOfCustomer: (UserOfCustomer & {
+      user: {
+        firstName: string;
+        lastName: string;
+        email: string;
+      },
+      role: {
+        name: string;
+      };
+    })[],
+    orderBy: any,
+  ) => {
+    if (orderBy.by === 'firstName') {
+      return _.orderBy(usersOfCustomer, (userOfCustomer) => userOfCustomer.user.firstName, orderBy.desc ? 'desc' : 'asc');
+    } if (orderBy.by === 'lastName') {
+      return _.orderBy(usersOfCustomer, (userOfCustomer) => userOfCustomer.user.lastName, orderBy.desc ? 'desc' : 'asc');
+    } if (orderBy.by === 'email') {
+      return _.orderBy(usersOfCustomer, (userOfCustomer) => userOfCustomer.user.email, orderBy.desc ? 'desc' : 'asc');
+    } if (orderBy.by === 'role') {
+      return _.orderBy(usersOfCustomer, (userOfCustomer) => userOfCustomer.role.name, orderBy.desc ? 'desc' : 'asc');
+    }
+
+    return usersOfCustomer;
+  };
+
   static paginatedUsers = async (
     customerSlug: string,
     paginationOpts: NexusGenInputs['PaginationWhereInput'],
   ) => {
-    // const paginationOpts: NexusGenInputs['PaginationWhereInput'] = {
-    //   pageIndex, offset, limit, orderBy, searchTerm,
-    // };
-
     const userOfCustomerFindManyArgs: FindManyUserOfCustomerArgs = {
       where: {
         customer: { slug: customerSlug },
@@ -143,9 +197,11 @@ class UserService {
       customer: { slug: customerSlug },
     } };
 
-    const findManyUsers = async ({ props }: FindManyCallBackProps) => {
-      console.log('props: ', props);
-      return prisma.userOfCustomer.findMany(props);
+    const findManyUsers = async ({ props, paginationOpts }: FindManyCallBackProps) => {
+      const users: any = await prisma.userOfCustomer.findMany(props);
+      const filteredBySearch = UserService.filterBySearchTerm(users, paginationOpts?.searchTerm);
+      const orderedUsers = UserService.orderUsersBy(filteredBySearch, paginationOpts?.orderBy?.[0]);
+      return orderedUsers;
     };
     const countUsers = async ({ props: countArgs }: FindManyCallBackProps) => prisma.userOfCustomer.count(countArgs);
 
