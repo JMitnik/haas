@@ -1,8 +1,8 @@
 import { FindManyUserOfCustomerArgs, User, UserOfCustomer } from '@prisma/client';
 
-import _ from 'lodash';
 import { NexusGenInputs } from '../../generated/nexus';
 import { Nullable } from '../../types/generic';
+import _ from 'lodash';
 
 import { FindManyCallBackProps, PaginateProps, paginate } from '../../utils/table/pagination';
 import { mailService } from '../../services/mailings/MailService';
@@ -208,7 +208,7 @@ class UserService {
     const paginateProps: PaginateProps = {
       findManyArgs: {
         findArgs: userOfCustomerFindManyArgs,
-        searchFields: ['firstName', 'lastName', 'email'],
+        searchFields: [],
         orderFields: [],
         findManyCallBack: findManyUsers,
       },

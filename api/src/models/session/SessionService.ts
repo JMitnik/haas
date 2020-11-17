@@ -296,8 +296,8 @@ class SessionService {
     const paginateProps: PaginateProps = {
       findManyArgs: {
         findArgs: null,
-        searchFields: ['firstName', 'lastName', 'email'],
-        orderFields: ['firstName', 'lastName', 'email', 'role'],
+        searchFields: [],
+        orderFields: [],
         findManyCallBack: findManySessions,
         dialogueId,
       },
