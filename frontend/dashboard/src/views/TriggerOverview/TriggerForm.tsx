@@ -16,8 +16,8 @@ import styled from 'styled-components/macro';
 import 'antd/dist/antd.css'; // Slider,
 import { Button, ButtonGroup, FormErrorMessage, RadioButtonGroup, Tag, TagIcon } from '@chakra-ui/core';
 import {
-  ButtonRadio, Div, Form, FormControl,
-  FormLabel, FormSection, H3, Hr, Input, InputGrid, InputHelper, Muted, Span,
+  Div, Form, FormControl, FormLabel,
+  FormSection, H3, Hr, Input, InputGrid, InputHelper, Muted, RadioButton, Span,
 } from '@haas/ui';
 import { SelectType } from 'types/generic';
 import { useTranslation } from 'react-i18next';
@@ -304,28 +304,28 @@ const FormConditionFragment = ({
                       onChange(val);
                     }}
                   >
-                    <ButtonRadio
+                    <RadioButton
                       mr={2}
                       icon={CornerRightDown}
                       value="LOW_THRESHOLD"
                       text="Low threshold"
                       description="Alert under threshold"
                     />
-                    <ButtonRadio
+                    <RadioButton
                       mr={2}
                       icon={CornerRightUp}
                       value="HIGH_THRESHOLD"
                       text="High threshold"
                       description="Alert over threshold"
                     />
-                    <ButtonRadio
+                    <RadioButton
                       mr={2}
                       icon={Minimize2}
                       value="INNER_RANGE"
                       text="Inner range"
                       description="Alert within range"
                     />
-                    <ButtonRadio
+                    <RadioButton
                       mb={2}
                       icon={Maximize2}
                       value="OUTER_RANGE"
@@ -342,7 +342,7 @@ const FormConditionFragment = ({
                       onBlur();
                     }}
                   >
-                    <ButtonRadio
+                    <RadioButton
                       mr={2}
                       icon={Target}
                       value="TEXT_MATCH"
@@ -630,13 +630,13 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                       }}
                       display="flex"
                     >
-                      <ButtonRadio
+                      <RadioButton
                         icon={Thermometer}
                         value="QUESTION"
                         text={t('question')}
                         description={t('trigger:trigger_question_alarm')}
                       />
-                      <ButtonRadio
+                      <RadioButton
                         isDisabled
                         icon={Watch}
                         value="SCHEDULED"
@@ -833,9 +833,9 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                     onChange={onChange}
                     display="flex"
                   >
-                    <ButtonRadio icon={Mail} value="EMAIL" text={t('email')} description={t('trigger:alert_email')} />
-                    <ButtonRadio icon={Smartphone} value="PHONE" text={t('sms')} description={t('trigger:alert_sms')} />
-                    <ButtonRadio value="BOTH" text={t('both')} description={t('trigger:alert_both')} />
+                    <RadioButton icon={Mail} value="EMAIL" text={t('email')} description={t('trigger:alert_email')} />
+                    <RadioButton icon={Smartphone} value="PHONE" text={t('sms')} description={t('trigger:alert_sms')} />
+                    <RadioButton value="BOTH" text={t('both')} description={t('trigger:alert_both')} />
                   </RadioButtonGroup>
                 )}
               />

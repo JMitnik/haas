@@ -5,14 +5,14 @@ import { useParams } from 'react-router-dom';
 import { useToast } from '@chakra-ui/core';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
+import ReactMarkdown from 'react-markdown';
 import styled, { css } from 'styled-components/macro';
 
 import { Flex, Span } from '@haas/ui';
+import { useCustomer } from 'providers/CustomerProvider';
 import deleteCTAMutation from 'mutations/deleteCTA';
 import getCTANodesQuery from 'queries/getCTANodes';
 
-import { useCustomer } from 'providers/CustomerProvider';
-import ReactMarkdown from 'react-markdown';
 import CTAForm from './CTAForm';
 import CTAIcon from './CTAIcon';
 import EditCTAButton from './EditCTAButton';
@@ -32,7 +32,7 @@ interface ShareProps {
   url: string;
   tooltip: string;
 }
-interface CTAEntryProps {
+interface CTACardProps {
   id: string;
   title: string;
   type: { label: string, value: string };
@@ -44,7 +44,7 @@ interface CTAEntryProps {
   onNewCTAChange: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const CTAEntryContainer = styled(Flex)<{ activeCTA: string | null, id: string }>`
+const CTACardContainer = styled(Flex)<{ activeCTA: string | null, id: string }>`
  ${({ id, activeCTA, theme }) => css`
     position: relative;
     flex-direction: column;
@@ -81,7 +81,7 @@ const OverflowSpan = styled(Span)`
   `}
 `;
 
-const CTAEntry = ({ id, activeCTA, onActiveCTAChange, title, type, links, share, Icon, onNewCTAChange }: CTAEntryProps) => {
+const CTACard = ({ id, activeCTA, onActiveCTAChange, title, type, links, share, Icon, onNewCTAChange }: CTACardProps) => {
   const toast = useToast();
   const { t } = useTranslation();
   const { activeCustomer } = useCustomer();
@@ -134,16 +134,14 @@ const CTAEntry = ({ id, activeCTA, onActiveCTAChange, title, type, links, share,
 
   return (
     <motion.div initial={{ opacity: 1, y: 150 }} animate={{ opacity: 1, y: 0 }}>
-
-      <CTAEntryContainer id={id} activeCTA={activeCTA}>
-
+      <CTACardContainer id={id} activeCTA={activeCTA}>
         <Flex flexDirection="row" width="100%">
           <CTAIcon type={type} Icon={Icon} />
 
           <Flex width="60%" flexDirection="column">
-            <Span fontSize="1.4em">
+            <motion.span>
               {t('title')}
-            </Span>
+            </motion.span>
             <OverflowSpan>
               <ReactMarkdown>
                 {title || t('none') || ''}
@@ -162,26 +160,24 @@ const CTAEntry = ({ id, activeCTA, onActiveCTAChange, title, type, links, share,
 
         </Flex>
 
-        {activeCTA === id
-          && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-              <CTAForm
-                id={id}
-                title={title}
-                type={type}
-                links={links}
-                share={share}
-                onDeleteCTA={deleteCTA}
-                onActiveCTAChange={onActiveCTAChange}
-                onNewCTAChange={onNewCTAChange}
-              />
-            </motion.div>
+        {activeCTA === id && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+            <CTAForm
+              id={id}
+              title={title}
+              type={type}
+              links={links}
+              share={share}
+              onDeleteCTA={deleteCTA}
+              onActiveCTAChange={onActiveCTAChange}
+              onNewCTAChange={onNewCTAChange}
+            />
+          </motion.div>
+        )}
 
-          )}
-
-      </CTAEntryContainer>
+      </CTACardContainer>
     </motion.div>
   );
 };
 
-export default CTAEntry;
+export default CTACard;

@@ -1,11 +1,11 @@
 import { Activity, Briefcase, Clipboard, Link, Link2, Loader, Minus, Upload } from 'react-feather';
 import { Button, ButtonGroup, FormErrorMessage, RadioButtonGroup, useToast } from '@chakra-ui/core';
-import {
-  ButtonRadio, Div, Form, FormControl, FormLabel, FormSection, H3, Hr, Input, InputGrid,
-  InputHelper,
-  Muted,
-} from '@haas/ui';
 import { Controller, UseFormMethods } from 'react-hook-form';
+import {
+  Div, Form, FormControl, FormLabel, FormSection, H3, Hr, Input, InputGrid, InputHelper,
+  Muted,
+  RadioButton,
+} from '@haas/ui';
 import { useHistory } from 'react-router';
 import { useMutation } from '@apollo/react-hooks';
 import { useTranslation } from 'react-i18next';
@@ -91,8 +91,8 @@ const CustomerLogoFormFragment = ({ form }: { form: UseFormMethods<FormDataProps
               onChange={onChange}
               display="flex"
             >
-              <ButtonRadio icon={Link2} value={1} text={t('existing_url')} description={t('existing_url_helper')} />
-              <ButtonRadio icon={Upload} value={0} text={t('upload_file')} description={t('upload_file_helper')} />
+              <RadioButton icon={Link2} value={1} text={t('existing_url')} description={t('existing_url_helper')} />
+              <RadioButton icon={Upload} value={0} text={t('upload_file')} description={t('upload_file_helper')} />
             </RadioButtonGroup>
           )}
         />
@@ -239,14 +239,14 @@ const CustomerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = 
                     name="seed"
                     render={({ onChange, onBlur, value }) => (
                       <RadioButtonGroup display="flex" onBlur={onBlur} value={value} onChange={onChange}>
-                        <ButtonRadio
+                        <RadioButton
                           icon={Clipboard}
                           value={1}
                           mr={2}
                           text={(t('customer:custom_template'))}
                           description={t('customer:custom_template_helper')}
                         />
-                        <ButtonRadio
+                        <RadioButton
                           icon={Loader}
                           value={0}
                           text={(t('customer:no_custom_template'))}
@@ -268,14 +268,14 @@ const CustomerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = 
                       name="willGenerateFakeData"
                       render={({ onChange, onBlur, value }) => (
                         <RadioButtonGroup display="flex" onBlur={onBlur} value={value} onChange={onChange}>
-                          <ButtonRadio
+                          <RadioButton
                             icon={Activity}
                             value={1}
                             mr={2}
                             text={(t('customer:use_fake_data'))}
                             description={t('customer:fake_data_helper')}
                           />
-                          <ButtonRadio
+                          <RadioButton
                             icon={Minus}
                             value={0}
                             text={(t('customer:no_use_fake_data'))}

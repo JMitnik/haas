@@ -14,13 +14,14 @@ import {
   InputGroupProps,
   FormControlProps,
   Textarea as ChakraTextArea,
-  RadioButtonGroup} from '@chakra-ui/core';
+  RadioButtonGroup as ChakraRadioButtonGroup} from '@chakra-ui/core';
 import styled, { css } from 'styled-components';
 import { SpaceProps, GridProps } from 'styled-system';
 import { InputHTMLAttributes } from 'react';
 import Color from 'color';
 import { FormLabelProps } from '@chakra-ui/core/dist/FormLabel';
 import { Grid } from './Container';
+import { Text } from './Type';
 
 export const FormContainer = styled(Div) <{expandedForm?: boolean}>`
   ${({ theme, expandedForm }) => css`
@@ -289,7 +290,7 @@ const ButtonRadioContainer = styled.div`
   }
 `;
 
-export const ButtonRadio = forwardRef((props: any, ref) => {
+export const RadioButton = forwardRef((props: any, ref) => {
   const { isChecked, isDisabled, value, text, description, icon, ...rest } = props;
 
   return (
@@ -505,33 +506,23 @@ export const FormSection = forwardRef((props: FormSectionProps, ref: Ref<HTMLDiv
   </FormSectionContainer>
 ));
 
+export const FormSectionHeader = styled(Text)`
+  ${({ theme }) => css`
+    font-size: 1.4rem;
+    color: ${theme.colors.default.text};
+    font-weight: 700;
+  `}
+`;
+
 interface InputGridProps extends GridProps {
   children: React.ReactNode;
 }
 
-
-export const BooleanRadioInput = ({ onChange, children, value }: any) => {
-  const handleButtonChange = (val: any) => {
-    if (val === 1) {
-      onChange(true);
-    }
-
-    if (val === 0) {
-      onChange(false);
-    }
-  };
-
-  return (
-    <RadioButtonGroup
-      defaultValue={value}
-      isInline
-      onChange={(val) => handleButtonChange(val)}
-      display="flex"
-    >
-      {children}
-    </RadioButtonGroup>
-  );
-};
+export const RadioButtons = ({ children }: { children: React.ReactNode }) => (
+  <ChakraRadioButtonGroup display="flex">
+    {children}
+  </ChakraRadioButtonGroup>
+)
 
 export const InputGrid = forwardRef((props: InputGridProps, ref: Ref<HTMLDivElement>) => (
   <Grid mb={4} gridTemplateColumns={['1fr', '1fr', '1fr']} {...props}>

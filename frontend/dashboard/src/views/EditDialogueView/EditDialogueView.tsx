@@ -2,9 +2,9 @@ import * as yup from 'yup';
 import { Activity, Minus, Plus, Type } from 'react-feather';
 import { ApolloError, gql } from 'apollo-boost';
 import { Button, ButtonGroup, FormErrorMessage, RadioButtonGroup, Stack } from '@chakra-ui/core';
-import { ButtonRadio, Div, Flex, Form, FormContainer, FormControl, FormLabel,
-  FormSection, H3, Hr, Input, InputGrid, InputHelper, Muted, PageTitle, Textarea } from '@haas/ui';
 import { Controller, useForm } from 'react-hook-form';
+import { Div, Flex, Form, FormContainer, FormControl, FormLabel, FormSection,
+  H3, Hr, Input, InputGrid, InputHelper, Muted, PageTitle, RadioButton, Textarea } from '@haas/ui';
 import { motion } from 'framer-motion';
 import { useHistory, useParams } from 'react-router';
 import { useMutation, useQuery } from '@apollo/react-hooks';
@@ -303,14 +303,14 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFo
                         control={form.control}
                         render={({ onChange, onBlur, value }) => (
                           <RadioButtonGroup onBlur={onBlur} value={value} onChange={onChange} display="flex">
-                            <ButtonRadio
+                            <RadioButton
                               icon={Minus}
                               value={1}
                               mr={2}
                               text={(t('dialogue:hide_fake_data'))}
                               description={t('dialogue:do_hide_fake_data_helper')}
                             />
-                            <ButtonRadio
+                            <RadioButton
                               icon={Activity}
                               value={0}
                               text={(t('dialogue:no_hide_fake_data'))}

@@ -29,6 +29,8 @@ import createCTAMutation from 'mutations/createCTA';
 import getCTANodesQuery from 'queries/getCTANodes';
 import updateCTAMutation from 'mutations/updateCTA';
 
+import FormNodeForm from './FormNodeForm';
+
 interface FormDataProps {
   title: string;
   ctaType: { label: string, value: string };
@@ -117,6 +119,7 @@ const schema = yup.object().shape({
 });
 
 const CTA_TYPES = [
+  { label: 'Form', value: 'FORM', icon: RegisterIcon },
   { label: 'Opinion', value: 'TEXTBOX', icon: OpinionIcon },
   { label: 'Register', value: 'REGISTRATION', RegisterIcon },
   { label: 'Link', value: 'LINK', LinkIcon },
@@ -356,7 +359,7 @@ const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTACha
                       />
                     )}
                   />
-                  <FormErrorMessage>{form.errors.title}</FormErrorMessage>
+                  <FormErrorMessage>{form.errors.title?.message}</FormErrorMessage>
                 </FormControl>
 
                 <FormControl isRequired>
@@ -366,8 +369,8 @@ const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTACha
                   <Controller
                     name="ctaType"
                     control={form.control}
-                    as={<Select />}
                     options={CTA_TYPES}
+                    as={Select}
                   />
 
                   <FormErrorMessage>{form.errors.ctaType?.value}</FormErrorMessage>
@@ -417,139 +420,140 @@ const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTACha
                       <FormErrorMessage>{form.errors.share?.tooltip}</FormErrorMessage>
                     </FormControl>
                   </>
-
-          )}
-
+                )}
               </InputGrid>
             </Div>
           </FormSection>
 
           {watchType?.value === 'LINK' && (
-          <FormSection id="links">
-            <Div>
-              <H3 color="default.text" fontWeight={500} pb={2}>Links</H3>
-              <Muted color="gray.600">
-                {t('cta:link_header')}
-              </Muted>
-            </Div>
-            <Div>
-              <InputGrid>
-                <Div gridColumn="1 / -1">
-                  <Flex flexDirection="row" alignItems="center" justifyContent="space-between" marginBottom={5}>
-                    <H4>Links</H4>
-                    <Button leftIcon={PlusCircle} onClick={addCondition} size="sm">{t('cta:add_link')}</Button>
-                  </Flex>
-                  <Hr />
+            <FormSection id="links">
+              <Div>
+                <H3 color="default.text" fontWeight={500} pb={2}>Links</H3>
+                <Muted color="gray.600">
+                  {t('cta:link_header')}
+                </Muted>
+              </Div>
+              <Div>
+                <InputGrid>
+                  <Div gridColumn="1 / -1">
+                    <Flex flexDirection="row" alignItems="center" justifyContent="space-between" marginBottom={5}>
+                      <H4>Links</H4>
+                      <Button leftIcon={PlusCircle} onClick={addCondition} size="sm">{t('cta:add_link')}</Button>
+                    </Flex>
+                    <Hr />
 
-                  <AnimatePresence>
-                    {activeLinks.map((link, index) => (
-                      <motion.div key={(`${link.id}` || link.url)} initial={{ opacity: 1 }} exit={{ opacity: 0, x: 100 }}>
-                        <Div
-                          position="relative"
-                          key={index}
-                          marginTop={15}
-                          gridColumn="1 / -1"
-                          bg="gray.100"
-                          padding={4}
-                        >
-                          <Grid
-                            gridGap="12px"
-                            gridTemplateColumns={['1fr 1fr']}
+                    <AnimatePresence>
+                      {activeLinks.map((link, index) => (
+                        <motion.div key={(`${link.id}` || link.url)} initial={{ opacity: 1 }} exit={{ opacity: 0, x: 100 }}>
+                          <Div
+                            position="relative"
+                            key={index}
+                            marginTop={15}
+                            gridColumn="1 / -1"
+                            bg="gray.100"
+                            padding={4}
                           >
-                            <FormControl isRequired isInvalid={!!form.errors?.links?.[index]?.url}>
-                              <FormLabel htmlFor={`links[${index}].url`}>{t('cta:url')}</FormLabel>
-                              <InputHelper>{t('cta:link_url_helper')}</InputHelper>
-                              <Input
-                                name={`links[${index}].url`}
-                                defaultValue={link.url}
-                                placeholder="https://link.to/"
-                                leftEl={<Type />}
-                                onChange={(e: any) => handleURLChange(e.currentTarget.value, index)}
-                                ref={form.register({ required: true })}
-                              />
-                              <FormErrorMessage>{!!form.errors?.links?.[index]?.url}</FormErrorMessage>
-                            </FormControl>
+                            <Grid
+                              gridGap="12px"
+                              gridTemplateColumns={['1fr 1fr']}
+                            >
+                              <FormControl isRequired isInvalid={!!form.errors?.links?.[index]?.url}>
+                                <FormLabel htmlFor={`links[${index}].url`}>{t('cta:url')}</FormLabel>
+                                <InputHelper>{t('cta:link_url_helper')}</InputHelper>
+                                <Input
+                                  name={`links[${index}].url`}
+                                  defaultValue={link.url}
+                                  placeholder="https://link.to/"
+                                  leftEl={<Type />}
+                                  onChange={(e: any) => handleURLChange(e.currentTarget.value, index)}
+                                  ref={form.register({ required: true })}
+                                />
+                                <FormErrorMessage>{!!form.errors?.links?.[index]?.url}</FormErrorMessage>
+                              </FormControl>
 
-                            <FormControl isRequired isInvalid={!!form.errors.links?.[index]?.type}>
-                              <FormLabel htmlFor={`links[${index}].type`}>{t('cta:type')}</FormLabel>
-                              <InputHelper>{t('cta:link_type_helper')}</InputHelper>
-                              <Controller
-                                id={`link-${link.id}-${index}`}
-                                name={`links[${index}].type`}
-                                control={form.control}
-                                defaultValue={link.type}
-                                render={({ onChange }) => (
-                                  <Select
-                                    options={LINK_TYPES}
-                                    value={link.type}
-                                    onChange={(opt: any) => {
-                                      handleLinkTypeChange(opt, index);
-                                      onChange(opt.value);
-                                    }}
-                                  />
-                                )}
-                              />
-                              <FormErrorMessage>{!!form.errors.links?.[index]?.type}</FormErrorMessage>
-                            </FormControl>
+                              <FormControl isRequired isInvalid={!!form.errors.links?.[index]?.type}>
+                                <FormLabel htmlFor={`links[${index}].type`}>{t('cta:type')}</FormLabel>
+                                <InputHelper>{t('cta:link_type_helper')}</InputHelper>
+                                <Controller
+                                  id={`link-${link.id}-${index}`}
+                                  name={`links[${index}].type`}
+                                  control={form.control}
+                                  defaultValue={link.type}
+                                  render={({ onChange }) => (
+                                    <Select
+                                      options={LINK_TYPES}
+                                      value={link.type}
+                                      onChange={(opt: any) => {
+                                        handleLinkTypeChange(opt, index);
+                                        onChange(opt.value);
+                                      }}
+                                    />
+                                  )}
+                                />
+                                <FormErrorMessage>{!!form.errors.links?.[index]?.type}</FormErrorMessage>
+                              </FormControl>
 
-                            <FormControl>
-                              <FormLabel htmlFor={`links[${index}].tooltip`}>{t('cta:tooltip')}</FormLabel>
-                              <InputHelper>{t('cta:link_tooltip_helper')}</InputHelper>
-                              <Input
-                                isInvalid={!!form.errors.links?.[index]?.tooltip}
-                                name={`links[${index}].tooltip`}
-                                defaultValue={link.title}
-                                onChange={(e:any) => handleTooltipChange(e.currentTarget.value, index)}
-                                ref={form.register({ required: false })}
-                              />
-                              <FormErrorMessage>{!!form.errors.links?.[index]?.tooltip}</FormErrorMessage>
-                            </FormControl>
+                              <FormControl>
+                                <FormLabel htmlFor={`links[${index}].tooltip`}>{t('cta:tooltip')}</FormLabel>
+                                <InputHelper>{t('cta:link_tooltip_helper')}</InputHelper>
+                                <Input
+                                  isInvalid={!!form.errors.links?.[index]?.tooltip}
+                                  name={`links[${index}].tooltip`}
+                                  defaultValue={link.title}
+                                  onChange={(e:any) => handleTooltipChange(e.currentTarget.value, index)}
+                                  ref={form.register({ required: false })}
+                                />
+                                <FormErrorMessage>{!!form.errors.links?.[index]?.tooltip}</FormErrorMessage>
+                              </FormControl>
 
-                            <FormControl>
-                              <FormLabel htmlFor={`links[${index}].iconUrl`}>{t('cta:link_icon')}</FormLabel>
-                              <InputHelper>{t('cta:link_icon_helper')}</InputHelper>
-                              <Input
-                                isInvalid={!!form.errors.links?.[index]?.iconUrl}
-                                name={`links[${index}].iconUrl`}
-                                defaultValue={link.iconUrl}
-                                onChange={(e:any) => handleIconChange(e.currentTarget.value, index)}
-                                ref={form.register({ required: false })}
-                              />
-                              <FormErrorMessage>{!!form.errors.links?.[index]?.iconUrl}</FormErrorMessage>
-                            </FormControl>
+                              <FormControl>
+                                <FormLabel htmlFor={`links[${index}].iconUrl`}>{t('cta:link_icon')}</FormLabel>
+                                <InputHelper>{t('cta:link_icon_helper')}</InputHelper>
+                                <Input
+                                  isInvalid={!!form.errors.links?.[index]?.iconUrl}
+                                  name={`links[${index}].iconUrl`}
+                                  defaultValue={link.iconUrl}
+                                  onChange={(e:any) => handleIconChange(e.currentTarget.value, index)}
+                                  ref={form.register({ required: false })}
+                                />
+                                <FormErrorMessage>{!!form.errors.links?.[index]?.iconUrl}</FormErrorMessage>
+                              </FormControl>
 
-                            <FormControl>
-                              <FormLabel htmlFor={`links[${index}].backgroundColor`}>{t('cta:background_color')}</FormLabel>
-                              <InputHelper>{t('cta:background_color_helper')}</InputHelper>
-                              <Input
-                                isInvalid={!!form.errors.links?.[index]?.backgroundColor}
-                                name={`links[${index}].backgroundColor`}
-                                defaultValue={link.backgroundColor}
-                                onChange={(e:any) => handleBackgroundColorChange(e.currentTarget.value, index)}
-                                ref={form.register({ required: false })}
-                              />
-                              <FormErrorMessage>{!!form.errors.links?.[index]?.backgroundColor}</FormErrorMessage>
-                            </FormControl>
+                              <FormControl>
+                                <FormLabel htmlFor={`links[${index}].backgroundColor`}>{t('cta:background_color')}</FormLabel>
+                                <InputHelper>{t('cta:background_color_helper')}</InputHelper>
+                                <Input
+                                  isInvalid={!!form.errors.links?.[index]?.backgroundColor}
+                                  name={`links[${index}].backgroundColor`}
+                                  defaultValue={link.backgroundColor}
+                                  onChange={(e:any) => handleBackgroundColorChange(e.currentTarget.value, index)}
+                                  ref={form.register({ required: false })}
+                                />
+                                <FormErrorMessage>{!!form.errors.links?.[index]?.backgroundColor}</FormErrorMessage>
+                              </FormControl>
 
-                          </Grid>
-                          <Button
-                            mt={4}
-                            variant="outline"
-                            size="sm"
-                            variantColor="red"
-                            onClick={() => handleDeleteLink(index)}
-                          >
-                            {t('cta:delete_link')}
-                          </Button>
-                        </Div>
-                      </motion.div>
-                    ))}
-                  </AnimatePresence>
-                </Div>
-              </InputGrid>
-            </Div>
+                            </Grid>
+                            <Button
+                              mt={4}
+                              variant="outline"
+                              size="sm"
+                              variantColor="red"
+                              onClick={() => handleDeleteLink(index)}
+                            >
+                              {t('cta:delete_link')}
+                            </Button>
+                          </Div>
+                        </motion.div>
+                      ))}
+                    </AnimatePresence>
+                  </Div>
+                </InputGrid>
+              </Div>
+            </FormSection>
+          )}
 
-          </FormSection>
+          {watchType.value === 'FORM' && (
+            <FormNodeForm form={form} />
           )}
         </Div>
 
