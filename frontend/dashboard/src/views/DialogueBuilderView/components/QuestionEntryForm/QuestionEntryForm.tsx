@@ -89,6 +89,7 @@ interface QuestionEntryFormProps {
   parentQuestionId?: string;
   parentQuestionType: string;
   onDeleteEntry: any;
+  onScroll: () => void;
 }
 
 const questionTypes = [
@@ -112,6 +113,7 @@ const QuestionEntryForm = ({
   parentQuestionId,
   edgeId,
   onDeleteEntry,
+  onScroll,
 }: QuestionEntryFormProps) => {
   const { activeCustomer } = useCustomer();
   const { customerSlug, dialogueSlug } = useParams();
@@ -215,6 +217,7 @@ const QuestionEntryForm = ({
       if (onAddExpandChange) {
         onAddExpandChange(false);
       }
+      onScroll();
       onActiveQuestionChange(null);
 
       toast({
@@ -249,6 +252,7 @@ const QuestionEntryForm = ({
   const [updateQuestion, { loading: updateLoading }] = useMutation(updateQuestionMutation, {
     onCompleted: () => {
       onActiveQuestionChange(null);
+      onScroll();
 
       toast({
         title: 'Node saved',
@@ -283,6 +287,7 @@ const QuestionEntryForm = ({
       onAddExpandChange(false);
     }
     onActiveQuestionChange(null);
+    onScroll();
   };
 
   const setMinValue = (event: React.FocusEvent<HTMLInputElement>) => {
