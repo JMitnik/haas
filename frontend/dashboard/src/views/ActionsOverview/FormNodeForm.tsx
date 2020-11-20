@@ -4,8 +4,8 @@ import React from 'react';
 
 import { AlertCircle, Circle, Star } from 'react-feather';
 import { Button } from '@chakra-ui/core';
-import { CTANodeFormProps } from './CTATypes';
 import { Controller, useFieldArray } from 'react-hook-form';
+import { CTANodeFormProps } from './CTATypes';
 
 type FormNodeFormProps = CTANodeFormProps;
 
@@ -39,7 +39,7 @@ const FormNodeForm = ({ form }: FormNodeFormProps) => {
 
   const { fields, append, remove } = useFieldArray({
     control: form.control,
-    name: 'fields',
+    name: 'formNode.fields',
     keyName: 'fieldIndex',
   });
 
@@ -58,73 +58,73 @@ const FormNodeForm = ({ form }: FormNodeFormProps) => {
             <UI.FormLabel htmlFor="fields">{t('fields')}</UI.FormLabel>
             <Button type="button" onClick={() => handleNewField()}>{t('add_field')}</Button>
             {fields.map((field, index) => (
-              <>
-                <UI.Card noHover bg="gray.200">
-                  <UI.CardBody>
-                    <UI.FormControl>
-                      <UI.FormLabel>{t('label')}</UI.FormLabel>
-                      <UI.Input name={`{fields[${index}]}.label`} />
-                    </UI.FormControl>
-                    <UI.FormControl>
-                      <UI.FormLabel>{t('is_required')}</UI.FormLabel>
-                      <Controller
-                        control={form.control}
-                        name={`{fields[${index}]}.isRequired`}
-                        render={(controlProps) => (
-                          <UI.RadioButtons {...controlProps}>
-                            <UI.RadioButton
-                              icon={AlertCircle}
-                              value={1}
-                              mr={2}
-                              text={(t('required'))}
-                              description={t('required_helper')}
-                            />
-                            <UI.RadioButton
-                              icon={Circle}
-                              value={0}
-                              mr={2}
-                              text={(t('not_required'))}
-                              description={t('not_required_helper')}
-                            />
-                          </UI.RadioButtons>
-                        )}
-                      />
-                    </UI.FormControl>
-                    <UI.FormControl>
-                      <UI.FormLabel>{t('form_type')}</UI.FormLabel>
-                      <Controller
-                        control={form.control}
-                        name={`{fields[${index}]}.type`}
-                        render={(controlProps) => (
-                          <UI.RadioButtons {...controlProps}>
-                            <UI.RadioButton
-                              value={TempFieldType.EMAIL}
-                              text="Email"
-                            />
-                            <UI.RadioButton
-                              value={TempFieldType.SHORT_TEXT}
-                              text="Short text"
-                            />
-                            <UI.RadioButton
-                              value={TempFieldType.LONG_TEXT}
-                              text="Long text"
-                            />
-                            <UI.RadioButton
-                              value={TempFieldType.NUMBER}
-                              text="Number"
-                            />
-                            <UI.RadioButton
-                              value={TempFieldType.PHONE_NUMBER}
-                              text="Phone number"
-                            />
-                          </UI.RadioButtons>
-                        )}
-                      />
-                    </UI.FormControl>
-                    test
-                  </UI.CardBody>
-                </UI.Card>
-              </>
+              <UI.Card key={field.fieldIndex} noHover bg="gray.200">
+                <UI.CardBody>
+                  <UI.FormControl>
+                    <UI.FormLabel>{t('label')}</UI.FormLabel>
+                    <UI.Input defaultValue="test" ref={form.register()} name={`formNode.fields[${index}].label`} />
+                  </UI.FormControl>
+                  <UI.FormControl>
+                    <UI.FormLabel>{t('is_required')}</UI.FormLabel>
+                    <Controller
+                      control={form.control}
+                      name={`formNode.fields[${index}].isRequired`}
+                      defaultValue={field.isRequired}
+                      render={(controlProps) => (
+                        <UI.RadioButtons {...controlProps}>
+                          <UI.RadioButton
+                            icon={AlertCircle}
+                            value={1}
+                            mr={2}
+                            text={(t('required'))}
+                            description={t('required_helper')}
+                          />
+                          <UI.RadioButton
+                            icon={Circle}
+                            value={0}
+                            mr={2}
+                            text={(t('not_required'))}
+                            description={t('not_required_helper')}
+                          />
+                        </UI.RadioButtons>
+                      )}
+                    />
+                  </UI.FormControl>
+                  <UI.FormControl>
+                    <UI.FormLabel>{t('form_type')}</UI.FormLabel>
+                    <Controller
+                      control={form.control}
+                      name={`formNode.fields[${index}].type`}
+                      defaultValue={field.type}
+                      render={(controlProps) => (
+                        <UI.RadioButtons {...controlProps}>
+                          <UI.RadioButton
+                            value={TempFieldType.EMAIL}
+                            text="Email"
+                          />
+                          <UI.RadioButton
+                            value={TempFieldType.SHORT_TEXT}
+                            text="Short text"
+                          />
+                          <UI.RadioButton
+                            value={TempFieldType.LONG_TEXT}
+                            text="Long text"
+                          />
+                          <UI.RadioButton
+                            value={TempFieldType.NUMBER}
+                            text="Number"
+                          />
+                          <UI.RadioButton
+                            value={TempFieldType.PHONE_NUMBER}
+                            text="Phone number"
+                          />
+                        </UI.RadioButtons>
+                      )}
+                    />
+                  </UI.FormControl>
+                  test
+                </UI.CardBody>
+              </UI.Card>
             ))}
           </UI.Div>
         </UI.InputGrid>

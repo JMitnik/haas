@@ -34,6 +34,7 @@ interface ConnectionInterface {
 input CreateCTAInputType {
   customerSlug: String
   dialogueSlug: String
+  form: FormNodeInputType
   links: CTALinksInputType
   share: ShareNodeInputType
   title: String
@@ -242,6 +243,44 @@ type FontSettings {
   id: ID!
 }
 
+"""FormNodeEntryInput"""
+input FormNodeEntryFieldInput {
+  email: String = ""
+  longText: String = ""
+  number: Int = 0
+  phoneNumber: String = ""
+  relatedFieldId: ID
+  shortText: String = ""
+  url: String = ""
+}
+
+"""FormNodeEntryInput"""
+input FormNodeEntryInput {
+  fields: [FormNodeEntryFieldInput!]
+}
+
+input FormNodeFieldInput {
+  isRequired: Boolean = false
+  label: String
+  position: Int
+  type: FormNodeFieldTypeEnum
+}
+
+"""The types a field can assume"""
+enum FormNodeFieldTypeEnum {
+  email
+  longText
+  number
+  phoneNumber
+  shortText
+  url
+}
+
+input FormNodeInputType {
+  fields: [FormNodeFieldInput!]
+  id: String
+}
+
 type ImageType {
   encoding: String
   filename: String
@@ -361,6 +400,7 @@ type NodeEntry {
 """Data type for the actual node entry"""
 input NodeEntryDataInput {
   choice: ChoiceNodeEntryInput
+  form: FormNodeEntryInput
   register: RegisterNodeEntryInput
   slider: SliderNodeEntryInput
   textbox: TextboxNodeEntryInput
@@ -494,6 +534,7 @@ type QuestionNode {
 """The different types a node can assume"""
 enum QuestionNodeTypeEnum {
   CHOICE
+  FORM
   GENERIC
   LINK
   REGISTRATION
@@ -746,6 +787,7 @@ enum TriggerTypeEnum {
 
 input UpdateCTAInputType {
   customerId: ID
+  form: FormNodeInputType
   id: String
   links: CTALinksInputType
   share: ShareNodeInputType

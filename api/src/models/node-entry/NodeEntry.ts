@@ -81,6 +81,30 @@ export const NodeEntryType = objectType({
   },
 });
 
+export const FormNodeEntryFieldInput = inputObjectType({
+  name: 'FormNodeEntryFieldInput',
+  description: 'FormNodeEntryInput',
+
+  definition(t) {
+    t.id('relatedFieldId');
+    t.string('email', { default: '' });
+    t.string('phoneNumber', { default: '' });
+    t.string('url', { default: '' });
+    t.string('shortText', { default: '' });
+    t.string('longText', { default: '' });
+    t.int('number', { default: 0 });
+  },
+});
+
+export const FormNodeEntryInput = inputObjectType({
+  name: 'FormNodeEntryInput',
+  description: 'FormNodeEntryInput',
+
+  definition(t) {
+    t.list.field('fields', { type: FormNodeEntryFieldInput });
+  },
+});
+
 export const RegisterNodeEntryInput = inputObjectType({
   name: 'RegisterNodeEntryInput',
   description: 'Input type for a register node',
@@ -133,8 +157,11 @@ export const NodeEntryDataInput = inputObjectType({
   definition(t) {
     t.field('slider', { type: SliderNodeEntryInput, nullable: true });
     t.field('textbox', { type: TextboxNodeEntryInput, nullable: true });
-    t.field('register', { type: RegisterNodeEntryInput, nullable: true });
+    t.field('form', { type: FormNodeEntryInput, nullable: true });
     t.field('choice', { type: ChoiceNodeEntryInput, nullable: true });
+
+    // @deprecated
+    t.field('register', { type: RegisterNodeEntryInput, nullable: true, deprecation: 'This will be deprectated from now on' });
   },
 });
 

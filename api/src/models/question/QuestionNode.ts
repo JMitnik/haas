@@ -1,4 +1,4 @@
-import { PrismaClient, QuestionNode, QuestionNodeUpdateInput, Share } from '@prisma/client';
+import { PrismaClient, QuestionNodeUpdateInput } from '@prisma/client';
 import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
 
 // eslint-disable-next-line import/no-cycle
@@ -45,7 +45,7 @@ export const QuestionNodeTypeEnum = enumType({
   name: 'QuestionNodeTypeEnum',
   description: 'The different types a node can assume',
 
-  members: ['GENERIC', 'SLIDER', 'CHOICE', 'REGISTRATION', 'TEXTBOX', 'LINK', 'SHARE'],
+  members: ['GENERIC', 'SLIDER', 'CHOICE', 'REGISTRATION', 'FORM', 'TEXTBOX', 'LINK', 'SHARE'],
 });
 
 export const ShareNodeType = objectType({
@@ -68,6 +68,33 @@ export const ShareNodeInputType = inputObjectType({
     t.string('tooltip');
     t.string('url');
     t.string('title');
+  },
+});
+
+export const FormNodeFieldTypeEnum = enumType({
+  name: 'FormNodeFieldTypeEnum',
+  description: 'The types a field can assume',
+
+  members: ['email', 'phoneNumber', 'url', 'shortText', 'longText', 'number'],
+});
+
+export const FormNodeFieldInput = inputObjectType({
+  name: 'FormNodeFieldInput',
+
+  definition(t) {
+    t.string('label');
+    t.field('type', { type: FormNodeFieldTypeEnum });
+    t.boolean('isRequired', { default: false });
+    t.int('position');
+  },
+});
+
+export const FormNodeInputType = inputObjectType({
+  name: 'FormNodeInputType',
+
+  definition(t) {
+    t.string('id', { nullable: true });
+    t.list.field('fields', { type: FormNodeFieldInput });
   },
 });
 
@@ -249,8 +276,13 @@ export const CreateCTAInputType = inputObjectType({
     t.field('links', {
       type: CTALinksInputType,
     });
+
     t.field('share', {
       type: ShareNodeInputType,
+    });
+
+    t.field('form', {
+      type: 'FormNodeInputType',
     });
   },
 });
@@ -299,6 +331,7 @@ export const UpdateCTAInputType = inputObjectType({
 
     t.field('links', { type: CTALinksInputType });
     t.field('share', { type: ShareNodeInputType });
+    t.field('form', { type: FormNodeInputType });
   },
 });
 
@@ -421,7 +454,7 @@ export const QuestionNodeMutations = extendType({
       args: {
         input: UpdateCTAInputType,
       },
-      async resolve(parent: any, args: any, ctx) {
+      async resolve(parent, args, ctx) {
         const { prisma }: { prisma: PrismaClient } = ctx;
         const { title, type, id, links, share } = args.input;
         const dbQuestionNode = await prisma.questionNode.findOne({
@@ -469,12 +502,14 @@ export const QuestionNodeMutations = extendType({
 
         await NodeService.upsertLinks(links?.linkTypes, id);
 
-        return prisma.questionNode.update({
-          where: {
-            id,
-          },
-          data: questionNodeUpdateInput,
-        });
+        if (args.in) {
+          return prisma.questionNode.update({
+            where: {
+              id,
+            },
+            data: questionNodeUpdateInput,
+          });
+        }
       },
     });
 

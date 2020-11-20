@@ -1,4 +1,4 @@
-import { Dialogue, Link, NodeType, QuestionCondition, QuestionNode, QuestionNodeCreateInput, QuestionNodeUpdateInput, Share } from '@prisma/client';
+import { Dialogue, Link, NodeType, QuestionCondition, QuestionNode, QuestionNodeCreateInput } from '@prisma/client';
 import EdgeService from '../edge/EdgeService';
 import prisma from '../../config/prisma';
 
@@ -39,17 +39,6 @@ interface LeafNodeProps {
   nodeId?: string;
   type?: string;
   title: string;
-}
-
-interface QuestionProps {
-  id: string;
-  title: string;
-  isRoot: boolean;
-  isLeaf: boolean;
-  type: NodeType;
-  overrideLeaf: LeafNodeProps;
-  options: Array<QuestionOptionProps>;
-  children: Array<EdgeChildProps>;
 }
 
 interface LinkGenericInputProps {

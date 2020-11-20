@@ -16,8 +16,8 @@ import getCTANodesQuery from 'queries/getCTANodes';
 import { AnimateSharedLayout, Variants, motion } from 'framer-motion';
 import { Button, Icon } from '@chakra-ui/core';
 import { useTranslation } from 'react-i18next';
-import ShareIcon from 'components/Icons/ShareIcon';
 import CTACard from './CTACard';
+import ShareIcon from 'components/Icons/ShareIcon';
 
 interface ActionOverviewProps {
   leafs: Array<any>;
@@ -59,6 +59,10 @@ const mapLeafs = (leafs: any) => leafs?.map((leaf: any) => {
     return { ...leaf, type: 'SHARE', icon: ShareIcon };
   }
 
+  if (leaf.type === 'FORM') {
+    return { ...leaf, type: 'FORM', icon: RegisterIcon };
+  }
+
   return null;
 });
 
@@ -77,6 +81,10 @@ const initializeCTAType = (type: string) => {
 
   if (type === 'SHARE') {
     return { label: 'Share', value: 'SHARE' };
+  }
+
+  if (type === 'FORM') {
+    return { label: 'Form', value: 'FORM' };
   }
 
   return { label: 'None', value: '' };

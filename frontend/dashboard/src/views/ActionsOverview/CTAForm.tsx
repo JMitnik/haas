@@ -29,6 +29,7 @@ import createCTAMutation from 'mutations/createCTA';
 import getCTANodesQuery from 'queries/getCTANodes';
 import updateCTAMutation from 'mutations/updateCTA';
 
+import intToBool from 'utils/intToBool';
 import FormNodeForm from './FormNodeForm';
 
 interface FormDataProps {
@@ -42,6 +43,12 @@ interface FormDataProps {
     iconUrl?: string;
     backgroundColor?: string;}>;
   share: { id?: string, tooltip: string, url: string, title: string };
+  formNode?: { fields: {
+    label: string;
+    type: string;
+    isRequired: boolean;
+    position: number;
+  }[] };
 }
 
 interface LinkInputProps {
@@ -115,6 +122,12 @@ const schema = yup.object().shape({
       },
     ),
     otherwise: yup.object().notRequired(),
+  }),
+  formNode: yup.object().shape({
+    fields: yup.array().of(yup.object().shape({
+      label: yup.string(),
+      type: yup.string(),
+    })),
   }),
 });
 
@@ -236,6 +249,8 @@ const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTACha
   const watchType = form.watch('ctaType');
 
   const onSubmit = (formData: FormDataProps) => {
+    console.log(formData);
+
     if (id === '-1') {
       const mappedLinks = { linkTypes: activeLinks.map((link) => {
         const { id, ...linkData } = link;
@@ -251,6 +266,10 @@ const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTACha
             type: formData.ctaType.value || undefined,
             links: mappedLinks,
             share: formData.share,
+            form: {
+              ...formData.formNode,
+              fields: formData.formNode?.fields.map((field) => ({ ...field, isRequired: intToBool(field.isRequired) })),
+            },
           },
         },
       });
@@ -265,6 +284,10 @@ const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTACha
             type: formData.ctaType.value || undefined,
             links: mappedLinks,
             share: formData.share,
+            form: {
+              ...formData.formNode,
+              fields: formData.formNode?.fields.map((field) => ({ ...field, isRequired: intToBool(field.isRequired) })),
+            },
           },
         },
       });

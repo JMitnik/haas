@@ -518,8 +518,15 @@ interface InputGridProps extends GridProps {
   children: React.ReactNode;
 }
 
-export const RadioButtons = ({ children }: { children: React.ReactNode }) => (
-  <ChakraRadioButtonGroup display="flex">
+interface RadioButtonsProps {
+  children: React.ReactNode;
+  onChange: any;
+  value: any;
+  onBlur: any
+}
+
+export const RadioButtons = ({ children, onChange, value, onBlur }: RadioButtonsProps) => (
+  <ChakraRadioButtonGroup display="flex" onChange={onChange} value={value} onBlur={onBlur}>
     {children}
   </ChakraRadioButtonGroup>
 )
