@@ -12,12 +12,14 @@ import { useTranslation } from 'react-i18next';
 import { yupResolver } from '@hookform/resolvers';
 import React, { useCallback, useEffect, useState } from 'react';
 import Select from 'react-select';
+import SimpleMDE from 'react-simplemde-editor';
 import cuid from 'cuid';
 
 import { Div, Flex, Form, FormContainer,
   FormControl, FormLabel, FormSection, Grid, H3, H4, Hr, Input, InputGrid, InputHelper, Muted, Span, Text } from '@haas/ui';
 import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
 
+import 'easymde/dist/easymde.min.css';
 import { useCustomer } from 'providers/CustomerProvider';
 import LinkIcon from 'components/Icons/LinkIcon';
 import OpinionIcon from 'components/Icons/OpinionIcon';
@@ -340,34 +342,42 @@ const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTACha
                 <FormControl gridColumn="1 / -1" isRequired isInvalid={!!form.errors.title}>
                   <FormLabel htmlFor="title">{t('title')}</FormLabel>
                   <InputHelper>{t('cta:title_helper')}</InputHelper>
-                  <Input
+                  <Controller
                     name="title"
-                    placeholder="Thank you for..."
-                    leftEl={<Type />}
+                    control={form.control}
                     defaultValue={title}
-                    ref={form.register({ required: true })}
+                    render={({ value, onChange }) => (
+                      <SimpleMDE
+                        value={value}
+                        onChange={onChange}
+                        options={{
+                          toolbar: ['bold', 'italic', 'preview', 'guide'],
+                        }}
+                      />
+                    )}
                   />
-                  <FormErrorMessage>{form.errors.title?.message}</FormErrorMessage>
+                  <FormErrorMessage>{form.errors.title}</FormErrorMessage>
                 </FormControl>
 
                 <FormControl isRequired>
                   <FormLabel htmlFor="ctaType">{t('cta:type')}</FormLabel>
                   <InputHelper>{t('cta:share_type_helper')}</InputHelper>
+
                   <Controller
                     name="ctaType"
                     control={form.control}
                     as={<Select />}
                     options={CTA_TYPES}
-                    // defaultValue={activeType}
                   />
-                  <FormErrorMessage>{form.errors.ctaType?.value?.message}</FormErrorMessage>
+
+                  <FormErrorMessage>{form.errors.ctaType?.value}</FormErrorMessage>
                 </FormControl>
 
                 {watchType?.value === 'SHARE' && (
                   <>
                     <FormControl isRequired>
-                      <FormLabel htmlFor="share.title">{t('general:title')}</FormLabel>
-                      <InputHelper>{t('cta:shared_item_title_helper')}</InputHelper>
+                      <FormLabel htmlFor="share.title">{t('cta:text')}</FormLabel>
+                      <InputHelper>{t('cta:shared_item_text_helper')}</InputHelper>
                       <Input
                         name="share.title"
                         placeholder="Get a discount..."
@@ -457,7 +467,7 @@ const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTACha
                                 onChange={(e: any) => handleURLChange(e.currentTarget.value, index)}
                                 ref={form.register({ required: true })}
                               />
-                              <FormErrorMessage>{!!form.errors?.links?.[index]?.url?.message}</FormErrorMessage>
+                              <FormErrorMessage>{!!form.errors?.links?.[index]?.url}</FormErrorMessage>
                             </FormControl>
 
                             <FormControl isRequired isInvalid={!!form.errors.links?.[index]?.type}>

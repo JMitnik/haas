@@ -3,9 +3,11 @@ import { PrismaClient,
   TriggerUpdateInput } from '@prisma/client';
 import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
 
+import { DialogueType } from '../questionnaire/Dialogue';
 import { PaginationWhereInput } from '../general/Pagination';
 import { QuestionNodeType } from '../question/QuestionNode';
 import { UserType } from '../users/User';
+import { resolve } from 'path';
 import TriggerService from './TriggerService';
 
 const TriggerTypeEnum = enumType({
@@ -37,6 +39,25 @@ const TriggerConditionType = objectType({
     t.string('textValue', { nullable: true });
 
     t.string('triggerId');
+    t.field('question', {
+      nullable: true,
+      type: QuestionNodeType,
+      async resolve(parent, args, ctx) {
+        const questionOfTrigger = await ctx.prisma.questionOfTrigger.findMany({
+          where: {
+            triggerId: parent.triggerId,
+            triggerConditionId: parent.id,
+          },
+          include: {
+            question: true,
+          },
+        });
+
+        if (!questionOfTrigger.length) return null;
+
+        return questionOfTrigger[0].question;
+      },
+    });
   },
 });
 
@@ -50,30 +71,34 @@ const TriggerType = objectType({
     t.field('medium', { type: TriggerMediumEnum });
 
     t.string('relatedNodeId', { nullable: true });
-    t.field('relatedNode', {
-      type: QuestionNodeType,
+    t.field('relatedDialogue', {
+      type: DialogueType,
       nullable: true,
 
       async resolve(parent, args, ctx) {
-        if (!parent.relatedNodeId) throw Error('Not good!');
-
-        return ctx.prisma.questionNode.findOne({
-          where: { id: parent.relatedNodeId },
+        const questionsOfTrigger = await ctx.prisma.questionOfTrigger.findMany({
+          where: {
+            triggerId: parent.id,
+          },
           include: {
-            questionDialogue: {
+            question: {
               select: {
-                slug: true,
+                questionDialogue: true,
               },
             },
           },
         });
+
+        if (!questionsOfTrigger.length) return null;
+
+        return questionsOfTrigger[0].question.questionDialogue;
       },
     });
 
     t.list.field('conditions', {
       type: TriggerConditionType,
       resolve(parent, args, ctx) {
-        return ctx.prisma.triggerCondition.findMany({ where: { triggerId: parent.id } });
+        return ctx.prisma.triggerCondition.findMany({ where: { triggerId: parent.id }, orderBy: { createdAt: 'asc' } });
       },
     });
     t.list.field('recipients', {
@@ -93,6 +118,7 @@ const TriggerConditionInputType = inputObjectType({
   name: 'TriggerConditionInputType',
   definition(t) {
     t.int('id');
+    t.string('questionId');
     t.field('type', { type: TriggerConditionEnum });
     t.int('minValue', { nullable: true });
     t.int('maxValue', { nullable: true });
@@ -117,6 +143,19 @@ const RecipientsInputType = inputObjectType({
   },
 });
 
+const CreateTriggerInputType = inputObjectType({
+  name: 'CreateTriggerInputType',
+  definition(t) {
+    t.string('customerSlug');
+    t.field('recipients', {
+      type: RecipientsInputType,
+    });
+    t.field('trigger', {
+      type: TriggerInputType,
+    });
+  },
+});
+
 const TriggerMutations = extendType({
   type: 'Mutation',
 
@@ -130,6 +169,7 @@ const TriggerMutations = extendType({
         if (!args.id) throw new Error('No valid id for trigger provided');
 
         // Clean up trail
+        await ctx.prisma.questionOfTrigger.deleteMany({ where: { triggerId: args.id } });
         await ctx.prisma.triggerCondition.deleteMany({ where: { triggerId: args.id } });
         const trigger = await ctx.prisma.trigger.delete({ where: { id: args.id } });
 
@@ -143,14 +183,12 @@ const TriggerMutations = extendType({
       type: TriggerType,
       args: {
         triggerId: 'String',
-        questionId: 'String',
         recipients: RecipientsInputType,
         trigger: TriggerInputType,
       },
 
       async resolve(parent, args, ctx) {
         if (!args.triggerId) throw new Error('No valid trigger ID provided');
-
         const dbTrigger = await ctx.prisma.trigger.findOne({
           where: { id: args.triggerId },
           include: {
@@ -167,10 +205,6 @@ const TriggerMutations = extendType({
           type: args.trigger?.type || 'QUESTION',
           medium: args.trigger?.medium || 'EMAIL',
         };
-
-        updateTriggerArgs = TriggerService.updateRelatedQuestion(
-          dbTrigger?.relatedNodeId, args.questionId, updateTriggerArgs,
-        );
 
         if (dbTrigger?.recipients) {
           updateTriggerArgs = TriggerService.updateRecipients(
@@ -194,33 +228,54 @@ const TriggerMutations = extendType({
     t.field('createTrigger', {
       type: TriggerType,
       args: {
-        customerSlug: 'String',
-        questionId: 'String',
-        recipients: RecipientsInputType,
-        trigger: TriggerInputType,
+        input: CreateTriggerInputType, // FIXME: args is still considered pre-input so if i don't make it any it won't work
       },
-      async resolve(parent, args, ctx) {
-        if (!args.customerSlug) throw new Error('No provided customer found');
+      async resolve(parent, args: any, ctx) {
+        if (!args.input.customerSlug) throw new Error('No provided customer found');
 
         // TODO: Setup sensible defaults instead of these?
         const createArgs : TriggerCreateInput = {
-          name: args.trigger?.name || '',
-          medium: args.trigger?.medium || 'EMAIL',
-          type: args.trigger?.type || 'QUESTION',
-          customer: { connect: { slug: args.customerSlug } },
-          relatedNode: { connect: { id: args.questionId || undefined } },
-          recipients: { connect: args.recipients?.ids?.map((id: string) => ({ id })) },
-          conditions: { create: args.trigger?.conditions?.map((condition) => ({
-            type: condition.type || 'TEXT_MATCH',
-            maxValue: condition.maxValue,
-            minValue: condition.minValue,
-            textValue: condition.textValue,
-          })) },
+          name: args.input.trigger?.name || '',
+          medium: args.input.trigger?.medium || 'EMAIL',
+          type: args.input.trigger?.type || 'QUESTION',
+          customer: { connect: { slug: args.input.customerSlug } },
+          relatedNode: undefined,
+          recipients: { connect: args.input.recipients?.ids?.map((id: string) => ({ id })) },
         };
 
-        return ctx.prisma.trigger.create({
+        const trigger = await ctx.prisma.trigger.create({
           data: createArgs,
-        }) as any;
+        });
+
+        const questionOfTriggers = await args.input.trigger?.conditions?.map(async (condition: any) => ctx.prisma.questionOfTrigger.create({
+          data: {
+            question: {
+              connect: {
+                id: condition?.questionId || undefined,
+              },
+            },
+            trigger: {
+              connect: {
+                id: trigger.id,
+              },
+            },
+            triggerCondition: {
+              create: {
+                type: condition.type || 'TEXT_MATCH',
+                maxValue: condition.maxValue,
+                minValue: condition.minValue,
+                textValue: condition.textValue,
+                trigger: {
+                  connect: {
+                    id: trigger.id,
+                  },
+                },
+              },
+            },
+          },
+        }));
+
+        return trigger as any;
       },
     });
   },

@@ -70,6 +70,7 @@ export interface dialogueStatistics_customer_dialogue_statistics_history {
 
 export interface dialogueStatistics_customer_dialogue_statistics {
   __typename: "DialogueStatistics";
+  nrInteractions: number;
   topPositivePath: dialogueStatistics_customer_dialogue_statistics_topPositivePath[] | null;
   mostPopularPath: dialogueStatistics_customer_dialogue_statistics_mostPopularPath | null;
   topNegativePath: dialogueStatistics_customer_dialogue_statistics_topNegativePath[] | null;
@@ -79,10 +80,6 @@ export interface dialogueStatistics_customer_dialogue_statistics {
 export interface dialogueStatistics_customer_dialogue {
   __typename: "Dialogue";
   id: string;
-  /**
-   * Count number of interactions between start-date and end-date
-   */
-  countInteractions: number;
   thisWeekAverageScore: number;
   previousScore: number;
   sessions: dialogueStatistics_customer_dialogue_sessions[];

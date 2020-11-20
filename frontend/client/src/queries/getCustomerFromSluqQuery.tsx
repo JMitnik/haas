@@ -1,15 +1,23 @@
 import gql from 'graphql-tag';
 
-import { CustomerFragment } from './CustomerFragment';
-
 const getCustomerFromSlug = gql`
-  query customer($slug: String!) {
+  query getCustomer($slug: String!) {
     customer(slug: $slug) {
-        ...CustomerFragment
+      id
+    name
+    slug
+    settings {
+      id
+      logoUrl
+      colourSettings {
+        id
+        primary
+        primaryAlt
+        secondary
+      }
+    }
     }
   }
-
-  ${CustomerFragment}
 `;
 
 export default getCustomerFromSlug;

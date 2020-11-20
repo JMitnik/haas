@@ -11,6 +11,7 @@ const TreeStoreModel = types
     session: types.optional(SessionModel, {}),
     tree: types.maybeNull(TreeModel),
     customer: types.maybeNull(CustomerModel),
+    hasStarted: types.boolean,
   })
   .actions((self) => {
     let initialState = {};
@@ -62,6 +63,18 @@ const TreeStoreModel = types
       resetProject: () => {
         applySnapshot(self, initialState);
       },
+      start: () => {
+        self.hasStarted = true;
+      },
+      /**
+       * Reach the final state: dont store anymore session information, and if user goes "back", it bring them back to the start
+       */
+      finalize: () => {
+        self.session.reset();
+      },
+      stop: () => {
+        self.hasStarted = false;
+      },
     };
   })
   .views((self) => ({
@@ -69,9 +82,7 @@ const TreeStoreModel = types
      * Extract all visited nodes that lead from the root to the top.
      */
     get relevantSessionEntries() {
-      if (!self.tree) {
-        throw new Error('Uninitialized tree!');
-      }
+      if (!self.tree) return [];
 
       const lastNonLeafNode = self.session.lastNonLeaf;
       const leafNodes = self.session.leafs;

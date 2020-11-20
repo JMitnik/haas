@@ -1,5 +1,6 @@
 import { ChevronLeft } from 'react-feather';
 import { Container } from '@haas/ui';
+import { Helmet } from 'react-helmet';
 import { Variants } from 'framer-motion';
 import { useHistory } from 'react-router-dom';
 import React, { ReactNode } from 'react';
@@ -25,14 +26,14 @@ const routerNavigationAnimation: Variants = {
   },
 };
 
-const DialogueTreeLayout = ({ children, node }: { children: ReactNode, node:TreeNodeProps }) => {
+const DialogueTreeLayout = ({ children, node, isAtLeaf }: { children: ReactNode, node: TreeNodeProps, isAtLeaf: boolean }) => {
   const history = useHistory();
-  const store = useDialogueTree();
+  const { store } = useDialogueTree();
 
   return (
     <DialogueTreeContainer>
       {/* TODO: Enable consistent animation */}
-      {!node.isRoot && (
+      {!node.isRoot && !node.isPostLeaf && !isAtLeaf && (
         <GoBackContainer variants={routerNavigationAnimation} animate="animate" initial="initial" exit="exit">
           <GoBackButton onClick={() => history.goBack()}>
             <ChevronLeft />
@@ -44,6 +45,17 @@ const DialogueTreeLayout = ({ children, node }: { children: ReactNode, node:Tree
       <Container mt={4}>
         {children}
       </Container>
+
+      {!!store.customer && (
+        <Helmet>
+          <title>
+            haas -
+            {' '}
+            {store?.tree?.title || ''}
+          </title>
+          <meta name="description" content={store.tree?.title} />
+        </Helmet>
+      )}
 
       {!!store.customer && <WatermarkLogo logoUrl={store.customer?.settings?.logoUrl} />}
     </DialogueTreeContainer>

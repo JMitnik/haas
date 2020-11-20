@@ -1,0 +1,26 @@
+fragment QuestionFragment on QuestionNode {
+  id
+  title
+  isRoot
+  isLeaf
+  type
+  children {
+    ...EdgeFragment
+    parentNode {
+      id
+    }
+    childNode {
+      id
+    }
+  }
+  overrideLeaf {
+    id
+    title
+    type
+  }
+  options {
+    id
+    value
+    publicValue
+  }
+}

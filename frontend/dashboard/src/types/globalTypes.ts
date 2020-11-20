@@ -113,6 +113,18 @@ export interface CreateCTAInputType {
   share?: ShareNodeInputType | null;
 }
 
+export interface CreateDialogueInputType {
+  customerSlug?: string | null;
+  title?: string | null;
+  dialogueSlug?: string | null;
+  description?: string | null;
+  isSeed?: boolean | null;
+  contentType?: string | null;
+  templateDialogueId?: string | null;
+  publicTitle?: string | null;
+  tags?: TagsInputObjectType | null;
+}
+
 export interface CreateQuestionNodeInputType {
   customerId?: string | null;
   overrideLeafId?: string | null;
@@ -124,18 +136,27 @@ export interface CreateQuestionNodeInputType {
   edgeCondition?: EdgeConditionInputType | null;
 }
 
-export interface CustomerCreateOptions {
-  slug: string;
-  primaryColour: string;
-  logo?: string | null;
-  isSeed?: boolean | null;
+export interface CreateTriggerInputType {
+  customerSlug?: string | null;
+  recipients?: RecipientsInputType | null;
+  trigger?: TriggerInputType | null;
 }
 
-export interface CustomerEditOptions {
+/**
+ * Creates a workspace
+ */
+export interface CreateWorkspaceInput {
   slug: string;
   name: string;
   logo?: string | null;
   primaryColour: string;
+  isSeed?: boolean | null;
+  willGenerateFakeData?: boolean | null;
+}
+
+export interface DeleteDialogueInputType {
+  id?: string | null;
+  customerSlug?: string | null;
 }
 
 /**
@@ -173,6 +194,17 @@ export interface EditUserInput {
   customerId?: string | null;
   lastName?: string | null;
   phone?: string | null;
+}
+
+/**
+ * Edit a workspace
+ */
+export interface EditWorkspaceInput {
+  id: string;
+  slug: string;
+  name: string;
+  logo?: string | null;
+  primaryColour: string;
 }
 
 export interface InviteUserInput {
@@ -231,6 +263,7 @@ export interface TagsInputObjectType {
 
 export interface TriggerConditionInputType {
   id?: number | null;
+  questionId?: string | null;
   type?: TriggerConditionEnum | null;
   minValue?: number | null;
   maxValue?: number | null;

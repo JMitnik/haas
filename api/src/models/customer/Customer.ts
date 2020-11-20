@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 import { ColourSettings, Customer, CustomerSettings, PrismaClient } from '@prisma/client';
 import { GraphQLError } from 'graphql';
 import { GraphQLUpload, UserInputError } from 'apollo-server-express';
@@ -203,19 +204,12 @@ export const Upload = GraphQLUpload && scalarType({
   parseLiteral: GraphQLUpload.parseLiteral,
 });
 
-const CustomerCreateOptionsInput = inputObjectType({
-  name: 'CustomerCreateOptions',
-  definition(t) {
-    t.string('slug', { required: true });
-    t.string('primaryColour', { required: true });
-    t.string('logo');
-    t.boolean('isSeed', { default: false, required: false });
-  },
-});
+const EditWorkspaceInput = inputObjectType({
+  name: 'EditWorkspaceInput',
+  description: 'Edit a workspace',
 
-const CustomerEditOptionsInput = inputObjectType({
-  name: 'CustomerEditOptions',
   definition(t) {
+    t.id('id', { required: true });
     t.string('slug', { required: true });
     t.string('name', { required: true });
     t.string('logo');
@@ -223,8 +217,26 @@ const CustomerEditOptionsInput = inputObjectType({
   },
 });
 
-export const CustomerMutations = Upload && extendType({
+const CreateWorkspaceInput = inputObjectType({
+  name: 'CreateWorkspaceInput',
+  description: 'Creates a workspace',
+
+  definition(t) {
+    // Basic workspace information
+    t.string('slug', { required: true });
+    t.string('name', { required: true });
+    t.string('logo');
+    t.string('primaryColour', { required: true });
+
+    // Creation specific data
+    t.boolean('isSeed', { default: false, required: false });
+    t.boolean('willGenerateFakeData', { default: false });
+  },
+});
+
+export const WorkspaceMutations = Upload && extendType({
   type: 'Mutation',
+
   definition(t) {
     t.field('singleUpload', {
       type: ImageType,
@@ -234,7 +246,6 @@ export const CustomerMutations = Upload && extendType({
       async resolve(parent, args) {
         const { file } = args;
         const { createReadStream, filename, mimetype, encoding } = await file;
-        console.log(file);
 
         const stream = new Promise<UploadApiResponse>((resolve, reject) => {
           const cld_upload_stream = cloudinary.v2.uploader.upload_stream({
@@ -254,14 +265,14 @@ export const CustomerMutations = Upload && extendType({
         return { filename, mimetype, encoding, url: secure_url };
       },
     });
-    t.field('createCustomer', {
+
+    t.field('createWorkspace', {
       type: CustomerType,
-      args: {
-        name: 'String',
-        options: CustomerCreateOptionsInput,
-      },
+      args: { input: CreateWorkspaceInput },
+
       async resolve(parent, args, ctx) {
-        const primaryColor = args?.options?.primaryColour;
+        if (!args.input) throw new UserInputError('No input provided');
+        const primaryColor = args?.input?.primaryColour;
 
         if (primaryColor) {
           try {
@@ -271,19 +282,19 @@ export const CustomerMutations = Upload && extendType({
           }
         }
 
-        const customer = CustomerService.createCustomer(args as any, ctx.session?.user?.id);
+        const workspace = CustomerService.createWorkspace(args?.input, ctx.session?.user?.id);
 
-        return customer as any;
+        return workspace as any;
       },
     });
-    t.field('editCustomer', {
+
+    t.field('editWorkspace', {
       type: CustomerType,
-      args: {
-        id: 'String',
-        options: CustomerEditOptionsInput,
-      },
+      args: { input: EditWorkspaceInput },
+
       resolve(parent, args) {
-        const primaryColor = args?.options?.primaryColour;
+        if (!args.input) throw new UserInputError('No input provided');
+        const primaryColor = args?.input?.primaryColour;
 
         if (primaryColor) {
           try {
@@ -293,7 +304,7 @@ export const CustomerMutations = Upload && extendType({
           }
         }
 
-        return CustomerService.editCustomer(args);
+        return CustomerService.editWorkspace(args.input);
       },
     });
   },
@@ -324,17 +335,12 @@ export const CustomersQuery = extendType({
     t.list.field('customers', {
       type: CustomerType,
       async resolve(parent, args, ctx) {
-        const { prisma }: { prisma: PrismaClient } = ctx;
-        const customers = await prisma.customer.findMany();
+        const customers = await ctx.prisma.customer.findMany();
         return customers;
       },
     });
   },
 });
-
-interface ContextProps {
-  prisma: PrismaClient;
-}
 
 export const CustomerQuery = extendType({
   type: 'Query',
@@ -362,13 +368,3 @@ export const CustomerQuery = extendType({
     });
   },
 });
-
-export default [
-  Upload,
-  CustomersQuery,
-  CustomerQuery,
-  DeleteCustomerMutation,
-  CustomerMutations,
-  CustomerCreateOptionsInput,
-  CustomerType,
-];

@@ -8,6 +8,7 @@ import { SessionEntryDataProps } from 'models/Session/SessionEntryModel';
 import { ReactComponent as SpeechIcon } from 'assets/icons/icon-chat.svg';
 import { TreeNodeOptionProps } from 'models/Tree/TreeNodeOptionModel';
 
+import ReactMarkdown from 'react-markdown';
 import { ChoiceIconContainer, MultiChoiceNodeContainer, MultiChoiceNodeGrid } from './MultiChoiceNodeStyles';
 import { GenericNodeProps } from '../types';
 
@@ -53,6 +54,7 @@ const MultiChoiceNode = ({ node, onEntryStore }: MultiChoiceNodeProps) => {
       <NodeTitle>{node.title}</NodeTitle>
 
       <MultiChoiceNodeGrid
+        data-cy="Choices"
         variants={multiChoiceContainerAnimation}
         initial="initial"
         animate="animate"
@@ -61,6 +63,7 @@ const MultiChoiceNode = ({ node, onEntryStore }: MultiChoiceNodeProps) => {
           <motion.div key={index} variants={multiChoiceItemAnimation}>
             <Div key={index} flex={['100%', 1]}>
               <ClientButton
+                data-cy="Option"
                 brand="primary"
                 type="button"
                 onClick={() => handleSubmit(multiChoiceOption)}
@@ -71,7 +74,9 @@ const MultiChoiceNode = ({ node, onEntryStore }: MultiChoiceNodeProps) => {
                 </ChoiceIconContainer>
                 <ButtonBody>
                   <H5>
-                    {(multiChoiceOption?.publicValue || multiChoiceOption?.value)}
+                    <ReactMarkdown>
+                      {(multiChoiceOption?.publicValue || multiChoiceOption?.value)}
+                    </ReactMarkdown>
                   </H5>
                 </ButtonBody>
               </ClientButton>

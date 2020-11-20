@@ -20,3 +20,8 @@ export interface DialogueProps {
   title: string;
   publicTitle: string;
 }
+
+export interface SelectType {
+  label: string;
+  value: string;
+}

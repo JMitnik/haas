@@ -1,11 +1,13 @@
+import { Redirect } from 'react-router-dom';
 import { TreeNodeProps } from 'models/Tree/TreeNodeModel';
-import { useHistory } from 'react-router-dom';
 import React from 'react';
 
 import { Loader } from '@haas/ui';
+import { useNavigator } from 'providers/NavigationProvider';
 import DialogueTreeLayout from 'layouts/DialogueTreeLayout';
 import NodeLayout from 'layouts/NodeLayout';
 import useDialogueTree from 'providers/DialogueTreeProvider';
+import useUploadQueue from 'providers/UploadQueueProvider';
 
 import { GenericNodeProps } from './nodes/types';
 import MultiChoiceNode from './nodes/MultiChoiceNode/MultiChoiceNode';
@@ -41,22 +43,75 @@ interface NodeViewProps {
 }
 
 const NodeView = ({ node }: NodeViewProps) => {
-  const store = useDialogueTree();
-  const history = useHistory();
+  const { store } = useDialogueTree();
+  const { uploadInteraction, queueEntry, reset } = useUploadQueue();
+  const { routes, goToActiveLeaf, goToNodeByEdge, goToPostLeafByEdge, checkIfReset } = useNavigator();
 
+  /**
+   * Stores entry and proceeds to next node
+   * @param entry
+   * @param edgeKey
+   */
   const handleEntryStore = (entry: any, edgeKey: any) => {
     // Store the entry
     store.session.add(node.id, entry);
 
-    // Get next edge and navigate there
-    const nextEdgeId = node.getNextEdgeIdFromKey(edgeKey);
-    history.push(`/${store.customer?.slug}/${store.tree?.slug}/${nextEdgeId}`);
+    // Use current condition to decide next Edge (or if we are at leaf, we will do something else)
+    const { edgeId, goesToLeaf, goesToPostLeaf } = node.getNextEdgeIdFromKey(edgeKey);
+
+    // If our entry is valid, and we will queue the entry (meaning, a session has been uploaded)
+    if (entry) {
+      queueEntry({
+        nodeId: node.id,
+        data: entry,
+      });
+    }
+
+    if (goesToPostLeaf) return goToPostLeafByEdge(edgeId);
+    if (goesToLeaf) {
+      uploadInteraction();
+
+      return goToActiveLeaf();
+    }
+
+    // Navigation: go to next node
+    return goToNodeByEdge(edgeId);
   };
 
+  /**
+   * Stores entry in queue only (does not proceed to next node)
+   * @param entry
+   * @param edgeKey
+   */
+  const handleQueueEntryOnly = (entry: any) => {
+    if (entry) {
+      queueEntry({
+        nodeId: node.id,
+        data: entry,
+      });
+    }
+  };
+
+  if (node.isRoot) {
+    store.start();
+  }
+
+  // Check if we will reset
+  const willReset = checkIfReset(node);
+  if (willReset) {
+    reset();
+    store.finalize();
+    return <Redirect to={routes.start} />;
+  }
+
+  if (node.isPostLeaf) {
+    store.stop();
+  }
+
   return (
-    <DialogueTreeLayout node={node}>
+    <DialogueTreeLayout isAtLeaf={node.isLeaf} node={node}>
       <NodeLayout>
-        <NodeType onEntryStore={handleEntryStore} node={node} />
+        <NodeType onQueueOnlyStore={handleQueueEntryOnly} onEntryStore={handleEntryStore} node={node} />
       </NodeLayout>
     </DialogueTreeLayout>
   );

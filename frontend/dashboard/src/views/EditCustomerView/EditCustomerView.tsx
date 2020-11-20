@@ -10,20 +10,38 @@ import { useToast } from '@chakra-ui/core';
 import { useTranslation } from 'react-i18next';
 import { yupResolver } from '@hookform/resolvers';
 import React from 'react';
+import gql from 'graphql-tag';
 
 import CustomerForm from 'components/CustomerForm';
 import booleanToNumber from 'utils/booleanToNumber';
-import parseOptionalBoolean from 'utils/parseOptionalBoolean';
+import intToBool from 'utils/intToBool';
 
-import editCustomerMutation from '../../mutations/editCustomer';
 import getEditCustomerData from '../../queries/getEditCustomer';
+
+const editWorkspaceMutation = gql`
+  mutation editWorkspace($input: EditWorkspaceInput) {
+    editWorkspace(input: $input) {
+        id
+        name
+        slug
+        settings {
+          logoUrl
+          colourSettings {
+          primary
+        }
+      }
+    }
+  }
+`;
 
 const schema = yup.object().shape({
   name: yup.string().required(),
   logo: yup.string().url(),
   uploadLogo: yup.string().url(),
   slug: yup.string().required(),
-  primaryColour: yup.string().required().matches(/^(#(\d|\D){6}$){1}/, { message: 'Provided colour is not a valid hexadecimal' }),
+  primaryColour: yup.string().required().matches(/^(#(\d|\D){6}$){1}/, {
+    message: 'Provided colour is not a valid hexadecimal',
+  }),
   useCustomUrl: yup.number(),
 }).required();
 
@@ -67,7 +85,7 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
     mode: 'onChange',
   });
 
-  const [editCustomer, { loading: isLoading, error: serverErrors }] = useMutation(editCustomerMutation, {
+  const [editWorkspace, { loading: isLoading, error: serverErrors }] = useMutation(editWorkspaceMutation, {
     onCompleted: (result: any) => {
       const customer: any = result.editCustomer;
 
@@ -93,20 +111,18 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
   });
 
   const onSubmit = (formData: FormDataProps) => {
-    const optionInput = {
-      logo: parseOptionalBoolean(formData.useCustomUrl) ? formData.logo : formData.uploadLogo,
-      slug: formData.slug,
-      primaryColour: formData.primaryColour,
-      name: formData.name,
-    };
-
-    editCustomer({
+    editWorkspace({
       variables: {
-        id: customer?.id,
-        options: optionInput,
+        input: {
+          id: customer?.id,
+          logo: intToBool(formData.useCustomUrl) ? formData.logo : formData.uploadLogo,
+          slug: formData.slug,
+          primaryColour: formData.primaryColour,
+          name: formData.name,
+        },
       },
     }).then(() => {
-      if (optionInput.slug !== customerSlug) {
+      if (formData.slug !== customerSlug) {
         toast({
           title: 'Redirecting to new slug',
           description: 'Redirecting user to new slug adress.',

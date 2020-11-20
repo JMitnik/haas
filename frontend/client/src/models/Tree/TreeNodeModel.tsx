@@ -10,12 +10,19 @@ export enum SpecialEdge {
   POST_LEAF_EDGE_ID = '-2',
 }
 
+interface EdgeOutput {
+  edgeId: string;
+  goesToLeaf: boolean;
+  goesToPostLeaf: boolean;
+}
+
 export const TreeNodeModel = types
   .model('TreeNode', {
     id: types.identifier,
     title: types.string,
     isRoot: types.optional(types.boolean, false),
     isLeaf: types.optional(types.boolean, false),
+    isPostLeaf: types.optional(types.boolean, false),
     type: types.string,
     children: types.array(types.maybe(types.reference(types.late(() => TreeEdgeModel)))),
     overrideLeaf: types.maybe(types.reference(types.late((): IAnyModelType => TreeNodeModel))),
@@ -28,16 +35,32 @@ export const TreeNodeModel = types
      * Finds candidate edge child based on `key`.
      * @param key
      */
-    getNextEdgeIdFromKey(key: any) {
+    getNextEdgeIdFromKey(key: any): EdgeOutput {
       // If we already are at leaf, go to POST-LEAF-EDGE
-      if (self.isLeaf) { return SpecialEdge.POST_LEAF_EDGE_ID; }
+      if (self.isLeaf) {
+        return {
+          goesToLeaf: false,
+          goesToPostLeaf: true,
+          edgeId: SpecialEdge.POST_LEAF_EDGE_ID,
+        };
+      }
 
       const candidateEdge = self.children.find((child: TreeEdgeProps) => child.matchesKeyByCondition(key));
 
       // If there are no edges (but we are not at leaf yet) => Return Leaf ID
-      if (!candidateEdge) return SpecialEdge.LEAF_EDGE_ID;
+      if (!candidateEdge) {
+        return {
+          goesToLeaf: true,
+          goesToPostLeaf: false,
+          edgeId: SpecialEdge.POST_LEAF_EDGE_ID,
+        };
+      }
 
-      return candidateEdge.id;
+      return {
+        goesToLeaf: false,
+        goesToPostLeaf: false,
+        edgeId: candidateEdge.id,
+      };
     },
   }));
 
@@ -47,6 +70,7 @@ export const createDefaultPostLeafNode = () => {
     title: 'Thank you for participating',
     type: 'POST_LEAF',
     isLeaf: true,
+    isPostLeaf: true,
   });
 
   return node;

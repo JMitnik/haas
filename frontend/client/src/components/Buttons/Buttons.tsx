@@ -37,6 +37,7 @@ export const ClientButton = styled(Button)`
     border-radius: 10px;
     transform: none;
     padding: 12px 22px;
+    font-size: 1rem;
     background: linear-gradient(45deg, ${Color(theme.colors.primary).lighten(0.3).hex()}, ${Color(theme.colors.primary).lighten(0.3).saturate(1).hex()}); 
     font-family: 'Open-sans', sans-serif;
     color: ${Color(theme.colors.primary).isDark() ? Color(theme.colors.primary).mix(Color('white'), 0.8).saturate(1).hex()
@@ -45,7 +46,6 @@ export const ClientButton = styled(Button)`
     ${ButtonBody} {
       width: 100%;
       text-align: left;
-      padding-left: 24px;
       border-radius: 0 10px 10px 0;
 
       h1, h2, h3, h4 ,h5 {
@@ -64,6 +64,7 @@ export const ClientButton = styled(Button)`
     }
 
     ${H5} {
+      font-size: 1rem;
       z-index: 100;
     }
 
