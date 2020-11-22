@@ -1,0 +1,814 @@
+Resources:
+  HAASVPC1DCEA562:
+    
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsHostnames: true
+      EnableDnsSupport: true
+      InstanceTenancy: default
+      Tags:
+        - Key: Name
+          Value: AwsStack/HAAS_VPC
+    Metadata:
+      aws:cdk:path: AwsStack/HAAS_VPC/Resource
+  HAASVPCHAASVPCPUBLICDEFAULTSubnet1Subnet2E22440A:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: 10.0.0.0/18
+      VpcId:
+        Ref: HAASVPC1DCEA562
+      AvailabilityZone:
+        Fn::Select:
+          - 0
+          - Fn::GetAZs: ""
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: aws-cdk:subnet-name
+          Value: HAAS_VPC_PUBLIC_DEFAULT
+        - Key: aws-cdk:subnet-type
+          Value: Public
+        - Key: Name
+          Value: AwsStack/HAAS_VPC/HAAS_VPC_PUBLIC_DEFAULTSubnet1
+    Metadata:
+      aws:cdk:path: AwsStack/HAAS_VPC/HAAS_VPC_PUBLIC_DEFAULTSubnet1/Subnet
+  HAASVPCHAASVPCPUBLICDEFAULTSubnet1RouteTable17309A88:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId:
+        Ref: HAASVPC1DCEA562
+      Tags:
+        - Key: Name
+          Value: AwsStack/HAAS_VPC/HAAS_VPC_PUBLIC_DEFAULTSubnet1
+    Metadata:
+      aws:cdk:path: AwsStack/HAAS_VPC/HAAS_VPC_PUBLIC_DEFAULTSubnet1/RouteTable
+  HAASVPCHAASVPCPUBLICDEFAULTSubnet1RouteTableAssociation6A858C5C:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId:
+        Ref: HAASVPCHAASVPCPUBLICDEFAULTSubnet1RouteTable17309A88
+      SubnetId:
+        Ref: HAASVPCHAASVPCPUBLICDEFAULTSubnet1Subnet2E22440A
+    Metadata:
+      aws:cdk:path: AwsStack/HAAS_VPC/HAAS_VPC_PUBLIC_DEFAULTSubnet1/RouteTableAssociation
+  HAASVPCHAASVPCPUBLICDEFAULTSubnet1DefaultRouteB71857B4:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId:
+        Ref: HAASVPCHAASVPCPUBLICDEFAULTSubnet1RouteTable17309A88
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId:
+        Ref: HAASVPCIGW86311ABE
+    DependsOn:
+      - HAASVPCVPCGWCB5CF5BE
+    Metadata:
+      aws:cdk:path: AwsStack/HAAS_VPC/HAAS_VPC_PUBLIC_DEFAULTSubnet1/DefaultRoute
+  HAASVPCHAASVPCPUBLICDEFAULTSubnet1EIP07E8CEBC:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+      Tags:
+        - Key: Name
+          Value: AwsStack/HAAS_VPC/HAAS_VPC_PUBLIC_DEFAULTSubnet1
+    Metadata:
+      aws:cdk:path: AwsStack/HAAS_VPC/HAAS_VPC_PUBLIC_DEFAULTSubnet1/EIP
+  HAASVPCHAASVPCPUBLICDEFAULTSubnet1NATGateway3958F7BB:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId:
+        Fn::GetAtt:
+          - HAASVPCHAASVPCPUBLICDEFAULTSubnet1EIP07E8CEBC
+          - AllocationId
+      SubnetId:
+        Ref: HAASVPCHAASVPCPUBLICDEFAULTSubnet1Subnet2E22440A
+      Tags:
+        - Key: Name
+          Value: AwsStack/HAAS_VPC/HAAS_VPC_PUBLIC_DEFAULTSubnet1
+    Metadata:
+      aws:cdk:path: AwsStack/HAAS_VPC/HAAS_VPC_PUBLIC_DEFAULTSubnet1/NATGateway
+  HAASVPCHAASVPCPUBLICDEFAULTSubnet2Subnet955B77DD:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: 10.0.64.0/18
+      VpcId:
+        Ref: HAASVPC1DCEA562
+      AvailabilityZone:
+        Fn::Select:
+          - 1
+          - Fn::GetAZs: ""
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: aws-cdk:subnet-name
+          Value: HAAS_VPC_PUBLIC_DEFAULT
+        - Key: aws-cdk:subnet-type
+          Value: Public
+        - Key: Name
+          Value: AwsStack/HAAS_VPC/HAAS_VPC_PUBLIC_DEFAULTSubnet2
+    Metadata:
+      aws:cdk:path: AwsStack/HAAS_VPC/HAAS_VPC_PUBLIC_DEFAULTSubnet2/Subnet
+  HAASVPCHAASVPCPUBLICDEFAULTSubnet2RouteTable6E4F6D1C:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId:
+        Ref: HAASVPC1DCEA562
+      Tags:
+        - Key: Name
+          Value: AwsStack/HAAS_VPC/HAAS_VPC_PUBLIC_DEFAULTSubnet2
+    Metadata:
+      aws:cdk:path: AwsStack/HAAS_VPC/HAAS_VPC_PUBLIC_DEFAULTSubnet2/RouteTable
+  HAASVPCHAASVPCPUBLICDEFAULTSubnet2RouteTableAssociationBFC82501:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId:
+        Ref: HAASVPCHAASVPCPUBLICDEFAULTSubnet2RouteTable6E4F6D1C
+      SubnetId:
+        Ref: HAASVPCHAASVPCPUBLICDEFAULTSubnet2Subnet955B77DD
+    Metadata:
+      aws:cdk:path: AwsStack/HAAS_VPC/HAAS_VPC_PUBLIC_DEFAULTSubnet2/RouteTableAssociation
+  HAASVPCHAASVPCPUBLICDEFAULTSubnet2DefaultRouteE79CEFE4:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId:
+        Ref: HAASVPCHAASVPCPUBLICDEFAULTSubnet2RouteTable6E4F6D1C
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId:
+        Ref: HAASVPCIGW86311ABE
+    DependsOn:
+      - HAASVPCVPCGWCB5CF5BE
+    Metadata:
+      aws:cdk:path: AwsStack/HAAS_VPC/HAAS_VPC_PUBLIC_DEFAULTSubnet2/DefaultRoute
+  HAASVPCHAASVPCPUBLICDEFAULTSubnet2EIP09DB7D6E:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+      Tags:
+        - Key: Name
+          Value: AwsStack/HAAS_VPC/HAAS_VPC_PUBLIC_DEFAULTSubnet2
+    Metadata:
+      aws:cdk:path: AwsStack/HAAS_VPC/HAAS_VPC_PUBLIC_DEFAULTSubnet2/EIP
+  HAASVPCHAASVPCPUBLICDEFAULTSubnet2NATGateway0797C44A:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId:
+        Fn::GetAtt:
+          - HAASVPCHAASVPCPUBLICDEFAULTSubnet2EIP09DB7D6E
+          - AllocationId
+      SubnetId:
+        Ref: HAASVPCHAASVPCPUBLICDEFAULTSubnet2Subnet955B77DD
+      Tags:
+        - Key: Name
+          Value: AwsStack/HAAS_VPC/HAAS_VPC_PUBLIC_DEFAULTSubnet2
+    Metadata:
+      aws:cdk:path: AwsStack/HAAS_VPC/HAAS_VPC_PUBLIC_DEFAULTSubnet2/NATGateway
+  HAASVPCHAASVPCPRIVATEDEFAULTSubnet1Subnet1EEDB177:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: 10.0.128.0/18
+      VpcId:
+        Ref: HAASVPC1DCEA562
+      AvailabilityZone:
+        Fn::Select:
+          - 0
+          - Fn::GetAZs: ""
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: aws-cdk:subnet-name
+          Value: HAAS_VPC_PRIVATE_DEFAULT
+        - Key: aws-cdk:subnet-type
+          Value: Private
+        - Key: Name
+          Value: AwsStack/HAAS_VPC/HAAS_VPC_PRIVATE_DEFAULTSubnet1
+    Metadata:
+      aws:cdk:path: AwsStack/HAAS_VPC/HAAS_VPC_PRIVATE_DEFAULTSubnet1/Subnet
+  HAASVPCHAASVPCPRIVATEDEFAULTSubnet1RouteTable36024081:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId:
+        Ref: HAASVPC1DCEA562
+      Tags:
+        - Key: Name
+          Value: AwsStack/HAAS_VPC/HAAS_VPC_PRIVATE_DEFAULTSubnet1
+    Metadata:
+      aws:cdk:path: AwsStack/HAAS_VPC/HAAS_VPC_PRIVATE_DEFAULTSubnet1/RouteTable
+  HAASVPCHAASVPCPRIVATEDEFAULTSubnet1RouteTableAssociation070449D4:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId:
+        Ref: HAASVPCHAASVPCPRIVATEDEFAULTSubnet1RouteTable36024081
+      SubnetId:
+        Ref: HAASVPCHAASVPCPRIVATEDEFAULTSubnet1Subnet1EEDB177
+    Metadata:
+      aws:cdk:path: AwsStack/HAAS_VPC/HAAS_VPC_PRIVATE_DEFAULTSubnet1/RouteTableAssociation
+  HAASVPCHAASVPCPRIVATEDEFAULTSubnet1DefaultRoute62DEAA56:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId:
+        Ref: HAASVPCHAASVPCPRIVATEDEFAULTSubnet1RouteTable36024081
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId:
+        Ref: HAASVPCHAASVPCPUBLICDEFAULTSubnet1NATGateway3958F7BB
+    Metadata:
+      aws:cdk:path: AwsStack/HAAS_VPC/HAAS_VPC_PRIVATE_DEFAULTSubnet1/DefaultRoute
+  HAASVPCHAASVPCPRIVATEDEFAULTSubnet2SubnetDEC8019B:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: 10.0.192.0/18
+      VpcId:
+        Ref: HAASVPC1DCEA562
+      AvailabilityZone:
+        Fn::Select:
+          - 1
+          - Fn::GetAZs: ""
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: aws-cdk:subnet-name
+          Value: HAAS_VPC_PRIVATE_DEFAULT
+        - Key: aws-cdk:subnet-type
+          Value: Private
+        - Key: Name
+          Value: AwsStack/HAAS_VPC/HAAS_VPC_PRIVATE_DEFAULTSubnet2
+    Metadata:
+      aws:cdk:path: AwsStack/HAAS_VPC/HAAS_VPC_PRIVATE_DEFAULTSubnet2/Subnet
+  HAASVPCHAASVPCPRIVATEDEFAULTSubnet2RouteTable8343798B:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId:
+        Ref: HAASVPC1DCEA562
+      Tags:
+        - Key: Name
+          Value: AwsStack/HAAS_VPC/HAAS_VPC_PRIVATE_DEFAULTSubnet2
+    Metadata:
+      aws:cdk:path: AwsStack/HAAS_VPC/HAAS_VPC_PRIVATE_DEFAULTSubnet2/RouteTable
+  HAASVPCHAASVPCPRIVATEDEFAULTSubnet2RouteTableAssociationBBC26999:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId:
+        Ref: HAASVPCHAASVPCPRIVATEDEFAULTSubnet2RouteTable8343798B
+      SubnetId:
+        Ref: HAASVPCHAASVPCPRIVATEDEFAULTSubnet2SubnetDEC8019B
+    Metadata:
+      aws:cdk:path: AwsStack/HAAS_VPC/HAAS_VPC_PRIVATE_DEFAULTSubnet2/RouteTableAssociation
+  HAASVPCHAASVPCPRIVATEDEFAULTSubnet2DefaultRoute6533C821:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId:
+        Ref: HAASVPCHAASVPCPRIVATEDEFAULTSubnet2RouteTable8343798B
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId:
+        Ref: HAASVPCHAASVPCPUBLICDEFAULTSubnet2NATGateway0797C44A
+    Metadata:
+      aws:cdk:path: AwsStack/HAAS_VPC/HAAS_VPC_PRIVATE_DEFAULTSubnet2/DefaultRoute
+  HAASVPCIGW86311ABE:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: AwsStack/HAAS_VPC
+    Metadata:
+      aws:cdk:path: AwsStack/HAAS_VPC/IGW
+  HAASVPCVPCGWCB5CF5BE:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId:
+        Ref: HAASVPC1DCEA562
+      InternetGatewayId:
+        Ref: HAASVPCIGW86311ABE
+    Metadata:
+      aws:cdk:path: AwsStack/HAAS_VPC/VPCGW
+  HAASAPICLUSTERC0B4C03E:
+    Type: AWS::ECS::Cluster
+    Metadata:
+      aws:cdk:path: AwsStack/HAAS_API_CLUSTER/Resource
+  DatabaseSecurityD521C81A:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: AwsStack/DatabaseSecurity
+      SecurityGroupEgress:
+        - CidrIp: 0.0.0.0/0
+          Description: Allow all outbound traffic by default
+          IpProtocol: "-1"
+      VpcId:
+        Ref: HAASVPC1DCEA562
+    Metadata:
+      aws:cdk:path: AwsStack/DatabaseSecurity/Resource
+  DatabaseSecurityfromAwsStackRemoteAccess10E7EB825432B146F125:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      IpProtocol: tcp
+      Description: from AwsStackRemoteAccess10E7EB82:5432
+      FromPort: 5432
+      GroupId:
+        Fn::GetAtt:
+          - DatabaseSecurityD521C81A
+          - GroupId
+      SourceSecurityGroupId:
+        Fn::GetAtt:
+          - RemoteAccess4CDDA52F
+          - GroupId
+      ToPort: 5432
+    Metadata:
+      aws:cdk:path: AwsStack/DatabaseSecurity/from AwsStackRemoteAccess10E7EB82:5432
+  RemoteAccess4CDDA52F:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Access for remote access
+      SecurityGroupEgress:
+        - CidrIp: 0.0.0.0/0
+          Description: Allow all outbound traffic by default
+          IpProtocol: "-1"
+      SecurityGroupIngress:
+        - CidrIp: 184.170.253.110/25
+          Description: from 184.170.253.110/25:22
+          FromPort: 22
+          IpProtocol: tcp
+          ToPort: 22
+      VpcId:
+        Ref: HAASVPC1DCEA562
+    Metadata:
+      aws:cdk:path: AwsStack/RemoteAccess/Resource
+  HAASDBSubnetGroupD71B522C:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: Subnet group for HAAS_DB database
+      SubnetIds:
+        - Ref: HAASVPCHAASVPCPUBLICDEFAULTSubnet1Subnet2E22440A
+        - Ref: HAASVPCHAASVPCPUBLICDEFAULTSubnet2Subnet955B77DD
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
+    Metadata:
+      aws:cdk:path: AwsStack/HAAS_DB/SubnetGroup/Default
+  HAASDBSecurityGroupCA6C8873:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for HAAS_DB database
+      SecurityGroupEgress:
+        - CidrIp: 0.0.0.0/0
+          Description: Allow all outbound traffic by default
+          IpProtocol: "-1"
+      VpcId:
+        Ref: HAASVPC1DCEA562
+    Metadata:
+      aws:cdk:path: AwsStack/HAAS_DB/SecurityGroup/Resource
+  HAASDBSecret0814DE7E:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Description:
+        Fn::Join:
+          - ""
+          - - "Generated by the CDK for stack: "
+            - Ref: AWS::StackName
+      GenerateSecretString:
+        ExcludeCharacters: " %+~`#$&*()|[]{}:;<>?!'/@\"\\"
+        GenerateStringKey: password
+        PasswordLength: 30
+        SecretStringTemplate: '{"username":"postgres"}'
+    Metadata:
+      aws:cdk:path: AwsStack/HAAS_DB/Secret/Resource
+  HAASDBSecretAttachmentFF0DBE34:
+    Type: AWS::SecretsManager::SecretTargetAttachment
+    Properties:
+      SecretId:
+        Ref: HAASDBSecret0814DE7E
+      TargetId:
+        Ref: HAASDBC3F5C5FB
+      TargetType: AWS::RDS::DBInstance
+    Metadata:
+      aws:cdk:path: AwsStack/HAAS_DB/Secret/Attachment/Resource
+  HAASDBC3F5C5FB:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      DBInstanceClass: db.t3.small
+      AllocatedStorage: "100"
+      CopyTagsToSnapshot: true
+      DBSubnetGroupName:
+        Ref: HAASDBSubnetGroupD71B522C
+      DeletionProtection: true
+      Engine: postgres
+      EngineVersion: "12"
+      MasterUsername:
+        Fn::Join:
+          - ""
+          - - "{{resolve:secretsmanager:"
+            - Ref: HAASDBSecret0814DE7E
+            - :SecretString:username::}}
+      MasterUserPassword:
+        Fn::Join:
+          - ""
+          - - "{{resolve:secretsmanager:"
+            - Ref: HAASDBSecret0814DE7E
+            - :SecretString:password::}}
+      PubliclyAccessible: true
+      StorageType: gp2
+      VPCSecurityGroups:
+        - Fn::GetAtt:
+            - HAASDBSecurityGroupCA6C8873
+            - GroupId
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
+    Metadata:
+      aws:cdk:path: AwsStack/HAAS_DB/Resource
+  HAASBASTIONInstanceSecurityGroup515E8B56:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: AwsStack/HAAS_BASTION/InstanceSecurityGroup
+      SecurityGroupEgress:
+        - CidrIp: 0.0.0.0/0
+          Description: Allow all outbound traffic by default
+          IpProtocol: "-1"
+      Tags:
+        - Key: Name
+          Value: AwsStack/HAAS_BASTION
+      VpcId:
+        Ref: HAASVPC1DCEA562
+    Metadata:
+      aws:cdk:path: AwsStack/HAAS_BASTION/InstanceSecurityGroup/Resource
+  HAASBASTIONInstanceRoleA76FDB8D:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service:
+                Fn::Join:
+                  - ""
+                  - - ec2.
+                    - Ref: AWS::URLSuffix
+        Version: "2012-10-17"
+      Tags:
+        - Key: Name
+          Value: AwsStack/HAAS_BASTION
+    Metadata:
+      aws:cdk:path: AwsStack/HAAS_BASTION/InstanceRole/Resource
+  HAASBASTIONInstanceProfileD6E10FDB:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+        - Ref: HAASBASTIONInstanceRoleA76FDB8D
+    Metadata:
+      aws:cdk:path: AwsStack/HAAS_BASTION/InstanceProfile
+  HAASBASTIONA6CAE48A:
+    Type: AWS::EC2::Instance
+    Properties:
+      AvailabilityZone:
+        Fn::Select:
+          - 0
+          - Fn::GetAZs: ""
+      IamInstanceProfile:
+        Ref: HAASBASTIONInstanceProfileD6E10FDB
+      ImageId:
+        Ref: SsmParameterValueawsserviceamiamazonlinuxlatestamznamihvmx8664gp2C96584B6F00A464EAD1953AFF4B05118Parameter
+      InstanceType: t3.micro
+      SecurityGroupIds:
+        - Fn::GetAtt:
+            - HAASBASTIONInstanceSecurityGroup515E8B56
+            - GroupId
+      SubnetId:
+        Ref: HAASVPCHAASVPCPUBLICDEFAULTSubnet1Subnet2E22440A
+      Tags:
+        - Key: Name
+          Value: AwsStack/HAAS_BASTION
+      UserData:
+        Fn::Base64: "#!/bin/bash"
+    DependsOn:
+      - HAASBASTIONInstanceRoleA76FDB8D
+    Metadata:
+      aws:cdk:path: AwsStack/HAAS_BASTION/Resource
+  HAASFARGATESERVICELB21527247:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      LoadBalancerAttributes:
+        - Key: deletion_protection.enabled
+          Value: "false"
+      Scheme: internet-facing
+      SecurityGroups:
+        - Fn::GetAtt:
+            - HAASFARGATESERVICELBSecurityGroupF77134B5
+            - GroupId
+      Subnets:
+        - Ref: HAASVPCHAASVPCPUBLICDEFAULTSubnet1Subnet2E22440A
+        - Ref: HAASVPCHAASVPCPUBLICDEFAULTSubnet2Subnet955B77DD
+      Type: application
+    DependsOn:
+      - HAASVPCHAASVPCPUBLICDEFAULTSubnet1DefaultRouteB71857B4
+      - HAASVPCHAASVPCPUBLICDEFAULTSubnet2DefaultRouteE79CEFE4
+    Metadata:
+      aws:cdk:path: AwsStack/HAAS_FARGATE_SERVICE/LB/Resource
+  HAASFARGATESERVICELBSecurityGroupF77134B5:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Automatically created Security Group for ELB AwsStackHAASFARGATESERVICELBFA8CAE02
+      SecurityGroupIngress:
+        - CidrIp: 0.0.0.0/0
+          Description: Allow from anyone on port 80
+          FromPort: 80
+          IpProtocol: tcp
+          ToPort: 80
+      VpcId:
+        Ref: HAASVPC1DCEA562
+    Metadata:
+      aws:cdk:path: AwsStack/HAAS_FARGATE_SERVICE/LB/SecurityGroup/Resource
+  HAASFARGATESERVICELBSecurityGrouptoAwsStackHAASFARGATESERVICEServiceSecurityGroupE70926B34000D8D8AF96:
+    Type: AWS::EC2::SecurityGroupEgress
+    Properties:
+      GroupId:
+        Fn::GetAtt:
+          - HAASFARGATESERVICELBSecurityGroupF77134B5
+          - GroupId
+      IpProtocol: tcp
+      Description: Load balancer to target
+      DestinationSecurityGroupId:
+        Fn::GetAtt:
+          - HAASFARGATESERVICEServiceSecurityGroup0656039C
+          - GroupId
+      FromPort: 4000
+      ToPort: 4000
+    Metadata:
+      aws:cdk:path: AwsStack/HAAS_FARGATE_SERVICE/LB/SecurityGroup/to AwsStackHAASFARGATESERVICEServiceSecurityGroupE70926B3:4000
+  HAASFARGATESERVICELBPublicListenerAF53D696:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      DefaultActions:
+        - TargetGroupArn:
+            Ref: HAASFARGATESERVICELBPublicListenerECSGroup3928EAE4
+          Type: forward
+      LoadBalancerArn:
+        Ref: HAASFARGATESERVICELB21527247
+      Port: 80
+      Protocol: HTTP
+    Metadata:
+      aws:cdk:path: AwsStack/HAAS_FARGATE_SERVICE/LB/PublicListener/Resource
+  HAASFARGATESERVICELBPublicListenerECSGroup3928EAE4:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Port: 80
+      Protocol: HTTP
+      TargetType: ip
+      VpcId:
+        Ref: HAASVPC1DCEA562
+    Metadata:
+      aws:cdk:path: AwsStack/HAAS_FARGATE_SERVICE/LB/PublicListener/ECSGroup/Resource
+  HAASFARGATESERVICETaskDefTaskRole8562BA69:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+        Version: "2012-10-17"
+    Metadata:
+      aws:cdk:path: AwsStack/HAAS_FARGATE_SERVICE/TaskDef/TaskRole/Resource
+  HAASFARGATESERVICETaskDef01959D3C:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      ContainerDefinitions:
+        - Essential: true
+          Image:
+            Fn::Join:
+              - ""
+              - - Ref: AWS::AccountId
+                - .dkr.ecr.
+                - Ref: AWS::Region
+                - "."
+                - Ref: AWS::URLSuffix
+                - /haas:latest
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group:
+                Ref: HAASFARGATESERVICETaskDefHAASAPICONTAINERLogGroup3826EB10
+              awslogs-stream-prefix: HAAS_FARGATE_SERVICE
+              awslogs-region:
+                Ref: AWS::Region
+          Name: HAAS_API_CONTAINER
+          PortMappings:
+            - ContainerPort: 4000
+              Protocol: tcp
+      Cpu: "256"
+      ExecutionRoleArn:
+        Fn::GetAtt:
+          - HAASFARGATESERVICETaskDefExecutionRole2C9E045C
+          - Arn
+      Family: AwsStackHAASFARGATESERVICETaskDef60892536
+      Memory: "512"
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      TaskRoleArn:
+        Fn::GetAtt:
+          - HAASFARGATESERVICETaskDefTaskRole8562BA69
+          - Arn
+    Metadata:
+      aws:cdk:path: AwsStack/HAAS_FARGATE_SERVICE/TaskDef/Resource
+  HAASFARGATESERVICETaskDefHAASAPICONTAINERLogGroup3826EB10:
+    Type: AWS::Logs::LogGroup
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
+    Metadata:
+      aws:cdk:path: AwsStack/HAAS_FARGATE_SERVICE/TaskDef/HAAS_API_CONTAINER/LogGroup/Resource
+  HAASFARGATESERVICETaskDefExecutionRole2C9E045C:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+        Version: "2012-10-17"
+    Metadata:
+      aws:cdk:path: AwsStack/HAAS_FARGATE_SERVICE/TaskDef/ExecutionRole/Resource
+  HAASFARGATESERVICETaskDefExecutionRoleDefaultPolicy1910209F:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action:
+              - ecr:BatchCheckLayerAvailability
+              - ecr:GetDownloadUrlForLayer
+              - ecr:BatchGetImage
+            Effect: Allow
+            Resource:
+              Fn::Join:
+                - ""
+                - - "arn:"
+                  - Ref: AWS::Partition
+                  - ":ecr:"
+                  - Ref: AWS::Region
+                  - ":"
+                  - Ref: AWS::AccountId
+                  - :repository/haas
+          - Action: ecr:GetAuthorizationToken
+            Effect: Allow
+            Resource: "*"
+          - Action:
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+            Effect: Allow
+            Resource:
+              Fn::GetAtt:
+                - HAASFARGATESERVICETaskDefHAASAPICONTAINERLogGroup3826EB10
+                - Arn
+        Version: "2012-10-17"
+      PolicyName: HAASFARGATESERVICETaskDefExecutionRoleDefaultPolicy1910209F
+      Roles:
+        - Ref: HAASFARGATESERVICETaskDefExecutionRole2C9E045C
+    Metadata:
+      aws:cdk:path: AwsStack/HAAS_FARGATE_SERVICE/TaskDef/ExecutionRole/DefaultPolicy/Resource
+  HAASFARGATESERVICEServiceB19C26D5:
+    Type: AWS::ECS::Service
+    Properties:
+      Cluster:
+        Ref: HAASAPICLUSTERC0B4C03E
+      DeploymentConfiguration:
+        MaximumPercent: 200
+        MinimumHealthyPercent: 50
+      DesiredCount: 1
+      EnableECSManagedTags: false
+      HealthCheckGracePeriodSeconds: 60
+      LaunchType: FARGATE
+      LoadBalancers:
+        - ContainerName: HAAS_API_CONTAINER
+          ContainerPort: 4000
+          TargetGroupArn:
+            Ref: HAASFARGATESERVICELBPublicListenerECSGroup3928EAE4
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: DISABLED
+          SecurityGroups:
+            - Fn::GetAtt:
+                - HAASFARGATESERVICEServiceSecurityGroup0656039C
+                - GroupId
+          Subnets:
+            - Ref: HAASVPCHAASVPCPRIVATEDEFAULTSubnet1Subnet1EEDB177
+            - Ref: HAASVPCHAASVPCPRIVATEDEFAULTSubnet2SubnetDEC8019B
+      TaskDefinition:
+        Ref: HAASFARGATESERVICETaskDef01959D3C
+    DependsOn:
+      - HAASFARGATESERVICELBPublicListenerECSGroup3928EAE4
+      - HAASFARGATESERVICELBPublicListenerAF53D696
+    Metadata:
+      aws:cdk:path: AwsStack/HAAS_FARGATE_SERVICE/Service/Service
+  HAASFARGATESERVICEServiceSecurityGroup0656039C:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: AwsStack/HAAS_FARGATE_SERVICE/Service/SecurityGroup
+      SecurityGroupEgress:
+        - CidrIp: 0.0.0.0/0
+          Description: Allow all outbound traffic by default
+          IpProtocol: "-1"
+      VpcId:
+        Ref: HAASVPC1DCEA562
+    Metadata:
+      aws:cdk:path: AwsStack/HAAS_FARGATE_SERVICE/Service/SecurityGroup/Resource
+  HAASFARGATESERVICEServiceSecurityGroupfromAwsStackHAASFARGATESERVICELBSecurityGroup96CE4EF240002D3365B6:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      IpProtocol: tcp
+      Description: Load balancer to target
+      FromPort: 4000
+      GroupId:
+        Fn::GetAtt:
+          - HAASFARGATESERVICEServiceSecurityGroup0656039C
+          - GroupId
+      SourceSecurityGroupId:
+        Fn::GetAtt:
+          - HAASFARGATESERVICELBSecurityGroupF77134B5
+          - GroupId
+      ToPort: 4000
+    Metadata:
+      aws:cdk:path: AwsStack/HAAS_FARGATE_SERVICE/Service/SecurityGroup/from AwsStackHAASFARGATESERVICELBSecurityGroup96CE4EF2:4000
+  CDKMetadata:
+    Type: AWS::CDK::Metadata
+    Properties:
+      Modules: aws-cdk=1.67.0,@aws-cdk/assets=1.67.0,@aws-cdk/aws-applicationautoscaling=1.67.0,@aws-cdk/aws-autoscaling=1.67.0,@aws-cdk/aws-autoscaling-common=1.67.0,@aws-cdk/aws-autoscaling-hooktargets=1.67.0,@aws-cdk/aws-certificatemanager=1.67.0,@aws-cdk/aws-cloudwatch=1.67.0,@aws-cdk/aws-codeguruprofiler=1.67.0,@aws-cdk/aws-ec2=1.67.0,@aws-cdk/aws-ecr=1.67.0,@aws-cdk/aws-ecr-assets=1.67.0,@aws-cdk/aws-ecs=1.67.0,@aws-cdk/aws-ecs-patterns=1.67.0,@aws-cdk/aws-elasticloadbalancingv2=1.67.0,@aws-cdk/aws-events=1.67.0,@aws-cdk/aws-events-targets=1.67.0,@aws-cdk/aws-iam=1.67.0,@aws-cdk/aws-kms=1.67.0,@aws-cdk/aws-lambda=1.67.0,@aws-cdk/aws-logs=1.67.0,@aws-cdk/aws-rds=1.67.0,@aws-cdk/aws-route53=1.67.0,@aws-cdk/aws-route53-targets=1.67.0,@aws-cdk/aws-s3=1.67.0,@aws-cdk/aws-s3-assets=1.67.0,@aws-cdk/aws-sam=1.67.0,@aws-cdk/aws-secretsmanager=1.67.0,@aws-cdk/aws-servicediscovery=1.67.0,@aws-cdk/aws-sns=1.67.0,@aws-cdk/aws-sns-subscriptions=1.67.0,@aws-cdk/aws-sqs=1.67.0,@aws-cdk/aws-ssm=1.67.0,@aws-cdk/cloud-assembly-schema=1.67.0,@aws-cdk/core=1.67.0,@aws-cdk/custom-resources=1.67.0,@aws-cdk/cx-api=1.67.0,@aws-cdk/region-info=1.67.0,jsii-runtime=node.js/v11.0.0
+    Metadata:
+      aws:cdk:path: AwsStack/CDKMetadata/Default
+    Condition: CDKMetadataAvailable
+Parameters:
+  SsmParameterValueawsserviceamiamazonlinuxlatestamznamihvmx8664gp2C96584B6F00A464EAD1953AFF4B05118Parameter:
+    Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
+    Default: /aws/service/ami-amazon-linux-latest/amzn-ami-hvm-x86_64-gp2
+Outputs:
+  HAASFARGATESERVICELoadBalancerDNS66907F3C:
+    Value:
+      Fn::GetAtt:
+        - HAASFARGATESERVICELB21527247
+        - DNSName
+  HAASFARGATESERVICEServiceURL7FF9F151:
+    Value:
+      Fn::Join:
+        - ""
+        - - http://
+          - Fn::GetAtt:
+              - HAASFARGATESERVICELB21527247
+              - DNSName
+Conditions:
+  CDKMetadataAvailable:
+    Fn::Or:
+      - Fn::Or:
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-east-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-northeast-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-northeast-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-south-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-southeast-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-southeast-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ca-central-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - cn-north-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - cn-northwest-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-central-1
+      - Fn::Or:
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-north-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-west-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-west-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-west-3
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - me-south-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - sa-east-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - us-east-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - us-east-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - us-west-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - us-west-2
+
