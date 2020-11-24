@@ -134,6 +134,7 @@ export interface NexusGenInputs {
     roleId?: string | null; // String
   }
   EditWorkspaceInput: { // input type
+    customerSlug: string; // String!
     id: string; // ID!
     logo?: string | null; // String
     name: string; // String!
@@ -978,6 +979,7 @@ export interface NexusGenArgTypes {
       tagId?: string | null; // String
     }
     deleteTrigger: { // args
+      customerSlug?: string | null; // String
       id?: string | null; // String
     }
     deleteUser: { // args
@@ -993,6 +995,7 @@ export interface NexusGenArgTypes {
       title?: string | null; // String
     }
     editTrigger: { // args
+      customerSlug?: string | null; // String
       recipients?: NexusGenInputs['RecipientsInputType'] | null; // RecipientsInputType
       trigger?: NexusGenInputs['TriggerInputType'] | null; // TriggerInputType
       triggerId?: string | null; // String

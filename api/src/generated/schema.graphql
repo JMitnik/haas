@@ -231,6 +231,7 @@ input EditUserInput {
 
 """Edit a workspace"""
 input EditWorkspaceInput {
+  customerSlug: String!
   id: ID!
   logo: String
   name: String!
@@ -321,10 +322,10 @@ type Mutation {
   deleteDialogue(input: DeleteDialogueInputType): Dialogue!
   deleteQuestion(input: DeleteNodeInputType): QuestionNode!
   deleteTag(tagId: String): Tag!
-  deleteTrigger(id: String): TriggerType
+  deleteTrigger(customerSlug: String, id: String): TriggerType
   deleteUser(input: DeleteUserInput): DeleteUserOutput!
   editDialogue(customerSlug: String, description: String, dialogueSlug: String, isWithoutGenData: Boolean, publicTitle: String, tags: TagsInputObjectType, title: String): Dialogue!
-  editTrigger(recipients: RecipientsInputType, trigger: TriggerInputType, triggerId: String): TriggerType!
+  editTrigger(customerSlug: String, recipients: RecipientsInputType, trigger: TriggerInputType, triggerId: String): TriggerType!
   editUser(input: EditUserInput, userId: String): UserType!
   editWorkspace(input: EditWorkspaceInput): Customer!
 
