@@ -130,9 +130,8 @@ const EditTriggerView = () => {
 };
 
 const EditTriggerForm = ({ trigger }: {trigger: any}) => {
-  const { triggerId } = useParams<{triggerId: string, customerSlug: string }>();
+  const { triggerId, customerSlug } = useParams<{triggerId: string, customerSlug: string }>();
   const history = useHistory();
-  const { customerSlug } = useParams();
   const { t } = useTranslation();
   const toast = useToast();
 
@@ -228,6 +227,7 @@ const EditTriggerForm = ({ trigger }: {trigger: any}) => {
 
     editTrigger({
       variables: {
+        customerSlug,
         triggerId,
         trigger,
         recipients,
