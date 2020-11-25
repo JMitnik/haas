@@ -1,4 +1,5 @@
 import { Dialogue, Link, NodeType, QuestionCondition, QuestionNode, QuestionNodeCreateInput } from '@prisma/client';
+import { NexusGenFieldTypes, NexusGenInputs } from '../../generated/nexus';
 import EdgeService from '../edge/EdgeService';
 import prisma from '../../config/prisma';
 
@@ -34,23 +35,9 @@ interface EdgeNodeProps {
   title: string;
 }
 
-interface LeafNodeProps {
-  id: string;
-  nodeId?: string;
-  type?: string;
-  title: string;
-}
-
 interface LinkGenericInputProps {
   type: 'SOCIAL' | 'API' | 'FACEBOOK' | 'LINKEDIN' | 'WHATSAPP' | 'INSTAGRAM' | 'TWITTER';
   url: string;
-}
-
-interface LinkInputProps extends LinkGenericInputProps {
-  id: string;
-  title?: string;
-  icon?: string;
-  backgroundColor?: string;
 }
 
 const standardOptions = [{ value: 'Facilities' },
@@ -80,17 +67,19 @@ const productServicesOptions = [{ value: 'Quality' },
 
 class NodeService {
   static removeNonExistingLinks = async (
-    dbLinks: Array<Link>,
-    newLinks: Array<LinkInputProps>) => {
+    existingLinks: Array<Link>,
+    newLinks: NexusGenInputs['CTALinkInputObjectType'][],
+  ) => {
     const newLinkIds = newLinks?.map(({ id }) => id);
-    const removeLinkIds = dbLinks?.filter(({ id }) => (!newLinkIds?.includes(id) && id)).map(({ id }) => id);
+    const removeLinkIds = existingLinks?.filter(({ id }) => (!newLinkIds?.includes(id) && id)).map(({ id }) => id);
+
     if (removeLinkIds?.length > 0) {
       await prisma.link.deleteMany({ where: { id: { in: removeLinkIds } } });
     }
   };
 
   static upsertLinks = async (
-    newLinks: Array<LinkInputProps>,
+    newLinks: NexusGenInputs['CTALinkInputObjectType'][],
     questionId: string,
   ) => {
     newLinks?.forEach(async (link) => {
@@ -100,10 +89,10 @@ class NodeService {
         },
         create: {
           title: link.title,
-          url: link.url,
-          type: link.type,
+          url: link.url || '',
+          type: link.type || 'API',
           backgroundColor: link.backgroundColor,
-          iconUrl: link.icon,
+          iconUrl: link.iconUrl || '',
           questionNode: {
             connect: {
               id: questionId,
@@ -112,10 +101,10 @@ class NodeService {
         },
         update: {
           title: link.title,
-          url: link.url,
-          type: link.type,
+          url: link.url || '',
+          type: link.type || 'API',
           backgroundColor: link.backgroundColor,
-          iconUrl: link.icon,
+          iconUrl: link.iconUrl || '',
         },
       });
     });

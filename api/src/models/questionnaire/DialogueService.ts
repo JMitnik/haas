@@ -7,7 +7,7 @@ import { Dialogue, DialogueCreateInput, DialogueUpdateInput,
   NodeType,
   QuestionOptionCreateManyWithoutQuestionNodeInput, Tag, TagWhereUniqueInput } from '@prisma/client';
 import { isPresent } from 'ts-is-present';
-import NodeService from '../question/NodeService';
+import NodeService from '../QuestionNode/NodeService';
 import filterDate from '../../utils/filterDate';
 // eslint-disable-next-line import/no-cycle
 import { NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';

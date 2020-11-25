@@ -5,7 +5,7 @@ import { UserInputError } from 'apollo-server-express';
 import { NexusGenInputs } from '../../generated/nexus';
 // eslint-disable-next-line import/no-cycle
 import DialogueService from '../questionnaire/DialogueService';
-import NodeService from '../question/NodeService';
+import NodeService from '../QuestionNode/NodeService';
 import defaultWorkspaceTemplate, { WorkspaceTemplate } from '../templates/defaultWorkspaceTemplate';
 import prisma from '../../config/prisma';
 

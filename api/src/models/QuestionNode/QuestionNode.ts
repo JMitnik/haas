@@ -1,4 +1,4 @@
-import { PrismaClient, QuestionNodeUpdateInput } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
 
 // eslint-disable-next-line import/no-cycle
@@ -321,20 +321,6 @@ export const UpdateQuestionNodeInputType = inputObjectType({
   },
 });
 
-export const UpdateCTAInputType = inputObjectType({
-  name: 'UpdateCTAInputType',
-  definition(t) {
-    t.string('id');
-    t.id('customerId');
-    t.string('title');
-    t.string('type');
-
-    t.field('links', { type: CTALinksInputType });
-    t.field('share', { type: ShareNodeInputType });
-    t.field('form', { type: FormNodeInputType });
-  },
-});
-
 export const DeleteNodeInputType = inputObjectType({
   name: 'DeleteNodeInputType',
   description: 'Delete Node Input type',
@@ -446,70 +432,6 @@ export const QuestionNodeMutations = extendType({
         }
 
         return null;
-      },
-    });
-
-    t.field('updateCTA', {
-      type: QuestionNodeType,
-      args: {
-        input: UpdateCTAInputType,
-      },
-      async resolve(parent, args, ctx) {
-        const { prisma }: { prisma: PrismaClient } = ctx;
-        const { title, type, id, links, share } = args.input;
-        const dbQuestionNode = await prisma.questionNode.findOne({
-          where: {
-            id,
-          },
-          include: {
-            links: true,
-            share: true,
-          },
-        });
-
-        const questionNodeUpdateInput: QuestionNodeUpdateInput = { title, type };
-
-        if (dbQuestionNode?.share && (!share || type !== 'SHARE')) {
-          await ctx.prisma.share.delete({ where: { id: dbQuestionNode.share.id } });
-        }
-
-        if (share && type === 'SHARE') {
-          await prisma.share.upsert({
-            where: {
-              id: share.id || '-1',
-            },
-            create: {
-              title: share.title,
-              url: share.url,
-              tooltip: share.tooltip,
-              questionNode: {
-                connect: {
-                  id: dbQuestionNode?.id,
-                },
-              },
-            },
-            update: {
-              title: share.title,
-              url: share.url,
-              tooltip: share.tooltip,
-            },
-          });
-        }
-
-        if (dbQuestionNode?.links) {
-          await NodeService.removeNonExistingLinks(dbQuestionNode?.links, links?.linkTypes);
-        }
-
-        await NodeService.upsertLinks(links?.linkTypes, id);
-
-        if (args.in) {
-          return prisma.questionNode.update({
-            where: {
-              id,
-            },
-            data: questionNodeUpdateInput,
-          });
-        }
       },
     });
 

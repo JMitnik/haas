@@ -3,7 +3,7 @@ import * as DebugAPI from '../models/debug/Debug';
 import * as InteractionAPI from '../models/session/Session';
 import * as NodeEntryAPI from '../models/node-entry/NodeEntry';
 import * as PaginationAPI from '../models/general/Pagination';
-import * as QuestionNodeAPI from '../models/question/QuestionNode';
+import * as QuestionNodeAPI from '../models/QuestionNode';
 import * as UserAPI from '../models/users/User';
 import * as WorkspaceAPI from '../models/customer/Customer';
 import config from './config';

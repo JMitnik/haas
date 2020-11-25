@@ -2,7 +2,7 @@ import { NodeEntry } from '@prisma/client';
 import { inputObjectType, objectType } from '@nexus/schema';
 
 // eslint-disable-next-line import/no-cycle
-import { QuestionNodeType } from '../question/QuestionNode';
+import { QuestionNodeType } from '../QuestionNode/QuestionNode';
 // eslint-disable-next-line import/no-cycle
 import NodeEntryService from './NodeEntryService';
 
