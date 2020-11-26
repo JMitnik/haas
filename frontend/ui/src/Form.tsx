@@ -546,6 +546,10 @@ export const CardForm = styled(Div)<CardFormProps>`
   ${({ theme, dualPane }) => css`
     ${dualPane && css`
       display: flex;
+
+      > *:first-child {
+        border-right: 1px solid ${theme.colors.gray[200]};
+      }
     `}
   `}
 `;

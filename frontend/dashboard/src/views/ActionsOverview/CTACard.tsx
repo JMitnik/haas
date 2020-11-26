@@ -1,3 +1,4 @@
+import * as UI from '@haas/ui';
 import { Edit3 } from 'react-feather';
 import { motion } from 'framer-motion';
 import { useMutation } from '@apollo/react-hooks';
@@ -44,7 +45,7 @@ interface CTACardProps {
   onNewCTAChange: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const CTACardContainer = styled(Flex)<{ activeCTA: string | null, id: string }>`
+const CTACardContainer = styled(UI.Card)<{ activeCTA: string | null, id: string }>`
  ${({ id, activeCTA, theme }) => css`
     position: relative;
     flex-direction: column;
@@ -54,7 +55,6 @@ const CTACardContainer = styled(Flex)<{ activeCTA: string | null, id: string }>`
     padding-left: 30px;
     margin-bottom: 20px;
     border-radius: ${theme.borderRadiuses.somewhatRounded};
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 
     ${!activeCTA && css`
       background-color: ${theme.colors.white};
@@ -134,7 +134,7 @@ const CTACard = ({ id, activeCTA, onActiveCTAChange, title, type, links, share, 
 
   return (
     <motion.div initial={{ opacity: 1, y: 150 }} animate={{ opacity: 1, y: 0 }}>
-      <CTACardContainer id={id} activeCTA={activeCTA}>
+      <CTACardContainer noHover id={id} activeCTA={activeCTA}>
         <Flex flexDirection="row" width="100%">
           <CTAIcon type={type} Icon={Icon} />
 

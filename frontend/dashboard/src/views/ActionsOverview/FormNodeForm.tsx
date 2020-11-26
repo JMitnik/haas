@@ -1,12 +1,13 @@
 import * as UI from '@haas/ui';
 import { useTranslation } from 'react-i18next';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
-import { AlertCircle, Circle, Type } from 'react-feather';
+import { AlertCircle, AtSign, Circle, FileText, Hash, Link2, Phone, Type } from 'react-feather';
 import { Button } from '@chakra-ui/core';
 import { Controller, UseFormMethods, useFieldArray, useWatch } from 'react-hook-form';
 
 import { CTANodeFormProps, FormDataProps } from './CTATypes';
+import useOnClickOutside from 'hooks/useClickOnOutside';
 
 type FormNodeFormProps = CTANodeFormProps;
 
@@ -23,7 +24,7 @@ enum TempFieldType {
 interface FieldProps {
   type: TempFieldType;
   color: string;
-  icon: React.ReactNode;
+  icon: any;
   constraints: {
     allowsRequired: boolean;
   }
@@ -32,42 +33,90 @@ interface FieldProps {
 const fieldMap: FieldProps[] = [
   {
     type: TempFieldType.EMAIL,
+    icon: AtSign,
+    color: '#f59e0b',
+    constraints: {
+      allowsRequired: true,
+    },
+  },
+  {
+    type: TempFieldType.PHONE_NUMBER,
+    icon: Phone,
+    color: '#fbbf24',
+    constraints: {
+      allowsRequired: true,
+    },
+  },
+  {
+    type: TempFieldType.URL,
+    icon: Link2,
+    color: '#DB2777',
+    constraints: {
+      allowsRequired: true,
+    },
+  },
+  {
+    type: TempFieldType.SHORT_TEXT,
     icon: Type,
-    color: '#3badff',
+    color: '#ef4444',
+    constraints: {
+      allowsRequired: true,
+    },
+  },
+  {
+    type: TempFieldType.LONG_TEXT,
+    icon: FileText,
+    color: '#ec4899',
+    constraints: {
+      allowsRequired: true,
+    },
+  },
+  {
+    type: TempFieldType.NUMBER,
+    icon: Hash,
+    color: '#f472b6',
     constraints: {
       allowsRequired: true,
     },
   },
 ];
 
-const FormNodeFieldFragment = ({ form, field, fieldIndex }: { form: UseFormMethods<FormDataProps>, field: any, fieldIndex: number }) => {
+const FormNodeFieldFragment = ({ form, field, fieldIndex, onClose }: { form: UseFormMethods<FormDataProps>, field: any, fieldIndex: number, onClose: () => void }) => {
+  const ref = useRef<HTMLDivElement | null>(null);
   const { t } = useTranslation();
 
-  const fieldName = `form.fields[${fieldIndex}]`;
+  const fieldName = `formNode.fields[${fieldIndex}]`;
 
   const formType = useWatch({
+    name: `${fieldName}.type`,
     control: form.control,
-    defaultValue: '',
+    defaultValue: field.type,
   });
 
-  const { register } = form;
-  useEffect(() => {
-    register(`${fieldName}.type`);
-  }, [register, fieldName]);
+  useOnClickOutside(ref, onClose);
+
+  console.log({ formType });
+  console.log({ fieldIndex });
 
   return (
-    <UI.Card noHover>
+    <UI.Card noHover ref={ref}>
       <UI.CardForm dualPane>
         <UI.List>
-          <UI.ListGroupHeader>{t('fields')}</UI.ListGroupHeader>
+          <UI.ListGroupHeader>{t('field_types')}</UI.ListGroupHeader>
           <UI.ListGroup>
-            {fieldMap.map((fieldCategory) => (
-              <UI.ListItem onClick={() => form.setValue(`${fieldName}.type`, fieldCategory.type)}>
-                <UI.ListIcon bg={fieldCategory.color}><Type /></UI.ListIcon>
+            {fieldMap.map((fieldCategory, index) => (
+              <UI.ListItem
+                key={index}
+                accent={fieldCategory.color}
+                isSelected={formType === fieldCategory.type}
+                onClick={() => form.setValue(`${fieldName}.type`, fieldCategory.type)}
+              >
+                <UI.ListIcon bg={fieldCategory.color}><fieldCategory.icon /></UI.ListIcon>
                 <UI.ListItemBody>
                   <UI.Text>{t(fieldCategory.type)}</UI.Text>
                   <UI.Text>{t(`${fieldCategory.type}_helper`)}</UI.Text>
                 </UI.ListItemBody>
+                <UI.ListItemCaret />
               </UI.ListItem>
             ))}
           </UI.ListGroup>
@@ -144,6 +193,10 @@ const FormNodeForm = ({ form }: FormNodeFormProps) => {
     append(appendNewField(fields.length + 1));
   };
 
+  useEffect(() => {
+    console.log(form.getValues());
+  }, [openedField, form]);
+
   return (
     <UI.FormSection id="form-node-form">
       <UI.Div>
@@ -154,20 +207,23 @@ const FormNodeForm = ({ form }: FormNodeFormProps) => {
           <UI.Div>
             <UI.FormLabel htmlFor="fields">{t('fields')}</UI.FormLabel>
             <Button type="button" onClick={() => handleNewField()}>{t('add_field')}</Button>
-            {fields.map((field, index) => (
-              <React.Fragment key={index}>
-                {openedField === index ? (
-                  <FormNodeFieldFragment
-                    form={form}
-                    field={field}
-                    fieldIndex={index}
-                    key={field.fieldIndex}
-                  />
-                ) : (
-                  <UI.Card onClick={() => setOpenedField(index)}>Open</UI.Card>
-                )}
-              </React.Fragment>
-            ))}
+            <UI.Grid gridTemplateColumns="1fr 1fr">
+              {fields.map((field, index) => (
+                <React.Fragment key={field.fieldIndex}>
+                  {openedField === index ? (
+                    <FormNodeFieldFragment
+                      onClose={() => setOpenedField(null)}
+                      form={form}
+                      field={field}
+                      fieldIndex={index}
+                      key={field.fieldIndex}
+                    />
+                  ) : (
+                    <UI.Card onClick={() => setOpenedField(index)}>Open</UI.Card>
+                  )}
+                </React.Fragment>
+              ))}
+            </UI.Grid>
           </UI.Div>
         </UI.InputGrid>
       </UI.Div>

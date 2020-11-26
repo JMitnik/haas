@@ -29,9 +29,9 @@ import createCTAMutation from 'mutations/createCTA';
 import getCTANodesQuery from 'queries/getCTANodes';
 import updateCTAMutation from 'mutations/updateCTA';
 
+import intToBool from 'utils/intToBool';
 import { FormDataProps } from './CTATypes';
 import FormNodeForm from './FormNodeForm';
-import intToBool from 'utils/intToBool';
 
 interface LinkInputProps {
   id?: string | null;
@@ -137,6 +137,7 @@ const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTACha
   const form = useForm<FormDataProps>({
     resolver: yupResolver(schema),
     mode: 'onChange',
+    shouldUnregister: false,
     defaultValues: {
       ctaType: type,
       share: { id: share?.id, title: share?.title, tooltip: share?.tooltip, url: share?.url },
