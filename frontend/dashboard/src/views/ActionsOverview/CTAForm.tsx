@@ -29,27 +29,9 @@ import createCTAMutation from 'mutations/createCTA';
 import getCTANodesQuery from 'queries/getCTANodes';
 import updateCTAMutation from 'mutations/updateCTA';
 
-import intToBool from 'utils/intToBool';
+import { FormDataProps } from './CTATypes';
 import FormNodeForm from './FormNodeForm';
-
-interface FormDataProps {
-  title: string;
-  ctaType: { label: string, value: string };
-  links: Array<{id?: string | null;
-    title: string;
-    type?: string;
-    url: string;
-    tooltip?: string;
-    iconUrl?: string;
-    backgroundColor?: string;}>;
-  share: { id?: string, tooltip: string, url: string, title: string };
-  formNode?: { fields: {
-    label: string;
-    type: string;
-    isRequired: boolean;
-    position: number;
-  }[] };
-}
+import intToBool from 'utils/intToBool';
 
 interface LinkInputProps {
   id?: string | null;

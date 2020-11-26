@@ -8,5 +8,6 @@ export * from './Icon';
 export * from './Loader';
 export * from './Labels';
 export * from './Nav';
+export * from './Lists';
 export * from './Type';
 export * from './Special';

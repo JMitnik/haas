@@ -537,6 +537,19 @@ export const InputGrid = forwardRef((props: InputGridProps, ref: Ref<HTMLDivElem
   </Grid>
 ));
 
+
+interface CardFormProps {
+  dualPane?: boolean;
+}
+
+export const CardForm = styled(Div)<CardFormProps>`
+  ${({ theme, dualPane }) => css`
+    ${dualPane && css`
+      display: flex;
+    `}
+  `}
+`;
+
 export const GridForm = styled.form`
   ${() => css`
     display: grid;
