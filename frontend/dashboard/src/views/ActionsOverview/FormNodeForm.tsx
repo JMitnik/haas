@@ -6,8 +6,8 @@ import { AlertCircle, AtSign, Circle, FileText, Hash, Link2, Phone, Type } from 
 import { Button } from '@chakra-ui/core';
 import { Controller, UseFormMethods, useFieldArray, useWatch } from 'react-hook-form';
 
-import { CTANodeFormProps, FormDataProps } from './CTATypes';
 import useOnClickOutside from 'hooks/useClickOnOutside';
+import { CTANodeFormProps, FormDataProps } from './CTATypes';
 
 type FormNodeFormProps = CTANodeFormProps;
 
@@ -81,6 +81,29 @@ const fieldMap: FieldProps[] = [
   },
 ];
 
+const FormNodePreview = ({ form, fieldIndex }: { form: UseFormMethods<FormDataProps>, fieldIndex: number }) => {
+  const fieldName = 'formNode.fields';
+
+  const formType = useWatch({
+    name: `${fieldName}`,
+    control: form.control,
+  });
+
+  useEffect(() => {
+    console.log({ fieldName });
+    console.log({ formType });
+    console.log(form.getValues());
+  });
+
+  return (
+    <UI.Card>
+      <UI.CardBody>
+        {formType?.type}
+      </UI.CardBody>
+    </UI.Card>
+  );
+};
+
 const FormNodeFieldFragment = ({ form, field, fieldIndex, onClose }: { form: UseFormMethods<FormDataProps>, field: any, fieldIndex: number, onClose: () => void }) => {
   const ref = useRef<HTMLDivElement | null>(null);
   const { t } = useTranslation();
@@ -94,9 +117,6 @@ const FormNodeFieldFragment = ({ form, field, fieldIndex, onClose }: { form: Use
   });
 
   useOnClickOutside(ref, onClose);
-
-  console.log({ formType });
-  console.log({ fieldIndex });
 
   return (
     <UI.Card noHover ref={ref}>
@@ -219,7 +239,12 @@ const FormNodeForm = ({ form }: FormNodeFormProps) => {
                       key={field.fieldIndex}
                     />
                   ) : (
-                    <UI.Card onClick={() => setOpenedField(index)}>Open</UI.Card>
+                    <UI.Card onClick={() => setOpenedField(index)}>
+                      <FormNodePreview
+                        form={form}
+                        fieldIndex={index}
+                      />
+                    </UI.Card>
                   )}
                 </React.Fragment>
               ))}
