@@ -146,7 +146,7 @@ const InviteUserView = () => {
                       name="email"
                       ref={form.register()}
                     />
-                    <FormErrorMessage>{form.errors.email}</FormErrorMessage>
+                    <FormErrorMessage>{form.errors.email?.message}</FormErrorMessage>
                   </FormControl>
                 </InputGrid>
               </Div>
