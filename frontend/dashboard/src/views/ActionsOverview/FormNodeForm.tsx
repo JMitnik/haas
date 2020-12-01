@@ -6,8 +6,8 @@ import { AlertCircle, AtSign, Circle, FileText, Hash, Link2, Phone, Type } from 
 import { Button } from '@chakra-ui/core';
 import { Controller, UseFormMethods, useFieldArray, useWatch } from 'react-hook-form';
 
-import useOnClickOutside from 'hooks/useClickOnOutside';
 import { CTANodeFormProps, FormDataProps } from './CTATypes';
+import useOnClickOutside from 'hooks/useClickOnOutside';
 
 type FormNodeFormProps = CTANodeFormProps;
 
@@ -117,10 +117,12 @@ const FormNodeFieldFragment = ({ form, field, fieldIndex, onClose }: { form: Use
   // });
 
   const formType = form.watch(`${fieldName}.type`, field.type);
+  const formLabel = form.watch(`${fieldName}.label`, field.label);
 
   useEffect(() => {
     console.log({ fieldName });
     console.log({ formType });
+    console.log({ formLabel });
     console.log(form.getValues());
   });
 
@@ -153,7 +155,7 @@ const FormNodeFieldFragment = ({ form, field, fieldIndex, onClose }: { form: Use
           <UI.CardBody>
             <UI.FormControl>
               <UI.FormLabel>{t('label')}</UI.FormLabel>
-              <UI.Input defaultValue="label" ref={form.register()} name={`${fieldName}.label`} />
+              <UI.Input ref={form.control.register} name={`${fieldName}.label`} key={field.fieldIndex} />
             </UI.FormControl>
             <UI.FormControl>
               <UI.FormLabel>{t('is_required')}</UI.FormLabel>
@@ -193,14 +195,14 @@ const FormNodeFieldFragment = ({ form, field, fieldIndex, onClose }: { form: Use
 };
 
 interface TempFieldProps {
-  label: string;
+  label: string | null;
   position: number;
   type: TempFieldType | null;
   isRequired: number;
 }
 
 const appendNewField = (index: number): TempFieldProps => ({
-  label: '',
+  label: null,
   position: index,
   type: null,
   isRequired: 0,
