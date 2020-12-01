@@ -110,10 +110,18 @@ const FormNodeFieldFragment = ({ form, field, fieldIndex, onClose }: { form: Use
 
   const fieldName = `formNode.fields[${fieldIndex}]`;
 
-  const formType = useWatch({
-    name: `${fieldName}.type`,
-    control: form.control,
-    defaultValue: field.type,
+  // const formType = useWatch({
+  //   name: `${fieldName}.type`,
+  //   control: form.control,
+  //   defaultValue: field.type,
+  // });
+
+  const formType = form.watch(`${fieldName}.type`, field.type);
+
+  useEffect(() => {
+    console.log({ fieldName });
+    console.log({ formType });
+    console.log(form.getValues());
   });
 
   useOnClickOutside(ref, onClose);
