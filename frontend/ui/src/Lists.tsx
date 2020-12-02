@@ -49,11 +49,11 @@ export const ListItem = styled(Div)<ListItemProps>`
 export const ListIcon = styled(Span)`
   ${({ theme }) => css`
     display: flex;
-    width: 40px;
+    width: 45px;
     height: 40px;
     margin-right: ${theme.gutter}px;
-    border-radius: 5px;
-    padding: 4px;
+    border-radius: 10px;
+    padding: 4px 10px;
     color: white;
     justify-content: center;
     align-items: center;

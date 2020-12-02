@@ -2,12 +2,12 @@ import * as UI from '@haas/ui';
 import { useTranslation } from 'react-i18next';
 import React, { useEffect, useRef, useState } from 'react';
 
-import { AlertCircle, AtSign, Circle, FileText, Hash, Link2, Phone, Type } from 'react-feather';
+import { AlertCircle, AtSign, Circle, Feather, FileText, Hash, Link2, Phone, Type } from 'react-feather';
 import { Button } from '@chakra-ui/core';
-import { Controller, UseFormMethods, useFieldArray, useWatch } from 'react-hook-form';
+import { Controller, UseFormMethods, useFieldArray, useForm, useWatch } from 'react-hook-form';
 
-import { CTANodeFormProps, FormDataProps } from './CTATypes';
 import useOnClickOutside from 'hooks/useClickOnOutside';
+import { CTANodeFormProps, FormDataProps } from './CTATypes';
 
 type FormNodeFormProps = CTANodeFormProps;
 
@@ -81,52 +81,61 @@ const fieldMap: FieldProps[] = [
   },
 ];
 
-const FormNodePreview = ({ form, fieldIndex }: { form: UseFormMethods<FormDataProps>, fieldIndex: number }) => {
-  const fieldName = 'formNode.fields';
+const FormNodePreview = ({ form, field, onMoveRight, onMoveLeft }: { form: UseFormMethods<FormDataProps>, field: any, onMoveRight: any, onMoveLeft: any }) => {
+  const fieldCategory = fieldMap.find((fieldItem) => fieldItem.type === field.type);
 
-  const formType = useWatch({
-    name: `${fieldName}`,
-    control: form.control,
-  });
-
-  useEffect(() => {
-    console.log({ fieldName });
-    console.log({ formType });
-    console.log(form.getValues());
-  });
+  const FieldIcon = fieldCategory?.icon || Feather;
 
   return (
     <UI.Card>
       <UI.CardBody>
-        {formType?.type}
+        {field.type && (
+          <UI.Flex>
+            <UI.IconBox mr={2} bg={fieldCategory?.color}><FieldIcon /></UI.IconBox>
+            <UI.ColumnFlex>
+              <UI.Text color="gray.700" fontWeight="900">{field?.label || 'Generic field'}</UI.Text>
+              <UI.Text fontWeight="300" color="gray.400">{field?.type}</UI.Text>
+            </UI.ColumnFlex>
+          </UI.Flex>
+        )}
+        <UI.Button
+          type="button"
+          onClick={(event) => {
+            event.stopPropagation();
+            onMoveLeft();
+          }}
+        >
+          Left
+        </UI.Button>
+        <UI.Button
+          type="button"
+          onClick={(event) => {
+            event.stopPropagation();
+            onMoveRight();
+          }}
+        >
+          Right
+        </UI.Button>
       </UI.CardBody>
     </UI.Card>
   );
 };
 
-const FormNodeFieldFragment = ({ form, field, fieldIndex, onClose }: { form: UseFormMethods<FormDataProps>, field: any, fieldIndex: number, onClose: () => void }) => {
+const FormNodeFieldFragment = ({ field, onClose, onSubmit }: { field: any, fieldIndex: number, onClose: () => void, onSubmit: any }) => {
   const ref = useRef<HTMLDivElement | null>(null);
   const { t } = useTranslation();
-
-  const fieldName = `formNode.fields[${fieldIndex}]`;
-
-  // const formType = useWatch({
-  //   name: `${fieldName}.type`,
-  //   control: form.control,
-  //   defaultValue: field.type,
-  // });
-
-  const formType = form.watch(`${fieldName}.type`, field.type);
-  const formLabel = form.watch(`${fieldName}.label`, field.label);
-
-  useEffect(() => {
-    console.log({ fieldName });
-    console.log({ formType });
-    console.log({ formLabel });
-    console.log(form.getValues());
+  const subform = useForm({
+    mode: 'all',
+    shouldUnregister: false,
+    defaultValues: field,
   });
 
-  useOnClickOutside(ref, onClose);
+  const formType = subform.watch('type');
+
+  useOnClickOutside(ref, () => {
+    onSubmit(subform.getValues());
+    onClose();
+  });
 
   return (
     <UI.Card noHover ref={ref}>
@@ -139,7 +148,7 @@ const FormNodeFieldFragment = ({ form, field, fieldIndex, onClose }: { form: Use
                 key={index}
                 accent={fieldCategory.color}
                 isSelected={formType === fieldCategory.type}
-                onClick={() => form.setValue(`${fieldName}.type`, fieldCategory.type)}
+                onClick={() => subform.setValue('type', fieldCategory.type)}
               >
                 <UI.ListIcon bg={fieldCategory.color}><fieldCategory.icon /></UI.ListIcon>
                 <UI.ListItemBody>
@@ -155,16 +164,16 @@ const FormNodeFieldFragment = ({ form, field, fieldIndex, onClose }: { form: Use
           <UI.CardBody>
             <UI.FormControl>
               <UI.FormLabel>{t('label')}</UI.FormLabel>
-              <UI.Input ref={form.control.register} name={`${fieldName}.label`} key={field.fieldIndex} />
+              <UI.Input ref={subform.register()} name="label" key={field.fieldIndex} />
             </UI.FormControl>
             <UI.FormControl>
               <UI.FormLabel>{t('is_required')}</UI.FormLabel>
               <Controller
-                control={form.control}
-                name={`${fieldName}.isRequired`}
+                control={subform.control}
+                name="isRequired"
                 defaultValue={field.isRequired}
-                render={(controlProps) => (
-                  <UI.RadioButtons {...controlProps}>
+                render={({ onBlur, onChange, value }) => (
+                  <UI.RadioButtons onBlur={onBlur} onChange={onChange} value={value}>
                     <UI.RadioButton
                       icon={AlertCircle}
                       value={1}
@@ -213,7 +222,7 @@ const FormNodeForm = ({ form }: FormNodeFormProps) => {
 
   const [openedField, setOpenedField] = useState<number | null>(null);
 
-  const { fields, append } = useFieldArray({
+  const { fields, append, move } = useFieldArray({
     control: form.control,
     name: 'formNode.fields',
     keyName: 'fieldIndex',
@@ -223,9 +232,7 @@ const FormNodeForm = ({ form }: FormNodeFormProps) => {
     append(appendNewField(fields.length + 1));
   };
 
-  useEffect(() => {
-    console.log(form.getValues());
-  }, [openedField, form]);
+  const formNodeFields = form.watch('formNode.fields', []);
 
   return (
     <UI.FormSection id="form-node-form">
@@ -242,17 +249,24 @@ const FormNodeForm = ({ form }: FormNodeFormProps) => {
                 <React.Fragment key={field.fieldIndex}>
                   {openedField === index ? (
                     <FormNodeFieldFragment
+                      onSubmit={(subForm: any) => {
+                        form.setValue(`formNode.fields[${index}]`, subForm, { shouldDirty: true, shouldValidate: true });
+                        form.trigger();
+                      }}
                       onClose={() => setOpenedField(null)}
-                      form={form}
-                      field={field}
+                      field={formNodeFields[index]}
                       fieldIndex={index}
                       key={field.fieldIndex}
                     />
                   ) : (
                     <UI.Card onClick={() => setOpenedField(index)}>
                       <FormNodePreview
+                        field={formNodeFields[index]}
                         form={form}
-                        fieldIndex={index}
+                        onMoveLeft={() => move(index, Math.max(index - 1, 0))}
+                        onMoveRight={() => {
+                          move(index, Math.min(index + 1, fields.length - 1));
+                        }}
                       />
                     </UI.Card>
                   )}
