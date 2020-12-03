@@ -304,20 +304,30 @@ export const CreateCTAInputType = inputObjectType({
   },
 });
 
-export const CreateSlideNodeMarkerInput = inputObjectType({
-  name: 'CreateSlideNodeMarkerInput',
+export const SliderNodeRangeInputType = inputObjectType({
+  name: 'SliderNodeRangeInputType',
 
   definition(t) {
-    t.string('label');
-    t.string('subLabel');
+    t.float('start', { nullable: true });
+    t.float('end', { nullable: true });
   },
 });
 
-export const CreateSliderNodeInputType = inputObjectType({
-  name: 'CreateSliderNodeInputType',
+export const SliderNodeMarkerInputType = inputObjectType({
+  name: 'SlideNodeMarkerInput',
 
   definition(t) {
-    t.list.field('markers', { type: CreateSlideNodeMarkerInput });
+    t.string('label', { required: true });
+    t.string('subLabel', { required: true });
+    t.field('range', { type: SliderNodeRangeInputType });
+  },
+});
+
+export const SliderNodeInputType = inputObjectType({
+  name: 'SliderNodeInputType',
+
+  definition(t) {
+    t.list.field('markers', { type: SliderNodeMarkerInputType });
   },
 });
 
@@ -349,6 +359,8 @@ export const UpdateQuestionNodeInputType = inputObjectType({
 
     t.string('title');
     t.string('type');
+
+    t.field('sliderNode', { type: SliderNodeInputType });
 
     t.field('optionEntries', { type: OptionsInputType });
     t.field('edgeCondition', { type: EdgeConditionInputType });
@@ -437,9 +449,10 @@ export const QuestionNodeMutations = extendType({
       args: { input: UpdateQuestionNodeInputType },
       // TODO: Remove the any
       resolve(parent: any, args: any) {
-        const { id, title, type, overrideLeafId, edgeId, optionEntries: { options }, edgeCondition } = args?.input;
+        const { id, title, type, overrideLeafId, edgeId, optionEntries: { options }, edgeCondition, sliderNode } = args?.input;
 
-        return NodeService.updateQuestionFromBuilder(id, title, type, overrideLeafId, edgeId, options, edgeCondition);
+        console.log(args.input);
+        return NodeService.updateQuestionFromBuilder(id, title, type, overrideLeafId, edgeId, options, edgeCondition, sliderNode);
       },
     });
 

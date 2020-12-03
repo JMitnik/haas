@@ -1,4 +1,5 @@
 import { Dialogue, Link, NodeType, QuestionCondition, QuestionNode, QuestionNodeCreateInput, QuestionNodeUpdateInput, Share } from '@prisma/client';
+import { NexusGenFieldTypes, NexusGenInputs } from '../../generated/nexus';
 import EdgeService from '../edge/EdgeService';
 import prisma from '../../config/prisma';
 
@@ -458,6 +459,7 @@ class NodeService {
       renderMax: number | null,
       matchValue: string | null
     },
+    sliderNode: NexusGenInputs,
   ) => {
     const activeQuestion = await prisma.questionNode.findOne({ where: { id: questionId },
       include: {
@@ -506,6 +508,8 @@ class NodeService {
     }
 
     const updatedOptionIds = await NodeService.updateQuestionOptions(options);
+
+    console.log({ sliderNode });
     return leaf ? prisma.questionNode.update({
       where: { id: questionId },
       data: {
@@ -524,6 +528,22 @@ class NodeService {
         options: {
           connect: updatedOptionIds,
         },
+        sliderNode: sliderNode ? {
+          create: {
+            markers: {
+              create: sliderNode.markers?.map((marker) => ({
+                label: marker.label || '',
+                subLabel: marker.subLabel || '',
+                range: {
+                  create: {
+                    start: marker?.range?.start || 2,
+                    end: marker?.range?.end || 5,
+                  },
+                },
+              })) || [],
+            },
+          },
+        } : undefined,
       },
     });
   };
@@ -569,6 +589,7 @@ class NodeService {
         },
       },
     );
+
     return { id: condition.id };
   };
 

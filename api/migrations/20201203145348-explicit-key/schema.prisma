@@ -1,6 +1,6 @@
 datasource postgresql {
   provider = "postgresql"
-  url      = env("DB_STRING")
+  url = "***"
 }
 
 // binaryTargets = ["debian-openssl-1.1.x"]
@@ -111,8 +111,8 @@ enum NodeType {
 
 model SliderNodeRange {
   id        Int          @id @default(autoincrement())
-  start     Float?
-  end       Float?
+  start     Int?
+  end       Int?
 }
 
 model SliderNodeMarker {

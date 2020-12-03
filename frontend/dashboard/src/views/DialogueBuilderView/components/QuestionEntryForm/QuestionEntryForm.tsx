@@ -31,6 +31,15 @@ import { EdgeConditonProps,
   OverrideLeafProps, QuestionEntryProps, QuestionOptionProps } from '../../DialogueBuilderInterfaces';
 import SliderNodeForm from './SliderNodeForm';
 
+interface SliderNodeMarkerProps {
+  label: string;
+  subLabel: string;
+  range: {
+    start?: number;
+    end?: number;
+  };
+}
+
 interface FormDataProps {
   title: string;
   minValue: string;
@@ -40,14 +49,7 @@ interface FormDataProps {
   activeLeaf: string;
   parentQuestionType: string;
   sliderNode: {
-    markers: {
-      label: string;
-      subLabel: string;
-      range: {
-        min?: number;
-        max?: number;
-      };
-    }[];
+    markers: SliderNodeMarkerProps[];
   };
   options: Array<string>;
 }
@@ -132,12 +134,23 @@ const QuestionEntryForm = ({
 
   const { t } = useTranslation();
 
+  const sliderNode = {
+    markers: question.sliderNode?.markers.map((marker: SliderNodeMarkerProps) => ({
+      label: marker.label,
+      subLabel: marker.subLabel,
+      range: {
+        start: marker.range.start,
+        end: marker.range.end,
+      },
+    })),
+  };
+
   const form = useForm<FormDataProps>({
     resolver: yupResolver(schema),
     mode: 'onChange',
     defaultValues: {
       parentQuestionType,
-      sliderNode: question.sliderNode,
+      sliderNode,
     },
   });
 
@@ -357,6 +370,8 @@ const QuestionEntryForm = ({
     const options = { options: activeOptions };
     const edgeCondition = activeCondition;
 
+    console.log('formData', formData);
+
     if (question.id !== '-1') {
       updateQuestion({
         variables: {
@@ -369,6 +384,7 @@ const QuestionEntryForm = ({
             type,
             optionEntries: options,
             edgeCondition,
+            sliderNode: formData.sliderNode || sliderNode,
           },
         },
       });
@@ -384,6 +400,7 @@ const QuestionEntryForm = ({
             parentQuestionId,
             optionEntries: options,
             edgeCondition,
+            sliderNode: formData.sliderNode,
           },
         },
       });

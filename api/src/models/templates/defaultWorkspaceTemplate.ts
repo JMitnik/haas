@@ -18,7 +18,7 @@ export interface WorkspaceTemplate {
   leafNodes: any;
   roles: RoleCreateInput[];
   tags: Tag[];
-  rootSliderOptions: RootSliderOptions;
+  rootSliderOptions: any;
 }
 
 const defaultLinks: any[] = [

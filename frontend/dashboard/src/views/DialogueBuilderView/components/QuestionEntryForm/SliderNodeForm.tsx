@@ -17,13 +17,15 @@ const SliderNodeForm = ({ form }: { form: any }) => {
   return (
     <UI.Div>
       <UI.Text color="gray.600" mb={1}>{t('dialogue:markers')}</UI.Text>
-      <UI.Text fontSize="0.8rem" mb={4} color="gray.500">
-        {t('dialogue:markers_helper')}
-      </UI.Text>
+      <UI.Div maxWidth={500}>
+        <UI.Text fontSize="0.8rem" mb={4} color="gray.500">
+          {t('dialogue:markers_helper')}
+        </UI.Text>
+      </UI.Div>
       {markers.fields.map((marker, index) => (
         <UI.Card boxShadow="lg" key={marker.fieldIndex} mb={4} noHover>
           <UI.CardBody>
-            <UI.Grid gridTemplateColumns="1fr 2fr">
+            <UI.Grid gridTemplateColumns={['1fr', '1fr', '1fr 1fr', '1fr 2fr']}>
               <UI.Div>
                 <UI.Div mb={2}>
                   <UI.FormControl>

@@ -63,15 +63,6 @@ input CreateQuestionNodeInputType {
   type: String
 }
 
-input CreateSlideNodeMarkerInput {
-  label: String
-  subLabel: String
-}
-
-input CreateSliderNodeInputType {
-  markers: [CreateSlideNodeMarkerInput!]
-}
-
 input CreateTriggerInputType {
   customerSlug: String
   recipients: RecipientsInputType
@@ -637,9 +628,19 @@ type ShareNodeType {
   url: String!
 }
 
+input SlideNodeMarkerInput {
+  label: String!
+  range: SliderNodeRangeInputType
+  subLabel: String!
+}
+
 """Input type for a slider node"""
 input SliderNodeEntryInput {
   value: Int
+}
+
+input SliderNodeInputType {
+  markers: [SlideNodeMarkerInput!]
 }
 
 type SliderNodeMarkerType {
@@ -647,6 +648,11 @@ type SliderNodeMarkerType {
   label: String!
   range: SliderNodeRangeType
   subLabel: String!
+}
+
+input SliderNodeRangeInputType {
+  end: Float
+  start: Float
 }
 
 type SliderNodeRangeType {
@@ -791,6 +797,7 @@ input UpdateQuestionNodeInputType {
   id: ID
   optionEntries: OptionsInputType
   overrideLeafId: ID
+  sliderNode: SliderNodeInputType
   title: String
   type: String
 }
