@@ -1,5 +1,6 @@
 import { ApolloError } from 'apollo-boost';
-import { Button, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast } from '@chakra-ui/core';
+import { Button, Popover, PopoverArrow, PopoverBody, PopoverCloseButton,
+  PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast } from '@chakra-ui/core';
 import { Div, Flex, PageTitle, Text } from '@haas/ui';
 import { Edit, Plus, Trash } from 'react-feather';
 import { debounce } from 'lodash';
@@ -102,6 +103,7 @@ const TriggersOverview = () => {
     deleteTrigger({
       variables: {
         id: entryId,
+        customerSlug,
       },
     });
   };

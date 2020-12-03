@@ -210,6 +210,8 @@ const EditWorkspaceInput = inputObjectType({
 
   definition(t) {
     t.id('id', { required: true });
+    // This one is necessary for auth
+    t.string('customerSlug', { required: true });
     t.string('slug', { required: true });
     t.string('name', { required: true });
     t.string('logo');

@@ -3,30 +3,35 @@ import { Div } from './Generics';
 import { Flex } from './Container';
 import { Span } from './Span';
 
+type BoxShadowSize = 'sm' | 'md' | 'lg';
 
 interface CardProps {
   noHover?: boolean;
   outline?: boolean;
+  boxShadow?: BoxShadowSize;
 }
 
 export const Card = styled(Div)<CardProps>`
-  ${({ theme, noHover, outline }) => css`
+  ${({ theme, noHover, boxShadow, outline }) => css`
     position: relative;
-    box-shadow: 0 1px 2px 0 rgba(0,0,0,.05);
     display: flex;
     flex-direction: column;
     border-radius: ${theme.borderRadiuses.somewhatRounded};
 
-    ${!!outline && css`
-    box-shadow: rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px;
-    `}
+    box-shadow: rgba(0, 0, 0, 0.08) 0px 4px 12px;
+    transition: all .3s cubic-bezier(.55,0,.1,1);
+
+    &:focus-within {
+      transition: all .3s cubic-bezier(.55,0,.1,1);
+      box-shadow: rgba(0, 0, 0, 0.20) 0px 4px 12px;
+    }
 
     ${!noHover && css`
       cursor: pointer;
 
       &:hover {
         transition: all .3s cubic-bezier(.55,0,.1,1);
-        box-shadow: 0 4px 6px -1px rgba(0,0,0,.1),0 2px 4px -1px rgba(0,0,0,.06)!important;
+        box-shadow: rgba(0, 0, 0, 0.20) 0px 4px 12px;
       }
     `}
   `}

@@ -115,6 +115,7 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
       variables: {
         input: {
           id: customer?.id,
+          customerSlug,
           logo: intToBool(formData.useCustomUrl) ? formData.logo : formData.uploadLogo,
           slug: formData.slug,
           primaryColour: formData.primaryColour,

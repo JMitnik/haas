@@ -10,6 +10,19 @@ export const QuestionFragment = gql`
     isRoot
     isLeaf
     type
+    sliderNode {
+      id
+      markers {
+        id
+        label
+        subLabel
+        range {
+          id
+          start
+          end
+        }
+      }
+    }
     children {
       ...EdgeFragment
       parentNode {

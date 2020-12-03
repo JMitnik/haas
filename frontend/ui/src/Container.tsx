@@ -92,6 +92,7 @@ export const Grid = styled.div<ExtraGridProps>`
     display: grid;
     grid-gap: ${theme.gutter}px;
     ${grid}
+    ${flexbox}
     ${width}
     ${layout}
     ${color}

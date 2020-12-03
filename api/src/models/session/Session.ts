@@ -13,7 +13,7 @@ export const SessionType = objectType({
   name: 'Session',
   definition(t) {
     t.id('id');
-    t.string('createdAt');
+    t.date('createdAt');
     t.string('dialogueId');
 
     // t.int('index');

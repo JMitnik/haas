@@ -356,7 +356,7 @@ const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTACha
                       />
                     )}
                   />
-                  <FormErrorMessage>{form.errors.title}</FormErrorMessage>
+                  <FormErrorMessage>{form.errors.title?.message}</FormErrorMessage>
                 </FormControl>
 
                 <FormControl isRequired>
@@ -370,7 +370,7 @@ const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTACha
                     options={CTA_TYPES}
                   />
 
-                  <FormErrorMessage>{form.errors.ctaType?.value}</FormErrorMessage>
+                  <FormErrorMessage>{form.errors.ctaType?.value?.message}</FormErrorMessage>
                 </FormControl>
 
                 {watchType?.value === 'SHARE' && (
@@ -385,7 +385,7 @@ const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTACha
                         defaultValue={share?.title}
                         ref={form.register({ required: true })}
                       />
-                      <FormErrorMessage>{form.errors.share?.title}</FormErrorMessage>
+                      <FormErrorMessage>{form.errors.share?.title?.message}</FormErrorMessage>
                     </FormControl>
 
                     {/* TODO: Change default value and error */}
@@ -399,7 +399,7 @@ const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTACha
                         defaultValue={share?.url}
                         ref={form.register({ required: true })}
                       />
-                      <FormErrorMessage>{form.errors.share?.url}</FormErrorMessage>
+                      <FormErrorMessage>{form.errors.share?.url?.message}</FormErrorMessage>
                     </FormControl>
 
                     {/* TODO: Change default value and error */}
@@ -414,7 +414,7 @@ const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTACha
                         // onChange={(e: any) => handleTooltipChange(e.currentTarget.value, 0)}
                         ref={form.register({ required: true })}
                       />
-                      <FormErrorMessage>{form.errors.share?.tooltip}</FormErrorMessage>
+                      <FormErrorMessage>{form.errors.share?.tooltip?.message}</FormErrorMessage>
                     </FormControl>
                   </>
 
@@ -467,7 +467,7 @@ const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTACha
                                 onChange={(e: any) => handleURLChange(e.currentTarget.value, index)}
                                 ref={form.register({ required: true })}
                               />
-                              <FormErrorMessage>{!!form.errors?.links?.[index]?.url}</FormErrorMessage>
+                              <FormErrorMessage>{!!form.errors?.links?.[index]?.url?.message}</FormErrorMessage>
                             </FormControl>
 
                             <FormControl isRequired isInvalid={!!form.errors.links?.[index]?.type}>
@@ -489,7 +489,7 @@ const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTACha
                                   />
                                 )}
                               />
-                              <FormErrorMessage>{!!form.errors.links?.[index]?.type}</FormErrorMessage>
+                              <FormErrorMessage>{!!form.errors.links?.[index]?.type?.message}</FormErrorMessage>
                             </FormControl>
 
                             <FormControl>
@@ -502,7 +502,7 @@ const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTACha
                                 onChange={(e:any) => handleTooltipChange(e.currentTarget.value, index)}
                                 ref={form.register({ required: false })}
                               />
-                              <FormErrorMessage>{!!form.errors.links?.[index]?.tooltip}</FormErrorMessage>
+                              <FormErrorMessage>{!!form.errors.links?.[index]?.tooltip?.message}</FormErrorMessage>
                             </FormControl>
 
                             <FormControl>
@@ -515,7 +515,7 @@ const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTACha
                                 onChange={(e:any) => handleIconChange(e.currentTarget.value, index)}
                                 ref={form.register({ required: false })}
                               />
-                              <FormErrorMessage>{!!form.errors.links?.[index]?.iconUrl}</FormErrorMessage>
+                              <FormErrorMessage>{!!form.errors.links?.[index]?.iconUrl?.message}</FormErrorMessage>
                             </FormControl>
 
                             <FormControl>
@@ -528,7 +528,7 @@ const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTACha
                                 onChange={(e:any) => handleBackgroundColorChange(e.currentTarget.value, index)}
                                 ref={form.register({ required: false })}
                               />
-                              <FormErrorMessage>{!!form.errors.links?.[index]?.backgroundColor}</FormErrorMessage>
+                              <FormErrorMessage>{!!form.errors.links?.[index]?.backgroundColor?.message}</FormErrorMessage>
                             </FormControl>
 
                           </Grid>

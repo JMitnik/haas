@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 
 import 'easymde/dist/easymde.min.css';
+import * as UI from '@haas/ui';
 import * as yup from 'yup';
 import { ApolloError } from 'apollo-client';
 import { Button, ButtonGroup, FormErrorMessage, Popover, PopoverArrow,
@@ -28,6 +29,17 @@ import updateQuestionMutation from 'mutations/updateQuestion';
 
 import { EdgeConditonProps,
   OverrideLeafProps, QuestionEntryProps, QuestionOptionProps } from '../../DialogueBuilderInterfaces';
+import SliderNodeForm from './SliderNodeForm';
+
+interface SliderNodeMarkerProps {
+  id: string;
+  label: string;
+  subLabel: string;
+  range: {
+    start?: number;
+    end?: number;
+  };
+}
 
 interface FormDataProps {
   title: string;
@@ -37,6 +49,10 @@ interface FormDataProps {
   matchText: string;
   activeLeaf: string;
   parentQuestionType: string;
+  sliderNode: {
+    id: string;
+    markers: SliderNodeMarkerProps[];
+  };
   options: Array<string>;
 }
 
@@ -120,13 +136,29 @@ const QuestionEntryForm = ({
 
   const { t } = useTranslation();
 
+  const sliderNode = {
+    id: question.sliderNode?.id,
+    markers: question.sliderNode?.markers.map((marker: SliderNodeMarkerProps) => ({
+      id: marker.id,
+      label: marker.label,
+      subLabel: marker.subLabel,
+      range: {
+        start: marker.range.start,
+        end: marker.range.end,
+      },
+    })),
+  };
+
   const form = useForm<FormDataProps>({
     resolver: yupResolver(schema),
     mode: 'onChange',
     defaultValues: {
       parentQuestionType,
+      sliderNode,
     },
   });
+
+  console.log('question', question);
 
   const toast = useToast();
   const [activeQuestionType, setActiveQuestionType] = useState(type);
@@ -341,6 +373,9 @@ const QuestionEntryForm = ({
     const overrideLeafId = activeLeaf?.value;
     const options = { options: activeOptions };
     const edgeCondition = activeCondition;
+    const sliderNodeData = formData.sliderNode || sliderNode;
+
+    const isSlider = activeQuestionType?.value === 'SLIDER' && sliderNodeData;
 
     if (question.id !== '-1') {
       updateQuestion({
@@ -354,6 +389,16 @@ const QuestionEntryForm = ({
             type,
             optionEntries: options,
             edgeCondition,
+            sliderNode: isSlider ? {
+              id: sliderNodeData.id,
+              markers: sliderNodeData.markers.map((marker, index) => ({
+                id: marker.id,
+                label: marker.label,
+                subLabel: marker.subLabel,
+                // We use the range from the incoming sliderNode
+                range: sliderNode?.markers?.[index].range,
+              })),
+            } : undefined,
           },
         },
       });
@@ -369,6 +414,16 @@ const QuestionEntryForm = ({
             parentQuestionId,
             optionEntries: options,
             edgeCondition,
+            sliderNode: isSlider ? {
+              id: sliderNodeData.id,
+              markers: sliderNodeData.markers.map((marker, index) => ({
+                id: marker.id,
+                label: marker.label,
+                subLabel: marker.subLabel,
+                // We use the range from the incoming sliderNode
+                range: sliderNode?.markers?.[index].range,
+              })),
+            } : undefined,
           },
         },
       });
@@ -406,7 +461,7 @@ const QuestionEntryForm = ({
                     />
                   )}
                 />
-                <FormErrorMessage>{form.errors.title}</FormErrorMessage>
+                <FormErrorMessage>{form.errors.title?.message}</FormErrorMessage>
               </FormControl>
             </InputGrid>
           </FormSection>
@@ -414,7 +469,7 @@ const QuestionEntryForm = ({
           {parentQuestionType === 'Slider' && (
             <>
               <Hr />
-
+              <UI.Div />
               <FormSection>
                 <Div>
                   <H3 color="default.text" fontWeight={500} pb={2}>{t('dialogue:condition')}</H3>
@@ -437,7 +492,7 @@ const QuestionEntryForm = ({
                         defaultValue={condition?.renderMin}
                         onBlur={(event: React.FocusEvent<HTMLInputElement>) => setMinValue(event)}
                       />
-                      <FormErrorMessage>{form.errors.minValue}</FormErrorMessage>
+                      <FormErrorMessage>{form.errors.minValue?.message}</FormErrorMessage>
                     </FormControl>
 
                     <FormControl isRequired isInvalid={!!form.errors.maxValue}>
@@ -453,7 +508,7 @@ const QuestionEntryForm = ({
                         defaultValue={condition?.renderMax}
                         onChange={(event: any) => setMaxValue(event.target.value)}
                       />
-                      <FormErrorMessage>{form.errors.maxValue}</FormErrorMessage>
+                      <FormErrorMessage>{form.errors.maxValue?.message}</FormErrorMessage>
                     </FormControl>
 
                   </InputGrid>
@@ -465,7 +520,6 @@ const QuestionEntryForm = ({
           {parentQuestionType === 'Choice' && (
             <>
               <Hr />
-
               <FormSection>
                 <Div>
                   <H3 color="default.text" fontWeight={500} pb={2}>{t('dialogue:condition')}</H3>
@@ -494,8 +548,7 @@ const QuestionEntryForm = ({
                           />
                         )}
                       />
-
-                      <FormErrorMessage>{form.errors.matchText}</FormErrorMessage>
+                      <FormErrorMessage>{form.errors.matchText?.message}</FormErrorMessage>
                     </FormControl>
                   </InputGrid>
                 </Div>
@@ -539,7 +592,7 @@ const QuestionEntryForm = ({
                       />
                     )}
                   />
-                  <FormErrorMessage>{form.errors.questionType}</FormErrorMessage>
+                  <FormErrorMessage>{form.errors.questionType?.message}</FormErrorMessage>
                 </FormControl>
 
                 <FormControl isInvalid={!!form.errors.activeLeaf}>
@@ -565,56 +618,76 @@ const QuestionEntryForm = ({
                       />
                     )}
                   />
-                  <FormErrorMessage>{form.errors.activeLeaf}</FormErrorMessage>
+                  <FormErrorMessage>{form.errors.activeLeaf?.message}</FormErrorMessage>
                 </FormControl>
               </InputGrid>
-
-              {activeQuestionType && activeQuestionType.value === 'CHOICE' && (
-              <>
-                <Div mb={1} gridColumn="1 / -1">
-                  <Flex justifyContent="space-between">
-                    <H4>
-                      {t('options')}
-                    </H4>
-                    <PlusCircle data-cy="AddOption" style={{ cursor: 'pointer' }} onClick={() => addNewOption()} />
-                  </Flex>
-
-                  <Hr />
-                </Div>
-
-                {!activeOptions.length && !form.errors.options && <Muted>{t('dialogue:add_option_reminder')}</Muted>}
-                {!activeOptions.length && form.errors.options && <Muted color="red">{t('dialogue:empty_option_reminder')}</Muted>}
-                {activeOptions && activeOptions.map((option, optionIndex) => (
-                  <Flex key={`container-${option.id}-${optionIndex}`} flexDirection="column">
-                    <Flex my={1} flexDirection="row">
-                      <Flex flexGrow={1}>
-                        <Input
-                          isInvalid={form.errors.options && Array.isArray(form.errors.options) && !!form.errors.options?.[optionIndex]}
-                          id={`options[${optionIndex}]`}
-                          key={`input-${option.id}-${optionIndex}`}
-                          name={`options[${optionIndex}]`}
-                          ref={form.register(
-                            { required: true,
-                              minLength: 1 },
-                          )}
-                          defaultValue={option.value}
-                          onChange={(e: any) => handleOptionChange(e.currentTarget.value, optionIndex)}
-                        />
-                      </Flex>
-
-                      <DeleteQuestionOptionButtonContainer
-                        onClick={(e: any) => deleteOption(e, optionIndex)}
-                      >
-                        <MinusCircle />
-                      </DeleteQuestionOptionButtonContainer>
-                    </Flex>
-                    {form.errors.options?.[optionIndex] && <Muted color="warning">Please fill in a proper value!</Muted>}
-                  </Flex>
-                ))}
-              </>
-              )}
             </Div>
           </FormSection>
+
+          {activeQuestionType && activeQuestionType.value === 'SLIDER' && (
+            <>
+              <UI.Hr />
+              <FormSection>
+                <UI.Div>
+                  <UI.H3 color="default.text" fontWeight={500} pb={2}>{t('dialogue:about_slider')}</UI.H3>
+                  <UI.Muted color="gray.600">
+                    {t('dialogue:about_slider_helper')}
+                  </UI.Muted>
+                </UI.Div>
+                <SliderNodeForm
+                  form={form}
+                />
+              </FormSection>
+            </>
+          )}
+
+          {activeQuestionType && activeQuestionType.value === 'CHOICE' && (
+          <FormSection>
+            <UI.Div />
+            <UI.Div>
+              <Div mb={1} gridColumn="1 / -1">
+                <Flex justifyContent="space-between">
+                  <H4>
+                    {t('options')}
+                  </H4>
+                  <PlusCircle data-cy="AddOption" style={{ cursor: 'pointer' }} onClick={() => addNewOption()} />
+                </Flex>
+
+                <Hr />
+              </Div>
+
+              {!activeOptions.length && !form.errors.options && <Muted>{t('dialogue:add_option_reminder')}</Muted>}
+              {!activeOptions.length && form.errors.options && <Muted color="red">{t('dialogue:empty_option_reminder')}</Muted>}
+              {activeOptions && activeOptions.map((option, optionIndex) => (
+                <Flex key={`container-${option.id}-${optionIndex}`} flexDirection="column">
+                  <Flex my={1} flexDirection="row">
+                    <Flex flexGrow={1}>
+                      <Input
+                        isInvalid={form.errors.options && Array.isArray(form.errors.options) && !!form.errors.options?.[optionIndex]}
+                        id={`options[${optionIndex}]`}
+                        key={`input-${option.id}-${optionIndex}`}
+                        name={`options[${optionIndex}]`}
+                        ref={form.register(
+                          { required: true,
+                            minLength: 1 },
+                        )}
+                        defaultValue={option.value}
+                        onChange={(e: any) => handleOptionChange(e.currentTarget.value, optionIndex)}
+                      />
+                    </Flex>
+
+                    <DeleteQuestionOptionButtonContainer
+                      onClick={(e: any) => deleteOption(e, optionIndex)}
+                    >
+                      <MinusCircle />
+                    </DeleteQuestionOptionButtonContainer>
+                  </Flex>
+                  {form.errors.options?.[optionIndex] && <Muted color="warning">Please fill in a proper value!</Muted>}
+                </Flex>
+              ))}
+            </UI.Div>
+          </FormSection>
+          )}
         </Div>
 
         <Flex justifyContent="space-between">
