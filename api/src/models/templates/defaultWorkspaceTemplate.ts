@@ -1,4 +1,4 @@
-import { NodeType, RoleCreateInput, TagEnum, SliderNodeMarkerCreateInput } from '@prisma/client';
+import { NodeType, RoleCreateInput, SliderNodeMarkerCreateInput, TagEnum } from '@prisma/client';
 
 interface Tag {
   name: string,
@@ -106,29 +106,29 @@ const defaultWorkspaceTemplate: WorkspaceTemplate = {
       {
         label: 'Good!',
         subLabel: 'This is good.',
-        range: { create: { start: 6, end: 9.5 } }
+        range: { create: { start: 6, end: 9.5 } },
       },
       {
         label: 'Amazing!',
         subLabel: 'This is excellent.',
-        range: { create: { start: 9.5 } }
+        range: { create: { start: 9.5 } },
       },
       {
         label: 'Neutral!',
         subLabel: 'Something is not great.',
-        range: { create: { start: 5, end: 6 } }
+        range: { create: { start: 5, end: 6 } },
       },
       {
         label: 'Bad',
         subLabel: 'This is bad.',
-        range: { create: { start: 3, end: 5 } }
+        range: { create: { start: 3, end: 5 } },
       },
       {
         label: 'Terrible',
         subLabel: 'This is terrible',
-        range: { create: { end: 3 } }
-      }
-    ]
+        range: { create: { end: 3 } },
+      },
+    ],
   },
   leafNodes: [
     {

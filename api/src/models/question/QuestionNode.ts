@@ -8,6 +8,7 @@ import { CTALinksInputType, LinkType } from '../link/Link';
 import { DialogueType } from '../questionnaire/Dialogue';
 // eslint-disable-next-line import/no-cycle
 import { EdgeType } from '../edge/Edge';
+import { SliderNode } from './SliderNode';
 import NodeService from './NodeService';
 
 export const CTAShareInputObjectType = inputObjectType({
@@ -72,7 +73,7 @@ export const ShareNodeInputType = inputObjectType({
 });
 
 export const SliderNodeRangeType = objectType({
-  name: 'SliderNodeRange',
+  name: 'SliderNodeRangeType',
 
   definition(t) {
     t.id('id');
@@ -82,21 +83,26 @@ export const SliderNodeRangeType = objectType({
 });
 
 export const SliderNodeMarkerType = objectType({
-  name: 'SliderNodeMarker',
+  name: 'SliderNodeMarkerType',
 
   definition(t) {
     t.id('id');
     t.string('label');
     t.string('subLabel');
-    t.field('range', { type: SliderNodeRangeType, nullable: true });
+    t.field('range', { type: SliderNodeRangeType, nullable: true, resolve: (parent: any) => parent.range || null });
   },
 });
 
 export const SliderNodeType = objectType({
-  name: 'SliderNode',
+  name: 'SliderNodeType',
+
   definition(t) {
     t.id('id', { nullable: true });
-    t.list.field('markers', { type: SliderNodeMarkerType });
+    t.list.field('markers', {
+      type: SliderNodeMarkerType,
+      nullable: true,
+      resolve: (parent: any) => parent.markers || SliderNode.DEFAULT_MARKERS,
+    });
   },
 });
 
@@ -119,12 +125,21 @@ export const QuestionNodeType = objectType({
 
     // Node-types
     // TODO: Remove `any` once we figure out how to not make prisma the backing-type
-    t.field('sliderNode', { type: SliderNodeType, nullable: true, resolve: (parent: any) => parent.sliderNode });
+    t.field('sliderNode', { description: 'Slidernode resolver',
+      type: SliderNodeType,
+      nullable: true,
+      resolve: (parent: any) => {
+        if (parent.type === 'SLIDER') {
+          return (parent.sliderNode || { markers: SliderNode.DEFAULT_MARKERS });
+        }
+
+        return null;
+      } });
 
     t.field('share', {
       type: ShareNodeType,
       nullable: true,
-      async resolve(parent, ctx) {
+      async resolve(parent, args, ctx) {
         if (!parent.isLeaf || !parent.id) {
           return null;
         }
@@ -158,7 +173,7 @@ export const QuestionNodeType = objectType({
 
     t.list.field('links', {
       type: LinkType,
-      async resolve(parent, ctx) {
+      async resolve(parent, args, ctx) {
         if (parent.isLeaf) {
           const links = await ctx.prisma.link.findMany({
             where: {
@@ -177,7 +192,7 @@ export const QuestionNodeType = objectType({
       type: DialogueType,
       nullable: true,
 
-      resolve(parent, ctx) {
+      resolve(parent, args, ctx) {
         if (parent.questionDialogueId) {
           return ctx.prisma.dialogue.findOne({
             where: {
@@ -194,7 +209,7 @@ export const QuestionNodeType = objectType({
       type: QuestionNodeType,
       nullable: true,
 
-      resolve(parent, ctx) {
+      resolve(parent, args, ctx) {
         const overrideLeaf = ctx.prisma.questionNode.findOne({
           where: { id: parent.id },
         }).overrideLeaf();
@@ -206,7 +221,7 @@ export const QuestionNodeType = objectType({
     t.list.field('options', {
       type: QuestionOptionType,
 
-      resolve(parent, ctx) {
+      resolve(parent, args, ctx) {
         const options = ctx.prisma.questionOption.findMany({
           where: { questionNodeId: parent.id },
         });
@@ -217,7 +232,7 @@ export const QuestionNodeType = objectType({
 
     t.list.field('children', {
       type: EdgeType,
-      resolve(parent, ctx) {
+      resolve(parent, args, ctx) {
         const children = ctx.prisma.edge.findMany({
           where: {
             parentNodeId: parent.id,
@@ -294,6 +309,7 @@ export const CreateSlideNodeMarkerInput = inputObjectType({
 
   definition(t) {
     t.string('label');
+    t.string('subLabel');
   },
 });
 
@@ -371,7 +387,7 @@ export const QuestionNodeMutations = extendType({
       args: { input: DeleteNodeInputType },
       // TODO: Remove the any
       // @ts-ignore
-      async resolve(args: any, ctx: any) {
+      async resolve(parent: any, args: any, ctx: any) {
         const { id, customerId, dialogueSlug } = args.input;
         const { prisma }: { prisma: PrismaClient } = ctx;
 
@@ -420,7 +436,7 @@ export const QuestionNodeMutations = extendType({
       type: QuestionNodeType,
       args: { input: UpdateQuestionNodeInputType },
       // TODO: Remove the any
-      resolve(args: any) {
+      resolve(parent: any, args: any) {
         const { id, title, type, overrideLeafId, edgeId, optionEntries: { options }, edgeCondition } = args?.input;
 
         return NodeService.updateQuestionFromBuilder(id, title, type, overrideLeafId, edgeId, options, edgeCondition);
@@ -434,7 +450,7 @@ export const QuestionNodeMutations = extendType({
         input: CreateQuestionNodeInputType,
       },
       // TODO: Remove the any
-      async resolve(args: any, ctx: any) {
+      async resolve(parent: any, args: any, ctx: any) {
         const { prisma }: { prisma: PrismaClient } = ctx;
         // eslint-disable-next-line max-len
         const { customerId, dialogueSlug, title, type, overrideLeafId, parentQuestionId, optionEntries, edgeCondition } = args.input;
@@ -532,7 +548,7 @@ export const QuestionNodeMutations = extendType({
       type: QuestionNodeType,
       args: { input: DeleteNodeInputType },
 
-      async resolve(args: any, ctx: any) {
+      async resolve(parent: any, args: any, ctx: any) {
         const { prisma }: { prisma: PrismaClient } = ctx;
 
         await prisma.share.deleteMany({ where: {
@@ -552,7 +568,7 @@ export const QuestionNodeMutations = extendType({
       type: QuestionNodeType,
       args: { input: CreateCTAInputType },
 
-      async resolve(args: any, ctx: any) {
+      async resolve(parent: any, args: any, ctx: any) {
         const { prisma }: { prisma: PrismaClient } = ctx;
         const { customerSlug, dialogueSlug, title, type, links, share } = args.input;
 

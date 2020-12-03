@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 
 import 'easymde/dist/easymde.min.css';
+import * as UI from '@haas/ui';
 import * as yup from 'yup';
 import { ApolloError } from 'apollo-client';
 import { Button, ButtonGroup, FormErrorMessage, Popover, PopoverArrow,
@@ -28,6 +29,7 @@ import updateQuestionMutation from 'mutations/updateQuestion';
 
 import { EdgeConditonProps,
   OverrideLeafProps, QuestionEntryProps, QuestionOptionProps } from '../../DialogueBuilderInterfaces';
+import SliderNodeForm from './SliderNodeForm';
 
 interface FormDataProps {
   title: string;
@@ -37,6 +39,16 @@ interface FormDataProps {
   matchText: string;
   activeLeaf: string;
   parentQuestionType: string;
+  sliderNode: {
+    markers: {
+      label: string;
+      subLabel: string;
+      range: {
+        min?: number;
+        max?: number;
+      };
+    }[];
+  };
   options: Array<string>;
 }
 
@@ -125,8 +137,11 @@ const QuestionEntryForm = ({
     mode: 'onChange',
     defaultValues: {
       parentQuestionType,
+      sliderNode: question.sliderNode,
     },
   });
+
+  console.log('question', question);
 
   const toast = useToast();
   const [activeQuestionType, setActiveQuestionType] = useState(type);
@@ -414,7 +429,7 @@ const QuestionEntryForm = ({
           {parentQuestionType === 'Slider' && (
             <>
               <Hr />
-
+              <UI.Div />
               <FormSection>
                 <Div>
                   <H3 color="default.text" fontWeight={500} pb={2}>{t('dialogue:condition')}</H3>
@@ -465,7 +480,6 @@ const QuestionEntryForm = ({
           {parentQuestionType === 'Choice' && (
             <>
               <Hr />
-
               <FormSection>
                 <Div>
                   <H3 color="default.text" fontWeight={500} pb={2}>{t('dialogue:condition')}</H3>
@@ -494,7 +508,6 @@ const QuestionEntryForm = ({
                           />
                         )}
                       />
-
                       <FormErrorMessage>{form.errors.matchText?.message}</FormErrorMessage>
                     </FormControl>
                   </InputGrid>
@@ -568,53 +581,73 @@ const QuestionEntryForm = ({
                   <FormErrorMessage>{form.errors.activeLeaf?.message}</FormErrorMessage>
                 </FormControl>
               </InputGrid>
-
-              {activeQuestionType && activeQuestionType.value === 'CHOICE' && (
-              <>
-                <Div mb={1} gridColumn="1 / -1">
-                  <Flex justifyContent="space-between">
-                    <H4>
-                      {t('options')}
-                    </H4>
-                    <PlusCircle data-cy="AddOption" style={{ cursor: 'pointer' }} onClick={() => addNewOption()} />
-                  </Flex>
-
-                  <Hr />
-                </Div>
-
-                {!activeOptions.length && !form.errors.options && <Muted>{t('dialogue:add_option_reminder')}</Muted>}
-                {!activeOptions.length && form.errors.options && <Muted color="red">{t('dialogue:empty_option_reminder')}</Muted>}
-                {activeOptions && activeOptions.map((option, optionIndex) => (
-                  <Flex key={`container-${option.id}-${optionIndex}`} flexDirection="column">
-                    <Flex my={1} flexDirection="row">
-                      <Flex flexGrow={1}>
-                        <Input
-                          isInvalid={form.errors.options && Array.isArray(form.errors.options) && !!form.errors.options?.[optionIndex]}
-                          id={`options[${optionIndex}]`}
-                          key={`input-${option.id}-${optionIndex}`}
-                          name={`options[${optionIndex}]`}
-                          ref={form.register(
-                            { required: true,
-                              minLength: 1 },
-                          )}
-                          defaultValue={option.value}
-                          onChange={(e: any) => handleOptionChange(e.currentTarget.value, optionIndex)}
-                        />
-                      </Flex>
-
-                      <DeleteQuestionOptionButtonContainer
-                        onClick={(e: any) => deleteOption(e, optionIndex)}
-                      >
-                        <MinusCircle />
-                      </DeleteQuestionOptionButtonContainer>
-                    </Flex>
-                    {form.errors.options?.[optionIndex] && <Muted color="warning">Please fill in a proper value!</Muted>}
-                  </Flex>
-                ))}
-              </>
-              )}
             </Div>
           </FormSection>
+
+          {activeQuestionType && activeQuestionType.value === 'SLIDER' && (
+            <>
+              <UI.Hr />
+              <FormSection>
+                <UI.Div>
+                  <UI.H3 color="default.text" fontWeight={500} pb={2}>{t('dialogue:about_slider')}</UI.H3>
+                  <UI.Muted color="gray.600">
+                    {t('dialogue:about_slider_helper')}
+                  </UI.Muted>
+                </UI.Div>
+                <SliderNodeForm
+                  form={form}
+                />
+              </FormSection>
+            </>
+          )}
+
+          {activeQuestionType && activeQuestionType.value === 'CHOICE' && (
+          <FormSection>
+            <UI.Div />
+            <UI.Div>
+              <Div mb={1} gridColumn="1 / -1">
+                <Flex justifyContent="space-between">
+                  <H4>
+                    {t('options')}
+                  </H4>
+                  <PlusCircle data-cy="AddOption" style={{ cursor: 'pointer' }} onClick={() => addNewOption()} />
+                </Flex>
+
+                <Hr />
+              </Div>
+
+              {!activeOptions.length && !form.errors.options && <Muted>{t('dialogue:add_option_reminder')}</Muted>}
+              {!activeOptions.length && form.errors.options && <Muted color="red">{t('dialogue:empty_option_reminder')}</Muted>}
+              {activeOptions && activeOptions.map((option, optionIndex) => (
+                <Flex key={`container-${option.id}-${optionIndex}`} flexDirection="column">
+                  <Flex my={1} flexDirection="row">
+                    <Flex flexGrow={1}>
+                      <Input
+                        isInvalid={form.errors.options && Array.isArray(form.errors.options) && !!form.errors.options?.[optionIndex]}
+                        id={`options[${optionIndex}]`}
+                        key={`input-${option.id}-${optionIndex}`}
+                        name={`options[${optionIndex}]`}
+                        ref={form.register(
+                          { required: true,
+                            minLength: 1 },
+                        )}
+                        defaultValue={option.value}
+                        onChange={(e: any) => handleOptionChange(e.currentTarget.value, optionIndex)}
+                      />
+                    </Flex>
+
+                    <DeleteQuestionOptionButtonContainer
+                      onClick={(e: any) => deleteOption(e, optionIndex)}
+                    >
+                      <MinusCircle />
+                    </DeleteQuestionOptionButtonContainer>
+                  </Flex>
+                  {form.errors.options?.[optionIndex] && <Muted color="warning">Please fill in a proper value!</Muted>}
+                </Flex>
+              ))}
+            </UI.Div>
+          </FormSection>
+          )}
         </Div>
 
         <Flex justifyContent="space-between">

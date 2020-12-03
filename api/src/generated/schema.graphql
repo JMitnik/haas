@@ -65,6 +65,7 @@ input CreateQuestionNodeInputType {
 
 input CreateSlideNodeMarkerInput {
   label: String
+  subLabel: String
 }
 
 input CreateSliderNodeInputType {
@@ -495,7 +496,9 @@ type QuestionNode {
   questionDialogue: Dialogue
   questionDialogueId: String
   share: ShareNodeType
-  sliderNode: SliderNode
+
+  """Slidernode resolver"""
+  sliderNode: SliderNodeType
   title: String!
   type: QuestionNodeTypeEnum!
   updatedAt: String
@@ -634,27 +637,27 @@ type ShareNodeType {
   url: String!
 }
 
-type SliderNode {
-  id: ID
-  markers: [SliderNodeMarker!]!
-}
-
 """Input type for a slider node"""
 input SliderNodeEntryInput {
   value: Int
 }
 
-type SliderNodeMarker {
+type SliderNodeMarkerType {
   id: ID!
   label: String!
-  range: SliderNodeRange
+  range: SliderNodeRangeType
   subLabel: String!
 }
 
-type SliderNodeRange {
+type SliderNodeRangeType {
   end: Float
   id: ID!
   start: Float
+}
+
+type SliderNodeType {
+  id: ID
+  markers: [SliderNodeMarkerType!]
 }
 
 """Details regarding interaction with social node"""

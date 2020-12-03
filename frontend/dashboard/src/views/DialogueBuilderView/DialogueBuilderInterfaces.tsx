@@ -15,6 +15,7 @@ export interface QuestionEntryProps {
   overrideLeaf?: OverrideLeafProps;
   children?: Array<EdgeChildProps>;
   options?: Array<QuestionOptionProps>;
+  sliderNode?: any;
 }
 
 export interface QuestionOptionProps {
