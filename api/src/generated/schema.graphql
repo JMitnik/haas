@@ -487,6 +487,9 @@ type QuestionNode {
   questionDialogue: Dialogue
   questionDialogueId: String
   share: ShareNodeType
+
+  """Slidernode resolver"""
+  sliderNode: SliderNodeType
   title: String!
   type: QuestionNodeTypeEnum!
   updatedAt: String
@@ -581,7 +584,7 @@ type RoleType {
 }
 
 type Session {
-  createdAt: String!
+  createdAt: Date!
   dialogueId: String!
   id: ID!
   nodeEntries: [NodeEntry!]!
@@ -625,9 +628,44 @@ type ShareNodeType {
   url: String!
 }
 
+input SlideNodeMarkerInput {
+  id: ID
+  label: String!
+  range: SliderNodeRangeInputType
+  subLabel: String!
+}
+
 """Input type for a slider node"""
 input SliderNodeEntryInput {
   value: Int
+}
+
+input SliderNodeInputType {
+  id: ID
+  markers: [SlideNodeMarkerInput!]
+}
+
+type SliderNodeMarkerType {
+  id: ID!
+  label: String!
+  range: SliderNodeRangeType
+  subLabel: String!
+}
+
+input SliderNodeRangeInputType {
+  end: Float
+  start: Float
+}
+
+type SliderNodeRangeType {
+  end: Float
+  id: ID!
+  start: Float
+}
+
+type SliderNodeType {
+  id: ID
+  markers: [SliderNodeMarkerType!]
 }
 
 """Details regarding interaction with social node"""
@@ -761,6 +799,7 @@ input UpdateQuestionNodeInputType {
   id: ID
   optionEntries: OptionsInputType
   overrideLeafId: ID
+  sliderNode: SliderNodeInputType
   title: String
   type: String
 }

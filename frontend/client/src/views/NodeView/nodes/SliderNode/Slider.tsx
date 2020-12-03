@@ -7,7 +7,7 @@ import Lottie from 'react-lottie';
 import React, { useEffect, useReducer, useState } from 'react';
 import styled from 'styled-components';
 
-import { Div, Flex, Span, Text, Slider as UISlider } from '@haas/ui';
+import { Div, Flex, Text, Slider as UISlider } from '@haas/ui';
 import { ReactComponent as FingerIcon } from 'assets/icons/icon-fingerprint.svg';
 import { HAASIdle, HAASRun, HAASStopping } from 'assets/animations';
 import { ReactComponent as HappyIcon } from 'assets/icons/icon-happy.svg';
@@ -15,6 +15,8 @@ import { ReactComponent as UnhappyIcon } from 'assets/icons/icon-unhappy.svg';
 
 import { FingerPrintContainer, HAASRabbit, SlideHereContainer, SliderNodeValue } from './SliderNodeStyles';
 import { SlideMeAnimation } from './SliderNodeAnimations';
+import { SliderNodeMarkersProps } from '../../../../models/Tree/SliderNodeMarkersModel';
+import { SliderText } from './SliderText';
 
 interface SliderAnimationStateProps {
   isStopped: boolean;
@@ -81,64 +83,17 @@ const sliderValueAnimeVariants: Variants = {
   },
 };
 
-const SliderText = ({ color, adaptedColor, score, isEarly }: { color: string, adaptedColor:string, score: number, isEarly: boolean }) => {
-  let text = 'Thanks for voting';
-  let subText = 'Let us continue';
-
-  switch (true) {
-    case isEarly:
-      text = 'That was quick!';
-      subText = 'Tap me again if you are sure.';
-      break;
-
-    case !isEarly && score >= 6 && score < 9.5:
-      text = 'Good!';
-      subText = 'This is good.';
-      break;
-    case !isEarly && score >= 9.5:
-      text = 'Amazing!';
-      subText = 'This is excellent.';
-      break;
-    case !isEarly && score > 5 && score < 6:
-      text = 'Neutral';
-      subText = 'Something is not great.';
-      break;
-    case !isEarly && score <= 5 && score > 3:
-      text = 'Bad';
-      subText = 'This is bad.';
-      break;
-    case !isEarly && score <= 3:
-      text = 'Terrible';
-      subText = 'This is terrible.';
-      break;
-
-    default:
-      text = 'Thanks for voting';
-      break;
-  }
-
-  return (
-    <Span ml={2} textAlign="left">
-      <Text fontSize="1rem" color={color}>
-        {text}
-      </Text>
-      <Text fontSize="0.7rem" color={adaptedColor}>
-        {subText}
-      </Text>
-    </Span>
-  );
-};
-
 interface SliderProps {
   form: any;
   register: any;
   onSubmit: () => void;
+  markers: SliderNodeMarkersProps[];
 }
 
 const endTime = 40;
 const initialWindUpSec = 2;
 
-const Slider = ({ form, register, onSubmit }: SliderProps) => {
+const Slider = ({ form, register, onSubmit, markers }: SliderProps) => {
   const [isValid, setIsValid] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
   const [showIsEarly, setShowIsEarly] = useState(false);
@@ -320,7 +275,11 @@ const Slider = ({ form, register, onSubmit }: SliderProps) => {
           {...attributes.popper}
         >
           {!animationState.isStopped && (
-            <motion.div initial={{ opacity: 0, y: 70, x: 10 }} animate={{ opacity: 1, y: 0 }} whileHover={{ scale: 1.1 }}>
+            <motion.div
+              initial={{ opacity: 0, y: 70, x: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              whileHover={{ scale: 1.1 }}
+            >
               <SliderNodeValue
                 initial="initial"
                 variants={sliderValueAnimeVariants}
@@ -365,7 +324,13 @@ const Slider = ({ form, register, onSubmit }: SliderProps) => {
                   </AnimatePresence>
                 </motion.span>
               </SliderNodeValue>
-              <SliderText color={sliderColor} adaptedColor={adaptedColor} score={adjustedScore} isEarly={showIsEarly} />
+              <SliderText
+                markers={markers}
+                color={sliderColor}
+                adaptedColor={adaptedColor}
+                score={adjustedScore}
+                isEarly={showIsEarly}
+              />
             </motion.div>
           )}
         </SliderSpeechWrapper>

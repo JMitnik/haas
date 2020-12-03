@@ -81,6 +81,8 @@ const CustomerRoutes = () => (
                   />
 
                   <GuardedRoute
+                    allowedPermission={SystemPermission.CAN_VIEW_DIALOGUE_ANALYTICS}
+                    redirectRoute="/dashboard/b/:customerSlug/d/:dialogueSlug/interactions"
                     path="/dashboard/b/:customerSlug/d/:dialogueSlug"
                     render={() => <DialoguePage />}
                   />
@@ -265,28 +267,38 @@ const RootApp = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
-const GeneralErrorFallback = ({ error }: { error?: Error | undefined }) => (
-  <Div minHeight="100vh" display="flex" alignItems="center">
-    <FallbackServerError />
-  </Div>
-);
+const GeneralErrorFallback = ({ error }: { error?: Error | undefined }) => {
+  if (error?.message.includes('Failed to fetch')) {
+    console.log('Server is down!!!!');
+  }
+
+  console.log(error);
+
+  return (
+    <Div minHeight="100vh" display="flex" alignItems="center">
+      <FallbackServerError />
+    </Div>
+  );
+};
 
 const App: FC = () => (
   <>
     <I18nextProvider i18n={lang}>
       <Router>
-        <ApolloProvider client={client}>
-          <DefaultThemeProviders>
-            <UserProvider>
-              <AppContainer>
-                <ErrorBoundary FallbackComponent={GeneralErrorFallback}>
-                  <AppRoutes />
-                </ErrorBoundary>
-              </AppContainer>
-              <GlobalStyle />
-            </UserProvider>
-          </DefaultThemeProviders>
-        </ApolloProvider>
+        <ErrorBoundary FallbackComponent={GeneralErrorFallback}>
+          <ApolloProvider client={client}>
+            <DefaultThemeProviders>
+              <UserProvider>
+                <AppContainer>
+                  <ErrorBoundary FallbackComponent={GeneralErrorFallback}>
+                    <AppRoutes />
+                  </ErrorBoundary>
+                </AppContainer>
+                <GlobalStyle />
+              </UserProvider>
+            </DefaultThemeProviders>
+          </ApolloProvider>
+        </ErrorBoundary>
       </Router>
     </I18nextProvider>
   </>

@@ -1,6 +1,14 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    label: {
+      en: 'Label',
+      de: 'Etikette',
+    },
+    sub_label: {
+      en: 'Helper label',
+      de: 'Helferetikett',
+    },
     recipient: {
       en: 'Recipient',
       de: 'Empfänger',
@@ -683,6 +691,14 @@ const language = {
     },
   },
   dialogue: {
+    markers: {
+      en: 'Markers',
+      de: 'Marker',
+    },
+    markers_helper: {
+      en: 'Markers are points in the slider of particular significance for the end-user. You can edit the relevant texts, or leave them as we defined originally. An additional helper label can be used to help your customer express themselves better.',
+      de: 'Marker sind Punkte in Ihrem Schieberegler, die für den Endbenutzer von besonderer Bedeutung sind. Sie können die relevanten Texte anhand unserer (derzeit vordefinierten) Texte bearbeiten oder sie ursprünglich definiert lassen. Ein zusätzliches Unteretikett kann verwendet werden, damit sich Ihre Kunden besser ausdrücken können.',
+    },
     data_helper: {
       en: 'Your data settings, such as data-sources, will be set here.',
       de: 'Ihre Dateneinstellungen, wie z. B. Datenquellen, werden hier festgelegt',
@@ -790,6 +806,14 @@ const language = {
     empty_option_reminder: {
       en: 'Please fill in at least one option.',
       de: 'Bitte triff mindestens eine Auswahl.',
+    },
+    about_slider: {
+      en: 'About the slider',
+      de: 'Über den Schieberegler',
+    },
+    about_slider_helper: {
+      en: 'Describe the slider markers here.',
+      de: 'Beschreiben Sie hier die Schiebermarker.',
     },
     about_question: {
       en: 'About question',

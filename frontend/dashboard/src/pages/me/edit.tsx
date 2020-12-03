@@ -1,6 +1,7 @@
-import { Button, ButtonGroup, FormErrorMessage, useToast } from '@chakra-ui/core';
+import { Button, ButtonGroup, useToast } from '@chakra-ui/core';
 import { Div, Form, FormContainer,
-  FormControl, FormLabel, FormSection, H3, Hr, Input, InputGrid, InputHelper, Muted, PageTitle, ViewContainer } from '@haas/ui';
+  FormControl, FormLabel, FormSection, H3, Hr,
+  Input, InputGrid, InputHelper, Muted, PageTitle, ViewContainer } from '@haas/ui';
 import { Mail, Phone, User } from 'react-feather';
 import { Variants, motion } from 'framer-motion';
 import { queryMe, useUser } from 'providers/UserProvider';

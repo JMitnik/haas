@@ -1,4 +1,4 @@
-import { PrismaClient, QuestionNode, QuestionNodeUpdateInput, Share } from '@prisma/client';
+import { PrismaClient, QuestionNodeUpdateInput } from '@prisma/client';
 import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
 
 // eslint-disable-next-line import/no-cycle
@@ -8,6 +8,7 @@ import { CTALinksInputType, LinkType } from '../link/Link';
 import { DialogueType } from '../questionnaire/Dialogue';
 // eslint-disable-next-line import/no-cycle
 import { EdgeType } from '../edge/Edge';
+import { SliderNode } from './SliderNode';
 import NodeService from './NodeService';
 
 export const CTAShareInputObjectType = inputObjectType({
@@ -71,8 +72,43 @@ export const ShareNodeInputType = inputObjectType({
   },
 });
 
+export const SliderNodeRangeType = objectType({
+  name: 'SliderNodeRangeType',
+
+  definition(t) {
+    t.id('id');
+    t.float('start', { nullable: true });
+    t.float('end', { nullable: true });
+  },
+});
+
+export const SliderNodeMarkerType = objectType({
+  name: 'SliderNodeMarkerType',
+
+  definition(t) {
+    t.id('id');
+    t.string('label');
+    t.string('subLabel');
+    t.field('range', { type: SliderNodeRangeType, nullable: true, resolve: (parent: any) => parent.range || null });
+  },
+});
+
+export const SliderNodeType = objectType({
+  name: 'SliderNodeType',
+
+  definition(t) {
+    t.id('id', { nullable: true });
+    t.list.field('markers', {
+      type: SliderNodeMarkerType,
+      nullable: true,
+      resolve: (parent: any) => parent.markers || SliderNode.DEFAULT_MARKERS,
+    });
+  },
+});
+
 export const QuestionNodeType = objectType({
   name: 'QuestionNode',
+
   definition(t) {
     t.id('id');
     t.boolean('isLeaf');
@@ -86,6 +122,19 @@ export const QuestionNodeType = objectType({
       nullable: true,
       resolve: (parent) => parent.updatedAt?.toString() || '',
     });
+
+    // Node-types
+    // TODO: Remove `any` once we figure out how to not make prisma the backing-type
+    t.field('sliderNode', { description: 'Slidernode resolver',
+      type: SliderNodeType,
+      nullable: true,
+      resolve: (parent: any) => {
+        if (parent.type === 'SLIDER') {
+          return (parent.sliderNode || { markers: SliderNode.DEFAULT_MARKERS });
+        }
+
+        return null;
+      } });
 
     t.field('share', {
       type: ShareNodeType,
@@ -255,6 +304,35 @@ export const CreateCTAInputType = inputObjectType({
   },
 });
 
+export const SliderNodeRangeInputType = inputObjectType({
+  name: 'SliderNodeRangeInputType',
+
+  definition(t) {
+    t.float('start', { nullable: true });
+    t.float('end', { nullable: true });
+  },
+});
+
+export const SliderNodeMarkerInputType = inputObjectType({
+  name: 'SlideNodeMarkerInput',
+
+  definition(t) {
+    t.id('id', { nullable: true });
+    t.string('label', { required: true });
+    t.string('subLabel', { required: true });
+    t.field('range', { type: SliderNodeRangeInputType });
+  },
+});
+
+export const SliderNodeInputType = inputObjectType({
+  name: 'SliderNodeInputType',
+
+  definition(t) {
+    t.id('id', { nullable: true });
+    t.list.field('markers', { type: SliderNodeMarkerInputType });
+  },
+});
+
 export const CreateQuestionNodeInputType = inputObjectType({
   name: 'CreateQuestionNodeInputType',
 
@@ -283,6 +361,8 @@ export const UpdateQuestionNodeInputType = inputObjectType({
 
     t.string('title');
     t.string('type');
+
+    t.field('sliderNode', { type: SliderNodeInputType });
 
     t.field('optionEntries', { type: OptionsInputType });
     t.field('edgeCondition', { type: EdgeConditionInputType });
@@ -371,9 +451,10 @@ export const QuestionNodeMutations = extendType({
       args: { input: UpdateQuestionNodeInputType },
       // TODO: Remove the any
       resolve(parent: any, args: any) {
-        const { id, title, type, overrideLeafId, edgeId, optionEntries: { options }, edgeCondition } = args?.input;
+        const { id, title, type, overrideLeafId, edgeId, optionEntries: { options }, edgeCondition, sliderNode } = args?.input;
 
-        return NodeService.updateQuestionFromBuilder(id, title, type, overrideLeafId, edgeId, options, edgeCondition);
+        console.log(args.input);
+        return NodeService.updateQuestionFromBuilder(id, title, type, overrideLeafId, edgeId, options, edgeCondition, sliderNode);
       },
     });
 
@@ -555,7 +636,6 @@ export const getQuestionNodeQuery = extendType({
         where: QuestionNodeInput,
       },
       nullable: true,
-
       async resolve(parent, args, ctx) {
         if (!args.where?.id) return null;
 

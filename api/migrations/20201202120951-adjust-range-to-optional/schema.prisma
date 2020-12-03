@@ -1,6 +1,6 @@
 datasource postgresql {
   provider = "postgresql"
-  url      = env("DB_STRING")
+  url = "***"
 }
 
 // binaryTargets = ["debian-openssl-1.1.x"]
@@ -110,23 +110,21 @@ enum NodeType {
 }
 
 model SliderNodeRange {
-  id        String          @id @default(cuid())
-  start     Float?
-  end       Float?
+  id        Int          @id @default(autoincrement())
+  start     Int?
+  end       Int?
 }
 
 model SliderNodeMarker {
-  id        String          @id @default(cuid())
+  id        Int          @id @default(autoincrement())
   range     SliderNodeRange
   label     String
   subLabel  String
-  sliderNodeId  String
-  sliderNode    SliderNode  @relation(fields: [sliderNodeId], references: [id])
 }
 
 model SliderNode {
-  id        String          @id @default(cuid())
-  markers SliderNodeMarker[]
+  id        Int          @id @default(autoincrement())
+  markers SliderNodeMarker
 }
 
 model QuestionNode {
