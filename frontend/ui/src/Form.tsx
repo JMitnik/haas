@@ -560,8 +560,6 @@ interface RangeSliderProps {
 }
 
 export const RangeSlider = ({ min=0, max=10, onChange, stepSize=0.5, isDisabled = false }: RangeSliderProps) => {
-  console.log({min});
-  console.log({max});
   return (
     <AntdSlider 
       range
