@@ -3,6 +3,11 @@ import { useFieldArray } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
 
+/**
+ * Slider node form: form-section used in the NodeForm in case current type is a form.
+ * Currently renders:
+ * - Markers
+ */
 const SliderNodeForm = ({ form }: { form: any }) => {
   const { t } = useTranslation();
 
