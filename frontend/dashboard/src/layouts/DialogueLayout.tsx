@@ -203,7 +203,7 @@ const IconButtonContainer = styled.div`
 const DialogueNavBar = ({ dialogue, customerSlug, dialogueSlug }: DialogueNavBarProps) => {
   const { t } = useTranslation();
   const { onClose, onOpen, isOpen } = useDisclosure();
-  const { canBuildDialogues } = useAuth();
+  const { canBuildDialogues, canViewDialogueView } = useAuth();
 
   const history = useHistory();
 
@@ -252,10 +252,12 @@ const DialogueNavBar = ({ dialogue, customerSlug, dialogueSlug }: DialogueNavBar
         <Div mb={4}>
           <DialogueNavBarHeading mb={1} mt={2} fontWeight="400" color="primaries.100">{t('analytics')}</DialogueNavBarHeading>
           <Hr />
-          <NavLink exact to={`/dashboard/b/${customerSlug}/d/${dialogueSlug}`}>
-            <Icon mr={2} as={BarChart} />
-            {t('views:dialogue_view')}
-          </NavLink>
+          {canViewDialogueView && (
+            <NavLink exact to={`/dashboard/b/${customerSlug}/d/${dialogueSlug}`}>
+              <Icon mr={2} as={BarChart} />
+              {t('views:dialogue_view')}
+            </NavLink>
+          )}
           <NavLink to={`/dashboard/b/${customerSlug}/d/${dialogueSlug}/interactions`}>
             <Icon mr={2} as={Activity} />
             {t('views:interactions_view')}

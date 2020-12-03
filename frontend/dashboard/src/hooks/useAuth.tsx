@@ -17,6 +17,7 @@ interface UseAuthProps {
   canBuildDialogues: boolean;
   canViewUsers: boolean;
   canDeleteUsers: boolean;
+  canViewDialogueView: boolean;
   hasPermission: (permission: SystemPermission) => boolean;
 }
 
@@ -43,12 +44,14 @@ const useAuth = (): UseAuthProps => {
   const canEditCustomer = authPermissions?.includes(SystemPermission.CAN_EDIT_WORKSPACE) || false;
   const canViewDialogueBuilder = authPermissions?.includes(SystemPermission.CAN_VIEW_DIALOGUE) || false;
   const canBuildDialogues = authPermissions?.includes(SystemPermission.CAN_BUILD_DIALOGUE) || false;
+  const canViewDialogueView = authPermissions?.includes(SystemPermission.CAN_VIEW_DIALOGUE_ANALYTICS) || false;
 
   const canCreateTriggers = authPermissions?.includes(SystemPermission.CAN_CREATE_TRIGGERS) || false;
   const canEditTriggers = authPermissions?.includes(SystemPermission.CAN_CREATE_TRIGGERS) || false;
   const canDeleteTriggers = authPermissions?.includes(SystemPermission.CAN_DELETE_TRIGGERS) || false;
 
   return {
+    canViewDialogueView,
     canEditTriggers,
     canDeleteTriggers,
     canCreateCustomers,
