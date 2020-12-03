@@ -258,31 +258,35 @@ class DialogueService {
     }));
   };
 
+  // TODO: Offload all this work to redis for much better performance + Cache
   static getStatistics = async (dialogueId: string, startDate?: Date | null, endDate?: Date | null): Promise<StatisticsProps> => {
     const sessions = await SessionService.fetchSessionsByDialogue(dialogueId, { startDate, endDate });
 
     if (!sessions) { throw new Error('No sessions present'); }
 
     const scoreEntries = SessionService.getScoringEntriesFromSessions(sessions).filter(isPresent) || [];
+
     // Then dresses it up as X/Y data for the lineChart
     const history: HistoryDataProps[] = scoreEntries?.map((entry) => ({
       x: entry?.creationDate.toUTCString() || null,
       y: entry?.sliderNodeEntry?.value || null,
       entryId: entry?.id || null,
+      sessionId: entry?.sessionId || null,
     })).filter(isPresent) || [];
     const historyCloned = [...history];
 
+    // Get text entries
     const nodeEntryTextValues = SessionService.getTextEntriesFromSessions(sessions).filter(isPresent);
 
-    const textAndScoreEntries: HistoryDataWithEntry[] = _.merge<HistoryDataProps[], NodeEntryWithTypes[]>(
-      history, nodeEntryTextValues,
-    ) || [];
+    // Merge text-entries with relevant score by the root-slider based on their sessionId
+    const textAndScoreEntries = _.values(_.merge(_.keyBy(nodeEntryTextValues, 'sessionId'), _.keyBy(history, 'sessionId')));
 
+    // Get the top paths
     const isPositiveEntries = _.groupBy(textAndScoreEntries, (entry) => entry.y && entry.y > 50);
-
     const topNegativePath = DialogueService.getTopNPaths(isPositiveEntries.false || [], 3, 'negative') || [];
     const topPositivePath = DialogueService.getTopNPaths(isPositiveEntries.true || [], 3, 'positive') || [];
 
+    // Get the most popular paths in general
     const mostPopularPath = _.maxBy([
       ...topNegativePath.map((pathItem) => ({ ...pathItem, basicSentiment: 'negative' })),
       ...topPositivePath.map((pathItem) => ({ ...pathItem, basicSentiment: 'positive' })),
