@@ -97,7 +97,7 @@ const SliderText = ({ color, adaptedColor, score, isEarly, markers }: { color: s
       const { start, end } = marker.range;
 
       const lowerBound = start || 0.0;
-      const upperBound = end || 10.0;
+      const upperBound = end || 10.1;
 
       if (lowerBound <= score && upperBound > score) {
         return true;

@@ -498,7 +498,6 @@ class NodeService {
       console.log('Something went wrong removing options: ', e);
     }
 
-    console.log(dbEdgeCondition);
     try {
       if (dbEdgeCondition) {
         await NodeService.updateEdge(dbEdgeCondition, edgeCondition);
@@ -510,8 +509,6 @@ class NodeService {
     }
 
     const updatedOptionIds = await NodeService.updateQuestionOptions(options);
-
-    console.log(sliderNode);
 
     const updatedNode = leaf ? await prisma.questionNode.update({
       where: { id: questionId },
@@ -534,41 +531,43 @@ class NodeService {
       },
     });
 
-    if (updatedNode.sliderNodeId) {
-      await prisma.sliderNode.update({
-        where: { id: updatedNode.sliderNodeId },
-        data: {
-          markers: {
-            update: sliderNode?.markers?.map((marker) => ({
-              where: { id: marker?.id || undefined },
-              data: {
-                label: marker.label,
-                subLabel: marker.subLabel,
-              },
-            })),
-          },
-        },
-      });
-    } else {
-      await prisma.sliderNode.create({
-        data: {
-          QuestionNode: {
-            connect: { id: questionId },
-          },
-          markers: {
-            create: sliderNode?.markers?.map((marker) => ({
-              label: marker.label || '',
-              subLabel: marker.subLabel || '',
-              range: {
-                create: {
-                  start: marker?.range?.start || 2,
-                  end: marker?.range?.end || 5,
+    if (type === NodeType.SLIDER) {
+      if (updatedNode.sliderNodeId) {
+        await prisma.sliderNode.update({
+          where: { id: updatedNode.sliderNodeId },
+          data: {
+            markers: {
+              update: sliderNode?.markers?.map((marker) => ({
+                where: { id: marker?.id || undefined },
+                data: {
+                  label: marker.label,
+                  subLabel: marker.subLabel,
                 },
-              },
-            })),
+              })),
+            },
           },
-        },
-      });
+        });
+      } else {
+        await prisma.sliderNode.create({
+          data: {
+            QuestionNode: {
+              connect: { id: questionId },
+            },
+            markers: {
+              create: sliderNode?.markers?.map((marker) => ({
+                label: marker.label || '',
+                subLabel: marker.subLabel || '',
+                range: {
+                  create: {
+                    start: marker?.range?.start || undefined,
+                    end: marker?.range?.end || undefined,
+                  },
+                },
+              })),
+            },
+          },
+        });
+      }
     }
 
     return updatedNode;

@@ -1,8 +1,8 @@
 import { Instance, types } from 'mobx-state-tree';
 
 const SliderNodeRangeModel = types.model({
-  start: types.maybe(types.number),
-  end: types.maybe(types.number),
+  start: types.maybeNull(types.number),
+  end: types.maybeNull(types.number),
 });
 
 const SliderNodeMarkersModel = types

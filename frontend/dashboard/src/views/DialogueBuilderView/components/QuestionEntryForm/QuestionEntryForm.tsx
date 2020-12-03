@@ -373,6 +373,9 @@ const QuestionEntryForm = ({
     const overrideLeafId = activeLeaf?.value;
     const options = { options: activeOptions };
     const edgeCondition = activeCondition;
+    const sliderNodeData = formData.sliderNode || sliderNode;
+
+    const isSlider = activeQuestionType?.value === 'SLIDER' && sliderNodeData;
 
     if (question.id !== '-1') {
       updateQuestion({
@@ -386,7 +389,16 @@ const QuestionEntryForm = ({
             type,
             optionEntries: options,
             edgeCondition,
-            sliderNode: formData.sliderNode || sliderNode,
+            sliderNode: isSlider ? {
+              id: sliderNodeData.id,
+              markers: sliderNodeData.markers.map((marker, index) => ({
+                id: marker.id,
+                label: marker.label,
+                subLabel: marker.subLabel,
+                // We use the range from the incoming sliderNode
+                range: sliderNode?.markers?.[index].range,
+              })),
+            } : undefined,
           },
         },
       });
@@ -402,7 +414,16 @@ const QuestionEntryForm = ({
             parentQuestionId,
             optionEntries: options,
             edgeCondition,
-            sliderNode: formData.sliderNode || sliderNode,
+            sliderNode: isSlider ? {
+              id: sliderNodeData.id,
+              markers: sliderNodeData.markers.map((marker, index) => ({
+                id: marker.id,
+                label: marker.label,
+                subLabel: marker.subLabel,
+                // We use the range from the incoming sliderNode
+                range: sliderNode?.markers?.[index].range,
+              })),
+            } : undefined,
           },
         },
       });
