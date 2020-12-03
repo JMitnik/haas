@@ -217,7 +217,7 @@ const AddDialogueView = () => {
                       name="title"
                       ref={form.register({ required: true })}
                     />
-                    <FormErrorMessage>{form.errors.title}</FormErrorMessage>
+                    <FormErrorMessage>{form.errors.title?.message}</FormErrorMessage>
                   </FormControl>
 
                   <FormControl isInvalid={!!form.errors.publicTitle}>
@@ -233,7 +233,7 @@ const AddDialogueView = () => {
                       name="publicTitle"
                       ref={form.register({ required: false })}
                     />
-                    <FormErrorMessage>{form.errors.publicTitle}</FormErrorMessage>
+                    <FormErrorMessage>{form.errors.publicTitle?.message}</FormErrorMessage>
                   </FormControl>
 
                   <FormControl isRequired isInvalid={!!form.errors.description}>
@@ -246,7 +246,7 @@ const AddDialogueView = () => {
                       name="description"
                       ref={form.register({ required: true })}
                     />
-                    <FormErrorMessage>{form.errors.description}</FormErrorMessage>
+                    <FormErrorMessage>{form.errors.description?.message}</FormErrorMessage>
                   </FormControl>
 
                   <FormControl isRequired isInvalid={!!form.errors.slug}>
@@ -258,7 +258,7 @@ const AddDialogueView = () => {
                       name="slug"
                       ref={form.register({ required: true })}
                     />
-                    <FormErrorMessage>{form.errors.slug}</FormErrorMessage>
+                    <FormErrorMessage>{form.errors.slug?.message}</FormErrorMessage>
                   </FormControl>
 
                 </InputGrid>

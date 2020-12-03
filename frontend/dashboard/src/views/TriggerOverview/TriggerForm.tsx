@@ -1,25 +1,30 @@
 /* eslint-disable radix */
+import * as UI from '@haas/ui';
 import { Controller, UseFormMethods, useFieldArray, useWatch } from 'react-hook-form';
-import { CornerRightDown, CornerRightUp, Key, Mail, Maximize2,
-  Minimize2, PlusCircle, Smartphone, Target, Thermometer, Type, UserPlus, Watch } from 'react-feather';
+import { CornerRightDown, CornerRightUp, Mail, Maximize2,
+  Minimize2, MousePointer, PlusCircle, Smartphone, Target, Thermometer, Type, UserPlus, Watch } from 'react-feather';
+import { ReactComponent as EmptyIll } from 'assets/images/empty.svg';
+import { ReactComponent as PaperIll } from 'assets/images/paper.svg';
+import { ReactComponent as SMSIll } from 'assets/images/sms.svg';
 import { Slider } from 'antd';
 import { useHistory, useParams } from 'react-router';
 import { useLazyQuery, useQuery } from '@apollo/react-hooks';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Select from 'react-select';
 import styled from 'styled-components/macro';
 
-import { Button, ButtonGroup, FormErrorMessage, RadioButtonGroup, Tag, TagIcon } from '@chakra-ui/core'; // Slider,
+import 'antd/dist/antd.css'; // Slider,
+import { Button, ButtonGroup, FormErrorMessage, RadioButtonGroup, Tag, TagIcon } from '@chakra-ui/core';
 import {
-  ButtonRadio, Div, Flex, Form, FormControl,
-  FormLabel, FormSection, H3, H4, Hr, Input, InputGrid, InputHelper, Muted, Span, Text,
+  ButtonRadio, Div, Form, FormControl,
+  FormLabel, FormSection, H3, Hr, Input, InputGrid, InputHelper, Muted, Span,
 } from '@haas/ui';
+import { SelectType } from 'types/generic';
 import { useTranslation } from 'react-i18next';
 import ServerError from 'components/ServerError';
 import getQuestionsQuery from 'queries/getQuestionnaireQuery';
 import gql from 'graphql-tag';
 
-import 'antd/dist/antd.css';
 import { getCustomerTriggerData as CustomerTriggerData } from './__generated__/getCustomerTriggerData';
 
 const SingleScore = ({ form, fieldIndex, conditionKey, defaultValue, icon }: any) => {
@@ -57,7 +62,15 @@ interface FormDataProps {
     label: string;
     value: string;
   };
-  conditions: Array<{ id: string, questionId: { label: string, value: string }, conditionType: string, range: Array<number>, highThreshold: number, lowThreshold: number, matchText: string }>;
+  conditions: Array<{
+    id: string,
+    questionId: SelectType,
+    conditionType: string,
+    range: Array<number>,
+    highThreshold: number,
+    lowThreshold: number,
+    matchText: string
+  }>;
   condition: string;
   matchText: string;
   lowThreshold: number;
@@ -66,10 +79,6 @@ interface FormDataProps {
     label: string;
     value: string;
   }>;
-}
-interface SelectType {
-  label: string;
-  value: string;
 }
 
 const conditionTypeSelect = [
@@ -160,6 +169,7 @@ const getCustomerTriggerData = gql`
     }
   }
 `;
+
 interface TriggerFormProps {
   form: UseFormMethods<FormDataProps>;
   onFormSubmit: any;
@@ -180,7 +190,15 @@ const getNodeType = (question: string, questions: Array<any>) => {
   return activeQuestionNode.type;
 };
 
-const FormConditionFragment = ({ form, condition: fieldCondition, fieldIndex, onDelete, questions, questionsSelect, activeDialogue }: any) => {
+const FormConditionFragment = ({
+  form,
+  condition: fieldCondition,
+  fieldIndex,
+  onDelete,
+  questions,
+  questionsSelect,
+  activeDialogue,
+}: any) => {
   const { t } = useTranslation();
 
   const watchConditionType = useWatch({
@@ -198,18 +216,45 @@ const FormConditionFragment = ({ form, condition: fieldCondition, fieldIndex, on
   const handleQuestionReset = () => {
     form.setValue(`conditions[${fieldIndex}].conditionType`, null);
     form.setValue(`conditions[${fieldIndex}].matchText`, '');
-    form.setValue(`conditions[${fieldIndex}].minThreshold`, 3);
-    form.setValue(`conditions[${fieldIndex}].maxThreshold`, 6);
-    form.setValue(`conditions[${fieldIndex}].range`, [3, 6]);
+    form.setValue(`conditions[${fieldIndex}].lowThreshold`, 4);
+    form.setValue(`conditions[${fieldIndex}].highThreshold`, 6);
+    form.setValue(`conditions[${fieldIndex}].range`, [4, 6]);
   };
 
+  const nodeType = useMemo(() => (
+    getNodeType(watchConditionQuestion?.value, questions?.customer?.dialogue?.questions)
+  ), [watchConditionQuestion, questions]);
+
   return (
-    <Div
-      marginTop={15}
+    <UI.Card
+      noHover
+      borderTop="3px solid"
+      borderColor="primary"
+      outline
+      mt={2}
       gridColumn="1 / -1"
-      bg="gray.100"
       padding={4}
     >
+      <UI.Flex justifyContent="space-between" alignItems="center">
+        <UI.Text color="gray.600" fontSize="1.5rem" fontWeight={700} mr="4px" mb={2}>
+          {t('condition')}
+          #
+          {' '}
+          {fieldIndex + 1}
+        </UI.Text>
+
+        <UI.Div>
+          <Button
+            variant="outline"
+            size="sm"
+            variantColor="red"
+            onClick={() => onDelete(fieldIndex)}
+          >
+            {t('delete')}
+          </Button>
+        </UI.Div>
+      </UI.Flex>
+      <UI.Hr />
       <input type="hidden" ref={form.register()} name={`conditions[${fieldIndex}].id`} />
       {form.watch('type') === TriggerQuestionType.QUESTION && activeDialogue && (
         <FormControl mb={4}>
@@ -233,7 +278,6 @@ const FormConditionFragment = ({ form, condition: fieldCondition, fieldIndex, on
               />
             )}
           />
-          <FormErrorMessage>{form.errors.conditions?.[fieldIndex]?.questionId?.value}</FormErrorMessage>
         </FormControl>
       )}
 
@@ -250,13 +294,12 @@ const FormConditionFragment = ({ form, condition: fieldCondition, fieldIndex, on
             options={conditionTypeSelect}
             render={({ onBlur, onChange, value }) => (
               <>
-                {getNodeType(watchConditionQuestion.value, questions?.customer?.dialogue?.questions) === 'SLIDER' ? (
+                {nodeType === 'SLIDER' ? (
                   <RadioButtonGroup
                     display="flex"
                     onBlur={onBlur}
                     value={value}
                     onChange={(val) => {
-                      handleQuestionReset();
                       onChange(val);
                     }}
                   >
@@ -292,11 +335,10 @@ const FormConditionFragment = ({ form, condition: fieldCondition, fieldIndex, on
                 ) : (
                   <RadioButtonGroup
                     display="flex"
-                    onBlur={onBlur}
                     value={value}
                     onChange={(val) => {
-                      handleQuestionReset();
                       onChange(val);
+                      onBlur();
                     }}
                   >
                     <ButtonRadio
@@ -366,7 +408,7 @@ const FormConditionFragment = ({ form, condition: fieldCondition, fieldIndex, on
           <Controller
             name={`conditions[${fieldIndex}].highThreshold`}
             control={form.control}
-            defaultValue={10 - fieldCondition?.highThreshold || null}
+            defaultValue={10 - fieldCondition?.highThreshold}
             render={({ onChange, value }) => (
               <Slider
                 step={0.5}
@@ -450,24 +492,15 @@ const FormConditionFragment = ({ form, condition: fieldCondition, fieldIndex, on
 
         </FormControl>
       )}
-
-      <Button
-        mt={4}
-        variant="outline"
-        size="sm"
-        variantColor="red"
-        onClick={() => onDelete(fieldIndex)}
-      >
-        {t('delete')}
-      </Button>
       <FormControl />
-    </Div>
+    </UI.Card>
   );
 };
 
 const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = false }: TriggerFormProps) => {
   const history = useHistory();
   const { t } = useTranslation();
+  const questionSelectRef = useRef<any>();
   const { customerSlug } = useParams<{ customerSlug: string }>();
 
   const { fields, append, remove } = useFieldArray({
@@ -507,7 +540,7 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
   }, [customerSlug, activeDialogue, fetchQuestions]);
 
   // Dealing with recipients
-  const [activeRecipients, setActiveRecipients] = useState<Array<null | { label: string, value: string }>>(() => databaseRecipients || []);
+  const [activeRecipients, setActiveRecipients] = useState<Array<null | SelectType>>(() => databaseRecipients || []);
 
   const addRecipient = () => setActiveRecipients((prevRecipients) => [...prevRecipients, null]);
 
@@ -568,13 +601,14 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                 control={form.control}
                 render={({ onChange, value }) => (
                   <Select
+                    ref={questionSelectRef}
                     options={dialogues}
                     value={value}
                     onChange={onChange}
                   />
                 )}
               />
-              <FormErrorMessage>{form.errors.dialogue?.label}</FormErrorMessage>
+              <FormErrorMessage>{form.errors.dialogue?.label?.message}</FormErrorMessage>
             </FormControl>
 
             <FormControl isInvalid={!!form.errors.type}>
@@ -613,7 +647,7 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                 )}
               />
 
-              <FormErrorMessage>{form.errors.dialogue?.label}</FormErrorMessage>
+              <FormErrorMessage>{form.errors.dialogue?.label?.message}</FormErrorMessage>
             </FormControl>
           </InputGrid>
         </Div>
@@ -628,18 +662,6 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
         </Div>
         <Div>
           <InputGrid>
-            <Flex flexDirection="row" alignItems="center" justifyContent="space-between" marginBottom={5}>
-              <H4>Conditions</H4>
-              <Button
-                leftIcon={PlusCircle}
-                onClick={addCondition}
-                isDisabled={!activeDialogue}
-                size="sm"
-              >
-                {t('trigger:add_condition')}
-              </Button>
-            </Flex>
-            <Hr />
             {fields?.map((condition, index) => (
               <FormConditionFragment
                 key={condition?.indexKey}
@@ -652,6 +674,51 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                 form={form}
               />
             ))}
+
+            {!activeDialogue ? (
+              <UI.IllustrationCard svg={<PaperIll />} text={t('trigger:select_dialogue_placeholder')}>
+                <Button
+                  leftIcon={MousePointer}
+                  onClick={() => questionSelectRef.current.focus()}
+                  size="sm"
+                  variant="outline"
+                  variantColor="teal"
+                >
+                  {t('trigger:select_a_dialogue')}
+                </Button>
+              </UI.IllustrationCard>
+            ) : (
+              <>
+                {fields.length === 0 ? (
+                  <UI.IllustrationCard svg={<EmptyIll />} text={t('trigger:condition_placeholder')}>
+                    <Button
+                      leftIcon={PlusCircle}
+                      onClick={addCondition}
+                      isDisabled={!activeDialogue}
+                      size="sm"
+                      variant="outline"
+                      variantColor="teal"
+                    >
+                      {t('trigger:add_condition')}
+                    </Button>
+                  </UI.IllustrationCard>
+                ) : (
+                  <UI.Div>
+                    <Button
+                      leftIcon={PlusCircle}
+                      onClick={addCondition}
+                      isDisabled={!activeDialogue}
+                      size="sm"
+                      variant="outline"
+                      variantColor="teal"
+                    >
+                      {t('trigger:add_condition')}
+                    </Button>
+                  </UI.Div>
+                )}
+              </>
+            )}
+
           </InputGrid>
 
         </Div>
@@ -664,15 +731,36 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
           <H3 color="default.text" fontWeight={500} pb={2}>{t('trigger:recipients')}</H3>
           <Muted color="gray.600">{t('trigger:recipients_helper')}</Muted>
         </Div>
-        <Div>
-          <Button onClick={addRecipient} variantColor="teal" leftIcon={UserPlus}>{t('add_user')}</Button>
+        <UI.InputGrid>
           {activeRecipients.map((recipient, index) => (
-            <Div
-              padding={4}
-              bg="gray.100"
+            <UI.Card
+              noHover
+              outline
+              borderTop="3px solid"
+              borderColor="tertiary"
               key={index}
               mt={2}
+              padding={4}
             >
+              <UI.Flex justifyContent="space-between" alignItems="center">
+                <UI.Text color="gray.600" fontSize="1.5rem" fontWeight={700} mr="4px" mb={2}>
+                  {t('recipient')}
+                  #
+                  {' '}
+                  {index + 1}
+                </UI.Text>
+
+                <Button
+                  onClick={() => deleteRecipient(index)}
+                  variantColor="red"
+                  variant="outline"
+                  size="sm"
+                >
+                  {t('delete')}
+                </Button>
+              </UI.Flex>
+
+              <UI.Hr />
               <InputGrid>
                 <FormControl isInvalid={!!form.errors.medium}>
                   <FormLabel htmlFor="medium">{t('trigger:recipient')}</FormLabel>
@@ -686,21 +774,38 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                     as={<Select />}
                   />
 
-                  <FormErrorMessage>{form.errors.medium}</FormErrorMessage>
+                  <FormErrorMessage>{form.errors.medium?.message}</FormErrorMessage>
                 </FormControl>
               </InputGrid>
+            </UI.Card>
+          ))}
+
+          {activeRecipients.length === 0 ? (
+            <UI.IllustrationCard svg={<SMSIll />} text={t('trigger:sms_placeholder')}>
               <Button
-                onClick={() => deleteRecipient(index)}
-                variantColor="red"
-                variant="outline"
+                onClick={addRecipient}
                 size="sm"
+                variant="outline"
+                variantColor="teal"
+                leftIcon={UserPlus}
               >
-                Delete
+                {t('add_recipient')}
+              </Button>
+            </UI.IllustrationCard>
+          ) : (
+            <Div>
+              <Button
+                onClick={addRecipient}
+                size="sm"
+                variant="outline"
+                variantColor="teal"
+                leftIcon={UserPlus}
+              >
+                {t('add_recipient')}
               </Button>
             </Div>
-
-          ))}
-        </Div>
+          )}
+        </UI.InputGrid>
       </FormSection>
 
       <Hr />
@@ -734,7 +839,7 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                 )}
               />
 
-              <FormErrorMessage>{form.errors.medium}</FormErrorMessage>
+              <FormErrorMessage>{form.errors.medium?.message}</FormErrorMessage>
             </FormControl>
           </InputGrid>
         </Div>

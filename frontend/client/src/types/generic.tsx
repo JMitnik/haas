@@ -104,3 +104,11 @@ export interface CustomerSettingsProps {
   logoUrl: string;
   colourSettings: CustomerColorSettingsProps;
 }
+
+export interface UrlParams {
+  dialogueSlug: string;
+  customerSlug: string;
+  edgeId?: string;
+  leafId?: string;
+  nodeId?: string;
+}

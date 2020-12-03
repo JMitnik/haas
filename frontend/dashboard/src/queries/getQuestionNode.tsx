@@ -6,6 +6,19 @@ const getQuestionNodeQuery = gql`
       id
       title
       type
+      sliderNode {
+        id
+        markers {
+          id
+          label
+          subLabel
+          range {
+            id
+            start
+            end
+          }
+        }
+      }
     }
   }
 `;

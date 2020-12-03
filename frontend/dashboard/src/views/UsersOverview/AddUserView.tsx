@@ -114,7 +114,7 @@ const AddUserView = () => {
                       name="firstName"
                       ref={form.register()}
                     />
-                    <FormErrorMessage>{form.errors.firstName}</FormErrorMessage>
+                    <FormErrorMessage>{form.errors.firstName?.message}</FormErrorMessage>
                   </FormControl>
                   <FormControl isRequired isInvalid={!!form.errors.lastName}>
                     <FormLabel htmlFor="lastName">{t('last_name')}</FormLabel>
@@ -125,7 +125,7 @@ const AddUserView = () => {
                       name="lastName"
                       ref={form.register()}
                     />
-                    <FormErrorMessage>{form.errors.lastName}</FormErrorMessage>
+                    <FormErrorMessage>{form.errors.lastName?.message}</FormErrorMessage>
                   </FormControl>
                   <FormControl isRequired isInvalid={!!form.errors.email}>
                     <FormLabel htmlFor="email">{t('email')}</FormLabel>
@@ -136,7 +136,7 @@ const AddUserView = () => {
                       name="email"
                       ref={form.register()}
                     />
-                    <FormErrorMessage>{form.errors.email}</FormErrorMessage>
+                    <FormErrorMessage>{form.errors.email?.message}</FormErrorMessage>
                   </FormControl>
                   <FormControl isInvalid={!!form.errors.phone}>
                     <FormLabel htmlFor="pgone">{t('phone')}</FormLabel>
@@ -147,7 +147,7 @@ const AddUserView = () => {
                       name="phone"
                       ref={form.register()}
                     />
-                    <FormErrorMessage>{form.errors.phone}</FormErrorMessage>
+                    <FormErrorMessage>{form.errors.phone?.message}</FormErrorMessage>
                   </FormControl>
                 </InputGrid>
               </Div>

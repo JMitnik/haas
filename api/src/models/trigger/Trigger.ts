@@ -162,7 +162,7 @@ const TriggerMutations = extendType({
   definition(t) {
     t.field('deleteTrigger', {
       type: TriggerType,
-      args: { id: 'String' },
+      args: { id: 'String', customerSlug: 'String' },
       nullable: true,
 
       async resolve(parent, args, ctx) {
@@ -183,6 +183,7 @@ const TriggerMutations = extendType({
       type: TriggerType,
       args: {
         triggerId: 'String',
+        customerSlug: 'String',
         recipients: RecipientsInputType,
         trigger: TriggerInputType,
       },

@@ -52,11 +52,12 @@ const authShield = shield({
     '*': isSuperAdmin,
     logout: allow,
     createSession: allow,
+    appendToInteraction: allow,
     verifyUserToken: allow,
     requestInvite: allow,
     deleteCustomer: isSuperAdmin,
     inviteUser: containsWorkspacePermission(SystemPermissionEnum.CAN_ADD_USERS),
-    // editCustomer: containsWorkspacePermission(SystemPermissionEnum.CAN_EDIT_WORKSPACE),
+    editWorkspace: containsWorkspacePermission(SystemPermissionEnum.CAN_EDIT_WORKSPACE),
     editUser: or(isSelf, isSuperAdmin),
 
     // debugMutation: isLocal,
@@ -70,12 +71,13 @@ const authShield = shield({
     createCTA: containsWorkspacePermission(SystemPermissionEnum.CAN_BUILD_DIALOGUE),
     copyDialogue: isSuperAdmin,
     createDialogue: containsWorkspacePermission(SystemPermissionEnum.CAN_BUILD_DIALOGUE),
+    editDialogue: containsWorkspacePermission(SystemPermissionEnum.CAN_EDIT_DIALOGUE),
     deleteDialogue: containsWorkspacePermission(SystemPermissionEnum.CAN_DELETE_DIALOGUE),
 
     // // Workspace-trigger specific settings
-    // deleteTrigger: containsWorkspacePermission(SystemPermissionEnum.CAN_DELETE_TRIGGERS),
-    // editTrigger: containsWorkspacePermission(SystemPermissionEnum.CAN_CREATE_TRIGGERS),
-    // createTrigger: containsWorkspacePermission(SystemPermissionEnum.CAN_CREATE_TRIGGERS),
+    deleteTrigger: containsWorkspacePermission(SystemPermissionEnum.CAN_DELETE_TRIGGERS),
+    editTrigger: containsWorkspacePermission(SystemPermissionEnum.CAN_CREATE_TRIGGERS),
+    createTrigger: containsWorkspacePermission(SystemPermissionEnum.CAN_CREATE_TRIGGERS),
   },
 }, { fallbackRule: allow, allowExternalErrors: true });
 

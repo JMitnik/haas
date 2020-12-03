@@ -1,3 +1,5 @@
+/* eslint-disable radix */
+import * as lodash from 'lodash';
 import * as qs from 'qs';
 import { debounce } from 'lodash';
 import { useLazyQuery } from '@apollo/react-hooks';
@@ -134,6 +136,50 @@ const InteractionsOverview = () => {
     fetchPolicy: 'cache-and-network',
   });
 
+  const handleExportCSV = (sessions: Array<Session> | undefined, customerSlug: string, dialogueSlug: string) => {
+    if (!sessions) return;
+    const mappedSessions = sessions.map((session) => {
+      const { createdAt, nodeEntries } = session;
+      const mappedNodeEntries = nodeEntries.map((entry, index) => {
+        const { relatedNode, value } = entry;
+        const entryAnswer = value?.choiceNodeEntry
+        || value?.linkNodeEntry
+        || value?.registrationNodeEntry
+        || value?.sliderNodeEntry
+        || value?.textboxNodeEntry;
+        return { [`depth${index}-title`]: relatedNode?.title, [`depth${index}-entry`]: entryAnswer };
+      });
+      const mergedNodeEntries = lodash.reduce(mappedNodeEntries, (prev, entry) => ({ ...prev, ...entry }), {});
+      const date = new Date(parseInt(createdAt));
+      const result = { timestamp: date.toISOString() };
+      const mergedResult = lodash.assign(result, mergedNodeEntries);
+      return mergedResult;
+    });
+
+    const biggestSession = lodash.maxBy(sessions, (session) => session.paths);
+    const headers = Array.from(Array(biggestSession?.paths)).map((entry: any, index) => [`depth${index}-title`, `depth${index}-entry`]);
+    const flattenedHeader = ['timestamp', ...lodash.flatten(headers)];
+
+    const csv = Papa.unparse(mappedSessions, { columns: flattenedHeader });
+    const csvData = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const csvUrl = window.URL.createObjectURL(csvData);
+    const tempLink = document.createElement('a');
+    const currDate = new Date().getTime();
+
+    tempLink.href = csvUrl;
+    tempLink.setAttribute('download', `${currDate}-${customerSlug}-${dialogueSlug}.csv`);
+    tempLink.click();
+    tempLink.remove();
+  };
+
+  const [fetchCSVData, { loading: csvLoading }] = useLazyQuery<CustomerSessionConnection>(getDialogueSessionConnectionQuery, {
+    fetchPolicy: 'cache-and-network',
+    onCompleted: (csvData: any) => {
+      const sessions = csvData?.customer?.dialogue?.sessionConnection?.sessions;
+      handleExportCSV(sessions, customerSlug, dialogueSlug);
+    },
+  });
+
   const location = useLocation();
 
   const [paginationProps, setPaginationProps] = useState<TableProps>({
@@ -173,20 +219,6 @@ const InteractionsOverview = () => {
     setPaginationProps((prevValues) => ({ ...prevValues, activeStartDate: startDate, activeEndDate: endDate, pageIndex: 0 }));
   }, 250), []);
 
-  // TODO: Make this into a custom hook / utility function
-  const handleExportCSV = (): void => {
-    const csv = Papa.unparse(sessions);
-    const csvData = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const csvUrl = window.URL.createObjectURL(csvData);
-    const tempLink = document.createElement('a');
-    const currDate = new Date().getTime();
-
-    tempLink.href = csvUrl;
-    tempLink.setAttribute('download', `${currDate}-${customerSlug}-${dialogueSlug}.csv`);
-    tempLink.click();
-    tempLink.remove();
-  };
-
   const { t } = useTranslation();
 
   const pageCount = data?.customer?.dialogue?.sessionConnection?.pageInfo.nrPages || 1;
@@ -201,8 +233,11 @@ const InteractionsOverview = () => {
 
       <Flex mb={4} alignItems="center" justifyContent="space-between">
         <Button
-          onClick={handleExportCSV}
+          onClick={() => fetchCSVData({
+            variables: { dialogueSlug, customerSlug },
+          })}
           leftIcon={Download}
+          isDisabled={csvLoading}
           size="sm"
         >
           <Span fontWeight="bold">{t('export_to_csv')}</Span>

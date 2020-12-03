@@ -3,7 +3,7 @@ import { useMutation } from '@apollo/react-hooks';
 import { useParams } from 'react-router';
 import { useToast } from '@chakra-ui/core';
 import { useTranslation } from 'react-i18next';
-import React from 'react';
+import React, { useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
 
 import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
@@ -59,6 +59,7 @@ const QuestionEntryItem = ({ depth,
   const { dialogueSlug } = useParams<{ dialogueSlug: string }>();
   const { t } = useTranslation();
   const toast = useToast();
+  const questionRef = useRef<HTMLDivElement | null>(null);
 
   const [deleteQuestion] = useMutation(deleteQuestionMutation, {
     variables: {
@@ -100,8 +101,19 @@ const QuestionEntryItem = ({ depth,
     ? { label: question.type, value: 'CHOICE' }
     : { label: 'Slider', value: 'SLIDER' };
 
+  const handleScroll = () => {
+    questionRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   return (
-    <Flex data-cy="QuestionEntry" position="relative" justifyContent="center" alignItems="center" flexGrow={1}>
+    <Flex
+      ref={questionRef}
+      data-cy="QuestionEntry"
+      position="relative"
+      justifyContent="center"
+      alignItems="center"
+      flexGrow={1}
+    >
       {depth > 1 && (
         <ConditionLabel activeCTA={activeQuestion} id={question.id} condition={condition} />
       )}
@@ -149,6 +161,7 @@ const QuestionEntryItem = ({ depth,
               overrideLeaf={question.overrideLeaf}
               type={activeType}
               onActiveQuestionChange={onActiveQuestionChange}
+              onScroll={handleScroll}
             />
           )}
 

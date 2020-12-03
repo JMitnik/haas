@@ -1,17 +1,8 @@
 # Prisma Migrate lockfile v1
 
-20200920204706-reinit
-20200920204820-test
-20200920204834-test2
-20200920204850-test3
-20200920204900-test4
-20200924165905-added-datetime
-20200928104416-add-share-node-type
-20200928164443-added-share-node-type
-20200928173755-added-question-node
-20200928175201-yea
-20201010194607-added-nodetype-source
-20201010214422-add-fake-data-to-dialogue
-20201021104715-add-question-of-trigger-model
-20201102235202-add-property
-20201106124452-added-createdat-triggercondition
+20201202120111-reset2
+20201202120951-adjust-range-to-optional
+20201202121647-made-slide-multiple
+20201203145348-explicit-key
+20201203151120-markers-to-float
+20201203153504-change-id

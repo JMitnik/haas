@@ -1,4 +1,5 @@
-import { Dialogue, Link, NodeType, QuestionCondition, QuestionNode, QuestionNodeCreateInput, QuestionNodeUpdateInput, Share } from '@prisma/client';
+import { Dialogue, Link, NodeType, QuestionCondition, QuestionNode, QuestionNodeCreateInput } from '@prisma/client';
+import { NexusGenInputs } from '../../generated/nexus';
 import EdgeService from '../edge/EdgeService';
 import prisma from '../../config/prisma';
 
@@ -39,17 +40,6 @@ interface LeafNodeProps {
   nodeId?: string;
   type?: string;
   title: string;
-}
-
-interface QuestionProps {
-  id: string;
-  title: string;
-  isRoot: boolean;
-  isLeaf: boolean;
-  type: NodeType;
-  overrideLeaf: LeafNodeProps;
-  options: Array<QuestionOptionProps>;
-  children: Array<EdgeChildProps>;
 }
 
 interface LinkGenericInputProps {
@@ -450,7 +440,7 @@ class NodeService {
     type: NodeType,
     overrideLeafId: string,
     edgeId: string,
-    options: Array<QuestionOptionProps>,
+    options: QuestionOptionProps[],
     edgeCondition: {
       id: number | null,
       conditionType: string,
@@ -458,6 +448,7 @@ class NodeService {
       renderMax: number | null,
       matchValue: string | null
     },
+    sliderNode: NexusGenInputs['SliderNodeInputType'],
   ) => {
     const activeQuestion = await prisma.questionNode.findOne({ where: { id: questionId },
       include: {
@@ -495,6 +486,7 @@ class NodeService {
     } catch (e) {
       console.log('Something went wrong removing options: ', e);
     }
+
     try {
       if (dbEdgeCondition) {
         await NodeService.updateEdge(dbEdgeCondition, edgeCondition);
@@ -506,7 +498,8 @@ class NodeService {
     }
 
     const updatedOptionIds = await NodeService.updateQuestionOptions(options);
-    return leaf ? prisma.questionNode.update({
+
+    const updatedNode = leaf ? await prisma.questionNode.update({
       where: { id: questionId },
       data: {
         title,
@@ -516,7 +509,7 @@ class NodeService {
           connect: updatedOptionIds,
         },
       },
-    }) : prisma.questionNode.update({
+    }) : await prisma.questionNode.update({
       where: { id: questionId },
       data: {
         title,
@@ -526,6 +519,47 @@ class NodeService {
         },
       },
     });
+
+    if (type === NodeType.SLIDER) {
+      if (updatedNode.sliderNodeId) {
+        await prisma.sliderNode.update({
+          where: { id: updatedNode.sliderNodeId },
+          data: {
+            markers: {
+              update: sliderNode?.markers?.map((marker) => ({
+                where: { id: marker?.id || undefined },
+                data: {
+                  label: marker.label,
+                  subLabel: marker.subLabel,
+                },
+              })),
+            },
+          },
+        });
+      } else {
+        await prisma.sliderNode.create({
+          data: {
+            QuestionNode: {
+              connect: { id: questionId },
+            },
+            markers: {
+              create: sliderNode?.markers?.map((marker) => ({
+                label: marker.label || '',
+                subLabel: marker.subLabel || '',
+                range: {
+                  create: {
+                    start: marker?.range?.start || undefined,
+                    end: marker?.range?.end || undefined,
+                  },
+                },
+              })),
+            },
+          },
+        });
+      }
+    }
+
+    return updatedNode;
   };
 
   static updateQuestionOptions = async (options: Array<QuestionOptionProps>) => Promise.all(
@@ -569,6 +603,7 @@ class NodeService {
         },
       },
     );
+
     return { id: condition.id };
   };
 

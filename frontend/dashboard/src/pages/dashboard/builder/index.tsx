@@ -52,13 +52,14 @@ const mapQuestionsInputData = (nodes: Array<QuestionEntryProps>) => {
   let questions = nodes?.filter((node) => !node.isLeaf);
   questions = orderBy(questions, (question) => question.creationDate, ['asc']);
 
-  return questions?.map(({ id, title, isRoot, isLeaf, type, overrideLeaf, options, children, updatedAt }) => ({
+  return questions?.map(({ id, title, isRoot, isLeaf, type, overrideLeaf, options, children, updatedAt, sliderNode }) => ({
     id,
     updatedAt,
     title,
     isRoot,
     isLeaf,
     type: initializeQuestionType(type),
+    sliderNode,
     icon: type === 'CHOICE' ? MultiChoiceBuilderIcon : HaasNodeIcon,
     overrideLeaf: !overrideLeaf
       ? undefined

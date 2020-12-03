@@ -26,14 +26,14 @@ const routerNavigationAnimation: Variants = {
   },
 };
 
-const DialogueTreeLayout = ({ children, node }: { children: ReactNode, node:TreeNodeProps }) => {
+const DialogueTreeLayout = ({ children, node, isAtLeaf }: { children: ReactNode, node: TreeNodeProps, isAtLeaf: boolean }) => {
   const history = useHistory();
-  const store = useDialogueTree();
+  const { store } = useDialogueTree();
 
   return (
     <DialogueTreeContainer>
       {/* TODO: Enable consistent animation */}
-      {!node.isRoot && (
+      {!node.isRoot && !node.isPostLeaf && !isAtLeaf && (
         <GoBackContainer variants={routerNavigationAnimation} animate="animate" initial="initial" exit="exit">
           <GoBackButton onClick={() => history.goBack()}>
             <ChevronLeft />

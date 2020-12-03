@@ -1,5 +1,5 @@
 import styled, { css } from 'styled-components/macro';
-import { FlexboxProps, borderRadius, BorderProps,
+import { FlexboxProps, borderRadius, border, BorderProps,
   flexbox, width, WidthProps, color, ColorProps, space, SpaceProps, LayoutProps, layout, FlexProps, flex, PositionProps, position, grid, GridProps } from 'styled-system';
 
 export interface GenericProps extends FlexboxProps, FlexProps, WidthProps, BorderProps, ColorProps, SpaceProps, LayoutProps, PositionProps, GridProps {
@@ -21,6 +21,7 @@ export const Div = styled.div<GenericProps>`
     ${flexbox};
     ${flex};
     ${width};
+    ${border}
     ${borderRadius}
     ${color};
     ${space};

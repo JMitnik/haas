@@ -61,10 +61,10 @@ const schema = yup.object().shape({
       then: yup.array().min(2).required(),
       otherwise: yup.array().notRequired(),
     }),
-    lowThreshold: yup.string().notRequired().when('conditionType', {
+    lowThreshold: yup.number().notRequired().when('conditionType', {
       is: (condition: string) => condition === TriggerConditionType.LOW_THRESHOLD,
-      then: yup.string().required(),
-      otherwise: yup.string().notRequired().nullable(),
+      then: yup.number().required(),
+      otherwise: yup.number().notRequired().nullable(),
     }),
     highThreshold: yup.number().when('conditionType', {
       is: (conditionType: string) => conditionType === TriggerConditionType.HIGH_THRESHOLD,
@@ -130,9 +130,8 @@ const EditTriggerView = () => {
 };
 
 const EditTriggerForm = ({ trigger }: {trigger: any}) => {
-  const { triggerId } = useParams<{triggerId: string, customerSlug: string }>();
+  const { triggerId, customerSlug } = useParams<{triggerId: string, customerSlug: string }>();
   const history = useHistory();
-  const { customerSlug } = useParams();
   const { t } = useTranslation();
   const toast = useToast();
 
@@ -156,19 +155,22 @@ const EditTriggerForm = ({ trigger }: {trigger: any}) => {
         id: condition.id,
         questionId: { label: condition.question?.title, value: condition.question?.id },
         conditionType: getConditionType(condition.type),
-        lowThreshold: condition?.minValue ? condition?.minValue / 10 : null,
-        highThreshold: condition?.maxValue ? condition.maxValue / 10 : null,
+        lowThreshold: condition?.minValue ? condition?.minValue / 10 : 4,
+        highThreshold: condition?.maxValue ? condition.maxValue / 10 : 6,
         range: [condition?.minValue
           ? condition?.minValue / 10
-          : null, condition?.maxValue ? condition.maxValue / 10 : null],
+          : 4, condition?.maxValue ? condition.maxValue / 10 : 6],
         matchText: condition?.textValue || null,
       })),
       medium: trigger.medium,
-      recipients: trigger.recipients?.map((recipient: any) => ({ label: `${recipient?.lastName}, ${recipient?.firstName} - E: ${recipient?.email} - P: ${recipient?.phone}`,
-        value: recipient?.id })),
+      recipients: trigger.recipients?.map((recipient: any) => ({
+        label: `${recipient?.lastName}, ${recipient?.firstName}: E: ${recipient?.email} - P: ${recipient?.phone}`,
+        value: recipient?.id,
+      })),
       type: trigger.type,
     },
     mode: 'all',
+    shouldUnregister: false,
   });
 
   const [editTrigger, { loading: isLoading, error: serverError }] = useMutation(editTriggerMutation, {
@@ -200,6 +202,7 @@ const EditTriggerForm = ({ trigger }: {trigger: any}) => {
     if (conditionType === TriggerConditionType.INNER_RANGE || conditionType === TriggerConditionType.OUTER_RANGE) {
       return range.length === 2 && cb ? cb(range) * 10 : null;
     }
+
     const result = value ? value * 10 : null;
     return result;
   };
@@ -224,6 +227,7 @@ const EditTriggerForm = ({ trigger }: {trigger: any}) => {
 
     editTrigger({
       variables: {
+        customerSlug,
         triggerId,
         trigger,
         recipients,

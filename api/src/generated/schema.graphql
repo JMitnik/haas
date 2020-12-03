@@ -2,6 +2,14 @@
 ### Do not make changes to this file directly
 
 
+"""Append new data to an uploaded session"""
+input AppendToInteractionInput {
+  data: NodeEntryDataInput
+  edgeId: String
+  nodeId: String
+  sessionId: ID
+}
+
 """Input type for a choice node"""
 input ChoiceNodeEntryInput {
   value: String
@@ -219,6 +227,7 @@ input EditUserInput {
 
 """Edit a workspace"""
 input EditWorkspaceInput {
+  customerSlug: String!
   id: ID!
   logo: String
   name: String!
@@ -288,6 +297,7 @@ type LoginOutput {
 }
 
 type Mutation {
+  appendToInteraction(input: AppendToInteractionInput): Session!
   assignTags(dialogueId: String, tags: TagsInputObjectType): Dialogue!
   copyDialogue(input: CreateDialogueInputType): Dialogue!
 
@@ -307,10 +317,10 @@ type Mutation {
   deleteDialogue(input: DeleteDialogueInputType): Dialogue!
   deleteQuestion(input: DeleteNodeInputType): QuestionNode!
   deleteTag(tagId: String): Tag!
-  deleteTrigger(id: String): TriggerType
+  deleteTrigger(customerSlug: String, id: String): TriggerType
   deleteUser(input: DeleteUserInput): DeleteUserOutput!
   editDialogue(customerSlug: String, description: String, dialogueSlug: String, isWithoutGenData: Boolean, publicTitle: String, tags: TagsInputObjectType, title: String): Dialogue!
-  editTrigger(recipients: RecipientsInputType, trigger: TriggerInputType, triggerId: String): TriggerType!
+  editTrigger(customerSlug: String, recipients: RecipientsInputType, trigger: TriggerInputType, triggerId: String): TriggerType!
   editUser(input: EditUserInput, userId: String): UserType!
   editWorkspace(input: EditWorkspaceInput): Customer!
 
@@ -482,6 +492,9 @@ type QuestionNode {
   questionDialogue: Dialogue
   questionDialogueId: String
   share: ShareNodeType
+
+  """Slidernode resolver"""
+  sliderNode: SliderNodeType
   title: String!
   type: QuestionNodeTypeEnum!
   updatedAt: String
@@ -576,7 +589,7 @@ type RoleType {
 }
 
 type Session {
-  createdAt: String!
+  createdAt: Date!
   dialogueId: String!
   id: ID!
   nodeEntries: [NodeEntry!]!
@@ -620,9 +633,49 @@ type ShareNodeType {
   url: String!
 }
 
+input SlideNodeMarkerInput {
+  id: ID
+  label: String!
+  range: SliderNodeRangeInputType
+  subLabel: String!
+}
+
 """Input type for a slider node"""
 input SliderNodeEntryInput {
   value: Int
+}
+
+input SliderNodeInputType {
+  id: ID
+  markers: [SlideNodeMarkerInput!]
+}
+
+type SliderNodeMarkerType {
+  id: ID!
+  label: String!
+  range: SliderNodeRangeType
+  subLabel: String!
+}
+
+input SliderNodeRangeInputType {
+  end: Float
+  start: Float
+}
+
+type SliderNodeRangeType {
+  end: Float
+  id: ID!
+  start: Float
+}
+
+type SliderNodeType {
+  id: ID
+  markers: [SliderNodeMarkerType!]
+}
+
+"""Details regarding interaction with social node"""
+input SocialNodeEntryInput {
+  visitedLink: String
 }
 
 enum SystemPermission {
@@ -751,6 +804,7 @@ input UpdateQuestionNodeInputType {
   id: ID
   optionEntries: OptionsInputType
   overrideLeafId: ID
+  sliderNode: SliderNodeInputType
   title: String
   type: String
 }

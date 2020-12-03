@@ -1,0 +1,448 @@
+datasource postgresql {
+  provider = "postgresql"
+  url = "***"
+}
+
+// binaryTargets = ["debian-openssl-1.1.x"]
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["transactionApi"]
+  output          = "./node_modules/@prisma/client"
+}
+
+model ColourSettings {
+  dark             String?
+  darkest          String?
+  error            String?
+  id               Int               @id @default(autoincrement())
+  light            String?
+  lightest         String?
+  muted            String?
+  normal           String?
+  primary          String
+  primaryAlt       String?
+  secondary        String?
+  success          String?
+  tertiary         String?
+  text             String?
+  warning          String?
+  customerSettings CustomerSettings?
+}
+
+model FontSettings {
+  body             String?
+  fontTitle        String?
+  id               Int               @id @default(autoincrement())
+  settingTitle     String?
+  special          String?
+  customerSettings CustomerSettings?
+}
+
+model CustomerSettings {
+  id               Int             @id @default(autoincrement())
+  logoUrl          String?
+  colourSettingsId Int?
+  colourSettings   ColourSettings? @relation(fields: [colourSettingsId], references: [id])
+  fontSettingsId   Int?
+  fontSettings     FontSettings?   @relation(fields: [fontSettingsId], references: [id])
+  customerId       String?         @unique
+  customer         Customer?       @relation(fields: [customerId], references: [id])
+}
+
+model Customer {
+  id          String            @id @default(cuid())
+  slug        String            @unique
+  name        String
+  settings    CustomerSettings?
+  dialogues   Dialogue[]
+  users       UserOfCustomer[]
+  roles       Role[]
+  permissions Permission[]
+  triggers    Trigger[]
+  tags        Tag[]
+}
+
+enum TagEnum {
+  DEFAULT
+  AGENT
+  LOCATION
+}
+
+model Tag {
+  id         String     @id @default(cuid())
+  type       TagEnum    @default(value: DEFAULT)
+  name       String
+  isTagOf    Dialogue[] @relation(references: [id])
+  customer   Customer   @relation(fields: [customerId], references: [id])
+  customerId String
+}
+
+model Dialogue {
+  id               String         @id @default(cuid())
+  title            String
+  slug             String
+  description      String
+  creationDate     DateTime       @default(now())
+  updatedAt        DateTime?      @updatedAt
+  publicTitle      String?
+  customerId       String
+  customer         Customer       @relation(fields: [customerId], references: [id])
+  edges            Edge[]
+  questions        QuestionNode[]
+  sessions         Session[]
+  tags             Tag[]
+  isOnline         Boolean        @default(value: false)
+  isWithoutGenData Boolean        @default(value: false)
+
+  wasGeneratedWithGenData Boolean @default(value: false)
+  @@unique([slug, customerId])
+}
+
+enum NodeType {
+  GENERIC
+  SLIDER
+  FORM
+  CHOICE
+  REGISTRATION
+  TEXTBOX
+  LINK
+  SHARE
+}
+
+model SliderNodeRange {
+  id        Int          @id @default(autoincrement())
+  start     Int?
+  end       Int?
+}
+
+model SliderNodeMarker {
+  id        Int          @id @default(autoincrement())
+  range     SliderNodeRange
+  label     String
+  subLabel  String
+}
+
+model SliderNode {
+  id        Int          @id @default(autoincrement())
+  markers SliderNodeMarker[]
+}
+
+model QuestionNode {
+  id           String           @id @default(cuid())
+  creationDate DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+  isLeaf       Boolean          @default(false)
+  isRoot       Boolean          @default(false)
+  title        String
+  type         NodeType         @default(value: GENERIC)
+  options      QuestionOption[]
+  children     Edge[]
+
+  overrideLeafId   String?
+  overrideLeaf     QuestionNode?  @relation("QNodeToOverrideLeaf", fields: [overrideLeafId], references: [id])
+  isOverrideLeafOf QuestionNode[] @relation("QNodeToOverrideLeaf")
+
+  questionDialogue   Dialogue? @relation(fields: [questionDialogueId], references: [id])
+  questionDialogueId String?
+
+  isChildNodeOf              Edge[]      @relation("Edge_childNodeToQuestionNode")
+  isParentNodeOf             Edge[]      @relation("Edge_parentNodeToQuestionNode")
+  isRelatedNodeOfNodeEntries NodeEntry[]
+
+  edgeId String?
+  Edge   Edge?   @relation("EdgeChildrenRelation", fields: [edgeId], references: [id])
+
+  QuestionOption QuestionOption[] @relation("QuestionNodeOptions")
+  triggers       Trigger[]
+
+  // Node-types
+  share      Share?
+  sliderNode SliderNode?
+
+  links             Link[]
+  QuestionOfTrigger QuestionOfTrigger[]
+}
+
+enum LinkTypeEnum {
+  SOCIAL
+  API
+  FACEBOOK
+  LINKEDIN
+  WHATSAPP
+  INSTAGRAM
+  TWITTER
+}
+
+model Share {
+  id        String    @id @default(cuid())
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+
+  url     String
+  title   String
+  tooltip String?
+
+  questionNode   QuestionNode? @relation(fields: [questionNodeId], references: [id])
+  questionNodeId String?
+}
+
+model Link {
+  id              String        @id @default(cuid())
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime?     @updatedAt
+  title           String?
+  type            LinkTypeEnum
+  url             String
+  iconUrl         String?
+  backgroundColor String?
+  questionNode    QuestionNode? @relation(fields: [questionNodeId], references: [id])
+  questionNodeId  String?
+}
+
+model Edge {
+  childNodeId                String
+  createdAt                  DateTime            @default(now())
+  updatedAt                  DateTime            @updatedAt
+  id                         String              @id @default(cuid())
+  parentNodeId               String
+  dialogueId                 String?
+  conditions                 QuestionCondition[]
+  isEdgeOf                   QuestionNode[]      @relation("EdgeChildrenRelation")
+  childNode                  QuestionNode        @relation("Edge_childNodeToQuestionNode", fields: [childNodeId], references: [id])
+  parentNode                 QuestionNode        @relation("Edge_parentNodeToQuestionNode", fields: [parentNodeId], references: [id])
+  dialogue                   Dialogue?           @relation(fields: [dialogueId], references: [id])
+  isRelatedNodeOfNodeEntries NodeEntry[]
+  questionNodeId             String?
+  QuestionNode               QuestionNode?       @relation(fields: [questionNodeId], references: [id])
+}
+
+model QuestionCondition {
+  conditionType String
+  id            Int     @id @default(autoincrement())
+  matchValue    String?
+  renderMax     Int?
+  renderMin     Int?
+  edgeId        String?
+  Edge          Edge?   @relation(fields: [edgeId], references: [id])
+}
+
+model QuestionOption {
+  id             Int           @id @default(autoincrement())
+  publicValue    String?
+  value          String
+  questionId     String?
+  question       QuestionNode? @relation("QuestionNodeOptions", fields: [questionId], references: [id])
+  questionNodeId String?
+  QuestionNode   QuestionNode? @relation(fields: [questionNodeId], references: [id])
+}
+
+model Session {
+  createdAt   DateTime    @default(now())
+  id          String      @id @default(cuid())
+  dialogueId  String
+  dialogue    Dialogue    @relation(fields: [dialogueId], references: [id])
+  nodeEntries NodeEntry[]
+}
+
+// Node-entry types
+enum InputSource {
+  CLIENT
+  INIT_GENERATED
+}
+
+model NodeEntry {
+  id            String        @id @default(cuid())
+  creationDate  DateTime      @default(now())
+  depth         Int?
+  relatedEdgeId String?
+  relatedNodeId String?
+  sessionId     String?
+  session       Session?      @relation(fields: [sessionId], references: [id])
+  relatedNode   QuestionNode? @relation(fields: [relatedNodeId], references: [id])
+  relatedEdge   Edge?         @relation(fields: [relatedEdgeId], references: [id])
+  inputSource   InputSource   @default(value: CLIENT)
+
+  // Entry types
+  sliderNodeEntry       SliderNodeEntry?
+  choiceNodeEntry       ChoiceNodeEntry?
+  textboxNodeEntry      TextboxNodeEntry?
+  registrationNodeEntry RegistrationNodeEntry?
+  linkNodeEntry         LinkNodeEntry?
+}
+
+model LinkNodeEntry {
+  id          Int       @id @default(autoincrement())
+  value       Json?
+  nodeEntryId String
+  nodeEntry   NodeEntry @relation(references: [id], fields: [nodeEntryId])
+}
+
+model SliderNodeEntry {
+  id          Int       @id @default(autoincrement())
+  value       Int?
+  nodeEntryId String
+  nodeEntry   NodeEntry @relation(references: [id], fields: [nodeEntryId])
+}
+
+model ChoiceNodeEntry {
+  id          Int       @id @default(autoincrement())
+  value       String?
+  nodeEntryId String
+  nodeEntry   NodeEntry @relation(references: [id], fields: [nodeEntryId])
+}
+
+model TextboxNodeEntry {
+  id          Int       @id @default(autoincrement())
+  value       String?
+  nodeEntryId String
+  nodeEntry   NodeEntry @relation(references: [id], fields: [nodeEntryId])
+}
+
+model RegistrationNodeEntry {
+  id          Int       @id @default(autoincrement())
+  value       Json?
+  nodeEntryId String
+  nodeEntry   NodeEntry @relation(references: [id], fields: [nodeEntryId])
+}
+
+// Permissions
+model Permission {
+  id          String    @id @default(cuid())
+  name        String
+  description String?
+  Customer    Customer? @relation(fields: [customerId], references: [id])
+  customerId  String?
+}
+
+enum SystemPermissionEnum {
+  CAN_ACCESS_ADMIN_PANEL
+  CAN_EDIT_DIALOGUE
+  CAN_BUILD_DIALOGUE
+  CAN_VIEW_DIALOGUE
+  CAN_DELETE_DIALOGUE
+  CAN_VIEW_DIALOGUE_ANALYTICS
+  CAN_VIEW_USERS
+  CAN_ADD_USERS
+  CAN_DELETE_USERS
+  CAN_EDIT_USERS
+  CAN_CREATE_TRIGGERS
+  CAN_DELETE_TRIGGERS
+  CAN_DELETE_WORKSPACE
+  CAN_EDIT_WORKSPACE
+}
+
+enum RoleTypeEnum {
+  ADMIN
+  MANAGER
+  USER
+  GUEST
+  CUSTOM
+}
+
+model Role {
+  id          String                 @id @default(cuid())
+  name        String
+  type        RoleTypeEnum           @default(value: USER)
+  isPrivate   Boolean                @default(false)
+  permissions SystemPermissionEnum[]
+  users       UserOfCustomer[]
+  Customer    Customer?              @relation(fields: [customerId], references: [id])
+  customerId  String?
+
+  @@unique([id, name])
+}
+
+model User {
+  id                 String                 @id @default(cuid())
+  createdAt          DateTime               @default(now())
+  updatedAt          DateTime?              @updatedAt
+  email              String                 @unique
+  password           String?
+  phone              String?
+  firstName          String?
+  lastName           String?
+  triggers           Trigger[]
+  customers          UserOfCustomer[]
+  globalPermissions  SystemPermissionEnum[]
+  loginToken         String?
+  loginTokenExpiry   DateTime?
+  refreshToken       String?
+  refreshTokenExpiry DateTime?
+  lastActivity       DateTime?
+}
+
+model UserOfCustomer {
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id])
+
+  roleId String
+  role   Role   @relation(fields: [roleId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@id([userId, customerId])
+}
+
+enum TriggerEnum {
+  QUESTION
+  SCHEDULED
+}
+
+enum TriggerMedium {
+  EMAIL
+  PHONE
+  BOTH
+}
+
+enum TriggerConditionEnum {
+  LOW_THRESHOLD
+  HIGH_THRESHOLD
+  INNER_RANGE
+  OUTER_RANGE
+  TEXT_MATCH
+}
+
+model TriggerCondition {
+  id                Int                  @id @default(autoincrement())
+  createdAt         DateTime?            @default(now())
+  type              TriggerConditionEnum @default(value: LOW_THRESHOLD)
+  minValue          Int?
+  maxValue          Int?
+  textValue         String?
+  trigger           Trigger              @relation(fields: [triggerId], references: [id])
+  triggerId         String
+  QuestionOfTrigger QuestionOfTrigger[]
+}
+
+model Trigger {
+  id                String              @id @default(cuid())
+  lastSent          DateTime?
+  name              String
+  type              TriggerEnum         @default(value: QUESTION)
+  medium            TriggerMedium
+  conditions        TriggerCondition[]
+  relatedNodeId     String?
+  relatedNode       QuestionNode?       @relation(fields: [relatedNodeId], references: [id])
+  recipients        User[]
+  customer          Customer?           @relation(fields: [customerId], references: [id])
+  customerId        String?
+  QuestionOfTrigger QuestionOfTrigger[]
+}
+
+model QuestionOfTrigger {
+  questionId String
+  question   QuestionNode @relation(fields: [questionId], references: [id])
+
+  triggerId String
+  trigger   Trigger @relation(fields: [triggerId], references: [id])
+
+  triggerConditionId Int
+  triggerCondition   TriggerCondition @relation(fields: [triggerConditionId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@id([questionId, triggerId])
+}

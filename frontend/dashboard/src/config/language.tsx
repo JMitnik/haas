@@ -1,6 +1,22 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    label: {
+      en: 'Label',
+      de: 'Etikette',
+    },
+    sub_label: {
+      en: 'Helper label',
+      de: 'Helferetikett',
+    },
+    recipient: {
+      en: 'Recipient',
+      de: 'Empfänger',
+    },
+    condition: {
+      en: 'Condition',
+      de: 'Bedingung',
+    },
     data: {
       en: 'Data',
       de: 'Data',
@@ -77,8 +93,8 @@ const language = {
       en: 'Try again in a second while we take care of the proble.',
       de: 'Versuchen Sie es gleich erneut. Wir kümmern uns um das Problem.',
     },
-    add_user: {
-      en: 'Add user',
+    add_recipient: {
+      en: 'Add recipient',
       de: 'Nutzer hinzufügen',
     },
     tags: {
@@ -675,6 +691,14 @@ const language = {
     },
   },
   dialogue: {
+    markers: {
+      en: 'Markers',
+      de: 'Marker',
+    },
+    markers_helper: {
+      en: 'Markers are points in the slider of particular significance for the end-user. You can edit the relevant texts, or leave them as we defined originally. An additional helper label can be used to help your customer express themselves better.',
+      de: 'Marker sind Punkte in Ihrem Schieberegler, die für den Endbenutzer von besonderer Bedeutung sind. Sie können die relevanten Texte anhand unserer (derzeit vordefinierten) Texte bearbeiten oder sie ursprünglich definiert lassen. Ein zusätzliches Unteretikett kann verwendet werden, damit sich Ihre Kunden besser ausdrücken können.',
+    },
     data_helper: {
       en: 'Your data settings, such as data-sources, will be set here.',
       de: 'Ihre Dateneinstellungen, wie z. B. Datenquellen, werden hier festgelegt',
@@ -782,6 +806,14 @@ const language = {
     empty_option_reminder: {
       en: 'Please fill in at least one option.',
       de: 'Bitte triff mindestens eine Auswahl.',
+    },
+    about_slider: {
+      en: 'About the slider',
+      de: 'Über den Schieberegler',
+    },
+    about_slider_helper: {
+      en: 'Describe the slider markers here.',
+      de: 'Beschreiben Sie hier die Schiebermarker.',
     },
     about_question: {
       en: 'About question',
@@ -1099,6 +1131,22 @@ const language = {
     },
   },
   trigger: {
+    condition_placeholder: {
+      en: 'Start by adding a condition.',
+      de: 'Beginnen Sie mit einer Bedingung hinzugefügt wird.',
+    },
+    sms_placeholder: {
+      en: 'Select one or more recipients to receive the alert notifications.',
+      de: 'Wählen Sie einen oder mehrere Empfänger aus, um die Warnmeldungen zu erhalten.',
+    },
+    select_a_dialogue: {
+      en: 'Select a dialogue',
+      de: 'Wählen Sie einen Dialog',
+    },
+    select_dialogue_placeholder: {
+      en: 'Before we can setup conditions, you should select a dialogue first.',
+      de: 'Bevor wir können Setup Bedingungen, sollten Sie einen Dialog zuerst auswählen.',
+    },
     alert_email: {
       en: 'Send alerts to emai',
       de: 'Senden per E-Mail',

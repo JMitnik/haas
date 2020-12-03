@@ -26,6 +26,7 @@ const TreeModel = types
         type: node.type,
         options: node.options,
         overrideLeaf: node.overrideLeaf?.id,
+        sliderNode: node.sliderNode,
       }));
 
       self.nodes.replace(newNodes);
@@ -70,7 +71,9 @@ const TreeModel = types
      * Extract Node by passing edge
      * @param edgeId
      */
-    getChildNodeByEdge(edgeId: string | undefined): TreeNodeProps {
+    getChildNodeByEdge(edgeId: string | undefined): TreeNodeProps | null {
+      if (!edgeId) return null;
+
       const edge: TreeEdgeProps | null = self.edges.find((edge: TreeEdgeProps) => edge.id === edgeId);
 
       if (edgeId === SpecialEdge.POST_LEAF_EDGE_ID) {
@@ -86,6 +89,15 @@ const TreeModel = types
       }
 
       return edge.childNode;
+    },
+
+    getNodeById(nodeId: string | undefined): TreeNodeProps | null {
+      if (!nodeId) return null;
+
+      const node = self.nodes.find((node) => node.id === nodeId);
+      const leaf = self.leaves.find((node) => node.id === nodeId);
+
+      return node || leaf || null;
     },
 
     /**

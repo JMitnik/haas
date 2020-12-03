@@ -1,4 +1,6 @@
 import Color from 'color';
+import React from 'react';
+import ReactMarkdown from 'react-markdown';
 import styled, { css } from 'styled-components/macro';
 
 import { Div, H2 } from '@haas/ui';
@@ -32,14 +34,77 @@ export const NodeContainer = styled(Div)`
   `}
 `;
 
-export const NodeTitle = styled(H2)`
-  ${({ theme }) => css`
+type NodeTitleSize = 'xs' | 'sm' | 'md' | 'lg';
+
+const NodeTitleWrapper = styled(H2)<{ size: NodeTitleSize }>`
+  white-space: pre-line;
+  text-align: left;
 
   @media (min-width: 601px) {
-    margin-top: 2rem;
+    text-align: center;
   }
   
+  ${({ theme, size }) => css`
+    ${size === 'xs' && css`
+      font-size: 1.1rem;
+    
+      @media (min-width: 601px) {
+        font-size: 1.5rem;
+      }
+    `}
+
+    ${size === 'sm' && css`
+      font-size: 1.3rem;
+    
+      @media (min-width: 601px) {
+        font-size: 1.8rem;
+      }
+    `}
+
+    ${size === 'md' && css`
+      font-size: 1.8rem;
+    
+      @media (min-width: 601px) {
+        font-size: 2rem;
+      }
+    `}
+
+    ${size === 'lg' && css`
+      font-size: 2.5rem;
+    
+      @media (min-width: 601px) {
+        font-size: 2.5rem;
+      }
+    `}
+
+    
   color: ${Color(theme.colors.primary).isDark() ? Color(theme.colors.primary).mix(Color('white'), 0.9).saturate(1).hex()
     : Color(theme.colors.primary).mix(Color('black'), 0.5).saturate(1).hex()};
   `}
 `;
+
+export const NodeTitle = ({ children }: { children: string }) => {
+  const textLength = children.length;
+
+  let fontSize: NodeTitleSize = 'md';
+
+  switch (true) {
+    case textLength < 30:
+      fontSize = 'lg';
+      break;
+    case textLength >= 30 && textLength < 60:
+      fontSize = 'md';
+      break;
+    default:
+      fontSize = 'sm';
+      break;
+  }
+
+  return (
+    <NodeTitleWrapper size={fontSize}>
+      <ReactMarkdown>
+        {children}
+      </ReactMarkdown>
+    </NodeTitleWrapper>
+  );
+};

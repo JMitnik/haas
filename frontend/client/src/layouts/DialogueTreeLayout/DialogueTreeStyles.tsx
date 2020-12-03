@@ -68,6 +68,8 @@ export const DialogueTreeContainer = styled(Div)`
 export const GoBackText = styled.span`
   opacity: 0;
   font-size: 0.8rem;
+  top: 80%;
+  position: relative;
   color: white;
   transition: all .3s cubic-bezier(.55,0,.1,1);
 `;
@@ -81,7 +83,7 @@ export const GoBackContainer = styled(motion.div)`
     @media ${theme.media.mob} {
       top: ${theme.gutter}px;
       left: ${theme.gutter}px;
-      }
+    }
 
     p, span {
       position: absolute;

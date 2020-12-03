@@ -46,7 +46,7 @@ const LoginView = () => {
     },
     onCompleted: () => {
       toast({
-        title: 'Invite has been sent!',
+        title: 'Invite has been sent in case the mail matches!',
         description: 'Check your email for your invitation',
         status: 'success',
         position: 'bottom-right',
@@ -78,7 +78,7 @@ const LoginView = () => {
                 <Form onSubmit={form.handleSubmit(handleRequestInvite)}>
                   <H2 color="gray.800" mb={2}>Log in</H2>
                   <Paragraph fontSize="0.9rem" color="gray.500" mb={4}>
-                    Login using your email address
+                    Login using your registered email address
                   </Paragraph>
                   <ServerError serverError={loginServerError} />
 
