@@ -1,6 +1,8 @@
 import * as UI from '@haas/ui';
 import React from 'react';
 
+import { SliderNodeMarkersProps } from '../../../../models/Tree/SliderNodeMarkersModel';
+
 interface SliderTextProps {
   color: string;
   adaptedColor: string;
