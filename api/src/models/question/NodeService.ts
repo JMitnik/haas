@@ -451,7 +451,7 @@ class NodeService {
     type: NodeType,
     overrideLeafId: string,
     edgeId: string,
-    options: Array<QuestionOptionProps>,
+    options: QuestionOptionProps[],
     edgeCondition: {
       id: number | null,
       conditionType: string,
@@ -459,7 +459,7 @@ class NodeService {
       renderMax: number | null,
       matchValue: string | null
     },
-    sliderNode: NexusGenInputs,
+    sliderNode: NexusGenInputs['SliderNodeInputType'],
   ) => {
     const activeQuestion = await prisma.questionNode.findOne({ where: { id: questionId },
       include: {
@@ -497,6 +497,8 @@ class NodeService {
     } catch (e) {
       console.log('Something went wrong removing options: ', e);
     }
+
+    console.log(dbEdgeCondition);
     try {
       if (dbEdgeCondition) {
         await NodeService.updateEdge(dbEdgeCondition, edgeCondition);
@@ -531,7 +533,7 @@ class NodeService {
         sliderNode: sliderNode ? {
           create: {
             markers: {
-              create: sliderNode.markers?.map((marker) => ({
+              create: sliderNode?.markers?.map((marker) => ({
                 label: marker.label || '',
                 subLabel: marker.subLabel || '',
                 range: {
