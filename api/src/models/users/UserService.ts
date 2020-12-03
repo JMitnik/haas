@@ -146,6 +146,9 @@ class UserService {
       if (userOfCustomer?.user?.lastName?.toLowerCase().includes(searchTerm.toLowerCase())) {
         return true;
       }
+      if (userOfCustomer?.role?.name?.toLowerCase().includes(searchTerm.toLowerCase())) {
+        return true;
+      }
       return false;
     });
 
