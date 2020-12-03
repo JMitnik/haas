@@ -495,6 +495,7 @@ type QuestionNode {
   questionDialogue: Dialogue
   questionDialogueId: String
   share: ShareNodeType
+  sliderNode: SliderNode
   title: String!
   type: QuestionNodeTypeEnum!
   updatedAt: String
@@ -635,6 +636,7 @@ type ShareNodeType {
 
 type SliderNode {
   id: ID
+  markers: [SliderNodeMarker!]!
 }
 
 """Input type for a slider node"""
@@ -645,6 +647,7 @@ input SliderNodeEntryInput {
 type SliderNodeMarker {
   id: ID!
   label: String!
+  range: SliderNodeRange
   subLabel: String!
 }
 

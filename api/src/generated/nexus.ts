@@ -762,6 +762,7 @@ export interface NexusGenFieldTypes {
     questionDialogue: NexusGenRootTypes['Dialogue'] | null; // Dialogue
     questionDialogueId: string | null; // String
     share: NexusGenRootTypes['ShareNodeType'] | null; // ShareNodeType
+    sliderNode: NexusGenRootTypes['SliderNode'] | null; // SliderNode
     title: string; // String!
     type: NexusGenEnums['QuestionNodeTypeEnum']; // QuestionNodeTypeEnum!
     updatedAt: string | null; // String
@@ -820,10 +821,12 @@ export interface NexusGenFieldTypes {
   }
   SliderNode: { // field return type
     id: string | null; // ID
+    markers: NexusGenRootTypes['SliderNodeMarker'][]; // [SliderNodeMarker!]!
   }
   SliderNodeMarker: { // field return type
     id: string; // ID!
     label: string; // String!
+    range: NexusGenRootTypes['SliderNodeRange'] | null; // SliderNodeRange
     subLabel: string; // String!
   }
   SliderNodeRange: { // field return type

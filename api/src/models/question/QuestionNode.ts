@@ -1,4 +1,4 @@
-import { PrismaClient, QuestionNode, QuestionNodeUpdateInput, Share } from '@prisma/client';
+import { PrismaClient, QuestionNodeUpdateInput } from '@prisma/client';
 import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
 
 // eslint-disable-next-line import/no-cycle
@@ -71,38 +71,38 @@ export const ShareNodeInputType = inputObjectType({
   },
 });
 
-export const SliderNodeRange = objectType({
+export const SliderNodeRangeType = objectType({
   name: 'SliderNodeRange',
 
   definition(t) {
     t.id('id');
     t.float('start', { nullable: true });
     t.float('end', { nullable: true });
-  }
-})
+  },
+});
 
-export const SliderNodeMarker = objectType({
+export const SliderNodeMarkerType = objectType({
   name: 'SliderNodeMarker',
 
   definition(t) {
     t.id('id');
     t.string('label');
     t.string('subLabel');
-    // t.field('range', { type: SliderNodeRange, nullable: true });
-  }
-})
+    t.field('range', { type: SliderNodeRangeType, nullable: true });
+  },
+});
 
-export const SliderNode = objectType({
+export const SliderNodeType = objectType({
   name: 'SliderNode',
   definition(t) {
     t.id('id', { nullable: true });
-    // t.list.field('markers', { type: SliderNodeMarker, nullable: });
-  }
-})
+    t.list.field('markers', { type: SliderNodeMarkerType });
+  },
+});
 
 export const QuestionNodeType = objectType({
   name: 'QuestionNode',
-  
+
   definition(t) {
     t.id('id');
     t.boolean('isLeaf');
@@ -118,12 +118,13 @@ export const QuestionNodeType = objectType({
     });
 
     // Node-types
-    // t.field('sliderNode', { type: SliderNode, nullable: true, resolve: (parent) => parent.sliderNode });
+    // TODO: Remove `any` once we figure out how to not make prisma the backing-type
+    t.field('sliderNode', { type: SliderNodeType, nullable: true, resolve: (parent: any) => parent.sliderNode });
 
     t.field('share', {
       type: ShareNodeType,
       nullable: true,
-      async resolve(parent, args, ctx) {
+      async resolve(parent, ctx) {
         if (!parent.isLeaf || !parent.id) {
           return null;
         }
@@ -157,7 +158,7 @@ export const QuestionNodeType = objectType({
 
     t.list.field('links', {
       type: LinkType,
-      async resolve(parent, args, ctx) {
+      async resolve(parent, ctx) {
         if (parent.isLeaf) {
           const links = await ctx.prisma.link.findMany({
             where: {
@@ -176,7 +177,7 @@ export const QuestionNodeType = objectType({
       type: DialogueType,
       nullable: true,
 
-      resolve(parent, args, ctx) {
+      resolve(parent, ctx) {
         if (parent.questionDialogueId) {
           return ctx.prisma.dialogue.findOne({
             where: {
@@ -193,7 +194,7 @@ export const QuestionNodeType = objectType({
       type: QuestionNodeType,
       nullable: true,
 
-      resolve(parent, args, ctx) {
+      resolve(parent, ctx) {
         const overrideLeaf = ctx.prisma.questionNode.findOne({
           where: { id: parent.id },
         }).overrideLeaf();
@@ -205,7 +206,7 @@ export const QuestionNodeType = objectType({
     t.list.field('options', {
       type: QuestionOptionType,
 
-      resolve(parent, args, ctx) {
+      resolve(parent, ctx) {
         const options = ctx.prisma.questionOption.findMany({
           where: { questionNodeId: parent.id },
         });
@@ -216,7 +217,7 @@ export const QuestionNodeType = objectType({
 
     t.list.field('children', {
       type: EdgeType,
-      resolve(parent, args, ctx) {
+      resolve(parent, ctx) {
         const children = ctx.prisma.edge.findMany({
           where: {
             parentNodeId: parent.id,
@@ -293,7 +294,7 @@ export const CreateSlideNodeMarkerInput = inputObjectType({
 
   definition(t) {
     t.string('label');
-  }
+  },
 });
 
 export const CreateSliderNodeInputType = inputObjectType({
@@ -301,7 +302,7 @@ export const CreateSliderNodeInputType = inputObjectType({
 
   definition(t) {
     t.list.field('markers', { type: CreateSlideNodeMarkerInput });
-  }
+  },
 });
 
 export const CreateQuestionNodeInputType = inputObjectType({
@@ -370,7 +371,7 @@ export const QuestionNodeMutations = extendType({
       args: { input: DeleteNodeInputType },
       // TODO: Remove the any
       // @ts-ignore
-      async resolve(parent: any, args: any, ctx: any) {
+      async resolve(args: any, ctx: any) {
         const { id, customerId, dialogueSlug } = args.input;
         const { prisma }: { prisma: PrismaClient } = ctx;
 
@@ -419,7 +420,7 @@ export const QuestionNodeMutations = extendType({
       type: QuestionNodeType,
       args: { input: UpdateQuestionNodeInputType },
       // TODO: Remove the any
-      resolve(parent: any, args: any) {
+      resolve(args: any) {
         const { id, title, type, overrideLeafId, edgeId, optionEntries: { options }, edgeCondition } = args?.input;
 
         return NodeService.updateQuestionFromBuilder(id, title, type, overrideLeafId, edgeId, options, edgeCondition);
@@ -433,7 +434,7 @@ export const QuestionNodeMutations = extendType({
         input: CreateQuestionNodeInputType,
       },
       // TODO: Remove the any
-      async resolve(parent: any, args: any, ctx: any) {
+      async resolve(args: any, ctx: any) {
         const { prisma }: { prisma: PrismaClient } = ctx;
         // eslint-disable-next-line max-len
         const { customerId, dialogueSlug, title, type, overrideLeafId, parentQuestionId, optionEntries, edgeCondition } = args.input;
@@ -531,7 +532,7 @@ export const QuestionNodeMutations = extendType({
       type: QuestionNodeType,
       args: { input: DeleteNodeInputType },
 
-      async resolve(parent: any, args: any, ctx: any) {
+      async resolve(args: any, ctx: any) {
         const { prisma }: { prisma: PrismaClient } = ctx;
 
         await prisma.share.deleteMany({ where: {
@@ -551,7 +552,7 @@ export const QuestionNodeMutations = extendType({
       type: QuestionNodeType,
       args: { input: CreateCTAInputType },
 
-      async resolve(parent: any, args: any, ctx: any) {
+      async resolve(args: any, ctx: any) {
         const { prisma }: { prisma: PrismaClient } = ctx;
         const { customerSlug, dialogueSlug, title, type, links, share } = args.input;
 
@@ -604,7 +605,6 @@ export const getQuestionNodeQuery = extendType({
         where: QuestionNodeInput,
       },
       nullable: true,
-
       async resolve(parent, args, ctx) {
         if (!args.where?.id) return null;
 
