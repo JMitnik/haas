@@ -84,8 +84,8 @@ const sliderValueAnimeVariants: Variants = {
 };
 
 const SliderText = ({ color, adaptedColor, score, isEarly, markers }: { color: string, adaptedColor:string, score: number, isEarly: boolean, markers: SliderNodeMarkersProps[] }) => {
-  let text = 'Thanks for voting';
-  let subText = 'Let us continue';
+  let text = '';
+  let subText = '';
 
   if (isEarly) {
     text = 'That was quick!';
@@ -111,7 +111,7 @@ const SliderText = ({ color, adaptedColor, score, isEarly, markers }: { color: s
     }
 
     text = activeMarker?.label || 'Thanks for voting';
-    subText = activeMarker?.subLabel || 'Let us continue';
+    subText = activeMarker?.subLabel || '';
   }
 
   // switch (true) {
