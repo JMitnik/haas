@@ -81,6 +81,8 @@ const CustomerRoutes = () => (
                   />
 
                   <GuardedRoute
+                    allowedPermission={SystemPermission.CAN_VIEW_DIALOGUE_ANALYTICS}
+                    redirectRoute="/dashboard/b/:customerSlug/d/:dialogueSlug/interactions"
                     path="/dashboard/b/:customerSlug/d/:dialogueSlug"
                     render={() => <DialoguePage />}
                   />
