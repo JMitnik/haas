@@ -317,6 +317,7 @@ export const SliderNodeMarkerInputType = inputObjectType({
   name: 'SlideNodeMarkerInput',
 
   definition(t) {
+    t.id('id', { nullable: true });
     t.string('label', { required: true });
     t.string('subLabel', { required: true });
     t.field('range', { type: SliderNodeRangeInputType });

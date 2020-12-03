@@ -240,6 +240,7 @@ export interface NexusGenInputs {
     url?: string | null; // String
   }
   SlideNodeMarkerInput: { // input type
+    id?: string | null; // ID
     label: string; // String!
     range?: NexusGenInputs['SliderNodeRangeInputType'] | null; // SliderNodeRangeInputType
     subLabel: string; // String!

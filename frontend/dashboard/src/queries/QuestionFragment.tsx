@@ -15,6 +15,7 @@ const QuestionFragment = gql`
     }
     sliderNode {
       markers {
+        id
         label
         subLabel
         range {

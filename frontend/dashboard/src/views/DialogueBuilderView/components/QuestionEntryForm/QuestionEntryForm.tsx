@@ -32,6 +32,7 @@ import { EdgeConditonProps,
 import SliderNodeForm from './SliderNodeForm';
 
 interface SliderNodeMarkerProps {
+  id: string;
   label: string;
   subLabel: string;
   range: {
@@ -49,7 +50,7 @@ interface FormDataProps {
   activeLeaf: string;
   parentQuestionType: string;
   sliderNode: {
-    id: number;
+    id: string;
     markers: SliderNodeMarkerProps[];
   };
   options: Array<string>;
@@ -138,6 +139,7 @@ const QuestionEntryForm = ({
   const sliderNode = {
     id: question.sliderNode?.id,
     markers: question.sliderNode?.markers.map((marker: SliderNodeMarkerProps) => ({
+      id: marker.id,
       label: marker.label,
       subLabel: marker.subLabel,
       range: {
@@ -372,8 +374,6 @@ const QuestionEntryForm = ({
     const options = { options: activeOptions };
     const edgeCondition = activeCondition;
 
-    console.log('formData', formData);
-
     if (question.id !== '-1') {
       updateQuestion({
         variables: {
@@ -402,7 +402,7 @@ const QuestionEntryForm = ({
             parentQuestionId,
             optionEntries: options,
             edgeCondition,
-            sliderNode: formData.sliderNode,
+            sliderNode: formData.sliderNode || sliderNode,
           },
         },
       });

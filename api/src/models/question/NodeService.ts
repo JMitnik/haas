@@ -1,4 +1,4 @@
-import { Dialogue, Link, NodeType, QuestionCondition, QuestionNode, QuestionNodeCreateInput, QuestionNodeUpdateInput, Share } from '@prisma/client';
+import { Dialogue, Link, NodeType, QuestionCondition, QuestionConditionDistinctFieldEnum, QuestionNode, QuestionNodeCreateInput, QuestionNodeUpdateInput, Share } from '@prisma/client';
 import { NexusGenFieldTypes, NexusGenInputs } from '../../generated/nexus';
 import EdgeService from '../edge/EdgeService';
 import prisma from '../../config/prisma';
@@ -511,14 +511,9 @@ class NodeService {
 
     const updatedOptionIds = await NodeService.updateQuestionOptions(options);
 
-    if (sliderNode) {
-      prisma.questionNode.update({
-        where: { id: questionId },
+    console.log(sliderNode);
 
-      });
-    }
-
-    return leaf ? prisma.questionNode.update({
+    const updatedNode = leaf ? await prisma.questionNode.update({
       where: { id: questionId },
       data: {
         title,
@@ -528,7 +523,7 @@ class NodeService {
           connect: updatedOptionIds,
         },
       },
-    }) : prisma.questionNode.update({
+    }) : await prisma.questionNode.update({
       where: { id: questionId },
       data: {
         title,
@@ -536,33 +531,47 @@ class NodeService {
         options: {
           connect: updatedOptionIds,
         },
-        sliderNode: sliderNode ? {
-          upsert: {
-            create: {
-              markers: {
-                create: sliderNode?.markers?.map((marker) => ({
-                  label: marker.label || '',
-                  subLabel: marker.subLabel || '',
-                  range: {
-                    create: {
-                      start: marker?.range?.start || 2,
-                      end: marker?.range?.end || 5,
-                    },
-                  },
-                })) || [],
-              },
-            },
-            update: {
-              markers: {
-                update: {
-
-                },
-              },
-            },
-          },
-        } : undefined,
       },
     });
+
+    if (updatedNode.sliderNodeId) {
+      await prisma.sliderNode.update({
+        where: { id: updatedNode.sliderNodeId },
+        data: {
+          markers: {
+            update: sliderNode?.markers?.map((marker) => ({
+              where: { id: marker?.id || undefined },
+              data: {
+                label: marker.label,
+                subLabel: marker.subLabel,
+              },
+            })),
+          },
+        },
+      });
+    } else {
+      await prisma.sliderNode.create({
+        data: {
+          QuestionNode: {
+            connect: { id: questionId },
+          },
+          markers: {
+            create: sliderNode?.markers?.map((marker) => ({
+              label: marker.label || '',
+              subLabel: marker.subLabel || '',
+              range: {
+                create: {
+                  start: marker?.range?.start || 2,
+                  end: marker?.range?.end || 5,
+                },
+              },
+            })),
+          },
+        },
+      });
+    }
+
+    return updatedNode;
   };
 
   static updateQuestionOptions = async (options: Array<QuestionOptionProps>) => Promise.all(

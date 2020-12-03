@@ -629,6 +629,7 @@ type ShareNodeType {
 }
 
 input SlideNodeMarkerInput {
+  id: ID
   label: String!
   range: SliderNodeRangeInputType
   subLabel: String!

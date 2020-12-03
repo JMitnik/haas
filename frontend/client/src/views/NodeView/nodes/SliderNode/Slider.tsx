@@ -1,5 +1,6 @@
 import { AnimatePresence, Variants, motion, transform,
   useAnimation, useMotionValue, useTransform } from 'framer-motion';
+import { getSnapshot } from 'mobx-state-tree';
 import { usePopper } from 'react-popper';
 import { useTimer } from 'use-timer';
 import Color from 'color';
@@ -15,6 +16,7 @@ import { ReactComponent as UnhappyIcon } from 'assets/icons/icon-unhappy.svg';
 
 import { FingerPrintContainer, HAASRabbit, SlideHereContainer, SliderNodeValue } from './SliderNodeStyles';
 import { SlideMeAnimation } from './SliderNodeAnimations';
+import { SliderNodeMarkersProps } from '../../../../models/Tree/SliderNodeMarkersModel';
 
 interface SliderAnimationStateProps {
   isStopped: boolean;
@@ -81,41 +83,73 @@ const sliderValueAnimeVariants: Variants = {
   },
 };
 
-const SliderText = ({ color, adaptedColor, score, isEarly }: { color: string, adaptedColor:string, score: number, isEarly: boolean }) => {
+const SliderText = ({ color, adaptedColor, score, isEarly, markers }: { color: string, adaptedColor:string, score: number, isEarly: boolean, markers: SliderNodeMarkersProps[] }) => {
   let text = 'Thanks for voting';
   let subText = 'Let us continue';
 
-  switch (true) {
-    case isEarly:
-      text = 'That was quick!';
-      subText = 'Tap me again if you are sure.';
-      break;
-
-    case !isEarly && score >= 6 && score < 9.5:
-      text = 'Good!';
-      subText = 'This is good.';
-      break;
-    case !isEarly && score >= 9.5:
-      text = 'Amazing!';
-      subText = 'This is excellent.';
-      break;
-    case !isEarly && score > 5 && score < 6:
-      text = 'Neutral';
-      subText = 'Something is not great.';
-      break;
-    case !isEarly && score <= 5 && score > 3:
-      text = 'Bad';
-      subText = 'This is bad.';
-      break;
-    case !isEarly && score <= 3:
-      text = 'Terrible';
-      subText = 'This is terrible.';
-      break;
-
-    default:
-      text = 'Thanks for voting';
-      break;
+  if (isEarly) {
+    text = 'That was quick!';
+    subText = 'Tap me again if you are sure.';
   }
+
+  if (!isEarly && markers.length) {
+    const activeMarker = markers.find((marker) => {
+      const { start, end } = marker.range;
+
+      const lowerBound = start || 0.0;
+      const upperBound = end || 10.0;
+
+      if (lowerBound <= score && upperBound > score) {
+        return true;
+      }
+
+      return false;
+    });
+
+    if (activeMarker) {
+      console.log(getSnapshot(activeMarker));
+    }
+
+    text = activeMarker?.label || 'Thanks for voting';
+    subText = activeMarker?.subLabel || 'Let us continue';
+  }
+
+  // switch (true) {
+  //   if
+  //   case isEarly:
+  //     text = 'That was quick!';
+  //     subText = 'Tap me again if you are sure.';
+  //     break;
+
+  //   if (markers.length) {
+  //     const marker.find(marker )
+  //   }
+
+  //   case !isEarly && score >= 6 && score < 9.5:
+  //     text = 'Good!';
+  //     subText = 'This is good.';
+  //     break;
+  //   case !isEarly && score >= 9.5:
+  //     text = 'Amazing!';
+  //     subText = 'This is excellent.';
+  //     break;
+  //   case !isEarly && score > 5 && score < 6:
+  //     text = 'Neutral';
+  //     subText = 'Something is not great.';
+  //     break;
+  //   case !isEarly && score <= 5 && score > 3:
+  //     text = 'Bad';
+  //     subText = 'This is bad.';
+  //     break;
+  //   case !isEarly && score <= 3:
+  //     text = 'Terrible';
+  //     subText = 'This is terrible.';
+  //     break;
+
+  //   default:
+  //     text = 'Thanks for voting';
+  //     break;
+  // }
 
   return (
     <Span ml={2} textAlign="left">
@@ -133,12 +167,13 @@ interface SliderProps {
   form: any;
   register: any;
   onSubmit: () => void;
+  markers: SliderNodeMarkersProps[];
 }
 
 const endTime = 40;
 const initialWindUpSec = 2;
 
-const Slider = ({ form, register, onSubmit }: SliderProps) => {
+const Slider = ({ form, register, onSubmit, markers }: SliderProps) => {
   const [isValid, setIsValid] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
   const [showIsEarly, setShowIsEarly] = useState(false);
@@ -365,7 +400,7 @@ const Slider = ({ form, register, onSubmit }: SliderProps) => {
                   </AnimatePresence>
                 </motion.span>
               </SliderNodeValue>
-              <SliderText color={sliderColor} adaptedColor={adaptedColor} score={adjustedScore} isEarly={showIsEarly} />
+              <SliderText markers={markers} color={sliderColor} adaptedColor={adaptedColor} score={adjustedScore} isEarly={showIsEarly} />
             </motion.div>
           )}
         </SliderSpeechWrapper>

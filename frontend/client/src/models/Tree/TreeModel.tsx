@@ -26,6 +26,7 @@ const TreeModel = types
         type: node.type,
         options: node.options,
         overrideLeaf: node.overrideLeaf?.id,
+        sliderNode: node.sliderNode,
       }));
 
       self.nodes.replace(newNodes);
