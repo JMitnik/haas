@@ -1,5 +1,5 @@
 import * as UI from '@haas/ui';
-import { Controller, useFieldArray } from 'react-hook-form';
+import { useFieldArray } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
 
@@ -22,8 +22,8 @@ const SliderNodeForm = ({ form }: { form: any }) => {
           {t('dialogue:markers_helper')}
         </UI.Text>
       </UI.Div>
-      {markers.fields.map((marker, index) => (
 
+      {markers.fields.map((marker, index) => (
         <UI.Card boxShadow="lg" key={marker.fieldIndex} mb={4} noHover>
           <input ref={form.register()} type="hidden" name={`sliderNode.markers[${index}].id`} defaultValue={marker.id} />
           <UI.CardBody>

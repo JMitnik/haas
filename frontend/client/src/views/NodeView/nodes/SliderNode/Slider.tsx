@@ -1,6 +1,5 @@
 import { AnimatePresence, Variants, motion, transform,
   useAnimation, useMotionValue, useTransform } from 'framer-motion';
-import { getSnapshot } from 'mobx-state-tree';
 import { usePopper } from 'react-popper';
 import { useTimer } from 'use-timer';
 import Color from 'color';
@@ -8,7 +7,7 @@ import Lottie from 'react-lottie';
 import React, { useEffect, useReducer, useState } from 'react';
 import styled from 'styled-components';
 
-import { Div, Flex, Span, Text, Slider as UISlider } from '@haas/ui';
+import { Div, Flex, Text, Slider as UISlider } from '@haas/ui';
 import { ReactComponent as FingerIcon } from 'assets/icons/icon-fingerprint.svg';
 import { HAASIdle, HAASRun, HAASStopping } from 'assets/animations';
 import { ReactComponent as HappyIcon } from 'assets/icons/icon-happy.svg';
@@ -17,6 +16,7 @@ import { ReactComponent as UnhappyIcon } from 'assets/icons/icon-unhappy.svg';
 import { FingerPrintContainer, HAASRabbit, SlideHereContainer, SliderNodeValue } from './SliderNodeStyles';
 import { SlideMeAnimation } from './SliderNodeAnimations';
 import { SliderNodeMarkersProps } from '../../../../models/Tree/SliderNodeMarkersModel';
+import { SliderText } from './SliderText';
 
 interface SliderAnimationStateProps {
   isStopped: boolean;
@@ -81,49 +81,6 @@ const sliderValueAnimeVariants: Variants = {
     opacity: 1,
     y: 0,
   },
-};
-
-const SliderText = ({ color, adaptedColor, score, isEarly, markers }: { color: string, adaptedColor:string, score: number, isEarly: boolean, markers: SliderNodeMarkersProps[] }) => {
-  let text = '';
-  let subText = '';
-
-  if (isEarly) {
-    text = 'That was quick!';
-    subText = 'Tap me again if you are sure.';
-  }
-
-  if (!isEarly && markers.length) {
-    const activeMarker = markers.find((marker) => {
-      const { start, end } = marker.range;
-
-      const lowerBound = start || 0.0;
-      const upperBound = end || 10.1;
-
-      if (lowerBound <= score && upperBound > score) {
-        return true;
-      }
-
-      return false;
-    });
-
-    if (activeMarker) {
-      console.log(getSnapshot(activeMarker));
-    }
-
-    text = activeMarker?.label || 'Thanks for voting';
-    subText = activeMarker?.subLabel || '';
-  }
-
-  return (
-    <Span ml={2} textAlign="left">
-      <Text fontSize="1rem" color={color}>
-        {text}
-      </Text>
-      <Text fontSize="0.7rem" color={adaptedColor}>
-        {subText}
-      </Text>
-    </Span>
-  );
 };
 
 interface SliderProps {
@@ -363,7 +320,13 @@ const Slider = ({ form, register, onSubmit, markers }: SliderProps) => {
                   </AnimatePresence>
                 </motion.span>
               </SliderNodeValue>
-              <SliderText markers={markers} color={sliderColor} adaptedColor={adaptedColor} score={adjustedScore} isEarly={showIsEarly} />
+              <SliderText
+                markers={markers}
+                color={sliderColor}
+                adaptedColor={adaptedColor}
+                score={adjustedScore}
+                isEarly={showIsEarly}
+              />
             </motion.div>
           )}
         </SliderSpeechWrapper>
