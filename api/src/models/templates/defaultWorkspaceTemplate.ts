@@ -1,8 +1,12 @@
-import { NodeType, RoleCreateInput, TagEnum } from '@prisma/client';
+import { NodeType, RoleCreateInput, TagEnum, SliderNodeMarkerCreateInput } from '@prisma/client';
 
 interface Tag {
   name: string,
   type: TagEnum,
+}
+
+interface RootSliderOptions {
+  markers: SliderNodeMarkerCreateInput[];
 }
 
 export interface WorkspaceTemplate {
@@ -14,6 +18,7 @@ export interface WorkspaceTemplate {
   leafNodes: any;
   roles: RoleCreateInput[];
   tags: Tag[];
+  rootSliderOptions: RootSliderOptions;
 }
 
 const defaultLinks: any[] = [
@@ -96,6 +101,35 @@ const defaultWorkspaceTemplate: WorkspaceTemplate = {
       },
     },
   ],
+  rootSliderOptions: {
+    markers: [
+      {
+        label: 'Good!',
+        subLabel: 'This is good.',
+        range: { create: { start: 6, end: 9.5 } }
+      },
+      {
+        label: 'Amazing!',
+        subLabel: 'This is excellent.',
+        range: { create: { start: 9.5 } }
+      },
+      {
+        label: 'Neutral!',
+        subLabel: 'Something is not great.',
+        range: { create: { start: 5, end: 6 } }
+      },
+      {
+        label: 'Bad',
+        subLabel: 'This is bad.',
+        range: { create: { start: 3, end: 5 } }
+      },
+      {
+        label: 'Terrible',
+        subLabel: 'This is terrible',
+        range: { create: { end: 3 } }
+      }
+    ]
+  },
   leafNodes: [
     {
       title:

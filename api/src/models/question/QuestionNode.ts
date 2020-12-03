@@ -71,8 +71,38 @@ export const ShareNodeInputType = inputObjectType({
   },
 });
 
+export const SliderNodeRange = objectType({
+  name: 'SliderNodeRange',
+
+  definition(t) {
+    t.id('id');
+    t.float('start', { nullable: true });
+    t.float('end', { nullable: true });
+  }
+})
+
+export const SliderNodeMarker = objectType({
+  name: 'SliderNodeMarker',
+
+  definition(t) {
+    t.id('id');
+    t.string('label');
+    t.string('subLabel');
+    // t.field('range', { type: SliderNodeRange, nullable: true });
+  }
+})
+
+export const SliderNode = objectType({
+  name: 'SliderNode',
+  definition(t) {
+    t.id('id', { nullable: true });
+    // t.list.field('markers', { type: SliderNodeMarker, nullable: });
+  }
+})
+
 export const QuestionNodeType = objectType({
   name: 'QuestionNode',
+  
   definition(t) {
     t.id('id');
     t.boolean('isLeaf');
@@ -86,6 +116,9 @@ export const QuestionNodeType = objectType({
       nullable: true,
       resolve: (parent) => parent.updatedAt?.toString() || '',
     });
+
+    // Node-types
+    // t.field('sliderNode', { type: SliderNode, nullable: true, resolve: (parent) => parent.sliderNode });
 
     t.field('share', {
       type: ShareNodeType,
@@ -253,6 +286,22 @@ export const CreateCTAInputType = inputObjectType({
       type: ShareNodeInputType,
     });
   },
+});
+
+export const CreateSlideNodeMarkerInput = inputObjectType({
+  name: 'CreateSlideNodeMarkerInput',
+
+  definition(t) {
+    t.string('label');
+  }
+});
+
+export const CreateSliderNodeInputType = inputObjectType({
+  name: 'CreateSliderNodeInputType',
+
+  definition(t) {
+    t.list.field('markers', { type: CreateSlideNodeMarkerInput });
+  }
 });
 
 export const CreateQuestionNodeInputType = inputObjectType({

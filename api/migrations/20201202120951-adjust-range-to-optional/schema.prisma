@@ -1,6 +1,6 @@
 datasource postgresql {
   provider = "postgresql"
-  url      = env("DB_STRING")
+  url = "***"
 }
 
 // binaryTargets = ["debian-openssl-1.1.x"]
@@ -124,7 +124,7 @@ model SliderNodeMarker {
 
 model SliderNode {
   id        Int          @id @default(autoincrement())
-  markers SliderNodeMarker[]
+  markers SliderNodeMarker
 }
 
 model QuestionNode {

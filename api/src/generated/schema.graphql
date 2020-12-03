@@ -63,6 +63,14 @@ input CreateQuestionNodeInputType {
   type: String
 }
 
+input CreateSlideNodeMarkerInput {
+  label: String
+}
+
+input CreateSliderNodeInputType {
+  markers: [CreateSlideNodeMarkerInput!]
+}
+
 input CreateTriggerInputType {
   customerSlug: String
   recipients: RecipientsInputType
@@ -581,7 +589,7 @@ type RoleType {
 }
 
 type Session {
-  createdAt: String!
+  createdAt: Date!
   dialogueId: String!
   id: ID!
   nodeEntries: [NodeEntry!]!
@@ -625,9 +633,25 @@ type ShareNodeType {
   url: String!
 }
 
+type SliderNode {
+  id: ID
+}
+
 """Input type for a slider node"""
 input SliderNodeEntryInput {
   value: Int
+}
+
+type SliderNodeMarker {
+  id: ID!
+  label: String!
+  subLabel: String!
+}
+
+type SliderNodeRange {
+  end: Float
+  id: ID!
+  start: Float
 }
 
 """Details regarding interaction with social node"""

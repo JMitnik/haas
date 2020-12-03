@@ -80,6 +80,12 @@ export interface NexusGenInputs {
     title?: string | null; // String
     type?: string | null; // String
   }
+  CreateSlideNodeMarkerInput: { // input type
+    label?: string | null; // String
+  }
+  CreateSliderNodeInputType: { // input type
+    markers?: NexusGenInputs['CreateSlideNodeMarkerInput'][] | null; // [CreateSlideNodeMarkerInput!]
+  }
   CreateTriggerInputType: { // input type
     customerSlug?: string | null; // String
     recipients?: NexusGenInputs['RecipientsInputType'] | null; // RecipientsInputType
@@ -420,6 +426,9 @@ export interface NexusGenRootTypes {
     updatedAt?: string | null; // String
     url: string; // String!
   }
+  SliderNode: prisma.SliderNode;
+  SliderNodeMarker: prisma.SliderNodeMarker;
+  SliderNodeRange: prisma.SliderNodeRange;
   Tag: prisma.Tag;
   TriggerConditionType: { // root type
     id: number; // Int!
@@ -496,6 +505,8 @@ export interface NexusGenAllTypes extends NexusGenRootTypes {
   CreateCTAInputType: NexusGenInputs['CreateCTAInputType'];
   CreateDialogueInputType: NexusGenInputs['CreateDialogueInputType'];
   CreateQuestionNodeInputType: NexusGenInputs['CreateQuestionNodeInputType'];
+  CreateSlideNodeMarkerInput: NexusGenInputs['CreateSlideNodeMarkerInput'];
+  CreateSliderNodeInputType: NexusGenInputs['CreateSliderNodeInputType'];
   CreateTriggerInputType: NexusGenInputs['CreateTriggerInputType'];
   CreateWorkspaceInput: NexusGenInputs['CreateWorkspaceInput'];
   CustomerWhereUniqueInput: NexusGenInputs['CustomerWhereUniqueInput'];
@@ -784,7 +795,7 @@ export interface NexusGenFieldTypes {
     roleId: string | null; // String
   }
   Session: { // field return type
-    createdAt: string; // String!
+    createdAt: any; // Date!
     dialogueId: string; // String!
     id: string; // ID!
     nodeEntries: NexusGenRootTypes['NodeEntry'][]; // [NodeEntry!]!
@@ -806,6 +817,19 @@ export interface NexusGenFieldTypes {
     tooltip: string | null; // String
     updatedAt: string | null; // String
     url: string; // String!
+  }
+  SliderNode: { // field return type
+    id: string | null; // ID
+  }
+  SliderNodeMarker: { // field return type
+    id: string; // ID!
+    label: string; // String!
+    subLabel: string; // String!
+  }
+  SliderNodeRange: { // field return type
+    end: number | null; // Float
+    id: string; // ID!
+    start: number | null; // Float
   }
   Tag: { // field return type
     customerId: string; // String!
@@ -1104,9 +1128,9 @@ export interface NexusGenAbstractResolveReturnTypes {
 
 export interface NexusGenInheritedFields {}
 
-export type NexusGenObjectNames = "ColourSettings" | "Customer" | "CustomerSettings" | "Debug" | "DeleteUserOutput" | "Dialogue" | "DialogueStatistics" | "Edge" | "EdgeCondition" | "FontSettings" | "ImageType" | "InviteUserOutput" | "LinkType" | "LoginOutput" | "Mutation" | "NodeEntry" | "NodeEntryValue" | "PaginationPageInfo" | "PermssionType" | "Query" | "QuestionNode" | "QuestionOption" | "RefreshAccessTokenOutput" | "RequestInviteOutput" | "RoleConnection" | "RoleType" | "Session" | "SessionConnection" | "ShareNodeType" | "Tag" | "TriggerConditionType" | "TriggerConnectionType" | "TriggerType" | "UserConnection" | "UserCustomer" | "UserType" | "VerifyUserTokenOutput" | "lineChartDataType" | "topPathType";
+export type NexusGenObjectNames = "ColourSettings" | "Customer" | "CustomerSettings" | "Debug" | "DeleteUserOutput" | "Dialogue" | "DialogueStatistics" | "Edge" | "EdgeCondition" | "FontSettings" | "ImageType" | "InviteUserOutput" | "LinkType" | "LoginOutput" | "Mutation" | "NodeEntry" | "NodeEntryValue" | "PaginationPageInfo" | "PermssionType" | "Query" | "QuestionNode" | "QuestionOption" | "RefreshAccessTokenOutput" | "RequestInviteOutput" | "RoleConnection" | "RoleType" | "Session" | "SessionConnection" | "ShareNodeType" | "SliderNode" | "SliderNodeMarker" | "SliderNodeRange" | "Tag" | "TriggerConditionType" | "TriggerConnectionType" | "TriggerType" | "UserConnection" | "UserCustomer" | "UserType" | "VerifyUserTokenOutput" | "lineChartDataType" | "topPathType";
 
-export type NexusGenInputNames = "AppendToInteractionInput" | "CTALinkInputObjectType" | "CTALinksInputType" | "CTAShareInputObjectType" | "ChoiceNodeEntryInput" | "CreateCTAInputType" | "CreateDialogueInputType" | "CreateQuestionNodeInputType" | "CreateTriggerInputType" | "CreateWorkspaceInput" | "CustomerWhereUniqueInput" | "DeleteDialogueInputType" | "DeleteNodeInputType" | "DeleteUserInput" | "DialogueFilterInputType" | "DialogueWhereUniqueInput" | "EdgeConditionInputType" | "EditUserInput" | "EditWorkspaceInput" | "InviteUserInput" | "LoginInput" | "NodeEntryDataInput" | "NodeEntryInput" | "OptionInputType" | "OptionsInputType" | "PaginationSortInput" | "PaginationWhereInput" | "PermissionIdsInput" | "PermissionInput" | "QuestionNodeWhereInputType" | "QuestionNodeWhereUniqueInput" | "RecipientsInputType" | "RegisterInput" | "RegisterNodeEntryInput" | "RequestInviteInput" | "RoleDataInput" | "RoleInput" | "SessionInput" | "SessionWhereUniqueInput" | "ShareNodeInputType" | "SliderNodeEntryInput" | "SocialNodeEntryInput" | "TagsInputObjectType" | "TextboxNodeEntryInput" | "TriggerConditionInputType" | "TriggerInputType" | "UpdateCTAInputType" | "UpdateQuestionNodeInputType" | "UserInput" | "UserOfCustomerInput";
+export type NexusGenInputNames = "AppendToInteractionInput" | "CTALinkInputObjectType" | "CTALinksInputType" | "CTAShareInputObjectType" | "ChoiceNodeEntryInput" | "CreateCTAInputType" | "CreateDialogueInputType" | "CreateQuestionNodeInputType" | "CreateSlideNodeMarkerInput" | "CreateSliderNodeInputType" | "CreateTriggerInputType" | "CreateWorkspaceInput" | "CustomerWhereUniqueInput" | "DeleteDialogueInputType" | "DeleteNodeInputType" | "DeleteUserInput" | "DialogueFilterInputType" | "DialogueWhereUniqueInput" | "EdgeConditionInputType" | "EditUserInput" | "EditWorkspaceInput" | "InviteUserInput" | "LoginInput" | "NodeEntryDataInput" | "NodeEntryInput" | "OptionInputType" | "OptionsInputType" | "PaginationSortInput" | "PaginationWhereInput" | "PermissionIdsInput" | "PermissionInput" | "QuestionNodeWhereInputType" | "QuestionNodeWhereUniqueInput" | "RecipientsInputType" | "RegisterInput" | "RegisterNodeEntryInput" | "RequestInviteInput" | "RoleDataInput" | "RoleInput" | "SessionInput" | "SessionWhereUniqueInput" | "ShareNodeInputType" | "SliderNodeEntryInput" | "SocialNodeEntryInput" | "TagsInputObjectType" | "TextboxNodeEntryInput" | "TriggerConditionInputType" | "TriggerInputType" | "UpdateCTAInputType" | "UpdateQuestionNodeInputType" | "UserInput" | "UserOfCustomerInput";
 
 export type NexusGenEnumNames = "LinkTypeEnumType" | "PaginationSortByEnum" | "QuestionNodeTypeEnum" | "SystemPermission" | "TagTypeEnum" | "TriggerConditionEnum" | "TriggerMediumEnum" | "TriggerTypeEnum";
 
