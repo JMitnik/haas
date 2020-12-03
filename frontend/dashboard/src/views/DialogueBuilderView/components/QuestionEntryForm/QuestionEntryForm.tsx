@@ -49,6 +49,7 @@ interface FormDataProps {
   activeLeaf: string;
   parentQuestionType: string;
   sliderNode: {
+    id: number;
     markers: SliderNodeMarkerProps[];
   };
   options: Array<string>;
@@ -135,6 +136,7 @@ const QuestionEntryForm = ({
   const { t } = useTranslation();
 
   const sliderNode = {
+    id: question.sliderNode?.id,
     markers: question.sliderNode?.markers.map((marker: SliderNodeMarkerProps) => ({
       label: marker.label,
       subLabel: marker.subLabel,

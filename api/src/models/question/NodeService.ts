@@ -511,7 +511,13 @@ class NodeService {
 
     const updatedOptionIds = await NodeService.updateQuestionOptions(options);
 
-    console.log({ sliderNode });
+    if (sliderNode) {
+      prisma.questionNode.update({
+        where: { id: questionId },
+
+      });
+    }
+
     return leaf ? prisma.questionNode.update({
       where: { id: questionId },
       data: {
@@ -531,18 +537,27 @@ class NodeService {
           connect: updatedOptionIds,
         },
         sliderNode: sliderNode ? {
-          create: {
-            markers: {
-              create: sliderNode?.markers?.map((marker) => ({
-                label: marker.label || '',
-                subLabel: marker.subLabel || '',
-                range: {
-                  create: {
-                    start: marker?.range?.start || 2,
-                    end: marker?.range?.end || 5,
+          upsert: {
+            create: {
+              markers: {
+                create: sliderNode?.markers?.map((marker) => ({
+                  label: marker.label || '',
+                  subLabel: marker.subLabel || '',
+                  range: {
+                    create: {
+                      start: marker?.range?.start || 2,
+                      end: marker?.range?.end || 5,
+                    },
                   },
+                })) || [],
+              },
+            },
+            update: {
+              markers: {
+                update: {
+
                 },
-              })) || [],
+              },
             },
           },
         } : undefined,

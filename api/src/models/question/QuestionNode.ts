@@ -327,6 +327,7 @@ export const SliderNodeInputType = inputObjectType({
   name: 'SliderNodeInputType',
 
   definition(t) {
+    t.id('id', { nullable: true });
     t.list.field('markers', { type: SliderNodeMarkerInputType });
   },
 });

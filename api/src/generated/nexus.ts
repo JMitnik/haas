@@ -248,6 +248,7 @@ export interface NexusGenInputs {
     value?: number | null; // Int
   }
   SliderNodeInputType: { // input type
+    id?: string | null; // ID
     markers?: NexusGenInputs['SlideNodeMarkerInput'][] | null; // [SlideNodeMarkerInput!]
   }
   SliderNodeRangeInputType: { // input type
