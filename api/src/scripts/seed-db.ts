@@ -6,7 +6,7 @@ import prisma from '../config/prisma';
 
 (async () => {
   try {
-    CustomerService.createWorkspace({
+    await CustomerService.createWorkspace({
       name: defaultWorkspaceTemplate.title,
       primaryColour: defaultWorkspaceTemplate.primaryColor,
       slug: defaultWorkspaceTemplate.slug,

@@ -4,6 +4,7 @@ version: '3.5'
 services:
   postgres:
     restart: always
+
     image: postgres:10.3
     environment:
       POSTGRES_USER: prisma
@@ -23,6 +24,8 @@ services:
       DB_STRING: 'postgresql://prisma:prisma@postgres:5432/postgres?schema=public'
     volumes:
         - './api/src:/app/src'
+        - './api/schema.prisma:/app/schema.prisma'
+        - './api/migrations:/app/migrations'
     depends_on: 
       - postgres
-    command: sh -c 'npx prisma migrate up --experimental && (npx ts-node src/scripts/seed-db.ts) && (npx tsnd --exit-child --transpile-only -- ./src/app.ts)'
+    command: sh -c 'npx prisma migrate up --experimental && (npx ts-node -s src/scripts/seed-db.ts) && (npx tsnd --exit-child --transpile-only -- ./src/app.ts)'
