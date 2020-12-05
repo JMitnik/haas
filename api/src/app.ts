@@ -16,9 +16,6 @@ process.on('SIGINT', () => {
 });
 
 const main = async () => {
-  console.log(config.testString);
-  console.log('🏳️\tStarting application');
-
   const apollo = await makeApollo();
   const app = express();
   const corsOptions: CorsOptions = {
@@ -40,7 +37,6 @@ const main = async () => {
 
   apollo.applyMiddleware({ app, cors: false });
 
-  console.log('🏳️\tStarting the server');
   if (config.useSSL) {
     const key: any = process.env.HTTPS_SERVER_KEY_PATH;
     const certificate: any = process.env.HTTPS_SERVER_CERT_PATH;
@@ -54,13 +50,13 @@ const main = async () => {
     });
   } else {
     app.listen(config.port);
-    console.log(`Listening on standard server, using port ${config.port}!`);
+    console.log(`🌐\tListening on standard server, using port ${config.port}!`);
   }
   console.log('🏁\tStarted the server!');
 };
 
 try {
-  console.log('Starting app');
+  console.log('🏃‍♂️\tStarting app');
   main();
 } catch (e) {
   console.log(e);

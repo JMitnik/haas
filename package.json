@@ -27,7 +27,7 @@
         "dock:start": "bash scripts/dock-start.sh",
         "dock:test": "bash scripts/dock-test.sh",
         "dev": "concurrently \"yarn start:client\" \"yarn start:dashboard\" \"yarn dev:api\"",
-        "dev:api": "yarn workspace @haas/api dev",
+        "dev:api": "docker-compose -f docker-compose.dev.yml up -d",
         "build:client": "yarn workspace @haas/client build",
         "build:api": "yarn workspace @haas/api generate && yarn workspace @haas/api build",
         "clean:npm": "find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +",

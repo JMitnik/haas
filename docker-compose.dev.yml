@@ -8,19 +8,25 @@ services:
       POSTGRES_PASSWORD: prisma
     ports:
       - '5431:5432'
+    volumes:
+      - local-dev-datavolume:/var/lib/postgresql/data
 
   api:
     build: 
       context: .
       dockerfile: container/dev.Dockerfile
     ports:
-      - '3999:4000'
+      - '4000:4000'
     env_file:
       - api/.env
     environment: 
       DB_STRING: 'postgresql://prisma:prisma@postgres:5432/postgres?schema=public'
     volumes:
         - './api/src:/app/src'
+        - './api/schema.prisma:/app/schema.prisma'
+        - './api/migrations:/app/migrations'
     depends_on: 
       - postgres
-    command: sh -c 'npx prisma migrate up --experimental && (node dist/scripts/seed-db.js) && (node dist/app.js)'
+    
+volumes:
+  local-dev-datavolume:
