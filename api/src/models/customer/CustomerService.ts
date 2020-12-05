@@ -140,6 +140,8 @@ class CustomerService {
         throw new UserInputError('customer:existing_slug');
       }
 
+      console.log(error);
+
       return null;
     }
   };

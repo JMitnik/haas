@@ -1,0 +1,26 @@
+version: '3.5'
+services:
+  postgres:
+    restart: always
+    image: postgres:10.3
+    environment:
+      POSTGRES_USER: prisma
+      POSTGRES_PASSWORD: prisma
+    ports:
+      - '5431:5432'
+
+  api:
+    build: 
+      context: .
+      dockerfile: migrate.Dockerfile
+    ports:
+      - '3999:4000'
+    env_file:
+      - api/.env
+    environment: 
+      DB_STRING: 'postgresql://prisma:prisma@postgres:5432/postgres?schema=public'
+    volumes:
+        - './api/src:/app/src'
+    depends_on: 
+      - postgres
+    command: sh -c 'npx prisma migrate up --experimental && (node dist/scripts/seed-db.js) && (node dist/app.js)'
