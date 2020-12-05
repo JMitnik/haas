@@ -1,4 +1,4 @@
-# Dev: Uses development docker-file and a code-change listener
+# CI: Uses production docker-file and a test-runner in the api/command
 
 version: '3.5'
 services:
@@ -9,26 +9,20 @@ services:
       POSTGRES_USER: prisma
       POSTGRES_PASSWORD: prisma
     ports:
-      - '5431:5432'
-    volumes:
-      - local-dev-datavolume:/var/lib/postgresql/data
+      - '5433:5432'
 
   api:
     build: 
       context: .
-      dockerfile: container/dev.Dockerfile
+      dockerfile: container/prod.Dockerfile
     ports:
-      - '4000:4000'
+      - '3999:4000'
     env_file:
       - api/.env
     environment: 
       DB_STRING: 'postgresql://prisma:prisma@postgres:5432/postgres?schema=public'
     volumes:
         - './api/src:/app/src'
-        - './api/schema.prisma:/app/schema.prisma'
-        - './api/migrations:/app/migrations'
     depends_on: 
       - postgres
-    
-volumes:
-  local-dev-datavolume:
+    command: sh -c 'npx prisma migrate up --experimental && (node dist/scripts/seed-db.js) && (node dist/app.js)'

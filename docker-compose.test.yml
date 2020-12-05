@@ -1,3 +1,5 @@
+# Test: Uses development docker-file and a test-runner in the api/command
+
 version: '3.5'
 services:
   postgres:
@@ -7,7 +9,7 @@ services:
       POSTGRES_USER: prisma
       POSTGRES_PASSWORD: prisma
     ports:
-      - '5431:5432'
+      - '5435:5432'
 
   api:
     build: 
@@ -23,4 +25,4 @@ services:
         - './api/src:/app/src'
     depends_on: 
       - postgres
-    command: sh -c 'npx prisma migrate up --experimental && (node dist/scripts/seed-db.js) && (node dist/app.js)'
+    command: sh -c 'npx prisma migrate up --experimental && (npx ts-node src/scripts/seed-db.ts) && (npx tsnd --exit-child --transpile-only -- ./src/app.ts)'

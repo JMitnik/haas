@@ -53,6 +53,7 @@ const main = async () => {
     console.log(`🌐\tListening on standard server, using port ${config.port}!`);
   }
   console.log('🏁\tStarted the server!');
+  console.log('=======================');
 };
 
 try {
