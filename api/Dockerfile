@@ -47,6 +47,9 @@ COPY --from=prodBuilder /app/node_modules/.prisma/client ./node_modules/.prisma/
 # Copy 3: copy the built node app.
 COPY --from=prodBuilder /app/dist ./dist
 
+# Copy handy utility wait-for-it
+COPY ./wait-for-it.sh ./
+
 EXPOSE ${PORT}
 EXPOSE 4000
 

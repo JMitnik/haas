@@ -3,7 +3,6 @@ import defaultWorkspaceTemplate from '../models/templates/defaultWorkspaceTempla
 import prisma from '../config/prisma';
 
 // Create workspace!
-
 (async () => {
   try {
     await CustomerService.createWorkspace({
@@ -13,7 +12,7 @@ import prisma from '../config/prisma';
       isSeed: true,
       logo: '',
       willGenerateFakeData: false,
-    }).catch((err) => console.log(err)).then(() => console.log('Okay done'));
+    }).catch((err) => console.log(err)).then(() => console.log('Okay done seeding workspace'));
   } catch (e) {
     console.log(e);
   }

@@ -17,6 +17,10 @@ EXPOSE 4000
 
 ENV NODE_ENV=production
 
+# Copy handy utility wait-for-it
+COPY ./wait-for-it.sh ./
+RUN ["chmod", "+x", "/app/wait-for-it.sh"]
+
 USER node
 # Start development server (refreshes itself)
 CMD [ "sh", "-c", "npx tsnd --exit-child --transpile-only -- ./src/app.ts" ]
