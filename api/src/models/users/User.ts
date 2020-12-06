@@ -2,8 +2,8 @@ import { ApolloError, UserInputError } from 'apollo-server-express';
 import { differenceInMinutes } from 'date-fns';
 import { extendType, inputObjectType, objectType, queryField, scalarType } from '@nexus/schema';
 
+import { ConnectionInterface, PaginationWhereInput } from '../general/Pagination';
 import { Kind } from 'graphql';
-import { PaginationWhereInput } from '../general/Pagination';
 import { RoleType, SystemPermission } from '../role/Role';
 import UserService from './UserService';
 
@@ -206,9 +206,7 @@ export const UserType = objectType({
 export const UserConnection = objectType({
   name: 'UserConnection',
   definition(t) {
-    t.int('pageIndex', { nullable: true });
-    t.int('totalPages', { nullable: true });
-
+    t.implements(ConnectionInterface);
     t.list.field('userCustomers', { type: UserCustomerType });
   },
 });

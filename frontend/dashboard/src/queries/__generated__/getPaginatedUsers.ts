@@ -29,11 +29,16 @@ export interface getPaginatedUsers_customer_usersConnection_userCustomers {
   role: getPaginatedUsers_customer_usersConnection_userCustomers_role;
 }
 
+export interface getPaginatedUsers_customer_usersConnection_pageInfo {
+  __typename: "PaginationPageInfo";
+  nrPages: number;
+  pageIndex: number;
+}
+
 export interface getPaginatedUsers_customer_usersConnection {
   __typename: "UserConnection";
   userCustomers: getPaginatedUsers_customer_usersConnection_userCustomers[];
-  totalPages: number | null;
-  pageIndex: number | null;
+  pageInfo: getPaginatedUsers_customer_usersConnection_pageInfo;
 }
 
 export interface getPaginatedUsers_customer {

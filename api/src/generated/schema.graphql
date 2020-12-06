@@ -399,6 +399,16 @@ type PaginationPageInfo {
   pageIndex: Int!
 }
 
+"""Fields that can be used for free text search on tables"""
+enum PaginationSearchEnum {
+  email
+  firstName
+  lastName
+  name
+  publicTitle
+  title
+}
+
 """Ways to sort a pagination object"""
 enum PaginationSortByEnum {
   createdAt
@@ -807,9 +817,12 @@ input UpdateQuestionNodeInputType {
 """The `Upload` scalar type represents a file upload."""
 scalar Upload
 
-type UserConnection {
-  pageIndex: Int
-  totalPages: Int
+type UserConnection implements ConnectionInterface {
+  endDate: String
+  limit: Int!
+  offset: Int!
+  pageInfo: PaginationPageInfo!
+  startDate: String
   userCustomers: [UserCustomer!]!
 }
 
