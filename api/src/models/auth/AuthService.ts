@@ -128,7 +128,6 @@ class AuthService {
 
   static async checkPassword(inputPassword: string, dbPassword: string) {
     const res = await bcrypt.compare(inputPassword, dbPassword);
-
     return res;
   }
 
