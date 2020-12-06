@@ -197,7 +197,7 @@ export const StyledInput = styled.input <{isInvalid?: boolean }>`
 
 export const StyledTextInput = styled(Input).attrs({ as: 'textarea' })`
   resize: none;
-  font-family: 'Open sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   min-height: 150px;
 `;
 
@@ -349,7 +349,7 @@ export const Textbox = styled.textarea`
     
     font-size: ${theme.fontSizes[1]}px;
     border-radius: 10px;
-    font-family: 'Open Sans', sans-serif;
+    font-family: 'Inter', sans-serif;
     box-shadow: none;
     padding: 24px 24px;
     min-height: 200px;

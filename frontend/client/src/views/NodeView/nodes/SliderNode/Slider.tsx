@@ -119,10 +119,10 @@ const SliderText = ({ color, adaptedColor, score, isEarly }: { color: string, ad
 
   return (
     <Span ml={2} textAlign="left">
-      <Text fontSize="1rem" color={color}>
+      <Text fontSize="1rem" fontWeight={700} color={color}>
         {text}
       </Text>
-      <Text fontSize="0.7rem" color={adaptedColor}>
+      <Text fontSize="0.7rem" fontWeight={500} color={adaptedColor}>
         {subText}
       </Text>
     </Span>
