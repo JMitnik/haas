@@ -7,7 +7,7 @@ import { NodeTitle } from 'layouts/NodeLayout/NodeLayoutStyles';
 import { SessionEntryDataProps } from 'models/Session/SessionEntryModel';
 import { TreeNodeOptionProps } from 'models/Tree/TreeNodeOptionModel';
 import ReactMarkdown from 'react-markdown';
-import SpeechIcon from './icon-chat.svg';
+import SpeechIcon from 'assets/icons/icon-chat.svg';
 
 import { ChoiceIconContainer, MultiChoiceNodeContainer, MultiChoiceNodeGrid } from './MultiChoiceNodeStyles';
 import { GenericNodeProps } from '../types';

@@ -1,4 +1,4 @@
-import { CheckCircle } from 'react-feather';
+import { CheckCircle, Mail, User } from 'react-feather';
 import { useForm } from 'react-hook-form';
 import React from 'react';
 
@@ -53,7 +53,7 @@ const RegisterNode = ({ node, onEntryStore }: RegisterNodeProps) => {
               <InputContainer>
                 <InputLabel>First name</InputLabel>
                 <Input
-                  leftEl={<IconContainer><div /></IconContainer>}
+                  leftEl={<IconContainer><User /></IconContainer>}
                   placeholder="Jane"
                   name="firstName"
                   ref={register}
@@ -63,7 +63,7 @@ const RegisterNode = ({ node, onEntryStore }: RegisterNodeProps) => {
               <InputContainer>
                 <InputLabel color="white">Last name</InputLabel>
                 <Input
-                  leftEl={<IconContainer><div /></IconContainer>}
+                  leftEl={<IconContainer><User /></IconContainer>}
                   placeholder="Doe"
                   name="lastName"
                   ref={register}
@@ -74,7 +74,7 @@ const RegisterNode = ({ node, onEntryStore }: RegisterNodeProps) => {
             <InputContainer>
               <InputLabel color="white">Email address</InputLabel>
               <Input
-                leftEl={<IconContainer><div /></IconContainer>}
+                leftEl={<IconContainer><Mail /></IconContainer>}
                 placeholder="Jane@haas.live"
                 name="email"
                 ref={register}
