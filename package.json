@@ -22,7 +22,7 @@
     "scripts": {
         "start": "concurrently \"yarn start:client\" \"yarn start:dashboard\" \"yarn start:api\"",
         "start:api": "yarn workspace @haas/api start",
-        "start:client": "yarn workspace @haas/client start",
+        "start:client": "yarn workspace @haas/client dev",
         "start:dashboard": "yarn workspace @haas/dashboard start",
         "build:client": "yarn workspace @haas/client build",
 
@@ -30,10 +30,12 @@
 
         "exec:frontend": "docker-compose -f docker-compose.dev.yml -p haas_dev exec frontends sh",
         "exec:api": "docker-compose -f docker-compose.dev.yml -p haas_dev exec api sh",
-        "up:client": "docker-compose -f docker-compose.dev.yml -p haas_dev exec frontends yarn workspace @haas/client start ",
+        "up:client": "docker-compose -f docker-compose.dev.yml -p haas_dev exec frontends yarn workspace @haas/client dev",
         "up:dashboard": "docker-compose -f docker-compose.dev.yml -p haas_dev exec frontends yarn workspace @haas/dashboard start ",
         "up:dev": "docker-compose -f docker-compose.dev.yml -p haas_dev up",
         "down:dev": "docker-compose -f docker-compose.dev.yml -p haas_dev down",
+        "migrate:dev": "docker-compose -f docker-compose.dev.yml -p haas_dev exec api npx prisma migrate up --experimental",
+        "seed:dev": "docker-compose -f docker-compose.dev.yml -p haas_dev exec api npx ts-node -s src/scripts/seed-db.ts",
         
         "up:test": "docker-compose -f docker-compose.test.yml -p haas_test up",
         "test:client": "yarn workspace @haas/client cypress",

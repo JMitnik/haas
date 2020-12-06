@@ -3,13 +3,13 @@ import { useQuery } from '@apollo/react-hooks';
 import React, { useContext, useEffect, useState } from 'react';
 import gql from 'graphql-tag';
 
-import { SystemPermission } from 'types/globalTypes';
 import {
   getCustomerOfUser_UserOfCustomer_customer as Customer,
   getCustomerOfUser_UserOfCustomer_role as Role,
   getCustomerOfUser as UserCustomerData,
   getCustomerOfUserVariables as UserCustomerVariables,
 } from './__generated__/getCustomerOfUser';
+import { SystemPermission } from 'types/globalTypes';
 import { useUser } from './UserProvider';
 
 const CustomerContext = React.createContext({} as CustomerContextProps);

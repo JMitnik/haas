@@ -9,7 +9,7 @@ import styled from 'styled-components';
 
 import { Div, Flex, Span, Text, Slider as UISlider } from '@haas/ui';
 import { HAASIdle, HAASRun, HAASStopping } from 'assets/animations';
-// import FingerIcon from '../../../../assets/icons/icon-fingerprint.svg';
+import FingerIcon from '../../../../assets/icons/icon-fingerprint.svg';
 // import HappyIcon from '../../../../assets/icons/icon-happy.svg';
 // import UnhappyIcon from '../../../../assets/icons/icon-unhappy.svg';
 

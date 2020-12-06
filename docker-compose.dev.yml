@@ -13,19 +13,6 @@ services:
     volumes:
       - local-dev-datavolume:/var/lib/postgresql/data
 
-  frontends:
-    image: node:13.12.0-alpine
-    tty: true
-    ports:
-      - '3000:3000'
-      - '3002:3002'
-    working_dir: /usr/src/app
-    volumes:
-      - './node_modules:/usr/src/app/node_modules'
-      - './package.json:/usr/src/app/package.json'
-      - './frontend:/usr/src/app/frontend:delegated'
-    command: 'sh'
-
   api:
     build: 
       context: .
