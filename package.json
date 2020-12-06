@@ -24,11 +24,10 @@
         "start:api": "yarn workspace @haas/api start",
         "start:client": "yarn workspace @haas/client start",
         "start:dashboard": "yarn workspace @haas/dashboard start",
-        "dock:start": "bash scripts/dock-start.sh",
-        "dock:test": "bash scripts/dock-test.sh",
+        "build:client": "yarn workspace @haas/client build",
+
         "dev": "concurrently \"yarn start:client\" \"yarn start:dashboard\" \"yarn dev:api\"",
         "dev:api": "docker-compose -f docker-compose.dev.yml up -d",
-        "build:client": "yarn workspace @haas/client build",
 
         "exec:frontend": "docker-compose -f docker-compose.dev.yml -p haas_dev exec frontends sh",
         "exec:api": "docker-compose -f docker-compose.dev.yml -p haas_dev exec api sh",
@@ -43,7 +42,7 @@
 
         "up:ci": "docker-compose -f docker-compose.ci.yml -p haas_ci up",
         "build:api": "yarn workspace @haas/api generate && yarn workspace @haas/api build",
-        
+
         "clean:npm": "find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +",
         "gen": "bash scripts/generate.sh",
         "gen:api": "yarn workspace @haas/api gen",
