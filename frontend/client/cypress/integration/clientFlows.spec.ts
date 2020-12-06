@@ -1,6 +1,6 @@
 describe('Client traverses the various flows', () => {
   it('Client traverses a neutral flow well', () => {
-    cy.visit('http://localhost:3000/test/test');
+    cy.visit('http://localhost:3000/default/default');
 
     // Click the select and select first to start the dialogue
     cy.get('[name="slider"]')

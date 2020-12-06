@@ -32,6 +32,7 @@
         "up:api": "docker-compose -f docker-compose.dev.yml -p haas_dev up",
         "down:api": "docker-compose -f docker-compose.dev.yml -p haas_dev down",
         "up:test": "docker-compose -f docker-compose.test.yml -p haas_test up",
+        "test:client": "yarn workspace @haas/client cypress",
         "down:test": "docker-compose -f docker-compose.test.yml -p haas_test down",
         "up:ci": "docker-compose -f docker-compose.ci.yml -p haas_ci up",
         "build:api": "yarn workspace @haas/api generate && yarn workspace @haas/api build",
@@ -45,9 +46,6 @@
         "kill": "yarn kill:api && yarn kill:client",
         "kill:api": "yarn workspace @haas/api kill",
         "kill:client": "kill $(lsof -t -i:3000) | exit 0",
-        "test": "yarn workspace @haas/client test",
-        "test:cypress-dashboard": "yarn workspace @haas/dashboard cypress open",
-        "test:cypress-client": "yarn workspace @haas/client cypress open",
         "restart:api": "yarn kill:api && yarn start:api"
     },
     "devDependencies": {
