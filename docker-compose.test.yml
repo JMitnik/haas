@@ -11,18 +11,19 @@ services:
       POSTGRES_PASSWORD: prisma
     ports:
       - '5435:5432'
-
-  client:
-    build:
-      shm_size: 2048M
-      context: .
-      dockerfile: container/client-dev.Dockerfile
-    stdin_open: true
+  
+  frontends:
+    image: node:13.12.0-alpine
+    tty: true
     ports:
       - '3000:3000'
+      - '3002:3002'
+    working_dir: /usr/src/app
     volumes:
-      - './frontend/client/src:/usr/src/frontend/client/src'
-    command: sh -c './wait-for-it.sh api:4000 -t 50 && yarn start'
+      - './node_modules:/usr/src/app/node_modules'
+      - './package.json:/usr/src/app/package.json'
+      - './frontend:/usr/src/app/frontend:delegated'
+    command: 'sh'
 
   api:
     build: 

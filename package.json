@@ -26,8 +26,7 @@
         "start:dashboard": "yarn workspace @haas/dashboard start",
         "build:client": "yarn workspace @haas/client build",
 
-        "dev": "concurrently \"yarn start:client\" \"yarn start:dashboard\" \"yarn dev:api\"",
-        "dev:api": "docker-compose -f docker-compose.dev.yml up -d",
+        "dev:api": "docker-compose -f docker-compose.dev.yml -p haas_dev up",
 
         "exec:frontend": "docker-compose -f docker-compose.dev.yml -p haas_dev exec frontends sh",
         "exec:api": "docker-compose -f docker-compose.dev.yml -p haas_dev exec api sh",
@@ -47,8 +46,10 @@
         "gen": "bash scripts/generate.sh",
         "gen:api": "yarn workspace @haas/api gen",
         "gen:dashboard": "yarn workspace @haas/dashboard gen",
+        
         "migrate": "yarn workspace @haas/api migrate",
         "migrate:create": "yarn workspace @haas/api migrate:create",
+
         "seed:api": "yarn workspace @haas/api seed",
         "kill": "yarn kill:api && yarn kill:client",
         "kill:api": "yarn workspace @haas/api kill",
