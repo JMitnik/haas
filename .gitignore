@@ -57,6 +57,7 @@ yarn-error.log*
 types.d.ts
 
 .now
+.next
 
 **/.env.prod
 api/.env.prod

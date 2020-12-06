@@ -5,12 +5,9 @@ import React from 'react';
 import { ButtonIcon } from '@haas/ui/src/Buttons';
 import { ClientButton, OutlineButton } from 'components/Buttons/Buttons';
 import { Div, Grid } from '@haas/ui';
-import { ReactComponent as EmailIcon } from 'assets/icons/icon-email.svg';
 import { Input, InputLabel } from '@haas/ui/src/Form';
-import { ReactComponent as LastNameIcon } from 'assets/icons/icon-last-name.svg';
 import { NodeTitle } from 'layouts/NodeLayout/NodeLayoutStyles';
 import { SessionEntryDataProps } from 'models/Session/SessionEntryModel';
-import { ReactComponent as UserIcon } from 'assets/icons/icon-user.svg';
 
 import { GenericNodeProps } from '../types';
 import { IconContainer, InputContainer, RegisterNodeContainer } from './RegisterNodeStyles';
@@ -56,7 +53,7 @@ const RegisterNode = ({ node, onEntryStore }: RegisterNodeProps) => {
               <InputContainer>
                 <InputLabel>First name</InputLabel>
                 <Input
-                  leftEl={<IconContainer><UserIcon /></IconContainer>}
+                  leftEl={<IconContainer><div /></IconContainer>}
                   placeholder="Jane"
                   name="firstName"
                   ref={register}
@@ -66,7 +63,7 @@ const RegisterNode = ({ node, onEntryStore }: RegisterNodeProps) => {
               <InputContainer>
                 <InputLabel color="white">Last name</InputLabel>
                 <Input
-                  leftEl={<IconContainer><LastNameIcon /></IconContainer>}
+                  leftEl={<IconContainer><div /></IconContainer>}
                   placeholder="Doe"
                   name="lastName"
                   ref={register}
@@ -77,7 +74,7 @@ const RegisterNode = ({ node, onEntryStore }: RegisterNodeProps) => {
             <InputContainer>
               <InputLabel color="white">Email address</InputLabel>
               <Input
-                leftEl={<IconContainer><EmailIcon /></IconContainer>}
+                leftEl={<IconContainer><div /></IconContainer>}
                 placeholder="Jane@haas.live"
                 name="email"
                 ref={register}

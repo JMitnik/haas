@@ -8,10 +8,10 @@ import React, { useEffect, useReducer, useState } from 'react';
 import styled from 'styled-components';
 
 import { Div, Flex, Span, Text, Slider as UISlider } from '@haas/ui';
-import { ReactComponent as FingerIcon } from 'assets/icons/icon-fingerprint.svg';
 import { HAASIdle, HAASRun, HAASStopping } from 'assets/animations';
-import { ReactComponent as HappyIcon } from 'assets/icons/icon-happy.svg';
-import { ReactComponent as UnhappyIcon } from 'assets/icons/icon-unhappy.svg';
+// import FingerIcon from '../../../../assets/icons/icon-fingerprint.svg';
+// import HappyIcon from '../../../../assets/icons/icon-happy.svg';
+// import UnhappyIcon from '../../../../assets/icons/icon-unhappy.svg';
 
 import { FingerPrintContainer, HAASRabbit, SlideHereContainer, SliderNodeValue } from './SliderNodeStyles';
 import { SlideMeAnimation } from './SliderNodeAnimations';
@@ -287,7 +287,7 @@ const Slider = ({ form, register, onSubmit }: SliderProps) => {
       {animationState.isStopped && (
         <SlideHereContainer variants={SlideMeAnimation} animate="animate" initial="initial" exit="exit">
           <Flex alignItems="center">
-            <UnhappyIcon />
+            <div />
             <Text fontSize="0.8rem">
               Unhappy
             </Text>
@@ -296,7 +296,7 @@ const Slider = ({ form, register, onSubmit }: SliderProps) => {
             <Text mr={1} fontSize="0.8rem">
               Happy
             </Text>
-            <HappyIcon />
+            <div />
           </Flex>
         </SlideHereContainer>
       )}
@@ -356,9 +356,9 @@ const Slider = ({ form, register, onSubmit }: SliderProps) => {
                         animate={{ y: 0 }}
                       >
                         {sliderValue > 5 ? (
-                          <HappyIcon />
+                          <div />
                         ) : (
-                          <UnhappyIcon />
+                          <div />
                         )}
                       </motion.div>
                     )}
@@ -415,7 +415,7 @@ const Slider = ({ form, register, onSubmit }: SliderProps) => {
             },
           }}
         >
-          <FingerIcon />
+          <div />
         </FingerPrintContainer>
       )}
 

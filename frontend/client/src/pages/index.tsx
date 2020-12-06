@@ -1,12 +1,13 @@
 import { AnimatePresence } from 'framer-motion';
 import { ErrorBoundary } from 'react-error-boundary';
 import { Route, Switch, useLocation } from 'react-router-dom';
-import React, { useLayoutEffect } from 'react';
+import React from 'react';
 
 import AppProviders from 'providers/AppProviders';
 import CustomerPage from 'pages/[customer]';
 import CustomersPage from 'pages/customers';
 import GlobalAppLayout from 'layouts/GlobalAppLayout';
+import useIsomorphicLayoutEffect from 'hooks/useIsomorphicLayoutEffect';
 
 import NodePage from './[customer]/[dialogue]/[node]';
 
@@ -40,9 +41,15 @@ const AppRoutes = () => {
 
   );
 };
+const SafeHydrate = ({ children }: { children: any }) => (
+  <div suppressHydrationWarning>
+    {' '}
+    {typeof document === 'undefined' ? null : children}
+  </div>
+);
 
 const App = () => {
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     const updateSize = () => {
       const vh = window.innerHeight * 0.01;
       document.documentElement.style.setProperty('--vh', `${vh}px`);
@@ -55,13 +62,15 @@ const App = () => {
   }, []);
 
   return (
-    <AppProviders>
-      <GlobalAppLayout>
-        <ErrorBoundary FallbackComponent={ErrorPage}>
-          <AppRoutes />
-        </ErrorBoundary>
-      </GlobalAppLayout>
-    </AppProviders>
+    <SafeHydrate>
+      <AppProviders>
+        <GlobalAppLayout>
+          <ErrorBoundary FallbackComponent={ErrorPage}>
+            <AppRoutes />
+          </ErrorBoundary>
+        </GlobalAppLayout>
+      </AppProviders>
+    </SafeHydrate>
   );
 };
 
