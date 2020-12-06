@@ -29,13 +29,21 @@
         "dev": "concurrently \"yarn start:client\" \"yarn start:dashboard\" \"yarn dev:api\"",
         "dev:api": "docker-compose -f docker-compose.dev.yml up -d",
         "build:client": "yarn workspace @haas/client build",
-        "up:api": "docker-compose -f docker-compose.dev.yml -p haas_dev up",
-        "down:api": "docker-compose -f docker-compose.dev.yml -p haas_dev down",
+
+        "exec:frontend": "docker-compose -f docker-compose.dev.yml -p haas_dev exec frontends sh",
+        "exec:api": "docker-compose -f docker-compose.dev.yml -p haas_dev exec api sh",
+        "up:client": "docker-compose -f docker-compose.dev.yml -p haas_dev exec frontends yarn workspace @haas/client start ",
+        "up:dashboard": "docker-compose -f docker-compose.dev.yml -p haas_dev exec frontends yarn workspace @haas/dashboard start ",
+        "up:dev": "docker-compose -f docker-compose.dev.yml -p haas_dev up",
+        "down:dev": "docker-compose -f docker-compose.dev.yml -p haas_dev down",
+        
         "up:test": "docker-compose -f docker-compose.test.yml -p haas_test up",
         "test:client": "yarn workspace @haas/client cypress",
         "down:test": "docker-compose -f docker-compose.test.yml -p haas_test down",
+
         "up:ci": "docker-compose -f docker-compose.ci.yml -p haas_ci up",
         "build:api": "yarn workspace @haas/api generate && yarn workspace @haas/api build",
+        
         "clean:npm": "find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +",
         "gen": "bash scripts/generate.sh",
         "gen:api": "yarn workspace @haas/api gen",

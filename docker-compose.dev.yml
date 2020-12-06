@@ -13,19 +13,18 @@ services:
     volumes:
       - local-dev-datavolume:/var/lib/postgresql/data
 
-  client:
-    build:
-      shm_size: 2048M
-      context: .
-      dockerfile: container/client-dev.Dockerfile
-    environment:
-      REACT_APP_API_ENDPOINT: 'api:4000'
-    stdin_open: true
+  frontends:
+    image: node:13.12.0-alpine
+    tty: true
     ports:
       - '3000:3000'
+      - '3002:3002'
+    working_dir: /usr/src/app
     volumes:
-      - './frontend/client/src:/usr/src/frontend/client/src'
-    command: sh -c './wait-for-it.sh api:4000 -t 50 && yarn start'
+      - './node_modules:/usr/src/app/node_modules'
+      - './package.json:/usr/src/app/package.json'
+      - './frontend:/usr/src/app/frontend:delegated'
+    command: 'sh'
 
   api:
     build: 
@@ -43,7 +42,7 @@ services:
         - './api/migrations:/app/migrations'
     depends_on: 
       - postgres
-    command: sh -c './wait-for-it.sh postgres:5432 && npx prisma migrate up --experimental && (npx ts-node -s src/scripts/seed-db.ts) && (npx tsnd --exit-child --transpile-only -- ./src/app.ts)'
+    command: sh -c './wait-for-it.sh postgres:5432 && (npx tsnd --exit-child --transpile-only -- ./src/app.ts)'
     
 volumes:
   local-dev-datavolume:
