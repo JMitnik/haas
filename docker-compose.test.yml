@@ -12,6 +12,20 @@ services:
     ports:
       - '5435:5432'
 
+  client:
+    build:
+      shm_size: 2048M
+      context: .
+      dockerfile: container/client-dev.Dockerfile
+    environment:
+      REACT_APP_API_ENDPOINT: 'api:4000'
+    stdin_open: true
+    ports:
+      - '3000:3000'
+    volumes:
+      - './frontend/client/src:/usr/src/frontend/client/src'
+    command: sh -c './wait-for-it.sh api:4000 -t 50 && yarn start'
+  
   api:
     build: 
       context: .
