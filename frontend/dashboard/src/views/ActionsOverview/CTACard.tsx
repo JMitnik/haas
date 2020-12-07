@@ -16,7 +16,6 @@ import getCTANodesQuery from 'queries/getCTANodes';
 
 import CTAForm from './CTAForm';
 import CTAIcon from './CTAIcon';
-import EditCTAButton from './EditCTAButton';
 
 interface LinkInputProps {
   id: string;
@@ -76,7 +75,7 @@ const OverflowSpan = styled(Span)`
     color: ${theme.colors.default.darkest};
     font-size: 1.2em;
     overflow: hidden;
-    white-space: nowrap;
+    /* white-space: nowrap; */
     text-overflow: ellipsis;
   `}
 `;
@@ -135,31 +134,32 @@ const CTACard = ({ id, activeCTA, onActiveCTAChange, title, type, links, share, 
   return (
     <motion.div initial={{ opacity: 1, y: 150 }} animate={{ opacity: 1, y: 0 }}>
       <CTACardContainer noHover id={id} activeCTA={activeCTA}>
-        <Flex flexDirection="row" width="100%">
-          <CTAIcon type={type} Icon={Icon} />
+        <Flex justifyContent="space-between" flexDirection="row" width="100%">
+          <UI.Flex>
+            <CTAIcon type={type} Icon={Icon} />
 
-          <Flex width="60%" flexDirection="column">
-            <motion.span>
-              <UI.Text style={{ textTransform: 'uppercase' }} color="gray.400" fontWeight="500" fontSize="0.8rem">
-                {t('title')}
-              </UI.Text>
-            </motion.span>
-            <OverflowSpan>
-              <UI.Text fontWeight="600" color="gray.600">
-                <ReactMarkdown>
-                  {title || t('none') || ''}
-                </ReactMarkdown>
-              </UI.Text>
-            </OverflowSpan>
-          </Flex>
+            <Flex flexDirection="column">
+              <motion.span>
+                <UI.Text style={{ textTransform: 'uppercase' }} color="gray.400" fontWeight="500" fontSize="0.8rem">
+                  {t('title')}
+                </UI.Text>
+              </motion.span>
+              <OverflowSpan>
+                <UI.Text fontWeight="600" color="gray.600">
+                  <ReactMarkdown>
+                    {title || t('none') || ''}
+                  </ReactMarkdown>
+                </UI.Text>
+              </OverflowSpan>
+            </Flex>
+          </UI.Flex>
 
-          <Flex width="30%" alignItems="center" justifyContent="center">
-            <EditCTAButton disabled={(activeCTA && activeCTA !== id) || false} onClick={() => onActiveCTAChange(id)}>
-              <Edit3 />
+          <Flex alignItems="center" justifyContent="center">
+            <UI.Button mr={4} variant="outline" variantColor="teal" size="sm" leftIcon={Edit3} isDisabled={(activeCTA && activeCTA !== id) || false} onClick={() => onActiveCTAChange(id)}>
               <Span>
                 {t('edit')}
               </Span>
-            </EditCTAButton>
+            </UI.Button>
           </Flex>
 
         </Flex>

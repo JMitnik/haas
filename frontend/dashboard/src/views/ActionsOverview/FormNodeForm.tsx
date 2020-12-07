@@ -1,5 +1,5 @@
 import * as UI from '@haas/ui';
-import { AlertCircle, AtSign, Circle, Feather, FileText, Hash, Link2, Phone, Type } from 'react-feather';
+import { AlertCircle, ArrowLeft, ArrowRight, AtSign, Circle, Edit2, Feather, FileText, Hash, Link2, Phone, Type } from 'react-feather';
 import { Button } from '@chakra-ui/core';
 import { Controller, UseFormMethods, useFieldArray, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -82,41 +82,66 @@ const fieldMap: FieldProps[] = [
   },
 ];
 
-const FormNodePreview = ({ form, field, onMoveRight, onMoveLeft }: { form: UseFormMethods<FormDataProps>, field: any, onMoveRight: any, onMoveLeft: any }) => {
+interface FormNodePreviewProps {
+  form: UseFormMethods<FormDataProps>;
+  field: any;
+  onMoveRight: any;
+  onMoveLeft: any;
+  onOpen: any;
+  fieldIndex: number;
+  nrFields: number;
+}
+
+const FormNodePreview = ({ form, field, onMoveRight, onMoveLeft, onOpen, fieldIndex, nrFields }: FormNodePreviewProps) => {
   const fieldCategory = fieldMap.find((fieldItem) => fieldItem.type === field.type);
 
   const FieldIcon = fieldCategory?.icon || Feather;
+  const { t } = useTranslation();
 
   return (
     <UI.Card>
       <UI.CardBody>
-        {field.type && (
-          <UI.Flex>
-            <UI.IconBox mr={2} bg={fieldCategory?.color}><FieldIcon /></UI.IconBox>
-            <UI.ColumnFlex>
-              <UI.Text color="gray.700" fontWeight="900">{field?.label || 'Generic field'}</UI.Text>
-              <UI.Text fontWeight="300" color="gray.400">{field?.type}</UI.Text>
-            </UI.ColumnFlex>
-          </UI.Flex>
-        )}
-        <UI.Button
-          type="button"
-          onClick={(event) => {
-            event.stopPropagation();
-            onMoveLeft();
-          }}
-        >
-          Left
-        </UI.Button>
-        <UI.Button
-          type="button"
-          onClick={(event) => {
-            event.stopPropagation();
-            onMoveRight();
-          }}
-        >
-          Right
-        </UI.Button>
+        <UI.Flex justifyContent="space-between">
+          {field.type ? (
+            <UI.Flex>
+              <UI.IconBox mr={2} bg={fieldCategory?.color}><FieldIcon /></UI.IconBox>
+              <UI.ColumnFlex>
+                <UI.Text color="gray.500" fontWeight="700">{field?.label || 'Unnamed field'}</UI.Text>
+                <UI.Text fontWeight="300" color="gray.500">{t(`${field?.type}_type`)}</UI.Text>
+              </UI.ColumnFlex>
+            </UI.Flex>
+          ) : (
+            <UI.Text>{t('empty_field')}</UI.Text>
+          )}
+          <UI.ButtonGroup>
+            {}
+            <UI.IconButton
+              size="sm"
+              aria-label="Move field left"
+              icon={ArrowLeft}
+              type="button"
+              isDisabled={fieldIndex === 0}
+              onClick={(event) => {
+                event.stopPropagation();
+                onMoveLeft();
+              }}
+            />
+            <UI.Button size="sm" type="button" onClick={onOpen}>
+              {t('edit_field')}
+            </UI.Button>
+            <UI.IconButton
+              size="sm"
+              aria-label="Move field right"
+              icon={ArrowRight}
+              type="button"
+              isDisabled={fieldIndex === nrFields - 1}
+              onClick={(event) => {
+                event.stopPropagation();
+                onMoveRight();
+              }}
+            />
+          </UI.ButtonGroup>
+        </UI.Flex>
       </UI.CardBody>
     </UI.Card>
   );
@@ -142,7 +167,7 @@ const FormNodeFieldFragment = ({ field, onClose, onSubmit }: { field: any, field
     <UI.Card noHover ref={ref}>
       <UI.CardForm dualPane>
         <UI.List>
-          <UI.ListGroupHeader>{t('field_types')}</UI.ListGroupHeader>
+          <UI.ListGroupHeader>{t('select_a_field_type')}</UI.ListGroupHeader>
           <UI.ListGroup>
             {fieldMap.map((fieldCategory, index) => (
               <UI.ListItem
@@ -266,10 +291,13 @@ const FormNodeForm = ({ form }: FormNodeFormProps) => {
                       key={field.fieldIndex}
                     />
                   ) : (
-                    <UI.Card onClick={() => setOpenedField(index)}>
+                    <UI.Card noHover>
                       <FormNodePreview
+                        fieldIndex={index}
+                        nrFields={fields.length}
                         field={formNodeFields[index]}
                         form={form}
+                        onOpen={() => setOpenedField(index)}
                         onMoveLeft={() => move(index, Math.max(index - 1, 0))}
                         onMoveRight={() => {
                           move(index, Math.min(index + 1, fields.length - 1));

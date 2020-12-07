@@ -1,6 +1,18 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    edit_field: {
+      en: 'Edit field',
+      de: 'Feld bearbeiten',
+    },
+    select_a_field_type: {
+      en: 'Select a field type',
+      de: 'Wählen Sie einen Feldtyp aus',
+    },
+    email_type: {
+      en: 'Email',
+      de: 'Email',
+    },
     add_field_reminder: {
       en: 'Add your first field!',
       de: 'Fügen Sie Ihr erstes Feld hinzu!',
