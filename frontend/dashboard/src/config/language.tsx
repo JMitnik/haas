@@ -1,6 +1,14 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    add_field_reminder: {
+      en: 'Add your first field!',
+      de: 'Fügen Sie Ihr erstes Feld hinzu!',
+    },
+    add_field: {
+      en: 'Add field',
+      de: 'Feld hinzufügen',
+    },
     form_node: {
       en: 'About the form',
       de: 'Über das Formular',
