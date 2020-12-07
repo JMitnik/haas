@@ -30,9 +30,9 @@ import createCTAMutation from 'mutations/createCTA';
 import getCTANodesQuery from 'queries/getCTANodes';
 import updateCTAMutation from 'mutations/updateCTA';
 
+import intToBool from 'utils/intToBool';
 import { FormDataProps } from './CTATypes';
 import FormNodeForm from './FormNodeForm';
-import intToBool from 'utils/intToBool';
 
 interface LinkInputProps {
   id?: string | null;
@@ -379,7 +379,7 @@ const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTACha
                     as={Select}
                   />
 
-                  <FormErrorMessage>{form.errors.ctaType?.value}</FormErrorMessage>
+                  <FormErrorMessage>{form.errors.ctaType?.value?.message}</FormErrorMessage>
                 </FormControl>
               </InputGrid>
             </Div>
@@ -483,7 +483,7 @@ const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTACha
                                     onChange={(e: any) => handleURLChange(e.currentTarget.value, index)}
                                     ref={form.register({ required: true })}
                                   />
-                                  <FormErrorMessage>{!!form.errors?.links?.[index]?.url}</FormErrorMessage>
+                                  <FormErrorMessage>{!!form.errors?.links?.[index]?.url?.message}</FormErrorMessage>
                                 </FormControl>
 
                                 <FormControl isRequired isInvalid={!!form.errors.links?.[index]?.type}>
@@ -505,7 +505,7 @@ const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTACha
                                       />
                                     )}
                                   />
-                                  <FormErrorMessage>{!!form.errors.links?.[index]?.type}</FormErrorMessage>
+                                  <FormErrorMessage>{!!form.errors.links?.[index]?.type?.message}</FormErrorMessage>
                                 </FormControl>
 
                                 <FormControl>
@@ -518,7 +518,7 @@ const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTACha
                                     onChange={(e:any) => handleTooltipChange(e.currentTarget.value, index)}
                                     ref={form.register({ required: false })}
                                   />
-                                  <FormErrorMessage>{!!form.errors.links?.[index]?.tooltip}</FormErrorMessage>
+                                  <FormErrorMessage>{!!form.errors.links?.[index]?.tooltip?.message}</FormErrorMessage>
                                 </FormControl>
 
                                 <FormControl>
@@ -531,7 +531,7 @@ const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTACha
                                     onChange={(e:any) => handleIconChange(e.currentTarget.value, index)}
                                     ref={form.register({ required: false })}
                                   />
-                                  <FormErrorMessage>{!!form.errors.links?.[index]?.iconUrl}</FormErrorMessage>
+                                  <FormErrorMessage>{!!form.errors.links?.[index]?.iconUrl?.message}</FormErrorMessage>
                                 </FormControl>
 
                                 <FormControl>
@@ -544,7 +544,7 @@ const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTACha
                                     onChange={(e:any) => handleBackgroundColorChange(e.currentTarget.value, index)}
                                     ref={form.register({ required: false })}
                                   />
-                                  <FormErrorMessage>{!!form.errors.links?.[index]?.backgroundColor}</FormErrorMessage>
+                                  <FormErrorMessage>{!!form.errors.links?.[index]?.backgroundColor?.message}</FormErrorMessage>
                                 </FormControl>
 
                               </Grid>

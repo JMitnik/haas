@@ -13,6 +13,17 @@ const QuestionFragment = gql`
       type
       title
     }
+    sliderNode {
+      markers {
+        id
+        label
+        subLabel
+        range {
+          start
+          end
+        }
+      }
+    }
     type
     children {
       id

@@ -101,11 +101,30 @@ model Dialogue {
 enum NodeType {
   GENERIC
   SLIDER
+  FORM
   CHOICE
   REGISTRATION
   TEXTBOX
   LINK
   SHARE
+}
+
+model SliderNodeRange {
+  id        Int          @id @default(autoincrement())
+  start     Int?
+  end       Int?
+}
+
+model SliderNodeMarker {
+  id        Int          @id @default(autoincrement())
+  range     SliderNodeRange
+  label     String
+  subLabel  String
+}
+
+model SliderNode {
+  id        Int          @id @default(autoincrement())
+  markers SliderNodeMarker[]
 }
 
 model QuestionNode {
@@ -136,7 +155,9 @@ model QuestionNode {
   QuestionOption QuestionOption[] @relation("QuestionNodeOptions")
   triggers       Trigger[]
 
-  share Share?
+  // Node-types
+  share      Share?
+  sliderNode SliderNode?
 
   links             Link[]
   QuestionOfTrigger QuestionOfTrigger[]
@@ -386,7 +407,7 @@ enum TriggerConditionEnum {
 
 model TriggerCondition {
   id                Int                  @id @default(autoincrement())
-  createdAt         DateTime?             @default(now())
+  createdAt         DateTime?            @default(now())
   type              TriggerConditionEnum @default(value: LOW_THRESHOLD)
   minValue          Int?
   maxValue          Int?

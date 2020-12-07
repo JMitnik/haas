@@ -1,6 +1,7 @@
-import { Button, ButtonGroup, FormErrorMessage, useToast } from '@chakra-ui/core';
+import { Button, ButtonGroup, useToast } from '@chakra-ui/core';
 import { Div, Form, FormContainer,
-  FormControl, FormLabel, FormSection, H3, Hr, Input, InputGrid, InputHelper, Muted, PageTitle, ViewContainer } from '@haas/ui';
+  FormControl, FormLabel, FormSection, H3, Hr,
+  Input, InputGrid, InputHelper, Muted, PageTitle, ViewContainer } from '@haas/ui';
 import { Mail, Phone, User } from 'react-feather';
 import { Variants, motion } from 'framer-motion';
 import { queryMe, useUser } from 'providers/UserProvider';
@@ -124,7 +125,6 @@ const EditMeForm = () => {
                   name="firstName"
                   ref={form.register()}
                 />
-                <FormErrorMessage>{form.errors.firstName}</FormErrorMessage>
               </FormControl>
               <FormControl isRequired isInvalid={!!form.errors.lastName}>
                 <FormLabel htmlFor="lastName">{t('last_name')}</FormLabel>
@@ -135,7 +135,6 @@ const EditMeForm = () => {
                   name="lastName"
                   ref={form.register()}
                 />
-                <FormErrorMessage>{form.errors.lastName}</FormErrorMessage>
               </FormControl>
               <FormControl isRequired isInvalid={!!form.errors.email}>
                 <FormLabel htmlFor="email">{t('email')}</FormLabel>
@@ -146,7 +145,6 @@ const EditMeForm = () => {
                   name="email"
                   ref={form.register()}
                 />
-                <FormErrorMessage>{form.errors.email}</FormErrorMessage>
               </FormControl>
               <FormControl isInvalid={!!form.errors.phone}>
                 <FormLabel htmlFor="phone">{t('phone')}</FormLabel>
@@ -157,7 +155,6 @@ const EditMeForm = () => {
                   name="phone"
                   ref={form.register()}
                 />
-                <FormErrorMessage>{form.errors.phone}</FormErrorMessage>
               </FormControl>
             </InputGrid>
           </Div>

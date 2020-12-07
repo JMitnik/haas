@@ -1,4 +1,6 @@
 import React, { forwardRef, Ref, ReactNode } from 'react';
+import 'antd/dist/antd.css'; // Slider,
+import { Slider as AntdSlider } from 'antd';
 import { Div, Paragraph } from '@haas/ui';
 import {
   Button,
@@ -501,7 +503,7 @@ interface FormSectionProps extends GridProps {
 }
 
 export const FormSection = forwardRef((props: FormSectionProps, ref: Ref<HTMLDivElement>) => (
-  <FormSectionContainer ref={ref} py={4} gridTemplateColumns={['1fr', '1fr', '1fr 3fr']} {...props}>
+  <FormSectionContainer ref={ref} py={4} gridTemplateColumns={['1fr', '1fr', '1fr', '1fr 3fr']} {...props}>
     {props.children}
   </FormSectionContainer>
 ));
@@ -572,3 +574,25 @@ export const GridForm = styled.form`
     padding: 10px;
   `}
 `;
+
+interface RangeSliderProps {
+  min: number;
+  max: number;
+  isDisabled?: boolean;
+  stepSize?: number;
+  onChange?: (vals: [number, number] | number) => void;
+}
+
+export const RangeSlider = ({ min=0, max=10, onChange, stepSize=0.5, isDisabled = false }: RangeSliderProps) => {
+  return (
+    <AntdSlider 
+      range
+      disabled={isDisabled}
+      max={10}
+      min={0}
+      step={stepSize}
+      defaultValue={[min, max]}
+      onAfterChange={onChange}
+    />
+  )
+};

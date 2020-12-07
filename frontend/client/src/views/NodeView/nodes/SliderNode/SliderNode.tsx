@@ -40,7 +40,7 @@ const SliderNode = ({ node, onEntryStore }: SliderNodeProps) => {
         <NodeTitle>{node.title}</NodeTitle>
       </Div>
       <Div>
-        <Slider form={form} onSubmit={handleSubmit} register={form.register} />
+        <Slider markers={node?.sliderNode?.markers || []} form={form} onSubmit={handleSubmit} register={form.register} />
       </Div>
 
     </SliderNodeContainer>

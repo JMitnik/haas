@@ -229,6 +229,17 @@ export const DialogueType = objectType({
           where: {
             isRoot: true,
           },
+          include: {
+            sliderNode: {
+              include: {
+                markers: {
+                  include: {
+                    range: true,
+                  },
+                },
+              },
+            },
+          },
         });
 
         return rootQuestions[0];
@@ -268,6 +279,17 @@ export const DialogueType = objectType({
           },
           orderBy: {
             creationDate: 'asc',
+          },
+          include: {
+            sliderNode: {
+              include: {
+                markers: {
+                  include: {
+                    range: true,
+                  },
+                },
+              },
+            },
           },
         });
 

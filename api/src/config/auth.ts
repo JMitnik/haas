@@ -71,6 +71,7 @@ const authShield = shield({
     createCTA: containsWorkspacePermission(SystemPermissionEnum.CAN_BUILD_DIALOGUE),
     copyDialogue: isSuperAdmin,
     createDialogue: containsWorkspacePermission(SystemPermissionEnum.CAN_BUILD_DIALOGUE),
+    editDialogue: containsWorkspacePermission(SystemPermissionEnum.CAN_EDIT_DIALOGUE),
     deleteDialogue: containsWorkspacePermission(SystemPermissionEnum.CAN_DELETE_DIALOGUE),
 
     // // Workspace-trigger specific settings

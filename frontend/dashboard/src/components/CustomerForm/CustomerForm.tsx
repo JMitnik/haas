@@ -1,5 +1,5 @@
 import { Activity, Briefcase, Clipboard, Link, Link2, Loader, Minus, Upload } from 'react-feather';
-import { Button, ButtonGroup, FormErrorMessage, RadioButtonGroup, useToast } from '@chakra-ui/core';
+import { Button, ButtonGroup, RadioButtonGroup, useToast } from '@chakra-ui/core';
 import { Controller, UseFormMethods } from 'react-hook-form';
 import {
   Div, Form, FormControl, FormLabel, FormSection, H3, Hr, Input, InputGrid, InputHelper,
@@ -172,7 +172,6 @@ const CustomerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = 
                 name="name"
                 ref={form.register()}
               />
-              <FormErrorMessage>{form.errors.name}</FormErrorMessage>
             </FormControl>
 
             <FormControl isInvalid={!!form.errors.slug} isRequired>
@@ -184,7 +183,6 @@ const CustomerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = 
                 name="slug"
                 ref={form.register()}
               />
-              <FormErrorMessage>{form.errors.slug}</FormErrorMessage>
             </FormControl>
           </InputGrid>
         </Div>

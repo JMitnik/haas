@@ -278,7 +278,6 @@ const FormConditionFragment = ({
               />
             )}
           />
-          <FormErrorMessage>{form.errors.conditions?.[fieldIndex]?.questionId?.value}</FormErrorMessage>
         </FormControl>
       )}
 
@@ -609,7 +608,7 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                   />
                 )}
               />
-              <FormErrorMessage>{form.errors.dialogue?.label}</FormErrorMessage>
+              <FormErrorMessage>{form.errors.dialogue?.label?.message}</FormErrorMessage>
             </FormControl>
 
             <FormControl isInvalid={!!form.errors.type}>
@@ -648,7 +647,7 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                 )}
               />
 
-              <FormErrorMessage>{form.errors.dialogue?.label}</FormErrorMessage>
+              <FormErrorMessage>{form.errors.dialogue?.label?.message}</FormErrorMessage>
             </FormControl>
           </InputGrid>
         </Div>
@@ -775,7 +774,7 @@ const TriggerForm = ({ form, onFormSubmit, isLoading, serverErrors, isInEdit = f
                     as={<Select />}
                   />
 
-                  <FormErrorMessage>{form.errors.medium}</FormErrorMessage>
+                  <FormErrorMessage>{form.errors.medium?.message}</FormErrorMessage>
                 </FormControl>
               </InputGrid>
             </UI.Card>
