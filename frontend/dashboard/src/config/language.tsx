@@ -804,8 +804,8 @@ const language = {
       de: 'Welcher Maximalwert soll die Folgefrage auslösen?',
     },
     about_type_helper: {
-      en: 'Describe the question type',
-      de: 'Details zur Frage',
+      en: 'Describe the question type.',
+      de: 'Details zur Frage.',
     },
     question_type: {
       en: 'Question type',
@@ -820,8 +820,8 @@ const language = {
       de: 'Welchen Call-to-Action möchtest du hinzufügen?',
     },
     add_option_reminder: {
-      en: 'Please add an option',
-      de: 'Füge ein Option hinzu',
+      en: 'Please add an option.',
+      de: 'Füge ein Option hinzu.',
     },
     empty_option_reminder: {
       en: 'Please fill in at least one option.',

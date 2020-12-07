@@ -55,11 +55,19 @@ export const FormGroupContainer = styled.div`
   `}
 `;
 
+export const InputHeader = styled(Text)`
+  ${({ theme }) => css`
+    color: ${theme.colors.gray[700]};
+    margin-bottom: ${theme.gutter / 4}px;
+  `}
+`;
+
 export const InputHelper = styled.p`
   ${({ theme }) => css`
-    color: ${theme.colors.gray[400]};
+    color: ${theme.colors.gray[500]};
     font-size: 0.8rem;
-    margin-bottom: 8px;
+    margin-bottom: ${theme.gutter / 2}px;
+    max-width: 500px;
   `}
 `;
 
