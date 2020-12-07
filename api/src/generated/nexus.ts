@@ -155,6 +155,7 @@ export interface NexusGenInputs {
     fields?: NexusGenInputs['FormNodeEntryFieldInput'][] | null; // [FormNodeEntryFieldInput!]
   }
   FormNodeFieldInput: { // input type
+    id?: string | null; // ID
     isRequired?: boolean | null; // Boolean
     label?: string | null; // String
     position?: number | null; // Int

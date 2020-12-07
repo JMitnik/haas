@@ -9,7 +9,6 @@ import ReactMarkdown from 'react-markdown';
 
 import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
 import { useCustomer } from 'providers/CustomerProvider';
-import EditButton from 'components/EditButton';
 import deleteQuestionMutation from 'mutations/deleteQuestion';
 
 import { EdgeConditonProps, QuestionEntryProps, QuestionOptionProps } from '../../DialogueBuilderInterfaces';

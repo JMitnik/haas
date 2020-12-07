@@ -74,6 +74,11 @@ export const UpdateCTAResolver = mutationField('updateCTA', {
       await NodeService.upsertLinks(args?.input?.links?.linkTypes, args?.input?.id);
     }
 
+    // If form is passed
+    if (args?.input?.form) {
+      // await prisma.
+    }
+
     // Finally, update question-node
     return prisma.questionNode.update({
       where: { id: args?.input?.id },

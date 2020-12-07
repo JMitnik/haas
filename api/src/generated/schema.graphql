@@ -261,6 +261,7 @@ input FormNodeEntryInput {
 }
 
 input FormNodeFieldInput {
+  id: ID
   isRequired: Boolean = false
   label: String
   position: Int

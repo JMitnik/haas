@@ -83,6 +83,7 @@ export const FormNodeFieldInput = inputObjectType({
   name: 'FormNodeFieldInput',
 
   definition(t) {
+    t.id('id', { required: false });
     t.string('label');
     t.field('type', { type: FormNodeFieldTypeEnum });
     t.boolean('isRequired', { default: false });

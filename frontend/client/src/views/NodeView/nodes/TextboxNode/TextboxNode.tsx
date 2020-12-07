@@ -2,9 +2,9 @@ import { CheckCircle } from 'react-feather';
 import { useForm } from 'react-hook-form';
 import React from 'react';
 
-import { ButtonIcon } from '@haas/ui/src/Buttons';
 import { ClientButton, OutlineButton } from 'components/Buttons/Buttons';
 import { Div, Grid, Textbox } from '@haas/ui';
+import { IconButton } from '@haas/ui/src/Buttons';
 import { NodeTitle } from 'layouts/NodeLayout/NodeLayoutStyles';
 import { SessionEntryDataProps } from 'models/Session/SessionEntryModel';
 
@@ -44,9 +44,7 @@ const TextboxNode = ({ node, onEntryStore }: TextboxNodeProps) => {
         <Div mt={4}>
           <Grid gridTemplateColumns="2fr 1fr">
             <ClientButton disabled={!dirty} isActive={dirty} onClick={() => onSubmit()}>
-              <ButtonIcon>
-                <CheckCircle />
-              </ButtonIcon>
+              <IconButton aria-label="check" icon={CheckCircle} />
               Submit
             </ClientButton>
 
