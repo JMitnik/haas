@@ -1,6 +1,14 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    form_node: {
+      en: 'About the form',
+      de: 'Über das Formular',
+    },
+    form_node_helper: {
+      en: 'Customize which fields the end-user gets to see.',
+      de: 'Passen Sie an, welche Felder der Endbenutzer zu de erhält.',
+    },
     recipient: {
       en: 'Recipient',
       de: 'Empfänger',
@@ -333,6 +341,10 @@ const language = {
       en: 'Call-to-Action',
       de: 'Call-to-Action',
     },
+    about_call_to_action: {
+      en: 'About the Call-to-Action',
+      de: 'Über den Call-to-Action',
+    },
     create_dialogue: {
       en: 'Create dialogue',
       de: 'Dialog erstellen',
@@ -502,16 +514,16 @@ const language = {
       de: 'Hinzugefügt!',
     },
     add_complete_description: {
-      en: 'The CTA has been created.',
-      de: 'Der CTA wurde erstellt.',
+      en: 'The Call-to-Action has been created.',
+      de: 'Der Call-to-Action wurde erstellt.',
     },
     edit_complete_title: {
       en: 'Edit complete',
       de: 'Bearbeiten abgeschlossen',
     },
     edit_complete_description: {
-      en: 'The CTA has been edited.',
-      de: 'Der CTA wurde bearbeitet.',
+      en: 'The Call-to-Action has been edited.',
+      de: 'Der Call-to-Action wurde bearbeitet.',
     },
   },
   register: {
@@ -1001,6 +1013,14 @@ const language = {
     },
   },
   cta: {
+    about_share: {
+      en: 'About the share',
+      de: 'Über den Anteil',
+    },
+    about_share_helper: {
+      en: 'Configure the share button, what the end-user gets to share, and what the button displays.',
+      de: 'Konfigurieren Sie die Schaltfläche "Teilen", was der Endbenutzer freigeben darf und was auf der Schaltfläche angezeigt wird.',
+    },
     text: {
       en: 'Text to share',
       de: 'Text zum Teilen',
@@ -1014,24 +1034,24 @@ const language = {
       de: 'Hinzugefügt!',
     },
     add_complete_description: {
-      en: 'The CTA has been created.',
-      de: 'Der CTA wurde erstellt.',
+      en: 'The Call-to-Action has been created.',
+      de: 'Der Call-to-Action wurde erstellt.',
     },
     edit_complete_title: {
       en: 'Edit complete',
       de: 'Bearbeiten abgeschlossen',
     },
     edit_complete_description: {
-      en: 'The CTA has been edited.',
-      de: 'Der CTA wurde bearbeitet.',
+      en: 'The Call-to-Action has been edited.',
+      de: 'Der Call-to-Action wurde bearbeitet.',
     },
     information_header: {
-      en: 'Information about your CTA',
-      de: 'Informationen zu Ihrem CTA',
+      en: 'Configure general information about this Call-to-Action, such as the text displayed, and the "type".',
+      de: 'Konfigurieren Sie allgemeine Informationen zu dieser Handlungsaufforderung, z. B. den angezeigten Text und den "Typ".',
     },
     title_helper: {
-      en: 'What is the header text of the CTA?',
-      de: 'Was ist der Haupttext des CTA?',
+      en: 'What is the header text of the Call-to-Action?',
+      de: 'Was ist der Haupttext des Call-to-Action?',
     },
     shared_item_title_helper: {
       en: 'What is the title of the shared item?',
@@ -1042,8 +1062,8 @@ const language = {
       de: 'Typ',
     },
     share_type_helper: {
-      en: 'What is the type of the CTA?',
-      de: 'Was ist der Typ des CTA?',
+      en: 'What is the type of the Call-to-Action?',
+      de: 'Was ist der Typ des Call-to-Action?',
     },
     url: {
       en: 'url',
@@ -1062,8 +1082,8 @@ const language = {
       de: 'Was ist der Text der Share-Schaltfläche',
     },
     link_header: {
-      en: 'What links do you want to add to the CTA',
-      de: 'Welche Links möchten Sie zum CTA hinzufügen?',
+      en: 'What links do you want to add to the Call-to-Action',
+      de: 'Welche Links möchten Sie zum Call-to-Action hinzufügen?',
     },
     add_link: {
       en: 'Add link',

@@ -140,12 +140,16 @@ const CTACard = ({ id, activeCTA, onActiveCTAChange, title, type, links, share, 
 
           <Flex width="60%" flexDirection="column">
             <motion.span>
-              {t('title')}
+              <UI.Text style={{ textTransform: 'uppercase' }} color="gray.400" fontWeight="500" fontSize="0.8rem">
+                {t('title')}
+              </UI.Text>
             </motion.span>
             <OverflowSpan>
-              <ReactMarkdown>
-                {title || t('none') || ''}
-              </ReactMarkdown>
+              <UI.Text fontWeight="600" color="gray.600">
+                <ReactMarkdown>
+                  {title || t('none') || ''}
+                </ReactMarkdown>
+              </UI.Text>
             </OverflowSpan>
           </Flex>
 

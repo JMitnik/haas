@@ -1,12 +1,12 @@
 import * as UI from '@haas/ui';
-import { useTranslation } from 'react-i18next';
-import React, { useEffect, useRef, useState } from 'react';
-
 import { AlertCircle, AtSign, Circle, Feather, FileText, Hash, Link2, Phone, Type } from 'react-feather';
 import { Button } from '@chakra-ui/core';
 import { Controller, UseFormMethods, useFieldArray, useForm, useWatch } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
+import React, { useEffect, useRef, useState } from 'react';
 
 import useOnClickOutside from 'hooks/useClickOnOutside';
+
 import { CTANodeFormProps, FormDataProps } from './CTATypes';
 
 type FormNodeFormProps = CTANodeFormProps;
@@ -238,11 +238,11 @@ const FormNodeForm = ({ form }: FormNodeFormProps) => {
     <UI.FormSection id="form-node-form">
       <UI.Div>
         <UI.FormSectionHeader>{t('form_node')}</UI.FormSectionHeader>
+        <UI.FormSectionHelper>{t('form_node')}</UI.FormSectionHelper>
       </UI.Div>
       <UI.Div>
         <UI.InputGrid>
           <UI.Div>
-            <UI.FormLabel htmlFor="fields">{t('fields')}</UI.FormLabel>
             <Button type="button" onClick={() => handleNewField()}>{t('add_field')}</Button>
             <UI.Grid gridTemplateColumns="1fr 1fr">
               {fields.map((field, index) => (

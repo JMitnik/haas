@@ -11,7 +11,7 @@ interface CTAIconProps {
 const CTAEntryIcon = styled(Div)`
    ${({ theme }) => css`
     color: ${theme.colors.white};
-    background-color: ${theme.colors.default.darker};
+    background-color: ${theme.colors.gray[400]};
     padding: 14px;
     border-radius: ${theme.borderRadiuses.somewhatRounded};
   `}
@@ -23,7 +23,7 @@ const CTAIcon = ({ type, Icon }: CTAIconProps) => (
       <CTAEntryIcon>
         <Icon />
       </CTAEntryIcon>
-      <Span marginTop="5px" fontSize="0.6em" color="default.darker">
+      <Span marginTop="5px" fontSize="0.6em" color="gray.400" fontWeight={700}>
         {type.label}
       </Span>
     </Flex>

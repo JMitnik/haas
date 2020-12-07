@@ -508,9 +508,18 @@ export const FormSection = forwardRef((props: FormSectionProps, ref: Ref<HTMLDiv
 
 export const FormSectionHeader = styled(Text)`
   ${({ theme }) => css`
-    font-size: 1.4rem;
+    font-size: 1.3rem;
     color: ${theme.colors.default.text};
     font-weight: 700;
+    margin-bottom: ${theme.gutter / 4}px;
+  `}
+`;
+
+export const FormSectionHelper = styled(Text)`
+  ${({ theme }) => css`
+    font-size: 0.9rem;
+    color: ${theme.colors.gray[500]};
+    font-weight: 400;
   `}
 `;
 
