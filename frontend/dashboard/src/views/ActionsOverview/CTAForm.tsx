@@ -30,9 +30,9 @@ import createCTAMutation from 'mutations/createCTA';
 import getCTANodesQuery from 'queries/getCTANodes';
 import updateCTAMutation from 'mutations/updateCTA';
 
-import intToBool from 'utils/intToBool';
 import { FormDataProps } from './CTATypes';
 import FormNodeForm from './FormNodeForm';
+import intToBool from 'utils/intToBool';
 
 interface LinkInputProps {
   id?: string | null;
@@ -509,7 +509,7 @@ const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTACha
                                 </FormControl>
 
                                 <FormControl>
-                                  <FormLabel htmlFor={`links[${index}].tooltip`}>{t('cta:tooltip')}</FormLabel>
+                                  <FormLabel htmlFor={`links[${index}].tooltip`}>{t('cta:link_tooltip')}</FormLabel>
                                   <InputHelper>{t('cta:link_tooltip_helper')}</InputHelper>
                                   <Input
                                     isInvalid={!!form.errors.links?.[index]?.tooltip}

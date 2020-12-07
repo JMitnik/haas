@@ -1162,8 +1162,8 @@ const language = {
       de: 'Was ist der Typ des Call-to-Action?',
     },
     url: {
-      en: 'url',
-      de: 'url',
+      en: 'Url',
+      de: 'Url',
     },
     url_share_helper: {
       en: 'What is the link you wish to share?',
@@ -1178,7 +1178,7 @@ const language = {
       de: 'Was ist der Text der Share-Schaltfläche',
     },
     link_header: {
-      en: 'What links do you want to add to the Call-to-Action',
+      en: 'What links do you want to add to the Call-to-Action?',
       de: 'Welche Links möchten Sie zum Call-to-Action hinzufügen?',
     },
     add_link: {
