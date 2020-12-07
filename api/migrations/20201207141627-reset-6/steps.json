@@ -26,6 +26,18 @@
     },
     {
       "tag": "CreateEnum",
+      "enum": "FormNodeFieldType",
+      "values": [
+        "email",
+        "phoneNumber",
+        "url",
+        "shortText",
+        "longText",
+        "number"
+      ]
+    },
+    {
+      "tag": "CreateEnum",
       "enum": "LinkTypeEnum",
       "values": [
         "SOCIAL",
@@ -1196,13 +1208,420 @@
     },
     {
       "tag": "CreateModel",
+      "model": "FormNodeField"
+    },
+    {
+      "tag": "CreateField",
+      "model": "FormNodeField",
+      "field": "id",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "FormNodeField",
+          "field": "id"
+        },
+        "directive": "id"
+      }
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "FormNodeField",
+          "field": "id"
+        },
+        "directive": "default"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "FormNodeField",
+          "field": "id"
+        },
+        "directive": "default"
+      },
+      "argument": "",
+      "value": "cuid()"
+    },
+    {
+      "tag": "CreateField",
+      "model": "FormNodeField",
+      "field": "label",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateField",
+      "model": "FormNodeField",
+      "field": "type",
+      "type": "FormNodeFieldType",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "FormNodeField",
+          "field": "type"
+        },
+        "directive": "default"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "FormNodeField",
+          "field": "type"
+        },
+        "directive": "default"
+      },
+      "argument": "",
+      "value": "shortText"
+    },
+    {
+      "tag": "CreateField",
+      "model": "FormNodeField",
+      "field": "isRequired",
+      "type": "Boolean",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "FormNodeField",
+          "field": "isRequired"
+        },
+        "directive": "default"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "FormNodeField",
+          "field": "isRequired"
+        },
+        "directive": "default"
+      },
+      "argument": "",
+      "value": "false"
+    },
+    {
+      "tag": "CreateField",
+      "model": "FormNodeField",
+      "field": "position",
+      "type": "Int",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateModel",
+      "model": "FormNode"
+    },
+    {
+      "tag": "CreateField",
+      "model": "FormNode",
+      "field": "id",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "FormNode",
+          "field": "id"
+        },
+        "directive": "id"
+      }
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "FormNode",
+          "field": "id"
+        },
+        "directive": "default"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "FormNode",
+          "field": "id"
+        },
+        "directive": "default"
+      },
+      "argument": "",
+      "value": "cuid()"
+    },
+    {
+      "tag": "CreateField",
+      "model": "FormNode",
+      "field": "createdAt",
+      "type": "DateTime",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "FormNode",
+          "field": "createdAt"
+        },
+        "directive": "default"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "FormNode",
+          "field": "createdAt"
+        },
+        "directive": "default"
+      },
+      "argument": "",
+      "value": "now()"
+    },
+    {
+      "tag": "CreateField",
+      "model": "FormNode",
+      "field": "fields",
+      "type": "FormNodeField",
+      "arity": "List"
+    },
+    {
+      "tag": "CreateModel",
+      "model": "FormNodeEntryData"
+    },
+    {
+      "tag": "CreateField",
+      "model": "FormNodeEntryData",
+      "field": "id",
+      "type": "Int",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "FormNodeEntryData",
+          "field": "id"
+        },
+        "directive": "id"
+      }
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "FormNodeEntryData",
+          "field": "id"
+        },
+        "directive": "default"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "FormNodeEntryData",
+          "field": "id"
+        },
+        "directive": "default"
+      },
+      "argument": "",
+      "value": "autoincrement()"
+    },
+    {
+      "tag": "CreateField",
+      "model": "FormNodeEntryData",
+      "field": "email",
+      "type": "String",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateField",
+      "model": "FormNodeEntryData",
+      "field": "phoneNumber",
+      "type": "String",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateField",
+      "model": "FormNodeEntryData",
+      "field": "url",
+      "type": "String",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateField",
+      "model": "FormNodeEntryData",
+      "field": "shortText",
+      "type": "String",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateField",
+      "model": "FormNodeEntryData",
+      "field": "longText",
+      "type": "String",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateField",
+      "model": "FormNodeEntryData",
+      "field": "number",
+      "type": "String",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateModel",
+      "model": "FormNodeEntry"
+    },
+    {
+      "tag": "CreateField",
+      "model": "FormNodeEntry",
+      "field": "id",
+      "type": "Int",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "FormNodeEntry",
+          "field": "id"
+        },
+        "directive": "id"
+      }
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "FormNodeEntry",
+          "field": "id"
+        },
+        "directive": "default"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "FormNodeEntry",
+          "field": "id"
+        },
+        "directive": "default"
+      },
+      "argument": "",
+      "value": "autoincrement()"
+    },
+    {
+      "tag": "CreateField",
+      "model": "FormNodeEntry",
+      "field": "value",
+      "type": "FormNodeEntryData",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateField",
+      "model": "FormNodeEntry",
+      "field": "nodeEntryId",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateField",
+      "model": "FormNodeEntry",
+      "field": "nodeEntry",
+      "type": "NodeEntry",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "FormNodeEntry",
+          "field": "nodeEntry"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "FormNodeEntry",
+          "field": "nodeEntry"
+        },
+        "directive": "relation"
+      },
+      "argument": "references",
+      "value": "[id]"
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "FormNodeEntry",
+          "field": "nodeEntry"
+        },
+        "directive": "relation"
+      },
+      "argument": "fields",
+      "value": "[nodeEntryId]"
+    },
+    {
+      "tag": "CreateModel",
       "model": "SliderNodeRange"
     },
     {
       "tag": "CreateField",
       "model": "SliderNodeRange",
       "field": "id",
-      "type": "Int",
+      "type": "String",
       "arity": "Required"
     },
     {
@@ -1239,21 +1658,21 @@
         "directive": "default"
       },
       "argument": "",
-      "value": "autoincrement()"
+      "value": "cuid()"
     },
     {
       "tag": "CreateField",
       "model": "SliderNodeRange",
       "field": "start",
-      "type": "Int",
-      "arity": "Required"
+      "type": "Float",
+      "arity": "Optional"
     },
     {
       "tag": "CreateField",
       "model": "SliderNodeRange",
       "field": "end",
-      "type": "Int",
-      "arity": "Required"
+      "type": "Float",
+      "arity": "Optional"
     },
     {
       "tag": "CreateModel",
@@ -1263,7 +1682,7 @@
       "tag": "CreateField",
       "model": "SliderNodeMarker",
       "field": "id",
-      "type": "Int",
+      "type": "String",
       "arity": "Required"
     },
     {
@@ -1300,7 +1719,7 @@
         "directive": "default"
       },
       "argument": "",
-      "value": "autoincrement()"
+      "value": "cuid()"
     },
     {
       "tag": "CreateField",
@@ -1324,6 +1743,59 @@
       "arity": "Required"
     },
     {
+      "tag": "CreateField",
+      "model": "SliderNodeMarker",
+      "field": "sliderNodeId",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateField",
+      "model": "SliderNodeMarker",
+      "field": "sliderNode",
+      "type": "SliderNode",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "SliderNodeMarker",
+          "field": "sliderNode"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "SliderNodeMarker",
+          "field": "sliderNode"
+        },
+        "directive": "relation"
+      },
+      "argument": "fields",
+      "value": "[sliderNodeId]"
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "SliderNodeMarker",
+          "field": "sliderNode"
+        },
+        "directive": "relation"
+      },
+      "argument": "references",
+      "value": "[id]"
+    },
+    {
       "tag": "CreateModel",
       "model": "SliderNode"
     },
@@ -1331,7 +1803,7 @@
       "tag": "CreateField",
       "model": "SliderNode",
       "field": "id",
-      "type": "Int",
+      "type": "String",
       "arity": "Required"
     },
     {
@@ -1368,14 +1840,14 @@
         "directive": "default"
       },
       "argument": "",
-      "value": "autoincrement()"
+      "value": "cuid()"
     },
     {
       "tag": "CreateField",
       "model": "SliderNode",
       "field": "markers",
       "type": "SliderNodeMarker",
-      "arity": "Required"
+      "arity": "List"
     },
     {
       "tag": "CreateModel",
@@ -1932,6 +2404,13 @@
       "model": "QuestionNode",
       "field": "sliderNode",
       "type": "SliderNode",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateField",
+      "model": "QuestionNode",
+      "field": "form",
+      "type": "FormNode",
       "arity": "Optional"
     },
     {
@@ -3438,6 +3917,13 @@
       "model": "NodeEntry",
       "field": "registrationNodeEntry",
       "type": "RegistrationNodeEntry",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateField",
+      "model": "NodeEntry",
+      "field": "formNodeEntry",
+      "type": "FormNodeEntry",
       "arity": "Optional"
     },
     {

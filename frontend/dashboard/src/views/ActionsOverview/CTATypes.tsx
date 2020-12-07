@@ -15,10 +15,14 @@ export interface FormDataProps {
     iconUrl?: string;
     backgroundColor?: string;}>;
   share: { id?: string, tooltip: string, url: string, title: string };
-  formNode?: { fields: {
-    label: string;
-    type: string;
-    isRequired: boolean;
-    position: number;
-  }[] };
+  formNode?: {
+    id?: string;
+    fields: {
+      id?: string;
+      label: string;
+      type: string;
+      isRequired: boolean;
+      position: number;
+    }[];
+  };
 }

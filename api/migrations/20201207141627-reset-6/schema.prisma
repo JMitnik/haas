@@ -109,21 +109,66 @@ enum NodeType {
   SHARE
 }
 
+// NodeType: Form
+enum FormNodeFieldType {
+  email
+  phoneNumber
+  url
+  shortText
+  longText
+  number
+}
+
+model FormNodeField {
+  id    String        @id @default(cuid())
+  label String
+  type  FormNodeFieldType @default(shortText)
+  isRequired  Boolean @default(false)
+  position  Int
+}
+
+model FormNode {
+  id           String           @id @default(cuid())
+  createdAt     DateTime        @default(now())
+  fields        FormNodeField[]
+}
+
+model FormNodeEntryData {
+  id          Int       @id @default(autoincrement())
+  email       String?
+  phoneNumber String?
+  url         String?
+  shortText   String?
+  longText    String?
+  number      String?
+}
+
+model FormNodeEntry {
+  id          Int       @id @default(autoincrement())
+  value       FormNodeEntryData
+
+  // Relation to node
+  nodeEntryId String
+  nodeEntry   NodeEntry @relation(references: [id], fields: [nodeEntryId])
+}
+
 model SliderNodeRange {
-  id        Int          @id @default(autoincrement())
-  start     Int?
-  end       Int?
+  id        String          @id @default(cuid())
+  start     Float?
+  end       Float?
 }
 
 model SliderNodeMarker {
-  id        Int          @id @default(autoincrement())
+  id        String          @id @default(cuid())
   range     SliderNodeRange
   label     String
   subLabel  String
+  sliderNodeId  String
+  sliderNode    SliderNode  @relation(fields: [sliderNodeId], references: [id])
 }
 
 model SliderNode {
-  id        Int          @id @default(autoincrement())
+  id        String          @id @default(cuid())
   markers SliderNodeMarker[]
 }
 
@@ -158,6 +203,7 @@ model QuestionNode {
   // Node-types
   share      Share?
   sliderNode SliderNode?
+  form  FormNode?
 
   links             Link[]
   QuestionOfTrigger QuestionOfTrigger[]
@@ -266,7 +312,11 @@ model NodeEntry {
   sliderNodeEntry       SliderNodeEntry?
   choiceNodeEntry       ChoiceNodeEntry?
   textboxNodeEntry      TextboxNodeEntry?
+  
+  // @Deprecated => FormNodeEntry
   registrationNodeEntry RegistrationNodeEntry?
+  
+  formNodeEntry FormNodeEntry?
   linkNodeEntry         LinkNodeEntry?
 }
 
@@ -298,6 +348,7 @@ model TextboxNodeEntry {
   nodeEntry   NodeEntry @relation(references: [id], fields: [nodeEntryId])
 }
 
+// @DEPRECATED
 model RegistrationNodeEntry {
   id          Int       @id @default(autoincrement())
   value       Json?

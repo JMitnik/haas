@@ -57,6 +57,7 @@ interface CTAFormProps {
   links: Array<LinkInputProps>;
   type: { label: string, value: string };
   share: ShareProps | null;
+  form: any;
   onActiveCTAChange: React.Dispatch<React.SetStateAction<string | null>>;
   onNewCTAChange: React.Dispatch<React.SetStateAction<boolean>>;
   onDeleteCTA: (onComplete: (() => void) | undefined) => void | Promise<ExecutionResult<any>>
@@ -131,7 +132,7 @@ const LINK_TYPES = [
   { label: 'TWITTER', value: 'TWITTER' },
 ];
 
-const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTAChange, onDeleteCTA }: CTAFormProps) => {
+const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTAChange, onDeleteCTA, form: formNode }: CTAFormProps) => {
   const { activeCustomer } = useCustomer();
   const { customerSlug, dialogueSlug } = useParams();
 
@@ -142,6 +143,16 @@ const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTACha
     defaultValues: {
       ctaType: type,
       share: { id: share?.id, title: share?.title, tooltip: share?.tooltip, url: share?.url },
+      formNode: {
+        id: formNode.id,
+        fields: formNode?.fields?.map((field: any) => ({
+          id: field.id,
+          label: field.label,
+          type: field.type,
+          isRequired: field.isRequired,
+          position: field.position,
+        })),
+      },
     },
   });
 

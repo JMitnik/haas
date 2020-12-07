@@ -99,6 +99,28 @@ export const FormNodeInputType = inputObjectType({
     t.list.field('fields', { type: FormNodeFieldInput });
   },
 });
+
+export const FormNodeField = objectType({
+  name: 'FormNodeField',
+
+  definition(t) {
+    t.id('id');
+    t.string('label');
+    t.field('type', { type: FormNodeFieldTypeEnum });
+    t.boolean('isRequired');
+    t.int('position');
+  },
+});
+
+export const FormNodeType = objectType({
+  name: 'FormNodeType',
+
+  definition(t) {
+    t.string('id', { nullable: true });
+    t.list.field('fields', { type: FormNodeField });
+  },
+});
+
 export const SliderNodeRangeType = objectType({
   name: 'SliderNodeRangeType',
 
@@ -158,6 +180,20 @@ export const QuestionNodeType = objectType({
       resolve: (parent: any) => {
         if (parent.type === 'SLIDER') {
           return (parent.sliderNode || { markers: SliderNode.DEFAULT_MARKERS });
+        }
+
+        return null;
+      } });
+
+    // Node-types
+    // TODO: Remove `any` once we figure out how to not make prisma the backing-type
+    t.field('form', { description: 'FormNode resolver',
+      type: FormNodeType,
+      nullable: true,
+      resolve: (parent: any) => {
+        if (parent.type === 'FORM') {
+          console.log(parent.form);
+          return parent.form;
         }
 
         return null;

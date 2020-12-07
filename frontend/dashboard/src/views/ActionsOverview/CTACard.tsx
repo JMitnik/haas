@@ -1,3 +1,4 @@
+import * as Ani from 'components/animation';
 import * as UI from '@haas/ui';
 import { Edit3 } from 'react-feather';
 import { motion } from 'framer-motion';
@@ -42,6 +43,7 @@ interface CTACardProps {
   activeCTA: string | null;
   onActiveCTAChange: React.Dispatch<React.SetStateAction<string | null>>;
   onNewCTAChange: React.Dispatch<React.SetStateAction<boolean>>;
+  form?: any;
 }
 
 const CTACardContainer = styled(UI.Card)<{ activeCTA: string | null, id: string }>`
@@ -80,7 +82,7 @@ const OverflowSpan = styled(Span)`
   `}
 `;
 
-const CTACard = ({ id, activeCTA, onActiveCTAChange, title, type, links, share, Icon, onNewCTAChange }: CTACardProps) => {
+const CTACard = ({ id, activeCTA, onActiveCTAChange, title, type, links, share, Icon, onNewCTAChange, form }: CTACardProps) => {
   const toast = useToast();
   const { t } = useTranslation();
   const { activeCustomer } = useCustomer();
@@ -132,7 +134,7 @@ const CTACard = ({ id, activeCTA, onActiveCTAChange, title, type, links, share, 
   };
 
   return (
-    <motion.div initial={{ opacity: 1, y: 150 }} animate={{ opacity: 1, y: 0 }}>
+    <Ani.FadeFromTop>
       <CTACardContainer noHover id={id} activeCTA={activeCTA}>
         <Flex justifyContent="space-between" flexDirection="row" width="100%">
           <UI.Flex>
@@ -168,6 +170,7 @@ const CTACard = ({ id, activeCTA, onActiveCTAChange, title, type, links, share, 
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
             <CTAForm
               id={id}
+              form={form}
               title={title}
               type={type}
               links={links}
@@ -180,7 +183,7 @@ const CTACard = ({ id, activeCTA, onActiveCTAChange, title, type, links, share, 
         )}
 
       </CTACardContainer>
-    </motion.div>
+    </Ani.FadeFromTop>
   );
 };
 

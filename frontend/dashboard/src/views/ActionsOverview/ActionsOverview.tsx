@@ -16,8 +16,8 @@ import getCTANodesQuery from 'queries/getCTANodes';
 import { AnimateSharedLayout, Variants, motion } from 'framer-motion';
 import { Button, Icon } from '@chakra-ui/core';
 import { useTranslation } from 'react-i18next';
-import CTACard from './CTACard';
 import ShareIcon from 'components/Icons/ShareIcon';
+import CTACard from './CTACard';
 
 interface ActionOverviewProps {
   leafs: Array<any>;
@@ -173,6 +173,7 @@ const ActionOverview = ({ leafs }: ActionOverviewProps) => {
                 type={initializeCTAType(leaf.type)}
                 links={leaf.links}
                 share={leaf?.share}
+                form={leaf?.form}
                 onNewCTAChange={setNewCTA}
               />
             ),
@@ -190,6 +191,7 @@ const ActionOverview = ({ leafs }: ActionOverviewProps) => {
                 type={initializeCTAType(leaf.type)}
                 links={leaf.links}
                 share={leaf?.share}
+                form={leaf?.form}
                 onNewCTAChange={setNewCTA}
               />
             ),

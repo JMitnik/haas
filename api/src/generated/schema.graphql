@@ -260,6 +260,14 @@ input FormNodeEntryInput {
   fields: [FormNodeEntryFieldInput!]
 }
 
+type FormNodeField {
+  id: ID!
+  isRequired: Boolean!
+  label: String!
+  position: Int!
+  type: FormNodeFieldTypeEnum!
+}
+
 input FormNodeFieldInput {
   id: ID
   isRequired: Boolean = false
@@ -280,6 +288,11 @@ enum FormNodeFieldTypeEnum {
 
 input FormNodeInputType {
   fields: [FormNodeFieldInput!]
+  id: String
+}
+
+type FormNodeType {
+  fields: [FormNodeField!]!
   id: String
 }
 
@@ -518,6 +531,9 @@ type Query {
 type QuestionNode {
   children: [Edge!]!
   creationDate: String
+
+  """FormNode resolver"""
+  form: FormNodeType
   id: ID!
   isLeaf: Boolean!
   isRoot: Boolean!
