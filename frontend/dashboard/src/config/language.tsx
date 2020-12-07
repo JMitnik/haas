@@ -9,6 +9,58 @@ const language = {
       en: 'Select a field type',
       de: 'Wählen Sie einen Feldtyp aus',
     },
+    phoneNumber: {
+      en: 'Phone number',
+      de: 'Telefonnummer',
+    },
+    phoneNumber_type: {
+      en: 'Phone number',
+      de: 'Telefonnummer',
+    },
+    phoneNumber_helper: {
+      en: 'For phone-number types.',
+      de: 'Für Telefonnummerntypen.',
+    },
+    url_type: {
+      en: 'Link',
+      de: 'Link',
+    },
+    url_helper: {
+      en: 'For link types',
+      de: 'Für URLtypen',
+    },
+    shortText: {
+      en: 'Short text',
+      de: 'Kurze Texte',
+    },
+    shortText_helper: {
+      en: 'For generic short texts',
+      de: 'Für generische Short-Texte',
+    },
+    longText: {
+      en: 'Long text',
+      de: 'Langer Text',
+    },
+    longText_type: {
+      en: 'Long text',
+      de: 'Langer Text',
+    },
+    longText_helper: {
+      en: 'For generic long texts',
+      de: 'Für generische Long-Texte',
+    },
+    number: {
+      en: 'Number',
+      de: 'Nummer',
+    },
+    number_type: {
+      en: 'Number',
+      de: 'Nummer',
+    },
+    number_helper: {
+      en: 'For generic numbers',
+      de: 'Für generische Nummern',
+    },
     email_type: {
       en: 'Email',
       de: 'Email',

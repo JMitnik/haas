@@ -8,7 +8,9 @@ import React, { useRef, useState } from 'react';
 import { ReactComponent as FieldIll } from 'assets/images/undraw_form.svg';
 import useOnClickOutside from 'hooks/useClickOnOutside';
 
+import { AnimatePresence, Variants, motion } from 'framer-motion';
 import { CTANodeFormProps, FormDataProps } from './CTATypes';
+import Dropdown from 'components/Dropdown';
 
 type FormNodeFormProps = CTANodeFormProps;
 
@@ -101,9 +103,9 @@ const FormNodePreview = ({ form, field, onMoveRight, onMoveLeft, onOpen, fieldIn
   return (
     <UI.Card>
       <UI.CardBody>
-        <UI.Flex justifyContent="space-between">
+        <UI.Flex flexWrap="wrap" justifyContent="space-between">
           {field.type ? (
-            <UI.Flex>
+            <UI.Flex mb={[4, 0]}>
               <UI.IconBox mr={2} bg={fieldCategory?.color}><FieldIcon /></UI.IconBox>
               <UI.ColumnFlex>
                 <UI.Text color="gray.500" fontWeight="700">{field?.label || 'Unnamed field'}</UI.Text>
@@ -147,6 +149,33 @@ const FormNodePreview = ({ form, field, onMoveRight, onMoveLeft, onOpen, fieldIn
   );
 };
 
+const parentPopup: Variants = {
+  initial: {
+    opacity: 0,
+  },
+  animate: {
+    opacity: 1,
+  },
+  exit: {
+    opacity: 0,
+  },
+};
+
+const childPopUp: Variants = {
+  initial: {
+    opacity: 0,
+    y: 100,
+  },
+  animate: {
+    opacity: 1,
+    y: 0,
+  },
+  exit: {
+    opacity: 0,
+    y: 100,
+  },
+};
+
 const FormNodeFieldFragment = ({ field, onClose, onSubmit }: { field: any, fieldIndex: number, onClose: () => void, onSubmit: any }) => {
   const ref = useRef<HTMLDivElement | null>(null);
   const { t } = useTranslation();
@@ -164,68 +193,72 @@ const FormNodeFieldFragment = ({ field, onClose, onSubmit }: { field: any, field
   });
 
   return (
-    <UI.Card noHover ref={ref}>
-      <UI.CardForm dualPane>
-        <UI.List>
-          <UI.ListGroupHeader>{t('select_a_field_type')}</UI.ListGroupHeader>
-          <UI.ListGroup>
-            {fieldMap.map((fieldCategory, index) => (
-              <UI.ListItem
-                key={index}
-                accent={fieldCategory.color}
-                isSelected={formType === fieldCategory.type}
-                onClick={() => subform.setValue('type', fieldCategory.type)}
-              >
-                <UI.ListIcon bg={fieldCategory.color}><fieldCategory.icon /></UI.ListIcon>
-                <UI.ListItemBody>
-                  <UI.Text>{t(fieldCategory.type)}</UI.Text>
-                  <UI.Text>{t(`${fieldCategory.type}_helper`)}</UI.Text>
-                </UI.ListItemBody>
-                <UI.ListItemCaret />
-              </UI.ListItem>
-            ))}
-          </UI.ListGroup>
-        </UI.List>
-        {formType ? (
-          <UI.CardBody>
-            <UI.FormControl>
-              <UI.FormLabel>{t('label')}</UI.FormLabel>
-              <UI.Input ref={subform.register()} name="label" key={field.fieldIndex} />
-            </UI.FormControl>
-            <UI.FormControl>
-              <UI.FormLabel>{t('is_required')}</UI.FormLabel>
-              <Controller
-                control={subform.control}
-                name="isRequired"
-                defaultValue={field.isRequired}
-                render={({ onBlur, onChange, value }) => (
-                  <UI.RadioButtons onBlur={onBlur} onChange={onChange} value={value}>
-                    <UI.RadioButton
-                      icon={AlertCircle}
-                      value={1}
-                      mr={2}
-                      text={(t('required'))}
-                      description={t('required_helper')}
-                    />
-                    <UI.RadioButton
-                      icon={Circle}
-                      value={0}
-                      mr={2}
-                      text={(t('not_required'))}
-                      description={t('not_required_helper')}
-                    />
-                  </UI.RadioButtons>
-                )}
-              />
-            </UI.FormControl>
-          </UI.CardBody>
-        ) : (
-          <UI.CardBody>
-            {t('select_your_type')}
-          </UI.CardBody>
-        )}
-      </UI.CardForm>
-    </UI.Card>
+    <motion.div style={{ zIndex: 300 }} variants={parentPopup} initial="initial" animate="animate" exit="exit">
+      <motion.div variants={childPopUp}>
+        <UI.Card bg="white" zIndex={300} noHover ref={ref}>
+          <UI.CardForm dualPane>
+            <UI.List>
+              <UI.ListGroupHeader>{t('select_a_field_type')}</UI.ListGroupHeader>
+              <UI.ListGroup>
+                {fieldMap.map((fieldCategory, index) => (
+                  <UI.ListItem
+                    key={index}
+                    accent={fieldCategory.color}
+                    isSelected={formType === fieldCategory.type}
+                    onClick={() => subform.setValue('type', fieldCategory.type)}
+                  >
+                    <UI.ListIcon bg={fieldCategory.color}><fieldCategory.icon /></UI.ListIcon>
+                    <UI.ListItemBody>
+                      <UI.Text>{t(fieldCategory.type)}</UI.Text>
+                      <UI.Text>{t(`${fieldCategory.type}_helper`)}</UI.Text>
+                    </UI.ListItemBody>
+                    <UI.ListItemCaret />
+                  </UI.ListItem>
+                ))}
+              </UI.ListGroup>
+            </UI.List>
+            {formType ? (
+              <UI.CardBody>
+                <UI.FormControl>
+                  <UI.FormLabel>{t('label')}</UI.FormLabel>
+                  <UI.Input ref={subform.register()} name="label" key={field.fieldIndex} />
+                </UI.FormControl>
+                <UI.FormControl>
+                  <UI.FormLabel>{t('is_required')}</UI.FormLabel>
+                  <Controller
+                    control={subform.control}
+                    name="isRequired"
+                    defaultValue={field.isRequired}
+                    render={({ onBlur, onChange, value }) => (
+                      <UI.RadioButtons onBlur={onBlur} onChange={onChange} value={value}>
+                        <UI.RadioButton
+                          icon={AlertCircle}
+                          value={1}
+                          mr={2}
+                          text={(t('required'))}
+                          description={t('required_helper')}
+                        />
+                        <UI.RadioButton
+                          icon={Circle}
+                          value={0}
+                          mr={2}
+                          text={(t('not_required'))}
+                          description={t('not_required_helper')}
+                        />
+                      </UI.RadioButtons>
+                    )}
+                  />
+                </UI.FormControl>
+              </UI.CardBody>
+            ) : (
+              <UI.CardBody>
+                {t('select_your_type')}
+              </UI.CardBody>
+            )}
+          </UI.CardForm>
+        </UI.Card>
+      </motion.div>
+    </motion.div>
   );
 };
 
@@ -268,7 +301,7 @@ const FormNodeForm = ({ form }: FormNodeFormProps) => {
       </UI.Div>
       <UI.Div>
         <UI.InputGrid>
-          <UI.Div>
+          <UI.Div pb="300px">
             {fields.length === 0 ? (
               <UI.IllustrationCard svg={<FieldIll />} text={t('add_field_reminder')}>
                 <Button type="button" onClick={() => handleNewField()}>{t('add_field')}</Button>
@@ -278,32 +311,35 @@ const FormNodeForm = ({ form }: FormNodeFormProps) => {
             )}
             <UI.Grid gridTemplateColumns="1fr 1fr">
               {fields.map((field, index) => (
-                <React.Fragment key={field.fieldIndex}>
-                  {openedField === index ? (
-                    <FormNodeFieldFragment
-                      onSubmit={(subForm: any) => {
-                        form.setValue(`formNode.fields[${index}]`, subForm, { shouldDirty: true, shouldValidate: true });
-                        form.trigger();
-                      }}
-                      onClose={() => setOpenedField(null)}
-                      field={formNodeFields[index]}
-                      fieldIndex={index}
-                      key={field.fieldIndex}
-                    />
-                  ) : (
-                    <FormNodePreview
-                      fieldIndex={index}
-                      nrFields={fields.length}
-                      field={formNodeFields[index]}
-                      form={form}
-                      onOpen={() => setOpenedField(index)}
-                      onMoveLeft={() => move(index, Math.max(index - 1, 0))}
-                      onMoveRight={() => {
-                        move(index, Math.min(index + 1, fields.length - 1));
-                      }}
-                    />
-                  )}
-                </React.Fragment>
+                <UI.Div position="relative" key={field.fieldIndex}>
+                  <AnimatePresence>
+                    {openedField === index && (
+                    <UI.Div position="absolute" top="0" zIndex={500}>
+                      <FormNodeFieldFragment
+                        onSubmit={(subForm: any) => {
+                          form.setValue(`formNode.fields[${index}]`, subForm, { shouldDirty: true, shouldValidate: true });
+                          form.trigger();
+                        }}
+                        onClose={() => setOpenedField(null)}
+                        field={formNodeFields[index]}
+                        fieldIndex={index}
+                        key={field.fieldIndex}
+                      />
+                    </UI.Div>
+                    )}
+                  </AnimatePresence>
+                  <FormNodePreview
+                    fieldIndex={index}
+                    nrFields={fields.length}
+                    field={formNodeFields[index]}
+                    form={form}
+                    onOpen={() => setOpenedField(index)}
+                    onMoveLeft={() => move(index, Math.max(index - 1, 0))}
+                    onMoveRight={() => {
+                      move(index, Math.min(index + 1, fields.length - 1));
+                    }}
+                  />
+                </UI.Div>
               ))}
             </UI.Grid>
           </UI.Div>
