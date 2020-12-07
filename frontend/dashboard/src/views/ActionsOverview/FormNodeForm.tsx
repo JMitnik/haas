@@ -291,19 +291,17 @@ const FormNodeForm = ({ form }: FormNodeFormProps) => {
                       key={field.fieldIndex}
                     />
                   ) : (
-                    <UI.Card noHover>
-                      <FormNodePreview
-                        fieldIndex={index}
-                        nrFields={fields.length}
-                        field={formNodeFields[index]}
-                        form={form}
-                        onOpen={() => setOpenedField(index)}
-                        onMoveLeft={() => move(index, Math.max(index - 1, 0))}
-                        onMoveRight={() => {
-                          move(index, Math.min(index + 1, fields.length - 1));
-                        }}
-                      />
-                    </UI.Card>
+                    <FormNodePreview
+                      fieldIndex={index}
+                      nrFields={fields.length}
+                      field={formNodeFields[index]}
+                      form={form}
+                      onOpen={() => setOpenedField(index)}
+                      onMoveLeft={() => move(index, Math.max(index - 1, 0))}
+                      onMoveRight={() => {
+                        move(index, Math.min(index + 1, fields.length - 1));
+                      }}
+                    />
                   )}
                 </React.Fragment>
               ))}
