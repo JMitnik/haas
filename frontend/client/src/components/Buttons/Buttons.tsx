@@ -43,6 +43,10 @@ export const ClientButton = styled(Button)`
     color: ${Color(theme.colors.primary).isDark() ? Color(theme.colors.primary).mix(Color('white'), 0.8).saturate(1).hex()
     : Color(theme.colors.primary).mix(Color('black'), 0.5).saturate(1).hex()};
 
+    &:disabled {
+      background: linear-gradient(45deg, ${Color(theme.colors.gray[500]).lighten(0.3).hex()}, ${Color(theme.colors.gray[500]).lighten(0.3).saturate(1).hex()}); 
+    }
+
     ${ButtonBody} {
       width: 100%;
       text-align: left;

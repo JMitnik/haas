@@ -1,4 +1,5 @@
 import { IAnyModelType, Instance, types } from 'mobx-state-tree';
+import FormNodeModel from './FormNodeModel';
 import SliderNodeModel from './SliderNodeModel';
 // eslint-disable-next-line import/no-cycle
 import { TreeEdgeModel, TreeEdgeProps } from './TreeEdgeModel';
@@ -30,6 +31,7 @@ export const TreeNodeModel = types
     options: types.array(TreeNodeOptionModel),
     links: types.array(TreeLinkModel),
     share: types.maybe(TreeShareModel),
+    form: types.maybe(FormNodeModel),
     sliderNode: types.maybeNull(SliderNodeModel),
   })
   .actions((self) => ({

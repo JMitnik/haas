@@ -43,7 +43,7 @@ const TextboxNode = ({ node, onEntryStore }: TextboxNodeProps) => {
 
         <Div mt={4}>
           <Grid gridTemplateColumns="2fr 1fr">
-            <ClientButton disabled={!dirty} isActive={dirty} onClick={() => onSubmit()}>
+            <ClientButton isDisabled={!dirty} isActive={dirty} onClick={() => onSubmit()}>
               <IconButton aria-label="check" icon={CheckCircle} />
               Submit
             </ClientButton>

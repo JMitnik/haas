@@ -8,9 +8,9 @@ import { SessionEntryDataProps } from 'models/Session/SessionEntryModel';
 import { ReactComponent as SpeechIcon } from 'assets/icons/icon-chat.svg';
 import { TreeNodeOptionProps } from 'models/Tree/TreeNodeOptionModel';
 
-import ReactMarkdown from 'react-markdown';
 import { ChoiceIconContainer, MultiChoiceNodeContainer, MultiChoiceNodeGrid } from './MultiChoiceNodeStyles';
 import { GenericNodeProps } from '../types';
+import ReactMarkdown from 'react-markdown';
 
 type MultiChoiceNodeProps = GenericNodeProps;
 
@@ -64,7 +64,6 @@ const MultiChoiceNode = ({ node, onEntryStore }: MultiChoiceNodeProps) => {
             <Div key={index} flex={['100%', 1]}>
               <ClientButton
                 data-cy="Option"
-                brand="primary"
                 type="button"
                 onClick={() => handleSubmit(multiChoiceOption)}
                 key={index}
