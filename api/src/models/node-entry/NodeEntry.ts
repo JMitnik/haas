@@ -87,12 +87,12 @@ export const FormNodeEntryFieldInput = inputObjectType({
 
   definition(t) {
     t.id('relatedFieldId');
-    t.string('email', { default: '' });
-    t.string('phoneNumber', { default: '' });
-    t.string('url', { default: '' });
-    t.string('shortText', { default: '' });
-    t.string('longText', { default: '' });
-    t.int('number', { default: 0 });
+    t.string('email', { required: false });
+    t.string('phoneNumber', { required: false });
+    t.string('url', { required: false });
+    t.string('shortText', { required: false });
+    t.string('longText', { required: false });
+    t.int('number', { required: false });
   },
 });
 
@@ -101,7 +101,7 @@ export const FormNodeEntryInput = inputObjectType({
   description: 'FormNodeEntryInput',
 
   definition(t) {
-    t.list.field('fields', { type: FormNodeEntryFieldInput });
+    t.list.field('values', { type: FormNodeEntryFieldInput });
   },
 });
 

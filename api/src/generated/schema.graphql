@@ -246,18 +246,18 @@ type FontSettings {
 
 """FormNodeEntryInput"""
 input FormNodeEntryFieldInput {
-  email: String = ""
-  longText: String = ""
-  number: Int = 0
-  phoneNumber: String = ""
+  email: String
+  longText: String
+  number: Int
+  phoneNumber: String
   relatedFieldId: ID
-  shortText: String = ""
-  url: String = ""
+  shortText: String
+  url: String
 }
 
 """FormNodeEntryInput"""
 input FormNodeEntryInput {
-  fields: [FormNodeEntryFieldInput!]
+  values: [FormNodeEntryFieldInput!]
 }
 
 type FormNodeField {

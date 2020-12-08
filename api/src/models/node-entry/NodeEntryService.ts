@@ -1,11 +1,15 @@
 import { ChoiceNodeEntry,
+  FormNodeEntryGetPayload,
   LinkNodeEntry, NodeEntry, NodeEntryCreateWithoutSessionInput, NodeEntryWhereInput,
   QuestionNode, RegistrationNodeEntry,
   SliderNodeEntry, TextboxNodeEntry } from '@prisma/client';
+import { isPresent } from 'ts-is-present';
 import _ from 'lodash';
 
 // eslint-disable-next-line import/no-cycle
+import { NexusGenInputs } from '../../generated/nexus';
 import { OrderByProps } from '../../types/generic';
+import { pickProperties } from '../../utils/pickProperties';
 import prisma from '../../config/prisma';
 
 export interface NodeEntryWithTypes extends NodeEntry {
@@ -16,15 +20,16 @@ export interface NodeEntryWithTypes extends NodeEntry {
   relatedNode?: QuestionNode | null;
   sliderNodeEntry?: SliderNodeEntry | undefined | null;
   choiceNodeEntry?: ChoiceNodeEntry | undefined | null;
+  formNodeEntry?: FormNodeEntryGetPayload<{ include: { values: true } }> | undefined | null;
   registrationNodeEntry?: RegistrationNodeEntry | undefined | null;
   textboxNodeEntry?: TextboxNodeEntry | undefined | null;
   linkNodeEntry?: LinkNodeEntry | undefined | null;
 }
 
 class NodeEntryService {
-  static constructCreateNodeEntryFragment = (nodeEntryInput: any): NodeEntryCreateWithoutSessionInput => ({
-    relatedNode: nodeEntryInput.nodeId && { connect: { id: nodeEntryInput.nodeId } },
-    relatedEdge: nodeEntryInput.edgeId && { connect: { id: nodeEntryInput.edgeId } },
+  static constructCreateNodeEntryFragment = (nodeEntryInput: NexusGenInputs['NodeEntryInput']): NodeEntryCreateWithoutSessionInput => ({
+    relatedNode: (nodeEntryInput.nodeId && { connect: { id: nodeEntryInput.nodeId } }) || undefined,
+    relatedEdge: (nodeEntryInput.edgeId && { connect: { id: nodeEntryInput.edgeId } }) || undefined,
     depth: nodeEntryInput?.depth,
 
     choiceNodeEntry: nodeEntryInput?.data?.choice?.value ? {
@@ -41,6 +46,20 @@ class NodeEntryService {
 
     textboxNodeEntry: nodeEntryInput?.data?.textbox?.value ? {
       create: { value: nodeEntryInput?.data?.textbox?.value },
+    } : undefined,
+
+    formNodeEntry: nodeEntryInput?.data?.form?.values ? {
+      create: {
+        values: {
+          create: nodeEntryInput?.data?.form?.values?.map((val) => ({
+            relatedField: { connect: { id: val.relatedFieldId || '-1' } },
+            ...pickProperties(
+              val,
+              ['email', 'phoneNumber', 'url', 'shortText', 'longText', 'number'],
+            ),
+          })),
+        },
+      },
     } : undefined,
   });
 
@@ -85,31 +104,6 @@ class NodeEntryService {
     return orderedNodeEntriesScore;
   };
 
-  static getEntries = async (whereInput: NodeEntryWhereInput): Promise<NodeEntryWithTypes[]> => {
-    const entries = prisma.nodeEntry.findMany({
-      where: whereInput,
-      include: {
-        session: {
-          select: {
-            id: true,
-            createdAt: true,
-          },
-        },
-        choiceNodeEntry: true,
-        registrationNodeEntry: true,
-        textboxNodeEntry: true,
-        linkNodeEntry: true,
-        sliderNodeEntry: true,
-      },
-    });
-
-    return entries;
-  };
-
-  // static fetchNodeEntryValue = async (nodeEntry: NodeEntry): Promise<any> => {
-  //   if
-  // }
-
   static getNodeEntryValue = (nodeEntry: NodeEntryWithTypes): any => {
     if (nodeEntry.relatedNode?.type === 'GENERIC') {
       return null;
@@ -142,6 +136,21 @@ class NodeEntryService {
     if (nodeEntry.relatedNode?.type === 'REGISTRATION') {
       try {
         return nodeEntry?.registrationNodeEntry?.value;
+      } catch {
+        throw new Error('RegistrationNodeEntry was not included on initial retrieval.');
+      }
+    }
+
+    if (nodeEntry.relatedNode?.type === 'FORM') {
+      try {
+        return nodeEntry?.formNodeEntry?.values.map((val) => Object.values(_.pick(val, [
+          'email',
+          'phoneNumber',
+          'url',
+          'shortText',
+          'longText',
+          'number',
+        ])).find(isPresent)).join(', ');
       } catch {
         throw new Error('RegistrationNodeEntry was not included on initial retrieval.');
       }

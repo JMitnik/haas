@@ -152,7 +152,7 @@ export interface NexusGenInputs {
     url?: string | null; // String
   }
   FormNodeEntryInput: { // input type
-    fields?: NexusGenInputs['FormNodeEntryFieldInput'][] | null; // [FormNodeEntryFieldInput!]
+    values?: NexusGenInputs['FormNodeEntryFieldInput'][] | null; // [FormNodeEntryFieldInput!]
   }
   FormNodeFieldInput: { // input type
     id?: string | null; // ID
