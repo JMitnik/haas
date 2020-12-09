@@ -22,6 +22,7 @@ export interface getDialogueSessionConnection_customer_dialogue_sessionConnectio
   registrationNodeEntry: string | null;
   choiceNodeEntry: string | null;
   linkNodeEntry: string | null;
+  formNodeEntry: any | null;
 }
 
 export interface getDialogueSessionConnection_customer_dialogue_sessionConnection_sessions_nodeEntries {

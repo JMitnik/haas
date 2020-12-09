@@ -378,6 +378,19 @@ export interface NexusGenRootTypes {
     renderMin?: number | null; // Int
   }
   FontSettings: prisma.FontSettings;
+  FormNodeEntryType: { // root type
+    id: number; // Int!
+    values: NexusGenRootTypes['FormNodeEntryValueType'][]; // [FormNodeEntryValueType!]!
+  }
+  FormNodeEntryValueType: { // root type
+    email?: string | null; // String
+    longText?: string | null; // String
+    number?: number | null; // Int
+    phoneNumber?: string | null; // String
+    relatedField: NexusGenRootTypes['FormNodeField']; // FormNodeField!
+    shortText?: string | null; // String
+    url?: string | null; // String
+  }
   FormNodeField: prisma.FormNodeField;
   FormNodeType: { // root type
     fields: NexusGenRootTypes['FormNodeField'][]; // [FormNodeField!]!
@@ -411,6 +424,7 @@ export interface NexusGenRootTypes {
   NodeEntry: prisma.NodeEntry;
   NodeEntryValue: { // root type
     choiceNodeEntry?: string | null; // String
+    formNodeEntry?: NexusGenRootTypes['FormNodeEntryType'] | null; // FormNodeEntryType
     linkNodeEntry?: string | null; // String
     registrationNodeEntry?: string | null; // String
     sliderNodeEntry?: number | null; // Int
@@ -696,6 +710,19 @@ export interface NexusGenFieldTypes {
   FontSettings: { // field return type
     id: string; // ID!
   }
+  FormNodeEntryType: { // field return type
+    id: number; // Int!
+    values: NexusGenRootTypes['FormNodeEntryValueType'][]; // [FormNodeEntryValueType!]!
+  }
+  FormNodeEntryValueType: { // field return type
+    email: string | null; // String
+    longText: string | null; // String
+    number: number | null; // Int
+    phoneNumber: string | null; // String
+    relatedField: NexusGenRootTypes['FormNodeField']; // FormNodeField!
+    shortText: string | null; // String
+    url: string | null; // String
+  }
   FormNodeField: { // field return type
     id: string; // ID!
     isRequired: boolean; // Boolean!
@@ -779,6 +806,7 @@ export interface NexusGenFieldTypes {
   }
   NodeEntryValue: { // field return type
     choiceNodeEntry: string | null; // String
+    formNodeEntry: NexusGenRootTypes['FormNodeEntryType'] | null; // FormNodeEntryType
     linkNodeEntry: string | null; // String
     registrationNodeEntry: string | null; // String
     sliderNodeEntry: number | null; // Int
@@ -1200,7 +1228,7 @@ export interface NexusGenAbstractResolveReturnTypes {
 
 export interface NexusGenInheritedFields {}
 
-export type NexusGenObjectNames = "ColourSettings" | "Customer" | "CustomerSettings" | "Debug" | "DeleteUserOutput" | "Dialogue" | "DialogueStatistics" | "Edge" | "EdgeCondition" | "FontSettings" | "FormNodeField" | "FormNodeType" | "ImageType" | "InviteUserOutput" | "LinkType" | "LoginOutput" | "Mutation" | "NodeEntry" | "NodeEntryValue" | "PaginationPageInfo" | "PermssionType" | "Query" | "QuestionNode" | "QuestionOption" | "RefreshAccessTokenOutput" | "RequestInviteOutput" | "RoleConnection" | "RoleType" | "Session" | "SessionConnection" | "ShareNodeType" | "SliderNodeMarkerType" | "SliderNodeRangeType" | "SliderNodeType" | "Tag" | "TriggerConditionType" | "TriggerConnectionType" | "TriggerType" | "UserConnection" | "UserCustomer" | "UserType" | "VerifyUserTokenOutput" | "lineChartDataType" | "topPathType";
+export type NexusGenObjectNames = "ColourSettings" | "Customer" | "CustomerSettings" | "Debug" | "DeleteUserOutput" | "Dialogue" | "DialogueStatistics" | "Edge" | "EdgeCondition" | "FontSettings" | "FormNodeEntryType" | "FormNodeEntryValueType" | "FormNodeField" | "FormNodeType" | "ImageType" | "InviteUserOutput" | "LinkType" | "LoginOutput" | "Mutation" | "NodeEntry" | "NodeEntryValue" | "PaginationPageInfo" | "PermssionType" | "Query" | "QuestionNode" | "QuestionOption" | "RefreshAccessTokenOutput" | "RequestInviteOutput" | "RoleConnection" | "RoleType" | "Session" | "SessionConnection" | "ShareNodeType" | "SliderNodeMarkerType" | "SliderNodeRangeType" | "SliderNodeType" | "Tag" | "TriggerConditionType" | "TriggerConnectionType" | "TriggerType" | "UserConnection" | "UserCustomer" | "UserType" | "VerifyUserTokenOutput" | "lineChartDataType" | "topPathType";
 
 export type NexusGenInputNames = "AppendToInteractionInput" | "CTALinkInputObjectType" | "CTALinksInputType" | "CTAShareInputObjectType" | "ChoiceNodeEntryInput" | "CreateCTAInputType" | "CreateDialogueInputType" | "CreateQuestionNodeInputType" | "CreateTriggerInputType" | "CreateWorkspaceInput" | "CustomerWhereUniqueInput" | "DeleteDialogueInputType" | "DeleteNodeInputType" | "DeleteUserInput" | "DialogueFilterInputType" | "DialogueWhereUniqueInput" | "EdgeConditionInputType" | "EditUserInput" | "EditWorkspaceInput" | "FormNodeEntryFieldInput" | "FormNodeEntryInput" | "FormNodeFieldInput" | "FormNodeInputType" | "InviteUserInput" | "LoginInput" | "NodeEntryDataInput" | "NodeEntryInput" | "OptionInputType" | "OptionsInputType" | "PaginationSortInput" | "PaginationWhereInput" | "PermissionIdsInput" | "PermissionInput" | "QuestionNodeWhereInputType" | "QuestionNodeWhereUniqueInput" | "RecipientsInputType" | "RegisterInput" | "RegisterNodeEntryInput" | "RequestInviteInput" | "RoleDataInput" | "RoleInput" | "SessionInput" | "SessionWhereUniqueInput" | "ShareNodeInputType" | "SlideNodeMarkerInput" | "SliderNodeEntryInput" | "SliderNodeInputType" | "SliderNodeRangeInputType" | "SocialNodeEntryInput" | "TagsInputObjectType" | "TextboxNodeEntryInput" | "TriggerConditionInputType" | "TriggerInputType" | "UpdateCTAInputType" | "UpdateQuestionNodeInputType" | "UserInput" | "UserOfCustomerInput";
 

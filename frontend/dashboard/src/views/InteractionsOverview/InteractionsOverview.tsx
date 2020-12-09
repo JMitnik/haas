@@ -1,4 +1,5 @@
 /* eslint-disable radix */
+import * as UI from '@haas/ui';
 import * as lodash from 'lodash';
 import * as qs from 'qs';
 import { debounce } from 'lodash';
@@ -124,6 +125,16 @@ const InteractionTableValue = ({ entry }: { entry: NodeEntry }) => {
 
     case QuestionNodeTypeEnum.TEXTBOX:
       return <>{entry.value?.textboxNodeEntry}</>;
+
+    case QuestionNodeTypeEnum.FORM:
+      console.log({ entry });
+      return (
+        <>
+          {entry.value?.formNodeEntry?.values?.map((val: any) => (
+            <UI.Label>{val?.email}</UI.Label>
+          ))}
+        </>
+      );
 
     default:
       return (<>N/A available</>);

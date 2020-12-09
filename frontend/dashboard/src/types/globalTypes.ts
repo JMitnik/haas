@@ -41,6 +41,7 @@ export enum PaginationSortByEnum {
  */
 export enum QuestionNodeTypeEnum {
   CHOICE = "CHOICE",
+  FORM = "FORM",
   GENERIC = "GENERIC",
   LINK = "LINK",
   REGISTRATION = "REGISTRATION",

@@ -260,6 +260,21 @@ input FormNodeEntryInput {
   values: [FormNodeEntryFieldInput!]
 }
 
+type FormNodeEntryType {
+  id: Int!
+  values: [FormNodeEntryValueType!]!
+}
+
+type FormNodeEntryValueType {
+  email: String
+  longText: String
+  number: Int
+  phoneNumber: String
+  relatedField: FormNodeField!
+  shortText: String
+  url: String
+}
+
 type FormNodeField {
   id: ID!
   isRequired: Boolean!
@@ -431,6 +446,7 @@ input NodeEntryInput {
 
 type NodeEntryValue {
   choiceNodeEntry: String
+  formNodeEntry: FormNodeEntryType
   linkNodeEntry: String
   registrationNodeEntry: String
   sliderNodeEntry: Int
