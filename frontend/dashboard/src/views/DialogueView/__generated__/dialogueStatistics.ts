@@ -36,7 +36,7 @@ export interface dialogueStatistics_customer_dialogue_sessions_nodeEntries {
 export interface dialogueStatistics_customer_dialogue_sessions {
   __typename: "Session";
   id: string;
-  createdAt: string;
+  createdAt: any;
   score: number;
   nodeEntries: dialogueStatistics_customer_dialogue_sessions_nodeEntries[];
 }

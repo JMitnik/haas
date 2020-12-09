@@ -24,6 +24,7 @@ export interface getEditDialogue_customer_dialogue {
   publicTitle: string | null;
   description: string;
   isWithoutGenData: boolean;
+  wasGeneratedWithGenData: boolean;
   tags: getEditDialogue_customer_dialogue_tags[] | null;
 }
 

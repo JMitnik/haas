@@ -23,6 +23,25 @@ export interface getTopicBuilder_customer_dialogue_questions_overrideLeaf {
   title: string;
 }
 
+export interface getTopicBuilder_customer_dialogue_questions_sliderNode_markers_range {
+  __typename: "SliderNodeRangeType";
+  start: number | null;
+  end: number | null;
+}
+
+export interface getTopicBuilder_customer_dialogue_questions_sliderNode_markers {
+  __typename: "SliderNodeMarkerType";
+  id: string;
+  label: string;
+  subLabel: string;
+  range: getTopicBuilder_customer_dialogue_questions_sliderNode_markers_range | null;
+}
+
+export interface getTopicBuilder_customer_dialogue_questions_sliderNode {
+  __typename: "SliderNodeType";
+  markers: getTopicBuilder_customer_dialogue_questions_sliderNode_markers[] | null;
+}
+
 export interface getTopicBuilder_customer_dialogue_questions_children_conditions {
   __typename: "EdgeCondition";
   id: number;
@@ -68,6 +87,10 @@ export interface getTopicBuilder_customer_dialogue_questions {
   isRoot: boolean;
   isLeaf: boolean;
   overrideLeaf: getTopicBuilder_customer_dialogue_questions_overrideLeaf | null;
+  /**
+   * Slidernode resolver
+   */
+  sliderNode: getTopicBuilder_customer_dialogue_questions_sliderNode | null;
   type: QuestionNodeTypeEnum;
   children: getTopicBuilder_customer_dialogue_questions_children[];
   options: getTopicBuilder_customer_dialogue_questions_options[];

@@ -162,16 +162,6 @@ export const InputGroup = forwardRef((props: InputGroupProps, ref) => (
   <ChakraInputGroup {...props} ref={ref} />
 ));
 
-export const Label = styled(Div).attrs({ as: 'label' })`
-  ${({ theme }) => css`
-    font-size: 0.8rem;
-    font-weight: 600;
-    margin-bottom: 2px;
-    display: inline-block;
-    color: ${theme.colors.gray[500]};
-  `}
-`;
-
 export const ErrorStyle = {
   control: (base: any) => ({
     ...base,

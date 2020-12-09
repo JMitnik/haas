@@ -30,6 +30,7 @@ const getDialogueSessionConnectionQuery = gql`
                   values {
                     relatedField {
                       id
+                      type
                     }
 
                     email

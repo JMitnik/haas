@@ -16,6 +16,25 @@ export interface QuestionFragment_overrideLeaf {
   title: string;
 }
 
+export interface QuestionFragment_sliderNode_markers_range {
+  __typename: "SliderNodeRangeType";
+  start: number | null;
+  end: number | null;
+}
+
+export interface QuestionFragment_sliderNode_markers {
+  __typename: "SliderNodeMarkerType";
+  id: string;
+  label: string;
+  subLabel: string;
+  range: QuestionFragment_sliderNode_markers_range | null;
+}
+
+export interface QuestionFragment_sliderNode {
+  __typename: "SliderNodeType";
+  markers: QuestionFragment_sliderNode_markers[] | null;
+}
+
 export interface QuestionFragment_children_conditions {
   __typename: "EdgeCondition";
   id: number;
@@ -61,6 +80,10 @@ export interface QuestionFragment {
   isRoot: boolean;
   isLeaf: boolean;
   overrideLeaf: QuestionFragment_overrideLeaf | null;
+  /**
+   * Slidernode resolver
+   */
+  sliderNode: QuestionFragment_sliderNode | null;
   type: QuestionNodeTypeEnum;
   children: QuestionFragment_children[];
   options: QuestionFragment_options[];

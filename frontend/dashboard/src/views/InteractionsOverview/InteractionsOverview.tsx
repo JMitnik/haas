@@ -15,20 +15,22 @@ import {
   getDialogueSessionConnection_customer_dialogue_sessionConnection_sessions_nodeEntries as NodeEntry,
   getDialogueSessionConnection_customer_dialogue_sessionConnection_sessions as Session,
 } from 'queries/__generated__/getDialogueSessionConnection';
-import { Div, Flex, Hr, PageTitle, Span, Text } from '@haas/ui';
+import { Div, Flex, PageTitle, Span, Text } from '@haas/ui';
 import { useTranslation } from 'react-i18next';
 
 import { QuestionNodeTypeEnum } from 'types/globalTypes';
 import DatePicker from 'components/DatePicker/DatePicker';
-import MultiChoiceNodeIcon from 'components/Icons/MultiChoiceNodeIcon';
 import SearchBar from 'components/SearchBar/SearchBar';
-import SliderNodeIcon from 'components/Icons/SliderNodeIcon';
 import Table from 'components/Table/Table';
 import getDialogueSessionConnectionQuery from 'queries/getDialogueSessionConnectionQuery';
 
+import { EntryBreadCrumbContainer,
+  NodeTypeIcon } from 'views/DialogueView/Modules/InteractionFeedModule/InteractionFeedEntry';
+import { FormNodeEntry } from './FormNodeEntry';
 import { InteractionDateCell, InteractionPathCell,
   InteractionUserCell, ScoreCell } from './InteractionTableCells';
-import { InteractionDetailQuestionEntry, InteractionsOverviewContainer } from './InteractionOverviewStyles';
+import { InteractionDetailQuestionEntry,
+  InteractionsOverviewContainer } from './InteractionOverviewStyles';
 
 interface TableProps {
   activeStartDate: Date | null;
@@ -63,37 +65,38 @@ const ExpandedInteractionRow = ({ data }: { data: Session }) => {
           </Div>
           <Div />
         </Div>
-        <Hr style={{ marginBottom: '15px' }} color="#999999" />
+        <UI.Hr />
         <Div position="relative" useFlex flexDirection="row">
-          <Div width="50%">
-            <Text color="gray.400" fontSize="1.2rem" fontWeight="600">{t('interactions:watch_journey_heading')}</Text>
-          </Div>
-          <InteractionDetailQuestionEntry useFlex flexDirection="column" width="50%">
+          <InteractionDetailQuestionEntry useFlex flexDirection="column">
             {/* TODO: Make each mapped entry an individual component */}
             {data.nodeEntries.map((nodeEntry: any, index: any) => {
-              const { id, relatedNode } = nodeEntry;
+              const { id, relatedNode, value } = nodeEntry;
 
               return (
                 <Div marginBottom={20} useFlex flexDirection="column" key={`${id}-${index}`}>
                   <Div useFlex flexDirection="row">
-                    <Div
-                      zIndex={1}
-                      alignSelf="center"
-                      padding={8}
-                      marginRight="10%"
-                      backgroundColor="gray.100"
-                      borderRadius="90px"
-                      border="1px solid #c0bcbb"
+                    <EntryBreadCrumbContainer
+                      pr={3}
+                      zIndex={10 - index}
+                      margin={0}
+                      height={40}
+                      score={relatedNode?.type === 'SLIDER' ? value?.sliderNodeEntry : null}
                     >
-                      {relatedNode?.type === 'SLIDER' ? <SliderNodeIcon /> : <MultiChoiceNodeIcon /> }
-                    </Div>
-                    <Div useFlex flexDirection="column">
+                      <NodeTypeIcon node={relatedNode} />
+                    </EntryBreadCrumbContainer>
+                    <Div maxWidth={400} ml={2} useFlex flexDirection="column">
                       <Div>
                         <Text fontWeight="300" color="gray.500" fontSize="0.8rem">{t('interactions:you_asked')}</Text>
                         <Text fontWeight="600" color="gray.500" fontSize="0.8rem">{relatedNode?.title || 'N/A'}</Text>
                       </Div>
                       <Div mt={4}>
-                        <Text fontWeight="300" color="gray.500" fontSize="0.8rem">{t('interactions:they_answered')}</Text>
+                        <Text
+                          fontWeight="300"
+                          color="gray.500"
+                          fontSize="0.8rem"
+                        >
+                          {t('interactions:they_answered')}
+                        </Text>
                         <Text fontWeight="600" color="gray.500" fontSize="0.8rem">
                           <InteractionTableValue entry={nodeEntry} />
                         </Text>
@@ -109,6 +112,12 @@ const ExpandedInteractionRow = ({ data }: { data: Session }) => {
     </Div>
   );
 };
+
+const FallbackNode = () => (
+  <UI.Div>
+    User kept it empty
+  </UI.Div>
+);
 
 const InteractionTableValue = ({ entry }: { entry: NodeEntry }) => {
   if (!entry) return <Div>test</Div>;
@@ -127,13 +136,9 @@ const InteractionTableValue = ({ entry }: { entry: NodeEntry }) => {
       return <>{entry.value?.textboxNodeEntry}</>;
 
     case QuestionNodeTypeEnum.FORM:
-      console.log({ entry });
+      if (!entry.value?.formNodeEntry) return <FallbackNode />;
       return (
-        <>
-          {entry.value?.formNodeEntry?.values?.map((val: any) => (
-            <UI.Label>{val?.email}</UI.Label>
-          ))}
-        </>
+        <FormNodeEntry nodeEntry={entry.value?.formNodeEntry} />
       );
 
     default:
@@ -156,6 +161,7 @@ const InteractionsOverview = () => {
         const entryAnswer = value?.choiceNodeEntry
         || value?.linkNodeEntry
         || value?.registrationNodeEntry
+        || value?.formNodeEntry
         || value?.sliderNodeEntry
         || value?.textboxNodeEntry;
         return { [`depth${index}-title`]: relatedNode?.title, [`depth${index}-entry`]: entryAnswer };
