@@ -482,7 +482,7 @@ class NodeService {
         throw Error;
       }
     } catch (e) {
-      console.log('something went wrong updating edges: ', e.message);
+      console.log('something went wrong updating edges: ', e);
     }
 
     const updatedOptionIds = await NodeService.updateQuestionOptions(options);

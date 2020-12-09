@@ -142,8 +142,8 @@ const UsersOverview = () => {
     setPaginationProps((prevValues) => ({ ...prevValues, activeSearchTerm: newSearchTerm }));
   }, 250), []);
 
-  const pageCount = data?.userTable?.totalPages || 1;
-  const pageIndex = data?.userTable?.pageIndex || 0;
+  const pageCount = data?.userTable?.pageInfo?.nrPages || 1;
+  const pageIndex = data?.userTable?.pageInfo?.pageIndex || 0;
 
   return (
     <>

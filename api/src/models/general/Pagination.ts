@@ -7,6 +7,13 @@ const PaginationSortByEnum = enumType({
   members: ['score', 'id', 'createdAt', 'email', 'name', 'firstName', 'lastName', 'role', 'medium', 'type', 'paths', 'user', 'when'],
 });
 
+export const PaginationSearchEnum = enumType({
+  name: 'PaginationSearchEnum',
+  description: 'Fields that can be used for free text search on tables',
+  // TODO: Make this enum overrideable?
+  members: ['name', 'firstName', 'lastName', 'email', 'title', 'publicTitle'],
+});
+
 // TODO: Can we make this a generic type
 export const PaginationSortInput = inputObjectType({
   name: 'PaginationSortInput',

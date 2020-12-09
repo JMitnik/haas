@@ -1,17 +1,15 @@
-import { User, UserWhereInput } from '@prisma/client';
-import _ from 'lodash';
+import { FindManyUserOfCustomerArgs, User, UserOfCustomer } from '@prisma/client';
 
 import { NexusGenInputs } from '../../generated/nexus';
 import { Nullable } from '../../types/generic';
+import _ from 'lodash';
 
+import { FindManyCallBackProps, PaginateProps, paginate } from '../../utils/table/pagination';
 import { mailService } from '../../services/mailings/MailService';
+
 import AuthService from '../auth/AuthService';
 import makeInviteTemplate from '../../services/mailings/templates/makeInviteTemplate';
 import prisma from '../../config/prisma';
-
-interface CreateUserOptions {
-  customerSlug?: string;
-}
 
 class UserService {
   static async createUser(userInput: NexusGenInputs['UserInput']) {
@@ -123,78 +121,71 @@ class UserService {
     });
   }
 
-  static getSearchTermFilter = (searchTerm: string) => {
-    if (!searchTerm) {
-      return [];
-    }
-
-    const searchTermFilter: UserWhereInput[] = [
-      {
-        firstName: { contains: searchTerm },
+  static filterBySearchTerm = (
+    usersOfCustomer: (UserOfCustomer & {
+      user: {
+        firstName: string;
+        lastName: string;
+        email: string;
       },
-      {
-        lastName: { contains: searchTerm },
-      },
-      {
-        email: { contains: searchTerm },
-      },
-      // TODO: Bring back role search
-      // {
-      //   role: { name: { contains: searchTerm } },
-      // },
-    ];
-
-    return searchTermFilter;
-  };
-
-  static orderUsersBy = (
-    users: (User & {
       role: {
         name: string;
       };
     })[],
-    orderBy: { id: string, desc: boolean },
+    searchTerm: string | null | undefined,
   ) => {
-    if (orderBy.id === 'firstName') {
-      return _.orderBy(users, (user) => user.firstName, orderBy.desc ? 'desc' : 'asc');
-    } if (orderBy.id === 'lastName') {
-      return _.orderBy(users, (user) => user.lastName, orderBy.desc ? 'desc' : 'asc');
-    } if (orderBy.id === 'email') {
-      return _.orderBy(users, (user) => user.email, orderBy.desc ? 'desc' : 'asc');
-    } if (orderBy.id === 'role') {
-      return _.orderBy(users, (user) => user.role.name, orderBy.desc ? 'desc' : 'asc');
-    }
+    if (!searchTerm) return usersOfCustomer;
 
-    return users;
+    const filtered = usersOfCustomer.filter((userOfCustomer) => {
+      if (userOfCustomer?.user?.email?.toLowerCase().includes(searchTerm.toLowerCase())) {
+        return true;
+      }
+      if (userOfCustomer?.user?.firstName?.toLowerCase().includes(searchTerm.toLowerCase())) {
+        return true;
+      }
+      if (userOfCustomer?.user?.lastName?.toLowerCase().includes(searchTerm.toLowerCase())) {
+        return true;
+      }
+      if (userOfCustomer?.role?.name?.toLowerCase().includes(searchTerm.toLowerCase())) {
+        return true;
+      }
+      return false;
+    });
+
+    return filtered;
   };
 
-  static sliceUsers = (
-    entries: Array<any>,
-    offset: number,
-    limit: number,
-    pageIndex: number,
-  ) => ((offset + limit) < entries.length
-    ? entries.slice(offset, (pageIndex + 1) * limit)
-    : entries.slice(offset, entries.length));
+  static orderUsersBy = (
+    usersOfCustomer: (UserOfCustomer & {
+      user: {
+        firstName: string;
+        lastName: string;
+        email: string;
+      },
+      role: {
+        name: string;
+      };
+    })[],
+    orderBy: any,
+  ) => {
+    if (orderBy.by === 'firstName') {
+      return _.orderBy(usersOfCustomer, (userOfCustomer) => userOfCustomer.user.firstName, orderBy.desc ? 'desc' : 'asc');
+    } if (orderBy.by === 'lastName') {
+      return _.orderBy(usersOfCustomer, (userOfCustomer) => userOfCustomer.user.lastName, orderBy.desc ? 'desc' : 'asc');
+    } if (orderBy.by === 'email') {
+      return _.orderBy(usersOfCustomer, (userOfCustomer) => userOfCustomer.user.email, orderBy.desc ? 'desc' : 'asc');
+    } if (orderBy.by === 'role') {
+      return _.orderBy(usersOfCustomer, (userOfCustomer) => userOfCustomer.role.name, orderBy.desc ? 'desc' : 'asc');
+    }
+
+    return usersOfCustomer;
+  };
 
   static paginatedUsers = async (
     customerSlug: string,
-    pageIndex?: Nullable<number>,
-    offset?: Nullable<number>,
-    limit?: Nullable<number>,
-    orderBy?: Nullable<any>,
-    searchTerm?: Nullable<string>,
+    paginationOpts: NexusGenInputs['PaginationWhereInput'],
   ) => {
-    let needPageReset = false;
-    const userWhereInput: UserWhereInput = { customers: { every: { AND: { customer: { slug: customerSlug } } } } };
-    const searchTermFilter = UserService.getSearchTermFilter(searchTerm || '');
-
-    if (searchTermFilter.length > 0) {
-      userWhereInput.OR = searchTermFilter;
-    }
-
-    // Search term filtered users
-    const usersOfCustomer = await prisma.userOfCustomer.findMany({
+    const userOfCustomerFindManyArgs: FindManyUserOfCustomerArgs = {
       where: {
         customer: { slug: customerSlug },
       },
@@ -203,22 +194,43 @@ class UserService {
         role: true,
         user: true,
       },
-    });
+    };
 
-    const totalPages = Math.ceil(usersOfCustomer.length / (limit || 1));
+    const countWhereInput: FindManyUserOfCustomerArgs = { where: {
+      customer: { slug: customerSlug },
+    } };
 
-    if (pageIndex && pageIndex + 1 > totalPages) {
-      offset = 0;
-      needPageReset = true;
-    }
+    const findManyUsers = async ({ props, paginationOpts }: FindManyCallBackProps) => {
+      const users: any = await prisma.userOfCustomer.findMany(props);
+      const filteredBySearch = UserService.filterBySearchTerm(users, paginationOpts?.searchTerm);
+      const orderedUsers = UserService.orderUsersBy(filteredBySearch, paginationOpts?.orderBy?.[0]);
+      return orderedUsers;
+    };
+    const countUsers = async ({ props: countArgs }: FindManyCallBackProps) => prisma.userOfCustomer.count(countArgs);
 
-    // Slice ordered filtered users
-    const slicedOrderedUsers = UserService.sliceUsers(usersOfCustomer, (offset || 0), (limit || 0), (pageIndex || 0));
+    const paginateProps: PaginateProps = {
+      findManyArgs: {
+        findArgs: userOfCustomerFindManyArgs,
+        searchFields: [],
+        orderFields: [],
+        findManyCallBack: findManyUsers,
+      },
+      countArgs: {
+        countWhereInput,
+        countCallBack: countUsers,
+      },
+      paginationOpts,
+    };
+
+    const { entries, pageInfo } = await paginate(paginateProps);
 
     return {
-      userCustomers: slicedOrderedUsers,
-      pageIndex: needPageReset ? 0 : pageIndex,
-      totalPages,
+      userCustomers: entries,
+      offset: paginationOpts?.offset || 0,
+      limit: paginationOpts?.limit || 0,
+      startDate: paginationOpts?.startDate?.toString(),
+      endDate: paginationOpts?.endDate?.toString(),
+      pageInfo,
     };
   };
 }
