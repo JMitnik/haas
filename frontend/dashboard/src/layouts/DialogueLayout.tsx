@@ -3,7 +3,7 @@ import React, { useContext, useRef, useState } from 'react';
 import { Activity, BarChart, Clipboard, Download, Mail, Menu, Share, Sliders, Zap } from 'react-feather';
 import { Button, Icon, IconButton, Modal, ModalBody,
   ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useClipboard, useDisclosure } from '@chakra-ui/core';
-import { ColumnFlex, Div, Flex, Grid, Hr, Input, StyledExtLink, Text, ViewContainer } from '@haas/ui';
+import { ColumnFlex, Div, ExtLinkContainer, Flex, Grid, Hr, Input, Text, ViewContainer } from '@haas/ui';
 import { NavLink } from 'react-router-dom';
 import { Variants, motion } from 'framer-motion';
 import { useHistory, useParams } from 'react-router';
@@ -45,7 +45,7 @@ const DialogueNavBarContainer = motion.custom(styled(Div)`
     bottom: 0;
     padding: ${theme.gutter}px ${theme.gutter}px;
 
-    ${StyledExtLink} {
+    ${ExtLinkContainer} {
       padding: 0;
       font-size: 0.7rem;
     }
