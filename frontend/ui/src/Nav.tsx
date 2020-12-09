@@ -31,14 +31,18 @@ const UserNav: FC = () => (
   </Div>
 );
 
-export const StyledExtLink = styled.a<ColorProps>`
-  ${color};
-  text-decoration: none;
-  color: inherit;
+export const ExtLinkContainer = styled.a<ColorProps>`
+  ${({ theme }) => css`
+    ${color};
+    
+    text-decoration: none;
+    font-weight: 600;
+    color: ${theme.colors.blue[300]};
+  `}
 `;
 
 export const ExtLink = ({ children, to }: { children: React.ReactNode, to: string }) => (
-  <StyledExtLink as="a" href={to}  target="_blank" rel="noopener noreferrer">{children}</StyledExtLink>
+  <ExtLinkContainer as="a" href={to}  target="_blank" rel="noopener noreferrer">{children}</ExtLinkContainer>
 );
 
 export const TopNav: FC = () => (
