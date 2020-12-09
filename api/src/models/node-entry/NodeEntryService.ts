@@ -104,6 +104,10 @@ class NodeEntryService {
     return orderedNodeEntriesScore;
   };
 
+  /**
+   * Return a textual-representation of a node-entry.
+   * - Used for building up a mail.
+   */
   static getNodeEntryValue = (nodeEntry: NodeEntryWithTypes): any => {
     if (nodeEntry.relatedNode?.type === 'GENERIC') {
       return null;
@@ -163,28 +167,75 @@ class NodeEntryService {
     throw new Error(`Unable to find node entry type ${nodeEntry.relatedNode?.type}.`);
   };
 
+  /**
+   * Searches for text-nodes.
+   * Used generally in the fetching of relevant interactions/sessions.
+   * @param text
+   */
   static constructFindWhereTextNodeEntryFragment(text: string): NodeEntryWhereInput {
-    // TODO: Figure out what to do with the texts
     return {
       OR: [
         { textboxNodeEntry: {
           value: {
             contains: text,
+            mode: 'insensitive',
           },
         } },
         { choiceNodeEntry: {
           value: {
             contains: text,
+            mode: 'insensitive',
           },
         } },
+        // DEPRECATED (but still included)
         {
-        // Ensure we can make this better searchable (JSON?)
           registrationNodeEntry: {
             value: {
               equals: text,
             },
           },
-        }],
+        },
+        {
+          formNodeEntry: {
+            values: {
+              some: {
+                OR: [
+                  {
+                    phoneNumber: {
+                      contains: text,
+                      mode: 'insensitive',
+                    },
+                  },
+                  {
+                    shortText: {
+                      contains: text,
+                      mode: 'insensitive',
+                    },
+                  },
+                  {
+                    url: {
+                      contains: text,
+                      mode: 'insensitive',
+                    },
+                  },
+                  {
+                    email: {
+                      contains: text,
+                      mode: 'insensitive',
+                    },
+                  },
+                  {
+                    longText: {
+                      contains: text,
+                      mode: 'insensitive',
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        },
+      ],
     };
   }
 
