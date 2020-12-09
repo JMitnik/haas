@@ -1,6 +1,10 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    see_interactions: {
+      en: 'See it in the interactions table.',
+      de: 'Sehen Sie es in der Interaktions-Tabelle.',
+    },
     edit_field: {
       en: 'Edit field',
       de: 'Feld bearbeiten',

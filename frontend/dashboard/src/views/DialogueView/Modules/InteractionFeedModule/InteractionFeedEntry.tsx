@@ -1,6 +1,7 @@
 import { Clipboard, Clock, Link as LinkIcon, MessageCircle, Target } from 'react-feather';
 import { Icon, Tooltip } from '@chakra-ui/core';
 import { formatDistanceToNow } from 'date-fns';
+import { useTranslation } from 'react-i18next';
 import React from 'react';
 import styled, { css } from 'styled-components/macro';
 
@@ -82,33 +83,37 @@ export const EntryBreadCrumbContainer = styled(Div)<{ score?: number | null, isI
   `}
 `;
 
-export const CompactEntriesPath = ({ nodeEntries }: { nodeEntries: NodeEntry[] }) => (
-  <Flex>
-    {nodeEntries.map((entry, index) => (
-      <Tooltip
-        zIndex={400}
-        key={index}
-        hasArrow
-        aria-label={parseNodeEntryValue(entry)?.toString() || ''}
-        placement="top"
-        label={parseNodeEntryValue(entry)?.toString()}
-      >
-        <EntryBreadCrumbContainer
-          isInline
-          pr={3}
-          zIndex={10 - index}
-          score={entry.relatedNode?.type === 'SLIDER' ? entry.value?.sliderNodeEntry : null}
+export const CompactEntriesPath = ({ nodeEntries }: { nodeEntries: NodeEntry[] }) => {
+  const { t } = useTranslation();
+  return (
+    <Flex>
+      {nodeEntries.map((entry, index) => (
+        <Tooltip
+          zIndex={400}
+          key={index}
+          hasArrow
+          aria-label={parseNodeEntryValue(entry, t)?.toString() || ''}
+          placement="top"
+          label={parseNodeEntryValue(entry, t)?.toString()}
         >
-          <NodeTypeIcon node={entry.relatedNode} />
-        </EntryBreadCrumbContainer>
-      </Tooltip>
-    ))}
-  </Flex>
-);
+          <EntryBreadCrumbContainer
+            isInline
+            pr={3}
+            zIndex={10 - index}
+            score={entry.relatedNode?.type === 'SLIDER' ? entry.value?.sliderNodeEntry : null}
+          >
+            <NodeTypeIcon node={entry.relatedNode} />
+          </EntryBreadCrumbContainer>
+        </Tooltip>
+      ))}
+    </Flex>
+  );
+};
 
 const InteractionFeedEntry = ({ interaction }: { interaction: Session }) => {
   const date = new Date(parseInt(interaction.createdAt, 10));
   const dist = formatDistanceToNow(date);
+  const { t } = useTranslation();
 
   return (
     <InteractionFeedEntryContainer>
@@ -125,7 +130,7 @@ const InteractionFeedEntry = ({ interaction }: { interaction: Session }) => {
               </Text>
               {' '}
               <Text color="gray.500" fontWeight={800} fontSize="0.8rem">
-                {parseNodeEntryValue(interaction?.nodeEntries[1])}
+                {parseNodeEntryValue(interaction?.nodeEntries[1], t)}
               </Text>
             </Div>
           ) : (
