@@ -1,6 +1,26 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    is_required: {
+      en: 'Is required',
+      de: 'Wird benötigt',
+    },
+    required: {
+      en: 'Required',
+      de: 'Benötigt',
+    },
+    not_required: {
+      en: 'Not required',
+      de: 'Nicht benötigt',
+    },
+    not_required_helper: {
+      en: 'User can leave this empty',
+      de: 'Benutzer kann dies leer lassen',
+    },
+    required_helper: {
+      en: 'User must fill this in.',
+      de: 'Benutzer muss dies in füllen',
+    },
     see_interactions: {
       en: 'See it in the interactions table.',
       de: 'Sehen Sie es in der Interaktions-Tabelle.',
@@ -17,6 +37,7 @@ const language = {
       en: 'Phone number',
       de: 'Telefonnummer',
     },
+
     phoneNumber_type: {
       en: 'Phone number',
       de: 'Telefonnummer',
@@ -38,8 +59,12 @@ const language = {
       de: 'Kurze Texte',
     },
     shortText_helper: {
-      en: 'For generic short texts',
-      de: 'Für generische Short-Texte',
+      en: 'For generic short texts, like names',
+      de: 'Für generische Short-Texte wie Namen',
+    },
+    shortText_type: {
+      en: 'Short text',
+      de: 'Kurze Texte',
     },
     longText: {
       en: 'Long text',

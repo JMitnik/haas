@@ -157,7 +157,16 @@ const CTACard = ({ id, activeCTA, onActiveCTAChange, title, type, links, share, 
           </UI.Flex>
 
           <Flex alignItems="center" justifyContent="center">
-            <UI.Button mr={4} variant="outline" variantColor="teal" size="sm" leftIcon={Edit3} isDisabled={(activeCTA && activeCTA !== id) || false} onClick={() => onActiveCTAChange(id)}>
+            <UI.Button
+              ml={4}
+              mr={4}
+              variant="outline"
+              variantColor="teal"
+              size="sm"
+              leftIcon={Edit3}
+              isDisabled={(activeCTA && activeCTA !== id) || false}
+              onClick={() => onActiveCTAChange(id)}
+            >
               <Span>
                 {t('edit')}
               </Span>

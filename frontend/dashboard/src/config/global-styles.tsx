@@ -27,6 +27,11 @@ const GlobalStyle = createGlobalStyle`
   svg {
     display: block;
   }
+  
+  /* For react-modal */
+  .ReactModal__Body--open {
+    overflow: hidden;
+  }
 `;
 
 export default GlobalStyle;

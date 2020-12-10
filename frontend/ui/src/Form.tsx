@@ -535,7 +535,7 @@ interface RadioButtonsProps {
 }
 
 export const RadioButtons = ({ children, onChange, value, onBlur }: RadioButtonsProps) => (
-  <ChakraRadioButtonGroup display="flex" onChange={onChange} value={value} onBlur={onBlur}>
+  <ChakraRadioButtonGroup display="flex" flexWrap="wrap" onChange={onChange} value={value} onBlur={onBlur}>
     {children}
   </ChakraRadioButtonGroup>
 )

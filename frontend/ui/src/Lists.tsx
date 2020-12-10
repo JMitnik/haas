@@ -39,6 +39,14 @@ export const ListItem = styled(Div)<ListItemProps>`
     padding: ${theme.gutter / 2}px;
     display: flex;
     border-left: 2px solid transparent;
+    transition: all .3s cubic-bezier(.55,0,.1,1);
+
+    &:hover {
+      border-left: 2px solid ${accent || theme.colors.primary};
+      background: ${Color(accent).mix(Color('white'), 0.95).hex()};
+      cursor: pointer;
+      transition: all .3s cubic-bezier(.55,0,.1,1);
+    }
 
     ${isSelected && css`
       border-left: 2px solid ${accent || theme.colors.primary};

@@ -18,10 +18,10 @@ export const Card = styled(Div)<CardProps>`
     display: flex;
     flex-direction: column;
     border-radius: ${theme.borderRadiuses.somewhatRounded};
-    transition: all .3s cubic-bezier(.55,0,.1,1);
+    /* transition: all .3s cubic-bezier(.55,0,.1,1); */
 
     box-shadow: rgba(0, 0, 0, 0.08) 0px 4px 12px;
-    transition: all .3s cubic-bezier(.55,0,.1,1);
+    /* transition: all .3s cubic-bezier(.55,0,.1,1); */
 
     &:focus-within {
       transition: all .3s cubic-bezier(.55,0,.1,1);

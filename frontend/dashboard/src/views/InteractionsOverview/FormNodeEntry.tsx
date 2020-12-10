@@ -96,17 +96,22 @@ export const FormNodeEntry = ({ nodeEntry }: { nodeEntry: FormNodeEntryType }) =
           const { relatedField, __typename, ...entryData } = formNodeFieldEntry;
           // We can't rely on the relatedField.type because users may have changed the type whilst the value remains
           // on previous type.
-          const [presentRelatedFieldType] = Object.entries(entryData).find(
-            ([, data]) => !!data,
-          ) as [FormNodeFieldTypeEnum, any];
+          if (!entryData) return null;
 
-          if (!presentRelatedFieldType) return null;
+          try {
+            const [presentRelatedFieldType] = Object.entries(entryData).find(
+              ([, data]) => !!data,
+            ) as [FormNodeFieldTypeEnum, any];
+            if (!presentRelatedFieldType) return null;
 
-          const FormNodeFieldEntry = MapFormNodeEntryVal[presentRelatedFieldType];
+            const FormNodeFieldEntry = MapFormNodeEntryVal[presentRelatedFieldType];
 
-          if (!FormNodeFieldEntry) return null;
+            if (!FormNodeFieldEntry) return null;
 
-          return <FormNodeFieldEntry key={index} formNodeFieldEntry={formNodeFieldEntry} />;
+            return <FormNodeFieldEntry key={index} formNodeFieldEntry={formNodeFieldEntry} />;
+          } catch {
+            return null;
+          }
         })}
       </UI.Grid>
     </UI.CardBody>
