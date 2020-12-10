@@ -91,7 +91,7 @@ const MapFormNodeEntryVal: {[key in FormNodeFieldTypeEnum]?: React.FC<{ formNode
 export const FormNodeEntry = ({ nodeEntry }: { nodeEntry: FormNodeEntryType }) => (
   <UI.Card noHover>
     <UI.CardBody>
-      <UI.Grid gridTemplateColumns="1fr 1fr">
+      <UI.Grid gridTemplateColumns={['1fr', '1fr', '1fr', '1fr 1fr']}>
         {nodeEntry.values.map((formNodeFieldEntry, index) => {
           const { relatedField, __typename, ...entryData } = formNodeFieldEntry;
           // We can't rely on the relatedField.type because users may have changed the type whilst the value remains

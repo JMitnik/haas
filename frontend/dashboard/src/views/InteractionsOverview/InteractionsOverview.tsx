@@ -84,7 +84,7 @@ const ExpandedInteractionRow = ({ data }: { data: Session }) => {
                     >
                       <NodeTypeIcon node={relatedNode} />
                     </EntryBreadCrumbContainer>
-                    <Div maxWidth={400} ml={2} useFlex flexDirection="column">
+                    <Div maxWidth={[300, 400, 500, 700]} ml={2} useFlex flexDirection="column">
                       <Div>
                         <Text fontWeight="300" color="gray.500" fontSize="0.8rem">{t('interactions:you_asked')}</Text>
                         <Text fontWeight="600" color="gray.500" fontSize="0.8rem">{relatedNode?.title || 'N/A'}</Text>
