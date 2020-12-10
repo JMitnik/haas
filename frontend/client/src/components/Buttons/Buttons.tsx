@@ -32,11 +32,11 @@ export const ClientButton = styled(Button)`
     position: relative;
     justify-content: flex-start;
     align-items: center;
-    /* padding: 0 !important; */
+    padding: 0 !important;
     box-shadow: 0 4px 6px rgba(50,50,93,.11), 0 1px 3px rgba(0,0,0,.08);
     border-radius: 10px;
     transform: none;
-    padding: 12px 22px;
+    /* padding: 12px 22px; */
     font-size: 1rem;
     background: linear-gradient(45deg, ${Color(theme.colors.primary).lighten(0.3).hex()}, ${Color(theme.colors.primary).lighten(0.3).saturate(1).hex()}); 
     font-family: 'Inter', sans-serif;

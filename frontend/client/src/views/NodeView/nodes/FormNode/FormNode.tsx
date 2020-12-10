@@ -1,21 +1,14 @@
 import * as UI from '@haas/ui';
-import { CheckCircle } from 'react-feather';
+import { AtSign, FileText, Hash, Link2, Phone, Type } from 'react-feather';
+import { ClientButton } from 'components/Buttons/Buttons';
+import { Div } from '@haas/ui';
+import { NodeTitle } from 'layouts/NodeLayout/NodeLayoutStyles';
+import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import React from 'react';
-
-import { ClientButton, OutlineButton } from 'components/Buttons/Buttons';
-import { Div, Grid } from '@haas/ui';
-import { ReactComponent as EmailIcon } from 'assets/icons/icon-email.svg';
-import { Input, InputLabel } from '@haas/ui/src/Form';
-import { ReactComponent as LastNameIcon } from 'assets/icons/icon-last-name.svg';
-import { NodeTitle } from 'layouts/NodeLayout/NodeLayoutStyles';
-import { SessionEntryDataProps } from 'models/Session/SessionEntryModel';
-import { ReactComponent as UserIcon } from 'assets/icons/icon-user.svg';
+import styled from 'styled-components';
 
 import { GenericNodeProps } from '../types';
-import { getSnapshot } from 'mobx-state-tree';
-import { motion } from 'framer-motion';
-import styled from 'styled-components';
 
 type FormNodeProps = GenericNodeProps;
 
@@ -24,6 +17,22 @@ interface FormNodeFormProps {
     value: string | number;
   }[]
 }
+
+const mapFieldType: {[key: string]: string} = {
+  email: 'email',
+  number: 'number',
+  phoneNumber: 'tel',
+  url: 'url',
+};
+
+const mapIcon: any = {
+  email: <AtSign />,
+  number: <Hash />,
+  phoneNumber: <Phone />,
+  url: <Link2 />,
+  shortText: <Type />,
+  longText: <FileText />,
+};
 
 const DrawerContainer = styled(UI.Div)`
   background: white;
@@ -39,7 +48,7 @@ const FormNode = ({ node, onEntryStore }: FormNodeProps) => {
     reValidateMode: 'onChange',
   });
 
-  const { dirty, isValid } = formState;
+  const { isValid } = formState;
 
   const fields = node?.form?.fields;
 
@@ -47,23 +56,17 @@ const FormNode = ({ node, onEntryStore }: FormNodeProps) => {
     event.preventDefault();
     const formEntry = getValues({ nest: true });
 
-    console.log(formEntry);
-
     const entry: any = {
       form: {
         values: formEntry.fields.map((fieldEntry, index) => ({
           relatedFieldId: fields?.[index].id,
-          [fields?.[index]?.type || '']: fieldEntry.value,
+          [fields?.[index]?.type || '']: fieldEntry.value || undefined,
         })),
       },
     };
 
-    console.log(entry);
-
     onEntryStore(entry, formEntry);
   };
-
-  console.log(getSnapshot(node));
 
   return (
     <UI.Div>
@@ -90,6 +93,8 @@ const FormNode = ({ node, onEntryStore }: FormNodeProps) => {
                       <UI.FormLabel htmlFor={`fields[${index}].value`}>{field.label}</UI.FormLabel>
                       <UI.Input
                         variant="outline"
+                        leftEl={mapIcon[field?.type] || <Type />}
+                        type={mapFieldType[field?.type] || 'text'}
                         ref={register({ required: field.isRequired })}
                         name={`fields[${index}].value`}
                         placeholder={field.label}

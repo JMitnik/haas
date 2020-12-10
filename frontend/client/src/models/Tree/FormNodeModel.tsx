@@ -1,5 +1,4 @@
 import { Instance, types } from 'mobx-state-tree';
-import SliderNodeMarkersModel from './SliderNodeMarkersModel';
 
 const FormNodeFieldModel = types.model({
   id: types.string,
