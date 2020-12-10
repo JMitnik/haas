@@ -17,7 +17,7 @@ import SimpleMDE from 'react-simplemde-editor';
 import cuid from 'cuid';
 
 import { Div, Flex, Form, FormContainer,
-  FormControl, FormLabel, FormSection, Grid, H3, H4, Hr, Input, InputGrid, InputHelper, Muted, Span, Text } from '@haas/ui';
+  FormControl, FormLabel, FormSection, Grid, H4, Hr, Input, InputGrid, InputHelper, Span, Text } from '@haas/ui';
 import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
 
 import 'easymde/dist/easymde.min.css';

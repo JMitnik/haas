@@ -1,8 +1,9 @@
 import * as UI from '@haas/ui';
-import { AlertCircle, ArrowLeft, ArrowRight, AtSign, Circle, Edit2, Feather, FileText, Hash, Link2, Phone, Type } from 'react-feather';
+import { AlertCircle, ArrowLeft, ArrowRight, AtSign, Circle, Feather, FileText, Hash, Link2, Phone, Type } from 'react-feather';
+import { AnimatePresence, Variants, motion } from 'framer-motion';
 import { Button } from '@chakra-ui/core';
 import { Controller, UseFormMethods, useFieldArray, useForm } from 'react-hook-form';
-import { usePopper } from 'react-popper';
+import { IllustrationCard } from '@haas/ui';
 import { useTranslation } from 'react-i18next';
 import React, { useRef, useState } from 'react';
 
@@ -10,9 +11,6 @@ import { ReactComponent as FieldIll } from 'assets/images/undraw_form.svg';
 import { ReactComponent as SelectIll } from 'assets/images/undraw_select.svg';
 import useOnClickOutside from 'hooks/useClickOnOutside';
 
-import { AnimatePresence, AnimateSharedLayout, Variants, motion } from 'framer-motion';
-import { IllustrationCard } from '@haas/ui';
-import Dropdown from 'components/Dropdown';
 import { CTANodeFormProps, FormDataProps } from './CTATypes';
 
 type FormNodeFormProps = CTANodeFormProps;
@@ -97,10 +95,7 @@ interface FormNodePreviewProps {
   nrFields: number;
 }
 
-const MotionCard = motion.custom(UI.Card);
-const MotionButton = motion.custom(UI.Button);
-
-const FormNodePreview = ({ form, field, onMoveRight, onMoveLeft, onOpen, fieldIndex, nrFields }: FormNodePreviewProps) => {
+const FormNodePreview = ({ field, onMoveRight, onMoveLeft, onOpen, fieldIndex, nrFields }: FormNodePreviewProps) => {
   const fieldCategory = fieldMap.find((fieldItem) => fieldItem.type === field.type);
 
   const FieldIcon = fieldCategory?.icon || Feather;
@@ -184,7 +179,15 @@ const childPopUp: Variants = {
   },
 };
 
-const FormNodeFieldFragment = ({ field, onClose, onSubmit, onDelete, fieldIndex }: { field: any, fieldIndex: number, onClose: () => void, onSubmit: any, onDelete: () => void }) => {
+interface FormNodeFieldFragmentProps {
+  field: any;
+  fieldIndex: number;
+  onClose: () => void;
+  onSubmit: (values: any) => void;
+  onDelete: () => void;
+}
+
+const FormNodeFieldFragment = ({ field, onClose, onSubmit, onDelete }: FormNodeFieldFragmentProps) => {
   const ref = useRef<HTMLDivElement | null>(null);
   const { t } = useTranslation();
 

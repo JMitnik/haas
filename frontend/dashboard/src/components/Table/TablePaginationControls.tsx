@@ -13,25 +13,6 @@ interface PaginationProps {
   sortBy: Array<any>;
 }
 
-const Button = styled.button`
-  ${({ theme }) => css`
-    background: none;
-    border: 1px solid ${theme.colors.default.darker};
-    border-radius: ${theme.borderRadiuses.subtleRounded};
-    color: ${theme.colors.primary};
-    padding: 5px 7.5px; 
-    margin: 10px;
-
-    &:hover {
-      cursor: pointer;
-      transition: all 0.2s ease-in;
-      outline-width: 0;
-      outline: none;
-      border: 1px solid ${theme.colors.default.darkest};
-    }
-  `}
-`;
-
 const StyledInput = styled.input`
  ${({ theme }) => css`
     background: none;
