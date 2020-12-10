@@ -25,17 +25,6 @@ export const UpdateCTAInputType = inputObjectType({
   },
 });
 
-const saveCreateFormNodeInput = (input: NexusGenInputs['FormNodeInputType']): FormNodeCreateInput => ({
-  fields: {
-    create: input.fields?.map((field) => ({
-      type: field.type || 'shortText',
-      label: field.label || 'Generic',
-      position: field.position || -1,
-      isRequired: field.isRequired || false,
-    })),
-  },
-});
-
 const saveEditFormNodeInput = (input: NexusGenInputs['FormNodeInputType']): FormNodeFieldUpsertArgs[] | undefined => (
   input.fields?.map((field) => ({
     create: {
@@ -152,7 +141,7 @@ export const UpdateCTAResolver = mutationField('updateCTA', {
           where: { id: args?.input?.id },
           data: {
             form: {
-              create: saveCreateFormNodeInput(args.input.form),
+              create: NodeService.saveCreateFormNodeInput(args.input.form),
             },
           },
         });

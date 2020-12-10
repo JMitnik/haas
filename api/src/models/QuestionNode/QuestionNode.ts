@@ -607,6 +607,9 @@ export const QuestionNodeMutations = extendType({
             share: {
               create: share,
             },
+            form: {
+              create: args.input.form ? NodeService.saveCreateFormNodeInput(args.input.form) : undefined,
+            },
             questionDialogue: {
               connect: {
                 id: customer?.dialogues[0].id,

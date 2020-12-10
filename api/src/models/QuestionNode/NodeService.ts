@@ -1,4 +1,4 @@
-import { Dialogue, Link, NodeType, QuestionCondition, QuestionNode, QuestionNodeCreateInput } from '@prisma/client';
+import { Dialogue, FormNodeCreateInput, Link, NodeType, QuestionCondition, QuestionNode, QuestionNodeCreateInput } from '@prisma/client';
 import { NexusGenInputs } from '../../generated/nexus';
 import EdgeService from '../edge/EdgeService';
 import prisma from '../../config/prisma';
@@ -77,6 +77,17 @@ class NodeService {
       await prisma.link.deleteMany({ where: { id: { in: removeLinkIds } } });
     }
   };
+
+  static saveCreateFormNodeInput = (input: NexusGenInputs['FormNodeInputType']): FormNodeCreateInput => ({
+    fields: {
+      create: input.fields?.map((field) => ({
+        type: field.type || 'shortText',
+        label: field.label || 'Generic',
+        position: field.position || -1,
+        isRequired: field.isRequired || false,
+      })),
+    },
+  });
 
   static upsertLinks = async (
     newLinks: NexusGenInputs['CTALinkInputObjectType'][],
