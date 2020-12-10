@@ -26,11 +26,12 @@ import LinkIcon from 'components/Icons/LinkIcon';
 import OpinionIcon from 'components/Icons/OpinionIcon';
 import RegisterIcon from 'components/Icons/RegisterIcon';
 import ShareIcon from 'components/Icons/ShareIcon';
+import boolToInt from 'utils/booleanToNumber';
 import createCTAMutation from 'mutations/createCTA';
 import getCTANodesQuery from 'queries/getCTANodes';
+import intToBool from 'utils/intToBool';
 import updateCTAMutation from 'mutations/updateCTA';
 
-import intToBool from 'utils/intToBool';
 import { FormDataProps } from './CTATypes';
 import FormNodeForm from './FormNodeForm';
 
@@ -149,7 +150,7 @@ const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTACha
           id: field.id,
           label: field.label,
           type: field.type,
-          isRequired: field.isRequired,
+          isRequired: boolToInt(field.isRequired),
           position: field.position,
         })),
       },
@@ -591,7 +592,7 @@ const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTACha
           <ButtonGroup>
             <Button
               isLoading={addLoading || updateLoading}
-              // isDisabled={!form.formState.isValid}
+              isDisabled={!form.formState.isValid}
               variantColor="teal"
               type="submit"
             >

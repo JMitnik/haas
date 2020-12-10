@@ -7,11 +7,13 @@ import { useTranslation } from 'react-i18next';
 import React, { useRef, useState } from 'react';
 
 import { ReactComponent as FieldIll } from 'assets/images/undraw_form.svg';
+import { ReactComponent as SelectIll } from 'assets/images/undraw_select.svg';
 import useOnClickOutside from 'hooks/useClickOnOutside';
 
 import { AnimatePresence, AnimateSharedLayout, Variants, motion } from 'framer-motion';
-import { CTANodeFormProps, FormDataProps } from './CTATypes';
+import { IllustrationCard } from '@haas/ui';
 import Dropdown from 'components/Dropdown';
+import { CTANodeFormProps, FormDataProps } from './CTATypes';
 
 type FormNodeFormProps = CTANodeFormProps;
 
@@ -117,7 +119,10 @@ const FormNodePreview = ({ form, field, onMoveRight, onMoveLeft, onOpen, fieldIn
               </UI.ColumnFlex>
             </UI.Flex>
           ) : (
-            <UI.Text>{t('empty_field')}</UI.Text>
+            <UI.ColumnFlex>
+              <UI.Text>{t('empty_field')}</UI.Text>
+              <UI.InputHelper>{t('empty_field_helper')}</UI.InputHelper>
+            </UI.ColumnFlex>
           )}
           <UI.ButtonGroup>
             <UI.IconButton
@@ -179,7 +184,7 @@ const childPopUp: Variants = {
   },
 };
 
-const FormNodeFieldFragment = ({ field, onClose, onSubmit, fieldIndex }: { field: any, fieldIndex: number, onClose: () => void, onSubmit: any }) => {
+const FormNodeFieldFragment = ({ field, onClose, onSubmit, onDelete, fieldIndex }: { field: any, fieldIndex: number, onClose: () => void, onSubmit: any, onDelete: () => void }) => {
   const ref = useRef<HTMLDivElement | null>(null);
   const { t } = useTranslation();
 
@@ -191,9 +196,18 @@ const FormNodeFieldFragment = ({ field, onClose, onSubmit, fieldIndex }: { field
 
   const formType = subform.watch('type');
 
-  useOnClickOutside(ref, () => {
+  const handleSaveValues = () => {
     onSubmit(subform.getValues());
     onClose();
+  };
+
+  const handleDelete = () => {
+    onDelete();
+    onClose();
+  };
+
+  useOnClickOutside(ref, () => {
+    handleSaveValues();
   });
 
   return (
@@ -222,7 +236,7 @@ const FormNodeFieldFragment = ({ field, onClose, onSubmit, fieldIndex }: { field
               </UI.ListGroup>
             </UI.List>
             {formType ? (
-              <UI.CardBody>
+              <UI.CardBody display="flex" flexDirection="column" justifyContent="space-between">
                 <UI.InputGrid>
                   <UI.FormControl>
                     <UI.FormLabel htmlFor="label">{t('label')}</UI.FormLabel>
@@ -255,10 +269,27 @@ const FormNodeFieldFragment = ({ field, onClose, onSubmit, fieldIndex }: { field
                     />
                   </UI.FormControl>
                 </UI.InputGrid>
+                <UI.ButtonGroup justifySelf="flex-end">
+                  <UI.Button onClick={handleSaveValues} variantColor="teal">{t('finish_editing')}</UI.Button>
+                  <UI.Button onClick={handleDelete} variantColor="red" variant="outline">{t('delete_field')}</UI.Button>
+                </UI.ButtonGroup>
               </UI.CardBody>
             ) : (
               <UI.CardBody>
-                {t('select_your_type')}
+                <IllustrationCard text={t('select_a_field_type')} svg={<SelectIll />} isFlat>
+                  <UI.Text fontWeight={200} pb={2}>or</UI.Text>
+                  <UI.ButtonGroup justifySelf="flex-end">
+                    <UI.Button
+                      size="sm"
+                      onClick={handleDelete}
+                      variantColor="red"
+                      variant="outline"
+                    >
+                      {t('delete_field')}
+
+                    </UI.Button>
+                  </UI.ButtonGroup>
+                </IllustrationCard>
               </UI.CardBody>
             )}
           </UI.CardForm>
@@ -284,16 +315,10 @@ const appendNewField = (index: number): TempFieldProps => ({
 
 const FormNodeForm = ({ form }: FormNodeFormProps) => {
   const { t } = useTranslation();
-  const [overlay, setOverlay] = useState<HTMLDivElement | null>(null);
-  const [toggleRef, setToggleRef] = useState<HTMLDivElement | null>(null);
-
-  const { styles, attributes } = usePopper(toggleRef, overlay, {
-    placement: 'left-end',
-  });
 
   const [openedField, setOpenedField] = useState<number | null>(null);
 
-  const { fields, append, move } = useFieldArray({
+  const { fields, append, move, remove } = useFieldArray({
     control: form.control,
     name: 'formNode.fields',
     keyName: 'fieldIndex',
@@ -312,60 +337,53 @@ const FormNodeForm = ({ form }: FormNodeFormProps) => {
         <UI.FormSectionHelper>{t('form_node_helper')}</UI.FormSectionHelper>
       </UI.Div>
       <UI.Div>
+        <UI.InputHeader>{t('about_fields_header')}</UI.InputHeader>
+        <UI.InputHelper>{t('about_fields_helper')}</UI.InputHelper>
         <UI.InputGrid>
-          <UI.Div pb="300px">
+          <UI.Div>
+            <UI.Grid gridTemplateColumns="1fr 1fr">
+              {fields.map((field, index) => (
+                <UI.Div position="relative" key={field.fieldIndex}>
+                  <AnimatePresence>
+                    {openedField === index && (
+                    <UI.Modal isOpen={openedField === index} onClose={() => setOpenedField(null)}>
+                      <FormNodeFieldFragment
+                        onSubmit={(subForm: any) => {
+                          form.setValue(`formNode.fields[${index}]`, subForm, { shouldDirty: true, shouldValidate: true });
+                          form.trigger();
+                        }}
+                        onClose={() => setOpenedField(null)}
+                        onDelete={() => remove(index)}
+                        field={formNodeFields[index]}
+                        fieldIndex={index}
+                        key={field.fieldIndex}
+                      />
+                    </UI.Modal>
+                    )}
+                  </AnimatePresence>
+
+                  <FormNodePreview
+                    fieldIndex={index}
+                    nrFields={fields.length}
+                    field={formNodeFields[index]}
+                    form={form}
+                    onOpen={() => setOpenedField(index)}
+                    onMoveLeft={() => move(index, Math.max(index - 1, 0))}
+                    onMoveRight={() => {
+                      move(index, Math.min(index + 1, fields.length - 1));
+                    }}
+                  />
+                </UI.Div>
+              ))}
+            </UI.Grid>
+
             {fields.length === 0 ? (
               <UI.IllustrationCard svg={<FieldIll />} text={t('add_field_reminder')}>
                 <Button type="button" onClick={() => handleNewField()}>{t('add_field')}</Button>
               </UI.IllustrationCard>
             ) : (
-              <Button type="button" onClick={() => handleNewField()}>{t('add_field')}</Button>
+              <Button mt={4} type="button" onClick={() => handleNewField()}>{t('add_field')}</Button>
             )}
-            <UI.Grid gridTemplateColumns="1fr 1fr">
-              {fields.map((field, index) => (
-                <UI.Div ref={setToggleRef}>
-                  <UI.Div position="relative" key={field.fieldIndex}>
-                    <AnimatePresence>
-                      {openedField === index && (
-                        // <UI.Div
-                        //   ref={setOverlay}
-                        //   position="absolute"
-                        //   top="0"
-                        //   zIndex={500}
-                        //   style={styles.popper}
-                        //   {...attributes.popper}
-                        // >
-                        <UI.Modal isOpen={openedField === index} onClose={() => setOpenedField(null)}>
-                          <FormNodeFieldFragment
-                            onSubmit={(subForm: any) => {
-                              form.setValue(`formNode.fields[${index}]`, subForm, { shouldDirty: true, shouldValidate: true });
-                              form.trigger();
-                            }}
-                            onClose={() => setOpenedField(null)}
-                            field={formNodeFields[index]}
-                            fieldIndex={index}
-                            key={field.fieldIndex}
-                          />
-                        </UI.Modal>
-                        // </UI.Div>
-                      )}
-                    </AnimatePresence>
-
-                    <FormNodePreview
-                      fieldIndex={index}
-                      nrFields={fields.length}
-                      field={formNodeFields[index]}
-                      form={form}
-                      onOpen={() => setOpenedField(index)}
-                      onMoveLeft={() => move(index, Math.max(index - 1, 0))}
-                      onMoveRight={() => {
-                        move(index, Math.min(index + 1, fields.length - 1));
-                      }}
-                    />
-                  </UI.Div>
-                </UI.Div>
-              ))}
-            </UI.Grid>
           </UI.Div>
         </UI.InputGrid>
       </UI.Div>

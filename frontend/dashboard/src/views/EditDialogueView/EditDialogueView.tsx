@@ -14,7 +14,7 @@ import React, { useState } from 'react';
 import Select from 'react-select';
 
 import ServerError from 'components/ServerError';
-import booleanToNumber from 'utils/booleanToNumber';
+import boolToInt from 'utils/booleanToNumber';
 import editDialogueMutation from 'mutations/editDialogue';
 import getQuestionnairesCustomerQuery from 'queries/getDialoguesOfCustomer';
 import getTagsQuery from 'queries/getTags';
@@ -108,7 +108,7 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFo
     defaultValues: {
       title: dialogue.title,
       description: dialogue.description,
-      isWithoutGenData: booleanToNumber(dialogue.isWithoutGenData || false),
+      isWithoutGenData: boolToInt(dialogue.isWithoutGenData || false),
       publicTitle: dialogue.publicTitle,
       slug: dialogue.slug,
     },

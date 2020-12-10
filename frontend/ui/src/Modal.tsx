@@ -10,9 +10,11 @@ export const ModalBody = styled(Div)`
   left: 50%;
 `;
 
+ReactModal.setAppElement('#root');
+
 export const Modal = ({ isOpen, children, onClose }: {isOpen: boolean, children: React.ReactNode, onClose: any } ) => {
   return (
-    <ReactModal 
+    <ReactModal
       isOpen={isOpen} 
       onRequestClose={onClose}
       style={{

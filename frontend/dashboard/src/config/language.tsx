@@ -2,8 +2,8 @@
 const language = {
   general: {
     is_required: {
-      en: 'Is required',
-      de: 'Wird benötigt',
+      en: 'Is the field required?',
+      de: 'Ist das Feld erforderlich?',
     },
     required: {
       en: 'Required',
@@ -12,6 +12,22 @@ const language = {
     not_required: {
       en: 'Not required',
       de: 'Nicht benötigt',
+    },
+    empty_field: {
+      en: 'Empty field',
+      de: 'Leeres Feld',
+    },
+    about_fields_header: {
+      en: 'Fields',
+      de: 'Felder',
+    },
+    about_fields_helper: {
+      en: 'With fields, you can request various types of data from your visitor. For example, you are only interested in a visitor\'s phone number, or perhaps a simple nickname will do.',
+      de: 'Mit Feldern können Sie verschiedene Arten von Daten von Ihrem Besucher anfordern. Zum Beispiel interessieren Sie sich nur für die Telefonnummer eines Besuchers, oder vielleicht reicht ein einfacher Spitzname.',
+    },
+    empty_field_helper: {
+      en: 'Select at least a type',
+      de: 'Wählen Sie mindestens einen Typ aus',
     },
     not_required_helper: {
       en: 'User can leave this empty',
@@ -37,7 +53,14 @@ const language = {
       en: 'Phone number',
       de: 'Telefonnummer',
     },
-
+    finish_editing: {
+      en: 'Finish editing',
+      de: 'Bearbeitung beenden',
+    },
+    delete_field: {
+      en: 'Delete field',
+      de: 'Feld löschen',
+    },
     phoneNumber_type: {
       en: 'Phone number',
       de: 'Telefonnummer',

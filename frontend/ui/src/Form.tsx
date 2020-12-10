@@ -546,7 +546,6 @@ export const InputGrid = forwardRef((props: InputGridProps, ref: Ref<HTMLDivElem
   </Grid>
 ));
 
-
 interface CardFormProps {
   dualPane?: boolean;
 }
