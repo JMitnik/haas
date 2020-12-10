@@ -78,6 +78,9 @@ class NodeService {
     }
   };
 
+  /**
+   * Save FormNodeInput when `creating`
+   */
   static saveCreateFormNodeInput = (input: NexusGenInputs['FormNodeInputType']): FormNodeCreateInput => ({
     fields: {
       create: input.fields?.map((field) => ({

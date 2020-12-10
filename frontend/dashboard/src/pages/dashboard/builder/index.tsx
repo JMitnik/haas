@@ -39,6 +39,10 @@ const initializeCTAType = (type?: string) => {
     return 'Share';
   }
 
+  if (type === 'FORM') {
+    return 'Form';
+  }
+
   return 'None';
 };
 

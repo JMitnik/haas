@@ -34,6 +34,10 @@ const CTALabel = ({ question }: { question: any }) => (
         <ShareIcon isCTA hasCTA />
       )}
 
+      {question.overrideLeaf?.type === 'Form' && (
+        <RegisterIcon isCTA hasCTA />
+      )}
+
       <TypeSpan fontSize="0.5em">
         {question.overrideLeaf?.type || (question.type === 'SHARE' && 'Share') || 'None'}
       </TypeSpan>
