@@ -1,3 +1,4 @@
+import * as _ from 'lodash';
 import { UserInputError } from 'apollo-server-express';
 import { inputObjectType, mutationField } from '@nexus/schema';
 
@@ -117,7 +118,21 @@ export const UpdateCTAResolver = mutationField('updateCTA', {
     // If form is passed
     if (args?.input?.form) {
       const removedFields = findDifference(existingNode?.form?.fields, args?.input?.form?.fields);
-      console.log(removedFields);
+
+      if (removedFields.length) {
+        await prisma.questionNode.update({
+          where: { id: args?.input?.id },
+          data: {
+            form: {
+              update: {
+                fields: {
+                  disconnect: removedFields.map((field) => ({ id: field?.id?.toString() || '' })),
+                },
+              },
+            },
+          },
+        });
+      }
 
       if (existingNode?.form) {
         await prisma.questionNode.update({
