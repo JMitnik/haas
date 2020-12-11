@@ -42,6 +42,18 @@ const DrawerContainer = styled(UI.Div)`
   backdrop-filter: blur(10px);
 `;
 
+const getFieldValue = (field: any, relatedField: any) => {
+  if (relatedField?.type === 'number') {
+    try {
+      return parseInt(field.value, 10) || undefined;
+    } catch {
+      return undefined;
+    }
+  }
+
+  return field.value || undefined;
+};
+
 const FormNode = ({ node, onEntryStore }: FormNodeProps) => {
   const { register, getValues, formState } = useForm<FormNodeFormProps>({
     mode: 'onChange',
@@ -60,7 +72,7 @@ const FormNode = ({ node, onEntryStore }: FormNodeProps) => {
       form: {
         values: formEntry.fields.map((fieldEntry, index) => ({
           relatedFieldId: fields?.[index].id,
-          [fields?.[index]?.type || '']: fieldEntry.value || undefined,
+          [fields?.[index]?.type || '']: getFieldValue(fieldEntry, fields?.[index]),
         })),
       },
     };

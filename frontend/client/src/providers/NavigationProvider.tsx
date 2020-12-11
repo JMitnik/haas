@@ -2,6 +2,8 @@ import { TreeNodeProps } from 'models/Tree/TreeNodeModel';
 import { useHistory } from 'react-router-dom';
 import useDialogueTree from './DialogueTreeProvider';
 
+const STAY_LEAFS = ['LINK', 'SHARE'];
+
 export const useNavigator = () => {
   const { store } = useDialogueTree();
   const history = useHistory();
@@ -25,8 +27,9 @@ export const useNavigator = () => {
     const suddenlyStarted = !currentNode.isLeaf && !currentNode.isRoot && !store.hasStarted;
     const inPostLeafAfterRefresh = currentNode.isPostLeaf && !store.hasStarted;
     const inTreeWithNoResults = !currentNode.isLeaf && !currentNode.isRoot && store.session.isEmpty;
+    const suddenlyInLeaf = currentNode.isLeaf && !STAY_LEAFS.includes(currentNode.type) && !store.hasStarted;
 
-    return suddenlyStarted || inPostLeafAfterRefresh || inTreeWithNoResults;
+    return suddenlyStarted || inPostLeafAfterRefresh || inTreeWithNoResults || suddenlyInLeaf;
   };
 
   return {

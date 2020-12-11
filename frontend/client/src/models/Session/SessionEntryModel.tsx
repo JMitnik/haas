@@ -23,7 +23,7 @@ export const SessionEntryDataModel = types.model({
       url: types.maybe(types.string),
       shortText: types.maybe(types.string),
       longText: types.maybe(types.string),
-      number: types.maybe(types.string),
+      number: types.maybe(types.number),
     }))),
   })),
 });
