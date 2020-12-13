@@ -30,10 +30,7 @@ export const ShareButton = styled(Button)`
     box-shadow: 0 0 0 0 rgba(0, 0, 0, 1);
     transform: scale(1);
     animation: pulse 2s infinite;
-
-    span {
-      font-size: 1.5em;
-    }
+    font-size: 1.5em;
 
     svg {
         color: currentColor;

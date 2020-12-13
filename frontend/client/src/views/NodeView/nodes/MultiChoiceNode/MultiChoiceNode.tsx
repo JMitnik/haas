@@ -1,5 +1,6 @@
 import { Variants, motion } from 'framer-motion';
 import React from 'react';
+import ReactMarkdown from 'react-markdown';
 
 import { ButtonBody, ClientButton } from 'components/Buttons/Buttons';
 import { Div, H5 } from '@haas/ui';
@@ -8,9 +9,8 @@ import { SessionEntryDataProps } from 'models/Session/SessionEntryModel';
 import { ReactComponent as SpeechIcon } from 'assets/icons/icon-chat.svg';
 import { TreeNodeOptionProps } from 'models/Tree/TreeNodeOptionModel';
 
-import { ChoiceIconContainer, MultiChoiceNodeContainer, MultiChoiceNodeGrid } from './MultiChoiceNodeStyles';
 import { GenericNodeProps } from '../types';
-import ReactMarkdown from 'react-markdown';
+import { MultiChoiceNodeContainer, MultiChoiceNodeGrid } from './MultiChoiceNodeStyles';
 
 type MultiChoiceNodeProps = GenericNodeProps;
 
@@ -67,10 +67,8 @@ const MultiChoiceNode = ({ node, onEntryStore }: MultiChoiceNodeProps) => {
                 type="button"
                 onClick={() => handleSubmit(multiChoiceOption)}
                 key={index}
+                leftIcon={SpeechIcon}
               >
-                <ChoiceIconContainer>
-                  <SpeechIcon />
-                </ChoiceIconContainer>
                 <ButtonBody>
                   <H5>
                     <ReactMarkdown>

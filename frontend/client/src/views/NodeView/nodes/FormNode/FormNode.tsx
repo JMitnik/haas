@@ -98,7 +98,7 @@ const FormNode = ({ node, onEntryStore }: FormNodeProps) => {
           <UI.Hr />
           <UI.Form onSubmit={(e: React.FormEvent<HTMLFormElement>) => { handleSubmit(e); return false; }}>
             <Div>
-              <UI.Grid gridTemplateColumns="1fr 1fr">
+              <UI.Grid gridTemplateColumns={['1fr', '1fr 1fr']}>
                 {fields?.map((field, index) => (
                   <UI.Div key={index}>
                     <UI.FormControl isRequired={field.isRequired}>
@@ -110,13 +110,14 @@ const FormNode = ({ node, onEntryStore }: FormNodeProps) => {
                         ref={register({ required: field.isRequired })}
                         name={`fields[${index}].value`}
                         placeholder={field.label}
+                        maxWidth={mapFieldType[field?.type] === 'number' ? '100px' : 'auto'}
                       />
                     </UI.FormControl>
                   </UI.Div>
                 ))}
               </UI.Grid>
               <UI.Div mt={4}>
-                <UI.Flex alignItems="center">
+                <UI.Flex flexWrap="wrap" alignItems="center">
                   <ClientButton
                     flexBasis="200px"
                     mr={2}
