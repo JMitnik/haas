@@ -128,7 +128,7 @@ const FormNode = ({ node, onEntryStore }: FormNodeProps) => {
                   >
                     Submit
                   </ClientButton>
-                  <UI.Button size="sm" variant="ghost">
+                  <UI.Button size="sm" variant="ghost" onClick={(e) => handleSubmit(e)}>
                     Do not share
                   </UI.Button>
                 </UI.Flex>
