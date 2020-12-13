@@ -64,3 +64,4 @@ api/.env.prod
 # VSCode related
 .vscode
 launch.json
+.next

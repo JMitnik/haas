@@ -12,7 +12,6 @@ const getDialogueSessionConnectionQuery = gql`
             createdAt
             paths
             score
-
             nodeEntries {
               id
               depth
@@ -26,6 +25,22 @@ const getDialogueSessionConnectionQuery = gql`
                 registrationNodeEntry
                 choiceNodeEntry
                 linkNodeEntry
+                formNodeEntry {
+                  id
+                  values {
+                    relatedField {
+                      id
+                      type
+                    }
+
+                    email
+                    phoneNumber
+                    url
+                    shortText
+                    longText
+                    number
+                  }
+                }
               }
             }
           }

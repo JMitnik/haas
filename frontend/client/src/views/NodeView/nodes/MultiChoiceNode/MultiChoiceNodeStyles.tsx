@@ -41,7 +41,7 @@ export const MultiChoiceNodeGrid = styled(motion.div)`
       border-radius: 10px;
       transform: none;
       padding: 12px 22px;
-      font-family: 'Open-sans', sans-serif;
+      font-family: 'Inter', sans-serif;
     };
  
       h1,h2,h3,h4,h5 {

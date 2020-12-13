@@ -1,5 +1,7 @@
 import React from 'react';
 
+import * as UI from '@haas/ui';
+import { ChevronLeft, ChevronRight } from 'react-feather';
 import { Flex, Span } from '@haas/ui';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -10,25 +12,6 @@ interface PaginationProps {
   pageCount: number;
   sortBy: Array<any>;
 }
-
-const Button = styled.button`
-  ${({ theme }) => css`
-    background: none;
-    border: 1px solid ${theme.colors.default.darker};
-    border-radius: ${theme.borderRadiuses.subtleRounded};
-    color: ${theme.colors.primary};
-    padding: 5px 7.5px; 
-    margin: 10px;
-
-    &:hover {
-      cursor: pointer;
-      transition: all 0.2s ease-in;
-      outline-width: 0;
-      outline: none;
-      border: 1px solid ${theme.colors.default.darkest};
-    }
-  `}
-`;
 
 const StyledInput = styled.input`
  ${({ theme }) => css`
@@ -70,12 +53,14 @@ const TablePaginationControls = ({ paginationProps, onPageChange }: TablePaginat
   return (
     <Flex gridRow="-1" alignItems="center" justifyContent="flex-end">
       <Flex marginRight="20px" alignItems="center" justifyContent="center">
-        <Button
+        <UI.IconButton
+          aria-label="Go back"
+          icon={ChevronLeft}
+          size="sm"
+          mr={2}
           onClick={() => onPageChange(paginationProps.pageIndex - 1)}
-          disabled={paginationProps.pageIndex === 0}
-        >
-          {'<'}
-        </Button>
+          isDisabled={paginationProps.pageIndex === 0}
+        />
         <Span>{t('page')}</Span>
         <div style={{ textAlign: 'center' }}>
           <StyledInput disabled type="number" value={paginationProps.pageIndex + 1} />
@@ -85,12 +70,14 @@ const TablePaginationControls = ({ paginationProps, onPageChange }: TablePaginat
           {' '}
           {paginationProps.pageCount}
         </Span>
-        <Button
+        <UI.IconButton
+          size="sm"
+          ml={2}
+          aria-label="Go forward"
+          icon={ChevronRight}
           onClick={() => onPageChange(paginationProps.pageIndex + 1)}
-          disabled={paginationProps.pageIndex === paginationProps.pageCount - 1}
-        >
-          {'>'}
-        </Button>
+          isDisabled={paginationProps.pageIndex === paginationProps.pageCount - 1}
+        />
       </Flex>
     </Flex>
   );

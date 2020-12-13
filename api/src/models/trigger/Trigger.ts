@@ -5,7 +5,7 @@ import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema
 
 import { DialogueType } from '../questionnaire/Dialogue';
 import { PaginationWhereInput } from '../general/Pagination';
-import { QuestionNodeType } from '../question/QuestionNode';
+import { QuestionNodeType } from '../QuestionNode/QuestionNode';
 import { UserType } from '../users/User';
 
 import TriggerService from './TriggerService';

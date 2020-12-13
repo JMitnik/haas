@@ -7,7 +7,7 @@ import { Dialogue, DialogueCreateInput, DialogueUpdateInput,
   NodeType,
   QuestionOptionCreateManyWithoutQuestionNodeInput, Tag, TagWhereUniqueInput } from '@prisma/client';
 import { isPresent } from 'ts-is-present';
-import NodeService from '../question/NodeService';
+import NodeService from '../QuestionNode/NodeService';
 import filterDate from '../../utils/filterDate';
 // eslint-disable-next-line import/no-cycle
 import { NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
@@ -492,6 +492,20 @@ class DialogueService {
         questions: {
           include: {
             links: true,
+            sliderNode: {
+              include: {
+                markers: {
+                  include: {
+                    range: true,
+                  },
+                },
+              },
+            },
+            form: {
+              include: {
+                fields: true,
+              },
+            },
             options: {
               select: {
                 publicValue: true,
@@ -573,6 +587,34 @@ class DialogueService {
             title: leaf.title,
             links: leaf.links,
             type: leaf.type,
+            form: leaf.form ? {
+              create: {
+                fields: {
+                  create: leaf.form?.fields?.map((field) => ({
+                    label: field?.label,
+                    type: field?.type || 'shortText',
+                    isRequired: field?.isRequired || false,
+                    position: field?.position,
+                  })),
+                },
+              },
+            } : undefined,
+            sliderNode: leaf.sliderNode ? {
+              create: {
+                markers: {
+                  create: leaf?.sliderNode?.markers?.map((marker) => ({
+                    label: marker?.label,
+                    subLabel: marker?.subLabel,
+                    range: {
+                      create: {
+                        start: marker?.range?.start,
+                        end: marker?.range?.end,
+                      },
+                    },
+                  })),
+                },
+              },
+            } : undefined,
           })),
         },
       },
@@ -611,6 +653,22 @@ class DialogueService {
               id: leaf.overrideLeaf.id,
             } } : undefined,
             type: leaf.type,
+            sliderNode: leaf.sliderNode ? {
+              create: {
+                markers: {
+                  create: leaf?.sliderNode?.markers?.map((marker) => ({
+                    label: marker?.label,
+                    subLabel: marker?.subLabel,
+                    range: {
+                      create: {
+                        start: marker?.range?.start,
+                        end: marker?.range?.end,
+                      },
+                    },
+                  })),
+                },
+              },
+            } : undefined,
           })) || [],
         },
       },

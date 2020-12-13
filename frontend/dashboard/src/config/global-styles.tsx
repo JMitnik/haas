@@ -6,7 +6,7 @@ const GlobalStyle = createGlobalStyle`
     font-family: 'Rubik', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
-    font-family: 'Open Sans', sans-serif;
+    font-family: 'Inter', sans-serif;
 
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -26,6 +26,11 @@ const GlobalStyle = createGlobalStyle`
 
   svg {
     display: block;
+  }
+  
+  /* For react-modal */
+  .ReactModal__Body--open {
+    overflow: hidden;
   }
 `;
 

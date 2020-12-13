@@ -13,7 +13,7 @@ export const SlideHereContainer = styled(motion.div)`
     width: 100%;
     color: ${Color(theme.colors.primary).mix(Color('white'), 0.6).hex()};
     opacity: 0;
-    font-family: 'Open Sans', sans-serif;
+    font-family: 'Inter', sans-serif;
     font-size: 1rem;
     justify-content: space-between;
     overflow: hidden;

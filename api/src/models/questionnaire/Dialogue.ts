@@ -9,7 +9,7 @@ import { CustomerType } from '../customer/Customer';
 // eslint-disable-next-line import/no-cycle
 import { EdgeType } from '../edge/Edge';
 // eslint-disable-next-line import/no-cycle
-import { QuestionNodeType } from '../question/QuestionNode';
+import { QuestionNodeType } from '../QuestionNode/QuestionNode';
 // eslint-disable-next-line import/no-cycle
 import { SessionConnection, SessionType } from '../session/Session';
 // eslint-disable-next-line import/no-cycle
@@ -230,6 +230,11 @@ export const DialogueType = objectType({
             isRoot: true,
           },
           include: {
+            form: {
+              include: {
+                fields: true,
+              },
+            },
             sliderNode: {
               include: {
                 markers: {
@@ -281,6 +286,11 @@ export const DialogueType = objectType({
             creationDate: 'asc',
           },
           include: {
+            form: {
+              include: {
+                fields: true,
+              },
+            },
             sliderNode: {
               include: {
                 markers: {
@@ -326,6 +336,13 @@ export const DialogueType = objectType({
             ],
           },
           orderBy: { updatedAt: 'desc' },
+          include: {
+            form: {
+              include: {
+                fields: true,
+              },
+            },
+          },
         });
 
         if (args.searchTerm) {

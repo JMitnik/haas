@@ -1,8 +1,6 @@
-import { CheckCircle } from 'react-feather';
 import { useForm } from 'react-hook-form';
 import React from 'react';
 
-import { ButtonIcon } from '@haas/ui/src/Buttons';
 import { ClientButton, OutlineButton } from 'components/Buttons/Buttons';
 import { Div, Grid } from '@haas/ui';
 import { ReactComponent as EmailIcon } from 'assets/icons/icon-email.svg';
@@ -85,10 +83,7 @@ const RegisterNode = ({ node, onEntryStore }: RegisterNodeProps) => {
             </InputContainer>
           </Grid>
           <Grid paddingTop={4} gridTemplateColumns={['1fr 1fr', '1fr 1fr']}>
-            <ClientButton type="submit" disabled={!dirty} isActive={dirty}>
-              <ButtonIcon>
-                <CheckCircle />
-              </ButtonIcon>
+            <ClientButton type="submit" isDisabled={!dirty} isActive={dirty}>
               Submit
             </ClientButton>
             <OutlineButton type="submit">Do not share</OutlineButton>

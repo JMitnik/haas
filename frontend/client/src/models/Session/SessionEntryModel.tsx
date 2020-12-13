@@ -15,6 +15,17 @@ export const SessionEntryDataModel = types.model({
   choice: types.maybe(types.model({
     value: types.string,
   })),
+  form: types.maybe(types.model({
+    values: types.array(types.maybe(types.model({
+      relatedFieldId: types.string,
+      email: types.maybe(types.string),
+      phoneNumber: types.maybe(types.string),
+      url: types.maybe(types.string),
+      shortText: types.maybe(types.string),
+      longText: types.maybe(types.string),
+      number: types.maybe(types.number),
+    }))),
+  })),
 });
 
 const SessionEntryModel = types
@@ -23,8 +34,8 @@ const SessionEntryModel = types
     data: types.optional(SessionEntryDataModel, {}),
   });
 
-export interface SessionEntryDataProps extends Instance<typeof SessionEntryDataModel>{}
+export interface SessionEntryDataProps extends Partial<Instance<typeof SessionEntryDataModel>>{}
 export interface SessionEntryDataInputProps extends SnapshotIn<typeof SessionEntryDataModel>{}
-export interface SessionEntryProps extends Instance<typeof SessionEntryModel>{}
+export interface SessionEntryProps extends Partial<Instance<typeof SessionEntryModel>>{}
 
 export default SessionEntryModel;

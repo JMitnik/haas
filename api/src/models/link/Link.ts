@@ -1,7 +1,7 @@
 import { enumType, inputObjectType, objectType } from '@nexus/schema';
 
 // eslint-disable-next-line import/no-cycle
-import { QuestionNodeType } from '../question/QuestionNode';
+import { QuestionNodeType } from '../QuestionNode/QuestionNode';
 
 export const LinkTypeEnumType = enumType({
   name: 'LinkTypeEnumType',

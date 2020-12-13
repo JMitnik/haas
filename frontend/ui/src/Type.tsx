@@ -14,9 +14,9 @@ export const Text = styled(GenericType).attrs({ as: 'p' })``;
 export const PageTitle = styled(Text)`
   ${({ theme }) => css`
     margin-bottom: ${theme.gutter}px;
-    color: ${theme.colors.gray[500]};
-    font-size: 1.6rem;
-    font-weight: 900;
+    color: ${theme.colors.gray[600]};
+    font-size: 2.1rem;
+    font-weight: 700;
     display: flex;
     align-items: center;
   `}
@@ -83,7 +83,7 @@ export const H5 = styled(GenericType).attrs({ as: 'h5' })`
 
 export const Muted = styled(GenericType).attrs({ as: 'p' })`
   ${({ theme }) => css`
-    font-weight: 500;
+    font-weight: 400;
     font-size: 0.8rem;
     color: ${theme.colors.gray['500']};
   `}

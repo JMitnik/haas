@@ -34,10 +34,22 @@ export const ScoreCell = ({ value }: CellProps) => {
   const decimalScore = (value) ? (value / 10).toFixed(1) : value;
   return (
     <Flex alignItems="center">
-      <Div display="inline-block" padding="10px" borderRadius="90px" backgroundColor={background} color={color}>
-        <Span fontSize="1.2em" fontWeight={900}>
-          {decimalScore}
-        </Span>
+      <Div
+        useFlex
+        alignItems="center"
+        justifyContent="center"
+        padding="10px"
+        borderRadius="90px"
+        width="50px"
+        height="50px"
+        backgroundColor={background}
+        color={color}
+      >
+        <Flex alignItems="center" justifyContent="center">
+          <Span fontSize="1.2em" fontWeight={900}>
+            {decimalScore}
+          </Span>
+        </Flex>
       </Div>
     </Flex>
   );

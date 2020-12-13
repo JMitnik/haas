@@ -21,12 +21,10 @@ const SliderNodeForm = ({ form }: { form: any }) => {
 
   return (
     <UI.Div>
-      <UI.Text color="gray.700" mb={1}>{t('dialogue:markers')}</UI.Text>
-      <UI.Div maxWidth={500}>
-        <UI.Text fontSize="0.8rem" mb={4} color="gray.500">
-          {t('dialogue:markers_helper')}
-        </UI.Text>
-      </UI.Div>
+      <UI.InputHeader>{t('dialogue:markers')}</UI.InputHeader>
+      <UI.InputHelper>
+        {t('dialogue:markers_helper')}
+      </UI.InputHelper>
 
       {markers.fields.map((marker, index) => (
         <UI.Card boxShadow="lg" key={marker.fieldIndex} mb={4} noHover>

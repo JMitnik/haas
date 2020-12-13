@@ -1,8 +1,5 @@
 # Prisma Migrate lockfile v1
 
-20201202120111-reset2
-20201202120951-adjust-range-to-optional
-20201202121647-made-slide-multiple
-20201203145348-explicit-key
-20201203151120-markers-to-float
-20201203153504-change-id
+20201207141627-reset-6
+20201208132747-reshape-form-entry
+20201208134932-change-number

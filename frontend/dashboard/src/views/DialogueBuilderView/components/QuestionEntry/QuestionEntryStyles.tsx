@@ -1,6 +1,6 @@
 import styled, { css } from 'styled-components/macro';
 
-import { Div, Flex, H4, Span } from '@haas/ui';
+import { Card, Div, Flex, H4, Span } from '@haas/ui';
 
 export const QuestionEntryHeader = styled(H4)`
 ${({ theme }) => css`
@@ -72,7 +72,7 @@ export const AddQuestionContainer = styled(Flex)`
  `}
 `;
 
-export const QuestionEntryViewContainer = styled(Flex) <{ activeCTA: string | null, id: string }>`
+export const QuestionEntryViewContainer = styled(Card) <{ activeCTA: string | null, id: string }>`
   ${({ id, activeCTA, theme }) => css`
     position: relative;
     flex-direction: row;

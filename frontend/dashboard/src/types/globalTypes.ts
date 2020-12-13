@@ -7,6 +7,18 @@
 // START Enums and Input Objects
 //==============================================================
 
+/**
+ * The types a field can assume
+ */
+export enum FormNodeFieldTypeEnum {
+  email = "email",
+  longText = "longText",
+  number = "number",
+  phoneNumber = "phoneNumber",
+  shortText = "shortText",
+  url = "url",
+}
+
 export enum LinkTypeEnumType {
   API = "API",
   FACEBOOK = "FACEBOOK",
@@ -41,6 +53,7 @@ export enum PaginationSortByEnum {
  */
 export enum QuestionNodeTypeEnum {
   CHOICE = "CHOICE",
+  FORM = "FORM",
   GENERIC = "GENERIC",
   LINK = "LINK",
   REGISTRATION = "REGISTRATION",
@@ -111,6 +124,7 @@ export interface CreateCTAInputType {
   type?: string | null;
   links?: CTALinksInputType | null;
   share?: ShareNodeInputType | null;
+  form?: FormNodeInputType | null;
 }
 
 export interface CreateDialogueInputType {
@@ -201,10 +215,24 @@ export interface EditUserInput {
  */
 export interface EditWorkspaceInput {
   id: string;
+  customerSlug: string;
   slug: string;
   name: string;
   logo?: string | null;
   primaryColour: string;
+}
+
+export interface FormNodeFieldInput {
+  id?: string | null;
+  label?: string | null;
+  type?: FormNodeFieldTypeEnum | null;
+  isRequired?: boolean | null;
+  position?: number | null;
+}
+
+export interface FormNodeInputType {
+  id?: string | null;
+  fields?: FormNodeFieldInput[] | null;
 }
 
 export interface InviteUserInput {
@@ -257,6 +285,23 @@ export interface ShareNodeInputType {
   title?: string | null;
 }
 
+export interface SlideNodeMarkerInput {
+  id?: string | null;
+  label: string;
+  subLabel: string;
+  range?: SliderNodeRangeInputType | null;
+}
+
+export interface SliderNodeInputType {
+  id?: string | null;
+  markers?: SlideNodeMarkerInput[] | null;
+}
+
+export interface SliderNodeRangeInputType {
+  start?: number | null;
+  end?: number | null;
+}
+
 export interface TagsInputObjectType {
   entries?: string[] | null;
 }
@@ -281,9 +326,10 @@ export interface UpdateCTAInputType {
   id?: string | null;
   customerId?: string | null;
   title?: string | null;
-  type?: string | null;
+  type?: QuestionNodeTypeEnum | null;
   links?: CTALinksInputType | null;
   share?: ShareNodeInputType | null;
+  form?: FormNodeInputType | null;
 }
 
 export interface UpdateQuestionNodeInputType {
@@ -293,6 +339,7 @@ export interface UpdateQuestionNodeInputType {
   edgeId?: string | null;
   title?: string | null;
   type?: string | null;
+  sliderNode?: SliderNodeInputType | null;
   optionEntries?: OptionsInputType | null;
   edgeCondition?: EdgeConditionInputType | null;
 }

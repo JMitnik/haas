@@ -1,8 +1,10 @@
+import * as UI from '@haas/ui';
 import { Div, Flex, H4 } from '@haas/ui';
 import { Info } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
 
+import { ReactComponent as NoDataIll } from 'assets/images/undraw_no_data.svg';
 import PaginationControls from 'components/Table/TablePaginationControls';
 import TableHeader from 'components/Table/TableHeader';
 import TableRow from 'components/Table/TableRow';
@@ -71,15 +73,6 @@ const Table = ({
         ))}
       </Div>
 
-      {data.length === 0 && !loading && (
-        <Flex gridRow="2 / -1" gridColumn="1 / -1" justifyContent="center" alignItems="center">
-          <Div color="default.darker" marginRight="5px">
-            <Info />
-          </Div>
-          <H4 color="default.darker">{t('no_data')}</H4>
-        </Flex>
-      )}
-
       {data.length === 0 && loading && (
         <Flex gridRow="2 / -1" gridColumn="1 / -1" justifyContent="center" alignItems="center">
           <Div color="default.darker" marginRight="5px">
@@ -87,6 +80,10 @@ const Table = ({
           </Div>
           <H4 color="default.darker">Loading data...</H4>
         </Flex>
+      )}
+
+      {data.length === 0 && !loading && (
+        <UI.IllustrationCard isFlat svg={<NoDataIll />} text={t('no_data')} />
       )}
 
       {!hidePagination && (

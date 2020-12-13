@@ -26,6 +26,16 @@ const getCTANodesOfDialogue = gql`
             url
             tooltip
           }
+          form {
+            id
+            fields {
+              id
+              label
+              type
+              isRequired
+              position
+            }
+          }
         }
       }
     }
