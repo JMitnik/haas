@@ -21,7 +21,7 @@ import {
   DeleteQuestionOptionButtonContainer,
 } from 'views/DialogueBuilderView/components/QuestionEntry/QuestionEntryStyles';
 import { Div, Flex, Form, FormContainer, FormControl, FormLabel,
-  FormSection, H3, H4, Hr, Input, InputGrid, InputHelper, Muted, Span, Text } from '@haas/ui';
+  FormSection, H4, Hr, Input, InputGrid, InputHelper, Muted, Span, Text } from '@haas/ui';
 import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
 import { useCustomer } from 'providers/CustomerProvider';
 import createQuestionMutation from 'mutations/createQuestion';
@@ -435,13 +435,13 @@ const QuestionEntryForm = ({
     <FormContainer expandedForm>
       <Hr />
       <Form onSubmit={form.handleSubmit(onSubmit)}>
-        <Div py={4}>
+        <Div>
           <FormSection id="general">
             <Div>
-              <H3 color="default.text" fontWeight={500} pb={2}>{t('dialogue:about_question')}</H3>
-              <Muted color="gray.600">
+              <UI.FormSectionHeader>{t('dialogue:about_question')}</UI.FormSectionHeader>
+              <UI.FormSectionHelper>
                 {t('dialogue:about_question_helper')}
-              </Muted>
+              </UI.FormSectionHelper>
             </Div>
             <InputGrid>
               <FormControl isRequired isInvalid={!!form.errors.title}>
@@ -472,10 +472,10 @@ const QuestionEntryForm = ({
               <UI.Div />
               <FormSection>
                 <Div>
-                  <H3 color="default.text" fontWeight={500} pb={2}>{t('dialogue:condition')}</H3>
-                  <Muted color="gray.600">
+                  <UI.FormSectionHeader>{t('dialogue:condition')}</UI.FormSectionHeader>
+                  <UI.FormSectionHelper>
                     {t('dialogue:condition_helper')}
-                  </Muted>
+                  </UI.FormSectionHelper>
                 </Div>
                 <Div>
                   <InputGrid>
@@ -522,10 +522,10 @@ const QuestionEntryForm = ({
               <Hr />
               <FormSection>
                 <Div>
-                  <H3 color="default.text" fontWeight={500} pb={2}>{t('dialogue:condition')}</H3>
-                  <Muted color="gray.600">
+                  <UI.FormSectionHeader>{t('dialogue:condition')}</UI.FormSectionHeader>
+                  <UI.FormSectionHelper>
                     {t('dialogue:condition_helper')}
-                  </Muted>
+                  </UI.FormSectionHelper>
                 </Div>
                 <Div>
                   <InputGrid>
@@ -560,12 +560,12 @@ const QuestionEntryForm = ({
 
           <FormSection>
             <Div>
-              <H3 color="default.text" fontWeight={500} pb={2}>
+              <UI.FormSectionHeader>
                 {t('dialogue:question_type')}
-              </H3>
-              <Muted color="gray.600">
+              </UI.FormSectionHeader>
+              <UI.FormSectionHelper>
                 {t('dialogue:about_type_helper')}
-              </Muted>
+              </UI.FormSectionHelper>
             </Div>
             <Div>
               <InputGrid>
@@ -629,10 +629,10 @@ const QuestionEntryForm = ({
               <UI.Hr />
               <FormSection>
                 <UI.Div>
-                  <UI.H3 color="default.text" fontWeight={500} pb={2}>{t('dialogue:about_slider')}</UI.H3>
-                  <UI.Muted color="gray.600">
+                  <UI.FormSectionHeader>{t('dialogue:about_slider')}</UI.FormSectionHeader>
+                  <UI.FormSectionHelper>
                     {t('dialogue:about_slider_helper')}
-                  </UI.Muted>
+                  </UI.FormSectionHelper>
                 </UI.Div>
                 <SliderNodeForm
                   form={form}

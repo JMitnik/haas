@@ -1,4 +1,4 @@
-const booleanToNumber = (optionalBoolean: number | boolean | undefined) => {
+const boolToInt = (optionalBoolean: number | boolean | undefined) => {
   if (typeof optionalBoolean === 'number') {
     return optionalBoolean;
   }
@@ -10,4 +10,4 @@ const booleanToNumber = (optionalBoolean: number | boolean | undefined) => {
   return undefined;
 };
 
-export default booleanToNumber;
+export default boolToInt;

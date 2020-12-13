@@ -1,9 +1,8 @@
-import { Edit } from 'react-feather';
 import { useHistory } from 'react-router-dom';
 import React from 'react';
 import styled from 'styled-components/macro';
 
-import { Div, EditDialogueContainer, H2 } from '@haas/ui';
+import { Div } from '@haas/ui';
 
 import { Score, TopicInfoView } from './DialogueInfoStyles';
 

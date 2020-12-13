@@ -3,7 +3,7 @@ import React, { useContext, useRef, useState } from 'react';
 import { Activity, BarChart, Clipboard, Download, Mail, Menu, Share, Sliders, Zap } from 'react-feather';
 import { Button, Icon, IconButton, Modal, ModalBody,
   ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useClipboard, useDisclosure } from '@chakra-ui/core';
-import { ColumnFlex, Div, Flex, Grid, Hr, Input, StyledExtLink, Text, ViewContainer } from '@haas/ui';
+import { ColumnFlex, Div, ExtLinkContainer, Flex, Grid, Hr, Input, Text, ViewContainer } from '@haas/ui';
 import { NavLink } from 'react-router-dom';
 import { Variants, motion } from 'framer-motion';
 import { useHistory, useParams } from 'react-router';
@@ -45,7 +45,7 @@ const DialogueNavBarContainer = motion.custom(styled(Div)`
     bottom: 0;
     padding: ${theme.gutter}px ${theme.gutter}px;
 
-    ${StyledExtLink} {
+    ${ExtLinkContainer} {
       padding: 0;
       font-size: 0.7rem;
     }
@@ -125,62 +125,64 @@ const ShareDialogueModal = ({ dialogueName, shareUrl, onClose }: ShareDialogueMo
 
   return (
     <ModalContent>
-      <ModalHeader>{t('share')}</ModalHeader>
-      <ModalCloseButton />
-      <ModalBody>
-        <Div mb={4}>
-          <Text fontWeight={600} fontSize="1.3rem" color="gray.700">{t('dialogue:share_qr')}</Text>
-          <Hr />
-          <Grid pt={2} gridTemplateColumns="1fr 1fr">
-            <Div>
-              <Text color="gray.500" fontSize="0.8rem">
-                {t('dialogue:qr_download_helper')}
-              </Text>
-            </Div>
-            <ColumnFlex alignItems="center">
-              <Div ref={qrContainerRef}>
-                <QRCode fgColor={qrColor} value={shareUrl} />
+      <motion.div animate={{ opacity: 1, y: 150 }}>
+        <ModalHeader>{t('share')}</ModalHeader>
+        <ModalCloseButton />
+        <ModalBody>
+          <Div mb={4}>
+            <Text fontWeight={600} fontSize="1.3rem" color="gray.700">{t('dialogue:share_qr')}</Text>
+            <Hr />
+            <Grid pt={2} gridTemplateColumns="1fr 1fr">
+              <Div>
+                <Text color="gray.500" fontSize="0.8rem">
+                  {t('dialogue:qr_download_helper')}
+                </Text>
               </Div>
-              <Button
-                margin="0 auto"
-                onClick={handleDownload}
-                as="a"
-                variantColor="teal"
-                mt={1}
-                size="xs"
-                leftIcon={() => <Download size={12} />}
-              >
-                <Text ml={1}>Download</Text>
-              </Button>
-            </ColumnFlex>
-          </Grid>
-        </Div>
-        <Div mb={4}>
-          <Text fontWeight={600} fontSize="1.3rem" color="gray.700">{t('dialogue:share_link')}</Text>
-          <Hr />
+              <ColumnFlex alignItems="center">
+                <Div ref={qrContainerRef}>
+                  <QRCode fgColor={qrColor} value={shareUrl} />
+                </Div>
+                <Button
+                  margin="0 auto"
+                  onClick={handleDownload}
+                  as="a"
+                  variantColor="teal"
+                  mt={1}
+                  size="xs"
+                  leftIcon={() => <Download size={12} />}
+                >
+                  <Text ml={1}>Download</Text>
+                </Button>
+              </ColumnFlex>
+            </Grid>
+          </Div>
+          <Div mb={4}>
+            <Text fontWeight={600} fontSize="1.3rem" color="gray.700">{t('dialogue:share_link')}</Text>
+            <Hr />
 
-          <Flex>
-            <Div flexGrow={1} pt={2}>
-              <Input
-                rightEl={(
-                  <Button width="auto" size="sm" onClick={onCopy} leftIcon={Clipboard}>
-                    {hasCopied ? 'Copied' : 'Copy'}
-                  </Button>
+            <Flex>
+              <Div flexGrow={1} pt={2}>
+                <Input
+                  rightEl={(
+                    <Button width="auto" size="sm" onClick={onCopy} leftIcon={Clipboard}>
+                      {hasCopied ? 'Copied' : 'Copy'}
+                    </Button>
                 )}
-                value={shareUrl}
-                isReadOnly
-              />
-            </Div>
+                  value={shareUrl}
+                  isReadOnly
+                />
+              </Div>
 
-          </Flex>
-        </Div>
-      </ModalBody>
+            </Flex>
+          </Div>
+        </ModalBody>
 
-      <ModalFooter>
-        <Button variant="outline" mr={3} onClick={onClose}>
-          Close
-        </Button>
-      </ModalFooter>
+        <ModalFooter>
+          <Button variant="outline" mr={3} onClick={onClose}>
+            Close
+          </Button>
+        </ModalFooter>
+      </motion.div>
     </ModalContent>
   );
 };
@@ -238,6 +240,7 @@ const DialogueNavBar = ({ dialogue, customerSlug, dialogueSlug }: DialogueNavBar
               <Share size={14} />
               <Text ml={1}>{t('share')}</Text>
             </Button>
+
             <Modal isOpen={isOpen} onClose={onClose}>
               <ModalOverlay />
               <ShareDialogueModal dialogueName={dialogueSlug} onClose={onClose} shareUrl={shareUrl} />

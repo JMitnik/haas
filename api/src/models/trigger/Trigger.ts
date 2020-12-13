@@ -5,9 +5,9 @@ import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema
 
 import { DialogueType } from '../questionnaire/Dialogue';
 import { PaginationWhereInput } from '../general/Pagination';
-import { QuestionNodeType } from '../question/QuestionNode';
+import { QuestionNodeType } from '../QuestionNode/QuestionNode';
 import { UserType } from '../users/User';
-import { resolve } from 'path';
+
 import TriggerService from './TriggerService';
 
 const TriggerTypeEnum = enumType({
@@ -305,7 +305,7 @@ const TriggerQueries = extendType({
       async resolve(parent, args) {
         if (!args.customerSlug) throw new Error('No customer provided');
 
-        const { triggers, pageInfo } = await TriggerService.paginatedTriggers(args.customerSlug, {
+        const { entries, pageInfo } = await TriggerService.paginatedTriggers(args.customerSlug, {
           limit: args.filter?.limit,
           offset: args.filter?.offset,
           orderBy: args.filter?.orderBy,
@@ -315,7 +315,7 @@ const TriggerQueries = extendType({
         // TODO: Do we put this here, or extract it from the graph?
         // const users = await ctx.prisma.trigger.findMany({ where: { customerId: args.customerId } });
 
-        return { triggers, pageInfo, offset: args.filter?.offset || 0, limit: args.filter?.limit || 0 };
+        return { triggers: entries, pageInfo, offset: args.filter?.offset || 0, limit: args.filter?.limit || 0 };
       },
     });
 

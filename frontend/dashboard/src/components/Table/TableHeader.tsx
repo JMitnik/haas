@@ -22,7 +22,7 @@ const TableHeader = ({ sortProperties, headers, onPaginationChange, onAddEntry, 
     >
       {headers && headers.map((header, index) => (
         <TableHeaderColumn
-          disableSorting={disableSorting}
+          disableSorting={header?.disableSorting}
           sortProperties={sortProperties}
           onPaginationChange={onPaginationChange}
           accessor={header.accessor}

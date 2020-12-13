@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { PaginationWhereInput, QuestionNodeTypeEnum } from "./../../types/globalTypes";
+import { PaginationWhereInput, QuestionNodeTypeEnum, FormNodeFieldTypeEnum } from "./../../types/globalTypes";
 
 // ====================================================
 // GraphQL query operation: getDialogueSessionConnection
@@ -15,6 +15,29 @@ export interface getDialogueSessionConnection_customer_dialogue_sessionConnectio
   type: QuestionNodeTypeEnum;
 }
 
+export interface getDialogueSessionConnection_customer_dialogue_sessionConnection_sessions_nodeEntries_value_formNodeEntry_values_relatedField {
+  __typename: "FormNodeField";
+  id: string;
+  type: FormNodeFieldTypeEnum;
+}
+
+export interface getDialogueSessionConnection_customer_dialogue_sessionConnection_sessions_nodeEntries_value_formNodeEntry_values {
+  __typename: "FormNodeEntryValueType";
+  relatedField: getDialogueSessionConnection_customer_dialogue_sessionConnection_sessions_nodeEntries_value_formNodeEntry_values_relatedField;
+  email: string | null;
+  phoneNumber: string | null;
+  url: string | null;
+  shortText: string | null;
+  longText: string | null;
+  number: number | null;
+}
+
+export interface getDialogueSessionConnection_customer_dialogue_sessionConnection_sessions_nodeEntries_value_formNodeEntry {
+  __typename: "FormNodeEntryType";
+  id: number;
+  values: getDialogueSessionConnection_customer_dialogue_sessionConnection_sessions_nodeEntries_value_formNodeEntry_values[];
+}
+
 export interface getDialogueSessionConnection_customer_dialogue_sessionConnection_sessions_nodeEntries_value {
   __typename: "NodeEntryValue";
   sliderNodeEntry: number | null;
@@ -22,6 +45,7 @@ export interface getDialogueSessionConnection_customer_dialogue_sessionConnectio
   registrationNodeEntry: string | null;
   choiceNodeEntry: string | null;
   linkNodeEntry: string | null;
+  formNodeEntry: getDialogueSessionConnection_customer_dialogue_sessionConnection_sessions_nodeEntries_value_formNodeEntry | null;
 }
 
 export interface getDialogueSessionConnection_customer_dialogue_sessionConnection_sessions_nodeEntries {
@@ -38,7 +62,7 @@ export interface getDialogueSessionConnection_customer_dialogue_sessionConnectio
 export interface getDialogueSessionConnection_customer_dialogue_sessionConnection_sessions {
   __typename: "Session";
   id: string;
-  createdAt: string;
+  createdAt: any;
   paths: number;
   score: number;
   nodeEntries: getDialogueSessionConnection_customer_dialogue_sessionConnection_sessions_nodeEntries[];

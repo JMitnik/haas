@@ -1,5 +1,7 @@
 import { Clipboard, Clock, Link as LinkIcon, MessageCircle, Target } from 'react-feather';
 import { Icon, Tooltip } from '@chakra-ui/core';
+import { formatDistanceToNow } from 'date-fns';
+import { useTranslation } from 'react-i18next';
 import React from 'react';
 import styled, { css } from 'styled-components/macro';
 
@@ -14,9 +16,8 @@ import parseNodeEntryValue from 'utils/parseNodeEntryValue';
 import scoreToColors from 'utils/scoreToColors';
 
 import { InteractionFeedEntryContainer, InteractionFeedEntryValueContainer } from './InteractionFeedEntryStyles';
-import { formatDistanceToNow } from 'date-fns';
 
-const NodeTypeIcon = ({ node }: { node: Node | null }) => {
+export const NodeTypeIcon = ({ node }: { node: Node | null }) => {
   if (!node?.type) return <Div />;
 
   switch (node.type) {
@@ -30,24 +31,29 @@ const NodeTypeIcon = ({ node }: { node: Node | null }) => {
       return <Clipboard />;
     case 'TEXTBOX':
       return <MessageCircle />;
+    case 'FORM':
+      return <Clipboard />;
     default:
       return <Logo />;
   }
 };
 
-const EntryBreadCrumbContainer = styled(Div)<{ score?: number | null }>`
-  ${({ theme, score }) => css`
+export const EntryBreadCrumbContainer = styled(Div)<{ score?: number | null, isInline?: boolean | null }>`
+  ${({ theme, score, isInline = false }) => css`
       display: flex;
       align-items: center;
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
       font-weight: 500;
-      min-height: 40px;
+      height: 40px;
       padding: 0;
       border: 1px solid white;
-      margin-left: -8px;
       justify-content: center;
       border-radius: 100px !important;
       width: 40px;
+      
+      ${isInline && css`
+        margin-left: -8px;
+      `}
       
       &:first-of-type {
         border-top-left-radius: 30px;
@@ -77,32 +83,37 @@ const EntryBreadCrumbContainer = styled(Div)<{ score?: number | null }>`
   `}
 `;
 
-export const CompactEntriesPath = ({ nodeEntries }: { nodeEntries: NodeEntry[] }) => (
-  <Flex>
-    {nodeEntries.map((entry, index) => (
-      <Tooltip
-        zIndex={400}
-        key={index}
-        hasArrow
-        aria-label={parseNodeEntryValue(entry)?.toString() || ''}
-        placement="top"
-        label={parseNodeEntryValue(entry)?.toString()}
-      >
-        <EntryBreadCrumbContainer
-          pr={3}
-          zIndex={10 - index}
-          score={entry.relatedNode?.type === 'SLIDER' ? entry.value?.sliderNodeEntry : null}
+export const CompactEntriesPath = ({ nodeEntries }: { nodeEntries: NodeEntry[] }) => {
+  const { t } = useTranslation();
+  return (
+    <Flex>
+      {nodeEntries.map((entry, index) => (
+        <Tooltip
+          zIndex={400}
+          key={index}
+          hasArrow
+          aria-label={parseNodeEntryValue(entry, t)?.toString() || ''}
+          placement="top"
+          label={parseNodeEntryValue(entry, t)?.toString()}
         >
-          <NodeTypeIcon node={entry.relatedNode} />
-        </EntryBreadCrumbContainer>
-      </Tooltip>
-    ))}
-  </Flex>
-);
+          <EntryBreadCrumbContainer
+            isInline
+            pr={3}
+            zIndex={10 - index}
+            score={entry.relatedNode?.type === 'SLIDER' ? entry.value?.sliderNodeEntry : null}
+          >
+            <NodeTypeIcon node={entry.relatedNode} />
+          </EntryBreadCrumbContainer>
+        </Tooltip>
+      ))}
+    </Flex>
+  );
+};
 
 const InteractionFeedEntry = ({ interaction }: { interaction: Session }) => {
   const date = new Date(parseInt(interaction.createdAt, 10));
   const dist = formatDistanceToNow(date);
+  const { t } = useTranslation();
 
   return (
     <InteractionFeedEntryContainer>
@@ -119,7 +130,7 @@ const InteractionFeedEntry = ({ interaction }: { interaction: Session }) => {
               </Text>
               {' '}
               <Text color="gray.500" fontWeight={800} fontSize="0.8rem">
-                {parseNodeEntryValue(interaction?.nodeEntries[1])}
+                {parseNodeEntryValue(interaction?.nodeEntries[1], t)}
               </Text>
             </Div>
           ) : (

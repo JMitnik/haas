@@ -34,6 +34,7 @@ interface ConnectionInterface {
 input CreateCTAInputType {
   customerSlug: String
   dialogueSlug: String
+  form: FormNodeInputType
   links: CTALinksInputType
   share: ShareNodeInputType
   title: String
@@ -243,6 +244,73 @@ type FontSettings {
   id: ID!
 }
 
+"""FormNodeEntryInput"""
+input FormNodeEntryFieldInput {
+  email: String
+  longText: String
+  number: Int
+  phoneNumber: String
+  relatedFieldId: ID
+  shortText: String
+  url: String
+}
+
+"""FormNodeEntryInput"""
+input FormNodeEntryInput {
+  values: [FormNodeEntryFieldInput!]
+}
+
+type FormNodeEntryType {
+  id: Int!
+  values: [FormNodeEntryValueType!]!
+}
+
+type FormNodeEntryValueType {
+  email: String
+  longText: String
+  number: Int
+  phoneNumber: String
+  relatedField: FormNodeField!
+  shortText: String
+  url: String
+}
+
+type FormNodeField {
+  id: ID!
+  isRequired: Boolean!
+  label: String!
+  position: Int!
+  type: FormNodeFieldTypeEnum!
+}
+
+input FormNodeFieldInput {
+  id: ID
+  isRequired: Boolean = false
+  label: String
+  position: Int
+  type: FormNodeFieldTypeEnum
+}
+
+"""The types a field can assume"""
+enum FormNodeFieldTypeEnum {
+  email
+  longText
+  number
+  phoneNumber
+  shortText
+  url
+}
+
+input FormNodeInputType {
+  fields: [FormNodeFieldInput!]
+  id: String
+}
+
+type FormNodeType {
+  fields: [FormNodeField!]!
+  id: String
+}
+
 type ImageType {
   encoding: String
   filename: String
@@ -362,6 +430,7 @@ type NodeEntry {
 """Data type for the actual node entry"""
 input NodeEntryDataInput {
   choice: ChoiceNodeEntryInput
+  form: FormNodeEntryInput
   register: RegisterNodeEntryInput
   slider: SliderNodeEntryInput
   textbox: TextboxNodeEntryInput
@@ -377,6 +446,7 @@ input NodeEntryInput {
 
 type NodeEntryValue {
   choiceNodeEntry: String
+  formNodeEntry: FormNodeEntryType
   linkNodeEntry: String
   registrationNodeEntry: String
   sliderNodeEntry: Int
@@ -397,6 +467,16 @@ input OptionsInputType {
 type PaginationPageInfo {
   nrPages: Int!
   pageIndex: Int!
+}
+
+"""Fields that can be used for free text search on tables"""
+enum PaginationSearchEnum {
+  email
+  firstName
+  lastName
+  name
+  publicTitle
+  title
 }
 
 """Ways to sort a pagination object"""
@@ -477,6 +557,9 @@ type Query {
 type QuestionNode {
   children: [Edge!]!
   creationDate: String
+
+  """FormNode resolver"""
+  form: FormNodeType
   id: ID!
   isLeaf: Boolean!
   isRoot: Boolean!
@@ -498,6 +581,7 @@ type QuestionNode {
 """The different types a node can assume"""
 enum QuestionNodeTypeEnum {
   CHOICE
+  FORM
   GENERIC
   LINK
   REGISTRATION
@@ -785,11 +869,12 @@ enum TriggerTypeEnum {
 
 input UpdateCTAInputType {
   customerId: ID
+  form: FormNodeInputType
   id: String
   links: CTALinksInputType
   share: ShareNodeInputType
   title: String
-  type: String
+  type: QuestionNodeTypeEnum
 }
 
 input UpdateQuestionNodeInputType {
@@ -807,9 +892,12 @@ input UpdateQuestionNodeInputType {
 """The `Upload` scalar type represents a file upload."""
 scalar Upload
 
-type UserConnection {
-  pageIndex: Int
-  totalPages: Int
+type UserConnection implements ConnectionInterface {
+  endDate: String
+  limit: Int!
+  offset: Int!
+  pageInfo: PaginationPageInfo!
+  startDate: String
   userCustomers: [UserCustomer!]!
 }
 

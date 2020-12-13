@@ -2,9 +2,33 @@ import { NodeEntry } from '@prisma/client';
 import { inputObjectType, objectType } from '@nexus/schema';
 
 // eslint-disable-next-line import/no-cycle
-import { QuestionNodeType } from '../question/QuestionNode';
+import { FormNodeField, QuestionNodeType } from '../QuestionNode/QuestionNode';
 // eslint-disable-next-line import/no-cycle
 import NodeEntryService from './NodeEntryService';
+
+export const FormNodeEntryValueType = objectType({
+  name: 'FormNodeEntryValueType',
+
+  definition(t) {
+    t.field('relatedField', { type: FormNodeField });
+    t.string('email', { nullable: true });
+    t.string('phoneNumber', { nullable: true });
+    t.string('url', { nullable: true });
+    t.string('shortText', { nullable: true });
+    t.string('longText', { nullable: true });
+    t.int('number', { nullable: true });
+  },
+});
+
+export const FormNodeEntryType = objectType({
+  name: 'FormNodeEntryType',
+
+  definition(t) {
+    t.int('id');
+
+    t.list.field('values', { type: FormNodeEntryValueType });
+  },
+});
 
 export const NodeEntryValueType = objectType({
   name: 'NodeEntryValue',
@@ -15,6 +39,7 @@ export const NodeEntryValueType = objectType({
     t.string('registrationNodeEntry', { nullable: true });
     t.string('choiceNodeEntry', { nullable: true });
     t.string('linkNodeEntry', { nullable: true });
+    t.field('formNodeEntry', { type: FormNodeEntryType, nullable: true });
   },
 });
 
@@ -66,6 +91,15 @@ export const NodeEntryType = objectType({
             registrationNodeEntry: true,
             sliderNodeEntry: true,
             textboxNodeEntry: true,
+            formNodeEntry: {
+              include: {
+                values: {
+                  include: {
+                    relatedField: true,
+                  },
+                },
+              },
+            },
           },
         });
 
@@ -75,9 +109,34 @@ export const NodeEntryType = objectType({
           registrationNodeEntry: nodeEntry?.registrationNodeEntry?.value?.toString(),
           sliderNodeEntry: nodeEntry?.sliderNodeEntry?.value,
           textboxNodeEntry: nodeEntry?.textboxNodeEntry?.value,
+          formNodeEntry: nodeEntry?.formNodeEntry,
         };
       },
     });
+  },
+});
+
+export const FormNodeEntryFieldInput = inputObjectType({
+  name: 'FormNodeEntryFieldInput',
+  description: 'FormNodeEntryInput',
+
+  definition(t) {
+    t.id('relatedFieldId');
+    t.string('email', { required: false });
+    t.string('phoneNumber', { required: false });
+    t.string('url', { required: false });
+    t.string('shortText', { required: false });
+    t.string('longText', { required: false });
+    t.int('number', { required: false });
+  },
+});
+
+export const FormNodeEntryInput = inputObjectType({
+  name: 'FormNodeEntryInput',
+  description: 'FormNodeEntryInput',
+
+  definition(t) {
+    t.list.field('values', { type: FormNodeEntryFieldInput });
   },
 });
 
@@ -133,8 +192,11 @@ export const NodeEntryDataInput = inputObjectType({
   definition(t) {
     t.field('slider', { type: SliderNodeEntryInput, nullable: true });
     t.field('textbox', { type: TextboxNodeEntryInput, nullable: true });
-    t.field('register', { type: RegisterNodeEntryInput, nullable: true });
+    t.field('form', { type: FormNodeEntryInput, nullable: true });
     t.field('choice', { type: ChoiceNodeEntryInput, nullable: true });
+
+    // @deprecated
+    t.field('register', { type: RegisterNodeEntryInput, nullable: true, deprecation: 'This will be deprectated from now on' });
   },
 });
 

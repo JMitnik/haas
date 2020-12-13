@@ -13,7 +13,7 @@ import React from 'react';
 import gql from 'graphql-tag';
 
 import CustomerForm from 'components/CustomerForm';
-import booleanToNumber from 'utils/booleanToNumber';
+import boolToInt from 'utils/booleanToNumber';
 import intToBool from 'utils/intToBool';
 
 import getEditCustomerData from '../../queries/getEditCustomer';
@@ -78,7 +78,7 @@ const EditCustomerForm = ({ customer }: { customer: any }) => {
       name: customer.name,
       logo: customer.settings?.logoUrl,
       uploadLogo: customer.settings?.logoUrl,
-      useCustomUrl: booleanToNumber(!startsWithCloudinary(customer.settings?.logoUrl)),
+      useCustomUrl: boolToInt(!startsWithCloudinary(customer.settings?.logoUrl)),
       primaryColour: customer.settings?.colourSettings?.primary,
       slug: customer.slug,
     },

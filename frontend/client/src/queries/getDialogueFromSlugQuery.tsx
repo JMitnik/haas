@@ -31,6 +31,16 @@ const getDialogueFromSlug = gql`
             url
             tooltip
           }
+          form {
+            id
+            fields {
+              id
+              label
+              type
+              isRequired
+              position
+            }
+          }
         }
         customerId
         rootQuestion {

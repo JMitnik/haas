@@ -1,6 +1,138 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    is_required: {
+      en: 'Is the field required?',
+      de: 'Ist das Feld erforderlich?',
+    },
+    required: {
+      en: 'Required',
+      de: 'Benötigt',
+    },
+    not_required: {
+      en: 'Not required',
+      de: 'Nicht benötigt',
+    },
+    empty_field: {
+      en: 'Empty field',
+      de: 'Leeres Feld',
+    },
+    about_fields_header: {
+      en: 'Fields',
+      de: 'Felder',
+    },
+    about_fields_helper: {
+      en: 'With fields, you can request various types of data from your visitor. For example, you are only interested in a visitor\'s phone number, or perhaps a simple nickname will do.',
+      de: 'Mit Feldern können Sie verschiedene Arten von Daten von Ihrem Besucher anfordern. Zum Beispiel interessieren Sie sich nur für die Telefonnummer eines Besuchers, oder vielleicht reicht ein einfacher Spitzname.',
+    },
+    empty_field_helper: {
+      en: 'Select at least a type',
+      de: 'Wählen Sie mindestens einen Typ aus',
+    },
+    not_required_helper: {
+      en: 'User can leave this empty',
+      de: 'Benutzer kann dies leer lassen',
+    },
+    required_helper: {
+      en: 'User must fill this in.',
+      de: 'Benutzer muss dies in füllen',
+    },
+    see_interactions: {
+      en: 'See it in the interactions table.',
+      de: 'Sehen Sie es in der Interaktions-Tabelle.',
+    },
+    edit_field: {
+      en: 'Edit field',
+      de: 'Feld bearbeiten',
+    },
+    select_a_field_type: {
+      en: 'Select a field type',
+      de: 'Wählen Sie einen Feldtyp aus',
+    },
+    phoneNumber: {
+      en: 'Phone number',
+      de: 'Telefonnummer',
+    },
+    finish_editing: {
+      en: 'Finish editing',
+      de: 'Bearbeitung beenden',
+    },
+    delete_field: {
+      en: 'Delete field',
+      de: 'Feld löschen',
+    },
+    phoneNumber_type: {
+      en: 'Phone number',
+      de: 'Telefonnummer',
+    },
+    phoneNumber_helper: {
+      en: 'For phone-number types.',
+      de: 'Für Telefonnummerntypen.',
+    },
+    url_type: {
+      en: 'Link',
+      de: 'Link',
+    },
+    url_helper: {
+      en: 'For link types',
+      de: 'Für URLtypen',
+    },
+    shortText: {
+      en: 'Short text',
+      de: 'Kurze Texte',
+    },
+    shortText_helper: {
+      en: 'For generic short texts, like names',
+      de: 'Für generische Short-Texte wie Namen',
+    },
+    shortText_type: {
+      en: 'Short text',
+      de: 'Kurze Texte',
+    },
+    longText: {
+      en: 'Long text',
+      de: 'Langer Text',
+    },
+    longText_type: {
+      en: 'Long text',
+      de: 'Langer Text',
+    },
+    longText_helper: {
+      en: 'For generic long texts',
+      de: 'Für generische Long-Texte',
+    },
+    number: {
+      en: 'Number',
+      de: 'Nummer',
+    },
+    number_type: {
+      en: 'Number',
+      de: 'Nummer',
+    },
+    number_helper: {
+      en: 'For generic numbers',
+      de: 'Für generische Nummern',
+    },
+    email_type: {
+      en: 'Email',
+      de: 'Email',
+    },
+    add_field_reminder: {
+      en: 'Add your first field!',
+      de: 'Fügen Sie Ihr erstes Feld hinzu!',
+    },
+    add_field: {
+      en: 'Add field',
+      de: 'Feld hinzufügen',
+    },
+    form_node: {
+      en: 'About the form',
+      de: 'Über das Formular',
+    },
+    form_node_helper: {
+      en: 'Customize which fields the end-user gets to see.',
+      de: 'Passen Sie an, welche Felder der Endbenutzer zu de erhält.',
+    },
     label: {
       en: 'Label',
       de: 'Etikette',
@@ -341,6 +473,10 @@ const language = {
       en: 'Call-to-Action',
       de: 'Call-to-Action',
     },
+    about_call_to_action: {
+      en: 'About the Call-to-Action',
+      de: 'Über den Call-to-Action',
+    },
     create_dialogue: {
       en: 'Create dialogue',
       de: 'Dialog erstellen',
@@ -510,16 +646,16 @@ const language = {
       de: 'Hinzugefügt!',
     },
     add_complete_description: {
-      en: 'The CTA has been created.',
-      de: 'Der CTA wurde erstellt.',
+      en: 'The Call-to-Action has been created.',
+      de: 'Der Call-to-Action wurde erstellt.',
     },
     edit_complete_title: {
       en: 'Edit complete',
       de: 'Bearbeiten abgeschlossen',
     },
     edit_complete_description: {
-      en: 'The CTA has been edited.',
-      de: 'Der CTA wurde bearbeitet.',
+      en: 'The Call-to-Action has been edited.',
+      de: 'Der Call-to-Action wurde bearbeitet.',
     },
   },
   register: {
@@ -784,8 +920,8 @@ const language = {
       de: 'Welcher Maximalwert soll die Folgefrage auslösen?',
     },
     about_type_helper: {
-      en: 'Describe the question type',
-      de: 'Details zur Frage',
+      en: 'Describe the question type.',
+      de: 'Details zur Frage.',
     },
     question_type: {
       en: 'Question type',
@@ -800,8 +936,8 @@ const language = {
       de: 'Welchen Call-to-Action möchtest du hinzufügen?',
     },
     add_option_reminder: {
-      en: 'Please add an option',
-      de: 'Füge ein Option hinzu',
+      en: 'Please add an option.',
+      de: 'Füge ein Option hinzu.',
     },
     empty_option_reminder: {
       en: 'Please fill in at least one option.',
@@ -1025,6 +1161,14 @@ const language = {
     },
   },
   cta: {
+    about_share: {
+      en: 'About the share',
+      de: 'Über den Anteil',
+    },
+    about_share_helper: {
+      en: 'Configure the share button, what the end-user gets to share, and what the button displays.',
+      de: 'Konfigurieren Sie die Schaltfläche "Teilen", was der Endbenutzer freigeben darf und was auf der Schaltfläche angezeigt wird.',
+    },
     text: {
       en: 'Text to share',
       de: 'Text zum Teilen',
@@ -1038,24 +1182,24 @@ const language = {
       de: 'Hinzugefügt!',
     },
     add_complete_description: {
-      en: 'The CTA has been created.',
-      de: 'Der CTA wurde erstellt.',
+      en: 'The Call-to-Action has been created.',
+      de: 'Der Call-to-Action wurde erstellt.',
     },
     edit_complete_title: {
       en: 'Edit complete',
       de: 'Bearbeiten abgeschlossen',
     },
     edit_complete_description: {
-      en: 'The CTA has been edited.',
-      de: 'Der CTA wurde bearbeitet.',
+      en: 'The Call-to-Action has been edited.',
+      de: 'Der Call-to-Action wurde bearbeitet.',
     },
     information_header: {
-      en: 'Information about your CTA',
-      de: 'Informationen zu Ihrem CTA',
+      en: 'Configure general information about this Call-to-Action, such as the text displayed, and the "type".',
+      de: 'Konfigurieren Sie allgemeine Informationen zu dieser Handlungsaufforderung, z. B. den angezeigten Text und den "Typ".',
     },
     title_helper: {
-      en: 'What is the header text of the CTA?',
-      de: 'Was ist der Haupttext des CTA?',
+      en: 'What is the header text of the Call-to-Action?',
+      de: 'Was ist der Haupttext des Call-to-Action?',
     },
     shared_item_title_helper: {
       en: 'What is the title of the shared item?',
@@ -1066,12 +1210,12 @@ const language = {
       de: 'Typ',
     },
     share_type_helper: {
-      en: 'What is the type of the CTA?',
-      de: 'Was ist der Typ des CTA?',
+      en: 'What is the type of the Call-to-Action?',
+      de: 'Was ist der Typ des Call-to-Action?',
     },
     url: {
-      en: 'url',
-      de: 'url',
+      en: 'Url',
+      de: 'Url',
     },
     url_share_helper: {
       en: 'What is the link you wish to share?',
@@ -1086,8 +1230,8 @@ const language = {
       de: 'Was ist der Text der Share-Schaltfläche',
     },
     link_header: {
-      en: 'What links do you want to add to the CTA',
-      de: 'Welche Links möchten Sie zum CTA hinzufügen?',
+      en: 'What links do you want to add to the Call-to-Action?',
+      de: 'Welche Links möchten Sie zum Call-to-Action hinzufügen?',
     },
     add_link: {
       en: 'Add link',

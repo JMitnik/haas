@@ -37,6 +37,7 @@ export const NodeContainer = styled(Div)`
 type NodeTitleSize = 'xs' | 'sm' | 'md' | 'lg';
 
 const NodeTitleWrapper = styled(H2)<{ size: NodeTitleSize }>`
+  font-weight: 800;
   white-space: pre-line;
   text-align: left;
 

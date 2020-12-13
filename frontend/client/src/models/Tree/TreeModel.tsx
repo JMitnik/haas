@@ -59,6 +59,7 @@ const TreeModel = types
         isLeaf: true,
         links: leaf.links,
         share: leaf?.share || undefined,
+        form: leaf?.form || undefined,
       }));
 
       const defaultPostLeafNode = createDefaultPostLeafNode();

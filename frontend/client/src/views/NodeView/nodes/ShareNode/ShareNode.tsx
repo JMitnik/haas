@@ -1,3 +1,4 @@
+import * as UI from '@haas/ui';
 import { Share2 } from 'react-feather';
 import { useClipboard } from 'use-clipboard-copy';
 import React from 'react';
@@ -5,8 +6,9 @@ import React from 'react';
 import { Flex } from '@haas/ui';
 import { NodeTitle } from 'layouts/NodeLayout/NodeLayoutStyles';
 
+import { ClientButton } from 'components/Buttons/Buttons';
 import { GenericNodeProps } from '../types';
-import { ShareButton, ShareButtonContainer, ShareNodeContainer, SuccesMessageContainer } from './ShareNodeStyles';
+import { ShareButtonContainer, ShareNodeContainer, SuccesMessageContainer } from './ShareNodeStyles';
 
 type SocialShareNodeProps = GenericNodeProps;
 
@@ -43,21 +45,21 @@ const ShareNode = ({ node }: SocialShareNodeProps) => {
     <ShareNodeContainer>
       <NodeTitle>{node.title}</NodeTitle>
       <ShareButtonContainer flexGrow={1}>
-        <Flex position="relative" width="100%" alignItems="center" justifyContent="center">
-          <ShareButton onClick={handleCopy}>
-            <Share2 />
-            <span>
+        <Flex
+          width="auto"
+          position="relative"
+          alignItems="center"
+          justifyContent="center"
+        >
+          <UI.Div width="auto">
+            <ClientButton leftIcon={Share2} onClick={handleCopy} usePulse size="lg">
               {share?.tooltip || 'Share'}
-            </span>
-          </ShareButton>
+            </ClientButton>
+          </UI.Div>
           {copied && (
-          <SuccesMessageContainer animate={{
-            bottom: ['-50px', '-40px'],
-            opacity: [0, 1],
-            transition: {
-              duration: 0.5,
-            },
-          }}
+          <SuccesMessageContainer
+            animate={{ opacity: 1, bottom: -30 }}
+            initial={{ opacity: 0, bottom: -80 }}
           >
             Copied Link!
           </SuccesMessageContainer>

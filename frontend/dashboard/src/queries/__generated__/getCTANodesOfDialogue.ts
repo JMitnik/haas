@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { QuestionNodeTypeEnum } from "./../../types/globalTypes";
+import { QuestionNodeTypeEnum, FormNodeFieldTypeEnum } from "./../../types/globalTypes";
 
 // ====================================================
 // GraphQL query operation: getCTANodesOfDialogue
@@ -27,6 +27,21 @@ export interface getCTANodesOfDialogue_customer_dialogue_leafs_share {
   tooltip: string | null;
 }
 
+export interface getCTANodesOfDialogue_customer_dialogue_leafs_form_fields {
+  __typename: "FormNodeField";
+  id: string;
+  label: string;
+  type: FormNodeFieldTypeEnum;
+  isRequired: boolean;
+  position: number;
+}
+
+export interface getCTANodesOfDialogue_customer_dialogue_leafs_form {
+  __typename: "FormNodeType";
+  id: string | null;
+  fields: getCTANodesOfDialogue_customer_dialogue_leafs_form_fields[];
+}
+
 export interface getCTANodesOfDialogue_customer_dialogue_leafs {
   __typename: "QuestionNode";
   id: string;
@@ -34,6 +49,10 @@ export interface getCTANodesOfDialogue_customer_dialogue_leafs {
   type: QuestionNodeTypeEnum;
   links: getCTANodesOfDialogue_customer_dialogue_leafs_links[];
   share: getCTANodesOfDialogue_customer_dialogue_leafs_share | null;
+  /**
+   * FormNode resolver
+   */
+  form: getCTANodesOfDialogue_customer_dialogue_leafs_form | null;
 }
 
 export interface getCTANodesOfDialogue_customer_dialogue {

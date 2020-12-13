@@ -2,7 +2,6 @@ import { CheckCircle } from 'react-feather';
 import { useForm } from 'react-hook-form';
 import React from 'react';
 
-import { ButtonIcon } from '@haas/ui/src/Buttons';
 import { ClientButton, OutlineButton } from 'components/Buttons/Buttons';
 import { Div, Grid, Textbox } from '@haas/ui';
 import { NodeTitle } from 'layouts/NodeLayout/NodeLayoutStyles';
@@ -37,16 +36,18 @@ const TextboxNode = ({ node, onEntryStore }: TextboxNodeProps) => {
 
   return (
     <TextboxContainer>
-      <NodeTitle>{node.title}</NodeTitle>
+      <NodeTitle>{node?.title}</NodeTitle>
       <Div>
         <Textbox name="textbox" ref={register} />
 
         <Div mt={4}>
-          <Grid gridTemplateColumns="2fr 1fr">
-            <ClientButton disabled={!dirty} isActive={dirty} onClick={() => onSubmit()}>
-              <ButtonIcon>
-                <CheckCircle />
-              </ButtonIcon>
+          <Grid gridTemplateColumns={['1fr 1fr', '1fr 1fr', '2fr 1fr']}>
+            <ClientButton
+              leftIcon={CheckCircle}
+              isDisabled={!dirty}
+              isActive={dirty}
+              onClick={() => onSubmit()}
+            >
               Submit
             </ClientButton>
 

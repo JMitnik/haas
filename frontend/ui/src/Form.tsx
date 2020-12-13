@@ -16,13 +16,14 @@ import {
   InputGroupProps,
   FormControlProps,
   Textarea as ChakraTextArea,
-  RadioButtonGroup} from '@chakra-ui/core';
+  RadioButtonGroup as ChakraRadioButtonGroup} from '@chakra-ui/core';
 import styled, { css } from 'styled-components';
 import { SpaceProps, GridProps } from 'styled-system';
 import { InputHTMLAttributes } from 'react';
 import Color from 'color';
 import { FormLabelProps } from '@chakra-ui/core/dist/FormLabel';
 import { Grid } from './Container';
+import { Text } from './Type';
 
 export const FormContainer = styled(Div) <{expandedForm?: boolean}>`
   ${({ theme, expandedForm }) => css`
@@ -54,11 +55,19 @@ export const FormGroupContainer = styled.div`
   `}
 `;
 
+export const InputHeader = styled(Text)`
+  ${({ theme }) => css`
+    color: ${theme.colors.gray[700]};
+    margin-bottom: ${theme.gutter / 4}px;
+  `}
+`;
+
 export const InputHelper = styled.p`
   ${({ theme }) => css`
-    color: ${theme.colors.gray[400]};
+    color: ${theme.colors.gray[500]};
     font-size: 0.8rem;
-    margin-bottom: 8px;
+    margin-bottom: ${theme.gutter / 2}px;
+    max-width: 500px;
   `}
 `;
 
@@ -152,16 +161,6 @@ export const Input = forwardRef((props: InputProps, ref: Ref<HTMLInputElement>) 
 export const InputGroup = forwardRef((props: InputGroupProps, ref) => (
   <ChakraInputGroup {...props} ref={ref} />
 ));
-
-export const Label = styled(Div).attrs({ as: 'label' })`
-  ${({ theme }) => css`
-    font-size: 0.8rem;
-    font-weight: 600;
-    margin-bottom: 2px;
-    display: inline-block;
-    color: ${theme.colors.gray[500]};
-  `}
-`;
 
 export const ErrorStyle = {
   control: (base: any) => ({
@@ -291,7 +290,7 @@ const ButtonRadioContainer = styled.div`
   }
 `;
 
-export const ButtonRadio = forwardRef((props: any, ref) => {
+export const RadioButton = forwardRef((props: any, ref) => {
   const { isChecked, isDisabled, value, text, description, icon, ...rest } = props;
 
   return (
@@ -507,39 +506,61 @@ export const FormSection = forwardRef((props: FormSectionProps, ref: Ref<HTMLDiv
   </FormSectionContainer>
 ));
 
+export const FormSectionHeader = styled(Text)`
+  ${({ theme }) => css`
+    font-size: 1.3rem;
+    color: ${theme.colors.default.text};
+    font-weight: 700;
+    margin-bottom: ${theme.gutter / 4}px;
+  `}
+`;
+
+export const FormSectionHelper = styled(Text)`
+  ${({ theme }) => css`
+    font-size: 0.9rem;
+    color: ${theme.colors.gray[500]};
+    font-weight: 400;
+  `}
+`;
+
 interface InputGridProps extends GridProps {
   children: React.ReactNode;
 }
 
+interface RadioButtonsProps {
+  children: React.ReactNode;
+  onChange: any;
+  value: any;
+  onBlur: any
+}
 
-export const BooleanRadioInput = ({ onChange, children, value }: any) => {
-  const handleButtonChange = (val: any) => {
-    if (val === 1) {
-      onChange(true);
-    }
-
-    if (val === 0) {
-      onChange(false);
-    }
-  };
-
-  return (
-    <RadioButtonGroup
-      defaultValue={value}
-      isInline
-      onChange={(val) => handleButtonChange(val)}
-      display="flex"
-    >
-      {children}
-    </RadioButtonGroup>
-  );
-};
+export const RadioButtons = ({ children, onChange, value, onBlur }: RadioButtonsProps) => (
+  <ChakraRadioButtonGroup display="flex" flexWrap="wrap" onChange={onChange} value={value} onBlur={onBlur}>
+    {children}
+  </ChakraRadioButtonGroup>
+)
 
 export const InputGrid = forwardRef((props: InputGridProps, ref: Ref<HTMLDivElement>) => (
   <Grid mb={4} gridTemplateColumns={['1fr', '1fr', '1fr']} {...props}>
     {props.children}
   </Grid>
 ));
+
+interface CardFormProps {
+  dualPane?: boolean;
+}
+
+export const CardForm = styled(Div)<CardFormProps>`
+  ${({ theme, dualPane }) => css`
+    ${dualPane && css`
+      display: flex;
+
+      > *:first-child {
+        border-right: 1px solid ${theme.colors.gray[200]};
+      }
+    `}
+  `}
+`;
 
 export const GridForm = styled.form`
   ${() => css`

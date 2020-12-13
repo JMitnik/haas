@@ -1,3 +1,4 @@
+import * as UI from '@haas/ui';
 import { Flex, Span } from '@haas/ui';
 import { useMutation } from '@apollo/react-hooks';
 import { useParams } from 'react-router';
@@ -8,7 +9,6 @@ import ReactMarkdown from 'react-markdown';
 
 import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
 import { useCustomer } from 'providers/CustomerProvider';
-import EditButton from 'components/EditButton';
 import deleteQuestionMutation from 'mutations/deleteQuestion';
 
 import { EdgeConditonProps, QuestionEntryProps, QuestionOptionProps } from '../../DialogueBuilderInterfaces';
@@ -135,10 +135,15 @@ const QuestionEntryItem = ({ depth,
             </Flex>
 
             <Flex width="30%" alignItems="center" justifyContent="center">
-              <EditButton
+              <UI.Button
+                variant="outline"
+                variantColor="teal"
+                size="sm"
                 isDisabled={(activeQuestion && activeQuestion !== question.id) || false}
                 onClick={() => onActiveQuestionChange(question.id)}
-              />
+              >
+                {t('edit')}
+              </UI.Button>
             </Flex>
 
           </Flex>

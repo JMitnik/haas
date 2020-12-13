@@ -10,6 +10,7 @@ import useDialogueTree from 'providers/DialogueTreeProvider';
 import useUploadQueue from 'providers/UploadQueueProvider';
 
 import { GenericNodeProps } from './nodes/types';
+import FormNode from './nodes/FormNode/FormNode';
 import MultiChoiceNode from './nodes/MultiChoiceNode/MultiChoiceNode';
 import PostLeafNode from './nodes/PostLeafNode/PostLeafNode';
 import RegisterNode from './nodes/RegisterNode/RegisterNode';
@@ -22,6 +23,7 @@ const nodeMap: Record<string, (props: GenericNodeProps) => JSX.Element> = {
   SLIDER: SliderNode,
   CHOICE: MultiChoiceNode,
   TEXTBOX: TextboxNode,
+  FORM: FormNode,
   LINK: SocialShareNode,
   REGISTRATION: RegisterNode,
   POST_LEAF: PostLeafNode,

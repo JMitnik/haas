@@ -13,11 +13,11 @@ import RegisterIcon from 'components/Icons/RegisterIcon';
 import SearchBar from 'components/SearchBar/SearchBar';
 import getCTANodesQuery from 'queries/getCTANodes';
 
+import { AnimateSharedLayout, Variants, motion } from 'framer-motion';
 import { Button, Icon } from '@chakra-ui/core';
-import { Variants, motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import ShareIcon from 'components/Icons/ShareIcon';
-import CTAEntry from './components/CTAEntry';
+import CTACard from './CTACard';
 
 interface ActionOverviewProps {
   leafs: Array<any>;
@@ -59,6 +59,10 @@ const mapLeafs = (leafs: any) => leafs?.map((leaf: any) => {
     return { ...leaf, type: 'SHARE', icon: ShareIcon };
   }
 
+  if (leaf.type === 'FORM') {
+    return { ...leaf, type: 'FORM', icon: RegisterIcon };
+  }
+
   return null;
 });
 
@@ -77,6 +81,10 @@ const initializeCTAType = (type: string) => {
 
   if (type === 'SHARE') {
     return { label: 'Share', value: 'SHARE' };
+  }
+
+  if (type === 'FORM') {
+    return { label: 'Form', value: 'FORM' };
   }
 
   return { label: 'None', value: '' };
@@ -137,55 +145,59 @@ const ActionOverview = ({ leafs }: ActionOverviewProps) => {
         </Button>
         <SearchBar activeSearchTerm={activeSearchTerm} onSearchTermChange={handleSearchTermChange} />
       </Flex>
-      <motion.div variants={actionsAnimation} initial="inital" animate="animate">
-        {newCTA && (
-          <CTAEntry
-            id="-1"
-            activeCTA={activeCTA}
-            onActiveCTAChange={setActiveCTA}
-            Icon={RegisterIcon}
-            title=""
-            type={initializeCTAType('REGISTER')}
-            links={[]}
-            share={{ title: '', url: '', tooltip: '' }}
-            onNewCTAChange={setNewCTA}
-          />
-        )}
-
-        {!activeLeafs && leafs && leafs.map(
-          (leaf: any, index: number) => (
-            <CTAEntry
-              key={index}
+      <AnimateSharedLayout>
+        <motion.div variants={actionsAnimation} initial="inital" animate="animate">
+          {newCTA && (
+            <CTACard
+              id="-1"
               activeCTA={activeCTA}
               onActiveCTAChange={setActiveCTA}
-              id={leaf.id}
-              Icon={leaf.icon}
-              title={leaf.title}
-              type={initializeCTAType(leaf.type)}
-              links={leaf.links}
-              share={leaf?.share}
+              Icon={RegisterIcon}
+              title=""
+              type={initializeCTAType('REGISTER')}
+              links={[]}
+              share={{ title: '', url: '', tooltip: '' }}
               onNewCTAChange={setNewCTA}
             />
-          ),
-        )}
+          )}
 
-        {activeLeafs && activeLeafs?.map(
-          (leaf: any, index: number) => (
-            <CTAEntry
-              key={index}
-              activeCTA={activeCTA}
-              onActiveCTAChange={setActiveCTA}
-              id={leaf.id}
-              Icon={leaf.icon}
-              title={leaf.title}
-              type={initializeCTAType(leaf.type)}
-              links={leaf.links}
-              share={leaf?.share}
-              onNewCTAChange={setNewCTA}
-            />
-          ),
-        )}
-      </motion.div>
+          {!activeLeafs && leafs && leafs.map(
+            (leaf: any, index: number) => (
+              <CTACard
+                key={index}
+                activeCTA={activeCTA}
+                onActiveCTAChange={setActiveCTA}
+                id={leaf.id}
+                Icon={leaf.icon}
+                title={leaf.title}
+                type={initializeCTAType(leaf.type)}
+                links={leaf.links}
+                share={leaf?.share}
+                form={leaf?.form}
+                onNewCTAChange={setNewCTA}
+              />
+            ),
+          )}
+
+          {activeLeafs && activeLeafs?.map(
+            (leaf: any, index: number) => (
+              <CTACard
+                key={index}
+                activeCTA={activeCTA}
+                onActiveCTAChange={setActiveCTA}
+                id={leaf.id}
+                Icon={leaf.icon}
+                title={leaf.title}
+                type={initializeCTAType(leaf.type)}
+                links={leaf.links}
+                share={leaf?.share}
+                form={leaf?.form}
+                onNewCTAChange={setNewCTA}
+              />
+            ),
+          )}
+        </motion.div>
+      </AnimateSharedLayout>
     </DialogueViewContainer>
   );
 };

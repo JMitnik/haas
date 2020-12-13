@@ -8,6 +8,8 @@ const GlobalAppLayout = styled(Div)`
     background: ${theme.colors.primary};
     display: flex;
     align-items: stretch;
+
+    font-family: 'Inter', sans-serif;
   `}
 `;
 

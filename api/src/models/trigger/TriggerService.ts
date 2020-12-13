@@ -1,11 +1,7 @@
 import {
-  ColourSettings,
-  Customer,
-  CustomerInclude,
-  CustomerSettings,
+  FindManyTriggerArgs,
   Trigger,
   TriggerCondition,
-  TriggerOrderByInput,
   TriggerUpdateInput,
   TriggerWhereInput,
   User,
@@ -16,11 +12,13 @@ import { isPresent } from 'ts-is-present';
 import _ from 'lodash';
 
 // eslint-disable-next-line import/no-cycle
-import { NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
+import { NexusGenInputs } from '../../generated/nexus';
 // eslint-disable-next-line import/no-cycle
 import { CustomerWithCustomerSettings } from '../customer/Customer';
+import { FindManyCallBackProps, PaginateProps, paginate } from '../../utils/table/pagination';
 import { SessionWithEntries } from '../session/SessionTypes';
 import { mailService } from '../../services/mailings/MailService';
+
 import { smsService } from '../../services/sms/SmsService';
 import NodeEntryService, { NodeEntryWithTypes } from '../node-entry/NodeEntryService';
 import makeTriggerMailTemplate from '../../services/mailings/templates/makeTriggerMailTemplate';
@@ -50,77 +48,39 @@ class TriggerService {
     return searchTermFilter;
   };
 
-  static orderUsersBy = (
-    triggers: Array<Trigger>,
-    orderBy: { id: string, desc: boolean },
-  ) => {
-    if (orderBy.id === 'name') {
-      return _.orderBy(triggers, (trigger) => trigger.name, orderBy.desc ? 'desc' : 'asc');
-    } if (orderBy.id === 'medium') {
-      return _.orderBy(triggers, (trigger) => trigger.medium, orderBy.desc ? 'desc' : 'asc');
-    } if (orderBy.id === 'type') {
-      return _.orderBy(triggers, (trigger) => trigger.type, orderBy.desc ? 'desc' : 'asc');
-    }
-
-    return triggers;
-  };
-
-  static slice = (
-    entries: Array<any>,
-    offset: number,
-    limit: number,
-    pageIndex: number,
-  ) => ((offset + limit) < entries.length
-    ? entries.slice(offset, (pageIndex + 1) * limit)
-    : entries.slice(offset, entries.length));
-
-  static formatOrderBy(orderByArray?: NexusGenInputs['PaginationSortInput'][]): (TriggerOrderByInput|undefined) {
-    if (!orderByArray?.length) return undefined;
-
-    const orderBy = orderByArray[0];
-
-    return {
-      medium: orderBy.by === 'medium' ? orderBy.desc ? 'desc' : 'asc' : undefined,
-      type: orderBy.by === 'type' ? orderBy.desc ? 'desc' : 'asc' : undefined,
-      name: orderBy.by === 'name' ? orderBy.desc ? 'desc' : 'asc' : undefined,
-    };
-  }
-
   static paginatedTriggers = async (
     customerSlug: string,
     paginationOpts: NexusGenInputs['PaginationWhereInput'],
   ) => {
-    // Build filter
-    const triggerWhereInput: TriggerWhereInput = { customer: { slug: customerSlug } };
+    const findManyTriggerArgs: FindManyTriggerArgs = { where: { customer: { slug: customerSlug } } };
 
-    const searchTermFilter = TriggerService.getSearchTermFilter(paginationOpts.search || '');
-    triggerWhereInput.OR = searchTermFilter.length ? searchTermFilter : undefined;
+    const findManyTriggers = async (
+      { props: findManyArgs } : FindManyCallBackProps,
+    ) => prisma.trigger.findMany(findManyArgs);
+    const countTriggers = async ({ props: countArgs } : FindManyCallBackProps) => prisma.trigger.count(countArgs);
 
-    const triggers = await prisma.trigger.findMany({
-      where: triggerWhereInput,
-      take: paginationOpts.limit || undefined,
-      skip: paginationOpts.offset || undefined,
-      orderBy: TriggerService.formatOrderBy(paginationOpts.orderBy || undefined),
-    });
-
-    const triggerTotal = await prisma.trigger.count({ where: { customer: { slug: customerSlug } } });
-    const totalPages = paginationOpts.limit ? Math.ceil(triggerTotal / (paginationOpts.limit)) : 1;
-    const currentPage = paginationOpts.pageIndex && paginationOpts.pageIndex <= totalPages
-      ? paginationOpts.pageIndex : 1;
-
-    const pageInfo: NexusGenRootTypes['PaginationPageInfo'] = {
-      nrPages: totalPages,
-      pageIndex: currentPage,
+    const paginateProps: PaginateProps = {
+      findManyArgs: {
+        findArgs: findManyTriggerArgs,
+        searchFields: ['name'],
+        orderFields: ['medium', 'type', 'name'],
+        findManyCallBack: findManyTriggers,
+      },
+      countArgs: {
+        countWhereInput: findManyTriggerArgs,
+        countCallBack: countTriggers,
+      },
+      paginationOpts,
     };
 
-    return {
-      triggers,
-      pageInfo,
-    };
+    return paginate(paginateProps);
   };
 
   static sendMailTrigger(trigger: TriggerWithSendData, recipient: User, session: SessionWithEntries) {
-    const triggerBody = makeTriggerMailTemplate(recipient.firstName || 'User', session, trigger?.customer?.settings?.colourSettings?.primary);
+    const triggerBody = makeTriggerMailTemplate(
+      recipient.firstName || 'User',
+      session, trigger?.customer?.settings?.colourSettings?.primary,
+    );
 
     mailService.send({
       body: triggerBody,
@@ -129,7 +89,11 @@ class TriggerService {
     });
   }
 
-  static sendSmsTrigger(trigger: TriggerWithSendData, recipient: User, session: SessionWithEntries, values: Array<{value: string | number | undefined, type: string}>) {
+  static sendSmsTrigger(
+    trigger: TriggerWithSendData,
+    recipient: User, session: SessionWithEntries,
+    values: Array<{value: string | number | undefined, type: string}>,
+  ) {
     if (!recipient.phone) return;
 
     const mappedValues = values.map((value) => `${value.type} -> ${value.value}`);
@@ -163,8 +127,6 @@ class TriggerService {
       default:
         break;
     }
-    // if (value && recipient.email && (trigger.medium === 'EMAIL' || trigger.medium === '' ))
-    // TODO: Add the mail check (below) in this body as well.
   };
 
   static async tryTrigger(session: SessionWithEntries, trigger: TriggerWithSendData) {

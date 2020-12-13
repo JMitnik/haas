@@ -18,9 +18,10 @@ const getPaginatedUsers = gql`
             name
           }
         }
-
-        totalPages
-        pageIndex
+        pageInfo {
+          nrPages
+          pageIndex
+        }  
       }
     }
   }
