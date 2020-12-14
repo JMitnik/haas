@@ -125,7 +125,7 @@ const ShareDialogueModal = ({ dialogueName, shareUrl, onClose }: ShareDialogueMo
 
   return (
     <ModalContent>
-      <motion.div animate={{ opacity: 1, y: 150 }}>
+      <motion.div animate={{ opacity: 1 }}>
         <ModalHeader>{t('share')}</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
