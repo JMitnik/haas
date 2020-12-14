@@ -1,6 +1,9 @@
 import * as AWS from 'aws-sdk';
 import * as fs from 'fs';
 import * as papaparse from 'papaparse';
+import archiver from 'archiver';
+import fetch from 'node-fetch';
+
 import config from '../../config/config';
 
 const s3 = new AWS.S3({ accessKeyId: config.awsAccessKeyId, secretAccessKey: config.awsSecretAccessKey });
@@ -19,9 +22,39 @@ interface InputProps {
 class AutodeckService {
   static createJob = async (input: InputProps) => {
     const csv = papaparse.unparse([input]);
-    fs.writeFileSync('/tmp/test.csv', csv);
-    const resultPath = await AutodeckService.uploadDataToS3('haas-autodeck-input', 'test.csv', csv);
-    return resultPath;
+    const date = new Date();
+    const tempDir = `/tmp/autodeck-${date.getTime()}/`;
+    fs.mkdirSync(tempDir);
+    fs.writeFileSync(`${tempDir}input.csv`, csv);
+    await AutodeckService.fetchImage(input.logo, `${tempDir}logo.jpg`);
+    await AutodeckService.zipDirectory(tempDir, '/home/daan/Desktop/autodeck_input.zip');
+    // const resultPath = await AutodeckService.uploadDataToS3('haas-autodeck-input', 'test.csv', csv);
+    // return resultPath;
+  };
+
+  /**
+ * @param {String} source
+ * @param {String} out
+ * @returns {Promise}
+ */
+  static zipDirectory = (source: string, out: string) => {
+    const archive = archiver('zip', { zlib: { level: 9 } });
+    const stream = fs.createWriteStream(out);
+
+    return new Promise((resolve, reject) => {
+      archive
+        .directory(source, false)
+        .on('error', (err) => reject(err))
+        .pipe(stream);
+      stream.on('close', () => resolve());
+      archive.finalize();
+    });
+  };
+
+  static fetchImage = async (url: string, destinationPath: string) => {
+    const response = await fetch(url);
+    const buffer = await response.buffer();
+    fs.writeFileSync(destinationPath, buffer);
   };
 
   static uploadDataToS3 = (bucket: string, fileKey: string, data: string) => {
