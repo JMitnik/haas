@@ -5,6 +5,7 @@ import archiver from 'archiver';
 import fetch from 'node-fetch';
 
 import config from '../../config/config';
+import prisma from '../../config/prisma';
 
 const s3 = new AWS.S3({ accessKeyId: config.awsAccessKeyId, secretAccessKey: config.awsSecretAccessKey });
 
@@ -30,8 +31,22 @@ class AutodeckService {
     await AutodeckService.zipDirectory(tempDir, '/home/daan/Desktop/autodeck_input.zip');
 
     if (fs.existsSync('/home/daan/Desktop/autodeck_input.zip')) {
-      const resultPath = await AutodeckService.uploadFileToS3('haas-autodeck-input', `${input.name}.zip`, '/home/daan/Desktop/autodeck_input.zip');
-      return resultPath;
+      await AutodeckService.uploadFileToS3('haas-autodeck-input', `${input.name}.zip`, '/home/daan/Desktop/autodeck_input.zip');
+      const job = await prisma.job.create({
+        data: {
+          type: 'CREATE_WORKSPACE_JOB',
+          createWorkspaceJob: {
+            create: {
+              referenceType: 'AWS',
+              status: 'PENDING',
+            },
+          },
+        },
+        include: {
+          createWorkspaceJob: true,
+        },
+      });
+      return job;
     }
     // const resultPath = await AutodeckService.uploadDataToS3('haas-autodeck-input', 'test.csv', csv);
     // return resultPath;

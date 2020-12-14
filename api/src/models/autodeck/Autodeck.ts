@@ -72,8 +72,8 @@ export const GenerateAutodeckMutation = mutationField('generateAutodeck', {
       return null;
     }
 
-    await AutodeckService.createJob(input);
+    const job = await AutodeckService.createJob(input);
 
-    return null;
+    return job ? job as any : null;
   },
 });
