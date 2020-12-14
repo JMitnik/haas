@@ -28,6 +28,11 @@ class AutodeckService {
     fs.writeFileSync(`${tempDir}input.csv`, csv);
     await AutodeckService.fetchImage(input.logo, `${tempDir}logo.jpg`);
     await AutodeckService.zipDirectory(tempDir, '/home/daan/Desktop/autodeck_input.zip');
+
+    if (fs.existsSync('/home/daan/Desktop/autodeck_input.zip')) {
+      const resultPath = await AutodeckService.uploadFileToS3('haas-autodeck-input', `${input.name}.zip`, '/home/daan/Desktop/autodeck_input.zip');
+      return resultPath;
+    }
     // const resultPath = await AutodeckService.uploadDataToS3('haas-autodeck-input', 'test.csv', csv);
     // return resultPath;
   };
@@ -75,7 +80,7 @@ class AutodeckService {
       Key: fileKey,
       Body: fs.createReadStream(filePath),
       ACL: 'private',
-      ContentType: 'text/csv',
+      ContentType: 'application/zip',
     }).promise();
   };
 }
