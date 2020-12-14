@@ -324,15 +324,15 @@ type FormNodeType {
 
 """Generate sales documents"""
 input GenerateAutodeckInput {
-  answer1: String
-  answer2: String
-  answer3: String
-  answer4: String
-  firstName: String
-  logo: String
-  name: String
-  primaryColour: String
-  website: String
+  answer1: String!
+  answer2: String!
+  answer3: String!
+  answer4: String!
+  firstName: String!
+  logo: String!
+  name: String!
+  primaryColour: String!
+  website: String!
 }
 
 type ImageType {

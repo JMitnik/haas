@@ -166,15 +166,15 @@ export interface NexusGenInputs {
     id?: string | null; // String
   }
   GenerateAutodeckInput: { // input type
-    answer1?: string | null; // String
-    answer2?: string | null; // String
-    answer3?: string | null; // String
-    answer4?: string | null; // String
-    firstName?: string | null; // String
-    logo?: string | null; // String
-    name?: string | null; // String
-    primaryColour?: string | null; // String
-    website?: string | null; // String
+    answer1: string; // String!
+    answer2: string; // String!
+    answer3: string; // String!
+    answer4: string; // String!
+    firstName: string; // String!
+    logo: string; // String!
+    name: string; // String!
+    primaryColour: string; // String!
+    website: string; // String!
   }
   InviteUserInput: { // input type
     customerId: string; // String!

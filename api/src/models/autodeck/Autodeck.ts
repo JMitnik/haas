@@ -1,4 +1,6 @@
+
 import { enumType, inputObjectType, mutationField, objectType } from '@nexus/schema';
+import AutodeckService from './AutodeckService';
 
 export const CloudReferenceType = enumType({
   name: 'CloudReferenceType',
@@ -45,15 +47,15 @@ export const GenerateAutodeckInput = inputObjectType({
   description: 'Generate sales documents',
 
   definition(t) {
-    t.string('name');
-    t.string('website');
-    t.string('logo');
-    t.string('primaryColour');
-    t.string('firstName');
-    t.string('answer1');
-    t.string('answer2');
-    t.string('answer3');
-    t.string('answer4');
+    t.string('name', { required: true });
+    t.string('website', { required: true });
+    t.string('logo', { required: true });
+    t.string('primaryColour', { required: true });
+    t.string('firstName', { required: true });
+    t.string('answer1', { required: true });
+    t.string('answer2', { required: true });
+    t.string('answer3', { required: true });
+    t.string('answer4', { required: true });
   },
 });
 
@@ -62,13 +64,15 @@ export const GenerateAutodeckMutation = mutationField('generateAutodeck', {
   nullable: true,
   args: { input: GenerateAutodeckInput },
 
-  resolve(parent, args) {
+  async resolve(parent, args) {
     console.log('input: ', args.input);
-    const customerId = args?.input?.name;
+    const { input } = args;
 
-    if (!customerId) {
+    if (!input) {
       return null;
     }
+
+    await AutodeckService.createJob(input);
 
     return null;
   },
