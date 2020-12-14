@@ -14,6 +14,7 @@ import AddCustomerPage from 'pages/dashboard/customers/add';
 import AddDialogueView from 'views/AddDialogueView';
 import AddTriggerView from 'views/TriggerOverview/AddTriggerView';
 import AnalyticsPage from 'pages/dashboard/analytics';
+import AutodeckPage from 'pages/dashboard/autodeck';
 import CustomerLayout from 'layouts/CustomerLayout';
 import CustomerPage from 'pages/dashboard/customer';
 import CustomerProvider from 'providers/CustomerProvider';
@@ -234,6 +235,10 @@ const AppRoutes = () => (
 
       <GuardedRoute path="/dashboard">
         <DashboardPage />
+      </GuardedRoute>
+
+      <GuardedRoute path="/autodeck">
+        <AutodeckPage />
       </GuardedRoute>
 
       <Route path="/verify_token">

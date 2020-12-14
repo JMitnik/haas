@@ -668,6 +668,64 @@ const language = {
       de: 'Dein Einladungstoken kann nicht gefunden werden. Versuche einen erneuten Login.',
     },
   },
+  autodeck: {
+    dialogue: {
+      en: 'Dialogue',
+      de: 'Dialog',
+    },
+    dialogue_helper: {
+      en: 'Personalize the content of the example dialogue on the sales material.',
+      de: 'Personalize the content of the example dialogue on the sales material.',
+    },
+    client_first_name: {
+      en: 'Client first name',
+      de: 'Client first name',
+    },
+    client_first_name_helper: {
+      en: 'Fill in the first name of the client targeted by the sales documents',
+      de: 'Fill in the first name of the client targeted by the sales documents',
+    },
+    answer_1: {
+      en: 'Answer 1',
+      de: 'Answer 1',
+    },
+    answer_1_helper: {
+      en: 'What is the first answer of the multi-choice example?',
+      de: 'What is the first answer of the multi-choice example?',
+    },
+    answer_2: {
+      en: 'Answer 2',
+      de: 'Answer 2',
+    },
+    answer_2_helper: {
+      en: 'What is the second answer of the multi-choice example?',
+      de: 'What is the second answer of the multi-choice example?',
+    },
+    answer_3: {
+      en: 'Answer 3',
+      de: 'Answer 3',
+    },
+    answer_3_helper: {
+      en: 'What is the third answer of the multi-choice example?',
+      de: 'What is the third answer of the multi-choice example?',
+    },
+    answer_4: {
+      en: 'Answer 4',
+      de: 'Answer 4',
+    },
+    answer_4_helper: {
+      en: 'What is the fourth answer of the multi-choice example?',
+      de: 'What is the fourth answer of the multi-choice example?',
+    },
+    website: {
+      en: 'Website URL',
+      de: 'Website URL',
+    },
+    website_helper: {
+      en: 'What is the website of the target company?',
+      de: 'What is the website of the target company?',
+    },
+  },
   customer: {
     fake_data: {
       en: 'Placeholder data',
