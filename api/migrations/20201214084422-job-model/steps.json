@@ -1,0 +1,567 @@
+{
+  "version": "0.3.14-fixed",
+  "steps": [
+    {
+      "tag": "CreateEnum",
+      "enum": "JobType",
+      "values": [
+        "CREATE_WORKSPACE_JOB"
+      ]
+    },
+    {
+      "tag": "CreateEnum",
+      "enum": "CloudReferenceType",
+      "values": [
+        "AWS",
+        "GCP",
+        "Azure",
+        "IBM"
+      ]
+    },
+    {
+      "tag": "CreateEnum",
+      "enum": "JobStatusType",
+      "values": [
+        "PENDING",
+        "COMPLETED",
+        "FAILED"
+      ]
+    },
+    {
+      "tag": "CreateModel",
+      "model": "Job"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Job",
+      "field": "id",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "Job",
+          "field": "id"
+        },
+        "directive": "id"
+      }
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "Job",
+          "field": "id"
+        },
+        "directive": "default"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "Job",
+          "field": "id"
+        },
+        "directive": "default"
+      },
+      "argument": "",
+      "value": "cuid()"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Job",
+      "field": "createdAt",
+      "type": "DateTime",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "Job",
+          "field": "createdAt"
+        },
+        "directive": "default"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "Job",
+          "field": "createdAt"
+        },
+        "directive": "default"
+      },
+      "argument": "",
+      "value": "now()"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Job",
+      "field": "updatedAt",
+      "type": "DateTime",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "Job",
+          "field": "updatedAt"
+        },
+        "directive": "updatedAt"
+      }
+    },
+    {
+      "tag": "CreateField",
+      "model": "Job",
+      "field": "type",
+      "type": "JobType",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Job",
+      "field": "createWorkspaceJob",
+      "type": "CreateWorkspaceJob",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "Job",
+          "field": "createWorkspaceJob"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "Job",
+          "field": "createWorkspaceJob"
+        },
+        "directive": "relation"
+      },
+      "argument": "references",
+      "value": "[id]"
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "Job",
+          "field": "createWorkspaceJob"
+        },
+        "directive": "relation"
+      },
+      "argument": "fields",
+      "value": "[createWorkspaceJobId]"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Job",
+      "field": "createWorkspaceJobId",
+      "type": "String",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateModel",
+      "model": "CreateWorkspaceJob"
+    },
+    {
+      "tag": "CreateField",
+      "model": "CreateWorkspaceJob",
+      "field": "id",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "CreateWorkspaceJob",
+          "field": "id"
+        },
+        "directive": "id"
+      }
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "CreateWorkspaceJob",
+          "field": "id"
+        },
+        "directive": "default"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "CreateWorkspaceJob",
+          "field": "id"
+        },
+        "directive": "default"
+      },
+      "argument": "",
+      "value": "cuid()"
+    },
+    {
+      "tag": "CreateField",
+      "model": "CreateWorkspaceJob",
+      "field": "referenceId",
+      "type": "String",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateField",
+      "model": "CreateWorkspaceJob",
+      "field": "referenceType",
+      "type": "CloudReferenceType",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateField",
+      "model": "CreateWorkspaceJob",
+      "field": "status",
+      "type": "JobStatusType",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "CreateWorkspaceJob",
+          "field": "status"
+        },
+        "directive": "default"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "CreateWorkspaceJob",
+          "field": "status"
+        },
+        "directive": "default"
+      },
+      "argument": "",
+      "value": "PENDING"
+    },
+    {
+      "tag": "CreateField",
+      "model": "CreateWorkspaceJob",
+      "field": "resourcesUrl",
+      "type": "String",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateField",
+      "model": "CreateWorkspaceJob",
+      "field": "Job",
+      "type": "Job",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateField",
+      "model": "FormNodeField",
+      "field": "FormNode",
+      "type": "FormNode",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "FormNodeField",
+          "field": "FormNode"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "FormNodeField",
+          "field": "FormNode"
+        },
+        "directive": "relation"
+      },
+      "argument": "fields",
+      "value": "[formNodeId]"
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "FormNodeField",
+          "field": "FormNode"
+        },
+        "directive": "relation"
+      },
+      "argument": "references",
+      "value": "[id]"
+    },
+    {
+      "tag": "CreateField",
+      "model": "FormNodeField",
+      "field": "formNodeId",
+      "type": "String",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateField",
+      "model": "FormNodeField",
+      "field": "FormNodeFieldEntryData",
+      "type": "FormNodeFieldEntryData",
+      "arity": "List"
+    },
+    {
+      "tag": "CreateField",
+      "model": "FormNode",
+      "field": "QuestionNode",
+      "type": "QuestionNode",
+      "arity": "List"
+    },
+    {
+      "tag": "CreateField",
+      "model": "SliderNodeRange",
+      "field": "SliderNodeMarker",
+      "type": "SliderNodeMarker",
+      "arity": "List"
+    },
+    {
+      "tag": "CreateField",
+      "model": "SliderNodeMarker",
+      "field": "sliderNodeRangeId",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "SliderNodeMarker",
+          "field": "range"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "SliderNodeMarker",
+          "field": "range"
+        },
+        "directive": "relation"
+      },
+      "argument": "fields",
+      "value": "[sliderNodeRangeId]"
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "SliderNodeMarker",
+          "field": "range"
+        },
+        "directive": "relation"
+      },
+      "argument": "references",
+      "value": "[id]"
+    },
+    {
+      "tag": "CreateField",
+      "model": "SliderNode",
+      "field": "QuestionNode",
+      "type": "QuestionNode",
+      "arity": "List"
+    },
+    {
+      "tag": "CreateField",
+      "model": "QuestionNode",
+      "field": "sliderNodeId",
+      "type": "String",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateField",
+      "model": "QuestionNode",
+      "field": "formNodeId",
+      "type": "String",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "QuestionNode",
+          "field": "sliderNode"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "QuestionNode",
+          "field": "sliderNode"
+        },
+        "directive": "relation"
+      },
+      "argument": "fields",
+      "value": "[sliderNodeId]"
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "QuestionNode",
+          "field": "sliderNode"
+        },
+        "directive": "relation"
+      },
+      "argument": "references",
+      "value": "[id]"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "QuestionNode",
+          "field": "form"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "QuestionNode",
+          "field": "form"
+        },
+        "directive": "relation"
+      },
+      "argument": "fields",
+      "value": "[formNodeId]"
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "QuestionNode",
+          "field": "form"
+        },
+        "directive": "relation"
+      },
+      "argument": "references",
+      "value": "[id]"
+    },
+    {
+      "tag": "CreateField",
+      "model": "FormNodeFieldEntryData",
+      "field": "FormNodeEntry",
+      "type": "FormNodeEntry",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "FormNodeFieldEntryData",
+          "field": "FormNodeEntry"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "FormNodeFieldEntryData",
+          "field": "FormNodeEntry"
+        },
+        "directive": "relation"
+      },
+      "argument": "fields",
+      "value": "[formNodeEntryId]"
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "FormNodeFieldEntryData",
+          "field": "FormNodeEntry"
+        },
+        "directive": "relation"
+      },
+      "argument": "references",
+      "value": "[id]"
+    },
+    {
+      "tag": "CreateField",
+      "model": "FormNodeFieldEntryData",
+      "field": "formNodeEntryId",
+      "type": "Int",
+      "arity": "Optional"
+    }
+  ]
+}
