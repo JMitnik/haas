@@ -165,6 +165,17 @@ export interface NexusGenInputs {
     fields?: NexusGenInputs['FormNodeFieldInput'][] | null; // [FormNodeFieldInput!]
     id?: string | null; // String
   }
+  GenerateAutodeckInput: { // input type
+    answer1?: string | null; // String
+    answer2?: string | null; // String
+    answer3?: string | null; // String
+    answer4?: string | null; // String
+    firstName?: string | null; // String
+    logo?: string | null; // String
+    name?: string | null; // String
+    primaryColour?: string | null; // String
+    website?: string | null; // String
+  }
   InviteUserInput: { // input type
     customerId: string; // String!
     email: string; // String!
@@ -341,7 +352,9 @@ export interface NexusGenInputs {
 }
 
 export interface NexusGenEnums {
+  CloudReferenceType: prisma.CloudReferenceType
   FormNodeFieldTypeEnum: "email" | "longText" | "number" | "phoneNumber" | "shortText" | "url"
+  JobStatusType: prisma.JobStatusType
   LinkTypeEnumType: "API" | "FACEBOOK" | "INSTAGRAM" | "LINKEDIN" | "SOCIAL" | "TWITTER" | "WHATSAPP"
   PaginationSearchEnum: "email" | "firstName" | "lastName" | "name" | "publicTitle" | "title"
   PaginationSortByEnum: "createdAt" | "email" | "firstName" | "id" | "lastName" | "medium" | "name" | "paths" | "role" | "score" | "type" | "user" | "when"
@@ -355,6 +368,13 @@ export interface NexusGenEnums {
 
 export interface NexusGenRootTypes {
   ColourSettings: prisma.ColourSettings;
+  CreateWorkspaceJobType: { // root type
+    cloudReference: NexusGenEnums['CloudReferenceType']; // CloudReferenceType!
+    id: string; // String!
+    referenceId: string; // String!
+    resourceUrl: string; // String!
+    status: NexusGenEnums['JobStatusType']; // JobStatusType!
+  }
   Customer: prisma.Customer;
   CustomerSettings: prisma.CustomerSettings;
   DeleteUserOutput: { // root type
@@ -405,6 +425,13 @@ export interface NexusGenRootTypes {
   InviteUserOutput: { // root type
     didAlreadyExist: boolean; // Boolean!
     didInvite: boolean; // Boolean!
+  }
+  JobObjectType: { // root type
+    createdAt: string; // String!
+    createWorkspaceJob?: NexusGenRootTypes['CreateWorkspaceJobType'] | null; // CreateWorkspaceJobType
+    createWorkspaceJobId: string; // String!
+    id: string; // String!
+    updatedAt: string; // String!
   }
   LinkType: { // root type
     backgroundColor?: string | null; // String
@@ -588,6 +615,7 @@ export interface NexusGenAllTypes extends NexusGenRootTypes {
   FormNodeEntryInput: NexusGenInputs['FormNodeEntryInput'];
   FormNodeFieldInput: NexusGenInputs['FormNodeFieldInput'];
   FormNodeInputType: NexusGenInputs['FormNodeInputType'];
+  GenerateAutodeckInput: NexusGenInputs['GenerateAutodeckInput'];
   InviteUserInput: NexusGenInputs['InviteUserInput'];
   LoginInput: NexusGenInputs['LoginInput'];
   NodeEntryDataInput: NexusGenInputs['NodeEntryDataInput'];
@@ -622,7 +650,9 @@ export interface NexusGenAllTypes extends NexusGenRootTypes {
   UpdateQuestionNodeInputType: NexusGenInputs['UpdateQuestionNodeInputType'];
   UserInput: NexusGenInputs['UserInput'];
   UserOfCustomerInput: NexusGenInputs['UserOfCustomerInput'];
+  CloudReferenceType: NexusGenEnums['CloudReferenceType'];
   FormNodeFieldTypeEnum: NexusGenEnums['FormNodeFieldTypeEnum'];
+  JobStatusType: NexusGenEnums['JobStatusType'];
   LinkTypeEnumType: NexusGenEnums['LinkTypeEnumType'];
   PaginationSearchEnum: NexusGenEnums['PaginationSearchEnum'];
   PaginationSortByEnum: NexusGenEnums['PaginationSortByEnum'];
@@ -640,6 +670,13 @@ export interface NexusGenFieldTypes {
     primary: string; // String!
     primaryAlt: string | null; // String
     secondary: string | null; // String
+  }
+  CreateWorkspaceJobType: { // field return type
+    cloudReference: NexusGenEnums['CloudReferenceType']; // CloudReferenceType!
+    id: string; // String!
+    referenceId: string; // String!
+    resourceUrl: string; // String!
+    status: NexusGenEnums['JobStatusType']; // JobStatusType!
   }
   Customer: { // field return type
     dialogue: NexusGenRootTypes['Dialogue'] | null; // Dialogue
@@ -745,6 +782,13 @@ export interface NexusGenFieldTypes {
     didAlreadyExist: boolean; // Boolean!
     didInvite: boolean; // Boolean!
   }
+  JobObjectType: { // field return type
+    createdAt: string; // String!
+    createWorkspaceJob: NexusGenRootTypes['CreateWorkspaceJobType'] | null; // CreateWorkspaceJobType
+    createWorkspaceJobId: string; // String!
+    id: string; // String!
+    updatedAt: string; // String!
+  }
   LinkType: { // field return type
     backgroundColor: string | null; // String
     iconUrl: string | null; // String
@@ -785,6 +829,7 @@ export interface NexusGenFieldTypes {
     editTrigger: NexusGenRootTypes['TriggerType']; // TriggerType!
     editUser: NexusGenRootTypes['UserType']; // UserType!
     editWorkspace: NexusGenRootTypes['Customer']; // Customer!
+    generateAutodeck: NexusGenRootTypes['JobObjectType'] | null; // JobObjectType
     inviteUser: NexusGenRootTypes['InviteUserOutput']; // InviteUserOutput!
     logout: string; // String!
     register: string | null; // String
@@ -1134,6 +1179,9 @@ export interface NexusGenArgTypes {
     editWorkspace: { // args
       input?: NexusGenInputs['EditWorkspaceInput'] | null; // EditWorkspaceInput
     }
+    generateAutodeck: { // args
+      input?: NexusGenInputs['GenerateAutodeckInput'] | null; // GenerateAutodeckInput
+    }
     inviteUser: { // args
       input?: NexusGenInputs['InviteUserInput'] | null; // InviteUserInput
     }
@@ -1231,11 +1279,11 @@ export interface NexusGenAbstractResolveReturnTypes {
 
 export interface NexusGenInheritedFields {}
 
-export type NexusGenObjectNames = "ColourSettings" | "Customer" | "CustomerSettings" | "DeleteUserOutput" | "Dialogue" | "DialogueStatistics" | "Edge" | "EdgeCondition" | "FontSettings" | "FormNodeEntryType" | "FormNodeEntryValueType" | "FormNodeField" | "FormNodeType" | "ImageType" | "InviteUserOutput" | "LinkType" | "LoginOutput" | "Mutation" | "NodeEntry" | "NodeEntryValue" | "PaginationPageInfo" | "PermssionType" | "Query" | "QuestionNode" | "QuestionOption" | "RefreshAccessTokenOutput" | "RequestInviteOutput" | "RoleConnection" | "RoleType" | "Session" | "SessionConnection" | "ShareNodeType" | "SliderNodeMarkerType" | "SliderNodeRangeType" | "SliderNodeType" | "Tag" | "TriggerConditionType" | "TriggerConnectionType" | "TriggerType" | "UserConnection" | "UserCustomer" | "UserType" | "VerifyUserTokenOutput" | "lineChartDataType" | "topPathType";
+export type NexusGenObjectNames = "ColourSettings" | "CreateWorkspaceJobType" | "Customer" | "CustomerSettings" | "DeleteUserOutput" | "Dialogue" | "DialogueStatistics" | "Edge" | "EdgeCondition" | "FontSettings" | "FormNodeEntryType" | "FormNodeEntryValueType" | "FormNodeField" | "FormNodeType" | "ImageType" | "InviteUserOutput" | "JobObjectType" | "LinkType" | "LoginOutput" | "Mutation" | "NodeEntry" | "NodeEntryValue" | "PaginationPageInfo" | "PermssionType" | "Query" | "QuestionNode" | "QuestionOption" | "RefreshAccessTokenOutput" | "RequestInviteOutput" | "RoleConnection" | "RoleType" | "Session" | "SessionConnection" | "ShareNodeType" | "SliderNodeMarkerType" | "SliderNodeRangeType" | "SliderNodeType" | "Tag" | "TriggerConditionType" | "TriggerConnectionType" | "TriggerType" | "UserConnection" | "UserCustomer" | "UserType" | "VerifyUserTokenOutput" | "lineChartDataType" | "topPathType";
 
-export type NexusGenInputNames = "AppendToInteractionInput" | "CTALinkInputObjectType" | "CTALinksInputType" | "CTAShareInputObjectType" | "ChoiceNodeEntryInput" | "CreateCTAInputType" | "CreateDialogueInputType" | "CreateQuestionNodeInputType" | "CreateTriggerInputType" | "CreateWorkspaceInput" | "CustomerWhereUniqueInput" | "DeleteDialogueInputType" | "DeleteNodeInputType" | "DeleteUserInput" | "DialogueFilterInputType" | "DialogueWhereUniqueInput" | "EdgeConditionInputType" | "EditUserInput" | "EditWorkspaceInput" | "FormNodeEntryFieldInput" | "FormNodeEntryInput" | "FormNodeFieldInput" | "FormNodeInputType" | "InviteUserInput" | "LoginInput" | "NodeEntryDataInput" | "NodeEntryInput" | "OptionInputType" | "OptionsInputType" | "PaginationSortInput" | "PaginationWhereInput" | "PermissionIdsInput" | "PermissionInput" | "QuestionNodeWhereInputType" | "QuestionNodeWhereUniqueInput" | "RecipientsInputType" | "RegisterInput" | "RegisterNodeEntryInput" | "RequestInviteInput" | "RoleDataInput" | "RoleInput" | "SessionInput" | "SessionWhereUniqueInput" | "ShareNodeInputType" | "SlideNodeMarkerInput" | "SliderNodeEntryInput" | "SliderNodeInputType" | "SliderNodeRangeInputType" | "SocialNodeEntryInput" | "TagsInputObjectType" | "TextboxNodeEntryInput" | "TriggerConditionInputType" | "TriggerInputType" | "UpdateCTAInputType" | "UpdateQuestionNodeInputType" | "UserInput" | "UserOfCustomerInput";
+export type NexusGenInputNames = "AppendToInteractionInput" | "CTALinkInputObjectType" | "CTALinksInputType" | "CTAShareInputObjectType" | "ChoiceNodeEntryInput" | "CreateCTAInputType" | "CreateDialogueInputType" | "CreateQuestionNodeInputType" | "CreateTriggerInputType" | "CreateWorkspaceInput" | "CustomerWhereUniqueInput" | "DeleteDialogueInputType" | "DeleteNodeInputType" | "DeleteUserInput" | "DialogueFilterInputType" | "DialogueWhereUniqueInput" | "EdgeConditionInputType" | "EditUserInput" | "EditWorkspaceInput" | "FormNodeEntryFieldInput" | "FormNodeEntryInput" | "FormNodeFieldInput" | "FormNodeInputType" | "GenerateAutodeckInput" | "InviteUserInput" | "LoginInput" | "NodeEntryDataInput" | "NodeEntryInput" | "OptionInputType" | "OptionsInputType" | "PaginationSortInput" | "PaginationWhereInput" | "PermissionIdsInput" | "PermissionInput" | "QuestionNodeWhereInputType" | "QuestionNodeWhereUniqueInput" | "RecipientsInputType" | "RegisterInput" | "RegisterNodeEntryInput" | "RequestInviteInput" | "RoleDataInput" | "RoleInput" | "SessionInput" | "SessionWhereUniqueInput" | "ShareNodeInputType" | "SlideNodeMarkerInput" | "SliderNodeEntryInput" | "SliderNodeInputType" | "SliderNodeRangeInputType" | "SocialNodeEntryInput" | "TagsInputObjectType" | "TextboxNodeEntryInput" | "TriggerConditionInputType" | "TriggerInputType" | "UpdateCTAInputType" | "UpdateQuestionNodeInputType" | "UserInput" | "UserOfCustomerInput";
 
-export type NexusGenEnumNames = "FormNodeFieldTypeEnum" | "LinkTypeEnumType" | "PaginationSearchEnum" | "PaginationSortByEnum" | "QuestionNodeTypeEnum" | "SystemPermission" | "TagTypeEnum" | "TriggerConditionEnum" | "TriggerMediumEnum" | "TriggerTypeEnum";
+export type NexusGenEnumNames = "CloudReferenceType" | "FormNodeFieldTypeEnum" | "JobStatusType" | "LinkTypeEnumType" | "PaginationSearchEnum" | "PaginationSortByEnum" | "QuestionNodeTypeEnum" | "SystemPermission" | "TagTypeEnum" | "TriggerConditionEnum" | "TriggerMediumEnum" | "TriggerTypeEnum";
 
 export type NexusGenInterfaceNames = "ConnectionInterface";
 

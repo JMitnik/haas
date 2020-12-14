@@ -15,6 +15,13 @@ input ChoiceNodeEntryInput {
   value: String
 }
 
+enum CloudReferenceType {
+  AWS
+  Azure
+  GCP
+  IBM
+}
+
 type ColourSettings {
   id: ID!
   primary: String!
@@ -78,6 +85,14 @@ input CreateWorkspaceInput {
   primaryColour: String!
   slug: String!
   willGenerateFakeData: Boolean = false
+}
+
+type CreateWorkspaceJobType {
+  cloudReference: CloudReferenceType!
+  id: String!
+  referenceId: String!
+  resourceUrl: String!
+  status: JobStatusType!
 }
 
 input CTALinkInputObjectType {
@@ -307,6 +322,19 @@ type FormNodeType {
   id: String
 }
 
+"""Generate sales documents"""
+input GenerateAutodeckInput {
+  answer1: String
+  answer2: String
+  answer3: String
+  answer4: String
+  firstName: String
+  logo: String
+  name: String
+  primaryColour: String
+  website: String
+}
+
 type ImageType {
   encoding: String
   filename: String
@@ -323,6 +351,20 @@ input InviteUserInput {
 type InviteUserOutput {
   didAlreadyExist: Boolean!
   didInvite: Boolean!
+}
+
+type JobObjectType {
+  createdAt: String!
+  createWorkspaceJob: CreateWorkspaceJobType
+  createWorkspaceJobId: String!
+  id: String!
+  updatedAt: String!
+}
+
+enum JobStatusType {
+  COMPLETED
+  FAILED
+  PENDING
 }
 
 type lineChartDataType {
@@ -391,6 +433,7 @@ type Mutation {
   editTrigger(customerSlug: String, recipients: RecipientsInputType, trigger: TriggerInputType, triggerId: String): TriggerType!
   editUser(input: EditUserInput, userId: String): UserType!
   editWorkspace(input: EditWorkspaceInput): Customer!
+  generateAutodeck(input: GenerateAutodeckInput): JobObjectType
 
   """Invite a user to a particular customer domain, given an email and role"""
   inviteUser(input: InviteUserInput): InviteUserOutput!

@@ -11,17 +11,15 @@ import { yupResolver } from '@hookform/resolvers';
 import React from 'react';
 import gql from 'graphql-tag';
 
-import intToBool from 'utils/intToBool';
-
-import { CreateWorkspaceInput } from 'types/globalTypes';
+// import { CreateWorkspaceInput } from 'types/globalTypes';
 import { useUser } from '../../providers/UserProvider';
 import AutodeckForm from './AutodeckForm';
 import getCustomersOfUser from '../../queries/getCustomersOfUser';
 
-const createWorkspaceMutation = gql`
-  mutation createWorkspace($input: CreateWorkspaceInput) {
-    createWorkspace(input: $input) {
-        name
+const generateAutodeckMutation = gql`
+  mutation generateAutodeck($input: GenerateAutodeckInput) {
+    generateAutodeck(input: $input) {
+        id
     }
   }
 `;
@@ -54,7 +52,7 @@ const AddCustomerView = () => {
     resolver: yupResolver(schema),
   });
 
-  const [createWorkspace, { loading, error: serverErrors }] = useMutation<null, {input: CreateWorkspaceInput}>(createWorkspaceMutation, {
+  const [generateAutodeck, { loading, error: serverErrors }] = useMutation<null, {input: any}>(generateAutodeckMutation, {
     onCompleted: () => {
       toast({
         title: 'Created!',
@@ -64,11 +62,11 @@ const AddCustomerView = () => {
         isClosable: true,
       });
 
-      refreshUser();
+      // refreshUser();
 
-      setTimeout(() => {
-        history.push('/');
-      }, 500);
+      // setTimeout(() => {
+      //   history.push('/');
+      // }, 500);
     },
     onError: () => {
       toast({
@@ -89,6 +87,15 @@ const AddCustomerView = () => {
 
   const onSubmit = (formData: FormDataProps) => {
     console.log('form data: ', formData);
+    const { answer1, answer2, answer3, answer4, name, primaryColour, website, firstName, logo } = formData;
+    const input = {
+      answer1, answer2, answer3, answer4, name, primaryColour, website, firstName, logo,
+    };
+    generateAutodeck({
+      variables: {
+        input,
+      },
+    });
     // createWorkspace({
     //   variables: {
     //     input: {
