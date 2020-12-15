@@ -364,7 +364,10 @@ type JobObjectType {
 enum JobStatusType {
   COMPLETED
   FAILED
+  IN_PHOTOSHOP_QUEUE
   PENDING
+  PHOTOSHOP_PROCESSING
+  PRE_PROCESSING
 }
 
 type lineChartDataType {

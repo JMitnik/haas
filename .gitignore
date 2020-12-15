@@ -60,6 +60,7 @@ types.d.ts
 
 **/.env.prod
 api/.env.prod
+expose
 
 # VSCode related
 .vscode

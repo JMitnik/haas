@@ -9,7 +9,7 @@ export const CloudReferenceType = enumType({
 
 export const JobStatusType = enumType({
   name: 'JobStatusType',
-  members: ['PENDING', 'COMPLETED', 'FAILED'],
+  members: ['PENDING', 'PRE_PROCESSING', 'IN_PHOTOSHOP_QUEUE', 'PHOTOSHOP_PROCESSING', 'COMPLETED', 'FAILED'],
 });
 
 export const CreateWorkspaceJobType = objectType({
