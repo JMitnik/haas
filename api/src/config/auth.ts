@@ -52,6 +52,7 @@ const authShield = shield({
     '*': isSuperAdmin,
     logout: allow,
     createSession: allow,
+    updateJob: allow,
     appendToInteraction: allow,
     verifyUserToken: allow,
     requestInvite: allow,

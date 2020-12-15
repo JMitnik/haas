@@ -77,3 +77,34 @@ export const GenerateAutodeckMutation = mutationField('generateAutodeck', {
     return job ? job as any : null;
   },
 });
+
+export const UpdateJobMutation = mutationField('updateJob', {
+  type: JobObjectType,
+  nullable: true,
+  args: { id: 'String', status: JobStatusType, resourceUrl: 'String', referenceId: 'String' },
+  resolve(parent, args, ctx) {
+    const { id, resourceUrl, status } = args;
+
+    if (!args.id) {
+      return null;
+    }
+
+    return ctx.prisma.job.update({
+      where: {
+        id: id || undefined,
+      },
+      data: {
+        createWorkspaceJob: {
+          update: {
+            resourcesUrl: resourceUrl,
+            status: status || undefined,
+          },
+        },
+      },
+      include: {
+        createWorkspaceJob: true,
+      },
+    }) as any;
+  },
+
+});

@@ -836,6 +836,7 @@ export interface NexusGenFieldTypes {
     requestInvite: NexusGenRootTypes['RequestInviteOutput']; // RequestInviteOutput!
     singleUpload: NexusGenRootTypes['ImageType']; // ImageType!
     updateCTA: NexusGenRootTypes['QuestionNode']; // QuestionNode!
+    updateJob: NexusGenRootTypes['JobObjectType'] | null; // JobObjectType
     updateQuestion: NexusGenRootTypes['QuestionNode']; // QuestionNode!
     updateRoles: NexusGenRootTypes['RoleType']; // RoleType!
     verifyUserToken: NexusGenRootTypes['VerifyUserTokenOutput']; // VerifyUserTokenOutput!
@@ -1196,6 +1197,12 @@ export interface NexusGenArgTypes {
     }
     updateCTA: { // args
       input?: NexusGenInputs['UpdateCTAInputType'] | null; // UpdateCTAInputType
+    }
+    updateJob: { // args
+      id?: string | null; // String
+      referenceId?: string | null; // String
+      resourceUrl?: string | null; // String
+      status?: NexusGenEnums['JobStatusType'] | null; // JobStatusType
     }
     updateQuestion: { // args
       input?: NexusGenInputs['UpdateQuestionNodeInputType'] | null; // UpdateQuestionNodeInputType
