@@ -22,34 +22,35 @@ interface InputProps {
 }
 class AutodeckService {
   static createJob = async (input: InputProps) => {
-    const csv = papaparse.unparse([input]);
+    const job = await prisma.job.create({
+      data: {
+        type: 'CREATE_WORKSPACE_JOB',
+        createWorkspaceJob: {
+          create: {
+            referenceType: 'AWS',
+            status: 'PENDING',
+          },
+        },
+      },
+      include: {
+        createWorkspaceJob: true,
+      },
+    });
+
+    const csvInput = { ...input, jobId: job.id };
+    const csv = papaparse.unparse([csvInput]);
     const date = new Date();
     const tempDir = `/tmp/autodeck-${date.getTime()}/`;
     fs.mkdirSync(tempDir);
     fs.writeFileSync(`${tempDir}input.csv`, csv);
+
     await AutodeckService.fetchImage(input.logo, `${tempDir}logo.jpg`);
     await AutodeckService.zipDirectory(tempDir, '/home/daan/Desktop/autodeck_input.zip');
 
     if (fs.existsSync('/home/daan/Desktop/autodeck_input.zip')) {
       await AutodeckService.uploadFileToS3('haas-autodeck-input', `${input.name}.zip`, '/home/daan/Desktop/autodeck_input.zip');
-      const job = await prisma.job.create({
-        data: {
-          type: 'CREATE_WORKSPACE_JOB',
-          createWorkspaceJob: {
-            create: {
-              referenceType: 'AWS',
-              status: 'PENDING',
-            },
-          },
-        },
-        include: {
-          createWorkspaceJob: true,
-        },
-      });
       return job;
     }
-    // const resultPath = await AutodeckService.uploadDataToS3('haas-autodeck-input', 'test.csv', csv);
-    // return resultPath;
   };
 
   /**
