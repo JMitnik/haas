@@ -50,6 +50,7 @@ const authShield = shield({
   },
   Mutation: {
     '*': isSuperAdmin,
+    debugMutation: allow,
     logout: allow,
     createSession: allow,
     appendToInteraction: allow,
