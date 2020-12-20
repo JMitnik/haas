@@ -1,16 +1,17 @@
 import * as UI from '@haas/ui';
 import * as qs from 'qs';
-import { Activity, Award, BarChart, MessageCircle,
+import { Activity, Award, BarChart, Clipboard, Download, MessageCircle,
   ThumbsDown, ThumbsUp, TrendingDown, TrendingUp } from 'react-feather';
-import { Button, Tag, TagIcon, TagLabel } from '@chakra-ui/core';
+import { Button, Tag, TagIcon, TagLabel, useClipboard } from '@chakra-ui/core';
 import { Div, Flex, Grid, H4, Icon, Loader, PageTitle, Span, Text } from '@haas/ui';
 import { sub } from 'date-fns';
 import { useHistory, useParams } from 'react-router-dom';
 import { useQuery } from '@apollo/react-hooks';
 import { useTranslation } from 'react-i18next';
-import React, { useReducer } from 'react';
+import QRCode from 'qrcode.react';
+import React, { useContext, useReducer, useRef } from 'react';
 import gql from 'graphql-tag';
-import styled, { css } from 'styled-components/macro';
+import styled, { ThemeContext, css } from 'styled-components/macro';
 
 import { ReactComponent as ChartbarIcon } from 'assets/icons/icon-chartbar.svg';
 import { ReactComponent as PathsIcon } from 'assets/icons/icon-launch.svg';
@@ -18,6 +19,7 @@ import { ReactComponent as QRIcon } from 'assets/icons/icon-qr.svg';
 import { ReactComponent as TrendingIcon } from 'assets/icons/icon-trending-up.svg';
 import { ReactComponent as TrophyIcon } from 'assets/icons/icon-trophy.svg';
 
+import Dropdown from 'components/Dropdown';
 import InteractionFeedModule from './Modules/InteractionFeedModule/InteractionFeedModule';
 import NegativePathsModule from './Modules/NegativePathsModule/index.tsx';
 import PositivePathsModule from './Modules/PositivePathsModule/PositivePathsModule';
@@ -180,6 +182,89 @@ const getDialogueStatistics = gql`
   }
 `;
 
+interface ShareDialogueDropdownProps {
+  dialogueName: string;
+  shareUrl: string;
+}
+
+const ShareDialogue = ({ dialogueName, shareUrl }: ShareDialogueDropdownProps) => {
+  const themeContext = useContext(ThemeContext);
+
+  const qrColor = themeContext.colors.primary || '#FFFFFF';
+  const qrContainerRef = useRef<HTMLDivElement>(null);
+
+  const { onCopy, hasCopied } = useClipboard(shareUrl);
+
+  const handleDownload = (): void => {
+    if (!qrContainerRef.current) return;
+
+    const canvas = qrContainerRef.current.querySelector('canvas');
+    if (!canvas) return;
+
+    const img = canvas.toDataURL('image/png');
+    const anchor = document.createElement('a');
+    anchor.href = img;
+    anchor.download = `QRCode-${dialogueName}.png`;
+    anchor.click();
+  };
+
+  const { t } = useTranslation();
+
+  return (
+    <UI.Card zIndex={500} noHover bg="white">
+      <UI.CardBody>
+        <UI.Div />
+        <UI.Div mb={4}>
+          <UI.Text fontWeight={600} fontSize="1.3rem" color="gray.700">{t('dialogue:share_qr')}</UI.Text>
+          <UI.Hr />
+          <UI.Grid pt={2} gridTemplateColumns="1fr 1fr">
+            <UI.Div>
+              <UI.Text color="gray.500" fontSize="0.8rem">
+                {t('dialogue:qr_download_helper')}
+              </UI.Text>
+            </UI.Div>
+            <UI.ColumnFlex alignItems="center">
+              <UI.Div ref={qrContainerRef}>
+                <QRCode fgColor={qrColor} value={shareUrl} />
+              </UI.Div>
+              <Button
+                margin="0 auto"
+                onClick={handleDownload}
+                as="a"
+                variantColor="teal"
+                mt={1}
+                size="xs"
+                leftIcon={() => <Download size={12} />}
+              >
+                <Text ml={1}>Download</Text>
+              </Button>
+            </UI.ColumnFlex>
+          </UI.Grid>
+        </UI.Div>
+        <Div mb={4}>
+          <Text fontWeight={600} fontSize="1.3rem" color="gray.700">{t('dialogue:share_link')}</Text>
+          <UI.Hr />
+
+          <Flex>
+            <Div flexGrow={1} pt={2}>
+              <UI.Input
+                rightEl={(
+                  <UI.Button width="auto" size="sm" onClick={onCopy} leftIcon={Clipboard}>
+                    {hasCopied ? 'Copied' : 'Copy'}
+                  </UI.Button>
+            )}
+                value={shareUrl}
+                isReadOnly
+              />
+            </Div>
+
+          </Flex>
+        </Div>
+      </UI.CardBody>
+    </UI.Card>
+  );
+};
+
 const calcScoreIncrease = (currentScore: number, prevScore: number) => {
   if (!prevScore) return 100;
 
@@ -224,6 +309,7 @@ const DialogueView = () => {
   };
 
   if (!dialogue) return <Loader />;
+  const shareUrl = `https://client.haas.live/${customerSlug}/${dialogueSlug}`;
 
   return (
     <DialogueViewContainer>
@@ -233,9 +319,15 @@ const DialogueView = () => {
             <ChartbarIcon />
           </UI.Icon>
           {t('views:dialogue_view')}
-          <UI.Button variantColor="teal" leftIcon={QRIcon} ml={4} size="sm">
-            {t('share')}
-          </UI.Button>
+          <Dropdown
+            offset={[0, 0]}
+            minWidth={400}
+            renderOverlay={<ShareDialogue dialogueName={dialogueSlug} shareUrl={shareUrl} />}
+          >
+            <UI.Button variantColor="teal" leftIcon={QRIcon} ml={4} size="sm">
+              {t('share')}
+            </UI.Button>
+          </Dropdown>
         </PageTitle>
         <UI.Div mb={4}>
           <DatePickerExpanded activeLabel={activeDateState.dateLabel} dispatch={dispatch} />
