@@ -751,6 +751,10 @@ const language = {
     },
   },
   views: {
+    configurations: {
+      en: 'Configurations',
+      de: 'Konfigurationen',
+    },
     invite_user: {
       en: 'Invite user',
       de: 'Benutzer einladen',

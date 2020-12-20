@@ -1,3 +1,4 @@
+import * as UI from '@haas/ui';
 import * as qs from 'qs';
 import { Activity, Award, BarChart, MessageCircle,
   ThumbsDown, ThumbsUp, TrendingDown, TrendingUp } from 'react-feather';
@@ -11,7 +12,9 @@ import React, { useReducer } from 'react';
 import gql from 'graphql-tag';
 import styled, { css } from 'styled-components/macro';
 
+import { ReactComponent as ChartbarIcon } from 'assets/icons/icon-chartbar.svg';
 import { ReactComponent as PathsIcon } from 'assets/icons/icon-launch.svg';
+import { ReactComponent as QRIcon } from 'assets/icons/icon-qr.svg';
 import { ReactComponent as TrendingIcon } from 'assets/icons/icon-trending-up.svg';
 import { ReactComponent as TrophyIcon } from 'assets/icons/icon-trophy.svg';
 
@@ -126,6 +129,7 @@ const getDialogueStatistics = gql`
       id
       dialogue(where: { slug: $dialogueSlug }) {
         id
+        title
         thisWeekAverageScore: averageScore(input: $statisticsDateFilter)
         previousScore: averageScore(input: $prevDateFilter)
         sessions(take: 3) {
@@ -223,12 +227,19 @@ const DialogueView = () => {
 
   return (
     <DialogueViewContainer>
-      <Flex justifyContent="space-between">
+      <Flex justifyContent="space-between" flexWrap="wrap">
         <PageTitle>
-          <Icon as={BarChart} mr={1} />
+          <UI.Icon mr={1}>
+            <ChartbarIcon />
+          </UI.Icon>
           {t('views:dialogue_view')}
+          <UI.Button variantColor="teal" leftIcon={QRIcon} ml={4} size="sm">
+            {t('share')}
+          </UI.Button>
         </PageTitle>
-        <DatePickerExpanded activeLabel={activeDateState.dateLabel} dispatch={dispatch} />
+        <UI.Div mb={4}>
+          <DatePickerExpanded activeLabel={activeDateState.dateLabel} dispatch={dispatch} />
+        </UI.Div>
       </Flex>
       <Grid gridTemplateColumns={['1fr', '1fr', '1fr 1fr 1fr']}>
         <Div gridColumn="1 / 4">

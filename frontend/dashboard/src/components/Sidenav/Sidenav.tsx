@@ -1,3 +1,4 @@
+import * as UI from '@haas/ui';
 import { AvatarBadge, Badge, Button, Avatar as ChakraAvatar, useToast } from '@chakra-ui/core';
 import { Div, Flex, Text } from '@haas/ui';
 import { ExternalLink, LogOut } from 'react-feather';
@@ -12,44 +13,79 @@ import { useTranslation } from 'react-i18next';
 import { useUser } from 'providers/UserProvider';
 import useAuth from 'hooks/useAuth';
 
+import { AnimatePresence, motion } from 'framer-motion';
+import { ensureDarkColor } from 'utils/ColorUtils';
 import Dropdown from 'components/Dropdown';
 import List from 'components/List/List';
 import ListItem from 'components/List/ListItem';
 
-interface NavItemProps extends LinkProps { }
+interface NavItemProps extends LinkProps {
+  renderSibling?: React.ReactNode;
+  exact?: boolean;
+  isSubchildActive?: boolean;
+}
 
-export const NavItemContainer = styled.li`
+export const NavItemContainer = styled.li<{ isSubchildActive?: boolean }>`
+  ${({ theme, isSubchildActive }) => css`
+    position: relative;
+    
+    ${isSubchildActive && css`
+      border-radius: 5px;
+      border: 1px solid ${theme.colors.gray[200]};
+      overflow: hidden;
+        
+      &::before {
+        content: '';
+        top: 0;
+        z-index: 200;
+        bottom: 0;
+        position: absolute;
+        left: 0;
+        height: 100%;
+        width: 3px;
+        background: ${theme.colors.primaryGradient};
+      }
+    `}
+  `}
 `;
 
-export const NavItem = ({ children, ...props }: NavItemProps) => (
-  <NavItemContainer>
+export const NavItem = ({ children, renderSibling, isSubchildActive, ...props }: NavItemProps) => (
+  <NavItemContainer isSubchildActive={isSubchildActive}>
     <NavLinkContainer {...props}>{children}</NavLinkContainer>
+    <motion.div layout animate={{ opacity: 1 }} initial={{ opacity: 0 }}>
+      <AnimatePresence>
+        {renderSibling}
+      </AnimatePresence>
+    </motion.div>
   </NavItemContainer>
 );
 
 export const NavLinkContainer = styled(NavLink) <LinkProps>`
   ${({ theme }) => css`
-    color: ${theme.isDarkColor ? Color(theme.colors.primaries['100']).lighten(0.2).hex() : theme.colors.primaries['300']};
+    color: ${theme.isDarkColor ? theme.colors.primaries['400'] : theme.colors.primaries['600']};
     padding: 8px 11px;
-    margin-left: ${theme.gutter}px;
     display: flex;
     align-items: center;
-    flex-direction: column;
-    font-size: 0.7rem;
+    font-size: 0.8rem;
 
     /* For the icons */
     svg {
+      margin-right: ${theme.gutter / 2}px;
       width: 24px;
-      fill: ${theme.isDarkColor ? theme.colors.primaries['100'] : theme.colors.primaries['300']};
+      fill: ${theme.isDarkColor ? theme.colors.primaries['400'] : theme.colors.primaries['500']};
 
       .secondary {
-        fill: ${theme.isDarkColor ? theme.colors.primaries['100'] : theme.colors.primaries['600']};
+        fill: ${theme.isDarkColor ? theme.colors.primaries['200'] : theme.colors.primaries['700']};
       }
+    }
+
+    &:hover {
+      color: ${theme.isDarkColor ? theme.colors.primaries['200'] : theme.colors.primaries['400']};
     }
 
     /* If active react router */
     &.active {
-      background: ${theme.isDarkColor ? theme.colors.primaries['300'] : theme.colors.primaries['800']};
+      background: ${theme.colors.primaryGradient};
       border-radius: ${theme.borderRadiuses.somewhatRounded};
       color: white;
 
@@ -60,12 +96,14 @@ export const NavLinkContainer = styled(NavLink) <LinkProps>`
   `}
 `;
 
-export const NavItems = styled.ul`
+export const NavItems = styled.div`
   ${({ theme }) => css`
-    list-style: none;
+    ul {
+      list-style: none;
 
-    ${NavItemContainer} + ${NavItemContainer} {
-      margin-top: ${theme.gutter}px;
+      ${NavItemContainer} + ${NavItemContainer} {
+        margin-top: ${theme.gutter / 2}px;
+      }
     }
   `}
 `;
@@ -222,10 +260,10 @@ export const SidenavContainer = styled.div`
     z-index: 1200;
     font-weight: 1000;
     width: ${theme.sidenav.width}px;
+    border-right: 1px solid ${theme.colors.gray['200']};
 
-    background: ${theme.isDarkColor ? theme.colors.primary : theme.colors.primaries['700']};
+    /* background: ${theme.isDarkColor ? theme.colors.primary : theme.colors.primaries['700']}; */
     display: flex;
-    padding-top: ${theme.gutter}px;
     height: 100vh;
     flex-direction: column;
     justify-content: space-between;
@@ -235,18 +273,29 @@ export const SidenavContainer = styled.div`
     }
 
     ${LogoContainer} {
-      color: ${theme.isDarkColor ? theme.colors.primaries['100'] : theme.colors.primaries['800']};
+      color: ${theme.colors.strongPrimary};
+
+      svg {
+        widht: 100%;
+        height: 100%;
+      }
+    }
+    
+    ${LogoContainer} + ${UI.Text} {
+      color: ${theme.colors.strongPrimary};
+      font-weight: 900;
+      font-size: 1.5rem;
     }
 
     ${NavItems} {
-      padding-top: 100px;
+      padding-top: ${theme.gutter}px;
     }
 
     ul {
       a {
         text-decoration: none;
-        margin-left: ${theme.gutter * 0.5}px;
-        margin-right: ${theme.gutter * 0.5}px;
+        /* margin-left: ${theme.gutter * 0.5}px; */
+        /* margin-right: ${theme.gutter * 0.5}px; */
 
         span {
             display: inline-block;

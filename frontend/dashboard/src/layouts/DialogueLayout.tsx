@@ -1,4 +1,4 @@
-import React, { useContext, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 
 import { Activity, BarChart, Clipboard, Download, Mail, Menu, Share, Sliders, Zap } from 'react-feather';
 import { Button, Icon, IconButton, Modal, ModalBody,
@@ -6,6 +6,7 @@ import { Button, Icon, IconButton, Modal, ModalBody,
 import { ColumnFlex, Div, ExtLinkContainer, Flex, Grid, Hr, Input, Text, ViewContainer } from '@haas/ui';
 import { NavLink } from 'react-router-dom';
 import { Variants, motion } from 'framer-motion';
+import { useDialogue } from 'providers/DialogueProvider';
 import { useHistory, useParams } from 'react-router';
 import { useQuery } from '@apollo/react-hooks';
 import { useTranslation } from 'react-i18next';
@@ -328,6 +329,7 @@ const DialogueLayoutContainer = styled.div<{ isMobile: boolean }>`
 
 const DialogueLayout = ({ children }: DialogueLayoutProps) => {
   const { customerSlug, dialogueSlug } = useParams<{customerSlug: string, dialogueSlug: string}>();
+  const { setActiveDialogue } = useDialogue();
   const device = useMediaDevice();
 
   const { data, loading } = useQuery(getSharedDialogueLayoutQuery, {
@@ -344,32 +346,19 @@ const DialogueLayout = ({ children }: DialogueLayoutProps) => {
 
   const dialogue = data?.customer?.dialogue;
 
-  if (loading || !dialogue) return <p>Loading!</p>;
+  useEffect(() => {
+    if (data) {
+      setActiveDialogue(data?.customer?.dialogue);
+    }
+
+    return (() => setActiveDialogue(null));
+  }, [data, setActiveDialogue]);
 
   return (
     <>
-      {device.isSmall && (
-        <FloatingBurger onClick={() => setShowContextMenu((showState) => !showState)} />
-      )}
-
-      <DialogueLayoutContainer isMobile={device.isSmall}>
-        <motion.div
-          initial="closed"
-          transition={{ bounceStiffness: 300 }}
-          variants={menuAnimation}
-          animate={showContextMenu || !device.isSmall ? 'open' : 'closed'}
-        >
-          <Div ref={navBarRef}>
-            <DialogueNavBar customerSlug={customerSlug} dialogueSlug={dialogueSlug} dialogue={dialogue} />
-          </Div>
-        </motion.div>
-
-        <Div overflow="hidden">
-          <ViewContainer>
-            {children}
-          </ViewContainer>
-        </Div>
-      </DialogueLayoutContainer>
+      <ViewContainer>
+        {children}
+      </ViewContainer>
     </>
   );
 };
