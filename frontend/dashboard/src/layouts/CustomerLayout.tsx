@@ -5,6 +5,7 @@ import styled, { css } from 'styled-components/macro';
 
 import { AnimatePresence, AnimateSharedLayout, motion } from 'framer-motion';
 import { ReactComponent as ChartIcon } from 'assets/icons/icon-chartbar.svg';
+import { ReactComponent as ChatIcon } from 'assets/icons/icon-chat-group.svg';
 import { ReactComponent as CursorClickIcon } from 'assets/icons/icon-cursorclick.svg';
 import { CustomThemeProviders } from 'providers/ThemeProvider';
 import { Div, PageHeading } from '@haas/ui';
@@ -16,6 +17,7 @@ import { ReactComponent as SliderIcon } from 'assets/icons/icon-slider.svg';
 import { ReactComponent as SurveyIcon } from 'assets/icons/icon-survey.svg';
 import { ReactComponent as TableIcon } from 'assets/icons/icon-table.svg';
 import { ReactComponent as UsersIcon } from 'assets/icons/icon-user-group.svg';
+
 import { ReactComponent as WrenchIcon } from 'assets/icons/icon-wrench.svg';
 import { ReactComponent as ZapIcon } from 'assets/icons/icon-zap.svg';
 import { useTranslation } from 'react-i18next';
@@ -154,22 +156,26 @@ const DashboardNav = ({ customerSlug }: { customerSlug: string }) => {
             {t('dialogues')}
           </NavItem>
           {canViewUsers && (
-          <NavItem to={`/dashboard/b/${customerSlug}/users`}>
-            <UsersIcon />
-            {t('users')}
-          </NavItem>
+            <NavItem to={`/dashboard/b/${customerSlug}/users`}>
+              <UsersIcon />
+              {t('users')}
+            </NavItem>
           )}
           {canCreateTriggers && (
-          <NavItem to={`/dashboard/b/${customerSlug}/triggers`}>
-            <NotificationIcon />
-            {t('alerts')}
-          </NavItem>
+            <NavItem to={`/dashboard/b/${customerSlug}/triggers`}>
+              <NotificationIcon />
+              {t('alerts')}
+            </NavItem>
           )}
-          {canEditCustomer && (
-          <NavItem to={`/dashboard/b/${customerSlug}/edit`}>
-            <SettingsIcon />
-            {t('settings')}
+          <NavItem to={`/dashboard/b/${customerSlug}/campaigns`}>
+            <ChatIcon />
+            {t('campaigns')}
           </NavItem>
+          {canEditCustomer && (
+            <NavItem to={`/dashboard/b/${customerSlug}/edit`}>
+              <SettingsIcon />
+              {t('settings')}
+            </NavItem>
           )}
         </AnimateSharedLayout>
       </motion.ul>

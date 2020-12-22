@@ -4,6 +4,7 @@ export const ROUTES = {
   WORKSPACE_ROOT: '/dashboard/b/:customerSlug',
   DIALOGUES_VIEW: '/dashboard/b/:customerSlug/d',
   DIALOGUE_ROOT: '/dashboard/b/:customerSlug/d/:dialogueSlug',
+  CAMPAIGNS_VIEW: '/dashboard/b/:customerSlug/campaigns',
 };
 
 export const useNavigator = () => {
@@ -16,10 +17,15 @@ export const useNavigator = () => {
     path: ROUTES.DIALOGUES_VIEW,
   });
 
+  const campaignsMatch = useRouteMatch({
+    path: ROUTES.CAMPAIGNS_VIEW,
+  });
+
   return {
     dialoguesMatch,
     dialogueMatch,
     customerSlug,
     dialogueSlug,
+    campaignsMatch,
   };
 };

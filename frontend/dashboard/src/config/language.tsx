@@ -1,6 +1,10 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    campaigns: {
+      en: 'Campaigns',
+      de: 'Kampagnen',
+    },
     is_required: {
       en: 'Is the field required?',
       de: 'Ist das Feld erforderlich?',

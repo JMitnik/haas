@@ -17,6 +17,7 @@ export const Modal = ({ isOpen, children, onClose }: {isOpen: boolean, children:
     <ReactModal
       isOpen={isOpen} 
       onRequestClose={onClose}
+      shouldCloseOnOverlayClick
       style={{
         overlay: {
           position: 'fixed',

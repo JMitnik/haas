@@ -290,7 +290,16 @@ const ButtonRadioContainer = styled.div`
   }
 `;
 
-export const RadioButton = forwardRef((props: any, ref) => {
+interface RadioButtonProps {
+  isChecked?: boolean;
+  isDisabled?: boolean;
+  value?: any;
+  text?: string;
+  description?: string;
+  icon?: any;
+}
+
+export const RadioButton = forwardRef((props: RadioButtonProps, ref) => {
   const { isChecked, isDisabled, value, text, description, icon, ...rest } = props;
 
   return (

@@ -9,12 +9,14 @@ import React, { FC } from 'react';
 import { AppContainer } from 'styles/AppStyles';
 import { DefaultThemeProviders } from 'providers/ThemeProvider';
 import { DialogueProvider } from 'providers/DialogueProvider';
+import { ROUTES } from 'hooks/useNavigator';
 import { SystemPermission } from 'types/globalTypes';
 import ActionsPage from 'pages/dashboard/actions';
 import AddCustomerPage from 'pages/dashboard/customers/add';
 import AddDialogueView from 'views/AddDialogueView';
 import AddTriggerView from 'views/TriggerOverview/AddTriggerView';
 import AnalyticsPage from 'pages/dashboard/analytics';
+import CampaignsView from 'views/CampaignsView/CampaignsView';
 import CustomerLayout from 'layouts/CustomerLayout';
 import CustomerPage from 'pages/dashboard/customer';
 import CustomerProvider from 'providers/CustomerProvider';
@@ -92,6 +94,11 @@ const CustomerRoutes = () => (
                   </Switch>
                 </DialogueLayout>
               )}
+            />
+
+            <CustomerRoute
+              path={ROUTES.CAMPAIGNS_VIEW}
+              render={() => <CampaignsView />}
             />
 
             <CustomerRoute
