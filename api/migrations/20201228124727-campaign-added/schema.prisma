@@ -1,6 +1,6 @@
 datasource postgresql {
   provider = "postgresql"
-  url      = env("DB_STRING")
+  url = "***"
 }
 
 // binaryTargets = ["debian-openssl-1.1.x"]
@@ -556,11 +556,6 @@ enum DeliveryStatusTypeEnum {
 model Delivery {
   // We generated the ID ourselves
   id  String @id
-
-  deliveryRecipientFirstName String?
-  deliveryRecipientLastName String?
-  deliveryRecipientEmail String?
-  deliveryRecipientPhone String?
 
   campaignId  String
   campaign  Campaign @relation(fields: [campaignId], references: [id])

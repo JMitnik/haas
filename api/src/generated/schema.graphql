@@ -42,6 +42,18 @@ interface ConnectionInterface {
   startDate: String
 }
 
+input CreateBatchDeliveriesInputType {
+  batchScheduledAt: String
+  campaignId: ID
+  label: String
+  uploadedCsv: Upload
+}
+
+type CreateBatchDeliveriesOutputType {
+  failedDeliveries: [FailedDeliveryModel!]!
+  nrDeliveries: Int!
+}
+
 input CreateCampaignInputType {
   label: String
   variants: [CreateCampaignVariantInputType!]
@@ -177,6 +189,19 @@ type DeleteUserOutput {
   deletedUser: Boolean!
 }
 
+"""Delivery"""
+type Delivery {
+  id: ID!
+}
+
+enum DeliveryStatusEnum {
+  DEPLOYED
+  FINISHED
+  OPENED
+  SCHEDULED
+  SENT
+}
+
 type Dialogue {
   averageScore(input: DialogueFilterInputType): Float!
   creationDate: String
@@ -264,6 +289,11 @@ input EditWorkspaceInput {
   name: String!
   primaryColour: String!
   slug: String!
+}
+
+type FailedDeliveryModel {
+  error: String!
+  record: String!
 }
 
 type FontSettings {
@@ -398,6 +428,7 @@ type Mutation {
   appendToInteraction(input: AppendToInteractionInput): Session!
   assignTags(dialogueId: String, tags: TagsInputObjectType): Dialogue!
   copyDialogue(input: CreateDialogueInputType): Dialogue!
+  createBatchDeliveries(input: CreateBatchDeliveriesInputType): CreateBatchDeliveriesOutputType!
   createCampaign(input: CreateCampaignInputType): Campaign!
 
   """Create Call to Actions"""
