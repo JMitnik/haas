@@ -3,6 +3,7 @@ import 'antd/dist/antd.css'; // Slider,
 import { Slider as AntdSlider } from 'antd';
 import { Div, Paragraph } from '@haas/ui';
 import {
+  ButtonProps as ChakraButtonProps,
   Button,
   FormControl as ChakraFormControl,
   FormLabel as ChakraFormLabel,
@@ -290,13 +291,14 @@ const ButtonRadioContainer = styled.div`
   }
 `;
 
-interface RadioButtonProps {
+interface RadioButtonProps extends ChakraButtonProps {
   isChecked?: boolean;
   isDisabled?: boolean;
   value?: any;
   text?: string;
   description?: string;
   icon?: any;
+  children?: any;
 }
 
 export const RadioButton = forwardRef((props: RadioButtonProps, ref) => {

@@ -1,12 +1,8 @@
-import * as csvParser from 'fast-csv';
 import { UserInputError } from 'apollo-server';
 import { inputObjectType, mutationField, objectType } from '@nexus/schema';
-import { isPresent } from 'ts-is-present';
 import { nanoid } from 'nanoid';
 
-import { CampaignCreateInput, CampaignVariantTypeEnum } from '@prisma/client';
-import { DeliveryModel } from './DeliveryModel';
-import { NexusGenInputs } from '../../generated/nexus';
+import { CampaignVariantTypeEnum } from '@prisma/client';
 import { parseCsv } from '../../utils/parseCsv';
 import { probability } from '../../utils/probability';
 import prisma from '../../config/prisma';
@@ -39,7 +35,6 @@ export const FailedDeliveryModel = objectType({
 export const CreateBatchDeliveriesOutputType = objectType({
   name: 'CreateBatchDeliveriesOutputType',
   definition(t) {
-    // t.list.field('deliveries', { type: DeliveryModel });
     t.list.field('failedDeliveries', { type: FailedDeliveryModel });
     t.int('nrDeliveries');
   },
