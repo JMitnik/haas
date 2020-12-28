@@ -502,3 +502,76 @@ model QuestionOfTrigger {
 
   @@id([questionId, triggerId])
 }
+
+// Campaigns
+enum CampaignVariantTypeEnum {
+  EMAIL
+  SMS
+  QUEUE
+}
+
+model Campaign {
+  id  String  @id @default(cuid())
+  label       String
+  deliveries  Delivery[]
+  variantsEdges    CampaignVariantToCampaign[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model CampaignVariantToCampaign {
+  campaignId  String
+  campaign  Campaign @relation(fields: [campaignId], references: [id])
+
+  campaignVariantId String
+  campaignVariant CampaignVariant @relation(fields: [campaignVariantId], references: [id])
+
+  // Weight decides in A/B testing which 
+  weight  Float
+
+  @@id([campaignId, campaignVariantId])
+}
+
+model CampaignVariant {
+  id  String @id @default(cuid())
+  label     String
+  body      String
+   
+  workspace   Customer
+  dialogue    Dialogue
+
+  subject   String?
+  type      CampaignVariantTypeEnum
+}
+
+enum DeliveryStatusTypeEnum {
+  SCHEDULED
+  DEPLOYED
+  SENT
+  OPENED
+  FINISHED
+}
+
+model Delivery {
+  // We generated the ID ourselves
+  id  String @id
+
+  campaignId  String
+  campaign  Campaign @relation(fields: [campaignId], references: [id])
+
+  campaignVariantId String
+  campaignVariant CampaignVariant @relation(fields: [campaignVariantId], references: [id])
+
+  currentStatus  DeliveryStatusTypeEnum
+
+  scheduledAt DateTime
+
+  events  DeliveryEvents[]
+}
+
+model DeliveryEvents {
+  id String @id @default(cuid())
+  status DeliveryStatusTypeEnum
+  createdAt DateTime @default(now())
+}

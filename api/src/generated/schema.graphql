@@ -10,6 +10,17 @@ input AppendToInteractionInput {
   sessionId: ID
 }
 
+"""Campaign"""
+type Campaign {
+  id: ID!
+}
+
+enum CampaignVariantEnum {
+  EMAIL
+  QUEUE
+  SMS
+}
+
 """Input type for a choice node"""
 input ChoiceNodeEntryInput {
   value: String
@@ -29,6 +40,21 @@ interface ConnectionInterface {
   offset: Int!
   pageInfo: PaginationPageInfo!
   startDate: String
+}
+
+input CreateCampaignInputType {
+  label: String
+  variants: [CreateCampaignVariantInputType!]
+}
+
+input CreateCampaignVariantInputType {
+  body: String
+  dialogueId: ID!
+  label: String
+  subject: String
+  type: CampaignVariantEnum!
+  weight: Float
+  workspaceId: ID!
 }
 
 input CreateCTAInputType {
@@ -372,6 +398,7 @@ type Mutation {
   appendToInteraction(input: AppendToInteractionInput): Session!
   assignTags(dialogueId: String, tags: TagsInputObjectType): Dialogue!
   copyDialogue(input: CreateDialogueInputType): Dialogue!
+  createCampaign(input: CreateCampaignInputType): Campaign!
 
   """Create Call to Actions"""
   createCTA(input: CreateCTAInputType): QuestionNode!
