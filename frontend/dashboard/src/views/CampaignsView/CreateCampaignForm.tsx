@@ -62,7 +62,7 @@ const CreateCampaignForm = () => {
           <UI.Div>
             <UI.FormSectionHeader>{t('variants')}</UI.FormSectionHeader>
             {variants.map((variant, index) => (
-              <UI.Button>
+              <UI.Button key={variant.variantIndex}>
                 {`${t('variant')} ${mapVariantIndexToLabel[index]}`}
               </UI.Button>
             ))}

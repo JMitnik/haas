@@ -92,7 +92,7 @@
         "start": "cra-workspaces start",
         "build": "cra-workspaces build",
         "test": "react-scripts test",
-        "test:watch": "jest test --watch",
+        "test:watch": "jest test --watch --maxWorkers=0",
         "gen": "apollo codegen:generate --target typescript --globalTypesFile='src/types/globalTypes.ts'",
         "eject": "react-scripts eject",
         "eslint": "eslint --ext .js,.jsx,.ts,.tsx ./src"

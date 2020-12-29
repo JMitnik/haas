@@ -550,11 +550,11 @@ export const RadioButtons = ({ children, onChange, value, onBlur }: RadioButtons
   </ChakraRadioButtonGroup>
 )
 
-export const InputGrid = forwardRef((props: InputGridProps, ref: Ref<HTMLDivElement>) => (
+export const InputGrid = (props: InputGridProps) => (
   <Grid mb={4} gridTemplateColumns={['1fr', '1fr', '1fr']} {...props}>
     {props.children}
   </Grid>
-));
+);
 
 interface CardFormProps {
   dualPane?: boolean;

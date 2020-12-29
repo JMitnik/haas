@@ -15,16 +15,16 @@ const ButtonContainer = styled.div`
   }
 `;
 
-export const Button = forwardRef((props: ButtonProps) => (
+export const Button = (props: ButtonProps) => (
   <ButtonContainer>
     <ChakraButton {...props} />
   </ButtonContainer>
-));
+);
 
-export const ButtonGroup = forwardRef((props: ChakraButtonGroupProps) => (
+export const ButtonGroup = (props: ChakraButtonGroupProps) => (
   <ChakraButtonGroup {...props} />
-));
+);
 
-export const IconButton = forwardRef((props: ChakraIconButtonProps) => (
+export const IconButton = (props: ChakraIconButtonProps) => (
   <ChakraIconButton {...props} />
-));
+);
