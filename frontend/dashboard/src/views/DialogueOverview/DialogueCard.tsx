@@ -4,7 +4,7 @@ import { formatDistance } from 'date-fns';
 import { useHistory, useParams } from 'react-router';
 import { useMutation } from '@apollo/react-hooks';
 import React, { useRef } from 'react';
-import styled, { css } from 'styled-components/macro';
+import styled, { css } from 'styled-components';
 
 import { Button, Popover, PopoverArrow, PopoverBody, PopoverCloseButton,
   PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast } from '@chakra-ui/core';

@@ -291,14 +291,13 @@ const ButtonRadioContainer = styled.div`
   }
 `;
 
-interface RadioButtonProps extends ChakraButtonProps {
+interface RadioButtonProps {
   isChecked?: boolean;
   isDisabled?: boolean;
   value?: any;
   text?: string;
   description?: string;
   icon?: any;
-  children?: any;
 }
 
 export const RadioButton = forwardRef((props: RadioButtonProps, ref) => {

@@ -9,5 +9,12 @@ module.exports = {
   transform: {
     '^.+\\.(ts|tsx)$': 'ts-jest',
   },
+  moduleDirectories: [
+    'node_modules',
+    'src',
+  ],
+  moduleNameMapper: {
+    '\\.(css|less)$': '<rootDir>/src/test/mocks/styleMock.js',
+  },
 };
 

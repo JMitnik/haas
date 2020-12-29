@@ -3,7 +3,7 @@ import { Icon, Tooltip } from '@chakra-ui/core';
 import { formatDistanceToNow } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
-import styled, { css } from 'styled-components/macro';
+import styled, { css } from 'styled-components';
 
 import { Div, Flex, Span, Text } from '@haas/ui';
 import {

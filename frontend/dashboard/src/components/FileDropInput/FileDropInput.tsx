@@ -3,7 +3,7 @@ import { Spinner } from '@chakra-ui/core';
 import { useDropzone } from 'react-dropzone';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
-import styled, { css } from 'styled-components/macro';
+import styled, { css } from 'styled-components';
 
 const getDropColor = (props: any) => {
   if (props.isDragAccept) {

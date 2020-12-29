@@ -1,4 +1,4 @@
-import styled, { css } from 'styled-components/macro';
+import styled, { css } from 'styled-components';
 import { Div } from './Generics';
 import { Flex } from './Container';
 import { Span } from './Span';

@@ -7,7 +7,7 @@ import { useUser } from 'providers/UserProvider';
 import React, { useEffect, useRef } from 'react';
 import formatServerError from 'utils/formatServerError';
 import gql from 'graphql-tag';
-import styled from 'styled-components/macro';
+import styled from 'styled-components';
 
 const verifyUserTokenQuery = gql`
   mutation verifyUserToken($token: String!) {

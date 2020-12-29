@@ -1,5 +1,5 @@
 import { NavLinkProps, NavLink } from 'react-router-dom';
-import styled, { css } from 'styled-components/macro';
+import styled, { css } from 'styled-components';
 
 const Tabbar = styled.div`
   ${({ theme }) => css`

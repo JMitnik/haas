@@ -2,7 +2,7 @@ import Color from 'color';
 
 import { Container, Div } from '@haas/ui';
 import { motion } from 'framer-motion';
-import styled, { css } from 'styled-components/macro';
+import styled, { css } from 'styled-components';
 
 export const DialogueTreeContainer = styled(Div)`
   ${({ theme }) => css`

@@ -1,4 +1,4 @@
-import styled, { css } from 'styled-components/macro';
+import styled, { css } from 'styled-components';
 import React, { FC } from 'react';
 import { Link } from 'react-router-dom';
 import { Settings } from 'react-feather';
@@ -19,17 +19,6 @@ const TopNavContainer = styled(Div)<GenericProps>`
     }
   `}
 `;
-
-const UserNav: FC = () => (
-  <Div useFlex width={1 / 10} alignItems="center" justifyContent="space-evenly">
-    <Link to="/settings">
-      <Settings />
-    </Link>
-    <Div pl={4}>
-      <ProfilePic />
-    </Div>
-  </Div>
-);
 
 export const ExtLinkContainer = styled.a<ColorProps>`
   ${({ theme }) => css`

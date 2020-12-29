@@ -1,4 +1,4 @@
-import styled, { css } from 'styled-components/macro';
+import styled, { css } from 'styled-components';
 import React from 'react';
 import { Text } from './Type';
 import Card from './Cards';

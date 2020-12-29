@@ -5,7 +5,7 @@ import { ExternalLink, LogOut } from 'react-feather';
 import { Link, LinkProps, NavLink, useHistory } from 'react-router-dom';
 import Color from 'color';
 import React from 'react';
-import styled, { css } from 'styled-components/macro';
+import styled, { css } from 'styled-components';
 
 import { FullLogo, FullLogoContainer, LogoContainer } from 'components/Logo/Logo';
 import { useCustomer } from 'providers/CustomerProvider';

@@ -3,7 +3,7 @@ import { debounce } from 'lodash';
 import { useLazyQuery } from '@apollo/react-hooks';
 import { useParams } from 'react-router-dom';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import styled from 'styled-components/macro';
+import styled from 'styled-components';
 
 import { Div, Flex, PageTitle } from '@haas/ui';
 import LinkIcon from 'components/Icons/LinkIcon';

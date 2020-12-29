@@ -11,7 +11,7 @@ import { useTranslation } from 'react-i18next';
 import QRCode from 'qrcode.react';
 import React, { useContext, useReducer, useRef } from 'react';
 import gql from 'graphql-tag';
-import styled, { ThemeContext, css } from 'styled-components/macro';
+import styled, { ThemeContext, css } from 'styled-components';
 
 import { ReactComponent as ChartbarIcon } from 'assets/icons/icon-chartbar.svg';
 import { ReactComponent as PathsIcon } from 'assets/icons/icon-launch.svg';

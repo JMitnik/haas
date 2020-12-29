@@ -1,5 +1,5 @@
 import { Card } from '@haas/ui';
-import styled, { css } from 'styled-components/macro';
+import styled, { css } from 'styled-components';
 
 export const CustomerCardImage = styled.img`
   position: absolute;

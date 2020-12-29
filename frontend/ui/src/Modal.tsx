@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import React, { useEffect, useRef } from 'react';
 import ReactModal from 'react-modal';
-import styled from 'styled-components/macro';
+import styled from 'styled-components';
 import { Div } from './Generics';
 
 export const ModalBody = styled(Div)`
@@ -10,7 +10,7 @@ export const ModalBody = styled(Div)`
   left: 50%;
 `;
 
-ReactModal.setAppElement('#root');
+if (process.env.NODE_ENV !== 'test') ReactModal.setAppElement('#root');
 
 const useOnClickOutside = (ref: any, handler: any) => {
   useEffect(

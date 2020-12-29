@@ -11,7 +11,7 @@ import { useHistory, useParams } from 'react-router';
 import { useLazyQuery, useQuery } from '@apollo/react-hooks';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Select from 'react-select';
-import styled from 'styled-components/macro';
+import styled from 'styled-components';
 
 import 'antd/dist/antd.css'; // Slider,
 import { Button, ButtonGroup, FormErrorMessage, RadioButtonGroup, Tag, TagIcon } from '@chakra-ui/core';

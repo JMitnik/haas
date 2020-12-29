@@ -1,6 +1,6 @@
 import { Flex } from '@haas/ui';
 import React from 'react';
-import styled, { css } from 'styled-components/macro';
+import styled, { css } from 'styled-components';
 
 export const AvatarContainer = styled.div`
   ${({ theme }) => css`

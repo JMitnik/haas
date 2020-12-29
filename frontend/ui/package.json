@@ -40,6 +40,8 @@
     "typescript": "~3.7.4"
   },
   "devDependencies": {
+    "@babel/preset-env": "^7.12.11",
+    "babel-jest": "^26.6.3",
     "eslint-plugin-react": "^7.17.0",
     "eslint-plugin-react-hooks": "^2.3.0"
   },

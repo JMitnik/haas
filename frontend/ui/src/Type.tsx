@@ -1,4 +1,4 @@
-import styled, { css } from 'styled-components/macro';
+import styled, { css } from 'styled-components';
 import { TypographyProps, typography, space, SpaceProps, color, ColorProps } from 'styled-system';
 
 interface GenericTypeProps extends TypographyProps, SpaceProps, ColorProps {}

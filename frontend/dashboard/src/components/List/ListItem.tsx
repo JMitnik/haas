@@ -1,6 +1,6 @@
 import { Div, Span } from '@haas/ui';
 import React, { ReactNode } from 'react';
-import styled, { css } from 'styled-components/macro';
+import styled, { css } from 'styled-components';
 
 interface ListItemContainerProps {
   isNotClickable?: boolean;

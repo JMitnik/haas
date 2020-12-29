@@ -4,7 +4,7 @@ import {
   ButtonGroup as ChakraButtonGroup, ButtonGroupProps as ChakraButtonGroupProps,
   IconButton as ChakraIconButton, IconButtonProps as ChakraIconButtonProps
 } from '@chakra-ui/core';
-import styled, { css } from 'styled-components/macro';
+import styled, { css } from 'styled-components';
 
 
 export interface ButtonProps extends ChakraButtonProps {};

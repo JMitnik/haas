@@ -1,5 +1,5 @@
 import { Div, Text } from '@haas/ui';
-import styled, { css } from 'styled-components/macro';
+import styled, { css } from 'styled-components';
 
 const FallbackContainer = styled(Div)`
     ${({ theme }) => css`

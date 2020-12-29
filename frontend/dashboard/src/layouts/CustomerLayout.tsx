@@ -1,7 +1,7 @@
 import * as UI from '@haas/ui';
 import { useParams, useRouteMatch } from 'react-router';
 import React from 'react';
-import styled, { css } from 'styled-components/macro';
+import styled, { css } from 'styled-components';
 
 import { AnimatePresence, AnimateSharedLayout, motion } from 'framer-motion';
 import { ReactComponent as ChartIcon } from 'assets/icons/icon-chartbar.svg';

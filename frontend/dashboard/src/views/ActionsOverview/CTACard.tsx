@@ -8,7 +8,7 @@ import { useToast } from '@chakra-ui/core';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
-import styled, { css } from 'styled-components/macro';
+import styled, { css } from 'styled-components';
 
 import { Flex, Span } from '@haas/ui';
 import { useCustomer } from 'providers/CustomerProvider';

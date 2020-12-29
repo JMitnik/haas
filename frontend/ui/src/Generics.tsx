@@ -1,4 +1,4 @@
-import styled, { css } from 'styled-components/macro';
+import styled, { css } from 'styled-components';
 import { FlexboxProps, borderRadius, border, BorderProps,
   flexbox, width, WidthProps, color, ColorProps, space, SpaceProps, LayoutProps, layout, FlexProps, flex, PositionProps, position, grid, GridProps } from 'styled-system';
 

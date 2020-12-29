@@ -1,5 +1,5 @@
 import { CSSReset, ThemeProvider as ChakraThemeProvider } from '@chakra-ui/core';
-import { ThemeProvider } from 'styled-components/macro';
+import { ThemeProvider } from 'styled-components';
 import React, { useEffect, useState } from 'react';
 
 import { makeCustomTheme } from 'utils/makeCustomerTheme';
