@@ -57,7 +57,7 @@ interface ValidateDeliveryRecordsResults {
  * @param csvRecords
  * @param campaignVariants
  */
-const validateDeliveryRows = (
+export const validateDeliveryRows = (
   csvRecords: any[],
   campaignVariants: CampaignVariantTypeEnum[],
 ): ValidateDeliveryRecordsResults => {

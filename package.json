@@ -41,6 +41,8 @@
         "kill:api": "yarn workspace @haas/api kill",
         "kill:client": "kill $(lsof -t -i:3000) | exit 0",
         "test": "yarn workspace @haas/client test",
+        "test:watch:api": "yarn workspace @haas/api test:watch",
+        "test:watch:dashboard": "yarn workspace @haas/dashboard test:watch",
         "test:cypress-dashboard": "yarn workspace @haas/dashboard cypress open",
         "test:cypress-client": "yarn workspace @haas/client cypress open",
         "restart:api": "yarn kill:api && yarn start:api"

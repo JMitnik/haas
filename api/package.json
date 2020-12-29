@@ -17,6 +17,7 @@
         "restart": "yarn kill && yarn start",
         "serve": "ts-node -P tsconfig.json ./src/app.ts",
         "test": "jest --detectOpenHandles",
+        "test:watch": "jest --watch",
         "migrate:create": "npx prisma migrate save --experimental",
         "migrate": "prisma migrate up --experimental --verbose",
         "gen": "prisma generate && ts-node ./src/config/schema.ts",
