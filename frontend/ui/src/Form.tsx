@@ -17,7 +17,8 @@ import {
   InputGroupProps,
   FormControlProps,
   Textarea as ChakraTextArea,
-  RadioButtonGroup as ChakraRadioButtonGroup} from '@chakra-ui/core';
+  RadioButtonGroup as ChakraRadioButtonGroup,
+} from '@chakra-ui/core';
 import styled, { css } from 'styled-components';
 import { SpaceProps, GridProps } from 'styled-system';
 import { InputHTMLAttributes } from 'react';
@@ -25,34 +26,36 @@ import Color from 'color';
 import { FormLabelProps } from '@chakra-ui/core/dist/FormLabel';
 import { Grid } from './Container';
 import { Text } from './Type';
+import { GenericProps } from './Generics';
 
-export const FormContainer = styled(Div) <{expandedForm?: boolean}>`
+export const FormContainer = styled(Div)<{ expandedForm?: boolean }>`
   ${({ theme, expandedForm }) => css`
     padding-bottom: ${theme.gutter * 3}px;
     background: white;
     padding: ${theme.gutter}px;
     border-radius: 10px;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    
-    ${expandedForm && css`
+
+    ${expandedForm &&
+    css`
       box-shadow: none;
     `}
   `}
 `;
 
 export const FormControl = forwardRef((props: FormControlProps, ref) => {
-  const { children, ...restProps } = props
+  const { children, ...restProps } = props;
 
   return (
     <ChakraFormControl display="flex" flexDirection="column" ref={ref} {...restProps}>
       {children}
     </ChakraFormControl>
-  )
+  );
 });
 
 export const FormGroupContainer = styled.div`
   ${({ theme }) => css`
-      padding-bottom: ${theme.gutter * 3}px;
+    padding-bottom: ${theme.gutter * 3}px;
   `}
 `;
 
@@ -76,7 +79,6 @@ export const Form = styled.form``;
 
 export const DeprecatedInputGroup = styled.div`
   ${({ theme }) => css`
-
     ${DeprecatedInputStyled} {
       border: none;
     }
@@ -121,20 +123,28 @@ interface InputProps extends ChakraInputProps {
   rightAddOn?: ReactNode;
 }
 
-export const Textarea = forwardRef((props: ChakraInputProps<HTMLTextAreaElement>, ref: Ref<HTMLTextAreaElement>) => (
-  <ChakraTextArea {...props} fontSize="0.8rem" ref={ref} />
-));
+export const Textarea = forwardRef(
+  (props: ChakraInputProps<HTMLTextAreaElement>, ref: Ref<HTMLTextAreaElement>) => (
+    <ChakraTextArea {...props} fontSize="0.8rem" ref={ref} />
+  )
+);
 
 export const Input = forwardRef((props: InputProps, ref: Ref<HTMLInputElement>) => (
   <InputGroup>
     {props.leftEl && (
-      <ChakraInputLeftElement color="gray.400" padding="12px"  fontSize="0.5rem" {...props}>
+      <ChakraInputLeftElement color="gray.400" padding="12px" fontSize="0.5rem" {...props}>
         {props.leftEl}
       </ChakraInputLeftElement>
     )}
 
     {props.rightEl && (
-      <ChakraInputRightElement width="auto" color="gray.400" padding="12px" fontSize="0.5rem" {...props}>
+      <ChakraInputRightElement
+        width="auto"
+        color="gray.400"
+        padding="12px"
+        fontSize="0.5rem"
+        {...props}
+      >
         {props.rightEl}
       </ChakraInputRightElement>
     )}
@@ -153,9 +163,12 @@ export const Input = forwardRef((props: InputProps, ref: Ref<HTMLInputElement>) 
 
     <ChakraInput
       errorBorderColor="red.400"
-      roundedBottomLeft={props.leftAddOn ? '0': 'auto'}
-      roundedTopLeft={props.leftAddOn ? '0': 'auto'}
-    {...props} fontSize="0.8rem" ref={ref} />
+      roundedBottomLeft={props.leftAddOn ? '0' : 'auto'}
+      roundedTopLeft={props.leftAddOn ? '0' : 'auto'}
+      {...props}
+      fontSize="0.8rem"
+      ref={ref}
+    />
   </InputGroup>
 ));
 
@@ -172,7 +185,7 @@ export const ErrorStyle = {
   }),
 };
 
-export const StyledInput = styled.input <{isInvalid?: boolean }>`
+export const StyledInput = styled.input<{ isInvalid?: boolean }>`
   ${({ theme, isInvalid }) => css`
     border-radius: ${theme.borderRadiuses.sm};
     background: ${theme.colors.white};
@@ -185,14 +198,15 @@ export const StyledInput = styled.input <{isInvalid?: boolean }>`
     /* Make somehow a color */
     border: 1px solid #dbdde0;
     box-shadow: none;
-    
+
     /* Set to variable */
     padding: 15px;
     width: 100%;
 
-    ${isInvalid && css`
-    border: 1px solid red;
-    outline: none;
+    ${isInvalid &&
+    css`
+      border: 1px solid red;
+      outline: none;
     `}
   `}
 `;
@@ -220,7 +234,7 @@ export const CheckBoxLabel = styled.label`
   cursor: pointer;
 
   &::after {
-    content: "";
+    content: '';
     display: block;
     border-radius: 50%;
     width: 18px;
@@ -240,10 +254,10 @@ export const CheckBox = styled.input`
   height: 26px;
 
   &:checked + ${CheckBoxLabel} {
-    background: #3847B2;
+    background: #3847b2;
 
     &::after {
-      content: "";
+      content: '';
       display: block;
       border-radius: 50%;
       width: 18px;
@@ -258,7 +272,7 @@ type SliderProps = InputHTMLAttributes<HTMLInputElement> | SpaceProps;
 
 export const Slider = forwardRef((props: SliderProps, ref: Ref<HTMLInputElement>) => (
   <SliderContainer>
-    <input {...props} ref={ref} type="range"/>
+    <input {...props} ref={ref} type="range" />
   </SliderContainer>
 ));
 
@@ -298,6 +312,10 @@ interface RadioButtonProps {
   text?: string;
   description?: string;
   icon?: any;
+  mr?: any;
+  ml?: any;
+  mb?: any;
+  mt?: any;
 }
 
 export const RadioButton = forwardRef((props: RadioButtonProps, ref) => {
@@ -320,14 +338,22 @@ export const RadioButton = forwardRef((props: RadioButtonProps, ref) => {
         {...rest}
       >
         <Div>
-          <Paragraph color={!isChecked ? 'gray.600' : 'auto'} fontSize="0.9rem">{text}</Paragraph>
-          <Paragraph color={!isChecked ? 'gray.500' : 'auto'} fontWeight={400} mt={2} fontSize="0.7rem">{description}</Paragraph>
+          <Paragraph color={!isChecked ? 'gray.600' : 'auto'} fontSize="0.9rem">
+            {text}
+          </Paragraph>
+          <Paragraph
+            color={!isChecked ? 'gray.500' : 'auto'}
+            fontWeight={400}
+            mt={2}
+            fontSize="0.7rem"
+          >
+            {description}
+          </Paragraph>
         </Div>
-    </Button>
+      </Button>
     </ButtonRadioContainer>
   );
 });
-
 
 export const DeprecatedInputStyled = styled.input`
   ${({ theme }) => css`
@@ -347,7 +373,8 @@ export const DeprecatedInputStyled = styled.input`
       font-weight: 500;
     }
 
-    &:focus, &:active {
+    &:focus,
+    &:active {
       background: ${Color(theme.colors.primary).mix(Color('white'), 0.9).hex()};
       outline: none !important;
     }
@@ -357,7 +384,7 @@ export const DeprecatedInputStyled = styled.input`
 export const Textbox = styled.textarea`
   ${({ theme }) => css`
     border: none;
-    
+
     font-size: ${theme.fontSizes[1]}px;
     border-radius: 10px;
     font-family: 'Open Sans', sans-serif;
@@ -379,9 +406,8 @@ export const Textbox = styled.textarea`
 
 export const SliderContainer = styled.div`
   ${() => css`
-
     /* TODO: Ensure that size is defined by a variable */
-    input[type=range] {
+    input[type='range'] {
       /* Style the input */
       & {
         -webkit-appearance: none; /* Hides the slider so that custom slider can be made */
@@ -478,7 +504,7 @@ export const SliderContainer = styled.div`
         height: 15px;
         cursor: pointer;
         width: 100%;
-        box-shadow: 0px 2px 2px 1px rgba(0,0,0,0.05);
+        box-shadow: 0px 2px 2px 1px rgba(0, 0, 0, 0.05);
         background: linear-gradient(45deg, rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.04));
         border-radius: 10px;
       }
@@ -489,7 +515,7 @@ export const SliderContainer = styled.div`
         height: 15px;
         cursor: pointer;
         width: 100%;
-        box-shadow: 0px 2px 2px 1px rgba(0,0,0,0.05);
+        box-shadow: 0px 2px 2px 1px rgba(0, 0, 0, 0.05);
         background: linear-gradient(45deg, rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.04));
         border-radius: 10px;
       }
@@ -500,18 +526,22 @@ export const SliderContainer = styled.div`
 export const FormSectionContainer = styled(Grid)`
   ${({ theme }) => css`
     & + & {
-      
     }
   `}
 `;
 
 interface FormSectionProps extends GridProps {
-  children: React.ReactNode; 
+  children: React.ReactNode;
   id?: string;
 }
 
 export const FormSection = forwardRef((props: FormSectionProps, ref: Ref<HTMLDivElement>) => (
-  <FormSectionContainer ref={ref} py={4} gridTemplateColumns={['1fr', '1fr', '1fr', '1fr 3fr']} {...props}>
+  <FormSectionContainer
+    ref={ref}
+    py={4}
+    gridTemplateColumns={['1fr', '1fr', '1fr', '1fr 3fr']}
+    {...props}
+  >
     {props.children}
   </FormSectionContainer>
 ));
@@ -541,14 +571,20 @@ interface RadioButtonsProps {
   children: React.ReactNode;
   onChange: any;
   value: any;
-  onBlur: any
+  onBlur: any;
 }
 
 export const RadioButtons = ({ children, onChange, value, onBlur }: RadioButtonsProps) => (
-  <ChakraRadioButtonGroup display="flex" flexWrap="wrap" onChange={onChange} value={value} onBlur={onBlur}>
+  <ChakraRadioButtonGroup
+    display="flex"
+    flexWrap="wrap"
+    onChange={onChange}
+    value={value}
+    onBlur={onBlur}
+  >
     {children}
   </ChakraRadioButtonGroup>
-)
+);
 
 export const InputGrid = (props: InputGridProps) => (
   <Grid mb={4} gridTemplateColumns={['1fr', '1fr', '1fr']} {...props}>
@@ -562,7 +598,8 @@ interface CardFormProps {
 
 export const CardForm = styled(Div)<CardFormProps>`
   ${({ theme, dualPane }) => css`
-    ${dualPane && css`
+    ${dualPane &&
+    css`
       display: flex;
 
       > *:first-child {
@@ -577,7 +614,7 @@ export const GridForm = styled.form`
     display: grid;
     row-gap: 20px;
     column-gap: 10px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     padding: 10px;
   `}
 `;
@@ -590,9 +627,15 @@ interface RangeSliderProps {
   onChange?: (vals: [number, number] | number) => void;
 }
 
-export const RangeSlider = ({ min=0, max=10, onChange, stepSize=0.5, isDisabled = false }: RangeSliderProps) => {
+export const RangeSlider = ({
+  min = 0,
+  max = 10,
+  onChange,
+  stepSize = 0.5,
+  isDisabled = false,
+}: RangeSliderProps) => {
   return (
-    <AntdSlider 
+    <AntdSlider
       range
       disabled={isDisabled}
       max={10}
@@ -601,5 +644,5 @@ export const RangeSlider = ({ min=0, max=10, onChange, stepSize=0.5, isDisabled 
       defaultValue={[min, max]}
       onAfterChange={onChange}
     />
-  )
+  );
 };

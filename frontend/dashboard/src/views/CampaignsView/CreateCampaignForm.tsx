@@ -1,6 +1,8 @@
 import * as UI from '@haas/ui';
+import * as yup from 'yup';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import { yupResolver } from '@hookform/resolvers';
 import React, { useState } from 'react';
 
 type CampaignVariantType = 'SMS' | 'MAIL' | 'QUEUE';
@@ -24,21 +26,29 @@ const createCampaignBodyPlaceholder = `
   Please visit {{dialogueUrl}}.
 `;
 
-const mapVariantIndexToLabel: {[key: number]: string} = {
+const mapVariantIndexToLabel: { [key: number]: string } = {
   0: 'A',
   1: 'B',
 };
 
+const schema = yup.object({
+  label: yup.string().required(),
+});
+
 const CreateCampaignForm = () => {
   const form = useForm<CreateCampaignFormProps>({
     defaultValues: {
-      label: 'Your new campaign!',
-      variants: [{
-        type: 'MAIL',
-        body: createCampaignBodyPlaceholder,
-        weight: 1,
-      }],
+      label: '',
+      variants: [
+        {
+          type: 'MAIL',
+          body: createCampaignBodyPlaceholder,
+          weight: 1,
+        },
+      ],
     },
+    resolver: yupResolver(schema),
+    mode: 'onChange',
   });
 
   const [activeVariantIndex, setActiveVariantIndex] = useState<number>(0);
@@ -56,8 +66,8 @@ const CreateCampaignForm = () => {
       <UI.Grid gridTemplateColumns={['1fr', '1fr 1fr']}>
         <UI.InputGrid>
           <UI.FormControl isRequired>
-            <UI.FormLabel>{t('campaign_label')}</UI.FormLabel>
-            <UI.Input name="label" ref={form.register} />
+            <UI.FormLabel htmlFor="label">{t('campaign_label')}</UI.FormLabel>
+            <UI.Input name="label" id="label" ref={form.register} />
           </UI.FormControl>
           <UI.Div>
             <UI.FormSectionHeader>{t('variants')}</UI.FormSectionHeader>
@@ -73,6 +83,9 @@ const CreateCampaignForm = () => {
             {`${t('variant')} ${mapVariantIndexToLabel[activeVariantIndex]}`}
           </UI.CardBody>
         </UI.Card>
+        <UI.Button type="submit" isDisabled={!form.formState.isValid}>
+          {t('save')}
+        </UI.Button>
       </UI.Grid>
     </UI.Form>
   );

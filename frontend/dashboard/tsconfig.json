@@ -19,7 +19,7 @@
     "noEmit": true,
     "jsx": "react",
     "baseUrl": "src",
-    "types": ["cypress"]
+    "types": ["jest", "@testing-library/jest-dom"]
   },
   "include": [
     "src"

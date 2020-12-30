@@ -1,6 +1,10 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    campaign_label: {
+      en: 'Campaign label',
+      de: 'Kampagnenetikett',
+    },
     campaigns: {
       en: 'Campaigns',
       de: 'Kampagnen',
