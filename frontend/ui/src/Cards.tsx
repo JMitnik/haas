@@ -2,6 +2,7 @@ import styled, { css } from 'styled-components';
 import { Div } from './Generics';
 import { Flex } from './Container';
 import { Span } from './Span';
+import { Button } from './Buttons';
 
 type BoxShadowSize = 'sm' | 'md' | 'lg';
 
@@ -38,6 +39,41 @@ export const Card = styled(Div)<CardProps>`
       &:hover {
         transition: all .3s cubic-bezier(.55,0,.1,1);
         box-shadow: rgba(0, 0, 0, 0.20) 0px 4px 12px;
+      }
+    `}
+  `}
+`;
+
+export const ButtonCard = styled(Button)<{ isActive: boolean }>`
+  ${({ theme, isActive }) => css`
+    border-radius: ${theme.borderRadiuses.md};
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    border: 1px solid #ebebeb;
+    padding: 4px 8px;
+    outline: none;
+    overflow: hidden;
+    position: relative;
+
+    &:focus, &:active {
+      outline: 0 !important;
+      background: ${theme.colors.gray[100]};
+      box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06) !important;
+    }
+
+    ${isActive && css`
+      background: ${theme.colors.gray[100]};
+      box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+
+      &::before {
+        content: '';
+        top: 0;
+        z-index: 200;
+        bottom: 0;
+        position: absolute;
+        left: 0;
+        height: 100%;
+        width: 3px;
+        background: ${theme.colors.primaryGradient};
       }
     `}
   `}

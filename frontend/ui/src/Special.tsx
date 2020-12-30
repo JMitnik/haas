@@ -19,6 +19,7 @@ const IllustrationCardWrapper = styled.div`
     }
 
     > svg {
+      color: ${theme.colors.primary};
       max-width: 300px;
       max-height: 300px;
       padding: 24px;

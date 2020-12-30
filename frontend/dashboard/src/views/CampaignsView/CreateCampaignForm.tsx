@@ -5,6 +5,8 @@ import { useTranslation } from 'react-i18next';
 import { yupResolver } from '@hookform/resolvers';
 import React, { useState } from 'react';
 
+import { ReactComponent as DecideIll } from 'assets/images/undraw_decide.svg';
+
 type CampaignVariantType = 'SMS' | 'MAIL' | 'QUEUE';
 
 interface CreateCampaignVariantFormProps {
@@ -43,7 +45,12 @@ const CreateCampaignForm = () => {
         {
           type: 'MAIL',
           body: createCampaignBodyPlaceholder,
-          weight: 1,
+          weight: 0.5,
+        },
+        {
+          type: 'MAIL',
+          body: createCampaignBodyPlaceholder,
+          weight: 0.5,
         },
       ],
     },
@@ -51,7 +58,11 @@ const CreateCampaignForm = () => {
     mode: 'onChange',
   });
 
-  const [activeVariantIndex, setActiveVariantIndex] = useState<number>(0);
+  const [activeVariantIndex, setActiveVariantIndex] = useState<number | null>(null);
+
+  const switchActiveVariant = (index: number) => {
+    setActiveVariantIndex(index);
+  };
 
   const { t } = useTranslation();
 
@@ -70,18 +81,34 @@ const CreateCampaignForm = () => {
             <UI.Input name="label" id="label" ref={form.register} />
           </UI.FormControl>
           <UI.Div>
-            <UI.FormSectionHeader>{t('variants')}</UI.FormSectionHeader>
-            {variants.map((variant, index) => (
-              <UI.Button key={variant.variantIndex}>
-                {`${t('variant')} ${mapVariantIndexToLabel[index]}`}
-              </UI.Button>
-            ))}
+            <UI.InputHeader>{t('variants')}</UI.InputHeader>
+            <UI.InputHelper>{t('variants_helper')}</UI.InputHelper>
+            <UI.Stack spacing={2}>
+              {variants.map((variant, index) => (
+                <UI.ButtonCard
+                  onClick={() => switchActiveVariant(index)}
+                  isActive={activeVariantIndex === index}
+                  bg="white"
+                  key={variant.variantIndex}
+                >
+                  {`${t('variant')} ${mapVariantIndexToLabel[index]}`}
+                </UI.ButtonCard>
+              ))}
+            </UI.Stack>
           </UI.Div>
         </UI.InputGrid>
-        <UI.Card noHover bg="gray.200">
-          <UI.CardBody>
-            {`${t('variant')} ${mapVariantIndexToLabel[activeVariantIndex]}`}
-          </UI.CardBody>
+        <UI.Card noHover bg="gray.100">
+          {(activeVariantIndex === 0 || activeVariantIndex) ? (
+            <UI.CardBody>
+              {`${t('variant')} ${mapVariantIndexToLabel[activeVariantIndex]}`}
+            </UI.CardBody>
+          ) : (
+            <UI.IllustrationCard
+              svg={<DecideIll />}
+              text={t('select_a_variant')}
+              isFlat
+            />
+          )}
         </UI.Card>
         <UI.Button type="submit" isDisabled={!form.formState.isValid}>
           {t('save')}

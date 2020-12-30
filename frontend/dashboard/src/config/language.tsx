@@ -1,6 +1,26 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    create_campaign: {
+      en: 'Create a campaign',
+      de: 'Eine Kampagne erstellen',
+    },
+    select_a_variant: {
+      en: 'Select a variant',
+      de: 'Wählen Sie eine Variante aus',
+    },
+    variant: {
+      en: 'Variant',
+      de: 'Variante',
+    },
+    variants: {
+      en: 'Variants',
+      de: 'Varianten',
+    },
+    variants_helper: {
+      en: 'Variants allow you to specify an A/B test for your campaign. You can specify different distribution channels (such as Email or SMS), by setting the probability of the different variants.',
+      de: 'Mit Varianten können Sie einen A / B-Test für Ihre Kampagne angeben. Sie können verschiedene Vertriebskanäle (wie E-Mail oder SMS) angeben, indem Sie die Wahrscheinlichkeit der verschiedenen Varianten festlegen.',
+    },
     campaign_label: {
       en: 'Campaign label',
       de: 'Kampagnenetikett',

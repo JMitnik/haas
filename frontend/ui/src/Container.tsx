@@ -1,3 +1,4 @@
+import React from 'react';
 import styled, { css } from 'styled-components';
 import {
   flexbox,
@@ -19,9 +20,14 @@ import {
   position,
   SpaceProps,
 } from 'styled-system';
+import { Stack as ChakraStack, StackProps as ChakraStackProps  } from '@chakra-ui/core';
 import { Div, GenericProps } from './Generics';
 
 interface ContainerProps extends GenericProps {}
+
+export const Stack = (props: ChakraStackProps) => (
+  <ChakraStack {...props} />
+)
 
 export const PageContainer = styled(Div)`
   width: 100%;
