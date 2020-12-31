@@ -14,6 +14,7 @@ const DialoguesPage = () => {
   // TODO: Handle the loading
   const { error, data, loading: isLoading } = useQuery<any>(getDialoguesOfCustomer, {
     variables: { customerSlug },
+    fetchPolicy: 'cache-and-network',
     onError: () => {
       toast({
         title: 'Something went wrong',

@@ -135,6 +135,7 @@ export interface CreateCTAInputType {
 
 export interface CreateCampaignInputType {
   label?: string | null;
+  workspaceId: string;
   variants?: CreateCampaignVariantInputType[] | null;
 }
 

@@ -184,6 +184,7 @@ const CreateCampaignForm = ({ onClose }: { onClose: () => void }) => {
     variables: {
       input: {
         label: form.getValues().label,
+        workspaceId: activeCustomer?.id || '',
         variants: form.getValues().variants?.map((variant) => ({
           dialogueId: variant.dialogue?.value || '',
           body: variant.body,

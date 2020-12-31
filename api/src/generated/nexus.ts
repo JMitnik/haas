@@ -69,6 +69,7 @@ export interface NexusGenInputs {
   CreateCampaignInputType: { // input type
     label?: string | null; // String
     variants?: NexusGenInputs['CreateCampaignVariantInputType'][] | null; // [CreateCampaignVariantInputType!]
+    workspaceId: string; // ID!
   }
   CreateCampaignVariantInputType: { // input type
     body?: string | null; // String
@@ -183,6 +184,9 @@ export interface NexusGenInputs {
   FormNodeInputType: { // input type
     fields?: NexusGenInputs['FormNodeFieldInput'][] | null; // [FormNodeFieldInput!]
     id?: string | null; // String
+  }
+  GetCampaignsInput: { // input type
+    customerSlug?: string | null; // String
   }
   InviteUserInput: { // input type
     customerId: string; // String!
@@ -623,6 +627,7 @@ export interface NexusGenAllTypes extends NexusGenRootTypes {
   FormNodeEntryInput: NexusGenInputs['FormNodeEntryInput'];
   FormNodeFieldInput: NexusGenInputs['FormNodeFieldInput'];
   FormNodeInputType: NexusGenInputs['FormNodeInputType'];
+  GetCampaignsInput: NexusGenInputs['GetCampaignsInput'];
   InviteUserInput: NexusGenInputs['InviteUserInput'];
   LoginInput: NexusGenInputs['LoginInput'];
   NodeEntryDataInput: NexusGenInputs['NodeEntryDataInput'];
@@ -686,6 +691,7 @@ export interface NexusGenFieldTypes {
     nrDeliveries: number; // Int!
   }
   Customer: { // field return type
+    campaigns: NexusGenRootTypes['Campaign'][]; // [Campaign!]!
     dialogue: NexusGenRootTypes['Dialogue'] | null; // Dialogue
     dialogues: NexusGenRootTypes['Dialogue'][] | null; // [Dialogue!]
     id: string; // ID!
@@ -1296,7 +1302,7 @@ export interface NexusGenInheritedFields {}
 
 export type NexusGenObjectNames = "Campaign" | "ColourSettings" | "CreateBatchDeliveriesOutputType" | "Customer" | "CustomerSettings" | "Debug" | "DeleteUserOutput" | "Delivery" | "Dialogue" | "DialogueStatistics" | "Edge" | "EdgeCondition" | "FailedDeliveryModel" | "FontSettings" | "FormNodeEntryType" | "FormNodeEntryValueType" | "FormNodeField" | "FormNodeType" | "ImageType" | "InviteUserOutput" | "LinkType" | "LoginOutput" | "Mutation" | "NodeEntry" | "NodeEntryValue" | "PaginationPageInfo" | "PermssionType" | "Query" | "QuestionNode" | "QuestionOption" | "RefreshAccessTokenOutput" | "RequestInviteOutput" | "RoleConnection" | "RoleType" | "Session" | "SessionConnection" | "ShareNodeType" | "SliderNodeMarkerType" | "SliderNodeRangeType" | "SliderNodeType" | "Tag" | "TriggerConditionType" | "TriggerConnectionType" | "TriggerType" | "UserConnection" | "UserCustomer" | "UserType" | "VerifyUserTokenOutput" | "lineChartDataType" | "topPathType";
 
-export type NexusGenInputNames = "AppendToInteractionInput" | "CTALinkInputObjectType" | "CTALinksInputType" | "CTAShareInputObjectType" | "ChoiceNodeEntryInput" | "CreateBatchDeliveriesInputType" | "CreateCTAInputType" | "CreateCampaignInputType" | "CreateCampaignVariantInputType" | "CreateDialogueInputType" | "CreateQuestionNodeInputType" | "CreateTriggerInputType" | "CreateWorkspaceInput" | "CustomerWhereUniqueInput" | "DeleteDialogueInputType" | "DeleteNodeInputType" | "DeleteUserInput" | "DialogueFilterInputType" | "DialogueWhereUniqueInput" | "EdgeConditionInputType" | "EditUserInput" | "EditWorkspaceInput" | "FormNodeEntryFieldInput" | "FormNodeEntryInput" | "FormNodeFieldInput" | "FormNodeInputType" | "InviteUserInput" | "LoginInput" | "NodeEntryDataInput" | "NodeEntryInput" | "OptionInputType" | "OptionsInputType" | "PaginationSortInput" | "PaginationWhereInput" | "PermissionIdsInput" | "PermissionInput" | "QuestionNodeWhereInputType" | "QuestionNodeWhereUniqueInput" | "RecipientsInputType" | "RegisterInput" | "RegisterNodeEntryInput" | "RequestInviteInput" | "RoleDataInput" | "RoleInput" | "SessionInput" | "SessionWhereUniqueInput" | "ShareNodeInputType" | "SlideNodeMarkerInput" | "SliderNodeEntryInput" | "SliderNodeInputType" | "SliderNodeRangeInputType" | "SocialNodeEntryInput" | "TagsInputObjectType" | "TextboxNodeEntryInput" | "TriggerConditionInputType" | "TriggerInputType" | "UpdateCTAInputType" | "UpdateQuestionNodeInputType" | "UserInput" | "UserOfCustomerInput";
+export type NexusGenInputNames = "AppendToInteractionInput" | "CTALinkInputObjectType" | "CTALinksInputType" | "CTAShareInputObjectType" | "ChoiceNodeEntryInput" | "CreateBatchDeliveriesInputType" | "CreateCTAInputType" | "CreateCampaignInputType" | "CreateCampaignVariantInputType" | "CreateDialogueInputType" | "CreateQuestionNodeInputType" | "CreateTriggerInputType" | "CreateWorkspaceInput" | "CustomerWhereUniqueInput" | "DeleteDialogueInputType" | "DeleteNodeInputType" | "DeleteUserInput" | "DialogueFilterInputType" | "DialogueWhereUniqueInput" | "EdgeConditionInputType" | "EditUserInput" | "EditWorkspaceInput" | "FormNodeEntryFieldInput" | "FormNodeEntryInput" | "FormNodeFieldInput" | "FormNodeInputType" | "GetCampaignsInput" | "InviteUserInput" | "LoginInput" | "NodeEntryDataInput" | "NodeEntryInput" | "OptionInputType" | "OptionsInputType" | "PaginationSortInput" | "PaginationWhereInput" | "PermissionIdsInput" | "PermissionInput" | "QuestionNodeWhereInputType" | "QuestionNodeWhereUniqueInput" | "RecipientsInputType" | "RegisterInput" | "RegisterNodeEntryInput" | "RequestInviteInput" | "RoleDataInput" | "RoleInput" | "SessionInput" | "SessionWhereUniqueInput" | "ShareNodeInputType" | "SlideNodeMarkerInput" | "SliderNodeEntryInput" | "SliderNodeInputType" | "SliderNodeRangeInputType" | "SocialNodeEntryInput" | "TagsInputObjectType" | "TextboxNodeEntryInput" | "TriggerConditionInputType" | "TriggerInputType" | "UpdateCTAInputType" | "UpdateQuestionNodeInputType" | "UserInput" | "UserOfCustomerInput";
 
 export type NexusGenEnumNames = "CampaignVariantEnum" | "DeliveryStatusEnum" | "FormNodeFieldTypeEnum" | "LinkTypeEnumType" | "PaginationSearchEnum" | "PaginationSortByEnum" | "QuestionNodeTypeEnum" | "SystemPermission" | "TagTypeEnum" | "TriggerConditionEnum" | "TriggerMediumEnum" | "TriggerTypeEnum";
 

@@ -24,6 +24,7 @@ export const CreateCampaignInputType = inputObjectType({
   name: 'CreateCampaignInputType',
   definition(t) {
     t.string('label');
+    t.id('workspaceId', { required: true });
     t.list.field('variants', { type: CreateCampaignVariantInputType });
   },
 });
@@ -41,6 +42,11 @@ const validateProbabilityEdges = (input: NexusGenInputs['CreateCampaignInputType
 
 const saveCampaign = (input: NexusGenInputs['CreateCampaignInputType']): CampaignCreateInput => ({
   label: input.label || '',
+  workspace: {
+    connect: {
+      id: input.workspaceId,
+    },
+  },
   variantsEdges: {
     create: input.variants?.map((variant) => ({
       weight: variant.weight || 50,

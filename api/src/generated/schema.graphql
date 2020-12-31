@@ -57,6 +57,7 @@ type CreateBatchDeliveriesOutputType {
 input CreateCampaignInputType {
   label: String
   variants: [CreateCampaignVariantInputType!]
+  workspaceId: ID!
 }
 
 input CreateCampaignVariantInputType {
@@ -139,6 +140,7 @@ input CTAShareInputObjectType {
 }
 
 type Customer {
+  campaigns: [Campaign!]!
   dialogue(where: DialogueWhereUniqueInput): Dialogue
   dialogues(filter: DialogueFilterInputType): [Dialogue!]
   id: ID!
@@ -365,6 +367,10 @@ input FormNodeInputType {
 type FormNodeType {
   fields: [FormNodeField!]!
   id: String
+}
+
+input GetCampaignsInput {
+  customerSlug: String
 }
 
 type ImageType {

@@ -3,11 +3,19 @@ import { Plus } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 
+import { ReactComponent as EmptyIll } from 'assets/images/undraw_empty.svg';
+import { useGetWorkspaceCampaigns } from 'hooks/useGetWorkspaceCampaigns';
+
 import CreateCampaignForm from './CreateCampaignForm';
 
 const CampaignsView = () => {
   const { t } = useTranslation();
   const [openedModal, setIsOpenedModal] = useState(false);
+  const [activeCampaign, setActiveCampaign] = useState(null);
+
+  const { campaigns } = useGetWorkspaceCampaigns({
+    // onlyLazy: true,
+  });
 
   return (
     <>
@@ -24,6 +32,24 @@ const CampaignsView = () => {
       </UI.ViewHeading>
       <UI.ViewContainer>
         {/* TODO: Set proper close */}
+        <UI.Div>
+          {campaigns.length === 0 && (
+            <UI.IllustrationCard
+              svg={<EmptyIll />}
+              isFlat
+              text={t('no_campaigns')}
+            >
+              <UI.Button
+                size="sm"
+                onClick={() => setIsOpenedModal(true)}
+                variantColor="teal"
+                leftIcon={Plus}
+              >
+                {t('create_campaign')}
+              </UI.Button>
+            </UI.IllustrationCard>
+          )}
+        </UI.Div>
         <UI.Modal isOpen={openedModal} onClose={() => setIsOpenedModal(false)}>
           <UI.Card width={900} noHover bg="white">
             <UI.CardBody>
