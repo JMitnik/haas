@@ -1,5 +1,6 @@
 import React, { forwardRef, Ref, ReactNode } from 'react';
 import 'antd/dist/antd.css'; // Slider,
+import 'easymde/dist/easymde.min.css'; // Markdown
 import { Slider as AntdSlider } from 'antd';
 import { Div, Paragraph } from '@haas/ui';
 import SimpleMDE from 'react-simplemde-editor';

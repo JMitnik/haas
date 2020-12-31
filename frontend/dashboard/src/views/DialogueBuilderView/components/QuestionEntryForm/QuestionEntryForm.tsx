@@ -1,6 +1,4 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-
-import 'easymde/dist/easymde.min.css';
 import * as UI from '@haas/ui';
 import * as yup from 'yup';
 import { ApolloError } from 'apollo-client';
@@ -15,7 +13,6 @@ import { useTranslation } from 'react-i18next';
 import { yupResolver } from '@hookform/resolvers';
 import React, { useCallback, useEffect, useState } from 'react';
 import Select from 'react-select';
-import SimpleMDE from 'react-simplemde-editor';
 
 import {
   DeleteQuestionOptionButtonContainer,
@@ -452,12 +449,9 @@ const QuestionEntryForm = ({
                   control={form.control}
                   defaultValue={title}
                   render={({ value, onChange }) => (
-                    <SimpleMDE
+                    <UI.MarkdownEditor
                       value={value}
                       onChange={onChange}
-                      options={{
-                        toolbar: ['bold', 'italic', 'preview', 'guide'],
-                      }}
                     />
                   )}
                 />

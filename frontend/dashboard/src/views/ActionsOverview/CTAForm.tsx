@@ -13,14 +13,12 @@ import { useTranslation } from 'react-i18next';
 import { yupResolver } from '@hookform/resolvers';
 import React, { useCallback, useEffect, useState } from 'react';
 import Select from 'react-select';
-import SimpleMDE from 'react-simplemde-editor';
 import cuid from 'cuid';
 
 import { Div, Flex, Form, FormContainer,
   FormControl, FormLabel, FormSection, Grid, H4, Hr, Input, InputGrid, InputHelper, Span, Text } from '@haas/ui';
 import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
 
-import 'easymde/dist/easymde.min.css';
 import { useCustomer } from 'providers/CustomerProvider';
 import LinkIcon from 'components/Icons/LinkIcon';
 import OpinionIcon from 'components/Icons/OpinionIcon';
@@ -368,12 +366,9 @@ const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTACha
                     control={form.control}
                     defaultValue={title}
                     render={({ value, onChange }) => (
-                      <SimpleMDE
+                      <UI.MarkdownEditor
                         value={value}
                         onChange={onChange}
-                        options={{
-                          toolbar: ['bold', 'italic', 'preview', 'guide'],
-                        }}
                       />
                     )}
                   />

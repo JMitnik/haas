@@ -6,11 +6,8 @@ import { yupResolver } from '@hookform/resolvers';
 import React, { useState } from 'react';
 
 import { ReactComponent as DecideIll } from 'assets/images/undraw_decide.svg';
-import { useCustomer } from 'providers/CustomerProvider';
 import { useGetWorkspaceDialogues } from 'hooks/useGetWorkspaceDialogues';
-import { useLazyQuery } from '@apollo/react-hooks';
 import Select from 'react-select/async';
-import SimpleMDE from 'react-simplemde-editor';
 
 type CampaignVariantType = 'SMS' | 'MAIL' | 'QUEUE';
 
