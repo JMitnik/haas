@@ -1,6 +1,14 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    body: {
+      en: 'Body',
+      de: 'Teil',
+    },
+    dialogue: {
+      en: 'Dialogue',
+      de: 'Dialog',
+    },
     create_campaign: {
       en: 'Create a campaign',
       de: 'Eine Kampagne erstellen',

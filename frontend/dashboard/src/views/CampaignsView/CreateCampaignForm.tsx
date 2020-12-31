@@ -6,6 +6,11 @@ import { yupResolver } from '@hookform/resolvers';
 import React, { useState } from 'react';
 
 import { ReactComponent as DecideIll } from 'assets/images/undraw_decide.svg';
+import { useCustomer } from 'providers/CustomerProvider';
+import { useGetWorkspaceDialogues } from 'hooks/useGetWorkspaceDialogues';
+import { useLazyQuery } from '@apollo/react-hooks';
+import Select from 'react-select/async';
+import SimpleMDE from 'react-simplemde-editor';
 
 type CampaignVariantType = 'SMS' | 'MAIL' | 'QUEUE';
 
@@ -38,6 +43,10 @@ const mapVariantIndexToLabel: { [key: number]: string } = {
 const variantSchema = yup.object({
   label: yup.string().required(),
   type: yup.mixed().oneOf(['MAIL', 'SMS']).required(),
+  dialogue: yup.object({
+    key: yup.string(),
+    value: yup.string(),
+  }),
   body: yup.string().required(),
   weight: yup.number().required(),
 }).required();
@@ -54,6 +63,8 @@ const ActiveVariantForm = ({ form, activeVariantIndex, variant }: { form: UseFor
   const activeVariant = form.watch(`variants[${activeVariantIndex}]`) as VariantFormProps;
   const { t } = useTranslation();
 
+  const { fetchLazyDialogues } = useGetWorkspaceDialogues({ onlyLazy: true });
+
   return (
     <UI.CardBody>
       <UI.Div mb={2}>
@@ -69,6 +80,41 @@ const ActiveVariantForm = ({ form, activeVariantIndex, variant }: { form: UseFor
             defaultValue={activeVariant?.label}
             id={`variants[${activeVariantIndex}].label`}
             ref={form.register()}
+          />
+        </UI.FormControl>
+
+        <UI.FormControl isRequired>
+          <UI.FormLabel htmlFor={`variants[${activeVariantIndex}].dialogue`}>{t('dialogue')}</UI.FormLabel>
+          <Controller
+            name={`variants[${activeVariantIndex}].dialogue`}
+            key={variant.variantIndex}
+            control={form.control}
+            defaultValue={activeVariant.dialogue}
+            render={({ value, onChange, onBlur }) => (
+              <Select
+                defaultOptions
+                loadOptions={fetchLazyDialogues}
+                value={value}
+                onChange={onChange}
+                onBlur={onBlur}
+              />
+            )}
+          />
+        </UI.FormControl>
+
+        <UI.FormControl isRequired>
+          <UI.FormLabel htmlFor={`variants[${activeVariantIndex}].body`}>{t('body')}</UI.FormLabel>
+          <Controller
+            name={`variants[${activeVariantIndex}].body`}
+            id={`variants[${activeVariantIndex}].body`}
+            control={form.control}
+            defaultValue={activeVariant.body}
+            render={({ value, onChange }) => (
+              <UI.MarkdownEditor
+                value={value}
+                onChange={onChange}
+              />
+            )}
           />
         </UI.FormControl>
       </UI.InputGrid>

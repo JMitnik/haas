@@ -2,8 +2,8 @@ import * as UI from '@haas/ui';
 import { Controller, useForm } from 'react-hook-form';
 import { Plus } from 'react-feather';
 import { useTranslation } from 'react-i18next';
-import React, { useState } from 'react';
 import CreateCampaignForm from './CreateCampaignForm';
+import React, { useState } from 'react';
 
 const CampaignsView = () => {
   const { t } = useTranslation();
@@ -17,7 +17,7 @@ const CampaignsView = () => {
       </UI.Button>
       {/* TODO: Set proper close */}
       <UI.Modal isOpen={openedModal} onClose={() => setIsOpenedModal(false)}>
-        <UI.Card width={700} noHover bg="white">
+        <UI.Card width={900} noHover bg="white">
           <UI.CardBody>
             <UI.FormSectionHeader>{t('create_campaign')}</UI.FormSectionHeader>
             <CreateCampaignForm />
