@@ -22,6 +22,7 @@ import {
 } from 'styled-system';
 import { Stack as ChakraStack, StackProps as ChakraStackProps  } from '@chakra-ui/core';
 import { Div, GenericProps } from './Generics';
+import { PageTitle } from './Type';
 
 interface ContainerProps extends GenericProps {}
 
@@ -47,6 +48,26 @@ export const Container = styled(Div)<ContainerProps>`
     ${width}
   `}
 `;
+
+
+const ViewHeadingContainer = styled(Div)`
+  ${({ theme }) => css`
+    padding: ${theme.gutter}px;
+    border-bottom: 1px solid ${theme.colors.gray[200]};
+
+    ${PageTitle} {
+      margin-bottom: 0;
+    }
+  `}
+`;
+
+export const ViewHeading = ({ children }: { children: React.ReactNode }) => (
+  <ViewHeadingContainer>
+    <Stack spacing={4} isInline alignItems="center">
+      {children}
+    </Stack>
+  </ViewHeadingContainer>
+);
 
 export const ViewContainer = styled(Div)`
   ${({ theme }) => css`

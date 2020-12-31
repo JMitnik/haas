@@ -10,21 +10,30 @@ const CampaignsView = () => {
   const [openedModal, setIsOpenedModal] = useState(false);
 
   return (
-    <UI.ViewContainer>
-      <UI.PageTitle>{t('campaigns')}</UI.PageTitle>
-      <UI.Button onClick={() => setIsOpenedModal(true)} variantColor="teal" leftIcon={Plus}>
-        {t('create_campaign')}
-      </UI.Button>
-      {/* TODO: Set proper close */}
-      <UI.Modal isOpen={openedModal} onClose={() => setIsOpenedModal(false)}>
-        <UI.Card width={900} noHover bg="white">
-          <UI.CardBody>
-            <UI.FormSectionHeader>{t('create_campaign')}</UI.FormSectionHeader>
-            <CreateCampaignForm onClose={() => setIsOpenedModal(false)} />
-          </UI.CardBody>
-        </UI.Card>
-      </UI.Modal>
-    </UI.ViewContainer>
+    <>
+      <UI.ViewHeading>
+        <UI.PageTitle>{t('campaigns')}</UI.PageTitle>
+        <UI.Button
+          size="sm"
+          onClick={() => setIsOpenedModal(true)}
+          variantColor="teal"
+          leftIcon={Plus}
+        >
+          {t('create_campaign')}
+        </UI.Button>
+      </UI.ViewHeading>
+      <UI.ViewContainer>
+        {/* TODO: Set proper close */}
+        <UI.Modal isOpen={openedModal} onClose={() => setIsOpenedModal(false)}>
+          <UI.Card width={900} noHover bg="white">
+            <UI.CardBody>
+              <UI.FormSectionHeader>{t('create_campaign')}</UI.FormSectionHeader>
+              <CreateCampaignForm onClose={() => setIsOpenedModal(false)} />
+            </UI.CardBody>
+          </UI.Card>
+        </UI.Modal>
+      </UI.ViewContainer>
+    </>
   );
 };
 
