@@ -26,10 +26,9 @@ interface CreateCampaignFormProps {
   variants: CreateCampaignVariantFormProps[];
 }
 
-const createCampaignBodyPlaceholder = `
-  Dear {{firstName}},
-  thank you for subscribing to {{dialogueId}}!
-  Please visit {{dialogueUrl}}.
+const createCampaignBodyPlaceholder = `Dear {{firstName}},
+thank you for subscribing to {{dialogueId}}!
+Please visit {{dialogueUrl}}.
 `;
 
 const mapVariantIndexToLabel: { [key: number]: string } = {
@@ -41,9 +40,9 @@ const variantSchema = yup.object({
   label: yup.string().required(),
   type: yup.mixed().oneOf(['MAIL', 'SMS']).required(),
   dialogue: yup.object({
-    key: yup.string(),
+    label: yup.string(),
     value: yup.string(),
-  }),
+  }).nullable(),
   body: yup.string().required(),
   weight: yup.number().required(),
 }).required();
@@ -63,14 +62,16 @@ const ActiveVariantForm = ({ form, activeVariantIndex, variant }: { form: UseFor
   const { fetchLazyDialogues } = useGetWorkspaceDialogues({ onlyLazy: true });
 
   return (
-    <UI.CardBody>
-      <UI.Div mb={2}>
-        {`${t('variant')} ${mapVariantIndexToLabel[activeVariantIndex]}`}
+    <UI.CardBody id="subForm">
+      <UI.Div mb={2} borderBottom="1px solid #fff" borderColor="gray.300" pb={2}>
+        <UI.Text fontWeight={700} color="gray.500" fontSize="0.9rem">
+          {`${t('edit_variant')} ${mapVariantIndexToLabel[activeVariantIndex]}`}
+        </UI.Text>
       </UI.Div>
 
       <UI.InputGrid>
         <UI.FormControl isRequired>
-          <UI.FormLabel htmlFor={`variants[${activeVariantIndex}].label`}>{t('label')}</UI.FormLabel>
+          <UI.FormLabel htmlFor={`variants[${activeVariantIndex}].label`}>{t('variant_label')}</UI.FormLabel>
           <UI.Input
             key={variant.variantIndex}
             name={`variants[${activeVariantIndex}].label`}
@@ -89,6 +90,10 @@ const ActiveVariantForm = ({ form, activeVariantIndex, variant }: { form: UseFor
             defaultValue={activeVariant.dialogue}
             render={({ value, onChange, onBlur }) => (
               <Select
+                placeholder="Select a dialogue"
+                id={`variants[${activeVariantIndex}].dialogue`}
+                classNamePrefix="select"
+                className="select"
                 defaultOptions
                 loadOptions={fetchLazyDialogues}
                 value={value}
@@ -129,12 +134,14 @@ const CreateCampaignForm = () => {
           type: 'MAIL',
           body: createCampaignBodyPlaceholder,
           weight: 50,
+          dialogue: null,
         },
         {
           label: '',
           type: 'MAIL',
           body: createCampaignBodyPlaceholder,
           weight: 50,
+          dialogue: null,
         },
       ],
     },
@@ -155,7 +162,7 @@ const CreateCampaignForm = () => {
 
   const { t } = useTranslation();
 
-  const { fields: variants, append, insert, move, prepend } = useFieldArray({
+  const { fields: variants } = useFieldArray({
     name: 'variants',
     control: form.control,
     keyName: 'variantIndex',
@@ -181,7 +188,7 @@ const CreateCampaignForm = () => {
   return (
     <UI.Form onSubmit={form.handleSubmit(handleSubmit)}>
       <UI.Grid gridTemplateColumns={['1fr', '1fr 1fr']}>
-        <UI.InputGrid>
+        <UI.Stack spacing={4}>
           <UI.FormControl isRequired>
             <UI.FormLabel htmlFor="label">{t('campaign_label')}</UI.FormLabel>
             <UI.Input name="label" id="label" ref={form.register} />
@@ -223,7 +230,7 @@ const CreateCampaignForm = () => {
               ))}
             </UI.Stack>
           </UI.Div>
-        </UI.InputGrid>
+        </UI.Stack>
         <UI.Card isFlat noHover bg="gray.100">
           {(activeVariantIndex === 0 || activeVariantIndex) ? (
             <ActiveVariantForm variant={variants[activeVariantIndex]} activeVariantIndex={activeVariantIndex} form={form} />

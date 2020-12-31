@@ -1,6 +1,10 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    edit_variant: {
+      en: 'Edit variant',
+      de: 'Variante bearbeiten:',
+    },
     body: {
       en: 'Body',
       de: 'Teil',
@@ -28,6 +32,10 @@ const language = {
     variants_helper: {
       en: 'Variants allow you to specify an A/B test for your campaign. You can specify different distribution channels (such as Email or SMS), by setting the probability of the different variants.',
       de: 'Mit Varianten können Sie einen A / B-Test für Ihre Kampagne angeben. Sie können verschiedene Vertriebskanäle (wie E-Mail oder SMS) angeben, indem Sie die Wahrscheinlichkeit der verschiedenen Varianten festlegen.',
+    },
+    variant_label: {
+      en: 'Variant label',
+      de: 'Variantenetikett',
     },
     campaign_label: {
       en: 'Campaign label',

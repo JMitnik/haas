@@ -12,14 +12,15 @@ interface UseGetWorkspaceDialoguesOptionsProps {
 export const useGetWorkspaceDialogues = (options?: UseGetWorkspaceDialoguesOptionsProps) => {
   const { customerSlug } = useNavigator();
   const { data: workspaceOfDialogues, loading: isLoading, client } = useQuery(getDialoguesOfCustomer, {
-    skip: options?.onlyLazy,
+    skip: true,
   });
 
   const fetchLazyDialogues = async () => new Promise(async (resolve) => {
     const { data } = await client.query({
       query: getDialoguesOfCustomer,
       variables: {
-        customerSlug,
+        // TODO: Fix for testing that we can mock the slug
+        customerSlug: customerSlug || 'test',
       },
     });
 
