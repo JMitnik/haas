@@ -9,17 +9,22 @@ import { useGetWorkspaceCampaigns } from 'hooks/useGetWorkspaceCampaigns';
 
 import CreateCampaignForm from './CreateCampaignForm';
 import Select from 'react-select';
+import { useHistory } from 'react-router';
+import { useNavigator } from 'hooks/useNavigator';
 
 const CampaignsView = () => {
   const { t } = useTranslation();
+  const history = useHistory();
+  const { customerSlug, goToCampaignView } = useNavigator();
   const [openedModal, setIsOpenedModal] = useState(false);
-  const [activeCampaign, setActiveCampaign] = useState(null);
 
   const { campaigns } = useGetWorkspaceCampaigns({
     // onlyLazy: true,
   });
 
-  console.log(campaigns);
+  const handleSelectCampaign = ({label, value}: any) => {
+    goToCampaignView(value);
+  }
 
   return (
     <>
@@ -63,7 +68,7 @@ const CampaignsView = () => {
                   label: campaign.label,
                   value: campaign.id
                 }))}
-                onChange={(data) => console.log(data)}
+                onChange={(data) => handleSelectCampaign(data)}
                 placeholder={t('select_campaign')}
               />
             </UI.Div>

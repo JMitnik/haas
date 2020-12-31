@@ -49,6 +49,7 @@ import UsersOverview from 'views/UsersOverview/UsersOverview';
 import VerifyTokenPage from 'pages/verify_token';
 import client from 'config/apollo';
 import lang from 'config/i18n-config';
+import { CampaignView } from 'views/CampaignView/CampaignView';
 
 const CustomerRoutes = () => (
   <AnimatePresence>
@@ -99,6 +100,11 @@ const CustomerRoutes = () => (
             <CustomerRoute
               path={ROUTES.CAMPAIGNS_VIEW}
               render={() => <CampaignsView />}
+            />
+
+            <CustomerRoute
+              path={ROUTES.CAMPAIGN_VIEW}
+              render={() => <CampaignView />}
             />
 
             <CustomerRoute
