@@ -4,9 +4,11 @@ import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 
 import { ReactComponent as EmptyIll } from 'assets/images/undraw_empty.svg';
+import { ReactComponent as SelectIll } from 'assets/images/undraw_select.svg';
 import { useGetWorkspaceCampaigns } from 'hooks/useGetWorkspaceCampaigns';
 
 import CreateCampaignForm from './CreateCampaignForm';
+import Select from 'react-select';
 
 const CampaignsView = () => {
   const { t } = useTranslation();
@@ -16,6 +18,8 @@ const CampaignsView = () => {
   const { campaigns } = useGetWorkspaceCampaigns({
     // onlyLazy: true,
   });
+
+  console.log(campaigns);
 
   return (
     <>
@@ -32,7 +36,7 @@ const CampaignsView = () => {
       </UI.ViewHeading>
       <UI.ViewContainer>
         {/* TODO: Set proper close */}
-          {campaigns.length === 0 && (
+          {campaigns.length === 0 ? (
             <UI.IllustrationCard
               svg={<EmptyIll />}
               isFlat
@@ -47,6 +51,23 @@ const CampaignsView = () => {
                 {t('create_campaign')}
               </UI.Button>
             </UI.IllustrationCard>
+          ): (
+            <UI.IllustrationCard
+            svg={<SelectIll />}
+            isFlat
+            text={t('select_campaign_text')}
+          >
+            <UI.Span fontSize="1rem" maxWidth="200px">
+              <Select
+                options={campaigns.map((campaign: any) => ({
+                  label: campaign.label,
+                  value: campaign.id
+                }))}
+                onChange={(data) => console.log(data)}
+                placeholder={t('select_campaign')}
+              />
+            </UI.Span>
+          </UI.IllustrationCard>
           )}
         <UI.Modal isOpen={openedModal} onClose={() => setIsOpenedModal(false)}>
           <UI.Card width={900} noHover bg="white">

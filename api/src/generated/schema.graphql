@@ -11,14 +11,24 @@ input AppendToInteractionInput {
 }
 
 """Campaign"""
-type Campaign {
+type CampaignType {
   id: ID!
+  label: String!
+  variants: [CampaignVariantType!]!
 }
 
 enum CampaignVariantEnum {
   EMAIL
   QUEUE
   SMS
+}
+
+"""Variant of campaign"""
+type CampaignVariantType {
+  body: String!
+  id: ID!
+  label: String!
+  weight: Int!
 }
 
 """Input type for a choice node"""
@@ -140,7 +150,7 @@ input CTAShareInputObjectType {
 }
 
 type Customer {
-  campaigns: [Campaign!]!
+  campaigns: [CampaignType!]!
   dialogue(where: DialogueWhereUniqueInput): Dialogue
   dialogues(filter: DialogueFilterInputType): [Dialogue!]
   id: ID!
@@ -435,7 +445,7 @@ type Mutation {
   assignTags(dialogueId: String, tags: TagsInputObjectType): Dialogue!
   copyDialogue(input: CreateDialogueInputType): Dialogue!
   createBatchDeliveries(input: CreateBatchDeliveriesInputType): CreateBatchDeliveriesOutputType!
-  createCampaign(input: CreateCampaignInputType): Campaign!
+  createCampaign(input: CreateCampaignInputType): CampaignType!
 
   """Create Call to Actions"""
   createCTA(input: CreateCTAInputType): QuestionNode!

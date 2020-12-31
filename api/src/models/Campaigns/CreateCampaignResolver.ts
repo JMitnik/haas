@@ -78,8 +78,21 @@ export const CreateCampaignResolver = mutationField('createCampaign', {
 
     const campaign = await prisma.campaign.create({
       data: saveCampaign(args.input),
+      include: {
+        variantsEdges: {
+          include: {
+            campaignVariant: true
+          }
+        }
+      }
     });
 
-    return campaign;
+    return {
+      ...campaign,
+      variants: campaign.variantsEdges.map(variantEdge => ({
+        weight: variantEdge.weight,
+        ...variantEdge.campaignVariant
+      }))
+    };
   },
 });

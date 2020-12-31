@@ -1,10 +1,25 @@
 import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
 
-export const CampaignModel = objectType({
-  name: 'Campaign',
-  description: 'Campaign',
+export const CampaignVariantModel = objectType({
+  name: 'CampaignVariantType',
+  description: 'Variant of campaign',
+
   definition(t) {
     t.id('id');
+    t.string('label');
+    t.int('weight');
+    t.string('body');
+  }
+})
+
+export const CampaignModel = objectType({
+  name: 'CampaignType',
+  description: 'Campaign',
+
+  definition(t) {
+    t.id('id');
+    t.string('label');
+    t.list.field('variants', { type: CampaignVariantModel });
   },
 });
 
@@ -38,7 +53,13 @@ export const GetCampaignsOfWorkspace = extendType({
           },
         });
 
-        return workspaceWithCampaigns.campaigns || [];
+        return workspaceWithCampaigns.campaigns.map(campaign => ({
+          ...campaign,
+          variants: campaign.variantsEdges.map((variantEdge) => ({
+            weight: variantEdge.weight,
+            ...variantEdge.campaignVariant
+          }))
+        })) || [];
       },
     });
   },

@@ -13,6 +13,12 @@ const GET_WORKSPACE_CAMPAIGNS = gql`
       id
       campaigns {
         id
+        label
+        
+        variants {
+          id
+          label
+        }
       }
     }
   }

@@ -1,6 +1,14 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    select_campaign: {
+      en: 'Select campaign',
+      de: 'Kampagne auswählen'
+    },
+    select_campaign_text: {
+      en: 'Select one of the created campaigns',
+      de: 'Wählen Sie eine der erstellten Kampagnen aus'
+    },
     no_campaigns: {
       en: 'No campaigns have been created yet.',
       de: 'Es wurden noch keine Kampagnen erstellt.'
