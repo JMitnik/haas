@@ -32,7 +32,6 @@ const CampaignsView = () => {
       </UI.ViewHeading>
       <UI.ViewContainer>
         {/* TODO: Set proper close */}
-        <UI.Div>
           {campaigns.length === 0 && (
             <UI.IllustrationCard
               svg={<EmptyIll />}
@@ -49,7 +48,6 @@ const CampaignsView = () => {
               </UI.Button>
             </UI.IllustrationCard>
           )}
-        </UI.Div>
         <UI.Modal isOpen={openedModal} onClose={() => setIsOpenedModal(false)}>
           <UI.Card width={900} noHover bg="white">
             <UI.CardBody>

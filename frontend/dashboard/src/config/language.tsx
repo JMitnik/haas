@@ -1,6 +1,10 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    no_campaigns: {
+      en: 'No campaigns have been created yet.',
+      de: 'Es wurden noch keine Kampagnen erstellt.'
+    },
     edit_variant: {
       en: 'Edit variant',
       de: 'Variante bearbeiten:',

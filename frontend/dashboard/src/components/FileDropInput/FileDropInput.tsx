@@ -75,6 +75,7 @@ const FileDropInput = (props: any) => {
 
   return (
     <section className="container">
+      {/* @ts-ignore */}
       <DropContainer {...getRootProps({ isDragActive, isDragAccept, isDragReject })}>
         {value && (
           <UploadPreviewContainer mb={2}>

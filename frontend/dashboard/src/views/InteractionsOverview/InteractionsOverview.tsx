@@ -202,7 +202,7 @@ const InteractionsOverview = () => {
   const [paginationProps, setPaginationProps] = useState<TableProps>({
     activeStartDate: null,
     activeEndDate: null,
-    activeSearchTerm: qs.parse(location.search, { ignoreQueryPrefix: true })?.search || '',
+    activeSearchTerm: qs.parse(location.search, { ignoreQueryPrefix: true })?.search?.toString() || '',
     pageIndex: 0,
     pageSize: 8,
     sortBy: [{ by: 'createdAt', desc: true }],

@@ -604,7 +604,8 @@ const QuestionEntryForm = ({
                     render={({ onChange, onBlur, value }) => (
                       <Select
                         options={leafs}
-                        value={(activeLeaf?.value && activeLeaf) || leafs[0]}
+                        // @ts-ignore
+                        value={(activeLeaf?.value && activeLeaf) || leafs[0] || ''}
                         onChange={(opt: any) => {
                           handleLeafChange(opt);
                           onChange(opt.value);

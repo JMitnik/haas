@@ -62,7 +62,7 @@ const VerifyTokenPage = () => {
   }, [isLoggedIn, user, history]);
 
   useEffect(() => {
-    const urlToken: string = qs.parse(location.search, { ignoreQueryPrefix: true })?.token;
+    const urlToken = qs.parse(location.search, { ignoreQueryPrefix: true })?.token;
 
     if (urlToken && !verifiedRef.current && !user) {
       verifiedRef.current = true;
