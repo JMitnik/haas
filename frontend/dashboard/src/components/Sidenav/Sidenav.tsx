@@ -3,7 +3,6 @@ import { AvatarBadge, Badge, Button, Avatar as ChakraAvatar, useToast } from '@c
 import { Div, Flex, Text } from '@haas/ui';
 import { ExternalLink, LogOut } from 'react-feather';
 import { Link, LinkProps, NavLink, useHistory } from 'react-router-dom';
-import Color from 'color';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -14,7 +13,6 @@ import { useUser } from 'providers/UserProvider';
 import useAuth from 'hooks/useAuth';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { ensureDarkColor } from 'utils/ColorUtils';
 import Dropdown from 'components/Dropdown';
 import List from 'components/List/List';
 import ListItem from 'components/List/ListItem';
@@ -294,8 +292,6 @@ export const SidenavContainer = styled.div`
     ul {
       a {
         text-decoration: none;
-        /* margin-left: ${theme.gutter * 0.5}px; */
-        /* margin-right: ${theme.gutter * 0.5}px; */
 
         span {
             display: inline-block;

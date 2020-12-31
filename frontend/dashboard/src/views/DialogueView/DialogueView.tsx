@@ -1,6 +1,6 @@
 import * as UI from '@haas/ui';
 import * as qs from 'qs';
-import { Activity, Award, BarChart, Clipboard, Download, MessageCircle,
+import { Activity, Award, Clipboard, Download, MessageCircle,
   ThumbsDown, ThumbsUp, TrendingDown, TrendingUp } from 'react-feather';
 import { Button, Tag, TagIcon, TagLabel, useClipboard } from '@chakra-ui/core';
 import { Div, Flex, Grid, H4, Icon, Loader, PageTitle, Span, Text } from '@haas/ui';

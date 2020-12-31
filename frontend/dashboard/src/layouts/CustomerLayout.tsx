@@ -1,9 +1,9 @@
 import * as UI from '@haas/ui';
-import { useParams, useRouteMatch } from 'react-router';
+import { useParams } from 'react-router';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import { AnimatePresence, AnimateSharedLayout, motion } from 'framer-motion';
+import { AnimateSharedLayout, motion } from 'framer-motion';
 import { ReactComponent as ChartIcon } from 'assets/icons/icon-chartbar.svg';
 import { ReactComponent as ChatIcon } from 'assets/icons/icon-chat-group.svg';
 import { ReactComponent as CursorClickIcon } from 'assets/icons/icon-cursorclick.svg';
@@ -19,7 +19,6 @@ import { ReactComponent as TableIcon } from 'assets/icons/icon-table.svg';
 import { ReactComponent as UsersIcon } from 'assets/icons/icon-user-group.svg';
 
 import { ReactComponent as WrenchIcon } from 'assets/icons/icon-wrench.svg';
-import { ReactComponent as ZapIcon } from 'assets/icons/icon-zap.svg';
 import { useTranslation } from 'react-i18next';
 import Logo from 'components/Logo/Logo';
 import MobileBottomNav from 'components/MobileBottomNav';
@@ -27,10 +26,7 @@ import Sidenav from 'components/Sidenav';
 import useAuth from 'hooks/useAuth';
 import useMediaDevice from 'hooks/useMediaDevice';
 
-import { Activity, BarChart, Mail, Zap } from 'react-feather';
 import { NavLink } from 'react-router-dom';
-import { ensureLightColor } from 'utils/ColorUtils';
-import { useDialogue } from 'providers/DialogueProvider';
 import { useNavigator } from 'hooks/useNavigator';
 import NotAuthorizedView from './NotAuthorizedView';
 
@@ -93,8 +89,7 @@ const SubNavItem = styled.li`
 const DashboardNav = ({ customerSlug }: { customerSlug: string }) => {
   const { t } = useTranslation();
   const { canViewUsers, canEditCustomer, canCreateTriggers } = useAuth();
-  const { dialogueMatch, dialoguesMatch } = useNavigator();
-  const { activeDialogue } = useDialogue();
+  const { dialogueMatch } = useNavigator();
   const dialogueSlug = dialogueMatch?.params?.dialogueSlug;
 
   return (

@@ -62,8 +62,6 @@ const ActiveVariantForm = ({ form, activeVariantIndex, variant }: { form: UseFor
 
   const { fetchLazyDialogues } = useGetWorkspaceDialogues({ onlyLazy: true });
 
-  console.log(activeVariant);
-
   return (
     <UI.CardBody id="subForm">
       <UI.Div mb={2} borderBottom="1px solid #fff" borderColor="gray.300" pb={2}>
@@ -255,7 +253,11 @@ const CreateCampaignForm = () => {
         </UI.Stack>
         <UI.Card isFlat noHover bg="gray.100">
           {(activeVariantIndex === 0 || activeVariantIndex) ? (
-            <ActiveVariantForm variant={variants[activeVariantIndex]} activeVariantIndex={activeVariantIndex} form={form} />
+            <ActiveVariantForm
+              variant={variants[activeVariantIndex]}
+              activeVariantIndex={activeVariantIndex}
+              form={form}
+            />
           ) : (
             <UI.IllustrationCard
               svg={<DecideIll />}

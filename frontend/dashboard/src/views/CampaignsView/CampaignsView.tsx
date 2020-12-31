@@ -1,9 +1,9 @@
 import * as UI from '@haas/ui';
-import { Controller, useForm } from 'react-hook-form';
 import { Plus } from 'react-feather';
 import { useTranslation } from 'react-i18next';
-import CreateCampaignForm from './CreateCampaignForm';
 import React, { useState } from 'react';
+
+import CreateCampaignForm from './CreateCampaignForm';
 
 const CampaignsView = () => {
   const { t } = useTranslation();
