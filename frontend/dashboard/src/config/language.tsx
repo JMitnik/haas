@@ -5,6 +5,18 @@ const language = {
       en: 'Edit variant',
       de: 'Variante bearbeiten:',
     },
+    campaign_email_helper: {
+      en: 'Send campaign via email',
+      de: 'Kampagne per E-Mail senden',
+    },
+    campaign_sms_helper: {
+      en: 'Send campaign via SMS',
+      de: 'Kampagne per SMS senden',
+    },
+    distribution: {
+      en: 'Distribution',
+      de: 'Verteilung',
+    },
     body: {
       en: 'Body',
       de: 'Teil',
@@ -1340,7 +1352,7 @@ const language = {
       de: 'Bevor wir können Setup Bedingungen, sollten Sie einen Dialog zuerst auswählen.',
     },
     alert_email: {
-      en: 'Send alerts to emai',
+      en: 'Send alerts to email',
       de: 'Senden per E-Mail',
     },
     alert_sms: {

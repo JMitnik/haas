@@ -26,7 +26,7 @@ import { SpaceProps, GridProps } from 'styled-system';
 import { InputHTMLAttributes } from 'react';
 import Color from 'color';
 import { FormLabelProps } from '@chakra-ui/core/dist/FormLabel';
-import { Grid } from './Container';
+import { Grid, Stack } from './Container';
 import { Text } from './Type';
 
 
@@ -575,20 +575,25 @@ interface RadioButtonsProps {
   children: React.ReactNode;
   onChange: any;
   value: any;
+  defaultValue?: any;
   onBlur: any;
 }
 
-export const RadioButtons = ({ children, onChange, value, onBlur }: RadioButtonsProps) => (
+export const RadioButtons = forwardRef(({ children, onChange, value, defaultValue, onBlur }: RadioButtonsProps, ref) => (
   <ChakraRadioButtonGroup
     display="flex"
     flexWrap="wrap"
     onChange={onChange}
+    defaultValue={defaultValue}
     value={value}
+    ref={ref}
+    isInline
+    spacing={2}
     onBlur={onBlur}
   >
     {children}
   </ChakraRadioButtonGroup>
-);
+));
 
 export const InputGrid = (props: InputGridProps) => (
   <Grid mb={4} gridTemplateColumns={['1fr', '1fr', '1fr']} {...props}>

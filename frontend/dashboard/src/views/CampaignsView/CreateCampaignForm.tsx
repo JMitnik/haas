@@ -6,6 +6,7 @@ import { yupResolver } from '@hookform/resolvers';
 import React, { useState } from 'react';
 
 import { ReactComponent as DecideIll } from 'assets/images/undraw_decide.svg';
+import { Mail, Smartphone } from 'react-feather';
 import { useGetWorkspaceDialogues } from 'hooks/useGetWorkspaceDialogues';
 import Select from 'react-select/async';
 
@@ -38,7 +39,7 @@ const mapVariantIndexToLabel: { [key: number]: string } = {
 
 const variantSchema = yup.object({
   label: yup.string().required(),
-  type: yup.mixed().oneOf(['MAIL', 'SMS']).required(),
+  type: yup.mixed().oneOf(['EMAIL', 'SMS']).required(),
   dialogue: yup.object({
     label: yup.string(),
     value: yup.string(),
@@ -60,6 +61,8 @@ const ActiveVariantForm = ({ form, activeVariantIndex, variant }: { form: UseFor
   const { t } = useTranslation();
 
   const { fetchLazyDialogues } = useGetWorkspaceDialogues({ onlyLazy: true });
+
+  console.log(activeVariant);
 
   return (
     <UI.CardBody id="subForm">
@@ -105,6 +108,25 @@ const ActiveVariantForm = ({ form, activeVariantIndex, variant }: { form: UseFor
         </UI.FormControl>
 
         <UI.FormControl isRequired>
+          <UI.FormLabel>{t('distribution')}</UI.FormLabel>
+          <Controller
+            control={form.control}
+            defaultValue={variant.type}
+            name={`variants[${activeVariantIndex}].type`}
+            render={({ onChange, value, onBlur }) => (
+              <UI.RadioButtons
+                value={value}
+                onChange={onChange}
+                onBlur={onBlur}
+              >
+                <UI.RadioButton icon={Mail} value="EMAIL" text={t('email')} description={t('campaign_email_helper')} />
+                <UI.RadioButton icon={Smartphone} value="SMS" text={t('sms')} description={t('campaign_sms_helper')} />
+              </UI.RadioButtons>
+            )}
+          />
+        </UI.FormControl>
+
+        <UI.FormControl isRequired>
           <UI.FormLabel htmlFor={`variants[${activeVariantIndex}].body`}>{t('body')}</UI.FormLabel>
           <Controller
             name={`variants[${activeVariantIndex}].body`}
@@ -131,14 +153,14 @@ const CreateCampaignForm = () => {
       variants: [
         {
           label: '',
-          type: 'MAIL',
+          type: 'EMAIL',
           body: createCampaignBodyPlaceholder,
           weight: 50,
           dialogue: null,
         },
         {
           label: '',
-          type: 'MAIL',
+          type: 'EMAIL',
           body: createCampaignBodyPlaceholder,
           weight: 50,
           dialogue: null,
@@ -187,7 +209,7 @@ const CreateCampaignForm = () => {
 
   return (
     <UI.Form onSubmit={form.handleSubmit(handleSubmit)}>
-      <UI.Grid gridTemplateColumns={['1fr', '1fr 1fr']}>
+      <UI.Grid gridTemplateColumns={['1fr', '1fr 2fr']}>
         <UI.Stack spacing={4}>
           <UI.FormControl isRequired>
             <UI.FormLabel htmlFor="label">{t('campaign_label')}</UI.FormLabel>
