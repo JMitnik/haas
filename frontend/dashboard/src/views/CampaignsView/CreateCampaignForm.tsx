@@ -5,27 +5,33 @@ import { useTranslation } from 'react-i18next';
 import { yupResolver } from '@hookform/resolvers';
 import React, { useState } from 'react';
 
+import { CampaignVariantEnum } from 'types/globalTypes';
+
 import { ReactComponent as DecideIll } from 'assets/images/undraw_decide.svg';
 import { Mail, Smartphone } from 'react-feather';
+import { useCustomer } from 'providers/CustomerProvider';
 import { useGetWorkspaceDialogues } from 'hooks/useGetWorkspaceDialogues';
+import { useMutation } from '@apollo/react-hooks';
+import { useToast } from '@chakra-ui/core';
 import Select from 'react-select/async';
+import gql from 'graphql-tag';
 
-type CampaignVariantType = 'SMS' | 'MAIL' | 'QUEUE';
+import {
+  createCampaignMutation_createCampaign as CreateOutput,
+  createCampaignMutationVariables as CreateVariables,
+} from './__generated__/createCampaignMutation';
 
-interface CreateCampaignVariantFormProps {
-  label: string;
-  type: CampaignVariantType;
-  dialogueId: string;
-  body: string;
-  weight: number;
-}
+const CREATE_CAMPAIGN_MUTATION = gql`
+  mutation createCampaignMutation($input: CreateCampaignInputType) {
+    createCampaign(input: $input) {
+      id
+    }
+  }
+`;
 
 type InputEvent = React.FormEvent<HTMLInputElement>;
 
-interface CreateCampaignFormProps {
-  label: string;
-  variants: CreateCampaignVariantFormProps[];
-}
+type CampaignType = 'SMS' | 'EMAIL' | 'QUEUE';
 
 const createCampaignBodyPlaceholder = `Dear {{firstName}},
 thank you for subscribing to {{dialogueId}}!
@@ -43,7 +49,7 @@ const variantSchema = yup.object({
   dialogue: yup.object({
     label: yup.string(),
     value: yup.string(),
-  }).nullable(),
+  }).required(),
   body: yup.string().required(),
   weight: yup.number().required(),
 }).required();
@@ -88,7 +94,7 @@ const ActiveVariantForm = ({ form, activeVariantIndex, variant }: { form: UseFor
             name={`variants[${activeVariantIndex}].dialogue`}
             key={variant.variantIndex}
             control={form.control}
-            defaultValue={activeVariant.dialogue}
+            defaultValue={activeVariant.dialogue || null}
             render={({ value, onChange, onBlur }) => (
               <Select
                 placeholder="Select a dialogue"
@@ -144,7 +150,11 @@ const ActiveVariantForm = ({ form, activeVariantIndex, variant }: { form: UseFor
   );
 };
 
-const CreateCampaignForm = () => {
+const CreateCampaignForm = ({ onClose }: { onClose: () => void }) => {
+  const { activeCustomer } = useCustomer();
+  const toast = useToast();
+  const { t } = useTranslation();
+
   const form = useForm<FormProps>({
     defaultValues: {
       label: '',
@@ -154,20 +164,57 @@ const CreateCampaignForm = () => {
           type: 'EMAIL',
           body: createCampaignBodyPlaceholder,
           weight: 50,
-          dialogue: null,
+          dialogue: undefined,
         },
         {
           label: '',
           type: 'EMAIL',
           body: createCampaignBodyPlaceholder,
           weight: 50,
-          dialogue: null,
+          dialogue: undefined,
         },
       ],
     },
     shouldUnregister: false,
     resolver: yupResolver(schema),
     mode: 'onChange',
+  });
+
+  const [createCampaign] = useMutation<CreateOutput, CreateVariables>(CREATE_CAMPAIGN_MUTATION, {
+    variables: {
+      input: {
+        label: form.getValues().label,
+        variants: form.getValues().variants?.map((variant) => ({
+          dialogueId: variant.dialogue?.value || '',
+          body: variant.body,
+          label: variant.label,
+          subject: '',
+          weight: variant.weight,
+          type: variant.type as CampaignVariantEnum,
+          workspaceId: activeCustomer?.id || '',
+        })),
+      },
+    },
+    onCompleted: () => {
+      toast({
+        title: t('toast:campaign_created'),
+        description: t('toast:campaign_created_helper'),
+        status: 'success',
+        position: 'bottom-right',
+        duration: 1500,
+      });
+
+      onClose();
+    },
+    onError: () => {
+      toast({
+        title: 'Something went wrong!',
+        description: 'Currently unable to edit your detail. Please try again.',
+        status: 'error',
+        position: 'bottom-right',
+        duration: 1500,
+      });
+    },
   });
 
   const [activeVariantIndex, setActiveVariantIndex] = useState<number | null>(null);
@@ -179,8 +226,6 @@ const CreateCampaignForm = () => {
       setActiveVariantIndex(index);
     }
   };
-
-  const { t } = useTranslation();
 
   const { fields: variants } = useFieldArray({
     name: 'variants',
@@ -201,8 +246,8 @@ const CreateCampaignForm = () => {
     form.setValue(`variants.${currentItemIndex}.weight`, value);
   };
 
-  const handleSubmit = (data: any) => {
-    console.log(data);
+  const handleSubmit = () => {
+    createCampaign();
   };
 
   return (

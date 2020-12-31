@@ -7,6 +7,12 @@
 // START Enums and Input Objects
 //==============================================================
 
+export enum CampaignVariantEnum {
+  EMAIL = "EMAIL",
+  QUEUE = "QUEUE",
+  SMS = "SMS",
+}
+
 /**
  * The types a field can assume
  */
@@ -125,6 +131,21 @@ export interface CreateCTAInputType {
   links?: CTALinksInputType | null;
   share?: ShareNodeInputType | null;
   form?: FormNodeInputType | null;
+}
+
+export interface CreateCampaignInputType {
+  label?: string | null;
+  variants?: CreateCampaignVariantInputType[] | null;
+}
+
+export interface CreateCampaignVariantInputType {
+  label?: string | null;
+  workspaceId: string;
+  dialogueId: string;
+  type: CampaignVariantEnum;
+  body?: string | null;
+  weight?: number | null;
+  subject?: string | null;
 }
 
 export interface CreateDialogueInputType {

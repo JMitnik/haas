@@ -34,8 +34,8 @@ const validateProbabilityEdges = (input: NexusGenInputs['CreateCampaignInputType
   const totalWeight = weights?.reduce((total, weight) => total + weight);
 
   // Since approximation, let's do it like this
-  if (totalWeight > 1.01 || totalWeight < 0.99) {
-    throw new UserInputError('Weights do not sum up to 1');
+  if (totalWeight !== 100) {
+    throw new UserInputError('Weights do not sum up to 100%');
   }
 };
 
@@ -43,7 +43,7 @@ const saveCampaign = (input: NexusGenInputs['CreateCampaignInputType']): Campaig
   label: input.label || '',
   variantsEdges: {
     create: input.variants?.map((variant) => ({
-      weight: variant.weight || 0.5,
+      weight: variant.weight || 50,
       campaignVariant: {
         create: {
           label: variant.label || '',

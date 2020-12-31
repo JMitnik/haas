@@ -20,7 +20,7 @@ const CampaignsView = () => {
         <UI.Card width={900} noHover bg="white">
           <UI.CardBody>
             <UI.FormSectionHeader>{t('create_campaign')}</UI.FormSectionHeader>
-            <CreateCampaignForm />
+            <CreateCampaignForm onClose={() => setIsOpenedModal(false)} />
           </UI.CardBody>
         </UI.Card>
       </UI.Modal>
