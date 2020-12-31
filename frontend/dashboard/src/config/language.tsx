@@ -1,14 +1,6 @@
 /* eslint-disable max-len */
 const language = {
   general: {
-    campaign_created: {
-      en: 'Campaign created!',
-      de: 'Kampagne erstellt!',
-    },
-    campaign_created_helper: {
-      en: 'A new campaign has been created.',
-      de: 'Eine neue Kampagne wurde erstellt.',
-    },
     edit_variant: {
       en: 'Edit variant',
       de: 'Variante bearbeiten:',
@@ -1183,6 +1175,14 @@ const language = {
     },
   },
   toast: {
+    campaign_created: {
+      en: 'Campaign created!',
+      de: 'Kampagne erstellt!',
+    },
+    campaign_created_helper: {
+      en: 'A new campaign has been created.',
+      de: 'Eine neue Kampagne wurde erstellt.',
+    },
     delete_node: {
       en: '',
       de: '',
