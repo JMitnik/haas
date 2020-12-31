@@ -57,7 +57,7 @@ const CampaignsView = () => {
             isFlat
             text={t('select_campaign_text')}
           >
-            <UI.Span fontSize="1rem" maxWidth="200px">
+            <UI.Div style={{ fontSize: '1rem', textAlign: 'left' }} margin="0 auto" maxWidth="200px">
               <Select
                 options={campaigns.map((campaign: any) => ({
                   label: campaign.label,
@@ -66,7 +66,7 @@ const CampaignsView = () => {
                 onChange={(data) => console.log(data)}
                 placeholder={t('select_campaign')}
               />
-            </UI.Span>
+            </UI.Div>
           </UI.IllustrationCard>
           )}
         <UI.Modal isOpen={openedModal} onClose={() => setIsOpenedModal(false)}>
