@@ -28,7 +28,9 @@ export const useNavigator = () => {
     });
     
     history.push(path);
-  }
+  };
+
+  const getCampaignsPath = () => generatePath(ROUTES.CAMPAIGNS_VIEW, { customerSlug, campaignId });
 
   const dialoguesMatch = useRouteMatch({
     path: ROUTES.DIALOGUES_VIEW,
@@ -40,6 +42,7 @@ export const useNavigator = () => {
 
   return {
     goToCampaignView,
+    getCampaignsPath,
     dialoguesMatch,
     dialogueMatch,
     customerSlug,

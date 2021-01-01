@@ -24,6 +24,18 @@ export const PageTitle = styled(Text)`
       width: 24px;
     }
   `}
+`
+
+export const Helper = styled(Text)`
+  ${({ theme }) => css`
+    margin: 0;  
+    color: ${theme.colors.gray[500]};
+    font-weight: 700;
+    line-height: 1rem;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  `}
 `;
 
 export const SubtlePageHeading = styled(Text)`

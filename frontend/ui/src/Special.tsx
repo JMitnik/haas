@@ -33,7 +33,6 @@ const IllustrationCardWrapper = styled.div`
   `}
 `;
 
-
 export const IllustrationCard = ({svg, text, children, isFlat}: { svg: any, text: string, children?: React.ReactNode, isFlat?: boolean; }) => {
   return (
     <Card noHover isFlat={isFlat}>

@@ -1,12 +1,14 @@
 import styled, { css } from 'styled-components';
 import React, { FC } from 'react';
-import { Link } from 'react-router-dom';
-import { Settings } from 'react-feather';
+import { Link, LinkProps } from 'react-router-dom';
+import { ChevronLeft, Settings } from 'react-feather';
 
 import { GenericProps, Div } from './Generics';
 import { ProfilePic } from './User';
-import { Paragraph } from './Type';
+import { Helper, Paragraph } from './Type';
 import { color, ColorProps } from 'styled-system';
+import { Icon } from './Icon';
+import { Flex } from './Container';
 
 const TopNavContainer = styled(Div)<GenericProps>`
   ${({ theme }) => css`
@@ -19,6 +21,18 @@ const TopNavContainer = styled(Div)<GenericProps>`
     }
   `}
 `;
+
+
+export const Breadcrumb = ({ children, ...props }: LinkProps) => (
+  <Link {...props}>
+    <Flex alignItems="center">
+      <Helper style={{ display: 'flex', alignItems: 'center', fontSize: '0.7rem' }}>
+        <Icon as={ChevronLeft} width="18px" color="currentColor" />
+        {children}
+      </Helper>
+    </Flex>
+  </Link>
+)
 
 export const ExtLinkContainer = styled.a<ColorProps>`
   ${({ theme }) => css`

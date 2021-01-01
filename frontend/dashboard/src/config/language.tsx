@@ -1,6 +1,10 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    back_to_campaigns: {
+      en: 'Back to campaigns',
+      de: 'Zurück zu den Kampagnen'
+    },
     select_campaign: {
       en: 'Select campaign',
       de: 'Kampagne auswählen'
