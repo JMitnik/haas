@@ -12,6 +12,7 @@ input AppendToInteractionInput {
 
 """Campaign"""
 type CampaignType {
+  deliveryConnection: [DeliveryConnectionType!]
   id: ID!
   label: String!
   variants: [CampaignVariantType!]!
@@ -26,6 +27,7 @@ enum CampaignVariantEnum {
 """Variant of campaign"""
 type CampaignVariantType {
   body: String!
+  deliveryConnection: [DeliveryConnectionType!]
   id: ID!
   label: String!
   weight: Int!
@@ -150,6 +152,7 @@ input CTAShareInputObjectType {
 }
 
 type Customer {
+  campaign(campaignId: String): CampaignType!
   campaigns: [CampaignType!]!
   dialogue(where: DialogueWhereUniqueInput): Dialogue
   dialogues(filter: DialogueFilterInputType): [Dialogue!]
@@ -201,9 +204,13 @@ type DeleteUserOutput {
   deletedUser: Boolean!
 }
 
-"""Delivery"""
-type Delivery {
-  id: ID!
+type DeliveryConnectionType implements ConnectionInterface {
+  deliveries: [DeliveryType!]!
+  endDate: String
+  limit: Int!
+  offset: Int!
+  pageInfo: PaginationPageInfo!
+  startDate: String
 }
 
 enum DeliveryStatusEnum {
@@ -212,6 +219,13 @@ enum DeliveryStatusEnum {
   OPENED
   SCHEDULED
   SENT
+}
+
+"""Delivery"""
+type DeliveryType {
+  id: ID!
+  recipientFirstName: String!
+  recipientLastName: String!
 }
 
 type Dialogue {
@@ -607,6 +621,7 @@ type PermssionType {
 type Query {
   customer(id: ID, slug: String): Customer
   customers: [Customer!]!
+  delivery(deliveryId: String): DeliveryType!
   dialogue(where: DialogueWhereUniqueInput): Dialogue
   dialogues(filter: DialogueFilterInputType): [Dialogue!]!
   edge(id: String): Edge

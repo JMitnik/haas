@@ -89,9 +89,10 @@ export const CreateCampaignResolver = mutationField('createCampaign', {
 
     return {
       ...campaign,
+      deliveries: [],
       variants: campaign.variantsEdges.map(variantEdge => ({
         weight: variantEdge.weight,
-        ...variantEdge.campaignVariant
+        ...variantEdge.campaignVariant,
       }))
     };
   },

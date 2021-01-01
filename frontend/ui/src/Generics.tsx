@@ -10,8 +10,6 @@ export interface GenericProps extends FlexboxProps, FlexProps, WidthProps, Borde
 
 export const Div = styled.div<GenericProps>`
   ${({ useFlex, useGrid, fillChildren }) => css`
-
-
     ${useFlex && css`display: flex;`}
     ${useGrid && css`display: grid;`}
     ${fillChildren && css` > * {height: 100%; width: 100%;}`}

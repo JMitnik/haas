@@ -3,17 +3,23 @@ import gql from 'graphql-tag';
 
 import { useNavigator } from './useNavigator';
 
-interface UseGetWorkspaceCampaignsOptionsProps {
+interface UseGetWorkspaceDialoguesOptionsProps {
+  campaignId?: String; 
   onlyLazy?: boolean;
 }
 
-const GET_WORKSPACE_CAMPAIGNS = gql`
-  query getWorkspaceCampaigns($customerSlug: String!) {
+const GET_WORKSPACE_CAMPAIGN_DELIVERIES = gql`
+  query getWorkspaceCampaigns($customerSlug: String!, $campaignId: String!) {
     customer(slug: $customerSlug) {
       id
-      campaigns {
+      campaign(campaignId: $campaignId) {
         id
         label
+        deliveryConnection {
+          deliveries {
+            id
+          }
+        }
         
         variants {
           id
@@ -24,37 +30,39 @@ const GET_WORKSPACE_CAMPAIGNS = gql`
   }
 `;
 
-export const useGetWorkspaceCampaigns = (options?: UseGetWorkspaceCampaignsOptionsProps) => {
+export const useGetWorkspaceCampaign = (options?: UseGetWorkspaceDialoguesOptionsProps) => {
   const { customerSlug } = useNavigator();
-  const { data: workspaceOfCampaigns, loading: isLoading, client } = useQuery(GET_WORKSPACE_CAMPAIGNS, {
+  const { data: workspaceOfCampaign, loading: isLoading, client } = useQuery(GET_WORKSPACE_CAMPAIGN_DELIVERIES, {
     skip: options?.onlyLazy,
     fetchPolicy: 'cache-and-network',
     variables: {
       // TODO: Fix for testing that we can mock the slug
       customerSlug: customerSlug || 'test',
+      campaignId: options?.campaignId,
     },
   });
 
   const fetchLazyCampaigns = async () => new Promise(async (resolve) => {
     const { data } = await client.query({
-      query: GET_WORKSPACE_CAMPAIGNS,
+      query: GET_WORKSPACE_CAMPAIGN_DELIVERIES,
       variables: {
         // TODO: Fix for testing that we can mock the slug
         customerSlug: customerSlug || 'test',
+        campaignId: options?.campaignId,
       },
     });
 
-    const campaigns = (data?.customer?.campaigns || []).map((dialogue: any) => ({
+    const deliveries = (data?.customer?.campaigns || []).map((dialogue: any) => ({
       label: dialogue.title,
       value: dialogue.id,
       ...dialogue,
     }));
 
-    return resolve(campaigns);
+    return resolve(deliveries);
   });
 
   return {
-    campaigns: workspaceOfCampaigns?.customer?.campaigns || [],
+    campaign: workspaceOfCampaign?.customer?.campaign,
     isLoading,
     fetchLazyCampaigns,
   };

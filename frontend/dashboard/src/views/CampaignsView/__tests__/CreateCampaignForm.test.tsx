@@ -54,6 +54,7 @@ const Wrapper = ({ children }: { children?: React.ReactNode }) => (
 );
 
 // TODO: Put this in a prep
+// @ts-ignore
 document.createRange = function () {
   return {
     setEnd() {},

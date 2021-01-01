@@ -380,12 +380,14 @@ export interface NexusGenEnums {
 
 export interface NexusGenRootTypes {
   CampaignType: { // root type
+    deliveryConnection?: NexusGenRootTypes['DeliveryConnectionType'][] | null; // [DeliveryConnectionType!]
     id: string; // ID!
     label: string; // String!
     variants: NexusGenRootTypes['CampaignVariantType'][]; // [CampaignVariantType!]!
   }
   CampaignVariantType: { // root type
     body: string; // String!
+    deliveryConnection?: NexusGenRootTypes['DeliveryConnectionType'][] | null; // [DeliveryConnectionType!]
     id: string; // ID!
     label: string; // String!
     weight: number; // Int!
@@ -401,7 +403,19 @@ export interface NexusGenRootTypes {
   DeleteUserOutput: { // root type
     deletedUser: boolean; // Boolean!
   }
-  Delivery: prisma.Delivery;
+  DeliveryConnectionType: { // root type
+    deliveries: NexusGenRootTypes['DeliveryType'][]; // [DeliveryType!]!
+    endDate?: string | null; // String
+    limit: number; // Int!
+    offset: number; // Int!
+    pageInfo: NexusGenRootTypes['PaginationPageInfo']; // PaginationPageInfo!
+    startDate?: string | null; // String
+  }
+  DeliveryType: { // root type
+    id: string; // ID!
+    recipientFirstName: string; // String!
+    recipientLastName: string; // String!
+  }
   Dialogue: prisma.Dialogue;
   DialogueStatistics: { // root type
     history?: NexusGenRootTypes['lineChartDataType'][] | null; // [lineChartDataType!]
@@ -600,7 +614,7 @@ export interface NexusGenRootTypes {
     basicSentiment?: string | null; // String
     quantity?: number | null; // Int
   }
-  ConnectionInterface: NexusGenRootTypes['SessionConnection'] | NexusGenRootTypes['UserConnection'] | NexusGenRootTypes['RoleConnection'] | NexusGenRootTypes['TriggerConnectionType'];
+  ConnectionInterface: NexusGenRootTypes['DeliveryConnectionType'] | NexusGenRootTypes['SessionConnection'] | NexusGenRootTypes['UserConnection'] | NexusGenRootTypes['RoleConnection'] | NexusGenRootTypes['TriggerConnectionType'];
   String: string;
   Int: number;
   Float: number;
@@ -688,12 +702,14 @@ export interface NexusGenAllTypes extends NexusGenRootTypes {
 
 export interface NexusGenFieldTypes {
   CampaignType: { // field return type
+    deliveryConnection: NexusGenRootTypes['DeliveryConnectionType'][] | null; // [DeliveryConnectionType!]
     id: string; // ID!
     label: string; // String!
     variants: NexusGenRootTypes['CampaignVariantType'][]; // [CampaignVariantType!]!
   }
   CampaignVariantType: { // field return type
     body: string; // String!
+    deliveryConnection: NexusGenRootTypes['DeliveryConnectionType'][] | null; // [DeliveryConnectionType!]
     id: string; // ID!
     label: string; // String!
     weight: number; // Int!
@@ -709,6 +725,7 @@ export interface NexusGenFieldTypes {
     nrDeliveries: number; // Int!
   }
   Customer: { // field return type
+    campaign: NexusGenRootTypes['CampaignType']; // CampaignType!
     campaigns: NexusGenRootTypes['CampaignType'][]; // [CampaignType!]!
     dialogue: NexusGenRootTypes['Dialogue'] | null; // Dialogue
     dialogues: NexusGenRootTypes['Dialogue'][] | null; // [Dialogue!]
@@ -732,8 +749,18 @@ export interface NexusGenFieldTypes {
   DeleteUserOutput: { // field return type
     deletedUser: boolean; // Boolean!
   }
-  Delivery: { // field return type
+  DeliveryConnectionType: { // field return type
+    deliveries: NexusGenRootTypes['DeliveryType'][]; // [DeliveryType!]!
+    endDate: string | null; // String
+    limit: number; // Int!
+    offset: number; // Int!
+    pageInfo: NexusGenRootTypes['PaginationPageInfo']; // PaginationPageInfo!
+    startDate: string | null; // String
+  }
+  DeliveryType: { // field return type
     id: string; // ID!
+    recipientFirstName: string; // String!
+    recipientLastName: string; // String!
   }
   Dialogue: { // field return type
     averageScore: number; // Float!
@@ -906,6 +933,7 @@ export interface NexusGenFieldTypes {
   Query: { // field return type
     customer: NexusGenRootTypes['Customer'] | null; // Customer
     customers: NexusGenRootTypes['Customer'][]; // [Customer!]!
+    delivery: NexusGenRootTypes['DeliveryType']; // DeliveryType!
     dialogue: NexusGenRootTypes['Dialogue'] | null; // Dialogue
     dialogues: NexusGenRootTypes['Dialogue'][]; // [Dialogue!]!
     edge: NexusGenRootTypes['Edge'] | null; // Edge
@@ -1096,6 +1124,9 @@ export interface NexusGenFieldTypes {
 
 export interface NexusGenArgTypes {
   Customer: {
+    campaign: { // args
+      campaignId?: string | null; // String
+    }
     dialogue: { // args
       where?: NexusGenInputs['DialogueWhereUniqueInput'] | null; // DialogueWhereUniqueInput
     }
@@ -1252,6 +1283,9 @@ export interface NexusGenArgTypes {
       id?: string | null; // ID
       slug?: string | null; // String
     }
+    delivery: { // args
+      deliveryId?: string | null; // String
+    }
     dialogue: { // args
       where?: NexusGenInputs['DialogueWhereUniqueInput'] | null; // DialogueWhereUniqueInput
     }
@@ -1313,12 +1347,12 @@ export interface NexusGenArgTypes {
 }
 
 export interface NexusGenAbstractResolveReturnTypes {
-  ConnectionInterface: "SessionConnection" | "UserConnection" | "RoleConnection" | "TriggerConnectionType"
+  ConnectionInterface: "DeliveryConnectionType" | "SessionConnection" | "UserConnection" | "RoleConnection" | "TriggerConnectionType"
 }
 
 export interface NexusGenInheritedFields {}
 
-export type NexusGenObjectNames = "CampaignType" | "CampaignVariantType" | "ColourSettings" | "CreateBatchDeliveriesOutputType" | "Customer" | "CustomerSettings" | "Debug" | "DeleteUserOutput" | "Delivery" | "Dialogue" | "DialogueStatistics" | "Edge" | "EdgeCondition" | "FailedDeliveryModel" | "FontSettings" | "FormNodeEntryType" | "FormNodeEntryValueType" | "FormNodeField" | "FormNodeType" | "ImageType" | "InviteUserOutput" | "LinkType" | "LoginOutput" | "Mutation" | "NodeEntry" | "NodeEntryValue" | "PaginationPageInfo" | "PermssionType" | "Query" | "QuestionNode" | "QuestionOption" | "RefreshAccessTokenOutput" | "RequestInviteOutput" | "RoleConnection" | "RoleType" | "Session" | "SessionConnection" | "ShareNodeType" | "SliderNodeMarkerType" | "SliderNodeRangeType" | "SliderNodeType" | "Tag" | "TriggerConditionType" | "TriggerConnectionType" | "TriggerType" | "UserConnection" | "UserCustomer" | "UserType" | "VerifyUserTokenOutput" | "lineChartDataType" | "topPathType";
+export type NexusGenObjectNames = "CampaignType" | "CampaignVariantType" | "ColourSettings" | "CreateBatchDeliveriesOutputType" | "Customer" | "CustomerSettings" | "Debug" | "DeleteUserOutput" | "DeliveryConnectionType" | "DeliveryType" | "Dialogue" | "DialogueStatistics" | "Edge" | "EdgeCondition" | "FailedDeliveryModel" | "FontSettings" | "FormNodeEntryType" | "FormNodeEntryValueType" | "FormNodeField" | "FormNodeType" | "ImageType" | "InviteUserOutput" | "LinkType" | "LoginOutput" | "Mutation" | "NodeEntry" | "NodeEntryValue" | "PaginationPageInfo" | "PermssionType" | "Query" | "QuestionNode" | "QuestionOption" | "RefreshAccessTokenOutput" | "RequestInviteOutput" | "RoleConnection" | "RoleType" | "Session" | "SessionConnection" | "ShareNodeType" | "SliderNodeMarkerType" | "SliderNodeRangeType" | "SliderNodeType" | "Tag" | "TriggerConditionType" | "TriggerConnectionType" | "TriggerType" | "UserConnection" | "UserCustomer" | "UserType" | "VerifyUserTokenOutput" | "lineChartDataType" | "topPathType";
 
 export type NexusGenInputNames = "AppendToInteractionInput" | "CTALinkInputObjectType" | "CTALinksInputType" | "CTAShareInputObjectType" | "ChoiceNodeEntryInput" | "CreateBatchDeliveriesInputType" | "CreateCTAInputType" | "CreateCampaignInputType" | "CreateCampaignVariantInputType" | "CreateDialogueInputType" | "CreateQuestionNodeInputType" | "CreateTriggerInputType" | "CreateWorkspaceInput" | "CustomerWhereUniqueInput" | "DeleteDialogueInputType" | "DeleteNodeInputType" | "DeleteUserInput" | "DialogueFilterInputType" | "DialogueWhereUniqueInput" | "EdgeConditionInputType" | "EditUserInput" | "EditWorkspaceInput" | "FormNodeEntryFieldInput" | "FormNodeEntryInput" | "FormNodeFieldInput" | "FormNodeInputType" | "GetCampaignsInput" | "InviteUserInput" | "LoginInput" | "NodeEntryDataInput" | "NodeEntryInput" | "OptionInputType" | "OptionsInputType" | "PaginationSortInput" | "PaginationWhereInput" | "PermissionIdsInput" | "PermissionInput" | "QuestionNodeWhereInputType" | "QuestionNodeWhereUniqueInput" | "RecipientsInputType" | "RegisterInput" | "RegisterNodeEntryInput" | "RequestInviteInput" | "RoleDataInput" | "RoleInput" | "SessionInput" | "SessionWhereUniqueInput" | "ShareNodeInputType" | "SlideNodeMarkerInput" | "SliderNodeEntryInput" | "SliderNodeInputType" | "SliderNodeRangeInputType" | "SocialNodeEntryInput" | "TagsInputObjectType" | "TextboxNodeEntryInput" | "TriggerConditionInputType" | "TriggerInputType" | "UpdateCTAInputType" | "UpdateQuestionNodeInputType" | "UserInput" | "UserOfCustomerInput";
 

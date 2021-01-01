@@ -8,8 +8,14 @@ export const ROUTES = {
   CAMPAIGN_VIEW: '/dashboard/b/:customerSlug/campaign/:campaignId',
 };
 
+interface DashboardParams {
+  customerSlug: string;
+  dialogueSlug: string;
+  campaignId: string;
+}
+
 export const useNavigator = () => {
-  const { customerSlug, dialogueSlug } = useParams<{ customerSlug: string, dialogueSlug: string }>();
+  const { customerSlug, dialogueSlug, campaignId } = useParams<DashboardParams>();
   const dialogueMatch = useRouteMatch<{ dialogueSlug: string }>({
     path: ROUTES.DIALOGUE_ROOT,
   });
@@ -38,6 +44,7 @@ export const useNavigator = () => {
     dialogueMatch,
     customerSlug,
     dialogueSlug,
+    campaignId,
     campaignsMatch,
   };
 };
