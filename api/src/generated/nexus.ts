@@ -380,14 +380,14 @@ export interface NexusGenEnums {
 
 export interface NexusGenRootTypes {
   CampaignType: { // root type
-    deliveryConnection?: NexusGenRootTypes['DeliveryConnectionType'][] | null; // [DeliveryConnectionType!]
+    deliveryConnection?: NexusGenRootTypes['DeliveryConnectionType'] | null; // DeliveryConnectionType
     id: string; // ID!
     label: string; // String!
     variants: NexusGenRootTypes['CampaignVariantType'][]; // [CampaignVariantType!]!
   }
   CampaignVariantType: { // root type
     body: string; // String!
-    deliveryConnection?: NexusGenRootTypes['DeliveryConnectionType'][] | null; // [DeliveryConnectionType!]
+    deliveryConnection?: NexusGenRootTypes['DeliveryConnectionType'] | null; // DeliveryConnectionType
     id: string; // ID!
     label: string; // String!
     weight: number; // Int!
@@ -702,14 +702,14 @@ export interface NexusGenAllTypes extends NexusGenRootTypes {
 
 export interface NexusGenFieldTypes {
   CampaignType: { // field return type
-    deliveryConnection: NexusGenRootTypes['DeliveryConnectionType'][] | null; // [DeliveryConnectionType!]
+    deliveryConnection: NexusGenRootTypes['DeliveryConnectionType'] | null; // DeliveryConnectionType
     id: string; // ID!
     label: string; // String!
     variants: NexusGenRootTypes['CampaignVariantType'][]; // [CampaignVariantType!]!
   }
   CampaignVariantType: { // field return type
     body: string; // String!
-    deliveryConnection: NexusGenRootTypes['DeliveryConnectionType'][] | null; // [DeliveryConnectionType!]
+    deliveryConnection: NexusGenRootTypes['DeliveryConnectionType'] | null; // DeliveryConnectionType
     id: string; // ID!
     label: string; // String!
     weight: number; // Int!

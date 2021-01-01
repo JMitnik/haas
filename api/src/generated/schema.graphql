@@ -12,7 +12,7 @@ input AppendToInteractionInput {
 
 """Campaign"""
 type CampaignType {
-  deliveryConnection: [DeliveryConnectionType!]
+  deliveryConnection: DeliveryConnectionType
   id: ID!
   label: String!
   variants: [CampaignVariantType!]!
@@ -27,7 +27,7 @@ enum CampaignVariantEnum {
 """Variant of campaign"""
 type CampaignVariantType {
   body: String!
-  deliveryConnection: [DeliveryConnectionType!]
+  deliveryConnection: DeliveryConnectionType
   id: ID!
   label: String!
   weight: Int!

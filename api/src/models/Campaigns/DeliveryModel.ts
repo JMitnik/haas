@@ -51,11 +51,17 @@ export const GetDelivery = extendType({
 /**
  * Access pattern to access Deliveries by campaign
  */
-export const GetDeliveryOfCampaign = extendType({
+export const GetDeliveryConnectionOfCampaign = extendType({
   type: 'CampaignType',
 
   definition(t) {
-    t.list.field('deliveryConnection', { type: DeliveryConnectionModel, nullable: true });
+    t.field('deliveryCollection', { 
+      type: DeliveryConnectionModel, 
+      nullable: true,
+      resolve: async (parent, args, ctx) => {
+        
+      }
+    });
   }
 });
 
@@ -66,7 +72,7 @@ export const GetDeliveryOfCampaignVariant = extendType({
   type: 'CampaignVariantType',
 
   definition(t) {
-    t.list.field('deliveryConnection', { type: DeliveryConnectionModel, nullable: true });
+    t.field('deliveryConnection', { type: DeliveryConnectionModel, nullable: true });
   }
 });
 
