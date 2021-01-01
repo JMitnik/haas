@@ -2,6 +2,7 @@ import * as UI from '@haas/ui';
 import { useGetWorkspaceCampaign } from 'hooks/useGetWorkspaceCampaign';
 import { useNavigator } from 'hooks/useNavigator';
 import React, { useState } from 'react';
+import { Plus } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { ImportDeliveriesForm } from './ImportDeliveriesForm';
 
@@ -25,7 +26,9 @@ export const CampaignView = () => {
           <UI.Breadcrumb to={campaignsPath}>{t('back_to_campaigns')}</UI.Breadcrumb>
           <UI.Stack isInline alignItems="center" spacing={4}>
             <UI.PageTitle>{campaign?.label}</UI.PageTitle>
-            <UI.Button onClick={() => setIsOpenImportModal(true)} size="sm" variantColor="teal">{t('import_deliveries')}</UI.Button>
+            <UI.Button 
+              leftIcon={Plus}
+            onClick={() => setIsOpenImportModal(true)} size="sm" variantColor="teal">{t('import_deliveries')}</UI.Button>
           </UI.Stack>
         </UI.Stack>
       </UI.ViewHeading>

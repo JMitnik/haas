@@ -1,6 +1,10 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    import_deliveries: {
+      en: 'Import deliveries',
+      de: 'Lieferungen importieren.'
+    },
     back_to_campaigns: {
       en: 'Back to campaigns',
       de: 'Zurück zu den Kampagnen'

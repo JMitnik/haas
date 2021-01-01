@@ -133,6 +133,7 @@ const ActiveVariantForm = ({ form, activeVariantIndex, variant }: { form: UseFor
         <UI.FormControl isRequired>
           <UI.FormLabel htmlFor={`variants[${activeVariantIndex}].body`}>{t('body')}</UI.FormLabel>
           <Controller
+            key={variant.variantIndex}
             name={`variants[${activeVariantIndex}].body`}
             id={`variants[${activeVariantIndex}].body`}
             control={form.control}

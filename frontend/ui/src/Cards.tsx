@@ -11,10 +11,11 @@ interface CardProps {
   isFlat?: boolean;
   outline?: boolean;
   boxShadow?: BoxShadowSize;
+  willFocusWithin?: boolean;
 }
 
 export const Card = styled(Div)<CardProps>`
-  ${({ theme, noHover, boxShadow, outline, isFlat }) => css`
+  ${({ theme, noHover, boxShadow, outline, isFlat, willFocusWithin }) => css`
     position: relative;
     display: flex;
     flex-direction: column;
@@ -24,10 +25,12 @@ export const Card = styled(Div)<CardProps>`
     box-shadow: rgba(0, 0, 0, 0.08) 0px 4px 12px;
     /* transition: all .3s cubic-bezier(.55,0,.1,1); */
 
-    &:focus-within {
-      transition: all .3s cubic-bezier(.55,0,.1,1);
-      box-shadow: rgba(0, 0, 0, 0.20) 0px 4px 12px;
-    }
+    ${willFocusWithin && css`
+      &:focus-within {
+        transition: all .3s cubic-bezier(.55,0,.1,1);
+        box-shadow: rgba(0, 0, 0, 0.20) 0px 4px 12px;
+      }
+    `}
 
     ${isFlat && css`
       box-shadow: none;

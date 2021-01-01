@@ -220,7 +220,6 @@ export const CreateBatchDeliveriesResolver = mutationField('createBatchDeliverie
             type: 'string',
             value: record.email || ''
           },
-          // TODO: Fill in the value
           {
             key: 'DeliveryBody',
             type: 'string',
