@@ -118,6 +118,7 @@ export const CreateBatchDeliveriesResolver = mutationField('createBatchDeliverie
             campaignVariant: {
               include: {
                 dialogue: true,
+                workspace: true,
               }
             },
           },
@@ -156,7 +157,8 @@ export const CreateBatchDeliveriesResolver = mutationField('createBatchDeliverie
         firstName: record.firstName,
         lastName: record.lastName,
         dialogueUrl,
-        dialogueName: variant?.campaignVariant?.dialogue?.title || ''
+        dialogueName: variant?.campaignVariant?.dialogue?.title || '',
+        workspaceName: variant?.campaignVariant?.workspace?.name || '',
       });
 
       return {
