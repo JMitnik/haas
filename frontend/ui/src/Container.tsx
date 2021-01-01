@@ -52,7 +52,7 @@ export const Container = styled(Div)<ContainerProps>`
 
 const ViewHeadingContainer = styled(Div)`
   ${({ theme }) => css`
-    padding: ${theme.gutter}px;
+    padding: ${theme.gutter / 2}px ${theme.gutter}px;
     border-bottom: 1px solid ${theme.colors.gray[200]};
 
     ${PageTitle} {

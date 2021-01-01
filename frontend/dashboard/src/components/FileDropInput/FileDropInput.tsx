@@ -55,7 +55,7 @@ const UploadPreviewContainer = styled(Div)`
 `;
 
 const FileDropInput = (props: any) => {
-  const { onDrop, isLoading, value } = props;
+  const { onDrop, isLoading, value, type } = props;
 
   const {
     acceptedFiles,
@@ -65,7 +65,7 @@ const FileDropInput = (props: any) => {
     isDragAccept,
     isDragReject,
   } = useDropzone({
-    accept: 'image/*',
+    // accept: 'image/*',
     onDrop,
   });
 

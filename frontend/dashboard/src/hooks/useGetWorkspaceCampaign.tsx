@@ -4,12 +4,12 @@ import gql from 'graphql-tag';
 import { useNavigator } from './useNavigator';
 
 interface UseGetWorkspaceDialoguesOptionsProps {
-  campaignId?: String; 
+  campaignId?: string; 
   onlyLazy?: boolean;
 }
 
-const GET_WORKSPACE_CAMPAIGN_DELIVERIES = gql`
-  query getWorkspaceCampaigns($customerSlug: String!, $campaignId: String!) {
+const GET_WORKSPACE_CAMPAIGN = gql`
+  query getWorkspaceCampaign($customerSlug: String!, $campaignId: String!) {
     customer(slug: $customerSlug) {
       id
       campaign(campaignId: $campaignId) {
@@ -32,7 +32,7 @@ const GET_WORKSPACE_CAMPAIGN_DELIVERIES = gql`
 
 export const useGetWorkspaceCampaign = (options?: UseGetWorkspaceDialoguesOptionsProps) => {
   const { customerSlug } = useNavigator();
-  const { data: workspaceOfCampaign, loading: isLoading, client } = useQuery(GET_WORKSPACE_CAMPAIGN_DELIVERIES, {
+  const { data: workspaceOfCampaign, loading: isLoading, client } = useQuery(GET_WORKSPACE_CAMPAIGN, {
     skip: options?.onlyLazy,
     fetchPolicy: 'cache-and-network',
     variables: {
@@ -44,7 +44,7 @@ export const useGetWorkspaceCampaign = (options?: UseGetWorkspaceDialoguesOption
 
   const fetchLazyCampaigns = async () => new Promise(async (resolve) => {
     const { data } = await client.query({
-      query: GET_WORKSPACE_CAMPAIGN_DELIVERIES,
+      query: GET_WORKSPACE_CAMPAIGN,
       variables: {
         // TODO: Fix for testing that we can mock the slug
         customerSlug: customerSlug || 'test',
