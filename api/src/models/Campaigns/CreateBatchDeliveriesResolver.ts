@@ -218,7 +218,7 @@ export const CreateBatchDeliveriesResolver = mutationField('createBatchDeliverie
           {
             key: 'DeliveryRecipient',
             type: 'string',
-            value: record.email || ''
+            value: (record.variant.campaignVariant.type === 'EMAIL' ? record.email : record.phoneNumber) || ''
           },
           {
             key: 'DeliveryBody',
