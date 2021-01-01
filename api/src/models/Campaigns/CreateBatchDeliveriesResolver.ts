@@ -6,6 +6,7 @@ import { CampaignVariantTypeEnum } from '@prisma/client';
 import { parseCsv } from '../../utils/parseCsv';
 import { probability } from '../../utils/probability';
 import prisma from '../../config/prisma';
+import DynamoScheduleService from '../../services/DynamoScheduleService';
 
 interface CSVDeliveryRow {
   firstName?: string;
@@ -150,12 +151,42 @@ export const CreateBatchDeliveriesResolver = mutationField('createBatchDeliverie
             scheduledAt: args?.input?.batchScheduledAt || now,
           },
         });
+
         return true;
       } catch (e) {
         console.log('Error:', e);
         return false;
       }
     }));
+
+    try {
+      await DynamoScheduleService.batchScheduleOneOffs(successRecords.map(record => ({
+        attributes: [
+          {
+            key: 'DeliveryDate',
+            value: nanoid(10),
+            type: 'string'
+          },
+          {
+            key: 'DeliveryDate_DeliveryID',
+            value: nanoid(10),
+            type: 'string'
+          },
+          {
+            key: 'email',
+            type: 'string',
+            value: record.email || ''
+          },
+          {
+            key: 'phoneNumber',
+            type: 'string',
+            value: record.phoneNumber || ''
+          },
+        ]
+      })), { tableName: 'CampaignDeliveries' });
+    } catch (e) {
+      console.log(e);
+    }
 
     return {
       nrDeliveries: successes.filter((item) => item).length,

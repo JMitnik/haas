@@ -5,7 +5,7 @@ import AWS from '../config/aws';
 
 import config from '../config/config';
 
-const dynamoClient = new AWS.DynamoDB.DocumentClient();
+const dynamoClient = new AWS.DynamoDB();
 
 export interface MailSendInput {
   recipient: string;
@@ -40,12 +40,15 @@ class DynamoScheduleService {
    * Schedules a batch of `one-off` items (>25 items) and send write requests to DynamoDB.
    * @param items
    */
-  async batchScheduleOneOffs(items: ScheduleItem[], schedulerOptions: SchedulerOptions) {
+  static async batchScheduleOneOffs(items: ScheduleItem[], schedulerOptions: SchedulerOptions) {
     const batchGroups = _.chunk(items, MAX_BATCH_SIZE);
 
     batchGroups.forEach(async (batch) => {
       const processedBatch = DynamoScheduleService.processBatchForDynamo(batch, schedulerOptions);
-      dynamoClient.batchWrite(processedBatch, (err, data) => {
+
+      console.log(JSON.stringify(processedBatch));
+
+      dynamoClient.batchWriteItem(processedBatch, (err, data) => {
         if (err) console.log(err, err.stack); // an error occurred
         else console.log(data); // successful response
       });
