@@ -1,3 +1,4 @@
+import * as UI from '@haas/ui';
 import { ChevronDown, ChevronUp } from 'react-feather';
 import { Div, Span, Text } from '@haas/ui';
 import { Icon } from '@chakra-ui/core';
@@ -38,9 +39,9 @@ const TableHeaderColumn = ({
       borderRadius="10px 0 0 10px"
     >
       <Div style={{ cursor: !disableSorting ? 'pointer' : 'auto' }} display="inline-block">
-        <Text color={isInActiveSort ? 'gray.600' : 'gray.400'} fontSize="1.1rem" fontWeight="600">
+        <UI.Helper style={{color: isInActiveSort ? 'gray.800 !important' : 'gray.400 !important'}} fontSize="1.1rem" fontWeight="600">
           {t(Header)}
-        </Text>
+        </UI.Helper>
       </Div>
 
       <Span>
