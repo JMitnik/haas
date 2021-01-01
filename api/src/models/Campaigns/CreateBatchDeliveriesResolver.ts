@@ -2,6 +2,7 @@ import { UserInputError } from 'apollo-server';
 import { inputObjectType, mutationField, objectType } from '@nexus/schema';
 import { nanoid } from 'nanoid';
 import format from 'date-fns/format';
+import mustache from 'mustache';
 
 import { CampaignVariantTypeEnum, DeliveryStatusTypeEnum } from '@prisma/client';
 import { parseCsv } from '../../utils/parseCsv';
@@ -114,7 +115,11 @@ export const CreateBatchDeliveriesResolver = mutationField('createBatchDeliverie
       include: {
         variantsEdges: {
           include: {
-            campaignVariant: true,
+            campaignVariant: {
+              include: {
+                dialogue: true,
+              }
+            },
           },
         },
       },
@@ -142,11 +147,24 @@ export const CreateBatchDeliveriesResolver = mutationField('createBatchDeliverie
       const useFirstVariant = probability(relatedCampaign.variantsEdges[0].weight);
       const variant = useFirstVariant ? relatedCampaign.variantsEdges[0] : relatedCampaign.variantsEdges[1];
 
+      const dialogueUrl = `https://haas.live/${id}`;
+
+      // Derive body of variant based on present data
+      const templateBody = variant.campaignVariant.body.replace(/\{\{([^\}]*)\}\}/g, '{{{$1}}}');
+
+      const body = mustache.render(templateBody, {
+        firstName: record.firstName,
+        lastName: record.lastName,
+        dialogueUrl,
+        dialogueName: variant?.campaignVariant?.dialogue?.title || ''
+      });
+
       return {
         ...record,
         id,
         scheduleKey,
         variant,
+        body,
         scheduleKeyId
       }
     });
@@ -204,7 +222,7 @@ export const CreateBatchDeliveriesResolver = mutationField('createBatchDeliverie
           {
             key: 'DeliveryBody',
             type: 'string',
-            value: record.variant.campaignVariant.body
+            value: record.body
           },
           {
             key: 'DeliveryStatus',

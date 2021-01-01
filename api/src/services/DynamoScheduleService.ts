@@ -3,8 +3,6 @@ import * as _ from 'lodash';
 import { DynamoDB } from 'aws-sdk';
 import AWS from '../config/aws';
 
-import config from '../config/config';
-
 const dynamoClient = new AWS.DynamoDB();
 
 export interface MailSendInput {
