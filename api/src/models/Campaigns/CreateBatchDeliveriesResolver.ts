@@ -1,8 +1,9 @@
 import { UserInputError } from 'apollo-server';
 import { inputObjectType, mutationField, objectType } from '@nexus/schema';
 import { nanoid } from 'nanoid';
+import format from 'date-fns/format';
 
-import { CampaignVariantTypeEnum } from '@prisma/client';
+import { CampaignVariantTypeEnum, DeliveryStatusTypeEnum } from '@prisma/client';
 import { parseCsv } from '../../utils/parseCsv';
 import { probability } from '../../utils/probability';
 import prisma from '../../config/prisma';
@@ -106,6 +107,8 @@ export const CreateBatchDeliveriesResolver = mutationField('createBatchDeliverie
     const csvData = await parseCsv(file);
 
     if (!args.input.campaignId) throw new UserInputError('No related campaign provided!');
+    if (!args.input.batchScheduledAt) throw new UserInputError('No scheduled date provided!');
+
     const relatedCampaign = await prisma.campaign.findOne({
       where: { id: args.input.campaignId },
       include: {
@@ -125,30 +128,49 @@ export const CreateBatchDeliveriesResolver = mutationField('createBatchDeliverie
       relatedCampaign.variantsEdges.map((variantEdge) => variantEdge.campaignVariant.type),
     );
 
-    // 3. For each row in CSV, assign a delivery to a potential "Variant" based on weight
-    const successes = await Promise.all(successRecords.map(async (record) => {
-      const useFirstVariant = probability(relatedCampaign.variantsEdges[0].weight);
-      const variant = useFirstVariant ? relatedCampaign.variantsEdges[0] : relatedCampaign.variantsEdges[1];
+    // For each row in CSV, we do some small preprocessing
+    const preprocessedRecords = successRecords.map(record => {
+      // Generate unique ID
       const id = nanoid(10);
 
+      // Derive the scheduleKey (dayMonthYear) and scheduleKeyId (timestamp_uniqueId)
+      const scheduledDate = new Date(args.input?.batchScheduledAt as string);
+      const scheduleKey = format(scheduledDate, 'ddMMyyyy');
+      const scheduleKeyId = `${scheduledDate.toISOString()}_${id}`;
+
+      // Assign a campaign variant
+      const useFirstVariant = probability(relatedCampaign.variantsEdges[0].weight);
+      const variant = useFirstVariant ? relatedCampaign.variantsEdges[0] : relatedCampaign.variantsEdges[1];
+
+      return {
+        ...record,
+        id,
+        scheduleKey,
+        variant,
+        scheduleKeyId
+      }
+    });
+
+    const successes = await Promise.all(preprocessedRecords.map(async (record) => {
       const now = new Date().toISOString();
 
       try {
         await prisma.delivery.create({
           data: {
-            id,
+            id: record.id,
             deliveryRecipientEmail: record.email,
             deliveryRecipientLastName: record.lastName,
             deliveryRecipientFirstName: record.firstName,
             deliveryRecipientPhone: record.phoneNumber,
             campaignVariant: {
-              connect: { id: variant.campaignVariantId },
+              connect: { id: record.variant.campaignVariantId },
             },
             campaign: {
-              connect: { id: variant.campaignId },
+              connect: { id: record.variant.campaignId },
             },
             currentStatus: 'SCHEDULED',
-            scheduledAt: args?.input?.batchScheduledAt || now,
+            // TODO: catch this on creation
+            scheduledAt: new Date(args?.input?.batchScheduledAt as string) || now,
           },
         });
 
@@ -159,23 +181,40 @@ export const CreateBatchDeliveriesResolver = mutationField('createBatchDeliverie
       }
     }));
 
+
     try {
-      await DynamoScheduleService.batchScheduleOneOffs(successRecords.map(record => ({
+      await DynamoScheduleService.batchScheduleOneOffs(preprocessedRecords.map(record => ({
         attributes: [
           {
             key: 'DeliveryDate',
-            value: nanoid(10),
+            value: record.scheduleKey,
             type: 'string'
           },
           {
             key: 'DeliveryDate_DeliveryID',
-            value: nanoid(10),
+            value: record.scheduleKeyId,
             type: 'string'
           },
           {
-            key: 'email',
+            key: 'DeliveryRecipient',
             type: 'string',
             value: record.email || ''
+          },
+          // TODO: Fill in the value
+          {
+            key: 'DeliveryBody',
+            type: 'string',
+            value: record.variant.campaignVariant.body
+          },
+          {
+            key: 'DeliveryStatus',
+            type: 'string',
+            value: DeliveryStatusTypeEnum.SCHEDULED
+          },
+          {
+            key: 'DeliveryType',
+            type: 'string',
+            value: record.variant.campaignVariant.type
           },
           {
             key: 'phoneNumber',
