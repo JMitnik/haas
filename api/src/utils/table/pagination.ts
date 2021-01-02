@@ -128,7 +128,7 @@ export const paginate = async ({
   // Find entries logic
   const findManyInput = constructFindManyInput({ ...findManyArgs, paginationOpts });
   const entries = await findManyArgs.findManyCallBack({ props: findManyInput, paginationOpts, rest });
-  const slicedEntries = slice(entries, (offset || 0), (limit || 0), (pageIndex || 0));
+  const slicedEntries = slice(entries, (offset || 0), (limit || entries.length), (pageIndex || 0));
 
   // Page logic
   const triggerTotal = await countCallBack({ props: countWhereInput, paginationOpts, rest: countRest });
