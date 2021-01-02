@@ -9,7 +9,7 @@ import { sortBy } from 'lodash';
 import { TEXT_NODES } from '../questionnaire/Dialogue';
 // eslint-disable-next-line import/no-cycle
 // eslint-disable-next-line import/no-cycle
-import { NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
+import { NexusGenFieldTypes, NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
 import NodeEntryService, { NodeEntryWithTypes } from '../node-entry/NodeEntryService';
 // eslint-disable-next-line import/no-cycle
 import { FindManyCallBackProps, PaginateProps, paginate } from '../../utils/table/pagination';
@@ -318,7 +318,7 @@ class SessionService {
     };
 
     return {
-      sessions: entries,
+      sessions: entries as NexusGenFieldTypes['Session'][],
       offset: paginationOpts?.offset || 0,
       limit: paginationOpts?.limit || 0,
       startDate: paginationOpts?.startDate?.toString(),

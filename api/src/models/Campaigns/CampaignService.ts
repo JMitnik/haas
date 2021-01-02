@@ -2,7 +2,7 @@ import { addDays } from 'date-fns';
 import { uniqueId } from 'lodash';
 import prisma from '../../config/prisma';
 import AWS from '../../config/aws';
-import { NexusGenInputs } from '../../generated/nexus';
+import { NexusGenFieldTypes, NexusGenInputs } from '../../generated/nexus';
 import { FindManyCallBackProps, PaginateProps, paginate } from '../../utils/table/pagination';
 import { DeliveryStatusTypeEnum, FindManyDeliveryArgs } from '@prisma/client';
 
@@ -18,12 +18,11 @@ export class CampaignService {
    * @param campaignId 
    * @param paginationOptions 
    */
-  static getPaginatedDeliveries(
+  static getPaginatedDeliveries<GenericModelType>(
     campaignId: string,
-    paginationOptions: NexusGenInputs['PaginationWhereInput'],
+    paginationOptions?: NexusGenInputs['PaginationWhereInput'],
     deliveryOptions?: DeliveryOptionsProps
   ) {
-
     const deliveryFilterOptions: FindManyDeliveryArgs = { 
       where: { 
         campaignId,
@@ -54,8 +53,21 @@ export class CampaignService {
       paginationOpts: paginationOptions
     };
 
-    return paginate(deliveryPaginationOptions);
+    return paginate<GenericModelType>(deliveryPaginationOptions);
+  }
+
+  /**
+   * Fetches general statistics about a specific collection
+   * @param deliveries 
+   */
+  static getStatisticsFromDeliveries(
+    deliveries: NexusGenFieldTypes['DeliveryType'][],
+  ) {
+    return {
+      nrTotal: deliveries.length,
+      nrFinished: deliveries.filter(entry => entry.status === 'FINISHED').length,
+      nrOpened: deliveries.filter(entry => entry.status === 'OPENED' || entry.status === 'FINISHED').length,
+      nrSent: deliveries.filter(entry => entry.status === 'DEPLOYED' || entry.status === 'SENT').length
+    }
   }
 }
-
-

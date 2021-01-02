@@ -9,6 +9,7 @@ import { QuestionNodeType } from '../QuestionNode/QuestionNode';
 import { UserType } from '../users/User';
 
 import TriggerService from './TriggerService';
+import { NexusGenFieldTypes } from '../../generated/nexus';
 
 const TriggerTypeEnum = enumType({
   name: 'TriggerTypeEnum',
@@ -315,7 +316,12 @@ const TriggerQueries = extendType({
         // TODO: Do we put this here, or extract it from the graph?
         // const users = await ctx.prisma.trigger.findMany({ where: { customerId: args.customerId } });
 
-        return { triggers: entries, pageInfo, offset: args.filter?.offset || 0, limit: args.filter?.limit || 0 };
+        return { 
+          triggers: entries as NexusGenFieldTypes['TriggerType'][], 
+          pageInfo, 
+          offset: args.filter?.offset || 0, 
+          limit: args.filter?.limit || 0 
+        };
       },
     });
 

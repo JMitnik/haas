@@ -1,5 +1,19 @@
-import { enumType, extendType, objectType } from '@nexus/schema';
+import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
+import { UserInputError } from 'apollo-server';
+import { NexusGenFieldTypes } from '../../generated/nexus';
+import { PaginationWhereInput } from '../general/Pagination';
+import { CampaignService } from './CampaignService';
 
+
+export const DeliveryStatusEnum = enumType({
+  name: 'DeliveryStatusEnum',
+
+  members: ['SCHEDULED', 'DEPLOYED', 'SENT', 'OPENED', 'FINISHED'],
+});
+
+/**
+ * Data model for a Delivery
+ */
 export const DeliveryModel = objectType({
   name: 'DeliveryType',
   description: 'Delivery',
@@ -7,6 +21,7 @@ export const DeliveryModel = objectType({
     t.id('id');
     t.string('recipientFirstName');
     t.string('recipientLastName');
+    t.field('status', { type: DeliveryStatusEnum });
   },
 });
 
@@ -16,8 +31,23 @@ export const DeliveryConnectionModel = objectType({
   definition(t) {
     t.implements('ConnectionInterface');
     t.list.field('deliveries', { type: DeliveryModel });
+    t.int('nrTotal');
+    t.int('nrSent');
+    t.int('nrOpened');
+    t.int('nrFinished');
   }
 });
+
+export const DeliveryConnectionFilterInput = inputObjectType({
+  name: 'DeliveryConnectionFilter',
+
+  definition(t) {
+    t.string('campaignId');
+    t.field('paginationFilter', { type: PaginationWhereInput, nullable: true });
+    t.field('status', { type: DeliveryStatusEnum, nullable: true });
+    t.id('campaignVariantId', { nullable: true });
+  }
+})
 
 /**
  * Access pattern to access Delivery by itself
@@ -55,11 +85,35 @@ export const GetDeliveryConnectionOfCampaign = extendType({
   type: 'CampaignType',
 
   definition(t) {
-    t.field('deliveryCollection', { 
+    t.field('deliveryConnection', { 
       type: DeliveryConnectionModel, 
       nullable: true,
+      args: { filter: DeliveryConnectionFilterInput },
+
       resolve: async (parent, args, ctx) => {
-        
+        if (!args?.filter?.campaignId) throw new UserInputError('No campaign ID was provided');
+
+        const deliveriesPaginated = await CampaignService.getPaginatedDeliveries<NexusGenFieldTypes['DeliveryType']>(
+          args?.filter?.campaignId,
+          args?.filter?.paginationFilter || undefined,
+          {
+            status: args?.filter?.status || undefined,
+            variantId: args?.filter?.campaignVariantId || undefined
+          }
+        );
+
+        const { nrFinished, nrOpened, nrSent, nrTotal } = CampaignService.getStatisticsFromDeliveries(deliveriesPaginated.entries);
+
+        return {
+          deliveries: deliveriesPaginated.entries,
+          pageInfo: deliveriesPaginated.pageInfo,
+          offset: args.filter?.paginationFilter?.offset || 0,
+          limit: args.filter?.paginationFilter?.limit || 0,
+          nrTotal,
+          nrFinished,
+          nrOpened,
+          nrSent
+        };
       }
     });
   }
@@ -74,10 +128,4 @@ export const GetDeliveryOfCampaignVariant = extendType({
   definition(t) {
     t.field('deliveryConnection', { type: DeliveryConnectionModel, nullable: true });
   }
-});
-
-export const DeliveryStatusEnum = enumType({
-  name: 'DeliveryStatusEnum',
-
-  members: ['SCHEDULED', 'DEPLOYED', 'SENT', 'OPENED', 'FINISHED'],
 });

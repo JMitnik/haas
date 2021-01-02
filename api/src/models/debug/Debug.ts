@@ -20,8 +20,6 @@ export const DebugMutation = mutationField('debugMutation', {
   type: 'String',
   nullable: true,
   async resolve() {
-    const test = CampaignService.getPaginatedDeliveries();
-    console.log(test);
     return 'asasdasd';
   },
 });

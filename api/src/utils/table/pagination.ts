@@ -34,8 +34,8 @@ export interface CountArgsProps {
 
 export interface PaginateProps {
   findManyArgs: FindManyArgsProps;
-  paginationOpts: NexusGenInputs['PaginationWhereInput'];
   countArgs: CountArgsProps;
+  paginationOpts?: NexusGenInputs['PaginationWhereInput'];
 }
 
 export type findManyInput = {
@@ -115,9 +115,9 @@ export const constructFindManyInput = (
   };
 };
 
-export const paginate = async ({
+export const paginate = async <GenericModelType>({
   findManyArgs,
-  paginationOpts,
+  paginationOpts = {},
   countArgs,
 } : PaginateProps,
 ) => {
@@ -142,7 +142,7 @@ export const paginate = async ({
   };
 
   return {
-    entries: slicedEntries,
+    entries: slicedEntries as GenericModelType[],
     pageInfo,
   };
 };

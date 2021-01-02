@@ -12,7 +12,7 @@ input AppendToInteractionInput {
 
 """Campaign"""
 type CampaignType {
-  deliveryConnection: DeliveryConnectionType
+  deliveryConnection(filter: DeliveryConnectionFilter): DeliveryConnectionType
   id: ID!
   label: String!
   variants: [CampaignVariantType!]!
@@ -204,10 +204,21 @@ type DeleteUserOutput {
   deletedUser: Boolean!
 }
 
+input DeliveryConnectionFilter {
+  campaignId: String
+  campaignVariantId: ID
+  paginationFilter: PaginationWhereInput
+  status: DeliveryStatusEnum
+}
+
 type DeliveryConnectionType implements ConnectionInterface {
   deliveries: [DeliveryType!]!
   endDate: String
   limit: Int!
+  nrFinished: Int!
+  nrOpened: Int!
+  nrSent: Int!
+  nrTotal: Int!
   offset: Int!
   pageInfo: PaginationPageInfo!
   startDate: String
@@ -226,6 +237,7 @@ type DeliveryType {
   id: ID!
   recipientFirstName: String!
   recipientLastName: String!
+  status: DeliveryStatusEnum!
 }
 
 type Dialogue {
@@ -578,6 +590,7 @@ enum PaginationSortByEnum {
   name
   paths
   role
+  scheduledAt
   score
   type
   user
