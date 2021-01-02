@@ -19,9 +19,12 @@ export const DeliveryModel = objectType({
   description: 'Delivery',
   definition(t) {
     t.id('id');
-    t.string('recipientFirstName');
-    t.string('recipientLastName');
-    t.field('status', { type: DeliveryStatusEnum });
+    t.string('deliveryRecipientFirstName');
+    t.string('deliveryRecipientLastName');
+    t.string('deliveryRecipientEmail');
+    t.string('deliveryRecipientPhone');
+    t.string('scheduledAt');
+    t.field('currentStatus', { type: DeliveryStatusEnum });
   },
 });
 
@@ -91,10 +94,11 @@ export const GetDeliveryConnectionOfCampaign = extendType({
       args: { filter: DeliveryConnectionFilterInput },
 
       resolve: async (parent, args, ctx) => {
-        if (!args?.filter?.campaignId) throw new UserInputError('No campaign ID was provided');
+        const campaignId = parent.id || args?.filter?.campaignId;
+        if (!campaignId) throw new UserInputError('No campaign ID was provided');
 
         const deliveriesPaginated = await CampaignService.getPaginatedDeliveries<NexusGenFieldTypes['DeliveryType']>(
-          args?.filter?.campaignId,
+          campaignId,
           args?.filter?.paginationFilter || undefined,
           {
             status: args?.filter?.status || undefined,

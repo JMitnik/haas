@@ -234,10 +234,13 @@ enum DeliveryStatusEnum {
 
 """Delivery"""
 type DeliveryType {
+  currentStatus: DeliveryStatusEnum!
+  deliveryRecipientEmail: String!
+  deliveryRecipientFirstName: String!
+  deliveryRecipientLastName: String!
+  deliveryRecipientPhone: String!
   id: ID!
-  recipientFirstName: String!
-  recipientLastName: String!
-  status: DeliveryStatusEnum!
+  scheduledAt: String!
 }
 
 type Dialogue {

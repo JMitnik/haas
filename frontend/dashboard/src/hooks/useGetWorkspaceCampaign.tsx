@@ -18,6 +18,12 @@ const GET_WORKSPACE_CAMPAIGN = gql`
         deliveryConnection {
           deliveries {
             id
+            deliveryRecipientFirstName
+            deliveryRecipientLastName
+            deliveryRecipientEmail
+            deliveryRecipientPhone
+            scheduledAt
+            currentStatus
           }
         }
         

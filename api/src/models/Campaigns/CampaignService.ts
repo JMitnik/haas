@@ -65,9 +65,9 @@ export class CampaignService {
   ) {
     return {
       nrTotal: deliveries.length,
-      nrFinished: deliveries.filter(entry => entry.status === 'FINISHED').length,
-      nrOpened: deliveries.filter(entry => entry.status === 'OPENED' || entry.status === 'FINISHED').length,
-      nrSent: deliveries.filter(entry => entry.status === 'DEPLOYED' || entry.status === 'SENT').length
+      nrFinished: deliveries.filter(entry => entry.currentStatus === 'FINISHED').length,
+      nrOpened: deliveries.filter(entry => entry.currentStatus === 'OPENED' || entry.currentStatus === 'FINISHED').length,
+      nrSent: deliveries.filter(entry => entry.currentStatus === 'DEPLOYED' || entry.currentStatus === 'SENT').length
     }
   }
 }

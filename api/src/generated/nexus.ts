@@ -421,10 +421,13 @@ export interface NexusGenRootTypes {
     startDate?: string | null; // String
   }
   DeliveryType: { // root type
+    currentStatus: NexusGenEnums['DeliveryStatusEnum']; // DeliveryStatusEnum!
+    deliveryRecipientEmail: string; // String!
+    deliveryRecipientFirstName: string; // String!
+    deliveryRecipientLastName: string; // String!
+    deliveryRecipientPhone: string; // String!
     id: string; // ID!
-    recipientFirstName: string; // String!
-    recipientLastName: string; // String!
-    status: NexusGenEnums['DeliveryStatusEnum']; // DeliveryStatusEnum!
+    scheduledAt: string; // String!
   }
   Dialogue: prisma.Dialogue;
   DialogueStatistics: { // root type
@@ -773,10 +776,13 @@ export interface NexusGenFieldTypes {
     startDate: string | null; // String
   }
   DeliveryType: { // field return type
+    currentStatus: NexusGenEnums['DeliveryStatusEnum']; // DeliveryStatusEnum!
+    deliveryRecipientEmail: string; // String!
+    deliveryRecipientFirstName: string; // String!
+    deliveryRecipientLastName: string; // String!
+    deliveryRecipientPhone: string; // String!
     id: string; // ID!
-    recipientFirstName: string; // String!
-    recipientLastName: string; // String!
-    status: NexusGenEnums['DeliveryStatusEnum']; // DeliveryStatusEnum!
+    scheduledAt: string; // String!
   }
   Dialogue: { // field return type
     averageScore: number; // Float!
