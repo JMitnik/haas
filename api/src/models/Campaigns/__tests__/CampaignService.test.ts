@@ -50,6 +50,7 @@ const SAMPLE_CAMPAIGN: CampaignCreateInput = {
   }
 };
 
+// TODO: Make DRY
 const NR_DELIVERIES_A = 15;
 
 const SAMPLE_DELIVERIES_A: DeliveryCreateInput[] = Array.from(Array(NR_DELIVERIES_A)).map((nr) => ({
@@ -75,8 +76,38 @@ const SAMPLE_DELIVERIES_B: DeliveryCreateInput[] = Array.from(Array(NR_DELIVERIE
   deliveryRecipientPhone: faker.phone.phoneNumber(),
   campaign: { connect: { id: SAMPLE_CAMPAIGN.id } },
   campaignVariant:{ connect: { id: 'TEST_VARIANT_2' } },
+  currentStatus: 'SCHEDULED',
+}));
+
+const NR_DELIVERIES_DEPLOYED_AND_A = 10;
+
+const SAMPLE_DELIVERIES_DEPLOYED_AND_A: DeliveryCreateInput[] = Array.from(Array(NR_DELIVERIES_DEPLOYED_AND_A)).map((nr) => ({
+  id: `TEST_DELIVERY_${faker.random.uuid()}`,
+  scheduledAt: faker.date.future().toISOString(),
+  deliveryRecipientFirstName: faker.name.firstName(),
+  deliveryRecipientLastName: faker.name.lastName(),
+  deliveryRecipientEmail: faker.internet.email(),
+  deliveryRecipientPhone: faker.phone.phoneNumber(),
+  campaign: { connect: { id: SAMPLE_CAMPAIGN.id } },
+  campaignVariant:{ connect: { id: 'TEST_VARIANT_1' } },
   currentStatus: 'DEPLOYED',
 }));
+
+const NR_DELIVERIES_DEPLOYED_AND_B = 5;
+
+const SAMPLE_DELIVERIES_DEPLOYED_AND_B: DeliveryCreateInput[] = Array.from(Array(NR_DELIVERIES_DEPLOYED_AND_B)).map((nr) => ({
+  id: `TEST_DELIVERY_${faker.random.uuid()}`,
+  scheduledAt: faker.date.future().toISOString(),
+  deliveryRecipientFirstName: faker.name.firstName(),
+  deliveryRecipientLastName: faker.name.lastName(),
+  deliveryRecipientEmail: faker.internet.email(),
+  deliveryRecipientPhone: faker.phone.phoneNumber(),
+  campaign: { connect: { id: SAMPLE_CAMPAIGN.id } },
+  campaignVariant:{ connect: { id: 'TEST_VARIANT_2' } },
+  currentStatus: 'DEPLOYED',
+}));
+
+const ALL_DELIVERIES = [...SAMPLE_DELIVERIES_A, ...SAMPLE_DELIVERIES_B, ...SAMPLE_DELIVERIES_DEPLOYED_AND_A, ...SAMPLE_DELIVERIES_DEPLOYED_AND_B];
 
 
 beforeAll(async () => {
@@ -106,7 +137,7 @@ beforeAll(async () => {
     }
 
     try {
-      const deliveries = await Promise.all([...SAMPLE_DELIVERIES_A, ...SAMPLE_DELIVERIES_B].map(async (SAMPLE_DELIVERY) => {
+      const deliveries = await Promise.all(ALL_DELIVERIES.map(async (SAMPLE_DELIVERY) => {
         await prisma.delivery.create({
           data: SAMPLE_DELIVERY
         }); 
@@ -178,16 +209,8 @@ afterAll(async () => {
   console.log("===============================");
 });
 
-describe('CampaignService', () => {
-  test('it fetches campaign', async () => {
-    const test = await prisma.campaign.findFirst({
-      where: { id: SAMPLE_CAMPAIGN.id }
-    });
-  
-    expect(test.label).toBe(SAMPLE_CAMPAIGN.label);
-  });
-
-  test('fetch 10 out of 50 deliveries', async () => {
+describe('CampaignService:pagination', () => {
+  test('it fetches 10 out of 50 deliveries', async () => {
     const deliveryPagination = await CampaignService.getPaginatedDeliveries(
       SAMPLE_CAMPAIGN.id as string, 
       { limit: 10 },
@@ -196,13 +219,23 @@ describe('CampaignService', () => {
     expect(deliveryPagination.entries.length).toBe(10);
   });
 
-  test('fetch only variant B', async () => {
+  test('it fetches only variant B', async () => {
     const deliveryPagination = await CampaignService.getPaginatedDeliveries(
       SAMPLE_CAMPAIGN.id as string, 
       {  },
       { variantId: 'TEST_VARIANT_2' }
     );
 
-    expect(deliveryPagination.entries.length).toBe(NR_DELIVERIES_B);
+    expect(deliveryPagination.entries.length).toBe(NR_DELIVERIES_B + NR_DELIVERIES_DEPLOYED_AND_B);
+  });
+
+  test('it fetches only deployed', async () => {
+    const deliveryPagination = await CampaignService.getPaginatedDeliveries(
+      SAMPLE_CAMPAIGN.id as string, 
+      {  },
+      { status: 'DEPLOYED' }
+    );
+
+    expect(deliveryPagination.entries.length).toBe(NR_DELIVERIES_DEPLOYED_AND_A + NR_DELIVERIES_DEPLOYED_AND_B);
   });
 });

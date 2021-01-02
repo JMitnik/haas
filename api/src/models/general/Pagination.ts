@@ -4,7 +4,12 @@ const PaginationSortByEnum = enumType({
   name: 'PaginationSortByEnum',
   description: 'Ways to sort a pagination object',
   // TODO: Make this enum overrideable?
-  members: ['score', 'id', 'createdAt', 'email', 'name', 'firstName', 'lastName', 'role', 'medium', 'type', 'paths', 'user', 'when'],
+  members: [
+    'score', 'id', 'createdAt', 'email', 
+    'name', 'firstName', 'lastName', 'role', 
+    'medium', 'type', 'paths', 'user', 'when',
+    'scheduledAt'
+  ],
 });
 
 export const PaginationSearchEnum = enumType({

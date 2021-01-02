@@ -13,7 +13,8 @@ interface DeliveryOptionsProps {
 
 export class CampaignService {
   /**
-   * Gets paginated deliveries
+   * Gets paginated deliveries given a `campaignId`, generic `paginationOptions` and specific
+   * delivery-centric access options.
    * @param campaignId 
    * @param paginationOptions 
    */
@@ -23,29 +24,32 @@ export class CampaignService {
     deliveryOptions?: DeliveryOptionsProps
   ) {
 
-    const findManyDeliveriesArgs: FindManyDeliveryArgs = { 
+    const deliveryFilterOptions: FindManyDeliveryArgs = { 
       where: { 
         campaignId,
         currentStatus: deliveryOptions?.status || undefined,
         campaignVariant: (!!deliveryOptions || undefined) && {
           id: deliveryOptions?.variantId
+        },
+        scheduledAt: {
+          
         }
       } 
     };
     
-    const findManyDeliveries = ({ props: findManyArgs }: FindManyCallBackProps) => prisma.delivery.findMany(findManyArgs);
-    const countDeliveries = async ({ props: countArgs } : FindManyCallBackProps) => prisma.delivery.count(countArgs);
+    const findManyDeliveriesCallback = ({ props: findManyArgs }: FindManyCallBackProps) => prisma.delivery.findMany(findManyArgs);
+    const countDeliveriesCallback = async ({ props: countArgs } : FindManyCallBackProps) => prisma.delivery.count(countArgs);
 
     const deliveryPaginationOptions: PaginateProps = {
       findManyArgs: {
-        findArgs: findManyDeliveriesArgs,
-        findManyCallBack: findManyDeliveries,
+        findArgs: deliveryFilterOptions,
+        findManyCallBack: findManyDeliveriesCallback,
         searchFields: [],
         orderFields: [],
       },
       countArgs: {
-        countCallBack: countDeliveries,
-        countWhereInput: findManyDeliveriesArgs
+        countCallBack: countDeliveriesCallback,
+        countWhereInput: deliveryFilterOptions
       },
       paginationOpts: paginationOptions
     };
