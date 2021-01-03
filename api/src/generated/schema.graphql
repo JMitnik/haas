@@ -28,9 +28,11 @@ enum CampaignVariantEnum {
 type CampaignVariantType {
   body: String!
   deliveryConnection: DeliveryConnectionType
+  dialogue: Dialogue!
   id: ID!
   label: String!
   weight: Int!
+  workspace: Customer!
 }
 
 """Input type for a choice node"""
@@ -233,6 +235,7 @@ enum DeliveryStatusEnum {
 
 """Delivery"""
 type DeliveryType {
+  campaignVariant: CampaignVariantType!
   currentStatus: DeliveryStatusEnum!
   deliveryRecipientEmail: String!
   deliveryRecipientFirstName: String!
@@ -508,6 +511,7 @@ type Mutation {
   requestInvite(input: RequestInviteInput): RequestInviteOutput!
   singleUpload(file: Upload): ImageType!
   updateCTA(input: UpdateCTAInputType): QuestionNode!
+  updateDeliveryStatus(deliveryId: String, status: DeliveryStatusEnum): String!
   updateQuestion(input: UpdateQuestionNodeInputType): QuestionNode!
   updateRoles(permissions: PermissionIdsInput, roleId: String): RoleType!
 
@@ -636,7 +640,7 @@ type PermssionType {
 type Query {
   customer(id: ID, slug: String): Customer
   customers: [Customer!]!
-  delivery(deliveryId: String): DeliveryType!
+  delivery(deliveryId: String): DeliveryType
   dialogue(where: DialogueWhereUniqueInput): Dialogue
   dialogues(filter: DialogueFilterInputType): [Dialogue!]!
   edge(id: String): Edge
@@ -791,6 +795,7 @@ type SessionConnection implements ConnectionInterface {
 
 """Input for session"""
 input SessionInput {
+  deliveryId: String
   dialogueId: String!
   entries: [NodeEntryInput!]
 }

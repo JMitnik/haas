@@ -56,16 +56,17 @@ export const DialogueTreeProvider = ({ children }: { children: React.ReactNode }
     },
   });
 
+  
   // When dialogue changes, set initial nodes and initial edges
   useEffect(() => {
-    if (customerData) {
+    if (customerData?.customer) {
       treeStore.initCustomer(customerData.customer);
     }
   }, [customerData]);
 
   // When dialogue changes, set initial nodes and initial edges
   useEffect(() => {
-    if (dialogueData) {
+    if (dialogueData?.customer) {
       treeStore.initTree(dialogueData?.customer?.dialogue);
     }
   }, [dialogueData]);

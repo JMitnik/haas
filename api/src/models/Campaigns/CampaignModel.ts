@@ -1,4 +1,6 @@
 import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema';
+import { CustomerType } from '../customer/Customer';
+import { DialogueType } from '../questionnaire/Dialogue';
 
 export const CampaignVariantModel = objectType({
   name: 'CampaignVariantType',
@@ -9,6 +11,8 @@ export const CampaignVariantModel = objectType({
     t.string('label');
     t.int('weight');
     t.string('body');
+    t.field('workspace', { type: CustomerType });
+    t.field('dialogue', { type: DialogueType });
   }
 })
 
@@ -52,7 +56,12 @@ export const GetCampaignOfWorkspace = extendType({
             deliveries: true,
             variantsEdges: {
               include: {
-                campaignVariant: true,
+                campaignVariant: {
+                  include: {
+                    dialogue: true,
+                    workspace: true,
+                  }
+                },
               }
             }
           }
@@ -64,7 +73,9 @@ export const GetCampaignOfWorkspace = extendType({
           variants: [
             ...workspaceWithCampaign.variantsEdges.map(variantEdge => ({
               ...variantEdge.campaignVariant,
-              weight: variantEdge.weight
+              weight: variantEdge.weight,
+              dialogue: variantEdge.campaignVariant.dialogue,
+              workspace: variantEdge.campaignVariant.workspace,
             }))
           ]
         };

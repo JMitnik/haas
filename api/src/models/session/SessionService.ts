@@ -51,6 +51,17 @@ class SessionService {
     });
 
     try {
+      if (sessionInput.deliveryId) {
+        await prisma.delivery.update({
+          where: { id: sessionInput.deliveryId },
+          data: { currentStatus: 'FINISHED' }
+        })
+      }
+    } catch (error) {
+      console.log(error);
+    }
+
+    try {
       await TriggerService.tryTriggers(session);
     } catch (e) {
       console.log('Something went wrong while handling sms triggers: ', e);

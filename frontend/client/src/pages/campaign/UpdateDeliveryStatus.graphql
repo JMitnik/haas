@@ -1,0 +1,3 @@
+mutation UpdateDeliveryStatus($deliveryId: String!, $status: DeliveryStatusEnum!) {
+  updateDeliveryStatus(deliveryId: $deliveryId, status: $status)
+}

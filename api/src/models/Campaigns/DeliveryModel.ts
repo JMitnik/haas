@@ -2,6 +2,7 @@ import { enumType, extendType, inputObjectType, objectType } from '@nexus/schema
 import { UserInputError } from 'apollo-server';
 import { NexusGenFieldTypes } from '../../generated/nexus';
 import { PaginationWhereInput } from '../general/Pagination';
+import { CampaignVariantModel } from './CampaignModel';
 import { CampaignService } from './CampaignService';
 
 
@@ -24,6 +25,7 @@ export const DeliveryModel = objectType({
     t.string('deliveryRecipientEmail');
     t.string('deliveryRecipientPhone');
     t.string('scheduledAt');
+    t.field('campaignVariant', { type: CampaignVariantModel });
     t.field('currentStatus', { type: DeliveryStatusEnum });
   },
 });
@@ -61,8 +63,11 @@ export const GetDelivery = extendType({
   definition(t) {
     t.field('delivery', { 
       type: DeliveryModel,
+      nullable: true,
       args: { deliveryId: 'String' },
       resolve: async (parent, args, ctx) => {
+        if (!args.deliveryId) throw new UserInputError('You forgot the delivery id');
+        
         const delivery = await ctx.prisma.delivery.findFirst({
           where: { id: args.deliveryId || '' },
           include: {

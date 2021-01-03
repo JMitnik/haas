@@ -279,6 +279,7 @@ export interface NexusGenInputs {
     permissions?: NexusGenEnums['SystemPermission'][] | null; // [SystemPermission!]
   }
   SessionInput: { // input type
+    deliveryId?: string | null; // String
     dialogueId: string; // String!
     entries?: NexusGenInputs['NodeEntryInput'][] | null; // [NodeEntryInput!]
   }
@@ -392,9 +393,11 @@ export interface NexusGenRootTypes {
   CampaignVariantType: { // root type
     body: string; // String!
     deliveryConnection?: NexusGenRootTypes['DeliveryConnectionType'] | null; // DeliveryConnectionType
+    dialogue: NexusGenRootTypes['Dialogue']; // Dialogue!
     id: string; // ID!
     label: string; // String!
     weight: number; // Int!
+    workspace: NexusGenRootTypes['Customer']; // Customer!
   }
   ColourSettings: prisma.ColourSettings;
   CreateBatchDeliveriesOutputType: { // root type
@@ -420,6 +423,7 @@ export interface NexusGenRootTypes {
     startDate?: string | null; // String
   }
   DeliveryType: { // root type
+    campaignVariant: NexusGenRootTypes['CampaignVariantType']; // CampaignVariantType!
     currentStatus: NexusGenEnums['DeliveryStatusEnum']; // DeliveryStatusEnum!
     deliveryRecipientEmail: string; // String!
     deliveryRecipientFirstName: string; // String!
@@ -723,9 +727,11 @@ export interface NexusGenFieldTypes {
   CampaignVariantType: { // field return type
     body: string; // String!
     deliveryConnection: NexusGenRootTypes['DeliveryConnectionType'] | null; // DeliveryConnectionType
+    dialogue: NexusGenRootTypes['Dialogue']; // Dialogue!
     id: string; // ID!
     label: string; // String!
     weight: number; // Int!
+    workspace: NexusGenRootTypes['Customer']; // Customer!
   }
   ColourSettings: { // field return type
     id: string; // ID!
@@ -775,6 +781,7 @@ export interface NexusGenFieldTypes {
     startDate: string | null; // String
   }
   DeliveryType: { // field return type
+    campaignVariant: NexusGenRootTypes['CampaignVariantType']; // CampaignVariantType!
     currentStatus: NexusGenEnums['DeliveryStatusEnum']; // DeliveryStatusEnum!
     deliveryRecipientEmail: string; // String!
     deliveryRecipientFirstName: string; // String!
@@ -920,6 +927,7 @@ export interface NexusGenFieldTypes {
     requestInvite: NexusGenRootTypes['RequestInviteOutput']; // RequestInviteOutput!
     singleUpload: NexusGenRootTypes['ImageType']; // ImageType!
     updateCTA: NexusGenRootTypes['QuestionNode']; // QuestionNode!
+    updateDeliveryStatus: string; // String!
     updateQuestion: NexusGenRootTypes['QuestionNode']; // QuestionNode!
     updateRoles: NexusGenRootTypes['RoleType']; // RoleType!
     verifyUserToken: NexusGenRootTypes['VerifyUserTokenOutput']; // VerifyUserTokenOutput!
@@ -954,7 +962,7 @@ export interface NexusGenFieldTypes {
   Query: { // field return type
     customer: NexusGenRootTypes['Customer'] | null; // Customer
     customers: NexusGenRootTypes['Customer'][]; // [Customer!]!
-    delivery: NexusGenRootTypes['DeliveryType']; // DeliveryType!
+    delivery: NexusGenRootTypes['DeliveryType'] | null; // DeliveryType
     dialogue: NexusGenRootTypes['Dialogue'] | null; // Dialogue
     dialogues: NexusGenRootTypes['Dialogue'][]; // [Dialogue!]!
     edge: NexusGenRootTypes['Edge'] | null; // Edge
@@ -1292,6 +1300,10 @@ export interface NexusGenArgTypes {
     }
     updateCTA: { // args
       input?: NexusGenInputs['UpdateCTAInputType'] | null; // UpdateCTAInputType
+    }
+    updateDeliveryStatus: { // args
+      deliveryId?: string | null; // String
+      status?: NexusGenEnums['DeliveryStatusEnum'] | null; // DeliveryStatusEnum
     }
     updateQuestion: { // args
       input?: NexusGenInputs['UpdateQuestionNodeInputType'] | null; // UpdateQuestionNodeInputType

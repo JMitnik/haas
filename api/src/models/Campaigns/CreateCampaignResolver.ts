@@ -81,7 +81,12 @@ export const CreateCampaignResolver = mutationField('createCampaign', {
       include: {
         variantsEdges: {
           include: {
-            campaignVariant: true
+            campaignVariant: {
+              include: {
+                dialogue: true,
+                workspace: true
+              }
+            }
           }
         }
       }

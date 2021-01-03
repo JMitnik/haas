@@ -23,6 +23,18 @@ const isSelf = rule({ cache: 'no_cache' })(
   },
 );
 
+const isFromClient = rule({ cache: 'contextual' })(
+  async (parent, args, ctx: APIContext) => {
+    if (config.env === 'local') return true;
+
+    if (ctx.req.get('origin') === 'client.haas.live') {
+      return true;
+    }
+
+    return false;
+  },
+)
+
 const isLocal = rule({ cache: 'no_cache' })(
   async () => config.env === 'local',
 );
@@ -66,6 +78,8 @@ const authShield = shield({
     editUser: or(isSelf, isSuperAdmin),
 
     // debugMutation: isLocal,
+
+    updateDeliveryStatus: isFromClient,
 
     // // Dialogue-specific settings
     deleteQuestion: containsWorkspacePermission(SystemPermissionEnum.CAN_BUILD_DIALOGUE),
