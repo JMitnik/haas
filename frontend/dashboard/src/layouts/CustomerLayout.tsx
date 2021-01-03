@@ -88,7 +88,7 @@ const SubNavItem = styled.li`
 
 const DashboardNav = ({ customerSlug }: { customerSlug: string }) => {
   const { t } = useTranslation();
-  const { canViewUsers, canEditCustomer, canCreateTriggers } = useAuth();
+  const { canViewUsers, canEditCustomer, canCreateTriggers, canViewCampaigns } = useAuth();
   const { dialogueMatch } = useNavigator();
   const dialogueSlug = dialogueMatch?.params?.dialogueSlug;
 
@@ -162,10 +162,12 @@ const DashboardNav = ({ customerSlug }: { customerSlug: string }) => {
               {t('alerts')}
             </NavItem>
           )}
-          <NavItem to={`/dashboard/b/${customerSlug}/campaigns`}>
-            <ChatIcon />
-            {t('campaigns')}
-          </NavItem>
+          {canViewCampaigns && (
+            <NavItem to={`/dashboard/b/${customerSlug}/campaigns`}>
+              <ChatIcon />
+              {t('campaigns')}
+            </NavItem>
+          )}
           {canEditCustomer && (
             <NavItem to={`/dashboard/b/${customerSlug}/edit`}>
               <SettingsIcon />

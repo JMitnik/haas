@@ -97,12 +97,14 @@ const CustomerRoutes = () => (
               )}
             />
 
-            <CustomerRoute
+            <GuardedRoute
+              allowedPermission={SystemPermission.CAN_VIEW_CAMPAIGNS}
               path={ROUTES.CAMPAIGNS_VIEW}
               render={() => <CampaignsView />}
             />
 
-            <CustomerRoute
+            <GuardedRoute
+              allowedPermission={SystemPermission.CAN_CREATE_DELIVERIES}
               path={ROUTES.CAMPAIGN_VIEW}
               render={() => <CampaignView />}
             />

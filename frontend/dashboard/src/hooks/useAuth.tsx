@@ -7,6 +7,9 @@ interface UseAuthProps {
   canCreateCustomers: boolean;
   canDeleteCustomers: boolean;
   canCreateTriggers: boolean;
+  canViewCampaigns: boolean;
+  canCreateCampaigns: boolean;
+  canCreateDeliveries: boolean;
   canEditTriggers: boolean;
   canDeleteTriggers: boolean;
   canInviteUsers: boolean;
@@ -39,6 +42,10 @@ const useAuth = (): UseAuthProps => {
   const canViewUsers = authPermissions?.includes(SystemPermission.CAN_VIEW_USERS) || false;
   const canDeleteUsers = authPermissions?.includes(SystemPermission.CAN_DELETE_USERS) || false;
   const canEditUsers = authPermissions?.includes(SystemPermission.CAN_EDIT_USERS) || false;
+  
+  const canViewCampaigns = authPermissions?.includes(SystemPermission.CAN_VIEW_CAMPAIGNS) || false;
+  const canCreateCampaigns = authPermissions?.includes(SystemPermission.CAN_CREATE_CAMPAIGNS) || false;
+  const canCreateDeliveries = authPermissions?.includes(SystemPermission.CAN_CREATE_DELIVERIES) || false;
 
   // Workspace-specific actions
   const canEditCustomer = authPermissions?.includes(SystemPermission.CAN_EDIT_WORKSPACE) || false;
@@ -51,6 +58,9 @@ const useAuth = (): UseAuthProps => {
   const canDeleteTriggers = authPermissions?.includes(SystemPermission.CAN_DELETE_TRIGGERS) || false;
 
   return {
+    canViewCampaigns,
+    canCreateCampaigns,
+    canCreateDeliveries,
     canViewDialogueView,
     canEditTriggers,
     canDeleteTriggers,

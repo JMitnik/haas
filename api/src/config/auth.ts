@@ -69,9 +69,9 @@ const authShield = shield({
     verifyUserToken: allow,
     requestInvite: allow,
     deleteCustomer: isSuperAdmin,
-    // TODO: Make this a specific permission
-    createCampaign: allow,
-    createBatchDeliveries: allow,
+
+    createCampaign: containsWorkspacePermission(SystemPermissionEnum.CAN_CREATE_CAMPAIGNS),
+    createBatchDeliveries: containsWorkspacePermission(SystemPermissionEnum.CAN_CREATE_DELIVERIES),
 
     inviteUser: containsWorkspacePermission(SystemPermissionEnum.CAN_ADD_USERS),
     editWorkspace: containsWorkspacePermission(SystemPermissionEnum.CAN_EDIT_WORKSPACE),
