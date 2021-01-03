@@ -1465,6 +1465,7 @@ export type CreateBatchDeliveriesMutation = (
 export type GetWorkspaceCampaignQueryVariables = Exact<{
   customerSlug: Scalars['String'];
   campaignId: Scalars['String'];
+  deliveryConnectionFilter?: Maybe<DeliveryConnectionFilter>;
 }>;
 
 
@@ -1588,13 +1589,13 @@ export type CreateBatchDeliveriesMutationHookResult = ReturnType<typeof useCreat
 export type CreateBatchDeliveriesMutationResult = ApolloReactCommon.MutationResult<CreateBatchDeliveriesMutation>;
 export type CreateBatchDeliveriesMutationOptions = ApolloReactCommon.BaseMutationOptions<CreateBatchDeliveriesMutation, CreateBatchDeliveriesMutationVariables>;
 export const GetWorkspaceCampaignDocument = gql`
-    query GetWorkspaceCampaign($customerSlug: String!, $campaignId: String!) {
+    query GetWorkspaceCampaign($customerSlug: String!, $campaignId: String!, $deliveryConnectionFilter: DeliveryConnectionFilter) {
   customer(slug: $customerSlug) {
     id
     campaign(campaignId: $campaignId) {
       id
       label
-      deliveryConnection {
+      deliveryConnection(filter: $deliveryConnectionFilter) {
         deliveries {
           id
           deliveryRecipientFirstName
@@ -1632,6 +1633,7 @@ export const GetWorkspaceCampaignDocument = gql`
  *   variables: {
  *      customerSlug: // value for 'customerSlug'
  *      campaignId: // value for 'campaignId'
+ *      deliveryConnectionFilter: // value for 'deliveryConnectionFilter'
  *   },
  * });
  */
@@ -1644,6 +1646,9 @@ export function useGetWorkspaceCampaignLazyQuery(baseOptions?: ApolloReactHooks.
 export type GetWorkspaceCampaignQueryHookResult = ReturnType<typeof useGetWorkspaceCampaignQuery>;
 export type GetWorkspaceCampaignLazyQueryHookResult = ReturnType<typeof useGetWorkspaceCampaignLazyQuery>;
 export type GetWorkspaceCampaignQueryResult = ApolloReactCommon.QueryResult<GetWorkspaceCampaignQuery, GetWorkspaceCampaignQueryVariables>;
+export function refetchGetWorkspaceCampaignQuery(variables?: GetWorkspaceCampaignQueryVariables) {
+      return { query: GetWorkspaceCampaignDocument, variables: variables }
+    }
 export const CreateCampaignDocument = gql`
     mutation CreateCampaign($input: CreateCampaignInputType) {
   createCampaign(input: $input) {
@@ -1717,6 +1722,9 @@ export function useGetWorkspaceCampaignsLazyQuery(baseOptions?: ApolloReactHooks
 export type GetWorkspaceCampaignsQueryHookResult = ReturnType<typeof useGetWorkspaceCampaignsQuery>;
 export type GetWorkspaceCampaignsLazyQueryHookResult = ReturnType<typeof useGetWorkspaceCampaignsLazyQuery>;
 export type GetWorkspaceCampaignsQueryResult = ApolloReactCommon.QueryResult<GetWorkspaceCampaignsQuery, GetWorkspaceCampaignsQueryVariables>;
+export function refetchGetWorkspaceCampaignsQuery(variables?: GetWorkspaceCampaignsQueryVariables) {
+      return { query: GetWorkspaceCampaignsDocument, variables: variables }
+    }
 export const GetWorkspaceDialoguesDocument = gql`
     query GetWorkspaceDialogues($customerSlug: String!, $filter: DialogueFilterInputType) {
   customer(slug: $customerSlug) {
@@ -1769,3 +1777,6 @@ export function useGetWorkspaceDialoguesLazyQuery(baseOptions?: ApolloReactHooks
 export type GetWorkspaceDialoguesQueryHookResult = ReturnType<typeof useGetWorkspaceDialoguesQuery>;
 export type GetWorkspaceDialoguesLazyQueryHookResult = ReturnType<typeof useGetWorkspaceDialoguesLazyQuery>;
 export type GetWorkspaceDialoguesQueryResult = ApolloReactCommon.QueryResult<GetWorkspaceDialoguesQuery, GetWorkspaceDialoguesQueryVariables>;
+export function refetchGetWorkspaceDialoguesQuery(variables?: GetWorkspaceDialoguesQueryVariables) {
+      return { query: GetWorkspaceDialoguesDocument, variables: variables }
+    }

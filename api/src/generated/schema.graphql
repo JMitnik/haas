@@ -57,7 +57,6 @@ interface ConnectionInterface {
 input CreateBatchDeliveriesInputType {
   batchScheduledAt: String
   campaignId: ID
-  label: String
   uploadedCsv: Upload
 }
 

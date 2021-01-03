@@ -11,6 +11,12 @@ interface DeliveryOptionsProps {
   variantId?: string;
 }
 
+interface DeliveryUpdateItemProps {
+  dateId: string;
+  oldStatus: DeliveryStatusTypeEnum;
+  newStatus: DeliveryStatusTypeEnum;
+}
+
 export class CampaignService {
   /**
    * Gets paginated deliveries given a `campaignId`, generic `paginationOptions` and specific
@@ -69,5 +75,24 @@ export class CampaignService {
       nrOpened: deliveries.filter(entry => entry.currentStatus === 'OPENED' || entry.currentStatus === 'FINISHED').length,
       nrSent: deliveries.filter(entry => entry.currentStatus === 'DEPLOYED' || entry.currentStatus === 'SENT').length
     }
+  }
+
+  /**
+   * Update a batch of deliveries
+   */
+  static async updateBatchDeliveries(updatedDeliveries: DeliveryUpdateItemProps[]) {
+
+    const deliveryUpdates = updatedDeliveries.map(delivery => {
+      const id = delivery.dateId.slice(delivery.dateId.length - 10);
+
+      return prisma.delivery.update({
+        where: { id },
+        data: {
+          currentStatus: delivery.newStatus,
+        }
+      })
+    });
+
+    return await prisma.$transaction(deliveryUpdates);
   }
 }

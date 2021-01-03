@@ -3,8 +3,17 @@ import { useNavigator } from 'hooks/useNavigator';
 import React, { useState } from 'react';
 import { Plus } from 'react-feather';
 import { useTranslation } from 'react-i18next';
-import { useGetWorkspaceCampaignQuery } from 'types/generated-types';
+import { DeliveryConnectionFilter, useGetWorkspaceCampaignQuery } from 'types/generated-types';
 import { ImportDeliveriesForm } from './ImportDeliveriesForm';
+
+export const campaignViewFilter: DeliveryConnectionFilter = {
+  paginationFilter: {
+    limit: 10
+  }
+};
+
+const POLL_INTERVAL_SECONDS = 60;
+const POLL_INTERVAL = POLL_INTERVAL_SECONDS * 1000;
 
 export const CampaignView = () => {
   const [isOpenImportModal, setIsOpenImportModal] = useState(false);
@@ -14,10 +23,13 @@ export const CampaignView = () => {
   const campaignsPath = getCampaignsPath();
 
   const { data } = useGetWorkspaceCampaignQuery({
+    fetchPolicy: 'cache-and-network',
     variables: {
       campaignId,
-      customerSlug
-    }
+      customerSlug,
+      deliveryConnectionFilter: campaignViewFilter,
+    },
+    pollInterval: POLL_INTERVAL
   });
 
   const campaign = data?.customer?.campaign;
@@ -53,7 +65,7 @@ export const CampaignView = () => {
 
             <UI.TableBody>
               {deliveryConnection?.deliveries.map(delivery => (
-                <UI.TableRow>
+                <UI.TableRow key={delivery.id}>
                   <UI.TableCell>
                     {delivery?.deliveryRecipientFirstName}
                   </UI.TableCell>
@@ -61,13 +73,12 @@ export const CampaignView = () => {
                     {delivery?.deliveryRecipientEmail}
                   </UI.TableCell>
                   <UI.TableCell>
-                    {delivery?.currentStatus}
+                    <UI.Label>
+                      {delivery?.currentStatus}
+                    </UI.Label>
                   </UI.TableCell>
                 </UI.TableRow>
               ))}
-              <UI.TableRow>
-                
-              </UI.TableRow>
             </UI.TableBody>
           </UI.Table>
         </UI.Card>

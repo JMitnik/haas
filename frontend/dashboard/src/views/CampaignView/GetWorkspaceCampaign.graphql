@@ -1,10 +1,10 @@
-query GetWorkspaceCampaign($customerSlug: String!, $campaignId: String!) {
+query GetWorkspaceCampaign($customerSlug: String!, $campaignId: String!, $deliveryConnectionFilter: DeliveryConnectionFilter) {
   customer(slug: $customerSlug) {
     id
     campaign(campaignId: $campaignId) {
       id
       label
-      deliveryConnection {
+      deliveryConnection(filter: $deliveryConnectionFilter) {
         deliveries {
           id
           deliveryRecipientFirstName

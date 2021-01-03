@@ -9,3 +9,4 @@ generates:
     config:
       withMutationOptionsType: true
       reactApolloVersion: 2
+      withRefetchFn: true

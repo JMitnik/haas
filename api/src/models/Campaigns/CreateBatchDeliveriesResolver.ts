@@ -20,7 +20,6 @@ interface CSVDeliveryRow {
 export const CreateBatchDeliveriesInputType = inputObjectType({
   name: 'CreateBatchDeliveriesInputType',
   definition(t) {
-    t.string('label');
     t.id('campaignId');
     t.upload('uploadedCsv');
     t.string('batchScheduledAt');
@@ -100,7 +99,7 @@ export const CreateBatchDeliveriesResolver = mutationField('createBatchDeliverie
   type: CreateBatchDeliveriesOutputType,
   args: { input: CreateBatchDeliveriesInputType },
 
-  async resolve(parent, args) {
+  async resolve(parent, args, ctx) {
     if (!args.input) throw new UserInputError('Empty input!');
     if (!args.input.uploadedCsv) throw new UserInputError('No CSV uploaded!');
 
@@ -201,6 +200,7 @@ export const CreateBatchDeliveriesResolver = mutationField('createBatchDeliverie
       }
     }));
 
+    const callbackUrl = `${ctx.session?.tunnelUrl}/webhooks/delivery`;
 
     try {
       await DynamoScheduleService.batchScheduleOneOffs(preprocessedRecords.map(record => ({
@@ -234,6 +234,11 @@ export const CreateBatchDeliveriesResolver = mutationField('createBatchDeliverie
             key: 'DeliveryType',
             type: 'string',
             value: record.variant.campaignVariant.type
+          },
+          {
+            key: 'callback',
+            type: 'string',
+            value: callbackUrl
           },
           {
             key: 'phoneNumber',

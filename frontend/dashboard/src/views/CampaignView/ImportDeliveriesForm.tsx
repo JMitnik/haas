@@ -1,44 +1,26 @@
 import * as yup from 'yup';
 import * as UI from '@haas/ui';
 import React from 'react'
-import { Controller, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { useState } from 'react';
-import Select from 'react-select';
 import { useTranslation } from 'react-i18next';
 import FileDropInput from 'components/FileDropInput';
 import { useToast } from '@chakra-ui/core';
-import { useCreateBatchDeliveriesMutation, useGetWorkspaceCampaignsQuery } from 'types/generated-types';
+import { useCreateBatchDeliveriesMutation, refetchGetWorkspaceCampaignQuery } from 'types/generated-types';
 import { useNavigator } from 'hooks/useNavigator';
+import { campaignViewFilter } from './CampaignView';
 
-const schema = yup.object({
-  label: yup.string().required(),
-  campaign: yup.object().shape({
-    label: yup.string(),
-    value: yup.string()
-  }).required(),
-}).required();
+const schema = yup.object({}).required();
 
 type FormProps = yup.InferType<typeof schema>;
 
 export const ImportDeliveriesForm = ({ onClose }: { onClose: () => void; }) => {
-  const form = useForm<FormProps>({
-    defaultValues: {
-      label: '',
-      campaign: undefined,
-    }
-  });
+  const { campaignId } = useNavigator();
+  const form = useForm<FormProps>();
 
   const { customerSlug } = useNavigator();
 
   const toast = useToast();
-
-  const { data } = useGetWorkspaceCampaignsQuery({
-    variables: {
-      customerSlug
-    }
-  });
-
-  const campaigns = data?.customer?.campaigns || [];
 
   const [activeCSV, setActiveCSV] = useState<File | null>(null);
   const [importDeliveries] = useCreateBatchDeliveriesMutation({
@@ -53,7 +35,9 @@ export const ImportDeliveriesForm = ({ onClose }: { onClose: () => void; }) => {
 
       onClose();
     },
-    onError: () => {
+    awaitRefetchQueries: true,
+    onError: (error) => {
+      console.log(error);
       toast({
         title: 'Something went wrong!',
         description: 'Currently unable to edit your detail. Please try again.',
@@ -62,6 +46,12 @@ export const ImportDeliveriesForm = ({ onClose }: { onClose: () => void; }) => {
         duration: 1500,
       });
     },
+    refetchQueries: [
+      refetchGetWorkspaceCampaignQuery({
+        customerSlug, campaignId,
+        deliveryConnectionFilter: campaignViewFilter
+      })
+    ]
   })
 
   const handleDrop = (files: File[]) => {
@@ -71,12 +61,11 @@ export const ImportDeliveriesForm = ({ onClose }: { onClose: () => void; }) => {
     setActiveCSV(file);
   };
 
-  const handleSubmit = (formData: FormProps) => {
+  const handleSubmit = () => {
     importDeliveries({
       variables: {
         input: {
-          label: formData.label,
-          campaignId: formData.campaign.value,
+          campaignId: campaignId,
           batchScheduledAt: new Date().toISOString(),
           uploadedCsv: activeCSV,
         }
@@ -91,30 +80,6 @@ export const ImportDeliveriesForm = ({ onClose }: { onClose: () => void; }) => {
       <UI.FormSectionHeader>{t('import_deliveries')}</UI.FormSectionHeader>
       
       <UI.InputGrid>
-        <UI.FormControl isRequired>
-          <UI.FormLabel htmlFor="label">{t('label')}</UI.FormLabel>
-          <UI.Input name="label" ref={form.register} id="label" />
-        </UI.FormControl>
-
-        <UI.FormControl isRequired>
-          <UI.FormLabel htmlFor="campaign">{t('campaign')}</UI.FormLabel>
-          <Controller
-            name="campaign"
-            control={form.control}
-            render={({ onBlur, onChange, value }) => (
-              <Select
-                options={campaigns.map((campaign: any) => ({
-                  label: campaign.label,
-                  value: campaign.id,
-                }))}
-                value={value}
-                onBlur={onBlur}
-                onChange={onChange}
-              />
-            )}
-          />
-        </UI.FormControl>
-
         <FileDropInput 
           onDrop={handleDrop}
         />

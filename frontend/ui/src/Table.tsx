@@ -37,7 +37,7 @@ interface TableCellProps {
 
 export const TableCell = styled.td<TableCellProps>`
   ${({ isNumeric }) => css`
-    padding: 1.5rem 1.5rem;
+    padding: 1rem 1.5rem;
     
     ${isNumeric && css`
       text-align: right;
