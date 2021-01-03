@@ -1445,6 +1445,23 @@ export type VerifyUserTokenOutput = {
   userData: UserType;
 };
 
+export type CreateBatchDeliveriesMutationVariables = Exact<{
+  input?: Maybe<CreateBatchDeliveriesInputType>;
+}>;
+
+
+export type CreateBatchDeliveriesMutation = (
+  { __typename?: 'Mutation' }
+  & { createBatchDeliveries: (
+    { __typename?: 'CreateBatchDeliveriesOutputType' }
+    & Pick<CreateBatchDeliveriesOutputType, 'nrDeliveries'>
+    & { failedDeliveries: Array<(
+      { __typename?: 'FailedDeliveryModel' }
+      & Pick<FailedDeliveryModel, 'record' | 'error'>
+    )> }
+  ) }
+);
+
 export type GetWorkspaceCampaignQueryVariables = Exact<{
   customerSlug: Scalars['String'];
   campaignId: Scalars['String'];
@@ -1534,6 +1551,42 @@ export type GetWorkspaceDialoguesQuery = (
 );
 
 
+export const CreateBatchDeliveriesDocument = gql`
+    mutation CreateBatchDeliveries($input: CreateBatchDeliveriesInputType) {
+  createBatchDeliveries(input: $input) {
+    nrDeliveries
+    failedDeliveries {
+      record
+      error
+    }
+  }
+}
+    `;
+export type CreateBatchDeliveriesMutationFn = ApolloReactCommon.MutationFunction<CreateBatchDeliveriesMutation, CreateBatchDeliveriesMutationVariables>;
+
+/**
+ * __useCreateBatchDeliveriesMutation__
+ *
+ * To run a mutation, you first call `useCreateBatchDeliveriesMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateBatchDeliveriesMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createBatchDeliveriesMutation, { data, loading, error }] = useCreateBatchDeliveriesMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateBatchDeliveriesMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<CreateBatchDeliveriesMutation, CreateBatchDeliveriesMutationVariables>) {
+        return ApolloReactHooks.useMutation<CreateBatchDeliveriesMutation, CreateBatchDeliveriesMutationVariables>(CreateBatchDeliveriesDocument, baseOptions);
+      }
+export type CreateBatchDeliveriesMutationHookResult = ReturnType<typeof useCreateBatchDeliveriesMutation>;
+export type CreateBatchDeliveriesMutationResult = ApolloReactCommon.MutationResult<CreateBatchDeliveriesMutation>;
+export type CreateBatchDeliveriesMutationOptions = ApolloReactCommon.BaseMutationOptions<CreateBatchDeliveriesMutation, CreateBatchDeliveriesMutationVariables>;
 export const GetWorkspaceCampaignDocument = gql`
     query GetWorkspaceCampaign($customerSlug: String!, $campaignId: String!) {
   customer(slug: $customerSlug) {

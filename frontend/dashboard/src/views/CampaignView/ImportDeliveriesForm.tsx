@@ -2,14 +2,12 @@ import * as yup from 'yup';
 import * as UI from '@haas/ui';
 import React from 'react'
 import { Controller, useForm } from 'react-hook-form';
-import { useMutation } from '@apollo/react-hooks';
-import gql from 'graphql-tag';
 import { useState } from 'react';
 import Select from 'react-select';
 import { useTranslation } from 'react-i18next';
 import FileDropInput from 'components/FileDropInput';
 import { useToast } from '@chakra-ui/core';
-import { useGetWorkspaceCampaignsQuery } from 'types/generated-types';
+import { useCreateBatchDeliveriesMutation, useGetWorkspaceCampaignsQuery } from 'types/generated-types';
 import { useNavigator } from 'hooks/useNavigator';
 
 const schema = yup.object({
@@ -21,18 +19,6 @@ const schema = yup.object({
 }).required();
 
 type FormProps = yup.InferType<typeof schema>;
-
-const IMPORT_DELIVERIES_MUTATION = gql`
-  mutation createBatchDeliveries($input: CreateBatchDeliveriesInputType) {
-    createBatchDeliveries(input: $input) {
-      nrDeliveries
-      failedDeliveries {
-        record
-        error
-      }
-    }
-  }
-`;
 
 export const ImportDeliveriesForm = ({ onClose }: { onClose: () => void; }) => {
   const form = useForm<FormProps>({
@@ -55,7 +41,7 @@ export const ImportDeliveriesForm = ({ onClose }: { onClose: () => void; }) => {
   const campaigns = data?.customer?.campaigns || [];
 
   const [activeCSV, setActiveCSV] = useState<File | null>(null);
-  const [importDeliveries] = useMutation(IMPORT_DELIVERIES_MUTATION, {
+  const [importDeliveries] = useCreateBatchDeliveriesMutation({
     onCompleted: () => {
       toast({
         title: t('toast:delivery_imported'),
