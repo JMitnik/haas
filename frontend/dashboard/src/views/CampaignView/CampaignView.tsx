@@ -21,6 +21,7 @@ export const CampaignView = () => {
   });
 
   const campaign = data?.customer?.campaign;
+  const deliveryConnection = campaign?.deliveryConnection;
 
   return (
     <>
@@ -36,28 +37,40 @@ export const CampaignView = () => {
         </UI.Stack>
       </UI.ViewHeading>
       <UI.ViewContainer>
-        <div>{campaign?.label}</div>
+        <UI.Card noHover p={2}>
+          <UI.Table>
+            <UI.TableHeading>
+              <UI.TableHeadingCell>
+                {t('recipient')}
+              </UI.TableHeadingCell>
+              <UI.TableHeadingCell>
+                {t('recipient_adress')}
+              </UI.TableHeadingCell>
+              <UI.TableHeadingCell>
+                {t('status')}
+              </UI.TableHeadingCell>
+            </UI.TableHeading>
 
-        <UI.Table>
-          <UI.TableHeading>
-            <UI.TableHeadingCell>
-              {t('recipient')}
-            </UI.TableHeadingCell>
-            <UI.TableHeadingCell>
-              {t('recipient_adress')}
-            </UI.TableHeadingCell>
-            <UI.TableHeadingCell>
-              {t('status')}
-            </UI.TableHeadingCell>
-          </UI.TableHeading>
-
-          <UI.TableBody>
-            
-            <UI.TableRow>
-              
-            </UI.TableRow>
-          </UI.TableBody>
-        </UI.Table>
+            <UI.TableBody>
+              {deliveryConnection?.deliveries.map(delivery => (
+                <UI.TableRow>
+                  <UI.TableCell>
+                    {delivery?.deliveryRecipientFirstName}
+                  </UI.TableCell>
+                  <UI.TableCell>
+                    {delivery?.deliveryRecipientEmail}
+                  </UI.TableCell>
+                  <UI.TableCell>
+                    {delivery?.currentStatus}
+                  </UI.TableCell>
+                </UI.TableRow>
+              ))}
+              <UI.TableRow>
+                
+              </UI.TableRow>
+            </UI.TableBody>
+          </UI.Table>
+        </UI.Card>
 
         <UI.Modal isOpen={isOpenImportModal} onClose={() => setIsOpenImportModal(false)}>
           <UI.Card bg="white" noHover width={700}>

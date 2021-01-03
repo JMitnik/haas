@@ -15,14 +15,6 @@ import gql from 'graphql-tag';
 import { useGetWorkspaceDialoguesQuery, useCreateCampaignMutation, CampaignVariantEnum } from 'types/generated-types';
 import { useNavigator } from 'hooks/useNavigator';
 
-const CREATE_CAMPAIGN_MUTATION = gql`
-  mutation createCampaignMutation($input: CreateCampaignInputType) {
-    createCampaign(input: $input) {
-      id
-    }
-  }
-`;
-
 type InputEvent = React.FormEvent<HTMLInputElement>;
 
 const createCampaignBodyPlaceholder = `Dear {{firstName}},
