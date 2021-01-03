@@ -7,7 +7,6 @@ import https from 'https';
 
 import config from './config/config';
 import makeApollo from './config/apollo';
-import { fetchTunnelUrl } from './utils/fetchTunnelUrl';
 import { CampaignService } from './models/Campaigns/CampaignService';
 
 process.on('SIGINT', () => {
