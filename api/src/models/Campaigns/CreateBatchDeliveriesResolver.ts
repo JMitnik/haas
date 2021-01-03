@@ -21,6 +21,7 @@ export const CreateBatchDeliveriesInputType = inputObjectType({
   name: 'CreateBatchDeliveriesInputType',
   definition(t) {
     t.id('campaignId');
+    t.string('workspaceId');
     t.upload('uploadedCsv');
     t.string('batchScheduledAt');
   },

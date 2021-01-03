@@ -55,6 +55,7 @@ export interface NexusGenInputs {
     batchScheduledAt?: string | null; // String
     campaignId?: string | null; // ID
     uploadedCsv?: any | null; // Upload
+    workspaceId?: string | null; // String
   }
   CreateCTAInputType: { // input type
     customerSlug?: string | null; // String

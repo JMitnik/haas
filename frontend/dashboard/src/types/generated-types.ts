@@ -83,6 +83,7 @@ export type ConnectionInterface = {
 
 export type CreateBatchDeliveriesInputType = {
   campaignId?: Maybe<Scalars['ID']>;
+  workspaceId?: Maybe<Scalars['String']>;
   uploadedCsv?: Maybe<Scalars['Upload']>;
   batchScheduledAt?: Maybe<Scalars['String']>;
 };

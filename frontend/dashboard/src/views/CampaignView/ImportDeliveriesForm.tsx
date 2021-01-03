@@ -9,16 +9,16 @@ import { useToast } from '@chakra-ui/core';
 import { useCreateBatchDeliveriesMutation, refetchGetWorkspaceCampaignQuery } from 'types/generated-types';
 import { useNavigator } from 'hooks/useNavigator';
 import { campaignViewFilter } from './CampaignView';
+import { useCustomer } from 'providers/CustomerProvider';
 
 const schema = yup.object({}).required();
 
 type FormProps = yup.InferType<typeof schema>;
 
 export const ImportDeliveriesForm = ({ onClose }: { onClose: () => void; }) => {
-  const { campaignId } = useNavigator();
+  const { campaignId, customerSlug } = useNavigator();
   const form = useForm<FormProps>();
-
-  const { customerSlug } = useNavigator();
+  const { activeCustomer } = useCustomer();
 
   const toast = useToast();
 
@@ -65,7 +65,8 @@ export const ImportDeliveriesForm = ({ onClose }: { onClose: () => void; }) => {
     importDeliveries({
       variables: {
         input: {
-          campaignId: campaignId,
+          workspaceId: activeCustomer?.id,
+          campaignId,
           batchScheduledAt: new Date().toISOString(),
           uploadedCsv: activeCSV,
         }

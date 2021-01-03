@@ -60,6 +60,7 @@ input CreateBatchDeliveriesInputType {
   batchScheduledAt: String
   campaignId: ID
   uploadedCsv: Upload
+  workspaceId: String
 }
 
 type CreateBatchDeliveriesOutputType {
