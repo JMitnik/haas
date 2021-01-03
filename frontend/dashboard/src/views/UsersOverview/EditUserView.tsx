@@ -1,7 +1,7 @@
 import * as yup from 'yup';
 import { Controller, useForm } from 'react-hook-form';
 import { Mail, Phone, User } from 'react-feather';
-import { gql } from 'apollo-boost';
+import gql from 'graphql-tag';
 import { useHistory, useParams } from 'react-router';
 import { useMutation, useQuery } from '@apollo/react-hooks';
 import React from 'react';

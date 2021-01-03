@@ -25,6 +25,11 @@ const GET_WORKSPACE_CAMPAIGN = gql`
             scheduledAt
             currentStatus
           }
+
+          nrTotal
+          nrSent
+          nrOpened
+          nrFinished
         }
         
         variants {

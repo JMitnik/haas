@@ -3,3 +3,5 @@ generates:
   ./src/types.d.ts:
     plugins:
       - typescript
+      - typescript-operations
+      - typescript-react-apollo

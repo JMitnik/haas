@@ -69,12 +69,15 @@ export const ViewHeading = ({ children }: { children: React.ReactNode }) => (
   </ViewHeadingContainer>
 );
 
-export const ViewContainer = styled(Div)`
-  ${({ theme }) => css`
+export const ViewContainer = styled(Div)<{ isCompact?: boolean; }>`
+  ${({ theme, isCompact }) => css`
     padding: ${theme.gutter}px;
-    max-width: 1400px;
     margin: 0 auto;
     min-height: 100vh;
+
+    ${isCompact && css`
+      max-width: 1400px;
+    `}
   `}
 `;
 

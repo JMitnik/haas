@@ -1,4 +1,3 @@
-import { ApolloError } from 'apollo-boost';
 import { Button, Popover, PopoverArrow, PopoverBody, PopoverCloseButton,
   PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast } from '@chakra-ui/core';
 import { Div, Flex, PageTitle, Text } from '@haas/ui';
@@ -84,7 +83,7 @@ const TriggersOverview = () => {
           pageIndex: paginationProps.pageIndex,
           orderBy: paginationProps.sortBy,
         } } }],
-    onError: (serverError: ApolloError) => {
+    onError: (serverError: any) => {
       console.log(serverError);
     },
     onCompleted: () => {

@@ -1,5 +1,4 @@
 import * as yup from 'yup';
-import { ApolloError } from 'apollo-boost';
 import { Button, ButtonGroup, FormErrorMessage, Stack, useToast } from '@chakra-ui/core';
 import { Container, Div, ErrorStyle, Flex, Form, FormContainer, FormControl, FormLabel,
   FormSection, H3, Hr, Input, InputGrid, InputHelper, Muted, PageTitle, Textarea } from '@haas/ui';
@@ -114,7 +113,7 @@ const AddDialogueView = () => {
         variables: { customerSlug },
       },
     ],
-    onError: (error: ApolloError) => {
+    onError: (error: any) => {
       toast({
         title: 'Something went wrong',
         description: 'There was a problem in adding the dialogue. Please try again',

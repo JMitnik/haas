@@ -1,6 +1,6 @@
 import * as yup from 'yup';
 import { Activity, Minus, Plus, Type } from 'react-feather';
-import { ApolloError, gql } from 'apollo-boost';
+import gql from 'graphql-tag';
 import { Button, ButtonGroup, FormErrorMessage, RadioButtonGroup, Stack } from '@chakra-ui/core';
 import { Controller, useForm } from 'react-hook-form';
 import { Div, Flex, Form, FormContainer, FormControl, FormLabel, FormSection,
@@ -124,7 +124,7 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFo
       variables: {
         customerSlug,
       } }],
-    onError: (serverError: ApolloError) => {
+    onError: (serverError: any) => {
       console.log(serverError);
     },
   });

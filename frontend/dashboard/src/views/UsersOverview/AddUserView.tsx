@@ -1,5 +1,4 @@
 import * as yup from 'yup';
-import { ApolloError } from 'apollo-boost';
 import { Controller, useForm } from 'react-hook-form';
 import { useHistory } from 'react-router';
 import { useMutation, useQuery } from '@apollo/react-hooks';
@@ -56,7 +55,7 @@ const AddUserView = () => {
     onCompleted: () => {
       history.push(`/dashboard/b/${activeCustomer?.slug}/users/`);
     },
-    onError: (serverError: ApolloError) => {
+    onError: (serverError: any) => {
       console.log(serverError);
     },
     refetchQueries: [

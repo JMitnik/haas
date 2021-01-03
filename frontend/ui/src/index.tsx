@@ -1,4 +1,5 @@
 export * from './Modal';
+export * from './Table';
 export * from './Generics';
 export * from './Form';
 export * from './Container';

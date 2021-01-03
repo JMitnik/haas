@@ -1,7 +1,6 @@
 import * as UI from '@haas/ui';
 import * as yup from 'yup';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ApolloError, ExecutionResult } from 'apollo-boost';
 import { Button, ButtonGroup, FormErrorMessage, Popover, PopoverArrow, PopoverBody, PopoverCloseButton,
   PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast } from '@chakra-ui/core';
 import { Controller, useForm } from 'react-hook-form';
@@ -59,7 +58,7 @@ interface CTAFormProps {
   form: any;
   onActiveCTAChange: React.Dispatch<React.SetStateAction<string | null>>;
   onNewCTAChange: React.Dispatch<React.SetStateAction<boolean>>;
-  onDeleteCTA: (onComplete: (() => void) | undefined) => void | Promise<ExecutionResult<any>>
+  onDeleteCTA: (onComplete: (() => void) | undefined) => void | Promise<any>;
 }
 
 const isShareType = (ctaType: any) => ctaType?.value === 'SHARE';
@@ -214,7 +213,7 @@ const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTACha
       onNewCTAChange(false);
       onActiveCTAChange(null);
     },
-    onError: (serverError: ApolloError) => {
+    onError: (serverError: any) => {
       console.log(serverError);
     },
     refetchQueries: refetchingQueries,
@@ -234,7 +233,7 @@ const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTACha
         onActiveCTAChange(null);
       }, 200);
     },
-    onError: (serverError: ApolloError) => {
+    onError: (serverError: any) => {
       console.log(serverError);
     },
     refetchQueries: refetchingQueries,

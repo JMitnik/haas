@@ -1,5 +1,5 @@
 import * as yup from 'yup';
-import { ApolloError, gql } from 'apollo-boost';
+import { gql } from 'graphql-tag';
 import { Controller, useForm } from 'react-hook-form';
 import { useHistory, useParams } from 'react-router';
 import { useMutation, useQuery } from '@apollo/react-hooks';
@@ -93,7 +93,7 @@ const InviteUserView = () => {
         history.push(`/dashboard/b/${customerSlug}/users/`);
       }, 300);
     },
-    onError: (serverError: ApolloError) => {
+    onError: (serverError: any) => {
       console.log(serverError);
     },
     refetchQueries: [
