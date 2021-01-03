@@ -5,21 +5,15 @@ import { useTranslation } from 'react-i18next';
 import { yupResolver } from '@hookform/resolvers';
 import React, { useState } from 'react';
 
-import { CampaignVariantEnum } from 'types/globalTypes';
-
 import { ReactComponent as DecideIll } from 'assets/images/undraw_decide.svg';
 import { Mail, Smartphone } from 'react-feather';
 import { useCustomer } from 'providers/CustomerProvider';
-import { useGetWorkspaceDialogues } from 'hooks/useGetWorkspaceDialogues';
-import { useMutation } from '@apollo/react-hooks';
 import { useToast } from '@chakra-ui/core';
-import Select from 'react-select/async';
+import Select from 'react-select';
 import gql from 'graphql-tag';
 
-import {
-  createCampaignMutation_createCampaign as CreateOutput,
-  createCampaignMutationVariables as CreateVariables,
-} from './__generated__/createCampaignMutation';
+import { useGetWorkspaceDialoguesQuery, useCreateCampaignMutation, CampaignVariantEnum } from 'types/generated-types';
+import { useNavigator } from 'hooks/useNavigator';
 
 const CREATE_CAMPAIGN_MUTATION = gql`
   mutation createCampaignMutation($input: CreateCampaignInputType) {
@@ -30,8 +24,6 @@ const CREATE_CAMPAIGN_MUTATION = gql`
 `;
 
 type InputEvent = React.FormEvent<HTMLInputElement>;
-
-type CampaignType = 'SMS' | 'EMAIL' | 'QUEUE';
 
 const createCampaignBodyPlaceholder = `Dear {{firstName}},
 thank you for subscribing to {{dialogueId}}!
@@ -66,7 +58,18 @@ const ActiveVariantForm = ({ form, activeVariantIndex, variant }: { form: UseFor
   const activeVariant = form.watch(`variants[${activeVariantIndex}]`) as VariantFormProps;
   const { t } = useTranslation();
 
-  const { fetchLazyDialogues } = useGetWorkspaceDialogues({ onlyLazy: true });
+  const { customerSlug } = useNavigator();
+
+  const { data } = useGetWorkspaceDialoguesQuery({
+    variables: {
+      customerSlug
+    }
+  });
+
+  const dialogues = data?.customer?.dialogues?.map(dialogue => ({
+    label: dialogue.title,
+    value: dialogue.id
+  })) || [];
 
   return (
     <UI.CardBody id="subForm">
@@ -102,7 +105,7 @@ const ActiveVariantForm = ({ form, activeVariantIndex, variant }: { form: UseFor
                 classNamePrefix="select"
                 className="select"
                 defaultOptions
-                loadOptions={fetchLazyDialogues}
+                options={dialogues}
                 value={value}
                 onChange={onChange}
                 onBlur={onBlur}
@@ -181,7 +184,7 @@ const CreateCampaignForm = ({ onClose }: { onClose: () => void }) => {
     mode: 'onChange',
   });
 
-  const [createCampaign] = useMutation<CreateOutput, CreateVariables>(CREATE_CAMPAIGN_MUTATION, {
+  const [createCampaign] = useCreateCampaignMutation({
     variables: {
       input: {
         label: form.getValues().label,

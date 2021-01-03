@@ -1,19 +1,27 @@
 import * as UI from '@haas/ui';
-import { useGetWorkspaceCampaign } from 'hooks/useGetWorkspaceCampaign';
 import { useNavigator } from 'hooks/useNavigator';
 import React, { useState } from 'react';
 import { Plus } from 'react-feather';
 import { useTranslation } from 'react-i18next';
+import { useGetWorkspaceCampaignQuery } from 'types/generated-types';
 import { ImportDeliveriesForm } from './ImportDeliveriesForm';
 
 export const CampaignView = () => {
   const [isOpenImportModal, setIsOpenImportModal] = useState(false);
   const { t } = useTranslation();
   
-  const { campaignId, getCampaignsPath } = useNavigator();
+  const { customerSlug, campaignId, getCampaignsPath } = useNavigator();
   const campaignsPath = getCampaignsPath();
-  const { campaign } = useGetWorkspaceCampaign({ campaignId });
-  
+
+  const { data } = useGetWorkspaceCampaignQuery({
+    variables: {
+      campaignId,
+      customerSlug
+    }
+  });
+
+  const campaign = data?.customer?.campaign;
+
   return (
     <>
       <UI.ViewHeading>

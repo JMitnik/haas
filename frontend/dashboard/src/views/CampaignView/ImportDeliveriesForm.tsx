@@ -1,6 +1,5 @@
 import * as yup from 'yup';
 import * as UI from '@haas/ui';
-import { useGetWorkspaceCampaigns } from 'hooks/useGetWorkspaceCampaigns';
 import React from 'react'
 import { Controller, useForm } from 'react-hook-form';
 import { useMutation } from '@apollo/react-hooks';
@@ -10,6 +9,8 @@ import Select from 'react-select';
 import { useTranslation } from 'react-i18next';
 import FileDropInput from 'components/FileDropInput';
 import { useToast } from '@chakra-ui/core';
+import { useGetWorkspaceCampaignsQuery } from 'types/generated-types';
+import { useNavigator } from 'hooks/useNavigator';
 
 const schema = yup.object({
   label: yup.string().required(),
@@ -41,9 +42,18 @@ export const ImportDeliveriesForm = ({ onClose }: { onClose: () => void; }) => {
     }
   });
 
+  const { customerSlug } = useNavigator();
+
   const toast = useToast();
 
-  const { campaigns } = useGetWorkspaceCampaigns();
+  const { data } = useGetWorkspaceCampaignsQuery({
+    variables: {
+      customerSlug
+    }
+  });
+
+  const campaigns = data?.customer?.campaigns || [];
+
   const [activeCSV, setActiveCSV] = useState<File | null>(null);
   const [importDeliveries] = useMutation(IMPORT_DELIVERIES_MUTATION, {
     onCompleted: () => {

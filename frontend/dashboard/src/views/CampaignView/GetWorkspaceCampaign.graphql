@@ -1,0 +1,30 @@
+query GetWorkspaceCampaign($customerSlug: String!, $campaignId: String!) {
+  customer(slug: $customerSlug) {
+    id
+    campaign(campaignId: $campaignId) {
+      id
+      label
+      deliveryConnection {
+        deliveries {
+          id
+          deliveryRecipientFirstName
+          deliveryRecipientLastName
+          deliveryRecipientEmail
+          deliveryRecipientPhone
+          scheduledAt
+          currentStatus
+        }
+
+        nrTotal
+        nrSent
+        nrOpened
+        nrFinished
+      }
+
+      variants {
+        id
+        label
+      }
+    }
+  }
+}

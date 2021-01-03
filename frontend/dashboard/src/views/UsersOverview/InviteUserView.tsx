@@ -1,5 +1,5 @@
 import * as yup from 'yup';
-import { gql } from 'graphql-tag';
+import gql from 'graphql-tag';
 import { Controller, useForm } from 'react-hook-form';
 import { useHistory, useParams } from 'react-router';
 import { useMutation, useQuery } from '@apollo/react-hooks';

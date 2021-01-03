@@ -5,12 +5,12 @@ import React, { useState } from 'react';
 
 import { ReactComponent as EmptyIll } from 'assets/images/undraw_empty.svg';
 import { ReactComponent as SelectIll } from 'assets/images/undraw_select.svg';
-import { useGetWorkspaceCampaigns } from 'hooks/useGetWorkspaceCampaigns';
 
 import CreateCampaignForm from './CreateCampaignForm';
 import Select from 'react-select';
 import { useHistory } from 'react-router';
 import { useNavigator } from 'hooks/useNavigator';
+import { useGetWorkspaceCampaignsQuery } from 'types/generated-types';
 
 const CampaignsView = () => {
   const { t } = useTranslation();
@@ -18,9 +18,14 @@ const CampaignsView = () => {
   const { customerSlug, goToCampaignView } = useNavigator();
   const [openedModal, setIsOpenedModal] = useState(false);
 
-  const { campaigns } = useGetWorkspaceCampaigns({
-    // onlyLazy: true,
+  const { data } = useGetWorkspaceCampaignsQuery({
+    fetchPolicy: 'cache-and-network',
+    variables: {
+      customerSlug
+    }
   });
+
+  const campaigns = data?.customer?.campaigns || [];
 
   const handleSelectCampaign = ({label, value}: any) => {
     goToCampaignView(value);
