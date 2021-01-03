@@ -25,6 +25,7 @@ export const DeliveryModel = objectType({
     t.string('deliveryRecipientEmail');
     t.string('deliveryRecipientPhone');
     t.string('scheduledAt');
+    t.string('updatedAt');
     t.field('campaignVariant', { type: CampaignVariantModel });
     t.field('currentStatus', { type: DeliveryStatusEnum });
   },

@@ -243,6 +243,7 @@ type DeliveryType {
   deliveryRecipientPhone: String!
   id: ID!
   scheduledAt: String!
+  updatedAt: String!
 }
 
 type Dialogue {
@@ -870,6 +871,8 @@ enum SystemPermission {
   CAN_ACCESS_ADMIN_PANEL
   CAN_ADD_USERS
   CAN_BUILD_DIALOGUE
+  CAN_CREATE_CAMPAIGNS
+  CAN_CREATE_DELIVERIES
   CAN_CREATE_TRIGGERS
   CAN_DELETE_DIALOGUE
   CAN_DELETE_TRIGGERS
@@ -878,6 +881,7 @@ enum SystemPermission {
   CAN_EDIT_DIALOGUE
   CAN_EDIT_USERS
   CAN_EDIT_WORKSPACE
+  CAN_VIEW_CAMPAIGNS
   CAN_VIEW_DIALOGUE
   CAN_VIEW_DIALOGUE_ANALYTICS
   CAN_VIEW_USERS

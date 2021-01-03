@@ -174,7 +174,7 @@ export const CreateBatchDeliveriesResolver = mutationField('createBatchDeliverie
       const now = new Date().toISOString();
 
       try {
-        await prisma.delivery.create({
+        const delivery = await prisma.delivery.create({
           data: {
             id: record.id,
             deliveryRecipientEmail: record.email,
@@ -191,6 +191,14 @@ export const CreateBatchDeliveriesResolver = mutationField('createBatchDeliverie
             // TODO: catch this on creation
             scheduledAt: new Date(args?.input?.batchScheduledAt as string) || now,
           },
+        });
+
+        await prisma.deliveryEvents.create({
+          data: {
+            status: 'SCHEDULED',
+            Delivery: { connect: { id: delivery.id } },
+            createdAt: delivery.createdAt
+          }
         });
 
         return true;

@@ -3,7 +3,7 @@ import { useNavigator } from 'hooks/useNavigator';
 import React, { useState } from 'react';
 import { Plus } from 'react-feather';
 import { useTranslation } from 'react-i18next';
-import { DeliveryConnectionFilter, useGetWorkspaceCampaignQuery } from 'types/generated-types';
+import { DeliveryConnectionFilter, DeliveryStatusEnum, useGetWorkspaceCampaignQuery } from 'types/generated-types';
 import { ImportDeliveriesForm } from './ImportDeliveriesForm';
 
 export const campaignViewFilter: DeliveryConnectionFilter = {
@@ -14,6 +14,38 @@ export const campaignViewFilter: DeliveryConnectionFilter = {
 
 const POLL_INTERVAL_SECONDS = 60;
 const POLL_INTERVAL = POLL_INTERVAL_SECONDS * 1000;
+
+const DeliveryStatus = ({ status, datetime }: { status: DeliveryStatusEnum, datetime: Date }) => {
+  switch(status) {
+    case DeliveryStatusEnum.Finished: {
+      return (
+        <UI.Label variantColor="red">
+          {status}
+        </UI.Label>
+      );
+    }
+
+    case DeliveryStatusEnum.Deployed: {
+      return (
+        <UI.Label variantColor="blue">
+          {status}
+        </UI.Label>
+      )
+    }
+
+    case DeliveryStatusEnum.Opened: {
+      return (
+        <UI.Label variantColor="yellow">{status}</UI.Label>
+      )
+    }
+
+    default: {
+      return (
+        <UI.Label>{status}</UI.Label>
+      )
+    }
+  }
+}
 
 export const CampaignView = () => {
   const [isOpenImportModal, setIsOpenImportModal] = useState(false);
@@ -73,9 +105,7 @@ export const CampaignView = () => {
                     {delivery?.deliveryRecipientEmail}
                   </UI.TableCell>
                   <UI.TableCell>
-                    <UI.Label>
-                      {delivery?.currentStatus}
-                    </UI.Label>
+                    <DeliveryStatus status={delivery?.currentStatus} datetime={new Date(delivery?.updatedAt)} />
                   </UI.TableCell>
                 </UI.TableRow>
               ))}

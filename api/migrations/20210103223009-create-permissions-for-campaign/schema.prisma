@@ -1,6 +1,6 @@
 datasource postgresql {
   provider = "postgresql"
-  url      = env("DB_STRING")
+  url = "***"
 }
 
 // binaryTargets = ["debian-openssl-1.1.x"]
@@ -590,4 +590,5 @@ model DeliveryEvents {
   status DeliveryStatusTypeEnum
   createdAt DateTime @default(now())
   deliveryId  String
+  workSpaceId String
 }

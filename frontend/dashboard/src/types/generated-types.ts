@@ -54,6 +54,8 @@ export type CampaignVariantType = {
   label: Scalars['String'];
   weight: Scalars['Int'];
   body: Scalars['String'];
+  workspace: Customer;
+  dialogue: Dialogue;
   deliveryConnection?: Maybe<DeliveryConnectionType>;
 };
 
@@ -80,7 +82,6 @@ export type ConnectionInterface = {
 };
 
 export type CreateBatchDeliveriesInputType = {
-  label?: Maybe<Scalars['String']>;
   campaignId?: Maybe<Scalars['ID']>;
   uploadedCsv?: Maybe<Scalars['Upload']>;
   batchScheduledAt?: Maybe<Scalars['String']>;
@@ -296,6 +297,8 @@ export type DeliveryType = {
   deliveryRecipientEmail: Scalars['String'];
   deliveryRecipientPhone: Scalars['String'];
   scheduledAt: Scalars['String'];
+  updatedAt: Scalars['String'];
+  campaignVariant: CampaignVariantType;
   currentStatus: DeliveryStatusEnum;
 };
 
@@ -572,6 +575,7 @@ export type Mutation = {
   deleteTag: Tag;
   createCampaign: CampaignType;
   createBatchDeliveries: CreateBatchDeliveriesOutputType;
+  updateDeliveryStatus: Scalars['String'];
   deleteTrigger?: Maybe<TriggerType>;
   editTrigger: TriggerType;
   createTrigger: TriggerType;
@@ -635,6 +639,12 @@ export type MutationCreateCampaignArgs = {
 
 export type MutationCreateBatchDeliveriesArgs = {
   input?: Maybe<CreateBatchDeliveriesInputType>;
+};
+
+
+export type MutationUpdateDeliveryStatusArgs = {
+  deliveryId?: Maybe<Scalars['String']>;
+  status?: Maybe<DeliveryStatusEnum>;
 };
 
 
@@ -917,7 +927,7 @@ export type PermssionType = {
 export type Query = {
   __typename?: 'Query';
   tags: Array<Tag>;
-  delivery: DeliveryType;
+  delivery?: Maybe<DeliveryType>;
   triggerConnection?: Maybe<TriggerConnectionType>;
   trigger?: Maybe<TriggerType>;
   triggers: Array<TriggerType>;
@@ -1181,6 +1191,7 @@ export type SessionConnection = ConnectionInterface & {
 export type SessionInput = {
   dialogueId: Scalars['String'];
   entries?: Maybe<Array<NodeEntryInput>>;
+  deliveryId?: Maybe<Scalars['String']>;
 };
 
 export type SessionWhereUniqueInput = {
@@ -1267,7 +1278,10 @@ export enum SystemPermission {
   CanCreateTriggers = 'CAN_CREATE_TRIGGERS',
   CanDeleteTriggers = 'CAN_DELETE_TRIGGERS',
   CanDeleteWorkspace = 'CAN_DELETE_WORKSPACE',
-  CanEditWorkspace = 'CAN_EDIT_WORKSPACE'
+  CanEditWorkspace = 'CAN_EDIT_WORKSPACE',
+  CanViewCampaigns = 'CAN_VIEW_CAMPAIGNS',
+  CanCreateCampaigns = 'CAN_CREATE_CAMPAIGNS',
+  CanCreateDeliveries = 'CAN_CREATE_DELIVERIES'
 }
 
 export type Tag = {
@@ -1482,7 +1496,7 @@ export type GetWorkspaceCampaignQuery = (
         & Pick<DeliveryConnectionType, 'nrTotal' | 'nrSent' | 'nrOpened' | 'nrFinished'>
         & { deliveries: Array<(
           { __typename?: 'DeliveryType' }
-          & Pick<DeliveryType, 'id' | 'deliveryRecipientFirstName' | 'deliveryRecipientLastName' | 'deliveryRecipientEmail' | 'deliveryRecipientPhone' | 'scheduledAt' | 'currentStatus'>
+          & Pick<DeliveryType, 'id' | 'deliveryRecipientFirstName' | 'deliveryRecipientLastName' | 'deliveryRecipientEmail' | 'deliveryRecipientPhone' | 'scheduledAt' | 'updatedAt' | 'currentStatus'>
         )> }
       )>, variants: Array<(
         { __typename?: 'CampaignVariantType' }
@@ -1603,6 +1617,7 @@ export const GetWorkspaceCampaignDocument = gql`
           deliveryRecipientEmail
           deliveryRecipientPhone
           scheduledAt
+          updatedAt
           currentStatus
         }
         nrTotal

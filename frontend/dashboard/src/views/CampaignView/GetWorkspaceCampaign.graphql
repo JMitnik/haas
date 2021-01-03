@@ -12,6 +12,7 @@ query GetWorkspaceCampaign($customerSlug: String!, $campaignId: String!, $delive
           deliveryRecipientEmail
           deliveryRecipientPhone
           scheduledAt
+          updatedAt
           currentStatus
         }
 

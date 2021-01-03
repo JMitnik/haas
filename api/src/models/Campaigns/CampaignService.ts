@@ -85,14 +85,26 @@ export class CampaignService {
     const deliveryUpdates = updatedDeliveries.map(delivery => {
       const id = delivery.dateId.slice(delivery.dateId.length - 10);
 
-      return prisma.delivery.update({
+      const updateDelivery = prisma.delivery.update({
         where: { id },
         data: {
           currentStatus: delivery.newStatus,
         }
-      })
+      });
+
+      const newEvent = prisma.deliveryEvents.create({
+        data: {
+          status: delivery.newStatus,
+          Delivery: { connect: { id } }
+        }
+      });
+
+      return [updateDelivery, newEvent];
     });
 
-    return await prisma.$transaction(deliveryUpdates);
+    const deliveries = deliveryUpdates.flat();
+
+    // @ts-ignore
+    return await prisma.$transaction(deliveries);
   }
 }
