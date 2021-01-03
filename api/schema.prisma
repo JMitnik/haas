@@ -386,6 +386,10 @@ enum SystemPermissionEnum {
   CAN_DELETE_TRIGGERS
   CAN_DELETE_WORKSPACE
   CAN_EDIT_WORKSPACE
+  // Campaign oriented
+  CAN_VIEW_CAMPAIGNS
+  CAN_CREATE_CAMPAIGNS
+  CAN_CREATE_DELIVERIES
 }
 
 enum RoleTypeEnum {
@@ -585,4 +589,6 @@ model DeliveryEvents {
   id String @id @default(cuid())
   status DeliveryStatusTypeEnum
   createdAt DateTime @default(now())
+  deliveryId  String
+  workSpaceId String
 }
