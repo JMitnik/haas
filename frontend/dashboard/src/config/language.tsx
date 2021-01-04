@@ -1,6 +1,10 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    character_limit: {
+      en: 'Character limit',
+      de: 'Zeichenlimit'
+    },
     import_deliveries: {
       en: 'Import deliveries',
       de: 'Lieferungen importieren.'

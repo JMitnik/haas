@@ -8,9 +8,8 @@ import React, { useState } from 'react';
 import { ReactComponent as DecideIll } from 'assets/images/undraw_decide.svg';
 import { Mail, Smartphone } from 'react-feather';
 import { useCustomer } from 'providers/CustomerProvider';
-import { useToast } from '@chakra-ui/core';
+import { useToast, CircularProgress, CircularProgressLabel } from '@chakra-ui/core';
 import Select from 'react-select';
-import gql from 'graphql-tag';
 
 import { useGetWorkspaceDialoguesQuery, useCreateCampaignMutation, CampaignVariantEnum } from 'types/generated-types';
 import { useNavigator } from 'hooks/useNavigator';
@@ -19,8 +18,9 @@ type InputEvent = React.FormEvent<HTMLInputElement>;
 
 const createCampaignBodyPlaceholder = `Dear {{firstName}},
 thank you for subscribing to {{dialogueId}}!
-Please visit {{dialogueUrl}}.
-`;
+Please visit {{dialogueUrl}}.`;
+
+const SMS_LIMIT_CHARACTERS = 160;
 
 const mapVariantIndexToLabel: { [key: number]: string } = {
   0: 'A',
@@ -34,7 +34,11 @@ const variantSchema = yup.object({
     label: yup.string(),
     value: yup.string(),
   }).required(),
-  body: yup.string().required(),
+  body: yup.string().when('type', {
+    is: (ctaType) => ctaType === 'SMS',
+    then: yup.string().max(SMS_LIMIT_CHARACTERS).required(),
+    otherwise: yup.string().required(),
+  }).required(),
   weight: yup.number().required(),
 }).required();
 
@@ -62,6 +66,9 @@ const ActiveVariantForm = ({ form, activeVariantIndex, variant }: { form: UseFor
     label: dialogue.title,
     value: dialogue.id
   })) || [];
+
+  const bodyCharacters = activeVariant.body.length;
+  const percentageFull = Math.min(Math.floor((activeVariant.body.length / SMS_LIMIT_CHARACTERS) * 100), 100);
 
   return (
     <UI.CardBody id="subForm">
@@ -126,7 +133,20 @@ const ActiveVariantForm = ({ form, activeVariantIndex, variant }: { form: UseFor
         </UI.FormControl>
 
         <UI.FormControl isRequired>
-          <UI.FormLabel htmlFor={`variants[${activeVariantIndex}].body`}>{t('body')}</UI.FormLabel>
+          <UI.Flex justifyContent="space-between" alignItems="flex-start">
+            <UI.FormLabel htmlFor={`variants[${activeVariantIndex}].body`}>{t('body')}</UI.FormLabel>
+            {activeVariant.type === 'SMS' && (
+              <UI.Div mb={2}>
+                <UI.ColumnFlex alignItems="flex-end">
+                  <UI.Helper>{t('character_limit')}</UI.Helper>
+                  <CircularProgress 
+                  mt={2} color={activeVariant.body.length <= 160 ? 'green': 'red'} value={percentageFull}>
+                    <CircularProgressLabel>{activeVariant?.body?.length}</CircularProgressLabel>
+                  </CircularProgress>
+                </UI.ColumnFlex>
+              </UI.Div>
+            )}
+          </UI.Flex>
           <Controller
             key={variant.variantIndex}
             name={`variants[${activeVariantIndex}].body`}
@@ -175,6 +195,8 @@ const CreateCampaignForm = ({ onClose }: { onClose: () => void }) => {
     resolver: yupResolver(schema),
     mode: 'onChange',
   });
+
+  console.log(form.formState.errors);
 
   const [createCampaign] = useCreateCampaignMutation({
     variables: {

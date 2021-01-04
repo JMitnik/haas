@@ -8,13 +8,11 @@ import { ReactComponent as SelectIll } from 'assets/images/undraw_select.svg';
 
 import CreateCampaignForm from './CreateCampaignForm';
 import Select from 'react-select';
-import { useHistory } from 'react-router';
 import { useNavigator } from 'hooks/useNavigator';
 import { useGetWorkspaceCampaignsQuery } from 'types/generated-types';
 
 const CampaignsView = () => {
   const { t } = useTranslation();
-  const history = useHistory();
   const { customerSlug, goToCampaignView } = useNavigator();
   const [openedModal, setIsOpenedModal] = useState(false);
 
@@ -27,7 +25,7 @@ const CampaignsView = () => {
 
   const campaigns = data?.customer?.campaigns || [];
 
-  const handleSelectCampaign = ({label, value}: any) => {
+  const handleSelectCampaign = ({ value }: any) => {
     goToCampaignView(value);
   }
 
