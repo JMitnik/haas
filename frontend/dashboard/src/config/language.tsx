@@ -5,6 +5,10 @@ const language = {
       en: 'Character limit',
       de: 'Zeichenlimit'
     },
+    recipient_adress: {
+      en: 'Recipient adres',
+      de: 'Empfänger adres.'
+    },
     import_deliveries: {
       en: 'Import deliveries',
       de: 'Lieferungen importieren.'
