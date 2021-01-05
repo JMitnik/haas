@@ -57,8 +57,8 @@ const Wrapper = ({ children }: { children?: React.ReactNode }) => (
 // @ts-ignore
 document.createRange = function () {
   return {
-    setEnd() {},
-    setStart() {},
+    setEnd() { },
+    setStart() { },
     getBoundingClientRect() {
       return { right: 0 };
     },

@@ -139,8 +139,8 @@ const ActiveVariantForm = ({ form, activeVariantIndex, variant }: { form: UseFor
               <UI.Div mb={2}>
                 <UI.ColumnFlex alignItems="flex-end">
                   <UI.Helper>{t('character_limit')}</UI.Helper>
-                  <CircularProgress 
-                  mt={2} color={activeVariant.body.length <= 160 ? 'green': 'red'} value={percentageFull}>
+                  <CircularProgress
+                    mt={2} color={activeVariant.body.length <= 160 ? 'green' : 'red'} value={percentageFull}>
                     <CircularProgressLabel>{activeVariant?.body?.length}</CircularProgressLabel>
                   </CircularProgress>
                 </UI.ColumnFlex>
@@ -166,7 +166,7 @@ const ActiveVariantForm = ({ form, activeVariantIndex, variant }: { form: UseFor
   );
 };
 
-const CreateCampaignForm = ({ onClose }: { onClose: () => void }) => {
+const CreateCampaignForm = ({ onClose }: { onClose?: () => void }) => {
   const { activeCustomer } = useCustomer();
   const toast = useToast();
   const { t } = useTranslation();
@@ -196,8 +196,6 @@ const CreateCampaignForm = ({ onClose }: { onClose: () => void }) => {
     mode: 'onChange',
   });
 
-  console.log(form.formState.errors);
-
   const [createCampaign] = useCreateCampaignMutation({
     variables: {
       input: {
@@ -223,7 +221,7 @@ const CreateCampaignForm = ({ onClose }: { onClose: () => void }) => {
         duration: 1500,
       });
 
-      onClose();
+      onClose?.();
     },
     onError: () => {
       toast({
@@ -233,6 +231,8 @@ const CreateCampaignForm = ({ onClose }: { onClose: () => void }) => {
         position: 'bottom-right',
         duration: 1500,
       });
+
+      onClose?.();
     },
   });
 
@@ -323,12 +323,12 @@ const CreateCampaignForm = ({ onClose }: { onClose: () => void }) => {
               form={form}
             />
           ) : (
-            <UI.IllustrationCard
-              svg={<DecideIll />}
-              text={t('select_a_variant')}
-              isFlat
-            />
-          )}
+              <UI.IllustrationCard
+                svg={<DecideIll />}
+                text={t('select_a_variant')}
+                isFlat
+              />
+            )}
         </UI.Card>
         <UI.Button type="submit" isDisabled={!form.formState.isValid}>
           {t('save')}

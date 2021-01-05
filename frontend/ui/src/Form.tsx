@@ -29,8 +29,11 @@ import { FormLabelProps } from '@chakra-ui/core/dist/FormLabel';
 import { Grid, Stack } from './Container';
 import { Text } from './Type';
 
+interface FormContainerProps {
+  expandedForm?: boolean;
+}
 
-export const FormContainer = styled(Div)<{ expandedForm?: boolean }>`
+export const FormContainer = styled(Div) <FormContainerProps>`
   ${({ theme, expandedForm }) => css`
     padding-bottom: ${theme.gutter * 3}px;
     background: white;
@@ -38,8 +41,7 @@ export const FormContainer = styled(Div)<{ expandedForm?: boolean }>`
     border-radius: 10px;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 
-    ${expandedForm &&
-    css`
+    ${expandedForm && css`
       box-shadow: none;
     `}
   `}
@@ -605,7 +607,7 @@ interface CardFormProps {
   dualPane?: boolean;
 }
 
-export const CardForm = styled(Div)<CardFormProps>`
+export const CardForm = styled(Div) <CardFormProps>`
   ${({ theme, dualPane }) => css`
     ${dualPane &&
     css`
@@ -667,8 +669,8 @@ const defaultMarkdownEditorOptions: MarkdownEditorOptions = {
 }
 
 interface MarkdownEditorProps {
-  value: string; 
-  onChange: (val: string) => void; 
+  value: string;
+  onChange: (val: string) => void;
   options?: MarkdownEditorOptions;
 }
 
