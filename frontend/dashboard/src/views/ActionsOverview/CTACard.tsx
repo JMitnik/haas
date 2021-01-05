@@ -2,7 +2,7 @@ import * as Ani from 'components/animation';
 import * as UI from '@haas/ui';
 import { Edit3 } from 'react-feather';
 import { motion } from 'framer-motion';
-import { useMutation } from '@apollo/react-hooks';
+import { useMutation } from '@apollo/client';
 import { useParams } from 'react-router-dom';
 import { useToast } from '@chakra-ui/core';
 import { useTranslation } from 'react-i18next';
@@ -46,7 +46,7 @@ interface CTACardProps {
   form?: any;
 }
 
-const CTACardContainer = styled(UI.Card)<{ activeCTA: string | null, id: string }>`
+const CTACardContainer = styled(UI.Card) <{ activeCTA: string | null, id: string }>`
  ${({ id, activeCTA, theme }) => css`
     position: relative;
     flex-direction: column;

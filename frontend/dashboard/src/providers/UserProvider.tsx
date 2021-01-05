@@ -1,8 +1,8 @@
-import { useMutation, useQuery } from '@apollo/react-hooks';
+import { useMutation, useQuery } from '@apollo/client';
 import React, { useContext, useEffect, useState } from 'react';
 
 import { useHistory } from 'react-router';
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
 
 import { me as GetUserData, me_me as User } from './__generated__/me';
 
@@ -82,7 +82,7 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
     fetchPolicy: 'network-only',
   });
 
-  const setUser = () => {};
+  const setUser = () => { };
 
   const [logout] = useMutation(logoutMutation, {
     onCompleted: () => {

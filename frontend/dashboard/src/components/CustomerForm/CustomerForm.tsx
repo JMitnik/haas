@@ -7,7 +7,7 @@ import {
   RadioButton,
 } from '@haas/ui';
 import { useHistory } from 'react-router';
-import { useMutation } from '@apollo/react-hooks';
+import { useMutation } from '@apollo/client';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
 import intToBool from 'utils/intToBool';
@@ -104,7 +104,7 @@ const CustomerLogoFormFragment = ({ form }: { form: UseFormMethods<FormDataProps
           <FormLabel htmlFor="logo">{t('logo_existing_url')}</FormLabel>
           <InputHelper>{t('logo_existing_url_helper')}</InputHelper>
           <Input
-              // eslint-disable-next-line jsx-a11y/anchor-is-valid
+            // eslint-disable-next-line jsx-a11y/anchor-is-valid
             leftEl={<Link />}
             name="logo"
             isInvalid={!!form.errors.logo}
@@ -113,22 +113,22 @@ const CustomerLogoFormFragment = ({ form }: { form: UseFormMethods<FormDataProps
         </FormControl>
 
       ) : (
-        <>
-          <FormControl>
-            <FormLabel htmlFor="cloudinary">{t('logo_upload')}</FormLabel>
-            <InputHelper>{t('logo_upload_helper')}</InputHelper>
+          <>
+            <FormControl>
+              <FormLabel htmlFor="cloudinary">{t('logo_upload')}</FormLabel>
+              <InputHelper>{t('logo_upload_helper')}</InputHelper>
 
-            <Controller
-              control={form.control}
-              name="uploadLogo"
-              defaultValue=""
-              render={({ onChange, value }) => (
-                <CustomerUploadLogoInput value={value} onChange={onChange} />
-              )}
-            />
-          </FormControl>
-        </>
-      )}
+              <Controller
+                control={form.control}
+                name="uploadLogo"
+                defaultValue=""
+                render={({ onChange, value }) => (
+                  <CustomerUploadLogoInput value={value} onChange={onChange} />
+                )}
+              />
+            </FormControl>
+          </>
+        )}
     </>
   );
 };

@@ -1,6 +1,5 @@
-import gql from 'graphql-tag';
-import * as ApolloReactCommon from '@apollo/react-common';
-import * as ApolloReactHooks from '@apollo/react-hooks';
+import { gql } from '@apollo/client';
+import * as Apollo from '@apollo/client';
 export type Maybe<T> = T | null;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
@@ -1578,7 +1577,7 @@ export const CreateBatchDeliveriesDocument = gql`
   }
 }
     `;
-export type CreateBatchDeliveriesMutationFn = ApolloReactCommon.MutationFunction<CreateBatchDeliveriesMutation, CreateBatchDeliveriesMutationVariables>;
+export type CreateBatchDeliveriesMutationFn = Apollo.MutationFunction<CreateBatchDeliveriesMutation, CreateBatchDeliveriesMutationVariables>;
 
 /**
  * __useCreateBatchDeliveriesMutation__
@@ -1597,12 +1596,12 @@ export type CreateBatchDeliveriesMutationFn = ApolloReactCommon.MutationFunction
  *   },
  * });
  */
-export function useCreateBatchDeliveriesMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<CreateBatchDeliveriesMutation, CreateBatchDeliveriesMutationVariables>) {
-        return ApolloReactHooks.useMutation<CreateBatchDeliveriesMutation, CreateBatchDeliveriesMutationVariables>(CreateBatchDeliveriesDocument, baseOptions);
+export function useCreateBatchDeliveriesMutation(baseOptions?: Apollo.MutationHookOptions<CreateBatchDeliveriesMutation, CreateBatchDeliveriesMutationVariables>) {
+        return Apollo.useMutation<CreateBatchDeliveriesMutation, CreateBatchDeliveriesMutationVariables>(CreateBatchDeliveriesDocument, baseOptions);
       }
 export type CreateBatchDeliveriesMutationHookResult = ReturnType<typeof useCreateBatchDeliveriesMutation>;
-export type CreateBatchDeliveriesMutationResult = ApolloReactCommon.MutationResult<CreateBatchDeliveriesMutation>;
-export type CreateBatchDeliveriesMutationOptions = ApolloReactCommon.BaseMutationOptions<CreateBatchDeliveriesMutation, CreateBatchDeliveriesMutationVariables>;
+export type CreateBatchDeliveriesMutationResult = Apollo.MutationResult<CreateBatchDeliveriesMutation>;
+export type CreateBatchDeliveriesMutationOptions = Apollo.BaseMutationOptions<CreateBatchDeliveriesMutation, CreateBatchDeliveriesMutationVariables>;
 export const GetWorkspaceCampaignDocument = gql`
     query GetWorkspaceCampaign($customerSlug: String!, $campaignId: String!, $deliveryConnectionFilter: DeliveryConnectionFilter) {
   customer(slug: $customerSlug) {
@@ -1653,15 +1652,15 @@ export const GetWorkspaceCampaignDocument = gql`
  *   },
  * });
  */
-export function useGetWorkspaceCampaignQuery(baseOptions: ApolloReactHooks.QueryHookOptions<GetWorkspaceCampaignQuery, GetWorkspaceCampaignQueryVariables>) {
-        return ApolloReactHooks.useQuery<GetWorkspaceCampaignQuery, GetWorkspaceCampaignQueryVariables>(GetWorkspaceCampaignDocument, baseOptions);
+export function useGetWorkspaceCampaignQuery(baseOptions: Apollo.QueryHookOptions<GetWorkspaceCampaignQuery, GetWorkspaceCampaignQueryVariables>) {
+        return Apollo.useQuery<GetWorkspaceCampaignQuery, GetWorkspaceCampaignQueryVariables>(GetWorkspaceCampaignDocument, baseOptions);
       }
-export function useGetWorkspaceCampaignLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetWorkspaceCampaignQuery, GetWorkspaceCampaignQueryVariables>) {
-          return ApolloReactHooks.useLazyQuery<GetWorkspaceCampaignQuery, GetWorkspaceCampaignQueryVariables>(GetWorkspaceCampaignDocument, baseOptions);
+export function useGetWorkspaceCampaignLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetWorkspaceCampaignQuery, GetWorkspaceCampaignQueryVariables>) {
+          return Apollo.useLazyQuery<GetWorkspaceCampaignQuery, GetWorkspaceCampaignQueryVariables>(GetWorkspaceCampaignDocument, baseOptions);
         }
 export type GetWorkspaceCampaignQueryHookResult = ReturnType<typeof useGetWorkspaceCampaignQuery>;
 export type GetWorkspaceCampaignLazyQueryHookResult = ReturnType<typeof useGetWorkspaceCampaignLazyQuery>;
-export type GetWorkspaceCampaignQueryResult = ApolloReactCommon.QueryResult<GetWorkspaceCampaignQuery, GetWorkspaceCampaignQueryVariables>;
+export type GetWorkspaceCampaignQueryResult = Apollo.QueryResult<GetWorkspaceCampaignQuery, GetWorkspaceCampaignQueryVariables>;
 export function refetchGetWorkspaceCampaignQuery(variables?: GetWorkspaceCampaignQueryVariables) {
       return { query: GetWorkspaceCampaignDocument, variables: variables }
     }
@@ -1672,7 +1671,7 @@ export const CreateCampaignDocument = gql`
   }
 }
     `;
-export type CreateCampaignMutationFn = ApolloReactCommon.MutationFunction<CreateCampaignMutation, CreateCampaignMutationVariables>;
+export type CreateCampaignMutationFn = Apollo.MutationFunction<CreateCampaignMutation, CreateCampaignMutationVariables>;
 
 /**
  * __useCreateCampaignMutation__
@@ -1691,12 +1690,12 @@ export type CreateCampaignMutationFn = ApolloReactCommon.MutationFunction<Create
  *   },
  * });
  */
-export function useCreateCampaignMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<CreateCampaignMutation, CreateCampaignMutationVariables>) {
-        return ApolloReactHooks.useMutation<CreateCampaignMutation, CreateCampaignMutationVariables>(CreateCampaignDocument, baseOptions);
+export function useCreateCampaignMutation(baseOptions?: Apollo.MutationHookOptions<CreateCampaignMutation, CreateCampaignMutationVariables>) {
+        return Apollo.useMutation<CreateCampaignMutation, CreateCampaignMutationVariables>(CreateCampaignDocument, baseOptions);
       }
 export type CreateCampaignMutationHookResult = ReturnType<typeof useCreateCampaignMutation>;
-export type CreateCampaignMutationResult = ApolloReactCommon.MutationResult<CreateCampaignMutation>;
-export type CreateCampaignMutationOptions = ApolloReactCommon.BaseMutationOptions<CreateCampaignMutation, CreateCampaignMutationVariables>;
+export type CreateCampaignMutationResult = Apollo.MutationResult<CreateCampaignMutation>;
+export type CreateCampaignMutationOptions = Apollo.BaseMutationOptions<CreateCampaignMutation, CreateCampaignMutationVariables>;
 export const GetWorkspaceCampaignsDocument = gql`
     query GetWorkspaceCampaigns($customerSlug: String!) {
   customer(slug: $customerSlug) {
@@ -1729,15 +1728,15 @@ export const GetWorkspaceCampaignsDocument = gql`
  *   },
  * });
  */
-export function useGetWorkspaceCampaignsQuery(baseOptions: ApolloReactHooks.QueryHookOptions<GetWorkspaceCampaignsQuery, GetWorkspaceCampaignsQueryVariables>) {
-        return ApolloReactHooks.useQuery<GetWorkspaceCampaignsQuery, GetWorkspaceCampaignsQueryVariables>(GetWorkspaceCampaignsDocument, baseOptions);
+export function useGetWorkspaceCampaignsQuery(baseOptions: Apollo.QueryHookOptions<GetWorkspaceCampaignsQuery, GetWorkspaceCampaignsQueryVariables>) {
+        return Apollo.useQuery<GetWorkspaceCampaignsQuery, GetWorkspaceCampaignsQueryVariables>(GetWorkspaceCampaignsDocument, baseOptions);
       }
-export function useGetWorkspaceCampaignsLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetWorkspaceCampaignsQuery, GetWorkspaceCampaignsQueryVariables>) {
-          return ApolloReactHooks.useLazyQuery<GetWorkspaceCampaignsQuery, GetWorkspaceCampaignsQueryVariables>(GetWorkspaceCampaignsDocument, baseOptions);
+export function useGetWorkspaceCampaignsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetWorkspaceCampaignsQuery, GetWorkspaceCampaignsQueryVariables>) {
+          return Apollo.useLazyQuery<GetWorkspaceCampaignsQuery, GetWorkspaceCampaignsQueryVariables>(GetWorkspaceCampaignsDocument, baseOptions);
         }
 export type GetWorkspaceCampaignsQueryHookResult = ReturnType<typeof useGetWorkspaceCampaignsQuery>;
 export type GetWorkspaceCampaignsLazyQueryHookResult = ReturnType<typeof useGetWorkspaceCampaignsLazyQuery>;
-export type GetWorkspaceCampaignsQueryResult = ApolloReactCommon.QueryResult<GetWorkspaceCampaignsQuery, GetWorkspaceCampaignsQueryVariables>;
+export type GetWorkspaceCampaignsQueryResult = Apollo.QueryResult<GetWorkspaceCampaignsQuery, GetWorkspaceCampaignsQueryVariables>;
 export function refetchGetWorkspaceCampaignsQuery(variables?: GetWorkspaceCampaignsQueryVariables) {
       return { query: GetWorkspaceCampaignsDocument, variables: variables }
     }
@@ -1784,15 +1783,15 @@ export const GetWorkspaceDialoguesDocument = gql`
  *   },
  * });
  */
-export function useGetWorkspaceDialoguesQuery(baseOptions: ApolloReactHooks.QueryHookOptions<GetWorkspaceDialoguesQuery, GetWorkspaceDialoguesQueryVariables>) {
-        return ApolloReactHooks.useQuery<GetWorkspaceDialoguesQuery, GetWorkspaceDialoguesQueryVariables>(GetWorkspaceDialoguesDocument, baseOptions);
+export function useGetWorkspaceDialoguesQuery(baseOptions: Apollo.QueryHookOptions<GetWorkspaceDialoguesQuery, GetWorkspaceDialoguesQueryVariables>) {
+        return Apollo.useQuery<GetWorkspaceDialoguesQuery, GetWorkspaceDialoguesQueryVariables>(GetWorkspaceDialoguesDocument, baseOptions);
       }
-export function useGetWorkspaceDialoguesLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetWorkspaceDialoguesQuery, GetWorkspaceDialoguesQueryVariables>) {
-          return ApolloReactHooks.useLazyQuery<GetWorkspaceDialoguesQuery, GetWorkspaceDialoguesQueryVariables>(GetWorkspaceDialoguesDocument, baseOptions);
+export function useGetWorkspaceDialoguesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetWorkspaceDialoguesQuery, GetWorkspaceDialoguesQueryVariables>) {
+          return Apollo.useLazyQuery<GetWorkspaceDialoguesQuery, GetWorkspaceDialoguesQueryVariables>(GetWorkspaceDialoguesDocument, baseOptions);
         }
 export type GetWorkspaceDialoguesQueryHookResult = ReturnType<typeof useGetWorkspaceDialoguesQuery>;
 export type GetWorkspaceDialoguesLazyQueryHookResult = ReturnType<typeof useGetWorkspaceDialoguesLazyQuery>;
-export type GetWorkspaceDialoguesQueryResult = ApolloReactCommon.QueryResult<GetWorkspaceDialoguesQuery, GetWorkspaceDialoguesQueryVariables>;
+export type GetWorkspaceDialoguesQueryResult = Apollo.QueryResult<GetWorkspaceDialoguesQuery, GetWorkspaceDialoguesQueryVariables>;
 export function refetchGetWorkspaceDialoguesQuery(variables?: GetWorkspaceDialoguesQueryVariables) {
       return { query: GetWorkspaceDialoguesDocument, variables: variables }
     }

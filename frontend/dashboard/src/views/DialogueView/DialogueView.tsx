@@ -1,16 +1,18 @@
 import * as UI from '@haas/ui';
 import * as qs from 'qs';
-import { Activity, Award, Clipboard, Download, MessageCircle,
-  ThumbsDown, ThumbsUp, TrendingDown, TrendingUp } from 'react-feather';
+import {
+  Activity, Award, Clipboard, Download, MessageCircle,
+  ThumbsDown, ThumbsUp, TrendingDown, TrendingUp
+} from 'react-feather';
 import { Button, Tag, TagIcon, TagLabel, useClipboard } from '@chakra-ui/core';
 import { Div, Flex, Grid, H4, Icon, Loader, PageTitle, Span, Text } from '@haas/ui';
 import { sub } from 'date-fns';
 import { useHistory, useParams } from 'react-router-dom';
-import { useQuery } from '@apollo/react-hooks';
+import { useQuery } from '@apollo/client';
 import { useTranslation } from 'react-i18next';
 import QRCode from 'qrcode.react';
 import React, { useContext, useReducer, useRef } from 'react';
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
 import styled, { ThemeContext, css } from 'styled-components';
 
 import { ReactComponent as ChartbarIcon } from 'assets/icons/icon-chartbar.svg';
@@ -252,7 +254,7 @@ const ShareDialogue = ({ dialogueName, shareUrl }: ShareDialogueDropdownProps) =
                   <UI.Button width="auto" size="sm" onClick={onCopy} leftIcon={Clipboard}>
                     {hasCopied ? 'Copied' : 'Copy'}
                   </UI.Button>
-            )}
+                )}
                 value={shareUrl}
                 isReadOnly
               />
@@ -272,7 +274,7 @@ const calcScoreIncrease = (currentScore: number, prevScore: number) => {
 };
 
 const DialogueView = () => {
-  const { dialogueSlug, customerSlug } = useParams();
+  const { dialogueSlug, customerSlug } = useParams<{ customerSlug: string, dialogueSlug: string }>();
   const [activeDateState, dispatch] = useReducer(dateReducer, {
     startDate: sub(new Date(), { weeks: 1 }),
     compareStatisticStartDate: sub(new Date(), { weeks: 2 }),
@@ -376,15 +378,15 @@ const DialogueView = () => {
                       </Text>
                     </>
                   ) : (
-                    <>
-                      <Icon size="22px" as={TrendingDown} color="red.200" />
-                      <Text fontWeight={600} fontSize="0.9rem" ml={1} color="red.400">
-                        {increaseInAverageScore.toFixed(2)}
-                        {' '}
+                      <>
+                        <Icon size="22px" as={TrendingDown} color="red.200" />
+                        <Text fontWeight={600} fontSize="0.9rem" ml={1} color="red.400">
+                          {increaseInAverageScore.toFixed(2)}
+                          {' '}
                         %
                       </Text>
-                    </>
-                  )}
+                      </>
+                    )}
                 </Flex>
               )}
             />
@@ -406,12 +408,12 @@ const DialogueView = () => {
                       <TagIcon icon={ThumbsUp} size="10px" color="green.600" />
                       <TagLabel color="green.600">{dialogue.statistics?.mostPopularPath?.quantity}</TagLabel>
                     </Tag>
-                ) : (
-                  <Tag size="sm" variantColor="red">
-                    <TagIcon icon={ThumbsDown} size="10px" color="red.600" />
-                    <TagLabel color="red.600">{dialogue.statistics?.mostPopularPath?.quantity}</TagLabel>
-                  </Tag>
-                )}
+                  ) : (
+                      <Tag size="sm" variantColor="red">
+                        <TagIcon icon={ThumbsDown} size="10px" color="red.600" />
+                        <TagLabel color="red.600">{dialogue.statistics?.mostPopularPath?.quantity}</TagLabel>
+                      </Tag>
+                    )}
                 </>
               )}
             />
@@ -452,8 +454,8 @@ const DialogueView = () => {
           {dialogue.statistics?.history ? (
             <ScoreGraphModule chartData={dialogue.statistics?.history} />
           ) : (
-            <Div>{t('no_data')}</Div>
-          )}
+              <Div>{t('no_data')}</Div>
+            )}
         </Div>
 
         <InteractionFeedModule interactions={dialogue?.sessions} />

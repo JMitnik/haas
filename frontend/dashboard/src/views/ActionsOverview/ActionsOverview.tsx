@@ -1,6 +1,6 @@
 import { Mail, Plus } from 'react-feather';
 import { debounce } from 'lodash';
-import { useLazyQuery } from '@apollo/react-hooks';
+import { useLazyQuery } from '@apollo/client';
 import { useParams } from 'react-router-dom';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
@@ -91,7 +91,7 @@ const initializeCTAType = (type: string) => {
 };
 
 const ActionOverview = ({ leafs }: ActionOverviewProps) => {
-  const { customerSlug, dialogueSlug } = useParams();
+  const { customerSlug, dialogueSlug } = useParams<{ customerSlug: string, dialogueSlug: string }>();
   const [activeSearchTerm, setActiveSearchTerm] = useState('');
 
   const [newCTA, setNewCTA] = useState(false);
@@ -117,11 +117,13 @@ const ActionOverview = ({ leafs }: ActionOverviewProps) => {
       firstUpdate.current = false;
       return;
     }
-    fetchActions({ variables: {
-      customerSlug,
-      dialogueSlug,
-      searchTerm: activeSearchTerm,
-    } });
+    fetchActions({
+      variables: {
+        customerSlug,
+        dialogueSlug,
+        searchTerm: activeSearchTerm,
+      }
+    });
   }, [activeSearchTerm, fetchActions, customerSlug, dialogueSlug]);
 
   const handleAddCTA = () => {

@@ -1,5 +1,5 @@
 import { useErrorHandler } from 'react-error-boundary';
-import { useQuery } from '@apollo/react-hooks';
+import { useQuery } from '@apollo/client';
 import React from 'react';
 
 import { getCustomers as CustomerData } from 'queries/__generated__/getCustomers';

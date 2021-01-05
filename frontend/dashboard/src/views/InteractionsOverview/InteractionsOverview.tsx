@@ -3,7 +3,7 @@ import * as UI from '@haas/ui';
 import * as lodash from 'lodash';
 import * as qs from 'qs';
 import { debounce } from 'lodash';
-import { useLazyQuery } from '@apollo/react-hooks';
+import { useLazyQuery } from '@apollo/client';
 import { useLocation, useParams } from 'react-router';
 import Papa from 'papaparse';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -24,13 +24,19 @@ import SearchBar from 'components/SearchBar/SearchBar';
 import Table from 'components/Table/Table';
 import getDialogueSessionConnectionQuery from 'queries/getDialogueSessionConnectionQuery';
 
-import { EntryBreadCrumbContainer,
-  NodeTypeIcon } from 'views/DialogueView/Modules/InteractionFeedModule/InteractionFeedEntry';
+import {
+  EntryBreadCrumbContainer,
+  NodeTypeIcon
+} from 'views/DialogueView/Modules/InteractionFeedModule/InteractionFeedEntry';
 import { FormNodeEntry } from './FormNodeEntry';
-import { InteractionDateCell, InteractionPathCell,
-  InteractionUserCell, ScoreCell } from './InteractionTableCells';
-import { InteractionDetailQuestionEntry,
-  InteractionsOverviewContainer } from './InteractionOverviewStyles';
+import {
+  InteractionDateCell, InteractionPathCell,
+  InteractionUserCell, ScoreCell
+} from './InteractionTableCells';
+import {
+  InteractionDetailQuestionEntry,
+  InteractionsOverviewContainer
+} from './InteractionOverviewStyles';
 
 interface TableProps {
   activeStartDate: Date | null;
@@ -147,7 +153,7 @@ const InteractionTableValue = ({ entry }: { entry: NodeEntry }) => {
 };
 
 const InteractionsOverview = () => {
-  const { dialogueSlug, customerSlug } = useParams();
+  const { dialogueSlug, customerSlug } = useParams<{ customerSlug: string, dialogueSlug: string }>();
   const [fetchInteractions, { data, loading }] = useLazyQuery<CustomerSessionConnection>(getDialogueSessionConnectionQuery, {
     fetchPolicy: 'cache-and-network',
   });
@@ -159,11 +165,11 @@ const InteractionsOverview = () => {
       const mappedNodeEntries = nodeEntries.map((entry, index) => {
         const { relatedNode, value } = entry;
         const entryAnswer = value?.choiceNodeEntry
-        || value?.linkNodeEntry
-        || value?.registrationNodeEntry
-        || value?.formNodeEntry
-        || value?.sliderNodeEntry
-        || value?.textboxNodeEntry;
+          || value?.linkNodeEntry
+          || value?.registrationNodeEntry
+          || value?.formNodeEntry
+          || value?.sliderNodeEntry
+          || value?.textboxNodeEntry;
         return { [`depth${index}-title`]: relatedNode?.title, [`depth${index}-entry`]: entryAnswer };
       });
       const mergedNodeEntries = lodash.reduce(mappedNodeEntries, (prev, entry) => ({ ...prev, ...entry }), {});

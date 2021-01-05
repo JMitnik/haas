@@ -1,8 +1,7 @@
-import { ApolloClient } from 'apollo-client';
-import { ApolloLink, from } from 'apollo-link';
-import { InMemoryCache } from 'apollo-cache-inmemory';
+import { ApolloClient, ApolloLink, from } from '@apollo/client';
+import { InMemoryCache } from '@apollo/client/cache';
 import { createUploadLink } from 'apollo-upload-client';
-import { onError } from 'apollo-link-error';
+import { onError } from '@apollo/client/link/error';
 
 const authorizeLink = new ApolloLink((operation, forward) => {
   const localToken = localStorage.getItem('access_token');

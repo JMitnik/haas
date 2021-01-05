@@ -1,5 +1,5 @@
 import { AnimatePresence } from 'framer-motion';
-import { ApolloProvider } from '@apollo/react-hooks';
+import { ApolloProvider } from '@apollo/client';
 import { Div, ViewContainer } from '@haas/ui';
 import { ErrorBoundary } from 'react-error-boundary';
 import { I18nextProvider } from 'react-i18next';

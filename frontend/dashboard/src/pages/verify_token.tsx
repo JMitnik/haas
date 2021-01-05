@@ -1,12 +1,14 @@
 import * as qs from 'qs';
-import { Div,
-  Loader, PageContainer, SubtlePageHeading } from '@haas/ui';
+import {
+  Div,
+  Loader, PageContainer, SubtlePageHeading
+} from '@haas/ui';
 import { useHistory, useLocation } from 'react-router';
-import { useMutation } from '@apollo/react-hooks';
+import { useMutation } from '@apollo/client';
 import { useUser } from 'providers/UserProvider';
 import React, { useEffect, useRef } from 'react';
 import formatServerError from 'utils/formatServerError';
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
 import styled from 'styled-components';
 
 const verifyUserTokenQuery = gql`

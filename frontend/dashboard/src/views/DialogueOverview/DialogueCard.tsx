@@ -2,12 +2,14 @@ import { Edit, MapPin, Trash, User } from 'react-feather';
 import { formatDistance } from 'date-fns';
 
 import { useHistory, useParams } from 'react-router';
-import { useMutation } from '@apollo/react-hooks';
+import { useMutation } from '@apollo/client';
 import React, { useRef } from 'react';
 import styled, { css } from 'styled-components';
 
-import { Button, Popover, PopoverArrow, PopoverBody, PopoverCloseButton,
-  PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast } from '@chakra-ui/core';
+import {
+  Button, Popover, PopoverArrow, PopoverBody, PopoverCloseButton,
+  PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast
+} from '@chakra-ui/core';
 import { Card, CardBody, ColumnFlex, Div, ExtLink, Flex, Paragraph, Text } from '@haas/ui';
 import { deleteDialogueMutation } from 'mutations/deleteDialogue';
 import { useTranslation } from 'react-i18next';
@@ -158,9 +160,11 @@ const DialogueCard = ({ dialogue, isCompact }: { dialogue: any, isCompact?: bool
               <Div>
                 {lastUpdated && (
                   <Text fontSize="0.7rem" color="gray.300">
-                    {t('last_updated', { date: formatDistance(lastUpdated, new Date(), {
-                      locale: getLocale(),
-                    }) })}
+                    {t('last_updated', {
+                      date: formatDistance(lastUpdated, new Date(), {
+                        locale: getLocale(),
+                      })
+                    })}
                   </Text>
                 )}
               </Div>
@@ -171,7 +175,7 @@ const DialogueCard = ({ dialogue, isCompact }: { dialogue: any, isCompact?: bool
                       onDelete={handleDeleteDialogue}
                       onEdit={goToEditDialogue}
                     />
-              )}
+                  )}
                 />
               )}
             </Flex>

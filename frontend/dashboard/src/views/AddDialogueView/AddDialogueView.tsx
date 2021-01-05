@@ -1,11 +1,13 @@
 import * as yup from 'yup';
 import { Button, ButtonGroup, FormErrorMessage, Stack, useToast } from '@chakra-ui/core';
-import { Container, Div, ErrorStyle, Flex, Form, FormContainer, FormControl, FormLabel,
-  FormSection, H3, Hr, Input, InputGrid, InputHelper, Muted, PageTitle, Textarea } from '@haas/ui';
+import {
+  Container, Div, ErrorStyle, Flex, Form, FormContainer, FormControl, FormLabel,
+  FormSection, H3, Hr, Input, InputGrid, InputHelper, Muted, PageTitle, Textarea
+} from '@haas/ui';
 import { Controller, useForm } from 'react-hook-form';
 import { Minus, Plus, Type } from 'react-feather';
 import { useHistory, useParams } from 'react-router';
-import { useMutation, useQuery } from '@apollo/react-hooks';
+import { useMutation, useQuery } from '@apollo/client';
 import { useTranslation } from 'react-i18next';
 import React, { useEffect, useState } from 'react';
 import Select from 'react-select';
@@ -39,7 +41,7 @@ const schema = yup.object({
     value: yup.string(),
   })
     .when(['contentOption'], {
-      is: (contentOption : { label: string, value: string} | undefined) => contentOption?.value === 'TEMPLATE',
+      is: (contentOption: { label: string, value: string } | undefined) => contentOption?.value === 'TEMPLATE',
       then: () => yup.object().required(),
       otherwise: () => yup.object().notRequired(),
     }),
@@ -48,7 +50,7 @@ const schema = yup.object({
     value: yup.string().notRequired(),
   }).nullable(true)
     .when(['customerOption'], {
-      is: (customerOption: { label: string, value: string} | undefined) => typeof customerOption?.value !== 'undefined',
+      is: (customerOption: { label: string, value: string } | undefined) => typeof customerOption?.value !== 'undefined',
       then: yup.object().required().shape({
         label: yup.string().required(),
         value: yup.string().required(),
@@ -80,7 +82,7 @@ const AddDialogueView = () => {
 
   const { t } = useTranslation();
 
-  const [activeTags, setActiveTags] = useState<Array<null | {label: string, value: string}>>([]);
+  const [activeTags, setActiveTags] = useState<Array<null | { label: string, value: string }>>([]);
   const { data: customerData } = useQuery<CustomerData>(getCustomersOfUser, {
     fetchPolicy: 'cache-and-network',
     variables: {

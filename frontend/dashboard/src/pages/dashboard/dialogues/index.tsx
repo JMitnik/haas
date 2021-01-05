@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom';
-import { useQuery } from '@apollo/react-hooks';
+import { useQuery } from '@apollo/client';
 import { useToast } from '@chakra-ui/core';
 import React from 'react';
 
@@ -8,7 +8,7 @@ import DialogueOverview from 'views/DialogueOverview';
 import getDialoguesOfCustomer from 'queries/getDialoguesOfCustomer';
 
 const DialoguesPage = () => {
-  const { customerSlug } = useParams();
+  const { customerSlug } = useParams<{ customerSlug: string }>();
   const toast = useToast();
 
   // TODO: Handle the loading

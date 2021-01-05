@@ -1,15 +1,17 @@
 import * as yup from 'yup';
 import { Controller, useForm } from 'react-hook-form';
 import { Mail, Phone, User } from 'react-feather';
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
 import { useHistory, useParams } from 'react-router';
-import { useMutation, useQuery } from '@apollo/react-hooks';
+import { useMutation, useQuery } from '@apollo/client';
 import React from 'react';
 import Select from 'react-select';
 
 import { Button, ButtonGroup, FormErrorMessage, useToast } from '@chakra-ui/core';
-import { Div, Form, FormContainer, FormControl,
-  FormLabel, FormSection, H3, Hr, Input, InputGrid, InputHelper, Loader, Muted, PageTitle } from '@haas/ui';
+import {
+  Div, Form, FormContainer, FormControl,
+  FormLabel, FormSection, H3, Hr, Input, InputGrid, InputHelper, Loader, Muted, PageTitle
+} from '@haas/ui';
 
 import { motion } from 'framer-motion';
 import { useCustomer } from 'providers/CustomerProvider';
@@ -54,7 +56,7 @@ const getUserFromCustomer = gql`
 
 const EditUserView = () => {
   const { activeCustomer } = useCustomer();
-  const { userId } = useParams<{userId: string}>();
+  const { userId } = useParams<{ userId: string }>();
 
   const { data, loading } = useQuery(getUserFromCustomer, {
     variables: {
@@ -101,7 +103,7 @@ const EditUserForm = ({ userCustomer }: { userCustomer: any }) => {
   const { t } = useTranslation();
 
   const { data } = useQuery(getRolesQuery, { variables: { customerSlug: activeCustomer?.slug } });
-  const roles: Array<{name: string, id: string}> = data?.roles;
+  const roles: Array<{ name: string, id: string }> = data?.roles;
   const mappedRoles = roles?.map(({ name, id }) => ({ label: name, value: id }));
 
   const form = useForm<FormDataProps>({

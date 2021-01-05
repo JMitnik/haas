@@ -3,8 +3,8 @@ import React, { useEffect } from 'react';
 import { ViewContainer } from '@haas/ui';
 import { useDialogue } from 'providers/DialogueProvider';
 import { useParams } from 'react-router';
-import { useQuery } from '@apollo/react-hooks';
-import gql from 'graphql-tag';
+import { useQuery } from '@apollo/client';
+import { gql } from '@apollo/client';
 
 interface DialogueLayoutProps {
   children: React.ReactNode;
@@ -25,7 +25,7 @@ const getSharedDialogueLayoutQuery = gql`
 `;
 
 const DialogueLayout = ({ children }: DialogueLayoutProps) => {
-  const { customerSlug, dialogueSlug } = useParams<{customerSlug: string, dialogueSlug: string}>();
+  const { customerSlug, dialogueSlug } = useParams<{ customerSlug: string, dialogueSlug: string }>();
   const { setActiveDialogue } = useDialogue();
 
   const { data } = useQuery(getSharedDialogueLayoutQuery, {
