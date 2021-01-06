@@ -1,9 +1,11 @@
 import React, { forwardRef, Ref, ReactNode } from 'react';
 import 'antd/dist/antd.css'; // Slider,
 import 'easymde/dist/easymde.min.css'; // Markdown
+import AntdDatePickerGenerate from 'rc-picker/lib/generate/dateFns';
+import generatePicker from 'antd/lib/date-picker/generatePicker';
 import {
   Slider as AntdSlider,
-  DatePicker as AntdDatepicker,
+  // DatePicker as AntdDatepicker,
 } from 'antd';
 import { Div, Paragraph } from '@haas/ui';
 import SimpleMDE from 'react-simplemde-editor';
@@ -32,6 +34,7 @@ import { FormLabelProps } from '@chakra-ui/core/dist/FormLabel';
 import { Grid, Stack } from './Container';
 import { Text } from './Type';
 
+const AntdDatepicker = generatePicker<Date>(AntdDatePickerGenerate);
 const { RangePicker: AntdRangePicker } = AntdDatepicker;
 
 interface FormContainerProps {
@@ -81,8 +84,11 @@ export const InputHelper = styled.p`
     font-size: 0.8rem;
     margin-bottom: ${theme.gutter / 2}px;
     max-width: 500px;
+    white-space: pre;
   `}
 `;
+
+export const FormLabelHelper = InputHelper;
 
 export const Form = styled.form``;
 
@@ -733,6 +739,7 @@ interface RangeProps {
 interface RangePickerProps {
   range: RangeProps;
   format?: string;
+  defaultValue?: [Date, Date];
   onChange: (dates: any, dateStrings: string[]) => void;
   showTime?: boolean | TimePickerProps;
 }
@@ -740,6 +747,7 @@ interface RangePickerProps {
 interface PureDatePickerProps {
   range?: any;
   format?: string;
+  defaultValue?: Date;
   onChange: (date: any, dateString: string) => void;
   showTime?: boolean | TimePickerProps;
 }

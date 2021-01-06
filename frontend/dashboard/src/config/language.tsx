@@ -1,6 +1,22 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    upload_deliveries: {
+      en: 'Upload deliveries',
+      de: 'Lieferungen hochladen.'
+    },
+    upload_deliveries_helper: {
+      en: 'Upload a CSV file with details about your recipients. \n - The appropriate format is to use ";" as delimiter \n - Use firstName;lastName;email;phone as your columns \n - Prefix the phone numbers with their country code: for example +49 30901820',
+      de: 'Laden Sie eine CSV-Datei mit Details zu Ihren Empfängern hoch. \n - Das entsprechende Format ist ";" als Trennzeichen \n - Verwenden Sie firstName;lastName;email;phone als Spalten. \n - Stellen Sie den Telefonnummern ihre Landesvorwahl voran, z. B. +49 30901820',
+    },
+    scheduled_at: {
+      en: 'Schedule for when to send',
+      de: 'Zeitplan'
+    },
+    scheduled_at_helper: {
+      en: 'Set a date and time for when to send out these deliveries. \n - By default we will send out deliveries immediately. \n - Note that distribution channels like SMS may have a 5-10 minute delay.',
+      de: 'Legen Sie ein Datum und eine Uhrzeit für den Versand dieser Lieferungen fest. \n - Standardmäßig versenden wir Lieferungen sofort. \n - Beachten Sie, dass Vertriebskanäle wie SMS eine Verzögerung von 5-10 Minuten haben können.',
+    },
     character_limit: {
       en: 'Character limit',
       de: 'Zeichenlimit'
@@ -11,7 +27,7 @@ const language = {
     },
     import_deliveries: {
       en: 'Import deliveries',
-      de: 'Lieferungen importieren.'
+      de: 'Lieferungen importieren'
     },
     back_to_campaigns: {
       en: 'Back to campaigns',

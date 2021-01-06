@@ -1,7 +1,7 @@
 import * as yup from 'yup';
 import * as UI from '@haas/ui';
 import React from 'react'
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import FileDropInput from 'components/FileDropInput';
@@ -12,14 +12,20 @@ import { campaignViewFilter } from './CampaignView';
 import { useCustomer } from 'providers/CustomerProvider';
 import { useRef } from 'react';
 
-const schema = yup.object({}).required();
+const schema = yup.object({
+  batchScheduledAt: yup.date()
+}).required();
 
 type FormProps = yup.InferType<typeof schema>;
 
 export const ImportDeliveriesForm = ({ onClose }: { onClose: () => void; }) => {
   const { campaignId, customerSlug } = useNavigator();
-  const form = useForm<FormProps>();
-  const datePickerConainerRef = useRef(null);
+  const form = useForm<FormProps>({
+    defaultValues: {
+      batchScheduledAt: new Date()
+    },
+    mode: 'all'
+  });
   const { activeCustomer } = useCustomer();
 
   const toast = useToast();
@@ -63,13 +69,13 @@ export const ImportDeliveriesForm = ({ onClose }: { onClose: () => void; }) => {
     setActiveCSV(file);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = (formData: FormProps) => {
     importDeliveries({
       variables: {
         input: {
           workspaceId: activeCustomer?.id,
           campaignId,
-          batchScheduledAt: new Date().toISOString(),
+          batchScheduledAt: (formData.batchScheduledAt as Date).toISOString(),
           uploadedCsv: activeCSV,
         }
       }
@@ -83,23 +89,42 @@ export const ImportDeliveriesForm = ({ onClose }: { onClose: () => void; }) => {
       <UI.FormSectionHeader>{t('import_deliveries')}</UI.FormSectionHeader>
 
       <UI.InputGrid>
-        <FileDropInput
-          onDrop={handleDrop}
-        />
-
-        <UI.Div ref={datePickerConainerRef}>
-          <UI.DatePicker
-            onChange={(data: any) => console.log(data)}
-            showTime={{
-              format: "HH:mm",
-              hourStep: 1,
-              minuteStep: 15,
-            }}
+        <UI.FormControl isRequired>
+          <UI.FormLabel>{t('upload_deliveries')}</UI.FormLabel>
+          <UI.FormLabelHelper>{t('upload_deliveries_helper')}</UI.FormLabelHelper>
+          <FileDropInput
+            onDrop={handleDrop}
           />
-        </UI.Div>
+        </UI.FormControl>
+
+        <UI.FormControl isRequired>
+          <UI.FormLabel>{t('scheduled_at')}</UI.FormLabel>
+          <UI.FormLabelHelper>{t('scheduled_at_helper')}</UI.FormLabelHelper>
+          <UI.Div>
+            <Controller
+              name="batchScheduledAt"
+              control={form.control}
+              render={({ onChange, value }) => (
+                <UI.DatePicker
+                  defaultValue={value}
+                  format="DD-MM-YYYY HH:mm"
+                  onChange={onChange}
+                  showTime={{
+                    format: "HH:mm",
+                    hourStep: 1,
+                    minuteStep: 15,
+                  }}
+                />
+              )}
+            />
+          </UI.Div>
+        </UI.FormControl>
 
       </UI.InputGrid>
-      <UI.Button type="submit">{t('save')}</UI.Button>
+      <UI.Button
+        type="submit"
+        isDisabled={!form.formState.isValid}
+      >{t('save')}</UI.Button>
     </UI.Form>
   )
 };
