@@ -24,7 +24,11 @@ exports.lambdaHandler = async (event, context, callback) => {
     
     const sharedCallbackUrl = event.Records[0].dynamodb.NewImage.callback.S;
     
-    await sendToCallbackUrl(sharedCallbackUrl, updates);
+    try {
+      await sendToCallbackUrl(sharedCallbackUrl, updates);
+    } catch(error) {
+      console.error(`Unable to send to callback url at ${sharedCallbackUrl}. Will still send SMS`);
+    }
     
     await Promise.all(event.Records.map((record) => {
       const row = record.dynamodb.NewImage;
