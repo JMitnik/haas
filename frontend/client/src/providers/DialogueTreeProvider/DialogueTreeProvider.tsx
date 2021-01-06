@@ -2,7 +2,7 @@ import { TreeStoreModelProps } from 'models/TreeStoreModel';
 import React, { useContext, useEffect } from 'react';
 
 import { Customer, Dialogue } from 'types/generic';
-import { useQuery } from '@apollo/react-hooks';
+import { useQuery } from '@apollo/client';
 import { useRouteMatch } from 'react-router-dom';
 import getCustomerFromSlug from 'queries/getCustomerFromSluqQuery';
 import getDialogueFromSlug from 'queries/getDialogueFromSlugQuery';
@@ -56,7 +56,7 @@ export const DialogueTreeProvider = ({ children }: { children: React.ReactNode }
     },
   });
 
-  
+
   // When dialogue changes, set initial nodes and initial edges
   useEffect(() => {
     if (customerData?.customer) {

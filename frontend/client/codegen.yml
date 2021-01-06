@@ -8,5 +8,5 @@ generates:
       - typescript-react-apollo
     config:
       withMutationOptionsType: true
-      reactApolloVersion: 2
+      reactApolloVersion: 3
       withRefetchFn: true

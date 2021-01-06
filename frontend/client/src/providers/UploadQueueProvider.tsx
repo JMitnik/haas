@@ -1,4 +1,4 @@
-import { useMutation } from '@apollo/react-hooks';
+import { useMutation } from '@apollo/client';
 import qs from 'qs';
 import React, { useCallback, useContext, useRef } from 'react';
 import gql from 'graphql-tag';

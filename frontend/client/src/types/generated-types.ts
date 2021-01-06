@@ -1,6 +1,5 @@
-import gql from 'graphql-tag';
-import * as ApolloReactCommon from '@apollo/react-common';
-import * as ApolloReactHooks from '@apollo/react-hooks';
+import { gql } from '@apollo/client';
+import * as Apollo from '@apollo/client';
 export type Maybe<T> = T | null;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
@@ -83,6 +82,7 @@ export type ConnectionInterface = {
 
 export type CreateBatchDeliveriesInputType = {
   campaignId?: Maybe<Scalars['ID']>;
+  workspaceId?: Maybe<Scalars['String']>;
   uploadedCsv?: Maybe<Scalars['Upload']>;
   batchScheduledAt?: Maybe<Scalars['String']>;
 };
@@ -297,6 +297,7 @@ export type DeliveryType = {
   deliveryRecipientEmail: Scalars['String'];
   deliveryRecipientPhone: Scalars['String'];
   scheduledAt: Scalars['String'];
+  updatedAt: Scalars['String'];
   campaignVariant: CampaignVariantType;
   currentStatus: DeliveryStatusEnum;
 };
@@ -1277,7 +1278,10 @@ export enum SystemPermission {
   CanCreateTriggers = 'CAN_CREATE_TRIGGERS',
   CanDeleteTriggers = 'CAN_DELETE_TRIGGERS',
   CanDeleteWorkspace = 'CAN_DELETE_WORKSPACE',
-  CanEditWorkspace = 'CAN_EDIT_WORKSPACE'
+  CanEditWorkspace = 'CAN_EDIT_WORKSPACE',
+  CanViewCampaigns = 'CAN_VIEW_CAMPAIGNS',
+  CanCreateCampaigns = 'CAN_CREATE_CAMPAIGNS',
+  CanCreateDeliveries = 'CAN_CREATE_DELIVERIES'
 }
 
 export type Tag = {
@@ -1724,15 +1728,15 @@ export const GetDeliveryDocument = gql`
  *   },
  * });
  */
-export function useGetDeliveryQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<GetDeliveryQuery, GetDeliveryQueryVariables>) {
-        return ApolloReactHooks.useQuery<GetDeliveryQuery, GetDeliveryQueryVariables>(GetDeliveryDocument, baseOptions);
+export function useGetDeliveryQuery(baseOptions?: Apollo.QueryHookOptions<GetDeliveryQuery, GetDeliveryQueryVariables>) {
+        return Apollo.useQuery<GetDeliveryQuery, GetDeliveryQueryVariables>(GetDeliveryDocument, baseOptions);
       }
-export function useGetDeliveryLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetDeliveryQuery, GetDeliveryQueryVariables>) {
-          return ApolloReactHooks.useLazyQuery<GetDeliveryQuery, GetDeliveryQueryVariables>(GetDeliveryDocument, baseOptions);
+export function useGetDeliveryLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetDeliveryQuery, GetDeliveryQueryVariables>) {
+          return Apollo.useLazyQuery<GetDeliveryQuery, GetDeliveryQueryVariables>(GetDeliveryDocument, baseOptions);
         }
 export type GetDeliveryQueryHookResult = ReturnType<typeof useGetDeliveryQuery>;
 export type GetDeliveryLazyQueryHookResult = ReturnType<typeof useGetDeliveryLazyQuery>;
-export type GetDeliveryQueryResult = ApolloReactCommon.QueryResult<GetDeliveryQuery, GetDeliveryQueryVariables>;
+export type GetDeliveryQueryResult = Apollo.QueryResult<GetDeliveryQuery, GetDeliveryQueryVariables>;
 export function refetchGetDeliveryQuery(variables?: GetDeliveryQueryVariables) {
       return { query: GetDeliveryDocument, variables: variables }
     }
@@ -1741,7 +1745,7 @@ export const UpdateDeliveryStatusDocument = gql`
   updateDeliveryStatus(deliveryId: $deliveryId, status: $status)
 }
     `;
-export type UpdateDeliveryStatusMutationFn = ApolloReactCommon.MutationFunction<UpdateDeliveryStatusMutation, UpdateDeliveryStatusMutationVariables>;
+export type UpdateDeliveryStatusMutationFn = Apollo.MutationFunction<UpdateDeliveryStatusMutation, UpdateDeliveryStatusMutationVariables>;
 
 /**
  * __useUpdateDeliveryStatusMutation__
@@ -1761,12 +1765,12 @@ export type UpdateDeliveryStatusMutationFn = ApolloReactCommon.MutationFunction<
  *   },
  * });
  */
-export function useUpdateDeliveryStatusMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<UpdateDeliveryStatusMutation, UpdateDeliveryStatusMutationVariables>) {
-        return ApolloReactHooks.useMutation<UpdateDeliveryStatusMutation, UpdateDeliveryStatusMutationVariables>(UpdateDeliveryStatusDocument, baseOptions);
+export function useUpdateDeliveryStatusMutation(baseOptions?: Apollo.MutationHookOptions<UpdateDeliveryStatusMutation, UpdateDeliveryStatusMutationVariables>) {
+        return Apollo.useMutation<UpdateDeliveryStatusMutation, UpdateDeliveryStatusMutationVariables>(UpdateDeliveryStatusDocument, baseOptions);
       }
 export type UpdateDeliveryStatusMutationHookResult = ReturnType<typeof useUpdateDeliveryStatusMutation>;
-export type UpdateDeliveryStatusMutationResult = ApolloReactCommon.MutationResult<UpdateDeliveryStatusMutation>;
-export type UpdateDeliveryStatusMutationOptions = ApolloReactCommon.BaseMutationOptions<UpdateDeliveryStatusMutation, UpdateDeliveryStatusMutationVariables>;
+export type UpdateDeliveryStatusMutationResult = Apollo.MutationResult<UpdateDeliveryStatusMutation>;
+export type UpdateDeliveryStatusMutationOptions = Apollo.BaseMutationOptions<UpdateDeliveryStatusMutation, UpdateDeliveryStatusMutationVariables>;
 export const CreateSessionDocument = gql`
     mutation createSession($input: SessionInput) {
   createSession(input: $input) {
@@ -1774,7 +1778,7 @@ export const CreateSessionDocument = gql`
   }
 }
     `;
-export type CreateSessionMutationFn = ApolloReactCommon.MutationFunction<CreateSessionMutation, CreateSessionMutationVariables>;
+export type CreateSessionMutationFn = Apollo.MutationFunction<CreateSessionMutation, CreateSessionMutationVariables>;
 
 /**
  * __useCreateSessionMutation__
@@ -1793,12 +1797,12 @@ export type CreateSessionMutationFn = ApolloReactCommon.MutationFunction<CreateS
  *   },
  * });
  */
-export function useCreateSessionMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<CreateSessionMutation, CreateSessionMutationVariables>) {
-        return ApolloReactHooks.useMutation<CreateSessionMutation, CreateSessionMutationVariables>(CreateSessionDocument, baseOptions);
+export function useCreateSessionMutation(baseOptions?: Apollo.MutationHookOptions<CreateSessionMutation, CreateSessionMutationVariables>) {
+        return Apollo.useMutation<CreateSessionMutation, CreateSessionMutationVariables>(CreateSessionDocument, baseOptions);
       }
 export type CreateSessionMutationHookResult = ReturnType<typeof useCreateSessionMutation>;
-export type CreateSessionMutationResult = ApolloReactCommon.MutationResult<CreateSessionMutation>;
-export type CreateSessionMutationOptions = ApolloReactCommon.BaseMutationOptions<CreateSessionMutation, CreateSessionMutationVariables>;
+export type CreateSessionMutationResult = Apollo.MutationResult<CreateSessionMutation>;
+export type CreateSessionMutationOptions = Apollo.BaseMutationOptions<CreateSessionMutation, CreateSessionMutationVariables>;
 export const CustomerDocument = gql`
     query customer($slug: String!) {
   customer(slug: $slug) {
@@ -1823,15 +1827,15 @@ export const CustomerDocument = gql`
  *   },
  * });
  */
-export function useCustomerQuery(baseOptions: ApolloReactHooks.QueryHookOptions<CustomerQuery, CustomerQueryVariables>) {
-        return ApolloReactHooks.useQuery<CustomerQuery, CustomerQueryVariables>(CustomerDocument, baseOptions);
+export function useCustomerQuery(baseOptions: Apollo.QueryHookOptions<CustomerQuery, CustomerQueryVariables>) {
+        return Apollo.useQuery<CustomerQuery, CustomerQueryVariables>(CustomerDocument, baseOptions);
       }
-export function useCustomerLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<CustomerQuery, CustomerQueryVariables>) {
-          return ApolloReactHooks.useLazyQuery<CustomerQuery, CustomerQueryVariables>(CustomerDocument, baseOptions);
+export function useCustomerLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<CustomerQuery, CustomerQueryVariables>) {
+          return Apollo.useLazyQuery<CustomerQuery, CustomerQueryVariables>(CustomerDocument, baseOptions);
         }
 export type CustomerQueryHookResult = ReturnType<typeof useCustomerQuery>;
 export type CustomerLazyQueryHookResult = ReturnType<typeof useCustomerLazyQuery>;
-export type CustomerQueryResult = ApolloReactCommon.QueryResult<CustomerQuery, CustomerQueryVariables>;
+export type CustomerQueryResult = Apollo.QueryResult<CustomerQuery, CustomerQueryVariables>;
 export function refetchCustomerQuery(variables?: CustomerQueryVariables) {
       return { query: CustomerDocument, variables: variables }
     }
@@ -1901,15 +1905,15 @@ ${CustomerFragmentFragmentDoc}`;
  *   },
  * });
  */
-export function useGetDialogueQuery(baseOptions: ApolloReactHooks.QueryHookOptions<GetDialogueQuery, GetDialogueQueryVariables>) {
-        return ApolloReactHooks.useQuery<GetDialogueQuery, GetDialogueQueryVariables>(GetDialogueDocument, baseOptions);
+export function useGetDialogueQuery(baseOptions: Apollo.QueryHookOptions<GetDialogueQuery, GetDialogueQueryVariables>) {
+        return Apollo.useQuery<GetDialogueQuery, GetDialogueQueryVariables>(GetDialogueDocument, baseOptions);
       }
-export function useGetDialogueLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetDialogueQuery, GetDialogueQueryVariables>) {
-          return ApolloReactHooks.useLazyQuery<GetDialogueQuery, GetDialogueQueryVariables>(GetDialogueDocument, baseOptions);
+export function useGetDialogueLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetDialogueQuery, GetDialogueQueryVariables>) {
+          return Apollo.useLazyQuery<GetDialogueQuery, GetDialogueQueryVariables>(GetDialogueDocument, baseOptions);
         }
 export type GetDialogueQueryHookResult = ReturnType<typeof useGetDialogueQuery>;
 export type GetDialogueLazyQueryHookResult = ReturnType<typeof useGetDialogueLazyQuery>;
-export type GetDialogueQueryResult = ApolloReactCommon.QueryResult<GetDialogueQuery, GetDialogueQueryVariables>;
+export type GetDialogueQueryResult = Apollo.QueryResult<GetDialogueQuery, GetDialogueQueryVariables>;
 export function refetchGetDialogueQuery(variables?: GetDialogueQueryVariables) {
       return { query: GetDialogueDocument, variables: variables }
     }
