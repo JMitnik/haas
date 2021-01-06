@@ -2,7 +2,7 @@ import '@testing-library/jest-dom/extend-expect';
 import 'mutationobserver-shim';
 import { I18nextProvider } from 'react-i18next';
 import { MemoryRouter } from 'react-router';
-import { MockedProvider } from '@apollo/react-testing';
+import { MockedProvider } from '@apollo/client/testing';
 import { act, fireEvent, render, waitFor } from '@testing-library/react';
 import React from 'react';
 import user from '@testing-library/user-event';
@@ -12,6 +12,7 @@ import getDialoguesOfCustomer from 'queries/getDialoguesOfCustomer';
 import lang from 'config/i18n-config';
 
 import CreateCampaignForm from '../CreateCampaignForm';
+import { GetWorkspaceDialoguesDocument } from 'types/generated-types';
 
 // TODO: Write a good mock
 const Wrapper = ({ children }: { children?: React.ReactNode }) => (
@@ -20,7 +21,7 @@ const Wrapper = ({ children }: { children?: React.ReactNode }) => (
       addTypename={false}
       mocks={[{
         request: {
-          query: getDialoguesOfCustomer,
+          query: GetWorkspaceDialoguesDocument,
           variables: {
             customerSlug: 'test',
           },
@@ -39,7 +40,7 @@ const Wrapper = ({ children }: { children?: React.ReactNode }) => (
                 averageScore: 5,
                 id: 'test456',
                 tags: [],
-                customer: null,
+                customer: { id: 'test123' },
               }],
             },
           },
@@ -107,6 +108,7 @@ test('it ensures toggleAble variants', async () => {
   // CLick the select
   const variantDropdown = getByText(/select a dialogue/i).closest('.select') as Element;
   fireEvent.keyDown(variantDropdown, { key: 'ArrowDown' });
+  debug(variantDropdown);
 
   const testEvent = getByText(/test dialogue/i);
   user.click(testEvent);
@@ -129,6 +131,7 @@ test('it ensures toggleAble variants', async () => {
   // CLick the select
   const variantDropdownB = getByText(/select a dialogue/i).closest('.select') as Element;
   fireEvent.keyDown(variantDropdownB, { key: 'ArrowDown' });
+
 
   const testEventB = getByText(/test dialogue/i);
   user.click(testEventB);

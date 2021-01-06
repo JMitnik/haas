@@ -1,7 +1,10 @@
 import React, { forwardRef, Ref, ReactNode } from 'react';
 import 'antd/dist/antd.css'; // Slider,
 import 'easymde/dist/easymde.min.css'; // Markdown
-import { Slider as AntdSlider } from 'antd';
+import {
+  Slider as AntdSlider,
+  DatePicker as AntdDatepicker,
+} from 'antd';
 import { Div, Paragraph } from '@haas/ui';
 import SimpleMDE from 'react-simplemde-editor';
 import {
@@ -28,6 +31,8 @@ import Color from 'color';
 import { FormLabelProps } from '@chakra-ui/core/dist/FormLabel';
 import { Grid, Stack } from './Container';
 import { Text } from './Type';
+
+const { RangePicker: AntdRangePicker } = AntdDatepicker;
 
 interface FormContainerProps {
   expandedForm?: boolean;
@@ -712,4 +717,64 @@ export const MarkdownEditor = ({ value, onChange, options = defaultMarkdownEdito
       }}
     />
   </MarkdownEditorContainer>
+)
+
+interface TimePickerProps {
+  minuteStep?: number;
+  hourStep?: number;
+  format?: string;
+  secondStep?: number;
+};
+
+interface RangeProps {
+  ranges: any;
+}
+
+interface RangePickerProps {
+  range: RangeProps;
+  format?: string;
+  onChange: (dates: any, dateStrings: string[]) => void;
+  showTime?: boolean | TimePickerProps;
+}
+
+interface PureDatePickerProps {
+  range?: any;
+  format?: string;
+  onChange: (date: any, dateString: string) => void;
+  showTime?: boolean | TimePickerProps;
+}
+
+export const DatePickerContainer = styled.div`
+  .ant-picker-panel-container {
+    border-radius: 10px;
+  }
+`;
+
+export const PureDatePickerWrapper = (props: PureDatePickerProps) => (
+  <AntdDatepicker
+    // @ts-ignore 
+    getPopupContainer={triggerNode => triggerNode.parentNode}
+    {...props}
+  />
+);
+
+export const RangeDatePickerWrapper = (props: RangePickerProps) => (
+  <AntdRangePicker
+    // @ts-ignore
+    getPopupContainer={triggerNode => triggerNode.parentNode}
+    {...props} />
+);
+
+export const DatePicker = ({ range, ...restProps }: RangePickerProps | PureDatePickerProps) => (
+  <DatePickerContainer>
+    {range !== undefined ? (
+      <RangeDatePickerWrapper
+        {...range}
+        {...restProps as RangePickerProps}
+      />
+    ) : (
+        <PureDatePickerWrapper
+          {...restProps as PureDatePickerProps} />
+      )}
+  </DatePickerContainer>
 )

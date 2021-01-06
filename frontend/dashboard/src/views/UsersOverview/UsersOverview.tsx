@@ -50,7 +50,7 @@ const UsersOverview = () => {
   const { t } = useTranslation();
   const history = useHistory();
   const toast = useToast();
-  const [fetchUsers, { data, refetch }] = useLazyQuery(getPaginatedUsers, { fetchPolicy: 'no-cache' });
+  const [fetchUsers, { data, refetch }] = useLazyQuery(getPaginatedUsers, { fetchPolicy: 'cache-and-network' });
 
   const [paginationProps, setPaginationProps] = useState<TableProps>({
     activeStartDate: null,

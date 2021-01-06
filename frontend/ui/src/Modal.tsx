@@ -1,7 +1,8 @@
 import { motion } from 'framer-motion';
 import React, { useEffect, useRef } from 'react';
+import { X } from 'react-feather';
 import ReactModal from 'react-modal';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { Div } from './Generics';
 
 export const ModalBody = styled(Div)`
@@ -12,6 +13,17 @@ export const ModalBody = styled(Div)`
 
 if (process.env.NODE_ENV !== 'test') ReactModal.setAppElement('#root');
 
+const CloseIconWrapper = styled.button`
+  ${({ theme }) => css`
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    width: 1rem;
+    height: 1rem;
+    color: ${theme.colors.gray[600]};
+  `}
+`;
+
 const useOnClickOutside = (ref: any, handler: any) => {
   useEffect(
     () => {
@@ -20,7 +32,6 @@ const useOnClickOutside = (ref: any, handler: any) => {
         if (!ref.current || ref.current.contains(event.target)) {
           return;
         }
-
         handler(event);
       };
 
@@ -42,14 +53,29 @@ const useOnClickOutside = (ref: any, handler: any) => {
   );
 }
 
+interface ModalProps {
+  isOpen: boolean;
+  children: React.ReactNode;
+  onClose: any;
+  willCloseOnOutsideClick?: boolean;
+}
 
-export const Modal = ({ isOpen, children, onClose }: {isOpen: boolean, children: React.ReactNode, onClose: any } ) => {
+export const Modal = ({
+  isOpen,
+  children,
+  onClose,
+  willCloseOnOutsideClick = true
+}: ModalProps) => {
   const ref = useRef<any>(null);
-  useOnClickOutside(ref, onClose);
+  useOnClickOutside(ref, () => {
+    if (willCloseOnOutsideClick) {
+      onClose();
+    }
+  });
 
   return (
     <ReactModal
-      isOpen={isOpen} 
+      isOpen={isOpen}
       onRequestClose={onClose}
       shouldCloseOnOverlayClick
       style={{
@@ -78,10 +104,13 @@ export const Modal = ({ isOpen, children, onClose }: {isOpen: boolean, children:
           outline: 'none',
           padding: '20px',
           margin: '0px auto',
-          maxWidth: '100%',       
+          maxWidth: '100%',
         }
       }}
     >
+      <CloseIconWrapper aria-label="closeModal" onClick={onClose}>
+        <X />
+      </CloseIconWrapper>
       <Div ref={ref}>
         <motion.div animate={{ y: 0, opacity: 1 }} initial={{ y: 200, opacity: 0 }}>
           {children}

@@ -59,7 +59,8 @@ const ActiveVariantForm = ({ form, activeVariantIndex, variant }: { form: UseFor
   const { data } = useGetWorkspaceDialoguesQuery({
     variables: {
       customerSlug
-    }
+    },
+    fetchPolicy: 'cache-and-network'
   });
 
   const dialogues = data?.customer?.dialogues?.map(dialogue => ({
@@ -67,7 +68,7 @@ const ActiveVariantForm = ({ form, activeVariantIndex, variant }: { form: UseFor
     value: dialogue.id
   })) || [];
 
-  const bodyCharacters = activeVariant.body.length;
+  console.log(data);
   const percentageFull = Math.min(Math.floor((activeVariant.body.length / SMS_LIMIT_CHARACTERS) * 100), 100);
 
   return (

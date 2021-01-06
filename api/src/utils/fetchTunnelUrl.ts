@@ -10,7 +10,6 @@ export const fetchTunnelUrl = async () => {
     const tunnel = tunnelData.tunnels.find((tunnel: any) => tunnel.public_url);
     return tunnel.public_url;
   } catch (error) {
-    console.log(error);
     return '';
   } 
 };

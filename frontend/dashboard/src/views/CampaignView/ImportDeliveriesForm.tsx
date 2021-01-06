@@ -10,6 +10,7 @@ import { useCreateBatchDeliveriesMutation, refetchGetWorkspaceCampaignQuery } fr
 import { useNavigator } from 'hooks/useNavigator';
 import { campaignViewFilter } from './CampaignView';
 import { useCustomer } from 'providers/CustomerProvider';
+import { useRef } from 'react';
 
 const schema = yup.object({}).required();
 
@@ -18,6 +19,7 @@ type FormProps = yup.InferType<typeof schema>;
 export const ImportDeliveriesForm = ({ onClose }: { onClose: () => void; }) => {
   const { campaignId, customerSlug } = useNavigator();
   const form = useForm<FormProps>();
+  const datePickerConainerRef = useRef(null);
   const { activeCustomer } = useCustomer();
 
   const toast = useToast();
@@ -79,11 +81,22 @@ export const ImportDeliveriesForm = ({ onClose }: { onClose: () => void; }) => {
   return (
     <UI.Form onSubmit={form.handleSubmit(handleSubmit)}>
       <UI.FormSectionHeader>{t('import_deliveries')}</UI.FormSectionHeader>
-      
+
       <UI.InputGrid>
-        <FileDropInput 
+        <FileDropInput
           onDrop={handleDrop}
         />
+
+        <UI.Div ref={datePickerConainerRef}>
+          <UI.DatePicker
+            onChange={(data: any) => console.log(data)}
+            showTime={{
+              format: "HH:mm",
+              hourStep: 1,
+              minuteStep: 15,
+            }}
+          />
+        </UI.Div>
 
       </UI.InputGrid>
       <UI.Button type="submit">{t('save')}</UI.Button>

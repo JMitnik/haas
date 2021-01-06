@@ -44,40 +44,44 @@ const CampaignsView = () => {
       </UI.ViewHeading>
       <UI.ViewContainer>
         {/* TODO: Set proper close */}
-          {campaigns.length === 0 ? (
-            <UI.IllustrationCard
-              svg={<EmptyIll />}
-              isFlat
-              text={t('no_campaigns')}
-            >
-              <UI.Button
-                size="sm"
-                onClick={() => setIsOpenedModal(true)}
-                variantColor="teal"
-                leftIcon={Plus}
-              >
-                {t('create_campaign')}
-              </UI.Button>
-            </UI.IllustrationCard>
-          ): (
-            <UI.IllustrationCard
-            svg={<SelectIll />}
+        {campaigns.length === 0 ? (
+          <UI.IllustrationCard
+            svg={<EmptyIll />}
             isFlat
-            text={t('select_campaign_text')}
+            text={t('no_campaigns')}
           >
-            <UI.Div style={{ fontSize: '1rem', textAlign: 'left' }} margin="0 auto" maxWidth="200px">
-              <Select
-                options={campaigns.map((campaign: any) => ({
-                  label: campaign.label,
-                  value: campaign.id
-                }))}
-                onChange={(data) => handleSelectCampaign(data)}
-                placeholder={t('select_campaign')}
-              />
-            </UI.Div>
+            <UI.Button
+              size="sm"
+              onClick={() => setIsOpenedModal(true)}
+              variantColor="teal"
+              leftIcon={Plus}
+            >
+              {t('create_campaign')}
+            </UI.Button>
           </UI.IllustrationCard>
+        ) : (
+            <UI.IllustrationCard
+              svg={<SelectIll />}
+              isFlat
+              text={t('select_campaign_text')}
+            >
+              <UI.Div style={{ fontSize: '1rem', textAlign: 'left' }} margin="0 auto" maxWidth="200px">
+                <Select
+                  options={campaigns.map((campaign: any) => ({
+                    label: campaign.label,
+                    value: campaign.id
+                  }))}
+                  onChange={(data) => handleSelectCampaign(data)}
+                  placeholder={t('select_campaign')}
+                />
+              </UI.Div>
+            </UI.IllustrationCard>
           )}
-        <UI.Modal isOpen={openedModal} onClose={() => setIsOpenedModal(false)}>
+        <UI.Modal
+          willCloseOnOutsideClick={false}
+          isOpen={openedModal}
+          onClose={() => setIsOpenedModal(false)}
+        >
           <UI.Card width={900} noHover bg="white">
             <UI.CardBody>
               <UI.FormSectionHeader>{t('create_campaign')}</UI.FormSectionHeader>
