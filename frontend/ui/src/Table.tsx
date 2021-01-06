@@ -1,9 +1,15 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-export const Table = styled.table`
-`;
 export const TableRow = styled.tr``;
+
+export const Table = styled.table`
+  ${({ theme }) => css`
+    ${TableRow} + ${TableRow} {
+      border-top: 1px solid ${theme.colors.gray[200]};
+    }
+  `}
+`;
 
 
 export const TableHeadingContainer = styled.thead`
@@ -37,7 +43,7 @@ interface TableCellProps {
 
 export const TableCell = styled.td<TableCellProps>`
   ${({ isNumeric }) => css`
-    padding: 1rem 1.5rem;
+    padding: 0.5rem 1.5rem;
     
     ${isNumeric && css`
       text-align: right;

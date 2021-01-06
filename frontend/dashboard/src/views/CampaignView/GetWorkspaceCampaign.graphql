@@ -1,4 +1,8 @@
-query GetWorkspaceCampaign($customerSlug: String!, $campaignId: String!, $deliveryConnectionFilter: DeliveryConnectionFilter) {
+query GetWorkspaceCampaign(
+  $customerSlug: String!
+  $campaignId: String!
+  $deliveryConnectionFilter: DeliveryConnectionFilter
+) {
   customer(slug: $customerSlug) {
     id
     campaign(campaignId: $campaignId) {
@@ -14,6 +18,11 @@ query GetWorkspaceCampaign($customerSlug: String!, $campaignId: String!, $delive
           scheduledAt
           updatedAt
           currentStatus
+
+          campaignVariant {
+            id
+            label
+          }
         }
 
         nrTotal

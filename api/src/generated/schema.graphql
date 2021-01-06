@@ -236,7 +236,7 @@ enum DeliveryStatusEnum {
 
 """Delivery"""
 type DeliveryType {
-  campaignVariant: CampaignVariantType!
+  campaignVariant: CampaignVariantType
   currentStatus: DeliveryStatusEnum!
   deliveryRecipientEmail: String
   deliveryRecipientFirstName: String

@@ -424,7 +424,6 @@ export interface NexusGenRootTypes {
     startDate?: string | null; // String
   }
   DeliveryType: { // root type
-    campaignVariant: NexusGenRootTypes['CampaignVariantType']; // CampaignVariantType!
     currentStatus: NexusGenEnums['DeliveryStatusEnum']; // DeliveryStatusEnum!
     deliveryRecipientEmail?: string | null; // String
     deliveryRecipientFirstName?: string | null; // String
@@ -783,7 +782,7 @@ export interface NexusGenFieldTypes {
     startDate: string | null; // String
   }
   DeliveryType: { // field return type
-    campaignVariant: NexusGenRootTypes['CampaignVariantType']; // CampaignVariantType!
+    campaignVariant: NexusGenRootTypes['CampaignVariantType'] | null; // CampaignVariantType
     currentStatus: NexusGenEnums['DeliveryStatusEnum']; // DeliveryStatusEnum!
     deliveryRecipientEmail: string | null; // String
     deliveryRecipientFirstName: string | null; // String

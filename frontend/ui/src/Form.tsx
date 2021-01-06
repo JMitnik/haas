@@ -84,7 +84,7 @@ export const InputHelper = styled.p`
     font-size: 0.8rem;
     margin-bottom: ${theme.gutter / 2}px;
     max-width: 500px;
-    white-space: pre;
+    white-space: pre-wrap;
   `}
 `;
 

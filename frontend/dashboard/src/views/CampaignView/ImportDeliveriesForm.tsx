@@ -8,7 +8,7 @@ import FileDropInput from 'components/FileDropInput';
 import { useToast } from '@chakra-ui/core';
 import { useCreateBatchDeliveriesMutation, refetchGetWorkspaceCampaignQuery } from 'types/generated-types';
 import { useNavigator } from 'hooks/useNavigator';
-import { campaignViewFilter } from './CampaignView';
+import { defaultCampaignViewFilter } from './CampaignView';
 import { useCustomer } from 'providers/CustomerProvider';
 import { useRef } from 'react';
 
@@ -57,7 +57,7 @@ export const ImportDeliveriesForm = ({ onClose }: { onClose: () => void; }) => {
     refetchQueries: [
       refetchGetWorkspaceCampaignQuery({
         customerSlug, campaignId,
-        deliveryConnectionFilter: campaignViewFilter
+        deliveryConnectionFilter: defaultCampaignViewFilter
       })
     ]
   })

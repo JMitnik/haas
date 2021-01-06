@@ -292,12 +292,12 @@ export enum DeliveryStatusEnum {
 export type DeliveryType = {
   __typename?: 'DeliveryType';
   id: Scalars['ID'];
-  deliveryRecipientFirstName: Scalars['String'];
-  deliveryRecipientLastName: Scalars['String'];
-  deliveryRecipientEmail: Scalars['String'];
-  deliveryRecipientPhone: Scalars['String'];
-  scheduledAt: Scalars['String'];
-  updatedAt: Scalars['String'];
+  deliveryRecipientFirstName?: Maybe<Scalars['String']>;
+  deliveryRecipientLastName?: Maybe<Scalars['String']>;
+  deliveryRecipientEmail?: Maybe<Scalars['String']>;
+  deliveryRecipientPhone?: Maybe<Scalars['String']>;
+  scheduledAt?: Maybe<Scalars['String']>;
+  updatedAt?: Maybe<Scalars['String']>;
   campaignVariant: CampaignVariantType;
   currentStatus: DeliveryStatusEnum;
 };
@@ -1497,6 +1497,10 @@ export type GetWorkspaceCampaignQuery = (
         & { deliveries: Array<(
           { __typename?: 'DeliveryType' }
           & Pick<DeliveryType, 'id' | 'deliveryRecipientFirstName' | 'deliveryRecipientLastName' | 'deliveryRecipientEmail' | 'deliveryRecipientPhone' | 'scheduledAt' | 'updatedAt' | 'currentStatus'>
+          & { campaignVariant: (
+            { __typename?: 'CampaignVariantType' }
+            & Pick<CampaignVariantType, 'id' | 'label'>
+          ) }
         )> }
       )>, variants: Array<(
         { __typename?: 'CampaignVariantType' }
@@ -1619,6 +1623,10 @@ export const GetWorkspaceCampaignDocument = gql`
           scheduledAt
           updatedAt
           currentStatus
+          campaignVariant {
+            id
+            label
+          }
         }
         nrTotal
         nrSent

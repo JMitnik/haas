@@ -145,7 +145,7 @@ export const CreateBatchDeliveriesResolver = mutationField('createBatchDeliverie
       const scheduleKeyId = `${scheduledDate.toISOString()}_${id}`;
 
       // Assign a campaign variant
-      const useFirstVariant = probability(relatedCampaign.variantsEdges[0].weight);
+      const useFirstVariant = probability(relatedCampaign.variantsEdges[0].weight / 100);
       const variant = useFirstVariant ? relatedCampaign.variantsEdges[0] : relatedCampaign.variantsEdges[1];
 
       const dialogueUrl = `https://client.haas.live/_r?ref=${id}`;
