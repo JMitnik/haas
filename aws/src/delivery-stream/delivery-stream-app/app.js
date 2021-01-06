@@ -27,7 +27,7 @@ exports.lambdaHandler = async (event, context, callback) => {
     try {
       await sendToCallbackUrl(sharedCallbackUrl, updates);
     } catch(error) {
-      console.error(`Unable to send to callback url at ${sharedCallbackUrl}. Will still send SMS`);
+      console.error(`Unable to send update to callback url at ${sharedCallbackUrl}. Will still send SMS`);
     }
     
     await Promise.all(event.Records.map((record) => {
