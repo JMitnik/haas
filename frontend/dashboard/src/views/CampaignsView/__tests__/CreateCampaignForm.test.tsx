@@ -8,13 +8,13 @@ import React from 'react';
 import user from '@testing-library/user-event';
 
 import ThemeProvider from 'providers/ThemeProvider';
-import getDialoguesOfCustomer from 'queries/getDialoguesOfCustomer';
 import lang from 'config/i18n-config';
 
 import CreateCampaignForm from '../CreateCampaignForm';
 import { GetWorkspaceDialoguesDocument } from 'types/generated-types';
 
 // TODO: Write a good mock
+// FIXME: Why does the mockprovider not catch the actual test?
 const Wrapper = ({ children }: { children?: React.ReactNode }) => (
   <MemoryRouter>
     <MockedProvider
