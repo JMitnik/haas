@@ -78,7 +78,7 @@ export const NavLinkContainer = styled(NavLink) <LinkProps>`
     }
 
     &:hover {
-      color: ${theme.isDarkColor ? theme.colors.primaries['200'] : theme.colors.primaries['400']};
+      color: ${theme.isDarkColor ? theme.colors.primaries['200'] : theme.colors.primaries['700']};
     }
 
     /* If active react router */
