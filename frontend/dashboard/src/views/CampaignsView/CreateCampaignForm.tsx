@@ -11,7 +11,7 @@ import { useCustomer } from 'providers/CustomerProvider';
 import { useToast, CircularProgress, CircularProgressLabel } from '@chakra-ui/core';
 import Select from 'react-select';
 
-import { useGetWorkspaceDialoguesQuery, useCreateCampaignMutation, CampaignVariantEnum } from 'types/generated-types';
+import { useGetWorkspaceDialoguesQuery, useCreateCampaignMutation, CampaignVariantEnum, refetchGetWorkspaceCampaignsQuery } from 'types/generated-types';
 import { useNavigator } from 'hooks/useNavigator';
 
 type InputEvent = React.FormEvent<HTMLInputElement>;
@@ -117,12 +117,14 @@ const ActiveVariantForm = ({ form, activeVariantIndex, variant }: { form: UseFor
         <UI.FormControl isRequired>
           <UI.FormLabel>{t('distribution')}</UI.FormLabel>
           <Controller
+            key={variant.variantIndex}
             control={form.control}
-            defaultValue={variant.type}
+            defaultValue={activeVariant.type}
             name={`variants[${activeVariantIndex}].type`}
             render={({ onChange, value, onBlur }) => (
               <UI.RadioButtons
                 value={value}
+                key={variant.variantIndex}
                 onChange={onChange}
                 onBlur={onBlur}
               >
@@ -213,6 +215,11 @@ const CreateCampaignForm = ({ onClose }: { onClose?: () => void }) => {
         })),
       },
     },
+    refetchQueries: [
+      refetchGetWorkspaceCampaignsQuery({
+        customerSlug: activeCustomer?.slug || ''
+      })
+    ],
     onCompleted: () => {
       toast({
         title: t('toast:campaign_created'),

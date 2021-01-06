@@ -238,13 +238,13 @@ enum DeliveryStatusEnum {
 type DeliveryType {
   campaignVariant: CampaignVariantType!
   currentStatus: DeliveryStatusEnum!
-  deliveryRecipientEmail: String!
-  deliveryRecipientFirstName: String!
-  deliveryRecipientLastName: String!
-  deliveryRecipientPhone: String!
+  deliveryRecipientEmail: String
+  deliveryRecipientFirstName: String
+  deliveryRecipientLastName: String
+  deliveryRecipientPhone: String
   id: ID!
-  scheduledAt: String!
-  updatedAt: String!
+  scheduledAt: String
+  updatedAt: String
 }
 
 type Dialogue {

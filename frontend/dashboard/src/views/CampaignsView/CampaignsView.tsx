@@ -10,11 +10,13 @@ import CreateCampaignForm from './CreateCampaignForm';
 import Select from 'react-select';
 import { useNavigator } from 'hooks/useNavigator';
 import { useGetWorkspaceCampaignsQuery } from 'types/generated-types';
+import useAuth from 'hooks/useAuth';
 
 const CampaignsView = () => {
   const { t } = useTranslation();
   const { customerSlug, goToCampaignView } = useNavigator();
   const [openedModal, setIsOpenedModal] = useState(false);
+  const { canCreateCampaigns } = useAuth();
 
   const { data } = useGetWorkspaceCampaignsQuery({
     fetchPolicy: 'cache-and-network',
@@ -33,14 +35,16 @@ const CampaignsView = () => {
     <>
       <UI.ViewHeading>
         <UI.PageTitle>{t('campaigns')}</UI.PageTitle>
-        <UI.Button
-          size="sm"
-          onClick={() => setIsOpenedModal(true)}
-          variantColor="teal"
-          leftIcon={Plus}
-        >
-          {t('create_campaign')}
-        </UI.Button>
+        {canCreateCampaigns && (
+          <UI.Button
+            size="sm"
+            onClick={() => setIsOpenedModal(true)}
+            variantColor="teal"
+            leftIcon={Plus}
+          >
+            {t('create_campaign')}
+          </UI.Button>
+        )}
       </UI.ViewHeading>
       <UI.ViewContainer>
         {/* TODO: Set proper close */}

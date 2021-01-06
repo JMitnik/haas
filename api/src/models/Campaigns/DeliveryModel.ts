@@ -20,12 +20,12 @@ export const DeliveryModel = objectType({
   description: 'Delivery',
   definition(t) {
     t.id('id');
-    t.string('deliveryRecipientFirstName');
-    t.string('deliveryRecipientLastName');
-    t.string('deliveryRecipientEmail');
-    t.string('deliveryRecipientPhone');
-    t.string('scheduledAt');
-    t.string('updatedAt');
+    t.string('deliveryRecipientFirstName', { nullable: true });
+    t.string('deliveryRecipientLastName', { nullable: true });
+    t.string('deliveryRecipientEmail', { nullable: true });
+    t.string('deliveryRecipientPhone', { nullable: true });
+    t.string('scheduledAt', { nullable: true });
+    t.string('updatedAt', { nullable: true });
     t.field('campaignVariant', { type: CampaignVariantModel });
     t.field('currentStatus', { type: DeliveryStatusEnum });
   },

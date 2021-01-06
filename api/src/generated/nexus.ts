@@ -426,13 +426,13 @@ export interface NexusGenRootTypes {
   DeliveryType: { // root type
     campaignVariant: NexusGenRootTypes['CampaignVariantType']; // CampaignVariantType!
     currentStatus: NexusGenEnums['DeliveryStatusEnum']; // DeliveryStatusEnum!
-    deliveryRecipientEmail: string; // String!
-    deliveryRecipientFirstName: string; // String!
-    deliveryRecipientLastName: string; // String!
-    deliveryRecipientPhone: string; // String!
+    deliveryRecipientEmail?: string | null; // String
+    deliveryRecipientFirstName?: string | null; // String
+    deliveryRecipientLastName?: string | null; // String
+    deliveryRecipientPhone?: string | null; // String
     id: string; // ID!
-    scheduledAt: string; // String!
-    updatedAt: string; // String!
+    scheduledAt?: string | null; // String
+    updatedAt?: string | null; // String
   }
   Dialogue: prisma.Dialogue;
   DialogueStatistics: { // root type
@@ -785,13 +785,13 @@ export interface NexusGenFieldTypes {
   DeliveryType: { // field return type
     campaignVariant: NexusGenRootTypes['CampaignVariantType']; // CampaignVariantType!
     currentStatus: NexusGenEnums['DeliveryStatusEnum']; // DeliveryStatusEnum!
-    deliveryRecipientEmail: string; // String!
-    deliveryRecipientFirstName: string; // String!
-    deliveryRecipientLastName: string; // String!
-    deliveryRecipientPhone: string; // String!
+    deliveryRecipientEmail: string | null; // String
+    deliveryRecipientFirstName: string | null; // String
+    deliveryRecipientLastName: string | null; // String
+    deliveryRecipientPhone: string | null; // String
     id: string; // ID!
-    scheduledAt: string; // String!
-    updatedAt: string; // String!
+    scheduledAt: string | null; // String
+    updatedAt: string | null; // String
   }
   Dialogue: { // field return type
     averageScore: number; // Float!
