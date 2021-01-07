@@ -2,6 +2,7 @@ import * as UI from '@haas/ui';
 import { format } from 'date-fns';
 import { useNavigator } from 'hooks/useNavigator';
 import React, { useState } from 'react';
+import { useRef } from 'react';
 import { useEffect } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { AtSign, Clock, Eye, Flag, Phone, Plus, Smartphone } from 'react-feather';
@@ -12,7 +13,7 @@ import { ImportDeliveriesForm } from './ImportDeliveriesForm';
 
 export const defaultCampaignViewFilter: DeliveryConnectionFilter = {
   paginationFilter: {
-    limit: 10,
+    limit: 7,
     startDate: undefined,
     endDate: undefined,
     pageIndex: 0,
@@ -109,15 +110,17 @@ export const CampaignView = () => {
   const [activeDelivery, setActiveDelivery] = useState<DeepPartial<DeliveryType> | null>(null);
   const { t } = useTranslation();
 
+  const [paginationState, setPaginationState] = useState(defaultCampaignViewFilter);
+
   const { customerSlug, campaignId, getCampaignsPath } = useNavigator();
   const campaignsPath = getCampaignsPath();
 
-  const { data, refetch } = useGetWorkspaceCampaignQuery({
+  const { data, fetchMore } = useGetWorkspaceCampaignQuery({
     fetchPolicy: 'cache-and-network',
     variables: {
       campaignId,
       customerSlug,
-      deliveryConnectionFilter: defaultCampaignViewFilter,
+      deliveryConnectionFilter: paginationState,
     },
     pollInterval: POLL_INTERVAL
   });
@@ -147,44 +150,87 @@ export const CampaignView = () => {
         </UI.Stack>
       </UI.ViewHeading>
       <UI.ViewContainer>
-        <UI.Card noHover p={2}>
-          <UI.Table>
-            <UI.TableHeading>
-              <UI.TableHeadingCell>
-                {t('recipient')}
-              </UI.TableHeadingCell>
-              <UI.TableHeadingCell>
-                {t('recipient_adress')}
-              </UI.TableHeadingCell>
-              <UI.TableHeadingCell>
-                {t('variant')}
-              </UI.TableHeadingCell>
-              <UI.TableHeadingCell>
-                {t('status')}
-              </UI.TableHeadingCell>
-            </UI.TableHeading>
+        <UI.Card noHover>
+          <UI.Div p={2}>
+            <UI.Table width="100%">
+              <UI.TableHeading>
+                <UI.TableHeadingCell>
+                  {t('recipient')}
+                </UI.TableHeadingCell>
+                <UI.TableHeadingCell>
+                  {t('recipient_adress')}
+                </UI.TableHeadingCell>
+                <UI.TableHeadingCell>
+                  {t('variant')}
+                </UI.TableHeadingCell>
+                <UI.TableHeadingCell>
+                  {t('status')}
+                </UI.TableHeadingCell>
+              </UI.TableHeading>
 
-            <UI.TableBody>
-              {deliveryConnection?.deliveries.map(delivery => (
-                <UI.TableRow key={delivery.id} onClick={() => setActiveDelivery(delivery)}>
-                  <UI.TableCell>
-                    {delivery?.deliveryRecipientFirstName}
-                  </UI.TableCell>
-                  <UI.TableCell>
-                    {delivery?.deliveryRecipientEmail}
-                  </UI.TableCell>
-                  <UI.TableCell>
-                    {delivery?.campaignVariant?.label}
-                  </UI.TableCell>
-                  <UI.TableCell>
-                    <DeliveryStatus
-                      delivery={delivery}
-                    />
-                  </UI.TableCell>
-                </UI.TableRow>
-              ))}
-            </UI.TableBody>
-          </UI.Table>
+              <UI.TableBody>
+                {deliveryConnection?.deliveries.map(delivery => (
+                  <UI.TableRow hasHover key={delivery.id} onClick={() => setActiveDelivery(delivery)}>
+                    <UI.TableCell>
+                      {delivery?.deliveryRecipientFirstName}
+                    </UI.TableCell>
+                    <UI.TableCell>
+                      {delivery?.deliveryRecipientEmail}
+                    </UI.TableCell>
+                    <UI.TableCell>
+                      {delivery?.campaignVariant?.label}
+                    </UI.TableCell>
+                    <UI.TableCell>
+                      <DeliveryStatus
+                        delivery={delivery}
+                      />
+                    </UI.TableCell>
+                  </UI.TableRow>
+                ))}
+              </UI.TableBody>
+            </UI.Table>
+          </UI.Div>
+          {(deliveryConnection?.pageInfo?.nrPages || 0) > 1 && (
+            <UI.PaginationFooter>
+              <UI.Div>
+                Showing page
+                <UI.Span ml={1} fontWeight="bold">
+                  {(paginationState.paginationFilter?.pageIndex || 0) + 1}
+                </UI.Span>
+                <UI.Span ml={1}>
+                  out of
+                </UI.Span>
+                <UI.Span ml={1} fontWeight="bold">
+                  {deliveryConnection?.pageInfo.nrPages}
+                </UI.Span>
+              </UI.Div>
+
+              <UI.Div>
+                <UI.Stack isInline>
+                  <UI.Button
+                    onClick={() => setPaginationState(state => ({
+                      ...state,
+                      paginationFilter: {
+                        ...state.paginationFilter,
+                        pageIndex: (state.paginationFilter?.pageIndex || 0) - 1,
+                        offset: (state.paginationFilter?.offset || 0) - (state.paginationFilter?.limit || 0),
+                      }
+                    }))}
+                    isDisabled={paginationState.paginationFilter?.pageIndex === 0}>Previous</UI.Button>
+                  <UI.Button
+                    onClick={() => setPaginationState(state => ({
+                      ...state,
+                      paginationFilter: {
+                        ...state.paginationFilter,
+                        pageIndex: (state.paginationFilter?.pageIndex || 0) + 1,
+                        offset: (state.paginationFilter?.offset || 0) + (state.paginationFilter?.limit || 0),
+                      }
+                    }))}
+                    isDisabled={(paginationState.paginationFilter?.pageIndex || 0) + 1 === deliveryConnection?.pageInfo.nrPages}>Next</UI.Button>
+                </UI.Stack>
+              </UI.Div>
+            </UI.PaginationFooter>
+          )}
         </UI.Card>
 
         <UI.Modal isOpen={isOpenDetailModel} onClose={() => setActiveDelivery(null)}>

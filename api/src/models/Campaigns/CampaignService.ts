@@ -58,7 +58,8 @@ export class CampaignService {
         countCallBack: countDeliveriesCallback,
         countWhereInput: deliveryFilterOptions
       },
-      paginationOpts: paginationOptions
+      paginationOpts: paginationOptions,
+      useSlice: false
     };
 
     return paginate<GenericModelType>(deliveryPaginationOptions);

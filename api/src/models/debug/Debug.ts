@@ -25,7 +25,8 @@ export const DebugMutation = mutationField('debugMutation', {
       orderBy: {
         scheduledAt: "desc",
       },
-      take: 15
+      take: 10,
+      skip: 10
     })
 
     console.log(deliveries)

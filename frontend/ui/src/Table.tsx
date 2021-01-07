@@ -1,14 +1,20 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-export const TableRow = styled.tr`
-  ${({ theme }) => css`
+interface TableRowProps {
+  hasHover?: boolean;
+}
+
+export const TableRow = styled.tr<TableRowProps>`
+  ${({ theme, hasHover }) => css`
     border-left: 3px solid transparent;
 
-    &:hover {
-      cursor: pointer;
-      background: ${theme.colors.gray[100]};
-    }
+    ${hasHover && css`
+      &:hover {
+        cursor: pointer;
+        background: ${theme.colors.gray[100]};
+      }
+    `}
   `}
 `;
 
@@ -60,6 +66,13 @@ export const TableCell = styled.td<TableCellProps>`
   `}
 `;
 
-export const PaginationControls = () => {
-
-}
+export const PaginationFooter = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: ${theme.colors.gray[700]};
+    padding: ${theme.gutter / 2}px;
+    border-top: 1px solid ${theme.colors.gray[200]};
+  `}
+`;

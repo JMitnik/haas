@@ -36,6 +36,7 @@ export interface PaginateProps {
   findManyArgs: FindManyArgsProps;
   countArgs: CountArgsProps;
   paginationOpts?: NexusGenInputs['PaginationWhereInput'];
+  useSlice?: boolean;
 }
 
 export type findManyInput = {
@@ -119,6 +120,7 @@ export const paginate = async <GenericModelType>({
   findManyArgs,
   paginationOpts = {},
   countArgs,
+  useSlice = true
 } : PaginateProps,
 ) => {
   const { offset, limit, pageIndex } = paginationOpts;
@@ -127,7 +129,6 @@ export const paginate = async <GenericModelType>({
 
   // Find entries logic
   const findManyInput = constructFindManyInput({ ...findManyArgs, paginationOpts });
-  console.log(findManyInput);
   const entries = await findManyArgs.findManyCallBack({ props: findManyInput, paginationOpts, rest });
   const slicedEntries = slice(entries, (offset || 0), (limit || entries.length), (pageIndex || 0));
 
@@ -143,7 +144,7 @@ export const paginate = async <GenericModelType>({
   };
 
   return {
-    entries: slicedEntries as GenericModelType[],
+    entries: useSlice ? slicedEntries : entries as GenericModelType[],
     pageInfo,
   };
 };
