@@ -1,3 +1,4 @@
+import { NexusGenInputs } from '../../generated/nexus';
 import { NodeType, RoleCreateInput, SliderNodeMarkerCreateInput, TagEnum } from '@prisma/client';
 
 interface Tag {
@@ -20,6 +21,29 @@ export interface WorkspaceTemplate {
   tags: Tag[];
   rootSliderOptions: any;
 }
+
+const defaultForm: NexusGenInputs['FormNodeInputType'] = {
+  fields: [
+    {
+      isRequired: false,
+      label: 'First name',
+      type: 'shortText',
+      position: 1,
+    },
+    {
+      isRequired: false,
+      label: 'Last name',
+      type: 'shortText',
+      position: 1,
+    },
+    {
+      isRequired: false,
+      label: 'Email',
+      type: 'email',
+      position: 1,
+    },
+  ],
+};
 
 const defaultLinks: any[] = [
   { url: 'https://facebook.com', type: 'FACEBOOK', backgroundColor: '#1877f2' },
@@ -163,7 +187,8 @@ const defaultWorkspaceTemplate: WorkspaceTemplate = {
     {
       title:
         'Thank you for your positive feedback. Come and join us on 1st April for our great event. Leave your email address below to register.',
-      type: NodeType.REGISTRATION,
+      type: NodeType.FORM,
+      form: defaultForm,
       links: [],
     },
     {
@@ -175,48 +200,56 @@ const defaultWorkspaceTemplate: WorkspaceTemplate = {
     {
       title:
         'We are happy about your positive feedback. You matter to us! Leave your email below to receive our newsletter.',
-      type: NodeType.REGISTRATION,
+      type: NodeType.FORM,
+      form: defaultForm,
       links: [],
     },
     {
       title:
         'Thank you for your feedback. You matter to us! Leave your email below to receive our newsletter.',
-      type: NodeType.REGISTRATION,
+      type: NodeType.FORM,
+      form: defaultForm,
       links: [],
     },
     {
       title: 'Thank you! Leave your email below to subscribe to our newsletter.',
-      type: NodeType.REGISTRATION,
+      type: NodeType.FORM,
+      form: defaultForm,
       links: [],
     },
     {
       title:
         'Thank you for your feedback. Our customer experience supervisor is informed. Please leave your email below so we can solve the issue.',
-      type: NodeType.REGISTRATION,
+      type: NodeType.FORM,
+      form: defaultForm,
       links: [],
     },
     {
       title:
         'Thank you for your feedback. You matter to us! Click below for your refund.',
-      type: NodeType.REGISTRATION,
+      type: NodeType.FORM,
+      form: defaultForm,
       links: [],
     },
     {
       title:
         'Thank you for your feedback. Please click on the Whatsapp link below so our service team can fix the issue.',
-      type: NodeType.REGISTRATION,
+      type: NodeType.FORM,
+      form: defaultForm,
       links: [],
     },
     {
       title:
         'Thank you for your feedback. Our team is on it. If you leave your email below we will keep you updated.',
-      type: NodeType.REGISTRATION,
+      type: NodeType.FORM,
+      form: defaultForm,
       links: [],
     },
     {
       title:
         'Thank you! Please leave your contact details below so we can reach out to you with a solution.',
-      type: NodeType.REGISTRATION,
+      type: NodeType.FORM,
+      form: defaultForm,
       links: [],
     },
   ],

@@ -13,9 +13,10 @@ interface DropdownProps {
   children?: React.ReactNode;
   placement?: Placement;
   offset?: [number, number];
+  minWidth?: number;
 }
 
-const Dropdown = ({ children, renderOverlay, placement = 'right-start', offset = [0, 12] }: DropdownProps) => {
+const Dropdown = ({ children, renderOverlay, placement = 'right-start', offset = [0, 12], minWidth }: DropdownProps) => {
   const ref = useRef<HTMLDivElement | null>(null);
   const [overlay, setOverlay] = useState<HTMLDivElement | null>(null);
   const [toggleRef, setToggleRef] = useState<HTMLDivElement | null>(null);
@@ -42,13 +43,21 @@ const Dropdown = ({ children, renderOverlay, placement = 'right-start', offset =
     <DropdownContainer ref={ref} onClick={(e) => e.stopPropagation()}>
       <AnimatePresence>
         {isOpen ? (
-          <Div ref={setOverlay} style={styles.popper} {...attributes.popper}>
+          <Div
+            ref={setOverlay}
+            style={{
+              ...styles.popper,
+              minWidth,
+            }}
+            {...attributes.popper}
+          >
             <motion.div
+              style={{ minWidth }}
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1, transition: { duration: 0.2 } }}
               exit={{ opacity: 0, scale: 0.8, transition: { duration: 0.2 } }}
             >
-              <DropdownOverlayContainer>
+              <DropdownOverlayContainer minWidth={minWidth}>
                 {renderOverlay}
               </DropdownOverlayContainer>
             </motion.div>

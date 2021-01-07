@@ -1,5 +1,5 @@
-import styled, { css } from 'styled-components/macro';
 import { Label } from '@haas/ui';
+import styled, { css } from 'styled-components';
 
 export const CustomerCardImage = styled.img`
     width: 75px;

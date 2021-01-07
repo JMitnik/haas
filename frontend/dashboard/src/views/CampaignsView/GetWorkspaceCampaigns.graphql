@@ -1,0 +1,14 @@
+query GetWorkspaceCampaigns($customerSlug: String!) {
+  customer(slug: $customerSlug) {
+    id
+    campaigns {
+      id
+      label
+
+      variants {
+        id
+        label
+      }
+    }
+  }
+}

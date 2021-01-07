@@ -1,5 +1,5 @@
 import { Div } from '@haas/ui';
-import styled, { css } from 'styled-components/macro';
+import styled, { css } from 'styled-components';
 
 const GlobalAppLayout = styled(Div)`
   ${({ theme }) => css`

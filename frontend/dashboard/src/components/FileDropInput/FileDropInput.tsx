@@ -3,7 +3,7 @@ import { Spinner } from '@chakra-ui/core';
 import { useDropzone } from 'react-dropzone';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
-import styled, { css } from 'styled-components/macro';
+import styled, { css } from 'styled-components';
 
 const getDropColor = (props: any) => {
   if (props.isDragAccept) {
@@ -65,7 +65,8 @@ const FileDropInput = (props: any) => {
     isDragAccept,
     isDragReject,
   } = useDropzone({
-    accept: 'image/*',
+    // TODO: Bring it back (temporarily disabled)
+    // accept: 'image/*',
     onDrop,
   });
 
@@ -75,6 +76,7 @@ const FileDropInput = (props: any) => {
 
   return (
     <section className="container">
+      {/* @ts-ignore */}
       <DropContainer {...getRootProps({ isDragActive, isDragAccept, isDragReject })}>
         {value && (
           <UploadPreviewContainer mb={2}>

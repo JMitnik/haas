@@ -1,7 +1,6 @@
-import mjml2html from "mjml";
+import mjml2html from 'mjml';
 
-const makeBasicTriggerTemplate = (recipientName: string, dialogueId: string, userScore: number) => {
-    return mjml2html(`
+const makeBasicTriggerTemplate = (recipientName: string, dialogueId: string, userScore: number) => mjml2html(`
         <mjml>
         <mj-body background-color="#0059f8">
             <mj-section text-align="center">
@@ -47,6 +46,5 @@ const makeBasicTriggerTemplate = (recipientName: string, dialogueId: string, use
         </mj-body>
         </mjml>
     `).html;
-} ;
 
 export default makeBasicTriggerTemplate;

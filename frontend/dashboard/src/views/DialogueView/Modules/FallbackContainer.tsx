@@ -1,9 +1,8 @@
 import { Div, Text } from '@haas/ui';
-import styled, { css } from 'styled-components/macro';
+import styled, { css } from 'styled-components';
 
 const FallbackContainer = styled(Div)`
     ${({ theme }) => css`
-    /* overflow: hidden; */
     position: relative;
     height: 100%;
     display: flex;
@@ -12,7 +11,7 @@ const FallbackContainer = styled(Div)`
     > ${Text} {
         padding: ${theme.gutter}px;
         position: relative;
-        z-index: 500;
+        z-index: 300;
     }
 
     > ${Div} {

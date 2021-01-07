@@ -1,4 +1,4 @@
-import { ThemeContext } from 'styled-components/macro';
+import { ThemeContext } from 'styled-components';
 import { useContext, useEffect, useState } from 'react';
 
 /**

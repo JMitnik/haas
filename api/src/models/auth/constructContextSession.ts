@@ -7,6 +7,7 @@ import { ContextSessionType } from './ContextSessionType';
 import config from '../../config/config';
 import prisma from '../../config/prisma';
 import readBearerToken from './readBearerToken';
+import { fetchTunnelUrl } from '../../utils/fetchTunnelUrl';
 
 const getWorkSpaceFromReq = async (req: Request) => {
   const vars = req.body.variables;
@@ -21,10 +22,10 @@ const getWorkSpaceFromReq = async (req: Request) => {
     return customer;
   }
 
-  if (vars?.customerId || vars?.input?.customerId) {
+  if (vars?.customerId || vars?.input?.customerId || vars?.workspaceId || vars?.input?.workspaceId) {
     const customer = await prisma.customer.findOne({
       where: {
-        id: vars?.customerId || vars?.input?.customerId,
+        id: vars?.customerId || vars?.input?.customerId || vars?.workspaceId || vars?.input?.workspaceId,
       },
     });
 
@@ -88,8 +89,11 @@ const constructContextSession = async (context: ExpressContext): Promise<Context
   const workspace = await getWorkSpaceFromReq(context.req);
   const activeWorkspace = customersAndPermissions?.find((userCustomer) => userCustomer.id === workspace?.id) || null;
 
+  const baseUrl = process.env.ENVIRONMENT === 'local' ? await fetchTunnelUrl(): config.baseUrl;
+
   return {
     user,
+    baseUrl,
     customersAndPermissions,
     expiresAt: decodedExpAt,
     globalPermissions: user?.globalPermissions || [],

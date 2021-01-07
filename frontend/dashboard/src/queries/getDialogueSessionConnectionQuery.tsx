@@ -1,4 +1,4 @@
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
 
 const getDialogueSessionConnectionQuery = gql`
   query getDialogueSessionConnection($dialogueSlug: String!, $customerSlug: String!, $filter: PaginationWhereInput) {

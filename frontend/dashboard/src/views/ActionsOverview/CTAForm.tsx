@@ -1,26 +1,27 @@
 import * as UI from '@haas/ui';
 import * as yup from 'yup';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ApolloError, ExecutionResult } from 'apollo-boost';
-import { Button, ButtonGroup, FormErrorMessage, Popover, PopoverArrow, PopoverBody, PopoverCloseButton,
-  PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast } from '@chakra-ui/core';
+import {
+  Button, ButtonGroup, FormErrorMessage, Popover, PopoverArrow, PopoverBody, PopoverCloseButton,
+  PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast
+} from '@chakra-ui/core';
 import { Controller, useForm } from 'react-hook-form';
 import { Link, PlusCircle, Trash, Type } from 'react-feather';
 import { cloneDeep, debounce } from 'lodash';
-import { useMutation } from '@apollo/react-hooks';
+import { useMutation } from '@apollo/client';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { yupResolver } from '@hookform/resolvers';
 import React, { useCallback, useEffect, useState } from 'react';
 import Select from 'react-select';
-import SimpleMDE from 'react-simplemde-editor';
 import cuid from 'cuid';
 
-import { Div, Flex, Form, FormContainer,
-  FormControl, FormLabel, FormSection, Grid, H4, Hr, Input, InputGrid, InputHelper, Span, Text } from '@haas/ui';
+import {
+  Div, Flex, Form, FormContainer,
+  FormControl, FormLabel, FormSection, Grid, H4, Hr, Input, InputGrid, InputHelper, Span, Text
+} from '@haas/ui';
 import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
 
-import 'easymde/dist/easymde.min.css';
 import { useCustomer } from 'providers/CustomerProvider';
 import LinkIcon from 'components/Icons/LinkIcon';
 import OpinionIcon from 'components/Icons/OpinionIcon';
@@ -61,7 +62,7 @@ interface CTAFormProps {
   form: any;
   onActiveCTAChange: React.Dispatch<React.SetStateAction<string | null>>;
   onNewCTAChange: React.Dispatch<React.SetStateAction<boolean>>;
-  onDeleteCTA: (onComplete: (() => void) | undefined) => void | Promise<ExecutionResult<any>>
+  onDeleteCTA: (onComplete: (() => void) | undefined) => void | Promise<any>;
 }
 
 const isShareType = (ctaType: any) => ctaType?.value === 'SHARE';
@@ -72,7 +73,7 @@ const schema = yup.object().shape({
     { label: yup.string().required(), value: yup.string().required() },
   ).required('CTA type is required'),
   links: yup.array().when('ctaType', {
-    is: (ctaType : { label: string, value: string }) => isShareType(ctaType),
+    is: (ctaType: { label: string, value: string }) => isShareType(ctaType),
     then: yup.array().of(yup.object().shape({
       url: yup.string().required(),
       tooltip: yup.string().required(),
@@ -85,22 +86,22 @@ const schema = yup.object().shape({
     })),
   }),
   share: yup.object().when('ctaType', {
-    is: (ctaType : { label: string, value: string }) => isShareType(ctaType),
+    is: (ctaType: { label: string, value: string }) => isShareType(ctaType),
     then: yup.object().shape(
       {
         id: yup.string().notRequired(),
         tooltip: yup.string().when('ctaType', {
-          is: (ctaType : { label: string, value: string }) => isShareType(ctaType),
+          is: (ctaType: { label: string, value: string }) => isShareType(ctaType),
           then: yup.string().required(),
           otherwise: yup.string().notRequired(),
         }),
         url: yup.string().when('ctaType', {
-          is: (ctaType : { label: string, value: string }) => isShareType(ctaType),
+          is: (ctaType: { label: string, value: string }) => isShareType(ctaType),
           then: yup.string().required(),
           otherwise: yup.string().notRequired(),
         }),
         title: yup.string().when('ctaType', {
-          is: (ctaType : { label: string, value: string }) => isShareType(ctaType),
+          is: (ctaType: { label: string, value: string }) => isShareType(ctaType),
           then: yup.string().required(),
           otherwise: yup.string().notRequired(),
         }),
@@ -135,7 +136,7 @@ const LINK_TYPES = [
 
 const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTAChange, onDeleteCTA, form: formNode }: CTAFormProps) => {
   const { activeCustomer } = useCustomer();
-  const { customerSlug, dialogueSlug } = useParams();
+  const { customerSlug, dialogueSlug } = useParams<{ customerSlug: string, dialogueSlug: string }>();
 
   const form = useForm<FormDataProps>({
     resolver: yupResolver(schema),
@@ -216,7 +217,7 @@ const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTACha
       onNewCTAChange(false);
       onActiveCTAChange(null);
     },
-    onError: (serverError: ApolloError) => {
+    onError: (serverError: any) => {
       console.log(serverError);
     },
     refetchQueries: refetchingQueries,
@@ -236,7 +237,7 @@ const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTACha
         onActiveCTAChange(null);
       }, 200);
     },
-    onError: (serverError: ApolloError) => {
+    onError: (serverError: any) => {
       console.log(serverError);
     },
     refetchQueries: refetchingQueries,
@@ -248,10 +249,12 @@ const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTACha
     console.log(formData);
 
     if (id === '-1') {
-      const mappedLinks = { linkTypes: activeLinks.map((link) => {
-        const { id, ...linkData } = link;
-        return { ...linkData, type: linkData.type?.value };
-      }) };
+      const mappedLinks = {
+        linkTypes: activeLinks.map((link) => {
+          const { id, ...linkData } = link;
+          return { ...linkData, type: linkData.type?.value };
+        })
+      };
 
       addCTA({
         variables: {
@@ -368,12 +371,9 @@ const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTACha
                     control={form.control}
                     defaultValue={title}
                     render={({ value, onChange }) => (
-                      <SimpleMDE
+                      <UI.MarkdownEditor
                         value={value}
                         onChange={onChange}
-                        options={{
-                          toolbar: ['bold', 'italic', 'preview', 'guide'],
-                        }}
                       />
                     )}
                   />
@@ -442,7 +442,7 @@ const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTACha
                       placeholder="Share..."
                       leftEl={<Type />}
                       defaultValue={share?.tooltip}
-                              // onChange={(e: any) => handleTooltipChange(e.currentTarget.value, 0)}
+                      // onChange={(e: any) => handleTooltipChange(e.currentTarget.value, 0)}
                       ref={form.register({ required: true })}
                     />
                     <FormErrorMessage>{form.errors.share?.tooltip}</FormErrorMessage>
@@ -527,7 +527,7 @@ const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTACha
                                     isInvalid={!!form.errors.links?.[index]?.tooltip}
                                     name={`links[${index}].tooltip`}
                                     defaultValue={link.title}
-                                    onChange={(e:any) => handleTooltipChange(e.currentTarget.value, index)}
+                                    onChange={(e: any) => handleTooltipChange(e.currentTarget.value, index)}
                                     ref={form.register({ required: false })}
                                   />
                                   <FormErrorMessage>{!!form.errors.links?.[index]?.tooltip?.message}</FormErrorMessage>
@@ -540,7 +540,7 @@ const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTACha
                                     isInvalid={!!form.errors.links?.[index]?.iconUrl}
                                     name={`links[${index}].iconUrl`}
                                     defaultValue={link.iconUrl}
-                                    onChange={(e:any) => handleIconChange(e.currentTarget.value, index)}
+                                    onChange={(e: any) => handleIconChange(e.currentTarget.value, index)}
                                     ref={form.register({ required: false })}
                                   />
                                   <FormErrorMessage>{!!form.errors.links?.[index]?.iconUrl?.message}</FormErrorMessage>
@@ -553,7 +553,7 @@ const CTAForm = ({ id, title, type, links, share, onActiveCTAChange, onNewCTACha
                                     isInvalid={!!form.errors.links?.[index]?.backgroundColor}
                                     name={`links[${index}].backgroundColor`}
                                     defaultValue={link.backgroundColor}
-                                    onChange={(e:any) => handleBackgroundColorChange(e.currentTarget.value, index)}
+                                    onChange={(e: any) => handleBackgroundColorChange(e.currentTarget.value, index)}
                                     ref={form.register({ required: false })}
                                   />
                                   <FormErrorMessage>{!!form.errors.links?.[index]?.backgroundColor?.message}</FormErrorMessage>

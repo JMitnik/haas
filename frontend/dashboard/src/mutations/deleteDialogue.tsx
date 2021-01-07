@@ -1,5 +1,5 @@
 /* eslint-disable import/prefer-default-export */
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
 
 export const deleteDialogueMutation = gql`
 mutation deleteDialogue($input: DeleteDialogueInputType) {

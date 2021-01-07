@@ -1,4 +1,4 @@
-import styled, { css } from 'styled-components/macro';
+import styled, { css } from 'styled-components';
 import { TypographyProps, typography, space, SpaceProps, color, ColorProps } from 'styled-system';
 
 interface GenericTypeProps extends TypographyProps, SpaceProps, ColorProps {}
@@ -15,10 +15,26 @@ export const PageTitle = styled(Text)`
   ${({ theme }) => css`
     margin-bottom: ${theme.gutter}px;
     color: ${theme.colors.gray[600]};
-    font-size: 2.1rem;
+    font-size: 1.8rem;
     font-weight: 700;
     display: flex;
     align-items: center;
+
+    svg {
+      width: 24px;
+    }
+  `}
+`
+
+export const Helper = styled(Text)`
+  ${({ theme }) => css`
+    margin: 0;  
+    color: ${theme.colors.gray[500]};
+    font-weight: 700;
+    line-height: 1rem;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
   `}
 `;
 

@@ -6,7 +6,8 @@ import prisma from '../../config/prisma';
 interface LeafNodeDataEntryProps {
   title: string;
   type: NodeType;
-  links: Array<LinkGenericInputProps>
+  links: LinkGenericInputProps[];
+  form?: NexusGenInputs['FormNodeInputType'];
 }
 
 interface QuestionOptionProps {
@@ -207,12 +208,12 @@ class NodeService {
   };
 
   static createTemplateLeafNodes = async (
-    leafNodesArray: Array<LeafNodeDataEntryProps>,
+    leafNodesArray: LeafNodeDataEntryProps[],
     dialogueId: string,
   ) => {
     // Make leafs based on array
     const leafs = await Promise.all(
-      leafNodesArray.map(async ({ title, type, links }) => prisma.questionNode.create({
+      leafNodesArray.map(async ({ title, type, links, form }) => prisma.questionNode.create({
         data: {
           title,
           questionDialogue: { connect: { id: dialogueId } },
@@ -222,6 +223,18 @@ class NodeService {
           links: links.length ? {
             create: links,
           } : undefined,
+          form: {
+            create: form?.fields ? {
+              fields: {
+                create: form?.fields?.length > 0 ? form.fields.map((field) => ({
+                  label: field.label || '',
+                  position: field.position || -1,
+                  isRequired: field.isRequired || false,
+                  type: field.type || 'shortText',
+                })) : undefined,
+              },
+            } : undefined,
+          },
         },
       })),
     );
@@ -628,7 +641,10 @@ class NodeService {
     leafs: QuestionNode[],
   ) => {
     // Root question (How do you feel about?)
-    const rootQuestion = await NodeService.createQuestionNode(`How do you feel about ${workspaceName}?`, dialogueId, NodeType.SLIDER, standardOptions, true);
+    const rootQuestion = await NodeService.createQuestionNode(
+      `How do you feel about ${workspaceName}?`,
+      dialogueId, NodeType.SLIDER, standardOptions, true,
+    );
 
     // Positive Sub child 1 (What did you like?)
     const instagramNodeId = NodeService.getCorrectLeaf(leafs, 'Follow us on Instagram and stay');

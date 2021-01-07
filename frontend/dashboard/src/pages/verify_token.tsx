@@ -1,13 +1,15 @@
 import * as qs from 'qs';
-import { Div,
-  Loader, PageContainer, SubtlePageHeading } from '@haas/ui';
+import {
+  Div,
+  Loader, PageContainer, SubtlePageHeading
+} from '@haas/ui';
 import { useHistory, useLocation } from 'react-router';
-import { useMutation } from '@apollo/react-hooks';
+import { useMutation } from '@apollo/client';
 import { useUser } from 'providers/UserProvider';
 import React, { useEffect, useRef } from 'react';
 import formatServerError from 'utils/formatServerError';
-import gql from 'graphql-tag';
-import styled from 'styled-components/macro';
+import { gql } from '@apollo/client';
+import styled from 'styled-components';
 
 const verifyUserTokenQuery = gql`
   mutation verifyUserToken($token: String!) {
@@ -62,7 +64,7 @@ const VerifyTokenPage = () => {
   }, [isLoggedIn, user, history]);
 
   useEffect(() => {
-    const urlToken: string = qs.parse(location.search, { ignoreQueryPrefix: true })?.token;
+    const urlToken = qs.parse(location.search, { ignoreQueryPrefix: true })?.token;
 
     if (urlToken && !verifiedRef.current && !user) {
       verifiedRef.current = true;

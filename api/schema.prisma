@@ -60,6 +60,7 @@ model Customer {
   permissions Permission[]
   triggers    Trigger[]
   tags        Tag[]
+  campaigns   Campaign[]
 }
 
 enum TagEnum {
@@ -385,6 +386,10 @@ enum SystemPermissionEnum {
   CAN_DELETE_TRIGGERS
   CAN_DELETE_WORKSPACE
   CAN_EDIT_WORKSPACE
+  // Campaign oriented
+  CAN_VIEW_CAMPAIGNS
+  CAN_CREATE_CAMPAIGNS
+  CAN_CREATE_DELIVERIES
 }
 
 enum RoleTypeEnum {
@@ -501,4 +506,88 @@ model QuestionOfTrigger {
   createdAt DateTime @default(now())
 
   @@id([questionId, triggerId])
+}
+
+// Campaigns
+enum CampaignVariantTypeEnum {
+  EMAIL
+  SMS
+  QUEUE
+}
+
+model Campaign {
+  id  String  @id @default(cuid())
+  label       String
+  deliveries  Delivery[]
+  variantsEdges    CampaignVariantToCampaign[]
+  
+  workspaceId String   
+  workspace   Customer @relation(fields: [workspaceId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model CampaignVariantToCampaign {
+  campaignId  String
+  campaign  Campaign @relation(fields: [campaignId], references: [id])
+
+  campaignVariantId String
+  campaignVariant CampaignVariant @relation(fields: [campaignVariantId], references: [id])
+
+  // Weight decides in A/B testing which 
+  weight  Int
+
+  @@id([campaignId, campaignVariantId])
+}
+
+model CampaignVariant {
+  id  String @id @default(cuid())
+  label     String
+  body      String
+   
+  workspace   Customer
+  dialogue    Dialogue
+
+  subject   String?
+  type      CampaignVariantTypeEnum
+}
+
+enum DeliveryStatusTypeEnum {
+  SCHEDULED
+  DEPLOYED
+  SENT
+  OPENED
+  FINISHED
+}
+
+model Delivery {
+  // We generated the ID ourselves
+  id  String @id
+
+  deliveryRecipientFirstName String?
+  deliveryRecipientLastName String?
+  deliveryRecipientEmail String?
+  deliveryRecipientPhone String?
+
+  campaignId  String
+  campaign  Campaign @relation(fields: [campaignId], references: [id])
+
+  campaignVariantId String
+  campaignVariant CampaignVariant @relation(fields: [campaignVariantId], references: [id])
+
+  currentStatus  DeliveryStatusTypeEnum
+
+  events  DeliveryEvents[]
+
+  scheduledAt DateTime
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime? @updatedAt
+}
+
+model DeliveryEvents {
+  id String @id @default(cuid())
+  status DeliveryStatusTypeEnum
+  createdAt DateTime @default(now())
+  deliveryId  String
 }

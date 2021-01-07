@@ -1,6 +1,6 @@
 import { Label } from '@haas/ui';
 import { motion } from 'framer-motion';
-import styled, { css } from 'styled-components/macro';
+import styled, { css } from 'styled-components';
 
 export const CustomerCardImage = styled.img`
   width: 75px;

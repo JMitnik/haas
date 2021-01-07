@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom';
-import { useQuery } from '@apollo/react-hooks';
+import { useQuery } from '@apollo/client';
 import React from 'react';
 
 import { Loader } from '@haas/ui';
@@ -11,7 +11,7 @@ import ShareIcon from 'components/Icons/ShareIcon';
 import getCTANodesQuery from 'queries/getCTANodes';
 
 const ActionsPage = () => {
-  const { dialogueSlug, customerSlug } = useParams();
+  const { dialogueSlug, customerSlug } = useParams<{ customerSlug: string, dialogueSlug: string }>();
 
   const { data, loading } = useQuery(getCTANodesQuery, {
     variables: {

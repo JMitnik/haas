@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import Color from 'color';
 
 import { Button, Div, Flex } from '@haas/ui';
-import styled, { css } from 'styled-components/macro';
+import styled, { css } from 'styled-components';
 
 export const ShareNodeContainer = styled(Div)`
   display: flex;

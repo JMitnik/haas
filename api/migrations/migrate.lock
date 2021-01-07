@@ -3,3 +3,10 @@
 20201207141627-reset-6
 20201208132747-reshape-form-entry
 20201208134932-change-number
+20201228124727-campaign-added
+20201228142753-delivery-added-props
+20201231141638-add-workspace-to-campaign
+20210101093637-add-timestampts-to-delivery
+20210101093800-make-updatedat-optional-on-deliveries
+20210103223009-create-permissions-for-campaign
+20210103223316-campaign-event-improvements

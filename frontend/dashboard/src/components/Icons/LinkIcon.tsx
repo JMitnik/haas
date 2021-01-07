@@ -1,7 +1,7 @@
 /* eslint-disable max-len */
 import React from 'react';
 
-import styled, { css } from 'styled-components/macro';
+import styled, { css } from 'styled-components';
 
 const Svg = styled.svg <{isCTA?: Boolean, hasCTA?: Boolean}>`
   ${({ hasCTA, isCTA, theme }) => css`

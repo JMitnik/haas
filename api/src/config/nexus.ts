@@ -1,4 +1,5 @@
 import * as AuthAPI from '../models/auth/Auth';
+import * as CampaignAPI from '../models/Campaigns';
 import * as DebugAPI from '../models/debug/Debug';
 import * as InteractionAPI from '../models/session/Session';
 import * as NodeEntryAPI from '../models/node-entry/NodeEntry';
@@ -19,6 +20,7 @@ import triggerNexus from '../models/trigger/Trigger';
 const nexus = [
   ...linkNexus,
   ...tagNexus,
+  ...Array(CampaignAPI),
   ...triggerNexus,
   ...permissionNexus,
   ...roleNexus,

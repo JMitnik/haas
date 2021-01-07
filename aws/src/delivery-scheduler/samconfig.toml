@@ -1,0 +1,10 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "delivery-scheduler"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-11yesm9onxt43"
+s3_prefix = "delivery-scheduler"
+region = "eu-central-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"

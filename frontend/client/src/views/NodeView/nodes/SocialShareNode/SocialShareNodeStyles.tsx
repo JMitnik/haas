@@ -1,6 +1,6 @@
 import { ColorProps, color } from 'styled-system';
 import { Div } from '@haas/ui';
-import styled, { css } from 'styled-components/macro';
+import styled, { css } from 'styled-components';
 
 export const SocialShareNodeContainer = styled(Div)``;
 

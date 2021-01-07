@@ -1,4 +1,4 @@
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
 
 const createCTAMutation = gql`
   mutation createCTA($input: CreateCTAInputType) {

@@ -1,6 +1,8 @@
 import { mutationField, objectType } from '@nexus/schema';
 import prisma from '../../config/prisma';
 
+import { CampaignService } from '../Campaigns/CampaignService';
+
 export const DebugType = objectType({
   name: 'Debug',
   definition(t) {
@@ -19,11 +21,15 @@ export const DebugMutation = mutationField('debugMutation', {
   type: 'String',
   nullable: true,
   async resolve() {
-    // heapdump.writeSnapshot(`heapDump-${Date.now()}.heapsnapshot`, (err, filename) => {
-    //   console.log('Heap dump of a bloated server written to', filename);
+    const deliveries = await prisma.delivery.findMany({
+      orderBy: {
+        scheduledAt: "desc",
+      },
+      take: 10,
+      skip: 10
+    })
 
-    //   return 'Saved heap dump';
-    // });
-    return 'test';
+    console.log(deliveries)
+    return 'asasdasd';
   },
 });

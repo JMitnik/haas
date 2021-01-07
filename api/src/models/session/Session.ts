@@ -127,8 +127,9 @@ export const SessionInput = inputObjectType({
 
   definition(t) {
     t.string('dialogueId', { required: true });
-
     t.list.field('entries', { type: NodeEntryInput });
+
+    t.string('deliveryId', { required: false });
   },
 });
 

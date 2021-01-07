@@ -2,7 +2,7 @@ import { Variants, motion } from 'framer-motion';
 import { observer, useObserver } from 'mobx-react-lite';
 import { useParams } from 'react-router-dom';
 import React from 'react';
-import styled from 'styled-components/macro';
+import styled from 'styled-components';
 
 import { HAASNode, UrlParams } from 'types/generic';
 import EmptyDialogueView from 'views/NodeView/EmptyDialogueView';

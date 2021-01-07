@@ -1,4 +1,4 @@
-import styled, { css } from 'styled-components/macro';
+import styled, { css } from 'styled-components';
 
 import { Card, Div, Flex, H4, Span } from '@haas/ui';
 
