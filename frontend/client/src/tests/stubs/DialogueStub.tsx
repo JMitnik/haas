@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/indent */
 /* eslint-disable max-len */
-import { CustomerFragmentFragment, EdgeCondition, EdgeFragmentFragment, GetDialogueQuery, QuestionFragmentFragment, QuestionNodeTypeEnum } from 'generated/graphql';
+import { CustomerFragmentFragment, EdgeCondition, EdgeFragmentFragment, GetDialogueQuery, QuestionFragmentFragment, QuestionNodeTypeEnum } from 'types/generated-types';
 
 // 0. Define all readable-identifiers
 const QuestionIds = [
@@ -62,52 +62,60 @@ function getRandomInt(max: number) {
 // 2. Define all nodes, each with some readable-identifier (unique)
 const QuestionNodes: BasicQuestionNode[] = [
   { id: '0-SLIDER', title: 'How do you feel?', type: QuestionNodeTypeEnum.Slider },
-    { id: '1-POSITIVE', title: 'Why good?', type: QuestionNodeTypeEnum.Choice, leafId: 'CTA-LINK' },
-      { id: '2-POSITIVE-TOPIC-A', title: 'Why good about [[topic]]?', type: QuestionNodeTypeEnum.Choice },
-      { id: '2-POSITIVE-TOPIC-B', title: 'Why good about [[topic]]?', type: QuestionNodeTypeEnum.Choice },
-      { id: '2-POSITIVE-TOPIC-C', title: 'Why good about [[topic]]?', type: QuestionNodeTypeEnum.Choice },
-      { id: '2-POSITIVE-TOPIC-D', title: 'Why good about [[topic]]?', type: QuestionNodeTypeEnum.Choice },
-    { id: '1-NEUTRAL', title: 'Why neutral?', type: QuestionNodeTypeEnum.Choice, leafId: 'CTA-OPINION' },
-      { id: '2-NEUTRAL-TOPIC-A', title: 'Why neutral about [[topic]]?', type: QuestionNodeTypeEnum.Choice },
-      { id: '2-NEUTRAL-TOPIC-B', title: 'Why neutral about [[topic]]?', type: QuestionNodeTypeEnum.Choice },
-      { id: '2-NEUTRAL-TOPIC-C', title: 'Why neutral about [[topic]]?', type: QuestionNodeTypeEnum.Choice },
-      { id: '2-NEUTRAL-TOPIC-D', title: 'Why neutral about [[topic]]?', type: QuestionNodeTypeEnum.Choice },
-    { id: '1-NEGATIVE', title: 'Why negative?', type: QuestionNodeTypeEnum.Choice, leafId: 'CTA-TEXTBOX' },
-      { id: '2-NEGATIVE-TOPIC-A', title: 'Why negative about [[topic]]?', type: QuestionNodeTypeEnum.Choice },
-      { id: '2-NEGATIVE-TOPIC-B', title: 'Why negative about [[topic]]?', type: QuestionNodeTypeEnum.Choice },
-      { id: '2-NEGATIVE-TOPIC-C', title: 'Why negative about [[topic]]?', type: QuestionNodeTypeEnum.Choice },
-      { id: '2-NEGATIVE-TOPIC-D', title: 'Why negative about [[topic]]?', type: QuestionNodeTypeEnum.Choice },
+  { id: '1-POSITIVE', title: 'Why good?', type: QuestionNodeTypeEnum.Choice, leafId: 'CTA-LINK' },
+  { id: '2-POSITIVE-TOPIC-A', title: 'Why good about [[topic]]?', type: QuestionNodeTypeEnum.Choice },
+  { id: '2-POSITIVE-TOPIC-B', title: 'Why good about [[topic]]?', type: QuestionNodeTypeEnum.Choice },
+  { id: '2-POSITIVE-TOPIC-C', title: 'Why good about [[topic]]?', type: QuestionNodeTypeEnum.Choice },
+  { id: '2-POSITIVE-TOPIC-D', title: 'Why good about [[topic]]?', type: QuestionNodeTypeEnum.Choice },
+  { id: '1-NEUTRAL', title: 'Why neutral?', type: QuestionNodeTypeEnum.Choice, leafId: 'CTA-OPINION' },
+  { id: '2-NEUTRAL-TOPIC-A', title: 'Why neutral about [[topic]]?', type: QuestionNodeTypeEnum.Choice },
+  { id: '2-NEUTRAL-TOPIC-B', title: 'Why neutral about [[topic]]?', type: QuestionNodeTypeEnum.Choice },
+  { id: '2-NEUTRAL-TOPIC-C', title: 'Why neutral about [[topic]]?', type: QuestionNodeTypeEnum.Choice },
+  { id: '2-NEUTRAL-TOPIC-D', title: 'Why neutral about [[topic]]?', type: QuestionNodeTypeEnum.Choice },
+  { id: '1-NEGATIVE', title: 'Why negative?', type: QuestionNodeTypeEnum.Choice, leafId: 'CTA-TEXTBOX' },
+  { id: '2-NEGATIVE-TOPIC-A', title: 'Why negative about [[topic]]?', type: QuestionNodeTypeEnum.Choice },
+  { id: '2-NEGATIVE-TOPIC-B', title: 'Why negative about [[topic]]?', type: QuestionNodeTypeEnum.Choice },
+  { id: '2-NEGATIVE-TOPIC-C', title: 'Why negative about [[topic]]?', type: QuestionNodeTypeEnum.Choice },
+  { id: '2-NEGATIVE-TOPIC-D', title: 'Why negative about [[topic]]?', type: QuestionNodeTypeEnum.Choice },
 ];
 
 // 3. Define for each topic
 const AllParentChildren: ParentChildren[] = [
-  { parentNodeId: '0-SLIDER',
+  {
+    parentNodeId: '0-SLIDER',
     childrenNodes: [
       { childNodeId: '1-POSITIVE', condition: { id: getRandomInt(100000), conditionType: 'valueBoundary', renderMin: 60, renderMax: 100 } },
       { childNodeId: '1-NEUTRAL', condition: { id: getRandomInt(100000), conditionType: 'valueBoundary', renderMin: 40, renderMax: 60 } },
       { childNodeId: '1-NEGATIVE', condition: { id: getRandomInt(100000), conditionType: 'valueBoundary', renderMin: 0, renderMax: 40 } },
-    ] },
-  { parentNodeId: '1-POSITIVE',
+    ]
+  },
+  {
+    parentNodeId: '1-POSITIVE',
     childrenNodes: [
       { childNodeId: '2-POSITIVE-TOPIC-A', condition: { id: getRandomInt(100000), conditionType: 'match', matchValue: 'Application' } },
       { childNodeId: '2-POSITIVE-TOPIC-B', condition: { id: getRandomInt(100000), conditionType: 'match', matchValue: 'Business' } },
       { childNodeId: '2-POSITIVE-TOPIC-C', condition: { id: getRandomInt(100000), conditionType: 'match', matchValue: 'Car-performance' } },
       { childNodeId: '2-POSITIVE-TOPIC-D', condition: { id: getRandomInt(100000), conditionType: 'match', matchValue: 'Delivery' } },
-    ] },
-  { parentNodeId: '1-NEUTRAL',
+    ]
+  },
+  {
+    parentNodeId: '1-NEUTRAL',
     childrenNodes: [
       { childNodeId: '2-NEUTRAL-TOPIC-A', condition: { id: getRandomInt(100000), conditionType: 'match', matchValue: 'Application' } },
       { childNodeId: '2-NEUTRAL-TOPIC-B', condition: { id: getRandomInt(100000), conditionType: 'match', matchValue: 'Business' } },
       { childNodeId: '2-NEUTRAL-TOPIC-C', condition: { id: getRandomInt(100000), conditionType: 'match', matchValue: 'Car-performance' } },
       { childNodeId: '2-NEUTRAL-TOPIC-D', condition: { id: getRandomInt(100000), conditionType: 'match', matchValue: 'Delivery' } },
-    ] },
-  { parentNodeId: '1-NEGATIVE',
+    ]
+  },
+  {
+    parentNodeId: '1-NEGATIVE',
     childrenNodes: [
       { childNodeId: '2-NEGATIVE-TOPIC-A', condition: { id: getRandomInt(100000), conditionType: 'match', matchValue: 'Application' } },
       { childNodeId: '2-NEGATIVE-TOPIC-B', condition: { id: getRandomInt(100000), conditionType: 'match', matchValue: 'Business' } },
       { childNodeId: '2-NEGATIVE-TOPIC-C', condition: { id: getRandomInt(100000), conditionType: 'match', matchValue: 'Car-performance' } },
       { childNodeId: '2-NEGATIVE-TOPIC-D', condition: { id: getRandomInt(100000), conditionType: 'match', matchValue: 'Delivery' } },
-    ] },
+    ]
+  },
 ];
 
 const rootNode = QuestionNodes[0];
@@ -121,8 +129,13 @@ const flattenParentChildrenToEdges = (parentChildren: ParentChildren): EdgeFragm
   childNode: {
     __typename: 'QuestionNode',
     id: child.childNodeId,
+    title: '',
+    children: [],
+    isRoot: false,
+    type: QuestionNodeTypeEnum.Choice,
   },
   parentNode: {
+    title: '',
     __typename: 'QuestionNode',
     id: parentChildren.parentNodeId,
   },
@@ -142,8 +155,13 @@ const getEdgesFromNode = (node: BasicQuestionNode): EdgeFragmentFragment[] => {
     childNode: {
       __typename: 'QuestionNode',
       id: edge.childNodeId,
+      title: '',
+      children: [],
+      isRoot: false,
+      type: QuestionNodeTypeEnum.Choice,
     },
     parentNode: {
+      title: '',
       __typename: 'QuestionNode',
       id: node.id,
     },

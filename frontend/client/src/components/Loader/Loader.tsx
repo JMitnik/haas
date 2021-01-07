@@ -1,7 +1,7 @@
 import { HAASRun } from 'assets/animations';
 import Lottie from 'react-lottie';
 import React from 'react';
-import styled from 'styled-components/macro';
+import styled from 'styled-components';
 
 const LoaderContainer = styled.div`
     position: absolute;

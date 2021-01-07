@@ -119,7 +119,7 @@ const FormNodePreview = ({ field, onMoveRight, onMoveLeft, onOpen, fieldIndex, n
               <UI.InputHelper>{t('empty_field_helper')}</UI.InputHelper>
             </UI.ColumnFlex>
           )}
-          <UI.ButtonGroup>
+          <UI.ButtonGroup display="flex">
             <UI.IconButton
               size="sm"
               aria-label="Move field left"

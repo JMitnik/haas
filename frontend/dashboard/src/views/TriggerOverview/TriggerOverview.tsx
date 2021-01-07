@@ -1,11 +1,12 @@
-import { ApolloError } from 'apollo-boost';
-import { Button, Popover, PopoverArrow, PopoverBody, PopoverCloseButton,
-  PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast } from '@chakra-ui/core';
+import {
+  Button, Popover, PopoverArrow, PopoverBody, PopoverCloseButton,
+  PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast
+} from '@chakra-ui/core';
 import { Div, Flex, PageTitle, Text } from '@haas/ui';
 import { Edit, Plus, Trash } from 'react-feather';
 import { debounce } from 'lodash';
 import { useHistory, useParams } from 'react-router';
-import { useLazyQuery, useMutation } from '@apollo/react-hooks';
+import { useLazyQuery, useMutation } from '@apollo/client';
 import { useTranslation } from 'react-i18next';
 import React, { useCallback, useEffect, useState } from 'react';
 
@@ -38,7 +39,7 @@ const HEADERS = [
 ];
 
 const TriggersOverview = () => {
-  const { customerSlug } = useParams();
+  const { customerSlug } = useParams<{ customerSlug: string }>();
   const toast = useToast();
   const { canEditTriggers, canDeleteTriggers } = useAuth();
   const history = useHistory();
@@ -73,8 +74,10 @@ const TriggersOverview = () => {
   }, [customerSlug, fetchTriggers, paginationProps]);
 
   const [deleteTrigger] = useMutation(deleteTriggerMutation, {
-    refetchQueries: [{ query: getTriggerTableQuery,
-      variables: { customerSlug,
+    refetchQueries: [{
+      query: getTriggerTableQuery,
+      variables: {
+        customerSlug,
         filter: {
           startDate: paginationProps.activeStartDate,
           endDate: paginationProps.activeEndDate,
@@ -83,8 +86,10 @@ const TriggersOverview = () => {
           limit: paginationProps.pageSize,
           pageIndex: paginationProps.pageIndex,
           orderBy: paginationProps.sortBy,
-        } } }],
-    onError: (serverError: ApolloError) => {
+        }
+      }
+    }],
+    onError: (serverError: any) => {
       console.log(serverError);
     },
     onCompleted: () => {
@@ -163,53 +168,53 @@ const TriggersOverview = () => {
             (data: any) => (
               <>
                 {canDeleteTriggers && (
-                <ShowMoreButton
-                  renderMenu={(
-                    <List>
-                      {canDeleteTriggers && (
-                        <>
-                          {canEditTriggers && (
-                            <ListItem
-                              onClick={(e: any) => handleEditEntry(e, data?.id)}
-                              renderLeftIcon={<Edit />}
-                            >
-                              {t('edit_trigger')}
-                            </ListItem>
-                          )}
-                          <Popover>
-                            {() => (
-                              <>
-                                <PopoverTrigger>
-                                  <ListItem
-                                    renderLeftIcon={<Trash />}
-                                  >
-                                    {t('delete_trigger')}
-                                  </ListItem>
-                                </PopoverTrigger>
-                                <PopoverContent zIndex={4}>
-                                  <PopoverArrow />
-                                  <PopoverHeader>{t('delete')}</PopoverHeader>
-                                  <PopoverCloseButton />
-                                  <PopoverBody>
-                                    <Text>{t('delete_trigger_popover')}</Text>
-                                  </PopoverBody>
-                                  <PopoverFooter>
-                                    <Button
-                                      variantColor="red"
-                                      onClick={(e: any) => handleDeleteTrigger(e, data?.id)}
-                                    >
-                                      {t('delete')}
-                                    </Button>
-                                  </PopoverFooter>
-                                </PopoverContent>
-                              </>
+                  <ShowMoreButton
+                    renderMenu={(
+                      <List>
+                        {canDeleteTriggers && (
+                          <>
+                            {canEditTriggers && (
+                              <ListItem
+                                onClick={(e: any) => handleEditEntry(e, data?.id)}
+                                renderLeftIcon={<Edit />}
+                              >
+                                {t('edit_trigger')}
+                              </ListItem>
                             )}
-                          </Popover>
-                        </>
-                      )}
-                    </List>
-                  )}
-                />
+                            <Popover>
+                              {() => (
+                                <>
+                                  <PopoverTrigger>
+                                    <ListItem
+                                      renderLeftIcon={<Trash />}
+                                    >
+                                      {t('delete_trigger')}
+                                    </ListItem>
+                                  </PopoverTrigger>
+                                  <PopoverContent zIndex={4}>
+                                    <PopoverArrow />
+                                    <PopoverHeader>{t('delete')}</PopoverHeader>
+                                    <PopoverCloseButton />
+                                    <PopoverBody>
+                                      <Text>{t('delete_trigger_popover')}</Text>
+                                    </PopoverBody>
+                                    <PopoverFooter>
+                                      <Button
+                                        variantColor="red"
+                                        onClick={(e: any) => handleDeleteTrigger(e, data?.id)}
+                                      >
+                                        {t('delete')}
+                                      </Button>
+                                    </PopoverFooter>
+                                  </PopoverContent>
+                                </>
+                              )}
+                            </Popover>
+                          </>
+                        )}
+                      </List>
+                    )}
+                  />
                 )}
               </>
             )

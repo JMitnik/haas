@@ -1,6 +1,6 @@
 import { debounce } from 'lodash';
 import { useHistory, useParams } from 'react-router';
-import { useLazyQuery, useMutation } from '@apollo/react-hooks';
+import { useLazyQuery, useMutation } from '@apollo/client';
 import React, { useCallback, useEffect, useState } from 'react';
 
 import { Div, Flex, PageTitle, Text } from '@haas/ui';
@@ -8,8 +8,10 @@ import SearchBar from 'components/SearchBar/SearchBar';
 import Table from 'components/Table/Table';
 import getPaginatedUsers from 'queries/getPaginatedUsers';
 
-import { Button, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent,
-  PopoverFooter, PopoverHeader, PopoverTrigger, useToast } from '@chakra-ui/core';
+import {
+  Button, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent,
+  PopoverFooter, PopoverHeader, PopoverTrigger, useToast
+} from '@chakra-ui/core';
 import { Edit, Plus, Trash } from 'react-feather';
 import { ErrorBoundary } from 'react-error-boundary';
 import { GenericCell, RoleCell } from 'components/Table/CellComponents/CellComponents';
@@ -48,7 +50,7 @@ const UsersOverview = () => {
   const { t } = useTranslation();
   const history = useHistory();
   const toast = useToast();
-  const [fetchUsers, { data, refetch }] = useLazyQuery(getPaginatedUsers, { fetchPolicy: 'no-cache' });
+  const [fetchUsers, { data, refetch }] = useLazyQuery(getPaginatedUsers, { fetchPolicy: 'cache-and-network' });
 
   const [paginationProps, setPaginationProps] = useState<TableProps>({
     activeStartDate: null,
@@ -84,7 +86,7 @@ const UsersOverview = () => {
 
   const [deleteUser] = useMutation(deleteUserQuery, {
     onCompleted: () => {
-      refetch({
+      refetch?.({
         customerSlug,
         filter: {
           startDate: paginationProps.activeStartDate,
@@ -181,53 +183,53 @@ const UsersOverview = () => {
               (data: any) => (
                 <>
                   {canDeleteUsers && (
-                  <ShowMoreButton
-                    renderMenu={(
-                      <List>
-                        {canDeleteUsers && (
-                          <>
-                            {canEditUsers && (
-                              <ListItem
-                                onClick={(e: any) => handleEditUser(e, data?.id)}
-                                renderLeftIcon={<Edit />}
-                              >
-                                {t('edit_user')}
-                              </ListItem>
-                            )}
-                            <Popover>
-                              {() => (
-                                <>
-                                  <PopoverTrigger>
-                                    <ListItem
-                                      renderLeftIcon={<Trash />}
-                                    >
-                                      {t('delete_user')}
-                                    </ListItem>
-                                  </PopoverTrigger>
-                                  <PopoverContent zIndex={4}>
-                                    <PopoverArrow />
-                                    <PopoverHeader>{t('delete')}</PopoverHeader>
-                                    <PopoverCloseButton />
-                                    <PopoverBody>
-                                      <Text>{t('delete_user_popover')}</Text>
-                                    </PopoverBody>
-                                    <PopoverFooter>
-                                      <Button
-                                        variantColor="red"
-                                        onClick={(e: any) => handleDeleteUser(e, data?.id)}
-                                      >
-                                        {t('delete')}
-                                      </Button>
-                                    </PopoverFooter>
-                                  </PopoverContent>
-                                </>
+                    <ShowMoreButton
+                      renderMenu={(
+                        <List>
+                          {canDeleteUsers && (
+                            <>
+                              {canEditUsers && (
+                                <ListItem
+                                  onClick={(e: any) => handleEditUser(e, data?.id)}
+                                  renderLeftIcon={<Edit />}
+                                >
+                                  {t('edit_user')}
+                                </ListItem>
                               )}
-                            </Popover>
-                          </>
-                        )}
-                      </List>
-                    )}
-                  />
+                              <Popover>
+                                {() => (
+                                  <>
+                                    <PopoverTrigger>
+                                      <ListItem
+                                        renderLeftIcon={<Trash />}
+                                      >
+                                        {t('delete_user')}
+                                      </ListItem>
+                                    </PopoverTrigger>
+                                    <PopoverContent zIndex={4}>
+                                      <PopoverArrow />
+                                      <PopoverHeader>{t('delete')}</PopoverHeader>
+                                      <PopoverCloseButton />
+                                      <PopoverBody>
+                                        <Text>{t('delete_user_popover')}</Text>
+                                      </PopoverBody>
+                                      <PopoverFooter>
+                                        <Button
+                                          variantColor="red"
+                                          onClick={(e: any) => handleDeleteUser(e, data?.id)}
+                                        >
+                                          {t('delete')}
+                                        </Button>
+                                      </PopoverFooter>
+                                    </PopoverContent>
+                                  </>
+                                )}
+                              </Popover>
+                            </>
+                          )}
+                        </List>
+                      )}
+                    />
                   )}
                 </>
               )

@@ -1,9 +1,11 @@
-import { useMutation } from '@apollo/react-hooks';
+import { useMutation } from '@apollo/client';
+import qs from 'qs';
 import React, { useCallback, useContext, useRef } from 'react';
-
-import createInteractionMutation from 'mutations/createSessionMutation';
 import gql from 'graphql-tag';
 import useDialogueTree from 'providers/DialogueTreeProvider';
+
+import { useCreateSessionMutation } from 'types/generated-types';
+import { useLocation } from 'react-router-dom';
 
 const UploadQueueContext = React.createContext({} as any);
 
@@ -17,10 +19,13 @@ const appendToInteractionMutation = gql`
 
 export const UploadQueueProvider = ({ children }: { children: React.ReactNode }) => {
   const willAppend = useRef(false);
+  const location = useLocation();
+
   const queue = useRef<any>([]);
   const { store } = useDialogueTree();
-  const [createInteraction, { data: interactionData }] = useMutation(createInteractionMutation);
+  const [createInteraction, { data: interactionData }] = useCreateSessionMutation();
   const [appendToInteraction] = useMutation(appendToInteractionMutation);
+  const ref = qs.parse(location.search, { ignoreQueryPrefix: true })?.ref?.toString() || '';
 
   /**
    * Upload the main interaction
@@ -33,7 +38,8 @@ export const UploadQueueProvider = ({ children }: { children: React.ReactNode })
       createInteraction({
         variables: {
           input: {
-            dialogueId: store.tree?.id,
+            dialogueId: store.tree?.id || '',
+            deliveryId: ref,
             entries: uploadEntries.map((entry: any) => ({
               nodeId: entry.node.node.id,
               edgeId: entry.edge?.id,
@@ -47,7 +53,7 @@ export const UploadQueueProvider = ({ children }: { children: React.ReactNode })
         willAppend.current = true;
       });
     }
-  }, [createInteraction, store, willAppend]);
+  }, [createInteraction, store, willAppend, ref]);
 
   /**
    * Dequeue the first item in our queue.

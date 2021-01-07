@@ -1,6 +1,7 @@
 require('dotenv').config();
 
 export interface ConfigProps {
+  baseUrl: string;
   jwtSecret: string;
   jwtExpiryMinutes: number;
   env: string;
@@ -27,6 +28,7 @@ if (!process.env.JWT_SECRET) throw new Error('Ensure you set a JWT secret in you
 if (!process.env.MAIL_SENDER) console.log('Mail sender not defined; wont send mails as a result');
 
 const config: ConfigProps = {
+  baseUrl: process.env.BASE_URL || 'http://localhost:4000',
   jwtSecret: process.env.JWT_SECRET,
   jwtExpiryMinutes: 30,
   env: process.env.ENVIRONMENT || 'local',

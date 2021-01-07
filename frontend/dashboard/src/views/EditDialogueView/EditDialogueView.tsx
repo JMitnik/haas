@@ -1,13 +1,15 @@
 import * as yup from 'yup';
 import { Activity, Minus, Plus, Type } from 'react-feather';
-import { ApolloError, gql } from 'apollo-boost';
+import { gql } from '@apollo/client';
 import { Button, ButtonGroup, FormErrorMessage, RadioButtonGroup, Stack } from '@chakra-ui/core';
 import { Controller, useForm } from 'react-hook-form';
-import { Div, Flex, Form, FormContainer, FormControl, FormLabel, FormSection,
-  H3, Hr, Input, InputGrid, InputHelper, Muted, PageTitle, RadioButton, Textarea } from '@haas/ui';
+import {
+  Div, Flex, Form, FormContainer, FormControl, FormLabel, FormSection,
+  H3, Hr, Input, InputGrid, InputHelper, Muted, PageTitle, RadioButton, Textarea
+} from '@haas/ui';
 import { motion } from 'framer-motion';
 import { useHistory, useParams } from 'react-router';
-import { useMutation, useQuery } from '@apollo/react-hooks';
+import { useMutation, useQuery } from '@apollo/client';
 import { useTranslation } from 'react-i18next';
 import { yupResolver } from '@hookform/resolvers';
 import React, { useState } from 'react';
@@ -22,8 +24,8 @@ import intToBool from 'utils/intToBool';
 
 interface EditDialogueFormProps {
   dialogue: any;
-  currentTags: Array<{label: string, value: string}>;
-  tagOptions: Array<{label: string, value: string}>;
+  currentTags: Array<{ label: string, value: string }>;
+  tagOptions: Array<{ label: string, value: string }>;
 }
 
 const getEditDialogueQuery = gql`
@@ -54,7 +56,7 @@ interface FormDataProps {
   publicTitle?: string;
   description: string;
   slug: string;
-  tags: Array<{label: string, value: string}>;
+  tags: Array<{ label: string, value: string }>;
   isWithoutGenData: number;
 }
 
@@ -84,12 +86,12 @@ const EditDialogueView = () => {
 
   if (editDialogueData.loading || tagsLoading) return null;
 
-  const tagOptions: Array<{label: string, value: string}> = tagsData?.tags && tagsData?.tags?.map((tag: any) => (
+  const tagOptions: Array<{ label: string, value: string }> = tagsData?.tags && tagsData?.tags?.map((tag: any) => (
     { label: tag?.name, value: tag?.id }));
 
   const currentTags = editDialogueData.data?.customer?.dialogue?.tags
-  && editDialogueData.data?.customer?.dialogue?.tags?.map((tag: any) => (
-    { label: tag?.name, value: tag?.id }));
+    && editDialogueData.data?.customer?.dialogue?.tags?.map((tag: any) => (
+      { label: tag?.name, value: tag?.id }));
 
   return (
     <EditDialogueForm
@@ -100,7 +102,7 @@ const EditDialogueView = () => {
   );
 };
 
-const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFormProps) => {
+const EditDialogueForm = ({ dialogue, currentTags, tagOptions }: EditDialogueFormProps) => {
   const history = useHistory();
   const form = useForm<FormDataProps>({
     resolver: yupResolver(schema),
@@ -114,22 +116,24 @@ const EditDialogueForm = ({ dialogue, currentTags, tagOptions } : EditDialogueFo
     },
   });
 
-  const { customerSlug, dialogueSlug } = useParams();
+  const { customerSlug, dialogueSlug } = useParams<{ customerSlug: string, dialogueSlug: string }>();
 
   const [editDialogue, { error: serverError, loading: isLoading }] = useMutation(editDialogueMutation, {
     onCompleted: () => {
       history.push(`/dashboard/b/${customerSlug}/d`);
     },
-    refetchQueries: [{ query: getQuestionnairesCustomerQuery,
+    refetchQueries: [{
+      query: getQuestionnairesCustomerQuery,
       variables: {
         customerSlug,
-      } }],
-    onError: (serverError: ApolloError) => {
+      }
+    }],
+    onError: (serverError: any) => {
       console.log(serverError);
     },
   });
 
-  const [activeTags, setActiveTags] = useState<Array<null | {label: string, value: string}>>(currentTags);
+  const [activeTags, setActiveTags] = useState<Array<null | { label: string, value: string }>>(currentTags);
 
   const onSubmit = (formData: FormDataProps) => {
     const tagIds = formData.tags?.map((tag) => tag?.value) || [];

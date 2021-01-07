@@ -1,4 +1,4 @@
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
 
 const getTriggersQuery = gql`
   query getTriggers($customerSlug: String, $userId: String, $filter: PaginationWhereInput) {

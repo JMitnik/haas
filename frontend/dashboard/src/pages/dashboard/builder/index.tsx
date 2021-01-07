@@ -1,6 +1,6 @@
 import { orderBy } from 'lodash';
 import { useParams } from 'react-router';
-import { useQuery } from '@apollo/react-hooks';
+import { useQuery } from '@apollo/client';
 import React from 'react';
 
 import { EdgeChildProps, QuestionEntryProps } from 'views/DialogueBuilderView/DialogueBuilderInterfaces';
@@ -48,8 +48,8 @@ const initializeCTAType = (type?: string) => {
 
 const findLeafs = (nodes: Array<QuestionEntryProps>) => {
   const selectLeafs = nodes?.map((leaf) => ({ value: leaf.id, label: leaf.title }));
-    selectLeafs?.unshift({ value: '', label: 'None' });
-    return selectLeafs;
+  selectLeafs?.unshift({ value: '', label: 'None' });
+  return selectLeafs;
 };
 
 const mapQuestionsInputData = (nodes: Array<QuestionEntryProps>) => {
@@ -86,7 +86,7 @@ const mapQuestionsInputData = (nodes: Array<QuestionEntryProps>) => {
 };
 
 const DialogueBuilderPage = () => {
-  const { customerSlug, dialogueSlug } = useParams();
+  const { customerSlug, dialogueSlug } = useParams<{ customerSlug: string, dialogueSlug: string }>();
   const { loading, data } = useQuery(getTopicBuilderQuery, {
     fetchPolicy: 'network-only',
     variables: { dialogueSlug, customerSlug },

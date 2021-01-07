@@ -5,12 +5,12 @@ import {
 import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { useHistory, useParams } from 'react-router';
-import { useMutation, useQuery } from '@apollo/react-hooks';
+import { useMutation, useQuery } from '@apollo/client';
 import { useToast } from '@chakra-ui/core';
 import { useTranslation } from 'react-i18next';
 import { yupResolver } from '@hookform/resolvers';
 import React from 'react';
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
 
 import CustomerForm from 'components/CustomerForm';
 import boolToInt from 'utils/booleanToNumber';

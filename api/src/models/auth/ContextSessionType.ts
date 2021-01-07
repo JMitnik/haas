@@ -17,6 +17,7 @@ export interface ActiveWorkspaceType {
 export interface ContextSessionType {
   token: string;
   expiresAt: string;
+  baseUrl: string;
   globalPermissions: SystemPermissionEnum[];
   customersAndPermissions: CustomerAndPermission[] | undefined;
   user: UserWithDependencies | null;

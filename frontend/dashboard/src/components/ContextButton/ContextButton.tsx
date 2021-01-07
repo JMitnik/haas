@@ -1,7 +1,7 @@
 import { ReactComponent as ContextButtonSVG } from 'assets/icons/icon-more.svg';
 import { Menu, MenuButton, MenuList } from '@chakra-ui/core';
 import React from 'react';
-import styled from 'styled-components/macro';
+import styled from 'styled-components';
 
 export const ContextButtonContainer = styled.div`
   height: 25px;

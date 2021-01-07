@@ -1,0 +1,1 @@
+aws dynamodb put-item --cli-input-json file://json/insert-deliveries.json --endpoint-url http://localhost:8000

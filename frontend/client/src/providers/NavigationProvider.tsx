@@ -1,5 +1,5 @@
 import { TreeNodeProps } from 'models/Tree/TreeNodeModel';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 import useDialogueTree from './DialogueTreeProvider';
 
 const STAY_LEAFS = ['LINK', 'SHARE'];
@@ -7,6 +7,7 @@ const STAY_LEAFS = ['LINK', 'SHARE'];
 export const useNavigator = () => {
   const { store } = useDialogueTree();
   const history = useHistory();
+  const location = useLocation();
 
   const routes = {
     start: `/${store.customer?.slug}/${store.tree?.slug}`,
@@ -14,14 +15,26 @@ export const useNavigator = () => {
   };
 
   const goToStart = () => {
-    history.push(`/${store.customer?.slug}/${store.tree?.slug}`);
+    history.push({
+      pathname: `/${store.customer?.slug}/${store.tree?.slug}`,
+      search: location.search
+    });
   };
 
-  const goToActiveLeaf = () => history.push(routes.activeLeaf);
+  const goToActiveLeaf = () => history.push({
+    pathname: routes.activeLeaf,
+    search: location.search
+  });
 
-  const goToNodeByEdge = (edgeId: string) => history.push(`/${store.customer?.slug}/${store.tree?.slug}/${edgeId}`);
+  const goToNodeByEdge = (edgeId: string) => history.push({
+   pathname: `/${store.customer?.slug}/${store.tree?.slug}/${edgeId}`,
+   search: location.search
+  });
 
-  const goToPostLeafByEdge = (edgeId: string) => history.push(`/${store.customer?.slug}/${store.tree?.slug}/${edgeId}`);
+  const goToPostLeafByEdge = (edgeId: string) => history.push({
+    pathname: `/${store.customer?.slug}/${store.tree?.slug}/${edgeId}`,
+    search: location.search
+  });
 
   const checkIfReset = (currentNode: TreeNodeProps) => {
     const suddenlyStarted = !currentNode.isLeaf && !currentNode.isRoot && !store.hasStarted;

@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { Card, CardBody, Div, Flex, H3, Text } from '@haas/ui';
-import styled, { css } from 'styled-components/macro';
+import styled, { css } from 'styled-components';
 
 import { Frown } from 'react-feather';
 import { Icon } from '@chakra-ui/core';

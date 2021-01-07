@@ -1,14 +1,16 @@
 import * as yup from 'yup';
-import { ApolloError, gql } from 'apollo-boost';
+import { gql } from '@apollo/client';
 import { Controller, useForm } from 'react-hook-form';
 import { useHistory, useParams } from 'react-router';
-import { useMutation, useQuery } from '@apollo/react-hooks';
+import { useMutation, useQuery } from '@apollo/client';
 import React from 'react';
 import Select from 'react-select';
 
 import { Button, ButtonGroup, FormErrorMessage, useToast } from '@chakra-ui/core';
-import { Div, Form, FormContainer, FormControl,
-  FormLabel, FormSection, H3, Hr, Input, InputGrid, InputHelper, Muted, PageTitle } from '@haas/ui';
+import {
+  Div, Form, FormContainer, FormControl,
+  FormLabel, FormSection, H3, Hr, Input, InputGrid, InputHelper, Muted, PageTitle
+} from '@haas/ui';
 import { Mail } from 'react-feather';
 import { motion } from 'framer-motion';
 import { useCustomer } from 'providers/CustomerProvider';
@@ -52,7 +54,7 @@ const InviteUserView = () => {
     resolver: yupResolver(schema),
     mode: 'onChange',
   });
-  const { customerSlug } = useParams();
+  const { customerSlug } = useParams<{ customerSlug: string }>();
   const { activeCustomer } = useCustomer();
   const toast = useToast();
   const { t } = useTranslation();
@@ -93,7 +95,7 @@ const InviteUserView = () => {
         history.push(`/dashboard/b/${customerSlug}/users/`);
       }, 300);
     },
-    onError: (serverError: ApolloError) => {
+    onError: (serverError: any) => {
       console.log(serverError);
     },
     refetchQueries: [
@@ -104,7 +106,7 @@ const InviteUserView = () => {
     ],
   });
 
-  const roles: Array<{name: string, id: string}> = data?.roles;
+  const roles: Array<{ name: string, id: string }> = data?.roles;
   const mappedRoles = roles?.map(({ name, id }) => ({ label: name, value: id }));
 
   const handleSubmit = (formData: FormDataProps) => {

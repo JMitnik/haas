@@ -1,0 +1,23 @@
+query GetWorkspaceDialogues($customerSlug: String!, $filter: DialogueFilterInputType) {
+  customer(slug: $customerSlug) {
+    id
+    dialogues(filter: $filter) {
+      id
+      title
+      slug
+      publicTitle
+      creationDate
+      updatedAt
+      customerId
+      averageScore
+      customer {
+        slug
+      }
+      tags {
+        id
+        type
+        name
+      }
+    }
+  }
+}

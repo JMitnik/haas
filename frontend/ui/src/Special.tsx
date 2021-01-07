@@ -1,4 +1,4 @@
-import styled, { css } from 'styled-components/macro';
+import styled, { css } from 'styled-components';
 import React from 'react';
 import { Text } from './Type';
 import Card from './Cards';
@@ -19,6 +19,7 @@ const IllustrationCardWrapper = styled.div`
     }
 
     > svg {
+      color: ${theme.colors.primary};
       max-width: 300px;
       max-height: 300px;
       padding: 24px;
@@ -31,7 +32,6 @@ const IllustrationCardWrapper = styled.div`
     }
   `}
 `;
-
 
 export const IllustrationCard = ({svg, text, children, isFlat}: { svg: any, text: string, children?: React.ReactNode, isFlat?: boolean; }) => {
   return (

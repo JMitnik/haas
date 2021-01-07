@@ -12,6 +12,8 @@ const theme = {
     primary: '#426b3a',
     primaryAlt: '#8cb6ff',
     primaries: generatePalette('#426b3a'),
+    strongPrimary: '#8cb6ff',
+    primaryGradient: undefined,
     secondary: '#6f6594',
     tertiary: '#3182CE',
     black: 'black',
@@ -64,7 +66,7 @@ const theme = {
   sidenav: {
     // Note-sidenav: uncomment to get back old sidenav
     // width: 200,
-    width: 100,
+    width: 220,
   },
   // zIndices: {
   //   dropdown: 200,

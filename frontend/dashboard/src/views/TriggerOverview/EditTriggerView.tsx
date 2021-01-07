@@ -4,7 +4,7 @@ import { FormContainer, PageTitle } from '@haas/ui';
 import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { useHistory, useParams } from 'react-router';
-import { useMutation, useQuery } from '@apollo/react-hooks';
+import { useMutation, useQuery } from '@apollo/client';
 import { useToast } from '@chakra-ui/core';
 import { useTranslation } from 'react-i18next';
 import { yupResolver } from '@hookform/resolvers';
@@ -31,7 +31,8 @@ interface FormDataProps {
     range: Array<number>,
     highThreshold: number,
     lowThreshold: number,
-    matchText: string }>;
+    matchText: string
+  }>;
   recipients: Array<{
     label: string;
     value: string;
@@ -39,11 +40,11 @@ interface FormDataProps {
 }
 
 enum TriggerConditionType {
-  LOW_THRESHOLD='LOW_THRESHOLD',
-  HIGH_THRESHOLD='HIGH_THRESHOLD',
-  INNER_RANGE='INNER_RANGE',
-  OUTER_RANGE='OUTER_RANGE',
-  TEXT_MATCH='TEXT_MATCH',
+  LOW_THRESHOLD = 'LOW_THRESHOLD',
+  HIGH_THRESHOLD = 'HIGH_THRESHOLD',
+  INNER_RANGE = 'INNER_RANGE',
+  OUTER_RANGE = 'OUTER_RANGE',
+  TEXT_MATCH = 'TEXT_MATCH',
 }
 
 const schema = yup.object().shape({
@@ -57,7 +58,7 @@ const schema = yup.object().shape({
     conditionType: yup.string().nullable(),
     range: yup.array().when('conditionType', {
       is: (condition: string) => condition === TriggerConditionType.INNER_RANGE
-      || condition === TriggerConditionType.OUTER_RANGE,
+        || condition === TriggerConditionType.OUTER_RANGE,
       then: yup.array().min(2).required(),
       otherwise: yup.array().notRequired(),
     }),
@@ -112,7 +113,7 @@ const getConditionType = (type: string) => {
 };
 
 const EditTriggerView = () => {
-  const { triggerId } = useParams<{triggerId: string, customerSlug: string }>();
+  const { triggerId } = useParams<{ triggerId: string, customerSlug: string }>();
 
   const { data: triggerData, error, loading } = useQuery(getTriggerQuery, {
     fetchPolicy: 'cache-and-network',
@@ -129,8 +130,8 @@ const EditTriggerView = () => {
   return <EditTriggerForm trigger={trigger} />;
 };
 
-const EditTriggerForm = ({ trigger }: {trigger: any}) => {
-  const { triggerId, customerSlug } = useParams<{triggerId: string, customerSlug: string }>();
+const EditTriggerForm = ({ trigger }: { trigger: any }) => {
+  const { triggerId, customerSlug } = useParams<{ triggerId: string, customerSlug: string }>();
   const history = useHistory();
   const { t } = useTranslation();
   const toast = useToast();

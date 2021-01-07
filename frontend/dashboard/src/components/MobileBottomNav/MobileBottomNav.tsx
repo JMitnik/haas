@@ -1,7 +1,7 @@
 import { Div } from '@haas/ui';
 import { NavItemContainer, NavItems } from 'components/Sidenav/Sidenav';
 import React from 'react';
-import styled, { css } from 'styled-components/macro';
+import styled, { css } from 'styled-components';
 
 const MobileBottomNavContainer = styled(Div)`
 	${({ theme }) => css`

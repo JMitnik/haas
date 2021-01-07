@@ -4,8 +4,6 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import 'layouts/index.css';
-import * as Sentry from '@sentry/react';
-import { Integrations } from '@sentry/apm';
 
 import App from './pages';
 

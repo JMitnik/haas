@@ -1,5 +1,5 @@
 import scoreToColors from 'utils/scoreToColors';
-import styled, { css } from 'styled-components/macro';
+import styled, { css } from 'styled-components';
 
 export const InteractionFeedEntryContainer = styled.div`
    ${() => css`

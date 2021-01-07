@@ -1,7 +1,7 @@
 import { useHistory, useParams } from 'react-router-dom';
-import { useQuery } from '@apollo/react-hooks';
+import { useQuery } from '@apollo/client';
 import React, { useContext, useEffect, useState } from 'react';
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
 
 import { SystemPermission } from 'types/globalTypes';
 import {

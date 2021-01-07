@@ -1,5 +1,5 @@
 /* eslint-disable import/prefer-default-export */
-import styled from 'styled-components/macro';
+import styled from 'styled-components';
 
 export const TopicInfoView = styled.div`
   display: flex;

@@ -2,7 +2,7 @@ import { BlockPicker, ColorResult } from 'react-color';
 import { Button } from '@chakra-ui/core';
 import { Div } from '@haas/ui';
 import React, { useRef, useState } from 'react';
-import styled from 'styled-components/macro';
+import styled from 'styled-components';
 
 import useOnClickOutside from 'hooks/useClickOnOutside';
 

@@ -1,17 +1,19 @@
 import { Button, ButtonGroup, useToast } from '@chakra-ui/core';
-import { Div, Form, FormContainer,
+import {
+  Div, Form, FormContainer,
   FormControl, FormLabel, FormSection, H3, Hr,
-  Input, InputGrid, InputHelper, Muted, PageTitle, ViewContainer } from '@haas/ui';
+  Input, InputGrid, InputHelper, Muted, PageTitle, ViewContainer
+} from '@haas/ui';
 import { Mail, Phone, User } from 'react-feather';
 import { Variants, motion } from 'framer-motion';
 import { queryMe, useUser } from 'providers/UserProvider';
 import { useForm } from 'react-hook-form';
 import { useHistory } from 'react-router';
-import { useMutation } from '@apollo/react-hooks';
+import { useMutation } from '@apollo/client';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
 import ServerError from 'components/ServerError';
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
 
 const EditMeAnimation: Variants = {
   initial: {

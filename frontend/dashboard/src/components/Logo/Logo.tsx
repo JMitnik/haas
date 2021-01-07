@@ -1,5 +1,5 @@
 import React from 'react';
-import styled, { css } from 'styled-components/macro';
+import styled, { css } from 'styled-components';
 
 import { Div, GenericProps, H2 } from '@haas/ui';
 import { ReactComponent as SVGLogo } from 'assets/logo.svg';

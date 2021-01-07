@@ -1,5 +1,5 @@
 import { Div, H2, H3 } from '@haas/ui';
-import styled, { css } from 'styled-components/macro';
+import styled, { css } from 'styled-components';
 
 export const TextboxContainer = styled(Div)`
   ${({ theme }) => css`

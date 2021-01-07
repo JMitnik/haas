@@ -1,5 +1,5 @@
 import Color from 'color';
-import styled, { css } from 'styled-components/macro';
+import styled, { css } from 'styled-components';
 
 import { Button, H5 } from '@haas/ui';
 

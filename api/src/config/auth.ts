@@ -23,6 +23,18 @@ const isSelf = rule({ cache: 'no_cache' })(
   },
 );
 
+const isFromClient = rule({ cache: 'contextual' })(
+  async (parent, args, ctx: APIContext) => {
+    if (config.env === 'local') return true;
+
+    if (ctx.req.get('origin') === 'client.haas.live') {
+      return true;
+    }
+
+    return false;
+  },
+)
+
 const isLocal = rule({ cache: 'no_cache' })(
   async () => config.env === 'local',
 );
@@ -34,10 +46,16 @@ const isLocal = rule({ cache: 'no_cache' })(
  */
 const containsWorkspacePermission = (guardedPermission: SystemPermissionEnum) => rule({ cache: 'no_cache' })(
   async (parent, args, ctx: APIContext) => {
+    // All permissions: either globalPermissions or workspace permissions
+    const allRelevantPermissions = [
+      ctx.session?.user?.globalPermissions,
+      ctx.session?.activeWorkspace?.permissions
+    ].flat();
+
     if (!ctx.session?.user?.id) return new ApolloError('Unauthorized', 'UNAUTHORIZED');
 
     if (!ctx.session?.activeWorkspace) return false;
-    if (!ctx.session.activeWorkspace?.permissions?.includes(guardedPermission)) return false;
+    if (!allRelevantPermissions?.includes(guardedPermission)) return false;
 
     return true;
   },
@@ -50,17 +68,24 @@ const authShield = shield({
   },
   Mutation: {
     '*': isSuperAdmin,
+    debugMutation: allow,
     logout: allow,
     createSession: allow,
     appendToInteraction: allow,
     verifyUserToken: allow,
     requestInvite: allow,
     deleteCustomer: isSuperAdmin,
+
+    createCampaign: containsWorkspacePermission(SystemPermissionEnum.CAN_CREATE_CAMPAIGNS),
+    createBatchDeliveries: containsWorkspacePermission(SystemPermissionEnum.CAN_CREATE_DELIVERIES),
+
     inviteUser: containsWorkspacePermission(SystemPermissionEnum.CAN_ADD_USERS),
     editWorkspace: containsWorkspacePermission(SystemPermissionEnum.CAN_EDIT_WORKSPACE),
     editUser: or(isSelf, isSuperAdmin),
 
     // debugMutation: isLocal,
+
+    updateDeliveryStatus: isFromClient,
 
     // // Dialogue-specific settings
     deleteQuestion: containsWorkspacePermission(SystemPermissionEnum.CAN_BUILD_DIALOGUE),

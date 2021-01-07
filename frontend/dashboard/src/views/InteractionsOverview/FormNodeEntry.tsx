@@ -7,7 +7,7 @@ import {
   as FormNodeEntryType,
 } from 'queries/__generated__/getDialogueSessionConnection';
 import { FormNodeFieldTypeEnum } from 'types/globalTypes';
-import styled from 'styled-components/macro';
+import styled from 'styled-components';
 
 /**
  * Wrap the underlying element to be full-width

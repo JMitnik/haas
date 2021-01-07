@@ -1,6 +1,6 @@
 import * as UI from '@haas/ui';
 import { Flex, Span } from '@haas/ui';
-import { useMutation } from '@apollo/react-hooks';
+import { useMutation } from '@apollo/client';
 import { useParams } from 'react-router';
 import { useToast } from '@chakra-ui/core';
 import { useTranslation } from 'react-i18next';
@@ -54,7 +54,7 @@ const QuestionEntryItem = ({ depth,
   edgeId,
   parentQuestionId,
   onAddExpandChange }
-: QuestionEntryItemProps) => {
+  : QuestionEntryItemProps) => {
   const { activeCustomer } = useCustomer();
   const { dialogueSlug } = useParams<{ dialogueSlug: string }>();
   const { t } = useTranslation();
