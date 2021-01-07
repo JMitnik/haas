@@ -9,16 +9,6 @@ import { Integrations } from '@sentry/apm';
 
 import App from './pages';
 
-const sentryDSN = process.env.SENTRY_DSN || 'https://0530140060cb4ffaa6cea16b258866c0@o438134.ingest.sentry.io/5401517';
-
-Sentry.init({
-  dsn: sentryDSN,
-  integrations: [
-    new Integrations.Tracing(),
-  ],
-  tracesSampleRate: 1.0,
-});
-
 if (process.env.NODE_ENV === 'test') {
   worker.start({
     waitUntilReady: true,
