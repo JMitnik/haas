@@ -4,6 +4,7 @@
     "private": true,
     "dependencies": {
         "@apollo/client": "^3.3.6",
+        "@babel/helper-builder-react-jsx": "^7.10.4",
         "@chakra-ui/core": "^0.8.0",
         "@emotion/core": "^10.0.28",
         "@emotion/styled": "^10.0.27",
