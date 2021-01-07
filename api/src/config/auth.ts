@@ -68,7 +68,6 @@ const authShield = shield({
   },
   Mutation: {
     '*': isSuperAdmin,
-    debugMutation: allow,
     logout: allow,
     createSession: allow,
     appendToInteraction: allow,
@@ -82,8 +81,6 @@ const authShield = shield({
     inviteUser: containsWorkspacePermission(SystemPermissionEnum.CAN_ADD_USERS),
     editWorkspace: containsWorkspacePermission(SystemPermissionEnum.CAN_EDIT_WORKSPACE),
     editUser: or(isSelf, isSuperAdmin),
-
-    // debugMutation: isLocal,
 
     updateDeliveryStatus: isFromClient,
 
