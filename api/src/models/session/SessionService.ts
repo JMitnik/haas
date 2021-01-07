@@ -52,10 +52,19 @@ class SessionService {
 
     try {
       if (sessionInput.deliveryId) {
-        await prisma.delivery.update({
+        const deliveryUpdate = prisma.delivery.update({
           where: { id: sessionInput.deliveryId },
           data: { currentStatus: 'FINISHED' }
-        })
+        });
+
+        const deliveryEventCreation = prisma.deliveryEvents.create({
+          data: {
+            Delivery: { connect: { id: sessionInput.deliveryId } },
+            status: 'FINISHED'
+          }
+        });
+
+        await prisma.$transaction([deliveryUpdate, deliveryEventCreation]);
       }
     } catch (error) {
       console.log(error);

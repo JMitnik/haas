@@ -27,7 +27,7 @@ const isFromClient = rule({ cache: 'contextual' })(
   async (parent, args, ctx: APIContext) => {
     if (config.env === 'local') return true;
 
-    if (ctx.req.get('origin') === 'client.haas.live') {
+    if (ctx.req.get('origin') === config.clientUrl) {
       return true;
     }
 
