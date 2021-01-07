@@ -115,7 +115,7 @@ export const CampaignView = () => {
   const { customerSlug, campaignId, getCampaignsPath } = useNavigator();
   const campaignsPath = getCampaignsPath();
 
-  const { data, fetchMore } = useGetWorkspaceCampaignQuery({
+  const { data } = useGetWorkspaceCampaignQuery({
     fetchPolicy: 'cache-and-network',
     variables: {
       campaignId,
@@ -172,7 +172,7 @@ export const CampaignView = () => {
                 {deliveryConnection?.deliveries.map(delivery => (
                   <UI.TableRow hasHover key={delivery.id} onClick={() => setActiveDelivery(delivery)}>
                     <UI.TableCell>
-                      {delivery?.deliveryRecipientFirstName}
+                      {delivery?.deliveryRecipientFirstName || ''}
                     </UI.TableCell>
                     <UI.TableCell>
                       {delivery?.deliveryRecipientEmail}
@@ -192,7 +192,7 @@ export const CampaignView = () => {
           </UI.Div>
           {(deliveryConnection?.pageInfo?.nrPages || 0) > 1 && (
             <UI.PaginationFooter>
-              <UI.Div>
+              <UI.Div style={{ lineHeight: 'normal' }}>
                 Showing page
                 <UI.Span ml={1} fontWeight="bold">
                   {(paginationState.paginationFilter?.pageIndex || 0) + 1}
@@ -202,6 +202,9 @@ export const CampaignView = () => {
                 </UI.Span>
                 <UI.Span ml={1} fontWeight="bold">
                   {deliveryConnection?.pageInfo.nrPages}
+                </UI.Span>
+                <UI.Span ml={3}>
+                  (Total deliveries: {data?.customer?.campaign.allDeliveryConnection?.nrTotal})
                 </UI.Span>
               </UI.Div>
 

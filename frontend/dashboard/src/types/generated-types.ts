@@ -1501,9 +1501,11 @@ export type GetWorkspaceCampaignQuery = (
     & { campaign: (
       { __typename?: 'CampaignType' }
       & Pick<CampaignType, 'id' | 'label'>
-      & { deliveryConnection?: Maybe<(
+      & { allDeliveryConnection?: Maybe<(
         { __typename?: 'DeliveryConnectionType' }
         & Pick<DeliveryConnectionType, 'nrTotal' | 'nrSent' | 'nrOpened' | 'nrFinished'>
+      )>, deliveryConnection?: Maybe<(
+        { __typename?: 'DeliveryConnectionType' }
         & { deliveries: Array<(
           { __typename?: 'DeliveryType' }
           & Pick<DeliveryType, 'id' | 'deliveryRecipientFirstName' | 'deliveryRecipientLastName' | 'deliveryRecipientEmail' | 'deliveryRecipientPhone' | 'scheduledAt' | 'updatedAt' | 'currentStatus'>
@@ -1629,6 +1631,12 @@ export const GetWorkspaceCampaignDocument = gql`
     campaign(campaignId: $campaignId) {
       id
       label
+      allDeliveryConnection: deliveryConnection {
+        nrTotal
+        nrSent
+        nrOpened
+        nrFinished
+      }
       deliveryConnection(filter: $deliveryConnectionFilter) {
         deliveries {
           id
@@ -1650,10 +1658,6 @@ export const GetWorkspaceCampaignDocument = gql`
             status
           }
         }
-        nrTotal
-        nrSent
-        nrOpened
-        nrFinished
         pageInfo {
           nrPages
         }

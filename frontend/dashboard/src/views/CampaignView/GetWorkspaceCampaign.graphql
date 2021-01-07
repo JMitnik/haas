@@ -8,6 +8,14 @@ query GetWorkspaceCampaign(
     campaign(campaignId: $campaignId) {
       id
       label
+
+      allDeliveryConnection: deliveryConnection {
+        nrTotal
+        nrSent
+        nrOpened
+        nrFinished
+      }
+
       deliveryConnection(filter: $deliveryConnectionFilter) {
         deliveries {
           id
@@ -31,11 +39,6 @@ query GetWorkspaceCampaign(
             status
           }
         }
-
-        nrTotal
-        nrSent
-        nrOpened
-        nrFinished
 
         pageInfo {
           nrPages
