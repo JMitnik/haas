@@ -29,6 +29,10 @@ query GetWorkspaceCampaign(
         nrSent
         nrOpened
         nrFinished
+
+        pageInfo {
+          nrPages
+        }
       }
 
       variants {

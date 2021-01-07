@@ -8,7 +8,7 @@ const PaginationSortByEnum = enumType({
     'score', 'id', 'createdAt', 'email', 
     'name', 'firstName', 'lastName', 'role', 
     'medium', 'type', 'paths', 'user', 'when',
-    'scheduledAt'
+    'scheduledAt', 'updatedAt'
   ],
 });
 

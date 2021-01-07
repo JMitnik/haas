@@ -50,3 +50,7 @@ export const TableCell = styled.td<TableCellProps>`
     `}
   `}
 `;
+
+export const PaginationControls = () => {
+
+}

@@ -298,7 +298,7 @@ export type DeliveryType = {
   deliveryRecipientPhone?: Maybe<Scalars['String']>;
   scheduledAt?: Maybe<Scalars['String']>;
   updatedAt?: Maybe<Scalars['String']>;
-  campaignVariant: CampaignVariantType;
+  campaignVariant?: Maybe<CampaignVariantType>;
   currentStatus: DeliveryStatusEnum;
 };
 
@@ -886,7 +886,8 @@ export enum PaginationSortByEnum {
   Paths = 'paths',
   User = 'user',
   When = 'when',
-  ScheduledAt = 'scheduledAt'
+  ScheduledAt = 'scheduledAt',
+  UpdatedAt = 'updatedAt'
 }
 
 /** Sorting of pagination (type and whether it ascends) */
@@ -1497,11 +1498,14 @@ export type GetWorkspaceCampaignQuery = (
         & { deliveries: Array<(
           { __typename?: 'DeliveryType' }
           & Pick<DeliveryType, 'id' | 'deliveryRecipientFirstName' | 'deliveryRecipientLastName' | 'deliveryRecipientEmail' | 'deliveryRecipientPhone' | 'scheduledAt' | 'updatedAt' | 'currentStatus'>
-          & { campaignVariant: (
+          & { campaignVariant?: Maybe<(
             { __typename?: 'CampaignVariantType' }
             & Pick<CampaignVariantType, 'id' | 'label'>
-          ) }
-        )> }
+          )> }
+        )>, pageInfo: (
+          { __typename?: 'PaginationPageInfo' }
+          & Pick<PaginationPageInfo, 'nrPages'>
+        ) }
       )>, variants: Array<(
         { __typename?: 'CampaignVariantType' }
         & Pick<CampaignVariantType, 'id' | 'label'>
@@ -1632,6 +1636,9 @@ export const GetWorkspaceCampaignDocument = gql`
         nrSent
         nrOpened
         nrFinished
+        pageInfo {
+          nrPages
+        }
       }
       variants {
         id

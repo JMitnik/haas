@@ -127,6 +127,7 @@ export const paginate = async <GenericModelType>({
 
   // Find entries logic
   const findManyInput = constructFindManyInput({ ...findManyArgs, paginationOpts });
+  console.log(findManyInput);
   const entries = await findManyArgs.findManyCallBack({ props: findManyInput, paginationOpts, rest });
   const slicedEntries = slice(entries, (offset || 0), (limit || entries.length), (pageIndex || 0));
 

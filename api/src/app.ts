@@ -50,7 +50,7 @@ const main = async () => {
   app.use(cookieParser());
   app.use(cors(corsOptions));
 
-  apollo.applyMiddleware({ app, cors: false });
+  apollo.applyMiddleware({ app, cors: false,  });
 
   console.log('🏳️\tStarting the server');
   if (config.useSSL) {

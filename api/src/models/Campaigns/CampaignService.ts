@@ -37,7 +37,7 @@ export class CampaignService {
           id: deliveryOptions?.variantId
         },
         scheduledAt: {
-          
+        
         }
       } 
     };
@@ -50,7 +50,7 @@ export class CampaignService {
         findArgs: deliveryFilterOptions,
         findManyCallBack: findManyDeliveriesCallback,
         searchFields: [],
-        orderFields: [],
+        orderFields: ['updatedAt', 'scheduledAt'],
       },
       countArgs: {
         countCallBack: countDeliveriesCallback,

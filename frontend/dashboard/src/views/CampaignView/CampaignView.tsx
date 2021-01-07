@@ -16,10 +16,15 @@ export const defaultCampaignViewFilter: DeliveryConnectionFilter = {
     endDate: undefined,
     pageIndex: 0,
     offset: 0,
-    orderBy: [{
-      by: PaginationSortByEnum.ScheduledAt,
-      desc: true,
-    }],
+    orderBy: [
+      {
+        by: PaginationSortByEnum.UpdatedAt,
+        desc: true
+      },
+      {
+        by: PaginationSortByEnum.ScheduledAt,
+        desc: true,
+      }],
   },
 };
 
@@ -103,7 +108,7 @@ export const CampaignView = () => {
   const { customerSlug, campaignId, getCampaignsPath } = useNavigator();
   const campaignsPath = getCampaignsPath();
 
-  const { data } = useGetWorkspaceCampaignQuery({
+  const { data, refetch } = useGetWorkspaceCampaignQuery({
     fetchPolicy: 'cache-and-network',
     variables: {
       campaignId,
