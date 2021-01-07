@@ -89,11 +89,11 @@ const constructContextSession = async (context: ExpressContext): Promise<Context
   const workspace = await getWorkSpaceFromReq(context.req);
   const activeWorkspace = customersAndPermissions?.find((userCustomer) => userCustomer.id === workspace?.id) || null;
 
-  const tunnelUrl = process.env.ENVIRONMENT === 'local' ? await fetchTunnelUrl(): '';
+  const baseUrl = process.env.ENVIRONMENT === 'local' ? await fetchTunnelUrl(): config.baseUrl;
 
   return {
     user,
-    tunnelUrl,
+    baseUrl,
     customersAndPermissions,
     expiresAt: decodedExpAt,
     globalPermissions: user?.globalPermissions || [],

@@ -209,7 +209,7 @@ export const CreateBatchDeliveriesResolver = mutationField('createBatchDeliverie
       }
     }));
 
-    const callbackUrl = `${ctx.session?.tunnelUrl}/webhooks/delivery`;
+    const callbackUrl = `${ctx.session?.baseUrl}/webhooks/delivery`;
 
     try {
       await DynamoScheduleService.batchScheduleOneOffs(preprocessedRecords.map(record => ({

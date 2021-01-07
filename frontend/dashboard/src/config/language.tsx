@@ -1,6 +1,30 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    events: {
+      en: 'Events',
+      de: 'Veranstaltungen'
+    },
+    scheduled_event: {
+      en: 'Delivery was scheduled',
+      de: 'Die Lieferung war geplant'
+    },
+    deployed_event: {
+      en: 'Delivery was sent',
+      de: 'Die Lieferung wurde gesendet'
+    },
+    opened_event: {
+      en: 'Delivery was opened',
+      de: 'Lieferung wurde eröffnet'
+    },
+    finished_event: {
+      en: 'Delivery\'s dialogue was finished',
+      de: 'Der Dialog der Lieferung wurde abgeschlossen'
+    },
+    details: {
+      en: 'Details',
+      de: 'Detail'
+    },
     upload_deliveries: {
       en: 'Upload deliveries',
       de: 'Lieferungen hochladen.'

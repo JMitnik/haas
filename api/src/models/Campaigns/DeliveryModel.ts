@@ -28,8 +28,20 @@ export const DeliveryModel = objectType({
     t.string('updatedAt', { nullable: true });
     t.field('campaignVariant', { type: CampaignVariantModel });
     t.field('currentStatus', { type: DeliveryStatusEnum });
+
+    t.list.field('events', { type: DeliveryEventModel });
   },
 });
+
+export const DeliveryEventModel = objectType({
+  name: 'DeliveryEventType',
+
+  definition(t) {
+    t.id('id');
+    t.field('status', { type: DeliveryStatusEnum });
+    t.string('createdAt');
+  }
+})
 
 export const DeliveryConnectionModel = objectType({
   name: 'DeliveryConnectionType',
@@ -72,6 +84,7 @@ export const GetDelivery = extendType({
         const delivery = await ctx.prisma.delivery.findFirst({
           where: { id: args.deliveryId || '' },
           include: {
+            events: true,
             campaignVariant: {
               include: {
                 dialogue: true,

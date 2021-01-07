@@ -3,6 +3,13 @@ import { ApolloError } from 'apollo-server';
 import { CustomerType } from '../customer/Customer';
 import { DialogueType } from '../questionnaire/Dialogue';
 
+
+export const CampaignVariantEnum = enumType({
+  name: 'CampaignVariantEnum',
+
+  members: ['SMS', 'EMAIL', 'QUEUE'],
+});
+
 export const CampaignVariantModel = objectType({
   name: 'CampaignVariantType',
   description: 'Variant of campaign',
@@ -12,6 +19,7 @@ export const CampaignVariantModel = objectType({
     t.string('label');
     t.int('weight');
     t.string('body');
+    t.field('type', { type: CampaignVariantEnum });
     t.field('workspace', { type: CustomerType });
     t.field('dialogue', { type: DialogueType });
   }
@@ -155,14 +163,9 @@ export const GetCampaignVariantOfDelivery = extendType({
           label: campaignVariant.label,
           weight: campaignVariant.CampaignVariantToCampaign[0].weight,
           workspace: campaignVariant.workspace,
+          type: campaignVariant.type
         };
       }
     })
   }
 })
-
-export const CampaignVariantEnum = enumType({
-  name: 'CampaignVariantEnum',
-
-  members: ['SMS', 'EMAIL', 'QUEUE'],
-});

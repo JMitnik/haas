@@ -1,7 +1,16 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-export const TableRow = styled.tr``;
+export const TableRow = styled.tr`
+  ${({ theme }) => css`
+    border-left: 3px solid transparent;
+
+    &:hover {
+      cursor: pointer;
+      background: ${theme.colors.gray[100]};
+    }
+  `}
+`;
 
 export const Table = styled.table`
   ${({ theme }) => css`

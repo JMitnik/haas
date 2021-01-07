@@ -53,6 +53,7 @@ export type CampaignVariantType = {
   label: Scalars['String'];
   weight: Scalars['Int'];
   body: Scalars['String'];
+  type: CampaignVariantEnum;
   workspace: Customer;
   dialogue: Dialogue;
   deliveryConnection?: Maybe<DeliveryConnectionType>;
@@ -280,6 +281,13 @@ export type DeliveryConnectionType = ConnectionInterface & {
   nrFinished: Scalars['Int'];
 };
 
+export type DeliveryEventType = {
+  __typename?: 'DeliveryEventType';
+  id: Scalars['ID'];
+  status: DeliveryStatusEnum;
+  createdAt: Scalars['String'];
+};
+
 export enum DeliveryStatusEnum {
   Scheduled = 'SCHEDULED',
   Deployed = 'DEPLOYED',
@@ -300,6 +308,7 @@ export type DeliveryType = {
   updatedAt?: Maybe<Scalars['String']>;
   campaignVariant?: Maybe<CampaignVariantType>;
   currentStatus: DeliveryStatusEnum;
+  events: Array<DeliveryEventType>;
 };
 
 export type Dialogue = {
@@ -1500,7 +1509,10 @@ export type GetWorkspaceCampaignQuery = (
           & Pick<DeliveryType, 'id' | 'deliveryRecipientFirstName' | 'deliveryRecipientLastName' | 'deliveryRecipientEmail' | 'deliveryRecipientPhone' | 'scheduledAt' | 'updatedAt' | 'currentStatus'>
           & { campaignVariant?: Maybe<(
             { __typename?: 'CampaignVariantType' }
-            & Pick<CampaignVariantType, 'id' | 'label'>
+            & Pick<CampaignVariantType, 'id' | 'label' | 'type'>
+          )>, events: Array<(
+            { __typename?: 'DeliveryEventType' }
+            & Pick<DeliveryEventType, 'id' | 'createdAt' | 'status'>
           )> }
         )>, pageInfo: (
           { __typename?: 'PaginationPageInfo' }
@@ -1630,6 +1642,12 @@ export const GetWorkspaceCampaignDocument = gql`
           campaignVariant {
             id
             label
+            type
+          }
+          events {
+            id
+            createdAt
+            status
           }
         }
         nrTotal

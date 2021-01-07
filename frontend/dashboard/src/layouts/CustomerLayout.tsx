@@ -30,7 +30,7 @@ import { NavLink } from 'react-router-dom';
 import { useNavigator } from 'hooks/useNavigator';
 import NotAuthorizedView from './NotAuthorizedView';
 
-const CustomerLayoutContainer = styled(Div)<{ isMobile?: boolean }>`
+const CustomerLayoutContainer = styled(Div) <{ isMobile?: boolean }>`
   ${({ theme, isMobile = false }) => css`
     display: grid;
     background: ${theme.colors.app.background};
@@ -70,7 +70,7 @@ const SubNavItem = styled.li`
       display: flex;
       align-items: center;
       margin: 0 ${theme.gutter / 2}px;
-      color: ${theme.colors.primaries[500]};
+      color: ${theme.isDarkColor ? theme.colors.primaries[500] : theme.colors.primaries[800]};
       padding: 4px 12px ;
     }
 
@@ -205,10 +205,10 @@ const CustomerLayout = ({ children }: { children: React.ReactNode }) => {
                 </Sidenav>
               </motion.div>
             ) : (
-              <MobileBottomNav>
-                <DashboardNav customerSlug={params.customerSlug} />
-              </MobileBottomNav>
-            )}
+                <MobileBottomNav>
+                  <DashboardNav customerSlug={params.customerSlug} />
+                </MobileBottomNav>
+              )}
           </Div>
 
           <DashboardViewContainer>

@@ -31,6 +31,7 @@ type CampaignVariantType {
   dialogue: Dialogue!
   id: ID!
   label: String!
+  type: CampaignVariantEnum!
   weight: Int!
   workspace: Customer!
 }
@@ -226,6 +227,12 @@ type DeliveryConnectionType implements ConnectionInterface {
   startDate: String
 }
 
+type DeliveryEventType {
+  createdAt: String!
+  id: ID!
+  status: DeliveryStatusEnum!
+}
+
 enum DeliveryStatusEnum {
   DEPLOYED
   FINISHED
@@ -242,6 +249,7 @@ type DeliveryType {
   deliveryRecipientFirstName: String
   deliveryRecipientLastName: String
   deliveryRecipientPhone: String
+  events: [DeliveryEventType!]!
   id: ID!
   scheduledAt: String
   updatedAt: String

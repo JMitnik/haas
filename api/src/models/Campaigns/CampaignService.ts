@@ -36,13 +36,15 @@ export class CampaignService {
         campaignVariant: (!!deliveryOptions || undefined) && {
           id: deliveryOptions?.variantId
         },
-        scheduledAt: {
-        
-        }
-      } 
+      },
     };
     
-    const findManyDeliveriesCallback = ({ props: findManyArgs }: FindManyCallBackProps) => prisma.delivery.findMany(findManyArgs);
+    const findManyDeliveriesCallback = ({ props: findManyArgs }: FindManyCallBackProps) => prisma.delivery.findMany({
+      ...findManyArgs,
+      include: {
+        events: true
+      }
+    });
     const countDeliveriesCallback = async ({ props: countArgs } : FindManyCallBackProps) => prisma.delivery.count(countArgs);
 
     const deliveryPaginationOptions: PaginateProps = {
