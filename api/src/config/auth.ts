@@ -27,7 +27,7 @@ const isFromClient = rule({ cache: 'contextual' })(
   async (parent, args, ctx: APIContext) => {
     if (config.env === 'local') return true;
 
-    if (ctx.req.get('origin') === 'client.haas.live') {
+    if (ctx.req.get('origin') === config.clientUrl) {
       return true;
     }
 
@@ -68,7 +68,6 @@ const authShield = shield({
   },
   Mutation: {
     '*': isSuperAdmin,
-    debugMutation: allow,
     logout: allow,
     createSession: allow,
     appendToInteraction: allow,
@@ -82,8 +81,6 @@ const authShield = shield({
     inviteUser: containsWorkspacePermission(SystemPermissionEnum.CAN_ADD_USERS),
     editWorkspace: containsWorkspacePermission(SystemPermissionEnum.CAN_EDIT_WORKSPACE),
     editUser: or(isSelf, isSuperAdmin),
-
-    // debugMutation: isLocal,
 
     updateDeliveryStatus: isFromClient,
 

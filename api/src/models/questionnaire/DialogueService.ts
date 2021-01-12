@@ -3,17 +3,21 @@ import _, { cloneDeep } from 'lodash';
 import cuid from 'cuid';
 
 import { ApolloError, UserInputError } from 'apollo-server-express';
-import { Dialogue, DialogueCreateInput, DialogueUpdateInput,
+import {
+  Dialogue, DialogueCreateInput, DialogueUpdateInput,
   NodeType,
-  QuestionOptionCreateManyWithoutQuestionNodeInput, Tag, TagWhereUniqueInput } from '@prisma/client';
+  QuestionOptionCreateManyWithoutQuestionNodeInput, Tag, TagWhereUniqueInput
+} from '@prisma/client';
 import { isPresent } from 'ts-is-present';
 import NodeService from '../QuestionNode/NodeService';
 import filterDate from '../../utils/filterDate';
 // eslint-disable-next-line import/no-cycle
 import { NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
 // eslint-disable-next-line import/no-cycle
-import { HistoryDataProps, HistoryDataWithEntry, IdMapProps,
-  PathFrequency, QuestionProps, StatisticsProps } from './DialogueTypes';
+import {
+  HistoryDataProps, HistoryDataWithEntry, IdMapProps,
+  PathFrequency, QuestionProps, StatisticsProps
+} from './DialogueTypes';
 // eslint-disable-next-line import/no-cycle
 import NodeEntryService, { NodeEntryWithTypes } from '../node-entry/NodeEntryService';
 // eslint-disable-next-line import/no-cycle
@@ -31,7 +35,7 @@ class DialogueService {
     dialogueSlug: string,
     description: string,
     publicTitle: string = '',
-    tags: Array<{id: string}> = [],
+    tags: Array<{ id: string }> = [],
   ): DialogueCreateInput {
     const constructDialogueFragment = {
       customer: { connect: { id: customerId } },
@@ -58,7 +62,7 @@ class DialogueService {
     )) { return true; }
 
     if (dialogue.publicTitle?.toLowerCase().includes(
-        searchTerm.toLowerCase()
+      searchTerm.toLowerCase()
     )) { return true; }
 
     if (dialogue.tags.find((tag) => tag.name.toLowerCase().includes(
@@ -279,7 +283,12 @@ class DialogueService {
     const nodeEntryTextValues = SessionService.getTextEntriesFromSessions(sessions).filter(isPresent);
 
     // Merge text-entries with relevant score by the root-slider based on their sessionId
-    const textAndScoreEntries = _.values(_.merge(_.keyBy(nodeEntryTextValues, 'sessionId'), _.keyBy(history, 'sessionId')));
+    const historyBySession = _.keyBy(history, 'sessionId');
+    const textAndScoreEntries = nodeEntryTextValues.map(val => ({
+      ...val,
+      x: val.sessionId ? historyBySession[val.sessionId].x : undefined,
+      y: val.sessionId ? historyBySession[val.sessionId].y : undefined,
+    }));
 
     // Get the top paths
     const isPositiveEntries = _.groupBy(textAndScoreEntries, (entry) => entry.y && entry.y > 50);
@@ -442,7 +451,7 @@ class DialogueService {
     dialogueSlug: string,
     description: string,
     publicTitle: string = '',
-    tags: Array<{id: string}> = [],
+    tags: Array<{ id: string }> = [],
   ) => {
     try {
       const dialogue = await prisma.dialogue.create({
@@ -468,7 +477,7 @@ class DialogueService {
     dialogueSlug: string,
     description: string,
     publicTitle: string = '',
-    tags: Array<{id: string}> = []) => {
+    tags: Array<{ id: string }> = []) => {
     const templateDialogue = await prisma.dialogue.findOne({
       where: {
         id: templateId,
@@ -649,9 +658,11 @@ class DialogueService {
             isLeaf: leaf.isLeaf,
             title: leaf.title,
             options: leaf.options,
-            overrideLeaf: leaf.overrideLeaf?.id ? { connect: {
-              id: leaf.overrideLeaf.id,
-            } } : undefined,
+            overrideLeaf: leaf.overrideLeaf?.id ? {
+              connect: {
+                id: leaf.overrideLeaf.id,
+              }
+            } : undefined,
             type: leaf.type,
             sliderNode: leaf.sliderNode ? {
               create: {
@@ -812,7 +823,7 @@ class DialogueService {
     customerName: string,
     dialogueTitle: string = 'Default dialogue',
     dialogueDescription: string = 'Default questions',
-    tags: Array<{id: string}>,
+    tags: Array<{ id: string }>,
   ): Promise<Dialogue> => {
     const dialogue = await DialogueService.initDialogue(
       customerId, dialogueTitle, dialogueSlug, dialogueDescription, '', tags,

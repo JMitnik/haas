@@ -52,10 +52,19 @@ class SessionService {
 
     try {
       if (sessionInput.deliveryId) {
-        await prisma.delivery.update({
+        const deliveryUpdate = prisma.delivery.update({
           where: { id: sessionInput.deliveryId },
           data: { currentStatus: 'FINISHED' }
-        })
+        });
+
+        const deliveryEventCreation = prisma.deliveryEvents.create({
+          data: {
+            Delivery: { connect: { id: sessionInput.deliveryId } },
+            status: 'FINISHED'
+          }
+        });
+
+        await prisma.$transaction([deliveryUpdate, deliveryEventCreation]);
       }
     } catch (error) {
       console.log(error);
@@ -112,7 +121,6 @@ class SessionService {
 
     const textEntries = sessions.flatMap((session) => session.nodeEntries).filter((entry) => {
       const isTextEntry = entry?.relatedNode?.type && TEXT_NODES.includes(entry?.relatedNode?.type);
-
       return isTextEntry;
     });
 
@@ -153,7 +161,7 @@ class SessionService {
     return rootedNodeEntry?.sliderNodeEntry?.value;
   }
 
-  static formatOrderBy(orderByArray?: NexusGenInputs['PaginationSortInput'][]): (SessionOrderByInput|undefined) {
+  static formatOrderBy(orderByArray?: NexusGenInputs['PaginationSortInput'][]): (SessionOrderByInput | undefined) {
     if (!orderByArray?.length) return undefined;
 
     const orderBy = orderByArray[0];
@@ -284,7 +292,7 @@ class SessionService {
       return sessions || [];
     };
 
-    const countSessions = async ({ paginationOpts: paginationOptions, rest } : FindManyCallBackProps) => {
+    const countSessions = async ({ paginationOpts: paginationOptions, rest }: FindManyCallBackProps) => {
       const { dialogueId } = rest;
       const startDate = paginationOptions?.startDate ? new Date(paginationOptions?.startDate) : null;
       const endDate = paginationOptions?.endDate ? new Date(paginationOptions?.endDate) : null;
