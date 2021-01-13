@@ -96,6 +96,31 @@ export const GetJobQuery = queryField('getJob', {
   },
 });
 
+export const UpdateCreatWorkspaceJobMutation = mutationField('updateCreateWorkspaceJob', {
+  type: CreateWorkspaceJobType,
+  nullable: true,
+  args: { id: 'String', status: JobStatusType, resourceUrl: 'String', referenceId: 'String' },
+  resolve(parent, args, ctx) {
+    const { id, resourceUrl, status } = args;
+
+    if (!args.id) {
+      return null;
+    }
+
+    return ctx.prisma.createWorkspaceJob.update({
+      where: {
+        id: id || undefined,
+      },
+      data: {
+        resourcesUrl: resourceUrl,
+        status: status || undefined,
+      },
+
+    }) as any;
+  },
+
+});
+
 export const UpdateJobMutation = mutationField('updateJob', {
   type: JobObjectType,
   nullable: true,

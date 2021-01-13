@@ -835,6 +835,7 @@ export interface NexusGenFieldTypes {
     register: string | null; // String
     requestInvite: NexusGenRootTypes['RequestInviteOutput']; // RequestInviteOutput!
     singleUpload: NexusGenRootTypes['ImageType']; // ImageType!
+    updateCreateWorkspaceJob: NexusGenRootTypes['CreateWorkspaceJobType'] | null; // CreateWorkspaceJobType
     updateCTA: NexusGenRootTypes['QuestionNode']; // QuestionNode!
     updateJob: NexusGenRootTypes['JobObjectType'] | null; // JobObjectType
     updateQuestion: NexusGenRootTypes['QuestionNode']; // QuestionNode!
@@ -1195,6 +1196,12 @@ export interface NexusGenArgTypes {
     }
     singleUpload: { // args
       file?: any | null; // Upload
+    }
+    updateCreateWorkspaceJob: { // args
+      id?: string | null; // String
+      referenceId?: string | null; // String
+      resourceUrl?: string | null; // String
+      status?: NexusGenEnums['JobStatusType'] | null; // JobStatusType
     }
     updateCTA: { // args
       input?: NexusGenInputs['UpdateCTAInputType'] | null; // UpdateCTAInputType
