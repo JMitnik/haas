@@ -1,0 +1,13 @@
+{
+  "version": "0.3.14-fixed",
+  "steps": [
+    {
+      "tag": "UpdateEnum",
+      "enum": "JobStatusType",
+      "createdValues": [
+        "PRE_PROCESSING_LOGO",
+        "PRE_PROCESSING_WEBSITE_SCREENSHOT"
+      ]
+    }
+  ]
+}
