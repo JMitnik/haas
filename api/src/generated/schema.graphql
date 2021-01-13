@@ -578,6 +578,7 @@ type Query {
   dialogue(where: DialogueWhereUniqueInput): Dialogue
   dialogues(filter: DialogueFilterInputType): [Dialogue!]!
   edge(id: String): Edge
+  getJob(id: String): CreateWorkspaceJobType
   lineChartData(dialogueId: String, limit: Int, numberOfDaysBack: Int, offset: Int): [lineChartDataType!]!
   me: UserType!
   questionNode(where: QuestionNodeWhereUniqueInput): QuestionNode

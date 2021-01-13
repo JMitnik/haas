@@ -1,5 +1,5 @@
 
-import { enumType, inputObjectType, mutationField, objectType } from '@nexus/schema';
+import { enumType, inputObjectType, mutationField, objectType, queryField } from '@nexus/schema';
 import AutodeckService from './AutodeckService';
 
 export const CloudReferenceType = enumType({
@@ -75,6 +75,24 @@ export const GenerateAutodeckMutation = mutationField('generateAutodeck', {
     const job = await AutodeckService.createJob(input);
 
     return job ? job as any : null;
+  },
+});
+
+export const GetJobQuery = queryField('getJob', {
+  type: CreateWorkspaceJobType,
+  nullable: true,
+  args: { id: 'String' },
+  async resolve(parent, args, ctx) {
+    if (!args.id) return null;
+
+    const job = await ctx.prisma.createWorkspaceJob.findOne({
+      where: {
+        id: args.id,
+      },
+    });
+
+    return job ? job as any : null;
+    // return null;
   },
 });
 

@@ -874,6 +874,7 @@ export interface NexusGenFieldTypes {
     dialogue: NexusGenRootTypes['Dialogue'] | null; // Dialogue
     dialogues: NexusGenRootTypes['Dialogue'][]; // [Dialogue!]!
     edge: NexusGenRootTypes['Edge'] | null; // Edge
+    getJob: NexusGenRootTypes['CreateWorkspaceJobType'] | null; // CreateWorkspaceJobType
     lineChartData: NexusGenRootTypes['lineChartDataType'][]; // [lineChartDataType!]!
     me: NexusGenRootTypes['UserType']; // UserType!
     questionNode: NexusGenRootTypes['QuestionNode'] | null; // QuestionNode
@@ -1227,6 +1228,9 @@ export interface NexusGenArgTypes {
       filter?: NexusGenInputs['DialogueFilterInputType'] | null; // DialogueFilterInputType
     }
     edge: { // args
+      id?: string | null; // String
+    }
+    getJob: { // args
       id?: string | null; // String
     }
     lineChartData: { // args
