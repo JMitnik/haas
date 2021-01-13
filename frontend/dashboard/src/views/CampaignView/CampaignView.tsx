@@ -305,7 +305,10 @@ export const CampaignView = () => {
                     <UI.Span color="gray.500">
                       {event?.createdAt && (
                         <>
-                          {format(parseInt(event?.createdAt, 10), 'MMM Mo HH:mm')}
+                          {format(
+                            new Date(parseInt(event?.createdAt, 10)),
+                            'MMM Do HH:mm'
+                          )}
                         </>
                       )}
                     </UI.Span>
