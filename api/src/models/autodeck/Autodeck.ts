@@ -1,6 +1,8 @@
 
 import { enumType, inputObjectType, mutationField, objectType, queryField } from '@nexus/schema';
 import AutodeckService from './AutodeckService';
+import { PaginationWhereInput } from '../general/Pagination';
+import { NexusGenFieldTypes } from '../../generated/nexus';
 
 export const CloudReferenceType = enumType({
   name: 'CloudReferenceType',
@@ -96,6 +98,36 @@ export const GetJobQuery = queryField('getJob', {
     // return null;
   },
 });
+
+export const AutodeckConnectionModel = objectType({
+  name: 'AutodeckConnectionType',
+  
+  definition(t) {
+    t.implements('ConnectionInterface');
+    t.list.field('jobs', { type: CreateWorkspaceJobType });
+  }
+});
+
+export const GetAutodeckJobsQuery = queryField('getAutodeckJobs', {
+  type: AutodeckConnectionModel,
+  args: { filter: PaginationWhereInput },
+
+  async resolve(parent, args) {
+    const { entries, pageInfo } = await AutodeckService.paginatedAutodeckJobs({
+      limit: args.filter?.limit,
+      offset: args.filter?.offset,
+      orderBy: args.filter?.orderBy,
+      search: args.filter?.searchTerm,
+    });
+
+    return { 
+      jobs: entries as NexusGenFieldTypes['CreateWorkspaceJobType'][], 
+      pageInfo, 
+      offset: args.filter?.offset || 0, 
+      limit: args.filter?.limit || 0 
+    };
+  },
+})
 
 export const UpdateCreatWorkspaceJobMutation = mutationField('updateCreateWorkspaceJob', {
   type: CreateWorkspaceJobType,

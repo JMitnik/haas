@@ -10,6 +10,15 @@ input AppendToInteractionInput {
   sessionId: ID
 }
 
+type AutodeckConnectionType implements ConnectionInterface {
+  endDate: String
+  jobs: [CreateWorkspaceJobType!]!
+  limit: Int!
+  offset: Int!
+  pageInfo: PaginationPageInfo!
+  startDate: String
+}
+
 """Campaign"""
 type CampaignType {
   deliveryConnection(filter: DeliveryConnectionFilter): DeliveryConnectionType
@@ -701,6 +710,7 @@ type Query {
   dialogue(where: DialogueWhereUniqueInput): Dialogue
   dialogues(filter: DialogueFilterInputType): [Dialogue!]!
   edge(id: String): Edge
+  getAutodeckJobs(filter: PaginationWhereInput): AutodeckConnectionType!
   getJob(id: String): CreateWorkspaceJobType
   lineChartData(dialogueId: String, limit: Int, numberOfDaysBack: Int, offset: Int): [lineChartDataType!]!
   me: UserType!

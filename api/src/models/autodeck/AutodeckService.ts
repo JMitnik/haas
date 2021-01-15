@@ -6,6 +6,9 @@ import fetch from 'node-fetch';
 
 import config from '../../config/config';
 import prisma from '../../config/prisma';
+import { NexusGenInputs } from '../../generated/nexus';
+import { FindManyTriggerArgs } from '@prisma/client';
+import { FindManyCallBackProps, PaginateProps, paginate } from '../../utils/table/pagination';
 
 const s3 = new AWS.S3({ accessKeyId: config.awsAccessKeyId, secretAccessKey: config.awsSecretAccessKey });
 
@@ -21,6 +24,34 @@ interface InputProps {
   website: string;
 }
 class AutodeckService {
+
+  static paginatedAutodeckJobs = async (
+    paginationOpts: NexusGenInputs['PaginationWhereInput'],
+  ) => {
+    const findManyTriggerArgs: FindManyTriggerArgs = {};
+
+    const findManyTriggers = async (
+      { props: findManyArgs } : FindManyCallBackProps,
+    ) => prisma.createWorkspaceJob.findMany(findManyArgs);
+    const countTriggers = async ({ props: countArgs } : FindManyCallBackProps) => prisma.createWorkspaceJob.count(countArgs);
+
+    const paginateProps: PaginateProps = {
+      findManyArgs: {
+        findArgs: findManyTriggerArgs,
+        searchFields: ['name'],
+        orderFields: ['medium', 'type', 'name'],
+        findManyCallBack: findManyTriggers,
+      },
+      countArgs: {
+        countWhereInput: findManyTriggerArgs,
+        countCallBack: countTriggers,
+      },
+      paginationOpts,
+    };
+
+    return paginate(paginateProps);
+  };
+
   static createJob = async (input: InputProps) => {
     const job = await prisma.job.create({
       data: {

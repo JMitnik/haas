@@ -1,0 +1,228 @@
+{
+  "version": "0.3.14-fixed",
+  "steps": [
+    {
+      "tag": "CreateField",
+      "model": "Customer",
+      "field": "CampaignVariant",
+      "type": "CampaignVariant",
+      "arity": "List"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Dialogue",
+      "field": "CampaignVariant",
+      "type": "CampaignVariant",
+      "arity": "List"
+    },
+    {
+      "tag": "CreateField",
+      "model": "CreateWorkspaceJob",
+      "field": "createdAt",
+      "type": "DateTime",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "CreateWorkspaceJob",
+          "field": "createdAt"
+        },
+        "directive": "default"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "CreateWorkspaceJob",
+          "field": "createdAt"
+        },
+        "directive": "default"
+      },
+      "argument": "",
+      "value": "now()"
+    },
+    {
+      "tag": "CreateField",
+      "model": "CreateWorkspaceJob",
+      "field": "updatedAt",
+      "type": "DateTime",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "CreateWorkspaceJob",
+          "field": "updatedAt"
+        },
+        "directive": "updatedAt"
+      }
+    },
+    {
+      "tag": "CreateField",
+      "model": "CreateWorkspaceJob",
+      "field": "name",
+      "type": "String",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateField",
+      "model": "CampaignVariant",
+      "field": "CampaignVariantToCampaign",
+      "type": "CampaignVariantToCampaign",
+      "arity": "List"
+    },
+    {
+      "tag": "CreateField",
+      "model": "CampaignVariant",
+      "field": "Delivery",
+      "type": "Delivery",
+      "arity": "List"
+    },
+    {
+      "tag": "CreateField",
+      "model": "CampaignVariant",
+      "field": "customerId",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateField",
+      "model": "CampaignVariant",
+      "field": "dialogueId",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "CampaignVariant",
+          "field": "workspace"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "CampaignVariant",
+          "field": "workspace"
+        },
+        "directive": "relation"
+      },
+      "argument": "fields",
+      "value": "[customerId]"
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "CampaignVariant",
+          "field": "workspace"
+        },
+        "directive": "relation"
+      },
+      "argument": "references",
+      "value": "[id]"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "CampaignVariant",
+          "field": "dialogue"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "CampaignVariant",
+          "field": "dialogue"
+        },
+        "directive": "relation"
+      },
+      "argument": "fields",
+      "value": "[dialogueId]"
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "CampaignVariant",
+          "field": "dialogue"
+        },
+        "directive": "relation"
+      },
+      "argument": "references",
+      "value": "[id]"
+    },
+    {
+      "tag": "CreateField",
+      "model": "DeliveryEvents",
+      "field": "Delivery",
+      "type": "Delivery",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "DeliveryEvents",
+          "field": "Delivery"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "DeliveryEvents",
+          "field": "Delivery"
+        },
+        "directive": "relation"
+      },
+      "argument": "fields",
+      "value": "[deliveryId]"
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "DeliveryEvents",
+          "field": "Delivery"
+        },
+        "directive": "relation"
+      },
+      "argument": "references",
+      "value": "[id]"
+    }
+  ]
+}
