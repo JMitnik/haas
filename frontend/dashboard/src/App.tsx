@@ -13,6 +13,7 @@ import { DialogueProvider } from 'providers/DialogueProvider';
 import { ROUTES } from 'hooks/useNavigator';
 import { SystemPermission } from 'types/globalTypes';
 import ActionsPage from 'pages/dashboard/actions';
+import AutodeckOverview from 'views/AutodeckOverview/AutodeckOverview'
 import AddCustomerPage from 'pages/dashboard/customers/add';
 import AddDialogueView from 'views/AddDialogueView';
 import AddTriggerView from 'views/TriggerOverview/AddTriggerView';
@@ -232,6 +233,12 @@ const AppRoutes = () => (
       <Route
         path="/dashboard/b/:customerSlug"
         render={() => <CustomerRoutes />}
+      />
+
+      <GuardedRoute
+        // allowedPermission={SystemPermission.CAN_CREATE_DELIVERIES}
+        path={ROUTES.AUTODECK_OVERVIEW}
+        render={() => <AutodeckOverview />}
       />
 
       <GuardedRoute
