@@ -64,6 +64,13 @@ export type ChoiceNodeEntryInput = {
   value?: Maybe<Scalars['String']>;
 };
 
+export enum CloudReferenceType {
+  Aws = 'AWS',
+  Gcp = 'GCP',
+  Azure = 'Azure',
+  Ibm = 'IBM'
+}
+
 export type ColourSettings = {
   __typename?: 'ColourSettings';
   id: Scalars['ID'];
@@ -159,6 +166,15 @@ export type CreateWorkspaceInput = {
   willGenerateFakeData?: Maybe<Scalars['Boolean']>;
 };
 
+export type CreateWorkspaceJobType = {
+  __typename?: 'CreateWorkspaceJobType';
+  id: Scalars['String'];
+  referenceId: Scalars['String'];
+  status: JobStatusType;
+  resourceUrl: Scalars['String'];
+  cloudReference: CloudReferenceType;
+};
+
 export type CtaLinkInputObjectType = {
   url?: Maybe<Scalars['String']>;
   type?: Maybe<LinkTypeEnumType>;
@@ -232,11 +248,6 @@ export type CustomerWhereUniqueInput = {
   id: Scalars['ID'];
 };
 
-
-export type Debug = {
-  __typename?: 'Debug';
-  debugResolver?: Maybe<Scalars['String']>;
-};
 
 export type DeleteDialogueInputType = {
   id?: Maybe<Scalars['ID']>;
@@ -511,6 +522,19 @@ export type FormNodeType = {
   fields: Array<FormNodeField>;
 };
 
+/** Generate sales documents */
+export type GenerateAutodeckInput = {
+  name: Scalars['String'];
+  website: Scalars['String'];
+  logo: Scalars['String'];
+  primaryColour: Scalars['String'];
+  firstName: Scalars['String'];
+  answer1: Scalars['String'];
+  answer2: Scalars['String'];
+  answer3: Scalars['String'];
+  answer4: Scalars['String'];
+};
+
 export type GetCampaignsInput = {
   customerSlug?: Maybe<Scalars['String']>;
 };
@@ -534,6 +558,27 @@ export type InviteUserOutput = {
   didInvite: Scalars['Boolean'];
   didAlreadyExist: Scalars['Boolean'];
 };
+
+export type JobObjectType = {
+  __typename?: 'JobObjectType';
+  id: Scalars['String'];
+  createdAt: Scalars['String'];
+  updatedAt: Scalars['String'];
+  createWorkspaceJobId: Scalars['String'];
+  createWorkspaceJob?: Maybe<CreateWorkspaceJobType>;
+};
+
+export enum JobStatusType {
+  Pending = 'PENDING',
+  PreProcessing = 'PRE_PROCESSING',
+  InPhotoshopQueue = 'IN_PHOTOSHOP_QUEUE',
+  PreProcessingLogo = 'PRE_PROCESSING_LOGO',
+  PreProcessingWebsiteScreenshot = 'PRE_PROCESSING_WEBSITE_SCREENSHOT',
+  PhotoshopProcessing = 'PHOTOSHOP_PROCESSING',
+  Completed = 'COMPLETED',
+  Failed = 'FAILED',
+  ReadyForProcessing = 'READY_FOR_PROCESSING'
+}
 
 export type LineChartDataType = {
   __typename?: 'lineChartDataType';
@@ -579,6 +624,9 @@ export type LoginOutput = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  generateAutodeck?: Maybe<JobObjectType>;
+  updateCreateWorkspaceJob?: Maybe<CreateWorkspaceJobType>;
+  updateJob?: Maybe<JobObjectType>;
   assignTags: Dialogue;
   createTag: Tag;
   deleteTag: Tag;
@@ -619,7 +667,27 @@ export type Mutation = {
   /** Create Call to Actions */
   createCTA: QuestionNode;
   updateCTA: QuestionNode;
-  debugMutation?: Maybe<Scalars['String']>;
+};
+
+
+export type MutationGenerateAutodeckArgs = {
+  input?: Maybe<GenerateAutodeckInput>;
+};
+
+
+export type MutationUpdateCreateWorkspaceJobArgs = {
+  id?: Maybe<Scalars['String']>;
+  status?: Maybe<JobStatusType>;
+  resourceUrl?: Maybe<Scalars['String']>;
+  referenceId?: Maybe<Scalars['String']>;
+};
+
+
+export type MutationUpdateJobArgs = {
+  id?: Maybe<Scalars['String']>;
+  status?: Maybe<JobStatusType>;
+  resourceUrl?: Maybe<Scalars['String']>;
+  referenceId?: Maybe<Scalars['String']>;
 };
 
 
@@ -936,6 +1004,7 @@ export type PermssionType = {
 
 export type Query = {
   __typename?: 'Query';
+  getJob?: Maybe<CreateWorkspaceJobType>;
   tags: Array<Tag>;
   delivery?: Maybe<DeliveryType>;
   triggerConnection?: Maybe<TriggerConnectionType>;
@@ -958,6 +1027,11 @@ export type Query = {
   questionNode?: Maybe<QuestionNode>;
   questionNodes: Array<QuestionNode>;
   edge?: Maybe<Edge>;
+};
+
+
+export type QueryGetJobArgs = {
+  id?: Maybe<Scalars['String']>;
 };
 
 

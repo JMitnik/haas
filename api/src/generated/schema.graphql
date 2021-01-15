@@ -431,7 +431,6 @@ type FormNodeType {
   id: String
 }
 
-<<<<<<< HEAD
 """Generate sales documents"""
 input GenerateAutodeckInput {
   answer1: String!
@@ -443,10 +442,10 @@ input GenerateAutodeckInput {
   name: String!
   primaryColour: String!
   website: String!
-=======
+}
+
 input GetCampaignsInput {
   customerSlug: String
->>>>>>> dev
 }
 
 type ImageType {
@@ -567,11 +566,8 @@ type Mutation {
   singleUpload(file: Upload): ImageType!
   updateCreateWorkspaceJob(id: String, referenceId: String, resourceUrl: String, status: JobStatusType): CreateWorkspaceJobType
   updateCTA(input: UpdateCTAInputType): QuestionNode!
-<<<<<<< HEAD
-  updateJob(id: String, referenceId: String, resourceUrl: String, status: JobStatusType): JobObjectType
-=======
   updateDeliveryStatus(deliveryId: String, status: DeliveryStatusEnum): String!
->>>>>>> dev
+  updateJob(id: String, referenceId: String, resourceUrl: String, status: JobStatusType): JobObjectType
   updateQuestion(input: UpdateQuestionNodeInputType): QuestionNode!
   updateRoles(permissions: PermissionIdsInput, roleId: String): RoleType!
 

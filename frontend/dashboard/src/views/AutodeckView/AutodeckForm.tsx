@@ -7,7 +7,7 @@ import {
   RadioButton,
 } from '@haas/ui';
 import { useHistory } from 'react-router';
-import { useMutation } from '@apollo/react-hooks';
+import { useMutation } from '@apollo/client';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
 import intToBool from 'utils/intToBool';

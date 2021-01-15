@@ -5,7 +5,7 @@ import {
 import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { useHistory } from 'react-router';
-import { useMutation } from '@apollo/react-hooks';
+import { useMutation } from '@apollo/client';
 import { useToast } from '@chakra-ui/core';
 import { yupResolver } from '@hookform/resolvers';
 import React from 'react';
