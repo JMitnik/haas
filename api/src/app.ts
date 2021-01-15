@@ -1,4 +1,5 @@
 import cookieParser from 'cookie-parser';
+import bodyParser from 'body-parser';
 import cors, { CorsOptions } from 'cors';
 import express from 'express';
 import fs from 'fs';
@@ -6,6 +7,7 @@ import https from 'https';
 
 import config from './config/config';
 import makeApollo from './config/apollo';
+import { CampaignService } from './models/Campaigns/CampaignService';
 
 process.on('SIGINT', () => {
   console.log('received sigint');
@@ -35,10 +37,20 @@ const main = async () => {
     credentials: true,
   };
 
+  app.post('/webhooks', bodyParser.json(), async (req: any, res: any, next: any) => {
+    res.send('success');
+  });
+
+  app.post('/webhooks/delivery', bodyParser.json(), async (req: any, res: any, next: any) => {
+    console.log(req.body);
+    await CampaignService.updateBatchDeliveries(req.body);
+    res.status(200).end();
+  });
+
   app.use(cookieParser());
   app.use(cors(corsOptions));
 
-  apollo.applyMiddleware({ app, cors: false });
+  apollo.applyMiddleware({ app, cors: false,  });
 
   console.log('🏳️\tStarting the server');
   if (config.useSSL) {

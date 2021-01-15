@@ -1,0 +1,28 @@
+{
+  "version": "0.3.14-fixed",
+  "steps": [
+    {
+      "tag": "UpdateEnum",
+      "enum": "SystemPermissionEnum",
+      "createdValues": [
+        "CAN_VIEW_CAMPAIGNS",
+        "CAN_CREATE_CAMPAIGNS",
+        "CAN_CREATE_DELIVERIES"
+      ]
+    },
+    {
+      "tag": "CreateField",
+      "model": "DeliveryEvents",
+      "field": "deliveryId",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateField",
+      "model": "DeliveryEvents",
+      "field": "workSpaceId",
+      "type": "String",
+      "arity": "Required"
+    }
+  ]
+}

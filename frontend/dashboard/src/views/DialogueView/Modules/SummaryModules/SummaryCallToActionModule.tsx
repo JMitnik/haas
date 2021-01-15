@@ -4,7 +4,7 @@ import React from 'react';
 import { Card, CardBody, Flex, H2, H3, Paragraph, Span } from '@haas/ui';
 
 const SummaryCallToActionModule = ({ callToActionCount }: { callToActionCount: number }) => {
-  const { customerSlug, dialogueSlug } = useParams();
+  const { customerSlug, dialogueSlug } = useParams<{ customerSlug: string, dialogueSlug: string }>();
   const history = useHistory();
 
   return (
@@ -20,18 +20,18 @@ const SummaryCallToActionModule = ({ callToActionCount }: { callToActionCount: n
           {!callToActionCount ? (
             <H2 color="default.darkest" mb={2}>No call to actions yet</H2>
           ) : (
-            <p>
-              <H2 color="default.darkest">
-                { callToActionCount }
-              </H2>
-              {' '}
-              <Span color="default.darker">
-                user(s) have interacted with the call to actions
+              <p>
+                <H2 color="default.darkest">
+                  {callToActionCount}
+                </H2>
+                {' '}
+                <Span color="default.darker">
+                  user(s) have interacted with the call to actions
 
-                is the score of this dialogue
+                  is the score of this dialogue
               </Span>
-            </p>
-          )}
+              </p>
+            )}
         </Paragraph>
       </CardBody>
     </Card>

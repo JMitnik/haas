@@ -3,7 +3,7 @@ import { Container, Div } from '@haas/ui';
 import { LogoContainer } from 'components/Logo/Logo';
 import Logo from 'components/Logo';
 import React from 'react';
-import styled, { css } from 'styled-components/macro';
+import styled, { css } from 'styled-components';
 
 import { Usernav, UsernavContainer } from '../components/Sidenav/Sidenav';
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import Color from 'color';
 import { ChevronRight } from 'react-feather';
-import styled, { css } from 'styled-components/macro';
+import styled, { css } from 'styled-components';
 
 import { Div } from '.';
 import { Span } from './Span';

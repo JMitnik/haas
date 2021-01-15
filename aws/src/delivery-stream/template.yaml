@@ -1,0 +1,28 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  delivery-stream
+
+  Sample SAM Template for delivery-stream
+  
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 15
+
+Resources:
+  DeliveryStreamHandler:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: delivery-stream-app/
+      Handler: app.lambdaHandler
+      Runtime: nodejs12.x
+      Policies:
+        - SESEmailTemplateCrudPolicy: {}
+      Events:
+        DynamoStream:
+          Type: DynamoDB
+          Properties:
+            Stream: !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/CampaignDeliveries/stream/2020-12-26T13:41:08.234'
+            StartingPosition: TRIM_HORIZON
+            BatchSize: 30

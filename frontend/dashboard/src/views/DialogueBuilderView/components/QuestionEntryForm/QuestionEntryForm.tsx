@@ -1,34 +1,35 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-
-import 'easymde/dist/easymde.min.css';
 import * as UI from '@haas/ui';
 import * as yup from 'yup';
-import { ApolloError } from 'apollo-client';
-import { Button, ButtonGroup, FormErrorMessage, Popover, PopoverArrow,
-  PopoverBody, PopoverCloseButton, PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast } from '@chakra-ui/core';
+import {
+  Button, ButtonGroup, FormErrorMessage, Popover, PopoverArrow,
+  PopoverBody, PopoverCloseButton, PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast
+} from '@chakra-ui/core';
 import { Controller, useForm } from 'react-hook-form';
 import { MinusCircle, PlusCircle, Trash } from 'react-feather';
 import { debounce } from 'lodash';
-import { useMutation } from '@apollo/react-hooks';
+import { useMutation, gql } from '@apollo/client';
 import { useParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { yupResolver } from '@hookform/resolvers';
 import React, { useCallback, useEffect, useState } from 'react';
 import Select from 'react-select';
-import SimpleMDE from 'react-simplemde-editor';
 
 import {
   DeleteQuestionOptionButtonContainer,
 } from 'views/DialogueBuilderView/components/QuestionEntry/QuestionEntryStyles';
-import { Div, Flex, Form, FormContainer, FormControl, FormLabel,
-  FormSection, H4, Hr, Input, InputGrid, InputHelper, Muted, Span, Text } from '@haas/ui';
+import {
+  Div, Flex, Form, FormContainer, FormControl, FormLabel,
+  FormSection, H4, Hr, Input, InputGrid, InputHelper, Muted, Span, Text
+} from '@haas/ui';
 import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
 import { useCustomer } from 'providers/CustomerProvider';
-import createQuestionMutation from 'mutations/createQuestion';
 import updateQuestionMutation from 'mutations/updateQuestion';
 
-import { EdgeConditonProps,
-  OverrideLeafProps, QuestionEntryProps, QuestionOptionProps } from '../../DialogueBuilderInterfaces';
+import {
+  EdgeConditonProps,
+  OverrideLeafProps, QuestionEntryProps, QuestionOptionProps
+} from '../../DialogueBuilderInterfaces';
 import SliderNodeForm from './SliderNodeForm';
 
 interface SliderNodeMarkerProps {
@@ -113,6 +114,14 @@ const questionTypes = [
   { value: 'CHOICE', label: 'Choice' },
 ];
 
+const createQuestionMutation = gql`
+  mutation createQuestion($input: CreateQuestionNodeInputType!) {
+    createQuestion(input: $input) {
+        id
+    }
+  }
+`;
+
 const QuestionEntryForm = ({
   onAddExpandChange,
   id,
@@ -132,7 +141,7 @@ const QuestionEntryForm = ({
   onScroll,
 }: QuestionEntryFormProps) => {
   const { activeCustomer } = useCustomer();
-  const { customerSlug, dialogueSlug } = useParams();
+  const { customerSlug, dialogueSlug } = useParams<{ customerSlug: string, dialogueSlug: string }>();
 
   const { t } = useTranslation();
 
@@ -166,9 +175,9 @@ const QuestionEntryForm = ({
   const [activeOptions, setActiveOptions] = useState(options);
 
   const matchValue = condition?.matchValue ? { label: condition.matchValue, value: condition.matchValue } : null;
-  const [activematchValue, setActiveMatchValue] = useState<null | {label: string, value: string}>(matchValue);
+  const [activematchValue, setActiveMatchValue] = useState<null | { label: string, value: string }>(matchValue);
   const [activeLeaf, setActiveLeaf] = useState({ label: overrideLeaf?.title, value: overrideLeaf?.id });
-  const [activeConditionSelect, setActiveConditionSelect] = useState<null | { label: string, value: string}>(
+  const [activeConditionSelect, setActiveConditionSelect] = useState<null | { label: string, value: string }>(
     condition?.conditionType ? {
       value: condition.conditionType,
       label: condition.conditionType,
@@ -267,7 +276,7 @@ const QuestionEntryForm = ({
         dialogueSlug,
       },
     }],
-    onError: (serverError: ApolloError) => {
+    onError: (serverError: any) => {
       // eslint-disable-next-line no-console
       console.log(serverError);
 
@@ -301,7 +310,7 @@ const QuestionEntryForm = ({
         dialogueSlug,
       },
     }],
-    onError: (serverError: ApolloError) => {
+    onError: (serverError: any) => {
       // eslint-disable-next-line no-console
       console.log(serverError);
       toast({
@@ -452,12 +461,9 @@ const QuestionEntryForm = ({
                   control={form.control}
                   defaultValue={title}
                   render={({ value, onChange }) => (
-                    <SimpleMDE
+                    <UI.MarkdownEditor
                       value={value}
                       onChange={onChange}
-                      options={{
-                        toolbar: ['bold', 'italic', 'preview', 'guide'],
-                      }}
                     />
                   )}
                 />
@@ -610,7 +616,8 @@ const QuestionEntryForm = ({
                     render={({ onChange, onBlur, value }) => (
                       <Select
                         options={leafs}
-                        value={(activeLeaf?.value && activeLeaf) || leafs[0]}
+                        // @ts-ignore
+                        value={(activeLeaf?.value && activeLeaf) || leafs[0] || ''}
                         onChange={(opt: any) => {
                           handleLeafChange(opt);
                           onChange(opt.value);
@@ -642,51 +649,53 @@ const QuestionEntryForm = ({
           )}
 
           {activeQuestionType && activeQuestionType.value === 'CHOICE' && (
-          <FormSection>
-            <UI.Div />
-            <UI.Div>
-              <Div mb={1} gridColumn="1 / -1">
-                <Flex justifyContent="space-between">
-                  <H4>
-                    {t('options')}
-                  </H4>
-                  <PlusCircle data-cy="AddOption" style={{ cursor: 'pointer' }} onClick={() => addNewOption()} />
-                </Flex>
-
-                <Hr />
-              </Div>
-
-              {!activeOptions.length && !form.errors.options && <Muted>{t('dialogue:add_option_reminder')}</Muted>}
-              {!activeOptions.length && form.errors.options && <Muted color="red">{t('dialogue:empty_option_reminder')}</Muted>}
-              {activeOptions && activeOptions.map((option, optionIndex) => (
-                <Flex key={`container-${option.id}-${optionIndex}`} flexDirection="column">
-                  <Flex my={1} flexDirection="row">
-                    <Flex flexGrow={1}>
-                      <Input
-                        isInvalid={form.errors.options && Array.isArray(form.errors.options) && !!form.errors.options?.[optionIndex]}
-                        id={`options[${optionIndex}]`}
-                        key={`input-${option.id}-${optionIndex}`}
-                        name={`options[${optionIndex}]`}
-                        ref={form.register(
-                          { required: true,
-                            minLength: 1 },
-                        )}
-                        defaultValue={option.value}
-                        onChange={(e: any) => handleOptionChange(e.currentTarget.value, optionIndex)}
-                      />
-                    </Flex>
-
-                    <DeleteQuestionOptionButtonContainer
-                      onClick={(e: any) => deleteOption(e, optionIndex)}
-                    >
-                      <MinusCircle />
-                    </DeleteQuestionOptionButtonContainer>
+            <FormSection>
+              <UI.Div />
+              <UI.Div>
+                <Div mb={1} gridColumn="1 / -1">
+                  <Flex justifyContent="space-between">
+                    <H4>
+                      {t('options')}
+                    </H4>
+                    <PlusCircle data-cy="AddOption" style={{ cursor: 'pointer' }} onClick={() => addNewOption()} />
                   </Flex>
-                  {form.errors.options?.[optionIndex] && <Muted color="warning">Please fill in a proper value!</Muted>}
-                </Flex>
-              ))}
-            </UI.Div>
-          </FormSection>
+
+                  <Hr />
+                </Div>
+
+                {!activeOptions.length && !form.errors.options && <Muted>{t('dialogue:add_option_reminder')}</Muted>}
+                {!activeOptions.length && form.errors.options && <Muted color="red">{t('dialogue:empty_option_reminder')}</Muted>}
+                {activeOptions && activeOptions.map((option, optionIndex) => (
+                  <Flex key={`container-${option.id}-${optionIndex}`} flexDirection="column">
+                    <Flex my={1} flexDirection="row">
+                      <Flex flexGrow={1}>
+                        <Input
+                          isInvalid={form.errors.options && Array.isArray(form.errors.options) && !!form.errors.options?.[optionIndex]}
+                          id={`options[${optionIndex}]`}
+                          key={`input-${option.id}-${optionIndex}`}
+                          name={`options[${optionIndex}]`}
+                          ref={form.register(
+                            {
+                              required: true,
+                              minLength: 1
+                            },
+                          )}
+                          defaultValue={option.value}
+                          onChange={(e: any) => handleOptionChange(e.currentTarget.value, optionIndex)}
+                        />
+                      </Flex>
+
+                      <DeleteQuestionOptionButtonContainer
+                        onClick={(e: any) => deleteOption(e, optionIndex)}
+                      >
+                        <MinusCircle />
+                      </DeleteQuestionOptionButtonContainer>
+                    </Flex>
+                    {form.errors.options?.[optionIndex] && <Muted color="warning">Please fill in a proper value!</Muted>}
+                  </Flex>
+                ))}
+              </UI.Div>
+            </FormSection>
           )}
         </Div>
 

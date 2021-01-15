@@ -1,0 +1,30 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  delivery-scheduler
+
+  Sample SAM Template for delivery-scheduler
+
+Globals:
+  Function:
+    Timeout: 15
+
+Resources:
+  DeliverySchedulerWorkerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: scheduler/
+      Handler: app.lambdaHandler
+      Runtime: nodejs12.x
+      Policies:
+      - AmazonDynamoDBFullAccess
+      Events:
+        CloudWatchEvent:
+          Type: Schedule
+          Properties:
+            Schedule: rate(1 minute)
+              
+Outputs:
+  DeliverySchedulerWorkerFunction:
+    Description: "Delivery Scheduler Function ARN"
+    Value: !GetAtt DeliverySchedulerWorkerFunction.Arn

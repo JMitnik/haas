@@ -1,5 +1,7 @@
-import { Button, ButtonGroup, Popover, PopoverArrow, PopoverBody,
-  PopoverCloseButton, PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast } from '@chakra-ui/core';
+import {
+  Button, ButtonGroup, Popover, PopoverArrow, PopoverBody,
+  PopoverCloseButton, PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast
+} from '@chakra-ui/core';
 import { useHistory } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import Color from 'color';
@@ -9,7 +11,7 @@ import { Card, CardBody, ColumnFlex, H3, Span, Text } from '@haas/ui';
 import { deleteFullCustomerQuery } from 'mutations/deleteFullCustomer';
 import { isValidColor } from 'utils/ColorUtils';
 import { queryMe, useUser } from 'providers/UserProvider';
-import { useMutation } from '@apollo/react-hooks';
+import { useMutation } from '@apollo/client';
 import getCustomersOfUser from 'queries/getCustomersOfUser';
 import useAuth from 'hooks/useAuth';
 

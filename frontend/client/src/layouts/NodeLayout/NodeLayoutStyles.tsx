@@ -1,7 +1,7 @@
 import Color from 'color';
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
-import styled, { css } from 'styled-components/macro';
+import styled, { css } from 'styled-components';
 
 import { Div, H2 } from '@haas/ui';
 

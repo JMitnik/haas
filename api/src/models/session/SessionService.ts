@@ -9,7 +9,7 @@ import { sortBy } from 'lodash';
 import { TEXT_NODES } from '../questionnaire/Dialogue';
 // eslint-disable-next-line import/no-cycle
 // eslint-disable-next-line import/no-cycle
-import { NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
+import { NexusGenFieldTypes, NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
 import NodeEntryService, { NodeEntryWithTypes } from '../node-entry/NodeEntryService';
 // eslint-disable-next-line import/no-cycle
 import { FindManyCallBackProps, PaginateProps, paginate } from '../../utils/table/pagination';
@@ -49,6 +49,26 @@ class SessionService {
         },
       },
     });
+
+    try {
+      if (sessionInput.deliveryId) {
+        const deliveryUpdate = prisma.delivery.update({
+          where: { id: sessionInput.deliveryId },
+          data: { currentStatus: 'FINISHED' }
+        });
+
+        const deliveryEventCreation = prisma.deliveryEvents.create({
+          data: {
+            Delivery: { connect: { id: sessionInput.deliveryId } },
+            status: 'FINISHED'
+          }
+        });
+
+        await prisma.$transaction([deliveryUpdate, deliveryEventCreation]);
+      }
+    } catch (error) {
+      console.log(error);
+    }
 
     try {
       await TriggerService.tryTriggers(session);
@@ -101,7 +121,6 @@ class SessionService {
 
     const textEntries = sessions.flatMap((session) => session.nodeEntries).filter((entry) => {
       const isTextEntry = entry?.relatedNode?.type && TEXT_NODES.includes(entry?.relatedNode?.type);
-
       return isTextEntry;
     });
 
@@ -142,7 +161,7 @@ class SessionService {
     return rootedNodeEntry?.sliderNodeEntry?.value;
   }
 
-  static formatOrderBy(orderByArray?: NexusGenInputs['PaginationSortInput'][]): (SessionOrderByInput|undefined) {
+  static formatOrderBy(orderByArray?: NexusGenInputs['PaginationSortInput'][]): (SessionOrderByInput | undefined) {
     if (!orderByArray?.length) return undefined;
 
     const orderBy = orderByArray[0];
@@ -273,7 +292,7 @@ class SessionService {
       return sessions || [];
     };
 
-    const countSessions = async ({ paginationOpts: paginationOptions, rest } : FindManyCallBackProps) => {
+    const countSessions = async ({ paginationOpts: paginationOptions, rest }: FindManyCallBackProps) => {
       const { dialogueId } = rest;
       const startDate = paginationOptions?.startDate ? new Date(paginationOptions?.startDate) : null;
       const endDate = paginationOptions?.endDate ? new Date(paginationOptions?.endDate) : null;
@@ -318,7 +337,7 @@ class SessionService {
     };
 
     return {
-      sessions: entries,
+      sessions: entries as NexusGenFieldTypes['Session'][],
       offset: paginationOpts?.offset || 0,
       limit: paginationOpts?.limit || 0,
       startDate: paginationOpts?.startDate?.toString(),

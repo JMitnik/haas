@@ -1,8 +1,16 @@
 import React, { forwardRef, Ref, ReactNode } from 'react';
 import 'antd/dist/antd.css'; // Slider,
-import { Slider as AntdSlider } from 'antd';
-import { Div, Paragraph } from '@haas/ui';
+import 'easymde/dist/easymde.min.css'; // Markdown
+import AntdDatePickerGenerate from 'rc-picker/lib/generate/dateFns';
+import generatePicker from 'antd/lib/date-picker/generatePicker';
 import {
+  Slider as AntdSlider,
+  // DatePicker as AntdDatepicker,
+} from 'antd';
+import { Div, Paragraph } from '@haas/ui';
+import SimpleMDE from 'react-simplemde-editor';
+import {
+  ButtonProps as ChakraButtonProps,
   Button,
   FormControl as ChakraFormControl,
   FormLabel as ChakraFormLabel,
@@ -16,23 +24,31 @@ import {
   InputGroupProps,
   FormControlProps,
   Textarea as ChakraTextArea,
-  RadioButtonGroup as ChakraRadioButtonGroup} from '@chakra-ui/core';
+  RadioButtonGroup as ChakraRadioButtonGroup,
+} from '@chakra-ui/core';
 import styled, { css } from 'styled-components';
 import { SpaceProps, GridProps } from 'styled-system';
 import { InputHTMLAttributes } from 'react';
 import Color from 'color';
 import { FormLabelProps } from '@chakra-ui/core/dist/FormLabel';
-import { Grid } from './Container';
+import { Grid, Stack } from './Container';
 import { Text } from './Type';
 
-export const FormContainer = styled(Div) <{expandedForm?: boolean}>`
+const AntdDatepicker = generatePicker<Date>(AntdDatePickerGenerate);
+const { RangePicker: AntdRangePicker } = AntdDatepicker;
+
+interface FormContainerProps {
+  expandedForm?: boolean;
+}
+
+export const FormContainer = styled(Div) <FormContainerProps>`
   ${({ theme, expandedForm }) => css`
     padding-bottom: ${theme.gutter * 3}px;
     background: white;
     padding: ${theme.gutter}px;
     border-radius: 10px;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    
+
     ${expandedForm && css`
       box-shadow: none;
     `}
@@ -40,18 +56,18 @@ export const FormContainer = styled(Div) <{expandedForm?: boolean}>`
 `;
 
 export const FormControl = forwardRef((props: FormControlProps, ref) => {
-  const { children, ...restProps } = props
+  const { children, ...restProps } = props;
 
   return (
     <ChakraFormControl display="flex" flexDirection="column" ref={ref} {...restProps}>
       {children}
     </ChakraFormControl>
-  )
+  );
 });
 
 export const FormGroupContainer = styled.div`
   ${({ theme }) => css`
-      padding-bottom: ${theme.gutter * 3}px;
+    padding-bottom: ${theme.gutter * 3}px;
   `}
 `;
 
@@ -68,14 +84,16 @@ export const InputHelper = styled.p`
     font-size: 0.8rem;
     margin-bottom: ${theme.gutter / 2}px;
     max-width: 500px;
+    white-space: pre-wrap;
   `}
 `;
+
+export const FormLabelHelper = InputHelper;
 
 export const Form = styled.form``;
 
 export const DeprecatedInputGroup = styled.div`
   ${({ theme }) => css`
-
     ${DeprecatedInputStyled} {
       border: none;
     }
@@ -120,20 +138,28 @@ interface InputProps extends ChakraInputProps {
   rightAddOn?: ReactNode;
 }
 
-export const Textarea = forwardRef((props: ChakraInputProps<HTMLTextAreaElement>, ref: Ref<HTMLTextAreaElement>) => (
-  <ChakraTextArea {...props} fontSize="0.8rem" ref={ref} />
-));
+export const Textarea = forwardRef(
+  (props: ChakraInputProps<HTMLTextAreaElement>, ref: Ref<HTMLTextAreaElement>) => (
+    <ChakraTextArea {...props} fontSize="0.8rem" ref={ref} />
+  )
+);
 
 export const Input = forwardRef((props: InputProps, ref: Ref<HTMLInputElement>) => (
   <InputGroup>
     {props.leftEl && (
-      <ChakraInputLeftElement color="gray.400" padding="12px"  fontSize="0.5rem" {...props}>
+      <ChakraInputLeftElement color="gray.400" padding="12px" fontSize="0.5rem" {...props}>
         {props.leftEl}
       </ChakraInputLeftElement>
     )}
 
     {props.rightEl && (
-      <ChakraInputRightElement width="auto" color="gray.400" padding="12px" fontSize="0.5rem" {...props}>
+      <ChakraInputRightElement
+        width="auto"
+        color="gray.400"
+        padding="12px"
+        fontSize="0.5rem"
+        {...props}
+      >
         {props.rightEl}
       </ChakraInputRightElement>
     )}
@@ -152,9 +178,14 @@ export const Input = forwardRef((props: InputProps, ref: Ref<HTMLInputElement>) 
 
     <ChakraInput
       errorBorderColor="red.400"
-      roundedBottomLeft={props.leftAddOn ? '0': 'auto'}
-      roundedTopLeft={props.leftAddOn ? '0': 'auto'}
-    {...props} fontSize="0.8rem" ref={ref} />
+      roundedBottomLeft={props.leftAddOn ? '0' : 'auto'}
+      roundedTopLeft={props.leftAddOn ? '0' : 'auto'}
+      roundedBottomRight={props.rightAddOn ? '0' : 'auto'}
+      roundedTopRight={props.rightAddOn ? '0' : 'auto'}
+      {...props}
+      fontSize="0.8rem"
+      ref={ref}
+    />
   </InputGroup>
 ));
 
@@ -171,7 +202,7 @@ export const ErrorStyle = {
   }),
 };
 
-export const StyledInput = styled.input <{isInvalid?: boolean }>`
+export const StyledInput = styled.input<{ isInvalid?: boolean }>`
   ${({ theme, isInvalid }) => css`
     border-radius: ${theme.borderRadiuses.sm};
     background: ${theme.colors.white};
@@ -184,14 +215,15 @@ export const StyledInput = styled.input <{isInvalid?: boolean }>`
     /* Make somehow a color */
     border: 1px solid #dbdde0;
     box-shadow: none;
-    
+
     /* Set to variable */
     padding: 15px;
     width: 100%;
 
-    ${isInvalid && css`
-    border: 1px solid red;
-    outline: none;
+    ${isInvalid &&
+    css`
+      border: 1px solid red;
+      outline: none;
     `}
   `}
 `;
@@ -219,7 +251,7 @@ export const CheckBoxLabel = styled.label`
   cursor: pointer;
 
   &::after {
-    content: "";
+    content: '';
     display: block;
     border-radius: 50%;
     width: 18px;
@@ -239,10 +271,10 @@ export const CheckBox = styled.input`
   height: 26px;
 
   &:checked + ${CheckBoxLabel} {
-    background: #3847B2;
+    background: #3847b2;
 
     &::after {
-      content: "";
+      content: '';
       display: block;
       border-radius: 50%;
       width: 18px;
@@ -257,7 +289,7 @@ type SliderProps = InputHTMLAttributes<HTMLInputElement> | SpaceProps;
 
 export const Slider = forwardRef((props: SliderProps, ref: Ref<HTMLInputElement>) => (
   <SliderContainer>
-    <input {...props} ref={ref} type="range"/>
+    <input {...props} ref={ref} type="range" />
   </SliderContainer>
 ));
 
@@ -290,7 +322,20 @@ const ButtonRadioContainer = styled.div`
   }
 `;
 
-export const RadioButton = forwardRef((props: any, ref) => {
+interface RadioButtonProps {
+  isChecked?: boolean;
+  isDisabled?: boolean;
+  value?: any;
+  text?: string;
+  description?: string;
+  icon?: any;
+  mr?: any;
+  ml?: any;
+  mb?: any;
+  mt?: any;
+}
+
+export const RadioButton = forwardRef((props: RadioButtonProps, ref) => {
   const { isChecked, isDisabled, value, text, description, icon, ...rest } = props;
 
   return (
@@ -310,14 +355,22 @@ export const RadioButton = forwardRef((props: any, ref) => {
         {...rest}
       >
         <Div>
-          <Paragraph color={!isChecked ? 'gray.600' : 'auto'} fontSize="0.9rem">{text}</Paragraph>
-          <Paragraph color={!isChecked ? 'gray.500' : 'auto'} fontWeight={400} mt={2} fontSize="0.7rem">{description}</Paragraph>
+          <Paragraph color={!isChecked ? 'gray.600' : 'auto'} fontSize="0.9rem">
+            {text}
+          </Paragraph>
+          <Paragraph
+            color={!isChecked ? 'gray.500' : 'auto'}
+            fontWeight={400}
+            mt={2}
+            fontSize="0.7rem"
+          >
+            {description}
+          </Paragraph>
         </Div>
-    </Button>
+      </Button>
     </ButtonRadioContainer>
   );
 });
-
 
 export const DeprecatedInputStyled = styled.input`
   ${({ theme }) => css`
@@ -337,7 +390,8 @@ export const DeprecatedInputStyled = styled.input`
       font-weight: 500;
     }
 
-    &:focus, &:active {
+    &:focus,
+    &:active {
       background: ${Color(theme.colors.primary).mix(Color('white'), 0.9).hex()};
       outline: none !important;
     }
@@ -347,7 +401,7 @@ export const DeprecatedInputStyled = styled.input`
 export const Textbox = styled.textarea`
   ${({ theme }) => css`
     border: none;
-    
+
     font-size: ${theme.fontSizes[1]}px;
     border-radius: 10px;
     font-family: 'Open Sans', sans-serif;
@@ -369,9 +423,8 @@ export const Textbox = styled.textarea`
 
 export const SliderContainer = styled.div`
   ${() => css`
-
     /* TODO: Ensure that size is defined by a variable */
-    input[type=range] {
+    input[type='range'] {
       /* Style the input */
       & {
         -webkit-appearance: none; /* Hides the slider so that custom slider can be made */
@@ -468,7 +521,7 @@ export const SliderContainer = styled.div`
         height: 15px;
         cursor: pointer;
         width: 100%;
-        box-shadow: 0px 2px 2px 1px rgba(0,0,0,0.05);
+        box-shadow: 0px 2px 2px 1px rgba(0, 0, 0, 0.05);
         background: linear-gradient(45deg, rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.04));
         border-radius: 10px;
       }
@@ -479,7 +532,7 @@ export const SliderContainer = styled.div`
         height: 15px;
         cursor: pointer;
         width: 100%;
-        box-shadow: 0px 2px 2px 1px rgba(0,0,0,0.05);
+        box-shadow: 0px 2px 2px 1px rgba(0, 0, 0, 0.05);
         background: linear-gradient(45deg, rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.04));
         border-radius: 10px;
       }
@@ -490,18 +543,22 @@ export const SliderContainer = styled.div`
 export const FormSectionContainer = styled(Grid)`
   ${({ theme }) => css`
     & + & {
-      
     }
   `}
 `;
 
 interface FormSectionProps extends GridProps {
-  children: React.ReactNode; 
+  children: React.ReactNode;
   id?: string;
 }
 
 export const FormSection = forwardRef((props: FormSectionProps, ref: Ref<HTMLDivElement>) => (
-  <FormSectionContainer ref={ref} py={4} gridTemplateColumns={['1fr', '1fr', '1fr', '1fr 3fr']} {...props}>
+  <FormSectionContainer
+    ref={ref}
+    py={4}
+    gridTemplateColumns={['1fr', '1fr', '1fr', '1fr 3fr']}
+    {...props}
+  >
     {props.children}
   </FormSectionContainer>
 ));
@@ -531,28 +588,40 @@ interface RadioButtonsProps {
   children: React.ReactNode;
   onChange: any;
   value: any;
-  onBlur: any
+  defaultValue?: any;
+  onBlur: any;
 }
 
-export const RadioButtons = ({ children, onChange, value, onBlur }: RadioButtonsProps) => (
-  <ChakraRadioButtonGroup display="flex" flexWrap="wrap" onChange={onChange} value={value} onBlur={onBlur}>
+export const RadioButtons = forwardRef(({ children, onChange, value, defaultValue, onBlur }: RadioButtonsProps, ref) => (
+  <ChakraRadioButtonGroup
+    display="flex"
+    flexWrap="wrap"
+    onChange={onChange}
+    defaultValue={defaultValue}
+    value={value}
+    ref={ref}
+    isInline
+    spacing={2}
+    onBlur={onBlur}
+  >
     {children}
   </ChakraRadioButtonGroup>
-)
+));
 
-export const InputGrid = forwardRef((props: InputGridProps, ref: Ref<HTMLDivElement>) => (
+export const InputGrid = (props: InputGridProps) => (
   <Grid mb={4} gridTemplateColumns={['1fr', '1fr', '1fr']} {...props}>
     {props.children}
   </Grid>
-));
+);
 
 interface CardFormProps {
   dualPane?: boolean;
 }
 
-export const CardForm = styled(Div)<CardFormProps>`
+export const CardForm = styled(Div) <CardFormProps>`
   ${({ theme, dualPane }) => css`
-    ${dualPane && css`
+    ${dualPane &&
+    css`
       display: flex;
 
       > *:first-child {
@@ -567,7 +636,7 @@ export const GridForm = styled.form`
     display: grid;
     row-gap: 20px;
     column-gap: 10px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     padding: 10px;
   `}
 `;
@@ -580,9 +649,15 @@ interface RangeSliderProps {
   onChange?: (vals: [number, number] | number) => void;
 }
 
-export const RangeSlider = ({ min=0, max=10, onChange, stepSize=0.5, isDisabled = false }: RangeSliderProps) => {
+export const RangeSlider = ({
+  min = 0,
+  max = 10,
+  onChange,
+  stepSize = 0.5,
+  isDisabled = false,
+}: RangeSliderProps) => {
   return (
-    <AntdSlider 
+    <AntdSlider
       range
       disabled={isDisabled}
       max={10}
@@ -591,5 +666,123 @@ export const RangeSlider = ({ min=0, max=10, onChange, stepSize=0.5, isDisabled 
       defaultValue={[min, max]}
       onAfterChange={onChange}
     />
-  )
+  );
 };
+
+interface MarkdownEditorOptions {
+  hideStatus?: boolean;
+  maxHeight?: number;
+}
+
+const defaultMarkdownEditorOptions: MarkdownEditorOptions = {
+  hideStatus: true,
+  maxHeight: 130,
+}
+
+interface MarkdownEditorProps {
+  value: string;
+  onChange: (val: string) => void;
+  options?: MarkdownEditorOptions;
+}
+
+export const MarkdownEditorContainer = styled(Div)`
+  ${({ theme }) => css`
+    .EasyMDEContainer {
+      border-radius: 5px;
+      background: white;
+    }
+
+    .editor-toolbar {
+      background: white;
+      border-radius: 5px 5px 0 0;
+      border: 1px solid ${theme.colors.gray[300]};
+      border-width: 1px 1px 0 1px;
+    }
+
+    .CodeMirror {
+      border: 1px solid ${theme.colors.gray[300]};
+      border-radius: 0 0 5px 5px;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .editor-statusbar {
+      display: none;
+    }
+  `}
+`;
+
+export const MarkdownEditor = ({ value, onChange, options = defaultMarkdownEditorOptions }: MarkdownEditorProps) => (
+  <MarkdownEditorContainer>
+    <SimpleMDE
+      value={value}
+      onChange={onChange}
+      options={{
+        status: options.hideStatus,
+        maxHeight: `${options.maxHeight}px`,
+        toolbar: ['bold', 'italic', 'preview'],
+      }}
+    />
+  </MarkdownEditorContainer>
+)
+
+interface TimePickerProps {
+  minuteStep?: number;
+  hourStep?: number;
+  format?: string;
+  secondStep?: number;
+};
+
+interface RangeProps {
+  ranges: any;
+}
+
+interface RangePickerProps {
+  range: RangeProps;
+  format?: string;
+  defaultValue?: [Date, Date];
+  onChange: (dates: any, dateStrings: string[]) => void;
+  showTime?: boolean | TimePickerProps;
+}
+
+interface PureDatePickerProps {
+  range?: any;
+  format?: string;
+  defaultValue?: Date;
+  onChange: (date: any, dateString: string) => void;
+  showTime?: boolean | TimePickerProps;
+}
+
+export const DatePickerContainer = styled.div`
+  .ant-picker-panel-container {
+    border-radius: 10px;
+  }
+`;
+
+export const PureDatePickerWrapper = (props: PureDatePickerProps) => (
+  <AntdDatepicker
+    // @ts-ignore 
+    getPopupContainer={triggerNode => triggerNode.parentNode}
+    {...props}
+  />
+);
+
+export const RangeDatePickerWrapper = (props: RangePickerProps) => (
+  <AntdRangePicker
+    // @ts-ignore
+    getPopupContainer={triggerNode => triggerNode.parentNode}
+    {...props} />
+);
+
+export const DatePicker = ({ range, ...restProps }: RangePickerProps | PureDatePickerProps) => (
+  <DatePickerContainer>
+    {range !== undefined ? (
+      <RangeDatePickerWrapper
+        {...range}
+        {...restProps as RangePickerProps}
+      />
+    ) : (
+        <PureDatePickerWrapper
+          {...restProps as PureDatePickerProps} />
+      )}
+  </DatePickerContainer>
+)

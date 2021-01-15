@@ -3,17 +3,19 @@ import { Div, Form, FormControl, FormLabel, Grid, H2, Input, InputGrid, Paragrap
 import { Mail, Send } from 'react-feather';
 import { useForm } from 'react-hook-form';
 import { useHistory } from 'react-router';
-import { useMutation } from '@apollo/react-hooks';
+import { useMutation } from '@apollo/client';
 import React from 'react';
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
 
 import { FullLogo } from 'components/Logo/Logo';
 import AnimatedRoute from 'components/Routes/AnimatedRoute';
 import AnimatedRoutes from 'components/Routes/AnimatedRoutes';
 import ServerError from 'components/ServerError';
 
-import { LoginContentContainer,
-  LoginViewContainer, LoginViewSideScreen } from './LoginViewStyles';
+import {
+  LoginContentContainer,
+  LoginViewContainer, LoginViewSideScreen
+} from './LoginViewStyles';
 
 interface FormData {
   email: string;

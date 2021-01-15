@@ -1,8 +1,9 @@
-import * as ApolloReactHooks from '@apollo/react-hooks';
-import gql from 'graphql-tag';
-
+import { gql } from '@apollo/client';
+import * as Apollo from '@apollo/client';
 export type Maybe<T> = T | null;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
+export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
+export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string;
@@ -10,10 +11,10 @@ export type Scalars = {
   Boolean: boolean;
   Int: number;
   Float: number;
-  /** The `Upload` scalar type represents a file upload. */
-  Upload: any;
   /** Date custom scalar type */
   Date: any;
+  /** The `Upload` scalar type represents a file upload. */
+  Upload: any;
 };
 
 /** Append new data to an uploaded session */
@@ -22,6 +23,39 @@ export type AppendToInteractionInput = {
   nodeId?: Maybe<Scalars['String']>;
   edgeId?: Maybe<Scalars['String']>;
   data?: Maybe<NodeEntryDataInput>;
+};
+
+/** Campaign */
+export type CampaignType = {
+  __typename?: 'CampaignType';
+  id: Scalars['ID'];
+  label: Scalars['String'];
+  variants: Array<CampaignVariantType>;
+  deliveryConnection?: Maybe<DeliveryConnectionType>;
+};
+
+
+/** Campaign */
+export type CampaignTypeDeliveryConnectionArgs = {
+  filter?: Maybe<DeliveryConnectionFilter>;
+};
+
+export enum CampaignVariantEnum {
+  Sms = 'SMS',
+  Email = 'EMAIL',
+  Queue = 'QUEUE'
+}
+
+/** Variant of campaign */
+export type CampaignVariantType = {
+  __typename?: 'CampaignVariantType';
+  id: Scalars['ID'];
+  label: Scalars['String'];
+  weight: Scalars['Int'];
+  body: Scalars['String'];
+  workspace: Customer;
+  dialogue: Dialogue;
+  deliveryConnection?: Maybe<DeliveryConnectionType>;
 };
 
 /** Input type for a choice node */
@@ -46,6 +80,35 @@ export type ConnectionInterface = {
   endDate?: Maybe<Scalars['String']>;
 };
 
+export type CreateBatchDeliveriesInputType = {
+  campaignId?: Maybe<Scalars['ID']>;
+  workspaceId?: Maybe<Scalars['String']>;
+  uploadedCsv?: Maybe<Scalars['Upload']>;
+  batchScheduledAt?: Maybe<Scalars['String']>;
+};
+
+export type CreateBatchDeliveriesOutputType = {
+  __typename?: 'CreateBatchDeliveriesOutputType';
+  failedDeliveries: Array<FailedDeliveryModel>;
+  nrDeliveries: Scalars['Int'];
+};
+
+export type CreateCampaignInputType = {
+  label?: Maybe<Scalars['String']>;
+  workspaceId: Scalars['ID'];
+  variants?: Maybe<Array<CreateCampaignVariantInputType>>;
+};
+
+export type CreateCampaignVariantInputType = {
+  label?: Maybe<Scalars['String']>;
+  workspaceId: Scalars['ID'];
+  dialogueId: Scalars['ID'];
+  type: CampaignVariantEnum;
+  body?: Maybe<Scalars['String']>;
+  weight?: Maybe<Scalars['Float']>;
+  subject?: Maybe<Scalars['String']>;
+};
+
 export type CreateCtaInputType = {
   customerSlug?: Maybe<Scalars['String']>;
   dialogueSlug?: Maybe<Scalars['String']>;
@@ -53,6 +116,7 @@ export type CreateCtaInputType = {
   type?: Maybe<Scalars['String']>;
   links?: Maybe<CtaLinksInputType>;
   share?: Maybe<ShareNodeInputType>;
+  form?: Maybe<FormNodeInputType>;
 };
 
 export type CreateDialogueInputType = {
@@ -76,6 +140,22 @@ export type CreateQuestionNodeInputType = {
   type?: Maybe<Scalars['String']>;
   optionEntries?: Maybe<OptionsInputType>;
   edgeCondition?: Maybe<EdgeConditionInputType>;
+};
+
+export type CreateTriggerInputType = {
+  customerSlug?: Maybe<Scalars['String']>;
+  recipients?: Maybe<RecipientsInputType>;
+  trigger?: Maybe<TriggerInputType>;
+};
+
+/** Creates a workspace */
+export type CreateWorkspaceInput = {
+  slug: Scalars['String'];
+  name: Scalars['String'];
+  logo?: Maybe<Scalars['String']>;
+  primaryColour: Scalars['String'];
+  isSeed?: Maybe<Scalars['Boolean']>;
+  willGenerateFakeData?: Maybe<Scalars['Boolean']>;
 };
 
 export type CtaLinkInputObjectType = {
@@ -109,37 +189,34 @@ export type Customer = {
   userCustomer?: Maybe<UserCustomer>;
   dialogues?: Maybe<Array<Dialogue>>;
   users?: Maybe<Array<UserType>>;
+  campaign: CampaignType;
+  campaigns: Array<CampaignType>;
 };
+
 
 export type CustomerUsersConnectionArgs = {
   customerSlug?: Maybe<Scalars['String']>;
   filter?: Maybe<PaginationWhereInput>;
 };
 
+
 export type CustomerDialogueArgs = {
   where?: Maybe<DialogueWhereUniqueInput>;
 };
+
 
 export type CustomerUserCustomerArgs = {
   userId?: Maybe<Scalars['String']>;
 };
 
+
 export type CustomerDialoguesArgs = {
   filter?: Maybe<DialogueFilterInputType>;
 };
 
-export type CustomerCreateOptions = {
-  slug: Scalars['String'];
-  primaryColour: Scalars['String'];
-  logo?: Maybe<Scalars['String']>;
-  isSeed?: Maybe<Scalars['Boolean']>;
-};
 
-export type CustomerEditOptions = {
-  slug: Scalars['String'];
-  name: Scalars['String'];
-  logo?: Maybe<Scalars['String']>;
-  primaryColour: Scalars['String'];
+export type CustomerCampaignArgs = {
+  campaignId?: Maybe<Scalars['String']>;
 };
 
 export type CustomerSettings = {
@@ -153,6 +230,7 @@ export type CustomerSettings = {
 export type CustomerWhereUniqueInput = {
   id: Scalars['ID'];
 };
+
 
 export type Debug = {
   __typename?: 'Debug';
@@ -181,18 +259,61 @@ export type DeleteUserOutput = {
   deletedUser: Scalars['Boolean'];
 };
 
+export type DeliveryConnectionFilter = {
+  campaignId?: Maybe<Scalars['String']>;
+  paginationFilter?: Maybe<PaginationWhereInput>;
+  status?: Maybe<DeliveryStatusEnum>;
+  campaignVariantId?: Maybe<Scalars['ID']>;
+};
+
+export type DeliveryConnectionType = ConnectionInterface & {
+  __typename?: 'DeliveryConnectionType';
+  offset: Scalars['Int'];
+  limit: Scalars['Int'];
+  pageInfo: PaginationPageInfo;
+  startDate?: Maybe<Scalars['String']>;
+  endDate?: Maybe<Scalars['String']>;
+  deliveries: Array<DeliveryType>;
+  nrTotal: Scalars['Int'];
+  nrSent: Scalars['Int'];
+  nrOpened: Scalars['Int'];
+  nrFinished: Scalars['Int'];
+};
+
+export enum DeliveryStatusEnum {
+  Scheduled = 'SCHEDULED',
+  Deployed = 'DEPLOYED',
+  Sent = 'SENT',
+  Opened = 'OPENED',
+  Finished = 'FINISHED'
+}
+
+/** Delivery */
+export type DeliveryType = {
+  __typename?: 'DeliveryType';
+  id: Scalars['ID'];
+  deliveryRecipientFirstName: Scalars['String'];
+  deliveryRecipientLastName: Scalars['String'];
+  deliveryRecipientEmail: Scalars['String'];
+  deliveryRecipientPhone: Scalars['String'];
+  scheduledAt: Scalars['String'];
+  updatedAt: Scalars['String'];
+  campaignVariant: CampaignVariantType;
+  currentStatus: DeliveryStatusEnum;
+};
+
 export type Dialogue = {
   __typename?: 'Dialogue';
   id: Scalars['ID'];
   title: Scalars['String'];
   slug: Scalars['String'];
   description: Scalars['String'];
+  isWithoutGenData: Scalars['Boolean'];
+  wasGeneratedWithGenData: Scalars['Boolean'];
   publicTitle?: Maybe<Scalars['String']>;
   creationDate?: Maybe<Scalars['String']>;
   updatedAt?: Maybe<Scalars['String']>;
   averageScore: Scalars['Float'];
-  /** Count number of interactions between start-date and end-date */
-  countInteractions: Scalars['Int'];
   statistics?: Maybe<DialogueStatistics>;
   sessionConnection?: Maybe<SessionConnection>;
   tags?: Maybe<Array<Tag>>;
@@ -205,25 +326,26 @@ export type Dialogue = {
   leafs: Array<QuestionNode>;
 };
 
+
 export type DialogueAverageScoreArgs = {
   input?: Maybe<DialogueFilterInputType>;
 };
 
-export type DialogueCountInteractionsArgs = {
-  input?: Maybe<DialogueFilterInputType>;
-};
 
 export type DialogueStatisticsArgs = {
   input?: Maybe<DialogueFilterInputType>;
 };
 
+
 export type DialogueSessionConnectionArgs = {
   filter?: Maybe<PaginationWhereInput>;
 };
 
+
 export type DialogueSessionsArgs = {
   take?: Maybe<Scalars['Int']>;
 };
+
 
 export type DialogueLeafsArgs = {
   searchTerm?: Maybe<Scalars['String']>;
@@ -237,6 +359,7 @@ export type DialogueFilterInputType = {
 
 export type DialogueStatistics = {
   __typename?: 'DialogueStatistics';
+  nrInteractions: Scalars['Int'];
   topPositivePath?: Maybe<Array<TopPathType>>;
   topNegativePath?: Maybe<Array<TopPathType>>;
   mostPopularPath?: Maybe<TopPathType>;
@@ -287,9 +410,100 @@ export type EditUserInput = {
   phone?: Maybe<Scalars['String']>;
 };
 
+/** Edit a workspace */
+export type EditWorkspaceInput = {
+  id: Scalars['ID'];
+  customerSlug: Scalars['String'];
+  slug: Scalars['String'];
+  name: Scalars['String'];
+  logo?: Maybe<Scalars['String']>;
+  primaryColour: Scalars['String'];
+};
+
+export type FailedDeliveryModel = {
+  __typename?: 'FailedDeliveryModel';
+  record: Scalars['String'];
+  error: Scalars['String'];
+};
+
 export type FontSettings = {
   __typename?: 'FontSettings';
   id: Scalars['ID'];
+};
+
+/** FormNodeEntryInput */
+export type FormNodeEntryFieldInput = {
+  relatedFieldId?: Maybe<Scalars['ID']>;
+  email?: Maybe<Scalars['String']>;
+  phoneNumber?: Maybe<Scalars['String']>;
+  url?: Maybe<Scalars['String']>;
+  shortText?: Maybe<Scalars['String']>;
+  longText?: Maybe<Scalars['String']>;
+  number?: Maybe<Scalars['Int']>;
+};
+
+/** FormNodeEntryInput */
+export type FormNodeEntryInput = {
+  values?: Maybe<Array<FormNodeEntryFieldInput>>;
+};
+
+export type FormNodeEntryType = {
+  __typename?: 'FormNodeEntryType';
+  id: Scalars['Int'];
+  values: Array<FormNodeEntryValueType>;
+};
+
+export type FormNodeEntryValueType = {
+  __typename?: 'FormNodeEntryValueType';
+  relatedField: FormNodeField;
+  email?: Maybe<Scalars['String']>;
+  phoneNumber?: Maybe<Scalars['String']>;
+  url?: Maybe<Scalars['String']>;
+  shortText?: Maybe<Scalars['String']>;
+  longText?: Maybe<Scalars['String']>;
+  number?: Maybe<Scalars['Int']>;
+};
+
+export type FormNodeField = {
+  __typename?: 'FormNodeField';
+  id: Scalars['ID'];
+  label: Scalars['String'];
+  type: FormNodeFieldTypeEnum;
+  isRequired: Scalars['Boolean'];
+  position: Scalars['Int'];
+};
+
+export type FormNodeFieldInput = {
+  id?: Maybe<Scalars['ID']>;
+  label?: Maybe<Scalars['String']>;
+  type?: Maybe<FormNodeFieldTypeEnum>;
+  isRequired?: Maybe<Scalars['Boolean']>;
+  position?: Maybe<Scalars['Int']>;
+};
+
+/** The types a field can assume */
+export enum FormNodeFieldTypeEnum {
+  Email = 'email',
+  PhoneNumber = 'phoneNumber',
+  Url = 'url',
+  ShortText = 'shortText',
+  LongText = 'longText',
+  Number = 'number'
+}
+
+export type FormNodeInputType = {
+  id?: Maybe<Scalars['String']>;
+  fields?: Maybe<Array<FormNodeFieldInput>>;
+};
+
+export type FormNodeType = {
+  __typename?: 'FormNodeType';
+  id?: Maybe<Scalars['String']>;
+  fields: Array<FormNodeField>;
+};
+
+export type GetCampaignsInput = {
+  customerSlug?: Maybe<Scalars['String']>;
 };
 
 export type ImageType = {
@@ -359,16 +573,19 @@ export type Mutation = {
   assignTags: Dialogue;
   createTag: Tag;
   deleteTag: Tag;
+  createCampaign: CampaignType;
+  createBatchDeliveries: CreateBatchDeliveriesOutputType;
+  updateDeliveryStatus: Scalars['String'];
   deleteTrigger?: Maybe<TriggerType>;
   editTrigger: TriggerType;
   createTrigger: TriggerType;
   createPermission?: Maybe<PermssionType>;
   createRole: RoleType;
   updateRoles: RoleType;
-  deleteCustomer?: Maybe<Customer>;
   singleUpload: ImageType;
-  createCustomer: Customer;
-  editCustomer: Customer;
+  createWorkspace: Customer;
+  editWorkspace: Customer;
+  deleteCustomer?: Maybe<Customer>;
   createUser: UserType;
   editUser: UserType;
   deleteUser: DeleteUserOutput;
@@ -389,17 +606,19 @@ export type Mutation = {
   deleteQuestion: QuestionNode;
   updateQuestion: QuestionNode;
   createQuestion?: Maybe<QuestionNode>;
-  updateCTA: QuestionNode;
   deleteCTA: QuestionNode;
   /** Create Call to Actions */
   createCTA: QuestionNode;
+  updateCTA: QuestionNode;
   debugMutation?: Maybe<Scalars['String']>;
 };
+
 
 export type MutationAssignTagsArgs = {
   dialogueId?: Maybe<Scalars['String']>;
   tags?: Maybe<TagsInputObjectType>;
 };
+
 
 export type MutationCreateTagArgs = {
   name?: Maybe<Scalars['String']>;
@@ -407,80 +626,109 @@ export type MutationCreateTagArgs = {
   type?: Maybe<TagTypeEnum>;
 };
 
+
 export type MutationDeleteTagArgs = {
   tagId?: Maybe<Scalars['String']>;
 };
 
+
+export type MutationCreateCampaignArgs = {
+  input?: Maybe<CreateCampaignInputType>;
+};
+
+
+export type MutationCreateBatchDeliveriesArgs = {
+  input?: Maybe<CreateBatchDeliveriesInputType>;
+};
+
+
+export type MutationUpdateDeliveryStatusArgs = {
+  deliveryId?: Maybe<Scalars['String']>;
+  status?: Maybe<DeliveryStatusEnum>;
+};
+
+
 export type MutationDeleteTriggerArgs = {
   id?: Maybe<Scalars['String']>;
+  customerSlug?: Maybe<Scalars['String']>;
 };
+
 
 export type MutationEditTriggerArgs = {
   triggerId?: Maybe<Scalars['String']>;
-  questionId?: Maybe<Scalars['String']>;
+  customerSlug?: Maybe<Scalars['String']>;
   recipients?: Maybe<RecipientsInputType>;
   trigger?: Maybe<TriggerInputType>;
 };
 
+
 export type MutationCreateTriggerArgs = {
-  customerSlug?: Maybe<Scalars['String']>;
-  questionId?: Maybe<Scalars['String']>;
-  recipients?: Maybe<RecipientsInputType>;
-  trigger?: Maybe<TriggerInputType>;
+  input?: Maybe<CreateTriggerInputType>;
 };
+
 
 export type MutationCreatePermissionArgs = {
   data?: Maybe<PermissionInput>;
 };
 
+
 export type MutationCreateRoleArgs = {
   data?: Maybe<RoleInput>;
 };
+
 
 export type MutationUpdateRolesArgs = {
   roleId?: Maybe<Scalars['String']>;
   permissions?: Maybe<PermissionIdsInput>;
 };
 
-export type MutationDeleteCustomerArgs = {
-  where?: Maybe<CustomerWhereUniqueInput>;
-};
 
 export type MutationSingleUploadArgs = {
   file?: Maybe<Scalars['Upload']>;
 };
 
-export type MutationCreateCustomerArgs = {
-  name?: Maybe<Scalars['String']>;
-  options?: Maybe<CustomerCreateOptions>;
+
+export type MutationCreateWorkspaceArgs = {
+  input?: Maybe<CreateWorkspaceInput>;
 };
 
-export type MutationEditCustomerArgs = {
-  id?: Maybe<Scalars['String']>;
-  options?: Maybe<CustomerEditOptions>;
+
+export type MutationEditWorkspaceArgs = {
+  input?: Maybe<EditWorkspaceInput>;
 };
+
+
+export type MutationDeleteCustomerArgs = {
+  where?: Maybe<CustomerWhereUniqueInput>;
+};
+
 
 export type MutationCreateUserArgs = {
   customerSlug?: Maybe<Scalars['String']>;
   input?: Maybe<UserInput>;
 };
 
+
 export type MutationEditUserArgs = {
   userId?: Maybe<Scalars['String']>;
   input?: Maybe<EditUserInput>;
 };
 
+
 export type MutationDeleteUserArgs = {
   input?: Maybe<DeleteUserInput>;
 };
+
 
 export type MutationCopyDialogueArgs = {
   input?: Maybe<CreateDialogueInputType>;
 };
 
+
 export type MutationCreateDialogueArgs = {
   input?: Maybe<CreateDialogueInputType>;
 };
+
 
 export type MutationEditDialogueArgs = {
   customerSlug?: Maybe<Scalars['String']>;
@@ -488,59 +736,73 @@ export type MutationEditDialogueArgs = {
   title?: Maybe<Scalars['String']>;
   description?: Maybe<Scalars['String']>;
   publicTitle?: Maybe<Scalars['String']>;
+  isWithoutGenData?: Maybe<Scalars['Boolean']>;
   tags?: Maybe<TagsInputObjectType>;
 };
+
 
 export type MutationDeleteDialogueArgs = {
   input?: Maybe<DeleteDialogueInputType>;
 };
 
+
 export type MutationRegisterArgs = {
   input?: Maybe<RegisterInput>;
 };
+
 
 export type MutationVerifyUserTokenArgs = {
   token?: Maybe<Scalars['String']>;
 };
 
+
 export type MutationRequestInviteArgs = {
   input?: Maybe<RequestInviteInput>;
 };
+
 
 export type MutationInviteUserArgs = {
   input?: Maybe<InviteUserInput>;
 };
 
+
 export type MutationCreateSessionArgs = {
   input?: Maybe<SessionInput>;
 };
+
 
 export type MutationAppendToInteractionArgs = {
   input?: Maybe<AppendToInteractionInput>;
 };
 
+
 export type MutationDeleteQuestionArgs = {
   input?: Maybe<DeleteNodeInputType>;
 };
+
 
 export type MutationUpdateQuestionArgs = {
   input?: Maybe<UpdateQuestionNodeInputType>;
 };
 
+
 export type MutationCreateQuestionArgs = {
   input?: Maybe<CreateQuestionNodeInputType>;
 };
 
-export type MutationUpdateCtaArgs = {
-  input?: Maybe<UpdateCtaInputType>;
-};
 
 export type MutationDeleteCtaArgs = {
   input?: Maybe<DeleteNodeInputType>;
 };
 
+
 export type MutationCreateCtaArgs = {
   input?: Maybe<CreateCtaInputType>;
+};
+
+
+export type MutationUpdateCtaArgs = {
+  input?: Maybe<UpdateCtaInputType>;
 };
 
 export type NodeEntry = {
@@ -559,8 +821,9 @@ export type NodeEntry = {
 export type NodeEntryDataInput = {
   slider?: Maybe<SliderNodeEntryInput>;
   textbox?: Maybe<TextboxNodeEntryInput>;
-  register?: Maybe<RegisterNodeEntryInput>;
+  form?: Maybe<FormNodeEntryInput>;
   choice?: Maybe<ChoiceNodeEntryInput>;
+  register?: Maybe<RegisterNodeEntryInput>;
 };
 
 /** Input type for node-entry metadata */
@@ -578,6 +841,7 @@ export type NodeEntryValue = {
   registrationNodeEntry?: Maybe<Scalars['String']>;
   choiceNodeEntry?: Maybe<Scalars['String']>;
   linkNodeEntry?: Maybe<Scalars['String']>;
+  formNodeEntry?: Maybe<FormNodeEntryType>;
 };
 
 export type OptionInputType = {
@@ -597,6 +861,16 @@ export type PaginationPageInfo = {
   pageIndex: Scalars['Int'];
 };
 
+/** Fields that can be used for free text search on tables */
+export enum PaginationSearchEnum {
+  Name = 'name',
+  FirstName = 'firstName',
+  LastName = 'lastName',
+  Email = 'email',
+  Title = 'title',
+  PublicTitle = 'publicTitle'
+}
+
 /** Ways to sort a pagination object */
 export enum PaginationSortByEnum {
   Score = 'score',
@@ -611,7 +885,8 @@ export enum PaginationSortByEnum {
   Type = 'type',
   Paths = 'paths',
   User = 'user',
-  When = 'when'
+  When = 'when',
+  ScheduledAt = 'scheduledAt'
 }
 
 /** Sorting of pagination (type and whether it ascends) */
@@ -652,6 +927,7 @@ export type PermssionType = {
 export type Query = {
   __typename?: 'Query';
   tags: Array<Tag>;
+  delivery?: Maybe<DeliveryType>;
   triggerConnection?: Maybe<TriggerConnectionType>;
   trigger?: Maybe<TriggerType>;
   triggers: Array<TriggerType>;
@@ -674,19 +950,28 @@ export type Query = {
   edge?: Maybe<Edge>;
 };
 
+
 export type QueryTagsArgs = {
   customerSlug?: Maybe<Scalars['String']>;
   dialogueId?: Maybe<Scalars['String']>;
 };
+
+
+export type QueryDeliveryArgs = {
+  deliveryId?: Maybe<Scalars['String']>;
+};
+
 
 export type QueryTriggerConnectionArgs = {
   customerSlug?: Maybe<Scalars['String']>;
   filter?: Maybe<PaginationWhereInput>;
 };
 
+
 export type QueryTriggerArgs = {
   triggerId?: Maybe<Scalars['String']>;
 };
+
 
 export type QueryTriggersArgs = {
   customerSlug?: Maybe<Scalars['String']>;
@@ -695,31 +980,38 @@ export type QueryTriggersArgs = {
   filter?: Maybe<PaginationWhereInput>;
 };
 
+
 export type QueryRoleConnectionArgs = {
   customerId?: Maybe<Scalars['String']>;
   filter?: Maybe<PaginationWhereInput>;
 };
 
+
 export type QueryRolesArgs = {
   customerSlug?: Maybe<Scalars['String']>;
 };
+
 
 export type QueryCustomerArgs = {
   id?: Maybe<Scalars['ID']>;
   slug?: Maybe<Scalars['String']>;
 };
 
+
 export type QueryUserOfCustomerArgs = {
   input?: Maybe<UserOfCustomerInput>;
 };
+
 
 export type QueryUsersArgs = {
   customerSlug?: Maybe<Scalars['String']>;
 };
 
+
 export type QueryUserArgs = {
   userId?: Maybe<Scalars['String']>;
 };
+
 
 export type QueryLineChartDataArgs = {
   dialogueId?: Maybe<Scalars['String']>;
@@ -728,25 +1020,31 @@ export type QueryLineChartDataArgs = {
   offset?: Maybe<Scalars['Int']>;
 };
 
+
 export type QueryDialogueArgs = {
   where?: Maybe<DialogueWhereUniqueInput>;
 };
+
 
 export type QueryDialoguesArgs = {
   filter?: Maybe<DialogueFilterInputType>;
 };
 
+
 export type QuerySessionsArgs = {
   where?: Maybe<SessionWhereUniqueInput>;
 };
+
 
 export type QuerySessionArgs = {
   where?: Maybe<SessionWhereUniqueInput>;
 };
 
+
 export type QueryQuestionNodeArgs = {
   where?: Maybe<QuestionNodeWhereUniqueInput>;
 };
+
 
 export type QueryEdgeArgs = {
   id?: Maybe<Scalars['String']>;
@@ -762,6 +1060,10 @@ export type QuestionNode = {
   creationDate?: Maybe<Scalars['String']>;
   type: QuestionNodeTypeEnum;
   overrideLeafId?: Maybe<Scalars['String']>;
+  /** Slidernode resolver */
+  sliderNode?: Maybe<SliderNodeType>;
+  /** FormNode resolver */
+  form?: Maybe<FormNodeType>;
   share?: Maybe<ShareNodeType>;
   questionDialogueId?: Maybe<Scalars['String']>;
   links: Array<LinkType>;
@@ -777,6 +1079,7 @@ export enum QuestionNodeTypeEnum {
   Slider = 'SLIDER',
   Choice = 'CHOICE',
   Registration = 'REGISTRATION',
+  Form = 'FORM',
   Textbox = 'TEXTBOX',
   Link = 'LINK',
   Share = 'SHARE'
@@ -867,7 +1170,7 @@ export type RoleType = {
 export type Session = {
   __typename?: 'Session';
   id: Scalars['ID'];
-  createdAt: Scalars['String'];
+  createdAt: Scalars['Date'];
   dialogueId: Scalars['String'];
   paths: Scalars['Int'];
   score: Scalars['Float'];
@@ -888,6 +1191,7 @@ export type SessionConnection = ConnectionInterface & {
 export type SessionInput = {
   dialogueId: Scalars['String'];
   entries?: Maybe<Array<NodeEntryInput>>;
+  deliveryId?: Maybe<Scalars['String']>;
 };
 
 export type SessionWhereUniqueInput = {
@@ -912,9 +1216,52 @@ export type ShareNodeType = {
   updatedAt?: Maybe<Scalars['String']>;
 };
 
+export type SlideNodeMarkerInput = {
+  id?: Maybe<Scalars['ID']>;
+  label: Scalars['String'];
+  subLabel: Scalars['String'];
+  range?: Maybe<SliderNodeRangeInputType>;
+};
+
 /** Input type for a slider node */
 export type SliderNodeEntryInput = {
   value?: Maybe<Scalars['Int']>;
+};
+
+export type SliderNodeInputType = {
+  id?: Maybe<Scalars['ID']>;
+  markers?: Maybe<Array<SlideNodeMarkerInput>>;
+};
+
+export type SliderNodeMarkerType = {
+  __typename?: 'SliderNodeMarkerType';
+  id: Scalars['ID'];
+  label: Scalars['String'];
+  subLabel: Scalars['String'];
+  range?: Maybe<SliderNodeRangeType>;
+};
+
+export type SliderNodeRangeInputType = {
+  start?: Maybe<Scalars['Float']>;
+  end?: Maybe<Scalars['Float']>;
+};
+
+export type SliderNodeRangeType = {
+  __typename?: 'SliderNodeRangeType';
+  id: Scalars['ID'];
+  start?: Maybe<Scalars['Float']>;
+  end?: Maybe<Scalars['Float']>;
+};
+
+export type SliderNodeType = {
+  __typename?: 'SliderNodeType';
+  id?: Maybe<Scalars['ID']>;
+  markers?: Maybe<Array<SliderNodeMarkerType>>;
+};
+
+/** Details regarding interaction with social node */
+export type SocialNodeEntryInput = {
+  visitedLink?: Maybe<Scalars['String']>;
 };
 
 export enum SystemPermission {
@@ -931,7 +1278,10 @@ export enum SystemPermission {
   CanCreateTriggers = 'CAN_CREATE_TRIGGERS',
   CanDeleteTriggers = 'CAN_DELETE_TRIGGERS',
   CanDeleteWorkspace = 'CAN_DELETE_WORKSPACE',
-  CanEditWorkspace = 'CAN_EDIT_WORKSPACE'
+  CanEditWorkspace = 'CAN_EDIT_WORKSPACE',
+  CanViewCampaigns = 'CAN_VIEW_CAMPAIGNS',
+  CanCreateCampaigns = 'CAN_CREATE_CAMPAIGNS',
+  CanCreateDeliveries = 'CAN_CREATE_DELIVERIES'
 }
 
 export type Tag = {
@@ -974,6 +1324,7 @@ export enum TriggerConditionEnum {
 
 export type TriggerConditionInputType = {
   id?: Maybe<Scalars['Int']>;
+  questionId?: Maybe<Scalars['String']>;
   type?: Maybe<TriggerConditionEnum>;
   minValue?: Maybe<Scalars['Int']>;
   maxValue?: Maybe<Scalars['Int']>;
@@ -988,6 +1339,7 @@ export type TriggerConditionType = {
   maxValue?: Maybe<Scalars['Int']>;
   textValue?: Maybe<Scalars['String']>;
   triggerId: Scalars['String'];
+  question?: Maybe<QuestionNode>;
 };
 
 export type TriggerConnectionType = ConnectionInterface & {
@@ -1020,7 +1372,7 @@ export type TriggerType = {
   type: TriggerTypeEnum;
   medium: TriggerMediumEnum;
   relatedNodeId?: Maybe<Scalars['String']>;
-  relatedNode?: Maybe<QuestionNode>;
+  relatedDialogue?: Maybe<Dialogue>;
   conditions: Array<TriggerConditionType>;
   recipients: Array<UserType>;
 };
@@ -1034,9 +1386,10 @@ export type UpdateCtaInputType = {
   id?: Maybe<Scalars['String']>;
   customerId?: Maybe<Scalars['ID']>;
   title?: Maybe<Scalars['String']>;
-  type?: Maybe<Scalars['String']>;
+  type?: Maybe<QuestionNodeTypeEnum>;
   links?: Maybe<CtaLinksInputType>;
   share?: Maybe<ShareNodeInputType>;
+  form?: Maybe<FormNodeInputType>;
 };
 
 export type UpdateQuestionNodeInputType = {
@@ -1046,14 +1399,19 @@ export type UpdateQuestionNodeInputType = {
   edgeId?: Maybe<Scalars['ID']>;
   title?: Maybe<Scalars['String']>;
   type?: Maybe<Scalars['String']>;
+  sliderNode?: Maybe<SliderNodeInputType>;
   optionEntries?: Maybe<OptionsInputType>;
   edgeCondition?: Maybe<EdgeConditionInputType>;
 };
 
-export type UserConnection = {
+
+export type UserConnection = ConnectionInterface & {
   __typename?: 'UserConnection';
-  pageIndex?: Maybe<Scalars['Int']>;
-  totalPages?: Maybe<Scalars['Int']>;
+  offset: Scalars['Int'];
+  limit: Scalars['Int'];
+  pageInfo: PaginationPageInfo;
+  startDate?: Maybe<Scalars['String']>;
+  endDate?: Maybe<Scalars['String']>;
   userCustomers: Array<UserCustomer>;
 };
 
@@ -1101,6 +1459,54 @@ export type VerifyUserTokenOutput = {
   userData: UserType;
 };
 
+export type GetDeliveryQueryVariables = Exact<{
+  deliveryId?: Maybe<Scalars['String']>;
+}>;
+
+
+export type GetDeliveryQuery = (
+  { __typename?: 'Query' }
+  & { delivery?: Maybe<(
+    { __typename?: 'DeliveryType' }
+    & Pick<DeliveryType, 'id'>
+    & { campaignVariant: (
+      { __typename?: 'CampaignVariantType' }
+      & Pick<CampaignVariantType, 'id'>
+      & { dialogue: (
+        { __typename?: 'Dialogue' }
+        & Pick<Dialogue, 'slug'>
+      ), workspace: (
+        { __typename?: 'Customer' }
+        & Pick<Customer, 'slug'>
+      ) }
+    ) }
+  )> }
+);
+
+export type UpdateDeliveryStatusMutationVariables = Exact<{
+  deliveryId: Scalars['String'];
+  status: DeliveryStatusEnum;
+}>;
+
+
+export type UpdateDeliveryStatusMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'updateDeliveryStatus'>
+);
+
+export type CreateSessionMutationVariables = Exact<{
+  input?: Maybe<SessionInput>;
+}>;
+
+
+export type CreateSessionMutation = (
+  { __typename?: 'Mutation' }
+  & { createSession: (
+    { __typename?: 'Session' }
+    & Pick<Session, 'id'>
+  ) }
+);
+
 export type CustomerFragmentFragment = (
   { __typename?: 'Customer' }
   & Pick<Customer, 'id' | 'name' | 'slug'>
@@ -1125,16 +1531,21 @@ export type EdgeFragmentFragment = (
     & Pick<EdgeCondition, 'id' | 'conditionType' | 'matchValue' | 'renderMin' | 'renderMax'>
   )>>, parentNode?: Maybe<(
     { __typename?: 'QuestionNode' }
-    & Pick<QuestionNode, 'id'>
+    & Pick<QuestionNode, 'id' | 'title'>
   )>, childNode?: Maybe<(
     { __typename?: 'QuestionNode' }
-    & Pick<QuestionNode, 'id'>
+    & Pick<QuestionNode, 'id' | 'title' | 'isRoot' | 'type'>
+    & { children: Array<(
+      { __typename?: 'Edge' }
+      & Pick<Edge, 'id'>
+    )> }
   )> }
 );
 
 export type CustomerQueryVariables = Exact<{
   slug: Scalars['String'];
 }>;
+
 
 export type CustomerQuery = (
   { __typename?: 'Query' }
@@ -1148,6 +1559,7 @@ export type GetDialogueQueryVariables = Exact<{
   customerSlug: Scalars['String'];
   dialogueSlug: Scalars['String'];
 }>;
+
 
 export type GetDialogueQuery = (
   { __typename?: 'Query' }
@@ -1242,9 +1654,16 @@ export const EdgeFragmentFragmentDoc = gql`
   }
   parentNode {
     id
+    title
   }
   childNode {
     id
+    title
+    isRoot
+    children {
+      id
+    }
+    type
   }
 }
     `;
@@ -1276,6 +1695,114 @@ export const QuestionFragmentFragmentDoc = gql`
   }
 }
     ${EdgeFragmentFragmentDoc}`;
+export const GetDeliveryDocument = gql`
+    query GetDelivery($deliveryId: String) {
+  delivery(deliveryId: $deliveryId) {
+    id
+    campaignVariant {
+      id
+      dialogue {
+        slug
+      }
+      workspace {
+        slug
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetDeliveryQuery__
+ *
+ * To run a query within a React component, call `useGetDeliveryQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetDeliveryQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetDeliveryQuery({
+ *   variables: {
+ *      deliveryId: // value for 'deliveryId'
+ *   },
+ * });
+ */
+export function useGetDeliveryQuery(baseOptions?: Apollo.QueryHookOptions<GetDeliveryQuery, GetDeliveryQueryVariables>) {
+        return Apollo.useQuery<GetDeliveryQuery, GetDeliveryQueryVariables>(GetDeliveryDocument, baseOptions);
+      }
+export function useGetDeliveryLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetDeliveryQuery, GetDeliveryQueryVariables>) {
+          return Apollo.useLazyQuery<GetDeliveryQuery, GetDeliveryQueryVariables>(GetDeliveryDocument, baseOptions);
+        }
+export type GetDeliveryQueryHookResult = ReturnType<typeof useGetDeliveryQuery>;
+export type GetDeliveryLazyQueryHookResult = ReturnType<typeof useGetDeliveryLazyQuery>;
+export type GetDeliveryQueryResult = Apollo.QueryResult<GetDeliveryQuery, GetDeliveryQueryVariables>;
+export function refetchGetDeliveryQuery(variables?: GetDeliveryQueryVariables) {
+      return { query: GetDeliveryDocument, variables: variables }
+    }
+export const UpdateDeliveryStatusDocument = gql`
+    mutation UpdateDeliveryStatus($deliveryId: String!, $status: DeliveryStatusEnum!) {
+  updateDeliveryStatus(deliveryId: $deliveryId, status: $status)
+}
+    `;
+export type UpdateDeliveryStatusMutationFn = Apollo.MutationFunction<UpdateDeliveryStatusMutation, UpdateDeliveryStatusMutationVariables>;
+
+/**
+ * __useUpdateDeliveryStatusMutation__
+ *
+ * To run a mutation, you first call `useUpdateDeliveryStatusMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateDeliveryStatusMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateDeliveryStatusMutation, { data, loading, error }] = useUpdateDeliveryStatusMutation({
+ *   variables: {
+ *      deliveryId: // value for 'deliveryId'
+ *      status: // value for 'status'
+ *   },
+ * });
+ */
+export function useUpdateDeliveryStatusMutation(baseOptions?: Apollo.MutationHookOptions<UpdateDeliveryStatusMutation, UpdateDeliveryStatusMutationVariables>) {
+        return Apollo.useMutation<UpdateDeliveryStatusMutation, UpdateDeliveryStatusMutationVariables>(UpdateDeliveryStatusDocument, baseOptions);
+      }
+export type UpdateDeliveryStatusMutationHookResult = ReturnType<typeof useUpdateDeliveryStatusMutation>;
+export type UpdateDeliveryStatusMutationResult = Apollo.MutationResult<UpdateDeliveryStatusMutation>;
+export type UpdateDeliveryStatusMutationOptions = Apollo.BaseMutationOptions<UpdateDeliveryStatusMutation, UpdateDeliveryStatusMutationVariables>;
+export const CreateSessionDocument = gql`
+    mutation createSession($input: SessionInput) {
+  createSession(input: $input) {
+    id
+  }
+}
+    `;
+export type CreateSessionMutationFn = Apollo.MutationFunction<CreateSessionMutation, CreateSessionMutationVariables>;
+
+/**
+ * __useCreateSessionMutation__
+ *
+ * To run a mutation, you first call `useCreateSessionMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateSessionMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createSessionMutation, { data, loading, error }] = useCreateSessionMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateSessionMutation(baseOptions?: Apollo.MutationHookOptions<CreateSessionMutation, CreateSessionMutationVariables>) {
+        return Apollo.useMutation<CreateSessionMutation, CreateSessionMutationVariables>(CreateSessionDocument, baseOptions);
+      }
+export type CreateSessionMutationHookResult = ReturnType<typeof useCreateSessionMutation>;
+export type CreateSessionMutationResult = Apollo.MutationResult<CreateSessionMutation>;
+export type CreateSessionMutationOptions = Apollo.BaseMutationOptions<CreateSessionMutation, CreateSessionMutationVariables>;
 export const CustomerDocument = gql`
     query customer($slug: String!) {
   customer(slug: $slug) {
@@ -1300,14 +1827,18 @@ export const CustomerDocument = gql`
  *   },
  * });
  */
-export function useCustomerQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<CustomerQuery, CustomerQueryVariables>) {
-  return ApolloReactHooks.useQuery<CustomerQuery, CustomerQueryVariables>(CustomerDocument, baseOptions);
-}
-export function useCustomerLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<CustomerQuery, CustomerQueryVariables>) {
-  return ApolloReactHooks.useLazyQuery<CustomerQuery, CustomerQueryVariables>(CustomerDocument, baseOptions);
-}
+export function useCustomerQuery(baseOptions: Apollo.QueryHookOptions<CustomerQuery, CustomerQueryVariables>) {
+        return Apollo.useQuery<CustomerQuery, CustomerQueryVariables>(CustomerDocument, baseOptions);
+      }
+export function useCustomerLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<CustomerQuery, CustomerQueryVariables>) {
+          return Apollo.useLazyQuery<CustomerQuery, CustomerQueryVariables>(CustomerDocument, baseOptions);
+        }
 export type CustomerQueryHookResult = ReturnType<typeof useCustomerQuery>;
 export type CustomerLazyQueryHookResult = ReturnType<typeof useCustomerLazyQuery>;
+export type CustomerQueryResult = Apollo.QueryResult<CustomerQuery, CustomerQueryVariables>;
+export function refetchCustomerQuery(variables?: CustomerQueryVariables) {
+      return { query: CustomerDocument, variables: variables }
+    }
 export const GetDialogueDocument = gql`
     query getDialogue($customerSlug: String!, $dialogueSlug: String!) {
   customer(slug: $customerSlug) {
@@ -1374,11 +1905,15 @@ ${CustomerFragmentFragmentDoc}`;
  *   },
  * });
  */
-export function useGetDialogueQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<GetDialogueQuery, GetDialogueQueryVariables>) {
-  return ApolloReactHooks.useQuery<GetDialogueQuery, GetDialogueQueryVariables>(GetDialogueDocument, baseOptions);
-}
-export function useGetDialogueLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetDialogueQuery, GetDialogueQueryVariables>) {
-  return ApolloReactHooks.useLazyQuery<GetDialogueQuery, GetDialogueQueryVariables>(GetDialogueDocument, baseOptions);
-}
+export function useGetDialogueQuery(baseOptions: Apollo.QueryHookOptions<GetDialogueQuery, GetDialogueQueryVariables>) {
+        return Apollo.useQuery<GetDialogueQuery, GetDialogueQueryVariables>(GetDialogueDocument, baseOptions);
+      }
+export function useGetDialogueLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetDialogueQuery, GetDialogueQueryVariables>) {
+          return Apollo.useLazyQuery<GetDialogueQuery, GetDialogueQueryVariables>(GetDialogueDocument, baseOptions);
+        }
 export type GetDialogueQueryHookResult = ReturnType<typeof useGetDialogueQuery>;
 export type GetDialogueLazyQueryHookResult = ReturnType<typeof useGetDialogueLazyQuery>;
+export type GetDialogueQueryResult = Apollo.QueryResult<GetDialogueQuery, GetDialogueQueryVariables>;
+export function refetchGetDialogueQuery(variables?: GetDialogueQueryVariables) {
+      return { query: GetDialogueDocument, variables: variables }
+    }

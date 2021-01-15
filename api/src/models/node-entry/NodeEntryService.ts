@@ -241,7 +241,7 @@ class NodeEntryService {
 
   static getTextValueFromEntry = (entry: NodeEntryWithTypes): (string | null) => {
     if (entry.relatedNode?.type === 'CHOICE') return entry.choiceNodeEntry?.value || null;
-    if (entry.relatedNode?.type === 'TEXTBOX') return entry.choiceNodeEntry?.value || null;
+    if (entry.relatedNode?.type === 'TEXTBOX') return entry.textboxNodeEntry?.value || null;
 
     return null;
   };

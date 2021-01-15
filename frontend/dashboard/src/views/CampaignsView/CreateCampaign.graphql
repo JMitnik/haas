@@ -1,0 +1,5 @@
+mutation CreateCampaign($input: CreateCampaignInputType) {
+  createCampaign(input: $input) {
+    id
+  }
+}

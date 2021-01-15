@@ -1,11 +1,11 @@
 import { CSSReset, ThemeProvider as ChakraThemeProvider } from '@chakra-ui/core';
-import { ThemeProvider } from 'styled-components/macro';
+import { ThemeProvider } from 'styled-components';
 import React, { useEffect, useState } from 'react';
 
 import { makeCustomTheme } from 'utils/makeCustomerTheme';
 import defaultTheme, { chakraDefaultTheme } from 'config/theme';
 
-import { generatePalette, isDarkColor } from 'utils/ColorUtils';
+import { ensureDarkColor, generateDefaultGradient, generatePalette, isDarkColor } from 'utils/ColorUtils';
 import { useCustomer } from './CustomerProvider';
 
 interface ThemeProvidersProps {
@@ -20,6 +20,8 @@ const makeBrandTheme = (settings: any) => {
   const brandTheme = {
     colors: {
       primaries: generatePalette(settings?.colourSettings.primary),
+      strongPrimary: ensureDarkColor(settings?.colourSettings.primary),
+      primaryGradient: generateDefaultGradient(settings?.colourSettings.primary),
       ...settings?.colourSettings,
     },
     isDarkColor: isDarkColor(settings?.colourSettings.primary),

@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import Color from 'color';
-import styled, { css } from 'styled-components/macro';
+import styled, { css } from 'styled-components';
 
 import { Div } from '@haas/ui';
 

@@ -2,7 +2,7 @@ import { Button, ButtonGroup } from '@chakra-ui/core';
 import { Div, Flex, Grid, H4, PageTitle } from '@haas/ui';
 import { Grid as GridIcon, List, Plus } from 'react-feather';
 import { Link, useParams } from 'react-router-dom';
-import { useLazyQuery } from '@apollo/react-hooks';
+import { useLazyQuery } from '@apollo/client';
 import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 
@@ -15,7 +15,7 @@ import { AddDialogueCard, TranslatedPlus } from './DialogueOverviewStyles';
 import DialogueCard from './DialogueCard';
 
 const DialogueOverview = ({ dialogues }: { dialogues: any, isLoading: boolean }) => {
-  const { customerSlug } = useParams();
+  const { customerSlug } = useParams<{ customerSlug: string }>();
   const { t } = useTranslation();
 
   const [useDialogueGridView, setUseDialogueGridView] = useState(true);
@@ -91,12 +91,12 @@ const DialogueOverview = ({ dialogues }: { dialogues: any, isLoading: boolean })
           </AddDialogueCard>
         </Grid>
       ) : (
-        <Grid gridRowGap={2}>
-          {filteredDialogues?.map((dialogue: any, index: any) => dialogue && (
-            <DialogueCard isCompact key={index} dialogue={dialogue} />
-          ))}
-        </Grid>
-      )}
+          <Grid gridRowGap={2}>
+            {filteredDialogues?.map((dialogue: any, index: any) => dialogue && (
+              <DialogueCard isCompact key={index} dialogue={dialogue} />
+            ))}
+          </Grid>
+        )}
     </>
   );
 };

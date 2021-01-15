@@ -1,6 +1,6 @@
 import { useHistory } from 'react-router-dom';
 import React from 'react';
-import styled from 'styled-components/macro';
+import styled from 'styled-components';
 
 import { Div } from '@haas/ui';
 

@@ -1,6 +1,130 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    events: {
+      en: 'Events',
+      de: 'Veranstaltungen'
+    },
+    scheduled_event: {
+      en: 'Delivery was scheduled',
+      de: 'Die Lieferung war geplant'
+    },
+    deployed_event: {
+      en: 'Delivery was sent',
+      de: 'Die Lieferung wurde gesendet'
+    },
+    opened_event: {
+      en: 'Delivery was opened',
+      de: 'Lieferung wurde eröffnet'
+    },
+    finished_event: {
+      en: 'Delivery\'s dialogue was finished',
+      de: 'Der Dialog der Lieferung wurde abgeschlossen'
+    },
+    details: {
+      en: 'Details',
+      de: 'Detail'
+    },
+    upload_deliveries: {
+      en: 'Upload deliveries',
+      de: 'Lieferungen hochladen.'
+    },
+    upload_deliveries_helper: {
+      en: 'Upload a CSV file with details about your recipients. \n - The appropriate format is to use ";" as delimiter \n - Use firstName;lastName;email;phone as your columns \n - Prefix the phone numbers with their country code: for example +49 30901820',
+      de: 'Laden Sie eine CSV-Datei mit Details zu Ihren Empfängern hoch. \n - Das entsprechende Format ist ";" als Trennzeichen \n - Verwenden Sie firstName;lastName;email;phone als Spalten. \n - Stellen Sie den Telefonnummern ihre Landesvorwahl voran, z. B. +49 30901820',
+    },
+    scheduled_at: {
+      en: 'Schedule for when to send',
+      de: 'Zeitplan'
+    },
+    scheduled_at_helper: {
+      en: 'Set a date and time for when to send out these deliveries. \n - By default we will send out deliveries immediately. \n - Note that distribution channels like SMS may have a 5-10 minute delay.',
+      de: 'Legen Sie ein Datum und eine Uhrzeit für den Versand dieser Lieferungen fest. \n - Standardmäßig versenden wir Lieferungen sofort. \n - Beachten Sie, dass Vertriebskanäle wie SMS eine Verzögerung von 5-10 Minuten haben können.',
+    },
+    character_limit: {
+      en: 'Character limit',
+      de: 'Zeichenlimit'
+    },
+    recipient_adress: {
+      en: 'Recipient adres',
+      de: 'Empfänger adres.'
+    },
+    import_deliveries: {
+      en: 'Import deliveries',
+      de: 'Lieferungen importieren'
+    },
+    back_to_campaigns: {
+      en: 'Back to campaigns',
+      de: 'Zurück zu den Kampagnen'
+    },
+    select_campaign: {
+      en: 'Select campaign',
+      de: 'Kampagne auswählen'
+    },
+    select_campaign_text: {
+      en: 'Select one of the created campaigns',
+      de: 'Wählen Sie eine der erstellten Kampagnen aus'
+    },
+    no_campaigns: {
+      en: 'No campaigns have been created yet.',
+      de: 'Es wurden noch keine Kampagnen erstellt.'
+    },
+    edit_variant: {
+      en: 'Edit variant',
+      de: 'Variante bearbeiten:',
+    },
+    campaign_email_helper: {
+      en: 'Send campaign via email',
+      de: 'Kampagne per E-Mail senden',
+    },
+    campaign_sms_helper: {
+      en: 'Send campaign via SMS',
+      de: 'Kampagne per SMS senden',
+    },
+    distribution: {
+      en: 'Distribution',
+      de: 'Verteilung',
+    },
+    body: {
+      en: 'Body',
+      de: 'Teil',
+    },
+    dialogue: {
+      en: 'Dialogue',
+      de: 'Dialog',
+    },
+    create_campaign: {
+      en: 'Create a campaign',
+      de: 'Eine Kampagne erstellen',
+    },
+    select_a_variant: {
+      en: 'Select a variant',
+      de: 'Wählen Sie eine Variante aus',
+    },
+    variant: {
+      en: 'Variant',
+      de: 'Variante',
+    },
+    variants: {
+      en: 'Variants',
+      de: 'Varianten',
+    },
+    variants_helper: {
+      en: 'Variants allow you to specify an A/B test for your campaign. You can specify different distribution channels (such as Email or SMS), by setting the probability of the different variants.',
+      de: 'Mit Varianten können Sie einen A / B-Test für Ihre Kampagne angeben. Sie können verschiedene Vertriebskanäle (wie E-Mail oder SMS) angeben, indem Sie die Wahrscheinlichkeit der verschiedenen Varianten festlegen.',
+    },
+    variant_label: {
+      en: 'Variant label',
+      de: 'Variantenetikett',
+    },
+    campaign_label: {
+      en: 'Campaign label',
+      de: 'Kampagnenetikett',
+    },
+    campaigns: {
+      en: 'Campaigns',
+      de: 'Kampagnen',
+    },
     is_required: {
       en: 'Is the field required?',
       de: 'Ist das Feld erforderlich?',
@@ -809,6 +933,10 @@ const language = {
     },
   },
   views: {
+    configurations: {
+      en: 'Configurations',
+      de: 'Konfigurationen',
+    },
     invite_user: {
       en: 'Invite user',
       de: 'Benutzer einladen',
@@ -1173,6 +1301,14 @@ const language = {
     },
   },
   toast: {
+    campaign_created: {
+      en: 'Campaign created!',
+      de: 'Kampagne erstellt!',
+    },
+    campaign_created_helper: {
+      en: 'A new campaign has been created.',
+      de: 'Eine neue Kampagne wurde erstellt.',
+    },
     delete_node: {
       en: '',
       de: '',
@@ -1350,7 +1486,7 @@ const language = {
       de: 'Bevor wir können Setup Bedingungen, sollten Sie einen Dialog zuerst auswählen.',
     },
     alert_email: {
-      en: 'Send alerts to emai',
+      en: 'Send alerts to email',
       de: 'Senden per E-Mail',
     },
     alert_sms: {

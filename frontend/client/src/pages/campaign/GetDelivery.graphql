@@ -1,0 +1,14 @@
+query GetDelivery($deliveryId: String) {
+  delivery(deliveryId: $deliveryId) {
+    id
+    campaignVariant {
+      id
+      dialogue {
+        slug
+      }
+      workspace {
+        slug
+      }
+    }
+  }
+}

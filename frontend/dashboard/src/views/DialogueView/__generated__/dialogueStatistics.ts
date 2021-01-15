@@ -80,6 +80,7 @@ export interface dialogueStatistics_customer_dialogue_statistics {
 export interface dialogueStatistics_customer_dialogue {
   __typename: "Dialogue";
   id: string;
+  title: string;
   thisWeekAverageScore: number;
   previousScore: number;
   sessions: dialogueStatistics_customer_dialogue_sessions[];

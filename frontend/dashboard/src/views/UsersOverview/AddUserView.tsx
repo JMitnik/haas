@@ -1,14 +1,15 @@
 import * as yup from 'yup';
-import { ApolloError } from 'apollo-boost';
 import { Controller, useForm } from 'react-hook-form';
 import { useHistory } from 'react-router';
-import { useMutation, useQuery } from '@apollo/react-hooks';
+import { useMutation, useQuery } from '@apollo/client';
 import React from 'react';
 import Select from 'react-select';
 
 import { Button, ButtonGroup, FormErrorMessage } from '@chakra-ui/core';
-import { Div, Form, FormContainer, FormControl,
-  FormLabel, FormSection, H3, Hr, Input, InputGrid, InputHelper, Muted, PageTitle } from '@haas/ui';
+import {
+  Div, Form, FormContainer, FormControl,
+  FormLabel, FormSection, H3, Hr, Input, InputGrid, InputHelper, Muted, PageTitle
+} from '@haas/ui';
 import { Mail, Phone, User } from 'react-feather';
 import { motion } from 'framer-motion';
 import { useCustomer } from 'providers/CustomerProvider';
@@ -56,7 +57,7 @@ const AddUserView = () => {
     onCompleted: () => {
       history.push(`/dashboard/b/${activeCustomer?.slug}/users/`);
     },
-    onError: (serverError: ApolloError) => {
+    onError: (serverError: any) => {
       console.log(serverError);
     },
     refetchQueries: [
@@ -67,7 +68,7 @@ const AddUserView = () => {
     ],
   });
 
-  const roles: Array<{name: string, id: string}> = data?.roles;
+  const roles: Array<{ name: string, id: string }> = data?.roles;
   const mappedRoles = roles?.map(({ name, id }) => ({ label: name, value: id }));
 
   const handleSubmit = (formData: FormDataProps) => {

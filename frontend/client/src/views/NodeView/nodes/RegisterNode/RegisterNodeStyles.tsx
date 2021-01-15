@@ -1,6 +1,6 @@
 import { Div, H2 } from '@haas/ui';
 import Color from 'color';
-import styled, { css } from 'styled-components/macro';
+import styled, { css } from 'styled-components';
 
 export const RegisterNodeContainer = styled(Div)`
   ${({ theme }) => css`

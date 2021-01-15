@@ -1,0 +1,21 @@
+{
+    "TableName": "CampaignDeliveries",
+    "KeySchema": [
+        {
+            "AttributeName": "DeliveryDate", 
+            "KeyType": "HASH" 
+        },
+        {
+            "AttributeName": "DeliveryDate_DeliveryID",
+            "KeyType": "RANGE"
+        }
+    ],
+    "AttributeDefinitions": [
+      { "AttributeName": "DeliveryDate", "AttributeType": "S" },
+      { "AttributeName": "DeliveryDate_DeliveryID", "AttributeType": "S" }
+    ],
+    "ProvisionedThroughput": {
+      "ReadCapacityUnits": 1,
+      "WriteCapacityUnits": 1
+    }
+}

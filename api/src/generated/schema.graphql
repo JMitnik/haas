@@ -10,6 +10,32 @@ input AppendToInteractionInput {
   sessionId: ID
 }
 
+"""Campaign"""
+type CampaignType {
+  deliveryConnection(filter: DeliveryConnectionFilter): DeliveryConnectionType
+  id: ID!
+  label: String!
+  variants: [CampaignVariantType!]!
+}
+
+enum CampaignVariantEnum {
+  EMAIL
+  QUEUE
+  SMS
+}
+
+"""Variant of campaign"""
+type CampaignVariantType {
+  body: String!
+  deliveryConnection: DeliveryConnectionType
+  dialogue: Dialogue!
+  id: ID!
+  label: String!
+  type: CampaignVariantEnum!
+  weight: Int!
+  workspace: Customer!
+}
+
 """Input type for a choice node"""
 input ChoiceNodeEntryInput {
   value: String
@@ -36,6 +62,34 @@ interface ConnectionInterface {
   offset: Int!
   pageInfo: PaginationPageInfo!
   startDate: String
+}
+
+input CreateBatchDeliveriesInputType {
+  batchScheduledAt: String
+  campaignId: ID
+  uploadedCsv: Upload
+  workspaceId: String
+}
+
+type CreateBatchDeliveriesOutputType {
+  failedDeliveries: [FailedDeliveryModel!]!
+  nrDeliveries: Int!
+}
+
+input CreateCampaignInputType {
+  label: String
+  variants: [CreateCampaignVariantInputType!]
+  workspaceId: ID!
+}
+
+input CreateCampaignVariantInputType {
+  body: String
+  dialogueId: ID!
+  label: String
+  subject: String
+  type: CampaignVariantEnum!
+  weight: Float
+  workspaceId: ID!
 }
 
 input CreateCTAInputType {
@@ -116,6 +170,8 @@ input CTAShareInputObjectType {
 }
 
 type Customer {
+  campaign(campaignId: String): CampaignType!
+  campaigns: [CampaignType!]!
   dialogue(where: DialogueWhereUniqueInput): Dialogue
   dialogues(filter: DialogueFilterInputType): [Dialogue!]
   id: ID!
@@ -160,6 +216,54 @@ input DeleteUserInput {
 
 type DeleteUserOutput {
   deletedUser: Boolean!
+}
+
+input DeliveryConnectionFilter {
+  campaignId: String
+  campaignVariantId: ID
+  paginationFilter: PaginationWhereInput
+  status: DeliveryStatusEnum
+}
+
+type DeliveryConnectionType implements ConnectionInterface {
+  deliveries: [DeliveryType!]!
+  endDate: String
+  limit: Int!
+  nrFinished: Int!
+  nrOpened: Int!
+  nrSent: Int!
+  nrTotal: Int!
+  offset: Int!
+  pageInfo: PaginationPageInfo!
+  startDate: String
+}
+
+type DeliveryEventType {
+  createdAt: String!
+  id: ID!
+  status: DeliveryStatusEnum!
+}
+
+enum DeliveryStatusEnum {
+  DEPLOYED
+  FINISHED
+  OPENED
+  SCHEDULED
+  SENT
+}
+
+"""Delivery"""
+type DeliveryType {
+  campaignVariant: CampaignVariantType
+  currentStatus: DeliveryStatusEnum!
+  deliveryRecipientEmail: String
+  deliveryRecipientFirstName: String
+  deliveryRecipientLastName: String
+  deliveryRecipientPhone: String
+  events: [DeliveryEventType!]!
+  id: ID!
+  scheduledAt: String
+  updatedAt: String
 }
 
 type Dialogue {
@@ -251,6 +355,11 @@ input EditWorkspaceInput {
   slug: String!
 }
 
+type FailedDeliveryModel {
+  error: String!
+  record: String!
+}
+
 type FontSettings {
   id: ID!
 }
@@ -322,6 +431,7 @@ type FormNodeType {
   id: String
 }
 
+<<<<<<< HEAD
 """Generate sales documents"""
 input GenerateAutodeckInput {
   answer1: String!
@@ -333,6 +443,10 @@ input GenerateAutodeckInput {
   name: String!
   primaryColour: String!
   website: String!
+=======
+input GetCampaignsInput {
+  customerSlug: String
+>>>>>>> dev
 }
 
 type ImageType {
@@ -416,6 +530,8 @@ type Mutation {
   appendToInteraction(input: AppendToInteractionInput): Session!
   assignTags(dialogueId: String, tags: TagsInputObjectType): Dialogue!
   copyDialogue(input: CreateDialogueInputType): Dialogue!
+  createBatchDeliveries(input: CreateBatchDeliveriesInputType): CreateBatchDeliveriesOutputType!
+  createCampaign(input: CreateCampaignInputType): CampaignType!
 
   """Create Call to Actions"""
   createCTA(input: CreateCTAInputType): QuestionNode!
@@ -451,7 +567,11 @@ type Mutation {
   singleUpload(file: Upload): ImageType!
   updateCreateWorkspaceJob(id: String, referenceId: String, resourceUrl: String, status: JobStatusType): CreateWorkspaceJobType
   updateCTA(input: UpdateCTAInputType): QuestionNode!
+<<<<<<< HEAD
   updateJob(id: String, referenceId: String, resourceUrl: String, status: JobStatusType): JobObjectType
+=======
+  updateDeliveryStatus(deliveryId: String, status: DeliveryStatusEnum): String!
+>>>>>>> dev
   updateQuestion(input: UpdateQuestionNodeInputType): QuestionNode!
   updateRoles(permissions: PermissionIdsInput, roleId: String): RoleType!
 
@@ -536,8 +656,10 @@ enum PaginationSortByEnum {
   name
   paths
   role
+  scheduledAt
   score
   type
+  updatedAt
   user
   when
 }
@@ -579,6 +701,7 @@ type PermssionType {
 type Query {
   customer(id: ID, slug: String): Customer
   customers: [Customer!]!
+  delivery(deliveryId: String): DeliveryType
   dialogue(where: DialogueWhereUniqueInput): Dialogue
   dialogues(filter: DialogueFilterInputType): [Dialogue!]!
   edge(id: String): Edge
@@ -734,6 +857,7 @@ type SessionConnection implements ConnectionInterface {
 
 """Input for session"""
 input SessionInput {
+  deliveryId: String
   dialogueId: String!
   entries: [NodeEntryInput!]
 }
@@ -808,6 +932,8 @@ enum SystemPermission {
   CAN_ACCESS_ADMIN_PANEL
   CAN_ADD_USERS
   CAN_BUILD_DIALOGUE
+  CAN_CREATE_CAMPAIGNS
+  CAN_CREATE_DELIVERIES
   CAN_CREATE_TRIGGERS
   CAN_DELETE_DIALOGUE
   CAN_DELETE_TRIGGERS
@@ -816,6 +942,7 @@ enum SystemPermission {
   CAN_EDIT_DIALOGUE
   CAN_EDIT_USERS
   CAN_EDIT_WORKSPACE
+  CAN_VIEW_CAMPAIGNS
   CAN_VIEW_DIALOGUE
   CAN_VIEW_DIALOGUE_ANALYTICS
   CAN_VIEW_USERS

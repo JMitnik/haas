@@ -8,6 +8,7 @@ dist
 secrets
 ssl
 
+.aws-sam
 api/logs
 
 # misc

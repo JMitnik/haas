@@ -6,7 +6,7 @@ import { Card, CardBody, CardFooter, ColumnFlex, Div, Flex, Grid, H3, Paragraph,
 import { Icon } from '@chakra-ui/core';
 
 const SummaryInteractionCountModule = ({ interactionCount }: { interactionCount: number }) => {
-  const { customerSlug, dialogueSlug } = useParams();
+  const { customerSlug, dialogueSlug } = useParams<{ customerSlug: string, dialogueSlug: string }>();
   const history = useHistory();
 
   return (

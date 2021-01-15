@@ -1,5 +1,5 @@
 import { AnimatePresence } from 'framer-motion';
-import { ApolloProvider } from '@apollo/react-hooks';
+import { ApolloProvider } from '@apollo/client';
 import { Div, ViewContainer } from '@haas/ui';
 import { ErrorBoundary } from 'react-error-boundary';
 import { I18nextProvider } from 'react-i18next';
@@ -7,7 +7,10 @@ import { Redirect, Route, BrowserRouter as Router, Switch } from 'react-router-d
 import React, { FC } from 'react';
 
 import { AppContainer } from 'styles/AppStyles';
+import { CampaignView } from 'views/CampaignView/CampaignView';
 import { DefaultThemeProviders } from 'providers/ThemeProvider';
+import { DialogueProvider } from 'providers/DialogueProvider';
+import { ROUTES } from 'hooks/useNavigator';
 import { SystemPermission } from 'types/globalTypes';
 import ActionsPage from 'pages/dashboard/actions';
 import AddCustomerPage from 'pages/dashboard/customers/add';
@@ -15,6 +18,7 @@ import AddDialogueView from 'views/AddDialogueView';
 import AddTriggerView from 'views/TriggerOverview/AddTriggerView';
 import AnalyticsPage from 'pages/dashboard/analytics';
 import AutodeckPage from 'pages/dashboard/autodeck';
+import CampaignsView from 'views/CampaignsView/CampaignsView';
 import CustomerLayout from 'layouts/CustomerLayout';
 import CustomerPage from 'pages/dashboard/customer';
 import CustomerProvider from 'providers/CustomerProvider';
@@ -51,129 +55,143 @@ import lang from 'config/i18n-config';
 const CustomerRoutes = () => (
   <AnimatePresence>
     <CustomerProvider>
-      <CustomerLayout>
-        <Switch>
-          <CustomerRoute
-            path="/dashboard/b/:customerSlug/d/:dialogueSlug"
-            render={() => (
-              <DialogueLayout>
-                <Switch>
-                  <GuardedRoute
-                    allowedPermission={SystemPermission.CAN_BUILD_DIALOGUE}
-                    path="/dashboard/b/:customerSlug/d/:dialogueSlug/builder"
-                    render={() => <DialogueBuilderPage />}
-                  />
+      <DialogueProvider>
+        <CustomerLayout>
+          <Switch>
+            <CustomerRoute
+              path="/dashboard/b/:customerSlug/d/:dialogueSlug"
+              render={() => (
+                <DialogueLayout>
+                  <Switch>
+                    <GuardedRoute
+                      allowedPermission={SystemPermission.CAN_BUILD_DIALOGUE}
+                      path="/dashboard/b/:customerSlug/d/:dialogueSlug/builder"
+                      render={() => <DialogueBuilderPage />}
+                    />
 
-                  <GuardedRoute
-                    allowedPermission={SystemPermission.CAN_EDIT_DIALOGUE}
-                    path="/dashboard/b/:customerSlug/d/:dialogueSlug/edit"
-                    render={() => <EditDialogueView />}
-                  />
+                    <GuardedRoute
+                      allowedPermission={SystemPermission.CAN_EDIT_DIALOGUE}
+                      path="/dashboard/b/:customerSlug/d/:dialogueSlug/edit"
+                      render={() => <EditDialogueView />}
+                    />
 
-                  <GuardedRoute
-                    path="/dashboard/b/:customerSlug/d/:dialogueSlug/interactions"
-                    render={() => <InteractionsOverview />}
-                  />
+                    <GuardedRoute
+                      path="/dashboard/b/:customerSlug/d/:dialogueSlug/interactions"
+                      render={() => <InteractionsOverview />}
+                    />
 
-                  <GuardedRoute
-                    allowedPermission={SystemPermission.CAN_BUILD_DIALOGUE}
-                    path="/dashboard/b/:customerSlug/d/:dialogueSlug/actions"
-                    render={() => <ActionsPage />}
-                  />
+                    <GuardedRoute
+                      allowedPermission={SystemPermission.CAN_BUILD_DIALOGUE}
+                      path="/dashboard/b/:customerSlug/d/:dialogueSlug/actions"
+                      render={() => <ActionsPage />}
+                    />
 
-                  <GuardedRoute
-                    allowedPermission={SystemPermission.CAN_VIEW_DIALOGUE_ANALYTICS}
-                    redirectRoute="/dashboard/b/:customerSlug/d/:dialogueSlug/interactions"
-                    path="/dashboard/b/:customerSlug/d/:dialogueSlug"
-                    render={() => <DialoguePage />}
-                  />
+                    <GuardedRoute
+                      allowedPermission={SystemPermission.CAN_VIEW_DIALOGUE_ANALYTICS}
+                      redirectRoute="/dashboard/b/:customerSlug/d/:dialogueSlug/interactions"
+                      path="/dashboard/b/:customerSlug/d/:dialogueSlug"
+                      render={() => <DialoguePage />}
+                    />
 
-                </Switch>
-              </DialogueLayout>
-            )}
-          />
+                  </Switch>
+                </DialogueLayout>
+              )}
+            />
 
-          <CustomerRoute
-            path="/dashboard/b/:customerSlug"
-            render={() => (
-              <ViewContainer>
-                <Switch>
-                  <GuardedRoute
-                    path="/dashboard/b/:customerSlug/analytics/"
-                    render={() => (
-                      <AnalyticsPage />
-                    )}
-                  />
+            <GuardedRoute
+              allowedPermission={SystemPermission.CAN_VIEW_CAMPAIGNS}
+              path={ROUTES.CAMPAIGNS_VIEW}
+              render={() => <CampaignsView />}
+            />
 
-                  <GuardedRoute
-                    allowedPermission={SystemPermission.CAN_CREATE_TRIGGERS}
-                    path="/dashboard/b/:customerSlug/triggers/add"
-                    render={() => (
-                      <AddTriggerView />
-                    )}
-                  />
+            <GuardedRoute
+              allowedPermission={SystemPermission.CAN_CREATE_DELIVERIES}
+              path={ROUTES.CAMPAIGN_VIEW}
+              render={() => <CampaignView />}
+            />
 
-                  <GuardedRoute
-                    allowedPermission={SystemPermission.CAN_CREATE_TRIGGERS}
-                    path="/dashboard/b/:customerSlug/triggers/:triggerId/edit"
-                    render={() => (
-                      <EditTriggerView />
-                    )}
-                  />
+            <CustomerRoute
+              path="/dashboard/b/:customerSlug"
+              render={() => (
+                <ViewContainer>
+                  <Switch>
+                    <GuardedRoute
+                      path="/dashboard/b/:customerSlug/analytics/"
+                      render={() => (
+                        <AnalyticsPage />
+                      )}
+                    />
 
-                  <GuardedRoute
-                    allowedPermission={SystemPermission.CAN_CREATE_TRIGGERS}
-                    path="/dashboard/b/:customerSlug/triggers"
-                    render={() => <TriggersOverview />}
-                  />
+                    <GuardedRoute
+                      allowedPermission={SystemPermission.CAN_CREATE_TRIGGERS}
+                      path="/dashboard/b/:customerSlug/triggers/add"
+                      render={() => (
+                        <AddTriggerView />
+                      )}
+                    />
 
-                  <GuardedRoute
-                    allowedPermission={SystemPermission.CAN_EDIT_WORKSPACE}
-                    path="/dashboard/b/:customerSlug/edit"
-                    render={() => <EditCustomerView />}
-                  />
+                    <GuardedRoute
+                      allowedPermission={SystemPermission.CAN_CREATE_TRIGGERS}
+                      path="/dashboard/b/:customerSlug/triggers/:triggerId/edit"
+                      render={() => (
+                        <EditTriggerView />
+                      )}
+                    />
 
-                  <GuardedRoute
-                    path="/dashboard/b/:customerSlug/u/:userId/edit"
-                    allowedPermission={SystemPermission.CAN_EDIT_USERS}
-                    render={() => (
-                      <EditUserView />
-                    )}
-                  />
+                    <GuardedRoute
+                      allowedPermission={SystemPermission.CAN_CREATE_TRIGGERS}
+                      path="/dashboard/b/:customerSlug/triggers"
+                      render={() => <TriggersOverview />}
+                    />
 
-                  <GuardedRoute
-                    allowedPermission={SystemPermission.CAN_ADD_USERS}
-                    path="/dashboard/b/:customerSlug/users/invite"
-                    render={() => (
-                      <InviteUserView />
-                    )}
-                  />
+                    <GuardedRoute
+                      allowedPermission={SystemPermission.CAN_EDIT_WORKSPACE}
+                      path="/dashboard/b/:customerSlug/edit"
+                      render={() => <EditCustomerView />}
+                    />
 
-                  <GuardedRoute
-                    allowedPermission={SystemPermission.CAN_VIEW_USERS}
-                    path="/dashboard/b/:customerSlug/users"
-                    render={() => <UsersOverview />}
-                  />
+                    <GuardedRoute
+                      path="/dashboard/b/:customerSlug/u/:userId/edit"
+                      allowedPermission={SystemPermission.CAN_EDIT_USERS}
+                      render={() => (
+                        <EditUserView />
+                      )}
+                    />
 
-                  <GuardedRoute
-                    path="/dashboard/b/:customerSlug/dialogue/add"
-                    render={() => <AddDialogueView />}
-                  />
+                    <GuardedRoute
+                      allowedPermission={SystemPermission.CAN_ADD_USERS}
+                      path="/dashboard/b/:customerSlug/users/invite"
+                      render={() => (
+                        <InviteUserView />
+                      )}
+                    />
 
-                  <GuardedRoute
-                    path="/dashboard/b/:customerSlug/d"
-                    render={() => <DialoguesPage />}
-                  />
-                  <GuardedRoute
-                    path="/dashboard/b/:customerSlug/"
-                    render={() => <CustomerPage />}
-                  />
-                </Switch>
-              </ViewContainer>
-            )}
-          />
-        </Switch>
-      </CustomerLayout>
+                    <GuardedRoute
+                      allowedPermission={SystemPermission.CAN_VIEW_USERS}
+                      path="/dashboard/b/:customerSlug/users"
+                      render={() => <UsersOverview />}
+                    />
+
+                    <GuardedRoute
+                      path="/dashboard/b/:customerSlug/dialogue/add"
+                      render={() => <AddDialogueView />}
+                    />
+
+                    <GuardedRoute
+                      path="/dashboard/b/:customerSlug/d"
+                      render={() => <DialoguesPage />}
+                    />
+                    <GuardedRoute
+                      path="/dashboard/b/:customerSlug/"
+                      render={() => <CustomerPage />}
+                    />
+                  </Switch>
+                </ViewContainer>
+              )}
+            />
+          </Switch>
+        </CustomerLayout>
+      </DialogueProvider>
     </CustomerProvider>
   </AnimatePresence>
 );

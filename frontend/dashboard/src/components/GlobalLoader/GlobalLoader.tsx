@@ -2,7 +2,7 @@ import { HAASRun } from 'assets/animations';
 import { motion } from 'framer-motion';
 import Lottie from 'react-lottie';
 import React from 'react';
-import styled, { css } from 'styled-components/macro';
+import styled, { css } from 'styled-components';
 
 const GlobalLoaderContainer = styled.div`
   ${({ theme }) => css`

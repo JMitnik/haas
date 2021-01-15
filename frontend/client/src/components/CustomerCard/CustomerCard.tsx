@@ -1,9 +1,9 @@
 import { CardBody, CardFooter, ColumnFlex, Div, Flex, H3 } from '@haas/ui';
-import { CustomerCardEnqueteLabel, CustomerCardImage } from './CustomerCardStyles';
 import { useHistory } from 'react-router-dom';
 import React from 'react';
 import Select from 'react-select';
-import styled, { css } from 'styled-components/macro';
+import styled, { css } from 'styled-components';
+import { CustomerCardEnqueteLabel, CustomerCardImage } from './CustomerCardStyles';
 
 // TODO: Reconcile with regular Card
 const Card = styled(Div)`
