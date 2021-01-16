@@ -29,7 +29,7 @@
         "@graphql-codegen/typescript": "^1.11.2",
         "@graphql-codegen/typescript-resolvers": "^1.11.2",
         "@nexus/schema": "^0.13.1",
-        "@prisma/client": "2.8.0",
+        "@prisma/client": "2.14.0",
         "@sentry/node": "^5.21.4",
         "@types/bcrypt": "^3.0.0",
         "@types/color": "3.0.1",
@@ -87,7 +87,7 @@
         "yup": "^0.29.1"
     },
     "devDependencies": {
-        "@prisma/cli": "2.8.0",
+        "@prisma/cli": "2.14.0",
         "@types/cookie-parser": "^1.4.2",
         "@types/jest": "^25.2.1",
         "@types/mustache": "^4.1.0",
@@ -98,7 +98,7 @@
     },
     "resolutions": {
         "**/**/fs-capacitor": "^6.2.0",
-        "@prisma/cli": "2.8.0",
-        "@prisma/client": "2.8.0"
+        "@prisma/cli": "2.14.0",
+        "@prisma/client": "2.14.0"
     }
 }

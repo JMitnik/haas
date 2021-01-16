@@ -6,7 +6,7 @@ datasource postgresql {
 // binaryTargets = ["debian-openssl-1.1.x"]
 generator client {
   provider        = "prisma-client-js"
-  previewFeatures = ["transactionApi"]
+  previewFeatures = ["groupBy"]
   output          = "./node_modules/@prisma/client"
 }
 
@@ -50,17 +50,18 @@ model CustomerSettings {
 }
 
 model Customer {
-  id          String            @id @default(cuid())
-  slug        String            @unique
-  name        String
-  settings    CustomerSettings?
-  dialogues   Dialogue[]
-  users       UserOfCustomer[]
-  roles       Role[]
-  permissions Permission[]
-  triggers    Trigger[]
-  tags        Tag[]
-  campaigns   Campaign[]
+  id              String            @id @default(cuid())
+  slug            String            @unique
+  name            String
+  settings        CustomerSettings?
+  dialogues       Dialogue[]
+  users           UserOfCustomer[]
+  roles           Role[]
+  permissions     Permission[]
+  triggers        Trigger[]
+  tags            Tag[]
+  campaigns       Campaign[]
+  CampaignVariant CampaignVariant[]
 }
 
 enum TagEnum {
@@ -97,6 +98,7 @@ model Dialogue {
 
   wasGeneratedWithGenData Boolean @default(value: false)
   @@unique([slug, customerId])
+  CampaignVariant CampaignVariant[]
 }
 
 enum NodeType {
@@ -121,21 +123,25 @@ enum FormNodeFieldType {
 }
 
 model FormNodeField {
-  id    String        @id @default(cuid())
-  label String
-  type  FormNodeFieldType @default(shortText)
-  isRequired  Boolean @default(false)
-  position  Int
+  id                     String                   @id @default(cuid())
+  label                  String
+  type                   FormNodeFieldType        @default(shortText)
+  isRequired             Boolean                  @default(false)
+  position               Int
+  FormNode               FormNode?                @relation(fields: [formNodeId], references: [id])
+  formNodeId             String?
+  FormNodeFieldEntryData FormNodeFieldEntryData[]
 }
 
 model FormNode {
-  id           String           @id @default(cuid())
-  createdAt     DateTime        @default(now())
-  fields        FormNodeField[]
+  id           String          @id @default(cuid())
+  createdAt    DateTime        @default(now())
+  fields       FormNodeField[]
+  QuestionNode QuestionNode[]
 }
 
 model FormNodeFieldEntryData {
-  id          Int       @id @default(autoincrement())
+  id Int @id @default(autoincrement())
 
   // Data property (belonging to a specific field)
   email       String?
@@ -146,12 +152,14 @@ model FormNodeFieldEntryData {
   number      Int?
 
   relatedFieldId  String
-  relatedField  FormNodeField @relation(references: [id], fields: [relatedFieldId])
+  relatedField    FormNodeField  @relation(references: [id], fields: [relatedFieldId])
+  FormNodeEntry   FormNodeEntry? @relation(fields: [formNodeEntryId], references: [id])
+  formNodeEntryId Int?
 }
 
 model FormNodeEntry {
-  id          Int       @id @default(autoincrement())
-  values      FormNodeFieldEntryData[]
+  id     Int                      @id @default(autoincrement())
+  values FormNodeFieldEntryData[]
 
   // Relation to node
   nodeEntryId String
@@ -159,23 +167,26 @@ model FormNodeEntry {
 }
 
 model SliderNodeRange {
-  id        String          @id @default(cuid())
-  start     Float?
-  end       Float?
+  id               String             @id @default(cuid())
+  start            Float?
+  end              Float?
+  SliderNodeMarker SliderNodeMarker[]
 }
 
 model SliderNodeMarker {
-  id        String          @id @default(cuid())
-  range     SliderNodeRange
-  label     String
-  subLabel  String
-  sliderNodeId  String
-  sliderNode    SliderNode  @relation(fields: [sliderNodeId], references: [id])
+  id                String          @id @default(cuid())
+  range             SliderNodeRange @relation(fields: [sliderNodeRangeId], references: [id])
+  label             String
+  subLabel          String
+  sliderNodeId      String
+  sliderNode        SliderNode      @relation(fields: [sliderNodeId], references: [id])
+  sliderNodeRangeId String
 }
 
 model SliderNode {
-  id        String          @id @default(cuid())
-  markers SliderNodeMarker[]
+  id           String             @id @default(cuid())
+  markers      SliderNodeMarker[]
+  QuestionNode QuestionNode[]
 }
 
 model QuestionNode {
@@ -208,11 +219,13 @@ model QuestionNode {
 
   // Node-types
   share      Share?
-  sliderNode SliderNode?
-  form  FormNode?
+  sliderNode SliderNode? @relation(fields: [sliderNodeId], references: [id])
+  form       FormNode?   @relation(fields: [formNodeId], references: [id])
 
   links             Link[]
   QuestionOfTrigger QuestionOfTrigger[]
+  sliderNodeId      String?
+  formNodeId        String?
 }
 
 enum LinkTypeEnum {
@@ -315,15 +328,15 @@ model NodeEntry {
   inputSource   InputSource   @default(value: CLIENT)
 
   // Entry types
-  sliderNodeEntry       SliderNodeEntry?
-  choiceNodeEntry       ChoiceNodeEntry?
-  textboxNodeEntry      TextboxNodeEntry?
-  
+  sliderNodeEntry  SliderNodeEntry?
+  choiceNodeEntry  ChoiceNodeEntry?
+  textboxNodeEntry TextboxNodeEntry?
+
   // @Deprecated => FormNodeEntry
   registrationNodeEntry RegistrationNodeEntry?
-  
-  formNodeEntry         FormNodeEntry?
-  linkNodeEntry         LinkNodeEntry?
+
+  formNodeEntry FormNodeEntry?
+  linkNodeEntry LinkNodeEntry?
 }
 
 model LinkNodeEntry {
@@ -516,12 +529,12 @@ enum CampaignVariantTypeEnum {
 }
 
 model Campaign {
-  id  String  @id @default(cuid())
-  label       String
-  deliveries  Delivery[]
-  variantsEdges    CampaignVariantToCampaign[]
-  
-  workspaceId String   
+  id            String                      @id @default(cuid())
+  label         String
+  deliveries    Delivery[]
+  variantsEdges CampaignVariantToCampaign[]
+
+  workspaceId String
   workspace   Customer @relation(fields: [workspaceId], references: [id])
 
   createdAt DateTime @default(now())
@@ -529,28 +542,32 @@ model Campaign {
 }
 
 model CampaignVariantToCampaign {
-  campaignId  String
-  campaign  Campaign @relation(fields: [campaignId], references: [id])
+  campaignId String
+  campaign   Campaign @relation(fields: [campaignId], references: [id])
 
   campaignVariantId String
-  campaignVariant CampaignVariant @relation(fields: [campaignVariantId], references: [id])
+  campaignVariant   CampaignVariant @relation(fields: [campaignVariantId], references: [id])
 
-  // Weight decides in A/B testing which 
-  weight  Int
+  // Weight decides in A/B testing which
+  weight Int
 
   @@id([campaignId, campaignVariantId])
 }
 
 model CampaignVariant {
-  id  String @id @default(cuid())
-  label     String
-  body      String
-   
-  workspace   Customer
-  dialogue    Dialogue
+  id    String @id @default(cuid())
+  label String
+  body  String
 
-  subject   String?
-  type      CampaignVariantTypeEnum
+  workspace Customer @relation(fields: [customerId], references: [id])
+  dialogue  Dialogue @relation(fields: [dialogueId], references: [id])
+
+  subject                   String?
+  type                      CampaignVariantTypeEnum
+  CampaignVariantToCampaign CampaignVariantToCampaign[]
+  Delivery                  Delivery[]
+  customerId                String
+  dialogueId                String
 }
 
 enum DeliveryStatusTypeEnum {
@@ -563,31 +580,32 @@ enum DeliveryStatusTypeEnum {
 
 model Delivery {
   // We generated the ID ourselves
-  id  String @id
+  id String @id
 
   deliveryRecipientFirstName String?
-  deliveryRecipientLastName String?
-  deliveryRecipientEmail String?
-  deliveryRecipientPhone String?
+  deliveryRecipientLastName  String?
+  deliveryRecipientEmail     String?
+  deliveryRecipientPhone     String?
 
-  campaignId  String
-  campaign  Campaign @relation(fields: [campaignId], references: [id])
+  campaignId String
+  campaign   Campaign @relation(fields: [campaignId], references: [id])
 
   campaignVariantId String
-  campaignVariant CampaignVariant @relation(fields: [campaignVariantId], references: [id])
+  campaignVariant   CampaignVariant @relation(fields: [campaignVariantId], references: [id])
 
-  currentStatus  DeliveryStatusTypeEnum
+  currentStatus DeliveryStatusTypeEnum
 
-  events  DeliveryEvents[]
+  events DeliveryEvents[]
 
   scheduledAt DateTime
-  createdAt   DateTime @default(now())
+  createdAt   DateTime  @default(now())
   updatedAt   DateTime? @updatedAt
 }
 
 model DeliveryEvents {
-  id String @id @default(cuid())
-  status DeliveryStatusTypeEnum
-  createdAt DateTime @default(now())
-  deliveryId  String
+  id         String                 @id @default(cuid())
+  status     DeliveryStatusTypeEnum
+  createdAt  DateTime               @default(now())
+  deliveryId String
+  Delivery   Delivery?              @relation(fields: [deliveryId], references: [id])
 }
