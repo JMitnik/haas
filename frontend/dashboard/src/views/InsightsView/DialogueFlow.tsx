@@ -17,7 +17,7 @@ interface DialogueFlowProps {
 }
 
 const DialogueFlow = ({ nodes, edges }: DialogueFlowProps) => {
-  const HEIGHT = '80vh';
+  const HEIGHT = '85vh';
 
   const processedNodes = nodes.map(node => ({
     id: node.id,
@@ -28,6 +28,7 @@ const DialogueFlow = ({ nodes, edges }: DialogueFlowProps) => {
     id: edge.id,
     source: edge.parentNode?.id,
     target: edge.childNode?.id,
+    label: edge.conditions?.[0]?.matchValue || '',
     type: "HAAS_NODE"
   }));
 
@@ -39,10 +40,10 @@ const DialogueFlow = ({ nodes, edges }: DialogueFlowProps) => {
 
   const getLayoutElements = () => {
     processedNodes.forEach((el) => {
-      dagreGraph.setNode(el?.id || '', { width: 150, height: 50 });
+      dagreGraph.setNode(el?.id || '', { width: 150, height: 80 });
     });
 
-    dagreGraph.setGraph({ rankdir: "LR" });
+    dagreGraph.setGraph({ rankdir: "LR", edgesep: 120, nodesep: 150, ranksep: 150 });
 
     processedEdges.forEach((edge) => {
       dagreGraph.setEdge((edge?.source || ''), edge.target || '');
@@ -68,7 +69,7 @@ const DialogueFlow = ({ nodes, edges }: DialogueFlowProps) => {
   const elements = getLayoutElements() as any || [];
 
   return (
-    <UI.Div style={{ borderLeft: '1px solid #e2e8f0' }}>
+    <UI.Div style={{ borderLeft: '1px solid #e2e8f0', overflow: 'hidden' }}>
       <UI.Div style={{ height: HEIGHT, width: '100%' }}>
         <ReactFlow elements={elements}>
           <MiniMap />
