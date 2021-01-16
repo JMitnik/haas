@@ -16,12 +16,12 @@ class CustomerService {
   };
 
   static customerSettings = async (parent: Customer) => {
-    const customerSettings = prisma.customerSettings.findOne({ where: { customerId: parent.id } });
+    const customerSettings = prisma.customerSettings.findUnique({ where: { customerId: parent.id } });
     return customerSettings;
   };
 
   static customerBySlug = async (customerSlug: string) => {
-    const customer = await prisma.customer.findOne({ where: { slug: customerSlug } });
+    const customer = await prisma.customer.findUnique({ where: { slug: customerSlug } });
 
     if (!customer) {
       throw new Error(`Unable to find customer ${customerSlug}!`);
@@ -150,7 +150,7 @@ class CustomerService {
    * @param dialogueSlug
    */
   static async getDialogueFromCustomerBySlug(customerId: string, dialogueSlug: string) {
-    const customerWithDialogue = await prisma.customer.findOne({
+    const customerWithDialogue = await prisma.customer.findUnique({
       where: { id: customerId },
       include: {
         dialogues: {
@@ -165,7 +165,7 @@ class CustomerService {
   static async deleteCustomer(customerId: string) {
     if (!customerId) return null;
 
-    const customer = await prisma.customer.findOne({
+    const customer = await prisma.customer.findUnique({
       where: { id: customerId },
       include: {
         settings: {
@@ -252,7 +252,7 @@ class CustomerService {
    * @param dialogueSlug
    */
   static async getDialogueFromCustomerById(customerId: string, dialogueId: string) {
-    const customerWithDialogue = await prisma.customer.findOne({
+    const customerWithDialogue = await prisma.customer.findUnique({
       where: { id: customerId },
       include: {
         dialogues: {

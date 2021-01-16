@@ -1,5 +1,5 @@
 import { NexusGenInputs } from '../../generated/nexus';
-import { NodeType, RoleCreateInput, SliderNodeMarkerCreateInput, TagEnum } from '@prisma/client';
+import { NodeType, Prisma, TagEnum } from '@prisma/client';
 
 interface Tag {
   name: string,
@@ -7,7 +7,7 @@ interface Tag {
 }
 
 interface RootSliderOptions {
-  markers: SliderNodeMarkerCreateInput[];
+  markers: Prisma.SliderNodeMarkerCreateInput[];
 }
 
 export interface WorkspaceTemplate {
@@ -17,7 +17,7 @@ export interface WorkspaceTemplate {
   description: string;
   primaryColor: string;
   leafNodes: any;
-  roles: RoleCreateInput[];
+  roles: Prisma.RoleCreateInput[];
   tags: Tag[];
   rootSliderOptions: any;
 }

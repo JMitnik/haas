@@ -3,11 +3,7 @@ import _, { cloneDeep } from 'lodash';
 import cuid from 'cuid';
 
 import { ApolloError, UserInputError } from 'apollo-server-express';
-import {
-  Dialogue, DialogueCreateInput, DialogueUpdateInput,
-  NodeType,
-  QuestionOptionCreateManyWithoutQuestionNodeInput, Tag, TagWhereUniqueInput
-} from '@prisma/client';
+import { Dialogue, Prisma, NodeType, Tag } from '@prisma/client';
 import { isPresent } from 'ts-is-present';
 import NodeService from '../QuestionNode/NodeService';
 import filterDate from '../../utils/filterDate';
@@ -36,7 +32,7 @@ class DialogueService {
     description: string,
     publicTitle: string = '',
     tags: Array<{ id: string }> = [],
-  ): DialogueCreateInput {
+  ): Prisma.DialogueCreateInput {
     const constructDialogueFragment = {
       customer: { connect: { id: customerId } },
       title,
@@ -75,11 +71,11 @@ class DialogueService {
   static updateTags = (
     dbTags: Array<Tag>,
     newTags: Array<string>,
-    updateDialogueArgs: DialogueUpdateInput,
+    updateDialogueArgs: Prisma.DialogueUpdateInput,
   ) => {
     const newTagObjects = newTags.map((tag) => ({ id: tag }));
 
-    const deleteTagObjects: TagWhereUniqueInput[] = [];
+    const deleteTagObjects: Prisma.TagWhereUniqueInput[] = [];
     dbTags.forEach((tag) => {
       if (!newTags.includes(tag.id)) {
         deleteTagObjects.push({ id: tag.id });
@@ -101,7 +97,7 @@ class DialogueService {
   static editDialogue = async (args: any) => {
     const { customerSlug, dialogueSlug, title, description, publicTitle, tags, isWithoutGenData } = args;
 
-    const customer = await prisma.customer.findOne({
+    const customer = await prisma.customer.findUnique({
       where: {
         slug: customerSlug,
       },
@@ -118,7 +114,7 @@ class DialogueService {
     });
     const dbDialogue = customer?.dialogues[0];
 
-    let updateDialogueArgs: DialogueUpdateInput = { title, description, publicTitle, isWithoutGenData };
+    let updateDialogueArgs: Prisma.DialogueUpdateInput = { title, description, publicTitle, isWithoutGenData };
     if (dbDialogue?.tags) {
       updateDialogueArgs = DialogueService.updateTags(dbDialogue.tags, tags.entries, updateDialogueArgs);
     }
@@ -189,7 +185,7 @@ class DialogueService {
     const nrDaysBack = Array.from(Array(30)).map((empty, index) => index + 1);
     const datesBackInTime = nrDaysBack.map((amtDaysBack) => subDays(currentDate, amtDaysBack));
 
-    const dialogueWithNodes = await prisma.dialogue.findOne({
+    const dialogueWithNodes = await prisma.dialogue.findUnique({
       where: { id: dialogueId },
       include: {
         questions: true,
@@ -307,7 +303,7 @@ class DialogueService {
   };
 
   static deleteDialogue = async (dialogueId: string) => {
-    const dialogue = await prisma.dialogue.findOne({
+    const dialogue = await prisma.dialogue.findUnique({
       where: {
         id: dialogueId,
       },
@@ -478,7 +474,7 @@ class DialogueService {
     description: string,
     publicTitle: string = '',
     tags: Array<{ id: string }> = []) => {
-    const templateDialogue = await prisma.dialogue.findOne({
+    const templateDialogue = await prisma.dialogue.findUnique({
       where: {
         id: templateId,
       },
@@ -566,7 +562,7 @@ class DialogueService {
       const mappedOverrideLeafId = question.overrideLeafId && idMap[question.overrideLeafId];
       const mappedOverrideLeaf = question.overrideLeafId ? { id: idMap[question.overrideLeafId] } : null;
       const mappedIsOverrideLeafOf = question.isOverrideLeafOf.map(({ id }) => ({ id: idMap[id] }));
-      const mappedOptions: QuestionOptionCreateManyWithoutQuestionNodeInput = { create: question.options };
+      const mappedOptions: Prisma.QuestionOptionCreateManyWithoutQuestionNodeInput = { create: question.options };
       const mappedObject = {
         ...question,
         id: mappedId,

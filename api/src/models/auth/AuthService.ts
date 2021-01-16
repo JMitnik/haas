@@ -14,7 +14,7 @@ interface UserTokenProps {
 
 class AuthService {
   static async registerUser(userInput: NexusGenInputs['RegisterInput']) {
-    const customerExists = prisma.customer.findOne({ where: { id: userInput.customerId } });
+    const customerExists = prisma.customer.findUnique({ where: { id: userInput.customerId } });
     if (!customerExists) throw new UserInputError('Customer does not exist');
 
     const userExists = await prisma.user.findMany({
@@ -71,7 +71,7 @@ class AuthService {
 
   static async verifyUserRefreshToken(userId: string): Promise<boolean> {
     try {
-      const user = await prisma.user.findOne({
+      const user = await prisma.user.findUnique({
         where: { id: userId },
       });
 

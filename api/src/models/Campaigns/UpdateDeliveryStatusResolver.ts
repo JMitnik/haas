@@ -14,7 +14,7 @@ export const UpdateDeliveryStatusResolver = mutationField('updateDeliveryStatus'
       if (!args.deliveryId) throw new UserInputError('No delivery ID provided');
       if (!args.status) throw new UserInputError('No status provided');
 
-      const currentDelivery = await ctx.prisma.delivery.findOne({ where: { id: args.deliveryId } });
+      const currentDelivery = await ctx.prisma.delivery.findUnique({ where: { id: args.deliveryId } });
 
       if (currentDelivery?.currentStatus === 'FINISHED') return 'Already finished';
 

@@ -257,7 +257,7 @@ export const QuestionNodeType = objectType({
 
       resolve(parent, args, ctx) {
         if (parent.questionDialogueId) {
-          return ctx.prisma.dialogue.findOne({
+          return ctx.prisma.dialogue.findUnique({
             where: {
               id: parent.questionDialogueId,
             },
@@ -273,7 +273,7 @@ export const QuestionNodeType = objectType({
       nullable: true,
 
       resolve(parent, args, ctx) {
-        const overrideLeaf = ctx.prisma.questionNode.findOne({
+        const overrideLeaf = ctx.prisma.questionNode.findUnique({
           where: { id: parent.id },
         }).overrideLeaf();
 
@@ -460,7 +460,7 @@ export const QuestionNodeMutations = extendType({
         const { id, customerId, dialogueSlug } = args.input;
         const { prisma }: { prisma: PrismaClient } = ctx;
 
-        const customer = await prisma.customer.findOne({
+        const customer = await prisma.customer.findUnique({
           where: {
             id: customerId || undefined,
           },
@@ -526,7 +526,7 @@ export const QuestionNodeMutations = extendType({
         const { customerId, dialogueSlug, title, type, overrideLeafId, parentQuestionId, optionEntries, edgeCondition } = args.input;
         const { options } = optionEntries;
 
-        const customer = await prisma.customer.findOne({
+        const customer = await prisma.customer.findUnique({
           where: {
             id: customerId,
           },
@@ -580,7 +580,7 @@ export const QuestionNodeMutations = extendType({
         const { prisma }: { prisma: PrismaClient } = ctx;
         const { customerSlug, dialogueSlug, title, type, links, share } = args.input;
 
-        const customer = await prisma.customer.findOne({
+        const customer = await prisma.customer.findUnique({
           where: {
             slug: customerSlug,
           },
@@ -635,7 +635,7 @@ export const getQuestionNodeQuery = extendType({
       async resolve(parent, args, ctx) {
         if (!args.where?.id) return null;
 
-        const questionNode = await ctx.prisma.questionNode.findOne({
+        const questionNode = await ctx.prisma.questionNode.findUnique({
           where: { id: args.where.id },
         });
 

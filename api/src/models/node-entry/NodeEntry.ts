@@ -72,7 +72,7 @@ export const NodeEntryType = objectType({
           return null;
         }
 
-        const relatedNode = ctx.prisma.questionNode.findOne({ where: { id: parent.relatedNodeId } });
+        const relatedNode = ctx.prisma.questionNode.findUnique({ where: { id: parent.relatedNodeId } });
         return relatedNode;
       },
     });
@@ -83,7 +83,7 @@ export const NodeEntryType = objectType({
       nullable: true,
 
       async resolve(parent, args, ctx) {
-        const nodeEntry = await ctx.prisma.nodeEntry.findOne({
+        const nodeEntry = await ctx.prisma.nodeEntry.findUnique({
           where: { id: parent.id },
           include: {
             choiceNodeEntry: true,

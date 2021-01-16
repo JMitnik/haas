@@ -191,7 +191,7 @@ export const DialogueType = objectType({
           return [];
         }
 
-        const dialogue = await ctx.prisma.dialogue.findOne({
+        const dialogue = await ctx.prisma.dialogue.findUnique({
           where: { id: parent.id },
           include: { tags: true },
         });
@@ -210,7 +210,7 @@ export const DialogueType = objectType({
           throw new Error('Cant find associated customer of dialogue');
         }
 
-        const customer = await ctx.prisma.customer.findOne({
+        const customer = await ctx.prisma.customer.findUnique({
           where: { id: parent.customerId },
         });
 
@@ -254,7 +254,7 @@ export const DialogueType = objectType({
     t.list.field('edges', {
       type: EdgeType,
       async resolve(parent, args, ctx) {
-        const dialogue = await ctx.prisma.dialogue.findOne({
+        const dialogue = await ctx.prisma.dialogue.findUnique({
           where: {
             id: parent.id,
           },
@@ -499,7 +499,7 @@ export const DialogueRootQuery = extendType({
           throw new Error('No valid id supplied');
         }
 
-        const dialogue = await ctx.prisma.dialogue.findOne({
+        const dialogue = await ctx.prisma.dialogue.findUnique({
           where: { id: args.where.id },
         });
 

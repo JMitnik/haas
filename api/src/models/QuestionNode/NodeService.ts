@@ -1,4 +1,4 @@
-import { Dialogue, FormNodeCreateInput, Link, NodeType, QuestionCondition, QuestionNode, QuestionNodeCreateInput } from '@prisma/client';
+import { Dialogue, Prisma, Link, NodeType, QuestionCondition, QuestionNode } from '@prisma/client';
 import { NexusGenInputs } from '../../generated/nexus';
 import EdgeService from '../edge/EdgeService';
 import prisma from '../../config/prisma';
@@ -82,7 +82,7 @@ class NodeService {
   /**
    * Save FormNodeInput when `creating`
    */
-  static saveCreateFormNodeInput = (input: NexusGenInputs['FormNodeInputType']): FormNodeCreateInput => ({
+  static saveCreateFormNodeInput = (input: NexusGenInputs['FormNodeInputType']): Prisma.FormNodeCreateInput => ({
     fields: {
       create: input.fields?.map((field) => ({
         type: field.type || 'shortText',
@@ -131,7 +131,7 @@ class NodeService {
     options: Array<any> = [],
     isRoot: boolean = false,
     overrideLeafId: string = '',
-    isLeaf: boolean = false): QuestionNodeCreateInput {
+    isLeaf: boolean = false): Prisma.QuestionNodeCreateInput {
     return {
       title,
       questionDialogue: {
@@ -465,7 +465,7 @@ class NodeService {
     },
     sliderNode: NexusGenInputs['SliderNodeInputType'],
   ) => {
-    const activeQuestion = await prisma.questionNode.findOne({ where: { id: questionId },
+    const activeQuestion = await prisma.questionNode.findUnique({ where: { id: questionId },
       include: {
         children: true,
         options: true,
@@ -481,7 +481,7 @@ class NodeService {
         },
       } });
 
-    const dbEdge = await prisma.edge.findOne({
+    const dbEdge = await prisma.edge.findUnique({
       where: {
         id: edgeId,
       },

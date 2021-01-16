@@ -1,7 +1,5 @@
 /* eslint-disable import/no-cycle */
-import {
-  NodeEntry, Session, SessionOrderByInput, SessionWhereInput,
-} from '@prisma/client';
+import { NodeEntry, Session, Prisma } from '@prisma/client';
 import { isPresent } from 'ts-is-present';
 
 import { sortBy } from 'lodash';
@@ -138,7 +136,7 @@ class SessionService {
   }
 
   static async getSessionScore(sessionId: string): Promise<number | undefined | null> {
-    const session = await prisma.session.findOne({
+    const session = await prisma.session.findUnique({
       where: { id: sessionId },
       include: {
         nodeEntries: {
@@ -161,7 +159,7 @@ class SessionService {
     return rootedNodeEntry?.sliderNodeEntry?.value;
   }
 
-  static formatOrderBy(orderByArray?: NexusGenInputs['PaginationSortInput'][]): (SessionOrderByInput | undefined) {
+  static formatOrderBy(orderByArray?: NexusGenInputs['PaginationSortInput'][]): (Prisma.SessionOrderByInput | undefined) {
     if (!orderByArray?.length) return undefined;
 
     const orderBy = orderByArray[0];
@@ -182,13 +180,13 @@ class SessionService {
     dialogueId: string,
     paginationOpts?: Nullable<PaginationProps>,
   ): Promise<Array<SessionWithEntries> | null | undefined> {
-    const dialogue = await prisma.dialogue.findOne({
+    const dialogue = await prisma.dialogue.findUnique({
       where: {
         id: dialogueId,
       },
     });
 
-    const dialougeWithSessionWithEntries = await prisma.dialogue.findOne({
+    const dialougeWithSessionWithEntries = await prisma.dialogue.findUnique({
       where: { id: dialogueId },
       include: {
         sessions: {
@@ -347,7 +345,7 @@ class SessionService {
   };
 
   static async getSessionEntries(session: Session): Promise<NodeEntry[] | []> {
-    const sessionWithEntries = await prisma.session.findOne({
+    const sessionWithEntries = await prisma.session.findUnique({
       where: { id: session.id },
       include: {
         nodeEntries: {
@@ -368,8 +366,8 @@ class SessionService {
   }
 
   // TODO: Make Utils script
-  static constructDateRangeWhereInput(startDate?: Date, endDate?: Date): SessionWhereInput[] | [] {
-    let dateRange: SessionWhereInput[] | [] = [];
+  static constructDateRangeWhereInput(startDate?: Date, endDate?: Date): Prisma.SessionWhereInput[] | [] {
+    let dateRange: Prisma.SessionWhereInput[] | [] = [];
 
     if (startDate && !endDate) {
       dateRange = [

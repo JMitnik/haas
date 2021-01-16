@@ -1,12 +1,4 @@
-import {
-  FindManyTriggerArgs,
-  Trigger,
-  TriggerCondition,
-  TriggerUpdateInput,
-  TriggerWhereInput,
-  User,
-  UserWhereUniqueInput,
-} from '@prisma/client';
+import { Prisma, Trigger, TriggerCondition, User } from '@prisma/client';
 import { isAfter, subSeconds } from 'date-fns';
 import { isPresent } from 'ts-is-present';
 import _ from 'lodash';
@@ -41,7 +33,7 @@ class TriggerService {
       return [];
     }
 
-    const searchTermFilter: TriggerWhereInput[] = [
+    const searchTermFilter: Prisma.TriggerWhereInput[] = [
       { name: { contains: searchTerm } },
     ];
 
@@ -52,7 +44,7 @@ class TriggerService {
     customerSlug: string,
     paginationOpts: NexusGenInputs['PaginationWhereInput'],
   ) => {
-    const findManyTriggerArgs: FindManyTriggerArgs = { where: { customer: { slug: customerSlug } } };
+    const findManyTriggerArgs: Prisma.FindManyTriggerArgs = { where: { customer: { slug: customerSlug } } };
 
     const findManyTriggers = async (
       { props: findManyArgs } : FindManyCallBackProps,
@@ -340,8 +332,8 @@ class TriggerService {
   static updateRelatedQuestion = (
     dbTriggerRelatedNodeId: string | null | undefined,
     newRelatedNodeId: string | null | undefined,
-    updateTriggerArgs: TriggerUpdateInput,
-  ): TriggerUpdateInput => {
+    updateTriggerArgs: Prisma.TriggerUpdateInput,
+  ): Prisma.TriggerUpdateInput => {
     if (newRelatedNodeId && newRelatedNodeId !== dbTriggerRelatedNodeId) {
       updateTriggerArgs.relatedNode = { connect: { id: newRelatedNodeId } };
     } else if (!newRelatedNodeId) {
@@ -421,11 +413,11 @@ class TriggerService {
   static updateRecipients = (
     dbTriggerRecipients: Array<User>,
     newRecipients: Array<string>,
-    updateTriggerArgs: TriggerUpdateInput,
-  ): TriggerUpdateInput => {
+    updateTriggerArgs: Prisma.TriggerUpdateInput,
+  ): Prisma.TriggerUpdateInput => {
     const newRecipientObjects = newRecipients.map((recipientId) => ({ id: recipientId }));
 
-    const deleteRecipientObjects: UserWhereUniqueInput[] = [];
+    const deleteRecipientObjects: Prisma.UserWhereUniqueInput[] = [];
     dbTriggerRecipients.forEach((recipient) => {
       if (!newRecipients.includes(recipient.id)) {
         deleteRecipientObjects.push({ id: recipient.id });

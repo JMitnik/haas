@@ -141,7 +141,7 @@ export const GetCampaignVariantOfDelivery = extendType({
       resolve: async (parent, args, ctx) => {
         if (!parent.id) throw new ApolloError('Cant find matching delivery');
 
-        const campaignVariant = (await ctx.prisma.delivery.findOne({
+        const campaignVariant = (await ctx.prisma.delivery.findUnique({
           where: { id: parent.id },
           include: {
             campaignVariant: {
