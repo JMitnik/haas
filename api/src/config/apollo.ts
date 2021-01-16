@@ -7,6 +7,7 @@ import authShield from './auth';
 import constructSession from '../models/auth/constructContextSession';
 import prisma from './prisma';
 import schema from './schema';
+import { redisClient } from './redis';
 
 const makeApollo = async () => {
   console.log('💼\tBootstrapping Graphql Engine Apollo');
@@ -16,6 +17,7 @@ const makeApollo = async () => {
     context: async (ctx): Promise<APIContext> => ({
       ...ctx,
       session: await constructSession(ctx),
+      redis: redisClient,
       prisma,
     }),
     plugins: [

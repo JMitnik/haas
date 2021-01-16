@@ -10,6 +10,7 @@ export interface ConfigProps {
   endpoint: string;
   isDebug: boolean;
   clientUrl: string;
+  redisUrl: string;
   dashboardUrl: string;
   cloudinaryUrl: string;
   prismaUrl: string;
@@ -36,6 +37,7 @@ const config: ConfigProps = {
   useSSL: Boolean(process.env.useSSL) || false,
   endpoint: process.env.APP_ENDPOINT || '/graphql',
   isDebug: Boolean(process.env.ENABLE_DEBUG) || false,
+  redisUrl: process.env.REDIS_URL || '',
   clientUrl: process.env.CLIENT_URL || 'http://localhost:3000',
   dashboardUrl: process.env.DASHBOARD_URL || 'http://localhost:3002',
   cloudinaryUrl: process.env.CLOUDINARY_URL || '',
