@@ -2,8 +2,8 @@ import * as UI from '@haas/ui';
 import { useParams } from 'react-router';
 import React from 'react';
 import styled, { css } from 'styled-components';
-
 import { AnimateSharedLayout, motion } from 'framer-motion';
+
 import { ReactComponent as ChartIcon } from 'assets/icons/icon-chartbar.svg';
 import { ReactComponent as ChatIcon } from 'assets/icons/icon-chat-group.svg';
 import { ReactComponent as CursorClickIcon } from 'assets/icons/icon-cursorclick.svg';
@@ -15,6 +15,7 @@ import { ReactComponent as NotificationIcon } from 'assets/icons/icon-notificati
 import { ReactComponent as SettingsIcon } from 'assets/icons/icon-cog.svg';
 import { ReactComponent as SliderIcon } from 'assets/icons/icon-slider.svg';
 import { ReactComponent as SurveyIcon } from 'assets/icons/icon-survey.svg';
+import { ReactComponent as InsightsIcon } from 'assets/icons/icon-insights-mini.svg';
 import { ReactComponent as TableIcon } from 'assets/icons/icon-table.svg';
 import { ReactComponent as UsersIcon } from 'assets/icons/icon-user-group.svg';
 
@@ -117,6 +118,12 @@ const DashboardNav = ({ customerSlug }: { customerSlug: string }) => {
                         </NavLink>
                       </SubNavItem>
                       <SubNavItem>
+                        <NavLink to={`/dashboard/b/${customerSlug}/d/${dialogueSlug}/insights`}>
+                          <UI.Icon mr={2} as={InsightsIcon} />
+                          {t('views:insights_view')}
+                        </NavLink>
+                      </SubNavItem>
+                      <SubNavItem>
                         <NavLink to={`/dashboard/b/${customerSlug}/d/${dialogueSlug}/interactions`}>
                           <UI.Icon mr={2} as={TableIcon} />
                           {t('views:interactions_view')}
@@ -127,7 +134,6 @@ const DashboardNav = ({ customerSlug }: { customerSlug: string }) => {
                           <UI.Icon mr={2} as={CursorClickIcon} />
                           {t('views:cta_view')}
                         </NavLink>
-
                       </SubNavItem>
                       <SubNavItem>
                         <NavLink to={`/dashboard/b/${customerSlug}/d/${dialogueSlug}/builder`}>

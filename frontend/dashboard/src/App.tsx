@@ -50,6 +50,7 @@ import VerifyTokenPage from 'pages/verify_token';
 import client from 'config/apollo';
 import lang from 'config/i18n-config';
 import { CampaignView } from 'views/CampaignView/CampaignView';
+import InsightsView from 'views/InsightsView/InsightsView';
 
 const CustomerRoutes = () => (
   <AnimatePresence>
@@ -77,6 +78,11 @@ const CustomerRoutes = () => (
                     <GuardedRoute
                       path="/dashboard/b/:customerSlug/d/:dialogueSlug/interactions"
                       render={() => <InteractionsOverview />}
+                    />
+
+                    <GuardedRoute
+                      path="/dashboard/b/:customerSlug/d/:dialogueSlug/insights"
+                      render={() => <InsightsView />}
                     />
 
                     <GuardedRoute

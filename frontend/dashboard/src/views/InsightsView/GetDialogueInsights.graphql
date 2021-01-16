@@ -1,0 +1,9 @@
+query GetDialogueInsights($customerSlug: String!, $dialogueSlug: String!) {
+  customer(slug: $customerSlug) {
+    id
+    dialogue(dialogueSlug: $dialogueSlug) {
+      id
+      label
+    }
+  }
+}

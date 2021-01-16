@@ -84,6 +84,8 @@ const authShield = shield({
 
     updateDeliveryStatus: isFromClient,
 
+    debugMutation: isLocal,
+
     // // Dialogue-specific settings
     deleteQuestion: containsWorkspacePermission(SystemPermissionEnum.CAN_BUILD_DIALOGUE),
     updateQuestion: containsWorkspacePermission(SystemPermissionEnum.CAN_BUILD_DIALOGUE),

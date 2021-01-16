@@ -887,6 +887,10 @@ const language = {
       en: 'Add dialogue',
       de: 'Dialog hinzufügen',
     },
+    insights_view: {
+      en: 'Insights',
+      de: 'Erkenntnisse',
+    },
     edit_dialogue_view: {
       en: 'Edit dialogue',
       de: 'Dialog einstellen',

@@ -1,7 +1,6 @@
 import { mutationField, objectType } from '@nexus/schema';
 import prisma from '../../config/prisma';
 
-import { CampaignService } from '../Campaigns/CampaignService';
 
 export const DebugType = objectType({
   name: 'Debug',
@@ -21,15 +20,12 @@ export const DebugMutation = mutationField('debugMutation', {
   type: 'String',
   nullable: true,
   async resolve() {
-    const deliveries = await prisma.delivery.findMany({
-      orderBy: {
-        scheduledAt: "desc",
-      },
-      take: 10,
-      skip: 10
-    })
+    const node = await prisma.nodeEntry.groupBy({
+      where: { relatedNode: { questionDialogueId: 'ckgmgqbmw7505178god5xgdmam2' } },
+      count: { relatedNodeId: true },
+      by: ['relatedNodeId'],
+    });
 
-    console.log(deliveries)
-    return 'asasdasd';
+    return 'haha';
   },
 });
