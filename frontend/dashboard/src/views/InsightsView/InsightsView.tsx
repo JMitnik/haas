@@ -4,9 +4,21 @@ import { useTranslation } from 'react-i18next';
 import * as UI from '@haas/ui';
 import DialogueFlow from './DialogueFlow';
 import { InsightsViewContainer } from './InsightsViewStyles';
+import { useGetDialogueInsightsQuery } from 'types/generated-types';
+import { useNavigator } from 'hooks/useNavigator';
 
 const InsightsView = () => {
   const { t } = useTranslation();
+  const { dialogueSlug, customerSlug } = useNavigator();
+
+  const { data } = useGetDialogueInsightsQuery({
+    variables: {
+      customerSlug,
+      dialogueSlug
+    }
+  });
+
+  console.log(data);
 
   return (
     <>
@@ -20,7 +32,7 @@ const InsightsView = () => {
           <UI.Div>
 
           </UI.Div>
-          <DialogueFlow />
+          <DialogueFlow edges={data?.customer?.dialogue?.edges || []} nodes={data?.customer?.dialogue?.questions || []} />
         </InsightsViewContainer>
       </UI.ViewContainer>
     </>

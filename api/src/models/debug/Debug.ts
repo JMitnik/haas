@@ -26,7 +26,7 @@ export const DebugMutation = mutationField('debugMutation', {
       by: ['relatedNodeId'],
     });
 
-    const sett = await ctx.redis.set('test', 'asdasdasd');
+    const sett = await ctx.redis.set('test', 'asdasdasd', 'ex', 10);
     const answer = await ctx.redis.get('test');
 
     return answer || '';

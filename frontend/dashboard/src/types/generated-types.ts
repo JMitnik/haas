@@ -1587,6 +1587,80 @@ export type GetWorkspaceDialoguesQuery = (
   )> }
 );
 
+export type GetDialogueInsightsQueryVariables = Exact<{
+  customerSlug: Scalars['String'];
+  dialogueSlug: Scalars['String'];
+}>;
+
+
+export type GetDialogueInsightsQuery = (
+  { __typename?: 'Query' }
+  & { customer?: Maybe<(
+    { __typename?: 'Customer' }
+    & Pick<Customer, 'id'>
+    & { dialogue?: Maybe<(
+      { __typename?: 'Dialogue' }
+      & Pick<Dialogue, 'id'>
+      & { leafs: Array<(
+        { __typename?: 'QuestionNode' }
+        & Pick<QuestionNode, 'id' | 'title' | 'type'>
+      )>, questions: Array<(
+        { __typename?: 'QuestionNode' }
+        & Pick<QuestionNode, 'id' | 'title' | 'creationDate' | 'updatedAt' | 'isRoot' | 'isLeaf' | 'type'>
+        & { overrideLeaf?: Maybe<(
+          { __typename?: 'QuestionNode' }
+          & Pick<QuestionNode, 'id' | 'type' | 'title'>
+        )>, sliderNode?: Maybe<(
+          { __typename?: 'SliderNodeType' }
+          & { markers?: Maybe<Array<(
+            { __typename?: 'SliderNodeMarkerType' }
+            & Pick<SliderNodeMarkerType, 'id' | 'label' | 'subLabel'>
+            & { range?: Maybe<(
+              { __typename?: 'SliderNodeRangeType' }
+              & Pick<SliderNodeRangeType, 'start' | 'end'>
+            )> }
+          )>> }
+        )>, children: Array<(
+          { __typename?: 'Edge' }
+          & Pick<Edge, 'id'>
+          & { conditions?: Maybe<Array<(
+            { __typename?: 'EdgeCondition' }
+            & Pick<EdgeCondition, 'id' | 'conditionType' | 'matchValue' | 'renderMin' | 'renderMax'>
+          )>>, parentNode?: Maybe<(
+            { __typename?: 'QuestionNode' }
+            & Pick<QuestionNode, 'id' | 'title'>
+          )>, childNode?: Maybe<(
+            { __typename?: 'QuestionNode' }
+            & Pick<QuestionNode, 'id' | 'title'>
+          )> }
+        )>, options: Array<(
+          { __typename?: 'QuestionOption' }
+          & Pick<QuestionOption, 'id' | 'value' | 'publicValue'>
+        )> }
+      )>, edges: Array<(
+        { __typename?: 'Edge' }
+        & Pick<Edge, 'id'>
+        & { conditions?: Maybe<Array<(
+          { __typename?: 'EdgeCondition' }
+          & Pick<EdgeCondition, 'id' | 'conditionType' | 'matchValue' | 'renderMin' | 'renderMax'>
+        )>>, parentNode?: Maybe<(
+          { __typename?: 'QuestionNode' }
+          & Pick<QuestionNode, 'id' | 'title'>
+        )>, childNode?: Maybe<(
+          { __typename?: 'QuestionNode' }
+          & Pick<QuestionNode, 'id' | 'title' | 'isRoot'>
+        )> }
+      )>, sessionConnection?: Maybe<(
+        { __typename?: 'SessionConnection' }
+        & { sessions: Array<(
+          { __typename?: 'Session' }
+          & Pick<Session, 'id'>
+        )> }
+      )> }
+    )> }
+  )> }
+);
+
 
 export const CreateBatchDeliveriesDocument = gql`
     mutation CreateBatchDeliveries($input: CreateBatchDeliveriesInputType) {
@@ -1831,4 +1905,121 @@ export type GetWorkspaceDialoguesLazyQueryHookResult = ReturnType<typeof useGetW
 export type GetWorkspaceDialoguesQueryResult = Apollo.QueryResult<GetWorkspaceDialoguesQuery, GetWorkspaceDialoguesQueryVariables>;
 export function refetchGetWorkspaceDialoguesQuery(variables?: GetWorkspaceDialoguesQueryVariables) {
       return { query: GetWorkspaceDialoguesDocument, variables: variables }
+    }
+export const GetDialogueInsightsDocument = gql`
+    query GetDialogueInsights($customerSlug: String!, $dialogueSlug: String!) {
+  customer(slug: $customerSlug) {
+    id
+    dialogue(where: {slug: $dialogueSlug}) {
+      id
+      leafs {
+        id
+        title
+        type
+      }
+      questions {
+        id
+        title
+        creationDate
+        updatedAt
+        isRoot
+        isLeaf
+        overrideLeaf {
+          id
+          type
+          title
+        }
+        sliderNode {
+          markers {
+            id
+            label
+            subLabel
+            range {
+              start
+              end
+            }
+          }
+        }
+        type
+        children {
+          id
+          conditions {
+            id
+            conditionType
+            matchValue
+            renderMin
+            renderMax
+          }
+          parentNode {
+            id
+            title
+          }
+          childNode {
+            id
+            title
+          }
+        }
+        options {
+          id
+          value
+          publicValue
+        }
+      }
+      edges {
+        id
+        conditions {
+          id
+          conditionType
+          matchValue
+          renderMin
+          renderMax
+        }
+        parentNode {
+          id
+          title
+        }
+        childNode {
+          id
+          title
+          isRoot
+        }
+      }
+      sessionConnection {
+        sessions {
+          id
+        }
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetDialogueInsightsQuery__
+ *
+ * To run a query within a React component, call `useGetDialogueInsightsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetDialogueInsightsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetDialogueInsightsQuery({
+ *   variables: {
+ *      customerSlug: // value for 'customerSlug'
+ *      dialogueSlug: // value for 'dialogueSlug'
+ *   },
+ * });
+ */
+export function useGetDialogueInsightsQuery(baseOptions: Apollo.QueryHookOptions<GetDialogueInsightsQuery, GetDialogueInsightsQueryVariables>) {
+        return Apollo.useQuery<GetDialogueInsightsQuery, GetDialogueInsightsQueryVariables>(GetDialogueInsightsDocument, baseOptions);
+      }
+export function useGetDialogueInsightsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetDialogueInsightsQuery, GetDialogueInsightsQueryVariables>) {
+          return Apollo.useLazyQuery<GetDialogueInsightsQuery, GetDialogueInsightsQueryVariables>(GetDialogueInsightsDocument, baseOptions);
+        }
+export type GetDialogueInsightsQueryHookResult = ReturnType<typeof useGetDialogueInsightsQuery>;
+export type GetDialogueInsightsLazyQueryHookResult = ReturnType<typeof useGetDialogueInsightsLazyQuery>;
+export type GetDialogueInsightsQueryResult = Apollo.QueryResult<GetDialogueInsightsQuery, GetDialogueInsightsQueryVariables>;
+export function refetchGetDialogueInsightsQuery(variables?: GetDialogueInsightsQueryVariables) {
+      return { query: GetDialogueInsightsDocument, variables: variables }
     }
