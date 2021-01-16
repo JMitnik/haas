@@ -4,4 +4,4 @@ import * as cdk from '@aws-cdk/core';
 import { MainStack } from '../lib/main-stack';
 
 const app = new cdk.App();
-new MainStack(app, 'TestStack');
+new MainStack(app, 'HaasMainStack');
