@@ -96,9 +96,9 @@ model Dialogue {
   isOnline         Boolean        @default(value: false)
   isWithoutGenData Boolean        @default(value: false)
 
-  wasGeneratedWithGenData Boolean @default(value: false)
+  wasGeneratedWithGenData Boolean           @default(value: false)
+  CampaignVariant         CampaignVariant[]
   @@unique([slug, customerId])
-  CampaignVariant CampaignVariant[]
 }
 
 enum NodeType {
@@ -607,5 +607,5 @@ model DeliveryEvents {
   status     DeliveryStatusTypeEnum
   createdAt  DateTime               @default(now())
   deliveryId String
-  Delivery   Delivery?              @relation(fields: [deliveryId], references: [id])
+  Delivery   Delivery               @relation(fields: [deliveryId], references: [id])
 }
