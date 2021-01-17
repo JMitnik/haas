@@ -262,6 +262,7 @@ type Dialogue {
   customerId: String!
   description: String!
   edges: [Edge!]!
+  generalNodeConnection: QuestionNodeConnectionType!
   id: ID!
   isWithoutGenData: Boolean!
   leafs(searchTerm: String): [QuestionNode!]!
@@ -695,6 +696,11 @@ type QuestionNode {
   title: String!
   type: QuestionNodeTypeEnum!
   updatedAt: String
+}
+
+"""Conncetion of question-node"""
+type QuestionNodeConnectionType {
+  questions: [QuestionNode!]!
 }
 
 """The different types a node can assume"""

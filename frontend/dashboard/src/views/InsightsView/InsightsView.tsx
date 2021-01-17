@@ -32,7 +32,10 @@ const InsightsView = () => {
           <UI.Div>
 
           </UI.Div>
-          <DialogueFlow edges={data?.customer?.dialogue?.edges || []} nodes={data?.customer?.dialogue?.questions || []} />
+          <DialogueFlow
+            edges={data?.customer?.dialogue?.edges || []}
+            nodes={data?.customer?.dialogue?.questions || []}
+          />
         </InsightsViewContainer>
       </UI.ViewContainer>
     </>

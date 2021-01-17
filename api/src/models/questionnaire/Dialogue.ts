@@ -254,6 +254,8 @@ export const DialogueType = objectType({
     t.list.field('edges', {
       type: EdgeType,
       async resolve(parent, args, ctx) {
+        // @ts-ignore
+        if (parent.edges) return parent.edges;
         const dialogue = await ctx.prisma.dialogue.findUnique({
           where: {
             id: parent.id,
@@ -272,7 +274,10 @@ export const DialogueType = objectType({
     t.list.field('questions', {
       type: QuestionNodeType,
 
-      resolve(parent, args, ctx) {
+      resolve(parent, args, ctx, info) {
+        // @ts-ignore
+        if (parent.questions) return parent.questions;
+
         const questions = ctx.prisma.questionNode.findMany({
           where: {
             AND: [

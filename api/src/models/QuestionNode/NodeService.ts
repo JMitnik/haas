@@ -42,29 +42,29 @@ interface LinkGenericInputProps {
 }
 
 const standardOptions = [{ value: 'Facilities' },
-  { value: 'Website/Mobile app' },
-  { value: 'Product/Services' },
-  { value: 'Customer Support' }];
+{ value: 'Website/Mobile app' },
+{ value: 'Product/Services' },
+{ value: 'Customer Support' }];
 
 const facilityOptions = [{ value: 'Cleanliness' },
-  { value: 'Atmosphere' },
-  { value: 'Location' },
-  { value: 'Other' }];
+{ value: 'Atmosphere' },
+{ value: 'Location' },
+{ value: 'Other' }];
 
 const websiteOptions = [{ value: 'Design' },
-  { value: 'Functionality' },
-  { value: 'Informative' },
-  { value: 'Other' }];
+{ value: 'Functionality' },
+{ value: 'Informative' },
+{ value: 'Other' }];
 
 const customerSupportOptions = [{ value: 'Friendliness' },
-  { value: 'Competence' },
-  { value: 'Speed' },
-  { value: 'Other' }];
+{ value: 'Competence' },
+{ value: 'Speed' },
+{ value: 'Other' }];
 
 const productServicesOptions = [{ value: 'Quality' },
-  { value: 'Price' },
-  { value: 'Friendliness' },
-  { value: 'Other' }];
+{ value: 'Price' },
+{ value: 'Friendliness' },
+{ value: 'Other' }];
 
 class NodeService {
   static removeNonExistingLinks = async (
@@ -188,19 +188,19 @@ class NodeService {
         create: qOptions,
       },
     } : {
-      title,
-      questionDialogue: {
-        connect: {
-          id: questionnaireId,
+        title,
+        questionDialogue: {
+          connect: {
+            id: questionnaireId,
+          },
         },
-      },
-      type,
-      isRoot,
-      isLeaf,
-      options: {
-        create: qOptions,
-      },
-    };
+        type,
+        isRoot,
+        isLeaf,
+        options: {
+          create: qOptions,
+        },
+      };
 
     return prisma.questionNode.create({
       data: params,
@@ -309,10 +309,10 @@ class NodeService {
   });
 
   static getDeleteIDs = (
-    edges: Array<{id: string, childNodeId: string, parentNodeId: string}>,
-    questions: Array<{id: string}>, foundEdgeIds: Array<string>,
+    edges: Array<{ id: string, childNodeId: string, parentNodeId: string }>,
+    questions: Array<{ id: string }>, foundEdgeIds: Array<string>,
     foundQuestionIds: Array<string>,
-  ): {edgeIds: Array<string>, questionIds: Array<string>} => {
+  ): { edgeIds: Array<string>, questionIds: Array<string> } => {
     const newlyFoundEdgeIds: Array<string> = [];
     const newlyFoundQuestionIds: Array<string> = [];
 
@@ -449,6 +449,51 @@ class NodeService {
     return newQuestion;
   };
 
+  static async getQuestionNodes(dialogueId: string) {
+    const questions = await prisma.questionNode.findMany({
+      where: {
+        AND: [
+          { questionDialogueId: dialogueId },
+          { isLeaf: false },
+        ],
+      },
+      orderBy: {
+        creationDate: 'asc',
+      },
+      include: {
+        form: {
+          include: {
+            fields: true,
+          },
+        },
+        sliderNode: {
+          include: {
+            markers: {
+              include: {
+                range: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    return questions;
+  }
+
+  static async getEdges(dialogueId: string) {
+    const dialogue = await prisma.dialogue.findUnique({
+      where: {
+        id: dialogueId,
+      },
+      include: {
+        edges: {},
+      },
+    });
+
+    return dialogue?.edges;
+  }
+
   static updateQuestionFromBuilder = async (
     questionId: string,
     title: string,
@@ -465,7 +510,8 @@ class NodeService {
     },
     sliderNode: NexusGenInputs['SliderNodeInputType'],
   ) => {
-    const activeQuestion = await prisma.questionNode.findUnique({ where: { id: questionId },
+    const activeQuestion = await prisma.questionNode.findUnique({
+      where: { id: questionId },
       include: {
         children: true,
         options: true,
@@ -479,7 +525,8 @@ class NodeService {
             id: true,
           },
         },
-      } });
+      }
+    });
 
     const dbEdge = await prisma.edge.findUnique({
       where: {
@@ -793,19 +840,19 @@ class NodeService {
 
     await EdgeService.createEdge(rootToWhatWouldYouLikeToTalkAbout,
       whatWouldYouLikeToTalkAboutToProduct, {
-        conditionType: 'match',
-        matchValue: 'Product/Services',
-        renderMin: null,
-        renderMax: null,
-      });
+      conditionType: 'match',
+      matchValue: 'Product/Services',
+      renderMin: null,
+      renderMax: null,
+    });
 
     await EdgeService.createEdge(rootToWhatWouldYouLikeToTalkAbout,
       whatWouldYouLikeToTalkAboutToCustomerSupport, {
-        conditionType: 'match',
-        matchValue: 'Customer Support',
-        renderMin: null,
-        renderMax: null,
-      });
+      conditionType: 'match',
+      matchValue: 'Customer Support',
+      renderMin: null,
+      renderMax: null,
+    });
 
     // Negative edges
     await EdgeService.createEdge(rootQuestion, rootToWeAreSorryToHearThat,
@@ -827,11 +874,11 @@ class NodeService {
 
     await EdgeService.createEdge(rootToWeAreSorryToHearThat,
       weAreSorryToHearThatToCustomerSupport, {
-        conditionType: 'match',
-        matchValue: 'Customer Support',
-        renderMax: null,
-        renderMin: null,
-      });
+      conditionType: 'match',
+      matchValue: 'Customer Support',
+      renderMax: null,
+      renderMin: null,
+    });
   };
 }
 

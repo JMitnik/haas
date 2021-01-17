@@ -344,6 +344,16 @@ class SessionService {
     };
   };
 
+  static async getCountByNodes(dialogueId: string) {
+    const countsByNode = await prisma.nodeEntry.groupBy({
+      where: { relatedNode: { questionDialogueId: dialogueId } },
+      count: { relatedNodeId: true },
+      by: ['relatedNodeId'],
+    });
+
+    return countsByNode;
+  }
+
   static async getSessionEntries(session: Session): Promise<NodeEntry[] | []> {
     const sessionWithEntries = await prisma.session.findUnique({
       where: { id: session.id },

@@ -10,6 +10,7 @@ import { DialogueType } from '../questionnaire/Dialogue';
 import { EdgeType } from '../edge/Edge';
 import { SliderNode } from './SliderNode';
 import NodeService from './NodeService';
+import SessionService from '../session/SessionService';
 
 export const CTAShareInputObjectType = inputObjectType({
   name: 'CTAShareInputObjectType',
@@ -174,7 +175,8 @@ export const QuestionNodeType = objectType({
 
     // Node-types
     // TODO: Remove `any` once we figure out how to not make prisma the backing-type
-    t.field('sliderNode', { description: 'Slidernode resolver',
+    t.field('sliderNode', {
+      description: 'Slidernode resolver',
       type: SliderNodeType,
       nullable: true,
       resolve: (parent: any) => {
@@ -183,11 +185,13 @@ export const QuestionNodeType = objectType({
         }
 
         return null;
-      } });
+      }
+    });
 
     // Node-types
     // TODO: Remove `any` once we figure out how to not make prisma the backing-type
-    t.field('form', { description: 'FormNode resolver',
+    t.field('form', {
+      description: 'FormNode resolver',
       type: FormNodeType,
       nullable: true,
       resolve: (parent: any) => {
@@ -197,7 +201,8 @@ export const QuestionNodeType = objectType({
         }
 
         return null;
-      } });
+      }
+    });
 
     t.field('share', {
       type: ShareNodeType,
@@ -559,9 +564,11 @@ export const QuestionNodeMutations = extendType({
       async resolve(parent: any, args: any, ctx: any) {
         const { prisma }: { prisma: PrismaClient } = ctx;
 
-        await prisma.share.deleteMany({ where: {
-          questionNodeId: args?.input?.id,
-        } });
+        await prisma.share.deleteMany({
+          where: {
+            questionNodeId: args?.input?.id,
+          }
+        });
 
         return prisma.questionNode.delete({
           where: {
@@ -620,6 +627,35 @@ export const QuestionNodeMutations = extendType({
       },
     });
   },
+});
+
+export const QuestionNodeConnectionType = objectType({
+  name: 'QuestionNodeConnectionType',
+  description: 'Conncetion of question-node',
+
+  definition(t) {
+    t.list.field('questions', { type: QuestionNodeType });
+  }
+});
+
+export const GetQuestionNodeConnectionOfDialogue = extendType({
+  type: 'Dialogue',
+
+  definition(t) {
+    t.field('generalNodeConnection', {
+      type: QuestionNodeConnectionType,
+      resolve: (parent, args, ctx) => {
+        const questions = NodeService.getQuestionNodes(parent.id);
+        const edges = NodeService.getEdges(parent.id);
+        const countByNodes = SessionService.getCountByNodes(parent.id);
+
+        return {
+          questions,
+          edges
+        }
+      }
+    });
+  }
 });
 
 export const getQuestionNodeQuery = extendType({
