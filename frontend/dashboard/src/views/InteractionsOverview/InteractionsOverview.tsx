@@ -8,7 +8,7 @@ import { useLocation, useParams } from 'react-router';
 import Papa from 'papaparse';
 import React, { useCallback, useEffect, useState } from 'react';
 
-import { Activity, Download } from 'react-feather';
+import { Activity, Download, Link, Monitor, Watch } from 'react-feather';
 import { Button, Icon } from '@chakra-ui/core';
 import {
   getDialogueSessionConnection as CustomerSessionConnection,
@@ -73,22 +73,29 @@ const ExpandedInteractionRow = ({ data }: { data: any }) => {
             <UI.Stack isInline spacing={4}>
               {data.device && (
                 <UI.Div>
-                  <UI.Helper>Device</UI.Helper>
-                  {data.device}
+                  <UI.Helper mb={1}>Device</UI.Helper>
+                  <UI.Label mt={1} size="sm" variantColor="cyan">
+                    <UI.Icon mr={2} ><Monitor width="0.8rem" /></UI.Icon>
+                    {data.device}
+                  </UI.Label>
                 </UI.Div>
               )}
               {data.totalTimeInSec && (
                 <UI.Div>
-                  <UI.Helper>Total duration taken</UI.Helper>
-                  {data.totalTimeInSec}
+                  <UI.Helper mb={1}>Duration</UI.Helper>
+                  <UI.Label mt={1} size="sm" variantColor="cyan">
+                    <UI.Icon mr={2} ><Watch width="0.8rem" /></UI.Icon>
+                    {data.totalTimeInSec} seconds
+                  </UI.Label>
                 </UI.Div>
               )}
               {data.originUrl && (
                 <UI.Div>
                   <UI.Helper>Origin url</UI.Helper>
-                  <UI.Text fontSize="0.7rem" fontWeight="400">
+                  <UI.Label size="sm" mt={1} variantColor="cyan">
+                    <UI.Icon mr={2} ><Link width="0.8rem" /></UI.Icon>
                     {data.originUrl}
-                  </UI.Text>
+                  </UI.Label>
                 </UI.Div>
               )}
             </UI.Stack>

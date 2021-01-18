@@ -10,7 +10,6 @@ import { useCreateBatchDeliveriesMutation, refetchGetWorkspaceCampaignQuery } fr
 import { useNavigator } from 'hooks/useNavigator';
 import { defaultCampaignViewFilter } from './CampaignView';
 import { useCustomer } from 'providers/CustomerProvider';
-import { useRef } from 'react';
 
 const schema = yup.object({
   batchScheduledAt: yup.date()
