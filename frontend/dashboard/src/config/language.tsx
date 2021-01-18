@@ -1,6 +1,10 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    delivery_recipient: {
+      en: 'Related delivery',
+      de: 'Verwandte Lieferung.'
+    },
     origin_url: {
       en: 'Originating url',
       de: 'Ursprungs-URL'
