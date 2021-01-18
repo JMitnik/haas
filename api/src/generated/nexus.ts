@@ -283,6 +283,7 @@ export interface NexusGenInputs {
     deliveryId?: string | null; // String
     dialogueId: string; // String!
     entries?: NexusGenInputs['NodeEntryInput'][] | null; // [NodeEntryInput!]
+    originUrl?: string | null; // String
   }
   SessionWhereUniqueInput: { // input type
     dialogueId?: string | null; // ID

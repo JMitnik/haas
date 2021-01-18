@@ -17,6 +17,7 @@ import { Nullable, PaginationProps } from '../../types/generic';
 import { SessionWithEntries } from './SessionTypes';
 import TriggerService from '../trigger/TriggerService';
 import prisma from '../../config/prisma';
+import Sentry from '../../config/sentry';
 
 class SessionService {
   /**
@@ -36,6 +37,8 @@ class SessionService {
         nodeEntries: {
           create: entries.map((entry: any) => NodeEntryService.constructCreateNodeEntryFragment(entry)),
         },
+        originUrl: sessionInput.originUrl || '',
+        totalTimeInSec: undefined,
       },
       include: {
         nodeEntries: {
@@ -67,13 +70,26 @@ class SessionService {
         await prisma.$transaction([deliveryUpdate, deliveryEventCreation]);
       }
     } catch (error) {
-      console.log(error);
+      Sentry.captureException(error);
+    }
+
+    try {
+      if (sessionInput.deliveryId) {
+        await prisma.session.update({
+          where: { id: session.id },
+          data: {
+            delivery: { update: { id: sessionInput.deliveryId } }
+          }
+        })
+      }
+    } catch (error) {
+      Sentry.captureException(error);
     }
 
     try {
       await TriggerService.tryTriggers(session);
-    } catch (e) {
-      console.log('Something went wrong while handling sms triggers: ', e);
+    } catch (error) {
+      console.log('Something went wrong while handling sms triggers: ', error);
     }
 
     return session;

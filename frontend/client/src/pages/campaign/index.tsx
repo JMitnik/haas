@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import React, { useState } from 'react';
 import { useEffect } from 'react';
 import { useLocation, Redirect } from 'react-router-dom';
+import * as Sentry from '@sentry/react';
 
 import Loader from 'components/Loader';
 import { useGetUrlRef } from 'hooks/useGetUrlRef';
@@ -27,7 +28,8 @@ export const CampaignRedirect = () => {
     },
     onCompleted: () => {
       setRedirect(true);
-    }, onError: () => {
+    }, onError: (error) => {
+      Sentry.captureException(error);
       setRedirect(true);
     }
   })
@@ -36,7 +38,7 @@ export const CampaignRedirect = () => {
     if (ref && !called && data?.delivery?.campaignVariant) {
       updateDelivery();
     }
-  }, [ ref, called, data, updateDelivery ]);
+  }, [ref, called, data, updateDelivery]);
 
   if (!ref) {
     return (
@@ -45,14 +47,14 @@ export const CampaignRedirect = () => {
       </motion.div>
     );
   }
-  
+
   if (redirect) {
     return (
       <motion.div exit={{ opacity: 0 }}>
-        <Redirect to={{ 
+        <Redirect to={{
           pathname: `/${data?.delivery?.campaignVariant.workspace.slug}/${data?.delivery?.campaignVariant.dialogue.slug}`,
           search: location.search
-         }} />
+        }} />
       </motion.div>
     );
   }
