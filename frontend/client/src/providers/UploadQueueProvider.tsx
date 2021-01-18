@@ -22,7 +22,7 @@ export const UploadQueueProvider = ({ children }: { children: React.ReactNode })
   const location = useLocation();
 
   const queue = useRef<any>([]);
-  const { store, originUrl } = useDialogueTree();
+  const { store, originUrl, device, startTime } = useDialogueTree();
   const [createInteraction, { data: interactionData }] = useCreateSessionMutation();
   const [appendToInteraction] = useMutation(appendToInteractionMutation);
   const ref = qs.parse(location.search, { ignoreQueryPrefix: true })?.ref?.toString() || '';
@@ -40,7 +40,9 @@ export const UploadQueueProvider = ({ children }: { children: React.ReactNode })
           input: {
             dialogueId: store.tree?.id || '',
             deliveryId: ref,
+            totalTimeInSec: Math.min(600, Math.floor((Date.now() - startTime) / 1000)) || -1,
             originUrl: originUrl,
+            device,
             entries: uploadEntries.map((entry: any) => ({
               nodeId: entry.node.node.id,
               edgeId: entry.edge?.id,

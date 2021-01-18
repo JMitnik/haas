@@ -38,7 +38,8 @@ class SessionService {
           create: entries.map((entry: any) => NodeEntryService.constructCreateNodeEntryFragment(entry)),
         },
         originUrl: sessionInput.originUrl || '',
-        totalTimeInSec: undefined,
+        totalTimeInSec: sessionInput.totalTimeInSec,
+        device: sessionInput.device || '',
       },
       include: {
         nodeEntries: {
@@ -78,7 +79,7 @@ class SessionService {
         await prisma.session.update({
           where: { id: session.id },
           data: {
-            delivery: { update: { id: sessionInput.deliveryId } }
+            delivery: { connect: { id: sessionInput.deliveryId } }
           }
         })
       }

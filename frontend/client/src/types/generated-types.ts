@@ -1203,6 +1203,8 @@ export type SessionInput = {
   entries?: Maybe<Array<NodeEntryInput>>;
   deliveryId?: Maybe<Scalars['String']>;
   originUrl?: Maybe<Scalars['String']>;
+  device?: Maybe<Scalars['String']>;
+  totalTimeInSec?: Maybe<Scalars['Int']>;
 };
 
 export type SessionWhereUniqueInput = {

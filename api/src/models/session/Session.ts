@@ -35,6 +35,20 @@ export const SessionType = objectType({
       },
     });
 
+    t.int('totalTimeInSec', {
+      nullable: true,
+      resolve: (parent) => parent.totalTimeInSec || null
+    });
+
+    t.string('originUrl', {
+      nullable: true,
+      resolve: (parent) => parent.originUrl || ''
+    });
+
+    t.field('delivery', { type: 'DeliveryType', nullable: true });
+
+    t.string('device', { nullable: true });
+
     t.list.field('nodeEntries', {
       type: NodeEntryType,
 
@@ -131,6 +145,8 @@ export const SessionInput = inputObjectType({
 
     t.string('deliveryId', { required: false });
     t.string('originUrl', { required: false });
+    t.string('device', { required: false });
+    t.int('totalTimeInSec', { required: false });
   },
 });
 

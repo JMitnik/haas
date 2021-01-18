@@ -13,7 +13,9 @@ import treeStore from './DialogueTreeStore';
 interface DialogueTreeContextType {
   store: TreeStoreModelProps;
   originUrl: string;
+  device: string;
   getNode: any;
+  startTime: number;
 }
 
 const DialogueTreeContext = React.createContext({} as DialogueTreeContextType);
@@ -30,6 +32,8 @@ interface DialogueDataProps {
 
 export const DialogueTreeProvider = ({ children }: { children: React.ReactNode }) => {
   const [originUrl, setOriginUrl] = useState<string | null>(null);
+  const [device] = useState<string | null>(navigator.platform);
+  const [startTime] = useState(Date.now());
 
   useEffect(() => {
     if (!originUrl) {
@@ -102,6 +106,8 @@ export const DialogueTreeProvider = ({ children }: { children: React.ReactNode }
     <DialogueTreeContext.Provider value={{
       store: treeStore,
       getNode,
+      device: device || '',
+      startTime,
       originUrl: originUrl || ''
     }}
     >

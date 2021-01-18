@@ -57,8 +57,9 @@ const tableHeaders = [
   { Header: 'score', accessor: 'score', Cell: ScoreCell },
 ];
 
-const ExpandedInteractionRow = ({ data }: { data: Session }) => {
+const ExpandedInteractionRow = ({ data }: { data: any }) => {
   const { t } = useTranslation();
+  console.log(data);
   return (
     <Div useFlex flexDirection="column" backgroundColor="gray.100" gridColumn="1 / -1">
       <Div padding={25}>
@@ -66,10 +67,32 @@ const ExpandedInteractionRow = ({ data }: { data: Session }) => {
           <Div useFlex flexDirection="row">
             <Div width="51%">
               <Text color="gray.400" fontSize="1.2rem" fontWeight="600">{t('interactions:user_data')}</Text>
-              <Text color="gray.400" fontWeight="300">{t('interactions:user_information')}</Text>
             </Div>
           </Div>
-          <Div />
+          <UI.Div pt={4}>
+            <UI.Stack isInline spacing={4}>
+              {data.device && (
+                <UI.Div>
+                  <UI.Helper>Device</UI.Helper>
+                  {data.device}
+                </UI.Div>
+              )}
+              {data.totalTimeInSec && (
+                <UI.Div>
+                  <UI.Helper>Total duration taken</UI.Helper>
+                  {data.totalTimeInSec}
+                </UI.Div>
+              )}
+              {data.originUrl && (
+                <UI.Div>
+                  <UI.Helper>Origin url</UI.Helper>
+                  <UI.Text fontSize="0.7rem" fontWeight="400">
+                    {data.originUrl}
+                  </UI.Text>
+                </UI.Div>
+              )}
+            </UI.Stack>
+          </UI.Div>
         </Div>
         <UI.Hr />
         <Div position="relative" useFlex flexDirection="row">
