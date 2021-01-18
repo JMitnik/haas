@@ -151,11 +151,14 @@ input CreateWorkspaceInput {
 }
 
 type CreateWorkspaceJobType {
-  cloudReference: CloudReferenceType!
+  createdAt: String!
   id: String!
-  referenceId: String!
-  resourceUrl: String!
+  name: String!
+  referenceId: String
+  referenceType: CloudReferenceType!
+  resourceUrl: String
   status: JobStatusType!
+  updatedAt: String
 }
 
 input CTALinkInputObjectType {

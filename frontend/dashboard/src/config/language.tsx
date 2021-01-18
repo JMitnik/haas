@@ -1,6 +1,14 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    created_at: {
+      en: 'Created at',
+      de: 'Hergestellt in',
+    },
+    updated_at: {
+      en: 'Updated at',
+      de: 'Aktualisiert am',
+    },
     events: {
       en: 'Events',
       de: 'Veranstaltungen'
@@ -793,6 +801,14 @@ const language = {
     },
   },
   autodeck: {
+    create_job: {
+      en: 'Create job',
+      de: 'Aufgabe erstellen',
+    },
+    job_name: {
+      en: 'Name',
+      de: 'Name',
+    },
     dialogue: {
       en: 'Dialogue',
       de: 'Dialog',
@@ -1641,6 +1657,7 @@ const language = {
       en: 'What text should be matched to trigger the alert?',
       de: 'Welche Textübereinstimmung soll die Push-Benachrichtigung auslösen?',
     },
+
   },
 };
 

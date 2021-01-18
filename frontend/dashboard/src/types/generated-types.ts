@@ -25,6 +25,16 @@ export type AppendToInteractionInput = {
   data?: Maybe<NodeEntryDataInput>;
 };
 
+export type AutodeckConnectionType = ConnectionInterface & {
+  __typename?: 'AutodeckConnectionType';
+  offset: Scalars['Int'];
+  limit: Scalars['Int'];
+  pageInfo: PaginationPageInfo;
+  startDate?: Maybe<Scalars['String']>;
+  endDate?: Maybe<Scalars['String']>;
+  jobs: Array<CreateWorkspaceJobType>;
+};
+
 /** Campaign */
 export type CampaignType = {
   __typename?: 'CampaignType';
@@ -169,10 +179,13 @@ export type CreateWorkspaceInput = {
 export type CreateWorkspaceJobType = {
   __typename?: 'CreateWorkspaceJobType';
   id: Scalars['String'];
-  referenceId: Scalars['String'];
+  createdAt: Scalars['String'];
+  name: Scalars['String'];
+  updatedAt?: Maybe<Scalars['String']>;
+  referenceId?: Maybe<Scalars['String']>;
   status: JobStatusType;
-  resourceUrl: Scalars['String'];
-  cloudReference: CloudReferenceType;
+  resourceUrl?: Maybe<Scalars['String']>;
+  referenceType: CloudReferenceType;
 };
 
 export type CtaLinkInputObjectType = {
@@ -1005,6 +1018,7 @@ export type PermssionType = {
 export type Query = {
   __typename?: 'Query';
   getJob?: Maybe<CreateWorkspaceJobType>;
+  getAutodeckJobs: AutodeckConnectionType;
   tags: Array<Tag>;
   delivery?: Maybe<DeliveryType>;
   triggerConnection?: Maybe<TriggerConnectionType>;
@@ -1032,6 +1046,11 @@ export type Query = {
 
 export type QueryGetJobArgs = {
   id?: Maybe<Scalars['String']>;
+};
+
+
+export type QueryGetAutodeckJobsArgs = {
+  filter?: Maybe<PaginationWhereInput>;
 };
 
 
@@ -1560,6 +1579,25 @@ export type CreateBatchDeliveriesMutation = (
   ) }
 );
 
+export type GetAutodeckJobsQueryVariables = Exact<{
+  filter?: Maybe<PaginationWhereInput>;
+}>;
+
+
+export type GetAutodeckJobsQuery = (
+  { __typename?: 'Query' }
+  & { getAutodeckJobs: (
+    { __typename?: 'AutodeckConnectionType' }
+    & { jobs: Array<(
+      { __typename?: 'CreateWorkspaceJobType' }
+      & Pick<CreateWorkspaceJobType, 'id' | 'name' | 'createdAt' | 'updatedAt' | 'referenceId' | 'status' | 'resourceUrl' | 'referenceType'>
+    )>, pageInfo: (
+      { __typename?: 'PaginationPageInfo' }
+      & Pick<PaginationPageInfo, 'nrPages' | 'pageIndex'>
+    ) }
+  ) }
+);
+
 export type GetWorkspaceCampaignQueryVariables = Exact<{
   customerSlug: Scalars['String'];
   campaignId: Scalars['String'];
@@ -1698,6 +1736,55 @@ export function useCreateBatchDeliveriesMutation(baseOptions?: Apollo.MutationHo
 export type CreateBatchDeliveriesMutationHookResult = ReturnType<typeof useCreateBatchDeliveriesMutation>;
 export type CreateBatchDeliveriesMutationResult = Apollo.MutationResult<CreateBatchDeliveriesMutation>;
 export type CreateBatchDeliveriesMutationOptions = Apollo.BaseMutationOptions<CreateBatchDeliveriesMutation, CreateBatchDeliveriesMutationVariables>;
+export const GetAutodeckJobsDocument = gql`
+    query getAutodeckJobs($filter: PaginationWhereInput) {
+  getAutodeckJobs(filter: $filter) {
+    jobs {
+      id
+      name
+      createdAt
+      updatedAt
+      referenceId
+      status
+      resourceUrl
+      referenceType
+    }
+    pageInfo {
+      nrPages
+      pageIndex
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetAutodeckJobsQuery__
+ *
+ * To run a query within a React component, call `useGetAutodeckJobsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetAutodeckJobsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetAutodeckJobsQuery({
+ *   variables: {
+ *      filter: // value for 'filter'
+ *   },
+ * });
+ */
+export function useGetAutodeckJobsQuery(baseOptions?: Apollo.QueryHookOptions<GetAutodeckJobsQuery, GetAutodeckJobsQueryVariables>) {
+        return Apollo.useQuery<GetAutodeckJobsQuery, GetAutodeckJobsQueryVariables>(GetAutodeckJobsDocument, baseOptions);
+      }
+export function useGetAutodeckJobsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetAutodeckJobsQuery, GetAutodeckJobsQueryVariables>) {
+          return Apollo.useLazyQuery<GetAutodeckJobsQuery, GetAutodeckJobsQueryVariables>(GetAutodeckJobsDocument, baseOptions);
+        }
+export type GetAutodeckJobsQueryHookResult = ReturnType<typeof useGetAutodeckJobsQuery>;
+export type GetAutodeckJobsLazyQueryHookResult = ReturnType<typeof useGetAutodeckJobsLazyQuery>;
+export type GetAutodeckJobsQueryResult = Apollo.QueryResult<GetAutodeckJobsQuery, GetAutodeckJobsQueryVariables>;
+export function refetchGetAutodeckJobsQuery(variables?: GetAutodeckJobsQueryVariables) {
+      return { query: GetAutodeckJobsDocument, variables: variables }
+    }
 export const GetWorkspaceCampaignDocument = gql`
     query GetWorkspaceCampaign($customerSlug: String!, $campaignId: String!, $deliveryConnectionFilter: DeliveryConnectionFilter) {
   customer(slug: $customerSlug) {

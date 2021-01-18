@@ -28,12 +28,19 @@ class AutodeckService {
   static paginatedAutodeckJobs = async (
     paginationOpts: NexusGenInputs['PaginationWhereInput'],
   ) => {
-    const findManyTriggerArgs: FindManyTriggerArgs = {};
+    const findManyTriggerArgs: FindManyTriggerArgs = {
+      where: {
+        id: {
+          not: undefined
+        }
+      },
+    };
 
     const findManyTriggers = async (
-      { props: findManyArgs } : FindManyCallBackProps,
+      { props: findManyArgs }: FindManyCallBackProps,
     ) => prisma.createWorkspaceJob.findMany(findManyArgs);
-    const countTriggers = async ({ props: countArgs } : FindManyCallBackProps) => prisma.createWorkspaceJob.count(countArgs);
+  
+    const countTriggers = async ({ props: countArgs }: FindManyCallBackProps) => prisma.createWorkspaceJob.count(countArgs);
 
     const paginateProps: PaginateProps = {
       findManyArgs: {

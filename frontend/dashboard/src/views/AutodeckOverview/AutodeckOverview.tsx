@@ -8,34 +8,28 @@ import { ErrorBoundary } from 'react-error-boundary';
 import { AtSign, Clock, Eye, Flag, Phone, Plus, Smartphone } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { DeepPartial } from 'types/customTypes';
-import { CampaignVariantEnum, DeliveryConnectionFilter, DeliveryStatusEnum, DeliveryType, GetWorkspaceCampaignQuery, PaginationSortByEnum, useGetWorkspaceCampaignQuery } from 'types/generated-types';
+import { CampaignVariantEnum, DeliveryConnectionFilter, JobStatusType, DeliveryType, PaginationSortByEnum, useGetAutodeckJobsQuery, GetAutodeckJobsQuery, PaginationWhereInput, CreateWorkspaceJobType } from 'types/generated-types';
 import { ImportDeliveriesForm } from './ImportDeliveriesForm';
 
-export const defaultCampaignViewFilter: DeliveryConnectionFilter = {
-  paginationFilter: {
-    limit: 7,
+export const paginationFilter: PaginationWhereInput = {
+    limit: 5,
     startDate: undefined,
     endDate: undefined,
     pageIndex: 0,
     offset: 0,
     orderBy: [
       {
-        by: PaginationSortByEnum.ScheduledAt,
-        desc: true,
-      },
-      {
         by: PaginationSortByEnum.UpdatedAt,
         desc: true
       },
     ],
-  },
 };
 
 const POLL_INTERVAL_SECONDS = 60;
 const POLL_INTERVAL = POLL_INTERVAL_SECONDS * 1000;
 
-const DeliveryScheduledLabel = ({ scheduledAt }: { scheduledAt: string }) => {
-  const date = new Date(parseInt(scheduledAt, 10));
+const DateLabel = ({ dateString }: { dateString: string }) => {
+  const date = new Date(parseInt(dateString, 10));
 
   return (
     <UI.Flex alignItems="center">
@@ -47,11 +41,11 @@ const DeliveryScheduledLabel = ({ scheduledAt }: { scheduledAt: string }) => {
   )
 };
 
-const DeliveryStatus = ({ delivery }: { delivery: DeepPartial<DeliveryType> }) => {
-  const status = delivery.currentStatus;
+const DeliveryStatus = ({ job }: { job: DeepPartial<CreateWorkspaceJobType> }) => {
+  const status = job.status;
 
   switch (status) {
-    case DeliveryStatusEnum.Finished: {
+    case JobStatusType.Completed: {
       return (
         <UI.Label variantColor="green">
           {status}
@@ -59,7 +53,7 @@ const DeliveryStatus = ({ delivery }: { delivery: DeepPartial<DeliveryType> }) =
       );
     }
 
-    case DeliveryStatusEnum.Deployed: {
+    case JobStatusType.ReadyForProcessing: {
       return (
         <UI.Label variantColor="blue">
           {status}
@@ -67,38 +61,9 @@ const DeliveryStatus = ({ delivery }: { delivery: DeepPartial<DeliveryType> }) =
       )
     }
 
-    case DeliveryStatusEnum.Scheduled: {
-      return (
-        <UI.Label>
-          <ErrorBoundary FallbackComponent={() => <div>{status}</div>}>
-            <UI.Div py={1}>
-              <UI.Stack>
-                <>
-                  <UI.Span>
-                    {status}
-                  </UI.Span>
-                  <UI.Span fontSize="0.6rem">
-                    {!!delivery.scheduledAt && (
-                      <DeliveryScheduledLabel scheduledAt={delivery.scheduledAt} />
-                    )}
-                  </UI.Span>
-                </>
-              </UI.Stack>
-            </UI.Div>
-          </ErrorBoundary>
-        </UI.Label>
-      )
-    }
-
-    case DeliveryStatusEnum.Opened: {
-      return (
-        <UI.Label variantColor="yellow">{status}</UI.Label>
-      )
-    }
-
     default: {
       return (
-        <UI.Label>{status}</UI.Label>
+        <UI.Label variantColor="yellow">{status}</UI.Label>
       )
     }
   }
@@ -107,32 +72,32 @@ const DeliveryStatus = ({ delivery }: { delivery: DeepPartial<DeliveryType> }) =
 export const AutodeckOverview = () => {
   const [isOpenImportModal, setIsOpenImportModal] = useState(false);
   const [isOpenDetailModel, setIsOpenDetailModel] = useState(false);
-  const [activeDelivery, setActiveDelivery] = useState<DeepPartial<DeliveryType> | null>(null);
+  const [activeJob, setActiveJob] = useState<DeepPartial<CreateWorkspaceJobType> | null>(null);
   const { t } = useTranslation();
 
-  const [paginationState, setPaginationState] = useState(defaultCampaignViewFilter);
+  const [paginationState, setPaginationState] = useState(paginationFilter);
 
   // const { customerSlug, campaignId, getCampaignsPath } = useNavigator();
   // const campaignsPath = getCampaignsPath();
 
-  // const { data } = useGetWorkspaceCampaignQuery({
-  //   fetchPolicy: 'cache-and-network',
-  //   variables: {
-  //     campaignId,
-  //     customerSlug,
-  //     deliveryConnectionFilter: paginationState,
-  //   },
-  //   pollInterval: POLL_INTERVAL
-  // });
+  const { data } = useGetAutodeckJobsQuery({
+    fetchPolicy: 'cache-and-network',
+    variables: {
+     filter: paginationState,
+    },
+    pollInterval: POLL_INTERVAL
+  });
 
   useEffect(() => {
-    if (activeDelivery) {
+    if (activeJob) {
       setIsOpenDetailModel(true);
     } else {
       setIsOpenDetailModel(false);
     }
-  }, [activeDelivery, setIsOpenImportModal]);
+  }, [activeJob, setIsOpenImportModal]);
 
+  console.log('data: ', data?.getAutodeckJobs.jobs)
+  // console.log('pageInfo: ', data?.getAutodeckJobs.pageInfo)
   // const campaign = data?.customer?.campaign;
   // const deliveryConnection = campaign?.deliveryConnection;
 
@@ -145,7 +110,7 @@ export const AutodeckOverview = () => {
             <UI.PageTitle>{'Autodeck overview'}</UI.PageTitle>
             <UI.Button
               leftIcon={Plus}
-              onClick={() => setIsOpenImportModal(true)} size="sm" variantColor="teal">{t('import_deliveries')}</UI.Button>
+              onClick={() => setIsOpenImportModal(true)} size="sm" variantColor="teal">{t('autodeck:create_job')}</UI.Button>
           </UI.Stack>
         </UI.Stack>
       </UI.ViewHeading>
@@ -155,13 +120,13 @@ export const AutodeckOverview = () => {
             <UI.Table width="100%">
               <UI.TableHeading>
                 <UI.TableHeadingCell>
-                  {t('recipient')}
+                  {t('autodeck:job_name')}
                 </UI.TableHeadingCell>
                 <UI.TableHeadingCell>
-                  {t('recipient_adress')}
+                  {t('created_at')}
                 </UI.TableHeadingCell>
                 <UI.TableHeadingCell>
-                  {t('variant')}
+                  {t('updated_at')}
                 </UI.TableHeadingCell>
                 <UI.TableHeadingCell>
                   {t('status')}
@@ -169,42 +134,42 @@ export const AutodeckOverview = () => {
               </UI.TableHeading>
 
               <UI.TableBody>
-                {/* {deliveryConnection?.deliveries.map(delivery => (
-                  <UI.TableRow hasHover key={delivery.id} onClick={() => setActiveDelivery(delivery)}>
+                {data?.getAutodeckJobs?.jobs.map(job => (
+                  <UI.TableRow hasHover key={job.id} onClick={() => setActiveJob(job)}>
                     <UI.TableCell>
-                      {delivery?.deliveryRecipientFirstName || ''}
+                      {job?.name || ''}
                     </UI.TableCell>
                     <UI.TableCell>
-                      {delivery?.deliveryRecipientEmail}
+                      <DateLabel dateString={job.createdAt} />
                     </UI.TableCell>
                     <UI.TableCell>
-                      {delivery?.campaignVariant?.label}
+                      {job.updatedAt 
+                      ? <DateLabel dateString={job.updatedAt} />
+                      : 'Not updated yet'  
+                    }
                     </UI.TableCell>
                     <UI.TableCell>
                       <DeliveryStatus
-                        delivery={delivery}
+                        job={job}
                       />
                     </UI.TableCell>
                   </UI.TableRow>
-                ))} */}
+                ))}
               </UI.TableBody>
             </UI.Table>
           </UI.Div>
-          {/* {(deliveryConnection?.pageInfo?.nrPages || 0) > 1 && (
+          {(data?.getAutodeckJobs?.pageInfo?.nrPages || 0) > 1 && (
             <UI.PaginationFooter>
               <UI.Div style={{ lineHeight: 'normal' }}>
                 Showing page
                 <UI.Span ml={1} fontWeight="bold">
-                  {(paginationState.paginationFilter?.pageIndex || 0) + 1}
+                  {(paginationState.pageIndex || 0) + 1}
                 </UI.Span>
                 <UI.Span ml={1}>
                   out of
                 </UI.Span>
                 <UI.Span ml={1} fontWeight="bold">
-                  {deliveryConnection?.pageInfo.nrPages}
-                </UI.Span>
-                <UI.Span ml={3}>
-                  (Total deliveries: {data?.customer?.campaign.allDeliveryConnection?.nrTotal})
+                  {data?.getAutodeckJobs?.pageInfo?.nrPages}
                 </UI.Span>
               </UI.Div>
 
@@ -213,104 +178,49 @@ export const AutodeckOverview = () => {
                   <UI.Button
                     onClick={() => setPaginationState(state => ({
                       ...state,
-                      paginationFilter: {
-                        ...state.paginationFilter,
-                        pageIndex: (state.paginationFilter?.pageIndex || 0) - 1,
-                        offset: (state.paginationFilter?.offset || 0) - (state.paginationFilter?.limit || 0),
-                      }
+
+                        pageIndex: (state.pageIndex || 0) - 1,
+                        offset: (state.offset || 0) - (state.limit || 0),
+
                     }))}
-                    isDisabled={paginationState.paginationFilter?.pageIndex === 0}>Previous</UI.Button>
+                    isDisabled={paginationState.pageIndex === 0}>Previous</UI.Button>
                   <UI.Button
                     onClick={() => setPaginationState(state => ({
                       ...state,
-                      paginationFilter: {
-                        ...state.paginationFilter,
-                        pageIndex: (state.paginationFilter?.pageIndex || 0) + 1,
-                        offset: (state.paginationFilter?.offset || 0) + (state.paginationFilter?.limit || 0),
-                      }
+                        ...state,
+                        pageIndex: (state.pageIndex || 0) + 1,
+                        offset: (state.offset || 0) + (state.limit || 0),
+
                     }))}
-                    isDisabled={(paginationState.paginationFilter?.pageIndex || 0) + 1 === deliveryConnection?.pageInfo.nrPages}>Next</UI.Button>
+                    isDisabled={(paginationState.pageIndex || 0) + 1 === data?.getAutodeckJobs?.pageInfo?.nrPages}>Next</UI.Button>
                 </UI.Stack>
               </UI.Div>
             </UI.PaginationFooter>
-          )} */}
+          )}
         </UI.Card>
 
-        <UI.Modal isOpen={isOpenDetailModel} onClose={() => setActiveDelivery(null)}>
+        <UI.Modal isOpen={isOpenDetailModel} onClose={() => setActiveJob(null)}>
           <UI.Card bg="white" width={600} noHover>
             <UI.CardBody>
               <UI.FormSectionHeader>{t('details')}</UI.FormSectionHeader>
               <UI.Stack mb={4}>
                 <UI.Div>
                   <UI.Helper mb={1}>{t('first_name')}</UI.Helper>
-                  {activeDelivery?.deliveryRecipientFirstName}
+                  {activeJob?.name}
                 </UI.Div>
                 <UI.Div>
                   <UI.Helper mb={1}>{t('last_name')}</UI.Helper>
-                  {activeDelivery?.deliveryRecipientLastName}
+                  {activeJob?.createdAt}
                 </UI.Div>
 
                 <UI.Div>
                   <UI.Helper mb={1}>{t('email')}</UI.Helper>
-                  {activeDelivery?.deliveryRecipientEmail}
+                  {activeJob?.updatedAt || 'Not updated yet'}
                 </UI.Div>
                 <UI.Div>
                   <UI.Helper mb={1}>{t('phone')}</UI.Helper>
-                  {activeDelivery?.deliveryRecipientPhone}
+                  {activeJob?.status}
                 </UI.Div>
-              </UI.Stack>
-
-              <UI.Hr />
-
-              <UI.FormSectionHeader>{t('events')}</UI.FormSectionHeader>
-              <UI.Stack spacing={4}>
-                {activeDelivery?.events?.map(event => (
-                  <UI.Flex alignItems="center" justifyContent="space-between">
-                    {event?.status === DeliveryStatusEnum.Scheduled && (
-                      <UI.Flex alignItems="center">
-                        <UI.Div mr={2} bg="gray.200" padding="5px" color="gray.500" style={{ borderRadius: '100%' }}>
-                          <Clock />
-                        </UI.Div>
-                        {t('scheduled_event')}
-                      </UI.Flex>
-                    )}
-                    {event?.status === DeliveryStatusEnum.Deployed && (
-                      <UI.Flex alignItems="center">
-                        <UI.Div mr={2} bg="blue.200" padding="5px" color="blue.500" style={{ borderRadius: '100%' }}>
-                          {activeDelivery.campaignVariant?.type === CampaignVariantEnum.Email ? (
-                            <AtSign />
-                          ) : (
-                              <Smartphone />
-                            )}
-                        </UI.Div>
-                        {t('deployed_event')}
-                      </UI.Flex>
-                    )}
-                    {event?.status === DeliveryStatusEnum.Opened && (
-                      <UI.Flex alignItems="center">
-                        <UI.Div mr={2} bg="yellow.200" padding="5px" color="yellow.500" style={{ borderRadius: '100%' }}>
-                          <Eye />
-                        </UI.Div>
-                        {t('opened_event')}
-                      </UI.Flex>
-                    )}
-                    {event?.status === DeliveryStatusEnum.Finished && (
-                      <UI.Flex alignItems="center">
-                        <UI.Div mr={2} bg="green.200" padding="5px" color="green.500" style={{ borderRadius: '100%' }}>
-                          <Flag />
-                        </UI.Div>
-                        {t('finished_event')}
-                      </UI.Flex>
-                    )}
-                    <UI.Span color="gray.500">
-                      {event?.createdAt && (
-                        <>
-                          {format(parseInt(event?.createdAt, 10), 'MMM Mo HH:mm')}
-                        </>
-                      )}
-                    </UI.Span>
-                  </UI.Flex>
-                ))}
               </UI.Stack>
             </UI.CardBody>
           </UI.Card>
@@ -319,8 +229,8 @@ export const AutodeckOverview = () => {
         <UI.Modal isOpen={isOpenImportModal} onClose={() => setIsOpenImportModal(false)}>
           <UI.Card bg="white" noHover width={700}>
             <UI.CardBody>
-              <ImportDeliveriesForm
-                onClose={() => setIsOpenImportModal(false)} />
+              {/* <ImportDeliveriesForm
+                onClose={() => setIsOpenImportModal(false)} /> */}
             </UI.CardBody>
           </UI.Card>
         </UI.Modal>

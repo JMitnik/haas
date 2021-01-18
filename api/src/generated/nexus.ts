@@ -428,11 +428,14 @@ export interface NexusGenRootTypes {
     nrDeliveries: number; // Int!
   }
   CreateWorkspaceJobType: { // root type
-    cloudReference: NexusGenEnums['CloudReferenceType']; // CloudReferenceType!
+    createdAt: string; // String!
     id: string; // String!
-    referenceId: string; // String!
-    resourceUrl: string; // String!
+    name: string; // String!
+    referenceId?: string | null; // String
+    referenceType: NexusGenEnums['CloudReferenceType']; // CloudReferenceType!
+    resourceUrl?: string | null; // String
     status: NexusGenEnums['JobStatusType']; // JobStatusType!
+    updatedAt?: string | null; // String
   }
   Customer: prisma.Customer;
   CustomerSettings: prisma.CustomerSettings;
@@ -798,11 +801,14 @@ export interface NexusGenFieldTypes {
     nrDeliveries: number; // Int!
   }
   CreateWorkspaceJobType: { // field return type
-    cloudReference: NexusGenEnums['CloudReferenceType']; // CloudReferenceType!
+    createdAt: string; // String!
     id: string; // String!
-    referenceId: string; // String!
-    resourceUrl: string; // String!
+    name: string; // String!
+    referenceId: string | null; // String
+    referenceType: NexusGenEnums['CloudReferenceType']; // CloudReferenceType!
+    resourceUrl: string | null; // String
     status: NexusGenEnums['JobStatusType']; // JobStatusType!
+    updatedAt: string | null; // String
   }
   Customer: { // field return type
     campaign: NexusGenRootTypes['CampaignType']; // CampaignType!
