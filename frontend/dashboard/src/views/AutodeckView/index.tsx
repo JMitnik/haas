@@ -116,12 +116,12 @@ const AddCustomerView = () => {
     <Container>
       <motion.div initial={{ opacity: 0, y: 100 }} animate={{ opacity: 1, y: 10 }}>
         <FormContainer>
-          <AutodeckForm
+          {/* <AutodeckForm
             form={form}
             isLoading={loading}
             onFormSubmit={onSubmit}
             serverErrors={serverErrors}
-          />
+          /> */}
         </FormContainer>
       </motion.div>
     </Container>

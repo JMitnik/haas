@@ -1,6 +1,14 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    general: {
+      en: 'General',
+      de: 'General',
+    },
+    pre_processing: {
+      en: 'Pre-processing',
+      de: 'Pre-processing',
+    },
     created_at: {
       en: 'Created at',
       de: 'Hergestellt in',
@@ -801,6 +809,30 @@ const language = {
     },
   },
   autodeck: {
+    primary_color: {
+      en: 'Primary color',
+      de: 'Primary color',
+    },
+    primary_color_helper: {
+      en: 'Choose between extracting the primary color from the logo or selecting a customer color',
+      de: 'Choose between extracting the primary color from the logo or selecting a customer color',
+    },
+    logo_color: {
+      en: 'Logo color',
+      de: 'Logo color',
+    },
+    logo_color_helper: {
+      en: 'Color from logo',
+      de: 'Color from logo',
+    },
+    custom_color: {
+      en: 'Custom color',
+      de: 'Custom color',
+    },
+    custom_color_helper: {
+      en: 'Select custom color',
+      de: 'Select custom color',
+    },
     create_job: {
       en: 'Create job',
       de: 'Aufgabe erstellen',

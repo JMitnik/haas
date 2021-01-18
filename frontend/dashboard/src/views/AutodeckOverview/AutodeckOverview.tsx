@@ -1,15 +1,12 @@
 import * as UI from '@haas/ui';
 import { format } from 'date-fns';
-import { useNavigator } from 'hooks/useNavigator';
 import React, { useState } from 'react';
-import { useRef } from 'react';
 import { useEffect } from 'react';
-import { ErrorBoundary } from 'react-error-boundary';
 import { AtSign, Clock, Eye, Flag, Phone, Plus, Smartphone } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { DeepPartial } from 'types/customTypes';
-import { CampaignVariantEnum, DeliveryConnectionFilter, JobStatusType, DeliveryType, PaginationSortByEnum, useGetAutodeckJobsQuery, GetAutodeckJobsQuery, PaginationWhereInput, CreateWorkspaceJobType } from 'types/generated-types';
-import { ImportDeliveriesForm } from './ImportDeliveriesForm';
+import { JobStatusType, PaginationSortByEnum, useGetAutodeckJobsQuery, GetAutodeckJobsQuery, PaginationWhereInput, CreateWorkspaceJobType } from 'types/generated-types';
+import AutodeckForm from 'views/AutodeckView/AutodeckForm'
 
 export const paginationFilter: PaginationWhereInput = {
     limit: 5,
@@ -56,6 +53,14 @@ const DeliveryStatus = ({ job }: { job: DeepPartial<CreateWorkspaceJobType> }) =
     case JobStatusType.ReadyForProcessing: {
       return (
         <UI.Label variantColor="blue">
+          {status}
+        </UI.Label>
+      )
+    }
+
+    case JobStatusType.Failed: {
+      return (
+        <UI.Label variantColor="red">
           {status}
         </UI.Label>
       )
@@ -227,10 +232,10 @@ export const AutodeckOverview = () => {
         </UI.Modal>
 
         <UI.Modal isOpen={isOpenImportModal} onClose={() => setIsOpenImportModal(false)}>
-          <UI.Card bg="white" noHover width={700}>
+          <UI.Card bg="white" noHover overflowY={'scroll'} height={800} width={1200}>
             <UI.CardBody>
-              {/* <ImportDeliveriesForm
-                onClose={() => setIsOpenImportModal(false)} /> */}
+              <AutodeckForm
+                onClose={() => setIsOpenImportModal(false)} />
             </UI.CardBody>
           </UI.Card>
         </UI.Modal>
