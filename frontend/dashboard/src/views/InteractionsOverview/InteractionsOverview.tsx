@@ -8,7 +8,7 @@ import { useLocation, useParams } from 'react-router';
 import Papa from 'papaparse';
 import React, { useCallback, useEffect, useState } from 'react';
 
-import { Activity, Download, Link, Monitor, Watch } from 'react-feather';
+import { Activity, Download, Link, Monitor, User, Watch } from 'react-feather';
 import { Button, Icon } from '@chakra-ui/core';
 import {
   getDialogueSessionConnection as CustomerSessionConnection,
@@ -59,7 +59,7 @@ const tableHeaders = [
 
 const ExpandedInteractionRow = ({ data }: { data: any }) => {
   const { t } = useTranslation();
-  console.log(data);
+
   return (
     <Div useFlex flexDirection="column" backgroundColor="gray.100" gridColumn="1 / -1">
       <Div padding={25}>
@@ -71,9 +71,19 @@ const ExpandedInteractionRow = ({ data }: { data: any }) => {
           </Div>
           <UI.Div pt={4}>
             <UI.Stack isInline spacing={4}>
+              {data.delivery && (
+                <UI.Div>
+                  <UI.Helper>{t('delivery_recipient')}</UI.Helper>
+                  <UI.Label size="sm" mt={1} variantColor="cyan">
+                    <UI.Icon mr={2} ><User width="0.8rem" /></UI.Icon>
+                    {data.delivery.deliveryRecipientFirstName}
+                    {data.delivery.deliveryRecipientLastName}
+                  </UI.Label>
+                </UI.Div>
+              )}
               {data.device && (
                 <UI.Div>
-                  <UI.Helper mb={1}>Device</UI.Helper>
+                  <UI.Helper mb={1}>{t('device')}</UI.Helper>
                   <UI.Label mt={1} size="sm" variantColor="cyan">
                     <UI.Icon mr={2} ><Monitor width="0.8rem" /></UI.Icon>
                     {data.device}
@@ -82,16 +92,16 @@ const ExpandedInteractionRow = ({ data }: { data: any }) => {
               )}
               {data.totalTimeInSec && (
                 <UI.Div>
-                  <UI.Helper mb={1}>Duration</UI.Helper>
+                  <UI.Helper mb={1}>{t('duration')}</UI.Helper>
                   <UI.Label mt={1} size="sm" variantColor="cyan">
                     <UI.Icon mr={2} ><Watch width="0.8rem" /></UI.Icon>
-                    {data.totalTimeInSec} seconds
+                    {data.totalTimeInSec} {t('seconds')}
                   </UI.Label>
                 </UI.Div>
               )}
               {data.originUrl && (
                 <UI.Div>
-                  <UI.Helper>Origin url</UI.Helper>
+                  <UI.Helper>{t('origin_url')}</UI.Helper>
                   <UI.Label size="sm" mt={1} variantColor="cyan">
                     <UI.Icon mr={2} ><Link width="0.8rem" /></UI.Icon>
                     {data.originUrl}

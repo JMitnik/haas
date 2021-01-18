@@ -243,6 +243,7 @@ class SessionService {
             createdAt: 'desc',
           },
           include: {
+            delivery: true,
             nodeEntries: {
               include: {
                 choiceNodeEntry: true,
