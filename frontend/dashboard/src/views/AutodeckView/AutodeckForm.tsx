@@ -1,5 +1,6 @@
 import * as yup from 'yup';
 import { Activity, Briefcase, Clipboard, Link, Link2, Loader, Minus, Upload } from 'react-feather';
+import { useUploadJobLogoMutation } from 'types/generated-types';
 import { Button, ButtonGroup, RadioButtonGroup, useToast } from '@chakra-ui/core';
 import { Controller, UseFormMethods, useForm } from 'react-hook-form';
 import {
@@ -12,6 +13,7 @@ import { useHistory } from 'react-router';
 import { useMutation } from '@apollo/client';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
+import cuid from 'cuid';
 import intToBool from 'utils/intToBool';
 
 import ColorPickerInput from 'components/ColorPicker';
@@ -37,10 +39,10 @@ import uploadSingleImage from '../../mutations/uploadSingleImage';
 //   answer4: string;
 // }
 
-const CustomerUploadLogoInput = ({ onChange, value }: any) => {
+const CustomerUploadLogoInput = ({ onChange, value, jobId }: any) => {
   const toast = useToast();
 
-  const [uploadFile, { loading }] = useMutation(uploadSingleImage, {
+  const [uploadFile, { loading }] = useUploadJobLogoMutation({
     onCompleted: (result) => {
       toast({
         title: 'Uploaded!',
@@ -50,7 +52,7 @@ const CustomerUploadLogoInput = ({ onChange, value }: any) => {
         isClosable: true,
       });
 
-      onChange(result.singleUpload.url);
+      onChange(result.uploadJobImage?.url);
     },
     onError: () => {
       toast({
@@ -61,13 +63,36 @@ const CustomerUploadLogoInput = ({ onChange, value }: any) => {
         isClosable: true,
       });
     },
-  });
+  })
+
+  // const [uploadFile, { loading }] = useMutation(uploadSingleImage, {
+  //   onCompleted: (result) => {
+  //     toast({
+  //       title: 'Uploaded!',
+  //       description: 'File has been uploaded.',
+  //       status: 'success',
+  //       position: 'bottom-right',
+  //       isClosable: true,
+  //     });
+
+  //     onChange(result.singleUpload.url);
+  //   },
+  //   onError: () => {
+  //     toast({
+  //       title: 'Something went wrong',
+  //       description: 'We were unable to upload file. Try again',
+  //       status: 'error',
+  //       position: 'bottom-right',
+  //       isClosable: true,
+  //     });
+  //   },
+  // });
 
   const onDrop = (files: File[]) => {
     if (!files.length) return;
 
     const [file] = files;
-    uploadFile({ variables: { file } });
+    uploadFile({ variables: { file, jobId } });
   };
 
   return (
@@ -83,8 +108,8 @@ const WebsiteScreenshotFragment = ({ form }: { form: UseFormMethods<FormDataProp
   return (
     <>
       <FormControl>
-        <FormLabel>{t('logo')}</FormLabel>
-        <InputHelper>{t('customer:logo_helper')}</InputHelper>
+        <FormLabel>{t('website_screenshot')}</FormLabel>
+        <InputHelper>{t('website_screenshot_subtext')}</InputHelper>
 
         <Controller
           control={form.control}
@@ -186,7 +211,7 @@ const PrimaryColourFragment = ({ form }: { form: UseFormMethods<FormDataProps> }
   );
 };
 
-const CustomerLogoFormFragment = ({ form }: { form: UseFormMethods<FormDataProps> }) => {
+const CustomerLogoFormFragment = ({ form, jobId }: { form: UseFormMethods<FormDataProps>, jobId: string }) => {
   const { t } = useTranslation();
 
   return (
@@ -237,7 +262,7 @@ const CustomerLogoFormFragment = ({ form }: { form: UseFormMethods<FormDataProps
                 name="uploadLogo"
                 defaultValue=""
                 render={({ onChange, value }) => (
-                  <CustomerUploadLogoInput value={value} onChange={onChange} />
+                  <CustomerUploadLogoInput jobId={jobId} value={value} onChange={onChange} />
                 )}
               />
             </FormControl>
@@ -308,12 +333,13 @@ const schema = yup.object().shape({
   }),
   useCustomUrl: yup.number(),
   useCustomColour: yup.number(),
+  useWebsiteUrl: yup.number(),
   uploadLogo: yup.string().url(),
   firstName: yup.string(),
-  answer1: yup.string().required('Answer #1 is required'),
-  answer2: yup.string().required('Answer #1 is required'),
-  answer3: yup.string().required('Answer #1 is required'),
-  answer4: yup.string().required('Answer #1 is required'),
+  answer1: yup.string(),
+  answer2: yup.string(),
+  answer3: yup.string(),
+  answer4: yup.string(),
 }).required();
 
 type FormDataProps = yup.InferType<typeof schema>;
@@ -322,10 +348,13 @@ type FormDataProps = yup.InferType<typeof schema>;
 const AutodeckForm = ({ onClose }: { onClose: () => void; }) => {
   const history = useHistory();
   const { t } = useTranslation();
+  const jobId = cuid()
+
   const form = useForm<FormDataProps>({
     defaultValues: {
       useCustomUrl: 0,
       useCustomColour: 1,
+      useWebsiteUrl: 1,
     },
     mode: 'all'
   });
@@ -350,8 +379,8 @@ const AutodeckForm = ({ onClose }: { onClose: () => void; }) => {
         <Div py={4}>
           <InputGrid>
             <FormControl isInvalid={!!form.errors.name} isRequired>
-              <FormLabel htmlFor="name">{t('name')}</FormLabel>
-              <InputHelper>{t('customer:name_helper')}</InputHelper>
+              <FormLabel htmlFor="name">{t('job_name')}</FormLabel>
+              <InputHelper>{t('job_name_helper')}</InputHelper>
               <Input
                 placeholder="Peach inc."
                 leftEl={<Briefcase />}
@@ -367,14 +396,14 @@ const AutodeckForm = ({ onClose }: { onClose: () => void; }) => {
 
       <FormSection id="logomanipulation">
         <Div>
-          <H3 color="default.text" fontWeight={500} pb={2}>{t('pre_processing')}</H3>
+          <H3 color="default.text" fontWeight={500} pb={2}>{t('logo_manipulation')}</H3>
           <Muted color="gray.600">
-            {t('customer:branding_helper')}
+            {t('logo_manipulation_helper')}
           </Muted>
         </Div>
         <Div>
           <InputGrid>
-            <CustomerLogoFormFragment form={form} />
+            <CustomerLogoFormFragment jobId={jobId} form={form} />
           </InputGrid>
           <Hr />
           <InputGrid>
@@ -386,9 +415,9 @@ const AutodeckForm = ({ onClose }: { onClose: () => void; }) => {
       <Hr />
       <FormSection id="website">
         <Div>
-          <H3 color="default.text" fontWeight={500} pb={2}>{t('pre_processing')}</H3>
+          <H3 color="default.text" fontWeight={500} pb={2}>{t('website_screenshot')}</H3>
           <Muted color="gray.600">
-            {t('customer:branding_helper')}
+            {t('website_screenshot_helper')}
           </Muted>
         </Div>
         <Div>

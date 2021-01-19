@@ -1,0 +1,5 @@
+  mutation uploadJobLogo($file: Upload!, $jobId: String) {
+    uploadJobImage(file: $file, jobId: $jobId) {
+        url
+    }
+  }

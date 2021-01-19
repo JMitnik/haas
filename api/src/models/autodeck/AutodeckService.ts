@@ -10,7 +10,8 @@ import { NexusGenInputs } from '../../generated/nexus';
 import { FindManyTriggerArgs } from '@prisma/client';
 import { FindManyCallBackProps, PaginateProps, paginate } from '../../utils/table/pagination';
 
-const s3 = new AWS.S3({ accessKeyId: config.awsAccessKeyId, secretAccessKey: config.awsSecretAccessKey });
+const s3 = new AWS.S3({ accessKeyId: config.awsAccessKeyId, secretAccessKey: config.awsSecretAccessKey, region: 'eu-central-1' });
+console.log('s3 config: ', s3.config)
 
 interface InputProps {
   answer1: string;
@@ -116,14 +117,13 @@ class AutodeckService {
     fs.writeFileSync(destinationPath, buffer);
   };
 
-  static uploadDataToS3 = (bucket: string, fileKey: string, data: string) => {
-    console.log('uploading: ', bucket, fileKey, data);
+  static uploadDataToS3 = (bucket: string, fileKey: string, data: string, mimeType: string) => {
     return s3.upload({
       Bucket: bucket,
       Key: fileKey,
       Body: data,
       ACL: 'private',
-      ContentType: 'text/csv',
+      ContentType: mimeType,
     }).promise();
   };
 

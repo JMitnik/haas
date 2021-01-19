@@ -1,8 +1,14 @@
 
 import { enumType, inputObjectType, mutationField, objectType, queryField } from '@nexus/schema';
+import AWS from 'aws-sdk';
+
 import AutodeckService from './AutodeckService';
 import { PaginationWhereInput } from '../general/Pagination';
 import { NexusGenFieldTypes } from '../../generated/nexus';
+import { Upload } from '../customer/Customer';
+import config from '../../config/config';
+
+const s3 = new AWS.S3({ accessKeyId: config.awsAccessKeyId, secretAccessKey: config.awsSecretAccessKey });
 
 export const CloudReferenceType = enumType({
   name: 'CloudReferenceType',
@@ -53,15 +59,16 @@ export const GenerateAutodeckInput = inputObjectType({
   description: 'Generate sales documents',
 
   definition(t) {
-    t.string('name', { required: true });
-    t.string('website', { required: true });
-    t.string('logo', { required: true });
-    t.string('primaryColour', { required: true });
-    t.string('firstName', { required: true });
-    t.string('answer1', { required: true });
-    t.string('answer2', { required: true });
-    t.string('answer3', { required: true });
-    t.string('answer4', { required: true });
+    t.string('id', { required: false });
+    t.string('name', { required: false });
+    t.string('website', { required: false });
+    t.string('logo', { required: false });
+    t.string('primaryColour', { required: false });
+    t.string('firstName', { required: false });
+    t.string('answer1', { required: false });
+    t.string('answer2', { required: false });
+    t.string('answer3', { required: false });
+    t.string('answer4', { required: false });
   },
 });
 
@@ -130,6 +137,56 @@ export const GetAutodeckJobsQuery = queryField('getAutodeckJobs', {
       limit: args.filter?.limit || 0 
     };
   },
+})
+
+export const AWSImageType = objectType({
+  name: 'AWSImageType',
+  definition(t) {
+    t.string('filename', { nullable: true });
+    t.string('mimetype', { nullable: true });
+    t.string('encoding', { nullable: true });
+    t.string('url', { nullable: true });
+  },
+});
+
+export const UploadImageMutation = Upload && mutationField('uploadJobImage', {
+      type: AWSImageType,
+      nullable: true,
+      args: {
+        file: Upload,
+        jobId: "String",
+      },
+      async resolve(parent, args) {
+        const { file, jobId } = args;
+        const { createReadStream, filename, mimetype, encoding } : 
+        {createReadStream: any, filename: string, mimetype: string, encoding: string} = await file;
+
+        console.log('file: ', file)
+        console.log('aws key: ', config.awsAccessKeyId)
+        const extension = filename.split('.')[1]
+        const fileKey = `${jobId}/original.${extension}`
+
+        // Use S3 ManagedUpload class as it supports multipart uploads
+        // const upload = new AWS.S3.ManagedUpload({
+        //   params: {
+        //     Bucket: 'haas-autodeck-logos',
+        //     Key: fileKey,
+        //     Body: createReadStream(),
+        //   }
+        // });
+
+        // var promise = await upload.promise().catch((err) => console.log(err));
+
+        // console.log('PROMISE: ', promise)
+
+        const uploadedFile = await AutodeckService.uploadDataToS3('haas-autodeck-logos', fileKey, createReadStream(), mimetype)
+        .catch((err) => console.log('error: ', err))
+
+        // console.log('Uploaded file: ', uploadedFile)
+        const awsFileURL = `https://haas-autodeck-logos.s3.eu-central-1.amazonaws.com/${fileKey}`
+
+        return { url: awsFileURL};
+      },
 })
 
 export const UpdateCreatWorkspaceJobMutation = mutationField('updateCreateWorkspaceJob', {

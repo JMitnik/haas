@@ -5,9 +5,33 @@ const language = {
       en: 'General',
       de: 'General',
     },
-    pre_processing: {
-      en: 'Pre-processing',
-      de: 'Pre-processing',
+    job_name: {
+      en: 'Job name',
+      de: 'Job name',
+    },
+    job_name_helper: {
+      en: 'What is the name you want to refer to for this Autodeck job',
+      de: 'What is the name you want to refer to for this Autodeck job',
+    },
+    website_screenshot: {
+      en: 'Website screenshot',
+      de: 'Website screenshot',
+    },
+    website_screenshot_subtext: {
+      en: 'Choose between uploading your website screenshot or inserting an existing URL.',
+      de: 'Choose between uploading your website screenshot or inserting an existing URL.',
+    },
+    website_screenshot_helper: {
+      en: 'Tell whether you want Autodeck to take a screenshot for you',
+      de: 'Tell whether you want Autodeck to take a screenshot for you',
+    },
+    logo_manipulation: {
+      en: 'Logo manipulation',
+      de: 'Logo manipulation',
+    },
+    logo_manipulation_helper: {
+      en: 'Describe what logo-manipulating tasks should be executed by Autodeck before generation personalized content',
+      de: 'Describe what logo-manipulating tasks should be executed by Autodeck before generation personalized content',
     },
     created_at: {
       en: 'Created at',

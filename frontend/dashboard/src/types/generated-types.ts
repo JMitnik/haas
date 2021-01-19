@@ -35,6 +35,14 @@ export type AutodeckConnectionType = ConnectionInterface & {
   jobs: Array<CreateWorkspaceJobType>;
 };
 
+export type AwsImageType = {
+  __typename?: 'AWSImageType';
+  filename?: Maybe<Scalars['String']>;
+  mimetype?: Maybe<Scalars['String']>;
+  encoding?: Maybe<Scalars['String']>;
+  url?: Maybe<Scalars['String']>;
+};
+
 /** Campaign */
 export type CampaignType = {
   __typename?: 'CampaignType';
@@ -638,6 +646,7 @@ export type LoginOutput = {
 export type Mutation = {
   __typename?: 'Mutation';
   generateAutodeck?: Maybe<JobObjectType>;
+  uploadJobImage?: Maybe<AwsImageType>;
   updateCreateWorkspaceJob?: Maybe<CreateWorkspaceJobType>;
   updateJob?: Maybe<JobObjectType>;
   assignTags: Dialogue;
@@ -685,6 +694,12 @@ export type Mutation = {
 
 export type MutationGenerateAutodeckArgs = {
   input?: Maybe<GenerateAutodeckInput>;
+};
+
+
+export type MutationUploadJobImageArgs = {
+  file?: Maybe<Scalars['Upload']>;
+  jobId?: Maybe<Scalars['String']>;
 };
 
 
@@ -1640,6 +1655,20 @@ export type GetWorkspaceCampaignQuery = (
   )> }
 );
 
+export type UploadJobLogoMutationVariables = Exact<{
+  file: Scalars['Upload'];
+  jobId?: Maybe<Scalars['String']>;
+}>;
+
+
+export type UploadJobLogoMutation = (
+  { __typename?: 'Mutation' }
+  & { uploadJobImage?: Maybe<(
+    { __typename?: 'AWSImageType' }
+    & Pick<AwsImageType, 'url'>
+  )> }
+);
+
 export type CreateCampaignMutationVariables = Exact<{
   input?: Maybe<CreateCampaignInputType>;
 }>;
@@ -1862,6 +1891,39 @@ export type GetWorkspaceCampaignQueryResult = Apollo.QueryResult<GetWorkspaceCam
 export function refetchGetWorkspaceCampaignQuery(variables?: GetWorkspaceCampaignQueryVariables) {
       return { query: GetWorkspaceCampaignDocument, variables: variables }
     }
+export const UploadJobLogoDocument = gql`
+    mutation uploadJobLogo($file: Upload!, $jobId: String) {
+  uploadJobImage(file: $file, jobId: $jobId) {
+    url
+  }
+}
+    `;
+export type UploadJobLogoMutationFn = Apollo.MutationFunction<UploadJobLogoMutation, UploadJobLogoMutationVariables>;
+
+/**
+ * __useUploadJobLogoMutation__
+ *
+ * To run a mutation, you first call `useUploadJobLogoMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUploadJobLogoMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [uploadJobLogoMutation, { data, loading, error }] = useUploadJobLogoMutation({
+ *   variables: {
+ *      file: // value for 'file'
+ *      jobId: // value for 'jobId'
+ *   },
+ * });
+ */
+export function useUploadJobLogoMutation(baseOptions?: Apollo.MutationHookOptions<UploadJobLogoMutation, UploadJobLogoMutationVariables>) {
+        return Apollo.useMutation<UploadJobLogoMutation, UploadJobLogoMutationVariables>(UploadJobLogoDocument, baseOptions);
+      }
+export type UploadJobLogoMutationHookResult = ReturnType<typeof useUploadJobLogoMutation>;
+export type UploadJobLogoMutationResult = Apollo.MutationResult<UploadJobLogoMutation>;
+export type UploadJobLogoMutationOptions = Apollo.BaseMutationOptions<UploadJobLogoMutation, UploadJobLogoMutationVariables>;
 export const CreateCampaignDocument = gql`
     mutation CreateCampaign($input: CreateCampaignInputType) {
   createCampaign(input: $input) {

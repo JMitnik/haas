@@ -19,6 +19,13 @@ type AutodeckConnectionType implements ConnectionInterface {
   startDate: String
 }
 
+type AWSImageType {
+  encoding: String
+  filename: String
+  mimetype: String
+  url: String
+}
+
 """Campaign"""
 type CampaignType {
   deliveryConnection(filter: DeliveryConnectionFilter): DeliveryConnectionType
@@ -445,15 +452,16 @@ type FormNodeType {
 
 """Generate sales documents"""
 input GenerateAutodeckInput {
-  answer1: String!
-  answer2: String!
-  answer3: String!
-  answer4: String!
-  firstName: String!
-  logo: String!
-  name: String!
-  primaryColour: String!
-  website: String!
+  answer1: String
+  answer2: String
+  answer3: String
+  answer4: String
+  firstName: String
+  id: String
+  logo: String
+  name: String
+  primaryColour: String
+  website: String
 }
 
 input GetCampaignsInput {
@@ -582,6 +590,7 @@ type Mutation {
   updateJob(id: String, referenceId: String, resourceUrl: String, status: JobStatusType): JobObjectType
   updateQuestion(input: UpdateQuestionNodeInputType): QuestionNode!
   updateRoles(permissions: PermissionIdsInput, roleId: String): RoleType!
+  uploadJobImage(file: Upload, jobId: String): AWSImageType
 
   """
   Given a token, checks in the database whether token has been set and has not expired yet

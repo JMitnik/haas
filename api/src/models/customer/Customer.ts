@@ -252,6 +252,8 @@ export const WorkspaceMutations = Upload && extendType({
         const { file } = args;
         const { createReadStream, filename, mimetype, encoding } = await file;
 
+        console.log('File: ', file)
+
         const stream = new Promise<UploadApiResponse>((resolve, reject) => {
           const cld_upload_stream = cloudinary.v2.uploader.upload_stream({
             folder: 'company_logos',
