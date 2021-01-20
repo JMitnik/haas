@@ -1,6 +1,6 @@
 import * as yup from 'yup';
 import { Activity, Briefcase, Clipboard, Link, Link2, Loader, Minus, Upload } from 'react-feather';
-import { useUploadJobLogoMutation, useCreateWorkspaceJobMutation, CreateWorkspaceJobMutation, Exact, GenerateAutodeckInput } from 'types/generated-types';
+import { useUploadJobLogoMutation, useCreateWorkspaceJobMutation, CreateWorkspaceJobMutation, Exact, GenerateAutodeckInput, CreateWorkspaceJobType } from 'types/generated-types';
 import { Button, ButtonGroup, RadioButtonGroup, useToast } from '@chakra-ui/core';
 import { Controller, UseFormMethods, useForm } from 'react-hook-form';
 import {
@@ -24,6 +24,7 @@ import useAuth from 'hooks/useAuth';
 
 
 import uploadSingleImage from '../../mutations/uploadSingleImage';
+import { DeepPartial } from 'types/customTypes';
 
 // interface FormDataProps {
 //   name: string;
@@ -349,10 +350,12 @@ interface AutodeckFormProps {
   isLoading: boolean;
   onCreateJob: (options?: MutationFunctionOptions<CreateWorkspaceJobMutation, Exact<{
     input?: GenerateAutodeckInput | null | undefined;
-}>> | undefined) => Promise<any>
+  }>> | undefined) => Promise<any>;
+  job: DeepPartial<CreateWorkspaceJobType> | null;
+  isInEditing: boolean;
 }
 
-const AutodeckForm = ({ onClose, isLoading, onCreateJob }: AutodeckFormProps) => {
+const AutodeckForm = ({ onClose, isLoading, onCreateJob, job, isInEditing }: AutodeckFormProps) => {
   const history = useHistory();
   const { t } = useTranslation();
   const jobId = cuid()
@@ -362,6 +365,7 @@ const AutodeckForm = ({ onClose, isLoading, onCreateJob }: AutodeckFormProps) =>
       useCustomUrl: 0,
       useCustomColour: 1,
       useWebsiteUrl: 1,
+      name: job?.name,
     },
     mode: 'all'
   });
@@ -443,7 +447,7 @@ const AutodeckForm = ({ onClose, isLoading, onCreateJob }: AutodeckFormProps) =>
           </InputGrid>
         </Div>
       </FormSection>
-      {isPreprocessed &&
+      {isInEditing &&
         <FormSection id="dialogue">
           <Div>
             <H3 color="default.text" fontWeight={500} pb={2}>{t('autodeck:dialogue')}</H3>

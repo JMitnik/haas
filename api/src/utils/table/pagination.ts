@@ -54,7 +54,7 @@ export const slice = (
   pageIndex: number,
 ) => ((offset + limit) < entries.length
   ? entries.slice(offset, (pageIndex + 1) * limit)
-  : entries);
+  : entries); // .slice(offset, entries.length)
 
 export const getSearchTermFilter = (searchFields: NexusGenEnums['PaginationSearchEnum'][], searchTerm: string) => {
   if (!searchTerm || !searchFields.length) {
