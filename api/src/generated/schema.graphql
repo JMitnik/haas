@@ -548,6 +548,7 @@ type LoginOutput {
 type Mutation {
   appendToInteraction(input: AppendToInteractionInput): Session!
   assignTags(dialogueId: String, tags: TagsInputObjectType): Dialogue!
+  confirmCreateWorkspaceJob(input: GenerateAutodeckInput): CreateWorkspaceJobType
   copyDialogue(input: CreateDialogueInputType): Dialogue!
   createBatchDeliveries(input: CreateBatchDeliveriesInputType): CreateBatchDeliveriesOutputType!
   createCampaign(input: CreateCampaignInputType): CampaignType!

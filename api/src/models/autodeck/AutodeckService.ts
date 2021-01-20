@@ -36,11 +36,16 @@ interface InputProps {
   website: string;
 }
 
-interface CreateWorkspaceJobProps {
+export interface CreateWorkspaceJobProps {
   id?: string | null;
   name?: string | null;
   websiteUrl?: string | null;
   logoUrl?: string | null;
+  answer1?: string | null;
+  answer2?: string | null;
+  answer3?: string | null;
+  answer4?: string | null;
+  firstName?: string | null;
 }
 
 class AutodeckService {
@@ -78,6 +83,21 @@ class AutodeckService {
 
     return paginate(paginateProps);
   };
+
+  static confirmWorkspaceJob = async (input: CreateWorkspaceJobProps) => {
+    // TODO: CSV logic as per AutodeckService.createJob()
+    
+    const updatedWorkspaceJob = await prisma.createWorkspaceJob.update({
+      where: {
+        id: input.id || '',
+      },
+      data: {
+        status: 'IN_PHOTOSHOP_QUEUE',
+      }
+    })
+
+    return updatedWorkspaceJob;
+  }
 
   static createWorkspaceJob = async (input: CreateWorkspaceJobProps) => {
     const workspaceJob = await prisma.createWorkspaceJob.create({

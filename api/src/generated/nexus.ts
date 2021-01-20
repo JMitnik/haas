@@ -987,6 +987,7 @@ export interface NexusGenFieldTypes {
   Mutation: { // field return type
     appendToInteraction: NexusGenRootTypes['Session']; // Session!
     assignTags: NexusGenRootTypes['Dialogue']; // Dialogue!
+    confirmCreateWorkspaceJob: NexusGenRootTypes['CreateWorkspaceJobType'] | null; // CreateWorkspaceJobType
     copyDialogue: NexusGenRootTypes['Dialogue']; // Dialogue!
     createBatchDeliveries: NexusGenRootTypes['CreateBatchDeliveriesOutputType']; // CreateBatchDeliveriesOutputType!
     createCampaign: NexusGenRootTypes['CampaignType']; // CampaignType!
@@ -1295,6 +1296,9 @@ export interface NexusGenArgTypes {
     assignTags: { // args
       dialogueId?: string | null; // String
       tags?: NexusGenInputs['TagsInputObjectType'] | null; // TagsInputObjectType
+    }
+    confirmCreateWorkspaceJob: { // args
+      input?: NexusGenInputs['GenerateAutodeckInput'] | null; // GenerateAutodeckInput
     }
     copyDialogue: { // args
       input?: NexusGenInputs['CreateDialogueInputType'] | null; // CreateDialogueInputType

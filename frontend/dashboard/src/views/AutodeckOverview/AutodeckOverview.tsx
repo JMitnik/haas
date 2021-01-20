@@ -5,7 +5,7 @@ import { useEffect } from 'react';
 import { AtSign, Clock, Eye, Flag, Phone, Plus, Smartphone } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { DeepPartial } from 'types/customTypes';
-import { JobStatusType, PaginationSortByEnum, useGetAutodeckJobsQuery, GetAutodeckJobsQuery, PaginationWhereInput, CreateWorkspaceJobType, useCreateWorkspaceJobMutation } from 'types/generated-types';
+import { JobStatusType, PaginationSortByEnum, useGetAutodeckJobsQuery, PaginationWhereInput, CreateWorkspaceJobType, useCreateWorkspaceJobMutation, useConfirmWorkspaceJobMutation } from 'types/generated-types';
 import AutodeckForm from 'views/AutodeckView/AutodeckForm'
 
 export const paginationFilter: PaginationWhereInput = {
@@ -66,6 +66,14 @@ const DeliveryStatus = ({ job }: { job: DeepPartial<CreateWorkspaceJobType> }) =
       )
     }
 
+    case JobStatusType.InPhotoshopQueue: {
+      return (
+        <UI.Label variantColor="purple">
+          {status}
+        </UI.Label>
+      )
+    }
+
     default: {
       return (
         <UI.Label variantColor="yellow">{status}</UI.Label>
@@ -83,6 +91,15 @@ export const AutodeckOverview = () => {
   const [paginationState, setPaginationState] = useState(paginationFilter);
 
   const [createJob, { loading }] = useCreateWorkspaceJobMutation({
+    onCompleted: () => {
+      setIsOpenImportModal(false);
+      refetchAutodeckJobs({
+        filter: paginationState,
+      })
+    }
+  })
+
+  const [confirmJob, { loading: confirmLoading }] = useConfirmWorkspaceJobMutation({
     onCompleted: () => {
       setIsOpenImportModal(false);
       refetchAutodeckJobs({
@@ -252,6 +269,8 @@ export const AutodeckOverview = () => {
                 isLoading={loading}
                 isInEditing={activeJob?.status === 'READY_FOR_PROCESSING'}
                 onCreateJob={createJob}
+                onConfirmJob={confirmJob}
+                isConfirmLoading={confirmLoading}
                 onClose={() => setIsOpenImportModal(false)} />
             </UI.CardBody>
           </UI.Card>

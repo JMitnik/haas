@@ -2,7 +2,7 @@
 import { enumType, inputObjectType, mutationField, objectType, queryField } from '@nexus/schema';
 import AWS from 'aws-sdk';
 
-import AutodeckService from './AutodeckService';
+import AutodeckService, { CreateWorkspaceJobProps } from './AutodeckService';
 import { PaginationWhereInput } from '../general/Pagination';
 import { NexusGenFieldTypes } from '../../generated/nexus';
 import { Upload } from '../customer/Customer';
@@ -90,6 +90,29 @@ export const GenerateAutodeckMutation = mutationField('generateAutodeck', {
     return job ? job as any : null;
   },
 });
+
+export const ConfirmCreateWorkspaceJobMutation = mutationField('confirmCreateWorkspaceJob', {
+  type: CreateWorkspaceJobType,
+  nullable: true,
+  args: { input: GenerateAutodeckInput },
+  async resolve(parent, args) {
+    const { input } = args;
+
+    if (!input) {
+      return null;
+    }
+
+    const confirmInput: CreateWorkspaceJobProps = { 
+      id: input.id,
+      answer1: input?.answer1, 
+      answer2: input?.answer2,  
+      answer3: input?.answer3,
+      answer4: input?.answer4,
+      firstName: input?.firstName
+    }
+    return AutodeckService.confirmWorkspaceJob(confirmInput) as any;
+  }
+})
 
 export const GetJobQuery = queryField('getJob', {
   type: CreateWorkspaceJobType,

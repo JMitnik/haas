@@ -1,6 +1,6 @@
 import * as yup from 'yup';
 import { Activity, Briefcase, Clipboard, Link, Link2, Loader, Minus, Upload } from 'react-feather';
-import { useUploadJobLogoMutation, useCreateWorkspaceJobMutation, CreateWorkspaceJobMutation, Exact, GenerateAutodeckInput, CreateWorkspaceJobType } from 'types/generated-types';
+import { useUploadJobLogoMutation, useCreateWorkspaceJobMutation, CreateWorkspaceJobMutation, Exact, GenerateAutodeckInput, CreateWorkspaceJobType, ConfirmWorkspaceJobMutation } from 'types/generated-types';
 import { Button, ButtonGroup, RadioButtonGroup, useToast } from '@chakra-ui/core';
 import { Controller, UseFormMethods, useForm } from 'react-hook-form';
 import {
@@ -65,29 +65,6 @@ const CustomerUploadLogoInput = ({ onChange, value, jobId }: any) => {
       });
     },
   })
-
-  // const [uploadFile, { loading }] = useMutation(uploadSingleImage, {
-  //   onCompleted: (result) => {
-  //     toast({
-  //       title: 'Uploaded!',
-  //       description: 'File has been uploaded.',
-  //       status: 'success',
-  //       position: 'bottom-right',
-  //       isClosable: true,
-  //     });
-
-  //     onChange(result.singleUpload.url);
-  //   },
-  //   onError: () => {
-  //     toast({
-  //       title: 'Something went wrong',
-  //       description: 'We were unable to upload file. Try again',
-  //       status: 'error',
-  //       position: 'bottom-right',
-  //       isClosable: true,
-  //     });
-  //   },
-  // });
 
   const onDrop = (files: File[]) => {
     if (!files.length) return;
@@ -353,9 +330,21 @@ interface AutodeckFormProps {
   }>> | undefined) => Promise<any>;
   job: DeepPartial<CreateWorkspaceJobType> | null;
   isInEditing: boolean;
+  onConfirmJob: (options?: MutationFunctionOptions<ConfirmWorkspaceJobMutation, Exact<{
+    input?: GenerateAutodeckInput | null | undefined;
+  }>> | undefined) => Promise<any>;
+  isConfirmLoading: boolean;
 }
 
-const AutodeckForm = ({ onClose, isLoading, onCreateJob, job, isInEditing }: AutodeckFormProps) => {
+const AutodeckForm = ({
+  onClose,
+  isLoading,
+  onCreateJob,
+  job,
+  isInEditing,
+  onConfirmJob,
+  isConfirmLoading
+}: AutodeckFormProps) => {
   const history = useHistory();
   const { t } = useTranslation();
   const jobId = cuid()
@@ -372,81 +361,98 @@ const AutodeckForm = ({ onClose, isLoading, onCreateJob, job, isInEditing }: Aut
 
   const onFormSubmit = (data: FormDataProps) => {
     console.log('Data: ', data);
-    onCreateJob({
+    if (!isInEditing) {
+      return onCreateJob({
+        variables: {
+          input: {
+            id: jobId,
+            name: data.name,
+            logo: data.logo || data.uploadLogo,
+            website: data.website
+          }
+        }
+      })
+    }
+    onConfirmJob({
       variables: {
         input: {
-          id: jobId,
-          name: data.name,
-          logo: data.logo || data.uploadLogo,
-          website: data.website
+          id: job?.id || '',
+          answer1: data.answer1,
+          answer2: data.answer2,
+          answer3: data.answer3,
+          answer4: data.answer4,
+          firstName: data.firstName,
         }
       }
     })
   }
 
-  const isPreprocessed = false;
-
-  console.log(form.watch('useCustomUrl'))
+  console.log('activeJob:', job?.id)
 
   return (
     <Form onSubmit={form.handleSubmit(onFormSubmit)}>
-      <FormSection id="about">
-        <Div>
-          <H3 color="default.text" fontWeight={500} pb={2}>{t('general')}</H3>
-          <Muted color="gray.600">
-            {t('customer:about_helper')}
-          </Muted>
-        </Div>
-        <Div py={4}>
-          <InputGrid>
-            <FormControl isInvalid={!!form.errors.name} isRequired>
-              <FormLabel htmlFor="name">{t('job_name')}</FormLabel>
-              <InputHelper>{t('job_name_helper')}</InputHelper>
-              <Input
-                placeholder="Peach inc."
-                leftEl={<Briefcase />}
-                name="name"
-                ref={form.register()}
-              />
-            </FormControl>
-          </InputGrid>
-        </Div>
-      </FormSection>
+      {!isInEditing && (
+        <>
+          <FormSection id="about">
+            <Div>
+              <H3 color="default.text" fontWeight={500} pb={2}>{t('general')}</H3>
+              <Muted color="gray.600">
+                {t('customer:about_helper')}
+              </Muted>
+            </Div>
+            <Div py={4}>
+              <InputGrid>
+                <FormControl isInvalid={!!form.errors.name} isRequired>
+                  <FormLabel htmlFor="name">{t('job_name')}</FormLabel>
+                  <InputHelper>{t('job_name_helper')}</InputHelper>
+                  <Input
+                    placeholder="Peach inc."
+                    leftEl={<Briefcase />}
+                    name="name"
+                    ref={form.register()}
+                  />
+                </FormControl>
+              </InputGrid>
+            </Div>
+          </FormSection>
 
-      <Hr />
-
-      <FormSection id="logomanipulation">
-        <Div>
-          <H3 color="default.text" fontWeight={500} pb={2}>{t('logo_manipulation')}</H3>
-          <Muted color="gray.600">
-            {t('logo_manipulation_helper')}
-          </Muted>
-        </Div>
-        <Div>
-          <InputGrid>
-            <CustomerLogoFormFragment jobId={jobId} form={form} />
-          </InputGrid>
           <Hr />
-          <InputGrid>
-            <PrimaryColourFragment form={form} />
-          </InputGrid>
-        </Div>
-      </FormSection>
 
-      <Hr />
-      <FormSection id="website">
-        <Div>
-          <H3 color="default.text" fontWeight={500} pb={2}>{t('website_screenshot')}</H3>
-          <Muted color="gray.600">
-            {t('website_screenshot_helper')}
-          </Muted>
-        </Div>
-        <Div>
-          <InputGrid>
-            <WebsiteScreenshotFragment form={form} />
-          </InputGrid>
-        </Div>
-      </FormSection>
+          <FormSection id="logomanipulation">
+            <Div>
+              <H3 color="default.text" fontWeight={500} pb={2}>{t('logo_manipulation')}</H3>
+              <Muted color="gray.600">
+                {t('logo_manipulation_helper')}
+              </Muted>
+            </Div>
+            <Div>
+              <InputGrid>
+                <CustomerLogoFormFragment jobId={jobId} form={form} />
+              </InputGrid>
+              <Hr />
+              <InputGrid>
+                <PrimaryColourFragment form={form} />
+              </InputGrid>
+            </Div>
+          </FormSection>
+
+          <Hr />
+          <FormSection id="website">
+            <Div>
+              <H3 color="default.text" fontWeight={500} pb={2}>{t('website_screenshot')}</H3>
+              <Muted color="gray.600">
+                {t('website_screenshot_helper')}
+              </Muted>
+            </Div>
+            <Div>
+              <InputGrid>
+                <WebsiteScreenshotFragment form={form} />
+              </InputGrid>
+            </Div>
+          </FormSection>
+        </>
+      )}
+
       {isInEditing &&
         <FormSection id="dialogue">
           <Div>
