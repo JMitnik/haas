@@ -89,43 +89,43 @@ class AutodeckService {
       }
     })
 
-    // const fileKey = input?.logoUrl?.split('.com/')[1]
-    // const logoManipulationEvent = {
-    //   s3: {
-    //     object: {
-    //       key: fileKey
-    //     },
-    //     bucket: {
-    //       name: 'haas-autodeck-logos'
-    //     }
-    //   }
-    // }
-    // const strLogoManipulationEvent = JSON.stringify(logoManipulationEvent, null, 2);
-    // const logoManipulationSNSParams = {
-    //   Message: strLogoManipulationEvent,
-    //   TopicArn: "arn:aws:sns:eu-central-1:118627563984:SalesDeckProcessingChannel"
-    // }
-    // sns.publish(logoManipulationSNSParams, (err, data) => {
-    //   if (err) console.log('ERROR: ', err);
+    const fileKey = input?.logoUrl?.split('.com/')[1]
+    const logoManipulationEvent = {
+      s3: {
+        object: {
+          key: fileKey
+        },
+        bucket: {
+          name: 'haas-autodeck-logos'
+        }
+      }
+    }
+    const strLogoManipulationEvent = JSON.stringify(logoManipulationEvent, null, 2);
+    const logoManipulationSNSParams = {
+      Message: strLogoManipulationEvent,
+      TopicArn: "arn:aws:sns:eu-central-1:118627563984:SalesDeckProcessingChannel"
+    }
+    sns.publish(logoManipulationSNSParams, (err, data) => {
+      if (err) console.log('ERROR: ', err);
 
-    //   console.log('Logo manipulation publish response: ', data);
-    // });
+      console.log('Logo manipulation publish response: ', data);
+    });
    
-    // const screenshotEvent: ScreenshotProps = {
-    //   websiteUrl: input.websiteUrl || '',
-    //   bucket: 'haas-autodeck-logos',
-    //   jobId: input.id || ''
-    // }
-    // const strScreenshotEvent = JSON.stringify(screenshotEvent, null, 2);
-    // const screenshotSNSParams = {
-    //   Message: strScreenshotEvent,
-    //   TopicArn: "arn:aws:sns:eu-central-1:118627563984:WebsiteScreenshotChannel"
-    // };
-    // sns.publish(screenshotSNSParams, (err, data) => {
-    //   if (err) console.log('ERROR: ', err);
+    const screenshotEvent: ScreenshotProps = {
+      websiteUrl: input.websiteUrl || '',
+      bucket: 'haas-autodeck-logos',
+      jobId: input.id || ''
+    }
+    const strScreenshotEvent = JSON.stringify(screenshotEvent, null, 2);
+    const screenshotSNSParams = {
+      Message: strScreenshotEvent,
+      TopicArn: "arn:aws:sns:eu-central-1:118627563984:WebsiteScreenshotChannel"
+    };
+    sns.publish(screenshotSNSParams, (err, data) => {
+      if (err) console.log('ERROR: ', err);
 
-    //   console.log('Website screenshot publish response: ', data);
-    // });
+      console.log('Website screenshot publish response: ', data);
+    });
 
     return workspaceJob;
   }

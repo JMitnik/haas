@@ -22,7 +22,7 @@ export const paginationFilter: PaginationWhereInput = {
     ],
 };
 
-const POLL_INTERVAL_SECONDS = 60;
+const POLL_INTERVAL_SECONDS = 20;
 const POLL_INTERVAL = POLL_INTERVAL_SECONDS * 1000;
 
 const DateLabel = ({ dateString }: { dateString: string }) => {
