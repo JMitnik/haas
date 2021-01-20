@@ -457,7 +457,7 @@ input GenerateAutodeckInput {
   answer3: String
   answer4: String
   firstName: String
-  id: String
+  id: String!
   logo: String
   name: String
   primaryColour: String
@@ -574,7 +574,7 @@ type Mutation {
   editTrigger(customerSlug: String, recipients: RecipientsInputType, trigger: TriggerInputType, triggerId: String): TriggerType!
   editUser(input: EditUserInput, userId: String): UserType!
   editWorkspace(input: EditWorkspaceInput): Customer!
-  generateAutodeck(input: GenerateAutodeckInput): JobObjectType
+  generateAutodeck(input: GenerateAutodeckInput): CreateWorkspaceJobType
 
   """Invite a user to a particular customer domain, given an email and role"""
   inviteUser(input: InviteUserInput): InviteUserOutput!

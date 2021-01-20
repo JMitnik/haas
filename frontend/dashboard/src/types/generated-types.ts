@@ -545,15 +545,16 @@ export type FormNodeType = {
 
 /** Generate sales documents */
 export type GenerateAutodeckInput = {
-  name: Scalars['String'];
-  website: Scalars['String'];
-  logo: Scalars['String'];
-  primaryColour: Scalars['String'];
-  firstName: Scalars['String'];
-  answer1: Scalars['String'];
-  answer2: Scalars['String'];
-  answer3: Scalars['String'];
-  answer4: Scalars['String'];
+  id: Scalars['String'];
+  name?: Maybe<Scalars['String']>;
+  website?: Maybe<Scalars['String']>;
+  logo?: Maybe<Scalars['String']>;
+  primaryColour?: Maybe<Scalars['String']>;
+  firstName?: Maybe<Scalars['String']>;
+  answer1?: Maybe<Scalars['String']>;
+  answer2?: Maybe<Scalars['String']>;
+  answer3?: Maybe<Scalars['String']>;
+  answer4?: Maybe<Scalars['String']>;
 };
 
 export type GetCampaignsInput = {
@@ -645,7 +646,7 @@ export type LoginOutput = {
 
 export type Mutation = {
   __typename?: 'Mutation';
-  generateAutodeck?: Maybe<JobObjectType>;
+  generateAutodeck?: Maybe<CreateWorkspaceJobType>;
   uploadJobImage?: Maybe<AwsImageType>;
   updateCreateWorkspaceJob?: Maybe<CreateWorkspaceJobType>;
   updateJob?: Maybe<JobObjectType>;
@@ -1577,21 +1578,17 @@ export type VerifyUserTokenOutput = {
   userData: UserType;
 };
 
-export type CreateBatchDeliveriesMutationVariables = Exact<{
-  input?: Maybe<CreateBatchDeliveriesInputType>;
+export type CreateWorkspaceJobMutationVariables = Exact<{
+  input?: Maybe<GenerateAutodeckInput>;
 }>;
 
 
-export type CreateBatchDeliveriesMutation = (
+export type CreateWorkspaceJobMutation = (
   { __typename?: 'Mutation' }
-  & { createBatchDeliveries: (
-    { __typename?: 'CreateBatchDeliveriesOutputType' }
-    & Pick<CreateBatchDeliveriesOutputType, 'nrDeliveries'>
-    & { failedDeliveries: Array<(
-      { __typename?: 'FailedDeliveryModel' }
-      & Pick<FailedDeliveryModel, 'record' | 'error'>
-    )> }
-  ) }
+  & { generateAutodeck?: Maybe<(
+    { __typename?: 'CreateWorkspaceJobType' }
+    & Pick<CreateWorkspaceJobType, 'id' | 'name' | 'status'>
+  )> }
 );
 
 export type GetAutodeckJobsQueryVariables = Exact<{
@@ -1610,6 +1607,37 @@ export type GetAutodeckJobsQuery = (
       { __typename?: 'PaginationPageInfo' }
       & Pick<PaginationPageInfo, 'nrPages' | 'pageIndex'>
     ) }
+  ) }
+);
+
+export type UploadJobLogoMutationVariables = Exact<{
+  file: Scalars['Upload'];
+  jobId?: Maybe<Scalars['String']>;
+}>;
+
+
+export type UploadJobLogoMutation = (
+  { __typename?: 'Mutation' }
+  & { uploadJobImage?: Maybe<(
+    { __typename?: 'AWSImageType' }
+    & Pick<AwsImageType, 'url'>
+  )> }
+);
+
+export type CreateBatchDeliveriesMutationVariables = Exact<{
+  input?: Maybe<CreateBatchDeliveriesInputType>;
+}>;
+
+
+export type CreateBatchDeliveriesMutation = (
+  { __typename?: 'Mutation' }
+  & { createBatchDeliveries: (
+    { __typename?: 'CreateBatchDeliveriesOutputType' }
+    & Pick<CreateBatchDeliveriesOutputType, 'nrDeliveries'>
+    & { failedDeliveries: Array<(
+      { __typename?: 'FailedDeliveryModel' }
+      & Pick<FailedDeliveryModel, 'record' | 'error'>
+    )> }
   ) }
 );
 
@@ -1652,20 +1680,6 @@ export type GetWorkspaceCampaignQuery = (
         & Pick<CampaignVariantType, 'id' | 'label'>
       )> }
     ) }
-  )> }
-);
-
-export type UploadJobLogoMutationVariables = Exact<{
-  file: Scalars['Upload'];
-  jobId?: Maybe<Scalars['String']>;
-}>;
-
-
-export type UploadJobLogoMutation = (
-  { __typename?: 'Mutation' }
-  & { uploadJobImage?: Maybe<(
-    { __typename?: 'AWSImageType' }
-    & Pick<AwsImageType, 'url'>
   )> }
 );
 
@@ -1729,42 +1743,40 @@ export type GetWorkspaceDialoguesQuery = (
 );
 
 
-export const CreateBatchDeliveriesDocument = gql`
-    mutation CreateBatchDeliveries($input: CreateBatchDeliveriesInputType) {
-  createBatchDeliveries(input: $input) {
-    nrDeliveries
-    failedDeliveries {
-      record
-      error
-    }
+export const CreateWorkspaceJobDocument = gql`
+    mutation createWorkspaceJob($input: GenerateAutodeckInput) {
+  generateAutodeck(input: $input) {
+    id
+    name
+    status
   }
 }
     `;
-export type CreateBatchDeliveriesMutationFn = Apollo.MutationFunction<CreateBatchDeliveriesMutation, CreateBatchDeliveriesMutationVariables>;
+export type CreateWorkspaceJobMutationFn = Apollo.MutationFunction<CreateWorkspaceJobMutation, CreateWorkspaceJobMutationVariables>;
 
 /**
- * __useCreateBatchDeliveriesMutation__
+ * __useCreateWorkspaceJobMutation__
  *
- * To run a mutation, you first call `useCreateBatchDeliveriesMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useCreateBatchDeliveriesMutation` returns a tuple that includes:
+ * To run a mutation, you first call `useCreateWorkspaceJobMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateWorkspaceJobMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [createBatchDeliveriesMutation, { data, loading, error }] = useCreateBatchDeliveriesMutation({
+ * const [createWorkspaceJobMutation, { data, loading, error }] = useCreateWorkspaceJobMutation({
  *   variables: {
  *      input: // value for 'input'
  *   },
  * });
  */
-export function useCreateBatchDeliveriesMutation(baseOptions?: Apollo.MutationHookOptions<CreateBatchDeliveriesMutation, CreateBatchDeliveriesMutationVariables>) {
-        return Apollo.useMutation<CreateBatchDeliveriesMutation, CreateBatchDeliveriesMutationVariables>(CreateBatchDeliveriesDocument, baseOptions);
+export function useCreateWorkspaceJobMutation(baseOptions?: Apollo.MutationHookOptions<CreateWorkspaceJobMutation, CreateWorkspaceJobMutationVariables>) {
+        return Apollo.useMutation<CreateWorkspaceJobMutation, CreateWorkspaceJobMutationVariables>(CreateWorkspaceJobDocument, baseOptions);
       }
-export type CreateBatchDeliveriesMutationHookResult = ReturnType<typeof useCreateBatchDeliveriesMutation>;
-export type CreateBatchDeliveriesMutationResult = Apollo.MutationResult<CreateBatchDeliveriesMutation>;
-export type CreateBatchDeliveriesMutationOptions = Apollo.BaseMutationOptions<CreateBatchDeliveriesMutation, CreateBatchDeliveriesMutationVariables>;
+export type CreateWorkspaceJobMutationHookResult = ReturnType<typeof useCreateWorkspaceJobMutation>;
+export type CreateWorkspaceJobMutationResult = Apollo.MutationResult<CreateWorkspaceJobMutation>;
+export type CreateWorkspaceJobMutationOptions = Apollo.BaseMutationOptions<CreateWorkspaceJobMutation, CreateWorkspaceJobMutationVariables>;
 export const GetAutodeckJobsDocument = gql`
     query getAutodeckJobs($filter: PaginationWhereInput) {
   getAutodeckJobs(filter: $filter) {
@@ -1814,6 +1826,75 @@ export type GetAutodeckJobsQueryResult = Apollo.QueryResult<GetAutodeckJobsQuery
 export function refetchGetAutodeckJobsQuery(variables?: GetAutodeckJobsQueryVariables) {
       return { query: GetAutodeckJobsDocument, variables: variables }
     }
+export const UploadJobLogoDocument = gql`
+    mutation uploadJobLogo($file: Upload!, $jobId: String) {
+  uploadJobImage(file: $file, jobId: $jobId) {
+    url
+  }
+}
+    `;
+export type UploadJobLogoMutationFn = Apollo.MutationFunction<UploadJobLogoMutation, UploadJobLogoMutationVariables>;
+
+/**
+ * __useUploadJobLogoMutation__
+ *
+ * To run a mutation, you first call `useUploadJobLogoMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUploadJobLogoMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [uploadJobLogoMutation, { data, loading, error }] = useUploadJobLogoMutation({
+ *   variables: {
+ *      file: // value for 'file'
+ *      jobId: // value for 'jobId'
+ *   },
+ * });
+ */
+export function useUploadJobLogoMutation(baseOptions?: Apollo.MutationHookOptions<UploadJobLogoMutation, UploadJobLogoMutationVariables>) {
+        return Apollo.useMutation<UploadJobLogoMutation, UploadJobLogoMutationVariables>(UploadJobLogoDocument, baseOptions);
+      }
+export type UploadJobLogoMutationHookResult = ReturnType<typeof useUploadJobLogoMutation>;
+export type UploadJobLogoMutationResult = Apollo.MutationResult<UploadJobLogoMutation>;
+export type UploadJobLogoMutationOptions = Apollo.BaseMutationOptions<UploadJobLogoMutation, UploadJobLogoMutationVariables>;
+export const CreateBatchDeliveriesDocument = gql`
+    mutation CreateBatchDeliveries($input: CreateBatchDeliveriesInputType) {
+  createBatchDeliveries(input: $input) {
+    nrDeliveries
+    failedDeliveries {
+      record
+      error
+    }
+  }
+}
+    `;
+export type CreateBatchDeliveriesMutationFn = Apollo.MutationFunction<CreateBatchDeliveriesMutation, CreateBatchDeliveriesMutationVariables>;
+
+/**
+ * __useCreateBatchDeliveriesMutation__
+ *
+ * To run a mutation, you first call `useCreateBatchDeliveriesMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateBatchDeliveriesMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createBatchDeliveriesMutation, { data, loading, error }] = useCreateBatchDeliveriesMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateBatchDeliveriesMutation(baseOptions?: Apollo.MutationHookOptions<CreateBatchDeliveriesMutation, CreateBatchDeliveriesMutationVariables>) {
+        return Apollo.useMutation<CreateBatchDeliveriesMutation, CreateBatchDeliveriesMutationVariables>(CreateBatchDeliveriesDocument, baseOptions);
+      }
+export type CreateBatchDeliveriesMutationHookResult = ReturnType<typeof useCreateBatchDeliveriesMutation>;
+export type CreateBatchDeliveriesMutationResult = Apollo.MutationResult<CreateBatchDeliveriesMutation>;
+export type CreateBatchDeliveriesMutationOptions = Apollo.BaseMutationOptions<CreateBatchDeliveriesMutation, CreateBatchDeliveriesMutationVariables>;
 export const GetWorkspaceCampaignDocument = gql`
     query GetWorkspaceCampaign($customerSlug: String!, $campaignId: String!, $deliveryConnectionFilter: DeliveryConnectionFilter) {
   customer(slug: $customerSlug) {
@@ -1891,39 +1972,6 @@ export type GetWorkspaceCampaignQueryResult = Apollo.QueryResult<GetWorkspaceCam
 export function refetchGetWorkspaceCampaignQuery(variables?: GetWorkspaceCampaignQueryVariables) {
       return { query: GetWorkspaceCampaignDocument, variables: variables }
     }
-export const UploadJobLogoDocument = gql`
-    mutation uploadJobLogo($file: Upload!, $jobId: String) {
-  uploadJobImage(file: $file, jobId: $jobId) {
-    url
-  }
-}
-    `;
-export type UploadJobLogoMutationFn = Apollo.MutationFunction<UploadJobLogoMutation, UploadJobLogoMutationVariables>;
-
-/**
- * __useUploadJobLogoMutation__
- *
- * To run a mutation, you first call `useUploadJobLogoMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useUploadJobLogoMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [uploadJobLogoMutation, { data, loading, error }] = useUploadJobLogoMutation({
- *   variables: {
- *      file: // value for 'file'
- *      jobId: // value for 'jobId'
- *   },
- * });
- */
-export function useUploadJobLogoMutation(baseOptions?: Apollo.MutationHookOptions<UploadJobLogoMutation, UploadJobLogoMutationVariables>) {
-        return Apollo.useMutation<UploadJobLogoMutation, UploadJobLogoMutationVariables>(UploadJobLogoDocument, baseOptions);
-      }
-export type UploadJobLogoMutationHookResult = ReturnType<typeof useUploadJobLogoMutation>;
-export type UploadJobLogoMutationResult = Apollo.MutationResult<UploadJobLogoMutation>;
-export type UploadJobLogoMutationOptions = Apollo.BaseMutationOptions<UploadJobLogoMutation, UploadJobLogoMutationVariables>;
 export const CreateCampaignDocument = gql`
     mutation CreateCampaign($input: CreateCampaignInputType) {
   createCampaign(input: $input) {

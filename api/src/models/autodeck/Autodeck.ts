@@ -59,7 +59,7 @@ export const GenerateAutodeckInput = inputObjectType({
   description: 'Generate sales documents',
 
   definition(t) {
-    t.string('id', { required: false });
+    t.string('id', { required: true });
     t.string('name', { required: false });
     t.string('website', { required: false });
     t.string('logo', { required: false });
@@ -73,7 +73,7 @@ export const GenerateAutodeckInput = inputObjectType({
 });
 
 export const GenerateAutodeckMutation = mutationField('generateAutodeck', {
-  type: JobObjectType,
+  type: CreateWorkspaceJobType,
   nullable: true,
   args: { input: GenerateAutodeckInput },
 
@@ -84,8 +84,8 @@ export const GenerateAutodeckMutation = mutationField('generateAutodeck', {
     if (!input) {
       return null;
     }
-
-    const job = await AutodeckService.createJob(input);
+    const jobInput = { id: input.id, name: input.name, websiteUrl: input.website, logoUrl: input.logo }
+    const job = await AutodeckService.createWorkspaceJob(jobInput);
 
     return job ? job as any : null;
   },

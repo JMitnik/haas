@@ -1,0 +1,7 @@
+  mutation createWorkspaceJob($input: GenerateAutodeckInput) {
+    generateAutodeck(input: $input) {
+      id
+      name
+      status
+    }
+  }

@@ -1,6 +1,6 @@
 import * as yup from 'yup';
 import { Activity, Briefcase, Clipboard, Link, Link2, Loader, Minus, Upload } from 'react-feather';
-import { useUploadJobLogoMutation } from 'types/generated-types';
+import { useUploadJobLogoMutation, useCreateWorkspaceJobMutation, CreateWorkspaceJobMutation, Exact, GenerateAutodeckInput } from 'types/generated-types';
 import { Button, ButtonGroup, RadioButtonGroup, useToast } from '@chakra-ui/core';
 import { Controller, UseFormMethods, useForm } from 'react-hook-form';
 import {
@@ -10,7 +10,7 @@ import {
   RadioButtons,
 } from '@haas/ui';
 import { useHistory } from 'react-router';
-import { useMutation } from '@apollo/client';
+import { useMutation, MutationFunctionOptions } from '@apollo/client';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
 import cuid from 'cuid';
@@ -344,8 +344,15 @@ const schema = yup.object().shape({
 
 type FormDataProps = yup.InferType<typeof schema>;
 
+interface AutodeckFormProps {
+  onClose: () => void;
+  isLoading: boolean;
+  onCreateJob: (options?: MutationFunctionOptions<CreateWorkspaceJobMutation, Exact<{
+    input?: GenerateAutodeckInput | null | undefined;
+}>> | undefined) => Promise<any>
+}
 
-const AutodeckForm = ({ onClose }: { onClose: () => void; }) => {
+const AutodeckForm = ({ onClose, isLoading, onCreateJob }: AutodeckFormProps) => {
   const history = useHistory();
   const { t } = useTranslation();
   const jobId = cuid()
@@ -361,6 +368,16 @@ const AutodeckForm = ({ onClose }: { onClose: () => void; }) => {
 
   const onFormSubmit = (data: FormDataProps) => {
     console.log('Data: ', data);
+    onCreateJob({
+      variables: {
+        input: {
+          id: jobId,
+          name: data.name,
+          logo: data.logo || data.uploadLogo,
+          website: data.website
+        }
+      }
+    })
   }
 
   const isPreprocessed = false;
@@ -455,7 +472,7 @@ const AutodeckForm = ({ onClose }: { onClose: () => void; }) => {
 
       <ButtonGroup>
         <Button
-          // isLoading={isLoading}
+          isLoading={isLoading}
           isDisabled={!form.formState.isValid}
           variantColor="teal"
           type="submit"

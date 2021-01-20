@@ -10,8 +10,19 @@ import { NexusGenInputs } from '../../generated/nexus';
 import { FindManyTriggerArgs } from '@prisma/client';
 import { FindManyCallBackProps, PaginateProps, paginate } from '../../utils/table/pagination';
 
+
+type ScreenshotProps = {
+  websiteUrl: string;
+  bucket: string;
+  jobId: string;
+};
+
 const s3 = new AWS.S3({ accessKeyId: config.awsAccessKeyId, secretAccessKey: config.awsSecretAccessKey, region: 'eu-central-1' });
-console.log('s3 config: ', s3.config)
+const sns = new AWS.SNS({
+  region: 'eu-central-1',
+  accessKeyId: config.awsAccessKeyId,
+  secretAccessKey: config.awsSecretAccessKey
+});
 
 interface InputProps {
   answer1: string;
@@ -24,6 +35,14 @@ interface InputProps {
   primaryColour: string;
   website: string;
 }
+
+interface CreateWorkspaceJobProps {
+  id?: string | null;
+  name?: string | null;
+  websiteUrl?: string | null;
+  logoUrl?: string | null;
+}
+
 class AutodeckService {
 
   static paginatedAutodeckJobs = async (
@@ -40,7 +59,7 @@ class AutodeckService {
     const findManyTriggers = async (
       { props: findManyArgs }: FindManyCallBackProps,
     ) => prisma.createWorkspaceJob.findMany(findManyArgs);
-  
+
     const countTriggers = async ({ props: countArgs }: FindManyCallBackProps) => prisma.createWorkspaceJob.count(countArgs);
 
     const paginateProps: PaginateProps = {
@@ -59,6 +78,57 @@ class AutodeckService {
 
     return paginate(paginateProps);
   };
+
+  static createWorkspaceJob = async (input: CreateWorkspaceJobProps) => {
+    const workspaceJob = await prisma.createWorkspaceJob.create({
+      data: {
+        id: input.id || '',
+        name: input.name,
+        status: 'PRE_PROCESSING',
+        referenceType: 'AWS',
+      }
+    })
+
+    // const fileKey = input?.logoUrl?.split('.com/')[1]
+    // const logoManipulationEvent = {
+    //   s3: {
+    //     object: {
+    //       key: fileKey
+    //     },
+    //     bucket: {
+    //       name: 'haas-autodeck-logos'
+    //     }
+    //   }
+    // }
+    // const strLogoManipulationEvent = JSON.stringify(logoManipulationEvent, null, 2);
+    // const logoManipulationSNSParams = {
+    //   Message: strLogoManipulationEvent,
+    //   TopicArn: "arn:aws:sns:eu-central-1:118627563984:SalesDeckProcessingChannel"
+    // }
+    // sns.publish(logoManipulationSNSParams, (err, data) => {
+    //   if (err) console.log('ERROR: ', err);
+
+    //   console.log('Logo manipulation publish response: ', data);
+    // });
+   
+    // const screenshotEvent: ScreenshotProps = {
+    //   websiteUrl: input.websiteUrl || '',
+    //   bucket: 'haas-autodeck-logos',
+    //   jobId: input.id || ''
+    // }
+    // const strScreenshotEvent = JSON.stringify(screenshotEvent, null, 2);
+    // const screenshotSNSParams = {
+    //   Message: strScreenshotEvent,
+    //   TopicArn: "arn:aws:sns:eu-central-1:118627563984:WebsiteScreenshotChannel"
+    // };
+    // sns.publish(screenshotSNSParams, (err, data) => {
+    //   if (err) console.log('ERROR: ', err);
+
+    //   console.log('Website screenshot publish response: ', data);
+    // });
+
+    return workspaceJob;
+  }
 
   static createJob = async (input: InputProps) => {
     const job = await prisma.job.create({

@@ -5,7 +5,7 @@ import { useEffect } from 'react';
 import { AtSign, Clock, Eye, Flag, Phone, Plus, Smartphone } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { DeepPartial } from 'types/customTypes';
-import { JobStatusType, PaginationSortByEnum, useGetAutodeckJobsQuery, GetAutodeckJobsQuery, PaginationWhereInput, CreateWorkspaceJobType } from 'types/generated-types';
+import { JobStatusType, PaginationSortByEnum, useGetAutodeckJobsQuery, GetAutodeckJobsQuery, PaginationWhereInput, CreateWorkspaceJobType, useCreateWorkspaceJobMutation } from 'types/generated-types';
 import AutodeckForm from 'views/AutodeckView/AutodeckForm'
 
 export const paginationFilter: PaginationWhereInput = {
@@ -82,10 +82,16 @@ export const AutodeckOverview = () => {
 
   const [paginationState, setPaginationState] = useState(paginationFilter);
 
-  // const { customerSlug, campaignId, getCampaignsPath } = useNavigator();
-  // const campaignsPath = getCampaignsPath();
+  const [createJob, { loading }] = useCreateWorkspaceJobMutation({
+    onCompleted: () => {
+      setIsOpenImportModal(false);
+      refetchAutodeckJobs({
+        filter: paginationState,
+      })
+    }
+  })
 
-  const { data } = useGetAutodeckJobsQuery({
+  const { data, refetch: refetchAutodeckJobs } = useGetAutodeckJobsQuery({
     fetchPolicy: 'cache-and-network',
     variables: {
      filter: paginationState,
@@ -235,6 +241,8 @@ export const AutodeckOverview = () => {
           <UI.Card bg="white" noHover overflowY={'scroll'} height={800} width={1200}>
             <UI.CardBody>
               <AutodeckForm
+                isLoading={loading}
+                onCreateJob={createJob}
                 onClose={() => setIsOpenImportModal(false)} />
             </UI.CardBody>
           </UI.Card>

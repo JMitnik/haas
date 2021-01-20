@@ -197,7 +197,7 @@ export interface NexusGenInputs {
     answer3?: string | null; // String
     answer4?: string | null; // String
     firstName?: string | null; // String
-    id?: string | null; // String
+    id: string; // String!
     logo?: string | null; // String
     name?: string | null; // String
     primaryColour?: string | null; // String
@@ -1011,7 +1011,7 @@ export interface NexusGenFieldTypes {
     editTrigger: NexusGenRootTypes['TriggerType']; // TriggerType!
     editUser: NexusGenRootTypes['UserType']; // UserType!
     editWorkspace: NexusGenRootTypes['Customer']; // Customer!
-    generateAutodeck: NexusGenRootTypes['JobObjectType'] | null; // JobObjectType
+    generateAutodeck: NexusGenRootTypes['CreateWorkspaceJobType'] | null; // CreateWorkspaceJobType
     inviteUser: NexusGenRootTypes['InviteUserOutput']; // InviteUserOutput!
     logout: string; // String!
     register: string | null; // String

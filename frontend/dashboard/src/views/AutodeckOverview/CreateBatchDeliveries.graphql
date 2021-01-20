@@ -1,9 +1,0 @@
-mutation CreateBatchDeliveries($input: CreateBatchDeliveriesInputType) {
-  createBatchDeliveries(input: $input) {
-    nrDeliveries
-    failedDeliveries {
-      record
-      error
-    }
-  }
-}
