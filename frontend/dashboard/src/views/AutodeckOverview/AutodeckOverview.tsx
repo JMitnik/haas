@@ -237,21 +237,24 @@ export const AutodeckOverview = () => {
               <UI.FormSectionHeader>{t('details')}</UI.FormSectionHeader>
               <UI.Stack mb={4}>
                 <UI.Div>
-                  <UI.Helper mb={1}>{t('first_name')}</UI.Helper>
+                  <UI.Helper mb={1}>{t('autodeck:job_name')}</UI.Helper>
                   {activeJob?.name}
                 </UI.Div>
                 <UI.Div>
-                  <UI.Helper mb={1}>{t('last_name')}</UI.Helper>
-                  {activeJob?.createdAt}
+                  <UI.Helper mb={1}>{t('created_at')}</UI.Helper>
+                  {activeJob?.createdAt && <DateLabel dateString={activeJob?.createdAt} /> }
                 </UI.Div>
 
                 <UI.Div>
-                  <UI.Helper mb={1}>{t('email')}</UI.Helper>
-                  {activeJob?.updatedAt || 'Not updated yet'}
+                  <UI.Helper mb={1}>{t('updated_at')}</UI.Helper>
+                  {activeJob?.updatedAt
+                    ? <DateLabel dateString={activeJob?.updatedAt} />
+                    : 'Not updated yet'
+                  }
                 </UI.Div>
                 <UI.Div useFlex justifyContent="space-between">
                   <UI.Div>
-                    <UI.Helper mb={1}>{t('phone')}</UI.Helper>
+                    <UI.Helper mb={1}>{t('status')}</UI.Helper>
                     {activeJob?.status}
                   </UI.Div>
                   <UI.Button
