@@ -1,0 +1,523 @@
+{
+  "version": "0.3.14-fixed",
+  "steps": [
+    {
+      "tag": "CreateField",
+      "model": "Customer",
+      "field": "CampaignVariant",
+      "type": "CampaignVariant",
+      "arity": "List"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Dialogue",
+      "field": "CampaignVariant",
+      "type": "CampaignVariant",
+      "arity": "List"
+    },
+    {
+      "tag": "CreateField",
+      "model": "FormNodeField",
+      "field": "FormNode",
+      "type": "FormNode",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "FormNodeField",
+          "field": "FormNode"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "FormNodeField",
+          "field": "FormNode"
+        },
+        "directive": "relation"
+      },
+      "argument": "fields",
+      "value": "[formNodeId]"
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "FormNodeField",
+          "field": "FormNode"
+        },
+        "directive": "relation"
+      },
+      "argument": "references",
+      "value": "[id]"
+    },
+    {
+      "tag": "CreateField",
+      "model": "FormNodeField",
+      "field": "formNodeId",
+      "type": "String",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateField",
+      "model": "FormNodeField",
+      "field": "FormNodeFieldEntryData",
+      "type": "FormNodeFieldEntryData",
+      "arity": "List"
+    },
+    {
+      "tag": "CreateField",
+      "model": "FormNode",
+      "field": "QuestionNode",
+      "type": "QuestionNode",
+      "arity": "List"
+    },
+    {
+      "tag": "CreateField",
+      "model": "SliderNodeRange",
+      "field": "SliderNodeMarker",
+      "type": "SliderNodeMarker",
+      "arity": "List"
+    },
+    {
+      "tag": "CreateField",
+      "model": "SliderNodeMarker",
+      "field": "sliderNodeRangeId",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "SliderNodeMarker",
+          "field": "range"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "SliderNodeMarker",
+          "field": "range"
+        },
+        "directive": "relation"
+      },
+      "argument": "fields",
+      "value": "[sliderNodeRangeId]"
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "SliderNodeMarker",
+          "field": "range"
+        },
+        "directive": "relation"
+      },
+      "argument": "references",
+      "value": "[id]"
+    },
+    {
+      "tag": "CreateField",
+      "model": "SliderNode",
+      "field": "QuestionNode",
+      "type": "QuestionNode",
+      "arity": "List"
+    },
+    {
+      "tag": "CreateField",
+      "model": "QuestionNode",
+      "field": "sliderNodeId",
+      "type": "String",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateField",
+      "model": "QuestionNode",
+      "field": "formNodeId",
+      "type": "String",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "QuestionNode",
+          "field": "sliderNode"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "QuestionNode",
+          "field": "sliderNode"
+        },
+        "directive": "relation"
+      },
+      "argument": "fields",
+      "value": "[sliderNodeId]"
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "QuestionNode",
+          "field": "sliderNode"
+        },
+        "directive": "relation"
+      },
+      "argument": "references",
+      "value": "[id]"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "QuestionNode",
+          "field": "form"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "QuestionNode",
+          "field": "form"
+        },
+        "directive": "relation"
+      },
+      "argument": "fields",
+      "value": "[formNodeId]"
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "QuestionNode",
+          "field": "form"
+        },
+        "directive": "relation"
+      },
+      "argument": "references",
+      "value": "[id]"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Session",
+      "field": "deliveryId",
+      "type": "String",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Session",
+      "field": "delivery",
+      "type": "Delivery",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "Session",
+          "field": "delivery"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "Session",
+          "field": "delivery"
+        },
+        "directive": "relation"
+      },
+      "argument": "fields",
+      "value": "[deliveryId]"
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "Session",
+          "field": "delivery"
+        },
+        "directive": "relation"
+      },
+      "argument": "references",
+      "value": "[id]"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Session",
+      "field": "originUrl",
+      "type": "String",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Session",
+      "field": "totalTimeInSec",
+      "type": "Int",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateField",
+      "model": "FormNodeFieldEntryData",
+      "field": "FormNodeEntry",
+      "type": "FormNodeEntry",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "FormNodeFieldEntryData",
+          "field": "FormNodeEntry"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "FormNodeFieldEntryData",
+          "field": "FormNodeEntry"
+        },
+        "directive": "relation"
+      },
+      "argument": "fields",
+      "value": "[formNodeEntryId]"
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "FormNodeFieldEntryData",
+          "field": "FormNodeEntry"
+        },
+        "directive": "relation"
+      },
+      "argument": "references",
+      "value": "[id]"
+    },
+    {
+      "tag": "CreateField",
+      "model": "FormNodeFieldEntryData",
+      "field": "formNodeEntryId",
+      "type": "Int",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateField",
+      "model": "CampaignVariant",
+      "field": "CampaignVariantToCampaign",
+      "type": "CampaignVariantToCampaign",
+      "arity": "List"
+    },
+    {
+      "tag": "CreateField",
+      "model": "CampaignVariant",
+      "field": "Delivery",
+      "type": "Delivery",
+      "arity": "List"
+    },
+    {
+      "tag": "CreateField",
+      "model": "CampaignVariant",
+      "field": "customerId",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateField",
+      "model": "CampaignVariant",
+      "field": "dialogueId",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "CampaignVariant",
+          "field": "workspace"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "CampaignVariant",
+          "field": "workspace"
+        },
+        "directive": "relation"
+      },
+      "argument": "fields",
+      "value": "[customerId]"
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "CampaignVariant",
+          "field": "workspace"
+        },
+        "directive": "relation"
+      },
+      "argument": "references",
+      "value": "[id]"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "CampaignVariant",
+          "field": "dialogue"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "CampaignVariant",
+          "field": "dialogue"
+        },
+        "directive": "relation"
+      },
+      "argument": "fields",
+      "value": "[dialogueId]"
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "CampaignVariant",
+          "field": "dialogue"
+        },
+        "directive": "relation"
+      },
+      "argument": "references",
+      "value": "[id]"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Delivery",
+      "field": "Session",
+      "type": "Session",
+      "arity": "List"
+    },
+    {
+      "tag": "CreateField",
+      "model": "DeliveryEvents",
+      "field": "Delivery",
+      "type": "Delivery",
+      "arity": "Optional"
+    },
+    {
+      "tag": "CreateDirective",
+      "location": {
+        "path": {
+          "tag": "Field",
+          "model": "DeliveryEvents",
+          "field": "Delivery"
+        },
+        "directive": "relation"
+      }
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "DeliveryEvents",
+          "field": "Delivery"
+        },
+        "directive": "relation"
+      },
+      "argument": "fields",
+      "value": "[deliveryId]"
+    },
+    {
+      "tag": "CreateArgument",
+      "location": {
+        "tag": "Directive",
+        "path": {
+          "tag": "Field",
+          "model": "DeliveryEvents",
+          "field": "Delivery"
+        },
+        "directive": "relation"
+      },
+      "argument": "references",
+      "value": "[id]"
+    },
+    {
+      "tag": "UpdateField",
+      "model": "DeliveryEvents",
+      "field": "deliveryId",
+      "arity": "Optional"
+    }
+  ]
+}
