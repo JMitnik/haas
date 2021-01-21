@@ -1,9 +1,10 @@
 import { subDays } from 'date-fns';
 import _, { cloneDeep } from 'lodash';
 import cuid from 'cuid';
+import { parseResolveInfo } from 'graphql-parse-resolve-info';
 
 import { ApolloError, UserInputError } from 'apollo-server-express';
-import { Dialogue, Prisma, NodeType, Tag } from '@prisma/client';
+import { Dialogue, Prisma, NodeType, Tag, PromiseReturnType } from '@prisma/client';
 import { isPresent } from 'ts-is-present';
 import NodeService from '../QuestionNode/NodeService';
 import filterDate from '../../utils/filterDate';
@@ -20,10 +21,15 @@ import NodeEntryService, { NodeEntryWithTypes } from '../node-entry/NodeEntrySer
 import SessionService from '../session/SessionService';
 import defaultWorkspaceTemplate, { WorkspaceTemplate } from '../templates/defaultWorkspaceTemplate';
 import prisma from '../../config/prisma';
+import { GraphQLResolveInfo } from 'graphql';
 
 function getRandomInt(max: number) {
   return Math.floor(Math.random() * Math.floor(max));
 }
+
+type CompleteDialogue = PromiseReturnType<typeof DialogueService.fetchCompleteDialogue>;
+type CompleteDialogueWithCounts = PromiseReturnType<typeof DialogueService.getDialogueCounts>;
+
 class DialogueService {
   static constructDialogue(
     customerId: string,
@@ -48,6 +54,118 @@ class DialogueService {
     }
 
     return constructDialogueFragment;
+  }
+
+  /**
+   * Check GraphQL `info` object to see if counts are requested.
+   * @param info 
+   */
+  static willCallCounts(info: GraphQLResolveInfo) {
+    const parsedInfo = parseResolveInfo(info);
+    if (!parsedInfo) return false;
+
+    return parsedInfo?.fieldsByTypeName?.Dialogue?.questions?.fieldsByTypeName?.QuestionNode?.nodeEntryConnection?.fieldsByTypeName?.NodeEntryConnectionType?.count;
+  }
+
+  static async fetchCompleteDialogue(dialogueId?: string, dialogueSlug?: string) {
+    const dialogue = await prisma.dialogue.findFirst({
+      where: dialogueSlug ? { slug: dialogueSlug } :
+        dialogueId ? { id: dialogueId } : undefined,
+      include: {
+        edges: {
+          include: {
+            childNode: true,
+            parentNode: true,
+            isRelatedNodeOfNodeEntries: true,
+            conditions: true
+          }
+        },
+        questions: {
+          where: { isLeaf: false, },
+          orderBy: {
+            creationDate: 'asc',
+          },
+          include: {
+            form: {
+              include: {
+                fields: true,
+              },
+            },
+            sliderNode: {
+              include: {
+                markers: {
+                  include: {
+                    range: true,
+                  },
+                },
+              },
+            },
+          }
+        }
+      }
+    });
+
+    return dialogue;
+  }
+
+  /**
+   * Calculates for a given dialogue its node-counts, and merges it into the dialogue object.
+   * @param dialogue 
+   */
+  static async getDialogueCounts(dialogue: CompleteDialogue) {
+    if (!dialogue) return null;
+
+    const counts = await SessionService.getCountByNodes(dialogue.id);
+
+    return {
+      ...dialogue,
+      questions: dialogue?.questions.map(questionNode => ({
+        ...questionNode,
+        nodeEntryConnection: {
+          count: counts[questionNode?.id]
+        }
+      }))
+    }
+  }
+
+
+  static async calculateDialogueBestPath(dialogue: CompleteDialogueWithCounts) {
+    const edges = dialogue?.edges;
+    const paths = [];
+    const maxIterations = 30; // Max just in case
+
+    let activeNode: any = null;
+    let isDone = false;
+    let iteration = 0;
+
+    while (!isDone || iteration < maxIterations) {
+      if (!activeNode) {
+        activeNode = dialogue?.questions.find(question => question.isRoot);
+      }
+
+      const activeEdges = edges?.filter(edge => edge.parentNodeId === activeNode.id);
+      const activeEdge = activeEdges?.sort(edge => dialogue?.questions[0].)
+      let child = activeEdge?.childNode;
+
+      if (child) {
+        paths.push([activeNode, activeEdge, child]);
+        activeNode = child;
+      } else {
+
+      }
+
+      iteration += 1;
+    }
+  }
+
+  /**
+   * Calculates for a given Dialogue, the following:
+   * - The most-popular path
+   * - Counts for all nodes
+   */
+  static async calculateDialogueNodeEntryConnection(dialogue: CompleteDialogue) {
+    const dialogueWithCounts = await DialogueService.getDialogueCounts(dialogue);
+    const dialogueBestPath = await DialogueSerivce.calculateDialogueBestPath(dialogueWithCounts)
   }
 
   static filterDialoguesBySearchTerm = (dialogues: Array<Dialogue & {

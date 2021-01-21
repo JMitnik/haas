@@ -1,10 +1,9 @@
 /* eslint-disable import/no-cycle */
-import { ColourSettings, Customer, CustomerSettings, PrismaClient } from '@prisma/client';
+import { ColourSettings, Customer, CustomerSettings, Prisma, PrismaClient } from '@prisma/client';
 import { GraphQLError } from 'graphql';
 import { GraphQLUpload, UserInputError } from 'apollo-server-express';
 import { extendType, inputObjectType, mutationField, objectType, scalarType } from '@nexus/schema';
 import cloudinary, { UploadApiResponse } from 'cloudinary';
-
 import { CustomerSettingsType } from '../settings/CustomerSettings';
 // eslint-disable-next-line import/no-cycle
 import { DialogueFilterInputType, DialogueType, DialogueWhereUniqueInput } from '../questionnaire/Dialogue';
@@ -16,6 +15,7 @@ import { UserConnection, UserCustomerType } from '../users/User';
 import DialogueService from '../questionnaire/DialogueService';
 import UserService from '../users/UserService';
 import isValidColor from '../../utils/isValidColor';
+import SessionService from '../session/SessionService';
 
 export interface CustomerSettingsWithColour extends CustomerSettings {
   colourSettings?: ColourSettings | null;
@@ -72,22 +72,72 @@ export const CustomerType = objectType({
       nullable: true,
       args: { where: DialogueWhereUniqueInput },
 
-      async resolve(parent, args) {
-        if (args?.where?.slug) {
-          const dialogueSlug: string = args.where.slug;
+      async resolve(parent, args, ctx, info) {
+        if (!args.where?.slug && !args.where?.id) return null;
 
-          const customer = await CustomerService.getDialogueFromCustomerBySlug(parent.id, dialogueSlug);
-          return customer || null as any;
+        const dialogue = await ctx.prisma.dialogue.findFirst({
+          where: args.where.slug ? { slug: args.where.slug } :
+            args.where.id ? { id: args.where.id } : undefined,
+          include: {
+            edges: {
+              include: {
+                childNode: true,
+                parentNode: true,
+                isRelatedNodeOfNodeEntries: true,
+                conditions: true
+              }
+            },
+            questions: {
+              where: { isLeaf: false, },
+              orderBy: {
+                creationDate: 'asc',
+              },
+              include: {
+                form: {
+                  include: {
+                    fields: true,
+                  },
+                },
+                sliderNode: {
+                  include: {
+                    markers: {
+                      include: {
+                        range: true,
+                      },
+                    },
+                  },
+                },
+              }
+            }
+          }
+        });
+
+        const willCallNodeCounts = DialogueService.willCallCounts(info);
+
+        if (willCallNodeCounts && dialogue) {
+          const counts = await SessionService.getCountByNodes(dialogue.id);
+          const dialogueWithCounts = {
+            ...dialogue,
+            questions: dialogue?.questions.map(questionNode => ({
+              ...questionNode,
+              nodeEntryConnection: {
+                count: counts.find(count => count['relatedNodeId'] === questionNode.id)?.count.relatedNodeId || 0
+              }
+            }))
+          };
+
+          return {
+            ...dialogue,
+            questions: dialogue?.questions.map(questionNode => ({
+              ...questionNode,
+              nodeEntryConnection: {
+                count: counts.find(count => count['relatedNodeId'] === questionNode.id)?.count.relatedNodeId
+              }
+            }))
+          }
         }
 
-        if (args?.where?.id) {
-          const dialogueId: string = args.where.id;
-
-          const customer = await CustomerService.getDialogueFromCustomerById(parent.id, dialogueId);
-          return customer || null as any;
-        }
-
-        return null;
+        return dialogue;
       },
     });
 
@@ -256,11 +306,11 @@ export const WorkspaceMutations = Upload && extendType({
           const cld_upload_stream = cloudinary.v2.uploader.upload_stream({
             folder: 'company_logos',
           },
-          (error, result: UploadApiResponse | undefined) => {
-            if (result) return resolve(result);
+            (error, result: UploadApiResponse | undefined) => {
+              if (result) return resolve(result);
 
-            return reject(error);
-          });
+              return reject(error);
+            });
 
           return createReadStream().pipe(cld_upload_stream);
         });

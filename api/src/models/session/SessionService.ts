@@ -12,7 +12,7 @@ import NodeEntryService, { NodeEntryWithTypes } from '../node-entry/NodeEntrySer
 // eslint-disable-next-line import/no-cycle
 import { FindManyCallBackProps, PaginateProps, paginate } from '../../utils/table/pagination';
 import { Nullable, PaginationProps } from '../../types/generic';
-import { SessionWithEntries } from './SessionTypes';
+import { NodeEntryCount, SessionWithEntries } from './SessionTypes';
 import TriggerService from '../trigger/TriggerService';
 import prisma from '../../config/prisma';
 
@@ -344,14 +344,21 @@ class SessionService {
     };
   };
 
-  static async getCountByNodes(dialogueId: string) {
+  /**
+   * Counts nodes by their entries. Returns a map of nodeIds to their count.
+   * @param dialogueId 
+   */
+  static async getCountByNodes(dialogueId: string): Promise<NodeEntryCount> {
     const countsByNode = await prisma.nodeEntry.groupBy({
       where: { relatedNode: { questionDialogueId: dialogueId } },
       count: { relatedNodeId: true },
       by: ['relatedNodeId'],
     });
 
-    return countsByNode;
+    return countsByNode.reduce((total, count) => {
+      total[`${count.relatedNodeId}`] = count.count.relatedNodeId || 0;
+      return total;
+    }, {} as NodeEntryCount);
   }
 
   static async getSessionEntries(session: Session): Promise<NodeEntry[] | []> {

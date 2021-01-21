@@ -2,7 +2,7 @@ import { extendType, inputObjectType, mutationField, objectType } from '@nexus/s
 
 // eslint-disable-next-line import/no-cycle
 import { UserInputError } from 'apollo-server-express';
-import { NodeEntryDataInput, NodeEntryInput, NodeEntryType } from '../node-entry/NodeEntry';
+import { NodeEntryDataInput, NodeEntryInput, NodeEntryType } from '../node-entry';
 // eslint-disable-next-line import/no-cycle
 import { ConnectionInterface } from '../general/Pagination';
 // eslint-disable-next-line import/no-cycle

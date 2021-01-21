@@ -11,6 +11,7 @@ import { EdgeType } from '../edge/Edge';
 import { SliderNode } from './SliderNode';
 import NodeService from './NodeService';
 import SessionService from '../session/SessionService';
+import { NodeEntryConnectionType } from '../node-entry';
 
 export const CTAShareInputObjectType = inputObjectType({
   name: 'CTAShareInputObjectType',
@@ -284,6 +285,11 @@ export const QuestionNodeType = objectType({
 
         return overrideLeaf;
       },
+    });
+
+    t.field('nodeEntryConnection', {
+      type: NodeEntryConnectionType,
+      nullable: true,
     });
 
     t.list.field('options', {

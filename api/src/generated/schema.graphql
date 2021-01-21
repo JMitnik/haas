@@ -544,6 +544,11 @@ type NodeEntry {
   value: NodeEntryValue
 }
 
+type NodeEntryConnectionType {
+  count: Int
+  nodeEntries: [NodeEntry!]!
+}
+
 """Data type for the actual node entry"""
 input NodeEntryDataInput {
   choice: ChoiceNodeEntryInput
@@ -684,6 +689,7 @@ type QuestionNode {
   isLeaf: Boolean!
   isRoot: Boolean!
   links: [LinkType!]!
+  nodeEntryConnection: NodeEntryConnectionType
   options: [QuestionOption!]!
   overrideLeaf: QuestionNode
   overrideLeafId: String

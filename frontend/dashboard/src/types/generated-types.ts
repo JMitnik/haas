@@ -333,6 +333,7 @@ export type Dialogue = {
   questions: Array<QuestionNode>;
   sessions: Array<Session>;
   leafs: Array<QuestionNode>;
+  generalNodeConnection: QuestionNodeConnectionType;
 };
 
 
@@ -826,6 +827,12 @@ export type NodeEntry = {
   value?: Maybe<NodeEntryValue>;
 };
 
+export type NodeEntryConnectionType = {
+  __typename?: 'NodeEntryConnectionType';
+  count?: Maybe<Scalars['Int']>;
+  nodeEntries: Array<NodeEntry>;
+};
+
 /** Data type for the actual node entry */
 export type NodeEntryDataInput = {
   slider?: Maybe<SliderNodeEntryInput>;
@@ -1079,8 +1086,15 @@ export type QuestionNode = {
   links: Array<LinkType>;
   questionDialogue?: Maybe<Dialogue>;
   overrideLeaf?: Maybe<QuestionNode>;
+  nodeEntryConnection?: Maybe<NodeEntryConnectionType>;
   options: Array<QuestionOption>;
   children: Array<Edge>;
+};
+
+/** Conncetion of question-node */
+export type QuestionNodeConnectionType = {
+  __typename?: 'QuestionNodeConnectionType';
+  questions: Array<QuestionNode>;
 };
 
 /** The different types a node can assume */
@@ -1607,7 +1621,10 @@ export type GetDialogueInsightsQuery = (
       )>, questions: Array<(
         { __typename?: 'QuestionNode' }
         & Pick<QuestionNode, 'id' | 'title' | 'creationDate' | 'updatedAt' | 'isRoot' | 'isLeaf' | 'type'>
-        & { overrideLeaf?: Maybe<(
+        & { nodeEntryConnection?: Maybe<(
+          { __typename?: 'NodeEntryConnectionType' }
+          & Pick<NodeEntryConnectionType, 'count'>
+        )>, overrideLeaf?: Maybe<(
           { __typename?: 'QuestionNode' }
           & Pick<QuestionNode, 'id' | 'type' | 'title'>
         )>, sliderNode?: Maybe<(
@@ -1924,6 +1941,9 @@ export const GetDialogueInsightsDocument = gql`
         updatedAt
         isRoot
         isLeaf
+        nodeEntryConnection {
+          count
+        }
         overrideLeaf {
           id
           type

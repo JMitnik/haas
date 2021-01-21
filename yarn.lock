@@ -11888,12 +11888,7 @@ from2@^2.1.0:
     inherits "^2.0.1"
     readable-stream "^2.0.0"
 
-fs-capacitor@^2.0.4:
-  version "2.0.4"
-  resolved "https://registry.yarnpkg.com/fs-capacitor/-/fs-capacitor-2.0.4.tgz#5a22e72d40ae5078b4fe64fe4d08c0d3fc88ad3c"
-  integrity sha512-8S4f4WsCryNw2mJJchi46YgB6CR5Ze+4L1h8ewl9tEpL4SJ3ZO+c/bS4BWhB8bK+O3TMqhuZarTitd0S0eh2pA==
-
-fs-capacitor@^6.1.0:
+fs-capacitor@^2.0.4, fs-capacitor@^6.1.0, fs-capacitor@^6.2.0:
   version "6.2.0"
   resolved "https://registry.yarnpkg.com/fs-capacitor/-/fs-capacitor-6.2.0.tgz#fa79ac6576629163cb84561995602d8999afb7f5"
   integrity sha512-nKcE1UduoSKX27NSZlg879LdQc94OtbOsEmKMN2MBNudXREvijRKx2GEBsTMTfws+BrbkJoEuynbGSVRSpauvw==
@@ -12449,6 +12444,11 @@ graphql-extensions@^0.12.7:
     apollo-server-env "^2.4.5"
     apollo-server-types "^0.6.2"
 
+graphql-fields@^2.0.3:
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/graphql-fields/-/graphql-fields-2.0.3.tgz#5e68dff7afbb202be4f4f40623e983b22c96ab8f"
+  integrity sha512-x3VE5lUcR4XCOxPIqaO4CE+bTK8u6gVouOdpQX9+EKHr+scqtK5Pp/l8nIGqIpN1TUlkKE6jDCCycm/WtLRAwA==
+
 graphql-import@^1.0.0-beta.1:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/graphql-import/-/graphql-import-1.0.2.tgz#e011758846cbc311777afac275cd9b75346f477e"
@@ -12467,6 +12467,14 @@ graphql-middleware@^4.0.2:
   integrity sha512-qKN3vLNd2fzaUczxQTR7WIB05L+b1xHLHRP5cdK9yboRckqTrFsW2Ot2rKqmXRwxaNCLJD7WEeg1ggdPSpGstg==
   dependencies:
     graphql-tools "^4.0.8"
+
+graphql-parse-resolve-info@^4.10.0:
+  version "4.10.0"
+  resolved "https://registry.yarnpkg.com/graphql-parse-resolve-info/-/graphql-parse-resolve-info-4.10.0.tgz#3f61fa4bcbcad65d017f503fac4075f07624a69f"
+  integrity sha512-4KWA4oiVnC1bduPZzmuUsTT9SZf/sbdrOAtOsHz747H6Azs4xPgj7/DPXCgdYvKrd4Ci9fNDcem4mOVV2Lct1w==
+  dependencies:
+    debug "^4.1.1"
+    tslib "^2.0.1"
 
 graphql-request@^3.3.0:
   version "3.4.0"

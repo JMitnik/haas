@@ -2,7 +2,7 @@ import * as AuthAPI from '../models/auth/Auth';
 import * as CampaignAPI from '../models/Campaigns';
 import * as DebugAPI from '../models/debug/Debug';
 import * as InteractionAPI from '../models/session/Session';
-import * as NodeEntryAPI from '../models/node-entry/NodeEntry';
+import * as NodeEntryAPI from '../models/node-entry';
 import * as PaginationAPI from '../models/general/Pagination';
 import * as QuestionNodeAPI from '../models/QuestionNode';
 import * as UserAPI from '../models/users/User';

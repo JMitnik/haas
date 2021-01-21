@@ -18,6 +18,11 @@ query GetDialogueInsights($customerSlug: String!, $dialogueSlug: String!) {
         updatedAt
         isRoot
         isLeaf
+
+        nodeEntryConnection {
+          count
+        }
+
         overrideLeaf {
           id
           type

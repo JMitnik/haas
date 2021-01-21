@@ -18,8 +18,6 @@ const InsightsView = () => {
     }
   });
 
-  console.log(data);
-
   return (
     <>
       <UI.ViewHeading>
