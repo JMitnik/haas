@@ -163,7 +163,7 @@ type CreateWorkspaceJobType {
   name: String!
   referenceId: String
   referenceType: CloudReferenceType!
-  resourceUrl: String
+  resourcesUrl: String
   status: JobStatusType!
   updatedAt: String
 }

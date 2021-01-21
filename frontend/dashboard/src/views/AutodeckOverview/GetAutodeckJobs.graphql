@@ -7,7 +7,7 @@ query getAutodeckJobs($filter: PaginationWhereInput) {
       updatedAt
       referenceId
       status
-      resourceUrl
+      resourcesUrl
       referenceType
     }
     pageInfo {

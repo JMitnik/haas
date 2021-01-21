@@ -2,7 +2,7 @@ import * as UI from '@haas/ui';
 import { format } from 'date-fns';
 import React, { useState } from 'react';
 import { useEffect } from 'react';
-import { AtSign, Clock, Eye, Flag, Phone, Plus, Smartphone } from 'react-feather';
+import { AtSign, Clock, Eye, Flag, Phone, Plus, Smartphone, Download } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { DeepPartial } from 'types/customTypes';
 import { JobStatusType, PaginationSortByEnum, useGetAutodeckJobsQuery, PaginationWhereInput, CreateWorkspaceJobType, useCreateWorkspaceJobMutation, useConfirmWorkspaceJobMutation } from 'types/generated-types';
@@ -249,19 +249,32 @@ export const AutodeckOverview = () => {
                   <UI.Helper mb={1}>{t('email')}</UI.Helper>
                   {activeJob?.updatedAt || 'Not updated yet'}
                 </UI.Div>
-                <UI.Div>
-                  <UI.Helper mb={1}>{t('phone')}</UI.Helper>
-                  {activeJob?.status}
+                <UI.Div useFlex justifyContent="space-between">
+                  <UI.Div>
+                    <UI.Helper mb={1}>{t('phone')}</UI.Helper>
+                    {activeJob?.status}
+                  </UI.Div>
+                  <UI.Button
+                    leftIcon={Download}
+                    isDisabled={activeJob?.status !== 'COMPLETED' || !activeJob.resourcesUrl}
+                    size="sm"
+                    variantColor="green">{activeJob?.resourcesUrl ?
+                      <a style={{ color: 'white', textDecoration: 'none' }} href={activeJob?.resourcesUrl} download>
+                        {t('autodeck:download_result')}
+                      </a> :
+                      t('autodeck:download_result')
+                    }
+                  </UI.Button>
                 </UI.Div>
               </UI.Stack>
             </UI.CardBody>
           </UI.Card>
         </UI.Modal>
 
-        <UI.Modal isOpen={isOpenImportModal} onClose={() => { 
+        <UI.Modal isOpen={isOpenImportModal} onClose={() => {
           setIsOpenImportModal(false)
           setActiveJob(null)
-          }}>
+        }}>
           <UI.Card bg="white" noHover overflowY={'scroll'} height={800} width={1200}>
             <UI.CardBody>
               <AutodeckForm

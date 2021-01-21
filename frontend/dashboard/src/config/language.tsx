@@ -833,6 +833,10 @@ const language = {
     },
   },
   autodeck: {
+    download_result: {
+      en: 'Download result',
+      de: 'Download result'
+    },
     primary_color: {
       en: 'Primary color',
       de: 'Primary color',

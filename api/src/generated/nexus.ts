@@ -440,7 +440,7 @@ export interface NexusGenRootTypes {
     name: string; // String!
     referenceId?: string | null; // String
     referenceType: NexusGenEnums['CloudReferenceType']; // CloudReferenceType!
-    resourceUrl?: string | null; // String
+    resourcesUrl?: string | null; // String
     status: NexusGenEnums['JobStatusType']; // JobStatusType!
     updatedAt?: string | null; // String
   }
@@ -819,7 +819,7 @@ export interface NexusGenFieldTypes {
     name: string; // String!
     referenceId: string | null; // String
     referenceType: NexusGenEnums['CloudReferenceType']; // CloudReferenceType!
-    resourceUrl: string | null; // String
+    resourcesUrl: string | null; // String
     status: NexusGenEnums['JobStatusType']; // JobStatusType!
     updatedAt: string | null; // String
   }

@@ -192,7 +192,7 @@ export type CreateWorkspaceJobType = {
   updatedAt?: Maybe<Scalars['String']>;
   referenceId?: Maybe<Scalars['String']>;
   status: JobStatusType;
-  resourceUrl?: Maybe<Scalars['String']>;
+  resourcesUrl?: Maybe<Scalars['String']>;
   referenceType: CloudReferenceType;
 };
 
@@ -1621,7 +1621,7 @@ export type GetAutodeckJobsQuery = (
     { __typename?: 'AutodeckConnectionType' }
     & { jobs: Array<(
       { __typename?: 'CreateWorkspaceJobType' }
-      & Pick<CreateWorkspaceJobType, 'id' | 'name' | 'createdAt' | 'updatedAt' | 'referenceId' | 'status' | 'resourceUrl' | 'referenceType'>
+      & Pick<CreateWorkspaceJobType, 'id' | 'name' | 'createdAt' | 'updatedAt' | 'referenceId' | 'status' | 'resourcesUrl' | 'referenceType'>
     )>, pageInfo: (
       { __typename?: 'PaginationPageInfo' }
       & Pick<PaginationPageInfo, 'nrPages' | 'pageIndex'>
@@ -1840,7 +1840,7 @@ export const GetAutodeckJobsDocument = gql`
       updatedAt
       referenceId
       status
-      resourceUrl
+      resourcesUrl
       referenceType
     }
     pageInfo {

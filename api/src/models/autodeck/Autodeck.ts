@@ -30,7 +30,7 @@ export const CreateWorkspaceJobType = objectType({
     t.string('updatedAt', { nullable: true })
     t.string('referenceId', { nullable: true });
     t.string('status');
-    t.string('resourceUrl', { nullable: true });
+    t.string('resourcesUrl', { nullable: true });
     t.field('referenceType', {
       type: CloudReferenceType,
     });
