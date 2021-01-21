@@ -12,6 +12,15 @@ const getDialogueSessionConnectionQuery = gql`
             createdAt
             paths
             score
+            originUrl
+            totalTimeInSec
+            device
+
+            delivery {
+              id
+              deliveryRecipientFirstName
+            }
+
             nodeEntries {
               id
               depth

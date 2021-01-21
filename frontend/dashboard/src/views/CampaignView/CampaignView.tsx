@@ -2,13 +2,15 @@ import * as UI from '@haas/ui';
 import { format } from 'date-fns';
 import { useNavigator } from 'hooks/useNavigator';
 import React, { useState } from 'react';
-import { useRef } from 'react';
 import { useEffect } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
-import { AtSign, Clock, Eye, Flag, Phone, Plus, Smartphone } from 'react-feather';
+import { AtSign, Clock, Eye, Flag, Plus, Smartphone } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { DeepPartial } from 'types/customTypes';
-import { CampaignVariantEnum, DeliveryConnectionFilter, DeliveryStatusEnum, DeliveryType, GetWorkspaceCampaignQuery, PaginationSortByEnum, useGetWorkspaceCampaignQuery } from 'types/generated-types';
+import {
+  CampaignVariantEnum, DeliveryConnectionFilter, DeliveryStatusEnum, DeliveryType,
+  PaginationSortByEnum, useGetWorkspaceCampaignQuery
+} from 'types/generated-types';
 import { ImportDeliveriesForm } from './ImportDeliveriesForm';
 
 export const defaultCampaignViewFilter: DeliveryConnectionFilter = {
@@ -305,7 +307,10 @@ export const CampaignView = () => {
                     <UI.Span color="gray.500">
                       {event?.createdAt && (
                         <>
-                          {format(parseInt(event?.createdAt, 10), 'MMM Mo HH:mm')}
+                          {format(
+                            new Date(parseInt(event?.createdAt, 10)),
+                            'MMM Do HH:mm'
+                          )}
                         </>
                       )}
                     </UI.Span>

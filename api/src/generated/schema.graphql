@@ -788,11 +788,15 @@ type RoleType {
 
 type Session {
   createdAt: Date!
+  delivery: DeliveryType
+  device: String
   dialogueId: String!
   id: ID!
   nodeEntries: [NodeEntry!]!
+  originUrl: String
   paths: Int!
   score: Float!
+  totalTimeInSec: Int
 }
 
 type SessionConnection implements ConnectionInterface {
@@ -807,8 +811,11 @@ type SessionConnection implements ConnectionInterface {
 """Input for session"""
 input SessionInput {
   deliveryId: String
+  device: String
   dialogueId: String!
   entries: [NodeEntryInput!]
+  originUrl: String
+  totalTimeInSec: Int
 }
 
 input SessionWhereUniqueInput {
