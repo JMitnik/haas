@@ -355,6 +355,7 @@ class SessionService {
     };
 
     return {
+      // @ts-ignore
       sessions: entries as NexusGenFieldTypes['Session'][],
       offset: paginationOpts?.offset || 0,
       limit: paginationOpts?.limit || 0,
