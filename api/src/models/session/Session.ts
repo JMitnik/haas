@@ -45,6 +45,8 @@ export const SessionType = objectType({
       resolve: (parent) => parent.originUrl || ''
     });
 
+    t.string('deliveryId', { nullable: true, resolve: (parent) => parent.deliveryId });
+
     t.field('delivery', { type: 'DeliveryType', nullable: true });
 
     t.string('device', { nullable: true });

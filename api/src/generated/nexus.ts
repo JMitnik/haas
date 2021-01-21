@@ -1052,6 +1052,7 @@ export interface NexusGenFieldTypes {
   Session: { // field return type
     createdAt: any; // Date!
     delivery: NexusGenRootTypes['DeliveryType'] | null; // DeliveryType
+    deliveryId: string | null; // String
     device: string | null; // String
     dialogueId: string; // String!
     id: string; // ID!

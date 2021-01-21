@@ -789,6 +789,7 @@ type RoleType {
 type Session {
   createdAt: Date!
   delivery: DeliveryType
+  deliveryId: String
   device: String
   dialogueId: String!
   id: ID!
