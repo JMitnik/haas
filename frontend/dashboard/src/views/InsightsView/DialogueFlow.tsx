@@ -3,7 +3,10 @@ import ReactFlow, {
   Controls,
   isNode,
   MiniMap,
-  Background
+  useZoomPanHelper,
+  Background,
+  ReactFlowProvider,
+  useStore,
 } from "react-flow-renderer";
 import * as UI from '@haas/ui';
 import dagre from 'dagre';
@@ -20,22 +23,36 @@ interface DialogueFlowProps {
 
 const DialogueFlow = ({ nodes, edges }: DialogueFlowProps) => {
   const HEIGHT = '85vh';
+  const { zoomIn, zoomOut, setCenter } = useZoomPanHelper();
+  const flowStore = useStore();
 
   const processedNodes = nodes.map(node => ({
     id: node.id,
     data: { label: node.title }
   }));
 
+  const activeEdges = ["ckgmgt9vo7513188godeqsj2cny", "ckgmjwe3m7588738godpr4aos25", "ckgw41bl616533828godce5wvzsv"];
+
+  const focusOnRandomEdge = () => {
+    const { edges, nodes } = flowStore.getState();
+    const firstEdge = edges.find(edge => edge.id === "ckgmgt9vo7513188godeqsj2cny");
+    const parentNodeId = firstEdge?.source;
+    const parentNode = nodes.find(node => node.id === parentNodeId);
+    const xZoom = parentNode?.__rf?.position.x + (parentNode?.__rf?.width / 2);
+    const yZoom = parentNode?.__rf?.position.y + (parentNode?.__rf?.height / 2);
+    const zoomLevel = 0.7;
+
+    setCenter(xZoom, yZoom, zoomLevel);
+  }
+
   const processedEdges = edges.map(edge => ({
     id: edge.id,
     source: edge.parentNode?.id,
     target: edge.childNode?.id,
     label: edge.conditions?.[0]?.matchValue || '',
-    type: "HAAS_NODE"
+    type: "HAAS_NODE",
+    animated: activeEdges.includes(edge.id || '')
   }));
-
-  console.log(processedEdges);
-  console.log(processedNodes);
 
   const dagreGraph = new dagre.graphlib.Graph();
   dagreGraph.setDefaultEdgeLabel(() => ({}));
@@ -72,6 +89,9 @@ const DialogueFlow = ({ nodes, edges }: DialogueFlowProps) => {
 
   return (
     <UI.Div style={{ borderLeft: '1px solid #e2e8f0', overflow: 'hidden' }}>
+      <UI.Button onClick={() => focusOnRandomEdge()}>
+        Debug random edge
+      </UI.Button>
       <UI.Div>
         <ReactFlowContainer style={{ height: HEIGHT, width: '100%' }}>
           <ReactFlow elements={elements}>

@@ -1,11 +1,14 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { ReactFlowProvider } from 'react-flow-renderer';
 
 import * as UI from '@haas/ui';
+
+import { useNavigator } from 'hooks/useNavigator';
+
 import DialogueFlow from './DialogueFlow';
 import { InsightsViewContainer } from './InsightsViewStyles';
 import { useGetDialogueInsightsQuery } from 'types/generated-types';
-import { useNavigator } from 'hooks/useNavigator';
 
 const InsightsView = () => {
   const { t } = useTranslation();
@@ -28,12 +31,13 @@ const InsightsView = () => {
       <UI.ViewContainer>
         <InsightsViewContainer gridTemplateColumns={['1fr', '1fr 2fr']}>
           <UI.Div>
-
           </UI.Div>
-          <DialogueFlow
-            edges={data?.customer?.dialogue?.edges || []}
-            nodes={data?.customer?.dialogue?.questions || []}
-          />
+          <ReactFlowProvider>
+            <DialogueFlow
+              edges={data?.customer?.dialogue?.edges || []}
+              nodes={data?.customer?.dialogue?.questions || []}
+            />
+          </ReactFlowProvider>
         </InsightsViewContainer>
       </UI.ViewContainer>
     </>
