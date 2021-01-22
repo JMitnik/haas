@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { DeepPartial } from 'types/customTypes';
 import {
   CampaignVariantEnum, DeliveryConnectionFilter, DeliveryStatusEnum, DeliveryType,
+  GetWorkspaceCampaignQuery,
   PaginationSortByEnum, useGetWorkspaceCampaignQuery
 } from 'types/generated-types';
 import { ImportDeliveriesForm } from './ImportDeliveriesForm';
@@ -117,15 +118,35 @@ export const CampaignView = () => {
   const { customerSlug, campaignId, getCampaignsPath } = useNavigator();
   const campaignsPath = getCampaignsPath();
 
-  const { data } = useGetWorkspaceCampaignQuery({
+  // For tables we will consider data-caches.
+  // useTableData
+  const [dataCache, setDataCache] = useState<GetWorkspaceCampaignQuery | undefined>(undefined);
+  const { data, loading } = useGetWorkspaceCampaignQuery({
     fetchPolicy: 'cache-and-network',
     variables: {
       campaignId,
       customerSlug,
       deliveryConnectionFilter: paginationState,
     },
-    pollInterval: POLL_INTERVAL
+    pollInterval: POLL_INTERVAL,
+    onCompleted: (data) => setDataCache(data),
   });
+
+  // use-table-select placement
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+
+  const handleSelect = (id: string) => {
+    if (selectedIds.includes(id)) {
+      console.log(selectedIds);
+      setSelectedIds(ids => ids.splice(ids.indexOf(id), 1));
+    } else {
+      setSelectedIds(ids => [...ids, id]);
+    }
+  }
+
+  const isInEdit = selectedIds.length > 0;
+
+  // use-table-select end
 
   useEffect(() => {
     if (activeDelivery) {
@@ -135,7 +156,7 @@ export const CampaignView = () => {
     }
   }, [activeDelivery, setIsOpenImportModal]);
 
-  const campaign = data?.customer?.campaign;
+  const campaign = dataCache?.customer?.campaign;
   const deliveryConnection = campaign?.deliveryConnection;
 
   return (
@@ -154,8 +175,11 @@ export const CampaignView = () => {
       <UI.ViewContainer>
         <UI.Card noHover>
           <UI.Div p={2}>
-            <UI.Table width="100%">
+            <UI.Table width="100%" isLoading={loading}>
               <UI.TableHeading>
+                <UI.TableHeadingCell>
+                  <UI.TableSelect />
+                </UI.TableHeadingCell>
                 <UI.TableHeadingCell>
                   {t('recipient')}
                 </UI.TableHeadingCell>
@@ -172,7 +196,12 @@ export const CampaignView = () => {
 
               <UI.TableBody>
                 {deliveryConnection?.deliveries.map(delivery => (
-                  <UI.TableRow hasHover key={delivery.id} onClick={() => setActiveDelivery(delivery)}>
+                  <UI.TableRow isSelected={selectedIds.includes(delivery.id)} hasHover key={delivery.id} onClick={() => setActiveDelivery(delivery)}>
+                    <UI.TableCell width="1rem" center>
+                      <UI.TableSelect
+                        isSelected={selectedIds.includes(delivery.id)} onClick={() => handleSelect(delivery.id)}
+                      />
+                    </UI.TableCell>
                     <UI.TableCell>
                       {delivery?.deliveryRecipientFirstName || ''}
                     </UI.TableCell>
@@ -189,6 +218,14 @@ export const CampaignView = () => {
                     </UI.TableCell>
                   </UI.TableRow>
                 ))}
+
+                {isInEdit && (
+                  <UI.TableActionBar>
+                    <UI.Div>
+                      Selected {selectedIds.length} deliveries
+                    </UI.Div>
+                  </UI.TableActionBar>
+                )}
               </UI.TableBody>
             </UI.Table>
           </UI.Div>
