@@ -1,6 +1,10 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    most_popular_path: {
+      en: 'Most popular path',
+      de: 'Der beliebteste Weg'
+    },
     events: {
       en: 'Events',
       de: 'Veranstaltungen'

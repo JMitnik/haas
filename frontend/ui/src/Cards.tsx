@@ -14,7 +14,15 @@ interface CardProps {
   willFocusWithin?: boolean;
 }
 
-export const Card = styled(Div)<CardProps>`
+export const CardHeader = styled(Div)`
+  ${({ theme }) => css`
+    display: flex;
+    padding: ${theme.gutter * 0.75}px;
+    margin-bottom: ${theme.gutter / 2}px;
+  `}
+`;
+
+export const Card = styled(Div) <CardProps>`
   ${({ theme, noHover, boxShadow, outline, isFlat, willFocusWithin }) => css`
     position: relative;
     display: flex;
@@ -24,6 +32,10 @@ export const Card = styled(Div)<CardProps>`
 
     box-shadow: rgba(0, 0, 0, 0.08) 0px 4px 12px;
     /* transition: all .3s cubic-bezier(.55,0,.1,1); */
+
+    ${CardHeader} + ${CardBody} {
+      padding-top: 0;
+    }
 
     ${willFocusWithin && css`
       &:focus-within {
@@ -47,7 +59,7 @@ export const Card = styled(Div)<CardProps>`
   `}
 `;
 
-export const ButtonCard = styled(Button)<{ isActive: boolean }>`
+export const ButtonCard = styled(Button) <{ isActive: boolean }>`
   ${({ theme, isActive }) => css`
     border-radius: ${theme.borderRadiuses.md};
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);

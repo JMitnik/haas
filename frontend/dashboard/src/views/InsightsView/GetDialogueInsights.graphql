@@ -18,6 +18,7 @@ query GetDialogueInsights($customerSlug: String!, $dialogueSlug: String!) {
         updatedAt
         isRoot
         isLeaf
+        type
 
         nodeEntryConnection {
           count
@@ -39,7 +40,7 @@ query GetDialogueInsights($customerSlug: String!, $dialogueSlug: String!) {
             }
           }
         }
-        type
+
         children {
           id
           conditions {
@@ -52,10 +53,12 @@ query GetDialogueInsights($customerSlug: String!, $dialogueSlug: String!) {
           parentNode {
             id
             title
+            type
           }
           childNode {
             id
             title
+            type
           }
         }
         options {
@@ -74,13 +77,19 @@ query GetDialogueInsights($customerSlug: String!, $dialogueSlug: String!) {
           renderMin
           renderMax
         }
+
+        parentNodeId
         parentNode {
           id
           title
+          type
         }
+
+        childNodeId
         childNode {
           id
           title
+          type
           isRoot
         }
       }

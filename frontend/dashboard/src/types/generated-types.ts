@@ -1645,10 +1645,10 @@ export type GetDialogueInsightsQuery = (
             & Pick<EdgeCondition, 'id' | 'conditionType' | 'matchValue' | 'renderMin' | 'renderMax'>
           )>>, parentNode?: Maybe<(
             { __typename?: 'QuestionNode' }
-            & Pick<QuestionNode, 'id' | 'title'>
+            & Pick<QuestionNode, 'id' | 'title' | 'type'>
           )>, childNode?: Maybe<(
             { __typename?: 'QuestionNode' }
-            & Pick<QuestionNode, 'id' | 'title'>
+            & Pick<QuestionNode, 'id' | 'title' | 'type'>
           )> }
         )>, options: Array<(
           { __typename?: 'QuestionOption' }
@@ -1656,16 +1656,16 @@ export type GetDialogueInsightsQuery = (
         )> }
       )>, edges: Array<(
         { __typename?: 'Edge' }
-        & Pick<Edge, 'id'>
+        & Pick<Edge, 'id' | 'parentNodeId' | 'childNodeId'>
         & { conditions?: Maybe<Array<(
           { __typename?: 'EdgeCondition' }
           & Pick<EdgeCondition, 'id' | 'conditionType' | 'matchValue' | 'renderMin' | 'renderMax'>
         )>>, parentNode?: Maybe<(
           { __typename?: 'QuestionNode' }
-          & Pick<QuestionNode, 'id' | 'title'>
+          & Pick<QuestionNode, 'id' | 'title' | 'type'>
         )>, childNode?: Maybe<(
           { __typename?: 'QuestionNode' }
-          & Pick<QuestionNode, 'id' | 'title' | 'isRoot'>
+          & Pick<QuestionNode, 'id' | 'title' | 'type' | 'isRoot'>
         )> }
       )>, sessionConnection?: Maybe<(
         { __typename?: 'SessionConnection' }
@@ -1941,6 +1941,7 @@ export const GetDialogueInsightsDocument = gql`
         updatedAt
         isRoot
         isLeaf
+        type
         nodeEntryConnection {
           count
         }
@@ -1960,7 +1961,6 @@ export const GetDialogueInsightsDocument = gql`
             }
           }
         }
-        type
         children {
           id
           conditions {
@@ -1973,10 +1973,12 @@ export const GetDialogueInsightsDocument = gql`
           parentNode {
             id
             title
+            type
           }
           childNode {
             id
             title
+            type
           }
         }
         options {
@@ -1994,13 +1996,17 @@ export const GetDialogueInsightsDocument = gql`
           renderMin
           renderMax
         }
+        parentNodeId
         parentNode {
           id
           title
+          type
         }
+        childNodeId
         childNode {
           id
           title
+          type
           isRoot
         }
       }

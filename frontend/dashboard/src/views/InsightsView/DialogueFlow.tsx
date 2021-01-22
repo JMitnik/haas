@@ -24,19 +24,22 @@ interface DialogueFlowProps {
 
 const DialogueFlow = ({ nodes, edges }: DialogueFlowProps) => {
   const HEIGHT = '85vh';
-  const [activeEdges, setActiveEdges] = useState<string[]>([]);
+  const [pinnedEdges, setPinnedEdges] = useState<string[]>([]);
   const { setCenter } = useZoomPanHelper();
   const flowStore = useStore();
+  const [hoverEdges, setHoverEdges] = useState<string[]>([]);
+
+  const activeEdges = pinnedEdges;
 
   const processedNodes = nodes.map(node => ({
     id: node.id,
     data: { label: node.title }
   }));
 
-  const isInFocusMode = activeEdges.length > 0;
+  const isInFocusMode = pinnedEdges.length > 0;
 
   const focusOnRandomEdge = () => {
-    setActiveEdges(["ckgmgt9vo7513188godeqsj2cny", "ckgmjwe3m7588738godpr4aos25", "ckgw41bl616533828godce5wvzsv"]);
+    setPinnedEdges(["ckgmgt9vo7513188godeqsj2cny", "ckgmjwe3m7588738godpr4aos25", "ckgw41bl616533828godce5wvzsv"]);
     const { edges, nodes } = flowStore.getState();
     const firstEdge = edges.find(edge => edge.id === "ckgmgt9vo7513188godeqsj2cny");
     const parentNodeId = firstEdge?.source;
@@ -96,7 +99,10 @@ const DialogueFlow = ({ nodes, edges }: DialogueFlowProps) => {
         Debug random edge
       </UI.Button>
       <UI.Div>
-        <ReactFlowContainer isInFocusMode={isInFocusMode} style={{ height: HEIGHT, width: '100%' }}>
+        <ReactFlowContainer
+          isInFocusMode={isInFocusMode}
+          style={{ height: HEIGHT, width: '100%' }}
+        >
           <ReactFlow elements={elements}>
             <MiniMap nodeColor="#444" className="minimap" />
             <Controls />
