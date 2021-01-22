@@ -112,16 +112,7 @@ class AutodeckService {
     })
 
     const fileKey = input?.logoUrl?.split('.com/')[1]
-    const logoManipulationEvent = {
-      s3: {
-        object: {
-          key: fileKey
-        },
-        bucket: {
-          name: 'haas-autodeck-logos'
-        }
-      }
-    }
+    const logoManipulationEvent = { key: fileKey, bucket: 'haas-autodeck-logos' }
     const strLogoManipulationEvent = JSON.stringify(logoManipulationEvent, null, 2);
     const logoManipulationSNSParams = {
       Message: strLogoManipulationEvent,
