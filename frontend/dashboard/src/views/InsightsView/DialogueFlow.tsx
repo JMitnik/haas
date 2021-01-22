@@ -6,10 +6,12 @@ import ReactFlow, {
   Background
 } from "react-flow-renderer";
 import * as UI from '@haas/ui';
-
-import { Edge, QuestionNode } from 'types/generated-types';
 import dagre from 'dagre';
+
 import { DeepPartial } from 'types/customTypes';
+import { Edge, QuestionNode } from 'types/generated-types';
+
+import { ReactFlowContainer } from './DialogueFlowStyles';
 
 interface DialogueFlowProps {
   nodes: DeepPartial<QuestionNode>[];
@@ -70,12 +72,14 @@ const DialogueFlow = ({ nodes, edges }: DialogueFlowProps) => {
 
   return (
     <UI.Div style={{ borderLeft: '1px solid #e2e8f0', overflow: 'hidden' }}>
-      <UI.Div style={{ height: HEIGHT, width: '100%' }}>
-        <ReactFlow elements={elements}>
-          <MiniMap />
-          <Controls />
-          <Background color="#aaa" gap={12} />
-        </ReactFlow>
+      <UI.Div>
+        <ReactFlowContainer style={{ height: HEIGHT, width: '100%' }}>
+          <ReactFlow elements={elements}>
+            <MiniMap nodeColor="#444" className="minimap" />
+            <Controls />
+            <Background color="#aaa" gap={12} />
+          </ReactFlow>
+        </ReactFlowContainer>
       </UI.Div>
     </UI.Div>
   )

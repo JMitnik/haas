@@ -143,16 +143,16 @@ class DialogueService {
         activeNode = dialogue?.questions.find(question => question.isRoot);
       }
 
-      const activeEdges = edges?.filter(edge => edge.parentNodeId === activeNode.id);
-      const activeEdge = activeEdges?.sort(edge => dialogue?.questions[0].)
-      let child = activeEdge?.childNode;
+      // const activeEdges = edges?.filter(edge => edge.parentNodeId === activeNode.id);
+      // const activeEdge = activeEdges?.sort(edge => dialogue?.questions[0].nodeEntryConnection.count);
+      // let child = activeEdge?.childNode;
 
-      if (child) {
-        paths.push([activeNode, activeEdge, child]);
-        activeNode = child;
-      } else {
+      // if (child) {
+      //   paths.push([activeNode, activeEdge, child]);
+      //   activeNode = child;
+      // } else {
 
-      }
+      // }
 
       iteration += 1;
     }

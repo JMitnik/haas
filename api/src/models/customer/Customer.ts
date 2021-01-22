@@ -113,6 +113,7 @@ export const CustomerType = objectType({
         });
 
         const willCallNodeCounts = DialogueService.willCallCounts(info);
+        console.log({ willCallNodeCounts });
 
         if (willCallNodeCounts && dialogue) {
           const counts = await SessionService.getCountByNodes(dialogue.id);
@@ -121,20 +122,12 @@ export const CustomerType = objectType({
             questions: dialogue?.questions.map(questionNode => ({
               ...questionNode,
               nodeEntryConnection: {
-                count: counts.find(count => count['relatedNodeId'] === questionNode.id)?.count.relatedNodeId || 0
+                count: counts[questionNode.id]
               }
             }))
           };
 
-          return {
-            ...dialogue,
-            questions: dialogue?.questions.map(questionNode => ({
-              ...questionNode,
-              nodeEntryConnection: {
-                count: counts.find(count => count['relatedNodeId'] === questionNode.id)?.count.relatedNodeId
-              }
-            }))
-          }
+          return dialogueWithCounts;
         }
 
         return dialogue;
