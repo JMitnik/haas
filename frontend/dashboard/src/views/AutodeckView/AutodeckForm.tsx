@@ -1,4 +1,5 @@
 import * as yup from 'yup';
+import styled, { css } from 'styled-components';
 import { Activity, Briefcase, Clipboard, Link, Link2, Loader, Minus, Upload } from 'react-feather';
 import { useGetPreviewDataLazyQuery, useUploadJobLogoMutation, useCreateWorkspaceJobMutation, CreateWorkspaceJobMutation, Exact, GenerateAutodeckInput, CreateWorkspaceJobType, ConfirmWorkspaceJobMutation } from 'types/generated-types';
 import { Button, ButtonGroup, RadioButtonGroup, useToast } from '@chakra-ui/core';
@@ -8,22 +9,19 @@ import {
   Muted,
   RadioButton,
   RadioButtons,
+  Flex,
 } from '@haas/ui';
 import { useHistory } from 'react-router';
 import { useMutation, MutationFunctionOptions } from '@apollo/client';
 import { useTranslation } from 'react-i18next';
-import React from 'react';
+import React, { useState } from 'react';
 import cuid from 'cuid';
 import intToBool from 'utils/intToBool';
 
 import ColorPickerInput from 'components/ColorPicker';
 
 import FileDropInput from 'components/FileDropInput';
-import ServerError from 'components/ServerError';
-import useAuth from 'hooks/useAuth';
 
-
-import uploadSingleImage from '../../mutations/uploadSingleImage';
 import { DeepPartial } from 'types/customTypes';
 import { useEffect } from 'react';
 
@@ -149,7 +147,52 @@ const WebsiteScreenshotFragment = ({ form }: { form: UseFormMethods<FormDataProp
   );
 };
 
-const PrimaryColourFragment = ({ form }: { form: UseFormMethods<FormDataProps> }) => {
+const ColorEntry = styled(Flex) <{ isSelected: boolean }>`
+  cursor: pointer;
+  padding: 20px 40px;
+  border-radius: 9px;
+  align-items: center;
+  box-shadow: ${props => props.isSelected ? 'rgba(0, 0, 0, 0.20) 0px 4px 12px;' : 'none'};
+`
+
+const ColourContainer = styled(Flex) <{ isSelected: boolean }>`
+  cursor: pointer;
+  border: ${props => props.isSelected ? '1px solid' : 'none'};
+  border-radius: ${props => props.isSelected ? '9px' : 'none'};
+  padding: 10px;
+  align-items: center;
+  flex-direction: column;
+`
+
+const ColorPaletteFragment = ({ form, onChange, value, palette }:
+  { form: UseFormMethods<FormDataProps>, onChange: any, value: any, palette: Array<string> }) => {
+  const { t } = useTranslation();
+  const [currColor, setCurrColor] = useState(palette[0])
+
+  useEffect(() => {
+    setCurrColor(palette[0])
+  }, [palette])
+
+  return (
+    <Flex flexDirection="row" justifyContent="space-around">
+      {palette.map((color) => (
+        <ColourContainer
+          isSelected={color === currColor}
+          key={color}
+          onClick={() => setCurrColor(color)}>
+          <ColorEntry
+            isSelected={color === currColor}
+            backgroundColor={color}>
+          </ColorEntry>
+          <span style={{ fontWeight: color === currColor ? 500 : 'normal' }}>{color}</span>
+        </ColourContainer>
+
+      ))}
+    </Flex>
+  )
+}
+
+const PrimaryColourFragment = ({ form, isInEditing, palette }: { form: UseFormMethods<FormDataProps>, isInEditing: boolean, palette: Array<string> }) => {
   const { t } = useTranslation();
 
   return (
@@ -176,6 +219,21 @@ const PrimaryColourFragment = ({ form }: { form: UseFormMethods<FormDataProps> }
         />
 
       </FormControl>
+
+      {form.watch('useCustomColour') === 1 && isInEditing && (
+        <FormControl>
+          <FormLabel htmlFor="primaryColour">{t('branding_color')}</FormLabel>
+          <InputHelper>{t('customer:branding_color_helper')}</InputHelper>
+          <Controller
+            control={form.control}
+            name="primaryColour"
+            defaultValue="#BEE3F8"
+            render={({ onChange, value }) => (
+              <ColorPaletteFragment palette={palette} form={form} onChange={onChange} value={value} />
+            )}
+          />
+        </FormControl>
+      )}
 
       {form.watch('useCustomColour') === 0 &&
         <>
@@ -360,7 +418,7 @@ const AutodeckForm = ({
   const form = useForm<FormDataProps>({
     defaultValues: {
       useCustomUrl: 0,
-      useCustomColour: isInEditing ? 0 : 1,
+      useCustomColour: 1,
       useWebsiteUrl: isInEditing ? 0 : 1,
       name: job?.name,
     },
@@ -455,7 +513,7 @@ const AutodeckForm = ({
             </InputGrid>
             <Hr />
             <InputGrid>
-              <PrimaryColourFragment form={form} />
+              <PrimaryColourFragment palette={previewData?.getPreviewData?.colors || []} isInEditing={isInEditing} form={form} />
             </InputGrid>
           </Div>
         </FormSection>

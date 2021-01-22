@@ -40,7 +40,7 @@ const UploadPreviewContainer = styled(Div)`
     box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
     height: 100%;
     display: flex;
-    background: ${theme.colors.primaries[500]};
+    background: transparent;
     padding: ${theme.gutter / 2}px;
     
     img {
