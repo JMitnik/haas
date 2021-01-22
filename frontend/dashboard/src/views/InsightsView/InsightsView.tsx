@@ -7,6 +7,7 @@ import * as UI from '@haas/ui';
 import { useNavigator } from 'hooks/useNavigator';
 import { ReactComponent as StarIcon } from 'assets/icons/icon-star.svg';
 import { ReactComponent as UsersIcon } from 'assets/icons/icon-users.svg';
+import { ReactComponent as ExclamationIcon } from 'assets/icons/icon-exclamation-circle.svg';
 
 
 import DialogueFlow from './DialogueFlow';
@@ -31,6 +32,12 @@ const InsightsView = () => {
   );
   const sampleBestPathCount = 22;
 
+  const sampleCriticalPathIds = ["ckgmgunr87515798godj5qgrnra", "ckgmjyva67591828godn437dtyc"];
+  const sampleCriticalPathEdges = data?.customer?.dialogue?.edges.filter(
+    edge => sampleCriticalPathIds.includes(edge.id)
+  );
+  const sampleWorstPathCount = 30;
+
   return (
     <>
       <UI.ViewHeading>
@@ -40,17 +47,17 @@ const InsightsView = () => {
       </UI.ViewHeading>
       <UI.ViewContainer>
         <InsightsViewContainer gridGap={4} gridTemplateColumns={['1fr', '1fr 2fr']}>
-          <UI.Div>
+          <UI.Stack spacing={4}>
             <UI.Card noHover>
-              <UI.CardHeader color="green.500">
+              <UI.CardHeader color="blue.500">
                 <UI.Icon mr={1}><StarIcon width="1rem" /></UI.Icon>
-                <UI.Helper color="green.500">{t('most_popular_path')}</UI.Helper>
+                <UI.Helper color="blue.500">{t('most_popular_path')}</UI.Helper>
               </UI.CardHeader>
               <UI.CardBody>
                 <UI.Flex justifyContent="space-between">
                   <UI.ColumnFlex>
-                    <UI.Text color="green.400" fontWeight="600" fontSize="1.5rem">{sampleBestPathCount}</UI.Text>
-                    <UI.Label variantColor="green">
+                    <UI.Text color="blue.400" fontWeight="600" fontSize="1.5rem">{sampleBestPathCount}</UI.Text>
+                    <UI.Label variantColor="blue">
                       <UI.Icon mr={1}><UsersIcon width="1.2rem" /></UI.Icon>
                       <UI.Text>Interactions</UI.Text>
                     </UI.Label>
@@ -61,7 +68,27 @@ const InsightsView = () => {
                 </UI.Flex>
               </UI.CardBody>
             </UI.Card>
-          </UI.Div>
+            <UI.Card noHover>
+              <UI.CardHeader color="red.500">
+                <UI.Icon mr={1}><ExclamationIcon width="1rem" /></UI.Icon>
+                <UI.Helper color="red.500">{t('most_critical_path')}</UI.Helper>
+              </UI.CardHeader>
+              <UI.CardBody>
+                <UI.Flex justifyContent="space-between">
+                  <UI.ColumnFlex>
+                    <UI.Text color="red.400" fontWeight="600" fontSize="1.5rem">{sampleWorstPathCount}</UI.Text>
+                    <UI.Label variantColor="red">
+                      <UI.Icon mr={1}><UsersIcon width="1.2rem" /></UI.Icon>
+                      <UI.Text>Interactions</UI.Text>
+                    </UI.Label>
+                  </UI.ColumnFlex>
+                  <DialoguePathCrumb
+                    dialoguePath={{ edges: sampleCriticalPathEdges || [] }}
+                  />
+                </UI.Flex>
+              </UI.CardBody>
+            </UI.Card>
+          </UI.Stack>
           <ReactFlowProvider>
             <DialogueFlow
               edges={data?.customer?.dialogue?.edges || []}

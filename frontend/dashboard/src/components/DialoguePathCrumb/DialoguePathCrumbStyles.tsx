@@ -32,6 +32,7 @@ export const DialoguePathCrumbContainer = styled(UI.Div) <{ isInline?: boolean |
       border: 1px solid white;
       justify-content: center;
       border-radius: 100px !important;
+      background: ${theme.colors.gray[300]};
       width: 40px;
       
       ${isInline && css`

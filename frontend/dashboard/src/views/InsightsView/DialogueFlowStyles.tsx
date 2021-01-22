@@ -15,7 +15,7 @@ export const ReactFlowContainer = styled.div<ReactFlowContainerProps>`
         opacity: 0.4;
       }
       .react-flow__edge.animated path {
-        stroke: red;
+        stroke: ${theme.colors.blue[500]};
         stroke-width: 3px;
         opacity: 1;
       }

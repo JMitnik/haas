@@ -5,6 +5,10 @@ const language = {
       en: 'Most popular path',
       de: 'Der beliebteste Weg'
     },
+    most_critical_path: {
+      en: 'Most critical path',
+      de: 'Der kritischster Weg'
+    },
     events: {
       en: 'Events',
       de: 'Veranstaltungen'
