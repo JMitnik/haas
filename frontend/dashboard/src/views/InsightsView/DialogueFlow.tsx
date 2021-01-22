@@ -15,6 +15,7 @@ import { DeepPartial } from 'types/customTypes';
 import { Edge, QuestionNode } from 'types/generated-types';
 
 import { ReactFlowContainer } from './DialogueFlowStyles';
+import { useState } from 'react';
 
 interface DialogueFlowProps {
   nodes: DeepPartial<QuestionNode>[];
@@ -23,7 +24,8 @@ interface DialogueFlowProps {
 
 const DialogueFlow = ({ nodes, edges }: DialogueFlowProps) => {
   const HEIGHT = '85vh';
-  const { zoomIn, zoomOut, setCenter } = useZoomPanHelper();
+  const [activeEdges, setActiveEdges] = useState<string[]>([]);
+  const { setCenter } = useZoomPanHelper();
   const flowStore = useStore();
 
   const processedNodes = nodes.map(node => ({
@@ -31,9 +33,10 @@ const DialogueFlow = ({ nodes, edges }: DialogueFlowProps) => {
     data: { label: node.title }
   }));
 
-  const activeEdges = ["ckgmgt9vo7513188godeqsj2cny", "ckgmjwe3m7588738godpr4aos25", "ckgw41bl616533828godce5wvzsv"];
+  const isInFocusMode = activeEdges.length > 0;
 
   const focusOnRandomEdge = () => {
+    setActiveEdges(["ckgmgt9vo7513188godeqsj2cny", "ckgmjwe3m7588738godpr4aos25", "ckgw41bl616533828godce5wvzsv"]);
     const { edges, nodes } = flowStore.getState();
     const firstEdge = edges.find(edge => edge.id === "ckgmgt9vo7513188godeqsj2cny");
     const parentNodeId = firstEdge?.source;
@@ -93,7 +96,7 @@ const DialogueFlow = ({ nodes, edges }: DialogueFlowProps) => {
         Debug random edge
       </UI.Button>
       <UI.Div>
-        <ReactFlowContainer style={{ height: HEIGHT, width: '100%' }}>
+        <ReactFlowContainer isInFocusMode={isInFocusMode} style={{ height: HEIGHT, width: '100%' }}>
           <ReactFlow elements={elements}>
             <MiniMap nodeColor="#444" className="minimap" />
             <Controls />
