@@ -20,6 +20,7 @@ interface EdgeType {
 
 interface DialoguePathType {
   edges: EdgeType[];
+  handle?: string;
 }
 
 interface DialoguePathCrumbProps {
@@ -52,6 +53,7 @@ export const DialoguePathCrumb = ({ dialoguePath }: DialoguePathCrumbProps) => {
     <UI.Flex>
       {dialoguePath.edges.map((edge, index) => (
         <L.DialoguePathCrumbContainer
+          key={index}
           isInline
           pr={3}
           zIndex={10 - index}

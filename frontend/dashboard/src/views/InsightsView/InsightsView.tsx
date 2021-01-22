@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ReactFlowProvider } from 'react-flow-renderer';
 
@@ -8,16 +8,43 @@ import { useNavigator } from 'hooks/useNavigator';
 import { ReactComponent as StarIcon } from 'assets/icons/icon-star.svg';
 import { ReactComponent as UsersIcon } from 'assets/icons/icon-users.svg';
 import { ReactComponent as ExclamationIcon } from 'assets/icons/icon-exclamation-circle.svg';
+import { QuestionNodeTypeEnum, useGetDialogueInsightsQuery } from 'types/generated-types';
 
 
 import DialogueFlow from './DialogueFlow';
 import { InsightsViewContainer } from './InsightsViewStyles';
-import { useGetDialogueInsightsQuery } from 'types/generated-types';
 import { DialoguePathCrumb } from 'components/DialoguePathCrumb';
+
+
+export enum DialoguePathHandle {
+  CRITICAL = 'critical',
+  POPULAR = 'popular'
+}
+
+
+// TODO: Resolve with DialoguePathCrumb types
+interface NodeType {
+  type: QuestionNodeTypeEnum;
+}
+
+interface EdgeType {
+  parentNodeId?: string | null;
+  childNodeId?: string | null;
+  parentNode?: NodeType | null;
+  childNode?: NodeType | null;
+}
+
+export interface DialoguePathType {
+  edges: string[];
+  handle: DialoguePathHandle;
+}
+
 
 const InsightsView = () => {
   const { t } = useTranslation();
   const { dialogueSlug, customerSlug } = useNavigator();
+  const [pinnedPath, setPinnedPath] = useState<DialoguePathType | null>(null);
+  const [hoverPath, setHoverPath] = useState<DialoguePathType | null>(null);
 
   const { data } = useGetDialogueInsightsQuery({
     variables: {
@@ -38,6 +65,7 @@ const InsightsView = () => {
   );
   const sampleWorstPathCount = 30;
 
+
   return (
     <>
       <UI.ViewHeading>
@@ -48,7 +76,10 @@ const InsightsView = () => {
       <UI.ViewContainer>
         <InsightsViewContainer gridGap={4} gridTemplateColumns={['1fr', '1fr 2fr']}>
           <UI.Stack spacing={4}>
-            <UI.Card noHover>
+            <UI.Card onClick={() => setPinnedPath({
+              edges: sampleBestPathIds,
+              handle: DialoguePathHandle.POPULAR
+            })}>
               <UI.CardHeader color="blue.500">
                 <UI.Icon mr={1}><StarIcon width="1rem" /></UI.Icon>
                 <UI.Helper color="blue.500">{t('most_popular_path')}</UI.Helper>
@@ -68,7 +99,11 @@ const InsightsView = () => {
                 </UI.Flex>
               </UI.CardBody>
             </UI.Card>
-            <UI.Card noHover>
+            <UI.Card onClick={() => setPinnedPath({
+              edges: sampleCriticalPathIds,
+              handle: DialoguePathHandle.CRITICAL
+            })
+            }>
               <UI.CardHeader color="red.500">
                 <UI.Icon mr={1}><ExclamationIcon width="1rem" /></UI.Icon>
                 <UI.Helper color="red.500">{t('most_critical_path')}</UI.Helper>
@@ -91,6 +126,8 @@ const InsightsView = () => {
           </UI.Stack>
           <ReactFlowProvider>
             <DialogueFlow
+              pinnedPath={pinnedPath}
+              hoverPath={hoverPath}
               edges={data?.customer?.dialogue?.edges || []}
               nodes={data?.customer?.dialogue?.questions || []}
             />

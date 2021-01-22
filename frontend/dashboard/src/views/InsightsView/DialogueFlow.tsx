@@ -12,34 +12,35 @@ import * as UI from '@haas/ui';
 import dagre from 'dagre';
 
 import { DeepPartial } from 'types/customTypes';
-import { Edge, QuestionNode } from 'types/generated-types';
+import { Edge, QuestionNode, QuestionNodeTypeEnum } from 'types/generated-types';
 
 import { ReactFlowContainer } from './DialogueFlowStyles';
 import { useState } from 'react';
+import { useEffect } from 'react';
+import { DialoguePathHandle, DialoguePathType } from './InsightsView';
 
 interface DialogueFlowProps {
   nodes: DeepPartial<QuestionNode>[];
   edges: DeepPartial<Edge>[];
+  pinnedPath?: DialoguePathType | null;
+  hoverPath?: DialoguePathType | null;
 }
 
-const DialogueFlow = ({ nodes, edges }: DialogueFlowProps) => {
+const DialogueFlow = ({ nodes, edges, pinnedPath, hoverPath }: DialogueFlowProps) => {
   const HEIGHT = '85vh';
-  const [pinnedEdges, setPinnedEdges] = useState<string[]>([]);
   const { setCenter } = useZoomPanHelper();
   const flowStore = useStore();
-  const [hoverEdges, setHoverEdges] = useState<string[]>([]);
 
-  const activeEdges = pinnedEdges;
+  const activeEdges = pinnedPath?.edges;
 
   const processedNodes = nodes.map(node => ({
     id: node.id,
     data: { label: node.title }
   }));
 
-  const isInFocusMode = pinnedEdges.length > 0;
+  const isInFocusMode = (pinnedPath?.edges || []).length > 0;
 
   const focusOnRandomEdge = () => {
-    setPinnedEdges(["ckgmgt9vo7513188godeqsj2cny", "ckgmjwe3m7588738godpr4aos25", "ckgw41bl616533828godce5wvzsv"]);
     const { edges, nodes } = flowStore.getState();
     const firstEdge = edges.find(edge => edge.id === "ckgmgt9vo7513188godeqsj2cny");
     const parentNodeId = firstEdge?.source;
@@ -51,14 +52,26 @@ const DialogueFlow = ({ nodes, edges }: DialogueFlowProps) => {
     setCenter(xZoom, yZoom, zoomLevel);
   }
 
-  const processedEdges = edges.map(edge => ({
-    id: edge.id,
-    source: edge.parentNode?.id,
-    target: edge.childNode?.id,
-    label: edge.conditions?.[0]?.matchValue || '',
-    type: "HAAS_NODE",
-    animated: activeEdges.includes(edge.id || '')
-  }));
+  useEffect(() => {
+    if (pinnedPath) {
+      focusOnRandomEdge();
+    }
+  }, [pinnedPath, focusOnRandomEdge]);
+
+  const processedEdges = edges.map(edge => {
+    const isActive = activeEdges?.includes(edge?.id || '');
+    return {
+      id: edge.id,
+      source: edge.parentNode?.id,
+      target: edge.childNode?.id,
+      label: edge.conditions?.[0]?.matchValue || '',
+      className: isActive ? (
+        pinnedPath?.handle === DialoguePathHandle.POPULAR ? 'popular' : 'critical')
+        : ''
+      ,
+      animated: activeEdges?.includes(edge?.id || '')
+    }
+  });
 
   const dagreGraph = new dagre.graphlib.Graph();
   dagreGraph.setDefaultEdgeLabel(() => ({}));
