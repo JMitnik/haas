@@ -108,9 +108,6 @@ const DialogueFlow = ({ nodes, edges, pinnedPath, hoverPath }: DialogueFlowProps
 
   return (
     <UI.Div style={{ borderLeft: '1px solid #e2e8f0', overflow: 'hidden' }}>
-      <UI.Button onClick={() => focusOnRandomEdge()}>
-        Debug random edge
-      </UI.Button>
       <UI.Div>
         <ReactFlowContainer
           isInFocusMode={isInFocusMode}

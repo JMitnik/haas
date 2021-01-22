@@ -53,11 +53,11 @@ const InsightsView = () => {
     }
   });
 
-  const sampleBestPathIds = ["ckgmgt9vo7513188godeqsj2cny", "ckgmjwe3m7588738godpr4aos25", "ckgw41bl616533828godce5wvzsv"];
+  const sampleBestPathIds = ["ckgmgrwys7511308godcb2m3s78", "ckgmilu7u7562668god0jf4so9t", "ckgo11r4u7711398godh366m1kn"];
   const sampleBestPathEdges = data?.customer?.dialogue?.edges.filter(
     edge => sampleBestPathIds.includes(edge.id)
   );
-  const sampleBestPathCount = 22;
+  const sampleBestPathCount = 111;
 
   const sampleCriticalPathIds = ["ckgmgunr87515798godj5qgrnra", "ckgmjyva67591828godn437dtyc"];
   const sampleCriticalPathEdges = data?.customer?.dialogue?.edges.filter(
