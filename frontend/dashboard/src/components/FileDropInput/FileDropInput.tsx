@@ -44,8 +44,8 @@ const UploadPreviewContainer = styled(Div)`
     padding: ${theme.gutter / 2}px;
     
     img {
-      max-width: 150px;
-      max-height: 150px;
+      max-width: 800px;
+      max-height: 400px;
       border-radius: 10px;
       height: 100%;
       width: 100%;

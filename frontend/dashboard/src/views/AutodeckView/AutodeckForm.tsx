@@ -1,6 +1,6 @@
 import * as yup from 'yup';
 import { Activity, Briefcase, Clipboard, Link, Link2, Loader, Minus, Upload } from 'react-feather';
-import { useUploadJobLogoMutation, useCreateWorkspaceJobMutation, CreateWorkspaceJobMutation, Exact, GenerateAutodeckInput, CreateWorkspaceJobType, ConfirmWorkspaceJobMutation } from 'types/generated-types';
+import { useGetPreviewDataLazyQuery, useUploadJobLogoMutation, useCreateWorkspaceJobMutation, CreateWorkspaceJobMutation, Exact, GenerateAutodeckInput, CreateWorkspaceJobType, ConfirmWorkspaceJobMutation } from 'types/generated-types';
 import { Button, ButtonGroup, RadioButtonGroup, useToast } from '@chakra-ui/core';
 import { Controller, UseFormMethods, useForm } from 'react-hook-form';
 import {
@@ -25,6 +25,7 @@ import useAuth from 'hooks/useAuth';
 
 import uploadSingleImage from '../../mutations/uploadSingleImage';
 import { DeepPartial } from 'types/customTypes';
+import { useEffect } from 'react';
 
 // interface FormDataProps {
 //   name: string;
@@ -72,6 +73,12 @@ const CustomerUploadLogoInput = ({ onChange, value, jobId }: any) => {
     const [file] = files;
     uploadFile({ variables: { file, jobId } });
   };
+
+  useEffect(() => {
+    if (value) {
+      onChange(value)
+    }
+  }, [value])
 
   return (
     <>
@@ -129,7 +136,7 @@ const WebsiteScreenshotFragment = ({ form }: { form: UseFormMethods<FormDataProp
 
               <Controller
                 control={form.control}
-                name="uploadLogo"
+                name="uploadWebsite"
                 defaultValue=""
                 render={({ onChange, value }) => (
                   <CustomerUploadLogoInput value={value} onChange={onChange} />
@@ -155,7 +162,6 @@ const PrimaryColourFragment = ({ form }: { form: UseFormMethods<FormDataProps> }
           control={form.control}
           key={'customer_color_controller'}
           name="useCustomColour"
-          defaultValue={1}
           render={({ onChange, onBlur, value }) => (
             <RadioButtons
               value={value}
@@ -189,7 +195,7 @@ const PrimaryColourFragment = ({ form }: { form: UseFormMethods<FormDataProps> }
   );
 };
 
-const CustomerLogoFormFragment = ({ form, jobId }: { form: UseFormMethods<FormDataProps>, jobId: string }) => {
+const CustomerLogoFormFragment = ({ form, jobId, previewLogo }: { form: UseFormMethods<FormDataProps>, jobId: string, previewLogo: string }) => {
   const { t } = useTranslation();
 
   return (
@@ -238,7 +244,7 @@ const CustomerLogoFormFragment = ({ form, jobId }: { form: UseFormMethods<FormDa
               <Controller
                 control={form.control}
                 name="uploadLogo"
-                defaultValue=""
+                defaultValue={previewLogo || ""}
                 render={({ onChange, value }) => (
                   <CustomerUploadLogoInput jobId={jobId} value={value} onChange={onChange} />
                 )}
@@ -349,11 +355,13 @@ const AutodeckForm = ({
   const { t } = useTranslation();
   const jobId = cuid()
 
+  const [fetchPreviewData, { data: previewData, loading: previewLoading }] = useGetPreviewDataLazyQuery()
+
   const form = useForm<FormDataProps>({
     defaultValues: {
       useCustomUrl: 0,
-      useCustomColour: 1,
-      useWebsiteUrl: 1,
+      useCustomColour: isInEditing ? 0 : 1,
+      useWebsiteUrl: isInEditing ? 0 : 1,
       name: job?.name,
     },
     mode: 'all'
@@ -387,71 +395,86 @@ const AutodeckForm = ({
     })
   }
 
+  useEffect(() => {
+    const jobId = job?.id;
+    if (!jobId) return;
+    fetchPreviewData({
+      variables: {
+        id: jobId,
+      }
+    });
+  }, [job])
+
+  useEffect(() => {
+    if (!previewData) return;
+    form.setValue('uploadLogo', previewData?.getPreviewData?.rembgLogoUrl);
+    form.setValue('uploadWebsite', previewData?.getPreviewData?.websiteScreenshotUrl);
+    form.setValue('primaryColour', previewData?.getPreviewData?.colors[0])
+  }, [previewData])
+
   console.log('activeJob:', job?.id)
 
   return (
     <Form onSubmit={form.handleSubmit(onFormSubmit)}>
-      {!isInEditing && (
-        <>
-          <FormSection id="about">
-            <Div>
-              <H3 color="default.text" fontWeight={500} pb={2}>{t('general')}</H3>
-              <Muted color="gray.600">
-                {t('customer:about_helper')}
-              </Muted>
-            </Div>
-            <Div py={4}>
-              <InputGrid>
-                <FormControl isInvalid={!!form.errors.name} isRequired>
-                  <FormLabel htmlFor="name">{t('job_name')}</FormLabel>
-                  <InputHelper>{t('job_name_helper')}</InputHelper>
-                  <Input
-                    placeholder="Peach inc."
-                    leftEl={<Briefcase />}
-                    name="name"
-                    ref={form.register()}
-                  />
-                </FormControl>
-              </InputGrid>
-            </Div>
-          </FormSection>
+      <>
+        <FormSection id="about">
+          <Div>
+            <H3 color="default.text" fontWeight={500} pb={2}>{t('general')}</H3>
+            <Muted color="gray.600">
+              {t('customer:about_helper')}
+            </Muted>
+          </Div>
+          <Div py={4}>
+            <InputGrid>
+              <FormControl isInvalid={!!form.errors.name} isRequired>
+                <FormLabel htmlFor="name">{t('job_name')}</FormLabel>
+                <InputHelper>{t('job_name_helper')}</InputHelper>
+                <Input
+                  placeholder="Peach inc."
+                  leftEl={<Briefcase />}
+                  name="name"
+                  ref={form.register()}
+                />
+              </FormControl>
+            </InputGrid>
+          </Div>
+        </FormSection>
 
-          <Hr />
+        <Hr />
 
-          <FormSection id="logomanipulation">
-            <Div>
-              <H3 color="default.text" fontWeight={500} pb={2}>{t('logo_manipulation')}</H3>
-              <Muted color="gray.600">
-                {t('logo_manipulation_helper')}
-              </Muted>
-            </Div>
-            <Div>
-              <InputGrid>
-                <CustomerLogoFormFragment jobId={jobId} form={form} />
-              </InputGrid>
-              <Hr />
-              <InputGrid>
-                <PrimaryColourFragment form={form} />
-              </InputGrid>
-            </Div>
-          </FormSection>
+        <FormSection id="logomanipulation">
+          <Div>
+            <H3 color="default.text" fontWeight={500} pb={2}>{t('logo_manipulation')}</H3>
+            <Muted color="gray.600">
+              {t('logo_manipulation_helper')}
+            </Muted>
+          </Div>
+          <Div>
+            <InputGrid>
+              <CustomerLogoFormFragment previewLogo={previewData?.getPreviewData?.rembgLogoUrl || ''} jobId={jobId} form={form} />
+            </InputGrid>
+            <Hr />
+            <InputGrid>
+              <PrimaryColourFragment form={form} />
+            </InputGrid>
+          </Div>
+        </FormSection>
 
-          <Hr />
-          <FormSection id="website">
-            <Div>
-              <H3 color="default.text" fontWeight={500} pb={2}>{t('website_screenshot')}</H3>
-              <Muted color="gray.600">
-                {t('website_screenshot_helper')}
-              </Muted>
-            </Div>
-            <Div>
-              <InputGrid>
-                <WebsiteScreenshotFragment form={form} />
-              </InputGrid>
-            </Div>
-          </FormSection>
-        </>
-      )}
+        <Hr />
+        <FormSection id="website">
+          <Div>
+            <H3 color="default.text" fontWeight={500} pb={2}>{t('website_screenshot')}</H3>
+            <Muted color="gray.600">
+              {t('website_screenshot_helper')}
+            </Muted>
+          </Div>
+          <Div>
+            <InputGrid>
+              <WebsiteScreenshotFragment form={form} />
+            </InputGrid>
+          </Div>
+        </FormSection>
+      </>
 
       {isInEditing &&
         <FormSection id="dialogue">

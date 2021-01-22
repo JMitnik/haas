@@ -716,6 +716,12 @@ type PermssionType {
   name: String!
 }
 
+type PreviewDataType {
+  colors: [String!]!
+  rembgLogoUrl: String!
+  websiteScreenshotUrl: String!
+}
+
 type Query {
   customer(id: ID, slug: String): Customer
   customers: [Customer!]!
@@ -725,6 +731,7 @@ type Query {
   edge(id: String): Edge
   getAutodeckJobs(filter: PaginationWhereInput): AutodeckConnectionType!
   getJob(id: String): CreateWorkspaceJobType
+  getPreviewData(id: String): PreviewDataType
   lineChartData(dialogueId: String, limit: Int, numberOfDaysBack: Int, offset: Int): [lineChartDataType!]!
   me: UserType!
   questionNode(where: QuestionNodeWhereUniqueInput): QuestionNode

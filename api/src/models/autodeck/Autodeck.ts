@@ -21,6 +21,15 @@ export const JobStatusType = enumType({
     'PRE_PROCESSING_WEBSITE_SCREENSHOT', 'PHOTOSHOP_PROCESSING', 'COMPLETED', 'FAILED', 'READY_FOR_PROCESSING'],
 });
 
+export const PreviewDataType = objectType({
+  name: 'PreviewDataType',
+  definition(t){
+    t.list.string('colors');
+    t.string('rembgLogoUrl');
+    t.string('websiteScreenshotUrl');
+  }
+})
+
 export const CreateWorkspaceJobType = objectType({
   name: 'CreateWorkspaceJobType',
   definition(t) {
@@ -71,6 +80,18 @@ export const GenerateAutodeckInput = inputObjectType({
     t.string('answer4', { required: false });
   },
 });
+
+export const GetPreviewDataQuery = queryField('getPreviewData', {
+  type: PreviewDataType,
+  nullable: true,
+  args: { id: 'String' },
+  async resolve(parent, args) {
+    if (!args.id) return null;
+
+    const previewData = await AutodeckService.getPreviewData(args.id);
+    return previewData as any;
+  }
+})
 
 export const GenerateAutodeckMutation = mutationField('generateAutodeck', {
   type: CreateWorkspaceJobType,

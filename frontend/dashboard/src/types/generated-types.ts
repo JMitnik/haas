@@ -1037,8 +1037,16 @@ export type PermssionType = {
   customer?: Maybe<Customer>;
 };
 
+export type PreviewDataType = {
+  __typename?: 'PreviewDataType';
+  colors: Array<Scalars['String']>;
+  rembgLogoUrl: Scalars['String'];
+  websiteScreenshotUrl: Scalars['String'];
+};
+
 export type Query = {
   __typename?: 'Query';
+  getPreviewData?: Maybe<PreviewDataType>;
   getJob?: Maybe<CreateWorkspaceJobType>;
   getAutodeckJobs: AutodeckConnectionType;
   tags: Array<Tag>;
@@ -1063,6 +1071,11 @@ export type Query = {
   questionNode?: Maybe<QuestionNode>;
   questionNodes: Array<QuestionNode>;
   edge?: Maybe<Edge>;
+};
+
+
+export type QueryGetPreviewDataArgs = {
+  id?: Maybe<Scalars['String']>;
 };
 
 
@@ -1643,6 +1656,19 @@ export type UploadJobLogoMutation = (
   )> }
 );
 
+export type GetPreviewDataQueryVariables = Exact<{
+  id?: Maybe<Scalars['String']>;
+}>;
+
+
+export type GetPreviewDataQuery = (
+  { __typename?: 'Query' }
+  & { getPreviewData?: Maybe<(
+    { __typename?: 'PreviewDataType' }
+    & Pick<PreviewDataType, 'colors' | 'rembgLogoUrl' | 'websiteScreenshotUrl'>
+  )> }
+);
+
 export type CreateBatchDeliveriesMutationVariables = Exact<{
   input?: Maybe<CreateBatchDeliveriesInputType>;
 }>;
@@ -1912,6 +1938,44 @@ export function useUploadJobLogoMutation(baseOptions?: Apollo.MutationHookOption
 export type UploadJobLogoMutationHookResult = ReturnType<typeof useUploadJobLogoMutation>;
 export type UploadJobLogoMutationResult = Apollo.MutationResult<UploadJobLogoMutation>;
 export type UploadJobLogoMutationOptions = Apollo.BaseMutationOptions<UploadJobLogoMutation, UploadJobLogoMutationVariables>;
+export const GetPreviewDataDocument = gql`
+    query getPreviewData($id: String) {
+  getPreviewData(id: $id) {
+    colors
+    rembgLogoUrl
+    websiteScreenshotUrl
+  }
+}
+    `;
+
+/**
+ * __useGetPreviewDataQuery__
+ *
+ * To run a query within a React component, call `useGetPreviewDataQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetPreviewDataQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetPreviewDataQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useGetPreviewDataQuery(baseOptions?: Apollo.QueryHookOptions<GetPreviewDataQuery, GetPreviewDataQueryVariables>) {
+        return Apollo.useQuery<GetPreviewDataQuery, GetPreviewDataQueryVariables>(GetPreviewDataDocument, baseOptions);
+      }
+export function useGetPreviewDataLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetPreviewDataQuery, GetPreviewDataQueryVariables>) {
+          return Apollo.useLazyQuery<GetPreviewDataQuery, GetPreviewDataQueryVariables>(GetPreviewDataDocument, baseOptions);
+        }
+export type GetPreviewDataQueryHookResult = ReturnType<typeof useGetPreviewDataQuery>;
+export type GetPreviewDataLazyQueryHookResult = ReturnType<typeof useGetPreviewDataLazyQuery>;
+export type GetPreviewDataQueryResult = Apollo.QueryResult<GetPreviewDataQuery, GetPreviewDataQueryVariables>;
+export function refetchGetPreviewDataQuery(variables?: GetPreviewDataQueryVariables) {
+      return { query: GetPreviewDataDocument, variables: variables }
+    }
 export const CreateBatchDeliveriesDocument = gql`
     mutation CreateBatchDeliveries($input: CreateBatchDeliveriesInputType) {
   createBatchDeliveries(input: $input) {

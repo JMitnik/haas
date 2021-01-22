@@ -11847,12 +11847,7 @@ from2@^2.1.0:
     inherits "^2.0.1"
     readable-stream "^2.0.0"
 
-fs-capacitor@^2.0.4:
-  version "2.0.4"
-  resolved "https://registry.yarnpkg.com/fs-capacitor/-/fs-capacitor-2.0.4.tgz#5a22e72d40ae5078b4fe64fe4d08c0d3fc88ad3c"
-  integrity sha512-8S4f4WsCryNw2mJJchi46YgB6CR5Ze+4L1h8ewl9tEpL4SJ3ZO+c/bS4BWhB8bK+O3TMqhuZarTitd0S0eh2pA==
-
-fs-capacitor@^6.1.0:
+fs-capacitor@^2.0.4, fs-capacitor@^6.1.0, fs-capacitor@^6.2.0:
   version "6.2.0"
   resolved "https://registry.yarnpkg.com/fs-capacitor/-/fs-capacitor-6.2.0.tgz#fa79ac6576629163cb84561995602d8999afb7f5"
   integrity sha512-nKcE1UduoSKX27NSZlg879LdQc94OtbOsEmKMN2MBNudXREvijRKx2GEBsTMTfws+BrbkJoEuynbGSVRSpauvw==
@@ -21014,6 +21009,11 @@ requires-port@^1.0.0:
   resolved "https://registry.yarnpkg.com/requires-port/-/requires-port-1.0.0.tgz#925d2601d39ac485e091cf0da5c6e694dc3dcaff"
   integrity sha1-kl0mAdOaxIXgkc8NpcbmlNw9yv8=
 
+rereadable-stream@^1.4.4:
+  version "1.4.5"
+  resolved "https://registry.yarnpkg.com/rereadable-stream/-/rereadable-stream-1.4.5.tgz#aed1f880597fcd20d695b93141256d9bb0b7119a"
+  integrity sha512-hgVjbKq65Ynx4FAYTZaNjy0Oy9z+VPEmSYE1087k+P0dGbKUK+ZtFmIoMHXZ7TdjnR8u5y8/ecaDVbpypD6X1w==
+
 resize-observer-polyfill@^1.5.0, resize-observer-polyfill@^1.5.1:
   version "1.5.1"
   resolved "https://registry.yarnpkg.com/resize-observer-polyfill/-/resize-observer-polyfill-1.5.1.tgz#0e9020dd3d21024458d4ebd27e23e40269810464"
@@ -21385,6 +21385,20 @@ scmp@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/scmp/-/scmp-2.1.0.tgz#37b8e197c425bdeb570ab91cc356b311a11f9c9a"
   integrity sha512-o/mRQGk9Rcer/jEEw/yw4mwo3EU/NvYvp577/Btqrym9Qy5/MdWGBqipbALgd2lrdWTJ5/gqDusxfnQBxOxT2Q==
+
+scramjet-core@^4.31.8:
+  version "4.31.9"
+  resolved "https://registry.yarnpkg.com/scramjet-core/-/scramjet-core-4.31.9.tgz#f6c60461601806ab3c463b79a4da5bde1cd5149e"
+  integrity sha512-Ys7YAK5UfA4L1+sOxAZbu1ZQFU+qSktmZIUjzxV8jYl9b98J3w7MH7deSG8+DYxn2fOlhNsrRr+XSqsxKxST3g==
+
+scramjet@^4.35.10:
+  version "4.35.10"
+  resolved "https://registry.yarnpkg.com/scramjet/-/scramjet-4.35.10.tgz#076d18e4b51f87f4374c9c103667f42b126f7f4b"
+  integrity sha512-Nwp05XAFQswU8T/2zvv5aC4YaqTX7KARwB2ZOz+atZqEw1B94PryFcGMGfLj/asXcwbEloYTUp7F05agyNuzUA==
+  dependencies:
+    papaparse "^5.3.0"
+    rereadable-stream "^1.4.4"
+    scramjet-core "^4.31.8"
 
 scroll-into-view-if-needed@^2.2.25:
   version "2.2.26"

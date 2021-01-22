@@ -1,8 +1,10 @@
 import * as AWS from 'aws-sdk';
 import * as fs from 'fs';
 import * as papaparse from 'papaparse';
+import { StringStream } from 'scramjet';
 import archiver from 'archiver';
 import fetch from 'node-fetch';
+import request from 'request';
 
 import config from '../../config/config';
 import prisma from '../../config/prisma';
@@ -148,6 +150,40 @@ class AutodeckService {
     });
 
     return workspaceJob;
+  }
+
+  static getPreviewData = async (id: String) => {
+    // Download colour CSV from S3
+    const S3_BUCKET_PREFIX = `https://haas-autodeck-logos.s3.eu-central-1.amazonaws.com/${id}`;
+    const rembgLogoUrl = `${S3_BUCKET_PREFIX}/rembg_logo.png`;
+    const websiteScreenshotUrl = `${S3_BUCKET_PREFIX}/website_screenshot.png`;
+    const csvUrl = `${S3_BUCKET_PREFIX}/dominant_colours.csv`;
+
+    const dominantColorsCSV = await request(csvUrl)
+    .pipe(new StringStream())                       // pass to stream
+    .CSVParse()
+    .toArray()
+    const colorPalette = dominantColorsCSV[1];
+    const result : { colors: Array<string>, rembgLogoUrl: string, websiteScreenshotUrl: string } 
+    = { colors: colorPalette, rembgLogoUrl, websiteScreenshotUrl };
+    return result;
+  }
+
+  static downloadFileFromS3 = async (bucket: string, fileKey: string, filePath: string) => {
+    'use strict';
+    return new Promise(function (resolve, reject) {
+      const file = fs.createWriteStream(filePath),
+        stream = s3.getObject({
+          Bucket: bucket,
+          Key: fileKey
+        }).createReadStream();
+      stream.on('error', reject);
+      file.on('error', reject);
+      file.on('finish', function () {
+        resolve(filePath);
+      });
+      stream.pipe(file);
+    });
   }
 
   static createJob = async (input: InputProps) => {
