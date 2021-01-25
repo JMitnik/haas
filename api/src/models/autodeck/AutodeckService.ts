@@ -17,6 +17,8 @@ type ScreenshotProps = {
   websiteUrl: string;
   bucket: string;
   jobId: string;
+  requiresRembg: boolean | null | undefined;
+  requiresScreenshot: boolean | null | undefined;
 };
 
 const s3 = new AWS.S3({ accessKeyId: config.awsAccessKeyId, secretAccessKey: config.awsSecretAccessKey, region: 'eu-central-1' });
@@ -48,6 +50,8 @@ export interface CreateWorkspaceJobProps {
   answer3?: string | null;
   answer4?: string | null;
   firstName?: string | null;
+  requiresRembg?: boolean | null;
+  requiresWebsiteScreenshot?: boolean | null;
 }
 
 class AutodeckService {
@@ -88,7 +92,7 @@ class AutodeckService {
 
   static confirmWorkspaceJob = async (input: CreateWorkspaceJobProps) => {
     // TODO: CSV logic as per AutodeckService.createJob()
-    
+
     const updatedWorkspaceJob = await prisma.createWorkspaceJob.update({
       where: {
         id: input.id || '',
@@ -108,37 +112,50 @@ class AutodeckService {
         name: input.name,
         status: 'PRE_PROCESSING',
         referenceType: 'AWS',
+        requiresRembg: input.requiresRembg || true,
+        requiresScreenshot: input.requiresWebsiteScreenshot || true,
       }
     })
 
-    const fileKey = input?.logoUrl?.split('.com/')[1]
-    const logoManipulationEvent = { key: fileKey, bucket: 'haas-autodeck-logos' }
-    const strLogoManipulationEvent = JSON.stringify(logoManipulationEvent, null, 2);
-    const logoManipulationSNSParams = {
-      Message: strLogoManipulationEvent,
-      TopicArn: "arn:aws:sns:eu-central-1:118627563984:SalesDeckProcessingChannel"
-    }
-    sns.publish(logoManipulationSNSParams, (err, data) => {
-      if (err) console.log('ERROR: ', err);
+    if (input.requiresRembg) {
+      const fileKey = input?.logoUrl?.split('.com/')[1]
+      const logoManipulationEvent = { 
+        key: fileKey, 
+        bucket: 'haas-autodeck-logos', 
+        requiresRembg: input.requiresRembg,
+        requiresScreenshot: input.requiresWebsiteScreenshot
+      }
+      const strLogoManipulationEvent = JSON.stringify(logoManipulationEvent, null, 2);
+      const logoManipulationSNSParams = {
+        Message: strLogoManipulationEvent,
+        TopicArn: "arn:aws:sns:eu-central-1:118627563984:SalesDeckProcessingChannel"
+      }
+      sns.publish(logoManipulationSNSParams, (err, data) => {
+        if (err) console.log('ERROR: ', err);
 
-      console.log('Logo manipulation publish response: ', data);
-    });
-   
-    const screenshotEvent: ScreenshotProps = {
-      websiteUrl: input.websiteUrl || '',
-      bucket: 'haas-autodeck-logos',
-      jobId: input.id || ''
+        console.log('Logo manipulation publish response: ', data);
+      });
     }
-    const strScreenshotEvent = JSON.stringify(screenshotEvent, null, 2);
-    const screenshotSNSParams = {
-      Message: strScreenshotEvent,
-      TopicArn: "arn:aws:sns:eu-central-1:118627563984:WebsiteScreenshotChannel"
-    };
-    sns.publish(screenshotSNSParams, (err, data) => {
-      if (err) console.log('ERROR: ', err);
 
-      console.log('Website screenshot publish response: ', data);
-    });
+    if (input.requiresWebsiteScreenshot) {
+      const screenshotEvent: ScreenshotProps = {
+        websiteUrl: input.websiteUrl || '',
+        bucket: 'haas-autodeck-logos',
+        jobId: input.id || '',
+        requiresRembg: input.requiresRembg,
+        requiresScreenshot: input.requiresWebsiteScreenshot
+      }
+      const strScreenshotEvent = JSON.stringify(screenshotEvent, null, 2);
+      const screenshotSNSParams = {
+        Message: strScreenshotEvent,
+        TopicArn: "arn:aws:sns:eu-central-1:118627563984:WebsiteScreenshotChannel"
+      };
+      sns.publish(screenshotSNSParams, (err, data) => {
+        if (err) console.log('ERROR: ', err);
+
+        console.log('Website screenshot publish response: ', data);
+      });
+    }
 
     return workspaceJob;
   }
@@ -151,12 +168,12 @@ class AutodeckService {
     const csvUrl = `${S3_BUCKET_PREFIX}/dominant_colours.csv`;
 
     const dominantColorsCSV = await request(csvUrl)
-    .pipe(new StringStream())                       // pass to stream
-    .CSVParse()
-    .toArray()
+      .pipe(new StringStream())                       // pass to stream
+      .CSVParse()
+      .toArray()
     const colorPalette = dominantColorsCSV[1];
-    const result : { colors: Array<string>, rembgLogoUrl: string, websiteScreenshotUrl: string } 
-    = { colors: colorPalette, rembgLogoUrl, websiteScreenshotUrl };
+    const result: { colors: Array<string>, rembgLogoUrl: string, websiteScreenshotUrl: string }
+      = { colors: colorPalette, rembgLogoUrl, websiteScreenshotUrl };
     return result;
   }
 

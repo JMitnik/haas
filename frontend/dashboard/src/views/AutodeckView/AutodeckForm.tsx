@@ -1,6 +1,6 @@
 import * as yup from 'yup';
 import styled, { css } from 'styled-components';
-import { Activity, Briefcase, Clipboard, Link, Link2, Loader, Minus, Upload } from 'react-feather';
+import { Activity, Briefcase, Clipboard, Link, Link2, Loader, Minus, Upload, ThumbsDown, ThumbsUp, Play, Pause } from 'react-feather';
 import { useGetPreviewDataLazyQuery, useUploadJobLogoMutation, useCreateWorkspaceJobMutation, CreateWorkspaceJobMutation, Exact, GenerateAutodeckInput, CreateWorkspaceJobType, ConfirmWorkspaceJobMutation } from 'types/generated-types';
 import { Button, ButtonGroup, RadioButtonGroup, useToast } from '@chakra-ui/core';
 import { Controller, UseFormMethods, useForm } from 'react-hook-form';
@@ -51,7 +51,7 @@ const CustomerUploadLogoInput = ({ onChange, value, jobId }: any) => {
         position: 'bottom-right',
         isClosable: true,
       });
-
+      console.log('upload image url: ', result.uploadJobImage?.url);
       onChange(result.uploadJobImage?.url);
     },
     onError: () => {
@@ -310,6 +310,28 @@ const CustomerLogoFormFragment = ({ form, jobId, previewLogo }: { form: UseFormM
             </FormControl>
           </>
         )}
+
+      <FormControl>
+        <FormLabel>{t('logo')}</FormLabel>
+        <InputHelper>{t('customer:logo_helper')}</InputHelper>
+
+        <Controller
+          control={form.control}
+          name="useRembg"
+          render={({ onChange, value }) => (
+            <RadioButtonGroup
+              value={value}
+              isInline
+              onChange={onChange}
+              display="flex"
+            >
+              <RadioButton icon={Play} value={1} text={t('autodeck:use_rembg')} description={t('autodeck:use_rembg_helper')} />
+              <RadioButton icon={Pause} value={0} text={t('autodeck:original_image')} description={t('autodeck:original_image_helper')} />
+            </RadioButtonGroup>
+          )}
+        />
+
+      </FormControl>
     </>
   );
 };
@@ -373,6 +395,7 @@ const schema = yup.object().shape({
   primaryColour: yup.string().required().matches(/^(#(\d|\D){6}$){1}/, {
     message: 'Provided colour is not a valid hexadecimal',
   }),
+  useRembg: yup.number(),
   useCustomUrl: yup.number(),
   useCustomColour: yup.number(),
   useWebsiteUrl: yup.number(),
@@ -411,7 +434,7 @@ const AutodeckForm = ({
 }: AutodeckFormProps) => {
   const history = useHistory();
   const { t } = useTranslation();
-  const jobId = cuid()
+  const [activeJobId, setActiveJobId] = useState(cuid());
 
   const [fetchPreviewData, { data: previewData, loading: previewLoading }] = useGetPreviewDataLazyQuery()
 
@@ -427,30 +450,38 @@ const AutodeckForm = ({
 
   const onFormSubmit = (data: FormDataProps) => {
     console.log('Data: ', data);
+    const requiresRembg = intToBool(data.useRembg);
+    const requiresColorPalette = intToBool(data.useCustomColour);
+    const requiresRembgLambda = requiresRembg || !requiresColorPalette;
+    const requiresWebsiteScreenshot = intToBool(data.useCustomUrl) || false;
+  
     if (!isInEditing) {
+      console.log('Active jobId on submit: ', activeJobId);
       return onCreateJob({
         variables: {
           input: {
-            id: jobId,
+            id: activeJobId,
             name: data.name,
             logo: data.logo || data.uploadLogo,
-            website: data.website
+            website: data.website,
+            requiresRembgLambda,
+            requiresWebsiteScreenshot,
           }
         }
       })
     }
-    onConfirmJob({
-      variables: {
-        input: {
-          id: job?.id || '',
-          answer1: data.answer1,
-          answer2: data.answer2,
-          answer3: data.answer3,
-          answer4: data.answer4,
-          firstName: data.firstName,
-        }
-      }
-    })
+    // onConfirmJob({
+    //   variables: {
+    //     input: {
+    //       id: job?.id || '',
+    //       answer1: data.answer1,
+    //       answer2: data.answer2,
+    //       answer3: data.answer3,
+    //       answer4: data.answer4,
+    //       firstName: data.firstName,
+    //     }
+    //   }
+    // })
   }
 
   useEffect(() => {
@@ -470,8 +501,6 @@ const AutodeckForm = ({
     form.setValue('primaryColour', previewData?.getPreviewData?.colors[0])
   }, [previewData])
 
-  console.log('activeJob:', job?.id)
-
   return (
     <Form onSubmit={form.handleSubmit(onFormSubmit)}>
       <>
@@ -488,6 +517,7 @@ const AutodeckForm = ({
                 <FormLabel htmlFor="name">{t('job_name')}</FormLabel>
                 <InputHelper>{t('job_name_helper')}</InputHelper>
                 <Input
+                  isDisabled={isInEditing}
                   placeholder="Peach inc."
                   leftEl={<Briefcase />}
                   name="name"
@@ -509,7 +539,7 @@ const AutodeckForm = ({
           </Div>
           <Div>
             <InputGrid>
-              <CustomerLogoFormFragment previewLogo={previewData?.getPreviewData?.rembgLogoUrl || ''} jobId={jobId} form={form} />
+              <CustomerLogoFormFragment previewLogo={previewData?.getPreviewData?.rembgLogoUrl || ''} jobId={activeJobId} form={form} />
             </InputGrid>
             <Hr />
             <InputGrid>
@@ -563,7 +593,7 @@ const AutodeckForm = ({
 
       <ButtonGroup>
         <Button
-          isLoading={isLoading}
+          isLoading={isLoading || isConfirmLoading}
           isDisabled={!form.formState.isValid}
           variantColor="teal"
           type="submit"

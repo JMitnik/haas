@@ -546,6 +546,8 @@ export type FormNodeType = {
 /** Generate sales documents */
 export type GenerateAutodeckInput = {
   id: Scalars['String'];
+  requiresRembgLambda: Scalars['Boolean'];
+  requiresWebsiteScreenshot: Scalars['Boolean'];
   name?: Maybe<Scalars['String']>;
   website?: Maybe<Scalars['String']>;
   logo?: Maybe<Scalars['String']>;

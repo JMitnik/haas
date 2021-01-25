@@ -461,6 +461,8 @@ input GenerateAutodeckInput {
   logo: String
   name: String
   primaryColour: String
+  requiresRembgLambda: Boolean!
+  requiresWebsiteScreenshot: Boolean!
   website: String
 }
 

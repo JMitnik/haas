@@ -833,6 +833,22 @@ const language = {
     },
   },
   autodeck: {
+    use_rembg: {
+      en: 'Remove background',
+      de: 'Hintergrund entfernen',
+    },
+    use_rembg_helper: {
+      en: 'Remove background from logo',
+      de: 'Entfernen Sie den Hintergrund vom Logo',
+    },
+    original_image: {
+      en: 'Original image',
+      de: 'Originales Logo',
+    },
+    original_image_helper: {
+      en: 'Use original logo',
+      de: 'Verwenden Sie das Original-Logo',
+    },
     download_result: {
       en: 'Download result',
       de: 'Download result'

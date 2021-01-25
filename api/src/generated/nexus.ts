@@ -201,6 +201,8 @@ export interface NexusGenInputs {
     logo?: string | null; // String
     name?: string | null; // String
     primaryColour?: string | null; // String
+    requiresRembgLambda: boolean; // Boolean!
+    requiresWebsiteScreenshot: boolean; // Boolean!
     website?: string | null; // String
   }
   GetCampaignsInput: { // input type
