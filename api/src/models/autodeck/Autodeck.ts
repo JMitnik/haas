@@ -69,9 +69,9 @@ export const GenerateAutodeckInput = inputObjectType({
 
   definition(t) {
     t.string('id', { required: true });
-    t.boolean('requiresRembgLambda', { required: true })
-    t.boolean('requiresWebsiteScreenshot', { required: true })
-
+    t.boolean('requiresRembgLambda', { required: true });
+    t.boolean('requiresWebsiteScreenshot', { required: true });
+    t.boolean('requiresColorExtraction', { required: true });
     t.string('name', { required: false });
     t.string('website', { required: false });
     t.string('logo', { required: false });
@@ -102,7 +102,6 @@ export const GenerateAutodeckMutation = mutationField('generateAutodeck', {
   args: { input: GenerateAutodeckInput },
 
   async resolve(parent, args) {
-    console.log('input: ', args.input);
     const { input } = args;
 
     if (!input) {
@@ -114,8 +113,11 @@ export const GenerateAutodeckMutation = mutationField('generateAutodeck', {
       websiteUrl: input.website, 
       logoUrl: input.logo, 
       requiresRembg: input.requiresRembgLambda,
-      requiresWebsiteScreenshot: input.requiresWebsiteScreenshot
+      requiresWebsiteScreenshot: input.requiresWebsiteScreenshot,
+      requiresColorExtraction: input.requiresColorExtraction,
     }
+
+    console.log('Job input: ', jobInput);
     const job = await AutodeckService.createWorkspaceJob(jobInput);
 
     return job ? job as any : null;
@@ -203,12 +205,18 @@ export const AWSImageType = objectType({
   },
 });
 
+export const UploadImageEnumType = enumType({
+  name: 'UploadImageEnumType',
+  members: ['LOGO', 'WEBSITE_SCREENSHOT']
+})
+
 export const UploadImageMutation = Upload && mutationField('uploadJobImage', {
   type: AWSImageType,
   nullable: true,
   args: {
     file: Upload,
     jobId: "String",
+    type: UploadImageEnumType,
   },
   async resolve(parent, args) {
     const { file, jobId } = args;
@@ -218,20 +226,9 @@ export const UploadImageMutation = Upload && mutationField('uploadJobImage', {
     console.log('file: ', file)
     console.log('aws key: ', config.awsAccessKeyId)
     const extension = filename.split('.')[1]
-    const fileKey = `${jobId}/original.${extension}`
-
-    // Use S3 ManagedUpload class as it supports multipart uploads
-    // const upload = new AWS.S3.ManagedUpload({
-    //   params: {
-    //     Bucket: 'haas-autodeck-logos',
-    //     Key: fileKey,
-    //     Body: createReadStream(),
-    //   }
-    // });
-
-    // var promise = await upload.promise().catch((err) => console.log(err));
-
-    // console.log('PROMISE: ', promise)
+    console.log('args type: ', args.type);
+    const fileName = args.type === 'LOGO' ? 'original' : 'website_screenshot'
+    const fileKey = `${jobId}/${fileName}.${extension}`
 
     const uploadedFile = await AutodeckService.uploadDataToS3('haas-autodeck-logos', fileKey, createReadStream(), mimetype)
       .catch((err) => console.log('error: ', err))

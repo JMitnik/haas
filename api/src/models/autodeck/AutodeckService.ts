@@ -19,6 +19,7 @@ type ScreenshotProps = {
   jobId: string;
   requiresRembg: boolean | null | undefined;
   requiresScreenshot: boolean | null | undefined;
+  requiresColorExtraction: boolean | null | undefined;
 };
 
 const s3 = new AWS.S3({ accessKeyId: config.awsAccessKeyId, secretAccessKey: config.awsSecretAccessKey, region: 'eu-central-1' });
@@ -52,6 +53,7 @@ export interface CreateWorkspaceJobProps {
   firstName?: string | null;
   requiresRembg?: boolean | null;
   requiresWebsiteScreenshot?: boolean | null;
+  requiresColorExtraction?: boolean | null;
 }
 
 class AutodeckService {
@@ -93,11 +95,20 @@ class AutodeckService {
   static confirmWorkspaceJob = async (input: CreateWorkspaceJobProps) => {
     // TODO: CSV logic as per AutodeckService.createJob()
 
-    const updatedWorkspaceJob = await prisma.createWorkspaceJob.update({
+    const updatedWorkspaceJob = await prisma.createWorkspaceJob.upsert({
       where: {
-        id: input.id || '',
+        id: input.id || '-1',
       },
-      data: {
+      create: {
+        id: input.id || '',
+        name: input.name || '',
+        status: 'IN_PHOTOSHOP_QUEUE',
+        referenceType: 'AWS',
+        requiresColorExtraction: false,
+        requiresRembg: false,
+        requiresScreenshot: false
+      },
+      update: {
         status: 'IN_PHOTOSHOP_QUEUE',
       }
     })
@@ -112,59 +123,77 @@ class AutodeckService {
         name: input.name,
         status: 'PRE_PROCESSING',
         referenceType: 'AWS',
-        requiresRembg: input.requiresRembg || true,
-        requiresScreenshot: input.requiresWebsiteScreenshot || true,
+        requiresRembg: input.requiresRembg || false,
+        requiresScreenshot: input.requiresWebsiteScreenshot || false,
+        requiresColorExtraction: input.requiresColorExtraction || false,
       }
     })
 
-    if (input.requiresRembg) {
-      const fileKey = input?.logoUrl?.split('.com/')[1]
-      const logoManipulationEvent = { 
-        key: fileKey, 
-        bucket: 'haas-autodeck-logos', 
-        requiresRembg: input.requiresRembg,
-        requiresScreenshot: input.requiresWebsiteScreenshot
-      }
-      const strLogoManipulationEvent = JSON.stringify(logoManipulationEvent, null, 2);
-      const logoManipulationSNSParams = {
-        Message: strLogoManipulationEvent,
-        TopicArn: "arn:aws:sns:eu-central-1:118627563984:SalesDeckProcessingChannel"
-      }
-      sns.publish(logoManipulationSNSParams, (err, data) => {
-        if (err) console.log('ERROR: ', err);
+    // if (input.requiresRembg || input.requiresColorExtraction) {
+    //   const fileKey = input?.logoUrl?.split('.com/')[1]
+    //   const logoManipulationEvent = { 
+    //     key: fileKey, 
+    //     bucket: 'haas-autodeck-logos', 
+    //     requiresRembg: input.requiresRembg,
+    //     requiresScreenshot: input.requiresWebsiteScreenshot,
+    //     requiresColorExtraction: input.requiresColorExtraction
+    //   }
+    //   const strLogoManipulationEvent = JSON.stringify(logoManipulationEvent, null, 2);
+    //   const logoManipulationSNSParams = {
+    //     Message: strLogoManipulationEvent,
+    //     TopicArn: "arn:aws:sns:eu-central-1:118627563984:SalesDeckProcessingChannel"
+    //   }
+    //   sns.publish(logoManipulationSNSParams, (err, data) => {
+    //     if (err) console.log('ERROR: ', err);
 
-        console.log('Logo manipulation publish response: ', data);
-      });
-    }
+    //     console.log('Logo manipulation publish response: ', data);
+    //   });
+    // }
 
-    if (input.requiresWebsiteScreenshot) {
-      const screenshotEvent: ScreenshotProps = {
-        websiteUrl: input.websiteUrl || '',
-        bucket: 'haas-autodeck-logos',
-        jobId: input.id || '',
-        requiresRembg: input.requiresRembg,
-        requiresScreenshot: input.requiresWebsiteScreenshot
-      }
-      const strScreenshotEvent = JSON.stringify(screenshotEvent, null, 2);
-      const screenshotSNSParams = {
-        Message: strScreenshotEvent,
-        TopicArn: "arn:aws:sns:eu-central-1:118627563984:WebsiteScreenshotChannel"
-      };
-      sns.publish(screenshotSNSParams, (err, data) => {
-        if (err) console.log('ERROR: ', err);
+    // if (input.requiresWebsiteScreenshot) {
+    //   const screenshotEvent: ScreenshotProps = {
+    //     websiteUrl: input.websiteUrl || '',
+    //     bucket: 'haas-autodeck-logos',
+    //     jobId: input.id || '',
+    //     requiresRembg: input.requiresRembg,
+    //     requiresScreenshot: input.requiresWebsiteScreenshot,
+    //     requiresColorExtraction: input.requiresColorExtraction
+    //   }
+    //   const strScreenshotEvent = JSON.stringify(screenshotEvent, null, 2);
+    //   const screenshotSNSParams = {
+    //     Message: strScreenshotEvent,
+    //     TopicArn: "arn:aws:sns:eu-central-1:118627563984:WebsiteScreenshotChannel"
+    //   };
+    //   sns.publish(screenshotSNSParams, (err, data) => {
+    //     if (err) console.log('ERROR: ', err);
 
-        console.log('Website screenshot publish response: ', data);
-      });
-    }
+    //     console.log('Website screenshot publish response: ', data);
+    //   });
+    // }
 
     return workspaceJob;
   }
 
-  static getPreviewData = async (id: String) => {
+  static getPreviewData = async (id: string) => {
     // Download colour CSV from S3
     const S3_BUCKET_PREFIX = `https://haas-autodeck-logos.s3.eu-central-1.amazonaws.com/${id}`;
     const rembgLogoUrl = `${S3_BUCKET_PREFIX}/rembg_logo.png`;
-    const websiteScreenshotUrl = `${S3_BUCKET_PREFIX}/website_screenshot.png`;
+
+    const params = {
+      Bucket: 'haas-autodeck-logos',
+      Prefix: `${id}/` 
+    };
+
+    const screenshotKey = await new Promise((resolve, reject) => {
+      s3.listObjectsV2(params, (err, data) => {
+        if (err) return reject(err);
+        const file = data.Contents?.find((file) => file.Key?.includes('website_screenshot'))
+        const fileName = file?.Key?.split('/')[1];
+        resolve(fileName);
+      });
+    });
+
+    const websiteScreenshotUrl = `${S3_BUCKET_PREFIX}/${screenshotKey}`;
     const csvUrl = `${S3_BUCKET_PREFIX}/dominant_colours.csv`;
 
     const dominantColorsCSV = await request(csvUrl)
@@ -172,6 +201,7 @@ class AutodeckService {
       .CSVParse()
       .toArray()
     const colorPalette = dominantColorsCSV[1];
+    
     const result: { colors: Array<string>, rembgLogoUrl: string, websiteScreenshotUrl: string }
       = { colors: colorPalette, rembgLogoUrl, websiteScreenshotUrl };
     return result;

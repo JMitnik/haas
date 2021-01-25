@@ -461,6 +461,7 @@ input GenerateAutodeckInput {
   logo: String
   name: String
   primaryColour: String
+  requiresColorExtraction: Boolean!
   requiresRembgLambda: Boolean!
   requiresWebsiteScreenshot: Boolean!
   website: String
@@ -593,7 +594,7 @@ type Mutation {
   updateJob(id: String, referenceId: String, resourceUrl: String, status: JobStatusType): JobObjectType
   updateQuestion(input: UpdateQuestionNodeInputType): QuestionNode!
   updateRoles(permissions: PermissionIdsInput, roleId: String): RoleType!
-  uploadJobImage(file: Upload, jobId: String): AWSImageType
+  uploadJobImage(file: Upload, jobId: String, type: UploadImageEnumType): AWSImageType
 
   """
   Given a token, checks in the database whether token has been set and has not expired yet
@@ -1093,6 +1094,11 @@ input UpdateQuestionNodeInputType {
 
 """The `Upload` scalar type represents a file upload."""
 scalar Upload
+
+enum UploadImageEnumType {
+  LOGO
+  WEBSITE_SCREENSHOT
+}
 
 type UserConnection implements ConnectionInterface {
   endDate: String

@@ -201,6 +201,7 @@ export interface NexusGenInputs {
     logo?: string | null; // String
     name?: string | null; // String
     primaryColour?: string | null; // String
+    requiresColorExtraction: boolean; // Boolean!
     requiresRembgLambda: boolean; // Boolean!
     requiresWebsiteScreenshot: boolean; // Boolean!
     website?: string | null; // String
@@ -399,6 +400,7 @@ export interface NexusGenEnums {
   TriggerConditionEnum: prisma.TriggerConditionEnum
   TriggerMediumEnum: "BOTH" | "EMAIL" | "PHONE"
   TriggerTypeEnum: "QUESTION" | "SCHEDULED"
+  UploadImageEnumType: "LOGO" | "WEBSITE_SCREENSHOT"
 }
 
 export interface NexusGenRootTypes {
@@ -777,6 +779,7 @@ export interface NexusGenAllTypes extends NexusGenRootTypes {
   TriggerConditionEnum: NexusGenEnums['TriggerConditionEnum'];
   TriggerMediumEnum: NexusGenEnums['TriggerMediumEnum'];
   TriggerTypeEnum: NexusGenEnums['TriggerTypeEnum'];
+  UploadImageEnumType: NexusGenEnums['UploadImageEnumType'];
 }
 
 export interface NexusGenFieldTypes {
@@ -1443,6 +1446,7 @@ export interface NexusGenArgTypes {
     uploadJobImage: { // args
       file?: any | null; // Upload
       jobId?: string | null; // String
+      type?: NexusGenEnums['UploadImageEnumType'] | null; // UploadImageEnumType
     }
     verifyUserToken: { // args
       token?: string | null; // String
@@ -1535,7 +1539,7 @@ export type NexusGenObjectNames = "AWSImageType" | "AutodeckConnectionType" | "C
 
 export type NexusGenInputNames = "AppendToInteractionInput" | "CTALinkInputObjectType" | "CTALinksInputType" | "CTAShareInputObjectType" | "ChoiceNodeEntryInput" | "CreateBatchDeliveriesInputType" | "CreateCTAInputType" | "CreateCampaignInputType" | "CreateCampaignVariantInputType" | "CreateDialogueInputType" | "CreateQuestionNodeInputType" | "CreateTriggerInputType" | "CreateWorkspaceInput" | "CustomerWhereUniqueInput" | "DeleteDialogueInputType" | "DeleteNodeInputType" | "DeleteUserInput" | "DeliveryConnectionFilter" | "DialogueFilterInputType" | "DialogueWhereUniqueInput" | "EdgeConditionInputType" | "EditUserInput" | "EditWorkspaceInput" | "FormNodeEntryFieldInput" | "FormNodeEntryInput" | "FormNodeFieldInput" | "FormNodeInputType" | "GenerateAutodeckInput" | "GetCampaignsInput" | "InviteUserInput" | "LoginInput" | "NodeEntryDataInput" | "NodeEntryInput" | "OptionInputType" | "OptionsInputType" | "PaginationSortInput" | "PaginationWhereInput" | "PermissionIdsInput" | "PermissionInput" | "QuestionNodeWhereInputType" | "QuestionNodeWhereUniqueInput" | "RecipientsInputType" | "RegisterInput" | "RegisterNodeEntryInput" | "RequestInviteInput" | "RoleDataInput" | "RoleInput" | "SessionInput" | "SessionWhereUniqueInput" | "ShareNodeInputType" | "SlideNodeMarkerInput" | "SliderNodeEntryInput" | "SliderNodeInputType" | "SliderNodeRangeInputType" | "SocialNodeEntryInput" | "TagsInputObjectType" | "TextboxNodeEntryInput" | "TriggerConditionInputType" | "TriggerInputType" | "UpdateCTAInputType" | "UpdateQuestionNodeInputType" | "UserInput" | "UserOfCustomerInput";
 
-export type NexusGenEnumNames = "CampaignVariantEnum" | "CloudReferenceType" | "DeliveryStatusEnum" | "FormNodeFieldTypeEnum" | "JobStatusType" | "LinkTypeEnumType" | "PaginationSearchEnum" | "PaginationSortByEnum" | "QuestionNodeTypeEnum" | "SystemPermission" | "TagTypeEnum" | "TriggerConditionEnum" | "TriggerMediumEnum" | "TriggerTypeEnum";
+export type NexusGenEnumNames = "CampaignVariantEnum" | "CloudReferenceType" | "DeliveryStatusEnum" | "FormNodeFieldTypeEnum" | "JobStatusType" | "LinkTypeEnumType" | "PaginationSearchEnum" | "PaginationSortByEnum" | "QuestionNodeTypeEnum" | "SystemPermission" | "TagTypeEnum" | "TriggerConditionEnum" | "TriggerMediumEnum" | "TriggerTypeEnum" | "UploadImageEnumType";
 
 export type NexusGenInterfaceNames = "ConnectionInterface";
 

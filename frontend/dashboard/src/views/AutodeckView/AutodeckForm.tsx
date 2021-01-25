@@ -1,7 +1,7 @@
 import * as yup from 'yup';
 import styled, { css } from 'styled-components';
 import { Activity, Briefcase, Clipboard, Link, Link2, Loader, Minus, Upload, ThumbsDown, ThumbsUp, Play, Pause } from 'react-feather';
-import { useGetPreviewDataLazyQuery, useUploadJobLogoMutation, useCreateWorkspaceJobMutation, CreateWorkspaceJobMutation, Exact, GenerateAutodeckInput, CreateWorkspaceJobType, ConfirmWorkspaceJobMutation } from 'types/generated-types';
+import { useGetPreviewDataLazyQuery, useUploadJobImageMutation, useCreateWorkspaceJobMutation, CreateWorkspaceJobMutation, Exact, GenerateAutodeckInput, CreateWorkspaceJobType, ConfirmWorkspaceJobMutation } from 'types/generated-types';
 import { Button, ButtonGroup, RadioButtonGroup, useToast } from '@chakra-ui/core';
 import { Controller, UseFormMethods, useForm } from 'react-hook-form';
 import {
@@ -39,10 +39,10 @@ import { useEffect } from 'react';
 //   answer4: string;
 // }
 
-const CustomerUploadLogoInput = ({ onChange, value, jobId }: any) => {
+const CustomerUploadLogoInput = ({ onChange, value, jobId, imageType }: any) => {
   const toast = useToast();
 
-  const [uploadFile, { loading }] = useUploadJobLogoMutation({
+  const [uploadFile, { loading }] = useUploadJobImageMutation({
     onCompleted: (result) => {
       toast({
         title: 'Uploaded!',
@@ -67,9 +67,9 @@ const CustomerUploadLogoInput = ({ onChange, value, jobId }: any) => {
 
   const onDrop = (files: File[]) => {
     if (!files.length) return;
-
+    console.log('Image type: ', imageType);
     const [file] = files;
-    uploadFile({ variables: { file, jobId } });
+    uploadFile({ variables: { file, jobId, type: imageType } });
   };
 
   useEffect(() => {
@@ -85,7 +85,7 @@ const CustomerUploadLogoInput = ({ onChange, value, jobId }: any) => {
   );
 };
 
-const WebsiteScreenshotFragment = ({ form }: { form: UseFormMethods<FormDataProps> }) => {
+const WebsiteScreenshotFragment = ({ form, jobId }: { form: UseFormMethods<FormDataProps>, jobId: string }) => {
   const { t } = useTranslation();
 
   return (
@@ -137,7 +137,7 @@ const WebsiteScreenshotFragment = ({ form }: { form: UseFormMethods<FormDataProp
                 name="uploadWebsite"
                 defaultValue=""
                 render={({ onChange, value }) => (
-                  <CustomerUploadLogoInput value={value} onChange={onChange} />
+                  <CustomerUploadLogoInput jobId={jobId} value={value} onChange={onChange} imageType="WEBSITE_SCREENSHOT" />
                 )}
               />
             </FormControl>
@@ -304,7 +304,7 @@ const CustomerLogoFormFragment = ({ form, jobId, previewLogo }: { form: UseFormM
                 name="uploadLogo"
                 defaultValue={previewLogo || ""}
                 render={({ onChange, value }) => (
-                  <CustomerUploadLogoInput jobId={jobId} value={value} onChange={onChange} />
+                  <CustomerUploadLogoInput jobId={jobId} value={value} onChange={onChange} imageType="LOGO" />
                 )}
               />
             </FormControl>
@@ -443,6 +443,7 @@ const AutodeckForm = ({
       useCustomUrl: 0,
       useCustomColour: 1,
       useWebsiteUrl: isInEditing ? 0 : 1,
+      useRembg: 1,
       name: job?.name,
     },
     mode: 'all'
@@ -450,12 +451,14 @@ const AutodeckForm = ({
 
   const onFormSubmit = (data: FormDataProps) => {
     console.log('Data: ', data);
-    const requiresRembg = intToBool(data.useRembg);
-    const requiresColorPalette = intToBool(data.useCustomColour);
-    const requiresRembgLambda = requiresRembg || !requiresColorPalette;
-    const requiresWebsiteScreenshot = intToBool(data.useCustomUrl) || false;
-  
-    if (!isInEditing) {
+    const requiresRembgLambda = data?.useRembg === 1 ? true : false;
+    const requiresColorExtraction = data?.useCustomColour === 1 ? true : false;
+    const requiresWebsiteScreenshot = data?.useCustomUrl === 1 ? true : false;
+
+    console.log('requires rembg: ', requiresRembgLambda);
+    console.log('requires color extraction: ', requiresColorExtraction);
+    console.log('requires website screenshot: ', requiresWebsiteScreenshot);
+    if (!isInEditing && (requiresRembgLambda || requiresColorExtraction || requiresWebsiteScreenshot)) {
       console.log('Active jobId on submit: ', activeJobId);
       return onCreateJob({
         variables: {
@@ -466,22 +469,27 @@ const AutodeckForm = ({
             website: data.website,
             requiresRembgLambda,
             requiresWebsiteScreenshot,
+            requiresColorExtraction
           }
         }
       })
     }
-    // onConfirmJob({
-    //   variables: {
-    //     input: {
-    //       id: job?.id || '',
-    //       answer1: data.answer1,
-    //       answer2: data.answer2,
-    //       answer3: data.answer3,
-    //       answer4: data.answer4,
-    //       firstName: data.firstName,
-    //     }
-    //   }
-    // })
+    onConfirmJob({
+      variables: {
+        input: {
+          id: job?.id || activeJobId || '',
+          name: data.name,
+          answer1: data.answer1,
+          answer2: data.answer2,
+          answer3: data.answer3,
+          answer4: data.answer4,
+          firstName: data.firstName,
+          requiresRembgLambda,
+          requiresWebsiteScreenshot,
+          requiresColorExtraction
+        }
+      }
+    })
   }
 
   useEffect(() => {
@@ -558,13 +566,19 @@ const AutodeckForm = ({
           </Div>
           <Div>
             <InputGrid>
-              <WebsiteScreenshotFragment form={form} />
+              <WebsiteScreenshotFragment jobId={activeJobId} form={form} />
             </InputGrid>
           </Div>
         </FormSection>
       </>
 
-      {isInEditing &&
+      {(isInEditing
+        || (form.watch('useRembg') === 0
+          && form.watch('useCustomUrl') === 0
+          && form.watch('useCustomColour') === 0))
+        &&
+        <>
+        <Hr />
         <FormSection id="dialogue">
           <Div>
             <H3 color="default.text" fontWeight={500} pb={2}>{t('autodeck:dialogue')}</H3>
@@ -589,6 +603,7 @@ const AutodeckForm = ({
             </InputGrid>
           </Div>
         </FormSection>
+        </>
       }
 
       <ButtonGroup>
