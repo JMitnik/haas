@@ -40,7 +40,7 @@ import boolToInt from 'utils/booleanToNumber';
 //   answer4: string;
 // }
 
-const CustomerUploadLogoInput = ({ onChange, value, jobId, imageType }: any) => {
+const CustomerUploadLogoInput = ({ onChange, value, jobId, imageType, isInEditing }: any) => {
   const toast = useToast();
 
   const [uploadFile, { loading }] = useUploadJobImageMutation({
@@ -68,7 +68,6 @@ const CustomerUploadLogoInput = ({ onChange, value, jobId, imageType }: any) => 
 
   const onDrop = (files: File[]) => {
     if (!files.length) return;
-    console.log('Image type: ', imageType);
     const [file] = files;
     uploadFile({ variables: { file, jobId, type: imageType } });
   };
@@ -81,40 +80,43 @@ const CustomerUploadLogoInput = ({ onChange, value, jobId, imageType }: any) => 
 
   return (
     <>
-      <FileDropInput value={value} onDrop={onDrop} isLoading={loading} />
+      <FileDropInput isInEditing={isInEditing} value={value} onDrop={onDrop} isLoading={loading} />
     </>
   );
 };
 
-const WebsiteScreenshotFragment = ({ form, jobId }: { form: UseFormMethods<FormDataProps>, jobId: string }) => {
+const WebsiteScreenshotFragment = ({ form, jobId, isInEditing }: {
+  form: UseFormMethods<FormDataProps>, jobId: string, isInEditing: boolean,
+}) => {
   const { t } = useTranslation();
 
   return (
     <>
-      <FormControl>
-        <FormLabel>{t('website_screenshot')}</FormLabel>
-        <InputHelper>{t('website_screenshot_subtext')}</InputHelper>
+      {!isInEditing &&
+        <FormControl>
+          <FormLabel>{t('website_screenshot')}</FormLabel>
+          <InputHelper>{t('website_screenshot_subtext')}</InputHelper>
+          <Controller
+            control={form.control}
+            name="useWebsiteUrl"
+            defaultValue={1}
+            render={({ onChange, value }) => (
+              <RadioButtonGroup
+                value={value}
+                isInline
+                onChange={onChange}
+                display="flex"
+              >
+                <RadioButton icon={Link2} value={1} text={t('existing_url')} description={t('existing_url_helper')} />
+                <RadioButton icon={Upload} value={0} text={t('upload_file')} description={t('upload_file_helper')} />
+              </RadioButtonGroup>
+            )}
+          />
+        </FormControl>
+      }
 
-        <Controller
-          control={form.control}
-          name="useWebsiteUrl"
-          defaultValue={1}
-          render={({ onChange, value }) => (
-            <RadioButtonGroup
-              value={value}
-              isInline
-              onChange={onChange}
-              display="flex"
-            >
-              <RadioButton icon={Link2} value={1} text={t('existing_url')} description={t('existing_url_helper')} />
-              <RadioButton icon={Upload} value={0} text={t('upload_file')} description={t('upload_file_helper')} />
-            </RadioButtonGroup>
-          )}
-        />
 
-      </FormControl>
-
-      {form.watch('useWebsiteUrl') ? (
+      {!isInEditing && form.watch('useWebsiteUrl') === 1 && (
         <FormControl isInvalid={!!form.errors.website} isRequired>
           <FormLabel htmlFor="website">{t('autodeck:website')}</FormLabel>
           <InputHelper>{t('autodeck:website_helper')}</InputHelper>
@@ -127,7 +129,7 @@ const WebsiteScreenshotFragment = ({ form, jobId }: { form: UseFormMethods<FormD
           />
         </FormControl>
 
-      ) : (
+      )}  {!isInEditing && form.watch('useWebsiteUrl') === 0 && (
           <>
             <FormControl>
               <FormLabel htmlFor="cloudinary">{t('logo_upload')}</FormLabel>
@@ -138,12 +140,32 @@ const WebsiteScreenshotFragment = ({ form, jobId }: { form: UseFormMethods<FormD
                 name="uploadWebsite"
                 defaultValue=""
                 render={({ onChange, value }) => (
-                  <CustomerUploadLogoInput jobId={jobId} value={value} onChange={onChange} imageType="WEBSITE_SCREENSHOT" />
+                  <CustomerUploadLogoInput isInEditing={isInEditing} jobId={jobId} value={value} onChange={onChange} imageType="WEBSITE_SCREENSHOT" />
                 )}
               />
             </FormControl>
           </>
         )}
+
+      {isInEditing && (
+        <FormControl>
+          <FormLabel htmlFor="cloudinary">{t('logo_upload')}</FormLabel>
+          <InputHelper>{t('logo_upload_helper')}</InputHelper>
+
+          <Controller
+            control={form.control}
+            name="uploadWebsite"
+            render={({ onChange, value }) => (
+              <CustomerUploadLogoInput
+                isInEditing={isInEditing}
+                jobId={jobId} value={value}
+                onChange={onChange}
+                imageType="WEBSITE_SCREENSHOT"
+              />
+            )}
+          />
+        </FormControl>
+      )}
     </>
   );
 };
@@ -258,34 +280,37 @@ const PrimaryColourFragment = ({ form, isInEditing, palette }: { form: UseFormMe
   );
 };
 
-const CustomerLogoFormFragment = ({ form, jobId, previewLogo }: { form: UseFormMethods<FormDataProps>, jobId: string, previewLogo: string }) => {
+const CustomerLogoFormFragment = ({ form, jobId, previewLogo, isInEditing }: { form: UseFormMethods<FormDataProps>, jobId: string, previewLogo: string, isInEditing: boolean }) => {
   const { t } = useTranslation();
 
   return (
     <>
-      <FormControl>
-        <FormLabel>{t('logo')}</FormLabel>
-        <InputHelper>{t('customer:logo_helper')}</InputHelper>
+      {!isInEditing && (
+        <FormControl>
+          <FormLabel>{t('logo')}</FormLabel>
+          <InputHelper>{t('customer:logo_helper')}</InputHelper>
 
-        <Controller
-          control={form.control}
-          name="useCustomUrl"
-          render={({ onChange, value }) => (
-            <RadioButtonGroup
-              value={value}
-              isInline
-              onChange={onChange}
-              display="flex"
-            >
-              <RadioButton icon={Link2} value={1} text={t('existing_url')} description={t('existing_url_helper')} />
-              <RadioButton icon={Upload} value={0} text={t('upload_file')} description={t('upload_file_helper')} />
-            </RadioButtonGroup>
-          )}
-        />
+          <Controller
+            control={form.control}
+            name="useCustomUrl"
+            render={({ onChange, value }) => (
+              <RadioButtonGroup
+                value={value}
+                isInline
+                onChange={onChange}
+                display="flex"
+              >
+                <RadioButton icon={Link2} value={1} text={t('existing_url')} description={t('existing_url_helper')} />
+                <RadioButton icon={Upload} value={0} text={t('upload_file')} description={t('upload_file_helper')} />
+              </RadioButtonGroup>
+            )}
+          />
 
-      </FormControl>
+        </FormControl>
+      )}
 
-      {form.watch('useCustomUrl') ? (
+
+      {!isInEditing && form.watch('useCustomUrl') === 1 && (
         <FormControl>
           <FormLabel htmlFor="logo">{t('logo_existing_url')}</FormLabel>
           <InputHelper>{t('logo_existing_url_helper')}</InputHelper>
@@ -298,7 +323,8 @@ const CustomerLogoFormFragment = ({ form, jobId, previewLogo }: { form: UseFormM
           />
         </FormControl>
 
-      ) : (
+      )} 
+      {!isInEditing && form.watch('useCustomUrl') === 0 && (
           <>
             <FormControl>
               <FormLabel htmlFor="cloudinary">{t('logo_upload')}</FormLabel>
@@ -309,34 +335,53 @@ const CustomerLogoFormFragment = ({ form, jobId, previewLogo }: { form: UseFormM
                 name="uploadLogo"
                 defaultValue={previewLogo || ""}
                 render={({ onChange, value }) => (
-                  <CustomerUploadLogoInput jobId={jobId} value={value} onChange={onChange} imageType="LOGO" />
+                  <CustomerUploadLogoInput isInEditing={isInEditing} jobId={jobId} value={value} onChange={onChange} imageType="LOGO" />
                 )}
               />
             </FormControl>
           </>
         )}
 
-      <FormControl>
-        <FormLabel>{t('logo')}</FormLabel>
-        <InputHelper>{t('customer:logo_helper')}</InputHelper>
+      {isInEditing && (
+        <FormControl>
+          <FormLabel htmlFor="cloudinary">{t('logo_upload')}</FormLabel>
+          <InputHelper>{t('logo_upload_helper')}</InputHelper>
 
-        <Controller
-          control={form.control}
-          name="useRembg"
-          render={({ onChange, value }) => (
-            <RadioButtonGroup
-              value={value}
-              isInline
-              onChange={onChange}
-              display="flex"
-            >
-              <RadioButton icon={Play} value={1} text={t('autodeck:use_rembg')} description={t('autodeck:use_rembg_helper')} />
-              <RadioButton icon={Pause} value={0} text={t('autodeck:original_image')} description={t('autodeck:original_image_helper')} />
-            </RadioButtonGroup>
-          )}
-        />
+          <Controller
+            control={form.control}
+            name="uploadLogo"
+            defaultValue={previewLogo || ""}
+            render={({ onChange, value }) => (
+              <CustomerUploadLogoInput isInEditing={isInEditing} jobId={jobId} value={value} onChange={onChange} imageType="LOGO" />
+            )}
+          />
+        </FormControl>
+      )}
 
-      </FormControl>
+      {!isInEditing && (
+        <FormControl>
+          <FormLabel>{t('logo')}</FormLabel>
+          <InputHelper>{t('customer:logo_helper')}</InputHelper>
+
+          <Controller
+            control={form.control}
+            name="useRembg"
+            render={({ onChange, value }) => (
+              <RadioButtonGroup
+                value={value}
+                isInline
+                onChange={onChange}
+                display="flex"
+              >
+                <RadioButton icon={Play} value={1} text={t('autodeck:use_rembg')} description={t('autodeck:use_rembg_helper')} />
+                <RadioButton icon={Pause} value={0} text={t('autodeck:original_image')} description={t('autodeck:original_image_helper')} />
+              </RadioButtonGroup>
+            )}
+          />
+
+        </FormControl>
+      )}
+
     </>
   );
 };
@@ -556,7 +601,7 @@ const AutodeckForm = ({
           </Div>
           <Div>
             <InputGrid>
-              <CustomerLogoFormFragment previewLogo={previewData?.getPreviewData?.rembgLogoUrl || ''} jobId={activeJobId} form={form} />
+              <CustomerLogoFormFragment isInEditing={isInEditing} previewLogo={previewData?.getPreviewData?.rembgLogoUrl || ''} jobId={activeJobId} form={form} />
             </InputGrid>
             <Hr />
             <InputGrid>
@@ -575,7 +620,7 @@ const AutodeckForm = ({
           </Div>
           <Div>
             <InputGrid>
-              <WebsiteScreenshotFragment jobId={activeJobId} form={form} />
+              <WebsiteScreenshotFragment isInEditing={isInEditing} jobId={activeJobId} form={form} />
             </InputGrid>
           </Div>
         </FormSection>
@@ -587,31 +632,31 @@ const AutodeckForm = ({
           && form.watch('useCustomColour') === 0))
         &&
         <>
-        <Hr />
-        <FormSection id="dialogue">
-          <Div>
-            <H3 color="default.text" fontWeight={500} pb={2}>{t('autodeck:dialogue')}</H3>
-            <Muted color="gray.600">
-              {t('autodeck:dialogue_helper')}
-            </Muted>
-          </Div>
-          <Div>
-            <InputGrid>
-              <FormControl isInvalid={!!form.errors.firstName} isRequired>
-                <FormLabel htmlFor="name">{t('autodeck:client_first_name')}</FormLabel>
-                <InputHelper>{t('autodeck:client_first_name_helper')}</InputHelper>
-                <Input
-                  // eslint-disable-next-line jsx-a11y/anchor-is-valid
-                  leftEl={<Link />}
-                  name="firstName"
-                  // isInvalid={!!form.errors.logo}
-                  ref={form.register()}
-                />
-              </FormControl>
-              <DialogueMultiChoiceFragment form={form} />
-            </InputGrid>
-          </Div>
-        </FormSection>
+          <Hr />
+          <FormSection id="dialogue">
+            <Div>
+              <H3 color="default.text" fontWeight={500} pb={2}>{t('autodeck:dialogue')}</H3>
+              <Muted color="gray.600">
+                {t('autodeck:dialogue_helper')}
+              </Muted>
+            </Div>
+            <Div>
+              <InputGrid>
+                <FormControl isInvalid={!!form.errors.firstName} isRequired>
+                  <FormLabel htmlFor="name">{t('autodeck:client_first_name')}</FormLabel>
+                  <InputHelper>{t('autodeck:client_first_name_helper')}</InputHelper>
+                  <Input
+                    // eslint-disable-next-line jsx-a11y/anchor-is-valid
+                    leftEl={<Link />}
+                    name="firstName"
+                    // isInvalid={!!form.errors.logo}
+                    ref={form.register()}
+                  />
+                </FormControl>
+                <DialogueMultiChoiceFragment form={form} />
+              </InputGrid>
+            </Div>
+          </FormSection>
         </>
       }
 
