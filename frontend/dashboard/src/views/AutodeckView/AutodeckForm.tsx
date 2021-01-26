@@ -167,12 +167,16 @@ const ColourContainer = styled(Flex) <{ isSelected: boolean }>`
 
 const ColorPaletteFragment = ({ form, onChange, value, palette }:
   { form: UseFormMethods<FormDataProps>, onChange: any, value: any, palette: Array<string> }) => {
-  const { t } = useTranslation();
   const [currColor, setCurrColor] = useState(palette[0])
 
   useEffect(() => {
     setCurrColor(palette[0])
   }, [palette])
+
+  const handleColorChange = (color: string) => {
+    setCurrColor(color)
+    onChange(color)
+  }
 
   return (
     <Flex flexDirection="row" justifyContent="space-around">
@@ -180,7 +184,7 @@ const ColorPaletteFragment = ({ form, onChange, value, palette }:
         <ColourContainer
           isSelected={color === currColor}
           key={color}
-          onClick={() => setCurrColor(color)}>
+          onClick={() => handleColorChange(color)}>
           <ColorEntry
             isSelected={color === currColor}
             backgroundColor={color}>

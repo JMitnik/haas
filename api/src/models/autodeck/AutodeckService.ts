@@ -94,19 +94,19 @@ class AutodeckService {
   };
 
   static confirmWorkspaceJob = async (input: CreateWorkspaceJobProps) => {
-    // TODO: Check if workspace job exist. If not => 
-    const workspaceJob = await prisma.createWorkspaceJob.findOne({
-      where: {
-        id: input.id || '',
-      }
-    })
+    // // TODO: Check if workspace job exist. If not => 
+    // const workspaceJob = await prisma.createWorkspaceJob.findOne({
+    //   where: {
+    //     id: input.id || '',
+    //   }
+    // })
 
-    if (!workspaceJob) {
-      const csvData = { 'colour-0': input.primaryColour };
-      const csv = papaparse.unparse([csvData]);
-      const csvPath = `${input.id}/dominant_colours.csv`;
-      await AutodeckService.uploadDataToS3('haas-autodeck-logos',  csvPath, csv, 'text/csv')
-    }
+    // if (!workspaceJob) {
+    const csvData = { 'colour-0': input.primaryColour };
+    const csv = papaparse.unparse([csvData]);
+    const csvPath = `${input.id}/dominant_colours.csv`;
+    await AutodeckService.uploadDataToS3('haas-autodeck-logos', csvPath, csv, 'text/csv')
+    // }
 
     const updatedWorkspaceJob = await prisma.createWorkspaceJob.upsert({
       where: {
@@ -146,15 +146,15 @@ class AutodeckService {
       const csvData = { 'colour-0': input.primaryColour };
       const csv = papaparse.unparse([csvData]);
       const csvPath = `${input.id}/dominant_colours.csv`;
-      await AutodeckService.uploadDataToS3('haas-autodeck-logos',  csvPath, csv, 'text/csv')
+      await AutodeckService.uploadDataToS3('haas-autodeck-logos', csvPath, csv, 'text/csv')
     }
 
     if (input.requiresRembg || input.requiresColorExtraction) {
       console.log('going to run lamba for logo manipulation');
       const fileKey = input?.logoUrl?.split('.com/')[1]
-      const logoManipulationEvent = { 
-        key: fileKey, 
-        bucket: 'haas-autodeck-logos', 
+      const logoManipulationEvent = {
+        key: fileKey,
+        bucket: 'haas-autodeck-logos',
         requiresRembg: input.requiresRembg,
         requiresScreenshot: input.requiresWebsiteScreenshot,
         requiresColorExtraction: input.requiresColorExtraction
@@ -199,10 +199,10 @@ class AutodeckService {
   static getPreviewData = async (id: string) => {
     // Download colour CSV from S3
     const S3_BUCKET_PREFIX = `https://haas-autodeck-logos.s3.eu-central-1.amazonaws.com/${id}`;
-    
+
     const params = {
       Bucket: 'haas-autodeck-logos',
-      Prefix: `${id}/` 
+      Prefix: `${id}/`
     };
 
     const logoKey = await new Promise((resolve, reject) => {
@@ -235,14 +235,14 @@ class AutodeckService {
 
     const dominantColorsCSV = await request(csvUrl)
       .pipe(new StringStream())                       // pass to stream
-      .CSVParse()
+      .CSVParse({ delimiter: ',' })
       .toArray()
-      .catch((err) => { 
-        console.log('Something went wrong retrieving dominant colors CSV')
-        return []; 
+      .catch((err) => {
+        console.log('Something went wrong retrieving dominant colors CSV: ', err)
+        return [];
       })
-    const colorPalette = dominantColorsCSV.length > 1 ? dominantColorsCSV[1] : [];
-    
+
+    const colorPalette = dominantColorsCSV.length > 0 ? dominantColorsCSV[1] : [];
     const result: { colors: Array<string>, rembgLogoUrl: string, websiteScreenshotUrl: string }
       = { colors: colorPalette, rembgLogoUrl, websiteScreenshotUrl };
     return result;
