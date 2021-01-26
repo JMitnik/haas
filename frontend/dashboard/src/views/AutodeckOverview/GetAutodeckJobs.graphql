@@ -9,6 +9,9 @@ query getAutodeckJobs($filter: PaginationWhereInput) {
       status
       resourcesUrl
       referenceType
+      requiresColorExtraction
+      requiresRembg
+      requiresScreenshot
     }
     pageInfo {
       nrPages

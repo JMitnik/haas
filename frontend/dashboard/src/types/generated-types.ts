@@ -189,10 +189,13 @@ export type CreateWorkspaceJobType = {
   id: Scalars['String'];
   createdAt: Scalars['String'];
   name: Scalars['String'];
+  status: JobStatusType;
+  requiresColorExtraction: Scalars['Boolean'];
+  requiresRembg: Scalars['Boolean'];
+  requiresScreenshot: Scalars['Boolean'];
+  resourcesUrl?: Maybe<Scalars['String']>;
   updatedAt?: Maybe<Scalars['String']>;
   referenceId?: Maybe<Scalars['String']>;
-  status: JobStatusType;
-  resourcesUrl?: Maybe<Scalars['String']>;
   referenceType: CloudReferenceType;
 };
 
@@ -652,7 +655,6 @@ export type Mutation = {
   generateAutodeck?: Maybe<CreateWorkspaceJobType>;
   confirmCreateWorkspaceJob?: Maybe<CreateWorkspaceJobType>;
   uploadJobImage?: Maybe<AwsImageType>;
-  uploadWebsiteScreenshotImage?: Maybe<AwsImageType>;
   updateCreateWorkspaceJob?: Maybe<CreateWorkspaceJobType>;
   updateJob?: Maybe<JobObjectType>;
   assignTags: Dialogue;
@@ -712,12 +714,6 @@ export type MutationUploadJobImageArgs = {
   file?: Maybe<Scalars['Upload']>;
   jobId?: Maybe<Scalars['String']>;
   type?: Maybe<UploadImageEnumType>;
-};
-
-
-export type MutationUploadWebsiteScreenshotImageArgs = {
-  file?: Maybe<Scalars['Upload']>;
-  jobId?: Maybe<Scalars['String']>;
 };
 
 
@@ -1650,7 +1646,7 @@ export type GetAutodeckJobsQuery = (
     { __typename?: 'AutodeckConnectionType' }
     & { jobs: Array<(
       { __typename?: 'CreateWorkspaceJobType' }
-      & Pick<CreateWorkspaceJobType, 'id' | 'name' | 'createdAt' | 'updatedAt' | 'referenceId' | 'status' | 'resourcesUrl' | 'referenceType'>
+      & Pick<CreateWorkspaceJobType, 'id' | 'name' | 'createdAt' | 'updatedAt' | 'referenceId' | 'status' | 'resourcesUrl' | 'referenceType' | 'requiresColorExtraction' | 'requiresRembg' | 'requiresScreenshot'>
     )>, pageInfo: (
       { __typename?: 'PaginationPageInfo' }
       & Pick<PaginationPageInfo, 'nrPages' | 'pageIndex'>
@@ -1668,20 +1664,6 @@ export type UploadJobImageMutationVariables = Exact<{
 export type UploadJobImageMutation = (
   { __typename?: 'Mutation' }
   & { uploadJobImage?: Maybe<(
-    { __typename?: 'AWSImageType' }
-    & Pick<AwsImageType, 'url'>
-  )> }
-);
-
-export type UploadJobScreenshotMutationVariables = Exact<{
-  file: Scalars['Upload'];
-  jobId?: Maybe<Scalars['String']>;
-}>;
-
-
-export type UploadJobScreenshotMutation = (
-  { __typename?: 'Mutation' }
-  & { uploadWebsiteScreenshotImage?: Maybe<(
     { __typename?: 'AWSImageType' }
     & Pick<AwsImageType, 'url'>
   )> }
@@ -1899,6 +1881,9 @@ export const GetAutodeckJobsDocument = gql`
       status
       resourcesUrl
       referenceType
+      requiresColorExtraction
+      requiresRembg
+      requiresScreenshot
     }
     pageInfo {
       nrPages
@@ -1970,39 +1955,6 @@ export function useUploadJobImageMutation(baseOptions?: Apollo.MutationHookOptio
 export type UploadJobImageMutationHookResult = ReturnType<typeof useUploadJobImageMutation>;
 export type UploadJobImageMutationResult = Apollo.MutationResult<UploadJobImageMutation>;
 export type UploadJobImageMutationOptions = Apollo.BaseMutationOptions<UploadJobImageMutation, UploadJobImageMutationVariables>;
-export const UploadJobScreenshotDocument = gql`
-    mutation uploadJobScreenshot($file: Upload!, $jobId: String) {
-  uploadWebsiteScreenshotImage(file: $file, jobId: $jobId) {
-    url
-  }
-}
-    `;
-export type UploadJobScreenshotMutationFn = Apollo.MutationFunction<UploadJobScreenshotMutation, UploadJobScreenshotMutationVariables>;
-
-/**
- * __useUploadJobScreenshotMutation__
- *
- * To run a mutation, you first call `useUploadJobScreenshotMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useUploadJobScreenshotMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [uploadJobScreenshotMutation, { data, loading, error }] = useUploadJobScreenshotMutation({
- *   variables: {
- *      file: // value for 'file'
- *      jobId: // value for 'jobId'
- *   },
- * });
- */
-export function useUploadJobScreenshotMutation(baseOptions?: Apollo.MutationHookOptions<UploadJobScreenshotMutation, UploadJobScreenshotMutationVariables>) {
-        return Apollo.useMutation<UploadJobScreenshotMutation, UploadJobScreenshotMutationVariables>(UploadJobScreenshotDocument, baseOptions);
-      }
-export type UploadJobScreenshotMutationHookResult = ReturnType<typeof useUploadJobScreenshotMutation>;
-export type UploadJobScreenshotMutationResult = Apollo.MutationResult<UploadJobScreenshotMutation>;
-export type UploadJobScreenshotMutationOptions = Apollo.BaseMutationOptions<UploadJobScreenshotMutation, UploadJobScreenshotMutationVariables>;
 export const GetPreviewDataDocument = gql`
     query getPreviewData($id: String) {
   getPreviewData(id: $id) {

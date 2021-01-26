@@ -124,7 +124,7 @@ export const AutodeckOverview = () => {
     }
   }, [activeJob, setIsOpenImportModal]);
 
-  const handleActiveJob = (job: CreateWorkspaceJobType, status: string) => {
+  const handleActiveJob = (job: DeepPartial<CreateWorkspaceJobType>, status: string) => {
     if (status === 'READY_FOR_PROCESSING') {
       setIsOpenImportModal(true);
     }

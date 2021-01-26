@@ -444,6 +444,9 @@ export interface NexusGenRootTypes {
     name: string; // String!
     referenceId?: string | null; // String
     referenceType: NexusGenEnums['CloudReferenceType']; // CloudReferenceType!
+    requiresColorExtraction: boolean; // Boolean!
+    requiresRembg: boolean; // Boolean!
+    requiresScreenshot: boolean; // Boolean!
     resourcesUrl?: string | null; // String
     status: NexusGenEnums['JobStatusType']; // JobStatusType!
     updatedAt?: string | null; // String
@@ -829,6 +832,9 @@ export interface NexusGenFieldTypes {
     name: string; // String!
     referenceId: string | null; // String
     referenceType: NexusGenEnums['CloudReferenceType']; // CloudReferenceType!
+    requiresColorExtraction: boolean; // Boolean!
+    requiresRembg: boolean; // Boolean!
+    requiresScreenshot: boolean; // Boolean!
     resourcesUrl: string | null; // String
     status: NexusGenEnums['JobStatusType']; // JobStatusType!
     updatedAt: string | null; // String

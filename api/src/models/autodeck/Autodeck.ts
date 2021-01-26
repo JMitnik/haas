@@ -36,10 +36,15 @@ export const CreateWorkspaceJobType = objectType({
     t.string('id');
     t.string('createdAt')
     t.string('name')
+    t.string('status');
+    t.boolean('requiresColorExtraction')
+    t.boolean('requiresRembg')
+    t.boolean('requiresScreenshot')
+
+    t.string('resourcesUrl', { nullable: true });
     t.string('updatedAt', { nullable: true })
     t.string('referenceId', { nullable: true });
-    t.string('status');
-    t.string('resourcesUrl', { nullable: true });
+
     t.field('referenceType', {
       type: CloudReferenceType,
     });
@@ -115,6 +120,7 @@ export const GenerateAutodeckMutation = mutationField('generateAutodeck', {
       requiresRembg: input.requiresRembgLambda,
       requiresWebsiteScreenshot: input.requiresWebsiteScreenshot,
       requiresColorExtraction: input.requiresColorExtraction,
+      primaryColour: input.primaryColour,
     }
 
     console.log('Job input: ', jobInput);
@@ -137,11 +143,13 @@ export const ConfirmCreateWorkspaceJobMutation = mutationField('confirmCreateWor
 
     const confirmInput: CreateWorkspaceJobProps = {
       id: input.id,
+      name: input.name,
       answer1: input?.answer1,
       answer2: input?.answer2,
       answer3: input?.answer3,
       answer4: input?.answer4,
-      firstName: input?.firstName
+      firstName: input?.firstName,
+      primaryColour: input?.primaryColour,
     }
     return AutodeckService.confirmWorkspaceJob(confirmInput) as any;
   }
@@ -223,10 +231,7 @@ export const UploadImageMutation = Upload && mutationField('uploadJobImage', {
     const { createReadStream, filename, mimetype, encoding }:
       { createReadStream: any, filename: string, mimetype: string, encoding: string } = await file;
 
-    console.log('file: ', file)
-    console.log('aws key: ', config.awsAccessKeyId)
     const extension = filename.split('.')[1]
-    console.log('args type: ', args.type);
     const fileName = args.type === 'LOGO' ? 'original' : 'website_screenshot'
     const fileKey = `${jobId}/${fileName}.${extension}`
 

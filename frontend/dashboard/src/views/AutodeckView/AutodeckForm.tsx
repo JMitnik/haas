@@ -24,6 +24,7 @@ import FileDropInput from 'components/FileDropInput';
 
 import { DeepPartial } from 'types/customTypes';
 import { useEffect } from 'react';
+import boolToInt from 'utils/booleanToNumber';
 
 // interface FormDataProps {
 //   name: string;
@@ -441,7 +442,7 @@ const AutodeckForm = ({
   const form = useForm<FormDataProps>({
     defaultValues: {
       useCustomUrl: 0,
-      useCustomColour: 1,
+      useCustomColour: boolToInt(job?.requiresColorExtraction) || 1,
       useWebsiteUrl: isInEditing ? 0 : 1,
       useRembg: 1,
       name: job?.name,
@@ -469,7 +470,8 @@ const AutodeckForm = ({
             website: data.website,
             requiresRembgLambda,
             requiresWebsiteScreenshot,
-            requiresColorExtraction
+            requiresColorExtraction,
+            primaryColour: data.primaryColour
           }
         }
       })
@@ -486,7 +488,8 @@ const AutodeckForm = ({
           firstName: data.firstName,
           requiresRembgLambda,
           requiresWebsiteScreenshot,
-          requiresColorExtraction
+          requiresColorExtraction,
+          primaryColour: data.primaryColour,
         }
       }
     })
@@ -508,6 +511,8 @@ const AutodeckForm = ({
     form.setValue('uploadWebsite', previewData?.getPreviewData?.websiteScreenshotUrl);
     form.setValue('primaryColour', previewData?.getPreviewData?.colors[0])
   }, [previewData])
+
+  console.log('WATCH:', form.watch())
 
   return (
     <Form onSubmit={form.handleSubmit(onFormSubmit)}>
@@ -615,7 +620,7 @@ const AutodeckForm = ({
         >
           Save
         </Button>
-        <Button variant="outline" onClick={() => history.goBack()}>{t('cancel')}</Button>
+        <Button variant="outline" onClick={() => onClose()}>{t('cancel')}</Button>
       </ButtonGroup>
     </Form>
   );

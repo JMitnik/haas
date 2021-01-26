@@ -163,6 +163,9 @@ type CreateWorkspaceJobType {
   name: String!
   referenceId: String
   referenceType: CloudReferenceType!
+  requiresColorExtraction: Boolean!
+  requiresRembg: Boolean!
+  requiresScreenshot: Boolean!
   resourcesUrl: String
   status: JobStatusType!
   updatedAt: String
