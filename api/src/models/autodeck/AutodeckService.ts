@@ -129,47 +129,49 @@ class AutodeckService {
       }
     })
 
-    // if (input.requiresRembg || input.requiresColorExtraction) {
-    //   const fileKey = input?.logoUrl?.split('.com/')[1]
-    //   const logoManipulationEvent = { 
-    //     key: fileKey, 
-    //     bucket: 'haas-autodeck-logos', 
-    //     requiresRembg: input.requiresRembg,
-    //     requiresScreenshot: input.requiresWebsiteScreenshot,
-    //     requiresColorExtraction: input.requiresColorExtraction
-    //   }
-    //   const strLogoManipulationEvent = JSON.stringify(logoManipulationEvent, null, 2);
-    //   const logoManipulationSNSParams = {
-    //     Message: strLogoManipulationEvent,
-    //     TopicArn: "arn:aws:sns:eu-central-1:118627563984:SalesDeckProcessingChannel"
-    //   }
-    //   sns.publish(logoManipulationSNSParams, (err, data) => {
-    //     if (err) console.log('ERROR: ', err);
+    if (input.requiresRembg || input.requiresColorExtraction) {
+      console.log('going to run lamba for logo manipulation');
+      const fileKey = input?.logoUrl?.split('.com/')[1]
+      const logoManipulationEvent = { 
+        key: fileKey, 
+        bucket: 'haas-autodeck-logos', 
+        requiresRembg: input.requiresRembg,
+        requiresScreenshot: input.requiresWebsiteScreenshot,
+        requiresColorExtraction: input.requiresColorExtraction
+      }
+      const strLogoManipulationEvent = JSON.stringify(logoManipulationEvent, null, 2);
+      const logoManipulationSNSParams = {
+        Message: strLogoManipulationEvent,
+        TopicArn: "arn:aws:sns:eu-central-1:118627563984:SalesDeckProcessingChannel"
+      }
+      sns.publish(logoManipulationSNSParams, (err, data) => {
+        if (err) console.log('ERROR: ', err);
 
-    //     console.log('Logo manipulation publish response: ', data);
-    //   });
-    // }
+        console.log('Logo manipulation publish response: ', data);
+      });
+    }
 
-    // if (input.requiresWebsiteScreenshot) {
-    //   const screenshotEvent: ScreenshotProps = {
-    //     websiteUrl: input.websiteUrl || '',
-    //     bucket: 'haas-autodeck-logos',
-    //     jobId: input.id || '',
-    //     requiresRembg: input.requiresRembg,
-    //     requiresScreenshot: input.requiresWebsiteScreenshot,
-    //     requiresColorExtraction: input.requiresColorExtraction
-    //   }
-    //   const strScreenshotEvent = JSON.stringify(screenshotEvent, null, 2);
-    //   const screenshotSNSParams = {
-    //     Message: strScreenshotEvent,
-    //     TopicArn: "arn:aws:sns:eu-central-1:118627563984:WebsiteScreenshotChannel"
-    //   };
-    //   sns.publish(screenshotSNSParams, (err, data) => {
-    //     if (err) console.log('ERROR: ', err);
+    if (input.requiresWebsiteScreenshot) {
+      console.log('going to run lamba for website screenshot');
+      const screenshotEvent: ScreenshotProps = {
+        websiteUrl: input.websiteUrl || '',
+        bucket: 'haas-autodeck-logos',
+        jobId: input.id || '',
+        requiresRembg: input.requiresRembg,
+        requiresScreenshot: input.requiresWebsiteScreenshot,
+        requiresColorExtraction: input.requiresColorExtraction
+      }
+      const strScreenshotEvent = JSON.stringify(screenshotEvent, null, 2);
+      const screenshotSNSParams = {
+        Message: strScreenshotEvent,
+        TopicArn: "arn:aws:sns:eu-central-1:118627563984:WebsiteScreenshotChannel"
+      };
+      sns.publish(screenshotSNSParams, (err, data) => {
+        if (err) console.log('ERROR: ', err);
 
-    //     console.log('Website screenshot publish response: ', data);
-    //   });
-    // }
+        console.log('Website screenshot publish response: ', data);
+      });
+    }
 
     return workspaceJob;
   }
