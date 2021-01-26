@@ -453,7 +453,7 @@ const AutodeckForm = ({
     console.log('Data: ', data);
     const requiresRembgLambda = data?.useRembg === 1 ? true : false;
     const requiresColorExtraction = data?.useCustomColour === 1 ? true : false;
-    const requiresWebsiteScreenshot = data?.useCustomUrl === 1 ? true : false;
+    const requiresWebsiteScreenshot = data?.useWebsiteUrl === 1 ? true : false;
 
     console.log('requires rembg: ', requiresRembgLambda);
     console.log('requires color extraction: ', requiresColorExtraction);
@@ -574,7 +574,7 @@ const AutodeckForm = ({
 
       {(isInEditing
         || (form.watch('useRembg') === 0
-          && form.watch('useCustomUrl') === 0
+          && form.watch('useWebsiteUrl') === 0
           && form.watch('useCustomColour') === 0))
         &&
         <>
