@@ -80,12 +80,14 @@ export const VerifyUserTokenMutation = mutationField('verifyUserToken', {
     const decodedToken = verifyAndDecodeToken(args.token) as any;
 
     const validUsers = await ctx.prisma.user.findMany({
-      where: { AND: {
-        loginToken: {
-          equals: args.token,
-        },
-        id: { equals: decodedToken?.id },
-      } },
+      where: {
+        AND: {
+          loginToken: {
+            equals: args.token,
+          },
+          id: { equals: decodedToken?.id },
+        }
+      },
       include: {
         customers: {
           include: {
@@ -163,6 +165,7 @@ export const RequestInviteOutput = objectType({
 
   definition(t) {
     t.boolean('didInvite');
+    t.boolean('userExists');
   },
 });
 
@@ -182,7 +185,7 @@ export const RequestInviteMutation = mutationField('requestInvite', {
       },
     });
 
-    if (!user) return { didInvite: false };
+    if (!user) return { didInvite: false, userExists: false };
 
     const loginToken = AuthService.createUserToken(user.id);
 
@@ -199,11 +202,12 @@ export const RequestInviteMutation = mutationField('requestInvite', {
     mailService.send({
       body: loginBody,
       recipient: user.email,
-      subject: 'Sign in to HAAS!',
+      subject: 'Your HAAS Magic-link is ready!',
     });
 
     return {
       didInvite: true,
+      userExists: true
     };
   },
 });

@@ -7,6 +7,7 @@ import authShield from './auth';
 import constructSession from '../models/auth/constructContextSession';
 import prisma from './prisma';
 import schema from './schema';
+import { bootstrapServices } from './bootstrap';
 
 const makeApollo = async () => {
   console.log('💼\tBootstrapping Graphql Engine Apollo');
@@ -17,6 +18,7 @@ const makeApollo = async () => {
       ...ctx,
       session: await constructSession(ctx),
       prisma,
+      services: bootstrapServices(),
     }),
     plugins: [
       {
@@ -25,8 +27,6 @@ const makeApollo = async () => {
             if (!ctx.operation) return;
 
             ctx.errors.forEach((error) => {
-              if (error.originalError instanceof ApolloError) return;
-
               Sentry.withScope((scope) => {
                 scope.setTag('kind', ctx.operation?.name?.kind.toString() || '');
 

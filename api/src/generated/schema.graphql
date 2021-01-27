@@ -754,6 +754,7 @@ input RequestInviteInput {
 
 type RequestInviteOutput {
   didInvite: Boolean!
+  userExists: Boolean!
 }
 
 type RoleConnection implements ConnectionInterface {

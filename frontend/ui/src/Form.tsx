@@ -128,7 +128,7 @@ export const InputLabel = styled.label`
 `;
 
 export const FormLabel = forwardRef((props: FormLabelProps, ref) => (
-  <ChakraFormLabel fontSize="0.8rem" color="gray.600" {...props} ref={ref} />
+  <ChakraFormLabel fontSize="0.8rem" color="gray.600" fontWeight="600" {...props} ref={ref} />
 ));
 
 interface InputProps extends ChakraInputProps {

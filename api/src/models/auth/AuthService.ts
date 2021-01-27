@@ -113,19 +113,6 @@ class AuthService {
     return decoded.exp;
   }
 
-  // static async loginUser(userInput: NexusGenInputs['LoginInput']) {
-  //   const user = await prisma.user.findOne({ where: { email: userInput.email } });
-
-  //   if (!user) throw new Error('auth:account_not_found');
-  //   if (!user?.password) throw new UserInputError('Something seems wrong with your account. Contact the admin for more info');
-
-  //   const isValidPassword = await AuthService.checkPassword(userInput.password, user?.password);
-
-  //   if (!isValidPassword) throw new UserInputError('Login credentials invalid');
-
-  //   return user;
-  // }
-
   static async checkPassword(inputPassword: string, dbPassword: string) {
     const res = await bcrypt.compare(inputPassword, dbPassword);
 

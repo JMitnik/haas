@@ -2,27 +2,20 @@
 import AWS from '../../config/aws';
 
 import config from '../../config/config';
+import { MailServiceType, MailSendInput } from './MailServiceTypes';
 
-export interface MailSendInput {
-  recipient: string;
-  body: string;
-  subject: string;
-  from?: string | null;
-}
-
-class MailService {
+class MailService implements MailServiceType {
   send(input: MailSendInput) {
     if (config.env !== 'local') this.sendWithSES(input);
 
     if (config.env === 'local') this.sendToLog(input);
   }
 
-  sendToLog(input: MailSendInput) {
+  private sendToLog(input: MailSendInput) {
     console.info(input);
   }
 
-  sendWithSES(input: MailSendInput) {
-    let isSent: boolean;
+  private sendWithSES(input: MailSendInput) {
     const mailDriver = new AWS.SES();
 
     const sendPromise = mailDriver.sendEmail({
