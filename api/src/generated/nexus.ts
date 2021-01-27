@@ -1450,6 +1450,7 @@ export interface NexusGenArgTypes {
       roleId?: string | null; // String
     }
     uploadJobImage: { // args
+      disapproved?: boolean | null; // Boolean
       file?: any | null; // Upload
       jobId?: string | null; // String
       type?: NexusGenEnums['UploadImageEnumType'] | null; // UploadImageEnumType

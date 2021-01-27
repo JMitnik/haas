@@ -1,7 +1,7 @@
 import * as yup from 'yup';
-import styled, { css } from 'styled-components';
-import { Activity, Briefcase, Clipboard, Link, Link2, Loader, Minus, Upload, ThumbsDown, ThumbsUp, Play, Pause } from 'react-feather';
-import { useGetPreviewDataLazyQuery, useUploadJobImageMutation, useCreateWorkspaceJobMutation, CreateWorkspaceJobMutation, Exact, GenerateAutodeckInput, CreateWorkspaceJobType, ConfirmWorkspaceJobMutation } from 'types/generated-types';
+import styled from 'styled-components';
+import { Briefcase, Clipboard, Link, Link2, Upload, ThumbsDown, ThumbsUp, Play, Pause, AlertCircle } from 'react-feather';
+import { useGetPreviewDataLazyQuery, useUploadJobImageMutation, CreateWorkspaceJobMutation, Exact, GenerateAutodeckInput, CreateWorkspaceJobType, ConfirmWorkspaceJobMutation } from 'types/generated-types';
 import { Button, ButtonGroup, RadioButtonGroup, useToast } from '@chakra-ui/core';
 import { Controller, UseFormMethods, useForm } from 'react-hook-form';
 import {
@@ -12,11 +12,10 @@ import {
   Flex,
 } from '@haas/ui';
 import { useHistory } from 'react-router';
-import { useMutation, MutationFunctionOptions } from '@apollo/client';
+import { MutationFunctionOptions } from '@apollo/client';
 import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 import cuid from 'cuid';
-import intToBool from 'utils/intToBool';
 
 import ColorPickerInput from 'components/ColorPicker';
 
@@ -26,21 +25,7 @@ import { DeepPartial } from 'types/customTypes';
 import { useEffect } from 'react';
 import boolToInt from 'utils/booleanToNumber';
 
-// interface FormDataProps {
-//   name: string;
-//   website: string;
-//   logo?: string;
-//   primaryColour: string;
-//   useCustomUrl?: number;
-//   uploadLogo?: string;
-//   firstName?: string;
-//   answer1: string;
-//   answer2: string;
-//   answer3: string;
-//   answer4: string;
-// }
-
-const CustomerUploadLogoInput = ({ onChange, value, jobId, imageType, isInEditing }: any) => {
+const CustomerUploadLogoInput = ({ onChange, value, jobId, imageType, isInEditing, isDisapproved }: any) => {
   const toast = useToast();
 
   const [uploadFile, { loading }] = useUploadJobImageMutation({
@@ -52,7 +37,6 @@ const CustomerUploadLogoInput = ({ onChange, value, jobId, imageType, isInEditin
         position: 'bottom-right',
         isClosable: true,
       });
-      console.log('upload image url: ', result.uploadJobImage?.url);
       onChange(result.uploadJobImage?.url);
     },
     onError: () => {
@@ -68,8 +52,10 @@ const CustomerUploadLogoInput = ({ onChange, value, jobId, imageType, isInEditin
 
   const onDrop = (files: File[]) => {
     if (!files.length) return;
+    onChange('');
     const [file] = files;
-    uploadFile({ variables: { file, jobId, type: imageType } });
+    const disapproved: boolean = isDisapproved || false
+    uploadFile({ variables: { file, jobId, type: imageType, disapproved } });
   };
 
   useEffect(() => {
@@ -124,47 +110,68 @@ const WebsiteScreenshotFragment = ({ form, jobId, isInEditing }: {
             // eslint-disable-next-line jsx-a11y/anchor-is-valid
             leftEl={<Link />}
             name="website"
-            // isInvalid={!!form.errors.logo}
             ref={form.register()}
           />
         </FormControl>
 
       )}  {!isInEditing && form.watch('useWebsiteUrl') === 0 && (
-          <>
-            <FormControl>
-              <FormLabel htmlFor="cloudinary">{t('logo_upload')}</FormLabel>
-              <InputHelper>{t('logo_upload_helper')}</InputHelper>
+        <>
+          <FormControl>
+            <FormLabel htmlFor="cloudinary">{t('logo_upload')}</FormLabel>
+            <InputHelper>{t('logo_upload_helper')}</InputHelper>
 
-              <Controller
-                control={form.control}
-                name="uploadWebsite"
-                defaultValue=""
-                render={({ onChange, value }) => (
-                  <CustomerUploadLogoInput isInEditing={isInEditing} jobId={jobId} value={value} onChange={onChange} imageType="WEBSITE_SCREENSHOT" />
-                )}
-              />
-            </FormControl>
-          </>
-        )}
+            <Controller
+              control={form.control}
+              name="uploadWebsite"
+              defaultValue=""
+              render={({ onChange, value }) => (
+                <CustomerUploadLogoInput isInEditing={isInEditing} jobId={jobId} value={value} onChange={onChange} imageType="WEBSITE_SCREENSHOT" />
+              )}
+            />
+          </FormControl>
+        </>
+      )}
 
       {isInEditing && (
-        <FormControl>
-          <FormLabel htmlFor="cloudinary">{t('logo_upload')}</FormLabel>
-          <InputHelper>{t('logo_upload_helper')}</InputHelper>
+        <>
+          <FormControl>
+            <FormLabel htmlFor="cloudinary">{t('logo_upload')}</FormLabel>
+            <InputHelper>{t('logo_upload_helper')}</InputHelper>
 
-          <Controller
-            control={form.control}
-            name="uploadWebsite"
-            render={({ onChange, value }) => (
-              <CustomerUploadLogoInput
-                isInEditing={isInEditing}
-                jobId={jobId} value={value}
-                onChange={onChange}
-                imageType="WEBSITE_SCREENSHOT"
-              />
-            )}
-          />
-        </FormControl>
+            <Controller
+              control={form.control}
+              name="uploadWebsite"
+              render={({ onChange, value }) => (
+                <CustomerUploadLogoInput
+                  isInEditing={isInEditing && form.watch('isWebsiteUrlApproved') === 1}
+                  jobId={jobId} value={value}
+                  onChange={onChange}
+                  imageType="WEBSITE_SCREENSHOT"
+                />
+              )}
+            />
+          </FormControl>
+          <FormControl>
+            <FormLabel>{'Website screenshot approval'}</FormLabel>
+            <InputHelper>{'Approve or edit the website screenshot used for document generation'}</InputHelper>
+            <Controller
+              control={form.control}
+              name="isWebsiteUrlApproved"
+              defaultValue={1}
+              render={({ onChange, value }) => (
+                <RadioButtonGroup
+                  value={value}
+                  isInline
+                  onChange={onChange}
+                  display="flex"
+                >
+                  <RadioButton icon={ThumbsUp} value={1} text={'Approve'} description={'Use current website screenshot'} />
+                  <RadioButton icon={ThumbsDown} value={0} text={'Edit'} description={'Upload new website screenshot'} />
+                </RadioButtonGroup>
+              )}
+            />
+          </FormControl>
+        </>
       )}
     </>
   );
@@ -323,26 +330,27 @@ const CustomerLogoFormFragment = ({ form, jobId, previewLogo, isInEditing }: { f
           />
         </FormControl>
 
-      )} 
+      )}
       {!isInEditing && form.watch('useCustomUrl') === 0 && (
-          <>
-            <FormControl>
-              <FormLabel htmlFor="cloudinary">{t('logo_upload')}</FormLabel>
-              <InputHelper>{t('logo_upload_helper')}</InputHelper>
+        <>
+          <FormControl>
+            <FormLabel htmlFor="cloudinary">{t('logo_upload')}</FormLabel>
+            <InputHelper>{t('logo_upload_helper')}</InputHelper>
 
-              <Controller
-                control={form.control}
-                name="uploadLogo"
-                defaultValue={previewLogo || ""}
-                render={({ onChange, value }) => (
-                  <CustomerUploadLogoInput isInEditing={isInEditing} jobId={jobId} value={value} onChange={onChange} imageType="LOGO" />
-                )}
-              />
-            </FormControl>
-          </>
-        )}
+            <Controller
+              control={form.control}
+              name="uploadLogo"
+              defaultValue={previewLogo || ""}
+              render={({ onChange, value }) => (
+                <CustomerUploadLogoInput isInEditing={isInEditing} jobId={jobId} value={value} onChange={onChange} imageType="LOGO" />
+              )}
+            />
+          </FormControl>
+        </>
+      )}
 
       {isInEditing && (
+        <>
         <FormControl>
           <FormLabel htmlFor="cloudinary">{t('logo_upload')}</FormLabel>
           <InputHelper>{t('logo_upload_helper')}</InputHelper>
@@ -352,10 +360,40 @@ const CustomerLogoFormFragment = ({ form, jobId, previewLogo, isInEditing }: { f
             name="uploadLogo"
             defaultValue={previewLogo || ""}
             render={({ onChange, value }) => (
-              <CustomerUploadLogoInput isInEditing={isInEditing} jobId={jobId} value={value} onChange={onChange} imageType="LOGO" />
+              <CustomerUploadLogoInput isDisapproved={form.watch('isLogoUrlApproved') === 0} isInEditing={isInEditing && form.watch('isLogoUrlApproved') === 1} jobId={jobId} value={value} onChange={onChange} imageType="LOGO" />
             )}
           />
+          {form.watch('isLogoUrlApproved') === 0 && (
+            <Flex marginTop="5px">
+              <Div width="auto" color="orange">
+                <AlertCircle color="orange" />
+              </Div>
+              <Div marginLeft="5px">The newly uploaded logo will <span style={{fontWeight: 'bold'}}>override</span> the currently used logo and <span style={{fontWeight: 'bold'}}>no background removal</span> will be performed.</Div>
+            </Flex>
+          )}
         </FormControl>
+        <FormControl>
+            <FormLabel>{'Website screenshot approval'}</FormLabel>
+            <InputHelper>{'Approve or edit the website screenshot used for document generation'}</InputHelper>
+            <Controller
+              control={form.control}
+              name="isLogoUrlApproved"
+              defaultValue={1}
+              render={({ onChange, value }) => (
+                <RadioButtonGroup
+                  value={value}
+                  isInline
+                  onChange={onChange}
+                  display="flex"
+                >
+                  <RadioButton icon={ThumbsUp} value={1} text={'Approve'} description={'Use current logo'} />
+                  <RadioButton icon={ThumbsDown} value={0} text={'Edit'} description={'Upload new logo'} />
+                </RadioButtonGroup>
+              )}
+            />
+          
+          </FormControl>
+        </>
       )}
 
       {!isInEditing && (
@@ -449,6 +487,8 @@ const schema = yup.object().shape({
   useCustomUrl: yup.number(),
   useCustomColour: yup.number(),
   useWebsiteUrl: yup.number(),
+  isWebsiteUrlApproved: yup.number(),
+  isLogoUrlApproved: yup.number(),
   uploadLogo: yup.string().url(),
   firstName: yup.string(),
   answer1: yup.string(),
@@ -500,16 +540,11 @@ const AutodeckForm = ({
   });
 
   const onFormSubmit = (data: FormDataProps) => {
-    console.log('Data: ', data);
     const requiresRembgLambda = data?.useRembg === 1 ? true : false;
     const requiresColorExtraction = data?.useCustomColour === 1 ? true : false;
     const requiresWebsiteScreenshot = data?.useWebsiteUrl === 1 ? true : false;
 
-    console.log('requires rembg: ', requiresRembgLambda);
-    console.log('requires color extraction: ', requiresColorExtraction);
-    console.log('requires website screenshot: ', requiresWebsiteScreenshot);
     if (!isInEditing && (requiresRembgLambda || requiresColorExtraction || requiresWebsiteScreenshot)) {
-      console.log('Active jobId on submit: ', activeJobId);
       return onCreateJob({
         variables: {
           input: {
@@ -561,8 +596,6 @@ const AutodeckForm = ({
     form.setValue('primaryColour', previewData?.getPreviewData?.colors[0])
   }, [previewData])
 
-  console.log('WATCH:', form.watch())
-
   return (
     <Form onSubmit={form.handleSubmit(onFormSubmit)}>
       <>
@@ -601,7 +634,7 @@ const AutodeckForm = ({
           </Div>
           <Div>
             <InputGrid>
-              <CustomerLogoFormFragment isInEditing={isInEditing} previewLogo={previewData?.getPreviewData?.rembgLogoUrl || ''} jobId={activeJobId} form={form} />
+              <CustomerLogoFormFragment isInEditing={isInEditing} previewLogo={previewData?.getPreviewData?.rembgLogoUrl || ''} jobId={job?.id || activeJobId} form={form} />
             </InputGrid>
             <Hr />
             <InputGrid>
@@ -620,7 +653,7 @@ const AutodeckForm = ({
           </Div>
           <Div>
             <InputGrid>
-              <WebsiteScreenshotFragment isInEditing={isInEditing} jobId={activeJobId} form={form} />
+              <WebsiteScreenshotFragment isInEditing={isInEditing} jobId={job?.id || activeJobId} form={form} />
             </InputGrid>
           </Div>
         </FormSection>

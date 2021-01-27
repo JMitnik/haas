@@ -714,6 +714,7 @@ export type MutationUploadJobImageArgs = {
   file?: Maybe<Scalars['Upload']>;
   jobId?: Maybe<Scalars['String']>;
   type?: Maybe<UploadImageEnumType>;
+  disapproved?: Maybe<Scalars['Boolean']>;
 };
 
 
@@ -1658,6 +1659,7 @@ export type UploadJobImageMutationVariables = Exact<{
   file: Scalars['Upload'];
   jobId?: Maybe<Scalars['String']>;
   type?: Maybe<UploadImageEnumType>;
+  disapproved?: Maybe<Scalars['Boolean']>;
 }>;
 
 
@@ -1922,8 +1924,8 @@ export function refetchGetAutodeckJobsQuery(variables?: GetAutodeckJobsQueryVari
       return { query: GetAutodeckJobsDocument, variables: variables }
     }
 export const UploadJobImageDocument = gql`
-    mutation uploadJobImage($file: Upload!, $jobId: String, $type: UploadImageEnumType) {
-  uploadJobImage(file: $file, jobId: $jobId, type: $type) {
+    mutation uploadJobImage($file: Upload!, $jobId: String, $type: UploadImageEnumType, $disapproved: Boolean) {
+  uploadJobImage(file: $file, jobId: $jobId, type: $type, disapproved: $disapproved) {
     url
   }
 }
@@ -1946,6 +1948,7 @@ export type UploadJobImageMutationFn = Apollo.MutationFunction<UploadJobImageMut
  *      file: // value for 'file'
  *      jobId: // value for 'jobId'
  *      type: // value for 'type'
+ *      disapproved: // value for 'disapproved'
  *   },
  * });
  */

@@ -225,6 +225,7 @@ export const UploadImageMutation = Upload && mutationField('uploadJobImage', {
     file: Upload,
     jobId: "String",
     type: UploadImageEnumType,
+    disapproved: "Boolean",
   },
   async resolve(parent, args) {
     const { file, jobId } = args;
@@ -232,7 +233,13 @@ export const UploadImageMutation = Upload && mutationField('uploadJobImage', {
       { createReadStream: any, filename: string, mimetype: string, encoding: string } = await file;
 
     const extension = filename.split('.')[1]
-    const fileName = args.type === 'LOGO' ? 'original' : 'website_screenshot'
+    let fileName;
+
+    if (args.type === 'LOGO') {
+      fileName = args.disapproved ? 'rembg_logo' : 'original'
+    } else {
+      fileName = 'website_screenshot'
+    }
     const fileKey = `${jobId}/${fileName}.${extension}`
 
     const uploadedFile = await AutodeckService.uploadDataToS3('haas-autodeck-logos', fileKey, createReadStream(), mimetype)

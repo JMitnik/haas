@@ -131,8 +131,6 @@ export const AutodeckOverview = () => {
     setActiveJob(job);
   }
 
-  console.log('data: ', data?.getAutodeckJobs.jobs)
-  console.log('Active job: ', activeJob);
   return (
     <>
       <UI.ViewHeading>

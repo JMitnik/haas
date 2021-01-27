@@ -597,7 +597,7 @@ type Mutation {
   updateJob(id: String, referenceId: String, resourceUrl: String, status: JobStatusType): JobObjectType
   updateQuestion(input: UpdateQuestionNodeInputType): QuestionNode!
   updateRoles(permissions: PermissionIdsInput, roleId: String): RoleType!
-  uploadJobImage(file: Upload, jobId: String, type: UploadImageEnumType): AWSImageType
+  uploadJobImage(disapproved: Boolean, file: Upload, jobId: String, type: UploadImageEnumType): AWSImageType
 
   """
   Given a token, checks in the database whether token has been set and has not expired yet
