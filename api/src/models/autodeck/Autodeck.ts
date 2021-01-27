@@ -23,7 +23,7 @@ export const JobStatusType = enumType({
 
 export const PreviewDataType = objectType({
   name: 'PreviewDataType',
-  definition(t){
+  definition(t) {
     t.list.string('colors');
     t.string('rembgLogoUrl');
     t.string('websiteScreenshotUrl');
@@ -36,10 +36,15 @@ export const CreateWorkspaceJobType = objectType({
     t.string('id');
     t.string('createdAt')
     t.string('name')
+    t.string('status');
+    t.boolean('requiresColorExtraction')
+    t.boolean('requiresRembg')
+    t.boolean('requiresScreenshot')
+
+    t.string('resourcesUrl', { nullable: true });
     t.string('updatedAt', { nullable: true })
     t.string('referenceId', { nullable: true });
-    t.string('status');
-    t.string('resourcesUrl', { nullable: true });
+
     t.field('referenceType', {
       type: CloudReferenceType,
     });
@@ -69,6 +74,9 @@ export const GenerateAutodeckInput = inputObjectType({
 
   definition(t) {
     t.string('id', { required: true });
+    t.boolean('requiresRembgLambda', { required: true });
+    t.boolean('requiresWebsiteScreenshot', { required: true });
+    t.boolean('requiresColorExtraction', { required: true });
     t.string('name', { required: false });
     t.string('website', { required: false });
     t.string('logo', { required: false });
@@ -99,13 +107,23 @@ export const GenerateAutodeckMutation = mutationField('generateAutodeck', {
   args: { input: GenerateAutodeckInput },
 
   async resolve(parent, args) {
-    console.log('input: ', args.input);
     const { input } = args;
 
     if (!input) {
       return null;
     }
-    const jobInput = { id: input.id, name: input.name, websiteUrl: input.website, logoUrl: input.logo }
+    const jobInput = {
+      id: input.id, 
+      name: input.name, 
+      websiteUrl: input.website, 
+      logoUrl: input.logo, 
+      requiresRembg: input.requiresRembgLambda,
+      requiresWebsiteScreenshot: input.requiresWebsiteScreenshot,
+      requiresColorExtraction: input.requiresColorExtraction,
+      primaryColour: input.primaryColour,
+    }
+
+    console.log('Job input: ', jobInput);
     const job = await AutodeckService.createWorkspaceJob(jobInput);
 
     return job ? job as any : null;
@@ -123,13 +141,15 @@ export const ConfirmCreateWorkspaceJobMutation = mutationField('confirmCreateWor
       return null;
     }
 
-    const confirmInput: CreateWorkspaceJobProps = { 
+    const confirmInput: CreateWorkspaceJobProps = {
       id: input.id,
-      answer1: input?.answer1, 
-      answer2: input?.answer2,  
+      name: input.name,
+      answer1: input?.answer1,
+      answer2: input?.answer2,
       answer3: input?.answer3,
       answer4: input?.answer4,
-      firstName: input?.firstName
+      firstName: input?.firstName,
+      primaryColour: input?.primaryColour,
     }
     return AutodeckService.confirmWorkspaceJob(confirmInput) as any;
   }
@@ -155,7 +175,7 @@ export const GetJobQuery = queryField('getJob', {
 
 export const AutodeckConnectionModel = objectType({
   name: 'AutodeckConnectionType',
-  
+
   definition(t) {
     t.implements('ConnectionInterface');
     t.list.field('jobs', { type: CreateWorkspaceJobType });
@@ -174,11 +194,11 @@ export const GetAutodeckJobsQuery = queryField('getAutodeckJobs', {
       search: args.filter?.searchTerm,
     });
 
-    return { 
-      jobs: entries as NexusGenFieldTypes['CreateWorkspaceJobType'][], 
-      pageInfo, 
-      offset: args.filter?.offset || 0, 
-      limit: args.filter?.limit || 0 
+    return {
+      jobs: entries as NexusGenFieldTypes['CreateWorkspaceJobType'][],
+      pageInfo,
+      offset: args.filter?.offset || 0,
+      limit: args.filter?.limit || 0
     };
   },
 })
@@ -193,44 +213,43 @@ export const AWSImageType = objectType({
   },
 });
 
+export const UploadImageEnumType = enumType({
+  name: 'UploadImageEnumType',
+  members: ['LOGO', 'WEBSITE_SCREENSHOT']
+})
+
 export const UploadImageMutation = Upload && mutationField('uploadJobImage', {
-      type: AWSImageType,
-      nullable: true,
-      args: {
-        file: Upload,
-        jobId: "String",
-      },
-      async resolve(parent, args) {
-        const { file, jobId } = args;
-        const { createReadStream, filename, mimetype, encoding } : 
-        {createReadStream: any, filename: string, mimetype: string, encoding: string} = await file;
+  type: AWSImageType,
+  nullable: true,
+  args: {
+    file: Upload,
+    jobId: "String",
+    type: UploadImageEnumType,
+    disapproved: "Boolean",
+  },
+  async resolve(parent, args) {
+    const { file, jobId } = args;
+    const { createReadStream, filename, mimetype, encoding }:
+      { createReadStream: any, filename: string, mimetype: string, encoding: string } = await file;
 
-        console.log('file: ', file)
-        console.log('aws key: ', config.awsAccessKeyId)
-        const extension = filename.split('.')[1]
-        const fileKey = `${jobId}/original.${extension}`
+    const extension = filename.split('.')[1]
+    let fileName;
 
-        // Use S3 ManagedUpload class as it supports multipart uploads
-        // const upload = new AWS.S3.ManagedUpload({
-        //   params: {
-        //     Bucket: 'haas-autodeck-logos',
-        //     Key: fileKey,
-        //     Body: createReadStream(),
-        //   }
-        // });
+    if (args.type === 'LOGO') {
+      fileName = args.disapproved ? 'rembg_logo' : 'original'
+    } else {
+      fileName = 'website_screenshot'
+    }
+    const fileKey = `${jobId}/${fileName}.${extension}`
 
-        // var promise = await upload.promise().catch((err) => console.log(err));
+    const uploadedFile = await AutodeckService.uploadDataToS3('haas-autodeck-logos', fileKey, createReadStream(), mimetype)
+      .catch((err) => console.log('error: ', err))
 
-        // console.log('PROMISE: ', promise)
+    // console.log('Uploaded file: ', uploadedFile)
+    const awsFileURL = `https://haas-autodeck-logos.s3.eu-central-1.amazonaws.com/${fileKey}`
 
-        const uploadedFile = await AutodeckService.uploadDataToS3('haas-autodeck-logos', fileKey, createReadStream(), mimetype)
-        .catch((err) => console.log('error: ', err))
-
-        // console.log('Uploaded file: ', uploadedFile)
-        const awsFileURL = `https://haas-autodeck-logos.s3.eu-central-1.amazonaws.com/${fileKey}`
-
-        return { url: awsFileURL};
-      },
+    return { url: awsFileURL };
+  },
 })
 
 export const UpdateCreatWorkspaceJobMutation = mutationField('updateCreateWorkspaceJob', {

@@ -1,5 +1,5 @@
-  mutation uploadJobLogo($file: Upload!, $jobId: String) {
-    uploadJobImage(file: $file, jobId: $jobId) {
+  mutation uploadJobImage($file: Upload!, $jobId: String, $type: UploadImageEnumType, $disapproved: Boolean) {
+    uploadJobImage(file: $file, jobId: $jobId, type: $type, disapproved: $disapproved) {
         url
     }
   }

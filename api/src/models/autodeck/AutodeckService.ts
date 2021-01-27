@@ -17,6 +17,9 @@ type ScreenshotProps = {
   websiteUrl: string;
   bucket: string;
   jobId: string;
+  requiresRembg: boolean | null | undefined;
+  requiresScreenshot: boolean | null | undefined;
+  requiresColorExtraction: boolean | null | undefined;
 };
 
 const s3 = new AWS.S3({ accessKeyId: config.awsAccessKeyId, secretAccessKey: config.awsSecretAccessKey, region: 'eu-central-1' });
@@ -48,6 +51,10 @@ export interface CreateWorkspaceJobProps {
   answer3?: string | null;
   answer4?: string | null;
   firstName?: string | null;
+  primaryColour?: string | null;
+  requiresRembg?: boolean | null;
+  requiresWebsiteScreenshot?: boolean | null;
+  requiresColorExtraction?: boolean | null;
 }
 
 class AutodeckService {
@@ -87,13 +94,34 @@ class AutodeckService {
   };
 
   static confirmWorkspaceJob = async (input: CreateWorkspaceJobProps) => {
-    // TODO: CSV logic as per AutodeckService.createJob()
-    
-    const updatedWorkspaceJob = await prisma.createWorkspaceJob.update({
+    // // TODO: Check if workspace job exist. If not => 
+    // const workspaceJob = await prisma.createWorkspaceJob.findOne({
+    //   where: {
+    //     id: input.id || '',
+    //   }
+    // })
+
+    // if (!workspaceJob) {
+    const csvData = { 'colour-0': input.primaryColour };
+    const csv = papaparse.unparse([csvData]);
+    const csvPath = `${input.id}/dominant_colours.csv`;
+    await AutodeckService.uploadDataToS3('haas-autodeck-logos', csvPath, csv, 'text/csv')
+    // }
+
+    const updatedWorkspaceJob = await prisma.createWorkspaceJob.upsert({
       where: {
-        id: input.id || '',
+        id: input.id || '-1',
       },
-      data: {
+      create: {
+        id: input.id || '',
+        name: input.name || '',
+        status: 'IN_PHOTOSHOP_QUEUE',
+        referenceType: 'AWS',
+        requiresColorExtraction: false,
+        requiresRembg: false,
+        requiresScreenshot: false
+      },
+      update: {
         status: 'IN_PHOTOSHOP_QUEUE',
       }
     })
@@ -108,55 +136,115 @@ class AutodeckService {
         name: input.name,
         status: 'PRE_PROCESSING',
         referenceType: 'AWS',
+        requiresRembg: input.requiresRembg || false,
+        requiresScreenshot: input.requiresWebsiteScreenshot || false,
+        requiresColorExtraction: input.requiresColorExtraction || false,
       }
     })
 
-    const fileKey = input?.logoUrl?.split('.com/')[1]
-    const logoManipulationEvent = { key: fileKey, bucket: 'haas-autodeck-logos' }
-    const strLogoManipulationEvent = JSON.stringify(logoManipulationEvent, null, 2);
-    const logoManipulationSNSParams = {
-      Message: strLogoManipulationEvent,
-      TopicArn: "arn:aws:sns:eu-central-1:118627563984:SalesDeckProcessingChannel"
+    if (!input.requiresColorExtraction) {
+      const csvData = { 'colour-0': input.primaryColour };
+      const csv = papaparse.unparse([csvData]);
+      const csvPath = `${input.id}/dominant_colours.csv`;
+      await AutodeckService.uploadDataToS3('haas-autodeck-logos', csvPath, csv, 'text/csv')
     }
-    sns.publish(logoManipulationSNSParams, (err, data) => {
-      if (err) console.log('ERROR: ', err);
 
-      console.log('Logo manipulation publish response: ', data);
-    });
-   
-    const screenshotEvent: ScreenshotProps = {
-      websiteUrl: input.websiteUrl || '',
-      bucket: 'haas-autodeck-logos',
-      jobId: input.id || ''
+    if (input.requiresRembg || input.requiresColorExtraction) {
+      console.log('going to run lamba for logo manipulation');
+      const fileKey = input?.logoUrl?.split('.com/')[1]
+      const logoManipulationEvent = {
+        key: fileKey,
+        bucket: 'haas-autodeck-logos',
+        requiresRembg: input.requiresRembg,
+        requiresScreenshot: input.requiresWebsiteScreenshot,
+        requiresColorExtraction: input.requiresColorExtraction
+      }
+      const strLogoManipulationEvent = JSON.stringify(logoManipulationEvent, null, 2);
+      const logoManipulationSNSParams = {
+        Message: strLogoManipulationEvent,
+        TopicArn: "arn:aws:sns:eu-central-1:118627563984:SalesDeckProcessingChannel"
+      }
+      sns.publish(logoManipulationSNSParams, (err, data) => {
+        if (err) console.log('ERROR: ', err);
+
+        console.log('Logo manipulation publish response: ', data);
+      });
     }
-    const strScreenshotEvent = JSON.stringify(screenshotEvent, null, 2);
-    const screenshotSNSParams = {
-      Message: strScreenshotEvent,
-      TopicArn: "arn:aws:sns:eu-central-1:118627563984:WebsiteScreenshotChannel"
-    };
-    sns.publish(screenshotSNSParams, (err, data) => {
-      if (err) console.log('ERROR: ', err);
 
-      console.log('Website screenshot publish response: ', data);
-    });
+    if (input.requiresWebsiteScreenshot) {
+      console.log('going to run lamba for website screenshot');
+      const screenshotEvent: ScreenshotProps = {
+        websiteUrl: input.websiteUrl || '',
+        bucket: 'haas-autodeck-logos',
+        jobId: input.id || '',
+        requiresRembg: input.requiresRembg,
+        requiresScreenshot: input.requiresWebsiteScreenshot,
+        requiresColorExtraction: input.requiresColorExtraction
+      }
+      const strScreenshotEvent = JSON.stringify(screenshotEvent, null, 2);
+      const screenshotSNSParams = {
+        Message: strScreenshotEvent,
+        TopicArn: "arn:aws:sns:eu-central-1:118627563984:WebsiteScreenshotChannel"
+      };
+      sns.publish(screenshotSNSParams, (err, data) => {
+        if (err) console.log('ERROR: ', err);
+
+        console.log('Website screenshot publish response: ', data);
+      });
+    }
 
     return workspaceJob;
   }
 
-  static getPreviewData = async (id: String) => {
+  static getPreviewData = async (id: string) => {
     // Download colour CSV from S3
     const S3_BUCKET_PREFIX = `https://haas-autodeck-logos.s3.eu-central-1.amazonaws.com/${id}`;
-    const rembgLogoUrl = `${S3_BUCKET_PREFIX}/rembg_logo.png`;
-    const websiteScreenshotUrl = `${S3_BUCKET_PREFIX}/website_screenshot.png`;
+
+    const params = {
+      Bucket: 'haas-autodeck-logos',
+      Prefix: `${id}/`
+    };
+
+    const logoKey = await new Promise((resolve, reject) => {
+      s3.listObjectsV2(params, (err, data) => {
+        if (err) return reject(err);
+        const fileWithRembg = data.Contents?.find((file) => file.Key?.includes('rembg'))
+        if (!fileWithRembg) {
+          const originalFile = data.Contents?.find((file) => file.Key?.includes('original'))
+          const fileName = originalFile?.Key?.split('/')[1];
+          resolve(fileName)
+        }
+        const fileName = fileWithRembg?.Key?.split('/')[1];
+        resolve(fileName);
+      });
+    });
+
+    const rembgLogoUrl = `${S3_BUCKET_PREFIX}/${logoKey}`;
+
+    const screenshotKey = await new Promise((resolve, reject) => {
+      s3.listObjectsV2(params, (err, data) => {
+        if (err) return reject(err);
+        const file = data.Contents?.find((file) => file.Key?.includes('website_screenshot'))
+        const fileName = file?.Key?.split('/')[1];
+        resolve(fileName);
+      });
+    });
+
+    const websiteScreenshotUrl = screenshotKey ? `${S3_BUCKET_PREFIX}/${screenshotKey}` : '';
     const csvUrl = `${S3_BUCKET_PREFIX}/dominant_colours.csv`;
 
     const dominantColorsCSV = await request(csvUrl)
-    .pipe(new StringStream())                       // pass to stream
-    .CSVParse()
-    .toArray()
-    const colorPalette = dominantColorsCSV[1];
-    const result : { colors: Array<string>, rembgLogoUrl: string, websiteScreenshotUrl: string } 
-    = { colors: colorPalette, rembgLogoUrl, websiteScreenshotUrl };
+      .pipe(new StringStream())                       // pass to stream
+      .CSVParse({ delimiter: ',' })
+      .toArray()
+      .catch((err) => {
+        console.log('Something went wrong retrieving dominant colors CSV: ', err)
+        return [];
+      })
+
+    const colorPalette = dominantColorsCSV.length > 0 ? dominantColorsCSV[1] : [];
+    const result: { colors: Array<string>, rembgLogoUrl: string, websiteScreenshotUrl: string }
+      = { colors: colorPalette, rembgLogoUrl, websiteScreenshotUrl };
     return result;
   }
 

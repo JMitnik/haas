@@ -189,10 +189,13 @@ export type CreateWorkspaceJobType = {
   id: Scalars['String'];
   createdAt: Scalars['String'];
   name: Scalars['String'];
+  status: JobStatusType;
+  requiresColorExtraction: Scalars['Boolean'];
+  requiresRembg: Scalars['Boolean'];
+  requiresScreenshot: Scalars['Boolean'];
+  resourcesUrl?: Maybe<Scalars['String']>;
   updatedAt?: Maybe<Scalars['String']>;
   referenceId?: Maybe<Scalars['String']>;
-  status: JobStatusType;
-  resourcesUrl?: Maybe<Scalars['String']>;
   referenceType: CloudReferenceType;
 };
 
@@ -546,6 +549,9 @@ export type FormNodeType = {
 /** Generate sales documents */
 export type GenerateAutodeckInput = {
   id: Scalars['String'];
+  requiresRembgLambda: Scalars['Boolean'];
+  requiresWebsiteScreenshot: Scalars['Boolean'];
+  requiresColorExtraction: Scalars['Boolean'];
   name?: Maybe<Scalars['String']>;
   website?: Maybe<Scalars['String']>;
   logo?: Maybe<Scalars['String']>;
@@ -707,6 +713,8 @@ export type MutationConfirmCreateWorkspaceJobArgs = {
 export type MutationUploadJobImageArgs = {
   file?: Maybe<Scalars['Upload']>;
   jobId?: Maybe<Scalars['String']>;
+  type?: Maybe<UploadImageEnumType>;
+  disapproved?: Maybe<Scalars['Boolean']>;
 };
 
 
@@ -1543,6 +1551,11 @@ export type UpdateQuestionNodeInputType = {
 };
 
 
+export enum UploadImageEnumType {
+  Logo = 'LOGO',
+  WebsiteScreenshot = 'WEBSITE_SCREENSHOT'
+}
+
 export type UserConnection = ConnectionInterface & {
   __typename?: 'UserConnection';
   offset: Scalars['Int'];
@@ -1634,7 +1647,7 @@ export type GetAutodeckJobsQuery = (
     { __typename?: 'AutodeckConnectionType' }
     & { jobs: Array<(
       { __typename?: 'CreateWorkspaceJobType' }
-      & Pick<CreateWorkspaceJobType, 'id' | 'name' | 'createdAt' | 'updatedAt' | 'referenceId' | 'status' | 'resourcesUrl' | 'referenceType'>
+      & Pick<CreateWorkspaceJobType, 'id' | 'name' | 'createdAt' | 'updatedAt' | 'referenceId' | 'status' | 'resourcesUrl' | 'referenceType' | 'requiresColorExtraction' | 'requiresRembg' | 'requiresScreenshot'>
     )>, pageInfo: (
       { __typename?: 'PaginationPageInfo' }
       & Pick<PaginationPageInfo, 'nrPages' | 'pageIndex'>
@@ -1642,13 +1655,15 @@ export type GetAutodeckJobsQuery = (
   ) }
 );
 
-export type UploadJobLogoMutationVariables = Exact<{
+export type UploadJobImageMutationVariables = Exact<{
   file: Scalars['Upload'];
   jobId?: Maybe<Scalars['String']>;
+  type?: Maybe<UploadImageEnumType>;
+  disapproved?: Maybe<Scalars['Boolean']>;
 }>;
 
 
-export type UploadJobLogoMutation = (
+export type UploadJobImageMutation = (
   { __typename?: 'Mutation' }
   & { uploadJobImage?: Maybe<(
     { __typename?: 'AWSImageType' }
@@ -1868,6 +1883,9 @@ export const GetAutodeckJobsDocument = gql`
       status
       resourcesUrl
       referenceType
+      requiresColorExtraction
+      requiresRembg
+      requiresScreenshot
     }
     pageInfo {
       nrPages
@@ -1905,39 +1923,41 @@ export type GetAutodeckJobsQueryResult = Apollo.QueryResult<GetAutodeckJobsQuery
 export function refetchGetAutodeckJobsQuery(variables?: GetAutodeckJobsQueryVariables) {
       return { query: GetAutodeckJobsDocument, variables: variables }
     }
-export const UploadJobLogoDocument = gql`
-    mutation uploadJobLogo($file: Upload!, $jobId: String) {
-  uploadJobImage(file: $file, jobId: $jobId) {
+export const UploadJobImageDocument = gql`
+    mutation uploadJobImage($file: Upload!, $jobId: String, $type: UploadImageEnumType, $disapproved: Boolean) {
+  uploadJobImage(file: $file, jobId: $jobId, type: $type, disapproved: $disapproved) {
     url
   }
 }
     `;
-export type UploadJobLogoMutationFn = Apollo.MutationFunction<UploadJobLogoMutation, UploadJobLogoMutationVariables>;
+export type UploadJobImageMutationFn = Apollo.MutationFunction<UploadJobImageMutation, UploadJobImageMutationVariables>;
 
 /**
- * __useUploadJobLogoMutation__
+ * __useUploadJobImageMutation__
  *
- * To run a mutation, you first call `useUploadJobLogoMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useUploadJobLogoMutation` returns a tuple that includes:
+ * To run a mutation, you first call `useUploadJobImageMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUploadJobImageMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [uploadJobLogoMutation, { data, loading, error }] = useUploadJobLogoMutation({
+ * const [uploadJobImageMutation, { data, loading, error }] = useUploadJobImageMutation({
  *   variables: {
  *      file: // value for 'file'
  *      jobId: // value for 'jobId'
+ *      type: // value for 'type'
+ *      disapproved: // value for 'disapproved'
  *   },
  * });
  */
-export function useUploadJobLogoMutation(baseOptions?: Apollo.MutationHookOptions<UploadJobLogoMutation, UploadJobLogoMutationVariables>) {
-        return Apollo.useMutation<UploadJobLogoMutation, UploadJobLogoMutationVariables>(UploadJobLogoDocument, baseOptions);
+export function useUploadJobImageMutation(baseOptions?: Apollo.MutationHookOptions<UploadJobImageMutation, UploadJobImageMutationVariables>) {
+        return Apollo.useMutation<UploadJobImageMutation, UploadJobImageMutationVariables>(UploadJobImageDocument, baseOptions);
       }
-export type UploadJobLogoMutationHookResult = ReturnType<typeof useUploadJobLogoMutation>;
-export type UploadJobLogoMutationResult = Apollo.MutationResult<UploadJobLogoMutation>;
-export type UploadJobLogoMutationOptions = Apollo.BaseMutationOptions<UploadJobLogoMutation, UploadJobLogoMutationVariables>;
+export type UploadJobImageMutationHookResult = ReturnType<typeof useUploadJobImageMutation>;
+export type UploadJobImageMutationResult = Apollo.MutationResult<UploadJobImageMutation>;
+export type UploadJobImageMutationOptions = Apollo.BaseMutationOptions<UploadJobImageMutation, UploadJobImageMutationVariables>;
 export const GetPreviewDataDocument = gql`
     query getPreviewData($id: String) {
   getPreviewData(id: $id) {
