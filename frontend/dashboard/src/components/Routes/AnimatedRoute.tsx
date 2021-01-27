@@ -18,7 +18,13 @@ const routeAnimation: Variants = {
 };
 
 const AnimatedRoute = ({ children, ...routeProps }: RouteProps) => (
-  <motion.div variants={routeAnimation} initial="initial" animate="enter" exit="exit">
+  <motion.div
+    variants={routeAnimation}
+    initial="initial"
+    animate="enter"
+    exit="exit"
+    style={{ height: '100%' }}
+  >
     <Route {...routeProps}>
       {children}
     </Route>
