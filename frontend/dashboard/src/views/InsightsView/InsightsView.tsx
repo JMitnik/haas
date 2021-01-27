@@ -76,10 +76,13 @@ const InsightsView = () => {
       <UI.ViewContainer>
         <InsightsViewContainer gridGap={4} gridTemplateColumns={['1fr', '1fr 2fr']}>
           <UI.Stack spacing={4}>
-            <UI.Card onClick={() => setPinnedPath({
-              edges: sampleBestPathIds,
-              handle: DialoguePathHandle.POPULAR
-            })}>
+            <UI.Card
+              isActive={pinnedPath?.handle === DialoguePathHandle.POPULAR}
+              borderLeftColor="blue.500"
+              onClick={() => setPinnedPath({
+                edges: sampleBestPathIds,
+                handle: DialoguePathHandle.POPULAR
+              })}>
               <UI.CardHeader color="blue.500">
                 <UI.Icon mr={1}><StarIcon width="1rem" /></UI.Icon>
                 <UI.Helper color="blue.500">{t('most_popular_path')}</UI.Helper>
@@ -99,11 +102,14 @@ const InsightsView = () => {
                 </UI.Flex>
               </UI.CardBody>
             </UI.Card>
-            <UI.Card onClick={() => setPinnedPath({
-              edges: sampleCriticalPathIds,
-              handle: DialoguePathHandle.CRITICAL
-            })
-            }>
+            <UI.Card
+              isActive={pinnedPath?.handle === DialoguePathHandle.CRITICAL}
+              borderLeftColor="red.500"
+              onClick={() => setPinnedPath({
+                edges: sampleCriticalPathIds,
+                handle: DialoguePathHandle.CRITICAL
+              })
+              }>
               <UI.CardHeader color="red.500">
                 <UI.Icon mr={1}><ExclamationIcon width="1rem" /></UI.Icon>
                 <UI.Helper color="red.500">{t('most_critical_path')}</UI.Helper>

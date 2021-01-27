@@ -11,6 +11,7 @@ interface CardProps {
   isFlat?: boolean;
   outline?: boolean;
   boxShadow?: BoxShadowSize;
+  isActive?: boolean;
   willFocusWithin?: boolean;
 }
 
@@ -23,7 +24,7 @@ export const CardHeader = styled(Div)`
 `;
 
 export const Card = styled(Div) <CardProps>`
-  ${({ theme, noHover, boxShadow, outline, isFlat, willFocusWithin }) => css`
+  ${({ theme, noHover, boxShadow, outline, isFlat, willFocusWithin, isActive, borderLeftColor }) => css`
     position: relative;
     display: flex;
     flex-direction: column;
@@ -44,6 +45,10 @@ export const Card = styled(Div) <CardProps>`
       }
     `}
 
+    ${isActive && css`
+      border-left-width: 4px;
+    `}
+
     ${isFlat && css`
       box-shadow: none;
     `}
@@ -52,7 +57,7 @@ export const Card = styled(Div) <CardProps>`
       cursor: pointer;
 
       &:hover {
-        transition: all .3s cubic-bezier(.55,0,.1,1);
+        transition: box-shadow .3s cubic-bezier(.55,0,.1,1);
         box-shadow: rgba(0, 0, 0, 0.20) 0px 4px 12px;
       }
     `}
