@@ -1,6 +1,6 @@
 datasource postgresql {
   provider = "postgresql"
-  url      = env("TEST_DB_STRING")
+  url      = env("DB_STRING")
 }
 
 // binaryTargets = ["debian-openssl-1.1.x"]
