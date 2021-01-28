@@ -13,6 +13,7 @@ import ServerError from 'components/ServerError';
 import { useRequestInviteMutation } from 'types/generated-types';
 
 import * as LS from './LoginViewStyles';
+import { useLogger } from 'hooks/useLogger';
 
 interface FormData {
   email: string;
@@ -24,15 +25,24 @@ const baseRoute = '/public/login';
 const LoginView = () => {
   const history = useHistory();
   const toast = useToast();
+  const logger = useLogger();
 
   const [requestInvite, { error: loginServerError, loading: isRequestingInvite }] = useRequestInviteMutation({
-    onError: () => {
+    onError: (error) => {
       toast({
         title: 'Unexpected error!',
         description: 'See the form for more information.',
         status: 'error',
         position: 'bottom-right',
         isClosable: true,
+      });
+
+      console.log(error.name);
+
+      logger.logError(error, {
+        tags: {
+          auth: 'login'
+        },
       });
     },
     onCompleted: () => {
@@ -43,7 +53,6 @@ const LoginView = () => {
         position: 'bottom-right',
         isClosable: true,
       });
-
       history.push(`${baseRoute}/waiting`);
     },
   });
@@ -67,7 +76,7 @@ const LoginView = () => {
         <UI.Text fontSize="2rem" fontWeight="800" color="gray.800" mb={2}>
           Sign in to Haas
         </UI.Text>
-        <UI.Card height="250px" width="100%" maxWidth={600} bg="white" noHover>
+        <UI.Card minHeight="250px" width="100%" maxWidth={600} bg="white" noHover>
           <UI.CardBody overflow="hidden">
             <AnimatedRoutes>
               <AnimatedRoute exact path={`${baseRoute}`}>
