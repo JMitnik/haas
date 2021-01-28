@@ -1,0 +1,51 @@
+haas:
+  dialogue:
+    resources:
+      ctas:
+        - node: { id: 'CTA-SHARE', heading: 'Share with your friends!', type: 'Share' }
+        - node: { id: 'CTA-OPINION', heading: 'Let us know your opinion!', type: 'Opinion' }
+      topics:
+        - topic: { name: 'Happiness', id: 'T_HAPPINESS', values: ['Application Design', 'Website design', 'Good AI Partner'] }
+        - topic: { name: 'Subscribe to email?', id: 'T_CLEAR', values: ['Yes', 'No'] }
+        - topic: { id: 'T_CORE', values: ['Deeper test', 'Gogogo', 'Hmmm'] }
+    node: { 
+      heading: 'How do you feel?', 
+      type: 'Slider',
+      children: [
+        {
+          heading: 'Why do you feel good?', 
+          type: 'Choice', 
+          options: { byTopicId: 'T_HAPPINESS' },
+          condition: { min: 60, max: 100 },
+          cta: { byId: '#CTA-SHARE' },
+          childrenByTemplate: {
+              type: 'Choice',
+              options: { byTopicId: 'T_CLEAR' },
+              heading: 'What did you like about the {{ context.matchValue }}?',
+          },
+        },
+        {
+          heading: 'Why are you meh?', 
+          type: 'Choice', 
+          options: { byTopicId: 'T_CORE' },
+          condition: { min: 10, max: 60 },
+          cta: { byId: 'CTA-SHARE' },
+          childrenByTemplate: {
+              type: 'Choice',
+              options: { byTopicId: 'T_CORE' },
+              heading: 'What did you not like about the {{ context.matchValue }}?',
+          },
+        },
+        {
+          heading: 'Why are you unhappy?',
+          type: 'Choice',
+          options: { byTopicId: 'T_HAPPINESS' },
+          overrideOptions: [{
+            byValue: 'Website design',
+            showAs: 'UI/UX',
+            cta: { byID: 'CTA-OPINION' }
+          }],
+          condition: { min: 0, max: 10 },
+        }
+      ]
+    }
