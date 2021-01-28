@@ -4,7 +4,7 @@ import styled, { css } from 'styled-components';
 import { Div, GenericProps, H2 } from '@haas/ui';
 import { ReactComponent as SVGLogo } from 'assets/logo.svg';
 
-export const LogoContainer = styled(Div)<{fill?: string}>`
+export const LogoContainer = styled(Div) <{ fill?: string }>`
   ${({ theme }) => css`
     display: flex;
 
@@ -23,7 +23,7 @@ export const LogoContainer = styled(Div)<{fill?: string}>`
   `}
 `;
 
-export const FullLogoContainer = styled(Div)<GenericProps>`
+export const FullLogoContainer = styled(Div) <GenericProps>`
   ${({ theme }) => css`
     display: flex;
     align-items: center;
@@ -58,7 +58,7 @@ export const FullLogo = (props: any) => (
   </FullLogoContainer>
 );
 
-const Logo = (props: any) => (
+export const Logo = (props: any) => (
   <LogoContainer {...props}>
     <SVGLogo />
   </LogoContainer>

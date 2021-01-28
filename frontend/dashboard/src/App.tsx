@@ -1,7 +1,7 @@
 import { AnimatePresence } from 'framer-motion';
 import { ApolloProvider } from '@apollo/client';
 import { Div, ViewContainer } from '@haas/ui';
-import { ErrorBoundary } from 'react-error-boundary';
+import { ErrorBoundary } from '@sentry/react';
 import { I18nextProvider } from 'react-i18next';
 import { Redirect, Route, BrowserRouter as Router, Switch } from 'react-router-dom';
 import React, { FC } from 'react';
@@ -303,12 +303,12 @@ const App: FC = () => (
   <>
     <I18nextProvider i18n={lang}>
       <Router>
-        <ErrorBoundary FallbackComponent={GeneralErrorFallback}>
+        <ErrorBoundary fallback={GeneralErrorFallback}>
           <ApolloProvider client={client}>
             <DefaultThemeProviders>
               <UserProvider>
                 <AppContainer>
-                  <ErrorBoundary FallbackComponent={GeneralErrorFallback}>
+                  <ErrorBoundary fallback={GeneralErrorFallback}>
                     <AppRoutes />
                   </ErrorBoundary>
                 </AppContainer>

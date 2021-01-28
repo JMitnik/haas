@@ -29,8 +29,8 @@ export class CampaignService {
     paginationOptions?: NexusGenInputs['PaginationWhereInput'],
     deliveryOptions?: DeliveryOptionsProps
   ) {
-    const deliveryFilterOptions: FindManyDeliveryArgs = { 
-      where: { 
+    const deliveryFilterOptions: FindManyDeliveryArgs = {
+      where: {
         campaignId,
         currentStatus: deliveryOptions?.status || undefined,
         campaignVariant: (!!deliveryOptions || undefined) && {
@@ -38,21 +38,21 @@ export class CampaignService {
         },
       },
     };
-    
+
     const findManyDeliveriesCallback = ({ props: findManyArgs }: FindManyCallBackProps) => prisma.delivery.findMany({
       ...findManyArgs,
       include: {
         events: true
       }
     });
-    const countDeliveriesCallback = async ({ props: countArgs } : FindManyCallBackProps) => prisma.delivery.count(countArgs);
+    const countDeliveriesCallback = async ({ props: countArgs }: FindManyCallBackProps) => prisma.delivery.count(countArgs);
 
     const deliveryPaginationOptions: PaginateProps = {
       findManyArgs: {
         findArgs: deliveryFilterOptions,
         findManyCallBack: findManyDeliveriesCallback,
         searchFields: [],
-        orderFields: ['updatedAt', 'scheduledAt'],
+        orderFields: ['updatedAt', 'scheduledAt', 'firstName'],
       },
       countArgs: {
         countCallBack: countDeliveriesCallback,

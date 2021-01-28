@@ -14,6 +14,17 @@ const makeSignInTemplate = ({ recipientMail, token, bgColor = '#0059f8' }: makeS
 
   return mjml2html(`
         <mjml>
+        <mj-head>
+        <mj-attributes>
+          <mj-text font-family="Ubuntu, Helvetica, Arial, sans-serif" color="#000000"></mj-text>
+          <mj-class name="description"></mj-class>
+          <mj-class name="preheader" color="#000000" font-size="11px" padding-left="25px" padding-right="25px"></mj-class>
+          <mj-class name="strong" font-weight="700"></mj-class>
+          <mj-class name="button" background-color="#fcc245" color="#000000" font-size="18px" border-radius="3px" font-family="Ubuntu, Helvetica, Arial, sans-serif"></mj-class>
+        </mj-attributes>
+        <mj-style inline="inline">a { text-decoration: none!important; }
+        </mj-style>
+      </mj-head>
         <mj-body background-color=${bgColor}>
             <mj-section text-align="center">
                 <mj-column>
@@ -32,9 +43,22 @@ const makeSignInTemplate = ({ recipientMail, token, bgColor = '#0059f8' }: makeS
             <mj-column width="100%">
             <mj-text>
             Hi ${recipientMail}, you have requested a sign in link.
+            </mj-text>
             
-            ${token && `To sign in, please click on the following link: <a href="${config.dashboardUrl}/verify_token?token=${token}">Sign in</a>`}
-                    </mj-text>
+           
+            ${token && `
+                <mj-text>
+                To sign in, please click on the following link:         
+                </mj-text>
+                <mj-button href="${config.dashboardUrl}/verify_token?token=${token}" background-color="#36d399">
+                ✨ Magic link
+                </mj-button>
+                
+                <mj-text>
+                Please note that this link expires in <span style="font-weight: 700">3 days</span>. If you wish to request a new login link, simply
+                go to <a href="${config.dashboardUrl}">the dashboard login</a> and fill in your mail again.
+                </mj-text>
+            `}
                 </mj-column>
             </mj-section>
         </mj-body>

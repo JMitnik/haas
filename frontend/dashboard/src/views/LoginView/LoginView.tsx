@@ -1,51 +1,38 @@
-import { Button, useToast } from '@chakra-ui/core';
-import { Div, Form, FormControl, FormLabel, Grid, H2, Input, InputGrid, Paragraph, Text } from '@haas/ui';
+import { useToast } from '@chakra-ui/core';
+import React from 'react';
+import * as UI from '@haas/ui';
+import { Div, Form, FormControl, InputGrid, Text } from '@haas/ui';
 import { Mail, Send } from 'react-feather';
 import { useForm } from 'react-hook-form';
 import { useHistory } from 'react-router';
-import { useMutation } from '@apollo/client';
-import React from 'react';
-import { gql } from '@apollo/client';
 
-import { FullLogo } from 'components/Logo/Logo';
+import Logo from 'components/Logo/Logo';
 import AnimatedRoute from 'components/Routes/AnimatedRoute';
 import AnimatedRoutes from 'components/Routes/AnimatedRoutes';
 import ServerError from 'components/ServerError';
+import { useRequestInviteMutation } from 'types/generated-types';
+import { useLogger } from 'hooks/useLogger';
 
-import {
-  LoginContentContainer,
-  LoginViewContainer, LoginViewSideScreen
-} from './LoginViewStyles';
+import * as LS from './LoginViewStyles';
 
 interface FormData {
   email: string;
   password: string;
 }
 
-const requestInviteMutation = gql`
-  mutation requestInvite($input: RequestInviteInput) {
-    requestInvite(input: $input) {
-      didInvite
-    }
-  }
-`;
-
 const baseRoute = '/public/login';
 
 const LoginView = () => {
   const history = useHistory();
   const toast = useToast();
+  const logger = useLogger();
 
-  const [requestInvite, { error: loginServerError, loading: isRequestingInvite }] = useMutation(requestInviteMutation, {
-    onError: () => {
-      toast({
-        title: 'Unexpected error!',
-        description: 'See the form for more information.',
-        status: 'error',
-        position: 'bottom-right',
-        isClosable: true,
-      });
-    },
+  const form = useForm<FormData>({
+    mode: 'onChange',
+    shouldUnregister: false
+  });
+
+  const [requestInvite, { error: loginServerError, loading: isRequestingInvite }] = useRequestInviteMutation({
     onCompleted: () => {
       toast({
         title: 'Invite has been sent in case the mail matches!',
@@ -54,55 +41,85 @@ const LoginView = () => {
         position: 'bottom-right',
         isClosable: true,
       });
-
       history.push(`${baseRoute}/waiting`);
     },
-  });
+    onError: (error) => {
+      toast({
+        title: 'Unexpected error!',
+        description: 'See the form for more information.',
+        status: 'error',
+        position: 'bottom-right',
+        isClosable: true,
+      });
 
-  const form = useForm<FormData>({
-    mode: 'onChange',
+      logger.logError(error, {
+        tags: {
+          section: 'auth',
+        },
+        user: {
+          email: form.getValues().email
+        }
+      });
+    },
   });
 
   const handleRequestInvite = async (data: FormData) => {
     requestInvite({
-      variables: { input: { email: data.email } },
+      variables: {
+        input: { email: data.email }
+      },
     });
   };
 
+  const sentEmail = form.watch('email');
+
   return (
-    <LoginViewContainer>
-      <Grid minHeight="100vh" gridTemplateColumns={['1fr', '2fr 1fr']} gridGap={0}>
-        <Div bg="white">
-          <LoginContentContainer padding={['4', '15%']}>
-            <FullLogo mb="84px" />
+    <LS.LoginViewContainer>
+      <LS.LoginContentContainer>
+        <Logo color="gray.500" mb={4} />
+        <UI.Text fontSize="2rem" fontWeight="800" color="gray.800" mb={2}>
+          Sign in to Haas
+        </UI.Text>
+        <UI.Card minHeight="250px" width="100%" maxWidth={600} bg="white" noHover>
+          <UI.CardBody
+            overflow="hidden" display="flex" alignItems="center" justifyContent="center">
             <AnimatedRoutes>
               <AnimatedRoute exact path={`${baseRoute}`}>
                 <Form onSubmit={form.handleSubmit(handleRequestInvite)}>
-                  <H2 color="gray.800" mb={2}>Log in</H2>
-                  <Paragraph fontSize="0.9rem" color="gray.500" mb={4}>
-                    Login using your registered email address
-                  </Paragraph>
                   <ServerError serverError={loginServerError} />
 
-                  <InputGrid gridTemplateColumns="1fr">
-                    <Div maxWidth="500px">
-                      <FormControl>
-                        <FormLabel htmlFor="email">Email</FormLabel>
-                        <Input
-                          name="email"
-                          id="email"
-                          autoFocus
-                          type="email"
-                          autoComplete="username"
-                          ref={form.register({ required: true })}
-                          leftEl={<Mail />}
-                          placeholder="bunny@haas.live"
-                        />
-                      </FormControl>
-                    </Div>
-                  </InputGrid>
+                  <UI.FormSectionHelper>
+                    Welcome to Haas Dashboard! To continue, input your email below, and we will send you a login link
+                  </UI.FormSectionHelper>
 
-                  <Button
+                  <UI.Div mt={2}>
+                    <InputGrid gridTemplateColumns="1fr">
+                      <Div>
+                        <FormControl>
+                          <UI.FormLabel
+                            fontSize="1rem"
+                            htmlFor="email"
+                          >
+                            Email
+                          </UI.FormLabel>
+                          <UI.Input
+                            name="email"
+                            id="email"
+                            autoFocus
+                            variant="filled"
+                            type="email"
+                            autoComplete="username"
+                            ref={form.register({ required: true })}
+                            leftEl={<Mail />}
+                            placeholder="bunny@haas.live"
+                          />
+                        </FormControl>
+                      </Div>
+                    </InputGrid>
+                  </UI.Div>
+
+                  <UI.Button
+                    variantColor="teal"
                     leftIcon={Send}
                     type="submit"
                     isDisabled={!form.formState.isValid}
@@ -110,24 +127,34 @@ const LoginView = () => {
                     isLoading={isRequestingInvite}
                     loadingText="Logging in"
                   >
-                    Request login
-                  </Button>
+                    Send login link
+                  </UI.Button>
                 </Form>
               </AnimatedRoute>
               <AnimatedRoute path={`${baseRoute}/waiting`}>
-                <Text fontSize="1.8rem" color="gray.600" textAlign="center">
-                  Check your mail!
-                </Text>
-                <Text textAlign="center" fontSize="1rem" fontWeight="300" color="gray.500">
-                  You should receive an invitation link very soon!
-                </Text>
+                <UI.Flex height="100%" alignItems="center" justifyContent="center">
+                  <UI.Div>
+                    <Text fontSize="1.8rem" color="gray.600" textAlign="center">
+                      Check your mail!
+                    </Text>
+                    { }
+                    <Text textAlign="center" fontSize="1rem" fontWeight="300" color="gray.500">
+                      <>
+                        {sentEmail && (
+                          <UI.Span>We sent an email to <UI.Span fontWeight="700">{sentEmail}.</UI.Span></UI.Span>
+                        )}
+                        <br />
+                      You should receive an invitation link very soon!
+                      </>
+                    </Text>
+                  </UI.Div>
+                </UI.Flex>
               </AnimatedRoute>
             </AnimatedRoutes>
-          </LoginContentContainer>
-        </Div>
-        <LoginViewSideScreen order={[1, 2]} />
-      </Grid>
-    </LoginViewContainer>
+          </UI.CardBody>
+        </UI.Card>
+      </LS.LoginContentContainer>
+    </LS.LoginViewContainer>
   );
 };
 

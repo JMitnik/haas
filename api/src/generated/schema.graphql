@@ -754,6 +754,7 @@ input RequestInviteInput {
 
 type RequestInviteOutput {
   didInvite: Boolean!
+  userExists: Boolean!
 }
 
 type RoleConnection implements ConnectionInterface {
@@ -789,6 +790,7 @@ type RoleType {
 type Session {
   createdAt: Date!
   delivery: DeliveryType
+  deliveryId: String
   device: String
   dialogueId: String!
   id: ID!

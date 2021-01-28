@@ -535,6 +535,7 @@ export interface NexusGenRootTypes {
   }
   RequestInviteOutput: { // root type
     didInvite: boolean; // Boolean!
+    userExists: boolean; // Boolean!
   }
   RoleConnection: { // root type
     endDate?: string | null; // String
@@ -1032,6 +1033,7 @@ export interface NexusGenFieldTypes {
   }
   RequestInviteOutput: { // field return type
     didInvite: boolean; // Boolean!
+    userExists: boolean; // Boolean!
   }
   RoleConnection: { // field return type
     endDate: string | null; // String
@@ -1052,6 +1054,7 @@ export interface NexusGenFieldTypes {
   Session: { // field return type
     createdAt: any; // Date!
     delivery: NexusGenRootTypes['DeliveryType'] | null; // DeliveryType
+    deliveryId: string | null; // String
     device: string | null; // String
     dialogueId: string; // String!
     id: string; // ID!
