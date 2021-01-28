@@ -34,7 +34,7 @@ export const defaultCampaignViewFilter: DeliveryConnectionFilter = {
   },
 };
 
-const POLL_INTERVAL_SECONDS = 60;
+const POLL_INTERVAL_SECONDS = 20;
 const POLL_INTERVAL = POLL_INTERVAL_SECONDS * 1000;
 
 const DeliveryScheduledLabel = ({ scheduledAt }: { scheduledAt: string }) => {
@@ -177,9 +177,9 @@ export const CampaignView = () => {
           <UI.Div p={2}>
             <UI.Table width="100%" isLoading={loading}>
               <UI.TableHeading>
-                <UI.TableHeadingCell>
+                {/* <UI.TableHeadingCell>
                   <UI.TableSelect />
-                </UI.TableHeadingCell>
+                </UI.TableHeadingCell> */}
                 <UI.TableHeadingCell>
                   {t('recipient')}
                 </UI.TableHeadingCell>
@@ -197,11 +197,11 @@ export const CampaignView = () => {
               <UI.TableBody>
                 {deliveryConnection?.deliveries.map(delivery => (
                   <UI.TableRow isSelected={selectedIds.includes(delivery.id)} hasHover key={delivery.id} onClick={() => setActiveDelivery(delivery)}>
-                    <UI.TableCell width="1rem" center>
+                    {/* <UI.TableCell width="1rem" center>
                       <UI.TableSelect
                         isSelected={selectedIds.includes(delivery.id)} onClick={() => handleSelect(delivery.id)}
                       />
-                    </UI.TableCell>
+                    </UI.TableCell> */}
                     <UI.TableCell>
                       {delivery?.deliveryRecipientFirstName || ''}
                     </UI.TableCell>
