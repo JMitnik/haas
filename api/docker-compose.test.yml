@@ -1,0 +1,24 @@
+version: '3.5'
+services:
+  db:
+    restart: always
+    image: postgres:10.3
+    environment:
+      POSTGRES_USER: prisma
+      POSTGRES_PASSWORD: prisma
+    ports:
+      - '5439:5432'
+  migrate:
+    build:
+      context: '.'
+      dockerfile: ./Dockerfile.migrate
+    ports:
+      - '4009:4000'
+    env_file:
+      - .env
+    volumes:
+      - ./schema.prisma:/app/schema.prisma
+    environment: 
+      DB_STRING: 'postgresql://prisma:prisma@db:5432/postgres?schema=public'
+    depends_on: 
+      - db

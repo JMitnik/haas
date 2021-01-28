@@ -1,5 +1,11 @@
+import { PrismaClient } from "@prisma/client";
+
 export class TemplateService {
-  constructor() { }
+  prisma: PrismaClient;
+
+  constructor(prisma: PrismaClient) {
+    this.prisma = prisma;
+  }
 
   /**
    * Parses a `HAAS` template (already imported)
@@ -9,7 +15,5 @@ export class TemplateService {
     const dialogueResources = dialogue.resources;
 
     // Parse resources (CTAs and Topics) (validate uniqueness IDs for instance)
-
-    // Parse 
   }
 }

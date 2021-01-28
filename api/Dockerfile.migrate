@@ -1,0 +1,10 @@
+FROM node:12.18.0-alpine3.11 AS base
+ENV PORT 4000
+
+WORKDIR /app
+
+RUN apk add yarn --update && yarn install
+RUN yarn add @prisma/cli@2.8.0
+
+FROM base as builder
+COPY migrations ./migrations
