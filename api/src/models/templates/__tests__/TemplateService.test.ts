@@ -18,11 +18,11 @@ afterAll(async (done) => {
 
 describe('TemplateService.parseTemplateFile', () => {
   it('Parses a yaml file', async () => {
-    const count = await prisma.campaign.findMany();
     const templateFile = fs.readFileSync(`${__dirname}/haas-test.yml`, 'utf8');
     const template = YAML.parse(templateFile);
     const templateService = new TemplateService(prisma);
 
     const dialogueTemplate = templateService.parseTemplate(template);
+
   });
 })

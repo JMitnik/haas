@@ -15,5 +15,8 @@ export class TemplateService {
     const dialogueResources = dialogue.resources;
 
     // Parse resources (CTAs and Topics) (validate uniqueness IDs for instance)
+
+
+    // Parse nodes, get both nodes and edges
   }
 }
