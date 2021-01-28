@@ -11,9 +11,9 @@ import AnimatedRoute from 'components/Routes/AnimatedRoute';
 import AnimatedRoutes from 'components/Routes/AnimatedRoutes';
 import ServerError from 'components/ServerError';
 import { useRequestInviteMutation } from 'types/generated-types';
+import { useLogger } from 'hooks/useLogger';
 
 import * as LS from './LoginViewStyles';
-import { useLogger } from 'hooks/useLogger';
 
 interface FormData {
   email: string;
@@ -28,23 +28,6 @@ const LoginView = () => {
   const logger = useLogger();
 
   const [requestInvite, { error: loginServerError, loading: isRequestingInvite }] = useRequestInviteMutation({
-    onError: (error) => {
-      toast({
-        title: 'Unexpected error!',
-        description: 'See the form for more information.',
-        status: 'error',
-        position: 'bottom-right',
-        isClosable: true,
-      });
-
-      console.log(error.name);
-
-      logger.logError(error, {
-        tags: {
-          auth: 'login'
-        },
-      });
-    },
     onCompleted: () => {
       toast({
         title: 'Invite has been sent in case the mail matches!',
@@ -54,6 +37,21 @@ const LoginView = () => {
         isClosable: true,
       });
       history.push(`${baseRoute}/waiting`);
+    },
+    onError: (error) => {
+      toast({
+        title: 'Unexpected error!',
+        description: 'See the form for more information.',
+        status: 'error',
+        position: 'bottom-right',
+        isClosable: true,
+      });
+
+      logger.logError(error, {
+        tags: {
+          section: 'auth'
+        },
+      });
     },
   });
 
