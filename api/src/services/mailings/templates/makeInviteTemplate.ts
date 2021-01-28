@@ -25,7 +25,7 @@ const makeInviteTemplate = ({ recipientMail, customerName, token, bgColor = '#00
             <mj-section border-radius="5px 5px 0 0"  background-color=${lighterBg}>
                 <mj-column>
                     <mj-text font-size="20px" color="white" align="left">
-                        Welcome to HAAS!
+                        Welcome to the ${customerName} workspace!
                     </mj-text>
                 </mj-column>
             </mj-section>
@@ -34,9 +34,22 @@ const makeInviteTemplate = ({ recipientMail, customerName, token, bgColor = '#00
             <mj-text>
             Dear ${recipientMail},
             you have been invited to join ${customerName}'s workspace.
+            </mj-text>
+
             
-            ${token && `To sign in, please click on the following link: <a href="${config.dashboardUrl}/verify_token?token=${token}">Sign in</a>`}
-                    </mj-text>
+            ${token && `
+              <mj-text>
+              To sign in, please click on the following button:         
+              </mj-text>
+              <mj-button href="${config.dashboardUrl}/verify_token?token=${token}" background-color="#36d399">
+              ✨ Magic link
+              </mj-button>
+              
+              <mj-text>
+              Please note that this link expires in <span style="font-weight: 700">3 days</span>. If you wish to request a new login link, simply
+              go to <a href="${config.dashboardUrl}">the dashboard login</a> and fill in your mail again.
+              </mj-text>
+            `}
                 </mj-column>
             </mj-section>
         </mj-body>

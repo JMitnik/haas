@@ -1,5 +1,5 @@
 import { useToast } from '@chakra-ui/core';
-import React from 'react';
+import React, { useState } from 'react';
 import * as UI from '@haas/ui';
 import { Div, Form, FormControl, Input, InputGrid, Text } from '@haas/ui';
 import { Mail, Send } from 'react-feather';
@@ -27,6 +27,11 @@ const LoginView = () => {
   const toast = useToast();
   const logger = useLogger();
 
+  const form = useForm<FormData>({
+    mode: 'onChange',
+    shouldUnregister: false
+  });
+
   const [requestInvite, { error: loginServerError, loading: isRequestingInvite }] = useRequestInviteMutation({
     onCompleted: () => {
       toast({
@@ -49,14 +54,13 @@ const LoginView = () => {
 
       logger.logError(error, {
         tags: {
-          section: 'auth'
+          section: 'auth',
         },
+        user: {
+          email: form.getValues().email
+        }
       });
     },
-  });
-
-  const form = useForm<FormData>({
-    mode: 'onChange',
   });
 
   const handleRequestInvite = async (data: FormData) => {
@@ -67,6 +71,8 @@ const LoginView = () => {
     });
   };
 
+  const sentEmail = form.watch('email');
+
   return (
     <LS.LoginViewContainer>
       <LS.LoginContentContainer>
@@ -75,7 +81,8 @@ const LoginView = () => {
           Sign in to Haas
         </UI.Text>
         <UI.Card minHeight="250px" width="100%" maxWidth={600} bg="white" noHover>
-          <UI.CardBody overflow="hidden">
+          <UI.CardBody
+            overflow="hidden" display="flex" alignItems="center" justifyContent="center">
             <AnimatedRoutes>
               <AnimatedRoute exact path={`${baseRoute}`}>
                 <Form onSubmit={form.handleSubmit(handleRequestInvite)}>
@@ -130,8 +137,15 @@ const LoginView = () => {
                     <Text fontSize="1.8rem" color="gray.600" textAlign="center">
                       Check your mail!
                     </Text>
+                    { }
                     <Text textAlign="center" fontSize="1rem" fontWeight="300" color="gray.500">
+                      <>
+                        {sentEmail && (
+                          <UI.Span>We sent an email to <UI.Span fontWeight="700">{sentEmail}.</UI.Span></UI.Span>
+                        )}
+                        <br />
                       You should receive an invitation link very soon!
+                      </>
                     </Text>
                   </UI.Div>
                 </UI.Flex>

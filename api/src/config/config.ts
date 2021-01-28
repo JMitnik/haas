@@ -30,7 +30,7 @@ if (!process.env.MAIL_SENDER) console.log('Mail sender not defined; wont send ma
 const config: ConfigProps = {
   baseUrl: process.env.BASE_URL || 'http://localhost:4000',
   jwtSecret: process.env.JWT_SECRET,
-  jwtExpiryMinutes: 30,
+  jwtExpiryMinutes: 4320,
   env: process.env.ENVIRONMENT || 'local',
   port: Number(process.env.PORT) || 4000,
   useSSL: Boolean(process.env.useSSL) || false,
