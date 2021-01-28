@@ -1,17 +1,16 @@
-FROM node:14 AS base
+FROM node:12.18.0-alpine3.11 AS base
 ENV PORT 4000
 
 WORKDIR /app
 
-RUN apt-get update \
-  && apt-get install curl python bash \
-  && yarn install
+RUN apk add bash yarn --update
+RUN yarn add @prisma/cli@2.8.0
 
 FROM base as builder
 
 COPY ./package.json schema.prisma ./
 
-RUN npx prisma generate
+RUN yarn install
 
 FROM base
 

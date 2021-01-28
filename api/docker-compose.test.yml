@@ -12,13 +12,26 @@ services:
     build:
       context: '.'
       dockerfile: ./Dockerfile.migrate
-    ports:
-      - '4009:4000'
     env_file:
       - .env
     volumes:
       - ./schema.prisma:/app/schema.prisma
     environment: 
       DB_STRING: 'postgresql://prisma:prisma@db:5432/postgres?schema=public'
+    depends_on: 
+      - db
+  api:
+    build:
+      context: '.'
+      dockerfile: ./Dockerfile
+    volumes:
+      - ./schema.prisma:/app/schema.prisma
+      - ./src:/src
+    ports:
+      - '4009:4000'
+    environment:
+      DB_STRING: 'postgresql://prisma:prisma@db:5432/postgres?schema=public'
+    env_file:
+      - .env
     depends_on: 
       - db
