@@ -20,11 +20,24 @@ ${({ theme }) => css`
 `;
 
 export const LoginContentContainer = styled(Div)`
+  ${({ theme }) => css`
+    display: flex;
+    flex-flow: column;
+    align-items: center;
+    width: 600px;
+    max-width: 100%;
+    margin: 0 auto;
+    padding: ${theme.gutter}px;
+  `}
 `;
 
 export const LoginViewContainer = styled.div`
   ${({ theme }) => css`
-    background: ${theme.colors.app.background};
+    background: ${theme.colors.gray[100]};
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   `}
 `;
 

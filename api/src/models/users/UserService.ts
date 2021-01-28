@@ -1,7 +1,6 @@
-import { FindManyUserOfCustomerArgs, User, UserOfCustomer } from '@prisma/client';
+import { FindManyUserOfCustomerArgs, UserOfCustomer } from '@prisma/client';
 
 import { NexusGenInputs } from '../../generated/nexus';
-import { Nullable } from '../../types/generic';
 import _ from 'lodash';
 
 import { FindManyCallBackProps, PaginateProps, paginate } from '../../utils/table/pagination';
@@ -10,10 +9,10 @@ import { mailService } from '../../services/mailings/MailService';
 import AuthService from '../auth/AuthService';
 import makeInviteTemplate from '../../services/mailings/templates/makeInviteTemplate';
 import prisma from '../../config/prisma';
+import makeRoleUpdateTemplate from '../../services/mailings/templates/makeRoleUpdateTemplate';
 
 class UserService {
   static async createUser(userInput: NexusGenInputs['UserInput']) {
-    // TODO: Connect to multile customers
     const user = await prisma.user.create({
       data: {
         email: userInput.email,
@@ -27,6 +26,9 @@ class UserService {
     return user;
   }
 
+  /**
+   * Invites a new user to a current customer, and mails them with a login-token.
+   */
   static async inviteNewUserToCustomer(email: string, customerId: string, roleId: string) {
     const createdUser = await prisma.user.create({
       data: {
@@ -80,46 +82,95 @@ class UserService {
     });
   }
 
-  static async inviteExistingUserToCustomer(user: User, customerId: string, roleId: string) {
-    const updatedUser = await prisma.user.update({
-      where: { id: user.id },
-      data: {
-        customers: {
-          create: {
-            customer: { connect: { id: customerId } },
-            role: { connect: { id: roleId } },
-          },
+  static async updateUserRole(userId: string, newRoleId: string, workspaceId: string) {
+    const updatedUser = await prisma.userOfCustomer.update({
+      where: {
+        userId_customerId: {
+          customerId: workspaceId,
+          userId: userId,
         },
       },
+      data: {
+        role: { connect: { id: newRoleId } },
+      },
       include: {
-        customers: {
-          include: {
-            customer: {
-              include: {
-                settings: {
-                  include: {
-                    colourSettings: true,
-                  },
-                },
-              },
-            },
-          },
+        role: {
+          select: {
+            name: true,
+          }
         },
+        user: {
+          select: {
+            email: true,
+          }
+        },
+        customer: {
+          select: {
+            name: true
+          }
+        }
+      }
+    });
+
+    const emailBody = makeRoleUpdateTemplate({
+      customerName: updatedUser.customer.name,
+      recipientMail: updatedUser.user.email,
+      newRoleName: updatedUser.role.name
+    });
+
+    mailService.send({
+      recipient: updatedUser.user.email,
+      subject: 'HAAS: New role assigned to you.',
+      body: emailBody,
+    });
+  }
+
+  static async inviteExistingUserToCustomer(userId: string, newRoleId: string, workspaceId: string) {
+    const invitedUser = await prisma.userOfCustomer.create({
+      data: {
+        customer: { connect: { id: workspaceId } },
+        role: { connect: { id: newRoleId } },
+        user: { connect: { id: userId } },
+      },
+      include: {
+        user: {
+          select: {
+            email: true,
+          }
+        },
+        customer: {
+          include: {
+            settings: { include: { colourSettings: true } }
+          }
+        }
+      }
+    });
+
+    const inviteLoginToken = AuthService.createUserToken(userId);
+
+    await prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        loginToken: inviteLoginToken,
       },
     });
 
     const emailBody = makeInviteTemplate({
-      customerName: updatedUser.customers[0].customer.name,
-      recipientMail: user.email,
-      bgColor: updatedUser.customers[0].customer.settings?.colourSettings?.primary,
+      customerName: invitedUser.customer.name,
+      recipientMail: invitedUser.user.email,
+      token: inviteLoginToken,
+      bgColor: invitedUser.customer.settings?.colourSettings?.primary,
     });
 
     mailService.send({
-      recipient: user.email,
-      subject: 'HAAS: You have been added to a new workspace!',
+      recipient: invitedUser.user.email,
+      subject: `HAAS: You have been invited to ${invitedUser.customer.name}`,
       body: emailBody,
     });
   }
+
 
   static filterBySearchTerm = (
     usersOfCustomer: (UserOfCustomer & {
@@ -196,9 +247,11 @@ class UserService {
       },
     };
 
-    const countWhereInput: FindManyUserOfCustomerArgs = { where: {
-      customer: { slug: customerSlug },
-    } };
+    const countWhereInput: FindManyUserOfCustomerArgs = {
+      where: {
+        customer: { slug: customerSlug },
+      }
+    };
 
     const findManyUsers = async ({ props, paginationOpts }: FindManyCallBackProps) => {
       const users: any = await prisma.userOfCustomer.findMany(props);
