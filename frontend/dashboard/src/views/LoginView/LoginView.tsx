@@ -1,7 +1,7 @@
 import { useToast } from '@chakra-ui/core';
-import React, { useState } from 'react';
+import React from 'react';
 import * as UI from '@haas/ui';
-import { Div, Form, FormControl, Input, InputGrid, Text } from '@haas/ui';
+import { Div, Form, FormControl, InputGrid, Text } from '@haas/ui';
 import { Mail, Send } from 'react-feather';
 import { useForm } from 'react-hook-form';
 import { useHistory } from 'react-router';

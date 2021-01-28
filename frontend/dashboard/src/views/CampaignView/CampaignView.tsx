@@ -1,5 +1,6 @@
 import * as UI from '@haas/ui';
 import { format } from 'date-fns';
+import { useLogger } from 'hooks/useLogger';
 import { useNavigator } from 'hooks/useNavigator';
 import React, { useState } from 'react';
 import { useEffect } from 'react';
@@ -16,7 +17,7 @@ import { ImportDeliveriesForm } from './ImportDeliveriesForm';
 
 export const defaultCampaignViewFilter: DeliveryConnectionFilter = {
   paginationFilter: {
-    limit: 7,
+    limit: 10,
     startDate: undefined,
     endDate: undefined,
     pageIndex: 0,
@@ -112,6 +113,7 @@ export const CampaignView = () => {
   const [isOpenDetailModel, setIsOpenDetailModel] = useState(false);
   const [activeDelivery, setActiveDelivery] = useState<DeepPartial<DeliveryType> | null>(null);
   const { t } = useTranslation();
+  const logger = useLogger();
 
   const [paginationState, setPaginationState] = useState(defaultCampaignViewFilter);
 
@@ -130,6 +132,9 @@ export const CampaignView = () => {
     },
     pollInterval: POLL_INTERVAL,
     onCompleted: (data) => setDataCache(data),
+    onError: (error) => logger.logError(error, {
+      tags: { section: 'campaign' }
+    })
   });
 
   // use-table-select placement
@@ -206,7 +211,8 @@ export const CampaignView = () => {
                       {delivery?.deliveryRecipientFirstName || ''}
                     </UI.TableCell>
                     <UI.TableCell>
-                      {delivery?.deliveryRecipientEmail}
+                      {delivery.campaignVariant?.type === CampaignVariantEnum.Email ?
+                        delivery?.deliveryRecipientEmail : delivery?.deliveryRecipientPhone}
                     </UI.TableCell>
                     <UI.TableCell>
                       {delivery?.campaignVariant?.label}
