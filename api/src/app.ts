@@ -37,6 +37,14 @@ const main = async () => {
     credentials: true,
   };
 
+  app.get('/', (req, res, next) => {
+    res.json({ status: 'HAAS API V1.0.0' });
+  });
+
+  app.get('/health', (req, res, next) => {
+    res.json({ status: 'Health check' });
+  });
+
   app.post('/webhooks', bodyParser.json(), async (req: any, res: any, next: any) => {
     res.send('success');
   });
@@ -50,7 +58,7 @@ const main = async () => {
   app.use(cookieParser());
   app.use(cors(corsOptions));
 
-  apollo.applyMiddleware({ app, cors: false,  });
+  apollo.applyMiddleware({ app, cors: false, });
 
   console.log('🏳️\tStarting the server');
   if (config.useSSL) {

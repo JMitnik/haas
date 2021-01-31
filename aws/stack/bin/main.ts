@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import 'source-map-support/register';
 import * as cdk from '@aws-cdk/core';
-import { MainStack } from '../lib/main-stack';
+import { APIStack } from '../lib/main-stack';
 
 const app = new cdk.App();
-new MainStack(app, 'HaasMainStack');
+new APIStack(app, 'HaasAPIMainStack');
