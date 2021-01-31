@@ -53,6 +53,7 @@ export type CampaignVariantType = {
   label: Scalars['String'];
   weight: Scalars['Int'];
   body: Scalars['String'];
+  type: CampaignVariantEnum;
   workspace: Customer;
   dialogue: Dialogue;
   deliveryConnection?: Maybe<DeliveryConnectionType>;
@@ -280,6 +281,13 @@ export type DeliveryConnectionType = ConnectionInterface & {
   nrFinished: Scalars['Int'];
 };
 
+export type DeliveryEventType = {
+  __typename?: 'DeliveryEventType';
+  id: Scalars['ID'];
+  status: DeliveryStatusEnum;
+  createdAt: Scalars['String'];
+};
+
 export enum DeliveryStatusEnum {
   Scheduled = 'SCHEDULED',
   Deployed = 'DEPLOYED',
@@ -292,14 +300,15 @@ export enum DeliveryStatusEnum {
 export type DeliveryType = {
   __typename?: 'DeliveryType';
   id: Scalars['ID'];
-  deliveryRecipientFirstName: Scalars['String'];
-  deliveryRecipientLastName: Scalars['String'];
-  deliveryRecipientEmail: Scalars['String'];
-  deliveryRecipientPhone: Scalars['String'];
-  scheduledAt: Scalars['String'];
-  updatedAt: Scalars['String'];
-  campaignVariant: CampaignVariantType;
+  deliveryRecipientFirstName?: Maybe<Scalars['String']>;
+  deliveryRecipientLastName?: Maybe<Scalars['String']>;
+  deliveryRecipientEmail?: Maybe<Scalars['String']>;
+  deliveryRecipientPhone?: Maybe<Scalars['String']>;
+  scheduledAt?: Maybe<Scalars['String']>;
+  updatedAt?: Maybe<Scalars['String']>;
+  campaignVariant?: Maybe<CampaignVariantType>;
   currentStatus: DeliveryStatusEnum;
+  events: Array<DeliveryEventType>;
 };
 
 export type Dialogue = {
@@ -886,7 +895,8 @@ export enum PaginationSortByEnum {
   Paths = 'paths',
   User = 'user',
   When = 'when',
-  ScheduledAt = 'scheduledAt'
+  ScheduledAt = 'scheduledAt',
+  UpdatedAt = 'updatedAt'
 }
 
 /** Sorting of pagination (type and whether it ascends) */
@@ -1192,6 +1202,9 @@ export type SessionInput = {
   dialogueId: Scalars['String'];
   entries?: Maybe<Array<NodeEntryInput>>;
   deliveryId?: Maybe<Scalars['String']>;
+  originUrl?: Maybe<Scalars['String']>;
+  device?: Maybe<Scalars['String']>;
+  totalTimeInSec?: Maybe<Scalars['Int']>;
 };
 
 export type SessionWhereUniqueInput = {
@@ -1469,7 +1482,7 @@ export type GetDeliveryQuery = (
   & { delivery?: Maybe<(
     { __typename?: 'DeliveryType' }
     & Pick<DeliveryType, 'id'>
-    & { campaignVariant: (
+    & { campaignVariant?: Maybe<(
       { __typename?: 'CampaignVariantType' }
       & Pick<CampaignVariantType, 'id'>
       & { dialogue: (
@@ -1479,7 +1492,7 @@ export type GetDeliveryQuery = (
         { __typename?: 'Customer' }
         & Pick<Customer, 'slug'>
       ) }
-    ) }
+    )> }
   )> }
 );
 

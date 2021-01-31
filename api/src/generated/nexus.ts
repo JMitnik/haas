@@ -281,8 +281,11 @@ export interface NexusGenInputs {
   }
   SessionInput: { // input type
     deliveryId?: string | null; // String
+    device?: string | null; // String
     dialogueId: string; // String!
     entries?: NexusGenInputs['NodeEntryInput'][] | null; // [NodeEntryInput!]
+    originUrl?: string | null; // String
+    totalTimeInSec?: number | null; // Int
   }
   SessionWhereUniqueInput: { // input type
     dialogueId?: string | null; // ID
@@ -532,6 +535,7 @@ export interface NexusGenRootTypes {
   }
   RequestInviteOutput: { // root type
     didInvite: boolean; // Boolean!
+    userExists: boolean; // Boolean!
   }
   RoleConnection: { // root type
     endDate?: string | null; // String
@@ -1029,6 +1033,7 @@ export interface NexusGenFieldTypes {
   }
   RequestInviteOutput: { // field return type
     didInvite: boolean; // Boolean!
+    userExists: boolean; // Boolean!
   }
   RoleConnection: { // field return type
     endDate: string | null; // String
@@ -1048,11 +1053,16 @@ export interface NexusGenFieldTypes {
   }
   Session: { // field return type
     createdAt: any; // Date!
+    delivery: NexusGenRootTypes['DeliveryType'] | null; // DeliveryType
+    deliveryId: string | null; // String
+    device: string | null; // String
     dialogueId: string; // String!
     id: string; // ID!
     nodeEntries: NexusGenRootTypes['NodeEntry'][]; // [NodeEntry!]!
+    originUrl: string | null; // String
     paths: number; // Int!
     score: number; // Float!
+    totalTimeInSec: number | null; // Int
   }
   SessionConnection: { // field return type
     endDate: string | null; // String

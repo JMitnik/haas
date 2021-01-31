@@ -1,16 +1,21 @@
 import { TreeStoreModelProps } from 'models/TreeStoreModel';
-import React, { useContext, useEffect } from 'react';
-
-import { Customer, Dialogue } from 'types/generic';
+import React, { useContext, useEffect, useState } from 'react';
 import { useQuery } from '@apollo/client';
 import { useRouteMatch } from 'react-router-dom';
+import { useTimer } from 'use-timer';
+
+import { Customer, Dialogue } from 'types/generic';
 import getCustomerFromSlug from 'queries/getCustomerFromSluqQuery';
 import getDialogueFromSlug from 'queries/getDialogueFromSlugQuery';
+
 import treeStore from './DialogueTreeStore';
 
 interface DialogueTreeContextType {
   store: TreeStoreModelProps;
+  originUrl: string;
+  device: string;
   getNode: any;
+  startTime: number;
 }
 
 const DialogueTreeContext = React.createContext({} as DialogueTreeContextType);
@@ -26,6 +31,16 @@ interface DialogueDataProps {
 }
 
 export const DialogueTreeProvider = ({ children }: { children: React.ReactNode }) => {
+  const [originUrl, setOriginUrl] = useState<string | null>(null);
+  const [device] = useState<string | null>(navigator.platform);
+  const [startTime] = useState(Date.now());
+
+  useEffect(() => {
+    if (!originUrl) {
+      setOriginUrl(window.location.href);
+    }
+  }, [setOriginUrl, originUrl]);
+
   const customerMatch = useRouteMatch<any>({
     path: '/:customerSlug',
     strict: true,
@@ -91,6 +106,9 @@ export const DialogueTreeProvider = ({ children }: { children: React.ReactNode }
     <DialogueTreeContext.Provider value={{
       store: treeStore,
       getNode,
+      device: device || '',
+      startTime,
+      originUrl: originUrl || ''
     }}
     >
       {children}

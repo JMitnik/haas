@@ -148,7 +148,7 @@ export const CreateBatchDeliveriesResolver = mutationField('createBatchDeliverie
       const useFirstVariant = probability(relatedCampaign.variantsEdges[0].weight / 100);
       const variant = useFirstVariant ? relatedCampaign.variantsEdges[0] : relatedCampaign.variantsEdges[1];
 
-      const dialogueUrl = `https://client.haas.live/_r?ref=${id}`;
+      const dialogueUrl = `https://client.haas.live/_r?ref=${id} `;
 
       // Derive body of variant based on present data
       const templateBody = variant.campaignVariant.body.replace(/\{\{([^\}]*)\}\}/g, '{{{$1}}}');

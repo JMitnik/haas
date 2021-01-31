@@ -1,12 +1,16 @@
+import { motion } from 'framer-motion';
 import React from 'react';
 import styled, { css } from 'styled-components';
+import Card, { CardBody } from './Cards';
+import { IconCheck } from './assets/icon-check';
 
 interface TableRowProps {
   hasHover?: boolean;
+  isSelected?: boolean;
 }
 
 export const TableRow = styled.tr<TableRowProps>`
-  ${({ theme, hasHover }) => css`
+  ${({ theme, hasHover, isSelected }) => css`
     border-left: 3px solid transparent;
 
     ${hasHover && css`
@@ -15,11 +19,27 @@ export const TableRow = styled.tr<TableRowProps>`
         background: ${theme.colors.gray[100]};
       }
     `}
+
+    ${isSelected && css`
+      background: blue;
+      background: ${theme.colors.gray[200]};
+
+      &:hover {
+        background: ${theme.colors.gray[200]};
+      }
+    `}
   `}
 `;
 
-export const Table = styled.table`
-  ${({ theme }) => css`
+export const Table = styled.table<{ isLoading?: boolean }>`
+  ${({ theme, isLoading }) => css`
+    
+    ${isLoading && css`
+      ${TableRow} {
+        opacity: 0.8;
+      }
+    `}
+
     ${TableRow} + ${TableRow} {
       border-top: 1px solid ${theme.colors.gray[200]};
     }
@@ -54,17 +74,80 @@ export const TableBody = styled.tbody``;
 
 interface TableCellProps {
   isNumeric?: boolean;
+  center?: boolean;
 }
 
 export const TableCell = styled.td<TableCellProps>`
-  ${({ isNumeric }) => css`
+  ${({ isNumeric, center }) => css`
     padding: 0.5rem 1.5rem;
     
     ${isNumeric && css`
       text-align: right;
     `}
+
+    ${center && css`
+      vertical-align: middle;
+    `}
   `}
 `;
+
+export const TableSelectContainer = styled.button`
+  ${({ theme }) => css`
+    width: 1rem;
+    border: 1px solid ${theme.colors.gray[400]};
+    height: 1rem;
+    border-radius: 5px;
+  `}
+`;
+
+interface TableSelectProps {
+  children?: React.ReactChildren;
+  onClick?: () => void;
+  isSelected?: boolean;
+}
+
+export const TableSelect = ({ children, onClick, isSelected }: TableSelectProps) => {
+
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    onClick?.();
+    console.log("Clicked!");
+  }
+
+  return (
+    <TableSelectContainer onClick={handleClick}>
+      {isSelected && (
+        <IconCheck />
+      )}
+      {children}
+    </TableSelectContainer>
+  )
+}
+
+const TableActionBarContainer = styled.div`
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+`;
+
+interface TableActionBarProps {
+  children?: React.ReactNode;
+}
+
+export const TableActionBar = ({ children }: TableActionBarProps) => {
+  return (
+    <TableActionBarContainer>
+      <motion.div animate={{ y: 0 }} initial={{ y: 50 }}>
+        <Card bg="white" noHover>
+          <CardBody>
+            {children}
+          </CardBody>
+        </Card>
+      </motion.div>
+    </TableActionBarContainer>
+  )
+};
 
 export const PaginationFooter = styled.div`
   ${({ theme }) => css`
