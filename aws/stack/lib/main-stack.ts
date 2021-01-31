@@ -29,16 +29,20 @@ export class APIStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
+    // Reference to our hosted-zone (haas.live)
     const hostedZone = route53.HostedZone.fromHostedZoneAttributes(this, 'HaasLiveZone', {
       hostedZoneId,
       zoneName: hostedZoneName
     })
 
+    // Certificate necessary for HTTPS registration of our API.
     const tlsCertificate = new acm.Certificate(this, 'HAASLiveCertificate', {
       domainName: 'api.haas.live',
       validation: acm.CertificateValidation.fromDns(hostedZone)
     });
 
+
+    // Our VPC: private subnet for sensitive space such as DB, and public for our services and bastion
     const vpc = new ec2.Vpc(this, "API_VPC", {
       maxAzs: 3,
       natGateways: 0,
@@ -54,11 +58,13 @@ export class APIStack extends cdk.Stack {
       ],
     });
 
+    // We preconfigure our RDS credentials, and will upload this to `API_MAIN_RDS_SECRET`.
     const rdsUsername = 'HAAS_ADMIN';
     const rdsPassword = new secretsmanager.Secret(this, 'API_RDS_SECRET', {
       secretName: 'API_MAIN_RDS_SECRET'
     });
 
+    // Our RDS Endpoint
     const rdsDb = new rds.DatabaseInstance(this, 'API_RDS', {
       vpc,
       engine: rds.DatabaseInstanceEngine.postgres({ version: rds.PostgresEngineVersion.VER_12 }),
@@ -72,17 +78,21 @@ export class APIStack extends cdk.Stack {
       },
     });
 
+    // Database endpoint
     const rdsEndpoint = rdsDb.instanceEndpoint.hostname;
 
+    // Our ECS cluster, housing our various Fargate Services
     const cluster = new ecs.Cluster(this, "API_MAIN_CLUSTER", {
       vpc,
       clusterName: "API_MAIN_CLUSTER",
       containerInsights: true
     });
 
+    // Environment values for our API service: access to DB and JWT.
     const jwtSecret = secretsmanager.Secret.fromSecretNameV2(this, 'SecretFromName', 'HAAS_JWT');
     const dbUrl = `postgresql://${rdsUsername}:${rdsPassword.secretValue.toString()}@${rdsEndpoint}/postgres?schema=public`;
 
+    // Our main API service; we will adjust this as necessary to deal with more load.
     const apiService = new ecs_patterns.ApplicationLoadBalancedFargateService(this, "API_SERVICE", {
       cluster,
       cpu: 256,
@@ -102,6 +112,7 @@ export class APIStack extends cdk.Stack {
     });
 
     // Public Bastion for accessing the database
+    // Note: we will use the client to adjust the security-groups allowed ingress connections
     const remoteBastion = new ec2.Instance(this, 'API_VPC_BASTION', {
       instanceType: ec2.InstanceType.of(ec2.InstanceClass.BURSTABLE3, ec2.InstanceSize.MICRO),
       machineImage: ec2.MachineImage.latestAmazonLinux(),
