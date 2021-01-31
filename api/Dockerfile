@@ -43,6 +43,7 @@ FROM base
 COPY --from=prodBuilder /tmp/node_modules ./node_modules
 
 # Copy 2: copy all built dependencies (such as prisma)
+COPY --from=prodBuilder /app/node_modules/@prisma/client ./node_modules/@prisma/client
 COPY --from=prodBuilder /app/node_modules/.prisma/client ./node_modules/.prisma/.client
 # Copy 3: copy the built node app.
 COPY --from=prodBuilder /app/dist ./dist
