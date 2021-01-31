@@ -1,5 +1,6 @@
 import * as cdk from '@aws-cdk/core';
 import * as ec2 from '@aws-cdk/aws-ec2';
+import * as ssm from '@aws-cdk/aws-ssm';
 import * as rds from '@aws-cdk/aws-rds';
 import * as acm from '@aws-cdk/aws-certificatemanager';
 import { SubnetType } from '@aws-cdk/aws-ec2';
@@ -11,6 +12,7 @@ import * as secretsmanager from "@aws-cdk/aws-secretsmanager";
 const pathToAPI = '/Users/jonathanmitnik/Developer/haas/code/api';
 const hostedZoneId = 'Z02703531WCURDDQ4Z46S';
 const hostedZoneName = 'haas.live';
+const bastionKeyName = 'HaasAPI_RemoteBastionAccess';
 
 export class APIStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
@@ -88,6 +90,23 @@ export class APIStack extends cdk.Stack {
       },
     });
 
+    // Public Bastion for accessing the database
+    const remoteBastion = new ec2.Instance(this, 'API_VPC_BASTION', {
+      instanceType: ec2.InstanceType.of(ec2.InstanceClass.BURSTABLE3, ec2.InstanceSize.MICRO),
+      machineImage: ec2.MachineImage.latestAmazonLinux(),
+      vpc,
+      vpcSubnets: {
+        subnetType: SubnetType.PUBLIC,
+      },
+      securityGroup: new ec2.SecurityGroup(this, 'API_VC_BASTION_SG', {
+        vpc,
+        securityGroupName: 'API_VC_BASTION_SG',
+      }),
+      keyName: bastionKeyName
+    });
+
+    // Who can access the database?
     rdsDb.connections.allowFrom(apiService.service, ec2.Port.tcp(5432));
+    rdsDb.connections.allowFrom(remoteBastion, ec2.Port.tcp(5432));
   }
 }
