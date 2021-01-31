@@ -87,5 +87,7 @@ export class APIStack extends cdk.Stack {
         }
       },
     });
+
+    rdsDb.connections.allowFrom(apiService.service, ec2.Port.tcp(5432));
   }
 }
