@@ -33,7 +33,7 @@ COPY ./src/ ./src/
 RUN npx tsc -p ./tsconfig.json --outDir dist
 
 # Put the schema.graphql in the dist as well
-COPY ./src/generated/schema.graphql ./dist/generated/schema.graphql
+COPY --chown=node:node ./src/generated/schema.graphql ./dist/generated/schema.graphql
 
 # Step 3: Prep for production
 FROM base
