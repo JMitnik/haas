@@ -9,6 +9,17 @@ import * as route53 from '@aws-cdk/aws-route53';
 import * as ecs_patterns from '@aws-cdk/aws-ecs-patterns';
 import * as secretsmanager from "@aws-cdk/aws-secretsmanager";
 
+
+// Prerequisites:
+// 1. You have an Ec2 Keyname-pair created (HaasAPI_RemoteBastionAccess)
+// 2. You have a hosted-zone with haas.live and a hostedZoneId (if not, edit this).
+// 3. You have a secret named HAAS_JWT for the API
+
+// What to do after first deploy
+// 1. Ensure the bastion is whitelisted in its security group
+// 2. If new database, ensure you have a prisa role.
+
+// Constants
 const pathToAPI = '/Users/jonathanmitnik/Developer/haas/code/api';
 const hostedZoneId = 'Z02703531WCURDDQ4Z46S';
 const hostedZoneName = 'haas.live';
@@ -57,8 +68,8 @@ export class APIStack extends cdk.Stack {
       vpcSubnets: { subnetType: SubnetType.ISOLATED },
       credentials: {
         username: rdsUsername,
-        password: rdsPassword.secretValue
-      }
+        password: rdsPassword.secretValue,
+      },
     });
 
     const rdsEndpoint = rdsDb.instanceEndpoint.hostname;
