@@ -352,7 +352,7 @@ export const CampaignView = () => {
                         <>
                           {format(
                             new Date(parseInt(event?.createdAt, 10)),
-                            'MMM Do HH:mm'
+                            'MMM do HH:mm'
                           )}
                         </>
                       )}
