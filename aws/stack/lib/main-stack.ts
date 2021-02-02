@@ -20,7 +20,7 @@ import * as secretsmanager from "@aws-cdk/aws-secretsmanager";
 // 2. If new database, ensure you have a prisa role.
 
 // Constants
-const pathToAPI = '/Users/jonathanmitnik/Developer/haas/code/api';
+const pathToAPI = '../../api';
 const hostedZoneId = 'Z02703531WCURDDQ4Z46S';
 const hostedZoneName = 'haas.live';
 const bastionKeyName = 'HaasAPI_RemoteBastionAccess';
