@@ -40,6 +40,7 @@ export class MainPipelineStack extends Stack {
         sourceArtifact,
         actionName: 'CFNSynth',
         subdirectory: 'aws/stack',
+        projectName: ''
         cloudAssemblyArtifact: cdkOutputArtifact,
       })
     });
