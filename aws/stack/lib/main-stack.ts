@@ -26,6 +26,9 @@ const hostedZoneName = 'haas.live';
 const bastionKeyName = 'HaasAPI_RemoteBastionAccess';
 
 export class APIStack extends cdk.Stack {
+  apiService: ecs_patterns.ApplicationLoadBalancedFargateService;
+  dbUrl: string;
+
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
@@ -92,6 +95,14 @@ export class APIStack extends cdk.Stack {
     const jwtSecret = secretsmanager.Secret.fromSecretNameV2(this, 'SecretFromName', 'HAAS_JWT');
     const dbUrl = `postgresql://${rdsUsername}:${rdsPassword.secretValue.toString()}@${rdsEndpoint}/postgres?schema=public`;
 
+    const dbString = new secretsmanager.Secret(this, 'API_RDS_String', {
+      secretName: 'API_RDS_String',
+      generateSecretString: {
+        secretStringTemplate: JSON.stringify({ url: dbUrl }),
+        generateStringKey: 'SECRET_URL'
+      }
+    });
+
     // Our main API service; we will adjust this as necessary to deal with more load.
     const apiService = new ecs_patterns.ApplicationLoadBalancedFargateService(this, "API_SERVICE", {
       cluster,
@@ -110,6 +121,9 @@ export class APIStack extends cdk.Stack {
         }
       },
     });
+
+    this.apiService = apiService;
+    this.dbUrl = dbUrl;
 
     // Public Bastion for accessing the database
     // Note: we will use the client to adjust the security-groups allowed ingress connections
