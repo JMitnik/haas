@@ -51,7 +51,7 @@ export class MainPipelineStack extends Stack {
         'ecr:DescribeRepositories'
       ],
       resources: ['*']
-    }));
+    }))
 
     const repository = new ecr.Repository(this, 'HAASMainRepository', {
       repositoryName: 'haas_repo',
@@ -66,6 +66,7 @@ export class MainPipelineStack extends Stack {
     buildStage.addActions(new codepipeline_actions.CodeBuildAction({
       actionName: 'DockerBuild',
       input: sourceArtifact,
+      outputs: [buildArtifact],
       project: new codebuild.PipelineProject(this, 'DockerBuild', {
         buildSpec: codebuild.BuildSpec.fromObject({
           version: '0.2',
