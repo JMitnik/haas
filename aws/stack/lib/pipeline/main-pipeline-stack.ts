@@ -1,5 +1,6 @@
 import * as codepipeline from '@aws-cdk/aws-codepipeline';
 import * as ecr from '@aws-cdk/aws-ecr';
+import * as ec2 from '@aws-cdk/aws-ec2';
 import * as iam from '@aws-cdk/aws-iam';
 import * as secretsmanager from "@aws-cdk/aws-secretsmanager";
 import * as codebuild from '@aws-cdk/aws-codebuild';
@@ -12,6 +13,7 @@ import { CdkPipeline, SimpleSynthAction } from "@aws-cdk/pipelines";
 interface MainPipelineStackProps extends StackProps {
   apiService: ecs_patterns.ApplicationLoadBalancedFargateService;
   dbUrl: string;
+  vpc: ec2.Vpc;
 }
 
 export class MainPipelineStack extends Stack {
@@ -44,7 +46,12 @@ export class MainPipelineStack extends Stack {
       })
     });
 
-    const assumedPipelineRole = pipeline.codePipeline.role;
+    pipeline.codePipeline.addToRolePolicy(new iam.PolicyStatement({
+      actions: [
+        'ecr:DescribeRepositories'
+      ],
+      resources: ['*']
+    }));
 
     const repository = new ecr.Repository(this, 'HAASMainRepository', {
       repositoryName: 'haas_repo',
@@ -54,15 +61,11 @@ export class MainPipelineStack extends Stack {
       assumedBy: new iam.ServicePrincipal('codebuild.amazonaws.com'),
     });
     repository.grantPullPush(buildRole);
-    repository.grantPullPush(assumedPipelineRole);
-
-    console.log(codebuild.BuildSpec.fromSourceFilename('./build-spec.yml'));
 
     const buildStage = pipeline.addStage('build');
     buildStage.addActions(new codepipeline_actions.CodeBuildAction({
       actionName: 'DockerBuild',
       input: sourceArtifact,
-      outputs: [buildArtifact],
       project: new codebuild.PipelineProject(this, 'DockerBuild', {
         buildSpec: codebuild.BuildSpec.fromObject({
           version: '0.2',
@@ -84,7 +87,7 @@ export class MainPipelineStack extends Stack {
             }
           }
         }),
-        role: buildRole
+        role: buildRole,
       }),
     }));
 
@@ -95,14 +98,15 @@ export class MainPipelineStack extends Stack {
       actionName: 'migrate',
       input: sourceArtifact,
       project: new codebuild.PipelineProject(this, 'MigrateBuild', {
-        buildSpec: codebuild.BuildSpec.fromSourceFilename('./migrate-build-spec.yml')
+        buildSpec: codebuild.BuildSpec.fromSourceFilename('./migrate-build-spec.yml'),
+        vpc: props?.vpc
       }),
       environmentVariables: {
         DB_STRING: {
           value: 'API_RDS_String',
           type: codebuild.BuildEnvironmentVariableType.SECRETS_MANAGER
         }
-      }
+      },
     }));
 
     if (!props?.apiService.service) return;

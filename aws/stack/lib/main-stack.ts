@@ -28,6 +28,7 @@ const bastionKeyName = 'HaasAPI_RemoteBastionAccess';
 export class APIStack extends cdk.Stack {
   apiService: ecs_patterns.ApplicationLoadBalancedFargateService;
   dbUrl: string;
+  vpc: ec2.Vpc;
 
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
@@ -60,6 +61,7 @@ export class APIStack extends cdk.Stack {
         },
       ],
     });
+    this.vpc = vpc;
 
     // We preconfigure our RDS credentials, and will upload this to `API_MAIN_RDS_SECRET`.
     const rdsUsername = 'HAAS_ADMIN';

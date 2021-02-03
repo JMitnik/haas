@@ -8,5 +8,6 @@ const app = new cdk.App();
 const api = new APIStack(app, 'HaasAPIMainStack');
 const pipeline = new MainPipelineStack(app, 'HaasMainPipeline', {
     apiService: api.apiService,
-    dbUrl: api.dbUrl
+    dbUrl: api.dbUrl,
+    vpc: api.vpc
 });
