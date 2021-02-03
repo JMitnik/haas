@@ -66,6 +66,7 @@ export class MainPipelineStack extends Stack {
     buildStage.addActions(new codepipeline_actions.CodeBuildAction({
       actionName: 'DockerBuild',
       input: sourceArtifact,
+      outputs: [buildArtifact],
       project: new codebuild.PipelineProject(this, 'DockerBuild', {
         buildSpec: codebuild.BuildSpec.fromObject({
           version: '0.2',
@@ -111,11 +112,11 @@ export class MainPipelineStack extends Stack {
 
     if (!props?.apiService.service) return;
 
-    // const deployStage = pipeline.addStage('deploy');
-    // deployStage.addActions(new codepipeline_actions.EcsDeployAction({
-    //   service: props?.apiService.service,
-    //   actionName: 'deploy',
-    //   input: buildArtifact,
-    // }));
+    const deployStage = pipeline.addStage('deploy');
+    deployStage.addActions(new codepipeline_actions.EcsDeployAction({
+      service: props?.apiService.service,
+      actionName: 'deploy',
+      input: buildArtifact,
+    }));
   }
 }
