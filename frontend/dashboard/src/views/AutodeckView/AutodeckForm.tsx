@@ -14,7 +14,7 @@ import {
 import { useHistory } from 'react-router';
 import { MutationFunctionOptions } from '@apollo/client';
 import { useTranslation } from 'react-i18next';
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import cuid from 'cuid';
 
 import ColorPickerInput from 'components/ColorPicker';
@@ -287,6 +287,70 @@ const PrimaryColourFragment = ({ form, isInEditing, palette }: { form: UseFormMe
   );
 };
 
+const Canvas = ({ value }: { value: any }) => {
+  const ref = useRef<HTMLCanvasElement | null>(null);
+  const [activeColor, setActiveColor] = useState<string | null>('rgb(255, 255, 255)')
+  useEffect(() => {
+    const context = ref.current?.getContext('2d');
+    console.log('CONTEXT CANVAS: ', context);
+    if (value && context) {
+
+      const image = new Image();
+      image.crossOrigin = "Anonymous";
+      // image.setAttribute('crossOrigin', '');  
+      image.src = value;
+
+      image.onload = () => {
+        context.drawImage(image, 0, 0);
+      };
+    }
+  }, [value, ref])
+
+  // useEffect(() => {
+  //   const context = ref.current?.getContext('2d');
+  //   if(context && activeColor) {
+
+  //   }
+  // }, [activeColor])
+
+  function getMousePosition(e: any, canvas: HTMLCanvasElement) {
+    const rect = canvas.getBoundingClientRect()
+    var x = e.clientX - rect.left; //x position within the element.
+    var y = e.clientY - rect.top;  //y position within the element.
+
+    return {
+      x,
+      y
+    };
+  }
+
+  const handleCanvasClick = (e: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {
+    const context = ref.current?.getContext('2d');
+    const eventLocation = ref.current && getMousePosition(e, ref.current)
+    console.log('event location: ', eventLocation);
+
+    if (eventLocation?.x && eventLocation?.y) {
+      const color = context?.getImageData(eventLocation?.x, eventLocation?.y, 1, 1).data
+      console.log('clicked color: ', color)
+      context?.fillRect(eventLocation.x, eventLocation.y, 1, 1)
+      if (color) setActiveColor(`rgb(${color[0]}, ${color[1]}, ${color[2]})`)
+
+    }
+
+    // console.log('Client: ', e.clientX, e.clientY,)
+
+  }
+
+  return (
+    <Div position="relative">
+      <canvas style={{ position: 'relative' }} onClick={(e) => handleCanvasClick(e)} width="800px" height="600px" ref={ref} />
+      <Div position="absolute" top="0" right="0" width="50px" height="50px" backgroundColor={activeColor} />
+    </Div>
+  )
+
+
+}
+
 const CustomerLogoFormFragment = ({ form, jobId, previewLogo, isInEditing }: { form: UseFormMethods<FormDataProps>, jobId: string, previewLogo: string, isInEditing: boolean }) => {
   const { t } = useTranslation();
 
@@ -351,28 +415,38 @@ const CustomerLogoFormFragment = ({ form, jobId, previewLogo, isInEditing }: { f
 
       {isInEditing && (
         <>
-        <FormControl>
-          <FormLabel htmlFor="cloudinary">{t('logo_upload')}</FormLabel>
-          <InputHelper>{t('logo_upload_helper')}</InputHelper>
+          {/* <FormControl>
+            <FormLabel htmlFor="cloudinary">{t('logo_upload')}</FormLabel>
+            <InputHelper>{t('logo_upload_helper')}</InputHelper>
 
-          <Controller
-            control={form.control}
-            name="uploadLogo"
-            defaultValue={previewLogo || ""}
-            render={({ onChange, value }) => (
-              <CustomerUploadLogoInput isDisapproved={form.watch('isLogoUrlApproved') === 0} isInEditing={isInEditing && form.watch('isLogoUrlApproved') === 1} jobId={jobId} value={value} onChange={onChange} imageType="LOGO" />
+            <Controller
+              control={form.control}
+              name="uploadLogo"
+              defaultValue={previewLogo || ""}
+              render={({ onChange, value }) => (
+                <CustomerUploadLogoInput isDisapproved={form.watch('isLogoUrlApproved') === 0} isInEditing={isInEditing && form.watch('isLogoUrlApproved') === 1} jobId={jobId} value={value} onChange={onChange} imageType="LOGO" />
+              )}
+            />
+            {form.watch('isLogoUrlApproved') === 0 && (
+              <Flex marginTop="5px">
+                <Div width="auto" color="orange">
+                  <AlertCircle color="orange" />
+                </Div>
+                <Div marginLeft="5px">The newly uploaded logo will <span style={{ fontWeight: 'bold' }}>override</span> the currently used logo and <span style={{ fontWeight: 'bold' }}>no background removal</span> will be performed.</Div>
+              </Flex>
             )}
-          />
-          {form.watch('isLogoUrlApproved') === 0 && (
-            <Flex marginTop="5px">
-              <Div width="auto" color="orange">
-                <AlertCircle color="orange" />
-              </Div>
-              <Div marginLeft="5px">The newly uploaded logo will <span style={{fontWeight: 'bold'}}>override</span> the currently used logo and <span style={{fontWeight: 'bold'}}>no background removal</span> will be performed.</Div>
-            </Flex>
-          )}
-        </FormControl>
-        <FormControl>
+          </FormControl> */}
+          <FormControl>
+            <FormLabel htmlFor="cloudinary">Logo adjustment</FormLabel>
+            <Controller
+              control={form.control}
+              name="adjustedLogo"
+              render={({ onChange, value }) => (
+                <Canvas value={value} />
+              )}
+            />
+          </FormControl>
+          <FormControl>
             <FormLabel>{'Website screenshot approval'}</FormLabel>
             <InputHelper>{'Approve or edit the website screenshot used for document generation'}</InputHelper>
             <Controller
@@ -391,7 +465,7 @@ const CustomerLogoFormFragment = ({ form, jobId, previewLogo, isInEditing }: { f
                 </RadioButtonGroup>
               )}
             />
-          
+
           </FormControl>
         </>
       )}
@@ -490,6 +564,7 @@ const schema = yup.object().shape({
   isWebsiteUrlApproved: yup.number(),
   isLogoUrlApproved: yup.number(),
   uploadLogo: yup.string().url(),
+  adjustedLogo: yup.string().url(),
   firstName: yup.string(),
   answer1: yup.string(),
   answer2: yup.string(),
@@ -591,7 +666,8 @@ const AutodeckForm = ({
 
   useEffect(() => {
     if (!previewData) return;
-    form.setValue('uploadLogo', previewData?.getPreviewData?.rembgLogoUrl);
+    // form.setValue('uploadLogo', previewData?.getPreviewData?.rembgLogoUrl);
+    form.setValue('adjustedLogo', previewData?.getPreviewData?.rembgLogoUrl);
     form.setValue('uploadWebsite', previewData?.getPreviewData?.websiteScreenshotUrl);
     form.setValue('primaryColour', previewData?.getPreviewData?.colors[0])
   }, [previewData])
