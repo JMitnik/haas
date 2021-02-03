@@ -1,5 +1,5 @@
 # Step 1: Setup the base of the image
-FROM node:14-alpine AS base
+FROM 649621042808.dkr.ecr.eu-central-1.amazonaws.com/node-base:14 AS base
 ENV PORT 4000
 
 RUN apk add --update openssl

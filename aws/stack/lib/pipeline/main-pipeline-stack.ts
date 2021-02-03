@@ -25,8 +25,8 @@ export class MainPipelineStack extends Stack {
     const buildArtifact = new codepipeline.Artifact();
     const cdkOutputArtifact = new codepipeline.Artifact();
 
-    const pipeline = new CdkPipeline(this, 'MainPipeline', {
-      pipelineName: 'HaasMainPipeline',
+    const pipeline = new CdkPipeline(this, 'HaasPipeline', {
+      pipelineName: 'HaasPipeline',
       cloudAssemblyArtifact: cdkOutputArtifact,
       selfMutating: false,
       sourceAction: new codepipeline_actions.GitHubSourceAction({
@@ -41,7 +41,7 @@ export class MainPipelineStack extends Stack {
 
       synthAction: SimpleSynthAction.standardYarnSynth({
         sourceArtifact,
-        actionName: 'CFNSynth',
+        actionName: 'HAASCfnSynth',
         subdirectory: 'aws/stack',
         cloudAssemblyArtifact: cdkOutputArtifact,
       })
@@ -54,11 +54,11 @@ export class MainPipelineStack extends Stack {
       resources: ['*']
     }))
 
-    const repository = new ecr.Repository(this, 'HAASMainRepository', {
-      repositoryName: 'haas_repo',
+    const repository = new ecr.Repository(this, 'HaasRepo', {
+      repositoryName: 'haas_service_repo',
     });
 
-    const buildRole = new iam.Role(this, 'DockerBuildRole', {
+    const buildRole = new iam.Role(this, 'BuildRole', {
       assumedBy: new iam.ServicePrincipal('codebuild.amazonaws.com'),
     });
     repository.grantPullPush(buildRole);
@@ -68,15 +68,30 @@ export class MainPipelineStack extends Stack {
       actionName: 'DockerBuild',
       input: sourceArtifact,
       outputs: [buildArtifact],
-      project: new codebuild.PipelineProject(this, 'DockerBuild', {
+      project: new codebuild.PipelineProject(this, 'Docker', {
+        environmentVariables: {
+          IMAGE_REPO_NAME: { value: 'haas_service_repo' },
+          IMAGE_TAG: { value: 'latest' },
+          AWS_ACCOUNT_ID: { value: '649621042808' },
+          AWS_DEFAULT_REGION: { value: 'eu-central-1' },
+        },
+        environment: {
+          privileged: true
+        },
         buildSpec: codebuild.BuildSpec.fromObject({
           version: '0.2',
           phases: {
+            pre_build: {
+              commands: [
+                'echo Logging in to AWS',
+                '$(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email)'
+              ]
+            },
             build: {
               commands: [
                 'echo Build started',
                 'echo Building the Docker image...',
-                'docker build -t $IMAGE_REPO_NAME:$IMAGE_TAG .',
+                'docker build -t $IMAGE_REPO_NAME:$IMAGE_TAG ./api',
                 'docker tag $IMAGE_REPO_NAME:$IMAGE_TAG $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG'
               ]
             },
@@ -84,7 +99,7 @@ export class MainPipelineStack extends Stack {
               commands: [
                 'echo finishing up',
                 'docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG',
-                'finished pushing docker image'
+                'echo finished pushing docker image'
               ]
             }
           }
@@ -93,13 +108,16 @@ export class MainPipelineStack extends Stack {
       }),
     }));
 
-    const migrateStage = pipeline.addStage('migrate');
+    const migrateStage = pipeline.addStage('Migrate');
     migrateStage.addActions(new codepipeline_actions.CodeBuildAction({
-      actionName: 'migrate',
+      actionName: 'Migrate',
       input: sourceArtifact,
-      project: new codebuild.PipelineProject(this, 'MigrateBuild', {
+      project: new codebuild.PipelineProject(this, 'Migrate', {
         buildSpec: codebuild.BuildSpec.fromSourceFilename('./migrate-build-spec.yml'),
-        vpc: props?.vpc
+        vpc: props?.vpc,
+        subnetSelection: {
+          subnetType: ec2.SubnetType.PUBLIC
+        }
       }),
       environmentVariables: {
         DB_STRING: {
@@ -111,10 +129,10 @@ export class MainPipelineStack extends Stack {
 
     if (!props?.apiService.service) return;
 
-    const deployStage = pipeline.addStage('deploy');
+    const deployStage = pipeline.addStage('Deploy');
     deployStage.addActions(new codepipeline_actions.EcsDeployAction({
       service: props?.apiService.service,
-      actionName: 'deploy',
+      actionName: 'Deploy',
       input: buildArtifact,
     }));
   }
