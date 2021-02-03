@@ -7,6 +7,7 @@ import { PaginationWhereInput } from '../general/Pagination';
 import { NexusGenFieldTypes } from '../../generated/nexus';
 import { Upload } from '../customer/Customer';
 import config from '../../config/config';
+import { resolve } from 'path';
 
 const s3 = new AWS.S3({ accessKeyId: config.awsAccessKeyId, secretAccessKey: config.awsSecretAccessKey });
 
@@ -212,6 +213,35 @@ export const AWSImageType = objectType({
     t.string('url', { nullable: true });
   },
 });
+
+export const RemovePixelRangeInput = inputObjectType({
+  name: 'RemovePixelRangeInput',
+  definition(t) {
+    t.string('key');
+    t.string('bucket');
+    t.int('red');
+    t.int('green');
+    t.int('blue');
+    t.int('range');
+  }
+})
+
+export const RemovePixelRangeMutation = mutationField('removePixelRange', {
+  type: AWSImageType,
+  nullable: true,
+  args: { input: RemovePixelRangeInput },
+  async resolve(parent, args) {
+    
+    if (!args.input || !args.input.blue || !args.input.bucket || 
+      !args.input.green || !args.input.key || !args.input.range || !args.input.red ) {
+      return null;
+    } 
+
+    AutodeckService.removePixelRange(args.input)
+
+    return { url: 'succesfully start lambda i guess'};
+  }
+})
 
 export const UploadImageEnumType = enumType({
   name: 'UploadImageEnumType',

@@ -589,6 +589,7 @@ type Mutation {
   """Logs a user out by removing their refresh token"""
   logout: String!
   register(input: RegisterInput): String
+  removePixelRange(input: RemovePixelRangeInput): AWSImageType
   requestInvite(input: RequestInviteInput): RequestInviteOutput!
   singleUpload(file: Upload): ImageType!
   updateCreateWorkspaceJob(id: String, referenceId: String, resourceUrl: String, status: JobStatusType): CreateWorkspaceJobType
@@ -829,6 +830,15 @@ input RegisterInput {
 """Input type for a register node"""
 input RegisterNodeEntryInput {
   value: String
+}
+
+input RemovePixelRangeInput {
+  blue: Int
+  bucket: String
+  green: Int
+  key: String
+  range: Int
+  red: Int
 }
 
 input RequestInviteInput {

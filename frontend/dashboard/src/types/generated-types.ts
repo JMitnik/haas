@@ -654,6 +654,7 @@ export type Mutation = {
   __typename?: 'Mutation';
   generateAutodeck?: Maybe<CreateWorkspaceJobType>;
   confirmCreateWorkspaceJob?: Maybe<CreateWorkspaceJobType>;
+  removePixelRange?: Maybe<AwsImageType>;
   uploadJobImage?: Maybe<AwsImageType>;
   updateCreateWorkspaceJob?: Maybe<CreateWorkspaceJobType>;
   updateJob?: Maybe<JobObjectType>;
@@ -707,6 +708,11 @@ export type MutationGenerateAutodeckArgs = {
 
 export type MutationConfirmCreateWorkspaceJobArgs = {
   input?: Maybe<GenerateAutodeckInput>;
+};
+
+
+export type MutationRemovePixelRangeArgs = {
+  input?: Maybe<RemovePixelRangeInput>;
 };
 
 
@@ -1272,6 +1278,15 @@ export type RegisterNodeEntryInput = {
   value?: Maybe<Scalars['String']>;
 };
 
+export type RemovePixelRangeInput = {
+  key?: Maybe<Scalars['String']>;
+  bucket?: Maybe<Scalars['String']>;
+  red?: Maybe<Scalars['Int']>;
+  green?: Maybe<Scalars['Int']>;
+  blue?: Maybe<Scalars['Int']>;
+  range?: Maybe<Scalars['Int']>;
+};
+
 export type RequestInviteInput = {
   email: Scalars['String'];
 };
@@ -1684,6 +1699,19 @@ export type GetPreviewDataQuery = (
   )> }
 );
 
+export type RemovePixelRangeMutationVariables = Exact<{
+  input?: Maybe<RemovePixelRangeInput>;
+}>;
+
+
+export type RemovePixelRangeMutation = (
+  { __typename?: 'Mutation' }
+  & { removePixelRange?: Maybe<(
+    { __typename?: 'AWSImageType' }
+    & Pick<AwsImageType, 'url'>
+  )> }
+);
+
 export type CreateBatchDeliveriesMutationVariables = Exact<{
   input?: Maybe<CreateBatchDeliveriesInputType>;
 }>;
@@ -1996,6 +2024,38 @@ export type GetPreviewDataQueryResult = Apollo.QueryResult<GetPreviewDataQuery, 
 export function refetchGetPreviewDataQuery(variables?: GetPreviewDataQueryVariables) {
       return { query: GetPreviewDataDocument, variables: variables }
     }
+export const RemovePixelRangeDocument = gql`
+    mutation removePixelRange($input: RemovePixelRangeInput) {
+  removePixelRange(input: $input) {
+    url
+  }
+}
+    `;
+export type RemovePixelRangeMutationFn = Apollo.MutationFunction<RemovePixelRangeMutation, RemovePixelRangeMutationVariables>;
+
+/**
+ * __useRemovePixelRangeMutation__
+ *
+ * To run a mutation, you first call `useRemovePixelRangeMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRemovePixelRangeMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [removePixelRangeMutation, { data, loading, error }] = useRemovePixelRangeMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useRemovePixelRangeMutation(baseOptions?: Apollo.MutationHookOptions<RemovePixelRangeMutation, RemovePixelRangeMutationVariables>) {
+        return Apollo.useMutation<RemovePixelRangeMutation, RemovePixelRangeMutationVariables>(RemovePixelRangeDocument, baseOptions);
+      }
+export type RemovePixelRangeMutationHookResult = ReturnType<typeof useRemovePixelRangeMutation>;
+export type RemovePixelRangeMutationResult = Apollo.MutationResult<RemovePixelRangeMutation>;
+export type RemovePixelRangeMutationOptions = Apollo.BaseMutationOptions<RemovePixelRangeMutation, RemovePixelRangeMutationVariables>;
 export const CreateBatchDeliveriesDocument = gql`
     mutation CreateBatchDeliveries($input: CreateBatchDeliveriesInputType) {
   createBatchDeliveries(input: $input) {

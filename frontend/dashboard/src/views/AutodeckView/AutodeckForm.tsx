@@ -1,7 +1,7 @@
 import * as yup from 'yup';
 import styled from 'styled-components';
 import { Briefcase, Clipboard, Link, Link2, Upload, ThumbsDown, ThumbsUp, Play, Pause, AlertCircle } from 'react-feather';
-import { useGetPreviewDataLazyQuery, useUploadJobImageMutation, CreateWorkspaceJobMutation, Exact, GenerateAutodeckInput, CreateWorkspaceJobType, ConfirmWorkspaceJobMutation } from 'types/generated-types';
+import { useGetPreviewDataLazyQuery, useUploadJobImageMutation, CreateWorkspaceJobMutation, Exact, GenerateAutodeckInput, CreateWorkspaceJobType, ConfirmWorkspaceJobMutation, useRemovePixelRangeMutation, RemovePixelRangeInput } from 'types/generated-types';
 import { Button, ButtonGroup, RadioButtonGroup, useToast } from '@chakra-ui/core';
 import { Controller, UseFormMethods, useForm } from 'react-hook-form';
 import {
@@ -289,7 +289,9 @@ const PrimaryColourFragment = ({ form, isInEditing, palette }: { form: UseFormMe
 
 const Canvas = ({ value }: { value: any }) => {
   const ref = useRef<HTMLCanvasElement | null>(null);
-  const [activeColor, setActiveColor] = useState<string | null>('rgb(255, 255, 255)')
+  const [activeColor, setActiveColor] = useState<Array<number>>([255, 255, 255])
+
+  const [removePixel, { loading }] = useRemovePixelRangeMutation();
   useEffect(() => {
     const context = ref.current?.getContext('2d');
     console.log('CONTEXT CANVAS: ', context);
@@ -305,13 +307,6 @@ const Canvas = ({ value }: { value: any }) => {
       };
     }
   }, [value, ref])
-
-  // useEffect(() => {
-  //   const context = ref.current?.getContext('2d');
-  //   if(context && activeColor) {
-
-  //   }
-  // }, [activeColor])
 
   function getMousePosition(e: any, canvas: HTMLCanvasElement) {
     const rect = canvas.getBoundingClientRect()
@@ -333,18 +328,49 @@ const Canvas = ({ value }: { value: any }) => {
       const color = context?.getImageData(eventLocation?.x, eventLocation?.y, 1, 1).data
       console.log('clicked color: ', color)
       context?.fillRect(eventLocation.x, eventLocation.y, 1, 1)
-      if (color) setActiveColor(`rgb(${color[0]}, ${color[1]}, ${color[2]})`)
+      if (color) setActiveColor([color[0], color[1], color[2]])
 
     }
+  }
 
-    // console.log('Client: ', e.clientX, e.clientY,)
+  const handleRemovePixel = () => {
+    const fileKey = value.split('.com/')?.[1]
+    console.log('fileKey: ', fileKey);
+    const input: RemovePixelRangeInput = {
+      red: activeColor[0],
+      green: activeColor[1],
+      blue: activeColor[2],
+      range: 30,
+      bucket: 'haas-autodeck-logos',
+      key: fileKey
+    }
 
+    removePixel({
+      variables: {
+        input
+      }
+    })
   }
 
   return (
     <Div position="relative">
       <canvas style={{ position: 'relative' }} onClick={(e) => handleCanvasClick(e)} width="800px" height="600px" ref={ref} />
-      <Div position="absolute" top="0" right="0" width="50px" height="50px" backgroundColor={activeColor} />
+      <Div
+        position="absolute"
+        top="0"
+        right="0"
+        width="50px"
+        height="50px"
+        backgroundColor={`rgba(${activeColor[0]}, ${activeColor[1]}, ${activeColor[2]})`}
+      />
+      <Button
+        // isLoading={isLoading || isConfirmLoading}
+        // isDisabled={!form.formState.isValid}
+        variantColor="teal"
+        onClick={handleRemovePixel}
+      >
+        Remove
+        </Button>
     </Div>
   )
 
