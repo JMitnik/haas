@@ -9,5 +9,6 @@ const api = new APIStack(app, 'HaasAPIMainStack');
 const pipeline = new MainPipelineStack(app, 'HaasPipeline', {
     apiService: api.apiService,
     dbUrl: api.dbUrl,
-    vpc: api.vpc
+    vpc: api.vpc,
+    db: api.db
 });

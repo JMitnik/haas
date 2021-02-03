@@ -1,6 +1,7 @@
 import * as codepipeline from '@aws-cdk/aws-codepipeline';
 import * as ecr from '@aws-cdk/aws-ecr';
 import * as ec2 from '@aws-cdk/aws-ec2';
+import * as rds from '@aws-cdk/aws-rds';
 import * as iam from '@aws-cdk/aws-iam';
 import * as secretsmanager from "@aws-cdk/aws-secretsmanager";
 import * as codebuild from '@aws-cdk/aws-codebuild';
@@ -14,6 +15,7 @@ interface MainPipelineStackProps extends StackProps {
   apiService: ecs_patterns.ApplicationLoadBalancedFargateService;
   dbUrl: string;
   vpc: ec2.Vpc;
+  db: rds.DatabaseInstance;
 }
 
 export class MainPipelineStack extends Stack {
@@ -58,9 +60,12 @@ export class MainPipelineStack extends Stack {
       repositoryName: 'haas_service_repo',
     });
 
+    const baseRepo = ecr.Repository.fromRepositoryName(this, 'BaseRepo', 'node-base');
+
     const buildRole = new iam.Role(this, 'BuildRole', {
       assumedBy: new iam.ServicePrincipal('codebuild.amazonaws.com'),
     });
+    baseRepo.grantPullPush(buildRole);
     repository.grantPullPush(buildRole);
 
     const buildStage = pipeline.addStage('build');
@@ -84,7 +89,8 @@ export class MainPipelineStack extends Stack {
             pre_build: {
               commands: [
                 'echo Logging in to AWS',
-                '$(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email)'
+                '$(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email)',
+                'aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com'
               ]
             },
             build: {
@@ -108,12 +114,31 @@ export class MainPipelineStack extends Stack {
       }),
     }));
 
+    const migrateRole = new iam.Role(this, 'MigrateRole', {
+      assumedBy: new iam.ServicePrincipal('codebuild.amazonaws.com'),
+    });
+
     const migrateStage = pipeline.addStage('Migrate');
     migrateStage.addActions(new codepipeline_actions.CodeBuildAction({
       actionName: 'Migrate',
       input: sourceArtifact,
       project: new codebuild.PipelineProject(this, 'Migrate', {
-        buildSpec: codebuild.BuildSpec.fromSourceFilename('./migrate-build-spec.yml'),
+        buildSpec: codebuild.BuildSpec.fromObject({
+          version: '0.2',
+          phases: {
+            pre_build: {
+              commands: [
+                'cd api',
+                'yarn install',
+              ]
+            },
+            build: {
+              commands: [
+                'yarn prisma migrate deploy --preview-feature',
+              ]
+            }
+          }
+        }),
         vpc: props?.vpc,
         subnetSelection: {
           subnetType: ec2.SubnetType.PUBLIC
@@ -125,7 +150,10 @@ export class MainPipelineStack extends Stack {
           type: codebuild.BuildEnvironmentVariableType.SECRETS_MANAGER
         }
       },
+      role: migrateRole
     }));
+
+    props?.db.grantConnect(migrateRole);
 
     if (!props?.apiService.service) return;
 

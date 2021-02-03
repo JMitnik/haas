@@ -29,6 +29,7 @@ export class APIStack extends cdk.Stack {
   apiService: ecs_patterns.ApplicationLoadBalancedFargateService;
   dbUrl: string;
   vpc: ec2.Vpc;
+  db: rds.DatabaseInstance;
 
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
@@ -142,6 +143,8 @@ export class APIStack extends cdk.Stack {
       }),
       keyName: bastionKeyName
     });
+
+    this.db = rdsDb;
 
     // Who can access the database?
     rdsDb.connections.allowFrom(apiService.service, ec2.Port.tcp(5432));
