@@ -26,8 +26,9 @@ export class MainPipelineStack extends Stack {
     const cdkOutputArtifact = new codepipeline.Artifact();
 
     const pipeline = new CdkPipeline(this, 'MainPipeline', {
-      pipelineName: 'HAASMainCDKPipeline',
+      pipelineName: 'HaasMainPipeline',
       cloudAssemblyArtifact: cdkOutputArtifact,
+      selfMutating: false,
       sourceAction: new codepipeline_actions.GitHubSourceAction({
         actionName: 'Github',
         trigger: codepipeline_actions.GitHubTrigger.WEBHOOK,
@@ -91,8 +92,6 @@ export class MainPipelineStack extends Stack {
         role: buildRole,
       }),
     }));
-
-    const dbUrl = secretsmanager.Secret.fromSecretNameV2(this, 'GetAPIString', 'API_RDS_String').secretValueFromJson('url').toString();
 
     const migrateStage = pipeline.addStage('migrate');
     migrateStage.addActions(new codepipeline_actions.CodeBuildAction({
