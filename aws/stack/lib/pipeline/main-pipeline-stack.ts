@@ -44,6 +44,8 @@ export class MainPipelineStack extends Stack {
       })
     });
 
+    const assumedPipelineRole = pipeline.codePipeline.role;
+
     const repository = new ecr.Repository(this, 'HAASMainRepository', {
       repositoryName: 'haas_repo',
     });
@@ -52,6 +54,7 @@ export class MainPipelineStack extends Stack {
       assumedBy: new iam.ServicePrincipal('codebuild.amazonaws.com'),
     });
     repository.grantPullPush(buildRole);
+    repository.grantPullPush(assumedPipelineRole);
 
     console.log(codebuild.BuildSpec.fromSourceFilename('./build-spec.yml'));
 
