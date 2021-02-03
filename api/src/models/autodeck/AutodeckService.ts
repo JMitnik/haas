@@ -139,7 +139,7 @@ class AutodeckService {
       sns.publish(sNSParams, (err, data) => {
         if (err) console.log('ERROR: ', err);
 
-        console.log('Logo manipulation publish response: ', data);
+        console.log('Remove pixel publish response: ', data);
       });
   }
 

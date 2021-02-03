@@ -231,12 +231,9 @@ export const RemovePixelRangeMutation = mutationField('removePixelRange', {
   nullable: true,
   args: { input: RemovePixelRangeInput },
   async resolve(parent, args) {
+    console.log('args input: ', args.input)
+    if (!args.input) return null;
     
-    if (!args.input || !args.input.blue || !args.input.bucket || 
-      !args.input.green || !args.input.key || !args.input.range || !args.input.red ) {
-      return null;
-    } 
-
     AutodeckService.removePixelRange(args.input)
 
     return { url: 'succesfully start lambda i guess'};

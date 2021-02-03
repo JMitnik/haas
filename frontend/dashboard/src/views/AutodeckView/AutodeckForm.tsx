@@ -340,10 +340,12 @@ const Canvas = ({ value }: { value: any }) => {
       red: activeColor[0],
       green: activeColor[1],
       blue: activeColor[2],
-      range: 30,
+      range: 50,
       bucket: 'haas-autodeck-logos',
       key: fileKey
     }
+
+    console.log('input: ', input);
 
     removePixel({
       variables: {
