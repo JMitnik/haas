@@ -22,6 +22,7 @@ export class MainPipelineStack extends Stack {
 
     // Define artifacts where the checkout output will be
     const sourceArtifact = new codepipeline.Artifact();
+    const buildArtifact = new codepipeline.Artifact();
     const cdkOutputArtifact = new codepipeline.Artifact();
 
     const pipeline = new CdkPipeline(this, 'MainPipeline', {
