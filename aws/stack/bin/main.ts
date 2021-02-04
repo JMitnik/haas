@@ -6,7 +6,8 @@ import { MainPipelineStack } from '../lib/pipeline/main-pipeline-stack';
 
 const app = new cdk.App();
 const api = new APIStack(app, 'HaasAPIMainStack');
-const pipeline = new MainPipelineStack(app, 'HaasPipeline', {
+const pipeline = new MainPipelineStack(app, 'haasSvcPipeline', {
+    prefix: 'haas_svc_api',
     apiService: api.apiService,
     dbUrl: api.dbUrl,
     vpc: api.vpc,

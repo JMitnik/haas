@@ -1,4 +1,6 @@
-# Step 1: Setup the base of the image
+###
+# Base: Prep our base image
+###
 FROM 649621042808.dkr.ecr.eu-central-1.amazonaws.com/node-base:14 AS base
 ENV PORT 4000
 
@@ -7,20 +9,19 @@ RUN apk add --update openssl
 WORKDIR /app
 
 # Step 2: Start building "all" dependencies
+###
+# Production Builder: Prep an image containing a production-ready build
+###
 FROM base as prodBuilder
 
 # Copy package and install production deps (these will be put later in final image)
-COPY ./package.json tsconfig.json schema.prisma ./
+COPY ./package.json tsconfig.json schema.prisma  ./
 
 # Install production only node_modules
 RUN yarn install --production
 
 # Put these "production node-modules" in temporary spot, as this will be overwritten soon
 RUN cp -RL /app/node_modules /tmp/node_modules
-
-# Delete cli from node-modules.
-# TODO: Find out why this is even copied in the first place
-RUN rm -rf /tmp/node_modules/@prisma/cli
 
 # Step 2b: Build and generate all intermediate dependencies such as prisma, etc
 RUN yarn install
@@ -35,6 +36,21 @@ RUN npx tsc -p ./tsconfig.json --outDir dist
 # Put the schema.graphql in the dist as well
 COPY --chown=node:node ./src/generated/schema.graphql ./dist/generated/schema.graphql
 
+###
+# Migrate Builder: Prep an image containing a migration-ready prisma
+# - Useful as target for a separate docker image
+###
+FROM base as migrateBuilder
+RUN npm install @prisma/cli@2.8.0 --no-save
+RUN npx prisma init > 0
+
+# Copy 3: copy the built node app.
+COPY schema.prisma package.json ./
+COPY ./migrations/ ./migrations/
+
+###
+# Production Deployment: Finilize the image
+###
 # Step 3: Prep for production
 FROM base
 

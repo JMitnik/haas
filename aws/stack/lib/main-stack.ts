@@ -1,6 +1,7 @@
 import * as cdk from '@aws-cdk/core';
 import * as ec2 from '@aws-cdk/aws-ec2';
 import * as ssm from '@aws-cdk/aws-ssm';
+import * as s3 from '@aws-cdk/aws-s3';
 import * as rds from '@aws-cdk/aws-rds';
 import * as acm from '@aws-cdk/aws-certificatemanager';
 import { SubnetType } from '@aws-cdk/aws-ec2';
@@ -49,8 +50,7 @@ export class APIStack extends cdk.Stack {
 
     // Our VPC: private subnet for sensitive space such as DB, and public for our services and bastion
     const vpc = new ec2.Vpc(this, "API_VPC", {
-      maxAzs: 3,
-      natGateways: 0,
+      maxAzs: 2,
       subnetConfiguration: [
         {
           name: 'API_VPC_PUBLIC_DEFAULT',
@@ -58,10 +58,23 @@ export class APIStack extends cdk.Stack {
         },
         {
           name: 'API_VPC_PRIVATE_DEFAULT',
-          subnetType: SubnetType.ISOLATED,
+          subnetType: SubnetType.PRIVATE,
         },
       ],
+      natGatewayProvider: ec2.NatProvider.instance({
+        instanceType: ec2.InstanceType.of(ec2.InstanceClass.T3A, ec2.InstanceSize.NANO),
+      })
     });
+
+    vpc.addGatewayEndpoint('S3Access', {
+      service: ec2.GatewayVpcEndpointAwsService.S3
+    });
+
+    // TODO: Find cheaper alternative
+    vpc.addInterfaceEndpoint('secretAccess', {
+      service: ec2.InterfaceVpcEndpointAwsService.SECRETS_MANAGER
+    });
+
     this.vpc = vpc;
 
     // We preconfigure our RDS credentials, and will upload this to `API_MAIN_RDS_SECRET`.
