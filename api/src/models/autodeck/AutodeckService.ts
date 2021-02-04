@@ -182,7 +182,7 @@ class AutodeckService {
     sns.publish(sNSParams, (err, data) => {
       if (err) console.log('ERROR: ', err);
 
-      console.log('Remove pixel publish response: ', data);
+      console.log('Remove whitify publish response: ', data);
     });
   }
 

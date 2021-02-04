@@ -301,6 +301,7 @@ const Canvas = ({ id, value, onChange }: any) => {
   const [fetchAdjustLogo, { loading: adjustedLoading }] = useGetAdjustedLogoLazyQuery({
     fetchPolicy: 'network-only',
     onCompleted: (result) => {
+      onChange("");
       console.log('Retrieved url: ', result.getAdjustedLogo?.url);
       onChange(result.getAdjustedLogo?.url)
     }
@@ -321,8 +322,11 @@ const Canvas = ({ id, value, onChange }: any) => {
   useEffect(() => {
     const context = ref.current?.getContext('2d');
     console.log('CONTEXT CANVAS: ', context);
-    if (value && context && ref.current?.width && ref.current?.height) {
+    if (ref.current?.width && ref.current?.height && context) {
       context.clearRect(0, 0, ref.current?.width, ref.current?.height);
+    }
+    
+    if (value && context) {
       const image = new Image();
       image.crossOrigin = "Anonymous";
       // image.setAttribute('crossOrigin', '');  
@@ -381,6 +385,7 @@ const Canvas = ({ id, value, onChange }: any) => {
   }
 
   const handleReset = () => {
+    setActiveBackground('white')
     fetchAdjustLogo({
       variables: {
         input: {
