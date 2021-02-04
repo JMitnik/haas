@@ -1,7 +1,7 @@
 import * as yup from 'yup';
 import styled from 'styled-components';
 import { Briefcase, Clipboard, Link, Link2, Upload, ThumbsDown, ThumbsUp, Play, Pause, AlertCircle } from 'react-feather';
-import { useGetPreviewDataLazyQuery, useUploadJobImageMutation, CreateWorkspaceJobMutation, Exact, GenerateAutodeckInput, CreateWorkspaceJobType, ConfirmWorkspaceJobMutation, useRemovePixelRangeMutation, RemovePixelRangeInput } from 'types/generated-types';
+import { useGetPreviewDataLazyQuery, useUploadJobImageMutation, CreateWorkspaceJobMutation, Exact, GenerateAutodeckInput, CreateWorkspaceJobType, ConfirmWorkspaceJobMutation, useRemovePixelRangeMutation, RemovePixelRangeInput, useWhitifyImageMutation } from 'types/generated-types';
 import { Button, ButtonGroup, RadioButtonGroup, useToast } from '@chakra-ui/core';
 import { Controller, UseFormMethods, useForm } from 'react-hook-form';
 import {
@@ -287,11 +287,13 @@ const PrimaryColourFragment = ({ form, isInEditing, palette }: { form: UseFormMe
   );
 };
 
-const Canvas = ({ value }: { value: any }) => {
+const Canvas = ({ value, onChange }: any) => {
   const ref = useRef<HTMLCanvasElement | null>(null);
   const [activeColor, setActiveColor] = useState<Array<number>>([255, 255, 255])
 
   const [removePixel, { loading }] = useRemovePixelRangeMutation();
+  const [whitifyImage, { loading: whitifyLoading }] = useWhitifyImageMutation();
+  
   useEffect(() => {
     const context = ref.current?.getContext('2d');
     console.log('CONTEXT CANVAS: ', context);
@@ -470,7 +472,7 @@ const CustomerLogoFormFragment = ({ form, jobId, previewLogo, isInEditing }: { f
               control={form.control}
               name="adjustedLogo"
               render={({ onChange, value }) => (
-                <Canvas value={value} />
+                <Canvas id={jobId} onChange={onChange} value={value} />
               )}
             />
           </FormControl>

@@ -226,6 +226,40 @@ export const RemovePixelRangeInput = inputObjectType({
   }
 })
 
+export const AdjustedImageInput = inputObjectType({
+  name: 'AdjustedImageInput',
+  definition(t) {
+    t.string('id');
+    // t.string('key');
+    t.string('bucket');
+    t.boolean('reset', { nullable: true })
+  }
+})
+
+export const GetAdjustedLogoQuery = queryField('getAdjustedLogo', {
+  type: AWSImageType,
+  nullable: true,
+  args: { input: AdjustedImageInput },
+  resolve(parent, args) {
+    console.log('args: ', args)
+    if (!args.input) return null;
+    console.log('Going to process adjusted logo')
+    return AutodeckService.getAdjustedLogo(args.input);
+  }
+})
+
+export const WhitifyImageMutation = mutationField('whitifyImage', {
+  type: AWSImageType,
+  nullable: true,
+  args: { input : AdjustedImageInput},
+  resolve(parent, args) {
+    console.log('args input: ', args.input)
+    if (!args.input) return null;
+    AutodeckService.whitifyImage(args.input)
+    return { url: 'Succesfully started lambda'}
+  }
+})
+
 export const RemovePixelRangeMutation = mutationField('removePixelRange', {
   type: AWSImageType,
   nullable: true,

@@ -17,6 +17,12 @@ export type Scalars = {
   Upload: any;
 };
 
+export type AdjustedImageInput = {
+  key?: Maybe<Scalars['String']>;
+  bucket?: Maybe<Scalars['String']>;
+  reset?: Maybe<Scalars['Boolean']>;
+};
+
 /** Append new data to an uploaded session */
 export type AppendToInteractionInput = {
   sessionId?: Maybe<Scalars['ID']>;
@@ -654,6 +660,7 @@ export type Mutation = {
   __typename?: 'Mutation';
   generateAutodeck?: Maybe<CreateWorkspaceJobType>;
   confirmCreateWorkspaceJob?: Maybe<CreateWorkspaceJobType>;
+  whitifyImage?: Maybe<AwsImageType>;
   removePixelRange?: Maybe<AwsImageType>;
   uploadJobImage?: Maybe<AwsImageType>;
   updateCreateWorkspaceJob?: Maybe<CreateWorkspaceJobType>;
@@ -708,6 +715,11 @@ export type MutationGenerateAutodeckArgs = {
 
 export type MutationConfirmCreateWorkspaceJobArgs = {
   input?: Maybe<GenerateAutodeckInput>;
+};
+
+
+export type MutationWhitifyImageArgs = {
+  input?: Maybe<AdjustedImageInput>;
 };
 
 
@@ -1063,6 +1075,7 @@ export type Query = {
   getPreviewData?: Maybe<PreviewDataType>;
   getJob?: Maybe<CreateWorkspaceJobType>;
   getAutodeckJobs: AutodeckConnectionType;
+  getAdjustedLogo?: Maybe<AwsImageType>;
   tags: Array<Tag>;
   delivery?: Maybe<DeliveryType>;
   triggerConnection?: Maybe<TriggerConnectionType>;
@@ -1100,6 +1113,11 @@ export type QueryGetJobArgs = {
 
 export type QueryGetAutodeckJobsArgs = {
   filter?: Maybe<PaginationWhereInput>;
+};
+
+
+export type QueryGetAdjustedLogoArgs = {
+  input?: Maybe<AdjustedImageInput>;
 };
 
 
@@ -1686,6 +1704,19 @@ export type UploadJobImageMutation = (
   )> }
 );
 
+export type GetAdjustedLogoQueryVariables = Exact<{
+  input?: Maybe<AdjustedImageInput>;
+}>;
+
+
+export type GetAdjustedLogoQuery = (
+  { __typename?: 'Query' }
+  & { getAdjustedLogo?: Maybe<(
+    { __typename?: 'AWSImageType' }
+    & Pick<AwsImageType, 'url'>
+  )> }
+);
+
 export type GetPreviewDataQueryVariables = Exact<{
   id?: Maybe<Scalars['String']>;
 }>;
@@ -1707,6 +1738,19 @@ export type RemovePixelRangeMutationVariables = Exact<{
 export type RemovePixelRangeMutation = (
   { __typename?: 'Mutation' }
   & { removePixelRange?: Maybe<(
+    { __typename?: 'AWSImageType' }
+    & Pick<AwsImageType, 'url'>
+  )> }
+);
+
+export type WhitifyImageMutationVariables = Exact<{
+  input?: Maybe<AdjustedImageInput>;
+}>;
+
+
+export type WhitifyImageMutation = (
+  { __typename?: 'Mutation' }
+  & { whitifyImage?: Maybe<(
     { __typename?: 'AWSImageType' }
     & Pick<AwsImageType, 'url'>
   )> }
@@ -1986,6 +2030,42 @@ export function useUploadJobImageMutation(baseOptions?: Apollo.MutationHookOptio
 export type UploadJobImageMutationHookResult = ReturnType<typeof useUploadJobImageMutation>;
 export type UploadJobImageMutationResult = Apollo.MutationResult<UploadJobImageMutation>;
 export type UploadJobImageMutationOptions = Apollo.BaseMutationOptions<UploadJobImageMutation, UploadJobImageMutationVariables>;
+export const GetAdjustedLogoDocument = gql`
+    query getAdjustedLogo($input: AdjustedImageInput) {
+  getAdjustedLogo(input: $input) {
+    url
+  }
+}
+    `;
+
+/**
+ * __useGetAdjustedLogoQuery__
+ *
+ * To run a query within a React component, call `useGetAdjustedLogoQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetAdjustedLogoQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetAdjustedLogoQuery({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useGetAdjustedLogoQuery(baseOptions?: Apollo.QueryHookOptions<GetAdjustedLogoQuery, GetAdjustedLogoQueryVariables>) {
+        return Apollo.useQuery<GetAdjustedLogoQuery, GetAdjustedLogoQueryVariables>(GetAdjustedLogoDocument, baseOptions);
+      }
+export function useGetAdjustedLogoLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetAdjustedLogoQuery, GetAdjustedLogoQueryVariables>) {
+          return Apollo.useLazyQuery<GetAdjustedLogoQuery, GetAdjustedLogoQueryVariables>(GetAdjustedLogoDocument, baseOptions);
+        }
+export type GetAdjustedLogoQueryHookResult = ReturnType<typeof useGetAdjustedLogoQuery>;
+export type GetAdjustedLogoLazyQueryHookResult = ReturnType<typeof useGetAdjustedLogoLazyQuery>;
+export type GetAdjustedLogoQueryResult = Apollo.QueryResult<GetAdjustedLogoQuery, GetAdjustedLogoQueryVariables>;
+export function refetchGetAdjustedLogoQuery(variables?: GetAdjustedLogoQueryVariables) {
+      return { query: GetAdjustedLogoDocument, variables: variables }
+    }
 export const GetPreviewDataDocument = gql`
     query getPreviewData($id: String) {
   getPreviewData(id: $id) {
@@ -2056,6 +2136,38 @@ export function useRemovePixelRangeMutation(baseOptions?: Apollo.MutationHookOpt
 export type RemovePixelRangeMutationHookResult = ReturnType<typeof useRemovePixelRangeMutation>;
 export type RemovePixelRangeMutationResult = Apollo.MutationResult<RemovePixelRangeMutation>;
 export type RemovePixelRangeMutationOptions = Apollo.BaseMutationOptions<RemovePixelRangeMutation, RemovePixelRangeMutationVariables>;
+export const WhitifyImageDocument = gql`
+    mutation whitifyImage($input: AdjustedImageInput) {
+  whitifyImage(input: $input) {
+    url
+  }
+}
+    `;
+export type WhitifyImageMutationFn = Apollo.MutationFunction<WhitifyImageMutation, WhitifyImageMutationVariables>;
+
+/**
+ * __useWhitifyImageMutation__
+ *
+ * To run a mutation, you first call `useWhitifyImageMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useWhitifyImageMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [whitifyImageMutation, { data, loading, error }] = useWhitifyImageMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useWhitifyImageMutation(baseOptions?: Apollo.MutationHookOptions<WhitifyImageMutation, WhitifyImageMutationVariables>) {
+        return Apollo.useMutation<WhitifyImageMutation, WhitifyImageMutationVariables>(WhitifyImageDocument, baseOptions);
+      }
+export type WhitifyImageMutationHookResult = ReturnType<typeof useWhitifyImageMutation>;
+export type WhitifyImageMutationResult = Apollo.MutationResult<WhitifyImageMutation>;
+export type WhitifyImageMutationOptions = Apollo.BaseMutationOptions<WhitifyImageMutation, WhitifyImageMutationVariables>;
 export const CreateBatchDeliveriesDocument = gql`
     mutation CreateBatchDeliveries($input: CreateBatchDeliveriesInputType) {
   createBatchDeliveries(input: $input) {

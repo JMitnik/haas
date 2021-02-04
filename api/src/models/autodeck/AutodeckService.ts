@@ -129,18 +129,75 @@ class AutodeckService {
     return updatedWorkspaceJob;
   }
 
+  static getAdjustedLogo = async (adjusedLogoInput: NexusGenInputs['AdjustedImageInput']) => {
+    // Download colour CSV from S3
+    const S3_BUCKET_PREFIX = `https://haas-autodeck-logos.s3.eu-central-1.amazonaws.com/${adjusedLogoInput.id}`;
+    if (!adjusedLogoInput.bucket) return { url: 'not_found' };
+
+    const params = {
+      Bucket: adjusedLogoInput.bucket,
+      Prefix: `${adjusedLogoInput.id}/`
+    };
+
+    const logoKey = await new Promise((resolve, reject) => {
+      s3.listObjectsV2(params, (err, data) => {
+        if (err) return reject(err);
+        if (adjusedLogoInput.reset) {
+          const fileWithRembg = data.Contents?.find((file) => file.Key?.includes('rembg'))
+          if (!fileWithRembg) {
+            const originalFile = data.Contents?.find((file) => file.Key?.includes('original'))
+            const fileName = originalFile?.Key?.split('/')[1];
+            resolve(fileName)
+          }
+          const fileName = fileWithRembg?.Key?.split('/')[1];
+          resolve(fileName);
+        }
+
+        const adjustedFile = data.Contents?.find((file) => file.Key?.includes('adjusted'));
+        if (!adjustedFile) {
+          const fileWithRembg = data.Contents?.find((file) => file.Key?.includes('rembg'))
+          if (!fileWithRembg) {
+            const originalFile = data.Contents?.find((file) => file.Key?.includes('original'))
+            const fileName = originalFile?.Key?.split('/')[1];
+            resolve(fileName)
+          }
+          const fileName = fileWithRembg?.Key?.split('/')[1];
+          resolve(fileName);
+        }
+        const adjustedFileName = adjustedFile?.Key?.split('/')[1];
+        resolve(adjustedFileName);
+      });
+    });
+
+    const adjustedLogoUrl = `${S3_BUCKET_PREFIX}/${logoKey}`;
+    return { url: adjustedLogoUrl }
+  }
+
+  static whitifyImage = (whitifyImageInput: NexusGenInputs['AdjustedImageInput']) => {
+    const strEvent = JSON.stringify(whitifyImageInput, null, 2);
+    const sNSParams = {
+      Message: strEvent,
+      TopicArn: "arn:aws:sns:eu-central-1:118627563984:WhitifyImageChannel"
+    }
+    sns.publish(sNSParams, (err, data) => {
+      if (err) console.log('ERROR: ', err);
+
+      console.log('Remove pixel publish response: ', data);
+    });
+  }
+
   static removePixelRange = (removePixelRangeEventInput: NexusGenInputs['RemovePixelRangeInput']) => {
 
-      const strEvent = JSON.stringify(removePixelRangeEventInput, null, 2);
-      const sNSParams = {
-        Message: strEvent,
-        TopicArn: "arn:aws:sns:eu-central-1:118627563984:PixalAdjustmentChannel"
-      }
-      sns.publish(sNSParams, (err, data) => {
-        if (err) console.log('ERROR: ', err);
+    const strEvent = JSON.stringify(removePixelRangeEventInput, null, 2);
+    const sNSParams = {
+      Message: strEvent,
+      TopicArn: "arn:aws:sns:eu-central-1:118627563984:PixalAdjustmentChannel"
+    }
+    sns.publish(sNSParams, (err, data) => {
+      if (err) console.log('ERROR: ', err);
 
-        console.log('Remove pixel publish response: ', data);
-      });
+      console.log('Remove pixel publish response: ', data);
+    });
   }
 
   static createWorkspaceJob = async (input: CreateWorkspaceJobProps) => {
