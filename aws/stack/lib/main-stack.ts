@@ -58,12 +58,9 @@ export class APIStack extends cdk.Stack {
         },
         {
           name: 'API_VPC_PRIVATE_DEFAULT',
-          subnetType: SubnetType.PRIVATE,
+          subnetType: SubnetType.ISOLATED,
         },
       ],
-      natGatewayProvider: ec2.NatProvider.instance({
-        instanceType: ec2.InstanceType.of(ec2.InstanceClass.T3A, ec2.InstanceSize.NANO),
-      })
     });
 
     vpc.addGatewayEndpoint('S3Access', {

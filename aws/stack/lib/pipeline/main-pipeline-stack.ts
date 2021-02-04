@@ -58,12 +58,12 @@ export class MainPipelineStack extends Stack {
     }))
 
     const repoName = `${props?.prefix}_service_repo`;
-
-    const repository = new ecr.Repository(this, `${props?.prefix}Repo`, {
-      repositoryName: repoName
-    });
+    const repository = new ecr.Repository(this, `${props?.prefix}Repo`, { repositoryName: repoName });
 
     const baseRepo = ecr.Repository.fromRepositoryName(this, 'BaseRepo', 'node-base');
+
+    const migrationRepoName = 'haas-migrations';
+    const migrationRepo = ecr.Repository.fromRepositoryName(this, 'MigrationRepo', migrationRepoName);
 
     const buildRole = new iam.Role(this, `${props?.prefix}BuildRole`, {
       assumedBy: new iam.ServicePrincipal('codebuild.amazonaws.com'),
@@ -79,13 +79,14 @@ export class MainPipelineStack extends Stack {
       project: new codebuild.PipelineProject(this, `${props?.prefix}DockerBuild`, {
         environmentVariables: {
           IMAGE_REPO_NAME: { value: repoName },
+          MIRATE_REPO_NAME: { value: migrationRepoName },
           IMAGE_TAG: { value: 'latest' },
           AWS_ACCOUNT_ID: { value: '649621042808' },
           AWS_DEFAULT_REGION: { value: 'eu-central-1' },
         },
         environment: {
           privileged: true,
-          buildImage: codebuild.LinuxBuildImage.fromEcrRepository()
+          buildImage: codebuild.LinuxBuildImage.AMAZON_LINUX_2_3
         },
         buildSpec: codebuild.BuildSpec.fromObject({
           version: '0.2',
@@ -102,13 +103,16 @@ export class MainPipelineStack extends Stack {
                 'echo Build started',
                 'echo Building the Docker image...',
                 'docker build -t $IMAGE_REPO_NAME:$CODEBUILD_RESOLVED_SOURCE_VERSION ./api',
-                'docker tag $IMAGE_REPO_NAME:$CODEBUILD_RESOLVED_SOURCE_VERSION $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$CODEBUILD_RESOLVED_SOURCE_VERSION'
+                'docker build -t $MIRATE_REPO_NAME:latest --target migrateBuilder ./api',
+                'docker tag $IMAGE_REPO_NAME:$CODEBUILD_RESOLVED_SOURCE_VERSION $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$CODEBUILD_RESOLVED_SOURCE_VERSION',
+                'docker tag $MIRATE_REPO_NAME:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$MIRATE_REPO_NAME:latest'
               ]
             },
             post_build: {
               commands: [
                 'echo finishing up',
                 'docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$CODEBUILD_RESOLVED_SOURCE_VERSION',
+                'docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$MIRATE_REPO_NAME:latest',
                 'echo finished pushing docker image',
                 `printf '{ "name": "haas-api", "imageUri": "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$CODEBUILD_RESOLVED_SOURCE_VERSION" }' > imagedefinitions.json`,
               ]
@@ -127,36 +131,6 @@ export class MainPipelineStack extends Stack {
     const migrateRole = new iam.Role(this, `${props?.prefix}MigrateRole`, {
       assumedBy: new iam.ServicePrincipal('codebuild.amazonaws.com'),
     });
-    const preMigrateOuput = new codepipeline.Artifact();
-
-    const preMigrateStage = pipeline.addStage(`${props?.prefix}PreMigrate`);
-    preMigrateStage.addActions(new codepipeline_actions.CodeBuildAction({
-      actionName: `${props?.prefix}PreMigrate`,
-      input: sourceArtifact,
-      outputs: [preMigrateOuput],
-      project: new codebuild.PipelineProject(this, `${props?.prefix}PreMigrate`, {
-        environment: {
-          buildImage: codebuild.LinuxBuildImage.AMAZON_LINUX_2_3
-        },
-        buildSpec: codebuild.BuildSpec.fromObject({
-          version: '0.2',
-          phases: {
-            build: {
-              commands: [
-                'echo $CODEBUILD_SRC_DIR',
-                'cd api && npm i @prisma/cli@2.8.0',
-              ]
-            }
-          },
-          artifacts: {
-            files: [
-              'package.json',
-              'api/**/*'
-            ]
-          }
-        }),
-      }),
-    }));
 
     const secret = secretsmanager.Secret.fromSecretNameV2(this, 'API_RDS_String', 'API_RDS_String');
     secret.grantRead(migrateRole);
@@ -166,7 +140,7 @@ export class MainPipelineStack extends Stack {
     const migrateStage = pipeline.addStage(`${props?.prefix}MigrateBuild`);
     migrateStage.addActions(new codepipeline_actions.CodeBuildAction({
       actionName: `${props?.prefix}MigrateBuild`,
-      input: preMigrateOuput,
+      input: sourceArtifact,
       outputs: [migrateArtifact],
       project: new codebuild.PipelineProject(this, `${props?.prefix}MigrateBuild`, {
         buildSpec: codebuild.BuildSpec.fromObject({
@@ -182,7 +156,7 @@ export class MainPipelineStack extends Stack {
                 'echo $CODEBUILD_SRC_DIR > codebuildsrcdir.txt',
                 'pwd > whereami.txt',
                 'ls > whatsaroundme.txt',
-                'yarn migrate 2> error.txt',
+                'npx prisma migrate up --experimental 2> error.txt',
               ]
             }
           },
@@ -196,7 +170,8 @@ export class MainPipelineStack extends Stack {
           }
         }),
         environment: {
-          buildImage: codebuild.LinuxBuildImage.AMAZON_LINUX_2_3
+          buildImage: codebuild.LinuxBuildImage.fromEcrRepository(migrationRepo),
+          privileged: true
         },
         vpc: props?.vpc,
         subnetSelection: {
