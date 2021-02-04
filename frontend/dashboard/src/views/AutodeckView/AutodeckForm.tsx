@@ -1,7 +1,7 @@
 import * as yup from 'yup';
 import styled from 'styled-components';
 import { Briefcase, Clipboard, Link, Link2, Upload, ThumbsDown, ThumbsUp, Play, Pause, AlertCircle } from 'react-feather';
-import { useGetPreviewDataLazyQuery, useUploadJobImageMutation, CreateWorkspaceJobMutation, Exact, GenerateAutodeckInput, CreateWorkspaceJobType, ConfirmWorkspaceJobMutation, useRemovePixelRangeMutation, RemovePixelRangeInput, useWhitifyImageMutation } from 'types/generated-types';
+import { useGetPreviewDataLazyQuery, useUploadJobImageMutation, CreateWorkspaceJobMutation, Exact, GenerateAutodeckInput, CreateWorkspaceJobType, ConfirmWorkspaceJobMutation, useRemovePixelRangeMutation, RemovePixelRangeInput, useWhitifyImageMutation, useGetAdjustedLogoQuery, useGetAdjustedLogoLazyQuery } from 'types/generated-types';
 import { Button, ButtonGroup, RadioButtonGroup, useToast } from '@chakra-ui/core';
 import { Controller, UseFormMethods, useForm } from 'react-hook-form';
 import {
@@ -287,18 +287,42 @@ const PrimaryColourFragment = ({ form, isInEditing, palette }: { form: UseFormMe
   );
 };
 
-const Canvas = ({ value, onChange }: any) => {
+const Canvas = ({ id, value, onChange }: any) => {
   const ref = useRef<HTMLCanvasElement | null>(null);
   const [activeColor, setActiveColor] = useState<Array<number>>([255, 255, 255])
-
+  const [activeBackground, setActiveBackground] = useState<string>('white')
   const [removePixel, { loading }] = useRemovePixelRangeMutation();
-  const [whitifyImage, { loading: whitifyLoading }] = useWhitifyImageMutation();
-  
+  const [whitifyImage, { loading: whitifyLoading }] = useWhitifyImageMutation({
+    onCompleted: () => {
+      setActiveBackground('black');
+    }
+  });
+
+  const [fetchAdjustLogo, { loading: adjustedLoading }] = useGetAdjustedLogoLazyQuery({
+    fetchPolicy: 'network-only',
+    onCompleted: (result) => {
+      console.log('Retrieved url: ', result.getAdjustedLogo?.url);
+      onChange(result.getAdjustedLogo?.url)
+    }
+  })
+
+  useEffect(() => {
+    fetchAdjustLogo({
+      variables: {
+        input: {
+          bucket: 'haas-autodeck-logos',
+          id,
+          reset: true,
+        }
+      },
+    })
+  }, [])
+
   useEffect(() => {
     const context = ref.current?.getContext('2d');
     console.log('CONTEXT CANVAS: ', context);
-    if (value && context) {
-
+    if (value && context && ref.current?.width && ref.current?.height) {
+      context.clearRect(0, 0, ref.current?.width, ref.current?.height);
       const image = new Image();
       image.crossOrigin = "Anonymous";
       // image.setAttribute('crossOrigin', '');  
@@ -308,7 +332,7 @@ const Canvas = ({ value, onChange }: any) => {
         context.drawImage(image, 0, 0);
       };
     }
-  }, [value, ref])
+  }, [value])
 
   function getMousePosition(e: any, canvas: HTMLCanvasElement) {
     const rect = canvas.getBoundingClientRect()
@@ -356,26 +380,106 @@ const Canvas = ({ value, onChange }: any) => {
     })
   }
 
+  const handleReset = () => {
+    fetchAdjustLogo({
+      variables: {
+        input: {
+          bucket: 'haas-autodeck-logos',
+          id,
+          reset: true,
+        }
+      },
+    })
+  }
+
+  const handleReload = () => {
+    fetchAdjustLogo({
+      variables: {
+        input: {
+          bucket: 'haas-autodeck-logos',
+          id,
+          reset: false,
+        }
+      },
+    })
+  }
+
+  const handleWhitify = () => {
+    const fileKey = value.split('.com/')[1];
+    console.log('whitify with: ', fileKey)
+    whitifyImage({
+      variables: {
+        input: {
+          key: fileKey,
+          bucket: 'haas-autodeck-logos',
+        }
+      }
+    })
+  }
+
+  const handleBackgroundswitch = () => {
+    setActiveBackground((prevState) => {
+      return prevState === 'black' ? 'white' : 'black';
+    })
+  }
+
   return (
-    <Div position="relative">
-      <canvas style={{ position: 'relative' }} onClick={(e) => handleCanvasClick(e)} width="800px" height="600px" ref={ref} />
-      <Div
-        position="absolute"
-        top="0"
-        right="0"
-        width="50px"
-        height="50px"
-        backgroundColor={`rgba(${activeColor[0]}, ${activeColor[1]}, ${activeColor[2]})`}
-      />
+    <>
       <Button
-        // isLoading={isLoading || isConfirmLoading}
-        // isDisabled={!form.formState.isValid}
-        variantColor="teal"
-        onClick={handleRemovePixel}
+        onClick={handleBackgroundswitch}
       >
-        Remove
+        Switch background
+      </Button>
+      <Div position="relative">
+        <Div backgroundColor={activeBackground}>
+          <canvas style={{ position: 'relative' }} onClick={(e) => handleCanvasClick(e)} width="800px" height="600px" ref={ref} />
+        </Div>
+
+        <Div
+          position="absolute"
+          top="0"
+          right="0"
+          width="50px"
+          height="50px"
+          backgroundColor={`rgba(${activeColor[0]}, ${activeColor[1]}, ${activeColor[2]})`}
+        />
+        <Flex justifyContent="space-evenly">
+          <Button
+            // isLoading={isLoading || isConfirmLoading}
+            // isDisabled={!form.formState.isValid}
+            variantColor="teal"
+            onClick={handleRemovePixel}
+          >
+            Remove pixel
         </Button>
-    </Div>
+          <Button
+            // isLoading={isLoading || isConfirmLoading}
+            // isDisabled={!form.formState.isValid}
+            variantColor="blue"
+            onClick={handleWhitify}
+          >
+            Whitify
+        </Button>
+          <Button
+            // isLoading={isLoading || isConfirmLoading}
+            // isDisabled={!form.formState.isValid}
+            variantColor="purple"
+            onClick={handleReload}
+          >
+            Reload
+        </Button>
+          <Button
+            // isLoading={isLoading || isConfirmLoading}
+            // isDisabled={!form.formState.isValid}
+            variantColor="red"
+            onClick={handleReset}
+          >
+            Reset
+        </Button>
+        </Flex>
+
+      </Div>
+    </>
   )
 
 
@@ -697,7 +801,7 @@ const AutodeckForm = ({
   useEffect(() => {
     if (!previewData) return;
     // form.setValue('uploadLogo', previewData?.getPreviewData?.rembgLogoUrl);
-    form.setValue('adjustedLogo', previewData?.getPreviewData?.rembgLogoUrl);
+    // form.setValue('adjustedLogo', previewData?.getPreviewData?.rembgLogoUrl);
     form.setValue('uploadWebsite', previewData?.getPreviewData?.websiteScreenshotUrl);
     form.setValue('primaryColour', previewData?.getPreviewData?.colors[0])
   }, [previewData])

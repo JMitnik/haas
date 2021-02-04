@@ -28,6 +28,7 @@ export interface NexusGenInputs {
   AdjustedImageInput: { // input type
     bucket?: string | null; // String
     id?: string | null; // String
+    key?: string | null; // String
     reset?: boolean | null; // Boolean
   }
   AppendToInteractionInput: { // input type

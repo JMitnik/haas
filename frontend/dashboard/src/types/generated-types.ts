@@ -18,6 +18,7 @@ export type Scalars = {
 };
 
 export type AdjustedImageInput = {
+  id?: Maybe<Scalars['String']>;
   key?: Maybe<Scalars['String']>;
   bucket?: Maybe<Scalars['String']>;
   reset?: Maybe<Scalars['Boolean']>;

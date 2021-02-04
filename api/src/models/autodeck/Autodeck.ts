@@ -229,8 +229,8 @@ export const RemovePixelRangeInput = inputObjectType({
 export const AdjustedImageInput = inputObjectType({
   name: 'AdjustedImageInput',
   definition(t) {
-    t.string('id');
-    // t.string('key');
+    t.string('id', { nullable: true });
+    t.string('key', { nullable: true});
     t.string('bucket');
     t.boolean('reset', { nullable: true })
   }
