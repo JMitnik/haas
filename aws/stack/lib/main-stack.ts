@@ -1,7 +1,6 @@
 import * as cdk from '@aws-cdk/core';
 import * as ec2 from '@aws-cdk/aws-ec2';
-import * as ssm from '@aws-cdk/aws-ssm';
-import * as s3 from '@aws-cdk/aws-s3';
+import * as ecr from '@aws-cdk/aws-ecr';
 import * as rds from '@aws-cdk/aws-rds';
 import * as acm from '@aws-cdk/aws-certificatemanager';
 import { SubnetType } from '@aws-cdk/aws-ec2';
@@ -9,6 +8,7 @@ import * as ecs from '@aws-cdk/aws-ecs';
 import * as route53 from '@aws-cdk/aws-route53';
 import * as ecs_patterns from '@aws-cdk/aws-ecs-patterns';
 import * as secretsmanager from "@aws-cdk/aws-secretsmanager";
+import { EcrImage } from '@aws-cdk/aws-ecs';
 
 
 // Prerequisites:
@@ -49,6 +49,7 @@ export class APIStack extends cdk.Stack {
       validation: acm.CertificateValidation.fromDns(hostedZone)
     });
 
+    const svcRepo = ecr.Repository.fromRepositoryName(this, 'ServiceRepo', 'haas-svc-api');
 
     // Our VPC: private subnet for sensitive space such as DB, and public for our services and bastion
     const vpc = new ec2.Vpc(this, "API_VPC", {
@@ -130,7 +131,7 @@ export class APIStack extends cdk.Stack {
       domainName: 'api.haas.live',
       certificate: tlsCertificate,
       taskImageOptions: {
-        image: ecs.ContainerImage.fromAsset(pathToAPI),
+        image: ecs.ContainerImage.fromEcrRepository(svcRepo),
         containerPort: 4000,
         environment: {
           JWT_SECRET: jwtSecret.secretValue.toString(),

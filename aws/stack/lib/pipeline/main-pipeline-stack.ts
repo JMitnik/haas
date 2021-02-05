@@ -59,8 +59,8 @@ export class MainPipelineStack extends Stack {
       resources: ['*']
     }))
 
-    const repoName = `${props?.prefix}_service_repo`;
-    const repository = new ecr.Repository(this, `${props?.prefix}Repo`, { repositoryName: repoName });
+    const repoName = `haas-svc-api`;
+    const repository = ecr.Repository.fromRepositoryName(this, 'ServiceRepo', repoName);
 
     const baseRepo = ecr.Repository.fromRepositoryName(this, 'BaseRepo', 'node-base');
 
@@ -111,6 +111,7 @@ export class MainPipelineStack extends Stack {
                 'docker build -t $IMAGE_REPO_NAME:$CODEBUILD_RESOLVED_SOURCE_VERSION ./api',
                 'docker build -t $MIRATE_REPO_NAME:latest --target migrateBuilder ./api',
                 'docker tag $IMAGE_REPO_NAME:$CODEBUILD_RESOLVED_SOURCE_VERSION $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$CODEBUILD_RESOLVED_SOURCE_VERSION',
+                'docker tag $IMAGE_REPO_NAME:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:latest',
                 'docker tag $MIRATE_REPO_NAME:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$MIRATE_REPO_NAME:latest'
               ]
             },
@@ -118,6 +119,7 @@ export class MainPipelineStack extends Stack {
               commands: [
                 'echo finishing up',
                 'docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$CODEBUILD_RESOLVED_SOURCE_VERSION',
+                'docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:latest',
                 'docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$MIRATE_REPO_NAME:latest',
                 'echo finished pushing docker image',
                 `printf '[{"name":"%s","imageUri":"%s"}]'  $HAAS_SERVICE_NAME  $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$CODEBUILD_RESOLVED_SOURCE_VERSION > imagedefinitions.json`,
@@ -223,16 +225,12 @@ export class MainPipelineStack extends Stack {
 
     if (!props?.apiService.service) return;
 
-    const deployRole = new iam.Role(this, `${props?.prefix}DeployRole`, {
-      assumedBy: new iam.ServicePrincipal('codedeploy.amazonaws.com'),
-    });
-    repository.grantPull(deployRole);
-
     const deployStage = pipeline.addStage(`${props?.prefix}Deploy`);
-    deployStage.addActions(new codepipeline_actions.EcsDeployAction({
+    const deployAction = new codepipeline_actions.EcsDeployAction({
       service: props?.apiService.service,
       actionName: `${props?.prefix}Deploy`,
       input: buildArtifact,
-    }));
+    });
+    deployStage.addActions(deployAction);
   }
 }
