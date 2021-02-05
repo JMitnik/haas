@@ -11,5 +11,7 @@ const pipeline = new MainPipelineStack(app, 'haasSvcPipeline', {
     apiService: api.apiService,
     dbUrl: api.dbUrl,
     vpc: api.vpc,
-    db: api.db
+    rdsPassword: api.rdsPassword,
+    db: api.db,
+    rdsSecurityGroup: api.rdsSecurityGroup
 });

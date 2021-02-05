@@ -31,6 +31,8 @@ export class APIStack extends cdk.Stack {
   dbUrl: string;
   vpc: ec2.Vpc;
   db: rds.DatabaseInstance;
+  rdsPassword: secretsmanager.Secret;
+  rdsSecurityGroup: ec2.SecurityGroup;
 
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
@@ -80,6 +82,8 @@ export class APIStack extends cdk.Stack {
       secretName: 'API_MAIN_RDS_SECRET'
     });
 
+    this.rdsPassword = rdsPassword;
+
     // Our RDS Endpoint
     const rdsDb = new rds.DatabaseInstance(this, 'API_RDS', {
       vpc,
@@ -126,7 +130,7 @@ export class APIStack extends cdk.Stack {
       domainName: 'api.haas.live',
       certificate: tlsCertificate,
       taskImageOptions: {
-        image: ecs.ContainerImage.fromAsset(pathToAPI),
+        image: ecs.ContainerImage.fr
         containerPort: 4000,
         environment: {
           JWT_SECRET: jwtSecret.secretValue.toString(),
@@ -137,6 +141,13 @@ export class APIStack extends cdk.Stack {
 
     this.apiService = apiService;
     this.dbUrl = dbUrl;
+
+    const rdsSecurityGroup = new ec2.SecurityGroup(this, 'RDS_Access_Security_Group', {
+      vpc,
+      securityGroupName: 'RDS_SECURITY_GROUP',
+    });
+
+    this.rdsSecurityGroup = rdsSecurityGroup;
 
     // Public Bastion for accessing the database
     // Note: we will use the client to adjust the security-groups allowed ingress connections
@@ -159,5 +170,6 @@ export class APIStack extends cdk.Stack {
     // Who can access the database?
     rdsDb.connections.allowFrom(apiService.service, ec2.Port.tcp(5432));
     rdsDb.connections.allowFrom(remoteBastion, ec2.Port.tcp(5432));
+    rdsDb.connections.allowFrom(rdsSecurityGroup, ec2.Port.tcp(5432));
   }
 }

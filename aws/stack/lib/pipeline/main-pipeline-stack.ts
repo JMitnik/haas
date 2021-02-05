@@ -17,6 +17,8 @@ interface MainPipelineStackProps extends StackProps {
   dbUrl: string;
   vpc: ec2.Vpc;
   db: rds.DatabaseInstance;
+  rdsPassword: secretsmanager.Secret;
+  rdsSecurityGroup: ec2.SecurityGroup;
 }
 
 export class MainPipelineStack extends Stack {
@@ -69,7 +71,10 @@ export class MainPipelineStack extends Stack {
       assumedBy: new iam.ServicePrincipal('codebuild.amazonaws.com'),
     });
     baseRepo.grantPullPush(buildRole);
+    migrationRepo.grantPullPush(buildRole);
     repository.grantPullPush(buildRole);
+
+    console.log(props?.apiService.service.taskDefinition.defaultContainer?.containerName);
 
     const buildStage = pipeline.addStage('build');
     buildStage.addActions(new codepipeline_actions.CodeBuildAction({
@@ -78,6 +83,7 @@ export class MainPipelineStack extends Stack {
       outputs: [buildArtifact],
       project: new codebuild.PipelineProject(this, `${props?.prefix}DockerBuild`, {
         environmentVariables: {
+          HAAS_SERVICE_NAME: { value: props?.apiService.service.taskDefinition.defaultContainer?.containerName },
           IMAGE_REPO_NAME: { value: repoName },
           MIRATE_REPO_NAME: { value: migrationRepoName },
           IMAGE_TAG: { value: 'latest' },
@@ -114,7 +120,7 @@ export class MainPipelineStack extends Stack {
                 'docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$CODEBUILD_RESOLVED_SOURCE_VERSION',
                 'docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$MIRATE_REPO_NAME:latest',
                 'echo finished pushing docker image',
-                `printf '{ "name": "haas-api", "imageUri": "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$CODEBUILD_RESOLVED_SOURCE_VERSION" }' > imagedefinitions.json`,
+                `printf '[{"name":"%s","imageUri":"%s"}]'  $HAAS_SERVICE_NAME  $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$CODEBUILD_RESOLVED_SOURCE_VERSION > imagedefinitions.json`,
               ]
             }
           },
@@ -136,58 +142,84 @@ export class MainPipelineStack extends Stack {
     secret.grantRead(migrateRole);
 
     const migrateArtifact = new codepipeline.Artifact('migrateArtifact');
+    migrationRepo.grantPull(migrateRole);
 
     const migrateStage = pipeline.addStage(`${props?.prefix}MigrateBuild`);
+
+    const migrateBuildProject = new codebuild.PipelineProject(this, `${props?.prefix}MigrateBuild`, {
+      buildSpec: codebuild.BuildSpec.fromObject({
+        version: '0.2',
+        phases: {
+          pre_build: {
+            commands: [
+              'cd /app'
+            ]
+          },
+          build: {
+            commands: [
+              'echo $CODEBUILD_SRC_DIR > codebuildsrcdir.txt',
+              'pwd > whereami.txt',
+              'ls > whatsaroundme.txt',
+              './node_modules/.bin/prisma migrate up --experimental > output.txt 2>&1',
+            ]
+          }
+        },
+        artifacts: {
+          files: [
+            '/app/codebuildsrcdir.txt',
+            '/app/whereami.txt',
+            '/app/whatsaroundme.txt',
+            '/app/output.txt'
+          ]
+        }
+      }),
+      // TODO: Set to true on next iteration, cant have this really be viewable
+      checkSecretsInPlainTextEnvVariables: false,
+      environment: {
+        buildImage: codebuild.LinuxBuildImage.fromEcrRepository(migrationRepo),
+        privileged: true,
+        environmentVariables: {
+          // TODO: Fix this and put it into secret manager format again
+          DB_STRING: {
+            value: secret.secretValueFromJson('url').toString(),
+            type: codebuild.BuildEnvironmentVariableType.PLAINTEXT
+          },
+          TEST: {
+            value: 'test'
+          },
+        }
+      },
+      vpc: props?.vpc,
+      subnetSelection: {
+        subnetType: ec2.SubnetType.ISOLATED
+      },
+      role: migrateRole,
+      securityGroups: props?.rdsSecurityGroup ? [props?.rdsSecurityGroup] : undefined
+    });
+
+    migrateBuildProject.addToRolePolicy(
+      new iam.PolicyStatement({
+        effect: iam.Effect.ALLOW,
+        actions: [
+          'secretsmanager:GetRandomPassword',
+          'secretsmanager:GetResourcePolicy',
+          'secretsmanager:GetSecretValue',
+          'secretsmanager:DescribeSecret',
+          'secretsmanager:ListSecretVersionIds',
+        ],
+        // TODO: Remove this and replace with appropriate resource
+        resources: ['*'],
+      })
+    )
+    props?.db.grantConnect(migrateRole);
+
     migrateStage.addActions(new codepipeline_actions.CodeBuildAction({
       actionName: `${props?.prefix}MigrateBuild`,
       input: sourceArtifact,
       outputs: [migrateArtifact],
-      project: new codebuild.PipelineProject(this, `${props?.prefix}MigrateBuild`, {
-        buildSpec: codebuild.BuildSpec.fromObject({
-          version: '0.2',
-          phases: {
-            pre_build: {
-              commands: [
-                'cd api'
-              ]
-            },
-            build: {
-              commands: [
-                'echo $CODEBUILD_SRC_DIR > codebuildsrcdir.txt',
-                'pwd > whereami.txt',
-                'ls > whatsaroundme.txt',
-                'npx prisma migrate up --experimental 2> error.txt',
-              ]
-            }
-          },
-          artifacts: {
-            files: [
-              'api/codebuildsrcdir.txt',
-              'api/whereami.txt',
-              'api/whatsaroundme.txt',
-              'api/error.txt'
-            ]
-          }
-        }),
-        environment: {
-          buildImage: codebuild.LinuxBuildImage.fromEcrRepository(migrationRepo),
-          privileged: true
-        },
-        vpc: props?.vpc,
-        subnetSelection: {
-          subnetType: ec2.SubnetType.ISOLATED
-        },
-        role: migrateRole
-      }),
-      environmentVariables: {
-        DB_STRING: {
-          value: 'API_RDS_String',
-          type: codebuild.BuildEnvironmentVariableType.SECRETS_MANAGER
-        }
-      },
+      project: migrateBuildProject
     }));
 
-    props?.db.grantConnect(migrateRole);
 
     if (!props?.apiService.service) return;
 

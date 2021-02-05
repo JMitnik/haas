@@ -617,3 +617,7 @@ model DeliveryEvents {
   deliveryId String?
   Delivery   Delivery?              @relation(fields: [deliveryId], references: [id])
 }
+
+model Visitor {
+  id String @id @default(cuid())
+}
