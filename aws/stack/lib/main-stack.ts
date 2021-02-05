@@ -140,6 +140,14 @@ export class APIStack extends cdk.Stack {
       },
     });
 
+    // Setup AutoScaling policy
+    const scaling = apiService.service.autoScaleTaskCount({ maxCapacity: 3 });
+    scaling.scaleOnCpuUtilization('CpuScaling', {
+      targetUtilizationPercent: 50,
+      scaleInCooldown: cdk.Duration.seconds(60),
+      scaleOutCooldown: cdk.Duration.seconds(60)
+    });
+
     this.apiService = apiService;
     this.dbUrl = dbUrl;
 
