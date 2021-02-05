@@ -130,7 +130,7 @@ export class APIStack extends cdk.Stack {
       domainName: 'api.haas.live',
       certificate: tlsCertificate,
       taskImageOptions: {
-        image: ecs.ContainerImage.fr
+        image: ecs.ContainerImage.fromAsset(pathToAPI),
         containerPort: 4000,
         environment: {
           JWT_SECRET: jwtSecret.secretValue.toString(),
