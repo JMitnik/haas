@@ -223,6 +223,11 @@ export class MainPipelineStack extends Stack {
 
     if (!props?.apiService.service) return;
 
+    const deployRole = new iam.Role(this, `${props?.prefix}DeployRole`, {
+      assumedBy: new iam.ServicePrincipal('codedeploy.amazonaws.com'),
+    });
+    repository.grantPull(deployRole);
+
     const deployStage = pipeline.addStage(`${props?.prefix}Deploy`);
     deployStage.addActions(new codepipeline_actions.EcsDeployAction({
       service: props?.apiService.service,

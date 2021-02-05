@@ -38,7 +38,7 @@ const main = async () => {
   };
 
   app.get('/', (req, res, next) => {
-    res.json({ status: 'HAAS API V1.0.0' });
+    res.json({ status: 'HAAS API V1.2.0' });
   });
 
   app.get('/health', (req, res, next) => {
