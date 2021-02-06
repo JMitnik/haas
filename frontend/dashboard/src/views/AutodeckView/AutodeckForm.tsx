@@ -301,8 +301,6 @@ const Canvas = ({ id, value, onChange }: any) => {
   const [fetchAdjustLogo, { loading: adjustedLoading }] = useGetAdjustedLogoLazyQuery({
     fetchPolicy: 'network-only',
     onCompleted: (result) => {
-      onChange("");
-      console.log('Retrieved url: ', result.getAdjustedLogo?.url);
       onChange(result.getAdjustedLogo?.url)
     }
   })
@@ -329,8 +327,8 @@ const Canvas = ({ id, value, onChange }: any) => {
     if (value && context) {
       const image = new Image();
       image.crossOrigin = "Anonymous";
-      // image.setAttribute('crossOrigin', '');  
-      image.src = value;
+      const source = value.split('#')[0]
+      image.src = source;
 
       image.onload = () => {
         context.drawImage(image, 0, 0);
@@ -364,7 +362,9 @@ const Canvas = ({ id, value, onChange }: any) => {
   }
 
   const handleRemovePixel = () => {
-    const fileKey = value.split('.com/')?.[1]
+    let fileKey = value?.split('.com/')?.[1]
+    fileKey = fileKey?.split('#')[0]
+   
     console.log('fileKey: ', fileKey);
     const input: RemovePixelRangeInput = {
       red: activeColor[0],
@@ -410,8 +410,9 @@ const Canvas = ({ id, value, onChange }: any) => {
   }
 
   const handleWhitify = () => {
-    const fileKey = value.split('.com/')[1];
-    console.log('whitify with: ', fileKey)
+    let fileKey = value.split('.com/')?.[1]
+    fileKey = fileKey.split('#')[0]
+
     whitifyImage({
       variables: {
         input: {

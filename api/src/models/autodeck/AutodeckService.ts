@@ -102,6 +102,7 @@ class AutodeckService {
     // })
 
     // if (!workspaceJob) {
+    // TODO: CSV needs to be edited based on the csv_to_env properties
     const csvData = { 'colour-0': input.primaryColour };
     const csv = papaparse.unparse([csvData]);
     const csvPath = `${input.id}/dominant_colours.csv`;
@@ -125,6 +126,20 @@ class AutodeckService {
         status: 'IN_PHOTOSHOP_QUEUE',
       }
     })
+
+    // TODO: Check which other variables needed in SQS Consumer 
+    const photoshopInput = { jobId: updatedWorkspaceJob.id }
+    const strEvent = JSON.stringify(photoshopInput, null, 2);
+    const sNSParams = {
+      Message: strEvent,
+      TopicArn: "arn:aws:sns:eu-central-1:118627563984:PhotoshopChannel"
+    }
+    sns.publish(sNSParams, (err, data) => {
+      if (err) console.log('ERROR: ', err);
+
+      console.log('Remove whitify publish response: ', data);
+    });
+
 
     return updatedWorkspaceJob;
   }
@@ -169,7 +184,7 @@ class AutodeckService {
       });
     });
 
-    const adjustedLogoUrl = `${S3_BUCKET_PREFIX}/${logoKey}`;
+    const adjustedLogoUrl = `${S3_BUCKET_PREFIX}/${logoKey}#${Date.now()}`;
     return { url: adjustedLogoUrl }
   }
 
