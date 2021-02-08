@@ -78,15 +78,23 @@ export const GenerateAutodeckInput = inputObjectType({
     t.boolean('requiresRembgLambda', { required: true });
     t.boolean('requiresWebsiteScreenshot', { required: true });
     t.boolean('requiresColorExtraction', { required: true });
+    t.boolean('usesAdjustedLogo', { required: true });
+
     t.string('name', { required: false });
     t.string('website', { required: false });
     t.string('logo', { required: false });
     t.string('primaryColour', { required: false });
     t.string('firstName', { required: false });
+    t.string('companyName', { required: false });
     t.string('answer1', { required: false });
     t.string('answer2', { required: false });
     t.string('answer3', { required: false });
     t.string('answer4', { required: false });
+    t.string('sorryAboutX', { required: false });
+    t.string('youLoveX', { required: false });
+    t.string('reward', { required: false });
+    t.string('emailContent', { required: false });
+    t.string('textMessage', { required: false });
   },
 });
 
@@ -151,7 +159,9 @@ export const ConfirmCreateWorkspaceJobMutation = mutationField('confirmCreateWor
       answer4: input?.answer4,
       firstName: input?.firstName,
       primaryColour: input?.primaryColour,
+      usesAdjustedLogo: input?.usesAdjustedLogo
     }
+  
     return AutodeckService.confirmWorkspaceJob(confirmInput) as any;
   }
 })

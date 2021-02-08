@@ -833,6 +833,54 @@ const language = {
     },
   },
   autodeck: {
+    company_name: {
+      en: 'Company name',
+      de: '',
+    },
+    company_name_helper: {
+      en: 'The name of the target company',
+      de: '',
+    },
+    sorry_about_x: {
+      en: 'Sorry about X',
+      de: 'Entschuldigung für X',
+    },
+    sorry_about_x_helper: {
+      en: 'Something the target user did not like',
+      de: 'Something the target user did not like',
+    },
+    you_love_x: {
+      en: 'You love X',
+      de: 'Du liebst X', 
+    },
+    you_love_x_helper: {
+      en: 'Something the target user loves',
+      de: 'The "You love X" message', 
+    },
+    reward: {
+      en: 'Reward',
+      de: '',
+    },
+    reward_helper: {
+      en: 'The reward the target user will receive',
+      de: '',
+    },
+    email_content: {
+      en: 'Email content',
+      de: '',
+    },
+    email_content_helper: {
+      en: 'The content of the email sent to the target user',
+      de: '',
+    },
+    text_content: {
+      en: 'SMS content',
+      de: '',
+    },
+    text_content_helper: {
+      en: 'The content of the SMS sent to the target user',
+      de: '',
+    },
     use_rembg: {
       en: 'Remove background',
       de: 'Hintergrund entfernen',

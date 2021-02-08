@@ -55,6 +55,7 @@ export interface CreateWorkspaceJobProps {
   requiresRembg?: boolean | null;
   requiresWebsiteScreenshot?: boolean | null;
   requiresColorExtraction?: boolean | null;
+  usesAdjustedLogo?: boolean | null;
 }
 
 class AutodeckService {
@@ -94,14 +95,6 @@ class AutodeckService {
   };
 
   static confirmWorkspaceJob = async (input: CreateWorkspaceJobProps) => {
-    // // TODO: Check if workspace job exist. If not => 
-    // const workspaceJob = await prisma.createWorkspaceJob.findOne({
-    //   where: {
-    //     id: input.id || '',
-    //   }
-    // })
-
-    // if (!workspaceJob) {
     // TODO: CSV needs to be edited based on the csv_to_env properties
     const csvData = { 'colour-0': input.primaryColour };
     const csv = papaparse.unparse([csvData]);
@@ -128,7 +121,7 @@ class AutodeckService {
     })
 
     // TODO: Check which other variables needed in SQS Consumer 
-    const photoshopInput = { jobId: updatedWorkspaceJob.id }
+    const photoshopInput = { jobId: updatedWorkspaceJob.id, usesAdjustedLogo: input.usesAdjustedLogo }
     const strEvent = JSON.stringify(photoshopInput, null, 2);
     const sNSParams = {
       Message: strEvent,
@@ -137,7 +130,7 @@ class AutodeckService {
     sns.publish(sNSParams, (err, data) => {
       if (err) console.log('ERROR: ', err);
 
-      console.log('Remove whitify publish response: ', data);
+      console.log('Photoshop channel publish response: ', data);
     });
 
 
@@ -145,7 +138,6 @@ class AutodeckService {
   }
 
   static getAdjustedLogo = async (adjusedLogoInput: NexusGenInputs['AdjustedImageInput']) => {
-    // Download colour CSV from S3
     const S3_BUCKET_PREFIX = `https://haas-autodeck-logos.s3.eu-central-1.amazonaws.com/${adjusedLogoInput.id}`;
     if (!adjusedLogoInput.bucket) return { url: 'not_found' };
 
@@ -158,9 +150,9 @@ class AutodeckService {
       s3.listObjectsV2(params, (err, data) => {
         if (err) return reject(err);
         if (adjusedLogoInput.reset) {
-          const fileWithRembg = data.Contents?.find((file) => file.Key?.includes('rembg'))
+          const fileWithRembg = data.Contents?.find((file) => file.Key?.includes('/rembg'))
           if (!fileWithRembg) {
-            const originalFile = data.Contents?.find((file) => file.Key?.includes('original'))
+            const originalFile = data.Contents?.find((file) => file.Key?.includes('/original'))
             const fileName = originalFile?.Key?.split('/')[1];
             resolve(fileName)
           }
@@ -291,12 +283,13 @@ class AutodeckService {
       Prefix: `${id}/`
     };
 
+    // FIXME: use different search query then 'rembg' as it finds inverse_rembg
     const logoKey = await new Promise((resolve, reject) => {
       s3.listObjectsV2(params, (err, data) => {
         if (err) return reject(err);
-        const fileWithRembg = data.Contents?.find((file) => file.Key?.includes('rembg'))
+        const fileWithRembg = data.Contents?.find((file) => file.Key?.includes('/rembg'))
         if (!fileWithRembg) {
-          const originalFile = data.Contents?.find((file) => file.Key?.includes('original'))
+          const originalFile = data.Contents?.find((file) => file.Key?.includes('/original'))
           const fileName = originalFile?.Key?.split('/')[1];
           resolve(fileName)
         }

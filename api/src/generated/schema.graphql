@@ -466,6 +466,8 @@ input GenerateAutodeckInput {
   answer2: String
   answer3: String
   answer4: String
+  companyName: String
+  emailContent: String
   firstName: String
   id: String!
   logo: String
@@ -474,7 +476,12 @@ input GenerateAutodeckInput {
   requiresColorExtraction: Boolean!
   requiresRembgLambda: Boolean!
   requiresWebsiteScreenshot: Boolean!
+  reward: String
+  sorryAboutX: String
+  textMessage: String
+  usesAdjustedLogo: Boolean!
   website: String
+  youLoveX: String
 }
 
 input GetCampaignsInput {

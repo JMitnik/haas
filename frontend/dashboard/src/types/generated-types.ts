@@ -559,15 +559,22 @@ export type GenerateAutodeckInput = {
   requiresRembgLambda: Scalars['Boolean'];
   requiresWebsiteScreenshot: Scalars['Boolean'];
   requiresColorExtraction: Scalars['Boolean'];
+  usesAdjustedLogo: Scalars['Boolean'];
   name?: Maybe<Scalars['String']>;
   website?: Maybe<Scalars['String']>;
   logo?: Maybe<Scalars['String']>;
   primaryColour?: Maybe<Scalars['String']>;
   firstName?: Maybe<Scalars['String']>;
+  companyName?: Maybe<Scalars['String']>;
   answer1?: Maybe<Scalars['String']>;
   answer2?: Maybe<Scalars['String']>;
   answer3?: Maybe<Scalars['String']>;
   answer4?: Maybe<Scalars['String']>;
+  sorryAboutX?: Maybe<Scalars['String']>;
+  youLoveX?: Maybe<Scalars['String']>;
+  reward?: Maybe<Scalars['String']>;
+  emailContent?: Maybe<Scalars['String']>;
+  textMessage?: Maybe<Scalars['String']>;
 };
 
 export type GetCampaignsInput = {

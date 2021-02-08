@@ -202,6 +202,8 @@ export interface NexusGenInputs {
     answer2?: string | null; // String
     answer3?: string | null; // String
     answer4?: string | null; // String
+    companyName?: string | null; // String
+    emailContent?: string | null; // String
     firstName?: string | null; // String
     id: string; // String!
     logo?: string | null; // String
@@ -210,7 +212,12 @@ export interface NexusGenInputs {
     requiresColorExtraction: boolean; // Boolean!
     requiresRembgLambda: boolean; // Boolean!
     requiresWebsiteScreenshot: boolean; // Boolean!
+    reward?: string | null; // String
+    sorryAboutX?: string | null; // String
+    textMessage?: string | null; // String
+    usesAdjustedLogo: boolean; // Boolean!
     website?: string | null; // String
+    youLoveX?: string | null; // String
   }
   GetCampaignsInput: { // input type
     customerSlug?: string | null; // String

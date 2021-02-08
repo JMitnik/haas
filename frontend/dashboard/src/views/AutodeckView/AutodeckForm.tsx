@@ -1,8 +1,8 @@
 import * as yup from 'yup';
 import styled from 'styled-components';
-import { Briefcase, Clipboard, Link, Link2, Upload, ThumbsDown, ThumbsUp, Play, Pause, AlertCircle } from 'react-feather';
+import { Briefcase, Clipboard, Link, Link2, Upload, ThumbsDown, ThumbsUp, Play, Pause, AlertCircle, Mail, PenTool, Heart, Edit2, UploadCloud } from 'react-feather';
 import { useGetPreviewDataLazyQuery, useUploadJobImageMutation, CreateWorkspaceJobMutation, Exact, GenerateAutodeckInput, CreateWorkspaceJobType, ConfirmWorkspaceJobMutation, useRemovePixelRangeMutation, RemovePixelRangeInput, useWhitifyImageMutation, useGetAdjustedLogoQuery, useGetAdjustedLogoLazyQuery } from 'types/generated-types';
-import { Button, ButtonGroup, RadioButtonGroup, useToast } from '@chakra-ui/core';
+import { Button, ButtonGroup, RadioButtonGroup, useToast, Spinner } from '@chakra-ui/core';
 import { Controller, UseFormMethods, useForm } from 'react-hook-form';
 import {
   Div, Form, FormControl, FormLabel, FormSection, H3, Hr, Input, InputGrid, InputHelper,
@@ -291,7 +291,7 @@ const Canvas = ({ id, value, onChange }: any) => {
   const ref = useRef<HTMLCanvasElement | null>(null);
   const [activeColor, setActiveColor] = useState<Array<number>>([255, 255, 255])
   const [activeBackground, setActiveBackground] = useState<string>('white')
-  const [removePixel, { loading }] = useRemovePixelRangeMutation();
+  const [removePixel, { loading: removePixelLoading }] = useRemovePixelRangeMutation();
   const [whitifyImage, { loading: whitifyLoading }] = useWhitifyImageMutation({
     onCompleted: () => {
       setActiveBackground('black');
@@ -323,7 +323,7 @@ const Canvas = ({ id, value, onChange }: any) => {
     if (ref.current?.width && ref.current?.height && context) {
       context.clearRect(0, 0, ref.current?.width, ref.current?.height);
     }
-    
+
     if (value && context) {
       const image = new Image();
       image.crossOrigin = "Anonymous";
@@ -364,7 +364,7 @@ const Canvas = ({ id, value, onChange }: any) => {
   const handleRemovePixel = () => {
     let fileKey = value?.split('.com/')?.[1]
     fileKey = fileKey?.split('#')[0]
-   
+
     console.log('fileKey: ', fileKey);
     const input: RemovePixelRangeInput = {
       red: activeColor[0],
@@ -432,6 +432,7 @@ const Canvas = ({ id, value, onChange }: any) => {
   return (
     <>
       <Button
+        marginBottom="5px"
         onClick={handleBackgroundswitch}
       >
         Switch background
@@ -440,6 +441,11 @@ const Canvas = ({ id, value, onChange }: any) => {
         <Div backgroundColor={activeBackground}>
           <canvas style={{ position: 'relative' }} onClick={(e) => handleCanvasClick(e)} width="800px" height="600px" ref={ref} />
         </Div>
+        {adjustedLoading && (
+          <Div position="absolute" top="280px" right="380px">
+            <Spinner />
+          </Div>
+        )}
 
         <Div
           position="absolute"
@@ -449,9 +455,9 @@ const Canvas = ({ id, value, onChange }: any) => {
           height="50px"
           backgroundColor={`rgba(${activeColor[0]}, ${activeColor[1]}, ${activeColor[2]})`}
         />
-        <Flex justifyContent="space-evenly">
+        <Flex marginTop="5px" justifyContent="space-evenly">
           <Button
-            // isLoading={isLoading || isConfirmLoading}
+            isLoading={removePixelLoading}
             // isDisabled={!form.formState.isValid}
             variantColor="teal"
             onClick={handleRemovePixel}
@@ -459,7 +465,7 @@ const Canvas = ({ id, value, onChange }: any) => {
             Remove pixel
         </Button>
           <Button
-            // isLoading={isLoading || isConfirmLoading}
+            isLoading={whitifyLoading}
             // isDisabled={!form.formState.isValid}
             variantColor="blue"
             onClick={handleWhitify}
@@ -467,7 +473,7 @@ const Canvas = ({ id, value, onChange }: any) => {
             Whitify
         </Button>
           <Button
-            // isLoading={isLoading || isConfirmLoading}
+            isLoading={adjustedLoading}
             // isDisabled={!form.formState.isValid}
             variantColor="purple"
             onClick={handleReload}
@@ -475,7 +481,7 @@ const Canvas = ({ id, value, onChange }: any) => {
             Reload
         </Button>
           <Button
-            // isLoading={isLoading || isConfirmLoading}
+            isLoading={adjustedLoading}
             // isDisabled={!form.formState.isValid}
             variantColor="red"
             onClick={handleReset}
@@ -555,7 +561,7 @@ const CustomerLogoFormFragment = ({ form, jobId, previewLogo, isInEditing }: { f
 
       {isInEditing && (
         <>
-          {/* <FormControl>
+          <FormControl>
             <FormLabel htmlFor="cloudinary">{t('logo_upload')}</FormLabel>
             <InputHelper>{t('logo_upload_helper')}</InputHelper>
 
@@ -564,10 +570,17 @@ const CustomerLogoFormFragment = ({ form, jobId, previewLogo, isInEditing }: { f
               name="uploadLogo"
               defaultValue={previewLogo || ""}
               render={({ onChange, value }) => (
-                <CustomerUploadLogoInput isDisapproved={form.watch('isLogoUrlApproved') === 0} isInEditing={isInEditing && form.watch('isLogoUrlApproved') === 1} jobId={jobId} value={value} onChange={onChange} imageType="LOGO" />
+                <CustomerUploadLogoInput
+                  isDisapproved={form.watch('isLogoUrlApproved') === 0}
+                  isInEditing={form.watch('isEditingLogo') !== 0}
+                  jobId={jobId}
+                  value={value}
+                  onChange={onChange}
+                  imageType="LOGO"
+                />
               )}
             />
-            {form.watch('isLogoUrlApproved') === 0 && (
+            {form.watch('isEditingLogo') === 0 && (
               <Flex marginTop="5px">
                 <Div width="auto" color="orange">
                   <AlertCircle color="orange" />
@@ -575,17 +588,8 @@ const CustomerLogoFormFragment = ({ form, jobId, previewLogo, isInEditing }: { f
                 <Div marginLeft="5px">The newly uploaded logo will <span style={{ fontWeight: 'bold' }}>override</span> the currently used logo and <span style={{ fontWeight: 'bold' }}>no background removal</span> will be performed.</Div>
               </Flex>
             )}
-          </FormControl> */}
-          <FormControl>
-            <FormLabel htmlFor="cloudinary">Logo adjustment</FormLabel>
-            <Controller
-              control={form.control}
-              name="adjustedLogo"
-              render={({ onChange, value }) => (
-                <Canvas id={jobId} onChange={onChange} value={value} />
-              )}
-            />
           </FormControl>
+
           <FormControl>
             <FormLabel>{'Website screenshot approval'}</FormLabel>
             <InputHelper>{'Approve or edit the website screenshot used for document generation'}</InputHelper>
@@ -601,12 +605,48 @@ const CustomerLogoFormFragment = ({ form, jobId, previewLogo, isInEditing }: { f
                   display="flex"
                 >
                   <RadioButton icon={ThumbsUp} value={1} text={'Approve'} description={'Use current logo'} />
-                  <RadioButton icon={ThumbsDown} value={0} text={'Edit'} description={'Upload new logo'} />
+                  <RadioButton icon={ThumbsDown} value={0} text={'Edit'} description={'Use different logo'} />
                 </RadioButtonGroup>
               )}
             />
 
           </FormControl>
+          {form.watch('isLogoUrlApproved') === 0 && (
+            <FormControl>
+              <FormLabel>Edit current logo</FormLabel>
+              <InputHelper>{'Upload new logo or edit the current logo'}</InputHelper>
+              <Controller
+                control={form.control}
+                name="isEditingLogo"
+                defaultValue={0}
+                render={({ onChange, value }) => (
+                  <RadioButtonGroup
+                    value={value}
+                    isInline
+                    onChange={onChange}
+                    display="flex"
+                  >
+                    <RadioButton icon={UploadCloud} value={0} text={'Upload'} description={'Upload new logo'} />
+                    <RadioButton icon={Edit2} value={1} text={'Edit'} description={'Edit current logo'} />
+                  </RadioButtonGroup>
+                )}
+              />
+
+            </FormControl>
+          )}
+
+          {form.watch('isEditingLogo') === 1 && (
+            <FormControl>
+              <FormLabel htmlFor="cloudinary">Logo adjustment</FormLabel>
+              <Controller
+                control={form.control}
+                name="adjustedLogo"
+                render={({ onChange, value }) => (
+                  <Canvas id={jobId} onChange={onChange} value={value} />
+                )}
+              />
+            </FormControl>
+          )}
         </>
       )}
 
@@ -643,6 +683,17 @@ const DialogueMultiChoiceFragment = ({ form }: { form: UseFormMethods<FormDataPr
 
   return (
     <>
+      <FormControl isInvalid={!!form.errors.companyName} isRequired>
+        <FormLabel htmlFor="companyName">{t('autodeck:company_name')}</FormLabel>
+        <InputHelper>{t('autodeck:company_name_helper')}</InputHelper>
+        <Input
+          placeholder="Haas inc."
+          leftEl={<Briefcase />}
+          name="companyName"
+          ref={form.register()}
+        />
+      </FormControl>
+
       <FormControl isInvalid={!!form.errors.answer1} isRequired>
         <FormLabel htmlFor="answer1">{t('autodeck:answer_1')}</FormLabel>
         <InputHelper>{t('autodeck:answer_1_helper')}</InputHelper>
@@ -686,6 +737,61 @@ const DialogueMultiChoiceFragment = ({ form }: { form: UseFormMethods<FormDataPr
           ref={form.register()}
         />
       </FormControl>
+
+      <FormControl isInvalid={!!form.errors.sorryAboutX} isRequired>
+        <FormLabel htmlFor="sorryAboutX">{t('autodeck:sorry_about_x')}</FormLabel>
+        <InputHelper>{t('autodeck:sorry_about_x_helper')}</InputHelper>
+        <Input
+          placeholder="The unfriendly service"
+          leftEl={<ThumbsDown />}
+          name="sorryAboutX"
+          ref={form.register()}
+        />
+      </FormControl>
+
+      <FormControl isInvalid={!!form.errors.youLoveX} isRequired>
+        <FormLabel htmlFor="youLoveX">{t('autodeck:you_love_x')}</FormLabel>
+        <InputHelper>{t('autodeck:you_love_x_helper')}</InputHelper>
+        <Input
+          placeholder="Our product"
+          leftEl={<ThumbsUp />}
+          name="youLoveX"
+          ref={form.register()}
+        />
+      </FormControl>
+
+      <FormControl isInvalid={!!form.errors.reward} isRequired>
+        <FormLabel htmlFor="reward">{t('autodeck:reward')}</FormLabel>
+        <InputHelper>{t('autodeck:reward_helper')}</InputHelper>
+        <Input
+          placeholder="And you both get a 20 percent discount"
+          leftEl={<Heart />}
+          name="reward"
+          ref={form.register()}
+        />
+      </FormControl>
+
+      <FormControl isInvalid={!!form.errors.emailContent} isRequired>
+        <FormLabel htmlFor="emailContent">{t('autodeck:email_content')}</FormLabel>
+        <InputHelper>{t('autodeck:email_content_helper')}</InputHelper>
+        <Input
+          placeholder="We see that you have just used on of our services"
+          leftEl={<Mail />}
+          name="emailContent"
+          ref={form.register()}
+        />
+      </FormControl>
+
+      <FormControl isInvalid={!!form.errors.textMessage} isRequired>
+        <FormLabel htmlFor="textMessage">{t('autodeck:text_content')}</FormLabel>
+        <InputHelper>{t('autodeck:text_content_helper')}</InputHelper>
+        <Input
+          placeholder="Hi Passi - thank you for purchasing one of our products. Why dont you tell us how you feel?"
+          leftEl={<PenTool />}
+          name="textMessage"
+          ref={form.register()}
+        />
+      </FormControl>
     </>
   );
 };
@@ -701,15 +807,22 @@ const schema = yup.object().shape({
   useCustomUrl: yup.number(),
   useCustomColour: yup.number(),
   useWebsiteUrl: yup.number(),
+  isEditingLogo: yup.number(),
   isWebsiteUrlApproved: yup.number(),
   isLogoUrlApproved: yup.number(),
   uploadLogo: yup.string().url(),
   adjustedLogo: yup.string().url(),
   firstName: yup.string(),
+  companyName: yup.string(),
   answer1: yup.string(),
   answer2: yup.string(),
   answer3: yup.string(),
   answer4: yup.string(),
+  sorryAboutX: yup.string(),
+  youLoveX: yup.string(),
+  reward: yup.string(),
+  emailContent: yup.string(),
+  textMessage: yup.string()
 }).required();
 
 type FormDataProps = yup.InferType<typeof schema>;
@@ -754,10 +867,13 @@ const AutodeckForm = ({
     mode: 'all'
   });
 
+  console.log('isEditingLogo', form.watch('isEditingLogo'))
+
   const onFormSubmit = (data: FormDataProps) => {
     const requiresRembgLambda = data?.useRembg === 1 ? true : false;
     const requiresColorExtraction = data?.useCustomColour === 1 ? true : false;
     const requiresWebsiteScreenshot = data?.useWebsiteUrl === 1 ? true : false;
+    const usesAdjustedLogo = data?.isEditingLogo === 1 ? true : false;
 
     if (!isInEditing && (requiresRembgLambda || requiresColorExtraction || requiresWebsiteScreenshot)) {
       return onCreateJob({
@@ -770,7 +886,8 @@ const AutodeckForm = ({
             requiresRembgLambda,
             requiresWebsiteScreenshot,
             requiresColorExtraction,
-            primaryColour: data.primaryColour
+            primaryColour: data.primaryColour,
+            usesAdjustedLogo: false,
           }
         }
       })
@@ -780,15 +897,22 @@ const AutodeckForm = ({
         input: {
           id: job?.id || activeJobId || '',
           name: data.name,
+          requiresRembgLambda,
+          requiresWebsiteScreenshot,
+          requiresColorExtraction,
+          firstName: data.firstName,
+          companyName: data.companyName,
           answer1: data.answer1,
           answer2: data.answer2,
           answer3: data.answer3,
           answer4: data.answer4,
-          firstName: data.firstName,
-          requiresRembgLambda,
-          requiresWebsiteScreenshot,
-          requiresColorExtraction,
           primaryColour: data.primaryColour,
+          usesAdjustedLogo: usesAdjustedLogo,
+          sorryAboutX: data?.sorryAboutX,
+          youLoveX: data.youLoveX,
+          reward: data.reward,
+          emailContent: data.emailContent,
+          textMessage: data.textMessage
         }
       }
     })
@@ -806,7 +930,7 @@ const AutodeckForm = ({
 
   useEffect(() => {
     if (!previewData) return;
-    // form.setValue('uploadLogo', previewData?.getPreviewData?.rembgLogoUrl);
+    form.setValue('uploadLogo', previewData?.getPreviewData?.rembgLogoUrl);
     // form.setValue('adjustedLogo', previewData?.getPreviewData?.rembgLogoUrl);
     form.setValue('uploadWebsite', previewData?.getPreviewData?.websiteScreenshotUrl);
     form.setValue('primaryColour', previewData?.getPreviewData?.colors[0])
