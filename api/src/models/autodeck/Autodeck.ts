@@ -150,19 +150,7 @@ export const ConfirmCreateWorkspaceJobMutation = mutationField('confirmCreateWor
       return null;
     }
 
-    const confirmInput: CreateWorkspaceJobProps = {
-      id: input.id,
-      name: input.name,
-      answer1: input?.answer1,
-      answer2: input?.answer2,
-      answer3: input?.answer3,
-      answer4: input?.answer4,
-      firstName: input?.firstName,
-      primaryColour: input?.primaryColour,
-      usesAdjustedLogo: input?.usesAdjustedLogo
-    }
-  
-    return AutodeckService.confirmWorkspaceJob(confirmInput) as any;
+    return AutodeckService.confirmWorkspaceJob(input) as any;
   }
 })
 

@@ -94,7 +94,7 @@ class AutodeckService {
     return paginate(paginateProps);
   };
 
-  static confirmWorkspaceJob = async (input: CreateWorkspaceJobProps) => {
+  static confirmWorkspaceJob = async (input: NexusGenInputs['GenerateAutodeckInput']) => {
     // TODO: CSV needs to be edited based on the csv_to_env properties
     const csvData = { 'colour-0': input.primaryColour };
     const csv = papaparse.unparse([csvData]);
@@ -120,18 +120,37 @@ class AutodeckService {
       }
     })
 
-    // TODO: Check which other variables needed in SQS Consumer 
-    const photoshopInput = { jobId: updatedWorkspaceJob.id, usesAdjustedLogo: input.usesAdjustedLogo }
-    const strEvent = JSON.stringify(photoshopInput, null, 2);
-    const sNSParams = {
-      Message: strEvent,
-      TopicArn: "arn:aws:sns:eu-central-1:118627563984:PhotoshopChannel"
-    }
-    sns.publish(sNSParams, (err, data) => {
-      if (err) console.log('ERROR: ', err);
+    //TODO: create .env/CSV file
+    const pitchdeckData = { 
+      companyName: input.companyName || 'Company X',
+      firstName: input.firstName || 'Mike',
+      primaryColour: input.primaryColour || '#426b3a',
+      answer1: input.answer1 || '',
+      answer2: input.answer2 || '',
+      answer3: input.answer3 || '',
+      answer4: input.answer4 || '',
+      sorryAboutX: input.sorryAboutX || '',
+      youLoveX: input.youLoveX || '',
+      reward: input.reward || '',
+      emailContent: input.emailContent || '',
+      textMessage: input.textMessage || '',
+    };
+    const pitchdeckCSV = papaparse.unparse([pitchdeckData]);
+    const pitchdeckCSVPath = `${input.id}/pitchdeck_input.csv`;
+    await AutodeckService.uploadDataToS3('haas-autodeck-logos', pitchdeckCSVPath, pitchdeckCSV, 'text/csv')
 
-      console.log('Photoshop channel publish response: ', data);
-    });
+    // TODO: Check which other variables needed in SQS Consumer 
+    // const photoshopInput = { jobId: updatedWorkspaceJob.id, usesAdjustedLogo: input.usesAdjustedLogo }
+    // const strEvent = JSON.stringify(photoshopInput, null, 2);
+    // const sNSParams = {
+    //   Message: strEvent,
+    //   TopicArn: "arn:aws:sns:eu-central-1:118627563984:PhotoshopChannel"
+    // }
+    // sns.publish(sNSParams, (err, data) => {
+    //   if (err) console.log('ERROR: ', err);
+
+    //   console.log('Photoshop channel publish response: ', data);
+    // });
 
 
     return updatedWorkspaceJob;
@@ -162,9 +181,9 @@ class AutodeckService {
 
         const adjustedFile = data.Contents?.find((file) => file.Key?.includes('adjusted'));
         if (!adjustedFile) {
-          const fileWithRembg = data.Contents?.find((file) => file.Key?.includes('rembg'))
+          const fileWithRembg = data.Contents?.find((file) => file.Key?.includes('/rembg'))
           if (!fileWithRembg) {
-            const originalFile = data.Contents?.find((file) => file.Key?.includes('original'))
+            const originalFile = data.Contents?.find((file) => file.Key?.includes('/original'))
             const fileName = originalFile?.Key?.split('/')[1];
             resolve(fileName)
           }
@@ -298,7 +317,7 @@ class AutodeckService {
       });
     });
 
-    const rembgLogoUrl = `${S3_BUCKET_PREFIX}/${logoKey}`;
+    const rembgLogoUrl = `${S3_BUCKET_PREFIX}/${logoKey}#${Date.now()}`;
 
     const screenshotKey = await new Promise((resolve, reject) => {
       s3.listObjectsV2(params, (err, data) => {
