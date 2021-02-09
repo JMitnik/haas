@@ -140,17 +140,17 @@ class AutodeckService {
     await AutodeckService.uploadDataToS3('haas-autodeck-logos', pitchdeckCSVPath, pitchdeckCSV, 'text/csv')
 
     // TODO: Check which other variables needed in SQS Consumer 
-    // const photoshopInput = { jobId: updatedWorkspaceJob.id, usesAdjustedLogo: input.usesAdjustedLogo }
-    // const strEvent = JSON.stringify(photoshopInput, null, 2);
-    // const sNSParams = {
-    //   Message: strEvent,
-    //   TopicArn: "arn:aws:sns:eu-central-1:118627563984:PhotoshopChannel"
-    // }
-    // sns.publish(sNSParams, (err, data) => {
-    //   if (err) console.log('ERROR: ', err);
+    const photoshopInput = { jobId: updatedWorkspaceJob.id, usesAdjustedLogo: input.usesAdjustedLogo }
+    const strEvent = JSON.stringify(photoshopInput, null, 2);
+    const sNSParams = {
+      Message: strEvent,
+      TopicArn: "arn:aws:sns:eu-central-1:118627563984:PhotoshopChannel"
+    }
+    sns.publish(sNSParams, (err, data) => {
+      if (err) console.log('ERROR: ', err);
 
-    //   console.log('Photoshop channel publish response: ', data);
-    // });
+      console.log('Photoshop channel publish response: ', data);
+    });
 
 
     return updatedWorkspaceJob;
