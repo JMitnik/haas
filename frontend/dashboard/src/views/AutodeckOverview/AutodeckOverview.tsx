@@ -74,6 +74,14 @@ const DeliveryStatus = ({ job }: { job: DeepPartial<CreateWorkspaceJobType> }) =
       )
     }
 
+    case JobStatusType.Processing: {
+      return (
+        <UI.Label variantColor="pink">
+          {status}
+        </UI.Label>
+      )
+    }
+
     default: {
       return (
         <UI.Label variantColor="yellow">{status}</UI.Label>

@@ -17,3 +17,6 @@
 20210115090822-added-extra-fields-to-create-workspace-job
 20210125062507-add-lambda-booleans
 20210125064606-added-requires-color-extraction-boolean-to-schema
+20210210082505-added-more-job-statuses
+20210210082602-job-status-fix
+20210210082859-new-status
