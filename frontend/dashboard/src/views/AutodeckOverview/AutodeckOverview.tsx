@@ -1,12 +1,12 @@
 import * as UI from '@haas/ui';
-import { format } from 'date-fns';
 import React, { useState } from 'react';
 import { useEffect } from 'react';
-import { AtSign, Clock, Eye, Flag, Phone, Plus, Smartphone, Download } from 'react-feather';
+import { Plus, Download } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { DeepPartial } from 'types/customTypes';
-import { JobStatusType, PaginationSortByEnum, useGetAutodeckJobsQuery, PaginationWhereInput, CreateWorkspaceJobType, useCreateWorkspaceJobMutation, useConfirmWorkspaceJobMutation } from 'types/generated-types';
+import { PaginationSortByEnum, useGetAutodeckJobsQuery, PaginationWhereInput, CreateWorkspaceJobType, useCreateWorkspaceJobMutation, useConfirmWorkspaceJobMutation } from 'types/generated-types';
 import AutodeckForm from 'views/AutodeckView/AutodeckForm'
+import { ProcessingStatus, DateLabel } from './Components';
 
 export const paginationFilter: PaginationWhereInput = {
   limit: 5,
@@ -24,71 +24,6 @@ export const paginationFilter: PaginationWhereInput = {
 
 const POLL_INTERVAL_SECONDS = 20;
 const POLL_INTERVAL = POLL_INTERVAL_SECONDS * 1000;
-
-const DateLabel = ({ dateString }: { dateString: string }) => {
-  const date = new Date(parseInt(dateString, 10));
-
-  return (
-    <UI.Flex alignItems="center">
-      <UI.Icon pr={1}>
-        <Clock width="0.7rem" />
-      </UI.Icon>
-      {format(date, 'MM/dd HH:mm')}
-    </UI.Flex>
-  )
-};
-
-const DeliveryStatus = ({ job }: { job: DeepPartial<CreateWorkspaceJobType> }) => {
-  const status = job.status;
-
-  switch (status) {
-    case JobStatusType.Completed: {
-      return (
-        <UI.Label variantColor="green">
-          {status}
-        </UI.Label>
-      );
-    }
-
-    case JobStatusType.ReadyForProcessing: {
-      return (
-        <UI.Label variantColor="blue">
-          {status}
-        </UI.Label>
-      )
-    }
-
-    case JobStatusType.Failed: {
-      return (
-        <UI.Label variantColor="red">
-          {status}
-        </UI.Label>
-      )
-    }
-
-    case JobStatusType.InPhotoshopQueue: {
-      return (
-        <UI.Label variantColor="purple">
-          {status}
-        </UI.Label>
-      )
-    }
-
-    case JobStatusType.Processing: {
-      return (
-        <UI.Label variantColor="pink">
-          {status}
-        </UI.Label>
-      )
-    }
-
-    default: {
-      return (
-        <UI.Label variantColor="yellow">{status}</UI.Label>
-      )
-    }
-  }
-}
 
 export const AutodeckOverview = () => {
   const [isOpenImportModal, setIsOpenImportModal] = useState(false);
@@ -187,7 +122,7 @@ export const AutodeckOverview = () => {
                       }
                     </UI.TableCell>
                     <UI.TableCell>
-                      <DeliveryStatus
+                      <ProcessingStatus
                         job={job}
                       />
                     </UI.TableCell>
