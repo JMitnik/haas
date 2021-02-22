@@ -13,7 +13,7 @@ import gql from 'graphql-tag';
 
 // import { CreateWorkspaceInput } from 'types/globalTypes';
 import { useUser } from '../../providers/UserProvider';
-import AutodeckForm from './AutodeckForm';
+import AutodeckForm from './Components/AutodeckForm';
 import getCustomersOfUser from '../../queries/getCustomersOfUser';
 
 const generateAutodeckMutation = gql`

@@ -5,7 +5,7 @@ import { Plus, Download } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { DeepPartial } from 'types/customTypes';
 import { PaginationSortByEnum, useGetAutodeckJobsQuery, PaginationWhereInput, CreateWorkspaceJobType, useCreateWorkspaceJobMutation, useConfirmWorkspaceJobMutation } from 'types/generated-types';
-import AutodeckForm from 'views/AutodeckView/AutodeckForm'
+import AutodeckForm from 'views/AutodeckView/Components/AutodeckForm'
 import { ProcessingStatus, DateLabel } from './Components';
 
 export const paginationFilter: PaginationWhereInput = {
