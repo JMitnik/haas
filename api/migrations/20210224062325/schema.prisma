@@ -1,6 +1,6 @@
 datasource postgresql {
   provider = "postgresql"
-  url      = env("DB_STRING")
+  url = "***"
 }
 
 // binaryTargets = ["debian-openssl-1.1.x"]
@@ -96,8 +96,6 @@ model Dialogue {
   isOnline         Boolean        @default(value: false)
   isWithoutGenData Boolean        @default(value: false)
 
-  endScreenText String?
-
   wasGeneratedWithGenData Boolean           @default(value: false)
   CampaignVariant         CampaignVariant[]
   @@unique([slug, customerId])
@@ -189,8 +187,6 @@ model SliderNode {
   id           String             @id @default(cuid())
   markers      SliderNodeMarker[]
   QuestionNode QuestionNode[]
-  
-  earlyReleaseText  String?
 }
 
 model QuestionNode {
