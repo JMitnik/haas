@@ -1,6 +1,6 @@
 datasource postgresql {
   provider = "postgresql"
-  url      = env("DB_STRING")
+  url = "***"
 }
 
 // binaryTargets = ["debian-openssl-1.1.x"]
@@ -221,7 +221,7 @@ model QuestionNode {
 
   QuestionOption   QuestionOption[] @relation("QuestionNodeOptions")
   triggers         Trigger[]
-  overridesChoices QuestionOption[]   @relation("ChoiceCTANode")
+  overridesChoices QuestionNode[]   @relation("ChoiceCTANode")
 
   // Node-types
   share      Share?

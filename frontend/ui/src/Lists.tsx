@@ -16,6 +16,13 @@ export const List = styled(Div)`
 
 export const ListHeader = styled(Text)`
   ${({ theme }) => css`
+    color: ${theme.colors.gray[600]};
+    font-weight: 700;
+    line-height: 1rem;
+    padding: ${theme.gutter / 2}px;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
   `}
 `;
 
@@ -32,21 +39,25 @@ export const ListGroupHeader = styled(Text)`
 interface ListItemProps {
   isSelected?: boolean;
   accent?: string;
+  hasNoSelect?: boolean;
 }
 
 export const ListItem = styled(Div)<ListItemProps>`
-  ${({ theme, isSelected, accent }) => css`
+  ${({ theme, isSelected, accent, hasNoSelect }) => css`
     padding: ${theme.gutter / 2}px;
     display: flex;
-    border-left: 2px solid transparent;
     transition: all .3s cubic-bezier(.55,0,.1,1);
 
-    &:hover {
-      border-left: 2px solid ${accent || theme.colors.primary};
-      background: ${Color(accent).mix(Color('white'), 0.95).hex()};
-      cursor: pointer;
-      transition: all .3s cubic-bezier(.55,0,.1,1);
-    }
+    ${!hasNoSelect && css`
+      border-left: 2px solid transparent;
+    
+      &:hover {
+        border-left: 2px solid ${accent || theme.colors.primary};
+        background: ${Color(accent).mix(Color('white'), 0.95).hex()};
+        cursor: pointer;
+        transition: all .3s cubic-bezier(.55,0,.1,1);
+      }
+    `}
 
     ${isSelected && css`
       border-left: 2px solid ${accent || theme.colors.primary};

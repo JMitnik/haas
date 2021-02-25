@@ -9,8 +9,8 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { DropdownContainer, DropdownOverlayContainer } from './DropdownStyles';
 
 interface DropdownProps {
-  renderOverlay?: React.ReactNode;
-  children?: React.ReactNode;
+  renderOverlay?: ({ onClose }: any) => React.ReactNode;
+  children?: ({ onOpen, onClose }: any) => React.ReactNode;
   placement?: Placement;
   offset?: [number, number];
   minWidth?: number;
@@ -39,6 +39,9 @@ const Dropdown = ({ children, renderOverlay, placement = 'right-start', offset =
     setIsOpen((isOpen) => !isOpen);
   };
 
+  const handleOpen = () => setIsOpen(true);
+  const handleClose = () => setIsOpen(false);
+
   return (
     <DropdownContainer ref={ref} onClick={(e) => e.stopPropagation()}>
       <AnimatePresence>
@@ -58,7 +61,7 @@ const Dropdown = ({ children, renderOverlay, placement = 'right-start', offset =
               exit={{ opacity: 0, scale: 0.8, transition: { duration: 0.2 } }}
             >
               <DropdownOverlayContainer minWidth={minWidth}>
-                {renderOverlay}
+                {renderOverlay?.({ onClose: handleClose })}
               </DropdownOverlayContainer>
             </motion.div>
           </Div>
@@ -75,7 +78,7 @@ const Dropdown = ({ children, renderOverlay, placement = 'right-start', offset =
         onClick={(e) => handleToggleDropdown(e)}
       >
         <>
-          {children}
+          {children?.({ onOpen: handleOpen, onClose: handleClose })}
         </>
       </Div>
     </DropdownContainer>
