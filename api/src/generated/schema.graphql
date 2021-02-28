@@ -571,6 +571,7 @@ type NodeEntryValue {
 
 input OptionInputType {
   id: Int
+  overrideLeafId: String
   publicValue: String
   value: String
 }
@@ -1013,7 +1014,7 @@ input UpdateQuestionNodeInputType {
   customerId: ID
   edgeCondition: EdgeConditionInputType
   edgeId: ID
-  id: ID
+  id: ID!
   optionEntries: OptionsInputType
   overrideLeafId: ID
   sliderNode: SliderNodeInputType

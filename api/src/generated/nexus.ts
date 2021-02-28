@@ -217,6 +217,7 @@ export interface NexusGenInputs {
   }
   OptionInputType: { // input type
     id?: number | null; // Int
+    overrideLeafId?: string | null; // String
     publicValue?: string | null; // String
     value?: string | null; // String
   }
@@ -350,7 +351,7 @@ export interface NexusGenInputs {
     customerId?: string | null; // ID
     edgeCondition?: NexusGenInputs['EdgeConditionInputType'] | null; // EdgeConditionInputType
     edgeId?: string | null; // ID
-    id?: string | null; // ID
+    id: string; // ID!
     optionEntries?: NexusGenInputs['OptionsInputType'] | null; // OptionsInputType
     overrideLeafId?: string | null; // ID
     sliderNode?: NexusGenInputs['SliderNodeInputType'] | null; // SliderNodeInputType

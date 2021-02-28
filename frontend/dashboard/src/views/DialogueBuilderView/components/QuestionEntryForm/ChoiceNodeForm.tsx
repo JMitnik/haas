@@ -4,7 +4,7 @@ import React from 'react'
 import { PlusCircle, Crosshair } from 'react-feather';
 import { ReactComponent as CloseIcon } from 'assets/icons/icon-close.svg';
 import { ReactComponent as ExclamationIcon } from 'assets/icons/icon-exclamation-circle.svg';
-import { UseFormMethods } from 'react-hook-form';
+import { Controller, UseFormMethods } from 'react-hook-form';
 import { useTranslation } from 'react-i18next/';
 import Select, { components } from 'react-select';
 import styled from 'styled-components';
@@ -83,7 +83,6 @@ const DropdownMenu = ({ onChange, onClose, items }: any) => {
                 )
               },
               SingleValue: (props) => {
-                console.log(props);
                 return (
                   <components.SingleValue {...props}>
                     <UI.Flex>
@@ -118,10 +117,11 @@ export const ChoiceNodeForm = ({ choices, form, ctaNodes }: ChoiceNodeFormProps)
   const { t } = useTranslation();
   const [testState, setTestState] = useState<any>();
 
-  const addNewOption = () => console.log("Add");
   const handleOptionChange = (choice: any, idx: number) => console.log("Add");
 
   const currentItems = [1, 1];
+
+  const options = form.watch('optionsFull');
 
   return (
     <UI.Div>
@@ -146,40 +146,54 @@ export const ChoiceNodeForm = ({ choices, form, ctaNodes }: ChoiceNodeFormProps)
               <UI.Helper>Call to Action</UI.Helper>
               <UI.Helper>Leads to</UI.Helper>
             </UI.Grid>
-          {currentItems.map(it => (
+          {options.map((choice: any, index: number) => (
             <UI.Grid p={2} borderBottom="1px solid #edf2f7" gridTemplateColumns="1fr 1fr 1fr">
               <UI.Div position="relative" width="100%" borderRight="1px solid #edf2f7">
                 <UI.GradientButton>
-                  Test value
+                  {choice.value}
                 </UI.GradientButton>
                 {/* <UI.Div>
                   <ExclamationIcon />
                 </UI.Div> */}
               </UI.Div>
               <UI.Div>
-                <Dropdown renderOverlay={({ onClose }) => (
-                  <DropdownMenu items={ctaNodes.map(ctaNode => ({
-                    value: ctaNode.id,
-                    label: ctaNode.title,
-                    type: ctaNode.type
-                  }))} onClose={onClose} onChange={(item: any) => setTestState(item)} />
-                )}>
-                  {() => (
-                    <UI.Div>
-                      {testState?.label ? (
-                        <UI.Label>{testState?.label}</UI.Label>
-                        ): (
-                          // TODO: Make it a theme?
-                        <UI.Button variantColor="gray" size="sm" color="#718096" backgroundColor="white" border="1px solid #edf2f7">
-                          <UI.Icon mr={1}>
-                            <PlusCircle />
-                          </UI.Icon>
-                          Add Call-to-Action
-                        </UI.Button>
+                <Controller
+                  name={`optionsFull.[${index}].overrideLeaf`}
+                  control={form.control}
+                  render={() => (
+                    <Dropdown renderOverlay={({ onClose }) => (
+                      <DropdownMenu items={ctaNodes.map(ctaNode => ({
+                        value: ctaNode.id,
+                        label: ctaNode.title,
+                        type: ctaNode.type
+                      }))} onClose={onClose} 
+                        onChange={(item: any) => form.setValue(`optionsFull.[${index}].overrideLeaf`, item)} 
+                      />
+                    )}>
+                      {() => (
+                        <UI.Div>
+                          {choice?.overrideLeaf ? (
+                            <UI.Label>{choice?.overrideLeaf?.label}</UI.Label>
+                            ): (
+                              // TODO: Make it a theme?
+                            <UI.Button 
+                              variantColor="gray" 
+                              size="sm" 
+                              color="#718096" 
+                              backgroundColor="white"
+                              border="1px solid #edf2f7"
+                            >
+                              <UI.Icon mr={1}>
+                                <PlusCircle />
+                              </UI.Icon>
+                              Add Call-to-Action
+                            </UI.Button>
+                          )}
+                        </UI.Div>
                       )}
-                    </UI.Div>
+                    </Dropdown>
                   )}
-                </Dropdown>
+                />
               </UI.Div>
             </UI.Grid>
           ))}

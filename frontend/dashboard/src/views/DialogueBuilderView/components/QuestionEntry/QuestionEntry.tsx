@@ -16,7 +16,7 @@ import { OverflowSpan, QuestionEntryContainer, QuestionEntryViewContainer } from
 import BuilderIcon from './BuilderIcon';
 import CTALabel from './CTALabel';
 import ConditionLabel from './ConditionLabel';
-import QuestionEntryForm from '../QuestionEntryForm/QuestionEntryForm';
+import DialogueBuilderQuestionForm from '../QuestionEntryForm/DialogueBuilderQuestionForm';
 import ShowChildQuestion from './ShowChildQuestion';
 
 interface QuestionEntryItemProps {
@@ -150,7 +150,7 @@ const QuestionEntryItem = ({ depth,
 
           </Flex>
           {activeQuestion === question.id && (
-            <QuestionEntryForm
+            <DialogueBuilderQuestionForm
               onDeleteEntry={deleteQuestion}
               onAddExpandChange={onAddExpandChange}
               parentQuestionType={parentQuestionType}

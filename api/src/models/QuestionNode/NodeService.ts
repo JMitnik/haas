@@ -14,6 +14,7 @@ interface QuestionOptionProps {
   id?: number;
   value: string;
   publicValue?: string;
+  overrideLeafId?: string;
 }
 
 interface EdgeChildProps {
@@ -267,7 +268,7 @@ class NodeService {
     return null;
   };
 
-  static getLeafState = (currentOverrideLeafId: string | null, newOverrideLeafId: string) => {
+  static getLeafState = (currentOverrideLeafId: string | null, newOverrideLeafId: string | null) => {
     if (newOverrideLeafId) {
       return {
         connect: {
@@ -453,8 +454,8 @@ class NodeService {
     questionId: string,
     title: string,
     type: NodeType,
-    overrideLeafId: string,
-    edgeId: string,
+    overrideLeafId: string | null,
+    edgeId: string | undefined,
     options: QuestionOptionProps[],
     edgeCondition: {
       id: number | null,
@@ -577,7 +578,7 @@ class NodeService {
     return updatedNode;
   };
 
-  static updateQuestionOptions = async (options: Array<QuestionOptionProps>) => Promise.all(
+  static updateQuestionOptions = async (options: QuestionOptionProps[]) => Promise.all(
     options?.map(async (option) => {
       const updatedQOption = await prisma.questionOption.upsert(
         {
@@ -585,10 +586,12 @@ class NodeService {
           create: {
             value: option.value,
             publicValue: option.publicValue,
+            overrideLeaf: option.overrideLeafId ? { connect:  {  id: option.overrideLeafId } } : undefined
           },
           update: {
             value: option.value,
             publicValue: option.publicValue,
+            overrideLeaf: option.overrideLeafId ? { connect:  {  id: option.overrideLeafId } } : undefined
           },
         },
       );

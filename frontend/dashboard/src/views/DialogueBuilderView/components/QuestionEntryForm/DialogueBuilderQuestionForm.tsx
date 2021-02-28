@@ -30,6 +30,7 @@ import {
 } from '../../DialogueBuilderInterfaces';
 import SliderNodeForm from './SliderNodeForm';
 import { ChoiceNodeForm } from './ChoiceNodeForm';
+import { useNavigator } from 'hooks/useNavigator';
 
 interface SliderNodeMarkerProps {
   id: string;
@@ -53,7 +54,8 @@ interface FormDataProps {
     id: string;
     markers: SliderNodeMarkerProps[];
   };
-  options: Array<string>;
+  options: string[];
+  optionsFull: any[];
 }
 
 const isChoiceType = (questionType: string) => {
@@ -81,11 +83,12 @@ const schema = yup.object().shape({
     then: yup.string().required(),
     otherwise: yup.string().notRequired(),
   }),
-  options: yup.array().of(yup.string().min(1)).when(['questionType'], {
-    is: (questionType: string) => isChoiceType(questionType),
-    then: yup.array(yup.string().min(1)).min(1).required(),
-    otherwise: yup.array(yup.string()).notRequired(),
-  }),
+  // options: yup.array().of(yup.string().min(1)).when(['questionType'], {
+  //   is: (questionType: string) => isChoiceType(questionType),
+  //   then: yup.array(yup.string().min(1)).min(1).required(),
+  //   otherwise: yup.array(yup.string()).notRequired(),
+  // }),
+  optionsFull: yup.array().of(yup.object()),
 });
 
 interface QuestionEntryFormProps {
@@ -95,7 +98,7 @@ interface QuestionEntryFormProps {
   overrideLeaf?: OverrideLeafProps;
   isRoot: boolean;
   type: { label: string, value: string };
-  options: Array<QuestionOptionProps>;
+  options: QuestionOptionProps[];
   leafs: Array<{ label: string, value: string }>;
   ctaNodes: CTANode[];
   onActiveQuestionChange: React.Dispatch<React.SetStateAction<string | null>>;
@@ -122,7 +125,7 @@ const createQuestionMutation = gql`
   }
 `;
 
-const QuestionEntryForm = ({
+const DialogueBuilderQuestionForm = ({
   onAddExpandChange,
   id,
   title,
@@ -142,8 +145,7 @@ const QuestionEntryForm = ({
   onScroll,
 }: QuestionEntryFormProps) => {
   const { activeCustomer } = useCustomer();
-  const { customerSlug, dialogueSlug } = useParams<{ customerSlug: string, dialogueSlug: string }>();
-
+  const { customerSlug, dialogueSlug } = useNavigator();
   const { t } = useTranslation();
 
   const sliderNode = {
@@ -162,9 +164,11 @@ const QuestionEntryForm = ({
   const form = useForm<FormDataProps>({
     resolver: yupResolver(schema),
     mode: 'onChange',
+    shouldUnregister: false,
     defaultValues: {
       parentQuestionType,
       sliderNode,
+      optionsFull: options
     },
   });
 
@@ -386,6 +390,8 @@ const QuestionEntryForm = ({
     const isSlider = activeQuestionType?.value === 'SLIDER' && sliderNodeData;
 
     if (question.id !== '-1') {
+      const values = form.getValues();
+      console.log(values);
       updateQuestion({
         variables: {
           input: {
@@ -395,7 +401,14 @@ const QuestionEntryForm = ({
             edgeId: edgeId || '-1',
             title,
             type,
-            optionEntries: options,
+            optionEntries: {
+              options: values.optionsFull?.map(option => ({
+                id: option?.id,
+                value: option?.value,
+                publicValue: option?.value,
+                overrideLeafId: option?.overrideLeaf?.value
+              }))
+            },
             edgeCondition,
             sliderNode: isSlider ? {
               id: sliderNodeData.id,
@@ -722,4 +735,4 @@ const QuestionEntryForm = ({
   );
 };
 
-export default QuestionEntryForm;
+export default DialogueBuilderQuestionForm;
