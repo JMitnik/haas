@@ -6,7 +6,7 @@ import {
   PopoverBody, PopoverCloseButton, PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast
 } from '@chakra-ui/core';
 import { Controller, useForm } from 'react-hook-form';
-import { MinusCircle, PlusCircle, Trash } from 'react-feather';
+import { Trash } from 'react-feather';
 import { debounce } from 'lodash';
 import { useMutation, gql } from '@apollo/client';
 import { useParams } from 'react-router';
@@ -16,18 +16,16 @@ import React, { useCallback, useEffect, useState } from 'react';
 import Select from 'react-select';
 
 import {
-  DeleteQuestionOptionButtonContainer,
-} from 'views/DialogueBuilderView/components/QuestionEntry/QuestionEntryStyles';
-import {
   Div, Flex, Form, FormContainer, FormControl, FormLabel,
-  FormSection, H4, Hr, Input, InputGrid, InputHelper, Muted, Span, Text
+  FormSection, Hr, Input, InputGrid, InputHelper, Span, Text
 } from '@haas/ui';
 import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
 import { useCustomer } from 'providers/CustomerProvider';
 import updateQuestionMutation from 'mutations/updateQuestion';
 
 import {
-  EdgeConditonProps,
+  CTANode,
+  EdgeConditionProps,
   OverrideLeafProps, QuestionEntryProps, QuestionOptionProps
 } from '../../DialogueBuilderInterfaces';
 import SliderNodeForm from './SliderNodeForm';
@@ -99,8 +97,9 @@ interface QuestionEntryFormProps {
   type: { label: string, value: string };
   options: Array<QuestionOptionProps>;
   leafs: Array<{ label: string, value: string }>;
+  ctaNodes: CTANode[];
   onActiveQuestionChange: React.Dispatch<React.SetStateAction<string | null>>;
-  condition: EdgeConditonProps | undefined;
+  condition: EdgeConditionProps | undefined;
   parentOptions: QuestionOptionProps[] | undefined;
   edgeId: string | undefined;
   question: QuestionEntryProps;
@@ -131,6 +130,7 @@ const QuestionEntryForm = ({
   type,
   options,
   leafs,
+  ctaNodes,
   onActiveQuestionChange,
   condition,
   parentOptions,
@@ -174,7 +174,7 @@ const QuestionEntryForm = ({
   const [activeOptions, setActiveOptions] = useState(options);
 
   const matchValue = condition?.matchValue ? { label: condition.matchValue, value: condition.matchValue } : null;
-  const [activematchValue, setActiveMatchValue] = useState<null | { label: string, value: string }>(matchValue);
+  const [activeMatchValue, setActiveMatchValue] = useState<null | { label: string, value: string }>(matchValue);
   const [activeLeaf, setActiveLeaf] = useState({ label: overrideLeaf?.title, value: overrideLeaf?.id });
   const [activeConditionSelect, setActiveConditionSelect] = useState<null | { label: string, value: string }>(
     condition?.conditionType ? {
@@ -182,7 +182,7 @@ const QuestionEntryForm = ({
       label: condition.conditionType,
     } : null,
   );
-  const [activeCondition, setActiveCondition] = useState<null | EdgeConditonProps>(condition || { conditionType: parentQuestionType === 'Slider' ? 'valueBoundary' : 'match' });
+  const [activeCondition, setActiveCondition] = useState<null | EdgeConditionProps>(condition || { conditionType: parentQuestionType === 'Slider' ? 'valueBoundary' : 'match' });
 
   const setConditionType = useCallback((conditionOption: any) => {
     setActiveConditionSelect(conditionOption);
@@ -247,10 +247,10 @@ const QuestionEntryForm = ({
   };
 
   useEffect(() => {
-    if (activematchValue?.value) {
-      form.setValue('matchText', activematchValue?.value);
+    if (activeMatchValue?.value) {
+      form.setValue('matchText', activeMatchValue?.value);
     }
-  }, [activematchValue]);
+  }, [activeMatchValue]);
 
   const [createQuestion, { loading: createLoading }] = useMutation(createQuestionMutation, {
     onCompleted: () => {
@@ -542,11 +542,11 @@ const QuestionEntryForm = ({
                         id="question-match-select"
                         name="matchText"
                         control={form.control}
-                        defaultValue={activematchValue}
+                        defaultValue={activeMatchValue}
                         render={({ onChange, onBlur, value }) => (
                           <Select
                             options={parentOptionsSelect}
-                            value={activematchValue}
+                            value={activeMatchValue}
                             onChange={(opt: any) => {
                               setMatchTextValue(opt);
                             }}
@@ -658,6 +658,7 @@ const QuestionEntryForm = ({
                   </UI.FormSectionHelper>
                 </UI.Div>
                 <ChoiceNodeForm
+                  ctaNodes={ctaNodes}
                   choices={[]}
                   form={form}
                 />

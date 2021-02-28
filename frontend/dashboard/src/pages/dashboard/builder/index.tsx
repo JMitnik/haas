@@ -103,6 +103,7 @@ const DialogueBuilderPage = () => {
       root={rootQuestionNode}
       dialogueId={dialogueData.id}
       selectLeafs={selectLeafs}
+      ctaNodes={dialogueData?.leafs}
       nodes={questionsData}
     />
   );

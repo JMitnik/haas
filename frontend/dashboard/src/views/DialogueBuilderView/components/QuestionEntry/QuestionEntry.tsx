@@ -11,7 +11,7 @@ import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
 import { useCustomer } from 'providers/CustomerProvider';
 import deleteQuestionMutation from 'mutations/deleteQuestion';
 
-import { EdgeConditonProps, QuestionEntryProps, QuestionOptionProps } from '../../DialogueBuilderInterfaces';
+import { CTANode, EdgeConditionProps, QuestionEntryProps, QuestionOptionProps } from '../../DialogueBuilderInterfaces';
 import { OverflowSpan, QuestionEntryContainer, QuestionEntryViewContainer } from './QuestionEntryStyles';
 import BuilderIcon from './BuilderIcon';
 import CTALabel from './CTALabel';
@@ -32,12 +32,13 @@ interface QuestionEntryItemProps {
   onAddQuestion?: (event: any, questionUUID: string) => void;
   onDeleteQuestion?: (event: any, questionId: string) => void;
   onActiveQuestionChange: React.Dispatch<React.SetStateAction<string | null>>;
-  condition: EdgeConditonProps | undefined;
+  condition: EdgeConditionProps | undefined;
   parentOptions: QuestionOptionProps[] | undefined;
   edgeId: string | undefined;
   parentQuestionId?: string;
   depth: number;
   parentQuestionType: string;
+  ctaNodes: CTANode[];
 }
 
 const QuestionEntryItem = ({ depth,
@@ -53,6 +54,7 @@ const QuestionEntryItem = ({ depth,
   parentOptions,
   edgeId,
   parentQuestionId,
+  ctaNodes,
   onAddExpandChange }
   : QuestionEntryItemProps) => {
   const { activeCustomer } = useCustomer();
@@ -162,6 +164,7 @@ const QuestionEntryItem = ({ depth,
               title={question.title}
               isRoot={question.isRoot}
               leafs={leafs}
+              ctaNodes={ctaNodes}
               options={question?.options || []}
               overrideLeaf={question.overrideLeaf}
               type={activeType}
