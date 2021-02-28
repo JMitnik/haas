@@ -46,13 +46,13 @@ const initializeCTAType = (type?: string) => {
   return 'None';
 };
 
-const findLeafs = (nodes: Array<QuestionEntryProps>) => {
+const findLeafs = (nodes: QuestionEntryProps[]) => {
   const selectLeafs = nodes?.map((leaf) => ({ value: leaf.id, label: leaf.title }));
   selectLeafs?.unshift({ value: '', label: 'None' });
   return selectLeafs;
 };
 
-const mapQuestionsInputData = (nodes: Array<QuestionEntryProps>) => {
+const mapQuestionsInputData = (nodes: QuestionEntryProps[]) => {
   let questions = nodes?.filter((node) => !node.isLeaf);
   questions = orderBy(questions, (question) => question.creationDate, ['asc']);
 
@@ -68,8 +68,12 @@ const mapQuestionsInputData = (nodes: Array<QuestionEntryProps>) => {
     overrideLeaf: !overrideLeaf
       ? undefined
       : { id: overrideLeaf?.id, title: overrideLeaf?.title, type: initializeCTAType(overrideLeaf?.type) },
-    options: options?.map((option) => (
-      { id: option.id, value: option.value, publicValue: option.publicValue })),
+    options: options?.map((option) => ({ 
+      id: option.id, 
+      value: option.value, 
+      publicValue: option.publicValue,
+      overrideLeaf: option.overrideLeaf,
+     })),
     children: children?.map((edge: EdgeChildProps) => ({
       id: edge.id,
       parentNode: { id: edge?.parentNode?.id, title: edge?.parentNode?.title },

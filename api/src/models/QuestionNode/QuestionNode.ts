@@ -10,6 +10,7 @@ import { DialogueType } from '../questionnaire/Dialogue';
 import { EdgeType } from '../edge/Edge';
 import { SliderNode } from './SliderNode';
 import NodeService from './NodeService';
+import prisma from '../../config/prisma';
 
 export const CTAShareInputObjectType = inputObjectType({
   name: 'CTAShareInputObjectType',
@@ -39,6 +40,19 @@ export const QuestionOptionType = objectType({
     });
 
     t.string('publicValue', { nullable: true });
+
+    t.field('overrideLeaf', { 
+      type: 'QuestionNode', 
+      nullable: true,
+
+      resolve: async (parent, ctx) => {
+        if (!parent.overrideLeafId) return null;
+
+        const cta = await prisma.questionNode.findFirst({ where: { id: parent.overrideLeafId } });
+
+        return cta as any;
+      }
+    });
   },
 });
 
@@ -287,6 +301,9 @@ export const QuestionNodeType = objectType({
       resolve(parent, args, ctx) {
         const options = ctx.prisma.questionOption.findMany({
           where: { questionNodeId: parent.id },
+          include: {
+            overrideLeaf: true
+          }
         });
 
         return options;

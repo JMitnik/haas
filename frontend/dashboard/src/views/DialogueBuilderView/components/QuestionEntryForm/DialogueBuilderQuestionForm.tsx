@@ -168,7 +168,14 @@ const DialogueBuilderQuestionForm = ({
     defaultValues: {
       parentQuestionType,
       sliderNode,
-      optionsFull: options
+      optionsFull: options.map(option => ({
+        ...option,
+        overrideLeaf: {
+          label: option.overrideLeaf?.title,
+          value: option.overrideLeaf?.id,
+          type: option.overrideLeaf?.type
+        }
+      }))
     },
   });
 

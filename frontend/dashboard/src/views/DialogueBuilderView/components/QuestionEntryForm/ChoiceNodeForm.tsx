@@ -172,8 +172,17 @@ export const ChoiceNodeForm = ({ choices, form, ctaNodes }: ChoiceNodeFormProps)
                     )}>
                       {() => (
                         <UI.Div>
-                          {choice?.overrideLeaf ? (
-                            <UI.Label>{choice?.overrideLeaf?.label}</UI.Label>
+                          {choice?.overrideLeaf?.label ? (
+                            <UI.Button 
+                            variantColor="gray" 
+                            size="sm" 
+                            color="#718096" 
+                            backgroundColor="white"
+                            border="1px solid #edf2f7"
+                            whiteSpace="normal"
+                          >
+                            {choice?.overrideLeaf?.label}
+                          </UI.Button>
                             ): (
                               // TODO: Make it a theme?
                             <UI.Button 

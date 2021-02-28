@@ -30,6 +30,7 @@ export interface QuestionOptionProps {
   id?: number;
   value: string;
   publicValue?: string;
+  overrideLeaf?: CTANode;
 }
 
 export interface ShallowQuestionEntryProps {

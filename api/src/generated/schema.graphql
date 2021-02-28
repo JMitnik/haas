@@ -721,6 +721,7 @@ input QuestionNodeWhereUniqueInput {
 
 type QuestionOption {
   id: Int!
+  overrideLeaf: QuestionNode
   publicValue: String
   questionId: String
   value: String!

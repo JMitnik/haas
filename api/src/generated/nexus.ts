@@ -1025,6 +1025,7 @@ export interface NexusGenFieldTypes {
   }
   QuestionOption: { // field return type
     id: number; // Int!
+    overrideLeaf: NexusGenRootTypes['QuestionNode'] | null; // QuestionNode
     publicValue: string | null; // String
     questionId: string | null; // String
     value: string; // String!
