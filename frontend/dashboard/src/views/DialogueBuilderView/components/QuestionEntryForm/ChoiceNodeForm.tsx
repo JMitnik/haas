@@ -48,8 +48,8 @@ const NodeCell = ({ node }: { node: any }) => {
   console.log(node);
 
   return (
-    <NodeCellContainer style={{ padding: '8px 12px' }}>
-      <UI.Flex>
+    <NodeCellContainer style={{ padding: '8px 12px', width: "100%" }}>
+      <UI.Flex width="100%">
         <UI.Icon
           bg={nodeProps.bg}
           color={nodeProps.color}
@@ -254,7 +254,7 @@ export const ChoiceNodeForm = ({ choices, form, ctaNodes }: ChoiceNodeFormProps)
                       />
                     )}>
                       {() => (
-                        <UI.Div>
+                        <UI.Div width="100%" justifyContent="center" display="flex">
                           {choice?.overrideLeaf?.label ? (
                             <NodeCell node={choice?.overrideLeaf} />
                           ) : (
