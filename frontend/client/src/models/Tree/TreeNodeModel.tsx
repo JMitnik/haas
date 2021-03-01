@@ -16,6 +16,7 @@ interface EdgeOutput {
   edgeId: string;
   goesToLeaf: boolean;
   goesToPostLeaf: boolean;
+  nextNode?: TreeNodeProps,
 }
 
 export const TreeNodeModel = types
@@ -63,6 +64,7 @@ export const TreeNodeModel = types
       return {
         goesToLeaf: false,
         goesToPostLeaf: false,
+        nextNode: candidateEdge?.childNode,
         edgeId: candidateEdge.id,
       };
     },
