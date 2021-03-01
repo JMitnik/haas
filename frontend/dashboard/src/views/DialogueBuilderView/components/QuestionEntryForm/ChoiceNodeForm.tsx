@@ -10,9 +10,10 @@ import Select, { components } from 'react-select';
 import styled from 'styled-components';
 import { useState } from 'react';
 import { CTANode } from 'views/DialogueBuilderView/DialogueBuilderInterfaces';
-import { MapNodeToIcon } from 'components/MapNodeToIcon';
+import { MapNodeToProperties } from 'components/MapNodeToProperties';
 import { QuestionNodeTypeEnum } from 'types/globalTypes';
 import { useEffect } from 'react';
+import { ChoiceNodeDropdownOptionContainer } from 'views/DialogueBuilderView/DialogueBuilderStyles';
 
 export interface ChoiceProps {
   id: string;
@@ -40,6 +41,52 @@ const CloseButton = ({ onClose }: any) => (
   </CloseButtonContainer>
 )
 
+const DropdownOption = (props: any) => {
+  const nodeProps = MapNodeToProperties(props.data.type);
+
+  return (
+    <ChoiceNodeDropdownOptionContainer>
+      <components.Option {...props}>
+        <UI.Flex>
+          <UI.Icon 
+            bg={nodeProps.bg} 
+            color={nodeProps.color} 
+            height="2rem" 
+            width="2rem"
+            stroke={nodeProps.stroke || undefined}
+            style={{ flexShrink: 0 }}
+            mr={3}
+          >
+            <nodeProps.icon />
+          </UI.Icon>
+          <UI.Div>
+            <UI.Text>
+              {props.label}
+            </UI.Text>
+            <UI.MicroLabel bg={nodeProps.bg} color={nodeProps.color !== 'transparent' ? nodeProps.color : nodeProps.stroke}>
+              {props.data.type}
+            </UI.MicroLabel>
+          </UI.Div>
+        </UI.Flex>
+      </components.Option>
+    </ChoiceNodeDropdownOptionContainer>
+  );
+};
+
+const DropdownSingleValue = (props: any) => {
+  // const nodeProps = MapNodeToProperties(props.data.type);
+
+  return (
+    <components.SingleValue {...props}>
+      <UI.Flex>
+          <UI.Span color="gray.300">
+            {props?.data?.label}
+          </UI.Span>
+        </UI.Flex>
+    </components.SingleValue>
+  )
+};
+
 const DropdownMenu = ({ onChange, onClose, items }: any) => {
   const [filteredState, setFilteredState] = useState<QuestionNodeTypeEnum | null>(null);
   const [filteredItems, setFilteredItems] = useState(items);
@@ -60,6 +107,7 @@ const DropdownMenu = ({ onChange, onClose, items }: any) => {
       <UI.ListItem hasNoSelect width="100%">
         <UI.Div width="100%">
           <UI.Div mb={2}>
+            <UI.Text fontWeight="">Filter by type</UI.Text>
             <UI.Switch>
               <UI.SwitchItem 
                 isActive={!filteredState} 
@@ -86,56 +134,29 @@ const DropdownMenu = ({ onChange, onClose, items }: any) => {
               </UI.SwitchItem>
             </UI.Switch>
           </UI.Div>
-          <Select
-            menuIsOpen
-            autoFocus
-            defaultValue={{ label: 'Test2', value: 'Test2' }} 
-            options={filteredItems}
-            onChange={onChange}
-            components={{
-              Option: (props) => {
-                const Icon = MapNodeToIcon(props.data.type);
-
-                return (
-                  <>
-                    <components.Option {...props}>
-                      <UI.Flex>
-                        <UI.Icon width="1rem">
-                          <Icon width="1rem" />
-                        </UI.Icon>
-                        <UI.Text ml={1}>
-                          {props.label}
-                        </UI.Text>
-                      </UI.Flex>
-                    </components.Option>
-                  </>
-                )
-              },
-              SingleValue: (props) => {
-                return (
-                  <components.SingleValue {...props}>
-                    <UI.Flex>
-                        <UI.Icon>
-                          <Crosshair />
-                        </UI.Icon>
-                        <UI.Span ml={1}>
-                          {props?.data?.label}
-                        </UI.Span>
-                      </UI.Flex>
-                  </components.SingleValue>
-                )
-              }
-            }}
-            styles={{
-              menu: () => ({
-                marginTop: 0
-              }),
-              control: (provided) => ({
-                ...provided,
-                borderWidth: 0
-              })
-            }}
-          />
+          <UI.Div>
+            <UI.Text>Search</UI.Text>
+            <Select
+              menuIsOpen
+              autoFocus
+              defaultValue={{ label: 'Test2', value: 'Test2' }} 
+              options={filteredItems}
+              onChange={onChange}
+              components={{
+                Option: DropdownOption,
+                SingleValue: DropdownSingleValue,
+              }}
+              styles={{
+                menu: () => ({
+                  marginTop: 0
+                }),
+                control: (provided) => ({
+                  ...provided,
+                  borderWidth: 1,
+                })
+              }}
+            />
+          </UI.Div>
         </UI.Div>
       </UI.ListItem>
     </UI.List>

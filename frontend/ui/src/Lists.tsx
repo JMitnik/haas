@@ -23,6 +23,7 @@ export const ListHeader = styled(Text)`
     font-size: 0.8rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
+    border-bottom: 1px solid ${theme.colors.gray[200]};
   `}
 `;
 
