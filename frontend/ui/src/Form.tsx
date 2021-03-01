@@ -786,3 +786,36 @@ export const DatePicker = ({ range, ...restProps }: RangePickerProps | PureDateP
       )}
   </DatePickerContainer>
 )
+export const Switch = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    flex-wrap: wrap;
+    background: ${theme.colors.gray[100]};
+    padding: 4px;
+    border-radius: 10px;
+  `}
+`;
+
+interface SwitchItemProps {
+  isActive?: boolean;
+}
+
+export const SwitchItem = styled.button.attrs({ type: 'button' })<SwitchItemProps>`
+  ${({ theme, isActive }) => css`
+    color: ${theme.colors.gray[700]};
+    font-weight: 700;
+    padding: 4px 8px;
+    border-radius: 10px;
+    margin-right: 12px;
+    
+    &:active, &:focus {
+      outline: none;
+    }
+
+    ${isActive && css`
+      background: white;
+      color: ${theme.colors.gray[600]};
+      box-shadow: 0 4px 6px rgba(50,50,93,.11), 0 1px 3px rgba(0,0,0,.08);
+    `}
+  `}
+`

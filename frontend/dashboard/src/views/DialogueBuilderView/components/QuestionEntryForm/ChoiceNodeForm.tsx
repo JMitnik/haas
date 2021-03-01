@@ -12,6 +12,7 @@ import { useState } from 'react';
 import { CTANode } from 'views/DialogueBuilderView/DialogueBuilderInterfaces';
 import { MapNodeToIcon } from 'components/MapNodeToIcon';
 import { QuestionNodeTypeEnum } from 'types/globalTypes';
+import { useEffect } from 'react';
 
 export interface ChoiceProps {
   id: string;
@@ -40,12 +41,16 @@ const CloseButton = ({ onClose }: any) => (
 )
 
 const DropdownMenu = ({ onChange, onClose, items }: any) => {
+  const [filteredState, setFilteredState] = useState<QuestionNodeTypeEnum | null>(null);
   const [filteredItems, setFilteredItems] = useState(items);
 
-  const changeFilteredItems = (filterType: QuestionNodeTypeEnum) => {
-    let newFilteredItems = items.filter((item: any) => item.type === filterType);
-    setFilteredItems(newFilteredItems)
-  };
+  useEffect(() => {
+    if (!filteredState) {
+      setFilteredItems(items);
+    } else {
+      setFilteredItems(items.filter((item: any) => item.type === filteredState));
+    }
+  }, [ filteredState, setFilteredItems ]);
 
   return (
 
@@ -54,9 +59,33 @@ const DropdownMenu = ({ onChange, onClose, items }: any) => {
       <UI.ListHeader>Call to action</UI.ListHeader>
       <UI.ListItem hasNoSelect width="100%">
         <UI.Div width="100%">
-          <UI.Button onClick={() => changeFilteredItems(QuestionNodeTypeEnum.TEXTBOX)}>
-            Filter something
-          </UI.Button>
+          <UI.Div mb={2}>
+            <UI.Switch>
+              <UI.SwitchItem 
+                isActive={!filteredState} 
+                onClick={() => setFilteredState(null)}>
+                All
+              </UI.SwitchItem>
+              <UI.SwitchItem 
+                isActive={filteredState === QuestionNodeTypeEnum.LINK} 
+                onClick={() => setFilteredState(QuestionNodeTypeEnum.LINK)}
+              >
+                Link
+              </UI.SwitchItem>
+              <UI.SwitchItem 
+                isActive={filteredState === QuestionNodeTypeEnum.SHARE} 
+                onClick={() => setFilteredState(QuestionNodeTypeEnum.SHARE)}
+              >
+                Share
+              </UI.SwitchItem>
+              <UI.SwitchItem 
+                isActive={filteredState === QuestionNodeTypeEnum.FORM} 
+                onClick={() => setFilteredState(QuestionNodeTypeEnum.FORM)}
+              >
+                Form
+              </UI.SwitchItem>
+            </UI.Switch>
+          </UI.Div>
           <Select
             menuIsOpen
             autoFocus
