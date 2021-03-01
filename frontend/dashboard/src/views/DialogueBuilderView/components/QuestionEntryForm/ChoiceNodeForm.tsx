@@ -11,9 +11,9 @@ import styled from 'styled-components';
 import { useState } from 'react';
 import { CTANode } from 'views/DialogueBuilderView/DialogueBuilderInterfaces';
 import { MapNodeToProperties } from 'components/MapNodeToProperties';
-import { QuestionNodeTypeEnum } from 'types/globalTypes';
+import { QuestionNodeTypeEnum } from 'types/generated-types';
 import { useEffect } from 'react';
-import { ChoiceNodeDropdownOptionContainer } from 'views/DialogueBuilderView/DialogueBuilderStyles';
+import { NodeCellContainer } from 'views/DialogueBuilderView/DialogueBuilderStyles';
 
 export interface ChoiceProps {
   id: string;
@@ -27,7 +27,7 @@ export interface ChoiceNodeFormProps {
   form: UseFormMethods<any>;
 }
 
-const CloseButtonContainer = styled.button`
+const CloseButtonContainer = styled.button.attrs({ type: 'button' })`
   position: absolute;
   top: 12px;
   right: 12px;
@@ -41,17 +41,50 @@ const CloseButton = ({ onClose }: any) => (
   </CloseButtonContainer>
 )
 
+const NodeCell = ({ node }: { node: any }) => {
+  if (!node.type) return null;
+
+  const nodeProps = MapNodeToProperties(node.type);
+  console.log(node);
+
+  return (
+    <NodeCellContainer style={{ padding: '8px 12px' }}>
+      <UI.Flex>
+        <UI.Icon
+          bg={nodeProps.bg}
+          color={nodeProps.color}
+          height="2rem"
+          width="2rem"
+          stroke={nodeProps.stroke || undefined}
+          style={{ flexShrink: 0 }}
+          mr={3}
+        >
+          <nodeProps.icon />
+        </UI.Icon>
+        <UI.Div>
+          <UI.Text>
+            {node.label}
+          </UI.Text>
+          <UI.MicroLabel bg={nodeProps.bg} color={nodeProps.color !== 'transparent' ? nodeProps.color : nodeProps.stroke}>
+            {node.type}
+          </UI.MicroLabel>
+        </UI.Div>
+      </UI.Flex>
+    </NodeCellContainer>
+  )
+}
+
 const DropdownOption = (props: any) => {
   const nodeProps = MapNodeToProperties(props.data.type);
 
   return (
-    <ChoiceNodeDropdownOptionContainer>
+    <NodeCellContainer>
       <components.Option {...props}>
         <UI.Flex>
-          <UI.Icon 
-            bg={nodeProps.bg} 
-            color={nodeProps.color} 
-            height="2rem" 
+          <UI.Icon
+            bg={nodeProps.bg}
+            color={nodeProps.color}
+            height="2rem"
             width="2rem"
             stroke={nodeProps.stroke || undefined}
             style={{ flexShrink: 0 }}
@@ -69,7 +102,7 @@ const DropdownOption = (props: any) => {
           </UI.Div>
         </UI.Flex>
       </components.Option>
-    </ChoiceNodeDropdownOptionContainer>
+    </NodeCellContainer>
   );
 };
 
@@ -79,10 +112,10 @@ const DropdownSingleValue = (props: any) => {
   return (
     <components.SingleValue {...props}>
       <UI.Flex>
-          <UI.Span color="gray.300">
-            {props?.data?.label}
-          </UI.Span>
-        </UI.Flex>
+        <UI.Span color="gray.300">
+          {props?.data?.label}
+        </UI.Span>
+      </UI.Flex>
     </components.SingleValue>
   )
 };
@@ -97,7 +130,7 @@ const DropdownMenu = ({ onChange, onClose, items }: any) => {
     } else {
       setFilteredItems(items.filter((item: any) => item.type === filteredState));
     }
-  }, [ filteredState, setFilteredItems ]);
+  }, [filteredState, setFilteredItems, items]);
 
   return (
 
@@ -109,26 +142,26 @@ const DropdownMenu = ({ onChange, onClose, items }: any) => {
           <UI.Div mb={2}>
             <UI.Text fontWeight="">Filter by type</UI.Text>
             <UI.Switch>
-              <UI.SwitchItem 
-                isActive={!filteredState} 
+              <UI.SwitchItem
+                isActive={!filteredState}
                 onClick={() => setFilteredState(null)}>
                 All
               </UI.SwitchItem>
-              <UI.SwitchItem 
-                isActive={filteredState === QuestionNodeTypeEnum.LINK} 
-                onClick={() => setFilteredState(QuestionNodeTypeEnum.LINK)}
+              <UI.SwitchItem
+                isActive={filteredState === QuestionNodeTypeEnum.Link}
+                onClick={() => setFilteredState(QuestionNodeTypeEnum.Link)}
               >
                 Link
               </UI.SwitchItem>
-              <UI.SwitchItem 
-                isActive={filteredState === QuestionNodeTypeEnum.SHARE} 
-                onClick={() => setFilteredState(QuestionNodeTypeEnum.SHARE)}
+              <UI.SwitchItem
+                isActive={filteredState === QuestionNodeTypeEnum.Share}
+                onClick={() => setFilteredState(QuestionNodeTypeEnum.Share)}
               >
                 Share
               </UI.SwitchItem>
-              <UI.SwitchItem 
-                isActive={filteredState === QuestionNodeTypeEnum.FORM} 
-                onClick={() => setFilteredState(QuestionNodeTypeEnum.FORM)}
+              <UI.SwitchItem
+                isActive={filteredState === QuestionNodeTypeEnum.Form}
+                onClick={() => setFilteredState(QuestionNodeTypeEnum.Form)}
               >
                 Form
               </UI.SwitchItem>
@@ -139,7 +172,7 @@ const DropdownMenu = ({ onChange, onClose, items }: any) => {
             <Select
               menuIsOpen
               autoFocus
-              defaultValue={{ label: 'Test2', value: 'Test2' }} 
+              defaultValue={{ label: 'Test2', value: 'Test2' }}
               options={filteredItems}
               onChange={onChange}
               components={{
@@ -185,17 +218,17 @@ export const ChoiceNodeForm = ({ choices, form, ctaNodes }: ChoiceNodeFormProps)
       )} */}
 
       <UI.Flex>
-        <UI.Div 
-          width="100%" 
-          backgroundColor="#fbfcff" 
+        <UI.Div
+          width="100%"
+          backgroundColor="#fbfcff"
           border="1px solid #edf2f7" borderRadius="10px" padding={4}>
-            <UI.Grid gridTemplateColumns="1fr 1fr 1fr">
-              <UI.Helper>
-                Choice
+          <UI.Grid gridTemplateColumns="1fr 1fr 1fr">
+            <UI.Helper>
+              Choice
               </UI.Helper>
-              <UI.Helper>Call to Action</UI.Helper>
-              <UI.Helper>Leads to</UI.Helper>
-            </UI.Grid>
+            <UI.Helper>Call to Action</UI.Helper>
+            <UI.Helper>Leads to</UI.Helper>
+          </UI.Grid>
           {options.map((choice: any, index: number) => (
             <UI.Grid p={2} borderBottom="1px solid #edf2f7" gridTemplateColumns="1fr 1fr 1fr">
               <UI.Div position="relative" width="100%" borderRight="1px solid #edf2f7">
@@ -216,38 +249,29 @@ export const ChoiceNodeForm = ({ choices, form, ctaNodes }: ChoiceNodeFormProps)
                         value: ctaNode.id,
                         label: ctaNode.title,
                         type: ctaNode.type
-                      }))} onClose={onClose} 
-                        onChange={(item: any) => form.setValue(`optionsFull.[${index}].overrideLeaf`, item)} 
+                      }))} onClose={onClose}
+                        onChange={(item: any) => form.setValue(`optionsFull.[${index}].overrideLeaf`, item)}
                       />
                     )}>
                       {() => (
                         <UI.Div>
                           {choice?.overrideLeaf?.label ? (
-                            <UI.Button 
-                            variantColor="gray" 
-                            size="sm" 
-                            color="#718096" 
-                            backgroundColor="white"
-                            border="1px solid #edf2f7"
-                            whiteSpace="normal"
-                          >
-                            {choice?.overrideLeaf?.label}
-                          </UI.Button>
-                            ): (
+                            <NodeCell node={choice?.overrideLeaf} />
+                          ) : (
                               // TODO: Make it a theme?
-                            <UI.Button 
-                              variantColor="gray" 
-                              size="sm" 
-                              color="#718096" 
-                              backgroundColor="white"
-                              border="1px solid #edf2f7"
-                            >
-                              <UI.Icon mr={1}>
-                                <PlusCircle />
-                              </UI.Icon>
+                              <UI.Button
+                                variantColor="gray"
+                                size="sm"
+                                color="#718096"
+                                backgroundColor="white"
+                                border="1px solid #edf2f7"
+                              >
+                                <UI.Icon mr={1}>
+                                  <PlusCircle />
+                                </UI.Icon>
                               Add Call-to-Action
-                            </UI.Button>
-                          )}
+                              </UI.Button>
+                            )}
                         </UI.Div>
                       )}
                     </Dropdown>
