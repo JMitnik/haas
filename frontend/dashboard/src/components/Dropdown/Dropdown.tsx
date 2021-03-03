@@ -7,6 +7,7 @@ import useOnClickOutside from 'hooks/useClickOnOutside';
 
 import { AnimatePresence, motion } from 'framer-motion';
 import { DropdownContainer, DropdownOverlayContainer } from './DropdownStyles';
+import { createPortal } from 'react-dom';
 
 interface DropdownProps {
   renderOverlay?: ({ onClose }: any) => React.ReactNode;
@@ -25,6 +26,7 @@ const Dropdown = ({ children, renderOverlay, placement = 'right-start', offset =
   useOnClickOutside(ref, () => setIsOpen(false));
   const { styles, attributes } = usePopper(toggleRef, overlay, {
     placement,
+    strategy: 'fixed',
     modifiers: [{
       name: 'offset',
       options: {
