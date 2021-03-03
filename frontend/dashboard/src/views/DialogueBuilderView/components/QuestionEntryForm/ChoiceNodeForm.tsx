@@ -270,9 +270,6 @@ export const ChoiceNodeForm = ({ choices, form, ctaNodes }: ChoiceNodeFormProps)
                     </Dropdown>
                   )}
                 />
-                <UI.GradientButton>
-                  {choice.value}
-                </UI.GradientButton>
               </UI.Div>
               <UI.Div>
                 <Controller
