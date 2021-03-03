@@ -120,7 +120,25 @@ const DropdownSingleValue = (props: any) => {
   )
 };
 
-const DropdownMenu = ({ onChange, onClose, items }: any) => {
+const ChoiceDropdown = ({ onChange, onClose, value }: any) => {
+  
+  return (
+    <UI.List maxWidth={400}>
+      <UI.ListHeader>Choice</UI.ListHeader>
+      <CloseButton onClose={onClose} />
+      <UI.ListItem hasNoSelect width="100%">
+        <UI.FormGroupContainer>
+          <UI.FormControl isRequired>
+            <UI.FormLabel htmlFor="value">Value</UI.FormLabel>
+            <UI.Input name="value" defaultValue={value} onChange={onChange} />
+          </UI.FormControl>
+        </UI.FormGroupContainer>
+      </UI.ListItem>
+    </UI.List>
+  );
+}
+
+const NodePicker = ({ onChange, onClose, items }: any) => {
   const [filteredState, setFilteredState] = useState<QuestionNodeTypeEnum | null>(null);
   const [filteredItems, setFilteredItems] = useState(items);
 
@@ -133,7 +151,6 @@ const DropdownMenu = ({ onChange, onClose, items }: any) => {
   }, [filteredState, setFilteredItems, items]);
 
   return (
-
     <UI.List maxWidth={300}>
       <CloseButton onClose={onClose} />
       <UI.ListHeader>Call to action</UI.ListHeader>
@@ -198,13 +215,15 @@ const DropdownMenu = ({ onChange, onClose, items }: any) => {
 
 export const ChoiceNodeForm = ({ choices, form, ctaNodes }: ChoiceNodeFormProps) => {
   const { t } = useTranslation();
-  const [testState, setTestState] = useState<any>();
-
   const handleOptionChange = (choice: any, idx: number) => console.log("Add");
 
-  const currentItems = [1, 1];
-
   const options = form.watch('optionsFull');
+
+  const formattedCtaNodes = ctaNodes.map(ctaNode => ({
+    value: ctaNode.id,
+    label: ctaNode.title,
+    type: ctaNode.type
+  }));
 
   return (
     <UI.Div>
@@ -232,12 +251,28 @@ export const ChoiceNodeForm = ({ choices, form, ctaNodes }: ChoiceNodeFormProps)
           {options.map((choice: any, index: number) => (
             <UI.Grid p={2} borderBottom="1px solid #edf2f7" gridTemplateColumns="1fr 1fr 1fr">
               <UI.Div position="relative" width="100%" borderRight="1px solid #edf2f7">
+                <Controller
+                  name={`optionsFull.[${index}].overrideLeaf`}
+                  control={form.control}
+                  render={({ value, onChange }) => (
+                    <Dropdown renderOverlay={({ onClose }) => (
+                      <ChoiceDropdown
+                        value={value}
+                        onChange={onChange}
+                        onClose={onClose}
+                      />
+                    )}>
+                      {() => (
+                        <UI.GradientButton>
+                          {choice.value}
+                        </UI.GradientButton>
+                      )}
+                    </Dropdown>
+                  )}
+                />
                 <UI.GradientButton>
                   {choice.value}
                 </UI.GradientButton>
-                {/* <UI.Div>
-                  <ExclamationIcon />
-                </UI.Div> */}
               </UI.Div>
               <UI.Div>
                 <Controller
@@ -245,11 +280,9 @@ export const ChoiceNodeForm = ({ choices, form, ctaNodes }: ChoiceNodeFormProps)
                   control={form.control}
                   render={() => (
                     <Dropdown renderOverlay={({ onClose }) => (
-                      <DropdownMenu items={ctaNodes.map(ctaNode => ({
-                        value: ctaNode.id,
-                        label: ctaNode.title,
-                        type: ctaNode.type
-                      }))} onClose={onClose}
+                      <NodePicker 
+                        items={formattedCtaNodes} 
+                        onClose={onClose}
                         onChange={(item: any) => form.setValue(`optionsFull.[${index}].overrideLeaf`, item)}
                       />
                     )}>

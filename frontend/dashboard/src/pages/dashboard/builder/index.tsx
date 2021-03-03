@@ -9,6 +9,7 @@ import DialogueBuilderView from 'views/DialogueBuilderView/DialogueBuilderView';
 import HaasNodeIcon from 'components/Icons/HaasNodeIcon';
 import MultiChoiceBuilderIcon from 'components/Icons/MultiChoiceBuilderIcon';
 import getTopicBuilderQuery from 'queries/getQuestionnaireQuery';
+import { useNavigator } from 'hooks/useNavigator';
 
 const initializeQuestionType = (type?: string) => {
   if (type === 'SLIDER') {
@@ -90,7 +91,7 @@ const mapQuestionsInputData = (nodes: QuestionEntryProps[]) => {
 };
 
 const DialogueBuilderPage = () => {
-  const { customerSlug, dialogueSlug } = useParams<{ customerSlug: string, dialogueSlug: string }>();
+  const { customerSlug, dialogueSlug } = useNavigator();
   const { loading, data } = useQuery(getTopicBuilderQuery, {
     fetchPolicy: 'network-only',
     variables: { dialogueSlug, customerSlug },
