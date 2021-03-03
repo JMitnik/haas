@@ -121,18 +121,17 @@ const DropdownSingleValue = (props: any) => {
 };
 
 const ChoiceDropdown = ({ onChange, onClose, value }: any) => {
-  
+  const { t } = useTranslation();
+
   return (
     <UI.List maxWidth={400}>
       <UI.ListHeader>Choice</UI.ListHeader>
       <CloseButton onClose={onClose} />
       <UI.ListItem hasNoSelect width="100%">
-        <UI.FormGroupContainer>
-          <UI.FormControl isRequired>
-            <UI.FormLabel htmlFor="value">Value</UI.FormLabel>
-            <UI.Input name="value" defaultValue={value} onChange={onChange} />
-          </UI.FormControl>
-        </UI.FormGroupContainer>
+        <UI.FormControl width="100%" isRequired>
+          <UI.FormLabel htmlFor="value">{t('choice')}</UI.FormLabel>
+          <UI.Textarea width="100%" name="value" defaultValue={value} onChange={onChange} />
+        </UI.FormControl>
       </UI.ListItem>
     </UI.List>
   );
@@ -241,15 +240,14 @@ export const ChoiceNodeForm = ({ choices, form, ctaNodes }: ChoiceNodeFormProps)
           width="100%"
           backgroundColor="#fbfcff"
           border="1px solid #edf2f7" borderRadius="10px" padding={4}>
-          <UI.Grid gridTemplateColumns="1fr 1fr 1fr">
+          <UI.Grid gridTemplateColumns="1fr 1fr">
             <UI.Helper>
               Choice
               </UI.Helper>
             <UI.Helper>Call to Action</UI.Helper>
-            <UI.Helper>Leads to</UI.Helper>
           </UI.Grid>
           {options.map((choice: any, index: number) => (
-            <UI.Grid p={2} borderBottom="1px solid #edf2f7" gridTemplateColumns="1fr 1fr 1fr">
+            <UI.Grid p={2} borderBottom="1px solid #edf2f7" gridTemplateColumns="1fr 1fr">
               <UI.Div position="relative" width="100%" borderRight="1px solid #edf2f7">
                 <Controller
                   name={`optionsFull.[${index}].value`}

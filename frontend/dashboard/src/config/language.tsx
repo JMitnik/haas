@@ -5,6 +5,10 @@ const language = {
       en: 'Edit dialogue',
       de: 'Dialog bearbeiten'
     },
+    choice :{
+      en: 'Choice',
+      de: 'Wahl'
+    },
     delivery_recipient: {
       en: 'Related delivery',
       de: 'Verwandte Lieferung.'
