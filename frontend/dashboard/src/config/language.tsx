@@ -1,6 +1,10 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    edit_dialogue: {
+      en: 'Edit dialogue',
+      de: 'Dialog bearbeiten'
+    },
     delivery_recipient: {
       en: 'Related delivery',
       de: 'Verwandte Lieferung.'

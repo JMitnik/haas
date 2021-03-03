@@ -326,8 +326,8 @@ const DialogueView = () => {
             minWidth={400}
             renderOverlay={() => <ShareDialogue dialogueName={dialogueSlug} shareUrl={shareUrl} />}
           >
-            {() => (
-              <UI.Button variantColor="teal" leftIcon={QRIcon} ml={4} size="sm">
+            {({ onOpen }) => (
+              <UI.Button onClick={onOpen} variantColor="teal" leftIcon={QRIcon} ml={4} size="sm">
                 {t('share')}
               </UI.Button>
             )}

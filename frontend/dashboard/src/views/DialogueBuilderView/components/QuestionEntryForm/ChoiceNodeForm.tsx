@@ -41,14 +41,14 @@ const CloseButton = ({ onClose }: any) => (
   </CloseButtonContainer>
 )
 
-const NodeCell = ({ node }: { node: any }) => {
+const NodeCell = ({ node, onOpen }: { node: any, onOpen?: () => void }) => {
   if (!node.type) return null;
 
   const nodeProps = MapNodeToProperties(node.type);
   console.log(node);
 
   return (
-    <NodeCellContainer style={{ padding: '8px 12px', width: "100%" }}>
+    <NodeCellContainer onClick={onOpen} style={{ padding: '8px 12px', width: "100%" }}>
       <UI.Flex width="100%">
         <UI.Icon
           bg={nodeProps.bg}
@@ -252,7 +252,7 @@ export const ChoiceNodeForm = ({ choices, form, ctaNodes }: ChoiceNodeFormProps)
             <UI.Grid p={2} borderBottom="1px solid #edf2f7" gridTemplateColumns="1fr 1fr 1fr">
               <UI.Div position="relative" width="100%" borderRight="1px solid #edf2f7">
                 <Controller
-                  name={`optionsFull.[${index}].overrideLeaf`}
+                  name={`optionsFull.[${index}].value`}
                   control={form.control}
                   render={({ value, onChange }) => (
                     <Dropdown renderOverlay={({ onClose }) => (
@@ -262,9 +262,9 @@ export const ChoiceNodeForm = ({ choices, form, ctaNodes }: ChoiceNodeFormProps)
                         onClose={onClose}
                       />
                     )}>
-                      {() => (
-                        <UI.GradientButton>
-                          {choice.value}
+                      {({ onOpen, containerRef }) => (
+                        <UI.GradientButton onClick={onOpen} ref={containerRef}>
+                          {value}
                         </UI.GradientButton>
                       )}
                     </Dropdown>
@@ -278,15 +278,15 @@ export const ChoiceNodeForm = ({ choices, form, ctaNodes }: ChoiceNodeFormProps)
                   render={() => (
                     <Dropdown renderOverlay={({ onClose }) => (
                       <NodePicker 
-                        items={formattedCtaNodes} 
+                        items={formattedCtaNodes}
                         onClose={onClose}
                         onChange={(item: any) => form.setValue(`optionsFull.[${index}].overrideLeaf`, item)}
                       />
                     )}>
-                      {() => (
+                      {({ onOpen }) => (
                         <UI.Div width="100%" justifyContent="center" display="flex">
                           {choice?.overrideLeaf?.label ? (
-                            <NodeCell node={choice?.overrideLeaf} />
+                            <NodeCell onOpen={onOpen} node={choice?.overrideLeaf} />
                           ) : (
                               // TODO: Make it a theme?
                               <UI.Button
@@ -295,6 +295,7 @@ export const ChoiceNodeForm = ({ choices, form, ctaNodes }: ChoiceNodeFormProps)
                                 color="#718096"
                                 backgroundColor="white"
                                 border="1px solid #edf2f7"
+                                onClick={onOpen}
                               >
                                 <UI.Icon mr={1}>
                                   <PlusCircle />

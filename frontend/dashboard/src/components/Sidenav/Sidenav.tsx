@@ -110,11 +110,18 @@ export const NavLogo = () => (
   <FullLogo />
 );
 
-export const UsernavContainer = styled.div``;
+export const UsernavContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
 
 export const AvatarContainer = styled(Div)`
   ${({ theme }) => css`
     padding: ${theme.gutter}px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     z-index: 1200;
 
     &:hover {
@@ -238,12 +245,13 @@ export const Usernav = () => {
   return (
     <UsernavContainer>
       <Dropdown renderOverlay={() => <UsernavDropdown />} placement="top-start" offset={[24, 0]}>
-        {() => (
+        {({ onOpen }) => (
           <AvatarContainer>
             <ChakraAvatar
               bg="gray.300"
               size="md"
               name={`${user?.firstName} ${user?.lastName}`}
+              onClick={onOpen}
             >
               <AvatarBadge size="1em" bg="green.400" />
             </ChakraAvatar>

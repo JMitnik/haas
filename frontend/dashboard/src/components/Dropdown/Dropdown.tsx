@@ -45,7 +45,7 @@ const Dropdown = ({ children, renderOverlay, placement = 'right-start', offset =
   const handleClose = () => setIsOpen(false);
 
   return (
-    <DropdownContainer>
+    <>
       <AnimatePresence>
         {isOpen ? (
           <>
@@ -75,19 +75,15 @@ const Dropdown = ({ children, renderOverlay, placement = 'right-start', offset =
       </AnimatePresence>
 
       <Div
-        height="100%"
-        useFlex
-        alignItems="center"
-        justifyContent="center"
         width="100%"
+        display="inline-block"
         ref={setToggleRef}
-        onClick={(e) => handleToggleDropdown(e)}
       >
         <>
-          {children?.({ onOpen: handleOpen, onClose: handleClose })}
+          {children?.({ onOpen: handleToggleDropdown, onClose: handleClose })}
         </>
       </Div>
-    </DropdownContainer>
+    </>
   );
 };
 

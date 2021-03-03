@@ -1,3 +1,4 @@
+import * as UI from '@haas/ui';
 import { debounce } from 'lodash';
 import { useHistory, useParams } from 'react-router';
 import { useLazyQuery, useMutation } from '@apollo/client';
@@ -185,26 +186,25 @@ const UsersOverview = () => {
                   {canDeleteUsers && (
                     <ShowMoreButton
                       renderMenu={(
-                        <List>
+                        <UI.List>
+                          <UI.ListHeader>{t('edit_user')}</UI.ListHeader>
                           {canDeleteUsers && (
                             <>
                               {canEditUsers && (
-                                <ListItem
+                                <UI.ListItem
                                   onClick={(e: any) => handleEditUser(e, data?.id)}
-                                  renderLeftIcon={<Edit />}
                                 >
                                   {t('edit_user')}
-                                </ListItem>
+                                </UI.ListItem>
                               )}
                               <Popover>
                                 {() => (
                                   <>
                                     <PopoverTrigger>
-                                      <ListItem
-                                        renderLeftIcon={<Trash />}
+                                      <UI.ListItem
                                       >
                                         {t('delete_user')}
-                                      </ListItem>
+                                      </UI.ListItem>
                                     </PopoverTrigger>
                                     <PopoverContent zIndex={4}>
                                       <PopoverArrow />
@@ -227,7 +227,7 @@ const UsersOverview = () => {
                               </Popover>
                             </>
                           )}
-                        </List>
+                        </UI.List>
                       )}
                     />
                   )}

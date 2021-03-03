@@ -1,3 +1,4 @@
+import * as UI from '@haas/ui';
 import {
   Button, Popover, PopoverArrow, PopoverBody, PopoverCloseButton,
   PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast
@@ -170,26 +171,24 @@ const TriggersOverview = () => {
                 {canDeleteTriggers && (
                   <ShowMoreButton
                     renderMenu={(
-                      <List>
+                      <UI.List>
+                        <UI.ListHeader>{t('edit_trigger')}</UI.ListHeader>
                         {canDeleteTriggers && (
                           <>
                             {canEditTriggers && (
-                              <ListItem
+                              <UI.ListItem
                                 onClick={(e: any) => handleEditEntry(e, data?.id)}
-                                renderLeftIcon={<Edit />}
                               >
                                 {t('edit_trigger')}
-                              </ListItem>
+                              </UI.ListItem>
                             )}
                             <Popover>
                               {() => (
                                 <>
                                   <PopoverTrigger>
-                                    <ListItem
-                                      renderLeftIcon={<Trash />}
-                                    >
+                                    <UI.ListItem>
                                       {t('delete_trigger')}
-                                    </ListItem>
+                                    </UI.ListItem>
                                   </PopoverTrigger>
                                   <PopoverContent zIndex={4}>
                                     <PopoverArrow />
@@ -212,7 +211,7 @@ const TriggersOverview = () => {
                             </Popover>
                           </>
                         )}
-                      </List>
+                      </UI.List>
                     )}
                   />
                 )}

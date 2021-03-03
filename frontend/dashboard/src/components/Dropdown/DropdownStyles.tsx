@@ -2,11 +2,6 @@ import styled, { css } from 'styled-components';
 
 export const DropdownContainer = styled.div`
   position: relative;
-  height: 100%;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 `;
 
 export const DropdownOverlayContainer = styled.div<{left?: string, right?: string, top?: string, bottom?: string, minWidth?: number} >`
