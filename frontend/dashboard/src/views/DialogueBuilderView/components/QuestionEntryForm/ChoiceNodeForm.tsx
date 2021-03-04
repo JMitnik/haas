@@ -3,6 +3,7 @@ import Dropdown from 'components/Dropdown';
 import React from 'react'
 import { PlusCircle, ArrowUp, ArrowDown, Trash } from 'react-feather';
 import { ReactComponent as CloseIcon } from 'assets/icons/icon-close.svg';
+import { ReactComponent as EmptyIll } from 'assets/images/empty.svg';
 import { Controller, useFieldArray, UseFormMethods } from 'react-hook-form';
 import { useTranslation } from 'react-i18next/';
 import Select, { components } from 'react-select';
@@ -251,150 +252,166 @@ export const ChoiceNodeForm = ({ form, ctaNodes }: ChoiceNodeFormProps) => {
           borderRadius="10px"
           padding={4}
         >
-          <UI.Grid gridTemplateColumns="2fr 2fr 1fr">
-            <UI.FormControl isRequired>
-              <UI.FormLabel display="flex">
-                <UI.Helper>
-                  Choice
+          {choicesForm.fields.length ? (
+            <>
+              <UI.Grid gridTemplateColumns="2fr 2fr 1fr">
+                <UI.FormControl isRequired>
+                  <UI.FormLabel display="flex">
+                    <UI.Helper>
+                      Choice
                 </UI.Helper>
-              </UI.FormLabel>
-            </UI.FormControl>
-            <UI.Helper>Call to Action</UI.Helper>
-          </UI.Grid>
-          {choicesForm.fields.map((choice, index) => (
-            <UI.Grid
-              key={choice.fieldIndex}
-              p={2}
-              borderBottom="1px solid #edf2f7"
-              gridTemplateColumns="2fr 2fr 1fr"
-            >
-              <UI.Div
-                display="flex"
-                alignItems="center"
-                position="relative"
-                width="100%"
-                borderRight="1px solid #edf2f7"
-              >
-                <Controller
-                  name={`optionsFull[${index}].value`}
-                  defaultValue={choice.value}
-                  control={form.control}
-                  render={({ value, onChange }) => (
-                    <Dropdown placement="left-start" renderOverlay={({ onClose }) => (
-                      <ChoiceDropdown
-                        value={value}
-                        onChange={onChange}
-                        onClose={onClose}
-                      />
-                    )}>
-                      {({ onOpen, containerRef }) => (
-                        <>
-                          {value ? (
-                            <UI.GradientButton onClick={onOpen} ref={containerRef}>
-                              {value}
-                            </UI.GradientButton>
-                          ) : (
-                              <UI.Button
-                                variantColor="altGray"
-                                size="sm"
-                                variant="outline"
-                                onClick={onOpen}
-                              >
-                                <UI.Icon mr={1}>
-                                  <PlusCircle />
-                                </UI.Icon>
-                              Set your choice
-                              </UI.Button>
-                            )}
-                        </>
-                      )}
-                    </Dropdown>
-                  )}
-                />
-              </UI.Div>
-              <UI.Div alignItems="center" display="flex">
-                <Controller
-                  name={`optionsFull[${index}].overrideLeaf`}
-                  control={form.control}
-                  defaultValue={choice.overrideLeaf}
-                  render={({ value, onChange }) => (
-                    <Dropdown renderOverlay={({ onClose }) => (
-                      <NodePicker
-                        items={formattedCtaNodes}
-                        onClose={onClose}
-                        onChange={onChange}
-                      />
-                    )}>
-                      {({ onOpen }) => (
-                        <UI.Div
-                          width="100%"
-                          justifyContent="center"
-                          display="flex"
-                          alignItems="center"
-                        >
-                          {value?.label ? (
-                            <NodeCell onOpen={onOpen} node={value} />
-                          ) : (
-                              <UI.Button
-                                variantColor="altGray"
-                                size="sm"
-                                variant="outline"
-                                onClick={onOpen}
-                              >
-                                <UI.Icon mr={1}>
-                                  <PlusCircle />
-                                </UI.Icon>
-                              Add Call-to-Action
-                              </UI.Button>
-                            )}
-                        </UI.Div>
-                      )}
-                    </Dropdown>
-                  )}
-                />
-              </UI.Div>
-              <UI.Stack alignItems="center" isInline spacing={2}>
-                <UI.Stack spacing={2}>
-                  <UI.Button
-                    size="sm"
-                    isDisabled={index === 0}
-                    onClick={() => choicesForm.move(index, index - 1)}
-                  >
-                    <UI.Icon>
-                      <ArrowUp />
-                    </UI.Icon>
-                  </UI.Button>
-                  <UI.Button
-                    size="sm"
-                    isDisabled={index === choicesForm.fields.length - 1}
-                    onClick={() => choicesForm.move(index, index + 1)}
-                  >
-                    <UI.Icon>
-                      <ArrowDown />
-                    </UI.Icon>
-                  </UI.Button>
-                </UI.Stack>
-                <UI.Button
-                  onClick={() => choicesForm.remove(index)}
-                  size="sm"
-                  variantColor="red"
-                  variant="outline"
+                  </UI.FormLabel>
+                </UI.FormControl>
+                <UI.Helper>Call to Action</UI.Helper>
+              </UI.Grid>
+              {choicesForm.fields.map((choice, index) => (
+                <UI.Grid
+                  key={choice.fieldIndex}
+                  p={2}
+                  borderBottom="1px solid #edf2f7"
+                  gridTemplateColumns="2fr 2fr 1fr"
                 >
-                  <UI.Icon>
-                    <Trash />
+                  <UI.Div
+                    display="flex"
+                    alignItems="center"
+                    position="relative"
+                    width="100%"
+                    borderRight="1px solid #edf2f7"
+                  >
+                    <Controller
+                      name={`optionsFull[${index}].value`}
+                      defaultValue={choice.value}
+                      control={form.control}
+                      render={({ value, onChange }) => (
+                        <Dropdown placement="left-start" renderOverlay={({ onClose }) => (
+                          <ChoiceDropdown
+                            value={value}
+                            onChange={onChange}
+                            onClose={onClose}
+                          />
+                        )}>
+                          {({ onOpen, containerRef }) => (
+                            <>
+                              {value ? (
+                                <UI.GradientButton onClick={onOpen} ref={containerRef}>
+                                  {value}
+                                </UI.GradientButton>
+                              ) : (
+                                  <UI.Button
+                                    size="sm"
+                                    variantColor={
+                                      form.errors?.optionsFull?.[index].value ? "red" : "altGray"
+                                    }
+                                    variant="outline"
+                                    onClick={onOpen}
+                                  >
+                                    <UI.Icon mr={1}>
+                                      <PlusCircle />
+                                    </UI.Icon>
+                              Set your choice
+                                  </UI.Button>
+                                )}
+                            </>
+                          )}
+                        </Dropdown>
+                      )}
+                    />
+                  </UI.Div>
+                  <UI.Div alignItems="center" display="flex">
+                    <Controller
+                      name={`optionsFull[${index}].overrideLeaf`}
+                      control={form.control}
+                      defaultValue={choice.overrideLeaf}
+                      render={({ value, onChange }) => (
+                        <Dropdown renderOverlay={({ onClose }) => (
+                          <NodePicker
+                            items={formattedCtaNodes}
+                            onClose={onClose}
+                            onChange={onChange}
+                          />
+                        )}>
+                          {({ onOpen }) => (
+                            <UI.Div
+                              width="100%"
+                              justifyContent="center"
+                              display="flex"
+                              alignItems="center"
+                            >
+                              {value?.label ? (
+                                <NodeCell onOpen={onOpen} node={value} />
+                              ) : (
+                                  <UI.Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={onOpen}
+                                    variantColor="altGray"
+                                  >
+                                    <UI.Icon mr={1}>
+                                      <PlusCircle />
+                                    </UI.Icon>
+                              Add Call-to-Action
+                                  </UI.Button>
+                                )}
+                            </UI.Div>
+                          )}
+                        </Dropdown>
+                      )}
+                    />
+                  </UI.Div>
+                  <UI.Stack alignItems="center" isInline spacing={2}>
+                    <UI.Stack spacing={2}>
+                      <UI.Button
+                        size="sm"
+                        isDisabled={index === 0}
+                        onClick={() => choicesForm.move(index, index - 1)}
+                      >
+                        <UI.Icon>
+                          <ArrowUp />
+                        </UI.Icon>
+                      </UI.Button>
+                      <UI.Button
+                        size="sm"
+                        isDisabled={index === choicesForm.fields.length - 1}
+                        onClick={() => choicesForm.move(index, index + 1)}
+                      >
+                        <UI.Icon>
+                          <ArrowDown />
+                        </UI.Icon>
+                      </UI.Button>
+                    </UI.Stack>
+                    <UI.Button
+                      onClick={() => choicesForm.remove(index)}
+                      size="sm"
+                      variantColor="red"
+                      variant="outline"
+                    >
+                      <UI.Icon>
+                        <Trash />
+                      </UI.Icon>
+                    </UI.Button>
+                  </UI.Stack>
+                </UI.Grid>
+              ))}
+              <UI.Div mt={4}>
+                <UI.Button variantColor="gray" onClick={handleNewChoice}>
+                  <UI.Icon mr={1}>
+                    <PlusCircle />
                   </UI.Icon>
-                </UI.Button>
-              </UI.Stack>
-            </UI.Grid>
-          ))}
-          <UI.Div mt={4}>
-            <UI.Button variantColor="gray" onClick={handleNewChoice}>
-              <UI.Icon mr={1}>
-                <PlusCircle />
-              </UI.Icon>
               Add choice
             </UI.Button>
-          </UI.Div>
+              </UI.Div>
+            </>
+          ) : (
+              <UI.IllustrationCard isFlat svg={<EmptyIll />} text={t('no_choices')}>
+                <UI.Button variantColor="gray" onClick={handleNewChoice}>
+                  <UI.Icon mr={1}>
+                    <PlusCircle />
+                  </UI.Icon>
+              Add choice
+            </UI.Button>
+              </UI.IllustrationCard>
+            )}
+
         </UI.Div>
       </UI.Flex>
     </UI.Div>

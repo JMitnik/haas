@@ -1,11 +1,15 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    no_choices: {
+      en: 'You have no choices yet',
+      de: 'Sie haben noch keine Auswahlmöglichkeiten'
+    },
     edit_dialogue: {
       en: 'Edit dialogue',
       de: 'Dialog bearbeiten'
     },
-    choice :{
+    choice: {
       en: 'Choice',
       de: 'Wahl'
     },
