@@ -1,5 +1,5 @@
 import * as UI from '@haas/ui';
-import { Edit, MapPin, Trash, User } from 'react-feather';
+import { MapPin, User } from 'react-feather';
 import { formatDistance } from 'date-fns';
 
 import { useHistory, useParams } from 'react-router';
@@ -14,8 +14,6 @@ import {
 import { Card, CardBody, ColumnFlex, Div, ExtLink, Flex, Paragraph, Text } from '@haas/ui';
 import { deleteDialogueMutation } from 'mutations/deleteDialogue';
 import { useTranslation } from 'react-i18next';
-import List from 'components/List/List';
-import ListItem from 'components/List/ListItem';
 import ShowMoreButton from 'components/ShowMoreButton';
 import SliderNodeIcon from 'components/Icons/SliderNodeIcon';
 import getDialoguesOfCustomer from 'queries/getDialoguesOfCustomer';

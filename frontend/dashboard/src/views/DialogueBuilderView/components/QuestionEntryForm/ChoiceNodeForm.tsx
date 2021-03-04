@@ -1,10 +1,9 @@
 import * as UI from '@haas/ui';
 import Dropdown from 'components/Dropdown';
 import React from 'react'
-import { PlusCircle, Crosshair } from 'react-feather';
+import { PlusCircle, ArrowUp, ArrowDown, Trash } from 'react-feather';
 import { ReactComponent as CloseIcon } from 'assets/icons/icon-close.svg';
-import { ReactComponent as ExclamationIcon } from 'assets/icons/icon-exclamation-circle.svg';
-import { Controller, UseFormMethods } from 'react-hook-form';
+import { Controller, useFieldArray, UseFormMethods } from 'react-hook-form';
 import { useTranslation } from 'react-i18next/';
 import Select, { components } from 'react-select';
 import styled from 'styled-components';
@@ -45,7 +44,6 @@ const NodeCell = ({ node, onOpen }: { node: any, onOpen?: () => void }) => {
   if (!node.type) return null;
 
   const nodeProps = MapNodeToProperties(node.type);
-  console.log(node);
 
   return (
     <NodeCellContainer onClick={onOpen} style={{ padding: '8px 12px', width: "100%" }}>
@@ -212,17 +210,27 @@ const NodePicker = ({ onChange, onClose, items }: any) => {
   )
 };
 
-export const ChoiceNodeForm = ({ choices, form, ctaNodes }: ChoiceNodeFormProps) => {
+export const ChoiceNodeForm = ({ form, ctaNodes }: ChoiceNodeFormProps) => {
   const { t } = useTranslation();
-  const handleOptionChange = (choice: any, idx: number) => console.log("Add");
 
-  const options = form.watch('optionsFull');
+  const choicesForm = useFieldArray({
+    name: 'optionsFull',
+    control: form.control,
+    keyName: 'fieldIndex'
+  });
 
   const formattedCtaNodes = ctaNodes.map(ctaNode => ({
     value: ctaNode.id,
     label: ctaNode.title,
     type: ctaNode.type
   }));
+
+  const handleNewChoice = () => {
+    choicesForm.append({
+      value: '',
+      overrideLeaf: null
+    })
+  }
 
   return (
     <UI.Div>
@@ -239,21 +247,40 @@ export const ChoiceNodeForm = ({ choices, form, ctaNodes }: ChoiceNodeFormProps)
         <UI.Div
           width="100%"
           backgroundColor="#fbfcff"
-          border="1px solid #edf2f7" borderRadius="10px" padding={4}>
-          <UI.Grid gridTemplateColumns="1fr 1fr">
-            <UI.Helper>
-              Choice
-              </UI.Helper>
+          border="1px solid #edf2f7"
+          borderRadius="10px"
+          padding={4}
+        >
+          <UI.Grid gridTemplateColumns="2fr 2fr 1fr">
+            <UI.FormControl isRequired>
+              <UI.FormLabel display="flex">
+                <UI.Helper>
+                  Choice
+                </UI.Helper>
+              </UI.FormLabel>
+            </UI.FormControl>
             <UI.Helper>Call to Action</UI.Helper>
           </UI.Grid>
-          {options.map((choice: any, index: number) => (
-            <UI.Grid p={2} borderBottom="1px solid #edf2f7" gridTemplateColumns="1fr 1fr">
-              <UI.Div position="relative" width="100%" borderRight="1px solid #edf2f7">
+          {choicesForm.fields.map((choice, index) => (
+            <UI.Grid
+              key={choice.fieldIndex}
+              p={2}
+              borderBottom="1px solid #edf2f7"
+              gridTemplateColumns="2fr 2fr 1fr"
+            >
+              <UI.Div
+                display="flex"
+                alignItems="center"
+                position="relative"
+                width="100%"
+                borderRight="1px solid #edf2f7"
+              >
                 <Controller
-                  name={`optionsFull.[${index}].value`}
+                  name={`optionsFull[${index}].value`}
+                  defaultValue={choice.value}
                   control={form.control}
                   render={({ value, onChange }) => (
-                    <Dropdown renderOverlay={({ onClose }) => (
+                    <Dropdown placement="left-start" renderOverlay={({ onClose }) => (
                       <ChoiceDropdown
                         value={value}
                         onChange={onChange}
@@ -261,38 +288,57 @@ export const ChoiceNodeForm = ({ choices, form, ctaNodes }: ChoiceNodeFormProps)
                       />
                     )}>
                       {({ onOpen, containerRef }) => (
-                        <UI.GradientButton onClick={onOpen} ref={containerRef}>
-                          {value}
-                        </UI.GradientButton>
+                        <>
+                          {value ? (
+                            <UI.GradientButton onClick={onOpen} ref={containerRef}>
+                              {value}
+                            </UI.GradientButton>
+                          ) : (
+                              <UI.Button
+                                variantColor="altGray"
+                                size="sm"
+                                variant="outline"
+                                onClick={onOpen}
+                              >
+                                <UI.Icon mr={1}>
+                                  <PlusCircle />
+                                </UI.Icon>
+                              Set your choice
+                              </UI.Button>
+                            )}
+                        </>
                       )}
                     </Dropdown>
                   )}
                 />
               </UI.Div>
-              <UI.Div>
+              <UI.Div alignItems="center" display="flex">
                 <Controller
-                  name={`optionsFull.[${index}].overrideLeaf`}
+                  name={`optionsFull[${index}].overrideLeaf`}
                   control={form.control}
-                  render={() => (
+                  defaultValue={choice.overrideLeaf}
+                  render={({ value, onChange }) => (
                     <Dropdown renderOverlay={({ onClose }) => (
-                      <NodePicker 
+                      <NodePicker
                         items={formattedCtaNodes}
                         onClose={onClose}
-                        onChange={(item: any) => form.setValue(`optionsFull.[${index}].overrideLeaf`, item)}
+                        onChange={onChange}
                       />
                     )}>
                       {({ onOpen }) => (
-                        <UI.Div width="100%" justifyContent="center" display="flex">
-                          {choice?.overrideLeaf?.label ? (
-                            <NodeCell onOpen={onOpen} node={choice?.overrideLeaf} />
+                        <UI.Div
+                          width="100%"
+                          justifyContent="center"
+                          display="flex"
+                          alignItems="center"
+                        >
+                          {value?.label ? (
+                            <NodeCell onOpen={onOpen} node={value} />
                           ) : (
-                              // TODO: Make it a theme?
                               <UI.Button
-                                variantColor="gray"
+                                variantColor="altGray"
                                 size="sm"
-                                color="#718096"
-                                backgroundColor="white"
-                                border="1px solid #edf2f7"
+                                variant="outline"
                                 onClick={onOpen}
                               >
                                 <UI.Icon mr={1}>
@@ -307,40 +353,50 @@ export const ChoiceNodeForm = ({ choices, form, ctaNodes }: ChoiceNodeFormProps)
                   )}
                 />
               </UI.Div>
+              <UI.Stack alignItems="center" isInline spacing={2}>
+                <UI.Stack spacing={2}>
+                  <UI.Button
+                    size="sm"
+                    isDisabled={index === 0}
+                    onClick={() => choicesForm.move(index, index - 1)}
+                  >
+                    <UI.Icon>
+                      <ArrowUp />
+                    </UI.Icon>
+                  </UI.Button>
+                  <UI.Button
+                    size="sm"
+                    isDisabled={index === choicesForm.fields.length - 1}
+                    onClick={() => choicesForm.move(index, index + 1)}
+                  >
+                    <UI.Icon>
+                      <ArrowDown />
+                    </UI.Icon>
+                  </UI.Button>
+                </UI.Stack>
+                <UI.Button
+                  onClick={() => choicesForm.remove(index)}
+                  size="sm"
+                  variantColor="red"
+                  variant="outline"
+                >
+                  <UI.Icon>
+                    <Trash />
+                  </UI.Icon>
+                </UI.Button>
+              </UI.Stack>
             </UI.Grid>
           ))}
+          <UI.Div mt={4}>
+            <UI.Button variantColor="gray" onClick={handleNewChoice}>
+              <UI.Icon mr={1}>
+                <PlusCircle />
+              </UI.Icon>
+              Add choice
+            </UI.Button>
+          </UI.Div>
         </UI.Div>
       </UI.Flex>
-
-      {choices && choices.map((choice, index) => (
-        <UI.Flex key={`container-${choice.id}-${index}`} flexDirection="column">
-          <UI.Flex my={1} flexDirection="row">
-            <UI.Flex flexGrow={1}>
-              <UI.Input
-                isInvalid={form.errors.options && Array.isArray(form.errors.options) && !!form.errors.options?.[index]}
-                id={`choices[${index}]`}
-                key={`input-${choice.id}-${index}`}
-                name={`choices[${index}]`}
-                ref={form.register({
-                  required: true,
-                  minLength: 1
-                })}
-                defaultValue={choice.value}
-                onChange={(e: any) => handleOptionChange(e.currentTarget.value, index)}
-              />
-            </UI.Flex>
-            {/* 
-                      <DeleteQuestionOptionButtonContainer
-                      onClick={(e: any) => deleteOption(e, index)}
-                      >
-                      <MinusCircle />
-                      </DeleteQuestionOptionButtonContainer> */}
-          </UI.Flex>
-          {form.errors.options?.[index] && (
-            <UI.Muted color="warning">Please fill in a proper value!</UI.Muted>
-          )}
-        </UI.Flex>
-      ))}
     </UI.Div>
   )
 };

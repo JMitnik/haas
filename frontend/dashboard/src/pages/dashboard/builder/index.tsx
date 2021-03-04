@@ -1,5 +1,4 @@
 import { orderBy } from 'lodash';
-import { useParams } from 'react-router';
 import { useQuery } from '@apollo/client';
 import React from 'react';
 
@@ -69,12 +68,12 @@ const mapQuestionsInputData = (nodes: QuestionEntryProps[]) => {
     overrideLeaf: !overrideLeaf
       ? undefined
       : { id: overrideLeaf?.id, title: overrideLeaf?.title, type: initializeCTAType(overrideLeaf?.type) },
-    options: options?.map((option) => ({ 
-      id: option.id, 
-      value: option.value, 
+    options: options?.map((option) => ({
+      id: option.id,
+      value: option.value,
       publicValue: option.publicValue,
       overrideLeaf: option.overrideLeaf,
-     })),
+    })),
     children: children?.map((edge: EdgeChildProps) => ({
       id: edge.id,
       parentNode: { id: edge?.parentNode?.id, title: edge?.parentNode?.title },

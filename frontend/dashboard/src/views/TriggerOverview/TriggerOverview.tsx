@@ -4,7 +4,7 @@ import {
   PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast
 } from '@chakra-ui/core';
 import { Div, Flex, PageTitle, Text } from '@haas/ui';
-import { Edit, Plus, Trash } from 'react-feather';
+import { Plus } from 'react-feather';
 import { debounce } from 'lodash';
 import { useHistory, useParams } from 'react-router';
 import { useLazyQuery, useMutation } from '@apollo/client';
@@ -12,8 +12,6 @@ import { useTranslation } from 'react-i18next';
 import React, { useCallback, useEffect, useState } from 'react';
 
 import { GenericCell } from 'components/Table/CellComponents/CellComponents';
-import List from 'components/List/List';
-import ListItem from 'components/List/ListItem';
 import SearchBar from 'components/SearchBar/SearchBar';
 import ShowMoreButton from 'components/ShowMoreButton';
 import Table from 'components/Table/Table';

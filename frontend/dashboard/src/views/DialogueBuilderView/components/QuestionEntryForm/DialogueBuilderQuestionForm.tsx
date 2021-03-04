@@ -9,7 +9,6 @@ import { Controller, useForm } from 'react-hook-form';
 import { Trash } from 'react-feather';
 import { debounce } from 'lodash';
 import { useMutation, gql } from '@apollo/client';
-import { useParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { yupResolver } from '@hookform/resolvers';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -88,7 +87,9 @@ const schema = yup.object().shape({
   //   then: yup.array(yup.string().min(1)).min(1).required(),
   //   otherwise: yup.array(yup.string()).notRequired(),
   // }),
-  optionsFull: yup.array().of(yup.object()),
+  optionsFull: yup.array().min(1).of(yup.object({
+    value: yup.string().required('form.value_required')
+  })),
 });
 
 interface QuestionEntryFormProps {
@@ -672,7 +673,7 @@ const DialogueBuilderQuestionForm = ({
             <>
               <UI.Hr />
               <UI.FormSection>
-              <UI.Div>
+                <UI.Div>
                   <UI.FormSectionHeader>{t('dialogue:about_slider')}</UI.FormSectionHeader>
                   <UI.FormSectionHelper>
                     {t('dialogue:about_slider_helper')}

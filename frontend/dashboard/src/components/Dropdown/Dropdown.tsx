@@ -7,7 +7,7 @@ import { usePopper } from 'react-popper';
 import useOnClickOutside from 'hooks/useClickOnOutside';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { DropdownContainer, DropdownOverlayContainer } from './DropdownStyles';
+import { DropdownOverlayContainer } from './DropdownStyles';
 
 interface DropdownProps {
   renderOverlay?: ({ onClose }: any) => React.ReactNode;
@@ -41,7 +41,6 @@ const Dropdown = ({ children, renderOverlay, placement = 'right-start', offset =
     setIsOpen((isOpen) => !isOpen);
   };
 
-  const handleOpen = () => setIsOpen(true);
   const handleClose = () => setIsOpen(false);
 
   return (
@@ -49,27 +48,27 @@ const Dropdown = ({ children, renderOverlay, placement = 'right-start', offset =
       <AnimatePresence>
         {isOpen ? (
           <>
-          {createPortal(
-            <Div
-              ref={setOverlay}
-              style={{
-                ...styles.popper,
-                minWidth,
-              }}
-              {...attributes.popper}
-            >
-              <motion.div
-                style={{ minWidth }}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1, transition: { duration: 0.2 } }}
-                exit={{ opacity: 0, scale: 0.8, transition: { duration: 0.2 } }}
+            {createPortal(
+              <Div
+                ref={setOverlay}
+                style={{
+                  ...styles.popper,
+                  minWidth,
+                }}
+                {...attributes.popper}
               >
-                <DropdownOverlayContainer minWidth={minWidth} ref={ref} onClick={(e) => e.stopPropagation()}>
-                  {renderOverlay?.({ onClose: handleClose })}
-                </DropdownOverlayContainer>
-              </motion.div>
-            </Div>
-          , document.getElementById('popper_root') as HTMLElement)}
+                <motion.div
+                  style={{ minWidth }}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1, transition: { duration: 0.2 } }}
+                  exit={{ opacity: 0, scale: 0.8, transition: { duration: 0.2 } }}
+                >
+                  <DropdownOverlayContainer minWidth={minWidth} ref={ref} onClick={(e) => e.stopPropagation()}>
+                    {renderOverlay?.({ onClose: handleClose })}
+                  </DropdownOverlayContainer>
+                </motion.div>
+              </Div>
+              , document.getElementById('popper_root') as HTMLElement)}
           </>
         ) : null}
       </AnimatePresence>

@@ -140,14 +140,14 @@ export const CampaignView = () => {
   // use-table-select placement
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
-  const handleSelect = (id: string) => {
-    if (selectedIds.includes(id)) {
-      console.log(selectedIds);
-      setSelectedIds(ids => ids.splice(ids.indexOf(id), 1));
-    } else {
-      setSelectedIds(ids => [...ids, id]);
-    }
-  }
+  // const handleSelect = (id: string) => {
+  //   if (selectedIds.includes(id)) {
+  //     console.log(selectedIds);
+  //     setSelectedIds(ids => ids.splice(ids.indexOf(id), 1));
+  //   } else {
+  //     setSelectedIds(ids => [...ids, id]);
+  //   }
+  // }
 
   const isInEdit = selectedIds.length > 0;
 

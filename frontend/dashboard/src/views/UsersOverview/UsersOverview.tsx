@@ -13,13 +13,11 @@ import {
   Button, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent,
   PopoverFooter, PopoverHeader, PopoverTrigger, useToast
 } from '@chakra-ui/core';
-import { Edit, Plus, Trash } from 'react-feather';
+import { Plus } from 'react-feather';
 import { ErrorBoundary } from 'react-error-boundary';
 import { GenericCell, RoleCell } from 'components/Table/CellComponents/CellComponents';
 import { useCustomer } from 'providers/CustomerProvider';
 import { useTranslation } from 'react-i18next';
-import List from 'components/List/List';
-import ListItem from 'components/List/ListItem';
 import ShowMoreButton from 'components/ShowMoreButton';
 import useAuth from 'hooks/useAuth';
 
