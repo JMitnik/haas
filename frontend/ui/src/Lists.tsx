@@ -4,7 +4,7 @@ import { ChevronRight } from 'react-feather';
 import styled, { css } from 'styled-components';
 
 import { ReactComponent as CloseIcon } from './assets/icon-close.svg';
-import { Div } from '.';
+import { Div, SelectContainer } from '.';
 
 import { Span } from './Span';
 import { Text } from './Type';
@@ -39,14 +39,17 @@ export const ListGroupHeader = styled(Text)`
   `}
 `;
 
+type ListItemVariant = 'gray';
+
 interface ListItemProps {
   isSelected?: boolean;
   accent?: string;
   hasNoSelect?: boolean;
+  variant?: ListItemVariant;
 }
 
-export const ListItem = styled(Div)<ListItemProps>`
-  ${({ theme, isSelected, accent, hasNoSelect }) => css`
+export const ListItem = styled(Div) <ListItemProps>`
+  ${({ theme, isSelected, accent, hasNoSelect, variant }) => css`
     padding: ${theme.gutter / 2}px;
     display: flex;
     transition: all .3s cubic-bezier(.55,0,.1,1);
@@ -65,6 +68,26 @@ export const ListItem = styled(Div)<ListItemProps>`
     ${isSelected && css`
       border-left: 2px solid ${accent || theme.colors.primary};
       background: ${Color(accent).mix(Color('white'), 0.9).hex()};
+    `}
+
+    ${variant && variant === 'gray' && css`
+      background: ${theme.colors.gray[50]};
+
+      ${Text} {
+        font-weight: 500;
+        color: ${theme.colors.gray[600]};
+        font-size: 0.8rem;
+      }
+
+      ${SelectContainer} {
+        .select__control {
+          border-color: ${theme.colors.gray[200]};
+        }
+
+        .select__menu {
+          background: white;
+        }
+      }
     `}
   `}
 `;

@@ -152,7 +152,11 @@ const NodePicker = ({ onChange, onClose, items }: any) => {
     <UI.List maxWidth={300}>
       <CloseButton onClose={onClose} />
       <UI.ListHeader>Call to action</UI.ListHeader>
-      <UI.ListItem hasNoSelect width="100%">
+      <UI.ListItem
+        variant="gray"
+        hasNoSelect
+        width="100%"
+      >
         <UI.Div width="100%">
           <UI.Div mb={2}>
             <UI.Text fontWeight="">Filter by type</UI.Text>
@@ -184,16 +188,16 @@ const NodePicker = ({ onChange, onClose, items }: any) => {
           </UI.Div>
           <UI.Div>
             <UI.Text>Search</UI.Text>
-            <Select
+            <UI.Select
               menuIsOpen
               autoFocus
-              defaultValue={{ label: 'Test2', value: 'Test2' }}
               options={filteredItems}
               onChange={onChange}
               components={{
                 Option: DropdownOption,
                 SingleValue: DropdownSingleValue,
               }}
+              classNamePrefix="select"
               styles={{
                 menu: () => ({
                   marginTop: 0
@@ -297,20 +301,20 @@ export const ChoiceNodeForm = ({ form, ctaNodes }: ChoiceNodeFormProps) => {
                                   {value}
                                 </UI.GradientButton>
                               ) : (
-                                  <UI.Button
-                                    size="sm"
-                                    variantColor={
-                                      form.errors?.optionsFull?.[index].value ? "red" : "altGray"
-                                    }
-                                    variant="outline"
-                                    onClick={onOpen}
-                                  >
-                                    <UI.Icon mr={1}>
-                                      <PlusCircle />
-                                    </UI.Icon>
+                                <UI.Button
+                                  size="sm"
+                                  variantColor={
+                                    form.errors?.optionsFull?.[index].value ? "red" : "altGray"
+                                  }
+                                  variant="outline"
+                                  onClick={onOpen}
+                                >
+                                  <UI.Icon mr={1}>
+                                    <PlusCircle />
+                                  </UI.Icon>
                               Set your choice
-                                  </UI.Button>
-                                )}
+                                </UI.Button>
+                              )}
                             </>
                           )}
                         </Dropdown>
@@ -340,18 +344,18 @@ export const ChoiceNodeForm = ({ form, ctaNodes }: ChoiceNodeFormProps) => {
                               {value?.label ? (
                                 <NodeCell onOpen={onOpen} node={value} />
                               ) : (
-                                  <UI.Button
-                                    size="sm"
-                                    variant="outline"
-                                    onClick={onOpen}
-                                    variantColor="altGray"
-                                  >
-                                    <UI.Icon mr={1}>
-                                      <PlusCircle />
-                                    </UI.Icon>
+                                <UI.Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={onOpen}
+                                  variantColor="altGray"
+                                >
+                                  <UI.Icon mr={1}>
+                                    <PlusCircle />
+                                  </UI.Icon>
                               Add Call-to-Action
-                                  </UI.Button>
-                                )}
+                                </UI.Button>
+                              )}
                             </UI.Div>
                           )}
                         </Dropdown>
@@ -402,15 +406,15 @@ export const ChoiceNodeForm = ({ form, ctaNodes }: ChoiceNodeFormProps) => {
               </UI.Div>
             </>
           ) : (
-              <UI.IllustrationCard isFlat svg={<EmptyIll />} text={t('no_choices')}>
-                <UI.Button variantColor="gray" onClick={handleNewChoice}>
-                  <UI.Icon mr={1}>
-                    <PlusCircle />
-                  </UI.Icon>
+            <UI.IllustrationCard isFlat svg={<EmptyIll />} text={t('no_choices')}>
+              <UI.Button variantColor="gray" onClick={handleNewChoice}>
+                <UI.Icon mr={1}>
+                  <PlusCircle />
+                </UI.Icon>
               Add choice
             </UI.Button>
-              </UI.IllustrationCard>
-            )}
+            </UI.IllustrationCard>
+          )}
 
         </UI.Div>
       </UI.Flex>
