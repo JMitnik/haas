@@ -82,14 +82,13 @@ const schema = yup.object().shape({
     then: yup.string().required(),
     otherwise: yup.string().notRequired(),
   }),
-  // options: yup.array().of(yup.string().min(1)).when(['questionType'], {
-  //   is: (questionType: string) => isChoiceType(questionType),
-  //   then: yup.array(yup.string().min(1)).min(1).required(),
-  //   otherwise: yup.array(yup.string()).notRequired(),
-  // }),
-  optionsFull: yup.array().min(1).of(yup.object({
-    value: yup.string().required('form.value_required')
-  })),
+  optionsFull: yup.array().when(['questionType'], {
+    is: (questionType: string) => isChoiceType(questionType),
+    then: yup.array().min(1).of(yup.object({
+      value: yup.string().required('form.value_required')
+    })),
+    otherwise: yup.array().notRequired(),
+  }),
 });
 
 interface QuestionEntryFormProps {
@@ -365,29 +364,6 @@ const DialogueBuilderQuestionForm = ({
     });
   }, 250), []);
 
-  const handleOptionChange = useCallback(debounce((value: any, optionIndex: number) => {
-    setActiveOptions((prevOptions) => {
-      prevOptions[optionIndex].value = value;
-      return [...prevOptions];
-    });
-  }, 250), []);
-
-  const deleteOption = (event: any, optionIndex: number) => {
-    setActiveOptions((prevOptions) => {
-      prevOptions.splice(optionIndex, 1);
-      return [...prevOptions];
-    });
-  };
-
-  const addNewOption = () => {
-    setActiveOptions((prevOptions) => {
-      const value = '';
-      const publicValue = '';
-      const newActiveOptions = [...prevOptions, { value, publicValue }];
-      return newActiveOptions;
-    });
-  };
-
   const onSubmit = (formData: FormDataProps) => {
     const { title } = formData;
     const type = activeQuestionType?.value;
@@ -400,7 +376,6 @@ const DialogueBuilderQuestionForm = ({
 
     if (question.id !== '-1') {
       const values = form.getValues();
-      console.log(values);
       updateQuestion({
         variables: {
           input: {

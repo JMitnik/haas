@@ -1,6 +1,6 @@
 import * as UI from '@haas/ui';
 import React, { useState, useEffect } from "react";
-import Select, { components } from 'react-select';
+import { components } from 'react-select';
 import { useTranslation } from 'react-i18next';
 
 import { QuestionNodeTypeEnum } from 'types/generated-types';
