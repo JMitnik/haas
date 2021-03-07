@@ -183,8 +183,6 @@ const DialogueBuilderQuestionForm = ({
   const toast = useToast();
   const [activeQuestionType, setActiveQuestionType] = useState(type);
 
-  const [activeOptions, setActiveOptions] = useState(options);
-
   const matchValue = condition?.matchValue ? { label: condition.matchValue, value: condition.matchValue } : null;
   const [activeMatchValue, setActiveMatchValue] = useState<null | { label: string, value: string }>(matchValue);
   const [activeLeaf, setActiveLeaf] = useState({ label: overrideLeaf?.title, value: overrideLeaf?.id });
@@ -368,14 +366,13 @@ const DialogueBuilderQuestionForm = ({
     const { title } = formData;
     const type = activeQuestionType?.value;
     const overrideLeafId = activeLeaf?.value;
-    const options = { options: activeOptions };
     const edgeCondition = activeCondition;
     const sliderNodeData = formData.sliderNode || sliderNode;
 
     const isSlider = activeQuestionType?.value === 'SLIDER' && sliderNodeData;
+    const values = form.getValues();
 
     if (question.id !== '-1') {
-      const values = form.getValues();
       updateQuestion({
         variables: {
           input: {
@@ -417,7 +414,14 @@ const DialogueBuilderQuestionForm = ({
             type,
             overrideLeafId: overrideLeafId || 'None',
             parentQuestionId,
-            optionEntries: options,
+            optionEntries: {
+              options: values.optionsFull?.map(option => ({
+                id: option?.id,
+                value: option?.value,
+                publicValue: option?.value,
+                overrideLeafId: option?.overrideLeaf?.value
+              }))
+            },
             edgeCondition,
             sliderNode: isSlider ? {
               id: sliderNodeData.id,
