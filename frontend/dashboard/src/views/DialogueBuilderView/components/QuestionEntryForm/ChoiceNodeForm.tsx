@@ -2,18 +2,12 @@ import * as UI from '@haas/ui';
 import Dropdown from 'components/Dropdown';
 import React from 'react'
 import { PlusCircle, ArrowUp, ArrowDown, Trash } from 'react-feather';
-import { ReactComponent as CloseIcon } from 'assets/icons/icon-close.svg';
 import { ReactComponent as EmptyIll } from 'assets/images/empty.svg';
 import { Controller, useFieldArray, UseFormMethods } from 'react-hook-form';
 import { useTranslation } from 'react-i18next/';
-import Select, { components } from 'react-select';
-import styled from 'styled-components';
-import { useState } from 'react';
 import { CTANode } from 'views/DialogueBuilderView/DialogueBuilderInterfaces';
-import { MapNodeToProperties } from 'components/MapNodeToProperties';
-import { QuestionNodeTypeEnum } from 'types/generated-types';
-import { useEffect } from 'react';
-import { NodeCellContainer } from 'views/DialogueBuilderView/DialogueBuilderStyles';
+import { NodePicker } from 'components/NodePicker';
+import { NodeCell } from 'components/NodeCell';
 
 export interface ChoiceProps {
   id: string;
@@ -21,111 +15,13 @@ export interface ChoiceProps {
   overrideLeafId: string;
 }
 
-export interface ChoiceNodeFormProps {
-  choices: ChoiceProps[];
-  ctaNodes: CTANode[];
-  form: UseFormMethods<any>;
-}
-
-const CloseButtonContainer = styled.button.attrs({ type: 'button' })`
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  width: 1rem;
-  height: 1rem;
-`;
-
-const CloseButton = ({ onClose }: any) => (
-  <CloseButtonContainer onClick={onClose}>
-    <CloseIcon />
-  </CloseButtonContainer>
-)
-
-const NodeCell = ({ node, onOpen }: { node: any, onOpen?: () => void }) => {
-  if (!node.type) return null;
-
-  const nodeProps = MapNodeToProperties(node.type);
-
-  return (
-    <NodeCellContainer onClick={onOpen} style={{ padding: '8px 12px', width: "100%" }}>
-      <UI.Flex width="100%">
-        <UI.Icon
-          bg={nodeProps.bg}
-          color={nodeProps.color}
-          height="2rem"
-          width="2rem"
-          stroke={nodeProps.stroke || undefined}
-          style={{ flexShrink: 0 }}
-          mr={3}
-        >
-          <nodeProps.icon />
-        </UI.Icon>
-        <UI.Div>
-          <UI.Text>
-            {node.label}
-          </UI.Text>
-          <UI.MicroLabel bg={nodeProps.bg} color={nodeProps.color !== 'transparent' ? nodeProps.color : nodeProps.stroke}>
-            {node.type}
-          </UI.MicroLabel>
-        </UI.Div>
-      </UI.Flex>
-    </NodeCellContainer>
-  )
-}
-
-const DropdownOption = (props: any) => {
-  const nodeProps = MapNodeToProperties(props.data.type);
-
-  return (
-    <NodeCellContainer>
-      <components.Option {...props}>
-        <UI.Flex>
-          <UI.Icon
-            bg={nodeProps.bg}
-            color={nodeProps.color}
-            height="2rem"
-            width="2rem"
-            stroke={nodeProps.stroke || undefined}
-            style={{ flexShrink: 0 }}
-            mr={3}
-          >
-            <nodeProps.icon />
-          </UI.Icon>
-          <UI.Div>
-            <UI.Text>
-              {props.label}
-            </UI.Text>
-            <UI.MicroLabel bg={nodeProps.bg} color={nodeProps.color !== 'transparent' ? nodeProps.color : nodeProps.stroke}>
-              {props.data.type}
-            </UI.MicroLabel>
-          </UI.Div>
-        </UI.Flex>
-      </components.Option>
-    </NodeCellContainer>
-  );
-};
-
-const DropdownSingleValue = (props: any) => {
-  // const nodeProps = MapNodeToProperties(props.data.type);
-
-  return (
-    <components.SingleValue {...props}>
-      <UI.Flex>
-        <UI.Span color="gray.300">
-          {props?.data?.label}
-        </UI.Span>
-      </UI.Flex>
-    </components.SingleValue>
-  )
-};
-
 const ChoiceDropdown = ({ onChange, onClose, value }: any) => {
   const { t } = useTranslation();
 
   return (
     <UI.List maxWidth={400}>
-      <UI.ListHeader>Choice</UI.ListHeader>
-      <CloseButton onClose={onClose} />
+      <UI.ListHeader>{t('choice')}</UI.ListHeader>
+      <UI.CloseButton onClose={onClose} />
       <UI.ListItem hasNoSelect width="100%">
         <UI.FormControl width="100%" isRequired>
           <UI.FormLabel htmlFor="value">{t('choice')}</UI.FormLabel>
@@ -136,84 +32,10 @@ const ChoiceDropdown = ({ onChange, onClose, value }: any) => {
   );
 }
 
-const NodePicker = ({ onChange, onClose, items }: any) => {
-  const [filteredState, setFilteredState] = useState<QuestionNodeTypeEnum | null>(null);
-  const [filteredItems, setFilteredItems] = useState(items);
-
-  useEffect(() => {
-    if (!filteredState) {
-      setFilteredItems(items);
-    } else {
-      setFilteredItems(items.filter((item: any) => item.type === filteredState));
-    }
-  }, [filteredState, setFilteredItems, items]);
-
-  return (
-    <UI.List maxWidth={300}>
-      <CloseButton onClose={onClose} />
-      <UI.ListHeader>Call to action</UI.ListHeader>
-      <UI.ListItem
-        variant="gray"
-        hasNoSelect
-        width="100%"
-      >
-        <UI.Div width="100%">
-          <UI.Div mb={2}>
-            <UI.Text fontWeight="">Filter by type</UI.Text>
-            <UI.Switch>
-              <UI.SwitchItem
-                isActive={!filteredState}
-                onClick={() => setFilteredState(null)}>
-                All
-              </UI.SwitchItem>
-              <UI.SwitchItem
-                isActive={filteredState === QuestionNodeTypeEnum.Link}
-                onClick={() => setFilteredState(QuestionNodeTypeEnum.Link)}
-              >
-                Link
-              </UI.SwitchItem>
-              <UI.SwitchItem
-                isActive={filteredState === QuestionNodeTypeEnum.Share}
-                onClick={() => setFilteredState(QuestionNodeTypeEnum.Share)}
-              >
-                Share
-              </UI.SwitchItem>
-              <UI.SwitchItem
-                isActive={filteredState === QuestionNodeTypeEnum.Form}
-                onClick={() => setFilteredState(QuestionNodeTypeEnum.Form)}
-              >
-                Form
-              </UI.SwitchItem>
-            </UI.Switch>
-          </UI.Div>
-          <UI.Div>
-            <UI.Text>Search</UI.Text>
-            <UI.Select
-              menuIsOpen
-              autoFocus
-              options={filteredItems}
-              onChange={onChange}
-              components={{
-                Option: DropdownOption,
-                SingleValue: DropdownSingleValue,
-              }}
-              classNamePrefix="select"
-              styles={{
-                menu: () => ({
-                  marginTop: 0
-                }),
-                control: (provided) => ({
-                  ...provided,
-                  borderWidth: 1,
-                })
-              }}
-            />
-          </UI.Div>
-        </UI.Div>
-      </UI.ListItem>
-    </UI.List>
-  )
-};
+export interface ChoiceNodeFormProps {
+  ctaNodes: CTANode[];
+  form: UseFormMethods<any>;
+}
 
 export const ChoiceNodeForm = ({ form, ctaNodes }: ChoiceNodeFormProps) => {
   const { t } = useTranslation();
@@ -230,7 +52,7 @@ export const ChoiceNodeForm = ({ form, ctaNodes }: ChoiceNodeFormProps) => {
     type: ctaNode.type
   }));
 
-  const handleNewChoice = () => {
+  const handleAddNewChoice = () => {
     choicesForm.append({
       value: '',
       overrideLeaf: null
@@ -239,16 +61,12 @@ export const ChoiceNodeForm = ({ form, ctaNodes }: ChoiceNodeFormProps) => {
 
   return (
     <UI.Div>
-      {/* TODO: Any generic helper with this? */}
-      {/* {!choices.length && !form.errors.options && (
-        <UI.Muted>{t('dialogue:add_option_reminder')}</UI.Muted>
-      )}
-
-      {!choices.length && form.errors.options && (
-        <UI.Muted color="red">{t('dialogue:empty_option_reminder')}</UI.Muted>
-      )} */}
-
+      <UI.InputHeader>{t('dialogue:choices')}</UI.InputHeader>
+      <UI.InputHelper>
+        {t('dialogue:choices_helper')}
+      </UI.InputHelper>
       <UI.Flex>
+        {/* TODO: Make a theme out of it */}
         <UI.Div
           width="100%"
           backgroundColor="#fbfcff"
@@ -262,11 +80,11 @@ export const ChoiceNodeForm = ({ form, ctaNodes }: ChoiceNodeFormProps) => {
                 <UI.FormControl isRequired>
                   <UI.FormLabel display="flex">
                     <UI.Helper>
-                      Choice
-                </UI.Helper>
+                      {t('choice')}
+                    </UI.Helper>
                   </UI.FormLabel>
                 </UI.FormControl>
-                <UI.Helper>Call to Action</UI.Helper>
+                <UI.Helper>{t('call_to_action')}</UI.Helper>
               </UI.Grid>
               {choicesForm.fields.map((choice, index) => (
                 <UI.Grid
@@ -312,7 +130,7 @@ export const ChoiceNodeForm = ({ form, ctaNodes }: ChoiceNodeFormProps) => {
                                   <UI.Icon mr={1}>
                                     <PlusCircle />
                                   </UI.Icon>
-                              Set your choice
+                                  {t('set_your_choice')}
                                 </UI.Button>
                               )}
                             </>
@@ -342,7 +160,7 @@ export const ChoiceNodeForm = ({ form, ctaNodes }: ChoiceNodeFormProps) => {
                               alignItems="center"
                             >
                               {value?.label ? (
-                                <NodeCell onOpen={onOpen} node={value} />
+                                <NodeCell onClick={onOpen} node={value} />
                               ) : (
                                 <UI.Button
                                   size="sm"
@@ -353,7 +171,7 @@ export const ChoiceNodeForm = ({ form, ctaNodes }: ChoiceNodeFormProps) => {
                                   <UI.Icon mr={1}>
                                     <PlusCircle />
                                   </UI.Icon>
-                              Add Call-to-Action
+                                  {t('add_call_to_action')}
                                 </UI.Button>
                               )}
                             </UI.Div>
@@ -397,25 +215,24 @@ export const ChoiceNodeForm = ({ form, ctaNodes }: ChoiceNodeFormProps) => {
                 </UI.Grid>
               ))}
               <UI.Div mt={4}>
-                <UI.Button variantColor="gray" onClick={handleNewChoice}>
+                <UI.Button variantColor="gray" onClick={handleAddNewChoice}>
                   <UI.Icon mr={1}>
                     <PlusCircle />
                   </UI.Icon>
-              Add choice
-            </UI.Button>
+                  {t('add_choice')}
+                </UI.Button>
               </UI.Div>
             </>
           ) : (
             <UI.IllustrationCard isFlat svg={<EmptyIll />} text={t('no_choices')}>
-              <UI.Button variantColor="gray" onClick={handleNewChoice}>
+              <UI.Button variantColor="gray" onClick={handleAddNewChoice}>
                 <UI.Icon mr={1}>
                   <PlusCircle />
                 </UI.Icon>
-              Add choice
-            </UI.Button>
+                {t('add_choice')}
+              </UI.Button>
             </UI.IllustrationCard>
           )}
-
         </UI.Div>
       </UI.Flex>
     </UI.Div>

@@ -557,7 +557,7 @@ const DialogueBuilderQuestionForm = ({
                 <Div>
                   <InputGrid>
                     <FormControl isRequired isInvalid={!!form.errors.matchText}>
-                      <FormLabel htmlFor="matchText">{t('dialogue:match_value')}</FormLabel>
+                      <FormLabel htmlFor="matchText">{t('match_value')}</FormLabel>
                       <InputHelper>What is the multi-choice question to trigger this question?</InputHelper>
 
                       <Controller
@@ -674,15 +674,14 @@ const DialogueBuilderQuestionForm = ({
               <UI.Hr />
               <UI.FormSection>
                 <UI.Div>
-                  <UI.FormSectionHeader>{t('dialogue:about_slider')}</UI.FormSectionHeader>
+                  <UI.FormSectionHeader>{t('dialogue:about_choice')}</UI.FormSectionHeader>
                   <UI.FormSectionHelper>
-                    {t('dialogue:about_slider_helper')}
+                    {t('dialogue:about_choice_helper')}
                   </UI.FormSectionHelper>
                 </UI.Div>
                 <ChoiceNodeForm
-                  ctaNodes={ctaNodes}
-                  choices={[]}
                   form={form}
+                  ctaNodes={ctaNodes}
                 />
               </UI.FormSection>
             </>
