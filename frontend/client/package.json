@@ -32,7 +32,6 @@
     "mobx-devtools-mst": "^0.9.22",
     "mobx-react-lite": "^2.0.7",
     "mobx-state-tree": "^3.16.0",
-    "msw": "^0.21.3",
     "mutationobserver-shim": "^0.3.5",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
@@ -61,10 +60,12 @@
     }
   },
   "devDependencies": {
+    "@4tw/cypress-drag-drop": "^1.6.0",
     "@graphql-codegen/cli": "^1.17.3",
     "@graphql-codegen/typescript-operations": "^1.17.13",
     "@graphql-codegen/typescript-react-apollo": "^2.2.1",
     "@hookform/devtools": "^2.0.3",
+    "@testing-library/cypress": "^7.0.4",
     "@types/js-yaml": "^3.12.5",
     "@types/mobx-devtools-mst": "0.9.0",
     "@types/react-helmet": "^6.1.0",
@@ -79,16 +80,19 @@
     "eslint-plugin-react-hooks": "^2.3.0",
     "jest-canvas-mock": "^2.2.0",
     "mobx-devtools-mst": "^0.9.22",
+    "msw": "^0.27.0",
     "react-app-rewire-yaml": "^1.1.0",
-    "react-hook-form-devtools": "^1.1.1"
+    "react-hook-form-devtools": "^1.1.1",
+    "uws": "^200.0.0"
   },
   "scripts": {
     "start": "cra-workspaces start",
+    "start:test": "(export REACT_APP_ENV=test && cra-workspaces start)",
     "dev": "cra-workspaces start",
     "start:https": "HTTPS=true SSL_CERT_FILE=secrets/server.cert SSL_KEY_FILE=server.key cra-workspaces start",
     "build": "cra-workspaces build",
     "test": "react-scripts test",
-    "cypress": "(export NODE_ENV=test && cypress open)",
+    "test:cypress": "(DEBUG=cypress:* && cypress open)",
     "eject": "react-scripts eject",
     "gen": "graphql-codegen"
   },
@@ -103,5 +107,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "msw": {
+    "workerDirectory": "public"
   }
 }
