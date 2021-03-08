@@ -95,12 +95,10 @@ class AutodeckService {
   };
 
   static confirmWorkspaceJob = async (input: NexusGenInputs['GenerateAutodeckInput']) => {
-    // TODO: CSV needs to be edited based on the csv_to_env properties
     const csvData = { 'colour-0': input.primaryColour };
     const csv = papaparse.unparse([csvData]);
     const csvPath = `${input.id}/dominant_colours.csv`;
     await AutodeckService.uploadDataToS3('haas-autodeck-logos', csvPath, csv, 'text/csv')
-    // }
 
     const updatedWorkspaceJob = await prisma.createWorkspaceJob.upsert({
       where: {
@@ -120,7 +118,6 @@ class AutodeckService {
       }
     })
 
-    //TODO: create .env/CSV file
     const pitchdeckData = { 
       companyName: input.companyName || 'Company X',
       firstName: input.firstName || 'Mike',
@@ -294,7 +291,6 @@ class AutodeckService {
   }
 
   static getPreviewData = async (id: string) => {
-    // Download colour CSV from S3
     const S3_BUCKET_PREFIX = `https://haas-autodeck-logos.s3.eu-central-1.amazonaws.com/${id}`;
 
     const params = {
@@ -302,7 +298,6 @@ class AutodeckService {
       Prefix: `${id}/`
     };
 
-    // FIXME: use different search query then 'rembg' as it finds inverse_rembg
     const logoKey = await new Promise((resolve, reject) => {
       s3.listObjectsV2(params, (err, data) => {
         if (err) return reject(err);
@@ -332,7 +327,7 @@ class AutodeckService {
     const csvUrl = `${S3_BUCKET_PREFIX}/dominant_colours.csv`;
 
     const dominantColorsCSV = await request(csvUrl)
-      .pipe(new StringStream())                       // pass to stream
+      .pipe(new StringStream())
       .CSVParse({ delimiter: ',' })
       .toArray()
       .catch((err) => {

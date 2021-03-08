@@ -1,15 +1,10 @@
 
 import { enumType, inputObjectType, mutationField, objectType, queryField } from '@nexus/schema';
-import AWS from 'aws-sdk';
 
-import AutodeckService, { CreateWorkspaceJobProps } from './AutodeckService';
+import AutodeckService from './AutodeckService';
 import { PaginationWhereInput } from '../general/Pagination';
 import { NexusGenFieldTypes } from '../../generated/nexus';
 import { Upload } from '../customer/Customer';
-import config from '../../config/config';
-import { resolve } from 'path';
-
-const s3 = new AWS.S3({ accessKeyId: config.awsAccessKeyId, secretAccessKey: config.awsSecretAccessKey });
 
 export const CloudReferenceType = enumType({
   name: 'CloudReferenceType',
@@ -168,7 +163,6 @@ export const GetJobQuery = queryField('getJob', {
     });
 
     return job ? job as any : null;
-    // return null;
   },
 });
 
