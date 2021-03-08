@@ -3,6 +3,7 @@ import React from 'react';
 import { Text } from './Type';
 import Card from './Cards';
 import { Span } from './Span';
+import { CloseIcon } from './assets/icon-close';
 
 const IllustrationCardWrapper = styled.div`
   ${({ theme }) => css`
@@ -33,7 +34,7 @@ const IllustrationCardWrapper = styled.div`
   `}
 `;
 
-export const IllustrationCard = ({svg, text, children, isFlat}: { svg: any, text: string, children?: React.ReactNode, isFlat?: boolean; }) => {
+export const IllustrationCard = ({ svg, text, children, isFlat }: { svg: any, text: string, children?: React.ReactNode, isFlat?: boolean; }) => {
   return (
     <Card noHover isFlat={isFlat}>
       <IllustrationCardWrapper>
@@ -53,3 +54,18 @@ export const Hr = styled.hr`
     padding: ${theme.gutter / 2}px 0;
   `}
 `;
+
+
+const CloseButtonContainer = styled.button.attrs({ type: 'button' })`
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 1rem;
+  height: 1rem;
+`;
+
+export const CloseButton = ({ onClose }: any) => (
+  <CloseButtonContainer onClick={onClose}>
+    <CloseIcon />
+  </CloseButtonContainer>
+);

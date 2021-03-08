@@ -22,5 +22,8 @@ fragment QuestionFragment on QuestionNode {
     id
     value
     publicValue
+    overrideLeaf {
+      id
+    }
   }
 }

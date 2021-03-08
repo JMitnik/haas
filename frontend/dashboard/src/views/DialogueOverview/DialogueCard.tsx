@@ -1,4 +1,5 @@
-import { Edit, MapPin, Trash, User } from 'react-feather';
+import * as UI from '@haas/ui';
+import { MapPin, User } from 'react-feather';
 import { formatDistance } from 'date-fns';
 
 import { useHistory, useParams } from 'react-router';
@@ -13,8 +14,6 @@ import {
 import { Card, CardBody, ColumnFlex, Div, ExtLink, Flex, Paragraph, Text } from '@haas/ui';
 import { deleteDialogueMutation } from 'mutations/deleteDialogue';
 import { useTranslation } from 'react-i18next';
-import List from 'components/List/List';
-import ListItem from 'components/List/ListItem';
 import ShowMoreButton from 'components/ShowMoreButton';
 import SliderNodeIcon from 'components/Icons/SliderNodeIcon';
 import getDialoguesOfCustomer from 'queries/getDialoguesOfCustomer';
@@ -30,14 +29,15 @@ const DialogueCardOptionsOverlay = ({ onDelete, onEdit }: DialogueCardOptionsOve
   const { t } = useTranslation();
 
   return (
-    <List>
+    <UI.List>
+      <UI.ListHeader>{t('edit_dialogue')}</UI.ListHeader>
       <Popover>
         {() => (
           <>
             <PopoverTrigger>
-              <ListItem renderLeftIcon={<Trash />}>
+              <UI.ListItem>
                 {t('delete')}
-              </ListItem>
+              </UI.ListItem>
             </PopoverTrigger>
             <PopoverContent zIndex={4}>
               <PopoverArrow />
@@ -58,10 +58,10 @@ const DialogueCardOptionsOverlay = ({ onDelete, onEdit }: DialogueCardOptionsOve
           </>
         )}
       </Popover>
-      <ListItem renderLeftIcon={<Edit />} onClick={onEdit}>
+      <UI.ListItem onClick={onEdit}>
         {t('edit')}
-      </ListItem>
-    </List>
+      </UI.ListItem>
+    </UI.List>
   );
 };
 
@@ -168,16 +168,18 @@ const DialogueCard = ({ dialogue, isCompact }: { dialogue: any, isCompact?: bool
                   </Text>
                 )}
               </Div>
-              {canAccessAdmin && (
-                <ShowMoreButton
-                  renderMenu={(
-                    <DialogueCardOptionsOverlay
-                      onDelete={handleDeleteDialogue}
-                      onEdit={goToEditDialogue}
-                    />
-                  )}
-                />
-              )}
+              <Div>
+                {canAccessAdmin && (
+                  <ShowMoreButton
+                    renderMenu={(
+                      <DialogueCardOptionsOverlay
+                        onDelete={handleDeleteDialogue}
+                        onEdit={goToEditDialogue}
+                      />
+                    )}
+                  />
+                )}
+              </Div>
             </Flex>
           </Div>
         </ColumnFlex>

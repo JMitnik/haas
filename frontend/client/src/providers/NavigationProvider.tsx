@@ -11,6 +11,7 @@ export const useNavigator = () => {
 
   const routes = {
     start: `/${store.customer?.slug}/${store.tree?.slug}`,
+    // BUG: This does not get updated in the right order.
     activeLeaf: `/${store.customer?.slug}/${store.tree?.slug}/n/${store.tree?.activeLeaf?.id}`,
   };
 
@@ -22,7 +23,7 @@ export const useNavigator = () => {
   };
 
   const goToActiveLeaf = () => history.push({
-    pathname: routes.activeLeaf,
+    pathname: `/${store.customer?.slug}/${store.tree?.slug}/n/${store.tree?.activeLeaf?.id}`,
     search: location.search
   });
 

@@ -41,6 +41,9 @@ export const QuestionFragment = gql`
       id
       value
       publicValue
+      overrideLeaf {
+        id
+      }
     }
   }
 

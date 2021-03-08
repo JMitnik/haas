@@ -1,6 +1,7 @@
 import { Instance, types } from 'mobx-state-tree';
 import { SpecialEdge, TreeNodeModel, TreeNodeProps, createDefaultPostLeafNode } from './TreeNodeModel';
 import { TreeEdgeModel, TreeEdgeProps } from './TreeEdgeModel';
+import { TreeNodeOptionProps } from './TreeNodeOptionModel';
 
 const TreeModel = types
   .model({
@@ -24,7 +25,12 @@ const TreeModel = types
         title: node.title,
         children: node.children.map((edge) => edge.id),
         type: node.type,
-        options: node.options,
+        options: node.options.map(option => ({
+          id: option.id,
+          value: option.value,
+          publicValue: option.publicValue,
+          overrideLeaf: option.overrideLeaf?.id
+        })),
         overrideLeaf: node.overrideLeaf?.id,
         sliderNode: node.sliderNode,
       }));
@@ -102,7 +108,7 @@ const TreeModel = types
     },
 
     /**
-     * Sets the current active leaf on the tree
+     * Sets the current active leaf on the tree.
      * @param node
      */
     setActiveLeafFromNode(node: TreeNodeProps): void {
@@ -110,6 +116,22 @@ const TreeModel = types
         self.activeLeaf = node.overrideLeaf;
       }
     },
+
+    /**
+     * Sets the current active leaf on the tree based on a choice selected.
+     */
+    setActiveLeafFromChoice(choice: TreeNodeOptionProps): void {
+      if (choice.overrideLeaf) {
+        self.activeLeaf = choice.overrideLeaf;
+      }
+    },
+
+    /**
+     * Sets the current active leaf.
+     */
+    setOverrideLeaf(overrideLeaf: TreeNodeProps): void {
+      self.activeLeaf = overrideLeaf;
+    }
   }))
   .views((self) => ({
     get rootNode(): TreeNodeProps {

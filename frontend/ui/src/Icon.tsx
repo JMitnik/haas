@@ -6,9 +6,19 @@ import {
   space, SpaceProps } from 'styled-system';
 import { Span } from '.';
 
-interface IconProps extends LayoutProps, TypographyProps, ColorProps, SpaceProps {}
+interface IconProps extends LayoutProps, TypographyProps, ColorProps, SpaceProps {
+  stroke?: string;
+}
 
 export const Icon = styled.span<IconProps>`
+  ${({ theme, stroke }) => css`
+    ${stroke && css`
+      svg {
+        stroke: ${stroke};
+      }
+    `}
+  `}
+  
   ${color}
   ${typography}
   ${layout}

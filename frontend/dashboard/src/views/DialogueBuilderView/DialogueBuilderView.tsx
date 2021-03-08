@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 
 import { DialogueBuilderContainer } from './DialogueBuilderStyles';
-import { QuestionEntryProps } from './DialogueBuilderInterfaces';
+import { CTANode, QuestionEntryProps } from './DialogueBuilderInterfaces';
 import QuestionSection from './components/QuestionSection';
 
 interface QuestionEntryExtendedProps extends QuestionEntryProps {
@@ -14,11 +14,12 @@ interface QuestionEntryExtendedProps extends QuestionEntryProps {
 interface DialogueBuilderViewProps {
   nodes: Array<QuestionEntryExtendedProps>;
   root: QuestionEntryExtendedProps | undefined;
+  ctaNodes: CTANode[];
   selectLeafs: Array<{label: string | undefined, value: string}>;
   dialogueId: string;
 }
 
-const DialogueBuilderView = ({ nodes, selectLeafs, root }: DialogueBuilderViewProps) => {
+const DialogueBuilderView = ({ nodes, selectLeafs, ctaNodes, root }: DialogueBuilderViewProps) => {
   const [activeQuestion, setActiveQuestion] = useState<null | string>(null);
 
   const { t } = useTranslation();
@@ -52,6 +53,7 @@ const DialogueBuilderView = ({ nodes, selectLeafs, root }: DialogueBuilderViewPr
           question={root}
           Icon={root.icon}
           leafs={selectLeafs}
+          ctaNodes={ctaNodes}
         />
         )}
       </ColumnFlex>

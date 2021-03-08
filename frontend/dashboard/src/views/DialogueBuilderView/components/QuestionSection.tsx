@@ -6,7 +6,7 @@ import SplitArrowIcon from 'components/Icons/SplitIcon';
 
 import { useTranslation } from 'react-i18next';
 import { AddQuestionContainer, DepthSpan } from './QuestionEntry/QuestionEntryStyles';
-import { EdgeConditonProps, QuestionEntryProps, QuestionOptionProps } from '../DialogueBuilderInterfaces';
+import { CTANode, EdgeConditionProps, QuestionEntryProps, QuestionOptionProps } from '../DialogueBuilderInterfaces';
 import QuestionEntry from './QuestionEntry/QuestionEntry';
 
 interface QuestionSectionProps {
@@ -15,6 +15,7 @@ interface QuestionSectionProps {
   questionsQ: Array<QuestionEntryProps>;
   question: QuestionEntryProps;
   leafs: any;
+  ctaNodes: CTANode[];
   index: number;
   Icon: (props: any) => JSX.Element;
   activeQuestion: string | null;
@@ -22,7 +23,7 @@ interface QuestionSectionProps {
   onDeleteQuestion?: (event: any, questionId: string) => void;
   onActiveQuestionChange: React.Dispatch<React.SetStateAction<string | null>>;
   depth: number;
-  condition: EdgeConditonProps | undefined;
+  condition: EdgeConditionProps | undefined;
   edgeId: string | undefined;
 }
 
@@ -35,6 +36,7 @@ const QuestionSection = ({
   questionsQ,
   question,
   leafs,
+  ctaNodes,
   Icon,
   depth,
   condition,
@@ -99,6 +101,7 @@ const QuestionSection = ({
         question={question}
         Icon={Icon}
         leafs={leafs}
+        ctaNodes={ctaNodes}
       />
 
       {isQuestionExpanded && children.map(
@@ -113,6 +116,7 @@ const QuestionSection = ({
             activeQuestion={activeQuestion}
             index={index}
             leafs={leafs}
+            ctaNodes={ctaNodes}
             onActiveQuestionChange={onActiveQuestionChange}
             question={child}
             questionsQ={questionsQ}
@@ -158,6 +162,7 @@ const QuestionSection = ({
             }}
             Icon={Icon}
             leafs={leafs}
+            ctaNodes={ctaNodes}
           />
         </Div>
       )}

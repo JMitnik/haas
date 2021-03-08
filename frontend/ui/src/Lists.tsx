@@ -3,7 +3,9 @@ import Color from 'color';
 import { ChevronRight } from 'react-feather';
 import styled, { css } from 'styled-components';
 
-import { Div } from '.';
+import { ReactComponent as CloseIcon } from './assets/icon-close.svg';
+import { Div, SelectContainer } from '.';
+
 import { Span } from './Span';
 import { Text } from './Type';
 
@@ -16,6 +18,14 @@ export const List = styled(Div)`
 
 export const ListHeader = styled(Text)`
   ${({ theme }) => css`
+    color: ${theme.colors.gray[600]};
+    font-weight: 700;
+    line-height: 1rem;
+    padding: ${theme.gutter / 2}px;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid ${theme.colors.gray[200]};
   `}
 `;
 
@@ -29,28 +39,55 @@ export const ListGroupHeader = styled(Text)`
   `}
 `;
 
+type ListItemVariant = 'gray';
+
 interface ListItemProps {
   isSelected?: boolean;
   accent?: string;
+  hasNoSelect?: boolean;
+  variant?: ListItemVariant;
 }
 
-export const ListItem = styled(Div)<ListItemProps>`
-  ${({ theme, isSelected, accent }) => css`
+export const ListItem = styled(Div) <ListItemProps>`
+  ${({ theme, isSelected, accent, hasNoSelect, variant }) => css`
     padding: ${theme.gutter / 2}px;
     display: flex;
-    border-left: 2px solid transparent;
     transition: all .3s cubic-bezier(.55,0,.1,1);
 
-    &:hover {
-      border-left: 2px solid ${accent || theme.colors.primary};
-      background: ${Color(accent).mix(Color('white'), 0.95).hex()};
-      cursor: pointer;
-      transition: all .3s cubic-bezier(.55,0,.1,1);
-    }
+    ${!hasNoSelect && css`
+      border-left: 2px solid transparent;
+    
+      &:hover {
+        border-left: 2px solid ${accent || theme.colors.primary};
+        background: ${Color(accent).mix(Color('white'), 0.95).hex()};
+        cursor: pointer;
+        transition: all .3s cubic-bezier(.55,0,.1,1);
+      }
+    `}
 
     ${isSelected && css`
       border-left: 2px solid ${accent || theme.colors.primary};
       background: ${Color(accent).mix(Color('white'), 0.9).hex()};
+    `}
+
+    ${variant && variant === 'gray' && css`
+      background: ${theme.colors.gray[50]};
+
+      ${Text} {
+        font-weight: 500;
+        color: ${theme.colors.gray[600]};
+        font-size: 0.8rem;
+      }
+
+      ${SelectContainer} {
+        .select__control {
+          border-color: ${theme.colors.gray[200]};
+        }
+
+        .select__menu {
+          background: white;
+        }
+      }
     `}
   `}
 `;
@@ -98,3 +135,17 @@ export const ListItemCaret = () => (
     <ChevronRight />
   </ListItemCaretWrapper>
 );
+
+const CloseButtonContainer = styled.button.attrs({ type: 'button' })`
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 1rem;
+  height: 1rem;
+`;
+
+export const CloseButton = ({ onClose }: any) => (
+  <CloseButtonContainer onClick={onClose}>
+    <CloseIcon />
+  </CloseButtonContainer>
+)

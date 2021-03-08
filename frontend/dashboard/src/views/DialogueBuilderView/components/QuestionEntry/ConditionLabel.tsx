@@ -1,12 +1,12 @@
 import React from 'react';
 
-import { EdgeConditonProps } from 'views/DialogueBuilderView/DialogueBuilderInterfaces';
+import { EdgeConditionProps } from 'views/DialogueBuilderView/DialogueBuilderInterfaces';
 import HaasNodeIcon from 'components/Icons/HaasNodeIcon';
 
 import { ConditionContainer, ConditionSpan } from './QuestionEntryStyles';
 
 interface ConditionLabelProps {
-  condition: EdgeConditonProps | undefined;
+  condition: EdgeConditionProps | undefined;
   id: string;
   activeCTA: string | null;
 }
