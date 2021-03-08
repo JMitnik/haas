@@ -11,6 +11,7 @@ import App from './pages';
 console.log(process.env.ENV);
 
 if (process.env.REACT_APP_ENV && process.env.REACT_APP_ENV === 'test') {
+  // TODO: Figure out how to get MSW working okay
   // worker.start({
   //   waitUntilReady: true,
   //   onUnhandledRequest: 'bypass',

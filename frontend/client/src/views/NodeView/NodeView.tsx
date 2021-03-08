@@ -60,21 +60,17 @@ const NodeView = ({ node }: NodeViewProps) => {
 
     // If an override leaf is given directly, it overrules the next-node's override leaf.
     if (overrideLeaf) {
-      console.log({directOverride: overrideLeaf});
       store.tree?.setOverrideLeaf(overrideLeaf);
     }
 
-    
+
     // Use current condition to decide next Edge (or if we are at leaf, we will do something else)
     const { edgeId, goesToLeaf, goesToPostLeaf, nextNode } = node.getNextEdgeIdFromKey(edgeKey);
-    console.log({ nextNode: nextNode });
 
     if (!overrideLeaf && nextNode?.overrideLeaf) {
-      console.log({nextNodeOverride: overrideLeaf});
-
       store.tree?.setActiveLeafFromNode(nextNode);
     }
-    
+
     // If our entry is valid, and we will queue the entry (meaning, a session has been uploaded)
     if (entry) {
       queueEntry({
