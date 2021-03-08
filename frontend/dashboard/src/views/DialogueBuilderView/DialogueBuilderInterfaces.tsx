@@ -1,4 +1,13 @@
-import { QuestionNodeTypeEnum } from "types";
+enum QuestionNodeTypeEnum {
+  Generic = 'GENERIC',
+  Slider = 'SLIDER',
+  Choice = 'CHOICE',
+  Registration = 'REGISTRATION',
+  Form = 'FORM',
+  Textbox = 'TEXTBOX',
+  Link = 'LINK',
+  Share = 'SHARE'
+}
 
 export interface CTANode {
   id: string;
