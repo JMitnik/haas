@@ -43,29 +43,29 @@ interface LinkGenericInputProps {
 }
 
 const standardOptions = [{ value: 'Facilities' },
-  { value: 'Website/Mobile app' },
-  { value: 'Product/Services' },
-  { value: 'Customer Support' }];
+{ value: 'Website/Mobile app' },
+{ value: 'Product/Services' },
+{ value: 'Customer Support' }];
 
 const facilityOptions = [{ value: 'Cleanliness' },
-  { value: 'Atmosphere' },
-  { value: 'Location' },
-  { value: 'Other' }];
+{ value: 'Atmosphere' },
+{ value: 'Location' },
+{ value: 'Other' }];
 
 const websiteOptions = [{ value: 'Design' },
-  { value: 'Functionality' },
-  { value: 'Informative' },
-  { value: 'Other' }];
+{ value: 'Functionality' },
+{ value: 'Informative' },
+{ value: 'Other' }];
 
 const customerSupportOptions = [{ value: 'Friendliness' },
-  { value: 'Competence' },
-  { value: 'Speed' },
-  { value: 'Other' }];
+{ value: 'Competence' },
+{ value: 'Speed' },
+{ value: 'Other' }];
 
 const productServicesOptions = [{ value: 'Quality' },
-  { value: 'Price' },
-  { value: 'Friendliness' },
-  { value: 'Other' }];
+{ value: 'Price' },
+{ value: 'Friendliness' },
+{ value: 'Other' }];
 
 class NodeService {
   static removeNonExistingLinks = async (
@@ -310,10 +310,10 @@ class NodeService {
   });
 
   static getDeleteIDs = (
-    edges: Array<{id: string, childNodeId: string, parentNodeId: string}>,
-    questions: Array<{id: string}>, foundEdgeIds: Array<string>,
+    edges: Array<{ id: string, childNodeId: string, parentNodeId: string }>,
+    questions: Array<{ id: string }>, foundEdgeIds: Array<string>,
     foundQuestionIds: Array<string>,
-  ): {edgeIds: Array<string>, questionIds: Array<string>} => {
+  ): { edgeIds: Array<string>, questionIds: Array<string> } => {
     const newlyFoundEdgeIds: Array<string> = [];
     const newlyFoundQuestionIds: Array<string> = [];
 
@@ -410,6 +410,7 @@ class NodeService {
           create: options.map((option) => ({
             value: option.value,
             publicValue: option.publicValue,
+            overrideLeaf: option.overrideLeafId ? { connect: { id: option.overrideLeafId } } : undefined
           })),
         },
         questionDialogue: {
@@ -466,7 +467,8 @@ class NodeService {
     },
     sliderNode: NexusGenInputs['SliderNodeInputType'],
   ) => {
-    const activeQuestion = await prisma.questionNode.findOne({ where: { id: questionId },
+    const activeQuestion = await prisma.questionNode.findOne({
+      where: { id: questionId },
       include: {
         children: true,
         options: true,
@@ -480,7 +482,8 @@ class NodeService {
             id: true,
           },
         },
-      } });
+      }
+    });
 
     const dbEdge = await prisma.edge.findOne({
       where: {
@@ -586,12 +589,12 @@ class NodeService {
           create: {
             value: option.value,
             publicValue: option.publicValue,
-            overrideLeaf: option.overrideLeafId ? { connect:  {  id: option.overrideLeafId } } : undefined
+            overrideLeaf: option.overrideLeafId ? { connect: { id: option.overrideLeafId } } : undefined
           },
           update: {
             value: option.value,
             publicValue: option.publicValue,
-            overrideLeaf: option.overrideLeafId ? { connect:  {  id: option.overrideLeafId } } : undefined
+            overrideLeaf: option.overrideLeafId ? { connect: { id: option.overrideLeafId } } : undefined
           },
         },
       );
@@ -796,19 +799,19 @@ class NodeService {
 
     await EdgeService.createEdge(rootToWhatWouldYouLikeToTalkAbout,
       whatWouldYouLikeToTalkAboutToProduct, {
-        conditionType: 'match',
-        matchValue: 'Product/Services',
-        renderMin: null,
-        renderMax: null,
-      });
+      conditionType: 'match',
+      matchValue: 'Product/Services',
+      renderMin: null,
+      renderMax: null,
+    });
 
     await EdgeService.createEdge(rootToWhatWouldYouLikeToTalkAbout,
       whatWouldYouLikeToTalkAboutToCustomerSupport, {
-        conditionType: 'match',
-        matchValue: 'Customer Support',
-        renderMin: null,
-        renderMax: null,
-      });
+      conditionType: 'match',
+      matchValue: 'Customer Support',
+      renderMin: null,
+      renderMax: null,
+    });
 
     // Negative edges
     await EdgeService.createEdge(rootQuestion, rootToWeAreSorryToHearThat,
@@ -830,11 +833,11 @@ class NodeService {
 
     await EdgeService.createEdge(rootToWeAreSorryToHearThat,
       weAreSorryToHearThatToCustomerSupport, {
-        conditionType: 'match',
-        matchValue: 'Customer Support',
-        renderMax: null,
-        renderMin: null,
-      });
+      conditionType: 'match',
+      matchValue: 'Customer Support',
+      renderMax: null,
+      renderMin: null,
+    });
   };
 }
 
