@@ -11,6 +11,7 @@ import { TreeNodeOptionProps } from 'models/Tree/TreeNodeOptionModel';
 
 import { GenericNodeProps } from '../types';
 import { MultiChoiceNodeContainer, MultiChoiceNodeGrid } from './MultiChoiceNodeStyles';
+import useDialogueTree from 'providers/DialogueTreeProvider';
 
 type MultiChoiceNodeProps = GenericNodeProps;
 
@@ -38,6 +39,7 @@ const multiChoiceItemAnimation: Variants = {
 };
 
 const MultiChoiceNode = ({ node, onEntryStore }: MultiChoiceNodeProps) => {
+  const { store } = useDialogueTree();
   const handleSubmit = async (multiChoiceOption: TreeNodeOptionProps) => {
     const entry: SessionEntryDataProps = {
       choice: { value: multiChoiceOption.value },
@@ -46,7 +48,7 @@ const MultiChoiceNode = ({ node, onEntryStore }: MultiChoiceNodeProps) => {
       textbox: undefined,
     };
 
-    onEntryStore(entry, multiChoiceOption.value);
+    onEntryStore(entry, multiChoiceOption.value, multiChoiceOption.overrideLeaf);
   };
 
   return (

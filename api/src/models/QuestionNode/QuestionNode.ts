@@ -10,6 +10,7 @@ import { DialogueType } from '../questionnaire/Dialogue';
 import { EdgeType } from '../edge/Edge';
 import { SliderNode } from './SliderNode';
 import NodeService from './NodeService';
+import prisma from '../../config/prisma';
 
 export const CTAShareInputObjectType = inputObjectType({
   name: 'CTAShareInputObjectType',
@@ -39,6 +40,19 @@ export const QuestionOptionType = objectType({
     });
 
     t.string('publicValue', { nullable: true });
+
+    t.field('overrideLeaf', { 
+      type: 'QuestionNode', 
+      nullable: true,
+
+      resolve: async (parent, ctx) => {
+        if (!parent.overrideLeafId) return null;
+
+        const cta = await prisma.questionNode.findFirst({ where: { id: parent.overrideLeafId } });
+
+        return cta as any;
+      }
+    });
   },
 });
 
@@ -287,6 +301,9 @@ export const QuestionNodeType = objectType({
       resolve(parent, args, ctx) {
         const options = ctx.prisma.questionOption.findMany({
           where: { questionNodeId: parent.id },
+          include: {
+            overrideLeaf: true
+          }
         });
 
         return options;
@@ -329,6 +346,7 @@ export const OptionInputType = inputObjectType({
     t.int('id', { nullable: true });
     t.string('value');
     t.string('publicValue', { nullable: true });
+    t.string('overrideLeafId', { required: false });
   },
 });
 
@@ -418,25 +436,6 @@ export const CreateQuestionNodeInputType = inputObjectType({
   },
 });
 
-export const UpdateQuestionNodeInputType = inputObjectType({
-  name: 'UpdateQuestionNodeInputType',
-
-  definition(t) {
-    t.id('id');
-    t.id('customerId');
-    t.id('overrideLeafId');
-    t.id('edgeId');
-
-    t.string('title');
-    t.string('type');
-
-    t.field('sliderNode', { type: SliderNodeInputType });
-
-    t.field('optionEntries', { type: OptionsInputType });
-    t.field('edgeCondition', { type: EdgeConditionInputType });
-  },
-});
-
 export const DeleteNodeInputType = inputObjectType({
   name: 'DeleteNodeInputType',
   description: 'Delete Node Input type',
@@ -498,18 +497,6 @@ export const QuestionNodeMutations = extendType({
         if (!deletedDialogues) throw new Error('Unable to delete dialogue');
 
         return deletedDialogues;
-      },
-    });
-
-    t.field('updateQuestion', {
-      type: QuestionNodeType,
-      args: { input: UpdateQuestionNodeInputType },
-      // TODO: Remove the any
-      resolve(parent: any, args: any) {
-        const { id, title, type, overrideLeafId, edgeId, optionEntries: { options }, edgeCondition, sliderNode } = args?.input;
-
-        console.log(args.input);
-        return NodeService.updateQuestionFromBuilder(id, title, type, overrideLeafId, edgeId, options, edgeCondition, sliderNode);
       },
     });
 

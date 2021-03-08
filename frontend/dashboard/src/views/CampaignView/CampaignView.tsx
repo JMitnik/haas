@@ -138,18 +138,18 @@ export const CampaignView = () => {
   });
 
   // use-table-select placement
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  // const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
-  const handleSelect = (id: string) => {
-    if (selectedIds.includes(id)) {
-      console.log(selectedIds);
-      setSelectedIds(ids => ids.splice(ids.indexOf(id), 1));
-    } else {
-      setSelectedIds(ids => [...ids, id]);
-    }
-  }
+  // const handleSelect = (id: string) => {
+  //   if (selectedIds.includes(id)) {
+  //     console.log(selectedIds);
+  //     setSelectedIds(ids => ids.splice(ids.indexOf(id), 1));
+  //   } else {
+  //     setSelectedIds(ids => [...ids, id]);
+  //   }
+  // }
 
-  const isInEdit = selectedIds.length > 0;
+  // const isInEdit = selectedIds.length > 0;
 
   // use-table-select end
 
@@ -201,7 +201,12 @@ export const CampaignView = () => {
 
               <UI.TableBody>
                 {deliveryConnection?.deliveries.map(delivery => (
-                  <UI.TableRow isSelected={selectedIds.includes(delivery.id)} hasHover key={delivery.id} onClick={() => setActiveDelivery(delivery)}>
+                  <UI.TableRow
+                    // isSelected={selectedIds.includes(delivery.id)} 
+                    hasHover
+                    key={delivery.id}
+                    onClick={() => setActiveDelivery(delivery)}
+                  >
                     {/* <UI.TableCell width="1rem" center>
                       <UI.TableSelect
                         isSelected={selectedIds.includes(delivery.id)} onClick={() => handleSelect(delivery.id)}
@@ -225,13 +230,13 @@ export const CampaignView = () => {
                   </UI.TableRow>
                 ))}
 
-                {isInEdit && (
+                {/* {isInEdit && (
                   <UI.TableActionBar>
                     <UI.Div>
                       Selected {selectedIds.length} deliveries
                     </UI.Div>
                   </UI.TableActionBar>
-                )}
+                )} */}
               </UI.TableBody>
             </UI.Table>
           </UI.Div>
@@ -325,8 +330,8 @@ export const CampaignView = () => {
                           {activeDelivery.campaignVariant?.type === CampaignVariantEnum.Email ? (
                             <AtSign />
                           ) : (
-                              <Smartphone />
-                            )}
+                            <Smartphone />
+                          )}
                         </UI.Div>
                         {t('deployed_event')}
                       </UI.Flex>

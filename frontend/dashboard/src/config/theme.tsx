@@ -21,6 +21,18 @@ const theme = {
     success: '#38B2AC',
     warning: '#ECC94B',
     error: '#F56565',
+    altGray: {
+      50: '#edf2f7',
+      100: '#cedae2',
+      200: '#aec3d0',
+      300: '#8cafbf',
+      400: '#6b9dae',
+      500: '#538895',
+      600: '#416d74',
+      700: '#2f5051',
+      800: '#1c3131',
+      900: '#081211',
+    },
     default: {
       0: '#ffffff',
       50: '#f6f7f9',

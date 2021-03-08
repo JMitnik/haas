@@ -1,9 +1,10 @@
+import * as UI from '@haas/ui';
 import {
   Button, Popover, PopoverArrow, PopoverBody, PopoverCloseButton,
   PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast
 } from '@chakra-ui/core';
 import { Div, Flex, PageTitle, Text } from '@haas/ui';
-import { Edit, Plus, Trash } from 'react-feather';
+import { Plus } from 'react-feather';
 import { debounce } from 'lodash';
 import { useHistory, useParams } from 'react-router';
 import { useLazyQuery, useMutation } from '@apollo/client';
@@ -11,8 +12,6 @@ import { useTranslation } from 'react-i18next';
 import React, { useCallback, useEffect, useState } from 'react';
 
 import { GenericCell } from 'components/Table/CellComponents/CellComponents';
-import List from 'components/List/List';
-import ListItem from 'components/List/ListItem';
 import SearchBar from 'components/SearchBar/SearchBar';
 import ShowMoreButton from 'components/ShowMoreButton';
 import Table from 'components/Table/Table';
@@ -170,26 +169,24 @@ const TriggersOverview = () => {
                 {canDeleteTriggers && (
                   <ShowMoreButton
                     renderMenu={(
-                      <List>
+                      <UI.List>
+                        <UI.ListHeader>{t('edit_trigger')}</UI.ListHeader>
                         {canDeleteTriggers && (
                           <>
                             {canEditTriggers && (
-                              <ListItem
+                              <UI.ListItem
                                 onClick={(e: any) => handleEditEntry(e, data?.id)}
-                                renderLeftIcon={<Edit />}
                               >
                                 {t('edit_trigger')}
-                              </ListItem>
+                              </UI.ListItem>
                             )}
                             <Popover>
                               {() => (
                                 <>
                                   <PopoverTrigger>
-                                    <ListItem
-                                      renderLeftIcon={<Trash />}
-                                    >
+                                    <UI.ListItem>
                                       {t('delete_trigger')}
-                                    </ListItem>
+                                    </UI.ListItem>
                                   </PopoverTrigger>
                                   <PopoverContent zIndex={4}>
                                     <PopoverArrow />
@@ -212,7 +209,7 @@ const TriggersOverview = () => {
                             </Popover>
                           </>
                         )}
-                      </List>
+                      </UI.List>
                     )}
                   />
                 )}
