@@ -1,4 +1,7 @@
 import * as yup from 'yup';
+import { MutationFunctionOptions } from '@apollo/client';
+import { CreateWorkspaceJobMutation, Exact, GenerateAutodeckInput, CreateWorkspaceJobType, ConfirmWorkspaceJobMutation } from 'types/generated-types';
+import { DeepPartial } from 'types/customTypes';
 
 export const schema = yup.object().shape({
   name: yup.string().required('Name is required'),
@@ -30,3 +33,17 @@ export const schema = yup.object().shape({
 }).required();
 
 export type FormDataProps = yup.InferType<typeof schema>;
+
+export interface AutodeckFormProps {
+  onClose: () => void;
+  isLoading: boolean;
+  onCreateJob: (options?: MutationFunctionOptions<CreateWorkspaceJobMutation, Exact<{
+    input?: GenerateAutodeckInput | null | undefined;
+  }>> | undefined) => Promise<any>;
+  job: DeepPartial<CreateWorkspaceJobType> | null;
+  isInEditing: boolean;
+  onConfirmJob: (options?: MutationFunctionOptions<ConfirmWorkspaceJobMutation, Exact<{
+    input?: GenerateAutodeckInput | null | undefined;
+  }>> | undefined) => Promise<any>;
+  isConfirmLoading: boolean;
+}
