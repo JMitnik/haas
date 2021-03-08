@@ -78,7 +78,6 @@ export const AutodeckOverview = () => {
     <>
       <UI.ViewHeading>
         <UI.Stack>
-          {/* <UI.Breadcrumb to={campaignsPath}>{t('back_to_campaigns')}</UI.Breadcrumb> */}
           <UI.Stack isInline alignItems="center" spacing={4}>
             <UI.PageTitle>{'Autodeck overview'}</UI.PageTitle>
             <UI.Button

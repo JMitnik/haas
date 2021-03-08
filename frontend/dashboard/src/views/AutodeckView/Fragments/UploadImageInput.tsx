@@ -40,7 +40,7 @@ const UploadImageInput = ({ onChange, value, jobId, imageType, isInEditing, isDi
     if (value) {
       onChange(value)
     }
-  }, [value])
+  }, [value, onChange])
 
   return (
     <>
@@ -48,7 +48,5 @@ const UploadImageInput = ({ onChange, value, jobId, imageType, isInEditing, isDi
     </>
   );
 };
-
-//
 
 export default UploadImageInput

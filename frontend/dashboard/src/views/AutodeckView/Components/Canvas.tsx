@@ -31,11 +31,10 @@ const Canvas = ({ id, value, onChange }: any) => {
         }
       },
     })
-  }, [])
+  }, [fetchAdjustLogo, id])
 
   useEffect(() => {
     const context = ref.current?.getContext('2d');
-    console.log('CONTEXT CANVAS: ', context);
     if (ref.current?.width && ref.current?.height && context) {
       context.clearRect(0, 0, ref.current?.width, ref.current?.height);
     }

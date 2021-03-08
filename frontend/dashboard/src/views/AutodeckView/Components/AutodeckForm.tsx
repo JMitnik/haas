@@ -98,14 +98,14 @@ const AutodeckForm = ({
         id: jobId,
       }
     });
-  }, [job])
+  }, [job, fetchPreviewData])
 
   useEffect(() => {
     if (!previewData) return;
     form.setValue('uploadLogo', previewData?.getPreviewData?.rembgLogoUrl);
     form.setValue('uploadWebsite', previewData?.getPreviewData?.websiteScreenshotUrl);
     form.setValue('primaryColour', previewData?.getPreviewData?.colors[0])
-  }, [previewData])
+  }, [previewData, form])
 
   return (
     <Form onSubmit={form.handleSubmit(onFormSubmit)}>
