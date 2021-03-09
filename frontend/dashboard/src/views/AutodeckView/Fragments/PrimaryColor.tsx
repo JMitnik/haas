@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import React from "react";
 import { FormControl, FormLabel } from "@chakra-ui/core";
 import { InputHelper, RadioButton, RadioButtons } from "@haas/ui";
-import { Link2 } from "react-feather";
+import { Link2, Clipboard } from "react-feather";
 import { FormDataProps } from "../Types";
 import ColorPaletteFragment from "./ColorPalette";
 import ColorPickerInput from 'components/ColorPicker';
