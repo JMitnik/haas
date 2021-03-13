@@ -200,7 +200,7 @@ export class MainPipelineStack extends Stack {
         environmentVariables: {
           // TODO: Fix this and put it into secret manager format again
           DB_STRING: {
-            value: ecs.Secret.fromSecretsManager(secret, 'url'),
+            value: `${secret.secretName}:url`,
             type: codebuild.BuildEnvironmentVariableType.SECRETS_MANAGER
           },
         }
