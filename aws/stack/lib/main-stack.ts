@@ -15,13 +15,13 @@ import { EcrImage } from '@aws-cdk/aws-ecs';
 // 1. You have an Ec2 Keyname-pair created (HaasAPI_RemoteBastionAccess)
 // 2. You have a hosted-zone with haas.live and a hostedZoneId (if not, edit this).
 // 3. You have a secret named HAAS_JWT for the API
+// 4. You have a repository (in this case, `haas-svc-api`).
 
 // What to do after first deploy
 // 1. Ensure the bastion is whitelisted in its security group
 // 2. If new database, ensure you have a prisa role.
 
 // Constants
-const pathToAPI = '../../api';
 const hostedZoneId = 'Z02703531WCURDDQ4Z46S';
 const hostedZoneName = 'haas.live';
 const bastionKeyName = 'HaasAPI_RemoteBastionAccess';
@@ -66,11 +66,13 @@ export class APIStack extends cdk.Stack {
       ],
     });
 
+    // We allow our VPC Access to S3 this way.
     vpc.addGatewayEndpoint('S3Access', {
       service: ec2.GatewayVpcEndpointAwsService.S3
     });
 
     // TODO: Find cheaper alternative
+    // We allow our VPC Access to Secrets Manager this way.
     vpc.addInterfaceEndpoint('secretAccess', {
       service: ec2.InterfaceVpcEndpointAwsService.SECRETS_MANAGER
     });

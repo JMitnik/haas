@@ -7,8 +7,7 @@ import * as secretsmanager from "@aws-cdk/aws-secretsmanager";
 import * as codebuild from '@aws-cdk/aws-codebuild';
 import * as codepipeline_actions from '@aws-cdk/aws-codepipeline-actions';
 import * as ecs_patterns from '@aws-cdk/aws-ecs-patterns';
-
-import { Construct, DefaultStackSynthesizer, SecretValue, Stack, StackProps } from '@aws-cdk/core';
+import { Construct, SecretValue, Stack, StackProps } from '@aws-cdk/core';
 import { CdkPipeline, SimpleSynthAction } from "@aws-cdk/pipelines";
 
 interface MainPipelineStackProps extends StackProps {
@@ -73,8 +72,6 @@ export class MainPipelineStack extends Stack {
     baseRepo.grantPullPush(buildRole);
     migrationRepo.grantPullPush(buildRole);
     repository.grantPullPush(buildRole);
-
-    console.log(props?.apiService.service.taskDefinition.defaultContainer?.containerName);
 
     const buildStage = pipeline.addStage('build');
     buildStage.addActions(new codepipeline_actions.CodeBuildAction({
