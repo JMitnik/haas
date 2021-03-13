@@ -133,7 +133,8 @@ export class APIStack extends cdk.Stack {
     // Our main API service; we will adjust this as necessary to deal with more load.
     const apiService = new ecs_patterns.ApplicationLoadBalancedFargateService(this, "API_SERVICE", {
       cluster,
-      cpu: 256,
+      cpu: 512,
+      memoryLimitMiB: 2048,
       desiredCount: 1,
       assignPublicIp: true,
       domainZone: hostedZone,
