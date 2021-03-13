@@ -189,7 +189,7 @@ model SliderNode {
   id           String             @id @default(cuid())
   markers      SliderNodeMarker[]
   QuestionNode QuestionNode[]
-  
+
   earlyReleaseText  String?
 }
 
@@ -627,10 +627,4 @@ model DeliveryEvents {
   createdAt  DateTime               @default(now())
   deliveryId String?
   Delivery   Delivery?              @relation(fields: [deliveryId], references: [id])
-}
-
-model Visitor {
-  id        String    @id @default(cuid())
-  createdAt DateTime  @default(now())
-  updatedAt DateTime? @updatedAt
 }
