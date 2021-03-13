@@ -135,9 +135,16 @@ export class APIStack extends cdk.Stack {
       taskImageOptions: {
         image: ecs.ContainerImage.fromEcrRepository(svcRepo),
         containerPort: 4000,
+        secrets: {
+          DB_STRING: {
+            // Because dbString has a field, we format it this way
+            arn: `${dbString.secretArn}:url::`,
+            grantRead: dbString.grantRead,
+            hasField: true,
+          }
+        },
         environment: {
           JWT_SECRET: jwtSecret.secretValue.toString(),
-          DB_STRING: dbUrl
         }
       },
     });

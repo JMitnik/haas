@@ -29,6 +29,10 @@ export class MainPipelineStack extends Stack {
     const buildArtifact = new codepipeline.Artifact();
     const cdkOutputArtifact = new codepipeline.Artifact();
 
+    /**
+     * Step 1: Define the pipeline, as well as how to create the
+     * cloudformation to transform this CDK code.
+     */
     const pipeline = new CdkPipeline(this, `${props?.prefix}Pipeline`, {
       pipelineName: `${props?.prefix}Pipeline`,
       cloudAssemblyArtifact: cdkOutputArtifact,
@@ -58,14 +62,20 @@ export class MainPipelineStack extends Stack {
       resources: ['*']
     }))
 
+    // The repository of the main code
     const repoName = `haas-svc-api`;
     const repository = ecr.Repository.fromRepositoryName(this, 'ServiceRepo', repoName);
 
+    // The repository with our custom base image (this is necssary because DockerHub rate-limits)
     const baseRepo = ecr.Repository.fromRepositoryName(this, 'BaseRepo', 'node-base');
 
+    // The repository containing our migrations (used in migration builds).
     const migrationRepoName = 'haas-migrations';
     const migrationRepo = ecr.Repository.fromRepositoryName(this, 'MigrationRepo', migrationRepoName);
 
+    /**
+     * Step 2: Build
+     */
     const buildRole = new iam.Role(this, `${props?.prefix}BuildRole`, {
       assumedBy: new iam.ServicePrincipal('codebuild.amazonaws.com'),
     });
@@ -78,6 +88,11 @@ export class MainPipelineStack extends Stack {
       actionName: `${props?.prefix}DockerBuild`,
       input: sourceArtifact,
       outputs: [buildArtifact],
+      // The build will create an envrionment and
+      // - Create a production-ready build (new tag and latest with an imagedefinitions.json for the deployment).
+      // - Create a migration-container containing the latest changes and prisma.
+      //      This is necssary as the codebuild is mostly private and has no access to npm.
+
       project: new codebuild.PipelineProject(this, `${props?.prefix}DockerBuild`, {
         environmentVariables: {
           HAAS_SERVICE_NAME: { value: props?.apiService.service.taskDefinition.defaultContainer?.containerName },
@@ -133,10 +148,14 @@ export class MainPipelineStack extends Stack {
       }),
     }));
 
+    /**
+     * Step 3: Migrations
+     */
     const migrateRole = new iam.Role(this, `${props?.prefix}MigrateRole`, {
       assumedBy: new iam.ServicePrincipal('codebuild.amazonaws.com'),
     });
 
+    // Our migration step needs DB-access.
     const secret = secretsmanager.Secret.fromSecretNameV2(this, 'API_RDS_String', 'API_RDS_String');
     secret.grantRead(migrateRole);
 
@@ -146,6 +165,7 @@ export class MainPipelineStack extends Stack {
     const migrateStage = pipeline.addStage(`${props?.prefix}MigrateBuild`);
 
     const migrateBuildProject = new codebuild.PipelineProject(this, `${props?.prefix}MigrateBuild`, {
+      // This build will call prisma's migration function, and output it to `output.txt` in the artifact.
       buildSpec: codebuild.BuildSpec.fromObject({
         version: '0.2',
         phases: {
@@ -183,9 +203,6 @@ export class MainPipelineStack extends Stack {
             value: secret.secretValueFromJson('url').toString(),
             type: codebuild.BuildEnvironmentVariableType.PLAINTEXT
           },
-          TEST: {
-            value: 'test'
-          },
         }
       },
       vpc: props?.vpc,
@@ -222,6 +239,10 @@ export class MainPipelineStack extends Stack {
 
     if (!props?.apiService.service) return;
 
+    /**
+     * Step 5: Deploy
+     * Uses the `imagedefinitions.json` from the buildArtifcat to know "what" to deploy.
+     */
     const deployStage = pipeline.addStage(`${props?.prefix}Deploy`);
     const deployAction = new codepipeline_actions.EcsDeployAction({
       service: props?.apiService.service,
