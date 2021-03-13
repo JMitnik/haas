@@ -189,7 +189,7 @@ model SliderNode {
   id           String             @id @default(cuid())
   markers      SliderNodeMarker[]
   QuestionNode QuestionNode[]
-  
+
   earlyReleaseText  String?
 }
 
