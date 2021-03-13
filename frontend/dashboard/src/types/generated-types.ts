@@ -233,11 +233,6 @@ export type CustomerWhereUniqueInput = {
 };
 
 
-export type Debug = {
-  __typename?: 'Debug';
-  debugResolver?: Maybe<Scalars['String']>;
-};
-
 export type DeleteDialogueInputType = {
   id?: Maybe<Scalars['ID']>;
   customerSlug?: Maybe<Scalars['String']>;
@@ -613,13 +608,12 @@ export type Mutation = {
   createSession: Session;
   appendToInteraction: Session;
   deleteQuestion: QuestionNode;
-  updateQuestion: QuestionNode;
   createQuestion?: Maybe<QuestionNode>;
   deleteCTA: QuestionNode;
   /** Create Call to Actions */
   createCTA: QuestionNode;
   updateCTA: QuestionNode;
-  debugMutation?: Maybe<Scalars['String']>;
+  updateQuestion: QuestionNode;
 };
 
 
@@ -790,11 +784,6 @@ export type MutationDeleteQuestionArgs = {
 };
 
 
-export type MutationUpdateQuestionArgs = {
-  input?: Maybe<UpdateQuestionNodeInputType>;
-};
-
-
 export type MutationCreateQuestionArgs = {
   input?: Maybe<CreateQuestionNodeInputType>;
 };
@@ -812,6 +801,11 @@ export type MutationCreateCtaArgs = {
 
 export type MutationUpdateCtaArgs = {
   input?: Maybe<UpdateCtaInputType>;
+};
+
+
+export type MutationUpdateQuestionArgs = {
+  input?: Maybe<UpdateQuestionNodeInputType>;
 };
 
 export type NodeEntry = {
@@ -857,6 +851,7 @@ export type OptionInputType = {
   id?: Maybe<Scalars['Int']>;
   value?: Maybe<Scalars['String']>;
   publicValue?: Maybe<Scalars['String']>;
+  overrideLeafId?: Maybe<Scalars['String']>;
 };
 
 export type OptionsInputType = {
@@ -1110,6 +1105,7 @@ export type QuestionOption = {
   value: Scalars['String'];
   questionId?: Maybe<Scalars['String']>;
   publicValue?: Maybe<Scalars['String']>;
+  overrideLeaf?: Maybe<QuestionNode>;
 };
 
 export type RecipientsInputType = {
@@ -1412,7 +1408,7 @@ export type UpdateCtaInputType = {
 };
 
 export type UpdateQuestionNodeInputType = {
-  id?: Maybe<Scalars['ID']>;
+  id: Scalars['ID'];
   customerId?: Maybe<Scalars['ID']>;
   overrideLeafId?: Maybe<Scalars['ID']>;
   edgeId?: Maybe<Scalars['ID']>;

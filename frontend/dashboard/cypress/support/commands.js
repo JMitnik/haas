@@ -1,3 +1,5 @@
+import "cypress-localstorage-commands";
+import '@testing-library/cypress/add-commands'
 // ***********************************************
 // This example commands.js shows you how to
 // create various custom commands and overwrite
@@ -23,3 +25,14 @@
 //
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
+
+Cypress.Commands.add('login', () => { 
+  cy.request({
+    method: 'POST',
+    url: 'http://localhost:3002/verify_token?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNrbTc5ejdmaTAwMDAwMW1oZjhwdzl3a3EiLCJleHAiOjE2MTU4NzQzMzgsImlhdCI6MTYxNTYxNTEzOH0.9bCny5K2TJMD6vj5nOD251871A5T6N0P25sc4A6ZwvM',
+  })
+  .its('body')
+  .then(body => {
+    cy.setLocalStorage("access_token", body.accessToken);
+  })
+});
