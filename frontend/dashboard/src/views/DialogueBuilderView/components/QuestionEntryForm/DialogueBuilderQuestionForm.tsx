@@ -6,31 +6,30 @@ import {
   PopoverBody, PopoverCloseButton, PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, useToast
 } from '@chakra-ui/core';
 import { Controller, useForm } from 'react-hook-form';
-import { MinusCircle, PlusCircle, Trash } from 'react-feather';
+import { Trash } from 'react-feather';
 import { debounce } from 'lodash';
 import { useMutation, gql } from '@apollo/client';
-import { useParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { yupResolver } from '@hookform/resolvers';
 import React, { useCallback, useEffect, useState } from 'react';
 import Select from 'react-select';
 
 import {
-  DeleteQuestionOptionButtonContainer,
-} from 'views/DialogueBuilderView/components/QuestionEntry/QuestionEntryStyles';
-import {
   Div, Flex, Form, FormContainer, FormControl, FormLabel,
-  FormSection, H4, Hr, Input, InputGrid, InputHelper, Muted, Span, Text
+  FormSection, Hr, Input, InputGrid, InputHelper, Span, Text
 } from '@haas/ui';
 import { getTopicBuilderQuery } from 'queries/getQuestionnaireQuery';
 import { useCustomer } from 'providers/CustomerProvider';
 import updateQuestionMutation from 'mutations/updateQuestion';
 
 import {
-  EdgeConditonProps,
+  CTANode,
+  EdgeConditionProps,
   OverrideLeafProps, QuestionEntryProps, QuestionOptionProps
 } from '../../DialogueBuilderInterfaces';
 import SliderNodeForm from './SliderNodeForm';
+import { ChoiceNodeForm } from './ChoiceNodeForm';
+import { useNavigator } from 'hooks/useNavigator';
 
 interface SliderNodeMarkerProps {
   id: string;
@@ -54,7 +53,8 @@ interface FormDataProps {
     id: string;
     markers: SliderNodeMarkerProps[];
   };
-  options: Array<string>;
+  options: string[];
+  optionsFull: any[];
 }
 
 const isChoiceType = (questionType: string) => {
@@ -82,10 +82,12 @@ const schema = yup.object().shape({
     then: yup.string().required(),
     otherwise: yup.string().notRequired(),
   }),
-  options: yup.array().of(yup.string().min(1)).when(['questionType'], {
+  optionsFull: yup.array().when(['questionType'], {
     is: (questionType: string) => isChoiceType(questionType),
-    then: yup.array(yup.string().min(1)).min(1).required(),
-    otherwise: yup.array(yup.string()).notRequired(),
+    then: yup.array().min(1).of(yup.object({
+      value: yup.string().required('form.value_required')
+    })),
+    otherwise: yup.array().notRequired(),
   }),
 });
 
@@ -96,10 +98,11 @@ interface QuestionEntryFormProps {
   overrideLeaf?: OverrideLeafProps;
   isRoot: boolean;
   type: { label: string, value: string };
-  options: Array<QuestionOptionProps>;
+  options: QuestionOptionProps[];
   leafs: Array<{ label: string, value: string }>;
+  ctaNodes: CTANode[];
   onActiveQuestionChange: React.Dispatch<React.SetStateAction<string | null>>;
-  condition: EdgeConditonProps | undefined;
+  condition: EdgeConditionProps | undefined;
   parentOptions: QuestionOptionProps[] | undefined;
   edgeId: string | undefined;
   question: QuestionEntryProps;
@@ -122,7 +125,7 @@ const createQuestionMutation = gql`
   }
 `;
 
-const QuestionEntryForm = ({
+const DialogueBuilderQuestionForm = ({
   onAddExpandChange,
   id,
   title,
@@ -130,6 +133,7 @@ const QuestionEntryForm = ({
   type,
   options,
   leafs,
+  ctaNodes,
   onActiveQuestionChange,
   condition,
   parentOptions,
@@ -141,8 +145,7 @@ const QuestionEntryForm = ({
   onScroll,
 }: QuestionEntryFormProps) => {
   const { activeCustomer } = useCustomer();
-  const { customerSlug, dialogueSlug } = useParams<{ customerSlug: string, dialogueSlug: string }>();
-
+  const { customerSlug, dialogueSlug } = useNavigator();
   const { t } = useTranslation();
 
   const sliderNode = {
@@ -161,21 +164,27 @@ const QuestionEntryForm = ({
   const form = useForm<FormDataProps>({
     resolver: yupResolver(schema),
     mode: 'onChange',
+    shouldUnregister: false,
     defaultValues: {
       parentQuestionType,
       sliderNode,
+      optionsFull: options.map(option => ({
+        value: option.value,
+        publicValue: option.publicValue,
+        overrideLeaf: {
+          label: option.overrideLeaf?.title,
+          value: option.overrideLeaf?.id,
+          type: option.overrideLeaf?.type
+        }
+      }))
     },
   });
-
-  console.log('question', question);
 
   const toast = useToast();
   const [activeQuestionType, setActiveQuestionType] = useState(type);
 
-  const [activeOptions, setActiveOptions] = useState(options);
-
   const matchValue = condition?.matchValue ? { label: condition.matchValue, value: condition.matchValue } : null;
-  const [activematchValue, setActiveMatchValue] = useState<null | { label: string, value: string }>(matchValue);
+  const [activeMatchValue, setActiveMatchValue] = useState<null | { label: string, value: string }>(matchValue);
   const [activeLeaf, setActiveLeaf] = useState({ label: overrideLeaf?.title, value: overrideLeaf?.id });
   const [activeConditionSelect, setActiveConditionSelect] = useState<null | { label: string, value: string }>(
     condition?.conditionType ? {
@@ -183,7 +192,7 @@ const QuestionEntryForm = ({
       label: condition.conditionType,
     } : null,
   );
-  const [activeCondition, setActiveCondition] = useState<null | EdgeConditonProps>(condition || { conditionType: parentQuestionType === 'Slider' ? 'valueBoundary' : 'match' });
+  const [activeCondition, setActiveCondition] = useState<null | EdgeConditionProps>(condition || { conditionType: parentQuestionType === 'Slider' ? 'valueBoundary' : 'match' });
 
   const setConditionType = useCallback((conditionOption: any) => {
     setActiveConditionSelect(conditionOption);
@@ -248,10 +257,10 @@ const QuestionEntryForm = ({
   };
 
   useEffect(() => {
-    if (activematchValue?.value) {
-      form.setValue('matchText', activematchValue?.value);
+    if (activeMatchValue?.value) {
+      form.setValue('matchText', activeMatchValue?.value);
     }
-  }, [activematchValue]);
+  }, [activeMatchValue]);
 
   const [createQuestion, { loading: createLoading }] = useMutation(createQuestionMutation, {
     onCompleted: () => {
@@ -353,38 +362,15 @@ const QuestionEntryForm = ({
     });
   }, 250), []);
 
-  const handleOptionChange = useCallback(debounce((value: any, optionIndex: number) => {
-    setActiveOptions((prevOptions) => {
-      prevOptions[optionIndex].value = value;
-      return [...prevOptions];
-    });
-  }, 250), []);
-
-  const deleteOption = (event: any, optionIndex: number) => {
-    setActiveOptions((prevOptions) => {
-      prevOptions.splice(optionIndex, 1);
-      return [...prevOptions];
-    });
-  };
-
-  const addNewOption = () => {
-    setActiveOptions((prevOptions) => {
-      const value = '';
-      const publicValue = '';
-      const newActiveOptions = [...prevOptions, { value, publicValue }];
-      return newActiveOptions;
-    });
-  };
-
   const onSubmit = (formData: FormDataProps) => {
     const { title } = formData;
     const type = activeQuestionType?.value;
     const overrideLeafId = activeLeaf?.value;
-    const options = { options: activeOptions };
     const edgeCondition = activeCondition;
     const sliderNodeData = formData.sliderNode || sliderNode;
 
     const isSlider = activeQuestionType?.value === 'SLIDER' && sliderNodeData;
+    const values = form.getValues();
 
     if (question.id !== '-1') {
       updateQuestion({
@@ -396,7 +382,14 @@ const QuestionEntryForm = ({
             edgeId: edgeId || '-1',
             title,
             type,
-            optionEntries: options,
+            optionEntries: {
+              options: values.optionsFull?.map(option => ({
+                id: option?.id,
+                value: option?.value,
+                publicValue: option?.value,
+                overrideLeafId: option?.overrideLeaf?.value
+              }))
+            },
             edgeCondition,
             sliderNode: isSlider ? {
               id: sliderNodeData.id,
@@ -421,7 +414,14 @@ const QuestionEntryForm = ({
             type,
             overrideLeafId: overrideLeafId || 'None',
             parentQuestionId,
-            optionEntries: options,
+            optionEntries: {
+              options: values.optionsFull?.map(option => ({
+                id: option?.id,
+                value: option?.value,
+                publicValue: option?.value,
+                overrideLeafId: option?.overrideLeaf?.value
+              }))
+            },
             edgeCondition,
             sliderNode: isSlider ? {
               id: sliderNodeData.id,
@@ -536,18 +536,18 @@ const QuestionEntryForm = ({
                 <Div>
                   <InputGrid>
                     <FormControl isRequired isInvalid={!!form.errors.matchText}>
-                      <FormLabel htmlFor="matchText">{t('dialogue:match_value')}</FormLabel>
+                      <FormLabel htmlFor="matchText">{t('match_value')}</FormLabel>
                       <InputHelper>What is the multi-choice question to trigger this question?</InputHelper>
 
                       <Controller
                         id="question-match-select"
                         name="matchText"
                         control={form.control}
-                        defaultValue={activematchValue}
+                        defaultValue={activeMatchValue}
                         render={({ onChange, onBlur, value }) => (
                           <Select
                             options={parentOptionsSelect}
-                            value={activematchValue}
+                            value={activeMatchValue}
                             onChange={(opt: any) => {
                               setMatchTextValue(opt);
                             }}
@@ -649,53 +649,21 @@ const QuestionEntryForm = ({
           )}
 
           {activeQuestionType && activeQuestionType.value === 'CHOICE' && (
-            <FormSection>
-              <UI.Div />
-              <UI.Div>
-                <Div mb={1} gridColumn="1 / -1">
-                  <Flex justifyContent="space-between">
-                    <H4>
-                      {t('options')}
-                    </H4>
-                    <PlusCircle data-cy="AddOption" style={{ cursor: 'pointer' }} onClick={() => addNewOption()} />
-                  </Flex>
-
-                  <Hr />
-                </Div>
-
-                {!activeOptions.length && !form.errors.options && <Muted>{t('dialogue:add_option_reminder')}</Muted>}
-                {!activeOptions.length && form.errors.options && <Muted color="red">{t('dialogue:empty_option_reminder')}</Muted>}
-                {activeOptions && activeOptions.map((option, optionIndex) => (
-                  <Flex key={`container-${option.id}-${optionIndex}`} flexDirection="column">
-                    <Flex my={1} flexDirection="row">
-                      <Flex flexGrow={1}>
-                        <Input
-                          isInvalid={form.errors.options && Array.isArray(form.errors.options) && !!form.errors.options?.[optionIndex]}
-                          id={`options[${optionIndex}]`}
-                          key={`input-${option.id}-${optionIndex}`}
-                          name={`options[${optionIndex}]`}
-                          ref={form.register(
-                            {
-                              required: true,
-                              minLength: 1
-                            },
-                          )}
-                          defaultValue={option.value}
-                          onChange={(e: any) => handleOptionChange(e.currentTarget.value, optionIndex)}
-                        />
-                      </Flex>
-
-                      <DeleteQuestionOptionButtonContainer
-                        onClick={(e: any) => deleteOption(e, optionIndex)}
-                      >
-                        <MinusCircle />
-                      </DeleteQuestionOptionButtonContainer>
-                    </Flex>
-                    {form.errors.options?.[optionIndex] && <Muted color="warning">Please fill in a proper value!</Muted>}
-                  </Flex>
-                ))}
-              </UI.Div>
-            </FormSection>
+            <>
+              <UI.Hr />
+              <UI.FormSection>
+                <UI.Div>
+                  <UI.FormSectionHeader>{t('dialogue:about_choice')}</UI.FormSectionHeader>
+                  <UI.FormSectionHelper>
+                    {t('dialogue:about_choice_helper')}
+                  </UI.FormSectionHelper>
+                </UI.Div>
+                <ChoiceNodeForm
+                  form={form}
+                  ctaNodes={ctaNodes}
+                />
+              </UI.FormSection>
+            </>
           )}
         </Div>
 
@@ -754,4 +722,4 @@ const QuestionEntryForm = ({
   );
 };
 
-export default QuestionEntryForm;
+export default DialogueBuilderQuestionForm;

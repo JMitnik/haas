@@ -114,11 +114,11 @@ const FormNodePreview = ({ field, onMoveRight, onMoveLeft, onOpen, fieldIndex, n
               </UI.ColumnFlex>
             </UI.Flex>
           ) : (
-            <UI.ColumnFlex>
-              <UI.Text>{t('empty_field')}</UI.Text>
-              <UI.InputHelper>{t('empty_field_helper')}</UI.InputHelper>
-            </UI.ColumnFlex>
-          )}
+              <UI.ColumnFlex>
+                <UI.Text>{t('empty_field')}</UI.Text>
+                <UI.InputHelper>{t('empty_field_helper')}</UI.InputHelper>
+              </UI.ColumnFlex>
+            )}
           <UI.ButtonGroup display="flex">
             <UI.IconButton
               size="sm"
@@ -272,29 +272,29 @@ const FormNodeFieldFragment = ({ field, onClose, onSubmit, onDelete }: FormNodeF
                     />
                   </UI.FormControl>
                 </UI.InputGrid>
-                <UI.ButtonGroup justifySelf="flex-end">
+                <UI.ButtonGroup justifySelf="flex-end" display="flex">
                   <UI.Button onClick={handleSaveValues} variantColor="teal">{t('finish_editing')}</UI.Button>
                   <UI.Button onClick={handleDelete} variantColor="red" variant="outline">{t('delete_field')}</UI.Button>
                 </UI.ButtonGroup>
               </UI.CardBody>
             ) : (
-              <UI.CardBody>
-                <IllustrationCard text={t('select_a_field_type')} svg={<SelectIll />} isFlat>
-                  <UI.Text fontWeight={200} pb={2}>or</UI.Text>
-                  <UI.ButtonGroup justifySelf="flex-end">
-                    <UI.Button
-                      size="sm"
-                      onClick={handleDelete}
-                      variantColor="red"
-                      variant="outline"
-                    >
-                      {t('delete_field')}
+                <UI.CardBody>
+                  <IllustrationCard text={t('select_a_field_type')} svg={<SelectIll />} isFlat>
+                    <UI.Text fontWeight={200} pb={2}>or</UI.Text>
+                    <UI.ButtonGroup justifySelf="flex-end">
+                      <UI.Button
+                        size="sm"
+                        onClick={handleDelete}
+                        variantColor="red"
+                        variant="outline"
+                      >
+                        {t('delete_field')}
 
-                    </UI.Button>
-                  </UI.ButtonGroup>
-                </IllustrationCard>
-              </UI.CardBody>
-            )}
+                      </UI.Button>
+                    </UI.ButtonGroup>
+                  </IllustrationCard>
+                </UI.CardBody>
+              )}
           </UI.CardForm>
         </UI.Card>
       </motion.div>
@@ -349,19 +349,19 @@ const FormNodeForm = ({ form }: FormNodeFormProps) => {
                 <UI.Div position="relative" key={field.fieldIndex}>
                   <AnimatePresence>
                     {openedField === index && (
-                    <UI.Modal isOpen={openedField === index} onClose={() => setOpenedField(null)}>
-                      <FormNodeFieldFragment
-                        onSubmit={(subForm: any) => {
-                          form.setValue(`formNode.fields[${index}]`, subForm, { shouldDirty: true, shouldValidate: true });
-                          form.trigger();
-                        }}
-                        onClose={() => setOpenedField(null)}
-                        onDelete={() => remove(index)}
-                        field={formNodeFields[index]}
-                        fieldIndex={index}
-                        key={field.fieldIndex}
-                      />
-                    </UI.Modal>
+                      <UI.Modal isOpen={openedField === index} onClose={() => setOpenedField(null)}>
+                        <FormNodeFieldFragment
+                          onSubmit={(subForm: any) => {
+                            form.setValue(`formNode.fields[${index}]`, subForm, { shouldDirty: true, shouldValidate: true });
+                            form.trigger();
+                          }}
+                          onClose={() => setOpenedField(null)}
+                          onDelete={() => remove(index)}
+                          field={formNodeFields[index]}
+                          fieldIndex={index}
+                          key={field.fieldIndex}
+                        />
+                      </UI.Modal>
                     )}
                   </AnimatePresence>
 
@@ -385,8 +385,8 @@ const FormNodeForm = ({ form }: FormNodeFormProps) => {
                 <Button type="button" onClick={() => handleNewField()}>{t('add_field')}</Button>
               </UI.IllustrationCard>
             ) : (
-              <Button mt={4} type="button" onClick={() => handleNewField()}>{t('add_field')}</Button>
-            )}
+                <Button mt={4} type="button" onClick={() => handleNewField()}>{t('add_field')}</Button>
+              )}
           </UI.Div>
         </UI.InputGrid>
       </UI.Div>

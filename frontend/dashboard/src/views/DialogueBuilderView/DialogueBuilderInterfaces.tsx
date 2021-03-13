@@ -1,3 +1,20 @@
+enum QuestionNodeTypeEnum {
+  Generic = 'GENERIC',
+  Slider = 'SLIDER',
+  Choice = 'CHOICE',
+  Registration = 'REGISTRATION',
+  Form = 'FORM',
+  Textbox = 'TEXTBOX',
+  Link = 'LINK',
+  Share = 'SHARE'
+}
+
+export interface CTANode {
+  id: string;
+  title: string;
+  type?: QuestionNodeTypeEnum;
+}
+
 export interface OverrideLeafProps {
   id?: string;
   type?: string;
@@ -13,8 +30,8 @@ export interface QuestionEntryProps {
   isLeaf: boolean;
   type: string;
   overrideLeaf?: OverrideLeafProps;
-  children?: Array<EdgeChildProps>;
-  options?: Array<QuestionOptionProps>;
+  children?: EdgeChildProps[];
+  options?: QuestionOptionProps[];
   sliderNode?: any;
 }
 
@@ -22,6 +39,7 @@ export interface QuestionOptionProps {
   id?: number;
   value: string;
   publicValue?: string;
+  overrideLeaf?: CTANode;
 }
 
 export interface ShallowQuestionEntryProps {
@@ -31,21 +49,15 @@ export interface ShallowQuestionEntryProps {
 
 export interface EdgeChildProps {
   id?: string;
-  conditions: Array<EdgeConditonProps>;
+  conditions: EdgeConditionProps[];
   parentNode: ShallowQuestionEntryProps;
   childNode: ShallowQuestionEntryProps;
 }
 
-export interface EdgeConditonProps {
+export interface EdgeConditionProps {
   id?: number;
   conditionType?: string;
   renderMin?: number;
   renderMax?: number;
   matchValue?: string;
-}
-
-export interface LeafProps {
-  id: string;
-  type: string;
-  title: string;
 }

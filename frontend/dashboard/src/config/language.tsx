@@ -1,6 +1,38 @@
 /* eslint-disable max-len */
 const language = {
   general: {
+    add_choice: {
+      en: 'Add choice',
+      de: 'Wahl hinzufügen'
+    },
+    no_choices: {
+      en: 'You have no choices yet',
+      de: 'Sie haben noch keine Auswahlmöglichkeiten'
+    },
+    edit_dialogue: {
+      en: 'Edit dialogue',
+      de: 'Dialog bearbeiten'
+    },
+    all: {
+      en: 'All',
+      de: 'Alle'
+    },
+    link: {
+      en: 'Link',
+      de: 'Verknüpfung',
+    },
+    form: {
+      en: 'Form',
+      de: 'Bilden',
+    },
+    choice: {
+      en: 'Choice',
+      de: 'Wahl'
+    },
+    set_your_choice: {
+      en: 'Set your choice',
+      de: 'Stellen Sie Ihre Wahl ein'
+    },
     delivery_recipient: {
       en: 'Related delivery',
       de: 'Verwandte Lieferung.'
@@ -975,6 +1007,14 @@ const language = {
     },
   },
   dialogue: {
+    choices: {
+      en: 'Choices',
+      de: 'Entscheidungen'
+    },
+    choices_helper: {
+      en: 'Choices of this question define what potential answer a visitor can give. Furthermore, it is also possible to optionally connect a Call-to-Action to the option the user selects. Note: if a Call-to-Action further in the journey is setup, this one will be overriden.',
+      de: 'Die Auswahl dieser Frage definiert, welche potenzielle Antwort ein Besucher geben kann. Darüber hinaus ist es auch möglich, optional eine Handlungsaufforderung mit der vom Benutzer ausgewählten Option zu verbinden. Hinweis: Wenn eine Handlungsaufforderung weiter unten auf der Reise eingerichtet wird, wird diese überschrieben.',
+    },
     markers: {
       en: 'Markers',
       de: 'Marker',
@@ -986,6 +1026,14 @@ const language = {
     data_helper: {
       en: 'Your data settings, such as data-sources, will be set here.',
       de: 'Ihre Dateneinstellungen, wie z. B. Datenquellen, werden hier festgelegt',
+    },
+    about_choice: {
+      en: 'About the choices',
+      de: 'Über die Auswahl'
+    },
+    about_choice_helper: {
+      en: 'Define the different choices a user can select.',
+      de: 'Definieren Sie die verschiedenen Auswahlmöglichkeiten, die ein Benutzer auswählen kann'
     },
     hide_fake_data: {
       en: 'Hide placeholder data',
