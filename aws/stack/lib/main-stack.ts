@@ -112,7 +112,10 @@ export class APIStack extends cdk.Stack {
     });
 
     // Environment values for our API service: access to DB and JWT.
-    const jwtSecret = secretsmanager.Secret.fromSecretNameV2(this, 'SecretFromName', 'HAAS_JWT');
+    const jwtSecret = secretsmanager.Secret.fromSecretNameV2(this,
+      'SecretFromName',
+      'HAAS_JWT'
+    );
     const dbUrl = `postgresql://${rdsUsername}:${rdsPassword.secretValue.toString()}@${rdsEndpoint}/postgres?schema=public`;
 
     const dbString = new secretsmanager.Secret(this, 'API_RDS_String', {
@@ -136,15 +139,10 @@ export class APIStack extends cdk.Stack {
         image: ecs.ContainerImage.fromEcrRepository(svcRepo),
         containerPort: 4000,
         secrets: {
-          DB_STRING: {
-            // Because dbString has a field, we format it this way
-            arn: `${dbString.secretArn}:url::`,
-            grantRead: dbString.grantRead,
-            hasField: true,
-          }
+          DB_STRING: ecs.Secret.fromSecretsManager(dbString, 'url'),
+          JWT_SECRET: ecs.Secret.fromSecretsManager(jwtSecret)
         },
         environment: {
-          JWT_SECRET: jwtSecret.secretValue.toString(),
         }
       },
     });

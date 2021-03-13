@@ -38,6 +38,8 @@ const main = async () => {
   };
 
   app.get('/', (req, res, next) => {
+    console.log(`The length of the env variable is ${config.jwtSecret.length}`);
+
     res.json({ status: 'HAAS API V2.1.0' });
   });
 

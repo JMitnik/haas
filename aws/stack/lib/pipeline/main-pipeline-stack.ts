@@ -1,6 +1,7 @@
 import * as codepipeline from '@aws-cdk/aws-codepipeline';
 import * as ecr from '@aws-cdk/aws-ecr';
 import * as ec2 from '@aws-cdk/aws-ec2';
+import * as ecs from '@aws-cdk/aws-ecs';
 import * as rds from '@aws-cdk/aws-rds';
 import * as iam from '@aws-cdk/aws-iam';
 import * as secretsmanager from "@aws-cdk/aws-secretsmanager";
@@ -193,15 +194,14 @@ export class MainPipelineStack extends Stack {
         }
       }),
       // TODO: Set to true on next iteration, cant have this really be viewable
-      checkSecretsInPlainTextEnvVariables: false,
       environment: {
         buildImage: codebuild.LinuxBuildImage.fromEcrRepository(migrationRepo),
         privileged: true,
         environmentVariables: {
           // TODO: Fix this and put it into secret manager format again
           DB_STRING: {
-            value: secret.secretValueFromJson('url').toString(),
-            type: codebuild.BuildEnvironmentVariableType.PLAINTEXT
+            value: ecs.Secret.fromSecretsManager(secret, 'url'),
+            type: codebuild.BuildEnvironmentVariableType.SECRETS_MANAGER
           },
         }
       },
