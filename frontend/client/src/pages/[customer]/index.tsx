@@ -28,9 +28,6 @@ const CustomerPage = () => {
     variables: {
       slug: customerSlug,
     },
-    onError: () => {
-      console.log('Shit, a mistake happened');
-    },
   });
 
   useEffect(() => {
