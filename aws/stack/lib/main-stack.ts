@@ -145,6 +145,7 @@ export class APIStack extends cdk.Stack {
         environment: {
           CLOUDINARY_URL: 'cloudinary://591617433181475:rGNg80eDICKoUKgzrMlSPQitZw8@dx8khik9g',
           MAIL_SENDER: 'noreply@haas.live',
+          ENVIRONMENT: 'prod',
         },
         secrets: {
           DB_STRING: ecs.Secret.fromSecretsManager(dbString, 'url'),
