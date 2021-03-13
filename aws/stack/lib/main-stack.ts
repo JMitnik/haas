@@ -142,6 +142,10 @@ export class APIStack extends cdk.Stack {
       taskImageOptions: {
         image: ecs.ContainerImage.fromEcrRepository(svcRepo),
         containerPort: 4000,
+        environment: {
+          CLOUDINARY_URL: 'cloudinary://591617433181475:rGNg80eDICKoUKgzrMlSPQitZw8@dx8khik9g',
+          MAIL_SENDER: 'noreply@haas.live',
+        },
         secrets: {
           DB_STRING: ecs.Secret.fromSecretsManager(dbString, 'url'),
           JWT_SECRET: ecs.Secret.fromSecretsManager(jwtSecret),
