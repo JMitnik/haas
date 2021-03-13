@@ -44,7 +44,7 @@ export class MainPipelineStack extends Stack {
         output: sourceArtifact,
         oauthToken: SecretValue.secretsManager('GithubAuth', { jsonField: 'GITHUB_AUTH' }),
         owner: 'JMitnik',
-        branch: 'feat/deployment-asw',
+        branch: 'master',
         repo: 'haas'
       }),
 
