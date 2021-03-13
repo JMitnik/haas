@@ -193,12 +193,10 @@ export class MainPipelineStack extends Stack {
           ]
         }
       }),
-      // TODO: Set to true on next iteration, cant have this really be viewable
       environment: {
         buildImage: codebuild.LinuxBuildImage.fromEcrRepository(migrationRepo),
         privileged: true,
         environmentVariables: {
-          // TODO: Fix this and put it into secret manager format again
           DB_STRING: {
             value: `${secret.secretName}:url`,
             type: codebuild.BuildEnvironmentVariableType.SECRETS_MANAGER

@@ -5,6 +5,7 @@ import * as rds from '@aws-cdk/aws-rds';
 import * as acm from '@aws-cdk/aws-certificatemanager';
 import { SubnetType } from '@aws-cdk/aws-ec2';
 import * as ecs from '@aws-cdk/aws-ecs';
+import * as iam from '@aws-cdk/aws-iam';
 import * as route53 from '@aws-cdk/aws-route53';
 import * as ecs_patterns from '@aws-cdk/aws-ecs-patterns';
 import * as secretsmanager from "@aws-cdk/aws-secretsmanager";
@@ -16,6 +17,7 @@ import { EcrImage } from '@aws-cdk/aws-ecs';
 // 2. You have a hosted-zone with haas.live and a hostedZoneId (if not, edit this).
 // 3. You have a secret named HAAS_JWT for the API
 // 4. You have a repository (in this case, `haas-svc-api`).
+// 5. Some AWS access key (Temporarily, we should not rely on this tbh.)
 
 // What to do after first deploy
 // 1. Ensure the bastion is whitelisted in its security group
@@ -126,6 +128,8 @@ export class APIStack extends cdk.Stack {
       }
     });
 
+    const awsSecret = secretsmanager.Secret.fromSecretNameV2(this, 'API_KEY', 'ProdAwsKey');
+
     // Our main API service; we will adjust this as necessary to deal with more load.
     const apiService = new ecs_patterns.ApplicationLoadBalancedFargateService(this, "API_SERVICE", {
       cluster,
@@ -140,10 +144,11 @@ export class APIStack extends cdk.Stack {
         containerPort: 4000,
         secrets: {
           DB_STRING: ecs.Secret.fromSecretsManager(dbString, 'url'),
-          JWT_SECRET: ecs.Secret.fromSecretsManager(jwtSecret)
+          JWT_SECRET: ecs.Secret.fromSecretsManager(jwtSecret),
+          // TODO: Use IAM Roles instead, this is not reliable
+          AWS_ACCESS_KEY_ID: ecs.Secret.fromSecretsManager(awsSecret, 'AWS_ACCESS_KEY_ID'),
+          AWS_SECRET_ACCESS_KEY: ecs.Secret.fromSecretsManager(awsSecret, 'AWS_SECRET_ACCESS_KEY'),
         },
-        environment: {
-        }
       },
     });
 
