@@ -27,7 +27,7 @@ import '@testing-library/cypress/add-commands'
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
 
 /**
- * Wraps around G
+ * Wraps around Graphql
  */
 Cypress.Commands.add('graphql', (operationName, callback, alias) => {
   cy.intercept('POST', 'http://localhost:4000/graphql', (req) => {
