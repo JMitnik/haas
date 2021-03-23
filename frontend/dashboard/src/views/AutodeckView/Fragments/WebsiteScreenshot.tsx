@@ -77,10 +77,12 @@ const WebsiteScreenshotFragment = ({ form, jobId, isInEditing }: {
             <Controller
               control={form.control}
               name="uploadWebsite"
+              defaultValue=""
               render={({ onChange, value }) => (
                 <UploadImageInput
+                  value={value}
                   isInEditing={isInEditing && form.watch('isWebsiteUrlApproved') === 1}
-                  jobId={jobId} value={value}
+                  jobId={jobId}
                   onChange={onChange}
                   imageType="WEBSITE_SCREENSHOT"
                 />

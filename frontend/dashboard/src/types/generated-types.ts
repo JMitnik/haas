@@ -616,6 +616,7 @@ export enum JobStatusType {
   InPhotoshopQueue = 'IN_PHOTOSHOP_QUEUE',
   PreProcessingLogo = 'PRE_PROCESSING_LOGO',
   PreProcessingWebsiteScreenshot = 'PRE_PROCESSING_WEBSITE_SCREENSHOT',
+  PhotoshopProcessing = 'PHOTOSHOP_PROCESSING',
   Processing = 'PROCESSING',
   WrappingUp = 'WRAPPING_UP',
   Completed = 'COMPLETED',

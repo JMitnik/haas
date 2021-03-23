@@ -41,6 +41,8 @@ const AutodeckForm = ({
     mode: 'all'
   });
 
+  const { setValue } = form
+
   const onFormSubmit = (data: FormDataProps) => {
     const requiresRembgLambda = data?.useRembg === 1 ? true : false;
     const requiresColorExtraction = data?.useCustomColour === 1 ? true : false;
@@ -102,10 +104,11 @@ const AutodeckForm = ({
 
   useEffect(() => {
     if (!previewData) return;
-    form.setValue('uploadLogo', previewData?.getPreviewData?.rembgLogoUrl);
-    form.setValue('uploadWebsite', previewData?.getPreviewData?.websiteScreenshotUrl);
-    form.setValue('primaryColour', previewData?.getPreviewData?.colors[0])
-  }, [previewData, form])
+    console.log('Setting preview data!')
+    setValue('uploadLogo', previewData?.getPreviewData?.rembgLogoUrl);
+    setValue('uploadWebsite', previewData?.getPreviewData?.websiteScreenshotUrl);
+    setValue('primaryColour', previewData?.getPreviewData?.colors[0])
+  }, [previewData, setValue])
 
   return (
     <Form onSubmit={form.handleSubmit(onFormSubmit)}>

@@ -158,6 +158,7 @@ const CustomerLogoFormFragment = ({ form, jobId, previewLogo, isInEditing }: { f
               <Controller
                 control={form.control}
                 name="adjustedLogo"
+                defaultValue=""
                 render={({ onChange, value }) => (
                   <Canvas id={jobId} onChange={onChange} value={value} />
                 )}

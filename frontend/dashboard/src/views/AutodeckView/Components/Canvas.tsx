@@ -43,7 +43,7 @@ const Canvas = ({ id, value, onChange }: any) => {
       const image = new Image();
       image.crossOrigin = "Anonymous";
       const source = value.split('#')[0]
-      image.src = source;
+      image.src = `${source}?crossOrigin`;
 
       image.onload = () => {
         context.drawImage(image, 0, 0);
@@ -147,14 +147,14 @@ const Canvas = ({ id, value, onChange }: any) => {
   return (
     <>
       <Button
-        marginBottom="5px"
+        marginBottom="30px"
         onClick={handleBackgroundswitch}
       >
         Switch background
       </Button>
       <Div position="relative">
         <Div backgroundColor={activeBackground}>
-          <canvas style={{ position: 'relative' }} onClick={(e) => handleCanvasClick(e)} width="800px" height="600px" ref={ref} />
+          <canvas style={{ position: 'relative', cursor: 'pointer', border: '1px solid' }} onClick={(e) => handleCanvasClick(e)} width="800px" height="600px" ref={ref} />
         </Div>
         {adjustedLoading && (
           <Div position="absolute" top="280px" right="380px">
@@ -163,9 +163,10 @@ const Canvas = ({ id, value, onChange }: any) => {
         )}
 
         <Div
+          border="1px solid black"
           position="absolute"
           top="0"
-          right="0"
+          right="42px"
           width="50px"
           height="50px"
           backgroundColor={`rgba(${activeColor[0]}, ${activeColor[1]}, ${activeColor[2]})`}
