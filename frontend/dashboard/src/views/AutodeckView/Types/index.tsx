@@ -19,17 +19,17 @@ export const schema = yup.object().shape({
   isLogoUrlApproved: yup.number(),
   uploadLogo: yup.string().url(),
   adjustedLogo: yup.string().url(),
-  firstName: yup.string(),
-  companyName: yup.string(),
-  answer1: yup.string(),
-  answer2: yup.string(),
-  answer3: yup.string(),
-  answer4: yup.string(),
-  sorryAboutX: yup.string(),
-  youLoveX: yup.string(),
-  reward: yup.string(),
-  emailContent: yup.string(),
-  textMessage: yup.string()
+  firstName: yup.string().required(),
+  companyName: yup.string().required(),
+  answer1: yup.string().required(),
+  answer2: yup.string().required(),
+  answer3: yup.string().required(),
+  answer4: yup.string().required(),
+  sorryAboutX: yup.string().required(),
+  youLoveX: yup.string().required(),
+  reward: yup.string().required(),
+  emailContent: yup.string().required(),
+  textMessage: yup.string().required()
 }).required();
 
 export type FormDataProps = yup.InferType<typeof schema>;
