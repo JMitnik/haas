@@ -4441,6 +4441,11 @@
     "@types/connect" "*"
     "@types/node" "*"
 
+"@types/caseless@*":
+  version "0.12.2"
+  resolved "https://registry.yarnpkg.com/@types/caseless/-/caseless-0.12.2.tgz#f65d3d6389e01eeb458bd54dc8f52b95a9463bc8"
+  integrity sha512-6ckxMjBBD8URvjB6J3NcnuAn5Pkl7t3TizAg+xdlzzQGSPSmBcXf8KoIH0ua/i+tio+ZRUHEXp0HEmvaR4kt0w==
+
 "@types/classnames@^2.2.9":
   version "2.2.11"
   resolved "https://registry.yarnpkg.com/@types/classnames/-/classnames-2.2.11.tgz#2521cc86f69d15c5b90664e4829d84566052c1cf"
@@ -5123,6 +5128,16 @@
   dependencies:
     "@types/react" "*"
 
+"@types/request@^2.48.5":
+  version "2.48.5"
+  resolved "https://registry.yarnpkg.com/@types/request/-/request-2.48.5.tgz#019b8536b402069f6d11bee1b2c03e7f232937a0"
+  integrity sha512-/LO7xRVnL3DxJ1WkPGDQrp4VTV1reX9RkC85mJ+Qzykj2Bdw+mG15aAfDahc76HtknjzE16SX/Yddn6MxVbmGQ==
+  dependencies:
+    "@types/caseless" "*"
+    "@types/node" "*"
+    "@types/tough-cookie" "*"
+    form-data "^2.5.0"
+
 "@types/serve-static@*":
   version "1.13.8"
   resolved "https://registry.yarnpkg.com/@types/serve-static/-/serve-static-1.13.8.tgz#851129d434433c7082148574ffec263d58309c46"
@@ -5251,6 +5266,11 @@
   integrity sha512-FvnCJljyxhPM3gkRgWmxmDZyAQSiBQQWLI0A0VFL0K7W1oRUrPJSqNO0NvTnLkBcotdlp3lKvaT0JrnyRDkzOg==
   dependencies:
     "@types/node" "*"
+
+"@types/tough-cookie@*":
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/@types/tough-cookie/-/tough-cookie-4.0.0.tgz#fef1904e4668b6e5ecee60c52cc6a078ffa6697d"
+  integrity sha512-I99sngh224D0M7XgW1s120zxCt3VYQ3IQsuw3P3jbq5GG4yc79+ZjyKznyOGIQrflfylLgcfekeZW/vk0yng6A==
 
 "@types/twilio@^2.11.0":
   version "2.11.0"
@@ -11683,7 +11703,7 @@ fork-ts-checker-webpack-plugin@3.1.1:
     tapable "^1.0.0"
     worker-rpc "^0.1.0"
 
-form-data@^2.3.2:
+form-data@^2.3.2, form-data@^2.5.0:
   version "2.5.1"
   resolved "https://registry.yarnpkg.com/form-data/-/form-data-2.5.1.tgz#f2cbec57b5e59e23716e128fe44d4e5dd23895f4"
   integrity sha512-m21N3WOmEEURgk6B9GLOE4RuWOFf28Lhh9qGYeNlGq4VDXUlJy2th2slBNU8Gp8EzloYZOibZJ7t5ecIrFSjVA==
@@ -11776,12 +11796,7 @@ from2@^2.1.0:
     inherits "^2.0.1"
     readable-stream "^2.0.0"
 
-fs-capacitor@^2.0.4:
-  version "2.0.4"
-  resolved "https://registry.yarnpkg.com/fs-capacitor/-/fs-capacitor-2.0.4.tgz#5a22e72d40ae5078b4fe64fe4d08c0d3fc88ad3c"
-  integrity sha512-8S4f4WsCryNw2mJJchi46YgB6CR5Ze+4L1h8ewl9tEpL4SJ3ZO+c/bS4BWhB8bK+O3TMqhuZarTitd0S0eh2pA==
-
-fs-capacitor@^6.1.0:
+fs-capacitor@^2.0.4, fs-capacitor@^6.1.0, fs-capacitor@^6.2.0:
   version "6.2.0"
   resolved "https://registry.yarnpkg.com/fs-capacitor/-/fs-capacitor-6.2.0.tgz#fa79ac6576629163cb84561995602d8999afb7f5"
   integrity sha512-nKcE1UduoSKX27NSZlg879LdQc94OtbOsEmKMN2MBNudXREvijRKx2GEBsTMTfws+BrbkJoEuynbGSVRSpauvw==
@@ -17795,7 +17810,7 @@ pako@~1.0.5:
   resolved "https://registry.yarnpkg.com/pako/-/pako-1.0.11.tgz#6c9599d340d54dfd3946380252a35705a6b992bf"
   integrity sha512-4hLB8Py4zZce5s4yd9XzopqwVv/yGNhV1Bl8NTmCq1763HeK2+EwVTv+leGeL13Dnh2wfbqowVPXCIO0z4taYw==
 
-papaparse@^5.2.0:
+papaparse@^5.2.0, papaparse@^5.3.0:
   version "5.3.0"
   resolved "https://registry.yarnpkg.com/papaparse/-/papaparse-5.3.0.tgz#ab1702feb96e79ab4309652f36db9536563ad05a"
   integrity sha512-Lb7jN/4bTpiuGPrYy4tkKoUS8sTki8zacB5ke1p5zolhcSE4TlWgrlsxjrDTbG/dFVh07ck7X36hUf/b5V68pg==
@@ -20849,6 +20864,11 @@ requires-port@^1.0.0:
   resolved "https://registry.yarnpkg.com/requires-port/-/requires-port-1.0.0.tgz#925d2601d39ac485e091cf0da5c6e694dc3dcaff"
   integrity sha1-kl0mAdOaxIXgkc8NpcbmlNw9yv8=
 
+rereadable-stream@^1.4.6:
+  version "1.4.7"
+  resolved "https://registry.yarnpkg.com/rereadable-stream/-/rereadable-stream-1.4.7.tgz#2159f856dbfe09950a2d13b2419d71b1d68f49b3"
+  integrity sha512-rjGiCiSngBxFOzB8Syp8R0NTRJO/76NyDXmJxKJ5fbXYCP9y+AO92eLkGj5CnrhZ+ZwVTy7eWE/ZDNMHw2Db+g==
+
 resize-observer-polyfill@^1.5.0, resize-observer-polyfill@^1.5.1:
   version "1.5.1"
   resolved "https://registry.yarnpkg.com/resize-observer-polyfill/-/resize-observer-polyfill-1.5.1.tgz#0e9020dd3d21024458d4ebd27e23e40269810464"
@@ -21210,6 +21230,20 @@ schema-utils@^2.0.0, schema-utils@^2.0.1, schema-utils@^2.1.0, schema-utils@^2.2
     "@types/json-schema" "^7.0.5"
     ajv "^6.12.4"
     ajv-keywords "^3.5.2"
+
+scramjet-core@^4.31.14:
+  version "4.31.14"
+  resolved "https://registry.yarnpkg.com/scramjet-core/-/scramjet-core-4.31.14.tgz#2415f5c5d4857a316a6e3e674632f156c4993c7f"
+  integrity sha512-fBI2zkCJV9mJh5QtXT9XvHzuLk2vTY+4PLQZO0XT78CwYWONHKngBsZFd8JHUbMXizkEDoII3+wy6MyDE8mjYw==
+
+scramjet@^4.35.13:
+  version "4.35.13"
+  resolved "https://registry.yarnpkg.com/scramjet/-/scramjet-4.35.13.tgz#950433a15d336d842d175ede94caacac55a06eab"
+  integrity sha512-YOAppWriUsi+2sQkZZabmivcnBOpKKKw5gHCbC8S3oKbxrBHiGCXbXt9PeS0IBkZM/JMQhjZFfVysocQ5NQcsA==
+  dependencies:
+    papaparse "^5.3.0"
+    rereadable-stream "^1.4.6"
+    scramjet-core "^4.31.14"
 
 scroll-into-view-if-needed@^2.2.25:
   version "2.2.26"
