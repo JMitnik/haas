@@ -1,29 +1,3 @@
 # Prisma Migrate lockfile v1
 
-20201207141627-reset-6
-20201208132747-reshape-form-entry
-20201208134932-change-number
-20201214084422-job-model
-20201215101452-added-more-job-status-options
-20210113075845-added-two-extra-job-statuses
-20210113080622-new-job-status
-20201228124727-campaign-added
-20201228142753-delivery-added-props
-20201231141638-add-workspace-to-campaign
-20210101093637-add-timestampts-to-delivery
-20210101093800-make-updatedat-optional-on-deliveries
-20210103223009-create-permissions-for-campaign
-20210103223316-campaign-event-improvements
-20210115090822-added-extra-fields-to-create-workspace-job
-20210125062507-add-lambda-booleans
-20210125064606-added-requires-color-extraction-boolean-to-schema
-20210210082505-added-more-job-statuses
-20210210082602-job-status-fix
-20210210082859-new-status
-20210118001822-added-delivery-tracking
-20210118005141-added-device
-20210224062325
-20210224062449-added-end-screen
-20210224062604-added-early-release-text
-20210224065512-remove-error-add
-20210224065552-reference-right-relation
+20210324100048-fresh-start
