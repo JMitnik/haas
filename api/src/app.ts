@@ -5,6 +5,7 @@ import express from 'express';
 import fs from 'fs';
 import https from 'https';
 
+import AWS from './config/aws';
 import config from './config/config';
 import makeApollo from './config/apollo';
 import { CampaignService } from './models/Campaigns/CampaignService';
@@ -37,6 +38,29 @@ const main = async () => {
     credentials: true,
   };
 
+  app.get('/', (req, res, next) => {
+    console.log(`The length of the env variable is ${config.jwtSecret.length}`);
+
+    res.json({ status: 'HAAS API V2.1.0' });
+  });
+
+  app.get('/health', (req, res, next) => {
+    res.json({ status: 'Health check' });
+  });
+
+  app.get('/test', async (req, res, next) => {
+    const dynamoClient = new AWS.DynamoDB.DocumentClient();
+    const result = await (dynamoClient.query({
+      TableName: 'CampaignDeliveries',
+      KeyConditionExpression: 'DeliveryDate = :dddd',
+      ExpressionAttributeValues: {
+        ':dddd': '26022021'
+      }
+    }).promise());
+
+    res.json({ nrItems: result?.Items?.length });
+  });
+
   app.post('/webhooks', bodyParser.json(), async (req: any, res: any, next: any) => {
     res.send('success');
   });
@@ -50,7 +74,7 @@ const main = async () => {
   app.use(cookieParser());
   app.use(cors(corsOptions));
 
-  apollo.applyMiddleware({ app, cors: false,  });
+  apollo.applyMiddleware({ app, cors: false, });
 
   console.log('🏳️\tStarting the server');
   if (config.useSSL) {

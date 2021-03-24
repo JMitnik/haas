@@ -709,12 +709,12 @@ export type Mutation = {
   createSession: Session;
   appendToInteraction: Session;
   deleteQuestion: QuestionNode;
-  updateQuestion: QuestionNode;
   createQuestion?: Maybe<QuestionNode>;
   deleteCTA: QuestionNode;
   /** Create Call to Actions */
   createCTA: QuestionNode;
   updateCTA: QuestionNode;
+  updateQuestion: QuestionNode;
 };
 
 
@@ -929,11 +929,6 @@ export type MutationDeleteQuestionArgs = {
 };
 
 
-export type MutationUpdateQuestionArgs = {
-  input?: Maybe<UpdateQuestionNodeInputType>;
-};
-
-
 export type MutationCreateQuestionArgs = {
   input?: Maybe<CreateQuestionNodeInputType>;
 };
@@ -951,6 +946,11 @@ export type MutationCreateCtaArgs = {
 
 export type MutationUpdateCtaArgs = {
   input?: Maybe<UpdateCtaInputType>;
+};
+
+
+export type MutationUpdateQuestionArgs = {
+  input?: Maybe<UpdateQuestionNodeInputType>;
 };
 
 export type NodeEntry = {
@@ -996,6 +996,7 @@ export type OptionInputType = {
   id?: Maybe<Scalars['Int']>;
   value?: Maybe<Scalars['String']>;
   publicValue?: Maybe<Scalars['String']>;
+  overrideLeafId?: Maybe<Scalars['String']>;
 };
 
 export type OptionsInputType = {
@@ -1280,6 +1281,7 @@ export type QuestionOption = {
   value: Scalars['String'];
   questionId?: Maybe<Scalars['String']>;
   publicValue?: Maybe<Scalars['String']>;
+  overrideLeaf?: Maybe<QuestionNode>;
 };
 
 export type RecipientsInputType = {
@@ -1322,6 +1324,7 @@ export type RequestInviteInput = {
 export type RequestInviteOutput = {
   __typename?: 'RequestInviteOutput';
   didInvite: Scalars['Boolean'];
+  userExists: Scalars['Boolean'];
 };
 
 export type RoleConnection = ConnectionInterface & {
@@ -1363,6 +1366,11 @@ export type Session = {
   dialogueId: Scalars['String'];
   paths: Scalars['Int'];
   score: Scalars['Float'];
+  totalTimeInSec?: Maybe<Scalars['Int']>;
+  originUrl?: Maybe<Scalars['String']>;
+  deliveryId?: Maybe<Scalars['String']>;
+  delivery?: Maybe<DeliveryType>;
+  device?: Maybe<Scalars['String']>;
   nodeEntries: Array<NodeEntry>;
 };
 
@@ -1381,6 +1389,9 @@ export type SessionInput = {
   dialogueId: Scalars['String'];
   entries?: Maybe<Array<NodeEntryInput>>;
   deliveryId?: Maybe<Scalars['String']>;
+  originUrl?: Maybe<Scalars['String']>;
+  device?: Maybe<Scalars['String']>;
+  totalTimeInSec?: Maybe<Scalars['Int']>;
 };
 
 export type SessionWhereUniqueInput = {
@@ -1582,7 +1593,7 @@ export type UpdateCtaInputType = {
 };
 
 export type UpdateQuestionNodeInputType = {
-  id?: Maybe<Scalars['ID']>;
+  id: Scalars['ID'];
   customerId?: Maybe<Scalars['ID']>;
   overrideLeafId?: Maybe<Scalars['ID']>;
   edgeId?: Maybe<Scalars['ID']>;
@@ -1882,6 +1893,19 @@ export type GetWorkspaceDialoguesQuery = (
       )>> }
     )>> }
   )> }
+);
+
+export type RequestInviteMutationVariables = Exact<{
+  input?: Maybe<RequestInviteInput>;
+}>;
+
+
+export type RequestInviteMutation = (
+  { __typename?: 'Mutation' }
+  & { requestInvite: (
+    { __typename?: 'RequestInviteOutput' }
+    & Pick<RequestInviteOutput, 'didInvite'>
+  ) }
 );
 
 
@@ -2422,3 +2446,35 @@ export type GetWorkspaceDialoguesQueryResult = Apollo.QueryResult<GetWorkspaceDi
 export function refetchGetWorkspaceDialoguesQuery(variables?: GetWorkspaceDialoguesQueryVariables) {
       return { query: GetWorkspaceDialoguesDocument, variables: variables }
     }
+export const RequestInviteDocument = gql`
+    mutation RequestInvite($input: RequestInviteInput) {
+  requestInvite(input: $input) {
+    didInvite
+  }
+}
+    `;
+export type RequestInviteMutationFn = Apollo.MutationFunction<RequestInviteMutation, RequestInviteMutationVariables>;
+
+/**
+ * __useRequestInviteMutation__
+ *
+ * To run a mutation, you first call `useRequestInviteMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRequestInviteMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [requestInviteMutation, { data, loading, error }] = useRequestInviteMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useRequestInviteMutation(baseOptions?: Apollo.MutationHookOptions<RequestInviteMutation, RequestInviteMutationVariables>) {
+        return Apollo.useMutation<RequestInviteMutation, RequestInviteMutationVariables>(RequestInviteDocument, baseOptions);
+      }
+export type RequestInviteMutationHookResult = ReturnType<typeof useRequestInviteMutation>;
+export type RequestInviteMutationResult = Apollo.MutationResult<RequestInviteMutation>;
+export type RequestInviteMutationOptions = Apollo.BaseMutationOptions<RequestInviteMutation, RequestInviteMutationVariables>;

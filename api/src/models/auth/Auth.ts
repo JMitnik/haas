@@ -80,12 +80,14 @@ export const VerifyUserTokenMutation = mutationField('verifyUserToken', {
     const decodedToken = verifyAndDecodeToken(args.token) as any;
 
     const validUsers = await ctx.prisma.user.findMany({
-      where: { AND: {
-        loginToken: {
-          equals: args.token,
-        },
-        id: { equals: decodedToken?.id },
-      } },
+      where: {
+        AND: {
+          loginToken: {
+            equals: args.token,
+          },
+          id: { equals: decodedToken?.id },
+        }
+      },
       include: {
         customers: {
           include: {
@@ -163,6 +165,7 @@ export const RequestInviteOutput = objectType({
 
   definition(t) {
     t.boolean('didInvite');
+    t.boolean('userExists');
   },
 });
 
@@ -182,7 +185,7 @@ export const RequestInviteMutation = mutationField('requestInvite', {
       },
     });
 
-    if (!user) return { didInvite: false };
+    if (!user) return { didInvite: false, userExists: false };
 
     const loginToken = AuthService.createUserToken(user.id);
 
@@ -199,11 +202,12 @@ export const RequestInviteMutation = mutationField('requestInvite', {
     mailService.send({
       body: loginBody,
       recipient: user.email,
-      subject: 'Sign in to HAAS!',
+      subject: 'Your HAAS Magic-link is ready!',
     });
 
     return {
       didInvite: true,
+      userExists: true
     };
   },
 });
@@ -274,7 +278,8 @@ export const InviteUserMutation = mutationField('inviteUser', {
       },
     });
 
-    // Case 1: If user completely does not exist in our database yet, create a new entry and login-token
+    // Case 1: If user completely does not exist in our database yet,
+    //  create a new entry and login-token
     if (!users.length) {
       await UserService.inviteNewUserToCustomer(email, customerId, roleId);
 
@@ -286,19 +291,10 @@ export const InviteUserMutation = mutationField('inviteUser', {
 
     const [user] = users;
 
-    // Case 2: If user-customer relation already exists, just update the role itself
+    // Case 2: If user-customer relation already exists, 
+    // just update the role itself
     if (user.customers.length) {
-      await ctx.prisma.userOfCustomer.update({
-        where: {
-          userId_customerId: {
-            customerId,
-            userId: user.id,
-          },
-        },
-        data: {
-          role: { connect: { id: roleId } },
-        },
-      });
+      await UserService.updateUserRole(user.id, roleId, customerId);
 
       return {
         didInvite: false,
@@ -306,14 +302,8 @@ export const InviteUserMutation = mutationField('inviteUser', {
       };
     }
 
-    // Cas 3: user exists but not with this customer yet.
-    await ctx.prisma.userOfCustomer.create({
-      data: {
-        customer: { connect: { id: customerId } },
-        role: { connect: { id: roleId } },
-        user: { connect: { id: user.id } },
-      },
-    });
+    // Case 3: Invite existing user to customer
+    await UserService.inviteExistingUserToCustomer(user.id, roleId, customerId);
 
     return {
       didAlreadyExist: true,

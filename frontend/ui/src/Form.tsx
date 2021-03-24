@@ -28,6 +28,7 @@ import {
 } from '@chakra-ui/core';
 import styled, { css } from 'styled-components';
 import { SpaceProps, GridProps } from 'styled-system';
+import ReactSelect from 'react-select';
 import { InputHTMLAttributes } from 'react';
 import Color from 'color';
 import { FormLabelProps } from '@chakra-ui/core/dist/FormLabel';
@@ -128,7 +129,7 @@ export const InputLabel = styled.label`
 `;
 
 export const FormLabel = forwardRef((props: FormLabelProps, ref) => (
-  <ChakraFormLabel fontSize="0.8rem" color="gray.600" {...props} ref={ref} />
+  <ChakraFormLabel fontSize="0.8rem" color="gray.600" fontWeight="600" {...props} ref={ref} />
 ));
 
 interface InputProps extends ChakraInputProps {
@@ -781,8 +782,87 @@ export const DatePicker = ({ range, ...restProps }: RangePickerProps | PureDateP
         {...restProps as RangePickerProps}
       />
     ) : (
-        <PureDatePickerWrapper
-          {...restProps as PureDatePickerProps} />
-      )}
+      <PureDatePickerWrapper
+        {...restProps as PureDatePickerProps} />
+    )}
   </DatePickerContainer>
 )
+export const Switch = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    flex-wrap: wrap;
+    background: ${theme.colors.gray[100]};
+    padding: 4px;
+    border-radius: 10px;
+    box-shadow: inset 0 2px 4px 0 rgb(0 0 0 / 5%);
+  `}
+`;
+
+interface SwitchItemProps {
+  isActive?: boolean;
+}
+
+export const SwitchItem = styled.button.attrs({ type: 'button' }) <SwitchItemProps>`
+  ${({ theme, isActive }) => css`
+    color: ${theme.colors.gray[700]};
+    font-weight: 700;
+    padding: 4px 8px;
+    border-radius: 10px;
+    margin-right: 12px;
+    
+    &:active, &:focus {
+      outline: none;
+    }
+
+    ${isActive && css`
+      background: white;
+      color: ${theme.colors.gray[600]};
+      box-shadow: 0 4px 6px rgba(50,50,93,.11), 0 1px 3px rgba(0,0,0,.08);
+    `}
+  `}
+`
+
+type ReactSelectProps = ReactSelect<T>['props'];
+
+interface SelectContainerProps {
+  menuIsOpen?: boolean;
+}
+
+export const SelectContainer = styled(Div) <SelectContainerProps>`
+  ${({ theme, menuIsOpen }) => css`
+    ${menuIsOpen && css`
+        .select__control {
+          margin-bottom: ${theme.gutter / 2}px;
+          border-radius: 10px;
+        }
+
+        .select__indicator {
+          display: none;
+        }
+
+        .select__indicator-separator {
+          display: none;
+        }
+
+        .select__option {
+          &:hover {
+            cursor: pointer;
+          }
+        }
+
+        .select__menu {
+          background: white;
+          /* Apply breakout */
+          margin: 0 -${theme.gutter / 2}px;
+          margin-bottom: -${theme.gutter / 2}px;
+          border-top: 1px solid ${theme.colors.gray[200]};
+        }
+    `}
+  `}
+`;
+
+export const Select = (props: ReactSelectProps) => (
+  <SelectContainer menuIsOpen={props.menuIsOpen}>
+    <ReactSelect {...props} classNamePrefix="select" />
+  </SelectContainer>
+);

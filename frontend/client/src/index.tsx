@@ -1,18 +1,25 @@
+import 'config/sentry';
 import 'mobx-react-lite/batchingForReactDom';
-import { worker } from 'tests/mocks/browser';
+
+import { worker } from 'mocks/browser';
 import React from 'react';
 import ReactDOM from 'react-dom';
-
 import 'layouts/index.css';
 
 import App from './pages';
 
-if (process.env.NODE_ENV === 'test') {
-  worker.start({
-    waitUntilReady: true,
-  }).then(() => {
-    ReactDOM.render(<App />, document.getElementById('root'));
-  });
+console.log(process.env.ENV);
+
+if (process.env.REACT_APP_ENV && process.env.REACT_APP_ENV === 'test') {
+  // TODO: Figure out how to get MSW working okay
+  // worker.start({
+  //   waitUntilReady: true,
+  //   onUnhandledRequest: 'bypass',
+  //   serviceWorker: { options: { scope: 'http://localhost:4000/graphql' } }
+  // }).then(() => {
+  //   ReactDOM.render(<App />, document.getElementById('root'));
+  // });
+  ReactDOM.render(<App />, document.getElementById('root'));
 } else {
   ReactDOM.render(<App />, document.getElementById('root'));
 }

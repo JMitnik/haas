@@ -16,4 +16,5 @@ try {
 
 console.log('🏁\tFinished bootstrapping AWS');
 
+
 export default AWS;

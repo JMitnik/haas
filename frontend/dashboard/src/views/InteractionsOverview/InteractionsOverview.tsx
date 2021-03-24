@@ -8,7 +8,7 @@ import { useLocation, useParams } from 'react-router';
 import Papa from 'papaparse';
 import React, { useCallback, useEffect, useState } from 'react';
 
-import { Activity, Download } from 'react-feather';
+import { Activity, Download, Link, Monitor, User, Watch } from 'react-feather';
 import { Button, Icon } from '@chakra-ui/core';
 import {
   getDialogueSessionConnection as CustomerSessionConnection,
@@ -57,8 +57,9 @@ const tableHeaders = [
   { Header: 'score', accessor: 'score', Cell: ScoreCell },
 ];
 
-const ExpandedInteractionRow = ({ data }: { data: Session }) => {
+const ExpandedInteractionRow = ({ data }: { data: any }) => {
   const { t } = useTranslation();
+
   return (
     <Div useFlex flexDirection="column" backgroundColor="gray.100" gridColumn="1 / -1">
       <Div padding={25}>
@@ -66,10 +67,49 @@ const ExpandedInteractionRow = ({ data }: { data: Session }) => {
           <Div useFlex flexDirection="row">
             <Div width="51%">
               <Text color="gray.400" fontSize="1.2rem" fontWeight="600">{t('interactions:user_data')}</Text>
-              <Text color="gray.400" fontWeight="300">{t('interactions:user_information')}</Text>
             </Div>
           </Div>
-          <Div />
+          <UI.Div pt={4}>
+            <UI.Stack isInline spacing={4}>
+              {data.delivery && (
+                <UI.Div>
+                  <UI.Helper>{t('delivery_recipient')}</UI.Helper>
+                  <UI.Label size="sm" mt={1} variantColor="cyan">
+                    <UI.Icon mr={2} ><User width="0.8rem" /></UI.Icon>
+                    {data.delivery.deliveryRecipientFirstName}
+                    {data.delivery.deliveryRecipientLastName}
+                  </UI.Label>
+                </UI.Div>
+              )}
+              {data.device && (
+                <UI.Div>
+                  <UI.Helper mb={1}>{t('device')}</UI.Helper>
+                  <UI.Label mt={1} size="sm" variantColor="cyan">
+                    <UI.Icon mr={2} ><Monitor width="0.8rem" /></UI.Icon>
+                    {data.device}
+                  </UI.Label>
+                </UI.Div>
+              )}
+              {data.totalTimeInSec && (
+                <UI.Div>
+                  <UI.Helper mb={1}>{t('duration')}</UI.Helper>
+                  <UI.Label mt={1} size="sm" variantColor="cyan">
+                    <UI.Icon mr={2} ><Watch width="0.8rem" /></UI.Icon>
+                    {data.totalTimeInSec} {t('seconds')}
+                  </UI.Label>
+                </UI.Div>
+              )}
+              {data.originUrl && (
+                <UI.Div>
+                  <UI.Helper>{t('origin_url')}</UI.Helper>
+                  <UI.Label size="sm" mt={1} variantColor="cyan">
+                    <UI.Icon mr={2} ><Link width="0.8rem" /></UI.Icon>
+                    {data.originUrl}
+                  </UI.Label>
+                </UI.Div>
+              )}
+            </UI.Stack>
+          </UI.Div>
         </Div>
         <UI.Hr />
         <Div position="relative" useFlex flexDirection="row">

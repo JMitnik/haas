@@ -67,3 +67,5 @@ expose
 .vscode
 launch.json
 .next
+
+cdk.out

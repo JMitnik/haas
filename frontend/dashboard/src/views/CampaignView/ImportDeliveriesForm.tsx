@@ -10,7 +10,7 @@ import { useCreateBatchDeliveriesMutation, refetchGetWorkspaceCampaignQuery } fr
 import { useNavigator } from 'hooks/useNavigator';
 import { defaultCampaignViewFilter } from './CampaignView';
 import { useCustomer } from 'providers/CustomerProvider';
-import { useRef } from 'react';
+import { useLogger } from 'hooks/useLogger';
 
 const schema = yup.object({
   batchScheduledAt: yup.date()
@@ -27,6 +27,7 @@ export const ImportDeliveriesForm = ({ onClose }: { onClose: () => void; }) => {
     mode: 'all'
   });
   const { activeCustomer } = useCustomer();
+  const logger = useLogger();
 
   const toast = useToast();
 
@@ -45,7 +46,9 @@ export const ImportDeliveriesForm = ({ onClose }: { onClose: () => void; }) => {
     },
     awaitRefetchQueries: true,
     onError: (error) => {
-      console.log(error);
+      logger.logError(error, {
+        tags: { section: 'campaign' }
+      });
       toast({
         title: 'Something went wrong!',
         description: 'Currently unable to edit your detail. Please try again.',

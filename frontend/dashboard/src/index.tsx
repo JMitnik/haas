@@ -1,5 +1,7 @@
 /* eslint-disable no-alert */
 /* eslint-disable no-restricted-globals */
+import 'config/sentry';
+
 import React from 'react';
 import ReactDOM from 'react-dom';
 

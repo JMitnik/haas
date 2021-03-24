@@ -1,3 +1,4 @@
+import prisma from '../../config/prisma';
 import { NexusGenEnums, NexusGenInputs, NexusGenRootTypes } from '../../generated/nexus';
 
 export interface FindManyProps {
@@ -23,13 +24,13 @@ export interface FindManyArgsProps {
   findManyCallBack: (
     args: FindManyCallBackProps
   ) => Promise<Array<any>>;
-  [k : string]: any;
+  [k: string]: any;
 }
 
 export interface CountArgsProps {
   countWhereInput: any;
   countCallBack: (args: FindManyCallBackProps) => Promise<number>;
-  [k : string]: any;
+  [k: string]: any;
 }
 
 export interface PaginateProps {
@@ -85,17 +86,11 @@ export const constructSortInput = (
 ) => {
   if (!orderByArray?.length) return undefined;
 
-  const orderBy = orderByArray?.[0];
-  if (!orderBy) return null;
-
-  const sortObject: Record<any, string> = {};
-
-  orderFields.forEach((sortOption) => {
-    const sortCondition = orderBy.by === sortOption ? orderBy.desc ? 'desc' : 'asc' : undefined;
-    if (sortCondition) {
-      sortObject[sortOption] = sortCondition;
-    }
-  });
+  const sortObject = orderByArray.filter((orderOption) => {
+    return orderFields.includes(orderOption?.by);
+  }).map(orderOption => ({
+    [orderOption?.by]: orderOption.desc ? 'desc' : 'asc'
+  }));
 
   return sortObject;
 };
@@ -121,7 +116,7 @@ export const paginate = async <GenericModelType>({
   paginationOpts = {},
   countArgs,
   useSlice = true
-} : PaginateProps,
+}: PaginateProps,
 ) => {
   const { offset, limit, pageIndex } = paginationOpts;
   const { countCallBack, countWhereInput, ...countRest } = countArgs;

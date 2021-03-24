@@ -96,6 +96,8 @@ model Dialogue {
   isOnline         Boolean        @default(value: false)
   isWithoutGenData Boolean        @default(value: false)
 
+  endScreenText String?
+
   wasGeneratedWithGenData Boolean           @default(value: false)
   CampaignVariant         CampaignVariant[]
   @@unique([slug, customerId])
@@ -187,6 +189,8 @@ model SliderNode {
   id           String             @id @default(cuid())
   markers      SliderNodeMarker[]
   QuestionNode QuestionNode[]
+
+  earlyReleaseText  String?
 }
 
 model QuestionNode {
@@ -207,6 +211,7 @@ model QuestionNode {
   questionDialogue   Dialogue? @relation(fields: [questionDialogueId], references: [id])
   questionDialogueId String?
 
+
   isChildNodeOf              Edge[]      @relation("Edge_childNodeToQuestionNode")
   isParentNodeOf             Edge[]      @relation("Edge_parentNodeToQuestionNode")
   isRelatedNodeOfNodeEntries NodeEntry[]
@@ -214,8 +219,9 @@ model QuestionNode {
   edgeId String?
   Edge   Edge?   @relation("EdgeChildrenRelation", fields: [edgeId], references: [id])
 
-  QuestionOption QuestionOption[] @relation("QuestionNodeOptions")
-  triggers       Trigger[]
+  QuestionOption   QuestionOption[] @relation("QuestionNodeOptions")
+  triggers         Trigger[]
+  overridesChoices QuestionOption[]   @relation("ChoiceCTANode")
 
   // Node-types
   share      Share?
@@ -292,11 +298,16 @@ model QuestionCondition {
 }
 
 model QuestionOption {
-  id             Int           @id @default(autoincrement())
-  publicValue    String?
-  value          String
-  questionId     String?
-  question       QuestionNode? @relation("QuestionNodeOptions", fields: [questionId], references: [id])
+  id          Int     @id @default(autoincrement())
+  publicValue String?
+  value       String
+
+  overrideLeafId String?
+  overrideLeaf   QuestionNode? @relation("ChoiceCTANode", fields: [overrideLeafId], references: [id])
+
+  questionId String?
+  question   QuestionNode? @relation("QuestionNodeOptions", fields: [questionId], references: [id])
+
   questionNodeId String?
   QuestionNode   QuestionNode? @relation(fields: [questionNodeId], references: [id])
 }
@@ -307,6 +318,13 @@ model Session {
   dialogueId  String
   dialogue    Dialogue    @relation(fields: [dialogueId], references: [id])
   nodeEntries NodeEntry[]
+
+  deliveryId String?
+  delivery   Delivery? @relation(fields: [deliveryId], references: [id])
+
+  originUrl      String?
+  totalTimeInSec Int?
+  device         String?
 }
 
 // Node-entry types
@@ -649,12 +667,13 @@ model Delivery {
   scheduledAt DateTime
   createdAt   DateTime  @default(now())
   updatedAt   DateTime? @updatedAt
+  Session     Session[]
 }
 
 model DeliveryEvents {
   id         String                 @id @default(cuid())
   status     DeliveryStatusTypeEnum
   createdAt  DateTime               @default(now())
-  deliveryId String
-  Delivery   Delivery               @relation(fields: [deliveryId], references: [id])
+  deliveryId String?
+  Delivery   Delivery?              @relation(fields: [deliveryId], references: [id])
 }

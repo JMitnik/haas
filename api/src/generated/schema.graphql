@@ -663,6 +663,7 @@ type NodeEntryValue {
 
 input OptionInputType {
   id: Int
+  overrideLeafId: String
   publicValue: String
   value: String
 }
@@ -822,6 +823,7 @@ input QuestionNodeWhereUniqueInput {
 
 type QuestionOption {
   id: Int!
+  overrideLeaf: QuestionNode
   publicValue: String
   questionId: String
   value: String!
@@ -865,6 +867,7 @@ input RequestInviteInput {
 
 type RequestInviteOutput {
   didInvite: Boolean!
+  userExists: Boolean!
 }
 
 type RoleConnection implements ConnectionInterface {
@@ -899,11 +902,16 @@ type RoleType {
 
 type Session {
   createdAt: Date!
+  delivery: DeliveryType
+  deliveryId: String
+  device: String
   dialogueId: String!
   id: ID!
   nodeEntries: [NodeEntry!]!
+  originUrl: String
   paths: Int!
   score: Float!
+  totalTimeInSec: Int
 }
 
 type SessionConnection implements ConnectionInterface {
@@ -918,8 +926,11 @@ type SessionConnection implements ConnectionInterface {
 """Input for session"""
 input SessionInput {
   deliveryId: String
+  device: String
   dialogueId: String!
   entries: [NodeEntryInput!]
+  originUrl: String
+  totalTimeInSec: Int
 }
 
 input SessionWhereUniqueInput {
@@ -1115,7 +1126,7 @@ input UpdateQuestionNodeInputType {
   customerId: ID
   edgeCondition: EdgeConditionInputType
   edgeId: ID
-  id: ID
+  id: ID!
   optionEntries: OptionsInputType
   overrideLeafId: ID
   sliderNode: SliderNodeInputType

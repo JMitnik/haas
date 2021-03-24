@@ -1,5 +1,7 @@
-import { AnimatePresence, Variants, motion, transform,
-  useAnimation, useMotionValue, useTransform } from 'framer-motion';
+import {
+  AnimatePresence, Variants, motion, transform,
+  useAnimation, useMotionValue, useTransform
+} from 'framer-motion';
 import { usePopper } from 'react-popper';
 import { useTimer } from 'use-timer';
 import Color from 'color';
@@ -32,9 +34,9 @@ interface AnimationPayload {
 }
 
 type SliderAnimationActionType =
-| { type: 'idle', payload?: AnimationPayload }
-| { type: 'run', payload: AnimationPayload }
-| { type: 'stop', payload?: AnimationPayload };
+  | { type: 'idle', payload?: AnimationPayload }
+  | { type: 'run', payload: AnimationPayload }
+  | { type: 'stop', payload?: AnimationPayload };
 
 const defaultSliderAnimationState: SliderAnimationStateProps = {
   isStopped: true,
@@ -241,13 +243,15 @@ const Slider = ({ form, register, onSubmit, markers }: SliderProps) => {
     <>
       {animationState.isStopped && (
         <SlideHereContainer variants={SlideMeAnimation} animate="animate" initial="initial" exit="exit">
-          <Flex alignItems="center">
+          <Flex
+            data-testid="unhappy"
+            alignItems="center">
             <UnhappyIcon />
             <Text fontSize="0.8rem">
               Unhappy
             </Text>
           </Flex>
-          <Flex alignItems="center">
+          <Flex alignItems="center" data-testid="happy">
             <Text mr={1} fontSize="0.8rem">
               Happy
             </Text>
@@ -352,6 +356,7 @@ const Slider = ({ form, register, onSubmit, markers }: SliderProps) => {
       </HAASRabbit>
       <form>
         <UISlider
+          data-testid="slider"
           data-cy="Slider"
           width={1}
           name="slider"

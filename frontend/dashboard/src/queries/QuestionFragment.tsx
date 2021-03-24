@@ -47,6 +47,11 @@ const QuestionFragment = gql`
         id
         value
         publicValue
+        overrideLeaf {
+          id
+          title
+          type
+        }
     }
   }
 `;

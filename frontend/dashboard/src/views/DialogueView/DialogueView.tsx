@@ -324,11 +324,13 @@ const DialogueView = () => {
           <Dropdown
             offset={[0, 0]}
             minWidth={400}
-            renderOverlay={<ShareDialogue dialogueName={dialogueSlug} shareUrl={shareUrl} />}
+            renderOverlay={() => <ShareDialogue dialogueName={dialogueSlug} shareUrl={shareUrl} />}
           >
-            <UI.Button variantColor="teal" leftIcon={QRIcon} ml={4} size="sm">
-              {t('share')}
-            </UI.Button>
+            {({ onOpen }) => (
+              <UI.Button onClick={onOpen} variantColor="teal" leftIcon={QRIcon} ml={4} size="sm">
+                {t('share')}
+              </UI.Button>
+            )}
           </Dropdown>
         </PageTitle>
         <UI.Div mb={4}>
