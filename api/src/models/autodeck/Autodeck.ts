@@ -6,6 +6,50 @@ import { PaginationWhereInput } from '../general/Pagination';
 import { NexusGenFieldTypes } from '../../generated/nexus';
 import { Upload } from '../customer/Customer';
 
+export const JobProcessLocation = objectType({
+  name: 'JobProcessLocation',
+  definition(t) {
+    t.string('id');
+    t.string('name');
+    t.string('path')
+  }
+})
+
+export const JobProcessLocations = objectType({
+  name: 'JobProcessLocations',
+  definition(t) {
+    t.list.field('jobProcessLocations', {
+      type: JobProcessLocation,
+    })
+  }
+})
+
+export const GetJobProcessLocationQuery = queryField('getJobProcessLocations', {
+  type: JobProcessLocations,
+  async resolve() {
+    const jobProcessLocations = await AutodeckService.getJobProcessLocations()
+    console.log('Job process Locations: ', jobProcessLocations)
+    return { jobProcessLocations: jobProcessLocations || [] };
+  }
+})
+
+export const createJobProcessLocationInput = inputObjectType({
+  name: 'createJobProcessLocationInput',
+  definition(t) {
+    t.string('name');
+    t.string('path');
+  }
+})
+
+export const CreateJobProcessLocationMutation = mutationField('createJobProcessLocation', {
+  type: JobProcessLocation,
+  args: {input : createJobProcessLocationInput},
+  resolve(parent, args) {
+    return AutodeckService.createJobProcessLocation(args.input)
+  }
+
+})
+
 export const CloudReferenceType = enumType({
   name: 'CloudReferenceType',
   members: ['AWS', 'GCP', 'Azure', 'IBM'],
@@ -47,6 +91,21 @@ export const CreateWorkspaceJobType = objectType({
     t.field('status', {
       type: JobStatusType,
     });
+
+    t.field('processLocation', {
+      type: JobProcessLocation,
+      resolve(parent, args, ctx) {
+        return ctx.prisma.jobProcessLocation.findFirst({
+          where: {
+            job: {
+              some: {
+                id: parent.id
+              }
+            }
+          }
+        })
+      }
+    })
   },
 });
 

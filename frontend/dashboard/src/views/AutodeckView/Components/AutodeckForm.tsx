@@ -1,7 +1,7 @@
 import { Briefcase, Link } from 'react-feather';
-import { useGetPreviewDataLazyQuery } from 'types/generated-types';
+import { useGetPreviewDataLazyQuery, useGetJobProcessLocationsQuery } from 'types/generated-types';
 import { Button, ButtonGroup } from '@chakra-ui/core';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import {
   Div, Form, FormControl, FormLabel, FormSection, H3, Hr, Input, InputGrid, InputHelper,
   Muted,
@@ -9,6 +9,8 @@ import {
 import { useTranslation } from 'react-i18next';
 import React, { useState, useEffect } from 'react';
 import cuid from 'cuid';
+import Select from 'react-select';
+
 import boolToInt from 'utils/booleanToNumber';
 import WebsiteScreenshotFragment from '../Fragments/WebsiteScreenshot';
 import PrimaryColourFragment from '../Fragments/PrimaryColor';
@@ -29,6 +31,7 @@ const AutodeckForm = ({
   const [activeJobId] = useState(cuid());
 
   const [fetchPreviewData, { data: previewData }] = useGetPreviewDataLazyQuery()
+  const { data: jobProcessLocations } = useGetJobProcessLocationsQuery()
 
   const form = useForm<FormDataProps>({
     defaultValues: {
@@ -110,6 +113,9 @@ const AutodeckForm = ({
     setValue('primaryColour', previewData?.getPreviewData?.colors[0])
   }, [previewData, setValue])
 
+  const mappedJobLocations = jobProcessLocations?.getJobProcessLocations?.jobProcessLocations
+    .map((jobLocation) => ({ label: `${jobLocation.name} - ${jobLocation.path}`, value: jobLocation.id }))
+
   return (
     <Form onSubmit={form.handleSubmit(onFormSubmit)}>
       <>
@@ -131,6 +137,17 @@ const AutodeckForm = ({
                   leftEl={<Briefcase />}
                   name="name"
                   ref={form.register()}
+                />
+              </FormControl>
+
+              <FormControl isInvalid={!!form.errors.jobLocation} isRequired>
+                <FormLabel htmlFor="name">{t('process_location')}</FormLabel>
+                <InputHelper>{t('process_location_helper')}</InputHelper>
+                <Controller
+                  name="jobLocation"
+                  as={Select}
+                  control={form.control}
+                  options={mappedJobLocations}
                 />
               </FormControl>
             </InputGrid>

@@ -5,6 +5,10 @@ import { DeepPartial } from 'types/customTypes';
 
 export const schema = yup.object().shape({
   name: yup.string().required('Name is required'),
+  jobLocation: yup.object().shape({
+    value: yup.string(),
+    label: yup.string()
+  }),
   website: yup.string().required('Website is required'),
   logo: yup.string().url('Url should be valid'),
   primaryColour: yup.string().required().matches(/^(#(\d|\D){6}$){1}/, {

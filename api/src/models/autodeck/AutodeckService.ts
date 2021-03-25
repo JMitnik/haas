@@ -60,6 +60,19 @@ export interface CreateWorkspaceJobProps {
 
 class AutodeckService {
 
+  static getJobProcessLocations = async () => {
+    return prisma.jobProcessLocation.findMany()
+  }
+
+  static createJobProcessLocation = async (input: any) => {
+    return prisma.jobProcessLocation.create({
+      data: {
+        name: input.name,
+        path: input.path
+      }
+    })
+  }
+
   static paginatedAutodeckJobs = async (
     paginationOpts: NexusGenInputs['PaginationWhereInput'],
   ) => {
@@ -111,7 +124,12 @@ class AutodeckService {
         referenceType: 'AWS',
         requiresColorExtraction: false,
         requiresRembg: false,
-        requiresScreenshot: false
+        requiresScreenshot: false,
+        processLocation: {
+          connect: {
+            id: 'PROCESS_LOCATION' //TODO: Need to change to value coming in from dashboard PROCESS_LOCATION
+          }
+        }
       },
       update: {
         status: 'IN_PHOTOSHOP_QUEUE',
@@ -233,6 +251,11 @@ class AutodeckService {
         requiresRembg: input.requiresRembg || false,
         requiresScreenshot: input.requiresWebsiteScreenshot || false,
         requiresColorExtraction: input.requiresColorExtraction || false,
+        processLocation: {
+          connect: {
+            id: 'TODO' //TODO: Need to add actual value from dashboard PROCESS_LOCATION
+          }
+        }
       }
     })
 
@@ -366,6 +389,11 @@ class AutodeckService {
           create: {
             referenceType: 'AWS',
             status: 'PENDING',
+            processLocation: {
+              connect: {
+                id: 'TODO' //TODO: Need to add actual value from dashboard PROCESS_LOCATION
+              }
+            }
           },
         },
       },

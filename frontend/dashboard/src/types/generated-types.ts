@@ -164,6 +164,11 @@ export type CreateDialogueInputType = {
   tags?: Maybe<TagsInputObjectType>;
 };
 
+export type CreateJobProcessLocationInput = {
+  name?: Maybe<Scalars['String']>;
+  path?: Maybe<Scalars['String']>;
+};
+
 export type CreateQuestionNodeInputType = {
   customerId?: Maybe<Scalars['ID']>;
   overrideLeafId?: Maybe<Scalars['ID']>;
@@ -204,6 +209,7 @@ export type CreateWorkspaceJobType = {
   updatedAt?: Maybe<Scalars['String']>;
   referenceId?: Maybe<Scalars['String']>;
   referenceType: CloudReferenceType;
+  processLocation: JobProcessLocation;
 };
 
 export type CtaLinkInputObjectType = {
@@ -610,6 +616,18 @@ export type JobObjectType = {
   createWorkspaceJob?: Maybe<CreateWorkspaceJobType>;
 };
 
+export type JobProcessLocation = {
+  __typename?: 'JobProcessLocation';
+  id: Scalars['String'];
+  name: Scalars['String'];
+  path: Scalars['String'];
+};
+
+export type JobProcessLocations = {
+  __typename?: 'JobProcessLocations';
+  jobProcessLocations: Array<JobProcessLocation>;
+};
+
 export enum JobStatusType {
   Pending = 'PENDING',
   PreProcessing = 'PRE_PROCESSING',
@@ -668,6 +686,7 @@ export type LoginOutput = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  createJobProcessLocation: JobProcessLocation;
   generateAutodeck?: Maybe<CreateWorkspaceJobType>;
   confirmCreateWorkspaceJob?: Maybe<CreateWorkspaceJobType>;
   whitifyImage?: Maybe<AwsImageType>;
@@ -715,6 +734,11 @@ export type Mutation = {
   createCTA: QuestionNode;
   updateCTA: QuestionNode;
   updateQuestion: QuestionNode;
+};
+
+
+export type MutationCreateJobProcessLocationArgs = {
+  input?: Maybe<CreateJobProcessLocationInput>;
 };
 
 
@@ -1083,6 +1107,7 @@ export type PreviewDataType = {
 
 export type Query = {
   __typename?: 'Query';
+  getJobProcessLocations: JobProcessLocations;
   getPreviewData?: Maybe<PreviewDataType>;
   getJob?: Maybe<CreateWorkspaceJobType>;
   getAutodeckJobs: AutodeckConnectionType;
@@ -1738,6 +1763,20 @@ export type GetAdjustedLogoQuery = (
   )> }
 );
 
+export type GetJobProcessLocationsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetJobProcessLocationsQuery = (
+  { __typename?: 'Query' }
+  & { getJobProcessLocations: (
+    { __typename?: 'JobProcessLocations' }
+    & { jobProcessLocations: Array<(
+      { __typename?: 'JobProcessLocation' }
+      & Pick<JobProcessLocation, 'id' | 'name' | 'path'>
+    )> }
+  ) }
+);
+
 export type GetPreviewDataQueryVariables = Exact<{
   id?: Maybe<Scalars['String']>;
 }>;
@@ -2099,6 +2138,45 @@ export type GetAdjustedLogoLazyQueryHookResult = ReturnType<typeof useGetAdjuste
 export type GetAdjustedLogoQueryResult = Apollo.QueryResult<GetAdjustedLogoQuery, GetAdjustedLogoQueryVariables>;
 export function refetchGetAdjustedLogoQuery(variables?: GetAdjustedLogoQueryVariables) {
       return { query: GetAdjustedLogoDocument, variables: variables }
+    }
+export const GetJobProcessLocationsDocument = gql`
+    query getJobProcessLocations {
+  getJobProcessLocations {
+    jobProcessLocations {
+      id
+      name
+      path
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetJobProcessLocationsQuery__
+ *
+ * To run a query within a React component, call `useGetJobProcessLocationsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetJobProcessLocationsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetJobProcessLocationsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetJobProcessLocationsQuery(baseOptions?: Apollo.QueryHookOptions<GetJobProcessLocationsQuery, GetJobProcessLocationsQueryVariables>) {
+        return Apollo.useQuery<GetJobProcessLocationsQuery, GetJobProcessLocationsQueryVariables>(GetJobProcessLocationsDocument, baseOptions);
+      }
+export function useGetJobProcessLocationsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetJobProcessLocationsQuery, GetJobProcessLocationsQueryVariables>) {
+          return Apollo.useLazyQuery<GetJobProcessLocationsQuery, GetJobProcessLocationsQueryVariables>(GetJobProcessLocationsDocument, baseOptions);
+        }
+export type GetJobProcessLocationsQueryHookResult = ReturnType<typeof useGetJobProcessLocationsQuery>;
+export type GetJobProcessLocationsLazyQueryHookResult = ReturnType<typeof useGetJobProcessLocationsLazyQuery>;
+export type GetJobProcessLocationsQueryResult = Apollo.QueryResult<GetJobProcessLocationsQuery, GetJobProcessLocationsQueryVariables>;
+export function refetchGetJobProcessLocationsQuery(variables?: GetJobProcessLocationsQueryVariables) {
+      return { query: GetJobProcessLocationsDocument, variables: variables }
     }
 export const GetPreviewDataDocument = gql`
     query getPreviewData($id: String) {

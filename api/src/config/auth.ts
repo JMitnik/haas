@@ -72,6 +72,7 @@ const authShield = shield({
     logout: allow,
     createSession: allow,
     updateJob: allow,
+    createJobProcessLocation: allow,
     updateCreateWorkspaceJob: allow,
     appendToInteraction: allow,
     verifyUserToken: allow,

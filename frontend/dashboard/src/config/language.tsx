@@ -5,6 +5,14 @@ const language = {
       en: 'General',
       de: 'General',
     },
+    process_location: {
+      en: 'Process type & location',
+      de: 'Process type & location',
+    },
+    process_location_helper: {
+      en: 'What kind of job are you trying to run',
+      de: 'What kind of job are you trying to run',
+    },
     job_name: {
       en: 'Job name',
       de: 'Job name',
