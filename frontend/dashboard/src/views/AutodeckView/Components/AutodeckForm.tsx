@@ -51,6 +51,7 @@ const AutodeckForm = ({
     const requiresColorExtraction = data?.useCustomColour === 1 ? true : false;
     const requiresWebsiteScreenshot = data?.useWebsiteUrl === 1 ? true : false;
     const usesAdjustedLogo = data?.isEditingLogo === 1 ? true : false;
+    const jobLocationId = data.jobLocation?.value
 
     if (!isInEditing && (requiresRembgLambda || requiresColorExtraction || requiresWebsiteScreenshot)) {
       return onCreateJob({
@@ -65,6 +66,7 @@ const AutodeckForm = ({
             requiresColorExtraction,
             primaryColour: data.primaryColour,
             usesAdjustedLogo: false,
+            jobLocationId
           }
         }
       })
@@ -89,7 +91,8 @@ const AutodeckForm = ({
           youLoveX: data.youLoveX,
           reward: data.reward,
           emailContent: data.emailContent,
-          textMessage: data.textMessage
+          textMessage: data.textMessage,
+          jobLocationId
         }
       }
     })
@@ -116,6 +119,9 @@ const AutodeckForm = ({
   const mappedJobLocations = jobProcessLocations?.getJobProcessLocations?.jobProcessLocations
     .map((jobLocation) => ({ label: `${jobLocation.name} - ${jobLocation.path}`, value: jobLocation.id }))
 
+  console.log('form: ', form.formState.isValid)
+  console.log('values; ', form.getValues())
+
   return (
     <Form onSubmit={form.handleSubmit(onFormSubmit)}>
       <>
@@ -141,13 +147,22 @@ const AutodeckForm = ({
               </FormControl>
 
               <FormControl isInvalid={!!form.errors.jobLocation} isRequired>
-                <FormLabel htmlFor="name">{t('process_location')}</FormLabel>
+                <FormLabel htmlFor="jobLocation">{t('process_location')}</FormLabel>
                 <InputHelper>{t('process_location_helper')}</InputHelper>
                 <Controller
                   name="jobLocation"
-                  as={Select}
+                  defaultValue={null}
                   control={form.control}
-                  options={mappedJobLocations}
+                  render={({ onChange, value }) => (
+                    <Select
+                      isDisabled={isInEditing}
+                      options={mappedJobLocations}
+                      value={value}
+                      onChange={(opt: any) => {
+                        onChange(opt);
+                      }}
+                    />
+                  )}
                 />
               </FormControl>
             </InputGrid>

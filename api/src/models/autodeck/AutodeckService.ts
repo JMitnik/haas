@@ -56,6 +56,7 @@ export interface CreateWorkspaceJobProps {
   requiresWebsiteScreenshot?: boolean | null;
   requiresColorExtraction?: boolean | null;
   usesAdjustedLogo?: boolean | null;
+  jobLocationId?: string | null;
 }
 
 class AutodeckService {
@@ -117,6 +118,9 @@ class AutodeckService {
       where: {
         id: input.id || '-1',
       },
+      include: {
+        processLocation: true,
+      },
       create: {
         id: input.id || '',
         name: input.name || '',
@@ -127,7 +131,7 @@ class AutodeckService {
         requiresScreenshot: false,
         processLocation: {
           connect: {
-            id: 'PROCESS_LOCATION' //TODO: Need to change to value coming in from dashboard PROCESS_LOCATION
+            id: input.jobLocationId || '-1'
           }
         }
       },
@@ -136,6 +140,7 @@ class AutodeckService {
       }
     })
 
+    
     const pitchdeckData = { 
       companyName: input.companyName || 'Company X',
       firstName: input.firstName || 'Mike',
@@ -154,8 +159,9 @@ class AutodeckService {
     const pitchdeckCSVPath = `${input.id}/pitchdeck_input.csv`;
     await AutodeckService.uploadDataToS3('haas-autodeck-logos', pitchdeckCSVPath, pitchdeckCSV, 'text/csv')
 
-    // TODO: Check which other variables needed in SQS Consumer 
-    const photoshopInput = { jobId: updatedWorkspaceJob.id, usesAdjustedLogo: input.usesAdjustedLogo }
+    console.log('Root folder path: ', updatedWorkspaceJob.processLocation.path)
+
+    const photoshopInput = { jobId: updatedWorkspaceJob.id, usesAdjustedLogo: input.usesAdjustedLogo, rootFolder: updatedWorkspaceJob.processLocation.path }
     const strEvent = JSON.stringify(photoshopInput, null, 2);
     const sNSParams = {
       Message: strEvent,
@@ -253,10 +259,10 @@ class AutodeckService {
         requiresColorExtraction: input.requiresColorExtraction || false,
         processLocation: {
           connect: {
-            id: 'TODO' //TODO: Need to add actual value from dashboard PROCESS_LOCATION
+            id: input.jobLocationId || '-1'
           }
         }
-      }
+      },
     })
 
     if (!input.requiresColorExtraction) {
@@ -381,42 +387,42 @@ class AutodeckService {
     });
   }
 
-  static createJob = async (input: InputProps) => {
-    const job = await prisma.job.create({
-      data: {
-        type: 'CREATE_WORKSPACE_JOB',
-        createWorkspaceJob: {
-          create: {
-            referenceType: 'AWS',
-            status: 'PENDING',
-            processLocation: {
-              connect: {
-                id: 'TODO' //TODO: Need to add actual value from dashboard PROCESS_LOCATION
-              }
-            }
-          },
-        },
-      },
-      include: {
-        createWorkspaceJob: true,
-      },
-    });
+  // static createJob = async (input: InputProps) => {
+  //   const job = await prisma.job.create({
+  //     data: {
+  //       type: 'CREATE_WORKSPACE_JOB',
+  //       createWorkspaceJob: {
+  //         create: {
+  //           referenceType: 'AWS',
+  //           status: 'PENDING',
+  //           processLocation: {
+  //             connect: {
+  //               id: 'TODO' //TODO: Need to add actual value from dashboard PROCESS_LOCATION
+  //             }
+  //           }
+  //         },
+  //       },
+  //     },
+  //     include: {
+  //       createWorkspaceJob: true,
+  //     },
+  //   });
 
-    const csvInput = { ...input, jobId: job.id };
-    const csv = papaparse.unparse([csvInput]);
-    const date = new Date();
-    const tempDir = `/tmp/autodeck-${date.getTime()}/`;
-    fs.mkdirSync(tempDir);
-    fs.writeFileSync(`${tempDir}input.csv`, csv);
+  //   const csvInput = { ...input, jobId: job.id };
+  //   const csv = papaparse.unparse([csvInput]);
+  //   const date = new Date();
+  //   const tempDir = `/tmp/autodeck-${date.getTime()}/`;
+  //   fs.mkdirSync(tempDir);
+  //   fs.writeFileSync(`${tempDir}input.csv`, csv);
 
-    await AutodeckService.fetchImage(input.logo, `${tempDir}logo.jpg`);
-    await AutodeckService.zipDirectory(tempDir, `/home/daan/Desktop/autodeck-input-${date.getTime()}.zip`);
+  //   await AutodeckService.fetchImage(input.logo, `${tempDir}logo.jpg`);
+  //   await AutodeckService.zipDirectory(tempDir, `/home/daan/Desktop/autodeck-input-${date.getTime()}.zip`);
 
-    if (fs.existsSync(`/home/daan/Desktop/autodeck-input-${date.getTime()}.zip`)) {
-      await AutodeckService.uploadFileToS3('haas-autodeck-input', `${input.name}.zip`, `/home/daan/Desktop/autodeck-input-${date.getTime()}.zip`);
-      return job;
-    }
-  };
+  //   if (fs.existsSync(`/home/daan/Desktop/autodeck-input-${date.getTime()}.zip`)) {
+  //     await AutodeckService.uploadFileToS3('haas-autodeck-input', `${input.name}.zip`, `/home/daan/Desktop/autodeck-input-${date.getTime()}.zip`);
+  //     return job;
+  //   }
+  // };
 
   /**
  * @param {String} source

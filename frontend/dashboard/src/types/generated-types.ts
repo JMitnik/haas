@@ -581,6 +581,7 @@ export type GenerateAutodeckInput = {
   reward?: Maybe<Scalars['String']>;
   emailContent?: Maybe<Scalars['String']>;
   textMessage?: Maybe<Scalars['String']>;
+  jobLocationId?: Maybe<Scalars['String']>;
 };
 
 export type GetCampaignsInput = {

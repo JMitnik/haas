@@ -134,6 +134,7 @@ export const GenerateAutodeckInput = inputObjectType({
     t.boolean('requiresColorExtraction', { required: true });
     t.boolean('usesAdjustedLogo', { required: true });
 
+    t.string('jobLocationId', { required: false })
     t.string('name', { required: false });
     t.string('website', { required: false });
     t.string('logo', { required: false });
@@ -184,6 +185,7 @@ export const GenerateAutodeckMutation = mutationField('generateAutodeck', {
       requiresWebsiteScreenshot: input.requiresWebsiteScreenshot,
       requiresColorExtraction: input.requiresColorExtraction,
       primaryColour: input.primaryColour,
+      jobLocationId: input.jobLocationId
     }
 
     console.log('Job input: ', jobInput);

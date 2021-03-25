@@ -218,6 +218,7 @@ export interface NexusGenInputs {
     usesAdjustedLogo: boolean; // Boolean!
     website?: string | null; // String
     youLoveX?: string | null; // String
+    jobLocationId?: string | null; // String
   }
   GetCampaignsInput: { // input type
     customerSlug?: string | null; // String
