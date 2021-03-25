@@ -127,8 +127,6 @@ const AutodeckForm = ({
     return setActiveTemplateType(jobLocation?.type)
   }
 
-  console.log('active template: ', activeTemplateType)
-
   return (
     <Form onSubmit={form.handleSubmit(onFormSubmit)}>
       <>
