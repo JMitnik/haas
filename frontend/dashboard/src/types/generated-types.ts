@@ -167,6 +167,7 @@ export type CreateDialogueInputType = {
 export type CreateJobProcessLocationInput = {
   name?: Maybe<Scalars['String']>;
   path?: Maybe<Scalars['String']>;
+  type?: Maybe<JobProcessLocationType>;
 };
 
 export type CreateQuestionNodeInputType = {
@@ -622,12 +623,19 @@ export type JobProcessLocation = {
   id: Scalars['String'];
   name: Scalars['String'];
   path: Scalars['String'];
+  type: JobProcessLocationType;
 };
 
 export type JobProcessLocations = {
   __typename?: 'JobProcessLocations';
   jobProcessLocations: Array<JobProcessLocation>;
 };
+
+export enum JobProcessLocationType {
+  OnePager = 'ONE_PAGER',
+  Pitchdeck = 'PITCHDECK',
+  Brochure = 'BROCHURE'
+}
 
 export enum JobStatusType {
   Pending = 'PENDING',
@@ -1730,7 +1738,7 @@ export type GetAutodeckJobsQuery = (
       & Pick<CreateWorkspaceJobType, 'id' | 'name' | 'createdAt' | 'updatedAt' | 'referenceId' | 'status' | 'resourcesUrl' | 'referenceType' | 'requiresColorExtraction' | 'requiresRembg' | 'requiresScreenshot'>
       & { processLocation: (
         { __typename?: 'JobProcessLocation' }
-        & Pick<JobProcessLocation, 'id' | 'name' | 'path'>
+        & Pick<JobProcessLocation, 'id' | 'name' | 'path' | 'type'>
       ) }
     )>, pageInfo: (
       { __typename?: 'PaginationPageInfo' }
@@ -1777,7 +1785,7 @@ export type GetJobProcessLocationsQuery = (
     { __typename?: 'JobProcessLocations' }
     & { jobProcessLocations: Array<(
       { __typename?: 'JobProcessLocation' }
-      & Pick<JobProcessLocation, 'id' | 'name' | 'path'>
+      & Pick<JobProcessLocation, 'id' | 'name' | 'path' | 'type'>
     )> }
   ) }
 );
@@ -2040,6 +2048,7 @@ export const GetAutodeckJobsDocument = gql`
         id
         name
         path
+        type
       }
     }
     pageInfo {
@@ -2156,6 +2165,7 @@ export const GetJobProcessLocationsDocument = gql`
       id
       name
       path
+      type
     }
   }
 }

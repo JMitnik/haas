@@ -16,6 +16,7 @@ query getAutodeckJobs($filter: PaginationWhereInput) {
         id
         name
         path
+        type
       }
     }
     pageInfo {

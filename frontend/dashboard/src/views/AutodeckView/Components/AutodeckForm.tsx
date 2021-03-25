@@ -1,5 +1,5 @@
 import { Briefcase, Link } from 'react-feather';
-import { useGetPreviewDataLazyQuery, useGetJobProcessLocationsQuery } from 'types/generated-types';
+import { useGetPreviewDataLazyQuery, useGetJobProcessLocationsQuery, JobProcessLocationType } from 'types/generated-types';
 import { Button, ButtonGroup } from '@chakra-ui/core';
 import { useForm, Controller } from 'react-hook-form';
 import {
@@ -29,6 +29,7 @@ const AutodeckForm = ({
 }: AutodeckFormProps) => {
   const { t } = useTranslation();
   const [activeJobId] = useState(cuid());
+  const [activeTemplateType, setActiveTemplateType] = useState<JobProcessLocationType | undefined>(undefined)
 
   const [fetchPreviewData, { data: previewData }] = useGetPreviewDataLazyQuery()
   const { data: jobProcessLocations } = useGetJobProcessLocationsQuery()
@@ -121,6 +122,13 @@ const AutodeckForm = ({
 
   const activeJobLocation = isInEditing && job?.processLocation ? { label: `${job?.processLocation?.name} - ${job?.processLocation?.path}`, value: job?.processLocation?.id } : null
 
+  const handleJobLocationChange = (id: string) => {
+    const jobLocation = jobProcessLocations?.getJobProcessLocations?.jobProcessLocations.find((location) => location.id === id)
+    return setActiveTemplateType(jobLocation?.type)
+  }
+
+  console.log('active template: ', activeTemplateType)
+
   return (
     <Form onSubmit={form.handleSubmit(onFormSubmit)}>
       <>
@@ -159,6 +167,7 @@ const AutodeckForm = ({
                       value={value}
                       onChange={(opt: any) => {
                         onChange(opt);
+                        handleJobLocationChange(opt?.value)
                       }}
                     />
                   )}
@@ -204,10 +213,10 @@ const AutodeckForm = ({
         </FormSection>
       </>
 
-      {(isInEditing
+      {((job?.processLocation?.type === "PITCHDECK" || activeTemplateType === JobProcessLocationType.Pitchdeck) && (isInEditing
         || (form.watch('useRembg') === 0
           && form.watch('useWebsiteUrl') === 0
-          && form.watch('useCustomColour') === 0))
+          && form.watch('useCustomColour') === 0)))
         &&
         <>
           <Hr />
@@ -232,6 +241,40 @@ const AutodeckForm = ({
                   />
                 </FormControl>
                 <PitchdeckFragment form={form} />
+              </InputGrid>
+            </Div>
+          </FormSection>
+        </>
+      }
+
+
+      {((job?.processLocation?.type === "ONE_PAGER" || activeTemplateType === JobProcessLocationType.OnePager) && (isInEditing
+        || (form.watch('useRembg') === 0
+          && form.watch('useWebsiteUrl') === 0
+          && form.watch('useCustomColour') === 0)))
+        &&
+        <>
+          <Hr />
+          <FormSection id="dialogue">
+            <Div>
+              <H3 color="default.text" fontWeight={500} pb={2}>{t('autodeck:dialogue')}</H3>
+              <Muted color="gray.600">
+                {t('autodeck:dialogue_helper')}
+              </Muted>
+            </Div>
+            <Div>
+              <InputGrid>
+                <FormControl isInvalid={!!form.errors.firstName} isRequired>
+                  <FormLabel htmlFor="name">{t('autodeck:client_first_name')}</FormLabel>
+                  <InputHelper>{t('autodeck:client_first_name_helper')}</InputHelper>
+                  <Input
+                    // eslint-disable-next-line jsx-a11y/anchor-is-valid
+                    leftEl={<Link />}
+                    name="firstName"
+                    // isInvalid={!!form.errors.logo}
+                    ref={form.register()}
+                  />
+                </FormControl>
               </InputGrid>
             </Div>
           </FormSection>
