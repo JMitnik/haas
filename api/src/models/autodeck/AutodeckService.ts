@@ -69,7 +69,8 @@ class AutodeckService {
     return prisma.jobProcessLocation.create({
       data: {
         name: input.name,
-        path: input.path
+        path: input.path,
+        type: input.type,
       }
     })
   }

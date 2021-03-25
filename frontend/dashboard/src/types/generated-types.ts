@@ -566,6 +566,7 @@ export type GenerateAutodeckInput = {
   requiresWebsiteScreenshot: Scalars['Boolean'];
   requiresColorExtraction: Scalars['Boolean'];
   usesAdjustedLogo: Scalars['Boolean'];
+  jobLocationId?: Maybe<Scalars['String']>;
   name?: Maybe<Scalars['String']>;
   website?: Maybe<Scalars['String']>;
   logo?: Maybe<Scalars['String']>;
@@ -581,7 +582,6 @@ export type GenerateAutodeckInput = {
   reward?: Maybe<Scalars['String']>;
   emailContent?: Maybe<Scalars['String']>;
   textMessage?: Maybe<Scalars['String']>;
-  jobLocationId?: Maybe<Scalars['String']>;
 };
 
 export type GetCampaignsInput = {
@@ -1728,6 +1728,10 @@ export type GetAutodeckJobsQuery = (
     & { jobs: Array<(
       { __typename?: 'CreateWorkspaceJobType' }
       & Pick<CreateWorkspaceJobType, 'id' | 'name' | 'createdAt' | 'updatedAt' | 'referenceId' | 'status' | 'resourcesUrl' | 'referenceType' | 'requiresColorExtraction' | 'requiresRembg' | 'requiresScreenshot'>
+      & { processLocation: (
+        { __typename?: 'JobProcessLocation' }
+        & Pick<JobProcessLocation, 'id' | 'name' | 'path'>
+      ) }
     )>, pageInfo: (
       { __typename?: 'PaginationPageInfo' }
       & Pick<PaginationPageInfo, 'nrPages' | 'pageIndex'>
@@ -2032,6 +2036,11 @@ export const GetAutodeckJobsDocument = gql`
       requiresColorExtraction
       requiresRembg
       requiresScreenshot
+      processLocation {
+        id
+        name
+        path
+      }
     }
     pageInfo {
       nrPages

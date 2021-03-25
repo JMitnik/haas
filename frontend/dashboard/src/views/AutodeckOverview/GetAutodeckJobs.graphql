@@ -12,6 +12,11 @@ query getAutodeckJobs($filter: PaginationWhereInput) {
       requiresColorExtraction
       requiresRembg
       requiresScreenshot
+      processLocation {
+        id
+        name
+        path
+      }
     }
     pageInfo {
       nrPages

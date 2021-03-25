@@ -6,12 +6,20 @@ import { PaginationWhereInput } from '../general/Pagination';
 import { NexusGenFieldTypes } from '../../generated/nexus';
 import { Upload } from '../customer/Customer';
 
+export const JobProcessLocationType = enumType({
+  name: 'JobProcessLocationType',
+  members: ['ONE_PAGER', 'PITCHDECK', 'BROCHURE'],
+});
+
 export const JobProcessLocation = objectType({
   name: 'JobProcessLocation',
   definition(t) {
     t.string('id');
     t.string('name');
     t.string('path')
+    t.field('type', {
+      type: JobProcessLocationType
+    })
   }
 })
 
@@ -38,6 +46,9 @@ export const createJobProcessLocationInput = inputObjectType({
   definition(t) {
     t.string('name');
     t.string('path');
+    t.field('type', {
+      type: JobProcessLocationType,
+    })
   }
 })
 

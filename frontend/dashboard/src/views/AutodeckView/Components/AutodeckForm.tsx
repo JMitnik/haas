@@ -119,8 +119,7 @@ const AutodeckForm = ({
   const mappedJobLocations = jobProcessLocations?.getJobProcessLocations?.jobProcessLocations
     .map((jobLocation) => ({ label: `${jobLocation.name} - ${jobLocation.path}`, value: jobLocation.id }))
 
-  console.log('form: ', form.formState.isValid)
-  console.log('values; ', form.getValues())
+  const activeJobLocation = isInEditing && job?.processLocation ? { label: `${job?.processLocation?.name} - ${job?.processLocation?.path}`, value: job?.processLocation?.id } : null
 
   return (
     <Form onSubmit={form.handleSubmit(onFormSubmit)}>
@@ -151,7 +150,7 @@ const AutodeckForm = ({
                 <InputHelper>{t('process_location_helper')}</InputHelper>
                 <Controller
                   name="jobLocation"
-                  defaultValue={null}
+                  defaultValue={activeJobLocation}
                   control={form.control}
                   render={({ onChange, value }) => (
                     <Select
