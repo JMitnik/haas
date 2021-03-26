@@ -3,7 +3,7 @@ import { useGetPreviewDataLazyQuery, useGetJobProcessLocationsQuery, JobProcessL
 import { Button, ButtonGroup } from '@chakra-ui/core';
 import { useForm, Controller, useFieldArray } from 'react-hook-form';
 import {
-  Div, Form, FormControl, FormLabel, FormSection, H3, Hr, Input, InputGrid, InputHelper,
+  Div, Form, FormControl, FormLabel, FormSection, H3, Hr, Input, InputGrid, InputHelper, Textarea,
   Muted,
 } from '@haas/ui';
 import { useTranslation } from 'react-i18next';
@@ -41,19 +41,30 @@ const AutodeckForm = ({
       useWebsiteUrl: isInEditing ? 0 : 1,
       useRembg: 1,
       name: job?.name,
-      customFields: job?.processLocation?.customFields || []
+      customFields: job?.processLocation?.customFields || [],
+      newCustomFields: []
     },
     mode: 'all'
   });
 
-  const { fields, append, prepend, remove, swap, move, insert } = useFieldArray(
+  const { fields } = useFieldArray(
     {
       control: form.control,
       name: "customFields",
+      keyName: 'key'
+    }
+  );
+
+  const { fields: newCustomFields, append, prepend, remove, swap, move, insert } = useFieldArray(
+    {
+      control: form.control,
+      name: "newCustomFields",
+      keyName: 'key'
     }
   );
 
   console.log('custom fields: ', fields)
+  console.log('form values: ', form.getValues())
 
   const { setValue } = form
 
@@ -302,21 +313,58 @@ const AutodeckForm = ({
           <InputGrid>
             {fields.map((customField, index) => {
               return (
-                <FormControl isInvalid={!!form.errors.customFields?.[index]} isRequired>
-                <FormLabel htmlFor="name">{fields[index]?.key}</FormLabel>
-                <InputHelper>Fill in a value corresponding with a layer in Photoshop</InputHelper>
-                <Input
-                  id={customField.id}
-                  // eslint-disable-next-line jsx-a11y/anchor-is-valid
-                  leftEl={<Link />}
-                  name={`customFields[${index}].key`}
-                  // isInvalid={!!form.errors.logo}
-                  ref={form.register()}
-                />
-              </FormControl>
+                <>
+
+                  <FormControl isInvalid={!!form.errors.customFields?.[index]} isRequired>
+                    <FormLabel htmlFor="name">{fields[index]?.key}</FormLabel>
+                    <InputHelper>Fill in a value corresponding with a layer in Photoshop</InputHelper>
+                    <Input
+                      id={customField.key}
+                      // eslint-disable-next-line jsx-a11y/anchor-is-valid
+                      leftEl={<Link />}
+                      name={`customFields[${index}].value`}
+                      // isInvalid={!!form.errors.logo}
+                      ref={form.register()}
+                    />
+                  </FormControl>
+                </>
               )
             })}
-           
+
+            {newCustomFields.map((newCustomField, index) => {
+              return (
+                <Div borderBottom="1px solid #4f5d6e" borderTop="1px solid #4f5d6e" padding="1em 0"> 
+                  <Div marginBottom="24px">
+                    <FormControl isInvalid={!!form.errors.newCustomFields?.[index]?.key} isRequired>
+                      <FormLabel htmlFor="name">Key</FormLabel>
+                      <InputHelper>Fill in a key corresponding with a layer in Photoshop</InputHelper>
+                      <Input
+                        id={newCustomField.key}
+                        // eslint-disable-next-line jsx-a11y/anchor-is-valid
+                        leftEl={<Link />}
+                        name={`newCustomFields[${index}].key`}
+                        // isInvalid={!!form.errors.logo}
+                        ref={form.register()}
+                      />
+                    </FormControl>
+                  </Div>
+
+                  <FormControl isInvalid={!!form.errors.newCustomFields?.[index]?.value} isRequired>
+                    <FormLabel htmlFor="name">Value</FormLabel>
+                    <InputHelper>Fill in a value a layer in Photoshop should get</InputHelper>
+                    <Textarea
+                      id={newCustomField.key}
+                      // eslint-disable-next-line jsx-a11y/anchor-is-valid
+                      name={`newCustomFields[${index}].value`}
+                      // isInvalid={!!form.errors.logo}
+                      ref={form.register()}
+                    />
+                  </FormControl>
+                </Div>
+              )
+            })}
+            <Button onClick={() => append({})}>Add new custom value</Button>
+
           </InputGrid>
         </Div>
       </FormSection>

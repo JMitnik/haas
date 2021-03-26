@@ -37,6 +37,10 @@ export const schema = yup.object().shape({
   customFields: yup.array().of(yup.object().shape({
     key: yup.string(),
     value: yup.string(),
+  })),
+  newCustomFields: yup.array().of(yup.object().shape({
+    key: yup.string(),
+    value: yup.string(),
   }))
 }).required();
 
