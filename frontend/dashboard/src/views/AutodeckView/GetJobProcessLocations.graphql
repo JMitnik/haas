@@ -5,6 +5,10 @@
         name
         path
         type
+        customFields {
+          key
+          value
+        }
       } 
     }
   }

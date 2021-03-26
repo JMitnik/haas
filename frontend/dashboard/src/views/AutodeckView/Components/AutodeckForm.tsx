@@ -1,7 +1,7 @@
 import { Briefcase, Link } from 'react-feather';
 import { useGetPreviewDataLazyQuery, useGetJobProcessLocationsQuery, JobProcessLocationType } from 'types/generated-types';
 import { Button, ButtonGroup } from '@chakra-ui/core';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm, Controller, useFieldArray } from 'react-hook-form';
 import {
   Div, Form, FormControl, FormLabel, FormSection, H3, Hr, Input, InputGrid, InputHelper,
   Muted,
@@ -41,9 +41,19 @@ const AutodeckForm = ({
       useWebsiteUrl: isInEditing ? 0 : 1,
       useRembg: 1,
       name: job?.name,
+      customFields: job?.processLocation?.customFields || []
     },
     mode: 'all'
   });
+
+  const { fields, append, prepend, remove, swap, move, insert } = useFieldArray(
+    {
+      control: form.control,
+      name: "customFields",
+    }
+  );
+
+  console.log('custom fields: ', fields)
 
   const { setValue } = form
 
@@ -124,6 +134,7 @@ const AutodeckForm = ({
 
   const handleJobLocationChange = (id: string) => {
     const jobLocation = jobProcessLocations?.getJobProcessLocations?.jobProcessLocations.find((location) => location.id === id)
+    form.setValue('customFields', jobLocation?.customFields || [])
     return setActiveTemplateType(jobLocation?.type)
   }
 
@@ -278,6 +289,37 @@ const AutodeckForm = ({
           </FormSection>
         </>
       }
+
+      <Hr />
+      <FormSection id="customFields">
+        <Div>
+          <H3 color="default.text" fontWeight={500} pb={2}>{t('autodeck:custom_fields')}</H3>
+          <Muted color="gray.600">
+            {t('autodeck:custom_fields_helper')}
+          </Muted>
+        </Div>
+        <Div>
+          <InputGrid>
+            {fields.map((customField, index) => {
+              return (
+                <FormControl isInvalid={!!form.errors.customFields?.[index]} isRequired>
+                <FormLabel htmlFor="name">{fields[index]?.key}</FormLabel>
+                <InputHelper>Fill in a value corresponding with a layer in Photoshop</InputHelper>
+                <Input
+                  id={customField.id}
+                  // eslint-disable-next-line jsx-a11y/anchor-is-valid
+                  leftEl={<Link />}
+                  name={`customFields[${index}].key`}
+                  // isInvalid={!!form.errors.logo}
+                  ref={form.register()}
+                />
+              </FormControl>
+              )
+            })}
+           
+          </InputGrid>
+        </Div>
+      </FormSection>
 
       <ButtonGroup>
         <Button

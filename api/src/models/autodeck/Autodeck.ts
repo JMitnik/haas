@@ -11,6 +11,16 @@ export const JobProcessLocationType = enumType({
   members: ['ONE_PAGER', 'PITCHDECK', 'BROCHURE'],
 });
 
+export const CustomFieldType = objectType({
+  name: 'CustomFieldType',
+  definition(t) {
+    t.string('id')
+    t.string('key')
+    t.string('value', { nullable: true })
+    t.string('jobProcessLocationId')
+  }
+})
+
 export const JobProcessLocation = objectType({
   name: 'JobProcessLocation',
   definition(t) {
@@ -19,6 +29,18 @@ export const JobProcessLocation = objectType({
     t.string('path')
     t.field('type', {
       type: JobProcessLocationType
+    })
+
+    t.list.field('customFields', {
+      type: CustomFieldType,
+      nullable: true,
+      resolve(parent, args, ctx) {
+        return ctx.prisma.customField.findMany({
+          where: {
+            jobProcessLocationId: parent.id,
+          }
+        })
+      }
     })
   }
 })
@@ -113,6 +135,9 @@ export const CreateWorkspaceJobType = objectType({
                 id: parent.id
               }
             }
+          },
+          include: {
+            fields: true,
           }
         })
       }

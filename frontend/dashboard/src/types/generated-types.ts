@@ -286,6 +286,14 @@ export type CustomerWhereUniqueInput = {
   id: Scalars['ID'];
 };
 
+export type CustomFieldType = {
+  __typename?: 'CustomFieldType';
+  id: Scalars['String'];
+  key: Scalars['String'];
+  value?: Maybe<Scalars['String']>;
+  jobProcessLocationId: Scalars['String'];
+};
+
 
 export type DeleteDialogueInputType = {
   id?: Maybe<Scalars['ID']>;
@@ -624,6 +632,7 @@ export type JobProcessLocation = {
   name: Scalars['String'];
   path: Scalars['String'];
   type: JobProcessLocationType;
+  customFields?: Maybe<Array<CustomFieldType>>;
 };
 
 export type JobProcessLocations = {
@@ -1739,6 +1748,10 @@ export type GetAutodeckJobsQuery = (
       & { processLocation: (
         { __typename?: 'JobProcessLocation' }
         & Pick<JobProcessLocation, 'id' | 'name' | 'path' | 'type'>
+        & { customFields?: Maybe<Array<(
+          { __typename?: 'CustomFieldType' }
+          & Pick<CustomFieldType, 'key' | 'value'>
+        )>> }
       ) }
     )>, pageInfo: (
       { __typename?: 'PaginationPageInfo' }
@@ -1786,6 +1799,10 @@ export type GetJobProcessLocationsQuery = (
     & { jobProcessLocations: Array<(
       { __typename?: 'JobProcessLocation' }
       & Pick<JobProcessLocation, 'id' | 'name' | 'path' | 'type'>
+      & { customFields?: Maybe<Array<(
+        { __typename?: 'CustomFieldType' }
+        & Pick<CustomFieldType, 'key' | 'value'>
+      )>> }
     )> }
   ) }
 );
@@ -2049,6 +2066,10 @@ export const GetAutodeckJobsDocument = gql`
         name
         path
         type
+        customFields {
+          key
+          value
+        }
       }
     }
     pageInfo {
@@ -2166,6 +2187,10 @@ export const GetJobProcessLocationsDocument = gql`
       name
       path
       type
+      customFields {
+        key
+        value
+      }
     }
   }
 }

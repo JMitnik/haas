@@ -33,7 +33,11 @@ export const schema = yup.object().shape({
   youLoveX: yup.string().required(),
   reward: yup.string().required(),
   emailContent: yup.string().required(),
-  textMessage: yup.string().required()
+  textMessage: yup.string().required(),
+  customFields: yup.array().of(yup.object().shape({
+    key: yup.string(),
+    value: yup.string(),
+  }))
 }).required();
 
 export type FormDataProps = yup.InferType<typeof schema>;

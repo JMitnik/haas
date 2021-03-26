@@ -17,6 +17,10 @@ query getAutodeckJobs($filter: PaginationWhereInput) {
         name
         path
         type
+        customFields {
+          key
+          value
+        }
       }
     }
     pageInfo {

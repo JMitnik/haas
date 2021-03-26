@@ -893,6 +893,14 @@ const language = {
     },
   },
   autodeck: {
+    custom_fields: {
+      en: 'Custom fields',
+      de: 'Custom fields',
+    },
+    custom_fields_helper: {
+      en: 'Add custom fields to an existing template',
+      de: 'Add custom fields to an existing template'
+    },
     company_name: {
       en: 'Company name',
       de: '',

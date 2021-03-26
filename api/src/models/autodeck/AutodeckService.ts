@@ -62,7 +62,11 @@ export interface CreateWorkspaceJobProps {
 class AutodeckService {
 
   static getJobProcessLocations = async () => {
-    return prisma.jobProcessLocation.findMany()
+    return prisma.jobProcessLocation.findMany({
+      include: {
+        fields: true,
+      }
+    })
   }
 
   static createJobProcessLocation = async (input: any) => {
@@ -71,6 +75,9 @@ class AutodeckService {
         name: input.name,
         path: input.path,
         type: input.type,
+      },
+      include: {
+        fields: true,
       }
     })
   }
