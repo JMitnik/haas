@@ -18,6 +18,7 @@ query getAutodeckJobs($filter: PaginationWhereInput) {
         path
         type
         customFields {
+          id
           key
           value
         }

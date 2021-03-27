@@ -159,9 +159,17 @@ export const JobObjectType = objectType({
   },
 });
 
+export const CustomFieldInputType = inputObjectType({
+  name: 'CustomFieldInputType',
+  definition(t) {
+    t.string('key')
+    t.string('value')
+  }
+})
+
 export const GenerateAutodeckInput = inputObjectType({
   name: 'GenerateAutodeckInput',
-  description: 'Generate sales documents',
+  description: 'Generate savales documents',
 
   definition(t) {
     t.string('id', { required: true });
@@ -186,6 +194,14 @@ export const GenerateAutodeckInput = inputObjectType({
     t.string('reward', { required: false });
     t.string('emailContent', { required: false });
     t.string('textMessage', { required: false });
+    
+    t.list.field('customFields', {
+      type: CustomFieldInputType,
+    })
+
+    t.list.field('newCustomFields', {
+      type: CustomFieldInputType,
+    })
   },
 });
 
@@ -221,7 +237,9 @@ export const GenerateAutodeckMutation = mutationField('generateAutodeck', {
       requiresWebsiteScreenshot: input.requiresWebsiteScreenshot,
       requiresColorExtraction: input.requiresColorExtraction,
       primaryColour: input.primaryColour,
-      jobLocationId: input.jobLocationId
+      jobLocationId: input.jobLocationId,
+      customFields: input.customFields,
+      newCustomFields: input.newCustomFields
     }
 
     console.log('Job input: ', jobInput);

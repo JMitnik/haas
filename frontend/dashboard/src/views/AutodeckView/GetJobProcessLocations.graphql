@@ -6,6 +6,7 @@
         path
         type
         customFields {
+          id
           key
           value
         }

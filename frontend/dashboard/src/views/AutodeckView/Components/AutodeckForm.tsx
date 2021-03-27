@@ -1,13 +1,14 @@
-import { Briefcase, Link } from 'react-feather';
+import { Briefcase, Link, Trash2 } from 'react-feather';
 import { useGetPreviewDataLazyQuery, useGetJobProcessLocationsQuery, JobProcessLocationType } from 'types/generated-types';
 import { Button, ButtonGroup } from '@chakra-ui/core';
 import { useForm, Controller, useFieldArray } from 'react-hook-form';
+import { debounce } from 'lodash';
 import {
   Div, Form, FormControl, FormLabel, FormSection, H3, Hr, Input, InputGrid, InputHelper, Textarea,
   Muted,
 } from '@haas/ui';
 import { useTranslation } from 'react-i18next';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import cuid from 'cuid';
 import Select from 'react-select';
 
@@ -17,6 +18,7 @@ import PrimaryColourFragment from '../Fragments/PrimaryColor';
 import CustomerLogoFormFragment from '../Fragments/CustomerLogoFragment';
 import PitchdeckFragment from '../Fragments/PitchdeckFragment';
 import { FormDataProps, AutodeckFormProps } from '../Types';
+import { Shape } from 'yup';
 
 const AutodeckForm = ({
   onClose,
@@ -30,7 +32,7 @@ const AutodeckForm = ({
   const { t } = useTranslation();
   const [activeJobId] = useState(cuid());
   const [activeTemplateType, setActiveTemplateType] = useState<JobProcessLocationType | undefined>(undefined)
-
+  const [activewNewCustomFields, setActiveNewCustomFields] = useState<Array<{id: string, key: string, value: string}>>([])
   const [fetchPreviewData, { data: previewData }] = useGetPreviewDataLazyQuery()
   const { data: jobProcessLocations } = useGetJobProcessLocationsQuery()
 
@@ -51,7 +53,7 @@ const AutodeckForm = ({
     {
       control: form.control,
       name: "customFields",
-      keyName: 'key'
+      keyName: 'arrayKey'
     }
   );
 
@@ -59,7 +61,7 @@ const AutodeckForm = ({
     {
       control: form.control,
       name: "newCustomFields",
-      keyName: 'key'
+      keyName: 'arrayKey'
     }
   );
 
@@ -68,6 +70,21 @@ const AutodeckForm = ({
 
   const { setValue } = form
 
+  // const concat = (customFields?: Shape<object | undefined, {
+  //   key: any;
+  //   value: any;
+  // }>[] | undefined, newCustomFields?: Shape<object | undefined, {
+  //   key: any;
+  //   value: any;
+  // }>[] | undefined) => {
+  //   console.log('custom fields: ',customFields, 'custom new fields: ',newCustomFields)
+  //   if (!customFields && !newCustomFields) return [];
+  //   if (!customFields && (newCustomFields && newCustomFields?.length > 0)) return newCustomFields;
+  //   if ((customFields && customFields.length > 0) && !newCustomFields) return customFields;
+  //   if ((customFields && customFields.length > 0) && (newCustomFields && newCustomFields?.length > 0)) return customFields.concat(newCustomFields)
+  //   return []
+  // }
+
   const onFormSubmit = (data: FormDataProps) => {
     const requiresRembgLambda = data?.useRembg === 1 ? true : false;
     const requiresColorExtraction = data?.useCustomColour === 1 ? true : false;
@@ -75,6 +92,13 @@ const AutodeckForm = ({
     const usesAdjustedLogo = data?.isEditingLogo === 1 ? true : false;
     const jobLocationId = data.jobLocation?.value
 
+    console.log('DATAAAAA: ', data)
+    const mappedCustomFields = data.customFields?.map((field) => ({ key: field?.key, value: field?.value })) || [];
+    const mappedNewCustomFields = data.newCustomFields?.map((field) => {
+      return { key: field?.key, value: field?.value}
+    })
+    // const customFields = concat(data.customFields, data.newCustomFields)
+    // console.log('ON SUBMIT: ', customFields)
     if (!isInEditing && (requiresRembgLambda || requiresColorExtraction || requiresWebsiteScreenshot)) {
       return onCreateJob({
         variables: {
@@ -88,7 +112,9 @@ const AutodeckForm = ({
             requiresColorExtraction,
             primaryColour: data.primaryColour,
             usesAdjustedLogo: false,
-            jobLocationId
+            jobLocationId,
+            customFields: mappedCustomFields || [],
+            newCustomFields: mappedNewCustomFields || []
           }
         }
       })
@@ -114,7 +140,9 @@ const AutodeckForm = ({
           reward: data.reward,
           emailContent: data.emailContent,
           textMessage: data.textMessage,
-          jobLocationId
+          jobLocationId,
+          customFields: mappedCustomFields || [],
+          newCustomFields: mappedNewCustomFields || []
         }
       }
     })
@@ -315,11 +343,13 @@ const AutodeckForm = ({
               return (
                 <>
 
-                  <FormControl isInvalid={!!form.errors.customFields?.[index]} isRequired>
+                  <input type="hidden" name={`customFields[${index}].key`} defaultValue={fields[index]?.key} ref={form.register()} />
+                  <FormControl isInvalid={!!form.errors.customFields?.[index]}>
                     <FormLabel htmlFor="name">{fields[index]?.key}</FormLabel>
                     <InputHelper>Fill in a value corresponding with a layer in Photoshop</InputHelper>
                     <Input
-                      id={customField.key}
+                      id={customField.arrayKey}
+                      defaultValue=""
                       // eslint-disable-next-line jsx-a11y/anchor-is-valid
                       leftEl={<Link />}
                       name={`customFields[${index}].value`}
@@ -333,37 +363,43 @@ const AutodeckForm = ({
 
             {newCustomFields.map((newCustomField, index) => {
               return (
-                <Div borderBottom="1px solid #4f5d6e" borderTop="1px solid #4f5d6e" padding="1em 0"> 
+                <Div key={newCustomField.arrayKey} position="relative" borderBottom="1px solid #4f5d6e" borderTop="1px solid #4f5d6e" padding="1em 0">
                   <Div marginBottom="24px">
-                    <FormControl isInvalid={!!form.errors.newCustomFields?.[index]?.key} isRequired>
+                    <Div position="absolute" right="5px" style={{ cursor: 'pointer' }} onClick={() => remove(index)}>
+                      <Trash2 color="red" />
+                    </Div>
+                    <FormControl isRequired>
                       <FormLabel htmlFor="name">Key</FormLabel>
                       <InputHelper>Fill in a key corresponding with a layer in Photoshop</InputHelper>
                       <Input
-                        id={newCustomField.key}
                         // eslint-disable-next-line jsx-a11y/anchor-is-valid
                         leftEl={<Link />}
+                        // value={fields[index].key}
                         name={`newCustomFields[${index}].key`}
+                        // onChange={(e: any) => handleKeyChange(e.currentTarget.value, index)}
                         // isInvalid={!!form.errors.logo}
                         ref={form.register()}
                       />
                     </FormControl>
                   </Div>
 
-                  <FormControl isInvalid={!!form.errors.newCustomFields?.[index]?.value} isRequired>
+                  <FormControl isRequired>
                     <FormLabel htmlFor="name">Value</FormLabel>
                     <InputHelper>Fill in a value a layer in Photoshop should get</InputHelper>
                     <Textarea
-                      id={newCustomField.key}
+                      // id={newCustomField.id}
                       // eslint-disable-next-line jsx-a11y/anchor-is-valid
+                      // value={newCustomFields[index].value}
                       name={`newCustomFields[${index}].value`}
+                      // onChange={(e: any) => handleValueChange(e.currentTarget.value, index)}
                       // isInvalid={!!form.errors.logo}
-                      ref={form.register()}
+                      ref={form.register({ required: false })}
                     />
                   </FormControl>
                 </Div>
               )
             })}
-            <Button onClick={() => append({})}>Add new custom value</Button>
+            <Button onClick={() => append({ id: cuid(), key: '', value: ''})}>Add new custom value</Button>
 
           </InputGrid>
         </Div>

@@ -122,6 +122,8 @@ class AutodeckService {
     const csvPath = `${input.id}/dominant_colours.csv`;
     await AutodeckService.uploadDataToS3('haas-autodeck-logos', csvPath, csv, 'text/csv')
 
+    console.log('CONFIRM INPUT DATA: ', input)
+
     const updatedWorkspaceJob = await prisma.createWorkspaceJob.upsert({
       where: {
         id: input.id || '-1',

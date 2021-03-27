@@ -286,6 +286,11 @@ export type CustomerWhereUniqueInput = {
   id: Scalars['ID'];
 };
 
+export type CustomFieldInputType = {
+  key?: Maybe<Scalars['String']>;
+  value?: Maybe<Scalars['String']>;
+};
+
 export type CustomFieldType = {
   __typename?: 'CustomFieldType';
   id: Scalars['String'];
@@ -568,7 +573,7 @@ export type FormNodeType = {
   fields: Array<FormNodeField>;
 };
 
-/** Generate sales documents */
+/** Generate savales documents */
 export type GenerateAutodeckInput = {
   id: Scalars['String'];
   requiresRembgLambda: Scalars['Boolean'];
@@ -591,6 +596,8 @@ export type GenerateAutodeckInput = {
   reward?: Maybe<Scalars['String']>;
   emailContent?: Maybe<Scalars['String']>;
   textMessage?: Maybe<Scalars['String']>;
+  customFields?: Maybe<Array<CustomFieldInputType>>;
+  newCustomFields?: Maybe<Array<CustomFieldInputType>>;
 };
 
 export type GetCampaignsInput = {
@@ -1750,7 +1757,7 @@ export type GetAutodeckJobsQuery = (
         & Pick<JobProcessLocation, 'id' | 'name' | 'path' | 'type'>
         & { customFields?: Maybe<Array<(
           { __typename?: 'CustomFieldType' }
-          & Pick<CustomFieldType, 'key' | 'value'>
+          & Pick<CustomFieldType, 'id' | 'key' | 'value'>
         )>> }
       ) }
     )>, pageInfo: (
@@ -1801,7 +1808,7 @@ export type GetJobProcessLocationsQuery = (
       & Pick<JobProcessLocation, 'id' | 'name' | 'path' | 'type'>
       & { customFields?: Maybe<Array<(
         { __typename?: 'CustomFieldType' }
-        & Pick<CustomFieldType, 'key' | 'value'>
+        & Pick<CustomFieldType, 'id' | 'key' | 'value'>
       )>> }
     )> }
   ) }
@@ -2067,6 +2074,7 @@ export const GetAutodeckJobsDocument = gql`
         path
         type
         customFields {
+          id
           key
           value
         }
@@ -2188,6 +2196,7 @@ export const GetJobProcessLocationsDocument = gql`
       path
       type
       customFields {
+        id
         key
         value
       }
