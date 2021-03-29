@@ -4,12 +4,22 @@ import { CreateWorkspaceJobMutation, Exact, GenerateAutodeckInput, CreateWorkspa
 import { DeepPartial } from 'types/customTypes';
 
 export const schema = yup.object().shape({
-  name: yup.string().required('Name is required'),
+  name: yup.string(),
+  customFields: yup.array().required().of(yup.object().nullable().notRequired().shape({
+    key: yup.string().nullable(),
+    value: yup.string().nullable(),
+  }).nullable()).notRequired(),
+  newCustomFields: yup.array().required().of(yup.object().nullable().notRequired().shape({
+    key: yup.string().required().matches(/^[a-zA-Z]*$/, {
+      message: 'Only alphabetic characters are accepted as key!',
+    }),
+    value: yup.string().required(),
+  }).nullable()).notRequired(),
   jobLocation: yup.object().shape({
     value: yup.string().required(),
     label: yup.string().required()
   }).required(),
-  website: yup.string().required('Website is required'),
+  website: yup.string().notRequired(),
   logo: yup.string().url('Url should be valid'),
   primaryColour: yup.string().required().matches(/^(#(\d|\D){6}$){1}/, {
     message: 'Provided colour is not a valid hexadecimal',
@@ -23,25 +33,17 @@ export const schema = yup.object().shape({
   isLogoUrlApproved: yup.number(),
   uploadLogo: yup.string().url(),
   adjustedLogo: yup.string().url(),
-  firstName: yup.string().required(),
-  companyName: yup.string().required(),
-  answer1: yup.string().required(),
-  answer2: yup.string().required(),
-  answer3: yup.string().required(),
-  answer4: yup.string().required(),
-  sorryAboutX: yup.string().required(),
-  youLoveX: yup.string().required(),
-  reward: yup.string().required(),
-  emailContent: yup.string().required(),
-  textMessage: yup.string().required(),
-  customFields: yup.array().required().of(yup.object().nullable().notRequired().shape({
-    key: yup.string().nullable(),
-    value: yup.string().nullable(),
-  }).nullable()).notRequired(),
-  newCustomFields: yup.array().required().of(yup.object().nullable().notRequired().shape({
-    key: yup.string().nullable(),
-    value: yup.string().nullable(),
-  }).nullable()).notRequired(),
+  firstName: yup.string(),
+  companyName: yup.string(),
+  answer1: yup.string(),
+  answer2: yup.string(),
+  answer3: yup.string(),
+  answer4: yup.string(),
+  sorryAboutX: yup.string(),
+  youLoveX: yup.string(),
+  reward: yup.string(),
+  emailContent: yup.string(),
+  textMessage: yup.string(),
 }).required();
 
 export type FormDataProps = yup.InferType<typeof schema>;

@@ -10,13 +10,14 @@ import { useTranslation } from 'react-i18next';
 import React, { useState, useEffect } from 'react';
 import cuid from 'cuid';
 import Select from 'react-select';
+import { yupResolver } from '@hookform/resolvers';
 
 import boolToInt from 'utils/booleanToNumber';
 import WebsiteScreenshotFragment from '../Fragments/WebsiteScreenshot';
 import PrimaryColourFragment from '../Fragments/PrimaryColor';
 import CustomerLogoFormFragment from '../Fragments/CustomerLogoFragment';
 import PitchdeckFragment from '../Fragments/PitchdeckFragment';
-import { FormDataProps, AutodeckFormProps } from '../Types';
+import { FormDataProps, AutodeckFormProps, schema } from '../Types';
 
 const AutodeckForm = ({
   onClose,
@@ -39,11 +40,13 @@ const AutodeckForm = ({
       useCustomColour: boolToInt(job?.requiresColorExtraction) || 1,
       useWebsiteUrl: isInEditing ? 0 : 1,
       useRembg: 1,
-      name: job?.name,
+      name: job?.name || '',
       customFields: job?.processLocation?.customFields || [],
       newCustomFields: []
     },
-    mode: 'all'
+    mode: 'all',
+    shouldFocusError: true,
+    resolver: yupResolver(schema)
   });
 
   const { fields } = useFieldArray(
@@ -61,9 +64,6 @@ const AutodeckForm = ({
       keyName: 'arrayKey'
     }
   );
-
-  console.log('custom fields: ', fields)
-  console.log('form values: ', form.getValues())
 
   const { setValue } = form
 
@@ -142,7 +142,6 @@ const AutodeckForm = ({
 
   useEffect(() => {
     if (!previewData) return;
-    console.log('Setting preview data!')
     setValue('uploadLogo', previewData?.getPreviewData?.rembgLogoUrl);
     setValue('uploadWebsite', previewData?.getPreviewData?.websiteScreenshotUrl);
     setValue('primaryColour', previewData?.getPreviewData?.colors[0])
@@ -178,6 +177,7 @@ const AutodeckForm = ({
                   isDisabled={isInEditing}
                   placeholder="Peach inc."
                   leftEl={<Briefcase />}
+                  defaultValue={'job'}
                   name="name"
                   ref={form.register()}
                 />
@@ -192,6 +192,15 @@ const AutodeckForm = ({
                   control={form.control}
                   render={({ onChange, value }) => (
                     <Select
+                      styles={!!form.errors.jobLocation ? {
+                        control: base => ({
+                          ...base,
+                          border: '1px solid red',
+                          '&:hover': {
+                            border: '1px solid red',
+                          }
+                        })
+                      } : undefined}
                       isDisabled={isInEditing}
                       options={mappedJobLocations}
                       value={value}
@@ -202,6 +211,7 @@ const AutodeckForm = ({
                     />
                   )}
                 />
+                {form.errors.jobLocation && <span style={{ color: 'red', marginTop: '5px' }}>Please select job type</span>}
               </FormControl>
             </InputGrid>
           </Div>
@@ -315,91 +325,86 @@ const AutodeckForm = ({
         || (form.watch('useRembg') === 0
           && form.watch('useWebsiteUrl') === 0
           && form.watch('useCustomColour') === 0))
-        && 
-          <>
-            <Hr />
-            <FormSection id="customFields">
-              <Div>
-                <H3 color="default.text" fontWeight={500} pb={2}>{t('autodeck:custom_fields')}</H3>
-                <Muted color="gray.600">
-                  {t('autodeck:custom_fields_helper')}
-                </Muted>
-              </Div>
-              <Div>
-                <InputGrid>
-                  {fields.map((customField, index) => {
-                    return (
-                      <>
+        &&
+        <>
+          <Hr />
+          <FormSection id="customFields">
+            <Div>
+              <H3 color="default.text" fontWeight={500} pb={2}>{t('autodeck:custom_fields')}</H3>
+              <Muted color="gray.600">
+                {t('autodeck:custom_fields_helper')}
+              </Muted>
+            </Div>
+            <Div>
+              <InputGrid>
+                {fields.map((customField, index) => {
+                  return (
+                    <>
+                      <input type="hidden" name={`customFields[${index}].key`} defaultValue={fields[index]?.key} ref={form.register()} />
+                      <FormControl isInvalid={!!form.errors.customFields?.[index]}>
+                        <FormLabel htmlFor={`customFields[${index}].key`}>{fields[index]?.key}</FormLabel>
+                        <InputHelper>Fill in a value corresponding with a layer in Photoshop</InputHelper>
+                        <Input
+                          id={customField.arrayKey}
+                          defaultValue=""
+                          // eslint-disable-next-line jsx-a11y/anchor-is-valid
+                          leftEl={<Link />}
+                          name={`customFields[${index}].value`}
+                          ref={form.register()}
+                        />
+                      </FormControl>
+                    </>
+                  )
+                })}
 
-                        <input type="hidden" name={`customFields[${index}].key`} defaultValue={fields[index]?.key} ref={form.register()} />
-                        <FormControl isInvalid={!!form.errors.customFields?.[index]}>
-                          <FormLabel htmlFor="name">{fields[index]?.key}</FormLabel>
-                          <InputHelper>Fill in a value corresponding with a layer in Photoshop</InputHelper>
+                {newCustomFields.map((newCustomField, index) => {
+                  const error: any = form.errors.newCustomFields?.[index]
+                  const errorTwo = error?.key?.message
+                  console.log('Error: ', errorTwo)
+                  return (
+                    <Div key={newCustomField.arrayKey} position="relative" borderBottom="1px solid #4f5d6e" borderTop="1px solid #4f5d6e" padding="1em 0">
+                      <Div marginBottom="24px">
+                        <Div position="absolute" right="5px" style={{ cursor: 'pointer' }} onClick={() => remove(index)}>
+                          <Trash2 color="red" />
+                        </Div>
+                        <FormControl isInvalid={!!form.errors.newCustomFields?.[index]} isRequired>
+                          <FormLabel htmlFor="key">Key</FormLabel>
+                          <InputHelper>Fill in a key corresponding with a layer in Photoshop</InputHelper>
                           <Input
-                            id={customField.arrayKey}
-                            defaultValue=""
                             // eslint-disable-next-line jsx-a11y/anchor-is-valid
                             leftEl={<Link />}
-                            name={`customFields[${index}].value`}
-                            // isInvalid={!!form.errors.logo}
+                            name={`newCustomFields[${index}].key`}
                             ref={form.register()}
                           />
-                        </FormControl>
-                      </>
-                    )
-                  })}
-
-                  {newCustomFields.map((newCustomField, index) => {
-                    return (
-                      <Div key={newCustomField.arrayKey} position="relative" borderBottom="1px solid #4f5d6e" borderTop="1px solid #4f5d6e" padding="1em 0">
-                        <Div marginBottom="24px">
-                          <Div position="absolute" right="5px" style={{ cursor: 'pointer' }} onClick={() => remove(index)}>
-                            <Trash2 color="red" />
-                          </Div>
-                          <FormControl isRequired>
-                            <FormLabel htmlFor="name">Key</FormLabel>
-                            <InputHelper>Fill in a key corresponding with a layer in Photoshop</InputHelper>
-                            <Input
-                              // eslint-disable-next-line jsx-a11y/anchor-is-valid
-                              leftEl={<Link />}
-                              // value={fields[index].key}
-                              name={`newCustomFields[${index}].key`}
-                              // onChange={(e: any) => handleKeyChange(e.currentTarget.value, index)}
-                              // isInvalid={!!form.errors.logo}
-                              ref={form.register()}
-                            />
-                          </FormControl>
-                        </Div>
-
-                        <FormControl isRequired>
-                          <FormLabel htmlFor="name">Value</FormLabel>
-                          <InputHelper>Fill in a value a layer in Photoshop should get</InputHelper>
-                          <Textarea
-                            // id={newCustomField.id}
-                            // eslint-disable-next-line jsx-a11y/anchor-is-valid
-                            // value={newCustomFields[index].value}
-                            name={`newCustomFields[${index}].value`}
-                            // onChange={(e: any) => handleValueChange(e.currentTarget.value, index)}
-                            // isInvalid={!!form.errors.logo}
-                            ref={form.register({ required: false })}
-                          />
+                          {errorTwo && <span style={{ marginTop: '5px', color: 'red' }}>{errorTwo}</span>}
                         </FormControl>
                       </Div>
-                    )
-                  })}
-                  <Button onClick={() => append({ id: cuid(), key: '', value: '' })}>Add new custom value</Button>
 
-                </InputGrid>
-              </Div>
-            </FormSection>
-          </>
+                      <FormControl isRequired>
+                        <FormLabel htmlFor="value">Value</FormLabel>
+                        <InputHelper>Fill in a value a layer in Photoshop should get</InputHelper>
+                        <Textarea
+                          // eslint-disable-next-line jsx-a11y/anchor-is-valid
+                          name={`newCustomFields[${index}].value`}
+                          ref={form.register({ required: false })}
+                        />
+                      </FormControl>
+                    </Div>
+                  )
+                })}
+                <Button onClick={() => append({ id: cuid(), key: '', value: '' })}>Add new custom value</Button>
+
+              </InputGrid>
+            </Div>
+          </FormSection>
+        </>
       }
 
 
       <ButtonGroup>
         <Button
           isLoading={isLoading || isConfirmLoading}
-          isDisabled={!form.formState.isValid}
+          // isDisabled={!form.formState.isValid}
           variantColor="teal"
           type="submit"
         >
