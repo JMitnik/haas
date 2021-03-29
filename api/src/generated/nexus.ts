@@ -219,6 +219,7 @@ export interface NexusGenInputs {
     website?: string | null; // String
     youLoveX?: string | null; // String
     jobLocationId?: string | null; // String
+    standardFields: { key: string, value: string }[]
     customFields: { key: string, value: string }[]
     newCustomFields: { key: string, value: string }[]
   }

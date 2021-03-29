@@ -29,18 +29,6 @@ const sns = new AWS.SNS({
   secretAccessKey: config.awsSecretAccessKey
 });
 
-interface InputProps {
-  answer1: string;
-  answer2: string;
-  answer3: string;
-  answer4: string;
-  firstName: string;
-  logo: string;
-  name: string;
-  primaryColour: string;
-  website: string;
-}
-
 export interface CreateWorkspaceJobProps {
   id?: string | null;
   name?: string | null;
@@ -116,13 +104,35 @@ class AutodeckService {
     return paginate(paginateProps);
   };
 
+  static addNewCustomFieldsToTemplate = async (input: NexusGenInputs['GenerateAutodeckInput'], processLocationId: string) => {
+
+    return prisma.jobProcessLocation.update({
+      where: {
+        id: processLocationId,
+      },
+      data: {
+        fields: {
+          create: input.newCustomFields.map(({key, value}) => ({ key, value }))
+        }
+      }
+    })
+  }
+
+  static generateKeyValuePair = (input: NexusGenInputs['GenerateAutodeckInput']) => {
+    const mergedCustomFields = input.customFields.concat(input.newCustomFields).concat(input.standardFields)
+    let mappedKeyValuePairs = {}
+    mergedCustomFields.forEach(({ key, value }) => {
+      Object.assign(mappedKeyValuePairs, { [key]: value })
+    })
+
+    return mappedKeyValuePairs
+  }
+
   static confirmWorkspaceJob = async (input: NexusGenInputs['GenerateAutodeckInput']) => {
     const csvData = { 'colour-0': input.primaryColour };
     const csv = papaparse.unparse([csvData]);
     const csvPath = `${input.id}/dominant_colours.csv`;
     await AutodeckService.uploadDataToS3('haas-autodeck-logos', csvPath, csv, 'text/csv')
-
-    console.log('CONFIRM INPUT DATA: ', input)
 
     const updatedWorkspaceJob = await prisma.createWorkspaceJob.upsert({
       where: {
@@ -141,8 +151,8 @@ class AutodeckService {
         requiresScreenshot: false,
         processLocation: {
           connect: {
-            id: input.jobLocationId || '-1'
-          }
+            id: input.jobLocationId || '-1',
+          },
         }
       },
       update: {
@@ -150,26 +160,31 @@ class AutodeckService {
       }
     })
 
+    const processLocationId = updatedWorkspaceJob.jobProcessLocationId
+    await AutodeckService.addNewCustomFieldsToTemplate(input, processLocationId)
     
+    const mappedCustomFields = AutodeckService.generateKeyValuePair(input)
+
     const pitchdeckData = { 
-      companyName: input.companyName || 'Company X',
-      firstName: input.firstName || 'Mike',
-      primaryColour: input.primaryColour || '#426b3a',
-      answer1: input.answer1 || '',
-      answer2: input.answer2 || '',
-      answer3: input.answer3 || '',
-      answer4: input.answer4 || '',
-      sorryAboutX: input.sorryAboutX || '',
-      youLoveX: input.youLoveX || '',
-      reward: input.reward || '',
-      emailContent: input.emailContent || '',
-      textMessage: input.textMessage || '',
+      ...mappedCustomFields,
+      // companyName: input.companyName || 'Company X',
+      // firstName: input.firstName || 'Mike',
+      // primaryColour: input.primaryColour || '#426b3a',
+      // answer1: input.answer1 || '',
+      // answer2: input.answer2 || '',
+      // answer3: input.answer3 || '',
+      // answer4: input.answer4 || '',
+      // sorryAboutX: input.sorryAboutX || '',
+      // youLoveX: input.youLoveX || '',
+      // reward: input.reward || '',
+      // emailContent: input.emailContent || '',
+      // textMessage: input.textMessage || '',
     };
+    
+
     const pitchdeckCSV = papaparse.unparse([pitchdeckData]);
     const pitchdeckCSVPath = `${input.id}/pitchdeck_input.csv`;
     await AutodeckService.uploadDataToS3('haas-autodeck-logos', pitchdeckCSVPath, pitchdeckCSV, 'text/csv')
-
-    console.log('Root folder path: ', updatedWorkspaceJob.processLocation.path)
 
     const photoshopInput = { jobId: updatedWorkspaceJob.id, usesAdjustedLogo: input.usesAdjustedLogo, rootFolder: updatedWorkspaceJob.processLocation.path }
     const strEvent = JSON.stringify(photoshopInput, null, 2);
@@ -179,8 +194,6 @@ class AutodeckService {
     }
     sns.publish(sNSParams, (err, data) => {
       if (err) console.log('ERROR: ', err);
-
-      console.log('Photoshop channel publish response: ', data);
     });
 
 
@@ -238,8 +251,6 @@ class AutodeckService {
     }
     sns.publish(sNSParams, (err, data) => {
       if (err) console.log('ERROR: ', err);
-
-      console.log('Remove whitify publish response: ', data);
     });
   }
 
@@ -252,8 +263,6 @@ class AutodeckService {
     }
     sns.publish(sNSParams, (err, data) => {
       if (err) console.log('ERROR: ', err);
-
-      console.log('Remove pixel publish response: ', data);
     });
   }
 
@@ -299,8 +308,6 @@ class AutodeckService {
       }
       sns.publish(logoManipulationSNSParams, (err, data) => {
         if (err) console.log('ERROR: ', err);
-
-        console.log('Logo manipulation publish response: ', data);
       });
     }
 
@@ -321,8 +328,6 @@ class AutodeckService {
       };
       sns.publish(screenshotSNSParams, (err, data) => {
         if (err) console.log('ERROR: ', err);
-
-        console.log('Website screenshot publish response: ', data);
       });
     }
 

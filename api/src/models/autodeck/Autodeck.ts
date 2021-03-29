@@ -58,7 +58,6 @@ export const GetJobProcessLocationQuery = queryField('getJobProcessLocations', {
   type: JobProcessLocations,
   async resolve() {
     const jobProcessLocations = await AutodeckService.getJobProcessLocations()
-    console.log('Job process Locations: ', jobProcessLocations)
     return { jobProcessLocations: jobProcessLocations || [] };
   }
 })
@@ -195,6 +194,10 @@ export const GenerateAutodeckInput = inputObjectType({
     t.string('emailContent', { required: false });
     t.string('textMessage', { required: false });
     
+    t.list.field('standardFields', {
+      type: CustomFieldInputType,
+    })
+
     t.list.field('customFields', {
       type: CustomFieldInputType,
     })
@@ -238,8 +241,6 @@ export const GenerateAutodeckMutation = mutationField('generateAutodeck', {
       requiresColorExtraction: input.requiresColorExtraction,
       primaryColour: input.primaryColour,
       jobLocationId: input.jobLocationId,
-      customFields: input.customFields,
-      newCustomFields: input.newCustomFields
     }
 
     console.log('Job input: ', jobInput);
