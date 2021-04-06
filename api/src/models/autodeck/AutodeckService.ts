@@ -22,11 +22,11 @@ type ScreenshotProps = {
   requiresColorExtraction: boolean | null | undefined;
 };
 
-const s3 = new AWS.S3({ accessKeyId: config.awsAccessKeyId, secretAccessKey: config.awsSecretAccessKey, region: 'eu-central-1' });
+const s3 = new AWS.S3({ accessKeyId: config.autodeckAwsAccessKeyId, secretAccessKey: config.autodeckAwsSecretAccessKey, region: 'eu-central-1' });
 const sns = new AWS.SNS({
   region: 'eu-central-1',
-  accessKeyId: config.awsAccessKeyId,
-  secretAccessKey: config.awsSecretAccessKey
+  accessKeyId: config.autodeckAwsAccessKeyId,
+  secretAccessKey: config.autodeckAwsSecretAccessKey
 });
 
 export interface CreateWorkspaceJobProps {
