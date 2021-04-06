@@ -193,6 +193,10 @@ export const GenerateAutodeckInput = inputObjectType({
     t.string('reward', { required: false });
     t.string('emailContent', { required: false });
     t.string('textMessage', { required: false });
+
+    // Generate workspace
+    t.string('slug', { required: false });
+    t.boolean('isGenerateWorkspace', { required: false });
     
     t.list.field('standardFields', {
       type: CustomFieldInputType,
@@ -254,14 +258,15 @@ export const ConfirmCreateWorkspaceJobMutation = mutationField('confirmCreateWor
   type: CreateWorkspaceJobType,
   nullable: true,
   args: { input: GenerateAutodeckInput },
-  async resolve(parent, args) {
+  async resolve(parent, args, ctx) {
     const { input } = args;
-
+    const userId = ctx.session?.user?.id
+    console.log('INPUT: ', input)
     if (!input) {
       return null;
     }
 
-    return AutodeckService.confirmWorkspaceJob(input) as any;
+    return AutodeckService.confirmWorkspaceJob(input, userId) as any;
   }
 })
 

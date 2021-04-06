@@ -1,10 +1,11 @@
-import { Briefcase, Link, Trash2 } from 'react-feather';
+import { Briefcase, Link, Trash2, ThumbsUp, ThumbsDown } from 'react-feather';
 import { useGetPreviewDataLazyQuery, useGetJobProcessLocationsQuery, JobProcessLocationType } from 'types/generated-types';
-import { Button, ButtonGroup } from '@chakra-ui/core';
+import { Button, ButtonGroup, RadioButtonGroup } from '@chakra-ui/core';
 import { useForm, Controller, useFieldArray } from 'react-hook-form';
 import {
   Div, Form, FormControl, FormLabel, FormSection, H3, Hr, Input, InputGrid, InputHelper, Textarea,
   Muted,
+  RadioButton,
 } from '@haas/ui';
 import { useTranslation } from 'react-i18next';
 import React, { useState, useEffect } from 'react';
@@ -18,6 +19,7 @@ import PrimaryColourFragment from '../Fragments/PrimaryColor';
 import CustomerLogoFormFragment from '../Fragments/CustomerLogoFragment';
 import PitchdeckFragment from '../Fragments/PitchdeckFragment';
 import { FormDataProps, AutodeckFormProps, schema } from '../Types';
+import intToBool from 'utils/intToBool';
 
 const AutodeckForm = ({
   onClose,
@@ -82,6 +84,10 @@ const AutodeckForm = ({
       return { key: field?.key, value: field?.value }
     })
 
+    const isGenerateWorkspace = data.isGenerateWorkspace === 1 ? true : false;
+
+    console.log('Submit data: ', data)
+
     if (!isInEditing && (requiresRembgLambda || requiresColorExtraction || requiresWebsiteScreenshot)) {
       return onCreateJob({
         variables: {
@@ -124,7 +130,9 @@ const AutodeckForm = ({
           jobLocationId,
           standardFields: mappedStandardFields,
           customFields: mappedCustomFields || [],
-          newCustomFields: mappedNewCustomFields || []
+          newCustomFields: mappedNewCustomFields || [],
+          slug: data.slug,
+          isGenerateWorkspace: isGenerateWorkspace
         }
       }
     })
@@ -182,6 +190,52 @@ const AutodeckForm = ({
                   ref={form.register()}
                 />
               </FormControl>
+
+              {(isInEditing
+                || (form.watch('useRembg') === 0
+                  && form.watch('useWebsiteUrl') === 0
+                  && form.watch('useCustomColour') === 0)) &&
+                <>
+                  <FormControl>
+                    <FormLabel>{'Generate workspace'}</FormLabel>
+                    <InputHelper>{'Should a workspace be generated based on current content'}</InputHelper>
+                    <Controller
+                      control={form.control}
+                      name="isGenerateWorkspace"
+                      defaultValue={0}
+                      render={({ onChange, value }) => (
+                        <RadioButtonGroup
+                          value={value}
+                          isInline
+                          onChange={onChange}
+                          display="flex"
+                        >
+                          <RadioButton icon={ThumbsUp} value={1} text={'Yes'} description={'Generate workspace'} />
+                          <RadioButton icon={ThumbsDown} value={0} text={'No'} description={'Do not generate workspace'} />
+                        </RadioButtonGroup>
+                      )}
+                    />
+
+                  </FormControl>
+
+                  {form.watch('isGenerateWorkspace') === 1 &&
+                    <>
+                      <FormControl isInvalid={!!form.errors.slug} isRequired>
+                        <FormLabel htmlFor="name">{t('slug')}</FormLabel>
+                        <InputHelper>{t('customer:slug_helper')}</InputHelper>
+                        <Input
+                          placeholder="peach"
+                          leftAddOn="https://client.haas.live/"
+                          name="slug"
+                          ref={form.register()}
+                        />
+                      </FormControl>
+                    </>
+                  }
+                </>
+              }
+
+
 
               <FormControl isInvalid={!!form.errors.jobLocation} isRequired>
                 <FormLabel htmlFor="jobLocation">{t('process_location')}</FormLabel>

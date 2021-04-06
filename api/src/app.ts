@@ -97,6 +97,7 @@ const main = async () => {
 
 try {
   console.log('Starting app');
+  console.log(process.env.AUTODECK_AWS_ACCESS_KEY_ID)
   main();
 } catch (e) {
   console.log(e);

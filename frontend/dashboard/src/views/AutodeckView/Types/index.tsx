@@ -24,6 +24,8 @@ export const schema = yup.object().shape({
   primaryColour: yup.string().required().matches(/^(#(\d|\D){6}$){1}/, {
     message: 'Provided colour is not a valid hexadecimal',
   }),
+  isGenerateWorkspace: yup.number(),
+  slug: yup.string(),
   useRembg: yup.number(),
   useCustomUrl: yup.number(),
   useCustomColour: yup.number(),

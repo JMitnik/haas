@@ -596,6 +596,8 @@ export type GenerateAutodeckInput = {
   reward?: Maybe<Scalars['String']>;
   emailContent?: Maybe<Scalars['String']>;
   textMessage?: Maybe<Scalars['String']>;
+  slug?: Maybe<Scalars['String']>;
+  isGenerateWorkspace?: Maybe<Scalars['Boolean']>;
   standardFields?: Maybe<Array<CustomFieldInputType>>;
   customFields?: Maybe<Array<CustomFieldInputType>>;
   newCustomFields?: Maybe<Array<CustomFieldInputType>>;

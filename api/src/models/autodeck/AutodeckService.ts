@@ -11,6 +11,7 @@ import prisma from '../../config/prisma';
 import { NexusGenInputs } from '../../generated/nexus';
 import { FindManyTriggerArgs } from '@prisma/client';
 import { FindManyCallBackProps, PaginateProps, paginate } from '../../utils/table/pagination';
+import CustomerService from '../customer/CustomerService';
 
 
 type ScreenshotProps = {
@@ -128,7 +129,7 @@ class AutodeckService {
     return mappedKeyValuePairs
   }
 
-  static confirmWorkspaceJob = async (input: NexusGenInputs['GenerateAutodeckInput']) => {
+  static confirmWorkspaceJob = async (input: NexusGenInputs['GenerateAutodeckInput'], userId?: string) => {
     const csvData = { 'colour-0': input.primaryColour };
     const csv = papaparse.unparse([csvData]);
     const csvPath = `${input.id}/dominant_colours.csv`;
@@ -165,7 +166,7 @@ class AutodeckService {
     
     const mappedCustomFields = AutodeckService.generateKeyValuePair(input)
 
-    const pitchdeckData = { 
+    const pitchdeckData: any = { 
       ...mappedCustomFields,
       rootPath: updatedWorkspaceJob.processLocation.path,
       // companyName: input.companyName || 'Company X',
@@ -196,6 +197,27 @@ class AutodeckService {
     sns.publish(sNSParams, (err, data) => {
       if (err) console.log('ERROR: ', err);
     });
+
+    console.log('isGenerateWorksapce: ', input.isGenerateWorkspace)
+    if (input.isGenerateWorkspace) {
+      try {
+        if (!updatedWorkspaceJob.name || !input.primaryColour || !input.slug) throw 'No unsufficent input data to generate workspace'
+        const workspaceInput: NexusGenInputs['CreateWorkspaceInput'] = {
+          name: updatedWorkspaceJob.name, 
+          primaryColour: input.primaryColour,
+          slug: input.slug,
+          isSeed: true,
+          logo: pitchdeckData?.uploadLogo,
+          willGenerateFakeData: true
+        }
+        const createdWorkspace = await CustomerService.createWorkspace(workspaceInput, userId)
+        console.log('created workspace: ', createdWorkspace)
+      } catch (e) {
+        console.log('Something went wrong: ', e)
+      }
+
+    }
+
 
 
     return updatedWorkspaceJob;
