@@ -167,6 +167,7 @@ class AutodeckService {
 
     const pitchdeckData = { 
       ...mappedCustomFields,
+      rootPath: updatedWorkspaceJob.processLocation.path,
       // companyName: input.companyName || 'Company X',
       // firstName: input.firstName || 'Mike',
       // primaryColour: input.primaryColour || '#426b3a',
