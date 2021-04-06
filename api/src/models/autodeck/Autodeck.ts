@@ -261,7 +261,6 @@ export const ConfirmCreateWorkspaceJobMutation = mutationField('confirmCreateWor
   async resolve(parent, args, ctx) {
     const { input } = args;
     const userId = ctx.session?.user?.id
-    console.log('INPUT: ', input)
     if (!input) {
       return null;
     }

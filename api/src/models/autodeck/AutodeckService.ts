@@ -198,7 +198,6 @@ class AutodeckService {
       if (err) console.log('ERROR: ', err);
     });
 
-    console.log('isGenerateWorksapce: ', input.isGenerateWorkspace)
     if (input.isGenerateWorkspace) {
       try {
         if (!updatedWorkspaceJob.name || !input.primaryColour || !input.slug) throw 'No unsufficent input data to generate workspace'
@@ -210,8 +209,7 @@ class AutodeckService {
           logo: pitchdeckData?.uploadLogo,
           willGenerateFakeData: true
         }
-        const createdWorkspace = await CustomerService.createWorkspace(workspaceInput, userId)
-        console.log('created workspace: ', createdWorkspace)
+        await CustomerService.createWorkspace(workspaceInput, userId)
       } catch (e) {
         console.log('Something went wrong: ', e)
       }
