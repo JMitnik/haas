@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { Plus, Download } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { DeepPartial } from 'types/customTypes';
-import { PaginationSortByEnum, useGetAutodeckJobsQuery, PaginationWhereInput, CreateWorkspaceJobType, useCreateWorkspaceJobMutation, useConfirmWorkspaceJobMutation } from 'types/generated-types';
+import { PaginationSortByEnum, useGetAutodeckJobsQuery, PaginationWhereInput, CreateWorkspaceJobType, useCreateWorkspaceJobMutation, useConfirmWorkspaceJobMutation, JobStatusType } from 'types/generated-types';
 import AutodeckForm from 'views/AutodeckView/Components/AutodeckForm'
 import { ProcessingStatus, DateLabel } from './Components';
 
@@ -182,7 +182,7 @@ export const AutodeckOverview = () => {
                 </UI.Div>
                 <UI.Div>
                   <UI.Helper mb={1}>{t('created_at')}</UI.Helper>
-                  {activeJob?.createdAt && <DateLabel dateString={activeJob?.createdAt} /> }
+                  {activeJob?.createdAt && <DateLabel dateString={activeJob?.createdAt} />}
                 </UI.Div>
 
                 <UI.Div>
@@ -192,6 +192,13 @@ export const AutodeckOverview = () => {
                     : 'Not updated yet'
                   }
                 </UI.Div>
+
+                {activeJob?.status === JobStatusType.Failed &&
+                  <UI.Div>
+                    <UI.Helper mb={1}>Error</UI.Helper>
+                    {activeJob.errorMessage}
+                  </UI.Div>
+                }
                 <UI.Div useFlex justifyContent="space-between">
                   <UI.Div>
                     <UI.Helper mb={1}>{t('status')}</UI.Helper>

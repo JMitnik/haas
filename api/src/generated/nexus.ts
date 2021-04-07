@@ -872,6 +872,8 @@ export interface NexusGenFieldTypes {
     resourcesUrl: string | null; // String
     status: NexusGenEnums['JobStatusType']; // JobStatusType!
     updatedAt: string | null; // String
+    message?: string | null;
+    errorMessage?: string | null;
   }
   Customer: { // field return type
     campaign: NexusGenRootTypes['CampaignType']; // CampaignType!
@@ -1474,6 +1476,7 @@ export interface NexusGenArgTypes {
       id?: string | null; // String
       referenceId?: string | null; // String
       resourceUrl?: string | null; // String
+      errorMessage?: string | null;
       status?: NexusGenEnums['JobStatusType'] | null; // JobStatusType
     }
     updateCTA: { // args
@@ -1487,6 +1490,7 @@ export interface NexusGenArgTypes {
       id?: string | null; // String
       referenceId?: string | null; // String
       resourceUrl?: string | null; // String
+      errorMessage?: string | null; 
       status?: NexusGenEnums['JobStatusType'] | null; // JobStatusType
     }
     updateQuestion: { // args

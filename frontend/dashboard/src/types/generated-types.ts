@@ -209,6 +209,8 @@ export type CreateWorkspaceJobType = {
   resourcesUrl?: Maybe<Scalars['String']>;
   updatedAt?: Maybe<Scalars['String']>;
   referenceId?: Maybe<Scalars['String']>;
+  errorMessage?: Maybe<Scalars['String']>;
+  message?: Maybe<Scalars['String']>;
   referenceType: CloudReferenceType;
   processLocation: JobProcessLocation;
 };
@@ -803,6 +805,7 @@ export type MutationUpdateCreateWorkspaceJobArgs = {
   status?: Maybe<JobStatusType>;
   resourceUrl?: Maybe<Scalars['String']>;
   referenceId?: Maybe<Scalars['String']>;
+  errorMessage?: Maybe<Scalars['String']>;
 };
 
 
@@ -811,6 +814,7 @@ export type MutationUpdateJobArgs = {
   status?: Maybe<JobStatusType>;
   resourceUrl?: Maybe<Scalars['String']>;
   referenceId?: Maybe<Scalars['String']>;
+  errorMessage?: Maybe<Scalars['String']>;
 };
 
 
@@ -1754,7 +1758,7 @@ export type GetAutodeckJobsQuery = (
     { __typename?: 'AutodeckConnectionType' }
     & { jobs: Array<(
       { __typename?: 'CreateWorkspaceJobType' }
-      & Pick<CreateWorkspaceJobType, 'id' | 'name' | 'createdAt' | 'updatedAt' | 'referenceId' | 'status' | 'resourcesUrl' | 'referenceType' | 'requiresColorExtraction' | 'requiresRembg' | 'requiresScreenshot'>
+      & Pick<CreateWorkspaceJobType, 'id' | 'name' | 'createdAt' | 'updatedAt' | 'referenceId' | 'errorMessage' | 'message' | 'status' | 'resourcesUrl' | 'referenceType' | 'requiresColorExtraction' | 'requiresRembg' | 'requiresScreenshot'>
       & { processLocation: (
         { __typename?: 'JobProcessLocation' }
         & Pick<JobProcessLocation, 'id' | 'name' | 'path' | 'type'>
@@ -2065,6 +2069,8 @@ export const GetAutodeckJobsDocument = gql`
       createdAt
       updatedAt
       referenceId
+      errorMessage
+      message
       status
       resourcesUrl
       referenceType

@@ -116,6 +116,8 @@ export const CreateWorkspaceJobType = objectType({
     t.string('resourcesUrl', { nullable: true });
     t.string('updatedAt', { nullable: true })
     t.string('referenceId', { nullable: true });
+    t.string('errorMessage', { nullable: true });
+    t.string('message', { nullable: true })
 
     t.field('referenceType', {
       type: CloudReferenceType,
@@ -307,6 +309,8 @@ export const GetAutodeckJobsQuery = queryField('getAutodeckJobs', {
       search: args.filter?.searchTerm,
     });
 
+    console.log('entries: ', entries)
+
     return {
       jobs: entries as NexusGenFieldTypes['CreateWorkspaceJobType'][],
       pageInfo,
@@ -428,9 +432,9 @@ export const UploadImageMutation = Upload && mutationField('uploadJobImage', {
 export const UpdateCreatWorkspaceJobMutation = mutationField('updateCreateWorkspaceJob', {
   type: CreateWorkspaceJobType,
   nullable: true,
-  args: { id: 'String', status: JobStatusType, resourceUrl: 'String', referenceId: 'String' },
+  args: { id: 'String', status: JobStatusType, resourceUrl: 'String', referenceId: 'String', errorMessage: 'String' },
   resolve(parent, args, ctx) {
-    const { id, resourceUrl, status } = args;
+    const { id, resourceUrl, status, errorMessage } = args;
 
     if (!args.id) {
       return null;
@@ -443,6 +447,7 @@ export const UpdateCreatWorkspaceJobMutation = mutationField('updateCreateWorksp
       data: {
         resourcesUrl: resourceUrl,
         status: status || undefined,
+        errorMessage
       },
 
     }) as any;
@@ -453,9 +458,9 @@ export const UpdateCreatWorkspaceJobMutation = mutationField('updateCreateWorksp
 export const UpdateJobMutation = mutationField('updateJob', {
   type: JobObjectType,
   nullable: true,
-  args: { id: 'String', status: JobStatusType, resourceUrl: 'String', referenceId: 'String' },
+  args: { id: 'String', status: JobStatusType, resourceUrl: 'String', referenceId: 'String', errorMessage: 'String' },
   resolve(parent, args, ctx) {
-    const { id, resourceUrl, status } = args;
+    const { id, resourceUrl, status, errorMessage } = args;
 
     if (!args.id) {
       return null;
@@ -470,6 +475,7 @@ export const UpdateJobMutation = mutationField('updateJob', {
           update: {
             resourcesUrl: resourceUrl,
             status: status || undefined,
+            errorMessage: errorMessage
           },
         },
       },
