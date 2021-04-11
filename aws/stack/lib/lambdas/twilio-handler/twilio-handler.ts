@@ -18,18 +18,18 @@ exports.main = async function(event: any, context: any) {
     const body: TwilioBody = parse(event.body);
 
     if (body.MessageStatus === 'accepted' || body.MessageStatus === 'delivered') {
-      console.log("Received! Update API next!");
+      console.log('Received! Update API next!');
     }
 
     if (body.MessageStatus === 'failed' || body.MessageStatus === 'undelivered') {
-      console.log("Failed! Time to crash and burn!");
+      console.log('Failed! Time to crash and burn!');
     }
 
     // We only accept GET for now
     return {
       statusCode: 200,
       headers: {},
-      body: "SMS has been handled"
+      body: 'SMS has been handled'
     };
   } catch(error) {
     var body = error.stack || JSON.stringify(error, null, 2);

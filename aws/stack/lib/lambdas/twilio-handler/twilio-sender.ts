@@ -34,7 +34,7 @@ exports.main = async function(event: any, context: any) {
     return {
       statusCode: 200,
       headers: {},
-      body: "SMS has been sent."
+      body: 'SMS has been sent.'
     };
   } catch(error) {
     var body = error.stack || JSON.stringify(error, null, 2);
@@ -44,5 +44,4 @@ exports.main = async function(event: any, context: any) {
         body: JSON.stringify(body)
     }
   }
-
 }
