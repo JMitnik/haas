@@ -4,6 +4,9 @@ import * as apigateway from '@aws-cdk/aws-apigateway';
 import * as secretsmanager from '@aws-cdk/aws-secretsmanager';
 import * as ssm from '@aws-cdk/aws-ssm';
 import * as iam from '@aws-cdk/aws-iam';
+import * as sns from '@aws-cdk/aws-sns';
+import * as sqs from '@aws-cdk/aws-sqs';
+import * as snsSubs from '@aws-cdk/aws-sns-subscriptions';
 
 interface TwilioHanderServiceProps {
     accountId: string;
@@ -55,7 +58,33 @@ export class TwilioHandlerService extends core.Construct {
             resources: [`arn:aws:ssm:eu-central-1:${props.accountId}:parameter/TWILIO_CALLBACK_URL`],
             effect: iam.Effect.ALLOW,
             actions: ['ssm:GetParameter']
+        }));
+
+        // Give permission to the callback handler to access Dynamo for the updates
+        callbackHandler.role?.addToPrincipalPolicy(new iam.PolicyStatement({
+            resources: [`arn:aws:dynamodb:eu-central-1:${props.accountId}:table/CampaignDeliveries`],
+            effect: iam.Effect.ALLOW,
+            actions: ['dynamodb:UpdateItem']
         }))
+
+        // Define a dead-letter-queue for the SMS
+        const dlq = new sqs.Queue(this, 'Twilio_SMS_DLQ', {
+            queueName: 'MySubscription_DLQ',
+            retentionPeriod: core.Duration.days(14),
+        });
+
+        // SNS Subscription for sending an SMS
+        const snsTopic = new sns.Topic(this, 'Twilio_SMS_Topic', {
+            displayName: 'Twilio SMS Topic',
+            topicName: 'twilioSMSTopic',
+        });
+
+        // Define a subscription wrapper for the sender
+        const senderLambdaSubscription = new snsSubs.LambdaSubscription(senderHandler, {
+            deadLetterQueue: dlq,
+        });
+
+        snsTopic.addSubscription(senderLambdaSubscription);
 
         // Finally, connect the gateway to the lambda-integrations
         postApi.root.addMethod('GET', senderIntegration);

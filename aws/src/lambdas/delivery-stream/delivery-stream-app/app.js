@@ -6,6 +6,8 @@ const sesClient = new AWS.SES();
 const snsClient = new AWS.SNS();
 const sqsClient = new AWS.SQS();
 
+const accountId = '649621042808';
+
 snsClient.setSMSAttributes({
   attributes: {
     DefaultSMSType: 'Transactional',
@@ -50,10 +52,15 @@ exports.lambdaHandler = async (event, context, callback) => {
           );
 
         } else if (row.DeliveryType.S === 'SMS') {
-          return sendRecordSMS(
+          return sendSNSMessage(
             row.DeliveryRecipient.S,
-            row.DeliveryBody.S
+            row.DeliveryBody.S,
+            row.DeliveryDate_DeliveryID.S
           );
+          // return sendRecordSMS(
+          //   row.DeliveryRecipient.S,
+          //   row.DeliveryBody.S
+          // );
         }
       }
     }));
@@ -95,6 +102,26 @@ const sendRecordSMS = (
   return snsClient.publish({
     PhoneNumber: recipient,
     Message: body,
+  }).promise().catch((err) => {
+    console.error('Error:', err);
+  }).then((data) => {
+    console.log('Sent SMS!');
+    console.log(data);
+  });
+};
+
+const sendSNSMessage = (
+  recipient,
+  body,
+  deliveryId
+) => {
+  return snsClient.publish({
+    TopicArn: `arn:aws:sns:eu-central-1:${accountId}:twilioSMSTopic`,
+    Message: JSON.stringify({
+      PhoneNumber: recipient,
+      body,
+      deliveryId
+    })
   }).promise().catch((err) => {
     console.error('Error:', err);
   }).then((data) => {
