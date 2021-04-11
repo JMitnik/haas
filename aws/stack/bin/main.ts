@@ -6,6 +6,8 @@ import { MainPipelineStack } from '../lib/pipeline/main-pipeline-stack';
 import { HaasCampaignStack } from '../lib/stacks/campaign-stack';
 
 const app = new cdk.App();
+
+// Main stack and pipeline
 const api = new APIStack(app, 'HaasAPIMainStack');
 const pipeline = new MainPipelineStack(app, 'haasSvcPipeline', {
     prefix: 'haas_svc_api',
@@ -17,6 +19,7 @@ const pipeline = new MainPipelineStack(app, 'haasSvcPipeline', {
     rdsSecurityGroup: api.rdsSecurityGroup
 });
 
-const haasCampaign = new HaasCampaignStack(app, 'HAASCampaign', {
+// Campaign stack
+const campaign = new HaasCampaignStack(app, 'HAASCampaign', {
     accountId: '649621042808'
 });
