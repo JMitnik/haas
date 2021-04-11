@@ -16,20 +16,27 @@ export class TwilioHandlerService extends core.Construct {
         super(scope, id);
         const postApi = new apigateway.RestApi(this, 'handle-twilio-api');
 
-        const ssmVal = new ssm.StringParameter(this, 'API_URL', {
+        // Synchronize the TWILIO_CALLBACK_URL parameter in SSM with the API gateway
+        new ssm.StringParameter(this, 'API_URL', {
             stringValue: postApi.url,
             parameterName: 'TWILIO_CALLBACK_URL',
         });
 
-        console.log(props.accountId);
-
+        // Get Twilio secrets from the secrets-manager
         const twilioSecret = secretsmanager.Secret.fromSecretNameV2(this, 'Twilio_SECRET', 'TWILIO_PROD');
 
+        // Define the `handler` lambda (receiving end)
         const callbackHandler = new lambda.NodejsFunction(this, 'twilio-handler', {
             entry: 'lib/lambdas/twilio-handler/twilio-handler.ts',
             handler: 'main',
         });
 
+        // Wrap lambda in an API-Gateway integration
+        const callbackIntegration = new apigateway.LambdaIntegration(callbackHandler, {
+            requestTemplates: { "application/json": "{ \"statusCode\": 200 }" },
+        });
+
+        // Define the `sender` lambda (sending end), and pass the relevant params.
         const senderHandler = new lambda.NodejsFunction(this, 'twilio-sender', {
             entry: 'lib/lambdas/twilio-handler/twilio-sender.ts',
             handler: 'main',
@@ -40,18 +47,17 @@ export class TwilioHandlerService extends core.Construct {
             }
         });
 
+        // Wrap lambda in an API-Gateway integration
+        const senderIntegration = new apigateway.LambdaIntegration(senderHandler);
+
+        // Give permission to the sender Lambda to access only the Twilio callback url
         senderHandler.role?.addToPrincipalPolicy(new iam.PolicyStatement({
             resources: [`arn:aws:ssm:eu-central-1:${props.accountId}:parameter/TWILIO_CALLBACK_URL`],
             effect: iam.Effect.ALLOW,
             actions: ['ssm:GetParameter']
         }))
 
-        const callbackIntegration = new apigateway.LambdaIntegration(callbackHandler, {
-            requestTemplates: { "application/json": "{ \"statusCode\": 200 }" },
-        });
-
-        const senderIntegration = new apigateway.LambdaIntegration(senderHandler);
-
+        // Finally, connect the gateway to the lambda-integrations
         postApi.root.addMethod('GET', senderIntegration);
         postApi.root.addMethod('POST', callbackIntegration);
 
