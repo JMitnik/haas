@@ -52,15 +52,15 @@ exports.lambdaHandler = async (event, context, callback) => {
           );
 
         } else if (row.DeliveryType.S === 'SMS') {
-          return sendSNSMessage(
-            row.DeliveryRecipient.S,
-            row.DeliveryBody.S,
-            row.DeliveryDate_DeliveryID.S
-          );
-          // return sendRecordSMS(
+          // return sendSNSMessage(
           //   row.DeliveryRecipient.S,
-          //   row.DeliveryBody.S
+          //   row.DeliveryBody.S,
+          //   row.DeliveryDate_DeliveryID.S
           // );
+          return sendRecordSMS(
+            row.DeliveryRecipient.S,
+            row.DeliveryBody.S
+          );
         }
       }
     }));
@@ -100,6 +100,12 @@ const sendRecordSMS = (
   body,
 ) => {
   return snsClient.publish({
+    MessageAttributes: {
+      'AWS.SNS.SMS.SenderID': {
+        'DataType': 'String',
+        'StringValue': 'haas'
+      }
+    },
     PhoneNumber: recipient,
     Message: body,
   }).promise().catch((err) => {
