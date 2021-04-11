@@ -3,6 +3,7 @@ import 'source-map-support/register';
 import * as cdk from '@aws-cdk/core';
 import { APIStack } from '../lib/main-stack';
 import { MainPipelineStack } from '../lib/pipeline/main-pipeline-stack';
+import { HaasCampaignStack } from '../lib/stacks/campaign-stack';
 
 const app = new cdk.App();
 const api = new APIStack(app, 'HaasAPIMainStack');
@@ -14,4 +15,8 @@ const pipeline = new MainPipelineStack(app, 'haasSvcPipeline', {
     rdsPassword: api.rdsPassword,
     db: api.db,
     rdsSecurityGroup: api.rdsSecurityGroup
+});
+
+const haasCampaign = new HaasCampaignStack(app, 'HAASCampaign', {
+    accountId: '649621042808'
 });

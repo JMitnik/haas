@@ -21,18 +21,18 @@ exports.lambdaHandler = async (event, context, callback) => {
       oldStatus: record.dynamodb.OldImage.DeliveryStatus.S,
       newStatus: record.dynamodb.NewImage.DeliveryStatus.S,
     }));
-    
+
     const sharedCallbackUrl = event.Records[0].dynamodb.NewImage.callback.S;
-    
+
     try {
       await sendToCallbackUrl(sharedCallbackUrl, updates);
     } catch(error) {
       console.error(`Unable to send update to callback url at ${sharedCallbackUrl}. Will still send SMS`);
     }
-    
+
     await Promise.all(event.Records.map((record) => {
       const row = record.dynamodb.NewImage;
-      
+
       if (
         record.eventName === 'MODIFY'
           && record.dynamodb.NewImage.DeliveryStatus.S !== record.dynamodb.OldImage.DeliveryStatus.S
@@ -105,7 +105,7 @@ const sendRecordSMS = (
 
 const sendToCallbackUrl = async (callbackUrl, payload) => {
   const {hostname, pathname} = URL.parse(callbackUrl);
-  
+
     return new Promise((resolve, reject) => {
         const req = https.request({
           hostname,
