@@ -34,14 +34,13 @@ beforeEach(() => {
     req.reply({ fixture: 'mockGetCustomer.json' });
   }, 'getCustomer');
 
-   cy.graphql('createSession', (req) => {
+  cy.graphql('createSession', (req) => {
     req.reply({ fixture: 'mockCreateSession.json' });
   }, 'createUserMockSession');
 
   cy.graphql('appendToInteraction', (req) => {
     req.reply({ fixture: 'mockAppendToInteraction.json' });
   }, 'appendToInteraction');
-
 })
 
 it('Fill in content of form node, check appendToInteraction mutation input', () => {
