@@ -1,3 +1,5 @@
+import '@testing-library/cypress/add-commands'
+
 // ***********************************************
 // This example commands.js shows you how to
 // create various custom commands and overwrite
@@ -23,3 +25,11 @@
 //
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
+
+Cypress.Commands.add('graphql', (operationName, callback, alias) => {
+  cy.intercept('POST', 'http://localhost:4000/graphql', (req) => {
+    if (req.body.operationName === operationName) {
+      callback(req);
+    }
+  }).as(alias);
+});

@@ -55,7 +55,7 @@ const getFieldValue = (field: any, relatedField: any) => {
 };
 
 const FormNode = ({ node, onEntryStore }: FormNodeProps) => {
-  const { register, getValues, formState, errors } = useForm<FormNodeFormProps>({
+  const { register, getValues, formState } = useForm<FormNodeFormProps>({
     mode: 'onChange',
     reValidateMode: 'onChange',
   });

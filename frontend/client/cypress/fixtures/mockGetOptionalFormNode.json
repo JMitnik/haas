@@ -63,7 +63,7 @@
                   "id": "cknif3k7w0720v0r5lv1bhek5",
                   "label": "Link",
                   "type": "url",
-                  "isRequired": false,
+                  "isRequired": true,
                   "position": 7,
                   "__typename": "FormNodeField"
                 }
