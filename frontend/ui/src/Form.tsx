@@ -145,7 +145,7 @@ export const Textarea = forwardRef(
   )
 );
 
-export const Input = forwardRef((props: InputProps, ref: Ref<HTMLInputElement>) => (
+export const Input = forwardRef(({id, ...props}: InputProps, ref: Ref<HTMLInputElement>) => (
   <InputGroup>
     {props.leftEl && (
       <ChakraInputLeftElement color="gray.400" padding="12px" fontSize="0.5rem" {...props}>
@@ -183,6 +183,7 @@ export const Input = forwardRef((props: InputProps, ref: Ref<HTMLInputElement>) 
       roundedTopLeft={props.leftAddOn ? '0' : 'auto'}
       roundedBottomRight={props.rightAddOn ? '0' : 'auto'}
       roundedTopRight={props.rightAddOn ? '0' : 'auto'}
+      id={id}
       {...props}
       fontSize="0.8rem"
       ref={ref}

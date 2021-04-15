@@ -55,7 +55,7 @@ const getFieldValue = (field: any, relatedField: any) => {
 };
 
 const FormNode = ({ node, onEntryStore }: FormNodeProps) => {
-  const { register, getValues, formState } = useForm<FormNodeFormProps>({
+  const { register, getValues, formState, errors } = useForm<FormNodeFormProps>({
     mode: 'onChange',
     reValidateMode: 'onChange',
   });
@@ -79,6 +79,8 @@ const FormNode = ({ node, onEntryStore }: FormNodeProps) => {
 
     onEntryStore(entry, formEntry);
   };
+
+  console.log('errors: ', errors)
 
   return (
     <UI.Div>
@@ -104,6 +106,8 @@ const FormNode = ({ node, onEntryStore }: FormNodeProps) => {
                     <UI.FormControl isRequired={field.isRequired}>
                       <UI.FormLabel htmlFor={`fields[${index}].value`}>{field.label}</UI.FormLabel>
                       <UI.Input
+                        // aria-labelledby={`fields[${index}].value`}
+                        id={`fields[${index}].value`}
                         variant="outline"
                         leftEl={mapIcon[field?.type] || <Type />}
                         type={mapFieldType[field?.type] || 'text'}
