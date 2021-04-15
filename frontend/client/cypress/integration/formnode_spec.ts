@@ -128,4 +128,7 @@ it('Fill in content of form node, check appendToInteraction mutation input', () 
     cy.wrap(linkObj).should('have.a.property', 'url')
     cy.wrap(linkObj).its('url').should('equal', FORM_VALUES.link)
   });
+
+  cy.findByText('Thank you for participating!').should('exist')
+  cy.findByText('How do you feel about Lufthansa?').should('not.exist')
 });
