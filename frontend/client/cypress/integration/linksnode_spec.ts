@@ -29,7 +29,11 @@ it('Custom link CTA', () => {
   cy.get('@websiteButton').click();
 
   // First request to create session 
-  cy.wait('@createUserMockSession');
+  cy.wait('@createUserMockSession').its('request.body.variables.input.entries').then((entries) => {
+    const choiceEntry = entries[0];
+    const keyValue = choiceEntry?.data.choice;
+    cy.wrap(keyValue).its('value').should('equal', 'Customer Support');
+  });
 
   // Expect to arrive at link CTA with this text
   cy.findByText(CTA_Link_Node_text).should('exist');
@@ -58,5 +62,4 @@ it('Custom link CTA', () => {
   cy.reload();
   cy.findByText(CTA_Link_Node_text).should('exist');
   cy.findByText('How do you feel about Lufthansa?').should('not.exist');
-
 });
