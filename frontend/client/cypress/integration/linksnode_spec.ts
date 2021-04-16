@@ -1,16 +1,3 @@
-/**
- * Settings
-**/
-
-interface FormNodeEntry {
-  relatedFieldId: string;
-  shortText?: string;
-  longText?: string;
-  email?: string;
-  phoneNumber?: string;
-  number?: number;
-}
-
 // Layer 1 Choice
 const firstLayerCustomerSupportButtonText = /Customer Support/i;
 
