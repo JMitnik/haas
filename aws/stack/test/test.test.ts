@@ -1,13 +1,11 @@
-import { expect as expectCDK, matchTemplate, MatchStyle } from '@aws-cdk/assert';
+import { expect as expectCDK, countResources } from '@aws-cdk/assert';
 import * as cdk from '@aws-cdk/core';
-import * as Test from '../lib/main-stack';
+import * as Stack from '../lib/main-stack';
 
 test('Empty Stack', () => {
   const app = new cdk.App();
   // WHEN
-  const stack = new Test.MainStack(app, 'MyTestStack');
+  const stack = new Stack.APIStack(app, 'MyTestStack');
   // THEN
-  expectCDK(stack).to(matchTemplate({
-    "Resources": {}
-  }, MatchStyle.EXACT))
+  expectCDK(stack).to(countResources('AWS::EC2::VPC', 1));
 });
