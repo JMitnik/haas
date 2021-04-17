@@ -22,7 +22,7 @@ it('Custom link CTA', () => {
   cy.visit('http://localhost:3000/test/test').then((win) => {
     // Create stub function so share isn't actually called
     win.navigator.share = cy.stub().as('share');
-    
+
     cy.wait('@getDialogue');
     cy.wait('@getCustomer');
 
@@ -31,14 +31,14 @@ it('Custom link CTA', () => {
     cy.get('@websiteButton').should('be.visible');
     cy.get('@websiteButton').click();
 
-    // First request to create session 
+    // First request to create session
     cy.wait('@createUserMockSession').its('request.body.variables.input.entries').then((entries) => {
       const choiceEntry = entries[0];
       const keyValue = choiceEntry?.data.choice;
       cy.wrap(keyValue).its('value').should('equal', 'Product/Services');
     });
 
-    // Expect to arrive at link CTA with this text
+    // Expect to arrive at share CTA with this text
     cy.findByText(CTA_Share_Node_text).should('exist');
     cy.findByText('Delen').click();
 
