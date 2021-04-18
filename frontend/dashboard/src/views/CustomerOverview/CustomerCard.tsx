@@ -71,6 +71,7 @@ const CustomerCard = ({ customer }: { customer: any }) => {
       backgroundColor={primaryColor.hex()}
       onClick={() => setCustomerSlug(customer.slug)}
       data-cy="CustomerCard"
+      data-testid="CustomerCard"
     >
       <CardBody flex="100%">
         <ColumnFlex justifyContent="space-between">

@@ -2,25 +2,6 @@ import "cypress-localstorage-commands";
 
 describe("Login logic", () => {
 
-  // beforeEach(() => {
-  //   cy.intercept('POST', 'http://localhost:4000/graphql', (req) => {
-  //     if (req.body.operationName === 'verifyUserToken') {
-  //       req.reply({ fixture: 'verifyUserToken.json' });
-  //     }
-  //   }).as('verifyUserToken');
-
-  //   cy.intercept('POST', 'http://localhost:4000/graphql', (req) => {
-  //     if (req.body.operationName === 'me') {
-  //       req.reply({ fixture: 'mockAdminUser.json' });
-  //     }
-  //   }).as('me');
-
-  //   cy.intercept('POST', 'http://localhost:4000/graphql', (req) => {
-  //     if (req.body.operationName === 'refreshAccessToken') {
-  //       req.reply({ fixture: 'mockRefreshActionToken.json' });
-  //     }
-  //   }).as('refreshAccessToken');
-
     beforeEach(() => {
       cy.graphql('getCustomers', (req) => {
         req.reply({ fixture: 'mockGetCustomers.json' });
