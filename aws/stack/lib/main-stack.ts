@@ -5,11 +5,11 @@ import * as rds from '@aws-cdk/aws-rds';
 import * as acm from '@aws-cdk/aws-certificatemanager';
 import { SubnetType } from '@aws-cdk/aws-ec2';
 import * as ecs from '@aws-cdk/aws-ecs';
-import * as iam from '@aws-cdk/aws-iam';
 import * as route53 from '@aws-cdk/aws-route53';
 import * as ecs_patterns from '@aws-cdk/aws-ecs-patterns';
 import * as secretsmanager from "@aws-cdk/aws-secretsmanager";
-import { EcrImage } from '@aws-cdk/aws-ecs';
+import { TwilioHandlerService } from './lambdas/twilio-handler/twilio-handler-service';
+import { Duration } from '@aws-cdk/core';
 
 
 // Prerequisites:
@@ -134,6 +134,7 @@ export class APIStack extends cdk.Stack {
     const apiService = new ecs_patterns.ApplicationLoadBalancedFargateService(this, "API_SERVICE", {
       cluster,
       cpu: 512,
+      memoryLimitMiB: 2048,
       desiredCount: 1,
       assignPublicIp: true,
       domainZone: hostedZone,
@@ -164,8 +165,7 @@ export class APIStack extends cdk.Stack {
     const scaling = apiService.service.autoScaleTaskCount({ maxCapacity: 3 });
     scaling.scaleOnCpuUtilization('CpuScaling', {
       targetUtilizationPercent: 50,
-      scaleInCooldown: cdk.Duration.seconds(60),
-      scaleOutCooldown: cdk.Duration.seconds(60)
+      scaleInCooldown: Duration.seconds(60)
     });
 
     this.apiService = apiService;
