@@ -44,7 +44,7 @@ const PrimaryColourFragment = ({ form, isInEditing, palette }: { form: UseFormMe
           <Controller
             control={form.control}
             name="primaryColour"
-            defaultValue="#BEE3F8"
+            defaultValue={palette?.[0] || "#BEE3F8"}
             render={({ onChange, value }) => (
               <ColorPaletteFragment palette={palette} form={form} onChange={onChange} value={value} />
             )}

@@ -669,7 +669,10 @@ export enum JobStatusType {
   WrappingUp = 'WRAPPING_UP',
   Completed = 'COMPLETED',
   Failed = 'FAILED',
-  ReadyForProcessing = 'READY_FOR_PROCESSING'
+  ReadyForProcessing = 'READY_FOR_PROCESSING',
+  TransformingPsdsToPngs = 'TRANSFORMING_PSDS_TO_PNGS',
+  StitchingSlides = 'STITCHING_SLIDES',
+  CompressingSalesMaterial = 'COMPRESSING_SALES_MATERIAL'
 }
 
 export type LineChartDataType = {

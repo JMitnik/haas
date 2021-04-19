@@ -1,13 +1,28 @@
 import React, { useRef, useState, useEffect } from 'react'
 import { useRemovePixelRangeMutation, useWhitifyImageMutation, useGetAdjustedLogoLazyQuery, RemovePixelRangeInput } from 'types/generated-types';
 import { Div, Flex } from '@haas/ui';
-import { Spinner, Button } from '@chakra-ui/core';
+import { Spinner, Button, useToast, Box } from '@chakra-ui/core';
 
 const Canvas = ({ id, value, onChange }: any) => {
   const ref = useRef<HTMLCanvasElement | null>(null);
+  const toast = useToast();
   const [activeColor, setActiveColor] = useState<Array<number>>([255, 255, 255])
   const [activeBackground, setActiveBackground] = useState<string>('white')
-  const [removePixel, { loading: removePixelLoading }] = useRemovePixelRangeMutation();
+  const [removePixel] = useRemovePixelRangeMutation({
+    onCompleted: () => {
+      toast({
+        title: 'Your logo edited',
+        status: 'success',
+        position: 'bottom-right',
+        duration: 4000,
+        render: () => (
+          <Box color="white" p={3} zIndex={9999} bg="blue.500">
+            The request to remove the pixel color has been succesfully sent. Please refresh until the new logo is available.
+          </Box>
+        ),
+      });
+    },
+  });
   const [whitifyImage, { loading: whitifyLoading }] = useWhitifyImageMutation({
     onCompleted: () => {
       setActiveBackground('black');
@@ -173,8 +188,6 @@ const Canvas = ({ id, value, onChange }: any) => {
         />
         <Flex marginTop="5px" justifyContent="space-evenly">
           <Button
-            isLoading={removePixelLoading}
-            // isDisabled={!form.formState.isValid}
             variantColor="teal"
             onClick={handleRemovePixel}
           >

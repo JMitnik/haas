@@ -19,7 +19,6 @@ import PrimaryColourFragment from '../Fragments/PrimaryColor';
 import CustomerLogoFormFragment from '../Fragments/CustomerLogoFragment';
 import PitchdeckFragment from '../Fragments/PitchdeckFragment';
 import { FormDataProps, AutodeckFormProps, schema } from '../Types';
-import intToBool from 'utils/intToBool';
 
 const AutodeckForm = ({
   onClose,
@@ -166,8 +165,6 @@ const AutodeckForm = ({
     return setActiveTemplateType(jobLocation?.type)
   }
 
-  console.log('form errors: ', form.errors)
-
   return (
     <Form onSubmit={form.handleSubmit(onFormSubmit)}>
       <>
@@ -309,7 +306,11 @@ const AutodeckForm = ({
         </FormSection>
       </>
 
-      {((job?.processLocation?.type === "PITCHDECK" || activeTemplateType === JobProcessLocationType.Pitchdeck) && (isInEditing
+      {((job?.processLocation?.type === "PITCHDECK" 
+      || job?.processLocation?.type === "BROCHURE"  
+      || activeTemplateType === JobProcessLocationType.Pitchdeck
+      || activeTemplateType === JobProcessLocationType.Brochure) 
+      && (isInEditing
         || (form.watch('useRembg') === 0
           && form.watch('useWebsiteUrl') === 0
           && form.watch('useCustomColour') === 0)))
@@ -416,7 +417,6 @@ const AutodeckForm = ({
                 {newCustomFields.map((newCustomField, index) => {
                   const error: any = form.errors.newCustomFields?.[index]
                   const errorTwo = error?.key?.message
-                  console.log('Error: ', errorTwo)
                   return (
                     <Div key={newCustomField.arrayKey} position="relative" borderBottom="1px solid #4f5d6e" borderTop="1px solid #4f5d6e" padding="1em 0">
                       <Div marginBottom="24px">
