@@ -166,6 +166,8 @@ const AutodeckForm = ({
     return setActiveTemplateType(jobLocation?.type)
   }
 
+  console.log('form errors: ', form.errors)
+
   return (
     <Form onSubmit={form.handleSubmit(onFormSubmit)}>
       <>
@@ -458,7 +460,7 @@ const AutodeckForm = ({
       <ButtonGroup>
         <Button
           isLoading={isLoading || isConfirmLoading}
-          // isDisabled={!form.formState.isValid}
+          isDisabled={!form.formState.isValid}
           variantColor="teal"
           type="submit"
         >

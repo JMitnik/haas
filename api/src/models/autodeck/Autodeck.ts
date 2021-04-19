@@ -309,8 +309,6 @@ export const GetAutodeckJobsQuery = queryField('getAutodeckJobs', {
       search: args.filter?.searchTerm,
     });
 
-    console.log('entries: ', entries)
-
     return {
       jobs: entries as NexusGenFieldTypes['CreateWorkspaceJobType'][],
       pageInfo,
@@ -357,9 +355,7 @@ export const GetAdjustedLogoQuery = queryField('getAdjustedLogo', {
   nullable: true,
   args: { input: AdjustedImageInput },
   resolve(parent, args) {
-    console.log('args: ', args)
     if (!args.input) return null;
-    console.log('Going to process adjusted logo')
     return AutodeckService.getAdjustedLogo(args.input);
   }
 })
@@ -369,7 +365,6 @@ export const WhitifyImageMutation = mutationField('whitifyImage', {
   nullable: true,
   args: { input : AdjustedImageInput},
   resolve(parent, args) {
-    console.log('args input: ', args.input)
     if (!args.input) return null;
     AutodeckService.whitifyImage(args.input)
     return { url: 'Succesfully started lambda'}
@@ -381,7 +376,6 @@ export const RemovePixelRangeMutation = mutationField('removePixelRange', {
   nullable: true,
   args: { input: RemovePixelRangeInput },
   async resolve(parent, args) {
-    console.log('args input: ', args.input)
     if (!args.input) return null;
     
     AutodeckService.removePixelRange(args.input)
