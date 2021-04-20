@@ -275,6 +275,19 @@ class AutodeckService {
     });
   }
 
+  static resizeImage = (input: { bucket: string, key: string }) => {
+
+    const strEvent = JSON.stringify(input, null, 2);
+    const sNSParams = {
+      Message: strEvent,
+      TopicArn: "arn:aws:sns:eu-central-1:118627563984:ResizeImageChannel"
+    }
+    sns.publish(sNSParams, (err, data) => {
+      if (err) console.log('ERROR: ', err);
+    });
+  }
+
+
   static removePixelRange = (removePixelRangeEventInput: NexusGenInputs['RemovePixelRangeInput']) => {
 
     const strEvent = JSON.stringify(removePixelRangeEventInput, null, 2);

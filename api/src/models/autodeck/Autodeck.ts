@@ -420,6 +420,11 @@ export const UploadImageMutation = Upload && mutationField('uploadJobImage', {
     // console.log('Uploaded file: ', uploadedFile)
     const awsFileURL = `https://haas-autodeck-logos.s3.eu-central-1.amazonaws.com/${fileKey}`
 
+    if (fileName !== 'website_screenshot') {
+      const message = { 'bucket': 'haas-autodeck-logos', 'key': fileKey };
+      AutodeckService.resizeImage(message);
+    }
+
     return { url: awsFileURL };
   },
 })
