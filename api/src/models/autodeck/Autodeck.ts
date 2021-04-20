@@ -26,7 +26,9 @@ export const JobProcessLocation = objectType({
   definition(t) {
     t.string('id');
     t.string('name');
-    t.string('path')
+    t.string('path');
+    t.int('xMaterialDimension');
+    t.int('yMaterialDimension');
     t.field('type', {
       type: JobProcessLocationType
     })
